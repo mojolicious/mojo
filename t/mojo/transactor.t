@@ -19,7 +19,7 @@ $t->add_generator(
   }
 );
 
-# Simle GET
+# Simple GET
 my $tx = $t->tx(GET => 'mojolicio.us/foo.html?bar=baz');
 is $tx->req->url->to_abs, 'http://mojolicio.us/foo.html?bar=baz', 'right URL';
 is $tx->req->method, 'GET', 'right method';

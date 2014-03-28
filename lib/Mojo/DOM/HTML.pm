@@ -49,6 +49,12 @@ my $TOKEN_RE = qr/
   )??
 /xis;
 
+# HTML elements that only contain raw text
+my %RAW = map { $_ => 1 } qw(script style);
+
+# HTML elements that only contain raw text and entities
+my %RCDATA = map { $_ => 1 } qw(title textarea);
+
 # HTML elements with optional end tags
 my %END = (
   body => ['head'],
@@ -85,6 +91,17 @@ my @PHRASING = (
 my @OBSOLETE = qw(acronym applet basefont big font strike tt);
 my %PHRASING = map { $_ => 1 } @OBSOLETE, @PHRASING;
 
+# HTML elements that don't get their self-closing flag acknowledged
+my %BLOCK = map { $_ => 1 } (
+  qw(a address applet article aside b big blockquote body button caption),
+  qw(center code col colgroup dd details dialog dir div dl dt em fieldset),
+  qw(figcaption figure font footer form frameset h1 h2 h3 h4 h5 h6 head),
+  qw(header hgroup html i iframe li listing main marquee menu nav nobr),
+  qw(noembed noframes noscript object ol optgroup option p plaintext pre rp),
+  qw(rt s script section select small strike strong style summary table),
+  qw(tbody td template textarea tfoot th thead title tr tt u ul xmp)
+);
+
 sub parse {
   my ($self, $html) = @_;
 
@@ -109,26 +126,28 @@ sub parse {
         my ($start, $attr) = ($xml ? $1 : lc($1), $2);
 
         # Attributes
-        my %attrs;
+        my (%attrs, $closing);
         while ($attr =~ /$ATTR_RE/g) {
           my ($key, $value) = ($xml ? $1 : lc($1), $2 // $3 // $4);
 
           # Empty tag
-          next if $key eq '/';
+          ++$closing and next if $key eq '/';
 
           $attrs{$key} = defined $value ? html_unescape($value) : $value;
         }
 
+        # "image" is an alias for "img"
+        $start = 'img' if !$xml && $start eq 'image';
         _start($start, \%attrs, $xml, \$current);
 
-        # Element without end tag
+        # Element without end tag (self-closing)
         _end($start, $xml, \$current)
-          if (!$xml && $EMPTY{$start}) || $attr =~ m!/\s*$!;
+          if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
 
-        # Relaxed "script" or "style" HTML elements
-        next if $xml || ($start ne 'script' && $start ne 'style');
+        # Raw text elements
+        next if $xml || !$RAW{$start} && !$RCDATA{$start};
         next unless $html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi;
-        _node($current, 'raw', $1);
+        _node($current, 'raw', $RCDATA{$start} ? html_unescape $1 : $1);
         _end($start, 0, \$current);
       }
     }

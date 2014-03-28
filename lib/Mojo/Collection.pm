@@ -99,7 +99,7 @@ sub _flatten {
   map { _ref($_) ? _flatten(@$_) : $_ } @_;
 }
 
-sub _ref { ref $_[0] eq 'ARRAY' || (blessed $_[0] && $_[0]->isa(__PACKAGE__)) }
+sub _ref { ref $_[0] eq 'ARRAY' || blessed $_[0] && $_[0]->isa(__PACKAGE__) }
 
 1;
 

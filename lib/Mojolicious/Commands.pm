@@ -306,7 +306,7 @@ Try to detect environment.
   $commands->run(@ARGV);
 
 Load and run commands. Automatic deployment environment detection can be
-disabled with the MOJO_NO_DETECT environment variable.
+disabled with the C<MOJO_NO_DETECT> environment variable.
 
 =head2 start_app
 

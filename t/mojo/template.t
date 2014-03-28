@@ -762,7 +762,6 @@ $mt->parse(<<'EOF');
 </html>
 EOF
 $mt->build;
-like $mt->code,   qr/^package /,        'right code';
 like $mt->code,   qr/lala/,             'right code';
 unlike $mt->code, qr/ comment lalala /, 'right code';
 ok !defined($mt->compiled), 'nothing compiled';
@@ -933,6 +932,15 @@ works!
 great!
 EOF
 is $output, "works!\ngreat!\n", 'comments did not affect the result';
+
+# Inline comment on last line
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% if (1) {
+works!
+% }   # tset
+EOF
+is $output, "works!\n", 'comment did not affect the result';
 
 # Multiline expression
 $mt     = Mojo::Template->new;

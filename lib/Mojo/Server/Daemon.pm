@@ -1,7 +1,6 @@
 package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
-use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::URL;
 use POSIX;
@@ -35,17 +34,18 @@ sub setuidgid {
 
   # Group
   if (my $group = $self->group) {
-    croak qq{Group "$group" does not exist}
+    return $self->_log(error => qq{Group "$group" does not exist.})
       unless defined(my $gid = getgrnam $group);
-    POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
+    return $self->_log(error => qq{Can't switch to group "$group": $!})
+      unless POSIX::setgid($gid);
   }
 
   # User
-  if (my $user = $self->user) {
-    croak qq{User "$user" does not exist}
-      unless defined(my $uid = getpwnam $user);
-    POSIX::setuid($uid) or croak qq{Can't switch to user "$user": $!};
-  }
+  return $self unless my $user = $self->user;
+  return $self->_log(error => qq{User "$user" does not exist.})
+    unless defined(my $uid = getpwnam $user);
+  return $self->_log(error => qq{Can't switch to user "$user": $!})
+    unless POSIX::setuid($uid);
 
   return $self;
 }
@@ -185,24 +185,21 @@ sub _listen {
 
       $stream->on(close => sub { $self->_close($id) });
       $stream->on(
-        error => sub {
-          return unless $self;
-          $self->app->log->error(pop);
-          $self->_close($id);
-        }
-      );
+        error => sub { $self && $self->_log(error => pop)->_close($id) });
       $stream->on(read => sub { $self->_read($id => pop) });
       $stream->on(timeout =>
-          sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
+          sub { $self->_log(debug => 'Inactivity timeout.') if $c->{tx} });
     }
   );
 
   return if $self->silent;
-  $self->app->log->info(qq{Listening at "$url".});
+  $self->_log(info => qq{Listening at "$url".});
   $query->params([]);
   $url->host('127.0.0.1') if $url->host eq '*';
   say "Server available at $url.";
 }
+
+sub _log { $_[0]->app->log->log(@_[1, 2]) and return $_[0] }
 
 sub _read {
   my ($self, $id, $chunk) = @_;
@@ -298,9 +295,9 @@ support.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
+L<IO::Socket::SSL> (1.84+) will be used automatically by L<Mojo::IOLoop> if
 they are installed. Individual features can also be disabled with the
-MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
+C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
@@ -340,7 +337,7 @@ Group for server process.
   $daemon     = $daemon->inactivity_timeout(5);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-closed, defaults to the value of the MOJO_INACTIVITY_TIMEOUT environment
+closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
 variable or C<15>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 
@@ -358,7 +355,7 @@ L<Mojo::IOLoop> singleton.
   $daemon    = $daemon->listen(['https://localhost:3000']);
 
 List of one or more locations to listen on, defaults to the value of the
-MOJO_LISTEN environment variable or C<http://*:3000>.
+C<MOJO_LISTEN> environment variable or C<http://*:3000>.
 
   # Listen on all IPv4 interfaces
   $daemon->listen(['http://*:3000']);
@@ -488,7 +485,7 @@ Stop accepting connections.
 
 =head1 DEBUGGING
 
-You can set the MOJO_DAEMON_DEBUG environment variable to get some advanced
+You can set the C<MOJO_DAEMON_DEBUG> environment variable to get some advanced
 diagnostics information printed to C<STDERR>.
 
   MOJO_DAEMON_DEBUG=1

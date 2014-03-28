@@ -84,7 +84,8 @@ sub render {
   my $options = {
     encoding => $self->encoding,
     handler  => $stash->{handler},
-    template => delete $stash->{template}
+    template => delete $stash->{template},
+    variant  => $stash->{variant}
   };
   my $inline = $options->{inline} = delete $stash->{inline};
   $options->{handler} //= $self->default_handler if defined $inline;
@@ -149,33 +150,28 @@ sub template_for {
 
 sub template_handler {
   my ($self, $options) = @_;
-
-  # Templates
   return undef unless my $file = $self->template_name($options);
-  unless ($self->{templates}) {
-    s/\.(\w+)$// and $self->{templates}{$_} ||= $1
-      for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
-  }
-  return $self->{templates}{$file} if exists $self->{templates}{$file};
-
-  # DATA templates
-  unless ($self->{data}) {
-    my $loader = Mojo::Loader->new;
-    my @templates = map { sort keys %{$loader->data($_)} } @{$self->classes};
-    s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
-  }
-  return $self->{data}{$file} if exists $self->{data}{$file};
-
-  # Default
-  return $self->default_handler;
+  return $self->default_handler unless my $handlers = $self->_handlers($file);
+  return $handlers->[0];
 }
 
 sub template_name {
   my ($self, $options) = @_;
+
   return undef unless my $template = $options->{template};
   return undef unless my $format   = $options->{format};
+  $template .= ".$format";
+
+  # Variants
   my $handler = $options->{handler};
-  return defined $handler ? "$template.$format.$handler" : "$template.$format";
+  if (defined(my $variant = $options->{variant})) {
+    $variant = "$template+$variant";
+    my $handlers = $self->_handlers($variant) // [];
+    $template = $variant
+      if @$handlers && !defined $handler || grep { $_ eq $handler } @$handlers;
+  }
+
+  return defined $handler ? "$template.$handler" : $template;
 }
 
 sub template_path {
@@ -190,8 +186,7 @@ sub template_path {
     return $file if -r $file;
   }
 
-  # Fall back to first path
-  return catfile($self->paths->[0], split '/', $name);
+  return undef;
 }
 
 sub _add {
@@ -207,6 +202,24 @@ sub _extends {
   my $layout = delete $stash->{layout};
   $stash->{extends} ||= join('/', 'layouts', $layout) if $layout;
   return delete $stash->{extends};
+}
+
+sub _handlers {
+  my ($self, $file) = @_;
+
+  unless ($self->{templates}) {
+
+    # Templates
+    s/\.(\w+)$// and push @{$self->{templates}{$_}}, $1
+      for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
+
+    # DATA templates
+    my $loader = Mojo::Loader->new;
+    s/\.(\w+)$// and push @{$self->{templates}{$_}}, $1
+      for map { sort keys %{$loader->data($_)} } @{$self->classes};
+  }
+
+  return $self->{templates}{$file};
 }
 
 sub _render_template {
@@ -327,7 +340,7 @@ implements the following new ones.
   my $best = $renderer->accepts(Mojolicious::Controller->new, 'html', 'json');
 
 Select best possible representation for L<Mojolicious::Controller> object from
-C<Accept> request header, C<format> stash value or C<format> GET/POST
+C<Accept> request header, C<format> stash value or C<format> C<GET>/C<POST>
 parameter, defaults to returning the first extension if no preference could be
 detected. Since browsers often don't really know what they actually want,
 unspecific C<Accept> request headers with more than one MIME type will be

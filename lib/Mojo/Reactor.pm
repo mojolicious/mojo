@@ -2,7 +2,7 @@ package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use IO::Poll qw(POLLERR POLLHUP POLLIN);
+use IO::Poll qw(POLLERR POLLHUP POLLIN POLLPRI);
 use Mojo::Loader;
 
 sub again { croak 'Method "again" not implemented by subclass' }
@@ -18,9 +18,9 @@ sub is_readable {
   my ($self, $handle) = @_;
 
   my $test = $self->{test} ||= IO::Poll->new;
-  $test->mask($handle, POLLIN);
+  $test->mask($handle, POLLIN | POLLPRI);
   $test->poll(0);
-  my $result = $test->handles(POLLIN | POLLERR | POLLHUP);
+  my $result = $test->handles(POLLIN | POLLPRI | POLLERR | POLLHUP);
   $test->remove($handle);
 
   return !!$result;
@@ -44,7 +44,7 @@ sub watch     { croak 'Method "watch" not implemented by subclass' }
 
 =head1 NAME
 
-Mojo::Reactor - Low level event reactor base class
+Mojo::Reactor - Low-level event reactor base class
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Mojo::Reactor - Low level event reactor base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor> is an abstract base class for low level event reactors.
+L<Mojo::Reactor> is an abstract base class for low-level event reactors.
 
 =head1 EVENTS
 
@@ -105,7 +105,7 @@ Restart active timer. Meant to be overloaded in a subclass.
   my $class = Mojo::Reactor->detect;
 
 Detect and load the best reactor implementation available, will try the value
-of the MOJO_REACTOR environment variable, L<Mojo::Reactor::EV> or
+of the C<MOJO_REACTOR> environment variable, L<Mojo::Reactor::EV> or
 L<Mojo::Reactor::Poll>.
 
   # Instantiate best reactor implementation available

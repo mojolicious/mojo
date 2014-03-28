@@ -26,7 +26,7 @@ presentation and input.
            +------------+    +-------+    +------+
 
 A slightly modified version of the pattern moving some application logic into
-the C<controller> is the foundation of pretty much every web framework these
+the I<controller> is the foundation of pretty much every web framework these
 days, including L<Mojolicious>.
 
               +----------------+     +-------+
@@ -37,9 +37,9 @@ days, including L<Mojolicious>.
   Response <- |                | <-> | View  |
               +----------------+     +-------+
 
-The C<controller> receives a request from a user, passes incoming data to the
-C<model> and retrieves data from it, which then gets turned into an actual
-response by the C<view>. But note that this pattern is just a guideline that
+The I<controller> receives a request from a user, passes incoming data to the
+I<model> and retrieves data from it, which then gets turned into an actual
+response by the I<view>. But note that this pattern is just a guideline that
 most of the time results in cleaner more maintainable code, not a rule that
 should be followed at all costs.
 
@@ -49,8 +49,8 @@ REST is a software architectural style for distributed hypermedia systems such
 as the web. While it can be applied to many protocols it is most commonly used
 with HTTP these days. In REST terms, when you are opening a URL like
 C<http://mojolicio.us/foo> with your browser, you are basically asking the web
-server for the HTML C<representation> of the C<http://mojolicio.us/foo>
-C<resource>.
+server for the HTML I<representation> of the C<http://mojolicio.us/foo>
+I<resource>.
 
   +--------+                                +--------+
   |        | -> http://mojolicio.us/foo  -> |        |
@@ -79,8 +79,9 @@ all session state is kept client-side.
   |         | <-    200 OK        <- |            |
   +---------+                        +------------+
 
-While HTTP methods such as PUT, GET and DELETE are not directly part of REST
-they go very well with it and are commonly used to manipulate C<resources>.
+While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part
+of REST they go very well with it and are commonly used to manipulate
+I<resources>.
 
 =head2 Sessions
 
@@ -112,8 +113,8 @@ ids were exchanged between browser and web server in the form of cookies.
   Set-Cookie: session=hmac-sha1(base64(json($session)))
 
 In L<Mojolicious> however we are taking this concept one step further by
-storing everything C<JSON> serialized and C<Base64> encoded in C<HMAC-SHA1>
-signed cookies, which is more compatible with the REST philosophy and reduces
+storing everything JSON serialized and Base64 encoded in HMAC-SHA1 signed
+cookies, which is more compatible with the REST philosophy and reduces
 infrastructure requirements.
 
 =head2 Test Driven Development
@@ -161,7 +162,9 @@ organized CPAN distribution to maximize maintainability.
      +- example              # Template directory for "Example" controller
         +- welcome.html.ep   # Template for "welcome" action
 
-Both application skeletons can be automatically generated.
+Both application skeletons can be automatically generated with the commands
+L<Mojolicious::Command::generate::lite_app> and
+L<Mojolicious::Command::generate::app>.
 
   $ mojo generate lite_app myapp.pl
   $ mojo generate app MyApp
@@ -235,8 +238,8 @@ logic related to matching usernames and passwords.
   1;
 
 A simple helper can be registered with the function
-L<Mojolicious::Lite/"helper"> to make our C<model> available to all actions
-and templates.
+L<Mojolicious::Lite/"helper"> to make our model available to all actions and
+templates.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
@@ -266,7 +269,8 @@ and templates.
   app->start;
 
 The method L<Mojolicious::Controller/"param"> is used to access query
-parameters, POST parameters, file uploads and route placeholders, all at once.
+parameters, C<POST> parameters, file uploads and route placeholders, all at
+once.
 
 =head2 Testing
 
@@ -314,14 +318,15 @@ on L<Mojo::DOM>.
 
   done_testing();
 
-From now on you can always check your progress by running these unit tests
-against your application.
+Your application won't pass these tests, but from now on you can use them to
+check your progress with the command L<Mojolicious::Command::test>.
 
   $ ./myapp.pl test
   $ ./myapp.pl test t/login.t
   $ ./myapp.pl test -v t/login.t
 
-Or perform quick requests right from the command line.
+Or perform quick requests right from the command line with
+L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get /
   Wrong username or password.
@@ -352,7 +357,7 @@ L<Mojolicious/"secrets">.
 
   app->secrets(['Mojolicious rocks']);
 
-This passphrase is used by the C<HMAC-SHA1> algorithm to make signed cookies
+This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
 
   $self->session(user => 'sri');
@@ -376,13 +381,13 @@ method L<Mojolicious::Controller/"flash">.
   $self->redirect_to('goodbye');
 
 Just remember that all session data gets serialized with L<Mojo::JSON> and
-stored in C<HMAC-SHA1> signed cookies, which usually have a 4096 byte limit,
+stored in HMAC-SHA1 signed cookies, which usually have a C<4096> byte limit,
 depending on browser.
 
 =head2 Final prototype
 
-A final C<myapp.pl> prototype passing all of the unit tests above could look
-like this.
+A final C<myapp.pl> prototype passing all of the tests above could look like
+this.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
@@ -487,7 +492,7 @@ possibilities.
 
 All templates and static files inlined in the C<DATA> section can be
 automatically turned into separate files in the C<templates> and C<public>
-directories.
+directories with the command L<Mojolicious::Command::inflate>.
 
   $ ./myapp.pl inflate
 
@@ -555,7 +560,7 @@ applications can use nested routes they have no need for C<group> blocks.
 =head2 Simplified application script
 
 C<myapp.pl> itself can now be turned into a simplified application script to
-allow running unit tests again.
+allow running tests again.
 
   #!/usr/bin/env perl
 

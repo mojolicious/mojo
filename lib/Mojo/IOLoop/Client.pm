@@ -14,7 +14,7 @@ use constant IPV6 => $ENV{MOJO_NO_IPV6}
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.75 (); 1';
+  : eval 'use IO::Socket::SSL 1.84 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -97,7 +97,7 @@ sub _try {
 
   return $self->_cleanup->emit_safe(connect => $handle)
     if !$args->{tls} || $handle->isa('IO::Socket::SSL');
-  return $self->emit(error => 'IO::Socket::SSL 1.75 required for TLS support')
+  return $self->emit(error => 'IO::Socket::SSL 1.84 required for TLS support')
     unless TLS;
 
   # Upgrade
@@ -105,10 +105,10 @@ sub _try {
   my %options = (
     SSL_ca_file => $args->{tls_ca}
       && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_cert_file       => $args->{tls_cert},
-    SSL_error_trap      => sub { $self->_cleanup->emit(error => $_[1]) },
-    SSL_hostname        => $args->{address},
-    SSL_key_file        => $args->{tls_key},
+    SSL_cert_file  => $args->{tls_cert},
+    SSL_error_trap => sub { $self->_cleanup->emit(error => $_[1]) },
+    SSL_hostname   => IO::Socket::SSL->can_client_sni ? $args->{address} : '',
+    SSL_key_file   => $args->{tls_key},
     SSL_startHandshake  => 0,
     SSL_verify_mode     => $args->{tls_ca} ? 0x01 : 0x00,
     SSL_verifycn_name   => $args->{address},
@@ -184,7 +184,7 @@ L<Mojo::IOLoop::Client> implements the following attributes.
   my $reactor = $client->reactor;
   $client     = $client->reactor(Mojo::Reactor::Poll->new);
 
-Low level event reactor, defaults to the C<reactor> attribute value of the
+Low-level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS
@@ -197,7 +197,7 @@ implements the following new ones.
   $client->connect(address => '127.0.0.1', port => 3000);
 
 Open a socket connection to a remote host. Note that TLS support depends on
-L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.20+).
+L<IO::Socket::SSL> (1.84+) and IPv6 support on L<IO::Socket::IP> (0.20+).
 
 These options are currently available:
 

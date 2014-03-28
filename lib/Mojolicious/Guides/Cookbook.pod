@@ -230,7 +230,7 @@ such as C<FCGI>, C<uWSGI> and C<mod_perl>.
   $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
 If an older server adapter is not be able to correctly detect the application
-home directory, you can simply use the MOJO_HOME environment variable.
+home directory, you can simply use the C<MOJO_HOME> environment variable.
 
   $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
@@ -314,6 +314,7 @@ with this little L<Mojo::Server> based mock server you can just embed them.
   say for @{$app->static->paths};
   say $app->config->{secret_identity};
   say $app->dumper({just => 'a helper test'});
+  say $app->build_controller->render(template => 'foo', partial => 1);
 
 The plugin L<Mojolicious::Plugin::Mount> uses this functionality to allow you
 to combine multiple applications into one and deploy them together.
@@ -491,7 +492,7 @@ created at startup time.
 
   app->start;
 
-Since timers and other low level event watchers are also independent from
+Since timers and other low-level event watchers are also independent from
 applications, errors can't get logged automatically, you can change that by
 subscribing to the event L<Mojo::Reactor/"error">.
 
@@ -777,15 +778,17 @@ application.
 
 =head1 USER AGENT
 
-When we say L<Mojolicious> is a web framework we actually mean it.
+When we say L<Mojolicious> is a web framework we actually mean it, with
+L<Mojo::UserAgent> there's a full featured HTTP and WebSocket user agent built
+right in.
 
 =head2 Web scraping
 
 Scraping information from web sites has never been this much fun before. The
 built-in HTML/XML parser L<Mojo::DOM> is accessible through
 L<Mojo::Message/"dom"> and supports all CSS selectors that make sense for a
-standalone parser, it can be a very powerful tool especially for unit testing
-web application.
+standalone parser, it can be a very powerful tool especially for testing web
+application.
 
   use Mojo::UserAgent;
 
@@ -909,7 +912,7 @@ L<Mojo::UserAgent::Transactor/"tx">.
 
 When downloading large files with L<Mojo::UserAgent> you don't have to worry
 about memory usage at all, because it will automatically stream everything
-above C<250KB> into a temporary file, which can then be moved into a permanent
+above 250KB into a temporary file, which can then be moved into a permanent
 file with L<Mojo::Asset::File/"move_to">.
 
   use Mojo::UserAgent;
@@ -919,8 +922,9 @@ file with L<Mojo::Asset::File/"move_to">.
   my $tx = $ua->get('latest.mojolicio.us');
   $tx->res->content->asset->move_to('mojo.tar.gz');
 
-To protect you from excessively large files there is also a limit of C<10MB>
-by default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
+To protect you from excessively large files there is also a limit of 10MB by
+default, which you can tweak with the attribute
+L<Mojo::Message/"max_message_size"> or C<MOJO_MAX_MESSAGE_SIZE> environment
 variable.
 
   # Increase limit to 1GB
@@ -1300,7 +1304,7 @@ CPAN module.
   $ make manifest
   $ make dist
 
-And if you have a C<PAUSE> account (which can be requested at
+And if you have a PAUSE account (which can be requested at
 L<http://pause.perl.org>) even upload it.
 
   $ mojo cpanify -u USER -p PASS MyApp-0.01.tar.gz

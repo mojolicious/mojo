@@ -311,9 +311,9 @@ is loaded.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.75+) will be used automatically if they are installed.
-Individual features can also be disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS
-environment variables.
+L<IO::Socket::SSL> (1.84+) will be used automatically if they are installed.
+Individual features can also be disabled with the C<MOJO_NO_IPV6> and
+C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB"> for more.
 
@@ -380,7 +380,7 @@ Number of connections to accept at once, defaults to C<50>.
   my $reactor = $loop->reactor;
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
-Low level event reactor, usually a L<Mojo::Reactor::Poll> or
+Low-level event reactor, usually a L<Mojo::Reactor::Poll> or
 L<Mojo::Reactor::EV> object with a default subscriber to the event
 L<Mojo::Reactor/"error">.
 
@@ -620,7 +620,7 @@ seconds.
 
 =head1 DEBUGGING
 
-You can set the MOJO_IOLOOP_DEBUG environment variable to get some advanced
+You can set the C<MOJO_IOLOOP_DEBUG> environment variable to get some advanced
 diagnostics information printed to C<STDERR>.
 
   MOJO_IOLOOP_DEBUG=1

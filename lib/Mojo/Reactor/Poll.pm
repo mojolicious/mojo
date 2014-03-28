@@ -1,7 +1,7 @@
 package Mojo::Reactor::Poll;
 use Mojo::Base 'Mojo::Reactor';
 
-use IO::Poll qw(POLLERR POLLHUP POLLIN POLLOUT);
+use IO::Poll qw(POLLERR POLLHUP POLLIN POLLOUT POLLPRI);
 use List::Util 'min';
 use Mojo::Util qw(md5_sum steady_time);
 use Time::HiRes 'usleep';
@@ -43,7 +43,7 @@ sub one_tick {
     if (keys %{$self->{io}}) {
       $poll->poll($timeout);
       ++$i and $self->_sandbox('Read', $self->{io}{fileno $_}{cb}, 0)
-        for $poll->handles(POLLIN | POLLHUP | POLLERR);
+        for $poll->handles(POLLIN | POLLPRI | POLLHUP | POLLERR);
       ++$i and $self->_sandbox('Write', $self->{io}{fileno $_}{cb}, 1)
         for $poll->handles(POLLOUT);
     }
@@ -95,8 +95,8 @@ sub watch {
 
   my $poll = $self->_poll;
   $poll->remove($handle);
-  if ($read && $write) { $poll->mask($handle, POLLIN | POLLOUT) }
-  elsif ($read)  { $poll->mask($handle, POLLIN) }
+  if ($read && $write) { $poll->mask($handle, POLLIN | POLLPRI | POLLOUT) }
+  elsif ($read)  { $poll->mask($handle, POLLIN | POLLPRI) }
   elsif ($write) { $poll->mask($handle, POLLOUT) }
 
   return $self;
@@ -128,7 +128,7 @@ sub _timer {
 
 =head1 NAME
 
-Mojo::Reactor::Poll - Low level event reactor with poll support
+Mojo::Reactor::Poll - Low-level event reactor with poll support
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ Mojo::Reactor::Poll - Low level event reactor with poll support
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::Poll> is a low level event reactor based on L<IO::Poll>.
+L<Mojo::Reactor::Poll> is a low-level event reactor based on L<IO::Poll>.
 
 =head1 EVENTS
 

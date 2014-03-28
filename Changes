@@ -1,5 +1,34 @@
 
-4.88  2014-03-05
+4.91  2014-03-27
+  - Removed deprecated secret method from Mojolicious.
+  - Improved performance of Mojolicious::Plugin::EPRenderer and
+    Mojolicious::Plugin::EPLRenderer.
+  - Improved Mojo::Reactor::Poll portability with POLLPRI support.
+
+4.90  2014-03-16
+  - Removed deprecated to_rel method from Mojo::URL.
+  - Updated IO::Socket::SSL requirement to 1.84 due to breaking changes in
+    IO::Socket::SSL.
+  - Improved documentation browser with more accessible links and readable
+    inline code.
+  - Fixed textarea and title parsing bugs in Mojo::DOM::HTML.
+
+4.89  2014-03-13
+  - Added support for template variants.
+  - Improved built-in templates with unobtrusive menu bar.
+  - Fixed bug in Mojo::DOM::HTML where non-self-closing elements were not
+    handled correctly.
+  - Fixed bug in Mojo::DOM::HTML where <image> was not treated as an alias for
+    <img>.
+
+4.88  2014-03-09
+  - Added build_controller method to Mojolicious.
+  - Added match method to Mojolicious::Routes.
+  - Improved Mojo::Server::Daemon to handle setuid/setgid errors more
+    gracefully.
+  - Improved Mojo::Server::Prefork to handle lock file errors more gracefully.
+  - Improved exception page to show better context information for templates.
+  - Fixed comment on last line bug in Mojo::Template.
 
 4.87  2014-03-04
   - Improved Mojo::ByteStream to allow more method chaining.
@@ -1038,7 +1067,7 @@
   - Improved documentation.
 
 3.13  2012-07-24
-  - Added multi name support to param method in Mojolicious::Controller.
+  - Added multi-name support to param method in Mojolicious::Controller.
   - Added remove method to Mojo::DOM.
   - Improved RFC 3986 compliance of Mojo::Parameters.
   - Improved Mojolicious::Plugin::Config log messages. (jberger)
@@ -2657,7 +2686,7 @@
   - Fixed connection reset handling in Mojo::IOLoop.
 
 0.999935  2010-11-03
-  - Added EXPERIMENTAL module Mojo::Util as a faster low level alternative to
+  - Added EXPERIMENTAL module Mojo::Util as a faster low-level alternative to
     Mojo::ByteStream and rewrote many internals to use it instead.
   - Improved Mojo::IOLoop performance by about 20%.
   - Made automatic file storage upgrade smarter.
@@ -3507,7 +3536,7 @@
   - Changed MojoX::Renderer and Mojo::Template API to make catching errors
     easier, we now use a scalar ref for results like most template engines.
   - Added MojoX::Context.
-  - Added multi level controller class support to Mojolicious.
+  - Added multi-level controller class support to Mojolicious.
   - MojoX::Dispatcher::Routes should be able to fail.
   - Added diagnostics functions to Mojo::HelloWorld.
   - Made the env parser Apache compatible.
@@ -3570,7 +3599,7 @@
     versions of formerly aliased attributes.
   - Fixed application/x-www-form-urlencoded.
   - Fixed support for query strings.
-  - Fixed multi query parameter support.
+  - Fixed multi-value query parameter support.
   - Added a context class to the Mojolicious generator.
   - Cleaned up Mojo::Server API. (Mark Stosberg)
   - Increased Mojo::Template performance. (Pedro Melo)

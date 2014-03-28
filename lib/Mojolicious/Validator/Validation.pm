@@ -211,10 +211,10 @@ Change validation L</"topic">.
 
 =head2 param
 
-  my @names       = $c->param;
-  my $foo         = $c->param('foo');
-  my @foo         = $c->param('foo');
-  my ($foo, $bar) = $c->param(['foo', 'bar']);
+  my @names       = $validation->param;
+  my $foo         = $validation->param('foo');
+  my @foo         = $validation->param('foo');
+  my ($foo, $bar) = $validation->param(['foo', 'bar']);
 
 Access validated parameters, similar to L<Mojolicious::Controller/"param">.
 
@@ -228,7 +228,7 @@ empty string.
 =head1 AUTOLOAD
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
-validation checks provided by L<Mojolicious::Validator> on
+validation checks provided by L</"validator"> on
 L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
 
   $validation->required('foo')->size(2, 5)->like(qr/^[A-Z]/);

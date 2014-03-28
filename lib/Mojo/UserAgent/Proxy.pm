@@ -86,9 +86,9 @@ implements the following new ones.
 
   $proxy = $proxy->detect;
 
-Check environment variables HTTP_PROXY, http_proxy, HTTPS_PROXY, https_proxy,
-NO_PROXY and no_proxy for proxy information. Automatic proxy detection can be
-enabled with the MOJO_PROXY environment variable.
+Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>,
+C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information. Automatic
+proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
 
 =head2 inject
 

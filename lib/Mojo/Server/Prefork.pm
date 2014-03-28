@@ -24,7 +24,7 @@ sub DESTROY {
   my $self = shift;
 
   # Worker
-  return unless $self->{finished};
+  return if $self->{worker};
 
   # Manager
   if (my $file = $self->{lock_file}) { unlink $file if -w $file }
@@ -169,10 +169,10 @@ sub _spawn {
     unless open my $handle, '>', $file;
 
   # Change user/group
-  my $loop = $self->setuidgid->ioloop;
+  $self->setuidgid->{worker}++;
 
   # Accept mutex
-  $loop->lock(
+  my $loop = $self->ioloop->lock(
     sub {
 
       # Blocking ("ualarm" can't be imported on Windows)

@@ -19,12 +19,14 @@ use Mojo::Util 'spurt';
 my $prefork = Mojo::Server::Prefork->new;
 my $file    = $prefork->pid_file;
 ok !$prefork->check_pid, 'no process id';
-$prefork->ensure_pid_file;
-ok -e $file, 'file exists';
-is $prefork->check_pid, $$, 'right process id';
 spurt "\n", $file;
 ok -e $file, 'file exists';
 ok !$prefork->check_pid, 'no process id';
+ok !-e $file, 'file has been cleaned up';
+$prefork->ensure_pid_file;
+ok -e $file, 'file exists';
+is $prefork->check_pid, $$, 'right process id';
+undef $prefork;
 ok !-e $file, 'file has been cleaned up';
 
 # Multiple workers and graceful shutdown

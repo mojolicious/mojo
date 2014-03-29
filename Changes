@@ -1,4 +1,6 @@
 
+4.92  2014-03-30
+
 4.91  2014-03-29
   - Added daemonize method to Mojo::Server.
   - Added ensure_pid_file method to Mojo::Server::Prefork.

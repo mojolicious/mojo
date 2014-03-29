@@ -610,8 +610,8 @@ operations to finish before reaching the next dispatch cycle.
 
 From the tutorial you should already know L<Mojolicious::Lite> routes, which
 are in fact just a small convenience layer around everything described above
-and accessible through methods like L<Mojolicious::Routes::Route/"get"> as
-part of the normal router.
+and accessible through methods like L<Mojolicious::Routes::Route/"get"> and
+L<Mojolicious::Routes::Route/"any"> as part of the normal router.
 
   # POST /foo -> {controller => 'foo', action => 'abc'}
   $r->post('/foo')->to(controller => 'foo', action => 'abc');

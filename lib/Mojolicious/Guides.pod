@@ -133,6 +133,10 @@ designed to be used with it and are being developed under the same umbrella.
 
 Pure-Perl non-blocking I/O MongoDB driver.
 
+=item L<Minion>
+
+Job queue.
+
 =back
 
 =head1 REFERENCE

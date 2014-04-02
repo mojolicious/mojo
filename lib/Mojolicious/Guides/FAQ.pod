@@ -71,6 +71,15 @@ In addition we will also keep the distribution installable up to a certain
 legacy version that we deem worthy of supporting, but not specifically
 optimize for it, this is currently 5.10.1.
 
+=head2 Do I need to clean my environment before testing Mojolicious?
+
+Mojolicious uses many environment variables both internally and externally,
+notably (but not exclusively) those starting with the prefix C<MOJO_*>. The 
+test suite expects a clean environment; testing with a non-standard
+environment is unsupported and is unlikely to succeed. Therefore when
+installing or upgrading Mojolicious and when running its tests, we highly
+recommend using an environment which does not set these variables.
+
 =head2 What is the difference between blocking and non-blocking operations?
 
 A I<blocking> operation is a subroutine that blocks the execution of the

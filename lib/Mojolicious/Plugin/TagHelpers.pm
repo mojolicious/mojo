@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
-use Mojo::Util qw(deprecated xml_escape);
+use Mojo::Util 'xml_escape';
 use Scalar::Util 'blessed';
 
 sub register {
@@ -156,13 +156,6 @@ sub _select_field {
 
   my $groups = '';
   for my $group (@$options) {
-
-    # DEPRECATED in Top Hat!
-    if (ref $group eq 'HASH') {
-      deprecated
-        'hash references are DEPRECATED in favor of Mojo::Collection objects';
-      $group = Mojo::Collection->new(each %$group);
-    }
 
     # "optgroup" tag
     if (blessed $group && $group->isa('Mojo::Collection')) {

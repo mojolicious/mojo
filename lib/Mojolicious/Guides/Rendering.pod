@@ -309,8 +309,8 @@ Since everything is just Perl normal control structures just work.
     <%= $framework %> was written by <%= $author %>.
   % }
 
-  % while (my ($app, $description) = each %$examples) {
-    <%= $app %> is a <%= $description %>.
+  % if (my $description = $examples->{tweetylicious}) {
+    Tweetylicious is a <%= $description %>.
   % }
 
 =head2 Content negotiation

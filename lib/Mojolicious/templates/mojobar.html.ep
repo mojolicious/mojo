@@ -1,6 +1,6 @@
 %= javascript '/mojo/jquery/jquery.js'
 <div id="mojobar">
-  %= stylesheet scoped => 'scoped', begin
+  <style scoped="scoped">
     #mojobar {
       background-color: #1a1a1a;
       background: -webkit-linear-gradient(top, #2a2a2a 0%, #000 100%);
@@ -46,7 +46,7 @@
     #mojobar-links input:focus { outline: 0 }
     #mojobar-links form { display: inline }
     .animated { transition: top 0.2s ease-in-out }
-  % end
+  </style>
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin
       %= image '/mojo/logo-white.png', alt => 'Mojolicious logo'

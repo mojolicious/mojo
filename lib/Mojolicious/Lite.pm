@@ -917,7 +917,7 @@ and return them with L<Mojolicious::Controller/"send">.
   <html>
     <head>
       <title>Echo</title>
-      %= javascript begin
+      <script>
         var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
         ws.onmessage = function (event) {
           document.body.innerHTML += JSON.parse(event.data).msg;
@@ -925,7 +925,7 @@ and return them with L<Mojolicious::Controller/"send">.
         ws.onopen = function (event) {
           ws.send(JSON.stringify({msg: 'I ♥ Mojolicious!'}));
         };
-      % end
+      </script>
     </head>
   </html>
 

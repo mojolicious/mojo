@@ -705,10 +705,10 @@ with methods like L<Mojolicious::Validator::Validation/"is_valid">.
   <!DOCTYPE html>
   <html>
     <head>
-      %= stylesheet begin
+      <style>
         label.field-with-error { color: #dd7e5e }
         input.field-with-error { background-color: #fd9e7e }
-      % end
+      </style>
     </head>
     <body>
       %= form_for index => begin

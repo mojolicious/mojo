@@ -67,7 +67,7 @@
     %= end
   </div>
 </div>
-%= javascript begin
+<script>
   var mojobar = $('#mojobar');
   var mojobarHeight = mojobar.outerHeight();
   function fixOffset() {
@@ -120,4 +120,4 @@
       fixOffset();
     });
   });
-% end
+</script>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head><title>Page not found</title></head>
-   %= stylesheet begin
+  <style>
       a img { border: 0 }
       body { background-color: #caecf6 }
       #noraptor {
@@ -19,7 +19,7 @@
         top: 50%;
         width: 306px;
       }
-    % end
+    </style>
   <body>
     %= link_to url_for->base => begin
       %= image '/mojo/noraptor.png', alt => 'Bye!', id => 'noraptor'

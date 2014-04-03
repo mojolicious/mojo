@@ -4,7 +4,7 @@
     <title><%= $title %></title>
     %= javascript '/mojo/prettify/run_prettify.js'
     %= stylesheet '/mojo/prettify/prettify-mojo-light.css'
-    %= stylesheet begin
+    <style>
       a { color: inherit }
       a:hover { color: #2a2a2a }
       a img { border: 0 }
@@ -75,7 +75,7 @@
       h1:hover .permalink, h2:hover .permalink, h3:hover .permalink {
         display: block;
       }
-    % end
+    </style>
   </head>
   <body>
     %= include inline => app->renderer->_bundled('mojobar')

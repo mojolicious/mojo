@@ -24,7 +24,7 @@ __DATA__
 <html>
   <head>
     <title>WebSocket Test</title>
-    %= javascript begin
+    <script>
       var ws;
       if ("WebSocket" in window) {
         ws = new WebSocket('<%= url_for('test')->to_abs %>');
@@ -40,7 +40,7 @@ __DATA__
       else {
         document.body.innerHTML += 'Browser does not support WebSockets.';
       }
-    % end
+    </script>
   </head>
   <body>Testing WebSockets: </body>
 </html>

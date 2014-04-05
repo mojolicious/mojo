@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head><title>Server error</title></head>
-   %= stylesheet begin
+  <style>
       body { background-color: #caecf6 }
       #raptor {
         background: url(<%= url_for '/mojo/failraptor.png' %>);
@@ -13,6 +13,6 @@
         top: 50%;
         width: 743px;
       }
-    % end
+    </style>
   <body><div id="raptor"></div></body>
 </html>

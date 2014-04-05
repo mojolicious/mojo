@@ -4,9 +4,11 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::Loader;
 use Mojo::Util 'md5_sum';
+use POSIX;
 use Scalar::Util 'blessed';
 
 has app => sub { shift->build_app('Mojo::HelloWorld') };
+has [qw(group user)];
 
 sub build_app {
   my ($self, $app) = @_;
@@ -16,6 +18,19 @@ sub build_app {
 }
 
 sub build_tx { shift->app->build_tx }
+
+sub daemonize {
+
+  # Fork and kill parent
+  die "Can't fork: $!" unless defined(my $pid = fork);
+  exit 0 if $pid;
+  POSIX::setsid or die "Can't start a new session: $!";
+
+  # Close filehandles
+  open STDIN,  '</dev/null';
+  open STDOUT, '>/dev/null';
+  open STDERR, '>&STDOUT';
+}
 
 sub load_app {
   my ($self, $path) = @_;
@@ -52,6 +67,29 @@ sub new {
 }
 
 sub run { croak 'Method "run" not implemented by subclass' }
+
+sub setuidgid {
+  my $self = shift;
+
+  # Group
+  if (my $group = $self->group) {
+    return $self->_log(qq{Group "$group" does not exist.})
+      unless defined(my $gid = getgrnam $group);
+    return $self->_log(qq{Can't switch to group "$group": $!})
+      unless POSIX::setgid($gid);
+  }
+
+  # User
+  return $self unless my $user = $self->user;
+  return $self->_log(qq{User "$user" does not exist.})
+    unless defined(my $uid = getpwnam $user);
+  return $self->_log(qq{Can't switch to user "$user": $!})
+    unless POSIX::setuid($uid);
+
+  return $self;
+}
+
+sub _log { $_[0]->app->log->error($_[1]) and return $_[0] }
 
 1;
 
@@ -114,6 +152,20 @@ L<Mojo::Server> implements the following attributes.
 
 Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 
+=head2 group
+
+  my $group = $server->group;
+  $server   = $server->group('users');
+
+Group for server process.
+
+=head2 user
+
+  my $user = $server->user;
+  $server  = $server->user('web');
+
+User for the server process.
+
 =head1 METHODS
 
 L<Mojo::Server> inherits all methods from L<Mojo::EventEmitter> and implements
@@ -130,6 +182,12 @@ Build application from class.
   my $tx = $server->build_tx;
 
 Let application build a transaction.
+
+=head2 daemonize
+
+  $server->daemonize;
+
+Daemonize server process.
 
 =head2 load_app
 
@@ -151,6 +209,12 @@ with default request handling.
   $server->run;
 
 Run server. Meant to be overloaded in a subclass.
+
+=head2 setuidgid
+
+  $server = $server->setuidgid;
+
+Set L</"user"> and L</"group"> for process.
 
 =head1 SEE ALSO
 

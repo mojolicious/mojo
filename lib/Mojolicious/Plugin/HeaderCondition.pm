@@ -24,9 +24,8 @@ sub _headers {
 
   # All headers need to match
   my $headers = $c->req->headers;
-  while (my ($name, $pattern) = each %$patterns) {
-    return undef unless _check(scalar $headers->header($name), $pattern);
-  }
+  _check(scalar $headers->header($_), $patterns->{$_}) || return undef
+    for keys %$patterns;
   return 1;
 }
 

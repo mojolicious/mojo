@@ -725,7 +725,8 @@ Both have a higher precedence than routes.
 =head2 External templates
 
 External templates will be searched by the renderer in a C<templates>
-directory if it exists.
+directory if it exists and have a higher precedence than those in the C<DATA>
+section.
 
   use Mojolicious::Lite;
 
@@ -917,7 +918,7 @@ and return them with L<Mojolicious::Controller/"send">.
   <html>
     <head>
       <title>Echo</title>
-      %= javascript begin
+      <script>
         var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
         ws.onmessage = function (event) {
           document.body.innerHTML += JSON.parse(event.data).msg;
@@ -925,7 +926,7 @@ and return them with L<Mojolicious::Controller/"send">.
         ws.onopen = function (event) {
           ws.send(JSON.stringify({msg: 'I ♥ Mojolicious!'}));
         };
-      % end
+      </script>
     </head>
   </html>
 

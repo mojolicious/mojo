@@ -14,7 +14,7 @@ my $START_LINE_RE = qr/
   ([a-zA-Z]+)                                            # Method
   \s+
   ([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
-  (?:\s+HTTP\/(\d\.\d))?                                 # Version
+  \s+HTTP\/(\d\.\d)                                      # Version
   $
 /x;
 
@@ -196,7 +196,8 @@ sub _parse_env {
   my $headers = $self->headers;
   my $url     = $self->url;
   my $base    = $url->base;
-  while (my ($name, $value) = each %$env) {
+  for my $name (keys %$env) {
+    my $value = $env->{$name};
     next unless $name =~ s/^HTTP_//i;
     $name =~ y/_/-/;
     $headers->header($name => $value);

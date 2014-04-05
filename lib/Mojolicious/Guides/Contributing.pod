@@ -166,7 +166,8 @@ consistent if not.
 The master source code repository should always be kept in a stable state, use
 feature branches for actual development.
 
-Code has to be run through L<Perl::Tidy> with the included C<.perltidyrc>, and
+Code has to be run through L<Perl::Tidy> with the included
+L<.perltidyrc|https://github.com/kraih/mojo/blob/master/.perltidyrc>, and
 everything should look like it was written by a single person.
 
 Functions and methods should be as short as possible, no spaghetti code.

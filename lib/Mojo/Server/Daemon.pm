@@ -3,13 +3,12 @@ use Mojo::Base 'Mojo::Server';
 
 use Mojo::IOLoop;
 use Mojo::URL;
-use POSIX;
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has acceptors => sub { [] };
-has [qw(backlog group silent user)];
+has [qw(backlog silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
@@ -27,27 +26,6 @@ sub run {
   my $self = shift;
   local $SIG{INT} = local $SIG{TERM} = sub { $self->ioloop->stop };
   $self->start->setuidgid->ioloop->start;
-}
-
-sub setuidgid {
-  my $self = shift;
-
-  # Group
-  if (my $group = $self->group) {
-    return $self->_log(error => qq{Group "$group" does not exist.})
-      unless defined(my $gid = getgrnam $group);
-    return $self->_log(error => qq{Can't switch to group "$group": $!})
-      unless POSIX::setgid($gid);
-  }
-
-  # User
-  return $self unless my $user = $self->user;
-  return $self->_log(error => qq{User "$user" does not exist.})
-    unless defined(my $uid = getpwnam $user);
-  return $self->_log(error => qq{Can't switch to user "$user": $!})
-    unless POSIX::setuid($uid);
-
-  return $self;
 }
 
 sub start {
@@ -184,22 +162,20 @@ sub _listen {
       $stream->timeout($self->inactivity_timeout);
 
       $stream->on(close => sub { $self->_close($id) });
-      $stream->on(
-        error => sub { $self && $self->_log(error => pop)->_close($id) });
+      $stream->on(error =>
+          sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read => sub { $self->_read($id => pop) });
       $stream->on(timeout =>
-          sub { $self->_log(debug => 'Inactivity timeout.') if $c->{tx} });
+          sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
     }
   );
 
   return if $self->silent;
-  $self->_log(info => qq{Listening at "$url".});
+  $self->app->log->info(qq{Listening at "$url".});
   $query->params([]);
   $url->host('127.0.0.1') if $url->host eq '*';
   say "Server available at $url.";
 }
-
-sub _log { $_[0]->app->log->log(@_[1, 2]) and return $_[0] }
 
 sub _read {
   my ($self, $id, $chunk) = @_;
@@ -324,13 +300,6 @@ Active acceptors.
 
 Listen backlog size, defaults to C<SOMAXCONN>.
 
-=head2 group
-
-  my $group = $daemon->group;
-  $daemon   = $daemon->group('users');
-
-Group for server process.
-
 =head2 inactivity_timeout
 
   my $timeout = $daemon->inactivity_timeout;
@@ -447,13 +416,6 @@ Maximum number of keep-alive requests per connection, defaults to C<25>.
 
 Disable console messages.
 
-=head2 user
-
-  my $user = $daemon->user;
-  $daemon  = $daemon->user('web');
-
-User for the server process.
-
 =head1 METHODS
 
 L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
@@ -464,12 +426,6 @@ implements the following new ones.
   $daemon->run;
 
 Run server.
-
-=head2 setuidgid
-
-  $daemon = $daemon->setuidgid;
-
-Set user and group for process.
 
 =head2 start
 

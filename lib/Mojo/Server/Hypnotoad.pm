@@ -8,7 +8,6 @@ use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
 use Mojo::Util 'steady_time';
-use POSIX 'setsid';
 use Scalar::Util 'weaken';
 
 sub run {
@@ -49,18 +48,8 @@ sub run {
   $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
 
   # Daemonize as early as possible (but not for restarts)
-  if (!$ENV{HYPNOTOAD_FOREGROUND} && $ENV{HYPNOTOAD_REV} < 3) {
-
-    # Fork and kill parent
-    die "Can't fork: $!" unless defined(my $pid = fork);
-    exit 0 if $pid;
-    setsid or die "Can't start a new session: $!";
-
-    # Close filehandles
-    open STDIN,  '</dev/null';
-    open STDOUT, '>/dev/null';
-    open STDERR, '>&STDOUT';
-  }
+  $prefork->daemonize
+    if !$ENV{HYPNOTOAD_FOREGROUND} && $ENV{HYPNOTOAD_REV} < 3;
 
   # Start accepting connections
   local $SIG{USR2} = sub { $self->{upgrade} ||= steady_time };

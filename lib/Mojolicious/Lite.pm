@@ -725,7 +725,8 @@ Both have a higher precedence than routes.
 =head2 External templates
 
 External templates will be searched by the renderer in a C<templates>
-directory if it exists.
+directory if it exists and have a higher precedence than those in the C<DATA>
+section.
 
   use Mojolicious::Lite;
 

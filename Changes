@@ -1,7 +1,9 @@
 
-4.92  2014-04-06
+4.92  2014-04-08
   - Removed deprecated use of hash references for optgroup generation with
     select_field helper.
+  - Improved dumper helper to escape unprintable characters.
+  - Fixed small handler detection bug in Mojolicious::Renderer.
 
 4.91  2014-03-29
   - Added daemonize method to Mojo::Server.

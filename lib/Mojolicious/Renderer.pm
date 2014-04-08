@@ -227,6 +227,7 @@ sub _render_template {
 
   # Find handler and render
   my $handler = $options->{handler} ||= $self->template_handler($options);
+  return undef unless $handler;
   if (my $renderer = $self->handlers->{$handler}) {
     return 1 if $renderer->($self, $c, $output, $options);
   }

@@ -1,5 +1,7 @@
 
 4.93  2014-04-09
+  - Fixed bug where Mojolicious::Static would not use the correct default MIME
+    type.
 
 4.92  2014-04-08
   - Removed deprecated use of hash references for optgroup generation with

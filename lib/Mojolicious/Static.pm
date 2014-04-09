@@ -53,8 +53,8 @@ sub serve {
   my ($self, $c, $rel) = @_;
   return undef unless my $asset = $self->file($rel);
   my $types = $c->app->types;
-  $c->res->headers->content_type(
-    $types->type($rel =~ /\.(\w+)$/ ? $1 : 'txt'));
+  my $type = $rel =~ /\.(\w+)$/ ? $types->type($1) : undef;
+  $c->res->headers->content_type($type || $types->type('txt'));
   return !!$self->serve_asset($c, $asset);
 }
 

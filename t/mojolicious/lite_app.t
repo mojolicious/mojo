@@ -757,7 +757,8 @@ $t->get_ok('/inline/ep/partial')->status_is(200)
   ->content_is("♥just ♥\nworks!\n");
 
 # Render static file outside of public directory
-$t->get_ok('/source')->status_is(200)->header_isnt('X-Missing' => 1)
+$t->get_ok('/source')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->header_isnt('X-Missing' => 1)
   ->content_like(qr!get_ok\('/source!);
 
 # File does not exist

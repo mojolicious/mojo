@@ -1220,8 +1220,8 @@ that you can use or overload.
   $ ./myapp.pl spy secrets
   secr3t
 
-And to make your commands application specific, just put them in a different
-namespace.
+And to make your commands application specific, just add a custom namespace to
+L<Mojolicious::Commands/"namespaces">.
 
   # Application
   package MyApp;

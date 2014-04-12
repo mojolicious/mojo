@@ -254,6 +254,11 @@ in debugging your application.
 
   app->start;
 
+You can even use CSS selectors with L<Mojolicious::Command::get> to extract
+only the information you're actually interested in.
+
+  $ ./myapp.pl get /dies '#error'
+
 =head2 Route names
 
 All routes can have a name associated with them, this allows automatic

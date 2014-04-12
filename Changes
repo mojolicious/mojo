@@ -1,5 +1,5 @@
 
-4.93  2014-04-09
+4.93  2014-04-13
   - Fixed bug where Mojolicious::Static would not use the correct default MIME
     type.
 

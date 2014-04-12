@@ -113,7 +113,7 @@ sub _finish {
   if (my $ws = $c->{tx} = delete $c->{ws}) {
 
     # Successful upgrade
-    if ($ws->res->code eq '101') {
+    if ($ws->res->code == 101) {
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
     }

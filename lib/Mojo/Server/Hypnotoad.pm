@@ -16,23 +16,19 @@ sub run {
   # No Windows support
   _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
 
-  # Remember application for later
-  $ENV{HYPNOTOAD_APP} ||= abs_path $path;
+  # Remember executable and application for later
+  $ENV{HYPNOTOAD_EXE} ||= $0;
+  $0 = $ENV{HYPNOTOAD_APP} ||= abs_path $path;
 
   # This is a production server
   $ENV{MOJO_MODE} ||= 'production';
 
-  # Remember executable for later
-  $ENV{HYPNOTOAD_EXE} ||= $0;
-  $0 = $ENV{HYPNOTOAD_APP};
-
-  # Clean start
+  # Clean start (to make sure everything works)
   die "Can't exec: $!" if !$ENV{HYPNOTOAD_REV}++ && !exec $ENV{HYPNOTOAD_EXE};
 
   # Preload application and configure server
   my $prefork = $self->{prefork} = Mojo::Server::Prefork->new;
-  my $app = $prefork->load_app($ENV{HYPNOTOAD_APP});
-  $self->_config($app);
+  $self->_config($prefork->load_app($ENV{HYPNOTOAD_APP}));
   weaken $self;
   $prefork->on(wait   => sub { $self->_manage });
   $prefork->on(reap   => sub { $self->_reap(pop) });

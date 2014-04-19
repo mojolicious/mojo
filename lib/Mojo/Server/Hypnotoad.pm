@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 # "Bender: I was God once.
 #  God: Yes, I saw. You were doing well, until everyone died."
-use Cwd 'abs_path';
+use Cwd qw(abs_path getcwd);
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
@@ -24,8 +24,8 @@ sub configure {
   # Prefork settings
   $ENV{MOJO_REVERSE_PROXY} = $c->{proxy} if defined $c->{proxy};
   $prefork->listen($c->{listen} || ['http://*:8080']);
-  my $file = catfile dirname($ENV{HYPNOTOAD_APP} // '.'), 'hypnotoad.pid';
-  $prefork->pid_file($c->{pid_file} || $file);
+  my $dir = $ENV{HYPNOTOAD_APP} ? dirname $ENV{HYPNOTOAD_APP} : getcwd;
+  $prefork->pid_file($c->{pid_file} || catfile $dir, 'hypnotoad.pid');
   $prefork->max_clients($c->{clients}) if $c->{clients};
   $prefork->max_requests($c->{keep_alive_requests})
     if $c->{keep_alive_requests};

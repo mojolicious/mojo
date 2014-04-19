@@ -99,7 +99,7 @@ sub parse {
     }
 
     # New header
-    if ($line =~ /^([^:]+)\s*:\s*(.*)$/) { push @$headers, $1, [$2] }
+    if ($line =~ /^(\S[^:]+)\s*:\s*(.*)$/) { push @$headers, $1, [$2] }
 
     # Multiline
     elsif (@$headers && $line =~ s/^\s+//) { push @{$headers->[-1]}, $line }

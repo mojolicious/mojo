@@ -1,6 +1,7 @@
 
 4.94  2014-04-19
   - Relaxed name handling in Mojo::Headers a little.
+  - Fixed small bug in online tests.
 
 4.93  2014-04-13
   - Fixed bug where Mojolicious::Static would not use the correct default MIME

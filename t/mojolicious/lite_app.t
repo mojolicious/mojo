@@ -718,16 +718,6 @@ $t->get_ok('/.html')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
-# "X-Forwarded-For"
-$t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
-  ->status_is(200)->content_like(qr!^http://localhost:\d+/0-!)
-  ->content_like(qr/-0$/)->content_unlike(qr!-192\.0\.2\.1-0$!);
-
-# "X-Forwarded-HTTPS"
-$t->get_ok('/0' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
-  ->content_like(qr!^http://localhost:\d+/0-!)->content_like(qr/-0$/)
-  ->content_unlike(qr!-192\.0\.2\.1-0$!);
-
 # Reverse proxy with "X-Forwarded-For"
 {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
@@ -744,6 +734,17 @@ $t->get_ok('/0' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
     ->content_like(qr!^https://localhost:\d+/0-!)->content_like(qr/-0$/)
     ->content_unlike(qr!-192\.0\.2\.1-0$!);
 }
+
+# "X-Forwarded-For"
+$t->ua->server->restart;
+$t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
+  ->status_is(200)->content_like(qr!^http://localhost:\d+/0-!)
+  ->content_like(qr/-0$/)->content_unlike(qr!-192\.0\.2\.1-0$!);
+
+# "X-Forwarded-HTTPS"
+$t->get_ok('/0' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
+  ->content_like(qr!^http://localhost:\d+/0-!)->content_like(qr/-0$/)
+  ->content_unlike(qr!-192\.0\.2\.1-0$!);
 
 # Inline "epl" template
 $t->delete_ok('/inline/epl')->status_is(200)->content_is("2 ☃\n");

@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 # "Bender: I was God once.
 #  God: Yes, I saw. You were doing well, until everyone died."
-use Cwd qw(abs_path getcwd);
+use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
@@ -19,20 +19,18 @@ sub configure {
   # Hypnotoad settings
   my $prefork = $self->prefork;
   my $c = $prefork->app->config($name) || {};
+  $c->{listen} ||= ['http://*:8080'];
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
   # Prefork settings
   $ENV{MOJO_REVERSE_PROXY} = $c->{proxy} if defined $c->{proxy};
-  $prefork->listen($c->{listen} || ['http://*:8080']);
-  my $dir = $ENV{HYPNOTOAD_APP} ? dirname $ENV{HYPNOTOAD_APP} : getcwd;
-  $prefork->pid_file($c->{pid_file} || catfile $dir, 'hypnotoad.pid');
   $prefork->max_clients($c->{clients}) if $c->{clients};
   $prefork->max_requests($c->{keep_alive_requests})
     if $c->{keep_alive_requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accept_interval accepts backlog graceful_timeout group),
-    qw(heartbeat_interval heartbeat_timeout inactivity_timeout lock_file),
-    qw(lock_timeout multi_accept user workers);
+    qw(heartbeat_interval heartbeat_timeout inactivity_timeout listen),
+    qw(lock_file lock_timeout multi_accept pid_file user workers);
 }
 
 sub run {
@@ -53,7 +51,8 @@ sub run {
 
   # Preload application and configure server
   my $prefork = $self->prefork;
-  $prefork->load_app($app);
+  $prefork->load_app($app)->config->{hypnotoad}{pid_file}
+    //= catfile dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid';
   $self->configure('hypnotoad');
   weaken $self;
   $prefork->on(wait   => sub { $self->_manage });

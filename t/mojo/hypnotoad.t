@@ -10,8 +10,7 @@ use Test::More;
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
 
-use Cwd 'getcwd';
-use File::Spec::Functions qw(catdir catfile);
+use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
@@ -48,8 +47,6 @@ use Mojo::Util qw(slurp spurt);
   is $hypnotoad->upgrade_timeout, 60, 'right default';
   $hypnotoad->configure('test');
   is_deeply $hypnotoad->prefork->listen, ['http://*:8080'], 'right value';
-  is $hypnotoad->prefork->pid_file, catfile(getcwd, 'hypnotoad.pid'),
-    'right value';
   $hypnotoad->configure('myserver');
   is $hypnotoad->prefork->accept_interval,    33,        'right value';
   is $hypnotoad->prefork->accepts,            13,        'right value';

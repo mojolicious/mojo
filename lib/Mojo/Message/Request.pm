@@ -8,6 +8,7 @@ use Mojo::URL;
 has env => sub { {} };
 has method => 'GET';
 has url => sub { Mojo::URL->new };
+has 'reverse_proxy';
 
 my $START_LINE_RE = qr/
   ^
@@ -170,7 +171,7 @@ sub parse {
 
   # "X-Forwarded-HTTPS"
   $base->scheme('https')
-    if $ENV{MOJO_REVERSE_PROXY} && $headers->header('X-Forwarded-HTTPS');
+    if $self->reverse_proxy && $headers->header('X-Forwarded-HTTPS');
 
   return $self;
 }
@@ -326,6 +327,13 @@ HTTP request URL, defaults to a L<Mojo::URL> object.
   say $req->url->to_abs->userinfo;
   say $req->url->to_abs->host;
   say $req->url->to_abs->path;
+
+=head2 reverse_proxy
+
+  my $bool = $req->reverse_proxy;
+  $req     = $req->reverse_proxy($bool);
+
+Request has been performed through a reverse proxy.
 
 =head1 METHODS
 

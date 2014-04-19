@@ -23,7 +23,7 @@ sub configure {
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
   # Prefork settings
-  $ENV{MOJO_REVERSE_PROXY} = $c->{proxy} if defined $c->{proxy};
+  $prefork->reverse_proxy($c->{proxy}) if defined $c->{proxy};
   $prefork->max_clients($c->{clients}) if $c->{clients};
   $prefork->max_requests($c->{keep_alive_requests})
     if $c->{keep_alive_requests};

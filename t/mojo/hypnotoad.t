@@ -21,7 +21,6 @@ use Mojo::Util qw(slurp spurt);
 
 # Configure
 {
-  local $ENV{MOJO_REVERSE_PROXY};
   my $hypnotoad = Mojo::Server::Hypnotoad->new;
   $hypnotoad->prefork->app->config->{myserver} = {
     accept_interval     => 33,
@@ -63,9 +62,9 @@ use Mojo::Util qw(slurp spurt);
   is $hypnotoad->prefork->max_requests, 3,               'right value';
   is $hypnotoad->prefork->multi_accept, 16,              'right value';
   is $hypnotoad->prefork->pid_file,     '/foo/bar.pid',  'right value';
-  is $hypnotoad->prefork->user,         'tester',        'right value';
-  is $hypnotoad->prefork->workers,      7,               'right value';
-  ok $ENV{MOJO_REVERSE_PROXY}, 'reverse proxy enabled';
+  ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
+  is $hypnotoad->prefork->user,          'tester', 'right value';
+  is $hypnotoad->prefork->workers,       7, 'right value';
   is $hypnotoad->upgrade_timeout, 45, 'right value';
 }
 

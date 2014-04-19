@@ -60,7 +60,7 @@ sub remote_address {
   }
 
   # Reverse proxy
-  if ($ENV{MOJO_REVERSE_PROXY}) {
+  if ($self->req->reverse_proxy) {
     return $self->{forwarded_for} if $self->{forwarded_for};
     my $forwarded = $self->req->headers->header('X-Forwarded-For') // '';
     $forwarded =~ /([^,\s]+)$/ and return $self->{forwarded_for} = $1;

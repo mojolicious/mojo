@@ -17,9 +17,9 @@ sub run {
     'g|group=s'      => sub { $daemon->group($_[1]) },
     'i|inactivity=i' => sub { $daemon->inactivity_timeout($_[1]) },
     'l|listen=s'     => \my @listen,
-    'p|proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
-    'r|requests=i' => sub { $daemon->max_requests($_[1]) },
-    'u|user=s'     => sub { $daemon->user($_[1]) };
+    'p|proxy'        => sub { $daemon->reverse_proxy(1) },
+    'r|requests=i'   => sub { $daemon->max_requests($_[1]) },
+    'u|user=s'       => sub { $daemon->user($_[1]) };
 
   $daemon->listen(\@listen) if @listen;
   $daemon->run;

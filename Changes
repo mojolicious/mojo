@@ -1,5 +1,7 @@
 
-4.94  2014-04-19
+4.94  2014-04-20
+  - Added reverse_proxy attribute to Mojo::Server::Daemon.
+  - Added reverse_proxy attribute to Mojo::Message::Request.
   - Added prefork and upgrade_timeout attributes to Mojo::Server::Hypnotoad.
   - Added configure method to Mojo::Server::Hypnotoad.
   - Relaxed name handling in Mojo::Headers a little.

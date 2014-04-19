@@ -731,6 +731,7 @@ $t->get_ok('/0' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
 # Reverse proxy with "X-Forwarded-For"
 {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
+  $t->ua->server->restart;
   $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
     ->status_is(200)->content_like(qr!http://localhost:\d+/0-192\.0\.2\.1-0$!);
 }
@@ -738,6 +739,7 @@ $t->get_ok('/0' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
 # Reverse proxy with "X-Forwarded-HTTPS"
 {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
+  $t->ua->server->restart;
   $t->get_ok('/0' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
     ->content_like(qr!^https://localhost:\d+/0-!)->content_like(qr/-0$/)
     ->content_unlike(qr!-192\.0\.2\.1-0$!);

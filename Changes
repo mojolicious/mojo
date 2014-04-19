@@ -1,4 +1,6 @@
 
+4.95  2014-04-21
+
 4.94  2014-04-20
   - Added reverse_proxy attribute to Mojo::Server::Daemon.
   - Added reverse_proxy attribute to Mojo::Message::Request.

@@ -1,5 +1,7 @@
 
 4.94  2014-04-19
+  - Added prefork and upgrade_timeout attributes to Mojo::Server::Hypnotoad.
+  - Added configure method to Mojo::Server::Hypnotoad.
   - Relaxed name handling in Mojo::Headers a little.
   - Fixed small bug in online tests.
 

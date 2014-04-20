@@ -390,7 +390,7 @@ L<Mojo::Server::Hypnotoad> implements the following attributes.
 
 L<Mojo::Server::Prefork> object this server manages.
 
-=head1 upgrade_timeout
+=head2 upgrade_timeout
 
   my $timeout = $hypnotoad->upgrade_timeout;
   $hypnotoad  = $hypnotoad->upgrade_timeout(15);

@@ -1,5 +1,6 @@
 
-4.95  2014-04-21
+4.95  2014-04-25
+  - Improved Mojo::IOLoop::Server to reuse cipher list from IO::Socket::SSL.
 
 4.94  2014-04-20
   - Added reverse_proxy attribute to Mojo::Server::Daemon.

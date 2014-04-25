@@ -23,6 +23,18 @@ $end2->();
 is_deeply [$delay->wait], [], 'no return values';
 is_deeply \@results, [1, 1], 'right results';
 
+# Argument splicing
+$delay = Mojo::IOLoop::Delay->new;
+Mojo::IOLoop->next_tick($delay->begin);
+$delay->begin(1)->(1, 2, 3);
+$delay->begin(1, 1)->(4, 5, 6);
+$delay->begin(0, 1)->(7, 8);
+$delay->begin(2)->(9, 10, 11);
+$delay->begin(0, 0)->(12, 13);
+$delay->begin(0, 2)->(14, 15, 16);
+$delay->begin(2, 5)->(17, 18, 19, 20);
+is_deeply [$delay->wait], [2, 3, 5, 7, 11, 14, 15, 19, 20], 'right values';
+
 # Data
 is $delay->data('foo'), undef, 'no value';
 is_deeply $delay->data(foo => 'bar')->data, {foo => 'bar'}, 'right value';

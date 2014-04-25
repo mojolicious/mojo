@@ -82,12 +82,10 @@ sub client {
 }
 
 sub delay {
-  my $self = _instance(shift);
-
+  my $self  = _instance(shift);
   my $delay = Mojo::IOLoop::Delay->new;
   weaken $delay->ioloop($self)->{ioloop};
   @_ > 1 ? $delay->steps(@_) : $delay->once(finish => shift) if @_;
-
   return $delay;
 }
 

@@ -8,10 +8,10 @@ has ioloop    => sub { Mojo::IOLoop->singleton };
 has remaining => sub { [] };
 
 sub begin {
-  my ($self, $ignore) = @_;
+  my ($self, $offset, $len) = @_;
   $self->{pending}++;
   my $id = $self->{counter}++;
-  return sub { $ignore // 1 and shift; $self->_step($id, @_) };
+  return sub { $self->_step($id, $offset // 1, $len, @_) };
 }
 
 sub data { shift->Mojo::_dict(data => @_) }
@@ -38,9 +38,10 @@ sub wait {
 sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
 
 sub _step {
-  my ($self, $id) = (shift, shift);
+  my ($self, $id, $offset, $len) = (shift, shift, shift, shift);
 
-  $self->{args}[$id] = [@_];
+  $self->{args}[$id]
+    = [defined $len ? splice(@_, $offset, $len) : splice(@_, $offset)];
   return $self if $self->{fail} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};
@@ -164,18 +165,30 @@ implements the following new ones.
 
 =head2 begin
 
-  my $without_first_arg = $delay->begin;
-  my $with_first_arg    = $delay->begin(0);
+  my $cb = $delay->begin;
+  my $cb = $delay->begin($offset);
+  my $cb = $delay->begin($offset, $len);
 
 Increment active event counter, the returned callback can be used to decrement
-the active event counter again. Arguments passed to the callback are queued in
-the right order for the next step or L</"finish"> event and L</"wait"> method,
-the first argument will be ignored by default.
+the active event counter again. Arguments passed to the callback are spliced
+and queued in the right order for the next step or L</"finish"> event and
+L</"wait"> method, the argument offset defaults to C<1> with no default
+length.
+
+  # Capture all arguments except for the first one (invocant)
+  my $delay = Mojo::IOLoop->delay;
+  Mojo::IOLoop->client({port => 3000} => $delay->begin);
+  my ($err, $stream) = $delay->wait;
 
   # Capture all arguments
   my $delay = Mojo::IOLoop->delay;
   Mojo::IOLoop->client({port => 3000} => $delay->begin(0));
   my ($loop, $err, $stream) = $delay->wait;
+
+  # Capture only the second argument
+  my $delay = Mojo::IOLoop->delay;
+  Mojo::IOLoop->client({port => 3000} => $delay->begin(1, 1));
+  my $err = $delay->wait;
 
 =head2 data
 

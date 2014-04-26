@@ -400,10 +400,10 @@ expression C<(bender|leela)>.
   $r->route('/:name', name => [qw(bender leela)])
     ->to(controller => 'foo', action => 'bar');
 
-You can also adjust the regular expressions behind placeholders to better suit
-your needs. Just make sure not to use C<^> and C<$> or capturing groups
-C<(...)>, because placeholders become part of a larger regular expression
-internally, C<(?:...)> is fine though.
+You can also adjust the regular expressions behind placeholders directly, just
+make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally, C<(?:...)>
+is fine though.
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef

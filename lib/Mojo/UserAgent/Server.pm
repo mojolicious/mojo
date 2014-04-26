@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Scalar::Util 'weaken';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
@@ -36,6 +37,7 @@ sub _restart {
     ioloop => $self->ioloop,
     silent => 1
   );
+  weaken $server->{app};
   delete $self->{port} if $full;
   die "Couldn't find a free TCP port for application.\n"
     unless my $port = $self->{port} ||= Mojo::IOLoop->generate_port;

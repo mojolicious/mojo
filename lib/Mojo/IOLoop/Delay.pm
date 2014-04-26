@@ -3,9 +3,13 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo;
 use Mojo::IOLoop;
+use Scalar::Util 'refaddr';
 
-has ioloop    => sub { Mojo::IOLoop->singleton };
-has remaining => sub { [] };
+has ioloop => sub { Mojo::IOLoop->singleton };
+
+my %REMAINING;
+
+sub DESTROY { delete $REMAINING{refaddr shift} }
 
 sub begin {
   my ($self, $offset, $len) = @_;
@@ -18,8 +22,11 @@ sub data { shift->Mojo::_dict(data => @_) }
 
 sub pass { $_[0]->begin->(@_) }
 
+sub remaining { $REMAINING{refaddr shift} //= [] }
+
 sub steps {
-  my $self = shift->remaining([@_]);
+  my $self = shift;
+  @{$self->remaining} = @_;
   $self->ioloop->next_tick($self->begin);
   return $self;
 }
@@ -151,13 +158,6 @@ L<Mojo::IOLoop::Delay> implements the following attributes.
 Event loop object to control, defaults to the global L<Mojo::IOLoop>
 singleton.
 
-=head2 remaining
-
-  my $remaining = $delay->remaining;
-  $delay        = $delay->remaining([sub {...}]);
-
-Remaining L</"steps"> in chain.
-
 =head1 METHODS
 
 L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::EventEmitter> and
@@ -212,6 +212,13 @@ values to the next step.
 
   # Longer version
   $delay->begin(0)->(@args);
+
+=head2 remaining
+
+  my $remaining = $delay->remaining;
+
+Remaining L</"steps"> in chain, stored outside the object to protect from
+circular references.
 
 =head2 steps
 

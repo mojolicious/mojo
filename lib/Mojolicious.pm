@@ -58,8 +58,6 @@ sub AUTOLOAD {
   return $self->build_controller->$helper(@_);
 }
 
-sub DESTROY { }
-
 sub build_controller {
   my ($self, $tx) = @_;
   $tx ||= $self->build_tx;

@@ -37,8 +37,6 @@ sub AUTOLOAD {
   return $self->$helper(@_);
 }
 
-sub DESTROY { }
-
 sub continue { $_[0]->app->routes->continue($_[0]) }
 
 sub cookie {

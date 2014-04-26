@@ -11,6 +11,9 @@ use Carp ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
+# Protect subclasses using AUTOLOAD
+sub DESTROY { }
+
 sub import {
   my $class = shift;
   return unless my $flag = shift;

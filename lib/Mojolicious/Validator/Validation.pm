@@ -19,8 +19,6 @@ sub AUTOLOAD {
   return $self->check($method => @_);
 }
 
-sub DESTROY { }
-
 sub check {
   my ($self, $check) = (shift, shift);
 

@@ -1,5 +1,6 @@
 
 4.95  2014-04-26
+  - Imprived Mojo::IOLoop::Delay with circular reference protection.
   - Improved Mojo::IOLoop::Delay to allow argument splicing.
   - Improved Mojo::IOLoop::Server to reuse cipher list from IO::Socket::SSL.
 

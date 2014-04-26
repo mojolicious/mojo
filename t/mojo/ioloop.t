@@ -106,7 +106,7 @@ $port = Mojo::IOLoop->generate_port;
 my $buffer = '';
 Mojo::IOLoop->server(
   (address => '127.0.0.1', port => $port) => sub {
-    my ($loop, $stream, $id) = @_;
+    my ($loop, $stream) = @_;
     $buffer .= 'accepted';
     $stream->on(
       read => sub {

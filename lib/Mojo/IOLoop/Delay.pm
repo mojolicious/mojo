@@ -245,7 +245,6 @@ gets emitted, only works when L</"ioloop"> is not running already.
     my ($delay, @args) = @_;
     ...
   });
-  Mojo::IOLoop->timer($_ => $delay->begin) for 1 .. 10;
   $delay->wait unless $delay->ioloop->is_running;
 
 =head1 SEE ALSO

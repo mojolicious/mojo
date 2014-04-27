@@ -1042,16 +1042,15 @@ synchronize multiple non-blocking requests.
   $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
   my ($mojo, $mango) = $delay->wait;
 
-The event L<Mojo::IOLoop::Delay/"finish"> can be used for code that needs to
-be able to work standalone as well as inside an already running event loop.
+One or more steps can be used for code that needs to be able to work
+standalone as well as inside an already running event loop.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
   # Synchronize non-blocking requests portably
   my $ua    = Mojo::UserAgent->new;
-  my $delay = Mojo::IOLoop->delay;
-  $delay->on(finish => sub {
+  my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, $mojo, $mango) = @_;
     ...
   });

@@ -240,11 +240,12 @@ event counter or an error occurs in a callback.
 Start L</"ioloop"> and stop it again once an L</"error"> or L</"finish"> event
 gets emitted, only works when L</"ioloop"> is not running already.
 
-  # Use the "finish" event to synchronize portably
-  $delay->on(finish => sub {
+  # Use a single step to synchronize portably
+  $delay->steps(sub {
     my ($delay, @args) = @_;
     ...
   });
+  Mojo::IOLoop->timer($_ => $delay->begin) for 1 .. 10;
   $delay->wait unless $delay->ioloop->is_running;
 
 =head1 SEE ALSO

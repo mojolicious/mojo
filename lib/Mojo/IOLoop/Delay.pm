@@ -20,11 +20,15 @@ sub data { shift->Mojo::_dict(data => @_) }
 
 sub pass { $_[0]->begin->(@_) }
 
-sub remaining { $REMAINING{shift()} //= [] }
+sub remaining {
+  my $self = shift;
+  return $REMAINING{$self} //= [] unless @_;
+  $REMAINING{$self} = shift;
+  return $self;
+}
 
 sub steps {
-  my $self = shift;
-  @{$self->remaining} = @_;
+  my $self = shift->remaining([@_]);
   $self->ioloop->next_tick($self->begin);
   return $self;
 }
@@ -54,10 +58,10 @@ sub _step {
   $self->{counter} = 0;
   if (my $cb = shift @{$self->remaining}) {
     eval { $self->$cb(@args); 1 }
-      or (++$self->{fail} and return $self->emit(error => $@));
+      or (++$self->{fail} and return $self->remaining([])->emit(error => $@));
   }
 
-  return $self->emit(finish => @args) unless $self->{counter};
+  return $self->remaining([])->emit(finish => @args) unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
   return $self;
 }
@@ -214,6 +218,7 @@ values to the next step.
 =head2 remaining
 
   my $remaining = $delay->remaining;
+  $delay        = $delay->remaining([]);
 
 Remaining L</"steps"> in chain, stored outside the object to protect from
 circular references.

@@ -82,11 +82,9 @@ sub client {
 }
 
 sub delay {
-  my $self  = _instance(shift);
   my $delay = Mojo::IOLoop::Delay->new;
-  weaken $delay->ioloop($self)->{ioloop};
-  @_ > 1 ? $delay->steps(@_) : $delay->once(finish => shift) if @_;
-  return $delay;
+  weaken $delay->ioloop(_instance(shift))->{ioloop};
+  return @_ ? $delay->steps(@_) : $delay;
 }
 
 sub generate_port { Mojo::IOLoop::Server->generate_port }
@@ -437,9 +435,8 @@ L<Mojo::IOLoop::Client/"connect">.
 
 Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow
 of events, which can help you avoid deep nested closures that often result
-from continuation-passing style. A single callback will be treated as a
-subscriber to the event L<Mojo::IOLoop::Delay/"finish">, and multiple ones as
-a chain for L<Mojo::IOLoop::Delay/"steps">.
+from continuation-passing style. Callbacks will be passed along to
+L<Mojo::IOLoop::Delay/"steps">.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

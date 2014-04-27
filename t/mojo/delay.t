@@ -93,6 +93,20 @@ is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [2, 3, 2, 1, 4, 5], 'right results';
 is $delay->data('foo'), 'bar', 'right value';
 
+# One step
+$result = undef;
+$delay  = Mojo::IOLoop::Delay->new;
+$delay->steps(sub { ++$result });
+$delay->begin->();
+is $result, undef, 'no result';
+Mojo::IOLoop->next_tick($delay->begin);
+is $result, undef, 'no result';
+$end = $delay->begin;
+Mojo::IOLoop->next_tick(sub { $end->() });
+is $result, undef, 'no result';
+$delay->wait;
+is $result, 1, 'right result';
+
 # End chain after first step
 ($finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;

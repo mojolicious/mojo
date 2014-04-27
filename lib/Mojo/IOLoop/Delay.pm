@@ -80,7 +80,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop::Delay->new;
-  $delay->on(finish => sub { say 'BOOM!' });
+  $delay->steps(sub { say 'BOOM!' });
   for my $i (1 .. 10) {
     my $end = $delay->begin;
     Mojo::IOLoop->timer($i => sub {

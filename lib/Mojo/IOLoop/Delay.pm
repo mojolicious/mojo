@@ -3,13 +3,11 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo;
 use Mojo::IOLoop;
-use Scalar::Util 'refaddr';
+use Hash::Util::FieldHash 'fieldhash';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
-my %REMAINING;
-
-sub DESTROY { delete $REMAINING{refaddr shift} }
+fieldhash my %REMAINING;
 
 sub begin {
   my ($self, $offset, $len) = @_;
@@ -22,7 +20,7 @@ sub data { shift->Mojo::_dict(data => @_) }
 
 sub pass { $_[0]->begin->(@_) }
 
-sub remaining { $REMAINING{refaddr shift} //= [] }
+sub remaining { $REMAINING{shift()} //= [] }
 
 sub steps {
   my $self = shift;

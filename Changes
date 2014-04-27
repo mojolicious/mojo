@@ -1,4 +1,6 @@
 
+4.96  2014-04-28
+
 4.95  2014-04-27
   - Improved Mojo::IOLoop::Delay with circular reference protection.
   - Improved Mojo::IOLoop::Delay to allow argument splicing.

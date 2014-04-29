@@ -1,6 +1,8 @@
 
-4.97  2014-04-29
-  - Deprecated "X-Forwarded-HTTPS" support in favor of "X-Forwarded-Proto".
+4.97  2014-04-30
+  - Deprecated support for "X-Forwarded-HTTPS" in favor of
+    "X-Forwarded-Proto".
+  - Added multi-name support to param method in Mojo::Parameters.
 
 4.96  2014-04-28
   - Improved Mojo::IOLoop to use Mojo::IOLoop::Delay more consistently.

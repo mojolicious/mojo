@@ -52,9 +52,12 @@ sub param {
   # List names
   return sort keys %{$self->to_hash} unless $name;
 
+  # Multiple names
+  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+
   # Replace values
   $self->remove($name) if defined $_[0];
-  $self->append($name, $_) for @_;
+  return $self->append($name => [@_]) if @_;
 
   # List values
   my @values;
@@ -265,11 +268,12 @@ necessary.
 
 =head2 param
 
-  my @names = $params->param;
-  my $foo   = $params->param('foo');
-  my @foo   = $params->param('foo');
-  my $foo   = $params->param(foo => 'ba&r');
-  my @foo   = $params->param(foo => qw(ba&r baz));
+  my @names       = $params->param;
+  my $foo         = $params->param('foo');
+  my @foo         = $params->param('foo');
+  my ($foo, $bar) = $params->param(['foo', 'bar']);
+  $params         = $params->param(foo => 'ba&r');
+  $params         = $params->param(foo => qw(ba&r baz));
 
 Check and replace parameter value. Be aware that if you request a parameter by
 name in scalar context, you will receive only the I<first> value for that

@@ -583,9 +583,10 @@ sure it is not excessively large, there's a 10MB limit by default.
 
 =head2 param
 
-  my @names = $msg->param;
-  my $foo   = $msg->param('foo');
-  my @foo   = $msg->param('foo');
+  my @names       = $msg->param;
+  my $foo         = $msg->param('foo');
+  my @foo         = $msg->param('foo');
+  my ($foo, $bar) = $msg->param(['foo', 'bar']);
 
 Access C<POST> parameters. Note that this method caches all data, so it should
 not be called before the entire message body has been received. Parts of the

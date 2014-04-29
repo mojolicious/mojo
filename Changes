@@ -1,4 +1,6 @@
 
+4.98  2014-05-01
+
 4.97  2014-04-30
   - Deprecated support for "X-Forwarded-HTTPS" in favor of
     "X-Forwarded-Proto".

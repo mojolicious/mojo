@@ -2,7 +2,7 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode);
+use Mojo::Util qw(b64_encode b64_decode deprecated);
 use Mojo::URL;
 
 has env => sub { {} };
@@ -169,9 +169,16 @@ sub parse {
   my $proxy_auth = _parse_basic_auth($headers->proxy_authorization);
   $self->proxy(Mojo::URL->new->userinfo($proxy_auth)) if $proxy_auth;
 
-  # "X-Forwarded-HTTPS"
+  # "X-Forwarded-Proto"
+  return $self unless $self->reverse_proxy;
   $base->scheme('https')
-    if $self->reverse_proxy && $headers->header('X-Forwarded-HTTPS');
+    if ($headers->header('X-Forwarded-Proto') // '') eq 'https';
+
+  # DEPRECATED in Top Hat!
+  $base->scheme('https')
+    and deprecated
+    'X-Forwarded-HTTPS is DEPRECATED in favor of X-Forwarded-Proto'
+    if $headers->header('X-Forwarded-HTTPS');
 
   return $self;
 }

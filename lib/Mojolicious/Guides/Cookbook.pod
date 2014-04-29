@@ -141,7 +141,7 @@ losing a single incoming connection, just by running the command above again.
 
 You might also want to enable proxy support if you're using Hypnotoad behind a
 reverse proxy. This allows L<Mojolicious> to automatically pick up the
-C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
+C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
 
   # myapp.conf
   {hypnotoad => {proxy => 1}};
@@ -184,7 +184,7 @@ proxy, which even supports WebSockets in newer versions.
       proxy_set_header Connection "upgrade";
       proxy_set_header Host $host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-HTTPS 0;
+      proxy_set_header X-Forwarded-Proto "http";
     }
   }
 
@@ -203,7 +203,7 @@ looks quite similar to the Nginx one above.
     ProxyPreserveHost On
     ProxyPass / http://localhost:8080/ keepalive=On
     ProxyPassReverse / http://localhost:8080/
-    RequestHeader set X-Forwarded-HTTPS "0"
+    RequestHeader set X-Forwarded-Proto "http"
   </VirtualHost>
 
 =head2 Apache/CGI

@@ -668,42 +668,42 @@ which can be combined to solve some of hardest problems in web development.
   use Mojolicious::Lite;
   use Scalar::Util 'weaken';
 
-  # Emit "request" event early for requests that get upgraded to multipart
+  # Intercept multipart uploads and log each chunk received
   hook after_build_tx => sub {
     my $tx = shift;
+
+    # Subscribe to "upgrade" event to indentify multipart uploads
     weaken $tx;
-    $tx->req->content->on(upgrade => sub { $tx->emit('request') });
+    $tx->req->content->on(upgrade => sub {
+      my ($single, $multi) = @_;
+      return unless $tx->req->url->path->contains('/upload');
+
+      # Subscribe to "part" event to find the right one
+      return $tx->req->content->on(part => sub {
+        my ($multi, $single) = @_;
+
+        # Subscribe to "body" event of part to make sure we have all headers
+        $single->on(body => sub {
+          my $single = shift;
+
+          # Make sure we have the right part and replace "read" event
+          return unless $single->headers->content_disposition =~ /example/;
+          $single->unsubscribe('read')->on(read => sub {
+            my ($single, $bytes) = @_;
+
+            # Log size of every chunk we receive
+            app->log->debug(length($bytes) . ' bytes uploaded.');
+          });
+        });
+      });
+    });
   };
 
   # Upload form in DATA section
   get '/' => 'index';
 
-  # Streaming multipart upload (invoked twice, due to early "request" event)
-  post '/upload' => sub {
-    my $self = shift;
-
-    # First invocation, subscribe to "part" event to find the right one
-    return $self->req->content->on(part => sub {
-      my ($multi, $single) = @_;
-
-      # Subscribe to "body" event of part to make sure we have all headers
-      $single->on(body => sub {
-        my $single = shift;
-
-        # Make sure we have the right part and replace "read" event
-        return unless $single->headers->content_disposition =~ /example/;
-        $single->unsubscribe('read')->on(read => sub {
-          my ($single, $bytes) = @_;
-
-          # Log size of every chunk we receive
-          $self->app->log->debug(length($bytes) . ' bytes uploaded.');
-        });
-      });
-    }) unless $self->req->is_finished;
-
-    # Second invocation, render response
-    $self->render(text => 'Upload was successful.');
-  };
+  # Streaming multipart upload
+  post '/upload' => {text => 'Upload was successful.'};
 
   app->start;
   __DATA__

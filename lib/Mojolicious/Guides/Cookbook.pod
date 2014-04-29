@@ -679,7 +679,7 @@ which can be combined to solve some of hardest problems in web development.
       return unless $tx->req->url->path->contains('/upload');
 
       # Subscribe to "part" event to find the right one
-      return $multi->on(part => sub {
+      $multi->on(part => sub {
         my ($multi, $single) = @_;
 
         # Subscribe to "body" event of part to make sure we have all headers

@@ -169,9 +169,15 @@ sub parse {
   my $proxy_auth = _parse_basic_auth($headers->proxy_authorization);
   $self->proxy(Mojo::URL->new->userinfo($proxy_auth)) if $proxy_auth;
 
-  # "X-Forwarded-HTTPS"
-  $base->scheme('https')
-    if $self->reverse_proxy && $headers->header('X-Forwarded-HTTPS');
+  if ($self->reverse_proxy) {
+    # "X-Forwarded-HTTPS"
+    $base->scheme('https') if $headers->header('X-Forwarded-HTTPS');
+
+    # "X-Forwarded-Proto"
+    $base->scheme('https')
+        if defined $headers->header('X-Forwarded-Proto')
+        && $headers->header('X-Forwarded-Proto') eq 'https';
+  }
 
   return $self;
 }

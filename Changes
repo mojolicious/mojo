@@ -1,5 +1,5 @@
 
-4.98  2014-05-02
+4.98  2014-05-03
   - Removed deprecated get_line function from Mojo::Util.
   - Removed deprecated content_xml, replace_content, text_before, text_after
     and to_xml methods from Mojo::DOM.

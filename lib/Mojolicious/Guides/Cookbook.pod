@@ -168,8 +168,9 @@ parameter.
 
 =head2 Nginx
 
-One of the most popular setups these days is Hypnotoad behind an Nginx reverse
-proxy, which even supports WebSockets in newer versions.
+One of the most popular setups these days is Hypnotoad behind an
+L<Nginx|http://nginx.org> reverse proxy, which even supports WebSockets in
+newer versions.
 
   upstream myapp {
     server 127.0.0.1:8080;
@@ -190,8 +191,8 @@ proxy, which even supports WebSockets in newer versions.
 
 =head2 Apache/mod_proxy
 
-Another good reverse proxy is Apache with C<mod_proxy>, the configuration
-looks quite similar to the Nginx one above.
+Another good reverse proxy is L<Apache|http://httpd.apache.org> with
+C<mod_proxy>, the configuration looks quite similar to the Nginx one above.
 
   <VirtualHost *:80>
     ServerName localhost

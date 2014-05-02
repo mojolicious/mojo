@@ -57,9 +57,6 @@ our @EXPORT_OK = (
   qw(xml_escape xor_encode)
 );
 
-# DEPRECATED in Top Hat!
-push @EXPORT_OK, 'get_line';
-
 sub b64_decode { decode_base64($_[0]) }
 sub b64_encode { encode_base64($_[0], $_[1]) }
 
@@ -116,12 +113,6 @@ sub dumper {
 }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
-
-# DEPRECATED in Top Hat!
-sub get_line {
-  deprecated 'Mojo::Util::get_line is DEPRECATED';
-  ${$_[0]} =~ s/^(.*?)\x0d?\x0a// ? $1 : undef;
-}
 
 sub hmac_sha1_sum { hmac_sha1_hex(@_) }
 

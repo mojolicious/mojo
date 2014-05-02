@@ -299,11 +299,11 @@ L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>,
 it has been reduced to the absolute minimal feature set required to build
 solid and scalable non-blocking TCP clients and servers.
 
-Note that depending on operating system, the default per-process and
-system-wide file descriptor limits are often very low and need to be tuned for
-better scalability. The C<LIBEV_FLAGS> environment variable should also be
-used to select the best possible L<EV> backend, which usually defaults to the
-not very scalable C<select>.
+Depending on operating system, the default per-process and system-wide file
+descriptor limits are often very low and need to be tuned for better
+scalability. The C<LIBEV_FLAGS> environment variable should also be used to
+select the best possible L<EV> backend, which usually defaults to the not very
+scalable C<select>.
 
   LIBEV_FLAGS=1   # select
   LIBEV_FLAGS=2   # poll

@@ -402,19 +402,19 @@ routes that allow C<POST> but not C<GET>, a C<method> attribute will be
 automatically added.
 
   <form action="/path/to/login">
-    <input name="first_name" />
+    <input name="first_name" type="text" />
     <input value="Ok" type="submit" />
   </form>
   <form action="/path/to/login.txt" method="POST">
-    <input name="first_name" />
+    <input name="first_name" type="text" />
     <input value="Ok" type="submit" />
   </form>
   <form action="/path/to/login" enctype="multipart/form-data">
-    <input disabled="disabled" name="first_name" />
+    <input disabled="disabled" name="first_name" type="text" />
     <input value="Ok" type="submit" />
   </form>
   <form action="http://example.com/login" method="POST">
-    <input name="first_name" />
+    <input name="first_name" type="text" />
     <input value="Ok" type="submit" />
   </form>
 

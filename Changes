@@ -1,8 +1,9 @@
 
-4.98  2014-05-03
+4.98  2014-05-09
   - Removed deprecated get_line function from Mojo::Util.
   - Removed deprecated content_xml, replace_content, text_before, text_after
     and to_xml methods from Mojo::DOM.
+  - Improved accept performance in Mojo::IOLoop::Server.
 
 4.97  2014-04-30
   - Deprecated support for "X-Forwarded-HTTPS" in favor of

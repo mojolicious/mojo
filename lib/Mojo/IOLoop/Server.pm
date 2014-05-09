@@ -89,8 +89,14 @@ sub listen {
   return unless $args->{tls};
   croak "IO::Socket::SSL 1.84 required for TLS support" unless TLS;
 
+  weaken $self;
   my $tls = $self->{tls} = {
     SSL_cert_file => $args->{tls_cert} || $CERT,
+    SSL_error_trap => sub {
+      return unless my $handle = delete $self->{handles}{shift()};
+      $self->reactor->remove($handle);
+      close $handle;
+    },
     SSL_honor_cipher_order => 1,
     SSL_key_file           => $args->{tls_key} || $KEY,
     SSL_startHandshake     => 0,
@@ -104,8 +110,7 @@ sub listen {
 sub start {
   my $self = shift;
   weaken $self;
-  $self->reactor->io(
-    $self->{handle} => sub { $self->_accept for 1 .. $self->multi_accept });
+  $self->reactor->io($self->{handle} => sub { $self->_accept });
 }
 
 sub stop { $_[0]->reactor->remove($_[0]{handle}) }
@@ -113,23 +118,20 @@ sub stop { $_[0]->reactor->remove($_[0]{handle}) }
 sub _accept {
   my $self = shift;
 
-  return unless my $handle = $self->{handle}->accept;
-  $handle->blocking(0);
+  # Greedy accept
+  for (1 .. $self->multi_accept) {
+    return unless my $handle = $self->{handle}->accept;
+    $handle->blocking(0);
 
-  # Disable Nagle's algorithm
-  setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
+    # Disable Nagle's algorithm
+    setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
-  # Start TLS handshake
-  return $self->emit_safe(accept => $handle) unless my $tls = $self->{tls};
-  weaken $self;
-  $tls->{SSL_error_trap} = sub {
-    return unless my $handle = delete $self->{handles}{shift()};
-    $self->reactor->remove($handle);
-    close $handle;
-  };
-  return unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
-  $self->reactor->io($handle => sub { $self->_tls($handle) });
-  $self->{handles}{$handle} = $handle;
+    # Start TLS handshake
+    $self->emit_safe(accept => $handle) and next unless my $tls = $self->{tls};
+    next unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
+    $self->reactor->io($handle => sub { $self->_tls($handle) });
+    $self->{handles}{$handle} = $handle;
+  }
 }
 
 sub _tls {

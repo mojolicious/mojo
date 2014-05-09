@@ -128,10 +128,15 @@ sub _accept {
 
     # Start TLS handshake
     $self->emit_safe(accept => $handle) and next unless my $tls = $self->{tls};
-    next unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
-    $self->reactor->io($handle => sub { $self->_tls($handle) });
-    $self->{handles}{$handle} = $handle;
+    $self->_handshake($self->{handles}{$handle} = $handle)
+      if $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
   }
+}
+
+sub _handshake {
+  my ($self, $handle) = @_;
+  weaken $self;
+  $self->reactor->io($handle => sub { $self->_tls($handle) });
 }
 
 sub _tls {

@@ -39,10 +39,10 @@ sub _restart {
   );
   weaken $server->{app};
   delete $self->{port} if $full;
-  die "Couldn't find a free TCP port for application.\n"
-    unless my $port = $self->{port} ||= Mojo::IOLoop->generate_port;
+  my $port = $self->{port} ? ":$self->{port}" : '';
   $self->{proto} = $proto ||= 'http';
-  $server->listen(["$proto://127.0.0.1:$port"])->start;
+  $self->{port} = $server->listen(["$proto://127.0.0.1$port"])
+    ->start->ioloop->acceptor($server->acceptors->[0])->handle->sockport;
 }
 
 1;

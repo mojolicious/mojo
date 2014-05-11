@@ -2,12 +2,10 @@ package Mojo::IOLoop::Stream;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK);
+use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 
-has reactor => sub {
-  require Mojo::IOLoop;
-  Mojo::IOLoop->singleton->reactor;
-};
+has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY { shift->close }
 

@@ -5,6 +5,7 @@ use Carp 'croak';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use IO::Socket::INET;
+use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
@@ -26,10 +27,7 @@ my $CERT = catfile dirname(__FILE__), 'server.crt';
 my $KEY  = catfile dirname(__FILE__), 'server.key';
 
 has multi_accept => 50;
-has reactor      => sub {
-  require Mojo::IOLoop;
-  Mojo::IOLoop->singleton->reactor;
-};
+has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY {
   my $self = shift;

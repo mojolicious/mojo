@@ -51,11 +51,10 @@ sub listen {
 
   # Look for reusable file descriptor
   my $address = $args->{address} || '0.0.0.0';
-  my ($port, $fd);
+  my $port = $args->{port};
   $ENV{MOJO_REUSE} ||= '';
-  $fd = $1
-    if ($port = $args->{port})
-    && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/;
+  my $fd;
+  $fd = $1 if $port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/;
 
   # Allow file descriptor inheritance
   local $^F = 1000;

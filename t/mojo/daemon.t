@@ -186,10 +186,10 @@ ok $remote_address, 'has local address';
 ok $remote_port > 0, 'has local port';
 
 # Pipelined
-$port = Mojo::IOLoop->generate_port;
-my $daemon = Mojo::Server::Daemon->new(listen => ["http://127.0.0.1:$port"],
-  silent => 1);
+my $daemon
+  = Mojo::Server::Daemon->new(listen => ['http://127.0.0.1'], silent => 1);
 $daemon->start;
+$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
 is $daemon->app->moniker, 'HelloWorld', 'right moniker';
 my $buffer = '';
 my $id;
@@ -214,16 +214,16 @@ Mojo::IOLoop->start;
 like $buffer, qr/Mojo$/, 'transactions were pipelined';
 
 # Throttling
-$port   = Mojo::IOLoop->generate_port;
 $daemon = Mojo::Server::Daemon->new(
   app    => $app,
-  listen => ["http://127.0.0.1:$port"],
+  listen => ['http://127.0.0.1'],
   silent => 1
 );
 is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
 $daemon->start;
 is scalar @{$daemon->acceptors}, 1, 'one active acceptor';
 is $daemon->app->moniker, 'mojolicious', 'right moniker';
+$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
 $tx = $ua->get("http://127.0.0.1:$port/throttle1" => {Connection => 'close'});
 ok $tx->success, 'successful';
 is $tx->res->code, 200,         'right status';

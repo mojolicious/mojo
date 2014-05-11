@@ -471,10 +471,9 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Unexpected 1xx responses
-$port = Mojo::IOLoop->generate_port;
-$req  = Mojo::Message::Request->new;
-Mojo::IOLoop->server(
-  {address => '127.0.0.1', port => $port} => sub {
+$req = Mojo::Message::Request->new;
+$id  = Mojo::IOLoop->server(
+  {address => '127.0.0.1'} => sub {
     my ($loop, $stream) = @_;
     $stream->on(
       read => sub {
@@ -489,6 +488,7 @@ Mojo::IOLoop->server(
     );
   }
 );
+$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 $tx = $ua->build_tx(GET => "http://localhost:$port/");
 my @unexpected;
 $tx->on(unexpected => sub { push @unexpected, pop });

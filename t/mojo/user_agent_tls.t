@@ -29,13 +29,13 @@ my $daemon = Mojo::Server::Daemon->new(
   ioloop => Mojo::IOLoop->singleton,
   silent => 1
 );
-my $port = Mojo::IOLoop->new->generate_port;
 my $listen
-  = "https://127.0.0.1:$port"
+  = 'https://127.0.0.1'
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt';
 $daemon->listen([$listen])->start;
+my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
 
 # No certificate
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
@@ -109,13 +109,14 @@ $daemon = Mojo::Server::Daemon->new(
   silent => 1
 );
 $listen
-  = "https://127.0.0.1:$port"
+  = 'https://127.0.0.1'
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt'
   . '&ciphers=RC4-SHA:ALL'
   . '&verify=0x00';
 $daemon->listen([$listen])->start;
+$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
 
 # Invalid certificate
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);

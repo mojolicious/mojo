@@ -38,17 +38,17 @@ use Mojo::IOLoop;
 # Built-in certificate
 my $loop  = Mojo::IOLoop->new;
 my $delay = $loop->delay;
-my $port  = Mojo::IOLoop->generate_port;
 my ($server, $client);
 my $end = $delay->begin;
-$loop->server(
-  {address => '127.0.0.1', port => $port, tls => 1} => sub {
+my $id  = $loop->server(
+  {address => '127.0.0.1', tls => 1} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test' => sub { shift->write('321') });
     $stream->on(close => $end);
     $stream->on(read => sub { $server .= pop });
   }
 );
+my $port = $loop->acceptor($id)->handle->sockport;
 my $end2 = $delay->begin;
 $loop->client(
   {port => $port, tls => 1} => sub {
@@ -65,14 +65,12 @@ is $client, 'test321', 'right content';
 
 # Valid client certificate
 $delay = Mojo::IOLoop->delay;
-$port  = Mojo::IOLoop->generate_port;
 ($server, $client) = ();
 my ($remove, $running, $timeout, $server_err, $server_close, $client_close);
 Mojo::IOLoop->remove(Mojo::IOLoop->recurring(0 => sub { $remove++ }));
 $end = $delay->begin;
-Mojo::IOLoop->server(
+$id  = Mojo::IOLoop->server(
   address  => '127.0.0.1',
-  port     => $port,
   tls      => 1,
   tls_ca   => 't/mojo/certs/ca.crt',
   tls_cert => 't/mojo/certs/server.crt',
@@ -93,6 +91,7 @@ Mojo::IOLoop->server(
     $stream->timeout(0.5);
   }
 );
+$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 $end2 = $delay->begin;
 Mojo::IOLoop->client(
   port     => $port,
@@ -150,17 +149,16 @@ ok $client_err, 'has error';
 
 # Invalid certificate authority (server)
 $loop = Mojo::IOLoop->new;
-$port = Mojo::IOLoop->generate_port;
 ($server_err, $client_err) = ();
-$loop->server(
+$id = $loop->server(
   address  => '127.0.0.1',
-  port     => $port,
   tls      => 1,
   tls_ca   => 'no cert',
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
   sub { $server_err = 'accepted' }
 );
+$port = $loop->acceptor($id)->handle->sockport;
 $loop->client(
   port     => $port,
   tls      => 1,
@@ -177,13 +175,11 @@ ok $client_err, 'has error';
 
 # Valid client and server certificates
 $delay = Mojo::IOLoop->delay;
-$port  = Mojo::IOLoop->generate_port;
 ($running, $timeout, $server, $server_err, $server_close) = ();
 ($client, $client_close) = ();
 $end = $delay->begin;
-Mojo::IOLoop->server(
+$id  = Mojo::IOLoop->server(
   address  => '127.0.0.1',
-  port     => $port,
   tls      => 1,
   tls_ca   => 't/mojo/certs/ca.crt',
   tls_cert => 't/mojo/certs/server.crt',
@@ -202,6 +198,7 @@ Mojo::IOLoop->server(
     $stream->on(read => sub { $server .= pop });
   }
 );
+$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 $end2 = $delay->begin;
 Mojo::IOLoop->client(
   port     => $port,
@@ -234,16 +231,15 @@ ok !$server_err, 'no error';
 
 # Invalid server certificate (unsigned)
 $loop = Mojo::IOLoop->new;
-$port = Mojo::IOLoop->generate_port;
 ($server_err, $client_err) = ();
-$loop->server(
+$id = $loop->server(
   address  => '127.0.0.1',
-  port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
   sub { $server_err = 'accepted' }
 );
+$port = $loop->acceptor($id)->handle->sockport;
 $loop->client(
   port   => $port,
   tls    => 1,
@@ -259,16 +255,15 @@ ok $client_err, 'has error';
 
 # Invalid server certificate (hostname)
 $loop = Mojo::IOLoop->new;
-$port = Mojo::IOLoop->generate_port;
 ($server_err, $client_err) = ();
-$loop->server(
+$id = $loop->server(
   address  => '127.0.0.1',
-  port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
   sub { $server_err = 'accepted' }
 );
+$port = $loop->acceptor($id)->handle->sockport;
 $loop->client(
   address => '127.0.0.1',
   port    => $port,
@@ -285,16 +280,15 @@ ok $client_err, 'has error';
 
 # Invalid certificate authority (client)
 $loop = Mojo::IOLoop->new;
-$port = Mojo::IOLoop->generate_port;
 ($server_err, $client_err) = ();
-$loop->server(
+$id = $loop->server(
   address  => '127.0.0.1',
-  port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
   sub { $server_err = 'accepted' }
 );
+$port = $loop->acceptor($id)->handle->sockport;
 $loop->client(
   port   => $port,
   tls    => 1,
@@ -310,12 +304,10 @@ ok $client_err, 'has error';
 
 # Ignore invalid client certificate
 $loop = Mojo::IOLoop->new;
-$port = Mojo::IOLoop->generate_port;
 my $cipher;
 ($server, $client, $client_err) = ();
-$loop->server(
+$id = $loop->server(
   address     => '127.0.0.1',
-  port        => $port,
   tls         => 1,
   tls_ca      => 't/mojo/certs/ca.crt',
   tls_cert    => 't/mojo/certs/server.crt',
@@ -328,6 +320,7 @@ $loop->server(
     $server = 'accepted';
   }
 );
+$port = $loop->acceptor($id)->handle->sockport;
 $loop->client(
   port     => $port,
   tls      => 1,

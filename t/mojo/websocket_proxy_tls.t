@@ -53,24 +53,23 @@ websocket '/test' => sub {
 
 # Web server with valid certificates
 my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
-my $port = Mojo::IOLoop->new->generate_port;
 my $listen
-  = "https://127.0.0.1:$port"
+  = 'https://127.0.0.1'
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt';
 $daemon->listen([$listen])->start;
+my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
 
 # Connect proxy server for testing
-my $proxy = Mojo::IOLoop->generate_port;
 my (%buffer, $connected, $read, $sent);
 my $nf
   = "HTTP/1.1 501 FOO\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.0 201 BAR\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
-Mojo::IOLoop->server(
-  {address => '127.0.0.1', port => $proxy} => sub {
+my $id = Mojo::IOLoop->server(
+  {address => '127.0.0.1'} => sub {
     my ($loop, $stream, $client) = @_;
 
     # Connection to client
@@ -138,6 +137,7 @@ Mojo::IOLoop->server(
     );
   }
 );
+my $proxy = Mojo::IOLoop->acceptor($id)->handle->sockport;
 
 # User agent with valid certificates
 my $ua = Mojo::UserAgent->new(

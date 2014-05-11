@@ -1,5 +1,7 @@
 
-4.99  2014-05-10
+4.99  2014-05-11
+  - Improved Mojo::IOLoop::Server and Mojo::Server::Daemon to be able to
+    listen on random ports.
 
 4.98  2014-05-09
   - Removed deprecated get_line function from Mojo::Util.

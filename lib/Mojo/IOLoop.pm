@@ -564,6 +564,13 @@ as L<Mojo::IOLoop::Server/"listen">.
     ...
   });
 
+  # Listen on random port
+  my $id = Mojo::IOLoop->server({address => '127.0.0.1'} => sub {
+    my ($loop, $stream, $id) = @_;
+    ...
+  });
+  my $port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+
 =head2 singleton
 
   my $loop = Mojo::IOLoop->singleton;

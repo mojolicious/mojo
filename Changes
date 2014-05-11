@@ -1,5 +1,8 @@
 
-4.99  2014-05-11
+4.99  2014-05-12
+  - Added support for performing blocking and non-blocking requests at the
+    same time with Mojo::UserAgent.
+  - Added nb_url method to Mojo::UserAgent::Server.
   - Improved Mojo::IOLoop::Server and Mojo::Server::Daemon to be able to
     listen on random ports.
 

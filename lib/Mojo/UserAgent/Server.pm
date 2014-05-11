@@ -20,19 +20,11 @@ sub app {
   return $self;
 }
 
-sub nb_url {
-  my $self = shift;
-  $self->_restart(0, @_) if !$self->{server} || @_;
-  return Mojo::URL->new("$self->{proto}://localhost:$self->{nb_port}/");
-}
+sub nb_url { shift->_url(1, @_) }
 
 sub restart { shift->_restart(1) }
 
-sub url {
-  my $self = shift;
-  $self->_restart(0, @_) if !$self->{server} || @_;
-  return Mojo::URL->new("$self->{proto}://localhost:$self->{port}/");
-}
+sub url { shift->_url(0, @_) }
 
 sub _restart {
   my ($self, $full, $proto) = @_;
@@ -54,6 +46,13 @@ sub _restart {
   $port = $self->{nb_port} ? ":$self->{nb_port}" : '';
   $self->{nb_port} = $server->listen(["$proto://127.0.0.1$port"])
     ->start->ioloop->acceptor($server->acceptors->[0])->handle->sockport;
+}
+
+sub _url {
+  my ($self, $nb) = (shift, shift);
+  $self->_restart(0, @_) if !$self->{server} || @_;
+  my $port = $nb ? $self->{nb_port} : $self->{port};
+  return Mojo::URL->new("$self->{proto}://localhost:$port/");
 }
 
 1;

@@ -295,10 +295,7 @@ is encode_json({test => [$num, $str]}), '{"test":[1,"0 but true"]}',
 
 # Upgraded string
 $str = "bar";
-{
-  no warnings 'numeric';
-  $num = 23 + $str;
-}
+{ no warnings 'numeric'; $num = 23 + $str }
 is encode_json({test => [$num, $str]}), '{"test":[23,"bar"]}',
   'upgraded string detected';
 

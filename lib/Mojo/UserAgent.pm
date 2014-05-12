@@ -48,10 +48,7 @@ sub start {
   my ($self, $tx, $cb) = @_;
 
   # Fork safety
-  unless (($self->{pid} //= $$) eq $$) {
-    delete $self->_cleanup->{pid};
-    $self->server->restart;
-  }
+  $self->_cleanup->server->restart unless ($self->{pid} //= $$) eq $$;
 
   # Non-blocking
   if ($cb) {
@@ -78,6 +75,7 @@ sub _cleanup {
   return unless my $loop = $self->_loop(0);
 
   # Clean up active connections (by closing them)
+  delete $self->{pid};
   $self->_handle($_, 1) for keys %{$self->{connections} || {}};
 
   # Clean up keep-alive connections

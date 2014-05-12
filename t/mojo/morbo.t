@@ -14,7 +14,7 @@ use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
-use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::Server::Morbo;
 use Mojo::UserAgent;
@@ -37,7 +37,7 @@ app->start;
 EOF
 
 # Start
-my $port   = Mojo::IOLoop->generate_port;
+my $port   = Mojo::IOLoop::Server->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
   "http://127.0.0.1:$port", $script;
@@ -123,7 +123,7 @@ sleep 1 while _port($port);
 SKIP: {
   skip 'SO_REUSEPORT support required!', 2 unless eval { _reuse_port() };
 
-  my $port   = Mojo::IOLoop->generate_port;
+  my $port   = Mojo::IOLoop::Server->generate_port;
   my $daemon = Mojo::Server::Daemon->new(
     listen => ["http://127.0.0.1:$port"],
     silent => 1
@@ -146,7 +146,7 @@ sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
 sub _reuse_port {
   IO::Socket::INET->new(
     Listen    => 1,
-    LocalPort => Mojo::IOLoop->generate_port,
+    LocalPort => Mojo::IOLoop::Server->generate_port,
     ReusePort => 1
   );
 }

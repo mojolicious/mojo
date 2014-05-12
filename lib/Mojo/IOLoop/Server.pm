@@ -225,7 +225,7 @@ implements the following new ones.
 
   my $port = $server->generate_port;
 
-Find a free TCP port, this is a utility function primarily used for tests.
+Find a free TCP port, primarily used for tests.
 
 =head2 handle
 

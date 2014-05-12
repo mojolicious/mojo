@@ -63,7 +63,7 @@ is $ua->get('/remote_address')->res->body, $address, 'right address';
 $ua = Mojo::UserAgent->new;
 
 # Connection refused
-my $port = Mojo::IOLoop->generate_port;
+my $port = Mojo::IOLoop::Server->generate_port;
 my $tx = $ua->build_tx(GET => "http://localhost:$port");
 $ua->start($tx);
 ok $tx->is_finished, 'transaction is finished';

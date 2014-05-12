@@ -87,8 +87,6 @@ sub delay {
   return @_ ? $delay->steps(@_) : $delay;
 }
 
-sub generate_port { Mojo::IOLoop::Server->generate_port }
-
 sub is_running { _instance(shift)->reactor->is_running }
 sub next_tick  { _instance(shift)->reactor->next_tick(@_) }
 sub one_tick   { _instance(shift)->reactor->one_tick }
@@ -482,13 +480,6 @@ L<Mojo::IOLoop::Delay/"steps">.
     sub { say 'And done after 5 seconds total.' }
   );
   $delay->wait unless Mojo::IOLoop->is_running;
-
-=head2 generate_port
-
-  my $port = Mojo::IOLoop->generate_port;
-  my $port = $loop->generate_port;
-
-Find a free TCP port, this is a utility function primarily used for tests.
 
 =head2 is_running
 

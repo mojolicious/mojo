@@ -4,7 +4,6 @@
   - Changed heuristics for number detection in Mojo::JSON to better line up
     with user expectations.
   - Removed deprecated support for "X-Forwarded-HTTPS".
-  - Improved
 
 4.99  2014-05-12
   - Added support for performing blocking and non-blocking requests at the

@@ -1,7 +1,6 @@
 package Mojo::JSON;
 use Mojo::Base -base;
 
-use B;
 use Carp 'croak';
 use Exporter 'import';
 use Mojo::Util;
@@ -263,8 +262,15 @@ sub _encode_value {
   return 'null' unless defined $value;
 
   # Number
-  my $flags = B::svref_2object(\$value)->FLAGS;
-  return 0 + $value if $flags & (B::SVp_IOK | B::SVp_NOK) && $value * 0 == 0;
+  my $num = $value;
+  {
+    no warnings 'numeric';
+    $num += 0;
+  }
+  my $str = $value;
+  $str .= '';
+  return $num
+    if ($value ^ '0') ne ($str ^ '0') && $num eq $str && $num * 0 == 0;
 
   # String
   return _encode_string($value);

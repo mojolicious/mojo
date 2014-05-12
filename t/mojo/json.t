@@ -289,8 +289,17 @@ is encode_json({test => [$num, $str]}), '{"test":[3.21,"3.21"]}',
   'upgraded number detected';
 $str = '0 but true';
 $num = 1 + $str;
-is encode_json({test => [$num, $str]}), '{"test":[1,0]}',
+is encode_json({test => [$num, $str]}), '{"test":[1,"0 but true"]}',
   'upgraded number detected';
+
+# Upgraded string
+$str = "bar";
+{
+  no warnings 'numeric';
+  $num = 23 + $str;
+}
+is encode_json({test => [$num, $str]}), '{"test":[23,"bar"]}',
+  'upgraded string detected';
 
 # Ensure numbers and strings are not upgraded
 my $mixed = [3, 'three', '3', 0, "0"];

@@ -12,6 +12,7 @@ use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::JSON qw(decode_json encode_json j);
 use Mojo::Util 'encode';
+use Scalar::Util 'dualvar';
 
 # Decode array
 my $array = decode_json '[]';
@@ -300,6 +301,10 @@ $str = "bar";
 }
 is encode_json({test => [$num, $str]}), '{"test":[23,"bar"]}',
   'upgraded string detected';
+
+# dualvar
+my $dual = dualvar 23, 'twenty three';
+is encode_json([$dual]), '["twenty three"]', 'dualvar stringified';
 
 # Ensure numbers and strings are not upgraded
 my $mixed = [3, 'three', '3', 0, "0"];

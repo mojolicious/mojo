@@ -1,4 +1,8 @@
 
+5.0  2014-05-13
+  - Code name "Beer Mug", this is a major release.
+  - Removed deprecated support for "X-Forwarded-HTTPS".
+
 4.99  2014-05-12
   - Added support for performing blocking and non-blocking requests at the
     same time with Mojo::UserAgent.

@@ -79,9 +79,9 @@ sub _cleanup {
   $self->_handle($_, 1) for keys %{$self->{connections} || {}};
 
   # Clean up keep-alive connections
-  $loop->remove($_->[1]) for @{delete $self->{queue}{0} || []};
+  $loop->remove($_->[1]) for @{delete $self->{queue}[0] || []};
   $loop = Mojo::IOLoop->singleton;
-  $loop->remove($_->[1]) for @{delete $self->{queue}{1} || []};
+  $loop->remove($_->[1]) for @{delete $self->{queue}[1] || []};
 
   return $self;
 }
@@ -207,8 +207,8 @@ sub _dequeue {
 
   my $found;
   my $loop = $self->_loop($nb);
-  my $old  = $self->{queue}{$nb} || [];
-  my $new  = $self->{queue}{$nb} = [];
+  my $old  = $self->{queue}[$nb] || [];
+  my $new  = $self->{queue}[$nb] = [];
   for my $queued (@$old) {
     push @$new, $queued and next if $found || !grep { $_ eq $name } @$queued;
 
@@ -224,7 +224,7 @@ sub _enqueue {
   my ($self, $nb, $name, $id) = @_;
 
   # Enforce connection limit
-  my $queue = $self->{queue}{$nb} ||= [];
+  my $queue = $self->{queue}[$nb] ||= [];
   my $max = $self->max_connections;
   $self->_remove(shift(@$queue)->[1]) while @$queue > $max;
   push @$queue, [$name, $id] if $max;

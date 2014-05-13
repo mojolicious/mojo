@@ -263,12 +263,10 @@ sub _encode_value {
   return 'null' unless defined $value;
 
   # Number
-  if (B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK)) {
-    no warnings 'numeric';
-    my $num = $value;
-    $num += 0;
-    return $num if $num eq $value && $num * 0 == 0;
-  }
+  return $value
+    if B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK)
+    && 0 + $value eq $value
+    && $value * 0 == 0;
 
   # String
   return _encode_string($value);

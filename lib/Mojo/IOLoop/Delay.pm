@@ -50,7 +50,7 @@ sub _step {
   my ($self, $id, $offset, $len) = (shift, shift, shift, shift);
 
   $self->{args}[$id]
-    = [defined $len ? splice(@_, $offset, $len) : splice(@_, $offset)];
+    = [@_ ? defined $len ? splice @_, $offset, $len : splice @_, $offset : ()];
   return $self if $self->{fail} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};

@@ -877,7 +877,8 @@ L<Mojo::Transaction::HTTP> object.
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 You can activate C<permessage-deflate> compression by setting the
-C<Sec-WebSocket-Extensions> header.
+C<Sec-WebSocket-Extensions> header, this can result in much better
+performance, but also increases memory usage by up to 300KB per connection.
 
   my $headers = {'Sec-WebSocket-Extensions' => 'permessage-deflate'};
   $ua->websocket('ws://example.com/foo' => $headers => sub {...});

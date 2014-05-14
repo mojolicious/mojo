@@ -570,6 +570,15 @@ L<Mojolicious::Controller/"send">.
 The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right after
 the WebSocket connection has been closed.
 
+  $self->tx->compressed(0);
+  $self->res->headers->remove('Sec-WebSocket-Extensions');
+
+By default C<permessage-deflate> compression will be used if the client
+supports it, this can result in much better performance, but also increases
+memory usage by up to 300KB per connection. It can be disabled with
+L<Mojo::Transaction::WebSocket/"compressed"> and by removing the
+C<Sec-WebSocket-Extensions> header from the WebSocket handshake response.
+
 =head2 Testing WebSocket web services
 
 While the message flow on WebSocket connections can be rather dynamic, it

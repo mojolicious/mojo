@@ -354,8 +354,7 @@ the server has been stopped.
   proxy => 1
 
 Activate reverse proxy support, which allows for the C<X-Forwarded-For> and
-C<X-Forwarded-Proto> headers to be picked up automatically, defaults to the
-value of the C<MOJO_REVERSE_PROXY> environment variable.
+C<X-Forwarded-Proto> headers to be picked up automatically.
 
 =head2 upgrade_timeout
 

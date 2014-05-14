@@ -5,6 +5,8 @@
     with user expectations.
   - Removed deprecated support for "X-Forwarded-HTTPS".
   - Removed generate_port method from Mojo::IOLoop.
+  - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
+    IO::Socket::SSL. (noxxi)
   - Fixed warnings in Mojo::IOLoop::Delay.
 
 4.99  2014-05-12

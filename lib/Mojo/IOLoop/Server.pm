@@ -127,7 +127,7 @@ sub _accept {
     # Start TLS handshake
     $self->emit_safe(accept => $handle) and next unless my $tls = $self->{tls};
     $self->_handshake($self->{handles}{$handle} = $handle)
-      if $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
+      if $handle = IO::Socket::SSL->start_SSL($handle, %$tls, SSL_server => 1);
   }
 }
 

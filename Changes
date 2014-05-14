@@ -1,5 +1,5 @@
 
-5.0  2014-05-14
+5.0  2014-05-15
   - Code name "Tiger Face", this is a major release.
   - Changed heuristics for number detection in Mojo::JSON to better line up
     with user expectations.

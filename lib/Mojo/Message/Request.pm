@@ -170,9 +170,9 @@ sub parse {
   $self->proxy(Mojo::URL->new->userinfo($proxy_auth)) if $proxy_auth;
 
   # "X-Forwarded-Proto"
-  return $self unless $self->reverse_proxy;
   $base->scheme('https')
-    if ($headers->header('X-Forwarded-Proto') // '') eq 'https';
+    if $self->reverse_proxy
+    && ($headers->header('X-Forwarded-Proto') // '') eq 'https';
 
   return $self;
 }

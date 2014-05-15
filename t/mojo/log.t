@@ -37,14 +37,23 @@ like $content, qr/\[.*\] \[debug\] Works too\.\n/, 'right debug message';
 
 # Formatting
 $log = Mojo::Log->new;
-like $log->format(debug => 'Test 123.'), qr/^\[.*\] \[debug\] Test 123\.\n$/,
-  'right format';
-like $log->format(qw(debug Test 1 2 3)),
+like $log->format->(time, 'debug', 'Test 123.'),
+  qr/^\[.*\] \[debug\] Test 123\.\n$/, 'right format';
+like $log->format->(time, 'debug', qw(Test 1 2 3)),
   qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
-like decode('UTF-8', $log->format(error => 'I ♥ Mojolicious.')),
+like $log->format->(time, 'error', 'I ♥ Mojolicious.'),
   qr/^\[.*\] \[error\] I ♥ Mojolicious\.\n$/, 'right format';
+$log->format(
+  sub {
+    my ($time, $level, @lines) = @_;
+    return join ':', $level, $time, @lines;
+  }
+);
+like $log->format->(time, 'debug', qw(Test 1 2 3)),
+  qr/^debug:\d+:Test:1:2:3$/, 'right format';
 
 # Events
+$log = Mojo::Log->new;
 my $msgs = [];
 $log->unsubscribe('message')->on(
   message => sub {

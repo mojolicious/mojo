@@ -296,12 +296,9 @@
         <div id="log" class="box infobox spaced">
           <table>
             % for my $msg (@{app->log->history}) {
-              % my ($time, $level, @lines) = @$msg;
-              % $time = localtime $time;
-              % my $lines = join "\n", @lines;
               <tr>
                 <td class="striped value wide">
-                  <pre>[<%= $time %>] [<%= $level %>] <%= $lines %></pre>
+                  <pre><%= app->log->format->(@$msg) %></pre>
                 </td>
               </tr>
             % }

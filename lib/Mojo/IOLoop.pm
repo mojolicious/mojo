@@ -157,7 +157,7 @@ sub _accepting {
   return unless $i < $max;
 
   # Acquire accept mutex
-  if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
+  if (my $cb = $self->lock) { return unless $cb->(!$i) }
   $self->_remove(delete $self->{accept});
 
   # Check if multi-accept is desirable
@@ -185,7 +185,7 @@ sub _not_accepting {
   # Release accept mutex
   return unless delete $self->{accepting};
   return unless my $cb = $self->unlock;
-  $self->$cb;
+  $cb->();
 
   $_->stop for values %{$self->{acceptors} || {}};
 }
@@ -345,7 +345,7 @@ processes. The callback should return true or false. Note that exceptions in
 this callback are not captured.
 
   $loop->lock(sub {
-    my ($loop, $blocking) = @_;
+    my $blocking = shift;
 
     # Got the accept mutex, start accepting new connections
     return 1;

@@ -5,6 +5,7 @@
     with user expectations.
   - Removed deprecated support for "X-Forwarded-HTTPS".
   - Removed generate_port method from Mojo::IOLoop.
+  - Added no_compression method to Mojo::Transaction::WebSocket.
   - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
     IO::Socket::SSL. (noxxi)
   - Fixed warnings in Mojo::IOLoop::Delay.

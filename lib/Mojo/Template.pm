@@ -501,10 +501,15 @@ Encoding used for template files.
 =head2 escape
 
   my $cb = $mt->escape;
-  $mt    = $mt->escape(sub { reverse $_[0] });
+  $mt    = $mt->escape(sub {...});
 
 A callback used to escape the results of escaped expressions, defaults to
 L<Mojo::Util/"xml_escape">.
+
+  $mt->escape(sub {
+    my $str = shift;
+    return reverse $str;
+  });
 
 =head2 escape_mark
 

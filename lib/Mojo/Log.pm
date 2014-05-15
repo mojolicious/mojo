@@ -142,7 +142,7 @@ A callback for formatting log messages.
 
   $log->format(sub {
     my ($time, $level, @lines) = @_;
-    ...
+    return "[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious.\n";
   });
 
 =head2 handle
@@ -191,7 +191,7 @@ the following new ones.
 
 =head2 append
 
-  $log->append($msg);
+  $log->append("[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious.\n");
 
 Append message to L</"handle">.
 

@@ -8,6 +8,7 @@ use Mojo::URL;
 has env => sub { {} };
 has method => 'GET';
 has url => sub { Mojo::URL->new };
+has 'reverse_proxy';
 
 my $START_LINE_RE = qr/
   ^
@@ -168,9 +169,10 @@ sub parse {
   my $proxy_auth = _parse_basic_auth($headers->proxy_authorization);
   $self->proxy(Mojo::URL->new->userinfo($proxy_auth)) if $proxy_auth;
 
-  # "X-Forwarded-HTTPS"
+  # "X-Forwarded-Proto"
   $base->scheme('https')
-    if $ENV{MOJO_REVERSE_PROXY} && $headers->header('X-Forwarded-HTTPS');
+    if $self->reverse_proxy
+    && ($headers->header('X-Forwarded-Proto') // '') eq 'https';
 
   return $self;
 }
@@ -327,6 +329,13 @@ HTTP request URL, defaults to a L<Mojo::URL> object.
   say $req->url->to_abs->host;
   say $req->url->to_abs->path;
 
+=head2 reverse_proxy
+
+  my $bool = $req->reverse_proxy;
+  $req     = $req->reverse_proxy($bool);
+
+Request has been performed through a reverse proxy.
+
 =head1 METHODS
 
 L<Mojo::Message::Request> inherits all methods from L<Mojo::Message> and
@@ -384,9 +393,10 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
 =head2 param
 
-  my @names = $req->param;
-  my $foo   = $req->param('foo');
-  my @foo   = $req->param('foo');
+  my @names       = $req->param;
+  my $foo         = $req->param('foo');
+  my @foo         = $req->param('foo');
+  my ($foo, $bar) = $req->param(['foo', 'bar']);
 
 Access C<GET> and C<POST> parameters. Note that this method caches all data,
 so it should not be called before the entire request body has been received.

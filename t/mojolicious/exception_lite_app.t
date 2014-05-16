@@ -166,7 +166,7 @@ like $log, qr/dead template with layout!/, 'right result';
 $t->get_ok('/dead_action')->status_is(500)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr!get &#39;/dead_action&#39;!)
-  ->content_like(qr/dead action!/);
+  ->content_like(qr/dead action!/)->text_is('#error' => "dead action!\n");
 like $log, qr/dead action!/, 'right result';
 
 # Dead action with different format

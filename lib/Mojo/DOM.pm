@@ -14,7 +14,7 @@ use List::Util 'first';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Mojo::Util qw(deprecated squish);
+use Mojo::Util 'squish';
 use Scalar::Util qw(blessed weaken);
 
 sub AUTOLOAD {
@@ -86,13 +86,6 @@ sub content {
   return $self;
 }
 
-# DEPRECATED in Top Hat!
-sub content_xml {
-  deprecated
-    'Mojo::DOM::content_xml is DEPRECATED in favor of Mojo::DOM::content';
-  shift->content;
-}
-
 sub contents { $_[0]->_collect(_nodes($_[0]->tree)) }
 
 sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
@@ -153,13 +146,6 @@ sub replace {
   return $self->_replace($self->_parent, $tree, $self->_parse("$new"));
 }
 
-# DEPRECATED in Top Hat!
-sub replace_content {
-  deprecated
-    'Mojo::DOM::replace_content is DEPRECATED in favor of Mojo::DOM::content';
-  shift->content(@_);
-}
-
 sub root {
   my $self = shift;
   return $self unless my $tree = $self->_ancestors(1);
@@ -178,50 +164,7 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { shift->_all_text(0, @_) }
 
-# DEPRECATED in Top Hat!
-sub text_after {
-  deprecated
-    'Mojo::DOM::text_after is DEPRECATED in favor of Mojo::DOM::contents';
-  my ($self, $trim) = @_;
-
-  return '' if (my $tree = $self->tree)->[0] ne 'tag';
-
-  my (@nodes, $started);
-  for my $n (_nodes($tree->[3])) {
-    ++$started and next if $n eq $tree;
-    next unless $started;
-    last if $n->[0] eq 'tag';
-    push @nodes, $n;
-  }
-
-  return _text(\@nodes, 0, _trim($tree->[3], $trim));
-}
-
-# DEPRECATED in Top Hat!
-sub text_before {
-  deprecated
-    'Mojo::DOM::text_before is DEPRECATED in favor of Mojo::DOM::contents';
-  my ($self, $trim) = @_;
-
-  return '' if (my $tree = $self->tree)->[0] ne 'tag';
-
-  my @nodes;
-  for my $n (_nodes($tree->[3])) {
-    last if $n eq $tree;
-    @nodes = $n->[0] eq 'tag' ? () : (@nodes, $n);
-  }
-
-  return _text(\@nodes, 0, _trim($tree->[3], $trim));
-}
-
 sub to_string { shift->_delegate('render') }
-
-# DEPRECATED in Top Hat!
-sub to_xml {
-  deprecated
-    'Mojo::DOM::to_xml is DEPRECATED in favor of Mojo::DOM::to_string';
-  shift->to_string;
-}
 
 sub tree { shift->_delegate(tree => @_) }
 

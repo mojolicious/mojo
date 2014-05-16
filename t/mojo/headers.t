@@ -154,23 +154,26 @@ Foo: first
  second
  third
 Content-Type: text/plain
+Foo Bar: baz
 Foo: first again
-  second again
+  second ":again"
 
 EOF
 ok $headers->is_finished, 'parser is finished';
-my $multi = [['first', 'second', 'third'], ['first again', 'second again']];
-$hash = {'Content-Type' => [['text/plain']], Foo => $multi};
+my $multi = [['first', 'second', 'third'], ['first again', 'second ":again"']];
+$hash = {'Content-Type' => [['text/plain']], Foo => $multi,
+  'Foo Bar' => [['baz']]};
 is_deeply $headers->to_hash(1), $hash, 'right structure';
 is_deeply [$headers->header('Foo')], $multi, 'right structure';
 is scalar $headers->header('Foo'),
-  'first, second, third, first again, second again', 'right value';
+  'first, second, third, first again, second ":again"', 'right value';
 $headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
 ok $headers->is_finished, 'parser is finished';
 is_deeply $headers->to_hash(1), $hash, 'successful roundtrip';
 $hash = {
   'Content-Type' => 'text/plain',
-  Foo            => 'first, second, third, first again, second again'
+  Foo            => 'first, second, third, first again, second ":again"',
+  'Foo Bar'      => 'baz'
 };
 is_deeply $headers->to_hash, $hash, 'right structure';
 

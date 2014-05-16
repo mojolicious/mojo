@@ -27,10 +27,10 @@ sub run {
     'l|listen=s'     => \my @listen,
     'multi-accept=i' => sub { $prefork->multi_accept($_[1]) },
     'P|pid-file=s'   => sub { $prefork->pid_file($_[1]) },
-    'p|proxy'        => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
-    'r|requests=i' => sub { $prefork->max_requests($_[1]) },
-    'u|user=s'     => sub { $prefork->user($_[1]) },
-    'w|workers=i'  => sub { $prefork->workers($_[1]) };
+    'p|proxy'        => sub { $prefork->reverse_proxy(1) },
+    'r|requests=i'   => sub { $prefork->max_requests($_[1]) },
+    'u|user=s'       => sub { $prefork->user($_[1]) },
+    'w|workers=i'    => sub { $prefork->workers($_[1]) };
 
   $prefork->listen(\@listen) if @listen;
   $prefork->run;

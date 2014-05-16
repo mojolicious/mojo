@@ -70,8 +70,8 @@ sub redirect {
 
   # Commonly used codes
   my $res = $old->res;
-  my $code = $res->code // '';
-  return undef unless grep { $_ eq $code } 301, 302, 303, 307, 308;
+  my $code = $res->code // 0;
+  return undef unless grep { $_ == $code } 301, 302, 303, 307, 308;
 
   # Fix broken location without authority and/or scheme
   return unless my $location = $res->headers->location;
@@ -81,7 +81,7 @@ sub redirect {
   # Clone request if necessary
   my $new = Mojo::Transaction::HTTP->new;
   my $req = $old->req;
-  if ($code eq 307 || $code eq 308) {
+  if ($code == 307 || $code == 308) {
     return undef unless my $clone = $req->clone;
     $new->req($clone);
   }
@@ -126,8 +126,8 @@ sub tx {
 
 sub upgrade {
   my ($self, $tx) = @_;
-  my $code = $tx->res->code // '';
-  return undef unless $tx->req->is_handshake && $code eq '101';
+  my $code = $tx->res->code // 0;
+  return undef unless $tx->req->is_handshake && $code == 101;
   my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1);
   return $ws->client_challenge ? $ws : undef;
 }

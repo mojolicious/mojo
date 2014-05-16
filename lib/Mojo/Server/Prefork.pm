@@ -177,7 +177,7 @@ sub _spawn {
 
       # Blocking ("ualarm" can't be imported on Windows)
       my $lock;
-      if ($_[1]) {
+      if ($_[0]) {
         eval {
           local $SIG{ALRM} = sub { die "alarm\n" };
           my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;

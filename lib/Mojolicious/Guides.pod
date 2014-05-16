@@ -114,7 +114,7 @@ Very Perl-ish and minimalistic template system.
 
 =item L<Test::Mojo>
 
-Test driven development toolkit for web applications.
+Testing toolkit for web applications.
 
 =item L<ojo>
 

@@ -37,8 +37,6 @@ sub AUTOLOAD {
   return $self->$helper(@_);
 }
 
-sub DESTROY { }
-
 sub continue { $_[0]->app->routes->continue($_[0]) }
 
 sub cookie {
@@ -585,7 +583,8 @@ status.
   my @foo         = $c->param('foo');
   my ($foo, $bar) = $c->param(['foo', 'bar']);
   $c              = $c->param(foo => 'ba;r');
-  $c              = $c->param(foo => qw(ba;r ba;z));
+  $c              = $c->param(foo => qw(ba;r baz));
+  $c              = $c->param(foo => ['ba;r', 'baz']);
 
 Access route placeholder values that are not reserved stash values, file
 uploads and C<GET>/C<POST> parameters, in that order. Note that this method is

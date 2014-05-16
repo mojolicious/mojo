@@ -107,11 +107,11 @@ C<auto_upgrade> enabled.
 
 =head2 auto_upgrade
 
-  my $upgrade = $single->auto_upgrade;
-  $single     = $single->auto_upgrade(0);
+  my $bool = $single->auto_upgrade;
+  $single  = $single->auto_upgrade($bool);
 
 Try to detect multipart content and automatically upgrade to a
-L<Mojo::Content::MultiPart> object, defaults to C<1>.
+L<Mojo::Content::MultiPart> object, defaults to a true value.
 
 =head1 METHODS
 

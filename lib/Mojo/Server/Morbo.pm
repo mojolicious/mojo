@@ -10,16 +10,22 @@ use POSIX 'WNOHANG';
 
 has watch => sub { [qw(lib templates)] };
 
-sub check_file {
-  my ($self, $file) = @_;
+sub check {
+  my $self = shift;
 
-  # Check if modify time and/or size have changed
-  my ($size, $mtime) = (stat $file)[7, 9];
-  return undef unless defined $mtime;
-  my $cache = $self->{cache} ||= {};
-  my $stats = $cache->{$file} ||= [$^T, $size];
-  return undef if $mtime <= $stats->[0] && $size == $stats->[1];
-  return !!($cache->{$file} = [$mtime, $size]);
+  # Discover files
+  my @files;
+  for my $watch (@{$self->watch}) {
+    if (-d $watch) {
+      my $home = Mojo::Home->new->parse($watch);
+      push @files, $home->rel_file($_) for @{$home->list_files};
+    }
+    elsif (-r $watch) { push @files, $watch }
+  }
+
+  # Check files
+  $self->_check($_) and return $_ for @files;
+  return undef;
 }
 
 sub run {
@@ -41,22 +47,22 @@ sub run {
   exit 0;
 }
 
+sub _check {
+  my ($self, $file) = @_;
+
+  # Check if modify time and/or size have changed
+  my ($size, $mtime) = (stat $file)[7, 9];
+  return undef unless defined $mtime;
+  my $cache = $self->{cache} ||= {};
+  my $stats = $cache->{$file} ||= [$^T, $size];
+  return undef if $mtime <= $stats->[0] && $size == $stats->[1];
+  return !!($cache->{$file} = [$mtime, $size]);
+}
+
 sub _manage {
   my $self = shift;
 
-  # Discover files
-  my @files;
-  for my $watch (@{$self->watch}) {
-    if (-d $watch) {
-      my $home = Mojo::Home->new->parse($watch);
-      push @files, $home->rel_file($_) for @{$home->list_files};
-    }
-    elsif (-r $watch) { push @files, $watch }
-  }
-
-  # Check files
-  for my $file (@files) {
-    next unless $self->check_file($file);
+  if (defined(my $file = $self->check)) {
     say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{running} if $self->{running};
     $self->{modified} = 1;
@@ -150,11 +156,12 @@ directory.
 L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 check_file
+=head2 check
 
-  my $bool = $morbo->check_file('/home/sri/lib/MyApp.pm');
+  my $file = $morbo->check;
 
-Check if file has been modified since last check.
+Check if file from L</"watch"> has been modified since last check and return
+its name or C<undef> if there have been no changes.
 
 =head2 run
 

@@ -82,16 +82,10 @@ sub client {
 }
 
 sub delay {
-  my $self = _instance(shift);
-
   my $delay = Mojo::IOLoop::Delay->new;
-  weaken $delay->ioloop($self)->{ioloop};
-  @_ > 1 ? $delay->steps(@_) : $delay->once(finish => shift) if @_;
-
-  return $delay;
+  weaken $delay->ioloop(_instance(shift))->{ioloop};
+  return @_ ? $delay->steps(@_) : $delay;
 }
-
-sub generate_port { Mojo::IOLoop::Server->generate_port }
 
 sub is_running { _instance(shift)->reactor->is_running }
 sub next_tick  { _instance(shift)->reactor->next_tick(@_) }
@@ -163,7 +157,7 @@ sub _accepting {
   return unless $i < $max;
 
   # Acquire accept mutex
-  if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
+  if (my $cb = $self->lock) { return unless $cb->(!$i) }
   $self->_remove(delete $self->{accept});
 
   # Check if multi-accept is desirable
@@ -191,7 +185,7 @@ sub _not_accepting {
   # Release accept mutex
   return unless delete $self->{accepting};
   return unless my $cb = $self->unlock;
-  $self->$cb;
+  $cb->();
 
   $_->stop for values %{$self->{acceptors} || {}};
 }
@@ -303,6 +297,17 @@ L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>,
 it has been reduced to the absolute minimal feature set required to build
 solid and scalable non-blocking TCP clients and servers.
 
+Depending on operating system, the default per-process and system-wide file
+descriptor limits are often very low and need to be tuned for better
+scalability. The C<LIBEV_FLAGS> environment variable should also be used to
+select the best possible L<EV> backend, which usually defaults to the not very
+scalable C<select>.
+
+  LIBEV_FLAGS=1   # select
+  LIBEV_FLAGS=2   # poll
+  LIBEV_FLAGS=4   # epoll (Linux)
+  LIBEV_FLAGS=8   # kqueue (*BSD, OS X)
+
 The event loop will be resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>. A TLS certificate and key are also built
 right in, to make writing test servers as easy as possible. Also note that for
@@ -340,7 +345,7 @@ processes. The callback should return true or false. Note that exceptions in
 this callback are not captured.
 
   $loop->lock(sub {
-    my ($loop, $blocking) = @_;
+    my $blocking = shift;
 
     # Got the accept mutex, start accepting new connections
     return 1;
@@ -439,9 +444,8 @@ L<Mojo::IOLoop::Client/"connect">.
 
 Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow
 of events, which can help you avoid deep nested closures that often result
-from continuation-passing style. A single callback will be treated as a
-subscriber to the event L<Mojo::IOLoop::Delay/"finish">, and multiple ones as
-a chain for L<Mojo::IOLoop::Delay/"steps">.
+from continuation-passing style. Callbacks will be passed along to
+L<Mojo::IOLoop::Delay/"steps">.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
@@ -476,13 +480,6 @@ a chain for L<Mojo::IOLoop::Delay/"steps">.
     sub { say 'And done after 5 seconds total.' }
   );
   $delay->wait unless Mojo::IOLoop->is_running;
-
-=head2 generate_port
-
-  my $port = Mojo::IOLoop->generate_port;
-  my $port = $loop->generate_port;
-
-Find a free TCP port, this is a utility function primarily used for tests.
 
 =head2 is_running
 
@@ -557,6 +554,13 @@ as L<Mojo::IOLoop::Server/"listen">.
     my ($loop, $stream, $id) = @_;
     ...
   });
+
+  # Listen on random port
+  my $id = Mojo::IOLoop->server({address => '127.0.0.1'} => sub {
+    my ($loop, $stream, $id) = @_;
+    ...
+  });
+  my $port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 
 =head2 singleton
 

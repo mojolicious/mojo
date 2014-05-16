@@ -480,7 +480,7 @@ following new ones.
   my $app = $t->app;
   $t      = $t->app(MyApp->new);
 
-Access application with L<Mojo::UserAgent/"app">.
+Access application with L<Mojo::UserAgent::Server/"app">.
 
   # Change log level
   $t->app->log->level('fatal');

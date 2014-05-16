@@ -22,8 +22,6 @@ sub AUTOLOAD {
   return $self->$shortcut(@_);
 }
 
-sub DESTROY { }
-
 sub add_child {
   my ($self, $route) = @_;
   weaken $route->remove->parent($self)->{parent};

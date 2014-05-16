@@ -156,6 +156,10 @@ sub new {
   return $self;
 }
 
+sub no_compression {
+  shift->compressed(0)->res->headers->remove('Sec-WebSocket-Extensions');
+}
+
 sub parse_frame {
   my ($self, $buffer) = @_;
 
@@ -614,6 +618,13 @@ Local interface port.
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
 L</"frame"> event with default message parser, which also handles C<PING> and
 C<CLOSE> frames automatically.
+
+=head2 no_compression
+
+  $ws->no_compression;
+
+Make sure C<permessage-deflate> extension is deactivated for this WebSocket
+connection.
 
 =head2 parse_frame
 

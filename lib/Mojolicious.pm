@@ -42,8 +42,8 @@ has static    => sub { Mojolicious::Static->new };
 has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Top Hat';
-our $VERSION  = '4.92';
+our $CODENAME = 'Tiger Face';
+our $VERSION  = '5.0';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -57,8 +57,6 @@ sub AUTOLOAD {
     unless my $helper = $self->renderer->helpers->{$method};
   return $self->build_controller->$helper(@_);
 }
-
-sub DESTROY { }
 
 sub build_controller {
   my ($self, $tx) = @_;
@@ -694,6 +692,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 Every major release of L<Mojolicious> has a code name, these are the ones that
 have been used in the past.
 
+5.0, C<Tiger Face> (u1F42F)
+
 4.0, C<Top Hat> (u1F3A9)
 
 3.0, C<Rainbow> (u1F308)
@@ -779,6 +779,8 @@ Ask Bjoern Hansen
 
 Audrey Tang
 
+Ben Tyler
+
 Ben van Staveren
 
 Benjamin Erhart
@@ -833,9 +835,13 @@ Gisle Aas
 
 Graham Barr
 
+Graham Knop
+
 Henry Tang
 
 Hideki Yamamura
+
+Hiroki Toyokawa
 
 Ian Goodacre
 
@@ -948,6 +954,8 @@ Shu Cho
 Skye Shaw
 
 Stanis Trendelenburg
+
+Steffen Ullrich
 
 Stephane Este-Gracias
 

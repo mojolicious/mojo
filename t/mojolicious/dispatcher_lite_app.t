@@ -52,7 +52,8 @@ hook before_dispatch => sub {
 # Custom dispatcher /custom
 hook before_dispatch => sub {
   my $c = shift;
-  $c->render(text => $c->param('a'), status => 205)
+  $c->render_maybe
+    or $c->render(text => $c->param('a'), status => 205)
     if $c->req->url->path->contains('/custom');
 };
 

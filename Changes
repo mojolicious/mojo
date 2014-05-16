@@ -1,7 +1,68 @@
 
-4.92  2014-04-05
+5.0  2014-05-16
+  - Code name "Tiger Face", this is a major release.
+  - Changed heuristics for number detection in Mojo::JSON to better line up
+    with user expectations.
+  - Changed lock and unlock callbacks in Mojo::IOLoop to not receive an
+    invocant.
+  - Removed deprecated support for "X-Forwarded-HTTPS".
+  - Removed generate_port method from Mojo::IOLoop.
+  - Removed format method from Mojo::Log.
+  - Removed check_file method from Mojo::Server::Morbo.
+  - Added format attribute to Mojo::Log.
+  - Added no_compression method to Mojo::Transaction::WebSocket.
+  - Added append method to Mojo::Log.
+  - Added check method to Mojo::Server::Morbo.
+  - Updated jQuery to version 2.1.1.
+  - Improved Mojo::Parameters to consistently accept arrays.
+  - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
+    IO::Socket::SSL. (noxxi)
+  - Fixed warnings in Mojo::IOLoop::Delay.
+
+4.99  2014-05-12
+  - Added support for performing blocking and non-blocking requests at the
+    same time with Mojo::UserAgent.
+  - Added nb_url method to Mojo::UserAgent::Server.
+  - Improved Mojo::IOLoop::Server and Mojo::Server::Daemon to be able to
+    listen on random ports.
+
+4.98  2014-05-09
+  - Removed deprecated get_line function from Mojo::Util.
+  - Removed deprecated content_xml, replace_content, text_before, text_after
+    and to_xml methods from Mojo::DOM.
+  - Improved accept performance in Mojo::IOLoop::Server.
+
+4.97  2014-04-30
+  - Deprecated support for "X-Forwarded-HTTPS" in favor of
+    "X-Forwarded-Proto".
+  - Added multi-name support to param method in Mojo::Parameters.
+
+4.96  2014-04-28
+  - Improved Mojo::IOLoop to use Mojo::IOLoop::Delay more consistently.
+
+4.95  2014-04-27
+  - Improved Mojo::IOLoop::Delay with circular reference protection.
+  - Improved Mojo::IOLoop::Delay to allow argument splicing.
+  - Improved Mojo::IOLoop::Server to reuse cipher list from IO::Socket::SSL.
+  - Fixed memory leak in Mojo::UserAgent::Server.
+
+4.94  2014-04-20
+  - Added reverse_proxy attribute to Mojo::Server::Daemon.
+  - Added reverse_proxy attribute to Mojo::Message::Request.
+  - Added prefork and upgrade_timeout attributes to Mojo::Server::Hypnotoad.
+  - Added configure method to Mojo::Server::Hypnotoad.
+  - Relaxed name handling in Mojo::Headers a little.
+  - Fixed small bug in online tests.
+
+4.93  2014-04-13
+  - Fixed bug where Mojolicious::Static would not use the correct default MIME
+    type.
+
+4.92  2014-04-08
   - Removed deprecated use of hash references for optgroup generation with
     select_field helper.
+  - Improved dumper helper to escape unprintable characters.
+  - Fixed small handler detection bug in Mojolicious::Renderer.
 
 4.91  2014-03-29
   - Added daemonize method to Mojo::Server.

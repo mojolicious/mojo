@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno 'EINPROGRESS';
 use IO::Socket::INET;
+use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
 
@@ -18,10 +19,7 @@ use constant TLS => $ENV{MOJO_NO_TLS}
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
-has reactor => sub {
-  require Mojo::IOLoop;
-  Mojo::IOLoop->singleton->reactor;
-};
+has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY { shift->_cleanup }
 

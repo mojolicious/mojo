@@ -141,7 +141,7 @@ losing a single incoming connection, just by running the command above again.
 
 You might also want to enable proxy support if you're using Hypnotoad behind a
 reverse proxy. This allows L<Mojolicious> to automatically pick up the
-C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
+C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
 
   # myapp.conf
   {hypnotoad => {proxy => 1}};
@@ -168,8 +168,9 @@ parameter.
 
 =head2 Nginx
 
-One of the most popular setups these days is Hypnotoad behind an Nginx reverse
-proxy, which even supports WebSockets in newer versions.
+One of the most popular setups these days is Hypnotoad behind an
+L<Nginx|http://nginx.org> reverse proxy, which even supports WebSockets in
+newer versions.
 
   upstream myapp {
     server 127.0.0.1:8080;
@@ -184,14 +185,14 @@ proxy, which even supports WebSockets in newer versions.
       proxy_set_header Connection "upgrade";
       proxy_set_header Host $host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-HTTPS 0;
+      proxy_set_header X-Forwarded-Proto "http";
     }
   }
 
 =head2 Apache/mod_proxy
 
-Another good reverse proxy is Apache with C<mod_proxy>, the configuration
-looks quite similar to the Nginx one above.
+Another good reverse proxy is L<Apache|http://httpd.apache.org> with
+C<mod_proxy>, the configuration looks quite similar to the Nginx one above.
 
   <VirtualHost *:80>
     ServerName localhost
@@ -203,7 +204,7 @@ looks quite similar to the Nginx one above.
     ProxyPreserveHost On
     ProxyPass / http://localhost:8080/ keepalive=On
     ProxyPassReverse / http://localhost:8080/
-    RequestHeader set X-Forwarded-HTTPS "0"
+    RequestHeader set X-Forwarded-Proto "http"
   </VirtualHost>
 
 =head2 Apache/CGI
@@ -569,6 +570,13 @@ L<Mojolicious::Controller/"send">.
 The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right after
 the WebSocket connection has been closed.
 
+  $self->tx->no_compression;
+
+By default C<permessage-deflate> compression will be used if the client
+supports it, this can result in much better performance, but also increases
+memory usage by up to 300KB per connection. It can be disabled with
+L<Mojo::Transaction::WebSocket/"no_compression">.
+
 =head2 Testing WebSocket web services
 
 While the message flow on WebSocket connections can be rather dynamic, it
@@ -668,42 +676,42 @@ which can be combined to solve some of hardest problems in web development.
   use Mojolicious::Lite;
   use Scalar::Util 'weaken';
 
-  # Emit "request" event early for requests that get upgraded to multipart
+  # Intercept multipart uploads and log each chunk received
   hook after_build_tx => sub {
     my $tx = shift;
+
+    # Subscribe to "upgrade" event to indentify multipart uploads
     weaken $tx;
-    $tx->req->content->on(upgrade => sub { $tx->emit('request') });
+    $tx->req->content->on(upgrade => sub {
+      my ($single, $multi) = @_;
+      return unless $tx->req->url->path->contains('/upload');
+
+      # Subscribe to "part" event to find the right one
+      $multi->on(part => sub {
+        my ($multi, $single) = @_;
+
+        # Subscribe to "body" event of part to make sure we have all headers
+        $single->on(body => sub {
+          my $single = shift;
+
+          # Make sure we have the right part and replace "read" event
+          return unless $single->headers->content_disposition =~ /example/;
+          $single->unsubscribe('read')->on(read => sub {
+            my ($single, $bytes) = @_;
+
+            # Log size of every chunk we receive
+            app->log->debug(length($bytes) . ' bytes uploaded.');
+          });
+        });
+      });
+    });
   };
 
   # Upload form in DATA section
   get '/' => 'index';
 
-  # Streaming multipart upload (invoked twice, due to early "request" event)
-  post '/upload' => sub {
-    my $self = shift;
-
-    # First invocation, subscribe to "part" event to find the right one
-    return $self->req->content->on(part => sub {
-      my ($multi, $single) = @_;
-
-      # Subscribe to "body" event of part to make sure we have all headers
-      $single->on(body => sub {
-        my $single = shift;
-
-        # Make sure we have the right part and replace "read" event
-        return unless $single->headers->content_disposition =~ /example/;
-        $single->unsubscribe('read')->on(read => sub {
-          my ($single, $bytes) = @_;
-
-          # Log size of every chunk we receive
-          $self->app->log->debug(length($bytes) . ' bytes uploaded.');
-        });
-      });
-    }) unless $self->req->is_finished;
-
-    # Second invocation, render response
-    $self->render(text => 'Upload was successful.');
-  };
+  # Streaming multipart upload
+  post '/upload' => {text => 'Upload was successful.'};
 
   app->start;
   __DATA__
@@ -1042,16 +1050,15 @@ synchronize multiple non-blocking requests.
   $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
   my ($mojo, $mango) = $delay->wait;
 
-The event L<Mojo::IOLoop::Delay/"finish"> can be used for code that needs to
-be able to work standalone as well as inside an already running event loop.
+One or more steps can be used for code that needs to be able to work
+standalone as well as inside an already running event loop.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
   # Synchronize non-blocking requests portably
   my $ua    = Mojo::UserAgent->new;
-  my $delay = Mojo::IOLoop->delay;
-  $delay->on(finish => sub {
+  my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, $mojo, $mango) = @_;
     ...
   });
@@ -1203,16 +1210,17 @@ that they will be picked up automatically by the command line interface?
   has usage       => "Usage: APPLICATION spy [TARGET]\n";
 
   sub run {
-    my ($self, $target) = @_;
+    my ($self, @args) = @_;
 
     # Leak secret passphrases
-    say for @{$self->app->secrets} if $target eq 'secrets';
+    say for @{$self->app->secrets} if $args[0] eq 'secrets';
   }
 
   1;
 
-There are many more useful attributes and methods in L<Mojolicious::Command>
-that you can use or overload.
+Command line arguments are passed right through and there are many useful
+attributes and methods in L<Mojolicious::Command> that you can use or
+overload.
 
   $ mojo spy secrets
   HelloWorld
@@ -1220,8 +1228,8 @@ that you can use or overload.
   $ ./myapp.pl spy secrets
   secr3t
 
-And to make your commands application specific, just put them in a different
-namespace.
+And to make your commands application specific, just add a custom namespace to
+L<Mojolicious::Commands/"namespaces">.
 
   # Application
   package MyApp;

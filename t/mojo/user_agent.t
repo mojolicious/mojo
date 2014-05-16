@@ -102,8 +102,8 @@ my $time = time;
 Mojo::IOLoop->start;
 ok time < ($time + 10), 'stopped automatically';
 
-# Non-blocking
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+# Blocking and non-blocking
+$ua = Mojo::UserAgent->new;
 my ($success, $code, $body);
 $ua->get(
   '/' => sub {
@@ -114,24 +114,14 @@ $ua->get(
     Mojo::IOLoop->stop;
   }
 );
-eval { $ua->get('/') };
-like $@, qr/^Non-blocking requests in progress/, 'right error';
+is $ua->get('/')->res->code, 200, 'right status';
 Mojo::IOLoop->start;
 ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
-# Error in callback is logged
-app->ua->once(error => sub { Mojo::IOLoop->stop });
-ok app->ua->has_subscribers('error'), 'has subscribers';
-my $err;
-my $msg = app->log->on(message => sub { $err .= pop });
-app->ua->get('/' => sub { die 'error event works' });
-Mojo::IOLoop->start;
-app->log->unsubscribe(message => $msg);
-like $err, qr/error event works/, 'right error';
-
 # HTTPS request without TLS support
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $tx = $ua->get($ua->server->url->scheme('https'));
 ok $tx->error, 'has error';
 
@@ -161,6 +151,16 @@ is $ua->options('/method')->res->body, 'OPTIONS', 'right method';
 is $ua->patch('/method')->res->body,   'PATCH',   'right method';
 is $ua->post('/method')->res->body,    'POST',    'right method';
 is $ua->put('/method')->res->body,     'PUT',     'right method';
+
+# Error in callback is logged
+app->ua->once(error => sub { Mojo::IOLoop->stop });
+ok app->ua->has_subscribers('error'), 'has subscribers';
+my $err;
+my $msg = app->log->on(message => sub { $err .= pop });
+app->ua->get('/' => sub { die 'error event works' });
+Mojo::IOLoop->start;
+app->log->unsubscribe(message => $msg);
+like $err, qr/error event works/, 'right error';
 
 # Events
 my ($finished_req, $finished_tx, $finished_res);
@@ -422,7 +422,7 @@ is $stream, 1, 'no leaking subscribers';
 # Nested non-blocking requests after blocking one, with custom URL
 my @kept_alive;
 $ua->get(
-  $ua->server->url => sub {
+  $ua->server->nb_url => sub {
     my ($self, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
     $self->get(
@@ -430,7 +430,7 @@ $ua->get(
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $self->get(
-          $ua->server->url => sub {
+          $ua->server->nb_url => sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->stop;
@@ -465,16 +465,15 @@ is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
 # Blocking request after non-blocking one, with custom URL
 $tx = $ua->get($ua->server->url);
-ok $tx->success, 'successful';
-ok !$tx->kept_alive, 'kept connection not alive';
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Unexpected 1xx responses
-$port = Mojo::IOLoop->generate_port;
-$req  = Mojo::Message::Request->new;
-Mojo::IOLoop->server(
-  {address => '127.0.0.1', port => $port} => sub {
+$req = Mojo::Message::Request->new;
+$id  = Mojo::IOLoop->server(
+  {address => '127.0.0.1'} => sub {
     my ($loop, $stream) = @_;
     $stream->on(
       read => sub {
@@ -489,6 +488,7 @@ Mojo::IOLoop->server(
     );
   }
 );
+$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 $tx = $ua->build_tx(GET => "http://localhost:$port/");
 my @unexpected;
 $tx->on(unexpected => sub { push @unexpected, pop });

@@ -263,8 +263,10 @@ sub _encode_value {
   return 'null' unless defined $value;
 
   # Number
-  my $flags = B::svref_2object(\$value)->FLAGS;
-  return 0 + $value if $flags & (B::SVp_IOK | B::SVp_NOK) && $value * 0 == 0;
+  return $value
+    if B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK)
+    && 0 + $value eq $value
+    && $value * 0 == 0;
 
   # String
   return _encode_string($value);
@@ -321,9 +323,8 @@ It supports normal Perl data types like scalar, array reference, hash
 reference and will try to call the C<TO_JSON> method on blessed references, or
 stringify them if it doesn't exist. Differentiating between strings and
 numbers in Perl is hard, depending on how it has been used, a scalar can be
-both at the same time. Since numeric comparisons on strings are very unlikely
-to happen intentionally, the numeric value always gets priority, so any
-scalar that has been used in numeric context is considered a number.
+both at the same time. The string value gets precedence unless both
+representations are equivalent.
 
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}

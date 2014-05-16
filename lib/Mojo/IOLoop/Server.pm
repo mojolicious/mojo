@@ -5,6 +5,7 @@ use Carp 'croak';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use IO::Socket::INET;
+use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
@@ -26,14 +27,11 @@ my $CERT = catfile dirname(__FILE__), 'server.crt';
 my $KEY  = catfile dirname(__FILE__), 'server.key';
 
 has multi_accept => 50;
-has reactor      => sub {
-  require Mojo::IOLoop;
-  Mojo::IOLoop->singleton->reactor;
-};
+has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY {
   my $self = shift;
-  $ENV{MOJO_REUSE} =~ s/(?:^|\,)\Q$self->{reuse}\E:\d+// if $self->{reuse};
+  $ENV{MOJO_REUSE} =~ s/(?:^|\,)\Q$self->{reuse}\E// if $self->{reuse};
   return unless my $reactor = $self->reactor;
   $self->stop if $self->{handle};
   $reactor->remove($_) for values %{$self->{handles}};
@@ -51,11 +49,10 @@ sub listen {
 
   # Look for reusable file descriptor
   my $address = $args->{address} || '0.0.0.0';
-  my $port    = $args->{port}    || 3000;
-  my $reuse = $self->{reuse} = "$address:$port";
+  my $port = $args->{port};
   $ENV{MOJO_REUSE} ||= '';
   my $fd;
-  if ($ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$reuse\E:(\d+)/) { $fd = $1 }
+  $fd = $1 if $port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/;
 
   # Allow file descriptor inheritance
   local $^F = 1000;
@@ -73,15 +70,16 @@ sub listen {
     my %options = (
       Listen => $args->{backlog} // SOMAXCONN,
       LocalAddr => $address,
-      LocalPort => $port,
       ReuseAddr => 1,
       ReusePort => $args->{reuse},
       Type      => SOCK_STREAM
     );
+    $options{LocalPort} = $port if $port;
     $options{LocalAddr} =~ s/[\[\]]//g;
     $handle = $class->new(%options) or croak "Can't create listen socket: $@";
     $fd = fileno $handle;
-    $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse:$fd" : "$reuse:$fd";
+    my $reuse = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
+    $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
   }
   $handle->blocking(0);
   $self->{handle} = $handle;
@@ -89,25 +87,28 @@ sub listen {
   return unless $args->{tls};
   croak "IO::Socket::SSL 1.84 required for TLS support" unless TLS;
 
-  # Prioritize RC4 to mitigate BEAST attack
-  $self->{tls} = {
-    SSL_ca_file => $args->{tls_ca}
-      && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+  weaken $self;
+  my $tls = $self->{tls} = {
     SSL_cert_file => $args->{tls_cert} || $CERT,
-    SSL_cipher_list => $args->{tls_ciphers}
-      // 'ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH',
+    SSL_error_trap => sub {
+      return unless my $handle = delete $self->{handles}{shift()};
+      $self->reactor->remove($handle);
+      close $handle;
+    },
     SSL_honor_cipher_order => 1,
     SSL_key_file           => $args->{tls_key} || $KEY,
     SSL_startHandshake     => 0,
     SSL_verify_mode => $args->{tls_verify} // $args->{tls_ca} ? 0x03 : 0x00
   };
+  $tls->{SSL_ca_file} = $args->{tls_ca}
+    if $args->{tls_ca} && -T $args->{tls_ca};
+  $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
 }
 
 sub start {
   my $self = shift;
   weaken $self;
-  $self->reactor->io(
-    $self->{handle} => sub { $self->_accept for 1 .. $self->multi_accept });
+  $self->reactor->io($self->{handle} => sub { $self->_accept });
 }
 
 sub stop { $_[0]->reactor->remove($_[0]{handle}) }
@@ -115,23 +116,25 @@ sub stop { $_[0]->reactor->remove($_[0]{handle}) }
 sub _accept {
   my $self = shift;
 
-  return unless my $handle = $self->{handle}->accept;
-  $handle->blocking(0);
+  # Greedy accept
+  for (1 .. $self->multi_accept) {
+    return unless my $handle = $self->{handle}->accept;
+    $handle->blocking(0);
 
-  # Disable Nagle's algorithm
-  setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
+    # Disable Nagle's algorithm
+    setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
-  # Start TLS handshake
-  return $self->emit_safe(accept => $handle) unless my $tls = $self->{tls};
+    # Start TLS handshake
+    $self->emit_safe(accept => $handle) and next unless my $tls = $self->{tls};
+    $self->_handshake($self->{handles}{$handle} = $handle)
+      if $handle = IO::Socket::SSL->start_SSL($handle, %$tls, SSL_server => 1);
+  }
+}
+
+sub _handshake {
+  my ($self, $handle) = @_;
   weaken $self;
-  $tls->{SSL_error_trap} = sub {
-    return unless my $handle = delete $self->{handles}{shift()};
-    $self->reactor->remove($handle);
-    close $handle;
-  };
-  return unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
   $self->reactor->io($handle => sub { $self->_tls($handle) });
-  $self->{handles}{$handle} = $handle;
 }
 
 sub _tls {
@@ -222,7 +225,7 @@ implements the following new ones.
 
   my $port = $server->generate_port;
 
-Find a free TCP port, this is a utility function primarily used for tests.
+Find a free TCP port, primarily used for tests.
 
 =head2 handle
 
@@ -257,7 +260,7 @@ Maximum backlog size, defaults to C<SOMAXCONN>.
 
   port => 80
 
-Port to listen on.
+Port to listen on, defaults to a random port.
 
 =item reuse
 
@@ -288,8 +291,7 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
   tls_ciphers => 'AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH'
 
-Cipher specification string, defaults to
-C<ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH>.
+Cipher specification string.
 
 =item tls_key
 

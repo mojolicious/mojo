@@ -27,8 +27,7 @@ get '/echo' => {text => 'plain echo!'};
 
 websocket '/no_compression' => sub {
   my $self = shift;
-  $self->tx->compressed(0);
-  $self->res->headers->remove('Sec-WebSocket-Extensions');
+  $self->tx->no_compression;
   $self->on(binary => sub { shift->send({binary => shift}) });
 };
 

@@ -10,7 +10,7 @@ use Test::More;
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK};
 
-use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
 use Mojo::Util 'spurt';
@@ -30,7 +30,7 @@ undef $prefork;
 ok !-e $file, 'file has been cleaned up';
 
 # Multiple workers and graceful shutdown
-my $port = Mojo::IOLoop->generate_port;
+my $port = Mojo::IOLoop::Server::->generate_port;
 $prefork = Mojo::Server::Prefork->new(
   heartbeat_interval => 0.5,
   listen             => ["http://*:$port"]
@@ -84,7 +84,7 @@ ok !-e $pid,  'process id file has been removed';
 ok !-e $lock, 'lock file has been removed';
 
 # One worker and immediate shutdown
-$port    = Mojo::IOLoop->generate_port;
+$port    = Mojo::IOLoop::Server->generate_port;
 $prefork = Mojo::Server::Prefork->new(
   heartbeat_interval => 0.5,
   listen             => ["http://*:$port"],

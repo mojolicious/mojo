@@ -30,12 +30,8 @@ Mojo::IOLoop->one_tick;
 ok time < ($time + 10), 'stopped automatically';
 
 # Listen
-my $port   = Mojo::IOLoop->generate_port;
-my $listen = IO::Socket::INET->new(
-  Listen    => 5,
-  LocalAddr => '127.0.0.1',
-  LocalPort => $port
-);
+my $listen = IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1');
+my $port = $listen->sockport;
 my ($readable, $writable);
 $reactor->io($listen => sub { pop() ? $writable++ : $readable++ })
   ->watch($listen, 0, 0)->watch($listen, 1, 1);
@@ -234,11 +230,10 @@ is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
 $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::Poll', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';
-$port = Mojo::IOLoop->generate_port;
 my ($server_err, $server_running, $client_err, $client_running);
 $server = $client = '';
-Mojo::IOLoop->server(
-  {address => '127.0.0.1', port => $port} => sub {
+$id = Mojo::IOLoop->server(
+  {address => '127.0.0.1'} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test' => sub { shift->write('321') });
     $stream->on(read => sub { $server .= pop });
@@ -247,6 +242,7 @@ Mojo::IOLoop->server(
     $server_err = $@;
   }
 );
+$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;

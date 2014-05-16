@@ -227,6 +227,7 @@ sub _render_template {
 
   # Find handler and render
   my $handler = $options->{handler} ||= $self->template_handler($options);
+  return undef unless $handler;
   if (my $renderer = $self->handlers->{$handler}) {
     return 1 if $renderer->($self, $c, $output, $options);
   }
@@ -250,7 +251,7 @@ Mojolicious::Renderer - Generate dynamic content
 
   my $renderer = Mojolicious::Renderer->new;
   push @{$renderer->classes}, 'MyApp::Foo';
-  push @{renderer->paths}, '/home/sri/templates';
+  push @{$renderer->paths}, '/home/sri/templates';
 
 =head1 DESCRIPTION
 

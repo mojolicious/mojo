@@ -75,6 +75,9 @@ is_deeply [$c->param('foo')], [qw(just works)], 'right values';
 is $c->param(foo => undef)->param('foo'), undef, 'no value';
 is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name,
   'bar', 'right value';
+is scalar $c->param(foo => ['ba;r', 'baz'])->param('foo'), 'ba;r',
+  'right value';
+is_deeply [$c->param('foo')], ['ba;r', 'baz'], 'right values';
 
 # Reserved stash values are hidden
 $c = Mojolicious::Controller->new;

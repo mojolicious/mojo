@@ -92,7 +92,8 @@ Every placeholder has a name, even if it's just an empty string.
 =head2 Generic placeholders
 
 Generic placeholders are the simplest form of placeholders, they use a colon
-prefix and match all characters except C</> and C<.>.
+prefix and match all characters except C</> and C<.>, similar to the regular
+expression C<([^/.]+)>.
 
   /hello              -> /:name/hello -> undef
   /sebastian/23/hello -> /:name/hello -> undef
@@ -119,7 +120,8 @@ parentheses.
 =head2 Relaxed placeholders
 
 Relaxed placeholders are just like generic placeholders, but use a hash prefix
-and match all characters except C</>.
+and match all characters except C</>, similar to the regular expression
+C<([^/]+)>.
 
   /hello              -> /#name/hello -> undef
   /sebastian/23/hello -> /#name/hello -> undef
@@ -131,7 +133,8 @@ and match all characters except C</>.
 =head2 Wildcard placeholders
 
 Wildcard placeholders are just like the two placeholders above, but use an
-asterisk prefix and match absolutely everything, including C</> and C<.>.
+asterisk prefix and match absolutely everything, including C</> and C<.>,
+similar to the regular expression C<(.+)>.
 
   /hello              -> /*name/hello -> undef
   /sebastian/23/hello -> /*name/hello -> {name => 'sebastian/23'}
@@ -351,7 +354,8 @@ already exist.
     ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
 
 One more interesting effect, a placeholder automatically becomes optional if
-there is already a stash value of the same name present.
+there is already a stash value of the same name present, this works similar to
+the regular expression C<([^/.]+)?>.
 
   # / -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
   $r->route('/:mymessage')
@@ -387,7 +391,8 @@ L<Mojolicious::Controller>.
 =head2 More restrictive placeholders
 
 A very easy way to make placeholders more restrictive are alternatives, you
-just make a list of possible values.
+just make a list of possible values, which then work similar to the regular
+expression C<(bender|leela)>.
 
   # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
   # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
@@ -395,10 +400,10 @@ just make a list of possible values.
   $r->route('/:name', name => [qw(bender leela)])
     ->to(controller => 'foo', action => 'bar');
 
-You can also adjust the regular expressions behind placeholders to better suit
-your needs. Just make sure not to use C<^> and C<$> or capturing groups
-C<(...)>, because placeholders become part of a larger regular expression
-internally, C<(?:...)> is fine though.
+You can also adjust the regular expressions behind placeholders directly, just
+make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally, C<(?:...)>
+is fine though.
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef

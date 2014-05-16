@@ -88,7 +88,7 @@ sub cookies {
   return $self;
 }
 
-sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }
+sub default_message { $MESSAGES{$_[1] || $_[0]->code // 404} || '' }
 
 sub extract_start_line {
   my ($self, $bufref) = @_;
@@ -128,7 +128,7 @@ sub get_start_line_chunk {
 sub is_empty {
   my $self = shift;
   return undef unless my $code = $self->code;
-  return $self->is_status_class(100) || $code eq 204 || $code eq 304;
+  return $self->is_status_class(100) || $code == 204 || $code == 304;
 }
 
 sub is_status_class {

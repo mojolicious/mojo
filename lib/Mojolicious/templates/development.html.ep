@@ -70,17 +70,17 @@
       }
       .value { padding-left: 1em }
       .wide { width: 100% }
-      #footer {
-        padding-top: 1em;
-        text-align: center;
-      }
-      #nothing { padding-top: 60px }
-      #showcase > pre {
+      #error {
         font: 1.5em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: 300;
         margin: 0;
         text-shadow: #333 0 1px 0;
       }
+      #footer {
+        padding-top: 1em;
+        text-align: center;
+      }
+      #nothing { padding-top: 60px }
       #showcase table { margin-top: 1em }
       #showcase td {
         padding-top: 0;
@@ -150,7 +150,7 @@
           % end
         % end
         <div id="showcase" class="box code spaced">
-          <pre><%= $exception->message %></pre>
+          <pre id="error"><%= $exception->message %></pre>
           <div id="context" class="more">
             <table>
               % for my $line (@{$exception->lines_before}) {
@@ -296,12 +296,9 @@
         <div id="log" class="box infobox spaced">
           <table>
             % for my $msg (@{app->log->history}) {
-              % my ($time, $level, @lines) = @$msg;
-              % $time = localtime $time;
-              % my $lines = join "\n", @lines;
               <tr>
                 <td class="striped value wide">
-                  <pre>[<%= $time %>] [<%= $level %>] <%= $lines %></pre>
+                  <pre><%= app->log->format->(@$msg) %></pre>
                 </td>
               </tr>
             % }

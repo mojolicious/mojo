@@ -14,7 +14,7 @@ use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
-use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::Server::Morbo;
 use Mojo::UserAgent;
@@ -24,8 +24,8 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
 # Prepare script
 my $dir = tempdir CLEANUP => 1;
 my $script = catdir $dir, 'myapp.pl';
-my $morbo = Mojo::Server::Morbo->new;
-ok !$morbo->check_file($script), 'file has not changed';
+my $morbo = Mojo::Server::Morbo->new(watch => [$script]);
+is $morbo->check, undef, 'file has not changed';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
 
@@ -37,7 +37,7 @@ app->start;
 EOF
 
 # Start
-my $port   = Mojo::IOLoop->generate_port;
+my $port   = Mojo::IOLoop::Server->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
   "http://127.0.0.1:$port", $script;
@@ -68,7 +68,7 @@ get '/hello' => {text => 'Hello World!'};
 
 app->start;
 EOF
-ok $morbo->check_file($script), 'file has changed';
+is $morbo->check, $script, 'file has changed';
 ok((stat $script)[9] > $mtime, 'modify time has changed');
 is((stat $script)[7], $size, 'still equal size');
 sleep 3;
@@ -87,7 +87,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 
 # Update script without changing mtime
 ($size, $mtime) = (stat $script)[7, 9];
-ok !$morbo->check_file($script), 'file has not changed';
+is $morbo->check, undef, 'file has not changed';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
 
@@ -98,7 +98,7 @@ get '/hello' => {text => 'Hello!'};
 app->start;
 EOF
 utime $mtime, $mtime, $script;
-ok $morbo->check_file($script), 'file has changed';
+is $morbo->check, $script, 'file has changed';
 ok((stat $script)[9] == $mtime, 'modify time has not changed');
 isnt((stat $script)[7], $size, 'size has changed');
 sleep 3;
@@ -123,7 +123,7 @@ sleep 1 while _port($port);
 SKIP: {
   skip 'SO_REUSEPORT support required!', 2 unless eval { _reuse_port() };
 
-  my $port   = Mojo::IOLoop->generate_port;
+  my $port   = Mojo::IOLoop::Server->generate_port;
   my $daemon = Mojo::Server::Daemon->new(
     listen => ["http://127.0.0.1:$port"],
     silent => 1
@@ -146,7 +146,7 @@ sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
 sub _reuse_port {
   IO::Socket::INET->new(
     Listen    => 1,
-    LocalPort => Mojo::IOLoop->generate_port,
+    LocalPort => Mojo::IOLoop::Server->generate_port,
     ReusePort => 1
   );
 }

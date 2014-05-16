@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Scalar::Util 'weaken';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
@@ -19,28 +20,39 @@ sub app {
   return $self;
 }
 
+sub nb_url { shift->_url(1, @_) }
+
 sub restart { shift->_restart(1) }
 
-sub url {
-  my $self = shift;
-  $self->_restart(0, @_)
-    if !$self->{server} || $self->{server}->ioloop ne $self->ioloop || @_;
-  return Mojo::URL->new("$self->{proto}://localhost:$self->{port}/");
-}
+sub url { shift->_url(0, @_) }
 
 sub _restart {
   my ($self, $full, $proto) = @_;
+  delete @{$self}{qw(nb_port port)} if $full;
 
-  my $server = $self->{server} = Mojo::Server::Daemon->new(
-    app    => $self->app,
-    ioloop => $self->ioloop,
-    silent => 1
-  );
-  delete $self->{port} if $full;
-  die "Couldn't find a free TCP port for application.\n"
-    unless my $port = $self->{port} ||= Mojo::IOLoop->generate_port;
   $self->{proto} = $proto ||= 'http';
-  $server->listen(["$proto://127.0.0.1:$port"])->start;
+
+  # Blocking
+  my $server = $self->{server}
+    = Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
+  weaken $server->app($self->app)->{app};
+  my $port = $self->{port} ? ":$self->{port}" : '';
+  $self->{port} = $server->listen(["$proto://127.0.0.1$port"])
+    ->start->ioloop->acceptor($server->acceptors->[0])->handle->sockport;
+
+  # Non-blocking
+  $server = $self->{nb_server} = Mojo::Server::Daemon->new(silent => 1);
+  weaken $server->app($self->app)->{app};
+  $port = $self->{nb_port} ? ":$self->{nb_port}" : '';
+  $self->{nb_port} = $server->listen(["$proto://127.0.0.1$port"])
+    ->start->ioloop->acceptor($server->acceptors->[0])->handle->sockport;
+}
+
+sub _url {
+  my ($self, $nb) = (shift, shift);
+  $self->_restart(0, @_) if !$self->{server} || @_;
+  my $port = $nb ? $self->{nb_port} : $self->{port};
+  return Mojo::URL->new("$self->{proto}://localhost:$port/");
 }
 
 1;
@@ -93,6 +105,15 @@ global default.
   # Change application behavior
   $server->app->defaults(testing => 'oh yea!');
 
+=head2 nb_url
+
+  my $url = $ua->nb_url;
+  my $url = $ua->nb_url('http');
+  my $url = $ua->nb_url('https');
+
+Get absolute L<Mojo::URL> object for server processing non-blocking requests
+with L</"app"> and switch protocol if necessary.
+
 =head2 restart
 
   $server->restart;
@@ -105,8 +126,8 @@ Restart server with new port.
   my $url = $ua->url('http');
   my $url = $ua->url('https');
 
-Get absolute L<Mojo::URL> object for L</"app"> and switch protocol if
-necessary.
+Get absolute L<Mojo::URL> object for server processing blocking requests with
+L</"app"> and switch protocol if necessary.
 
 =head1 SEE ALSO
 

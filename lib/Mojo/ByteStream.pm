@@ -306,7 +306,7 @@ L<Mojo::Util/"trim">.
 
   $stream = $stream->unindent;
 
-Unindent bytestream with C<Mojo::Util/"unindent">.
+Unindent bytestream with L<Mojo::Util/"unindent">.
 
 =head2 unquote
 

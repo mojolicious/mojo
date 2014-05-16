@@ -117,13 +117,13 @@ storing everything JSON serialized and Base64 encoded in HMAC-SHA1 signed
 cookies, which is more compatible with the REST philosophy and reduces
 infrastructure requirements.
 
-=head2 Test Driven Development
+=head2 Test-Driven Development
 
 TDD is a software development process where the developer starts writing
 failing test cases that define the desired functionality and then moves on to
 producing code that passes these tests. There are many advantages such as
 always having good test coverage and code being designed for testability,
-which will in turn often prevent future changes from breaking old code. Most
+which will in turn often prevent future changes from breaking old code. Much
 of L<Mojolicious> was developed using TDD.
 
 =head1 PROTOTYPE
@@ -274,8 +274,8 @@ once.
 
 =head2 Testing
 
-In L<Mojolicious> we take test driven development very serious and try to
-promote it wherever we can.
+In L<Mojolicious> we take testing very serious and try to make it a pleasant
+experience.
 
   $ mkdir t
   $ touch t/login.t
@@ -708,8 +708,8 @@ C<t/login.t> can be simplified.
 
   done_testing();
 
-Test driven development takes a little getting used to, but is very well worth
-it!
+Test-driven development takes a little getting used to, but can be a very
+powerful tool.
 
 =head1 MORE
 

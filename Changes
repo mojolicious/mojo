@@ -1,5 +1,5 @@
 
-5.0  2014-05-15
+5.0  2014-05-16
   - Code name "Tiger Face", this is a major release.
   - Changed heuristics for number detection in Mojo::JSON to better line up
     with user expectations.
@@ -13,6 +13,7 @@
   - Added no_compression method to Mojo::Transaction::WebSocket.
   - Added append method to Mojo::Log.
   - Added check method to Mojo::Server::Morbo.
+  - Updated jQuery to version 2.1.1.
   - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
     IO::Socket::SSL. (noxxi)
   - Fixed warnings in Mojo::IOLoop::Delay.

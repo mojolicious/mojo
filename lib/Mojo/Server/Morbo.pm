@@ -63,7 +63,7 @@ sub _manage {
   my $self = shift;
 
   if (defined(my $file = $self->check_files)) {
-    say qq{File "$file" changed.} if $ENV{MORBO_VERBOSE};
+    say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{running} if $self->{running};
     $self->{modified} = 1;
   }

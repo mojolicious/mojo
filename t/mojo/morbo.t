@@ -24,8 +24,8 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
 # Prepare script
 my $dir = tempdir CLEANUP => 1;
 my $script = catdir $dir, 'myapp.pl';
-my $morbo = Mojo::Server::Morbo->new;
-ok !$morbo->check_file($script), 'file has not changed';
+my $morbo = Mojo::Server::Morbo->new(watch => [$script]);
+is $morbo->check_files, undef, 'file has not changed';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
 
@@ -68,7 +68,7 @@ get '/hello' => {text => 'Hello World!'};
 
 app->start;
 EOF
-ok $morbo->check_file($script), 'file has changed';
+is $morbo->check_files, $script, 'file has changed';
 ok((stat $script)[9] > $mtime, 'modify time has changed');
 is((stat $script)[7], $size, 'still equal size');
 sleep 3;
@@ -87,7 +87,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 
 # Update script without changing mtime
 ($size, $mtime) = (stat $script)[7, 9];
-ok !$morbo->check_file($script), 'file has not changed';
+is $morbo->check_files, undef, 'file has not changed';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
 
@@ -98,7 +98,7 @@ get '/hello' => {text => 'Hello!'};
 app->start;
 EOF
 utime $mtime, $mtime, $script;
-ok $morbo->check_file($script), 'file has changed';
+is $morbo->check_files, $script, 'file has changed';
 ok((stat $script)[9] == $mtime, 'modify time has not changed');
 isnt((stat $script)[7], $size, 'size has changed');
 sleep 3;

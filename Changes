@@ -8,9 +8,11 @@
   - Removed deprecated support for "X-Forwarded-HTTPS".
   - Removed generate_port method from Mojo::IOLoop.
   - Removed format method from Mojo::Log.
+  - Removed check_file method from Mojo::Server::Morbo.
   - Added format attribute to Mojo::Log.
   - Added no_compression method to Mojo::Transaction::WebSocket.
   - Added append method to Mojo::Log.
+  - Added check_files method to Mojo::Server::Morbo.
   - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
     IO::Socket::SSL. (noxxi)
   - Fixed warnings in Mojo::IOLoop::Delay.

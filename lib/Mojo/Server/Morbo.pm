@@ -10,7 +10,7 @@ use POSIX 'WNOHANG';
 
 has watch => sub { [qw(lib templates)] };
 
-sub check_files {
+sub check {
   my $self = shift;
 
   # Discover files
@@ -62,7 +62,7 @@ sub _check {
 sub _manage {
   my $self = shift;
 
-  if (defined(my $file = $self->check_files)) {
+  if (defined(my $file = $self->check)) {
     say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{running} if $self->{running};
     $self->{modified} = 1;
@@ -156,9 +156,9 @@ directory.
 L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 check_files
+=head2 check
 
-  my $file = $morbo->check_files;
+  my $file = $morbo->check;
 
 Check if file from L</"watch"> has been modified since last check and return
 its name or C<undef> if there have been no changes.

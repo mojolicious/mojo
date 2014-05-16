@@ -12,7 +12,7 @@
   - Added format attribute to Mojo::Log.
   - Added no_compression method to Mojo::Transaction::WebSocket.
   - Added append method to Mojo::Log.
-  - Added check_files method to Mojo::Server::Morbo.
+  - Added check method to Mojo::Server::Morbo.
   - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
     IO::Socket::SSL. (noxxi)
   - Fixed warnings in Mojo::IOLoop::Delay.

@@ -141,6 +141,9 @@ is_deeply $params->to_hash, {foo => ['ba;r', 'b;az'], bar => 23},
   'right structure';
 is $params->param('foo'), 'ba;r', 'right value';
 is_deeply [$params->param('foo')], [qw(ba;r b;az)], 'right values';
+$params = Mojo::Parameters->new;
+is $params->param(foo => ['ba;r', 'baz'])->to_string, 'foo=ba%3Br&foo=baz',
+  'right format';
 
 # Unicode
 $params = Mojo::Parameters->new;

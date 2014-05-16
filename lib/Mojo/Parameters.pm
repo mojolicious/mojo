@@ -57,7 +57,7 @@ sub param {
 
   # Replace values
   $self->remove($name) if defined $_[0];
-  return $self->append($name => [@_]) if @_;
+  return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]) if @_;
 
   # List values
   my @values;
@@ -274,6 +274,7 @@ necessary.
   my ($foo, $bar) = $params->param(['foo', 'bar']);
   $params         = $params->param(foo => 'ba&r');
   $params         = $params->param(foo => qw(ba&r baz));
+  $params         = $params->param(foo => ['ba;r', 'baz']);
 
 Check and replace parameter value. Be aware that if you request a parameter by
 name in scalar context, you will receive only the I<first> value for that

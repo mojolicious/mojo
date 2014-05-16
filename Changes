@@ -14,6 +14,7 @@
   - Added append method to Mojo::Log.
   - Added check method to Mojo::Server::Morbo.
   - Updated jQuery to version 2.1.1.
+  - Improved Mojo::Parameters to consistently accept arrays.
   - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
     IO::Socket::SSL. (noxxi)
   - Fixed warnings in Mojo::IOLoop::Delay.

@@ -1210,16 +1210,17 @@ that they will be picked up automatically by the command line interface?
   has usage       => "Usage: APPLICATION spy [TARGET]\n";
 
   sub run {
-    my ($self, $target) = @_;
+    my ($self, @args) = @_;
 
     # Leak secret passphrases
-    say for @{$self->app->secrets} if $target eq 'secrets';
+    say for @{$self->app->secrets} if $args[0] eq 'secrets';
   }
 
   1;
 
-There are many more useful attributes and methods in L<Mojolicious::Command>
-that you can use or overload.
+Command line arguments are passed right through and there are many useful
+attributes and methods in L<Mojolicious::Command> that you can use or
+overload.
 
   $ mojo spy secrets
   HelloWorld

@@ -24,7 +24,7 @@ sub path_for {
   %values = (%$captures, format => undef, %values);
   my $pattern = $endpoint->pattern;
   $values{format}
-    = defined $captures->{format}
+    //= defined $captures->{format}
     ? $captures->{format}
     : $pattern->defaults->{format}
     if $pattern->constraints->{format};

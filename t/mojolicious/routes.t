@@ -538,6 +538,7 @@ is_deeply $m->stack, [], 'empty stack';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/format2.txt.txt'});
 is_deeply $m->stack, [], 'empty stack';
+is $m->path_for('format2', format => 'txt'), '/format2.txt', 'right path';
 
 # Format with constraint alternatives
 $m = Mojolicious::Routes::Match->new(root => $r);

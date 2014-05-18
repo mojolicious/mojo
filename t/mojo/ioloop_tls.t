@@ -340,4 +340,28 @@ is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
 is $cipher, 'RC4-SHA', 'RC4-SHA has been negotiatied';
 
+# Ignore missing client certificate
+($server, $client, $client_err) = ();
+$id = Mojo::IOLoop->server(
+  address    => '127.0.0.1',
+  tls        => 1,
+  tls_ca     => 't/mojo/certs/ca.crt',
+  tls_cert   => 't/mojo/certs/server.crt',
+  tls_key    => 't/mojo/certs/server.key',
+  tls_verify => 0x01,
+  sub { $server = 'accepted' }
+);
+$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+Mojo::IOLoop->client(
+  {port => $port, tls => 1} => sub {
+    shift->stop;
+    $client     = 'connected';
+    $client_err = shift;
+  }
+);
+Mojo::IOLoop->start;
+is $server, 'accepted',  'right result';
+is $client, 'connected', 'right result';
+ok !$client_err, 'no error';
+
 done_testing();

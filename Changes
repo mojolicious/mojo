@@ -17,6 +17,7 @@
   - Improved Mojo::Parameters to consistently accept arrays.
   - Fixed Mojo::IOLoop::Server to work correctly with newer versions of
     IO::Socket::SSL. (noxxi)
+  - Fixed verification bug in Mojo::IOLoop::Server.
   - Fixed path generation bug in Mojolicious::Routes::Match.
   - Fixed warnings in Mojo::IOLoop::Delay.
 

@@ -98,7 +98,7 @@ sub listen {
     SSL_honor_cipher_order => 1,
     SSL_key_file           => $args->{tls_key} || $KEY,
     SSL_startHandshake     => 0,
-    SSL_verify_mode => $args->{tls_verify} // $args->{tls_ca} ? 0x03 : 0x00
+    SSL_verify_mode => $args->{tls_verify} // ($args->{tls_ca} ? 0x03 : 0x00)
   };
   $tls->{SSL_ca_file} = $args->{tls_ca}
     if $args->{tls_ca} && -T $args->{tls_ca};

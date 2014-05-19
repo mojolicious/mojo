@@ -13,7 +13,7 @@ use Test::Mojo;
 
 websocket '/echo' => sub {
   my $self = shift;
-  $self->tx->max_websocket_size(262145);
+  $self->tx->max_websocket_size(262145)->with_compression;
   $self->on(binary => sub { shift->send({binary => shift}) });
   $self->on(
     text => sub {
@@ -27,7 +27,6 @@ get '/echo' => {text => 'plain echo!'};
 
 websocket '/no_compression' => sub {
   my $self = shift;
-  $self->tx->no_compression;
   $self->on(binary => sub { shift->send({binary => shift}) });
 };
 

@@ -10,7 +10,7 @@
   - Removed format method from Mojo::Log.
   - Removed check_file method from Mojo::Server::Morbo.
   - Added format attribute to Mojo::Log.
-  - Added no_compression method to Mojo::Transaction::WebSocket.
+  - Added with_compression method to Mojo::Transaction::WebSocket.
   - Added append method to Mojo::Log.
   - Added check method to Mojo::Server::Morbo.
   - Updated jQuery to version 2.1.1.

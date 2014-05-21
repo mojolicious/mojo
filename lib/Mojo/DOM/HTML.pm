@@ -16,7 +16,7 @@ my $ATTR_RE = qr/
     |
       '([^']*?)'     # Apostrophes
     |
-      ([^>\s\/]*)    # Unquoted
+      ([^>\s]*)      # Unquoted
     )
   )?
   \s*

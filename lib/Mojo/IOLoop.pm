@@ -22,9 +22,7 @@ has multi_accept    => 50;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
-  my $reactor = $class->new;
-  $reactor->on(error => sub { warn "@{[blessed $_[0]]}: $_[1]" });
-  return $reactor;
+  return $class->new->catch(sub { warn "@{[blessed $_[0]]}: $_[1]" });
 };
 
 # Ignore PIPE signal

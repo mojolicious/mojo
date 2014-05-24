@@ -18,9 +18,7 @@ has ua   => sub {
   my $ua = Mojo::UserAgent->new;
   weaken $ua->server->app($self)->{app};
   weaken $self;
-  $ua->on(error => sub { $self->log->error($_[1]) });
-
-  return $ua;
+  return $ua->catch(sub { $self->log->error($_[1]) });
 };
 
 sub build_tx { Mojo::Transaction::HTTP->new }

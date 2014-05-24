@@ -1,5 +1,5 @@
 
-5.0  2014-05-21
+5.0  2014-05-24
   - Code name "Tiger Face", this is a major release.
   - Changed heuristics for number detection in Mojo::JSON to better line up
     with user expectations.
@@ -11,6 +11,7 @@
   - Removed check_file method from Mojo::Server::Morbo.
   - Added format attribute to Mojo::Log.
   - Added with_compression method to Mojo::Transaction::WebSocket.
+  - Added catch method to Mojo::EventEmitter.
   - Added append method to Mojo::Log.
   - Added check method to Mojo::Server::Morbo.
   - Updated jQuery to version 2.1.1.

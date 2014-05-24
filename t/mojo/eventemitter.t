@@ -32,8 +32,7 @@ like $@, qr/^Mojo::EventEmitter: Event "error" failed: intentional/,
 
 # Error fallback
 my ($echo, $err);
-$e->on(error => sub { $err = pop });
-$e->on(test2 => sub { $echo .= 'echo: ' . pop });
+$e->catch(sub { $err = pop })->on(test2 => sub { $echo .= 'echo: ' . pop });
 $e->on(
   test2 => sub {
     my ($self, $msg) = @_;

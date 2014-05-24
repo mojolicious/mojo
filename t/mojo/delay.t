@@ -266,7 +266,6 @@ ok !$finished, 'finish event has not been emitted';
 # Exception in second step
 ($failed, $finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
-$delay->on(error => sub { $failed = pop });
 $delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub {
@@ -275,7 +274,7 @@ $delay->steps(
   },
   sub { die 'Second step!' },
   sub { $result = 'failed' }
-);
+)->catch(sub { $failed = pop });
 $delay->wait;
 is_deeply $delay->remaining, [], 'no remaining steps';
 like $failed, qr/^Second step!/, 'right error';

@@ -141,7 +141,7 @@ implements the following new ones.
 
   $e = $e->catch(sub {...});
 
-Subscribe to C<error> event.
+Subscribe to L</"error"> event.
 
   # Longer version
   $e->on(error => sub {...});

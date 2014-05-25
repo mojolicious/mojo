@@ -1,7 +1,7 @@
 package Mojo::Collection;
 use Mojo::Base -strict;
 use overload
-  bool     => sub { scalar @{shift()} },
+  bool     => sub { !!@{shift()} },
   '""'     => sub { shift->join("\n") },
   fallback => 1;
 
@@ -142,10 +142,6 @@ L<Mojo::Collection> is an array-based container for collections.
   my $collection = Mojo::Collection->new(1 .. 25);
   $collection->[23] += 100;
   say for @$collection;
-  $collection=Mojo::Collection->new();
-  # Empty collections are false
-  say "I am empty" unless $collection;
-
 
 =head1 FUNCTIONS
 
@@ -320,7 +316,7 @@ L<Mojo::Collection> overloads the following operators.
 
   my $bool = !!$collection;
 
-Always true.
+True or false, depending on if the collection is empty.
 
 =head2 stringify
 

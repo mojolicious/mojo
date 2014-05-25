@@ -23,6 +23,7 @@
   - Fixed verification bug in Mojo::IOLoop::Server.
   - Fixed path generation bug in Mojolicious::Routes::Match.
   - Fixed warnings in Mojo::IOLoop::Delay.
+  - Make empty collections return false
 
 4.99  2014-05-12
   - Added support for performing blocking and non-blocking requests at the

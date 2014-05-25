@@ -142,6 +142,10 @@ L<Mojo::Collection> is an array-based container for collections.
   my $collection = Mojo::Collection->new(1 .. 25);
   $collection->[23] += 100;
   say for @$collection;
+  $collection=Mojo::Collection->new();
+  # Empty collections are false
+  unless $collection say "I am empty";
+
 
 =head1 FUNCTIONS
 

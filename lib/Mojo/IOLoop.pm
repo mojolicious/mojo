@@ -493,6 +493,7 @@ L<Mojo::IOLoop::Delay/"steps">.
     my ($delay, $err) = @_;
     say "Something went wrong: $err";
   });
+  $delay->wait unless Mojo::IOLoop->is_running;
 
 =head2 is_running
 

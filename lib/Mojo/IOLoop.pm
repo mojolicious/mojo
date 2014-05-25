@@ -479,6 +479,21 @@ L<Mojo::IOLoop::Delay/"steps">.
   );
   $delay->wait unless Mojo::IOLoop->is_running;
 
+  # Handle exceptions in all steps
+  my $delay = Mojo::IOLoop->delay(
+    sub {
+      my $delay = shift;
+      die 'Intentional error!';
+    },
+    sub {
+      my ($delay, @args) = @_;
+      say 'Never actually reached.';ø
+    }
+  )->catch(sub {
+    my ($delay, $err) = @_;
+    say "Something went wrong: $err";
+  });
+
 =head2 is_running
 
   my $bool = Mojo::IOLoop->is_running;

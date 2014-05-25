@@ -117,6 +117,22 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
   );
   $delay->wait unless Mojo::IOLoop->is_running;
 
+  # Handle exceptions in all steps
+  my $delay = Mojo::IOLoop::Delay->new;
+  $delay->steps(
+    sub {
+      my $delay = shift;
+      die 'Intentional error!';
+    },
+    sub {
+      my ($delay, @args) = @_;
+      say 'Never actually reached.';
+    }
+  )->catch(sub {
+    my ($delay, $err) = @_;
+    say "Something went wrong: $err";
+  });
+
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Delay> manages callbacks and controls the flow of events for

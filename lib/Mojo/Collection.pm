@@ -1,6 +1,9 @@
 package Mojo::Collection;
 use Mojo::Base -strict;
-use overload bool => sub {1}, '""' => sub { shift->join("\n") }, fallback => 1;
+use overload
+  bool     => sub { scalar @{shift()} },
+  '""'     => sub { shift->join("\n") },
+  fallback => 1;
 
 use Carp 'croak';
 use Exporter 'import';

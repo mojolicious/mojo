@@ -144,7 +144,7 @@ L<Mojo::Collection> is an array-based container for collections.
   say for @$collection;
   $collection=Mojo::Collection->new();
   # Empty collections are false
-  unless $collection say "I am empty";
+  say "I am empty" unless $collection;
 
 
 =head1 FUNCTIONS

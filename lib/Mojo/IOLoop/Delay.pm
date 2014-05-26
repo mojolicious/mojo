@@ -36,12 +36,12 @@ sub steps {
 sub wait {
   my $self = shift;
 
-  my @args;
+  return $self if $self->ioloop->is_running;
   $self->once(error => \&_die);
-  $self->once(finish => sub { shift->ioloop->stop; @args = @_ });
+  $self->once(finish => sub { shift->ioloop->stop });
   $self->ioloop->start;
 
-  return wantarray ? @args : $args[0];
+  return $self;
 }
 
 sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
@@ -88,7 +88,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
       $end->();
     });
   }
-  $delay->wait unless Mojo::IOLoop->is_running;
+  $delay->wait;
 
   # Sequentialize multiple events
   my $delay = Mojo::IOLoop::Delay->new;
@@ -115,7 +115,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
       say 'And done after 5 seconds total.';
     }
   );
-  $delay->wait unless Mojo::IOLoop->is_running;
+  $delay->wait;
 
   # Handle exceptions in all steps
   my $delay = Mojo::IOLoop::Delay->new;
@@ -131,8 +131,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
   )->catch(sub {
     my ($delay, $err) = @_;
     say "Something went wrong: $err";
-  });
-  $delay->wait unless Mojo::IOLoop->is_running;
+  })->wait;
 
 =head1 DESCRIPTION
 
@@ -195,19 +194,28 @@ L</"wait"> method, the argument offset defaults to C<1> with no default
 length.
 
   # Capture all arguments except for the first one (invocant)
-  my $delay = Mojo::IOLoop->delay;
+  my $delay = Mojo::IOLoop->delay(sub {
+    my ($delay, $err, $stream) = @_;
+    ...
+  });
   Mojo::IOLoop->client({port => 3000} => $delay->begin);
-  my ($err, $stream) = $delay->wait;
+  $delay->wait;
 
   # Capture all arguments
-  my $delay = Mojo::IOLoop->delay;
+  my $delay = Mojo::IOLoop->delay(sub {
+    my ($delay, $loop, $err, $stream) = @_;
+    ...
+  });
   Mojo::IOLoop->client({port => 3000} => $delay->begin(0));
-  my ($loop, $err, $stream) = $delay->wait;
+  $delay->wait;
 
   # Capture only the second argument
-  my $delay = Mojo::IOLoop->delay;
+  my $delay = Mojo::IOLoop->delay(sub {
+    my ($delay, $err) = @_;
+    ...
+  });
   Mojo::IOLoop->client({port => 3000} => $delay->begin(1, 1));
-  my $err = $delay->wait;
+  $delay->wait;
 
 =head2 data
 
@@ -252,18 +260,16 @@ not increment the active event counter or an error occurs in a callback.
 
 =head2 wait
 
-  my $arg  = $delay->wait;
-  my @args = $delay->wait;
+  $delay = $delay->wait;
 
 Start L</"ioloop"> and stop it again once an L</"error"> or L</"finish"> event
-gets emitted, only works when L</"ioloop"> is not running already.
+gets emitted, does nothing when L</"ioloop"> is already running already.
 
   # Use a single step to synchronize portably
   $delay->steps(sub {
     my ($delay, @args) = @_;
     ...
-  });
-  $delay->wait unless $delay->ioloop->is_running;
+  })->wait;
 
 =head1 SEE ALSO
 

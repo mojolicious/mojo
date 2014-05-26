@@ -143,12 +143,13 @@ is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
 
 # Concurrent requests
-my $delay = Mojo::IOLoop->delay;
+my ($tx2, $tx3);
+my $delay = Mojo::IOLoop->delay(sub { (undef, $tx, $tx2, $tx3) = @_ });
 $ua->get('/concurrent1/' => $delay->begin);
 $ua->post('/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 =>
     $delay->begin);
 $ua->get('/concurrent3/' => $delay->begin);
-($tx, my $tx2, my $tx3) = $delay->wait;
+$delay->wait;
 ok $tx->is_finished, 'transaction is finished';
 is $tx->res->body, 'Whatever!', 'right content';
 ok !$tx->error, 'no error';

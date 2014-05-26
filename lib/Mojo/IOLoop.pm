@@ -454,10 +454,10 @@ along to L<Mojo::IOLoop::Delay/"steps">.
       $end->();
     });
   }
-  $delay->wait unless Mojo::IOLoop->is_running;
+  $delay->wait;
 
   # Sequentialize multiple events
-  my $delay = Mojo::IOLoop->delay(
+  Mojo::IOLoop->delay(
 
     # First step (simple timer)
     sub {
@@ -476,11 +476,10 @@ along to L<Mojo::IOLoop::Delay/"steps">.
 
     # Third step (the end)
     sub { say 'And done after 5 seconds total.' }
-  );
-  $delay->wait unless Mojo::IOLoop->is_running;
+  )->wait;
 
   # Handle exceptions in all steps
-  my $delay = Mojo::IOLoop->delay(
+  Mojo::IOLoop->delay(
     sub {
       my $delay = shift;
       die 'Intentional error!';
@@ -492,8 +491,7 @@ along to L<Mojo::IOLoop::Delay/"steps">.
   )->catch(sub {
     my ($delay, $err) = @_;
     say "Something went wrong: $err";
-  });
-  $delay->wait unless Mojo::IOLoop->is_running;
+  })->wait;
 
 =head2 is_running
 

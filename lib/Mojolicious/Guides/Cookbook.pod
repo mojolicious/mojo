@@ -1043,20 +1043,7 @@ synchronize multiple non-blocking requests.
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # Synchronize non-blocking requests and capture results
-  my $ua    = Mojo::UserAgent->new;
-  my $delay = Mojo::IOLoop->delay;
-  $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
-  $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
-  my ($mojo, $mango) = $delay->wait;
-
-One or more steps can be used for code that needs to be able to work
-standalone as well as inside an already running event loop.
-
-  use Mojo::UserAgent;
-  use Mojo::IOLoop;
-
-  # Synchronize non-blocking requests portably
+  # Synchronize non-blocking requests
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, $mojo, $mango) = @_;
@@ -1064,7 +1051,7 @@ standalone as well as inside an already running event loop.
   });
   $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
   $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
-  $delay->wait unless Mojo::IOLoop->is_running;
+  $delay->wait;
 
 =head2 WebSockets
 

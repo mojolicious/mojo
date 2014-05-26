@@ -486,7 +486,7 @@ along to L<Mojo::IOLoop::Delay/"steps">.
     },
     sub {
       my ($delay, @args) = @_;
-      say 'Never actually reached.';ø
+      say 'Never actually reached.';
     }
   )->catch(sub {
     my ($delay, $err) = @_;

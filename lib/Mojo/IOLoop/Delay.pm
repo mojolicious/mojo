@@ -88,8 +88,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
   $delay->wait;
 
   # Sequentialize multiple events
-  my $delay = Mojo::IOLoop::Delay->new;
-  $delay->steps(
+  Mojo::IOLoop::Delay->new->steps(
 
     # First step (simple timer)
     sub {
@@ -111,12 +110,10 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
       my ($delay, @args) = @_;
       say 'And done after 5 seconds total.';
     }
-  );
-  $delay->wait;
+  )->wait;
 
   # Handle exceptions in all steps
-  my $delay = Mojo::IOLoop::Delay->new;
-  $delay->steps(
+  Mojo::IOLoop::Delay->new->steps(
     sub {
       my $delay = shift;
       die 'Intentional error!';

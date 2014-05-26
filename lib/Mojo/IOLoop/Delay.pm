@@ -35,13 +35,10 @@ sub steps {
 
 sub wait {
   my $self = shift;
-
-  return $self if $self->ioloop->is_running;
+  return if $self->ioloop->is_running;
   $self->once(error => \&_die);
   $self->once(finish => sub { shift->ioloop->stop });
   $self->ioloop->start;
-
-  return $self;
 }
 
 sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
@@ -260,7 +257,7 @@ not increment the active event counter or an error occurs in a callback.
 
 =head2 wait
 
-  $delay = $delay->wait;
+  $delay->wait;
 
 Start L</"ioloop"> and stop it again once an L</"error"> or L</"finish"> event
 gets emitted, does nothing when L</"ioloop"> is already running.

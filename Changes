@@ -8,8 +8,8 @@
   - Removed deprecated support for "X-Forwarded-HTTPS".
   - Removed return values from wait method in Mojo::IOLoop::Delay.
   - Removed generate_port method from Mojo::IOLoop.
-  - Replaced format method with format attribute in Mojo::Log.
   - Removed check_file method from Mojo::Server::Morbo.
+  - Replaced format method in Mojo::Log with an attribute.
   - Added with_compression method to Mojo::Transaction::WebSocket.
   - Added catch method to Mojo::EventEmitter.
   - Added append method to Mojo::Log.
@@ -18,6 +18,7 @@
   - Improved Mojo::IOLoop::Delay to automatically check if the event loop is
     already running.
   - Improved Mojo::Parameters to consistently accept arrays.
+  - Improved Mojo::Collection to perform actual boolean checks. (marcus)
   - Fixed Mojo::DOM::HTML to handle slashes in unquoted attribute values
     correctly.
   - Fixed Mojo::IOLoop::Server to work correctly with newer versions of

@@ -367,7 +367,7 @@ localized2 <%= content %>
 
 @@ outerlayout.html.ep
 %= c(qw(> o l l e H <))->reverse->join
-<%= $self->render('outermenu', partial => 1) %>
+<%= $self->render_partial('outermenu') %>
 
 @@ outermenu.html.ep
 % stash test => 'there';

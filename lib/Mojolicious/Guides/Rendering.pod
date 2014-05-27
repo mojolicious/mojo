@@ -199,6 +199,23 @@ alternatives.
 
   $self->render_maybe('localized/baz') or $self->render('foo/bar/baz');
 
+=head2 Partial rendering
+
+Sometimes you might want to use the rendered result directly instead of
+generating a response, for example to send emails, this can be done with
+L<Mojolicious::Controller/"render_partial">.
+
+  my $html = $self->render_partial('mail');
+
+No encoding will be performed, making it easy to reuse the result in other
+templates or to generate binary data.
+
+  my $pdf = $self->render_partial('invoice', format => 'pdf');
+  $self->render(data => $pdf, format => 'pdf');
+
+All arguments passed will get localized automatically and are only available
+in the partial template.
+
 =head2 Template variants
 
 To make your application look great on many different devices you can also
@@ -243,20 +260,6 @@ The C<json> stash value allows you to pass Perl data structures to the
 renderer which get directly encoded to JSON with L<Mojo::JSON>.
 
   $self->render(json => {foo => [1, 'test', 3]});
-
-=head2 Partial rendering
-
-Sometimes you might want to use the rendered result directly instead of
-generating a response, for example to send emails, this can be done using the
-C<partial> render argument (not the stash value).
-
-  my $html = $self->render('mail', partial => 1);
-
-No encoding will be performed, making it easy to reuse the result in other
-templates or to generate binary data.
-
-  my $pdf = $self->render('invoice', format => 'pdf', partial => 1);
-  $self->render(data => $pdf, format => 'pdf');
 
 =head2 Status code
 
@@ -531,10 +534,10 @@ L<Mojolicious/"defaults">.
 
   1;
 
-Layouts can also be used with C<partial> templates, but the C<layout> value
-needs to be passed as a render argument (not a stash value).
+Layouts can also be used with partial templates, but the C<layout> value needs
+to be passed as a render argument (not a stash value).
 
-  my $html = $self->render('reminder', layout => 'mail', partial => 1);
+  my $html = $self->render_partial('reminder', layout => 'mail');
 
 =head2 Including partial templates
 
@@ -552,31 +555,17 @@ shortcut to make your life a little easier.
   <head><title>Howdy</title></head>
 
 Instead of C<include> you could also just call
-L<Mojolicious::Controller/"render"> with the C<partial> argument.
+L<Mojolicious::Controller/"render_partial">.
 
   @@ foo/bar.html.ep
   <!DOCTYPE html>
   <html>
-    %= $self->render('header', partial => 1)
+    %= $self->render_partial('header')
     <body>Bar</body>
   </html>
 
   @@ header.html.ep
   <head><title>Howdy</title></head>
-
-But there is one small difference between the two, if you pass stash values to
-C<include>, they will get localized automatically and are only available in
-the partial template.
-
-  @@ foo/bar.html.ep
-  <!DOCTYPE html>
-  <html>
-    %= include 'header', title => 'Hello'
-    <body>Bar</body>
-  </html>
-
-  @@ header.html.ep
-  <head><title><%= $title %></title></head>
 
 =head2 Reusable template blocks
 

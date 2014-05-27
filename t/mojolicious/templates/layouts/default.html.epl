@@ -3,6 +3,6 @@
 <html>
 <head></head>
 <body>
-<%= $self->render(partial => 1, template => '23') %><%= $self->content %>
+<%= $self->render_partial(template => '23') %><%= $self->content %>
 </body>
 </html>

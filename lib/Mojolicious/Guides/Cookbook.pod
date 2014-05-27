@@ -315,7 +315,7 @@ with this little L<Mojo::Server> based mock server you can just embed them.
   say for @{$app->static->paths};
   say $app->config->{secret_identity};
   say $app->dumper({just => 'a helper test'});
-  say $app->build_controller->render(template => 'foo', partial => 1);
+  say $app->build_controller->render_partial(template => 'foo');
 
 The plugin L<Mojolicious::Plugin::Mount> uses this functionality to allow you
 to combine multiple applications into one and deploy them together.

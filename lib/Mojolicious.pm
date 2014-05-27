@@ -534,7 +534,7 @@ new ones.
 Build default controller object with L</"controller_class">.
 
   # Render template from application
-  my $foo = $app->build_controller->render(template => 'foo', partial => 1);
+  my $foo = $app->build_controller->render_partial(template => 'foo');
 
 =head2 build_tx
 

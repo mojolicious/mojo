@@ -462,7 +462,7 @@ is $t->app->build_controller->req->url, '', 'no URL';
 is $t->app->build_controller->stash->{default}, 23, 'right value';
 is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url,
   '/foo', 'right URL';
-is $t->app->build_controller->render('index', handler => 'epl', partial => 1),
+is $t->app->build_controller->render_partial('index', handler => 'epl'),
   'Just works!', 'right result';
 
 # Unicode snowman

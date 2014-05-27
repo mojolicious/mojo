@@ -150,7 +150,7 @@ sub to {
 
   my $pattern = $self->pattern;
   return $pattern->defaults unless @_;
-  my ($shortcut, %defaults) = _defaults(@_);
+  my ($shortcut, %defaults) = _values(@_);
 
   if ($shortcut) {
 
@@ -194,18 +194,6 @@ sub websocket {
   return $route;
 }
 
-sub _defaults {
-
-  # Hash or shortcut (one)
-  return ref $_[0] eq 'HASH' ? (undef, %{shift()}) : @_ if @_ == 1;
-
-  # Shortcut and values (odd)
-  return shift, @_ if @_ % 2;
-
-  # Shortcut and hash or just values (even)
-  return ref $_[1] eq 'HASH' ? (shift, %{shift()}) : (undef, @_);
-}
-
 sub _generate_route {
   my ($self, $methods, @args) = @_;
 
@@ -239,6 +227,18 @@ sub _generate_route {
   $route->over(\@conditions)->to(\%defaults);
 
   return defined $name ? $route->name($name) : $route;
+}
+
+sub _values {
+
+  # Hash or name (one)
+  return ref $_[0] eq 'HASH' ? (undef, %{shift()}) : @_ if @_ == 1;
+
+  # Name and values (odd)
+  return shift, @_ if @_ % 2;
+
+  # Name and hash or just values (even)
+  return ref $_[1] eq 'HASH' ? (shift, %{shift()}) : (undef, @_);
 }
 
 1;

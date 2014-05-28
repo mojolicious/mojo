@@ -16,11 +16,11 @@ sub path_for {
   # Current route
   my $endpoint;
   if ($name && $name eq 'current' || !$name) {
-    return unless $endpoint = $self->endpoint;
+    return {} unless $endpoint = $self->endpoint;
   }
 
   # Find endpoint
-  else { return $name unless $endpoint = $self->root->lookup($name) }
+  else { return {path => $name} unless $endpoint = $self->root->lookup($name) }
 
   # Merge values (clear format)
   my $captures = $self->stack->[-1] || {};
@@ -33,7 +33,7 @@ sub path_for {
     if $pattern->constraints->{format};
 
   my $path = $endpoint->render('', \%values);
-  return wantarray ? ($path, $endpoint->has_websocket) : $path;
+  return {path => $path, websocket => $endpoint->has_websocket};
 }
 
 sub _match {
@@ -178,18 +178,12 @@ L</"endpoint">.
 
 =head2 path_for
 
-  my $path        = $match->path_for;
-  my $path        = $match->path_for(foo => 'bar');
-  my $path        = $match->path_for({foo => 'bar'});
-  my $path        = $match->path_for('named');
-  my $path        = $match->path_for('named', foo => 'bar');
-  my $path        = $match->path_for('named', {foo => 'bar'});
-  my ($path, $ws) = $match->path_for;
-  my ($path, $ws) = $match->path_for(foo => 'bar');
-  my ($path, $ws) = $match->path_for({foo => 'bar'});
-  my ($path, $ws) = $match->path_for('named');
-  my ($path, $ws) = $match->path_for('named', foo => 'bar');
-  my ($path, $ws) = $match->path_for('named', {foo => 'bar'});
+  my $info = $match->path_for;
+  my $info = $match->path_for(foo => 'bar');
+  my $info = $match->path_for({foo => 'bar'});
+  my $info = $match->path_for('named');
+  my $info = $match->path_for('named', foo => 'bar');
+  my $info = $match->path_for('named', {foo => 'bar'});
 
 Render matching route with parameters into path.
 

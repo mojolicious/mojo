@@ -332,9 +332,10 @@ sub url_for {
 
   # Route
   else {
-    my ($generated, $ws) = $self->match->path_for($target, @_);
-    $path->parse($generated) if $generated;
-    $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws') if $ws;
+    my $generated = $self->match->path_for($target, @_);
+    $path->parse($generated->{path}) if $generated->{path};
+    $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws')
+      if $generated->{websocket};
   }
 
   # Make path absolute

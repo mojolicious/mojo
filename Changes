@@ -5,6 +5,7 @@
     with user expectations.
   - Changed lock and unlock callbacks in Mojo::IOLoop to not receive an
     invocant.
+  - Changed return value of path_for method in Mojolicious::Routes::Match.
   - Removed deprecated support for "X-Forwarded-HTTPS".
   - Removed return values from wait method in Mojo::IOLoop::Delay.
   - Removed generate_port method from Mojo::IOLoop.

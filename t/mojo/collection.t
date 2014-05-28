@@ -166,4 +166,10 @@ eval { Mojo::Collection::missing() };
 like $@, qr/^Undefined subroutine &Mojo::Collection::missing called/,
   'right error';
 
+# Boolean context
+$collection = Mojo::Collection->new;
+ok !$collection, 'empty collection is falsy';
+$collection = Mojo::Collection->new('wat');
+ok $collection, ' non-empty collection is truthy ';
+
 done_testing();

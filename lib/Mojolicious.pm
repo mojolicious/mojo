@@ -159,9 +159,9 @@ sub new {
   # Hide controller attributes/methods and "handler"
   $r->hide(qw(app continue cookie finish flash handler match on param));
   $r->hide(qw(redirect_to render render_exception render_later render_maybe));
-  $r->hide(qw(render_not_found render_static rendered req res respond_to));
-  $r->hide(qw(send session signed_cookie stash tx url_for validation write));
-  $r->hide(qw(write_chunk));
+  $r->hide(qw(render_not_found render_partial render_static rendered req));
+  $r->hide(qw(res respond_to send session signed_cookie stash tx url_for));
+  $r->hide(qw(validation write write_chunk));
 
   # Check if we have a log directory
   my $mode = $self->mode;
@@ -534,7 +534,7 @@ new ones.
 Build default controller object with L</"controller_class">.
 
   # Render template from application
-  my $foo = $app->build_controller->render(template => 'foo', partial => 1);
+  my $foo = $app->build_controller->render_partial(template => 'foo');
 
 =head2 build_tx
 

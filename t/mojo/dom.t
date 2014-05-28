@@ -303,15 +303,17 @@ EOF
 is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
 # HTML5 (unquoted values)
-$dom
-  = Mojo::DOM->new->parse('<div id = test foo ="bar" class=tset>works</div>');
+$dom = Mojo::DOM->new->parse(
+  '<div id = test foo ="bar" class=tset bar=/baz/ baz=//>works</div>');
 is $dom->at('#test')->text,                'works', 'right text';
 is $dom->at('div')->text,                  'works', 'right text';
 is $dom->at('[foo=bar][foo="bar"]')->text, 'works', 'right text';
 is $dom->at('[foo="ba"]'), undef, 'no result';
 is $dom->at('[foo=bar]')->text, 'works', 'right text';
 is $dom->at('[foo=ba]'), undef, 'no result';
-is $dom->at('.tset')->text, 'works', 'right text';
+is $dom->at('.tset')->text,       'works', 'right text';
+is $dom->at('[bar=/baz/]')->text, 'works', 'right text';
+is $dom->at('[baz=//]')->text,    'works', 'right text';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
 $dom = Mojo::DOM->new->parse(
@@ -2298,7 +2300,7 @@ is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
 # Slash between attributes
-$dom = Mojo::DOM->new('<input /type=checkbox/value="/a/" checked/><br/>');
+$dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');
 is_deeply $dom->at('input')->attr,
   {type => 'checkbox', value => '/a/', checked => undef}, 'right attributes';
 is "$dom", '<input checked type="checkbox" value="/a/"><br>', 'right result';

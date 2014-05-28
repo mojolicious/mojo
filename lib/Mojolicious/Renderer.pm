@@ -75,8 +75,10 @@ sub render {
   my $stash = $c->stash;
   local $stash->{layout}  = $stash->{layout}  if exists $stash->{layout};
   local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
-  delete @{$stash}{qw(layout extends)}
-    if my $partial = delete $args->{partial};
+
+  # Partial
+  local @{$stash}{keys %$args} if my $partial = delete $args->{'mojo.partial'};
+  delete @{$stash}{qw(layout extends)} if $partial;
 
   # Merge stash and arguments
   %$stash = (%$stash, %$args);

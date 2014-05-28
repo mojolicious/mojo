@@ -21,7 +21,7 @@ has tx => sub { Mojo::Transaction::HTTP->new };
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
   qw(action app cb controller data extends format handler json layout),
-  qw(namespace partial path status template text variant)
+  qw(namespace path status template text variant)
 );
 
 sub AUTOLOAD {
@@ -152,7 +152,7 @@ sub render {
   my $maybe   = delete $args->{'mojo.maybe'};
 
   # Render
-  my $partial = $args->{partial};
+  my $partial = $args->{'mojo.partial'};
   my ($output, $format) = $app->renderer->render($self, $args);
   return defined $output ? Mojo::ByteStream->new($output) : undef if $partial;
 
@@ -174,6 +174,8 @@ sub render_later { shift->stash('mojo.rendered' => 1) }
 sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
 sub render_not_found { _development('not_found', @_) }
+
+sub render_partial { shift->render(@_, 'mojo.partial' => 1) }
 
 sub render_static {
   my ($self, $file) = @_;
@@ -330,9 +332,10 @@ sub url_for {
 
   # Route
   else {
-    my ($generated, $ws) = $self->match->path_for($target, @_);
-    $path->parse($generated) if $generated;
-    $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws') if $ws;
+    my $generated = $self->match->path_for($target, @_);
+    $path->parse($generated->{path}) if $generated->{path};
+    $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws')
+      if $generated->{websocket};
   }
 
   # Make path absolute
@@ -633,23 +636,21 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 
 =head2 render
 
-  my $bool   = $c->render;
-  my $bool   = $c->render(controller => 'foo', action => 'bar');
-  my $bool   = $c->render(template => 'foo/index');
-  my $bool   = $c->render(template => 'index', format => 'html');
-  my $bool   = $c->render(data => $bytes);
-  my $bool   = $c->render(text => 'Hello!');
-  my $bool   = $c->render(json => {foo => 'bar'});
-  my $bool   = $c->render(handler => 'something');
-  my $bool   = $c->render('foo/index');
-  my $output = $c->render('foo/index', partial => 1);
+  my $bool = $c->render;
+  my $bool = $c->render(controller => 'foo', action => 'bar');
+  my $bool = $c->render(template => 'foo/index');
+  my $bool = $c->render(template => 'index', format => 'html');
+  my $bool = $c->render(data => $bytes);
+  my $bool = $c->render(text => 'Hello!');
+  my $bool = $c->render(json => {foo => 'bar'});
+  my $bool = $c->render(handler => 'something');
+  my $bool = $c->render('foo/index');
 
 Render content using L<Mojolicious::Renderer/"render"> and emit hooks
-L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render"> if the
-result is not C<partial>. If no template is provided a default one based on
-controller and action or route name will be generated with
-L<Mojolicious::Renderer/"template_for">, all additional values get merged into
-the L</"stash">.
+L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">. If no
+template is provided a default one based on controller and action or route
+name will be generated with L<Mojolicious::Renderer/"template_for">, all
+additional values get merged into the L</"stash">.
 
   # Render characters
   $c->render(text => 'I ♥ Mojolicious!');
@@ -699,7 +700,7 @@ automatic rendering would result in a response.
   my $bool = $c->render_maybe(controller => 'foo', action => 'bar');
   my $bool = $c->render_maybe('foo/index', format => 'html');
 
-Try to render content but do not call L</"render_not_found"> if no response
+Try to render content, but do not call L</"render_not_found"> if no response
 could be generated, takes the same arguments as L</"render">.
 
   # Render template "index_local" only if it exists
@@ -713,6 +714,14 @@ Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>. Also sets
 the stash value C<snapshot> to a copy of the L</"stash"> for use in the
 templates.
+
+=head2 render_partial
+
+  my $output = $c->render_partial('foo/index', format => 'pdf');
+
+Try to render content and return it, all arguments get localized automatically
+and are only available in the partial template, takes the same arguments as
+L</"render">.
 
 =head2 render_static
 
@@ -884,9 +893,9 @@ Non-persistent data storage and exchange for the current request, application
 wide default values can be set with L<Mojolicious/"defaults">. Some stash
 values have a special meaning and are reserved, the full list is currently
 C<action>, C<app>, C<cb>, C<controller>, C<data>, C<extends>, C<format>,
-C<handler>, C<json>, C<layout>, C<namespace>, C<partial>, C<path>, C<status>,
-C<template>, C<text> and C<variant>. Note that all stash values with a
-C<mojo.*> prefix are reserved for internal use.
+C<handler>, C<json>, C<layout>, C<namespace>, C<path>, C<status>, C<template>,
+C<text> and C<variant>. Note that all stash values with a C<mojo.*> prefix are
+reserved for internal use.
 
   # Remove value
   my $foo = delete $c->stash->{foo};

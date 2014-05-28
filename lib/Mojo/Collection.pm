@@ -1,6 +1,9 @@
 package Mojo::Collection;
 use Mojo::Base -strict;
-use overload bool => sub {1}, '""' => sub { shift->join("\n") }, fallback => 1;
+use overload
+  bool     => sub { !!@{shift()} },
+  '""'     => sub { shift->join("\n") },
+  fallback => 1;
 
 use Carp 'croak';
 use Exporter 'import';
@@ -313,7 +316,7 @@ L<Mojo::Collection> overloads the following operators.
 
   my $bool = !!$collection;
 
-Always true.
+True or false, depending on if the collection is empty.
 
 =head2 stringify
 

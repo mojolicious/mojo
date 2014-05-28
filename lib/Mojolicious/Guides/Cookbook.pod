@@ -315,7 +315,7 @@ with this little L<Mojo::Server> based mock server you can just embed them.
   say for @{$app->static->paths};
   say $app->config->{secret_identity};
   say $app->dumper({just => 'a helper test'});
-  say $app->build_controller->render(template => 'foo', partial => 1);
+  say $app->build_controller->render_partial(template => 'foo');
 
 The plugin L<Mojolicious::Plugin::Mount> uses this functionality to allow you
 to combine multiple applications into one and deploy them together.
@@ -570,12 +570,12 @@ L<Mojolicious::Controller/"send">.
 The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right after
 the WebSocket connection has been closed.
 
-  $self->tx->no_compression;
+  $self->tx->with_compression;
 
-By default C<permessage-deflate> compression will be used if the client
-supports it, this can result in much better performance, but also increases
-memory usage by up to 300KB per connection. It can be disabled with
-L<Mojo::Transaction::WebSocket/"no_compression">.
+You can activate C<permessage-deflate> compression with
+L<Mojo::Transaction::WebSocket/"with_compression">, this can result in much
+better performance, but also increases memory usage by up to 300KB per
+connection.
 
 =head2 Testing WebSocket web services
 
@@ -1043,20 +1043,7 @@ synchronize multiple non-blocking requests.
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # Synchronize non-blocking requests and capture results
-  my $ua    = Mojo::UserAgent->new;
-  my $delay = Mojo::IOLoop->delay;
-  $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
-  $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
-  my ($mojo, $mango) = $delay->wait;
-
-One or more steps can be used for code that needs to be able to work
-standalone as well as inside an already running event loop.
-
-  use Mojo::UserAgent;
-  use Mojo::IOLoop;
-
-  # Synchronize non-blocking requests portably
+  # Synchronize non-blocking requests
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, $mojo, $mango) = @_;
@@ -1064,7 +1051,7 @@ standalone as well as inside an already running event loop.
   });
   $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
   $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
-  $delay->wait unless Mojo::IOLoop->is_running;
+  $delay->wait;
 
 =head2 WebSockets
 

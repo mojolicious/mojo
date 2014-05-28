@@ -414,21 +414,10 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->cert('tls.crt')->key('tls.key')
     ->post('https://example.com' => json => {top => 'secret'});
 
-  # Blocking concurrent requests (does not work inside a running event loop)
-  my $delay = Mojo::IOLoop->delay;
-  for my $url ('mojolicio.us', 'cpan.org') {
-    my $end = $delay->begin(0);
-    $ua->get($url => sub {
-      my ($ua, $tx) = @_;
-      $end->($tx->res->dom->at('title')->text);
-    });
-  }
-  my @titles = $delay->wait;
-
-  # Non-blocking concurrent requests (does work inside a running event loop)
+  # Non-blocking concurrent requests
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, @titles) = @_;
-    ...
+    say for @titles;
   });
   for my $url ('mojolicio.us', 'cpan.org') {
     my $end = $delay->begin(0);
@@ -437,7 +426,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
       $end->($tx->res->dom->at('title')->text);
     });
   }
-  $delay->wait unless Mojo::IOLoop->is_running;
+  $delay->wait;
 
   # Non-blocking WebSocket connection sending and receiving JSON messages
   $ua->websocket('ws://example.com/echo.json' => sub {

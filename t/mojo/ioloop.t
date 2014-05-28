@@ -119,16 +119,18 @@ $id = Mojo::IOLoop->server(
 );
 $port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 my $delay = Mojo::IOLoop->delay;
-my $end   = $delay->begin(0);
+my $end   = $delay->begin;
+$handle = undef;
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;
-    $end->($stream);
+    $handle = $stream->steal_handle;
+    $end->();
     $stream->on(close => sub { $buffer .= 'should not happen' });
     $stream->on(error => sub { $buffer .= 'should not happen either' });
   }
 );
-$handle = $delay->wait->steal_handle;
+$delay->wait;
 my $stream = Mojo::IOLoop::Stream->new($handle);
 is $stream->timeout, 15, 'right default';
 is $stream->timeout(16)->timeout, 16, 'right timeout';

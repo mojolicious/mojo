@@ -44,6 +44,12 @@ app->renderer->add_handler(dead => sub { die 'renderer works!' });
 # UTF-8 text
 app->types->type(txt => 'text/plain;charset=UTF-8');
 
+# Rewrite partial renders
+hook before_render => sub {
+  my ($self, $args) = @_;
+  $args->{test} = 'after' if $self->stash->{partial};
+};
+
 get '/☃' => sub {
   my $self = shift;
   $self->render(
@@ -213,6 +219,13 @@ get '/inline/ep/partial' => sub {
     inline  => '<%= include inline => $inline_template %>works!',
     handler => 'ep'
   );
+};
+
+get '/partial' => sub {
+  my $self = shift;
+  $self->stash(partial => 1, test => 'before');
+  my $partial = $self->render_partial(inline => '<%= $test =%>');
+  $self->render(text => $self->stash('test') . $partial);
 };
 
 get '/source' => sub {
@@ -462,7 +475,7 @@ is $t->app->build_controller->req->url, '', 'no URL';
 is $t->app->build_controller->stash->{default}, 23, 'right value';
 is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url,
   '/foo', 'right URL';
-is $t->app->build_controller->render('index', handler => 'epl', partial => 1),
+is $t->app->build_controller->render_partial('index', handler => 'epl'),
   'Just works!', 'right result';
 
 # Unicode snowman
@@ -758,6 +771,9 @@ $t->get_ok('/inline/ep/too')->status_is(200)->content_is("0\n");
 # Inline template with partial
 $t->get_ok('/inline/ep/partial')->status_is(200)
   ->content_is("♥just ♥\nworks!\n");
+
+# Rewritten localized arguments
+$t->get_ok('/partial')->status_is(200)->content_is('beforeafter');
 
 # Render static file outside of public directory
 $t->get_ok('/source')->status_is(200)

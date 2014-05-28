@@ -35,8 +35,8 @@ sub register {
   $app->helper(csrf_token    => \&_csrf_token);
   $app->helper(current_route => \&_current_route);
   $app->helper(dumper        => sub { shift; dumper(@_) });
-  $app->helper(include       => \&_include);
-  $app->helper(ua => sub { shift->app->ua });
+  $app->helper(include => sub { shift->render_partial(@_) });
+  $app->helper(ua      => sub { shift->app->ua });
   $app->helper(url_with => \&_url_with);
 }
 
@@ -75,18 +75,6 @@ sub _current_route {
   return '' unless my $endpoint = shift->match->endpoint;
   return $endpoint->name unless @_;
   return $endpoint->name eq shift;
-}
-
-sub _include {
-  my $self = shift;
-
-  # Template may be first argument
-  my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
-  $args->{template} = $template if $template;
-
-  # Localize arguments
-  local @{$self->stash}{keys %$args};
-  return $self->render(partial => 1, %$args);
 }
 
 sub _url_with {
@@ -244,8 +232,7 @@ Alias for L<Mojolicious::Controller/"flash">.
   %= include 'menubar'
   %= include 'menubar', format => 'txt'
 
-Include a partial template, all arguments get localized automatically and are
-only available in the partial template.
+Alias for C<Mojolicious::Controller/"render_partial">.
 
 =head2 layout
 

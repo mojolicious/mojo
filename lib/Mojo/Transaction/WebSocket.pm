@@ -156,10 +156,6 @@ sub new {
   return $self;
 }
 
-sub no_compression {
-  shift->compressed(0)->res->headers->remove('Sec-WebSocket-Extensions');
-}
-
 sub parse_frame {
   my ($self, $buffer) = @_;
 
@@ -260,11 +256,6 @@ sub server_handshake {
     and $res_headers->sec_websocket_protocol($1);
   $res_headers->sec_websocket_accept(
     _challenge($req_headers->sec_websocket_key));
-
-  # "permessage-deflate" extension
-  $self->compressed(1)
-    and $res_headers->sec_websocket_extensions('permessage-deflate')
-    if ($req_headers->sec_websocket_extensions // '') =~ /permessage-deflate/;
 }
 
 sub server_read {
@@ -287,6 +278,16 @@ sub server_write {
   }
 
   return delete $self->{write} // '';
+}
+
+sub with_compression {
+  my $self = shift;
+
+  # "permessage-deflate" extension
+  $self->compressed(1)
+    and $self->res->headers->sec_websocket_extensions('permessage-deflate')
+    if ($self->req->headers->sec_websocket_extensions // '')
+    =~ /permessage-deflate/;
 }
 
 sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
@@ -619,13 +620,6 @@ Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
 L</"frame"> event with default message parser, which also handles C<PING> and
 C<CLOSE> frames automatically.
 
-=head2 no_compression
-
-  $ws->no_compression;
-
-Make sure C<permessage-deflate> extension is deactivated for this WebSocket
-connection.
-
 =head2 parse_frame
 
   my $frame = $ws->parse_frame(\$bytes);
@@ -709,6 +703,12 @@ Read data server-side, used to implement web servers.
   my $bytes = $ws->server_write;
 
 Write data server-side, used to implement web servers.
+
+=head2 with_compression
+
+  $ws->with_compression;
+
+Negotiate C<permessage-deflate> extension for this WebSocket connection.
 
 =head1 DEBUGGING
 

@@ -22,9 +22,7 @@ has multi_accept    => 50;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
-  my $reactor = $class->new;
-  $reactor->on(error => sub { warn "@{[blessed $_[0]]}: $_[1]" });
-  return $reactor;
+  return $class->new->catch(sub { warn "@{[blessed $_[0]]}: $_[1]" });
 };
 
 # Ignore PIPE signal
@@ -443,9 +441,9 @@ L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay(sub {...}, sub {...});
 
 Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow
-of events, which can help you avoid deep nested closures that often result
-from continuation-passing style. Callbacks will be passed along to
-L<Mojo::IOLoop::Delay/"steps">.
+of events for this event loop, which can help you avoid deep nested closures
+that often result from continuation-passing style. Callbacks will be passed
+along to L<Mojo::IOLoop::Delay/"steps">.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
@@ -456,10 +454,10 @@ L<Mojo::IOLoop::Delay/"steps">.
       $end->();
     });
   }
-  $delay->wait unless Mojo::IOLoop->is_running;
+  $delay->wait;
 
   # Sequentialize multiple events
-  my $delay = Mojo::IOLoop->delay(
+  Mojo::IOLoop->delay(
 
     # First step (simple timer)
     sub {
@@ -478,8 +476,22 @@ L<Mojo::IOLoop::Delay/"steps">.
 
     # Third step (the end)
     sub { say 'And done after 5 seconds total.' }
-  );
-  $delay->wait unless Mojo::IOLoop->is_running;
+  )->wait;
+
+  # Handle exceptions in all steps
+  Mojo::IOLoop->delay(
+    sub {
+      my $delay = shift;
+      die 'Intentional error!';
+    },
+    sub {
+      my ($delay, @args) = @_;
+      say 'Never actually reached.';
+    }
+  )->catch(sub {
+    my ($delay, $err) = @_;
+    say "Something went wrong: $err";
+  })->wait;
 
 =head2 is_running
 

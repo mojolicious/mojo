@@ -175,17 +175,7 @@ sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
 sub render_not_found { _development('not_found', @_) }
 
-sub render_partial {
-  my $self = shift;
-
-  # Template may be first argument
-  my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
-  $args->{template} = $template if $template;
-
-  # Localize arguments
-  local @{$self->stash}{keys %$args};
-  return $self->render(%$args, 'mojo.partial' => 1);
-}
+sub render_partial { shift->render(@_, 'mojo.partial' => 1) }
 
 sub render_static {
   my ($self, $file) = @_;

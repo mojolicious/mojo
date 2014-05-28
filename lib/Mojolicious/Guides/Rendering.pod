@@ -199,22 +199,22 @@ alternatives.
 
   $self->render_maybe('localized/baz') or $self->render('foo/bar/baz');
 
-=head2 Partial rendering
+=head2 Rendering to strings
 
 Sometimes you might want to use the rendered result directly instead of
 generating a response, for example to send emails, this can be done with
-L<Mojolicious::Controller/"render_partial">.
+L<Mojolicious::Controller/"render_to_string">.
 
-  my $html = $self->render_partial('mail');
+  my $html = $self->render_to_string('mail');
 
 No encoding will be performed, making it easy to reuse the result in other
 templates or to generate binary data.
 
-  my $pdf = $self->render_partial('invoice', format => 'pdf');
+  my $pdf = $self->render_to_string('invoice', format => 'pdf');
   $self->render(data => $pdf, format => 'pdf');
 
 All arguments passed will get localized automatically and are only available
-in the partial template.
+during this render operation.
 
 =head2 Template variants
 
@@ -534,10 +534,11 @@ L<Mojolicious/"defaults">.
 
   1;
 
-Layouts can also be used with partial templates, but the C<layout> value needs
-to be passed as a render argument (not a stash value).
+Layouts can also be used with L<Mojolicious::Controller/"render_to_string">,
+but the C<layout> value needs to be passed as a render argument (not a stash
+value).
 
-  my $html = $self->render_partial('reminder', layout => 'mail');
+  my $html = $self->render_to_string('reminder', layout => 'mail');
 
 =head2 Including partial templates
 
@@ -555,12 +556,12 @@ shortcut to make your life a little easier.
   <head><title>Howdy</title></head>
 
 Instead of C<include> you could also just call
-L<Mojolicious::Controller/"render_partial">.
+L<Mojolicious::Controller/"render_to_string">.
 
   @@ foo/bar.html.ep
   <!DOCTYPE html>
   <html>
-    %= $self->render_partial('header')
+    %= $self->render_to_string('header')
     <body>Bar</body>
   </html>
 

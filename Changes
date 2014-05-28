@@ -10,7 +10,7 @@
   - Removed return values from wait method in Mojo::IOLoop::Delay.
   - Removed generate_port method from Mojo::IOLoop.
   - Removed check_file method from Mojo::Server::Morbo.
-  - Replaced reserved stash value partial with render_partial method.
+  - Replaced reserved stash value partial with render_to_string method.
   - Replaced format method in Mojo::Log with an attribute.
   - Added with_compression method to Mojo::Transaction::WebSocket.
   - Added catch method to Mojo::EventEmitter.

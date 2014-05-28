@@ -152,9 +152,9 @@ sub render {
   my $maybe   = delete $args->{'mojo.maybe'};
 
   # Render
-  my $partial = $args->{'mojo.partial'};
+  my $ts = $args->{'mojo.to_string'};
   my ($output, $format) = $app->renderer->render($self, $args);
-  return defined $output ? Mojo::ByteStream->new($output) : undef if $partial;
+  return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
 
   # Maybe
   return $maybe ? undef : !$self->render_not_found unless defined $output;
@@ -175,8 +175,6 @@ sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
 sub render_not_found { _development('not_found', @_) }
 
-sub render_partial { shift->render(@_, 'mojo.partial' => 1) }
-
 sub render_static {
   my ($self, $file) = @_;
   my $app = $self->app;
@@ -184,6 +182,8 @@ sub render_static {
   $app->log->debug(qq{File "$file" not found, public directory missing?});
   return !$self->render_not_found;
 }
+
+sub render_to_string { shift->render(@_, 'mojo.to_string' => 1) }
 
 sub rendered {
   my ($self, $status) = @_;
@@ -715,14 +715,6 @@ C<not_found.$format.*> and set the response status code to C<404>. Also sets
 the stash value C<snapshot> to a copy of the L</"stash"> for use in the
 templates.
 
-=head2 render_partial
-
-  my $output = $c->render_partial('foo/index', format => 'pdf');
-
-Try to render content and return it, all arguments get localized automatically
-and are only available in the partial template, takes the same arguments as
-L</"render">.
-
 =head2 render_static
 
   my $bool = $c->render_static('images/logo.png');
@@ -731,6 +723,14 @@ L</"render">.
 Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
 method does not protect from traversing to parent directories.
+
+=head2 render_to_string
+
+  my $output = $c->render_to_string('foo/index', format => 'pdf');
+
+Try to render content and return it, all arguments get localized automatically
+and are only available during this render operation, takes the same arguments
+as L</"render">.
 
 =head2 rendered
 

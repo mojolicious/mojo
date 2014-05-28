@@ -44,10 +44,10 @@ app->renderer->add_handler(dead => sub { die 'renderer works!' });
 # UTF-8 text
 app->types->type(txt => 'text/plain;charset=UTF-8');
 
-# Rewrite partial renders
+# Rewrite when rendering to string
 hook before_render => sub {
   my ($self, $args) = @_;
-  $args->{test} = 'after' if $self->stash->{partial};
+  $args->{test} = 'after' if $self->stash->{to_string};
 };
 
 get '/☃' => sub {
@@ -212,7 +212,7 @@ get '/inline/ep' =>
 
 get '/inline/ep/too' => sub { shift->render(inline => '0', handler => 'ep') };
 
-get '/inline/ep/partial' => sub {
+get '/inline/ep/include' => sub {
   my $self = shift;
   $self->stash(inline_template => "♥<%= 'just ♥' %>");
   $self->render(
@@ -221,11 +221,11 @@ get '/inline/ep/partial' => sub {
   );
 };
 
-get '/partial' => sub {
+get '/to_string' => sub {
   my $self = shift;
-  $self->stash(partial => 1, test => 'before');
-  my $partial = $self->render_partial(inline => '<%= $test =%>');
-  $self->render(text => $self->stash('test') . $partial);
+  $self->stash(to_string => 1, test => 'before');
+  my $str = $self->render_to_string(inline => '<%= $test =%>');
+  $self->render(text => $self->stash('test') . $str);
 };
 
 get '/source' => sub {
@@ -475,7 +475,7 @@ is $t->app->build_controller->req->url, '', 'no URL';
 is $t->app->build_controller->stash->{default}, 23, 'right value';
 is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url,
   '/foo', 'right URL';
-is $t->app->build_controller->render_partial('index', handler => 'epl'),
+is $t->app->build_controller->render_to_string('index', handler => 'epl'),
   'Just works!', 'right result';
 
 # Unicode snowman
@@ -768,12 +768,12 @@ $t->get_ok('/inline/ep?foo=bar')->status_is(200)->content_is("barworks!\n");
 # Inline "ep" template "0"
 $t->get_ok('/inline/ep/too')->status_is(200)->content_is("0\n");
 
-# Inline template with partial
-$t->get_ok('/inline/ep/partial')->status_is(200)
+# Inline template with include
+$t->get_ok('/inline/ep/include')->status_is(200)
   ->content_is("♥just ♥\nworks!\n");
 
 # Rewritten localized arguments
-$t->get_ok('/partial')->status_is(200)->content_is('beforeafter');
+$t->get_ok('/to_string')->status_is(200)->content_is('beforeafter');
 
 # Render static file outside of public directory
 $t->get_ok('/source')->status_is(200)

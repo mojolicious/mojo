@@ -278,7 +278,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok !$success, 'no success';
-is $err->{msg}, 'Proxy connection failed', 'right message';
+is $err->{message}, 'Proxy connection failed', 'right error';
 
 # Blocking proxy request again
 $ua->proxy->https("http://localhost:$proxy");

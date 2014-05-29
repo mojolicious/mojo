@@ -215,6 +215,12 @@ is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
   is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 }
 
+# Parse broken start line
+$res = Mojo::Message::Response->new;
+$res->parse("12345\x0d\x0a");
+ok $res->is_finished, 'response is finished';
+is $res->error->{message}, 'Bad response start line', 'right error';
+
 # Parse full HTTP 1.0 response (missing Content-Length)
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
@@ -339,7 +345,7 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
   $res->parse('a' x 1000);
   ok $res->is_finished, 'response is finished';
   ok $res->content->is_finished, 'content is finished';
-  is $res->error->{msg}, 'Maximum buffer size exceeded', 'right error';
+  is $res->error->{message}, 'Maximum buffer size exceeded', 'right error';
   is $res->error->{advise}, 400, 'right advise';
   is $res->code,    200,   'right status';
   is $res->message, 'OK',  'right message';
@@ -361,7 +367,7 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
   ok $res->content->is_limit_exceeded, 'limit is exceeded';
   ok $res->is_finished, 'response is finished';
   ok $res->content->is_finished, 'content is finished';
-  is $res->error->{msg}, 'Maximum buffer size exceeded', 'right error';
+  is $res->error->{message}, 'Maximum buffer size exceeded', 'right error';
   is $res->error->{advise}, 400, 'right advise';
   is $res->code,    200,   'right status';
   is $res->message, 'OK',  'right message';
@@ -385,7 +391,7 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
   ok $res->content->is_limit_exceeded, 'limit is exceeded';
   ok $res->is_finished, 'response is finished';
   ok $res->content->is_finished, 'content is finished';
-  is $res->error->{msg}, 'Maximum buffer size exceeded', 'right error';
+  is $res->error->{message}, 'Maximum buffer size exceeded', 'right error';
   is $res->error->{advise}, 400, 'right advise';
   is $res->code,    200,   'right status';
   is $res->message, 'OK',  'right message';

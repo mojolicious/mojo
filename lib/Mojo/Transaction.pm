@@ -15,12 +15,12 @@ sub client_close {
   # Premature connection close
   my $res = $self->res->finish;
   if ($close && !$res->code && !$res->error) {
-    $res->error({msg => 'Premature connection close'});
+    $res->error({message => 'Premature connection close'});
   }
 
   # 400/500
   elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-    $res->error({msg => $res->message, code => $res->code});
+    $res->error({message => $res->message, code => $res->code});
   }
 
   return $self->server_close;
@@ -279,8 +279,8 @@ message in L</"error">, 400 and 500 responses also a code.
   if (my $res = $tx->success) { say $res->body }
   else {
     my $err = $tx->error;
-    die "$err->{code} response: $err->{msg}" if $err->{code};
-    die "Connection error: $err->{msg}";
+    die "$err->{code} response: $err->{message}" if $err->{code};
+    die "Connection error: $err->{message}";
   }
 
 =head1 SEE ALSO

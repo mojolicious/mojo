@@ -94,8 +94,8 @@ my $get = my $post = '';
 $ua->get('/' => sub { $get = pop->error });
 $ua->post('/' => sub { $post = pop->error });
 undef $ua;
-is $get->{msg},  'Premature connection close', 'right error';
-is $post->{msg}, 'Premature connection close', 'right error';
+is $get->{message},  'Premature connection close', 'right error';
+is $post->{message}, 'Premature connection close', 'right error';
 
 # The poll reactor stops when there are no events being watched anymore
 my $time = time;
@@ -266,7 +266,7 @@ $msg = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');
 app->log->unsubscribe(message => $msg);
 ok !$tx->success, 'not successful';
-is $tx->error->{msg}, 'Premature connection close', 'right error';
+is $tx->error->{message}, 'Premature connection close', 'right error';
 is $timeout, 1, 'finish event has been emitted';
 like $log, qr/Inactivity timeout\./, 'right log message';
 
@@ -284,7 +284,7 @@ $ua->once(
 );
 $tx = $ua->get('/timeout?timeout=5');
 ok !$tx->success, 'not successful';
-is $tx->error->{msg}, 'Inactivity timeout', 'right error';
+is $tx->error->{message}, 'Inactivity timeout', 'right error';
 
 # Keep alive connection times out
 my ($fail, $id);
@@ -313,16 +313,16 @@ $ua->once(
 );
 $tx = $ua->get('/echo' => 'Hello World!');
 ok !$tx->success, 'not successful';
-is $tx->error->{msg},    'Maximum message size exceeded', 'right error';
-is $tx->error->{advise}, 413,                             'right advise';
-is $tx->error->{code},   undef,                           'no status';
+is $tx->error->{message}, 'Maximum message size exceeded', 'right error';
+is $tx->error->{advise},  413,                             'right advise';
+is $tx->error->{code},    undef,                           'no status';
 ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 
 # 404 response
 $tx = $ua->get('/does_not_exist');
 ok !$tx->success, 'not successful';
-is $tx->error->{msg},  'Not Found', 'right error';
-is $tx->error->{code}, 404,         'right status';
+is $tx->error->{message}, 'Not Found', 'right error';
+is $tx->error->{code},    404,         'right status';
 
 # Fork safety
 $tx = $ua->get('/');

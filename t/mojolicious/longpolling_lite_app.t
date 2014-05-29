@@ -302,12 +302,12 @@ $tx->res->content->unsubscribe('read')->on(
   read => sub {
     my ($self, $chunk) = @_;
     $buffer .= $chunk;
-    $tx->res->error({msg => 'Interrupted'}) if length $buffer == 3;
+    $tx->res->error({message => 'Interrupted'}) if length $buffer == 3;
   }
 );
 $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
-is $tx->res->error->{msg}, 'Interrupted', 'right error';
+is $tx->res->error->{message}, 'Interrupted', 'right error';
 is $buffer, 'hi ', 'right content';
 
 # Stream with delay and finish
@@ -421,7 +421,7 @@ $tx->res->content->unsubscribe('read')->on(
 );
 $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
-is $tx->error->{msg}, 'Request timeout', 'right error';
+is $tx->error->{message}, 'Request timeout', 'right error';
 is $buffer, 'how', 'right content';
 $t->ua->request_timeout(0);
 
@@ -436,7 +436,7 @@ $tx->res->content->unsubscribe('read')->on(
 );
 $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
-is $tx->error->{msg}, 'Inactivity timeout', 'right error';
+is $tx->error->{message}, 'Inactivity timeout', 'right error';
 is $buffer, 'how', 'right content';
 
 done_testing();

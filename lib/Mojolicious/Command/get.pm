@@ -67,7 +67,7 @@ sub run {
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
   my $err = $tx->error;
   $url = encode 'UTF-8', $url;
-  warn qq{Problem loading URL "$url". ($err->{msg})\n}
+  warn qq{Problem loading URL "$url". ($err->{message})\n}
     if $err && !$err->{code};
 
   # JSON Pointer

@@ -214,7 +214,7 @@ Connection identifier or socket.
 
   my $err = $tx->error;
 
-Error and code.
+Transaction error, commonly used together with L</"success">.
 
 =head2 is_finished
 
@@ -279,9 +279,8 @@ message in L</"error">, 400 and 500 responses also a code.
   if (my $res = $tx->success) { say $res->body }
   else {
     my $err = $tx->error;
-    say $err->{code}
-      ? "$err->{code} response: $err->{msg}"
-      : "Connection error: $err->{msg}";
+    die "$err->{code} response: $err->{msg}" if $err->{code};
+    die "Connection error: $err->{msg}";
   }
 
 =head1 SEE ALSO

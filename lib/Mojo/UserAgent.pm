@@ -392,9 +392,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   if (my $res = $tx->success) { say $res->body }
   else {
     my $err = $tx->error;
-    say $err->{code}
-      ? "$err->{code} response: $err->{msg}"
-      : "Connection error: $err->{msg}";
+    die "$err->{code} response: $err->{msg}" if $err->{code};
+    die "Connection error: $err->{msg}";
   }
 
   # Quick JSON API request with Basic authentication

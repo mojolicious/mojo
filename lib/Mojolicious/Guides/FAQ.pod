@@ -65,7 +65,7 @@ which we already have done in the past.
 
 First of all, you need to be aware that according to the L<perlpolicy>, only
 the two most recent stable release series of Perl are supported by the
-community and receive bug fixes, which are currently 5.18.x and 5.16.x.
+community and receive bug fixes, which are currently 5.20.x and 5.18.x.
 L<Mojolicious> follows this model and fully supports these two release series.
 In addition we will also keep the distribution installable up to a certain
 legacy version that we deem worthy of supporting, but not specifically
@@ -74,7 +74,7 @@ optimize for it, this is currently 5.10.1.
 =head2 Do I need to clean my environment before testing Mojolicious?
 
 Mojolicious uses many environment variables both internally and externally,
-notably (but not exclusively) those starting with the prefix C<MOJO_*>. The 
+notably (but not exclusively) those starting with the prefix C<MOJO_*>. The
 test suite expects a clean environment; testing with a non-standard
 environment is unsupported and is unlikely to succeed. Therefore when
 installing or upgrading Mojolicious and when running its tests, we highly

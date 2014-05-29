@@ -234,7 +234,7 @@ is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
 $tx = $ua->inactivity_timeout(0.5)
   ->get("http://127.0.0.1:$port/throttle2" => {Connection => 'close'});
 ok !$tx->success, 'not successful';
-is $tx->error, 'Inactivity timeout', 'right error';
+is $tx->error->{msg}, 'Inactivity timeout', 'right error';
 $daemon->start;
 $tx = $ua->inactivity_timeout(10)
   ->get("http://127.0.0.1:$port/throttle3" => {Connection => 'close'});

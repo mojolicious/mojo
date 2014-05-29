@@ -112,7 +112,8 @@ sub dispatch {
   $plugins->emit_hook(before_routes => $c);
   my $res = $tx->res;
   return if $res->code;
-  if (my $code = ($tx->req->error)[1]) { $res->code($code) }
+  my $err = $tx->req->error;
+  if (my $code = $err->{advise}) { $res->code($code) }
   elsif ($tx->is_websocket) { $res->code(426) }
   $c->render_not_found unless $self->routes->dispatch($c) || $tx->res->code;
 }

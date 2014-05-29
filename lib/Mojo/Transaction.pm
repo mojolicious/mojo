@@ -12,16 +12,15 @@ has res => sub { Mojo::Message::Response->new };
 sub client_close {
   my ($self, $close) = @_;
 
-  # Remove code from parser errors
-  my $res = $self->res->finish;
-  if (my $err = $res->error) { $res->error($err) }
-
   # Premature connection close
-  elsif ($close && !$res->code) { $res->error('Premature connection close') }
+  my $res = $self->res->finish;
+  if ($close && !$res->code && !$res->error) {
+    $res->error({msg => 'Premature connection close'});
+  }
 
   # 400/500
   elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-    $res->error($res->message, $res->code);
+    $res->error({msg => $res->message, code => $res->code});
   }
 
   return $self->server_close;
@@ -36,13 +35,7 @@ sub connection {
   return $self->{connection};
 }
 
-sub error {
-  my $self = shift;
-  my $req  = $self->req;
-  return $req->error if $req->error;
-  my $res = $self->res;
-  return $res->error ? $res->error : undef;
-}
+sub error { $_[0]->req->error || $_[0]->res->error }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
 
@@ -219,8 +212,7 @@ Connection identifier or socket.
 
 =head2 error
 
-  my $err          = $tx->error;
-  my ($err, $code) = $tx->error;
+  my $err = $tx->error;
 
 Error and code.
 
@@ -286,8 +278,10 @@ message in L</"error">, 400 and 500 responses also a code.
   # Sensible exception handling
   if (my $res = $tx->success) { say $res->body }
   else {
-    my ($err, $code) = $tx->error;
-    say $code ? "$code response: $err" : "Connection error: $err";
+    my $err = $tx->error;
+    say $err->{code}
+      ? "$err->{code} response: $err->{msg}"
+      : "Connection error: $err->{msg}";
   }
 
 =head1 SEE ALSO

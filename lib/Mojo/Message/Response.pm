@@ -95,7 +95,7 @@ sub extract_start_line {
 
   # We have a full response line
   return undef unless $$bufref =~ s/^(.*?)\x0d?\x0a//;
-  $self->error('Bad response start line') and return undef
+  $self->error({msg => 'Bad response start line'}) and return undef
     unless $1 =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
   $self->content->skip_body(1) if $self->code($2)->is_empty;
   return !!$self->version($1)->message($3)->content->auto_relax(1);

@@ -6,6 +6,7 @@
   - Changed lock and unlock callbacks in Mojo::IOLoop to not receive an
     invocant.
   - Changed return value of path_for method in Mojolicious::Routes::Match.
+  - Changed return value and arguments of error method in Mojo::Message.
   - Removed deprecated support for "X-Forwarded-HTTPS".
   - Removed return values from wait method in Mojo::IOLoop::Delay.
   - Removed list context support from header method in Mojo::Headers.

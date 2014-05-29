@@ -130,7 +130,7 @@ sub _connect_proxy {
 
       # CONNECT failed (connection needs to be kept alive)
       unless ($tx->keep_alive && $tx->res->is_status_class(200)) {
-        $old->req->error('Proxy connection failed');
+        $old->req->error({msg => 'Proxy connection failed'});
         return $self->$cb($old);
       }
 
@@ -232,7 +232,10 @@ sub _enqueue {
 
 sub _error {
   my ($self, $id, $err, $timeout) = @_;
-  if (my $tx = $self->{connections}{$id}{tx}) { $tx->res->error($err) }
+
+  if (my $tx = $self->{connections}{$id}{tx}) {
+    $tx->res->error({msg => $err});
+  }
   elsif (!$timeout) { return $self->emit(error => $err) }
   $self->_handle($id, 1);
 }
@@ -388,8 +391,10 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {
-    my ($err, $code) = $tx->error;
-    say $code ? "$code response: $err" : "Connection error: $err";
+    my $err = $tx->error;
+    say $err->{code}
+      ? "$err->{code} response: $err->{msg}"
+      : "Connection error: $err->{msg}";
   }
 
   # Quick JSON API request with Basic authentication
@@ -675,7 +680,7 @@ L<Mojo::UserAgent::Transactor/"tx">.
   $tx->res->on(progress => sub {
     my $res = shift;
     return unless my $server = $res->headers->server;
-    $res->error('Oh noes, it is IIS!') if $server =~ /IIS/;
+    $res->error({msg => 'Oh noes, it is IIS!'}) if $server =~ /IIS/;
   });
   $tx = $ua->start($tx);
 

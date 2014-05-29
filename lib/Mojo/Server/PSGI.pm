@@ -22,10 +22,11 @@ sub run {
 
   # Response headers
   my $res     = $tx->res->fix_headers;
-  my $headers = $res->content->headers;
+  my $headers = $res->headers;
   my @headers;
-  for my $name (@{$headers->names}) {
-    push @headers, $name => $_ for map {@$_} $headers->header($name);
+  my $hash = $headers->to_hash(1);
+  for my $name (keys %$hash) {
+    push @headers, map { $name => $_ } map {@$_} @{$hash->{$name}};
   }
 
   # PSGI response

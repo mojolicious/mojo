@@ -19,7 +19,7 @@ my %NORMALCASE = map { lc($_) => $_ } (
 for my $header (values %NORMALCASE) {
   my $name = lc $header;
   $name =~ y/-/_/;
-  monkey_patch __PACKAGE__, $name, sub { scalar shift->header($header => @_) };
+  monkey_patch __PACKAGE__, $name, sub { shift->header($header => @_) };
 }
 
 sub add {
@@ -62,12 +62,8 @@ sub header {
   # Replace
   return $self->remove($name)->add($name, @_) if @_;
 
-  # String
-  return unless my $headers = $self->{headers}{lc $name};
-  return join ', ', map { join ', ', @$_ } @$headers unless wantarray;
-
-  # Array
-  return @$headers;
+  return undef unless my $headers = $self->{headers}{lc $name};
+  return join ', ', map { join ', ', @$_ } @$headers;
 }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
@@ -118,7 +114,7 @@ sub parse {
   return $self;
 }
 
-sub referrer { scalar shift->header(Referer => @_) }
+sub referrer { shift->header(Referer => @_) }
 
 sub remove {
   my ($self, $name) = @_;
@@ -128,7 +124,7 @@ sub remove {
 
 sub to_hash {
   my ($self, $multi) = @_;
-  return {map { $_ => $multi ? [$self->header($_)] : scalar $self->header($_) }
+  return {map { $_ => $multi ? $self->{headers}{lc $_} : $self->header($_) }
       @{$self->names}};
 }
 
@@ -138,7 +134,8 @@ sub to_string {
   # Make sure multiline values are formatted correctly
   my @headers;
   for my $name (@{$self->names}) {
-    push @headers, "$name: " . join("\x0d\x0a ", @$_) for $self->header($name);
+    push @headers, "$name: " . join("\x0d\x0a ", @$_)
+      for @{$self->{headers}{lc $name}};
   }
 
   return join "\x0d\x0a", @headers;
@@ -373,21 +370,12 @@ Parse headers from a hash reference, an empty hash removes all headers.
 
 =head2 header
 
-  my $value  = $headers->header('Foo');
-  my @values = $headers->header('Foo');
-  $headers   = $headers->header(Foo => 'one value');
-  $headers   = $headers->header(Foo => 'first value', 'second value');
-  $headers   = $headers->header(Foo => ['first line', 'second line']);
+  my $value = $headers->header('Foo');
+  $headers  = $headers->header(Foo => 'one value');
+  $headers  = $headers->header(Foo => 'first value', 'second value');
+  $headers  = $headers->header(Foo => ['first line', 'second line']);
 
 Get or replace the current header values.
-
-  # Multiple headers with the same name
-  for my $header ($headers->header('Set-Cookie')) {
-    say 'Set-Cookie:';
-
-    # Multiple lines per header
-    say for @$header;
-  }
 
 =head2 host
 

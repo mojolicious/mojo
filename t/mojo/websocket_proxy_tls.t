@@ -24,7 +24,7 @@ app->log->level('fatal');
 get '/' => sub {
   my $self = shift;
   $self->res->headers->header('X-Works',
-    $self->req->headers->header('X-Works'));
+    $self->req->headers->header('X-Works') // '');
   my $rel = $self->req->url;
   my $abs = $rel->to_abs;
   $self->render(text => "Hello World! $rel $abs");

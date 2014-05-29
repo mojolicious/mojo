@@ -123,14 +123,11 @@ is $headers->to_string,
     "X-Test: 23\x0d\x0a 24\x0d\x0a"
   . "X-Test: single line\x0d\x0a"
   . "X-Test: 25\x0d\x0a 26", 'right format';
-my @array = $headers->header('X-Test');
-is_deeply \@array, [[23, 24], ['single line'], [25, 26]], 'right structure';
 is_deeply $headers->to_hash(1),
   {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
 is_deeply $headers->to_hash, {'X-Test' => '23, 24, single line, 25, 26'},
   'right structure';
-my $str = $headers->header('X-Test');
-is $str, "23, 24, single line, 25, 26", 'right format';
+is $headers->header('X-Test'), "23, 24, single line, 25, 26", 'right format';
 
 # Parse headers
 $headers = Mojo::Headers->new;
@@ -160,11 +157,12 @@ Foo: first again
 
 EOF
 ok $headers->is_finished, 'parser is finished';
-my $multi = [['first', 'second', 'third'], ['first again', 'second ":again"']];
-$hash = {'Content-Type' => [['text/plain']], Foo => $multi,
-  'Foo Bar' => [['baz']]};
+$hash = {
+  'Content-Type' => [['text/plain']],
+  Foo => [['first', 'second', 'third'], ['first again', 'second ":again"']],
+  'Foo Bar' => [['baz']]
+};
 is_deeply $headers->to_hash(1), $hash, 'right structure';
-is_deeply [$headers->header('Foo')], $multi, 'right structure';
 is scalar $headers->header('Foo'),
   'first, second, third, first again, second ":again"', 'right value';
 $headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");

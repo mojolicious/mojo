@@ -314,7 +314,7 @@ $ua->once(
 $tx = $ua->get('/echo' => 'Hello World!');
 ok !$tx->success, 'not successful';
 is $tx->error->{message}, 'Maximum message size exceeded', 'right error';
-is $tx->error->{advise},  413,                             'right advise';
+is $tx->error->{advice},  413,                             'right advice';
 is $tx->error->{code},    undef,                           'no status';
 ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 

@@ -174,7 +174,7 @@ sub parse {
 
   # Check buffer size
   return $self->error(
-    {message => 'Maximum buffer size exceeded', advise => 400})
+    {message => 'Maximum buffer size exceeded', advice => 400})
     if $self->content->is_limit_exceeded;
 
   return $self->emit('progress')->content->is_finished ? $self->finish : $self;
@@ -249,7 +249,7 @@ sub _cache {
 sub _limit {
   my ($self, $msg, $code) = @_;
   $self->{limit} = 1;
-  $self->error({message => $msg, advise => $code});
+  $self->error({message => $msg, advice => $code});
 }
 
 sub _parse_formdata {
@@ -491,7 +491,7 @@ make sure it is not excessively large, there's a 10MB limit by default.
 =head2 error
 
   my $err = $msg->error;
-  $msg    = $msg->error({message => 'Parser error', advise => 500});
+  $msg    = $msg->error({message => 'Parser error', advice => 500});
 
 Message error.
 

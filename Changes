@@ -10,13 +10,12 @@
   - Removed return values from wait method in Mojo::IOLoop::Delay.
   - Removed list context support from header method in Mojo::Headers.
   - Removed generate_port method from Mojo::IOLoop.
-  - Removed check_file method from Mojo::Server::Morbo.
   - Replaced reserved stash value partial with render_to_string method.
   - Replaced format method in Mojo::Log with an attribute.
+  - Replaced check_file method in Mojo::Server::Morbo with check method.
   - Added with_compression method to Mojo::Transaction::WebSocket.
   - Added catch method to Mojo::EventEmitter.
   - Added append method to Mojo::Log.
-  - Added check method to Mojo::Server::Morbo.
   - Updated jQuery to version 2.1.1.
   - Improved Mojo::IOLoop::Delay to automatically check if the event loop is
     already running.

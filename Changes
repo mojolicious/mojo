@@ -1,4 +1,6 @@
 
+5.02  2014-05-31
+
 5.01  2014-05-30
   - Fixed continuation line handling in Mojo::Headers.
 

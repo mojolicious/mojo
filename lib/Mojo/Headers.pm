@@ -63,7 +63,7 @@ sub header {
   return $self->remove($name)->add($name, @_) if @_;
 
   return undef unless my $headers = $self->{headers}{lc $name};
-  return join ', ', map { join ', ', @$_ } @$headers;
+  return join ', ', map { join ' ', @$_ } @$headers;
 }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }

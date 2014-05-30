@@ -125,9 +125,9 @@ is $headers->to_string,
   . "X-Test: 25\x0d\x0a 26", 'right format';
 is_deeply $headers->to_hash(1),
   {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
-is_deeply $headers->to_hash, {'X-Test' => '23, 24, single line, 25, 26'},
+is_deeply $headers->to_hash, {'X-Test' => '23 24, single line, 25 26'},
   'right structure';
-is $headers->header('X-Test'), "23, 24, single line, 25, 26", 'right format';
+is $headers->header('X-Test'), "23 24, single line, 25 26", 'right format';
 
 # Parse headers
 $headers = Mojo::Headers->new;
@@ -163,14 +163,14 @@ $hash = {
   'Foo Bar' => [['baz']]
 };
 is_deeply $headers->to_hash(1), $hash, 'right structure';
-is scalar $headers->header('Foo'),
-  'first, second, third, first again, second ":again"', 'right value';
+is $headers->header('Foo'), 'first second third, first again second ":again"',
+  'right value';
 $headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
 ok $headers->is_finished, 'parser is finished';
 is_deeply $headers->to_hash(1), $hash, 'successful roundtrip';
 $hash = {
   'Content-Type' => 'text/plain',
-  Foo            => 'first, second, third, first again, second ":again"',
+  Foo            => 'first second third, first again second ":again"',
   'Foo Bar'      => 'baz'
 };
 is_deeply $headers->to_hash, $hash, 'right structure';
@@ -208,7 +208,7 @@ $headers = Mojo::Headers->new;
 $headers->from_hash(
   {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});
 $hash = $headers->to_hash;
-is $hash->{'X-Test'}, '23, 24, single line, 25, 26', 'right value';
+is $hash->{'X-Test'}, '23 24, single line, 25 26', 'right value';
 is $hash->{'X-Test2'}, 'foo', 'right value';
 $hash = $headers->to_hash(1);
 is_deeply $hash->{'X-Test'}, [[23, 24], ['single line'], [25, 26]],

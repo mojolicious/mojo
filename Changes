@@ -1,5 +1,6 @@
 
 5.01  2014-05-30
+  - Fixed continuation line handling in Mojo::Headers.
 
 5.0  2014-05-29
   - Code name "Tiger Face", this is a major release.

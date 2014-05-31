@@ -938,8 +938,8 @@ Assets such as templates and static files can be easily bundled with your
 plugins, even if you plan to release them to CPAN.
 
   $ mojo generate plugin AlertAssets
-  $ mkdir AlertAssets/lib/Mojolicious/Plugin/AlertAssets
-  $ cd AlertAssets/lib/Mojolicious/Plugin/AlertAssets
+  $ mkdir Mojolicious-Plugin-AlertAssets/lib/Mojolicious/Plugin/AlertAssets
+  $ cd Mojolicious-Plugin-AlertAssets/lib/Mojolicious/Plugin/AlertAssets
   $ mkdir public
   $ echo 'alert("Hello World!");' > public/alertassets.js
   $ mkdir templates

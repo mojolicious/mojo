@@ -61,7 +61,7 @@ sub build_body       { shift->_build('get_body_chunk') }
 sub build_headers    { shift->_build('get_header_chunk') }
 sub build_start_line { shift->_build('get_start_line_chunk') }
 
-sub cookie { shift->_cache(cookies => @_) }
+sub cookie { shift->_cache(cookie => @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
@@ -194,7 +194,7 @@ sub to_string {
   return $self->build_start_line . $self->build_headers . $self->build_body;
 }
 
-sub upload { shift->_cache(uploads => @_) }
+sub upload { shift->_cache(upload => @_) }
 
 sub uploads {
   my $self = shift;
@@ -236,7 +236,11 @@ sub _build {
 sub _cache {
   my ($self, $method, $name) = @_;
 
+  # Multiple names
+  return map { scalar $self->$method($_) } @$name if ref $name eq 'ARRAY';
+
   # Cache objects by name
+  $method .= 's';
   unless ($self->{$method}) {
     $self->{$method} = {};
     push @{$self->{$method}{$_->name}}, $_ for @{$self->$method};
@@ -453,8 +457,9 @@ Render start line.
 
 =head2 cookie
 
-  my $cookie  = $msg->cookie('foo');
-  my @cookies = $msg->cookie('foo');
+  my $foo         = $msg->cookie('foo');
+  my @foo         = $msg->cookie('foo');
+  my ($foo, $bar) = $msg->cookie(['foo', 'bar']);
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
 L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
@@ -613,8 +618,9 @@ Render whole message.
 
 =head2 upload
 
-  my $upload  = $msg->upload('foo');
-  my @uploads = $msg->upload('foo');
+  my $foo         = $msg->upload('foo');
+  my @foo         = $msg->upload('foo');
+  my ($foo, $bar) = $msg->upload(['foo', 'bar']);
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 Note that this method caches all data, so it should not be called before the

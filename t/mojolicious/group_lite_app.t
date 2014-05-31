@@ -13,6 +13,16 @@ use Test::Mojo;
 
 app->secrets(['test1']);
 
+get '/multi' => sub {
+  my $self = shift;
+  $self->cookie(unsigned1 => 'one');
+  $self->cookie(unsigned1 => 'two', {path => '/multi'});
+  $self->cookie(unsigned2 => 'three');
+  $self->signed_cookie(signed1 => 'four');
+  $self->signed_cookie(signed1 => 'five', {path => '/multi'});
+  $self->signed_cookie(signed2 => 'six');
+};
+
 get '/expiration' => sub {
   my $self = shift;
   if ($self->param('redirect')) {
@@ -188,6 +198,15 @@ $t->get_ok('/expiration?redirect=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('0');
 ok !$t->tx->res->cookie('mojolicious')->expires, 'no expiration';
 $t->reset_session;
+
+# Multiple cookies with same name
+$t->get_ok('/multi')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("\n\n\n\n\n\n\n\n");
+
+# Multiple cookies with same name (again)
+$t->get_ok('/multi')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("one\nthree\none\ntwo\nfour\nsix\nfour\nfive\n");
 
 # Missing action behind bridge
 $t->get_ok('/missing')->status_is(404)->content_is("Oops!\n");
@@ -450,6 +469,20 @@ done_testing();
 __DATA__
 @@ not_found.html.epl
 Oops!
+
+@@ multi.html.ep
+% my ($one, $three) = $self->cookie([qw(unsigned1 unsigned2)]);
+%= $one // ''
+%= $three // '';
+% my @unsigned1 = $self->cookie('unsigned1');
+%= $unsigned1[0] // ''
+%= $unsigned1[1] // ''
+% my ($four, $six) = $self->signed_cookie([qw(signed1 signed2)]);
+%= $four // ''
+%= $six // '';
+% my @signed1 = $self->signed_cookie('signed1');
+%= $signed1[0] // ''
+%= $signed1[1] // ''
 
 @@ param_auth.html.epl
 Bender!

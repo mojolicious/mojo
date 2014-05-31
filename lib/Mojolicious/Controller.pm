@@ -42,6 +42,9 @@ sub continue { $_[0]->app->routes->continue($_[0]) }
 sub cookie {
   my ($self, $name) = (shift, shift);
 
+  # Multiple names
+  return map { scalar $self->cookie($_) } @$name if ref $name eq 'ARRAY';
+
   # Response cookie
   if (@_) {
 
@@ -270,6 +273,10 @@ sub session {
 
 sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
+
+  # Multiple names
+  return map { scalar $self->signed_cookie($_) } @$name
+    if ref $name eq 'ARRAY';
 
   # Response cookie
   my $secrets = $self->stash->{'mojo.secrets'};
@@ -513,10 +520,11 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
-  my $value  = $c->cookie('foo');
-  my @values = $c->cookie('foo');
-  $c         = $c->cookie(foo => 'bar');
-  $c         = $c->cookie(foo => 'bar', {path => '/'});
+  my $foo         = $c->cookie('foo');
+  my @foo         = $c->cookie('foo');
+  my ($foo, $bar) = $c->cookie(['foo', 'bar']);
+  $c              = $c->cookie(foo => 'bar');
+  $c              = $c->cookie(foo => 'bar', {path => '/'});
 
 Access request cookie values and create new response cookies.
 
@@ -873,10 +881,11 @@ browser.
 
 =head2 signed_cookie
 
-  my $value  = $c->signed_cookie('foo');
-  my @values = $c->signed_cookie('foo');
-  $c         = $c->signed_cookie(foo => 'bar');
-  $c         = $c->signed_cookie(foo => 'bar', {path => '/'});
+  my $foo         = $c->signed_cookie('foo');
+  my @foo         = $c->signed_cookie('foo');
+  my ($foo, $bar) = $c->signed_cookie(['foo', 'bar']);
+  $c              = $c->signed_cookie(foo => 'bar');
+  $c              = $c->signed_cookie(foo => 'bar', {path => '/'});
 
 Access signed request cookie values and create new signed response cookies.
 Cookies failing HMAC-SHA1 signature verification will be automatically

@@ -2358,4 +2358,9 @@ is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
 is $dom->tree->[5][1], ' HTML4 ',             'right comment';
 is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
 
+# Huge number of attributes
+my $huge = '<div ' . ('a=b ' x 32768) . '>Test</div>';
+$dom = Mojo::DOM->new($huge);
+is $dom->at('div[a=b]')->text, 'Test', 'right text';
+
 done_testing();

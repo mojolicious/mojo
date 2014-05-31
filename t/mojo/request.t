@@ -1567,6 +1567,30 @@ is $req2->cookie('bar')->value, 'baz',  'right value';
 is $req2->cookie('baz')->value, 'yada', 'right value';
 is $req2->body, "Hello World!\n", 'right content';
 
+# Build HTTP 1.1 request with cookies sharing the same name
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->cookies(
+  {name => 'foo', value => 'bar'},
+  {name => 'foo', value => 'baz'},
+  {name => 'foo', value => 'yada'},
+  {name => 'bar', value => 'foo'}
+);
+$req2 = Mojo::Message::Request->new;
+$req2->parse($req->to_string);
+ok $req2->is_finished, 'request is finished';
+is $req2->method,      'GET', 'right method';
+is $req2->version,     '1.1', 'right version';
+is $req2->headers->host, '127.0.0.1', 'right "Host" value';
+is $req2->headers->cookie, 'foo=bar; foo=baz; foo=yada; bar=foo',
+  'right "Cookie" value';
+is $req2->url, '/foo/bar', 'right URL';
+is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is_deeply [map { $_->value } $req2->cookie('foo')], [qw(bar baz yada)],
+  'right values';
+is_deeply [map { $_->value } $req2->cookie('bar')], ['foo'], 'right values';
+
 # Parse full HTTP 1.0 request with cookies and progress callback
 $req     = Mojo::Message::Request->new;
 $counter = 0;

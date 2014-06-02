@@ -2363,4 +2363,9 @@ my $huge = '<div ' . ('a=b ' x 32768) . '>Test</div>';
 $dom = Mojo::DOM->new($huge);
 is $dom->at('div[a=b]')->text, 'Test', 'right text';
 
+# Broken tag
+$huge = '<br< abc abc abc abc abc abc abc abc<p>Test</p>';
+$dom = Mojo::DOM->new($huge);
+is $dom->at('p')->text, 'Test', 'right text';
+
 done_testing();

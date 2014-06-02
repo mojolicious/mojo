@@ -1,5 +1,6 @@
 
-5.03  2014-06-01
+5.03  2014-06-02
+  - Fixed bug where Mojo::DOM::HTML could not handle certain broken tags.
 
 5.02  2014-05-31
   - Added multi-name support to cookie and signed_cookie methods in

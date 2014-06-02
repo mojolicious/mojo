@@ -65,9 +65,10 @@ sub run {
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
-  my ($err, $code) = $tx->error;
+  my $err = $tx->error;
   $url = encode 'UTF-8', $url;
-  warn qq{Problem loading URL "$url". ($err)\n} if $err && !$code;
+  warn qq{Problem loading URL "$url". ($err->{message})\n}
+    if $err && !$err->{code};
 
   # JSON Pointer
   return unless defined $selector;

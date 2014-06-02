@@ -35,7 +35,7 @@ sub register {
   $app->helper(csrf_token    => \&_csrf_token);
   $app->helper(current_route => \&_current_route);
   $app->helper(dumper        => sub { shift; dumper(@_) });
-  $app->helper(include => sub { shift->render_partial(@_) });
+  $app->helper(include => sub { shift->render_to_string(@_) });
   $app->helper(ua      => sub { shift->app->ua });
   $app->helper(url_with => \&_url_with);
 }
@@ -232,7 +232,7 @@ Alias for L<Mojolicious::Controller/"flash">.
   %= include 'menubar'
   %= include 'menubar', format => 'txt'
 
-Alias for C<Mojolicious::Controller/"render_partial">.
+Alias for C<Mojolicious::Controller/"render_to_string">.
 
 =head2 layout
 

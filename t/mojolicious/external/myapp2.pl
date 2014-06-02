@@ -21,7 +21,7 @@ hook around_dispatch => sub {
 get '/' => sub {
   my $self = shift;
   $self->render(
-    text => $self->render_partial('menubar') . app->defaults->{secret});
+    text => $self->render_to_string('menubar') . app->defaults->{secret});
 };
 
 get '/cached' => sub {

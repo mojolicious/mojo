@@ -336,8 +336,9 @@ sub _request_ok {
 
   # Perform request
   $self->tx($self->ua->start($tx));
-  my ($err, $code) = $self->tx->error;
-  Test::More::diag $err if !(my $ok = !$err || $code) && $err;
+  my $err = $self->tx->error;
+  Test::More::diag $err->{message}
+    if !(my $ok = !$err->{message} || $err->{code}) && $err;
   my $desc = encode 'UTF-8', "@{[uc $tx->req->method]} $url";
   return $self->_test('ok', $ok, $desc);
 }

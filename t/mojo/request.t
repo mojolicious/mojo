@@ -19,10 +19,10 @@ $req->parse('Cookie: ' . ('a=b; ' x (1024 * 1024 * 2)) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
-is $req->error,       'Maximum message size exceeded', 'right error';
-is $req->method,      'GET', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '/', 'right URL';
+is $req->error->{message}, 'Maximum message size exceeded', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->url,     '/',   'right URL';
 is $req->cookie('a'), undef, 'no value';
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding line limit
@@ -32,10 +32,10 @@ $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse('Cookie: ' . ('a=b; ' x 131072) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
-is $req->error,       'Maximum line size exceeded', 'right error';
-is $req->method,      'GET', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '/', 'right URL';
+is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->url,     '/',   'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -47,10 +47,10 @@ $req->parse("Content-Length: 4\x0d\x0aCookie: "
     . ('a=b; ' x 131072)
     . "\x0d\x0aX-Test: 23\x0d\x0a\x0d\x0aabcd");
 ok $req->is_finished, 'request is finished';
-is $req->error,       'Maximum line size exceeded', 'right error';
-is $req->method,      'GET', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '/', 'right URL';
+is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->url,     '/',   'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -66,15 +66,22 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
 is $req->body,        'a=b; ' x 131072, 'right content';
 
+# Parse broken start line
+$req = Mojo::Message::Request->new;
+$req->parse("12345\x0d\x0a");
+ok $req->is_finished, 'request is finished';
+is $req->error->{message}, 'Bad request start line', 'right error';
+is $req->error->{advice}, 400, 'right advice';
+
 # Parse broken HTTP 1.1 message with header exceeding line limit
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0aCookie: " . ('a=b; ' x 131072));
 ok $req->is_finished, 'request is finished';
-is $req->error,       'Maximum line size exceeded', 'right error';
-is $req->method,      'GET', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '/', 'right URL';
+is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->url,     '/',   'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -83,10 +90,10 @@ $req = Mojo::Message::Request->new;
 is $req->max_line_size, 10240, 'right size';
 $req->parse('GET /' . ('abcd' x 131072) . ' HTTP/1.1');
 ok $req->is_finished, 'request is finished';
-is $req->error,       'Maximum line size exceeded', 'right error';
-is $req->method,      'GET', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '', 'no URL';
+is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->url,     '',    'no URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -96,10 +103,10 @@ $req = Mojo::Message::Request->new;
 $req->parse('GET /');
 $req->parse('abcd' x 131072);
 ok $req->is_finished, 'request is finished';
-is $req->error,       'Maximum line size exceeded', 'right error';
-is $req->method,      'GET', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '', 'no URL';
+is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->url,     '',    'no URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -331,13 +338,13 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is $req->headers->max_line_size, 5, 'right size';
   $req->parse('GET /foo/bar/baz.html HTTP/1');
   ok $req->is_finished, 'request is finished';
-  is(($req->error)[0], 'Maximum line size exceeded', 'right error');
-  is(($req->error)[1], 431, 'right status');
+  is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+  is $req->error->{advice}, 431, 'right advice';
   ok $req->is_limit_exceeded, 'limit is exceeded';
   ok $limit, 'limit is exceeded';
-  $req->error('Nothing important.');
-  is(($req->error)[0], 'Nothing important.', 'right error');
-  is(($req->error)[1], undef, 'no status');
+  $req->error({message => 'Nothing important.'});
+  is $req->error->{message}, 'Nothing important.', 'right error';
+  is $req->error->{advice}, undef, 'no advice';
   ok $req->is_limit_exceeded, 'limit is still exceeded';
 }
 
@@ -349,8 +356,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   $req->parse("GET / HTTP/1.0\x0d\x0a");
   $req->parse("Content-Type: text/plain\x0d\x0a");
   ok $req->is_finished, 'request is finished';
-  is(($req->error)[0], 'Maximum line size exceeded', 'right error');
-  is(($req->error)[1], 431, 'right status');
+  is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+  is $req->error->{advice}, 431, 'right advice';
   ok $req->is_limit_exceeded, 'limit is exceeded';
 }
 
@@ -363,8 +370,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is $req->max_message_size, 5, 'right size';
   $req->parse('GET /foo/bar/baz.html HTTP/1');
   ok $req->is_finished, 'request is finished';
-  is(($req->error)[0], 'Maximum message size exceeded', 'right error');
-  is(($req->error)[1], 413, 'right status');
+  is $req->error->{message}, 'Maximum message size exceeded', 'right error';
+  is $req->error->{advice}, 413, 'right advice';
   ok $req->is_limit_exceeded, 'limit is exceeded';
   ok $limit, 'limit is exceeded';
 }
@@ -376,8 +383,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   $req->parse("GET / HTTP/1.0\x0d\x0a");
   $req->parse("Content-Type: text/plain\x0d\x0a");
   ok $req->is_finished, 'request is finished';
-  is(($req->error)[0], 'Maximum message size exceeded', 'right error');
-  is(($req->error)[1], 413, 'right status');
+  is $req->error->{message}, 'Maximum message size exceeded', 'right error';
+  is $req->error->{advice}, 413, 'right advice';
   ok $req->is_limit_exceeded, 'limit is exceeded';
 }
 
@@ -390,8 +397,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   $req->parse('Hello World!');
   $req->parse('Hello World!');
   ok $req->is_finished, 'request is finished';
-  is(($req->error)[0], 'Maximum message size exceeded', 'right error');
-  is(($req->error)[1], 413, 'right status');
+  is $req->error->{message}, 'Maximum message size exceeded', 'right error';
+  is $req->error->{advice}, 413, 'right advice';
   ok $req->is_limit_exceeded, 'limit is exceeded';
 }
 
@@ -1559,6 +1566,32 @@ is $req2->cookie('foo')->value, 'bar',  'right value';
 is $req2->cookie('bar')->value, 'baz',  'right value';
 is $req2->cookie('baz')->value, 'yada', 'right value';
 is $req2->body, "Hello World!\n", 'right content';
+
+# Build HTTP 1.1 request with cookies sharing the same name
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->cookies(
+  {name => 'foo', value => 'bar'},
+  {name => 'foo', value => 'baz'},
+  {name => 'foo', value => 'yada'},
+  {name => 'bar', value => 'foo'}
+);
+$req2 = Mojo::Message::Request->new;
+$req2->parse($req->to_string);
+ok $req2->is_finished, 'request is finished';
+is $req2->method,      'GET', 'right method';
+is $req2->version,     '1.1', 'right version';
+is $req2->headers->host, '127.0.0.1', 'right "Host" value';
+is $req2->headers->cookie, 'foo=bar; foo=baz; foo=yada; bar=foo',
+  'right "Cookie" value';
+is $req2->url, '/foo/bar', 'right URL';
+is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is_deeply [map { $_->value } $req2->cookie('foo')], [qw(bar baz yada)],
+  'right values';
+is_deeply [map { $_->value } $req2->cookie('bar')], ['foo'], 'right values';
+is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(bar foo)],
+  'right values';
 
 # Parse full HTTP 1.0 request with cookies and progress callback
 $req     = Mojo::Message::Request->new;

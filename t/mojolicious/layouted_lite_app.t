@@ -193,12 +193,12 @@ $t->get_ok('/triple_inheritance')->status_is(200)
 $t->get_ok('/plugin_with_template')->status_is(200)
   ->content_is("layout_with_template\nwith template\n\n");
 
-# Nested partial templates
+# Nested included templates
 $t->get_ok('/nested-includes')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("layouted Nested <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
-# Partial template with localized stash values
+# Included template with localized stash values
 $t->get_ok('/localized/include')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_type_is('text/html;charset=UTF-8')
@@ -224,7 +224,7 @@ $t->get_ok('/outerlayouttwo')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("layouted <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
-# Partial template with layout
+# Included template with layout
 $t->get_ok('/outerinnerlayout')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
@@ -353,10 +353,10 @@ Nested <%= include 'outerlayout' %>
 @@ localized.html.ep
 % extends 'localized1';
 <%= $test %>
-<%= include 'localized_partial', test => 321, extends => 'localized2' %>
+<%= include 'localized_include', test => 321, extends => 'localized2' %>
 <%= $test %>
 
-@@ localized_partial.html.ep
+@@ localized_include.html.ep
 <%= $test %>
 
 @@ localized1.html.ep
@@ -367,7 +367,7 @@ localized2 <%= content %>
 
 @@ outerlayout.html.ep
 %= c(qw(> o l l e H <))->reverse->join
-<%= $self->render_partial('outermenu') %>
+<%= $self->render_to_string('outermenu') %>
 
 @@ outermenu.html.ep
 % stash test => 'there';

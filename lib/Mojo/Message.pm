@@ -61,7 +61,7 @@ sub build_body       { shift->_build('get_body_chunk') }
 sub build_headers    { shift->_build('get_header_chunk') }
 sub build_start_line { shift->_build('get_start_line_chunk') }
 
-sub cookie { shift->_cache(cookies => @_) }
+sub cookie { shift->_cache(cookie => @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
@@ -74,16 +74,9 @@ sub dom {
 
 sub error {
   my $self = shift;
-
-  # Set
-  if (@_) {
-    $self->{error} = [@_];
-    return $self->finish;
-  }
-
-  # Get
-  return unless my $err = $self->{error};
-  return wantarray ? @$err : $err->[0];
+  return $self->{error} unless @_;
+  $self->{error} = shift;
+  return $self->finish;
 }
 
 sub extract_start_line {
@@ -180,7 +173,8 @@ sub parse {
     if $self->headers->is_limit_exceeded;
 
   # Check buffer size
-  return $self->error('Maximum buffer size exceeded', 400)
+  return $self->error(
+    {message => 'Maximum buffer size exceeded', advice => 400})
     if $self->content->is_limit_exceeded;
 
   return $self->emit('progress')->content->is_finished ? $self->finish : $self;
@@ -200,7 +194,7 @@ sub to_string {
   return $self->build_start_line . $self->build_headers . $self->build_body;
 }
 
-sub upload { shift->_cache(uploads => @_) }
+sub upload { shift->_cache(upload => @_) }
 
 sub uploads {
   my $self = shift;
@@ -242,7 +236,11 @@ sub _build {
 sub _cache {
   my ($self, $method, $name) = @_;
 
+  # Multiple names
+  return map { scalar $self->$method($_) } @$name if ref $name eq 'ARRAY';
+
   # Cache objects by name
+  $method .= 's';
   unless ($self->{$method}) {
     $self->{$method} = {};
     push @{$self->{$method}{$_->name}}, $_ for @{$self->$method};
@@ -253,9 +251,9 @@ sub _cache {
 }
 
 sub _limit {
-  my $self = shift;
+  my ($self, $msg, $code) = @_;
   $self->{limit} = 1;
-  $self->error(@_);
+  $self->error({message => $msg, advice => $code});
 }
 
 sub _parse_formdata {
@@ -459,8 +457,9 @@ Render start line.
 
 =head2 cookie
 
-  my $cookie  = $msg->cookie('foo');
-  my @cookies = $msg->cookie('foo');
+  my $foo         = $msg->cookie('foo');
+  my @foo         = $msg->cookie('foo');
+  my ($foo, $bar) = $msg->cookie(['foo', 'bar']);
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
 L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
@@ -496,12 +495,10 @@ make sure it is not excessively large, there's a 10MB limit by default.
 
 =head2 error
 
-  my $err          = $msg->error;
-  my ($err, $code) = $msg->error;
-  $msg             = $msg->error('Parser error');
-  $msg             = $msg->error('Parser error', 500);
+  my $err = $msg->error;
+  $msg    = $msg->error({message => 'Parser error', advice => 500});
 
-Error and code.
+Message error.
 
 =head2 extract_start_line
 
@@ -621,8 +618,9 @@ Render whole message.
 
 =head2 upload
 
-  my $upload  = $msg->upload('foo');
-  my @uploads = $msg->upload('foo');
+  my $foo         = $msg->upload('foo');
+  my @foo         = $msg->upload('foo');
+  my ($foo, $bar) = $msg->upload(['foo', 'bar']);
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 Note that this method caches all data, so it should not be called before the

@@ -15,13 +15,14 @@ sub run {
   my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
   $class = "Mojolicious::Plugin::$class";
   my $app = class_to_path $class;
-  $self->render_to_rel_file('class', "$name/lib/$app", $class, $name);
+  my $dir = join '-', split '::', $class;
+  $self->render_to_rel_file('class', "$dir/lib/$app", $class, $name);
 
   # Test
-  $self->render_to_rel_file('test', "$name/t/basic.t", $name);
+  $self->render_to_rel_file('test', "$dir/t/basic.t", $name);
 
   # Makefile
-  $self->render_to_rel_file('makefile', "$name/Makefile.PL", $class, $app);
+  $self->render_to_rel_file('makefile', "$dir/Makefile.PL", $class, $app);
 }
 
 1;

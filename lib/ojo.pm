@@ -41,10 +41,11 @@ sub import {
 sub _request {
   my $ua = shift;
 
-  my $tx = $ua->start($ua->build_tx(@_));
-  my ($err, $code) = $tx->error;
-  warn qq/Problem loading URL "@{[$tx->req->url->to_abs]}". ($err)\n/
-    if $err && !$code;
+  my $tx  = $ua->start($ua->build_tx(@_));
+  my $err = $tx->error;
+  warn
+    qq/Problem loading URL "@{[$tx->req->url->to_abs]}". ($err->{message})\n/
+    if $err && !$err->{code};
 
   return $tx->res;
 }

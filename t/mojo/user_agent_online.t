@@ -85,7 +85,7 @@ ok $tx->error,       'has error';
 $tx = $ua->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $ua->start($tx);
 ok $tx->is_finished, 'transaction is finished';
-like $tx->error, qr/^Couldn't connect/, 'right error';
+like $tx->error->{message}, qr/^Couldn't connect/, 'right error';
 
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;
@@ -253,12 +253,12 @@ is $tx->redirects->[-1]->res->code, 301, 'right status';
 # Connect timeout (non-routable address)
 $tx = $ua->connect_timeout(0.5)->get('192.0.2.1');
 ok $tx->is_finished, 'transaction is finished';
-is $tx->error, 'Connect timeout', 'right error';
+is $tx->error->{message}, 'Connect timeout', 'right error';
 $ua->connect_timeout(3);
 
 # Request timeout (non-routable address)
 $tx = $ua->request_timeout(0.5)->get('192.0.2.1');
 ok $tx->is_finished, 'transaction is finished';
-is $tx->error, 'Request timeout', 'right error';
+is $tx->error->{message}, 'Request timeout', 'right error';
 
 done_testing();

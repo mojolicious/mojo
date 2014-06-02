@@ -442,6 +442,10 @@ Run server.
 
 Start accepting connections.
 
+  # Listen on random port
+  my $id   = $daemon->listen(['http://127.0.0.1'])->start->acceptors->[0];
+  my $port = $daemon->ioloop->acceptor($id)->handle->sockport;
+
 =head2 stop
 
   $daemon = $daemon->stop;

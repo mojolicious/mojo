@@ -64,7 +64,7 @@ sub new {
 sub warn { shift->log(warn => @_) }
 
 sub _format {
-  '[' . localtime(shift) . '] [' . shift . '] ' . join("\n", @_, '');
+  '[' . localtime(shift) . '] [' . shift() . '] ' . join("\n", @_, '');
 }
 
 sub _message {

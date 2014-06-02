@@ -19,7 +19,7 @@
       testing framework, static file server, first class Unicode support and
       much more for you to discover.
   * Very clean, portable and Object Oriented pure-Perl API without any hidden
-    magic and no requirements besides Perl 5.10.1 (although 5.16+ is
+    magic and no requirements besides Perl 5.10.1 (although 5.18+ is
     recommended, and optional CPAN modules will be used to provide advanced
     functionality if they are installed).
   * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,

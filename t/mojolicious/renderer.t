@@ -6,7 +6,7 @@ use Mojolicious::Controller;
 # Partial rendering
 my $c = Mojolicious::Controller->new;
 $c->app->log->level('fatal');
-is $c->render_partial(text => 'works'), 'works', 'renderer is working';
+is $c->render_to_string(text => 'works'), 'works', 'renderer is working';
 
 # Normal rendering with default format
 my $r = $c->app->renderer->default_format('test');

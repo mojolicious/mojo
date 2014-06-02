@@ -76,9 +76,9 @@ sub render {
   local $stash->{layout}  = $stash->{layout}  if exists $stash->{layout};
   local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
 
-  # Partial
-  local @{$stash}{keys %$args} if my $partial = delete $args->{'mojo.partial'};
-  delete @{$stash}{qw(layout extends)} if $partial;
+  # Rendering to string
+  local @{$stash}{keys %$args} if my $ts = delete $args->{'mojo.to_string'};
+  delete @{$stash}{qw(layout extends)} if $ts;
 
   # Merge stash and arguments
   %$stash = (%$stash, %$args);
@@ -131,7 +131,7 @@ sub render {
 
   # Encoding
   $output = encode $options->{encoding}, $output
-    if !$partial && $options->{encoding} && $output;
+    if !$ts && $options->{encoding} && $output;
 
   return $output, $options->{format};
 }

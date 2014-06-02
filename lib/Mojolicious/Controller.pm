@@ -42,6 +42,9 @@ sub continue { $_[0]->app->routes->continue($_[0]) }
 sub cookie {
   my ($self, $name) = (shift, shift);
 
+  # Multiple names
+  return map { scalar $self->cookie($_) } @$name if ref $name eq 'ARRAY';
+
   # Response cookie
   if (@_) {
 
@@ -152,9 +155,9 @@ sub render {
   my $maybe   = delete $args->{'mojo.maybe'};
 
   # Render
-  my $partial = $args->{'mojo.partial'};
+  my $ts = $args->{'mojo.to_string'};
   my ($output, $format) = $app->renderer->render($self, $args);
-  return defined $output ? Mojo::ByteStream->new($output) : undef if $partial;
+  return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
 
   # Maybe
   return $maybe ? undef : !$self->render_not_found unless defined $output;
@@ -175,8 +178,6 @@ sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
 sub render_not_found { _development('not_found', @_) }
 
-sub render_partial { shift->render(@_, 'mojo.partial' => 1) }
-
 sub render_static {
   my ($self, $file) = @_;
   my $app = $self->app;
@@ -184,6 +185,8 @@ sub render_static {
   $app->log->debug(qq{File "$file" not found, public directory missing?});
   return !$self->render_not_found;
 }
+
+sub render_to_string { shift->render(@_, 'mojo.to_string' => 1) }
 
 sub rendered {
   my ($self, $status) = @_;
@@ -270,6 +273,10 @@ sub session {
 
 sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
+
+  # Multiple names
+  return map { scalar $self->signed_cookie($_) } @$name
+    if ref $name eq 'ARRAY';
 
   # Response cookie
   my $secrets = $self->stash->{'mojo.secrets'};
@@ -513,10 +520,11 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
-  my $value  = $c->cookie('foo');
-  my @values = $c->cookie('foo');
-  $c         = $c->cookie(foo => 'bar');
-  $c         = $c->cookie(foo => 'bar', {path => '/'});
+  my $foo         = $c->cookie('foo');
+  my @foo         = $c->cookie('foo');
+  my ($foo, $bar) = $c->cookie(['foo', 'bar']);
+  $c              = $c->cookie(foo => 'bar');
+  $c              = $c->cookie(foo => 'bar', {path => '/'});
 
 Access request cookie values and create new response cookies.
 
@@ -715,14 +723,6 @@ C<not_found.$format.*> and set the response status code to C<404>. Also sets
 the stash value C<snapshot> to a copy of the L</"stash"> for use in the
 templates.
 
-=head2 render_partial
-
-  my $output = $c->render_partial('foo/index', format => 'pdf');
-
-Try to render content and return it, all arguments get localized automatically
-and are only available in the partial template, takes the same arguments as
-L</"render">.
-
 =head2 render_static
 
   my $bool = $c->render_static('images/logo.png');
@@ -731,6 +731,14 @@ L</"render">.
 Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
 method does not protect from traversing to parent directories.
+
+=head2 render_to_string
+
+  my $output = $c->render_to_string('foo/index', format => 'pdf');
+
+Try to render content and return it, all arguments get localized automatically
+and are only available during this render operation, takes the same arguments
+as L</"render">.
 
 =head2 rendered
 
@@ -873,10 +881,11 @@ browser.
 
 =head2 signed_cookie
 
-  my $value  = $c->signed_cookie('foo');
-  my @values = $c->signed_cookie('foo');
-  $c         = $c->signed_cookie(foo => 'bar');
-  $c         = $c->signed_cookie(foo => 'bar', {path => '/'});
+  my $foo         = $c->signed_cookie('foo');
+  my @foo         = $c->signed_cookie('foo');
+  my ($foo, $bar) = $c->signed_cookie(['foo', 'bar']);
+  $c              = $c->signed_cookie(foo => 'bar');
+  $c              = $c->signed_cookie(foo => 'bar', {path => '/'});
 
 Access signed request cookie values and create new signed response cookies.
 Cookies failing HMAC-SHA1 signature verification will be automatically

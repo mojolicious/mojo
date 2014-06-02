@@ -153,7 +153,7 @@ $t->get_ok('/dead_template')->status_is(500)->content_like(qr/dead template!/)
   ->content_like(qr/line 1/);
 like $log, qr/dead template!/, 'right result';
 
-# Dead partial template
+# Dead included template
 $t->get_ok('/dead_included_template')->status_is(500)
   ->content_like(qr/dead template!/)->content_like(qr/line 1/);
 

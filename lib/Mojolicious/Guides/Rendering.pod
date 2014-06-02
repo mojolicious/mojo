@@ -254,11 +254,6 @@ performed.
 
   $self->render(data => $bytes);
 
-To render image data, like thumbnails, specify the format.
-
-  my $bytes = Mojo::Asset::File->new(path => '/home/sri/foo.jpg');
-  $self->render(data => $bytes->slurp, format =>'jpg');
-
 =head2 Rendering JSON
 
 The C<json> stash value allows you to pass Perl data structures to the

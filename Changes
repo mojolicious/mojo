@@ -1,4 +1,6 @@
 
+5.04  2014-06-03
+
 5.03  2014-06-02
   - Fixed bug where Mojo::DOM::HTML could not handle certain broken tags.
 

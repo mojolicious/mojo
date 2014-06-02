@@ -123,8 +123,8 @@ Mojolicious::Routes::Match - Find routes
   say $match->stack->[0]{action};
 
   # Render
-  say $match->path_for;
-  say $match->path_for(action => 'baz');
+  say $match->path_for->{path};
+  say $match->path_for(action => 'baz')->{path};
 
 =head1 DESCRIPTION
 

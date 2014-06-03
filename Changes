@@ -1,4 +1,6 @@
 
+5.05  2014-06-04
+
 5.04  2014-06-03
   - Added expect_close attribute to Mojo::Content.
   - Improved support for broken responses to CONNECT requests.

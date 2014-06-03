@@ -196,6 +196,20 @@ is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27,           'right "Content-Length" value';
 is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 
+# Parse full HTTP 1.0 response (keep-alive)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
+$res->parse("Connection: keep-alive\x0d\x0a\x0d\x0a");
+$res->parse("HTTP/1.0 200 Internal Server Error\x0d\x0a\x0d\x0a");
+ok $res->is_finished, 'response is finished';
+is $res->code,        500, 'right status';
+is $res->message,     'Internal Server Error', 'right message';
+is $res->version,     '1.0', 'right version';
+is $res->body,        '', 'no content';
+is $res->content->leftovers,
+  "HTTP/1.0 200 Internal Server Error\x0d\x0a\x0d\x0a",
+  'next response in leftovers';
+
 # Parse full HTTP 1.0 response (no limit)
 {
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
@@ -1025,7 +1039,7 @@ is_deeply [$res->dom->find('p > a')->pluck('text')->each], [qw(test test)],
 
 # Build DOM from response with charset
 $res = Mojo::Message::Response->new;
-$res->parse("HTTP/1.1 200 OK\x0a");
+$res->parse("HTTP/1.0 200 OK\x0a");
 $res->parse(
   "Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
 $res->parse("\x0a");

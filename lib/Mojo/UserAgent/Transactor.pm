@@ -58,9 +58,10 @@ sub proxy_connect {
   my $url = $req->url;
   return undef unless $req->is_handshake || $url->protocol eq 'https';
 
-  # CONNECT request
+  # CONNECT request (expect a bad response)
   my $new = $self->tx(CONNECT => $url->clone->userinfo(undef));
   $new->req->proxy($proxy);
+  $new->res->content->auto_relax(0);
 
   return $new;
 }

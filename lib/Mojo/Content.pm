@@ -114,7 +114,8 @@ sub parse {
 
   # Relaxed parsing
   my $headers = $self->headers;
-  if ($self->auto_relax && !length($headers->content_length // '')) {
+  my $len = $headers->content_length // '';
+  if ($self->auto_relax && !length $len) {
     my $connection = lc($headers->connection // '');
     $self->relaxed(1)
       if $connection eq 'close' || (!$connection && $self->expect_close);
@@ -129,9 +130,8 @@ sub parse {
 
   # Normal content
   else {
-    my $len = $headers->content_length || 0;
     $self->{size} ||= 0;
-    if ((my $need = $len - $self->{size}) > 0) {
+    if ((my $need = ($len ||= 0) - $self->{size}) > 0) {
       my $len = length $self->{buffer};
       my $chunk = substr $self->{buffer}, 0, $need > $len ? $len : $need, '';
       $self->_uncompress($chunk);

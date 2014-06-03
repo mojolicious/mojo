@@ -200,14 +200,13 @@ is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
 $res->parse("Connection: keep-alive\x0d\x0a\x0d\x0a");
-$res->parse("HTTP/1.0 200 Internal Server Error\x0d\x0a\x0d\x0a");
+$res->parse("HTTP/1.0 200 OK\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
 is $res->code,        500, 'right status';
 is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.0', 'right version';
 is $res->body,        '', 'no content';
-is $res->content->leftovers,
-  "HTTP/1.0 200 Internal Server Error\x0d\x0a\x0d\x0a",
+is $res->content->leftovers, "HTTP/1.0 200 OK\x0d\x0a\x0d\x0a",
   'next response in leftovers';
 
 # Parse full HTTP 1.0 response (no limit)

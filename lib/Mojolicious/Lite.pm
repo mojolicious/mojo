@@ -535,12 +535,12 @@ routes are only evaluated if the callback returned a true value.
   use Mojolicious::Lite;
 
   # Authenticate based on name parameter
-  under sub {
+  under {allow => 'Bender'} => sub {
     my $self = shift;
 
     # Authenticated
     my $name = $self->param('name') || '';
-    return 1 if $name eq 'Bender';
+    return 1 if $name eq '$self->stash('allow');
 
     # Not authenticated
     $self->render('denied');
@@ -554,10 +554,10 @@ routes are only evaluated if the callback returned a true value.
   __DATA__
 
   @@ denied.html.ep
-  You are not Bender, permission denied.
+  You are not <%= $allow %>, permission denied.
 
   @@ index.html.ep
-  Hi Bender.
+  Hi <%= $allow %>.
 
 Prefixing multiple routes is another good use for L</"under">.
 
@@ -1007,11 +1007,13 @@ automatically exported.
 
 =head2 any
 
+  my $route = any '/:foo' => sub {...};
+  my $route = any '/:foo' => {foo => 'bar'} => sub {...};
   my $route = any '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = any [qw(GET POST)] => '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the
-listed HTTP request methods or all. See also the tutorial above for more
+listed HTTP request methods or all. See also the tutorial above for many more
 argument variations.
 
 =head2 app
@@ -1022,17 +1024,22 @@ The L<Mojolicious::Lite> application.
 
 =head2 del
 
+  my $route = del '/:foo' => sub {...};
+  my $route = del '/:foo' => {foo => 'bar'} => sub {...};
   my $route = del '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"delete">, matching only
-C<DELETE> requests. See also the tutorial above for more argument variations.
+C<DELETE> requests. See also the tutorial above for many more argument
+variations.
 
 =head2 get
 
+  my $route = get '/:foo' => sub {...};
+  my $route = get '/:foo' => {foo => 'bar'} => sub {...};
   my $route = get '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET>
-requests. See also the tutorial above for more argument variations.
+requests. See also the tutorial above for many more argument variations.
 
 =head2 group
 
@@ -1054,18 +1061,23 @@ Share code with L<Mojolicious/"hook">.
 
 =head2 options
 
+  my $route = options '/:foo' => sub {...};
+  my $route = options '/:foo' => {foo => 'bar'} => sub {...};
   my $route = options '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"options">, matching only
-C<OPTIONS> requests. See also the tutorial above for more argument
+C<OPTIONS> requests. See also the tutorial above for many more argument
 variations.
 
 =head2 patch
 
+  my $route = patch '/:foo' => sub {...};
+  my $route = patch '/:foo' => {foo => 'bar'} => sub {...};
   my $route = patch '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"patch">, matching only
-C<PATCH> requests. See also the tutorial above for more argument variations.
+C<PATCH> requests. See also the tutorial above for many more argument
+variations.
 
 =head2 plugin
 
@@ -1075,22 +1087,29 @@ Load a plugin with L<Mojolicious/"plugin">.
 
 =head2 post
 
+  my $route = post '/:foo' => sub {...};
+  my $route = post '/:foo' => {foo => 'bar'} => sub {...};
   my $route = post '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"post">, matching only
-C<POST> requests. See also the tutorial above for more argument variations.
+C<POST> requests. See also the tutorial above for many more argument
+variations.
 
 =head2 put
 
+  my $route = put '/:foo' => sub {...};
+  my $route = put '/:foo' => {foo => 'bar'} => sub {...};
   my $route = put '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT>
-requests. See also the tutorial above for more argument variations.
+requests. See also the tutorial above for many more argument variations.
 
 =head2 under
 
   my $bridge = under sub {...};
-  my $bridge = under '/:foo';
+  my $bridge = under '/:foo' => sub {...};
+  my $bridge = under '/:foo' => [foo => qr/\w+/];
+  my $bridge = under {format => 0};
 
 Generate bridge route with L<Mojolicious::Routes::Route/"under">, to which all
 following routes are automatically appended. See also the tutorial above for
@@ -1098,10 +1117,12 @@ more argument variations.
 
 =head2 websocket
 
+  my $route = websocket '/:foo' => sub {...};
+  my $route = websocket '/:foo' => {foo => 'bar'} => sub {...};
   my $route = websocket '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"websocket">, matching only
-WebSocket handshakes. See also the tutorial above for more argument
+WebSocket handshakes. See also the tutorial above for many more argument
 variations.
 
 =head1 ATTRIBUTES

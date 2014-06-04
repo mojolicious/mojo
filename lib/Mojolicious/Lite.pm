@@ -535,12 +535,12 @@ routes are only evaluated if the callback returned a true value.
   use Mojolicious::Lite;
 
   # Authenticate based on name parameter
-  under {allow => 'Bender'} => sub {
+  under sub {
     my $self = shift;
 
     # Authenticated
     my $name = $self->param('name') || '';
-    return 1 if $name eq $self->stash('allow');
+    return 1 if $name eq 'Bender';
 
     # Not authenticated
     $self->render('denied');
@@ -554,10 +554,10 @@ routes are only evaluated if the callback returned a true value.
   __DATA__
 
   @@ denied.html.ep
-  You are not <%= $allow %>, permission denied.
+  You are not Bender, permission denied.
 
   @@ index.html.ep
-  Hi <%= $allow %>.
+  Hi Bender.
 
 Prefixing multiple routes is another good use for L</"under">.
 

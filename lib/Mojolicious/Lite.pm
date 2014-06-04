@@ -540,7 +540,7 @@ routes are only evaluated if the callback returned a true value.
 
     # Authenticated
     my $name = $self->param('name') || '';
-    return 1 if $name eq '$self->stash('allow');
+    return 1 if $name eq $self->stash('allow');
 
     # Not authenticated
     $self->render('denied');

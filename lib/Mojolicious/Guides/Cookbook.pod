@@ -210,7 +210,10 @@ C<mod_proxy>, the configuration looks quite similar to the Nginx one above.
 =head2 Apache/CGI
 
 C<CGI> is supported out of the box and your L<Mojolicious> application will
-automatically detect that it is executed as a C<CGI> script.
+automatically detect that it is executed as a C<CGI> script. It's use in
+production environments is discouraged though, because as a result of how
+C<CGI> works, it is very slow and many web servers are making it exceptionally
+hard to configure properly.
 
   ScriptAlias / /home/sri/myapp/script/myapp/
 

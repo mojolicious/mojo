@@ -481,7 +481,7 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 =head2 Layouts
 
 Most of the time when using C<ep> templates you will want to wrap your
-generated content in a HTML skeleton, thanks to layouts that's absolutely
+generated content in an HTML skeleton, thanks to layouts that's absolutely
 trivial.
 
   @@ foo/bar.html.ep

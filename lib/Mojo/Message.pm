@@ -498,7 +498,8 @@ make sure it is not excessively large, there's a 10MB limit by default.
   my $err = $msg->error;
   $msg    = $msg->error({message => 'Parser error', advice => 500});
 
-Message error.
+Get or set message error, an C<undef> return value indicates that there is no
+error.
 
 =head2 extract_start_line
 

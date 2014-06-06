@@ -214,7 +214,8 @@ Connection identifier or socket.
 
   my $err = $tx->error;
 
-Transaction error, commonly used together with L</"success">.
+Return transaction error or C<undef> if there is no error, commonly used
+together with L</"success">.
 
 =head2 is_finished
 

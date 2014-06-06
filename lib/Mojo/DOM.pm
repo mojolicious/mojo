@@ -518,6 +518,9 @@ Append new content to this node's content.
   # "<!-- A B --><br>"
   $dom->parse('<!-- A --><br>')->contents->first->append_content('B ')->root;
 
+  # "<p>A<i>B</i></p>"
+  $dom->parse('<p>A</p>')->at('p')->append_content('<i>B</i>')->root;
+
 =head2 at
 
   my $result = $dom->at('html title');
@@ -574,6 +577,9 @@ Return this node's content or replace it with new content.
 
   # "<!-- B --><br>"
   $dom->parse('<!-- A --><br>')->contents->first->content(' B ')->root;
+
+  # "<p><i>B</i></p>"
+  $dom->parse('<p>A</p>')->at('p')->content('<i>B</i>')->root;
 
 =head2 contents
 
@@ -698,6 +704,9 @@ Prepend new content to this node's content.
 
   # "<!-- A B --><br>"
   $dom->parse('<!-- B --><br>')->contents->first->prepend_content(' A')->root;
+
+  # "<p><i>B</i>A</p>"
+  $dom->parse('<p>A</p>')->at('p')->prepend_content('<i>B</i>')->root;
 
 =head2 previous
 

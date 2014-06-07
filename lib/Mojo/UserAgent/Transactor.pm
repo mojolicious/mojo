@@ -74,7 +74,7 @@ sub redirect {
   my $code = $res->code // 0;
   return undef unless grep { $_ == $code } 301, 302, 303, 307, 308;
 
-  # Fix broken location without authority and/or scheme
+  # Fix location without authority and/or scheme
   return unless my $location = $res->headers->location;
   $location = Mojo::URL->new($location);
   $location = $location->base($old->req->url)->to_abs unless $location->is_abs;

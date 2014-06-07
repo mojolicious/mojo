@@ -70,7 +70,8 @@ Mojo::Content::Single - HTTP content
 =head1 DESCRIPTION
 
 L<Mojo::Content::Single> is a container for HTTP content based on
-L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
+L<RFC 7230|http://tools.ietf.org/html/rfc7230> and
+L<RFC 7231|http://tools.ietf.org/html/rfc7231>.
 
 =head1 EVENTS
 

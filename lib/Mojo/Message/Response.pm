@@ -6,7 +6,7 @@ use Mojo::Date;
 
 has [qw(code message)];
 
-# Umarked codes are from RFC 2616
+# Umarked codes are from RFC 7231
 my %MESSAGES = (
   100 => 'Continue',
   101 => 'Switching Protocols',
@@ -28,7 +28,7 @@ my %MESSAGES = (
   304 => 'Not Modified',
   305 => 'Use Proxy',
   307 => 'Temporary Redirect',
-  308 => 'Permanent Redirect',                 # Draft
+  308 => 'Permanent Redirect',                 # RFC 7238
   400 => 'Bad Request',
   401 => 'Unauthorized',
   402 => 'Payment Required',
@@ -173,7 +173,8 @@ Mojo::Message::Response - HTTP response
 =head1 DESCRIPTION
 
 L<Mojo::Message::Response> is a container for HTTP responses based on
-L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
+L<RFC 7230|http://tools.ietf.org/html/rfc7230> and
+L<RFC 7231|http://tools.ietf.org/html/rfc7231>.
 
 =head1 EVENTS
 

@@ -140,7 +140,9 @@ Mojolicious::Static - Serve static files
 =head1 DESCRIPTION
 
 L<Mojolicious::Static> is a static file server with C<Range> and
-C<If-Modified-Since> support.
+C<If-Modified-Since> support based on
+L<RFC 7232|http://tools.ietf.org/html/rfc7232> and
+L<RFC 7233|http://tools.ietf.org/html/rfc7233>.
 
 =head1 ATTRIBUTES
 

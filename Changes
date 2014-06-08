@@ -1,6 +1,7 @@
 
-5.05  2014-06-07
-  - Fixed parsing of header fields with single-character names.
+5.05  2014-06-08
+  - Fixed parsing of header fields with single character names in
+    Mojo::Headers. (crab)
 
 5.04  2014-06-03
   - Added expect_close attribute to Mojo::Content.

@@ -144,7 +144,7 @@ is $headers->content_type,  'text/plain', 'right value';
 is $headers->expect,        '100-continue', 'right value';
 is $headers->cache_control, 'public', 'right value';
 is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
-is $headers->header('o'),   'x', 'right value';
+is $headers->header('o'), 'x', 'right value';
 
 # Parse multiline headers
 $headers = Mojo::Headers->new;

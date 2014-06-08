@@ -133,6 +133,7 @@ is $headers->header('X-Test'), "23 24, single line, 25 26", 'right format';
 $headers = Mojo::Headers->new;
 isa_ok $headers->parse(<<'EOF'), 'Mojo::Headers', 'right return value';
 Content-Type: text/plain
+o: x
 Expect: 100-continue
 Cache-control: public
 Expires: Thu, 01 Dec 1994 16:00:00 GMT
@@ -143,6 +144,7 @@ is $headers->content_type,  'text/plain', 'right value';
 is $headers->expect,        '100-continue', 'right value';
 is $headers->cache_control, 'public', 'right value';
 is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
+is $headers->header('o'),   'x', 'right value';
 
 # Parse multiline headers
 $headers = Mojo::Headers->new;

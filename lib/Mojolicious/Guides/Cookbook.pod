@@ -279,11 +279,11 @@ that passes along additional information with C<X-*> headers. In such cases
 you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming
 requests.
 
-  # Change scheme if "X-Forwarded-Protocol" header is set to "https"
+  # Change scheme if "X-Forwarded-HTTPS" header is set
   app->hook(before_dispatch => sub {
     my $c = shift;
     $c->req->url->base->scheme('https')
-      if $c->req->headers->header('X-Forwarded-Protocol') eq 'https';
+      if $c->req->headers->header('X-Forwarded-HTTPS');
   });
 
 Since reverse proxies generally don't pass along information about path

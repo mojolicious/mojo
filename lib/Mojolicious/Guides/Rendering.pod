@@ -1201,7 +1201,7 @@ is called.
       ...
 
       # Just die if an error occurs
-      die 'Something went wrong';
+      die 'Something went wrong with the template';
 
       # Or pass the rendered result back to the renderer
       $$output = 'Hello World!';

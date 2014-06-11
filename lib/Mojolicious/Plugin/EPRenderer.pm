@@ -2,7 +2,7 @@ package Mojolicious::Plugin::EPRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;
-use Mojo::Util qw(encode md5_sum monkey_patch steady_time);
+use Mojo::Util qw(encode md5_sum monkey_patch);
 
 sub register {
   my ($self, $app, $conf) = @_;

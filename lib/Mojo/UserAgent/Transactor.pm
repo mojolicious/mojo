@@ -61,7 +61,7 @@ sub proxy_connect {
   # CONNECT request (expect a bad response)
   my $new = $self->tx(CONNECT => $url->clone->userinfo(undef));
   $new->req->proxy($proxy);
-  $new->res->content->auto_relax(0);
+  $new->res->content->auto_relax(0)->headers->connection('keep-alive');
 
   return $new;
 }

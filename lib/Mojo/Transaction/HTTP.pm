@@ -35,11 +35,12 @@ sub keep_alive {
   my $res_conn = lc($res->headers->connection // '');
   return undef if $req_conn eq 'close' || $res_conn eq 'close';
 
-  # Keep-alive
-  return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';
+  # Keep-alive is optional for 1.0
+  if ($res->version eq '1.0') { return $res_conn eq 'keep-alive' }
+  if ($req->version eq '1.0') { return $req_conn eq 'keep-alive' }
 
-  # No keep-alive for 1.0
-  return !($req->version eq '1.0' || $res->version eq '1.0');
+  # 1.1
+  return 1;
 }
 
 sub redirects {

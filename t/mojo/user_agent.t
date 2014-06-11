@@ -48,6 +48,12 @@ post '/echo' => sub {
 
 any '/method' => {inline => '<%= $self->req->method =%>'};
 
+get '/one' => sub {
+  my $self = shift;
+  $self->res->version('1.0')->headers->connection('test');
+  $self->render(text => 'One!');
+};
+
 # Max redirects
 {
   local $ENV{MOJO_MAX_REDIRECTS} = 25;
@@ -151,6 +157,21 @@ is $ua->options('/method')->res->body, 'OPTIONS', 'right method';
 is $ua->patch('/method')->res->body,   'PATCH',   'right method';
 is $ua->post('/method')->res->body,    'POST',    'right method';
 is $ua->put('/method')->res->body,     'PUT',     'right method';
+
+# No keep-alive
+$tx = $ua->get('/one');
+ok $tx->success, 'successful';
+ok !$tx->keep_alive, 'connection will not be kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->headers->connection, 'test', 'right "Connection" value';
+is $tx->res->body, 'One!', 'right content';
+$tx = $ua->get('/one');
+ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->headers->connection, 'test', 'right "Connection" value';
+is $tx->res->body, 'One!', 'right content';
 
 # Error in callback is logged
 app->ua->once(error => sub { Mojo::IOLoop->stop });

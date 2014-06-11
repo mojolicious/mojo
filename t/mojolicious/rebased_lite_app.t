@@ -74,7 +74,7 @@ EOF
 ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo')),
   'no session cookie';
 $t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')
-  ->header_is(Location => 'http://example.com/rebased/foo');
+  ->header_is(Location => '/rebased/foo');
 ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo')),
   'session cookie';
 

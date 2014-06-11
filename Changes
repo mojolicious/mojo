@@ -1,5 +1,6 @@
 
-5.06  2014-06-10
+5.06  2014-06-11
+  - Improved redirect_to to behave more like url_for.
 
 5.05  2014-06-08
   - Fixed parsing of header fields with single character names in

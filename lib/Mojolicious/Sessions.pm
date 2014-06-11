@@ -1,20 +1,22 @@
 package Mojolicious::Sessions;
 use Mojo::Base -base;
 
-use Mojo::JSON qw(encode_json j);
+use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 
 has [qw(cookie_domain secure)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
+has deserialize        => sub { \&Mojo::JSON::j };
+has serialize          => sub { \&Mojo::JSON::encode_json };
 
 sub load {
   my ($self, $c) = @_;
 
   return unless my $value = $c->signed_cookie($self->cookie_name);
   $value =~ y/-/=/;
-  return unless my $session = j(b64_decode $value);
+  return unless my $session = $self->deserialize->(b64_decode $value);
 
   # "expiration" value is inherited
   my $expiration = $session->{expiration} // $self->default_expiration;
@@ -46,7 +48,7 @@ sub store {
   $session->{expires} = $default || time + $expiration
     if $expiration || $default;
 
-  my $value = b64_encode(encode_json($session), '');
+  my $value = b64_encode($self->serialize->($session), '');
   $value =~ y/=/-/;
   my $options = {
     domain   => $self->cookie_domain,
@@ -126,6 +128,18 @@ C<expiration> and C<expires> session values.
   # Delete whole session by setting an expiration date in the past
   $c->session(expires => 1);
 
+=head2 deserialize
+
+  my $cb    = $sessions->deserialize;
+  $sessions = $sessions->deserialize(sub {...});
+
+A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
+
+  $sessions->deserialize(sub {
+    my $bytes = shift;
+    return {};
+  });
+
 =head2 secure
 
   my $bool  = $sessions->secure;
@@ -133,6 +147,19 @@ C<expiration> and C<expires> session values.
 
 Set the secure flag on all session cookies, so that browsers send them only
 over HTTPS connections.
+
+=head2 serialize
+
+  my $cb    = $sessions->serialize;
+  $sessions = $sessions->serialize(sub {...});
+
+A callback used to serialize sessions, defaults to
+L<Mojo::JSON/"encode_json">.
+
+  $sessions->serialize(sub {
+    my $hash = shift;
+    return '';
+  });
 
 =head1 METHODS
 

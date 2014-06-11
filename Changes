@@ -1,5 +1,6 @@
 
 5.06  2014-06-11
+  - Added deserialize and serialize attributes to Mojolicious::Sessions.
   - Improved redirect_to to behave more like url_for.
   - Fixed bug in Mojo::UserAgent where HTTP/1.0 connections were sometimes
     kept alive.

@@ -36,10 +36,10 @@ sub keep_alive {
   return undef if $req_conn eq 'close' || $res_conn eq 'close';
 
   # Keep-alive is optional for 1.0
-  if ($res->version eq '1.0') { return $res_conn eq 'keep-alive' }
-  if ($req->version eq '1.0') { return $req_conn eq 'keep-alive' }
+  return $res_conn eq 'keep-alive' if $res->version eq '1.0';
+  return $req_conn eq 'keep-alive' if $req->version eq '1.0';
 
-  # 1.1
+  # Keep-alive is the default for 1.1
   return 1;
 }
 

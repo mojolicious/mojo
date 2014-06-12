@@ -11,8 +11,8 @@ our @EXPORT_OK = ('b');
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
-  qw(sha1_sum slurp spurt squish trim unindent unquote url_escape),
+  qw(md5_bytes md5_sum punycode_decode punycode_encode quote secure_compare),
+  qw(sha1_bytes sha1_sum slurp spurt squish trim unindent unquote url_escape),
   qw(url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
@@ -28,17 +28,8 @@ sub b { __PACKAGE__->new(@_) }
 
 sub clone { $_[0]->new(${$_[0]}) }
 
-sub decode {
-  my $self = shift;
-  $$self = Mojo::Util::decode shift || 'UTF-8', $$self;
-  return $self;
-}
-
-sub encode {
-  my $self = shift;
-  $$self = Mojo::Util::encode shift || 'UTF-8', $$self;
-  return $self;
-}
+sub decode { shift->_delegate(\&Mojo::Util::decode, @_) }
+sub encode { shift->_delegate(\&Mojo::Util::encode, @_) }
 
 sub new {
   my $class = shift;
@@ -52,8 +43,6 @@ sub say {
   return $self;
 }
 
-sub secure_compare { Mojo::Util::secure_compare ${shift()}, @_ }
-
 sub size { length ${$_[0]} }
 
 sub split {
@@ -64,6 +53,12 @@ sub split {
 sub tap { shift->Mojo::Base::tap(@_) }
 
 sub to_string { ${$_[0]} }
+
+sub _delegate {
+  my ($self, $sub) = (shift, shift);
+  $$self = $sub->(shift || 'UTF-8', $$self);
+  return $self;
+}
 
 1;
 

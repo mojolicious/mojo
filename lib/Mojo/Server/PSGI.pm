@@ -26,7 +26,7 @@ sub run {
   my @headers;
   my $hash = $headers->to_hash(1);
   for my $name (keys %$hash) {
-    push @headers, map { $name => $_ } map {@$_} @{$hash->{$name}};
+    push @headers, map { $name => $_ } @{$hash->{$name}};
   }
 
   # PSGI response

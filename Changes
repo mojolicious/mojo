@@ -1,5 +1,6 @@
 
-5.07  2014-06-12
+5.07  2014-06-13
+  - Fixed RFC 7230 compliance bugs in Mojo::Headers.
 
 5.06  2014-06-11
   - Added deserialize and serialize attributes to Mojolicious::Sessions.

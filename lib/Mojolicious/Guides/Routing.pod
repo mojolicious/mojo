@@ -343,7 +343,7 @@ to bypass controllers and execute a callback instead.
 This technique is the foundation of L<Mojolicious::Lite>, you can learn more
 about it from the included tutorial.
 
-=head2 Placeholders and destinations
+=head2 Optional placeholders
 
 Extracted placeholder values will simply redefine older stash values if they
 already exist.

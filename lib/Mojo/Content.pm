@@ -406,7 +406,7 @@ Content headers, defaults to a L<Mojo::Headers> object.
   $content = $content->max_buffer_size(1024);
 
 Maximum size in bytes of buffer for content parser, defaults to the value of
-the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144>.
+the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144> (256KB).
 
 =head2 max_leftover_size
 
@@ -414,7 +414,8 @@ the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144>.
   $content = $content->max_leftover_size(1024);
 
 Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
-value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
+value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>
+(256KB).
 
 =head2 relaxed
 

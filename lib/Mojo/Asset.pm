@@ -88,7 +88,7 @@ subclass.
   my $bytes = $asset->get_chunk($offset, $max);
 
 Get chunk of data starting from a specific position, defaults to a maximum
-chunk size of C<131072> bytes. Meant to be overloaded in a subclass.
+chunk size of C<131072> bytes (128KB). Meant to be overloaded in a subclass.
 
 =head2 is_file
 

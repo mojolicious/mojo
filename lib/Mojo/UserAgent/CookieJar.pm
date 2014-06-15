@@ -151,7 +151,7 @@ L<Mojo::UserAgent::CookieJar> implements the following attributes.
   my $size = $jar->max_cookie_size;
   $jar     = $jar->max_cookie_size(4096);
 
-Maximum cookie size in bytes, defaults to C<4096>.
+Maximum cookie size in bytes, defaults to C<4096> (4KB).
 
 =head1 METHODS
 

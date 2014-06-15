@@ -1,5 +1,5 @@
 
-5.08  2014-06-14
+5.08  2014-06-15
 
 5.07  2014-06-13
   - Fixed RFC 7230 compliance bugs in Mojo::Headers.

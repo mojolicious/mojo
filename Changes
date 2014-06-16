@@ -1,5 +1,8 @@
 
-5.08  2014-06-15
+5.08  2014-06-16
+  - Added reset method to Mojo::IOLoop.
+  - Added reset method to Mojo::Reactor.
+  - Added reset method to Mojo::Reactor::Poll.
 
 5.07  2014-06-13
   - Fixed RFC 7230 compliance bugs in Mojo::Headers.

@@ -98,6 +98,14 @@ sub remove {
   $self->_remove($id);
 }
 
+sub reset {
+  my $self = _instance(shift);
+  $self->_remove($_)
+    for keys %{$self->{acceptors}}, keys %{$self->{connections}};
+  delete @$self{qw(accept stop)};
+  $self->reactor->reset;
+}
+
 sub server {
   my ($self, $cb) = (_instance(shift), pop);
 
@@ -551,6 +559,13 @@ amount of time in seconds.
 
 Remove anything with an id, connections will be dropped gracefully by allowing
 them to finish writing all data in their write buffers.
+
+=head2 reset
+
+  Mojo::IOLoop->reset;
+  $loop->reset;
+
+Remove everything.
 
 =head2 server
 

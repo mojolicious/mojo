@@ -137,13 +137,13 @@ ok !$timer,     'timer was not triggered';
 ok !$recurring, 'recurring was not triggered again';
 
 # Reset
-$reactor->remove($id);
-$reactor->remove($server);
+$reactor->reset;
 ($readable, $writable) = ();
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
-ok !$readable, 'io event was not triggered again';
-ok !$writable, 'io event was not triggered again';
+ok !$readable,  'io event was not triggered again';
+ok !$writable,  'io event was not triggered again';
+ok !$recurring, 'recurring was not triggered again';
 my $reactor2 = Mojo::Reactor::Poll->new;
 is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 

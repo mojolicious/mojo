@@ -76,7 +76,7 @@ $loop->remove($id);
 ok $count > 1, 'more than one recurring event';
 ok $count < 10, 'less than ten recurring events';
 
-# Handle
+# Handle and reset
 my ($handle, $handle2);
 $id = Mojo::IOLoop->server(
   (address => '127.0.0.1') => sub {
@@ -90,8 +90,13 @@ Mojo::IOLoop->acceptor($id)->on(accept => sub { $handle2 = pop });
 $id2
   = Mojo::IOLoop->client((address => 'localhost', port => $port) => sub { });
 Mojo::IOLoop->start;
-Mojo::IOLoop->remove($id);
-Mojo::IOLoop->remove($id2);
+$count = 0;
+Mojo::IOLoop->recurring(0 => sub { $timer++ });
+Mojo::IOLoop->reset;
+Mojo::IOLoop->one_tick;
+is $count, 0, 'no recurring events';
+ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
+ok !Mojo::IOLoop->stream($id2),  'stream has been removed';
 is $handle, $handle2, 'handles are equal';
 isa_ok $handle, 'IO::Socket', 'right reference';
 

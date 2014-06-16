@@ -80,6 +80,8 @@ sub remove {
   return !!delete $self->{io}{fileno $remove};
 }
 
+sub reset { delete @{shift()}{qw(io poll timers)} }
+
 sub start {
   my $self = shift;
   $self->{running}++;
@@ -206,6 +208,12 @@ amount of time in seconds.
   my $bool = $reactor->remove($id);
 
 Remove handle or timer.
+
+=head2 reset
+
+  $reactor->reset;
+
+Remove all handles and timers.
 
 =head2 start
 

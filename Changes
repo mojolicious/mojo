@@ -1,5 +1,5 @@
 
-5.08  2014-06-16
+5.08  2014-06-17
   - Added reset method to Mojo::IOLoop.
   - Added reset method to Mojo::Reactor.
   - Added reset method to Mojo::Reactor::Poll.

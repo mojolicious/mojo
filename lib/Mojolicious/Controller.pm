@@ -658,7 +658,7 @@ Render content using L<Mojolicious::Renderer/"render"> and emit hooks
 L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">. If no
 template is provided a default one based on controller and action or route
 name will be generated with L<Mojolicious::Renderer/"template_for">, all
-additional values get merged into the L</"stash">.
+additional pairs get merged into the L</"stash">.
 
   # Render characters
   $c->render(text => 'I ♥ Mojolicious!');

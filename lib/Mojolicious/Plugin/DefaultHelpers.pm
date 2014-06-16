@@ -219,7 +219,8 @@ Dump a Perl data structure with L<Mojo::Util/"dumper">.
   % extends 'blue';
   % extends 'blue', title => 'Blue!';
 
-Extend a template. All additional values get merged into the L</"stash">.
+Set C<extends> stash value, all additional pairs get merged into the
+L</"stash">.
 
 =head2 flash
 
@@ -239,7 +240,7 @@ Alias for C<Mojolicious::Controller/"render_to_string">.
   % layout 'green';
   % layout 'green', title => 'Green!';
 
-Render this template with a layout. All additional values get merged into the
+Set C<layout> stash value, all additional pairs get merged into the
 L</"stash">.
 
 =head2 param
@@ -269,7 +270,8 @@ Alias for L<Mojolicious::Controller/"stash">.
   % title 'Welcome!', foo => 'bar';
   %= title
 
-Page title. All additional values get merged into the L</"stash">.
+Set C<title> stash value, all additional pairs get merged into the
+L</"stash">.
 
 =head2 ua
 

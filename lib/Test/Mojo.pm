@@ -316,8 +316,7 @@ sub _request_ok {
 
   # Establish WebSocket connection
   if ($tx->req->is_handshake) {
-    $self->{messages} = [];
-    $self->{finished} = undef;
+    @$self{qw(finished messages)} = (undef, []);
     $self->ua->start(
       $tx => sub {
         my ($ua, $tx) = @_;

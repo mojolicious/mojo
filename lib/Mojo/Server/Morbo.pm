@@ -74,7 +74,7 @@ sub _manage {
   sleep 1;
 }
 
-sub _reap { delete $_[0]->{running} while (waitpid -1, WNOHANG) > 0 }
+sub _reap { delete $_[0]{running} while (waitpid -1, WNOHANG) > 0 }
 
 sub _spawn {
   my $self = shift;

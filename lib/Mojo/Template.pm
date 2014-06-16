@@ -240,7 +240,7 @@ sub render_file {
   $self->name($path) unless defined $self->{name};
   my $template = slurp $path;
   my $encoding = $self->encoding;
-  croak qq{Template "$path" has invalid encoding.}
+  croak qq{Template "$path" has invalid encoding}
     if $encoding && !defined($template = decode $encoding, $template);
 
   return $self->render($template, @_);

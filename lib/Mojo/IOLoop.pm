@@ -100,12 +100,10 @@ sub remove {
 
 sub reset {
   my $self = _instance(shift);
-
   $self->_remove($_)
     for keys %{$self->{acceptors}}, keys %{$self->{connections}};
   $self->reactor->reset;
-  $self->_stop;
-  $self->stop;
+  $self->$_ for qw(_stop stop);
 }
 
 sub server {

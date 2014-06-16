@@ -12,7 +12,7 @@ sub parse {
   my $config = $json->decode($self->render($content, $file, $conf, $app));
   my $err    = $json->error;
   die qq{Couldn't parse config "$file": $err} if !$config && $err;
-  die qq{Invalid config "$file".} if !$config || ref $config ne 'HASH';
+  die qq{Invalid config "$file"} if !$config || ref $config ne 'HASH';
 
   return $config;
 }

@@ -103,8 +103,8 @@ sub reset {
 
   $self->_remove($_)
     for keys %{$self->{acceptors}}, keys %{$self->{connections}};
-  delete @$self{qw(accept stop)};
   $self->reactor->reset;
+  $self->_stop;
   $self->stop;
 }
 

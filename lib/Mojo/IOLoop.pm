@@ -100,10 +100,12 @@ sub remove {
 
 sub reset {
   my $self = _instance(shift);
+
   $self->_remove($_)
     for keys %{$self->{acceptors}}, keys %{$self->{connections}};
   delete @$self{qw(accept stop)};
   $self->reactor->reset;
+  $self->stop;
 }
 
 sub server {
@@ -565,7 +567,7 @@ them to finish writing all data in their write buffers.
   Mojo::IOLoop->reset;
   $loop->reset;
 
-Remove everything.
+Remove everything and stop the event loop.
 
 =head2 server
 

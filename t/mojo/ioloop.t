@@ -91,9 +91,16 @@ $id2
   = Mojo::IOLoop->client((address => 'localhost', port => $port) => sub { });
 Mojo::IOLoop->start;
 $count = 0;
-Mojo::IOLoop->recurring(0 => sub { $timer++ });
-Mojo::IOLoop->reset;
-Mojo::IOLoop->one_tick;
+Mojo::IOLoop->recurring(10 => sub { $timer++ });
+my $running;
+Mojo::IOLoop->next_tick(
+  sub {
+    Mojo::IOLoop->reset;
+    $running = Mojo::IOLoop->is_running;
+  }
+);
+Mojo::IOLoop->start;
+ok !$running, 'not running';
 is $count, 0, 'no recurring events';
 ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
 ok !Mojo::IOLoop->stream($id2),  'stream has been removed';
@@ -104,6 +111,7 @@ isa_ok $handle, 'IO::Socket', 'right reference';
 my $time = time;
 Mojo::IOLoop->start;
 Mojo::IOLoop->one_tick;
+Mojo::IOLoop->reset;
 ok time < ($time + 10), 'stopped automatically';
 
 # Stream

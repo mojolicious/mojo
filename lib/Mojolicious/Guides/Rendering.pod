@@ -659,6 +659,12 @@ template with named blocks that child templates can override.
     New header
   % end
 
+  @@ third.html.ep
+  % extends 'second';
+  % content footer => begin
+    New footer
+  % end
+
 This chain could go on and on to allow a very high level of template reuse.
 
 =head2 Form validation

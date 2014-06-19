@@ -736,9 +736,9 @@ method does not protect from traversing to parent directories.
 
   my $output = $c->render_to_string('foo/index', format => 'pdf');
 
-Try to render content and return it, all arguments get localized automatically
-and are only available during this render operation, takes the same arguments
-as L</"render">.
+Try to render content and return it or return C<undef>, all arguments get
+localized automatically and are only available during this render operation,
+takes the same arguments as L</"render">.
 
 =head2 rendered
 

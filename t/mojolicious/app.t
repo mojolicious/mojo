@@ -63,6 +63,8 @@ is $t->app->secrets->[0], $t->app->moniker, 'secret defaults to moniker';
 is $t->app->renderer->template_handler(
   {template => 'foo/bar/index', format => 'html'}), 'epl', 'right handler';
 is $t->app->build_controller->req->url, '', 'no URL';
+is $t->app->build_controller->render_to_string('does_not_exist'), undef,
+  'no result';
 
 # Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };

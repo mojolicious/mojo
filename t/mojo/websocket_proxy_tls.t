@@ -22,31 +22,31 @@ use Mojolicious::Lite;
 app->log->level('fatal');
 
 get '/' => sub {
-  my $self = shift;
-  $self->res->headers->header('X-Works',
-    $self->req->headers->header('X-Works') // '');
-  my $rel = $self->req->url;
+  my $c = shift;
+  $c->res->headers->header('X-Works',
+    $c->req->headers->header('X-Works') // '');
+  my $rel = $c->req->url;
   my $abs = $rel->to_abs;
-  $self->render(text => "Hello World! $rel $abs");
+  $c->render(text => "Hello World! $rel $abs");
 };
 
 get '/broken_redirect' => sub {
-  my $self = shift;
-  $self->render(text => 'Redirecting!', status => 302);
-  $self->res->headers->location('/');
+  my $c = shift;
+  $c->render(text => 'Redirecting!', status => 302);
+  $c->res->headers->location('/');
 };
 
 get '/proxy' => sub {
-  my $self = shift;
-  $self->render(text => $self->req->url->to_abs);
+  my $c = shift;
+  $c->render(text => $c->req->url->to_abs);
 };
 
 websocket '/test' => sub {
-  my $self = shift;
-  $self->on(
+  my $c = shift;
+  $c->on(
     message => sub {
-      my ($self, $msg) = @_;
-      $self->send("${msg}test2");
+      my ($c, $msg) = @_;
+      $c->send("${msg}test2");
     }
   );
 };

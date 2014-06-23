@@ -12,13 +12,13 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 websocket '/echo' => sub {
-  my $self = shift;
-  $self->tx->max_websocket_size(262145)->with_compression;
-  $self->on(binary => sub { shift->send({binary => shift}) });
-  $self->on(
+  my $c = shift;
+  $c->tx->max_websocket_size(262145)->with_compression;
+  $c->on(binary => sub { shift->send({binary => shift}) });
+  $c->on(
     text => sub {
-      my ($self, $bytes) = @_;
-      $self->send("echo: $bytes");
+      my ($c, $bytes) = @_;
+      $c->send("echo: $bytes");
     }
   );
 };
@@ -26,19 +26,19 @@ websocket '/echo' => sub {
 get '/echo' => {text => 'plain echo!'};
 
 websocket '/no_compression' => sub {
-  my $self = shift;
-  $self->on(binary => sub { shift->send({binary => shift}) });
+  my $c = shift;
+  $c->on(binary => sub { shift->send({binary => shift}) });
 };
 
 websocket '/json' => sub {
-  my $self = shift;
-  $self->on(
+  my $c = shift;
+  $c->on(
     json => sub {
-      my ($self, $json) = @_;
-      return $self->send({json => $json}) unless ref $json;
-      return $self->send({json => [@$json, 4]}) if ref $json eq 'ARRAY';
+      my ($c, $json) = @_;
+      return $c->send({json => $json}) unless ref $json;
+      return $c->send({json => [@$json, 4]}) if ref $json eq 'ARRAY';
       $json->{test} += 1;
-      $self->send({json => $json});
+      $c->send({json => $json});
     }
   );
 };
@@ -46,24 +46,24 @@ websocket '/json' => sub {
 get '/plain' => {text => 'Nothing to see here!'};
 
 websocket '/push' => sub {
-  my $self = shift;
-  my $id = Mojo::IOLoop->recurring(0.1 => sub { $self->send('push') });
-  $self->on(finish => sub { Mojo::IOLoop->remove($id) });
+  my $c = shift;
+  my $id = Mojo::IOLoop->recurring(0.1 => sub { $c->send('push') });
+  $c->on(finish => sub { Mojo::IOLoop->remove($id) });
 };
 
 websocket '/unicode' => sub {
-  my $self = shift;
-  $self->on(
+  my $c = shift;
+  $c->on(
     message => sub {
-      my ($self, $msg) = @_;
-      $self->send("♥: $msg");
+      my ($c, $msg) = @_;
+      $c->send("♥: $msg");
     }
   );
 };
 
 websocket '/bytes' => sub {
-  my $self = shift;
-  $self->on(
+  my $c = shift;
+  $c->on(
     frame => sub {
       my ($ws, $frame) = @_;
       $ws->send({$frame->[4] == 2 ? 'binary' : 'text', $frame->[5]});
@@ -72,17 +72,17 @@ websocket '/bytes' => sub {
 };
 
 websocket '/once' => sub {
-  my $self = shift;
-  $self->on(
+  my $c = shift;
+  $c->on(
     message => sub {
-      my ($self, $msg) = @_;
-      $self->send("ONE: $msg");
+      my ($c, $msg) = @_;
+      $c->send("ONE: $msg");
     }
   );
-  $self->tx->once(
+  $c->tx->once(
     message => sub {
       my ($tx, $msg) = @_;
-      $self->send("TWO: $msg");
+      $c->send("TWO: $msg");
     }
   );
 };
@@ -90,13 +90,13 @@ websocket '/once' => sub {
 under '/nested';
 
 websocket sub {
-  my $self = shift;
-  my $echo = $self->cookie('echo') // '';
-  $self->cookie(echo => 'again');
-  $self->on(
+  my $c = shift;
+  my $echo = $c->cookie('echo') // '';
+  $c->cookie(echo => 'again');
+  $c->on(
     message => sub {
-      my ($self, $msg) = @_;
-      $self->send("nested echo: $msg$echo")->finish(1000);
+      my ($c, $msg) = @_;
+      $c->send("nested echo: $msg$echo")->finish(1000);
     }
   );
 };

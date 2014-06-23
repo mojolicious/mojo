@@ -23,25 +23,25 @@ helper dead_helper => sub { die "dead helper!\n" };
 
 # Custom rendering for missing "txt" template
 hook before_render => sub {
-  my ($self, $args) = @_;
+  my ($c, $args) = @_;
   return unless ($args->{template} // '') eq 'not_found';
-  my $exception = $self->stash('snapshot')->{exception};
+  my $exception = $c->stash('snapshot')->{exception};
   $args->{text} = "Missing template, $exception." if $args->{format} eq 'txt';
 };
 
 # Custom exception rendering for "txt"
 hook before_render => sub {
-  my ($self, $args) = @_;
-  @$args{qw(text format)} = ($self->stash('exception'), 'txt')
-    if ($args->{template} // '') eq 'exception' && $self->accepts('txt');
+  my ($c, $args) = @_;
+  @$args{qw(text format)} = ($c->stash('exception'), 'txt')
+    if ($args->{template} // '') eq 'exception' && $c->accepts('txt');
 };
 
 get '/logger' => sub {
-  my $self  = shift;
-  my $level = $self->param('level');
-  my $msg   = $self->param('message');
-  $self->app->log->log($level => $msg);
-  $self->render(text => "$level: $msg");
+  my $c     = shift;
+  my $level = $c->param('level');
+  my $msg   = $c->param('message');
+  $c->app->log->log($level => $msg);
+  $c->render(text => "$level: $msg");
 };
 
 get '/dead_template';
@@ -58,17 +58,16 @@ get '/double_dead_action_☃' => sub {
 };
 
 get '/trapped' => sub {
-  my $self = shift;
+  my $c = shift;
   eval { die {foo => 'bar'} };
-  $self->render(text => $@->{foo} || 'failed');
+  $c->render(text => $@->{foo} || 'failed');
 };
 
 get '/missing_template' => {exception => 'whatever'};
 
 get '/missing_template/too' => sub {
-  my $self = shift;
-  $self->render('does_not_exist')
-    or $self->res->headers->header('X-Not-Found' => 1);
+  my $c = shift;
+  $c->render('does_not_exist') or $c->res->headers->header('X-Not-Found' => 1);
 };
 
 get '/missing_helper' => sub { shift->missing_helper };
@@ -83,9 +82,9 @@ has 'error';
 package main;
 
 get '/trapped/too' => sub {
-  my $self = shift;
+  my $c = shift;
   eval { die MyException->new(error => 'works') };
-  $self->render(text => "$@" || 'failed');
+  $c->render(text => "$@" || 'failed');
 };
 
 # Reuse exception and snapshot

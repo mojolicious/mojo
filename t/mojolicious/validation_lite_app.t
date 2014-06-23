@@ -13,10 +13,10 @@ use Test::Mojo;
 app->validator->add_check(two => sub { length $_[2] == 2 ? undef : 'ohoh' });
 
 any '/' => sub {
-  my $self = shift;
+  my $c = shift;
 
-  my $validation = $self->validation;
-  return $self->render unless $validation->has_data;
+  my $validation = $c->validation;
+  return $c->render unless $validation->has_data;
 
   $validation->required('foo')->two->in('☃☃');
   $validation->optional('bar')->two;
@@ -25,9 +25,9 @@ any '/' => sub {
 } => 'index';
 
 any '/forgery' => sub {
-  my $self       = shift;
-  my $validation = $self->validation;
-  return $self->render unless $validation->has_data;
+  my $c          = shift;
+  my $validation = $c->validation;
+  return $c->render unless $validation->has_data;
   $validation->csrf_protect->required('foo');
 };
 
@@ -223,11 +223,11 @@ $t->post_ok('/forgery' => {'X-CSRF-Token' => $token})->status_is(200)
 # Failed validation for all fields (with custom helper)
 $t->app->helper(
   tag_with_error => sub {
-    my ($self, $tag) = (shift, shift);
+    my ($c, $tag) = (shift, shift);
     my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
     $attrs{class}
       .= $attrs{class} ? ' my-field-with-error' : 'my-field-with-error';
-    return $self->tag($tag, %attrs, defined $content ? $content : ());
+    return $c->tag($tag, %attrs, defined $content ? $content : ());
   }
 );
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')

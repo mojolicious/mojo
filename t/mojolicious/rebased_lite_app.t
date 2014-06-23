@@ -32,9 +32,9 @@ get '/' => 'root';
 get '/foo';
 
 get '/bar' => sub {
-  my $self = shift;
-  $self->flash(just => 'works!')->flash({works => 'too!'});
-  $self->redirect_to($self->url_for('foo'));
+  my $c = shift;
+  $c->flash(just => 'works!')->flash({works => 'too!'});
+  $c->redirect_to($c->url_for('foo'));
 };
 
 get '/baz' => sub { shift->render('root') };

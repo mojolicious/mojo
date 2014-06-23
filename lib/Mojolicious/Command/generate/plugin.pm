@@ -88,8 +88,8 @@ use Test::Mojo;
 plugin '<%= $name %>';
 
 get '/' => sub {
-  my $self = shift;
-  $self->render(text => 'Hello Mojo!');
+  my $c = shift;
+  $c->render(text => 'Hello Mojo!');
 };
 
 my $t = Test::Mojo->new;

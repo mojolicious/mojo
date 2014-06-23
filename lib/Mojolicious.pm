@@ -581,9 +581,13 @@ and the application object, as well as a function in C<ep> templates.
   # Helper
   $app->helper(cache => sub { state $cache = {} });
 
-  # Controller/Application
-  $self->cache->{foo} = 'bar';
-  my $result = $self->cache->{foo};
+  # Application
+  $app->cache->{foo} = 'bar';
+  my $result = $app->cache->{foo};
+
+  # Controller
+  $c->cache->{foo} = 'bar';
+  my $result = $c->cache->{foo};
 
   # Template
   % cache->{foo} = 'bar';

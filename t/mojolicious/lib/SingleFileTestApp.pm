@@ -22,8 +22,8 @@ sub startup {
   # Helper route
   $self->routes->route('/helper')->to(
     cb => sub {
-      my $self = shift;
-      $self->render(text => $self->some_plugin);
+      my $c = shift;
+      $c->render(text => $c->some_plugin);
     }
   );
 

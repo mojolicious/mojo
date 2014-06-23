@@ -19,22 +19,22 @@ Essentials every L<Mojolicious> developer should know.
 The foundation of every web framework is a tiny black box connecting incoming
 requests with code generating the appropriate response.
 
-  GET /user/show/1 -> $self->render(text => 'Sebastian');
+  GET /user/show/1 -> $c->render(text => 'Sebastian');
 
 This black box is usually called a dispatcher. There are many implementations
 using different strategies to establish these connections, but pretty much all
 are based around mapping the requests path to some kind of response generator.
 
-  /user/show/1 -> $self->render(text => 'Sebastian');
-  /user/show/2 -> $self->render(text => 'Sara');
-  /user/show/3 -> $self->render(text => 'Baerbel');
-  /user/show/4 -> $self->render(text => 'Wolfgang');
+  /user/show/1 -> $c->render(text => 'Sebastian');
+  /user/show/2 -> $c->render(text => 'Sara');
+  /user/show/3 -> $c->render(text => 'Baerbel');
+  /user/show/4 -> $c->render(text => 'Wolfgang');
 
 While it is very well possible to make all these connections static, it is
 also rather inefficient. That's why regular expressions are commonly used to
 make the dispatch process more dynamic.
 
-  qr!/user/show/(\d+)! -> $self->render(text => $users{$1});
+  qr!/user/show/(\d+)! -> $c->render(text => $users{$1});
 
 Modern dispatchers have pretty much everything HTTP has to offer at their
 disposal and can use many more variables than just the request path, such as
@@ -50,12 +50,12 @@ request method and headers like C<Host>, C<User-Agent> and C<Accept>.
 While regular expressions are quite powerful they also tend to be unpleasant
 to look at and are generally overkill for ordinary path matching.
 
-  qr!/user/show/(\d+)! -> $self->render(text => $users{$1});
+  qr!/user/show/(\d+)! -> $c->render(text => $users{$1});
 
 This is where routes come into play, they have been designed from the ground
 up to represent paths with placeholders.
 
-  /user/show/:id -> $self->render(text => $users{$id});
+  /user/show/:id -> $c->render(text => $users{$id});
 
 The only difference between a static path and the route above is the C<:id>
 placeholder. One or more placeholders can be anywhere in the route.
@@ -336,8 +336,8 @@ The C<cb> stash value, which won't be inherited by nested routes, can be used
 to bypass controllers and execute a callback instead.
 
   $r->route('/bye')->to(cb => sub {
-    my $self = shift;
-    $self->render(text => 'Good bye.');
+    my $c = shift;
+    $c->render(text => 'Good bye.');
   });
 
 This technique is the foundation of L<Mojolicious::Lite>, you can learn more
@@ -471,13 +471,13 @@ L<Mojolicious::Controller/"url_for"> for this.
     ->to(controller => 'foo', action => 'bar');
 
   # Generate URL "/foo/abc" for route "test"
-  my $url = $self->url_for('test');
+  my $url = $c->url_for('test');
 
   # Generate URL "/foo/sebastian" for route "test"
-  my $url = $self->url_for('test', name => 'sebastian');
+  my $url = $c->url_for('test', name => 'sebastian');
 
   # Generate URL "http://127.0.0.1:3000/foo/sebastian" for route "test"
-  my $url = $self->url_for('test', name => 'sebastian')->to_abs;
+  my $url = $c->url_for('test', name => 'sebastian')->to_abs;
 
 Nameless routes get an automatically generated one assigned that is simply
 equal to the route itself without non-word characters.
@@ -486,23 +486,23 @@ equal to the route itself without non-word characters.
   $r->route('/foo/bar')->to('test#stuff');
 
   # Generate URL "/foo/bar"
-  my $url = $self->url_for('foobar');
+  my $url = $c->url_for('foobar');
 
 To refer to the current route you can use the reserved name C<current> or no
 name at all.
 
   # Generate URL for current route
-  my $url = $self->url_for('current');
-  my $url = $self->url_for;
+  my $url = $c->url_for('current');
+  my $url = $c->url_for;
 
 To check or get the name of the current route you can use the helper
 L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
 
   # Name for current route
-  my $name = $self->current_route;
+  my $name = $c->current_route;
 
   # Check route name in code shared by multiple routes
-  $self->stash(button => 'green') if $self->current_route('login');
+  $c->stash(button => 'green') if $c->current_route('login');
 
 =head2 HTTP methods
 
@@ -576,13 +576,13 @@ be broken, this makes bridges a very powerful tool for authentication.
   # /foo/bar -> {cb => sub {...}}
   #             {controller => 'foo', action => 'bar'}
   my $foo = $r->bridge('/foo')->to(cb => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Authenticated
-    return 1 if $self->req->headers->header('X-Bender');
+    return 1 if $c->req->headers->header('X-Bender');
 
     # Not authenticated
-    $self->render(text => "You're not Bender.");
+    $c->render(text => "You're not Bender.");
     return undef;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
@@ -595,16 +595,16 @@ operations to finish before reaching the next dispatch cycle.
   # /foo/bar -> {cb => sub {...}}
   #          -> {controller => 'foo', action => 'bar'}
   my $foo = $r->bridge('/foo')->to(cb => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Wait 3 seconds and then give visitors a 50% chance to continue
     Mojo::IOLoop->timer(3 => sub {
 
       # Loser
-      return $self->render(text => 'No luck.') unless int rand 2;
+      return $c->render(text => 'No luck.') unless int rand 2;
 
       # Winner
-      $self->continue;
+      $c->continue;
     });
 
     return undef;
@@ -644,8 +644,8 @@ full L<Mojolicious> applications very straightforward.
 
   # POST /bar
   $r->post('/bar' => sub {
-    my $self = shift;
-    $self->render(text => 'Just like a Mojolicious::Lite action.');
+    my $c = shift;
+    $c->render(text => 'Just like a Mojolicious::Lite action.');
   });
 
 Even the more abstract concepts are available with methods like
@@ -655,12 +655,12 @@ L<Mojolicious::Routes::Route/"under">.
   # POST /yada
   my $yada = $r->under('/yada');
   $yada->get(sub {
-    my $self = shift;
-    $self->render(text => 'Hello.');
+    my $c = shift;
+    $c->render(text => 'Hello.');
   });
   $yada->post(sub {
-    my $self = shift;
-    $self->render(text => 'Go away.');
+    my $c = shift;
+    $c->render(text => 'Go away.');
   });
 
 =head2 Hooks
@@ -695,7 +695,7 @@ especially for plugins.
 Post-processing the response to set additional headers is a very common use.
 
   # Make sure static files are cached
-  $self->hook(after_static => sub {
+  $app->hook(after_static => sub {
     my $c = shift;
     $c->res->headers->cache_control('max-age=3600, must-revalidate');
   });
@@ -703,14 +703,14 @@ Post-processing the response to set additional headers is a very common use.
 Same for pre-processing the request.
 
   # Allow "_method" query parameter to override request method
-  $self->hook(before_dispatch => sub {
+  $app->hook(before_dispatch => sub {
     my $c = shift;
     return unless my $method = $c->req->url->query->param('_method');
     $c->req->method($method);
   });
 
   # Choose template variant based on request headers
-  $self->hook(before_dispatch => sub {
+  $app->hook(before_dispatch => sub {
     my $c = shift;
     return unless my $agent = $c->req->headers->user_agent;
     $c->stash(variant => 'ie') if $agent =~ /Internet Explorer/;
@@ -719,7 +719,7 @@ Same for pre-processing the request.
 Or more advanced extensions to add monitoring to your application.
 
   # Forward exceptions to a web service
-  $self->hook(after_dispatch => sub {
+  $app->hook(after_dispatch => sub {
     my $c = shift;
     return unless my $e = $c->stash('exception');
     $c->ua->post('https://example.com/bugs' => form => {exception => $e});
@@ -728,14 +728,14 @@ Or more advanced extensions to add monitoring to your application.
 You can even extend much of the core functionality.
 
   # Make controller object available to actions as $_
-  $self->hook(around_action => sub {
+  $app->hook(around_action => sub {
     my ($next, $c, $action, $last) = @_;
     local $_ = $c;
     return $next->();
   });
 
   # Pass route name as argument to actions
-  $self->hook(around_action => sub {
+  $app->hook(around_action => sub {
     my ($next, $c, $action, $last) = @_;
     return $c->$action($c->current_route);
   });
@@ -762,9 +762,9 @@ to make route generation more expressive.
 
     # Handle OPTIONS requests
     $resource->options(sub {
-      my $self = shift;
-      $self->res->headers->allow('POST, GET, OPTIONS');
-      $self->render(data => '', status => 204);
+      my $c = shift;
+      $c->res->headers->allow('POST, GET, OPTIONS');
+      $c->render(data => '', status => 204);
     });
 
     return $resource;
@@ -909,9 +909,9 @@ specific language in normal L<Mojolicious> controllers.
 
   # /hello
   get '/hello' => sub {
-    my $self = shift;
-    my $name = $self->param('name');
-    $self->render(text => "Hello $name.");
+    my $c    = shift;
+    my $name = $c->param('name');
+    $c->render(text => "Hello $name.");
   };
 
   1;

@@ -20,38 +20,37 @@ get '/' => {text => 'works!'};
 
 my $timeout = undef;
 get '/timeout' => sub {
-  my $self = shift;
-  Mojo::IOLoop->stream($self->tx->connection)
-    ->timeout($self->param('timeout'));
-  $self->on(finish => sub { $timeout = 1 });
+  my $c = shift;
+  Mojo::IOLoop->stream($c->tx->connection)->timeout($c->param('timeout'));
+  $c->on(finish => sub { $timeout = 1 });
 };
 
 get '/no_length' => sub {
-  my $self = shift;
-  $self->finish('works too!');
-  $self->rendered(200);
+  my $c = shift;
+  $c->finish('works too!');
+  $c->rendered(200);
 };
 
 get '/no_content' => {text => 'fail!', status => 204};
 
 get '/echo' => sub {
-  my $self = shift;
-  gzip \(my $uncompressed = $self->req->body), \my $compressed;
-  $self->res->headers->content_encoding($self->req->headers->accept_encoding);
-  $self->render(data => $compressed);
+  my $c = shift;
+  gzip \(my $uncompressed = $c->req->body), \my $compressed;
+  $c->res->headers->content_encoding($c->req->headers->accept_encoding);
+  $c->render(data => $compressed);
 };
 
 post '/echo' => sub {
-  my $self = shift;
-  $self->render(data => $self->req->body);
+  my $c = shift;
+  $c->render(data => $c->req->body);
 };
 
 any '/method' => {inline => '<%= $self->req->method =%>'};
 
 get '/one' => sub {
-  my $self = shift;
-  $self->res->version('1.0')->headers->connection('test');
-  $self->render(text => 'One!');
+  my $c = shift;
+  $c->res->version('1.0')->headers->connection('test');
+  $c->render(text => 'One!');
 };
 
 # Max redirects
@@ -189,7 +188,7 @@ $tx = $ua->build_tx(GET => '/');
 ok !$tx->is_finished, 'transaction is not finished';
 $ua->once(
   start => sub {
-    my ($self, $tx) = @_;
+    my ($ua, $tx) = @_;
     $tx->req->on(finish => sub { $finished_req++ });
     $tx->on(finish => sub { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
@@ -212,7 +211,7 @@ $tx = $ua->build_tx(GET => '/no_length');
 ok !$tx->is_finished, 'transaction is not finished';
 $ua->once(
   start => sub {
-    my ($self, $tx) = @_;
+    my ($ua, $tx) = @_;
     $tx->req->on(finish => sub { $finished_req++ });
     $tx->on(finish => sub { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
@@ -253,7 +252,7 @@ is $tx->res->body, 'works!', 'right content';
 ($success, $code, $body) = ();
 $ua->post(
   '/echo' => form => {hello => 'world'} => sub {
-    my ($self, $tx) = @_;
+    my ($ua, $tx) = @_;
     $success = $tx->success;
     $code    = $tx->res->code;
     $body    = $tx->res->body;
@@ -269,7 +268,7 @@ is $body,    'hello=world', 'right content';
 ($success, $code, $body) = ();
 $ua->post(
   '/echo' => json => {hello => 'world'} => sub {
-    my ($self, $tx) = @_;
+    my ($ua, $tx) = @_;
     $success = $tx->success;
     $code    = $tx->res->code;
     $body    = $tx->res->body;
@@ -445,15 +444,15 @@ is $stream, 1, 'no leaking subscribers';
 my @kept_alive;
 $ua->get(
   $ua->server->nb_url => sub {
-    my ($self, $tx) = @_;
+    my ($ua, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
-    $self->get(
+    $ua->get(
       '/' => sub {
-        my ($self, $tx) = @_;
+        my ($ua, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
-        $self->get(
+        $ua->get(
           $ua->server->nb_url => sub {
-            my ($self, $tx) = @_;
+            my ($ua, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->stop;
           }

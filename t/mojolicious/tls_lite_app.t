@@ -25,22 +25,22 @@ app->log->level('fatal');
 app->sessions->secure(1);
 
 get '/login' => sub {
-  my $self = shift;
-  my $name = $self->param('name') || 'anonymous';
-  $self->session(name => $name);
-  $self->render(text => "Welcome $name!");
+  my $c = shift;
+  my $name = $c->param('name') || 'anonymous';
+  $c->session(name => $name);
+  $c->render(text => "Welcome $name!");
 };
 
 get '/again' => sub {
-  my $self = shift;
-  my $name = $self->session('name') || 'anonymous';
-  $self->render(text => "Welcome back $name!");
+  my $c = shift;
+  my $name = $c->session('name') || 'anonymous';
+  $c->render(text => "Welcome back $name!");
 };
 
 get '/logout' => sub {
-  my $self = shift;
-  $self->session(expires => 1);
-  $self->redirect_to('login');
+  my $c = shift;
+  $c->session(expires => 1);
+  $c->redirect_to('login');
 };
 
 # Use HTTPS

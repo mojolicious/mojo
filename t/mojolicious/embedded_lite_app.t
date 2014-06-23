@@ -18,30 +18,30 @@ package TestApp;
 use Mojolicious::Lite;
 
 get '/hello' => sub {
-  my $self    = shift;
-  my $name    = $self->stash('name');
-  my $counter = ++$self->session->{counter};
-  $self->render(text => "Hello from the $name ($counter) app!");
+  my $c       = shift;
+  my $name    = $c->stash('name');
+  my $counter = ++$c->session->{counter};
+  $c->render(text => "Hello from the $name ($counter) app!");
 };
 
 package MyTestApp::Test1;
 use Mojolicious::Lite;
 
 get '/yada' => sub {
-  my $self = shift;
-  my $name = $self->stash('name');
-  $self->render(text => "yada $name works!");
+  my $c    = shift;
+  my $name = $c->stash('name');
+  $c->render(text => "yada $name works!");
 };
 
 get '/bye' => sub {
-  my $self = shift;
-  my $name = $self->stash('name');
+  my $c    = shift;
+  my $name = $c->stash('name');
   my $nb   = '';
-  $self->ua->server->app(main::app());
-  $self->ua->get(
+  $c->ua->server->app(main::app());
+  $c->ua->get(
     '/hello/hello' => sub {
       my ($ua, $tx) = @_;
-      $self->render(text => $tx->res->body . "$name! $nb");
+      $c->render(text => $tx->res->body . "$name! $nb");
     }
   );
   $nb .= 'success!';
@@ -51,10 +51,10 @@ package MyTestApp::Test2;
 use Mojolicious::Lite;
 
 get '/' => sub {
-  my $self = shift;
-  my $name = $self->param('name');
-  my $url  = $self->url_for;
-  $self->render(text => "Bye from the $name app! $url!");
+  my $c    = shift;
+  my $name = $c->param('name');
+  my $url  = $c->url_for;
+  $c->render(text => "Bye from the $name app! $url!");
 };
 
 package MyTestApp::Basic;

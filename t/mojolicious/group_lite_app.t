@@ -14,34 +14,34 @@ use Test::Mojo;
 app->secrets(['test1']);
 
 get '/multi' => sub {
-  my $self = shift;
-  $self->cookie(unsigned1 => 'one');
-  $self->cookie(unsigned1 => 'two', {path => '/multi'});
-  $self->cookie(unsigned2 => 'three');
-  $self->signed_cookie(signed1 => 'four');
-  $self->signed_cookie(signed1 => 'five', {path => '/multi'});
-  $self->signed_cookie(signed2 => 'six');
+  my $c = shift;
+  $c->cookie(unsigned1 => 'one');
+  $c->cookie(unsigned1 => 'two', {path => '/multi'});
+  $c->cookie(unsigned2 => 'three');
+  $c->signed_cookie(signed1 => 'four');
+  $c->signed_cookie(signed1 => 'five', {path => '/multi'});
+  $c->signed_cookie(signed2 => 'six');
 };
 
 get '/expiration' => sub {
-  my $self = shift;
-  if ($self->param('redirect')) {
-    $self->session(expiration => 0);
-    return $self->redirect_to('expiration');
+  my $c = shift;
+  if ($c->param('redirect')) {
+    $c->session(expiration => 0);
+    return $c->redirect_to('expiration');
   }
-  $self->render(text => $self->session('expiration'));
+  $c->render(text => $c->session('expiration'));
 };
 
 under('/missing' => sub {1})->route->to('does_not_exist#not_at_all');
 
 under '/suspended' => sub {
-  my $self = shift;
+  my $c = shift;
 
   Mojo::IOLoop->next_tick(
     sub {
-      return $self->render(text => 'stopped!') unless $self->param('ok');
-      $self->stash(suspended => 'suspended!');
-      $self->continue;
+      return $c->render(text => 'stopped!') unless $c->param('ok');
+      $c->stash(suspended => 'suspended!');
+      $c->continue;
     }
   );
 
@@ -51,33 +51,33 @@ under '/suspended' => sub {
 get '/' => {inline => '<%= $suspended %>\\'};
 
 under sub {
-  my $self = shift;
-  $self->render(text => 'Unauthorized!', status => 401) and return undef
-    unless $self->req->headers->header('X-Bender');
-  $self->res->headers->add('X-Under' => 23);
-  $self->res->headers->add('X-Under' => 24);
+  my $c = shift;
+  $c->render(text => 'Unauthorized!', status => 401) and return undef
+    unless $c->req->headers->header('X-Bender');
+  $c->res->headers->add('X-Under' => 23);
+  $c->res->headers->add('X-Under' => 24);
   1;
 };
 
 get '/with_under' => sub {
-  my $self = shift;
-  $self->render(text => 'Unders are cool!');
+  my $c = shift;
+  $c->render(text => 'Unders are cool!');
 };
 
 get '/with_under_too' => sub {
-  my $self = shift;
-  $self->render(text => 'Unders are cool too!');
+  my $c = shift;
+  $c->render(text => 'Unders are cool too!');
 };
 
 under sub {
-  my $self = shift;
+  my $c = shift;
 
   # Authenticated
-  my $name = $self->param('name') || '';
+  my $name = $c->param('name') || '';
   return 1 if $name eq 'Bender';
 
   # Not authenticated
-  $self->render('param_auth_denied');
+  $c->render('param_auth_denied');
   return undef;
 };
 
@@ -87,11 +87,11 @@ get '/param_auth/too' =>
   sub { shift->render(text => 'You could be Bender too!') };
 
 under sub {
-  my $self = shift;
-  $self->stash(_name => 'stash');
-  $self->cookie(foo => 'cookie', {expires => time + 60});
-  $self->signed_cookie(bar => 'signed_cookie', {expires => time + 120});
-  $self->cookie(bad => 'bad_cookie--12345678');
+  my $c = shift;
+  $c->stash(_name => 'stash');
+  $c->cookie(foo => 'cookie', {expires => time + 60});
+  $c->signed_cookie(bar => 'signed_cookie', {expires => time + 120});
+  $c->cookie(bad => 'bad_cookie--12345678');
   1;
 };
 
@@ -106,9 +106,9 @@ hook after_dispatch => sub {
 };
 
 get '/late/session' => sub {
-  my $self = shift;
-  my $late = $self->session('late') || 'not yet!';
-  $self->render(text => $late);
+  my $c = shift;
+  my $late = $c->session('late') || 'not yet!';
+  $c->render(text => $late);
 };
 
 # Counter
@@ -163,9 +163,9 @@ group {
 
   # Check "ok" parameter
   under sub {
-    my $self = shift;
-    return 1 if $self->req->param('ok');
-    $self->render(text => "You're not ok.");
+    my $c = shift;
+    return 1 if $c->req->param('ok');
+    $c->render(text => "You're not ok.");
     return !!0;
   };
 

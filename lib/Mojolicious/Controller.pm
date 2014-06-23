@@ -607,13 +607,13 @@ parameters, so you have to make sure it is not excessively large, there's a
 
   # List context is ambiguous and should be avoided, you can get multiple
   # values returned for a query string like "?foo=bar&foo=baz&foo=yada"
-  my $hash = {foo => $self->param('foo')};
+  my $hash = {foo => $c->param('foo')};
 
   # Better enforce scalar context
-  my $hash = {foo => scalar $self->param('foo')};
+  my $hash = {foo => scalar $c->param('foo')};
 
   # The multi-name form can also be used to enforce scalar context
-  my $hash = {foo => $self->param(['foo'])};
+  my $hash = {foo => $c->param(['foo'])};
 
 For more control you can also access request information directly.
 
@@ -712,7 +712,7 @@ Try to render content, but do not call L</"render_not_found"> if no response
 could be generated, takes the same arguments as L</"render">.
 
   # Render template "index_local" only if it exists
-  $self->render_maybe('index_local') or $self->render('index');
+  $c->render_maybe('index_local') or $c->render('index');
 
 =head2 render_not_found
 
@@ -750,12 +750,12 @@ Finalize response and emit hook L<Mojolicious/"after_dispatch">, defaults to
 using a C<200> response code.
 
   # Custom response
-  $self->res->headers->content_type('text/plain');
-  $self->res->body('Hello World!');
-  $self->rendered(200);
+  $c->res->headers->content_type('text/plain');
+  $c->res->body('Hello World!');
+  $c->rendered(200);
 
   # Accept WebSocket handshake without subscribing to an event
-  $self->rendered(101);
+  $c->rendered(101);
 
 =head2 req
 

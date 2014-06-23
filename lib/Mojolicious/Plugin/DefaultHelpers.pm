@@ -17,10 +17,10 @@ sub register {
   for my $name (qw(extends layout title)) {
     $app->helper(
       $name => sub {
-        my $self  = shift;
-        my $stash = $self->stash;
+        my $c     = shift;
+        my $stash = $c->stash;
         $stash->{$name} = shift if @_;
-        $self->stash(@_) if @_;
+        $c->stash(@_) if @_;
         return $stash->{$name};
       }
     );
@@ -41,34 +41,34 @@ sub register {
 }
 
 sub _accepts {
-  my $self = shift;
-  return $self->app->renderer->accepts($self, @_);
+  my $c = shift;
+  return $c->app->renderer->accepts($c, @_);
 }
 
 sub _content {
-  my ($self, $name, $content) = @_;
+  my ($c, $name, $content) = @_;
   $name ||= 'content';
 
   # Set (first come)
-  my $c = $self->stash->{'mojo.content'} ||= {};
-  $c->{$name} //= ref $content eq 'CODE' ? $content->() : $content
+  my $hash = $c->stash->{'mojo.content'} ||= {};
+  $hash->{$name} //= ref $content eq 'CODE' ? $content->() : $content
     if defined $content;
 
   # Get
-  return Mojo::ByteStream->new($c->{$name} // '');
+  return Mojo::ByteStream->new($hash->{$name} // '');
 }
 
 sub _content_for {
-  my ($self, $name, $content) = @_;
-  return _content($self, $name) unless defined $content;
-  my $c = $self->stash->{'mojo.content'} ||= {};
-  return $c->{$name} .= ref $content eq 'CODE' ? $content->() : $content;
+  my ($c, $name, $content) = @_;
+  return _content($c, $name) unless defined $content;
+  my $hash = $c->stash->{'mojo.content'} ||= {};
+  return $hash->{$name} .= ref $content eq 'CODE' ? $content->() : $content;
 }
 
 sub _csrf_token {
-  my $self = shift;
-  $self->session->{csrf_token}
-    ||= sha1_sum($self->app->secrets->[0] . steady_time . rand 999);
+  my $c = shift;
+  $c->session->{csrf_token}
+    ||= sha1_sum($c->app->secrets->[0] . steady_time . rand 999);
 }
 
 sub _current_route {
@@ -78,8 +78,8 @@ sub _current_route {
 }
 
 sub _url_with {
-  my $self = shift;
-  return $self->url_for(@_)->query($self->req->url->query->clone);
+  my $c = shift;
+  return $c->url_for(@_)->query($c->req->url->query->clone);
 }
 
 1;
@@ -124,17 +124,17 @@ L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension
 if no preference could be detected.
 
   # Check if JSON is acceptable
-  $self->render(json => {hello => 'world'}) if $self->accepts('json');
+  $c->render(json => {hello => 'world'}) if $c->accepts('json');
 
   # Check if JSON was specifically requested
-  $self->render(json => {hello => 'world'}) if $self->accepts('', 'json');
+  $c->render(json => {hello => 'world'}) if $c->accepts('', 'json');
 
   # Unsupported representation
-  $self->render(data => '', status => 204)
-    unless my $format = $self->accepts('html', 'json');
+  $c->render(data => '', status => 204)
+    unless my $format = $c->accepts('html', 'json');
 
   # Detected representations to select from
-  my @formats = @{$self->accepts};
+  my @formats = @{$c->accepts};
 
 =head2 app
 

@@ -23,8 +23,8 @@ use Mojolicious::Lite;
 use ojo;
 
 get '/remote_address' => sub {
-  my $self = shift;
-  $self->render(text => $self->tx->remote_address);
+  my $c = shift;
+  $c->render(text => $c->tx->remote_address);
 };
 
 # Make sure user agents dont taint the ioloop
@@ -108,15 +108,15 @@ ok $kept_alive, 'connection was kept alive';
 my @kept_alive;
 $ua->get(
   'http://mojolicio.us' => sub {
-    my ($self, $tx) = @_;
+    my ($ua, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
-    $self->get(
+    $ua->get(
       'http://mojolicio.us' => sub {
-        my ($self, $tx) = @_;
+        my ($ua, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
-        $self->get(
+        $ua->get(
           'http://mojolicio.us' => sub {
-            my ($self, $tx) = @_;
+            my ($ua, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->singleton->stop;
           }

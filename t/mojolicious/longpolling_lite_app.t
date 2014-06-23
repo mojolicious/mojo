@@ -20,47 +20,47 @@ package main;
 app->controller_class('MyTestApp::Controller');
 
 get '/shortpoll' => sub {
-  my $self = shift;
-  $self->res->headers->connection('close');
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->finish('this was short.');
+  my $c = shift;
+  $c->res->headers->connection('close');
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->finish('this was short.');
 } => 'shortpoll';
 
 get '/shortpoll/plain' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->res->headers->content_length(25);
-  $self->write('this was short and plain.');
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->res->headers->content_length(25);
+  $c->write('this was short and plain.');
 };
 
 get '/shortpoll/nolength' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->write('this was short and had no length.');
-  $self->write('');
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->write('this was short and had no length.');
+  $c->write('');
 };
 
 get '/longpoll' => sub {
-  my $self = shift;
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->write_chunk('hi ');
+  my $c = shift;
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->write_chunk('hi ');
   my $id = Mojo::IOLoop->timer(
     0.25 => sub {
-      $self->write_chunk(
+      $c->write_chunk(
         'there,' => sub {
           shift->write_chunk(' whats up?' => sub { shift->finish });
         }
       );
     }
   );
-  $self->on(
+  $c->on(
     finish => sub {
       shift->stash->{finished}++;
       Mojo::IOLoop->remove($id);
@@ -69,16 +69,16 @@ get '/longpoll' => sub {
 };
 
 get '/longpoll/nolength' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->write('hi ');
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->write('hi ');
   Mojo::IOLoop->timer(
     0.25 => sub {
-      $self->write(
+      $c->write(
         'there,' => sub {
-          shift->write(' what length?' => sub { $self->finish });
+          shift->write(' what length?' => sub { $c->finish });
         }
       );
     }
@@ -86,12 +86,12 @@ get '/longpoll/nolength' => sub {
 };
 
 get '/longpoll/nested' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->cookie(foo => 'bar');
-  $self->write_chunk(
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->cookie(foo => 'bar');
+  $c->write_chunk(
     sub {
       shift->write_chunk('nested!' => sub { shift->write_chunk('') });
     }
@@ -99,32 +99,32 @@ get '/longpoll/nested' => sub {
 };
 
 get '/longpoll/plain' => sub {
-  my $self = shift;
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->res->headers->content_length(25);
-  $self->write('hi ');
+  my $c = shift;
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->res->headers->content_length(25);
+  $c->write('hi ');
   Mojo::IOLoop->timer(
     0.25 => sub {
-      $self->on(finish => sub { shift->stash->{finished}++ });
-      $self->write('there plain,' => sub { shift->write(' whats up?') });
+      $c->on(finish => sub { shift->stash->{finished}++ });
+      $c->write('there plain,' => sub { shift->write(' whats up?') });
     }
   );
 };
 
 get '/longpoll/delayed' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->write_chunk;
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->write_chunk;
   Mojo::IOLoop->timer(
     0.25 => sub {
-      $self->write_chunk(
+      $c->write_chunk(
         sub {
-          my $self = shift;
-          $self->write_chunk('how');
-          $self->finish('dy!');
+          my $c = shift;
+          $c->write_chunk('how');
+          $c->finish('dy!');
         }
       );
     }
@@ -132,19 +132,19 @@ get '/longpoll/delayed' => sub {
 };
 
 get '/longpoll/plain/delayed' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->res->headers->content_length(12);
-  $self->write;
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->res->headers->content_length(12);
+  $c->write;
   Mojo::IOLoop->timer(
     0.25 => sub {
-      $self->write(
+      $c->write(
         sub {
-          my $self = shift;
-          $self->write('how');
-          $self->write('dy plain!');
+          my $c = shift;
+          $c->write('how');
+          $c->write('dy plain!');
         }
       );
     }
@@ -152,18 +152,18 @@ get '/longpoll/plain/delayed' => sub {
 } => 'delayed';
 
 get '/longpoll/nolength/delayed' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->write;
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->write;
   Mojo::IOLoop->timer(
     0.25 => sub {
-      $self->write(
+      $c->write(
         sub {
-          my $self = shift;
-          $self->write('how');
-          $self->finish('dy nolength!');
+          my $c = shift;
+          $c->write('how');
+          $c->finish('dy nolength!');
         }
       );
     }
@@ -171,55 +171,55 @@ get '/longpoll/nolength/delayed' => sub {
 };
 
 get '/longpoll/static/delayed' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
-  $self->cookie(bar => 'baz');
-  $self->session(foo => 'bar');
-  Mojo::IOLoop->timer(0.25 => sub { $self->render_static('hello.txt') });
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->cookie(bar => 'baz');
+  $c->session(foo => 'bar');
+  Mojo::IOLoop->timer(0.25 => sub { $c->render_static('hello.txt') });
 };
 
 get '/longpoll/dynamic/delayed' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished}++ });
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished}++ });
   Mojo::IOLoop->timer(
     0.25 => sub {
-      $self->res->code(201);
-      $self->cookie(baz => 'yada');
-      $self->res->body('Dynamic!');
-      $self->rendered;
+      $c->res->code(201);
+      $c->cookie(baz => 'yada');
+      $c->res->body('Dynamic!');
+      $c->rendered;
     }
   );
 } => 'dynamic';
 
 get '/stream' => sub {
-  my $self = shift;
-  my $i    = 0;
+  my $c = shift;
+  my $i = 0;
   my $drain;
   $drain = sub {
-    my $self = shift;
-    return $self->finish if $i >= 10;
-    $self->write_chunk($i++, $drain);
-    $self->stash->{subscribers}
-      += @{Mojo::IOLoop->stream($self->tx->connection)->subscribers('drain')};
+    my $c = shift;
+    return $c->finish if $i >= 10;
+    $c->write_chunk($i++, $drain);
+    $c->stash->{subscribers}
+      += @{Mojo::IOLoop->stream($c->tx->connection)->subscribers('drain')};
   };
-  $self->$drain;
+  $c->$drain;
 };
 
 get '/finish' => sub {
-  my $self   = shift;
-  my $stream = Mojo::IOLoop->stream($self->tx->connection);
-  $self->on(finish => sub { shift->stash->{writing} = $stream->is_writing });
-  $self->render_later;
-  Mojo::IOLoop->next_tick(sub { $self->render(msg => 'Finish!') });
+  my $c      = shift;
+  my $stream = Mojo::IOLoop->stream($c->tx->connection);
+  $c->on(finish => sub { shift->stash->{writing} = $stream->is_writing });
+  $c->render_later;
+  Mojo::IOLoop->next_tick(sub { $c->render(msg => 'Finish!') });
 };
 
 get '/too_long' => sub {
-  my $self = shift;
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
-  $self->res->headers->content_length(12);
-  $self->write('how');
-  Mojo::IOLoop->timer(5 => sub { $self->write('dy plain!') });
+  my $c = shift;
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
+  $c->res->headers->content_length(12);
+  $c->write('how');
+  Mojo::IOLoop->timer(5 => sub { $c->write('dy plain!') });
 };
 
 my $t = Test::Mojo->new;
@@ -300,7 +300,7 @@ my $tx = $t->ua->build_tx(GET => '/longpoll');
 my $buffer = '';
 $tx->res->content->unsubscribe('read')->on(
   read => sub {
-    my ($self, $chunk) = @_;
+    my ($content, $chunk) = @_;
     $buffer .= $chunk;
     $tx->res->error({message => 'Interrupted'}) if length $buffer == 3;
   }
@@ -415,7 +415,7 @@ $tx = $t->ua->request_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->content->unsubscribe('read')->on(
   read => sub {
-    my ($self, $chunk) = @_;
+    my ($content, $chunk) = @_;
     $buffer .= $chunk;
   }
 );
@@ -430,7 +430,7 @@ $tx = $t->ua->inactivity_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->content->unsubscribe('read')->on(
   read => sub {
-    my ($self, $chunk) = @_;
+    my ($content, $chunk) = @_;
     $buffer .= $chunk;
   }
 );

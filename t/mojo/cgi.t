@@ -12,24 +12,24 @@ app->log->level('fatal');
 get '/' => {text => 'Your Mojo is working!'};
 
 post '/chunked' => sub {
-  my $self = shift;
+  my $c = shift;
 
-  my $params = $self->req->params->to_hash;
+  my $params = $c->req->params->to_hash;
   my @chunks;
   for my $key (sort keys %$params) { push @chunks, $params->{$key} }
 
   my $cb;
   $cb = sub {
-    my $self = shift;
+    my $c = shift;
     $cb = undef unless my $chunk = shift @chunks || '';
-    $self->write_chunk($chunk, $cb);
+    $c->write_chunk($chunk, $cb);
   };
-  $self->$cb;
+  $c->$cb;
 };
 
 get '/params' => sub {
-  my $self = shift;
-  $self->render(json => $self->req->params->to_hash);
+  my $c = shift;
+  $c->render(json => $c->req->params->to_hash);
 };
 
 # Simple

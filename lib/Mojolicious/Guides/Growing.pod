@@ -184,8 +184,8 @@ This will be the foundation for our login manager example application.
   use Mojolicious::Lite;
 
   get '/' => sub {
-    my $self = shift;
-    $self->render(text => 'Hello world!');
+    my $c = shift;
+    $c->render(text => 'Hello world!');
   };
 
   app->start;
@@ -252,18 +252,18 @@ templates.
 
   # /?user=sri&pass=secr3t
   any '/' => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Query parameters
-    my $user = $self->param('user') || '';
-    my $pass = $self->param('pass') || '';
+    my $user = $c->param('user') || '';
+    my $pass = $c->param('pass') || '';
 
     # Check password
-    return $self->render(text => "Welcome $user.")
-      if $self->users->check($user, $pass);
+    return $c->render(text => "Welcome $user.")
+      if $c->users->check($user, $pass);
 
     # Failed
-    $self->render(text => 'Wrong username or password.');
+    $c->render(text => 'Wrong username or password.');
   };
 
   app->start;
@@ -360,25 +360,25 @@ L<Mojolicious/"secrets">.
 This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
 
-  $self->session(user => 'sri');
-  my $user = $self->session('user');
+  $c->session(user => 'sri');
+  my $user = $c->session('user');
 
 By default all sessions expire after one hour, for more control you can use
 the C<expiration> session value to set an expiration date in seconds from now.
 
-  $self->session(expiration => 3600);
+  $c->session(expiration => 3600);
 
 And the whole session can be deleted by using the C<expires> session value to
 set an absolute expiration date in the past.
 
-  $self->session(expires => 1);
+  $c->session(expires => 1);
 
 For data that should only be visible on the next request, like a confirmation
 message after a 302 redirect, you can use the flash, accessible through the
 method L<Mojolicious::Controller/"flash">.
 
-  $self->flash(message => 'Everything is fine.');
-  $self->redirect_to('goodbye');
+  $c->flash(message => 'Everything is fine.');
+  $c->redirect_to('goodbye');
 
 Just remember that all session data gets serialized with L<Mojo::JSON> and
 stored in HMAC-SHA1 signed cookies, which usually have a C<4096> byte (4KB)
@@ -402,33 +402,33 @@ this.
 
   # Main login action
   any '/' => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Query or POST parameters
-    my $user = $self->param('user') || '';
-    my $pass = $self->param('pass') || '';
+    my $user = $c->param('user') || '';
+    my $pass = $c->param('pass') || '';
 
     # Check password and render "index.html.ep" if necessary
-    return $self->render unless $self->users->check($user, $pass);
+    return $c->render unless $c->users->check($user, $pass);
 
     # Store username in session
-    $self->session(user => $user);
+    $c->session(user => $user);
 
     # Store a friendly message for the next page in flash
-    $self->flash(message => 'Thanks for logging in.');
+    $c->flash(message => 'Thanks for logging in.');
 
     # Redirect to protected page with a 302 response
-    $self->redirect_to('protected');
+    $c->redirect_to('protected');
   } => 'index';
 
   # Make sure user is logged in for actions in this group
   group {
     under sub {
-      my $self = shift;
+      my $c = shift;
 
       # Redirect to main page with a 302 response if user is not logged in
-      return 1 if $self->session('user');
-      $self->redirect_to('index');
+      return 1 if $c->session('user');
+      $c->redirect_to('index');
       return undef;
     };
 
@@ -438,13 +438,13 @@ this.
 
   # Logout action
   get '/logout' => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Expire and in turn clear session automatically
-    $self->session(expires => 1);
+    $c->session(expires => 1);
 
     # Redirect to main page with a 302 response
-    $self->redirect_to('index');
+    $c->redirect_to('index');
   };
 
   app->start;
@@ -525,29 +525,29 @@ actual action code needs to be changed.
     my $r = $self->routes;
 
     $r->any('/' => sub {
-      my $self = shift;
+      my $c = shift;
 
-      my $user = $self->param('user') || '';
-      my $pass = $self->param('pass') || '';
-      return $self->render unless $self->users->check($user, $pass);
+      my $user = $c->param('user') || '';
+      my $pass = $c->param('pass') || '';
+      return $c->render unless $c->users->check($user, $pass);
 
-      $self->session(user => $user);
-      $self->flash(message => 'Thanks for logging in.');
-      $self->redirect_to('protected');
+      $c->session(user => $user);
+      $c->flash(message => 'Thanks for logging in.');
+      $c->redirect_to('protected');
     } => 'index');
 
     my $logged_in = $r->under(sub {
-      my $self = shift;
-      return 1 if $self->session('user');
-      $self->redirect_to('index');
+      my $c = shift;
+      return 1 if $c->session('user');
+      $c->redirect_to('index');
       return undef;
     });
     $logged_in->get('/protected');
 
     $r->get('/logout' => sub {
-      my $self = shift;
-      $self->session(expires => 1);
-      $self->redirect_to('index');
+      my $c = shift;
+      $c->session(expires => 1);
+      $c->redirect_to('index');
     });
   }
 

@@ -10,34 +10,34 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 any [qw(POST PUT)] => '/json/echo' => sub {
-  my $self = shift;
-  $self->respond_to(json => {json => $self->req->json});
+  my $c = shift;
+  $c->respond_to(json => {json => $c->req->json});
 };
 
 get '/accepts' => sub {
-  my $self = shift;
-  $self->render(json => {best => $self->accepts('html', 'json', 'txt')});
+  my $c = shift;
+  $c->render(json => {best => $c->accepts('html', 'json', 'txt')});
 };
 
 get '/wants_json' => sub {
-  my $self = shift;
-  $self->render(json => {wants_json => \$self->accepts('', 'json')});
+  my $c = shift;
+  $c->render(json => {wants_json => \$c->accepts('', 'json')});
 };
 
 under '/rest';
 
 get sub {
-  my $self = shift;
-  $self->respond_to(
-    json => sub { $self->render(json => {just => 'works'}) },
-    html => sub { $self->render(data => '<html><body>works') },
-    xml  => sub { $self->render(data => '<just>works</just>') }
+  my $c = shift;
+  $c->respond_to(
+    json => sub { $c->render(json => {just => 'works'}) },
+    html => sub { $c->render(data => '<html><body>works') },
+    xml  => sub { $c->render(data => '<just>works</just>') }
   );
 };
 
 post sub {
-  my $self = shift;
-  $self->respond_to(
+  my $c = shift;
+  $c->respond_to(
     json => {json => {just => 'works too'}},
     html => {text => '<html><body>works too'},
     xml  => {data => '<just>works too</just>'},

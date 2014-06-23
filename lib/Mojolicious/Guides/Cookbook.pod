@@ -262,8 +262,8 @@ But you could even use middleware right in your application.
   use Plack::Builder;
 
   get '/welcome' => sub {
-    my $self = shift;
-    $self->render(text => 'Hello Mojo!');
+    my $c = shift;
+    $c->render(text => 'Hello Mojo!');
   };
 
   builder {
@@ -371,10 +371,10 @@ latency backend web services.
 
   # Search MetaCPAN for "mojolicious"
   get '/' => sub {
-    my $self = shift;
-    $self->ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
+    my $c = shift;
+    $c->ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
       my ($ua, $tx) = @_;
-      $self->render('metacpan', hits => $tx->res->json->{hits}{hits});
+      $c->render('metacpan', hits => $tx->res->json->{hits}{hits});
     });
   };
 
@@ -402,7 +402,7 @@ often result from continuation-passing style.
 
   # Search MetaCPAN for "mojo" and "mango"
   get '/' => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Prepare response in two steps
     Mojo::IOLoop->delay(
@@ -412,14 +412,14 @@ often result from continuation-passing style.
         my $delay = shift;
         my $url   = Mojo::URL->new('api.metacpan.org/v0/module/_search');
         $url->query({sort => 'date:desc'});
-        $self->ua->get($url->clone->query({q => 'mojo'})  => $delay->begin);
-        $self->ua->get($url->clone->query({q => 'mango'}) => $delay->begin);
+        $c->ua->get($url->clone->query({q => 'mojo'})  => $delay->begin);
+        $c->ua->get($url->clone->query({q => 'mango'}) => $delay->begin);
       },
 
       # Delayed rendering
       sub {
         my ($delay, $mojo, $mango) = @_;
-        $self->render(json => {
+        $c->render(json => {
           mojo  => $mojo->res->json('/hits/hits/0/_source/release'),
           mango => $mango->res->json('/hits/hits/0/_source/release')
         });
@@ -441,9 +441,9 @@ processed concurrently.
 
   # Wait 3 seconds before rendering a response
   get '/' => sub {
-    my $self = shift;
+    my $c = shift;
     Mojo::IOLoop->timer(3 => sub {
-      $self->render(text => 'Delayed by 3 seconds!');
+      $c->render(text => 'Delayed by 3 seconds!');
     });
   };
 
@@ -458,17 +458,17 @@ emitted.
 
   # Count to 5 in 1 second steps
   get '/' => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Start recurring timer
     my $i = 1;
     my $id = Mojo::IOLoop->recurring(1 => sub {
-      $self->write_chunk($i);
-      $self->finish if $i++ == 5;
+      $c->write_chunk($i);
+      $c->finish if $i++ == 5;
     });
 
     # Stop recurring timer
-    $self->on(finish => sub { Mojo::IOLoop->remove($id) });
+    $c->on(finish => sub { Mojo::IOLoop->remove($id) });
   };
 
   app->start;
@@ -490,8 +490,8 @@ created at startup time.
 
   # Show current title
   get '/' => sub {
-    my $self = shift;
-    $self->render(json => {title => $title});
+    my $c = shift;
+    $c->render(json => {title => $title});
   };
 
   app->start;
@@ -525,24 +525,24 @@ L<Mojolicious::Controller/"send">.
 
   # WebSocket echo service
   websocket '/echo' => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Opened
-    $self->app->log->debug('WebSocket opened.');
+    $c->app->log->debug('WebSocket opened.');
 
     # Increase inactivity timeout for connection a bit
-    Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
+    Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
 
     # Incoming message
-    $self->on(message => sub {
-      my ($self, $msg) = @_;
-      $self->send("echo: $msg");
+    $c->on(message => sub {
+      my ($c, $msg) = @_;
+      $c->send("echo: $msg");
     });
 
     # Closed
-    $self->on(finish => sub {
-      my ($self, $code, $reason) = @_;
-      $self->app->log->debug("WebSocket closed with status $code.");
+    $c->on(finish => sub {
+      my ($c, $code, $reason) = @_;
+      $c->app->log->debug("WebSocket closed with status $code.");
     });
   };
 
@@ -573,7 +573,7 @@ L<Mojolicious::Controller/"send">.
 The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right after
 the WebSocket connection has been closed.
 
-  $self->tx->with_compression;
+  $c->tx->with_compression;
 
 You can activate C<permessage-deflate> compression with
 L<Mojo::Transaction::WebSocket/"with_compression">, this can result in much
@@ -626,24 +626,24 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
 
   # EventSource for log messages
   get '/events' => sub {
-    my $self = shift;
+    my $c = shift;
 
     # Increase inactivity timeout for connection a bit
-    Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
+    Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
 
     # Change content type
-    $self->res->headers->content_type('text/event-stream');
+    $c->res->headers->content_type('text/event-stream');
 
     # Subscribe to "message" event and forward "log" events to browser
-    my $cb = $self->app->log->on(message => sub {
+    my $cb = $c->app->log->on(message => sub {
       my ($log, $level, @lines) = @_;
-      $self->write("event:log\ndata: [$level] @lines\n\n");
+      $c->write("event:log\ndata: [$level] @lines\n\n");
     });
 
     # Unsubscribe from "message" event again once we are done
-    $self->on(finish => sub {
-      my $self = shift;
-      $self->app->log->unsubscribe(message => $cb);
+    $c->on(finish => sub {
+      my $c = shift;
+      $c->app->log->unsubscribe(message => $cb);
     });
   };
 
@@ -743,10 +743,10 @@ allows other event loops like L<AnyEvent> to just work.
 
   # Wait 3 seconds before rendering a response
   get '/' => sub {
-    my $self = shift;
+    my $c = shift;
     my $w;
     $w = AE::timer 3, 0, sub {
-      $self->render(text => 'Delayed by 3 seconds!');
+      $c->render(text => 'Delayed by 3 seconds!');
       undef $w;
     };
   };

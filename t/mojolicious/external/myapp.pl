@@ -23,8 +23,8 @@ app->routes->add_condition(
 get '/' => 'index';
 
 get '/echo' => sub {
-  my $self = shift;
-  $self->render(text => 'echo: ' . ($self->stash('message') || 'nothing!'));
+  my $c = shift;
+  $c->render(text => 'echo: ' . ($c->stash('message') || 'nothing!'));
 };
 
 get '/stream' => sub {
@@ -36,15 +36,15 @@ get '/stream' => sub {
 };
 
 get '/url/☃' => sub {
-  my $self  = shift;
-  my $route = $self->url_for;
-  my $rel   = $self->url_for('/☃/stream');
-  $self->render(text => "$route -> $rel!");
+  my $c     = shift;
+  my $route = $c->url_for;
+  my $rel   = $c->url_for('/☃/stream');
+  $c->render(text => "$route -> $rel!");
 };
 
 get '/host' => (message => 'it works!') => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for->base->host);
+  my $c = shift;
+  $c->render(text => $c->url_for->base->host);
 };
 
 get '/one' => sub { shift->render(text => 'One') };

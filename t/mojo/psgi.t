@@ -16,15 +16,15 @@ under sub {
 get '/' => {text => 'Your Mojo is working!'};
 
 get '/cookies' => sub {
-  my $self   = shift;
-  my $params = $self->req->params->to_hash;
-  for my $key (sort keys %$params) { $self->cookie($key, $params->{$key}) }
-  $self->render(text => 'nomnomnom');
+  my $c      = shift;
+  my $params = $c->req->params->to_hash;
+  for my $key (sort keys %$params) { $c->cookie($key, $params->{$key}) }
+  $c->render(text => 'nomnomnom');
 };
 
 post '/params' => sub {
-  my $self = shift;
-  $self->render(json => $self->req->params->to_hash);
+  my $c = shift;
+  $c->render(json => $c->req->params->to_hash);
 };
 
 # Binding

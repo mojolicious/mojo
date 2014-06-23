@@ -17,8 +17,8 @@ ok app->routes->find('perldoc'), 'route found';
 app->defaults(layout => 'gray');
 
 get '/' => sub {
-  my $self = shift;
-  $self->render('simple', handler => 'pod');
+  my $c = shift;
+  $c->render('simple', handler => 'pod');
 };
 
 post '/' => 'index';

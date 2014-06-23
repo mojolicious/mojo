@@ -22,8 +22,8 @@ use Mojolicious::Lite;
 plugin 'PODRenderer';
 
 get '/' => sub {
-  my $self = shift;
-  $self->render('index');
+  my $c = shift;
+  $c->render('index');
 };
 
 app->start;

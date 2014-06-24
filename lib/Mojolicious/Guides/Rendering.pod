@@ -139,7 +139,7 @@ indent your code without ruining the result.
 
 Stash values that don't have invalid characters in their name get
 automatically initialized as normal variables in the template, and the
-controller object as C<$c>.
+controller object as both C<$self> and C<$c>.
 
   $c->stash(name => 'tester');
 

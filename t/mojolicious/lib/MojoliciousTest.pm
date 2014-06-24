@@ -38,7 +38,7 @@ sub startup {
   # Templateless renderer
   $self->renderer->add_handler(
     test => sub {
-      my ($self, $c, $output) = @_;
+      my ($renderer, $c, $output) = @_;
       $$output = 'Hello Mojo from a templateless renderer!';
     }
   );

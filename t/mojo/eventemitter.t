@@ -35,7 +35,7 @@ my ($echo, $err);
 $e->catch(sub { $err = pop })->on(test2 => sub { $echo .= 'echo: ' . pop });
 $e->on(
   test2 => sub {
-    my ($self, $msg) = @_;
+    my ($e, $msg) = @_;
     die "test2: $msg\n";
   }
 );

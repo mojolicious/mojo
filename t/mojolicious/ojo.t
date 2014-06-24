@@ -27,6 +27,10 @@ is p('/' => form => {foo => 'bar'})->body, 'POSTfoo=bar', 'right content';
 is p('/' => json => {foo => 'bar'})->body, 'POST{"foo":"bar"}',
   'right content';
 
+# Mojolicious::Lite
+get '/test' => {text => 'pass'};
+is app->ua->get('/test')->res->body, 'pass', 'right content';
+
 # Parse XML
 is x('<title>works</title>')->at('title')->text, 'works', 'right text';
 

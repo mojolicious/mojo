@@ -75,6 +75,10 @@ C<MOJO_PROXY> environment variable.
 
   $ MOJO_PROXY=0 perl -Mojo -E 'say g("example.com")->body'
 
+Every L<ojo> one-liner is also a L<Mojolicious::Lite> application.
+
+  $ perl -Mojo -E 'get "/" => {inline => "%= time"}; app->start' get /
+
 =head1 FUNCTIONS
 
 L<ojo> implements the following functions, which are automatically exported.

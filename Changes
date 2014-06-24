@@ -1,4 +1,6 @@
 
+5.10  2014-06-25
+
 5.09  2014-06-24
   - Improved .ep templates to make the current controller available as $c.
 

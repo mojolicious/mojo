@@ -33,7 +33,7 @@ sub register {
           unless $self->{helpers};
 
         # Stash values (every time)
-        my $prepend = 'my $self = shift; my $_S = $self->stash;';
+        my $prepend = 'my $self = my $c = shift; my $_S = $c->stash;';
         $prepend .= " my \$$_ = \$_S->{'$_'};" for @keys;
 
         $cache->set($key => $mt->prepend($prepend . $mt->prepend));

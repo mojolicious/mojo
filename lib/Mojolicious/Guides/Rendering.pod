@@ -139,11 +139,11 @@ indent your code without ruining the result.
 
 Stash values that don't have invalid characters in their name get
 automatically initialized as normal variables in the template, and the
-controller object as C<$self>.
+controller object as C<$c>.
 
   $c->stash(name => 'tester');
 
-  Hello <%= $name %> from <%= $self->tx->remote_address %>.
+  Hello <%= $name %> from <%= $c->tx->remote_address %>.
 
 There are also many helper functions available, but more about that later.
 
@@ -561,7 +561,7 @@ L<Mojolicious::Controller/"render_to_string">.
   @@ foo/bar.html.ep
   <!DOCTYPE html>
   <html>
-    %= $self->render_to_string('header')
+    %= $c->render_to_string('header')
     <body>Bar</body>
   </html>
 

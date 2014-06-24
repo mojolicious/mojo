@@ -45,7 +45,7 @@ post '/echo' => sub {
   $c->render(data => $c->req->body);
 };
 
-any '/method' => {inline => '<%= $self->req->method =%>'};
+any '/method' => {inline => '<%= $c->req->method =%>'};
 
 get '/one' => sub {
   my $c = shift;

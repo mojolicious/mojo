@@ -471,16 +471,16 @@ __DATA__
 Oops!
 
 @@ multi.html.ep
-% my ($one, $three) = $self->cookie([qw(unsigned1 unsigned2)]);
+% my ($one, $three) = $c->cookie([qw(unsigned1 unsigned2)]);
 %= $one // ''
 %= $three // '';
-% my @unsigned1 = $self->cookie('unsigned1');
+% my @unsigned1 = $c->cookie('unsigned1');
 %= $unsigned1[0] // ''
 %= $unsigned1[1] // ''
-% my ($four, $six) = $self->signed_cookie([qw(signed1 signed2)]);
+% my ($four, $six) = $c->signed_cookie([qw(signed1 signed2)]);
 %= $four // ''
 %= $six // '';
-% my @signed1 = $self->signed_cookie('signed1');
+% my @signed1 = $c->signed_cookie('signed1');
 %= $signed1[0] // ''
 %= $signed1[1] // ''
 
@@ -491,16 +491,16 @@ Bender!
 Not Bender!
 
 @@ bridge2stash.html.ep
-% my $cookie = $self->req->cookie('mojolicious');
-<%= stash('_name') %> too!<%= $self->cookie('foo') %>!\
-<%= $self->signed_cookie('foo') %>!\
-<%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
-<%= $self->cookie('bad') %>!<%= session 'foo' %>!\
+% my $cookie = $c->req->cookie('mojolicious');
+<%= stash('_name') %> too!<%= $c->cookie('foo') %>!\
+<%= $c->signed_cookie('foo') %>!\
+<%= $c->signed_cookie('bar')%>!<%= $c->signed_cookie('bad')%>!\
+<%= $c->cookie('bad') %>!<%= session 'foo' %>!\
 <%= flash 'foo' %>!
-% $self->session(foo => 'session');
-% my $headers = $self->req->headers;
-% $self->flash(foo => 'flash') if $headers->header('X-Flash');
-% $self->session(expires => 1) if $headers->header('X-Flash2');
+% $c->session(foo => 'session');
+% my $headers = $c->req->headers;
+% $c->flash(foo => 'flash') if $headers->header('X-Flash');
+% $c->session(expires => 1) if $headers->header('X-Flash2');
 
 @@ withundercount.html.ep
 counter

@@ -1104,18 +1104,18 @@ text!
 <div id="☃">Redirect works!</div>
 
 @@ test(test)(\Qtest\E)(.html.ep
-<%= $self->match->endpoint->name %>
+<%= $c->match->endpoint->name %>
 
 @@ with_header_condition.html.ep
 Test ok!
 
 @@ root.html.epl
-% my $self = shift;
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
+% my $c = shift;
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
 
 @@ root_path.html.epl
 %== shift->url_for('root');
@@ -1130,11 +1130,11 @@ Just works!\
 <%= shift->param('name') %> ангел
 
 @@ layouts/layout.html.epl
-% my $self = shift;
-<%= $self->title %><%= $self->content %> with layout
+% my $c = shift;
+<%= $c->title %><%= $c->content %> with layout
 
 @@ autostash.html.ep
-% $self->layout('layout');
+% $c->layout('layout');
 %= $foo
 %= $self->test_helper('bar')
 % my $foo = 42;

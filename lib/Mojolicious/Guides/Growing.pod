@@ -582,7 +582,8 @@ makes sense to split our action code from its routing information.
   $ touch lib/MyApp/Login.pm
   $ chmod 644 lib/MyApp/Login.pm
 
-Once again the actual action code does not change at all.
+Once again the actual action code does not need to change, we just rename
+C<$c> to C<$self> since the controller is now the invocant.
 
   package MyApp::Login;
   use Mojo::Base 'Mojolicious::Controller';

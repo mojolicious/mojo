@@ -10,13 +10,12 @@ use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 use Time::HiRes ();
 
-has accepts         => 1000;
-has accept_interval => 0.025;
+has accepts => 1000;
+has [qw(accept_interval multi_accept)];
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
 has lock_file          => sub { catfile tmpdir, 'prefork.lock' };
 has lock_timeout       => 1;
-has multi_accept       => 50;
 has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
 has workers            => 4;
 
@@ -68,7 +67,7 @@ sub run {
   # Prepare lock file and event loop
   $self->{lock_file} = $self->lock_file . ".$$";
   my $loop = $self->ioloop->max_accepts($self->accepts);
-  $loop->$_($self->$_) for qw(accept_interval multi_accept);
+  $loop->$_($self->$_ // $loop->$_) for qw(accept_interval multi_accept);
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
@@ -388,9 +387,9 @@ and implements the following new ones.
   my $interval = $prefork->accept_interval;
   $prefork     = $prefork->accept_interval(0.5);
 
-Interval in seconds for trying to reacquire the accept mutex, defaults to
-C<0.025>. Note that changing this value can affect performance and idle CPU
-usage.
+Interval in seconds for trying to reacquire the accept mutex, passed along to
+L<Mojo::IOLoop/"accept_interval">. Note that changing this value can affect
+performance and idle CPU usage.
 
 =head2 accepts
 
@@ -398,10 +397,11 @@ usage.
   $prefork    = $prefork->accepts(100);
 
 Maximum number of connections a worker is allowed to accept before stopping
-gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
-to accept new connections indefinitely. Note that up to half of this value can
-be subtracted randomly to improve load balancing, and that worker processes
-will stop sending heartbeat messages once the limit has been reached.
+gracefully, passed along to L<Mojo::IOLoop/"max_accepts">, defaults to
+C<1000>. Setting the value to C<0> will allow workers to accept new
+connections indefinitely. Note that up to half of this value can be subtracted
+randomly to improve load balancing, and that worker processes will stop
+sending heartbeat messages once the limit has been reached.
 
 =head2 graceful_timeout
 
@@ -448,7 +448,8 @@ performance and idle CPU usage.
   my $multi = $prefork->multi_accept;
   $prefork  = $prefork->multi_accept(100);
 
-Number of connections to accept at once, defaults to C<50>.
+Number of connections to accept at once, passed along to
+L<Mojo::IOLoop/"multi_accept">.
 
 =head2 pid_file
 

@@ -243,42 +243,45 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
   accept_interval => 0.5
 
-Interval in seconds for trying to reacquire the accept mutex, defaults to
-C<0.025>. Note that changing this value can affect performance and idle CPU
-usage.
+Interval in seconds for trying to reacquire the accept mutex, defaults to the
+value of L<Mojo::IOLoop/"accept_interval">. Note that changing this value can
+affect performance and idle CPU usage.
 
 =head2 accepts
 
   accepts => 100
 
 Maximum number of connections a worker is allowed to accept before stopping
-gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
-to accept new connections indefinitely. Note that up to half of this value can
-be subtracted randomly to improve load balancing, and that worker processes
-will stop sending heartbeat messages once the limit has been reached.
+gracefully, defaults to the value of L<Mojo::Server::Prefork/"accepts">.
+Setting the value to C<0> will allow workers to accept new connections
+indefinitely. Note that up to half of this value can be subtracted randomly to
+improve load balancing, and that worker processes will stop sending heartbeat
+messages once the limit has been reached.
 
 =head2 backlog
 
   backlog => 128
 
-Listen backlog size, defaults to C<SOMAXCONN>.
+Listen backlog size, defaults to the value of
+L<Mojo::Server::Daemon/"backlog">.
 
 =head2 clients
 
   clients => 100
 
 Maximum number of concurrent client connections per worker process, defaults
-to C<1000>. Note that high concurrency works best with applications that
-perform mostly non-blocking operations, to optimize for blocking operations
-you can decrease this value and increase L</"workers"> instead for better
-performance.
+to the value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency
+works best with applications that perform mostly non-blocking operations, to
+optimize for blocking operations you can decrease this value and increase
+L</"workers"> instead for better performance.
 
 =head2 graceful_timeout
 
   graceful_timeout => 15
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
-being forced, defaults to C<20>.
+being forced, defaults to the value of
+L<Mojo::Server::Prefork/"graceful_timeout">.
 
 =head2 group
 
@@ -290,28 +293,31 @@ Group name for worker processes.
 
   heartbeat_interval => 3
 
-Heartbeat interval in seconds, defaults to C<5>.
+Heartbeat interval in seconds, defaults to the value of
+L<Mojo::Server::Prefork/"heartbeat_interval">.
 
 =head2 heartbeat_timeout
 
   heartbeat_timeout => 2
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped gracefully, defaults to C<20>.
+stopped gracefully, defaults to the value of
+L<Mojo::Server::Prefork/"heartbeat_timeout">.
 
 =head2 inactivity_timeout
 
   inactivity_timeout => 10
 
 Maximum amount of time in seconds a connection can be inactive before getting
-closed, defaults to C<15>. Setting the value to C<0> will allow connections to
-be inactive indefinitely.
+closed, defaults to the value of L<Mojo::Server::Daemon/"inactivity_timeout">.
+Setting the value to C<0> will allow connections to be inactive indefinitely.
 
 =head2 keep_alive_requests
 
   keep_alive_requests => 50
 
-Number of keep-alive requests per connection, defaults to C<25>.
+Number of keep-alive requests per connection, defaults to the value of
+L<Mojo::Server::Daemon/"max_requests">.
 
 =head2 listen
 
@@ -325,21 +331,23 @@ also L<Mojo::Server::Daemon/"listen"> for more examples.
   lock_file => '/tmp/hypnotoad.lock'
 
 Full path of accept mutex lock file prefix, to which the process id will be
-appended, defaults to a random temporary path.
+appended, defaults to the value of L<Mojo::Server::Prefork/"lock_file">.
 
 =head2 lock_timeout
 
   lock_timeout => 0.5
 
 Maximum amount of time in seconds a worker may block when waiting for the
-accept mutex, defaults to C<1>. Note that changing this value can affect
-performance and idle CPU usage.
+accept mutex, defaults to the value of
+L<Mojo::Server::Prefork/"lock_timeout">. Note that changing this value can
+affect performance and idle CPU usage.
 
 =head2 multi_accept
 
   multi_accept => 100
 
-Number of connections to accept at once, defaults to C<50>.
+Number of connections to accept at once, defaults to the value of
+L<Mojo::IOLoop/"multi_accept">.
 
 =head2 pid_file
 
@@ -361,7 +369,7 @@ C<X-Forwarded-Proto> headers to be picked up automatically.
   upgrade_timeout => 45
 
 Maximum amount of time in seconds a zero downtime software upgrade may take
-before getting canceled, defaults to C<60>.
+before getting canceled, defaults to the value of L</"upgrade_timeout">.
 
 =head2 user
 
@@ -373,10 +381,11 @@ Username for worker processes.
 
   workers => 10
 
-Number of worker processes, defaults to C<4>. A good rule of thumb is two
-worker processes per CPU core for applications that perform mostly
-non-blocking operations, blocking operations often require more and benefit
-from decreasing the number of concurrent L</"clients"> (often as low as C<1>).
+Number of worker processes, defaults to the value of
+L<Mojo::Server::Prefork/"workers">. A good rule of thumb is two worker
+processes per CPU core for applications that perform mostly non-blocking
+operations, blocking operations often require more and benefit from decreasing
+the number of concurrent L</"clients"> (often as low as C<1>).
 
 =head1 ATTRIBUTES
 

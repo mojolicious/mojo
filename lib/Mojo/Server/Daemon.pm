@@ -8,12 +8,11 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has acceptors => sub { [] };
-has [qw(backlog silent)];
+has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
-has max_clients   => 1000;
-has max_requests  => 25;
+has max_requests => 25;
 has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };
 
 sub DESTROY {
@@ -41,7 +40,7 @@ sub start {
 
   # Start listening
   else { $self->_listen($_) for @{$self->listen} }
-  $loop->max_connections($self->max_clients);
+  if (my $max = $self->max_clients) { $loop->max_connections($max) }
 
   return $self;
 }
@@ -401,7 +400,8 @@ TLS verification mode, defaults to C<0x03>.
   my $max = $daemon->max_clients;
   $daemon = $daemon->max_clients(1000);
 
-Maximum number of concurrent client connections, defaults to C<1000>.
+Maximum number of concurrent client connections, passed along to
+L<Mojo::IOLoop/"max_connections">.
 
 =head2 max_requests
 

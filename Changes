@@ -1,5 +1,7 @@
 
-5.10  2014-06-25
+5.10  2014-06-27
+  - Fixed small bug where Mojo::Server::Daemon was too eager to reconfigure
+    Mojo::IOLoop.
 
 5.09  2014-06-24
   - Improved .ep templates to make the current controller available as $c.

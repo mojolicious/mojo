@@ -287,7 +287,8 @@ L<Mojo::Server::Prefork/"graceful_timeout">.
 
   group => 'staff'
 
-Group name for worker processes.
+Group name for worker processes, defaults to the value of
+L<Mojo::Server/"group">.
 
 =head2 heartbeat_interval
 
@@ -362,7 +363,8 @@ the server has been stopped.
   proxy => 1
 
 Activate reverse proxy support, which allows for the C<X-Forwarded-For> and
-C<X-Forwarded-Proto> headers to be picked up automatically.
+C<X-Forwarded-Proto> headers to be picked up automatically, defaults to the
+value of L<Mojo::Server::Daemon/"reverse_proxy">.
 
 =head2 upgrade_timeout
 
@@ -375,7 +377,8 @@ before getting canceled, defaults to the value of L</"upgrade_timeout">.
 
   user => 'sri'
 
-Username for worker processes.
+Username for worker processes, defaults to the value of
+L<Mojo::Server/"user">.
 
 =head2 workers
 

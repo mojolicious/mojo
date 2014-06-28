@@ -1,4 +1,6 @@
 
+5.11  2014-06-29
+
 5.10  2014-06-28
   - Added cleanup attribute to Mojo::Server::Prefork.
   - Improved Mojo::Server::Prefork to keep sending heartbeat messages when

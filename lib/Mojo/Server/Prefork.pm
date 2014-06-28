@@ -411,7 +411,7 @@ sending heartbeat messages once the limit has been reached.
   $prefork = $prefork->cleanup($bool);
 
 Delete L</"lock_file"> and L</"pid_file"> automatically once they are not
-needed anymore.
+needed anymore, defaults to a true value.
 
 =head2 graceful_timeout
 

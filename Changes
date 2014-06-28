@@ -1,5 +1,7 @@
 
-5.10  2014-06-27
+5.10  2014-06-28
+  - Improved Mojo::Server::Prefork to keep sending heartbeat messages when
+    stopping gracefully.
   - Fixed small bug where Mojo::Server::Daemon was too eager to reconfigure
     Mojo::IOLoop.
 

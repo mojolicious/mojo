@@ -105,10 +105,13 @@ sub _heartbeat {
   return unless $poll->handles(POLLIN | POLLPRI);
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
-  # Update heartbeats
+  # Update heartbeats (and stop gracefully if necessary)
   my $time = steady_time;
-  $self->{pool}{$1} and $self->emit(heartbeat => $1)->{pool}{$1}{time} = $time
-    while $chunk =~ /(\d+)\n/g;
+  while ($chunk =~ /(\d+):(\d)\n/g) {
+    next unless my $w = $self->{pool}{$1};
+    $self->emit(heartbeat => $1) and $w->{time} = $time;
+    $w->{graceful} ||= $time if $2;
+  }
 }
 
 sub _manage {
@@ -123,34 +126,33 @@ sub _manage {
   # Shutdown
   elsif (!keys %{$self->{pool}}) { return delete $self->{running} }
 
-  # Manage workers
+  # Wait for heartbeats
   $self->emit('wait')->_heartbeat;
-  my $log = $self->app->log;
+
+  my $interval = $self->heartbeat_interval;
+  my $ht       = $self->heartbeat_timeout;
+  my $gt       = $self->graceful_timeout;
+  my $time     = steady_time;
+  my $log      = $self->app->log;
+
   for my $pid (keys %{$self->{pool}}) {
     next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
-    my $interval = $self->heartbeat_interval;
-    my $timeout  = $self->heartbeat_timeout;
-    my $time     = steady_time;
-    if (!$w->{graceful} && ($w->{time} + $interval + $timeout <= $time)) {
-      $log->info("Worker $pid has no heartbeat, restarting.");
-      $w->{graceful} = $time;
-    }
+    $log->error("Worker $pid has no heartbeat, restarting.")
+      and $w->{graceful} = $time
+      if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 
     # Graceful stop with timeout
-    $w->{graceful} ||= $time if $self->{graceful};
-    if ($w->{graceful}) {
-      $log->debug("Trying to stop worker $pid gracefully.");
-      kill 'QUIT', $pid;
-      $w->{force} = 1 if $w->{graceful} + $self->graceful_timeout <= $time;
-    }
+    my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
+    $log->debug("Trying to stop worker $pid gracefully.")
+      and kill 'QUIT', $pid
+      if $graceful && !$w->{quit}++;
+    $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
-    if (($self->{finished} && !$self->{graceful}) || $w->{force}) {
-      $log->debug("Stopping worker $pid.");
-      kill 'KILL', $pid;
-    }
+    $log->debug("Stopping worker $pid.") and kill 'KILL', $pid
+      if $w->{force} || ($self->{finished} && !$graceful);
   }
 }
 
@@ -198,8 +200,8 @@ sub _spawn {
   weaken $self;
   $loop->recurring(
     $self->heartbeat_interval => sub {
-      return unless shift->max_connections;
-      $self->{writer}->syswrite("$$\n") or exit 0;
+      my $graceful = shift->max_connections ? 0 : 1;
+      $self->{writer}->syswrite("$$:$graceful\n") or exit 0;
     }
   );
 

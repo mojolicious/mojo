@@ -209,8 +209,7 @@ be closed immediately.
 As long as they are accepting new connections, worker processes of all
 built-in preforking web servers send heartbeat messages to the manager process
 at regular intervals, to signal that they are still responsive. A blocking
-operation such as an infinite loop in your application (or active connections
-after a worker has stopped accepting new connections) can prevent this, and
+operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_interval"> if your application requires it.

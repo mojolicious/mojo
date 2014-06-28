@@ -60,6 +60,7 @@ Mojo::Reactor - Low-level event reactor base class
   sub one_tick   {...}
   sub recurring  {...}
   sub remove     {...}
+  sub reset      {...}
   sub start      {...}
   sub stop       {...}
   sub timer      {...}

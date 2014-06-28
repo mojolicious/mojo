@@ -37,7 +37,7 @@ sub run {
   my ($self, $app) = @_;
 
   # No Windows support
-  _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
+  $self->_exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
 
   # Remember executable and application for later
   $ENV{HYPNOTOAD_EXE} ||= $0;
@@ -60,7 +60,7 @@ sub run {
   $prefork->on(finish => sub { $self->{finished} = 1 });
 
   # Testing
-  _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
+  $self->_exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
 
   # Stop running server
   $self->_stop if $ENV{HYPNOTOAD_STOP};
@@ -77,7 +77,7 @@ sub run {
   $prefork->run;
 }
 
-sub _exit { say shift and exit 0 }
+sub _exit { shift->prefork->cleanup(0) and say shift and exit 0 }
 
 sub _hot_deploy {
   my $self = shift;
@@ -87,7 +87,7 @@ sub _hot_deploy {
 
   # Start hot deployment
   kill 'USR2', $pid;
-  _exit("Starting hot deployment for Hypnotoad server $pid.");
+  $self->_exit("Starting hot deployment for Hypnotoad server $pid.");
 }
 
 sub _manage {
@@ -127,10 +127,12 @@ sub _reap {
 }
 
 sub _stop {
-  _exit('Hypnotoad server not running.')
-    unless my $pid = shift->prefork->check_pid;
+  my $self = shift;
+
+  $self->_exit('Hypnotoad server not running.')
+    unless my $pid = $self->prefork->check_pid;
   kill 'QUIT', $pid;
-  _exit("Stopping Hypnotoad server $pid gracefully.");
+  $self->_exit("Stopping Hypnotoad server $pid gracefully.");
 }
 
 1;

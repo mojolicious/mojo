@@ -179,7 +179,7 @@ implements the following new ones.
   my $bool = $file->cleanup;
   $file    = $file->cleanup($bool);
 
-Delete file automatically once it's not used anymore.
+Delete L</"path"> automatically once the file is not used anymore.
 
 =head2 handle
 

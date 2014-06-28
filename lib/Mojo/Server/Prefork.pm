@@ -12,10 +12,10 @@ use Time::HiRes ();
 
 has accepts => 1000;
 has [qw(accept_interval multi_accept)];
+has [qw(cleanup lock_timeout)] => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
 has lock_file          => sub { catfile tmpdir, 'prefork.lock' };
-has lock_timeout       => 1;
 has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
 has workers            => 4;
 
@@ -23,7 +23,7 @@ sub DESTROY {
   my $self = shift;
 
   # Worker
-  return if $self->{worker};
+  return unless $self->cleanup;
 
   # Manager
   if (my $file = $self->{lock_file}) { unlink $file if -w $file }
@@ -170,7 +170,7 @@ sub _spawn {
     unless open my $handle, '>', $file;
 
   # Change user/group
-  $self->setuidgid->{worker}++;
+  $self->setuidgid->cleanup(0);
 
   # Accept mutex
   my $loop = $self->ioloop->lock(
@@ -404,6 +404,14 @@ C<1000>. Setting the value to C<0> will allow workers to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
 randomly to improve load balancing, and that worker processes will stop
 sending heartbeat messages once the limit has been reached.
+
+=head2 cleanup
+
+  my $bool = $prefork->cleanup;
+  $prefork = $prefork->cleanup($bool);
+
+Delete L</"lock_file"> and L</"pid_file"> automatically once they are not
+needed anymore.
 
 =head2 graceful_timeout
 

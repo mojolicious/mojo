@@ -186,6 +186,24 @@ sub render_static {
   return !$self->render_not_found;
 }
 
+sub render_steps {
+  my $self = shift;
+
+  $self->render_later->stash->{'mojo.steps'}++;
+  my $delay = Mojo::IOLoop->delay(@_);
+  my $tx    = $self->tx;
+  $delay->on(
+    finish => sub {
+      --$self->stash->{'mojo.steps'}
+        or $self->res->code
+        or $self->render_maybe
+        or $self->render_not_found;
+      undef $tx;
+    }
+  );
+  $delay->catch(sub { $self->render_exception(pop) })->wait;
+}
+
 sub render_to_string { shift->render(@_, 'mojo.to_string' => 1) }
 
 sub rendered {
@@ -731,6 +749,41 @@ templates.
 Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
 method does not protect from traversing to parent directories.
+
+=head2 render_steps
+
+  $c->render_steps(sub {...}, sub {...});
+
+Disable automatic rendering and use L<Mojo::IOLoop/"delay"> to manage
+callbacks and control the flow of events, which can help you avoid deep nested
+closures that often result from continuation-passing style. Perform automatic
+rendering once there are no remaining steps or call L</"render_exception"> if
+an error occured in one of the steps, breaking the chain.
+
+  # Longer version
+  $c->render_later;
+  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...});
+  $delay->on(error  => sub { $c->render_exception(pop) });
+  $delay->on(finish => sub {
+    $c->res->code or $c->render_maybe or $c->render_not_found;
+  });
+  $delay->wait;
+
+  # Render response in two steps
+  $c->render_steps(
+    sub {
+      my $delay = shift;
+      $c->ua->get('mojolicio.us'         => $delay->begin);
+      $c->ua->get('mojolicio.us/perldoc' => $delay->begin);
+    },
+    sub {
+      my ($delay, $root, $perldoc) = @_;
+      $c->render(json => {
+        root    => $root->res->code,
+        perldoc => $perdoc->res->code
+      });
+    }
+  );
 
 =head2 render_to_string
 

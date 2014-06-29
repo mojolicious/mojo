@@ -1,5 +1,6 @@
 
-5.11  2014-06-29
+5.11  2014-06-30
+  - Added render_steps method to Mojolicious::Controller.
   - Improved error method in Mojolicious::Validator::Validation to return
     field names when called without arguments.
 

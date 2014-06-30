@@ -130,8 +130,8 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Delay> manages callbacks and controls the flow of events for
-L<Mojo::IOLoop>, which can help you avoid deep nested closures that often
-result from continuation-passing style.
+L<Mojo::IOLoop>, which can help you avoid deep nested closures and memory
+leaks that often result from continuation-passing style.
 
 =head1 EVENTS
 

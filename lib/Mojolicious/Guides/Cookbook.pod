@@ -393,8 +393,9 @@ latency backend web services.
   </html>
 
 Multiple events such as concurrent requests can be easily synchronized with
-L<Mojo::IOLoop/"delay">, which can help you avoid deep nested closures that
-often result from continuation-passing style.
+L<Mojolicious::Controller/"render_steps">, which can help you avoid deep
+nested closures and memory leaks that often result from continuation-passing
+style.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -405,7 +406,7 @@ often result from continuation-passing style.
     my $c = shift;
 
     # Prepare response in two steps
-    my $delay = Mojo::IOLoop->delay(
+    $c->render_steps(
 
       # Concurrent requests
       sub {
@@ -425,9 +426,6 @@ often result from continuation-passing style.
         });
       }
     );
-
-    # Handle exceptions in steps
-    $delay->catch(sub { $c->render_exception(pop) });
   };
 
   app->start;

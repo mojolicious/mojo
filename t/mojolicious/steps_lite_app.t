@@ -38,6 +38,20 @@ get '/nested' => sub {
   );
 };
 
+my $early;
+get '/early' => sub {
+  my $c = shift;
+  $c->render_steps(
+    sub { Mojo::IOLoop->next_tick(shift->begin) },
+    sub {
+      Mojo::IOLoop->next_tick(shift->begin);
+      $c->render(text => 'second');
+      $c->res->headers->header('X-Next' => 'third');
+    },
+    sub { $early = $c->res->headers->header('X-Next') }
+  );
+};
+
 get '/not_found' => sub {
   my $c = shift;
   $c->render_steps(
@@ -71,6 +85,11 @@ $t->get_ok('/steps?auto=1')->status_is(200)
 
 # Nested steps
 $t->get_ok('/nested')->status_is(200)->content_is('action');
+
+# Transaction is available after rendering early
+$t->get_ok('/early')->status_is(200)->content_is('second');
+Mojo::IOLoop->one_tick until $early;
+is $early, 'third', 'right result';
 
 # Template not found
 $t->get_ok('/not_found')->status_is(404);

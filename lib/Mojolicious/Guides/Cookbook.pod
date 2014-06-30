@@ -405,7 +405,7 @@ often result from continuation-passing style.
     my $c = shift;
 
     # Prepare response in two steps
-    Mojo::IOLoop->delay(
+    my $delay = Mojo::IOLoop->delay(
 
       # Concurrent requests
       sub {
@@ -425,6 +425,9 @@ often result from continuation-passing style.
         });
       }
     );
+
+    # Handle exceptions in steps and start event loop if necessary
+    $delay->catch(sub { $c->render_exception(pop) })->wait;
   };
 
   app->start;

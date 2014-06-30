@@ -426,8 +426,8 @@ often result from continuation-passing style.
       }
     );
 
-    # Handle exceptions in steps and start event loop if necessary
-    $delay->catch(sub { $c->render_exception(pop) })->wait;
+    # Handle exceptions in steps
+    $delay->catch(sub { $c->render_exception(pop) });
   };
 
   app->start;

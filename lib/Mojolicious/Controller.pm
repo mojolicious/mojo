@@ -189,15 +189,11 @@ sub render_static {
 sub render_steps {
   my $self = shift;
 
-  $self->render_later->stash->{'mojo.steps'}++;
   my $delay = Mojo::IOLoop->delay(@_);
-  my $tx    = $self->tx;
+  my $tx    = $self->render_later->tx;
   $delay->on(
     finish => sub {
-      --$self->stash->{'mojo.steps'}
-        or $self->res->code
-        or $self->render_maybe
-        or $self->render_not_found;
+      $self->res->code or $self->render_maybe or $self->render_not_found;
       undef $tx;
     }
   );

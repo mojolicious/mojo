@@ -10,14 +10,9 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 helper steps => sub {
-  my ($c, $cb) = @_;
-  $c->render_steps(
-    sub { Mojo::IOLoop->next_tick(shift->begin) },
-    sub {
-      $c->stash(text => 'helper', steps => 'action');
-      Mojo::IOLoop->next_tick($cb);
-    }
-  );
+  my $c = shift;
+  $c->render_steps(sub { Mojo::IOLoop->next_tick(shift->begin) },
+    sub { $c->stash(text => 'helper') });
 };
 
 get '/steps' => sub {
@@ -29,14 +24,7 @@ get '/steps' => sub {
   );
 };
 
-get '/nested' => sub {
-  my $c = shift;
-  $c->render_steps(
-    sub { Mojo::IOLoop->next_tick(shift->begin) },
-    sub { $c->steps(shift->begin) },
-    sub { $c->stash(text => $c->stash('steps')) }
-  );
-};
+get '/helper' => sub { shift->steps };
 
 my $early;
 get '/early' => sub {
@@ -73,7 +61,7 @@ my $t = Test::Mojo->new;
 
 # Event loop is automatically started
 my $c = app->build_controller;
-$c->steps(sub { });
+$c->steps;
 is $c->res->body, 'helper', 'right content';
 
 # Three steps with manual rendering
@@ -83,8 +71,8 @@ $t->get_ok('/steps')->status_is(200)->content_is('three steps');
 $t->get_ok('/steps?auto=1')->status_is(200)
   ->content_is("three steps (template)\n");
 
-# Nested steps
-$t->get_ok('/nested')->status_is(200)->content_is('action');
+# Steps in helper
+$t->get_ok('/helper')->status_is(200)->content_is('helper');
 
 # Transaction is available after rendering early
 $t->get_ok('/early')->status_is(200)->content_is('second');

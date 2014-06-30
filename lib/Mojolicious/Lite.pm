@@ -876,7 +876,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
   # Concurrent non-blocking
   get '/titles' => sub {
     my $c = shift;
-    $c->render_steps(
+    Mojo::IOLoop->delay(
       sub {
         my $delay = shift;
         $c->ua->get('http://mojolicio.us'  => $delay->begin);

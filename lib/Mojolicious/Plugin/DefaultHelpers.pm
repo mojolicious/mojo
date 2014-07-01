@@ -224,7 +224,7 @@ Check or get name of current route.
 Disable automatic rendering and use L<Mojo::IOLoop/"delay"> to manage
 callbacks and control the flow of events, which can help you avoid deep nested
 closures and memory leaks that often result from continuation-passing style.
-Call L<Mojolicious::Controller/"render_exception"> if an error occured in one
+Calls L<Mojolicious::Controller/"render_exception"> if an error occured in one
 of the steps, breaking the chain.
 
   # Longer version

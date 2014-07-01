@@ -130,20 +130,6 @@ L<Mojo::UserAgent> object.
   # Perform blocking request
   say $app->ua->get('example.com')->res->body;
 
-  # Perform concurrent non-blocking requests
-  Mojo::IOLoop->delay(
-    sub {
-      my $delay = shift;
-      $app->ua->get('http://example.com'  => $delay->begin);
-      $app->ua->get('https://example.com' => $delay->begin);
-    },
-    sub {
-      my ($delay, $first, $second) = @_;
-      say $first->res->body;
-      say $second->res->body;
-    }
-  )->wait;
-
 =head1 METHODS
 
 L<Mojo> inherits all methods from L<Mojo::Base> and implements the following

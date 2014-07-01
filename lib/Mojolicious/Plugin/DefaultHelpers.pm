@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 use Mojo::Collection;
+use Mojo::IOLoop;
 use Mojo::Util qw(dumper sha1_sum steady_time);
 
 sub register {
@@ -34,6 +35,7 @@ sub register {
   $app->helper(content_for   => \&_content_for);
   $app->helper(csrf_token    => \&_csrf_token);
   $app->helper(current_route => \&_current_route);
+  $app->helper(delay         => \&_delay);
   $app->helper(dumper        => sub { shift; dumper(@_) });
   $app->helper(include => sub { shift->render_to_string(@_) });
   $app->helper(ua      => sub { shift->app->ua });
@@ -75,6 +77,13 @@ sub _current_route {
   return '' unless my $endpoint = shift->match->endpoint;
   return $endpoint->name unless @_;
   return $endpoint->name eq shift;
+}
+
+sub _delay {
+  my $self  = shift;
+  my $delay = Mojo::IOLoop->delay(@_);
+  my $tx    = $self->render_later->tx;
+  $delay->catch(sub { $self->render_exception(pop) and undef $tx })->wait;
 }
 
 sub _url_with {
@@ -207,6 +216,21 @@ Get CSRF token from L</"session">, and generate one if none exists.
   %= current_route
 
 Check or get name of current route.
+
+=head2 delay
+
+  $c->delay(sub {...}, sub {...});
+
+Disable automatic rendering and use L<Mojo::IOLoop/"delay"> to manage
+callbacks and control the flow of events, which can help you avoid deep nested
+closures and memory leaks that often result from continuation-passing style.
+Call L<Mojolicious::Controller/"render_exception"> if an error occured in one
+of the steps, breaking the chain.
+
+  # Longer version
+  $c->render_later;
+  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...});
+  $delay->catch(sub { $c->render_exception(pop) })->wait;
 
 =head2 dumper
 

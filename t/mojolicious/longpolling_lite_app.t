@@ -222,6 +222,22 @@ get '/too_long' => sub {
   Mojo::IOLoop->timer(5 => sub { $c->write('dy plain!') });
 };
 
+my $steps;
+helper steps => sub {
+  my $c = shift;
+  $c->delay(
+    sub { Mojo::IOLoop->next_tick(shift->begin) },
+    sub {
+      Mojo::IOLoop->next_tick(shift->begin);
+      $c->param('die') ? die 'intentional' : $c->render(text => 'second');
+      $c->res->headers->header('X-Next' => 'third');
+    },
+    sub { $steps = $c->res->headers->header('X-Next') }
+  );
+};
+
+get '/steps' => sub { shift->steps };
+
 my $t = Test::Mojo->new;
 
 # Stream without delay and finish
@@ -438,6 +454,19 @@ $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
 is $tx->error->{message}, 'Inactivity timeout', 'right error';
 is $buffer, 'how', 'right content';
+
+# Transaction is available after rendering early in steps
+$t->get_ok('/steps')->status_is(200)->content_is('second');
+Mojo::IOLoop->one_tick until $steps;
+is $steps, 'third', 'right result';
+
+# Event loop is automatically started for steps
+my $c = app->build_controller;
+$c->steps;
+is $c->res->body, 'second', 'right content';
+
+# Exception in step
+$t->get_ok('/steps?die=1')->status_is(500)->content_like(qr/intentional/);
 
 done_testing();
 

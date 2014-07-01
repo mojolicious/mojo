@@ -605,7 +605,7 @@ Opposite of L</"content_type_like">.
 
 =head2 csrf_token
 
-  $token = $t->csrf_token;
+  my $token = $t->csrf_token;
 
 Returns valid L<Mojolicious::Controller/"csrf_token">
 
@@ -907,7 +907,7 @@ Send message or frame via WebSocket.
 =head2 session
 
   $t = $t->session(user => 'Cartman');
-  $session = $t->session('user');
+  my $session = $t->session('user');
 
 Stores or retrieves L<Mojolicious::Controller/"session">.
 

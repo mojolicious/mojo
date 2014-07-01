@@ -1,18 +1,26 @@
 use Mojo::Base -strict;
-use Test::More;
-use Test::Mojo;
-use Mojolicious::Lite;
 
+BEGIN {
+  $ENV{MOJO_MODE}    = 'testing';
+  $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
+}
+
+use Test::More;
+use Mojolicious::Lite;
+use Test::Mojo;
+
+# Custom secret
+app->secrets(['very secr3t!']);
 
 get '/csrf_token' => sub {
   my $c = shift;
   $c->render(text => $c->csrf_token);
 };
 
-
 post '/session' => sub {
   my $c = shift;
-  $c->session('foo' => $c->param('foo'));
+  $c->session('foo' => 'Bender');
   $c->render(text => 'ok');
 };
 
@@ -21,7 +29,7 @@ get '/session' => sub {
   $c->render(text => $c->session('foo'));
 };
 
-post '/private' => sub {
+get '/private' => sub {
   my $c = shift;
 
   return $c->render(text => 'access denied', status => 401)
@@ -38,15 +46,17 @@ my $t = Test::Mojo->new;
 # Session
 is $t->session('foo' => 'bar')->session('foo'), 'bar';
 $t->get_ok('/session')->content_is('bar');
-is $t->post_ok('/session' => form => {foo => 'Bender'})->session('foo'),
-  'Bender';
+is $t->post_ok('/session')->session('foo'), 'Bender';
 
 # csrf_token
 $t->get_ok('/csrf_token')->content_is($t->csrf_token);
 
 # real world test
-$t->post_ok('/private')->status_is('401');
-$t->session(user => 'Cartman')->post_ok('/private')->status_is('403');
-$t->post_ok('/private?csrf_token=' . $t->csrf_token)->status_is('200');
+$t->get_ok('/private')
+  ->status_is('401', 'Right statusi (authorization needed)');
+$t->session(user => 'Cartman')->get_ok('/private')
+  ->status_is('403', 'Right status (missing csrf_token)');
+$t->get_ok('/private?csrf_token=' . $t->csrf_token)
+  ->status_is('200', 'Right status');
 
 done_testing;

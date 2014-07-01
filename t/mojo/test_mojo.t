@@ -44,18 +44,24 @@ get '/private' => sub {
 my $t = Test::Mojo->new;
 
 # Session
-is $t->session('foo' => 'bar')->session('foo'), 'bar';
-$t->get_ok('/session')->content_is('bar');
-is $t->post_ok('/session')->session('foo'), 'Bender';
+is $t->session('foo' => 'bar')->session('foo'), 'bar', 'Right session value';
+$t->get_ok('/session')
+  ->content_is('bar', 'Right session available in controller');
+is $t->post_ok('/session')->session('foo'), 'Bender',
+  'Session is changed right way by application';
 
 # csrf_token
 $t->get_ok('/csrf_token')->content_is($t->csrf_token);
 
-# real world test
+# missing session
 $t->get_ok('/private')
-  ->status_is('401', 'Right statusi (authorization needed)');
+  ->status_is('401', 'Right status 401 (authorization needed)');
+
+# session is ok, but csrf_token is missing
 $t->session(user => 'Cartman')->get_ok('/private')
-  ->status_is('403', 'Right status (missing csrf_token)');
+  ->status_is('403', 'Right status 403 (missing csrf_token)');
+
+# all fine
 $t->get_ok('/private?csrf_token=' . $t->csrf_token)
   ->status_is('200', 'Right status');
 

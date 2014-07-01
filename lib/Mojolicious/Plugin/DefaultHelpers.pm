@@ -27,19 +27,15 @@ sub register {
     );
   }
 
-  $app->helper(accepts => \&_accepts);
-  $app->helper(b       => sub { shift; Mojo::ByteStream->new(@_) });
-  $app->helper(c       => sub { shift; Mojo::Collection->new(@_) });
-  $app->helper(config => sub { shift->app->config(@_) });
-  $app->helper(content       => \&_content);
-  $app->helper(content_for   => \&_content_for);
-  $app->helper(csrf_token    => \&_csrf_token);
-  $app->helper(current_route => \&_current_route);
-  $app->helper(delay         => \&_delay);
-  $app->helper(dumper        => sub { shift; dumper(@_) });
+  $app->helper($_ => $self->can("_$_"))
+    for qw(accepts content content_for csrf_token current_route delay),
+    qw(url_with);
+  $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
+  $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
+  $app->helper(config  => sub { shift->app->config(@_) });
+  $app->helper(dumper  => sub { shift; dumper(@_) });
   $app->helper(include => sub { shift->render_to_string(@_) });
   $app->helper(ua      => sub { shift->app->ua });
-  $app->helper(url_with => \&_url_with);
 }
 
 sub _accepts {

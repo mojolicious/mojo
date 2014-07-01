@@ -81,8 +81,8 @@ sub _current_route {
 
 sub _delay {
   my $self  = shift;
-  my $delay = Mojo::IOLoop->delay(@_);
   my $tx    = $self->render_later->tx;
+  my $delay = Mojo::IOLoop->delay(@_);
   $delay->catch(sub { $self->render_exception(pop) and undef $tx })->wait;
 }
 

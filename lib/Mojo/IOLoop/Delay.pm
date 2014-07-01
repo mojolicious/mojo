@@ -259,12 +259,6 @@ not increment the active event counter or an error occurs in a callback.
 Start L</"ioloop"> and stop it again once an L</"error"> or L</"finish"> event
 gets emitted, does nothing when L</"ioloop"> is already running.
 
-  # Use a single step to synchronize portably
-  $delay->steps(sub {
-    my ($delay, @args) = @_;
-    ...
-  })->wait;
-
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

@@ -1,5 +1,5 @@
 
-5.11  2014-06-30
+5.11  2014-07-01
   - Improved error method in Mojolicious::Validator::Validation to return
     field names when called without arguments.
 

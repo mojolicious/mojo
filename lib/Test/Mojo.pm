@@ -81,6 +81,15 @@ sub content_type_unlike {
     $regex, $desc);
 }
 
+sub csrf_token {
+  my $self       = shift;
+  my $c          = _build_controller($self->ua);
+  my $csrf_token = $c->csrf_token;
+
+  _inject_sessions($self->ua, $c);
+  return $csrf_token;
+}
+
 sub delete_ok { shift->_build_ok(DELETE => @_) }
 
 sub element_exists {
@@ -238,6 +247,15 @@ sub send_ok {
   return $self->_test('ok', 1, $desc || 'send message');
 }
 
+sub session {
+  my $self = shift;
+  my $c    = _build_controller($self->ua);
+  $c->session(@_);
+
+  _inject_sessions($self->ua, $c);
+  return @_ == 1 ? $c->session($_[0]) : $self;
+}
+
 sub status_is {
   my ($self, $status, $desc) = @_;
   $desc ||= "$status " . $self->tx->res->new(code => $status)->default_message;
@@ -280,10 +298,32 @@ sub websocket_ok {
   return $self->_request_ok($self->ua->build_websocket_tx(@_), $_[0]);
 }
 
+sub _build_controller {
+  my $ua = shift;
+
+  my $tx = Mojo::Transaction::HTTP->new();
+  $tx->req->url($ua->server->url);
+  $ua->cookie_jar->inject($tx);
+
+  my $app = $ua->server->app;
+  my $c   = $app->build_controller($tx);
+  $ua->server->app->sessions->load($c);
+
+  return $c;
+}
+
 sub _build_ok {
   my ($self, $method, $url) = (shift, shift, shift);
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   return $self->_request_ok($self->ua->build_tx($method, $url, @_), $url);
+}
+
+sub _inject_sessions {
+  my ($ua, $c) = @_;
+  $ua->server->app->sessions->store($c);
+
+  my @cookies = map { $_->origin($ua->server->url->host) } @{$c->res->cookies};
+  $ua->cookie_jar->add(@cookies);
 }
 
 sub _json {
@@ -561,6 +601,12 @@ Check response C<Content-Type> header for similar match.
   $t = $t->content_type_unlike(qr/text/, 'different content type');
 
 Opposite of L</"content_type_like">.
+
+=head2 csrf_token
+
+  $token = $t->csrf_token;
+
+Returns valid L<Mojolicious::Controller/"csrf_token">
 
 =head2 delete_ok
 
@@ -856,6 +902,13 @@ Send message or frame via WebSocket.
     ->message_ok
     ->json_message_is('/test' => 'I ♥ Mojolicious!')
     ->finish_ok;
+
+=head2 session
+
+  $t = $t->session(user => 'Cartman');
+  $session = $t->session('user');
+
+Stores or retrieves L<Mojolicious::Controller/"session">.
 
 =head2 status_is
 

@@ -322,7 +322,8 @@ sub _inject_sessions {
   my ($ua, $c) = @_;
   $ua->server->app->sessions->store($c);
 
-  my @cookies = map { $_->origin($ua->server->url->host) } @{$c->res->cookies};
+  my @cookies
+    = map { $_->origin($ua->server->url->ihost) } @{$c->res->cookies};
   $ua->cookie_jar->add(@cookies);
 }
 

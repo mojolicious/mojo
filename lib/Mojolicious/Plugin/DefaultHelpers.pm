@@ -125,8 +125,8 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
 
 =head2 accepts
 
-  %= accepts->[0] // 'html'
-  %= accepts('html', 'json', 'txt') // 'html'
+  my $formats = $c->accepts;
+  my $format  = $c->accepts('html', 'json', 'txt');
 
 Select best possible representation for resource from C<Accept> request
 header, C<format> stash value or C<format> C<GET>/C<POST> parameter with

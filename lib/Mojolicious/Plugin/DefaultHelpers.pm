@@ -257,8 +257,8 @@ Alias for L<Mojolicious::Controller/"flash">.
 
   $c->inactivity_timeout(3600);
 
-Use L<Mojo::IOLoop::Stream/"timeout"> to increase connection timeout if
-possible.
+Use L<Mojo::IOLoop/"stream"> to find the current connection and increase
+timeout if possible.
 
   # Longer version
   Mojo::IOLoop->stream($c->tx->connection)->timeout(3600);

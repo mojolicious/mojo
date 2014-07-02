@@ -518,7 +518,6 @@ L<Mojolicious::Controller/"on"> and return them with
 L<Mojolicious::Controller/"send">.
 
   use Mojolicious::Lite;
-  use Mojo::IOLoop;
 
   # Template with browser-side code
   get '/' => 'index';
@@ -531,7 +530,7 @@ L<Mojolicious::Controller/"send">.
     $c->app->log->debug('WebSocket opened.');
 
     # Increase inactivity timeout for connection a bit
-    Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
+    $c->inactivity_timeout(300);
 
     # Incoming message
     $c->on(message => sub {
@@ -619,7 +618,6 @@ for sending data from clients to servers, the advantage however is low
 infrastructure requirements, since it reuses the HTTP protocol for transport.
 
   use Mojolicious::Lite;
-  use Mojo::IOLoop;
 
   # Template with browser-side code
   get '/' => 'index';
@@ -629,7 +627,7 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     my $c = shift;
 
     # Increase inactivity timeout for connection a bit
-    Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
+    $c->inactivity_timeout(300);
 
     # Change content type
     $c->res->headers->content_type('text/event-stream');

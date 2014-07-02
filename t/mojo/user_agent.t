@@ -21,7 +21,7 @@ get '/' => {text => 'works!'};
 my $timeout = undef;
 get '/timeout' => sub {
   my $c = shift;
-  Mojo::IOLoop->stream($c->tx->connection)->timeout($c->param('timeout'));
+  $c->inactivity_timeout($c->param('timeout'));
   $c->on(finish => sub { $timeout = 1 });
 };
 

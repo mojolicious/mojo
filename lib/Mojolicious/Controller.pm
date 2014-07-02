@@ -849,10 +849,11 @@ status.
   });
 
 For mostly idle WebSockets you might also want to increase the inactivity
-timeout, which usually defaults to C<15> seconds.
+timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">,
+which usually defaults to C<15> seconds.
 
   # Increase inactivity timeout for connection to 300 seconds
-  Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
+  $c->inactivity_timeout(300);
 
 =head2 session
 
@@ -979,10 +980,11 @@ invoked once all data has been written.
   });
 
 For Comet (long polling) you might also want to increase the inactivity
-timeout, which usually defaults to C<15> seconds.
+timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">,
+which usually defaults to C<15> seconds.
 
   # Increase inactivity timeout for connection to 300 seconds
-  Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
+  $c->inactivity_timeout(300);
 
 =head2 write_chunk
 

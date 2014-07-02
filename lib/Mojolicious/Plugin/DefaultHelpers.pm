@@ -29,7 +29,7 @@ sub register {
 
   $app->helper($_ => $self->can("_$_"))
     for qw(accepts content content_for csrf_token current_route delay),
-    qw(url_with);
+    qw(inactivity_timeout url_with);
   $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
   $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
   $app->helper(config  => sub { shift->app->config(@_) });
@@ -80,6 +80,11 @@ sub _delay {
   my $tx    = $self->render_later->tx;
   my $delay = Mojo::IOLoop->delay(@_);
   $delay->catch(sub { $self->render_exception(pop) and undef $tx })->wait;
+}
+
+sub _inactivity_timeout {
+  return unless my $stream = Mojo::IOLoop->stream(shift->tx->connection // '');
+  $stream->timeout(shift);
 }
 
 sub _url_with {
@@ -247,6 +252,16 @@ L</"stash">.
   %= flash 'foo'
 
 Alias for L<Mojolicious::Controller/"flash">.
+
+=head2 inactivity_timeout
+
+  $c->inactivity_timeout(3600);
+
+Use L<Mojo::IOLoop::Stream/"timeout"> to increase connection timeout if
+possible.
+
+  # Longer version
+  Mojo::IOLoop->stream($c->tx->connection)->timeout(3600);
 
 =head2 include
 

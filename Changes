@@ -1,6 +1,7 @@
 
-5.11  2014-07-01
-  - Added delay helper to Mojolicious::Plugin::DefaultHelpers.
+5.11  2014-07-02
+  - Added delay and inactivity_timeout helpers to
+    Mojolicious::Plugin::DefaultHelpers.
   - Improved error method in Mojolicious::Validator::Validation to return
     field names when called without arguments.
 

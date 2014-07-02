@@ -126,7 +126,7 @@ websocket '/close' => sub {
 
 websocket '/timeout' => sub {
   my $c = shift;
-  Mojo::IOLoop->stream($c->tx->connection)->timeout(0.25);
+  $c->inactivity_timeout(0.25);
   $c->on(finish => sub { shift->stash->{finished}++ });
 };
 

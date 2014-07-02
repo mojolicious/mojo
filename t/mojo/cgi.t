@@ -29,6 +29,7 @@ post '/chunked' => sub {
 
 get '/params' => sub {
   my $c = shift;
+  $c->inactivity_timeout(60);
   $c->render(json => $c->req->params->to_hash);
 };
 

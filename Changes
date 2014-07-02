@@ -4,6 +4,7 @@
     Mojolicious::Plugin::DefaultHelpers.
   - Improved error method in Mojolicious::Validator::Validation to return
     field names when called without arguments.
+  - Fixed "0" value bug in Mojo::UserAgent::Transactor.
 
 5.10  2014-06-28
   - Added cleanup attribute to Mojo::Server::Prefork.

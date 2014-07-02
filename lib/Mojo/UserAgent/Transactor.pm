@@ -208,7 +208,7 @@ sub _multipart {
         if (my $file = delete $value->{file}) {
           $file = Mojo::Asset::File->new(path => $file) unless ref $file;
           $part->asset($file);
-          $value->{filename} ||= basename $file->path
+          $value->{filename} //= basename $file->path
             if $file->isa('Mojo::Asset::File');
         }
 
@@ -218,7 +218,7 @@ sub _multipart {
         }
 
         # Filename and headers
-        $filename = delete $value->{filename} || $name;
+        $filename = delete $value->{filename} // $name;
         $filename = encode $charset, $filename if $charset;
         $headers->from_hash($value);
       }
@@ -232,7 +232,7 @@ sub _multipart {
       # Content-Disposition
       $name = encode $charset, $name if $charset;
       my $disposition = qq{form-data; name="$name"};
-      $disposition .= qq{; filename="$filename"} if $filename;
+      $disposition .= qq{; filename="$filename"} if defined $filename;
       $headers->content_disposition($disposition);
     }
   }

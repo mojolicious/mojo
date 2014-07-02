@@ -249,22 +249,22 @@ ok !$tx->req->content->parts->[0]->asset->is_file,      'stored in memory';
 ok !$tx->req->content->parts->[0]->asset->auto_upgrade, 'no upgrade';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
-# Multipart form with filename
+# Multipart form with filename ("0")
 $tx = $t->tx(POST => 'http://example.com/foo' => form =>
-    {myzip => {content => 'whatever', filename => 'foo.zip'}});
+    {0 => {content => 'whatever', filename => '0'}});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/foo\.zip/, 'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/0/,
+  'right "Content-Disposition" value';
 ok !$tx->req->content->parts->[0]->headers->header('filename'),
   'no "filename" header';
 is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
-is $tx->req->upload('myzip')->filename, 'foo.zip',  'right filename';
-is $tx->req->upload('myzip')->size,     8,          'right size';
-is $tx->req->upload('myzip')->slurp,    'whatever', 'right content';
+is $tx->req->upload('0')->filename, '0',        'right filename';
+is $tx->req->upload('0')->size,     8,          'right size';
+is $tx->req->upload('0')->slurp,    'whatever', 'right content';
 
 # Multipart form with asset and filename (UTF-8)
 my $snowman = encode 'UTF-8', '☃';

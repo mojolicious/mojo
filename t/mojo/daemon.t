@@ -38,6 +38,13 @@ use Mojolicious;
   );
 }
 
+# Reverse proxy
+{
+  ok !Mojo::Server::Daemon->new->reverse_proxy, 'no reverse proxy';
+  local $ENV{MOJO_REVERSE_PROXY} = 25;
+  ok !!Mojo::Server::Daemon->new->reverse_proxy, 'reverse proxy';
+}
+
 # Optional home detection
 my @path = qw(th is mojo dir wil l never-ever exist);
 my $app = Mojo->new(home => Mojo::Home->new(catdir @path));

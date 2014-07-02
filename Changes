@@ -1,5 +1,6 @@
 
 5.11  2014-07-02
+  - Moved reverse_proxy attribute from Mojo::Server::Daemon to Mojo::Server.
   - Added delay and inactivity_timeout helpers to
     Mojolicious::Plugin::DefaultHelpers.
   - Improved error method in Mojolicious::Validator::Validation to return

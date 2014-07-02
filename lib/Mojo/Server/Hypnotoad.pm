@@ -362,7 +362,7 @@ the server has been stopped.
 
 Activate reverse proxy support, which allows for the C<X-Forwarded-For> and
 C<X-Forwarded-Proto> headers to be picked up automatically, defaults to the
-value of L<Mojo::Server::Daemon/"reverse_proxy">.
+value of L<Mojo::Server/"reverse_proxy">.
 
 =head2 upgrade_timeout
 

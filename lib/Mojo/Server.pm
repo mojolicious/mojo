@@ -9,6 +9,7 @@ use Scalar::Util 'blessed';
 
 has app => sub { shift->build_app('Mojo::HelloWorld') };
 has [qw(group user)];
+has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };
 
 sub build_app {
   my ($self, $app) = @_;
@@ -17,7 +18,12 @@ sub build_app {
   die ref $e ? $e : qq{Couldn't find application class "$app".\n};
 }
 
-sub build_tx { shift->app->build_tx }
+sub build_tx {
+  my $self = shift;
+  my $tx   = $self->app->build_tx;
+  $tx->req->reverse_proxy(1) if $self->reverse_proxy;
+  return $tx;
+}
 
 sub daemonize {
 
@@ -158,6 +164,14 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
   $server   = $server->group('users');
 
 Group for server process.
+
+=head2 reverse_proxy
+
+  my $bool = $server->reverse_proxy;
+  $server  = $server->reverse_proxy($bool);
+
+This server operates behind a reverse proxy, defaults to the value of the
+C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 user
 

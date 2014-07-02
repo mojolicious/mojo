@@ -107,6 +107,10 @@ See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 L<Mojo::Server::PSGI> inherits all events from L<Mojo::Server>.
 
+=head1 ATTRIBUTES
+
+L<Mojo::Server::PSGI> inherits all attributes from L<Mojo::Server>.
+
 =head1 METHODS
 
 L<Mojo::Server::PSGI> inherits all methods from L<Mojo::Server> and implements

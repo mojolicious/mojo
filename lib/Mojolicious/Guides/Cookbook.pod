@@ -1054,6 +1054,9 @@ synchronize multiple non-blocking requests.
   $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
   $delay->wait;
 
+The call to L<Mojo::IOLoop::Delay/"wait"> makes this code portable, it can now
+work inside an already running event loop or start one on demand.
+
 =head2 WebSockets
 
 WebSockets are not just for the server-side, you can use

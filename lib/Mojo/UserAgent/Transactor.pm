@@ -230,7 +230,8 @@ sub _multipart {
       }
 
       # Content-Disposition
-      $name = url_escape $charset ? encode($charset, $name) : $name, '"';
+      $name = url_escape $name, '"';
+      $name = encode $charset, $name if $charset;
       my $disposition = qq{form-data; name="$name"};
       $disposition .= qq{; filename="$filename"} if defined $filename;
       $headers->content_disposition($disposition);

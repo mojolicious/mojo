@@ -15,13 +15,9 @@ our @EXPORT_OK = ('c');
 
 sub AUTOLOAD {
   my $self = shift;
-
   my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
-
-  croak qq{Can't locate object method "$method" via package "$package"}
-    unless @$self;
   return $self->pluck($method, @_);
 }
 

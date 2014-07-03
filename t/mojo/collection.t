@@ -152,10 +152,6 @@ is_deeply [$collection->uniq->reverse->uniq->each], [5, 4, 3, 2, 1],
   'right result';
 
 # Missing method and function (AUTOLOAD)
-eval { Mojo::Collection->new->missing };
-like $@,
-  qr/^Can't locate object method "missing" via package "Mojo::Collection"/,
-  'right error';
 eval { Mojo::Collection->new(b('whatever'))->missing };
 like $@,
   qr/^Can't locate object method "missing" via package "Mojo::ByteStream"/,

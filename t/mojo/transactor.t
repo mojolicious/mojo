@@ -270,9 +270,9 @@ is $tx->req->upload('0')->slurp,    'whatever', 'right content';
 my $snowman = encode 'UTF-8', '☃';
 $tx = $t->tx(
   POST => 'http://example.com/foo' => form => {
-    '☃' => {
+    '"☃"' => {
       file     => Mojo::Asset::Memory->new->add_chunk('snowman'),
-      filename => '☃.jpg'
+      filename => '"☃".jpg'
     }
   } => charset => 'UTF-8'
 );
@@ -284,9 +284,9 @@ like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/$snowman/, 'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'snowman', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
-is $tx->req->upload('☃')->filename, '☃.jpg', 'right filename';
-is $tx->req->upload('☃')->size,     7,         'right size';
-is $tx->req->upload('☃')->slurp,    'snowman', 'right content';
+is $tx->req->upload('%22☃%22')->filename, '%22☃%22.jpg', 'right filename';
+is $tx->req->upload('%22☃%22')->size,     7,               'right size';
+is $tx->req->upload('%22☃%22')->slurp,    'snowman',       'right content';
 
 # Multipart form with multiple uploads sharing the same name
 $tx = $t->tx(

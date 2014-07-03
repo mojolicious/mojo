@@ -11,7 +11,7 @@ use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode url_escape);
 
 has generators => sub { {form => \&_form, json => \&_json} };
 has name => 'Mojolicious (Perl)';
@@ -218,7 +218,7 @@ sub _multipart {
         }
 
         # Filename and headers
-        $filename = delete $value->{filename} // $name;
+        $filename = url_escape delete $value->{filename} // $name, '"';
         $filename = encode $charset, $filename if $charset;
         $headers->from_hash($value);
       }
@@ -230,7 +230,7 @@ sub _multipart {
       }
 
       # Content-Disposition
-      $name = encode $charset, $name if $charset;
+      $name = url_escape $charset ? encode($charset, $name) : $name, '"';
       my $disposition = qq{form-data; name="$name"};
       $disposition .= qq{; filename="$filename"} if defined $filename;
       $headers->content_disposition($disposition);

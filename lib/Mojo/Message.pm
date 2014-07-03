@@ -277,14 +277,12 @@ sub _parse_formdata {
     my ($filename) = $disposition =~ /[; ]filename="((?:\\"|[^"])*)"/;
     next if $upload && !defined $filename || !$upload && defined $filename;
     my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
+    $part = $part->asset->slurp unless $upload;
+
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;
-    }
-
-    unless ($upload) {
-      $part = $part->asset->slurp;
-      $part = decode($charset, $part) // $part if $charset;
+      $part = decode($charset, $part) // $part unless $upload;
     }
 
     push @formdata, [$name, $part, $filename];

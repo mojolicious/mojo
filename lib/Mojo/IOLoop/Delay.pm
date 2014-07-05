@@ -116,7 +116,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
   Mojo::IOLoop::Delay->new->steps(
     sub {
       my $delay = shift;
-      die 'Intentional error!';
+      die 'Intentional error';
     },
     sub {
       my ($delay, @args) = @_;

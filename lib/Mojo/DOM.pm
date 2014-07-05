@@ -409,11 +409,11 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
   say $dom->div->children('p')->first->{id};
 
   # Iterate
-  $dom->find('p[id]')->each(sub { say shift->{id} });
+  $dom->find('p[id]')->each(sub { say $_->{id} });
 
   # Loop
   for my $e ($dom->find('p[id]')->each) {
-    say $e->text;
+    say $e->{id}, ':', $e->text;
   }
 
   # Modify

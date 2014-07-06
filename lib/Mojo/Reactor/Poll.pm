@@ -42,13 +42,13 @@ sub one_tick {
     # I/O
     if (keys %{$self->{io}}) {
       $poll->poll($timeout);
-      for my $f ($poll->handles(POLLIN | POLLPRI | POLLHUP | POLLERR)) {
-        next unless exists $self->{io}{fileno $f};
-        ++$i and $self->_sandbox('Read', $self->{io}{fileno $f}{cb}, 0);
+      for my $handle ($poll->handles(POLLIN | POLLPRI | POLLHUP | POLLERR)) {
+        next unless my $io = $self->{io}{fileno $handle};
+        ++$i and $self->_sandbox('Read', $io->{cb}, 0);
       }
-      for my $f ($poll->handles(POLLOUT)) {
-        next unless exists $self->{io}{fileno $f};
-        ++$i and $self->_sandbox('Write', $self->{io}{fileno $f}{cb}, 1);
+      for my $handle ($poll->handles(POLLOUT)) {
+        next unless my $io = $self->{io}{fileno $handle};
+        ++$i and $self->_sandbox('Write', $io->{cb}, 1);
       }
     }
 

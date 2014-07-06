@@ -404,7 +404,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('www.perl.org')->res->dom->html->head->title->text;
 
   # Scrape the latest headlines from a news site with CSS selectors
-  say $ua->get('perlnews.org')->res->dom('h2 > a')->text->shuffle;
+  say $ua->get('blogs.perl.org')->res->dom('h2 > a')->text->shuffle;
 
   # IPv6 PUT request with content
   my $tx

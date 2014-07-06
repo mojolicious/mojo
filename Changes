@@ -1,5 +1,7 @@
 
-5.13  2014-07-06
+5.13  2014-07-07
+  - Fixed Mojo::Reactor::Poll bug where watchers were active after they have
+    been removed. (jberger)
 
 5.12  2014-07-04
   - Fixed a few multipart form handling bugs.

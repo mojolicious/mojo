@@ -150,6 +150,13 @@ ok !$recurring, 'recurring was not triggered again';
 my $reactor2 = Mojo::Reactor::EV->new;
 is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 
+# Reset while watchers are active
+$writable = undef;
+$reactor->io($_ => sub { ++$writable and shift->reset })->watch($_, 0, 1)
+  for $client, $server;
+$reactor->start;
+is $writable, 1, 'only one handle was writable';
+
 # Concurrent reactors
 $timer = 0;
 $reactor->recurring(0 => sub { $timer++ });

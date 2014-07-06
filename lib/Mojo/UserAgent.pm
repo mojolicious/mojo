@@ -114,7 +114,7 @@ sub _connect {
       $stream->on(close => sub { $self->_handle($id, 1) });
       $stream->on(error => sub { $self && $self->_error($id, pop) });
       $stream->on(read => sub { $self->_read($id, pop) });
-      $cb->();
+      $self->$cb;
     }
   );
 }
@@ -145,9 +145,8 @@ sub _connect_proxy {
       my $handle = $loop->stream($id)->steal_handle;
       my $c      = delete $self->{connections}{$id};
       $loop->remove($id);
-      weaken $self;
       $id = $self->_connect($nb, $self->transactor->endpoint($old),
-        $handle, sub { $self->_start($nb, $old->connection($id), $cb) });
+        $handle, sub { shift->_start($nb, $old->connection($id), $cb) });
       $self->{connections}{$id} = $c;
     }
   );
@@ -194,9 +193,8 @@ sub _connection {
   # Connect
   warn "-- Connect ($proto:$host:$port)\n" if DEBUG;
   ($proto, $host, $port) = $self->transactor->peer($tx);
-  weaken $self;
   $id = $self->_connect(
-    ($nb, $proto, $host, $port, $id) => sub { $self->_connected($id) });
+    ($nb, $proto, $host, $port, $id) => sub { shift->_connected($id) });
   $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
 
   return $id;

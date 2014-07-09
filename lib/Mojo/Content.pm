@@ -515,7 +515,7 @@ Check if content is chunked.
 
   my $bool = $content->is_compressed;
 
-Check if content is C<gzip> compressed.
+Check if content is gzip compressed.
 
 =head2 is_dynamic
 

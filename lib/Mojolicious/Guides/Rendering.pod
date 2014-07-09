@@ -1054,11 +1054,11 @@ lot more efficient to use L<Mojolicious/"after_render">.
     # Check if "gzip => 1" has been set in the stash
     return unless $c->stash->{gzip};
 
-    # Check if user agent accepts GZip compression
+    # Check if user agent accepts gzip compression
     return unless ($c->req->headers->accept_encoding // '') =~ /gzip/i;
     $c->res->headers->append(Vary => 'Accept-Encoding');
 
-    # Compress content with GZip
+    # Compress content with gzip
     $c->res->headers->content_encoding('gzip');
     gzip $output, \my $compressed;
     $$output = $compressed;

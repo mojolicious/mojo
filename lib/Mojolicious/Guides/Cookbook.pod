@@ -977,7 +977,7 @@ L<Mojo::UserAgent> makes it actually easy.
   $tx = $ua->start($tx);
 
 The event L<Mojo::Content/"read"> will be emitted for every chunk of data that
-is received, even C<chunked> encoding and C<gzip> compression will be handled
+is received, even C<chunked> encoding and gzip compression will be handled
 transparently if necessary.
 
 =head2 Streaming request

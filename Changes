@@ -1,5 +1,5 @@
 
-5.13  2014-07-09
+5.13  2014-07-10
   - Improved HTML5.1 compliance of Mojo::DOM::HTML.
   - Fixed Mojo::Reactor::Poll bug where watchers were active after they have
     been removed. (jberger)

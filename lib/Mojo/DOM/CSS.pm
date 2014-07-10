@@ -507,15 +507,15 @@ An C<E> element, only sibling of its type.
 
 =head2 E.warning
 
-  my $warning = $css->select('div.warning');
-
 An C<E> element whose class is "warning".
+
+  my $warning = $css->select('div.warning');
 
 =head2 E#myid
 
-  my $foo = $css->select('div#foo');
-
 An C<E> element with C<ID> equal to "myid".
+
+  my $foo = $css->select('div#foo');
 
 =head2 E:not(s)
 

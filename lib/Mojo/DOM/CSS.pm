@@ -171,37 +171,28 @@ sub _parent {
 sub _pc {
   my ($class, $args, $current) = @_;
 
-  # ":first-*"
-  if ($class =~ /^first-(?:(child)|of-type)$/) {
-    $class = defined $1 ? 'nth-child' : 'nth-of-type';
-    $args = 1;
-  }
-
-  # ":last-*"
-  elsif ($class =~ /^last-(?:(child)|of-type)$/) {
-    $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
-    $args = '-n+1';
-  }
-
-  # ":checked"
-  if ($class eq 'checked') {
-    my $attrs = $current->[2];
-    return 1 if exists $attrs->{checked} || exists $attrs->{selected};
-  }
-
   # ":empty"
-  elsif ($class eq 'empty') { return 1 unless defined $current->[4] }
+  return !defined $current->[4] if $class eq 'empty';
 
   # ":root"
-  elsif ($class eq 'root') {
-    if (my $parent = $current->[3]) { return 1 if $parent->[0] eq 'root' }
-  }
+  return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
   # ":not"
-  elsif ($class eq 'not') { return 1 if !_match($args, $current, $current) }
+  return !_match($args, $current, $current) if $class eq 'not';
+
+  # ":checked"
+  return exists $current->[2]{checked} || exists $current->[2]{selected}
+    if $class eq 'checked';
+
+  # ":first-*" or ":last-*" (rewrite with equation)
+  if ($class =~ /^(first|last)-(?:(child)|of-type)$/) {
+    $class = $1 eq 'first' ? 'nth-' : 'nth-last-';
+    $class .= defined $2 ? 'child' : 'of-type';
+    $args = $1 eq 'first' ? 1 : '-n+1';
+  }
 
   # ":nth-*"
-  elsif ($class =~ /^nth-/) {
+  if ($class =~ /^nth-/) {
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
     my @siblings = @{_siblings($current, $type)};
 

@@ -3,9 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
-use Carp 'croak';
 use Mojo::IOLoop;
-use Mojo::URL;
 use Mojo::Util 'monkey_patch';
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Proxy;

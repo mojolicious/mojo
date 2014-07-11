@@ -248,10 +248,7 @@ sub _finish {
   $old->client_close($close);
 
   # Finish WebSocket
-  if ($old->is_websocket) {
-    delete $self->{connections}{$id};
-    return $self->_remove($id, $close);
-  }
+  return $self->_remove($id, 1) if $old->is_websocket;
 
   if (my $jar = $self->cookie_jar) { $jar->extract($old) }
 

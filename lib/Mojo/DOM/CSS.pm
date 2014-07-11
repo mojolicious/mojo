@@ -35,8 +35,7 @@ my $TOKEN_RE        = qr/
 
 sub match {
   my $tree = shift->tree;
-  return undef if $tree->[0] ne 'tag';
-  return _match(_compile(shift), $tree, $tree);
+  return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, $tree);
 }
 
 sub select     { shift->_select(0, @_) }

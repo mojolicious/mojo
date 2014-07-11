@@ -185,11 +185,8 @@ sub _pc {
     if $class eq 'checked';
 
   # ":first-*" or ":last-*" (rewrite with equation)
-  if ($class =~ /^(first|last)-(?:(child)|of-type)$/) {
-    $class = $1 eq 'first' ? 'nth-' : 'nth-last-';
-    $class .= defined $2 ? 'child' : 'of-type';
-    $args = $1 eq 'first' ? 1 : '-n+1';
-  }
+  ($class, $args) = $1 ? ("nth-$class", 1) : ("nth-last-$class", '-n+1')
+    if $class =~ s/^(?:(first)|last)-//;
 
   # ":nth-*"
   if ($class =~ /^nth-/) {

@@ -3,6 +3,7 @@
   - Added json_like, json_message_like, json_message_unlike and json_unlike
     methods to Test::Mojo.
   - Improved HTML5.1 compliance of Mojo::DOM::HTML.
+  - Fixed bug where Mojo::UserAgent would keep too many connections alive.
   - Fixed Mojo::Reactor::Poll bug where watchers were active after they have
     been removed. (jberger)
 

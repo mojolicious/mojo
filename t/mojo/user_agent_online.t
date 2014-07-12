@@ -55,7 +55,9 @@ my $sock = IO::Socket::INET->new(PeerAddr => 'mojolicio.us', PeerPort => 80);
 my $address = $sock->sockhost;
 isnt $address, '127.0.0.1', 'different address';
 $ua->local_address('127.0.0.1')->max_connections(0);
-is $ua->get('/remote_address')->res->body, '127.0.0.1', 'right address';
+my $tx = $ua->get('/remote_address');
+ok !$ua->ioloop->stream($tx->connection), 'connection is not active';
+is $tx->res->body, '127.0.0.1', 'right address';
 $ua->local_address($address);
 is $ua->get('/remote_address')->res->body, $address, 'right address';
 
@@ -64,7 +66,7 @@ $ua = Mojo::UserAgent->new;
 
 # Connection refused
 my $port = Mojo::IOLoop::Server->generate_port;
-my $tx = $ua->build_tx(GET => "http://localhost:$port");
+$tx = $ua->build_tx(GET => "http://localhost:$port");
 $ua->start($tx);
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->error,       'has error';

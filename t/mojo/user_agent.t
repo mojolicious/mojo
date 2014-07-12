@@ -521,4 +521,19 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
 
+# Connection limit
+$ua = Mojo::UserAgent->new(max_connections => 2);
+my $result;
+Mojo::IOLoop->delay(
+  sub {
+    my $delay = shift;
+    $ua->get('/' => $delay->begin) for 1 .. 5;
+  },
+  sub {
+    my $delay = shift;
+    $result = [grep {defined} map { Mojo::IOLoop->stream($_->connection) } @_];
+  }
+)->wait;
+is scalar @$result, 2, 'two active connections';
+
 done_testing();

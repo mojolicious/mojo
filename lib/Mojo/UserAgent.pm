@@ -201,17 +201,17 @@ sub _connection {
 sub _dequeue {
   my ($self, $nb, $name, $test) = @_;
 
-  my $found;
   my $loop = $self->_loop($nb);
-  my $old  = $self->{$nb ? 'nb_queue' : 'queue'} || [];
-  my $new  = $self->{$nb ? 'nb_queue' : 'queue'} = [];
+  my $old = $self->{$nb ? 'nb_queue' : 'queue'} ||= [];
+  my ($found, @new);
   for my $queued (@$old) {
-    push @$new, $queued and next if $found || !grep { $_ eq $name } @$queued;
+    push @new, $queued and next if $found || !grep { $_ eq $name } @$queued;
 
     # Search for id/name and sort out corrupted connections if necessary
     next unless my $stream = $loop->stream($queued->[1]);
     $test && $stream->is_readable ? $stream->close : ($found = $queued->[1]);
   }
+  @$old = @new;
 
   return $found;
 }
@@ -222,8 +222,8 @@ sub _enqueue {
   # Enforce connection limit
   my $queue = $self->{$nb ? 'nb_queue' : 'queue'} ||= [];
   my $max = $self->max_connections;
-  $self->_remove(shift(@$queue)->[1]) while @$queue > $max;
-  push @$queue, [$name, $id] if $max;
+  $self->_remove(shift(@$queue)->[1]) while @$queue && @$queue >= $max;
+  $max ? push(@$queue, [$name, $id]) : $self->_loop($nb)->stream($id)->close;
 }
 
 sub _error {
@@ -569,7 +569,8 @@ Local address to bind to.
   $ua     = $ua->max_connections(5);
 
 Maximum number of keep-alive connections that the user agent will retain
-before it starts closing the oldest ones, defaults to C<5>.
+before it starts closing the oldest ones, defaults to C<5>. Setting the value
+to C<0> will prevent any connections from being kept alive.
 
 =head2 max_redirects
 

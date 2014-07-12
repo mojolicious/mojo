@@ -406,7 +406,8 @@ Test::Mojo - Testing Mojo!
     ->status_is(200)
     ->header_is('Server' => 'Mojolicious (Perl)')
     ->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
-    ->json_is('/results/4/title' => 'Perl rocks!');
+    ->json_is('/results/4/title' => 'Perl rocks!')
+    ->json_like('/results/7/title' => qr/Perl/);
 
   # WebSocket
   $t->websocket_ok('/echo')

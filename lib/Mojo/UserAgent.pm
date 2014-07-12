@@ -223,7 +223,7 @@ sub _enqueue {
   my $queue = $self->{$nb ? 'nb_queue' : 'queue'} ||= [];
   my $max = $self->max_connections;
   $self->_remove(shift(@$queue)->[1]) while @$queue && @$queue >= $max;
-  $max ? push(@$queue, [$name, $id]) : $self->_loop($nb)->stream($id)->close;
+  $max ? push @$queue, [$name, $id] : $self->_loop($nb)->stream($id)->close;
 }
 
 sub _error {
@@ -275,8 +275,8 @@ sub _read {
   # Process incoming data
   warn "-- Client <<< Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
   $tx->client_read($chunk);
-  if    ($tx->is_finished)     { $self->_finish($id) }
-  elsif ($c->{tx}->is_writing) { $self->_write($id) }
+  if    ($tx->is_finished) { $self->_finish($id) }
+  elsif ($tx->is_writing)  { $self->_write($id) }
 }
 
 sub _redirect {

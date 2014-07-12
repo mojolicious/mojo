@@ -209,9 +209,13 @@ $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})
   ->json_message_is('/2' => 3, 'right value')
   ->json_message_hasnt('/5', 'not five elements')
   ->send_ok({json => {'☃' => [1, 2, 3]}})
-  ->message_ok->json_message_is('/☃', [1, 2, 3])->send_ok({json => 'works'})
-  ->message_ok->json_message_is('works')->send_ok({json => undef})
-  ->message_ok->json_message_is(undef)->finish_ok;
+  ->message_ok->json_message_is('/☃', [1, 2, 3])
+  ->json_message_like('/☃/1' => qr/\d/)
+  ->json_message_unlike('/☃/1' => qr/[a-z]/)
+  ->json_message_like('/☃/2' => qr/3/, 'right value')
+  ->json_message_unlike('/☃/2' => qr/2/, 'different value')
+  ->send_ok({json => 'works'})->message_ok->json_message_is('works')
+  ->send_ok({json => undef})->message_ok->json_message_is(undef)->finish_ok;
 
 # Plain request
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');

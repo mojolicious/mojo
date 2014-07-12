@@ -920,7 +920,10 @@ $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_type_is('application/json')->json_is({foo => [1, -2, 3, 'b☃r']})
   ->json_is('/foo' => [1, -2, 3, 'b☃r'])
   ->json_is('/foo/3', 'b☃r', 'right value')->json_has('/foo')
-  ->json_hasnt('/bar');
+  ->json_hasnt('/bar')->json_like('/foo/3' => qr/r$/)
+  ->json_unlike('/foo/3' => qr/b$/)
+  ->json_like('/foo/3' => qr/^b/, 'right value')
+  ->json_unlike('/foo/3' => qr/^r/, 'different value');
 
 # JSON ("null")
 $t->get_ok('/json' => json => undef)->status_is(200)

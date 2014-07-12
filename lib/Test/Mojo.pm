@@ -161,6 +161,12 @@ sub json_is {
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
+sub json_like {
+  my ($self, $p, $regex, $desc) = @_;
+  $desc ||= encode 'UTF-8', qq{similar match for JSON Pointer "$p"};
+  return $self->_test('like', $self->tx->res->json($p), $regex, $desc);
+}
+
 sub json_message_has {
   my ($self, $p, $desc) = @_;
   $desc ||= encode 'UTF-8', qq{has value for JSON Pointer "$p"};
@@ -178,6 +184,24 @@ sub json_message_is {
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
   my $desc = encode 'UTF-8', shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->_json(get => $p), $data, $desc);
+}
+
+sub json_message_like {
+  my ($self, $p, $regex, $desc) = @_;
+  $desc ||= encode 'UTF-8', qq{similar match for JSON Pointer "$p"};
+  return $self->_test('like', $self->_json(get => $p), $regex, $desc);
+}
+
+sub json_message_unlike {
+  my ($self, $p, $regex, $desc) = @_;
+  $desc ||= encode 'UTF-8', qq{no similar match for JSON Pointer "$p"};
+  return $self->_test('unlike', $self->_json(get => $p), $regex, $desc);
+}
+
+sub json_unlike {
+  my ($self, $p, $regex, $desc) = @_;
+  $desc ||= encode 'UTF-8', qq{no similar match for JSON Pointer "$p"};
+  return $self->_test('unlike', $self->tx->res->json($p), $regex, $desc);
 }
 
 sub message_is {
@@ -676,6 +700,14 @@ Opposite of L</"json_has">.
 Check the value extracted from JSON response using the given JSON Pointer with
 L<Mojo::JSON::Pointer>, which defaults to the root value if it is omitted.
 
+=head2 json_like
+
+  $t = $t->json_like('/foo/1' => qr/^\d+$/);
+  $t = $t->json_like('/foo/1' => qr/^\d+$/, 'right value');
+
+Check the value extracted from JSON response using the given JSON Pointer with
+L<Mojo::JSON::Pointer> for similar match.
+
 =head2 json_message_has
 
   $t = $t->json_message_has('/foo');
@@ -700,6 +732,28 @@ Opposite of L</"json_message_has">.
 Check the value extracted from JSON WebSocket message using the given JSON
 Pointer with L<Mojo::JSON::Pointer>, which defaults to the root value if it is
 omitted.
+
+=head2 json_message_like
+
+  $t = $t->json_message_like('/foo/1' => qr/^\d+$/);
+  $t = $t->json_message_like('/foo/1' => qr/^\d+$/, 'right value');
+
+Check the value extracted from JSON WebSocket message using the given JSON
+Pointer with L<Mojo::JSON::Pointer> for similar match.
+
+=head2 json_message_unlike
+
+  $t = $t->json_message_unlike('/foo/1' => qr/^\d+$/);
+  $t = $t->json_message_unlike('/foo/1' => qr/^\d+$/, 'different value');
+
+Opposite of L</"json_message_like">.
+
+=head2 json_unlike
+
+  $t = $t->json_unlike('/foo/1' => qr/^\d+$/);
+  $t = $t->json_unlike('/foo/1' => qr/^\d+$/, 'different value');
+
+Opposite of L</"json_like">.
 
 =head2 message_is
 

@@ -204,7 +204,7 @@ sub _dequeue {
   my $found;
   my $loop = $self->_loop($nb);
   my $old  = $self->{$nb ? 'nb_queue' : 'queue'} || [];
-  my $new  = $self->{$nb ? 'nb_queue' : 'queue'} = [];
+  my $new  = [];
   for my $queued (@$old) {
     push @$new, $queued and next if $found || !grep { $_ eq $name } @$queued;
 
@@ -212,6 +212,7 @@ sub _dequeue {
     next unless my $stream = $loop->stream($queued->[1]);
     $test && $stream->is_readable ? $stream->close : ($found = $queued->[1]);
   }
+  @$old = @$new;
 
   return $found;
 }

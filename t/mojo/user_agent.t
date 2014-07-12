@@ -521,4 +521,18 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
 
+# bug: leaking stream while adding to keep-alive queue
+Mojo::IOLoop->reset;
+{
+    my $ua = Mojo::UserAgent->new->max_connections(2);
+    my $n = 6;
+    $ua->get('/', sub { undef $ua if !--$n }) for 1 .. $n;
+}
+{
+    my $err;
+    local $SIG{__DIE__} = sub { $err = shift };
+    Mojo::IOLoop->start;
+    is $err, undef, 'no streams leaked because inactivity_timeout not happens';
+}
+
 done_testing();

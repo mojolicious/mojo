@@ -1,5 +1,5 @@
 
-5.13  2014-07-12
+5.13  2014-07-13
   - Added json_like, json_message_like, json_message_unlike and json_unlike
     methods to Test::Mojo.
   - Improved HTML5.1 compliance of Mojo::DOM::HTML.

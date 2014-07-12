@@ -226,18 +226,22 @@ Python's WSGI and Ruby's Rack. L<Mojolicious> applications are ridiculously
 simple to deploy with L<Plack>.
 
   $ plackup ./script/myapp
-  HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 L<Plack> provides many server and protocol adapters for you to choose from,
 such as C<FCGI>, C<uWSGI> and C<mod_perl>.
 
   $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
+The C<MOJO_REVERSE_PROXY> environment variable can be used to enable proxy
+support, this allows L<Mojolicious> to automatically pick up the
+C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
+
+  $ MOJO_REVERSE_PROXY=1 plackup ./script/myapp
+
 If an older server adapter is not be able to correctly detect the application
 home directory, you can simply use the C<MOJO_HOME> environment variable.
 
   $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
-  HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 There is no need for a C<.psgi> file, just point the server adapter at your
 application script, it will automatically act like one if it detects the

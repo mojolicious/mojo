@@ -43,7 +43,7 @@ get '/proxy' => sub {
 # Reverse proxy
 {
   ok !Mojo::Server::CGI->new->reverse_proxy, 'no reverse proxy';
-  local $ENV{MOJO_REVERSE_PROXY} = 25;
+  local $ENV{MOJO_REVERSE_PROXY} = 1;
   ok !!Mojo::Server::CGI->new->reverse_proxy, 'reverse proxy';
 }
 

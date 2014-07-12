@@ -41,7 +41,7 @@ use Mojolicious;
 # Reverse proxy
 {
   ok !Mojo::Server::Daemon->new->reverse_proxy, 'no reverse proxy';
-  local $ENV{MOJO_REVERSE_PROXY} = 25;
+  local $ENV{MOJO_REVERSE_PROXY} = 1;
   ok !!Mojo::Server::Daemon->new->reverse_proxy, 'reverse proxy';
 }
 

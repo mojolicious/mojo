@@ -52,7 +52,9 @@ sub grep {
   return $self->new(grep { $_ =~ $cb } @$self);
 }
 
-sub join { Mojo::ByteStream->new(join $_[1] // '', map({"$_"} @{$_[0]})) }
+sub join {
+  Mojo::ByteStream->new(join $_[1] // '', map {"$_"} @{$_[0]});
+}
 
 sub last { shift->[-1] }
 

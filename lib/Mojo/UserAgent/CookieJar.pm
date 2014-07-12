@@ -25,7 +25,7 @@ sub add {
     next unless my $path = $cookie->path;
     next unless length(my $name = $cookie->name // '');
     my $jar = $self->{jar}{$domain} ||= [];
-    @$jar = (grep({_compare($_, $path, $name, $origin)} @$jar), $cookie);
+    @$jar = (grep({ _compare($_, $path, $name, $origin) } @$jar), $cookie);
   }
 
   return $self;

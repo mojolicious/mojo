@@ -523,23 +523,16 @@ is $tx->res->body, 'Hi!', 'right content';
 
 # bug: leaking stream while adding to keep-alive queue
 Mojo::IOLoop->reset;
-my $t;
 {
-    my $ua = Mojo::UserAgent->new->max_connections(2)->inactivity_timeout(3);
+    my $ua = Mojo::UserAgent->new->max_connections(2);
     my $n = 6;
-    for (1 .. $n) {
-        $ua->get('http://powerman.name/test/'.$_, sub {
-            if (!--$n) {
-                $t = time;
-                undef $ua;
-            }
-        });
-    }
+    $ua->get('/', sub { undef $ua if !--$n }) for 1 .. $n;
 }
 {
-    local $SIG{__DIE__} = sub { print @_ };
+    my $err;
+    local $SIG{__DIE__} = sub { $err = shift };
     Mojo::IOLoop->start;
+    is $err, undef, 'no streams leaked because inactivity_timeout not happens';
 }
-ok time-$t < 2, 'no streams leaked because inactivity_timeout not happens';
 
 done_testing();

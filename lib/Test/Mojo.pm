@@ -115,29 +115,30 @@ sub head_ok { shift->_build_ok(HEAD => @_) }
 
 sub header_is {
   my ($self, $name, $value, $desc) = @_;
-  $desc ||= "$name: " . ($value ? $value : '');
-  return $self->_test('is', scalar $self->tx->res->headers->header($name),
-    $value, $desc);
+  $desc ||= "$name: " . ($value // '');
+  return $self->_test('is', $self->tx->res->headers->header($name), $value,
+    $desc);
 }
 
 sub header_isnt {
   my ($self, $name, $value, $desc) = @_;
-  $desc ||= "not $name: " . ($value ? $value : '');
-  return $self->_test('isnt', scalar $self->tx->res->headers->header($name),
-    $value, $desc);
+  $desc ||= "not $name: " . ($value // '');
+  return $self->_test('isnt', $self->tx->res->headers->header($name), $value,
+    $desc);
 }
 
 sub header_like {
   my ($self, $name, $regex, $desc) = @_;
-  return $self->_test('like', scalar $self->tx->res->headers->header($name),
-    $regex, $desc || "$name is similar");
+  $desc ||= "$name is similar";
+  return $self->_test('like', $self->tx->res->headers->header($name), $regex,
+    $desc);
 }
 
 sub header_unlike {
   my ($self, $name, $regex, $desc) = @_;
-  return $self->_test('unlike',
-    scalar $self->tx->res->headers->header($name) // '',
-    $regex, $desc || "$name is not similar");
+  $desc ||= "$name is not similar";
+  return $self->_test('unlike', $self->tx->res->headers->header($name),
+    $regex, $desc);
 }
 
 sub json_has {

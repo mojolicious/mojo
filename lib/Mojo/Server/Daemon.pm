@@ -203,13 +203,10 @@ sub _remove {
 sub _write {
   my ($self, $id) = @_;
 
-  # Not writing
+  # Get chunk and write
   return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
-  return unless $tx->is_writing;
-
-  # Get chunk and write
-  return if $c->{writing}++;
+  return if !$tx->is_writing || $c->{writing}++;
   my $chunk = $tx->server_write;
   delete $c->{writing};
   warn "-- Server >>> Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;

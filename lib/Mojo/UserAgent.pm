@@ -78,7 +78,7 @@ sub _cleanup {
 
   # Clean up keep-alive connections
   $loop->remove($_->[1]) for @{delete $self->{queue} || []};
-  $loop = Mojo::IOLoop->singleton;
+  $loop = $self->_loop(1);
   $loop->remove($_->[1]) for @{delete $self->{nb_queue} || []};
 
   return $self;
@@ -253,8 +253,10 @@ sub _finish {
   if (my $jar = $self->cookie_jar) { $jar->extract($old) }
 
   # Upgrade connection to WebSocket
-  if (my $new = $self->_upgrade($id)) {
-    $c->{cb}->($self, $new);
+  if (my $new = $self->transactor->upgrade($old)) {
+    weaken $self;
+    $new->on(resume => sub { $self->_write($id) });
+    $c->{cb}->($self, $c->{tx} = $new);
     return $new->client_read($old->res->content->leftovers);
   }
 
@@ -293,8 +295,8 @@ sub _remove {
   my $c = delete $self->{connections}{$id} || {};
   my $tx = $c->{tx};
   if ($close || !$tx || !$tx->keep_alive || $tx->error) {
-    $self->_dequeue($_, $id) for (1, 0);
-    $self->_loop($_)->remove($id) for (1, 0);
+    $self->_dequeue($_, $id) for 1, 0;
+    $self->_loop($_)->remove($id) for 1, 0;
     return;
   }
 
@@ -327,25 +329,13 @@ sub _start {
   return $id;
 }
 
-sub _upgrade {
-  my ($self, $id) = @_;
-
-  my $c = $self->{connections}{$id};
-  return undef unless my $new = $self->transactor->upgrade($c->{tx});
-  weaken $self;
-  $new->on(resume => sub { $self->_write($id) });
-
-  return $c->{tx} = $new;
-}
-
 sub _write {
   my ($self, $id) = @_;
 
   # Get and write chunk
   return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
-  return unless $tx->is_writing;
-  return if $c->{writing}++;
+  return if !$tx->is_writing || $c->{writing}++;
   my $chunk = $tx->client_write;
   delete $c->{writing};
   warn "-- Client >>> Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;

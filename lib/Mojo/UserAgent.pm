@@ -222,7 +222,7 @@ sub _enqueue {
   # Enforce connection limit
   my $queue = $self->{$nb ? 'nb_queue' : 'queue'} ||= [];
   my $max = $self->max_connections;
-  $self->_remove(shift(@$queue)->[1]) while @$queue > $max;
+  $self->_remove(shift(@$queue)->[1]) while @$queue >= $max;
   push @$queue, [$name, $id] if $max;
 }
 

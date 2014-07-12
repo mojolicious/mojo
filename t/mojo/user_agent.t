@@ -521,4 +521,25 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
 
+# bug: leaking stream while adding to keep-alive queue
+Mojo::IOLoop->reset;
+my $t;
+{
+    my $ua = Mojo::UserAgent->new->max_connections(2)->inactivity_timeout(3);
+    my $n = 6;
+    for (1 .. $n) {
+        $ua->get('http://powerman.name/test/'.$_, sub {
+            if (!--$n) {
+                $t = time;
+                undef $ua;
+            }
+        });
+    }
+}
+{
+    local $SIG{__DIE__} = sub { print @_ };
+    Mojo::IOLoop->start;
+}
+ok time-$t < 2, 'no streams leaked because inactivity_timeout not happens';
+
 done_testing();

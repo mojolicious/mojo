@@ -261,6 +261,7 @@ sub _render {
   }
 
   # Render whole tree
+  no warnings 'recursion';
   $result .= _render($tree->[$_], $xml)
     for ($type eq 'root' ? 1 : 4) .. $#$tree;
 

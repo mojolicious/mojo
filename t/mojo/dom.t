@@ -2363,8 +2363,13 @@ is $dom->tree->[5][1], ' HTML4 ',             'right comment';
 is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
 
 # Huge number of attributes
-my $huge = '<div ' . ('a=b ' x 32768) . '>Test</div>';
-$dom = Mojo::DOM->new($huge);
+$dom = Mojo::DOM->new('<div ' . ('a=b ' x 32768) . '>Test</div>');
 is $dom->at('div[a=b]')->text, 'Test', 'right text';
+
+# Huge number of nested tags
+my $huge = ('<a>' x 100) . 'works' . ('</a>' x 100);
+$dom = Mojo::DOM->new($huge);
+is $dom->all_text, 'works', 'right text';
+is "$dom", $huge, 'right result';
 
 done_testing();

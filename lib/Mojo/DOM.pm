@@ -325,6 +325,7 @@ sub _text {
     # Nested tag
     my $content = '';
     if ($type eq 'tag' && $recurse) {
+      no warnings 'recursion';
       $content = _text([_nodes($n)], 1, _trim($n, $trim));
     }
 

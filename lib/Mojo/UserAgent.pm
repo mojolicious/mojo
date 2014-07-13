@@ -87,19 +87,17 @@ sub _cleanup {
 sub _connect {
   my ($self, $nb, $proto, $host, $port, $handle, $cb) = @_;
 
+  my $args
+    = {address => $host, port => $port, timeout => $self->connect_timeout};
+  if (my $address = $self->local_address) { $args->{local_address} = $address }
+  $args->{handle} = $handle if $handle;
+  $args->{tls}    = 1       if $proto eq 'https';
+  if ($args->{tls}) { $args->{"tls_$_"} = $self->$_ for qw(ca cert key) }
+
   weaken $self;
   my $id;
   return $id = $self->_loop($nb)->client(
-    address       => $host,
-    handle        => $handle,
-    local_address => $self->local_address,
-    port          => $port,
-    timeout       => $self->connect_timeout,
-    tls           => $proto eq 'https',
-    tls_ca        => $self->ca,
-    tls_cert      => $self->cert,
-    tls_key       => $self->key,
-    sub {
+    $args => sub {
       my ($loop, $err, $stream) = @_;
 
       # Connection error
@@ -112,7 +110,7 @@ sub _connect {
       $stream->on(close => sub { $self && $self->_finish($id, 1) });
       $stream->on(error => sub { $self && $self->_error($id, pop) });
       $stream->on(read => sub { $self->_read($id, pop) });
-      $self->$cb;
+      $self->$cb($id);
     }
   );
 }
@@ -191,8 +189,7 @@ sub _connection {
   # Connect
   warn "-- Connect ($proto:$host:$port)\n" if DEBUG;
   ($proto, $host, $port) = $self->transactor->peer($tx);
-  $id = $self->_connect(
-    ($nb, $proto, $host, $port, $id) => sub { shift->_connected($id) });
+  $id = $self->_connect(($nb, $proto, $host, $port, $id) => \&_connected);
   $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
 
   return $id;

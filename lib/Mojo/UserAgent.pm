@@ -87,17 +87,19 @@ sub _cleanup {
 sub _connect {
   my ($self, $nb, $proto, $host, $port, $handle, $cb) = @_;
 
-  my $args
-    = {address => $host, port => $port, timeout => $self->connect_timeout};
-  if (my $address = $self->local_address) { $args->{local_address} = $address }
-  $args->{handle} = $handle if $handle;
-  $args->{tls}    = 1       if $proto eq 'https';
-  if ($args->{tls}) { $args->{"tls_$_"} = $self->$_ for qw(ca cert key) }
-
   weaken $self;
   my $id;
   return $id = $self->_loop($nb)->client(
-    $args => sub {
+    address       => $host,
+    handle        => $handle,
+    local_address => $self->local_address,
+    port          => $port,
+    timeout       => $self->connect_timeout,
+    tls           => $proto eq 'https',
+    tls_ca        => $self->ca,
+    tls_cert      => $self->cert,
+    tls_key       => $self->key,
+    sub {
       my ($loop, $err, $stream) = @_;
 
       # Connection error

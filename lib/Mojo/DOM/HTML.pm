@@ -21,7 +21,6 @@ my $ATTR_RE = qr/
   )?
   \s*
 /x;
-my $END_RE   = qr!^\s*/\s*(.+)!;
 my $TOKEN_RE = qr/
   ([^<]+)?                                          # Text
   (?:
@@ -107,7 +106,7 @@ sub parse {
 
   my $xml = $self->xml;
   my $current = my $tree = ['root'];
-  while ($html =~ m/\G$TOKEN_RE/gcs) {
+  while ($html =~ m/\G$TOKEN_RE/gcso) {
     my ($text, $pi, $comment, $cdata, $doctype, $tag, $runaway)
       = ($1, $2, $3, $4, $5, $6, $11);
 
@@ -119,16 +118,16 @@ sub parse {
     if (defined $tag) {
 
       # End
-      if ($tag =~ $END_RE) { _end($xml ? $1 : lc($1), $xml, \$current) }
+      if ($tag =~ /^\s*\/\s*(.+)/) { _end($xml ? $1 : lc $1, $xml, \$current) }
 
       # Start
       elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {
-        my ($start, $attr) = ($xml ? $1 : lc($1), $2);
+        my ($start, $attr) = ($xml ? $1 : lc $1, $2);
 
         # Attributes
         my (%attrs, $closing);
-        while ($attr =~ /$ATTR_RE/g) {
-          my ($key, $value) = ($xml ? $1 : lc($1), $2 // $3 // $4);
+        while ($attr =~ /$ATTR_RE/go) {
+          my ($key, $value) = ($xml ? $1 : lc $1, $2 // $3 // $4);
 
           # Empty tag
           ++$closing and next if $key eq '/';

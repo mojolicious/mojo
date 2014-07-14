@@ -1,6 +1,8 @@
 
 5.14  2014-07-14
   - Improved all_text performance in Mojo::DOM.
+  - Improved Mojo::DOM::CSS, Mojo::DOM::HTML and Mojo::JSON performance with
+    regular expression optimizations.
   - Fixed deep recursion warnings in Mojo::DOM and Mojo::DOM::HTML. (jberger)
 
 5.13  2014-07-13

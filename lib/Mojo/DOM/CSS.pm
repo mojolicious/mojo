@@ -93,7 +93,7 @@ sub _compile {
   my $css = shift;
 
   my $pattern = [[]];
-  while ($css =~ /$TOKEN_RE/g) {
+  while ($css =~ /$TOKEN_RE/go) {
     my ($separator, $element, $pc, $attrs, $combinator)
       = ($1, $2 // '', $3, $6, $11);
 
@@ -115,18 +115,18 @@ sub _compile {
     push @$selector, ['tag', $tag];
 
     # Class or ID
-    while ($element =~ /$CLASS_ID_RE/g) {
+    while ($element =~ /$CLASS_ID_RE/go) {
       push @$selector, ['attr', 'class', _regex('~', $1)] if defined $1;
       push @$selector, ['attr', 'id',    _regex('',  $2)] if defined $2;
     }
 
     # Pseudo classes (":not" contains more selectors)
     push @$selector, ['pc', "$1", $1 eq 'not' ? _compile($2) : $2]
-      while $pc =~ /$PSEUDO_CLASS_RE/g;
+      while $pc =~ /$PSEUDO_CLASS_RE/go;
 
     # Attributes
     push @$selector, ['attr', _unescape($1), _regex($2 // '', $3 // $4)]
-      while $attrs =~ /$ATTR_RE/g;
+      while $attrs =~ /$ATTR_RE/go;
 
     # Combinator
     push @$part, [combinator => $combinator] if $combinator;

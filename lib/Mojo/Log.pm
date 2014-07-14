@@ -51,7 +51,7 @@ sub is_level {
 
 sub is_warn { shift->is_level('warn') }
 
-sub log { shift->emit('message', lc(shift), @_) }
+sub log { shift->emit('message', lc shift, @_) }
 
 sub new {
   my $self = shift->SUPER::new(@_);

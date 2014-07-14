@@ -77,23 +77,23 @@ sub _decode {
   my $value = _decode_value();
 
   # Leftover data
-  _exception('Unexpected data') unless m/\G$WHITESPACE_RE\z/gc;
+  _exception('Unexpected data') unless m/\G$WHITESPACE_RE\z/gco;
 
   return $value;
 }
 
 sub _decode_array {
   my @array;
-  until (m/\G$WHITESPACE_RE\]/gc) {
+  until (m/\G$WHITESPACE_RE\]/gco) {
 
     # Value
     push @array, _decode_value();
 
     # Separator
-    redo if m/\G$WHITESPACE_RE,/gc;
+    redo if m/\G$WHITESPACE_RE,/gco;
 
     # End
-    last if m/\G$WHITESPACE_RE\]/gc;
+    last if m/\G$WHITESPACE_RE\]/gco;
 
     # Invalid character
     _exception('Expected comma or right square bracket while parsing array');
@@ -104,27 +104,27 @@ sub _decode_array {
 
 sub _decode_object {
   my %hash;
-  until (m/\G$WHITESPACE_RE\}/gc) {
+  until (m/\G$WHITESPACE_RE\}/gco) {
 
     # Quote
-    m/\G$WHITESPACE_RE"/gc
+    m/\G$WHITESPACE_RE"/gco
       or _exception('Expected string while parsing object');
 
     # Key
     my $key = _decode_string();
 
     # Colon
-    m/\G$WHITESPACE_RE:/gc
+    m/\G$WHITESPACE_RE:/gco
       or _exception('Expected colon while parsing object');
 
     # Value
     $hash{$key} = _decode_value();
 
     # Separator
-    redo if m/\G$WHITESPACE_RE,/gc;
+    redo if m/\G$WHITESPACE_RE,/gco;
 
     # End
-    last if m/\G$WHITESPACE_RE\}/gc;
+    last if m/\G$WHITESPACE_RE\}/gco;
 
     # Invalid character
     _exception('Expected comma or right curly bracket while parsing object');
@@ -191,7 +191,7 @@ sub _decode_string {
 sub _decode_value {
 
   # Leading whitespace
-  m/\G$WHITESPACE_RE/gc;
+  m/\G$WHITESPACE_RE/gco;
 
   # String
   return _decode_string() if m/\G"/gc;
@@ -275,7 +275,7 @@ sub _encode_value {
 sub _exception {
 
   # Leading whitespace
-  m/\G$WHITESPACE_RE/gc;
+  m/\G$WHITESPACE_RE/gco;
 
   # Context
   my $context = 'Malformed JSON: ' . shift;

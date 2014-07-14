@@ -373,6 +373,11 @@ L<Mojo::ByteStream> objects are always excluded from automatic escaping.
   % use Mojo::ByteStream 'b';
   <%= b('<div>excluded!</div>') %>
 
+Whitespace characters around tags can be trimmed by adding an additional equal
+sign to the end of a tag.
+
+  <%= All whitespace characters around this expression will be trimmed =%>
+
 Newline characters can be escaped with a backslash.
 
   This is <%= 1 + 1 %> a\
@@ -384,10 +389,6 @@ backslash.
   This will <%= 1 + 1 %> result\\
   in multiple\\
   lines
-
-Whitespace characters around tags can be trimmed with a special tag ending.
-
-  <%= All whitespace characters around this expression will be trimmed =%>
 
 You can capture whole template blocks for reuse later with the C<begin> and
 C<end> keywords.

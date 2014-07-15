@@ -39,11 +39,8 @@ my $TOKEN_RE = qr/
         \s*)
       )
     |
-      (\s*
-      [^<>\s]+                                        # Tag
-      \s*
-      (?:(?:$ATTR_RE){0,32766})*+                     # Attributes
-      )
+      (\s*[^<>\s]+                                    # Tag
+      \s*(?:(?:$ATTR_RE){0,32766})*+)                 # Attributes
     )>
   |
     (<)                                               # Runaway "<"

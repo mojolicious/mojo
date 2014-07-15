@@ -27,10 +27,7 @@ my $TOKEN_RE        = qr/
   ((?:[^[\\:\s,]|$ESCAPE_RE\s?)+)?   # Element
   ($PSEUDO_CLASS_RE*)?               # Pseudoclass
   ((?:$ATTR_RE)*)?                   # Attributes
-  (?:
-    \s*
-    ([>+~])                          # Combinator
-  )?
+  (?:\s*([>+~]))?                    # Combinator
 /x;
 
 sub match {

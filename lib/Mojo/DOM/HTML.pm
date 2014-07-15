@@ -22,29 +22,31 @@ my $ATTR_RE = qr/
   \s*
 /x;
 my $TOKEN_RE = qr/
-  ([^<]+)?                                          # Text
+  ([^<]+)?                                            # Text
   (?:
-    <\?(.*?)\?>                                     # Processing Instruction
-  |
-    <!--(.*?)--\s*>                                 # Comment
-  |
-    <!\[CDATA\[(.*?)\]\]>                           # CDATA
-  |
-    <!DOCTYPE(
-      \s+\w+
-      (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
-      (?:\s+\[.+?\])?                               # Int Subset
+    <(?:
+      \?(.*?)\?                                       # Processing Instruction
+    |
+      !(?:
+        --(.*?)--\s*                                  # Comment
+      |
+        \[CDATA\[(.*?)\]\]                            # CDATA
+      |
+        DOCTYPE(
+        \s+\w+                                        # Doctype
+        (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
+        (?:\s+\[.+?\])?                               # Int Subset
+        \s*)
+      )
+    |
+      (\s*
+      [^<>\s]+                                        # Tag
       \s*
+      (?:(?:$ATTR_RE){0,32766})*+                     # Attributes
+      )
     )>
   |
-    <(
-      \s*
-      [^<>\s]+                                      # Tag
-      \s*
-      (?:(?:$ATTR_RE){0,32766})*+                   # Attributes
-    )>
-  |
-    (<)                                             # Runaway "<"
+    (<)                                               # Runaway "<"
   )??
 /xis;
 

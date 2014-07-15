@@ -1,5 +1,6 @@
 
 5.15  2014-07-15
+  - Improved Mojo::DOM::HTML performance slightly.
 
 5.14  2014-07-14
   - Improved all_text performance in Mojo::DOM.

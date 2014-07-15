@@ -12,10 +12,9 @@ has 'reverse_proxy';
 
 my $START_LINE_RE = qr/
   ^
-  ([a-zA-Z]+)                                            # Method
-  \s+
-  ([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
-  \s+HTTP\/(\d\.\d)                                      # Version
+  ([a-zA-Z]+)                                               # Method
+  \s+([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
+  \s+HTTP\/(\d\.\d)                                         # Version
   $
 /x;
 

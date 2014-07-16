@@ -17,7 +17,8 @@ has handle => sub {
   my $handle = IO::File->new;
   my $path   = $self->path;
   if (defined $path && -f $path) {
-    $handle->open($path, '<') or croak qq{Can't open file "$path": $!};
+    $handle->open($path, O_APPEND | O_RDWR)
+      or croak qq{Can't open file "$path": $!};
     return $handle;
   }
 

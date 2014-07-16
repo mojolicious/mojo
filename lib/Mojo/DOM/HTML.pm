@@ -25,8 +25,6 @@ my $TOKEN_RE = qr/
   ([^<]+)?                                            # Text
   (?:
     <(?:
-      \?(.*?)\?                                       # Processing Instruction
-    |
       !(?:
         --(.*?)--\s*                                  # Comment
       |
@@ -38,6 +36,8 @@ my $TOKEN_RE = qr/
         (?:\s+\[.+?\])?                               # Int Subset
         \s*)
       )
+    |
+      \?(.*?)\?                                       # Processing Instruction
     |
       (\s*[^<>\s]+                                    # Tag
       \s*(?:(?:$ATTR_RE){0,32766})*+)                 # Attributes
@@ -106,7 +106,7 @@ sub parse {
   my $xml = $self->xml;
   my $current = my $tree = ['root'];
   while ($html =~ m/\G$TOKEN_RE/gcso) {
-    my ($text, $pi, $comment, $cdata, $doctype, $tag, $runaway)
+    my ($text, $comment, $cdata, $doctype, $pi, $tag, $runaway)
       = ($1, $2, $3, $4, $5, $6, $11);
 
     # Text (and runaway "<")

@@ -1,6 +1,7 @@
 
-5.15  2014-07-16
+5.15  2014-07-17
   - Improved Mojo::DOM::HTML performance slightly.
+  - Fixed small selector bug in get command.
 
 5.14  2014-07-14
   - Improved all_text performance in Mojo::DOM.

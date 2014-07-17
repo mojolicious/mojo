@@ -91,32 +91,30 @@ sub _say { length && say encode('UTF-8', $_) for @_ }
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;
 
+  # Keep a strong reference to the root
   $buffer = decode($charset, $buffer) // $buffer if $charset;
-  my $results = Mojo::DOM->new($buffer)->find($selector);
+  my $dom     = Mojo::DOM->new($buffer);
+  my $results = $dom->find($selector);
 
   while (defined(my $command = shift @args)) {
 
     # Number
-    ($results = [$results->[$command]])->[0] ? next : return
-      if $command =~ /^\d+$/;
+    ($results = $results->slice($command)) and next if $command =~ /^\d+$/;
 
     # Text
-    return _say(map { $_->text } @$results) if $command eq 'text';
+    return _say($results->text) if $command eq 'text';
 
     # All text
-    return _say(map { $_->all_text } @$results) if $command eq 'all';
+    return _say($results->all_text) if $command eq 'all';
 
     # Attribute
-    if ($command eq 'attr') {
-      return unless my $name = shift @args;
-      return _say(map { $_->attr->{$name} } @$results);
-    }
+    return _say($results->attr($args[0] // '')->each) if $command eq 'attr';
 
     # Unknown
     die qq{Unknown command "$command".\n};
   }
 
-  _say(@$results);
+  _say($results);
 }
 
 1;

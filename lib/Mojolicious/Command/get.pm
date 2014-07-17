@@ -102,10 +102,10 @@ sub _select {
     ($results = $results->slice($command)) and next if $command =~ /^\d+$/;
 
     # Text
-    return _say($results->text) if $command eq 'text';
+    return _say($results->text->each) if $command eq 'text';
 
     # All text
-    return _say($results->all_text) if $command eq 'all';
+    return _say($results->all_text->each) if $command eq 'all';
 
     # Attribute
     return _say($results->attr($args[0] // '')->each) if $command eq 'attr';
@@ -114,7 +114,7 @@ sub _select {
     die qq{Unknown command "$command".\n};
   }
 
-  _say($results);
+  _say($results->each);
 }
 
 1;

@@ -1154,6 +1154,26 @@ choice.
 
 Fun L<Mojolicious> application hacks for all occasions.
 
+=head2 Basic authentication
+
+Basic authentication data will be automatically extracted from the
+C<Authorization> header.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub {
+    my $c = shift;
+
+    # Check for username "Bender" and password "rocks"
+    return $c->render(text => 'Hello Bender!')
+      if $c->req->url->to_abs->userinfo eq 'Bender:rocks';
+
+    $c->res->headers->www_authenticate('Basic');
+    $c->render(text => 'Authorization required!', status => 401);
+  };
+
+  app->start;
+
 =head2 Adding a configuration file
 
 Adding a configuration file to your application is as easy as adding a file to

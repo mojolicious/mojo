@@ -253,7 +253,7 @@ sub _cache {
 sub _limit {
   my ($self, $msg, $code) = @_;
   $self->{limit} = 1;
-  $self->error({message => $msg, advice => $code});
+  return $self->error({message => $msg, advice => $code});
 }
 
 sub _parse_formdata {

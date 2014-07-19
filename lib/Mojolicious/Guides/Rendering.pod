@@ -57,7 +57,8 @@ with plugins, but more about that later.
 L<Mojolicious> includes a minimalistic but very powerful template system out
 of the box called Embedded Perl or C<ep> for short. It allows the embedding of
 Perl code right into actual content using a small set of special tags and line
-start characters.
+start characters. For all templates L<strict>, L<warnings>, L<utf8> and Perl
+5.10 features are automatically enabled.
 
   <% Perl code %>
   <%= Perl expression, replaced with XML escaped result %>
@@ -110,12 +111,12 @@ An additional equal sign can be used to disable escaping of the characters
 C<E<lt>>, C<E<gt>>, C<&>, C<'> and C<"> in results from Perl expressions,
 which is the default to prevent XSS attacks against your application.
 
-  <%= 'lalala' %>
-  <%== '<p>test</p>' %>
+  <%= 'I ♥ Mojolicious!' %>
+  <%== '<p>I ♥ Mojolicious!</p>' %>
 
 Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
 
-  <%= b('<p>test</p>') %>
+  <%= b('<p>I ♥ Mojolicious!</p>') %>
 
 Whitespace characters around tags can be trimmed by adding an additional equal
 sign to the end of a tag.

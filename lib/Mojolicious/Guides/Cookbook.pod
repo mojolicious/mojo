@@ -849,7 +849,8 @@ L<Mojo::Message/"json">.
 
 =head2 Basic authentication
 
-You can just add username and password to the URL.
+You can just add username and password to the URL, an C<Authorization> header
+will be automatically generated.
 
   use Mojo::UserAgent;
 
@@ -1168,11 +1169,16 @@ C<Authorization> header.
     return $c->render(text => 'Hello Bender!')
       if $c->req->url->to_abs->userinfo eq 'Bender:rocks';
 
+    # Require authentication
     $c->res->headers->www_authenticate('Basic');
-    $c->render(text => 'Authorization required!', status => 401);
+    $c->render(text => 'Authentication required!', status => 401);
   };
 
   app->start;
+
+This can be combined with TLS for a secure authentication mechanism.
+
+  $ ./myapp.pl daemon -l https://*:3000?cert=./server.crt&key=./server.key
 
 =head2 Adding a configuration file
 

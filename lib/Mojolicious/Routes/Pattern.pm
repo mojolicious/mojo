@@ -77,10 +77,7 @@ sub render {
     if ($op eq 'slash') { $fragment = '/' unless $optional }
 
     # Text
-    elsif ($op eq 'text') {
-      $fragment = $value;
-      $optional = 0;
-    }
+    elsif ($op eq 'text') { ($fragment, $optional) = ($value, 0) }
 
     # Placeholder, relaxed or wildcard
     elsif ($op eq 'placeholder' || $op eq 'relaxed' || $op eq 'wildcard') {
@@ -113,17 +110,13 @@ sub _compile {
 
     # Slash
     if ($op eq 'slash') {
-      $regex    = ($optional ? "(?:/$block)?" : "/$block") . $regex;
-      $block    = '';
-      $optional = 1;
+      $regex = ($optional ? "(?:/$block)?" : "/$block") . $regex;
+      ($block, $optional) = ('', 1);
       next;
     }
 
     # Text
-    elsif ($op eq 'text') {
-      $fragment = quotemeta $value;
-      $optional = 0;
-    }
+    elsif ($op eq 'text') { ($fragment, $optional) = (quotemeta $value, 0) }
 
     # Placeholder
     elsif ($op eq 'placeholder' || $op eq 'relaxed' || $op eq 'wildcard') {
@@ -194,8 +187,7 @@ sub _tokenize {
     # Quote start
     if ($char eq $quote_start) {
       push @tree, ['placeholder', ''];
-      $state  = 'placeholder';
-      $quoted = 1;
+      ($state, $quoted) = ('placeholder', 1);
     }
 
     # Placeholder start
@@ -211,10 +203,7 @@ sub _tokenize {
     }
 
     # Quote end
-    elsif ($char eq $quote_end) {
-      $state  = 'text';
-      $quoted = 0;
-    }
+    elsif ($char eq $quote_end) { ($state, $quoted) = ('text', 0) }
 
     # Slash
     elsif ($char eq '/') {

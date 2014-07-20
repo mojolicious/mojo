@@ -24,6 +24,7 @@ sub AUTOLOAD {
 
 sub add_child {
   my ($self, $route) = @_;
+  $self->root->flush;
   weaken $route->remove->parent($self)->{parent};
   push @{$self->children}, $route;
   return $self;

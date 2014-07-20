@@ -197,17 +197,14 @@ $r->route('/missing/too/*', '' => ['test'])
   ->to('missing#too', '' => 'missing');
 
 # Cached lookup
+is $r->find('fast'),   undef, 'fastest route not found';
+is $r->lookup('fast'), undef, 'fastest route not found';
 my $fast = $r->route('/fast');
 is $r->find('fast'),   $fast, 'fast route found';
 is $r->lookup('fast'), $fast, 'fast route found';
 my $faster = $r->route('/faster')->name('fast');
 is $r->find('fast'),   $faster, 'faster route found';
-is $r->lookup('fast'), $fast,   'fast route found';
-is $r->find('fastest'),   undef, 'fastest route not found';
-is $r->lookup('fastest'), undef, 'fastest route not found';
-my $fastest = $r->route('/fastest');
-is $r->find('fastest'),   $fastest, 'fastest route found';
-is $r->lookup('fastest'), $fastest, 'fastest route found';
+is $r->lookup('fast'), $faster, 'fast route found';
 
 # Make sure stash stays clean
 my $c = Mojolicious::Controller->new;

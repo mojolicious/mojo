@@ -115,6 +115,7 @@ sub put   { shift->_generate_route(PUT   => @_) }
 sub remove {
   my $self = shift;
   return $self unless my $parent = $self->parent;
+  $self->root->flush;
   @{$parent->children} = grep { $_ ne $self } @{$parent->children};
   return $self->parent(undef);
 }

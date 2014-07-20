@@ -53,6 +53,12 @@ sub dispatch {
   return 1;
 }
 
+sub flush {
+  my $self = shift;
+  if (my $cache = $self->cache) { $cache->empty }
+  delete $self->{reverse};
+}
+
 sub hide { push @{shift->hidden}, @_ }
 
 sub is_hidden {
@@ -333,6 +339,12 @@ every action.
   my $bool = $r->dispatch(Mojolicious::Controller->new);
 
 Match routes with L</"match"> and dispatch with L</"continue">.
+
+=head2 flush
+
+  $r->flush;
+
+Flush caches and allow routes to be changed again.
 
 =head2 hide
 

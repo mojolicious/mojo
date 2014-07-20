@@ -36,7 +36,7 @@ sub all {
   return map { @{$jar->{$_}} } sort keys %$jar;
 }
 
-sub empty { shift->{jar} = {} }
+sub empty { delete shift->{jar} }
 
 sub extract {
   my ($self, $tx) = @_;

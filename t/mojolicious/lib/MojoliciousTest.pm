@@ -156,7 +156,7 @@ sub startup {
   $r->route('/rss.xml')->to('foo#bar', format => 'rss');
 
   # /*/* (the default route)
-  $r->route('/(controller)/(action)')->to(action => 'index');
+  $r->route('/(controller)/(action)')->to(action => 'index')->name('default');
 
   # /just/some/template (embedded template)
   $r->route('/just/some/template')->to(template => 'just/some/template');

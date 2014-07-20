@@ -3,6 +3,8 @@ use Mojo::Base -base;
 
 has 'max_keys' => 100;
 
+sub empty { delete shift->{cache} }
+
 sub get { (shift->{cache} || {})->{shift()} }
 
 sub set {
@@ -10,7 +12,7 @@ sub set {
 
   my $cache = $self->{cache} ||= {};
   my $queue = $self->{queue} ||= [];
-  delete $cache->{shift @$queue} if @$queue >= $self->max_keys;
+  delete $cache->{shift @$queue} while @$queue >= $self->max_keys;
   push @$queue, $key unless exists $cache->{$key};
   $cache->{$key} = $value;
 
@@ -52,6 +54,12 @@ Maximum number of cache keys, defaults to C<100>.
 
 L<Mojo::Cache> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 empty
+
+  $cache->empty;
+
+Empty cache.
 
 =head2 get
 

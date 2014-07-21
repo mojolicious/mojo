@@ -183,6 +183,18 @@ ok !$asset->is_file, 'stored in memory';
 $asset = $asset->add_chunk('lala');
 ok !$asset->is_file, 'stored in memory';
 
+# Append to file asset
+$file = Mojo::Asset::File->new(cleanup => 0);
+is $file->add_chunk('hello')->slurp, 'hello', 'right content';
+$path = $file->path;
+undef $file;
+ok -e $path, 'file still exists';
+$file = Mojo::Asset::File->new(path => $path, cleanup => 1);
+is $file->add_chunk(' world')->slurp, 'hello world',  'right content';
+is $file->add_chunk('!')->slurp,      'hello world!', 'right content';
+undef $file;
+ok !-e $path, 'file has been cleaned up';
+
 # Temporary directory
 {
   my $tmpdir = tempdir CLEANUP => 1;

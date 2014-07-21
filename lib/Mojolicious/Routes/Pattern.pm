@@ -63,7 +63,8 @@ sub render {
 
   # Merge values with defaults
   my $format = ($values ||= {})->{format};
-  $values = {%{$self->defaults}, %$values};
+  my $defaults = $self->defaults;
+  $values = {%$defaults, %$values};
 
   # Placeholders can only be optional without a format
   my $optional = !$format;
@@ -79,10 +80,10 @@ sub render {
     # Text
     elsif ($op eq 'text') { ($fragment, $optional) = ($value, 0) }
 
-    # Placeholder, relaxed or wildcard
-    elsif ($op eq 'placeholder' || $op eq 'relaxed' || $op eq 'wildcard') {
+    # Placeholder
+    else {
       $fragment = $values->{$value} // '';
-      my $default = $self->defaults->{$value};
+      my $default = $defaults->{$value};
       if (!defined $default || ($default ne $fragment)) { $optional = 0 }
       elsif ($optional) { $fragment = '' }
     }

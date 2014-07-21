@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use File::Basename 'dirname';
 use File::Spec::Functions qw(catdir catfile);
-use File::Temp 'tempdir';
+use File::Temp qw(tempfile tempdir);
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 
@@ -208,6 +208,18 @@ ok !$asset->is_file, 'stored in memory';
   undef $file;
   ok !-e $path, 'file has been cleaned up';
 }
+
+# Custom existing file
+my ($fh, $tmppath) = tempfile();
+ok -e $tmppath, 'file exists';
+$file = Mojo::Asset::File->new(path => $tmppath);
+is $file->path, $tmppath, 'right path';
+$file->add_chunk('works!');
+is $file->slurp, 'works!', 'right add chunk content';
+undef $file;
+ok -e $tmppath, 'file exists';
+unlink $tmppath;
+ok !-e $tmppath, 'file has been cleaned up';
 
 # Temporary file without cleanup
 $file = Mojo::Asset::File->new(cleanup => 0)->add_chunk('test');

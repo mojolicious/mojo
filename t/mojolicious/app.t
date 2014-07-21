@@ -269,14 +269,6 @@ $t->get_ok('/happy/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
 
-# Foo::index (modify routes at runtime)
-ok $t->app->routes->cache, 'routes are cached';
-$t->get_ok('/foo/index')->content_like(qr/Hello Mojo/);
-$t->app->routes->get('/foo/index' => {text => 'new route'});
-$t->app->routes->add_child($t->app->routes->find('default'));
-$t->get_ok('/foo/index')->content_is('new route');
-ok $t->app->routes->cache, 'routes are still cached';
-
 # Foo::test
 $t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => 'Bite my shiny metal ass!')

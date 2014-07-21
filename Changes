@@ -1,7 +1,5 @@
 
 5.16  2014-07-21
-  - Added empty method to Mojo::Cache.
-  - Added flush method to Mojolicious::Routes.
   - Improved Mojo::Asset::File to allow appending data to existing files.
     (iakuf, sri)
 

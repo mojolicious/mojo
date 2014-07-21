@@ -19,13 +19,9 @@ is $cache->get('foo'),  undef,  'no result';
 is $cache->get('bar'),  undef,  'no result';
 is $cache->get('baz'),  'yada', 'right result';
 is $cache->get('yada'), 23,     'right result';
-$cache->empty;
-is $cache->get('baz'),  undef, 'no result';
-is $cache->get('yada'), undef, 'no result';
-$cache->max_keys(1)->set(one => 1)->set(two => 2)->set(three => 3);
-is $cache->get('one'),   undef, 'no result';
-is $cache->get('two'),   undef, 'no result';
-is $cache->get('three'), 3,     'right result';
+$cache->max_keys(1)->set(one => 1)->set(two => 2);
+is $cache->get('one'), undef, 'no result';
+is $cache->get('two'), 2,     'right result';
 
 $cache = Mojo::Cache->new(max_keys => 3);
 is $cache->get('foo'), undef, 'no result';

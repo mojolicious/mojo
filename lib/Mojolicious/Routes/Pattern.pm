@@ -179,47 +179,42 @@ sub _tokenize {
   my $relaxed     = $self->relaxed_start;
   my $wildcard    = $self->wildcard_start;
 
-  my $state = 'text';
-  my (@tree, $quoted);
+  my (@tree, $inside, $quoted);
   for my $char (split '', $pattern) {
-    my $inside = !!grep { $_ eq $state } qw(placeholder relaxed wildcard);
 
     # Quote start
     if ($char eq $quote_start) {
       push @tree, ['placeholder', ''];
-      ($state, $quoted) = ('placeholder', 1);
+      ($inside, $quoted) = (1, 1);
     }
 
     # Placeholder start
     elsif ($char eq $placeholder) {
-      push @tree, ['placeholder', ''] if $state ne 'placeholder';
-      $state = 'placeholder';
+      push @tree, ['placeholder', ''] unless $inside++;
     }
 
     # Relaxed or wildcard start (upgrade when quoted)
     elsif ($char eq $relaxed || $char eq $wildcard) {
       push @tree, ['placeholder', ''] unless $quoted;
-      $tree[-1][0] = $state = $char eq $relaxed ? 'relaxed' : 'wildcard';
+      $tree[-1][0] = $char eq $relaxed ? 'relaxed' : 'wildcard';
+      $inside = 1;
     }
 
     # Quote end
-    elsif ($char eq $quote_end) { ($state, $quoted) = ('text', 0) }
+    elsif ($char eq $quote_end) { ($inside, $quoted) = (0, 0) }
 
     # Slash
     elsif ($char eq '/') {
       push @tree, ['slash'];
-      $state = 'text';
+      $inside = 0;
     }
 
     # Placeholder, relaxed or wildcard
-    elsif ($inside && $char =~ /\w/) { $tree[-1][-1] .= $char }
+    elsif ($inside) { $tree[-1][-1] .= $char }
 
     # Text
-    else {
-      push @tree, ['text', $char] and next unless $tree[-1][0] eq 'text';
-      $tree[-1][-1] .= $char;
-      $state = 'text';
-    }
+    elsif ($tree[-1][0] eq 'text') { $tree[-1][-1] .= $char }
+    else                           { push @tree, ['text', $char] }
   }
 
   return $self->pattern($pattern)->tree(\@tree);

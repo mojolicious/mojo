@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use File::Basename 'dirname';
 use File::Spec::Functions qw(catdir catfile);
-use File::Temp qw/tempfile tempdir/;
+use File::Temp qw(tempfile tempdir);
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 
@@ -209,7 +209,7 @@ ok !$asset->is_file, 'stored in memory';
   ok !-e $path, 'file has been cleaned up';
 }
 
-# Custom Existing file
+# Custom existing file
 my ($fh, $tmppath) = tempfile();
 ok -e $tmppath, 'file exists';
 $file = Mojo::Asset::File->new(path => $tmppath);

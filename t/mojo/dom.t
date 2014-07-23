@@ -2309,9 +2309,7 @@ $dom = Mojo::DOM->new(<<EOF);
   <p>Test</p>
   <input type="text" name="a" value="A" />
   <input type="checkbox" checked name="b" value="B">
-  <input type="checkbox" name="c" value="C">
-  <input type="radio" name="d" value="D">
-  <input type="radio" checked name="e" value="E">
+  <input type="radio" checked name="c" value="C">
   <select name="f">
     <option value="F">G</option>
     <optgroup>
@@ -2321,44 +2319,25 @@ $dom = Mojo::DOM->new(<<EOF);
     <option value="J" selected>K</option>
   </select>
   <select name="n"><option>N</option></select>
-  <select name="l"><option selected>L</option></select>
+  <select name="d"><option selected>D</option></select>
   <textarea name="m">M</textarea>
-  <input type="button" name="s" value="S" />
   <button name="o" value="O">No!</button>
   <input type="submit" name="p" value="P" />
 </form>
-<form id="button">
-  <button type="reset" name="r" value="R">No!</button>
-  <button type="button" name="q" value="Q">No!</button>
-  <button type="submit" name="s" value="S">Yes!</button>
-</form>
-<form id="input">
-  <input type="button" name="t" value="T">
-  <input type="reset" name="u" value="U">
-  <input type="submit" name="v" value="V">
-</form>
-<form id="empty"></form>
 EOF
-is $dom->at('p')->val, undef, 'no value';
-is_deeply $dom->at('form')->val,
-  {a => 'A', f => ['I', 'J'], l => 'L', m => 'M', o => 'O'}, 'right values';
-is $dom->at('input')->val, 'A', 'right value';
-is $dom->find('input')->[2]->val, 'C', 'right value';
-is $dom->find('input')->[3]->val, 'D', 'right value';
+is $dom->at('p')->val,                         undef, 'no value';
+is $dom->at('input')->val,                     'A',   'right value';
+is $dom->at('input:checked')->val,             'B',   'right value';
+is $dom->at('input:checked[type=radio]')->val, 'C',   'right value';
 is_deeply $dom->find('select')->first->val, ['I', 'J'], 'right values';
-is $dom->at('select option')->val, 'F', 'right value';
+is $dom->at('select option')->val,                          'F', 'right value';
+is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
 is $dom->find('select')->[1]->val, undef, 'no value';
 is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
-is $dom->find('select')->last->val, 'L', 'right value';
+is $dom->find('select')->last->val, 'D', 'right value';
 is $dom->at('textarea')->val, 'M', 'right value';
-is $dom->at('form')->find('input')->[-2]->val, 'S', 'right value';
-is $dom->at('form')->find('input')->last->val, 'P', 'right value';
-is_deeply $dom->at('#button')->val, {s => 'S'}, 'right values';
-is $dom->at('#button [type=button]')->val, 'Q', 'right value';
-is_deeply $dom->at('#input')->val, {v => 'V'}, 'right values';
-is $dom->at('#input [type=button]')->val, 'T', 'right value';
-is $dom->at('#input [type=reset]')->val,  'U', 'right value';
-is_deeply $dom->at('#empty')->val, {}, 'no values';
+is $dom->at('button')->val,   'O', 'right value';
+is $dom->find('form input')->last->val, 'P', 'right value';
 
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');

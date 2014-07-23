@@ -179,20 +179,21 @@ sub type {
 sub val {
   my $self = shift;
 
-  # Element
-  return $self->_val unless $self->type eq 'form';
+  # "option"
+  my $type = $self->type;
+  return $self->{value} // $self->text if $type eq 'option';
 
-  # Form
-  my $form = {};
-  _pair($form, $_->{name}, $_->_val) for $self->find('select, textarea')->each;
-  _input($form, $_)
-    for $self->find('input:not([type=button], [type=submit], [type="reset"])')
-    ->each;
-  my $e = $self->at(
-    'button[type="submit"], button:not([type]), input[type=submit]');
-  _input($form, $e) if $e;
+  # "select"
+  if ($type eq 'select') {
+    my @values = $self->find('option[selected]')->val->each;
+    return @values ? @values > 1 ? \@values : $values[0] : undef;
+  }
 
-  return $form;
+  # "textarea"
+  return $self->text if $type eq 'textarea';
+
+  # "input" or "button"
+  return $type eq 'input' || $type eq 'button' ? $self->{value} : undef;
 }
 
 sub wrap         { shift->_wrap(0, @_) }
@@ -272,13 +273,6 @@ sub _delegate {
   return $self;
 }
 
-sub _input {
-  my ($form, $e) = @_;
-  my $type = $e->{type} // '';
-  _pair($form, $e->{name}, $e->_val)
-    if ($type ne 'radio' && $type ne 'checkbox') || defined $e->{checked};
-}
-
 sub _link {
   my ($children, $parent) = @_;
 
@@ -305,8 +299,6 @@ sub _offset {
   $_ eq $child ? last : $i++ for @$parent[$i .. $#$parent];
   return $i;
 }
-
-sub _pair { $_[0]->{$_[1]} = $_[2] if defined $_[1] && defined $_[2] }
 
 sub _parent { $_[0]->tree->[$_[0]->node eq 'tag' ? 3 : 2] }
 
@@ -379,26 +371,6 @@ sub _text {
   }
 
   return $text;
-}
-
-sub _val {
-  my $self = shift;
-
-  # "option"
-  my $type = $self->type;
-  return $self->{value} // $self->text if $type eq 'option';
-
-  # "select"
-  if ($type eq 'select') {
-    my @values = $self->find('option[selected]')->val->each;
-    return @values ? @values > 1 ? \@values : $values[0] : undef;
-  }
-
-  # "textarea"
-  return $self->text if $type eq 'textarea';
-
-  # "input" or "button"
-  return $type eq 'input' || $type eq 'button' ? $self->{value} : undef;
 }
 
 sub _wrap {
@@ -876,20 +848,13 @@ This element's type.
 
   my $value = $dom->val;
 
-Extract values from C<button>, C<form>, C<input>, C<option>, C<select> and
-C<textarea> elements or return C<undef> if this element has no value. In the
-case of C<select>, find an C<option> element with C<selected> attribute and
-return its value or an array reference with all values if there are more than
-one. In the case of C<form>, find all elements mentioned before that would be
-submitted by pressing the first button and return a hash reference with their
-names and values.
+Extract values from C<button>, C<input>, C<option>, C<select> and C<textarea>
+elements or return C<undef> if this element has no value. In the case of
+C<select>, find an C<option> element with C<selected> attribute and return its
+value or an array reference with all values if there are more than one.
 
   # "b"
   $dom->parse('<form><input name="a" value="b"></form>')->at('input')->val;
-
-  # "b"
-  $dom->parse('<form action="/"><input name="a" value="b"></form>')
-    ->at('form')->val->{a};
 
 =head2 wrap
 

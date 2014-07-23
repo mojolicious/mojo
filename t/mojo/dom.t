@@ -2323,16 +2323,21 @@ $dom = Mojo::DOM->new(<<EOF);
   <select name="n"><option>N</option></select>
   <select name="l"><option selected>L</option></select>
   <textarea name="m">M</textarea>
-  <button name="o" value="O">No!</button>
   <input type="button" name="s" value="S" />
+  <button name="o" value="O">No!</button>
   <input type="submit" name="p" value="P" />
 </form>
-<form><input type="submit" name="q" value="Q"></form>
-<form>
-  <input type="button" name="r" value="R">
-  <input type="submit" name="t" value="T">
+<form id="button">
+  <button type="reset" name="r" value="R">No!</button>
+  <button type="button" name="b" value="B">No!</button>
+  <button type="submit" name="s" value="S">Yes!</button>
 </form>
-<form></form>
+<form id="input">
+  <input type="button" name="b" value="B">
+  <input type="reset" name="r" value="R">
+  <input type="submit" name="q" value="Q">
+</form>
+<form id="empty"></form>
 EOF
 is $dom->at('p')->val, undef, 'no value';
 is_deeply $dom->at('form')->val,
@@ -2348,11 +2353,13 @@ is $dom->find('select')->last->val, 'L', 'right value';
 is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('form')->find('input')->[-2]->val, 'S', 'right value';
 is $dom->at('form')->find('input')->last->val, 'P', 'right value';
-is_deeply $dom->find('form')->[1]->val, {q => 'Q'}, 'right values';
-is_deeply $dom->find('form')->[2]->val, {}, 'no values';
-is $dom->find('form')->[2]->find('input')->first->val, 'R', 'right value';
-is $dom->find('form')->[2]->find('input')->last->val,  'T', 'right value';
-is_deeply $dom->find('form')->last->val, {}, 'no values';
+is_deeply $dom->at('form#button')->val, {s => 'S'}, 'right value';
+is_deeply $dom->at('form#button')->at('[type="button"]')->val, 'B',
+  'right value';
+is_deeply $dom->at('form#input')->val, {q => 'Q'}, 'right value';
+is_deeply $dom->at('form#input')->at('[type="button"]')->val, 'B',
+  'right value';
+is_deeply $dom->at('form#empty')->val, {}, 'right value';
 
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');

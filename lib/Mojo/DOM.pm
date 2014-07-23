@@ -186,8 +186,10 @@ sub val {
   my $form = {};
   _pair($form, $_->{name}, $_->_val) for $self->find('select, textarea')->each;
   _input($form, $_)
-    for $self->find('input:not([type=button], [type="submit"])')->each;
-  my $e = $self->at('button, input[type=button], input[type=submit]');
+    for $self->find('input:not([type=button], [type=submit], [type="reset"])')
+    ->each;
+  my $e = $self->at(
+    'button[type="submit"], button:not([type]), input[type=submit]');
   _input($form, $e) if $e;
 
   return $form;

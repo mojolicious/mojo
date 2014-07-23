@@ -273,8 +273,9 @@ sub _delegate {
 sub _input {
   my ($form, $e) = @_;
   my $type = $e->{type} // '';
-  _pair($form, $e->{name}, $e->_val)
-    if ($type ne 'radio' && $type ne 'checkbox') || defined $e->{checked};
+  my $check = $type eq 'radio' || $type eq 'checkbox';
+  return if $type eq 'button' || ($check && !defined $e->{checked});
+  _pair($form, $e->{name}, $e->_val);
 }
 
 sub _link {

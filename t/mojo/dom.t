@@ -2328,7 +2328,10 @@ $dom = Mojo::DOM->new(<<EOF);
   <input type="submit" name="p" value="P" />
 </form>
 <form><input type="submit" name="q" value="Q"></form>
-<form><input type="button" name="r" value="R"></form>
+<form>
+  <input type="button" name="r" value="R">
+  <input type="submit" name="t" value="T">
+</form>
 <form></form>
 EOF
 is $dom->at('p')->val, undef, 'no value';
@@ -2346,7 +2349,9 @@ is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('form')->find('input')->[-2]->val, 'S', 'right value';
 is $dom->at('form')->find('input')->last->val, 'P', 'right value';
 is_deeply $dom->find('form')->[1]->val, {q => 'Q'}, 'right values';
-is_deeply $dom->find('form')->[2]->val, {r => 'R'}, 'right values';
+is_deeply $dom->find('form')->[2]->val, {}, 'no values';
+is $dom->find('form')->[2]->find('input')->first->val, 'R', 'right value';
+is $dom->find('form')->[2]->find('input')->last->val,  'T', 'right value';
 is_deeply $dom->find('form')->last->val, {}, 'no values';
 
 # Slash between attributes

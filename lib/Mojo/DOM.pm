@@ -184,10 +184,7 @@ sub val {
   return $self->{value} // $self->text if $type eq 'option';
 
   # "select"
-  if ($type eq 'select') {
-    my @values = $self->find('option[selected]')->val->each;
-    return @values ? @values > 1 ? \@values : $values[0] : undef;
-  }
+  return $self->find('option[selected]')->val || undef if $type eq 'select';
 
   # "textarea"
   return $self->text if $type eq 'textarea';
@@ -850,8 +847,8 @@ This element's type.
 
 Extract values from C<button>, C<input>, C<option>, C<select> and C<textarea>
 elements or return C<undef> if this element has no value. In the case of
-C<select>, find an C<option> element with C<selected> attribute and return its
-value or an array reference with all values if there are more than one.
+C<select>, find all C<option> elements with C<selected> attribute and return a
+L<Mojo::Collection> object containing their values.
 
   # "b"
   $dom->parse('<form><input name="a" value="b"></form>')->at('input')->val;

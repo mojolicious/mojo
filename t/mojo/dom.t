@@ -2329,13 +2329,13 @@ $dom = Mojo::DOM->new(<<EOF);
 </form>
 <form id="button">
   <button type="reset" name="r" value="R">No!</button>
-  <button type="button" name="b" value="B">No!</button>
+  <button type="button" name="q" value="Q">No!</button>
   <button type="submit" name="s" value="S">Yes!</button>
 </form>
 <form id="input">
-  <input type="button" name="b" value="B">
-  <input type="reset" name="r" value="R">
-  <input type="submit" name="q" value="Q">
+  <input type="button" name="t" value="T">
+  <input type="reset" name="u" value="U">
+  <input type="submit" name="v" value="V">
 </form>
 <form id="empty"></form>
 EOF
@@ -2353,13 +2353,12 @@ is $dom->find('select')->last->val, 'L', 'right value';
 is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('form')->find('input')->[-2]->val, 'S', 'right value';
 is $dom->at('form')->find('input')->last->val, 'P', 'right value';
-is_deeply $dom->at('form#button')->val, {s => 'S'}, 'right value';
-is_deeply $dom->at('form#button')->at('[type="button"]')->val, 'B',
-  'right value';
-is_deeply $dom->at('form#input')->val, {q => 'Q'}, 'right value';
-is_deeply $dom->at('form#input')->at('[type="button"]')->val, 'B',
-  'right value';
-is_deeply $dom->at('form#empty')->val, {}, 'right value';
+is_deeply $dom->at('#button')->val, {s => 'S'}, 'right values';
+is $dom->at('#button [type=button]')->val, 'Q', 'right value';
+is_deeply $dom->at('#input')->val, {v => 'V'}, 'right values';
+is $dom->at('#input [type=button]')->val, 'T', 'right value';
+is $dom->at('#input [type=reset]')->val,  'U', 'right value';
+is_deeply $dom->at('#empty')->val, {}, 'no values';
 
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');

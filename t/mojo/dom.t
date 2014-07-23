@@ -2306,7 +2306,7 @@ is $dom->find('div > ul ul')->[1], undef, 'no result';
 # Form values
 $dom = Mojo::DOM->new(<<EOF);
 <form action="/foo">
-  <progress value="70" max="100">70 %</progress>
+  <p>Test</p>
   <input type="text" name="a" value="A" />
   <input type="checkbox" checked name="b" value="B">
   <input type="radio" checked name="c" value="C">
@@ -2325,17 +2325,20 @@ $dom = Mojo::DOM->new(<<EOF);
   <input type="submit" name="p" value="P" />
 </form>
 EOF
-is $dom->at('progress')->val,                  undef, 'no value';
-is $dom->at('input')->val,                     'A',   'right value';
-is $dom->at('input:checked')->val,             'B',   'right value';
-is $dom->at('input:checked[type=radio]')->val, 'C',   'right value';
+is_deeply [$dom->at('p')->val->each], [], 'no values';
+is $dom->at('input')->val->size, 1, 'one value';
+is $dom->at('input')->val,                     'A', 'right value';
+is $dom->at('input:checked')->val,             'B', 'right value';
+is $dom->at('input:checked[type=radio]')->val, 'C', 'right value';
 is $dom->find('select')->first->val->join(':'), 'I:J', 'right value';
 is_deeply [$dom->find('select')->first->val->each], ['I', 'J'], 'right values';
+is $dom->at('select option')->val->size, 1, 'one value';
 is $dom->at('select option')->val,                          'F', 'right value';
 is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
-is $dom->find('select')->[1]->val, undef, 'no value';
+is $dom->find('select')->[1]->val->size, 0, 'no values';
 is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
 is $dom->find('select')->last->val, 'D', 'right value';
+is $dom->at('textarea')->val->size, 1,   'one value';
 is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('button')->val,   'O', 'right value';
 is $dom->find('form input')->last->val, 'P', 'right value';

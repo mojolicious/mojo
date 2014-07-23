@@ -181,16 +181,17 @@ sub val {
 
   # "option"
   my $type = $self->type;
-  return $self->{value} // $self->text if $type eq 'option';
+  return Mojo::Collection->new($self->{value} // $self->text)
+    if $type eq 'option';
 
   # "select"
-  return $self->find('option[selected]')->val || undef if $type eq 'select';
+  return $self->find('option[selected]')->val->flatten if $type eq 'select';
 
   # "textarea"
-  return $self->text if $type eq 'textarea';
+  return Mojo::Collection->new($self->text) if $type eq 'textarea';
 
   # "input" or "button"
-  return $type eq 'input' || $type eq 'button' ? $self->{value} : undef;
+  return Mojo::Collection->new($self->{value} // ());
 }
 
 sub wrap         { shift->_wrap(0, @_) }
@@ -843,12 +844,12 @@ This element's type.
 
 =head2 val
 
-  my $value = $dom->val;
+  my $collection = $dom->val;
 
 Extract values from C<button>, C<input>, C<option>, C<select> and C<textarea>
-elements or return C<undef> if this element has no value. In the case of
-C<select>, find all C<option> elements with C<selected> attribute and return a
-L<Mojo::Collection> object containing their values.
+elements and return a L<Mojo::Collection> object containing these values. In
+the case of C<select>, find all C<option> elements it contains that have a
+C<selected> attribute and extract their values.
 
   # "b"
   $dom->parse('<form><input name="a" value="b"></form>')->at('input')->val;

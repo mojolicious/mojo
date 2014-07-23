@@ -2306,7 +2306,7 @@ is $dom->find('div > ul ul')->[1], undef, 'no result';
 # Form values
 $dom = Mojo::DOM->new(<<EOF);
 <form action="/foo">
-  <p>Test</p>
+  <progress value="70" max="100">70 %</progress>
   <input type="text" name="a" value="A" />
   <input type="checkbox" checked name="b" value="B">
   <input type="radio" checked name="c" value="C">
@@ -2325,7 +2325,7 @@ $dom = Mojo::DOM->new(<<EOF);
   <input type="submit" name="p" value="P" />
 </form>
 EOF
-is $dom->at('p')->val,                         undef, 'no value';
+is $dom->at('progress')->val,                  undef, 'no value';
 is $dom->at('input')->val,                     'A',   'right value';
 is $dom->at('input:checked')->val,             'B',   'right value';
 is $dom->at('input:checked[type=radio]')->val, 'C',   'right value';

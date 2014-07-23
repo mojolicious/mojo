@@ -873,8 +873,6 @@ This element's type.
 =head2 val
 
   my $value = $dom->val;
-  my $array = $dom->val;
-  my $hash  = $dom->val;
 
 Extract values from C<button>, C<form>, C<input>, C<option>, C<select> and
 C<textarea> elements or return C<undef> if this element has no value. In the

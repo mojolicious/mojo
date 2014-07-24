@@ -19,7 +19,7 @@ sub configure {
   # Hypnotoad settings
   my $prefork = $self->prefork;
   my $c = $prefork->app->config($name) || {};
-  $c->{listen} ||= ['http://*:8080'];
+  $c->{listen} ||= [split ',', $ENV{MOJO_LISTEN} || 'http://*:8080'];
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
   # Prefork settings

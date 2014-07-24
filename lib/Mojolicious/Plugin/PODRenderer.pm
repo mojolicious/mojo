@@ -58,13 +58,12 @@ sub _html {
   # Rewrite headers
   my $toc = Mojo::URL->new->fragment('toc');
   my (%anchors, @parts);
+  my $pod = Pod::Simple::HTML->new;
   for my $e ($dom->find('h1, h2, h3')->each) {
 
     # Anchor and text
-    my $name = my $text = $e->all_text;
-    $name =~ s/\s+/_/g;
-    $name =~ s/[^\w\-]//g;
-    my $anchor = $name;
+    my $text   = $e->all_text;
+    my $anchor = my $name = $pod->section_escape($text);
     my $i      = 1;
     $anchor = $name . $i++ while $anchors{$anchor}++;
 

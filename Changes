@@ -3,6 +3,7 @@
   - Welcome to the Mojolicious core team Jan Henning Thorsen.
   - Added val method to Mojo::DOM. (batman, sri)
   - Improved Mojo::Collection performance.
+  - Fixed support for Unicode anchors in Mojolicious::Plugin::PODRenderer.
 
 5.16  2014-07-21
   - Improved Mojo::Asset::File to allow appending data to existing files.

@@ -111,7 +111,9 @@
     $(".mojoscroll").click(function(e) {
       e.preventDefault();
       e.stopPropagation();
-      var hash   = "#" + this.href.split("#")[1];
+      var hash = this.href.split("#")[1];
+      hash     = hash.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&");
+      hash       = "#" + hash;
       var target = $(hash);
       var old    = target.attr('id');
       target.attr('id', '');

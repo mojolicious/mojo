@@ -44,7 +44,7 @@ hypnotoad - Hypnotoad HTTP and WebSocket server
     -h, --help                     Show this message.
     -l, --listen <location>        One or more locations you want to listen
                                    on, defaults to the value of MOJO_LISTEN or
-                                   "http://*:3000".
+                                   "http://*:8080".
     -s, --stop                     Stop server gracefully.
     -t, --test                     Test application and exit.
 

@@ -26,7 +26,7 @@ sub DESTROY { }
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
-  shift->grep(sub { length($_ // '') });
+  $_[0]->new(grep { defined $_ && (ref $_ || length $_) } @{$_[0]});
 }
 
 sub each {
@@ -70,7 +70,7 @@ sub new {
 
 sub pluck {
   my ($self, $method, @args) = @_;
-  return $self->map(sub { $_->$method(@args) });
+  return $self->new(map { $_->$method(@args) } @$self);
 }
 
 sub reverse { $_[0]->new(reverse @{$_[0]}) }
@@ -93,7 +93,7 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub uniq {
   my %seen;
-  return shift->grep(sub { !$seen{$_}++ });
+  return $_[0]->new(grep { !$seen{$_}++ } @{$_[0]});
 }
 
 sub _flatten {

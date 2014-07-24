@@ -2,6 +2,7 @@
 5.17  2014-07-24
   - Welcome to the Mojolicious core team Jan Henning Thorsen.
   - Added val method to Mojo::DOM. (batman, sri)
+  - Improved Mojo::Collection performance.
 
 5.16  2014-07-21
   - Improved Mojo::Asset::File to allow appending data to existing files.

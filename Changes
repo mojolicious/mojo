@@ -1,4 +1,6 @@
 
+5.19  2014-07-26
+
 5.18  2014-07-25
   - Improved is_readable performance in Mojo::Reactor.
 

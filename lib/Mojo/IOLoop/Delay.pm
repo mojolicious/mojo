@@ -282,8 +282,8 @@ Data shared between all L</"steps">.
   $delay = $delay->jump(label => 'LABEL');
 
 Increment active event counter and decrement it again right away to pass
-values to the labeled step or step that is is far from the current one by number of jumps.
-0 means "the next step", -1 means "the latest one".
+values to the labeled step or step that is far from the current one by number
+of jumps. 0 means "the next step", -1 means "the latest one".
 
   my $delay = Mojo::IOLoop->delay(
 

@@ -18,7 +18,18 @@ sub begin {
 
 sub data { shift->Mojo::_dict(data => @_) }
 
-sub pass { $_[0]->begin->(@_) }
+sub jump {
+  my $self = shift;
+  my $index = $self->_step_index(shift, shift);
+
+  $self->remaining(
+    defined $index
+    ? [@{$self->remaining}[$index .. $#{$self->remaining}]]
+    : []);
+  return $self->begin->($self, @_);
+}
+
+sub pass { shift->jump(index => 0, @_) }
 
 sub remaining {
   my $self = shift;
@@ -53,7 +64,9 @@ sub _step {
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
-  if (my $cb = shift @{$self->remaining}) {
+  my $cb;
+  $cb = shift @{$self->remaining} for 0 .. $self->_step_index(index => 0) // 0;
+  if ($cb) {
     eval { $self->$cb(@args); 1 }
       or (++$self->{fail} and return $self->remaining([])->emit(error => $@));
   }
@@ -61,6 +74,44 @@ sub _step {
   return $self->remaining([])->emit(finish => @args) unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
   return $self;
+}
+
+sub _step_index {
+  my ($self, %selector) = @_;
+
+  return
+    defined $selector{index}
+    ? _step_num_index($self->remaining, $selector{index})
+    : _step_labeled_index($self->remaining, $selector{label});
+}
+
+sub _step_labeled_index {
+  my ($arr, $label) = (shift, shift);
+
+  my $i = 0;
+  foreach my $step (@$arr) {
+    return ++$i if $step eq $label;
+    $i++;
+  }
+  return;
+}
+
+sub _step_num_index {
+  my ($arr, $num) = (shift, shift);
+
+  if ($num < 0) {
+    for (my ($i, $ref_count) = (-1, 0); -$i - 1 < @$arr; $i--) {
+      $ref_count++ if ref $$arr[$i];
+      return $i + @$arr unless -$num > $ref_count;
+    }
+  }
+  else {
+    for (my ($i, $ref_count) = (0, 0); $i < @$arr; $i++) {
+      $ref_count++ if ref $$arr[$i];
+      return $i if $ref_count > $num;
+    }
+  }
+  return;
 }
 
 1;
@@ -223,6 +274,47 @@ Data shared between all L</"steps">.
   # Remove value
   my $foo = delete $delay->data->{foo};
 
+=head2 jump
+
+  $delay = $delay->jump(index => 0, @args);
+  $delay = $delay->jump(index => -1);
+  $delay = $delay->pass(label => 'LABEL', @args);
+  $delay = $delay->jump(label => 'LABEL');
+
+Increment active event counter and decrement it again right away to pass
+values to the labeled step or step that is is far from the current one by number of jumps.
+0 means "the next step", -1 means "the latest one".
+
+  my $delay = Mojo::IOLoop->delay(
+
+    sub { my $delay = shift; $delay->jump(label => 'HERE', "Value for HERE") },
+    sub { warn "Never happens" },
+
+    # labeled step
+    HERE => sub {
+      my $delay = shift;
+      say "HERE", ', received: ', @_;
+      $delay->jump(index => -1);
+    },
+
+    sub { warn "Never happens" },
+
+    # latest step (index => -1)
+    sub {
+      my $delay = shift;
+      say "I'm the latest step";
+
+      # same as $delay->pass('Some value');
+      $delay->jump(index => 0, 'Some value');
+    },
+  )->wait;
+
+Passing index 0 means the same as:
+
+  $delay->begin(0)->(@args);
+
+You can jump in the forward direction only.
+
 =head2 pass
 
   $delay = $delay->pass;
@@ -232,7 +324,7 @@ Increment active event counter and decrement it again right away to pass
 values to the next step.
 
   # Longer version
-  $delay->begin(0)->(@args);
+  $delay->jump(index => 0, @args);
 
 =head2 remaining
 

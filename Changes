@@ -1,5 +1,7 @@
 
 5.20  2014-07-27
+  - Fixed a few bugs in Mojolicious::Plugin::PODRenderer by switching from
+    Pod::Simple::HTML to Pod::Simple::XHTML.
 
 5.19  2014-07-26
   - Improved support for Unicode anchors in Mojolicious::Plugin::PODRenderer.

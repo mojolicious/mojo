@@ -1,5 +1,6 @@
 
 5.19  2014-07-26
+  - Improved support for Unicode anchors in Mojolicious::Plugin::PODRenderer.
 
 5.18  2014-07-25
   - Improved is_readable performance in Mojo::Reactor.

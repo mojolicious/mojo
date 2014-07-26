@@ -68,10 +68,15 @@
   </div>
 </div>
 <script>
+  function escapeAnchor(hash) {
+    var anchor = hash.split("#")[1]
+    anchor = anchor.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&");
+    return "#" + anchor;
+  }
   var mojobar = $('#mojobar');
   var mojobarHeight = mojobar.outerHeight();
   function fixOffset() {
-    var offset = $(window.location.hash).offset();
+    var offset = $(escapeAnchor(window.location.hash)).offset();
     if (offset) {
       $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
     }
@@ -111,10 +116,8 @@
     $(".mojoscroll").click(function(e) {
       e.preventDefault();
       e.stopPropagation();
-      var hash = this.href.split("#")[1];
-      hash     = hash.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&");
-      hash       = "#" + hash;
-      var target = $(hash);
+      var hash   = "#" + this.href.split("#")[1];
+      var target = $(escapeAnchor(hash));
       var old    = target.attr('id');
       target.attr('id', '');
       location.hash = hash;

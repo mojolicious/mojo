@@ -39,10 +39,7 @@ sub endpoint {
   return $proto, $host, $port;
 }
 
-sub peer {
-  my ($self, $tx) = @_;
-  return $self->_proxy($tx, $self->endpoint($tx));
-}
+sub peer { $_[0]->_proxy($_[1], $_[0]->endpoint($_[1])) }
 
 sub proxy_connect {
   my ($self, $old) = @_;

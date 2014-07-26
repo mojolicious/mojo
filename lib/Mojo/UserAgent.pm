@@ -239,7 +239,7 @@ sub _finish {
   my ($self, $id, $close) = @_;
 
   # Remove request timeout
-  my $c = $self->{connections}{$id};
+  return unless my $c    = $self->{connections}{$id};
   return unless my $loop = $self->_loop($c->{nb});
   $loop->remove($c->{timeout}) if $c->{timeout};
 

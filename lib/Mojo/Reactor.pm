@@ -15,7 +15,9 @@ sub detect {
 sub io { croak 'Method "io" not implemented by subclass' }
 
 # This may break at some point in the future, but is worth it for performance
-sub is_readable { !(IO::Poll::_poll(0, fileno(pop), POLLIN | POLLPRI) == 0) }
+sub is_readable {
+  !(IO::Poll::_poll(0, fileno(pop), my $dummy = POLLIN | POLLPRI) == 0);
+}
 
 sub is_running { croak 'Method "is_running" not implemented by subclass' }
 

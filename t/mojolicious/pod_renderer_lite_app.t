@@ -6,6 +6,10 @@ BEGIN {
 }
 
 use Test::More;
+
+plan skip_all => 'Mojolicious::Plugin::PODRenderer requires Perl 5.12'
+  if $] < 5.012;
+
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -30,17 +34,18 @@ get '/empty' => {inline => '', handler => 'pod'};
 my $t = Test::Mojo->new;
 
 # Simple POD template
-$t->get_ok('/')->status_is(200)->content_like(qr!<h1.*>Test123</h1>!)
+$t->get_ok('/')->status_is(200)
+  ->content_like(qr!<h1 id="Test123">Test123</h1>!)
   ->content_like(qr|<p>It <code>works</code>!</p>|);
 
 # POD helper
-$t->post_ok('/')->status_is(200)->content_like(qr!test123<h1.*>A</h1>!)
-  ->content_like(qr!<h1.*>B</h1>!)
+$t->post_ok('/')->status_is(200)->content_like(qr!test123<h1 id="A">A</h1>!)
+  ->content_like(qr!<h1 id="B">B</h1>!)
   ->content_like(qr!\s+<p><code>test</code></p>!)->content_like(qr/Gray/);
 
 # POD filter
 $t->post_ok('/block')->status_is(200)
-  ->content_like(qr!test321<h2.*>lalala</h2>!)
+  ->content_like(qr!test321<h2 id="lalala">lalala</h2>!)
   ->content_like(qr!<p><code>test</code></p>!)->content_like(qr/Gray/);
 
 # Empty

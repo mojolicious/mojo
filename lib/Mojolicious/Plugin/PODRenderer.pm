@@ -12,6 +12,9 @@ use Pod::Simple::Search;
 sub register {
   my ($self, $app, $conf) = @_;
 
+  # Pod::Simple::XHTML in Perl 5.10.1 was broken
+  die 'Mojolicious::Plugin::PODRenderer requires Perl 5.12' if $] < 5.012;
+
   my $preprocess = $conf->{preprocess} || 'ep';
   $app->renderer->add_handler(
     $conf->{name} || 'pod' => sub {
@@ -61,13 +64,13 @@ sub _html {
   my $pod = Pod::Simple::XHTML->new;
   for my $e ($dom->find('h1, h2, h3')->each) {
 
-    # Anchor
-    my $text = $e->all_text;
-    my $anchor = $pod->idify($e->{id} // $text);
+    # Unique anchor
+    my $anchor = $pod->idify($e->{id});
 
     # Rewrite
     push @parts, [] if $e->type eq 'h1' || !@parts;
     my $link = Mojo::URL->new->fragment($anchor);
+    my $text = $e->all_text;
     push @{$parts[-1]}, $text, $link;
     my $permalink = $self->link_to('#' => $link, class => 'permalink');
     $e->content($permalink . $self->link_to($text => $toc, id => $anchor));

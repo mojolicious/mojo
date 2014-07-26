@@ -58,17 +58,16 @@ sub _html {
   # Rewrite headers
   my $toc = Mojo::URL->new->fragment('toc');
   my (%anchors, @parts);
+  my $pod = Pod::Simple::XHTML->new;
   for my $e ($dom->find('h1, h2, h3')->each) {
 
     # Anchor
-    my $anchor = my $name = $e->{id};
-    my $i = 1;
-    $anchor = $name . $i++ while $anchors{$anchor}++;
+    my $text = $e->all_text;
+    my $anchor = $pod->idify($e->{id} // $text);
 
     # Rewrite
     push @parts, [] if $e->type eq 'h1' || !@parts;
     my $link = Mojo::URL->new->fragment($anchor);
-    my $text = $e->all_text;
     push @{$parts[-1]}, $text, $link;
     my $permalink = $self->link_to('#' => $link, class => 'permalink');
     $e->content($permalink . $self->link_to($text => $toc, id => $anchor));

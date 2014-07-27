@@ -215,6 +215,73 @@ is scalar @{$delay->remaining}, 0, 'no steps remaining';
 is $delay->data('num'), 9, 'right value';
 is $result, 18, 'right result';
 
+# Jumps
+#                  1        2                 4                  6
+my $arr1 = [one => sub { }, sub { }, third => sub { }, fourth => sub { }];
+$delay = Mojo::IOLoop::Delay->new;
+$delay->remaining($arr1);
+
+is $delay->_step_index(label => 'one'),    1, "right index";
+is $delay->_step_index(label => 'third'),  4, "right index";
+is $delay->_step_index(label => 'fourth'), 6, "right index";
+
+is $delay->_step_index(index => 100), undef, "right index";
+is $delay->_step_index(index => 0),   1,     "right index";
+is $delay->_step_index(index => 1),   2,     "right index";
+is $delay->_step_index(index => 2),   4,     "right index";
+is $delay->_step_index(index => 3),   6,     "right index";
+
+is $delay->_step_index(index => -1),   6,     "right index";
+is $delay->_step_index(index => -2),   4,     "right index";
+is $delay->_step_index(index => -3),   2,     "right index";
+is $delay->_step_index(index => -4),   1,     "right index";
+is $delay->_step_index(index => -100), undef, "right undefined index";
+
+$delay->remaining([]);
+my @args;
+
+$delay->steps(
+  sub { shift->jump(label => 'HELLO'); },
+  sub { fail 'Skipped step before 0 label '; },
+
+  'HELLO' => sub { shift->jump(label => 'WORLD', 'Hello'); },
+  'WORLD' => sub { shift->jump(index => 0,       @_, 'Eric', 'Cartman'); },
+  sub { shift; @args = @_; }
+)->wait;
+is_deeply \@args, [qw(Hello Eric Cartman)], "Right arguments";
+
+@args = ();
+$delay->steps(
+  sub { shift->jump(label => '0', 0, 1); },
+  SKIP => sub { fail 'Skipped step befor 0 label'; },
+  sub { fail 'Skipped step before 0 label '; },
+
+  '0' => sub { shift->jump(index => 0, @_, 'L0'); },
+  sub { shift; @args = @_; }
+)->wait;
+is_deeply \@args, [qw(0 1 L0)], "Right arguments";
+
+@args = ();
+$delay->steps(
+  sub { shift->jump(index => 2, 'Hello'); },
+  SKIPPED => sub { fail 'Skipped step befor 0 label'; },
+  sub { fail 'Skipped step before 0 label '; },
+  sub { shift->pass(@_, "World"); }
+);
+$delay->once(finish => sub { shift; @args = @_ });
+$delay->wait;
+is_deeply \@args, [qw(Hello World)], "Right arguments";
+
+@args = ();
+$delay->steps(
+  sub { shift->jump(index => -2, 'Hello'); },
+  sub { fail 'Skipped step befor 0 label'; },
+  sub { shift->jump(index => -1, @_, "World"); },
+  sub { shift; @args = @_; }
+)->wait;
+is_deeply \@args, [qw(Hello World)], "Right arguments";
+
+
 # Exception in first step
 my $failed;
 ($finished, $result) = ();

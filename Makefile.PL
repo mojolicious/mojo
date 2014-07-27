@@ -13,7 +13,7 @@ WriteMakefile(
   AUTHOR       => 'Sebastian Riedel <sri@cpan.org>',
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => '5.010001', 'Pod::Simple' => '3.09'},
+    requires  => {perl => '5.010001'},
     resources => {
       homepage    => 'http://mojolicio.us',
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
@@ -23,6 +23,7 @@ WriteMakefile(
     },
     no_index => {directory => ['t']}
   },
+  PREREQ_PM => {'Pod::Simple' => '3.09'},
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
   test => {TESTS => 't/*.t t/*/*.t'}
 );

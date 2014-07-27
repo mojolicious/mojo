@@ -6,10 +6,6 @@ BEGIN {
 }
 
 use Test::More;
-
-plan skip_all => 'Mojolicious::Plugin::PODRenderer requires Perl 5.12'
-  if $] < 5.012;
-
 use Mojolicious::Lite;
 use Test::Mojo;
 

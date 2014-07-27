@@ -6,14 +6,11 @@ use Mojo::ByteStream 'b';
 use Mojo::DOM;
 use Mojo::URL;
 use Mojo::Util qw(slurp unindent url_escape);
-use Pod::Simple::XHTML;
+use Pod::Simple::XHTML 3.09;
 use Pod::Simple::Search;
 
 sub register {
   my ($self, $app, $conf) = @_;
-
-  # Pod::Simple::XHTML in Perl 5.10.1 was broken
-  die 'Mojolicious::Plugin::PODRenderer requires Perl 5.12' if $] < 5.012;
 
   my $preprocess = $conf->{preprocess} || 'ep';
   $app->renderer->add_handler(

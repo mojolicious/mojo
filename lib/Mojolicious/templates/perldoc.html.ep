@@ -30,6 +30,10 @@
         position: relative;
       }
       h1 a, h2 a, h3 a { text-decoration: none }
+      li > p {
+        margin-bottom: 0;
+        margin-top: 0;
+      }
       pre {
         background: url(<%= url_for '/mojo/stripes.png' %>);
         border: 1px solid #d1d1d1;

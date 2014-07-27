@@ -846,13 +846,19 @@ This element's type.
 
   my $collection = $dom->val;
 
-Extract values from C<button>, C<input>, C<option>, C<select> and C<textarea>
-elements and return a L<Mojo::Collection> object containing these values. In
+Extract values from C<button>, C<input>, C<option>, C<select> or C<textarea>
+element and return a L<Mojo::Collection> object containing these values. In
 the case of C<select>, find all C<option> elements it contains that have a
 C<selected> attribute and extract their values.
 
   # "b"
-  $dom->parse('<form><input name="a" value="b"></form>')->at('input')->val;
+  $dom->parse('<input name="a" value="b">')->at('input')->val;
+
+  # "c"
+  $dom->parse('<option value="c">C</option>')->at('option')->val;
+
+  # "d"
+  $dom->parse('<option>d</option>')->at('option')->val;
 
 =head2 wrap
 

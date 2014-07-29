@@ -85,30 +85,33 @@ sub _cleanup {
 }
 
 sub _connect {
-  my ($self, $nb, $tx, $proto, $host, $port, $handle, $cb) = @_;
+  my ($self, $nb, $peer, $tx, $handle, $cb) = @_;
 
-  my $options
-    = {address => $host, port => $port, timeout => $self->connect_timeout};
-  if (my $local = $self->local_address) { $options->{local_address} = $local }
-  $options->{handle} = $handle if $handle;
+  my $t = $self->transactor;
+  my ($proto, $host, $port) = $peer ? $t->peer($tx) : $t->endpoint($tx);
+  my %options
+    = (address => $host, port => $port, timeout => $self->connect_timeout);
+  if (my $local = $self->local_address) { $options{local_address} = $local }
+  $options{handle} = $handle if $handle;
 
   # SOCKS
   if ($proto eq 'socks') {
-    @$options{qw(socks_address socks_port)} = @$options{qw(address port)};
-    ($proto, @$options{qw(address port)}) = $self->transactor->endpoint($tx);
-    my $userinfo = $tx->req->proxy->userinfo;
-    @$options{qw(socks_user socks_pass)} = split ':', $userinfo if $userinfo;
+    @options{qw(socks_address socks_port)} = @options{qw(address port)};
+    ($proto, @options{qw(address port)}) = $t->endpoint($tx);
+    my $req      = $tx->req;
+    my $userinfo = $req->proxy->userinfo;
+    $req->proxy(0);
+    @options{qw(socks_user socks_pass)} = split ':', $userinfo if $userinfo;
   }
 
   # TLS
-  if ($options->{tls} = $proto eq 'https') {
-    $options->{"tls_$_"} = $self->$_ for qw(ca cert key);
-  }
+  map { $options{"tls_$_"} = $self->$_ } qw(ca cert key)
+    if ($options{tls} = $proto eq 'https');
 
   weaken $self;
   my $id;
   return $id = $self->_loop($nb)->client(
-    $options => sub {
+    %options => sub {
       my ($loop, $err, $stream) = @_;
 
       # Connection error
@@ -141,7 +144,7 @@ sub _connect_proxy {
         return $self->$cb($old);
       }
 
-      # Prevent proxy reassignment and start real transaction
+      # Start real transaction
       $old->req->proxy(0);
       my $id = $tx->connection;
       return $self->_start($nb, $old->connection($id), $cb)
@@ -152,8 +155,8 @@ sub _connect_proxy {
       my $handle = $loop->stream($id)->steal_handle;
       my $c      = delete $self->{connections}{$id};
       $loop->remove($id);
-      $id = $self->_connect($nb, $old, $self->transactor->endpoint($old),
-        $handle, sub { shift->_start($nb, $old->connection($id), $cb) });
+      $id = $self->_connect($nb, 0, $old, $handle,
+        sub { shift->_start($nb, $old->connection($id), $cb) });
       $self->{connections}{$id} = $c;
     }
   );
@@ -199,8 +202,7 @@ sub _connection {
 
   # Connect
   warn "-- Connect ($proto:$host:$port)\n" if DEBUG;
-  ($proto, $host, $port) = $self->transactor->peer($tx);
-  $id = $self->_connect(($nb, $tx, $proto, $host, $port, $id) => \&_connected);
+  $id = $self->_connect($nb, 1, $tx, $id, \&_connected);
   $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
 
   return $id;

@@ -22,6 +22,8 @@ use Mojo::UserAgent;
 use Mojolicious::Lite;
 use Scalar::Util 'weaken';
 
+app->log->level('fatal');
+
 get '/' => sub {
   my $c = shift;
   $c->render(text => $c->tx->remote_port);
@@ -79,9 +81,9 @@ Mojo::IOLoop->singleton->reactor->io(
                 $client = Mojo::IOLoop::Stream->new($client);
                 Mojo::IOLoop->stream($client);
                 $client->on(read  => sub { $server->write(pop) });
-                $client->on(close => sub { $server->close });
+                $client->on(close => sub { $server && $server->close });
                 $server->on(read  => sub { $client->write(pop) });
-                $server->on(close => sub { $client->close });
+                $server->on(close => sub { $client && $client->close });
               }
             );
           }

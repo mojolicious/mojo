@@ -1,7 +1,7 @@
 package Mojolicious::Command::version;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::IOLoop::Server;
+use Mojo::IOLoop::Client;
 use Mojo::UserAgent;
 use Mojolicious;
 
@@ -11,11 +11,11 @@ has usage => sub { shift->extract_usage };
 sub run {
   my $self = shift;
 
-  my $ev = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'not installed';
-  my $ipv6
-    = Mojo::IOLoop::Server::IPV6 ? $IO::Socket::IP::VERSION : 'not installed';
-  my $tls
-    = Mojo::IOLoop::Server::TLS ? $IO::Socket::SSL::VERSION : 'not installed';
+  my $ev    = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'not installed';
+  my $class = 'Mojo::IOLoop::Client';
+  my $ipv6  = $class->IPV6 ? $IO::Socket::IP::VERSION : 'not installed';
+  my $socks = $class->SOCKS ? $IO::Socket::Socks::VERSION : 'not installed';
+  my $tls   = $class->TLS ? $IO::Socket::SSL::VERSION : 'not installed';
 
   print <<EOF;
 CORE
@@ -23,9 +23,10 @@ CORE
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
-  EV 4.0+               ($ev)
-  IO::Socket::IP 0.20+  ($ipv6)
-  IO::Socket::SSL 1.84+ ($tls)
+  EV 4.0+                 ($ev)
+  IO::Socket::IP 0.20+    ($ipv6)
+  IO::Socket::Socks 0.63+ ($ipv6)
+  IO::Socket::SSL 1.84+   ($tls)
 
 EOF
 

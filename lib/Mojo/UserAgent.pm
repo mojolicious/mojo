@@ -85,21 +85,30 @@ sub _cleanup {
 }
 
 sub _connect {
-  my ($self, $nb, $proto, $host, $port, $handle, $cb) = @_;
+  my ($self, $nb, $tx, $proto, $host, $port, $handle, $cb) = @_;
+
+  my $options
+    = {address => $host, port => $port, timeout => $self->connect_timeout};
+  if (my $local = $self->local_address) { $options->{local_address} = $local }
+  $options->{handle} = $handle if $handle;
+
+  # SOCKS
+  if ($proto eq 'socks') {
+    @$options{qw(socks_address socks_port)} = @$options{qw(address port)};
+    ($proto, @$options{qw(address port)}) = $self->transactor->endpoint($tx);
+    my $userinfo = $tx->req->proxy->userinfo;
+    @$options{qw(socks_user socks_pass)} = split ':', $userinfo if $userinfo;
+  }
+
+  # TLS
+  if ($options->{tls} = $proto eq 'https') {
+    $options->{"tls_$_"} = $self->$_ for qw(ca cert key);
+  }
 
   weaken $self;
   my $id;
   return $id = $self->_loop($nb)->client(
-    address       => $host,
-    handle        => $handle,
-    local_address => $self->local_address,
-    port          => $port,
-    timeout       => $self->connect_timeout,
-    tls           => $proto eq 'https',
-    tls_ca        => $self->ca,
-    tls_cert      => $self->cert,
-    tls_key       => $self->key,
-    sub {
+    $options => sub {
       my ($loop, $err, $stream) = @_;
 
       # Connection error
@@ -143,7 +152,7 @@ sub _connect_proxy {
       my $handle = $loop->stream($id)->steal_handle;
       my $c      = delete $self->{connections}{$id};
       $loop->remove($id);
-      $id = $self->_connect($nb, $self->transactor->endpoint($old),
+      $id = $self->_connect($nb, $old, $self->transactor->endpoint($old),
         $handle, sub { shift->_start($nb, $old->connection($id), $cb) });
       $self->{connections}{$id} = $c;
     }
@@ -191,7 +200,7 @@ sub _connection {
   # Connect
   warn "-- Connect ($proto:$host:$port)\n" if DEBUG;
   ($proto, $host, $port) = $self->transactor->peer($tx);
-  $id = $self->_connect(($nb, $proto, $host, $port, $id) => \&_connected);
+  $id = $self->_connect(($nb, $tx, $proto, $host, $port, $id) => \&_connected);
   $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
 
   return $id;
@@ -424,19 +433,20 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 =head1 DESCRIPTION
 
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
-agent, with IPv6, TLS, SNI, IDNA, Comet (long polling), keep-alive, connection
-pooling, timeout, cookie, multipart, proxy, gzip compression and multiple
-event loop support.
+agent, with IPv6, SOCKS5, TLS, SNI, IDNA, Comet (long polling), keep-alive,
+connection pooling, timeout, cookie, multipart, proxy, gzip compression and
+multiple event loop support.
 
 All connections will be reset automatically if a new process has been forked,
 this allows multiple processes to share the same L<Mojo::UserAgent> object
 safely.
 
-For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.84+) will be used automatically by L<Mojo::IOLoop> if
-they are installed. Individual features can also be disabled with the
-C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide IPv6, SOCKS5 as well as
+TLS support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+),
+L<IO::Socket::Socks> (0.63+) and L<IO::Socket::SSL> (1.84+) will be used
+automatically if they are installed. Individual features can also be disabled
+with the C<MOJO_NO_IPV6>, C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment
+variables.
 
 See L<Mojolicious::Guides::Cookbook/"USER AGENT"> for more.
 
@@ -579,6 +589,9 @@ Proxy manager, defaults to a L<Mojo::UserAgent::Proxy> object.
 
   # Detect proxy servers from environment
   $ua->proxy->detect;
+
+  # Manually configure Tor
+  $ua->proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
 
 =head2 request_timeout
 

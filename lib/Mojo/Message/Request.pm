@@ -101,15 +101,15 @@ sub get_start_line_chunk {
 
     # CONNECT
     my $method = uc $self->method;
+    my $proxy  = $self->proxy;
     if ($method eq 'CONNECT') {
       my $port = $url->port || ($url->protocol eq 'https' ? '443' : '80');
       $path = $url->ihost . ":$port";
     }
 
     # Proxy
-    elsif ($self->proxy) {
-      $path = $url->clone->userinfo(undef)
-        unless $self->is_handshake || $url->protocol eq 'https';
+    elsif ($proxy && $proxy->protocol ne 'socks' && !$self->is_handshake) {
+      $path = $url->clone->userinfo(undef) unless $url->protocol eq 'https';
     }
 
     $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";

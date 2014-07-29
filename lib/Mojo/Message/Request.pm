@@ -400,21 +400,24 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
   my @foo         = $req->param('foo');
   my ($foo, $bar) = $req->param(['foo', 'bar']);
 
-Access C<GET> and C<POST> parameters. Note that this method caches all data,
-so it should not be called before the entire request body has been received.
-Parts of the request body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large, there's a
-10MB limit by default.
+Access C<GET> and C<POST> parameters extracted from
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
+Note that this method caches all data, so it should not be called before the
+entire request body has been received. Parts of the request body need to be
+loaded into memory to parse C<POST> parameters, so you have to make sure it is
+not excessively large, there's a 10MB limit by default.
 
 =head2 params
 
   my $params = $req->params;
 
-All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
-that this method caches all data, so it should not be called before the entire
-request body has been received. Parts of the request body need to be loaded
-into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large, there's a 10MB limit by default.
+All C<GET> and C<POST> parameters extracted from
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
+usually a L<Mojo::Parameters> object. Note that this method caches all data,
+so it should not be called before the entire request body has been received.
+Parts of the request body need to be loaded into memory to parse C<POST>
+parameters, so you have to make sure it is not excessively large, there's a
+10MB limit by default.
 
   # Get parameter value
   say $req->params->param('foo');

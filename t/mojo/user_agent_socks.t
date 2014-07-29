@@ -22,6 +22,7 @@ use Mojo::UserAgent;
 use Mojolicious::Lite;
 use Scalar::Util 'weaken';
 
+# Silence
 app->log->level('fatal');
 
 get '/' => sub {
@@ -113,6 +114,8 @@ ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200, 'right status';
+is $tx->req->headers->proxy_authorization, undef,
+  'no "Proxy-Authorization" value';
 is $tx->res->body, $last, 'right content';
 isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
   $last, 'different ports');

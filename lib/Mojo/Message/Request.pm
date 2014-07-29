@@ -107,7 +107,7 @@ sub get_start_line_chunk {
     }
 
     # Proxy
-    elsif ((my $proxy = $self->proxy) && $url->protocol ne 'https') {
+    elsif ($self->proxy && $url->protocol ne 'https') {
       $path = $url->clone->userinfo(undef) unless $self->is_handshake;
     }
 

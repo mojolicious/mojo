@@ -612,7 +612,7 @@ parameters, so you have to make sure it is not excessively large, there's a
   # Better enforce scalar context
   my $hash = {foo => scalar $c->param('foo')};
 
-  # The multi-name form can also be used to enforce scalar context
+  # The multi-name form can also be used to enforce a list with one element
   my $hash = {foo => $c->param(['foo'])};
 
 For more control you can also access request information directly.

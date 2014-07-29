@@ -112,22 +112,27 @@ ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $last, 'right content';
-isnt $last, $port, 'different port';
+isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
+  $last, 'different ports');
 
 # Keep alive request with SOCKS proxy
+my $before = $last;
 $tx = $ua->get('/');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $last, 'right content';
-isnt $last, $port, 'different port';
+is $before, $last, 'same port';
+isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
+  $last, 'different ports');
 
 # WebSocket with SOCKS proxy
-my $result;
+my ($result, $id);
 $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
+    $id = $tx->connection;
     $tx->on(
       message => sub {
         $result = pop;
@@ -139,7 +144,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 is $result, $last, 'right result';
-isnt $last, $port, 'different port';
+isnt(Mojo::IOLoop->stream($id)->handle->sockport, $last, 'different ports');
 
 # HTTPS request with SOCKS proxy
 $ua->proxy->https("socks://foo:bar\@127.0.0.1:$port");
@@ -150,6 +155,7 @@ ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,           'right status';
 is $tx->res->body, "https:$last", 'right content';
-isnt $last, $port, 'different port';
+isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
+  $last, 'different ports');
 
 done_testing();

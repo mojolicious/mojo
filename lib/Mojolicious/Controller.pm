@@ -598,13 +598,14 @@ status.
   $c              = $c->param(foo => ['ba;r', 'baz']);
 
 Access route placeholder values that are not reserved stash values, file
-uploads as well as C<GET> and C<POST> parameters extracted from
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
-in that order. Note that this method is context sensitive in some cases and
-therefore needs to be used with care, there can always be multiple values,
-which might have unexpected consequences. Parts of the request body need to be
-loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large, there's a 10MB limit by default.
+uploads as well as C<GET> and C<POST> parameters extracted from the query
+string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
+message body, in that order. Note that this method is context sensitive in
+some cases and therefore needs to be used with care, there can always be
+multiple values, which might have unexpected consequences. Parts of the
+request body need to be loaded into memory to parse C<POST> parameters, so you
+have to make sure it is not excessively large, there's a 10MB limit by
+default.
 
   # List context is ambiguous and should be avoided, you can get multiple
   # values returned for a query string like "?foo=bar&foo=baz&foo=yada"
@@ -946,7 +947,7 @@ to inherit query parameters from the current request.
   my $validation = $c->validation;
 
 Get L<Mojolicious::Validator::Validation> object for current request to
-validate C<GET> and C<POST> parameters extracted from
+validate C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
 Parts of the request body need to be loaded into memory to parse C<POST>
 parameters, so you have to make sure it is not excessively large, there's a

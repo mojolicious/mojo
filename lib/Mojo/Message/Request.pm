@@ -400,7 +400,7 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
   my @foo         = $req->param('foo');
   my ($foo, $bar) = $req->param(['foo', 'bar']);
 
-Access C<GET> and C<POST> parameters extracted from
+Access C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
 Note that this method caches all data, so it should not be called before the
 entire request body has been received. Parts of the request body need to be
@@ -411,7 +411,7 @@ not excessively large, there's a 10MB limit by default.
 
   my $params = $req->params;
 
-All C<GET> and C<POST> parameters extracted from
+All C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
 usually a L<Mojo::Parameters> object. Note that this method caches all data,
 so it should not be called before the entire request body has been received.

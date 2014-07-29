@@ -57,15 +57,15 @@ Mojo::IOLoop->singleton->reactor->io(
           }
           else {
             my $command = $client->command;
-            $client->command_reply(IO::Socket::Socks::REPLY_SUCCESS,
+            $client->command_reply(IO::Socket::Socks::REPLY_SUCCESS(),
               $command->[1], $command->[2]);
             $done = 1;
           }
         }
-        elsif ($err == IO::Socket::Socks::SOCKS_WANT_WRITE) {
+        elsif ($err == IO::Socket::Socks::SOCKS_WANT_WRITE()) {
           $reactor->watch($client, 1, 1);
         }
-        elsif ($err == IO::Socket::Socks::SOCKS_WANT_READ) {
+        elsif ($err == IO::Socket::Socks::SOCKS_WANT_READ()) {
           $reactor->watch($client, 1, 0);
         }
       }

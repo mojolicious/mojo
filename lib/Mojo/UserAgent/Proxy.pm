@@ -59,7 +59,7 @@ L<Mojo::UserAgent::Proxy> implements the following attributes.
 =head2 http
 
   my $http = $proxy->http;
-  $proxy   = $proxy->http('http://sri:secret@127.0.0.1:8080');
+  $proxy   = $proxy->http('socks://sri:secret@127.0.0.1:8080');
 
 Proxy server to use for HTTP and WebSocket requests.
 

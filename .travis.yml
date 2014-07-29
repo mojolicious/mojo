@@ -6,9 +6,9 @@ perl:
   - "5.12"
   - "5.10"
 env:
-  - "HARNESS_OPTIONS=j9 TEST_POD=1 TEST_EV=1"
+  - "HARNESS_OPTIONS=j9 TEST_POD=1 TEST_EV=1 TEST_IPV6=1 TEST_TLS=1"
 install:
-  - "cpanm -n Test::Pod Test::Pod::Coverage EV"
+  - "cpanm -n Test::Pod Test::Pod::Coverage EV IO::Socket::IP IO::Socket::SSL"
   - "cpanm -n --installdeps ."
 notifications:
   email: false

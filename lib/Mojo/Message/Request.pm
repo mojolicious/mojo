@@ -107,9 +107,8 @@ sub get_start_line_chunk {
     }
 
     # Proxy
-    elsif ($self->proxy) {
-      $path = $url->clone->userinfo(undef)
-        unless $self->is_handshake || $url->protocol eq 'https';
+    elsif ($self->proxy && $url->protocol ne 'https') {
+      $path = $url->clone->userinfo(undef) unless $self->is_handshake;
     }
 
     $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";

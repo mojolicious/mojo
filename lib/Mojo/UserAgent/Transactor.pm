@@ -33,8 +33,10 @@ sub endpoint {
   my $port  = $url->port || ($proto eq 'https' ? 443 : 80);
 
   # Proxy for normal HTTP requests
+  my $socks;
+  if (my $proxy = $req->proxy) { $socks = $proxy->protocol eq 'socks' }
   return $self->_proxy($tx, $proto, $host, $port)
-    if $proto eq 'http' && !$req->is_handshake;
+    if $proto eq 'http' && !$req->is_handshake && !$socks;
 
   return $proto, $host, $port;
 }
@@ -50,6 +52,7 @@ sub proxy_connect {
 
   # No proxy
   return undef unless my $proxy = $req->proxy;
+  return undef if $proxy->protocol eq 'socks';
 
   # WebSocket and/or HTTPS
   my $url = $req->url;

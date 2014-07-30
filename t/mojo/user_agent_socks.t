@@ -106,10 +106,16 @@ Mojo::IOLoop->singleton->reactor->io(
   }
 );
 
-# Simple request with SOCKS proxy
+# Failed authentication with SOCKS proxy
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-$ua->proxy->http("socks://foo:bar\@127.0.0.1:$port");
+$ua->proxy->http("socks://foo:baz\@127.0.0.1:$port");
 my $tx = $ua->get('/');
+ok !$tx->success, 'not successful';
+ok $tx->error, 'has error';
+
+# Simple request with SOCKS proxy
+$ua->proxy->http("socks://foo:bar\@127.0.0.1:$port");
+$tx = $ua->get('/');
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';

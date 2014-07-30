@@ -81,7 +81,7 @@ sub render {
   delete @{$stash}{qw(layout extends)} if $ts;
 
   # Merge stash and arguments
-  %$stash = (%$stash, %$args);
+  @$stash{keys %$args} = values %$args;
 
   my $options = {
     encoding => $self->encoding,

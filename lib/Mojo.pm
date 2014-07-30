@@ -23,7 +23,7 @@ has ua   => sub {
 
 sub build_tx { Mojo::Transaction::HTTP->new }
 
-sub config { shift->_dict(config => @_) }
+sub config { _dict(config => @_) }
 
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
@@ -40,19 +40,20 @@ sub new {
 }
 
 sub _dict {
-  my ($self, $name) = (shift, shift);
+  my ($name, $object) = (shift, shift);
 
   # Hash
-  my $dict = $self->{$name} ||= {};
+  my $dict = $object->{$name} ||= {};
   return $dict unless @_;
 
   # Get
   return $dict->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
-  %$dict = (%$dict, %{ref $_[0] ? $_[0] : {@_}});
+  my $values = ref $_[0] ? $_[0] : {@_};
+  @$dict{keys %$values} = values %$values;
 
-  return $self;
+  return $object;
 }
 
 1;

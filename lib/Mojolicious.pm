@@ -68,7 +68,8 @@ sub build_controller {
   $stash->{'mojo.secrets'} //= $self->secrets;
 
   # Build default controller
-  %$stash = (%$stash, %{$self->defaults});
+  my $defaults = $self->defaults;
+  @$stash{keys %$defaults} = values %$defaults;
   my $c
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{app};
@@ -83,7 +84,7 @@ sub build_tx {
   return $tx;
 }
 
-sub defaults { shift->_dict(defaults => @_) }
+sub defaults { Mojo::_dict(defaults => @_) }
 
 sub dispatch {
   my ($self, $c) = @_;

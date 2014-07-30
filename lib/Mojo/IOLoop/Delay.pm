@@ -16,7 +16,7 @@ sub begin {
   return sub { $self->_step($id, $offset // 1, $len, @_) };
 }
 
-sub data { shift->Mojo::_dict(data => @_) }
+sub data { Mojo::_dict(data => @_) }
 
 sub pass { $_[0]->begin->(@_) }
 

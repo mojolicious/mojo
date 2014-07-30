@@ -34,9 +34,8 @@ sub continue {
 
   # Merge captures into stash
   my $stash = $c->stash;
-  my $captures = $stash->{'mojo.captures'} //= {};
-  %$captures = (%$captures, %$field);
-  %$stash    = (%$stash,    %$field);
+  @{$stash->{'mojo.captures'} //= {}}{keys %$field} = values %$field;
+  @$stash{keys %$field} = values %$field;
 
   my $continue;
   my $last = !$stack->[++$current];

@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 # No imports, for security reasons!
 use Carp ();
+use Mojo;
 use Mojo::ByteStream;
 use Mojo::Exception;
 use Mojo::Transaction::HTTP;
@@ -87,8 +88,8 @@ sub flash {
     if @_ == 1 && !ref $_[0];
 
   # Initialize new flash and merge values
-  my $flash = $session->{new_flash} ||= {};
-  %$flash = (%$flash, %{@_ > 1 ? {@_} : $_[0]});
+  my $values = ref $_[0] ? $_[0] : {@_};
+  @{$session->{new_flash} ||= {}}{keys %$values} = values %$values;
 
   return $self;
 }
@@ -266,7 +267,8 @@ sub session {
   return $session->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
-  %$session = (%$session, %{ref $_[0] ? $_[0] : {@_}});
+  my $values = ref $_[0] ? $_[0] : {@_};
+  @$session{keys %$values} = values %$values;
 
   return $self;
 }
@@ -311,7 +313,7 @@ sub signed_cookie {
   return wantarray ? @results : $results[0];
 }
 
-sub stash { shift->Mojolicious::_dict(stash => @_) }
+sub stash { Mojo::_dict(stash => @_) }
 
 sub url_for {
   my $self = shift;

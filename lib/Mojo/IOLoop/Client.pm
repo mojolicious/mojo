@@ -22,7 +22,7 @@ use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 # SOCKS support requires IO::Socket::Socks
 use constant SOCKS => $ENV{MOJO_NO_SOCKS}
   ? 0
-  : eval 'use IO::Socket::Socks 0.63 (); 1';
+  : eval 'use IO::Socket::Socks 0.64 (); 1';
 use constant SOCKS_READ  => SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
 use constant SOCKS_WRITE => SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
 
@@ -124,7 +124,7 @@ sub _try_socks {
   my $handle = $self->{handle};
   return $self->_try_tls($args) unless $args->{socks_address};
   return $self->emit(
-    error => 'IO::Socket::Socks 0.63 required for SOCKS support')
+    error => 'IO::Socket::Socks 0.64 required for SOCKS support')
     unless SOCKS;
 
   my %options

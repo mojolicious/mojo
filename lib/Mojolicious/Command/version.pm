@@ -25,7 +25,7 @@ CORE
 OPTIONAL
   EV 4.0+                 ($ev)
   IO::Socket::IP 0.20+    ($ipv6)
-  IO::Socket::Socks 0.63+ ($ipv6)
+  IO::Socket::Socks 0.64+ ($ipv6)
   IO::Socket::SSL 1.84+   ($tls)
 
 EOF

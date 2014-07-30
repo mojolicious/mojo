@@ -1,4 +1,6 @@
 
+5.23  2014-07-31
+
 5.22  2014-07-30
   - Added SOCKS5 support to Mojo::UserAgent.
   - Added socks_address, socks_pass, socks_port and socks_user options to

@@ -76,10 +76,10 @@ sub _current_route {
 }
 
 sub _delay {
-  my $self  = shift;
-  my $tx    = $self->render_later->tx;
+  my $c     = shift;
+  my $tx    = $c->render_later->tx;
   my $delay = Mojo::IOLoop->delay(@_);
-  $delay->catch(sub { $self->render_exception(pop) and undef $tx })->wait;
+  $delay->catch(sub { $c->render_exception(pop) and undef $tx })->wait;
 }
 
 sub _inactivity_timeout {

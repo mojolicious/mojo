@@ -1,5 +1,8 @@
 
-5.22  2014-07-29
+5.22  2014-07-30
+  - Added SOCKS5 support to Mojo::UserAgent.
+  - Added socks_address, socks_pass, socks_port and socks_pass options to
+    Mojo::IOLoop::Client::connect.
 
 5.21  2014-07-27
   - Improved handling of Pod::Simple::XHTML 3.09 dependency.

@@ -663,6 +663,19 @@ L<Mojolicious::Routes::Route/"under">.
     $c->render(text => 'Go away.');
   });
 
+=head2 Catch-all route
+
+Since routes match in the order in which they were defined, you can catch all
+requests that did not match in your last route with an optional wildcard
+placeholder.
+
+  # * /*
+  $r->any('/*whatever' => {whatever => ''} => sub {
+    my $c        = shift;
+    my $whatever = $c->param('whatever');
+    $c->render(text => "/$whatever did not match.", status => 404);
+  });
+
 =head2 Hooks
 
 Hooks operate outside the routing system and allow you to extend

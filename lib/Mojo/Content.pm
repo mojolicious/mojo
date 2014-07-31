@@ -179,8 +179,7 @@ sub write_chunk {
 sub _build {
   my ($self, $method) = @_;
 
-  my $buffer = '';
-  my $offset = 0;
+  my ($buffer, $offset) = ('', 0);
   while (1) {
 
     # No chunk yet, try again

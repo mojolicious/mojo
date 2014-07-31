@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 # No imports, for security reasons!
 use Carp ();
-use Mojo;
 use Mojo::ByteStream;
 use Mojo::Exception;
 use Mojo::Transaction::HTTP;
@@ -313,7 +312,7 @@ sub signed_cookie {
   return wantarray ? @results : $results[0];
 }
 
-sub stash { Mojo::_dict(stash => @_) }
+sub stash { Mojo::Util::_stash(stash => @_) }
 
 sub url_for {
   my $self = shift;

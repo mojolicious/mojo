@@ -8,6 +8,7 @@ use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
+use Mojo::Util;
 use Scalar::Util 'weaken';
 
 has home => sub { Mojo::Home->new };
@@ -23,7 +24,7 @@ has ua   => sub {
 
 sub build_tx { Mojo::Transaction::HTTP->new }
 
-sub config { _dict(config => @_) }
+sub config { Mojo::Util::_stash(config => @_) }
 
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
@@ -37,23 +38,6 @@ sub new {
     if -w $home->rel_file('log');
 
   return $self;
-}
-
-sub _dict {
-  my ($name, $object) = (shift, shift);
-
-  # Hash
-  my $dict = $object->{$name} ||= {};
-  return $dict unless @_;
-
-  # Get
-  return $dict->{$_[0]} unless @_ > 1 || ref $_[0];
-
-  # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  @$dict{keys %$values} = values %$values;
-
-  return $object;
 }
 
 1;

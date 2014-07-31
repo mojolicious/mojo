@@ -1,7 +1,7 @@
 package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
-use Mojolicious::Routes::Route;
+use Mojo::Util;
 
 has current => 0;
 has [qw(endpoint root)];
@@ -10,8 +10,7 @@ has stack => sub { [] };
 sub match { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
 
 sub path_for {
-  my ($self, $name, %values)
-    = (shift, Mojolicious::Routes::Route::_values(@_));
+  my ($self, $name, %values) = (shift, Mojo::Util::_options(@_));
 
   # Current route
   my $endpoint;

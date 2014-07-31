@@ -84,7 +84,7 @@ sub build_tx {
   return $tx;
 }
 
-sub defaults { Mojo::_dict(defaults => @_) }
+sub defaults { Mojo::Util::_stash(defaults => @_) }
 
 sub dispatch {
   my ($self, $c) = @_;

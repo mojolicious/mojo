@@ -2,6 +2,7 @@ package Mojolicious::Routes::Route;
 use Mojo::Base -base;
 
 use Carp 'croak';
+use Mojo::Util;
 use Mojolicious::Routes::Pattern;
 use Scalar::Util qw(blessed weaken);
 
@@ -150,7 +151,7 @@ sub to {
 
   my $pattern = $self->pattern;
   return $pattern->defaults unless @_;
-  my ($shortcut, %defaults) = _values(@_);
+  my ($shortcut, %defaults) = Mojo::Util::_options(@_);
 
   if ($shortcut) {
 
@@ -227,18 +228,6 @@ sub _generate_route {
   $route->over(\@conditions)->to(\%defaults);
 
   return defined $name ? $route->name($name) : $route;
-}
-
-sub _values {
-
-  # Hash or name (one)
-  return ref $_[0] eq 'HASH' ? (undef, %{shift()}) : @_ if @_ == 1;
-
-  # Name and values (odd)
-  return shift, @_ if @_ % 2;
-
-  # Name and hash or just values (even)
-  return ref $_[1] eq 'HASH' ? (shift, %{shift()}) : (undef, @_);
 }
 
 1;

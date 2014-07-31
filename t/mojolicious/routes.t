@@ -194,6 +194,9 @@ $r->route('/missing/*/name')->to('missing#wildcard');
 $r->route('/missing/too/*', '' => ['test'])
   ->to('missing#too', '' => 'missing');
 
+# /partial/*
+$r->route('/partial')->detour('foo#bar');
+
 # Cached lookup
 my $fast = $r->route('/fast');
 is $r->find('fast'),   $fast, 'fast route found';
@@ -847,5 +850,17 @@ is_deeply $m->stack,
   [{controller => 'missing', action => 'too', '' => 'missing'}],
   'right structure';
 is $m->path_for->{path}, '/missing/too', 'right path';
+
+# Partial route
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/partial/test'});
+is_deeply $m->stack,
+  [{controller => 'foo', action => 'bar', 'path' => '/test'}],
+  'right structure';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/partial.test'});
+is_deeply $m->stack,
+  [{controller => 'foo', action => 'bar', 'path' => '.test'}],
+  'right structure';
 
 done_testing();

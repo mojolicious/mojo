@@ -39,11 +39,13 @@ sub _match {
   my ($self, $r, $c, $options) = @_;
 
   # Pattern
-  my $path = $options->{path};
-  return
-    unless my $captures = $r->pattern->match_partial(\$path, $r->is_endpoint);
+  my $path    = $options->{path};
+  my $partial = $r->partial;
+  my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
+  return unless my $captures = $r->pattern->match_partial(\$path, $detect);
   local $options->{path} = $path;
-  $captures = $self->{captures} = {%{$self->{captures} || {}}, %$captures};
+  @{$self->{captures} ||= {}}{keys %$captures} = values %$captures;
+  $captures = $self->{captures};
 
   # Method
   my $methods = $r->via;
@@ -63,14 +65,13 @@ sub _match {
 
   # Partial
   my $empty = !length $path || $path eq '/';
-  if ($r->partial) {
+  if ($partial) {
     $captures->{path} = $path;
     $self->endpoint($r);
     $empty = 1;
   }
 
   # Endpoint (or bridge)
-  my $endpoint = $r->is_endpoint;
   if (($endpoint && $empty) || $r->inline) {
     push @{$self->stack}, {%$captures};
     if ($endpoint && $empty) {

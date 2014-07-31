@@ -167,7 +167,7 @@ sub to {
     }
   }
 
-  $pattern->defaults({%{$pattern->defaults}, %defaults});
+  @{$pattern->defaults}{keys %defaults} = values %defaults;
 
   return $self;
 }

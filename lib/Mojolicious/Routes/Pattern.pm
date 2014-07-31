@@ -20,12 +20,11 @@ sub match_partial {
   my ($self, $pathref, $detect) = @_;
 
   # Compile on demand
-  my $regex = $self->regex || $self->_compile;
-  my $format
-    = $detect ? ($self->format_regex || $self->_compile_format) : undef;
+  $self->_compile unless $self->{regex};
+  $self->_compile_format if $detect && !$self->{format_regex};
 
   # Match
-  return undef unless my @captures = $$pathref =~ $regex;
+  return undef unless my @captures = $$pathref =~ $self->regex;
   $$pathref = ${^POSTMATCH};
 
   # Merge captures
@@ -37,11 +36,10 @@ sub match_partial {
   }
 
   # Format
-  my $constraint = $self->constraints->{format};
-  return $captures if !$detect || defined $constraint && !$constraint;
-  if ($$pathref =~ s!^/?$format!!) { $captures->{format} = $1 }
-  elsif ($constraint) { return undef unless $captures->{format} }
-
+  return $captures unless $detect && (my $regex = $self->format_regex);
+  return undef unless $$pathref =~ $regex;
+  $captures->{format} = $1 if defined $1;
+  $$pathref = '';
   return $captures;
 }
 
@@ -146,23 +144,23 @@ sub _compile {
   # Not rooted with a slash
   $regex = "$block$regex" if $block;
 
-  return $self->regex(qr/^$regex/ps)->regex;
+  $self->regex(qr/^$regex/ps);
 }
 
 sub _compile_format {
   my $self = shift;
 
   # Default regex
-  my $c = $self->constraints;
-  return $self->format_regex(qr!\.([^/]+)$!)->format_regex
-    unless defined $c->{format};
+  my $format = $self->constraints->{format};
+  return $self->format_regex(qr!^/?(?:\.([^/]+))?$!) unless defined $format;
 
   # No regex
-  return undef unless $c->{format};
+  return undef unless $format;
 
   # Compile custom regex
-  my $regex = _compile_req($c->{format});
-  return $self->format_regex(qr!\.$regex$!)->format_regex;
+  my $regex = '/?\.' . _compile_req($format);
+  $regex = "(?:$regex)?" if $self->defaults->{format};
+  $self->format_regex(qr!^$regex$!);
 }
 
 sub _compile_req {

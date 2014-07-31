@@ -3,6 +3,7 @@
   - Improved router performance.
   - Improved routes command to show format regular expression separately.
   - Fixed partial route bug in Mojolicious::Routes::Match.
+  - Fixed format detection bug in Mojolicious::Routes::Pattern.
 
 5.22  2014-07-30
   - Added SOCKS5 support to Mojo::UserAgent.

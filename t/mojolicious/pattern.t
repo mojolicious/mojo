@@ -252,6 +252,13 @@ $result = $pattern->match('/0', 1);
 is_deeply $result, {}, 'right structure';
 is $pattern->render($result, 1), '/0', 'right result';
 
+# Optional format with constraint
+$pattern                        = Mojolicious::Routes::Pattern->new('/');
+$pattern->defaults->{format}    = 'txt';
+$pattern->constraints->{format} = ['txt'];
+$result                         = $pattern->match('/', 1);
+is_deeply $result, {format => 'txt'}, 'right structure';
+
 # Unicode
 $pattern = Mojolicious::Routes::Pattern->new('/(one)♥(two)');
 $result  = $pattern->match('/i♥mojolicious');

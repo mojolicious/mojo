@@ -158,9 +158,9 @@ sub _compile_format {
   return undef unless $format;
 
   # Compile custom regex
-  my $regex = '/?\.' . _compile_req($format);
+  my $regex = '\.' . _compile_req($format);
   $regex = "(?:$regex)?" if $self->defaults->{format};
-  $self->format_regex(qr!^$regex$!);
+  $self->format_regex(qr!^/?$regex$!);
 }
 
 sub _compile_req {

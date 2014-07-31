@@ -429,13 +429,8 @@ automatically detected and stored in the stash value C<format>.
   $r->route('/foo')->to(controller => 'foo', action => 'bar');
 
 This for example allows multiple templates in different formats to share the
-same code.
-
-  # /foo      -> {controller => 'foo', action => 'bar'}
-  # /foo.html -> {controller => 'foo', action => 'bar', format => 'html'}
-  $r->route('/foo')->to(controller => 'foo', action => 'bar');
-
-Restrictive placeholders can also be used.
+same action code. Restrictive placeholders can also be used to limit the
+allowed formats.
 
   # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}

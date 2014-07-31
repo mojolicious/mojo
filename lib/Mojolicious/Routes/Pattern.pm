@@ -122,10 +122,10 @@ sub _compile {
       unshift @$placeholders, $value;
 
       # Placeholder
-      if ($op eq 'placeholder') { $fragment = '([^\/\.]+)' }
+      if ($op eq 'placeholder') { $fragment = '([^/\.]+)' }
 
       # Relaxed
-      elsif ($op eq 'relaxed') { $fragment = '([^\/]+)' }
+      elsif ($op eq 'relaxed') { $fragment = '([^/]+)' }
 
       # Wildcard
       elsif ($op eq 'wildcard') { $fragment = '(.+)' }

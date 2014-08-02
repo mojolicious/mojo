@@ -81,9 +81,9 @@ $tree   = [
   ]
 ];
 is_deeply split_header($header), $tree, 'right result';
-my $cb = sub { substr(${$_[0]}, 0, 3, ''), undef };
-is_deeply split_header('', $cb), [['', undef]], 'right result';
-$header = q{f;o; bar=baz, b,z; yada="a b c"};
+my $cb = sub { ${$_[0]} =~ s/^\s*<(.+?)>// ? ($1, undef) : () };
+is_deeply split_header('', $cb), [], 'right result';
+$header = q{<f;o>; bar=baz, <b,z>; yada="a b c"};
 $tree = [['f;o', undef, 'bar', 'baz'], ['b,z', undef, 'yada', 'a b c']];
 is_deeply split_header($header, $cb), $tree, 'right result';
 

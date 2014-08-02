@@ -140,15 +140,9 @@ sub json {
 }
 
 sub links {
-  my $self = shift;
-
-  my %links;
-  for my $link (@{split_header $self->headers->link // '', \&_link}) {
-    my $hash = {url => (splice @$link, 0, 2)[0], @$link};
-    $links{$hash->{rel}} = $hash;
-  }
-
-  return \%links;
+  my $links = split_header shift->headers->link // '', \&_link;
+  my @links = map { {url => (splice @$_, 0, 2)[0], @$_} } @$links;
+  return {map { $_->{rel} => $_ } @links};
 }
 
 sub param { shift->body_params->param(@_) }

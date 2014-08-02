@@ -1,4 +1,6 @@
 
+5.25  2014-08-03
+
 5.24  2014-08-02
   - Improved url_escape performance slightly.
   - Fixed memory leak in Mojo::IOLoop::Client.

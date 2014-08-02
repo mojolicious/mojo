@@ -3,6 +3,7 @@
   - Added links method to Mojo::Message.
   - Improved split_header function in Mojo::Util to handle more formats with
     an optional callback.
+  - Improved url_escape performance slightly.
   - Fixed bug where ojo would sometimes die silently.
 
 5.23  2014-07-31

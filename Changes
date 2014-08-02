@@ -1,7 +1,5 @@
 
 5.24  2014-08-02
-  - Improved split_header function in Mojo::Util to handle more formats with
-    an optional callback.
   - Improved url_escape performance slightly.
   - Fixed bug where ojo would sometimes die silently.
 

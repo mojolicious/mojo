@@ -248,10 +248,9 @@ sub slurp {
 }
 
 sub split_header {
-  my ($str, $cb) = @_;
+  my $str = shift;
 
-  my @tree;
-  my @token = $cb ? $cb->(\$str) : ();
+  my (@tree, @token);
   while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
     push @token, $1, undef;
     $token[-1] = unquote($1)
@@ -261,7 +260,7 @@ sub split_header {
     $str =~ s/^;\s*//;
     next unless $str =~ s/^,\s*//;
     push @tree, [@token];
-    @token = $cb ? $cb->(\$str) : ();
+    @token = ();
   }
 
   # Take care of final token
@@ -626,10 +625,8 @@ Read all data at once from file.
 =head2 split_header
 
    my $tree = split_header 'foo="bar baz"; test=123, yada';
-   my $tree = split_header '</foo;bar>; rel=next', sub {...};
 
-Split HTTP header value, the optional callback will be invoked at the
-beginning of every new comma separated segment.
+Split HTTP header value.
 
   # "one"
   split_header('one; two="three four", five=six')->[0][0];
@@ -639,12 +636,6 @@ beginning of every new comma separated segment.
 
   # "five"
   split_header('one; two="three four", five=six')->[1][0];
-
-  # "foo;baz"
-  split_header('<foo;baz>; rel=next', sub {
-    my $strref = shift;
-    return $$strref =~ s/^<(.+?)>// ? ($1, undef) : ();
-  })->[0][0];
 
 =head2 spurt
 

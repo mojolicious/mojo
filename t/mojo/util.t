@@ -81,11 +81,6 @@ $tree   = [
   ]
 ];
 is_deeply split_header($header), $tree, 'right result';
-my $cb = sub { ${$_[0]} =~ s/^\s*<(.+?)>// ? ($1, undef) : () };
-is_deeply split_header('', $cb), [], 'right result';
-$header = q{<f;o>; bar=baz, <b,z>; yada="a b c"};
-$tree = [['f;o', undef, 'bar', 'baz'], ['b,z', undef, 'yada', 'a b c']];
-is_deeply split_header($header, $cb), $tree, 'right result';
 
 # unindent
 is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",

@@ -304,11 +304,8 @@ sub _remove {
   # Close connection
   my $c = delete $self->{connections}{$id} || {};
   my $tx = $c->{tx};
-  if ($close || !$tx || !$tx->keep_alive || $tx->error) {
-    $self->_dequeue($_, $id) for 1, 0;
-    $self->_loop($_)->remove($id) for 1, 0;
-    return;
-  }
+  return map { $self->_dequeue($_, $id); $self->_loop($_)->remove($id) } 1, 0
+    if $close || !$tx || !$tx->keep_alive || $tx->error;
 
   # Keep connection alive (CONNECT requests get upgraded)
   $self->_enqueue($c->{nb}, join(':', $self->transactor->endpoint($tx)), $id)

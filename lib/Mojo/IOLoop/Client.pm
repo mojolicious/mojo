@@ -136,6 +136,7 @@ sub _try_socks {
   $reactor->remove($handle);
   return $self->emit(error => 'SOCKS upgrade failed')
     unless IO::Socket::Socks->start_SOCKS($handle, %options);
+  weaken $self;
   $reactor->io($handle => sub { $self->_socks($args) })->watch($handle, 0, 1);
 }
 

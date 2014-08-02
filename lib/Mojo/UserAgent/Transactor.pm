@@ -284,6 +284,23 @@ Mojo::UserAgent::Transactor - User agent transactor
 L<Mojo::UserAgent::Transactor> is the transaction building and manipulation
 framework used by L<Mojo::UserAgent>.
 
+=head1 GENERATORS
+
+These content generators are available by default.
+
+=head2 form
+
+  $t->tx(POST => 'http://example.com' => form => {a => 'b'});
+
+Generate query string, C<application/x-www-form-urlencoded> or
+C<multipart/form-data> content.
+
+=head2 json
+
+  $t->tx(PATCH => 'http://example.com' => json => {a => 'b'});
+
+Generate JSON content with L<Mojo::JSON>.
+
 =head1 ATTRIBUTES
 
 L<Mojo::UserAgent::Transactor> implements the following attributes.
@@ -356,7 +373,7 @@ C<307> or C<308> redirect response if possible.
     PUT  => 'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
-requests, with support for content generators.
+requests, with support for L</"GENERATORS">.
 
   # Generate and inspect custom GET request with DNT header and content
   say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;

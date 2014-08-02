@@ -67,8 +67,8 @@ is_deeply split_header('f "o" o , ba  r'),
   'right result';
 is_deeply split_header('foo="b,; a\" r\"\\\\"'), [['foo', 'b,; a" r"\\']],
   'right result';
-is_deeply split_header('foo = "b a\" r\"\\\\"'), [['foo', 'b a" r"\\']],
-  'right result';
+is_deeply split_header('foo = "b a\" r\"\\\\"; bar="ba z"'),
+  [['foo', 'b a" r"\\', 'bar', 'ba z']], 'right result';
 my $header = q{</foo/bar>; rel="x"; t*=UTF-8'de'a%20b};
 my $tree = [['</foo/bar>', undef, 'rel', 'x', 't*', 'UTF-8\'de\'a%20b']];
 is_deeply split_header($header), $tree, 'right result';

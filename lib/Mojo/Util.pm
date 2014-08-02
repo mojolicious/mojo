@@ -643,7 +643,7 @@ beginning of every new comma separated segment.
   # "foo;baz"
   split_header('<foo;baz>; rel=next', sub {
     my $strref = shift;
-    return $$strref =~ s/^<.+?>// ? ($1, undef) : ();
+    return $$strref =~ s/^<(.+?)>// ? ($1, undef) : ();
   })->[0][0];
 
 =head2 spurt

@@ -9,7 +9,7 @@ use Mojo::JSON 'j';
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
-use Mojo::Util 'decode';
+use Mojo::Util qw(decode split_header);
 
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
@@ -137,6 +137,19 @@ sub json {
   return undef if $self->content->is_multipart;
   my $data = $self->{json} //= j($self->body);
   return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
+}
+
+sub links {
+  my $self = shift;
+
+  my %links;
+  my $cb = sub { ${$_[0]} =~ s/^\s*<(.+?)>// ? ($1, undef) : () };
+  for my $link (@{split_header $self->headers->link // '', $cb}) {
+    my $hash = {url => (splice @$link, 0, 2)[0], @$link};
+    $links{$hash->{rel}} = $hash;
+  }
+
+  return \%links;
 }
 
 sub param { shift->body_params->param(@_) }
@@ -577,6 +590,17 @@ sure it is not excessively large, there's a 10MB limit by default.
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];
   say $msg->json('/foo/bar/23');
+
+=head2 links
+
+  my $links = $msg->links;
+
+Extract web links from C<Link> header according to
+L<RFC 5988|http://tools.ietf.org/html/rfc5988>.
+
+  # Extract information about next page
+  say $msg->links->{next}{url};
+  say $msg->links->{next}{title};
 
 =head2 param
 

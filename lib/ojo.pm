@@ -14,7 +14,7 @@ sub import {
 
   # Mojolicious::Lite
   my $caller = caller;
-  eval "package $caller; use Mojolicious::Lite;";
+  eval "package $caller; use Mojolicious::Lite; 1" or die $@;
   my $ua = $caller->app->ua;
   $ua->server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
 

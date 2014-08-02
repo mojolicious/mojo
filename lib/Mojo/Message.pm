@@ -139,12 +139,6 @@ sub json {
   return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
 
-sub links {
-  my $links = split_header shift->headers->link // '', \&_link;
-  my @links = map { {url => (splice @$_, 0, 2)[0], @$_} } @$links;
-  return {map { $_->{rel} => $_ } @links};
-}
-
 sub param { shift->body_params->param(@_) }
 
 sub parse {
@@ -261,8 +255,6 @@ sub _limit {
   $self->{limit} = 1;
   return $self->error({message => $msg, advice => $code});
 }
-
-sub _link { ${$_[0]} =~ s/^\s*<(.+?)>// ? ($1, undef) : () }
 
 sub _parse_formdata {
   my ($self, $upload) = @_;
@@ -585,17 +577,6 @@ sure it is not excessively large, there's a 10MB limit by default.
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];
   say $msg->json('/foo/bar/23');
-
-=head2 links
-
-  my $links = $msg->links;
-
-Extract web links from C<Link> header according to
-L<RFC 5988|http://tools.ietf.org/html/rfc5988>.
-
-  # Extract information about next page
-  say $msg->links->{next}{url};
-  say $msg->links->{next}{title};
 
 =head2 param
 

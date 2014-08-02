@@ -416,8 +416,6 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 500 Internal Server Error\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
-$res->parse("Link: <http://example.com?foo=b;,ar>; rel=next\x0d\x0a");
-$res->parse(qq{Link: </>; rel=root; title="foo bar"\x0d\x0a});
 $res->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
 $res->parse("4\x0d\x0a");
 $res->parse("abcd\x0d\x0a");
@@ -432,14 +430,6 @@ is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 13,           'right "Content-Length" value';
 is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $res->body_size, 13, 'right size';
-is $res->headers->link,
-  '<http://example.com?foo=b;,ar>; rel=next, </>; rel=root; title="foo bar"',
-  'right "Link" value';
-my $links = {
-  next => {url => 'http://example.com?foo=b;,ar', rel => 'next'},
-  root => {url => '/', rel => 'root', title => 'foo bar'}
-};
-is_deeply $res->links, $links, 'right links';
 
 # Parse HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;
@@ -473,8 +463,6 @@ isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
-is $res->headers->link, undef, 'no "Link" value';
-is_deeply $res->links, {}, 'no links';
 
 # Parse HTTP 1.1 chunked multipart response (at once)
 $res = Mojo::Message::Response->new;

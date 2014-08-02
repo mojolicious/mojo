@@ -473,6 +473,8 @@ isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
+is $res->headers->link, undef, 'no "Link" value';
+is_deeply $res->links, {}, 'no links';
 
 # Parse HTTP 1.1 chunked multipart response (at once)
 $res = Mojo::Message::Response->new;

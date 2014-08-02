@@ -143,8 +143,7 @@ sub links {
   my $self = shift;
 
   my %links;
-  my $cb = sub { ${$_[0]} =~ s/^\s*<(.+?)>// ? ($1, undef) : () };
-  for my $link (@{split_header $self->headers->link // '', $cb}) {
+  for my $link (@{split_header $self->headers->link // '', \&_link}) {
     my $hash = {url => (splice @$link, 0, 2)[0], @$link};
     $links{$hash->{rel}} = $hash;
   }
@@ -268,6 +267,8 @@ sub _limit {
   $self->{limit} = 1;
   return $self->error({message => $msg, advice => $code});
 }
+
+sub _link { ${$_[0]} =~ s/^\s*<(.+?)>// ? ($1, undef) : () }
 
 sub _parse_formdata {
   my ($self, $upload) = @_;

@@ -249,6 +249,9 @@ $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
   ->element_exists('select.my-field-with-error')
   ->element_exists('input.my-field-with-error[type="password"]');
 
+# Parameters from route placeholders
+$t->get_ok('/named_route/foo_name')->status_is(200);
+
 done_testing();
 
 __DATA__

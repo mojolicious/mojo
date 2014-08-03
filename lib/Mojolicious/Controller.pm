@@ -365,6 +365,8 @@ sub validation {
   my $header = $req->headers->header('X-CSRF-Token');
   my $hash   = $req->params->to_hash;
   $hash->{csrf_token} //= $header if $token && $header;
+  my $captures = $stash->{'mojo.captures'} ||= {};
+  @$hash{grep { !$RESERVED{$_} } keys %$captures} = values %$captures;
   my $validation = $self->app->validator->validation->input($hash);
   return $stash->{'mojo.validation'} = $validation->csrf_token($token);
 }

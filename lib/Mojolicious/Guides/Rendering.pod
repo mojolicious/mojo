@@ -670,11 +670,12 @@ This chain could go on and on to allow a very high level of template reuse.
 =head2 Form validation
 
 You can use L<Mojolicious::Controller/"validation"> to validate C<GET> and
-C<POST> parameters submitted to your application. All unknown fields will be
-ignored by default, so you have to decide which should be required or optional
-before you can perform checks on their values. Every check is performed right
-away, so you can use the results immediately to build more advanced validation
-logic with methods like L<Mojolicious::Validator::Validation/"is_valid">.
+C<POST> parameters submitted to your application or parameters captured by 
+route placeholders. All unknown fields will be ignored by default, so you 
+have to decide which should be required or optional before you can perform 
+checks on their values. Every check is performed right away, so you can use 
+the results immediately to build more advanced validation logic with methods 
+like L<Mojolicious::Validator::Validation/"is_valid">.
 
   use Mojolicious::Lite;
 

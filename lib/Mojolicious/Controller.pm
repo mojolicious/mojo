@@ -366,7 +366,7 @@ sub validation {
   my $hash   = $req->params->to_hash;
   $hash->{csrf_token} //= $header if $token && $header;
   
-  # Load parameters from named routes
+  # Load parameters from route placeholder
   my $captures = $stash->{'mojo.captures'} ||= {};
   my @keys = grep { !$RESERVED{$_} } keys %$captures;
   @$hash{@keys} = @$captures{@keys};
@@ -955,7 +955,8 @@ to inherit query parameters from the current request.
 
 Get L<Mojolicious::Validator::Validation> object for current request to
 validate C<GET> and C<POST> parameters extracted from the query string,
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message body and named routes.
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body 
+and route placeholders.
 Parts of the request body need to be loaded into memory to parse C<POST>
 parameters, so you have to make sure it is not excessively large, there's a
 10MB limit by default.

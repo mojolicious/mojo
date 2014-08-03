@@ -31,6 +31,13 @@ any '/forgery' => sub {
   $validation->csrf_protect->required('foo');
 };
 
+any '/named_route/:name' => sub {
+  my $c          = shift;
+  my $validation = $c->validation;
+  return $c->render unless $validation->has_data;
+  $validation->required('name');
+} => 'named_route';
+
 my $t = Test::Mojo->new;
 
 # Required and optional values
@@ -270,3 +277,6 @@ __DATA__
   %= csrf_field
   %= text_field 'foo'
 %= end
+
+@@ named_route.html.ep
+Got the paremeter from the named route.

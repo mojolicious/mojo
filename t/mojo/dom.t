@@ -2351,8 +2351,10 @@ is "$dom", '<input checked type="checkbox" value="/a/"><br>', 'right result';
 
 # Dot and hash in class and id attributes
 $dom = Mojo::DOM->new('<p class="a#b.c">A</p><p id="a#b.c">B</p>');
-is $dom->at('p.a\#b\.c')->text, 'A', 'right text';
-is $dom->at('p#a\#b\.c')->text, 'B', 'right text';
+is $dom->at('p.a\#b\.c')->text,       'A', 'right text';
+is $dom->at(':not(p.a\#b\.c)')->text, 'B', 'right text';
+is $dom->at('p#a\#b\.c')->text,       'B', 'right text';
+is $dom->at(':not(p#a\#b\.c)')->text, 'A', 'right text';
 
 # Extra whitespace
 $dom = Mojo::DOM->new('< span>a< /span><b >b</b><span >c</ span>');

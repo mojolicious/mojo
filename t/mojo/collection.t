@@ -112,6 +112,12 @@ is $collection->size, 1, 'right size';
 $collection = c(5, 4, 3, 2, 1);
 is $collection->size, 5, 'right size';
 
+# reduce
+$collection = c(2, 5, 4, 1);
+is $collection->reduce(sub { shift() + shift() }), 12, 'right result';
+is $collection->reduce(sub { shift() + shift() }, 5), 17, 'right result';
+is c()->reduce(sub { shift() + shift() }), undef, 'no result';
+
 # sort
 $collection = c(2, 5, 4, 1);
 is_deeply [$collection->sort->each], [1, 2, 4, 5], 'right order';

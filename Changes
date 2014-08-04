@@ -1,5 +1,6 @@
 
 5.25  2014-08-04
+  - Added reduce method to Mojo::Collection.
   - Fixed escaping bugs in Mojo::DOM::CSS.
 
 5.24  2014-08-02

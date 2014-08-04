@@ -73,6 +73,11 @@ sub pluck {
   return $self->new(map { $_->$method(@args) } @$self);
 }
 
+sub reduce {
+  my ($self, $cb) = (shift, shift);
+  return List::Util::reduce(sub { $a->$cb($b) }, @_, @$self);
+}
+
 sub reverse { $_[0]->new(reverse @{$_[0]}) }
 
 sub shuffle { $_[0]->new(List::Util::shuffle @{$_[0]}) }
@@ -250,6 +255,16 @@ results.
 
   # Equal to but more convenient than
   my $new = $collection->map(sub { $_->$method(@args) });
+
+=head2 reduce
+
+  my $result = $collection->reduce(sub {...});
+  my $result = $collection->reduce(sub {...}, $initial);
+
+Reduce elements in collection with callback, the first element will be used as
+initial value if none has been provided.
+
+  my $sum = $collection->reduce(sub { shift() + shift() });
 
 =head2 reverse
 

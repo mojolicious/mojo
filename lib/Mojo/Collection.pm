@@ -74,7 +74,7 @@ sub pluck {
 }
 
 sub reduce {
-  my ($self, $cb) = (shift, shift);
+  my ($self, $cb) = (shift, pop);
   return List::Util::reduce(sub { $a->$cb($b) }, @_, @$self);
 }
 
@@ -259,7 +259,7 @@ results.
 =head2 reduce
 
   my $result = $collection->reduce(sub {...});
-  my $result = $collection->reduce(sub {...}, $initial);
+  my $result = $collection->reduce($initial => sub {...});
 
 Reduce elements in collection with callback, the first element will be used as
 initial value if none has been provided.

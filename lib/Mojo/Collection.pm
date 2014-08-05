@@ -187,6 +187,7 @@ Evaluate callback for each element in collection or return all elements as a
 list if none has been provided. The element will be the first argument passed
 to the callback and is also available as C<$_>.
 
+  # Make a numbered list
   $collection->each(sub {
     my ($e, $count) = @_;
     say "$count: $e";
@@ -203,7 +204,8 @@ return the first one that matched the regular expression, or for which the
 callback returned true. The element will be the first argument passed to the
 callback and is also available as C<$_>.
 
-  my $five = $collection->first(sub { $_ == 5 });
+  # Find first value that is greater than 5
+  my $greater = $collection->first(sub { $_ > 5 });
 
 =head2 flatten
 
@@ -222,6 +224,7 @@ create a new collection with all elements that matched the regular expression,
 or for which the callback returned true. The element will be the first
 argument passed to the callback and is also available as C<$_>.
 
+  # Find all values that contain the word "mojo"
   my $interesting = $collection->grep(qr/mojo/i);
 
 =head2 join
@@ -231,7 +234,8 @@ argument passed to the callback and is also available as C<$_>.
 
 Turn collection into L<Mojo::ByteStream>.
 
-  $collection->join("\n")->say;
+  # Join all values with commas
+  $collection->join(', ')->say;
 
 =head2 last
 
@@ -247,7 +251,8 @@ Evaluate callback for each element in collection and create a new collection
 from the results. The element will be the first argument passed to the
 callback and is also available as C<$_>.
 
-  my $doubled = $collection->map(sub { $_ * 2 });
+  # Append the word "mojo" to all values
+  my $mojoified = $collection->map(sub { $_ . 'mojo' });
 
 =head2 new
 
@@ -274,7 +279,11 @@ results.
 Reduce elements in collection with callback, the first element will be used as
 initial value if none has been provided.
 
+  # Calculate the sum of all values
   my $sum = $collection->reduce(sub { $a + $b });
+
+  # Count how often each value occurs in collection
+  my $hash = $collection->reduce(sub { $a->{$b}++; $a }, {});
 
 =head2 reverse
 
@@ -308,6 +317,7 @@ Number of elements in collection.
 Sort elements based on return value of callback and create a new collection
 from the results.
 
+  # Sort values case insensitive
   my $insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
 
 =head2 tap

@@ -1,5 +1,5 @@
 
-5.25  2014-08-05
+5.25  2014-08-06
   - Added reduce method to Mojo::Collection. (sri, batman)
   - Improved sort method in Mojo::Collection to use $a and $b. (batman)
   - Improved documentation browser CSS.

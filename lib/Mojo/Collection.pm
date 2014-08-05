@@ -98,7 +98,7 @@ sub sort {
   my $caller = caller;
   no strict 'refs';
   my @sorted = sort {
-    local (*{"$caller\::a"}, *{"$caller\::b"}) = (\$a, \$b);
+    local (*{"${caller}::a"}, *{"${caller}::b"}) = (\$a, \$b);
     $a->$cb($b);
   } @$self;
   return $self->new(@sorted);

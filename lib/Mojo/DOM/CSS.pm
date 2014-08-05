@@ -14,13 +14,6 @@ my $ATTR_RE   = qr/
   )?
   \]
 /x;
-my $CLASS_ID_RE = qr/
-  (?:
-    (?:\.((?:\\[.\#]|[^\#.])+))   # Class
-  |
-    (?:\#((?:\\[.\#]|[^.\#])+))   # ID
-  )
-/x;
 my $PSEUDO_CLASS_RE = qr/(?::([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
 my $TOKEN_RE        = qr/
   (\s*,\s*)?                         # Separator
@@ -35,8 +28,8 @@ sub match {
   return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, $tree);
 }
 
-sub select     { shift->_select(0, @_) }
-sub select_one { shift->_select(1, @_) }
+sub select     { _select(0, shift->tree, _compile(@_)) }
+sub select_one { _select(1, shift->tree, _compile(@_)) }
 
 sub _ancestor {
   my ($selectors, $current, $tree) = @_;
@@ -112,9 +105,9 @@ sub _compile {
     push @$selector, ['tag', $tag];
 
     # Class or ID
-    while ($element =~ /$CLASS_ID_RE/go) {
-      push @$selector, ['attr', 'class', _regex('~', $1)] if defined $1;
-      push @$selector, ['attr', 'id',    _regex('',  $2)] if defined $2;
+    while ($element =~ /(?:([.#])((?:\\[.\#]|[^\#.])+))/g) {
+      my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
+      push @$selector, ['attr', $name, _regex($op, $2)];
     }
 
     # Pseudo classes (":not" contains more selectors)
@@ -232,12 +225,10 @@ sub _regex {
 }
 
 sub _select {
-  my ($self, $one, $selector) = @_;
+  my ($one, $tree, $pattern) = @_;
 
   my @results;
-  my $pattern = _compile($selector);
-  my $tree    = $self->tree;
-  my @queue   = ($tree);
+  my @queue = ($tree);
   while (my $current = shift @queue) {
     my $type = $current->[0];
 

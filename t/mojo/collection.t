@@ -130,8 +130,7 @@ is_deeply [$collection->sort(sub { uc(shift) cmp uc(shift) })->each],
   [qw(Mojo perl Test)], 'right order';
 $collection = c();
 is_deeply [$collection->sort->each], [], 'no elements';
-is_deeply [$collection->sort(sub { $_[1] cmp $_[0] })->each], [],
-  'no elements';
+is_deeply [$collection->sort(sub { $a cmp $b })->each], [], 'no elements';
 
 # slice
 $collection = c(1, 2, 3, 4, 5, 6, 7, 10, 9, 8);

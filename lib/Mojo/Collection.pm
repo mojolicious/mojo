@@ -97,12 +97,11 @@ sub sort {
 
   my $caller = caller;
   no strict 'refs';
-  return $self->new(
-    sort {
-      local (*{"$caller\::a"}, *{"$caller\::b"}) = (\$a, \$b);
-      $a->$cb($b);
-    } @$self
-  );
+  my @sorted = sort {
+    local (*{"$caller\::a"}, *{"$caller\::b"}) = (\$a, \$b);
+    $a->$cb($b);
+  } @$self;
+  return $self->new(@sorted);
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }

@@ -74,8 +74,9 @@ sub pluck {
 }
 
 sub reduce {
-  my ($self, $cb) = (shift, shift);
-  return List::Util::reduce(sub { $a->$cb($b) }, @_, @$self);
+  my $self = shift;
+  @_ = (@_, @$self);
+  goto &List::Util::reduce;
 }
 
 sub reverse { $_[0]->new(reverse @{$_[0]}) }
@@ -264,7 +265,7 @@ results.
 Reduce elements in collection with callback, the first element will be used as
 initial value if none has been provided.
 
-  my $sum = $collection->reduce(sub { shift() + shift() });
+  my $sum = $collection->reduce(sub { $a + $b });
 
 =head2 reverse
 

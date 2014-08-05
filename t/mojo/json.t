@@ -165,9 +165,6 @@ $bytes = encode_json {foo => []};
 is $bytes, '{"foo":[]}', 'encode {foo => []}';
 $bytes = encode_json {foo => ['bar']};
 is $bytes, '{"foo":["bar"]}', 'encode {foo => [\'bar\']}';
-$bytes = encode_json {foo => 'bar', baz => 'yada'};
-is $bytes, '{"baz":"yada","foo":"bar"}',
-  'encode {foo => \'bar\', baz => \'yada\'}';
 
 # Encode name
 $bytes = encode_json [Mojo::JSON->true];

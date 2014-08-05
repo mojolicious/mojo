@@ -2,7 +2,6 @@
 5.25  2014-08-05
   - Added reduce method to Mojo::Collection.
   - Improved sort method in Mojo::Collection to use $a and $b. (batman)
-  - Improved Mojo::JSON to generate canonical JSON objects.
   - Improved documentation browser CSS.
   - Fixed escaping bugs in Mojo::DOM::CSS.
 

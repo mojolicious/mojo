@@ -121,6 +121,8 @@ is c()->reduce(sub { $a + $b }), undef, 'no result';
 # sort
 $collection = c(2, 5, 4, 1);
 is_deeply [$collection->sort->each], [1, 2, 4, 5], 'right order';
+is_deeply [$collection->sort(sub { $b cmp $a })->each], [5, 4, 2, 1],
+  'right order';
 is_deeply [$collection->sort(sub { $_[1] cmp $_[0] })->each], [5, 4, 2, 1],
   'right order';
 $collection = c(qw(Test perl Mojo));

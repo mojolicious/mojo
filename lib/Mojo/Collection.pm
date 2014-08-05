@@ -92,7 +92,17 @@ sub slice {
 
 sub sort {
   my ($self, $cb) = @_;
-  return $self->new($cb ? sort { $a->$cb($b) } @$self : sort @$self);
+
+  return $self->new(sort @$self) unless $cb;
+
+  my $caller = caller;
+  no strict 'refs';
+  return $self->new(
+    sort {
+      local (*{"$caller\::a"}, *{"$caller\::b"}) = (\$a, \$b);
+      $a->$cb($b);
+    } @$self
+  );
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }
@@ -299,7 +309,7 @@ Number of elements in collection.
 Sort elements based on return value of callback and create a new collection
 from the results.
 
-  my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
+  my $insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
 
 =head2 tap
 

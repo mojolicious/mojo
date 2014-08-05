@@ -225,7 +225,7 @@ sub _encode_array {
 sub _encode_object {
   my $object = shift;
   my @pairs = map { _encode_string($_) . ':' . _encode_value($object->{$_}) }
-    keys %$object;
+    sort keys %$object;
   return '{' . join(',', @pairs) . '}';
 }
 

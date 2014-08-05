@@ -622,7 +622,12 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # Extract information from multiple elements
   my @headers = $dom->find('h1, h2, h3')->text->each;
-  my @links   = $dom->find('a[href]')->attr('href')->each;
+
+  # Count all the different tags
+  my $hash = $dom->find('*')->type->reduce(sub { $a->{$b}++; $a }, {});
+
+  # Find elements with a class that contains dots
+  my @divs = $dom->find('div.foo\.bar')->each;
 
 =head2 match
 

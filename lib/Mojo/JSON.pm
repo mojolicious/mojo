@@ -398,6 +398,14 @@ L<Mojo::JSON> implements the following attributes.
 
 Parser error.
 
+=head2
+
+  my $j = Mojo::JSON->new(canonical=>1);
+  my $bytes = $j->encode({foo => 1, bar => 2, baz => 3});
+  # '{"bar":2,"baz":3,"foo":1}'
+
+Set canonical JSON encoding (sorted keys).
+
 =head1 METHODS
 
 L<Mojo::JSON> inherits all methods from L<Mojo::Base> and implements the

@@ -60,14 +60,11 @@ sub is_fresh {
 
   # If-None-Match
   my $res_headers = $c->res->headers;
-  my $matches = $match && ($res_headers->etag // '') ne $match ? 0 : 1;
+  return undef if $match && ($res_headers->etag // '') ne $match;
 
   # If-Modified-Since
-  return $matches unless (my $last = $res_headers->last_modified) && $since;
-  my $unmodified
-    = Mojo::Date->new($last)->epoch <= (Mojo::Date->new($since)->epoch // 0);
-
-  return $matches && $unmodified;
+  return !!$match unless (my $last = $res_headers->last_modified) && $since;
+  return _epoch($last) <= (_epoch($since) // 0);
 }
 
 sub serve {
@@ -107,6 +104,8 @@ sub serve_asset {
 
   return $res->content->asset($asset->start_range($start)->end_range($end));
 }
+
+sub _epoch { Mojo::Date->new(shift)->epoch }
 
 sub _get_data_file {
   my ($self, $rel) = @_;

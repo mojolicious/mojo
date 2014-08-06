@@ -1,5 +1,5 @@
 
-5.25  2014-08-06
+5.25  2014-08-07
   - Added reduce method to Mojo::Collection. (sri, batman)
   - Added if_none_match method to Mojo::Headers.
   - Added is_fresh method to Mojolicious::Static.

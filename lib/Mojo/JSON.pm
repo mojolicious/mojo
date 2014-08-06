@@ -324,6 +324,10 @@ Mojo::JSON - Minimalistic JSON
   my $err  = $json->error;
   say $err ? "Error: $err" : $hash->{message};
 
+  # Canonical (keys sorted) encoding
+  my $json  = Mojo::JSON->new(canonical->1);
+  my $bytes = $json->encode({foo = >[1, 2], bar => 'hello!', baz => \1});
+
 =head1 DESCRIPTION
 
 L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl

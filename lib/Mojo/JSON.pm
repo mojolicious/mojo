@@ -398,7 +398,7 @@ L<Mojo::JSON> implements the following attributes.
 
 Parser error.
 
-=head2
+=head2 canonical
 
   my $j = Mojo::JSON->new(canonical=>1);
   my $bytes = $j->encode({foo => 1, bar => 2, baz => 3});

@@ -35,6 +35,10 @@ is $t->app->static->file('hello.txt')->slurp,
   "Hello Mojo from a static file!\n", 'right content';
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 
+# Default namespaces
+is_deeply $t->app->routes->namespaces,
+  ['MojoliciousTest::Controller', 'MojoliciousTest'], 'right namespaces';
+
 # Plugin::Test::SomePlugin2::register (security violation)
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
   ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')

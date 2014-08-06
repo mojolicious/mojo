@@ -26,7 +26,7 @@ EOF
   $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
   # Controller
-  my $controller = "${class}::Example";
+  my $controller = "${class}::Controller::Example";
   my $path       = class_to_path $controller;
   $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 

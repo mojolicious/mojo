@@ -4,6 +4,8 @@
   - Added if_none_match method to Mojo::Headers.
   - Added is_fresh method to Mojolicious::Static.
   - Added is_fresh helper to Mojolicious::Plugin::DefaultHelpers.
+  - Improved Mojolicious to use MyApp::Controller namespace by default and
+    encourage its use in the documentation.
   - Improved sort method in Mojo::Collection to use $a and $b. (batman)
   - Improved Mojolicious::Static to support ETag and If-None-Match headers.
   - Improved documentation browser CSS.

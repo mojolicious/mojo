@@ -151,7 +151,7 @@ Mojolicious::Static - Serve static files
   use Mojolicious::Static;
 
   my $static = Mojolicious::Static->new;
-  push @{$static->classes}, 'MyApp::Foo';
+  push @{$static->classes}, 'MyApp::Controller::Foo';
   push @{$static->paths}, '/home/sri/public';
 
 =head1 DESCRIPTION

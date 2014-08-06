@@ -439,7 +439,7 @@ Mojolicious::Controller - Controller base class
 =head1 SYNOPSIS
 
   # Controller
-  package MyApp::Foo;
+  package MyApp::Controller::Foo;
   use Mojo::Base 'Mojolicious::Controller';
 
   # Action

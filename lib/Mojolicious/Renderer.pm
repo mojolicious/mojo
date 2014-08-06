@@ -252,7 +252,7 @@ Mojolicious::Renderer - Generate dynamic content
   use Mojolicious::Renderer;
 
   my $renderer = Mojolicious::Renderer->new;
-  push @{$renderer->classes}, 'MyApp::Foo';
+  push @{$renderer->classes}, 'MyApp::Controller::Foo';
   push @{$renderer->paths}, '/home/sri/templates';
 
 =head1 DESCRIPTION

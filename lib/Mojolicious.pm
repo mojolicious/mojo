@@ -154,8 +154,8 @@ sub new {
   push @{$self->renderer->paths}, $home->rel_dir('templates');
   push @{$self->static->paths},   $home->rel_dir('public');
 
-  # Default to application namespace
-  my $r = $self->routes->namespaces([ref $self]);
+  # Default to controller and application namespace
+  my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
 
   # Hide controller attributes/methods and "handler"
   $r->hide(qw(app continue cookie finish flash handler match on param));
@@ -220,7 +220,7 @@ Mojolicious - Real-time web framework
   }
 
   # Controller
-  package MyApp::Foo;
+  package MyApp::Controller::Foo;
   use Mojo::Base 'Mojolicious::Controller';
 
   # Action
@@ -457,7 +457,7 @@ startup method to define the url endpoints for your application.
   $r->post('/baz')->to('test#baz');
 
   # Add another namespace to load controllers from
-  push @{$app->routes->namespaces}, 'MyApp::Controller';
+  push @{$app->routes->namespaces}, 'MyApp::C';
 
 =head2 secrets
 

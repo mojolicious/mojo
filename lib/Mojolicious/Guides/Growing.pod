@@ -578,14 +578,14 @@ allow running tests again.
 Hybrid routes are a nice intermediate step, but to maximize maintainability it
 makes sense to split our action code from its routing information.
 
-  $ mkdir lib/MyApp
-  $ touch lib/MyApp/Login.pm
-  $ chmod 644 lib/MyApp/Login.pm
+  $ mkdir -p lib/MyApp/Controller
+  $ touch lib/MyApp/Controller/Login.pm
+  $ chmod 644 lib/MyApp/Controller/Login.pm
 
 Once again the actual action code does not need to change, we just rename
 C<$c> to C<$self> since the controller is now the invocant.
 
-  package MyApp::Login;
+  package MyApp::Controller::Login;
   use Mojo::Base 'Mojolicious::Controller';
 
   sub index {

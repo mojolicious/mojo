@@ -144,11 +144,8 @@ sub _class {
   for my $class (@classes) {
 
     # Failed
-    unless (my $found = $self->_load($class)) {
-      next unless defined $found;
-      $log->debug(qq{Class "$class" is not a controller.});
-      return undef;
-    }
+    next unless defined(my $found = $self->_load($class));
+    return !$log->debug(qq{Class "$class" is not a controller.}) unless $found;
 
     # Success
     my $new = $class->new(%$c);
@@ -288,7 +285,7 @@ C<attr>, C<has>, C<new> and C<tap>.
 Namespaces to load controllers from.
 
   # Add another namespace to load controllers from
-  push @{$r->namespaces}, 'MyApp::Controller';
+  push @{$r->namespaces}, 'MyApp::C';
 
 =head2 shortcuts
 

@@ -12,6 +12,12 @@ use Test::Mojo;
 
 get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
+get '/etag' => sub {
+  my $c = shift;
+  $c->res->headers->etag('"abc"');
+  $c->is_fresh ? $c->rendered(304) : $c->render(text => 'I ♥ Mojolicious!');
+};
+
 my $t = Test::Mojo->new;
 
 # Static file
@@ -79,6 +85,15 @@ $t->get_ok('/hello3.txt' => {Range => 'bytes=0-0'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->header_is('Content-Range' => 'bytes 0-0/1')->content_is('X');
+
+# Fresh content
+$t->get_ok('/etag')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is(ETag => '"abc"')->content_is('I ♥ Mojolicious!');
+
+# Stale content
+$t->get_ok('/etag' => {'If-None-Match' => '"abc"'})
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is(ETag => '"abc"')
+  ->status_is(304)->content_is('');
 
 # Empty file
 $t->get_ok('/hello4.txt')->status_is(200)

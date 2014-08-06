@@ -3,6 +3,7 @@
   - Added reduce method to Mojo::Collection. (sri, batman)
   - Added if_none_match method to Mojo::Headers.
   - Added is_fresh method to Mojolicious::Static.
+  - Added is_fresh helper to Mojolicious::Plugin::DefaultHelpers.
   - Improved sort method in Mojo::Collection to use $a and $b. (batman)
   - Improved Mojolicious::Static to support ETag and If-None-Match headers.
   - Improved documentation browser CSS.

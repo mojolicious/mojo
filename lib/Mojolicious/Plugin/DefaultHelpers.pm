@@ -32,10 +32,11 @@ sub register {
     qw(inactivity_timeout url_with);
   $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
   $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
-  $app->helper(config  => sub { shift->app->config(@_) });
-  $app->helper(dumper  => sub { shift; dumper(@_) });
-  $app->helper(include => sub { shift->render_to_string(@_) });
-  $app->helper(ua      => sub { shift->app->ua });
+  $app->helper(config   => sub { shift->app->config(@_) });
+  $app->helper(dumper   => sub { shift; dumper(@_) });
+  $app->helper(include  => sub { shift->render_to_string(@_) });
+  $app->helper(is_fresh => sub { $_[0]->app->static->is_fresh($_[0]) });
+  $app->helper(ua       => sub { shift->app->ua });
 }
 
 sub _accepts {
@@ -269,6 +270,18 @@ timeout if possible.
   %= include 'menubar', format => 'txt'
 
 Alias for C<Mojolicious::Controller/"render_to_string">.
+
+=head2 is_fresh
+
+  $bool = $c->is_fresh;
+
+Check freshness of response by comparing the C<If-None-Match> and
+C<If-Modified-Since> request headers with the C<ETag> and C<Last-Modified>
+response headers with L<Mojolicious::Static/"is_fresh">.
+
+  # Add ETag header and check freshness before rendering
+  $c->res->headers->etag('"abc"');
+  $c->is_fresh ? $c->rendered(304) : $c->render(text => 'I ♥ Mojolicious!');
 
 =head2 layout
 

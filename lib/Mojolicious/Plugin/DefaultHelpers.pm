@@ -29,14 +29,13 @@ sub register {
 
   $app->helper($_ => $self->can("_$_"))
     for qw(accepts content content_for csrf_token current_route delay),
-    qw(inactivity_timeout url_with);
+    qw(inactivity_timeout is_fresh url_with);
   $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
   $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
-  $app->helper(config   => sub { shift->app->config(@_) });
-  $app->helper(dumper   => sub { shift; dumper(@_) });
-  $app->helper(include  => sub { shift->render_to_string(@_) });
-  $app->helper(is_fresh => sub { $_[0]->app->static->is_fresh($_[0]) });
-  $app->helper(ua       => sub { shift->app->ua });
+  $app->helper(config  => sub { shift->app->config(@_) });
+  $app->helper(dumper  => sub { shift; dumper(@_) });
+  $app->helper(include => sub { shift->render_to_string(@_) });
+  $app->helper(ua      => sub { shift->app->ua });
 }
 
 sub _accepts {
@@ -86,6 +85,11 @@ sub _delay {
 sub _inactivity_timeout {
   return unless my $stream = Mojo::IOLoop->stream(shift->tx->connection // '');
   $stream->timeout(shift);
+}
+
+sub _is_fresh {
+  my ($c, %options) = @_;
+  return $c->app->static->is_fresh($c, \%options);
 }
 
 sub _url_with {
@@ -274,14 +278,17 @@ Alias for C<Mojolicious::Controller/"render_to_string">.
 =head2 is_fresh
 
   my $bool = $c->is_fresh;
+  my $bool = $c->is_fresh(etag => 'abc');
+  my $bool = $c->is_fresh(last_modified => $epoch);
 
 Check freshness of response by comparing the C<If-None-Match> and
 C<If-Modified-Since> request headers with the C<ETag> and C<Last-Modified>
 response headers with L<Mojolicious::Static/"is_fresh">.
 
   # Add ETag header and check freshness before rendering
-  $c->res->headers->etag('"abc"');
-  $c->is_fresh ? $c->rendered(304) : $c->render(text => 'I ♥ Mojolicious!');
+  $c->is_fresh(etag => 'abc')
+    ? $c->rendered(304)
+    : $c->render(text => 'I ♥ Mojolicious!');
 
 =head2 layout
 

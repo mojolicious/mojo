@@ -51,7 +51,12 @@ sub file {
 }
 
 sub is_fresh {
-  my ($self, $c) = @_;
+  my ($self, $c, $options) = @_;
+
+  my $res_headers = $c->res->headers;
+  my ($last, $etag) = @$options{qw(last_modified etag)};
+  $res_headers->last_modified(Mojo::Date->new($last)) if $last;
+  $res_headers->etag($etag = qq{"$etag"}) if $etag;
 
   # Unconditional
   my $req_headers = $c->req->headers;
@@ -59,11 +64,10 @@ sub is_fresh {
   return undef unless (my $since = $req_headers->if_modified_since) || $match;
 
   # If-None-Match
-  my $res_headers = $c->res->headers;
-  return undef if $match && ($res_headers->etag // '') ne $match;
+  return undef if $match && ($etag // $res_headers->etag // '') ne $match;
 
   # If-Modified-Since
-  return !!$match unless (my $last = $res_headers->last_modified) && $since;
+  return !!$match unless ($last //= $res_headers->last_modified) && $since;
   return _epoch($last) <= (_epoch($since) // 0);
 }
 
@@ -82,9 +86,9 @@ sub serve_asset {
   # Last-Modified and ETag
   my $mtime = $asset->is_file ? (stat $asset->path)[9] : $MTIME;
   my $res = $c->res;
-  $res->code(200)->headers->last_modified(Mojo::Date->new($mtime))
-    ->etag('"' . md5_sum($mtime) . '"')->accept_ranges('bytes');
-  return $res->code(304) if $self->is_fresh($c);
+  $res->code(200)->headers->accept_ranges('bytes');
+  return $res->code(304)
+    if $self->is_fresh($c, {etag => md5_sum($mtime), last_modified => $mtime});
 
   # Range
   my $size = $asset->size;
@@ -206,11 +210,29 @@ protect from traversing to parent directories.
 
 =head2 is_fresh
 
-  my $bool = $static->is_fresh(Mojolicious::Controller->new);
+  my $bool = $static->is_fresh(Mojolicious::Controller->new, {etag => 'abc'});
 
 Check freshness of response by comparing the C<If-None-Match> and
 C<If-Modified-Since> request headers with the C<ETag> and C<Last-Modified>
 response headers.
+
+These options are currently available:
+
+=over 2
+
+=item etag
+
+  etag => 'abc'
+
+Add C<ETag> header.
+
+=item last_modified
+
+  last_modified => $epoch
+
+Add C<Last-Modified> header.
+
+=back
 
 =head2 serve
 

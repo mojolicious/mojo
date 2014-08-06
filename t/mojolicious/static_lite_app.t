@@ -14,11 +14,31 @@ get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
 get '/etag' => sub {
   my $c = shift;
-  $c->res->headers->etag('"abc"');
-  $c->is_fresh ? $c->rendered(304) : $c->render(text => 'I ♥ Mojolicious!');
+  $c->is_fresh(etag => 'abc')
+    ? $c->rendered(304)
+    : $c->render(text => 'I ♥ Mojolicious!');
 };
 
 my $t = Test::Mojo->new;
+
+# Freshness
+my $c = $t->app->build_controller;
+ok !$c->is_fresh, 'content is stale';
+$c->res->headers->etag('"abc"');
+$c->req->headers->if_none_match('"abc"');
+ok $c->is_fresh, 'content is fresh';
+$c = $t->app->build_controller;
+my $date = Mojo::Date->new(23);
+$c->res->headers->last_modified($date);
+$c->req->headers->if_modified_since($date);
+ok $c->is_fresh, 'content is fresh';
+$c = $t->app->build_controller;
+$c->req->headers->if_none_match('"abc"');
+$c->req->headers->if_modified_since($date);
+ok $c->is_fresh(etag => 'abc', last_modified => $date->epoch),
+  'content is fresh';
+is $c->res->headers->etag,          '"abc"', 'right "ETag" value';
+is $c->res->headers->last_modified, "$date", 'right "Last-Modified" value';
 
 # Static file
 $t->get_ok('/hello.txt')->status_is(200)

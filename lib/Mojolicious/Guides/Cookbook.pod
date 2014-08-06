@@ -1226,7 +1226,8 @@ application, you can use application specific plugins.
   $ mkdir -p lib/MyApp/Plugin
   $ touch lib/MyApp/Plugin/MyHelpers.pm
 
-They work just like normal plugins and you can have as many as you like.
+They work just like normal plugins and are also subclasses of
+L<Mojolicious::Plugin>.
 
   package MyApp::Plugin::MyHelpers;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -1241,8 +1242,9 @@ They work just like normal plugins and you can have as many as you like.
 
   1;
 
-The only difference to normal plugins is that you use their full class name to
-load them.
+You can have as many application specific plugins as you like, the only
+difference to normal plugins is that you load them using their full class
+name.
 
   use Mojolicious::Lite;
 

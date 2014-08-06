@@ -259,11 +259,10 @@ old ones.
 When the dispatcher sees C<controller> and C<action> values in the stash it
 will always try to turn them into a class and method to dispatch to. The
 C<controller> value gets camelized using L<Mojo::Util/"camelize"> and
-prefixed with a C<namespace>, which has two default values, the applications
-class followed by C<Controller> (C<MyApp::Controller>) as well as the bare
-application class (C<MyApp>), and they are searched in that order. While the
-action value is not changed at all, because of this both values are case
-sensitive.
+appended to one or more namespaces, defaulting to a controller namespace based
+on the application class (C<MyApp::Controller>), as well as the bare
+application class (C<MyApp>), and these namespaces are searched in that order.
+The action value is not changed at all, so both values are case sensitive.
 
   # Application
   package MyApp;
@@ -321,7 +320,7 @@ route with all its children.
   $r->route('/bye')
     ->to(namespace => 'MyApp::MyController::Foo::Bar', action => 'bye');
 
-The C<controller> is always appended to the C<namespace> if available.
+The C<controller> is always appended to this C<namespace> if available.
 
   # /bye -> MyApp::MyController::Foo::Bar->bye
   $r->route('/bye')->to('foo-bar#bye', namespace => 'MyApp::MyController');

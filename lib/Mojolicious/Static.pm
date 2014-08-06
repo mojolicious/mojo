@@ -84,11 +84,11 @@ sub serve_asset {
   my ($self, $c, $asset) = @_;
 
   # Last-Modified and ETag
-  my $mtime = $asset->is_file ? (stat $asset->path)[9] : $MTIME;
   my $res = $c->res;
   $res->code(200)->headers->accept_ranges('bytes');
-  return $res->code(304)
-    if $self->is_fresh($c, {etag => md5_sum($mtime), last_modified => $mtime});
+  my $mtime = $asset->is_file ? (stat $asset->path)[9] : $MTIME;
+  my $options = {etag => md5_sum($mtime), last_modified => $mtime};
+  return $res->code(304) if $self->is_fresh($c, $options);
 
   # Range
   my $size = $asset->size;
@@ -213,7 +213,7 @@ protect from traversing to parent directories.
   my $bool = $static->is_fresh(Mojolicious::Controller->new, {etag => 'abc'});
 
 Check freshness of response by comparing the C<If-None-Match> and
-C<If-Modified-Since> request headers with the C<ETag> and C<Last-Modified>
+C<If-Modified-Since> request headers to the C<ETag> and C<Last-Modified>
 response headers.
 
 These options are currently available:
@@ -224,13 +224,13 @@ These options are currently available:
 
   etag => 'abc'
 
-Add C<ETag> header.
+Add C<ETag> header before comparing.
 
 =item last_modified
 
   last_modified => $epoch
 
-Add C<Last-Modified> header.
+Add C<Last-Modified> header before comparing.
 
 =back
 

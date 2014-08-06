@@ -39,6 +39,10 @@ ok $c->is_fresh(etag => 'abc', last_modified => $date->epoch),
   'content is fresh';
 is $c->res->headers->etag,          '"abc"', 'right "ETag" value';
 is $c->res->headers->last_modified, "$date", 'right "Last-Modified" value';
+$c = $t->app->build_controller;
+ok !$c->is_fresh(last_modified => $date->epoch), 'content is stale';
+is $c->res->headers->etag,          undef,   'no "ETag" value';
+is $c->res->headers->last_modified, "$date", 'right "Last-Modified" value';
 
 # Static file
 $t->get_ok('/hello.txt')->status_is(200)

@@ -282,7 +282,7 @@ Alias for C<Mojolicious::Controller/"render_to_string">.
   my $bool = $c->is_fresh(last_modified => $epoch);
 
 Check freshness of response by comparing the C<If-None-Match> and
-C<If-Modified-Since> request headers with the C<ETag> and C<Last-Modified>
+C<If-Modified-Since> request headers to the C<ETag> and C<Last-Modified>
 response headers with L<Mojolicious::Static/"is_fresh">.
 
   # Add ETag header and check freshness before rendering

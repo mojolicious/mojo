@@ -63,8 +63,9 @@ sub is_fresh {
   my $matches = $match && ($res_headers->etag // '') ne $match ? 0 : 1;
 
   # If-Modified-Since
-  my $last = Mojo::Date->new($res_headers->last_modified // '')->epoch;
-  my $unmodified = !$since || $last <= (Mojo::Date->new($since)->epoch // 0);
+  return $matches unless (my $last = $res_headers->last_modified) && $since;
+  my $unmodified
+    = Mojo::Date->new($last)->epoch <= (Mojo::Date->new($since)->epoch // 0);
 
   return $matches && $unmodified;
 }

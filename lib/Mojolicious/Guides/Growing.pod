@@ -651,8 +651,8 @@ most.
 
 =head2 Templates
 
-Templates are usually bound to controllers, so they need to be moved into the
-appropriate directories.
+Templates are our views, and usually bound to controllers, so they need to be
+moved into the appropriate directories.
 
   $ mkdir templates/login
   $ mv templates/index.html.ep templates/login/index.html.ep

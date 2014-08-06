@@ -457,7 +457,7 @@ startup method to define the url endpoints for your application.
   $r->post('/baz')->to('test#baz');
 
   # Add another namespace to load controllers from
-  push @{$app->routes->namespaces}, 'MyApp::C';
+  push @{$app->routes->namespaces}, 'MyApp::MyController';
 
 =head2 secrets
 

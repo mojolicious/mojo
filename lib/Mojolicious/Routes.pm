@@ -285,7 +285,7 @@ C<attr>, C<has>, C<new> and C<tap>.
 Namespaces to load controllers from.
 
   # Add another namespace to load controllers from
-  push @{$r->namespaces}, 'MyApp::C';
+  push @{$r->namespaces}, 'MyApp::MyController';
 
 =head2 shortcuts
 

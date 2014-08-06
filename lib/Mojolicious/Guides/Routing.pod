@@ -315,21 +315,22 @@ dispatching to it.
 You can use the C<namespace> stash value to change the namespace of a whole
 route with all its children.
 
-  # /bye -> MyApp::C::Foo::Bar->bye
-  $r->route('/bye')->to(namespace => 'MyApp::C::Foo::Bar', action => 'bye');
+  # /bye -> MyApp::MyController::Foo::Bar->bye
+  $r->route('/bye')
+    ->to(namespace => 'MyApp::MyController::Foo::Bar', action => 'bye');
 
 The C<controller> is always appended to the C<namespace> if available.
 
-  # /bye -> MyApp::C::Foo::Bar->bye
-  $r->route('/bye')->to('foo-bar#bye', namespace => 'MyApp::C');
+  # /bye -> MyApp::MyController::Foo::Bar->bye
+  $r->route('/bye')->to('foo-bar#bye', namespace => 'MyApp::MyController');
 
-  # /hey -> MyApp::C::Foo::Bar->hey
-  $r->route('/hey')->to('Foo::Bar#hey', namespace => 'MyApp::C');
+  # /hey -> MyApp::MyController::Foo::Bar->hey
+  $r->route('/hey')->to('Foo::Bar#hey', namespace => 'MyApp::MyController');
 
 You can also change the default namespaces for all routes in the application
 with the router attribute L<Mojolicious::Routes/"namespaces">.
 
-  $r->namespaces(['MyApp::C']);
+  $r->namespaces(['MyApp::MyController']);
 
 =head2 Route to callback
 

@@ -259,9 +259,10 @@ old ones.
 When the dispatcher sees C<controller> and C<action> values in the stash it
 will always try to turn them into a class and method to dispatch to. The
 C<controller> value gets camelized using L<Mojo::Util/"camelize"> and
-prefixed with a C<namespace> (defaulting to the applications class followed by
-C<::Controller>). While the action value is not changed at all, because of
-this both values are case sensitive.
+prefixed with a C<namespace>, which has two default values, the applications
+class followed by C<::Controller> as well as the bare application class, and
+they are searched in that order. While the action value is not changed at all,
+because of this both values are case sensitive.
 
   # Application
   package MyApp;

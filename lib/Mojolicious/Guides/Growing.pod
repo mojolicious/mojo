@@ -149,7 +149,8 @@ organized CPAN distribution to maximize maintainability.
   |- lib                     # Library directory
   |  |- MyApp.pm             # Application class
   |  +- MyApp                # Application namespace
-  |     +- Example.pm        # Controller class
+  |     +- Controller        # Controller namespace
+  |        +- Example.pm     # Controller class
   |- t                       # Test directory
   |  +- basic.t              # Random test
   |- log                     # Log directory

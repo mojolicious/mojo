@@ -44,7 +44,12 @@ sub decode_json {
   return eval { $value = _decode(shift); 1 } ? $value : croak _chomp($@);
 }
 
-sub encode { encode_json($_[1]) }
+sub encode {
+  no warnings 'redefine';
+  local *_encode_object = \&_encode_object_canonical
+    if exists $_[0]->{canonical} && $_[0]->{canonical};
+  encode_json($_[1]);
+}
 
 sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 
@@ -226,6 +231,13 @@ sub _encode_object {
   my $object = shift;
   my @pairs = map { _encode_string($_) . ':' . _encode_value($object->{$_}) }
     keys %$object;
+  return '{' . join(',', @pairs) . '}';
+}
+
+sub _encode_object_canonical {
+  my $object = shift;
+  my @pairs = map { _encode_string($_) . ':' . _encode_value($object->{$_}) }
+    sort keys %$object;
   return '{' . join(',', @pairs) . '}';
 }
 

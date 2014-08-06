@@ -165,6 +165,8 @@ $bytes = encode_json {foo => []};
 is $bytes, '{"foo":[]}', 'encode {foo => []}';
 $bytes = encode_json {foo => ['bar']};
 is $bytes, '{"foo":["bar"]}', 'encode {foo => [\'bar\']}';
+$bytes = Mojo::JSON->new(canonical=>1)->encode({foo=>1, bar=>2, baz=>3});
+is $bytes, '{"bar":2,"baz":3,"foo":1}', 'Canonical object encoding.';
 
 # Encode name
 $bytes = encode_json [Mojo::JSON->true];

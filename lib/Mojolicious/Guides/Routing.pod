@@ -271,8 +271,7 @@ The action value is not changed at all, so both values are case sensitive.
   sub startup {
     my $self = shift;
 
-    # /bye -> {controller => 'foo', action => 'bye'}
-    #      -> MyApp::Controller::Foo->bye
+    # /bye -> MyApp::Controller::Foo->bye
     $self->routes->route('/bye')->to(controller => 'foo', action => 'bye');
   }
 
@@ -303,8 +302,7 @@ C<controller#action>.
 During camelization C<-> gets replaced with C<::>, this allows multi-level
 C<controller> hierarchies.
 
-  # / -> {controller => 'foo-bar', action => 'hi'}
-  #   -> MyApp::Controller::Foo::Bar->hi
+  # / -> MyApp::Controller::Foo::Bar->hi
   $r->route('/')->to('foo-bar#hi');
 
 For security reasons the dispatcher will always check if the C<controller> is

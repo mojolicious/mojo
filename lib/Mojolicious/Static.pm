@@ -56,17 +56,15 @@ sub is_fresh {
   # Unconditional
   my $req_headers = $c->req->headers;
   my $match       = $req_headers->if_none_match;
-  my $since       = $req_headers->if_modified_since;
-  return undef unless $match || $since;
+  return undef unless (my $since = $req_headers->if_modified_since) || $match;
 
   # If-None-Match
-  my ($matches, $unmodified) = (1, 1);
   my $res_headers = $c->res->headers;
-  $matches = undef if $match && ($res_headers->etag // '') ne $match;
+  my $matches = $match && ($res_headers->etag // '') ne $match ? 0 : 1;
 
   # If-Modified-Since
   my $last = Mojo::Date->new($res_headers->last_modified // '')->epoch;
-  $unmodified = !$since || $last <= (Mojo::Date->new($since)->epoch // 0);
+  my $unmodified = !$since || $last <= (Mojo::Date->new($since)->epoch // 0);
 
   return $matches && $unmodified;
 }

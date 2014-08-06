@@ -206,14 +206,14 @@ In L<Mojolicious> we consider web applications simple frontends for existing
 business logic, that means L<Mojolicious> is by design entirely L<model> layer
 agnostic and you just use whatever Perl modules you like most.
 
-  $ mkdir lib
-  $ touch lib/MyUsers.pm
-  $ chmod 644 lib/MyUsers.pm
+  $ mkdir -p lib/MyApp
+  $ touch lib/MyApp/Users.pm
+  $ chmod 644 lib/MyApp/Users.pm
 
 Our login manager will simply use a plain old Perl module abstracting away all
 logic related to matching usernames and passwords.
 
-  package MyUsers;
+  package MyApp::Users;
 
   use strict;
   use warnings;
@@ -246,10 +246,10 @@ templates.
   use Mojolicious::Lite;
 
   use lib 'lib';
-  use MyUsers;
+  use MyApp::Users;
 
   # Helper to lazy initialize and store our model object
-  helper users => sub { state $users = MyUsers->new };
+  helper users => sub { state $users = MyApp::Users->new };
 
   # /?user=sri&pass=secr3t
   any '/' => sub {
@@ -394,12 +394,12 @@ this.
   use Mojolicious::Lite;
 
   use lib 'lib';
-  use MyUsers;
+  use MyApp::Users;
 
   # Make signed cookies secure
   app->secrets(['Mojolicious rocks']);
 
-  helper users => sub { state $users = MyUsers->new };
+  helper users => sub { state $users = MyApp::Users->new };
 
   # Main login action
   any '/' => sub {
@@ -515,13 +515,13 @@ actual action code needs to be changed.
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
-  use MyUsers;
+  use MyApp::Users;
 
   sub startup {
     my $self = shift;
 
     $self->secrets(['Mojolicious rocks']);
-    $self->helper(users => sub { state $users = MyUsers->new });
+    $self->helper(users => sub { state $users = MyApp::Users->new });
 
     my $r = $self->routes;
 
@@ -579,7 +579,7 @@ allow running tests again.
 Hybrid routes are a nice intermediate step, but to maximize maintainability it
 makes sense to split our action code from its routing information.
 
-  $ mkdir -p lib/MyApp/Controller
+  $ mkdir lib/MyApp/Controller
   $ touch lib/MyApp/Controller/Login.pm
   $ chmod 644 lib/MyApp/Controller/Login.pm
 
@@ -627,13 +627,13 @@ information.
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
-  use MyUsers;
+  use MyApp::Users;
 
   sub startup {
     my $self = shift;
 
     $self->secrets(['Mojolicious rocks']);
-    $self->helper(users => sub { state $users = MyUsers->new });
+    $self->helper(users => sub { state $users = MyApp::Users->new });
 
     my $r = $self->routes;
     $r->any('/')->to('login#index')->name('index');

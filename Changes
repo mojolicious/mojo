@@ -1,7 +1,10 @@
 
 5.25  2014-08-06
   - Added reduce method to Mojo::Collection. (sri, batman)
+  - Added if_none_match method to Mojo::Headers.
+  - Added is_fresh method to Mojolicious::Static.
   - Improved sort method in Mojo::Collection to use $a and $b. (batman)
+  - Improved Mojolicious::Static to support ETag and If-None-Match headers.
   - Improved documentation browser CSS.
   - Fixed escaping bugs in Mojo::DOM::CSS.
 
@@ -136,7 +139,7 @@
     invocant.
   - Changed return value of path_for method in Mojolicious::Routes::Match.
   - Changed return value and arguments of error method in Mojo::Message.
-  - Removed deprecated support for "X-Forwarded-HTTPS".
+  - Removed deprecated support for X-Forwarded-HTTPS.
   - Removed return values from wait method in Mojo::IOLoop::Delay.
   - Removed list context support from header method in Mojo::Headers.
   - Removed generate_port method from Mojo::IOLoop.
@@ -174,8 +177,7 @@
   - Improved accept performance in Mojo::IOLoop::Server.
 
 4.97  2014-04-30
-  - Deprecated support for "X-Forwarded-HTTPS" in favor of
-    "X-Forwarded-Proto".
+  - Deprecated support for X-Forwarded-HTTPS in favor of X-Forwarded-Proto.
   - Added multi-name support to param method in Mojo::Parameters.
 
 4.96  2014-04-28
@@ -2646,7 +2648,7 @@
   - Fixed size limits in message parser.
 
 1.18  2011-04-19
-  - Added support for "X-Forwarded-HTTPS" and "X-Forwarded-Host" headers.
+  - Added support for X-Forwarded-HTTPS and X-Forwarded-Host headers.
   - Added argument localization to the include helper. (crab, moritz, sri)
   - Fixed test case.
 
@@ -3176,7 +3178,7 @@
       print $client->get('http://search.cpan.org')->res->body;
       my $tx = $client->post_form('http://kraih.com', {q => 'mojo'});
   - Made plugins much more configurable.
-  - Improved PSGI support and added "psgi" command.
+  - Improved PSGI support and added psgi command.
   - Added automatic environment detection for Plack based servers, there is
     no technical way to detect all PSGI compliant servers yet though. That
     means "plackup myapp.pl" and "plackup script/myapp" should just work.
@@ -3203,8 +3205,8 @@
   - Added I18N support. (vti, memowe)
   - Added template detection again, you can now just mix multiple template
     engines and the renderer will automatically pick the right template. So
-    you don't have to use the "handler" argument anymore, even though it's
-    still available and overrides auto detection.
+    you don't have to use the handler argument anymore, even though it's still
+    available and overrides auto detection.
   - Added Flash Policy Server example. (xantus)
   - Added more reference docs.
   - Added ".gitignore" generator command. (marcus)
@@ -3485,8 +3487,8 @@
   - Merged eplite and epl, this change is not backwards compatible, you will
     have to rename all your eplite templates to epl.
   - Simplified MojoX::Renderer, this change is not backwards compatible!
-    Handler can no longer be detected, that means "default_handler" or the
-    "handler" argument are required. The template argument can no longer
+    Handler can no longer be detected, that means default_handler or the
+    handler argument are required. The template argument can no longer
     contain format or handler.
       $self->render(template => 'foo.html.epl');
     becomes

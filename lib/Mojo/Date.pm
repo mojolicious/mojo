@@ -16,14 +16,14 @@ sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 sub parse {
   my ($self, $date) = @_;
 
-  # epoch (784111777)
-  return $self->epoch($date) if $date =~ /^\d+$/;
-
   # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
   my ($day, $month, $year, $h, $m, $s);
   if ($date =~ /^\w+\,\s+(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+GMT$/) {
     ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
+
+  # epoch (784111777)
+  elsif ($date =~ /^\d+$/) { return $self->epoch($date) }
 
   # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
   elsif ($date =~ /^\w+\,\s+(\d+)-(\w+)-(\d+)\s+(\d+):(\d+):(\d+)\s+GMT$/) {

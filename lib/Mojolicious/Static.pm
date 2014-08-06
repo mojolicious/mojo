@@ -7,6 +7,7 @@ use Mojo::Asset::Memory;
 use Mojo::Date;
 use Mojo::Home;
 use Mojo::Loader;
+use Mojo::Util 'md5_sum';
 
 has classes => sub { ['main'] };
 has paths   => sub { [] };
@@ -49,6 +50,27 @@ sub file {
   return $self->_get_file(catfile($PUBLIC, split('/', $rel)));
 }
 
+sub is_fresh {
+  my ($self, $c) = @_;
+
+  # Unconditional
+  my $req_headers = $c->req->headers;
+  my $match       = $req_headers->if_none_match;
+  my $since       = $req_headers->if_modified_since;
+  return undef unless $match || $since;
+
+  # If-None-Match
+  my ($matches, $unmodified) = (1, 1);
+  my $res_headers = $c->res->headers;
+  $matches = undef if $match && ($res_headers->etag // '') ne $match;
+
+  # If-Modified-Since
+  my $last = Mojo::Date->new($res_headers->last_modified // '')->epoch;
+  $unmodified = !$since || $last <= (Mojo::Date->new($since)->epoch // 0);
+
+  return $matches && $unmodified;
+}
+
 sub serve {
   my ($self, $c, $rel) = @_;
   return undef unless my $asset = $self->file($rel);
@@ -61,24 +83,17 @@ sub serve {
 sub serve_asset {
   my ($self, $c, $asset) = @_;
 
-  # Last modified
+  # Last-Modified and ETag
   my $mtime = $asset->is_file ? (stat $asset->path)[9] : $MTIME;
   my $res = $c->res;
   $res->code(200)->headers->last_modified(Mojo::Date->new($mtime))
-    ->accept_ranges('bytes');
-
-  # If modified since
-  my $headers = $c->req->headers;
-  if (my $date = $headers->if_modified_since) {
-    my $since = Mojo::Date->new($date)->epoch;
-    return $res->code(304) if defined $since && $since == $mtime;
-  }
+    ->etag('"' . md5_sum($mtime) . '"')->accept_ranges('bytes');
+  return $res->code(304) if $self->is_fresh($c);
 
   # Range
-  my $size  = $asset->size;
-  my $start = 0;
-  my $end   = $size - 1;
-  if (my $range = $headers->range) {
+  my $size = $asset->size;
+  my ($start, $end) = (0, $size - 1);
+  if (my $range = $c->req->headers->range) {
 
     # Not satisfiable
     return $res->code(416) unless $size && $range =~ m/^bytes=(\d+)?-(\d+)?/;
@@ -190,6 +205,14 @@ relative to L</"paths"> or from L</"classes">. Note that this method does not
 protect from traversing to parent directories.
 
   my $content = $static->file('foo/bar.html')->slurp;
+
+=head2 is_fresh
+
+  my $bool = $static->is_fresh(Mojolicious::Controller->new);
+
+Check freshness of response by comparing the C<If-None-Match> and
+C<If-Modified-Since> request headers with the C<ETag> and C<Last-Modified>
+response headers.
 
 =head2 serve
 

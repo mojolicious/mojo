@@ -10,11 +10,12 @@ my %NORMALCASE = map { lc($_) => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Allow Authorization Cache-Control Connection Content-Disposition),
   qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
-  qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Link),
-  qw(Location Origin Proxy-Authenticate Proxy-Authorization Range),
-  qw(Sec-WebSocket-Accept Sec-WebSocket-Extensions Sec-WebSocket-Key),
-  qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
-  qw(TE Trailer Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
+  qw(Date ETag Expect Expires Host If-Modified-Since If-None-Match),
+  qw(Last-Modified Link Location Origin Proxy-Authenticate),
+  qw(Proxy-Authorization Range Sec-WebSocket-Accept Sec-WebSocket-Extensions),
+  qw(Sec-WebSocket-Key Sec-WebSocket-Protocol Sec-WebSocket-Version Server),
+  qw(Set-Cookie Status TE Trailer Transfer-Encoding Upgrade User-Agent Vary),
+  qw(WWW-Authenticate)
 );
 for my $header (values %NORMALCASE) {
   my $name = lc $header;
@@ -341,7 +342,7 @@ but is very commonly used.
 =head2 etag
 
   my $etag = $headers->etag;
-  $headers = $headers->etag('abc321');
+  $headers = $headers->etag('"abc321"');
 
 Shortcut for the C<ETag> header.
 
@@ -388,6 +389,13 @@ Shortcut for the C<Host> header.
   $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<If-Modified-Since> header.
+
+=head2 if_none_match
+
+  my $etag = $headers->if_none_match;
+  $headers = $headers->if_none_match('"abc321"');
+
+Shortcut for the C<If-None-Match> header.
 
 =head2 is_finished
 

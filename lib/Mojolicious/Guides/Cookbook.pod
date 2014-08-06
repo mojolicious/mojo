@@ -1218,6 +1218,46 @@ the helper L<Mojolicious::Plugin::DefaultHelpers/"config">
 Alternatively you can also use configuration files in the JSON format with
 L<Mojolicious::Plugin::JSONConfig>.
 
+=head2 Adding a plugin to your application
+
+To organize your code better and to prevent helpers from cluttering your
+application, you can use application specific plugins.
+
+  $ mkdir -p lib/MyApp/Plugin
+  $ touch lib/MyApp/Plugin/MyHelpers.pm
+
+They work just like normal plugins and you can have as many as you like.
+
+  package MyApp::Plugin::MyHelpers;
+  use Mojo::Base 'Mojolicious::Plugin';
+
+  sub register {
+    my ($self, $app) = @_;
+    $app->helper(info => sub {
+      my ($c, $str) = @_;
+      $c->app->log->info($str);
+    });
+  }
+
+  1;
+
+The only difference to normal plugins is that you use their full class name to
+load them.
+
+  use Mojolicious::Lite;
+
+  use lib 'lib';
+
+  plugin 'MyApp::Plugin::MyHelpers';
+
+  get '/' => sub {
+    my $c = shift;
+    $c->info('I ♥ Mojolicious!');
+    $c->render(text => 'Hello.');
+  };
+
+  app->start;
+
 =head2 Adding commands to Mojolicious
 
 By now you've probably used many of the built-in commands described in

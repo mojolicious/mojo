@@ -8,6 +8,7 @@ use Mojo::Util;
 use Scalar::Util 'blessed';
 
 has 'error';
+has 'canonical';
 
 our @EXPORT_OK = qw(decode_json encode_json j);
 
@@ -47,7 +48,7 @@ sub decode_json {
 sub encode {
   no warnings 'redefine';
   local *_encode_object = \&_encode_object_canonical
-    if exists $_[0]->{canonical} && $_[0]->{canonical};
+    if $_[0]->canonical;
   encode_json($_[1]);
 }
 

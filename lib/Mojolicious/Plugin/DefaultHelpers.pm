@@ -273,7 +273,7 @@ Alias for C<Mojolicious::Controller/"render_to_string">.
 
 =head2 is_fresh
 
-  $bool = $c->is_fresh;
+  my $bool = $c->is_fresh;
 
 Check freshness of response by comparing the C<If-None-Match> and
 C<If-Modified-Since> request headers with the C<ETag> and C<Last-Modified>

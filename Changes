@@ -1,4 +1,6 @@
 
+5.26  2014-08-08
+
 5.25  2014-08-07
   - Added reduce method to Mojo::Collection. (sri, batman)
   - Added if_none_match method to Mojo::Headers.

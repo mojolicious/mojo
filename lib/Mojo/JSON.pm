@@ -8,6 +8,7 @@ use Mojo::Util;
 use Scalar::Util 'blessed';
 
 has 'error';
+has 'canonical';
 
 our @EXPORT_OK = qw(decode_json encode_json j);
 
@@ -44,7 +45,12 @@ sub decode_json {
   return eval { $value = _decode(shift); 1 } ? $value : croak _chomp($@);
 }
 
-sub encode { encode_json($_[1]) }
+sub encode {
+  no warnings 'redefine';
+  local *_encode_object = \&_encode_object_canonical
+    if $_[0]->canonical;
+  encode_json($_[1]);
+}
 
 sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 
@@ -229,6 +235,13 @@ sub _encode_object {
   return '{' . join(',', @pairs) . '}';
 }
 
+sub _encode_object_canonical {
+  my $object = shift;
+  my @pairs = map { _encode_string($_) . ':' . _encode_value($object->{$_}) }
+    sort keys %$object;
+  return '{' . join(',', @pairs) . '}';
+}
+
 sub _encode_string {
   my $str = shift;
   $str =~ s!([\x00-\x1f\x{2028}\x{2029}\\"/])!$REVERSE{$1}!gs;
@@ -312,6 +325,10 @@ Mojo::JSON - Minimalistic JSON
   my $err  = $json->error;
   say $err ? "Error: $err" : $hash->{message};
 
+  # Canonical (keys sorted) encoding
+  my $json  = Mojo::JSON->new(canonical=>1);
+  my $bytes = $json->encode({foo = >[1, 2], bar => 'hello!', baz => \1});
+
 =head1 DESCRIPTION
 
 L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl
@@ -380,6 +397,14 @@ L<Mojo::JSON> implements the following attributes.
   $json   = $json->error('Parser error');
 
 Parser error.
+
+=head2 canonical
+
+  my $j = Mojo::JSON->new(canonical=>1);
+  my $bytes = $j->encode({foo => 1, bar => 2, baz => 3});
+  # '{"bar":2,"baz":3,"foo":1}'
+
+Set canonical JSON encoding (sorted keys).
 
 =head1 METHODS
 

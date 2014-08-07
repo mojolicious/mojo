@@ -160,39 +160,38 @@ sub parse_frame {
   my ($self, $buffer) = @_;
 
   # Head
-  return undef unless length(my $clone = $$buffer) >= 2;
-  my $head = substr $clone, 0, 2;
+  return undef unless length $$buffer >= 2;
+  my ($first, $second) = unpack 'C*', substr($$buffer, 0, 2);
 
   # FIN
-  my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
+  my $fin = ($first & 0b10000000) == 0b10000000 ? 1 : 0;
 
   # RSV1-3
-  my $rsv1 = (vec($head, 0, 8) & 0b01000000) == 0b01000000 ? 1 : 0;
-  my $rsv2 = (vec($head, 0, 8) & 0b00100000) == 0b00100000 ? 1 : 0;
-  my $rsv3 = (vec($head, 0, 8) & 0b00010000) == 0b00010000 ? 1 : 0;
+  my $rsv1 = ($first & 0b01000000) == 0b01000000 ? 1 : 0;
+  my $rsv2 = ($first & 0b00100000) == 0b00100000 ? 1 : 0;
+  my $rsv3 = ($first & 0b00010000) == 0b00010000 ? 1 : 0;
 
   # Opcode
-  my $op = vec($head, 0, 8) & 0b00001111;
+  my $op = $first & 0b00001111;
   warn "-- Parsing frame ($fin, $rsv1, $rsv2, $rsv3, $op)\n" if DEBUG;
 
   # Small payload
-  my $len = vec($head, 1, 8) & 0b01111111;
-  my $hlen = 2;
+  my ($hlen, $len) = (2, $second & 0b01111111);
   if ($len < 126) { warn "-- Small payload ($len)\n" if DEBUG }
 
   # Extended payload (16bit)
   elsif ($len == 126) {
-    return undef unless length $clone > 4;
+    return undef unless length $$buffer > 4;
     $hlen = 4;
-    $len = unpack 'n', substr($clone, 2, 2);
+    $len = unpack 'n', substr($$buffer, 2, 2);
     warn "-- Extended 16bit payload ($len)\n" if DEBUG;
   }
 
   # Extended payload (64bit with 32bit fallback)
   elsif ($len == 127) {
-    return undef unless length $clone > 10;
+    return undef unless length $$buffer > 10;
     $hlen = 10;
-    my $ext = substr $clone, 2, 8;
+    my $ext = substr $$buffer, 2, 8;
     $len = MODERN ? unpack('Q>', $ext) : unpack('N', substr($ext, 4, 4));
     warn "-- Extended 64bit payload ($len)\n" if DEBUG;
   }
@@ -201,19 +200,14 @@ sub parse_frame {
   $self->finish(1009) and return undef if $len > $self->max_websocket_size;
 
   # Check if whole packet has arrived
-  my $masked = vec($head, 1, 8) & 0b10000000;
-  return undef if length $clone < ($len + $hlen + ($masked ? 4 : 0));
-  substr $clone, 0, $hlen, '';
+  $len += 4 if my $masked = $second & 0b10000000;
+  return undef if length $$buffer < ($hlen + $len);
+  substr $$buffer, 0, $hlen, '';
 
   # Payload
-  $len += 4 if $masked;
-  return undef if length $clone < $len;
-  my $payload = $len ? substr($clone, 0, $len, '') : '';
-
-  # Unmask payload
+  my $payload = $len ? substr($$buffer, 0, $len, '') : '';
   $payload = xor_encode($payload, substr($payload, 0, 4, '') x 128) if $masked;
   warn "$payload\n" if DEBUG;
-  $$buffer = $clone;
 
   return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];
 }

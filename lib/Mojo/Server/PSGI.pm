@@ -21,10 +21,9 @@ sub run {
   $self->emit(request => $tx);
 
   # Response headers
-  my $res     = $tx->res->fix_headers;
-  my $headers = $res->headers;
+  my $res  = $tx->res->fix_headers;
+  my $hash = $res->headers->to_hash(1);
   my @headers;
-  my $hash = $headers->to_hash(1);
   for my $name (keys %$hash) {
     push @headers, map { $name => $_ } @{$hash->{$name}};
   }

@@ -1,8 +1,6 @@
 package Mojo::JSON::Pointer;
 use Mojo::Base -base;
 
-use Scalar::Util 'looks_like_number';
-
 has 'data';
 
 sub contains { shift->_pointer(1, @_) }
@@ -23,7 +21,7 @@ sub _pointer {
     if (ref $data eq 'HASH' && exists $data->{$p}) { $data = $data->{$p} }
 
     # Array
-    elsif (ref $data eq 'ARRAY' && looks_like_number($p) && @$data > $p) {
+    elsif (ref $data eq 'ARRAY' && $p =~ /^\d+$/ && @$data > $p) {
       $data = $data->[$p];
     }
 

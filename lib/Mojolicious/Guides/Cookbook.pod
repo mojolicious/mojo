@@ -1234,9 +1234,10 @@ L<Mojolicious::Plugin>.
 
   sub register {
     my ($self, $app) = @_;
-    $app->helper(info => sub {
-      my ($c, $str) = @_;
-      $c->app->log->info($str);
+    $app->helper(render_with_header => sub {
+      my ($c, @args) = @_;
+      $c->res->headers->header('X-Mojo' => 'I <3 Mojolicious!')
+      $c->render(@args);
     });
   }
 
@@ -1254,8 +1255,7 @@ name.
 
   get '/' => sub {
     my $c = shift;
-    $c->info('I ♥ Mojolicious!');
-    $c->render(text => 'Hello.');
+    $c->render_with_header(text => 'I ♥ Mojolicious!');
   };
 
   app->start;

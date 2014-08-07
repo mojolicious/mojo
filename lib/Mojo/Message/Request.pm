@@ -60,8 +60,7 @@ sub extract_start_line {
   return undef unless $$bufref =~ s/^\s*(.*?)\x0d?\x0a//;
 
   # We have a (hopefully) full request line
-  $self->error({message => 'Bad request start line', advice => 400})
-    and return undef
+  return !$self->error({message => 'Bad request start line', advice => 400})
     unless $1 =~ $START_LINE_RE;
   my $url = $self->method($1)->version($3)->url;
   return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));

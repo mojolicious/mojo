@@ -26,18 +26,17 @@ sub run {
   # Response start line
   STDOUT->autoflush(1);
   binmode STDOUT;
-  my $res = $tx->res;
+  my $res = $tx->res->fix_headers;
   return undef if $self->nph && !_write($res, 'get_start_line_chunk');
 
   # Response headers
-  $res->fix_headers;
   my $code = $res->code    || 404;
   my $msg  = $res->message || $res->default_message;
   $res->headers->status("$code $msg") unless $self->nph;
   return undef unless _write($res, 'get_header_chunk');
 
   # Response body
-  $tx->is_empty or _write($res, 'get_body_chunk') or return undef;
+  return undef unless $tx->is_empty || _write($res, 'get_body_chunk');
 
   # Finish transaction
   $tx->server_close;

@@ -139,6 +139,15 @@ my $id = Mojo::IOLoop->server(
 );
 my $proxy = Mojo::IOLoop->acceptor($id)->handle->sockport;
 
+# Fake server to test failed TLS handshake
+$id = Mojo::IOLoop->server(
+  sub {
+    my ($loop, $stream) = @_;
+    $stream->on(read => sub { shift->close });
+  }
+);
+my $fake = Mojo::IOLoop->acceptor($id)->handle->sockport;
+
 # User agent with valid certificates
 my $ua = Mojo::UserAgent->new(
   ioloop => Mojo::IOLoop->singleton,
@@ -280,8 +289,11 @@ Mojo::IOLoop->start;
 ok !$success, 'no success';
 is $err->{message}, 'Proxy connection failed', 'right error';
 
+# Failed TLS handshake through proxy
+$tx = $ua->get("https://localhost:$fake");
+ok $tx->res->error, 'has error';
+
 # Blocking proxy request again
-$ua->proxy->https("http://localhost:$proxy");
 $tx = $ua->get("https://localhost:$port/proxy");
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, "https://localhost:$port/proxy", 'right content';

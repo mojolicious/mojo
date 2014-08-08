@@ -38,6 +38,12 @@ is app->test_helper2, 'Mojolicious::Controller', 'right value';
 app->test_helper3->{foo} = 'bar';
 is app->test_helper3->{foo}, 'bar', 'right result';
 
+# Nested helpers
+helper 'test.helper' => sub { shift->app->controller_class };
+is app->test->helper, 'Mojolicious::Controller', 'right value';
+is app->build_controller->test->helper, 'Mojolicious::Controller',
+  'right value';
+
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
 

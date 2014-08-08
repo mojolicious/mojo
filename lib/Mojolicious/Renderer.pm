@@ -7,6 +7,7 @@ use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader;
 use Mojo::Util qw(decamelize encode slurp);
+use Mojolicious::Renderer::Helpers;
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -65,6 +66,21 @@ sub get_data_template {
   # Find template
   my $template = $self->template_name($options);
   return $loader->data($self->{index}{$template}, $template);
+}
+
+sub get_helper {
+  my ($self, $name) = @_;
+
+  my $helpers = $self->helpers;
+  return $helpers->{$name} if $helpers->{$name};
+
+  my $lookup = $self->{lookup} ||= {};
+  $lookup->{$name} = 1
+    if $lookup->{$name} || grep { $_ =~ /^\Q$name\E\./ } keys %$helpers;
+  return undef unless $lookup->{$name};
+  return sub {
+    Mojolicious::Renderer::Helpers->new(controller => shift, prefix => $name);
+  };
 }
 
 sub render {

@@ -54,7 +54,7 @@ sub AUTOLOAD {
 
   # Call helper with fresh controller
   croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $helper = $self->renderer->helpers->{$method};
+    unless my $helper = $self->renderer->get_helper($method);
   return $self->build_controller->$helper(@_);
 }
 

@@ -155,7 +155,7 @@ sub _try_tls {
     SSL_ca_file => $args->{tls_ca}
       && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
     SSL_cert_file  => $args->{tls_cert},
-    SSL_error_trap => sub { $self->_cleanup->emit(error => $_[1]) },
+    SSL_error_trap => sub { $self->emit(error => $_[1]) },
     SSL_hostname   => IO::Socket::SSL->can_client_sni ? $args->{address} : '',
     SSL_key_file   => $args->{tls_key},
     SSL_startHandshake  => 0,

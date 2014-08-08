@@ -153,11 +153,10 @@ sub _connect_proxy {
       # TLS upgrade
       my $loop   = $self->_loop($nb);
       my $handle = $loop->stream($id)->steal_handle;
-      my $c      = delete $self->{connections}{$id};
       $loop->remove($id);
       $id = $self->_connect($nb, 0, $old, $handle,
         sub { shift->_start($nb, $old->connection($id), $cb) });
-      $self->{connections}{$id} = $c;
+      $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $old};
     }
   );
 }

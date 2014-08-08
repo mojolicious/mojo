@@ -1,6 +1,7 @@
 
 5.26  2014-08-08
   - Improved WebSocket performance.
+  - Fixed proxy exception handling bug in Mojo::UserAgent.
 
 5.25  2014-08-07
   - Added reduce method to Mojo::Collection. (sri, batman)

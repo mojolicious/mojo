@@ -29,6 +29,19 @@ is $frame->[4], 1,          'text frame';
 is $frame->[5], 'whatever', 'right payload';
 is $ws->build_frame(1, 1, 1, 1, 1, 'whatever'), $bytes, 'frames are equal';
 
+# Simple text frame roundtrip without FIN bit
+$ws = Mojo::Transaction::WebSocket->new;
+$bytes = $ws->build_frame(0, 0, 0, 0, 1, 'whatever');
+is $bytes, "\x01\x08\x77\x68\x61\x74\x65\x76\x65\x72", 'right frame';
+$frame = $ws->parse_frame(\($dummy = $bytes));
+is $frame->[0], 0,          'fin flag is not set';
+is $frame->[1], 0,          'rsv1 flag is not set';
+is $frame->[2], 0,          'rsv2 flag is not set';
+is $frame->[3], 0,          'rsv3 flag is not set';
+is $frame->[4], 1,          'text frame';
+is $frame->[5], 'whatever', 'right payload';
+is $ws->build_frame(0, 0, 0, 0, 1, 'whatever'), $bytes, 'frames are equal';
+
 # Simple text frame roundtrip with RSV1 flags set
 $ws = Mojo::Transaction::WebSocket->new;
 $bytes = $ws->build_frame(1, 1, 0, 0, 1, 'whatever');

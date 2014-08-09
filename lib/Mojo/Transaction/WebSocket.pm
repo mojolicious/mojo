@@ -18,12 +18,12 @@ use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 # Opcodes
 use constant {
-  CONTINUATION => 0,
-  TEXT         => 1,
-  BINARY       => 2,
-  CLOSE        => 8,
-  PING         => 9,
-  PONG         => 10
+  CONTINUATION => 0x0,
+  TEXT         => 0x1,
+  BINARY       => 0x2,
+  CLOSE        => 0x8,
+  PING         => 0x9,
+  PONG         => 0xa
 };
 
 has [qw(compressed masked)];
@@ -35,35 +35,30 @@ sub build_frame {
   warn "-- Building frame ($fin, $rsv1, $rsv2, $rsv3, $op)\n" if DEBUG;
 
   # Head
-  my $frame = 0b00000000;
-  vec($frame, 0, 8) = $op | 0b10000000 if $fin;
-  vec($frame, 0, 8) |= 0b01000000 if $rsv1;
-  vec($frame, 0, 8) |= 0b00100000 if $rsv2;
-  vec($frame, 0, 8) |= 0b00010000 if $rsv3;
+  my $head = $op + ($fin ? 128 : 0);
+  $head |= 0b01000000 if $rsv1;
+  $head |= 0b00100000 if $rsv2;
+  $head |= 0b00010000 if $rsv3;
+  my $frame = pack 'C', $head;
 
   # Small payload
   my $len    = length $payload;
-  my $prefix = 0;
   my $masked = $self->masked;
   if ($len < 126) {
     warn "-- Small payload ($len)\n$payload\n" if DEBUG;
-    vec($prefix, 0, 8) = $masked ? ($len | 0b10000000) : $len;
-    $frame .= $prefix;
+    $frame .= pack 'C', $masked ? ($len | 128) : $len;
   }
 
   # Extended payload (16bit)
   elsif ($len < 65536) {
     warn "-- Extended 16bit payload ($len)\n$payload\n" if DEBUG;
-    vec($prefix, 0, 8) = $masked ? (126 | 0b10000000) : 126;
-    $frame .= $prefix;
-    $frame .= pack 'n', $len;
+    $frame .= pack 'Cn', $masked ? (126 | 128) : 126, $len;
   }
 
   # Extended payload (64bit with 32bit fallback)
   else {
     warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
-    vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
-    $frame .= $prefix;
+    $frame .= pack 'C', $masked ? (127 | 128) : 127;
     $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xffffffff);
   }
 

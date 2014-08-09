@@ -75,9 +75,8 @@ sub get_helper {
   return $helpers->{$name} if $helpers->{$name};
 
   my $lookup = $self->{lookup} ||= {};
-  $lookup->{$name} = 1
-    if $lookup->{$name} || grep { $_ =~ /^\Q$name\E\./ } keys %$helpers;
-  return undef unless $lookup->{$name};
+  return undef unless $lookup->{$name} || grep {/^\Q$name\E\./} keys %$helpers;
+  $lookup->{$name} = 1;
   return sub {
     Mojolicious::Renderer::Helpers->new(controller => shift, prefix => $name);
   };

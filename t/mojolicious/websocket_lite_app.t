@@ -132,6 +132,11 @@ $t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
   ->send_ok({binary => 'bytes!'})
   ->message_ok->message_isnt({text => 'bytes!'})->finish_ok;
 
+# Bytes in multiple frames
+$t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'a'])
+  ->send_ok([0, 0, 0, 0, 0, 'b'])->send_ok([1, 0, 0, 0, 0, 'c'])
+  ->message_ok->message_is({binary => 'abc'})->finish_ok;
+
 # Zero
 $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
   ->send_ok(0)->message_ok->message_like({text => qr/0/})->finish_ok(1000)

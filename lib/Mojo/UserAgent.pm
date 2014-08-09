@@ -139,10 +139,9 @@ sub _connect_proxy {
       my ($self, $tx) = @_;
 
       # CONNECT failed (connection needs to be kept alive)
-      unless ($tx->keep_alive && $tx->res->is_status_class(200)) {
-        $old->req->error({message => 'Proxy connection failed'});
-        return $self->$cb($old);
-      }
+      $old->res->error({message => 'Proxy connection failed'})
+        and return $self->$cb($old)
+        if $tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive;
 
       # Start real transaction
       $old->req->proxy(0);

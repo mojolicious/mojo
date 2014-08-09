@@ -276,18 +276,18 @@ is $tx->res->body, "https://localhost:$port/proxy", 'right content';
 # Proxy WebSocket with bad target
 $ua->proxy->https("http://localhost:$proxy");
 my $port2 = $port + 1;
-my ($success, $err);
+$result = undef;
 $ua->websocket(
   "wss://localhost:$port2/test" => sub {
     my ($ua, $tx) = @_;
-    $success = $tx->success;
-    $err     = $tx->error;
+    $result = $tx;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-ok !$success, 'no success';
-is $err->{message}, 'Proxy connection failed', 'right error';
+ok !$result->success, 'no success';
+is $result->res->error->{message}, 'Proxy connection failed', 'right error';
+is $result->error->{message}, 'Proxy connection failed', 'right error';
 
 # Failed TLS handshake through proxy
 $tx = $ua->get("https://localhost:$fake");

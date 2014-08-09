@@ -1,5 +1,5 @@
 
-5.26  2014-08-08
+5.26  2014-08-09
   - Improved WebSocket performance.
   - Fixed proxy exception handling bug in Mojo::UserAgent.
 

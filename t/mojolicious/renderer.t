@@ -62,19 +62,31 @@ like $log, qr/Cookie "foo" is bigger than 4096 bytes\./, 'right message';
 $c->app->log->unsubscribe(message => $cb);
 
 # Nested helpers
-$c->app->helper('myapp.defaults' => sub { shift->app->defaults(@_) });
-$c->myapp->defaults(foo => 'bar');
-is $c->myapp->defaults('foo'), 'bar', 'right result';
-is $c->app->myapp->defaults('foo'), 'bar', 'right result';
+my $first = Mojolicious::Controller->new;
+$first->app->log->level('fatal');
+$first->app->helper('myapp.defaults' => sub { shift->app->defaults(@_) });
+ok $first->app->renderer->get_helper('myapp'),          'found helper';
+ok $first->app->renderer->get_helper('myapp.defaults'), 'found helper';
+$first->myapp->defaults(foo => 'bar');
+is $first->myapp->defaults('foo'), 'bar', 'right result';
+is $first->app->myapp->defaults('foo'), 'bar', 'right result';
+my $second = Mojolicious::Controller->new;
+$second->app->log->level('fatal');
+ok !$second->app->renderer->get_helper('myapp'),          'no helper';
+ok !$second->app->renderer->get_helper('myapp.defaults'), 'no helper';
+$second->app->helper('myapp.defaults' => sub {'nothing'});
+my $myapp = $first->myapp;
+is $first->myapp->defaults('foo'),  'bar',     'right result';
+is $second->myapp->defaults('foo'), 'nothing', 'right result';
+is $first->myapp->defaults('foo'),  'bar',     'right result';
 
 # Missing method (AUTOLOAD)
-eval { $c->myapp->missing };
-like $@,
-  qr/^Can't locate object method "missing" via package "@{[ref $c->myapp]}"/,
+my $class = ref $first->myapp;
+eval { $first->myapp->missing };
+like $@, qr/^Can't locate object method "missing" via package "$class"/,
   'right error';
-eval { $c->app->myapp->missing };
-like $@,
-  qr/^Can't locate object method "missing" via package "@{[ref $c->myapp]}"/,
+eval { $first->app->myapp->missing };
+like $@, qr/^Can't locate object method "missing" via package "$class"/,
   'right error';
 
 done_testing();

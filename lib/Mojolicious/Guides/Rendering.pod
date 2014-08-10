@@ -847,7 +847,7 @@ The token can also be submitted with the C<X-CSRF-Token> request header.
 =head2 Adding helpers
 
 Adding and redefining helpers is very easy, you can use them to do pretty much
-everything.
+anything.
 
   use Mojolicious::Lite;
 
@@ -895,7 +895,7 @@ escaping.
   % end
 
 Similar to stash values you can use a prefix like C<myapp.*> to keep helpers
-from getting exposed to templates and to organize them into namespaces as your
+from getting exposed in templates and to organize them into namespaces as your
 application grows. Every prefix automatically becomes a helper that returns a
 proxy object on which you can call the nested helpers.
 

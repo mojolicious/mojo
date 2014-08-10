@@ -1,7 +1,7 @@
 package ojo;
 use Mojo::Base -strict;
 
-use Benchmark qw(timeit :hireswallclock);
+use Benchmark qw(timeit timestr :hireswallclock);
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
@@ -30,7 +30,7 @@ sub import {
     d => sub { _request($ua, 'DELETE', @_) },
     g => sub { _request($ua, 'GET',    @_) },
     h => sub { _request($ua, 'HEAD',   @_) },
-    i => sub (&@) { timeit($_[1] // 1, $_[0])->[0] },
+    i => sub (&@) { say STDERR timestr timeit($_[1] // 1, $_[0]) },
     j => \&j,
     o => sub { _request($ua, 'OPTIONS', @_) },
     p => sub { _request($ua, 'POST',    @_) },
@@ -138,13 +138,13 @@ L<Mojo::Message::Response> object.
 
 =head2 i
 
-  my $seconds = i {...};
-  my $seconds = i {...} 100;
+  i {...};
+  i {...} 100;
 
-Measure time it took to execture block in floating seconds, with an optional
-number of iterations, which defaults to C<1>.
+Benchmark block and print the results to C<STDERR>, with an optional number of
+iterations, which defaults to C<1>.
 
-  $ perl -Mojo -E 'say i { say g("mojolicio.us")->code }'
+  $ perl -Mojo -E 'i { say g("mojolicio.us")->code }'
 
 =head2 j
 

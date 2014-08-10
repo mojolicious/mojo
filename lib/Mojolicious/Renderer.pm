@@ -76,8 +76,8 @@ sub get_helper {
   my $lookup = $self->{lookup} ||= {};
   return undef
     unless $lookup->{$name} || grep {/^\Q$name\E\./} keys %{$self->helpers};
-  $lookup->{$name} ||= 1;
-  return sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
+  return $lookup->{$name}
+    ||= sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
 }
 
 sub render {

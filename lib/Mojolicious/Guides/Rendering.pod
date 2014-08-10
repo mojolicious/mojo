@@ -868,7 +868,9 @@ everything.
   % debug 'Hello from a template!';
 
 Helpers can also accept template blocks as last argument, this for example
-allows very pleasant to use tag helpers and filters.
+allows very pleasant to use tag helpers and filters. Wrapping the helper
+result into a L<Mojo::ByteStream> object can prevent accidental double
+escaping.
 
   use Mojolicious::Lite;
   use Mojo::ByteStream;
@@ -892,8 +894,36 @@ allows very pleasant to use tag helpers and filters.
     More text.
   % end
 
-Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
-accidental double escaping.
+Similar to stash values you can use a prefix like C<myapp.*> to hide helpers
+from templates and organize them into namespaces when your application grows.
+Every prefix automatically becomes a helper that returns a proxy object on
+which you can call the nested helpers.
+
+  use Mojolicious::Lite;
+
+  helper 'cache_control.no_caching' => sub {
+    my $c = shift;
+    $c->res->header->cache_control('private, max-age=0, no-cache');
+  };
+
+  helper 'cache_control.five_mins' => sub {
+    my $c = shift;
+    $c->res->header->cache_control('public, max-age=300');
+  };
+
+  get '/news' => sub {
+    my $c = shift;
+    $c->cache_control->no_caching;
+    $c->render(text => 'Always up to date.');
+  };
+
+  get '/some_older_story' => sub {
+    my $c = shift;
+    $c->cache_control->five_mins;
+    $c->render(text => 'This one can be cached for a bit.');
+  };
+
+  app->start;
 
 =head2 Helper plugins
 

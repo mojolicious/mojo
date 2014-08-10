@@ -403,6 +403,13 @@ Register a new helper.
 
 Get a C<DATA> section template by name, usually used by handlers.
 
+=head2 get_helper
+
+  my $helper = $renderer->get_helper('url_for');
+
+Get helper without prefix or generate a helper dynamically for a prefix,
+generated helpers return a proxy object on which nested helpers can be called.
+
 =head2 render
 
   my ($output, $format) = $renderer->render(Mojolicious::Controller->new);

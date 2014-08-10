@@ -2,7 +2,7 @@
 5.27  2014-08-11
   - Added support for nested helpers.
   - Added get_helper method to Mojolicious::Renderer.
-  - Added i function to ojo.
+  - Added n function to ojo.
 
 5.26  2014-08-09
   - Improved WebSocket performance.

@@ -30,8 +30,8 @@ sub import {
     d => sub { _request($ua, 'DELETE', @_) },
     g => sub { _request($ua, 'GET',    @_) },
     h => sub { _request($ua, 'HEAD',   @_) },
-    i => sub (&@) { say STDERR timestr timeit($_[1] // 1, $_[0]) },
     j => \&j,
+    n => sub (&@) { say STDERR timestr timeit($_[1] // 1, $_[0]) },
     o => sub { _request($ua, 'OPTIONS', @_) },
     p => sub { _request($ua, 'POST',    @_) },
     r => \&dumper,
@@ -136,16 +136,6 @@ L<Mojo::Message::Response> object.
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
 
-=head2 i
-
-  i {...};
-  i {...} 100;
-
-Benchmark block and print the results to C<STDERR>, with an optional number of
-iterations, which defaults to C<1>.
-
-  $ perl -Mojo -E 'i { say g("mojolicio.us")->code }'
-
 =head2 j
 
   my $bytes = j([1, 2, 3]);
@@ -155,6 +145,16 @@ iterations, which defaults to C<1>.
 Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 
   $ perl -Mojo -E 'b(j({hello => "world!"}))->spurt("hello.json")'
+
+=head2 n
+
+  n {...};
+  n {...} 100;
+
+Benchmark block and print the results to C<STDERR>, with an optional number of
+iterations, which defaults to C<1>.
+
+  $ perl -Mojo -E 'n { say g("mojolicio.us")->code }'
 
 =head2 o
 

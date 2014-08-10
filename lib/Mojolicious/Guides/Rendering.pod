@@ -894,10 +894,10 @@ escaping.
     More text.
   % end
 
-Similar to stash values you can use a prefix like C<myapp.*> to hide helpers
-from templates and organize them into namespaces when your application grows.
-Every prefix automatically becomes a helper that returns a proxy object on
-which you can call the nested helpers.
+Similar to stash values you can use a prefix like C<myapp.*> to keep helpers
+from getting exposed to templates and organize them into namespaces when your
+application grows. Every prefix automatically becomes a helper that returns a
+proxy object on which you can call the nested helpers.
 
   use Mojolicious::Lite;
 

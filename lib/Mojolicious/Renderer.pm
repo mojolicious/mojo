@@ -70,10 +70,7 @@ sub get_data_template {
 
 sub get_helper {
   my ($self, $name) = @_;
-
-  if (my $helper = $self->helpers->{$name}) { return $helper }
-  if (my $proxy  = $self->{proxy}{$name})   { return $proxy }
-
+  if (my $h = $self->helpers->{$name} || $self->{proxy}{$name}) { return $h }
   return undef unless grep {/^\Q$name\E\./} keys %{$self->helpers};
   return $self->{proxy}{$name}
     = sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
@@ -402,8 +399,8 @@ Get a C<DATA> section template by name, usually used by handlers.
   my $helper = $renderer->get_helper('url_for');
 
 Get a helper by full name, generate a helper dynamically for a prefix or
-return C<undef>. Generated helpers return a proxy object on which nested
-helpers can be called.
+return C<undef> if no helper or prefix could be found. Generated helpers
+return a proxy object on which nested helpers can be called.
 
 =head2 render
 

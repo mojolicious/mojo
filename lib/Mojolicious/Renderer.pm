@@ -261,6 +261,8 @@ sub AUTOLOAD {
   return $c->$helper(@_);
 }
 
+sub DESTROY { }
+
 1;
 
 =encoding utf8

@@ -73,7 +73,7 @@ sub get_helper {
   if (my $h = $self->helpers->{$name} || $self->{proxy}{$name}) { return $h }
   return undef unless grep {/^\Q$name\E\./} keys %{$self->helpers};
   return $self->{proxy}{$name}
-    = sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
+    = sub { bless [shift, $name], 'Mojolicious::Renderer::_Proxy' };
 }
 
 sub render {
@@ -249,15 +249,15 @@ sub _render_template {
 }
 
 package Mojolicious::Renderer::_Proxy;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 
 sub AUTOLOAD {
   my $self = shift;
 
   my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
-  my $c = $self->{c};
+  my $c = $self->[0];
   Carp::croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $helper = $c->app->renderer->get_helper("$self->{p}.$method");
+    unless my $helper = $c->app->renderer->get_helper("$self->[1].$method");
   return $c->$helper(@_);
 }
 

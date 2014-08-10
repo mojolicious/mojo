@@ -254,16 +254,12 @@ sub _render_template {
 package Mojolicious::Renderer::_Proxy;
 use Mojo::Base -base;
 
-use Carp         ();
-use Scalar::Util ();
+use Carp ();
 
 sub AUTOLOAD {
   my $self = shift;
 
   my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
-
   my $c = $self->{c};
   Carp::croak qq{Can't locate object method "$method" via package "$package"}
     unless my $helper = $c->app->renderer->get_helper("$self->{p}.$method");
@@ -407,8 +403,9 @@ Get a C<DATA> section template by name, usually used by handlers.
 
   my $helper = $renderer->get_helper('url_for');
 
-Get helper without prefix or generate a helper dynamically for a prefix,
-generated helpers return a proxy object on which nested helpers can be called.
+Get a helper by full name, generate a helper dynamically for a prefix or
+return C<undef>. Generated helpers return a proxy object on which nested
+helpers can be called.
 
 =head2 render
 

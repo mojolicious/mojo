@@ -61,4 +61,20 @@ $c->cookie(foo => 'x' x 4097);
 like $log, qr/Cookie "foo" is bigger than 4096 bytes\./, 'right message';
 $c->app->log->unsubscribe(message => $cb);
 
+# Nested helpers
+$c->app->helper('myapp.defaults' => sub { shift->app->defaults(@_) });
+$c->myapp->defaults(foo => 'bar');
+is $c->myapp->defaults('foo'), 'bar', 'right result';
+is $c->app->myapp->defaults('foo'), 'bar', 'right result';
+
+# Missing method (AUTOLOAD)
+eval { $c->myapp->missing };
+like $@,
+  qr/^Can't locate object method "missing" via package "@{[ref $c->myapp]}"/,
+  'right error';
+eval { $c->app->myapp->missing };
+like $@,
+  qr/^Can't locate object method "missing" via package "@{[ref $c->myapp]}"/,
+  'right error';
+
 done_testing();

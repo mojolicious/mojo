@@ -903,12 +903,12 @@ proxy object on which you can call the nested helpers.
 
   helper 'cache_control.no_caching' => sub {
     my $c = shift;
-    $c->res->header->cache_control('private, max-age=0, no-cache');
+    $c->res->headers->cache_control('private, max-age=0, no-cache');
   };
 
   helper 'cache_control.five_mins' => sub {
     my $c = shift;
-    $c->res->header->cache_control('public, max-age=300');
+    $c->res->headers->cache_control('public, max-age=300');
   };
 
   get '/news' => sub {

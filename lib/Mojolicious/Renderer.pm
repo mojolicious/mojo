@@ -72,12 +72,11 @@ sub get_helper {
   my ($self, $name) = @_;
 
   if (my $helper = $self->helpers->{$name}) { return $helper }
+  if (my $proxy  = $self->{proxy}{$name})   { return $proxy }
 
-  my $lookup = $self->{lookup} ||= {};
-  return undef
-    unless $lookup->{$name} || grep {/^\Q$name\E\./} keys %{$self->helpers};
-  return $lookup->{$name}
-    ||= sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
+  return undef unless grep {/^\Q$name\E\./} keys %{$self->helpers};
+  return $self->{proxy}{$name}
+    = sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
 }
 
 sub render {

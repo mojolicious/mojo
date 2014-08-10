@@ -67,6 +67,8 @@ $first->app->log->level('fatal');
 $first->app->helper('myapp.defaults' => sub { shift->app->defaults(@_) });
 ok $first->app->renderer->get_helper('myapp'),          'found helper';
 ok $first->app->renderer->get_helper('myapp.defaults'), 'found helper';
+ok !$first->app->renderer->get_helper('myap.'), 'no helper';
+ok !$first->app->renderer->get_helper('yapp'),  'no helper';
 $first->myapp->defaults(foo => 'bar');
 is $first->myapp->defaults('foo'), 'bar', 'right result';
 is $first->app->myapp->defaults('foo'), 'bar', 'right result';

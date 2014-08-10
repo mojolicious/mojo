@@ -1,11 +1,11 @@
 package ojo;
 use Mojo::Base -strict;
 
+use Benchmark qw(timeit :hireswallclock);
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON 'j';
-use Time::HiRes qw(gettimeofday tv_interval);
 use Mojo::Util qw(dumper monkey_patch);
 
 # Silent one-liners
@@ -27,10 +27,10 @@ sub import {
     a => sub { $caller->can('any')->(@_) and return $ua->server->app },
     b => \&b,
     c => \&c,
-    d => sub { _request($ua, 'DELETE',  @_) },
-    g => sub { _request($ua, 'GET',     @_) },
-    h => sub { _request($ua, 'HEAD',    @_) },
-    i => \&_timer,
+    d => sub { _request($ua, 'DELETE', @_) },
+    g => sub { _request($ua, 'GET',    @_) },
+    h => sub { _request($ua, 'HEAD',   @_) },
+    i => sub (&@) { timeit($_[1] // 1, $_[0])->[0] },
     j => \&j,
     o => sub { _request($ua, 'OPTIONS', @_) },
     p => sub { _request($ua, 'POST',    @_) },
@@ -50,12 +50,6 @@ sub _request {
     if $err && !$err->{code};
 
   return $tx->res;
-}
-
-sub _timer (&@) {
-  my $start = [gettimeofday];
-  $_[0]->() for 1 .. $_[1] // 1;
-  return sprintf '%f', tv_interval($start, [gettimeofday]);
 }
 
 1;

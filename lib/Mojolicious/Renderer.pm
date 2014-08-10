@@ -7,7 +7,6 @@ use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader;
 use Mojo::Util qw(decamelize encode slurp);
-use Mojolicious::Renderer::Helpers;
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -77,9 +76,7 @@ sub get_helper {
   my $lookup = $self->{lookup} ||= {};
   return undef unless $lookup->{$name} || grep {/^\Q$name\E\./} keys %$helpers;
   $lookup->{$name} = 1;
-  return sub {
-    Mojolicious::Renderer::Helpers->new(controller => shift, prefix => $name);
-  };
+  return sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
 }
 
 sub render {
@@ -252,6 +249,25 @@ sub _render_template {
   # No handler
   else { $c->app->log->error(qq{No handler for "$handler" available.}) }
   return undef;
+}
+
+package Mojolicious::Renderer::_Proxy;
+use Mojo::Base -base;
+
+use Carp         ();
+use Scalar::Util ();
+
+sub AUTOLOAD {
+  my $self = shift;
+
+  my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
+  Carp::croak "Undefined subroutine &${package}::$method called"
+    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
+
+  my $c = $self->{c};
+  Carp::croak qq{Can't locate object method "$method" via package "$package"}
+    unless my $helper = $c->app->renderer->get_helper("$self->{p}.$method");
+  return $c->$helper(@_);
 }
 
 1;

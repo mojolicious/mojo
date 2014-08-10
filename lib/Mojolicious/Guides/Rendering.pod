@@ -145,6 +145,11 @@ controller object as both C<$self> and C<$c>.
 
   Hello <%= $name %> from <%= $c->tx->remote_address %>.
 
+A prefix like C<myapp.*> is commonly used for stash values that you don't want
+to expose in templates.
+
+  $c->stash('myapp.name' => 'tester');
+
 There are also many helper functions available, but more about that later.
 
   <%= dumper {foo => 'bar'} %>

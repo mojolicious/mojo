@@ -9,6 +9,7 @@ BEGIN {
 
 use Test::More;
 use ojo;
+use Time::HiRes 'usleep';
 
 # Application
 a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })
@@ -48,5 +49,12 @@ is c(1, 2, 3)->join('-'), '1-2-3', 'right result';
 
 # Dumper
 is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
+
+# Timer
+my $i = 0;
+ok i { ++$i and usleep 0.025 * 1000000 } >= 0.025, 'got a time';
+is $i, 1, 'block has been invoked once';
+i { $i++ } 10;
+is $i, 11, 'block has been invoked ten times';
 
 done_testing();

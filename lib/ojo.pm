@@ -5,6 +5,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON 'j';
+use Time::HiRes qw(gettimeofday tv_interval);
 use Mojo::Util qw(dumper monkey_patch);
 
 # Silent one-liners
@@ -29,6 +30,7 @@ sub import {
     d => sub { _request($ua, 'DELETE',  @_) },
     g => sub { _request($ua, 'GET',     @_) },
     h => sub { _request($ua, 'HEAD',    @_) },
+    i => \&_timer,
     j => \&j,
     o => sub { _request($ua, 'OPTIONS', @_) },
     p => sub { _request($ua, 'POST',    @_) },
@@ -48,6 +50,12 @@ sub _request {
     if $err && !$err->{code};
 
   return $tx->res;
+}
+
+sub _timer (&@) {
+  my $start = [gettimeofday];
+  $_[0]->() for 1 .. $_[1] // 1;
+  return sprintf '%f', tv_interval($start, [gettimeofday]);
 }
 
 1;
@@ -133,6 +141,16 @@ L<Mojo::Message::Response> object.
 
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
+
+=head2 i
+
+  my $seconds = i {...};
+  my $seconds = i {...} 100;
+
+Measure time it took to execture block in floating seconds, with an optional
+number of iterations, which defaults to C<1>.
+
+  $ perl -Mojo -E 'say i { say g("mojolicio.us")->code }'
 
 =head2 j
 

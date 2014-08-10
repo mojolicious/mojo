@@ -895,7 +895,7 @@ escaping.
   % end
 
 Similar to stash values you can use a prefix like C<myapp.*> to keep helpers
-from getting exposed to templates and organize them into namespaces when your
+from getting exposed to templates and to organize them into namespaces as your
 application grows. Every prefix automatically becomes a helper that returns a
 proxy object on which you can call the nested helpers.
 
@@ -906,7 +906,7 @@ proxy object on which you can call the nested helpers.
     $c->res->headers->cache_control('private, max-age=0, no-cache');
   };
 
-  helper 'cache_control.five_mins' => sub {
+  helper 'cache_control.five_minutes' => sub {
     my $c = shift;
     $c->res->headers->cache_control('public, max-age=300');
   };
@@ -919,7 +919,7 @@ proxy object on which you can call the nested helpers.
 
   get '/some_older_story' => sub {
     my $c = shift;
-    $c->cache_control->five_mins;
+    $c->cache_control->five_minutes;
     $c->render(text => 'This one can be cached for a bit.');
   };
 

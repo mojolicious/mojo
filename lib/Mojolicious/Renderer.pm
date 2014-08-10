@@ -1,6 +1,7 @@
 package Mojolicious::Renderer;
 use Mojo::Base -base;
 
+use Carp ();
 use File::Spec::Functions 'catfile';
 use Mojo::Cache;
 use Mojo::JSON 'encode_json';
@@ -75,7 +76,7 @@ sub get_helper {
 
   my $lookup = $self->{lookup} ||= {};
   return undef unless $lookup->{$name} || grep {/^\Q$name\E\./} keys %$helpers;
-  $lookup->{$name} = 1;
+  $lookup->{$name} ||= 1;
   return sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
 }
 
@@ -253,8 +254,6 @@ sub _render_template {
 
 package Mojolicious::Renderer::_Proxy;
 use Mojo::Base -base;
-
-use Carp ();
 
 sub AUTOLOAD {
   my $self = shift;

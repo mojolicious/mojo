@@ -71,11 +71,11 @@ sub get_data_template {
 sub get_helper {
   my ($self, $name) = @_;
 
-  my $helpers = $self->helpers;
-  return $helpers->{$name} if $helpers->{$name};
+  if (my $helper = $self->helpers->{$name}) { return $helper }
 
   my $lookup = $self->{lookup} ||= {};
-  return undef unless $lookup->{$name} || grep {/^\Q$name\E\./} keys %$helpers;
+  return undef
+    unless $lookup->{$name} || grep {/^\Q$name\E\./} keys %{$self->helpers};
   $lookup->{$name} ||= 1;
   return sub { Mojolicious::Renderer::_Proxy->new(c => shift, p => $name) };
 }

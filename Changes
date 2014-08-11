@@ -3,6 +3,8 @@
   - Added support for nested helpers.
   - Added get_helper method to Mojolicious::Renderer.
   - Added n function to ojo.
+  - Fixed bug in Mojolicious::Routes::Match where placeholder values got
+    merged too early.
 
 5.26  2014-08-09
   - Improved WebSocket performance.

@@ -197,6 +197,12 @@ $r->route('/missing/too/*', '' => ['test'])
 # /partial/*
 $r->route('/partial')->detour('foo#bar');
 
+# GET  /similar/*
+# POST /similar/too
+my $similar = $r->bridge('/similar');
+$similar->route('/:something')->via('GET')->to('similar#get');
+$similar->route('/too')->via('POST')->to('similar#post');
+
 # Cached lookup
 my $fast = $r->route('/fast');
 is $r->find('fast'),   $fast, 'fast route found';
@@ -861,6 +867,17 @@ $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/partial.test'});
 is_deeply $m->stack,
   [{controller => 'foo', action => 'bar', 'path' => '.test'}],
+  'right structure';
+
+# Similar routes with placeholders
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/similar/too'});
+is_deeply $m->stack,
+  [{}, {controller => 'similar', action => 'get', 'something' => 'too'}],
+  'right structure';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'POST', path => '/similar/too'});
+is_deeply $m->stack, [{}, {controller => 'similar', action => 'post'}],
   'right structure';
 
 done_testing();

@@ -64,8 +64,12 @@ $c->app->log->unsubscribe(message => $cb);
 # Nested helpers
 my $first = Mojolicious::Controller->new;
 $first->app->log->level('fatal');
+$first->app->helper('myapp.multi_level.test' => sub {'works!'});
+ok $first->app->renderer->get_helper('myapp'),                  'found helper';
+ok $first->app->renderer->get_helper('myapp.multi_level'),      'found helper';
+ok $first->app->renderer->get_helper('myapp.multi_level.test'), 'found helper';
+is $first->myapp->multi_level->test, 'works!', 'right result';
 $first->app->helper('myapp.defaults' => sub { shift->app->defaults(@_) });
-ok $first->app->renderer->get_helper('myapp'),          'found helper';
 ok $first->app->renderer->get_helper('myapp.defaults'), 'found helper';
 is $first->app->renderer->get_helper('myap.'),          undef, 'no helper';
 is $first->app->renderer->get_helper('yapp'),           undef, 'no helper';

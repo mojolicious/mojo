@@ -44,6 +44,8 @@ sub _match {
   my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
   return unless my $captures = $r->pattern->match_partial(\$path, $detect);
   local $options->{path} = $path;
+  local @{$self->{captures} ||= {}}{keys %$captures} = values %$captures;
+  $captures = $self->{captures};
 
   # Method
   my $methods = $r->via;
@@ -60,10 +62,6 @@ sub _match {
 
   # WebSocket
   return if $r->is_websocket && !$options->{websocket};
-
-  # Merge after everything matched
-  @{$self->{captures} ||= {}}{keys %$captures} = values %$captures;
-  $captures = $self->{captures};
 
   # Partial
   my $empty = !length $path || $path eq '/';

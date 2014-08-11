@@ -1,4 +1,6 @@
 
+5.28  2014-08-12
+
 5.27  2014-08-11
   - Added support for nested helpers.
   - Added get_helper method to Mojolicious::Renderer.

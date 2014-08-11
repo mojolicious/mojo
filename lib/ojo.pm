@@ -113,7 +113,7 @@ Turn list into a L<Mojo::Collection> object.
 =head2 d
 
   my $res = d('example.com');
-  my $res = d('http://example.com' => {DNT => 1} => 'Hi!');
+  my $res = d('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return
 resulting L<Mojo::Message::Response> object.
@@ -121,7 +121,7 @@ resulting L<Mojo::Message::Response> object.
 =head2 g
 
   my $res = g('example.com');
-  my $res = g('http://example.com' => {DNT => 1} => 'Hi!');
+  my $res = g('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
 L<Mojo::Message::Response> object.
@@ -131,7 +131,7 @@ L<Mojo::Message::Response> object.
 =head2 h
 
   my $res = h('example.com');
-  my $res = h('http://example.com' => {DNT => 1} => 'Hi!');
+  my $res = h('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
@@ -159,7 +159,7 @@ iterations, which defaults to C<1>.
 =head2 o
 
   my $res = o('example.com');
-  my $res = o('http://example.com' => {DNT => 1} => 'Hi!');
+  my $res = o('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform C<OPTIONS> request with L<Mojo::UserAgent/"options"> and return
 resulting L<Mojo::Message::Response> object.
@@ -167,7 +167,7 @@ resulting L<Mojo::Message::Response> object.
 =head2 p
 
   my $res = p('example.com');
-  my $res = p('http://example.com' => {DNT => 1} => 'Hi!');
+  my $res = p('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
@@ -183,7 +183,7 @@ Dump a Perl data structure with L<Mojo::Util/"dumper">.
 =head2 t
 
   my $res = t('example.com');
-  my $res = t('http://example.com' => {DNT => 1} => 'Hi!');
+  my $res = t('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
 L<Mojo::Message::Response> object.
@@ -191,7 +191,7 @@ L<Mojo::Message::Response> object.
 =head2 u
 
   my $res = u('example.com');
-  my $res = u('http://example.com' => {DNT => 1} => 'Hi!');
+  my $res = u('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform C<PUT> request with L<Mojo::UserAgent/"put"> and return resulting
 L<Mojo::Message::Response> object.

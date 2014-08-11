@@ -591,9 +591,9 @@ Opposite of L</"content_type_like">.
 =head2 delete_ok
 
   $t = $t->delete_ok('/foo');
-  $t = $t->delete_ok('/foo' => {DNT => 1} => 'Hi!');
-  $t = $t->delete_ok('/foo' => {DNT => 1} => form => {a => 'b'});
-  $t = $t->delete_ok('/foo' => {DNT => 1} => json => {a => 'b'});
+  $t = $t->delete_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->delete_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->delete_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform a C<DELETE> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"delete">, except for the callback.
@@ -630,9 +630,9 @@ Wait for WebSocket connection to be closed gracefully and check status.
 =head2 get_ok
 
   $t = $t->get_ok('/foo');
-  $t = $t->get_ok('/foo' => {DNT => 1} => 'Hi!');
-  $t = $t->get_ok('/foo' => {DNT => 1} => form => {a => 'b'});
-  $t = $t->get_ok('/foo' => {DNT => 1} => json => {a => 'b'});
+  $t = $t->get_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->get_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->get_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform a C<GET> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"get">, except for the callback.
@@ -643,9 +643,9 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
 =head2 head_ok
 
   $t = $t->head_ok('/foo');
-  $t = $t->head_ok('/foo' => {DNT => 1} => 'Hi!');
-  $t = $t->head_ok('/foo' => {DNT => 1} => form => {a => 'b'});
-  $t = $t->head_ok('/foo' => {DNT => 1} => json => {a => 'b'});
+  $t = $t->head_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->head_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->head_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform a C<HEAD> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"head">, except for the callback.
@@ -818,9 +818,9 @@ Construct a new L<Test::Mojo> object.
 =head2 options_ok
 
   $t = $t->options_ok('/foo');
-  $t = $t->options_ok('/foo' => {DNT => 1} => 'Hi!');
-  $t = $t->options_ok('/foo' => {DNT => 1} => form => {a => 'b'});
-  $t = $t->options_ok('/foo' => {DNT => 1} => json => {a => 'b'});
+  $t = $t->options_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->options_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->options_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform a C<OPTIONS> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"options">, except for the callback.
@@ -838,9 +838,9 @@ Invoke callback if the value of L</"success"> is false.
 =head2 patch_ok
 
   $t = $t->patch_ok('/foo');
-  $t = $t->patch_ok('/foo' => {DNT => 1} => 'Hi!');
-  $t = $t->patch_ok('/foo' => {DNT => 1} => form => {a => 'b'});
-  $t = $t->patch_ok('/foo' => {DNT => 1} => json => {a => 'b'});
+  $t = $t->patch_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->patch_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->patch_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform a C<PATCH> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"patch">, except for the callback.
@@ -848,9 +848,9 @@ arguments as L<Mojo::UserAgent/"patch">, except for the callback.
 =head2 post_ok
 
   $t = $t->post_ok('/foo');
-  $t = $t->post_ok('/foo' => {DNT => 1} => 'Hi!');
-  $t = $t->post_ok('/foo' => {DNT => 1} => form => {a => 'b'});
-  $t = $t->post_ok('/foo' => {DNT => 1} => json => {a => 'b'});
+  $t = $t->post_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->post_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->post_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform a C<POST> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"post">, except for the callback.
@@ -867,9 +867,9 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
 =head2 put_ok
 
   $t = $t->put_ok('/foo');
-  $t = $t->put_ok('/foo' => {DNT => 1} => 'Hi!');
-  $t = $t->put_ok('/foo' => {DNT => 1} => form => {a => 'b'});
-  $t = $t->put_ok('/foo' => {DNT => 1} => json => {a => 'b'});
+  $t = $t->put_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->put_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->put_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform a C<PUT> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"put">, except for the callback.

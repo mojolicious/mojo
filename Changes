@@ -1,5 +1,5 @@
 
-5.28  2014-08-12
+5.28  2014-08-13
   - Improved performance of nested helpers and helpers in templates
     significantly.
   - Improved Mojo::JSON to generate smaller JSON by not escaping the "/"

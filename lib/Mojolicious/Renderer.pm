@@ -75,7 +75,7 @@ sub get_helper {
   if (my $h = $self->helpers->{$name} || $self->{proxy}{$name}) { return $h }
 
   my $found;
-  my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum("$name:$self");
+  my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum "$name:$self";
   for my $key (keys %{$self->helpers}) {
     $key =~ /^(\Q$name\E\.([^.]+))/ ? ($found, my $method) = (1, $2) : next;
     my $sub = $self->get_helper($1);

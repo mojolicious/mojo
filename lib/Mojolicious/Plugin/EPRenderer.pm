@@ -11,8 +11,8 @@ sub register {
 
   # Auto escape by default to prevent XSS attacks
   my $template = {auto_escape => 1, %{$conf->{template} || {}}};
-  $self->{namespace} = $template->{namespace}
-    //= 'Mojo::Template::Sandbox::' . md5_sum("$self");
+  my $ns = $self->{namespace} = $template->{namespace}
+    //= 'Mojo::Template::Sandbox::' . md5_sum "$self";
 
   # Add "ep" handler and make it the default
   $app->renderer->default_handler('ep')->add_handler(
@@ -38,7 +38,7 @@ sub register {
 
         # Stash values (every time)
         my $prepend = 'my $self = my $c = shift; my $_S = $c->stash;';
-        $prepend .= " my \$$_ = \$_S->{'$_'};" for @keys;
+        $prepend .= join '', map {" my \$$_ = \$_S->{'$_'};"} @keys;
 
         $cache->set($key => $mt->prepend($prepend . $mt->prepend));
       }
@@ -46,7 +46,7 @@ sub register {
       # Make current controller available
       no strict 'refs';
       no warnings 'redefine';
-      local *{"@{[$mt->namespace]}::_C"} = sub {$c};
+      local *{"${ns}::_C"} = sub {$c};
 
       # Render with "epl" handler
       return $renderer->handlers->{epl}->($renderer, $c, $output, $options);
@@ -55,10 +55,10 @@ sub register {
 }
 
 sub _helpers {
-  my ($ns, $helpers) = @_;
-  for my $name (grep {/^\w+$/} keys %$helpers) {
-    my $sub = $helpers->{$name};
-    monkey_patch $ns, $name, sub { $ns->_C->$sub(@_) };
+  my ($class, $helpers) = @_;
+  for my $method (grep {/^\w+$/} keys %$helpers) {
+    my $sub = $helpers->{$method};
+    monkey_patch $class, $method, sub { $class->_C->$sub(@_) };
   }
 }
 

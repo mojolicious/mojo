@@ -1,13 +1,12 @@
 package Mojolicious::Renderer;
 use Mojo::Base -base;
 
-use Carp ();
 use File::Spec::Functions 'catfile';
 use Mojo::Cache;
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader;
-use Mojo::Util qw(decamelize encode slurp);
+use Mojo::Util qw(decamelize encode md5_sum monkey_patch slurp);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -29,6 +28,8 @@ my $HOME = Mojo::Home->new;
 $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
+
+sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 
 sub accepts {
   my ($self, $c) = (shift, shift);
@@ -70,10 +71,19 @@ sub get_data_template {
 
 sub get_helper {
   my ($self, $name) = @_;
+
   if (my $h = $self->helpers->{$name} || $self->{proxy}{$name}) { return $h }
-  return undef unless grep {/^\Q$name\E\./} keys %{$self->helpers};
-  return $self->{proxy}{$name}
-    = sub { bless [shift, $name], 'Mojolicious::Renderer::_Proxy' };
+
+  my $found;
+  my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum("$name:$self");
+  for my $key (keys %{$self->helpers}) {
+    $key =~ /^(\Q$name\E\.([^.]+))/ ? ($found, my $method) = (1, $2) : next;
+    my $sub = $self->get_helper($1);
+    monkey_patch $class, $method => sub { ${shift()}->$sub(@_) };
+  }
+
+  $found ? push @{$self->{namespaces}}, $class : return undef;
+  return $self->{proxy}{$name} = sub { bless \shift, $class };
 }
 
 sub render {
@@ -203,6 +213,7 @@ sub template_path {
 sub _add {
   my ($self, $attr, $name, $cb) = @_;
   $self->$attr->{$name} = $cb;
+  delete $self->{proxy};
   return $self;
 }
 
@@ -247,21 +258,6 @@ sub _render_template {
   else { $c->app->log->error(qq{No handler for "$handler" available.}) }
   return undef;
 }
-
-package Mojolicious::Renderer::_Proxy;
-use Mojo::Base -strict;
-
-sub AUTOLOAD {
-  my $self = shift;
-
-  my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
-  my $c = $self->[0];
-  Carp::croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $helper = $c->app->renderer->get_helper("$self->[1].$method");
-  return $c->$helper(@_);
-}
-
-sub DESTROY { }
 
 1;
 

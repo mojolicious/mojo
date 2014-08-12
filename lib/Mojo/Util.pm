@@ -11,6 +11,7 @@ use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
+use Symbol 'delete_package';
 use Time::HiRes ();
 
 # Check for monotonic clock support
@@ -416,6 +417,15 @@ sub _stash {
   @$dict{keys %$values} = values %$values;
 
   return $object;
+}
+
+sub _teardown {
+  return unless my $class = shift;
+
+  # @ISA has to be cleared first because of circular references
+  no strict 'refs';
+  @{"${class}::ISA"} = ();
+  delete_package $class;
 }
 
 1;

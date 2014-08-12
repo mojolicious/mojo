@@ -4,11 +4,15 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Template;
 use Mojo::Util qw(encode md5_sum monkey_patch);
 
+sub DESTROY { Mojo::Util::_teardown(shift->{namespace}) }
+
 sub register {
   my ($self, $app, $conf) = @_;
 
   # Auto escape by default to prevent XSS attacks
   my $template = {auto_escape => 1, %{$conf->{template} || {}}};
+  $self->{namespace} = $template->{namespace}
+    //= 'Mojo::Template::Sandbox::' . md5_sum("$self");
 
   # Add "ep" handler and make it the default
   $app->renderer->default_handler('ep')->add_handler(
@@ -53,8 +57,8 @@ sub register {
 sub _helpers {
   my ($ns, $helpers) = @_;
   for my $name (grep {/^\w+$/} keys %$helpers) {
-    monkey_patch $ns, $name,
-      sub { $ns->_C->app->renderer->helpers->{$name}->($ns->_C, @_) };
+    my $sub = $helpers->{$name};
+    monkey_patch $ns, $name, sub { $ns->_C->$sub(@_) };
   }
 }
 

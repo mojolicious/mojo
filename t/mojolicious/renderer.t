@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use Mojo::Util 'decode';
 use Mojolicious::Controller;
 
 # Partial rendering
@@ -94,5 +95,18 @@ like $@, qr/^Can't locate object method "missing" via package "$class"/,
 eval { $first->app->myapp->missing };
 like $@, qr/^Can't locate object method "missing" via package "$class"/,
   'right error';
+
+# No leaky namespaces
+my $helper_class = ref $second->myapp;
+is ref $second->myapp, $helper_class, 'same class';
+ok $helper_class->can('defaults'), 'helpers are active';
+my $template_class = decode 'UTF-8',
+  $second->render_to_string(inline => "<%= __PACKAGE__ =%>");
+is decode('UTF-8', $second->render_to_string(inline => "<%= __PACKAGE__ =%>")),
+  $template_class, 'same class';
+ok $template_class->can('stash'), 'helpers are active';
+undef $second;
+ok !$helper_class->can('defaults'), 'helpers have been cleaned up';
+ok !$template_class->can('stash'),  'helpers have been cleaned up';
 
 done_testing();

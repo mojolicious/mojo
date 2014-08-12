@@ -13,7 +13,7 @@ has pattern    => sub { Mojolicious::Routes::Pattern->new };
 sub AUTOLOAD {
   my $self = shift;
 
-  my ($package, $method) = our $AUTOLOAD =~ /^(.*)::(.*)$/;
+  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 

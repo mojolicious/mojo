@@ -230,7 +230,7 @@ sub _encode_object {
 
 sub _encode_string {
   my $str = shift;
-  $str =~ s!([\x00-\x1f\x{2028}\x{2029}\\"/])!$REVERSE{$1}!gs;
+  $str =~ s!([\x00-\x1f\x{2028}\x{2029}\\"])!$REVERSE{$1}!gs;
   return "\"$str\"";
 }
 

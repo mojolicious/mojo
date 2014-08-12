@@ -147,7 +147,7 @@ is b($bytes)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
 $bytes = encode_json ["123abc"];
 is $bytes, '["123abc"]', 'encode ["123abc"]';
 $bytes = encode_json ["\x00\x1f \a\b/\f\r"];
-is $bytes, '["\\u0000\\u001F \\u0007\\b\/\f\r"]',
+is $bytes, '["\\u0000\\u001F \\u0007\\b/\f\r"]',
   'encode ["\x00\x1f \a\b/\f\r"]';
 $bytes = encode_json '';
 is $bytes, '""', 'encode ""';

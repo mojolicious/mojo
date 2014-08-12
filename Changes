@@ -1,5 +1,7 @@
 
 5.28  2014-08-12
+  - Improved Mojo::JSON to generate smaller JSON by not escaping the "/"
+    character.
 
 5.27  2014-08-11
   - Added support for nested helpers.

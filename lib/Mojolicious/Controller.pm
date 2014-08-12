@@ -27,7 +27,7 @@ my %RESERVED = map { $_ => 1 } (
 sub AUTOLOAD {
   my $self = shift;
 
-  my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
+  my ($package, $method) = our $AUTOLOAD =~ /^(.*)::(.*)$/;
   Carp::croak "Undefined subroutine &${package}::$method called"
     unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
 

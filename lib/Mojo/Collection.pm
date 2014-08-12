@@ -15,7 +15,7 @@ our @EXPORT_OK = ('c');
 
 sub AUTOLOAD {
   my $self = shift;
-  my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
+  my ($package, $method) = our $AUTOLOAD =~ /^(.*)::(.*)$/;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
   return $self->pluck($method, @_);

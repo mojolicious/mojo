@@ -338,8 +338,10 @@ In addition to the L</"METHODS"> above, you can also call methods provided by
 all elements in the collection directly and create a new collection from the
 results, similar to L</"pluck">.
 
-  push @$collection, Mojo::DOM->new("<div><h1>$_</h1></div>") for 1 .. 9;
-  say $collection->find('h1')->type('h2')->prepend_content('Test ')->root;
+  # "<h2>Test1</h2><h2>Test2</h2>"
+  my $collection = Mojo::Collection->new;
+  push @$collection, Mojo::DOM->new("<h1>$_</h1>") for 1 .. 2;
+  $collection->find('h1')->type('h2')->prepend_content('Test ')->first->root;
 
 =head1 OPERATORS
 

@@ -597,11 +597,13 @@ variations.
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 shortcuts provided by L</"root"> on L<Mojolicious::Routes::Route> objects.
 
+  # Add a "firefox" shortcut
   $r->root->add_shortcut(firefox => sub {
     my ($r, $path) = @_;
     $r->get($path, agent => qr/Firefox/);
   });
 
+  # Use "firefox" shortcut to generate routes
   $r->firefox('/welcome')->to('firefox#welcome');
   $r->firefox('/bye')->to('firefox#bye');
 

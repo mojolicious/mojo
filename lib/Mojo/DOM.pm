@@ -913,9 +913,14 @@ automatically available as object methods, which return a L<Mojo::DOM> or
 L<Mojo::Collection> object, depending on number of children. For more power
 and consistent results you can also use L</"children">.
 
-  say $dom->p->text;
-  say $dom->div->[23]->text;
-  say $dom->div->text;
+  # "Test"
+  $dom->parse('<p>Test</p>')->p->text;
+
+  # "B"
+  $dom->parse('<div>A</div><div>B</div>')->div->[2]->text;
+
+  # "A"
+  $dom->parse('<div>A</div>')->div->text;
 
 =head1 OPERATORS
 

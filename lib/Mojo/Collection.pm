@@ -339,9 +339,9 @@ all elements in the collection directly and create a new collection from the
 results, similar to L</"pluck">.
 
   # "<h2>Test1</h2><h2>Test2</h2>"
-  my $collection = Mojo::Collection->new;
-  push @$collection, Mojo::DOM->new("<h1>$_</h1>") for 1 .. 2;
-  $collection->find('h1')->type('h2')->prepend_content('Test')->join;
+  my $collection = Mojo::Collection->new(
+    Mojo::DOM->new("<h1>1</h1>"), Mojo::DOM->new("<h1>2</h1>"));
+  $collection->at('h1')->type('h2')->prepend_content('Test')->join;
 
 =head1 OPERATORS
 

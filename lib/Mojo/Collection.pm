@@ -341,7 +341,7 @@ results, similar to L</"pluck">.
   # "<h2>Test1</h2><h2>Test2</h2>"
   my $collection = Mojo::Collection->new;
   push @$collection, Mojo::DOM->new("<h1>$_</h1>") for 1 .. 2;
-  $collection->find('h1')->type('h2')->prepend_content('Test')->first->root;
+  $collection->find('h1')->type('h2')->prepend_content('Test')->join;
 
 =head1 OPERATORS
 

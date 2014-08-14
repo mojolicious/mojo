@@ -312,7 +312,7 @@ Mojo::DOM::HTML - HTML/XML engine
 
   # Turn HTML into DOM tree
   my $html = Mojo::DOM::HTML->new;
-  $html->parse('<div><p id="a">A</p><p id="b">B</p></div>');
+  $html->parse('<div><p id="a">Test</p><p id="b">123</p></div>');
   my $tree = $html->tree;
 
 =head1 DESCRIPTION

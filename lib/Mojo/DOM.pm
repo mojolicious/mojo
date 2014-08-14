@@ -410,7 +410,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
   use Mojo::DOM;
 
   # Parse
-  my $dom = Mojo::DOM->new('<div><p id="a">A</p><p id="b">B</p></div>');
+  my $dom = Mojo::DOM->new('<div><p id="a">Test</p><p id="b">123</p></div>');
 
   # Find
   say $dom->at('#b')->text;
@@ -513,8 +513,9 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
 Append HTML/XML fragment to this node.
 
-  # "<div><h1>A</h1><h2>B</h2></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
+  # "<div><h1>One</h1><h2>Two</h2></div>"
+  $dom->parse('<div><h1>One</h1></div>')->at('h1')
+    ->append('<h2>Two</h2>')->root;
 
   # "<p>test 123</p>"
   $dom->parse('<p>test</p>')->at('p')->contents->first->append(' 123')->root;
@@ -526,14 +527,16 @@ Append HTML/XML fragment to this node.
 Append HTML/XML fragment or raw content (depending on node type) to this
 node's content.
 
-  # "<div><h1>AB</h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
+  # "<div><h1>OneTwo</h1></div>"
+  $dom->parse('<div><h1>One</h1></div>')->at('h1')
+    ->append_content('Two')->root;
 
-  # "<!-- A B --><br>"
-  $dom->parse('<!-- A --><br>')->contents->first->append_content('B ')->root;
+  # "<!-- One Two --><br>"
+  $dom->parse('<!-- One --><br>')
+    ->contents->first->append_content('Two ')->root;
 
-  # "<p>A<i>B</i></p>"
-  $dom->parse('<p>A</p>')->at('p')->append_content('<i>B</i>')->root;
+  # "<p>One<i>Two</i></p>"
+  $dom->parse('<p>One</p>')->at('p')->append_content('<i>Two</i>')->root;
 
 =head2 at
 
@@ -581,20 +584,20 @@ Return this node's content or replace it with HTML/XML fragment or raw content
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->content;
 
-  # "<div><h1>B</h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->content('B')->root;
+  # "<div><h1>Two</h1></div>"
+  $dom->parse('<div><h1>One</h1></div>')->at('h1')->content('Two')->root;
 
   # "<div><h1></h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->content('')->root;
+  $dom->parse('<div><h1>Test</h1></div>')->at('h1')->content('')->root;
 
-  # " A "
-  $dom->parse('<!-- A --><br>')->contents->first->content;
+  # " Test "
+  $dom->parse('<!-- Test --><br>')->contents->first->content;
 
-  # "<!-- B --><br>"
-  $dom->parse('<!-- A --><br>')->contents->first->content(' B ')->root;
+  # "<!-- Two --><br>"
+  $dom->parse('<!-- One --><br>')->contents->first->content(' Two ')->root;
 
-  # "<p><i>B</i></p>"
-  $dom->parse('<p>A</p>')->at('p')->content('<i>B</i>')->root;
+  # "<p><i>Two</i></p>"
+  $dom->parse('<p>One</p>')->at('p')->content('<i>Two</i>')->root;
 
 =head2 contents
 
@@ -664,8 +667,8 @@ fragment if necessary.
 Return L<Mojo::DOM> object for next sibling element or C<undef> if there are
 no more siblings.
 
-  # "<h2>B</h2>"
-  $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h1')->next;
+  # "<h2>Two</h2>"
+  $dom->parse('<div><h1>One</h1><h2>Two</h2></div>')->at('h1')->next;
 
 =head2 next_sibling
 
@@ -707,8 +710,9 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
 Prepend HTML/XML fragment to this node.
 
-  # "<div><h1>A</h1><h2>B</h2></div>"
-  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
+  # "<div><h1>One</h1><h2>Two</h2></div>"
+  $dom->parse('<div><h2>Two</h2></div>')->at('h2')
+    ->prepend('<h1>One</h1>')->root;
 
   # "<p>test 123</p>"
   $dom->parse('<p>123</p>')->at('p')->contents->first->prepend('test ')->root;
@@ -720,14 +724,16 @@ Prepend HTML/XML fragment to this node.
 Prepend HTML/XML fragment or raw content (depending on node type) to this
 node's content.
 
-  # "<div><h2>AB</h2></div>"
-  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
+  # "<div><h2>OneTwo</h2></div>"
+  $dom->parse('<div><h2>Two</h2></div>')->at('h2')
+    ->prepend_content('One')->root;
 
-  # "<!-- A B --><br>"
-  $dom->parse('<!-- B --><br>')->contents->first->prepend_content(' A')->root;
+  # "<!-- One Two --><br>"
+  $dom->parse('<!-- Two --><br>')
+    ->contents->first->prepend_content(' One')->root;
 
-  # "<p><i>B</i>A</p>"
-  $dom->parse('<p>A</p>')->at('p')->prepend_content('<i>B</i>')->root;
+  # "<p><i>Two</i>One</p>"
+  $dom->parse('<p>One</p>')->at('p')->prepend_content('<i>Two</i>')->root;
 
 =head2 previous
 
@@ -736,8 +742,8 @@ node's content.
 Return L<Mojo::DOM> object for previous sibling element or C<undef> if there
 are no more siblings.
 
-  # "<h1>A</h1>"
-  $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h2')->previous;
+  # "<h1>test</h1>"
+  $dom->parse('<div><h1>test</h1><h2>123</h2></div>')->at('h2')->previous;
 
 =head2 previous_sibling
 
@@ -757,7 +763,7 @@ no more siblings.
 Remove this node and return L</"parent">.
 
   # "<div></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->remove;
+  $dom->parse('<div><h1>test</h1></div>')->at('h1')->remove;
 
   # "<p><b>456</b></p>"
   $dom->parse('<p>123<b>456</b></p>')->at('p')->contents->first->remove->root;
@@ -768,11 +774,12 @@ Remove this node and return L</"parent">.
 
 Replace this node with HTML/XML fragment and return L</"parent">.
 
-  # "<div><h2>B</h2></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
+  # "<div><h2>Two</h2></div>"
+  $dom->parse('<div><h1>One</h1></div>')->at('h1')->replace('<h2>Two</h2>');
 
-  # "<p><b>B</b></p>"
-  $dom->parse('<p>A</p>')->at('p')->contents->[0]->replace('<b>B</b>')->root;
+  # "<p><b>Two</b></p>"
+  $dom->parse('<p>One</p>')->at('p')
+    ->contents->[0]->replace('<b>Two</b>')->root;
 
 =head2 root
 
@@ -798,8 +805,8 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
 Remove this element while preserving its content and return L</"parent">.
 
-  # "<div>A</div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->strip;
+  # "<div>test</div>"
+  $dom->parse('<div><h1>test</h1></div>')->at('h1')->strip;
 
 =head2 tap
 
@@ -873,17 +880,17 @@ C<selected> attribute and extract their values.
 Wrap HTML/XML fragment around this node, placing it as the last child of the
 first innermost element.
 
-  # "<p>B<b>A</b></p>"
-  $dom->parse('<b>A</b>')->at('b')->wrap('<p>B</p>')->root;
+  # "<p>Two<b>One</b></p>"
+  $dom->parse('<b>One</b>')->at('b')->wrap('<p>Two</p>')->root;
 
-  # "<div><p><b>A</b></p>B</div>"
-  $dom->parse('<b>A</b>')->at('b')->wrap('<div><p></p>B</div>')->root;
+  # "<div><p><b>One</b></p>Two</div>"
+  $dom->parse('<b>One</b>')->at('b')->wrap('<div><p></p>Two</div>')->root;
 
-  # "<p><b>A</b></p><p>B</p>"
-  $dom->parse('<b>A</b>')->at('b')->wrap('<p></p><p>B</p>')->root;
+  # "<p><b>One</b></p><p>Two</p>"
+  $dom->parse('<b>One</b>')->at('b')->wrap('<p></p><p>Two</p>')->root;
 
-  # "<p><b>A</b></p>"
-  $dom->parse('<p>A</p>')->at('p')->contents->first->wrap('<b>')->root;
+  # "<p><b>test</b></p>"
+  $dom->parse('<p>test</p>')->at('p')->contents->first->wrap('<b>')->root;
 
 =head2 wrap_content
 
@@ -892,11 +899,11 @@ first innermost element.
 Wrap HTML/XML fragment around this node's content, placing it as the last
 children of the first innermost element.
 
-  # "<p><b>BA</b></p>"
-  $dom->parse('<p>A<p>')->at('p')->wrap_content('<b>B</b>')->root;
+  # "<p><b>TwoOne</b></p>"
+  $dom->parse('<p>One<p>')->at('p')->wrap_content('<b>Two</b>')->root;
 
-  # "<p><b>A</b></p><p>B</p>"
-  $dom->parse('<b>A</b>')->wrap_content('<p></p><p>B</p>');
+  # "<p><b>One</b></p><p>Two</p>"
+  $dom->parse('<b>One</b>')->wrap_content('<p></p><p>Two</p>');
 
 =head2 xml
 
@@ -916,11 +923,11 @@ and consistent results you can also use L</"children">.
   # "Test"
   $dom->parse('<p>Test</p>')->p->text;
 
-  # "B"
-  $dom->parse('<div>A</div><div>B</div>')->div->[2]->text;
+  # "Two"
+  $dom->parse('<div>One</div><div>Two</div>')->div->[2]->text;
 
-  # "A"
-  $dom->parse('<div>A</div>')->div->text;
+  # "test"
+  $dom->parse('<div>test</div>')->div->text;
 
 =head1 OPERATORS
 
@@ -948,7 +955,7 @@ Always true.
 Alias for L</"attr">.
 
   # "test"
-  $dom->parse('<div id="test">A</div>')->at('div')->{id};
+  $dom->parse('<div id="test">Test</div>')->at('div')->{id};
 
 =head2 stringify
 

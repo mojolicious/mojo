@@ -45,7 +45,7 @@ sub register {
 
 sub _csrf_field {
   my $c = shift;
-  return _hidden_field($c, csrf_token => $c->csrf_token, @_);
+  return _hidden_field($c, csrf_token => $c->helpers->csrf_token, @_);
 }
 
 sub _form_for {
@@ -246,7 +246,7 @@ sub _text_area {
 sub _validation {
   my ($c, $name) = (shift, shift);
   return _tag(@_) unless $c->validation->has_error($name);
-  return $c->tag_with_error(@_);
+  return $c->helpers->tag_with_error(@_);
 }
 
 1;

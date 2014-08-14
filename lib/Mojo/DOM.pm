@@ -430,7 +430,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
   }
 
   # Modify
-  $dom->div->p->last->append('<p id="c">C</p>');
+  $dom->div->p->last->append('<p id="c">456</p>');
   $dom->find(':not(p)')->strip;
 
   # Render
@@ -868,7 +868,7 @@ C<selected> attribute and extract their values.
   $dom->parse('<input name="a" value="b">')->at('input')->val;
 
   # "c"
-  $dom->parse('<option value="c">C</option>')->at('option')->val;
+  $dom->parse('<option value="c">Test</option>')->at('option')->val;
 
   # "d"
   $dom->parse('<option>d</option>')->at('option')->val;

@@ -7,6 +7,7 @@ BEGIN {
 
 use Test::More;
 use File::Spec::Functions 'catdir';
+use FindBin;
 use Mojo;
 use Mojo::IOLoop;
 use Mojo::Log;
@@ -60,6 +61,13 @@ $app->config(foo => 'bar', baz => 'yada');
 is $app->config({test => 23})->config->{test}, 23, 'right value';
 is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
   'right value';
+
+# Load broken app
+eval {
+  Mojo::Server::Daemon->new->load_app(
+    "$FindBin::Bin/lib/Mojo/LoaderException.pm");
+};
+like $@, qr/^Couldn't load application/, 'right error';
 
 # Transaction
 isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';

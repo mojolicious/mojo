@@ -560,7 +560,9 @@ L</"session">.
 
   my $helpers = $c->helpers;
 
-Return proxy object on which all helpers can be called.
+Return proxy object on which all helpers provided by L</"app"> can be called.
+This includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>.
 
   $c->helpers->layout('green');
 

@@ -694,8 +694,8 @@ L<Mojo::UserAgent::Transactor/"websocket">.
 
 Perform blocking C<DELETE> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<DELETE> method). You can
+also append a callback to perform requests non-blocking.
 
   $ua->delete('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -714,8 +714,8 @@ append a callback to perform requests non-blocking.
 
 Perform blocking C<GET> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<GET> method). You can
+also append a callback to perform requests non-blocking.
 
   $ua->get('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -734,8 +734,8 @@ append a callback to perform requests non-blocking.
 
 Perform blocking C<HEAD> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<HEAD> method). You can
+also append a callback to perform requests non-blocking.
 
   $ua->head('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -754,8 +754,8 @@ append a callback to perform requests non-blocking.
 
 Perform blocking C<OPTIONS> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<OPTIONS> method). You
+can also append a callback to perform requests non-blocking.
 
   $ua->options('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -774,8 +774,8 @@ append a callback to perform requests non-blocking.
 
 Perform blocking C<PATCH> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PATCH> method). You can
+also append a callback to perform requests non-blocking.
 
   $ua->patch('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -794,8 +794,8 @@ append a callback to perform requests non-blocking.
 
 Perform blocking C<POST> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<POST> method). You can
+also append a callback to perform requests non-blocking.
 
   $ua->post('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -814,8 +814,8 @@ append a callback to perform requests non-blocking.
 
 Perform blocking C<PUT> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PUT> method). You can
+also append a callback to perform requests non-blocking.
 
   $ua->put('http://example.com' => sub {
     my ($ua, $tx) = @_;

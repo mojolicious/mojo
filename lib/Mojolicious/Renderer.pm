@@ -76,8 +76,9 @@ sub get_helper {
 
   my $found;
   my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum "$name:$self";
+  my $re = $name eq '' ? qr/^(([^.]+))/ : qr/^(\Q$name\E\.([^.]+))/;
   for my $key (keys %{$self->helpers}) {
-    $key =~ /^(\Q$name\E\.([^.]+))/ ? ($found, my $method) = (1, $2) : next;
+    $key =~ $re ? ($found, my $method) = (1, $2) : next;
     my $sub = $self->get_helper($1);
     monkey_patch $class, $method => sub { ${shift()}->$sub(@_) };
   }

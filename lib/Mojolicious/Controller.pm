@@ -93,6 +93,8 @@ sub flash {
   return $self;
 }
 
+sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
+
 sub on {
   my ($self, $name, $cb) = @_;
   my $tx = $self->tx;
@@ -553,6 +555,14 @@ L</"session">.
   # Show message after redirect
   $c->flash(message => 'User created successfully!');
   $c->redirect_to('show_user', id => 23);
+
+=head2 helpers
+
+  my $helpers = $c->helpers;
+
+Return proxy object on which all helpers can be called.
+
+  $c->helpers->layout('green');
 
 =head2 on
 

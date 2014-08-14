@@ -158,11 +158,11 @@ sub new {
   my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
 
   # Hide controller attributes/methods and "handler"
-  $r->hide(qw(app continue cookie finish flash handler match on param));
-  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
-  $r->hide(qw(render_not_found render_static render_to_string rendered req));
-  $r->hide(qw(res respond_to send session signed_cookie stash tx url_for));
-  $r->hide(qw(validation write write_chunk));
+  $r->hide(qw(app continue cookie finish flash handler helpers match on));
+  $r->hide(qw(param redirect_to render render_exception render_later));
+  $r->hide(qw(render_maybe render_not_found render_static render_to_string));
+  $r->hide(qw(rendered req res respond_to send session signed_cookie stash));
+  $r->hide(qw(tx url_for validation write write_chunk));
 
   # Check if we have a log directory
   my $mode = $self->mode;

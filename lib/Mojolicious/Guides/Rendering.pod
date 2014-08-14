@@ -474,11 +474,15 @@ be very useful for debugging. We differentiate between default helpers which
 are more general purpose like C<dumper> and tag helpers, which are template
 specific and mostly used to generate HTML tags.
 
-  %= javascript '/script.js'
-
-  %= javascript begin
-    var a = 'b';
+  %= link_to 'http://mojolicio.us' => begin
+    Mojolicious
   % end
+
+In controllers you can also use the method
+L<Mojolicious::Controller/"helpers"> to ensure that helper calls don't
+conflict with existing methods you may already have.
+
+  my $serialized = $c->helpers->dumper([1, 2, 3]);
 
 A list of all built-in helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.

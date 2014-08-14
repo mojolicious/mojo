@@ -72,7 +72,7 @@ sub get_data_template {
 sub get_helper {
   my ($self, $name) = @_;
 
-  if (my $h = $self->helpers->{$name} || $self->{proxy}{$name}) { return $h }
+  if (my $h = $self->{proxy}{$name} || $self->helpers->{$name}) { return $h }
 
   my $found;
   my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum "$name:$self";

@@ -560,11 +560,12 @@ L</"session">.
 
   my $helpers = $c->helpers;
 
-Return proxy object on which all helpers provided by L</"app"> can be called.
-This includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
+Return proxy object on which helpers provided by L</"app"> can be called. This
+includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
-  $c->helpers->layout('green');
+  # Make sure to use the "title" helper and not the controller method
+  $c->helpers->title('Welcome!');
 
 =head2 on
 

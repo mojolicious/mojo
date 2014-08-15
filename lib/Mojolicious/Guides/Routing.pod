@@ -25,10 +25,10 @@ This black box is usually called a dispatcher. There are many implementations
 using different strategies to establish these connections, but pretty much all
 are based around mapping the requests path to some kind of response generator.
 
-  /user/show/1 -> $c->render(text => 'Sebastian');
-  /user/show/2 -> $c->render(text => 'Sara');
-  /user/show/3 -> $c->render(text => 'Baerbel');
-  /user/show/4 -> $c->render(text => 'Wolfgang');
+  /user/show/2 -> $c->render(text => 'Daniel');
+  /user/show/3 -> $c->render(text => 'Sara');
+  /user/show/4 -> $c->render(text => 'Baerbel');
+  /user/show/5 -> $c->render(text => 'Wolfgang');
 
 While it is very well possible to make all these connections static, it is
 also rather inefficient. That's why regular expressions are commonly used to

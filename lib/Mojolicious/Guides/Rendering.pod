@@ -305,11 +305,11 @@ L<Mojolicious::Controller/"stash">.
 
   $c->stash(author     => 'Sebastian');
   $c->stash(frameworks => [qw(Catalyst Mojolicious)]);
-  $c->stash(examples   => {tweetylicious => 'a microblogging app'});
+  $c->stash(examples   => {convos => 'an IRC app'});
 
   %= $author
   %= $frameworks->[1]
-  %= $examples->{tweetylicious}
+  %= $examples->{convos}
 
 Since everything is just Perl normal control structures just work.
 
@@ -317,9 +317,50 @@ Since everything is just Perl normal control structures just work.
     <%= $framework %> was written by <%= $author %>.
   % }
 
-  % if (my $description = $examples->{tweetylicious}) {
-    Tweetylicious is a <%= $description %>.
+  % if (my $description = $examples->{convos}) {
+    Convos is a <%= $description %>.
   % }
+
+For templates that might get rendered in different ways and where you're not
+sure if a stash value will actually be set, you can just use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"stash">.
+
+  % if (my $examples = stash 'examples') {
+    Convos is <%= $examples->{convos} %>.
+  % }
+
+=head2 Helpers
+
+Helpers are little functions you can use in templates as well as application
+and controller code.
+
+  # Template
+  %= dumper [1, 2, 3]
+
+  # Application
+  my $serialized = $app->dumper([1, 2, 3]);
+
+  # Controller
+  my $serialized = $c->dumper([1, 2, 3]);
+
+The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will
+use L<Data::Dumper> to serialize whatever data structure you pass it, this can
+be very useful for debugging. We differentiate between default helpers which
+are more general purpose like C<dumper> and tag helpers, which are template
+specific and mostly used to generate HTML tags.
+
+  %= link_to 'http://mojolicio.us' => begin
+    Mojolicious
+  % end
+
+In controllers you can also use the method
+L<Mojolicious::Controller/"helpers"> to fully qualify helper calls and ensure
+that they don't conflict with existing methods you may already have.
+
+  my $serialized = $c->helpers->dumper([1, 2, 3]);
+
+A list of all built-in helpers can be found in
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
 =head2 Content negotiation
 
@@ -459,39 +500,6 @@ passed to the renderer.
   get '/' => sub { die "This sho...ALL GLORY TO THE HYPNOTOAD!\n" };
 
   app->start;
-
-=head2 Helpers
-
-Helpers are little functions you can use in templates as well as application
-and controller code.
-
-  # Template
-  %= dumper [1, 2, 3]
-
-  # Application
-  my $serialized = $app->dumper([1, 2, 3]);
-
-  # Controller
-  my $serialized = $c->dumper([1, 2, 3]);
-
-The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will
-use L<Data::Dumper> to serialize whatever data structure you pass it, this can
-be very useful for debugging. We differentiate between default helpers which
-are more general purpose like C<dumper> and tag helpers, which are template
-specific and mostly used to generate HTML tags.
-
-  %= link_to 'http://mojolicio.us' => begin
-    Mojolicious
-  % end
-
-In controllers you can also use the method
-L<Mojolicious::Controller/"helpers"> to fully qualify helper calls and ensure
-that they don't conflict with existing methods you may already have.
-
-  my $serialized = $c->helpers->dumper([1, 2, 3]);
-
-A list of all built-in helpers can be found in
-L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
 =head2 Layouts
 

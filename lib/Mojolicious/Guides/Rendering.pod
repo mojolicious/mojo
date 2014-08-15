@@ -300,8 +300,8 @@ These mappings can be easily extended or changed with L<Mojolicious/"types">.
 
 =head2 Stash data
 
-Any of the native Perl data types can be passed to templates through the
-L<Mojolicious::Controller/"stash">.
+Any of the native Perl data types can be passed to templates as references
+through the L<Mojolicious::Controller/"stash">.
 
   $c->stash(author     => 'Sebastian');
   $c->stash(frameworks => [qw(Catalyst Mojolicious)]);

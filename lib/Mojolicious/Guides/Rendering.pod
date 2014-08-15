@@ -462,10 +462,16 @@ passed to the renderer.
 
 =head2 Helpers
 
-Helpers are little functions you can use in templates and controller code.
+Helpers are little functions you can use in templates as well as application
+and controller code.
 
+  # Template
   %= dumper [1, 2, 3]
 
+  # Application
+  my $serialized = $app->dumper([1, 2, 3]);
+
+  # Controller
   my $serialized = $c->dumper([1, 2, 3]);
 
 The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will
@@ -479,8 +485,8 @@ specific and mostly used to generate HTML tags.
   % end
 
 In controllers you can also use the method
-L<Mojolicious::Controller/"helpers"> to ensure that helper calls don't
-conflict with existing methods you may already have.
+L<Mojolicious::Controller/"helpers"> to fully qualify helper calls and ensure
+that they don't conflict with existing methods you may already have.
 
   my $serialized = $c->helpers->dumper([1, 2, 3]);
 

@@ -915,7 +915,8 @@ escaping.
 Similar to stash values you can use a prefix like C<myapp.*> to keep helpers
 from getting exposed in templates and to organize them into namespaces as your
 application grows. Every prefix automatically becomes a helper that returns a
-proxy object on which you can call the nested helpers.
+proxy object containing the current controller object and on which you can
+call the nested helpers.
 
   use Mojolicious::Lite;
 

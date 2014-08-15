@@ -399,7 +399,8 @@ Get a C<DATA> section template by name, usually used by handlers.
 
 Get a helper by full name, generate a helper dynamically for a prefix or
 return C<undef> if no helper or prefix could be found. Generated helpers
-return a proxy object on which nested helpers can be called.
+return a proxy object that contains the current controller object and on which
+nested helpers can be called.
 
 =head2 render
 

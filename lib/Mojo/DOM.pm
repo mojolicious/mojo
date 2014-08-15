@@ -478,7 +478,7 @@ Return a L<Mojo::Collection> object containing all nodes in DOM structure as
 L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
-  $dom->parse('<p><!-- test --><b>123<!-- 456 --></b></p>')
+  $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')
     ->all_contents->grep(sub { $_->node eq 'comment' })->remove->first;
 
 =head2 all_text
@@ -517,8 +517,8 @@ Append HTML/XML fragment to this node.
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')
     ->append('<h2>123</h2>')->root;
 
-  # "<p>test 123</p>"
-  $dom->parse('<p>test</p>')->at('p')->contents->first->append(' 123')->root;
+  # "<p>Test 123</p>"
+  $dom->parse('<p>Test</p>')->at('p')->contents->first->append(' 123')->root;
 
 =head2 append_content
 
@@ -581,8 +581,8 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 Return this node's content or replace it with HTML/XML fragment or raw content
 (depending on node type).
 
-  # "<b>test</b>"
-  $dom->parse('<div><b>test</b></div>')->div->content;
+  # "<b>Test</b>"
+  $dom->parse('<div><b>Test</b></div>')->div->content;
 
   # "<div><h1>123</h1></div>"
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->content('123')->root;
@@ -607,10 +607,10 @@ Return a L<Mojo::Collection> object containing the child nodes of this element
 as L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
-  $dom->parse('<p>test<b>123</b></p>')->at('p')->contents->first->remove;
+  $dom->parse('<p>Test<b>123</b></p>')->at('p')->contents->first->remove;
 
-  # "<!-- test -->"
-  $dom->parse('<!-- test --><b>123</b>')->contents->first;
+  # "<!-- Test -->"
+  $dom->parse('<!-- Test --><b>123</b>')->contents->first;
 
 =head2 find
 
@@ -678,7 +678,7 @@ Return L<Mojo::DOM> object for next sibling node or C<undef> if there are no
 more siblings.
 
   # "456"
-  $dom->parse('<p><b>123</b><!-- test -->456</p>')->at('b')
+  $dom->parse('<p><b>123</b><!-- Test -->456</p>')->at('b')
     ->next_sibling->next_sibling;
 
 =head2 node
@@ -714,8 +714,8 @@ Prepend HTML/XML fragment to this node.
   $dom->parse('<div><h2>123</h2></div>')->at('h2')
     ->prepend('<h1>Test</h1>')->root;
 
-  # "<p>test 123</p>"
-  $dom->parse('<p>123</p>')->at('p')->contents->first->prepend('test ')->root;
+  # "<p>Test 123</p>"
+  $dom->parse('<p>123</p>')->at('p')->contents->first->prepend('Test ')->root;
 
 =head2 prepend_content
 
@@ -742,8 +742,8 @@ node's content.
 Return L<Mojo::DOM> object for previous sibling element or C<undef> if there
 are no more siblings.
 
-  # "<h1>test</h1>"
-  $dom->parse('<div><h1>test</h1><h2>123</h2></div>')->at('h2')->previous;
+  # "<h1>Test</h1>"
+  $dom->parse('<div><h1>Test</h1><h2>123</h2></div>')->at('h2')->previous;
 
 =head2 previous_sibling
 
@@ -753,7 +753,7 @@ Return L<Mojo::DOM> object for previous sibling node or C<undef> if there are
 no more siblings.
 
   # "123"
-  $dom->parse('<p>123<!-- test --><b>456</b></p>')->at('b')
+  $dom->parse('<p>123<!-- Test --><b>456</b></p>')->at('b')
     ->previous_sibling->previous_sibling;
 
 =head2 remove
@@ -763,7 +763,7 @@ no more siblings.
 Remove this node and return L</"parent">.
 
   # "<div></div>"
-  $dom->parse('<div><h1>test</h1></div>')->at('h1')->remove;
+  $dom->parse('<div><h1>Test</h1></div>')->at('h1')->remove;
 
   # "<p><b>456</b></p>"
   $dom->parse('<p>123<b>456</b></p>')->at('p')->contents->first->remove->root;
@@ -805,8 +805,8 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
 Remove this element while preserving its content and return L</"parent">.
 
-  # "<div>test</div>"
-  $dom->parse('<div><h1>test</h1></div>')->at('h1')->strip;
+  # "<div>Test</div>"
+  $dom->parse('<div><h1>Test</h1></div>')->at('h1')->strip;
 
 =head2 tap
 
@@ -834,8 +834,8 @@ smart whitespace trimming is enabled by default.
 
 Render this node and its content to HTML/XML.
 
-  # "<b>test</b>"
-  $dom->parse('<div><b>test</b></div>')->div->b->to_string;
+  # "<b>Test</b>"
+  $dom->parse('<div><b>Test</b></div>')->div->b->to_string;
 
 =head2 tree
 
@@ -889,8 +889,8 @@ first innermost element.
   # "<p><b>Test</b></p><p>123</p>"
   $dom->parse('<b>Test</b>')->at('b')->wrap('<p></p><p>123</p>')->root;
 
-  # "<p><b>test</b></p>"
-  $dom->parse('<p>test</p>')->at('p')->contents->first->wrap('<b>')->root;
+  # "<p><b>Test</b></p>"
+  $dom->parse('<p>Test</p>')->at('p')->contents->first->wrap('<b>')->root;
 
 =head2 wrap_content
 
@@ -926,8 +926,8 @@ and consistent results you can also use L</"children">.
   # "123"
   $dom->parse('<div>Test</div><div>123</div>')->div->[2]->text;
 
-  # "test"
-  $dom->parse('<div>test</div>')->div->text;
+  # "Test"
+  $dom->parse('<div>Test</div>')->div->text;
 
 =head1 OPERATORS
 
@@ -939,8 +939,8 @@ L<Mojo::DOM> overloads the following operators.
 
 Alias for L</"contents">.
 
-  # "<!-- test -->"
-  $dom->parse('<!-- test --><b>123</b>')->[0];
+  # "<!-- Test -->"
+  $dom->parse('<!-- Test --><b>123</b>')->[0];
 
 =head2 bool
 

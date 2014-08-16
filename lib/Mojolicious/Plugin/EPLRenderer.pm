@@ -9,17 +9,8 @@ sub register { $_[1]->renderer->add_handler(epl => \&_epl) }
 sub _epl {
   my ($renderer, $c, $output, $options) = @_;
 
-  # Template
-  my $name   = $renderer->template_name($options);
-  my $inline = $options->{inline};
-  $name = md5_sum encode('UTF-8', $inline) if defined $inline;
-  return undef unless defined $name;
-
   # Cached
-  my $key   = delete $options->{cache} || $name;
-  my $cache = $renderer->cache;
-  my $mt    = $cache->get($key);
-  $mt ||= $cache->set($key => Mojo::Template->new)->get($key);
+  my $mt = delete $options->{'mojo.template'} || Mojo::Template->new;
   my $log = $c->app->log;
   if ($mt->compiled) {
     $log->debug("Rendering cached @{[$mt->name]}.");
@@ -28,6 +19,9 @@ sub _epl {
 
   # Not cached
   else {
+    my $inline = $options->{inline};
+    my $name = defined $inline ? md5_sum encode('UTF-8', $inline) : undef;
+    return undef unless defined($name //= $renderer->template_name($options));
 
     # Inline
     if (defined $inline) {
@@ -37,7 +31,7 @@ sub _epl {
 
     # File
     else {
-      $mt->encoding($renderer->encoding) if $renderer->encoding;
+      if (my $encoding = $renderer->encoding) { $mt->encoding($encoding) }
 
       # Try template
       if (defined(my $path = $renderer->template_path($options))) {

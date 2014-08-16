@@ -480,6 +480,8 @@ is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url,
   '/foo', 'right URL';
 is $t->app->build_controller->render_to_string('index', handler => 'epl'),
   'Just works!', 'right result';
+is $t->app->build_controller->render_to_string(inline => '0'), "0\n",
+  'right result';
 
 # Unicode snowman
 $t->get_ok('/☃')->status_is(200)

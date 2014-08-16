@@ -1,6 +1,8 @@
 
 5.29  2014-08-16
   - Added helpers method to Mojolicious::Controller.
+  - Improved performance of .ep templates slightly.
+  - Fixed "0" value bug in Mojolicious::Plugin::EPRenderer.
 
 5.28  2014-08-13
   - Improved performance of nested helpers and helpers in templates

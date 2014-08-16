@@ -19,22 +19,24 @@ sub register {
     $conf->{name} || 'ep' => sub {
       my ($renderer, $c, $output, $options) = @_;
 
-      # Generate name
-      my $name = $options->{inline} || $renderer->template_name($options);
+      my $name = $options->{inline} // $renderer->template_name($options);
       return undef unless defined $name;
       my @keys = sort grep {/^\w+$/} keys %{$c->stash};
-      my $id = encode 'UTF-8', join(',', $name, @keys);
-      my $key = $options->{cache} = md5_sum $id;
+      my $key = md5_sum encode 'UTF-8', join(',', $name, @keys);
 
-      # Cache template for "epl" handler
+      # Prepare template for "epl" handler
       my $cache = $renderer->cache;
-      my $mt    = $cache->get($key);
-      unless ($mt) {
-        $mt = Mojo::Template->new($template);
+      unless ($options->{'mojo.template'} = $cache->get($key)) {
+        my $mt = $options->{'mojo.template'} = Mojo::Template->new($template);
 
         # Helpers (only once)
-        ++$self->{helpers} and _helpers($mt->namespace, $renderer->helpers)
-          unless $self->{helpers};
+        unless ($self->{helpers} || $self->{helpers}++) {
+          my $helpers = $renderer->helpers;
+          for my $method (grep {/^\w+$/} keys %$helpers) {
+            my $sub = $helpers->{$method};
+            monkey_patch $ns, $method, sub { $ns->_C->$sub(@_) };
+          }
+        }
 
         # Stash values (every time)
         my $prepend = 'my $self = my $c = shift; my $_S = $c->stash;';
@@ -52,14 +54,6 @@ sub register {
       return $renderer->handlers->{epl}->($renderer, $c, $output, $options);
     }
   );
-}
-
-sub _helpers {
-  my ($class, $helpers) = @_;
-  for my $method (grep {/^\w+$/} keys %$helpers) {
-    my $sub = $helpers->{$method};
-    monkey_patch $class, $method, sub { $class->_C->$sub(@_) };
-  }
 }
 
 1;

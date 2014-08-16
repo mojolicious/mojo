@@ -1,4 +1,6 @@
 
+5.30  2014-08-17
+
 5.29  2014-08-16
   - Added helpers method to Mojolicious::Controller.
   - Improved performance of .ep templates slightly.

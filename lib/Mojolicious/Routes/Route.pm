@@ -123,13 +123,15 @@ sub remove {
 sub render {
   my ($self, $path, $values) = @_;
 
-  # Render pattern
-  my $prefix = $self->pattern->render($values, !$path);
-  $path = "$prefix$path" unless $prefix eq '/';
-  $path ||= '/' unless my $parent = $self->parent;
+  # Render pattern (if necessary)
+  if (defined((my $pattern = $self->pattern)->pattern) || !$path) {
+    my $prefix = $pattern->render($values, !$path);
+    $path = "$prefix$path" unless $prefix eq '/';
+  }
 
   # Let parent render
-  return $parent ? $parent->render($path, $values) : $path;
+  return $path || '/' unless my $parent = $self->parent;
+  return $parent->render($path, $values);
 }
 
 sub root {

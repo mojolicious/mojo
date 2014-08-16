@@ -55,6 +55,7 @@ is $pattern->render({a => 'c', b => 'd'}), '/test/c/123/d/456', 'right result';
 
 # Root
 $pattern = Mojolicious::Routes::Pattern->new('/');
+is $pattern->pattern, undef, 'slash has been optimized away';
 $pattern->defaults({action => 'index'});
 ok !$pattern->match('/test/foo/bar'), 'no result';
 is_deeply $pattern->match('/'), {action => 'index'}, 'right structure';

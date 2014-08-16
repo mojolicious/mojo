@@ -269,8 +269,8 @@ Compiled regular expression for format matching.
 
 =head2 pattern
 
-  my $pattern = $pattern->pattern;
-  $pattern    = $pattern->pattern('/(foo)/(bar)');
+  my $raw  = $pattern->pattern;
+  $pattern = $pattern->pattern('/(foo)/(bar)');
 
 Raw unparsed pattern.
 

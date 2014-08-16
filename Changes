@@ -1,6 +1,7 @@
 
 5.30  2014-08-17
-  - Improved Mojo::IOLoop::Client to use a timeout for every connection.
+  - Improved Mojo::URL performance.
+  - Fixed Mojo::IOLoop::Client to use a timeout for every connection.
 
 5.29  2014-08-16
   - Added helpers method to Mojolicious::Controller.

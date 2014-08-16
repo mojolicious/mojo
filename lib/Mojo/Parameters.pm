@@ -31,9 +31,10 @@ sub append {
 sub clone {
   my $self = shift;
 
-  my $clone = $self->new->charset($self->charset);
-  if (defined $self->{string}) { $clone->{string} = $self->{string} }
-  else                         { $clone->params([@{$self->params}]) }
+  my $clone = $self->new;
+  if   (exists $self->{charset}) { $clone->{charset} = $self->{charset} }
+  if   (defined $self->{string}) { $clone->{string}  = $self->{string} }
+  else                           { $clone->{params}  = [@{$self->params}] }
 
   return $clone;
 }

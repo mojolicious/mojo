@@ -32,7 +32,8 @@ sub canonicalize {
 sub clone {
   my $self = shift;
 
-  my $clone = $self->new->charset($self->charset);
+  my $clone = $self->new;
+  if (exists $self->{charset}) { $clone->{charset} = $self->{charset} }
   if (my $parts = $self->{parts}) {
     $clone->{$_} = $self->{$_} for qw(leading_slash trailing_slash);
     $clone->{parts} = [@$parts];

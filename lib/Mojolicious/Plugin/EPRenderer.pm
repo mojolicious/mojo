@@ -30,13 +30,8 @@ sub register {
         my $mt = $options->{'mojo.template'} = Mojo::Template->new($template);
 
         # Helpers (only once)
-        unless ($self->{helpers} || $self->{helpers}++) {
-          my $helpers = $renderer->helpers;
-          for my $method (grep {/^\w+$/} keys %$helpers) {
-            my $sub = $helpers->{$method};
-            monkey_patch $ns, $method, sub { $ns->_C->$sub(@_) };
-          }
-        }
+        ++$self->{helpers} and _helpers($ns, $renderer->helpers)
+          unless $self->{helpers};
 
         # Stash values (every time)
         my $prepend = 'my $self = my $c = shift; my $_S = $c->stash;';
@@ -54,6 +49,14 @@ sub register {
       return $renderer->handlers->{epl}->($renderer, $c, $output, $options);
     }
   );
+}
+
+sub _helpers {
+  my ($class, $helpers) = @_;
+  for my $method (grep {/^\w+$/} keys %$helpers) {
+    my $sub = $helpers->{$method};
+    monkey_patch $class, $method, sub { $class->_C->$sub(@_) };
+  }
 }
 
 1;

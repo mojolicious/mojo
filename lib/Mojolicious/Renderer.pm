@@ -89,7 +89,6 @@ sub get_helper {
 
 sub render {
   my ($self, $c, $args) = @_;
-  $args ||= {};
 
   # Localize "extends" and "layout" to allow argument overrides
   my $stash = $c->stash;
@@ -404,7 +403,6 @@ nested helpers can be called.
 
 =head2 render
 
-  my ($output, $format) = $renderer->render(Mojolicious::Controller->new);
   my ($output, $format) = $renderer->render(Mojolicious::Controller->new, {
     template => 'foo/bar',
     foo      => 'bar'

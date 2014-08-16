@@ -62,12 +62,12 @@ sub _connect {
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return $self->emit(error => "Couldn't connect: $@")
       unless $self->{handle} = $handle = $class->new(%options);
-
-    # Timeout
-    $self->{timer} = $reactor->timer($args->{timeout} || 10,
-      sub { $self->emit(error => 'Connect timeout') });
   }
   $handle->blocking(0);
+
+  # Timeout
+  $self->{timer} = $reactor->timer($args->{timeout} || 10,
+    sub { $self->emit(error => 'Connect timeout') });
 
   # Wait for handle to become writable
   weaken $self;

@@ -41,14 +41,10 @@ sub host_port {
 }
 
 sub clone {
-  my $self = shift;
-
+  my $self  = shift;
   my $clone = $self->new;
-  map { $clone->{$_} = $self->{$_} } qw(scheme userinfo host port fragment);
-  $clone->{path}  = $self->path->clone;
-  $clone->{query} = $self->query->clone;
-  if (my $base = $self->{base}) { $clone->{base} = $base->clone }
-
+  @$clone{keys %$self} = values %$self;
+  $clone->{$_} && ($clone->{$_} = $clone->{$_}->clone) for qw(base path query);
   return $clone;
 }
 

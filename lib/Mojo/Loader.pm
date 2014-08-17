@@ -55,7 +55,7 @@ sub _all {
   seek $handle, 0, 0;
   my $data = join '', <$handle>;
 
-  # Ignore everything before __DATA__ (Windows will seek to start of file)
+  # Ignore everything before __DATA__ (some versions seek to start of file)
   $data =~ s/^.*\n__DATA__\r?\n/\n/s;
 
   # Ignore everything after __END__

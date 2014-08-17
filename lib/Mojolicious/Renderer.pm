@@ -242,18 +242,15 @@ sub _warmup {
 
   my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
 
-  # Classes for DATA templates
-  for my $class (reverse @{$self->classes}) {
-    $index->{$_} = $class for keys %{$LOADER->data($class)};
-  }
-
   # Handlers for templates
   s/\.(\w+)$// and push @{$templates->{$_}}, $1
     for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
 
-  # Handlers for DATA templates
-  s/\.(\w+)$// and push @{$templates->{$_}}, $1
-    for map { sort keys %{$LOADER->data($_)} } @{$self->classes};
+  # Handlers and classes for DATA templates
+  for my $class (reverse @{$self->classes}) {
+    $index->{$_} = $class for my @keys = sort keys %{$LOADER->data($class)};
+    s/\.(\w+)$// and unshift @{$templates->{$_}}, $1 for reverse @keys;
+  }
 }
 
 1;

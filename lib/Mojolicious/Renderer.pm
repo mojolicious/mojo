@@ -29,7 +29,6 @@ $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
 
-# For templates from DATA sections
 my $LOADER = Mojo::Loader->new;
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
@@ -58,13 +57,7 @@ sub add_helper  { shift->_add(helpers  => @_) }
 sub get_data_template {
   my ($self, $options) = @_;
 
-  # Index DATA templates
-  unless ($self->{index}) {
-    my $index = $self->{index} = {};
-    for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{$LOADER->data($class)};
-    }
-  }
+  $self->_warmup unless $self->{index};
 
   # Find template
   my $template = $self->template_name($options);
@@ -230,18 +223,7 @@ sub _extends {
 
 sub _handlers {
   my ($self, $file) = @_;
-
-  unless ($self->{templates}) {
-
-    # Templates
-    s/\.(\w+)$// and push @{$self->{templates}{$_}}, $1
-      for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
-
-    # DATA templates
-    s/\.(\w+)$// and push @{$self->{templates}{$_}}, $1
-      for map { sort keys %{$LOADER->data($_)} } @{$self->classes};
-  }
-
+  $self->_warmup unless $self->{templates};
   return $self->{templates}{$file};
 }
 
@@ -258,6 +240,25 @@ sub _render_template {
   # No handler
   else { $c->app->log->error(qq{No handler for "$handler" available.}) }
   return undef;
+}
+
+sub _warmup {
+  my $self = shift;
+
+  my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
+
+  # Classes
+  for my $class (reverse @{$self->classes}) {
+    $index->{$_} = $class for keys %{$LOADER->data($class)};
+  }
+
+  # Templates
+  s/\.(\w+)$// and push @{$templates->{$_}}, $1
+    for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
+
+  # DATA templates
+  s/\.(\w+)$// and push @{$templates->{$_}}, $1
+    for map { sort keys %{$LOADER->data($_)} } @{$self->classes};
 }
 
 1;

@@ -19,7 +19,6 @@ my $MTIME = time;
 my $HOME   = Mojo::Home->new;
 my $PUBLIC = $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/public');
 
-# For files from DATA sections
 my $LOADER = Mojo::Loader->new;
 
 sub dispatch {
@@ -125,13 +124,7 @@ sub _get_data_file {
   # Protect templates
   return undef if $rel =~ /\.\w+\.\w+$/;
 
-  # Index DATA files
-  unless ($self->{index}) {
-    my $index = $self->{index} = {};
-    for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{$LOADER->data($class)};
-    }
-  }
+  $self->_warmup unless $self->{index};
 
   # Find file
   return undef
@@ -143,6 +136,14 @@ sub _get_file {
   my ($self, $path) = @_;
   no warnings 'newline';
   return -f $path && -r $path ? Mojo::Asset::File->new(path => $path) : undef;
+}
+
+sub _warmup {
+  my $self = shift;
+  my $index = $self->{index} = {};
+  for my $class (reverse @{$self->classes}) {
+    $index->{$_} = $class for keys %{$LOADER->data($class)};
+  }
 }
 
 1;

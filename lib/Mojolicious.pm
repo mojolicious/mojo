@@ -188,7 +188,11 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-sub start { shift->commands->run(@_ ? @_ : @ARGV) }
+sub start {
+  my $self = shift;
+  $_->_warmup for $self->static, $self->renderer;
+  return $self->commands->run(@_ ? @_ : @ARGV);
+}
 
 sub startup { }
 

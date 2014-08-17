@@ -705,7 +705,7 @@ L<Mojolicious/"types">.
 
 Similar to templates, but with only a single file extension and optional
 Base64 encoding, static files can be inlined in the C<DATA> section and are
-served automatically.
+served automatically for C<GET> and C<HEAD> requests.
 
   use Mojolicious::Lite;
 
@@ -718,8 +718,8 @@ served automatically.
   @@ test.txt (base64)
   dGVzdCAxMjMKbGFsYWxh
 
-External static files are not limited to a single file extension and will be
-served automatically from a C<public> directory if it exists.
+External static files are not limited to a single file extension and will also
+be served automatically from a C<public> directory if it exists.
 
   $ mkdir public
   $ mv something.js public/something.js

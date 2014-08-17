@@ -19,6 +19,9 @@ my $MTIME = time;
 my $HOME   = Mojo::Home->new;
 my $PUBLIC = $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/public');
 
+# For files from DATA sections
+my $LOADER = Mojo::Loader->new;
+
 sub dispatch {
   my ($self, $c) = @_;
 
@@ -123,17 +126,16 @@ sub _get_data_file {
   return undef if $rel =~ /\.\w+\.\w+$/;
 
   # Index DATA files
-  my $loader = Mojo::Loader->new;
   unless ($self->{index}) {
     my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{$loader->data($class)};
+      $index->{$_} = $class for keys %{$LOADER->data($class)};
     }
   }
 
   # Find file
   return undef
-    unless defined(my $data = $loader->data($self->{index}{$rel}, $rel));
+    unless defined(my $data = $LOADER->data($self->{index}{$rel}, $rel));
   return Mojo::Asset::Memory->new->add_chunk($data);
 }
 

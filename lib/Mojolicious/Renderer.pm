@@ -29,6 +29,9 @@ $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
 
+# For templates from DATA sections
+my $LOADER = Mojo::Loader->new;
+
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 
 sub accepts {
@@ -56,17 +59,16 @@ sub get_data_template {
   my ($self, $options) = @_;
 
   # Index DATA templates
-  my $loader = Mojo::Loader->new;
   unless ($self->{index}) {
     my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{$loader->data($class)};
+      $index->{$_} = $class for keys %{$LOADER->data($class)};
     }
   }
 
   # Find template
   my $template = $self->template_name($options);
-  return $loader->data($self->{index}{$template}, $template);
+  return $LOADER->data($self->{index}{$template}, $template);
 }
 
 sub get_helper {
@@ -236,9 +238,8 @@ sub _handlers {
       for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
 
     # DATA templates
-    my $loader = Mojo::Loader->new;
     s/\.(\w+)$// and push @{$self->{templates}{$_}}, $1
-      for map { sort keys %{$loader->data($_)} } @{$self->classes};
+      for map { sort keys %{$LOADER->data($_)} } @{$self->classes};
   }
 
   return $self->{templates}{$file};

@@ -57,10 +57,8 @@ sub add_helper  { shift->_add(helpers  => @_) }
 sub get_data_template {
   my ($self, $options) = @_;
 
-  $self->_warmup unless $self->{index};
-
   # Find template
-  my $template = $self->template_name($options);
+  return undef unless my $template = $self->template_name($options);
   return $LOADER->data($self->{index}{$template}, $template);
 }
 
@@ -167,7 +165,8 @@ sub template_for {
 sub template_handler {
   my ($self, $options) = @_;
   return undef unless my $file = $self->template_name($options);
-  return $self->default_handler unless my $handlers = $self->_handlers($file);
+  return $self->default_handler
+    unless my $handlers = $self->{templates}{$file};
   return $handlers->[0];
 }
 
@@ -178,11 +177,13 @@ sub template_name {
   return undef unless my $format   = $options->{format};
   $template .= ".$format";
 
+  $self->_warmup unless $self->{templates};
+
   # Variants
   my $handler = $options->{handler};
   if (defined(my $variant = $options->{variant})) {
     $variant = "$template+$variant";
-    my $handlers = $self->_handlers($variant) // [];
+    my $handlers = $self->{templates}{$variant} // [];
     $template = $variant
       if @$handlers && !defined $handler || grep { $_ eq $handler } @$handlers;
   }
@@ -221,12 +222,6 @@ sub _extends {
   return delete $stash->{extends};
 }
 
-sub _handlers {
-  my ($self, $file) = @_;
-  $self->_warmup unless $self->{templates};
-  return $self->{templates}{$file};
-}
-
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
@@ -247,16 +242,16 @@ sub _warmup {
 
   my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
 
-  # Classes
+  # Classes for DATA templates
   for my $class (reverse @{$self->classes}) {
     $index->{$_} = $class for keys %{$LOADER->data($class)};
   }
 
-  # Templates
+  # Handlers for templates
   s/\.(\w+)$// and push @{$templates->{$_}}, $1
     for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
 
-  # DATA templates
+  # Handlers for DATA templates
   s/\.(\w+)$// and push @{$templates->{$_}}, $1
     for map { sort keys %{$LOADER->data($_)} } @{$self->classes};
 }

@@ -22,9 +22,14 @@ my $PUBLIC = $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/public');
 sub dispatch {
   my ($self, $c) = @_;
 
+  # Method (GET or HEAD)
+  my $req    = $c->req;
+  my $method = $req->method;
+  return undef unless $method eq 'GET' || $method eq 'HEAD';
+
   # Canonical path
   my $stash = $c->stash;
-  my $path  = $c->req->url->path;
+  my $path  = $req->url->path;
   $path = $stash->{path} ? $path->new($stash->{path}) : $path->clone;
   return undef unless my @parts = @{$path->canonicalize->parts};
 

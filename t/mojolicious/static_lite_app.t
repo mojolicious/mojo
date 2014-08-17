@@ -12,6 +12,8 @@ use Test::Mojo;
 
 get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
+options '/hello.txt' => sub { shift->render(text => 'Options!') };
+
 get '/etag' => sub {
   my $c = shift;
   $c->is_fresh(etag => 'abc')
@@ -49,6 +51,17 @@ $t->get_ok('/hello.txt')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
   ->content_is("Hello Mojo from a static file!\n");
+
+# Static file (HEAD)
+$t->head_ok('/hello.txt')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
+  ->content_is('');
+
+# Route for method other than GET and HEAD
+$t->options_ok('/hello.txt')->status_is(200)
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 8)->content_is('Options!');
 
 # Partial static file
 $t->get_ok('/hello.txt' => {Range => 'bytes=2-8'})->status_is(206)

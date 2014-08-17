@@ -59,15 +59,11 @@ sub parse {
 sub render {
   my ($self, $values, $render) = @_;
 
-  # Merge values with defaults
-  my $format = ($values ||= {})->{format};
-  my $defaults = $self->defaults;
-  $values = {%$defaults, %$values};
-
   # Placeholders can only be optional without a format
-  my $optional = !$format;
+  my $optional = !(my $format = $values->{format});
 
-  my $str = '';
+  my $str      = '';
+  my $defaults = $self->defaults;
   for my $token (reverse @{$self->tree}) {
     my ($op, $value) = @$token[0, 1];
     my $fragment = '';
@@ -80,8 +76,8 @@ sub render {
 
     # Placeholder
     else {
-      $fragment = $values->{$value} // '';
       my $default = $defaults->{$value};
+      $fragment = $values->{$value} // $default // '';
       if (!defined $default || ($default ne $fragment)) { $optional = 0 }
       elsif ($optional) { $fragment = '' }
     }

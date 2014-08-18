@@ -12,6 +12,12 @@ use Test::Mojo;
 
 get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
+post '/hello4.txt' => sub {
+  my $c = shift;
+  $c->res->headers->content_type('text/html');
+  $c->render_static('hello2.txt');
+};
+
 options '/hello.txt' => sub { shift->render(text => 'Options!') };
 
 get '/etag' => sub {
@@ -62,6 +68,10 @@ $t->head_ok('/hello.txt')->status_is(200)
 $t->options_ok('/hello.txt')->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 8)->content_is('Options!');
+
+# Unknown method
+$t->put_ok('/hello.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)');
 
 # Partial static file
 $t->get_ok('/hello.txt' => {Range => 'bytes=2-8'})->status_is(206)
@@ -122,6 +132,11 @@ $t->get_ok('/hello3.txt' => {Range => 'bytes=0-0'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->header_is('Content-Range' => 'bytes 0-0/1')->content_is('X');
+
+# Render static file with custom content type
+$t->post_ok('/hello4.txt')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/html')
+  ->header_is('Content-Length' => 1)->content_is('X');
 
 # Fresh content
 $t->get_ok('/etag')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

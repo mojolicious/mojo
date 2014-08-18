@@ -80,10 +80,15 @@ sub is_fresh {
 
 sub serve {
   my ($self, $c, $rel) = @_;
+
   return undef unless my $asset = $self->file($rel);
-  my $types = $c->app->types;
-  my $type = $rel =~ /\.(\w+)$/ ? $types->type($1) : undef;
-  $c->res->headers->content_type($type || $types->type('txt'));
+
+  my $types   = $c->app->types;
+  my $type    = $rel =~ /\.(\w+)$/ ? $types->type($1) : undef;
+  my $headers = $c->res->headers;
+  $headers->content_type($type || $types->type('txt'))
+    unless $headers->content_type;
+
   return !!$self->serve_asset($c, $asset);
 }
 

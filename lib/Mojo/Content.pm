@@ -10,6 +10,9 @@ has headers           => sub { Mojo::Headers->new };
 has max_buffer_size   => sub { $ENV{MOJO_MAX_BUFFER_SIZE} || 262144 };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
+my $BOUNDARY_RE
+  = qr!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i;
+
 sub body_contains {
   croak 'Method "body_contains" not implemented by subclass';
 }
@@ -17,10 +20,7 @@ sub body_contains {
 sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
 sub boundary {
-  return undef unless my $type = shift->headers->content_type;
-  $type =~ m!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i
-    and return $1 // $2;
-  return undef;
+  (shift->headers->content_type // '') =~ $BOUNDARY_RE ? $1 // $2 : undef;
 }
 
 sub build_body    { shift->_build('get_body_chunk') }

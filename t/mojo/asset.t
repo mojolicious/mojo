@@ -9,6 +9,8 @@ use Mojo::Asset::Memory;
 
 # File asset
 my $file = Mojo::Asset::File->new;
+is $file->size,  0,  'file is empty';
+is $file->slurp, '', 'file is empty';
 $file->add_chunk('abc');
 is $file->contains('abc'), 0,  '"abc" at position 0';
 is $file->contains('bc'),  1,  '"bc" at position 1';

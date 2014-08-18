@@ -70,11 +70,8 @@ sub attr {
       $code .= ref $default eq 'CODE' ? '$default->($_[0]);' : '$default;';
     }
 
-    # Store value
-    $code .= "\n  }\n  \$_[0]{'$attr'} = \$_[1];\n";
-
-    # Footer (return invocant)
-    $code .= "  \$_[0];\n}";
+    # Footer (store value and return invocant)
+    $code .= "\n  }\n  \$_[0]{'$attr'} = \$_[1];\n  \$_[0];\n}";
 
     warn "-- Attribute $attr in $class\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
     Carp::croak "Mojo::Base error: $@" unless eval "$code;1";

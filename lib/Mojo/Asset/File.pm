@@ -78,8 +78,7 @@ sub contains {
     # Search window
     my $pos = index $window, $str;
     return $offset + $pos if $pos >= 0;
-    $offset += $read;
-    return -1 if $read == 0 || $offset == $end;
+    return -1 if $read == 0 || ($offset += $read) == $end;
 
     # Resize window
     substr $window, 0, $read, '';
@@ -98,8 +97,7 @@ sub get_chunk {
 
   my $buffer;
   if (defined(my $end = $self->end_range)) {
-    my $chunk = $end + 1 - $offset;
-    return '' if $chunk <= 0;
+    return '' if (my $chunk = $end + 1 - $offset) <= 0;
     $handle->sysread($buffer, $chunk > $max ? $max : $chunk);
   }
   else { $handle->sysread($buffer, $max) }
@@ -128,11 +126,8 @@ sub size {
 }
 
 sub slurp {
-  my $handle = shift->handle;
-  $handle->sysseek(0, SEEK_SET);
-  my $content = '';
-  while ($handle->sysread(my $buffer, 131072)) { $content .= $buffer }
-  return $content;
+  return '' unless defined(my $file = shift->path);
+  return Mojo::Util::slurp $file;
 }
 
 1;

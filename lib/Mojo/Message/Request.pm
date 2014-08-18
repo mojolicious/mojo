@@ -223,10 +223,8 @@ sub _parse_env {
   $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
 
   # Scheme/Version
-  if (($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!) {
-    $base->scheme($1);
-    $self->version($2);
-  }
+  $base->scheme($1) and $self->version($2)
+    if ($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!;
 
   # HTTPS
   $base->scheme('https') if uc($env->{HTTPS} // '') eq 'ON';

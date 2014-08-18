@@ -1,5 +1,5 @@
 
-5.31  2014-08-18
+5.31  2014-08-19
   - Improved Mojolicious::Static to allow custom content types.
 
 5.30  2014-08-17

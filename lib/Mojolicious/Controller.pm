@@ -748,6 +748,10 @@ Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
 method does not protect from traversing to parent directories.
 
+  # Serve file with a custom content type
+  $c->res->headers->content_type('application/myapp');
+  $c->render_static('foo.txt');
+
 =head2 render_to_string
 
   my $output = $c->render_to_string('foo/index', format => 'pdf');

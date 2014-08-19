@@ -62,21 +62,20 @@ sub render {
   # Placeholders can only be optional without a format
   my $optional = !(my $format = $values->{format});
 
-  my $str      = '';
-  my $defaults = $self->defaults;
+  my $str = '';
   for my $token (reverse @{$self->tree}) {
     my ($op, $value) = @$token[0, 1];
     my $fragment = '';
 
-    # Slash
-    if ($op eq 'slash') { $fragment = '/' unless $optional }
-
     # Text
-    elsif ($op eq 'text') { ($fragment, $optional) = ($value, 0) }
+    if ($op eq 'text') { ($fragment, $optional) = ($value, 0) }
+
+    # Slash
+    elsif ($op eq 'slash') { $fragment = '/' unless $optional }
 
     # Placeholder
     else {
-      my $default = $defaults->{$value};
+      my $default = $self->defaults->{$value};
       $fragment = $values->{$value} // $default // '';
       if (!defined $default || ($default ne $fragment)) { $optional = 0 }
       elsif ($optional) { $fragment = '' }
@@ -198,18 +197,21 @@ sub _tokenize {
     # Quote end
     elsif ($char eq $quote_end) { ($inside, $quoted) = (0, 0) }
 
-    # Slash
+    # Slash (first slash is text for optimizations)
     elsif ($char eq '/') {
-      push @tree, ['slash'];
+      push @tree, @tree ? ['slash'] : ['text', '/'];
       $inside = 0;
     }
 
     # Placeholder, relaxed or wildcard
     elsif ($inside) { $tree[-1][-1] .= $char }
 
-    # Text
+    # Text (optimize text followed by slash followed by text)
     elsif ($tree[-1][0] eq 'text') { $tree[-1][-1] .= $char }
-    else                           { push @tree, ['text', $char] }
+    elsif ($tree[-2] && $tree[-2][0] eq 'text' && $tree[-1][0] eq 'slash') {
+      pop @tree && ($tree[-1][-1] .= "/$char");
+    }
+    else { push @tree, ['text', $char] }
   }
 
   return $self->pattern($pattern)->tree(\@tree);

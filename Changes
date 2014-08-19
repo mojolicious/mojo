@@ -1,6 +1,7 @@
 
 5.31  2014-08-19
   - Improved Mojolicious::Static to allow custom content types.
+  - Improved url_for performance.
 
 5.30  2014-08-17
   - Improved Mojolicious::Static to only handle GET and HEAD requests.

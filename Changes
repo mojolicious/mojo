@@ -1,4 +1,6 @@
 
+5.32  2014-08-20
+
 5.31  2014-08-19
   - Improved Mojolicious::Static to allow custom content types.
   - Improved url_for performance.

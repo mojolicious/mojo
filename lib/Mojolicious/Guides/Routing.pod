@@ -299,8 +299,8 @@ C<controller#action>.
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye'}
   $r->route('/bye')->to('foo#bye', mymessage => 'Bye');
 
-During camelization C<-> gets replaced with C<::>, this allows multi-level
-C<controller> hierarchies.
+During camelization C<-> characters get replaced with C<::>, this allows
+multi-level C<controller> hierarchies.
 
   # / -> MyApp::Controller::Foo::Bar->hi
   $r->route('/')->to('foo-bar#hi');

@@ -24,12 +24,19 @@ utilizing multiple template systems and data encoding modules.
 
 Templates can be automatically detected if enough information is provided by
 the developer or routes. Template names are expected to follow the
-C<name.format.handler> scheme, with C<name> defaulting to C<controller/action>
-or the route name, C<format> defaulting to C<html> and C<handler> to C<ep>.
+C<template.format.handler> scheme, with C<template> defaulting to
+C<controller/action> or the route name, C<format> defaulting to C<html> and
+C<handler> to C<ep>.
 
   {controller => 'users', action => 'list'} -> 'users/list.html.ep'
-  {name => 'foo', format => 'txt'}          -> 'foo.txt.ep'
-  {name => 'foo', handler => 'epl'}         -> 'foo.html.epl'
+  {template => 'foo', format => 'txt'}      -> 'foo.txt.ep'
+  {template => 'foo', handler => 'epl'}     -> 'foo.html.epl'
+
+The C<controller> value gets decamelized using L<Mojo::Util/"decamelize"> and
+C<-> characters replaced with C</>.
+
+  {controller => 'My::Users', action => 'add'} -> 'my/users/add.html.ep'
+  {controller => 'my-users', action => 'show'} -> 'my/users/show.html.ep'
 
 All templates should be in the C<templates> directories of the application,
 which can be customized with L<Mojolicious::Renderer/"paths">, or one of the

@@ -64,7 +64,7 @@ sub render {
 
   my $str = '';
   for my $token (reverse @{$self->tree}) {
-    my ($op, $value) = @$token[0, 1];
+    my ($op, $value) = @$token;
     my $fragment = '';
 
     # Text
@@ -99,21 +99,21 @@ sub _compile {
   my $block = my $regex = '';
   my $optional = 1;
   for my $token (reverse @{$self->tree}) {
-    my ($op, $value) = @$token[0, 1];
+    my ($op, $value) = @$token;
     my $fragment = '';
 
+    # Text
+    if ($op eq 'text') { ($fragment, $optional) = (quotemeta $value, 0) }
+
     # Slash
-    if ($op eq 'slash') {
+    elsif ($op eq 'slash') {
       $regex = ($optional ? "(?:/$block)?" : "/$block") . $regex;
       ($block, $optional) = ('', 1);
       next;
     }
 
-    # Text
-    elsif ($op eq 'text') { ($fragment, $optional) = (quotemeta $value, 0) }
-
     # Placeholder
-    elsif ($op eq 'placeholder' || $op eq 'relaxed' || $op eq 'wildcard') {
+    else {
       unshift @$placeholders, $value;
 
       # Placeholder
@@ -123,11 +123,10 @@ sub _compile {
       elsif ($op eq 'relaxed') { $fragment = '([^/]+)' }
 
       # Wildcard
-      elsif ($op eq 'wildcard') { $fragment = '(.+)' }
+      else { $fragment = '(.+)' }
 
       # Custom regex
-      my $constraint = $constraints->{$value};
-      $fragment = _compile_req($constraint) if $constraint;
+      if (my $c = $constraints->{$value}) { $fragment = _compile_req($c) }
 
       # Optional placeholder
       exists $defaults->{$value} ? ($fragment .= '?') : ($optional = 0);
@@ -317,7 +316,7 @@ Character indicating a relaxed placeholder, defaults to C<#>.
 =head2 tree
 
   my $tree = $pattern->tree;
-  $pattern = $pattern->tree([['slash'], ['text', 'foo']]);
+  $pattern = $pattern->tree([['text', '/foo']]);
 
 Pattern in parsed form. Note that this structure should only be used very
 carefully since it is very dynamic.

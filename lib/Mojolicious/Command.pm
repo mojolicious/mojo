@@ -20,8 +20,7 @@ has usage       => "Usage: APPLICATION\n";
 sub chmod_file {
   my ($self, $path, $mod) = @_;
   chmod $mod, $path or croak qq{Can't chmod file "$path": $!};
-  $mod = sprintf '%lo', $mod;
-  say "  [chmod] $path $mod" unless $self->quiet;
+  say "  [chmod] $path " . sprintf('%lo', $mod) unless $self->quiet;
   return $self;
 }
 

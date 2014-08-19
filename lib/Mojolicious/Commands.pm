@@ -83,10 +83,7 @@ sub run {
   return print $self->message, tablify(\@rows), $self->hint;
 }
 
-sub start_app {
-  my $self = shift;
-  return Mojo::Server->new->build_app(shift)->start(@_);
-}
+sub start_app { shift; Mojo::Server->new->build_app(shift)->start(@_) }
 
 sub _command {
   my ($module, $fatal) = @_;

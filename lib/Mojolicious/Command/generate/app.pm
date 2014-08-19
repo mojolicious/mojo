@@ -19,7 +19,7 @@ EOF
   # Script
   my $name = class_to_file $class;
   $self->render_to_rel_file('mojo', "$name/script/$name", $class);
-  $self->chmod_file("$name/script/$name", 0744);
+  $self->chmod_rel_file("$name/script/$name", 0744);
 
   # Application class
   my $app = class_to_path $class;

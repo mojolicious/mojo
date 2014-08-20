@@ -1,5 +1,7 @@
 
-5.32  2014-08-20
+5.32  2014-08-21
+  - Added to_datetime method to Mojo::Date.
+  - Improved Mojo::Date to support RFC 3339.
 
 5.31  2014-08-19
   - Improved Mojolicious::Static to allow custom content types.

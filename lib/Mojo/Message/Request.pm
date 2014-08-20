@@ -11,11 +11,9 @@ has url => sub { Mojo::URL->new };
 has 'reverse_proxy';
 
 my $START_LINE_RE = qr/
-  ^
-  ([a-zA-Z]+)                                               # Method
+  ^([a-zA-Z]+)                                              # Method
   \s+([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
-  \s+HTTP\/(\d\.\d)                                         # Version
-  $
+  \s+HTTP\/(\d\.\d)$                                        # Version
 /x;
 
 sub clone {

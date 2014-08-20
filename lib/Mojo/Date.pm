@@ -7,10 +7,8 @@ use Time::Local 'timegm';
 has 'epoch';
 
 my $RFC3339_RE = qr/
-  ^
-  (\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(?:\.\d+)?   # Date and time
-  (?:Z|([+-])(\d+):(\d+))?                        # Offset
-  $
+  ^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(?:\.\d+)?   # Date and time
+  (?:Z|([+-])(\d+):(\d+))?$                        # Offset
 /xi;
 
 my @DAYS   = qw(Sun Mon Tue Wed Thu Fri Sat);
@@ -33,7 +31,7 @@ sub parse {
     ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
 
-  # RFC 3339
+  # RFC 3339 (1994-11-06T08:49:37Z)
   elsif ($date =~ $RFC3339_RE) {
     ($year, $month, $day, $h, $m, $s) = ($1, $2 - 1, $3, $4, $5, $6);
     $offset = (($8 * 3600) + ($9 * 60)) * ($7 eq '-' ? -1 : 1) if $7;
@@ -91,7 +89,7 @@ Mojo::Date - HTTP date
   say $date->epoch;
 
   # Build
-  my $date = Mojo::Date->new(time);
+  my $date = Mojo::Date->new(time + 60);
   say "$date";
 
 =head1 DESCRIPTION
@@ -100,11 +98,6 @@ L<Mojo::Date> implements HTTP date and time functions based on
 L<RFC 7230|http://tools.ietf.org/html/rfc7230>,
 L<RFC 7231|http://tools.ietf.org/html/rfc7231> and
 L<RFC 3339|http://tools.ietf.org/html/rfc3339>.
-
-  Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
-  Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
-  Sun Nov  6 08:49:37 1994       ; ANSI C's asctime() format
-  1994-11-06T08:49:37Z           ; RFC 3339
 
 =head1 ATTRIBUTES
 

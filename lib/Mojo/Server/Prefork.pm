@@ -257,9 +257,9 @@ Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
 L<Mojo::Server::Prefork> is a full featured, UNIX optimized, preforking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Daemon>, with IPv6, TLS, Comet (long polling),
-keep-alive, connection pooling, timeout, cookie, multipart and multiple event
-loop support. Note that the server uses signals for process management, so you
-should avoid modifying signal handlers in your applications.
+keep-alive and multiple event loop support. Note that the server uses signals
+for process management, so you should avoid modifying signal handlers in your
+applications.
 
 For better scalability (epoll, kqueue) and to provide IPv6, SOCKS5 as well as
 TLS support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+),

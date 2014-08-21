@@ -142,6 +142,10 @@ Parse date.
 
   # RFC 3339
   say Mojo::Date->new('1994-11-06T08:49:37Z')->epoch;
+  say Mojo::Date->new('1994-11-06T08:49:37')->epoch;
+  say Mojo::Date->new('1994-11-06T08:49:37.21Z')->epoch;
+  say Mojo::Date->new('1994-11-06T08:49:37+01:00')->epoch;
+  say Mojo::Date->new('1994-11-06T08:49:37-01:00')->epoch;
 
 =head2 to_datetime
 

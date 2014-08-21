@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Tiger Face';
-our $VERSION  = '5.32';
+our $VERSION  = '5.33';
 
 sub AUTOLOAD {
   my $self = shift;

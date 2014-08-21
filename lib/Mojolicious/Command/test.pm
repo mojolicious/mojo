@@ -1,11 +1,7 @@
 package Mojolicious::Command::test;
 use Mojo::Base 'Mojolicious::Command';
 
-use Cwd 'realpath';
-use FindBin;
-use File::Spec::Functions qw(abs2rel catdir splitdir);
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
-use Mojo::Home;
 
 has description => 'Run tests.';
 has usage => sub { shift->extract_usage };
@@ -15,19 +11,11 @@ sub run {
 
   GetOptionsFromArray \@args, 'v|verbose' => sub { $ENV{HARNESS_VERBOSE} = 1 };
 
-  unless (@args) {
-    my @base = splitdir(abs2rel $FindBin::Bin);
-
-    # "./t"
-    my $path = catdir @base, 't';
-
-    # "../t"
-    $path = catdir @base, '..', 't' unless -d $path;
-    die "Can't find test directory.\n" unless -d $path;
-
-    my $home = Mojo::Home->new($path);
-    /\.t$/ and push @args, $home->rel_file($_) for @{$home->list_files};
-    say "Running tests from '", realpath($path), "'.";
+  if (!@args && (my $home = $self->app->home)) {
+    die "Can't find test directory.\n" unless -d $home->rel_dir('t');
+    my $files = $home->list_files('t');
+    /\.t$/ and push @args, $home->rel_file("t/$_") for @$files;
+    say qq{Running tests from "}, $home->rel_dir('t') . '".';
   }
 
   $ENV{HARNESS_OPTIONS} //= 'c';

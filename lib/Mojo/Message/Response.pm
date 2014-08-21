@@ -56,7 +56,6 @@ my %MESSAGES = (
   428 => 'Precondition Required',              # RFC 6585
   429 => 'Too Many Requests',                  # RFC 6585
   431 => 'Request Header Fields Too Large',    # RFC 6585
-  451 => 'Unavailable For Legal Reasons',      # Draft
   500 => 'Internal Server Error',
   501 => 'Not Implemented',
   502 => 'Bad Gateway',

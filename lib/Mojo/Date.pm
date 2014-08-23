@@ -4,7 +4,7 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Time::Local 'timegm';
 
-has 'epoch';
+has epoch => sub {time};
 
 my $RFC3339_RE = qr/
   ^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(?:\.\d+)?   # Date and time
@@ -48,18 +48,18 @@ sub parse {
   }
 
   # Invalid
-  else { return $self }
+  else { return $self->epoch(undef) }
 
   # Prevent crash
-  my $epoch = eval { timegm($s, $m, $h, $day, $month, $year) };
-  return
-    defined $epoch && ($epoch += $offset) >= 0 ? $self->epoch($epoch) : $self;
+  my $epoch = eval { timegm $s, $m, $h, $day, $month, $year };
+  return $self->epoch(
+    (defined $epoch && ($epoch += $offset) >= 0) ? $epoch : undef);
 }
 
 sub to_datetime {
 
   # RFC 3339 (1994-11-06T08:49:37Z)
-  my ($s, $m, $h, $day, $month, $year) = gmtime(shift->epoch // time);
+  my ($s, $m, $h, $day, $month, $year) = gmtime shift->epoch;
   return sprintf '%04d-%02d-%02dT%02d:%02d:%02dZ', $year + 1900, $month + 1,
     $day, $h, $m, $s;
 }
@@ -67,7 +67,7 @@ sub to_datetime {
 sub to_string {
 
   # RFC 7231 (Sun, 06 Nov 1994 08:49:37 GMT)
-  my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime(shift->epoch // time);
+  my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime shift->epoch;
   return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT', $DAYS[$wday], $mday,
     $MONTHS[$month], $year + 1900, $h, $m, $s;
 }
@@ -108,7 +108,7 @@ L<Mojo::Date> implements the following attributes.
   my $epoch = $date->epoch;
   $date     = $date->epoch(784111777);
 
-Epoch seconds.
+Epoch seconds, defaults to the current time.
 
 =head1 METHODS
 

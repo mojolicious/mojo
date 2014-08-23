@@ -68,6 +68,13 @@ is "$date", 'Sun, 06 Nov 1994 08:49:37 GMT', 'right format';
 $date = Mojo::Date->new(1305280824);
 is $date->to_string, 'Fri, 13 May 2011 10:00:24 GMT', 'right format';
 
+# Current time roundtrips
+my $before = time;
+ok(Mojo::Date->new(Mojo::Date->new->to_string)->epoch >= $before,
+  'successful roundtrip');
+ok(Mojo::Date->new(Mojo::Date->new->to_datetime)->epoch >= $before,
+  'successful roundtrip');
+
 # Zero time checks
 $date = Mojo::Date->new(0);
 is $date->epoch, 0, 'right epoch value';

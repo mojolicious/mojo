@@ -7,7 +7,7 @@ use Time::Local 'timegm';
 has epoch => sub {time};
 
 my $RFC3339_RE = qr/
-  ^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(?:\.\d+)?   # Date and time
+  ^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+(?:\.\d+)?)   # Date and time
   (?:Z|([+-])(\d+):(\d+))?$                        # Offset
 /xi;
 
@@ -22,7 +22,7 @@ sub parse {
   my ($self, $date) = @_;
 
   # epoch (784111777)
-  return $self->epoch($date) if $date =~ /^\d+$/;
+  return $self->epoch($date) if $date =~ /^\d+$|^\d+\.\d+$/;
 
   # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
   my $offset = 0;
@@ -59,9 +59,10 @@ sub parse {
 sub to_datetime {
 
   # RFC 3339 (1994-11-06T08:49:37Z)
-  my ($s, $m, $h, $day, $month, $year) = gmtime shift->epoch;
-  return sprintf '%04d-%02d-%02dT%02d:%02d:%02dZ', $year + 1900, $month + 1,
+  my ($s, $m, $h, $day, $month, $year) = gmtime(my $epoch = shift->epoch);
+  my $str = sprintf '%04d-%02d-%02dT%02d:%02d:%02d', $year + 1900, $month + 1,
     $day, $h, $m, $s;
+  return $epoch =~ /\.(\d+)$/ ? "$str.$1Z" : "${str}Z";
 }
 
 sub to_string {
@@ -130,6 +131,7 @@ Parse date.
 
   # Epoch
   say Mojo::Date->new('784111777')->epoch;
+  say Mojo::Date->new('784111777.21')->epoch;
 
   # RFC 822/1123
   say Mojo::Date->new('Sun, 06 Nov 1994 08:49:37 GMT')->epoch;
@@ -155,6 +157,9 @@ Render L<RFC 3339|http://tools.ietf.org/html/rfc3339> date and time.
 
   # "1994-11-06T08:49:37Z"
   Mojo::Date->new(784111777)->to_datetime;
+
+  # "1994-11-06T08:49:37.21Z"
+  Mojo::Date->new(784111777.21)->to_datetime;
 
 =head2 to_string
 

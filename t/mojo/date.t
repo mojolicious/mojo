@@ -15,7 +15,7 @@ is(Mojo::Date->new('2014-08-20T20:45:00')->epoch,
 is(Mojo::Date->new(1408567500)->to_datetime,
   '2014-08-20T20:45:00Z', 'right format');
 is(Mojo::Date->new('2014-08-20T20:45:00.01')->epoch,
-  1408567500, 'right epoch value');
+  1408567500.01, 'right epoch value');
 is(Mojo::Date->new('2014-08-20T20:45:00-00:46')->epoch,
   1408570260, 'right epoch value');
 is(Mojo::Date->new(1408570260)->to_datetime,
@@ -29,9 +29,9 @@ is(Mojo::Date->new(1408561140)->to_datetime,
 is(Mojo::Date->new('1994-11-06T08:49:37Z')->epoch,
   784111777, 'right epoch value');
 is(Mojo::Date->new('1994-11-06t08:49:37.33z')->epoch,
-  784111777, 'right epoch value');
-is(Mojo::Date->new(784111777)->to_datetime,
-  '1994-11-06T08:49:37Z', 'right format');
+  784111777.33, 'right epoch value');
+is(Mojo::Date->new(784111777.33)->to_datetime,
+  '1994-11-06T08:49:37.33Z', 'right format');
 
 # RFC 850/1036
 is(Mojo::Date->new('Sunday, 06-Nov-94 08:49:37 GMT')->epoch,

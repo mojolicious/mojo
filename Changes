@@ -1,5 +1,6 @@
 
 5.33  2014-08-23
+  - Improved Mojo::Date to be able to handle higher precision times.
   - Improved Mojo::ByteStream performance.
 
 5.32  2014-08-21

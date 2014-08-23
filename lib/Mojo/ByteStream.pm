@@ -1,6 +1,6 @@
 package Mojo::ByteStream;
 use Mojo::Base -strict;
-use overload '""' => sub { shift->to_string }, fallback => 1;
+use overload '""' => sub { ${shift()} }, fallback => 1;
 
 use Exporter 'import';
 use Mojo::Collection;
@@ -52,7 +52,7 @@ sub split {
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
-sub to_string { ${$_[0]} }
+sub to_string { ${shift()} }
 
 sub _delegate {
   my ($self, $sub) = (shift, shift);

@@ -388,6 +388,11 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Scrape the latest headlines from a news site with CSS selectors
   say $ua->get('blogs.perl.org')->res->dom('h2 > a')->text->shuffle;
 
+  # Search DuckDuckGo anonymously through Tor
+  $ua->proxy->http('socks://127.0.0.1:9050');
+  say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')
+    ->res->json('/Abstract');
+
   # IPv6 PUT request with content
   my $tx
     = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');

@@ -131,12 +131,14 @@ sub get_start_line_chunk {
 sub is_empty {
   my $self = shift;
   return undef unless my $code = $self->code;
+  ($code) = split(' ',$code) unless ($code =~ m#^\d+$#);
   return $self->is_status_class(100) || $code == 204 || $code == 304;
 }
 
 sub is_status_class {
   my ($self, $class) = @_;
   return undef unless my $code = $self->code;
+  ($code) = split(' ',$code) unless ($code =~ m#^\d+$#);
   return $code >= $class && $code < ($class + 100);
 }
 

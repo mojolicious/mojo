@@ -5,7 +5,8 @@ use Carp 'croak';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-has [qw(kept_alive local_address local_port remote_port)];
+has [
+  qw(kept_alive local_address local_port original_remote_address remote_port)];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
@@ -47,10 +48,7 @@ sub remote_address {
   my $self = shift;
 
   # New address
-  if (@_) {
-    $self->{remote_address} = shift;
-    return $self;
-  }
+  return $self->original_remote_address(@_) if @_;
 
   # Reverse proxy
   if ($self->req->reverse_proxy) {
@@ -59,7 +57,7 @@ sub remote_address {
     $forwarded =~ /([^,\s]+)$/ and return $self->{forwarded_for} = $1;
   }
 
-  return $self->{remote_address};
+  return $self->original_remote_address;
 }
 
 sub resume       { shift->_state(qw(write resume)) }
@@ -155,6 +153,13 @@ Local interface address.
 
 Local interface port.
 
+=head2 original_remote_address
+
+  my $address = $tx->original_remote_address;
+  $tx         = $tx->original_remote_address('127.0.0.1');
+
+Remote interface address.
+
 =head2 remote_port
 
   my $port = $tx->remote_port;
@@ -246,7 +251,9 @@ Resume transaction.
   my $address = $tx->remote_address;
   $tx         = $tx->remote_address('127.0.0.1');
 
-Remote interface address.
+Same as L</"original_remote_address"> or the last value of the
+C<X-Forwarded-For> header if L<Mojo::Message::Request/"reverse_proxy"> is
+true.
 
 =head2 server_close
 

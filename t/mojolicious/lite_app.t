@@ -203,8 +203,9 @@ get '/root' => sub { shift->render(text => 'root fallback!') };
 get '/template.txt' => {template => 'template', format => 'txt'};
 
 get ':number' => [number => qr/0/] => sub {
-  my $c       = shift;
-  my $url     = $c->req->url->to_abs;
+  my $c   = shift;
+  my $url = $c->req->url->to_abs;
+  $c->res->headers->header('X-Original' => $c->tx->original_remote_address);
   my $address = $c->tx->remote_address;
   my $num     = $c->param('number');
   $c->render(text => "$url-$address-$num");
@@ -741,7 +742,8 @@ $t->get_ok('/.html')->status_is(200)
   local $ENV{MOJO_REVERSE_PROXY} = 1;
   $t->ua->server->restart;
   $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
-    ->status_is(200)->content_like(qr!http://localhost:\d+/0-192\.0\.2\.1-0$!);
+    ->status_is(200)->header_unlike('X-Original' => qr/192\.0\.2\.1/)
+    ->content_like(qr!http://localhost:\d+/0-192\.0\.2\.1-0$!);
 }
 
 # Reverse proxy with "X-Forwarded-Proto"

@@ -252,8 +252,8 @@ Resume transaction.
   $tx         = $tx->remote_address('127.0.0.1');
 
 Same as L</"original_remote_address"> or the last value of the
-C<X-Forwarded-For> header if L<Mojo::Message::Request/"reverse_proxy"> is
-true.
+C<X-Forwarded-For> header if L</"req"> has been performed through a reverse
+proxy.
 
 =head2 server_close
 

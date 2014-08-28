@@ -73,6 +73,35 @@ sub to_string {
     $MONTHS[$month], $year + 1900, $h, $m, $s;
 }
 
+sub to_words {
+  my $self = shift;
+  my $from = shift // time;
+
+  my $s = $from - $self->epoch;
+  $s = $s * -1 if my $in = $s < 0;
+  return _wrap($in, 'less than a minute') if $s < 45;
+  return _wrap($in, 'about a minute')     if $s < 90;
+
+  my $m = int($s / 60);
+  return _wrap($in, "$m minutes")    if $m < 45;
+  return _wrap($in, 'about an hour') if $m < 90;
+
+  my $h = int($m / 60);
+  return _wrap($in, "$h hours") if $h < 24;
+  return _wrap($in, 'a day')    if $h < 42;
+
+  my $days = int($h / 24);
+  return _wrap($in, "$days days")                  if $days < 30;
+  return _wrap($in, 'about a month')               if $days < 45;
+  return _wrap($in, "@{[int($days / 30)]} months") if $days < 365;
+
+  my $years = $days / 365;
+  return _wrap($in, 'about a year') if $years < 1.5;
+  return _wrap($in, "@{[int $years]} years");
+}
+
+sub _wrap { $_[0] ? "in $_[1]" : "$_[1] ago" }
+
 1;
 
 =encoding utf8
@@ -169,6 +198,46 @@ Render date suitable for HTTP messages.
 
   # "Sun, 06 Nov 1994 08:49:37 GMT"
   Mojo::Date->new(784111777)->to_string;
+
+=head2 to_words
+
+  my $str = $date->to_words;
+  my $str = $date->to_words(784111777);
+
+Distance of time in words from now or a specific point in time.
+
+  # "less than a minute ago"
+  Mojo::Date->new(time - 1)->to_words;
+
+  # "in about a minute"
+  Mojo::Date->new(time + 50)->to_words;
+
+  # "5 minutes ago"
+  Mojo::Date->new(time - 300)->to_words;
+
+  # "about an hour ago"
+  Mojo::Date->new(time - 3600)->to_words;
+
+  # "in 3 hours"
+  Mojo::Date->new(time + 10800)->to_words;
+
+  # "a day ago"
+  Mojo::Date->new(time - 86400)->to_words;
+
+  # "4 days ago"
+  Mojo::Date->new(time - 345600)->to_words;
+
+  # "about a month ago"
+  Mojo::Date->new(time - 2592000)->to_words;
+
+  # "5 months ago"
+  Mojo::Date->new(time - 12960000)->to_words;
+
+  # "about a year ago"
+  Mojo::Date->new(time - 33696000)->to_words;
+
+  # "in 3 years"
+  Mojo::Date->new(time + 101088000)->to_words;
 
 =head1 OPERATORS
 

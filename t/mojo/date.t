@@ -68,6 +68,44 @@ is "$date", 'Sun, 06 Nov 1994 08:49:37 GMT', 'right format';
 $date = Mojo::Date->new(1305280824);
 is $date->to_string, 'Fri, 13 May 2011 10:00:24 GMT', 'right format';
 
+# to_words
+$date = Mojo::Date->new;
+is $date->epoch(time - 1)->to_words, 'less than a minute ago', 'right words';
+my $now = time;
+is $date->epoch($now)->to_words($now + 1), 'less than a minute ago',
+  'right words';
+is $date->epoch($now)->to_words($now - 1), 'in less than a minute',
+  'right words';
+is $date->epoch($now)->to_words($now + 50), 'about a minute ago',
+  'right words';
+is $date->epoch($now)->to_words($now - 50), 'in about a minute', 'right words';
+is $date->epoch($now)->to_words($now + 300), '5 minutes ago', 'right words';
+is $date->epoch($now)->to_words($now - 300), 'in 5 minutes', 'right words';
+is $date->epoch($now)->to_words($now + 3600), 'about an hour ago',
+  'right words';
+is $date->epoch($now)->to_words($now - 3600), 'in about an hour',
+  'right words';
+is $date->epoch($now)->to_words($now + 10800), '3 hours ago', 'right words';
+is $date->epoch($now)->to_words($now - 10800), 'in 3 hours', 'right words';
+is $date->epoch($now)->to_words($now + 86400), 'a day ago', 'right words';
+is $date->epoch($now)->to_words($now - 86400), 'in a day', 'right words';
+is $date->epoch($now)->to_words($now + 345600), '4 days ago', 'right words';
+is $date->epoch($now)->to_words($now - 345600), 'in 4 days', 'right words';
+is $date->epoch($now)->to_words($now + 2592000), 'about a month ago',
+  'right words';
+is $date->epoch($now)->to_words($now - 2592000), 'in about a month',
+  'right words';
+is $date->epoch($now)->to_words($now + 12960000), '5 months ago',
+  'right words';
+is $date->epoch($now)->to_words($now - 12960000), 'in 5 months', 'right words';
+is $date->epoch($now)->to_words($now + 33696000), 'about a year ago',
+  'right words';
+is $date->epoch($now)->to_words($now - 33696000), 'in about a year',
+  'right words';
+is $date->epoch($now)->to_words($now + 101088000), '3 years ago',
+  'right words';
+is $date->epoch($now)->to_words($now - 101088000), 'in 3 years', 'right words';
+
 # Current time roundtrips
 my $before = time;
 ok(Mojo::Date->new(Mojo::Date->new->to_string)->epoch >= $before,

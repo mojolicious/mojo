@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 use Mojo::Collection;
+use Mojo::Date;
 use Mojo::IOLoop;
 use Mojo::Util qw(dumper sha1_sum steady_time);
 
@@ -32,10 +33,11 @@ sub register {
     qw(inactivity_timeout is_fresh url_with);
   $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
   $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
-  $app->helper(config  => sub { shift->app->config(@_) });
-  $app->helper(dumper  => sub { shift; dumper(@_) });
-  $app->helper(include => sub { shift->render_to_string(@_) });
-  $app->helper(ua      => sub { shift->app->ua });
+  $app->helper(config        => sub { shift->app->config(@_) });
+  $app->helper(time_in_words => sub { Mojo::Date->new($_[1])->to_words });
+  $app->helper(dumper        => sub { shift; dumper(@_) });
+  $app->helper(include       => sub { shift->render_to_string(@_) });
+  $app->helper(ua            => sub { shift->app->ua });
 }
 
 sub _accepts {
@@ -318,6 +320,13 @@ Alias for L<Mojolicious::Controller/"session">.
 Alias for L<Mojolicious::Controller/"stash">.
 
   %= stash('name') // 'Somebody'
+
+=head2 time_in_words
+
+  %= time_in_words 784111777
+
+Report the approximate distance in time from now with
+L<Mojo::Date/"to_words">.
 
 =head2 title
 

@@ -9,7 +9,7 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  GetOptionsFromArray \@args, 'v|verbose' => sub { $ENV{HARNESS_VERBOSE} = 1 };
+  GetOptionsFromArray \@args, 'v|verbose' => \$ENV{HARNESS_VERBOSE};
 
   if (!@args && (my $home = $self->app->home)) {
     die "Can't find test directory.\n" unless -d $home->rel_dir('t');

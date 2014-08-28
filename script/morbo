@@ -11,8 +11,8 @@ use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 GetOptions
   'h|help'     => \my $help,
   'l|listen=s' => \my @listen,
-  'm|mode=s'   => sub { $ENV{MOJO_MODE} = $_[1] },
-  'v|verbose'  => sub { $ENV{MORBO_VERBOSE} = 1 },
+  'm|mode=s'   => \$ENV{MOJO_MODE},
+  'v|verbose'  => \$ENV{MORBO_VERBOSE},
   'w|watch=s'  => \my @watch;
 
 my $app = shift;

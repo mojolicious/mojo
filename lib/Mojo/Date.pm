@@ -75,9 +75,8 @@ sub to_string {
 
 sub to_words {
   my $self = shift;
-  my $from = shift // time;
 
-  my $s = $from - $self->epoch;
+  my $s = (shift // time) - $self->epoch;
   $s = $s * -1 if my $in = $s < 0;
   return _wrap($in, 'less than a minute') if $s < 45;
   return _wrap($in, 'about a minute')     if $s < 90;
@@ -204,7 +203,7 @@ Render date suitable for HTTP messages.
   my $str = $date->to_words;
   my $str = $date->to_words(784111777);
 
-Distance of time in words from now or a specific point in time.
+Report the approximate distance of time from now or a specific point in time.
 
   # "less than a minute ago"
   Mojo::Date->new(time - 1)->to_words;

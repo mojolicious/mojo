@@ -47,17 +47,12 @@ sub is_writing { (shift->{state} // 'write') eq 'write' }
 sub remote_address {
   my $self = shift;
 
-  # New address
   return $self->original_remote_address(@_) if @_;
+  return $self->original_remote_address unless $self->req->reverse_proxy;
 
   # Reverse proxy
-  if ($self->req->reverse_proxy) {
-    return $self->{forwarded_for} if $self->{forwarded_for};
-    my $forwarded = $self->req->headers->header('X-Forwarded-For') // '';
-    $forwarded =~ /([^,\s]+)$/ and return $self->{forwarded_for} = $1;
-  }
-
-  return $self->original_remote_address;
+  return ($self->req->headers->header('X-Forwarded-For') // '')
+    =~ /([^,\s]+)$/ ? $1 : $self->original_remote_address;
 }
 
 sub resume       { shift->_state(qw(write resume)) }

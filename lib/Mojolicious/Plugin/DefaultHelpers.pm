@@ -325,8 +325,11 @@ Alias for L<Mojolicious::Controller/"stash">.
 
   %= time_in_words 784111777
 
-Report the approximate distance in time from now with
+Report the approximate distance of time from now with
 L<Mojo::Date/"to_words">.
+
+  # "in 5 minutes"
+  $c->time_in_words(time + 300);
 
 =head2 title
 

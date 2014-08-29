@@ -390,27 +390,51 @@ requests, with support for L</"GENERATORS">.
   my $tx = $t->tx(PUT => 'http://example.com');
   $tx->req->content->asset(Mojo::Asset::File->new(path => '/foo.txt'));
 
-  # GET request with query parameters
-  my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
+The C<json> content generator uses L<Mojo::JSON> for encoding and sets the
+content type to C<application/json>.
 
   # POST request with "application/json" content
   my $tx = $t->tx(
     POST => 'http://example.com' => json => {a => 'b', c => [1, 2, 3]});
 
+The C<form> content generator will automatically use query parameters for
+C<GET> and C<HEAD> requests.
+
+  # GET request with query parameters
+  my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
+
+For all other request methods the C<application/x-www-form-urlencoded> content
+type is used.
+
   # POST request with "application/x-www-form-urlencoded" content
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {a => 'b', c => 'd'});
+
+Parameters may be encoded with the C<charset> option.
 
   # PUT request with Shift_JIS encoded form values
   my $tx = $t->tx(
     PUT => 'example.com' => form => {a => 'b'} => charset => 'Shift_JIS');
 
+An array reference can be used for multiple form values sharing the same name.
+
   # POST request with form values sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});
+
+A hash reference with a C<content> value can be used to switch to the
+C<multipart/form-data> content type.
 
   # POST request with "multipart/form-data" content
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {mytext => {content => 'lala'}});
+
+  # POST request with multiple files sharing the same name
+  my $tx = $t->tx(POST => 'http://example.com' =>
+    form => {mytext => [{content => 'first'}, {content => 'second'}]});
+
+For file uploads a hash reference with a C<file> value can be used instead, it
+should contain the path of a file or an asset object, like
+L<Mojo::Asset::File> or L<Mojo::Asset::Memory>.
 
   # POST request with upload streamed from file
   my $tx = $t->tx(
@@ -421,9 +445,9 @@ requests, with support for L</"GENERATORS">.
   my $tx    = $t->tx(
     POST => 'http://example.com' => form => {mytext => {file => $asset}});
 
-  # POST request with multiple files sharing the same name
-  my $tx = $t->tx(POST => 'http://example.com' =>
-    form => {mytext => [{content => 'first'}, {content => 'second'}]});
+A C<filename> value will be detected automatically if possible, but can also
+be set manually. All remainging values in the hash reference get merged into
+the C<multipart/form-data> content as headers.
 
   # POST request with form values and customized upload (filename and header)
   my $tx = $t->tx(POST => 'http://example.com' => form => {
@@ -436,11 +460,8 @@ requests, with support for L</"GENERATORS">.
     }
   });
 
-The C<form> content generator will automatically use query parameters for
-C<GET>/C<HEAD> requests and the C<application/x-www-form-urlencoded> content
-type for everything else. Both get upgraded automatically to using the
-C<multipart/form-data> content type when necessary or when the header has been
-set manually.
+The C<multipart/form-data> content type can also be enforced by setting the
+C<Content-Type> header manually.
 
   # Force "multipart/form-data"
   my $headers = {'Content-Type' => 'multipart/form-data'};

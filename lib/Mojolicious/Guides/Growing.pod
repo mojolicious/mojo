@@ -377,8 +377,9 @@ set an absolute expiration date in the past.
   $c->session(expires => 1);
 
 For data that should only be visible on the next request, like a confirmation
-message after a 302 redirect, you can use the flash, accessible through the
-method L<Mojolicious::Controller/"flash">.
+message after a 302 redirect performed with
+L<Mojolicious::Controller/"redirect_to">, you can use the flash, accessible
+through the method L<Mojolicious::Controller/"flash">.
 
   $c->flash(message => 'Everything is fine.');
   $c->redirect_to('goodbye');

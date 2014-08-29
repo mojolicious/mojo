@@ -826,6 +826,10 @@ L<Mojolicious::Validator::Validation/"error">.
     </body>
   </html>
 
+The methods L<Mojolicious::Controller/"flash"> and
+L<Mojolicious::Controller/"redirect_to"> are often used together to prevent
+double form submission.
+
 =head2 Cross-site request forgery
 
 CSRF is a very common attack on web applications that trick your logged in

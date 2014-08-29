@@ -321,11 +321,11 @@ Alias for L<Mojolicious::Controller/"stash">.
 
 =head2 title
 
+  %= title
   % title 'Welcome!';
   % title 'Welcome!', foo => 'bar';
-  %= title
 
-Set C<title> stash value, all additional pairs get merged into the
+Get of set C<title> stash value, all additional pairs get merged into the
 L</"stash">.
 
 =head2 ua

@@ -421,8 +421,8 @@ An array reference can be used for multiple form values sharing the same name.
   # POST request with form values sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});
 
-A hash reference with a C<content> value can be used to switch to the
-C<multipart/form-data> content type.
+A hash reference with a C<content> or C<file> value can be used to switch to
+the C<multipart/form-data> content type for file uploads.
 
   # POST request with "multipart/form-data" content
   my $tx = $t->tx(
@@ -432,8 +432,7 @@ C<multipart/form-data> content type.
   my $tx = $t->tx(POST => 'http://example.com' =>
     form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
-For file uploads a hash reference with a C<file> value can be used instead, it
-should contain the path of a file or an asset object, like
+The C<file> value should contain the path of a file or an asset object, like
 L<Mojo::Asset::File> or L<Mojo::Asset::Memory>.
 
   # POST request with upload streamed from file
@@ -445,9 +444,9 @@ L<Mojo::Asset::File> or L<Mojo::Asset::Memory>.
   my $tx    = $t->tx(
     POST => 'http://example.com' => form => {mytext => {file => $asset}});
 
-A C<filename> value will be detected automatically if possible, but can also
-be set manually. All remainging values in the hash reference get merged into
-the C<multipart/form-data> content as headers.
+A C<filename> value will be generated automatically, but can also be set
+manually if necessary. All remainging values in the hash reference get merged
+into the C<multipart/form-data> content as headers.
 
   # POST request with form values and customized upload (filename and header)
   my $tx = $t->tx(POST => 'http://example.com' => form => {

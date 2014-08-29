@@ -313,7 +313,7 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
   Mojolicious::Commands->start_app('MyApp');
   Mojolicious::Commands->start_app(MyApp => @ARGV);
 
-Load application and start the command line interface for it.
+Load application from class and start the command line interface for it.
 
   # Always start daemon for application and ignore @ARGV
   Mojolicious::Commands->start_app('MyApp', 'daemon', '-l', 'http://*:8080');

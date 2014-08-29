@@ -432,8 +432,8 @@ the C<multipart/form-data> content type for file uploads.
   my $tx = $t->tx(POST => 'http://example.com' =>
     form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
-The C<file> value should contain the path of a file or an asset object, like
-L<Mojo::Asset::File> or L<Mojo::Asset::Memory>.
+The C<file> value should contain the path to the file you want to upload or an
+asset object, like L<Mojo::Asset::File> or L<Mojo::Asset::Memory>.
 
   # POST request with upload streamed from file
   my $tx = $t->tx(

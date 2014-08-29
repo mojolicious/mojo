@@ -347,9 +347,8 @@ many helpers.
 
 =head2 Helpers
 
-You can also extend L<Mojolicious> with your own helpers, a list of all
-built-in ones can be found in L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers>.
+Helpers are little functions you can reuse throughout your whole application,
+from actions to templates.
 
   use Mojolicious::Lite;
 
@@ -373,6 +372,9 @@ L<Mojolicious::Plugin::TagHelpers>.
 
   @@ secret.html.ep
   We know who you are <%= whois %>.
+
+A list of all built-in ones can be found in
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
 =head2 Placeholders
 

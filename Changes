@@ -1,4 +1,6 @@
 
+5.35  2014-08-30
+
 5.34  2014-08-29
   - Added original_remote_address attribute to Mojo::Transaction.
   - Fixed bug where Mojolicious::Commands would change @ARGV when loaded.

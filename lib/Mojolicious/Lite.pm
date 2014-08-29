@@ -93,9 +93,9 @@ applications.
 =head2 Hello World
 
 A simple Hello World application can look like this, L<strict>, L<warnings>,
-L<utf8> and Perl 5.10 features are automatically enabled and a few functions
-imported when you use L<Mojolicious::Lite>, turning your script into a full
-featured web application.
+L<utf8> and Perl 5.10 features are automatically enabled and a few
+L</"FUNCTIONS"> imported when you use L<Mojolicious::Lite>, turning your
+script into a full featured web application.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
@@ -1022,7 +1022,12 @@ argument variations.
 
   my $app = app;
 
-The L<Mojolicious::Lite> application.
+Returns the L<Mojolicious::Lite> application object, which is a subclass of
+L<Mojolicious>.
+
+  # Use all the available attributes and methods
+  app->log->level('error');
+  app->defaults(foo => 'bar');
 
 =head2 del
 

@@ -257,7 +257,21 @@ application logic.
 
   builder {
     enable 'Deflater';
-    require './script/myapp';
+    require 'myapp.pl';
+  };
+
+You can also customize your application with L<Mojo::Server::PSGI>.
+
+  #!/usr/bin/env plackup -s FCGI
+  use Plack::Builder;
+  use Mojo::Server::PSGI;
+
+  builder {
+    enable 'Deflater';
+    my $server = Mojo::Server::PSGI->new;
+    $server->load_app('./script/myapp');
+    $server->app->config(foo => 'bar');
+    $server->to_psgi_app;
   };
 
 But you could even use middleware right in your application.

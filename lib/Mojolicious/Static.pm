@@ -103,21 +103,18 @@ sub serve_asset {
   return $res->code(304) if $self->is_fresh($c, $options);
 
   # Range
-  my $size = $asset->size;
-  my ($start, $end) = (0, $size - 1);
-  if (my $range = $c->req->headers->range) {
+  return $res->content->asset($asset)
+    unless my $range = $c->req->headers->range;
 
-    # Not satisfiable
-    return $res->code(416) unless $size && $range =~ m/^bytes=(\d+)?-(\d+)?/;
-    $start = $1 if defined $1;
-    $end = $2 if defined $2 && $2 <= $end;
-    return $res->code(416) if $start > $end || $end > ($size - 1);
+  # Not satisfiable
+  return $res->code(416) unless my $size = $asset->size;
+  return $res->code(416) unless $range =~ m/^bytes=(\d+)?-(\d+)?/;
+  my ($start, $end) = ($1 // 0, defined $2 && $2 < $size ? $2 : $size - 1);
+  return $res->code(416) if $start > $end;
 
-    # Satisfiable
-    $res->code(206)->headers->content_length($end - $start + 1)
-      ->content_range("bytes $start-$end/$size");
-  }
-
+  # Satisfiable
+  $res->code(206)->headers->content_length($end - $start + 1)
+    ->content_range("bytes $start-$end/$size");
   return $res->content->asset($asset->start_range($start)->end_range($end));
 }
 

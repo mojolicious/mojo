@@ -110,7 +110,14 @@ $t->get_ok('/hello.txt' => {Range => 'bytes=0-0'})->status_is(206)
   ->header_is('Content-Range' => 'bytes 0-0/31')->content_is('H');
 
 # Partial static file, end outside of range
-$t->get_ok('/hello.txt' => {Range => 'bytes=25-35'})->status_is(206)
+$t->get_ok('/hello.txt' => {Range => 'bytes=25-31'})->status_is(206)
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 6)
+  ->header_is('Content-Range'  => 'bytes 25-30/31')
+  ->header_is('Accept-Ranges'  => 'bytes')->content_is("file!\n");
+
+# Partial static file, end way outside of range
+$t->get_ok('/hello.txt' => {Range => 'bytes=25-300'})->status_is(206)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 6)
   ->header_is('Content-Range'  => 'bytes 25-30/31')

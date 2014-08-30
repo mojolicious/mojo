@@ -1,5 +1,6 @@
 
 5.35  2014-08-30
+  - Improved monkey_patch to be able to name generated functions.
 
 5.34  2014-08-29
   - Added original_remote_address attribute to Mojo::Transaction.

@@ -98,7 +98,7 @@ sub serve_asset {
   # Last-Modified and ETag
   my $res = $c->res;
   $res->code(200)->headers->accept_ranges('bytes');
-  my $mtime = $asset->mtime;
+  my $mtime = $asset->is_file ? (stat $asset->path)[9] : $MTIME;
   my $options = {etag => md5_sum($mtime), last_modified => $mtime};
   return $res->code(304) if $self->is_fresh($c, $options);
 
@@ -134,7 +134,7 @@ sub _get_data_file {
   # Find file
   return undef
     unless defined(my $data = $LOADER->data($self->{index}{$rel}, $rel));
-  return Mojo::Asset::Memory->new(mtime => $MTIME)->add_chunk($data);
+  return Mojo::Asset::Memory->new->add_chunk($data);
 }
 
 sub _get_file {

@@ -257,7 +257,7 @@ application logic.
 
   builder {
     enable 'Deflater';
-    require 'myapp.pl';
+    require './script/myapp';
   };
 
 But you could even use middleware right in your application.

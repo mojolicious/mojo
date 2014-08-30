@@ -264,9 +264,7 @@ only the information you're actually interested in.
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with
 L<Mojolicious::Controller/"url_for"> as well as many helpers like
-L<Mojolicious::Plugin::TagHelpers/"link_to">. Nameless routes get an
-automatically generated one assigned that is simply equal to the route itself
-without non-word characters.
+L<Mojolicious::Plugin::TagHelpers/"link_to">.
 
   use Mojolicious::Lite;
 
@@ -288,6 +286,9 @@ without non-word characters.
 
   @@ hello.html.ep
   Hello World!
+
+Nameless routes get an automatically generated one assigned that is simply
+equal to the route itself without non-word characters.
 
 =head2 Layouts
 
@@ -474,8 +475,7 @@ Routes can be restricted to specific request methods with different keywords.
 =head2 Optional placeholders
 
 All placeholders require a value, but by assigning them default values you can
-make capturing optional. Default values that don't belong to a placeholder
-simply get merged into the stash all the time.
+make capturing optional.
 
   use Mojolicious::Lite;
 
@@ -491,6 +491,9 @@ simply get merged into the stash all the time.
 
   @@ groovy.txt.ep
   My name is <%= $name %> and it is <%= $day %>.
+
+Default values that don't belong to a placeholder simply get merged into the
+stash all the time.
 
 =head2 Restrictive placeholders
 
@@ -617,10 +620,12 @@ L</"under"> statements.
 
 =head2 Formats
 
-Formats can be automatically detected by looking at file extensions.
+Formats can be automatically detected from file extensions, they are used to
+find the right template and generate the correct C<Content-Type> header.
 
   use Mojolicious::Lite;
 
+  # /detection
   # /detection.html
   # /detection.txt
   get '/detection' => sub {
@@ -641,7 +646,8 @@ Formats can be automatically detected by looking at file extensions.
   @@ detected.txt.ep
   TXT was detected.
 
-Restrictive placeholders can also be used.
+The default format is C<html>, restrictive placeholders can be used to limit
+possible values.
 
   use Mojolicious::Lite;
 
@@ -729,7 +735,7 @@ served automatically from a C<public> directory if it exists.
 
 Both have a higher precedence than routes for C<GET> and C<HEAD> requests.
 Content negotiation with C<Range>, C<If-None-Match> and C<If-Modified-Since>
-headers is supported and can be tested very easily with
+headers is supported as well and can be tested very easily with
 L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get /something.js -v -H 'Range: bytes=2-4'

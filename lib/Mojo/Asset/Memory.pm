@@ -6,6 +6,7 @@ use Mojo::Util 'spurt';
 
 has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
+has mtime => sub {time};
 
 sub add_chunk {
   my ($self, $chunk) = @_;
@@ -113,6 +114,13 @@ automatically upgrade to a L<Mojo::Asset::File> object.
 Maximum size in bytes of data to keep in memory before automatically upgrading
 to a L<Mojo::Asset::File> object, defaults to the value of the
 C<MOJO_MAX_MEMORY_SIZE> environment variable or C<262144> (256KB).
+
+=head2 mtime
+
+  my $mtime = $mem->mtime;
+  $mem      = $mem->mtime(1408567500);
+
+Modification time of asset, defaults to the current time.
 
 =head1 METHODS
 

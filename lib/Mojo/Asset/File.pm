@@ -120,15 +120,15 @@ sub move_to {
   return $self->path($to)->cleanup(0);
 }
 
-sub size {
-  return 0 unless defined(my $file = shift->path);
-  return -s $file;
-}
+sub mtime { _check(shift->path, 1) }
+sub size  { _check(shift->path, 0) }
 
 sub slurp {
   return '' unless defined(my $file = shift->path);
   return Mojo::Util::slurp $file;
 }
+
+sub _check { $_[0] ? $_[1] ? (stat $_[0])[9] : -s $_[0] : 0 }
 
 1;
 
@@ -232,6 +232,12 @@ True.
   $file = $file->move_to('/home/sri/bar.txt');
 
 Move asset data into a specific file and disable L</"cleanup">.
+
+=head2 mtime
+
+  my $mtime = $file->mtime;
+
+Modification time of asset.
 
 =head2 size
 

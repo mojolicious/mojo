@@ -10,11 +10,14 @@ use Mojo::Asset::Memory;
 # File asset
 my $file = Mojo::Asset::File->new;
 is $file->size,  0,  'file is empty';
+is $file->mtime, 0,  'file is empty';
 is $file->slurp, '', 'file is empty';
 $file->add_chunk('abc');
 is $file->contains('abc'), 0,  '"abc" at position 0';
 is $file->contains('bc'),  1,  '"bc" at position 1';
 is $file->contains('db'),  -1, 'does not contain "db"';
+is $file->size, 3, 'right size';
+is $file->mtime, (stat $file->path)[9], 'right mtime';
 
 # Cleanup
 my $path = $file->path;
@@ -28,6 +31,10 @@ $mem->add_chunk('abc');
 is $mem->contains('abc'), 0,  '"abc" at position 0';
 is $mem->contains('bc'),  1,  '"bc" at position 1';
 is $mem->contains('db'),  -1, 'does not contain "db"';
+is $mem->size, 3, 'right size';
+ok $mem->mtime > (time - 100), 'right mtime';
+my $mtime = $mem->mtime;
+is $mem->mtime($mtime + 23)->mtime, $mtime + 23, 'right mtime';
 
 # Empty file asset
 $file = Mojo::Asset::File->new;
@@ -228,6 +235,7 @@ $file = Mojo::Asset::File->new(cleanup => 0)->add_chunk('test');
 ok $file->is_file, 'stored in file';
 is $file->slurp,   'test', 'right content';
 is $file->size,    4, 'right size';
+is $file->mtime, (stat $file->path)[9], 'right mtime';
 is $file->contains('es'), 1, '"es" at position 1';
 $path = $file->path;
 undef $file;

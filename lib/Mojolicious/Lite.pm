@@ -728,6 +728,11 @@ served automatically from a C<public> directory if it exists.
   $ mv mojolicious.tar.gz public/mojolicious.tar.gz
 
 Both have a higher precedence than routes for C<GET> and C<HEAD> requests.
+Content negotiation with C<Range>, C<If-None-Match> and C<If-Modified-Since>
+headers is supported and can be easily tested with
+L<Mojolicious::Command::get>.
+
+  $ ./myapp.pl get /something.js -v -H 'Host: bytes=2-4'
 
 =head2 External templates
 

@@ -169,8 +169,8 @@ Mojolicious::Static - Serve static files
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Static> is a static file server with C<Range> and
-C<If-Modified-Since> support based on
+L<Mojolicious::Static> is a static file server with C<Range>,
+C<If-Modified-Since> and C<If-None-Match> support based on
 L<RFC 7232|http://tools.ietf.org/html/rfc7232> and
 L<RFC 7233|http://tools.ietf.org/html/rfc7233>.
 
@@ -259,8 +259,8 @@ that this method does not protect from traversing to parent directories.
 
   $static->serve_asset(Mojolicious::Controller->new, Mojo::Asset::File->new);
 
-Serve a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object with C<Range>
-and C<If-Modified-Since> support.
+Serve a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object with C<Range>,
+C<If-Modified-Since> and C<If-None-Match> support.
 
 =head1 SEE ALSO
 

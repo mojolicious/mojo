@@ -257,14 +257,15 @@ application logic.
 
   builder {
     enable 'Deflater';
-    require 'myapp.pl';
+    require './script/myapp';
   };
 
-You can also customize your application with L<Mojo::Server::PSGI>.
+L<Mojo::Server::PSGI> can be used directly to load and customize applications
+in the wrapper script.
 
   #!/usr/bin/env plackup -s FCGI
-  use Plack::Builder;
   use Mojo::Server::PSGI;
+  use Plack::Builder;
 
   builder {
     enable 'Deflater';

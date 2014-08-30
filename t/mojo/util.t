@@ -408,6 +408,15 @@ is MojoMonkeyTest::yin(), 'yin', 'right result';
 ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
 
+# monkey_patch (with name)
+SKIP: {
+  skip 'Sub::Util required!', 2 unless eval 'use Sub::Util; 1';
+  is Sub::Util::subname(MojoMonkeyTest->can('foo')), 'MojoMonkeyTest::foo',
+    'right name';
+  is Sub::Util::subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar',
+    'right name';
+}
+
 # tablify
 is tablify([["f\r\no o\r\n", 'bar']]),     "fo o  bar\n",      'right result';
 is tablify([["  foo",        '  b a r']]), "  foo    b a r\n", 'right result';

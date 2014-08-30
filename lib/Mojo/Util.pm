@@ -30,7 +30,7 @@ use constant {
 };
 
 # Will be shipping with Perl 5.22
-my $NAME = eval "use Sub::Util; 1" ? \&Sub::Util::set_subname : sub { $_[1] };
+my $NAME = eval 'use Sub::Util; 1' ? \&Sub::Util::set_subname : sub { $_[1] };
 
 # To update HTML entities run this command
 # perl examples/entities.pl > lib/Mojo/entities.txt

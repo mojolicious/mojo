@@ -1,5 +1,5 @@
 
-5.36  2014-08-31
+5.36  2014-09-01
 
 5.35  2014-08-30
   - Improved monkey_patch to be able to name generated functions.

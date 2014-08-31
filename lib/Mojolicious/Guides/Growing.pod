@@ -358,7 +358,7 @@ using the method L<Mojolicious::Controller/"session">, there is no setup
 required, but we suggest setting a more secure passphrase with
 L<Mojolicious/"secrets">.
 
-  app->secrets(['Mojolicious rocks']);
+  $app->secrets(['Mojolicious rocks']);
 
 This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.

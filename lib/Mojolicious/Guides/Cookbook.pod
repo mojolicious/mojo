@@ -299,7 +299,7 @@ you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming
 requests.
 
   # Change scheme if "X-Forwarded-HTTPS" header is set
-  app->hook(before_dispatch => sub {
+  $app->hook(before_dispatch => sub {
     my $c = shift;
     $c->req->url->base->scheme('https')
       if $c->req->headers->header('X-Forwarded-HTTPS');
@@ -310,11 +310,11 @@ prefixes your application might be deployed under, rewriting the base path of
 incoming requests is also quite common.
 
   # Move first part and slash from path to base path in production mode
-  app->hook(before_dispatch => sub {
+  $app->hook(before_dispatch => sub {
     my $c = shift;
     push @{$c->req->url->base->path->trailing_slash(1)},
       shift @{$c->req->url->path->leading_slash(0)};
-  }) if app->mode eq 'production';
+  }) if $app->mode eq 'production';
 
 L<Mojo::URL> objects are very easy to manipulate, just make sure that the URL
 (C<foo/bar?baz=yada>), which represents the routing destination, is always

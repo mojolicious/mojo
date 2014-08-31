@@ -121,7 +121,7 @@ sub parse {
   my ($self, $template) = @_;
 
   # Clean start
-  my $tree = $self->template($template)->tree([])->tree;
+  $self->template($template)->tree(\my @tree);
 
   my $tag     = $self->tag_start;
   my $replace = $self->replace_mark;
@@ -219,9 +219,7 @@ sub parse {
       }
     }
 
-    # Optimize successive text lines
-    if (_text($tree->[-1]) && _text(\@token)) { $tree->[-1][1] .= $token[1] }
-    else                                      { push @$tree, \@token }
+    push @tree, \@token;
   }
 
   return $self;
@@ -249,8 +247,6 @@ sub _line {
   $name =~ y/"//d;
   return qq{#line @{[shift]} "$name"};
 }
-
-sub _text { $_[0] && @{$_[0]} == 2 && $_[0][0] eq 'text' }
 
 sub _trim {
   my ($self, $line) = @_;

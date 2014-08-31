@@ -223,7 +223,10 @@ sub parse {
         @capture_token = ();
       }
     }
-    push @$tree, \@token;
+
+    # Optimize successive text lines
+    if (_text($tree->[-1]) && _text(\@token)) { $tree->[-1][1] .= $token[1] }
+    else                                      { push @$tree, \@token }
   }
 
   return $self;
@@ -251,6 +254,8 @@ sub _line {
   $name =~ y/"//d;
   return qq{#line @{[shift]} "$name"};
 }
+
+sub _text { $_[0] && @{$_[0]} == 2 && $_[0][0] eq 'text' }
 
 sub _trim {
   my ($self, $line) = @_;

@@ -29,14 +29,14 @@ sub detect {
 sub _args {
   return if __PACKAGE__->detect;
   Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
-  GetOptionsFromArray $_[0] ? $_[1] : [@{$_[1]}],
+  GetOptionsFromArray shift,
     'h|help'   => \$ENV{MOJO_HELP},
     'home=s'   => \$ENV{MOJO_HOME},
     'm|mode=s' => \$ENV{MOJO_MODE};
   Getopt::Long::Configure('default');
 }
 
-BEGIN { _args(0, \@ARGV) }
+BEGIN { _args([@ARGV]) }
 
 sub run {
   my ($self, $name, @args) = @_;
@@ -62,7 +62,7 @@ sub run {
       unless $module;
 
     # Run command (remove options shared by all commands)
-    _args(1, \@args);
+    _args(\@args);
     my $command = $module->new(app => $self->app);
     return $help ? $command->help(@args) : $command->run(@args);
   }

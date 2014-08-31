@@ -203,7 +203,7 @@ you refresh your browser.
 =head2 Model
 
 In L<Mojolicious> we consider web applications simple frontends for existing
-business logic, that means L<Mojolicious> is by design entirely L<model> layer
+business logic, that means L<Mojolicious> is by design entirely I<model> layer
 agnostic and you just use whatever Perl modules you like most.
 
   $ mkdir -p lib/MyApp/Model

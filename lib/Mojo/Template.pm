@@ -26,7 +26,7 @@ has tree      => sub { [] };
 sub build {
   my $self = shift;
 
-  my (@lines, $cpst, $multi);
+  my (@lines, $capture, $multi);
   my $escape = $self->auto_escape;
   for my $line (@{$self->tree}) {
     push @lines, '';
@@ -73,15 +73,15 @@ sub build {
           && ($line->[$j + 3] // '') eq '');
 
         # Append semicolon
-        $lines[-1] .= ';' unless $multi || $cpst;
+        $lines[-1] .= ';' unless $multi || $capture;
       }
 
       # Capture start
-      if ($cpst) {
-        $lines[-1] .= $cpst;
-        $cpst = undef;
+      if ($capture) {
+        $lines[-1] .= " sub { my \$_M = ''; ";
+        $capture = 0;
       }
-      $cpst = " sub { my \$_M = ''; " if $op eq 'cpst';
+      $capture = 1 if $op eq 'cpst';
     }
   }
 
@@ -150,9 +150,8 @@ sub parse {
 
   # Split lines
   my $state = 'text';
-  my ($trimming, @capture_token);
+  my ($trimming, $capture);
   for my $line (split "\n", $template) {
-    $trimming = 0 if $state eq 'text';
 
     # Turn Perl line into mixed line
     if ($state eq 'text' && $line !~ s/^(\s*)\Q$start$replace\E/$1$start/) {
@@ -174,7 +173,7 @@ sub parse {
     for my $token (split $token_re, $line) {
 
       # Capture end
-      @capture_token = ('cpen', undef) if $token =~ s/$cpen_re/$1/;
+      $capture = 1 if $token =~ s/$cpen_re/$1/;
 
       # End
       if ($state ne 'text' && $token =~ $end_re) {
@@ -184,10 +183,7 @@ sub parse {
         splice @token, -2, 0, 'cpst', undef if $1;
 
         # Trim left side
-        if ($2) {
-          $trimming = 1;
-          $self->_trim(\@token);
-        }
+        $self->_trim(\@token) if $trimming = $2;
 
         # Hint at end
         push @token, 'text', '';
@@ -205,8 +201,8 @@ sub parse {
       # Comment
       elsif ($token =~ /^\Q$tag$cmnt\E$/) { $state = 'cmnt' }
 
-      # Text
-      else {
+      # Text (comments are just ignored)
+      elsif ($state ne 'cmnt') {
 
         # Replace
         $token = $tag if $token eq "$tag$replace";
@@ -217,10 +213,9 @@ sub parse {
           $trimming = 0;
         }
 
-        # Comments are ignored
-        next if $state eq 'cmnt';
-        push @token, @capture_token, $state, $token;
-        @capture_token = ();
+        # Token (with optional capture end)
+        push @token, $capture ? ('cpen', undef) : (), $state, $token;
+        $capture = 0;
       }
     }
 

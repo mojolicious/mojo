@@ -640,6 +640,10 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
   # Run tests against remote host
   $t->get_ok('http://mojolicio.us/perldoc')->status_is(200);
 
+  # Run additional tests on the transaction
+  $t->get_ok('/foo')->status_is(200);
+  is $t->tx->res->dom->at('input')->val, 'whatever', 'right value';
+
 =head2 head_ok
 
   $t = $t->head_ok('/foo');

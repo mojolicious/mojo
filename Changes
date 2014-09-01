@@ -1,6 +1,7 @@
 
 5.36  2014-09-02
   - Improved Mojo::Template performance.
+  - Improved performance of .ep templates.
 
 5.35  2014-08-30
   - Improved monkey_patch to be able to name generated functions.

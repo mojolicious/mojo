@@ -24,8 +24,8 @@ designed for. Because of this, L<Mojolicious> contains a whole new HTTP
 client/server stack called L<Mojo>, which was heavily inspired by the original
 LWPng effort and carefully designed with these new requirements in mind. So
 while some of the higher abstraction layers might look similar to other web
-frameworks, it is more of a web toolkit and can even be the foundation for
-more advanced web frameworks.
+frameworks, it is more of a web toolkit and can even be used as the foundation
+for more advanced web frameworks.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 

@@ -142,7 +142,7 @@ $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
   ->send_ok(0)->message_ok->message_like({text => qr/0/})->finish_ok(1000)
   ->finished_ok(1000);
 
-# 64bit binary message (extended limit)
+# 64-bit binary message (extended limit)
 $t->request_ok($t->ua->build_websocket_tx('/echo'));
 is $t->tx->max_websocket_size, 262144, 'right size';
 $t->tx->max_websocket_size(262145);
@@ -150,11 +150,11 @@ $t->send_ok({binary => 'a' x 262145})
   ->message_ok->message_is({binary => 'a' x 262145})
   ->finish_ok->finished_ok(1005);
 
-# 64bit binary message (too large)
+# 64-bit binary message (too large)
 $t->websocket_ok('/echo')->send_ok({binary => 'b' x 262145})
   ->finished_ok(1009);
 
-# Binary message in two 64bit frames without FIN bit (too large)
+# Binary message in two 64-bit frames without FIN bit (too large)
 $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'c' x 100000])
   ->send_ok([0, 0, 0, 0, 0, 'c' x 162146])->finished_ok(1009);
 

@@ -49,15 +49,15 @@ sub build_frame {
     $frame .= pack 'C', $masked ? ($len | 128) : $len;
   }
 
-  # Extended payload (16bit)
+  # Extended payload (16-bit)
   elsif ($len < 65536) {
-    warn "-- Extended 16bit payload ($len)\n$payload\n" if DEBUG;
+    warn "-- Extended 16-bit payload ($len)\n$payload\n" if DEBUG;
     $frame .= pack 'Cn', $masked ? (126 | 128) : 126, $len;
   }
 
-  # Extended payload (64bit with 32bit fallback)
+  # Extended payload (64-bit with 32-bit fallback)
   else {
-    warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
+    warn "-- Extended 64-bit payload ($len)\n$payload\n" if DEBUG;
     $frame .= pack 'C', $masked ? (127 | 128) : 127;
     $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xffffffff);
   }
@@ -174,21 +174,21 @@ sub parse_frame {
   my ($hlen, $len) = (2, $second & 0b01111111);
   if ($len < 126) { warn "-- Small payload ($len)\n" if DEBUG }
 
-  # Extended payload (16bit)
+  # Extended payload (16-bit)
   elsif ($len == 126) {
     return undef unless length $$buffer > 4;
     $hlen = 4;
     $len = unpack 'n', substr($$buffer, 2, 2);
-    warn "-- Extended 16bit payload ($len)\n" if DEBUG;
+    warn "-- Extended 16-bit payload ($len)\n" if DEBUG;
   }
 
-  # Extended payload (64bit with 32bit fallback)
+  # Extended payload (64-bit with 32-bit fallback)
   elsif ($len == 127) {
     return undef unless length $$buffer > 10;
     $hlen = 10;
     my $ext = substr $$buffer, 2, 8;
     $len = MODERN ? unpack('Q>', $ext) : unpack('N', substr($ext, 4, 4));
-    warn "-- Extended 64bit payload ($len)\n" if DEBUG;
+    warn "-- Extended 64-bit payload ($len)\n" if DEBUG;
   }
 
   # Check message size
@@ -354,8 +354,8 @@ Mojo::Transaction::WebSocket - WebSocket transaction
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions
-based on L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64bit
-frames require a Perl with support for quads or they are limited to 32bit.
+based on L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64-bit
+frames require a Perl with support for quads or they are limited to 32-bit.
 
 =head1 EVENTS
 
@@ -490,7 +490,7 @@ object.
   my $bool = $ws->masked;
   $ws      = $ws->masked($bool);
 
-Mask outgoing frames with XOR cipher and a random 32bit key.
+Mask outgoing frames with XOR cipher and a random 32-bit key.
 
 =head2 max_websocket_size
 

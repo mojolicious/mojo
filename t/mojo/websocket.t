@@ -420,7 +420,7 @@ $ua->websocket(
 Mojo::IOLoop->start;
 is $status, 1006, 'right status';
 
-# 16bit length
+# 16-bit length
 $result = undef;
 $ua->websocket(
   '/echo' => sub {

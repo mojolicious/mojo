@@ -1487,7 +1487,7 @@
 
 2.93  2012-05-05
   - Added remove method to Mojolicious::Routes::Route.
-  - Improved 32bit Perl support of Mojo::Transaction::WebSocket.
+  - Improved 32-bit Perl support of Mojo::Transaction::WebSocket.
     (mikemagowan, sri)
   - Improved exception handling of application and configuration file loaders.
   - Improved exception handling of Mojolicious::Plugin::I18N.
@@ -2426,7 +2426,7 @@
   - Modernized Mojo::HelloWorld.
   - Improved HTML healing capabilities of Mojo::DOM::HTML.
   - Improved HTML rendering in Mojo::DOM::HTML.
-  - Improved 64bit support in Mojo::Transaction::WebSocket.
+  - Improved 64-bit support in Mojo::Transaction::WebSocket.
   - Fixed memory leak in Mojo::IOLoop::Client.
   - Fixed memory leak in Mojolicious.
   - Fixed small bug in Mojo::IOLoop::Server.
@@ -2671,7 +2671,7 @@
     available.
   - Updated jQuery to version 1.6.
   - Fixed PSGI read error handling.
-  - Fixed 64bit WebSocket message bug.
+  - Fixed 64-bit WebSocket message bug.
   - Fixed small Windows bug.
 
 1.22  2011-05-02

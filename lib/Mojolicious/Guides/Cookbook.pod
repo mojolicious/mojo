@@ -1328,10 +1328,10 @@ L<Mojolicious::Commands/"namespaces">.
 Some options like C<-m> for the operating mode of your application are shared
 by all commands automatically.
 
-  $ ./myapp.pl ./myapp.pl spy -m production mode
+  $ ./myapp.pl spy -m production mode
   production
 
-For a full list of shared options see L<Mojolicious::Commands/"SYOPSIS">.
+For a full list of shared options see L<Mojolicious::Commands/"SYNOPSIS">.
 
 =head2 Running code against your application
 

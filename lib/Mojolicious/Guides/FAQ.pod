@@ -16,7 +16,7 @@ We hope these answers are to your satisfaction.
 
 =head2 How does Mojolicious compare to other Perl web frameworks?
 
-The short answer is "it doesn't", because we interpret the words
+The short answer is "it doesn't", because we interpret the term
 "web framework" much more literally than others. With the emergence of the
 real-time web and new technologies such as WebSockets, we are facing new
 challenges that go way beyond what commonly used modules like L<LWP> were
@@ -24,8 +24,8 @@ designed for. Because of this, L<Mojolicious> contains a whole new HTTP
 client/server stack called L<Mojo>, which was heavily inspired by the original
 LWPng effort and carefully designed with these new requirements in mind. So
 while some of the higher abstraction layers might look similar to other web
-frameworks, it actually defines a whole new category and could even be the
-foundation for more advanced ones in the future.
+frameworks, it is more of a web toolkit and can even be the foundation for
+more advanced web frameworks.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 

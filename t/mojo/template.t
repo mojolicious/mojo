@@ -1013,7 +1013,7 @@ test
 654
 321
 EOF
-is $mt->tree->[0][1], "test\n123\n", 'optimized text lines';
+is $mt->tree->[0][0][1], "test\n123\n", 'optimized text lines';
 $output = $mt->build->compile || $mt->interpret;
 is $output, "test\n123\n456789\\\n987\n654\n321\n", 'just text';
 

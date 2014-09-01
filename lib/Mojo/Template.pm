@@ -221,9 +221,9 @@ sub parse {
     }
 
     # Optimize successive text lines ending with newlines
-    push @tree, \@token and next
-      if grep { _reject($_) } $tree[-1] // [], \@token;
-    $tree[-1][1] .= $token[1];
+    my $previous = $tree[-1] // [];
+    if (_text($previous) && _text(\@token)) { $previous->[1] .= $token[1] }
+    else                                    { push @tree, \@token }
   }
 
   return $self;
@@ -252,7 +252,7 @@ sub _line {
   return qq{#line @{[shift]} "$name"};
 }
 
-sub _reject { @{$_[0]} != 2 || $_[0][0] ne 'text' || $_[0][1] !~ /\n$/ }
+sub _text { @{$_[0]} == 2 && $_[0][0] eq 'text' && $_[0][1] =~ /\n$/ }
 
 sub _trim {
   my ($self, $line) = @_;

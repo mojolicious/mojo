@@ -45,7 +45,8 @@ sub build {
 
       # Text (quote and fix line ending)
       if ($op eq 'text') {
-        $value = $newline ? quotemeta($value) . '\n' : quotemeta $value;
+        $value = join "\n", map { quotemeta $_ } split("\n", $value);
+        $value .= '\n' if $newline;
         $lines[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
       }
 
@@ -166,7 +167,7 @@ sub parse {
     }
 
     # Escaped line ending
-    $line .= "\n" unless $line =~ s/\\\\$/\\\n/ || $line =~ s/\\$//;
+    $line .= "\n" if $line !~ s/\\\\$/\\\n/ && $line !~ s/\\$//;
 
     # Mixed line
     my @token;
@@ -219,7 +220,10 @@ sub parse {
       }
     }
 
-    push @tree, \@token;
+    # Optimize successive text lines ending with newlines
+    push @tree, \@token and next
+      if grep { _reject($_) } $tree[-1] // [], \@token;
+    $tree[-1][1] .= $token[1];
   }
 
   return $self;
@@ -247,6 +251,8 @@ sub _line {
   $name =~ y/"//d;
   return qq{#line @{[shift]} "$name"};
 }
+
+sub _reject { @{$_[0]} != 2 || $_[0][0] ne 'text' || $_[0][1] !~ /\n$/ }
 
 sub _trim {
   my ($self, $line) = @_;

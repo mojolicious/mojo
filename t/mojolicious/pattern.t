@@ -4,8 +4,14 @@ use Test::More;
 use Mojo::ByteStream 'b';
 use Mojolicious::Routes::Pattern;
 
+# Text pattern (optimized)
+my $pattern = Mojolicious::Routes::Pattern->new('/test/123');
+is_deeply $pattern->match('/test/123'), {}, 'right structure';
+is_deeply $pattern->match('/test'), undef, 'no result';
+is $pattern->tree->[0][1], '/test/123', 'optimized pattern';
+
 # Normal pattern with text, placeholders and a default value
-my $pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action');
+$pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action');
 $pattern->defaults({action => 'index'});
 is_deeply $pattern->match('/test/foo/bar', 1),
   {controller => 'foo', action => 'bar'}, 'right structure';

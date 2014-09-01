@@ -652,7 +652,8 @@ like "$output", qr/ohoh/, 'right result';
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 test
-123
+123\
+456
  %# This dies
 % die 'oops!';
 %= 1 + 1
@@ -663,21 +664,23 @@ like $output->message, qr/oops!/, 'right message';
 is $output->lines_before->[0][0], 1,               'right number';
 is $output->lines_before->[0][1], 'test',          'right line';
 is $output->lines_before->[1][0], 2,               'right number';
-is $output->lines_before->[1][1], '123',           'right line';
+is $output->lines_before->[1][1], '123\\',         'right line';
 is $output->lines_before->[2][0], 3,               'right number';
-is $output->lines_before->[2][1], ' %# This dies', 'right line';
-is $output->line->[0], 4, 'right number';
+is $output->lines_before->[2][1], '456',           'right line';
+is $output->lines_before->[3][0], 4,               'right number';
+is $output->lines_before->[3][1], ' %# This dies', 'right line';
+is $output->line->[0], 5, 'right number';
 is $output->line->[1], "% die 'oops!';", 'right line';
-is $output->lines_after->[0][0], 5,          'right number';
+is $output->lines_after->[0][0], 6,          'right number';
 is $output->lines_after->[0][1], '%= 1 + 1', 'right line';
-is $output->lines_after->[1][0], 6,          'right number';
+is $output->lines_after->[1][0], 7,          'right number';
 is $output->lines_after->[1][1], 'test',     'right line';
-like "$output", qr/oops! at template line 4/, 'right result';
+like "$output", qr/oops! at template line 5/, 'right result';
 
 # Exception in template (empty perl lines)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-test
+test\\
 123
 %
 % die 'oops!';
@@ -689,15 +692,15 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/oops!/, 'right message';
-is $output->lines_before->[0][0], 1,      'right number';
-is $output->lines_before->[0][1], 'test', 'right line';
+is $output->lines_before->[0][0], 1,          'right number';
+is $output->lines_before->[0][1], 'test\\\\', 'right line';
 ok $output->lines_before->[0][2], 'contains code';
-is $output->lines_before->[1][0], 2,      'right number';
-is $output->lines_before->[1][1], '123',  'right line';
+is $output->lines_before->[1][0], 2,          'right number';
+is $output->lines_before->[1][1], '123',      'right line';
 ok $output->lines_before->[1][2], 'contains code';
-is $output->lines_before->[2][0], 3,      'right number';
-is $output->lines_before->[2][1], '%',    'right line';
-is $output->lines_before->[2][2], ' ',    'right code';
+is $output->lines_before->[2][0], 3,          'right number';
+is $output->lines_before->[2][1], '%',        'right line';
+is $output->lines_before->[2][2], ' ',        'right code';
 is $output->line->[0], 4, 'right number';
 is $output->line->[1], "% die 'oops!';", 'right line';
 is $output->lines_after->[0][0], 5,     'right number';
@@ -998,6 +1001,19 @@ $output = $mt->render(<<'EOF');
 %>
 EOF
 is $output, "hello world\n", 'escaped multiline expression';
+
+# Optimize successive text lines ending with newlines
+$mt = Mojo::Template->new;
+$mt->parse(<<'EOF');
+test
+123
+456\
+789\\
+0
+EOF
+is $mt->tree->[0][1], "test\n123\n", 'optimized text lines';
+$mt->build->compile;
+is $mt->interpret, "test\n123\n456789\\\n0\n", 'just text';
 
 # Scoped scalar
 $mt     = Mojo::Template->new;

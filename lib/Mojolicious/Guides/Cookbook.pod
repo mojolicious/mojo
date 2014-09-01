@@ -1292,6 +1292,9 @@ that they will be picked up automatically by the command line interface?
 
     # Leak secret passphrases
     say for @{$self->app->secrets} if $args[0] eq 'secrets';
+
+    # Leak mode
+    say $self->app->mode if $args[0] eq 'mode';
   }
 
   1;
@@ -1321,6 +1324,14 @@ L<Mojolicious::Commands/"namespaces">.
   }
 
   1;
+
+Some options like C<-m> for the operating mode of your application are shared
+by all commands automatically.
+
+  $ ./myapp.pl ./myapp.pl spy -m production mode
+  production
+
+For a full list of shared options see L<Mojolicious::Commands/"SYOPSIS">.
 
 =head2 Running code against your application
 

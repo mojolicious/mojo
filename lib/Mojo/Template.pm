@@ -46,12 +46,11 @@ sub build {
         $blocks[-1] .= 'return Mojo::ByteStream->new($_M) }';
 
         # No following code
-        my $next = $block->[$i + 1];
-        $blocks[-1] .= ';' if !defined $next->[1] || $next->[1] =~ /^\s*$/;
+        $blocks[-1] .= ';' if ($block->[$i + 1][1] // '') =~ /^\s*$/;
       }
 
       # Code or multiline expression
-      elsif ($op eq 'code' || $multi) { $blocks[-1] .= "$value" }
+      elsif ($op eq 'code' || $multi) { $blocks[-1] .= $value }
 
       # Expression
       if ($op eq 'expr' || $op eq 'escp') {
@@ -69,8 +68,7 @@ sub build {
         }
 
         # Multiline
-        my $previous = $block->[$i + 1] || [''];
-        $multi = $previous->[0] ne 'text' || $previous->[1] ne '';
+        $multi = !$block->[$i + 1] || $block->[$i + 1][0] eq 'code';
 
         # Append semicolon
         $blocks[-1] .= ';' unless $multi || $capture;

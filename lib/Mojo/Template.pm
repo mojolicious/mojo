@@ -26,13 +26,14 @@ has tree      => sub { [] };
 sub build {
   my $self = shift;
 
-  my @blocks = ('');
-  my ($capture, $multi);
-  my $escape = $self->auto_escape;
   my $tree   = $self->tree;
-  for my $i (0 .. $#$tree) {
-    my ($op, $value) = @{$tree->[$i]};
-    push @blocks, '' and next if $op eq 'line' && $tree->[$i + 1];
+  my $escape = $self->auto_escape;
+
+  my @blocks = ('');
+  my ($i, $capture, $multi);
+  while (++$i <= @$tree && (my $next = $tree->[$i])) {
+    my ($op, $value) = @{$tree->[$i - 1]};
+    push @blocks, '' and next if $op eq 'line';
     my $newline = chomp($value //= '');
 
     # Text (quote and fix line ending)
@@ -47,7 +48,7 @@ sub build {
       $blocks[-1] .= 'return Mojo::ByteStream->new($_M) }';
 
       # No following code
-      $blocks[-1] .= ';' if ($tree->[$i + 1][1] // '') =~ /^\s*$/;
+      $blocks[-1] .= ';' if ($next->[1] // '') =~ /^\s*$/;
     }
 
     # Code or multiline expression
@@ -65,7 +66,7 @@ sub build {
       elsif (!$multi) { $blocks[-1] .= "\$_M .= scalar $value" }
 
       # Multiline
-      $multi = !$tree->[$i + 1] || $tree->[$i + 1][0] ne 'text';
+      $multi = !$next || $next->[0] ne 'text';
 
       # Append semicolon
       $blocks[-1] .= ';' unless $multi || $capture;
@@ -590,7 +591,7 @@ Raw unparsed template.
 =head2 tree
 
   my $tree = $mt->tree;
-  $mt      = $mt->tree([['text', 'foo']]);
+  $mt      = $mt->tree([['text', 'foo'], ['line']]);
 
 Template in parsed form. Note that this structure should only be used very
 carefully since it is very dynamic.

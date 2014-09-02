@@ -81,7 +81,7 @@ is $output, "onetwo  three\n", 'expression tags trimmed';
 
 # Nothing to trim
 $mt     = Mojo::Template->new;
-$output = $mt->render("<% =%>");
+$output = $mt->render('<% =%>');
 is $output, '', 'nothing trimmed';
 
 # Replace tag

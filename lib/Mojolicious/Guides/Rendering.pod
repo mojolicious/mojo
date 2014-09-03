@@ -875,8 +875,9 @@ The token can also be submitted with the C<X-CSRF-Token> request header.
 
 =head2 Adding helpers
 
-Adding and redefining helpers is very easy, you can use them to do pretty much
-anything.
+You should always try to keep your actions small and reuse as much code as
+possible. Helpers make this very easy, you can use them to do pretty much
+anything an action could do.
 
   use Mojolicious::Lite;
 
@@ -954,6 +955,9 @@ call the nested helpers.
   };
 
   app->start;
+
+While helpers can also be redefined, this should only be done very carefully
+to avoid conflicts.
 
 =head2 Helper plugins
 

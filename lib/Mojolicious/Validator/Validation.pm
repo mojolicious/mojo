@@ -122,8 +122,8 @@ L<Mojolicious::Validator::Validation> implements the following attributes.
 
 =head2 csrf_token
 
-  my $token   = $validation->token;
-  $validation = $validation->token('fa6a08...');
+  my $token   = $validation->csrf_token;
+  $validation = $validation->csrf_token('fa6a08...');
 
 CSRF token.
 

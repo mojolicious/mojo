@@ -275,7 +275,7 @@ sub _wrap {
   my $head = $self->_line(1);
   $head .= "\npackage @{[$self->namespace]}; use Mojo::Base -strict;";
   $code = "$head sub { my \$_M = ''; @{[$self->prepend]}; { $code\n";
-  $code .= $self->_line($num + 1) . "\n@{[$self->append]}; \$_M } };";
+  $code .= $self->_line($num + 1) . "\n@{[$self->append]}; } \$_M };";
 
   warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $code;

@@ -141,7 +141,7 @@ sub helper {
   my ($self, $name, $cb) = @_;
   my $r = $self->renderer;
   $self->log->debug(qq{Helper "$name" already exists, replacing.})
-    if exists $r->helpers->{$name};
+    if $r->get_helper($name);
   $r->add_helper($name => $cb);
 }
 

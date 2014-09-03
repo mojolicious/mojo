@@ -15,7 +15,7 @@ sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};
   return $app->new unless my $e = Mojo::Loader->new->load($app);
-  die ref $e ? $e : qq{Couldn't find application class "$app".\n};
+  die ref $e ? $e : qq{Couldn't find application class "$app" in \@INC.\n};
 }
 
 sub build_tx {

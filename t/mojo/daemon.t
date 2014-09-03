@@ -69,6 +69,11 @@ eval {
 };
 like $@, qr/^Couldn't load application/, 'right error';
 
+# Load missing application class
+eval { Mojo::Server::Daemon->new->build_app('Mojo::DoesNotExist') };
+is $@, qq{Couldn't find application class "Mojo::DoesNotExist" in \@INC.\n},
+  'right error';
+
 # Transaction
 isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';
 

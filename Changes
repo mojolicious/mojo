@@ -1,4 +1,6 @@
 
+5.38  2014-09-04
+
 5.37  2014-09-03
   - Improved Mojo::Template performance slightly.
   - Fixed .ep template bug where the stash value "c" could no longer be used.

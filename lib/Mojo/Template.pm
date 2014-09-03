@@ -8,8 +8,8 @@ use Mojo::Util qw(decode encode monkey_patch slurp);
 
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
-has [qw(auto_escape compiled)];
 has [qw(append code prepend template)] => '';
+has [qw(auto_escape compiled)];
 has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
@@ -43,6 +43,9 @@ sub build {
       $blocks[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
     }
 
+    # Code or multiline expression
+    elsif ($op eq 'code' || $multi) { $blocks[-1] .= $value }
+
     # Capture end
     elsif ($op eq 'cpen') {
       $blocks[-1] .= 'return Mojo::ByteStream->new($_M) }';
@@ -50,9 +53,6 @@ sub build {
       # No following code
       $blocks[-1] .= ';' if ($next->[1] // '') =~ /^\s*$/;
     }
-
-    # Code or multiline expression
-    elsif ($op eq 'code' || $multi) { $blocks[-1] .= $value }
 
     # Expression
     if ($op eq 'expr' || $op eq 'escp') {
@@ -217,7 +217,7 @@ sub parse {
     push @tree, ['line'] and next
       if $tree[-4] && $tree[-4][0] ne 'line'
       || (!$tree[-3] || $tree[-3][0] ne 'text' || $tree[-3][1] !~ /\n$/)
-      || ($tree[-1][0] ne 'text' || $tree[-2][0] ne 'line');
+      || ($tree[-2][0] ne 'line' || $tree[-1][0] ne 'text');
     $tree[-3][1] .= pop(@tree)->[1];
   }
 

@@ -8,9 +8,8 @@ Mojolicious::Guides - Mojolicious guide to the galaxy
 =head1 DON'T PANIC!
 
 We are constantly working on new documentation, follow us on
-L<Twitter|http://twitter.com/kraih>, L<GitHub|http://github.com/kraih/mojo>
-or join the official IRC channel C<#mojo> on C<irc.perl.org> to get all the
-latest updates.
+L<GitHub|http://github.com/kraih/mojo> or join the official IRC channel
+C<#mojo> on C<irc.perl.org> to get all the latest updates.
 
 =head1 LEARNING PERL
 

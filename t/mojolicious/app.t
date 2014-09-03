@@ -65,6 +65,8 @@ is $t->app->renderer->template_handler(
 is $t->app->build_controller->req->url, '', 'no URL';
 is $t->app->build_controller->render_to_string('does_not_exist'), undef,
   'no result';
+is $t->app->build_controller->render_to_string(inline => '%= $c', c => 'foo'),
+  "foo\n", 'right result';
 
 # Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };

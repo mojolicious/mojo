@@ -34,10 +34,11 @@ sub register {
           unless $self->{helpers};
 
         # Stash values (every time)
-        my $prepend = 'my $self = my $c = shift; my $_S = $c->stash;';
+        my $prepend = 'my $self = my $c = shift; my $_S = $c->stash; {';
         $prepend .= join '', map {" my \$$_ = \$_S->{'$_'};"} @keys;
+        $mt->prepend($prepend . $mt->prepend)->append('}' . $mt->append);
 
-        $cache->set($key => $mt->prepend($prepend . $mt->prepend));
+        $cache->set($key => $mt);
       }
 
       # Make current controller available

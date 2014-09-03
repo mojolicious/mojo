@@ -851,7 +851,8 @@ non-blocking.
 Open a non-blocking WebSocket connection with transparent handshake, takes the
 same arguments as L<Mojo::UserAgent::Transactor/"websocket">. The callback
 will receive either a L<Mojo::Transaction::WebSocket> or
-L<Mojo::Transaction::HTTP> object.
+L<Mojo::Transaction::HTTP> object, depending on if the handshake was
+successful.
 
   $ua->websocket('ws://example.com/echo' => sub {
     my ($ua, $tx) = @_;

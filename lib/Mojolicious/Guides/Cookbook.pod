@@ -1242,16 +1242,17 @@ application, you can use application specific plugins.
   $ touch lib/MyApp/Plugin/MyHelpers.pm
 
 They work just like normal plugins and are also subclasses of
-L<Mojolicious::Plugin>.
+L<Mojolicious::Plugin>, nested helpers with a prefix based on the plugin name
+are an easy way to avoid conflicts.
 
   package MyApp::Plugin::MyHelpers;
   use Mojo::Base 'Mojolicious::Plugin';
 
   sub register {
     my ($self, $app) = @_;
-    $app->helper(render_with_header => sub {
+    $app->helper('my_helpers.render_with_header' => sub {
       my ($c, @args) = @_;
-      $c->res->headers->header('X-Mojo' => 'I <3 Mojolicious!')
+      $c->res->headers->header('X-Mojo' => 'I <3 Mojolicious!');
       $c->render(@args);
     });
   }
@@ -1270,7 +1271,7 @@ name.
 
   get '/' => sub {
     my $c = shift;
-    $c->render_with_header(text => 'I ♥ Mojolicious!');
+    $c->my_helpers->render_with_header(text => 'I ♥ Mojolicious!');
   };
 
   app->start;

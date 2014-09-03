@@ -15,7 +15,7 @@ sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};
   return $app->new unless my $e = Mojo::Loader->new->load($app);
-  die ref $e ? $e : qq{Couldn't find application class "$app" in \@INC.\n};
+  die ref $e ? $e : qq{Can't find application class "$app" in \@INC. (@INC)\n};
 }
 
 sub build_tx {
@@ -52,7 +52,7 @@ sub load_app {
     # Try to load application from script into sandbox
     my $app = eval "package Mojo::Server::Sandbox::@{[md5_sum $path]};"
       . 'return do($path) || die($@ || $!);';
-    die qq{Couldn't load application from file "$path": $@} if !$app && $@;
+    die qq{Can't load application from file "$path": $@} if !$app && $@;
     die qq{File "$path" did not return an application object.\n}
       unless blessed $app && $app->isa('Mojo');
     $self->app($app);

@@ -67,11 +67,11 @@ eval {
   Mojo::Server::Daemon->new->load_app(
     "$FindBin::Bin/lib/Mojo/LoaderException.pm");
 };
-like $@, qr/^Couldn't load application/, 'right error';
+like $@, qr/^Can't load application/, 'right error';
 
 # Load missing application class
 eval { Mojo::Server::Daemon->new->build_app('Mojo::DoesNotExist') };
-is $@, qq{Couldn't find application class "Mojo::DoesNotExist" in \@INC.\n},
+like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/,
   'right error';
 
 # Transaction

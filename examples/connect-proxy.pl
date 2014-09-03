@@ -76,7 +76,7 @@ Mojo::IOLoop->server(
       }
     );
   }
-) or die "Couldn't create listen socket!\n";
+);
 
 print <<'EOF';
 Starting CONNECT proxy on port 3000.

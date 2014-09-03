@@ -17,7 +17,7 @@ sub parse {
   my $config
     = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
     . "sub app; local *app = sub { \$app }; use Mojo::Base -strict; $content";
-  die qq{Couldn't load configuration from file "$file": $@} if !$config && $@;
+  die qq{Can't load configuration from file "$file": $@} if !$config && $@;
   die qq{Configuration file "$file" did not return a hash reference.\n}
     unless ref $config eq 'HASH';
 

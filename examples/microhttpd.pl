@@ -32,7 +32,7 @@ Mojo::IOLoop->server(
     );
     $stream->on(close => sub { delete $buffer{$id} });
   }
-) or die "Couldn't create listen socket!\n";
+);
 
 print <<'EOF';
 Starting server on port 8080.

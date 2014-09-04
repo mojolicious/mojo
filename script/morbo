@@ -40,6 +40,7 @@ morbo - Morbo HTTP and WebSocket development server
     morbo script/myapp
     morbo myapp.pl
     morbo -m production -l https://*:443 -l http://[::]:3000 myapp.pl
+    morbo -l 'https://*:443?cert=./server.crt&key=./server.key'
     morbo -w /usr/local/lib -w public myapp.pl
 
   Options:

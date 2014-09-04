@@ -1193,7 +1193,7 @@ C<Authorization> header.
 
 This can be combined with TLS for a secure authentication mechanism.
 
-  $ ./myapp.pl daemon -l https://*:3000?cert=./server.crt&key=./server.key
+  $ ./myapp.pl daemon -l 'https://*:3000?cert=./server.crt&key=./server.key'
 
 =head2 Adding a configuration file
 

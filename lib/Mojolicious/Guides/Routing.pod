@@ -192,24 +192,21 @@ class, but the router can be accessed from everywhere (even at runtime).
 =head2 Routing destination
 
 After you start a new route with methods like
-L<Mojolicious::Routes::Route/"get"> or L<Mojolicious::Routes::Route/"any">,
-you can also give it a destination in the form of a hash using the chained
-method L<Mojolicious::Routes::Route/"to">.
+L<Mojolicious::Routes::Route/"get">, you can also give it a destination in the
+form of a hash using the chained method L<Mojolicious::Routes::Route/"to">.
 
-  # GET /welcome -> {controller => 'foo', action => 'welcome'}
+  # /welcome -> {controller => 'foo', action => 'welcome'}
   $r->get('/welcome')->to(controller => 'foo', action => 'welcome');
-
-  # * /bye -> {controller => 'foo', action => 'bye'}
-  $r->any('/bye')->to(controller => 'foo', action => 'bye');
 
 Now if the route matches an incoming request it will use the content of this
 hash to try and find appropriate code to generate a response.
 
 =head2 HTTP methods
 
-There are methods for the most common HTTP methods, and
-L<Mojolicious::Routes::Route/"any"> accepts an array reference with arbitrary
-methods as first argument.
+There are already shortcuts for the most common HTTP request methods like
+L<Mojolicious::Routes::Route/"post">, and for more control
+L<Mojolicious::Routes::Route/"any"> accepts an optional array reference with
+arbitrary request methods as first argument.
 
   # PUT /hello  -> undef
   # GET /hello  -> {controller => 'foo', action => 'hello'}
@@ -217,6 +214,9 @@ methods as first argument.
 
   # PUT /hello -> {controller => 'foo', action => 'hello'}
   $r->put('/hello')->to(controller => 'foo', action => 'hello');
+
+  # POST /hello -> {controller => 'foo', action => 'hello'}
+  $r->post('/hello')->to(controller => 'foo', action => 'hello');
 
   # GET|POST /bye  -> {controller => 'foo', action => 'bye'}
   $r->any([qw(GET POST)] => '/bye')->to(controller => 'foo', action => 'bye');

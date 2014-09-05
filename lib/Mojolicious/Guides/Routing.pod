@@ -497,8 +497,8 @@ expressions.
 
 To share code with multiple nested routes you can use
 L<Mojolicious::Routes::Route/"under">, because unlike normal nested routes,
-routes generated with it have their own intermediate destination and result in
-additional dispatch cycles when they match.
+the routes generated with it have their own intermediate destination and
+result in additional dispatch cycles when they match.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}

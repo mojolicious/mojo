@@ -312,6 +312,7 @@ current parent if necessary.
   my $route = $r->any('/:foo' => {foo => 'bar'} => sub {...});
   my $route = $r->any('/:foo' => [foo => qr/\w+/] => sub {...});
   my $route = $r->any([qw(GET POST)] => '/:foo' => sub {...});
+  my $route = $r->any([qw(GET POST)] => '/:foo' => [foo => qr/\w+/]);
 
 Generate L<Mojolicious::Routes::Route> object matching any of the listed HTTP
 request methods or all. See also the L<Mojolicious::Lite> tutorial for many

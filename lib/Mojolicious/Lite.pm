@@ -1026,6 +1026,7 @@ automatically exported.
   my $route = any '/:foo' => {foo => 'bar'} => sub {...};
   my $route = any '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = any [qw(GET POST)] => '/:foo' => sub {...};
+  my $route = any [qw(GET POST)] => '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the
 listed HTTP request methods or all. See also the tutorial above for many more

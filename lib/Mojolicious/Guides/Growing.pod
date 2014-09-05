@@ -170,6 +170,9 @@ L<Mojolicious::Command::generate::app>.
   $ mojo generate lite_app myapp.pl
   $ mojo generate app MyApp
 
+Feature-wise both are almost equal, the only real differences are
+organizational.
+
 =head2 Foundation
 
 We start our new application with a single executable Perl script.

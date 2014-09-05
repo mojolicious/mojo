@@ -342,49 +342,6 @@ For security reasons the dispatcher will always check if the C<controller> is
 actually a subclass of L<Mojolicious::Controller> or L<Mojo> before
 dispatching to it.
 
-=head2 Named routes
-
-Naming your routes will allow backreferencing in many methods and helpers
-throughout the whole framework, most of them internally rely on
-L<Mojolicious::Controller/"url_for"> for this.
-
-  # /foo/abc -> {controller => 'foo', action => 'bar', test => 'abc'}
-  $r->get('/foo/:test')->to('foo#bar')->name('baz');
-
-  # Generate URL "/foo/abc" for route "baz"
-  my $url = $c->url_for('baz');
-
-  # Generate URL "/foo/jan" for route "baz"
-  my $url = $c->url_for('baz', test => 'jan');
-
-  # Generate URL "http://127.0.0.1:3000/foo/jan" for route "baz"
-  my $url = $c->url_for('baz', test => 'jan')->to_abs;
-
-Nameless routes get an automatically generated one assigned that is simply
-equal to the route itself without non-word characters.
-
-  # /foo/bar ("foobar")
-  $r->get('/foo/bar')->to('test#stuff');
-
-  # Generate URL "/foo/bar"
-  my $url = $c->url_for('foobar');
-
-To refer to the current route you can use the reserved name C<current> or no
-name at all.
-
-  # Generate URL for current route
-  my $url = $c->url_for('current');
-  my $url = $c->url_for;
-
-To check or get the name of the current route you can use the helper
-L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
-
-  # Name for current route
-  my $name = $c->current_route;
-
-  # Check route name in code shared by multiple routes
-  $c->stash(button => 'green') if $c->current_route('login');
-
 =head2 Route to class
 
 You can use the C<namespace> stash value to change the namespace of a whole
@@ -424,6 +381,50 @@ which usually looks much better.
     my $c = shift;
     $c->render(text => 'Good bye.');
   });
+
+=head2 Named routes
+
+Naming your routes will allow backreferencing in many methods and helpers
+throughout the whole framework, most of them internally rely on
+L<Mojolicious::Controller/"url_for"> for this.
+
+  # /foo/abc -> {controller => 'foo', action => 'bar', test => 'abc'}
+  $r->get('/foo/:test')->to('foo#bar')->name('baz');
+
+  # Generate URL "/foo/abc" for route "baz"
+  my $url = $c->url_for('baz');
+
+  # Generate URL "/foo/jan" for route "baz"
+  my $url = $c->url_for('baz', test => 'jan');
+
+  # Generate URL "http://127.0.0.1:3000/foo/jan" for route "baz"
+  my $url = $c->url_for('baz', test => 'jan')->to_abs;
+
+Nameless routes get an automatically generated one assigned that is simply
+equal to the route itself without non-word characters, custom names have a
+higher precedence though.
+
+  # /foo/bar ("foobar")
+  $r->get('/foo/bar')->to('test#stuff');
+
+  # Generate URL "/foo/bar"
+  my $url = $c->url_for('foobar');
+
+To refer to the current route you can use the reserved name C<current> or no
+name at all.
+
+  # Generate URL for current route
+  my $url = $c->url_for('current');
+  my $url = $c->url_for;
+
+To check or get the name of the current route you can use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
+
+  # Name for current route
+  my $name = $c->current_route;
+
+  # Check route name in code shared by multiple routes
+  $c->stash(button => 'green') if $c->current_route('login');
 
 =head2 Optional placeholders
 

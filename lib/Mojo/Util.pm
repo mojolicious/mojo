@@ -299,7 +299,7 @@ sub tablify {
     for my $i (0 .. $#$row) {
       $row->[$i] =~ s/[\r\n]//g;
       my $len = length $row->[$i];
-      $spec[$i] = $len if $len > ($spec[$i] // 0);
+      $spec[$i] = $len if $len >= ($spec[$i] // 0);
     }
   }
 

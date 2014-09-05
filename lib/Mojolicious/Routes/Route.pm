@@ -267,7 +267,7 @@ The children of this route, used for nesting routes.
   my $bool = $r->inline;
   $r       = $r->inline($bool);
 
-Allow L</"bridge"> semantics for this route.
+Allow L</"under"> semantics for this route.
 
 =head2 parent
 
@@ -321,13 +321,13 @@ more argument variations.
 
 =head2 bridge
 
-  my $bridge = $r->bridge;
-  my $bridge = $r->bridge('/:action');
-  my $bridge = $r->bridge('/:action', action => qr/\w+/);
-  my $bridge = $r->bridge(format => 0);
+  my $route = $r->bridge;
+  my $route = $r->bridge('/:action');
+  my $route = $r->bridge('/:action', action => qr/\w+/);
+  my $route = $r->bridge(format => 0);
 
-Low-level generator for bridge routes, returns a L<Mojolicious::Routes::Route>
-object.
+Low-level generator for nested routes with their own intermediate destination,
+returns a L<Mojolicious::Routes::Route> object.
 
   my $auth = $r->bridge('/user')->to('user#auth');
   $auth->get('/show')->to('#show');
@@ -557,13 +557,14 @@ Stringify the whole route.
 
 =head2 under
 
-  my $bridge = $r->under(sub {...});
-  my $bridge = $r->under('/:foo' => sub {...});
-  my $bridge = $r->under('/:foo' => [foo => qr/\w+/]);
-  my $bridge = $r->under({format => 0});
+  my $route = $r->under(sub {...});
+  my $route = $r->under('/:foo' => sub {...});
+  my $route = $r->under('/:foo' => [foo => qr/\w+/]);
+  my $route = $r->under({format => 0});
 
-Generate L<Mojolicious::Routes::Route> object for bridge route. See also the
-L<Mojolicious::Lite> tutorial for many more argument variations.
+Generate L<Mojolicious::Routes::Route> object for a nested route with its own
+intermediate destination. See also the L<Mojolicious::Lite> tutorial for many
+more argument variations.
 
   my $auth = $r->under('/user')->to('user#auth');
   $auth->get('/show')->to('#show');

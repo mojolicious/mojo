@@ -493,11 +493,12 @@ is fine though.
 This way you get easily readable routes and the raw power of regular
 expressions.
 
-=head2 Bridges
+=head2 Under
 
-Bridge routes created with the method L<Mojolicious::Routes::Route/"under">
-can be used to share code with multiple nested routes, because unlike normal
-nested routes, they result in additional dispatch cycles when they match.
+To share code with multiple nested routes you can use
+L<Mojolicious::Routes::Route/"under">, because unlike normal nested routes,
+routes generated with it have their own destination and result in additional
+dispatch cycles when they match.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}
@@ -505,8 +506,9 @@ nested routes, they result in additional dispatch cycles when they match.
   my $foo = $r->under('/foo')->to('foo#baz');
   $foo->get('/bar')->to('#bar');
 
-The actual bridge code needs to return a true value or the dispatch chain will
-be broken, this makes bridges a very powerful tool for authentication.
+The actual action code for this destination needs to return a true value or
+the dispatch chain will be broken, this can be a very powerful tool for
+authentication.
 
   # /foo/bar -> {cb => sub {...}}
   #             {controller => 'foo', action => 'bar'}
@@ -733,9 +735,6 @@ to make route generation more expressive.
   # OPTIONS /user -> {cb => sub {...}}
   $r->resource('user');
 
-Shortcuts can lead to anything, routes, bridges or maybe even both. And watch
-out for quicksand!
-
 =head2 Introspection
 
 The command L<Mojolicious::Command::routes> can be used from the command line
@@ -744,7 +743,7 @@ expressions.
 
   $ ./myapp.pl routes -v
   /foo/:name  ....  POST  fooname  ^/foo/([^/\.]+)  ^/?(?:\.([^/]+))?$
-  /bar        B...  *     bar      ^/bar
+  /bar        ..U.  *     bar      ^/bar
     +/baz     ...W  GET   baz      ^/baz            ^/?(?:\.([^/]+))?$
   /yada       ....  *     yada     ^/yada           ^/?(?:\.([^/]+))?$
 

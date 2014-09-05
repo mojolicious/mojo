@@ -475,7 +475,7 @@ expression C<(bender|leela)>.
   # /fry    -> undef
   # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
   # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
-  $r->get('/:name', [name => [qw(bender leela)]])->to('foo#bar');
+  $r->get('/:name' => [name => [qw(bender leela)]])->to('foo#bar');
 
 You can also adjust the regular expressions behind placeholders directly, just
 make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
@@ -484,11 +484,11 @@ is fine though.
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef
-  $r->get('/:number', [number => qr/\d+/])->to('foo#bar');
+  $r->get('/:number' => [number => qr/\d+/])->to('foo#bar');
 
   # /23   -> undef
   # /test -> {controller => 'foo', action => 'bar', name => 'test'}
-  $r->get('/:name', [name => qr/[a-zA-Z]+/])->to('foo#bar');
+  $r->get('/:name' => [name => qr/[a-zA-Z]+/])->to('foo#bar');
 
 This way you get easily readable routes and the raw power of regular
 expressions.
@@ -560,14 +560,14 @@ allowed formats.
   # /foo.txt -> undef
   # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
-  $r->get('/foo', [format => [qw(rss xml)]])->to('foo#bar');
+  $r->get('/foo' => [format => [qw(rss xml)]])->to('foo#bar');
 
 Or you can just disable format detection, which gets inherited by nested
 routes and allows selective re-enabling.
 
   # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef
-  $r->get('/foo', [format => 0])->to('foo#bar');
+  $r->get('/foo' => [format => 0])->to('foo#bar');
 
   # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef
@@ -577,7 +577,7 @@ routes and allows selective re-enabling.
   # /baz.xml  -> undef
   my $inactive = $r->under([format => 0]);
   $inactive->get('/foo')->to('foo#bar');
-  $inactive->get('/baz', format => [qw(txt html)])->to('baz#yada');
+  $inactive->get('/baz' => [format => [qw(txt html)]])->to('baz#yada');
 
 =head2 WebSockets
 

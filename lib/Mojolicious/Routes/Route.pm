@@ -557,8 +557,9 @@ Stringify the whole route.
 
   my $route = $r->under(sub {...});
   my $route = $r->under('/:foo' => sub {...});
+  my $route = $r->under('/:foo' => {foo => 'bar'});
   my $route = $r->under('/:foo' => [foo => qr/\w+/]);
-  my $route = $r->under({format => 0});
+  my $route = $r->under([format => 0]);
 
 Generate L<Mojolicious::Routes::Route> object for a nested route with its own
 intermediate destination. See also the L<Mojolicious::Lite> tutorial for many

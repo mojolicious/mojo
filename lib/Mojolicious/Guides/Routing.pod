@@ -342,7 +342,7 @@ For security reasons the dispatcher will always check if the C<controller> is
 actually a subclass of L<Mojolicious::Controller> or L<Mojo> before
 dispatching to it.
 
-=head2 Route to class
+=head2 Namespaces
 
 You can use the C<namespace> stash value to change the namespace of a whole
 route with all its children.

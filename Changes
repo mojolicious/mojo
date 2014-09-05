@@ -1,4 +1,6 @@
 
+5.39  2014-09-06
+
 5.38  2014-09-05
   - Improved routes command to use new terminology for flags.
   - Fixed bug in Mojo::Util where tablify could not handle empty columns.

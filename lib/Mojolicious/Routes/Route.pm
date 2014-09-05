@@ -222,12 +222,9 @@ sub _generate_route {
     elsif (ref $arg eq 'HASH') { %defaults = (%defaults, %$arg) }
   }
 
-  # Create bridge or route
   my $route
-    = $methods eq 'under'
-    ? $self->bridge($pattern, @constraints)
-    : $self->route($pattern, @constraints)->via($methods);
-  $route->over(\@conditions)->to(\%defaults);
+    = $self->route($pattern, @constraints)->over(\@conditions)->to(\%defaults);
+  $methods eq 'under' ? $route->inline(1) : $route->via($methods);
 
   return defined $name ? $route->name($name) : $route;
 }

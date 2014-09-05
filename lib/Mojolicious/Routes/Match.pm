@@ -71,7 +71,7 @@ sub _match {
     $empty = 1;
   }
 
-  # Endpoint (or bridge)
+  # Endpoint (or intermediate destination)
   if (($endpoint && $empty) || $r->inline) {
     push @{$self->stack}, {%$captures};
     if ($endpoint && $empty) {

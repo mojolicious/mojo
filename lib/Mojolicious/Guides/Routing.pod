@@ -164,7 +164,7 @@ defined.
     my $r = $self->routes;
 
     # Route
-    $r->route('/welcome')->to(controller => 'foo', action => 'welcome');
+    $r->get('/welcome')->to(controller => 'foo', action => 'welcome');
   }
 
   1;
@@ -191,16 +191,49 @@ class, but the router can be accessed from everywhere (even at runtime).
 
 =head2 Routing destination
 
-After you start a new route with the method
-L<Mojolicious::Routes::Route/"route">, you can also give it a destination in
-the form of a hash using the chained method
-L<Mojolicious::Routes::Route/"to">.
+After you start a new route with methods like
+L<Mojolicious::Routes::Route/"get"> or L<Mojolicious::Routes::Route/"any">,
+you can also give it a destination in the form of a hash using the chained
+method L<Mojolicious::Routes::Route/"to">.
 
-  # /welcome -> {controller => 'foo', action => 'welcome'}
-  $r->route('/welcome')->to(controller => 'foo', action => 'welcome');
+  # GET /welcome -> {controller => 'foo', action => 'welcome'}
+  $r->get('/welcome')->to(controller => 'foo', action => 'welcome');
+
+  # * /bye -> {controller => 'foo', action => 'bye'}
+  $r->any('/bye')->to(controller => 'foo', action => 'bye');
 
 Now if the route matches an incoming request it will use the content of this
 hash to try and find appropriate code to generate a response.
+
+=head2 HTTP methods
+
+There are methods for the most common HTTP methods, and
+L<Mojolicious::Routes::Route/"any"> accepts an array reference with arbitrary
+methods as first argument.
+
+  # GET /hello  -> {controller => 'foo', action => 'hello'}
+  # POST /hello -> undef
+  # PUT /hello  -> undef
+  $r->get('/hello')->to(controller => 'foo', action => 'hello');
+
+  # PUT /hello -> {controller => 'foo', action => 'hello'}
+  $r->put('/hello')->to(controller => 'foo', action => 'hello');
+
+  # GET /bye  -> {controller => 'foo', action => 'bye'}
+  # POST /bye -> {controller => 'foo', action => 'bye'}
+  # PUT /bye  -> undef
+  $r->any([qw(GET POST)] => '/bye')->to(controller => 'foo', action => 'bye');
+
+  # * /whatever -> {controller => 'foo', action => 'whatever'}
+  $r->any('/whatever')->to(controller => 'foo', action => 'whatever');
+
+With one small exception, C<HEAD> requests are considered equal to C<GET> and
+content will not be sent with the response.
+
+  # GET /test  -> {controller => 'bar', action => 'test'}
+  # HEAD /test -> {controller => 'bar', action => 'test'}
+  # PUT /test  -> undef
+  $r->get('/test')->to(controller => 'bar', action => 'test');
 
 =head2 Stash
 
@@ -209,7 +242,7 @@ L<Mojolicious> request cycle. We call it the stash, and it persists until a
 response has been generated.
 
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye'}
-  $r->route('/bye')
+  $r->get('/bye')
     ->to(controller => 'foo', action => 'bye', mymessage => 'Bye');
 
 There are a few stash values with special meaning, such as C<controller> and
@@ -238,8 +271,8 @@ endpoints of these nested routes can.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'bar'}
-  my $foo = $r->route('/foo')->to(controller => 'foo');
-  $foo->route('/bar')->to(action => 'bar');
+  my $foo = $r->any('/foo')->to(controller => 'foo');
+  $foo->get('/bar')->to(action => 'bar');
 
 The stash is simply inherited from route to route and newer values override
 old ones.
@@ -249,10 +282,10 @@ old ones.
   # /foo/bar -> {controller => 'foo', action => 'bar'}
   # /foo/baz -> {controller => 'foo', action => 'baz'}
   # /foo/cde -> {controller => 'foo', action => 'abc'}
-  my $foo = $r->route('/foo')->to(controller => 'foo', action => 'abc');
-  $foo->route('/bar')->to(action => 'bar');
-  $foo->route('/baz')->to(action => 'baz');
-  $foo->route('/cde');
+  my $foo = $r->any('/foo')->to(controller => 'foo', action => 'abc');
+  $foo->get('/bar')->to(action => 'bar');
+  $foo->get('/baz')->to(action => 'baz');
+  $foo->get('/cde');
 
 =head2 Special stash values
 
@@ -272,7 +305,7 @@ The action value is not changed at all, so both values are case sensitive.
     my $self = shift;
 
     # /bye -> MyApp::Controller::Foo->bye
-    $self->routes->route('/bye')->to(controller => 'foo', action => 'bye');
+    $self->routes->get('/bye')->to(controller => 'foo', action => 'bye');
   }
 
   1;
@@ -297,19 +330,19 @@ used ones they also got a special shortcut in the form of
 C<controller#action>.
 
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye'}
-  $r->route('/bye')->to('foo#bye', mymessage => 'Bye');
+  $r->get('/bye')->to('foo#bye', mymessage => 'Bye');
 
 During camelization C<-> characters get replaced with C<::>, this allows
 multi-level C<controller> hierarchies.
 
   # / -> MyApp::Controller::Foo::Bar->hi
-  $r->route('/')->to('foo-bar#hi');
+  $r->get('/')->to('foo-bar#hi');
 
 You can also just specify the C<controller> in CamelCase form instead of
 snake_case.
 
   # / -> MyApp::Controller::Foo::Bar->hi
-  $r->route('/')->to('Foo::Bar#hi');
+  $r->get('/')->to('Foo::Bar#hi');
 
 For security reasons the dispatcher will always check if the C<controller> is
 actually a subclass of L<Mojolicious::Controller> or L<Mojo> before
@@ -321,16 +354,16 @@ You can use the C<namespace> stash value to change the namespace of a whole
 route with all its children.
 
   # /bye -> MyApp::MyController::Foo::Bar->bye
-  $r->route('/bye')
+  $r->get('/bye')
     ->to(namespace => 'MyApp::MyController::Foo::Bar', action => 'bye');
 
 The C<controller> is always appended to this C<namespace> if available.
 
   # /bye -> MyApp::MyController::Foo::Bar->bye
-  $r->route('/bye')->to('foo-bar#bye', namespace => 'MyApp::MyController');
+  $r->get('/bye')->to('foo-bar#bye', namespace => 'MyApp::MyController');
 
   # /hey -> MyApp::MyController::Foo::Bar->hey
-  $r->route('/hey')->to('Foo::Bar#hey', namespace => 'MyApp::MyController');
+  $r->get('/hey')->to('Foo::Bar#hey', namespace => 'MyApp::MyController');
 
 You can also change the default namespaces for all routes in the application
 with the router attribute L<Mojolicious::Routes/"namespaces">.
@@ -342,13 +375,18 @@ with the router attribute L<Mojolicious::Routes/"namespaces">.
 The C<cb> stash value, which won't be inherited by nested routes, can be used
 to bypass controllers and execute a callback instead.
 
-  $r->route('/bye')->to(cb => sub {
+  $r->get('/bye')->to(cb => sub {
     my $c = shift;
     $c->render(text => 'Good bye.');
   });
 
-This technique is the foundation of L<Mojolicious::Lite>, you can learn more
-about it from the included tutorial.
+But just like in L<Mojolicious::Lite> you can also pass the callback directly,
+which usually looks much better.
+
+  $r->get('/bye' => sub {
+    my $c = shift;
+    $c->render(text => 'Good bye.');
+  });
 
 =head2 Optional placeholders
 
@@ -357,21 +395,18 @@ already exist.
 
   # /bye -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
   # /hey -> {controller => 'foo', action => 'bar', mymessage => 'hey'}
-  $r->route('/:mymessage')
-    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
+  $r->get('/:mymessage')->to('foo#bar', mymessage => 'hi');
 
 One more interesting effect, a placeholder automatically becomes optional if
 there is already a stash value of the same name present, this works similar to
 the regular expression C<([^/.]+)?>.
 
   # / -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
-  $r->route('/:mymessage')
-    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
+  $r->get('/:mymessage')->to('foo#bar', mymessage => 'hi');
 
   # /test/123     -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
   # /test/bye/123 -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
-  $r->route('/test/:mymessage/123')
-    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
+  $r->get('/test/:mymessage/123')->to('foo#bar', mymessage => 'hi');
 
 This is also the case if multiple placeholders are right after another and not
 separated by other characters than C</>.
@@ -379,8 +414,7 @@ separated by other characters than C</>.
   # /           -> {controller => 'foo',   action => 'bar'}
   # /users      -> {controller => 'users', action => 'bar'}
   # /users/list -> {controller => 'users', action => 'list'}
-  $r->route('/:controller/:action')
-    ->to(controller => 'foo', action => 'bar');
+  $r->get('/:controller/:action')->to('foo#bar');
 
 Special stash values like C<controller> and C<action> can also be
 placeholders, which is very convenient especially during development, but
@@ -404,8 +438,7 @@ expression C<(bender|leela)>.
   # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
   # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
   # /fry    -> undef
-  $r->route('/:name', name => [qw(bender leela)])
-    ->to(controller => 'foo', action => 'bar');
+  $r->get('/:name', [name => [qw(bender leela)]])->to('foo#bar');
 
 You can also adjust the regular expressions behind placeholders directly, just
 make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
@@ -414,53 +447,14 @@ is fine though.
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef
-  $r->route('/:number', number => qr/\d+/)
-    ->to(controller => 'foo', action => 'bar');
+  $r->get('/:number', [number => qr/\d+/])->to('foo#bar');
 
   # /23   -> undef
   # /test -> {controller => 'foo', action => 'bar', name => 'test'}
-  $r->route('/:name', name => qr/[a-zA-Z]+/)
-    ->to(controller => 'foo', action => 'bar');
+  $r->get('/:name', [name => qr/[a-zA-Z]+/])->to('foo#bar');
 
 This way you get easily readable routes and the raw power of regular
 expressions.
-
-=head2 Formats
-
-File extensions like C<.html> and C<.txt> at the end of a route are
-automatically detected and stored in the stash value C<format>.
-
-  # /foo      -> {controller => 'foo', action => 'bar'}
-  # /foo.html -> {controller => 'foo', action => 'bar', format => 'html'}
-  # /foo.txt  -> {controller => 'foo', action => 'bar', format => 'txt'}
-  $r->route('/foo')->to(controller => 'foo', action => 'bar');
-
-This for example allows multiple templates in different formats to share the
-same action code. Restrictive placeholders can also be used to limit the
-allowed formats.
-
-  # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
-  # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
-  # /foo.txt -> undef
-  $r->route('/foo', format => [qw(rss xml)])
-    ->to(controller => 'foo', action => 'bar');
-
-Or you can just disable format detection, which gets inherited by nested
-routes and allows selective re-enabling.
-
-  # /foo      -> {controller => 'foo', action => 'bar'}
-  # /foo.html -> undef
-  $r->route('/foo', format => 0)->to('foo#bar');
-
-  # /foo      -> {controller => 'foo', action => 'bar'}
-  # /foo.html -> undef
-  # /baz      -> undef
-  # /baz.txt  -> {controller => 'baz', action => 'yada', format => 'txt'}
-  # /baz.html -> {controller => 'baz', action => 'yada', format => 'html'}
-  # /baz.xml  -> undef
-  my $inactive = $r->route(format => 0);
-  $inactive->route('/foo')->to('foo#bar');
-  $inactive->route('/baz', format => [qw(txt html)])->to('baz#yada');
 
 =head2 Named routes
 
@@ -468,24 +462,23 @@ Naming your routes will allow backreferencing in many methods and helpers
 throughout the whole framework, most of them internally rely on
 L<Mojolicious::Controller/"url_for"> for this.
 
-  # /foo/abc -> {controller => 'foo', action => 'bar', name => 'abc'}
-  $r->route('/foo/:name')->name('test')
-    ->to(controller => 'foo', action => 'bar');
+  # /foo/abc -> {controller => 'foo', action => 'bar', test => 'abc'}
+  $r->get('/foo/:test')->to('foo#bar')->name('baz');
 
-  # Generate URL "/foo/abc" for route "test"
-  my $url = $c->url_for('test');
+  # Generate URL "/foo/abc" for route "baz"
+  my $url = $c->url_for('baz');
 
-  # Generate URL "/foo/sebastian" for route "test"
-  my $url = $c->url_for('test', name => 'sebastian');
+  # Generate URL "/foo/jan" for route "baz"
+  my $url = $c->url_for('baz', test => 'jan');
 
-  # Generate URL "http://127.0.0.1:3000/foo/sebastian" for route "test"
-  my $url = $c->url_for('test', name => 'sebastian')->to_abs;
+  # Generate URL "http://127.0.0.1:3000/foo/jan" for route "baz"
+  my $url = $c->url_for('baz', test => 'jan')->to_abs;
 
 Nameless routes get an automatically generated one assigned that is simply
 equal to the route itself without non-word characters.
 
   # /foo/bar ("foobar")
-  $r->route('/foo/bar')->to('test#stuff');
+  $r->get('/foo/bar')->to('test#stuff');
 
   # Generate URL "/foo/bar"
   my $url = $c->url_for('foobar');
@@ -506,29 +499,95 @@ L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
   # Check route name in code shared by multiple routes
   $c->stash(button => 'green') if $c->current_route('login');
 
-=head2 HTTP methods
+=head2 Bridges
 
-The method L<Mojolicious::Routes::Route/"via"> allows only specific HTTP
-methods to pass.
+Bridge routes created with the method L<Mojolicious::Routes::Route/"under">
+can be used to share code with multiple nested routes, because unlike normal
+nested routes, they result in additional dispatch cycles when they match.
 
-  # GET /bye    -> {controller => 'foo', action => 'bye'}
-  # POST /bye   -> undef
-  # DELETE /bye -> undef
-  $r->route('/bye')->via('GET')->to(controller => 'foo', action => 'bye');
+  # /foo     -> undef
+  # /foo/bar -> {controller => 'foo', action => 'baz'}
+  #             {controller => 'foo', action => 'bar'}
+  my $foo = $r->under('/foo')->to('foo#baz');
+  $foo->get('/bar')->to('#bar');
 
-  # GET /bye    -> {controller => 'foo', action => 'bye'}
-  # POST /bye   -> {controller => 'foo', action => 'bye'}
-  # DELETE /bye -> undef
-  $r->route('/bye')->via('GET', 'POST')
-    ->to(controller => 'foo', action => 'bye');
+The actual bridge code needs to return a true value or the dispatch chain will
+be broken, this makes bridges a very powerful tool for authentication.
 
-With one small exception, C<HEAD> requests are considered equal to C<GET> and
-content will not be sent with the response.
+  # /foo     -> undef
+  # /foo/bar -> {cb => sub {...}}
+  #             {controller => 'foo', action => 'bar'}
+  my $foo = $r->under('/foo' => sub {
+    my $c = shift;
 
-  # GET /test  -> {controller => 'bar', action => 'test'}
-  # HEAD /test -> {controller => 'bar', action => 'test'}
-  # PUT /test  -> undef
-  $r->route('/test')->via('GET')->to(controller => 'bar', action => 'test');
+    # Authenticated
+    return 1 if $c->req->headers->header('X-Bender');
+
+    # Not authenticated
+    $c->render(text => "You're not Bender.");
+    return undef;
+  });
+  $foo->get('/bar')->to('foo#bar');
+
+Broken dispatch chains can be continued by calling the method
+L<Mojolicious::Controller/"continue">, this allows for example non-blocking
+operations to finish before reaching the next dispatch cycle.
+
+  # /foo     -> undef
+  # /foo/bar -> {cb => sub {...}}
+  #          -> {controller => 'foo', action => 'bar'}
+  my $foo = $r->under('/foo' => sub {
+    my $c = shift;
+
+    # Wait 3 seconds and then give visitors a 50% chance to continue
+    Mojo::IOLoop->timer(3 => sub {
+
+      # Loser
+      return $c->render(text => 'No luck.') unless int rand 2;
+
+      # Winner
+      $c->continue;
+    });
+
+    return undef;
+  });
+  $foo->get('/bar')->to('foo#bar');
+
+=head2 Formats
+
+File extensions like C<.html> and C<.txt> at the end of a route are
+automatically detected and stored in the stash value C<format>.
+
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> {controller => 'foo', action => 'bar', format => 'html'}
+  # /foo.txt  -> {controller => 'foo', action => 'bar', format => 'txt'}
+  $r->get('/foo')->to('foo#bar');
+
+This for example allows multiple templates in different formats to share the
+same action code. Restrictive placeholders can also be used to limit the
+allowed formats.
+
+  # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
+  # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
+  # /foo.txt -> undef
+  $r->get('/foo', [format => [qw(rss xml)]])->to('foo#bar');
+
+Or you can just disable format detection, which gets inherited by nested
+routes and allows selective re-enabling.
+
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> undef
+  $r->get('/foo', [format => 0])->to('foo#bar');
+
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> undef
+  # /baz      -> undef
+  # /baz.txt  -> {controller => 'baz', action => 'yada', format => 'txt'}
+  # /baz.html -> {controller => 'baz', action => 'yada', format => 'html'}
+  # /baz.xml  -> undef
+  my $inactive = $r->under([format => 0]);
+  $inactive->get('/foo')->to('foo#bar');
+  $inactive->get('/baz', format => [qw(txt html)])->to('baz#yada');
 
 =head2 WebSockets
 
@@ -537,7 +596,7 @@ access to WebSocket handshakes, which are normal C<GET> requests with some
 additional information.
 
   # /echo (WebSocket handshake)
-  $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
+  $r->websocket('/echo')->to('foo#echo');
 
   # Controller
   package MyApp::Controller::Foo;
@@ -558,112 +617,6 @@ The connection gets established when you respond to the WebSocket handshake
 request with a C<101> response status, which happens automatically if you
 subscribe to an event with L<Mojolicious::Controller/"on"> or send a message
 with L<Mojolicious::Controller/"send"> right away.
-
-=head2 Bridges
-
-Bridge routes created with the method L<Mojolicious::Routes::Route/"bridge">
-can be used to share code with multiple nested routes, because unlike normal
-nested routes, they result in additional dispatch cycles when they match.
-
-  # /foo     -> undef
-  # /foo/bar -> {controller => 'foo', action => 'baz'}
-  #             {controller => 'foo', action => 'bar'}
-  my $foo = $r->bridge('/foo')->to(controller => 'foo', action => 'baz');
-  $foo->route('/bar')->to(action => 'bar');
-
-The actual bridge code needs to return a true value or the dispatch chain will
-be broken, this makes bridges a very powerful tool for authentication.
-
-  # /foo     -> undef
-  # /foo/bar -> {cb => sub {...}}
-  #             {controller => 'foo', action => 'bar'}
-  my $foo = $r->bridge('/foo')->to(cb => sub {
-    my $c = shift;
-
-    # Authenticated
-    return 1 if $c->req->headers->header('X-Bender');
-
-    # Not authenticated
-    $c->render(text => "You're not Bender.");
-    return undef;
-  });
-  $foo->route('/bar')->to(controller => 'foo', action => 'bar');
-
-Broken dispatch chains can be continued by calling the method
-L<Mojolicious::Controller/"continue">, this allows for example non-blocking
-operations to finish before reaching the next dispatch cycle.
-
-  # /foo     -> undef
-  # /foo/bar -> {cb => sub {...}}
-  #          -> {controller => 'foo', action => 'bar'}
-  my $foo = $r->bridge('/foo')->to(cb => sub {
-    my $c = shift;
-
-    # Wait 3 seconds and then give visitors a 50% chance to continue
-    Mojo::IOLoop->timer(3 => sub {
-
-      # Loser
-      return $c->render(text => 'No luck.') unless int rand 2;
-
-      # Winner
-      $c->continue;
-    });
-
-    return undef;
-  });
-  $foo->route('/bar')->to(controller => 'foo', action => 'bar');
-
-=head2 More convenient routes
-
-From the tutorial you should already know L<Mojolicious::Lite> routes, which
-are in fact just a small convenience layer around everything described above
-and accessible through methods like L<Mojolicious::Routes::Route/"get"> and
-L<Mojolicious::Routes::Route/"any"> as part of the normal router.
-
-  # POST /foo -> {controller => 'foo', action => 'abc'}
-  $r->post('/foo')->to(controller => 'foo', action => 'abc');
-
-  # PATCH /bar -> {controller => 'foo', action => 'bar', test => 23}
-  $r->patch('/bar')->to('foo#bar', test => 23);
-
-  # GET /baz -> {template => 'foo/bar'}
-  $r->get('/baz')->to(template => 'foo/bar');
-
-  # * /yada.txt  -> {controller => 'foo', action => 'yada', format => 'txt'}
-  # * /yada.json -> {controller => 'foo', action => 'yada', format => 'json'}
-  $r->any('/yada' => [format => [qw(txt json)]])->to('foo#yada');
-
-  # GET   /foo/bar  -> {controller => 'foo', action => 'bar'}
-  # PUT   /foo/baz  -> {controller => 'foo', action => 'baz'}
-  # PATCH /foo      -> {controller => 'foo', action => 'yada'}
-  my $foo = $r->any('/foo')->to('foo#');
-  $foo->get('/bar')->to('#bar');
-  $foo->put('/baz')->to('#baz');
-  $foo->patch->to('#yada');
-
-This makes the process of growing your L<Mojolicious::Lite> prototypes into
-full L<Mojolicious> applications very straightforward.
-
-  # POST /bar
-  $r->post('/bar' => sub {
-    my $c = shift;
-    $c->render(text => 'Just like a Mojolicious::Lite action.');
-  });
-
-Even the more abstract concepts are available with methods like
-L<Mojolicious::Routes::Route/"under">.
-
-  # GET  /yada
-  # POST /yada
-  my $yada = $r->under('/yada');
-  $yada->get(sub {
-    my $c = shift;
-    $c->render(text => 'Hello.');
-  });
-  $yada->post(sub {
-    my $c = shift;
-    $c->render(text => 'Go away.');
-  });
 
 =head2 Catch-all route
 
@@ -767,7 +720,7 @@ to make route generation more expressive.
     my ($r, $name) = @_;
 
     # Generate "/$name" route
-    my $resource = $r->route("/$name")->to("$name#");
+    my $resource = $r->any("/$name")->to("$name#");
 
     # Handle POST requests
     $resource->post->to('#create')->name("create_$name");

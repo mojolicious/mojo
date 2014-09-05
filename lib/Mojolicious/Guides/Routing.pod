@@ -211,17 +211,14 @@ There are methods for the most common HTTP methods, and
 L<Mojolicious::Routes::Route/"any"> accepts an array reference with arbitrary
 methods as first argument.
 
-  # GET /hello  -> {controller => 'foo', action => 'hello'}
-  # POST /hello -> undef
   # PUT /hello  -> undef
+  # GET /hello  -> {controller => 'foo', action => 'hello'}
   $r->get('/hello')->to(controller => 'foo', action => 'hello');
 
   # PUT /hello -> {controller => 'foo', action => 'hello'}
   $r->put('/hello')->to(controller => 'foo', action => 'hello');
 
-  # GET /bye  -> {controller => 'foo', action => 'bye'}
-  # POST /bye -> {controller => 'foo', action => 'bye'}
-  # PUT /bye  -> undef
+  # GET|POST /bye  -> {controller => 'foo', action => 'bye'}
   $r->any([qw(GET POST)] => '/bye')->to(controller => 'foo', action => 'bye');
 
   # * /whatever -> {controller => 'foo', action => 'whatever'}
@@ -232,7 +229,6 @@ content will not be sent with the response.
 
   # GET /test  -> {controller => 'bar', action => 'test'}
   # HEAD /test -> {controller => 'bar', action => 'test'}
-  # PUT /test  -> undef
   $r->get('/test')->to(controller => 'bar', action => 'test');
 
 =head2 Stash
@@ -277,8 +273,6 @@ endpoints of these nested routes can.
 The stash is simply inherited from route to route and newer values override
 old ones.
 
-  # /foo     -> undef
-  # /foo/abc -> undef
   # /foo/bar -> {controller => 'foo', action => 'bar'}
   # /foo/baz -> {controller => 'foo', action => 'baz'}
   # /foo/cde -> {controller => 'foo', action => 'abc'}
@@ -347,6 +341,49 @@ snake_case.
 For security reasons the dispatcher will always check if the C<controller> is
 actually a subclass of L<Mojolicious::Controller> or L<Mojo> before
 dispatching to it.
+
+=head2 Named routes
+
+Naming your routes will allow backreferencing in many methods and helpers
+throughout the whole framework, most of them internally rely on
+L<Mojolicious::Controller/"url_for"> for this.
+
+  # /foo/abc -> {controller => 'foo', action => 'bar', test => 'abc'}
+  $r->get('/foo/:test')->to('foo#bar')->name('baz');
+
+  # Generate URL "/foo/abc" for route "baz"
+  my $url = $c->url_for('baz');
+
+  # Generate URL "/foo/jan" for route "baz"
+  my $url = $c->url_for('baz', test => 'jan');
+
+  # Generate URL "http://127.0.0.1:3000/foo/jan" for route "baz"
+  my $url = $c->url_for('baz', test => 'jan')->to_abs;
+
+Nameless routes get an automatically generated one assigned that is simply
+equal to the route itself without non-word characters.
+
+  # /foo/bar ("foobar")
+  $r->get('/foo/bar')->to('test#stuff');
+
+  # Generate URL "/foo/bar"
+  my $url = $c->url_for('foobar');
+
+To refer to the current route you can use the reserved name C<current> or no
+name at all.
+
+  # Generate URL for current route
+  my $url = $c->url_for('current');
+  my $url = $c->url_for;
+
+To check or get the name of the current route you can use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
+
+  # Name for current route
+  my $name = $c->current_route;
+
+  # Check route name in code shared by multiple routes
+  $c->stash(button => 'green') if $c->current_route('login');
 
 =head2 Route to class
 
@@ -435,9 +472,9 @@ A very easy way to make placeholders more restrictive are alternatives, you
 just make a list of possible values, which then work similar to the regular
 expression C<(bender|leela)>.
 
+  # /fry    -> undef
   # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
   # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
-  # /fry    -> undef
   $r->get('/:name', [name => [qw(bender leela)]])->to('foo#bar');
 
 You can also adjust the regular expressions behind placeholders directly, just
@@ -456,49 +493,6 @@ is fine though.
 This way you get easily readable routes and the raw power of regular
 expressions.
 
-=head2 Named routes
-
-Naming your routes will allow backreferencing in many methods and helpers
-throughout the whole framework, most of them internally rely on
-L<Mojolicious::Controller/"url_for"> for this.
-
-  # /foo/abc -> {controller => 'foo', action => 'bar', test => 'abc'}
-  $r->get('/foo/:test')->to('foo#bar')->name('baz');
-
-  # Generate URL "/foo/abc" for route "baz"
-  my $url = $c->url_for('baz');
-
-  # Generate URL "/foo/jan" for route "baz"
-  my $url = $c->url_for('baz', test => 'jan');
-
-  # Generate URL "http://127.0.0.1:3000/foo/jan" for route "baz"
-  my $url = $c->url_for('baz', test => 'jan')->to_abs;
-
-Nameless routes get an automatically generated one assigned that is simply
-equal to the route itself without non-word characters.
-
-  # /foo/bar ("foobar")
-  $r->get('/foo/bar')->to('test#stuff');
-
-  # Generate URL "/foo/bar"
-  my $url = $c->url_for('foobar');
-
-To refer to the current route you can use the reserved name C<current> or no
-name at all.
-
-  # Generate URL for current route
-  my $url = $c->url_for('current');
-  my $url = $c->url_for;
-
-To check or get the name of the current route you can use the helper
-L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
-
-  # Name for current route
-  my $name = $c->current_route;
-
-  # Check route name in code shared by multiple routes
-  $c->stash(button => 'green') if $c->current_route('login');
-
 =head2 Bridges
 
 Bridge routes created with the method L<Mojolicious::Routes::Route/"under">
@@ -514,7 +508,6 @@ nested routes, they result in additional dispatch cycles when they match.
 The actual bridge code needs to return a true value or the dispatch chain will
 be broken, this makes bridges a very powerful tool for authentication.
 
-  # /foo     -> undef
   # /foo/bar -> {cb => sub {...}}
   #             {controller => 'foo', action => 'bar'}
   my $foo = $r->under('/foo' => sub {
@@ -533,9 +526,6 @@ Broken dispatch chains can be continued by calling the method
 L<Mojolicious::Controller/"continue">, this allows for example non-blocking
 operations to finish before reaching the next dispatch cycle.
 
-  # /foo     -> undef
-  # /foo/bar -> {cb => sub {...}}
-  #          -> {controller => 'foo', action => 'bar'}
   my $foo = $r->under('/foo' => sub {
     my $c = shift;
 
@@ -567,9 +557,9 @@ This for example allows multiple templates in different formats to share the
 same action code. Restrictive placeholders can also be used to limit the
 allowed formats.
 
+  # /foo.txt -> undef
   # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
-  # /foo.txt -> undef
   $r->get('/foo', [format => [qw(rss xml)]])->to('foo#bar');
 
 Or you can just disable format detection, which gets inherited by nested
@@ -740,7 +730,7 @@ to make route generation more expressive.
 
   # POST    /user -> {controller => 'user', action => 'create'}
   # GET     /user -> {controller => 'user', action => 'show'}
-  # OPTIONS /user
+  # OPTIONS /user -> {cb => sub {...}}
   $r->resource('user');
 
 Shortcuts can lead to anything, routes, bridges or maybe even both. And watch

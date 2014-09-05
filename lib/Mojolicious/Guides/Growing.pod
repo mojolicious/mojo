@@ -171,7 +171,7 @@ L<Mojolicious::Command::generate::app>.
   $ mojo generate app MyApp
 
 Feature-wise both are almost equal, the only real differences are
-organizational.
+organizational, so each one can be gradually transformed into the other.
 
 =head2 Foundation
 

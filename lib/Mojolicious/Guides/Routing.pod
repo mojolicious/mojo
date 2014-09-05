@@ -224,8 +224,9 @@ arbitrary request methods as first argument.
   # * /whatever -> {controller => 'foo', action => 'whatever'}
   $r->any('/whatever')->to(controller => 'foo', action => 'whatever');
 
-With one small exception, C<HEAD> requests are considered equal to C<GET> and
-content will not be sent with the response.
+
+There is one small exception, C<HEAD> requests are considered equal to C<GET>,
+but content will not be sent with the response even if it is present.
 
   # GET /test  -> {controller => 'bar', action => 'test'}
   # HEAD /test -> {controller => 'bar', action => 'test'}
@@ -388,17 +389,17 @@ Naming your routes will allow backreferencing in many methods and helpers
 throughout the whole framework, most of them internally rely on
 L<Mojolicious::Controller/"url_for"> for this.
 
-  # /foo/abc -> {controller => 'foo', action => 'bar', test => 'abc'}
-  $r->get('/foo/:test')->to('foo#bar')->name('baz');
+  # /foo/marcus -> {controller => 'foo', action => 'bar', user => 'marcus'}
+  $r->get('/foo/:user')->to('foo#bar')->name('baz');
 
-  # Generate URL "/foo/abc" for route "baz"
+  # Generate URL "/foo/marcus" for route "baz"
   my $url = $c->url_for('baz');
 
   # Generate URL "/foo/jan" for route "baz"
-  my $url = $c->url_for('baz', test => 'jan');
+  my $url = $c->url_for('baz', user => 'jan');
 
   # Generate URL "http://127.0.0.1:3000/foo/jan" for route "baz"
-  my $url = $c->url_for('baz', test => 'jan')->to_abs;
+  my $url = $c->url_for('baz', user => 'jan')->to_abs;
 
 Nameless routes get an automatically generated one assigned that is simply
 equal to the route itself without non-word characters, custom names have a

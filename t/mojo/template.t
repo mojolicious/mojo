@@ -1007,6 +1007,11 @@ $output = $mt->render(<<'EOF');
 EOF
 is $output, "hello world\n", 'escaped multiline expression';
 
+# Empty statement
+$mt     = Mojo::Template->new;
+$output = $mt->render("test\n\n123\n\n<% %>456\n789");
+is $output, "test\n\n123\n\n456\n789\n", 'empty statement';
+
 # Optimize successive text lines ending with newlines
 $mt = Mojo::Template->new;
 $mt->parse(<<'EOF');

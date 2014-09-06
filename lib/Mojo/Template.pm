@@ -38,7 +38,7 @@ sub build {
 
     # Text (quote and fix line ending)
     if ($op eq 'text') {
-      $value = join "\n", map { quotemeta $_ } split("\n", $value);
+      $value = join "\n", map { quotemeta $_ } split("\n", $value, -1);
       $value .= '\n' if $newline;
       $blocks[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
     }

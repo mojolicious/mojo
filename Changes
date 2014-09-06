@@ -1,5 +1,6 @@
 
 5.39  2014-09-06
+  - Fixed bug in Mojo::Template where newline characters could get lost.
 
 5.38  2014-09-05
   - Improved routes command to use new terminology for flags.
@@ -426,7 +427,7 @@
   - Improved router to allow format detection for bridges.
 
 4.68  2014-01-22
-  - Added Mojo::DOM::Node.
+  - Added module Mojo::DOM::Node.
   - Added contents and node methods to Mojo::DOM.
   - Removed deprecated http_proxy, https_proxy, name and no_proxy attributes
     from Mojo::UserAgent.
@@ -1653,7 +1654,7 @@
 2.65  2012-03-22
   - Deprecated Mojo::IOLoop::drop in favor of Mojo::IOLoop::remove.
   - Renamed Mojo::Reactor::drop to Mojo::Reactor::remove.
-  - Added Mojo::Reactor::Poll.
+  - Added module Mojo::Reactor::Poll.
   - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
   - Removed experimental status from Mojo::IOLoop::Client.
   - Removed experimental status from Mojo::IOLoop::Server.
@@ -1673,7 +1674,7 @@
 
 2.63  2012-03-20
   - Renamed Mojo::IOWatcher to Mojo::Reactor.
-  - Added Mojolicious::Routes::Route.
+  - Added module Mojolicious::Routes::Route.
   - Added find and root methods to Mojolicious::Routes::Route.
   - Improved form_for helper to automatically add method="POST" attributes
     when necessary.
@@ -3757,7 +3758,7 @@
   - Added layout support to MojoX::Renderer.
   - Made render call optional.
   - Added format support to MojoX::Routes.
-  - Added Mojo::Loader::Exception.
+  - Added module Mojo::Loader::Exception.
   - Added wildcard symbol support to MojoX::Routes and rewrote many routes
     internals.
   - Added Makefile.PL generator.
@@ -3768,7 +3769,7 @@
   - Added encoding support to Mojo::Template and made "utf8" the default.
   - Added HEAD support to Mojo::Server::Daemon. (acajou)
   - Added new relaxed placeholder to MojoX::Routes::Pattern.
-  - Added Mojo::Template::Exception.
+  - Added module Mojo::Template::Exception.
   - Added HEAD support to the Mojo::Transaction state machine and related
     modules. (acajou)
   - Added safe_post option to Mojo::Pipeline. (acajou)
@@ -3809,10 +3810,10 @@
 
 0.9  2008-12-01
   - Added modes to Mojolicious.
-  - Added Mojo::Log and log support for Mojo/Mojolicious.
+  - Added module Mojo::Log and log support for Mojo/Mojolicious.
+  - Added module MojoX::Context.
   - Changed MojoX::Renderer and Mojo::Template API to make catching errors
     easier, we now use a scalar ref for results like most template engines.
-  - Added MojoX::Context.
   - Added multi-level controller class support to Mojolicious.
   - MojoX::Dispatcher::Routes should be able to fail.
   - Added diagnostics functions to Mojo::HelloWorld.

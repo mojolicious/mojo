@@ -436,6 +436,12 @@ L<Test::Mojo> implements the following attributes.
 Current WebSocket message represented as an array reference containing the
 frame type and payload.
 
+  # More specific tests
+  use Mojo::JSON 'decode_json';
+  my $hash = decode_json $t->message->[1];
+  is ref $hash, 'HASH', 'right reference';
+  is $hash->{foo}, 'bar', 'right value';
+
   # Test custom message
   $t->message([binary => $bytes])
     ->json_message_has('/foo/bar')

@@ -433,7 +433,8 @@ L<Test::Mojo> implements the following attributes.
   my $msg = $t->message;
   $t      = $t->message([text => $bytes]);
 
-Current WebSocket message.
+Current WebSocket message represented as an array reference containing
+the frame type and payload.
 
   # Test custom message
   $t->message([binary => $bytes])

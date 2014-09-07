@@ -70,7 +70,7 @@ sub camelize {
 
   # CamelCase words
   return join '::', map {
-    join '', map { ucfirst lc } split '_', $_
+    join('', map { ucfirst lc } split '_')
   } split '-', $str;
 }
 
@@ -87,17 +87,10 @@ sub decamelize {
   my $str = shift;
   return $str if $str !~ /^[A-Z]/;
 
-  # Module parts
-  my @parts;
-  for my $part (split '::', $str) {
-
-    # snake_case words
-    my @words;
-    push @words, lc $1 while $part =~ s/([A-Z]{1}[^A-Z]*)//;
-    push @parts, join '_', @words;
-  }
-
-  return join '-', @parts;
+  # snake_case words
+  return join '-', map {
+    join('_', map {lc} grep {length} split /([A-Z]{1}[^A-Z]*)/)
+  } split '::', $str;
 }
 
 sub decode {

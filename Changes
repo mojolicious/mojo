@@ -1,5 +1,6 @@
 
-5.39  2014-09-06
+5.39  2014-09-07
+  - Improved decamelize performance.
   - Fixed bug in Mojo::Template where newline characters could get lost.
 
 5.38  2014-09-05

@@ -11,18 +11,16 @@ use Mojo::Util qw(decode encode url_escape url_unescape);
 has charset => 'UTF-8';
 
 sub append {
-  my ($self, @pairs) = @_;
+  my $self = shift;
 
   my $params = $self->params;
-  for (my $i = 0; $i < @pairs; $i += 2) {
-    my $key   = $pairs[$i]     // '';
-    my $value = $pairs[$i + 1] // '';
+  while (my ($name, $value) = splice @_, 0, 2) {
 
     # Single value
-    if (ref $value ne 'ARRAY') { push @$params, $key => $value }
+    if (ref $value ne 'ARRAY') { push @$params, $name => $value }
 
     # Multiple values
-    else { push @$params, $key => (defined $_ ? "$_" : '') for @$value }
+    else { push @$params, $name => (defined $_ ? "$_" : '') for @$value }
   }
 
   return $self;
@@ -108,38 +106,35 @@ sub parse {
   my $self = shift;
 
   # Pairs
-  if (@_ > 1) { $self->append(@_) }
+  return $self->append(@_) if @_ > 1;
 
   # String
-  else { $self->{string} = shift }
-
+  $self->{string} = shift;
   return $self;
 }
 
 sub remove {
-  my $self = shift;
-  my $name = shift // '';
+  my ($self, $name) = @_;
 
   my $params = $self->params;
-  for (my $i = 0; $i < @$params;) {
-    if ($params->[$i] eq $name) { splice @$params, $i, 2 }
-    else                        { $i += 2 }
-  }
+  my $i      = 0;
+  $params->[$i] eq $name ? splice @$params, $i, 2 : ($i += 2)
+    while $i < @$params;
 
-  return $self->params($params);
+  return $self;
 }
 
 sub to_hash {
   my $self = shift;
 
-  my $params = $self->params;
   my %hash;
+  my $params = $self->params;
   for (my $i = 0; $i < @$params; $i += 2) {
     my ($name, $value) = @{$params}[$i, $i + 1];
 
     # Array
     if (exists $hash{$name}) {
-      $hash{$name} = [$hash{$name}] unless ref $hash{$name} eq 'ARRAY';
+      $hash{$name} = [$hash{$name}] if ref $hash{$name} ne 'ARRAY';
       push @{$hash{$name}}, $value;
     }
 
@@ -160,7 +155,7 @@ sub to_string {
     return url_escape $str, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
   }
 
-  # Build pairs;
+  # Build pairs
   my $params = $self->params;
   return '' unless @$params;
   my @pairs;

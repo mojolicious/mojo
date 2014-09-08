@@ -238,8 +238,8 @@ C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
 
   $ MOJO_REVERSE_PROXY=1 plackup ./script/myapp
 
-If an older server adapter is not be able to correctly detect the application
-home directory, you can simply use the C<MOJO_HOME> environment variable.
+If an older server adapter is unable to correctly detect the application home
+directory, you can simply use the C<MOJO_HOME> environment variable.
 
   $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
 

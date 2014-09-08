@@ -13,16 +13,14 @@ has charset => 'UTF-8';
 sub canonicalize {
   my $self = shift;
 
-  my @parts;
-  for my $part (grep { $_ ne '.' && $_ ne '' } @{$self->parts}) {
-    if ($part ne '..') { push @parts, $part }
-
-    # ".."
-    else { @parts && $parts[-1] ne '..' ? pop @parts : push @parts, '..' }
+  my $parts = $self->parts;
+  for (my $i = 0; $i <= $#$parts;) {
+    if ($parts->[$i] eq '.' || $parts->[$i] eq '') { splice @$parts, $i, 1 }
+    elsif ($i < 1 || $parts->[$i] ne '..' || $parts->[$i - 1] eq '..') { $i++ }
+    else { splice @$parts, --$i, 2 }
   }
-  $self->trailing_slash(undef) unless @parts;
 
-  return $self->parts(\@parts);
+  return @$parts ? $self : $self->trailing_slash(undef);
 }
 
 sub clone {

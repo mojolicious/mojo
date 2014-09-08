@@ -1,5 +1,3 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
 
 websocket '/test' => sub {

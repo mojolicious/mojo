@@ -1,7 +1,4 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
-
 use Mojo::IOLoop;
 
 # Minimal CONNECT proxy server to test TLS tunneling

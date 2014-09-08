@@ -1,7 +1,4 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
-
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
 

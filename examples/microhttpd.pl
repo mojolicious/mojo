@@ -1,7 +1,4 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
-
 use Mojo::IOLoop;
 
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)

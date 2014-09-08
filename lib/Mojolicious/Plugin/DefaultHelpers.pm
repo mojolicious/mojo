@@ -241,6 +241,18 @@ the steps, breaking the chain.
   my $delay = Mojo::IOLoop->delay(sub {...}, sub {...});
   $delay->catch(sub { $c->render_exception(pop) and undef $tx })->wait;
 
+  # Non-blocking request
+  $c->delay(
+    sub {
+      my $delay = shift;
+      $c->ua->get('http://mojolicio.us' => $delay->begin);
+    },
+    sub {
+      my ($delay, $tx) = @_;
+      $c->render(json => {title => $tx->res->dom->at('title')->text});
+    }
+  );
+
 =head2 dumper
 
   %= dumper {some => 'data'}

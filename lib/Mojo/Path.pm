@@ -14,15 +14,11 @@ sub canonicalize {
   my $self = shift;
 
   my @parts;
-  for my $part (@{$self->parts}) {
+  for my $part (grep { $_ ne '.' && $_ ne '' } @{$self->parts}) {
+    if ($part ne '..') { push @parts, $part }
 
     # ".."
-    if ($part eq '..') {
-      (@parts && $parts[-1] ne '..') ? pop @parts : push @parts, '..';
-    }
-
-    # Something else than "."
-    elsif ($part ne '.' && $part ne '') { push @parts, $part }
+    else { @parts && $parts[-1] ne '..' ? pop @parts : push @parts, '..' }
   }
   $self->trailing_slash(undef) unless @parts;
 

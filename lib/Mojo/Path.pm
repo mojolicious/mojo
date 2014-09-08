@@ -43,10 +43,7 @@ sub clone {
   return $clone;
 }
 
-sub contains {
-  my ($self, $path) = @_;
-  return $path eq '/' || $self->to_route =~ m!^\Q$path\E(?:/|$)!;
-}
+sub contains { $_[1] eq '/' || $_[0]->to_route =~ m!^\Q$_[1]\E(?:/|$)! }
 
 sub leading_slash { shift->_parse(leading_slash => @_) }
 
@@ -87,8 +84,7 @@ sub to_dir {
 
 sub to_route {
   my $clone = shift->clone;
-  my $route = join '/', @{$clone->parts};
-  return "/$route" . ($clone->trailing_slash ? '/' : '');
+  return '/' . join '/', @{$clone->parts}, $clone->trailing_slash ? '' : ();
 }
 
 sub to_string {

@@ -8,15 +8,12 @@ use Mojo::Util 'encode';
 has format => sub { \&_format };
 has handle => sub {
 
-  # File
-  if (my $path = shift->path) {
-    croak qq{Can't open log file "$path": $!}
-      unless open my $file, '>>', $path;
-    return $file;
-  }
-
   # STDERR
-  return \*STDERR;
+  return \*STDERR unless my $path = shift->path;
+
+  # File
+  croak qq{Can't open log file "$path": $!} unless open my $file, '>>', $path;
+  return $file;
 };
 has history => sub { [] };
 has level => 'debug';

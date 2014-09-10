@@ -14,12 +14,9 @@ use Scalar::Util 'weaken';
 has home => sub { Mojo::Home->new };
 has log  => sub { Mojo::Log->new };
 has ua   => sub {
-  my $self = shift;
-
   my $ua = Mojo::UserAgent->new;
-  weaken $ua->server->app($self)->{app};
-  weaken $self;
-  return $ua->catch(sub { $self->log->error($_[1]) });
+  weaken $ua->server->app(shift)->{app};
+  return $ua;
 };
 
 sub build_tx { Mojo::Transaction::HTTP->new }

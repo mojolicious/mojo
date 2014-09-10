@@ -179,14 +179,13 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->headers->connection, 'test', 'right "Connection" value';
 is $tx->res->body, 'One!', 'right content';
 
-# Error in callback is logged
-app->ua->once(error => sub { Mojo::IOLoop->stop });
-ok app->ua->has_subscribers('error'), 'has subscribers';
+# Error in callback
+Mojo::IOLoop->singleton->reactor->unsubscribe('error');
 my $err;
-my $msg = app->log->on(message => sub { $err .= pop });
+Mojo::IOLoop->singleton->reactor->once(
+  error => sub { $err .= pop; Mojo::IOLoop->stop });
 app->ua->get('/' => sub { die 'error event works' });
 Mojo::IOLoop->start;
-app->log->unsubscribe(message => $msg);
 like $err, qr/error event works/, 'right error';
 
 # Events
@@ -289,7 +288,7 @@ is $body,    '{"hello":"world"}', 'right content';
 
 # Built-in web server times out
 my $log = '';
-$msg = app->log->on(message => sub { $log .= pop });
+my $msg = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');
 app->log->unsubscribe(message => $msg);
 ok !$tx->success, 'not successful';

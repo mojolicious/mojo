@@ -515,9 +515,18 @@ created at startup time.
 
   app->start;
 
-Since timers and other low-level event watchers are also independent from
-applications, errors can't get logged automatically, you can change that by
-subscribing to the event L<Mojo::Reactor/"error">.
+Just remember that all events are processed cooperatively, so your callbacks
+shouldn't block for too long.
+
+=head2 Exceptions in events
+
+Since timers and other non-blocking operations are running solely in the event
+loop, outside of the application, exceptions that get thrown in callbacks
+can't get caught and handled automatically, you can change that by subscribing
+to the event L<Mojo::Reactor/"error">.
+
+  use Mojolicious::Lite;
+  use Mojo::IOLoop;
 
   # Forward error messages to the application log
   Mojo::IOLoop->singleton->reactor->on(error => sub {
@@ -525,8 +534,32 @@ subscribing to the event L<Mojo::Reactor/"error">.
     app->log->error($err);
   });
 
-Just remember that all events are processed cooperatively, so your callbacks
-shouldn't block for too long.
+  # Exception only gets logged (and connection times out)
+  get '/connection_times_out' => sub {
+    my $c = shift;
+    Mojo::IOLoop->timer(2 => sub {
+      die 'This request will not be getting a response';
+    });
+  };
+
+  # Exception gets caught and handled
+  get '/catch_exception' => sub {
+    my $c = shift;
+    Mojo::IOLoop->timer(2 => sub {
+      eval { die 'This request will be getting a response' };
+      $c->render_exception($@) if $@;
+    });
+  };
+
+  app->start;
+
+A default subscriber that prints all errors to C<STDERR> will usually be added
+by L<Mojo::IOLoop> as a fallback.
+
+  Mojo::IOLoop->singleton->reactor->unsubscribe('error');
+
+During development you can also make every exception that gets thrown in a
+callback fatal by removing all of its subscribers.
 
 =head2 WebSocket web service
 

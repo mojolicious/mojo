@@ -125,7 +125,7 @@ sub _accept {
     setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
     # Start TLS handshake
-    $self->emit_safe(accept => $handle) and next unless my $tls = $self->{tls};
+    $self->emit(accept => $handle) and next unless my $tls = $self->{tls};
     $self->_handshake($self->{handles}{$handle} = $handle)
       if $handle = IO::Socket::SSL->start_SSL($handle, %$tls, SSL_server => 1);
   }
@@ -143,7 +143,7 @@ sub _tls {
   # Accepted
   if ($handle->accept_SSL) {
     $self->reactor->remove($handle);
-    return $self->emit_safe(accept => delete $self->{handles}{$handle});
+    return $self->emit(accept => delete $self->{handles}{$handle});
   }
 
   # Switch between reading and writing
@@ -195,7 +195,7 @@ emit the following new ones.
     ...
   });
 
-Emitted safely for each accepted connection.
+Emitted for each accepted connection.
 
 =head1 ATTRIBUTES
 

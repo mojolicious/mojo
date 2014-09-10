@@ -534,6 +534,11 @@ L<Mojo::Reactor/"error">.
 A default subscriber that prints all errors to C<STDERR> will usually be added
 by L<Mojo::IOLoop> as a fallback.
 
+  Mojo::IOLoop->singleton->reactor->unsubscribe('error');
+
+During development you can also make every exception in a callback fatal by
+removing all of its subscribers.
+
 =head2 WebSocket web service
 
 The WebSocket protocol offers full bi-directional low-latency communication

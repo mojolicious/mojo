@@ -522,8 +522,9 @@ shouldn't block for too long.
 
 Since timers and other non-blocking operations are running solely in the event
 loop, outside of the application, exceptions that get thrown in callbacks
-can't get caught and handled automatically, you can change that by subscribing
-to the event L<Mojo::Reactor/"error">.
+can't get caught and handled automatically. But you can handle them manually
+by subscribing to the event L<Mojo::Reactor/"error"> or catching them inside
+the callback.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;

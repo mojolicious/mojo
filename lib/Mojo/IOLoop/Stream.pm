@@ -123,8 +123,7 @@ sub _write {
   if (length $self->{buffer}) {
     my $written = $handle->syswrite($self->{buffer});
     return $self->_error unless defined $written;
-    $self->emit(write => substr($self->{buffer}, 0, $written, ''));
-    $self->_again;
+    $self->emit(write => substr($self->{buffer}, 0, $written, ''))->_again;
   }
 
   $self->emit('drain') if !length $self->{buffer};

@@ -515,9 +515,11 @@ created at startup time.
 
   app->start;
 
-Since timers and other low-level event watchers are also independent from
-applications, errors can't get logged automatically, you can change that by
-subscribing to the event L<Mojo::Reactor/"error">.
+=head2 Exceptions in events
+
+Since timers and other event watchers are independent from applications,
+errors can't get logged automatically, you can change that by subscribing to
+the event L<Mojo::Reactor/"error">.
 
   # Forward error messages to the application log
   Mojo::IOLoop->singleton->reactor->on(error => sub {

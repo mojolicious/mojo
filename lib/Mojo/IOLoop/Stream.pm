@@ -16,7 +16,7 @@ sub close {
   return unless my $handle  = delete $self->timeout(0)->{handle};
   $reactor->remove($handle);
   close $handle;
-  $self->emit_safe('close');
+  $self->emit('close');
 }
 
 sub close_gracefully {
@@ -76,7 +76,7 @@ sub timeout {
   return $self unless my $timeout = $self->{timeout} = shift;
   weaken $self;
   $self->{timer}
-    = $reactor->timer($timeout => sub { $self->emit_safe('timeout')->close });
+    = $reactor->timer($timeout => sub { $self->emit('timeout')->close });
 
   return $self;
 }
@@ -113,7 +113,7 @@ sub _read {
   my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
   return $self->_error unless defined $read;
   return $self->close if $read == 0;
-  $self->emit_safe(read => $buffer)->_again;
+  $self->emit(read => $buffer)->_again;
 }
 
 sub _write {
@@ -123,13 +123,13 @@ sub _write {
   if (length $self->{buffer}) {
     my $written = $handle->syswrite($self->{buffer});
     return $self->_error unless defined $written;
-    $self->emit_safe(write => substr($self->{buffer}, 0, $written, ''));
+    $self->emit(write => substr($self->{buffer}, 0, $written, ''));
     $self->_again;
   }
 
-  $self->emit_safe('drain') if !length $self->{buffer};
-  return                    if $self->is_writing;
-  return $self->close       if $self->{graceful};
+  $self->emit('drain') if !length $self->{buffer};
+  return               if $self->is_writing;
+  return $self->close  if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0) if $self->{handle};
 }
 
@@ -184,7 +184,7 @@ emit the following new ones.
     ...
   });
 
-Emitted safely if the stream gets closed.
+Emitted if the stream gets closed.
 
 =head2 drain
 
@@ -193,7 +193,7 @@ Emitted safely if the stream gets closed.
     ...
   });
 
-Emitted safely once all data has been written.
+Emitted once all data has been written.
 
 =head2 error
 
@@ -211,7 +211,7 @@ Emitted if an error occurs on the stream, fatal if unhandled.
     ...
   });
 
-Emitted safely if new data arrives on the stream.
+Emitted if new data arrives on the stream.
 
 =head2 timeout
 
@@ -220,8 +220,8 @@ Emitted safely if new data arrives on the stream.
     ...
   });
 
-Emitted safely if the stream has been inactive for too long and will get
-closed automatically.
+Emitted if the stream has been inactive for too long and will get closed
+automatically.
 
 =head2 write
 
@@ -230,7 +230,7 @@ closed automatically.
     ...
   });
 
-Emitted safely if new data has been written to the stream.
+Emitted if new data has been written to the stream.
 
 =head1 ATTRIBUTES
 

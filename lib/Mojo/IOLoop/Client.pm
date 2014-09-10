@@ -109,8 +109,7 @@ sub _tls {
 
   # Connected
   my $handle = $self->{handle};
-  return $self->_cleanup->emit_safe(connect => $handle)
-    if $handle->connect_SSL;
+  return $self->_cleanup->emit(connect => $handle) if $handle->connect_SSL;
 
   # Switch between reading and writing
   my $err = $IO::Socket::SSL::SSL_ERROR;
@@ -144,7 +143,7 @@ sub _try_tls {
   my ($self, $args) = @_;
 
   my $handle = $self->{handle};
-  return $self->_cleanup->emit_safe(connect => $handle)
+  return $self->_cleanup->emit(connect => $handle)
     if !$args->{tls} || $handle->isa('IO::Socket::SSL');
   return $self->emit(error => 'IO::Socket::SSL 1.84 required for TLS support')
     unless TLS;
@@ -213,7 +212,7 @@ emit the following new ones.
     ...
   });
 
-Emitted safely once the connection is established.
+Emitted once the connection is established.
 
 =head2 error
 

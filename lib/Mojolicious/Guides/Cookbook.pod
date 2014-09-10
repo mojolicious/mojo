@@ -521,9 +521,9 @@ shouldn't block for too long.
 =head2 Exceptions in events
 
 Since timers and other non-blocking operations are running solely in the event
-loop, outside of the application, errors in callbacks can't get caught and
-logged automatically, you can change that by subscribing to the event
-L<Mojo::Reactor/"error">.
+loop, outside of the application, exceptions that get thrown in callbacks
+can't get caught and handled automatically, you can change that by subscribing
+to the event L<Mojo::Reactor/"error">.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -558,8 +558,8 @@ by L<Mojo::IOLoop> as a fallback.
 
   Mojo::IOLoop->singleton->reactor->unsubscribe('error');
 
-During development you can also make every exception in a callback fatal by
-removing all of its subscribers.
+During development you can also make every exception that gets thrown in a
+callback fatal by removing all of its subscribers.
 
 =head2 WebSocket web service
 

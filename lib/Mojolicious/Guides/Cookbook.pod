@@ -515,11 +515,15 @@ created at startup time.
 
   app->start;
 
+Just remember that all events are processed cooperatively, so your callbacks
+shouldn't block for too long.
+
 =head2 Exceptions in events
 
-Since timers and other event watchers are independent from applications,
-errors can't get logged automatically, you can change that by subscribing to
-the event L<Mojo::Reactor/"error">.
+Since timers and other non-blocking operations are running solely in the event
+loop, outside of the application, errors in callbacks can't get caught and
+logged automatically, you can change that by subscribing to the event
+L<Mojo::Reactor/"error">.
 
   # Forward error messages to the application log
   Mojo::IOLoop->singleton->reactor->on(error => sub {
@@ -527,8 +531,8 @@ the event L<Mojo::Reactor/"error">.
     app->log->error($err);
   });
 
-Just remember that all events are processed cooperatively, so your callbacks
-shouldn't block for too long.
+A default subscriber that prints all errors to C<STDERR> will usually be added
+by L<Mojo::IOLoop> as a fallback.
 
 =head2 WebSocket web service
 

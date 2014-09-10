@@ -125,7 +125,7 @@ L<Mojo::EventEmitter> can emit the following events.
     ...
   });
 
-Emitted for event errors, fatal if unhandled.
+Emitted for failed events emitted with L</"emit_safe">, fatal if unhandled.
 
   $e->on(error => sub {
     my ($e, $err) = @_;

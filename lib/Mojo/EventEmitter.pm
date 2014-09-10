@@ -25,7 +25,7 @@ sub emit {
 
 # DEPRECATED in Tiger Face!
 sub emit_safe {
-  deprecated 'Mojo::EventEmitter is DEPRECATED';
+  deprecated 'Mojo::EventEmitter::emit_safe is DEPRECATED';
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}{$name}) {

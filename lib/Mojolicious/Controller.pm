@@ -781,7 +781,7 @@ using a C<200> response code.
 
   my $req = $c->req;
 
-Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
+Get L<Mojo::Message::Request> object from L</"tx">.
 
   # Longer version
   my $req = $c->tx->req;
@@ -803,7 +803,7 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
 
   my $res = $c->res;
 
-Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
+Get L<Mojo::Message::Response> object from L</"tx">.
 
   # Longer version
   my $res = $c->tx->res;

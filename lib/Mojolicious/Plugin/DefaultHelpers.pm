@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 use Mojo::Collection;
+use Mojo::Exception;
 use Mojo::IOLoop;
 use Mojo::Util qw(dumper sha1_sum steady_time);
 
@@ -32,10 +33,12 @@ sub register {
     qw(inactivity_timeout is_fresh url_with);
   $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
   $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
-  $app->helper(config  => sub { shift->app->config(@_) });
-  $app->helper(dumper  => sub { shift; dumper(@_) });
-  $app->helper(include => sub { shift->render_to_string(@_) });
-  $app->helper(ua      => sub { shift->app->ua });
+  $app->helper(config            => sub { shift->app->config(@_) });
+  $app->helper(dumper            => sub { shift; dumper(@_) });
+  $app->helper(include           => sub { shift->render_to_string(@_) });
+  $app->helper('reply.exception' => sub { _development('exception', @_) });
+  $app->helper('reply.not_found' => sub { _development('not_found', @_) });
+  $app->helper(ua                => sub { shift->app->ua });
 }
 
 sub _accepts {
@@ -80,6 +83,50 @@ sub _delay {
   my $tx    = $c->render_later->tx;
   my $delay = Mojo::IOLoop->delay(@_);
   $delay->catch(sub { $c->render_exception(pop) and undef $tx })->wait;
+}
+
+sub _development {
+  my ($page, $self, $e) = @_;
+
+  my $app = $self->app;
+  $app->log->error($e = Mojo::Exception->new($e)) if $page eq 'exception';
+
+  # Filtered stash snapshot
+  my $stash = $self->stash;
+  my %snapshot = map { $_ => $stash->{$_} }
+    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
+
+  # Render with fallbacks
+  my $mode     = $app->mode;
+  my $renderer = $app->renderer;
+  my $options  = {
+    exception => $page eq 'exception' ? $e : undef,
+    format => $stash->{format} || $renderer->default_format,
+    handler  => undef,
+    snapshot => \%snapshot,
+    status   => $page eq 'exception' ? 500 : 404,
+    template => "$page.$mode"
+  };
+  my $inline = $renderer->_bundled($mode eq 'development' ? $mode : $page);
+  return $self if _fallbacks($self, $options, $page, $inline);
+  _fallbacks($self, {%$options, format => 'html'}, $page, $inline);
+  return $self;
+}
+
+sub _fallbacks {
+  my ($self, $options, $template, $inline) = @_;
+
+  # Mode specific template
+  return 1 if $self->render_maybe(%$options);
+
+  # Normal template
+  return 1 if $self->render_maybe(%$options, template => $template);
+
+  # Inline template
+  my $stash = $self->stash;
+  return undef unless $stash->{format} eq 'html';
+  delete @$stash{qw(extends layout)};
+  return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
 }
 
 sub _inactivity_timeout {
@@ -318,6 +365,25 @@ L</"stash">.
   %= param 'foo'
 
 Alias for L<Mojolicious::Controller/"param">.
+
+=head2 reply->exception
+
+  $c = $c->reply->exception('Oops!');
+  $c = $c->reply->exception(Mojo::Exception->new('Oops!'));
+
+Render the exception template C<exception.$mode.$format.*> or
+C<exception.$format.*> and set the response status code to C<500>. Also sets
+the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot>
+to a copy of the L</"stash"> for use in the templates.
+
+=head2 reply->not_found
+
+  $c = $c->reply->not_found;
+
+Render the not found template C<not_found.$mode.$format.*> or
+C<not_found.$format.*> and set the response status code to C<404>. Also sets
+the stash value C<snapshot> to a copy of the L</"stash"> for use in the
+templates.
 
 =head2 session
 

@@ -445,8 +445,9 @@ By now you've probably already encountered the built-in 404 (Not Found) and
 500 (Server Error) pages, that get rendered automatically when you make a
 mistake. Those are fallbacks for when your own exception handling fails, but
 especially during development they can also be a great help, you can render
-them manually with the methods L<Mojolicious::Controller/"render_exception">
-and L<Mojolicious::Controller/"render_not_found">.
+them manually with the helpers
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> and
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
   use Mojolicious::Lite;
   use Scalar::Util 'looks_like_number';
@@ -456,11 +457,11 @@ and L<Mojolicious::Controller/"render_not_found">.
     my ($dividend, $divisor) = $c->param(['dividend', 'divisor']);
 
     # 404
-    return $c->render_not_found
+    return $c->reply->not_found
       unless looks_like_number $dividend && looks_like_number $divisor;
 
     # 500
-    return $c->render_exception('Division by zero!') if $divisor == 0;
+    return $c->reply->exception('Division by zero!') if $divisor == 0;
 
     # 200
     $c->render(text => $dividend / $divisor);

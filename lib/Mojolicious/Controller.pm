@@ -4,7 +4,6 @@ use Mojo::Base -base;
 # No imports, for security reasons!
 use Carp ();
 use Mojo::ByteStream;
-use Mojo::Exception;
 use Mojo::Transaction::HTTP;
 use Mojo::URL;
 use Mojo::Util;
@@ -172,13 +171,13 @@ sub render {
   return !!$self->rendered($self->stash->{status});
 }
 
-sub render_exception { _development('exception', @_) }
+sub render_exception { shift->helpers->reply->exception(@_) }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }
 
 sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
-sub render_not_found { _development('not_found', @_) }
+sub render_not_found { shift->helpers->reply->not_found }
 
 sub render_static {
   my ($self, $file) = @_;
@@ -384,50 +383,6 @@ sub write_chunk {
   my $content = $self->res->content;
   $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
-}
-
-sub _development {
-  my ($page, $self, $e) = @_;
-
-  my $app = $self->app;
-  $app->log->error($e = Mojo::Exception->new($e)) if $page eq 'exception';
-
-  # Filtered stash snapshot
-  my $stash = $self->stash;
-  my %snapshot = map { $_ => $stash->{$_} }
-    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
-
-  # Render with fallbacks
-  my $mode     = $app->mode;
-  my $renderer = $app->renderer;
-  my $options  = {
-    exception => $page eq 'exception' ? $e : undef,
-    format => $stash->{format} || $renderer->default_format,
-    handler  => undef,
-    snapshot => \%snapshot,
-    status   => $page eq 'exception' ? 500 : 404,
-    template => "$page.$mode"
-  };
-  my $inline = $renderer->_bundled($mode eq 'development' ? $mode : $page);
-  return $self if _fallbacks($self, $options, $page, $inline);
-  _fallbacks($self, {%$options, format => 'html'}, $page, $inline);
-  return $self;
-}
-
-sub _fallbacks {
-  my ($self, $options, $template, $inline) = @_;
-
-  # Mode specific template
-  return 1 if $self->render_maybe(%$options);
-
-  # Normal template
-  return 1 if $self->render_maybe(%$options, template => $template);
-
-  # Inline template
-  my $stash = $self->stash;
-  return undef unless $stash->{format} eq 'html';
-  delete @$stash{qw(extends layout)};
-  return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
 }
 
 1;
@@ -700,10 +655,7 @@ additional pairs get merged into the L</"stash">.
   $c = $c->render_exception('Oops!');
   $c = $c->render_exception(Mojo::Exception->new('Oops!'));
 
-Render the exception template C<exception.$mode.$format.*> or
-C<exception.$format.*> and set the response status code to C<500>. Also sets
-the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot>
-to a copy of the L</"stash"> for use in the templates.
+Alias for L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception">.
 
 =head2 render_later
 
@@ -734,10 +686,7 @@ could be generated, takes the same arguments as L</"render">.
 
   $c = $c->render_not_found;
 
-Render the not found template C<not_found.$mode.$format.*> or
-C<not_found.$format.*> and set the response status code to C<404>. Also sets
-the stash value C<snapshot> to a copy of the L</"stash"> for use in the
-templates.
+Alias for L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
 =head2 render_static
 

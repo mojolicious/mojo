@@ -320,7 +320,7 @@ It supports normal Perl data types like scalar, array reference, hash
 reference and will try to call the C<TO_JSON> method on blessed references, or
 stringify them if it doesn't exist. Differentiating between strings and
 numbers in Perl is hard, depending on how it has been used, a scalar can be
-both at the same time. The string value gets precedence unless both
+both at the same time. The string value has a higher precedence unless both
 representations are equivalent.
 
   [1, -2, 3]     -> [1, -2, 3]

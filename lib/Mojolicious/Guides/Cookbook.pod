@@ -559,8 +559,9 @@ by L<Mojo::IOLoop> as a fallback.
 
   Mojo::IOLoop->singleton->reactor->unsubscribe('error');
 
-During development you can also make every exception that gets thrown in a
-callback fatal by removing all of its subscribers.
+During development or for applications where crashing is simply preferable,
+you can also make every exception that gets thrown in a callback fatal by
+removing all of its subscribers.
 
 =head2 WebSocket web service
 

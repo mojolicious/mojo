@@ -1,9 +1,9 @@
 
 5.40  2014-09-12
+  - Deprecated Mojo::EventEmitter::emit_safe.
   - Added reply->exception and reply->not_found helpers to
     Mojolicious::Plugin::DefaultHelpers.
-  - Deprecated Mojo::EventEmitter::emit_safe.
-  - Improved all events to work the same.
+  - Improved all events to handle exceptions the same.
 
 5.39  2014-09-07
   - Improved decamelize performance.

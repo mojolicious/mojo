@@ -676,7 +676,8 @@ automatic rendering would result in a response.
   my $bool = $c->render_maybe(controller => 'foo', action => 'bar');
   my $bool = $c->render_maybe('foo/index', format => 'html');
 
-Try to render content, but do not call L</"render_not_found"> if no response
+Try to render content, but do not call
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found"> if no response
 could be generated, takes the same arguments as L</"render">.
 
   # Render template "index_local" only if it exists

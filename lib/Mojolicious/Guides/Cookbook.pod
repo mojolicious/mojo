@@ -548,7 +548,7 @@ the callback.
     my $c = shift;
     Mojo::IOLoop->timer(2 => sub {
       eval { die 'This request will be getting a response' };
-      $c->render_exception($@) if $@;
+      $c->reply->exception($@) if $@;
     });
   };
 

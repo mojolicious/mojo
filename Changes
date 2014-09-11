@@ -1,5 +1,5 @@
 
-5.40  2014-09-11
+5.40  2014-09-12
   - Added reply->exception and reply->not_found helpers to
     Mojolicious::Plugin::DefaultHelpers.
   - Deprecated Mojo::EventEmitter::emit_safe.

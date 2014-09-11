@@ -224,13 +224,20 @@ arbitrary request methods as first argument.
   # * /whatever -> {controller => 'foo', action => 'whatever'}
   $r->any('/whatever')->to(controller => 'foo', action => 'whatever');
 
-
 There is one small exception, C<HEAD> requests are considered equal to C<GET>,
 but content will not be sent with the response even if it is present.
 
   # GET /test  -> {controller => 'bar', action => 'test'}
   # HEAD /test -> {controller => 'bar', action => 'test'}
   $r->get('/test')->to(controller => 'bar', action => 'test');
+
+=head2 IRIs
+
+IRIs are handled transparently, that means paths are guaranteed to be
+unescaped and decoded from bytes to characters.
+
+  # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
+  $r->get('/☃')->to(controller => 'foo', action => 'snowman');
 
 =head2 Stash
 
@@ -704,6 +711,22 @@ You can even extend much of the core functionality.
 
 For a full list of available hooks see L<Mojolicious/"HOOKS">.
 
+=head2 Introspection
+
+The command L<Mojolicious::Command::routes> can be used from the command line
+to list all available routes together with name and underlying regular
+expressions.
+
+  $ ./myapp.pl routes -v
+  /foo/:name  ....  POST  fooname  ^/foo/([^/\.]+)  ^/?(?:\.([^/]+))?$
+  /bar        ..U.  *     bar      ^/bar
+    +/baz     ...W  GET   baz      ^/baz            ^/?(?:\.([^/]+))?$
+  /yada       ....  *     yada     ^/yada           ^/?(?:\.([^/]+))?$
+
+=head1 ADVANCED
+
+Less commonly used and more powerful features.
+
 =head2 Shortcuts
 
 You can also add your own shortcuts with L<Mojolicious::Routes/"add_shortcut">
@@ -736,30 +759,6 @@ to make route generation more expressive.
   # GET     /user -> {controller => 'user', action => 'show'}
   # OPTIONS /user -> {cb => sub {...}}
   $r->resource('user');
-
-=head2 Introspection
-
-The command L<Mojolicious::Command::routes> can be used from the command line
-to list all available routes together with name and underlying regular
-expressions.
-
-  $ ./myapp.pl routes -v
-  /foo/:name  ....  POST  fooname  ^/foo/([^/\.]+)  ^/?(?:\.([^/]+))?$
-  /bar        ..U.  *     bar      ^/bar
-    +/baz     ...W  GET   baz      ^/baz            ^/?(?:\.([^/]+))?$
-  /yada       ....  *     yada     ^/yada           ^/?(?:\.([^/]+))?$
-
-=head1 ADVANCED
-
-Less commonly used and more powerful features.
-
-=head2 IRIs
-
-IRIs are handled transparently, that means paths are guaranteed to be
-unescaped and decoded from bytes to characters.
-
-  # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
-  $r->get('/☃')->to('foo#snowman');
 
 =head2 Rearranging routes
 

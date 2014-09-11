@@ -640,6 +640,92 @@ A naive translation to Perl code could look like this.
   }
   return $output;
 
+=head2 Adding helpers
+
+You should always try to keep your actions small and reuse as much code as
+possible. Helpers make this very easy, you can use them to do pretty much
+anything an action could do.
+
+  use Mojolicious::Lite;
+
+  helper debug => sub {
+    my ($c, $str) = @_;
+    $c->app->log->debug($str);
+  };
+
+  get '/' => sub {
+    my $c = shift;
+    $c->debug('Hello from an action!');
+  } => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  % debug 'Hello from a template!';
+
+Helpers can also accept template blocks as last argument, this for example
+allows very pleasant to use tag helpers and filters. Wrapping the helper
+result into a L<Mojo::ByteStream> object can prevent accidental double
+escaping.
+
+  use Mojolicious::Lite;
+  use Mojo::ByteStream;
+
+  helper trim_newline => sub {
+    my ($c, $block) = @_;
+    my $result = $block->();
+    $result =~ s/\n//g;
+    return Mojo::ByteStream->new($result);
+  };
+
+  get '/' => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  %= trim_newline begin
+    Some text.
+    %= 1 + 1
+    More text.
+  % end
+
+Similar to stash values you can use a prefix like C<myapp.*> to keep helpers
+from getting exposed in templates and to organize them into namespaces as your
+application grows. Every prefix automatically becomes a helper that returns a
+proxy object containing the current controller object and on which you can
+call the nested helpers.
+
+  use Mojolicious::Lite;
+
+  helper 'cache_control.no_caching' => sub {
+    my $c = shift;
+    $c->res->headers->cache_control('private, max-age=0, no-cache');
+  };
+
+  helper 'cache_control.five_minutes' => sub {
+    my $c = shift;
+    $c->res->headers->cache_control('public, max-age=300');
+  };
+
+  get '/news' => sub {
+    my $c = shift;
+    $c->cache_control->no_caching;
+    $c->render(text => 'Always up to date.');
+  };
+
+  get '/some_older_story' => sub {
+    my $c = shift;
+    $c->cache_control->five_minutes;
+    $c->render(text => 'This one can be cached for a bit.');
+  };
+
+  app->start;
+
+While helpers can also be redefined, this should only be done very carefully
+to avoid conflicts.
+
 =head2 Content blocks
 
 Blocks and the helper L<Mojolicious::Plugin::DefaultHelpers/"content_for">
@@ -874,91 +960,9 @@ with L<Mojolicious::Validator::Validation/"csrf_protect">.
 
 The token can also be submitted with the C<X-CSRF-Token> request header.
 
-=head2 Adding helpers
+=head1 ADVANCED
 
-You should always try to keep your actions small and reuse as much code as
-possible. Helpers make this very easy, you can use them to do pretty much
-anything an action could do.
-
-  use Mojolicious::Lite;
-
-  helper debug => sub {
-    my ($c, $str) = @_;
-    $c->app->log->debug($str);
-  };
-
-  get '/' => sub {
-    my $c = shift;
-    $c->debug('Hello from an action!');
-  } => 'index';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  % debug 'Hello from a template!';
-
-Helpers can also accept template blocks as last argument, this for example
-allows very pleasant to use tag helpers and filters. Wrapping the helper
-result into a L<Mojo::ByteStream> object can prevent accidental double
-escaping.
-
-  use Mojolicious::Lite;
-  use Mojo::ByteStream;
-
-  helper trim_newline => sub {
-    my ($c, $block) = @_;
-    my $result = $block->();
-    $result =~ s/\n//g;
-    return Mojo::ByteStream->new($result);
-  };
-
-  get '/' => 'index';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  %= trim_newline begin
-    Some text.
-    %= 1 + 1
-    More text.
-  % end
-
-Similar to stash values you can use a prefix like C<myapp.*> to keep helpers
-from getting exposed in templates and to organize them into namespaces as your
-application grows. Every prefix automatically becomes a helper that returns a
-proxy object containing the current controller object and on which you can
-call the nested helpers.
-
-  use Mojolicious::Lite;
-
-  helper 'cache_control.no_caching' => sub {
-    my $c = shift;
-    $c->res->headers->cache_control('private, max-age=0, no-cache');
-  };
-
-  helper 'cache_control.five_minutes' => sub {
-    my $c = shift;
-    $c->res->headers->cache_control('public, max-age=300');
-  };
-
-  get '/news' => sub {
-    my $c = shift;
-    $c->cache_control->no_caching;
-    $c->render(text => 'Always up to date.');
-  };
-
-  get '/some_older_story' => sub {
-    my $c = shift;
-    $c->cache_control->five_minutes;
-    $c->render(text => 'This one can be cached for a bit.');
-  };
-
-  app->start;
-
-While helpers can also be redefined, this should only be done very carefully
-to avoid conflicts.
+Less commonly used and more powerful features.
 
 =head2 Helper plugins
 
@@ -1085,10 +1089,6 @@ plugin.
 
   @@ alertassets.html.ep
   %= javascript "/alertassets.js"
-
-=head1 ADVANCED
-
-Less commonly used and more powerful features.
 
 =head2 Rendering static files
 

@@ -1277,7 +1277,7 @@ application, you can use application specific plugins.
   $ touch lib/MyApp/Plugin/MyHelpers.pm
 
 They work just like normal plugins and are also subclasses of
-L<Mojolicious::Plugin>, nested helpers with a prefix based on the plugin name
+L<Mojolicious::Plugin>. Nested helpers with a prefix based on the plugin name
 are an easy way to avoid conflicts.
 
   package MyApp::Plugin::MyHelpers;
@@ -1310,6 +1310,9 @@ name.
   };
 
   app->start;
+
+Of course these plugins can contain more than just helpers, take a look at
+L<Mojolicious::Plugins/"PLUGINS"> for a few ideas.
 
 =head2 Adding commands to Mojolicious
 

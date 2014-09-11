@@ -86,13 +86,13 @@ sub _delay {
 }
 
 sub _development {
-  my ($page, $self, $e) = @_;
+  my ($page, $c, $e) = @_;
 
-  my $app = $self->app;
+  my $app = $c->app;
   $app->log->error($e = Mojo::Exception->new($e)) if $page eq 'exception';
 
   # Filtered stash snapshot
-  my $stash = $self->stash;
+  my $stash = $c->stash;
   my %snapshot = map { $_ => $stash->{$_} }
     grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
 
@@ -108,25 +108,25 @@ sub _development {
     template => "$page.$mode"
   };
   my $inline = $renderer->_bundled($mode eq 'development' ? $mode : $page);
-  return $self if _fallbacks($self, $options, $page, $inline);
-  _fallbacks($self, {%$options, format => 'html'}, $page, $inline);
-  return $self;
+  return $c if _fallbacks($c, $options, $page, $inline);
+  _fallbacks($c, {%$options, format => 'html'}, $page, $inline);
+  return $c;
 }
 
 sub _fallbacks {
-  my ($self, $options, $template, $inline) = @_;
+  my ($c, $options, $template, $inline) = @_;
 
   # Mode specific template
-  return 1 if $self->render_maybe(%$options);
+  return 1 if $c->render_maybe(%$options);
 
   # Normal template
-  return 1 if $self->render_maybe(%$options, template => $template);
+  return 1 if $c->render_maybe(%$options, template => $template);
 
   # Inline template
-  my $stash = $self->stash;
+  my $stash = $c->stash;
   return undef unless $stash->{format} eq 'html';
   delete @$stash{qw(extends layout)};
-  return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
+  return $c->render_maybe(%$options, inline => $inline, handler => 'ep');
 }
 
 sub _inactivity_timeout {

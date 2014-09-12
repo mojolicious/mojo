@@ -1090,9 +1090,9 @@ plugin.
   @@ alertassets.html.ep
   %= javascript "/alertassets.js"
 
-=head2 Rendering static files
+=head2 Serving static files
 
-If automatic rendering of static files is not enough, you can also render them
+If automatic serving of static files is not enough, you can also serve them
 manually from your C<DATA> sections and C<public> directories with
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
 

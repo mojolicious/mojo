@@ -1,5 +1,7 @@
 
-5.41  2014-09-13
+5.41  2014-09-12
+  - Fixed bug in Mojo::UserAgent where connections would sometimes not get
+    closed correctly.
 
 5.40  2014-09-12
   - Deprecated Mojo::EventEmitter::emit_safe.

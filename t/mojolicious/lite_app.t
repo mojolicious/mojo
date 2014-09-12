@@ -376,23 +376,13 @@ get '/subrequest_non_blocking' => sub {
   $c->stash->{nb} = 'success!';
 };
 
-get '/redirect_url' => sub {
-  shift->redirect_to('http://127.0.0.1/foo')->render(text => 'Redirecting!');
-};
+get '/redirect_url' => sub { shift->redirect_to('http://127.0.0.1/foo') };
 
-get '/redirect_path' => sub {
-  shift->redirect_to('/foo/bar?foo=bar')->render(text => 'Redirecting!');
-};
+get '/redirect_path' => sub { shift->redirect_to('/foo/bar?foo=bar') };
 
-get '/redirect_named' => sub {
-  shift->redirect_to('index', format => 'txt')->render(text => 'Redirecting!');
-};
+get '/redirect_named' => sub { shift->redirect_to('index', format => 'txt') };
 
 get '/redirect_twice' => sub { shift->redirect_to('/redirect_named') };
-
-get '/redirect_no_render' => sub {
-  shift->redirect_to('index', {format => 'txt'});
-};
 
 get '/redirect_callback' => sub {
   my $c = shift;
@@ -975,22 +965,18 @@ is $nb, 'broken!', 'right text';
 
 # Redirect to URL
 $t->get_ok('/redirect_url')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 12)
-  ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Redirecting!');
+  ->header_is(Server   => 'Mojolicious (Perl)')
+  ->header_is(Location => 'http://127.0.0.1/foo')->content_is('');
 
 # Redirect to path
 $t->get_ok('/redirect_path')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 12)
-  ->header_like(Location => qr!/foo/bar\?foo=bar$!)
-  ->content_is('Redirecting!');
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_like(Location => qr!/foo/bar\?foo=bar$!)->content_is('');
 
 # Redirect to named route
 $t->get_ok('/redirect_named')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 12)
-  ->header_like(Location => qr!/template.txt$!)->content_is('Redirecting!');
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_like(Location => qr!/template.txt$!)->content_is('');
 
 # Redirect twice
 $t->ua->max_redirects(3);
@@ -1002,12 +988,6 @@ is scalar @$redirects, 2, 'two redirects';
 is $redirects->[0]->req->url->path, '/redirect_twice', 'right path';
 is $redirects->[1]->req->url->path, '/redirect_named', 'right path';
 $t->ua->max_redirects(0);
-
-# Redirect without rendering
-$t->get_ok('/redirect_no_render')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 0)
-  ->header_like(Location => qr!/template.txt$!)->content_is('');
 
 # Non-blocking redirect
 $t->get_ok('/redirect_callback')->status_is(301)
@@ -1032,7 +1012,7 @@ $t->get_ok('/redirect_named')->status_is(200)
 $t->ua->max_redirects(0);
 Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_like(Location => qr!/template.txt$!)->content_is('Redirecting!');
+  ->header_like(Location => qr!/template.txt$!)->content_is('');
 
 # Request with koi8-r content
 my $koi8

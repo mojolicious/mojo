@@ -1,5 +1,5 @@
 
-5.41  2014-09-12
+5.41  2014-09-13
   - Fixed bug in Mojo::UserAgent where connections would sometimes not get
     closed correctly.
 

@@ -17,13 +17,7 @@ sub register {
 
   # Stash key shortcuts (should not generate log messages)
   for my $name (qw(extends layout title)) {
-    $app->helper(
-      $name => sub {
-        my $c = shift;
-        $c->stash($name => shift, @_) if @_;
-        return $c->stash->{$name};
-      }
-    );
+    $app->helper($name => sub { shift->stash($name, @_) });
   }
 
   $app->helper($_ => $self->can("_$_"))

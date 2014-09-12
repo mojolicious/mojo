@@ -1,4 +1,6 @@
 
+5.41  2014-09-13
+
 5.40  2014-09-12
   - Deprecated Mojo::EventEmitter::emit_safe.
   - Added reply->exception and reply->not_found helpers to

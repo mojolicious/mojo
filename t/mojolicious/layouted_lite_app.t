@@ -28,7 +28,7 @@ hook after_render => sub {
 # Default layout for whole application
 app->defaults(layout => 'default');
 
-get '/works' => sub { shift->title('Just works')->render };
+get '/works';
 
 get '/mixed';
 
@@ -287,6 +287,7 @@ Mixed <%= content %>
 Blue<%= title %><%= content %>
 
 @@ works.html.ep
+% title 'Just works';
 % layout 'green' if param 'green';
 % extends 'blue' if param 'blue';
 This <template> just works!

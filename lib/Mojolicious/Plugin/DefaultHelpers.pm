@@ -20,9 +20,8 @@ sub register {
     $app->helper(
       $name => sub {
         my $c = shift;
-        return return $c->stash->{$name} unless @_;
-        $c->stash($name => shift, @_);
-        return $c;
+        $c->stash($name => shift, @_) if @_;
+        return $c->stash->{$name};
       }
     );
   }

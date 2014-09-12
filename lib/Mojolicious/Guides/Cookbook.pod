@@ -554,7 +554,7 @@ the callback.
 
   app->start;
 
-A default subscriber that prints all errors to C<STDERR> will usually be added
+A default subscriber that turns all errors into warnings will usually be added
 by L<Mojo::IOLoop> as a fallback.
 
   Mojo::IOLoop->singleton->reactor->unsubscribe('error');

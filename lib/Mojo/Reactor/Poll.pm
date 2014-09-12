@@ -99,11 +99,13 @@ sub timer { shift->_timer(0, @_) }
 sub watch {
   my ($self, $handle, $read, $write) = @_;
 
+  my $mode = 0;
+  $mode |= POLLIN | POLLPRI if $read;
+  $mode |= POLLOUT if $write;
+
   my $poll = $self->_poll;
   $poll->remove($handle);
-  if ($read && $write) { $poll->mask($handle, POLLIN | POLLPRI | POLLOUT) }
-  elsif ($read)  { $poll->mask($handle, POLLIN | POLLPRI) }
-  elsif ($write) { $poll->mask($handle, POLLOUT) }
+  $poll->mask($handle, $mode) if $mode != 0;
 
   return $self;
 }

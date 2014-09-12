@@ -30,15 +30,15 @@ sub timer { shift->_timer(0, @_) }
 sub watch {
   my ($self, $handle, $read, $write) = @_;
 
+  my $mode = 0;
+  $mode |= EV::READ  if $read;
+  $mode |= EV::WRITE if $write;
+
   my $fd = fileno $handle;
   my $io = $self->{io}{$fd};
-  my $mode;
-  if ($read && $write) { $mode = EV::READ | EV::WRITE }
-  elsif ($read)  { $mode = EV::READ }
-  elsif ($write) { $mode = EV::WRITE }
-  else           { delete $io->{watcher} }
-  if (my $w = $io->{watcher}) { $w->set($fd, $mode) }
-  elsif ($mode) {
+  if ($mode == 0) { delete $io->{watcher} }
+  elsif (my $w = $io->{watcher}) { $w->set($fd, $mode) }
+  else {
     weaken $self;
     $io->{watcher} = EV::io($fd, $mode, sub { $self->_io($fd, @_) });
   }
@@ -49,9 +49,9 @@ sub watch {
 sub _io {
   my ($self, $fd, $w, $revents) = @_;
   my $io = $self->{io}{$fd};
-  $self->_sandbox('Read', $io->{cb}, 0) if EV::READ &$revents;
+  $self->_sandbox('Read', $io->{cb}, 0) if EV::READ & $revents;
   $self->_sandbox('Write', $io->{cb}, 1)
-    if EV::WRITE &$revents && $self->{io}{$fd};
+    if EV::WRITE & $revents && $self->{io}{$fd};
 }
 
 sub _timer {

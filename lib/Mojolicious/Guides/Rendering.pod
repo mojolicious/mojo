@@ -1094,10 +1094,10 @@ plugin.
 
 If automatic rendering of static files is not enough, you can also render them
 manually from your C<DATA> sections and C<public> directories with
-L<Mojolicious::Controller/"render_static">.
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
 
   $c->res->headers->content_disposition('attachment; filename=bar.png;');
-  $c->render_static('foo/bar.png');
+  $c->reply->static('foo/bar.png');
 
 =head2 Custom responses
 

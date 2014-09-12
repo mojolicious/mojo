@@ -10,12 +10,12 @@ use Mojo::Date;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
+get '/hello3.txt' => sub { shift->reply->static('hello2.txt') };
 
 post '/hello4.txt' => sub {
   my $c = shift;
   $c->res->headers->content_type('text/html');
-  $c->render_static('hello2.txt');
+  $c->reply->static('hello2.txt');
 };
 
 options '/hello.txt' => sub { shift->render(text => 'Options!') };

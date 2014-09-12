@@ -175,7 +175,7 @@ get '/longpoll/static/delayed' => sub {
   $c->on(finish => sub { shift->stash->{finished}++ });
   $c->cookie(bar => 'baz');
   $c->session(foo => 'bar');
-  Mojo::IOLoop->timer(0.25 => sub { $c->render_static('hello.txt') });
+  Mojo::IOLoop->timer(0.25 => sub { $c->reply->static('hello.txt') });
 };
 
 get '/longpoll/dynamic/delayed' => sub {

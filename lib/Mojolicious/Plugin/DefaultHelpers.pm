@@ -30,6 +30,7 @@ sub register {
   $app->helper(include           => sub { shift->render_to_string(@_) });
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
+  $app->helper('reply.static'    => sub { _static(@_) });
   $app->helper(ua                => sub { shift->app->ua });
 }
 
@@ -129,6 +130,13 @@ sub _inactivity_timeout {
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
+}
+
+sub _static {
+  my ($c, $file) = @_;
+  return !!$c->rendered if $c->app->static->serve($c, $file);
+  $c->app->log->debug(qq{File "$file" not found, public directory missing?});
+  return !$c->render_not_found;
 }
 
 sub _url_with {
@@ -375,6 +383,19 @@ Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>. Also sets
 the stash value C<snapshot> to a copy of the L</"stash"> for use in the
 templates.
+
+=head2 reply->static
+
+  my $bool = $c->reply->static('images/logo.png');
+  my $bool = $c->reply->static('../lib/MyApp.pm');
+
+Reply with a static file using L<Mojolicious::Static/"serve">, usually from
+the C<public> directories or C<DATA> sections of your application. Note that
+this helper does not protect from traversing to parent directories.
+
+  # Serve file with a custom content type
+  $c->res->headers->content_type('application/myapp');
+  $c->reply->static('foo.txt');
 
 =head2 session
 

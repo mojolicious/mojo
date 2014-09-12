@@ -238,7 +238,7 @@ get '/source' => sub {
   my $c = shift;
   my $file = $c->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
   $c->render_maybe('this_does_not_ever_exist')
-    or $c->render_static($file)
+    or $c->reply->static($file)
     or $c->res->headers->header('X-Missing' => 1);
 };
 
@@ -395,7 +395,7 @@ get '/redirect_callback' => sub {
   );
 };
 
-get '/static_render' => sub { shift->render_static('hello.txt') };
+get '/static' => sub { shift->reply->static('hello.txt') };
 
 app->types->type('koi8-r' => 'text/html; charset=koi8-r');
 get '/koi8-r' => sub {
@@ -996,7 +996,7 @@ $t->get_ok('/redirect_callback')->status_is(301)
   ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Whatever!');
 
 # Static file
-$t->get_ok('/static_render')->status_is(200)
+$t->get_ok('/static')->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 31)
   ->content_is("Hello Mojo from a static file!\n");

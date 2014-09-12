@@ -30,8 +30,8 @@ sub register {
   $app->helper(include           => sub { shift->render_to_string(@_) });
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
-  $app->helper('reply.static'    => sub { _static(@_) });
-  $app->helper(ua                => sub { shift->app->ua });
+  $app->helper('reply.static' => \&_static);
+  $app->helper(ua => sub { shift->app->ua });
 }
 
 sub _accepts {

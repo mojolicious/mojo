@@ -975,11 +975,11 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
 
 =head2 Custom responses
 
-Most content, static as well as dynamic, gets served through
+Most response content, static as well as dynamic, gets served through
 L<Mojo::Asset::File> and L<Mojo::Asset::Memory> objects. For somewhat static
 content, like cached JSON data or temporary file, you can create your own and
 use the helper L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>asset"> to
-serve it while allowing content negotiation to be performed with C<Range>,
+serve them while allowing content negotiation to be performed with C<Range>,
 C<If-Modified-Since> and C<If-None-Match> headers.
 
   $c->res->headers->content_type('text/plain');

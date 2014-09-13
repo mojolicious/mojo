@@ -120,15 +120,14 @@ sub move_to {
   return $self->path($to)->cleanup(0);
 }
 
-sub mtime { _stat(shift->path, 1) }
-sub size  { _stat(shift->path, 0) }
+sub mtime { (stat shift->handle)[9] }
+
+sub size { -s shift->handle }
 
 sub slurp {
   return '' unless defined(my $file = shift->path);
   return Mojo::Util::slurp $file;
 }
-
-sub _stat { $_[0] ? $_[1] ? (stat $_[0])[9] : -s $_[0] : 0 }
 
 1;
 

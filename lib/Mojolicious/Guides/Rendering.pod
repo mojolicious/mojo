@@ -964,6 +964,25 @@ The token can also be submitted with the C<X-CSRF-Token> request header.
 
 Less commonly used and more powerful features.
 
+=head2 Serving static files
+
+Static files are automatically served from your C<DATA> sections and C<public>
+directories, and if that's not enough you can also serve them manually with
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
+
+  $c->res->headers->content_disposition('attachment; filename=bar.png;');
+  $c->reply->static('foo/bar.png');
+
+=head2 Custom responses
+
+For entirely custom responses to, for example, stream content directly from
+files, you can use L<Mojolicious::Controller/"rendered"> to tell the renderer
+that a response has been generated.
+
+  $c->res->headers->content_type('text/plain');
+  $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+  $c->rendered(200);
+
 =head2 Helper plugins
 
 Some helpers might be useful enough for you to share them between multiple
@@ -1089,25 +1108,6 @@ plugin.
 
   @@ alertassets.html.ep
   %= javascript "/alertassets.js"
-
-=head2 Serving static files
-
-If automatic serving of static files is not enough, you can also serve them
-manually from your C<DATA> sections and C<public> directories with
-L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
-
-  $c->res->headers->content_disposition('attachment; filename=bar.png;');
-  $c->reply->static('foo/bar.png');
-
-=head2 Custom responses
-
-For entirely custom responses to, for example, stream content directly from
-files, you can use L<Mojolicious::Controller/"rendered"> to tell the renderer
-that a response has been generated.
-
-  $c->res->headers->content_type('text/plain');
-  $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
-  $c->rendered(200);
 
 =head2 Post-processing dynamic content
 

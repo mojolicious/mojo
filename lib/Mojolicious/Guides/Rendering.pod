@@ -975,9 +975,19 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
 
 =head2 Custom responses
 
-For entirely custom responses to, for example, stream content directly from
-files, you can use L<Mojolicious::Controller/"rendered"> to tell the renderer
-that a response has been generated.
+Most generated content gets served through L<Mojo::Asset::File> and
+L<Mojo::Asset::Memory> objects in responses. For somewhat static content, like
+cached JSON data, you can create your own and use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>asset"> to serve it while
+allowing content negotiation to be performed with C<Range>,
+C<If-Modified-Since> and C<If-None-Match> headers.
+
+  $c->res->headers->content_type('text/plain');
+  $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+
+For even more control you can also just skip the helper and use
+L<Mojolicious::Controller/"rendered"> to tell the renderer when you're done
+generating a response.
 
   $c->res->headers->content_type('text/plain');
   $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));

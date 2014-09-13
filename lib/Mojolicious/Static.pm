@@ -12,9 +12,6 @@ use Mojo::Util 'md5_sum';
 has classes => sub { ['main'] };
 has paths   => sub { [] };
 
-# Last modified default
-my $MTIME = time;
-
 # Bundled files
 my $HOME   = Mojo::Home->new;
 my $PUBLIC = $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/public');
@@ -98,7 +95,7 @@ sub serve_asset {
   # Last-Modified and ETag
   my $res = $c->res;
   $res->code(200)->headers->accept_ranges('bytes');
-  my $mtime = $asset->is_file ? (stat $asset->path)[9] : $MTIME;
+  my $mtime = $asset->mtime;
   my $options = {etag => md5_sum($mtime), last_modified => $mtime};
   return $res->code(304) if $self->is_fresh($c, $options);
 

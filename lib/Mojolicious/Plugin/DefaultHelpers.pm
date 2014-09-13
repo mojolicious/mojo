@@ -20,23 +20,29 @@ sub register {
     $app->helper($name => sub { shift->stash($name, @_) });
   }
 
+  $app->helper(accepts => sub { $_[0]->app->renderer->accepts(@_) });
+  $app->helper(b       => sub { shift; Mojo::ByteStream->new(@_) });
+  $app->helper(c       => sub { shift; Mojo::Collection->new(@_) });
+  $app->helper(config  => sub { shift->app->config(@_) });
+
   $app->helper($_ => $self->can("_$_"))
-    for qw(accepts content content_for csrf_token current_route delay),
+    for qw(content content_for csrf_token current_route delay),
     qw(inactivity_timeout is_fresh url_with);
-  $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
-  $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
-  $app->helper(config            => sub { shift->app->config(@_) });
-  $app->helper(dumper            => sub { shift; dumper(@_) });
-  $app->helper(include           => sub { shift->render_to_string(@_) });
+
+  $app->helper(dumper => sub { shift; dumper(@_) });
+  $app->helper(include => sub { shift->render_to_string(@_) });
+
+  $app->helper("reply.$_" => $self->can("_$_")) for qw(asset static);
+
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
-  $app->helper('reply.static' => \&_static);
-  $app->helper(ua => sub { shift->app->ua });
+  $app->helper(ua                => sub { shift->app->ua });
 }
 
-sub _accepts {
+sub _asset {
   my $c = shift;
-  return $c->app->renderer->accepts($c, @_);
+  $c->app->static->serve_asset($c, @_);
+  $c->rendered;
 }
 
 sub _content {
@@ -67,8 +73,7 @@ sub _csrf_token {
 
 sub _current_route {
   return '' unless my $endpoint = shift->match->endpoint;
-  return $endpoint->name unless @_;
-  return $endpoint->name eq shift;
+  return @_ ? $endpoint->name eq shift : $endpoint->name;
 }
 
 sub _delay {
@@ -364,6 +369,14 @@ L</"stash">.
   %= param 'foo'
 
 Alias for L<Mojolicious::Controller/"param">.
+
+=head2 reply->asset
+
+  $c->reply->asset(Mojo::Asset::File->new);
+
+Reply with L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object using
+L<Mojolicious::Static/"serve_asset">, and perform content negotiation with
+C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
 
 =head2 reply->exception
 

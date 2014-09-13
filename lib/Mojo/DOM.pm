@@ -593,8 +593,9 @@ and C<tag> nodes) or raw content.
   # " Test "
   $dom->parse('<!-- Test --><br>')->contents->first->content;
 
-  # "<!-- 123 --><br>"
-  $dom->parse('<!-- Test --><br>')->contents->first->content(' 123 ')->root;
+  # "<div><!-- 123 -->456</div>"
+  $dom->parse('<div><!-- Test -->456</div>')->at('div')
+    ->contents->first->content(' 123 ')->root;
 
   # "<p><i>123</i></p>"
   $dom->parse('<p>Test</p>')->at('p')->content('<i>123</i>')->root;

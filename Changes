@@ -2,6 +2,7 @@
 5.41  2014-09-13
   - Deprecated Mojolicious::Controller::render_static in favor of
     reply->static helper.
+  - Added reply->static helper to Mojolicious::Plugin::DefaultHelpers.
   - Fixed bug in Mojo::UserAgent where connections would sometimes not get
     closed correctly.
 

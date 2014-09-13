@@ -374,9 +374,15 @@ Alias for L<Mojolicious::Controller/"param">.
 
   $c->reply->asset(Mojo::Asset::File->new);
 
-Reply with L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object using
-L<Mojolicious::Static/"serve_asset">, and perform content negotiation with
-C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
+Reply with L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object and perform
+content negotiation using C<Range>, C<If-Modified-Since> and C<If-None-Match>
+headers with L<Mojolicious::Static/"serve_asset">.
+
+  # Serve asset with custom modification time
+  my $asset = Mojo::Asset::Memory->new;
+  $asset->add_chunk('Hello World!')->mtime(784111777);
+  $c->res->headers->content_type('text/plain');
+  $c->reply->asset($asset);
 
 =head2 reply->exception
 

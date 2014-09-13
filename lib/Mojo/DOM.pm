@@ -587,6 +587,9 @@ and C<tag> nodes) or raw content.
   # "<div><h1>123</h1></div>"
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->content('123')->root;
 
+  # "<p><i>123</i></p>"
+  $dom->parse('<p>Test</p>')->at('p')->content('<i>123</i>')->root;
+
   # "<div><h1></h1></div>"
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->content('')->root;
 
@@ -596,9 +599,6 @@ and C<tag> nodes) or raw content.
   # "<div><!-- 123 -->456</div>"
   $dom->parse('<div><!-- Test -->456</div>')->at('div')
     ->contents->first->content(' 123 ')->root;
-
-  # "<p><i>123</i></p>"
-  $dom->parse('<p>Test</p>')->at('p')->content('<i>123</i>')->root;
 
 =head2 contents
 

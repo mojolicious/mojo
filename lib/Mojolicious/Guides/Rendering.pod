@@ -970,8 +970,15 @@ Static files are automatically served from your C<DATA> sections and C<public>
 directories, and if that's not enough you can also serve them manually with
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
 
-  $c->res->headers->content_disposition('attachment; filename=bar.png;');
-  $c->reply->static('foo/bar.png');
+  use Mojolicious::Lite;
+
+  get '/some_static_file' => sub {
+    my $c = shift;
+    $c->res->headers->content_disposition('attachment; filename=bar.png;');
+    $c->reply->static('foo/bar.png');
+  };
+
+  app->start;
 
 =head2 Custom responses
 
@@ -982,16 +989,30 @@ use the helper L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>asset"> to
 serve them while allowing content negotiation to be performed with C<Range>,
 C<If-Modified-Since> and C<If-None-Match> headers.
 
-  $c->res->headers->content_type('text/plain');
-  $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+  use Mojolicious::Lite;
+
+  get '/leak' => sub {
+    my $c = shift;
+    $c->res->headers->content_type('text/plain');
+    $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+  };
+
+  app->start;
 
 For even more control you can also just skip the helper and use
 L<Mojolicious::Controller/"rendered"> to tell the renderer when you're done
 generating a response.
 
-  $c->res->headers->content_type('text/plain');
-  $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
-  $c->rendered(200);
+  use Mojolicious::Lite;
+
+  get '/leak' => sub {
+    my $c = shift;
+    $c->res->headers->content_type('text/plain');
+    $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+    $c->rendered(200);
+  };
+
+  app->start;
 
 =head2 Helper plugins
 
@@ -1164,14 +1185,27 @@ L<Mojolicious::Controller/"write_chunk"> come in handy. A common use would be
 to send the C<head> section of an HTML document to the browser in advance and
 speed up preloading of referenced images and stylesheets.
 
-  $c->write_chunk('<html><head><title>Example</title></head>' => sub {
+  use Mojolicious::Lite;
+
+  get '/' => sub {
     my $c = shift;
-    $c->finish('<body>Example</body></html>');
-  });
+    $c->write_chunk('<html><head><title>Example</title></head>' => sub {
+      my $c = shift;
+      $c->finish('<body>Example</body></html>');
+    });
+  };
+
+  app->start;
 
 The optional drain callback ensures that all previous chunks have been
 written before processing continues. An empty chunk or call to
 L<Mojolicious::Controller/"finish"> marks the end of the stream.
+
+  HTTP/1.1 200 OK
+  Connection: keep-alive
+  Date: Sat, 13 Sep 2014 16:48:29 GMT
+  Transfer-Encoding: chunked
+  Server: Mojolicious (Perl)
 
   29
   <html><head><title>Example</title></head>

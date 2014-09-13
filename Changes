@@ -1,4 +1,6 @@
 
+5.42  2014-09-14
+
 5.41  2014-09-13
   - Deprecated Mojolicious::Controller::render_static in favor of
     reply->static helper.

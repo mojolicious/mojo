@@ -262,9 +262,9 @@ only the information you're actually interested in.
 =head2 Route names
 
 All routes can have a name associated with them, this allows automatic
-template detection and back referencing with
-L<Mojolicious::Controller/"url_for"> as well as many helpers like
-L<Mojolicious::Plugin::TagHelpers/"link_to">.
+template detection and backreferencing with
+L<Mojolicious::Controller/"url_for">, on which many methods and helpers like
+L<Mojolicious::Plugin::TagHelpers/"link_to"> rely.
 
   use Mojolicious::Lite;
 

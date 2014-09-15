@@ -203,6 +203,31 @@ fun thanks to automatic reloading.
 Just save your changes and they will be automatically in effect the next time
 you refresh your browser.
 
+=head2 A birds-eye view
+
+It all starts with an HTTP request like this, sent by your browser.
+
+  GET / HTTP/1.1
+  Host: localhost
+
+Once the request has been received by the web server, it will be passed on to
+L<Mojolicious>, where it will be processed in a few simple steps.
+
+  1. Check if a static file exists that would meet the requirements.
+  2. Try to find a route that would meet the requirements.
+  3. Dispatch the request to this route, usually reaching one or more actions.
+  4. Process the request, maybe generating a response with the renderer.
+  5. Return control to the web server, and if no response has been generated
+     yet, wait for a non-blocking operation to do so.
+
+With our application the router would have found an action in step 2, and
+rendered some text in step 4, resulting in an HTTP response like this being
+sent back to the browser.
+
+  HTTP/1.1 200 OK
+  Content-Length: 12
+  Hello world!
+
 =head2 Model
 
 In L<Mojolicious> we consider web applications simple frontends for existing

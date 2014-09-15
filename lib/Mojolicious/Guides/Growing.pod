@@ -512,7 +512,7 @@ this.
     <body><%= content %></body>
   </html>
 
-And our directory structure should be looking like this now.
+And the directory structure should be looking like this now.
 
   myapp
   |- myapp.pl

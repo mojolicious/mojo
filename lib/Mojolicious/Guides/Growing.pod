@@ -208,7 +208,7 @@ you refresh your browser.
 It all starts with an HTTP request like this, sent by your browser.
 
   GET / HTTP/1.1
-  Host: localhost
+  Host: localhost:3000
 
 Once the request has been received by the web server, it will be passed on to
 L<Mojolicious>, where it will be processed in a few simple steps.

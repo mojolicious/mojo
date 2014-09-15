@@ -512,8 +512,19 @@ this.
     <body><%= content %></body>
   </html>
 
-A list of all built-in helpers can be found in
-L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
+And our directory structure should be looking like this now.
+
+  myapp
+  |- myapp.pl
+  |- lib
+  |  +- MyApp
+  |     +- Model
+  |        +- Users.pm
+  +- t
+     +- login.t
+
+Our templates are using quite a few renderer features,
+L<Mojolicious::Guides::Rendering> explains them all in great detail.
 
 =head1 WELL STRUCTURED APPLICATION
 
@@ -678,8 +689,8 @@ information.
 
   1;
 
-L<Mojolicious::Routes> allows many route variations, choose whatever you like
-most.
+The router allows many different route variations,
+L<Mojolicious::Guides::Routing> explains them all in great detail.
 
 =head2 Templates
 
@@ -716,8 +727,8 @@ without breaking updated dual-life modules.
 
 =head2 Simplified tests
 
-Normal L<Mojolicious> applications are a little easier to test, so
-C<t/login.t> can be simplified.
+Full L<Mojolicious> applications are a little easier to test, so C<t/login.t>
+can be simplified.
 
   use Test::More;
   use Test::Mojo;
@@ -743,6 +754,27 @@ C<t/login.t> can be simplified.
     ->element_exists('form input[type="submit"]');
 
   done_testing();
+
+And our final directory structure should be looking like this.
+
+  myapp
+  |- script
+  |  +- myapp
+  |- lib
+  |  |- MyApp.pm
+  |  +- MyApp
+  |     |- Controller
+  |     |  +- Login.pm
+  |     +- Model
+  |        +- Users.pm
+  |- t
+  |  +- login.t
+  +- templates
+     |- layouts
+     |  +- default.html.ep
+     +- login
+        |- index.html.ep
+        +- protected.html.ep
 
 Test-driven development takes a little getting used to, but can be a very
 powerful tool.

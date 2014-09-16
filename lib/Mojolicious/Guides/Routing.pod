@@ -554,6 +554,14 @@ operations to finish before reaching the next dispatch cycle.
   });
   $foo->get('/bar')->to('foo#bar');
 
+Every destination is just a snapshot of the stash at the time the route
+matched, and only the C<format> value is shared by all of them. For a little
+more power you can introspect the preceding and succeeding destinations with
+L<Mojolicious::Controller/"match">.
+
+  # Action of the fourth dispatch cycle
+  my $action = $c->match->stack->[3]{action};
+
 =head2 Formats
 
 File extensions like C<.html> and C<.txt> at the end of a route are

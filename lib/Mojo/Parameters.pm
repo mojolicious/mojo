@@ -200,7 +200,7 @@ Mojo::Parameters - Parameters
 
 L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>
 and based on L<RFC 3986|http://tools.ietf.org/html/rfc3986> as well as the
-L<HTML Living Standard|http://www.whatwg.org/html>.
+L<HTML Living Standard|https://html.spec.whatwg.org>.
 
 =head1 ATTRIBUTES
 

@@ -422,7 +422,8 @@ Test::Mojo - Testing Mojo!
 =head1 DESCRIPTION
 
 L<Test::Mojo> is a collection of testing helpers for everyone developing
-L<Mojo> and L<Mojolicious> applications.
+L<Mojo> and L<Mojolicious> applications, it is usually used together with
+L<Test::More>.
 
 =head1 ATTRIBUTES
 

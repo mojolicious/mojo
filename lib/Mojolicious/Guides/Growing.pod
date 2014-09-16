@@ -523,7 +523,7 @@ And the directory structure should be looking like this now.
   +- t
      +- login.t
 
-Our templates are using quite a few renderer features,
+Our templates are using quite a few features of the renderer,
 L<Mojolicious::Guides::Rendering> explains them all in great detail.
 
 =head1 WELL STRUCTURED APPLICATION
@@ -540,8 +540,8 @@ directories with the command L<Mojolicious::Command::inflate>.
 
   $ ./myapp.pl inflate
 
-Those directories always get priority, so inflating can also be a great way to
-allow your users to customize their applications.
+Those directories have a higher precedence, so inflating can also be a great
+way to allow your users to customize their applications.
 
 =head2 Simplified application class
 
@@ -616,6 +616,24 @@ allow running tests again.
 
   # Start command line interface for application
   Mojolicious::Commands->start_app('MyApp');
+
+And the directory structure of our hybrid application should be looking like
+this.
+
+  myapp
+  |- myapp.pl
+  |- lib
+  |  |- MyApp.pm
+  |  +- MyApp
+  |     +- Model
+  |        +- Users.pm
+  |- t
+  |  +- login.t
+  +- templates
+     |- layouts
+     |  +- default.html.ep
+     |- index.html.ep
+     +- protected.html.ep
 
 =head2 Controller class
 

@@ -46,7 +46,7 @@
 ```perl
 use Mojolicious::Lite;
 
-get '/' => {text => 'Hello World!'};
+get '/' => {text => 'I ♥ Mojolicious!'};
 
 app->start;
 ```
@@ -67,36 +67,33 @@ app->start;
 ```perl
 use Mojolicious::Lite;
 
-# Simple plain text response
-get '/' => {text => 'I ♥ Mojolicious!'};
+# Route associating "/" with template in DATA section
+get '/' => 'fetch';
 
-# Route associating "/time" with template in DATA section
-get '/time' => 'clock';
-
-# Scrape information from remote sites
-post '/title' => sub {
-  my $c     = shift;
-  my $url   = $c->param('url') || 'http://mojolicio.us';
-  my $title = $c->ua->get($url)->res->dom->at('title')->text;
-  $c->render(json => {url => $url, title => $title});
-};
-
-# WebSocket echo service
-websocket '/echo' => sub {
+# WebSocket service scraping information from remote site
+websocket '/title' => sub {
   my $c = shift;
   $c->on(message => sub {
-    my ($c, $msg) = @_;
-    $c->send("echo: $msg");
+    my ($c, $url) = @_;
+    my $title = $c->ua->get($url)->res->dom->at('title')->text;
+    $c->send($title);
   });
 };
 
 app->start;
 __DATA__
 
-@@ clock.html.ep
-% use Time::Piece;
-% my $now = localtime;
-The time is <%= $now->hms %>.
+@@ fetch.html.ep
+% my $websocket = url_for 'title';
+<script>
+  var ws = new WebSocket('<%= $websocket->to_abs %>');
+  ws.onmessage = function (event) {
+    document.body.innerHTML += event.data;
+  };
+  ws.onopen = function () {
+    ws.send('http://mojolicio.us');
+  };
+</script>
 ```
 
   Single file prototypes like this one can easily grow into well-structured

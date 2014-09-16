@@ -943,7 +943,7 @@ and return them with L<Mojolicious::Controller/"send">.
         ws.onmessage = function (event) {
           document.body.innerHTML += JSON.parse(event.data).msg;
         };
-        ws.onopen = function (event) {
+        ws.onopen = function () {
           ws.send(JSON.stringify({msg: 'I ♥ Mojolicious!'}));
         };
       </script>

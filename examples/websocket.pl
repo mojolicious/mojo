@@ -31,7 +31,7 @@ __DATA__
         ws.onmessage = function (event) {
           document.body.innerHTML += JSON.parse(event.data).test;
         };
-        ws.onopen = function (event) {
+        ws.onopen = function () {
           ws.send(JSON.stringify({test: 'WebSocket support works! ♥'}));
         };
       }

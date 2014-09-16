@@ -160,7 +160,7 @@ The root of the route structure, usually a L<Mojolicious::Routes> object.
 =head2 stack
 
   my $stack = $match->stack;
-  $match    = $match->stack([{foo => 'bar'}]);
+  $match    = $match->stack([{action => 'foo'}, {action => 'bar'}]);
 
 Captured parameters with nesting history.
 

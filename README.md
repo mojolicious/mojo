@@ -58,7 +58,7 @@ app->start;
     Server available at http://127.0.0.1:3000.
 
     $ curl http://127.0.0.1:3000/
-    Hello World!
+    I ♥ Mojolicious!
 
 ## Duct tape for the HTML5 web
 

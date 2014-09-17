@@ -1,4 +1,6 @@
 
+5.43  2014-09-18
+
 5.42  2014-09-17
   - Fixed url_for bug where an unnecessary slash could be rendered before
     formats.

@@ -57,7 +57,7 @@ sub parse {
 }
 
 sub render {
-  my ($self, $values, $render) = @_;
+  my ($self, $values, $endpoint) = @_;
 
   # Placeholders can only be optional without a format
   my $optional = !(my $format = $values->{format});
@@ -85,8 +85,7 @@ sub render {
   }
 
   # Format can be optional
-  $str ||= '/';
-  return $render && $format ? "$str.$format" : $str;
+  return $endpoint && $format ? "$str.$format" : $str;
 }
 
 sub _compile {

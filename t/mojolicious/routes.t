@@ -186,6 +186,10 @@ is $second->render('', {}), '/second', 'right result';
 $target->add_child($first)->add_child($second);
 is $second->render('', {}), '/target/second', 'right result';
 
+# /slash
+$r->route('/slash')->to(controller => 'just')->route('/')
+  ->to(action => 'slash');
+
 # /missing/*/name
 # /missing/too
 # /missing/too/test
@@ -823,6 +827,15 @@ is $m->path_for->{path}, '/source/third', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/target/third'});
 is_deeply $m->stack, [], 'empty stack';
+
+# Just a slash with a format after a path
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/slash.txt'});
+is_deeply $m->stack,
+  [{controller => 'just', action => 'slash', format => 'txt'}],
+  'right structure';
+is $m->path_for->{path}, '/slash', 'right path';
+is $m->path_for(format => 'html')->{path}, '/slash.html', 'right path';
 
 # Nameless placeholder
 $m = Mojolicious::Routes::Match->new(root => $r);

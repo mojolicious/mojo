@@ -65,7 +65,7 @@ is $pattern->pattern, undef, 'slash has been optimized away';
 $pattern->defaults({action => 'index'});
 ok !$pattern->match('/test/foo/bar'), 'no result';
 is_deeply $pattern->match('/'), {action => 'index'}, 'right structure';
-is $pattern->render, '/', 'right result';
+is $pattern->render, '', 'right result';
 
 # Regex in pattern
 $pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',
@@ -253,7 +253,7 @@ is $pattern->render($result, 1), '/foo/bar', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('//');
 $result = $pattern->match('/', 1);
 is_deeply $result, {}, 'right structure';
-is $pattern->render($result, 1), '/', 'right result';
+is $pattern->render($result, 1), '', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('0');
 $result = $pattern->match('/0', 1);
 is_deeply $result, {}, 'right structure';

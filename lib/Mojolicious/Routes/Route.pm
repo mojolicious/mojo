@@ -124,13 +124,14 @@ sub render {
   my ($self, $path, $values) = @_;
 
   # Render pattern (if necessary)
-  if (defined((my $pattern = $self->pattern)->pattern) || !$path) {
-    my $prefix = $pattern->render($values, !$path);
+  my $endpoint = !@{$self->children};
+  if (defined((my $pattern = $self->pattern)->pattern) || $endpoint) {
+    my $prefix = $pattern->render($values, $endpoint);
     $path = "$prefix$path" unless $prefix eq '/';
   }
 
   # Let parent render
-  return $path || '/' unless my $parent = $self->parent;
+  return $path =~ m!^/! ? $path : "/$path" unless my $parent = $self->parent;
   return $parent->render($path, $values);
 }
 

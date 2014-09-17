@@ -68,7 +68,7 @@ app->start;
 use Mojolicious::Lite;
 
 # Route associating "/" with template in DATA section
-get '/' => 'fetch';
+get '/' => 'root';
 
 # WebSocket service scraping information from remote site
 websocket '/title' => sub {
@@ -83,7 +83,7 @@ websocket '/title' => sub {
 app->start;
 __DATA__
 
-@@ fetch.html.ep
+@@ root.html.ep
 % my $websocket = url_for 'title';
 <script>
   var ws = new WebSocket('<%= $websocket->to_abs %>');

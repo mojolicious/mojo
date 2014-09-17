@@ -66,6 +66,7 @@ $pattern->defaults({action => 'index'});
 ok !$pattern->match('/test/foo/bar'), 'no result';
 is_deeply $pattern->match('/'), {action => 'index'}, 'right structure';
 is $pattern->render, '', 'right result';
+is $pattern->render({format => 'txt'}, 1), '.txt', 'right result';
 
 # Regex in pattern
 $pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',

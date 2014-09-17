@@ -1,7 +1,7 @@
 
 5.42  2014-09-17
-  - Fixed bug in Mojolicious::Routes::Pattern where an unnecessary slash could
-    be rendered before formats.
+  - Fixed url_for bug where an unnecessary slash could be rendered before
+    formats.
 
 5.41  2014-09-13
   - Deprecated Mojolicious::Controller::render_static in favor of

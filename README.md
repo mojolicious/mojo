@@ -67,10 +67,10 @@ app->start;
 ```perl
 use Mojolicious::Lite;
 
-# Route associating "/" with template in DATA section
+# Route connecting "/" with a template in the DATA section
 get '/' => 'index';
 
-# WebSocket service scraping information from remote site
+# WebSocket service scraping information from a web site
 websocket '/title' => sub {
   my $c = shift;
   $c->on(message => sub {

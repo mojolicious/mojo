@@ -71,7 +71,7 @@ use Mojolicious::Lite;
 # Render template "index.html.ep" from the DATA section
 get '/' => {template => 'index'};
 
-# WebSocket service extracting the title from a web site
+# WebSocket service used by the template to extract the title from a web site
 websocket '/title' => sub {
   my $c = shift;
   $c->on(message => sub {

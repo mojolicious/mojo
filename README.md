@@ -62,7 +62,8 @@ app->start;
 
 ## Duct tape for the HTML5 web
 
-  Web development for humans, making hard things possible and everything fun.
+  Single file prototypes like this one can easily grow into well-structured
+  applications.
 
 ```perl
 use Mojolicious::Lite;
@@ -95,9 +96,6 @@ __DATA__
   };
 </script>
 ```
-
-  Single file prototypes like this one can easily grow into well-structured
-  applications.
 
 ## Want to know more?
 

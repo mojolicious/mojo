@@ -69,7 +69,7 @@ app->start;
 use Mojolicious::Lite;
 
 # Route connecting "/" with a template in the DATA section
-get '/' => 'index';
+get '/' => {template => 'index'};
 
 # WebSocket service scraping information from a web site
 websocket '/title' => sub {

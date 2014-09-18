@@ -117,7 +117,7 @@
     %= include inline => app->renderer->_bundled('mojobar')
     <script>
       function mojoDrawer (handle, drawer) {
-        $(handle).click(function() {
+        $(handle).click(function () {
           $(drawer).slideToggle('slow');
           var text = $(handle + ' div.tap').text();
           text = text == "tap for more" ? "tap for less" : "tap for more";
@@ -125,7 +125,7 @@
         });
         $(drawer).toggle();
       }
-      $(document).ready(function() {
+      $(document).ready(function () {
         mojoDrawer('#trace', '#frames');
         mojoDrawer('#more', '#infos');
       });
@@ -179,8 +179,8 @@
             <div class="tap">tap for more</div>
             <script>
               var current = '#context';
-              $('#showcase').click(function() {
-                $(current).slideToggle('slow', function() {
+              $('#showcase').click(function () {
+                $(current).slideToggle('slow', function () {
                   if (current == '#context') {
                     current = '#insight';
                   }

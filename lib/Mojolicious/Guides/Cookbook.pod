@@ -616,9 +616,7 @@ L<Mojolicious::Controller/"send">.
         };
 
         // Outgoing messages
-        window.setInterval(function() {
-          ws.send('Hello Mojo!');
-        }, 1000);
+        window.setInterval(function () { ws.send('Hello Mojo!') }, 1000);
       </script>
     </body>
   </html>

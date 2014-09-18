@@ -88,12 +88,8 @@ __DATA__
 % my $websocket = url_for 'title';
 <script>
   var ws = new WebSocket('<%= $websocket->to_abs %>');
-  ws.onmessage = function (event) {
-    document.body.innerHTML += event.data;
-  };
-  ws.onopen = function () {
-    ws.send('http://mojolicio.us');
-  };
+  ws.onmessage = function (event) { document.body.innerHTML += event.data };
+  ws.onopen    = function (event) { ws.send('http://mojolicio.us') };
 </script>
 ```
 

@@ -106,7 +106,7 @@
       }
     });
   });
-  $(document).ready(function() {
+  $(document).ready(function () {
     $('a[href^="#"]').addClass('mojoscroll');
     $(".mojoscroll").click(function(e) {
       e.preventDefault();

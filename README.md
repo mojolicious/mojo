@@ -75,8 +75,8 @@ get '/' => {template => 'index'};
 websocket '/title' => sub {
   my $c = shift;
   $c->on(message => sub {
-    my ($c, $url) = @_;
-    my $title = $c->ua->get($url)->res->dom->at('title')->text;
+    my ($c, $msg) = @_;
+    my $title = $c->ua->get($msg)->res->dom->at('title')->text;
     $c->send($title);
   });
 };
@@ -85,9 +85,9 @@ app->start;
 __DATA__
 
 @@ index.html.ep
-% my $websocket = url_for 'title';
+% my $url = url_for 'title';
 <script>
-  var ws = new WebSocket('<%= $websocket->to_abs %>');
+  var ws = new WebSocket('<%= $url->to_abs %>');
   ws.onmessage = function (event) { document.body.innerHTML += event.data };
   ws.onopen    = function (event) { ws.send('http://mojolicio.us') };
 </script>

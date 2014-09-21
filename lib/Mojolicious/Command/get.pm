@@ -66,14 +66,12 @@ sub run {
   STDOUT->autoflush(1);
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
   my $err = $tx->error;
-  $url = encode 'UTF-8', $url;
-  warn qq{Problem loading URL "$url". ($err->{message})\n}
+  warn qq{Problem loading URL "@{[$tx->req->url]}". ($err->{message})\n}
     if $err && !$err->{code};
 
   # JSON Pointer
   return unless defined $selector;
-  my $type = $tx->res->headers->content_type // '';
-  return _json($buffer, $selector) if $type =~ /json/i;
+  return _json($buffer, $selector) if $selector eq '' || $selector =~ m!^/!;
 
   # Selector
   _select($buffer, $selector, $charset // $tx->res->content->charset, @args);

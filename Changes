@@ -1,7 +1,9 @@
 
-5.43  2014-09-21
+5.43  2014-09-22
   - Updated Makefile.PL for version 2 of the CPAN distribution metadata
     specification.
+  - Improved get command to not depend on Content-Type headers for
+    differentiating between JSON and HTML/XML.
 
 5.42  2014-09-17
   - Fixed url_for bug where an unnecessary slash could be rendered before

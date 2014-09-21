@@ -66,9 +66,9 @@ app->start;
   applications.
 
 ```perl
+use Mojolicious::Lite;
 use 5.20.0;
 use experimental 'signatures';
-use Mojolicious::Lite;
 
 # Render template "index.html.ep" from the DATA section
 get '/' => {template => 'index'};

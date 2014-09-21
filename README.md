@@ -62,8 +62,8 @@ app->start;
 
 ## Duct tape for the HTML5 web
 
-  Use the latest Perl and HTML features in single file prototypes like this
-  one and grow them easily into well-structured applications.
+  Use all the latest Perl and HTML features in single file prototypes like
+  this one and grow them easily into well-structured applications.
 
 ```perl
 use Mojolicious::Lite;

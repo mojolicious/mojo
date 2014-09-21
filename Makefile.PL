@@ -16,12 +16,15 @@ WriteMakefile(
   META_MERGE   => {
     requires  => {perl => '5.010001'},
     resources => {
-      homepage    => 'http://mojolicio.us',
-      license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      MailingList => 'http://groups.google.com/group/mojolicious',
-      repository  => 'http://github.com/kraih/mojo',
-      bugtracker  => 'http://github.com/kraih/mojo/issues',
-      x_IRC       => 'irc://irc.perl.org/#mojo'
+      license  => ['http://www.opensource.org/licenses/artistic-license-2.0'],
+      homepage => 'http://mojolicio.us',
+      bugtracker => {web => 'https://github.com/kraih/mojo/issues'},
+      repository => {
+        url  => 'https://github.com/kraih/mojo.git',
+        web  => 'https://github.com/kraih/mojo',
+        type => 'git'
+      },
+      x_IRC => 'irc://irc.perl.org/#mojo'
     },
     no_index => {directory => ['t']}
   },

@@ -1,5 +1,7 @@
 
 5.43  2014-09-21
+  - Updated Makefile.PL for version 2 of the CPAN distribution metadata
+    specification.
 
 5.42  2014-09-17
   - Fixed url_for bug where an unnecessary slash could be rendered before

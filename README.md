@@ -66,16 +66,16 @@ app->start;
   applications.
 
 ```perl
+use 5.20.0;
+use experimental 'signatures';
 use Mojolicious::Lite;
 
 # Render template "index.html.ep" from the DATA section
 get '/' => {template => 'index'};
 
 # WebSocket service used by the template to extract the title from a web site
-websocket '/title' => sub {
-  my $c = shift;
-  $c->on(message => sub {
-    my ($c, $msg) = @_;
+websocket '/title' => sub ($c) {
+  $c->on(message => sub ($c, $msg) {
     my $title = $c->ua->get($msg)->res->dom->at('title')->text;
     $c->send($title);
   });

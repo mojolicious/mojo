@@ -93,6 +93,11 @@ __DATA__
 </script>
 ```
 
+  Perl might be over 25 years old, but it is still an evolving language with a
+  yearly release cycle. We strongly recommend that you update regularly.
+  (Subroutine signatures)[https://metacpan.org/pod/distribution/perl/pod/perlsub.pod#Signatures]
+  is just one of many new features.
+
 ## Want to know more?
 
   Take a look at our excellent [documentation](http://mojolicio.us/perldoc>)!

@@ -61,8 +61,9 @@ app->start;
 
 ## Duct tape for the HTML5 web
 
-  Use all the latest Perl and HTML features in single file prototypes like
-  this one and grow them easily into well-structured applications.
+  Use all the latest Perl and HTML features in beautiful single file
+  prototypes like this one, and grow them easily into well-structured
+  applications.
 
 ```perl
 use Mojolicious::Lite;
@@ -91,11 +92,6 @@ __DATA__
   ws.onopen    = function (event) { ws.send('http://mojolicio.us') };
 </script>
 ```
-
-  Perl might be over 25 years old, but it is still an evolving language with a
-  yearly release cycle. We strongly recommend that you update regularly.
-  [Subroutine signatures](https://metacpan.org/pod/distribution/perl/pod/perlsub.pod#Signatures)
-  is just one of many new features.
 
 ## Want to know more?
 

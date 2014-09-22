@@ -91,6 +91,11 @@ is $second->helpers->myapp->defaults('foo'), 'nothing', 'right result';
 is $first->myapp->defaults('foo'), 'bar', 'right result';
 is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
 
+# Reuse proxy objects
+my $helpers = $first->helpers;
+is $helpers->myapp->multi_level->test, 'works!', 'right result';
+is $helpers->myapp->multi_level->test, 'works!', 'right result';
+
 # Missing method (AUTOLOAD)
 my $class = ref $first->myapp;
 eval { $first->myapp->missing };

@@ -77,7 +77,7 @@ sub get_helper {
   }
 
   $found ? push @{$self->{namespaces}}, $class : return undef;
-  return $self->{proxy}{$name} = sub { bless \shift, $class };
+  return $self->{proxy}{$name} = sub { bless \(my $dummy = shift), $class };
 }
 
 sub render {

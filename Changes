@@ -1,4 +1,6 @@
 
+5.44  2014-09-23
+
 5.43  2014-09-22
   - Updated Makefile.PL for version 2 of the CPAN distribution metadata
     specification.

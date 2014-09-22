@@ -48,7 +48,7 @@ therefore considered a prerequisite, you should definitely take a look!
 =item L<Mojolicious::Guides::Growing>
 
 Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
-well structured L<Mojolicious> application.
+well-structured L<Mojolicious> application.
 
 =item L<Mojolicious::Guides::Routing>
 

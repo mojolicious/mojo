@@ -8,7 +8,7 @@ Mojolicious::Guides::Growing - Growing
 =head1 OVERVIEW
 
 This document explains the process of starting a L<Mojolicious::Lite>
-prototype from scratch and growing it into a well structured L<Mojolicious>
+prototype from scratch and growing it into a well-structured L<Mojolicious>
 application.
 
 =head1 CONCEPTS
@@ -526,7 +526,7 @@ And the directory structure should be looking like this now.
 Our templates are using quite a few features of the renderer,
 L<Mojolicious::Guides::Rendering> explains them all in great detail.
 
-=head1 WELL STRUCTURED APPLICATION
+=head1 WELL-STRUCTURED APPLICATION
 
 Due to the flexibility of L<Mojolicious> there are many variations of the
 actual growing process, but this should give you a good overview of the

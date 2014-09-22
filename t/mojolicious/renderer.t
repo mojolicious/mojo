@@ -93,8 +93,8 @@ is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
 
 # Reuse proxy objects
 my $helpers = $first->helpers;
-is $helpers->myapp->multi_level->test, 'works!', 'right result';
-is $helpers->myapp->multi_level->test, 'works!', 'right result';
+is $helpers->myapp->multi_level->test, $helpers->myapp->multi_level->test,
+  'same result';
 
 # Missing method (AUTOLOAD)
 my $class = ref $first->myapp;

@@ -32,12 +32,10 @@ EOF
 
   # Check latest version on CPAN
   my $latest = eval {
-    my $ua = Mojo::UserAgent->new(max_redirects => 10);
-    $ua->proxy->detect;
-    $ua->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
-  };
+    Mojo::UserAgent->new(max_redirects => 10)->tap(sub { $_->proxy->detect })
+      ->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
+  } or return;
 
-  return unless $latest;
   my $msg = 'This version is up to date, have fun!';
   $msg = 'Thanks for testing a development release, you are awesome!'
     if $latest < $Mojolicious::VERSION;

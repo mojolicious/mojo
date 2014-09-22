@@ -12,8 +12,7 @@
 ## Features
 
   * An amazing real-time web framework, allowing you to easily grow single
-    file [Mojolicious::Lite](http://mojolicio.us/perldoc/Mojolicious/Lite)
-    prototypes into well structured web applications.
+    file prototypes into well structured web applications.
     * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish
       templates, content negotiation, session management, form validation,
       testing framework, static file server, first class Unicode support and

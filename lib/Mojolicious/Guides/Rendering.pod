@@ -1355,22 +1355,22 @@ that need to be automatically encoded, but this can be easily disabled if
 you're generating bytes instead.
 
   use Mojolicious::Lite;
-  use Mango::BSON ':bson';
+  use Storable 'nfreeze';
 
-  # Add "bson" handler
-  app->renderer->add_handler(bson => sub {
+  # Add "storable" handler
+  app->renderer->add_handler(storable => sub {
     my ($renderer, $c, $output, $options) = @_;
 
     # Disable automatic encoding
     delete $options->{encoding};
 
-    # Encode BSON data from stash value
-    $$output = bson_encode delete $c->stash->{bson};
+    # Encode data from stash value
+    $$output = nfreeze delete $c->stash->{storable};
 
     return 1;
   });
 
-  get '/' => {bson => {i => '♥ mojolicious'}, handler => 'bson'};
+  get '/' => {storable => {i => '♥ mojolicious'}, handler => 'storable'};
 
   app->start;
 

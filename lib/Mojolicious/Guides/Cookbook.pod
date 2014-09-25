@@ -419,7 +419,7 @@ style.
   use Mojolicious::Lite;
   use Mojo::URL;
 
-  # Search MetaCPAN for "mojo" and "mango"
+  # Search MetaCPAN for "mojo" and "minion"
   get '/' => sub {
     my $c = shift;
 
@@ -431,16 +431,16 @@ style.
         my $delay = shift;
         my $url   = Mojo::URL->new('api.metacpan.org/v0/module/_search');
         $url->query({sort => 'date:desc'});
-        $c->ua->get($url->clone->query({q => 'mojo'})  => $delay->begin);
-        $c->ua->get($url->clone->query({q => 'mango'}) => $delay->begin);
+        $c->ua->get($url->clone->query({q => 'mojo'})   => $delay->begin);
+        $c->ua->get($url->clone->query({q => 'minion'}) => $delay->begin);
       },
 
       # Delayed rendering
       sub {
-        my ($delay, $mojo, $mango) = @_;
+        my ($delay, $mojo, $minion) = @_;
         $c->render(json => {
-          mojo  => $mojo->res->json('/hits/hits/0/_source/release'),
-          mango => $mango->res->json('/hits/hits/0/_source/release')
+          mojo   => $mojo->res->json('/hits/hits/0/_source/release'),
+          minion => $minion->res->json('/hits/hits/0/_source/release')
         });
       }
     );
@@ -947,7 +947,7 @@ content repeatedly for multiple requests.
 
   # Send multiple files streaming via PUT and POST
   $ua->put('http://example.com/upload'  => stream => '/home/sri/mojo.png');
-  $ua->post('http://example.com/upload' => stream => '/home/sri/mango.png');
+  $ua->post('http://example.com/upload' => stream => '/home/sri/minion.png');
 
 The C<json> and C<form> content generators are always available.
 
@@ -1079,8 +1079,8 @@ can keep many concurrent connections active at the same time.
     my ($ua, $mojo) = @_;
     ...
   });
-  $ua->get('http://metacpan.org/search?q=mango' => sub {
-    my ($ua, $mango) = @_;
+  $ua->get('http://metacpan.org/search?q=minion' => sub {
+    my ($ua, $minion) = @_;
     ...
   });
 
@@ -1100,11 +1100,11 @@ synchronize multiple non-blocking requests.
   # Synchronize non-blocking requests
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay(sub {
-    my ($delay, $mojo, $mango) = @_;
+    my ($delay, $mojo, $minion) = @_;
     ...
   });
-  $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
-  $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=mojo'   => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=minion' => $delay->begin);
   $delay->wait;
 
 The call to L<Mojo::IOLoop::Delay/"wait"> makes this code portable, it can now

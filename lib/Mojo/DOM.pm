@@ -119,8 +119,8 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next { _maybe($_[0], $_[0]->_siblings->[1][0]) }
-sub next_sibling { _maybe($_[0], $_[0]->_siblings(0, 1)->[1][0]) }
+sub next         { _maybe($_[0], $_[0]->_siblings(1)->[1]) }
+sub next_sibling { _maybe($_[0], $_[0]->_siblings->[1]) }
 
 sub node { shift->tree->[0] }
 
@@ -136,8 +136,8 @@ sub prepend { shift->_add(0, @_) }
 
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous { _maybe($_[0], $_[0]->_siblings->[0][-1]) }
-sub previous_sibling { _maybe($_[0], $_[0]->_siblings(0, 1)->[0][-1]) }
+sub previous         { _maybe($_[0], $_[0]->_siblings(1)->[0]) }
+sub previous_sibling { _maybe($_[0], $_[0]->_siblings->[0]) }
 
 sub remove { shift->replace('') }
 
@@ -153,7 +153,7 @@ sub root {
   return _build($self, $tree, $self->xml);
 }
 
-sub siblings { _select($_[0]->_collect(@{_siblings($_[0], 1)}), $_[1]) }
+sub siblings { _select($_[0]->_collect(@{_siblings($_[0], 1, 1)}), $_[1]) }
 
 sub strip {
   my $self = shift;
@@ -320,19 +320,19 @@ sub _select {
 }
 
 sub _siblings {
-  my ($self, $merge, $all) = @_;
+  my ($self, $tags, $all) = @_;
 
-  return $merge ? [] : [[], []] unless my $parent = $self->parent;
+  return [] unless my $parent = $self->parent;
 
   my $tree = $self->tree;
   my (@before, @after, $match);
   for my $node (_nodes($parent->tree)) {
     ++$match and next if !$match && $node eq $tree;
-    next unless $all || $node->[0] eq 'tag';
+    next if $tags && $node->[0] ne 'tag';
     $match ? push @after, $node : push @before, $node;
   }
 
-  return $merge ? [@before, @after] : [\@before, \@after];
+  return $all ? [@before, @after] : [$before[-1], $after[0]];
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }

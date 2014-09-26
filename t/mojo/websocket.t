@@ -382,7 +382,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok $finished, 'transaction is finished';
-ok !$ws, 'no websocket';
+ok !$ws, 'not a websocket';
 is $code, 500, 'right status';
 is $msg, 'Internal Server Error', 'right message';
 
@@ -398,7 +398,7 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-ok !$ws, 'no websocket';
+ok !$ws, 'not a websocket';
 is $code, 403,            'right status';
 is $msg,  "i'm a teapot", 'right message';
 

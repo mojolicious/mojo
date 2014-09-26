@@ -186,6 +186,10 @@ is $second->render('', {}), '/second', 'right result';
 $target->add_child($first)->add_child($second);
 is $second->render('', {}), '/target/second', 'right result';
 
+# /websocket
+$r->websocket('/websocket' => {controller => 'ws'})->route('/')
+  ->to(action => 'just')->route->to(works => 1);
+
 # /slash
 $r->route('/slash')->to(controller => 'just')->route('/')
   ->to(action => 'slash');
@@ -828,6 +832,16 @@ $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/target/third'});
 is_deeply $m->stack, [], 'empty stack';
 
+# WebSocket
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/websocket'});
+is_deeply $m->stack, [], 'empty stack';
+$m->match($c => {method => 'GET', path => '/websocket', websocket => 1});
+is_deeply $m->stack, [{controller => 'ws', action => 'just', works => 1}],
+  'right structure';
+is $m->path_for->{path}, '/websocket', 'right path';
+ok $m->path_for->{websocket}, 'is a websocket';
+
 # Just a slash with a format after a path
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/slash.txt'});
@@ -835,6 +849,7 @@ is_deeply $m->stack,
   [{controller => 'just', action => 'slash', format => 'txt'}],
   'right structure';
 is $m->path_for->{path}, '/slash', 'right path';
+ok !$m->path_for->{websocket}, 'not a websocket';
 is $m->path_for(format => 'html')->{path}, '/slash.html', 'right path';
 
 # Nameless placeholder

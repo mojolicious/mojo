@@ -74,7 +74,7 @@ sub has_websocket {
   my $self = shift;
   return 1 if $self->is_websocket;
   return undef unless my $parent = $self->parent;
-  return $parent->is_websocket;
+  return $parent->has_websocket;
 }
 
 sub is_endpoint { $_[0]->inline ? undef : !@{$_[0]->children} }

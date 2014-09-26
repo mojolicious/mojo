@@ -5,6 +5,8 @@
   - Improved performance of next, next_sibling, previous and previous_sibling
     methods in Mojo::DOM significantly.
   - Improved Mojo::Cache to allow caching to be disabled. (mvgrimes, sri)
+  - Fixed url_for bug where deeply nested WebSocket routes would not work
+    correctly.
 
 5.44  2014-09-23
   - Fixed bug in Mojolicious::Renderer that prevented proxy objects from being

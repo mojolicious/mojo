@@ -158,8 +158,8 @@ sub template_for {
     if $controller && $action;
 
   # Try the route name if we don't have controller and action
-  return undef unless my $endpoint = $c->match->endpoint;
-  return $endpoint->name;
+  return undef unless my $route = $c->match->endpoint;
+  return $route->name;
 }
 
 sub template_handler {

@@ -13,26 +13,26 @@ sub path_for {
   my ($self, $name, %values) = (shift, Mojo::Util::_options(@_));
 
   # Current route
-  my $endpoint;
+  my $route;
   if ($name && $name eq 'current' || !$name) {
-    return {} unless $endpoint = $self->endpoint;
+    return {} unless $route = $self->endpoint;
   }
 
   # Find endpoint
-  else { return {path => $name} unless $endpoint = $self->root->lookup($name) }
+  else { return {path => $name} unless $route = $self->root->lookup($name) }
 
   # Merge values (clear format)
   my $captures = $self->stack->[-1] || {};
   %values = (%$captures, format => undef, %values);
-  my $pattern = $endpoint->pattern;
+  my $pattern = $route->pattern;
   $values{format}
     //= defined $captures->{format}
     ? $captures->{format}
     : $pattern->defaults->{format}
     if $pattern->constraints->{format};
 
-  my $path = $endpoint->render('', \%values);
-  return {path => $path, websocket => $endpoint->has_websocket};
+  my $path = $route->render('', \%values);
+  return {path => $path, websocket => $route->has_websocket};
 }
 
 sub _match {
@@ -144,8 +144,8 @@ Current position on the L</"stack">, defaults to C<0>.
 
 =head2 endpoint
 
-  my $endpoint = $match->endpoint;
-  $match       = $match->endpoint(Mojolicious::Routes::Route->new);
+  my $route = $match->endpoint;
+  $match    = $match->endpoint(Mojolicious::Routes::Route->new);
 
 The route endpoint that matched, usually a L<Mojolicious::Routes::Route>
 object.

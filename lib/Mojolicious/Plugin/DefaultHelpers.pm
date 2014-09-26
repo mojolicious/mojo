@@ -72,8 +72,8 @@ sub _csrf_token {
 }
 
 sub _current_route {
-  return '' unless my $endpoint = shift->match->endpoint;
-  return @_ ? $endpoint->name eq shift : $endpoint->name;
+  return '' unless my $route = shift->match->endpoint;
+  return @_ ? $route->name eq shift : $route->name;
 }
 
 sub _delay {

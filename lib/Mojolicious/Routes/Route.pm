@@ -516,7 +516,7 @@ Render route with parameters into a path.
 
   my $root = $r->root;
 
-The L<Mojolicious::Routes> object this route is an descendent of.
+The L<Mojolicious::Routes> object this route is a descendant of.
 
   $r->root->cache(0);
 

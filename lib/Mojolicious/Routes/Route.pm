@@ -58,7 +58,10 @@ sub find {
 
 sub get { shift->_generate_route(GET => @_) }
 
+# DEPRECATED in Tiger Face!
 sub has_conditions {
+  Mojo::Util::deprecated
+    'Mojolicious::Routes::Route::has_conditions is DEPRECATED';
   my $self = shift;
   return 1 if @{$self->over || []};
   return undef unless my $parent = $self->parent;
@@ -374,12 +377,6 @@ Generate L<Mojolicious::Routes::Route> object matching only C<GET> requests.
 See also the L<Mojolicious::Lite> tutorial for many more argument variations.
 
   $r->get('/user')->to('user#show');
-
-=head2 has_conditions
-
-  my $bool = $r->has_conditions;
-
-Check if this route has active conditions.
 
 =head2 has_custom_name
 

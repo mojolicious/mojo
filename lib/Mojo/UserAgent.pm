@@ -316,8 +316,7 @@ sub _start {
     $url->scheme($base->scheme)->authority($base->authority);
   }
 
-  $self->proxy->inject($tx);
-  if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
+  $_ && $_->inject($tx) for $self->proxy, $self->cookie_jar;
 
   # Connect and add request timeout if necessary
   my $id = $self->emit(start => $tx)->_connection($nb, $tx, $cb);

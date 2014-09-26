@@ -1,5 +1,6 @@
 
-5.45  2014-09-27
+5.45  2014-09-26
+  - Deprecated Mojolicious::Routes::Route::has_conditions.
   - Added extracting attribute to Mojo::UserAgent::CookieJar.
   - Improved performance of next, next_sibling, previous and previous_sibling
     methods in Mojo::DOM significantly.

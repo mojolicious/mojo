@@ -259,9 +259,6 @@ L<Mojolicious::Controller> and L<Mojo>.
 
 Routing cache, defaults to a L<Mojo::Cache> object.
 
-  # Disable caching
-  $r->cache(0);
-
 =head2 conditions
 
   my $conditions = $r->conditions;

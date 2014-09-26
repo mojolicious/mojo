@@ -509,8 +509,8 @@ environment variable or C<10>.
 Cookie jar to use for this user agents requests, defaults to a
 L<Mojo::UserAgent::CookieJar> object.
 
-  # Disable cookie jar
-  $ua->cookie_jar(0);
+  # Disable extraction of cookies from responses
+  $ua->cookie_jar->extracting(0);
 
 =head2 inactivity_timeout
 

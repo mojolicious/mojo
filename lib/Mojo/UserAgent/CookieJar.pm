@@ -4,6 +4,7 @@ use Mojo::Base -base;
 use Mojo::Cookie::Request;
 use Mojo::Path;
 
+has extracting      => 1;
 has max_cookie_size => 4096;
 
 sub add {
@@ -40,6 +41,9 @@ sub empty { delete shift->{jar} }
 
 sub extract {
   my ($self, $tx) = @_;
+
+  return unless $self->extracting;
+
   my $url = $tx->req->url;
   for my $cookie (@{$tx->res->cookies}) {
 
@@ -145,6 +149,14 @@ L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 =head1 ATTRIBUTES
 
 L<Mojo::UserAgent::CookieJar> implements the following attributes.
+
+=head2 extracting
+
+  my $bool = $jar->extracting;
+  $jar     = $jar->extracting(0);
+
+Allow L</"extract"> to L</"add"> new cookies to the jar, defaults to a true
+value.
 
 =head2 max_cookie_size
 

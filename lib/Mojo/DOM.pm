@@ -327,7 +327,7 @@ sub _siblings {
   my $tree = $self->tree;
   my (@before, @after, $match);
   for my $node (_nodes($parent->tree)) {
-    ++$match and next if $node eq $tree;
+    ++$match and next if !$match && $node eq $tree;
     next unless $all || $node->[0] eq 'tag';
     $match ? push @after, $node : push @before, $node;
   }

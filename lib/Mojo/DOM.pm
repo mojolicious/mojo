@@ -45,7 +45,7 @@ sub append_content { shift->_content(1, 0, @_) }
 sub at {
   my $self = shift;
   return undef unless my $result = $self->_css->select_one(@_);
-  return _tag($self, $result, $self->xml);
+  return _build($self, $result, $self->xml);
 }
 
 sub attr {
@@ -119,15 +119,15 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next { shift->_siblings->[1][0] }
-sub next_sibling { shift->_siblings(0, 1)->[1][0] }
+sub next { _maybe($_[0], $_[0]->_siblings->[1][0]) }
+sub next_sibling { _maybe($_[0], $_[0]->_siblings(0, 1)->[1][0]) }
 
 sub node { shift->tree->[0] }
 
 sub parent {
   my $self = shift;
   return undef if $self->tree->[0] eq 'root';
-  return _tag($self, $self->_parent, $self->xml);
+  return _build($self, $self->_parent, $self->xml);
 }
 
 sub parse { shift->_delegate(parse => shift) }
@@ -136,8 +136,8 @@ sub prepend { shift->_add(0, @_) }
 
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous { shift->_siblings->[0][-1] }
-sub previous_sibling { shift->_siblings(0, 1)->[0][-1] }
+sub previous { _maybe($_[0], $_[0]->_siblings->[0][-1]) }
+sub previous_sibling { _maybe($_[0], $_[0]->_siblings(0, 1)->[0][-1]) }
 
 sub remove { shift->replace('') }
 
@@ -150,10 +150,10 @@ sub replace {
 sub root {
   my $self = shift;
   return $self unless my $tree = $self->_ancestors(1);
-  return _tag($self, $tree, $self->xml);
+  return _build($self, $tree, $self->xml);
 }
 
-sub siblings { _select(Mojo::Collection->new(@{_siblings($_[0], 1)}), $_[1]) }
+sub siblings { _select($_[0]->_collect(@{_siblings($_[0], 1)}), $_[1]) }
 
 sub strip {
   my $self = shift;
@@ -241,10 +241,12 @@ sub _ancestors {
   return $root ? $ancestors[-1] : @ancestors[0 .. $#ancestors - 1];
 }
 
+sub _build { shift->new->tree(shift)->xml(shift) }
+
 sub _collect {
   my $self = shift;
   my $xml  = $self->xml;
-  return Mojo::Collection->new(map { _tag($self, $_, $xml) } @_);
+  return Mojo::Collection->new(map { _build($self, $_, $xml) } @_);
 }
 
 sub _content {
@@ -287,6 +289,8 @@ sub _link {
   return @new;
 }
 
+sub _maybe { $_[1] ? _build($_[0], $_[1], $_[0]->xml) : undef }
+
 sub _nodes {
   return unless my $tree = shift;
   return @$tree[_start($tree) .. $#$tree];
@@ -322,18 +326,16 @@ sub _siblings {
 
   my $tree = $self->tree;
   my (@before, @after, $match);
-  for my $child ($parent->contents->each) {
-    ++$match and next if $child->tree eq $tree;
-    next unless $all || $child->node eq 'tag';
-    $match ? push @after, $child : push @before, $child;
+  for my $node (_nodes($parent->tree)) {
+    ++$match and next if $node eq $tree;
+    next unless $all || $node->[0] eq 'tag';
+    $match ? push @after, $node : push @before, $node;
   }
 
   return $merge ? [@before, @after] : [\@before, \@after];
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
-
-sub _tag { shift->new->tree(shift)->xml(shift) }
 
 sub _text {
   my ($nodes, $recurse, $trim) = @_;

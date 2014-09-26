@@ -97,7 +97,7 @@ sub over {
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   return $self unless @$conditions;
   $self->{over} = $conditions;
-  $self->root->cache(0);
+  $self->root->cache->max_keys(0);
 
   return $self;
 }

@@ -40,4 +40,13 @@ is $cache->get('bar'),  'baz',  'right result';
 is $cache->get('baz'),  'yada', 'right result';
 is $cache->get('yada'), 23,     'right result';
 
+$cache = Mojo::Cache->new(max_keys => 0);
+is $cache->get('foo'), undef, 'no result';
+$cache->set(foo => 'bar');
+is $cache->get('foo'), undef, 'no result';
+$cache = Mojo::Cache->new(max_keys => -1);
+is $cache->get('foo'), undef, 'no result';
+$cache->set(foo => 'bar');
+is $cache->get('foo'), undef, 'no result';
+
 done_testing();

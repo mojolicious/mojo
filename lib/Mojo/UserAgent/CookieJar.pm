@@ -153,7 +153,7 @@ L<Mojo::UserAgent::CookieJar> implements the following attributes.
 =head2 extracting
 
   my $bool = $jar->extracting;
-  $jar     = $jar->extracting(0);
+  $jar     = $jar->extracting($bool);
 
 Allow L</"extract"> to L</"add"> new cookies to the jar, defaults to a true
 value.

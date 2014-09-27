@@ -505,7 +505,7 @@ environment variable or C<10>.
   my $cookie_jar = $ua->cookie_jar;
   $ua            = $ua->cookie_jar(Mojo::UserAgent::CookieJar->new);
 
-Cookie jar to use for this user agents requests, defaults to a
+Cookie jar to use for requests performed by this user agent, defaults to a
 L<Mojo::UserAgent::CookieJar> object.
 
   # Disable extraction of cookies from responses

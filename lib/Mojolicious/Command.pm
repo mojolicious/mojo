@@ -14,8 +14,8 @@ use Pod::Usage 'pod2usage';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
 has description => 'No description.';
-has quiet       => 0;
-has usage       => "Usage: APPLICATION\n";
+has 'quiet';
+has usage => "Usage: APPLICATION\n";
 
 sub chmod_file {
   my ($self, $path, $mod) = @_;

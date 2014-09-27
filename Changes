@@ -1,5 +1,6 @@
 
-5.46  2014-09-27
+5.46  2014-09-26
+  - PAUSE lost the previous release.
 
 5.45  2014-09-26
   - Deprecated Mojolicious::Routes::Route::has_conditions.

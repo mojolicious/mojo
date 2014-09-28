@@ -14,7 +14,7 @@ sub path_for {
 
   # Current route
   my $route;
-  if ($name && $name eq 'current' || !$name) {
+  if (!$name || $name eq 'current') {
     return {} unless $route = $self->endpoint;
   }
 

@@ -42,26 +42,27 @@ sub _match {
   my $path    = $options->{path};
   my $partial = $r->partial;
   my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
-  return unless my $captures = $r->pattern->match_partial(\$path, $detect);
+  return undef
+    unless my $captures = $r->pattern->match_partial(\$path, $detect);
   local $options->{path} = $path;
   local @{$self->{captures} ||= {}}{keys %$captures} = values %$captures;
   $captures = $self->{captures};
 
   # Method
   my $methods = $r->via;
-  return if $methods && !grep { $_ eq $options->{method} } @$methods;
+  return undef if $methods && !grep { $_ eq $options->{method} } @$methods;
 
   # Conditions
   if (my $over = $r->over) {
     my $conditions = $self->{conditions} ||= $self->root->conditions;
     for (my $i = 0; $i < @$over; $i += 2) {
-      return unless my $condition = $conditions->{$over->[$i]};
-      return if !$condition->($r, $c, $captures, $over->[$i + 1]);
+      return undef unless my $condition = $conditions->{$over->[$i]};
+      return undef if !$condition->($r, $c, $captures, $over->[$i + 1]);
     }
   }
 
   # WebSocket
-  return if $r->is_websocket && !$options->{websocket};
+  return undef if $r->is_websocket && !$options->{websocket};
 
   # Partial
   my $empty = !length $path || $path eq '/';
@@ -77,22 +78,16 @@ sub _match {
     if ($endpoint && $empty) {
       my $format = $captures->{format};
       if ($format) { $_->{format} = $format for @{$self->stack} }
-      return $self->endpoint($r);
+      return !!$self->endpoint($r);
     }
     delete @$captures{qw(app cb)};
   }
 
   # Match children
-  my $snapshot = [@{$self->stack}];
+  my @snapshot = $r->parent ? ([@{$self->stack}], $captures) : ([], {});
   for my $child (@{$r->children}) {
-    $self->_match($child, $c, $options);
-
-    # Endpoint found
-    return if $self->endpoint;
-
-    # Reset
-    if   ($r->parent) { $self->stack([@$snapshot])->{captures} = $captures }
-    else              { $self->stack([])->{captures}           = {} }
+    return 1 if $self->_match($child, $c, $options);
+    $self->stack([@{$snapshot[0]}])->{captures} = $snapshot[1];
   }
 }
 

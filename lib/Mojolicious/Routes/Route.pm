@@ -72,9 +72,8 @@ sub has_custom_name { !!shift->{custom} }
 
 sub has_websocket {
   my $self = shift;
-  return 1 if $self->is_websocket;
-  return undef unless my $parent = $self->parent;
-  return $parent->has_websocket;
+  return $self->{has_websocket} if exists $self->{has_websocket};
+  return $self->{has_websocket} = grep { $_->is_websocket } @{$self->_chain};
 }
 
 sub is_endpoint { $_[0]->inline ? undef : !@{$_[0]->children} }
@@ -137,11 +136,7 @@ sub render {
   return $parent->render($path, $values);
 }
 
-sub root {
-  my $root = my $parent = shift;
-  $root = $parent while $parent = $parent->parent;
-  return $root;
-}
+sub root { shift->_chain->[0] }
 
 sub route {
   my $self   = shift;
@@ -178,10 +173,7 @@ sub to {
 }
 
 sub to_string {
-  my $self = shift;
-  my $pattern = $self->parent ? $self->parent->to_string : '';
-  $pattern .= $self->pattern->pattern if $self->pattern->pattern;
-  return $pattern;
+  join '', map { $_->pattern->pattern // '' } @{shift->_chain};
 }
 
 sub under { shift->_generate_route(under => @_) }
@@ -198,6 +190,12 @@ sub websocket {
   my $route = shift->get(@_);
   $route->{websocket} = 1;
   return $route;
+}
+
+sub _chain {
+  my @chain = (my $parent = shift);
+  unshift @chain, $parent while $parent = $parent->parent;
+  return \@chain;
 }
 
 sub _generate_route {
@@ -388,7 +386,8 @@ Check if this route has a custom name.
 
   my $bool = $r->has_websocket;
 
-Check if this route has a WebSocket ancestor.
+Check if this route has a WebSocket ancestor and cache the result for future
+checks.
 
 =head2 is_endpoint
 

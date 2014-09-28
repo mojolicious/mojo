@@ -1,5 +1,6 @@
 
-5.47  2014-09-27
+5.47  2014-09-28
+  - Improved url_for performance.
 
 5.46  2014-09-26
   - PAUSE lost the previous release.

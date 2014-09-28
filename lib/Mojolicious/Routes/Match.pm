@@ -31,7 +31,7 @@ sub path_for {
     : $pattern->defaults->{format}
     if $pattern->constraints->{format};
 
-  my $path = $route->render('', \%values);
+  my $path = $route->render(\%values);
   return {path => $path, websocket => $route->has_websocket};
 }
 

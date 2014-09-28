@@ -123,17 +123,10 @@ sub remove {
 }
 
 sub render {
-  my ($self, $path, $values) = @_;
-
-  # Render pattern (if necessary)
-  my $endpoint = !@{$self->children};
-  my $pattern  = $self->pattern;
-  $path = $pattern->render($values, $endpoint) . $path
-    if $endpoint || defined($pattern->pattern);
-
-  # Let parent render
-  return $path =~ m!^/! ? $path : "/$path" unless my $parent = $self->parent;
-  return $parent->render($path, $values);
+  my ($self, $values) = @_;
+  my $path = join '',
+    map { $_->pattern->render($values, !@{$_->children}) } @{$self->_chain};
+  return length $path ? $path : '/';
 }
 
 sub root { shift->_chain->[0] }
@@ -503,8 +496,7 @@ Remove route from parent.
 
 =head2 render
 
-  my $path = $r->render($suffix);
-  my $path = $r->render($suffix, {foo => 'bar'});
+  my $path = $r->render({foo => 'bar'});
 
 Render route with parameters into a path.
 

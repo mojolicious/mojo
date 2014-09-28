@@ -180,11 +180,11 @@ $source->route('/second')->to('#second');
 my $third  = $source->route('/third')->to('#third');
 my $target = $r->remove->route('/target')->to('target#');
 my $second = $r->find('second');
-is $second->render('', {}), '/source/second', 'right result';
+is $second->render({}), '/source/second', 'right result';
 $second->remove;
-is $second->render('', {}), '/second', 'right result';
+is $second->render({}), '/second', 'right result';
 $target->add_child($first)->add_child($second);
-is $second->render('', {}), '/target/second', 'right result';
+is $second->render({}), '/target/second', 'right result';
 
 # /websocket
 $r->websocket('/websocket' => {controller => 'ws'})->route('/')

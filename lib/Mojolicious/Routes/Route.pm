@@ -126,7 +126,7 @@ sub render {
   my ($self, $values) = @_;
   my $path = join '',
     map { $_->pattern->render($values, !@{$_->children}) } @{$self->_chain};
-  return length $path ? $path : '/';
+  return $path || '/';
 }
 
 sub root { shift->_chain->[0] }

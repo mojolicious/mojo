@@ -1,8 +1,5 @@
 
 5.48  2014-10-04
-  - Added encode_json_text function to Mojo::JSON.
-  - Improved JSON decoding functions and methods in Mojo::JSON to accept wide
-    characters.
 
 5.47  2014-09-28
   - Improved url_for performance.

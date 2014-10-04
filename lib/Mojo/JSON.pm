@@ -9,7 +9,7 @@ use Scalar::Util 'blessed';
 
 has 'error';
 
-our @EXPORT_OK = qw(decode_json encode_json encode_json_text j);
+our @EXPORT_OK = qw(decode_json encode_json j);
 
 # Literal names
 my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
@@ -48,8 +48,6 @@ sub encode { encode_json($_[1]) }
 
 sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 
-sub encode_json_text { _encode_value(shift) }
-
 sub false {$FALSE}
 
 sub j {
@@ -66,9 +64,12 @@ sub _decode {
   # Missing input
   die "Missing or empty input\n" unless length(my $bytes = shift);
 
+  # Wide characters
+  die "Wide character in input\n" unless utf8::downgrade($bytes, 1);
+
   # UTF-8
-  $bytes = Mojo::Util::decode 'UTF-8', $bytes if utf8::downgrade $bytes, 1;
-  die "Input is not UTF-8 encoded\n" unless defined(local $_ = $bytes);
+  die "Input is not UTF-8 encoded\n"
+    unless defined(local $_ = Mojo::Util::decode('UTF-8', $bytes));
 
   # Value
   my $value = _decode_value();
@@ -349,7 +350,6 @@ individually.
 =head2 decode_json
 
   my $value = decode_json($bytes);
-  my $value = decode_json($chars);
 
 Decode JSON to Perl value and die if decoding fails.
 
@@ -359,18 +359,11 @@ Decode JSON to Perl value and die if decoding fails.
 
 Encode Perl value to JSON.
 
-=head2 encode_json_text
-
-  my $chars = encode_json_text({i => '♥ mojolicious'});
-
-Encode Perl value to JSON text without C<UTF-8> encoding.
-
 =head2 j
 
   my $bytes = j([1, 2, 3]);
   my $bytes = j({i => '♥ mojolicious'});
   my $value = j($bytes);
-  my $value = j($chars);
 
 Encode Perl data structure (which may only be an array reference or hash
 reference) or decode JSON, an C<undef> return value indicates a bare C<null>
@@ -395,7 +388,6 @@ following new ones.
 =head2 decode
 
   my $value = $json->decode($bytes);
-  my $value = $json->decode($chars);
 
 Decode JSON to Perl value and set L</"error"> if decoding failed.
 

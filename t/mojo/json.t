@@ -10,7 +10,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::ByteStream 'b';
-use Mojo::JSON qw(decode_json encode_json encode_json_text j);
+use Mojo::JSON qw(decode_json encode_json j);
 use Mojo::Util 'encode';
 use Scalar::Util 'dualvar';
 
@@ -250,10 +250,6 @@ is index($bytes, b("\x{2029}")->encode), -1, 'properly escaped';
 is_deeply decode_json($bytes), ["\x{2028}test\x{2029}123"],
   'successful roundtrip';
 
-# Wide characters
-is_deeply decode_json('["♥"]'), ['♥'], 'wide characters decoded';
-is encode_json_text(['♥']), '["♥"]', 'wide characters encoded';
-
 # Blessed reference
 $bytes = encode_json [b('test')];
 is_deeply decode_json($bytes), ['test'], 'successful roundtrip';
@@ -330,6 +326,8 @@ is j('null'), undef, 'decode null';
 is $json->decode('test'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Expected string, array, object, number,'
   . ' boolean or null at line 0, offset 0', 'right error';
+is $json->decode('["♥"]'), undef, 'wide character in input';
+is $json->error, 'Wide character in input', 'right error';
 is $json->decode(b('["\\ud800"]')->encode), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Missing low-surrogate at line 1, offset 8',
   'right error';

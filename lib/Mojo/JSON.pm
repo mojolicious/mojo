@@ -355,20 +355,20 @@ Decode JSON to Perl value and die if decoding fails.
 
 =head2 encode_json
 
-  my $bytes = encode_json({foo => 'bar'});
+  my $bytes = encode_json({i => '♥ mojolicious'});
 
 Encode Perl value to JSON.
 
 =head2 encode_json_text
 
-  my $chars = encode_json_text({foo => 'bar'});
+  my $chars = encode_json_text({i => '♥ mojolicious'});
 
 Encode Perl value to JSON text without C<UTF-8> encoding.
 
 =head2 j
 
   my $bytes = j([1, 2, 3]);
-  my $bytes = j({foo => 'bar'});
+  my $bytes = j({i => '♥ mojolicious'});
   my $value = j($bytes);
   my $value = j($chars);
 
@@ -401,7 +401,7 @@ Decode JSON to Perl value and set L</"error"> if decoding failed.
 
 =head2 encode
 
-  my $bytes = $json->encode({foo => 'bar'});
+  my $bytes = $json->encode({i => '♥ mojolicious'});
 
 Encode Perl value to JSON.
 

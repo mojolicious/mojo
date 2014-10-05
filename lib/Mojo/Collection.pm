@@ -70,7 +70,8 @@ sub new {
 
 sub pluck {
   my ($self, $method, @args) = @_;
-  return $self->new(map { $_->$method(@args) } @$self);
+  return $self->new(
+    map { ref $_ eq 'HASH' ? $_->{$method} : $_->$method(@args) } @$self);
 }
 
 sub reduce {
@@ -262,13 +263,15 @@ Construct a new array-based L<Mojo::Collection> object.
 
 =head2 pluck
 
+  my $new = $collection->pluck($key);
   my $new = $collection->pluck($method);
   my $new = $collection->pluck($method, @args);
 
-Call method on each element in collection and create a new collection from the
-results.
+Extract value from hash reference or call method on each element in collection
+and create a new collection from the results.
 
   # Equal to but more convenient than
+  my $new = $collection->map(sub { $_->{$key} });
   my $new = $collection->map(sub { $_->$method(@args) });
 
 =head2 reduce

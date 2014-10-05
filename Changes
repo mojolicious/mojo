@@ -1,5 +1,7 @@
 
-5.48  2014-10-04
+5.48  2014-10-05
+  - Improved pluck method in Mojo::Collection to be able to extract values
+    from hash references.
 
 5.47  2014-09-28
   - Improved url_for performance.

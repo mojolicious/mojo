@@ -401,18 +401,18 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     ->post('https://example.com' => json => {top => 'secret'});
 
   # Non-blocking concurrent requests
-  my $delay = Mojo::IOLoop->delay(sub {
-    my ($delay, @titles) = @_;
-    say for @titles;
-  });
-  for my $url ('mojolicio.us', 'cpan.org') {
-    my $end = $delay->begin(0);
-    $ua->get($url => sub {
-      my ($ua, $tx) = @_;
-      $end->($tx->res->dom->at('title')->text);
-    });
-  }
-  $delay->wait;
+  Mojo::IOLoop->delay(
+    sub {
+      my $delay = shift;
+      $ua->get('mojolicio.us' => $delay->begin);
+      $ua->get('cpan.org'     => $delay->begin);
+    },
+    sub {
+      my ($delay, $mojo, $cpan) = @_;
+      say $mojo->res->dom->at('title')->text;
+      say $cpan->res->dom->at('title')->text;
+    }
+  )->wait;
 
   # Non-blocking WebSocket connection sending and receiving JSON messages
   $ua->websocket('ws://example.com/echo.json' => sub {

@@ -32,16 +32,13 @@ my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
 sub decode {
-  my $self = shift->error(undef);
-  my $value;
-  return $value if eval { $value = _decode(shift); 1 };
-  $self->error(_chomp($@));
-  return undef;
+  shift->error(my $err = _catch(\my $value, pop));
+  return defined $err ? undef : $value;
 }
 
 sub decode_json {
-  my $value;
-  return eval { $value = _decode(shift); 1 } ? $value : croak _chomp($@);
+  my $err = _catch(\my $value, shift);
+  return defined $err ? croak $err : $value;
 }
 
 sub encode { encode_json($_[1]) }
@@ -57,7 +54,11 @@ sub j {
 
 sub true {$TRUE}
 
-sub _chomp { chomp $_[0] ? $_[0] : $_[0] }
+sub _catch {
+  my $valueref = shift;
+  eval { $$valueref = _decode(@_); 1 } ? return undef : chomp $@;
+  return $@;
+}
 
 sub _decode {
 
@@ -75,7 +76,7 @@ sub _decode {
   my $value = _decode_value();
 
   # Leftover data
-  _exception('Unexpected data') unless m/\G[\x20\x09\x0a\x0d]*\z/gc;
+  _throw('Unexpected data') unless m/\G[\x20\x09\x0a\x0d]*\z/gc;
 
   return $value;
 }
@@ -94,7 +95,7 @@ sub _decode_array {
     last if m/\G[\x20\x09\x0a\x0d]*\]/gc;
 
     # Invalid character
-    _exception('Expected comma or right square bracket while parsing array');
+    _throw('Expected comma or right square bracket while parsing array');
   }
 
   return \@array;
@@ -106,14 +107,14 @@ sub _decode_object {
 
     # Quote
     m/\G[\x20\x09\x0a\x0d]*"/gc
-      or _exception('Expected string while parsing object');
+      or _throw('Expected string while parsing object');
 
     # Key
     my $key = _decode_string();
 
     # Colon
     m/\G[\x20\x09\x0a\x0d]*:/gc
-      or _exception('Expected colon while parsing object');
+      or _throw('Expected colon while parsing object');
 
     # Value
     $hash{$key} = _decode_value();
@@ -125,7 +126,7 @@ sub _decode_object {
     last if m/\G[\x20\x09\x0a\x0d]*\}/gc;
 
     # Invalid character
-    _exception('Expected comma or right curly bracket while parsing object');
+    _throw('Expected comma or right curly bracket while parsing object');
   }
 
   return \%hash;
@@ -140,9 +141,9 @@ sub _decode_string {
 
   # Invalid character
   unless (m/\G"/gc) {
-    _exception('Unexpected character or invalid escape while parsing string')
+    _throw('Unexpected character or invalid escape while parsing string')
       if m/\G[\x00-\x1f\\]/;
-    _exception('Unterminated string');
+    _throw('Unterminated string');
   }
 
   # Unescape popular characters
@@ -168,11 +169,11 @@ sub _decode_string {
 
         # High surrogate
         ($ord & 0xfc00) == 0xd800
-          or pos($_) = $pos + pos($str), _exception('Missing high-surrogate');
+          or pos($_) = $pos + pos($str), _throw('Missing high-surrogate');
 
         # Low surrogate
         $str =~ m/\G\\u([Dd][C-Fc-f]..)/gc
-          or pos($_) = $pos + pos($str), _exception('Missing low-surrogate');
+          or pos($_) = $pos + pos($str), _throw('Missing low-surrogate');
 
         $ord = 0x10000 + ($ord - 0xd800) * 0x400 + (hex($1) - 0xdc00);
       }
@@ -214,7 +215,7 @@ sub _decode_value {
   return undef if m/\Gnull/gc;
 
   # Invalid character
-  _exception('Expected string, array, object, number, boolean or null');
+  _throw('Expected string, array, object, number, boolean or null');
 }
 
 sub _encode_array {
@@ -269,7 +270,7 @@ sub _encode_value {
   return _encode_string($value);
 }
 
-sub _exception {
+sub _throw {
 
   # Leading whitespace
   m/\G[\x20\x09\x0a\x0d]*/gc;

@@ -9,7 +9,7 @@ use Scalar::Util 'blessed';
 
 has 'error';
 
-our @EXPORT_OK = qw(decode_json encode_json j);
+our @EXPORT_OK = qw(decode_json encode_json from_json j to_json);
 
 # Literal names
 my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
@@ -47,10 +47,17 @@ sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 
 sub false {$FALSE}
 
+sub from_json {
+  my $err = _catch(\my $value, shift, 1);
+  return defined $err ? croak $err : $value;
+}
+
 sub j {
   return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
   return eval { _decode($_[0]) };
 }
+
+sub to_json { _encode_value(shift) }
 
 sub true {$TRUE}
 
@@ -61,16 +68,14 @@ sub _catch {
 }
 
 sub _decode {
+  my ($json, $unencoded) = @_;
 
   # Missing input
-  die "Missing or empty input\n" unless length(my $bytes = shift);
-
-  # Wide characters
-  die "Wide character in input\n" unless utf8::downgrade($bytes, 1);
+  die "Missing or empty input\n" unless length $json;
 
   # UTF-8
-  die "Input is not UTF-8 encoded\n"
-    unless defined(local $_ = Mojo::Util::decode('UTF-8', $bytes));
+  local $_ = $unencoded ? $json : Mojo::Util::decode 'UTF-8', $json;
+  die "Input is not UTF-8 encoded\n" unless defined $_;
 
   # Value
   my $value = _decode_value();
@@ -303,8 +308,8 @@ Mojo::JSON - Minimalistic JSON
   use Mojo::JSON qw(decode_json encode_json);
 
   # Encode and decode JSON (die on errors)
-  my $bytes = encode_json({foo => [1, 2], bar => 'hello!', baz => \1});
-  my $hash  = decode_json($bytes);
+  my $bytes = encode_json {foo => [1, 2], bar => 'hello!', baz => \1};
+  my $hash  = decode_json $bytes;
 
   # Handle errors
   my $json = Mojo::JSON->new;
@@ -350,25 +355,38 @@ individually.
 
 =head2 decode_json
 
-  my $value = decode_json($bytes);
+  my $value = decode_json $bytes;
 
 Decode JSON to Perl value and die if decoding fails.
 
 =head2 encode_json
 
-  my $bytes = encode_json({i => '♥ mojolicious'});
+  my $bytes = encode_json {i => '♥ mojolicious'};
 
 Encode Perl value to JSON.
 
+=head2 from_json
+
+  my $value = from_json $chars;
+
+Decode JSON text without C<UTF-8> encoding to Perl value and die if decoding
+fails.
+
 =head2 j
 
-  my $bytes = j([1, 2, 3]);
-  my $bytes = j({i => '♥ mojolicious'});
-  my $value = j($bytes);
+  my $bytes = j [1, 2, 3];
+  my $bytes = j {i => '♥ mojolicious'};
+  my $value = j $bytes;
 
 Encode Perl data structure (which may only be an array reference or hash
 reference) or decode JSON, an C<undef> return value indicates a bare C<null>
 or that decoding failed.
+
+=head2 to_json
+
+  my $chars = to_json {i => '♥ mojolicious'};
+
+Encode Perl value to JSON text without C<UTF-8> encoding.
 
 =head1 ATTRIBUTES
 

@@ -368,8 +368,8 @@ Encode Perl value to JSON.
 
   my $value = from_json $chars;
 
-Decode JSON text without C<UTF-8> encoding to Perl value and die if decoding
-fails.
+Decode JSON text that is not C<UTF-8> encoded to Perl value and die if
+decoding fails.
 
 =head2 j
 
@@ -385,7 +385,7 @@ or that decoding failed.
 
   my $chars = to_json {i => '♥ mojolicious'};
 
-Encode Perl value to JSON text without C<UTF-8> encoding.
+Encode Perl value to JSON text without C<UTF-8> encoding it.
 
 =head1 ATTRIBUTES
 

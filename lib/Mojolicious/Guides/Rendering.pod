@@ -255,7 +255,7 @@ too.
 =head2 Rendering text
 
 Characters can be rendered to bytes with the C<text> stash value, the given
-content will be automatically encoded to bytes with
+content will be automatically encoded with
 L<Mojolicious::Renderer/"encoding">.
 
   $c->render(text => 'I ♥ Mojolicious!');

@@ -266,8 +266,8 @@ Construct a new array-based L<Mojo::Collection> object.
   my $new = $collection->pluck($method);
   my $new = $collection->pluck($method, @args);
 
-Extract hash reference value or call method on each element in collection and
-create a new collection from the results.
+Extract hash reference value from, or call method on, each element in
+collection and create a new collection from the results.
 
   # Longer version
   my $new = $collection->map(sub { $_->{$key} });

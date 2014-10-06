@@ -48,7 +48,7 @@ is $collection->first(qr/[1-4]/), 4, 'right result';
 is $collection->first(sub { ref $_ eq 'CODE' }), undef, 'no result';
 $collection = c();
 is $collection->first, undef, 'no result';
-is $collection->first(sub { defined $_ }), undef, 'no result';
+is $collection->first(sub {defined}), undef, 'no result';
 
 # last
 is c(5, 4, 3)->last, 3, 'right result';

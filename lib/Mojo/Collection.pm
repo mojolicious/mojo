@@ -26,7 +26,7 @@ sub DESTROY { }
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
-  $_[0]->new(grep { defined $_ && (ref $_ || length $_) } @{$_[0]});
+  $_[0]->new(grep { defined && (ref || length) } @{$_[0]});
 }
 
 sub each {

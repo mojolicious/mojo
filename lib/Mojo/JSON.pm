@@ -68,14 +68,13 @@ sub _catch {
 }
 
 sub _decode {
-  my ($json, $unencoded) = @_;
 
   # Missing input
-  die "Missing or empty input\n" unless length $json;
+  die "Missing or empty input\n" unless length(local $_ = shift);
 
   # UTF-8
-  local $_ = $unencoded ? $json : Mojo::Util::decode 'UTF-8', $json;
-  die "Input is not UTF-8 encoded\n" unless defined $_;
+  $_ = Mojo::Util::decode 'UTF-8', $_ unless shift;
+  die "Input is not UTF-8 encoded\n" unless defined;
 
   # Value
   my $value = _decode_value();

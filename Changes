@@ -1,7 +1,10 @@
 
 5.48  2014-10-07
-  - Emergency release for a critical security issue that can result in
+  - Emergency release for a serious security issue that can result in
     parameter injection attacks, everybody should update!
+    Breaking change: Methods that previously worked differently in scalar than
+    in list context now always assume scalar context, and new methods have
+    been added to cover the list context functionality.
   - Added all_cookies and all_uploads methods to Mojo::Message.
   - Added all_params method to Mojo::Message::Request.
   - Added all_params method to Mojo::Parameters.

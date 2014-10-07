@@ -136,8 +136,8 @@ It's not a feature without a test and documentation.
 
 A feature is only needed when the majority of the user base benefits from it.
 
-Features may only be changed in a major release or after being deprecated for
-at least 3 months.
+Features may only be changed in a major release, to fix a serious security
+issue, or after being deprecated for at least 3 months.
 
 Refactoring and deprecations should be avoided if no important feature depends
 on it.

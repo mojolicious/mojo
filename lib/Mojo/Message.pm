@@ -142,8 +142,6 @@ sub json {
 sub multi_cookie { shift->_cache('cookie', 1, @_) }
 sub multi_upload { shift->_cache('upload', 1, @_) }
 
-sub param { shift->body_params->param(@_) }
-
 sub parse {
   my ($self, $chunk) = @_;
 
@@ -588,19 +586,6 @@ Access multiple message cookies with the same name, usually
 L<Mojo::Cookie::Request> or L<Mojo::Cookie::Response> objects. Note that this
 method caches all data, so it should not be called before all headers have
 been received.
-
-=head2 param
-
-  my @names       = $msg->param;
-  my $value       = $msg->param('foo');
-  my ($foo, $bar) = $msg->param(['foo', 'bar']);
-
-Access C<POST> parameters extracted from C<application/x-www-form-urlencoded>
-or C<multipart/form-data> message body. Note that this method caches all data,
-so it should not be called before the entire message body has been received.
-Parts of the message body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large, there's a
-10MB limit by default.
 
 =head2 parse
 

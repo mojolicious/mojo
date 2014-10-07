@@ -50,8 +50,7 @@ sub load_app {
     local $ENV{MOJO_EXE};
 
     # Try to load application from script into sandbox
-    my $app = eval "package Mojo::Server::Sandbox::@{[md5_sum $path]};"
-      . 'return do($path) || die($@ || $!);';
+    my $app = $self->_do( $path );
     die qq{Can't load application from file "$path": $@} if !$app && $@;
     die qq{File "$path" did not return an application object.\n}
       unless blessed $app && $app->isa('Mojo');
@@ -89,6 +88,15 @@ sub setuidgid {
     unless POSIX::setuid($uid);
 
   return $self;
+}
+
+sub _do {
+    my $path = pop;
+    # prepend '.' to @INC if no directories in path
+    local @INC = ($path !~ m!/! ? ('.', @INC) : @INC);
+    my $app = eval "package Mojo::Server::Sandbox::@{[md5_sum $path]};"
+	. 'return do($path) || die($@ || $!);';
+    return $app;
 }
 
 sub _log { $_[0]->app->log->error($_[1]) and return $_[0] }

@@ -391,10 +391,7 @@ sub _signed_cookie {
       }
       if ($valid) { push @results, $value }
 
-      else {
-        $self->app->log->debug(
-          qq{Bad signed cookie "$name", possible hacking attempt.});
-      }
+      else { $self->app->log->debug(qq{Cookie "$name" has bad signature.}) }
     }
 
     else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }

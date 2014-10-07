@@ -1,4 +1,6 @@
 
+5.49  2014-10-08
+
 5.48  2014-10-07
   - Emergency release for a serious security issue that can result in
     parameter injection attacks, everybody should update!

@@ -509,7 +509,7 @@ than one cookie you can also use L</"every_cookie">.
 
 =head2 every_cookie
 
-  my $cookies = $c->all_cookie('foo');
+  my $cookies = $c->every_cookie('foo');
 
 Access all request cookie values with the same name. To access only one cookie
 you can also use L</"cookie">.

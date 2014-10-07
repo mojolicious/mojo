@@ -57,7 +57,6 @@ sub cookie {
   }
 
   # Request cookies
-  return map { $_->value } $self->req->cookie($name) if wantarray;
   return undef unless my $cookie = $self->req->cookie($name);
   return $cookie->value;
 }
@@ -93,6 +92,10 @@ sub flash {
 }
 
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
+
+sub multi_cookie {
+  [map { $_->value } shift->req->cookie(shift)];
+}
 
 sub multi_param { _param(@_) }
 
@@ -357,16 +360,15 @@ sub write_chunk {
 
 sub _param {
   my ($self, $name) = @_;
-  my $captures = $self->stash->{'mojo.captures'} ||= {};
 
   # Captured unreserved values
+  my $captures = $self->stash->{'mojo.captures'} ||= {};
   if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
     return ref $value eq 'ARRAY' ? $value : [$value];
   }
 
-  my $req = $self->req;
-
   # Uploads
+  my $req = $self->req;
   return [$req->upload($name)] if $req->upload($name);
 
   # Param values
@@ -378,7 +380,7 @@ sub _signed_cookie {
 
   my $secrets = $self->stash->{'mojo.secrets'};
   my @results;
-  for my $value ($self->cookie($name)) {
+  for my $value (@{$self->multi_cookie($name)}) {
 
     # Check signature with rotating secrets
     if ($value =~ s/--([^\-]+)$//) {
@@ -496,8 +498,7 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
-  my $foo         = $c->cookie('foo');
-  my @foo         = $c->cookie('foo');
+  my $value       = $c->cookie('foo');
   my ($foo, $bar) = $c->cookie(['foo', 'bar']);
   $c              = $c->cookie(foo => 'bar');
   $c              = $c->cookie(foo => 'bar', {path => '/'});
@@ -540,11 +541,22 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
   # Make sure to use the "title" helper and not the controller method
   $c->helpers->title('Welcome!');
 
+=head2 multi_cookie
+
+  my $values = $c->multi_cookie('foo');
+
+Access multiple request cookie values with the same name.
+
 =head2 multi_param
 
   my $values = $c->multi_param('foo');
 
-Returns an array reference containing all of the values for the given parameter.
+Access multiple route placeholder values that are not reserved stash values,
+file uploads as well as C<GET> and C<POST> parameters with the same name
+extracted from the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body, in that order. Parts of the request body
+need to be loaded into memory to parse C<POST> parameters, so you have to make
+sure it is not excessively large, there's a 10MB limit by default.
 
 =head2 multi_signed_cookie
 
@@ -589,7 +601,7 @@ status.
 =head2 param
 
   my @names       = $c->param;
-  my $foo         = $c->param('foo');
+  my $value       = $c->param('foo');
   my ($foo, $bar) = $c->param(['foo', 'bar']);
   $c              = $c->param(foo => 'ba;r');
   $c              = $c->param(foo => qw(ba;r baz));
@@ -598,11 +610,11 @@ status.
 Access route placeholder values that are not reserved stash values, file
 uploads as well as C<GET> and C<POST> parameters extracted from the query
 string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
-message body, in that order. This method will only return the first parameter
-for a given name even if multiple are provided, to get all of the parameters 
-of that name use L<multi_param>. Parts of the request body need to be loaded
-into memory to parse C<POST> parameters, so you have to make sure it is not 
+message body, in that order. Parts of the request body need to be loaded into
+memory to parse C<POST> parameters, so you have to make sure it is not
 excessively large, there's a 10MB limit by default.
+
+  my $values = $c->multi_param('foo');
 
 For more control you can also access request information directly.
 

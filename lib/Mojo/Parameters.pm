@@ -43,7 +43,7 @@ sub merge {
   return $self;
 }
 
-sub multi_param { _param(@_) }
+sub multi_param { shift->_param(@_) }
 
 sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
@@ -60,7 +60,7 @@ sub param {
   $self->remove($name) if defined $_[0];
   return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]) if @_;
 
-  return _param($self, $name)->[0];
+  return $self->_param($name)->[0];
 }
 
 sub params {
@@ -261,10 +261,10 @@ parameters.
 
 =head2 multi_param
 
-  my $values = $param->multi_param('foo');
+  my $values = $params->multi_param('foo');
 
-Returns an array reference containing all of the values for the given parameter.
-Note that this method will normalize the parameters.
+Check multiple parameter values with the same name. Note that this method will
+normalize the parameters.
 
 =head2 new
 
@@ -280,16 +280,14 @@ necessary.
 =head2 param
 
   my @names       = $params->param;
-  my $foo         = $params->param('foo');
+  my $value       = $params->param('foo');
   my ($foo, $bar) = $params->param(['foo', 'bar']);
   $params         = $params->param(foo => 'ba&r');
   $params         = $params->param(foo => qw(ba&r baz));
   $params         = $params->param(foo => ['ba;r', 'baz']);
 
-Check and replace parameter value. Be aware that if you will receive only the
-I<first> value for that parameter even if there are multiple values for that 
-name; to get all the parameters use L<multi_param>. Note that this method will
-normalize the parameters.
+Check and replace parameter values. Note that this method will normalize the
+parameters.
 
 =head2 params
 

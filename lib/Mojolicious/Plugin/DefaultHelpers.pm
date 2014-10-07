@@ -11,8 +11,8 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  my @alias = qw(app flash multi_param param stash session url_for validation);
-  for my $name (@alias) {
+  my @names = qw(app flash multi_param param stash session url_for validation);
+  for my $name (@names) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -367,7 +367,7 @@ L</"stash">.
 
 =head2 multi_param
 
-  %= multi_param 'foo'
+  %= multi_param('foo')->[2]
 
 Alias for L<Mojolicious::Controller/"multi_param">.
 

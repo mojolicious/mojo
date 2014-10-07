@@ -389,11 +389,22 @@ Check if connection is secure.
 
 Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
+=head2 multi_param
+
+  my $values = $req->multi_param('foo');
+
+Access multiple C<GET> and C<POST> parameters with the same name extracted
+from the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body. Note that this method caches all data, so
+it should not be called before the entire request body has been received.
+Parts of the request body need to be loaded into memory to parse C<POST>
+parameters, so you have to make sure it is not excessively large, there's a
+10MB limit by default.
+
 =head2 param
 
   my @names       = $req->param;
-  my $foo         = $req->param('foo');
-  my @foo         = $req->param('foo');
+  my $value       = $req->param('foo');
   my ($foo, $bar) = $req->param(['foo', 'bar']);
 
 Access C<GET> and C<POST> parameters extracted from the query string and

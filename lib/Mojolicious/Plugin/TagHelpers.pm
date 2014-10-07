@@ -76,7 +76,7 @@ sub _input {
   my %attrs = @_ % 2 ? (value => shift, @_) : @_;
 
   # Special selection value
-  my @values = @{ $c->multi_param($name) };
+  my @values = @{$c->multi_param($name)};
   my $type = $attrs{type} || '';
   if (@values && $type ne 'submit') {
 
@@ -152,7 +152,7 @@ sub _password_field {
 sub _select_field {
   my ($c, $name, $options, %attrs) = (shift, shift, shift, @_);
 
-  my %values = map { $_ => 1 } @{ $c->multi_param($name) };
+  my %values = map { $_ => 1 } @{$c->multi_param($name)};
 
   my $groups = '';
   for my $group (@$options) {

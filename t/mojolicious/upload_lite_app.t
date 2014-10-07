@@ -26,7 +26,7 @@ post '/upload' => sub {
 
 post '/multi' => sub {
   my $c = shift;
-  my @uploads = map { @{ $c->multi_param($_) } } @{ $c->multi_param('name') };
+  my @uploads = map { @{$c->multi_param($_)} } @{$c->multi_param('name')};
   $c->render(text => join '', map { $_->filename, $_->asset->slurp } @uploads);
 };
 

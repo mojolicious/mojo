@@ -474,9 +474,9 @@ Oops!
 % my ($one, $three) = $c->cookie([qw(unsigned1 unsigned2)]);
 %= $one // ''
 %= $three // '';
-% my @unsigned1 = $c->cookie('unsigned1');
-%= $unsigned1[0] // ''
-%= $unsigned1[1] // ''
+% my $unsigned1 = $c->multi_cookie('unsigned1');
+%= $unsigned1->[0] // ''
+%= $unsigned1->[1] // ''
 % my ($four, $six) = $c->signed_cookie([qw(signed1 signed2)]);
 %= $four // ''
 %= $six // '';

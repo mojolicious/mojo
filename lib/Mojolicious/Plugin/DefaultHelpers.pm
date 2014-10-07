@@ -11,8 +11,7 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  my @names = qw(app flash multi_param param stash session url_for validation);
-  for my $name (@names) {
+  for my $name (qw(app flash param stash session url_for validation)) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -364,12 +363,6 @@ response headers with L<Mojolicious::Static/"is_fresh">.
 
 Set C<layout> stash value, all additional pairs get merged into the
 L</"stash">.
-
-=head2 multi_param
-
-  %= multi_param('foo')->[2]
-
-Alias for L<Mojolicious::Controller/"multi_param">.
 
 =head2 param
 

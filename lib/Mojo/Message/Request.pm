@@ -16,6 +16,8 @@ my $START_LINE_RE = qr/
   \s+HTTP\/(\d\.\d)$                                        # Version
 /x;
 
+sub all_params { shift->params->all_params(@_) }
+
 sub clone {
   my $self = shift;
 
@@ -125,8 +127,6 @@ sub is_secure {
 sub is_xhr {
   (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpRequest/i;
 }
-
-sub multi_param { shift->params->multi_param(@_) }
 
 sub param { shift->params->param(@_) }
 
@@ -339,6 +339,21 @@ Request has been performed through a reverse proxy.
 L<Mojo::Message::Request> inherits all methods from L<Mojo::Message> and
 implements the following new ones.
 
+=head2 all_params
+
+  my $values = $req->all_params('foo');
+
+Access all C<GET> and C<POST> parameters with the same name extracted from the
+query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body. To access only one value you can also use
+L</"param">. Note that this method caches all data, so it should not be called
+before the entire request body has been received. Parts of the request body
+need to be loaded into memory to parse C<POST> parameters, so you have to make
+sure it is not excessively large, there's a 10MB limit by default.
+
+  # Get first value
+  say $req->all_params('foo')->[0];
+
 =head2 clone
 
   my $clone = $req->clone;
@@ -389,18 +404,6 @@ Check if connection is secure.
 
 Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
-=head2 multi_param
-
-  my $values = $req->multi_param('foo');
-
-Access multiple C<GET> and C<POST> parameters with the same name extracted
-from the query string and C<application/x-www-form-urlencoded> or
-C<multipart/form-data> message body. Note that this method caches all data, so
-it should not be called before the entire request body has been received.
-Parts of the request body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large, there's a
-10MB limit by default.
-
 =head2 param
 
   my @names       = $req->param;
@@ -409,10 +412,11 @@ parameters, so you have to make sure it is not excessively large, there's a
 
 Access C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
-Note that this method caches all data, so it should not be called before the
-entire request body has been received. Parts of the request body need to be
-loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large, there's a 10MB limit by default.
+To access more than one value you can also use L</"all_params">. Note that
+this method caches all data, so it should not be called before the entire
+request body has been received. Parts of the request body need to be loaded
+into memory to parse C<POST> parameters, so you have to make sure it is not
+excessively large, there's a 10MB limit by default.
 
 =head2 params
 

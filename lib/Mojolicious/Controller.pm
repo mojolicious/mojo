@@ -36,6 +36,14 @@ sub AUTOLOAD {
   return $self->$helper(@_);
 }
 
+sub all_cookies {
+  [map { $_->value } @{shift->req->all_cookies(shift)}];
+}
+
+sub all_params { _param(@_) }
+
+sub all_signed_cookies { _signed_cookie(@_) }
+
 sub continue { $_[0]->app->routes->continue($_[0]) }
 
 sub cookie {
@@ -92,14 +100,6 @@ sub flash {
 }
 
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
-
-sub multi_cookie {
-  [map { $_->value } @{shift->req->multi_cookie(shift)}];
-}
-
-sub multi_param { _param(@_) }
-
-sub multi_signed_cookie { _signed_cookie(@_) }
 
 sub on {
   my ($self, $name, $cb) = @_;
@@ -368,10 +368,10 @@ sub _param {
 
   # Uploads
   my $req = $self->req;
-  if (my $uploads = $req->multi_upload($name)) { return $uploads if @$uploads }
+  if (my $uploads = $req->all_uploads($name)) { return $uploads if @$uploads }
 
   # Param values
-  return $req->multi_param($name);
+  return $req->all_params($name);
 }
 
 sub _signed_cookie {
@@ -379,7 +379,7 @@ sub _signed_cookie {
 
   my $secrets = $self->stash->{'mojo.secrets'};
   my @results;
-  for my $value (@{$self->multi_cookie($name)}) {
+  for my $value (@{$self->all_cookies($name)}) {
 
     # Check signature with rotating secrets
     if ($value =~ s/--([^\-]+)$//) {
@@ -489,6 +489,41 @@ underlying connection might get closed early.
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
+=head2 all_cookies
+
+  my $values = $c->all_cookie('foo');
+
+Access all request cookie values with the same name. To access only one cookie
+you can also use L</"cookie">.
+
+  $ Get first cookie value
+  my $first = $c->all_cookies('foo')->[0];
+
+=head2 all_params
+
+  my $values = $c->all_params('foo');
+
+Access all route placeholder values that are not reserved stash values, file
+uploads as well as C<GET> and C<POST> parameters with the same name extracted
+from the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body, in that order. To access only one value
+you can also use L</"param">. Parts of the request body need to be loaded into
+memory to parse C<POST> parameters, so you have to make sure it is not
+excessively large, there's a 10MB limit by default.
+
+  # Get first value
+  my $first = $c->all_params('foo')->[0];
+
+=head2 all_signed_cookies
+
+  my $values = $c->all_signed_cookies('foo');
+
+Access all signed request cookie values with the same name. To access only one
+signed cookie you can also use L</"signed_cookie">.
+
+  # Get first signed cookie value
+  my $first = $c->all_signed_cookies('foo')->[0]->value;
+
 =head2 continue
 
   $c->continue;
@@ -502,7 +537,8 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
   $c              = $c->cookie(foo => 'bar');
   $c              = $c->cookie(foo => 'bar', {path => '/'});
 
-Access request cookie values and create new response cookies.
+Access request cookie values and create new response cookies. To access more
+than one cookie you can also use L</"all_cookies">.
 
   # Create response cookie with domain and expiration date
   $c->cookie(user => 'sri', {domain => 'example.com', expires => time + 60});
@@ -539,29 +575,6 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
   # Make sure to use the "title" helper and not the controller method
   $c->helpers->title('Welcome!');
-
-=head2 multi_cookie
-
-  my $values = $c->multi_cookie('foo');
-
-Access multiple request cookie values with the same name.
-
-=head2 multi_param
-
-  my $values = $c->multi_param('foo');
-
-Access multiple route placeholder values that are not reserved stash values,
-file uploads as well as C<GET> and C<POST> parameters with the same name
-extracted from the query string and C<application/x-www-form-urlencoded> or
-C<multipart/form-data> message body, in that order. Parts of the request body
-need to be loaded into memory to parse C<POST> parameters, so you have to make
-sure it is not excessively large, there's a 10MB limit by default.
-
-=head2 multi_signed_cookie
-
-  my $values = $c->multi_signed_cookie('foo');
-
-Access multiple signed request cookie values with the same name.
 
 =head2 on
 
@@ -609,11 +622,13 @@ status.
 Access route placeholder values that are not reserved stash values, file
 uploads as well as C<GET> and C<POST> parameters extracted from the query
 string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
-message body, in that order. Parts of the request body need to be loaded into
-memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large, there's a 10MB limit by default.
+message body, in that order. To access more than one value you can also use
+L</"all_params">. Parts of the request body need to be loaded into memory to
+parse C<POST> parameters, so you have to make sure it is not excessively
+large, there's a 10MB limit by default.
 
-  my $values = $c->multi_param('foo');
+  # Get last value
+  my $last = $c->all_params('foo')->[-1];
 
 For more control you can also access request information directly.
 
@@ -874,7 +889,8 @@ on browser.
   $c              = $c->signed_cookie(foo => 'bar');
   $c              = $c->signed_cookie(foo => 'bar', {path => '/'});
 
-Access signed request cookie values and create new signed response cookies.
+Access signed request cookie values and create new signed response cookies. To
+access more than one signed cookie you can also use L</"all_signed_cookies">.
 Cookies failing HMAC-SHA1 signature verification will be automatically
 discarded.
 

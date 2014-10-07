@@ -39,7 +39,7 @@ is_deeply [$validation->error], [], 'no names';
 ok $validation->required('foo')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 is $validation->param('foo'), 'bar', 'right value';
-is_deeply $validation->multi_param('foo'), ['bar'], 'right values';
+is_deeply $validation->all_params('foo'), ['bar'], 'right values';
 is_deeply [$validation->param], ['foo'], 'right names';
 ok !$validation->has_error, 'no error';
 ok $validation->optional('baz')->is_valid, 'valid';
@@ -78,7 +78,7 @@ is_deeply [$validation->error], [qw(baz yada)], 'right names';
 $validation = $t->app->validation->input(
   {foo => [qw(bar whatever)], baz => [qw(yada ohoh)]});
 ok $validation->required('foo')->in(qw(23 bar whatever))->is_valid, 'valid';
-is_deeply $validation->multi_param('foo'), [qw(bar whatever)], 'right results';
+is_deeply $validation->all_params('foo'), [qw(bar whatever)], 'right results';
 is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
 ok !$validation->has_error, 'no error';
 ok !$validation->required('baz')->in(qw(yada whatever))->is_valid, 'not valid';

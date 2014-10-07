@@ -17,6 +17,9 @@ has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} // 10485760 };
 has version          => '1.1';
 
+sub all_cookies { shift->_cache('cookie', 1, @_) }
+sub all_uploads { shift->_cache('upload', 1, @_) }
+
 sub body {
   my $self = shift;
 
@@ -138,9 +141,6 @@ sub json {
   my $data = $self->{json} //= j($self->body);
   return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
-
-sub multi_cookie { shift->_cache('cookie', 1, @_) }
-sub multi_upload { shift->_cache('upload', 1, @_) }
 
 sub parse {
   my ($self, $chunk) = @_;
@@ -409,6 +409,30 @@ HTTP version of message, defaults to C<1.1>.
 L<Mojo::Message> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 all_cookies
+
+  my $cookies = $msg->all_cookies('foo');
+
+Access all message cookies with the same name, usually
+L<Mojo::Cookie::Request> or L<Mojo::Cookie::Response> objects. To access only
+one cookie you can also use L</"cookie">. Note that this method caches all
+data, so it should not be called before all headers have been received.
+
+  # Get first cookie value
+  say $msg->all_cookies('foo')->[0]->value;
+
+=head2 all_uploads
+
+  my $uploads = $msg->all_uploads('foo');
+
+Access all C<multipart/form-data> file uploads with the same name, usually
+L<Mojo::Upload> objects. To access only one upload you can also use
+L</"upload">. Note that this method caches all data, so it should not be
+called before the entire message body has been received.
+
+  # Get content of first uploaded file
+  say $msg->all_uploads('foo')->[0]->asset->slurp;
+
 =head2 body
 
   my $bytes = $msg->body;
@@ -457,12 +481,13 @@ Render start line.
 
 =head2 cookie
 
-  my $value       = $msg->cookie('foo');
+  my $cookie      = $msg->cookie('foo');
   my ($foo, $bar) = $msg->cookie(['foo', 'bar']);
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
-L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
-it should not be called before all headers have been received.
+L<Mojo::Cookie::Response> objects. To access more than one cookie you can also
+use L</"all_cookies">. Note that this method caches all data, so it should not
+be called before all headers have been received.
 
   # Get cookie value
   say $msg->cookie('foo')->value;
@@ -578,15 +603,6 @@ sure it is not excessively large, there's a 10MB limit by default.
   say $msg->json->{foo}{bar}[23];
   say $msg->json('/foo/bar/23');
 
-=head2 multi_cookie
-
-  my $values = $msg->multi_cookie('foo');
-
-Access multiple message cookies with the same name, usually
-L<Mojo::Cookie::Request> or L<Mojo::Cookie::Response> objects. Note that this
-method caches all data, so it should not be called before all headers have
-been received.
-
 =head2 parse
 
   $msg = $msg->parse('HTTP/1.1 200 OK...');
@@ -614,23 +630,16 @@ Render whole message.
 
 =head2 upload
 
-  my $value       = $msg->upload('foo');
+  my $upload      = $msg->upload('foo');
   my ($foo, $bar) = $msg->upload(['foo', 'bar']);
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
-Note that this method caches all data, so it should not be called before the
-entire message body has been received.
+To access more than one upload you can also use L</"all_uploads">. Note that
+this method caches all data, so it should not be called before the entire
+message body has been received.
 
   # Get content of uploaded file
   say $msg->upload('foo')->asset->slurp;
-
-=head2 multi_upload
-
-  my $values = $msg->multi_upload('foo');
-
-Access multiple C<multipart/form-data> file uploads with the same name,
-usually L<Mojo::Upload> objects. Note that this method caches all data, so it
-should not be called before the entire message body has been received.
 
 =head2 uploads
 

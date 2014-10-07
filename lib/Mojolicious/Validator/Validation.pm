@@ -19,7 +19,7 @@ sub AUTOLOAD {
   return $self->check($method => @_);
 }
 
-sub all_params { shift->_param(shift) }
+sub all_params { shift->_param(@_) }
 
 sub check {
   my ($self, $check) = (shift, shift);
@@ -92,8 +92,7 @@ sub required {
 }
 
 sub _param {
-  my ($self, $name) = @_;
-  my $value = $self->output->{$name};
+  my $value = shift->output->{shift()};
   return [ref $value eq 'ARRAY' ? @$value : $value];
 }
 

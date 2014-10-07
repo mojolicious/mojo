@@ -125,13 +125,12 @@ sub param {
     return sort @keys;
   }
 
-  # Override values
-  if (@_) {
-    $captures->{$name} = @_ > 1 ? [@_] : $_[0];
-    return $self;
-  }
+  # Value
+  return _param($self, $name)->[0] unless @_;
 
-  return _param($self, $name)->[0];
+  # Override values
+  $captures->{$name} = @_ > 1 ? [@_] : $_[0];
+  return $self;
 }
 
 sub redirect_to {
@@ -276,13 +275,13 @@ sub signed_cookie {
   # Multiple names
   return map { $self->signed_cookie($_) } @$name if ref $name eq 'ARRAY';
 
-  # Response cookie
-  my $secrets = $self->stash->{'mojo.secrets'};
-  return $self->cookie($name,
-    "$value--" . Mojo::Util::hmac_sha1_sum($value, $secrets->[0]), $options)
-    if defined $value;
+  # Request cookie
+  return _signed_cookie($self, $name)->[0] unless defined $value;
 
-  return _signed_cookie($self, $name)->[0];
+  # Response cookie
+  my $checksum
+    = Mojo::Util::hmac_sha1_sum($value, $self->stash->{'mojo.secrets'}[0]);
+  return $self->cookie($name, "$value--$checksum", $options);
 }
 
 sub stash { Mojo::Util::_stash(stash => @_) }
@@ -491,7 +490,7 @@ implements the following new ones.
 
 =head2 all_cookies
 
-  my $values = $c->all_cookie('foo');
+  my $cookies = $c->all_cookie('foo');
 
 Access all request cookie values with the same name. To access only one cookie
 you can also use L</"cookie">.
@@ -516,7 +515,7 @@ excessively large, there's a 10MB limit by default.
 
 =head2 all_signed_cookies
 
-  my $values = $c->all_signed_cookies('foo');
+  my $cookies = $c->all_signed_cookies('foo');
 
 Access all signed request cookie values with the same name. To access only one
 signed cookie you can also use L</"signed_cookie">.
@@ -532,7 +531,7 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
-  my $value       = $c->cookie('foo');
+  my $cookie      = $c->cookie('foo');
   my ($foo, $bar) = $c->cookie(['foo', 'bar']);
   $c              = $c->cookie(foo => 'bar');
   $c              = $c->cookie(foo => 'bar', {path => '/'});
@@ -884,7 +883,7 @@ on browser.
 
 =head2 signed_cookie
 
-  my $value       = $c->signed_cookie('foo');
+  my $cookie      = $c->signed_cookie('foo');
   my ($foo, $bar) = $c->signed_cookie(['foo', 'bar']);
   $c              = $c->signed_cookie(foo => 'bar');
   $c              = $c->signed_cookie(foo => 'bar', {path => '/'});

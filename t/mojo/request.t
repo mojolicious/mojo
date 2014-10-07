@@ -1587,9 +1587,10 @@ is $req2->headers->cookie, 'foo=bar; foo=baz; foo=yada; bar=foo',
   'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is_deeply [map { $_->value } $req2->cookie('foo')], [qw(bar baz yada)],
+is_deeply [map { $_->value } @{$req2->multi_cookie('foo')}],
+  [qw(bar baz yada)], 'right values';
+is_deeply [map { $_->value } @{$req2->multi_cookie('bar')}], ['foo'],
   'right values';
-is_deeply [map { $_->value } $req2->cookie('bar')], ['foo'], 'right values';
 is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(bar foo)],
   'right values';
 

@@ -60,6 +60,8 @@ sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
 
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
+sub multi_param { shift->_param(shift) }
+
 sub optional {
   my ($self, $name) = @_;
 
@@ -75,20 +77,24 @@ sub param {
   my ($self, $name) = @_;
 
   # Multiple names
-  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # List names
   return sort keys %{$self->output} unless defined $name;
 
-  my $value = $self->output->{$name};
-  my @values = ref $value eq 'ARRAY' ? @$value : ($value);
-  return wantarray ? @values : $values[0];
+  return $self->_param($name)->[0];
 }
 
 sub required {
   my ($self, $name) = @_;
   return $self if $self->optional($name)->is_valid;
   return $self->error($name => ['required']);
+}
+
+sub _param {
+  my ($self, $name) = @_;
+  my $value = $self->output->{$name};
+  return [ref $value eq 'ARRAY' ? @$value : $value];
 }
 
 1;
@@ -205,6 +211,13 @@ Check if validation resulted in errors, defaults to checking all fields.
 Check if validation was successful and field has a value, defaults to checking
 the current L</"topic">.
 
+=head2 multi_param
+
+  my $values = $validation->multi_param('foo');
+
+Access multiple validated parameters with the same name, similar to
+L<Mojolicious::Controller/"multi_param">.
+
 =head2 optional
 
   $validation = $validation->optional('foo');
@@ -214,8 +227,7 @@ Change validation L</"topic">.
 =head2 param
 
   my @names       = $validation->param;
-  my $foo         = $validation->param('foo');
-  my @foo         = $validation->param('foo');
+  my $value       = $validation->param('foo');
   my ($foo, $bar) = $validation->param(['foo', 'bar']);
 
 Access validated parameters, similar to L<Mojolicious::Controller/"param">.

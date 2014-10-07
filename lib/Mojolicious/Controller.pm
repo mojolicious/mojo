@@ -42,7 +42,7 @@ sub cookie {
   my ($self, $name) = (shift, shift);
 
   # Multiple names
-  return map { scalar $self->cookie($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->cookie($_) } @$name if ref $name eq 'ARRAY';
 
   # Response cookie
   if (@_) {
@@ -94,7 +94,7 @@ sub flash {
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 
 sub multi_cookie {
-  [map { $_->value } shift->req->cookie(shift)];
+  [map { $_->value } @{shift->req->multi_cookie(shift)}];
 }
 
 sub multi_param { _param(@_) }
@@ -112,7 +112,7 @@ sub param {
   my ($self, $name) = (shift, shift);
 
   # Multiple names
-  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # List names
   my $captures = $self->stash->{'mojo.captures'} ||= {};
@@ -274,8 +274,7 @@ sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
 
   # Multiple names
-  return map { scalar $self->signed_cookie($_) } @$name
-    if ref $name eq 'ARRAY';
+  return map { $self->signed_cookie($_) } @$name if ref $name eq 'ARRAY';
 
   # Response cookie
   my $secrets = $self->stash->{'mojo.secrets'};
@@ -369,7 +368,7 @@ sub _param {
 
   # Uploads
   my $req = $self->req;
-  return [$req->upload($name)] if $req->upload($name);
+  if (my $uploads = $req->multi_upload($name)) { return $uploads if @$uploads }
 
   # Param values
   return $req->multi_param($name);

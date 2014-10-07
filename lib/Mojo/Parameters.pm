@@ -54,7 +54,7 @@ sub param {
   return sort keys %{$self->to_hash} unless $name;
 
   # Multiple names
-  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # Replace values
   $self->remove($name) if defined $_[0];

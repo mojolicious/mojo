@@ -60,7 +60,7 @@ sub param {
   $self->remove($name) if defined $_[0];
   return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]) if @_;
 
-  return $self->_param($name)->[0];
+  return $self->_param($name)->[-1];
 }
 
 sub params {

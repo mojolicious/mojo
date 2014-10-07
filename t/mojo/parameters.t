@@ -35,8 +35,8 @@ is $params2->to_string, 'x=1&y=2', 'right format';
 is_deeply $params->param('foo'), 'b;ar', 'right structure';
 is_deeply $params->every_param('foo'), ['b;ar'], 'right structure';
 is_deeply $params->every_param('a'), [4, 5], 'right structure';
-is_deeply [$params->param(['a'])], [4], 'right structure';
-is_deeply [$params->param([qw(a foo)])], [4, 'b;ar'], 'right structure';
+is_deeply [$params->param(['a'])], [5], 'right structure';
+is_deeply [$params->param([qw(a foo)])], [5, 'b;ar'], 'right structure';
 $params->param(foo => 'bar');
 is_deeply [$params->param('foo')], ['bar'], 'right structure';
 is_deeply $params->param(foo => qw(baz yada))->every_param('foo'),
@@ -136,13 +136,13 @@ is_deeply $params->to_hash, {foo => ['ba;r', 'b;az']}, 'right structure';
 $params->append(foo => ['bar'], foo => ['baz', 'yada']);
 is_deeply $params->to_hash, {foo => ['ba;r', 'b;az', 'bar', 'baz', 'yada']},
   'right structure';
-is $params->param('foo'), 'ba;r', 'right value';
+is $params->param('foo'), 'yada', 'right value';
 is_deeply $params->every_param('foo'), [qw(ba;r b;az bar baz yada)],
   'right values';
 $params = Mojo::Parameters->new(foo => ['ba;r', 'b;az'], bar => 23);
 is_deeply $params->to_hash, {foo => ['ba;r', 'b;az'], bar => 23},
   'right structure';
-is $params->param('foo'), 'ba;r', 'right value';
+is $params->param('foo'), 'b;az', 'right value';
 is_deeply $params->every_param('foo'), [qw(ba;r b;az)], 'right values';
 $params = Mojo::Parameters->new;
 is $params->param(foo => ['ba;r', 'baz'])->to_string, 'foo=ba%3Br&foo=baz',

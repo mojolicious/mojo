@@ -248,7 +248,7 @@ sub _cache {
   }
 
   my $objects = $self->{$method}{$name} || [];
-  return $all ? $objects : $objects->[0];
+  return $all ? $objects : $objects->[-1];
 }
 
 sub _limit {

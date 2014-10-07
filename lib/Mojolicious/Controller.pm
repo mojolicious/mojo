@@ -126,7 +126,7 @@ sub param {
   }
 
   # Value
-  return _param($self, $name)->[0] unless @_;
+  return _param($self, $name)->[-1] unless @_;
 
   # Override values
   $captures->{$name} = @_ > 1 ? [@_] : $_[0];
@@ -276,7 +276,7 @@ sub signed_cookie {
   return map { $self->signed_cookie($_) } @$name if ref $name eq 'ARRAY';
 
   # Request cookie
-  return _signed_cookie($self, $name)->[0] unless defined $value;
+  return _signed_cookie($self, $name)->[-1] unless defined $value;
 
   # Response cookie
   my $checksum
@@ -626,8 +626,8 @@ L</"every_param">. Parts of the request body need to be loaded into memory to
 parse C<POST> parameters, so you have to make sure it is not excessively
 large, there's a 10MB limit by default.
 
-  # Get last value
-  my $last = $c->every_param('foo')->[-1];
+  # Get first value
+  my $first = $c->every_param('foo')->[0];
 
 For more control you can also access request information directly.
 

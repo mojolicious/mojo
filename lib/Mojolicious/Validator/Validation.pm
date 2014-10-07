@@ -82,7 +82,7 @@ sub param {
   # List names
   return sort keys %{$self->output} unless defined $name;
 
-  return $self->_param($name)->[0];
+  return $self->_param($name)->[-1];
 }
 
 sub required {

@@ -1591,7 +1591,7 @@ is_deeply [map { $_->value } @{$req2->every_cookie('foo')}],
   [qw(bar baz yada)], 'right values';
 is_deeply [map { $_->value } @{$req2->every_cookie('bar')}], ['foo'],
   'right values';
-is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(bar foo)],
+is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(yada foo)],
   'right values';
 
 # Parse full HTTP 1.0 request with cookies and progress callback

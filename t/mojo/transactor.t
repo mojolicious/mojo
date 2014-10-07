@@ -197,7 +197,7 @@ like $tx->req->content->parts->[3]->headers->content_disposition, qr/"b"/,
   'right "Content-Disposition" value';
 is $tx->req->content->parts->[3]->asset->slurp, 4, 'right part';
 is $tx->req->content->parts->[4], undef, 'no more parts';
-is_deeply [$tx->req->param('a')], [1, 2, 3], 'right values';
+is_deeply $tx->req->multi_param('a'), [1, 2, 3], 'right values';
 is_deeply [$tx->req->param('b')], [4], 'right values';
 
 # Multipart form with real file and custom header

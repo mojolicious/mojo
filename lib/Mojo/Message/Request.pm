@@ -126,6 +126,8 @@ sub is_xhr {
   (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpRequest/i;
 }
 
+sub multi_param { shift->params->multi_param(@_) }
+
 sub param { shift->params->param(@_) }
 
 sub params {

@@ -94,6 +94,8 @@ sub flash {
 
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 
+sub multi_param { _param(@_) }
+
 sub multi_signed_cookie { _signed_cookie(@_) }
 
 sub on {
@@ -126,16 +128,7 @@ sub param {
     return $self;
   }
 
-  # Captured unreserved values
-  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
-    return ref $value eq 'ARRAY' ? wantarray ? @$value : $$value[0] : $value;
-  }
-
-  # Uploads
-  return $req->upload($name) if $req->upload($name);
-
-  # Param values
-  return $req->param($name);
+  return _param($self, $name)->[0];
 }
 
 sub redirect_to {
@@ -362,6 +355,24 @@ sub write_chunk {
   return $self->rendered;
 }
 
+sub _param {
+  my ($self, $name) = @_;
+  my $captures = $self->stash->{'mojo.captures'} ||= {};
+
+  # Captured unreserved values
+  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
+    return ref $value eq 'ARRAY' ? $value : [$value];
+  }
+
+  my $req = $self->req;
+
+  # Uploads
+  return [$req->upload($name)] if $req->upload($name);
+
+  # Param values
+  return $req->multi_param($name);
+}
+
 sub _signed_cookie {
   my ($self, $name) = @_;
 
@@ -529,6 +540,12 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
   # Make sure to use the "title" helper and not the controller method
   $c->helpers->title('Welcome!');
 
+=head2 multi_param
+
+  my $values = $c->multi_param('foo');
+
+Returns an array reference containing all of the values for the given parameter.
+
 =head2 multi_signed_cookie
 
   my $values = $c->multi_signed_cookie('foo');
@@ -573,7 +590,6 @@ status.
 
   my @names       = $c->param;
   my $foo         = $c->param('foo');
-  my @foo         = $c->param('foo');
   my ($foo, $bar) = $c->param(['foo', 'bar']);
   $c              = $c->param(foo => 'ba;r');
   $c              = $c->param(foo => qw(ba;r baz));
@@ -582,22 +598,11 @@ status.
 Access route placeholder values that are not reserved stash values, file
 uploads as well as C<GET> and C<POST> parameters extracted from the query
 string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
-message body, in that order. Note that this method is context sensitive in
-some cases and therefore needs to be used with care, there can always be
-multiple values, which might have unexpected consequences. Parts of the
-request body need to be loaded into memory to parse C<POST> parameters, so you
-have to make sure it is not excessively large, there's a 10MB limit by
-default.
-
-  # List context is ambiguous and should be avoided, you can get multiple
-  # values returned for a query string like "?foo=bar&foo=baz&foo=yada"
-  my $hash = {foo => $c->param('foo')};
-
-  # Better enforce scalar context
-  my $hash = {foo => scalar $c->param('foo')};
-
-  # The multi-name form can also be used to enforce a list with one element
-  my $hash = {foo => $c->param(['foo'])};
+message body, in that order. This method will only return the first parameter
+for a given name even if multiple are provided, to get all of the parameters 
+of that name use L<multi_param>. Parts of the request body need to be loaded
+into memory to parse C<POST> parameters, so you have to make sure it is not 
+excessively large, there's a 10MB limit by default.
 
 For more control you can also access request information directly.
 

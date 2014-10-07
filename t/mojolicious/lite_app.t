@@ -97,8 +97,8 @@ any sub { shift->render(text => 'Bye!') };
 
 post '/multipart/form' => sub {
   my $c    = shift;
-  my @test = $c->param('test');
-  $c->render(text => join "\n", @test);
+  my $test = $c->multi_param('test');
+  $c->render(text => join "\n", @$test);
 };
 
 get '/auto_name' => sub {

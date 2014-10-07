@@ -19,8 +19,6 @@ sub AUTOLOAD {
   return $self->check($method => @_);
 }
 
-sub all_params { shift->_param(@_) }
-
 sub check {
   my ($self, $check) = (shift, shift);
 
@@ -55,6 +53,8 @@ sub error {
 
   return $self;
 }
+
+sub every_param { shift->_param(@_) }
 
 sub has_data { !!keys %{shift->input} }
 
@@ -165,17 +165,6 @@ L<Mojolicious::Validator> object this validation belongs to.
 L<Mojolicious::Validator::Validation> inherits all methods from L<Mojo::Base>
 and implements the following new ones.
 
-=head2 all_params
-
-  my $values = $validation->all_params('foo');
-
-Access all validated parameters with the same name, similar to
-L<Mojolicious::Controller/"all_params">. To access only one value you can also
-use L</"param">.
-
-  # Get first value
-  my $first = $validation->all_params('foo')->[0];
-
 =head2 check
 
   $validation = $validation->check('size', 2, 7);
@@ -199,6 +188,17 @@ Get or set details for failed validation check, at any given time there can
 only be one per field.
 
   my ($check, $result, @args) = @{$validation->error('foo')};
+
+=head2 every_param
+
+  my $values = $validation->every_param('foo');
+
+Access all validated parameters with the same name, similar to
+L<Mojolicious::Controller/"every_param">. To access only one value you can
+also use L</"param">.
+
+  # Get first value
+  my $first = $validation->every_param('foo')->[0];
 
 =head2 has_data
 
@@ -234,7 +234,7 @@ Change validation L</"topic">.
   my ($foo, $bar) = $validation->param(['foo', 'bar']);
 
 Access validated parameters, similar to L<Mojolicious::Controller/"param">. To
-access more than one value you can also use L</"all_params">.
+access more than one value you can also use L</"every_param">.
 
 =head2 required
 

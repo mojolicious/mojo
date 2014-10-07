@@ -474,13 +474,13 @@ Oops!
 % my ($one, $three) = $c->cookie([qw(unsigned1 unsigned2)]);
 %= $one // ''
 %= $three // '';
-% my $unsigned1 = $c->all_cookies('unsigned1');
+% my $unsigned1 = $c->every_cookie('unsigned1');
 %= $unsigned1->[0] // ''
 %= $unsigned1->[1] // ''
 % my ($four, $six) = $c->signed_cookie([qw(signed1 signed2)]);
 %= $four // ''
 %= $six // '';
-% my $signed1 = $c->all_signed_cookies('signed1');
+% my $signed1 = $c->every_signed_cookie('signed1');
 %= $signed1->[0] // ''
 %= $signed1->[1] // ''
 

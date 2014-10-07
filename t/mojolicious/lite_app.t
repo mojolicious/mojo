@@ -97,7 +97,7 @@ any sub { shift->render(text => 'Bye!') };
 
 post '/multipart/form' => sub {
   my $c    = shift;
-  my $test = $c->all_params('test');
+  my $test = $c->every_param('test');
   $c->render(text => join "\n", @$test);
 };
 

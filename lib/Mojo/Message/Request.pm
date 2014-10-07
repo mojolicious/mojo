@@ -16,8 +16,6 @@ my $START_LINE_RE = qr/
   \s+HTTP\/(\d\.\d)$                                        # Version
 /x;
 
-sub all_params { shift->params->all_params(@_) }
-
 sub clone {
   my $self = shift;
 
@@ -52,6 +50,8 @@ sub cookies {
 
   return $self;
 }
+
+sub every_param { shift->params->every_param(@_) }
 
 sub extract_start_line {
   my ($self, $bufref) = @_;
@@ -339,21 +339,6 @@ Request has been performed through a reverse proxy.
 L<Mojo::Message::Request> inherits all methods from L<Mojo::Message> and
 implements the following new ones.
 
-=head2 all_params
-
-  my $values = $req->all_params('foo');
-
-Access all C<GET> and C<POST> parameters with the same name extracted from the
-query string and C<application/x-www-form-urlencoded> or
-C<multipart/form-data> message body. To access only one value you can also use
-L</"param">. Note that this method caches all data, so it should not be called
-before the entire request body has been received. Parts of the request body
-need to be loaded into memory to parse C<POST> parameters, so you have to make
-sure it is not excessively large, there's a 10MB limit by default.
-
-  # Get first value
-  say $req->all_params('foo')->[0];
-
 =head2 clone
 
   my $clone = $req->clone;
@@ -367,6 +352,21 @@ Clone request if possible, otherwise return C<undef>.
   $req        = $req->cookies({name => 'foo', value => 'bar'});
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
+
+=head2 every_param
+
+  my $values = $req->every_param('foo');
+
+Access all C<GET> and C<POST> parameters with the same name extracted from the
+query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body. To access only one value you can also use
+L</"param">. Note that this method caches all data, so it should not be called
+before the entire request body has been received. Parts of the request body
+need to be loaded into memory to parse C<POST> parameters, so you have to make
+sure it is not excessively large, there's a 10MB limit by default.
+
+  # Get first value
+  say $req->every_param('foo')->[0];
 
 =head2 extract_start_line
 
@@ -412,7 +412,7 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
 Access C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
-To access more than one value you can also use L</"all_params">. Note that
+To access more than one value you can also use L</"every_param">. Note that
 this method caches all data, so it should not be called before the entire
 request body has been received. Parts of the request body need to be loaded
 into memory to parse C<POST> parameters, so you have to make sure it is not

@@ -10,8 +10,6 @@ use Mojo::Util qw(decode encode url_escape url_unescape);
 
 has charset => 'UTF-8';
 
-sub all_params { shift->_param(@_) }
-
 sub append {
   my $self = shift;
 
@@ -38,6 +36,8 @@ sub clone {
 
   return $clone;
 }
+
+sub every_param { shift->_param(@_) }
 
 sub merge {
   my $self = shift;
@@ -229,16 +229,6 @@ Charset used for encoding and decoding parameters, defaults to C<UTF-8>.
 L<Mojo::Parameters> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 all_params
-
-  my $values = $params->all_params('foo');
-
-Access all parameter values with the same name. To access only one value you
-can also use L</"param">. Note that this method will normalize the parameters.
-
-  # Get first value
-  say $params->all_params('foo')->[0];
-
 =head2 append
 
   $params = $params->append(foo => 'ba&r');
@@ -261,6 +251,16 @@ Append parameters. Note that this method will normalize the parameters.
   my $params2 = $params->clone;
 
 Clone parameters.
+
+=head2 every_param
+
+  my $values = $params->every_param('foo');
+
+Access all parameter values with the same name. To access only one value you
+can also use L</"param">. Note that this method will normalize the parameters.
+
+  # Get first value
+  say $params->every_param('foo')->[0];
 
 =head2 merge
 
@@ -290,7 +290,7 @@ necessary.
   $params         = $params->param(foo => ['ba;r', 'baz']);
 
 Access parameter values. To access more than one value you can also use
-L</"all_params">. Note that this method will normalize the parameters.
+L</"every_param">. Note that this method will normalize the parameters.
 
 =head2 params
 

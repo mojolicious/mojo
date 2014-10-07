@@ -193,9 +193,8 @@ only be one per field.
 
   my $values = $validation->every_param('foo');
 
-Access all validated parameters with the same name, similar to
-L<Mojolicious::Controller/"every_param">. To access only one value you can
-also use L</"param">.
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference.
 
   # Get first value
   my $first = $validation->every_param('foo')->[0];
@@ -233,8 +232,8 @@ Change validation L</"topic">.
   my $value       = $validation->param('foo');
   my ($foo, $bar) = $validation->param(['foo', 'bar']);
 
-Access validated parameters, similar to L<Mojolicious::Controller/"param">. To
-access more than one value you can also use L</"every_param">.
+Access validated parameters. To access multiple values sharing the same name
+you can also use L</"every_param">.
 
 =head2 required
 

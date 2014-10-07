@@ -256,8 +256,8 @@ Clone parameters.
 
   my $values = $params->every_param('foo');
 
-Access all parameter values with the same name. To access only one value you
-can also use L</"param">. Note that this method will normalize the parameters.
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference. Note that this method will normalize the parameters.
 
   # Get first value
   say $params->every_param('foo')->[0];
@@ -289,8 +289,9 @@ necessary.
   $params         = $params->param(foo => qw(ba&r baz));
   $params         = $params->param(foo => ['ba;r', 'baz']);
 
-Access parameter values. To access more than one value you can also use
-L</"every_param">. Note that this method will normalize the parameters.
+Access parameter values. To access multiple values sharing the same name you
+can also use L</"every_param">. Note that this method will normalize the
+parameters.
 
 =head2 params
 

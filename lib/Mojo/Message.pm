@@ -461,9 +461,9 @@ Render start line.
   my ($foo, $bar) = $msg->cookie(['foo', 'bar']);
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
-L<Mojo::Cookie::Response> objects. To access more than one cookie you can also
-use L</"every_cookie">. Note that this method caches all data, so it should
-not be called before all headers have been received.
+L<Mojo::Cookie::Response> objects. To access multiple cookies sharing the same
+name you can also use L</"every_cookie">. Note that this method caches all
+data, so it should not be called before all headers have been received.
 
   # Get cookie value
   say $msg->cookie('foo')->value;
@@ -505,10 +505,9 @@ error.
 
   my $cookies = $msg->every_cookie('foo');
 
-Access all message cookies with the same name, usually
-L<Mojo::Cookie::Request> or L<Mojo::Cookie::Response> objects. To access only
-one cookie you can also use L</"cookie">. Note that this method caches all
-data, so it should not be called before all headers have been received.
+Similar to L</"cookie">, but returns all message cookies sharing the same name
+as an array reference. Note that this method caches all data, so it should not
+be called before all headers have been received.
 
   # Get first cookie value
   say $msg->every_cookie('foo')->[0]->value;
@@ -517,9 +516,8 @@ data, so it should not be called before all headers have been received.
 
   my $uploads = $msg->every_upload('foo');
 
-Access all C<multipart/form-data> file uploads with the same name, usually
-L<Mojo::Upload> objects. To access only one upload you can also use
-L</"upload">. Note that this method caches all data, so it should not be
+Similar to L</"upload">, but returns all file uploads sharing the same name as
+an array reference. Note that this method caches all data, so it should not be
 called before the entire message body has been received.
 
   # Get content of first uploaded file
@@ -634,9 +632,9 @@ Render whole message.
   my ($foo, $bar) = $msg->upload(['foo', 'bar']);
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
-To access more than one upload you can also use L</"every_upload">. Note that
-this method caches all data, so it should not be called before the entire
-message body has been received.
+To access multiple uploads sharing the same name you can also use
+L</"every_upload">. Note that this method caches all data, so it should not be
+called before the entire message body has been received.
 
   # Get content of uploaded file
   say $msg->upload('foo')->asset->slurp;

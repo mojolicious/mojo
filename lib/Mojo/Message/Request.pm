@@ -357,13 +357,11 @@ Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
   my $values = $req->every_param('foo');
 
-Access all C<GET> and C<POST> parameters with the same name extracted from the
-query string and C<application/x-www-form-urlencoded> or
-C<multipart/form-data> message body. To access only one value you can also use
-L</"param">. Note that this method caches all data, so it should not be called
-before the entire request body has been received. Parts of the request body
-need to be loaded into memory to parse C<POST> parameters, so you have to make
-sure it is not excessively large, there's a 10MB limit by default.
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference. Note that this method caches all data, so it should not be
+called before the entire request body has been received. Parts of the request
+body need to be loaded into memory to parse C<POST> parameters, so you have to
+make sure it is not excessively large, there's a 10MB limit by default.
 
   # Get first value
   say $req->every_param('foo')->[0];
@@ -412,11 +410,11 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
 Access C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
-To access more than one value you can also use L</"every_param">. Note that
-this method caches all data, so it should not be called before the entire
-request body has been received. Parts of the request body need to be loaded
-into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large, there's a 10MB limit by default.
+To access multiple values sharing the same name you can also use
+L</"every_param">. Note that this method caches all data, so it should not be
+called before the entire request body has been received. Parts of the request
+body need to be loaded into memory to parse C<POST> parameters, so you have to
+make sure it is not excessively large, there's a 10MB limit by default.
 
 =head2 params
 

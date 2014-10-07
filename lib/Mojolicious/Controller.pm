@@ -94,6 +94,8 @@ sub flash {
 
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 
+sub multi_signed_cookie { _signed_cookie(@_) }
+
 sub on {
   my ($self, $name, $cb) = @_;
   my $tx = $self->tx;
@@ -285,31 +287,7 @@ sub signed_cookie {
     "$value--" . Mojo::Util::hmac_sha1_sum($value, $secrets->[0]), $options)
     if defined $value;
 
-  # Request cookies
-  my @results;
-  for my $value ($self->cookie($name)) {
-
-    # Check signature with rotating secrets
-    if ($value =~ s/--([^\-]+)$//) {
-      my $signature = $1;
-
-      my $valid;
-      for my $secret (@$secrets) {
-        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
-        ++$valid and last if Mojo::Util::secure_compare($signature, $check);
-      }
-      if ($valid) { push @results, $value }
-
-      else {
-        $self->app->log->debug(
-          qq{Bad signed cookie "$name", possible hacking attempt.});
-      }
-    }
-
-    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
-  }
-
-  return wantarray ? @results : $results[0];
+  return _signed_cookie($self, $name)->[0];
 }
 
 sub stash { Mojo::Util::_stash(stash => @_) }
@@ -382,6 +360,36 @@ sub write_chunk {
   my $content = $self->res->content;
   $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
+}
+
+sub _signed_cookie {
+  my ($self, $name) = @_;
+
+  my $secrets = $self->stash->{'mojo.secrets'};
+  my @results;
+  for my $value ($self->cookie($name)) {
+
+    # Check signature with rotating secrets
+    if ($value =~ s/--([^\-]+)$//) {
+      my $signature = $1;
+
+      my $valid;
+      for my $secret (@$secrets) {
+        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
+        ++$valid and last if Mojo::Util::secure_compare($signature, $check);
+      }
+      if ($valid) { push @results, $value }
+
+      else {
+        $self->app->log->debug(
+          qq{Bad signed cookie "$name", possible hacking attempt.});
+      }
+    }
+
+    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
+  }
+
+  return \@results;
 }
 
 1;
@@ -520,6 +528,12 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
   # Make sure to use the "title" helper and not the controller method
   $c->helpers->title('Welcome!');
+
+=head2 multi_signed_cookie
+
+  my $values = $c->multi_signed_cookie('foo');
+
+Access multiple signed request cookie values with the same name.
 
 =head2 on
 
@@ -839,8 +853,7 @@ on browser.
 
 =head2 signed_cookie
 
-  my $foo         = $c->signed_cookie('foo');
-  my @foo         = $c->signed_cookie('foo');
+  my $value       = $c->signed_cookie('foo');
   my ($foo, $bar) = $c->signed_cookie(['foo', 'bar']);
   $c              = $c->signed_cookie(foo => 'bar');
   $c              = $c->signed_cookie(foo => 'bar', {path => '/'});

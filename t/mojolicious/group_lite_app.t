@@ -480,9 +480,9 @@ Oops!
 % my ($four, $six) = $c->signed_cookie([qw(signed1 signed2)]);
 %= $four // ''
 %= $six // '';
-% my @signed1 = $c->signed_cookie('signed1');
-%= $signed1[0] // ''
-%= $signed1[1] // ''
+% my $signed1 = $c->multi_signed_cookie('signed1');
+%= $signed1->[0] // ''
+%= $signed1->[1] // ''
 
 @@ param_auth.html.epl
 Bender!

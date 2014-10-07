@@ -496,7 +496,7 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
-  my $cookie      = $c->cookie('foo');
+  my $value       = $c->cookie('foo');
   my ($foo, $bar) = $c->cookie(['foo', 'bar']);
   $c              = $c->cookie(foo => 'bar');
   $c              = $c->cookie(foo => 'bar', {path => '/'});
@@ -509,7 +509,7 @@ than one cookie you can also use L</"every_cookie">.
 
 =head2 every_cookie
 
-  my $cookies = $c->every_cookie('foo');
+  my $values = $c->every_cookie('foo');
 
 Access all request cookie values with the same name. To access only one cookie
 you can also use L</"cookie">.
@@ -534,13 +534,13 @@ excessively large, there's a 10MB limit by default.
 
 =head2 every_signed_cookie
 
-  my $cookies = $c->every_signed_cookie('foo');
+  my $values = $c->every_signed_cookie('foo');
 
 Access all signed request cookie values with the same name. To access only one
 signed cookie you can also use L</"signed_cookie">.
 
   # Get first signed cookie value
-  my $first = $c->every_signed_cookie('foo')->[0]->value;
+  my $first = $c->every_signed_cookie('foo')->[0];
 
 =head2 finish
 
@@ -883,7 +883,7 @@ on browser.
 
 =head2 signed_cookie
 
-  my $cookie      = $c->signed_cookie('foo');
+  my $value       = $c->signed_cookie('foo');
   my ($foo, $bar) = $c->signed_cookie(['foo', 'bar']);
   $c              = $c->signed_cookie(foo => 'bar');
   $c              = $c->signed_cookie(foo => 'bar', {path => '/'});

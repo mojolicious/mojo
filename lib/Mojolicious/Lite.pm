@@ -144,7 +144,7 @@ Your application will automatically reload itself if you start it with the
 C<morbo> development web server, so you don't have to restart the server after
 every change.
 
-  $ morbo myapp.pl
+  $ morbo ./myapp.pl
   Server available at http://127.0.0.1:3000.
 
 For more information about how to deploy your application see also

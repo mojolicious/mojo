@@ -85,7 +85,7 @@ It is basically a restarter that forks a new L<Mojo::Server::Daemon> web
 server whenever a file in your project changes, and should therefore only be
 used during development.
 
-  $ morbo script/myapp
+  $ morbo ./script/myapp
   Server available at http://127.0.0.1:3000.
 
 =head2 Hypnotoad
@@ -105,7 +105,7 @@ It is based on the L<Mojo::Server::Prefork> web server, which adds preforking
 to L<Mojo::Server::Daemon>, but optimized specifically for production
 environments out of the box.
 
-  $ hypnotoad script/myapp
+  $ hypnotoad ./script/myapp
   Server available at http://127.0.0.1:8080.
 
 It automatically sets the operating mode to C<production> and you can tweak
@@ -136,7 +136,7 @@ software upgrades (hot deployment). That means you can upgrade L<Mojolicious>,
 Perl or even system libraries at runtime without ever stopping the server or
 losing a single incoming connection, just by running the command above again.
 
-  $ hypnotoad script/myapp
+  $ hypnotoad ./script/myapp
   Starting hot deployment for Hypnotoad server 31841.
 
 You might also want to enable proxy support if you're using Hypnotoad behind a

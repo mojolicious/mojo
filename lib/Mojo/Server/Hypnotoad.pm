@@ -160,12 +160,12 @@ To start applications with it you can use the L<hypnotoad> script, for
 L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
 C<production> mode.
 
-  $ hypnotoad myapp.pl
+  $ hypnotoad ./myapp.pl
   Server available at http://127.0.0.1:8080.
 
 You can run the same command again for automatic hot deployment.
 
-  $ hypnotoad myapp.pl
+  $ hypnotoad ./myapp.pl
   Starting hot deployment for Hypnotoad server 31841.
 
 This second invocation will load the application again, detect the process id

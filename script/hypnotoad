@@ -33,9 +33,9 @@ hypnotoad - Hypnotoad HTTP and WebSocket server
 
   Usage: hypnotoad [OPTIONS] [APPLICATION]
 
-    hypnotoad script/myapp
-    hypnotoad myapp.pl
-    hypnotoad -f myapp.pl
+    hypnotoad ./script/myapp
+    hypnotoad ./myapp.pl
+    hypnotoad -f ./myapp.pl
 
   Options:
     -f, --foreground   Keep manager process in foreground.

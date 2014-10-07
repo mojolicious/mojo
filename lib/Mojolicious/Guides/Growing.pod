@@ -197,7 +197,7 @@ This will be the foundation for our login manager example application.
 The built-in development web server makes working on your application a lot of
 fun thanks to automatic reloading.
 
-  $ morbo myapp.pl
+  $ morbo ./myapp.pl
   Server available at http://127.0.0.1:3000.
 
 Just save your changes and they will be automatically in effect the next time

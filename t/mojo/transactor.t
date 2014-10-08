@@ -151,12 +151,14 @@ is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $tx->req->body, 'test=12345678912', 'right content';
 
-# UTF-8 form with header
-$tx = $t->tx(POST => 'http://example.com/foo' => {Accept => '*/*'} => form =>
+# UTF-8 form with header and custom content type
+$tx
+  = $t->tx(POST => 'http://example.com/foo' =>
+    {Accept => '*/*', 'Content-Type' => 'application/mojo-form'} => form =>
     {test => 123} => charset => 'UTF-8');
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
+is $tx->req->headers->content_type, 'application/mojo-form',
   'right "Content-Type" value';
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'test=123', 'right content';
@@ -218,12 +220,14 @@ ok !$tx->req->content->parts->[0]->headers->header('file'), 'no "file" header';
 is $tx->req->content->parts->[0]->headers->dnt, 1, 'right "DNT" header';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
-# Multipart form with asset
-$tx = $t->tx(POST => 'http://example.com/foo' => form =>
+# Multipart form with asset and custom content type
+$tx
+  = $t->tx(POST => 'http://example.com/foo' =>
+    {'Content-Type' => 'multipart/mojo-form'} => form =>
     {mytext => {file => Mojo::Asset::File->new(path => $path)}});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->headers->content_type, 'multipart/form-data',
+is $tx->req->headers->content_type, 'multipart/mojo-form',
   'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/"mytext"/, 'right "Content-Disposition" value';

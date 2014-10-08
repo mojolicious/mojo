@@ -1,5 +1,19 @@
 
+5.49  2014-10-09
+  - Improved form content generator to allow custom content types.
+
 5.48  2014-10-07
+  - Emergency release for a serious security issue that can result in
+    parameter injection attacks, everybody should update!
+    Breaking change: Methods that previously worked differently in scalar than
+    in list context now always assume scalar context, and new methods have
+    been added to cover the list context functionality.
+  - Added every_cookie and every_upload methods to Mojo::Message.
+  - Added every_param method to Mojo::Message::Request.
+  - Added every_param method to Mojo::Parameters.
+  - Added every_cookie, every_param and every_signed_cookie methods to
+    Mojolicious::Controller.
+  - Added every_param method to Mojolicious::Validator::Validation.
   - Added from_json and to_json functions to Mojo::JSON.
   - Improved pluck method in Mojo::Collection to be able to extract values
     from hash references.

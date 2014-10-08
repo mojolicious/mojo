@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Tiger Face';
-our $VERSION  = '5.48';
+our $VERSION  = '5.49';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -158,7 +158,8 @@ sub new {
   my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
 
   # Hide controller attributes/methods and "handler"
-  $r->hide(qw(app continue cookie finish flash handler helpers match on));
+  $r->hide(qw(app continue cookie every_cookie every_param));
+  $r->hide(qw(every_signed_cookie finish flash handler helpers match on));
   $r->hide(qw(param redirect_to render render_exception render_later));
   $r->hide(qw(render_maybe render_not_found render_to_string rendered req));
   $r->hide(qw(res respond_to send session signed_cookie stash tx url_for));

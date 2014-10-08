@@ -97,8 +97,8 @@ any sub { shift->render(text => 'Bye!') };
 
 post '/multipart/form' => sub {
   my $c    = shift;
-  my @test = $c->param('test');
-  $c->render(text => join "\n", @test);
+  my $test = $c->every_param('test');
+  $c->render(text => join "\n", @$test);
 };
 
 get '/auto_name' => sub {
@@ -599,7 +599,7 @@ $t->get_ok('/multi/B?foo=A&baz=C')->status_is(200)
 # Injection attack
 $t->get_ok('/multi/B?foo=A&foo=E&baz=C&yada=D&yada=text&yada=fail')
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('ABC');
+  ->content_is('EBC');
 
 # Missing parameter
 $t->get_ok('/multi/B?baz=C')->status_is(200)

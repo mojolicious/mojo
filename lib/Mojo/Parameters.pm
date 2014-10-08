@@ -37,6 +37,8 @@ sub clone {
   return $clone;
 }
 
+sub every_param { shift->_param(@_) }
+
 sub merge {
   my $self = shift;
   push @{$self->params}, @{$_->params} for @_;
@@ -52,20 +54,14 @@ sub param {
   return sort keys %{$self->to_hash} unless $name;
 
   # Multiple names
-  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
+
+  # Last value
+  return $self->_param($name)->[-1] unless @_;
 
   # Replace values
   $self->remove($name) if defined $_[0];
-  return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]) if @_;
-
-  # List values
-  my @values;
-  my $params = $self->params;
-  for (my $i = 0; $i < @$params; $i += 2) {
-    push @values, $params->[$i + 1] if $params->[$i] eq $name;
-  }
-
-  return wantarray ? @values : $values[0];
+  return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]);
 }
 
 sub params {
@@ -175,6 +171,18 @@ sub to_string {
   return join '&', @pairs;
 }
 
+sub _param {
+  my ($self, $name) = @_;
+
+  my @values;
+  my $params = $self->params;
+  for (my $i = 0; $i < @$params; $i += 2) {
+    push @values, $params->[$i + 1] if $params->[$i] eq $name;
+  }
+
+  return \@values;
+}
+
 1;
 
 =encoding utf8
@@ -244,6 +252,16 @@ Append parameters. Note that this method will normalize the parameters.
 
 Clone parameters.
 
+=head2 every_param
+
+  my $values = $params->every_param('foo');
+
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference. Note that this method will normalize the parameters.
+
+  # Get first value
+  say $params->every_param('foo')->[0];
+
 =head2 merge
 
   $params = $params->merge(Mojo::Parameters->new(foo => 'b&ar', baz => 23));
@@ -265,18 +283,15 @@ necessary.
 =head2 param
 
   my @names       = $params->param;
-  my $foo         = $params->param('foo');
-  my @foo         = $params->param('foo');
+  my $value       = $params->param('foo');
   my ($foo, $bar) = $params->param(['foo', 'bar']);
   $params         = $params->param(foo => 'ba&r');
   $params         = $params->param(foo => qw(ba&r baz));
   $params         = $params->param(foo => ['ba;r', 'baz']);
 
-Check and replace parameter value. Be aware that if you request a parameter by
-name in scalar context, you will receive only the I<first> value for that
-parameter, if there are multiple values for that name. In list context you
-will receive I<all> of the values for that name. Note that this method will
-normalize the parameters.
+Access parameter values. To access multiple values sharing the same name you
+can also use L</"every_param">. Note that this method will normalize the
+parameters.
 
 =head2 params
 

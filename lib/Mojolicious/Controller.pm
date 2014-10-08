@@ -42,7 +42,7 @@ sub cookie {
   my ($self, $name) = (shift, shift);
 
   # Multiple names
-  return map { scalar $self->cookie($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->cookie($_) } @$name if ref $name eq 'ARRAY';
 
   # Response cookie
   if (@_) {
@@ -57,10 +57,17 @@ sub cookie {
   }
 
   # Request cookies
-  return map { $_->value } $self->req->cookie($name) if wantarray;
   return undef unless my $cookie = $self->req->cookie($name);
   return $cookie->value;
 }
+
+sub every_cookie {
+  [map { $_->value } @{shift->req->every_cookie(shift)}];
+}
+
+sub every_param { _param(@_) }
+
+sub every_signed_cookie { _signed_cookie(@_) }
 
 sub finish {
   my $self = shift;
@@ -105,7 +112,7 @@ sub param {
   my ($self, $name) = (shift, shift);
 
   # Multiple names
-  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # List names
   my $captures = $self->stash->{'mojo.captures'} ||= {};
@@ -118,22 +125,12 @@ sub param {
     return sort @keys;
   }
 
+  # Value
+  return _param($self, $name)->[-1] unless @_;
+
   # Override values
-  if (@_) {
-    $captures->{$name} = @_ > 1 ? [@_] : $_[0];
-    return $self;
-  }
-
-  # Captured unreserved values
-  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
-    return ref $value eq 'ARRAY' ? wantarray ? @$value : $$value[0] : $value;
-  }
-
-  # Uploads
-  return $req->upload($name) if $req->upload($name);
-
-  # Param values
-  return $req->param($name);
+  $captures->{$name} = @_ > 1 ? [@_] : $_[0];
+  return $self;
 }
 
 sub redirect_to {
@@ -276,40 +273,15 @@ sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
 
   # Multiple names
-  return map { scalar $self->signed_cookie($_) } @$name
-    if ref $name eq 'ARRAY';
+  return map { $self->signed_cookie($_) } @$name if ref $name eq 'ARRAY';
+
+  # Request cookie
+  return _signed_cookie($self, $name)->[-1] unless defined $value;
 
   # Response cookie
-  my $secrets = $self->stash->{'mojo.secrets'};
-  return $self->cookie($name,
-    "$value--" . Mojo::Util::hmac_sha1_sum($value, $secrets->[0]), $options)
-    if defined $value;
-
-  # Request cookies
-  my @results;
-  for my $value ($self->cookie($name)) {
-
-    # Check signature with rotating secrets
-    if ($value =~ s/--([^\-]+)$//) {
-      my $signature = $1;
-
-      my $valid;
-      for my $secret (@$secrets) {
-        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
-        ++$valid and last if Mojo::Util::secure_compare($signature, $check);
-      }
-      if ($valid) { push @results, $value }
-
-      else {
-        $self->app->log->debug(
-          qq{Bad signed cookie "$name", possible hacking attempt.});
-      }
-    }
-
-    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
-  }
-
-  return wantarray ? @results : $results[0];
+  my $checksum
+    = Mojo::Util::hmac_sha1_sum($value, $self->stash->{'mojo.secrets'}[0]);
+  return $self->cookie($name, "$value--$checksum", $options);
 }
 
 sub stash { Mojo::Util::_stash(stash => @_) }
@@ -382,6 +354,48 @@ sub write_chunk {
   my $content = $self->res->content;
   $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
+}
+
+sub _param {
+  my ($self, $name) = @_;
+
+  # Captured unreserved values
+  my $captures = $self->stash->{'mojo.captures'} ||= {};
+  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
+    return ref $value eq 'ARRAY' ? $value : [$value];
+  }
+
+  # Uploads or param values
+  my $req     = $self->req;
+  my $uploads = $req->every_upload($name);
+  return @$uploads ? $uploads : $req->every_param($name);
+}
+
+sub _signed_cookie {
+  my ($self, $name) = @_;
+
+  my $secrets = $self->stash->{'mojo.secrets'};
+  my @results;
+  for my $value (@{$self->every_cookie($name)}) {
+
+    # Check signature with rotating secrets
+    if ($value =~ s/--([^\-]+)$//) {
+      my $signature = $1;
+
+      my $valid;
+      for my $secret (@$secrets) {
+        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
+        ++$valid and last if Mojo::Util::secure_compare($signature, $check);
+      }
+      if ($valid) { push @results, $value }
+
+      else { $self->app->log->debug(qq{Cookie "$name" has bad signature.}) }
+    }
+
+    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
+  }
+
+  return \@results;
 }
 
 1;
@@ -477,16 +491,46 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
-  my $foo         = $c->cookie('foo');
-  my @foo         = $c->cookie('foo');
+  my $value       = $c->cookie('foo');
   my ($foo, $bar) = $c->cookie(['foo', 'bar']);
   $c              = $c->cookie(foo => 'bar');
   $c              = $c->cookie(foo => 'bar', {path => '/'});
 
-Access request cookie values and create new response cookies.
+Access request cookie values and create new response cookies. To access
+multiple values sharing the same name you can also use L</"every_cookie">.
 
   # Create response cookie with domain and expiration date
   $c->cookie(user => 'sri', {domain => 'example.com', expires => time + 60});
+
+=head2 every_cookie
+
+  my $values = $c->every_cookie('foo');
+
+Similar to L</"cookie">, but returns all request cookie values sharing the
+same name as an array reference.
+
+  $ Get first cookie value
+  my $first = $c->every_cookie('foo')->[0];
+
+=head2 every_param
+
+  my $values = $c->every_param('foo');
+
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference.
+
+  # Get first value
+  my $first = $c->every_param('foo')->[0];
+
+=head2 every_signed_cookie
+
+  my $values = $c->every_signed_cookie('foo');
+
+Similar to L</"signed_cookie">, but returns all signed request cookie values
+sharing the same name as an array reference.
+
+  # Get first signed cookie value
+  my $first = $c->every_signed_cookie('foo')->[0];
 
 =head2 finish
 
@@ -558,8 +602,7 @@ status.
 =head2 param
 
   my @names       = $c->param;
-  my $foo         = $c->param('foo');
-  my @foo         = $c->param('foo');
+  my $value       = $c->param('foo');
   my ($foo, $bar) = $c->param(['foo', 'bar']);
   $c              = $c->param(foo => 'ba;r');
   $c              = $c->param(foo => qw(ba;r baz));
@@ -568,22 +611,13 @@ status.
 Access route placeholder values that are not reserved stash values, file
 uploads as well as C<GET> and C<POST> parameters extracted from the query
 string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
-message body, in that order. Note that this method is context sensitive in
-some cases and therefore needs to be used with care, there can always be
-multiple values, which might have unexpected consequences. Parts of the
-request body need to be loaded into memory to parse C<POST> parameters, so you
-have to make sure it is not excessively large, there's a 10MB limit by
-default.
+message body, in that order. To access multiple values sharing the same name
+you can also use L</"every_param">. Parts of the request body need to be
+loaded into memory to parse C<POST> parameters, so you have to make sure it is
+not excessively large, there's a 10MB limit by default.
 
-  # List context is ambiguous and should be avoided, you can get multiple
-  # values returned for a query string like "?foo=bar&foo=baz&foo=yada"
-  my $hash = {foo => $c->param('foo')};
-
-  # Better enforce scalar context
-  my $hash = {foo => scalar $c->param('foo')};
-
-  # The multi-name form can also be used to enforce a list with one element
-  my $hash = {foo => $c->param(['foo'])};
+  # Get first value
+  my $first = $c->every_param('foo')->[0];
 
 For more control you can also access request information directly.
 
@@ -839,15 +873,15 @@ on browser.
 
 =head2 signed_cookie
 
-  my $foo         = $c->signed_cookie('foo');
-  my @foo         = $c->signed_cookie('foo');
+  my $value       = $c->signed_cookie('foo');
   my ($foo, $bar) = $c->signed_cookie(['foo', 'bar']);
   $c              = $c->signed_cookie(foo => 'bar');
   $c              = $c->signed_cookie(foo => 'bar', {path => '/'});
 
-Access signed request cookie values and create new signed response cookies.
-Cookies failing HMAC-SHA1 signature verification will be automatically
-discarded.
+Access signed request cookie values and create new signed response cookies. To
+access multiple values sharing the same name you can also use
+L</"every_signed_cookie">. Cookies failing HMAC-SHA1 signature verification
+will be automatically discarded.
 
 =head2 stash
 

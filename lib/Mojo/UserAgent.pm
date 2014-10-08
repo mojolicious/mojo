@@ -812,8 +812,9 @@ implied). You can also append a callback to perform requests non-blocking.
 
   my $tx = $ua->start(Mojo::Transaction::HTTP->new);
 
-Perform blocking request. You can also append a callback to perform requests
-non-blocking.
+Perform blocking request for a custom L<Mojo::Transaction::HTTP> object, which
+can be prepared manually or with L</"build_tx">. You can also append a
+callback to perform requests non-blocking.
 
   my $tx = $ua->build_tx(GET => 'http://example.com');
   $ua->start($tx => sub {

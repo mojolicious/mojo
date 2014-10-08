@@ -587,12 +587,12 @@ is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
 is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
-is_deeply [$req->param('foo')], [qw(bar bar 13)], 'right values';
+is_deeply $req->every_param('foo'),     [qw(bar bar 13)], 'right values';
 is $req->param(' tset'), '23 ', 'right value';
 $req->param('set', 'single');
 is $req->param('set'), 'single', 'setting single param works';
 $req->param('multi', 1, 2, 3);
-is_deeply [$req->param('multi')], [qw(1 2 3)],
+is_deeply $req->every_param('multi'), [qw(1 2 3)],
   'setting multiple value param works';
 is $req->param('test23'), undef, 'no value';
 
@@ -1587,10 +1587,11 @@ is $req2->headers->cookie, 'foo=bar; foo=baz; foo=yada; bar=foo',
   'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is_deeply [map { $_->value } $req2->cookie('foo')], [qw(bar baz yada)],
+is_deeply [map { $_->value } @{$req2->every_cookie('foo')}],
+  [qw(bar baz yada)], 'right values';
+is_deeply [map { $_->value } @{$req2->every_cookie('bar')}], ['foo'],
   'right values';
-is_deeply [map { $_->value } $req2->cookie('bar')], ['foo'], 'right values';
-is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(bar foo)],
+is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(yada foo)],
   'right values';
 
 # Parse full HTTP 1.0 request with cookies and progress callback

@@ -206,7 +206,7 @@ $t->get_ok('/multi')->status_is(200)
 # Multiple cookies with same name (again)
 $t->get_ok('/multi')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("one\nthree\none\ntwo\nfour\nsix\nfour\nfive\n");
+  ->content_is("two\nthree\none\ntwo\nfive\nsix\nfour\nfive\n");
 
 # Missing action behind bridge
 $t->get_ok('/missing')->status_is(404)->content_is("Oops!\n");
@@ -274,9 +274,8 @@ $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
   "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
-like $log, qr/Cookie "foo" not signed\./, 'right message';
-like $log, qr/Bad signed cookie "bad", possible hacking attempt\./,
-  'right message';
+like $log, qr/Cookie "foo" not signed\./,        'right message';
+like $log, qr/Cookie "bad" has bad signature\./, 'right message';
 ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
 $t->app->log->unsubscribe(message => $cb);
@@ -474,15 +473,15 @@ Oops!
 % my ($one, $three) = $c->cookie([qw(unsigned1 unsigned2)]);
 %= $one // ''
 %= $three // '';
-% my @unsigned1 = $c->cookie('unsigned1');
-%= $unsigned1[0] // ''
-%= $unsigned1[1] // ''
+% my $unsigned1 = $c->every_cookie('unsigned1');
+%= $unsigned1->[0] // ''
+%= $unsigned1->[1] // ''
 % my ($four, $six) = $c->signed_cookie([qw(signed1 signed2)]);
 %= $four // ''
 %= $six // '';
-% my @signed1 = $c->signed_cookie('signed1');
-%= $signed1[0] // ''
-%= $signed1[1] // ''
+% my $signed1 = $c->every_signed_cookie('signed1');
+%= $signed1->[0] // ''
+%= $signed1->[1] // ''
 
 @@ param_auth.html.epl
 Bender!

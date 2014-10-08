@@ -61,7 +61,7 @@ sub build_body       { shift->_build('get_body_chunk') }
 sub build_headers    { shift->_build('get_header_chunk') }
 sub build_start_line { shift->_build('get_start_line_chunk') }
 
-sub cookie { shift->_cache(cookie => @_) }
+sub cookie { shift->_cache('cookie', 0, @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
@@ -78,6 +78,9 @@ sub error {
   $self->{error} = shift;
   return $self->finish;
 }
+
+sub every_cookie { shift->_cache('cookie', 1, @_) }
+sub every_upload { shift->_cache('upload', 1, @_) }
 
 sub extract_start_line {
   croak 'Method "extract_start_line" not implemented by subclass';
@@ -139,8 +142,6 @@ sub json {
   return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
 
-sub param { shift->body_params->param(@_) }
-
 sub parse {
   my ($self, $chunk) = @_;
 
@@ -194,7 +195,7 @@ sub to_string {
   return $self->build_start_line . $self->build_headers . $self->build_body;
 }
 
-sub upload { shift->_cache(upload => @_) }
+sub upload { shift->_cache('upload', 0, @_) }
 
 sub uploads {
   my $self = shift;
@@ -234,10 +235,10 @@ sub _build {
 }
 
 sub _cache {
-  my ($self, $method, $name) = @_;
+  my ($self, $method, $all, $name) = @_;
 
   # Multiple names
-  return map { scalar $self->$method($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->$method($_) } @$name if ref $name eq 'ARRAY';
 
   # Cache objects by name
   $method .= 's';
@@ -246,8 +247,8 @@ sub _cache {
     push @{$self->{$method}{$_->name}}, $_ for @{$self->$method};
   }
 
-  return unless my $objects = $self->{$method}{$name};
-  return wantarray ? @$objects : $objects->[0];
+  my $objects = $self->{$method}{$name} || [];
+  return $all ? $objects : $objects->[-1];
 }
 
 sub _limit {
@@ -456,13 +457,13 @@ Render start line.
 
 =head2 cookie
 
-  my $foo         = $msg->cookie('foo');
-  my @foo         = $msg->cookie('foo');
+  my $cookie      = $msg->cookie('foo');
   my ($foo, $bar) = $msg->cookie(['foo', 'bar']);
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
-L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
-it should not be called before all headers have been received.
+L<Mojo::Cookie::Response> objects. To access multiple cookies sharing the same
+name you can also use L</"every_cookie">. Note that this method caches all
+data, so it should not be called before all headers have been received.
 
   # Get cookie value
   say $msg->cookie('foo')->value;
@@ -499,6 +500,26 @@ make sure it is not excessively large, there's a 10MB limit by default.
 
 Get or set message error, an C<undef> return value indicates that there is no
 error.
+
+=head2 every_cookie
+
+  my $cookies = $msg->every_cookie('foo');
+
+Similar to L</"cookie">, but returns all message cookies sharing the same name
+as an array reference.
+
+  # Get first cookie value
+  say $msg->every_cookie('foo')->[0]->value;
+
+=head2 every_upload
+
+  my $uploads = $msg->every_upload('foo');
+
+Similar to L</"upload">, but returns all file uploads sharing the same name as
+an array reference.
+
+  # Get content of first uploaded file
+  say $msg->every_upload('foo')->[0]->asset->slurp;
 
 =head2 extract_start_line
 
@@ -578,20 +599,6 @@ sure it is not excessively large, there's a 10MB limit by default.
   say $msg->json->{foo}{bar}[23];
   say $msg->json('/foo/bar/23');
 
-=head2 param
-
-  my @names       = $msg->param;
-  my $foo         = $msg->param('foo');
-  my @foo         = $msg->param('foo');
-  my ($foo, $bar) = $msg->param(['foo', 'bar']);
-
-Access C<POST> parameters extracted from C<application/x-www-form-urlencoded>
-or C<multipart/form-data> message body. Note that this method caches all data,
-so it should not be called before the entire message body has been received.
-Parts of the message body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large, there's a
-10MB limit by default.
-
 =head2 parse
 
   $msg = $msg->parse('HTTP/1.1 200 OK...');
@@ -619,13 +626,13 @@ Render whole message.
 
 =head2 upload
 
-  my $foo         = $msg->upload('foo');
-  my @foo         = $msg->upload('foo');
+  my $upload      = $msg->upload('foo');
   my ($foo, $bar) = $msg->upload(['foo', 'bar']);
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
-Note that this method caches all data, so it should not be called before the
-entire message body has been received.
+To access multiple uploads sharing the same name you can also use
+L</"every_upload">. Note that this method caches all data, so it should not be
+called before the entire message body has been received.
 
   # Get content of uploaded file
   say $msg->upload('foo')->asset->slurp;

@@ -51,6 +51,8 @@ sub cookies {
   return $self;
 }
 
+sub every_param { shift->params->every_param(@_) }
+
 sub extract_start_line {
   my ($self, $bufref) = @_;
 
@@ -351,6 +353,16 @@ Clone request if possible, otherwise return C<undef>.
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
+=head2 every_param
+
+  my $values = $req->every_param('foo');
+
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference.
+
+  # Get first value
+  say $req->every_param('foo')->[0];
+
 =head2 extract_start_line
 
   my $bool = $req->extract_start_line(\$str);
@@ -390,16 +402,16 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 =head2 param
 
   my @names       = $req->param;
-  my $foo         = $req->param('foo');
-  my @foo         = $req->param('foo');
+  my $value       = $req->param('foo');
   my ($foo, $bar) = $req->param(['foo', 'bar']);
 
 Access C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
-Note that this method caches all data, so it should not be called before the
-entire request body has been received. Parts of the request body need to be
-loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large, there's a 10MB limit by default.
+To access multiple values sharing the same name you can also use
+L</"every_param">. Note that this method caches all data, so it should not be
+called before the entire request body has been received. Parts of the request
+body need to be loaded into memory to parse C<POST> parameters, so you have to
+make sure it is not excessively large, there's a 10MB limit by default.
 
 =head2 params
 

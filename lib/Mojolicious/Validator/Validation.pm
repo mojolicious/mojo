@@ -54,6 +54,8 @@ sub error {
   return $self;
 }
 
+sub every_param { shift->_param(@_) }
+
 sub has_data { !!keys %{shift->input} }
 
 sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
@@ -75,20 +77,23 @@ sub param {
   my ($self, $name) = @_;
 
   # Multiple names
-  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # List names
   return sort keys %{$self->output} unless defined $name;
 
-  my $value = $self->output->{$name};
-  my @values = ref $value eq 'ARRAY' ? @$value : ($value);
-  return wantarray ? @values : $values[0];
+  return $self->_param($name)->[-1];
 }
 
 sub required {
   my ($self, $name) = @_;
   return $self if $self->optional($name)->is_valid;
   return $self->error($name => ['required']);
+}
+
+sub _param {
+  my $value = shift->output->{shift()};
+  return [ref $value eq 'ARRAY' ? @$value : $value];
 }
 
 1;
@@ -184,6 +189,16 @@ only be one per field.
 
   my ($check, $result, @args) = @{$validation->error('foo')};
 
+=head2 every_param
+
+  my $values = $validation->every_param('foo');
+
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference.
+
+  # Get first value
+  my $first = $validation->every_param('foo')->[0];
+
 =head2 has_data
 
   my $bool = $validation->has_data;
@@ -214,11 +229,11 @@ Change validation L</"topic">.
 =head2 param
 
   my @names       = $validation->param;
-  my $foo         = $validation->param('foo');
-  my @foo         = $validation->param('foo');
+  my $value       = $validation->param('foo');
   my ($foo, $bar) = $validation->param(['foo', 'bar']);
 
-Access validated parameters, similar to L<Mojolicious::Controller/"param">.
+Access validated parameters. To access multiple values sharing the same name
+you can also use L</"every_param">.
 
 =head2 required
 

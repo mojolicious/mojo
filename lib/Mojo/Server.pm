@@ -2,6 +2,7 @@ package Mojo::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
+use Cwd 'abs_path';
 use Mojo::Loader;
 use Mojo::Util 'md5_sum';
 use POSIX;
@@ -40,6 +41,9 @@ sub daemonize {
 
 sub load_app {
   my ($self, $path) = @_;
+
+  # Make sure do() executes the file we expect (and not something from @INC)
+  $path = abs_path $path;
 
   # Clean environment (reset FindBin defensively)
   {

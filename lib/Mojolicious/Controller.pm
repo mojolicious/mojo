@@ -496,8 +496,9 @@ Continue dispatch chain with L<Mojolicious::Routes/"continue">.
   $c              = $c->cookie(foo => 'bar');
   $c              = $c->cookie(foo => 'bar', {path => '/'});
 
-Access request cookie values and create new response cookies. To access
-multiple values sharing the same name you can also use L</"every_cookie">.
+Access request cookie values and create new response cookies. If there are
+multiple values sharing the same name, and you want to access more than just
+the last one, you can use L</"every_cookie">.
 
   # Create response cookie with domain and expiration date
   $c->cookie(user => 'sri', {domain => 'example.com', expires => time + 60});
@@ -611,10 +612,11 @@ status.
 Access route placeholder values that are not reserved stash values, file
 uploads as well as C<GET> and C<POST> parameters extracted from the query
 string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
-message body, in that order. To access multiple values sharing the same name
-you can also use L</"every_param">. Parts of the request body need to be
-loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large, there's a 10MB limit by default.
+message body, in that order. If there are multiple values sharing the same
+name, and you want to access more than just the last one, you can use
+L</"every_param">. Parts of the request body need to be loaded into memory to
+parse C<POST> parameters, so you have to make sure it is not excessively
+large, there's a 10MB limit by default.
 
   # Get first value
   my $first = $c->every_param('foo')->[0];
@@ -878,10 +880,10 @@ on browser.
   $c              = $c->signed_cookie(foo => 'bar');
   $c              = $c->signed_cookie(foo => 'bar', {path => '/'});
 
-Access signed request cookie values and create new signed response cookies. To
-access multiple values sharing the same name you can also use
-L</"every_signed_cookie">. Cookies failing HMAC-SHA1 signature verification
-will be automatically discarded.
+Access signed request cookie values and create new signed response cookies. If
+there are multiple values sharing the same name, and you want to access more
+than just the last one, you can use L</"every_signed_cookie">. Cookies failing
+HMAC-SHA1 signature verification will be automatically discarded.
 
 =head2 stash
 

@@ -289,9 +289,9 @@ necessary.
   $params         = $params->param(foo => qw(ba&r baz));
   $params         = $params->param(foo => ['ba;r', 'baz']);
 
-Access parameter values. To access multiple values sharing the same name you
-can also use L</"every_param">. Note that this method will normalize the
-parameters.
+Access parameter values. If there are multiple values sharing the same name,
+and you want to access more than just the last one, you can use
+L</"every_param">. Note that this method will normalize the parameters.
 
 =head2 params
 

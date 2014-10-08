@@ -232,8 +232,9 @@ Change validation L</"topic">.
   my $value       = $validation->param('foo');
   my ($foo, $bar) = $validation->param(['foo', 'bar']);
 
-Access validated parameters. To access multiple values sharing the same name
-you can also use L</"every_param">.
+Access validated parameters. If there are multiple values sharing the same
+name, and you want to access more than just the last one, you can use
+L</"every_param">.
 
 =head2 required
 

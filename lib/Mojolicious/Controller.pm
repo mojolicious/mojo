@@ -365,12 +365,10 @@ sub _param {
     return ref $value eq 'ARRAY' ? $value : [$value];
   }
 
-  # Uploads
-  my $req = $self->req;
-  if (my $uploads = $req->every_upload($name)) { return $uploads if @$uploads }
-
-  # Param values
-  return $req->every_param($name);
+  # Uploads or param values
+  my $req     = $self->req;
+  my $uploads = $req->every_upload($name);
+  return @$uploads ? $uploads : $req->every_param($name);
 }
 
 sub _signed_cookie {

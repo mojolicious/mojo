@@ -42,6 +42,9 @@ sub daemonize {
 sub load_app {
   my ($self, $path) = @_;
 
+  # Make sure do() executes the file we expect (and not something from @INC)
+  $path = abs_path $path;
+
   # Clean environment (reset FindBin defensively)
   {
     local $0 = $path = abs_path $path;
@@ -90,6 +93,15 @@ sub setuidgid {
     unless POSIX::setuid($uid);
 
   return $self;
+}
+
+sub _do {
+    my $path = pop;
+    # prepend '.' to @INC if no directories in path
+    local @INC = ($path !~ m!/! ? ('.', @INC) : @INC);
+    my $app = eval "package Mojo::Server::Sandbox::@{[md5_sum $path]};"
+	. 'return do($path) || die($@ || $!);';
+    return $app;
 }
 
 sub _log { $_[0]->app->log->error($_[1]) and return $_[0] }

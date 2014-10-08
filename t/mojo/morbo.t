@@ -119,6 +119,62 @@ is $tx->res->body, 'Hello!', 'right content';
 kill 'INT', $pid;
 sleep 1 while _port($port);
 
+
+# address issue/683
+
+# Prepare set of scripts
+my $tmp_1 = tempdir CLEANUP => 1;
+my $tmp_2 = tempdir CLEANUP => 1;
+
+my $name = 'myapp.pl';
+my $script_1 = catdir $tmp_1, $name;
+my $script_2 = catdir $tmp_2, $name;
+
+## change directory
+chdir $tmp_1 or die "$!";
+
+$morbo = Mojo::Server::Morbo->new(watch => [$name]);
+is $morbo->check, undef, 'file has not changed';
+# write first script with identifying feature
+spurt <<EOF, $script_1;
+use Mojolicious::Lite;
+
+app->log->level('fatal');
+
+get '/hello' => {text => "Hello from script $script_1"};
+
+app->start;
+EOF
+# write second script with identifying feature
+spurt <<EOF, $script_2;
+use Mojolicious::Lite;
+
+app->log->level('fatal');
+
+get '/hello' => {text => "Hello from script $script_2"};
+
+app->start;
+EOF
+
+# Start
+$port = Mojo::IOLoop::Server->generate_port;
+$pid  = open my $server2, '-|', $^X, "-I$tmp_2", "$prefix/morbo", '-l',
+  "http://127.0.0.1:$port", $name;
+sleep 1 while !_port($port);
+
+# Application is alive
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_finished, 'transaction is finished';
+is $tx->res->code, 200,            'right status';
+is $tx->res->body, "Hello from script $script_1", 'right content';
+
+## we'd prefer not to leave the tmp directory around
+chdir $FindBin::Bin;
+
+# Stop
+kill 'INT', $pid;
+sleep 1 while _port($port);
+
 # SO_REUSEPORT
 SKIP: {
   skip 'SO_REUSEPORT support required!', 2 unless eval { _reuse_port() };

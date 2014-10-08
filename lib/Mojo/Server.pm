@@ -55,7 +55,7 @@ sub load_app {
 
     # Try to load application from script into sandbox
     my $app = eval "package Mojo::Server::Sandbox::@{[md5_sum $path]};"
-	. 'return do($path) || die($@ || $!);';
+      . 'return do($path) || die($@ || $!);';
     die qq{Can't load application from file "$path": $@} if !$app && $@;
     die qq{File "$path" did not return an application object.\n}
       unless blessed $app && $app->isa('Mojo');

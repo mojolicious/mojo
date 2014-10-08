@@ -517,9 +517,7 @@ same name as an array reference.
   my $values = $c->every_param('foo');
 
 Similar to L</"param">, but returns all values sharing the same name as an
-array reference. Parts of the request body need to be loaded into memory to
-parse C<POST> parameters, so you have to make sure it is not excessively
-large, there's a 10MB limit by default.
+array reference.
 
   # Get first value
   my $first = $c->every_param('foo')->[0];

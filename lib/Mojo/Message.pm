@@ -506,8 +506,7 @@ error.
   my $cookies = $msg->every_cookie('foo');
 
 Similar to L</"cookie">, but returns all message cookies sharing the same name
-as an array reference. Note that this method caches all data, so it should not
-be called before all headers have been received.
+as an array reference.
 
   # Get first cookie value
   say $msg->every_cookie('foo')->[0]->value;
@@ -517,8 +516,7 @@ be called before all headers have been received.
   my $uploads = $msg->every_upload('foo');
 
 Similar to L</"upload">, but returns all file uploads sharing the same name as
-an array reference. Note that this method caches all data, so it should not be
-called before the entire message body has been received.
+an array reference.
 
   # Get content of first uploaded file
   say $msg->every_upload('foo')->[0]->asset->slurp;

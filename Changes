@@ -1,6 +1,8 @@
 
 5.49  2014-10-09
   - Improved form content generator to allow custom content types.
+  - Improved Mojo::Server to load applications consistently for all servers.
+    (tianon, sri)
 
 5.48  2014-10-07
   - Emergency release for a serious security issue that can result in

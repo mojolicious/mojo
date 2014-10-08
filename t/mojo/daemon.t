@@ -6,6 +6,7 @@ BEGIN {
 }
 
 use Test::More;
+use Cwd 'abs_path';
 use File::Spec::Functions 'catdir';
 use FindBin;
 use Mojo;
@@ -61,6 +62,11 @@ $app->config(foo => 'bar', baz => 'yada');
 is $app->config({test => 23})->config->{test}, 23, 'right value';
 is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
   'right value';
+
+# Script name
+my $path = "$FindBin::Bin/lib/../lib/myapp.pl";
+is(Mojo::Server::Daemon->new->load_app($path)->config('script'),
+  abs_path($path), 'right script name');
 
 # Load broken app
 eval {

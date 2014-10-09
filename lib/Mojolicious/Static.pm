@@ -120,8 +120,8 @@ sub _epoch { Mojo::Date->new(shift)->epoch }
 sub _get_data_file {
   my ($self, $rel) = @_;
 
-  # Protect templates
-  return undef if $rel =~ /\.\w+\.\w+$/;
+  # Protect files without extensions and templates with two extensions
+  return undef if $rel !~ /\.\w+$/ || $rel =~ /\.\w+\.\w+$/;
 
   $self->_warmup unless $self->{index};
 

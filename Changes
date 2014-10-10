@@ -1,4 +1,6 @@
 
+5.50  2014-10-11
+
 5.49  2014-10-10
   - Improved form content generator to allow custom content types.
   - Improved Mojo::Server to load applications consistently for all servers.

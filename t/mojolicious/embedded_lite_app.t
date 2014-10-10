@@ -194,7 +194,7 @@ $t->get_ok('/x/1/stream')->status_is(200)->content_is('hello!');
 
 # URL from myapp.pl
 $t->get_ok('/x/1/url/☃')->status_is(200)
-  ->content_is('/x/1/url/%E2%98%83 -> /x/1/%E2%98%83/stream!');
+  ->content_is('/x/1/url/%E2%98%83.json -> /x/1/%E2%98%83/stream!');
 
 # Route to template from myapp.pl
 $t->get_ok('/x/1/template/menubar')->status_is(200)
@@ -227,7 +227,8 @@ $t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
 
 # URL from myapp.pl with unicode prefix
 $t->get_ok('/x/♥/url/☃')->status_is(200)
-  ->content_is('/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
+  ->content_is(
+  '/x/%E2%99%A5/url/%E2%98%83.json -> /x/%E2%99%A5/%E2%98%83/stream!');
 
 # Route to template from myapp.pl with unicode prefix
 $t->get_ok('/x/♥/template/menubar')->status_is(200)

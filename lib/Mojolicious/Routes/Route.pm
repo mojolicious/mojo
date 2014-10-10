@@ -125,7 +125,7 @@ sub remove {
 sub render {
   my ($self, $values) = @_;
   my $path = join '',
-    map { $_->pattern->render($values, !@{$_->children}) } @{$self->_chain};
+    map { $_->pattern->render($values, $_->_children) } @{$self->_chain};
   return $path || '/';
 }
 
@@ -190,6 +190,8 @@ sub _chain {
   unshift @chain, $parent while $parent = $parent->parent;
   return \@chain;
 }
+
+sub _children { !@{$_[0]->children} && !$_[0]->partial }
 
 sub _generate_route {
   my ($self, $methods, @args) = @_;

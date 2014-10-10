@@ -37,7 +37,7 @@ get '/stream' => sub {
 
 get '/url/☃' => sub {
   my $c     = shift;
-  my $route = $c->url_for;
+  my $route = $c->url_for({format => 'json'});
   my $rel   = $c->url_for('/☃/stream');
   $c->render(text => "$route -> $rel!");
 };

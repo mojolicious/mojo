@@ -23,7 +23,7 @@ sub run {
   }
 
   # Turn them into real files
-  for my $name (keys %all) {
+  for my $name (grep {/\.\w+$/} keys %all) {
     my $prefix = $name =~ /\.\w+\.\w+$/ ? 'templates' : 'public';
     $self->write_file($self->rel_file("$prefix/$name"), $all{$name});
   }

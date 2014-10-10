@@ -5,6 +5,7 @@
     (tianon, sri)
   - Fixed Mojolicious::Static to hide files without extensions in DATA
     sections.
+  - Fixed inflate command to ignore files without extensions.
   - Fixed bug in Mojolicious::Routes::Route where formats could be rendered
     twice for embedded applications.
 

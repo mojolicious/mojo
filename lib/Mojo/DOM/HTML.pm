@@ -54,17 +54,24 @@ my %RAW = map { $_ => 1 } qw(script style);
 my %RCDATA = map { $_ => 1 } qw(title textarea);
 
 # HTML elements with optional end tags
-my %END = (body => ['head'], rp => [qw(rt rp)], rt => [qw(rt rp)]);
-$END{$_} = [$_] for qw(optgroup option);
+my %END = (body => 'head', optgroup => 'optgroup', option => 'option');
 
 # HTML elements that break paragraphs
-map { $END{$_} = ['p'] } (
+map { $END{$_} = 'p' } (
   qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
   qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
 );
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
+
+# HTML elements with optional end tags and scoping rules
+my %CLOSE
+  = (li => [{li => 1}, {ul => 1, ol => 1}], tr => [{tr => 1}, {table => 1}]);
+$CLOSE{$_} = [\%TABLE, {table => 1}] for qw(colgroup tbody tfoot thead);
+$CLOSE{$_} = [{dd => 1, dt => 1}, {dl    => 1}] for qw(dd dt);
+$CLOSE{$_} = [{rp => 1, rt => 1}, {ruby  => 1}] for qw(rp rt);
+$CLOSE{$_} = [{th => 1, td => 1}, {table => 1}] for qw(td th);
 
 # HTML elements without end tags
 my %EMPTY = map { $_ => 1 } (
@@ -165,17 +172,6 @@ sub parse {
 
 sub render { _render($_[0]->tree, $_[0]->xml) }
 
-sub _close {
-  my ($current, $allowed, $scope) = @_;
-
-  # Close allowed parent elements in scope
-  my $parent = $$current;
-  while ($parent->[0] ne 'root' && !$scope->{$parent->[1]}) {
-    _end($parent->[1], 0, $current) if $allowed->{$parent->[1]};
-    $parent = $parent->[3];
-  }
-}
-
 sub _end {
   my ($end, $xml, $current) = @_;
 
@@ -267,27 +263,17 @@ sub _start {
 
   # Autoclose optional HTML elements
   if (!$xml && $$current->[0] ne 'root') {
-    if (my $end = $END{$start}) { _end($_, 0, $current) for @$end }
+    if (my $end = $END{$start}) { _end($end, 0, $current) }
 
-    # "dd" and "dt"
-    elsif ($start eq 'dd' || $start eq 'dt') {
-      _close($current, {dd => 1, dt => 1}, {dl => 1});
-    }
+    elsif (my $close = $CLOSE{$start}) {
+      my ($allowed, $scope) = @$close;
 
-    # "li"
-    elsif ($start eq 'li') { _close($current, {li => 1}, {ul => 1, ol => 1}) }
-
-    # "colgroup", "thead", "tbody" and "tfoot"
-    elsif ($start eq 'colgroup' || $start =~ /^t(?:head|body|foot)$/) {
-      _close($current, \%TABLE, {table => 1});
-    }
-
-    # "tr"
-    elsif ($start eq 'tr') { _close($current, {tr => 1}, {table => 1}) }
-
-    # "th" and "td"
-    elsif ($start eq 'th' || $start eq 'td') {
-      _close($current, {th => 1, td => 1}, {table => 1});
+      # Close allowed parent elements in scope
+      my $parent = $$current;
+      while ($parent->[0] ne 'root' && !$scope->{$parent->[1]}) {
+        _end($parent->[1], 0, $current) if $allowed->{$parent->[1]};
+        $parent = $parent->[3];
+      }
     }
   }
 

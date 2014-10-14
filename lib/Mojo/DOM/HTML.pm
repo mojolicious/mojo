@@ -291,7 +291,7 @@ sub _start {
 
     # "th" and "td"
     elsif ($start eq 'th' || $start eq 'td') {
-      _close($current, {$_ => 1}, {table => 1}) for qw(th td);
+      _close($current, {th => 1, td => 1}, {table => 1});
     }
   }
 

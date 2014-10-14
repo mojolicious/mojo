@@ -271,7 +271,7 @@ sub _start {
 
     # "dd" and "dt"
     elsif ($start eq 'dd' || $start eq 'dt') {
-      _close($current, {dd => 1, dt => 1}, {dl => 1}) for qw(dd dt);
+      _close($current, {dd => 1, dt => 1}, {dl => 1});
     }
 
     # "li"

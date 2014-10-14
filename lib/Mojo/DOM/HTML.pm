@@ -56,8 +56,6 @@ my %RCDATA = map { $_ => 1 } qw(title textarea);
 # HTML elements with optional end tags
 my %END = (
   body => ['head'],
-  dd   => [qw(dt dd)],
-  dt   => [qw(dt dd)],
   rp   => [qw(rt rp)],
   rt   => [qw(rt rp)]
 );
@@ -274,6 +272,11 @@ sub _start {
   # Autoclose optional HTML elements
   if (!$xml && $$current->[0] ne 'root') {
     if (my $end = $END{$start}) { _end($_, 0, $current) for @$end }
+
+    # "dd" and "dt"
+    elsif ($start eq 'dd' || $start eq 'dt') {
+      _close($current, {dd => 1, dt => 1}, {dl => 1}) for qw(dd dt);
+    }
 
     # "li"
     elsif ($start eq 'li') { _close($current, {li => 1}, {ul => 1, ol => 1}) }

@@ -1311,6 +1311,22 @@ is $dom->find('dl > dd')->[1]->text, 'D', 'right text';
 is $dom->find('dl > dt')->[2]->text, 'E', 'right text';
 is $dom->find('dl > dd')->[2]->text, 'F', 'right text';
 
+# but different levels don't self-terminate to allow for nesting
+$dom = Mojo::DOM->new->parse(<<EOF);
+<dl>
+  <dt>A</dt>
+  <DD>
+    <dl>
+      <dt>B</dt>
+      <dd>C</dd>
+    </dl>
+  </dd>
+</dl>
+EOF
+is $dom->find('dl > dd > dl > dt')->[0]->text, 'B', 'right text';
+is $dom->find('dl > dd > dl > dd')->[0]->text, 'C', 'right text';
+is $dom->find('dl > dt')->[0]->text,           'A', 'right text';
+
 # Optional "rp" and "rt" tags
 $dom = Mojo::DOM->new->parse(<<EOF);
 <ruby>

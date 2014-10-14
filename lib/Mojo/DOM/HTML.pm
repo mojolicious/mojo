@@ -54,11 +54,7 @@ my %RAW = map { $_ => 1 } qw(script style);
 my %RCDATA = map { $_ => 1 } qw(title textarea);
 
 # HTML elements with optional end tags
-my %END = (
-  body => ['head'],
-  rp   => [qw(rt rp)],
-  rt   => [qw(rt rp)]
-);
+my %END = (body => ['head'], rp => [qw(rt rp)], rt => [qw(rt rp)]);
 $END{$_} = [$_] for qw(optgroup option);
 
 # HTML elements that break paragraphs

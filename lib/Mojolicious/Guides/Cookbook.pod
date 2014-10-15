@@ -981,7 +981,7 @@ file with L<Mojo::Asset::File/"move_to">.
 
   # Lets fetch the latest Mojolicious tarball
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
-  my $tx = $ua->get('latest.mojolicio.us');
+  my $tx = $ua->get('https://www.github.com/kraih/mojo/tarball/master');
   $tx->res->content->asset->move_to('mojo.tar.gz');
 
 To protect you from excessively large files there is also a limit of 10MB by

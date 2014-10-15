@@ -393,7 +393,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');
 
   # Follow redirects to grab the latest Mojolicious release :)
-  $ua->max_redirects(5)->get('latest.mojolicio.us')
+  $ua->max_redirects(5)
+    ->get('https://www.github.com/kraih/mojo/tarball/master')
     ->res->content->asset->move_to('/Users/sri/mojo.tar.gz');
 
   # TLS certificate authentication and JSON POST

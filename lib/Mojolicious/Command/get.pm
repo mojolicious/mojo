@@ -65,7 +65,7 @@ sub run {
   STDOUT->autoflush(1);
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
   my $err = $tx->error;
-  warn qq{Problem loading URL "@{[$tx->req->url]}". ($err->{message})\n}
+  warn qq{Problem loading URL "@{[$tx->req->url]}": $err->{message}\n}
     if $err && !$err->{code};
 
   # JSON Pointer

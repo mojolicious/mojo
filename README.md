@@ -36,6 +36,10 @@
 
     $ curl get.mojolicio.us | sh
 
+  And if you already have `cpanm` installed with a secure toolchain.
+
+    $ cpanm -n --mirror https://cpan.metacpan.org/ --mirror-only --verify Mojolicious
+
   We recommend the use of a [Perlbrew](http://perlbrew.pl) environment.
 
 ## Getting Started

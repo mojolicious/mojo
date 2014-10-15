@@ -1,5 +1,5 @@
 
-5.50  2014-10-14
+5.50  2014-10-15
   - Improved Mojo::DOM::HTML performance slightly.
   - Fixed description list parsing bug in Mojo::DOM::HTML. (Trelane)
 

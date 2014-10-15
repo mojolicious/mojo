@@ -34,11 +34,11 @@
 
   All you need is a one-liner, it takes less than a minute.
 
-    $ curl get.mojolicio.us | sh
+    $ curl -L cpanmin.us | perl - -n Mojolicious
 
   And if you already have `cpanm` installed with a secure toolchain.
 
-    $ cpanm -n --mirror https://cpan.metacpan.org/ --mirror-only --verify Mojolicious
+    $ cpanm --mirror https://cpan.metacpan.org/ --mirror-only --verify -n Mojolicious
 
   We recommend the use of a [Perlbrew](http://perlbrew.pl) environment.
 

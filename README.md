@@ -2,7 +2,7 @@
 # Mojolicious [![Build Status](https://travis-ci.org/kraih/mojo.svg?branch=master)](https://travis-ci.org/kraih/mojo)
 
   Back in the early days of the web, many people learned Perl because of a
-  wonderful Perl library called [CGI](http://metacpan.org/module/CGI). It was
+  wonderful Perl library called [CGI](https://metacpan.org/module/CGI). It was
   simple enough to get started without knowing much about the language and
   powerful enough to keep you going, learning by doing was much fun. While
   most of the techniques used are outdated now, the idea behind it is not.

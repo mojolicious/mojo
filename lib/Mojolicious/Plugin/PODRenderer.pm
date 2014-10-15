@@ -40,7 +40,7 @@ sub _html {
   # Rewrite links
   my $dom     = Mojo::DOM->new(_pod_to_html($src));
   my $perldoc = $c->url_for('/perldoc/');
-  $_->{href} =~ s!^http://metacpan\.org/pod/!$perldoc!
+  $_->{href} =~ s!^https://metacpan\.org/pod/!$perldoc!
     and $_->{href} =~ s!::!/!gi
     for $dom->find('a[href]')->attr->each;
 
@@ -83,7 +83,7 @@ sub _perldoc {
   my $module = join '::', split '/', scalar $c->param('module');
   my $path
     = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
-  return $c->redirect_to("http://metacpan.org/pod/$module")
+  return $c->redirect_to("https://metacpan.org/pod/$module")
     unless $path && -r $path;
 
   my $src = slurp $path;
@@ -94,7 +94,7 @@ sub _pod_to_html {
   return '' unless defined(my $pod = ref $_[0] eq 'CODE' ? shift->() : shift);
 
   my $parser = Pod::Simple::XHTML->new;
-  $parser->perldoc_url_prefix('http://metacpan.org/pod/');
+  $parser->perldoc_url_prefix('https://metacpan.org/pod/');
   $parser->$_('') for qw(html_header html_footer);
   $parser->output_string(\(my $output));
   return $@ unless eval { $parser->parse_string_document("$pod"); 1 };

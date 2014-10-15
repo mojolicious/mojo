@@ -56,11 +56,11 @@
     %= link_to Documentation => 'http://mojolicio.us/perldoc'
     %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
     %= link_to GitHub => 'https://github.com/kraih/mojo'
-    %= link_to CPAN => 'http://metacpan.org/release/Mojolicious/'
-    %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
+    %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'
+    %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
     %= link_to Blog => 'http://blog.kraih.com'
-    %= link_to Twitter => 'http://twitter.com/kraih'
-    %= form_for 'http://google.com/cse' => (target => '_blank') => begin
+    %= link_to Twitter => 'https://twitter.com/kraih'
+    %= form_for 'https://google.com/cse' => (target => '_blank') => begin
       %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
       %= hidden_field ie => 'UTF-8'
       %= search_field 'q', placeholder => 'Search'

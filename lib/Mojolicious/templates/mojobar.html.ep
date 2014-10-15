@@ -60,7 +60,7 @@
     %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
     %= link_to Blog => 'http://blog.kraih.com'
     %= link_to Twitter => 'https://twitter.com/kraih'
-    %= form_for 'https://google.com/cse' => (target => '_blank') => begin
+    %= form_for 'https://www.google.com/cse' => (target => '_blank') => begin
       %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
       %= hidden_field ie => 'UTF-8'
       %= search_field 'q', placeholder => 'Search'

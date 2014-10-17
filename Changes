@@ -1,4 +1,6 @@
 
+5.52  2014-10-18
+
 5.51  2014-10-17
   - Fixed bug in Mojolicious::Validator::Validation where every_param would
     sometimes return an array reference containing an undef value.

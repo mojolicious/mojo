@@ -92,7 +92,7 @@ sub required {
 }
 
 sub _param {
-  my $value = shift->output->{shift()};
+  return [] unless defined(my $value = shift->output->{shift()});
   return [ref $value eq 'ARRAY' ? @$value : $value];
 }
 

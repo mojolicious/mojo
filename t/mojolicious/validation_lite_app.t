@@ -36,6 +36,8 @@ my $t = Test::Mojo->new;
 # Required and optional values
 my $validation = $t->app->validation->input({foo => 'bar', baz => 'yada'});
 is_deeply [$validation->error], [], 'no names';
+is $validation->param('foo'), undef, 'no value';
+is_deeply $validation->every_param('foo'), [], 'no values';
 ok $validation->required('foo')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 is $validation->param('foo'), 'bar', 'right value';

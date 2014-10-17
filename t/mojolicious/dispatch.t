@@ -72,6 +72,7 @@ is $c->param(foo => 'works')->param('foo'), 'works', 'right value';
 is $c->param(foo => 'too')->param('foo'),   'too',   'right value';
 is $c->param(foo => qw(just works))->param('foo'), 'works', 'right value';
 is_deeply $c->every_param('foo'), [qw(just works)], 'right values';
+is_deeply $c->every_param('bar'), [], 'no values';
 is $c->param(foo => undef)->param('foo'), undef, 'no value';
 is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name,
   'bar', 'right value';

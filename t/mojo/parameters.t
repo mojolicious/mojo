@@ -67,6 +67,7 @@ is $params->to_string, 'bar=bar&foo=', 'right format';
 $params = Mojo::Parameters->new(foo => 0);
 is $params->param('foo'), 0, 'right value';
 is_deeply $params->every_param('foo'), [0], 'right value';
+is_deeply $params->every_param('bar'), [], 'no values';
 is $params->to_string, 'foo=0', 'right format';
 $params = Mojo::Parameters->new($params->to_string);
 is $params->param('foo'), 0, 'right value';

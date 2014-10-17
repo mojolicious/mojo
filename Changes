@@ -1,5 +1,7 @@
 
-5.51  2014-10-16
+5.51  2014-10-17
+  - Fixed Mojo::ByteStream and Mojo::Collection to always return true in
+    boolean context.
 
 5.50  2014-10-15
   - Improved Mojo::DOM::HTML performance slightly.

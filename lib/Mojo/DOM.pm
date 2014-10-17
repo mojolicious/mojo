@@ -868,13 +868,13 @@ the case of C<select>, find all C<option> elements it contains that have a
 C<selected> attribute and extract their values.
 
   # "b"
-  $dom->parse('<input name="a" value="b">')->at('input')->val->first;
+  $dom->parse('<input name="a" value="b">')->at('input')->val;
 
   # "c"
-  $dom->parse('<option value="c">Test</option>')->at('option')->val->first;
+  $dom->parse('<option value="c">Test</option>')->at('option')->val;
 
   # "d"
-  $dom->parse('<option>d</option>')->at('option')->val->first;
+  $dom->parse('<option>d</option>')->at('option')->val;
 
 =head2 wrap
 

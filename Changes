@@ -1,4 +1,6 @@
 
+5.53  2014-10-19
+
 5.52  2014-10-18
   - Fixed read-only file system compatibility of Mojo::Asset::File.
 

@@ -887,6 +887,8 @@ Kevin Old
 
 Kitamura Akatsuki
 
+Klaus S. Madsen
+
 Lars Balker Rasmussen
 
 Leon Brocard

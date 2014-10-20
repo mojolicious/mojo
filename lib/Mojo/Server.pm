@@ -74,12 +74,12 @@ sub run { croak 'Method "run" not implemented by subclass' }
 sub setuidgid {
   my $self = shift;
 
-  # Group
+  # Group (make sure secondary groups are reassigned too)
   if (my $group = $self->group) {
     return $self->_log(qq{Group "$group" does not exist.})
       unless defined(my $gid = getgrnam $group);
     return $self->_log(qq{Can't switch to group "$group": $!})
-      unless POSIX::setgid($gid);
+      unless ($( = $) = "$gid $gid") && $) eq "$gid $gid" && $( eq "$gid $gid";
   }
 
   # User

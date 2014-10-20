@@ -1,5 +1,7 @@
 
 5.53  2014-10-20
+  - Fixed bug in Mojo::Server where secondary groups were not reassigned
+    correctly. (ksm, sri)
 
 5.52  2014-10-18
   - Fixed read-only file system compatibility of Mojo::Asset::File.

@@ -38,16 +38,6 @@ Please report security issues directly to the CPAN email address of the
 pumpkin-holder, which is currently C<sri@cpan.org>, and give us a few days to
 develop and release a proper fix.
 
-=head2 Feature requests
-
-Please do not open GitHub issues for feature requests, if there's something
-you would like to see in a future version of L<Mojolicious>, you have to write
-the code yourself.
-
-If you're looking for feedback on your ideas, you're welcome to discuss them
-on the L<mailing-list|http://groups.google.com/group/mojolicious> or the
-official IRC channel C<#mojo> on C<irc.perl.org>.
-
 =head1 RESOLVING ISSUES
 
 There are many ways in which you can help us resolve existing issues on the

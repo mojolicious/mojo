@@ -75,9 +75,11 @@ sub redirect {
   return undef unless grep { $_ == $code } 301, 302, 303, 307, 308;
 
   # Fix location without authority and/or scheme
-  return unless my $location = $res->headers->location;
+  return undef unless my $location = $res->headers->location;
   $location = Mojo::URL->new($location);
   $location = $location->base($old->req->url)->to_abs unless $location->is_abs;
+  my $proto = $location->protocol;
+  return undef unless $proto eq 'http' || $proto eq 'https';
 
   # Clone request if necessary
   my $new = Mojo::Transaction::HTTP->new;

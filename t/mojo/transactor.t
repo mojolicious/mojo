@@ -793,13 +793,13 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 $tx = $t->tx(
   POST => 'http://mojolicio.us/foo' => {Accept => '*/*'} => 'whatever');
 $tx->res->code(308);
-$tx->res->headers->location('http://example.com/bar');
+$tx->res->headers->location('https://example.com/bar');
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->url->to_abs, 'https://example.com/bar', 'right URL';
+is $tx->req->headers->accept,   '*/*', 'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, 'whatever', 'right content';
 is $tx->res->code, undef,      'no status';
@@ -819,6 +819,12 @@ $tx->res->code(309);
 $tx->res->headers->location('http://example.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
+is $t->redirect($tx), undef, 'unsupported redirect';
+
+# 302 redirect with bad location
+$tx = $t->tx(GET => 'http://mojolicio.us/foo');
+$tx->res->code(302);
+$tx->res->headers->location('data:image/png;base64,helloworld123');
 is $t->redirect($tx), undef, 'unsupported redirect';
 
 # 302 redirect (relative path and query)

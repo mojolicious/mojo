@@ -1,5 +1,6 @@
 
 5.54  2014-10-22
+  - Added auto_decompress attribute to Mojo::Content.
   - Fixed bug where Mojo::UserAgent would try to follow redirects for
     protocols other than HTTP and HTTPS.
 

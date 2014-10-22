@@ -189,7 +189,7 @@ $t->message_ok->message_is({binary => 'a' x 50000});
 ok length $payload < 262145, 'message has been compressed';
 $t->finish_ok->finished_ok(1005);
 
-# Compressed message exceeding the limit when uncompressed
+# Compressed message exceeding the limit when decompressed
 $t->websocket_ok(
   '/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
   ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate')

@@ -345,6 +345,22 @@ ok !$tx->success, 'not successful';
 is $tx->error->{message}, 'Not Found', 'right error';
 is $tx->error->{code},    404,         'right status';
 
+# Compressed response
+$tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');
+$tx = $ua->start($ua->build_tx(GET => '/echo' => 'Hello GZip!'));
+ok $tx->success, 'successful';
+is $tx->res->code, 200, 'right status';
+is $tx->res->headers->content_encoding, undef, 'no "Content-Encoding" value';
+is $tx->res->body, 'Hello GZip!', 'right content';
+$tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');
+$tx->res->content->auto_decompress(0);
+$tx = $ua->start($tx);
+ok $tx->success, 'successful';
+is $tx->res->code, 200, 'right status';
+is $tx->res->headers->content_encoding, 'gzip',
+  'right "Content-Encoding" value';
+isnt $tx->res->body, 'Hello GZip!', 'different content';
+
 # Fork safety
 $tx = $ua->get('/');
 is $tx->res->body, 'works!', 'right content';

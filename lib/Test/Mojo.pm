@@ -685,8 +685,8 @@ Check response header for similar match.
 
 =head2 header_unlike
 
-  $t = $t->header_like(ETag => qr/abc/);
-  $t = $t->header_like(ETag => qr/abc/, 'different header');
+  $t = $t->header_unlike(ETag => qr/abc/);
+  $t = $t->header_unlike(ETag => qr/abc/, 'different header');
 
 Opposite of L</"header_like">.
 

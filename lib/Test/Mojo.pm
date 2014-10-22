@@ -664,29 +664,29 @@ arguments as L<Mojo::UserAgent/"head">, except for the callback.
 
 =head2 header_is
 
-  $t = $t->header_is(Expect => 'fun');
-  $t = $t->header_is(Expect => 'fun', 'right header');
+  $t = $t->header_is(ETag => '"abc321"');
+  $t = $t->header_is(ETag => '"abc321"', 'right header');
 
 Check response header for exact match.
 
 =head2 header_isnt
 
-  $t = $t->header_isnt(Expect => 'fun');
-  $t = $t->header_isnt(Expect => 'fun', 'different header');
+  $t = $t->header_isnt(Etag => '"abc321"');
+  $t = $t->header_isnt(ETag => '"abc321"', 'different header');
 
 Opposite of L</"header_is">.
 
 =head2 header_like
 
-  $t = $t->header_like(Expect => qr/fun/);
-  $t = $t->header_like(Expect => qr/fun/, 'right header');
+  $t = $t->header_like(ETag => qr/abc/);
+  $t = $t->header_like(ETag => qr/abc/, 'right header');
 
 Check response header for similar match.
 
 =head2 header_unlike
 
-  $t = $t->header_like(Expect => qr/fun/);
-  $t = $t->header_like(Expect => qr/fun/, 'different header');
+  $t = $t->header_like(ETag => qr/abc/);
+  $t = $t->header_like(ETag => qr/abc/, 'different header');
 
 Opposite of L</"header_like">.
 

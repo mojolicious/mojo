@@ -43,18 +43,18 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Tiger Face';
-our $VERSION  = '5.07';
+our $VERSION  = '5.54';
 
 sub AUTOLOAD {
   my $self = shift;
 
-  my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
+  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 
   # Call helper with fresh controller
   croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $helper = $self->renderer->helpers->{$method};
+    unless my $helper = $self->renderer->get_helper($method);
   return $self->build_controller->$helper(@_);
 }
 
@@ -68,7 +68,8 @@ sub build_controller {
   $stash->{'mojo.secrets'} //= $self->secrets;
 
   # Build default controller
-  %$stash = (%$stash, %{$self->defaults});
+  my $defaults = $self->defaults;
+  @$stash{keys %$defaults} = values %$defaults;
   my $c
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{app};
@@ -83,7 +84,7 @@ sub build_tx {
   return $tx;
 }
 
-sub defaults { shift->_dict(defaults => @_) }
+sub defaults { Mojo::Util::_stash(defaults => @_) }
 
 sub dispatch {
   my ($self, $c) = @_;
@@ -153,15 +154,19 @@ sub new {
   push @{$self->renderer->paths}, $home->rel_dir('templates');
   push @{$self->static->paths},   $home->rel_dir('public');
 
-  # Default to application namespace
-  my $r = $self->routes->namespaces([ref $self]);
+  # Default to controller and application namespace
+  my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
 
   # Hide controller attributes/methods and "handler"
-  $r->hide(qw(app continue cookie finish flash handler match on param));
-  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
-  $r->hide(qw(render_not_found render_static render_to_string rendered req));
+  $r->hide(qw(app continue cookie every_cookie every_param));
+  $r->hide(qw(every_signed_cookie finish flash handler helpers match on));
+  $r->hide(qw(param redirect_to render render_exception render_later));
+  $r->hide(qw(render_maybe render_not_found render_to_string rendered req));
   $r->hide(qw(res respond_to send session signed_cookie stash tx url_for));
   $r->hide(qw(validation write write_chunk));
+
+  # DEPRECATED in Tiger Face!
+  $r->hide('render_static');
 
   # Check if we have a log directory
   my $mode = $self->mode;
@@ -187,7 +192,11 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-sub start { shift->commands->run(@_ ? @_ : @ARGV) }
+sub start {
+  my $self = shift;
+  $_->_warmup for $self->static, $self->renderer;
+  return $self->commands->run(@_ ? @_ : @ARGV);
+}
 
 sub startup { }
 
@@ -219,7 +228,7 @@ Mojolicious - Real-time web framework
   }
 
   # Controller
-  package MyApp::Foo;
+  package MyApp::Controller::Foo;
   use Mojo::Base 'Mojolicious::Controller';
 
   # Action
@@ -356,8 +365,9 @@ Useful for rewriting outgoing responses and other post-processing tasks.
 Emitted right before the L</"before_dispatch"> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you want
 to continue the chain. Default exception handling with
-L<Mojolicious::Controller/"render_exception"> is the first hook in the chain
-and a call to L</"dispatch"> the last, yours will be in between.
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> is the first
+hook in the chain and a call to L</"dispatch"> the last, yours will be in
+between.
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;
@@ -456,7 +466,7 @@ startup method to define the url endpoints for your application.
   $r->post('/baz')->to('test#baz');
 
   # Add another namespace to load controllers from
-  push @{$app->routes->namespaces}, 'MyApp::Controller';
+  push @{$app->routes->namespaces}, 'MyApp::MyController';
 
 =head2 secrets
 
@@ -581,9 +591,13 @@ and the application object, as well as a function in C<ep> templates.
   # Helper
   $app->helper(cache => sub { state $cache = {} });
 
-  # Controller/Application
-  $self->cache->{foo} = 'bar';
-  my $result = $self->cache->{foo};
+  # Application
+  $app->cache->{foo} = 'bar';
+  my $result = $app->cache->{foo};
+
+  # Controller
+  $c->cache->{foo} = 'bar';
+  my $result = $c->cache->{foo};
 
   # Template
   % cache->{foo} = 'bar';
@@ -733,6 +747,8 @@ Abhijit Menon-Sen, C<ams@cpan.org>
 
 Glen Hinkle, C<tempire@cpan.org>
 
+Jan Henning Thorsen, C<jhthorsen@cpan.org>
+
 Joel Berger, C<jberger@cpan.org>
 
 Marcus Ramberg, C<mramberg@cpan.org>
@@ -849,8 +865,6 @@ Ilya Chesnokov
 
 James Duncan
 
-Jan Henning Thorsen
-
 Jan Jona Javorsek
 
 Jan Schmidt
@@ -873,6 +887,8 @@ Kevin Old
 
 Kitamura Akatsuki
 
+Klaus S. Madsen
+
 Lars Balker Rasmussen
 
 Leon Brocard
@@ -880,6 +896,10 @@ Leon Brocard
 Magnus Holm
 
 Maik Fischer
+
+Mark Fowler
+
+Mark Grimes
 
 Mark Stosberg
 
@@ -964,6 +984,8 @@ Stephane Este-Gracias
 Tatsuhiko Miyagawa
 
 Terrence Brannon
+
+Tianon Gravi
 
 Tomas Znamenacek
 

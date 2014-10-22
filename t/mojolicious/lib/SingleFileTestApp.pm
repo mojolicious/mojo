@@ -22,8 +22,8 @@ sub startup {
   # Helper route
   $self->routes->route('/helper')->to(
     cb => sub {
-      my $self = shift;
-      $self->render(text => $self->some_plugin);
+      my $c = shift;
+      $c->render(text => $c->some_plugin);
     }
   );
 
@@ -63,7 +63,7 @@ sub data_template { shift->render('index') }
 
 sub data_template2 { shift->stash(template => 'too') }
 
-sub data_static { shift->render_static('singlefiletestapp/foo.txt') }
+sub data_static { shift->reply->static('singlefiletestapp/foo.txt') }
 
 sub index {
   shift->stash(template => 'WithGreenLayout', msg => 'works great!');

@@ -11,12 +11,9 @@ has url => sub { Mojo::URL->new };
 has 'reverse_proxy';
 
 my $START_LINE_RE = qr/
-  ^
-  ([a-zA-Z]+)                                            # Method
-  \s+
-  ([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
-  \s+HTTP\/(\d\.\d)                                      # Version
-  $
+  ^([a-zA-Z]+)                                              # Method
+  \s+([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
+  \s+HTTP\/(\d\.\d)$                                        # Version
 /x;
 
 sub clone {
@@ -54,6 +51,8 @@ sub cookies {
   return $self;
 }
 
+sub every_param { shift->params->every_param(@_) }
+
 sub extract_start_line {
   my ($self, $bufref) = @_;
 
@@ -61,8 +60,7 @@ sub extract_start_line {
   return undef unless $$bufref =~ s/^\s*(.*?)\x0d?\x0a//;
 
   # We have a (hopefully) full request line
-  $self->error({message => 'Bad request start line', advice => 400})
-    and return undef
+  return !$self->error({message => 'Bad request start line', advice => 400})
     unless $1 =~ $START_LINE_RE;
   my $url = $self->method($1)->version($3)->url;
   return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
@@ -108,9 +106,8 @@ sub get_start_line_chunk {
     }
 
     # Proxy
-    elsif ($self->proxy) {
-      $path = $url->clone->userinfo(undef)
-        unless $self->is_handshake || $url->protocol eq 'https';
+    elsif ($self->proxy && $url->protocol ne 'https') {
+      $path = $url->clone->userinfo(undef) unless $self->is_handshake;
     }
 
     $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";
@@ -226,10 +223,8 @@ sub _parse_env {
   $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
 
   # Scheme/Version
-  if (($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!) {
-    $base->scheme($1);
-    $self->version($2);
-  }
+  $base->scheme($1) and $self->version($2)
+    if ($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!;
 
   # HTTPS
   $base->scheme('https') if uc($env->{HTTPS} // '') eq 'ON';
@@ -358,6 +353,16 @@ Clone request if possible, otherwise return C<undef>.
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
+=head2 every_param
+
+  my $values = $req->every_param('foo');
+
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference.
+
+  # Get first value
+  say $req->every_param('foo')->[0];
+
 =head2 extract_start_line
 
   my $bool = $req->extract_start_line(\$str);
@@ -397,25 +402,29 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 =head2 param
 
   my @names       = $req->param;
-  my $foo         = $req->param('foo');
-  my @foo         = $req->param('foo');
+  my $value       = $req->param('foo');
   my ($foo, $bar) = $req->param(['foo', 'bar']);
 
-Access C<GET> and C<POST> parameters. Note that this method caches all data,
-so it should not be called before the entire request body has been received.
-Parts of the request body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large, there's a
-10MB limit by default.
+Access C<GET> and C<POST> parameters extracted from the query string and
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
+If there are multiple values sharing the same name, and you want to access
+more than just the last one, you can use L</"every_param">. Note that this
+method caches all data, so it should not be called before the entire request
+body has been received. Parts of the request body need to be loaded into
+memory to parse C<POST> parameters, so you have to make sure it is not
+excessively large, there's a 10MB limit by default.
 
 =head2 params
 
   my $params = $req->params;
 
-All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
-that this method caches all data, so it should not be called before the entire
-request body has been received. Parts of the request body need to be loaded
-into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large, there's a 10MB limit by default.
+All C<GET> and C<POST> parameters extracted from the query string and
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
+usually a L<Mojo::Parameters> object. Note that this method caches all data,
+so it should not be called before the entire request body has been received.
+Parts of the request body need to be loaded into memory to parse C<POST>
+parameters, so you have to make sure it is not excessively large, there's a
+10MB limit by default.
 
   # Get parameter value
   say $req->params->param('foo');

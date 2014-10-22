@@ -41,14 +41,14 @@ hook after_build_tx => sub {
 };
 
 post '/upload' => sub {
-  my $self = shift;
-  my $id   = $self->param('id');
-  $self->render(data => $cache{$id});
+  my $c  = shift;
+  my $id = $c->param('id');
+  $c->render(data => $cache{$id});
 };
 
 get '/download' => sub {
-  my $self = shift;
-  $self->render(data => $cache{$self->param('id')});
+  my $c = shift;
+  $c->render(data => $cache{$c->param('id')});
 };
 
 my $t = Test::Mojo->new;

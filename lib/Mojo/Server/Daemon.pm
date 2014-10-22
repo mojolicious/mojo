@@ -8,13 +8,11 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has acceptors => sub { [] };
-has [qw(backlog silent)];
+has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
-has max_clients   => 1000;
-has max_requests  => 25;
-has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };
+has max_requests => 25;
 
 sub DESTROY {
   my $self = shift;
@@ -41,7 +39,7 @@ sub start {
 
   # Start listening
   else { $self->_listen($_) for @{$self->listen} }
-  $loop->max_connections($self->max_clients);
+  if (my $max = $self->max_clients) { $loop->max_connections($max) }
 
   return $self;
 }
@@ -68,7 +66,6 @@ sub _build_tx {
   my $handle = $self->ioloop->stream($id)->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
-  $tx->req->reverse_proxy(1) if $self->reverse_proxy;
   $tx->req->url->base->scheme('https') if $c->{tls};
 
   # Handle upgrades and requests
@@ -163,7 +160,7 @@ sub _listen {
       warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
       $stream->timeout($self->inactivity_timeout);
 
-      $stream->on(close => sub { $self->_close($id) });
+      $stream->on(close => sub { $self && $self->_close($id) });
       $stream->on(error =>
           sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read => sub { $self->_read($id => pop) });
@@ -206,13 +203,10 @@ sub _remove {
 sub _write {
   my ($self, $id) = @_;
 
-  # Not writing
+  # Get chunk and write
   return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
-  return unless $tx->is_writing;
-
-  # Get chunk and write
-  return if $c->{writing}++;
+  return if !$tx->is_writing || $c->{writing}++;
   my $chunk = $tx->server_write;
   delete $c->{writing};
   warn "-- Server >>> Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
@@ -267,15 +261,15 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured, highly portable non-blocking I/O
-HTTP and WebSocket server, with IPv6, TLS, Comet (long polling), keep-alive,
-connection pooling, timeout, cookie, multipart and multiple event loop
-support.
+HTTP and WebSocket server, with IPv6, TLS, Comet (long polling), keep-alive
+and multiple event loop support.
 
-For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.84+) will be used automatically by L<Mojo::IOLoop> if
-they are installed. Individual features can also be disabled with the
-C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide IPv6, SOCKS5 as well as
+TLS support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+),
+L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL> (1.84+) will be used
+automatically if they are installed. Individual features can also be disabled
+with the C<MOJO_NO_IPV6>, C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment
+variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
@@ -401,7 +395,8 @@ TLS verification mode, defaults to C<0x03>.
   my $max = $daemon->max_clients;
   $daemon = $daemon->max_clients(1000);
 
-Maximum number of concurrent client connections, defaults to C<1000>.
+Maximum number of concurrent client connections, passed along to
+L<Mojo::IOLoop/"max_connections">.
 
 =head2 max_requests
 
@@ -409,14 +404,6 @@ Maximum number of concurrent client connections, defaults to C<1000>.
   $daemon = $daemon->max_requests(100);
 
 Maximum number of keep-alive requests per connection, defaults to C<25>.
-
-=head2 reverse_proxy
-
-  my $bool = $daemon->reverse_proxy;
-  $daemon  = $daemon->reverse_proxy($bool);
-
-This server operates behind a reverse proxy, defaults to the value of the
-C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 silent
 

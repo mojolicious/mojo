@@ -2,7 +2,7 @@
 # Mojolicious [![Build Status](https://travis-ci.org/kraih/mojo.svg?branch=master)](https://travis-ci.org/kraih/mojo)
 
   Back in the early days of the web, many people learned Perl because of a
-  wonderful Perl library called [CGI](http://metacpan.org/module/CGI). It was
+  wonderful Perl library called [CGI](https://metacpan.org/module/CGI). It was
   simple enough to get started without knowing much about the language and
   powerful enough to keep you going, learning by doing was much fun. While
   most of the techniques used are outdated now, the idea behind it is not.
@@ -12,19 +12,17 @@
 ## Features
 
   * An amazing real-time web framework, allowing you to easily grow single
-    file [Mojolicious::Lite](http://mojolicio.us/perldoc/Mojolicious/Lite)
-    prototypes into well structured web applications.
+    file prototypes into well-structured web applications.
     * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish
       templates, content negotiation, session management, form validation,
       testing framework, static file server, first class Unicode support and
       much more for you to discover.
-  * Very clean, portable and Object Oriented pure-Perl API without any hidden
-    magic and no requirements besides Perl 5.10.1 (although 5.18+ is
-    recommended, and optional CPAN modules will be used to provide advanced
-    functionality if they are installed).
+  * Very clean, portable and Object Oriented pure-Perl API with no hidden
+    magic and no requirements besides Perl 5.18.0 (versions as old as 5.10.1
+    can be used too, but may require additional CPAN modules to be installed)
   * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
-    SNI, IDNA, Comet (long polling), keep-alive, connection pooling, timeout,
-    cookie, multipart, proxy, and gzip compression support.
+    SNI, IDNA, HTTP/SOCKS5 proxy, Comet (long polling), keep-alive, connection
+    pooling, timeout, cookie, multipart, and gzip compression support.
   * Built-in non-blocking I/O web server, supporting multiple event loops as
     well as optional preforking and hot deployment, perfect for embedding.
   * Automatic CGI and [PSGI](http://plackperl.org) detection.
@@ -36,7 +34,11 @@
 
   All you need is a one-liner, it takes less than a minute.
 
-    $ curl get.mojolicio.us | sh
+    $ curl -L cpanmin.us | perl - -n Mojolicious
+
+  And if you already have `cpanm` installed with a secure toolchain.
+
+    $ cpanm --mirror https://cpan.metacpan.org --mirror-only --verify -n Mojolicious
 
   We recommend the use of a [Perlbrew](http://perlbrew.pl) environment.
 
@@ -47,7 +49,7 @@
 ```perl
 use Mojolicious::Lite;
 
-get '/' => {text => 'Hello World!'};
+get '/' => {text => 'I ♥ Mojolicious!'};
 
 app->start;
 ```
@@ -59,49 +61,41 @@ app->start;
     Server available at http://127.0.0.1:3000.
 
     $ curl http://127.0.0.1:3000/
-    Hello World!
+    I ♥ Mojolicious!
 
 ## Duct tape for the HTML5 web
 
-  Web development for humans, making hard things possible and everything fun.
+  Use all the latest Perl and HTML features in beautiful single file
+  prototypes like this one, and grow them easily into well-structured
+  applications.
 
 ```perl
 use Mojolicious::Lite;
+use 5.20.0;
+use experimental 'signatures';
 
-# Simple plain text response
-get '/' => {text => 'I ♥ Mojolicious!'};
+# Render template "index.html.ep" from the DATA section
+get '/' => {template => 'index'};
 
-# Route associating "/time" with template in DATA section
-get '/time' => 'clock';
-
-# Scrape information from remote sites
-post '/title' => sub {
-  my $self  = shift;
-  my $url   = $self->param('url') || 'http://mojolicio.us';
-  my $title = $self->ua->get($url)->res->dom->at('title')->text;
-  $self->render(json => {url => $url, title => $title});
-};
-
-# WebSocket echo service
-websocket '/echo' => sub {
-  my $self = shift;
-  $self->on(message => sub {
-    my ($self, $msg) = @_;
-    $self->send("echo: $msg");
+# WebSocket service used by the template to extract the title from a web site
+websocket '/title' => sub ($c) {
+  $c->on(message => sub ($c, $msg) {
+    my $title = $c->ua->get($msg)->res->dom->at('title')->text;
+    $c->send($title);
   });
 };
 
 app->start;
 __DATA__
 
-@@ clock.html.ep
-% use Time::Piece;
-% my $now = localtime;
-The time is <%= $now->hms %>.
+@@ index.html.ep
+% my $url = url_for 'title';
+<script>
+  var ws = new WebSocket('<%= $url->to_abs %>');
+  ws.onmessage = function (event) { document.body.innerHTML += event.data };
+  ws.onopen    = function (event) { ws.send('http://mojolicio.us') };
+</script>
 ```
-
-  Single file prototypes like this one can easily grow into well-structured
-  applications.
 
 ## Want to know more?
 

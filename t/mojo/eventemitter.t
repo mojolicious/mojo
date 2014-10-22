@@ -16,41 +16,21 @@ eval { $e->emit('die') };
 is $@, "works!\n", 'right error';
 
 # Unhandled error event
-eval { $e->emit(error => 'just') };
-like $@, qr/^Mojo::EventEmitter: just/, 'right error';
-eval { $e->emit_safe(error => 'works') };
+eval { $e->emit(error => 'works') };
 like $@, qr/^Mojo::EventEmitter: works/, 'right error';
+
+# Catch
+my $err;
+ok !$e->has_subscribers('foo'), 'no subscribers';
+$e->catch(sub { $err = pop });
+ok $e->has_subscribers('error'), 'has subscribers';
+$e->emit(error => 'just works!');
+is $err, 'just works!', 'right error';
 
 # Exception in error event
 $e->once(error => sub { die "$_[1]entional" });
 eval { $e->emit(error => 'int') };
 like $@, qr/^intentional/, 'right error';
-$e->once(error => sub { die "$_[1]entional" });
-eval { $e->emit_safe(error => 'int') };
-like $@, qr/^Mojo::EventEmitter: Event "error" failed: intentional/,
-  'right error';
-
-# Error fallback
-my ($echo, $err);
-$e->catch(sub { $err = pop })->on(test2 => sub { $echo .= 'echo: ' . pop });
-$e->on(
-  test2 => sub {
-    my ($self, $msg) = @_;
-    die "test2: $msg\n";
-  }
-);
-my $cb = sub { $echo .= 'echo2: ' . pop };
-$e->on(test2 => $cb);
-$e->emit_safe('test2', 'works!');
-is $echo, 'echo: works!echo2: works!', 'right echo';
-is $err, qq{Event "test2" failed: test2: works!\n}, 'right error';
-($echo, $err) = ();
-is scalar @{$e->subscribers('test2')}, 3, 'three subscribers';
-$e->unsubscribe(test2 => $cb);
-is scalar @{$e->subscribers('test2')}, 2, 'two subscribers';
-$e->emit_safe('test2', 'works!');
-is $echo, 'echo: works!', 'right echo';
-is $err, qq{Event "test2" failed: test2: works!\n}, 'right error';
 
 # Normal event again
 $e->emit('test1');
@@ -126,7 +106,7 @@ is $once, 1, 'event was not emitted again';
 # Unsubscribe
 $e = Mojo::EventEmitter->new;
 my $counter;
-$cb = $e->on(foo => sub { $counter++ });
+my $cb = $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->unsubscribe(foo => $e->once(foo => sub { $counter++ }));
@@ -151,7 +131,7 @@ is $buffer, '', 'no result';
 $e->emit(one => $buffer => 'two');
 is $buffer, 'abctwo123two', 'right result';
 $e->once(one => sub { $_[1] .= 'def' });
-$e->emit_safe(one => $buffer => 'three');
+$e->emit(one => $buffer => 'three');
 is $buffer, 'abctwo123twoabcthree123threedef', 'right result';
 $e->emit(one => $buffer => 'x');
 is $buffer, 'abctwo123twoabcthree123threedefabcx123x', 'right result';

@@ -1,7 +1,4 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
-
 use Mojo::IOLoop;
 
 # Minimal CONNECT proxy server to test TLS tunneling
@@ -76,7 +73,7 @@ Mojo::IOLoop->server(
       }
     );
   }
-) or die "Couldn't create listen socket!\n";
+);
 
 print <<'EOF';
 Starting CONNECT proxy on port 3000.

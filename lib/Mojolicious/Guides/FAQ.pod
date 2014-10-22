@@ -16,7 +16,7 @@ We hope these answers are to your satisfaction.
 
 =head2 How does Mojolicious compare to other Perl web frameworks?
 
-The short answer is "it doesn't", because we interpret the words
+The short answer is "it doesn't", because we interpret the term
 "web framework" much more literally than others. With the emergence of the
 real-time web and new technologies such as WebSockets, we are facing new
 challenges that go way beyond what commonly used modules like L<LWP> were
@@ -24,8 +24,8 @@ designed for. Because of this, L<Mojolicious> contains a whole new HTTP
 client/server stack called L<Mojo>, which was heavily inspired by the original
 LWPng effort and carefully designed with these new requirements in mind. So
 while some of the higher abstraction layers might look similar to other web
-frameworks, it actually defines a whole new category and could even be the
-foundation for more advanced ones in the future.
+frameworks, it is more of a web toolkit and can even be used as the foundation
+for more advanced web frameworks.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 
@@ -34,8 +34,9 @@ without compromises. While there are no rules in
 L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently
 discourage adding non-optional ones in favor of a faster and more painless
 installation process. And we do in fact already use several optional CPAN
-modules such as L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and L<Plack> to
-provide advanced functionality if they are installed.
+modules such as L<EV>, L<IO::Socket::IP>, L<IO::Socket::Socks>,
+L<IO::Socket::SSL> and L<Plack> to provide advanced functionality if they are
+installed.
 
 =head2 Why reinvent wheels?
 
@@ -172,11 +173,11 @@ one.
 =head2 What does "Your secret passphrase needs to be changed" mean?
 
 L<Mojolicious> uses secret passphrases for security features such as signed
-cookies. It defaults to using the moniker of your application, which is not
-very secure, so we added this log message as a reminder. You can change the
+cookies. It defaults to using L<Mojolicious/"moniker">, which is not very
+secure, so we added this log message as a reminder. You can change the
 passphrase with the attribute L<Mojolicious/"secrets">.
 
-  app->secrets(['My very secret passphrase.']);
+  $app->secrets(['My very secret passphrase.']);
 
 =head2 What does "Nothing has been rendered, expecting delayed response" mean?
 
@@ -209,8 +210,7 @@ be closed immediately.
 As long as they are accepting new connections, worker processes of all
 built-in preforking web servers send heartbeat messages to the manager process
 at regular intervals, to signal that they are still responsive. A blocking
-operation such as an infinite loop in your application (or active connections
-after a worker has stopped accepting new connections) can prevent this, and
+operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_interval"> if your application requires it.

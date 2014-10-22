@@ -8,15 +8,12 @@ use Mojo::Util 'encode';
 has format => sub { \&_format };
 has handle => sub {
 
-  # File
-  if (my $path = shift->path) {
-    croak qq{Can't open log file "$path": $!}
-      unless open my $file, '>>', $path;
-    return $file;
-  }
-
   # STDERR
-  return \*STDERR;
+  return \*STDERR unless my $path = shift->path;
+
+  # File
+  croak qq{Can't open log file "$path": $!} unless open my $file, '>>', $path;
+  return $file;
 };
 has history => sub { [] };
 has level => 'debug';
@@ -38,8 +35,7 @@ sub append {
 sub debug { shift->log(debug => @_) }
 sub error { shift->log(error => @_) }
 sub fatal { shift->log(fatal => @_) }
-
-sub info { shift->log(info => @_) }
+sub info  { shift->log(info  => @_) }
 
 sub is_debug { shift->is_level('debug') }
 sub is_error { shift->is_level('error') }
@@ -47,13 +43,12 @@ sub is_fatal { shift->is_level('fatal') }
 sub is_info  { shift->is_level('info') }
 
 sub is_level {
-  my ($self, $level) = @_;
-  return $LEVEL->{lc $level} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || $self->level};
+  $LEVEL->{lc pop} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || shift->level};
 }
 
 sub is_warn { shift->is_level('warn') }
 
-sub log { shift->emit('message', lc(shift), @_) }
+sub log { shift->emit('message', lc shift, @_) }
 
 sub new {
   my $self = shift->SUPER::new(@_);

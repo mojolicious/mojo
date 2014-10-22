@@ -87,13 +87,13 @@ $t->get_ok('/advanced')->status_is(200)->header_is('X-Append' => 'bar')
   ->content_is("&LT;escape me>\n123423");
 
 # Normal "pod" template
-$t->get_ok('/docs')->status_is(200)->content_like(qr!<h3>snowman</h3>!);
+$t->get_ok('/docs')->status_is(200)->content_like(qr!<h3.*>snowman</h3>!);
 
 # Template in "teapod" format
-$t->get_ok('/docs2')->status_is(200)->content_like(qr!<h2>snowman</h2>!);
+$t->get_ok('/docs2')->status_is(200)->content_like(qr!<h2.*>snowman</h2>!);
 
 # Empty stash value
-$t->get_ok('/docs3')->status_is(200)->content_like(qr!<h3></h3>!);
+$t->get_ok('/docs3')->status_is(200)->content_like(qr!<h3.*></h3>!);
 
 # REST request for "foo" format
 $t->get_ok('/rest')->status_is(200)->header_is('X-Rest' => 1)

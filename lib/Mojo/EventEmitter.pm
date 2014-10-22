@@ -1,6 +1,7 @@
 package Mojo::EventEmitter;
 use Mojo::Base -base;
 
+use Mojo::Util 'deprecated';
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
@@ -22,21 +23,18 @@ sub emit {
   return $self;
 }
 
+# DEPRECATED in Tiger Face!
 sub emit_safe {
+  deprecated 'Mojo::EventEmitter::emit_safe is DEPRECATED';
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}{$name}) {
-    warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
-      if DEBUG;
     for my $cb (@$s) {
       $self->emit(error => qq{Event "$name" failed: $@})
         unless eval { $self->$cb(@_); 1 };
     }
   }
-  else {
-    warn "-- Emit $name in @{[blessed $self]} safely (0)\n" if DEBUG;
-    die "@{[blessed $self]}: $_[0]" if $name eq 'error';
-  }
+  else { die "@{[blessed $self]}: $_[0]" if $name eq 'error' }
 
   return $self;
 }
@@ -125,7 +123,8 @@ L<Mojo::EventEmitter> can emit the following events.
     ...
   });
 
-Emitted for event errors, fatal if unhandled.
+This is a special event for errors, it will not be emitted directly by this
+class but is fatal if unhandled.
 
   $e->on(error => sub {
     my ($e, $err) = @_;
@@ -152,13 +151,6 @@ Subscribe to L</"error"> event.
   $e = $e->emit('foo', 123);
 
 Emit event.
-
-=head2 emit_safe
-
-  $e = $e->emit_safe('foo');
-  $e = $e->emit_safe('foo', 123);
-
-Emit event safely and emit L</"error"> event on failure.
 
 =head2 has_subscribers
 

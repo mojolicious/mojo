@@ -587,12 +587,12 @@ is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
 is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
-is_deeply [$req->param('foo')], [qw(bar bar 13)], 'right values';
+is_deeply $req->every_param('foo'),     [qw(bar bar 13)], 'right values';
 is $req->param(' tset'), '23 ', 'right value';
 $req->param('set', 'single');
 is $req->param('set'), 'single', 'setting single param works';
 $req->param('multi', 1, 2, 3);
-is_deeply [$req->param('multi')], [qw(1 2 3)],
+is_deeply $req->every_param('multi'), [qw(1 2 3)],
   'setting multiple value param works';
 is $req->param('test23'), undef, 'no value';
 
@@ -1587,10 +1587,11 @@ is $req2->headers->cookie, 'foo=bar; foo=baz; foo=yada; bar=foo',
   'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is_deeply [map { $_->value } $req2->cookie('foo')], [qw(bar baz yada)],
+is_deeply [map { $_->value } @{$req2->every_cookie('foo')}],
+  [qw(bar baz yada)], 'right values';
+is_deeply [map { $_->value } @{$req2->every_cookie('bar')}], ['foo'],
   'right values';
-is_deeply [map { $_->value } $req2->cookie('bar')], ['foo'], 'right values';
-is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(bar foo)],
+is_deeply [map { $_->value } $req2->cookie([qw(foo bar)])], [qw(yada foo)],
   'right values';
 
 # Parse full HTTP 1.0 request with cookies and progress callback
@@ -1694,7 +1695,7 @@ is $req->param('Zuname'),  '',  'right value';
 is $req->param('Text'),    '',  'right value';
 is $req->content->parts->[0]->asset->slurp, 'T', 'right content';
 
-# Chrome 30 multipart/form-data request (with quotation marks)
+# Chrome 35 multipart/form-data request (with quotation marks)
 $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.1\x0d\x0a");
 $req->parse("Host: 127.0.0.1:3000\x0d\x0a");
@@ -1713,16 +1714,16 @@ $req->parse("Accept-Encoding: gzip,deflate,sdch\x0d\x0a");
 $req->parse("Accept-Language: en-US,en;q=0.8\x0d\x0a\x0d\x0a");
 $req->parse("------WebKitFormBoundaryMTelhBLWA9N3KXAR\x0d\x0a");
 $req->parse('Content-Disposition: form-data; na');
-$req->parse('me="foo \\%22bar%22 baz"; filename="fo\\%22o%22.txt"');
+$req->parse('me="foo \\%22bar%22 baz\"; filename="fo\\%22o%22.txt\"');
 $req->parse("\x0d\x0a\x0d\x0atest\x0d\x0a");
 $req->parse("------WebKitFormBoundaryMTelhBLWA9N3KXAR--\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->upload('foo \\%22bar%22 baz')->filename, 'fo\\%22o%22.txt',
+is $req->upload('foo \\%22bar%22 baz\\')->filename, 'fo\\%22o%22.txt\\',
   'right filename';
-is $req->upload('foo \\%22bar%22 baz')->slurp, 'test', 'right content';
+is $req->upload('foo \\%22bar%22 baz\\')->slurp, 'test', 'right content';
 
 # Firefox 24 multipart/form-data request (with quotation marks)
 $req = Mojo::Message::Request->new;

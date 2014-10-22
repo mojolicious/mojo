@@ -10,6 +10,9 @@ has headers           => sub { Mojo::Headers->new };
 has max_buffer_size   => sub { $ENV{MOJO_MAX_BUFFER_SIZE} || 262144 };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
+my $BOUNDARY_RE
+  = qr!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i;
+
 sub body_contains {
   croak 'Method "body_contains" not implemented by subclass';
 }
@@ -17,10 +20,7 @@ sub body_contains {
 sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
 sub boundary {
-  return undef unless my $type = shift->headers->content_type;
-  $type =~ m!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i
-    and return $1 // $2;
-  return undef;
+  (shift->headers->content_type // '') =~ $BOUNDARY_RE ? $1 // $2 : undef;
 }
 
 sub build_body    { shift->_build('get_body_chunk') }
@@ -179,8 +179,7 @@ sub write_chunk {
 sub _build {
   my ($self, $method) = @_;
 
-  my $buffer = '';
-  my $offset = 0;
+  my ($buffer, $offset) = ('', 0);
   while (1) {
 
     # No chunk yet, try again
@@ -406,7 +405,7 @@ Content headers, defaults to a L<Mojo::Headers> object.
   $content = $content->max_buffer_size(1024);
 
 Maximum size in bytes of buffer for content parser, defaults to the value of
-the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144>.
+the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144> (256KB).
 
 =head2 max_leftover_size
 
@@ -414,7 +413,8 @@ the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144>.
   $content = $content->max_leftover_size(1024);
 
 Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
-value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
+value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>
+(256KB).
 
 =head2 relaxed
 
@@ -514,7 +514,7 @@ Check if content is chunked.
 
   my $bool = $content->is_compressed;
 
-Check if content is C<gzip> compressed.
+Check if content is gzip compressed.
 
 =head2 is_dynamic
 

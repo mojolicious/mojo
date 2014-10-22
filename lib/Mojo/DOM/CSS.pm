@@ -14,33 +14,22 @@ my $ATTR_RE   = qr/
   )?
   \]
 /x;
-my $CLASS_ID_RE = qr/
-  (?:
-    (?:\.((?:\\\.|[^\#.])+))   # Class
-  |
-    (?:\#((?:\\\#|[^.\#])+))   # ID
-  )
-/x;
 my $PSEUDO_CLASS_RE = qr/(?::([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
 my $TOKEN_RE        = qr/
   (\s*,\s*)?                         # Separator
   ((?:[^[\\:\s,]|$ESCAPE_RE\s?)+)?   # Element
   ($PSEUDO_CLASS_RE*)?               # Pseudoclass
   ((?:$ATTR_RE)*)?                   # Attributes
-  (?:
-    \s*
-    ([>+~])                          # Combinator
-  )?
+  (?:\s*([>+~]))?                    # Combinator
 /x;
 
 sub match {
   my $tree = shift->tree;
-  return undef if $tree->[0] ne 'tag';
-  return _match(_compile(shift), $tree, $tree);
+  return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, $tree);
 }
 
-sub select     { shift->_select(0, @_) }
-sub select_one { shift->_select(1, @_) }
+sub select     { _select(0, shift->tree, _compile(@_)) }
+sub select_one { _select(1, shift->tree, _compile(@_)) }
 
 sub _ancestor {
   my ($selectors, $current, $tree) = @_;
@@ -94,7 +83,7 @@ sub _compile {
   my $css = shift;
 
   my $pattern = [[]];
-  while ($css =~ /$TOKEN_RE/g) {
+  while ($css =~ /$TOKEN_RE/go) {
     my ($separator, $element, $pc, $attrs, $combinator)
       = ($1, $2 // '', $3, $6, $11);
 
@@ -116,18 +105,18 @@ sub _compile {
     push @$selector, ['tag', $tag];
 
     # Class or ID
-    while ($element =~ /$CLASS_ID_RE/g) {
-      push @$selector, ['attr', 'class', _regex('~', $1)] if defined $1;
-      push @$selector, ['attr', 'id',    _regex('',  $2)] if defined $2;
+    while ($element =~ /(?:([.#])((?:\\[.\#]|[^\#.])+))/g) {
+      my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
+      push @$selector, ['attr', $name, _regex($op, $2)];
     }
 
     # Pseudo classes (":not" contains more selectors)
     push @$selector, ['pc', "$1", $1 eq 'not' ? _compile($2) : $2]
-      while $pc =~ /$PSEUDO_CLASS_RE/g;
+      while $pc =~ /$PSEUDO_CLASS_RE/go;
 
     # Attributes
     push @$selector, ['attr', _unescape($1), _regex($2 // '', $3 // $4)]
-      while $attrs =~ /$ATTR_RE/g;
+      while $attrs =~ /$ATTR_RE/go;
 
     # Combinator
     push @$part, [combinator => $combinator] if $combinator;
@@ -171,37 +160,25 @@ sub _parent {
 sub _pc {
   my ($class, $args, $current) = @_;
 
-  # ":first-*"
-  if ($class =~ /^first-(?:(child)|of-type)$/) {
-    $class = defined $1 ? 'nth-child' : 'nth-of-type';
-    $args = 1;
-  }
-
-  # ":last-*"
-  elsif ($class =~ /^last-(?:(child)|of-type)$/) {
-    $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
-    $args = '-n+1';
-  }
-
-  # ":checked"
-  if ($class eq 'checked') {
-    my $attrs = $current->[2];
-    return 1 if exists $attrs->{checked} || exists $attrs->{selected};
-  }
-
   # ":empty"
-  elsif ($class eq 'empty') { return 1 unless defined $current->[4] }
+  return !defined $current->[4] if $class eq 'empty';
 
   # ":root"
-  elsif ($class eq 'root') {
-    if (my $parent = $current->[3]) { return 1 if $parent->[0] eq 'root' }
-  }
+  return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
   # ":not"
-  elsif ($class eq 'not') { return 1 if !_match($args, $current, $current) }
+  return !_match($args, $current, $current) if $class eq 'not';
+
+  # ":checked"
+  return exists $current->[2]{checked} || exists $current->[2]{selected}
+    if $class eq 'checked';
+
+  # ":first-*" or ":last-*" (rewrite with equation)
+  ($class, $args) = $1 ? ("nth-$class", 1) : ("nth-last-$class", '-n+1')
+    if $class =~ s/^(?:(first)|last)-//;
 
   # ":nth-*"
-  elsif ($class =~ /^nth-/) {
+  if ($class =~ /^nth-/) {
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
     my @siblings = @{_siblings($current, $type)};
 
@@ -248,12 +225,10 @@ sub _regex {
 }
 
 sub _select {
-  my ($self, $one, $selector) = @_;
+  my ($one, $tree, $pattern) = @_;
 
   my @results;
-  my $pattern = _compile($selector);
-  my $tree    = $self->tree;
-  my @queue   = ($tree);
+  my @queue = ($tree);
   while (my $current = shift @queue) {
     my $type = $current->[0];
 
@@ -507,15 +482,15 @@ An C<E> element, only sibling of its type.
 
 =head2 E.warning
 
-  my $warning = $css->select('div.warning');
-
 An C<E> element whose class is "warning".
+
+  my $warning = $css->select('div.warning');
 
 =head2 E#myid
 
-  my $foo = $css->select('div#foo');
-
 An C<E> element with C<ID> equal to "myid".
+
+  my $foo = $css->select('div#foo');
 
 =head2 E:not(s)
 

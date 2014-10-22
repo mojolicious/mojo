@@ -122,32 +122,40 @@ ok $readable, 'handle is readable again';
 ok $writable, 'handle is writable again';
 ok !$timer, 'timer was not triggered';
 ok $recurring, 'recurring was triggered again';
-($readable, $writable, $timer, $recurring) = ();
-$reactor->timer(0.025 => sub { shift->stop });
-$reactor->start;
-ok $readable, 'handle is readable again';
-ok $writable, 'handle is writable again';
-ok !$timer, 'timer was not triggered';
-ok $recurring, 'recurring was triggered again';
 $reactor->remove($id);
 ($readable, $writable, $timer, $recurring) = ();
-is $reactor->next_tick(sub { shift->stop }), undef, 'returned undef';
+$reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok $readable, 'handle is readable again';
 ok $writable, 'handle is writable again';
 ok !$timer,     'timer was not triggered';
 ok !$recurring, 'recurring was not triggered again';
+($readable, $writable, $timer, $recurring) = ();
+$id = $reactor->recurring(0 => sub { $recurring++ });
+is $reactor->next_tick(sub { shift->stop }), undef, 'returned undef';
+$reactor->start;
+ok $readable, 'handle is readable again';
+ok $writable, 'handle is writable again';
+ok !$timer, 'timer was not triggered';
+ok $recurring, 'recurring was triggered again';
 
 # Reset
-$reactor->remove($id);
-$reactor->remove($server);
-($readable, $writable) = ();
+$reactor->reset;
+($readable, $writable, $recurring) = ();
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
-ok !$readable, 'io event was not triggered again';
-ok !$writable, 'io event was not triggered again';
+ok !$readable,  'io event was not triggered again';
+ok !$writable,  'io event was not triggered again';
+ok !$recurring, 'recurring was not triggered again';
 my $reactor2 = Mojo::Reactor::EV->new;
 is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
+
+# Reset while watchers are active
+$writable = undef;
+$reactor->io($_ => sub { ++$writable and shift->reset })->watch($_, 0, 1)
+  for $client, $server;
+$reactor->start;
+is $writable, 1, 'only one handle was writable';
 
 # Concurrent reactors
 $timer = 0;

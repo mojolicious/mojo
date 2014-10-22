@@ -8,9 +8,11 @@ sub get { (shift->{cache} || {})->{shift()} }
 sub set {
   my ($self, $key, $value) = @_;
 
+  return $self unless (my $max = $self->max_keys) > 0;
+
   my $cache = $self->{cache} ||= {};
   my $queue = $self->{queue} ||= [];
-  delete $cache->{shift @$queue} if @$queue >= $self->max_keys;
+  delete $cache->{shift @$queue} while @$queue >= $max;
   push @$queue, $key unless exists $cache->{$key};
   $cache->{$key} = $value;
 
@@ -46,7 +48,8 @@ L<Mojo::Cache> implements the following attributes.
   my $max = $cache->max_keys;
   $cache  = $cache->max_keys(50);
 
-Maximum number of cache keys, defaults to C<100>.
+Maximum number of cache keys, defaults to C<100>. Setting the value to C<0>
+will disable caching.
 
 =head1 METHODS
 

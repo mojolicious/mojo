@@ -70,11 +70,8 @@ sub attr {
       $code .= ref $default eq 'CODE' ? '$default->($_[0]);' : '$default;';
     }
 
-    # Store value
-    $code .= "\n  }\n  \$_[0]{'$attr'} = \$_[1];\n";
-
-    # Footer (return invocant)
-    $code .= "  \$_[0];\n}";
+    # Footer (store value and return invocant)
+    $code .= "\n  }\n  \$_[0]{'$attr'} = \$_[1];\n  \$_[0];\n}";
 
     warn "-- Attribute $attr in $class\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
     Carp::croak "Mojo::Base error: $@" unless eval "$code;1";
@@ -186,12 +183,12 @@ L<Mojo::Base> implements the following methods.
 =head2 attr
 
   $object->attr('name');
-  BaseSubClass->attr('name');
-  BaseSubClass->attr([qw(name1 name2 name3)]);
-  BaseSubClass->attr(name => 'foo');
-  BaseSubClass->attr(name => sub {...});
-  BaseSubClass->attr([qw(name1 name2 name3)] => 'foo');
-  BaseSubClass->attr([qw(name1 name2 name3)] => sub {...});
+  SubClass->attr('name');
+  SubClass->attr([qw(name1 name2 name3)]);
+  SubClass->attr(name => 'foo');
+  SubClass->attr(name => sub {...});
+  SubClass->attr([qw(name1 name2 name3)] => 'foo');
+  SubClass->attr([qw(name1 name2 name3)] => sub {...});
 
 Create attribute accessor for hash-based objects, an array reference can be
 used to create more than one at a time. Pass an optional second argument to
@@ -202,9 +199,9 @@ argument.
 
 =head2 new
 
-  my $object = BaseSubClass->new;
-  my $object = BaseSubClass->new(name => 'value');
-  my $object = BaseSubClass->new({name => 'value'});
+  my $object = SubClass->new;
+  my $object = SubClass->new(name => 'value');
+  my $object = SubClass->new({name => 'value'});
 
 This base class provides a basic constructor for hash-based objects. You can
 pass it either a hash or a hash reference with attribute values.

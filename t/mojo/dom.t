@@ -2281,6 +2281,22 @@ is "$dom", <<EOF, 'right result';
 <bar>after</bar>
 EOF
 
+# Nested description lists
+$dom = Mojo::DOM->new->parse(<<EOF);
+<dl>
+  <dt>A</dt>
+  <DD>
+    <dl>
+      <dt>B
+      <dd>C
+    </dl>
+  </dd>
+</dl>
+EOF
+is $dom->find('dl > dd > dl > dt')->[0]->text, 'B', 'right text';
+is $dom->find('dl > dd > dl > dd')->[0]->text, 'C', 'right text';
+is $dom->find('dl > dt')->[0]->text,           'A', 'right text';
+
 # Nested lists
 $dom = Mojo::DOM->new(<<EOF);
 <div>
@@ -2303,11 +2319,58 @@ is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
+# Form values
+$dom = Mojo::DOM->new(<<EOF);
+<form action="/foo">
+  <p>Test</p>
+  <input type="text" name="a" value="A" />
+  <input type="checkbox" checked name="b" value="B">
+  <input type="radio" checked name="c" value="C">
+  <select name="f">
+    <option value="F">G</option>
+    <optgroup>
+      <option>H</option>
+      <option selected>I</option>
+    </optgroup>
+    <option value="J" selected>K</option>
+  </select>
+  <select name="n"><option>N</option></select>
+  <select name="d"><option selected>D</option></select>
+  <textarea name="m">M</textarea>
+  <button name="o" value="O">No!</button>
+  <input type="submit" name="p" value="P" />
+</form>
+EOF
+is_deeply [$dom->at('p')->val->each], [], 'no values';
+is $dom->at('input')->val->size, 1, 'one value';
+is $dom->at('input')->val,                     'A', 'right value';
+is $dom->at('input:checked')->val,             'B', 'right value';
+is $dom->at('input:checked[type=radio]')->val, 'C', 'right value';
+is $dom->find('select')->first->val->join(':'), 'I:J', 'right value';
+is_deeply [$dom->find('select')->first->val->each], ['I', 'J'], 'right values';
+is $dom->at('select option')->val->size, 1, 'one value';
+is $dom->at('select option')->val,                          'F', 'right value';
+is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
+is $dom->find('select')->[1]->val->size, 0, 'no values';
+is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
+is $dom->find('select')->last->val, 'D', 'right value';
+is $dom->at('textarea')->val->size, 1,   'one value';
+is $dom->at('textarea')->val, 'M', 'right value';
+is $dom->at('button')->val,   'O', 'right value';
+is $dom->find('form input')->last->val, 'P', 'right value';
+
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');
 is_deeply $dom->at('input')->attr,
   {type => 'checkbox', value => '/a/', checked => undef}, 'right attributes';
 is "$dom", '<input checked type="checkbox" value="/a/"><br>', 'right result';
+
+# Dot and hash in class and id attributes
+$dom = Mojo::DOM->new('<p class="a#b.c">A</p><p id="a#b.c">B</p>');
+is $dom->at('p.a\#b\.c')->text,       'A', 'right text';
+is $dom->at(':not(p.a\#b\.c)')->text, 'B', 'right text';
+is $dom->at('p#a\#b\.c')->text,       'B', 'right text';
+is $dom->at(':not(p#a\#b\.c)')->text, 'A', 'right text';
 
 # Extra whitespace
 $dom = Mojo::DOM->new('< span>a< /span><b >b</b><span >c</ span>');
@@ -2363,8 +2426,13 @@ is $dom->tree->[5][1], ' HTML4 ',             'right comment';
 is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
 
 # Huge number of attributes
-my $huge = '<div ' . ('a=b ' x 32768) . '>Test</div>';
-$dom = Mojo::DOM->new($huge);
+$dom = Mojo::DOM->new('<div ' . ('a=b ' x 32768) . '>Test</div>');
 is $dom->at('div[a=b]')->text, 'Test', 'right text';
+
+# Huge number of nested tags
+my $huge = ('<a>' x 100) . 'works' . ('</a>' x 100);
+$dom = Mojo::DOM->new($huge);
+is $dom->all_text, 'works', 'right text';
+is "$dom", $huge, 'right result';
 
 done_testing();

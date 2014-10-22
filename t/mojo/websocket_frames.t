@@ -29,6 +29,19 @@ is $frame->[4], 1,          'text frame';
 is $frame->[5], 'whatever', 'right payload';
 is $ws->build_frame(1, 1, 1, 1, 1, 'whatever'), $bytes, 'frames are equal';
 
+# Simple text frame roundtrip without FIN bit
+$ws = Mojo::Transaction::WebSocket->new;
+$bytes = $ws->build_frame(0, 0, 0, 0, 1, 'whatever');
+is $bytes, "\x01\x08\x77\x68\x61\x74\x65\x76\x65\x72", 'right frame';
+$frame = $ws->parse_frame(\($dummy = $bytes));
+is $frame->[0], 0,          'fin flag is not set';
+is $frame->[1], 0,          'rsv1 flag is not set';
+is $frame->[2], 0,          'rsv2 flag is not set';
+is $frame->[3], 0,          'rsv3 flag is not set';
+is $frame->[4], 1,          'text frame';
+is $frame->[5], 'whatever', 'right payload';
+is $ws->build_frame(0, 0, 0, 0, 1, 'whatever'), $bytes, 'frames are equal';
+
 # Simple text frame roundtrip with RSV1 flags set
 $ws = Mojo::Transaction::WebSocket->new;
 $bytes = $ws->build_frame(1, 1, 0, 0, 1, 'whatever');
@@ -140,7 +153,7 @@ is $frame->[4], 2,   'binary frame';
 is $frame->[5], 'a', 'right payload';
 is $bytes = $ws->build_frame(1, 0, 0, 0, 2, 'a'), $bytes, 'frames are equal';
 
-# 16bit text frame roundtrip
+# 16-bit text frame roundtrip
 $ws = Mojo::Transaction::WebSocket->new;
 $bytes = $ws->build_frame(1, 0, 0, 0, 1, 'hi' x 10000);
 is $bytes, "\x81\x7e\x4e\x20" . ("\x68\x69" x 10000), 'right frame';
@@ -153,7 +166,7 @@ is $frame->[4], 1, 'text frame';
 is $frame->[5], 'hi' x 10000, 'right payload';
 is $ws->build_frame(1, 0, 0, 0, 1, 'hi' x 10000), $bytes, 'frames are equal';
 
-# 64bit text frame roundtrip
+# 64-bit text frame roundtrip
 $ws = Mojo::Transaction::WebSocket->new(max_websocket_size => 500000);
 $bytes = $ws->build_frame(1, 0, 0, 0, 1, 'hi' x 200000);
 is $bytes, "\x81\x7f\x00\x00\x00\x00\x00\x06\x1a\x80" . ("\x68\x69" x 200000),

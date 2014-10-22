@@ -17,8 +17,8 @@ ok app->routes->find('perldoc'), 'route found';
 app->defaults(layout => 'gray');
 
 get '/' => sub {
-  my $self = shift;
-  $self->render('simple', handler => 'pod');
+  my $c = shift;
+  $c->render('simple', handler => 'pod');
 };
 
 post '/' => 'index';
@@ -31,17 +31,18 @@ my $t = Test::Mojo->new;
 
 # Simple POD template
 $t->get_ok('/')->status_is(200)
-  ->content_like(qr|<h1>Test123</h1>\s+<p>It <code>works</code>!</p>|);
+  ->content_like(qr!<h1 id="Test123">Test123</h1>!)
+  ->content_like(qr|<p>It <code>works</code>!</p>|);
 
 # POD helper
-$t->post_ok('/')->status_is(200)
-  ->content_like(qr!test123\s+<h1>A</h1>\s+<h1>B</h1>!)
+$t->post_ok('/')->status_is(200)->content_like(qr!test123<h1 id="A">A</h1>!)
+  ->content_like(qr!<h1 id="B">B</h1>!)
   ->content_like(qr!\s+<p><code>test</code></p>!)->content_like(qr/Gray/);
 
 # POD filter
 $t->post_ok('/block')->status_is(200)
-  ->content_like(qr!test321\s+<h2>lalala</h2>\s+<p><code>test</code></p>!)
-  ->content_like(qr/Gray/);
+  ->content_like(qr!test321<h2 id="lalala">lalala</h2>!)
+  ->content_like(qr!<p><code>test</code></p>!)->content_like(qr/Gray/);
 
 # Empty
 $t->get_ok('/empty')->status_is(200)->content_is('');

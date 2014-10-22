@@ -74,7 +74,7 @@ sub _manage {
   sleep 1;
 }
 
-sub _reap { delete $_[0]->{running} while (waitpid -1, WNOHANG) > 0 }
+sub _reap { delete $_[0]{running} while (waitpid -1, WNOHANG) > 0 }
 
 sub _spawn {
   my $self = shift;
@@ -120,21 +120,22 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
 
 L<Mojo::Server::Morbo> is a full featured, self-restart capable non-blocking
 I/O HTTP and WebSocket server, built around the very well tested and reliable
-L<Mojo::Server::Daemon>, with IPv6, TLS, Comet (long polling), keep-alive,
-connection pooling, timeout, cookie, multipart and multiple event loop
-support. Note that the server uses signals for process management, so you
-should avoid modifying signal handlers in your applications.
+L<Mojo::Server::Daemon>, with IPv6, TLS, Comet (long polling), keep-alive and
+multiple event loop support. Note that the server uses signals for process
+management, so you should avoid modifying signal handlers in your
+applications.
 
 To start applications with it you can use the L<morbo> script.
 
-  $ morbo myapp.pl
+  $ morbo ./myapp.pl
   Server available at http://127.0.0.1:3000.
 
-For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.84+) will be used automatically by L<Mojo::IOLoop> if
-they are installed. Individual features can also be disabled with the
-C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide IPv6, SOCKS5 as well as
+TLS support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+),
+L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL> (1.84+) will be used
+automatically if they are installed. Individual features can also be disabled
+with the C<MOJO_NO_IPV6>, C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment
+variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 

@@ -117,7 +117,7 @@
     %= include inline => app->renderer->_bundled('mojobar')
     <script>
       function mojoDrawer (handle, drawer) {
-        $(handle).click(function() {
+        $(handle).click(function () {
           $(drawer).slideToggle('slow');
           var text = $(handle + ' div.tap').text();
           text = text == "tap for more" ? "tap for less" : "tap for more";
@@ -125,7 +125,7 @@
         });
         $(drawer).toggle();
       }
-      $(document).ready(function() {
+      $(document).ready(function () {
         mojoDrawer('#trace', '#frames');
         mojoDrawer('#more', '#infos');
       });
@@ -179,8 +179,8 @@
             <div class="tap">tap for more</div>
             <script>
               var current = '#context';
-              $('#showcase').click(function() {
-                $(current).slideToggle('slow', function() {
+              $('#showcase').click(function () {
+                $(current).slideToggle('slow', function () {
                   if (current == '#context') {
                     current = '#insight';
                   }
@@ -216,8 +216,8 @@
           <h1>Page not found... yet!</h1>
           <p>
             None of these routes could generate a response for your
-            <code><%= $self->req->method %></code> request for
-            <code><%= $self->req->url->path->to_route %></code>, maybe you need
+            <code><%= $c->req->method %></code> request for
+            <code><%= $c->req->url->path->to_route %></code>, maybe you need
             to add a new one?
           </p>
           % my $walk = begin
@@ -254,7 +254,7 @@
       % }
       <div id="request" class="box infobox spaced">
         <table>
-          % my $req = $self->req;
+          % my $req = $c->req;
           %= $kv->(Method => $req->method)
           % my $url = $req->url;
           %= $kv->(URL => $url->to_string)
@@ -263,8 +263,8 @@
           %= $kv->(Stash => dumper $snapshot)
           %= $kv->(Session => dumper session)
           %= $kv->(Version => $req->version)
-          % for my $name (sort @{$self->req->headers->names}) {
-            % my $value = $self->req->headers->header($name);
+          % for my $name (sort @{$c->req->headers->names}) {
+            % my $value = $c->req->headers->header($name);
             %= $kv->($name, $value)
           % }
         </table>

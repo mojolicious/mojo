@@ -18,12 +18,12 @@ use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 # Opcodes
 use constant {
-  CONTINUATION => 0,
-  TEXT         => 1,
-  BINARY       => 2,
-  CLOSE        => 8,
-  PING         => 9,
-  PONG         => 10
+  CONTINUATION => 0x0,
+  TEXT         => 0x1,
+  BINARY       => 0x2,
+  CLOSE        => 0x8,
+  PING         => 0x9,
+  PONG         => 0xa
 };
 
 has [qw(compressed masked)];
@@ -35,35 +35,30 @@ sub build_frame {
   warn "-- Building frame ($fin, $rsv1, $rsv2, $rsv3, $op)\n" if DEBUG;
 
   # Head
-  my $frame = 0b00000000;
-  vec($frame, 0, 8) = $op | 0b10000000 if $fin;
-  vec($frame, 0, 8) |= 0b01000000 if $rsv1;
-  vec($frame, 0, 8) |= 0b00100000 if $rsv2;
-  vec($frame, 0, 8) |= 0b00010000 if $rsv3;
+  my $head = $op + ($fin ? 128 : 0);
+  $head |= 0b01000000 if $rsv1;
+  $head |= 0b00100000 if $rsv2;
+  $head |= 0b00010000 if $rsv3;
+  my $frame = pack 'C', $head;
 
   # Small payload
   my $len    = length $payload;
-  my $prefix = 0;
   my $masked = $self->masked;
   if ($len < 126) {
     warn "-- Small payload ($len)\n$payload\n" if DEBUG;
-    vec($prefix, 0, 8) = $masked ? ($len | 0b10000000) : $len;
-    $frame .= $prefix;
+    $frame .= pack 'C', $masked ? ($len | 128) : $len;
   }
 
-  # Extended payload (16bit)
+  # Extended payload (16-bit)
   elsif ($len < 65536) {
-    warn "-- Extended 16bit payload ($len)\n$payload\n" if DEBUG;
-    vec($prefix, 0, 8) = $masked ? (126 | 0b10000000) : 126;
-    $frame .= $prefix;
-    $frame .= pack 'n', $len;
+    warn "-- Extended 16-bit payload ($len)\n$payload\n" if DEBUG;
+    $frame .= pack 'Cn', $masked ? (126 | 128) : 126, $len;
   }
 
-  # Extended payload (64bit with 32bit fallback)
+  # Extended payload (64-bit with 32-bit fallback)
   else {
-    warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
-    vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
-    $frame .= $prefix;
+    warn "-- Extended 64-bit payload ($len)\n$payload\n" if DEBUG;
+    $frame .= pack 'C', $masked ? (127 | 128) : 127;
     $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xffffffff);
   }
 
@@ -160,60 +155,54 @@ sub parse_frame {
   my ($self, $buffer) = @_;
 
   # Head
-  return undef unless length(my $clone = $$buffer) >= 2;
-  my $head = substr $clone, 0, 2;
+  return undef unless length $$buffer >= 2;
+  my ($first, $second) = unpack 'C*', substr($$buffer, 0, 2);
 
   # FIN
-  my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
+  my $fin = ($first & 0b10000000) == 0b10000000 ? 1 : 0;
 
   # RSV1-3
-  my $rsv1 = (vec($head, 0, 8) & 0b01000000) == 0b01000000 ? 1 : 0;
-  my $rsv2 = (vec($head, 0, 8) & 0b00100000) == 0b00100000 ? 1 : 0;
-  my $rsv3 = (vec($head, 0, 8) & 0b00010000) == 0b00010000 ? 1 : 0;
+  my $rsv1 = ($first & 0b01000000) == 0b01000000 ? 1 : 0;
+  my $rsv2 = ($first & 0b00100000) == 0b00100000 ? 1 : 0;
+  my $rsv3 = ($first & 0b00010000) == 0b00010000 ? 1 : 0;
 
   # Opcode
-  my $op = vec($head, 0, 8) & 0b00001111;
+  my $op = $first & 0b00001111;
   warn "-- Parsing frame ($fin, $rsv1, $rsv2, $rsv3, $op)\n" if DEBUG;
 
   # Small payload
-  my $len = vec($head, 1, 8) & 0b01111111;
-  my $hlen = 2;
+  my ($hlen, $len) = (2, $second & 0b01111111);
   if ($len < 126) { warn "-- Small payload ($len)\n" if DEBUG }
 
-  # Extended payload (16bit)
+  # Extended payload (16-bit)
   elsif ($len == 126) {
-    return undef unless length $clone > 4;
+    return undef unless length $$buffer > 4;
     $hlen = 4;
-    $len = unpack 'n', substr($clone, 2, 2);
-    warn "-- Extended 16bit payload ($len)\n" if DEBUG;
+    $len = unpack 'n', substr($$buffer, 2, 2);
+    warn "-- Extended 16-bit payload ($len)\n" if DEBUG;
   }
 
-  # Extended payload (64bit with 32bit fallback)
+  # Extended payload (64-bit with 32-bit fallback)
   elsif ($len == 127) {
-    return undef unless length $clone > 10;
+    return undef unless length $$buffer > 10;
     $hlen = 10;
-    my $ext = substr $clone, 2, 8;
+    my $ext = substr $$buffer, 2, 8;
     $len = MODERN ? unpack('Q>', $ext) : unpack('N', substr($ext, 4, 4));
-    warn "-- Extended 64bit payload ($len)\n" if DEBUG;
+    warn "-- Extended 64-bit payload ($len)\n" if DEBUG;
   }
 
   # Check message size
   $self->finish(1009) and return undef if $len > $self->max_websocket_size;
 
   # Check if whole packet has arrived
-  my $masked = vec($head, 1, 8) & 0b10000000;
-  return undef if length $clone < ($len + $hlen + ($masked ? 4 : 0));
-  substr $clone, 0, $hlen, '';
+  $len += 4 if my $masked = $second & 0b10000000;
+  return undef if length $$buffer < ($hlen + $len);
+  substr $$buffer, 0, $hlen, '';
 
   # Payload
-  $len += 4 if $masked;
-  return undef if length $clone < $len;
-  my $payload = $len ? substr($clone, 0, $len, '') : '';
-
-  # Unmask payload
+  my $payload = $len ? substr($$buffer, 0, $len, '') : '';
   $payload = xor_encode($payload, substr($payload, 0, 4, '') x 128) if $masked;
   warn "$payload\n" if DEBUG;
-  $$buffer = $clone;
 
   return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];
 }
@@ -365,8 +354,8 @@ Mojo::Transaction::WebSocket - WebSocket transaction
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions
-based on L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64bit
-frames require a Perl with support for quads or they are limited to 32bit.
+based on L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64-bit
+frames require a Perl with support for quads or they are limited to 32-bit.
 
 =head1 EVENTS
 
@@ -501,7 +490,7 @@ object.
   my $bool = $ws->masked;
   $ws      = $ws->masked($bool);
 
-Mask outgoing frames with XOR cipher and a random 32bit key.
+Mask outgoing frames with XOR cipher and a random 32-bit key.
 
 =head2 max_websocket_size
 
@@ -509,7 +498,7 @@ Mask outgoing frames with XOR cipher and a random 32bit key.
   $ws      = $ws->max_websocket_size(1024);
 
 Maximum WebSocket message size in bytes, defaults to the value of the
-C<MOJO_MAX_WEBSOCKET_SIZE> environment variable or C<262144>.
+C<MOJO_MAX_WEBSOCKET_SIZE> environment variable or C<262144> (256KB).
 
 =head1 METHODS
 

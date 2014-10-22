@@ -34,9 +34,8 @@ sub continue {
 
   # Merge captures into stash
   my $stash = $c->stash;
-  my $captures = $stash->{'mojo.captures'} //= {};
-  %$captures = (%$captures, %$field);
-  %$stash    = (%$stash,    %$field);
+  @{$stash->{'mojo.captures'} //= {}}{keys %$field} = values %$field;
+  @$stash{keys %$field} = values %$field;
 
   my $continue;
   my $last = !$stack->[++$current];
@@ -87,17 +86,15 @@ sub match {
   my $match = Mojolicious::Routes::Match->new(root => $self);
   $c->match($match);
   my $cache = $self->cache;
-  my $cached = $cache ? $cache->get("$method:$path:$ws") : undef;
-  return $match->endpoint($cached->{endpoint})->stack($cached->{stack})
-    if $cached;
+  if (my $result = $cache->get("$method:$path:$ws")) {
+    return $match->endpoint($result->{endpoint})->stack($result->{stack});
+  }
 
   # Check routes
   $match->match($c => {method => $method, path => $path, websocket => $ws});
-
-  # Cache routes without conditions
-  return unless $cache && (my $endpoint = $match->endpoint);
-  my $result = {endpoint => $endpoint, stack => $match->stack};
-  $cache->set("$method:$path:$ws" => $result) unless $endpoint->has_conditions;
+  return unless my $route = $match->endpoint;
+  $cache->set(
+    "$method:$path:$ws" => {endpoint => $route, stack => $match->stack});
 }
 
 sub route {
@@ -145,11 +142,8 @@ sub _class {
   for my $class (@classes) {
 
     # Failed
-    unless (my $found = $self->_load($class)) {
-      next unless defined $found;
-      $log->debug(qq{Class "$class" is not a controller.});
-      return undef;
-    }
+    next unless defined(my $found = $self->_load($class));
+    return !$log->debug(qq{Class "$class" is not a controller.}) unless $found;
 
     # Success
     my $new = $class->new(%$c);
@@ -263,9 +257,6 @@ L<Mojolicious::Controller> and L<Mojo>.
 
 Routing cache, defaults to a L<Mojo::Cache> object.
 
-  # Disable caching
-  $r->cache(0);
-
 =head2 conditions
 
   my $conditions = $r->conditions;
@@ -289,7 +280,7 @@ C<attr>, C<has>, C<new> and C<tap>.
 Namespaces to load controllers from.
 
   # Add another namespace to load controllers from
-  push @{$r->namespaces}, 'MyApp::Controller';
+  push @{$r->namespaces}, 'MyApp::MyController';
 
 =head2 shortcuts
 

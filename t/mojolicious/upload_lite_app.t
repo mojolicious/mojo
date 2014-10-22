@@ -13,24 +13,21 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 post '/upload' => sub {
-  my $self    = shift;
-  my $file    = $self->param('file');
+  my $c       = shift;
+  my $file    = $c->param('file');
   my $headers = $file->headers;
-  $self->render(text => $file->filename
+  $c->render(text => $file->filename
       . $file->asset->slurp
-      . $self->param('test')
+      . $c->param('test')
       . ($headers->content_type  // '')
       . ($headers->header('X-X') // '')
-      . join(',', $self->param));
+      . join(',', $c->param));
 };
 
 post '/multi' => sub {
-  my $self = shift;
-  my @uploads = map { $self->param($_) } $self->param('name');
-  $self->render(
-    text => join '',
-    map { $_->filename, $_->asset->slurp } @uploads
-  );
+  my $c = shift;
+  my @uploads = map { @{$c->every_param($_)} } @{$c->every_param('name')};
+  $c->render(text => join '', map { $_->filename, $_->asset->slurp } @uploads);
 };
 
 my $t = Test::Mojo->new;

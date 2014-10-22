@@ -11,7 +11,7 @@ use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode url_escape);
 
 has generators => sub { {form => \&_form, json => \&_json} };
 has name => 'Mojolicious (Perl)';
@@ -33,16 +33,15 @@ sub endpoint {
   my $port  = $url->port || ($proto eq 'https' ? 443 : 80);
 
   # Proxy for normal HTTP requests
+  my $socks;
+  if (my $proxy = $req->proxy) { $socks = $proxy->protocol eq 'socks' }
   return $self->_proxy($tx, $proto, $host, $port)
-    if $proto eq 'http' && !$req->is_handshake;
+    if $proto eq 'http' && !$req->is_handshake && !$socks;
 
   return $proto, $host, $port;
 }
 
-sub peer {
-  my ($self, $tx) = @_;
-  return $self->_proxy($tx, $self->endpoint($tx));
-}
+sub peer { $_[0]->_proxy($_[1], $_[0]->endpoint($_[1])) }
 
 sub proxy_connect {
   my ($self, $old) = @_;
@@ -53,6 +52,7 @@ sub proxy_connect {
 
   # No proxy
   return undef unless my $proxy = $req->proxy;
+  return undef if $proxy->protocol eq 'socks';
 
   # WebSocket and/or HTTPS
   my $url = $req->url;
@@ -75,9 +75,11 @@ sub redirect {
   return undef unless grep { $_ == $code } 301, 302, 303, 307, 308;
 
   # Fix location without authority and/or scheme
-  return unless my $location = $res->headers->location;
+  return undef unless my $location = $res->headers->location;
   $location = Mojo::URL->new($location);
   $location = $location->base($old->req->url)->to_abs unless $location->is_abs;
+  my $proto = $location->protocol;
+  return undef unless $proto eq 'http' || $proto eq 'https';
 
   # Clone request if necessary
   my $new = Mojo::Transaction::HTTP->new;
@@ -155,19 +157,19 @@ sub _form {
   my ($self, $tx, $form, %options) = @_;
 
   # Check for uploads and force multipart if necessary
-  my $multipart;
+  my $req       = $tx->req;
+  my $headers   = $req->headers;
+  my $multipart = ($headers->content_type // '') =~ m!multipart/form-data!i;
   for my $value (map { ref $_ eq 'ARRAY' ? @$_ : $_ } values %$form) {
     ++$multipart and last if ref $value eq 'HASH';
   }
-  my $req     = $tx->req;
-  my $headers = $req->headers;
-  $headers->content_type('multipart/form-data') if $multipart;
 
   # Multipart
-  if (($headers->content_type // '') eq 'multipart/form-data') {
+  if ($multipart) {
     my $parts = $self->_multipart($options{charset}, $form);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
+    _type($headers, 'multipart/form-data');
     return $tx;
   }
 
@@ -178,15 +180,14 @@ sub _form {
   if ($method eq 'GET' || $method eq 'HEAD') { $req->url->query->merge($p) }
   else {
     $req->body($p->to_string);
-    $headers->content_type('application/x-www-form-urlencoded');
+    _type($headers, 'application/x-www-form-urlencoded');
   }
   return $tx;
 }
 
 sub _json {
   my ($self, $tx, $data) = @_;
-  my $headers = $tx->req->body(encode_json($data))->headers;
-  $headers->content_type('application/json') unless $headers->content_type;
+  _type($tx->req->body(encode_json $data)->headers, 'application/json');
   return $tx;
 }
 
@@ -208,7 +209,7 @@ sub _multipart {
         if (my $file = delete $value->{file}) {
           $file = Mojo::Asset::File->new(path => $file) unless ref $file;
           $part->asset($file);
-          $value->{filename} ||= basename $file->path
+          $value->{filename} //= basename $file->path
             if $file->isa('Mojo::Asset::File');
         }
 
@@ -218,7 +219,7 @@ sub _multipart {
         }
 
         # Filename and headers
-        $filename = delete $value->{filename} || $name;
+        $filename = url_escape delete $value->{filename} // $name, '"';
         $filename = encode $charset, $filename if $charset;
         $headers->from_hash($value);
       }
@@ -230,9 +231,10 @@ sub _multipart {
       }
 
       # Content-Disposition
+      $name = url_escape $name, '"';
       $name = encode $charset, $name if $charset;
       my $disposition = qq{form-data; name="$name"};
-      $disposition .= qq{; filename="$filename"} if $filename;
+      $disposition .= qq{; filename="$filename"} if defined $filename;
       $headers->content_disposition($disposition);
     }
   }
@@ -252,6 +254,8 @@ sub _proxy {
 
   return $proto, $host, $port;
 }
+
+sub _type { $_[0]->content_type($_[1]) unless $_[0]->content_type }
 
 1;
 
@@ -282,6 +286,23 @@ Mojo::UserAgent::Transactor - User agent transactor
 
 L<Mojo::UserAgent::Transactor> is the transaction building and manipulation
 framework used by L<Mojo::UserAgent>.
+
+=head1 GENERATORS
+
+These content generators are available by default.
+
+=head2 form
+
+  $t->tx(POST => 'http://example.com' => form => {a => 'b'});
+
+Generate query string, C<application/x-www-form-urlencoded> or
+C<multipart/form-data> content.
+
+=head2 json
+
+  $t->tx(PATCH => 'http://example.com' => json => {a => 'b'});
+
+Generate JSON content with L<Mojo::JSON>.
 
 =head1 ATTRIBUTES
 
@@ -344,18 +365,18 @@ C<307> or C<308> redirect response if possible.
 
   my $tx = $t->tx(GET  => 'example.com');
   my $tx = $t->tx(POST => 'http://example.com');
-  my $tx = $t->tx(GET  => 'http://example.com' => {DNT => 1});
+  my $tx = $t->tx(GET  => 'http://example.com' => {Accept => '*/*'});
   my $tx = $t->tx(PUT  => 'http://example.com' => 'Hi!');
   my $tx = $t->tx(PUT  => 'http://example.com' => form => {a => 'b'});
   my $tx = $t->tx(PUT  => 'http://example.com' => json => {a => 'b'});
-  my $tx = $t->tx(POST => 'http://example.com' => {DNT => 1} => 'Hi!');
+  my $tx = $t->tx(POST => 'http://example.com' => {Accept => '*/*'} => 'Hi!');
   my $tx = $t->tx(
-    PUT  => 'http://example.com' => {DNT => 1} => form => {a => 'b'});
+    PUT  => 'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $t->tx(
-    PUT  => 'http://example.com' => {DNT => 1} => json => {a => 'b'});
+    PUT  => 'http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
-requests, with support for content generators.
+requests, with support for L</"GENERATORS">.
 
   # Generate and inspect custom GET request with DNT header and content
   say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;
@@ -372,27 +393,50 @@ requests, with support for content generators.
   my $tx = $t->tx(PUT => 'http://example.com');
   $tx->req->content->asset(Mojo::Asset::File->new(path => '/foo.txt'));
 
-  # GET request with query parameters
-  my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
+The C<json> content generator uses L<Mojo::JSON> for encoding and sets the
+content type to C<application/json>.
 
   # POST request with "application/json" content
   my $tx = $t->tx(
     POST => 'http://example.com' => json => {a => 'b', c => [1, 2, 3]});
 
+The C<form> content generator will automatically use query parameters for
+C<GET> and C<HEAD> requests.
+
+  # GET request with query parameters
+  my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
+
+For all other request methods the C<application/x-www-form-urlencoded> content
+type is used.
+
   # POST request with "application/x-www-form-urlencoded" content
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {a => 'b', c => 'd'});
+
+Parameters may be encoded with the C<charset> option.
 
   # PUT request with Shift_JIS encoded form values
   my $tx = $t->tx(
     PUT => 'example.com' => form => {a => 'b'} => charset => 'Shift_JIS');
 
+An array reference can be used for multiple form values sharing the same name.
+
   # POST request with form values sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});
+
+A hash reference with a C<content> or C<file> value can be used to switch to
+the C<multipart/form-data> content type for file uploads.
 
   # POST request with "multipart/form-data" content
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {mytext => {content => 'lala'}});
+
+  # POST request with multiple files sharing the same name
+  my $tx = $t->tx(POST => 'http://example.com' =>
+    form => {mytext => [{content => 'first'}, {content => 'second'}]});
+
+The C<file> value should contain the path to the file you want to upload or an
+asset object, like L<Mojo::Asset::File> or L<Mojo::Asset::Memory>.
 
   # POST request with upload streamed from file
   my $tx = $t->tx(
@@ -403,9 +447,9 @@ requests, with support for content generators.
   my $tx    = $t->tx(
     POST => 'http://example.com' => form => {mytext => {file => $asset}});
 
-  # POST request with multiple files sharing the same name
-  my $tx = $t->tx(POST => 'http://example.com' =>
-    form => {mytext => [{content => 'first'}, {content => 'second'}]});
+A C<filename> value will be generated automatically, but can also be set
+manually if necessary. All remainging values in the hash reference get merged
+into the C<multipart/form-data> content as headers.
 
   # POST request with form values and customized upload (filename and header)
   my $tx = $t->tx(POST => 'http://example.com' => form => {
@@ -418,11 +462,8 @@ requests, with support for content generators.
     }
   });
 
-The C<form> content generator will automatically use query parameters for
-C<GET>/C<HEAD> requests and the C<application/x-www-form-urlencoded> content
-type for everything else. Both get upgraded automatically to using the
-C<multipart/form-data> content type when necessary or when the header has been
-set manually.
+The C<multipart/form-data> content type can also be enforced by setting the
+C<Content-Type> header manually.
 
   # Force "multipart/form-data"
   my $headers = {'Content-Type' => 'multipart/form-data'};

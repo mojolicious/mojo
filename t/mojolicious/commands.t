@@ -10,7 +10,14 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Mojolicious::Commands;
+# Make sure @ARGV is not changed
+{
+  local $ENV{MOJO_MODE};
+  local @ARGV = qw(-m production -x whatever);
+  require Mojolicious::Commands;
+  is $ENV{MOJO_MODE}, 'production', 'right mode';
+  is_deeply \@ARGV, [qw(-m production -x whatever)], 'unchanged';
+}
 
 # Environment detection
 my $commands = Mojolicious::Commands->new;
@@ -53,6 +60,16 @@ is $app->start('test_command'), 'works!', 'right result';
 {
   is(Mojolicious::Commands->start_app(MojoliciousTest => 'test_command'),
     'works!', 'right result');
+}
+
+# Do not pick up options for detected environments
+{
+  local $ENV{MOJO_MODE};
+  local $ENV{PLACK_ENV} = 'testing';
+  local @ARGV = qw(psgi -m production);
+  is ref Mojolicious::Commands->start_app('MojoliciousTest'), 'CODE',
+    'right reference';
+  is $ENV{MOJO_MODE}, undef, 'no mode';
 }
 
 # mojo

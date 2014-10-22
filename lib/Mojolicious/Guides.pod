@@ -8,9 +8,8 @@ Mojolicious::Guides - Mojolicious guide to the galaxy
 =head1 DON'T PANIC!
 
 We are constantly working on new documentation, follow us on
-L<Twitter|http://twitter.com/kraih>, L<GitHub|http://github.com/kraih/mojo>
-or join the official IRC channel C<#mojo> on C<irc.perl.org> to get all the
-latest updates.
+L<GitHub|http://github.com/kraih/mojo> or join the official IRC channel
+C<#mojo> on C<irc.perl.org> to get all the latest updates.
 
 =head1 LEARNING PERL
 
@@ -21,6 +20,11 @@ L<Modern Perl book|http://modernperlbooks.com/books/modern_perl/>, freely
 available in many formats. Both are excellent introductions to the language.
 For more books and documentation, check out
 L<learn.perl.org|http://learn.perl.org/>.
+
+=head1 LEARNING HTML
+
+All web development starts with HTML, to learn the basics we recommend the
+L<Mozilla Developer Network|https://developer.mozilla.org/en-US/learn/html>.
 
 =head1 TUTORIAL
 
@@ -44,7 +48,7 @@ therefore considered a prerequisite, you should definitely take a look!
 =item L<Mojolicious::Guides::Growing>
 
 Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
-well structured L<Mojolicious> application.
+well-structured L<Mojolicious> application.
 
 =item L<Mojolicious::Guides::Routing>
 
@@ -119,23 +123,6 @@ Testing toolkit for web applications.
 =item L<ojo>
 
 Fun one-liners using everything above.
-
-=back
-
-=head1 SPIN-OFFS
-
-These modules are not part of the L<Mojolicious> distribution, but have been
-designed to be used with it and are being developed under the same umbrella.
-
-=over 2
-
-=item L<Mango>
-
-Pure-Perl non-blocking I/O MongoDB driver.
-
-=item L<Minion>
-
-Job queue.
 
 =back
 

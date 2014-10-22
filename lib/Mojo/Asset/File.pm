@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';
 use Errno 'EEXIST';
-use Fcntl qw(O_CREAT O_EXCL O_RDWR O_APPEND);
+use Fcntl qw(O_APPEND O_CREAT O_EXCL O_RDONLY O_RDWR);
 use File::Copy 'move';
 use File::Spec::Functions 'catfile';
 use IO::File;
@@ -17,15 +17,15 @@ has handle => sub {
   my $handle = IO::File->new;
   my $path   = $self->path;
   if (defined $path && -f $path) {
-    $handle->open($path, -w $path ? O_APPEND | O_RDWR : O_RDONLY)
       or croak qq{Can't open file "$path": $!};
+    $handle->open($path, O_RDONLY) or croak qq{Can't open file "$path": $!};
     return $handle;
   }
 
   # Open new or temporary file
   my $base = catfile $self->tmpdir, 'mojo.tmp';
   my $name = $path // $base;
-  until ($handle->open($name, O_CREAT | O_EXCL | O_RDWR)) {
+  until ($handle->open($name, O_APPEND | O_CREAT | O_EXCL | O_RDWR)) {
     croak qq{Can't open file "$name": $!} if defined $path || $! != $!{EEXIST};
     $name = "$base." . md5_sum(time . $$ . rand 999);
   }
@@ -47,13 +47,9 @@ sub DESTROY {
 
 sub add_chunk {
   my ($self, $chunk) = @_;
-
-  my $handle = $self->handle;
-  $handle->sysseek(0, SEEK_END);
   $chunk //= '';
   croak "Can't write to asset: $!"
-    unless defined $handle->syswrite($chunk, length $chunk);
-
+    unless defined $self->handle->syswrite($chunk, length $chunk);
   return $self;
 }
 
@@ -82,8 +78,7 @@ sub contains {
     # Search window
     my $pos = index $window, $str;
     return $offset + $pos if $pos >= 0;
-    $offset += $read;
-    return -1 if $read == 0 || $offset == $end;
+    return -1 if $read == 0 || ($offset += $read) == $end;
 
     # Resize window
     substr $window, 0, $read, '';
@@ -102,8 +97,7 @@ sub get_chunk {
 
   my $buffer;
   if (defined(my $end = $self->end_range)) {
-    my $chunk = $end + 1 - $offset;
-    return '' if $chunk <= 0;
+    return '' if (my $chunk = $end + 1 - $offset) <= 0;
     $handle->sysread($buffer, $chunk > $max ? $max : $chunk);
   }
   else { $handle->sysread($buffer, $max) }
@@ -126,17 +120,13 @@ sub move_to {
   return $self->path($to)->cleanup(0);
 }
 
-sub size {
-  return 0 unless defined(my $file = shift->path);
-  return -s $file;
-}
+sub mtime { (stat shift->handle)[9] }
+
+sub size { -s shift->handle }
 
 sub slurp {
-  my $handle = shift->handle;
-  $handle->sysseek(0, SEEK_SET);
-  my $content = '';
-  while ($handle->sysread(my $buffer, 131072)) { $content .= $buffer }
-  return $content;
+  return '' unless defined(my $file = shift->path);
+  return Mojo::Util::slurp $file;
 }
 
 1;
@@ -180,7 +170,7 @@ implements the following new ones.
   my $bool = $file->cleanup;
   $file    = $file->cleanup($bool);
 
-Delete file automatically once it's not used anymore.
+Delete L</"path"> automatically once the file is not used anymore.
 
 =head2 handle
 
@@ -228,7 +218,7 @@ Check if asset contains a specific string.
   my $bytes = $file->get_chunk($offset, $max);
 
 Get chunk of data starting from a specific position, defaults to a maximum
-chunk size of C<131072> bytes.
+chunk size of C<131072> bytes (128KB).
 
 =head2 is_file
 
@@ -241,6 +231,12 @@ True.
   $file = $file->move_to('/home/sri/bar.txt');
 
 Move asset data into a specific file and disable L</"cleanup">.
+
+=head2 mtime
+
+  my $mtime = $file->mtime;
+
+Modification time of asset.
 
 =head2 size
 

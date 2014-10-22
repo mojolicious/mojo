@@ -32,9 +32,9 @@ get '/' => 'root';
 get '/foo';
 
 get '/bar' => sub {
-  my $self = shift;
-  $self->flash(just => 'works!')->flash({works => 'too!'});
-  $self->redirect_to($self->url_for('foo'));
+  my $c = shift;
+  $c->flash(just => 'works!')->flash({works => 'too!'});
+  $c->redirect_to($c->url_for('foo'));
 };
 
 get '/baz' => sub { shift->render('root') };
@@ -112,12 +112,12 @@ done_testing();
 
 __DATA__
 @@ root.html.ep
-%= $self->req->url->base
+%= $c->req->url->base
 %= javascript '/mojo/jquery/jquery.js'
 %= image '/images/test.png'
 %= stylesheet '//example.com/base.css'
 %= link_to Contact => 'mailto:sri@example.com'
-%= $self->req->url->to_abs
+%= $c->req->url->to_abs
 %= url_for('foo')->to_abs
 %= url_for 'foo'
 %= url_for('foo')->base
@@ -127,10 +127,10 @@ __DATA__
 % }
 
 @@ foo.html.ep
-<%= $self->req->url->base %><%= flash 'just' || '' %><%= flash 'works' || '' %>
+<%= $c->req->url->base %><%= flash 'just' || '' %><%= flash 'works' || '' %>
 %= stylesheet '/b.css', media => 'test'
 %= image '/images/test.png', alt => 'Test'
-%= $self->req->url->to_abs
+%= $c->req->url->to_abs
 %= url_for('root')->to_abs
 %= url_for 'root'
 %= url_for('root')->base

@@ -11,18 +11,16 @@ use Mojo::Util qw(decode encode url_escape url_unescape);
 has charset => 'UTF-8';
 
 sub append {
-  my ($self, @pairs) = @_;
+  my $self = shift;
 
   my $params = $self->params;
-  for (my $i = 0; $i < @pairs; $i += 2) {
-    my $key   = $pairs[$i]     // '';
-    my $value = $pairs[$i + 1] // '';
+  while (my ($name, $value) = splice @_, 0, 2) {
 
     # Single value
-    if (ref $value ne 'ARRAY') { push @$params, $key => $value }
+    if (ref $value ne 'ARRAY') { push @$params, $name => $value }
 
     # Multiple values
-    else { push @$params, $key => (defined $_ ? "$_" : '') for @$value }
+    else { push @$params, $name => (defined $_ ? "$_" : '') for @$value }
   }
 
   return $self;
@@ -31,12 +29,15 @@ sub append {
 sub clone {
   my $self = shift;
 
-  my $clone = $self->new->charset($self->charset);
-  if (defined $self->{string}) { $clone->{string} = $self->{string} }
-  else                         { $clone->params([@{$self->params}]) }
+  my $clone = $self->new;
+  if   (exists $self->{charset}) { $clone->{charset} = $self->{charset} }
+  if   (defined $self->{string}) { $clone->{string}  = $self->{string} }
+  else                           { $clone->{params}  = [@{$self->params}] }
 
   return $clone;
 }
+
+sub every_param { shift->_param(@_) }
 
 sub merge {
   my $self = shift;
@@ -53,20 +54,14 @@ sub param {
   return sort keys %{$self->to_hash} unless $name;
 
   # Multiple names
-  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
+
+  # Last value
+  return $self->_param($name)->[-1] unless @_;
 
   # Replace values
   $self->remove($name) if defined $_[0];
-  return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]) if @_;
-
-  # List values
-  my @values;
-  my $params = $self->params;
-  for (my $i = 0; $i < @$params; $i += 2) {
-    push @values, $params->[$i + 1] if $params->[$i] eq $name;
-  }
-
-  return wantarray ? @values : $values[0];
+  return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]);
 }
 
 sub params {
@@ -107,38 +102,35 @@ sub parse {
   my $self = shift;
 
   # Pairs
-  if (@_ > 1) { $self->append(@_) }
+  return $self->append(@_) if @_ > 1;
 
   # String
-  else { $self->{string} = shift }
-
+  $self->{string} = shift;
   return $self;
 }
 
 sub remove {
-  my $self = shift;
-  my $name = shift // '';
+  my ($self, $name) = @_;
 
   my $params = $self->params;
-  for (my $i = 0; $i < @$params;) {
-    if ($params->[$i] eq $name) { splice @$params, $i, 2 }
-    else                        { $i += 2 }
-  }
+  my $i      = 0;
+  $params->[$i] eq $name ? splice @$params, $i, 2 : ($i += 2)
+    while $i < @$params;
 
-  return $self->params($params);
+  return $self;
 }
 
 sub to_hash {
   my $self = shift;
 
-  my $params = $self->params;
   my %hash;
+  my $params = $self->params;
   for (my $i = 0; $i < @$params; $i += 2) {
     my ($name, $value) = @{$params}[$i, $i + 1];
 
     # Array
     if (exists $hash{$name}) {
-      $hash{$name} = [$hash{$name}] unless ref $hash{$name} eq 'ARRAY';
+      $hash{$name} = [$hash{$name}] if ref $hash{$name} ne 'ARRAY';
       push @{$hash{$name}}, $value;
     }
 
@@ -159,7 +151,7 @@ sub to_string {
     return url_escape $str, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
   }
 
-  # Build pairs;
+  # Build pairs
   my $params = $self->params;
   return '' unless @$params;
   my @pairs;
@@ -177,6 +169,18 @@ sub to_string {
   }
 
   return join '&', @pairs;
+}
+
+sub _param {
+  my ($self, $name) = @_;
+
+  my @values;
+  my $params = $self->params;
+  for (my $i = 0; $i < @$params; $i += 2) {
+    push @values, $params->[$i + 1] if $params->[$i] eq $name;
+  }
+
+  return \@values;
 }
 
 1;
@@ -204,7 +208,7 @@ Mojo::Parameters - Parameters
 
 L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>
 and based on L<RFC 3986|http://tools.ietf.org/html/rfc3986> as well as the
-L<HTML Living Standard|http://www.whatwg.org/html>.
+L<HTML Living Standard|https://html.spec.whatwg.org>.
 
 =head1 ATTRIBUTES
 
@@ -248,6 +252,16 @@ Append parameters. Note that this method will normalize the parameters.
 
 Clone parameters.
 
+=head2 every_param
+
+  my $values = $params->every_param('foo');
+
+Similar to L</"param">, but returns all values sharing the same name as an
+array reference. Note that this method will normalize the parameters.
+
+  # Get first value
+  say $params->every_param('foo')->[0];
+
 =head2 merge
 
   $params = $params->merge(Mojo::Parameters->new(foo => 'b&ar', baz => 23));
@@ -269,18 +283,15 @@ necessary.
 =head2 param
 
   my @names       = $params->param;
-  my $foo         = $params->param('foo');
-  my @foo         = $params->param('foo');
+  my $value       = $params->param('foo');
   my ($foo, $bar) = $params->param(['foo', 'bar']);
   $params         = $params->param(foo => 'ba&r');
   $params         = $params->param(foo => qw(ba&r baz));
   $params         = $params->param(foo => ['ba;r', 'baz']);
 
-Check and replace parameter value. Be aware that if you request a parameter by
-name in scalar context, you will receive only the I<first> value for that
-parameter, if there are multiple values for that name. In list context you
-will receive I<all> of the values for that name. Note that this method will
-normalize the parameters.
+Access parameter values. If there are multiple values sharing the same name,
+and you want to access more than just the last one, you can use
+L</"every_param">. Note that this method will normalize the parameters.
 
 =head2 params
 

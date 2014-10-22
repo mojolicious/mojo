@@ -10,11 +10,12 @@ my %NORMALCASE = map { lc($_) => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Allow Authorization Cache-Control Connection Content-Disposition),
   qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
-  qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Link),
-  qw(Location Origin Proxy-Authenticate Proxy-Authorization Range),
-  qw(Sec-WebSocket-Accept Sec-WebSocket-Extensions Sec-WebSocket-Key),
-  qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
-  qw(TE Trailer Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
+  qw(Date ETag Expect Expires Host If-Modified-Since If-None-Match),
+  qw(Last-Modified Link Location Origin Proxy-Authenticate),
+  qw(Proxy-Authorization Range Sec-WebSocket-Accept Sec-WebSocket-Extensions),
+  qw(Sec-WebSocket-Key Sec-WebSocket-Protocol Sec-WebSocket-Version Server),
+  qw(Set-Cookie Status TE Trailer Transfer-Encoding Upgrade User-Agent Vary),
+  qw(WWW-Authenticate)
 );
 for my $header (values %NORMALCASE) {
   my $name = lc $header;
@@ -28,7 +29,7 @@ sub add {
   # Make sure we have a normal case entry for name
   my $key = lc $name;
   $self->{normalcase}{$key} //= $name unless $NORMALCASE{$key};
-  push @{$self->{headers}{$key}}, map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
+  push @{$self->{headers}{$key}}, @_;
 
   return $self;
 }
@@ -63,7 +64,7 @@ sub header {
   return $self->remove($name)->add($name, @_) if @_;
 
   return undef unless my $headers = $self->{headers}{lc $name};
-  return join ', ', map { join ' ', @$_ } @$headers;
+  return join ', ', @$headers;
 }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
@@ -95,10 +96,10 @@ sub parse {
     }
 
     # New header
-    if ($line =~ /^(\S[^:]*)\s*:\s*(.*)$/) { push @$headers, $1, [$2] }
+    if ($line =~ /^(\S[^:]*)\s*:\s*(.*)$/) { push @$headers, $1, $2 }
 
     # Multiline
-    elsif (@$headers && $line =~ s/^\s+//) { push @{$headers->[-1]}, $line }
+    elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
 
     # Empty line
     else {
@@ -134,8 +135,7 @@ sub to_string {
   # Make sure multiline values are formatted correctly
   my @headers;
   for my $name (@{$self->names}) {
-    push @headers, "$name: " . join("\x0d\x0a ", @$_)
-      for @{$self->{headers}{lc $name}};
+    push @headers, "$name: $_" for @{$self->{headers}{lc $name}};
   }
 
   return join "\x0d\x0a", @headers;
@@ -182,7 +182,7 @@ L<Mojo::Headers> implements the following attributes.
   $headers = $headers->max_line_size(1024);
 
 Maximum header line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
+C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
 
 =head1 METHODS
 
@@ -228,7 +228,6 @@ Shortcut for the C<Accept-Ranges> header.
 
   $headers = $headers->add(Foo => 'one value');
   $headers = $headers->add(Foo => 'first value', 'second value');
-  $headers = $headers->add(Foo => ['first line', 'second line']);
 
 Add one or more header values with one or more lines.
 
@@ -343,7 +342,7 @@ but is very commonly used.
 =head2 etag
 
   my $etag = $headers->etag;
-  $headers = $headers->etag('abc321');
+  $headers = $headers->etag('"abc321"');
 
 Shortcut for the C<ETag> header.
 
@@ -374,7 +373,6 @@ Parse headers from a hash reference, an empty hash removes all headers.
   my $value = $headers->header('Foo');
   $headers  = $headers->header(Foo => 'one value');
   $headers  = $headers->header(Foo => 'first value', 'second value');
-  $headers  = $headers->header(Foo => ['first line', 'second line']);
 
 Get or replace the current header values.
 
@@ -391,6 +389,13 @@ Shortcut for the C<Host> header.
   $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<If-Modified-Since> header.
+
+=head2 if_none_match
+
+  my $etag = $headers->if_none_match;
+  $headers = $headers->if_none_match('"abc321"');
+
+Shortcut for the C<If-None-Match> header.
 
 =head2 is_finished
 
@@ -566,8 +571,8 @@ Shortcut for the C<TE> header.
   my $single = $headers->to_hash;
   my $multi  = $headers->to_hash(1);
 
-Turn headers into hash reference, nested array references to represent
-multiple headers with the same name are disabled by default.
+Turn headers into hash reference, array references to represent multiple
+headers with the same name are disabled by default.
 
   say $headers->to_hash->{DNT};
 

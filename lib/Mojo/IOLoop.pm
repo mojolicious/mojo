@@ -98,6 +98,14 @@ sub remove {
   $self->_remove($id);
 }
 
+sub reset {
+  my $self = _instance(shift);
+  $self->_remove($_)
+    for keys %{$self->{acceptors}}, keys %{$self->{connections}};
+  $self->reactor->reset;
+  $self->$_ for qw(_stop stop);
+}
+
 sub server {
   my ($self, $cb) = (_instance(shift), pop);
 
@@ -312,11 +320,12 @@ right in, to make writing test servers as easy as possible. Also note that for
 convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop>
 is loaded.
 
-For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.84+) will be used automatically if they are installed.
-Individual features can also be disabled with the C<MOJO_NO_IPV6> and
-C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide IPv6, SOCKS5 as well as
+TLS support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+),
+L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL> (1.84+) will be used
+automatically if they are installed. Individual features can also be disabled
+with the C<MOJO_NO_IPV6>, C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment
+variables.
 
 See L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB"> for more.
 
@@ -442,8 +451,8 @@ L<Mojo::IOLoop::Client/"connect">.
 
 Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow
 of events for this event loop, which can help you avoid deep nested closures
-that often result from continuation-passing style. Callbacks will be passed
-along to L<Mojo::IOLoop::Delay/"steps">.
+and memory leaks that often result from continuation-passing style. Callbacks
+will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
@@ -482,7 +491,7 @@ along to L<Mojo::IOLoop::Delay/"steps">.
   Mojo::IOLoop->delay(
     sub {
       my $delay = shift;
-      die 'Intentional error!';
+      die 'Intentional error';
     },
     sub {
       my ($delay, @args) = @_;
@@ -551,6 +560,13 @@ amount of time in seconds.
 
 Remove anything with an id, connections will be dropped gracefully by allowing
 them to finish writing all data in their write buffers.
+
+=head2 reset
+
+  Mojo::IOLoop->reset;
+  $loop->reset;
+
+Remove everything and stop the event loop.
 
 =head2 server
 

@@ -180,11 +180,19 @@ $source->route('/second')->to('#second');
 my $third  = $source->route('/third')->to('#third');
 my $target = $r->remove->route('/target')->to('target#');
 my $second = $r->find('second');
-is $second->render('', {}), '/source/second', 'right result';
+is $second->render({}), '/source/second', 'right result';
 $second->remove;
-is $second->render('', {}), '/second', 'right result';
+is $second->render({}), '/second', 'right result';
 $target->add_child($first)->add_child($second);
-is $second->render('', {}), '/target/second', 'right result';
+is $second->render({}), '/target/second', 'right result';
+
+# /websocket
+$r->websocket('/websocket' => {controller => 'ws'})->route('/')
+  ->to(action => 'just')->route->to(works => 1);
+
+# /slash
+$r->route('/slash')->to(controller => 'just')->route('/')
+  ->to(action => 'slash');
 
 # /missing/*/name
 # /missing/too
@@ -193,6 +201,15 @@ $r->route('/missing/:/name')->to('missing#placeholder');
 $r->route('/missing/*/name')->to('missing#wildcard');
 $r->route('/missing/too/*', '' => ['test'])
   ->to('missing#too', '' => 'missing');
+
+# /partial/*
+$r->route('/partial')->detour('foo#bar');
+
+# GET  /similar/*
+# POST /similar/too
+my $similar = $r->bridge('/similar');
+$similar->route('/:something')->via('GET')->to('similar#get');
+$similar->route('/too')->via('POST')->to('similar#post');
 
 # Cached lookup
 my $fast = $r->route('/fast');
@@ -815,6 +832,26 @@ $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/target/third'});
 is_deeply $m->stack, [], 'empty stack';
 
+# WebSocket
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/websocket'});
+is_deeply $m->stack, [], 'empty stack';
+$m->match($c => {method => 'GET', path => '/websocket', websocket => 1});
+is_deeply $m->stack, [{controller => 'ws', action => 'just', works => 1}],
+  'right structure';
+is $m->path_for->{path}, '/websocket', 'right path';
+ok $m->path_for->{websocket}, 'is a websocket';
+
+# Just a slash with a format after a path
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/slash.txt'});
+is_deeply $m->stack,
+  [{controller => 'just', action => 'slash', format => 'txt'}],
+  'right structure';
+is $m->path_for->{path}, '/slash', 'right path';
+ok !$m->path_for->{websocket}, 'not a websocket';
+is $m->path_for(format => 'html')->{path}, '/slash.html', 'right path';
+
 # Nameless placeholder
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/missing/foo/name'});
@@ -847,5 +884,28 @@ is_deeply $m->stack,
   [{controller => 'missing', action => 'too', '' => 'missing'}],
   'right structure';
 is $m->path_for->{path}, '/missing/too', 'right path';
+
+# Partial route
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/partial/test'});
+is_deeply $m->stack,
+  [{controller => 'foo', action => 'bar', 'path' => '/test'}],
+  'right structure';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/partial.test'});
+is_deeply $m->stack,
+  [{controller => 'foo', action => 'bar', 'path' => '.test'}],
+  'right structure';
+
+# Similar routes with placeholders
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/similar/too'});
+is_deeply $m->stack,
+  [{}, {controller => 'similar', action => 'get', 'something' => 'too'}],
+  'right structure';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'POST', path => '/similar/too'});
+is_deeply $m->stack, [{}, {controller => 'similar', action => 'post'}],
+  'right structure';
 
 done_testing();

@@ -41,13 +41,10 @@ sub host_port {
 }
 
 sub clone {
-  my $self = shift;
-
+  my $self  = shift;
   my $clone = $self->new;
-  $clone->$_($self->$_) for qw(scheme userinfo host port fragment);
-  $clone->path($self->path->clone)->query($self->query->clone);
-  $clone->base($self->base->clone) if $self->{base};
-
+  @$clone{keys %$self} = values %$self;
+  $clone->{$_} && ($clone->{$_} = $clone->{$_}->clone) for qw(base path query);
   return $clone;
 }
 
@@ -296,7 +293,7 @@ Clone this URL.
 
 Normalized version of L</"host"> and L</"port">.
 
-  # "xn--da5b0n.net:8080"
+  # "xn--n3h.net:8080"
   Mojo::URL->new('http://☃.net:8080/test')->host_port;
 
 =head2 ihost
@@ -306,7 +303,7 @@ Normalized version of L</"host"> and L</"port">.
 
 Host part of this URL in punycode format.
 
-  # "xn--da5b0n.net"
+  # "xn--n3h.net"
   Mojo::URL->new('http://☃.net')->ihost;
 
 =head2 is_abs

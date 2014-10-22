@@ -1,7 +1,4 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
-
 use Mojo::IOLoop;
 
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
@@ -32,7 +29,7 @@ Mojo::IOLoop->server(
     );
     $stream->on(close => sub { delete $buffer{$id} });
   }
-) or die "Couldn't create listen socket!\n";
+);
 
 print <<'EOF';
 Starting server on port 8080.

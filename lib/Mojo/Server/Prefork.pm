@@ -10,13 +10,12 @@ use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 use Time::HiRes ();
 
-has accepts         => 1000;
-has accept_interval => 0.025;
+has accepts => 1000;
+has [qw(accept_interval multi_accept)];
+has [qw(cleanup lock_timeout)] => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
 has lock_file          => sub { catfile tmpdir, 'prefork.lock' };
-has lock_timeout       => 1;
-has multi_accept       => 50;
 has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
 has workers            => 4;
 
@@ -24,7 +23,7 @@ sub DESTROY {
   my $self = shift;
 
   # Worker
-  return if $self->{worker};
+  return unless $self->cleanup;
 
   # Manager
   if (my $file = $self->{lock_file}) { unlink $file if -w $file }
@@ -68,7 +67,7 @@ sub run {
   # Prepare lock file and event loop
   $self->{lock_file} = $self->lock_file . ".$$";
   my $loop = $self->ioloop->max_accepts($self->accepts);
-  $loop->$_($self->$_) for qw(accept_interval multi_accept);
+  $loop->$_($self->$_ // $loop->$_) for qw(accept_interval multi_accept);
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
@@ -106,10 +105,13 @@ sub _heartbeat {
   return unless $poll->handles(POLLIN | POLLPRI);
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
-  # Update heartbeats
+  # Update heartbeats (and stop gracefully if necessary)
   my $time = steady_time;
-  $self->{pool}{$1} and $self->emit(heartbeat => $1)->{pool}{$1}{time} = $time
-    while $chunk =~ /(\d+)\n/g;
+  while ($chunk =~ /(\d+):(\d)\n/g) {
+    next unless my $w = $self->{pool}{$1};
+    $self->emit(heartbeat => $1) and $w->{time} = $time;
+    $w->{graceful} ||= $time if $2;
+  }
 }
 
 sub _manage {
@@ -124,34 +126,33 @@ sub _manage {
   # Shutdown
   elsif (!keys %{$self->{pool}}) { return delete $self->{running} }
 
-  # Manage workers
+  # Wait for heartbeats
   $self->emit('wait')->_heartbeat;
-  my $log = $self->app->log;
+
+  my $interval = $self->heartbeat_interval;
+  my $ht       = $self->heartbeat_timeout;
+  my $gt       = $self->graceful_timeout;
+  my $time     = steady_time;
+  my $log      = $self->app->log;
+
   for my $pid (keys %{$self->{pool}}) {
     next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
-    my $interval = $self->heartbeat_interval;
-    my $timeout  = $self->heartbeat_timeout;
-    my $time     = steady_time;
-    if (!$w->{graceful} && ($w->{time} + $interval + $timeout <= $time)) {
-      $log->info("Worker $pid has no heartbeat, restarting.");
-      $w->{graceful} = $time;
-    }
+    $log->error("Worker $pid has no heartbeat, restarting.")
+      and $w->{graceful} = $time
+      if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 
     # Graceful stop with timeout
-    $w->{graceful} ||= $time if $self->{graceful};
-    if ($w->{graceful}) {
-      $log->debug("Trying to stop worker $pid gracefully.");
-      kill 'QUIT', $pid;
-      $w->{force} = 1 if $w->{graceful} + $self->graceful_timeout <= $time;
-    }
+    my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
+    $log->debug("Trying to stop worker $pid gracefully.")
+      and kill 'QUIT', $pid
+      if $graceful && !$w->{quit}++;
+    $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
-    if (($self->{finished} && !$self->{graceful}) || $w->{force}) {
-      $log->debug("Stopping worker $pid.");
-      kill 'KILL', $pid;
-    }
+    $log->debug("Stopping worker $pid.") and kill 'KILL', $pid
+      if $w->{force} || ($self->{finished} && !$graceful);
   }
 }
 
@@ -169,7 +170,7 @@ sub _spawn {
     unless open my $handle, '>', $file;
 
   # Change user/group
-  $self->setuidgid->{worker}++;
+  $self->setuidgid->cleanup(0);
 
   # Accept mutex
   my $loop = $self->ioloop->lock(
@@ -199,8 +200,8 @@ sub _spawn {
   weaken $self;
   $loop->recurring(
     $self->heartbeat_interval => sub {
-      return unless shift->max_connections;
-      $self->{writer}->syswrite("$$\n") or exit 0;
+      my $graceful = shift->max_connections ? 0 : 1;
+      $self->{writer}->syswrite("$$:$graceful\n") or exit 0;
     }
   );
 
@@ -256,15 +257,16 @@ Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
 L<Mojo::Server::Prefork> is a full featured, UNIX optimized, preforking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Daemon>, with IPv6, TLS, Comet (long polling),
-keep-alive, connection pooling, timeout, cookie, multipart and multiple event
-loop support. Note that the server uses signals for process management, so you
-should avoid modifying signal handlers in your applications.
+keep-alive and multiple event loop support. Note that the server uses signals
+for process management, so you should avoid modifying signal handlers in your
+applications.
 
-For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.84+) will be used automatically by L<Mojo::IOLoop> if
-they are installed. Individual features can also be disabled with the
-C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide IPv6, SOCKS5 as well as
+TLS support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+),
+L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL> (1.84+) will be used
+automatically if they are installed. Individual features can also be disabled
+with the C<MOJO_NO_IPV6>, C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment
+variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
@@ -388,9 +390,9 @@ and implements the following new ones.
   my $interval = $prefork->accept_interval;
   $prefork     = $prefork->accept_interval(0.5);
 
-Interval in seconds for trying to reacquire the accept mutex, defaults to
-C<0.025>. Note that changing this value can affect performance and idle CPU
-usage.
+Interval in seconds for trying to reacquire the accept mutex, passed along to
+L<Mojo::IOLoop/"accept_interval">. Note that changing this value can affect
+performance and idle CPU usage.
 
 =head2 accepts
 
@@ -398,10 +400,19 @@ usage.
   $prefork    = $prefork->accepts(100);
 
 Maximum number of connections a worker is allowed to accept before stopping
-gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
-to accept new connections indefinitely. Note that up to half of this value can
-be subtracted randomly to improve load balancing, and that worker processes
-will stop sending heartbeat messages once the limit has been reached.
+gracefully, passed along to L<Mojo::IOLoop/"max_accepts">, defaults to
+C<1000>. Setting the value to C<0> will allow workers to accept new
+connections indefinitely. Note that up to half of this value can be subtracted
+randomly to improve load balancing, and that worker processes will stop
+sending heartbeat messages once the limit has been reached.
+
+=head2 cleanup
+
+  my $bool = $prefork->cleanup;
+  $prefork = $prefork->cleanup($bool);
+
+Delete L</"lock_file"> and L</"pid_file"> automatically once they are not
+needed anymore, defaults to a true value.
 
 =head2 graceful_timeout
 
@@ -448,7 +459,8 @@ performance and idle CPU usage.
   my $multi = $prefork->multi_accept;
   $prefork  = $prefork->multi_accept(100);
 
-Number of connections to accept at once, defaults to C<50>.
+Number of connections to accept at once, passed along to
+L<Mojo::IOLoop/"multi_accept">.
 
 =head2 pid_file
 

@@ -1,5 +1,3 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojo::Base 'Mojolicious';
 
 sub handler {

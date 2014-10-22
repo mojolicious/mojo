@@ -21,12 +21,11 @@ sub run {
   $self->emit(request => $tx);
 
   # Response headers
-  my $res     = $tx->res->fix_headers;
-  my $headers = $res->headers;
+  my $res  = $tx->res->fix_headers;
+  my $hash = $res->headers->to_hash(1);
   my @headers;
-  my $hash = $headers->to_hash(1);
   for my $name (keys %$hash) {
-    push @headers, map { $name => $_ } map {@$_} @{$hash->{$name}};
+    push @headers, map { $name => $_ } @{$hash->{$name}};
   }
 
   # PSGI response
@@ -106,6 +105,10 @@ See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 =head1 EVENTS
 
 L<Mojo::Server::PSGI> inherits all events from L<Mojo::Server>.
+
+=head1 ATTRIBUTES
+
+L<Mojo::Server::PSGI> inherits all attributes from L<Mojo::Server>.
 
 =head1 METHODS
 

@@ -1,14 +1,12 @@
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
 
 websocket '/test' => sub {
-  my $self = shift;
-  $self->on(
+  my $c = shift;
+  $c->on(
     json => sub {
-      my ($self, $hash) = @_;
+      my ($c, $hash) = @_;
       $hash->{test} = "♥ $hash->{test}";
-      $self->send({json => $hash});
+      $c->send({json => $hash});
     }
   );
 };

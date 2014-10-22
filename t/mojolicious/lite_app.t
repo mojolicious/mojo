@@ -38,6 +38,12 @@ is app->test_helper2, 'Mojolicious::Controller', 'right value';
 app->test_helper3->{foo} = 'bar';
 is app->test_helper3->{foo}, 'bar', 'right result';
 
+# Nested helpers
+helper 'test.helper' => sub { shift->app->controller_class };
+is app->test->helper, 'Mojolicious::Controller', 'right value';
+is app->build_controller->test->helper, 'Mojolicious::Controller',
+  'right value';
+
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
@@ -46,44 +52,43 @@ app->types->type(txt => 'text/plain;charset=UTF-8');
 
 # Rewrite when rendering to string
 hook before_render => sub {
-  my ($self, $args) = @_;
-  $args->{test} = 'after' if $self->stash->{to_string};
+  my ($c, $args) = @_;
+  $args->{test} = 'after' if $c->stash->{to_string};
 };
 
 get '/☃' => sub {
-  my $self = shift;
-  $self->render(
-    text => $self->url_for . $self->url_for({}) . $self->url_for('current'));
+  my $c = shift;
+  $c->render(text => $c->url_for . $c->url_for({}) . $c->url_for('current'));
 };
 
 get '/uni/aäb' => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for);
+  my $c = shift;
+  $c->render(text => $c->url_for);
 };
 
 get '/unicode/:0' => sub {
-  my $self = shift;
-  $self->render(text => $self->param('0') . $self->url_for);
+  my $c = shift;
+  $c->render(text => $c->param('0') . $c->url_for);
 };
 
 get '/' => 'root';
 
 get '/alternatives/:char' => [char => [qw(☃ ♥)]] => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for);
+  my $c = shift;
+  $c->render(text => $c->url_for);
 };
 
 get '/optional/:middle/placeholder' =>
   {middle => 'none', inline => '<%= $middle %>-<%= url_for =%>'};
 
 get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
-  my $self = shift;
-  $self->render(text => $self->stash('format'));
+  my $c = shift;
+  $c->render(text => $c->stash('format'));
 };
 
 get '/noformat' => [format => 0] => {format => 'xml'} => sub {
-  my $self = shift;
-  $self->render(text => $self->stash('format') . $self->url_for);
+  my $c = shift;
+  $c->render(text => $c->stash('format') . $c->url_for);
 };
 
 del sub { shift->render(text => 'Hello!') };
@@ -91,33 +96,33 @@ del sub { shift->render(text => 'Hello!') };
 any sub { shift->render(text => 'Bye!') };
 
 post '/multipart/form' => sub {
-  my $self = shift;
-  my @test = $self->param('test');
-  $self->render(text => join "\n", @test);
+  my $c    = shift;
+  my $test = $c->every_param('test');
+  $c->render(text => join "\n", @$test);
 };
 
 get '/auto_name' => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for('auto_name'));
+  my $c = shift;
+  $c->render(text => $c->url_for('auto_name'));
 };
 
 get '/query_string' => sub {
-  my $self = shift;
-  $self->render(text => b($self->req->url->query)->url_unescape);
+  my $c = shift;
+  $c->render(text => b($c->req->url->query)->url_unescape);
 };
 
 get '/multi/:bar' => sub {
-  my $self = shift;
-  my ($foo, $bar, $baz) = $self->param([qw(foo bar baz)]);
-  $self->render(
+  my $c = shift;
+  my ($foo, $bar, $baz) = $c->param([qw(foo bar baz)]);
+  $c->render(
     data => join('', map { $_ // '' } $foo, $bar, $baz),
-    test => $self->param(['yada'])
+    test => $c->param(['yada'])
   );
 };
 
 get '/reserved' => sub {
-  my $self = shift;
-  $self->render(text => $self->param('data') . join(',', $self->param));
+  my $c = shift;
+  $c->render(text => $c->param('data') . join(',', $c->param));
 };
 
 get '/custom_name' => 'auto_name';
@@ -135,20 +140,20 @@ get '/without-format' => 'without-format';
 any '/json_too' => {json => {hello => 'world'}};
 
 get '/null/:null' => sub {
-  my $self = shift;
-  $self->render(text => $self->param('null'), layout => 'layout');
+  my $c = shift;
+  $c->render(text => $c->param('null'), layout => 'layout');
 };
 
 get '/action_template' => {controller => 'foo'} => sub {
-  my $self = shift;
-  $self->render(action => 'bar');
-  $self->rendered;
+  my $c = shift;
+  $c->render(action => 'bar');
+  $c->rendered;
 };
 
 get '/dead' => sub {
-  my $self = shift;
-  $self->dead;
-  $self->render(text => 'failed!');
+  my $c = shift;
+  $c->dead;
+  $c->render(text => 'failed!');
 };
 
 get '/dead_template' => 'dead_template';
@@ -160,32 +165,32 @@ get '/dead_auto_renderer' => {handler => 'dead'};
 get '/regex/in/template' => 'test(test)(\Qtest\E)(';
 
 get '/maybe/ajax' => sub {
-  my $self = shift;
-  return $self->render(text => 'is ajax') if $self->req->is_xhr;
-  $self->render(text => 'not ajax');
+  my $c = shift;
+  return $c->render(text => 'is ajax') if $c->req->is_xhr;
+  $c->render(text => 'not ajax');
 };
 
 get '/stream' => sub {
-  my $self = shift;
+  my $c = shift;
   my $chunks
-    = [qw(foo bar), $self->req->url->to_abs->userinfo, $self->url_for->to_abs];
-  $self->res->code(200);
-  $self->res->headers->content_type('text/plain');
+    = [qw(foo bar), $c->req->url->to_abs->userinfo, $c->url_for->to_abs];
+  $c->res->code(200);
+  $c->res->headers->content_type('text/plain');
   my $cb;
   $cb = sub {
     my $content = shift;
     my $chunk = shift @$chunks || '';
     $content->write_chunk($chunk, $chunk ? $cb : undef);
   };
-  $self->res->content->$cb;
-  $self->rendered;
+  $c->res->content->$cb;
+  $c->rendered;
 };
 
 get '/finished' => sub {
-  my $self = shift;
-  $self->on(finish => sub { shift->stash->{finished} *= 2 });
-  $self->stash->{finished} = 1;
-  $self->render(text => 'so far so good!');
+  my $c = shift;
+  $c->on(finish => sub { shift->stash->{finished} *= 2 });
+  $c->stash->{finished} = 1;
+  $c->render(text => 'so far so good!');
 };
 
 get '/привет/мир' =>
@@ -198,11 +203,12 @@ get '/root' => sub { shift->render(text => 'root fallback!') };
 get '/template.txt' => {template => 'template', format => 'txt'};
 
 get ':number' => [number => qr/0/] => sub {
-  my $self    = shift;
-  my $url     = $self->req->url->to_abs;
-  my $address = $self->tx->remote_address;
-  my $num     = $self->param('number');
-  $self->render(text => "$url-$address-$num");
+  my $c   = shift;
+  my $url = $c->req->url->to_abs;
+  $c->res->headers->header('X-Original' => $c->tx->original_remote_address);
+  my $address = $c->tx->remote_address;
+  my $num     = $c->param('number');
+  $c->render(text => "$url-$address-$num");
 };
 
 del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1 %> ☃') };
@@ -213,43 +219,42 @@ get '/inline/ep' =>
 get '/inline/ep/too' => sub { shift->render(inline => '0', handler => 'ep') };
 
 get '/inline/ep/include' => sub {
-  my $self = shift;
-  $self->stash(inline_template => "♥<%= 'just ♥' %>");
-  $self->render(
+  my $c = shift;
+  $c->stash(inline_template => "♥<%= 'just ♥' %>");
+  $c->render(
     inline  => '<%= include inline => $inline_template %>works!',
     handler => 'ep'
   );
 };
 
 get '/to_string' => sub {
-  my $self = shift;
-  $self->stash(to_string => 1, test => 'before');
-  my $str = $self->render_to_string(inline => '<%= $test =%>');
-  $self->render(text => $self->stash('test') . $str);
+  my $c = shift;
+  $c->stash(to_string => 1, test => 'before');
+  my $str = $c->render_to_string(inline => '<%= $test =%>');
+  $c->render(text => $c->stash('test') . $str);
 };
 
 get '/source' => sub {
-  my $self = shift;
-  my $file = $self->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
-  $self->render_maybe('this_does_not_ever_exist')
-    or $self->render_static($file)
-    or $self->res->headers->header('X-Missing' => 1);
+  my $c = shift;
+  my $file = $c->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
+  $c->render_maybe('this_does_not_ever_exist')
+    or $c->reply->static($file)
+    or $c->res->headers->header('X-Missing' => 1);
 };
 
 get '/foo_relaxed/#test' => sub {
-  my $self = shift;
-  $self->render(
-    text => $self->stash('test') . ($self->req->headers->dnt ? 1 : 0));
+  my $c = shift;
+  $c->render(text => $c->stash('test') . ($c->req->headers->dnt ? 1 : 0));
 };
 
 get '/foo_wildcard/(*test)' => sub {
-  my $self = shift;
-  $self->render(text => $self->stash('test'));
+  my $c = shift;
+  $c->render(text => $c->stash('test'));
 };
 
 get '/foo_wildcard_too/*test' => sub {
-  my $self = shift;
-  $self->render(text => $self->stash('test'));
+  my $c = shift;
+  $c->render(text => $c->stash('test'));
 };
 
 get '/with/header/condition' => (
@@ -258,15 +263,14 @@ get '/with/header/condition' => (
 ) => 'with_header_condition';
 
 post '/with/header/condition' => sub {
-  my $self = shift;
-  $self->render(
-    text => 'foo ' . $self->req->headers->header('X-Secret-Header'));
+  my $c = shift;
+  $c->render(text => 'foo ' . $c->req->headers->header('X-Secret-Header'));
 } => (headers => {'X-Secret-Header' => 'bar'});
 
 get '/session_cookie' => sub {
-  my $self = shift;
-  $self->render(text => 'Cookie set!');
-  $self->res->cookies(
+  my $c = shift;
+  $c->render(text => 'Cookie set!');
+  $c->res->cookies(
     Mojo::Cookie::Response->new(
       path  => '/session_cookie',
       name  => 'session',
@@ -276,15 +280,15 @@ get '/session_cookie' => sub {
 };
 
 get '/session_cookie/2' => sub {
-  my $self    = shift;
-  my $session = $self->req->cookie('session');
+  my $c       = shift;
+  my $session = $c->req->cookie('session');
   my $value   = $session ? $session->value : 'missing';
-  $self->render(text => "Session is $value!");
+  $c->render(text => "Session is $value!");
 };
 
 get '/foo' => sub {
-  my $self = shift;
-  $self->render(text => 'Yea baby!');
+  my $c = shift;
+  $c->render(text => 'Yea baby!');
 };
 
 get '/layout' => sub {
@@ -299,47 +303,47 @@ get '/layout' => sub {
 post '/template' => 'index';
 
 any '/something' => sub {
-  my $self = shift;
-  $self->render(text => 'Just works!');
+  my $c = shift;
+  $c->render(text => 'Just works!');
 };
 
 any [qw(get post)] => '/something/else' => sub {
-  my $self = shift;
-  $self->render(text => 'Yay!');
+  my $c = shift;
+  $c->render(text => 'Yay!');
 };
 
 get '/regex/:test' => [test => qr/\d+/] => sub {
-  my $self = shift;
-  $self->render(text => $self->stash('test'));
+  my $c = shift;
+  $c->render(text => $c->stash('test'));
 };
 
 post '/bar/:test' => {test => 'default'} => sub {
-  my $self = shift;
-  $self->render(text => $self->stash('test'));
+  my $c = shift;
+  $c->render(text => $c->stash('test'));
 };
 
 patch '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for('foxy', {stuff => 'foo'}));
+  my $c = shift;
+  $c->render(text => $c->url_for('foxy', {stuff => 'foo'}));
 } => 'foxy';
 
 get '/url_for_foxy' => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for('foxy', stuff => '#test'));
+  my $c = shift;
+  $c->render(text => $c->url_for('foxy', stuff => '#test'));
 };
 
 post '/utf8' => 'form';
 
 post '/malformed_utf8' => sub {
-  my $self = shift;
-  $self->render(text => b($self->param('foo'))->url_escape->to_string);
+  my $c = shift;
+  $c->render(text => b($c->param('foo'))->url_escape->to_string);
 };
 
 get '/json' => sub {
-  my $self = shift;
-  return $self->render(json => $self->req->json)
-    if ($self->req->headers->content_type // '') eq 'application/json';
-  $self->render(json => {foo => [1, -2, 3, 'b☃r']}, layout => 'layout');
+  my $c = shift;
+  return $c->render(json => $c->req->json)
+    if ($c->req->headers->content_type // '') eq 'application/json';
+  $c->render(json => {foo => [1, -2, 3, 'b☃r']}, layout => 'layout');
 };
 
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') };
@@ -352,8 +356,8 @@ app->helper(agent => sub { shift->req->headers->user_agent });
 get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 
 get '/subrequest' => sub {
-  my $self = shift;
-  $self->render(text => $self->ua->post('/template')->success->body);
+  my $c = shift;
+  $c->render(text => $c->ua->post('/template')->success->body);
 };
 
 # Make sure hook runs non-blocking
@@ -361,47 +365,37 @@ hook after_dispatch => sub { shift->stash->{nb} = 'broken!' };
 
 my $nb;
 get '/subrequest_non_blocking' => sub {
-  my $self = shift;
-  $self->ua->post(
+  my $c = shift;
+  $c->ua->post(
     '/template' => sub {
       my ($ua, $tx) = @_;
-      $self->render(text => $tx->res->body . $self->stash->{nb});
-      $nb = $self->stash->{nb};
+      $c->render(text => $tx->res->body . $c->stash->{nb});
+      $nb = $c->stash->{nb};
     }
   );
-  $self->stash->{nb} = 'success!';
+  $c->stash->{nb} = 'success!';
 };
 
-get '/redirect_url' => sub {
-  shift->redirect_to('http://127.0.0.1/foo')->render(text => 'Redirecting!');
-};
+get '/redirect_url' => sub { shift->redirect_to('http://127.0.0.1/foo') };
 
-get '/redirect_path' => sub {
-  shift->redirect_to('/foo/bar?foo=bar')->render(text => 'Redirecting!');
-};
+get '/redirect_path' => sub { shift->redirect_to('/foo/bar?foo=bar') };
 
-get '/redirect_named' => sub {
-  shift->redirect_to('index', format => 'txt')->render(text => 'Redirecting!');
-};
+get '/redirect_named' => sub { shift->redirect_to('index', format => 'txt') };
 
 get '/redirect_twice' => sub { shift->redirect_to('/redirect_named') };
 
-get '/redirect_no_render' => sub {
-  shift->redirect_to('index', {format => 'txt'});
-};
-
 get '/redirect_callback' => sub {
-  my $self = shift;
+  my $c = shift;
   Mojo::IOLoop->next_tick(
     sub {
-      $self->res->code(301);
-      $self->res->body('Whatever!');
-      $self->redirect_to('http://127.0.0.1/foo');
+      $c->res->code(301);
+      $c->res->body('Whatever!');
+      $c->redirect_to('http://127.0.0.1/foo');
     }
   );
 };
 
-get '/static_render' => sub { shift->render_static('hello.txt') };
+get '/static' => sub { shift->reply->static('hello.txt') };
 
 app->types->type('koi8-r' => 'text/html; charset=koi8-r');
 get '/koi8-r' => sub {
@@ -411,8 +405,8 @@ get '/koi8-r' => sub {
 };
 
 get '/captures/:foo/:bar' => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for);
+  my $c = shift;
+  $c->render(text => $c->url_for);
 };
 
 # Default condition
@@ -426,10 +420,10 @@ app->routes->add_condition(
 );
 
 get '/default/:text' => (default => 23) => sub {
-  my $self    = shift;
-  my $default = $self->stash('default');
-  my $test    = $self->stash('test');
-  $self->render(text => "works $default $test");
+  my $c       = shift;
+  my $default = $c->stash('default');
+  my $test    = $c->stash('test');
+  $c->render(text => "works $default $test");
 };
 
 # Redirect condition
@@ -453,14 +447,14 @@ get '/redirect/condition/1' => (redirect => 1) =>
 get '/url_with';
 
 get '/url_with/:foo' => sub {
-  my $self = shift;
-  $self->render(text => $self->url_with({foo => 'bar'})->to_abs);
+  my $c = shift;
+  $c->render(text => $c->url_with({foo => 'bar'})->to_abs);
 };
 
 my $dynamic_inline = 1;
 get '/dynamic/inline' => sub {
-  my $self = shift;
-  $self->render(inline => 'dynamic inline ' . $dynamic_inline++);
+  my $c = shift;
+  $c->render(inline => 'dynamic inline ' . $dynamic_inline++);
 };
 
 my $t = Test::Mojo->new;
@@ -477,6 +471,8 @@ is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url,
   '/foo', 'right URL';
 is $t->app->build_controller->render_to_string('index', handler => 'epl'),
   'Just works!', 'right result';
+is $t->app->build_controller->render_to_string(inline => '0'), "0\n",
+  'right result';
 
 # Unicode snowman
 $t->get_ok('/☃')->status_is(200)
@@ -603,7 +599,7 @@ $t->get_ok('/multi/B?foo=A&baz=C')->status_is(200)
 # Injection attack
 $t->get_ok('/multi/B?foo=A&foo=E&baz=C&yada=D&yada=text&yada=fail')
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('ABC');
+  ->content_is('EBC');
 
 # Missing parameter
 $t->get_ok('/multi/B?baz=C')->status_is(200)
@@ -736,7 +732,8 @@ $t->get_ok('/.html')->status_is(200)
   local $ENV{MOJO_REVERSE_PROXY} = 1;
   $t->ua->server->restart;
   $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
-    ->status_is(200)->content_like(qr!http://localhost:\d+/0-192\.0\.2\.1-0$!);
+    ->status_is(200)->header_unlike('X-Original' => qr/192\.0\.2\.1/)
+    ->content_like(qr!http://localhost:\d+/0-192\.0\.2\.1-0$!);
 }
 
 # Reverse proxy with "X-Forwarded-Proto"
@@ -923,7 +920,10 @@ $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_type_is('application/json')->json_is({foo => [1, -2, 3, 'b☃r']})
   ->json_is('/foo' => [1, -2, 3, 'b☃r'])
   ->json_is('/foo/3', 'b☃r', 'right value')->json_has('/foo')
-  ->json_hasnt('/bar');
+  ->json_hasnt('/bar')->json_like('/foo/3' => qr/r$/)
+  ->json_unlike('/foo/3' => qr/b$/)
+  ->json_like('/foo/3' => qr/^b/, 'right value')
+  ->json_unlike('/foo/3' => qr/^r/, 'different value');
 
 # JSON ("null")
 $t->get_ok('/json' => json => undef)->status_is(200)
@@ -965,22 +965,18 @@ is $nb, 'broken!', 'right text';
 
 # Redirect to URL
 $t->get_ok('/redirect_url')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 12)
-  ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Redirecting!');
+  ->header_is(Server   => 'Mojolicious (Perl)')
+  ->header_is(Location => 'http://127.0.0.1/foo')->content_is('');
 
 # Redirect to path
 $t->get_ok('/redirect_path')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 12)
-  ->header_like(Location => qr!/foo/bar\?foo=bar$!)
-  ->content_is('Redirecting!');
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_like(Location => qr!/foo/bar\?foo=bar$!)->content_is('');
 
 # Redirect to named route
 $t->get_ok('/redirect_named')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 12)
-  ->header_like(Location => qr!/template.txt$!)->content_is('Redirecting!');
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_like(Location => qr!/template.txt$!)->content_is('');
 
 # Redirect twice
 $t->ua->max_redirects(3);
@@ -993,12 +989,6 @@ is $redirects->[0]->req->url->path, '/redirect_twice', 'right path';
 is $redirects->[1]->req->url->path, '/redirect_named', 'right path';
 $t->ua->max_redirects(0);
 
-# Redirect without rendering
-$t->get_ok('/redirect_no_render')->status_is(302)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 0)
-  ->header_like(Location => qr!/template.txt$!)->content_is('');
-
 # Non-blocking redirect
 $t->get_ok('/redirect_callback')->status_is(301)
   ->header_is(Server           => 'Mojolicious (Perl)')
@@ -1006,7 +996,7 @@ $t->get_ok('/redirect_callback')->status_is(301)
   ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Whatever!');
 
 # Static file
-$t->get_ok('/static_render')->status_is(200)
+$t->get_ok('/static')->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 31)
   ->content_is("Hello Mojo from a static file!\n");
@@ -1022,7 +1012,7 @@ $t->get_ok('/redirect_named')->status_is(200)
 $t->ua->max_redirects(0);
 Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_like(Location => qr!/template.txt$!)->content_is('Redirecting!');
+  ->header_like(Location => qr!/template.txt$!)->content_is('');
 
 # Request with koi8-r content
 my $koi8
@@ -1107,18 +1097,18 @@ text!
 <div id="☃">Redirect works!</div>
 
 @@ test(test)(\Qtest\E)(.html.ep
-<%= $self->match->endpoint->name %>
+<%= $c->match->endpoint->name %>
 
 @@ with_header_condition.html.ep
 Test ok!
 
 @@ root.html.epl
-% my $self = shift;
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
-%== $self->url_for('root_path')
+% my $c = shift;
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
+%== $c->url_for('root_path')
 
 @@ root_path.html.epl
 %== shift->url_for('root');
@@ -1133,11 +1123,11 @@ Just works!\
 <%= shift->param('name') %> ангел
 
 @@ layouts/layout.html.epl
-% my $self = shift;
-<%= $self->title %><%= $self->content %> with layout
+% my $c = shift;
+<%= $c->title %><%= $c->content %> with layout
 
 @@ autostash.html.ep
-% $self->layout('layout');
+% $c->layout('layout');
 %= $foo
 %= $self->test_helper('bar')
 % my $foo = 42;

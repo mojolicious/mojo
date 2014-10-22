@@ -19,6 +19,7 @@ ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new;
 is $path->to_string,     '',  'no path';
 is $path->to_abs_string, '/', 'right absolute path';
+is $path->to_route,      '/', 'right route';
 
 # Advanced
 $path = Mojo::Path->new('/AZaz09-._~!$&\'()*+,;=:@');

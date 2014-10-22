@@ -1,6 +1,6 @@
 package Mojo::ByteStream;
 use Mojo::Base -strict;
-use overload '""' => sub { shift->to_string }, fallback => 1;
+use overload bool => sub {1}, '""' => sub { ${$_[0]} }, fallback => 1;
 
 use Exporter 'import';
 use Mojo::Collection;
@@ -11,8 +11,8 @@ our @EXPORT_OK = ('b');
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum punycode_decode punycode_encode quote secure_compare),
-  qw(sha1_bytes sha1_sum slurp spurt squish trim unindent unquote url_escape),
+  qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
+  qw(sha1_sum slurp spurt squish trim unindent unquote url_escape),
   qw(url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
@@ -42,6 +42,8 @@ sub say {
   say $handle $$self;
   return $self;
 }
+
+sub secure_compare { Mojo::Util::secure_compare ${shift()}, shift }
 
 sub size { length ${$_[0]} }
 

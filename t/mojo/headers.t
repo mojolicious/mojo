@@ -21,9 +21,9 @@ is $hash->{Connection}, 'close',        'right value';
 is $hash->{Expect},     'continue-100', 'right value';
 is $hash->{'Content-Type'}, 'text/html', 'right value';
 $hash = $headers->to_hash(1);
-is_deeply $hash->{Connection},     [['close']],        'right structure';
-is_deeply $hash->{Expect},         [['continue-100']], 'right structure';
-is_deeply $hash->{'Content-Type'}, [['text/html']],    'right structure';
+is_deeply $hash->{Connection},     ['close'],        'right structure';
+is_deeply $hash->{Expect},         ['continue-100'], 'right structure';
+is_deeply $hash->{'Content-Type'}, ['text/html'],    'right structure';
 is_deeply [sort @{$headers->names}], [qw(Connection Content-Type Expect)],
   'right structure';
 $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
@@ -116,19 +116,6 @@ is $clone->expect,   'nothing',      'right value';
 $clone = Mojo::Headers->new->add(Foo => [qw(bar baz)])->clone;
 is_deeply $clone->to_hash(1)->{Foo}, [[qw(bar baz)]], 'right structure';
 
-# Multiline values
-$headers = Mojo::Headers->new;
-$headers->header('X-Test', [23, 24], 'single line', [25, 26]);
-is $headers->to_string,
-    "X-Test: 23\x0d\x0a 24\x0d\x0a"
-  . "X-Test: single line\x0d\x0a"
-  . "X-Test: 25\x0d\x0a 26", 'right format';
-is_deeply $headers->to_hash(1),
-  {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
-is_deeply $headers->to_hash, {'X-Test' => '23 24, single line, 25 26'},
-  'right structure';
-is $headers->header('X-Test'), "23 24, single line, 25 26", 'right format';
-
 # Parse headers
 $headers = Mojo::Headers->new;
 isa_ok $headers->parse(<<'EOF'), 'Mojo::Headers', 'right return value';
@@ -160,9 +147,9 @@ Foo: first again
 EOF
 ok $headers->is_finished, 'parser is finished';
 $hash = {
-  'Content-Type' => [['text/plain']],
-  Foo => [['first', 'second', 'third'], ['first again', 'second ":again"']],
-  'Foo Bar' => [['baz']]
+  'Content-Type' => ['text/plain'],
+  Foo            => ['first second third', 'first again second ":again"'],
+  'Foo Bar'      => ['baz']
 };
 is_deeply $headers->to_hash(1), $hash, 'right structure';
 is $headers->header('Foo'), 'first second third, first again second ":again"',
@@ -199,23 +186,24 @@ $headers->append(Vary => 'Accept-Encoding');
 is $headers->vary, 'Accept, Accept-Encoding', 'right value';
 $headers = Mojo::Headers->new;
 $headers->add(Vary => 'Accept', 'Accept-Encoding');
-is_deeply $headers->to_hash(1), {Vary => [['Accept'], ['Accept-Encoding']]},
+is_deeply $headers->to_hash(1), {Vary => ['Accept', 'Accept-Encoding']},
   'right structure';
 $headers->append(Vary => 'Accept-Language');
 is_deeply $headers->to_hash(1),
-  {Vary => [['Accept, Accept-Encoding, Accept-Language']]}, 'right structure';
+  {Vary => ['Accept, Accept-Encoding, Accept-Language']}, 'right structure';
 
-# Multiline
+# Multiple headers with the same name
 $headers = Mojo::Headers->new;
-$headers->from_hash(
-  {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});
+$headers->from_hash({'X-Test' => [23, 24], 'X-Test2' => 'foo'});
 $hash = $headers->to_hash;
-is $hash->{'X-Test'}, '23 24, single line, 25 26', 'right value';
-is $hash->{'X-Test2'}, 'foo', 'right value';
+is $hash->{'X-Test'},  '23, 24', 'right value';
+is $hash->{'X-Test2'}, 'foo',    'right value';
 $hash = $headers->to_hash(1);
-is_deeply $hash->{'X-Test'}, [[23, 24], ['single line'], [25, 26]],
+is_deeply $hash->{'X-Test'}, [23, 24], 'right structure';
+is_deeply $hash->{'X-Test2'}, ['foo'], 'right structure';
+$headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
+is_deeply $headers->to_hash(1), {'X-Test' => [23, 24], 'X-Test2' => ['foo']},
   'right structure';
-is_deeply $hash->{'X-Test2'}, [['foo']], 'right structure';
 
 # Headers in chunks
 $headers = Mojo::Headers->new;

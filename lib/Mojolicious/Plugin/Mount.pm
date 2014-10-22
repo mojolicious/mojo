@@ -17,9 +17,7 @@ sub register {
   }
 
   my $route = $app->routes->route($path)->detour(app => $embed);
-  $route->over(host => $host) if $host;
-
-  return $route;
+  return $host ? $route->over(host => $host) : $route;
 }
 
 1;

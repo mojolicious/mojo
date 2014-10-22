@@ -15,23 +15,23 @@ use Mojolicious::Lite;
 app->log->level('fatal');
 
 get '/' => sub {
-  my $self = shift;
-  my $rel  = $self->req->url;
-  my $abs  = $rel->to_abs;
-  $self->render(text => "Hello World! $rel $abs");
+  my $c   = shift;
+  my $rel = $c->req->url;
+  my $abs = $rel->to_abs;
+  $c->render(text => "Hello World! $rel $abs");
 };
 
 get '/proxy' => sub {
-  my $self = shift;
-  $self->render(text => $self->req->url);
+  my $c = shift;
+  $c->render(text => $c->req->url);
 };
 
 websocket '/test' => sub {
-  my $self = shift;
-  $self->on(
+  my $c = shift;
+  $c->on(
     message => sub {
-      my ($self, $msg) = @_;
-      $self->send("${msg}test2");
+      my ($c, $msg) = @_;
+      $c->send("${msg}test2");
     }
   );
 };

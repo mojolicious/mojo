@@ -14,6 +14,7 @@ has serialize          => sub { \&Mojo::JSON::encode_json };
 sub load {
   my ($self, $c) = @_;
 
+  return unless $c->req->headers->cookie;
   return unless my $value = $c->signed_cookie($self->cookie_name);
   $value =~ y/-/=/;
   return unless my $session = $self->deserialize->(b64_decode $value);

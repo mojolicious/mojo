@@ -443,8 +443,8 @@ is $req->content->progress, 0, 'right progress';
 $req->parse("--8jXGX\x0d\x0a");
 is $req->content->progress, 9, 'right progress';
 $req->parse(
-  "Content-Disposition: Form-Data; Name = file; Filename = file.txt\x0d\x0a"
-    . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+      "Content-Disposition: form-data; name=\"file\"; filename=\"file.txt\""
+    . "\x0d\x0aContent-Type: application/octet-stream\x0d\x0a\x0d\x0a");
 is $req->content->progress, 117, 'right progress';
 $req->parse('11023456789');
 is $req->content->progress, 128, 'right progress';

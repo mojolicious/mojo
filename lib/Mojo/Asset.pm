@@ -15,6 +15,7 @@ sub is_file {undef}
 sub is_range { !!($_[0]->end_range || $_[0]->start_range) }
 
 sub move_to { croak 'Method "move_to" not implemented by subclass' }
+sub mtime   { croak 'Method "mtime" not implemented by subclass' }
 sub size    { croak 'Method "size" not implemented by subclass' }
 sub slurp   { croak 'Method "slurp" not implemented by subclass' }
 
@@ -35,6 +36,7 @@ Mojo::Asset - HTTP content storage base class
   sub contains  {...}
   sub get_chunk {...}
   sub move_to   {...}
+  sub mtime     {...}
   sub size      {...}
   sub slurp     {...}
 
@@ -88,7 +90,7 @@ subclass.
   my $bytes = $asset->get_chunk($offset, $max);
 
 Get chunk of data starting from a specific position, defaults to a maximum
-chunk size of C<131072> bytes. Meant to be overloaded in a subclass.
+chunk size of C<131072> bytes (128KB). Meant to be overloaded in a subclass.
 
 =head2 is_file
 
@@ -107,6 +109,12 @@ Check if asset has a L</"start_range"> or L</"end_range">.
   $asset = $asset->move_to('/home/sri/foo.txt');
 
 Move asset data into a specific file. Meant to be overloaded in a subclass.
+
+=head2 mtime
+
+  my $mtime = $asset->mtime;
+
+Modification time of asset. Meant to be overloaded in a subclass.
 
 =head2 size
 

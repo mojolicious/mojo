@@ -44,17 +44,17 @@ sub register {
 }
 
 sub _csrf_field {
-  my $self = shift;
-  return _hidden_field($self, csrf_token => $self->csrf_token, @_);
+  my $c = shift;
+  return _hidden_field($c, csrf_token => $c->helpers->csrf_token, @_);
 }
 
 sub _form_for {
-  my ($self, @url) = (shift, shift);
+  my ($c, @url) = (shift, shift);
   push @url, shift if ref $_[0] eq 'HASH';
 
   # POST detection
   my @post;
-  if (my $r = $self->app->routes->lookup($url[0])) {
+  if (my $r = $c->app->routes->lookup($url[0])) {
     my %methods = (GET => 1, POST => 1);
     do {
       my @via = @{$r->via || []};
@@ -63,20 +63,20 @@ sub _form_for {
     @post = (method => 'POST') if $methods{POST} && !$methods{GET};
   }
 
-  return _tag('form', action => $self->url_for(@url), @post, @_);
+  return _tag('form', action => $c->url_for(@url), @post, @_);
 }
 
 sub _hidden_field {
-  my $self = shift;
+  my $c = shift;
   return _tag('input', name => shift, value => shift, @_, type => 'hidden');
 }
 
 sub _input {
-  my ($self, $name) = (shift, shift);
+  my ($c, $name) = (shift, shift);
   my %attrs = @_ % 2 ? (value => shift, @_) : @_;
 
   # Special selection value
-  my @values = $self->param($name);
+  my @values = @{$c->every_param($name)};
   my $type = $attrs{type} || '';
   if (@values && $type ne 'submit') {
 
@@ -91,11 +91,11 @@ sub _input {
     else { $attrs{value} = $values[0] }
   }
 
-  return _validation($self, $name, 'input', %attrs, name => $name);
+  return _validation($c, $name, 'input', %attrs, name => $name);
 }
 
 sub _javascript {
-  my $self = shift;
+  my $c = shift;
 
   # CDATA
   my $cb = sub {''};
@@ -104,19 +104,19 @@ sub _javascript {
   }
 
   # URL
-  my $src = @_ % 2 ? $self->url_for(shift) : undef;
+  my $src = @_ % 2 ? $c->url_for(shift) : undef;
 
   return _tag('script', @_, $src ? (src => $src) : (), $cb);
 }
 
 sub _label_for {
-  my ($self, $name) = (shift, shift);
+  my ($c, $name) = (shift, shift);
   my $content = ref $_[-1] eq 'CODE' ? pop : shift;
-  return _validation($self, $name, 'label', for => $name, @_, $content);
+  return _validation($c, $name, 'label', for => $name, @_, $content);
 }
 
 sub _link_to {
-  my ($self, $content) = (shift, shift);
+  my ($c, $content) = (shift, shift);
   my @url = ($content);
 
   # Content
@@ -128,7 +128,7 @@ sub _link_to {
   # Captures
   push @url, shift if ref $_[0] eq 'HASH';
 
-  return _tag('a', href => $self->url_for(@url), @_);
+  return _tag('a', href => $c->url_for(@url), @_);
 }
 
 sub _option {
@@ -144,15 +144,15 @@ sub _option {
 }
 
 sub _password_field {
-  my ($self, $name) = (shift, shift);
-  return _validation($self, $name, 'input', @_, name => $name,
+  my ($c, $name) = (shift, shift);
+  return _validation($c, $name, 'input', @_, name => $name,
     type => 'password');
 }
 
 sub _select_field {
-  my ($self, $name, $options, %attrs) = (shift, shift, shift, @_);
+  my ($c, $name, $options, %attrs) = (shift, shift, shift, @_);
 
-  my %values = map { $_ => 1 } $self->param($name);
+  my %values = map { $_ => 1 } @{$c->every_param($name)};
 
   my $groups = '';
   for my $group (@$options) {
@@ -168,12 +168,12 @@ sub _select_field {
     else { $groups .= _option(\%values, $group) }
   }
 
-  return _validation($self, $name, 'select', %attrs, name => $name,
+  return _validation($c, $name, 'select', %attrs, name => $name,
     sub {$groups});
 }
 
 sub _stylesheet {
-  my $self = shift;
+  my $c = shift;
 
   # CDATA
   my $cb;
@@ -182,14 +182,14 @@ sub _stylesheet {
   }
 
   # "link" or "style" tag
-  my $href = @_ % 2 ? $self->url_for(shift) : undef;
+  my $href = @_ % 2 ? $c->url_for(shift) : undef;
   return $href
     ? _tag('link', rel => 'stylesheet', href => $href, @_)
     : _tag('style', @_, $cb);
 }
 
 sub _submit_button {
-  my $self = shift;
+  my $c = shift;
   return _tag('input', value => shift // 'Ok', @_, type => 'submit');
 }
 
@@ -225,28 +225,28 @@ sub _tag {
 }
 
 sub _tag_with_error {
-  my ($self, $tag) = (shift, shift);
+  my ($c, $tag) = (shift, shift);
   my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
   $attrs{class} .= $attrs{class} ? ' field-with-error' : 'field-with-error';
   return _tag($tag, %attrs, defined $content ? $content : ());
 }
 
 sub _text_area {
-  my ($self, $name) = (shift, shift);
+  my ($c, $name) = (shift, shift);
 
   # Make sure content is wrapped
   my $cb = ref $_[-1] eq 'CODE' ? pop : sub {''};
   my $content = @_ % 2 ? shift : undef;
   $cb = sub { xml_escape $content }
-    if defined($content = $self->param($name) // $content);
+    if defined($content = $c->param($name) // $content);
 
-  return _validation($self, $name, 'textarea', @_, name => $name, $cb);
+  return _validation($c, $name, 'textarea', @_, name => $name, $cb);
 }
 
 sub _validation {
-  my ($self, $name) = (shift, shift);
-  return _tag(@_) unless $self->validation->has_error($name);
-  return $self->tag_with_error(@_);
+  my ($c, $name) = (shift, shift);
+  return _tag(@_) unless $c->validation->has_error($name);
+  return $c->helpers->tag_with_error(@_);
 }
 
 1;
@@ -686,9 +686,9 @@ HTML/XML tag generator.
 
 Very useful for reuse in more specific tag helpers.
 
-  $self->tag('div');
-  $self->tag('div', id => 'foo');
-  $self->tag(div => sub { 'Content' });
+  $c->tag('div');
+  $c->tag('div', id => 'foo');
+  $c->tag(div => sub { 'Content' });
 
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
 accidental double escaping.

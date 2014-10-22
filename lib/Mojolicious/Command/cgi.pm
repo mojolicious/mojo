@@ -9,9 +9,8 @@ has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
-  my $cgi = Mojo::Server::CGI->new(app => $self->app);
-  GetOptionsFromArray \@args, nph => sub { $cgi->nph(1) };
-  $cgi->run;
+  GetOptionsFromArray \@args, nph => \(my $nph = 0);
+  Mojo::Server::CGI->new(app => $self->app, nph => $nph)->run;
 }
 
 1;

@@ -19,14 +19,14 @@ EOF
   # Script
   my $name = class_to_file $class;
   $self->render_to_rel_file('mojo', "$name/script/$name", $class);
-  $self->chmod_file("$name/script/$name", 0744);
+  $self->chmod_rel_file("$name/script/$name", 0744);
 
   # Application class
   my $app = class_to_path $class;
   $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
   # Controller
-  my $controller = "${class}::Example";
+  my $controller = "${class}::Controller::Example";
   my $path       = class_to_path $controller;
   $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 

@@ -42,10 +42,14 @@ sub one_tick {
     # I/O
     if (keys %{$self->{io}}) {
       $poll->poll($timeout);
-      ++$i and $self->_sandbox('Read', $self->{io}{fileno $_}{cb}, 0)
-        for $poll->handles(POLLIN | POLLPRI | POLLHUP | POLLERR);
-      ++$i and $self->_sandbox('Write', $self->{io}{fileno $_}{cb}, 1)
-        for $poll->handles(POLLOUT);
+      for my $handle ($poll->handles(POLLIN | POLLPRI | POLLHUP | POLLERR)) {
+        next unless my $io = $self->{io}{fileno $handle};
+        ++$i and $self->_sandbox('Read', $io->{cb}, 0);
+      }
+      for my $handle ($poll->handles(POLLOUT)) {
+        next unless my $io = $self->{io}{fileno $handle};
+        ++$i and $self->_sandbox('Write', $io->{cb}, 1);
+      }
     }
 
     # Wait for timeout if poll can't be used
@@ -80,6 +84,8 @@ sub remove {
   return !!delete $self->{io}{fileno $remove};
 }
 
+sub reset { delete @{shift()}{qw(io poll timers)} }
+
 sub start {
   my $self = shift;
   $self->{running}++;
@@ -93,11 +99,13 @@ sub timer { shift->_timer(0, @_) }
 sub watch {
   my ($self, $handle, $read, $write) = @_;
 
+  my $mode = 0;
+  $mode |= POLLIN | POLLPRI if $read;
+  $mode |= POLLOUT if $write;
+
   my $poll = $self->_poll;
   $poll->remove($handle);
-  if ($read && $write) { $poll->mask($handle, POLLIN | POLLPRI | POLLOUT) }
-  elsif ($read)  { $poll->mask($handle, POLLIN | POLLPRI) }
-  elsif ($write) { $poll->mask($handle, POLLOUT) }
+  $poll->mask($handle, $mode) if $mode != 0;
 
   return $self;
 }
@@ -206,6 +214,12 @@ amount of time in seconds.
   my $bool = $reactor->remove($id);
 
 Remove handle or timer.
+
+=head2 reset
+
+  $reactor->reset;
+
+Remove all handles and timers.
 
 =head2 start
 

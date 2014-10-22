@@ -5,6 +5,8 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+# Pod::Simple 3.09 first shipped with Perl 5.11.2
+# Time::Local 1.2 first shipped with Perl 5.13.9
 WriteMakefile(
   NAME         => 'Mojolicious',
   VERSION_FROM => 'lib/Mojolicious.pm',
@@ -14,14 +16,15 @@ WriteMakefile(
   META_MERGE   => {
     requires  => {perl => '5.010001'},
     resources => {
-      homepage    => 'http://mojolicio.us',
-      license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      MailingList => 'http://groups.google.com/group/mojolicious',
-      repository  => 'http://github.com/kraih/mojo',
-      bugtracker  => 'http://github.com/kraih/mojo/issues'
+      license    => 'http://www.opensource.org/licenses/artistic-license-2.0',
+      homepage   => 'http://mojolicio.us',
+      bugtracker => 'https://github.com/kraih/mojo/issues',
+      repository => 'https://github.com/kraih/mojo.git',
+      x_IRC      => 'irc://irc.perl.org/#mojo'
     },
     no_index => {directory => ['t']}
   },
+  PREREQ_PM => {'Pod::Simple' => '3.09', 'Time::Local' => '1.2'},
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
   test => {TESTS => 't/*.t t/*/*.t'}
 );

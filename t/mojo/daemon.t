@@ -6,7 +6,9 @@ BEGIN {
 }
 
 use Test::More;
+use Cwd 'abs_path';
 use File::Spec::Functions 'catdir';
+use FindBin;
 use Mojo;
 use Mojo::IOLoop;
 use Mojo::Log;
@@ -38,6 +40,13 @@ use Mojolicious;
   );
 }
 
+# Reverse proxy
+{
+  ok !Mojo::Server::Daemon->new->reverse_proxy, 'no reverse proxy';
+  local $ENV{MOJO_REVERSE_PROXY} = 1;
+  ok !!Mojo::Server::Daemon->new->reverse_proxy, 'reverse proxy';
+}
+
 # Optional home detection
 my @path = qw(th is mojo dir wil l never-ever exist);
 my $app = Mojo->new(home => Mojo::Home->new(catdir @path));
@@ -53,6 +62,23 @@ $app->config(foo => 'bar', baz => 'yada');
 is $app->config({test => 23})->config->{test}, 23, 'right value';
 is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
   'right value';
+
+# Script name
+my $path = "$FindBin::Bin/lib/../lib/myapp.pl";
+is(Mojo::Server::Daemon->new->load_app($path)->config('script'),
+  abs_path($path), 'right script name');
+
+# Load broken app
+eval {
+  Mojo::Server::Daemon->new->load_app(
+    "$FindBin::Bin/lib/Mojo/LoaderException.pm");
+};
+like $@, qr/^Can't load application/, 'right error';
+
+# Load missing application class
+eval { Mojo::Server::Daemon->new->build_app('Mojo::DoesNotExist') };
+like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/,
+  'right error';
 
 # Transaction
 isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';
@@ -179,12 +205,13 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 ok $tx->local_address, 'has local address';
 ok $tx->local_port > 0, 'has local port';
-ok $tx->remote_address, 'has local address';
-ok $tx->remote_port > 0, 'has local port';
+ok $tx->original_remote_address, 'has original remote address';
+ok $tx->remote_address,          'has remote address';
+ok $tx->remote_port > 0, 'has remote port';
 ok $local_address, 'has local address';
 ok $local_port > 0, 'has local port';
-ok $remote_address, 'has local address';
-ok $remote_port > 0, 'has local port';
+ok $remote_address, 'has remote address';
+ok $remote_port > 0, 'has remote port';
 
 # Pipelined
 my $daemon
@@ -221,7 +248,9 @@ $daemon = Mojo::Server::Daemon->new(
   silent => 1
 );
 is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
+$daemon->ioloop->max_connections(500);
 $daemon->start;
+is $daemon->ioloop->max_connections, 500, 'right number';
 is scalar @{$daemon->acceptors}, 1, 'one active acceptor';
 is $daemon->app->moniker, 'mojolicious', 'right moniker';
 $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
@@ -235,7 +264,8 @@ $tx = $ua->inactivity_timeout(0.5)
   ->get("http://127.0.0.1:$port/throttle2" => {Connection => 'close'});
 ok !$tx->success, 'not successful';
 is $tx->error->{message}, 'Inactivity timeout', 'right error';
-$daemon->start;
+$daemon->max_clients(600)->start;
+is $daemon->ioloop->max_connections, 600, 'right number';
 $tx = $ua->inactivity_timeout(10)
   ->get("http://127.0.0.1:$port/throttle3" => {Connection => 'close'});
 ok $tx->success, 'successful';

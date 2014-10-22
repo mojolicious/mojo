@@ -58,22 +58,22 @@ L<Mojo::UserAgent::Proxy> implements the following attributes.
 
 =head2 http
 
-  my $http = $ua->http;
-  $ua      = $ua->http('http://sri:secret@127.0.0.1:8080');
+  my $http = $proxy->http;
+  $proxy   = $proxy->http('socks://sri:secret@127.0.0.1:8080');
 
 Proxy server to use for HTTP and WebSocket requests.
 
 =head2 https
 
-  my $https = $ua->https;
-  $ua       = $ua->https('http://sri:secret@127.0.0.1:8080');
+  my $https = $proxy->https;
+  $proxy    = $proxy->https('http://sri:secret@127.0.0.1:8080');
 
 Proxy server to use for HTTPS and WebSocket requests.
 
 =head2 not
 
   my $not = $proxy->not;
-  $ua     = $proxy->not([qw(localhost intranet.mojolicio.us)]);
+  $proxy  = $proxy->not([qw(localhost intranet.mojolicio.us)]);
 
 Domains that don't require a proxy server to be used.
 

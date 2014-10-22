@@ -4,8 +4,14 @@ use Test::More;
 use Mojo::ByteStream 'b';
 use Mojolicious::Routes::Pattern;
 
+# Text pattern (optimized)
+my $pattern = Mojolicious::Routes::Pattern->new('/test/123');
+is_deeply $pattern->match('/test/123'), {}, 'right structure';
+is_deeply $pattern->match('/test'), undef, 'no result';
+is $pattern->tree->[0][1], '/test/123', 'optimized pattern';
+
 # Normal pattern with text, placeholders and a default value
-my $pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action');
+$pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action');
 $pattern->defaults({action => 'index'});
 is_deeply $pattern->match('/test/foo/bar', 1),
   {controller => 'foo', action => 'bar'}, 'right structure';
@@ -55,10 +61,12 @@ is $pattern->render({a => 'c', b => 'd'}), '/test/c/123/d/456', 'right result';
 
 # Root
 $pattern = Mojolicious::Routes::Pattern->new('/');
+is $pattern->pattern, undef, 'slash has been optimized away';
 $pattern->defaults({action => 'index'});
 ok !$pattern->match('/test/foo/bar'), 'no result';
 is_deeply $pattern->match('/'), {action => 'index'}, 'right structure';
-is $pattern->render, '/', 'right result';
+is $pattern->render, '', 'right result';
+is $pattern->render({format => 'txt'}, 1), '.txt', 'right result';
 
 # Regex in pattern
 $pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',
@@ -246,11 +254,18 @@ is $pattern->render($result, 1), '/foo/bar', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('//');
 $result = $pattern->match('/', 1);
 is_deeply $result, {}, 'right structure';
-is $pattern->render($result, 1), '/', 'right result';
+is $pattern->render($result, 1), '', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('0');
 $result = $pattern->match('/0', 1);
 is_deeply $result, {}, 'right structure';
 is $pattern->render($result, 1), '/0', 'right result';
+
+# Optional format with constraint
+$pattern                        = Mojolicious::Routes::Pattern->new('/');
+$pattern->defaults->{format}    = 'txt';
+$pattern->constraints->{format} = ['txt'];
+$result                         = $pattern->match('/', 1);
+is_deeply $result, {format => 'txt'}, 'right structure';
 
 # Unicode
 $pattern = Mojolicious::Routes::Pattern->new('/(one)♥(two)');

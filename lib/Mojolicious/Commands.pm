@@ -1,7 +1,7 @@
 package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long 'GetOptions';
+use Getopt::Long 'GetOptionsFromArray';
 use Mojo::Server;
 use Mojo::Util 'tablify';
 
@@ -26,15 +26,17 @@ sub detect {
 }
 
 # Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
-BEGIN {
+sub _args {
+  return if __PACKAGE__->detect;
   Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
-  GetOptions(
-    'h|help'   => sub { $ENV{MOJO_HELP} = 1 },
-    'home=s'   => sub { $ENV{MOJO_HOME} = $_[1] },
-    'm|mode=s' => sub { $ENV{MOJO_MODE} = $_[1] }
-  ) unless __PACKAGE__->detect;
+  GetOptionsFromArray shift,
+    'h|help'   => \$ENV{MOJO_HELP},
+    'home=s'   => \$ENV{MOJO_HOME},
+    'm|mode=s' => \$ENV{MOJO_MODE};
   Getopt::Long::Configure('default');
 }
+
+BEGIN { _args([@ARGV]) }
 
 sub run {
   my ($self, $name, @args) = @_;
@@ -59,7 +61,8 @@ sub run {
     die qq{Unknown command "$name", maybe you need to install it?\n}
       unless $module;
 
-    # Run command
+    # Run command (remove options shared by all commands)
+    _args(\@args);
     my $command = $module->new(app => $self->app);
     return $help ? $command->help(@args) : $command->run(@args);
   }
@@ -83,10 +86,7 @@ sub run {
   return print $self->message, tablify(\@rows), $self->hint;
 }
 
-sub start_app {
-  my $self = shift;
-  return Mojo::Server->new->build_app(shift)->start(@_);
-}
+sub start_app { shift; Mojo::Server->new->build_app(shift)->start(@_) }
 
 sub _command {
   my ($module, $fatal) = @_;
@@ -313,7 +313,7 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
   Mojolicious::Commands->start_app('MyApp');
   Mojolicious::Commands->start_app(MyApp => @ARGV);
 
-Load application and start the command line interface for it.
+Load application from class and start the command line interface for it.
 
   # Always start daemon for application and ignore @ARGV
   Mojolicious::Commands->start_app('MyApp', 'daemon', '-l', 'http://*:8080');

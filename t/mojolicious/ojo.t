@@ -27,6 +27,10 @@ is p('/' => form => {foo => 'bar'})->body, 'POSTfoo=bar', 'right content';
 is p('/' => json => {foo => 'bar'})->body, 'POST{"foo":"bar"}',
   'right content';
 
+# Mojolicious::Lite
+get '/test' => {text => 'pass'};
+is app->ua->get('/test')->res->body, 'pass', 'right content';
+
 # Parse XML
 is x('<title>works</title>')->at('title')->text, 'works', 'right text';
 
@@ -44,5 +48,19 @@ is c(1, 2, 3)->join('-'), '1-2-3', 'right result';
 
 # Dumper
 is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
+
+# Benchmark
+{
+  my $buffer = '';
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  my $i = 0;
+  n { ++$i };
+  is $i,        1,             'block has been invoked once';
+  like $buffer, qr/wallclock/, 'right output';
+  n { $i++ } 10;
+  is $i, 11, 'block has been invoked ten times';
+  like $buffer, qr/wallclock.*wallclock/s, 'right output';
+}
 
 done_testing();

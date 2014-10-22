@@ -19,14 +19,14 @@ hook around_dispatch => sub {
 };
 
 get '/' => sub {
-  my $self = shift;
-  $self->render(
-    text => $self->render_to_string('menubar') . app->defaults->{secret});
+  my $c = shift;
+  $c->render(
+    text => $c->render_to_string('menubar') . app->defaults->{secret});
 };
 
 get '/cached' => sub {
-  my $self = shift;
-  $self->render(text => $self->my_cache);
+  my $c = shift;
+  $c->render(text => $c->my_cache);
 };
 
 app->start;

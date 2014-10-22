@@ -4,8 +4,12 @@ use Mojo::Base 'Mojo::Asset';
 use Mojo::Asset::File;
 use Mojo::Util 'spurt';
 
+# Last modified default
+my $MTIME = time;
+
 has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
+has mtime => sub {$MTIME};
 
 sub add_chunk {
   my ($self, $chunk) = @_;
@@ -112,7 +116,14 @@ automatically upgrade to a L<Mojo::Asset::File> object.
 
 Maximum size in bytes of data to keep in memory before automatically upgrading
 to a L<Mojo::Asset::File> object, defaults to the value of the
-C<MOJO_MAX_MEMORY_SIZE> environment variable or C<262144>.
+C<MOJO_MAX_MEMORY_SIZE> environment variable or C<262144> (256KB).
+
+=head2 mtime
+
+  my $mtime = $mem->mtime;
+  $mem      = $mem->mtime(1408567500);
+
+Modification time of asset, defaults to the time this class was loaded.
 
 =head1 METHODS
 
@@ -138,7 +149,7 @@ Check if asset contains a specific string.
   my $bytes = $mem->get_chunk($offset, $max);
 
 Get chunk of data starting from a specific position, defaults to a maximum
-chunk size of C<131072> bytes.
+chunk size of C<131072> bytes (128KB).
 
 =head2 move_to
 

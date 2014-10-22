@@ -63,6 +63,10 @@ is $t->app->secrets->[0], $t->app->moniker, 'secret defaults to moniker';
 is $t->app->renderer->template_handler(
   {template => 'foo/bar/index', format => 'html'}), 'epl', 'right handler';
 is $t->app->build_controller->req->url, '', 'no URL';
+is $t->app->build_controller->render_to_string('does_not_exist'), undef,
+  'no result';
+is $t->app->build_controller->render_to_string(inline => '%= $c', c => 'foo'),
+  "foo\n", 'right result';
 
 # Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };
@@ -89,45 +93,48 @@ like $@, qr/^Undefined subroutine &Mojolicious::Route::missing called/,
 # Hidden controller attributes and methods
 $t->app->routes->hide('bar');
 ok !$t->app->routes->is_hidden('foo'), 'not hidden';
-ok $t->app->routes->is_hidden('bar'),              'is hidden';
-ok $t->app->routes->is_hidden('_foo'),             'is hidden';
-ok $t->app->routes->is_hidden('AUTOLOAD'),         'is hidden';
-ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';
-ok $t->app->routes->is_hidden('FOO_BAR'),          'is hidden';
-ok $t->app->routes->is_hidden('app'),              'is hidden';
-ok $t->app->routes->is_hidden('attr'),             'is hidden';
-ok $t->app->routes->is_hidden('continue'),         'is hidden';
-ok $t->app->routes->is_hidden('cookie'),           'is hidden';
-ok $t->app->routes->is_hidden('finish'),           'is hidden';
-ok $t->app->routes->is_hidden('flash'),            'is hidden';
-ok $t->app->routes->is_hidden('handler'),          'is hidden';
-ok $t->app->routes->is_hidden('has'),              'is hidden';
-ok $t->app->routes->is_hidden('match'),            'is hidden';
-ok $t->app->routes->is_hidden('new'),              'is hidden';
-ok $t->app->routes->is_hidden('on'),               'is hidden';
-ok $t->app->routes->is_hidden('param'),            'is hidden';
-ok $t->app->routes->is_hidden('redirect_to'),      'is hidden';
-ok $t->app->routes->is_hidden('render'),           'is hidden';
-ok $t->app->routes->is_hidden('render_exception'), 'is hidden';
-ok $t->app->routes->is_hidden('render_later'),     'is hidden';
-ok $t->app->routes->is_hidden('render_maybe'),     'is hidden';
-ok $t->app->routes->is_hidden('render_not_found'), 'is hidden';
-ok $t->app->routes->is_hidden('render_static'),    'is hidden';
-ok $t->app->routes->is_hidden('render_to_string'), 'is hidden';
-ok $t->app->routes->is_hidden('rendered'),         'is hidden';
-ok $t->app->routes->is_hidden('req'),              'is hidden';
-ok $t->app->routes->is_hidden('res'),              'is hidden';
-ok $t->app->routes->is_hidden('respond_to'),       'is hidden';
-ok $t->app->routes->is_hidden('send'),             'is hidden';
-ok $t->app->routes->is_hidden('session'),          'is hidden';
-ok $t->app->routes->is_hidden('signed_cookie'),    'is hidden';
-ok $t->app->routes->is_hidden('stash'),            'is hidden';
-ok $t->app->routes->is_hidden('tap'),              'is hidden';
-ok $t->app->routes->is_hidden('tx'),               'is hidden';
-ok $t->app->routes->is_hidden('url_for'),          'is hidden';
-ok $t->app->routes->is_hidden('validation'),       'is hidden';
-ok $t->app->routes->is_hidden('write'),            'is hidden';
-ok $t->app->routes->is_hidden('write_chunk'),      'is hidden';
+ok $t->app->routes->is_hidden('bar'),                 'is hidden';
+ok $t->app->routes->is_hidden('_foo'),                'is hidden';
+ok $t->app->routes->is_hidden('AUTOLOAD'),            'is hidden';
+ok $t->app->routes->is_hidden('DESTROY'),             'is hidden';
+ok $t->app->routes->is_hidden('FOO_BAR'),             'is hidden';
+ok $t->app->routes->is_hidden('app'),                 'is hidden';
+ok $t->app->routes->is_hidden('attr'),                'is hidden';
+ok $t->app->routes->is_hidden('continue'),            'is hidden';
+ok $t->app->routes->is_hidden('cookie'),              'is hidden';
+ok $t->app->routes->is_hidden('every_cookie'),        'is hidden';
+ok $t->app->routes->is_hidden('every_param'),         'is hidden';
+ok $t->app->routes->is_hidden('every_signed_cookie'), 'is hidden';
+ok $t->app->routes->is_hidden('finish'),              'is hidden';
+ok $t->app->routes->is_hidden('flash'),               'is hidden';
+ok $t->app->routes->is_hidden('handler'),             'is hidden';
+ok $t->app->routes->is_hidden('has'),                 'is hidden';
+ok $t->app->routes->is_hidden('helpers'),             'is hidden';
+ok $t->app->routes->is_hidden('match'),               'is hidden';
+ok $t->app->routes->is_hidden('new'),                 'is hidden';
+ok $t->app->routes->is_hidden('on'),                  'is hidden';
+ok $t->app->routes->is_hidden('param'),               'is hidden';
+ok $t->app->routes->is_hidden('redirect_to'),         'is hidden';
+ok $t->app->routes->is_hidden('render'),              'is hidden';
+ok $t->app->routes->is_hidden('render_exception'),    'is hidden';
+ok $t->app->routes->is_hidden('render_later'),        'is hidden';
+ok $t->app->routes->is_hidden('render_maybe'),        'is hidden';
+ok $t->app->routes->is_hidden('render_not_found'),    'is hidden';
+ok $t->app->routes->is_hidden('render_to_string'),    'is hidden';
+ok $t->app->routes->is_hidden('rendered'),            'is hidden';
+ok $t->app->routes->is_hidden('req'),                 'is hidden';
+ok $t->app->routes->is_hidden('res'),                 'is hidden';
+ok $t->app->routes->is_hidden('respond_to'),          'is hidden';
+ok $t->app->routes->is_hidden('send'),                'is hidden';
+ok $t->app->routes->is_hidden('session'),             'is hidden';
+ok $t->app->routes->is_hidden('signed_cookie'),       'is hidden';
+ok $t->app->routes->is_hidden('stash'),               'is hidden';
+ok $t->app->routes->is_hidden('tap'),                 'is hidden';
+ok $t->app->routes->is_hidden('tx'),                  'is hidden';
+ok $t->app->routes->is_hidden('url_for'),             'is hidden';
+ok $t->app->routes->is_hidden('validation'),          'is hidden';
+ok $t->app->routes->is_hidden('write'),               'is hidden';
+ok $t->app->routes->is_hidden('write_chunk'),         'is hidden';
 
 # Unknown hooks
 ok !$t->app->plugins->emit_chain('does_not_exist'), 'hook has been emitted';
@@ -222,8 +229,7 @@ like $log, qr/Rendering template "syntaxerror.html.epl"\./, 'right message';
 like $log, qr/Missing right curly/, 'right message';
 like $log, qr/Template "exception.development.html.ep" not found\./,
   'right message';
-like $log, qr/Rendering cached template "exception.html.epl"\./,
-  'right message';
+like $log, qr/Rendering template "exception.html.epl"\./, 'right message';
 like $log, qr/500 Internal Server Error/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -257,10 +263,16 @@ $t->get_ok('/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
 
 # Foo::fun
 $url = $t->ua->server->url;
+$log = '';
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $url->path('/fun/time');
 $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
+like $log,
+  qr!Rendering cached template "foo/fun\.html\.ep" from DATA section\.!,
+  'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Foo::fun
 $t->get_ok('/happy/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
@@ -372,8 +384,9 @@ my $mtime = Mojo::Date->new((stat $path)[9])->to_string;
 
 # Static file /hello.txt
 $t->get_ok('/hello.txt')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('Last-Modified' => $mtime)->header_is('Content-Length' => $size)
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('Last-Modified'  => $mtime)->header_like('ETag' => qr/^"\w+"$/)
+  ->header_is('Content-Length' => $size)
   ->content_type_is('text/plain;charset=UTF-8')
   ->content_like(qr/Hello Mojo from a development static file!/);
 
@@ -386,6 +399,28 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
 # Check If-Modified-Since
 $t->get_ok('/hello.txt' => {'If-Modified-Since' => $mtime})->status_is(304)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('');
+
+# Check If-None-Match
+my $etag = $t->tx->res->headers->etag;
+$t->get_ok('/hello.txt' => {'If-None-Match' => $etag})->status_is(304)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('');
+
+# Check If-None-Match and If-Last-Modified
+$t->get_ok(
+  '/hello.txt' => {'If-None-Match' => $etag, 'If-Last-Modified' => $mtime})
+  ->status_is(304)->header_is(Server => 'Mojolicious (Perl)')->content_is('');
+
+# Bad If-None-Match with correct If-Modified-Since
+$t->get_ok(
+  '/hello.txt' => {'If-None-Match' => '"123"', 'If-Modified-Since' => $mtime})
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Hello Mojo from a development static file!/);
+
+# Bad If-Modified-Since with correct If-None-Match
+$t->get_ok('/hello.txt' =>
+    {'If-Modified-Since' => Mojo::Date->new(23), 'If-None-Match' => $etag})
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Hello Mojo from a development static file!/);
 
 # Embedded development static file
 $t->get_ok('/some/static/file.txt')->status_is(200)

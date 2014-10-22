@@ -50,6 +50,7 @@ Mojolicious::Command::prefork - Prefork command
 
     ./myapp.pl prefork -m production -l http://*:8080
     ./myapp.pl prefork -l http://127.0.0.1:8080 -l https://[::]:8081
+    ./myapp.pl prefork -l 'https://*:443?cert=./server.crt&key=./server.key'
 
   Options:
     -A, --accepts <number>               Number of connections for workers to

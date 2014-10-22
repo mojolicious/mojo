@@ -10,7 +10,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::ByteStream 'b';
-use Mojo::JSON qw(decode_json encode_json j);
+use Mojo::JSON qw(decode_json encode_json from_json j to_json);
 use Mojo::Util 'encode';
 use Scalar::Util 'dualvar';
 
@@ -147,7 +147,7 @@ is b($bytes)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
 $bytes = encode_json ["123abc"];
 is $bytes, '["123abc"]', 'encode ["123abc"]';
 $bytes = encode_json ["\x00\x1f \a\b/\f\r"];
-is $bytes, '["\\u0000\\u001F \\u0007\\b\/\f\r"]',
+is $bytes, '["\\u0000\\u001F \\u0007\\b/\f\r"]',
   'encode ["\x00\x1f \a\b/\f\r"]';
 $bytes = encode_json '';
 is $bytes, '""', 'encode ""';
@@ -250,6 +250,11 @@ is index($bytes, b("\x{2029}")->encode), -1, 'properly escaped';
 is_deeply decode_json($bytes), ["\x{2028}test\x{2029}123"],
   'successful roundtrip';
 
+# JSON without UTF-8 encoding
+is_deeply from_json('["♥"]'), ['♥'], 'characters decoded';
+is to_json(['♥']), '["♥"]', 'characters encoded';
+is_deeply from_json(to_json(["\xe9"])), ["\xe9"], 'successful roundtrip';
+
 # Blessed reference
 $bytes = encode_json [b('test')];
 is_deeply decode_json($bytes), ['test'], 'successful roundtrip';
@@ -326,8 +331,6 @@ is j('null'), undef, 'decode null';
 is $json->decode('test'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Expected string, array, object, number,'
   . ' boolean or null at line 0, offset 0', 'right error';
-is $json->decode('["♥"]'), undef, 'wide character in input';
-is $json->error, 'Wide character in input', 'right error';
 is $json->decode(b('["\\ud800"]')->encode), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Missing low-surrogate at line 1, offset 8',
   'right error';
@@ -374,10 +377,15 @@ is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef,
   'syntax error';
 is $json->error, 'Malformed JSON: Unexpected data at line 3, offset 8',
   'right error';
+is $json->decode('["♥"]'), undef, 'wide character in input';
+is $json->error, 'Input is not UTF-8 encoded', 'right error';
 is $json->decode(encode('Shift_JIS', 'やった')), undef, 'invalid encoding';
 is $json->error, 'Input is not UTF-8 encoded', 'right error';
 is j('{'), undef, 'syntax error';
 eval { decode_json("[\"foo\",\n\"bar\",\n\"bazra\"]lalala") };
+like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/,
+  'right error';
+eval { from_json("[\"foo\",\n\"bar\",\n\"bazra\"]lalala") };
 like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/,
   'right error';
 

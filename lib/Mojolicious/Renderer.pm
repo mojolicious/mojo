@@ -6,7 +6,7 @@ use Mojo::Cache;
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader;
-use Mojo::Util qw(decamelize encode slurp);
+use Mojo::Util qw(decamelize encode md5_sum monkey_patch slurp);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -28,6 +28,10 @@ my $HOME = Mojo::Home->new;
 $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
+
+my $LOADER = Mojo::Loader->new;
+
+sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 
 sub accepts {
   my ($self, $c) = (shift, shift);
@@ -53,23 +57,31 @@ sub add_helper  { shift->_add(helpers  => @_) }
 sub get_data_template {
   my ($self, $options) = @_;
 
-  # Index DATA templates
-  my $loader = Mojo::Loader->new;
-  unless ($self->{index}) {
-    my $index = $self->{index} = {};
-    for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{$loader->data($class)};
-    }
+  # Find template
+  return undef unless my $template = $self->template_name($options);
+  return $LOADER->data($self->{index}{$template}, $template);
+}
+
+sub get_helper {
+  my ($self, $name) = @_;
+
+  if (my $h = $self->{proxy}{$name} || $self->helpers->{$name}) { return $h }
+
+  my $found;
+  my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum "$name:$self";
+  my $re = $name eq '' ? qr/^(([^.]+))/ : qr/^(\Q$name\E\.([^.]+))/;
+  for my $key (keys %{$self->helpers}) {
+    $key =~ $re ? ($found, my $method) = (1, $2) : next;
+    my $sub = $self->get_helper($1);
+    monkey_patch $class, $method => sub { ${shift()}->$sub(@_) };
   }
 
-  # Find template
-  my $template = $self->template_name($options);
-  return $loader->data($self->{index}{$template}, $template);
+  $found ? push @{$self->{namespaces}}, $class : return undef;
+  return $self->{proxy}{$name} = sub { bless \(my $dummy = shift), $class };
 }
 
 sub render {
   my ($self, $c, $args) = @_;
-  $args ||= {};
 
   # Localize "extends" and "layout" to allow argument overrides
   my $stash = $c->stash;
@@ -81,7 +93,7 @@ sub render {
   delete @{$stash}{qw(layout extends)} if $ts;
 
   # Merge stash and arguments
-  %$stash = (%$stash, %$args);
+  @$stash{keys %$args} = values %$args;
 
   my $options = {
     encoding => $self->encoding,
@@ -146,14 +158,15 @@ sub template_for {
     if $controller && $action;
 
   # Try the route name if we don't have controller and action
-  return undef unless my $endpoint = $c->match->endpoint;
-  return $endpoint->name;
+  return undef unless my $route = $c->match->endpoint;
+  return $route->name;
 }
 
 sub template_handler {
   my ($self, $options) = @_;
   return undef unless my $file = $self->template_name($options);
-  return $self->default_handler unless my $handlers = $self->_handlers($file);
+  return $self->default_handler
+    unless my $handlers = $self->{templates}{$file};
   return $handlers->[0];
 }
 
@@ -164,11 +177,13 @@ sub template_name {
   return undef unless my $format   = $options->{format};
   $template .= ".$format";
 
+  $self->_warmup unless $self->{templates};
+
   # Variants
   my $handler = $options->{handler};
   if (defined(my $variant = $options->{variant})) {
     $variant = "$template+$variant";
-    my $handlers = $self->_handlers($variant) // [];
+    my $handlers = $self->{templates}{$variant} // [];
     $template = $variant
       if @$handlers && !defined $handler || grep { $_ eq $handler } @$handlers;
   }
@@ -194,6 +209,7 @@ sub template_path {
 sub _add {
   my ($self, $attr, $name, $cb) = @_;
   $self->$attr->{$name} = $cb;
+  delete $self->{proxy};
   return $self;
 }
 
@@ -204,24 +220,6 @@ sub _extends {
   my $layout = delete $stash->{layout};
   $stash->{extends} ||= join('/', 'layouts', $layout) if $layout;
   return delete $stash->{extends};
-}
-
-sub _handlers {
-  my ($self, $file) = @_;
-
-  unless ($self->{templates}) {
-
-    # Templates
-    s/\.(\w+)$// and push @{$self->{templates}{$_}}, $1
-      for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
-
-    # DATA templates
-    my $loader = Mojo::Loader->new;
-    s/\.(\w+)$// and push @{$self->{templates}{$_}}, $1
-      for map { sort keys %{$loader->data($_)} } @{$self->classes};
-  }
-
-  return $self->{templates}{$file};
 }
 
 sub _render_template {
@@ -239,6 +237,22 @@ sub _render_template {
   return undef;
 }
 
+sub _warmup {
+  my $self = shift;
+
+  my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
+
+  # Handlers for templates
+  s/\.(\w+)$// and push @{$templates->{$_}}, $1
+    for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
+
+  # Handlers and classes for DATA templates
+  for my $class (reverse @{$self->classes}) {
+    $index->{$_} = $class for my @keys = sort keys %{$LOADER->data($class)};
+    s/\.(\w+)$// and unshift @{$templates->{$_}}, $1 for reverse @keys;
+  }
+}
+
 1;
 
 =encoding utf8
@@ -252,7 +266,7 @@ Mojolicious::Renderer - Generate dynamic content
   use Mojolicious::Renderer;
 
   my $renderer = Mojolicious::Renderer->new;
-  push @{$renderer->classes}, 'MyApp::Foo';
+  push @{$renderer->classes}, 'MyApp::Controller::Foo';
   push @{$renderer->paths}, '/home/sri/templates';
 
 =head1 DESCRIPTION
@@ -372,9 +386,17 @@ Register a new helper.
 
 Get a C<DATA> section template by name, usually used by handlers.
 
+=head2 get_helper
+
+  my $helper = $renderer->get_helper('url_for');
+
+Get a helper by full name, generate a helper dynamically for a prefix or
+return C<undef> if no helper or prefix could be found. Generated helpers
+return a proxy object containing the current controller object and on which
+nested helpers can be called.
+
 =head2 render
 
-  my ($output, $format) = $renderer->render(Mojolicious::Controller->new);
   my ($output, $format) = $renderer->render(Mojolicious::Controller->new, {
     template => 'foo/bar',
     foo      => 'bar'

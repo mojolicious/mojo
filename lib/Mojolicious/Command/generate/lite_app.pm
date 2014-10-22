@@ -8,7 +8,7 @@ sub run {
   my ($self, $name) = @_;
   $name ||= 'myapp.pl';
   $self->render_to_rel_file('liteapp', $name);
-  $self->chmod_file($name, 0744);
+  $self->chmod_rel_file($name, 0744);
 }
 
 1;
@@ -22,8 +22,8 @@ use Mojolicious::Lite;
 plugin 'PODRenderer';
 
 get '/' => sub {
-  my $self = shift;
-  $self->render('index');
+  my $c = shift;
+  $c->render('index');
 };
 
 app->start;

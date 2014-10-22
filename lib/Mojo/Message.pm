@@ -9,7 +9,7 @@ use Mojo::JSON 'j';
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
-use Mojo::Util 'decode';
+use Mojo::Util qw(decode split_header);
 
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
@@ -61,7 +61,7 @@ sub build_body       { shift->_build('get_body_chunk') }
 sub build_headers    { shift->_build('get_header_chunk') }
 sub build_start_line { shift->_build('get_start_line_chunk') }
 
-sub cookie { shift->_cache(cookie => @_) }
+sub cookie { shift->_cache('cookie', 0, @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
@@ -78,6 +78,9 @@ sub error {
   $self->{error} = shift;
   return $self->finish;
 }
+
+sub every_cookie { shift->_cache('cookie', 1, @_) }
+sub every_upload { shift->_cache('upload', 1, @_) }
 
 sub extract_start_line {
   croak 'Method "extract_start_line" not implemented by subclass';
@@ -139,8 +142,6 @@ sub json {
   return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
 
-sub param { shift->body_params->param(@_) }
-
 sub parse {
   my ($self, $chunk) = @_;
 
@@ -194,7 +195,7 @@ sub to_string {
   return $self->build_start_line . $self->build_headers . $self->build_body;
 }
 
-sub upload { shift->_cache(upload => @_) }
+sub upload { shift->_cache('upload', 0, @_) }
 
 sub uploads {
   my $self = shift;
@@ -234,10 +235,10 @@ sub _build {
 }
 
 sub _cache {
-  my ($self, $method, $name) = @_;
+  my ($self, $method, $all, $name) = @_;
 
   # Multiple names
-  return map { scalar $self->$method($_) } @$name if ref $name eq 'ARRAY';
+  return map { $self->$method($_) } @$name if ref $name eq 'ARRAY';
 
   # Cache objects by name
   $method .= 's';
@@ -246,14 +247,14 @@ sub _cache {
     push @{$self->{$method}{$_->name}}, $_ for @{$self->$method};
   }
 
-  return unless my $objects = $self->{$method}{$name};
-  return wantarray ? @$objects : $objects->[0];
+  my $objects = $self->{$method}{$name} || [];
+  return $all ? $objects : $objects->[-1];
 }
 
 sub _limit {
   my ($self, $msg, $code) = @_;
   $self->{limit} = 1;
-  $self->error({message => $msg, advice => $code});
+  return $self->error({message => $msg, advice => $code});
 }
 
 sub _parse_formdata {
@@ -274,17 +275,15 @@ sub _parse_formdata {
     }
 
     next unless my $disposition = $part->headers->content_disposition;
-    my ($filename) = $disposition =~ /[; ]filename\s*=\s*"?((?:\\"|[^"])*)"?/i;
+    my ($filename) = $disposition =~ /[; ]filename="((?:\\"|[^"])*)"/;
     next if $upload && !defined $filename || !$upload && defined $filename;
-    my ($name) = $disposition =~ /[; ]name\s*=\s*"?((?:\\"|[^";])+)"?/i;
+    my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
+    $part = $part->asset->slurp unless $upload;
+
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;
-    }
-
-    unless ($upload) {
-      $part = $part->asset->slurp;
-      $part = decode($charset, $part) // $part if $charset;
+      $part = decode($charset, $part) // $part unless $upload;
     }
 
     push @formdata, [$name, $part, $filename];
@@ -384,7 +383,7 @@ Default charset used for form-data parsing, defaults to C<UTF-8>.
   $msg     = $msg->max_line_size(1024);
 
 Maximum start line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
+C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
 
 =head2 max_message_size
 
@@ -392,8 +391,8 @@ C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
   $msg     = $msg->max_message_size(1024);
 
 Maximum message size in bytes, defaults to the value of the
-C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<10485760>. Setting the
-value to C<0> will allow messages of indefinite size. Note that increasing
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<10485760> (10MB). Setting
+the value to C<0> will allow messages of indefinite size. Note that increasing
 this value can also drastically increase memory usage, should you for example
 attempt to parse an excessively large message body with the L</"body_params">,
 L</"dom"> or L</"json"> methods.
@@ -458,13 +457,14 @@ Render start line.
 
 =head2 cookie
 
-  my $foo         = $msg->cookie('foo');
-  my @foo         = $msg->cookie('foo');
+  my $cookie      = $msg->cookie('foo');
   my ($foo, $bar) = $msg->cookie(['foo', 'bar']);
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
-L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
-it should not be called before all headers have been received.
+L<Mojo::Cookie::Response> objects. If there are multiple cookies sharing the
+same name, and you want to access more than just the last one, you can use
+L</"every_cookie">. Note that this method caches all data, so it should not be
+called before all headers have been received.
 
   # Get cookie value
   say $msg->cookie('foo')->value;
@@ -501,6 +501,26 @@ make sure it is not excessively large, there's a 10MB limit by default.
 
 Get or set message error, an C<undef> return value indicates that there is no
 error.
+
+=head2 every_cookie
+
+  my $cookies = $msg->every_cookie('foo');
+
+Similar to L</"cookie">, but returns all message cookies sharing the same name
+as an array reference.
+
+  # Get first cookie value
+  say $msg->every_cookie('foo')->[0]->value;
+
+=head2 every_upload
+
+  my $uploads = $msg->every_upload('foo');
+
+Similar to L</"upload">, but returns all file uploads sharing the same name as
+an array reference.
+
+  # Get content of first uploaded file
+  say $msg->every_upload('foo')->[0]->asset->slurp;
 
 =head2 extract_start_line
 
@@ -580,19 +600,6 @@ sure it is not excessively large, there's a 10MB limit by default.
   say $msg->json->{foo}{bar}[23];
   say $msg->json('/foo/bar/23');
 
-=head2 param
-
-  my @names       = $msg->param;
-  my $foo         = $msg->param('foo');
-  my @foo         = $msg->param('foo');
-  my ($foo, $bar) = $msg->param(['foo', 'bar']);
-
-Access C<POST> parameters. Note that this method caches all data, so it should
-not be called before the entire message body has been received. Parts of the
-message body need to be loaded into memory to parse C<POST> parameters, so you
-have to make sure it is not excessively large, there's a 10MB limit by
-default.
-
 =head2 parse
 
   $msg = $msg->parse('HTTP/1.1 200 OK...');
@@ -620,13 +627,14 @@ Render whole message.
 
 =head2 upload
 
-  my $foo         = $msg->upload('foo');
-  my @foo         = $msg->upload('foo');
+  my $upload      = $msg->upload('foo');
   my ($foo, $bar) = $msg->upload(['foo', 'bar']);
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
-Note that this method caches all data, so it should not be called before the
-entire message body has been received.
+If there are multiple uploads sharing the same name, and you want to access
+more than just the last one, you can use L</"every_upload">. Note that this
+method caches all data, so it should not be called before the entire message
+body has been received.
 
   # Get content of uploaded file
   say $msg->upload('foo')->asset->slurp;

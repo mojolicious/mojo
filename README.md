@@ -17,7 +17,7 @@
       templates, content negotiation, session management, form validation,
       testing framework, static file server, first class Unicode support and
       much more for you to discover.
-  * Very clean, portable and Object-Oriented pure-Perl API with no hidden
+  * Very clean, portable and object-oriented pure-Perl API with no hidden
     magic and no requirements besides Perl 5.18.0 (versions as old as 5.10.1
     can be used too, but may require additional CPAN modules to be installed)
   * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,

@@ -8,11 +8,10 @@ use Mojo::Util 'encode';
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
-  my $json   = Mojo::JSON->new;
+  my $json = Mojo::JSON->new;
   my $config = $json->decode($self->render($content, $file, $conf, $app));
-  my $err    = $json->error;
-  die qq{Can't parse config "$file": $err} if !$config && $err;
-  die qq{Invalid config "$file"} if !$config || ref $config ne 'HASH';
+  if (my $err = $json->error) { die qq{Can't parse config "$file": $err} }
+  die qq{Invalid config "$file"} unless ref $config eq 'HASH';
 
   return $config;
 }

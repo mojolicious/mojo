@@ -10,7 +10,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::ByteStream 'b';
-use Mojo::JSON qw(decode_json encode_json from_json j to_json);
+use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
 use Mojo::Util 'encode';
 use Scalar::Util 'dualvar';
 
@@ -54,8 +54,7 @@ is_deeply $array, [Mojo::JSON->true], 'decode [true]';
 $array = decode_json '[null]';
 is_deeply $array, [undef], 'decode [null]';
 $array = decode_json '[true, false]';
-is_deeply $array, [Mojo::JSON->true, Mojo::JSON->false],
-  'decode [true, false]';
+is_deeply $array, [true, false], 'decode [true, false]';
 $value = decode_json 'true';
 is $value, Mojo::JSON->true, 'decode true';
 $value = decode_json 'false';
@@ -322,70 +321,74 @@ like encode_json({test => -sin(9**9**9)}), qr/^{"test":".*"}$/,
   'encode "nan" as string';
 
 # "null"
-my $json = Mojo::JSON->new;
-is $json->decode('null'), undef, 'decode null';
-ok !$json->error, 'no error';
 is j('null'), undef, 'decode null';
 
 # Errors
-is $json->decode('test'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Expected string, array, object, number,'
-  . ' boolean or null at line 0, offset 0', 'right error';
-is $json->decode(b('["\\ud800"]')->encode), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Missing low-surrogate at line 1, offset 8',
+eval { decode_json 'test' };
+like $@, qr/Malformed JSON: Expected string, array, object/, 'right error';
+like $@, qr/object, number, boolean or null at line 0, offset 0/,
   'right error';
-is $json->decode(b('["\\udf46"]')->encode), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Missing high-surrogate at line 1, offset 8',
+eval { decode_json b('["\\ud800"]')->encode };
+like $@, qr/Malformed JSON: Missing low-surrogate at line 1, offset 8/,
   'right error';
-is $json->decode('[[]'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Expected comma or right square bracket while'
-  . ' parsing array at line 1, offset 3', 'right error';
-is $json->decode('{{}'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Expected string while'
-  . ' parsing object at line 1, offset 1', 'right error';
-is $json->decode("[\"foo\x00]"), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Unexpected character or invalid escape while'
-  . ' parsing string at line 1, offset 5', 'right error';
-is $json->decode('{"foo":"bar"{'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Expected comma or right curly bracket while'
-  . ' parsing object at line 1, offset 12', 'right error';
-is $json->decode('{"foo""bar"}'), undef, 'syntax error';
-is $json->error,
-  'Malformed JSON: Expected colon while parsing object at line 1, offset 6',
+eval { decode_json b('["\\udf46"]')->encode };
+like $@, qr/Malformed JSON: Missing high-surrogate at line 1, offset 8/,
   'right error';
-is $json->decode('[[]...'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Expected comma or right square bracket while'
-  . ' parsing array at line 1, offset 3', 'right error';
-is $json->decode('{{}...'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Expected string while'
-  . ' parsing object at line 1, offset 1', 'right error';
-is $json->decode('[nan]'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Expected string, array, object, number,'
-  . ' boolean or null at line 1, offset 1', 'right error';
-is $json->decode('["foo]'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Unterminated string at line 1, offset 6',
+eval { decode_json '[[]' };
+like $@, qr/Malformed JSON: Expected comma or right square bracket/,
   'right error';
-is $json->decode('{"foo":"bar"}lala'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Unexpected data at line 1, offset 13',
+like $@, qr/bracket while parsing array at line 1, offset 3/, 'right error';
+eval { decode_json '{{}' };
+like $@,
+  qr/Malformed JSON: Expected string while parsing object at line 1, offset 1/,
   'right error';
-is $json->decode(''), undef, 'missing input';
-is $json->error, 'Missing or empty input', 'right error';
-is $json->decode("[\"foo\",\n\"bar\"]lala"), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Unexpected data at line 2, offset 6',
+eval { decode_json "[\"foo\x00]" };
+like $@, qr/Malformed JSON: Unexpected character or invalid escape/,
   'right error';
-is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef,
-  'syntax error';
-is $json->error, 'Malformed JSON: Unexpected data at line 3, offset 8',
+like $@, qr/escape while parsing string at line 1, offset 5/, 'right error';
+eval { decode_json '{"foo":"bar"{' };
+like $@, qr/Malformed JSON: Expected comma or right curly bracket/,
   'right error';
-is $json->decode('["♥"]'), undef, 'wide character in input';
-is $json->error, 'Input is not UTF-8 encoded', 'right error';
-is $json->decode(encode('Shift_JIS', 'やった')), undef, 'invalid encoding';
-is $json->error, 'Input is not UTF-8 encoded', 'right error';
+like $@, qr/bracket while parsing object at line 1, offset 12/, 'right error';
+eval { decode_json '{"foo""bar"}' };
+like $@,
+  qr/Malformed JSON: Expected colon while parsing object at line 1, offset 6/,
+  'right error';
+eval { decode_json '[[]...' };
+like $@, qr/Malformed JSON: Expected comma or right square bracket/,
+  'right error';
+like $@, qr/bracket while parsing array at line 1, offset 3/, 'right error';
+eval { decode_json '{{}...' };
+like $@,
+  qr/Malformed JSON: Expected string while parsing object at line 1, offset 1/,
+  'right error';
+eval { decode_json '[nan]' };
+like $@, qr/Malformed JSON: Expected string, array, object, number/,
+  'right error';
+like $@, qr/number, boolean or null at line 1, offset 1/, 'right error';
+eval { decode_json '["foo]' };
+like $@, qr/Malformed JSON: Unterminated string at line 1, offset 6/,
+  'right error';
+eval { decode_json '{"foo":"bar"}lala' };
+like $@, qr/Malformed JSON: Unexpected data at line 1, offset 13/,
+  'right error';
+eval { decode_json '' };
+like $@, qr/Missing or empty input/, 'right error';
+eval { decode_json "[\"foo\",\n\"bar\"]lala" };
+like $@, qr/Malformed JSON: Unexpected data at line 2, offset 6/,
+  'right error';
+eval { decode_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };
+like $@, qr/Malformed JSON: Unexpected data at line 3, offset 8/,
+  'right error';
+eval { decode_json '["♥"]' };
+like $@, qr/Input is not UTF-8 encoded/, 'right error';
+eval { decode_json encode('Shift_JIS', 'やった') };
+like $@, qr/Input is not UTF-8 encoded/, 'right error';
 is j('{'), undef, 'syntax error';
-eval { decode_json("[\"foo\",\n\"bar\",\n\"bazra\"]lalala") };
+eval { decode_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };
 like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/,
   'right error';
-eval { from_json("[\"foo\",\n\"bar\",\n\"bazra\"]lalala") };
+eval { from_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };
 like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/,
   'right error';
 

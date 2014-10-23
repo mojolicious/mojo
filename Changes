@@ -1,5 +1,6 @@
 
 5.54  2014-10-23
+  - Deprecated Object-Oriented Mojo::JSON API.
   - Added auto_decompress attribute to Mojo::Content.
   - Fixed bug where Mojo::UserAgent would try to follow redirects for
     protocols other than HTTP and HTTPS.

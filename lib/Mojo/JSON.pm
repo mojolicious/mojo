@@ -4,12 +4,13 @@ use Mojo::Base -base;
 use B;
 use Carp 'croak';
 use Exporter 'import';
-use Mojo::Util;
+use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
 
+# DEPRECATED in Tiger Face!
 has 'error';
 
-our @EXPORT_OK = qw(decode_json encode_json from_json j to_json);
+our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
 # Literal names
 my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
@@ -31,6 +32,7 @@ my %ESCAPE = (
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
+# DEPRECATED in Tiger Face!
 sub decode {
   shift->error(my $err = _catch(\my $value, pop));
   return defined $err ? undef : $value;
@@ -41,6 +43,7 @@ sub decode_json {
   return defined $err ? croak $err : $value;
 }
 
+# DEPRECATED in Tiger Face!
 sub encode { encode_json($_[1]) }
 
 sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
@@ -55,6 +58,12 @@ sub from_json {
 sub j {
   return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
   return eval { _decode($_[0]) };
+}
+
+# DEPRECATED in Tiger Face!
+sub new {
+  deprecated 'Object-Oriented Mojo::JSON API is DEPRECATED';
+  return shift->SUPER::new(@_);
 }
 
 sub to_json { _encode_value(shift) }
@@ -306,15 +315,8 @@ Mojo::JSON - Minimalistic JSON
 
   use Mojo::JSON qw(decode_json encode_json);
 
-  # Encode and decode JSON (die on errors)
   my $bytes = encode_json {foo => [1, 2], bar => 'hello!', baz => \1};
   my $hash  = decode_json $bytes;
-
-  # Handle errors
-  my $json = Mojo::JSON->new;
-  my $hash = $json->decode($bytes);
-  my $err  = $json->error;
-  say $err ? "Error: $err" : $hash->{message};
 
 =head1 DESCRIPTION
 
@@ -364,6 +366,12 @@ Decode JSON to Perl value and die if decoding fails.
 
 Encode Perl value to JSON.
 
+=head2 false
+
+  my $false = false;
+
+False value, used because Perl has no native equivalent.
+
 =head2 from_json
 
   my $value = from_json $chars;
@@ -387,45 +395,9 @@ or that decoding failed.
 
 Encode Perl value to JSON text without C<UTF-8> encoding it.
 
-=head1 ATTRIBUTES
-
-L<Mojo::JSON> implements the following attributes.
-
-=head2 error
-
-  my $err = $json->error;
-  $json   = $json->error('Parser error');
-
-Parser error.
-
-=head1 METHODS
-
-L<Mojo::JSON> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
-
-=head2 decode
-
-  my $value = $json->decode($bytes);
-
-Decode JSON to Perl value and set L</"error"> if decoding failed.
-
-=head2 encode
-
-  my $bytes = $json->encode({i => '♥ mojolicious'});
-
-Encode Perl value to JSON.
-
-=head2 false
-
-  my $false = Mojo::JSON->false;
-  my $false = $json->false;
-
-False value, used because Perl has no native equivalent.
-
 =head2 true
 
-  my $true = Mojo::JSON->true;
-  my $true = $json->true;
+  my $true = true;
 
 True value, used because Perl has no native equivalent.
 

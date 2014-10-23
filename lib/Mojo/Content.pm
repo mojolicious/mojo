@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Compress::Raw::Zlib qw(WANT_GZIP Z_STREAM_END);
 use Mojo::Headers;
+use Scalar::Util 'looks_like_number';
 
 has [qw(auto_decompress auto_relax expect_close relaxed skip_body)];
 has headers           => sub { Mojo::Headers->new };
@@ -88,7 +89,6 @@ sub parse {
   # Headers
   $self->_parse_until_body(@_);
   return $self if $self->{state} eq 'headers';
-  $self->emit('body') unless $self->{body}++;
 
   # Chunked content
   $self->{real_size} //= 0;
@@ -123,22 +123,21 @@ sub parse {
 
   # Chunked or relaxed content
   if ($self->is_chunked || $self->relaxed) {
-    $self->{size} += length($self->{buffer} //= '');
-    $self->_decompress($self->{buffer});
+    $self->_decompress($self->{buffer} //= '');
+    $self->{size} += length $self->{buffer};
     $self->{buffer} = '';
+    return $self;
   }
 
   # Normal content
-  else {
-    $self->{size} ||= 0;
-    if ((my $need = ($len ||= 0) - $self->{size}) > 0) {
-      my $len = length $self->{buffer};
-      my $chunk = substr $self->{buffer}, 0, $need > $len ? $len : $need, '';
-      $self->_decompress($chunk);
-      $self->{size} += length $chunk;
-    }
-    $self->{state} = 'finished' if $len <= $self->progress;
+  $len = 0 unless looks_like_number $len;
+  if ((my $need = $len - ($self->{size} ||= 0)) > 0) {
+    my $len = length $self->{buffer};
+    my $chunk = substr $self->{buffer}, 0, $need > $len ? $len : $need, '';
+    $self->_decompress($chunk);
+    $self->{size} += length $chunk;
   }
+  $self->{state} = 'finished' if $len <= $self->progress;
 
   return $self;
 }
@@ -272,7 +271,8 @@ sub _parse_chunked_trailing_headers {
   return unless $headers->is_finished;
   $self->{chunk_state} = 'finished';
 
-  # Replace Transfer-Encoding with Content-Length
+  # Take care of leftover and replace Transfer-Encoding with Content-Length
+  $self->{buffer} .= $headers->leftovers;
   $headers->remove('Transfer-Encoding');
   $headers->content_length($self->{real_size}) unless $headers->content_length;
 }
@@ -287,7 +287,6 @@ sub _parse_headers {
   # Take care of leftovers
   my $leftovers = $self->{pre_buffer} = $headers->leftovers;
   $self->{header_size} = $self->{raw_size} - length $leftovers;
-  $self->emit('body') unless $self->{body}++;
 }
 
 sub _parse_until_body {
@@ -295,12 +294,8 @@ sub _parse_until_body {
 
   $self->{raw_size} += length($chunk //= '');
   $self->{pre_buffer} .= $chunk;
-
-  unless ($self->{state}) {
-    $self->{header_size} = $self->{raw_size} - length $self->{pre_buffer};
-    $self->{state}       = 'headers';
-  }
-  $self->_parse_headers if ($self->{state} // '') eq 'headers';
+  $self->_parse_headers if ($self->{state} ||= 'headers') eq 'headers';
+  $self->emit('body') if $self->{state} ne 'headers' && !$self->{body}++;
 }
 
 1;

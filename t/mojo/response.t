@@ -270,12 +270,26 @@ $res->parse("Hello World!\n1234\nlalalala\n");
 ok !$res->is_finished, 'response is not finished';
 ok !$res->is_empty,    'response is not empty';
 ok !$res->content->skip_body, 'body has not been skipped';
+ok $res->content->relaxed, 'relaxed response';
 is $res->code,    500,                     'right status';
 is $res->message, 'Internal Server Error', 'right message';
 is $res->version, '1.1',                   'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, undef,        'no "Content-Length" value';
 is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.1 response (broken Content-Length)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0d\x0a");
+$res->parse("Content-Length: 123test\x0d\x0a\x0d\x0a");
+$res->parse('Hello World!');
+ok $res->is_finished, 'response is finished';
+is $res->code,        200, 'right status';
+is $res->message,     'OK', 'right message';
+is $res->version,     '1.1', 'right version';
+is $res->headers->content_length, '123test', 'right "Content-Length" value';
+is $res->body, '', 'no content';
+is $res->content->leftovers, 'Hello World!', 'content in leftovers';
 
 # Parse full HTTP 1.1 response (100 Continue)
 $res = Mojo::Message::Response->new;
@@ -462,7 +476,7 @@ isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 
-# Parse HTTP 1.1 chunked multipart response (at once)
+# Parse HTTP 1.1 chunked multipart response with leftovers (at once)
 $res = Mojo::Message::Response->new;
 my $multipart
   = "HTTP/1.1 200 OK\x0d\x0a"
@@ -484,7 +498,8 @@ my $multipart
   . "print \"Hello World :)\\n\"\n"
   . "\x0d\x0a------------0xKhTmLbOuNdA"
   . "r\x0d\x0a3\x0d\x0aY--\x0d\x0a"
-  . "0\x0d\x0a\x0d\x0a";
+  . "0\x0d\x0a\x0d\x0a"
+  . "HTTP/1.0 200 OK\x0d\x0a\x0d\x0a";
 $res->parse($multipart);
 ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
@@ -506,6 +521,8 @@ isa_ok $res->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $res->upload('upload')->asset->size, 69, 'right size';
 is $res->content->parts->[2]->headers->content_type,
   'application/octet-stream', 'right "Content-Type" value';
+is $res->content->leftovers, "HTTP/1.0 200 OK\x0d\x0a\x0d\x0a",
+  'next response in leftovers';
 
 # Parse HTTP 1.1 chunked multipart response (in multiple small chunks)
 $res = Mojo::Message::Response->new;

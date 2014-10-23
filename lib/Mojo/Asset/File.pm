@@ -10,6 +10,7 @@ use IO::File;
 use Mojo::Util 'md5_sum';
 
 has [qw(cleanup mode path)];
+has mode => sub { return 'ro' };
 has handle => sub {
   my $self = shift;
 

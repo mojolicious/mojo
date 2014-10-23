@@ -1,4 +1,6 @@
 
+5.55  2014-10-24
+
 5.54  2014-10-23
   - Deprecated Object-Oriented Mojo::JSON API.
   - Added auto_decompress attribute to Mojo::Content.

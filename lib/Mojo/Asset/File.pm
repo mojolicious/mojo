@@ -9,7 +9,7 @@ use File::Spec::Functions 'catfile';
 use IO::File;
 use Mojo::Util 'md5_sum';
 
-has [qw(cleanup path)];
+has [qw(cleanup mode path)];
 has handle => sub {
   my $self = shift;
 
@@ -17,8 +17,8 @@ has handle => sub {
   my $handle = IO::File->new;
   my $path   = $self->path;
   if (defined $path && -f $path) {
-      or croak qq{Can't open file "$path": $!};
-    $handle->open($path, O_RDONLY) or croak qq{Can't open file "$path": $!};
+    my $mode = $self->mode eq 'rw' ? O_APPEND | O_RDWR : O_RDONLY;
+    $handle->open($path, $mode) or croak qq{Can't open file "$path": $!};
     return $handle;
   }
 

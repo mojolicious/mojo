@@ -9,9 +9,9 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 my %NORMALCASE = map { lc($_) => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Allow Authorization Cache-Control Connection Content-Disposition),
-  qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
-  qw(Date ETag Expect Expires Host If-Modified-Since If-None-Match),
-  qw(Last-Modified Link Location Origin Proxy-Authenticate),
+  qw(Content-Encoding Content-Length Content-Location Content-Range),
+  qw(Content-Type Cookie DNT Date ETag Expect Expires Host If-Modified-Since),
+  qw(If-None-Match Last-Modified Link Location Origin Proxy-Authenticate),
   qw(Proxy-Authorization Range Sec-WebSocket-Accept Sec-WebSocket-Extensions),
   qw(Sec-WebSocket-Key Sec-WebSocket-Protocol Sec-WebSocket-Version Server),
   qw(Set-Cookie Status TE Trailer Transfer-Encoding Upgrade User-Agent Vary),
@@ -301,6 +301,13 @@ Shortcut for the C<Content-Encoding> header.
   $headers = $headers->content_length(4000);
 
 Shortcut for the C<Content-Length> header.
+
+=head2 content_location
+
+  my $location = $headers->content_location;
+  $headers     = $headers->content_location('http://127.0.0.1/foo');
+
+Shortcut for the C<Content-Location> header.
 
 =head2 content_range
 

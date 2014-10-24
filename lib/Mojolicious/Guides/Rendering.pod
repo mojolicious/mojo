@@ -144,9 +144,9 @@ backslash.
   in multiple\\
   lines
 
-Stash values that don't have invalid characters in their name get
-automatically initialized as normal variables in the template, and the
-controller object as both C<$self> and C<$c>.
+At the beginning of the template, stash values that don't have invalid
+characters in their name get automatically initialized as normal variables,
+and the controller object as both C<$self> and C<$c>.
 
   $c->stash(name => 'tester');
 

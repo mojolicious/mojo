@@ -8,14 +8,14 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 # Common headers
 my %NORMALCASE = map { lc($_) => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
-  qw(Allow Authorization Cache-Control Connection Content-Disposition),
-  qw(Content-Encoding Content-Length Content-Location Content-Range),
-  qw(Content-Type Cookie DNT Date ETag Expect Expires Host If-Modified-Since),
-  qw(If-None-Match Last-Modified Link Location Origin Proxy-Authenticate),
-  qw(Proxy-Authorization Range Sec-WebSocket-Accept Sec-WebSocket-Extensions),
-  qw(Sec-WebSocket-Key Sec-WebSocket-Protocol Sec-WebSocket-Version Server),
-  qw(Set-Cookie Status TE Trailer Transfer-Encoding Upgrade User-Agent Vary),
-  qw(WWW-Authenticate)
+  qw(Access-Control-Allow-Origin Allow Authorization Cache-Control Connection),
+  qw( Content-Disposition Content-Encoding Content-Language Content-Length),
+  qw(Content-Location Content-Range Content-Type Cookie DNT Date ETag Expect),
+  qw(Expires Host If-Modified-Since If-None-Match Last-Modified Link Location),
+  qw(Origin Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept),
+  qw(Sec-WebSocket-Extensions Sec-WebSocket-Key Sec-WebSocket-Protocol),
+  qw(Sec-WebSocket-Version Server Set-Cookie Status Strict-Transport-Security),
+  qw(TE Trailer Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
 );
 for my $header (values %NORMALCASE) {
   my $name = lc $header;
@@ -224,6 +224,14 @@ Shortcut for the C<Accept-Language> header.
 
 Shortcut for the C<Accept-Ranges> header.
 
+=head2 access_control_allow_origin
+
+  my $origin = $headers->access_control_allow_origin;
+  $headers   = $headers->access_control_allow_origin('*');
+
+Shortcut for the C<Access-Control-Allow-Origin> header from
+L<Cross-Origin Resource Sharing|http://www.w3.org/TR/2010/WD-cors-20100727/>.
+
 =head2 add
 
   $headers = $headers->add(Foo => 'one value');
@@ -294,6 +302,13 @@ Shortcut for the C<Content-Disposition> header.
   $headers     = $headers->content_encoding('gzip');
 
 Shortcut for the C<Content-Encoding> header.
+
+=head2 content_language
+
+  my $language = $headers->content_language;
+  $headers     = $headers->content_language('en');
+
+Shortcut for the C<Content-Language> header.
 
 =head2 content_length
 
@@ -565,6 +580,14 @@ L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 Shortcut for the C<Status> header from
 L<RFC 3875|http://tools.ietf.org/html/rfc3875>.
+
+=head2 strict_transport_security
+
+  my $policy = $headers->strict_transport_security;
+  $headers   = $headers->strict_transport_security('max-age=31536000');
+
+Shortcut for the C<Strict-Transport-Security> header from
+L<RFC 6797|http://tools.ietf.org/html/rfc6797>.
 
 =head2 te
 

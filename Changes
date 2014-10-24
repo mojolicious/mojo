@@ -1,6 +1,7 @@
 
-5.55  2014-10-24
-  - Added content_location method to Mojo::Headers.
+5.55  2014-10-25
+  - Added access_control_allow_origin, content_language, content_location and
+    strict_transport_security methods to Mojo::Headers.
 
 5.54  2014-10-23
   - Deprecated Object-Oriented Mojo::JSON API.

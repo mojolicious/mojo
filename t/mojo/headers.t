@@ -50,13 +50,16 @@ is $headers->accept_charset('foo')->accept_charset,   'foo', 'right value';
 is $headers->accept_encoding('foo')->accept_encoding, 'foo', 'right value';
 is $headers->accept_language('foo')->accept_language, 'foo', 'right value';
 is $headers->accept_ranges('foo')->accept_ranges,     'foo', 'right value';
-is $headers->allow('foo')->allow,                     'foo', 'right value';
-is $headers->authorization('foo')->authorization,     'foo', 'right value';
-is $headers->connection('foo')->connection,           'foo', 'right value';
-is $headers->cache_control('foo')->cache_control,     'foo', 'right value';
+is $headers->access_control_allow_origin('foo')->access_control_allow_origin,
+  'foo', 'right value';
+is $headers->allow('foo')->allow,                 'foo', 'right value';
+is $headers->authorization('foo')->authorization, 'foo', 'right value';
+is $headers->connection('foo')->connection,       'foo', 'right value';
+is $headers->cache_control('foo')->cache_control, 'foo', 'right value';
 is $headers->content_disposition('foo')->content_disposition, 'foo',
   'right value';
 is $headers->content_encoding('foo')->content_encoding,   'foo', 'right value';
+is $headers->content_language('foo')->content_language,   'foo', 'right value';
 is $headers->content_length('foo')->content_length,       'foo', 'right value';
 is $headers->content_location('foo')->content_location,   'foo', 'right value';
 is $headers->content_range('foo')->content_range,         'foo', 'right value';
@@ -87,9 +90,11 @@ is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
   'right value';
 is $headers->sec_websocket_version('foo')->sec_websocket_version, 'foo',
   'right value';
-is $headers->server('foo')->server,                       'foo', 'right value';
-is $headers->set_cookie('foo')->set_cookie,               'foo', 'right value';
-is $headers->status('foo')->status,                       'foo', 'right value';
+is $headers->server('foo')->server,         'foo', 'right value';
+is $headers->set_cookie('foo')->set_cookie, 'foo', 'right value';
+is $headers->status('foo')->status,         'foo', 'right value';
+is $headers->strict_transport_security('foo')->strict_transport_security,
+  'foo', 'right value';
 is $headers->te('foo')->te,                               'foo', 'right value';
 is $headers->trailer('foo')->trailer,                     'foo', 'right value';
 is $headers->transfer_encoding('foo')->transfer_encoding, 'foo', 'right value';

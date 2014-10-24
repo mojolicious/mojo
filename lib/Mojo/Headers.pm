@@ -9,7 +9,7 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 my %NORMALCASE = map { lc($_) => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Access-Control-Allow-Origin Allow Authorization Cache-Control Connection),
-  qw( Content-Disposition Content-Encoding Content-Language Content-Length),
+  qw(Content-Disposition Content-Encoding Content-Language Content-Length),
   qw(Content-Location Content-Range Content-Type Cookie DNT Date ETag Expect),
   qw(Expires Host If-Modified-Since If-None-Match Last-Modified Link Location),
   qw(Origin Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept),
@@ -230,7 +230,7 @@ Shortcut for the C<Accept-Ranges> header.
   $headers   = $headers->access_control_allow_origin('*');
 
 Shortcut for the C<Access-Control-Allow-Origin> header from
-L<Cross-Origin Resource Sharing|http://www.w3.org/TR/2010/WD-cors-20100727/>.
+L<Cross-Origin Resource Sharing|http://www.w3.org/TR/cors/>.
 
 =head2 add
 

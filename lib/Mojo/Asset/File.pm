@@ -17,7 +17,7 @@ has handle => sub {
   my $handle = IO::File->new;
   my $path   = $self->path;
   if (defined $path && -f $path) {
-    $handle->open($path, utime(undef, undef, $path) ? O_APPEND | O_RDWR : O_RDONLY)
+    $handle->open($path, -w _ && utime((stat(_))[8,9], $path) ? O_APPEND | O_RDWR : O_RDONLY)
       or croak qq{Can't open file "$path": $!};
     return $handle;
   }

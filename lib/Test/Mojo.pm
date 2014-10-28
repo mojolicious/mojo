@@ -265,14 +265,13 @@ sub send_ok {
 
 sub status_is {
   my ($self, $status, $desc) = @_;
-  $desc ||= "$status " . $self->tx->res->new(code => $status)->default_message;
+  $desc ||= "$status " . $self->tx->res->default_message($status);
   return $self->_test('is', $self->tx->res->code, $status, $desc);
 }
 
 sub status_isnt {
   my ($self, $status, $desc) = @_;
-  $desc
-    ||= "not $status " . $self->tx->res->new(code => $status)->default_message;
+  $desc ||= "not $status " . $self->tx->res->default_message($status);
   return $self->_test('isnt', $self->tx->res->code, $status, $desc);
 }
 

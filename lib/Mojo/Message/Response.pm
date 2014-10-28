@@ -214,6 +214,7 @@ Access response cookies, usually L<Mojo::Cookie::Response> objects.
 =head2 default_message
 
   my $msg = $res->default_message;
+  my $msg = $res->default_message(418);
 
 Generate default response message for code.
 

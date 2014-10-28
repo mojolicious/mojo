@@ -1,5 +1,5 @@
 
-5.55  2014-10-25
+5.55  2014-10-28
   - Added access_control_allow_origin, content_language, content_location and
     strict_transport_security methods to Mojo::Headers.
 

@@ -80,6 +80,7 @@ is $res->code(509)->default_message, 'Bandwidth Limit Exceeded',
 is $res->code(510)->default_message, 'Not Extended', 'right message';
 is $res->code(511)->default_message, 'Network Authentication Required',
   'right message';
+is $res->default_message(100), 'Continue', 'right message';
 
 # Status code ranges
 ok $res->code(200)->is_status_class(200), 'is in range';

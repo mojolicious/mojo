@@ -62,7 +62,7 @@ sub j {
 
 # DEPRECATED in Tiger Face!
 sub new {
-  deprecated 'Object-Oriented Mojo::JSON API is DEPRECATED';
+  deprecated 'Object-oriented Mojo::JSON API is DEPRECATED';
   return shift->SUPER::new(@_);
 }
 

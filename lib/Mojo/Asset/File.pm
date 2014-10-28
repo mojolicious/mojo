@@ -29,6 +29,7 @@ has handle => sub {
     $name = "$base." . md5_sum(time . $$ . rand 999);
   }
   $self->path($name);
+  $self->{_rw}++;
 
   # Enable automatic cleanup
   $self->cleanup(1) unless defined $self->cleanup;
@@ -47,6 +48,14 @@ sub DESTROY {
 sub add_chunk {
   my ($self, $chunk) = @_;
   $chunk //= '';
+
+  # upgrade to rw
+  unless ($self->{_rw}) {
+    $self->handle->close && $self->handle->open($self->path, O_APPEND | O_RDWR)
+      or croak qq{Can't open file "${\$self->path}": $!};
+    $self->{_rw}++;
+  }
+
   croak "Can't write to asset: $!"
     unless defined $self->handle->syswrite($chunk, length $chunk);
   return $self;
@@ -112,6 +121,7 @@ sub move_to {
   # Windows requires that the handle is closed
   close $self->handle;
   delete $self->{handle};
+  delete $self->{_rw};
 
   # Move file and prevent clean up
   my $from = $self->path;

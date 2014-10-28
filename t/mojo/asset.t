@@ -25,6 +25,12 @@ ok -e $path, 'temporary file exists';
 undef $file;
 ok !-e $path, 'temporary file has been cleaned up';
 
+# Open existing and upgrade to rw
+Mojo::Asset::File->new(path => $path, cleanup => 0)->add_chunk('foo');
+$file = Mojo::Asset::File->new(path => $path);
+ok eval { $file->add_chunk('bar') }, "didn't die";
+is $file->get_chunk, 'foobar', 'right content';
+
 # Memory asset
 my $mem = Mojo::Asset::Memory->new;
 $mem->add_chunk('abc');

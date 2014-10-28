@@ -39,7 +39,7 @@ sub emit_safe {
   return $self;
 }
 
-sub has_subscribers { !!@{shift->subscribers(shift)} }
+sub has_subscribers { !!@{shift->{events}{shift()} || []} }
 
 sub on {
   my ($self, $name, $cb) = @_;

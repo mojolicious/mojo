@@ -185,7 +185,7 @@ Always true.
 
   my $str = "$home";
 
-Alias for L</to_string>.
+Alias for L</"to_string">.
 
 =head1 SEE ALSO
 

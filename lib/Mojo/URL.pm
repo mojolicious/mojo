@@ -437,7 +437,7 @@ Always true.
 
   my $str = "$url";
 
-Alias for L</to_string>.
+Alias for L</"to_string">.
 
 =head1 SEE ALSO
 

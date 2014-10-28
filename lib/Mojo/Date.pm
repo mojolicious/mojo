@@ -7,8 +7,8 @@ use Time::Local 1.2 'timegm';
 has epoch => sub {time};
 
 my $RFC3339_RE = qr/
-  ^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+(?:\.\d+)?)   # Date and time
-  (?:Z|([+-])(\d+):(\d+))?$                        # Offset
+  ^(\d+)-(\d+)-(\d+)\D+(\d+):(\d+):(\d+(?:\.\d+)?)   # Date and time
+  (?:Z|([+-])(\d+):(\d+))?$                          # Offset
 /xi;
 
 my @DAYS   = qw(Sun Mon Tue Wed Thu Fri Sat);
@@ -184,7 +184,7 @@ Always true.
 
   my $str = "$date";
 
-Alias for L</to_string>.
+Alias for L</"to_string">.
 
 =head1 SEE ALSO
 

@@ -51,7 +51,7 @@ is $pointer->new([{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}])
 # Unicode
 is $pointer->new({'☃' => 'snowman'})->get('/☃'), 'snowman',
   'found the snowman';
-is $pointer->new({'☃' => ['snowman']})->get('/☃/0'), 'snowman',
+is $pointer->new->data({'☃' => ['snowman']})->get('/☃/0'), 'snowman',
   'found the snowman';
 
 # RFC 6901

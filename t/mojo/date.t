@@ -30,6 +30,8 @@ is(Mojo::Date->new('1994-11-06T08:49:37Z')->epoch,
   784111777, 'right epoch value');
 is(Mojo::Date->new('1994-11-06t08:49:37.33z')->epoch,
   784111777.33, 'right epoch value');
+is(Mojo::Date->new('2014-08-20  20:45:00')->epoch,
+  1408567500, 'right epoch value');
 is(Mojo::Date->new(784111777.33)->to_datetime,
   '1994-11-06T08:49:37.33Z', 'right format');
 

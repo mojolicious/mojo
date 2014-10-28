@@ -79,7 +79,7 @@ Always true.
 
   my $str = "$cookie";
 
-Alias for L</to_string>.
+Alias for L</"to_string">.
 
 =head1 SEE ALSO
 

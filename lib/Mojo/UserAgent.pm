@@ -381,8 +381,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('www.perl.org')->res->dom->at('title')->text;
 
   # Scrape the latest headlines from a news site with CSS selectors
-  say $ua->get('blogs.perl.org')
-    ->res->dom->find('h2 > a')->pluck('text')->shuffle;
+  say $ua->get('blogs.perl.org')->res->dom->find('h2 > a')->pluck('text');
 
   # Search DuckDuckGo anonymously through Tor
   $ua->proxy->http('socks://127.0.0.1:9050');

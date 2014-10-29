@@ -22,6 +22,7 @@ sub AUTOLOAD {
   return $self->pluck($method, @_);
 }
 
+# DEPRECATED in Tiger Face!
 sub DESTROY { }
 
 sub c { __PACKAGE__->new(@_) }

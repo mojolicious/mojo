@@ -492,7 +492,7 @@ make sure it is not excessively large, there's a 10MB limit by default.
 
   # Use everything else Mojo::DOM has to offer
   say $msg->dom->at('title')->text;
-  say $msg->dom->at('body')->children->type->uniq;
+  say $msg->dom->at('body')->children->pluck('type')->uniq;
 
 =head2 error
 

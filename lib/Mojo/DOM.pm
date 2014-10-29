@@ -32,6 +32,7 @@ sub AUTOLOAD {
   croak qq{Can't locate object method "$method" via package "$package"};
 }
 
+# DEPRECATED in Tiger Face!
 sub DESTROY { }
 
 sub all_contents { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
@@ -419,7 +420,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Find
   say $dom->at('#b')->text;
-  say $dom->find('p')->text;
+  say $dom->find('p')->pluck('text');
   say $dom->find('[id]')->pluck(attr => 'id');
 
   # Iterate
@@ -504,7 +505,7 @@ L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of ancestor elements
-  say $dom->ancestors->type;
+  say $dom->ancestors->pluck('type');
 
 =head2 append
 
@@ -627,8 +628,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my @headers = $dom->find('h1, h2, h3')->pluck('text')->each;
 
   # Count all the different tags
-  my $hash = $dom->find('*')->pluck('type')
-    ->reduce(sub { $a->{$b}++; $a }, {});
+  my $hash = $dom->find('*')->reduce(sub { $a->{$b->type}++; $a }, {});
 
   # Find elements with a class that contains dots
   my @divs = $dom->find('div.foo\.bar')->each;

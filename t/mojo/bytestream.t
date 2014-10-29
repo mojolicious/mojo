@@ -112,7 +112,6 @@ is $stream->split('/')->map(sub { $_->quote })->join(', '), '"1", "2", "3"',
   'right result';
 is $stream->split('/')->map(sub { shift->quote })->join(', '),
   '"1", "2", "3"', 'right result';
-is $stream->split('/')->quote->join(', '), '"1", "2", "3"', 'right result';
 
 # length
 is b('foo bar baz')->size, 11, 'size is 11';

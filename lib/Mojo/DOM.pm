@@ -188,7 +188,8 @@ sub val {
     if $type eq 'option';
 
   # "select"
-  return $self->find('option[selected]')->val->flatten if $type eq 'select';
+  return $self->find('option[selected]')->pluck('val')->flatten
+    if $type eq 'select';
 
   # "textarea"
   return Mojo::Collection->new($self->text) if $type eq 'textarea';

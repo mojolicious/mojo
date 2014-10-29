@@ -1,10 +1,10 @@
 package Mojolicious::Routes::Route;
 use Mojo::Base -base;
 
-use Carp 'croak';
+use Carp ();
 use Mojo::Util;
 use Mojolicious::Routes::Pattern;
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util ();
 
 has [qw(inline parent partial)];
 has 'children' => sub { [] };
@@ -14,18 +14,18 @@ sub AUTOLOAD {
   my $self = shift;
 
   my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  croak "Undefined subroutine &${package}::$method called"
-    unless blessed $self && $self->isa(__PACKAGE__);
+  Carp::croak "Undefined subroutine &${package}::$method called"
+    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
 
   # Call shortcut with current route
-  croak qq{Can't locate object method "$method" via package "$package"}
+  Carp::croak qq{Can't locate object method "$method" via package "$package"}
     unless my $shortcut = $self->root->shortcuts->{$method};
   return $self->$shortcut(@_);
 }
 
 sub add_child {
   my ($self, $route) = @_;
-  weaken $route->remove->parent($self)->{parent};
+  Scalar::Util::weaken $route->remove->parent($self)->{parent};
   push @{$self->children}, $route;
   return $self;
 }

@@ -488,11 +488,11 @@ whole message body needs to be loaded into memory to parse it, so you have to
 make sure it is not excessively large, there's a 10MB limit by default.
 
   # Perform "find" right away
-  say $msg->dom('h1, h2, h3')->text;
+  say $msg->dom('h1, h2, h3')->pluck('text');
 
   # Use everything else Mojo::DOM has to offer
   say $msg->dom->at('title')->text;
-  say $msg->dom->html->body->children->type->uniq;
+  say $msg->dom->at('body')->children->type->uniq;
 
 =head2 error
 

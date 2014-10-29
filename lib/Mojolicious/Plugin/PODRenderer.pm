@@ -42,7 +42,7 @@ sub _html {
   my $perldoc = $c->url_for('/perldoc/');
   $_->{href} =~ s!^https://metacpan\.org/pod/!$perldoc!
     and $_->{href} =~ s!::!/!gi
-    for $dom->find('a[href]')->attr->each;
+    for $dom->find('a[href]')->pluck('attr')->each;
 
   # Rewrite code blocks for syntax highlighting and correct indentation
   for my $e ($dom->find('pre > code')->each) {

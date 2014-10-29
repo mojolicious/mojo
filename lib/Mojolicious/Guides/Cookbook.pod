@@ -1197,7 +1197,7 @@ This can be an invaluable tool for testing your applications.
 For quick hacks and especially testing, L<ojo> one-liners are also a great
 choice.
 
-  $ perl -Mojo -E 'say g("mojolicio.us")->dom->html->head->title->text'
+  $ perl -Mojo -E 'say g("mojolicio.us")->dom->at("title")->text'
 
 =head1 APPLICATIONS
 

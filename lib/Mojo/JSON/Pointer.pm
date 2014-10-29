@@ -12,12 +12,12 @@ sub new { @_ > 1 ? shift->SUPER::new(data => shift) : shift->SUPER::new }
 
 sub _pointer {
   my ($self, $contains, $pointer) = @_;
+  my $data = $self->data;
 
   # DEPRECATED in Tiger Face!
   deprecated 'Support for data arguments in Mojo::JSON::Pointer is DEPRECATED'
+    and (($pointer, $data) = ($_[3], $pointer))
     if defined $_[3];
-  ($pointer, my $data)
-    = defined $_[3] ? ($_[3], $pointer) : ($pointer, $self->data);
 
   return $data unless $pointer =~ s!^/!!;
   for my $p ($pointer eq '' ? ($pointer) : (split '/', $pointer)) {

@@ -189,14 +189,14 @@ implements the following new ones.
   my $code = $res->code;
   $res     = $res->code(200);
 
-HTTP response code.
+HTTP response status code.
 
 =head2 message
 
   my $msg = $res->message;
   $res    = $res->message('OK');
 
-HTTP response message.
+HTTP response status message.
 
 =head1 METHODS
 
@@ -216,7 +216,8 @@ Access response cookies, usually L<Mojo::Cookie::Response> objects.
   my $msg = $res->default_message;
   my $msg = $res->default_message(418);
 
-Generate default response message for code.
+Generate default response message for status code, defaults to using
+L</"code">.
 
 =head2 extract_start_line
 

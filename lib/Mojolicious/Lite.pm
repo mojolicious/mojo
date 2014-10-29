@@ -874,7 +874,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     my $c   = shift;
     my $url = $c->param('url') || 'http://mojolicio.us';
     my $dom = $c->ua->get($url)->res->dom;
-    $c->render(json => [$dom->find('h1, h2, h3')->text->each]);
+    $c->render(json => [$dom->find('h1, h2, h3')->pluck('text')->each]);
   };
 
   # Non-blocking
@@ -898,8 +898,8 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
       sub {
         my ($delay, $mojo, $cpan) = @_;
         $c->render(json => {
-          mojo => $mojo->res->dom->html->head->title->text,
-          cpan => $cpan->res->dom->html->head->title->text
+          mojo => $mojo->res->dom->at('title')->text,
+          cpan => $cpan->res->dom->at('title')->text
         });
       }
     );

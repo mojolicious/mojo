@@ -149,26 +149,11 @@ is c({foo => 'bar'}, {foo => 'baz'})->pluck('foo')->join, 'barbaz',
 $collection = c(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9));
 is $collection->pluck('reverse'), "3\n2\n1\n6\n5\n4\n9\n8\n7", 'right result';
 is $collection->pluck(join => '-'), "1-2-3\n4-5-6\n7-8-9", 'right result';
-$collection = c(b('one'), b('two'), b('three'));
-is $collection->camelize, "One\nTwo\nThree", 'right result';
-is $collection->url_escape('^netwhr')->reverse, "%54hree\n%54w%6F\n%4Fne",
-  'right result';
 
 # uniq
 $collection = c(1, 2, 3, 2, 3, 4, 5, 4);
 is_deeply [$collection->uniq->each], [1, 2, 3, 4, 5], 'right result';
 is_deeply [$collection->uniq->reverse->uniq->each], [5, 4, 3, 2, 1],
   'right result';
-
-# Missing method and function (AUTOLOAD)
-eval { Mojo::Collection->new(b('whatever'))->missing };
-like $@,
-  qr/^Can't locate object method "missing" via package "Mojo::ByteStream"/,
-  'right error';
-eval { Mojo::Collection->new(undef)->missing };
-like $@, qr/^Can't call method "missing" on an undefined value/, 'right error';
-eval { Mojo::Collection::missing() };
-like $@, qr/^Undefined subroutine &Mojo::Collection::missing called/,
-  'right error';
 
 done_testing();

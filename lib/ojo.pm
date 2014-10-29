@@ -125,7 +125,7 @@ resulting L<Mojo::Message::Response> object.
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
 L<Mojo::Message::Response> object.
 
-  $ perl -Mojo -E 'say g("mojolicio.us")->dom("h1, h2, h3")->text'
+  $ perl -Mojo -E 'say g("mojolicio.us")->dom("h1, h2, h3")->pluck("text")'
 
 =head2 h
 

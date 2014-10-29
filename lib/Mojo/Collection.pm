@@ -13,8 +13,8 @@ our @EXPORT_OK = ('c');
 
 # DEPRECATED in Tiger Face!
 sub AUTOLOAD {
-  deprecated 'Mojo::Collection::AUTOLOAD is DEPRECATED '
-    . 'in favor of Mojo::Collection::pluck';
+  deprecated 'Mojo::Collection::AUTOLOAD is DEPRECATED in favor of'
+    . ' Mojo::Collection::pluck';
   my $self = shift;
   my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
   croak "Undefined subroutine &${package}::$method called"

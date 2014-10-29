@@ -3,19 +3,19 @@ use Mojo::Base -base;
 
 # "Professor: These old Doomsday devices are dangerously unstable. I'll rest
 #             easier not knowing where they are."
-use Carp 'croak';
+use Carp ();
 use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 use Mojo::Util;
-use Scalar::Util 'weaken';
+use Scalar::Util ();
 
 has home => sub { Mojo::Home->new };
 has log  => sub { Mojo::Log->new };
 has ua   => sub {
   my $ua = Mojo::UserAgent->new;
-  weaken $ua->server->app(shift)->{app};
+  Scalar::Util::weaken $ua->server->app(shift)->{app};
   return $ua;
 };
 
@@ -23,7 +23,7 @@ sub build_tx { Mojo::Transaction::HTTP->new }
 
 sub config { Mojo::Util::_stash(config => @_) }
 
-sub handler { croak 'Method "handler" not implemented in subclass' }
+sub handler { Carp::croak 'Method "handler" not implemented in subclass' }
 
 sub new {
   my $self = shift->SUPER::new(@_);

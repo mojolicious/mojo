@@ -1,5 +1,7 @@
 
 5.56  2014-10-29
+  - Deprecated Mojo::Collection::AUTOLOAD in favor of Mojo::Collection::pluck.
+  - Deprecated Mojo::DOM::AUTOLOAD in favor of Mojo::DOM::children.
 
 5.55  2014-10-28
   - Deprecated support for data arguments in Mojo::JSON::Pointer.

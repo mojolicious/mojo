@@ -1,4 +1,6 @@
 
+5.57  2014-10-30
+
 5.56  2014-10-29
   - Deprecated Mojo::Collection::AUTOLOAD in favor of Mojo::Collection::pluck.
   - Deprecated Mojo::DOM::AUTOLOAD in favor of Mojo::DOM::children.

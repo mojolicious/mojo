@@ -249,9 +249,13 @@ In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
 validation checks provided by L</"validator"> on
 L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
 
+  # Call validation checks
   $validation->required('foo')->size(2, 5)->like(qr/^[A-Z]/);
   $validation->optional('bar')->equal_to('foo');
   $validation->optional('baz')->in(qw(test 123));
+
+  # Longer version
+  $validation->required('foo')->check('size', 2,5)->check('like', qr/^[A-Z]/);
 
 =head1 SEE ALSO
 

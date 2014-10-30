@@ -1016,8 +1016,12 @@ helpers provided by L</"app"> on L<Mojolicious::Controller> objects. This
 includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
+  # Call helpers
   $c->layout('green');
   $c->title('Welcome!');
+
+  # Longer version
+  $c->helpers->layout('green');
 
 =head1 SEE ALSO
 

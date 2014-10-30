@@ -675,10 +675,10 @@ object, so they can't depend on or change controller state, which includes
 request, response and stash.
 
   # Call helper
-  $app->log->debug($app->dumper({foo => 'bar'}));
+  say $app->dumper({foo => 'bar'});
 
   # Longer version
-  $app->log->debug($app->build_controller->helpers->dumper({foo => 'bar'}));
+  say $app->build_controller->helpers->dumper({foo => 'bar'});
 
 =head1 BUNDLED FILES
 

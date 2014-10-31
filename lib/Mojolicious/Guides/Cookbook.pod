@@ -1077,11 +1077,11 @@ can keep many concurrent connections active at the same time.
   my $ua = Mojo::UserAgent->new;
   $ua->get('http://metacpan.org/search?q=mojo' => sub {
     my ($ua, $mojo) = @_;
-    ...
+    say $mojo->res->dom->at('title')->text;
   });
   $ua->get('http://metacpan.org/search?q=minion' => sub {
     my ($ua, $minion) = @_;
-    ...
+    say $minion->res->dom->at('title')->text;
   });
 
   # Start event loop if necessary
@@ -1101,7 +1101,8 @@ synchronize multiple non-blocking requests.
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, $mojo, $minion) = @_;
-    ...
+    say $mojo->res->dom->at('title')->text;
+    say $minion->res->dom->at('title')->text;
   });
   $ua->get('http://metacpan.org/search?q=mojo'   => $delay->begin);
   $ua->get('http://metacpan.org/search?q=minion' => $delay->begin);

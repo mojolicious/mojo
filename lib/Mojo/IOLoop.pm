@@ -314,6 +314,10 @@ scalable C<select>.
   LIBEV_FLAGS=4   # epoll (Linux)
   LIBEV_FLAGS=8   # kqueue (*BSD, OS X)
 
+Connections are established non-blocking, but name resolution needs to be
+performed blocking, so you should limit concurrency if resolver timeouts are a
+possibility.
+
 The event loop will be resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>. A TLS certificate and key are also built
 right in, to make writing test servers as easy as possible. Also note that for

@@ -200,10 +200,10 @@ it for applications that take a long time to process a request.
 
 =head2 What does "Premature connection close" mean?
 
-This error message is often related to the one above, and means that the web
-server closed the connection before the user agent could receive the whole
-response or that the user agent got destroyed, which forces all connections to
-be closed immediately.
+This error message is often related to the one above, and means that the
+connection got closed before the user agent could receive the whole response
+or that the user agent got destroyed, which forces all connections to be
+closed immediately.
 
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 

@@ -1427,7 +1427,8 @@ is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
 is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
 is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
-is $dom->find('table > tbody > tr > td')->pluck('text'), "B\nE", 'right text';
+is $dom->find('table > tbody > tr > td')->pluck('text')->join("\n"), "B\nE",
+  'right text';
 
 # Optional "colgroup", "tbody", "tr", "th" and "td" tags
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -1993,10 +1994,10 @@ is $dom->find('a B c')->size, 2, 'right number of elements';
 @results = ();
 $dom->find('a B c')->each(sub { push @results, $_->text });
 is_deeply \@results, [qw(bar baz)], 'right results';
-is $dom->find('a B c'), qq{<c id="three">bar</c>\n<c ID="four">baz</c>},
-  'right result';
+is $dom->find('a B c')->join("\n"),
+  qq{<c id="three">bar</c>\n<c ID="four">baz</c>}, 'right result';
 is_deeply [keys %$dom], [], 'root has no attributes';
-is $dom->find('#nothing'), '', 'no result';
+is $dom->find('#nothing')->join, '', 'no result';
 
 # Direct hash access to attributes in HTML mode
 $dom = Mojo::DOM->new(<<EOF);
@@ -2025,10 +2026,10 @@ is $dom->find('a b c')->size, 2, 'right number of elements';
 @results = ();
 $dom->find('a b c')->each(sub { push @results, $_->text });
 is_deeply \@results, [qw(bar baz)], 'right results';
-is $dom->find('a b c'), qq{<c id="three">bar</c>\n<c id="four">baz</c>},
-  'right result';
+is $dom->find('a b c')->join("\n"),
+  qq{<c id="three">bar</c>\n<c id="four">baz</c>}, 'right result';
 is_deeply [keys %$dom], [], 'root has no attributes';
-is $dom->find('#nothing'), '', 'no result';
+is $dom->find('#nothing')->join, '', 'no result';
 
 # Append and prepend content
 $dom = Mojo::DOM->new('<a><b>Test<c /></b></a>');
@@ -2276,46 +2277,6 @@ is $dom->find('div > ul li')->[1]->text, 'B', 'right text';
 is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
-
-# Form values
-$dom = Mojo::DOM->new(<<EOF);
-<form action="/foo">
-  <p>Test</p>
-  <input type="text" name="a" value="A" />
-  <input type="checkbox" checked name="b" value="B">
-  <input type="radio" checked name="c" value="C">
-  <select name="f">
-    <option value="F">G</option>
-    <optgroup>
-      <option>H</option>
-      <option selected>I</option>
-    </optgroup>
-    <option value="J" selected>K</option>
-  </select>
-  <select name="n"><option>N</option></select>
-  <select name="d"><option selected>D</option></select>
-  <textarea name="m">M</textarea>
-  <button name="o" value="O">No!</button>
-  <input type="submit" name="p" value="P" />
-</form>
-EOF
-is_deeply [$dom->at('p')->val->each], [], 'no values';
-is $dom->at('input')->val->size, 1, 'one value';
-is $dom->at('input')->val,                     'A', 'right value';
-is $dom->at('input:checked')->val,             'B', 'right value';
-is $dom->at('input:checked[type=radio]')->val, 'C', 'right value';
-is $dom->find('select')->first->val->join(':'), 'I:J', 'right value';
-is_deeply [$dom->find('select')->first->val->each], ['I', 'J'], 'right values';
-is $dom->at('select option')->val->size, 1, 'one value';
-is $dom->at('select option')->val,                          'F', 'right value';
-is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
-is $dom->find('select')->[1]->val->size, 0, 'no values';
-is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
-is $dom->find('select')->last->val, 'D', 'right value';
-is $dom->at('textarea')->val->size, 1,   'one value';
-is $dom->at('textarea')->val, 'M', 'right value';
-is $dom->at('button')->val,   'O', 'right value';
-is $dom->find('form input')->last->val, 'P', 'right value';
 
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');

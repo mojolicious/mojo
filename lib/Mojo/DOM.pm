@@ -180,7 +180,9 @@ sub type {
   return $self;
 }
 
+# DEPRECATED in Tiger Face!
 sub val {
+  deprecated 'Mojo::DOM::val is DEPRECATED';
   my $self = shift;
 
   # "option"
@@ -420,8 +422,8 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Find
   say $dom->at('#b')->text;
-  say $dom->find('p')->pluck('text');
-  say $dom->find('[id]')->pluck(attr => 'id');
+  say $dom->find('p')->pluck('text')->join("\n");
+  say $dom->find('[id]')->pluck(attr => 'id')->join("\n");
 
   # Iterate
   $dom->find('p[id]')->reverse->each(sub { say $_->{id} });
@@ -505,7 +507,7 @@ L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of ancestor elements
-  say $dom->ancestors->pluck('type');
+  say $dom->ancestors->pluck('type')->join("\n");
 
 =head2 append
 
@@ -559,7 +561,7 @@ from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 This element's attributes.
 
   # List id attributes
-  say $dom->find('*')->pluck(attr => 'id')->compact;
+  say $dom->find('*')->pluck(attr => 'id')->compact->join("\n");
 
 =head2 children
 
@@ -798,7 +800,7 @@ L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of sibling elements
-  say $dom->siblings->pluck('type');
+  say $dom->siblings->pluck('type')->join("\n");
 
 =head2 strip
 
@@ -854,25 +856,7 @@ carefully since it is very dynamic.
 This element's type.
 
   # List types of child elements
-  say $dom->children->pluck('type');
-
-=head2 val
-
-  my $collection = $dom->val;
-
-Extract values from C<button>, C<input>, C<option>, C<select> or C<textarea>
-element and return a L<Mojo::Collection> object containing these values. In
-the case of C<select>, find all C<option> elements it contains that have a
-C<selected> attribute and extract their values.
-
-  # "b"
-  $dom->parse('<input name="a" value="b">')->at('input')->val;
-
-  # "c"
-  $dom->parse('<option value="c">Test</option>')->at('option')->val;
-
-  # "d"
-  $dom->parse('<option>d</option>')->at('option')->val;
+  say $dom->children->pluck('type')->join("\n");
 
 =head2 wrap
 

@@ -1,6 +1,5 @@
 package Mojo::Collection;
 use Mojo::Base -strict;
-use overload bool => sub {1}, '""' => sub { shift->join("\n") }, fallback => 1;
 
 use Carp 'croak';
 use Exporter 'import';
@@ -8,6 +7,15 @@ use List::Util;
 use Mojo::ByteStream;
 use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
+
+# DEPRECATED in Tiger Face!
+use overload
+  bool => sub {1},
+  '""' => sub {
+  deprecated 'Stringify support in Mojo::Collection is DEPRECATED';
+  shift->join("\n");
+  },
+  fallback => 1;
 
 our @EXPORT_OK = ('c');
 
@@ -143,7 +151,6 @@ Mojo::Collection - Collection
 
   # Stringify collection
   say $collection->join("\n");
-  say "$collection";
 
   # Use the alternative constructor
   use Mojo::Collection 'c';
@@ -335,22 +342,6 @@ Alias for L<Mojo::Base/"tap">.
   my $new = $collection->uniq;
 
 Create a new collection without duplicate elements.
-
-=head1 OPERATORS
-
-L<Mojo::Collection> overloads the following operators.
-
-=head2 bool
-
-  my $bool = !!$collection;
-
-Always true.
-
-=head2 stringify
-
-  my $str = "$collection";
-
-Stringify elements in collection and L</"join"> them with newlines.
 
 =head1 SEE ALSO
 

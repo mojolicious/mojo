@@ -75,8 +75,6 @@ is $collection->join(''),    '123',       'right result';
 is $collection->join('---'), '1---2---3', 'right result';
 is $collection->join("\n"),  "1\n2\n3",   'right result';
 is $collection->join('/')->url_escape, '1%2F2%2F3', 'right result';
-$collection = c(c(1, 2, 3), c(3, 2, 1));
-is $collection->join(''), "1\n2\n33\n2\n1", 'right result';
 
 # map
 $collection = c(1, 2, 3);
@@ -147,8 +145,10 @@ is_deeply [$collection->slice(6 .. 9)->each], [7, 10, 9, 8], 'right result';
 is c({foo => 'bar'}, {foo => 'baz'})->pluck('foo')->join, 'barbaz',
   'right result';
 $collection = c(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9));
-is $collection->pluck('reverse'), "3\n2\n1\n6\n5\n4\n9\n8\n7", 'right result';
-is $collection->pluck(join => '-'), "1-2-3\n4-5-6\n7-8-9", 'right result';
+is $collection->pluck('reverse')->pluck(join => "\n")->join("\n"),
+  "3\n2\n1\n6\n5\n4\n9\n8\n7", 'right result';
+is $collection->pluck(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
+  'right result';
 
 # uniq
 $collection = c(1, 2, 3, 2, 3, 4, 5, 4);

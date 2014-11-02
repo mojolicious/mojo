@@ -9,13 +9,11 @@ use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
 
 # DEPRECATED in Tiger Face!
-use overload
-  bool => sub {1},
-  '""' => sub {
-  deprecated 'Stringify support in Mojo::Collection is DEPRECATED';
+use overload '""' => sub {
+  deprecated 'Stringification support in Mojo::Collection is DEPRECATED';
   shift->join("\n");
-  },
-  fallback => 1;
+};
+use overload bool => sub {1}, fallback => 1;
 
 our @EXPORT_OK = ('c');
 
@@ -78,6 +76,7 @@ sub new {
   return bless [@_], ref $class || $class;
 }
 
+# DEPRECATED in Tiger Face!
 sub pluck {
   deprecated
     'Mojo::Collection::pluck is DEPRECATED in favor of Mojo::Collection::map';

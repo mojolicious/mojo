@@ -4,6 +4,7 @@
   - Deprecated Mojo::Collection::pluck in favor of Mojo::Collection::map.
   - Deprecated Mojo::DOM::val.
   - Improved map method in Mojo::Collection to be able to call methods.
+  - Improved tap method in Mojo::Base to be able to call methods.
 
 5.56  2014-10-29
   - Deprecated Mojo::Collection::AUTOLOAD in favor of Mojo::Collection::pluck.

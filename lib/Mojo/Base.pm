@@ -84,8 +84,8 @@ sub new {
 }
 
 sub tap {
-  my ($self, $cb) = @_;
-  $_->$cb for $self;
+  my ($self, $cb) = (shift, shift);
+  $_->$cb(@_) for $self;
   return $self;
 }
 
@@ -209,10 +209,15 @@ pass it either a hash or a hash reference with attribute values.
 =head2 tap
 
   $object = $object->tap(sub {...});
+  $object = $object->tap($method);
+  $object = $object->tap($method, @args);
 
 K combinator, tap into a method chain to perform operations on an object
 within the chain. The object will be the first argument passed to the callback
 and is also available as C<$_>.
+
+  # Longer version
+  $object = $object->tap(sub { $_->$method(@args) });
 
 =head1 DEBUGGING
 

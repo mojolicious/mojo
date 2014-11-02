@@ -13,6 +13,8 @@ use base 'Mojo::BaseTest::Base2';
 __PACKAGE__->attr(heads => 1);
 __PACKAGE__->attr('name');
 
+sub more_heads { shift->{heads} += shift // 1 }
+
 package Mojo::BaseTestTest;
 use Mojo::Base 'Mojo::BaseTest';
 
@@ -66,6 +68,9 @@ $monkey = Mojo::BaseTest->new;
 is $monkey->tap(sub { $_->name('foo') })->name, 'foo', 'right attribute value';
 is $monkey->tap(sub { shift->name('bar')->name })->name, 'bar',
   'right attribute value';
+is $monkey->tap('heads')->heads,      1, 'right attribute value';
+is $monkey->tap('more_heads')->heads, 2, 'right attribute value';
+is $monkey->tap(more_heads => 3)->heads, 5, 'right attribute value';
 
 # Inherit -base flag
 $monkey = Mojo::BaseTest::Base3->new(evil => 1);

@@ -1,7 +1,9 @@
 
 5.57  2014-11-02
   - Deprecated stringify support in Mojo::Collection.
+  - Deprecated Mojo::Collection::pluck in favor of Mojo::Collection::map.
   - Deprecated Mojo::DOM::val.
+  - Improved map method in Mojo::Collection to be able to call methods.
 
 5.56  2014-10-29
   - Deprecated Mojo::Collection::AUTOLOAD in favor of Mojo::Collection::pluck.

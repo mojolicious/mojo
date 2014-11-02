@@ -8,8 +8,10 @@ plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
   unless eval 'use Test::Pod::Coverage 1.04; 1';
 
 # DEPRECATED in Tiger Face!
-my @tiger
-  = (qw(decode emit_safe encode error has_conditions new render_static val));
+my @tiger = (
+  qw(decode emit_safe encode error has_conditions new pluck render_static),
+  qw(val)
+);
 
 # False positive constants
 all_pod_coverage_ok({also_private => [qw(IPV6 TLS), @tiger]});

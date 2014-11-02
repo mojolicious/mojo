@@ -191,7 +191,7 @@ sub val {
     if $type eq 'option';
 
   # "select"
-  return $self->find('option[selected]')->pluck('val')->flatten
+  return $self->find('option[selected]')->map('val')->flatten
     if $type eq 'select';
 
   # "textarea"
@@ -422,8 +422,8 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Find
   say $dom->at('#b')->text;
-  say $dom->find('p')->pluck('text')->join("\n");
-  say $dom->find('[id]')->pluck(attr => 'id')->join("\n");
+  say $dom->find('p')->map('text')->join("\n");
+  say $dom->find('[id]')->map(attr => 'id')->join("\n");
 
   # Iterate
   $dom->find('p[id]')->reverse->each(sub { say $_->{id} });
@@ -435,7 +435,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Modify
   $dom->find('div p')->last->append('<p id="c">456</p>');
-  $dom->find(':not(p)')->pluck('strip');
+  $dom->find(':not(p)')->map('strip');
 
   # Render
   say "$dom";
@@ -481,7 +481,7 @@ L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
   $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')->all_contents
-    ->grep(sub { $_->node eq 'comment' })->pluck('remove')->first;
+    ->grep(sub { $_->node eq 'comment' })->map('remove')->first;
 
 =head2 all_text
 
@@ -507,7 +507,7 @@ L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of ancestor elements
-  say $dom->ancestors->pluck('type')->join("\n");
+  say $dom->ancestors->map('type')->join("\n");
 
 =head2 append
 
@@ -561,7 +561,7 @@ from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 This element's attributes.
 
   # List id attributes
-  say $dom->find('*')->pluck(attr => 'id')->compact->join("\n");
+  say $dom->find('*')->map(attr => 'id')->compact->join("\n");
 
 =head2 children
 
@@ -627,7 +627,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my $id = $dom->find('div')->[23]{id};
 
   # Extract information from multiple elements
-  my @headers = $dom->find('h1, h2, h3')->pluck('text')->each;
+  my @headers = $dom->find('h1, h2, h3')->map('text')->each;
 
   # Count all the different tags
   my $hash = $dom->find('*')->reduce(sub { $a->{$b->type}++; $a }, {});
@@ -800,7 +800,7 @@ L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of sibling elements
-  say $dom->siblings->pluck('type')->join("\n");
+  say $dom->siblings->map('type')->join("\n");
 
 =head2 strip
 
@@ -856,7 +856,7 @@ carefully since it is very dynamic.
 This element's type.
 
   # List types of child elements
-  say $dom->children->pluck('type')->join("\n");
+  say $dom->children->map('type')->join("\n");
 
 =head2 wrap
 

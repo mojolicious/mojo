@@ -82,6 +82,11 @@ is $collection->map(sub { $_ + 1 })->join(''), '234', 'right result';
 is_deeply [@$collection], [1, 2, 3], 'right elements';
 is $collection->map(sub { shift() + 2 })->join(''), '345', 'right result';
 is_deeply [@$collection], [1, 2, 3], 'right elements';
+$collection = c(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9));
+is $collection->map('reverse')->map(join => "\n")->join("\n"),
+  "3\n2\n1\n6\n5\n4\n9\n8\n7", 'right result';
+is $collection->map(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
+  'right result';
 
 # reverse
 $collection = c(3, 2, 1);
@@ -140,15 +145,6 @@ is_deeply [$collection->slice(-3, -5)->each], [10, 6], 'right result';
 is_deeply [$collection->slice(1, 2, 3)->each], [2, 3, 4], 'right result';
 is_deeply [$collection->slice(6, 1, 4)->each], [7, 2, 5], 'right result';
 is_deeply [$collection->slice(6 .. 9)->each], [7, 10, 9, 8], 'right result';
-
-# pluck
-is c({foo => 'bar'}, {foo => 'baz'})->pluck('foo')->join, 'barbaz',
-  'right result';
-$collection = c(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9));
-is $collection->pluck('reverse')->pluck(join => "\n")->join("\n"),
-  "3\n2\n1\n6\n5\n4\n9\n8\n7", 'right result';
-is $collection->pluck(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
-  'right result';
 
 # uniq
 $collection = c(1, 2, 3, 2, 3, 4, 5, 4);

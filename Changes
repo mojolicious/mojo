@@ -1,5 +1,5 @@
 
-5.58  2014-11-03
+5.58  2014-11-04
 
 5.57  2014-11-02
   - Deprecated stringification support in Mojo::Collection.

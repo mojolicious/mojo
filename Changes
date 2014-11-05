@@ -1,5 +1,6 @@
 
-5.58  2014-11-04
+5.58  2014-11-05
+  - Improved error handling in Mojo::IOLoop::Client.
 
 5.57  2014-11-02
   - Deprecated stringification support in Mojo::Collection.

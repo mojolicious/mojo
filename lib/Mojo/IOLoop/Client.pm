@@ -5,7 +5,7 @@ use Errno 'EINPROGRESS';
 use IO::Socket::INET;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
-use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
@@ -81,8 +81,7 @@ sub _ready {
   my $handle = $self->{handle};
   return $! == EINPROGRESS ? undef : $self->emit(error => $!)
     if $handle->isa('IO::Socket::IP') && !$handle->connect;
-  return $self->emit(error => $! = $handle->sockopt(SO_ERROR))
-    unless $handle->connected;
+  return $self->emit(error => $! || 'Not connected') unless $handle->connected;
 
   # Disable Nagle's algorithm
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;

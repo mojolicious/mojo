@@ -690,8 +690,9 @@ Very useful for reuse in more specific tag helpers.
   $c->tag('div', id => 'foo');
   $c->tag(div => sub { 'Content' });
 
-Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
-accidental double escaping.
+Content will be escaped unless provided as a subroutine reference. Results are
+automatically wrapped in L<Mojo::ByteStream> objects to prevent accidental
+double escaping by the renderer.
 
 =head2 tag_with_error
 

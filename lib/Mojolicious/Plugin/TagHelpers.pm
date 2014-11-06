@@ -686,12 +686,13 @@ HTML/XML tag generator.
 
 Very useful for reuse in more specific tag helpers.
 
-  $c->tag('div');
-  $c->tag('div', id => 'foo');
-  $c->tag(div => sub { 'Content' });
+  my $output = $c->tag('div');
+  my $output = $c->tag('div', id => 'foo');
+  my $output = $c->tag(div => 'Content that will be escaped');
+  my $output = $c->tag(div => sub { 'Content that will not be escaped' });
 
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
-accidental double escaping.
+accidental double escaping in C<ep> templates.
 
 =head2 tag_with_error
 

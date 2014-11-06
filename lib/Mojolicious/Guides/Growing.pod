@@ -90,13 +90,13 @@ about previous requests, which makes user-friendly login systems very tricky.
 Sessions solve this problem by allowing web applications to keep stateful
 information across several HTTP requests.
 
-  GET /login?user=sri&pass=s3cret HTTP/1.1
+  GET /login?user=sebastian&pass=s3cret HTTP/1.1
   Host: mojolicio.us
 
   HTTP/1.1 200 OK
   Set-Cookie: sessionid=987654321
   Content-Length: 10
-  Hello sri.
+  Hello sebastian.
 
   GET /protected HTTP/1.1
   Host: mojolicio.us
@@ -105,7 +105,7 @@ information across several HTTP requests.
   HTTP/1.1 200 OK
   Set-Cookie: sessionid=987654321
   Content-Length: 16
-  Hello again sri.
+  Hello again sebastian.
 
 Traditionally all session data was stored on the server-side and only session
 ids were exchanged between browser and web server in the form of cookies.
@@ -282,7 +282,7 @@ templates.
   # Helper to lazy initialize and store our model object
   helper users => sub { state $users = MyApp::Model::Users->new };
 
-  # /?user=sri&pass=secr3t
+  # /?user=sebastian&pass=secr3t
   any '/' => sub {
     my $c = shift;
 
@@ -336,8 +336,8 @@ on L<Mojo::DOM>.
     ->element_exists('form input[type="submit"]');
 
   # Test login with valid credentials
-  $t->post_ok('/' => form => {user => 'sri', pass => 'secr3t'})
-    ->status_is(200)->text_like('html body' => qr/Welcome sri/);
+  $t->post_ok('/' => form => {user => 'sebastian', pass => 'secr3t'})
+    ->status_is(200)->text_like('html body' => qr/Welcome sebastian/);
 
   # Test accessing a protected page
   $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
@@ -363,8 +363,8 @@ L<Mojolicious::Command::get>.
   $ ./myapp.pl get /
   Wrong username or password.
 
-  $ ./myapp.pl get -v '/?user=sri&pass=secr3t'
-  GET /?user=sri&pass=secr3t HTTP/1.1
+  $ ./myapp.pl get -v '/?user=sebastian&pass=secr3t'
+  GET /?user=sebastian&pass=secr3t HTTP/1.1
   User-Agent: Mojolicious (Perl)
   Connection: keep-alive
   Accept-Encoding: gzip
@@ -378,7 +378,7 @@ L<Mojolicious::Command::get>.
   Content-Length: 12
   Content-Type: text/plain
 
-  Welcome sri.
+  Welcome sebastian.
 
 =head2 State keeping
 
@@ -392,7 +392,7 @@ L<Mojolicious/"secrets">.
 This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
 
-  $c->session(user => 'sri');
+  $c->session(user => 'sebastian');
   my $user = $c->session('user');
 
 By default all sessions expire after one hour, for more control you can use
@@ -761,8 +761,8 @@ can be simplified.
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');
 
-  $t->post_ok('/' => form => {user => 'sri', pass => 'secr3t'})
-    ->status_is(200)->text_like('html body' => qr/Welcome sri/);
+  $t->post_ok('/' => form => {user => 'sebastian', pass => 'secr3t'})
+    ->status_is(200)->text_like('html body' => qr/Welcome sebastian/);
 
   $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
 

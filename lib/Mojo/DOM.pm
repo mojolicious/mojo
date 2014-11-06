@@ -19,11 +19,11 @@ use Scalar::Util qw(blessed weaken);
 
 # DEPRECATED in Tiger Face!
 sub AUTOLOAD {
-  deprecated
-    'Mojo::DOM::AUTOLOAD is DEPRECATED in favor of Mojo::DOM::children';
   my $self = shift;
 
   my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
+  deprecated "Mojo::DOM::AUTOLOAD ($method) is DEPRECATED"
+    . ' in favor of Mojo::DOM::children';
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 

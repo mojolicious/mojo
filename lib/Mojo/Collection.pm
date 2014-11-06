@@ -20,10 +20,10 @@ our @EXPORT_OK = ('c');
 
 # DEPRECATED in Tiger Face!
 sub AUTOLOAD {
-  deprecated 'Mojo::Collection::AUTOLOAD is DEPRECATED in favor of'
-    . ' Mojo::Collection::map';
   my $self = shift;
   my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
+  deprecated "Mojo::Collection::AUTOLOAD ($method) is DEPRECATED"
+    . ' in favor of Mojo::Collection::map';
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
   return $self->map($method, @_);

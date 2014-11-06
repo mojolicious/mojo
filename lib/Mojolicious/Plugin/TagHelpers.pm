@@ -688,8 +688,8 @@ Very useful for reuse in more specific tag helpers.
 
   my $output = $c->tag('div');
   my $output = $c->tag('div', id => 'foo');
-  my $output = $c->tag(div => 'Content that will be escaped');
-  my $output = $c->tag(div => sub { 'Content that will not be escaped' });
+  my $output = $c->tag(div => '<p>This will be escaped</p>');
+  my $output = $c->tag(div => sub { '<p>This will not be escaped</p>' });
 
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
 accidental double escaping in C<ep> templates.

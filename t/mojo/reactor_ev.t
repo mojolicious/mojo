@@ -1,5 +1,7 @@
 use Mojo::Base -strict;
 
+BEGIN { $ENV{MOJO_NO_IPV6} = 1 }
+
 use Test::More;
 
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'

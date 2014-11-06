@@ -10,7 +10,8 @@ use Scalar::Util 'blessed';
 
 # DEPRECATED in Tiger Face!
 use overload '""' => sub {
-  deprecated 'Stringification support in Mojo::Collection is DEPRECATED';
+  deprecated 'Stringification support in Mojo::Collection is DEPRECATED'
+    . ' in favor of Mojo::Collection::join';
   shift->join("\n");
 };
 use overload bool => sub {1}, fallback => 1;

@@ -250,9 +250,9 @@ separation of concerns more visible.
   use warnings;
 
   my $USERS = {
-    sri    => 'secr3t',
-    marcus => 'lulz',
-    yko    => 'zeecaptain'
+    joel      => 'las3rs',
+    marcus    => 'lulz',
+    sebastian => 'secr3t'
   };
 
   sub new { bless {}, shift }

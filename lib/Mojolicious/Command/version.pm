@@ -13,9 +13,9 @@ sub run {
 
   my $ev    = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'not installed';
   my $class = 'Mojo::IOLoop::Client';
-  my $ipv6  = $class->IPV6 ? $IO::Socket::IP::VERSION : 'not installed';
   my $socks = $class->SOCKS ? $IO::Socket::Socks::VERSION : 'not installed';
   my $tls   = $class->TLS ? $IO::Socket::SSL::VERSION : 'not installed';
+  my $ndn   = $class->NDN ? $Net::DNS::Native::VERSION : 'not installed';
 
   print <<EOF;
 CORE
@@ -24,9 +24,9 @@ CORE
 
 OPTIONAL
   EV 4.0+                 ($ev)
-  IO::Socket::IP 0.20+    ($ipv6)
   IO::Socket::Socks 0.64+ ($socks)
   IO::Socket::SSL 1.84+   ($tls)
+  Net::DNS::Native        ($ndn)
 
 EOF
 

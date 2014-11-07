@@ -7,6 +7,7 @@ use ExtUtils::MakeMaker;
 
 # Pod::Simple 3.09 first shipped with Perl 5.11.2
 # Time::Local 1.2 first shipped with Perl 5.13.9
+# IO::Socket::IP 0.26 first shipped with Perl 5.19.8
 WriteMakefile(
   NAME         => 'Mojolicious',
   VERSION_FROM => 'lib/Mojolicious.pm',
@@ -24,7 +25,11 @@ WriteMakefile(
     },
     no_index => {directory => ['t']}
   },
-  PREREQ_PM => {'Pod::Simple' => '3.09', 'Time::Local' => '1.2'},
+  PREREQ_PM => {
+    'IO::Socket::IP' => '0.26',
+    'Pod::Simple'    => '3.09',
+    'Time::Local'    => '1.2'
+  },
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
   test => {TESTS => 't/*.t t/*/*.t'}
 );

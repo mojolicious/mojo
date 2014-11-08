@@ -1,5 +1,6 @@
 
 5.60  2014-11-08
+  - Updated Net::DNS::Native requirement to 0.12 for some important bug fixes.
 
 5.59  2014-11-07
   - Added support for non-blocking name resolution with Net::DNS::Native.

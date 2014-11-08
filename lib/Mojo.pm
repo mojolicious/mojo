@@ -27,13 +27,8 @@ sub handler { Carp::croak 'Method "handler" not implemented in subclass' }
 
 sub new {
   my $self = shift->SUPER::new(@_);
-
-  # Check if we have a log directory
   my $home = $self->home;
   $home->detect(ref $self) unless @{$home->parts};
-  $self->log->path($home->rel_file('log/mojo.log'))
-    if -w $home->rel_file('log');
-
   return $self;
 }
 
@@ -154,9 +149,7 @@ be overloaded in a subclass.
 
   my $app = Mojo->new;
 
-Construct a new L<Mojo> application. Will automatically detect your home
-directory if necessary and set up logging to C<log/mojo.log> if there's a
-C<log> directory.
+Construct a new L<Mojo> application.
 
 =head1 SEE ALSO
 

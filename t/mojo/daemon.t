@@ -13,6 +13,25 @@ use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious;
 
+package TestApp;
+use Mojo::Base 'Mojo';
+
+sub handler {
+  my ($self, $tx) = @_;
+  $tx->res->code(200);
+  $tx->res->body('Hello TestApp!');
+  $tx->resume;
+}
+
+package main;
+
+# Minimal application
+my $ua = Mojo::UserAgent->new;
+$ua->server->app(TestApp->new);
+my $tx = $ua->get('/');
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Hello TestApp!', 'right content';
+
 # Timeout
 {
   is(Mojo::Server::Daemon->new->inactivity_timeout, 15, 'right value');
@@ -82,7 +101,7 @@ isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';
 
 # Fresh application
 $app = Mojolicious->new;
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 is $ua->server->app($app)->app->moniker, 'mojolicious', 'right moniker';
 
 # Silence
@@ -121,7 +140,7 @@ $app->routes->post(
 $app->routes->any('/*whatever' => {text => 'Whatever!'});
 
 # Normal request
-my $tx = $ua->get('/normal/');
+$tx = $ua->get('/normal/');
 ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';

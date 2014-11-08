@@ -171,7 +171,7 @@ sub new {
   # Check if we have a log directory
   my $mode = $self->mode;
   $self->log->path($home->rel_file("log/$mode.log"))
-    if -w $home->rel_file('log');
+    if -d $home->rel_dir('log') and -w _;
 
   $self->plugin($_)
     for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);

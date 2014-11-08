@@ -20,6 +20,8 @@ is $@, qq{Plugin "does_not_exist" missing, maybe you need to install it?\n},
 # Default
 app->defaults(default => 23);
 
+is app->log->handle, \*STDERR, 'log handle is correct';
+
 # Secret
 my $log = '';
 my $cb = app->log->on(message => sub { $log .= pop });

@@ -235,13 +235,11 @@ is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
 $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::Poll', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';
-my ($server_err, $server_running, $client_err, $client_running);
-$server = $client = '';
+my ($buffer, $server_err, $server_running, $client_err, $client_running);
 $id = Mojo::IOLoop->server(
   {address => '127.0.0.1'} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test' => sub { shift->write('321') });
-    $stream->on(read => sub { $server .= pop });
     $server_running = Mojo::IOLoop->is_running;
     eval { Mojo::IOLoop->start };
     $server_err = $@;
@@ -251,21 +249,24 @@ $port = Mojo::IOLoop->acceptor($id)->handle->sockport;
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;
-    $stream->write('tset' => sub { shift->write('123') });
-    $stream->on(read => sub { $client .= pop });
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        $buffer .= $chunk;
+        return unless $buffer eq 'test321';
+        Mojo::IOLoop->singleton->reactor->stop;
+      }
+    );
     $client_running = Mojo::IOLoop->is_running;
     eval { Mojo::IOLoop->start };
     $client_err = $@;
   }
 );
-Mojo::IOLoop->timer(1 => sub { Mojo::IOLoop->singleton->reactor->stop });
 Mojo::IOLoop->singleton->reactor->start;
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 like $server_err, qr/^Mojo::IOLoop already running/, 'right error';
 like $client_err, qr/^Mojo::IOLoop already running/, 'right error';
 ok $server_running, 'loop is running';
 ok $client_running, 'loop is running';
-is $server,         'tset123', 'right content';
-is $client,         'test321', 'right content';
 
 done_testing();

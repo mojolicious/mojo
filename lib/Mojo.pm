@@ -11,7 +11,7 @@ use Mojo::UserAgent;
 use Mojo::Util;
 use Scalar::Util ();
 
-has home => sub { Mojo::Home->new };
+has home => sub { Mojo::Home->new->detect(ref shift) };
 has log  => sub { Mojo::Log->new };
 has ua   => sub {
   my $ua = Mojo::UserAgent->new;
@@ -24,13 +24,6 @@ sub build_tx { Mojo::Transaction::HTTP->new }
 sub config { Mojo::Util::_stash(config => @_) }
 
 sub handler { Carp::croak 'Method "handler" not implemented in subclass' }
-
-sub new {
-  my $self = shift->SUPER::new(@_);
-  my $home = $self->home;
-  $home->detect(ref $self) unless @{$home->parts};
-  return $self;
-}
 
 1;
 
@@ -144,12 +137,6 @@ be overloaded in a subclass.
     my ($self, $tx) = @_;
     ...
   }
-
-=head2 new
-
-  my $app = Mojo->new;
-
-Construct a new L<Mojo> application.
 
 =head1 SEE ALSO
 

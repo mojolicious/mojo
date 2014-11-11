@@ -126,6 +126,25 @@ Fun one-liners using everything above.
 
 =back
 
+=head1 SPIN-OFFS
+
+These modules are not part of the L<Mojolicious> distribution, but have been
+designed to be used with it and are being developed under the same umbrella.
+
+=over 2
+
+=item L<Mojo::Pg>
+
+A tiny wrapper around L<DBD::Pg> that makes
+L<PostgreSQL|http://www.postgresql.org> a lot of fun to use with
+L<Mojolicious>.
+
+=item L<Minion>
+
+A job queue for L<Mojolicious> with support for multiple backends.
+
+=back
+
 =head1 REFERENCE
 
 This is the class hierarchy of the L<Mojolicious> distribution.

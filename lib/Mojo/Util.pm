@@ -58,7 +58,7 @@ our @EXPORT_OK = (
   qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
   qw(steady_time tablify trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode)
+  qw(xml_escape xor_encode xss_escape)
 );
 
 sub b64_decode { decode_base64($_[0]) }
@@ -350,6 +350,11 @@ sub xor_encode {
   $output .= $buffer ^ $key
     while length($buffer = substr($input, 0, $len, '')) == $len;
   return $output .= $buffer ^ substr($key, 0, length $buffer, '');
+}
+
+sub xss_escape {
+  no warnings 'uninitialized';
+  ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : xml_escape("$_[0]");
 }
 
 sub _adapt {
@@ -718,6 +723,12 @@ Escape unsafe characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string.
   my $encoded = xor_encode $str, $key;
 
 XOR encode string with variable length key.
+
+=head2 xss_escape
+
+  my $escaped = xss_escape $str;
+
+Same as L</"xml_escape">, but does not escape L<Mojo::ByteStream> objects.
 
 =head1 SEE ALSO
 

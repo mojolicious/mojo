@@ -6,6 +6,7 @@ use lib "$FindBin::Bin/lib";
 use Test::More;
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
+use Mojo::ByteStream 'b';
 use Mojo::DeprecationTest;
 
 use Mojo::Util
@@ -14,7 +15,7 @@ use Mojo::Util
   qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
   qw(steady_time tablify trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode);
+  qw(xml_escape xor_encode xss_escape);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -192,6 +193,10 @@ is xml_escape('привет'), 'привет', 'right XML escaped result';
 # xml_escape (UTF-8)
 is xml_escape('привет<foo>'), 'привет&lt;foo&gt;',
   'right XML escaped result';
+
+# xss_escape
+is xss_escape('<p>'), '&lt;p&gt;', 'right XSS escaped result';
+is xss_escape(b('<p>')), '<p>', 'right XSS escaped result';
 
 # punycode_encode
 is punycode_encode('bücher'), 'bcher-kva', 'right punycode encoded result';

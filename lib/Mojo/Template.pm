@@ -14,7 +14,7 @@ has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
-has escape        => sub { \&Mojo::Util::xml_escape };
+has escape        => sub { \&Mojo::Util::xss_escape };
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
@@ -264,11 +264,7 @@ sub _wrap {
   my ($self, $code) = @_;
 
   # Escape function
-  my $escape = $self->escape;
-  monkey_patch $self->namespace, _escape => sub {
-    no warnings 'uninitialized';
-    ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : $escape->("$_[0]");
-  };
+  monkey_patch $self->namespace, '_escape', $self->escape;
 
   # Wrap lines
   my $num = () = $code =~ /\n/g;
@@ -493,7 +489,7 @@ Encoding used for template files.
   $mt    = $mt->escape(sub {...});
 
 A callback used to escape the results of escaped expressions, defaults to
-L<Mojo::Util/"xml_escape">.
+L<Mojo::Util/"xss_escape">.
 
   $mt->escape(sub {
     my $str = shift;

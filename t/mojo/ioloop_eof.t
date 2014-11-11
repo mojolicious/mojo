@@ -14,7 +14,7 @@ my $id  = Mojo::IOLoop->server(
   {address => '127.0.0.1'} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test');
-    $stream->on(eof => sub { shift->handle->syswrite('321') });
+    $stream->on(eof => sub { shift->handle->write('321') });
     $stream->on(close => $end);
     $stream->on(read => sub { $server .= pop });
   }
@@ -25,7 +25,7 @@ Mojo::IOLoop->client(
   {address => '127.0.0.1', port => $port} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset', sub { shift->handle->shutdown(1) });
-    $stream->on(eof => sub { shift->handle->syswrite('123') });
+    $stream->on(eof => sub { shift->handle->write('123') });
     $stream->on(close => $end2);
     $stream->on(read => sub { $client .= pop });
     $stream->timeout(0.5);

@@ -12,19 +12,19 @@ push @$collection, 3, 4, 5;
 is_deeply [@$collection], [1, 2, 3, 4, 5], 'right result';
 
 # Tap into method chain
-is_deeply [c(1, 2, 3)->tap(sub { $_->[1] += 2 })->each], [1, 4, 3],
+is_deeply c(1, 2, 3)->tap(sub { $_->[1] += 2 })->to_array, [1, 4, 3],
   'right result';
 
 # compact
-is_deeply [c(undef, 0, 1, '', 2, 3)->compact->each], [0, 1, 2, 3],
+is_deeply c(undef, 0, 1, '', 2, 3)->compact->to_array, [0, 1, 2, 3],
   'right result';
-is_deeply [c(3, 2, 1)->compact->each], [3, 2, 1], 'right result';
-is_deeply [c()->compact->each], [], 'right result';
+is_deeply c(3, 2, 1)->compact->to_array, [3, 2, 1], 'right result';
+is_deeply c()->compact->to_array, [], 'right result';
 
 # flatten
-is_deeply [c(1, 2, [3, 4], 5, c(6, 7))->flatten->each], [1, 2, 3, 4, 5, 6, 7],
-  'right result';
-is_deeply [c(undef, 1, [2, {}, [3, c(4, 5)]], undef, 6)->flatten->each],
+is_deeply c(1, 2, [3, 4], 5, c(6, 7))->flatten->to_array,
+  [1, 2, 3, 4, 5, 6, 7], 'right result';
+is_deeply c(undef, 1, [2, {}, [3, c(4, 5)]], undef, 6)->flatten->to_array,
   [undef, 1, 2, {}, 3, 4, 5, undef, 6], 'right result';
 
 # each
@@ -57,16 +57,18 @@ is c()->last, undef, 'no result';
 
 # grep
 $collection = c(1, 2, 3, 4, 5, 6, 7, 8, 9);
-is_deeply [$collection->grep(qr/[6-9]/)->each], [6, 7, 8, 9], 'right elements';
-is_deeply [$collection->grep(sub {/[6-9]/})->each], [6, 7, 8, 9],
+is_deeply $collection->grep(qr/[6-9]/)->to_array, [6, 7, 8, 9],
   'right elements';
-is_deeply [$collection->grep(sub { $_ > 5 })->each], [6, 7, 8, 9],
+is_deeply $collection->grep(sub {/[6-9]/})->to_array, [6, 7, 8, 9],
   'right elements';
-is_deeply [$collection->grep(sub { $_ < 5 })->each], [1, 2, 3, 4],
+is_deeply $collection->grep(sub { $_ > 5 })->to_array, [6, 7, 8, 9],
   'right elements';
-is_deeply [$collection->grep(sub { shift == 5 })->each], [5], 'right elements';
-is_deeply [$collection->grep(sub { $_ < 1 })->each], [], 'no elements';
-is_deeply [$collection->grep(sub { $_ > 9 })->each], [], 'no elements';
+is_deeply $collection->grep(sub { $_ < 5 })->to_array, [1, 2, 3, 4],
+  'right elements';
+is_deeply $collection->grep(sub { shift == 5 })->to_array, [5],
+  'right elements';
+is_deeply $collection->grep(sub { $_ < 1 })->to_array, [], 'no elements';
+is_deeply $collection->grep(sub { $_ > 9 })->to_array, [], 'no elements';
 
 # join
 $collection = c(1, 2, 3);
@@ -90,18 +92,18 @@ is $collection->map(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
 
 # reverse
 $collection = c(3, 2, 1);
-is_deeply [$collection->reverse->each], [1, 2, 3], 'right order';
+is_deeply $collection->reverse->to_array, [1, 2, 3], 'right order';
 $collection = c(3);
-is_deeply [$collection->reverse->each], [3], 'right order';
+is_deeply $collection->reverse->to_array, [3], 'right order';
 $collection = c();
-is_deeply [$collection->reverse->each], [], 'no elements';
+is_deeply $collection->reverse->to_array, [], 'no elements';
 
 # shuffle
 $collection = c(0 .. 10000);
 my $random = $collection->shuffle;
 is $collection->size, $random->size, 'same number of elements';
 isnt "@$collection", "@$random", 'different order';
-is_deeply [c()->shuffle->each], [], 'no elements';
+is_deeply c()->shuffle->to_array, [], 'no elements';
 
 # size
 $collection = c();
@@ -123,33 +125,33 @@ is c()->reduce(sub { $a + $b }), undef, 'no result';
 
 # sort
 $collection = c(2, 5, 4, 1);
-is_deeply [$collection->sort->each], [1, 2, 4, 5], 'right order';
-is_deeply [$collection->sort(sub { $b cmp $a })->each], [5, 4, 2, 1],
+is_deeply $collection->sort->to_array, [1, 2, 4, 5], 'right order';
+is_deeply $collection->sort(sub { $b cmp $a })->to_array, [5, 4, 2, 1],
   'right order';
-is_deeply [$collection->sort(sub { $_[1] cmp $_[0] })->each], [5, 4, 2, 1],
+is_deeply $collection->sort(sub { $_[1] cmp $_[0] })->to_array, [5, 4, 2, 1],
   'right order';
 $collection = c(qw(Test perl Mojo));
-is_deeply [$collection->sort(sub { uc(shift) cmp uc(shift) })->each],
+is_deeply $collection->sort(sub { uc(shift) cmp uc(shift) })->to_array,
   [qw(Mojo perl Test)], 'right order';
 $collection = c();
-is_deeply [$collection->sort->each], [], 'no elements';
-is_deeply [$collection->sort(sub { $a cmp $b })->each], [], 'no elements';
+is_deeply $collection->sort->to_array, [], 'no elements';
+is_deeply $collection->sort(sub { $a cmp $b })->to_array, [], 'no elements';
 
 # slice
 $collection = c(1, 2, 3, 4, 5, 6, 7, 10, 9, 8);
-is_deeply [$collection->slice(0)->each],  [1], 'right result';
-is_deeply [$collection->slice(1)->each],  [2], 'right result';
-is_deeply [$collection->slice(2)->each],  [3], 'right result';
-is_deeply [$collection->slice(-1)->each], [8], 'right result';
-is_deeply [$collection->slice(-3, -5)->each], [10, 6], 'right result';
-is_deeply [$collection->slice(1, 2, 3)->each], [2, 3, 4], 'right result';
-is_deeply [$collection->slice(6, 1, 4)->each], [7, 2, 5], 'right result';
-is_deeply [$collection->slice(6 .. 9)->each], [7, 10, 9, 8], 'right result';
+is_deeply $collection->slice(0)->to_array,  [1], 'right result';
+is_deeply $collection->slice(1)->to_array,  [2], 'right result';
+is_deeply $collection->slice(2)->to_array,  [3], 'right result';
+is_deeply $collection->slice(-1)->to_array, [8], 'right result';
+is_deeply $collection->slice(-3, -5)->to_array, [10, 6], 'right result';
+is_deeply $collection->slice(1, 2, 3)->to_array, [2, 3, 4], 'right result';
+is_deeply $collection->slice(6, 1, 4)->to_array, [7, 2, 5], 'right result';
+is_deeply $collection->slice(6 .. 9)->to_array, [7, 10, 9, 8], 'right result';
 
 # uniq
 $collection = c(1, 2, 3, 2, 3, 4, 5, 4);
-is_deeply [$collection->uniq->each], [1, 2, 3, 4, 5], 'right result';
-is_deeply [$collection->uniq->reverse->uniq->each], [5, 4, 3, 2, 1],
+is_deeply $collection->uniq->to_array, [1, 2, 3, 4, 5], 'right result';
+is_deeply $collection->uniq->reverse->uniq->to_array, [5, 4, 3, 2, 1],
   'right result';
 
 done_testing();

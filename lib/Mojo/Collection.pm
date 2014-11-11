@@ -118,6 +118,8 @@ sub sort {
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
+sub to_array { [@{shift()}] }
+
 sub uniq {
   my %seen;
   return $_[0]->new(grep { !$seen{$_}++ } @{$_[0]});
@@ -328,6 +330,12 @@ from the results.
   $collection = $collection->tap(sub {...});
 
 Alias for L<Mojo::Base/"tap">.
+
+=head2 to_array
+
+  my $array = $collection->to_array;
+
+Turn collection into array reference.
 
 =head2 uniq
 

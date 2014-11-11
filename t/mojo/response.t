@@ -1038,18 +1038,18 @@ is $res->version,     '1.1', 'right version';
 is $res->dom->at('p')->text,     'foo', 'right value';
 is $res->dom->at('p > a')->text, 'bar', 'right value';
 is $res->dom('p')->first->text, 'foo', 'right value';
-is_deeply [$res->dom('p > a')->map('text')->each], [qw(bar baz)],
+is_deeply $res->dom('p > a')->map('text')->to_array, [qw(bar baz)],
   'right values';
 my @text = $res->dom('a')->map(content => 'yada')->first->root->find('p > a')
   ->map('text')->each;
 is_deeply \@text, [qw(yada yada)], 'right values';
-is_deeply [$res->dom('p > a')->map('text')->each], [qw(yada yada)],
+is_deeply $res->dom('p > a')->map('text')->to_array, [qw(yada yada)],
   'right values';
 @text
   = $res->dom->find('a')->map(content => 'test')->first->root->find('p > a')
   ->map('text')->each;
 is_deeply \@text, [qw(test test)], 'right values';
-is_deeply [$res->dom->find('p > a')->map('text')->each], [qw(test test)],
+is_deeply $res->dom->find('p > a')->map('text')->to_array, [qw(test test)],
   'right values';
 
 # Build DOM from response with charset

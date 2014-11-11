@@ -112,10 +112,7 @@ sub _read {
   my $self = shift;
   my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
   return $self->_error unless defined $read;
-  if ($read == 0) {
-      $self->emit('eof');
-      return $self->close;
-  }
+  return $self->emit('eof')->close if $read == 0;
   $self->emit(read => $buffer)->_again;
 }
 

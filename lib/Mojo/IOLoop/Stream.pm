@@ -112,7 +112,10 @@ sub _read {
   my $self = shift;
   my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
   return $self->_error unless defined $read;
-  return $self->close if $read == 0;
+  if ($read == 0) {
+      $self->emit('eof');
+      return $self->close;
+  }
   $self->emit(read => $buffer)->_again;
 }
 
@@ -175,6 +178,15 @@ L<Mojo::IOLoop>.
 
 L<Mojo::IOLoop::Stream> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
+
+=head2 eof
+
+  $stream->on(eof => sub {
+    my $stream = shift;
+    ...
+  });
+
+Emitted once all data has been read.
 
 =head2 close
 

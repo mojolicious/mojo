@@ -1,4 +1,6 @@
 
+5.61  2014-11-12
+
 5.60  2014-11-11
   - Added to_array method to Mojo::Collection.
   - Added xss_escape function to Mojo::Util.

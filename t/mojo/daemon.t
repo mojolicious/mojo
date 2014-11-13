@@ -207,16 +207,12 @@ my %params;
 for my $i (1 .. 10) { $params{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %params) { $result .= $params{$key} }
-my ($code, $body);
-my $port = $ua->server->url->port;
-$tx = $ua->post("http://127.0.0.1:$port/chunked" => form => \%params);
+$tx = $ua->post('/chunked' => form => \%params);
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 
 # Upload
-($code, $body) = ();
-$tx = $ua->post(
-  "http://127.0.0.1:$port/upload" => form => {file => {content => $result}});
+$tx = $ua->post('/upload' => form => {file => {content => $result}});
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 ok $tx->local_address, 'has local address';
@@ -233,7 +229,7 @@ ok $remote_port > 0, 'has remote port';
 my $daemon
   = Mojo::Server::Daemon->new(listen => ['http://127.0.0.1'], silent => 1);
 $daemon->start;
-$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
+my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
 is $daemon->app->moniker, 'HelloWorld', 'right moniker';
 my $buffer = '';
 my $id;

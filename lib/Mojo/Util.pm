@@ -36,7 +36,7 @@ my $NAME = eval 'use Sub::Util; 1' ? \&Sub::Util::set_subname : sub { $_[1] };
 # perl -pi -e 'undef $_ if $d; $d=1 if /^__DATA__/;' lib/Mojo/Util.pm
 # perl examples/entities.pl >> lib/Mojo/Util.pm
 my %ENTITIES;
-for my $line (<DATA>) {
+while (my $line = <DATA>) {
   next unless $line =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
   $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
 }

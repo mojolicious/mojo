@@ -7,8 +7,6 @@ use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use Exporter 'import';
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Symbol 'delete_package';

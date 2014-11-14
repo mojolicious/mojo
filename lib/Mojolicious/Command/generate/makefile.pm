@@ -9,21 +9,6 @@ has usage => sub { shift->extract_usage };
 sub run { shift->render_to_rel_file('makefile', 'Makefile.PL') }
 
 1;
-__DATA__
-
-@@ makefile
-use strict;
-use warnings;
-
-use ExtUtils::MakeMaker;
-
-WriteMakefile(
-  VERSION   => '0.01',
-  PREREQ_PM => {'Mojolicious' => '<%= $Mojolicious::VERSION %>'},
-  test      => {TESTS => 't/*.t'}
-);
-
-__END__
 
 =encoding utf8
 
@@ -81,3 +66,17 @@ Run this command.
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut
+
+__DATA__
+
+@@ makefile
+use strict;
+use warnings;
+
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+  VERSION   => '0.01',
+  PREREQ_PM => {'Mojolicious' => '<%= $Mojolicious::VERSION %>'},
+  test      => {TESTS => 't/*.t'}
+);

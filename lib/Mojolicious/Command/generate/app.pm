@@ -47,6 +47,64 @@ EOF
 }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Command::generate::app - App generator command
+
+=head1 SYNOPSIS
+
+  Usage: APPLICATION generate app [NAME]
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Command::generate::app> generates application directory
+structures for fully functional L<Mojolicious> applications.
+
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
+
+=head1 ATTRIBUTES
+
+L<Mojolicious::Command::generate::app> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
+
+=head2 description
+
+  my $description = $app->description;
+  $app            = $app->description('Foo!');
+
+Short description of this command, used for the command list.
+
+=head2 usage
+
+  my $usage = $app->usage;
+  $app      = $app->usage('Foo!');
+
+Usage information for this command, used for the help screen.
+
+=head1 METHODS
+
+L<Mojolicious::Command::generate::app> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
+
+=head2 run
+
+  $app->run(@ARGV);
+
+Run this command.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=cut
+
 __DATA__
 
 @@ mojo
@@ -139,62 +197,3 @@ This page was generated from the template "templates/example/welcome.html.ep"
 and the layout "templates/layouts/default.html.ep",
 <a href="<%%== url_for %>">click here</a> to reload the page or
 <a href="/index.html">here</a> to move forward to a static page.
-
-__END__
-
-=encoding utf8
-
-=head1 NAME
-
-Mojolicious::Command::generate::app - App generator command
-
-=head1 SYNOPSIS
-
-  Usage: APPLICATION generate app [NAME]
-
-=head1 DESCRIPTION
-
-L<Mojolicious::Command::generate::app> generates application directory
-structures for fully functional L<Mojolicious> applications.
-
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
-
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
-
-=head1 ATTRIBUTES
-
-L<Mojolicious::Command::generate::app> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
-
-=head2 description
-
-  my $description = $app->description;
-  $app            = $app->description('Foo!');
-
-Short description of this command, used for the command list.
-
-=head2 usage
-
-  my $usage = $app->usage;
-  $app      = $app->usage('Foo!');
-
-Usage information for this command, used for the help screen.
-
-=head1 METHODS
-
-L<Mojolicious::Command::generate::app> inherits all methods from
-L<Mojolicious::Command> and implements the following new ones.
-
-=head2 run
-
-  $app->run(@ARGV);
-
-Run this command.
-
-=head1 SEE ALSO
-
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
-
-=cut

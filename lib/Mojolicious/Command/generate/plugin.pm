@@ -26,6 +26,64 @@ sub run {
 }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Command::generate::plugin - Plugin generator command
+
+=head1 SYNOPSIS
+
+  Usage: APPLICATION generate plugin [NAME]
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Command::generate::plugin> generates directory structures for
+fully functional L<Mojolicious> plugins.
+
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
+
+=head1 ATTRIBUTES
+
+L<Mojolicious::Command::generate::plugin> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
+
+=head2 description
+
+  my $description = $plugin->description;
+  $plugin         = $plugin->description('Foo!');
+
+Short description of this command, used for the command list.
+
+=head2 usage
+
+  my $usage = $plugin->usage;
+  $plugin   = $plugin->usage('Foo!');
+
+Usage information for this command, used for the help screen.
+
+=head1 METHODS
+
+L<Mojolicious::Command::generate::plugin> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
+
+=head2 run
+
+  $plugin->run(@ARGV);
+
+Run this command.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=cut
+
 __DATA__
 
 @@ class
@@ -111,62 +169,3 @@ WriteMakefile(
   PREREQ_PM    => {'Mojolicious' => '<%= $Mojolicious::VERSION %>'},
   test         => {TESTS => 't/*.t'}
 );
-
-__END__
-
-=encoding utf8
-
-=head1 NAME
-
-Mojolicious::Command::generate::plugin - Plugin generator command
-
-=head1 SYNOPSIS
-
-  Usage: APPLICATION generate plugin [NAME]
-
-=head1 DESCRIPTION
-
-L<Mojolicious::Command::generate::plugin> generates directory structures for
-fully functional L<Mojolicious> plugins.
-
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
-
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
-
-=head1 ATTRIBUTES
-
-L<Mojolicious::Command::generate::plugin> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
-
-=head2 description
-
-  my $description = $plugin->description;
-  $plugin         = $plugin->description('Foo!');
-
-Short description of this command, used for the command list.
-
-=head2 usage
-
-  my $usage = $plugin->usage;
-  $plugin   = $plugin->usage('Foo!');
-
-Usage information for this command, used for the help screen.
-
-=head1 METHODS
-
-L<Mojolicious::Command::generate::plugin> inherits all methods from
-L<Mojolicious::Command> and implements the following new ones.
-
-=head2 run
-
-  $plugin->run(@ARGV);
-
-Run this command.
-
-=head1 SEE ALSO
-
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
-
-=cut

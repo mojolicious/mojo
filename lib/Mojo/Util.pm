@@ -428,6 +428,312 @@ sub _teardown {
 }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mojo::Util - Portable utility functions
+
+=head1 SYNOPSIS
+
+  use Mojo::Util qw(b64_encode url_escape url_unescape);
+
+  my $str = 'test=23';
+  my $escaped = url_escape $str;
+  say url_unescape $escaped;
+  say b64_encode $escaped, '';
+
+=head1 DESCRIPTION
+
+L<Mojo::Util> provides portable utility functions for L<Mojo>.
+
+=head1 FUNCTIONS
+
+L<Mojo::Util> implements the following functions, which can be imported
+individually.
+
+=head2 b64_decode
+
+  my $bytes = b64_decode $b64;
+
+Base64 decode bytes.
+
+=head2 b64_encode
+
+  my $b64 = b64_encode $bytes;
+  my $b64 = b64_encode $bytes, "\n";
+
+Base64 encode bytes, the line ending defaults to a newline.
+
+=head2 camelize
+
+  my $camelcase = camelize $snakecase;
+
+Convert snake_case string to CamelCase and replace C<-> with C<::>.
+
+  # "FooBar"
+  camelize 'foo_bar';
+
+  # "FooBar::Baz"
+  camelize 'foo_bar-baz';
+
+  # "FooBar::Baz"
+  camelize 'FooBar::Baz';
+
+=head2 class_to_file
+
+  my $file = class_to_file 'Foo::Bar';
+
+Convert a class name to a file.
+
+  # "foo_bar"
+  class_to_file 'Foo::Bar';
+
+  # "foobar"
+  class_to_file 'FOO::Bar';
+
+  # "foo_bar"
+  class_to_file 'FooBar';
+
+  # "foobar"
+  class_to_file 'FOOBar';
+
+=head2 class_to_path
+
+  my $path = class_to_path 'Foo::Bar';
+
+Convert class name to path.
+
+  # "Foo/Bar.pm"
+  class_to_path 'Foo::Bar';
+
+  # "FooBar.pm"
+  class_to_path 'FooBar';
+
+=head2 decamelize
+
+  my $snakecase = decamelize $camelcase;
+
+Convert CamelCase string to snake_case and replace C<::> with C<->.
+
+  # "foo_bar"
+  decamelize 'FooBar';
+
+  # "foo_bar-baz"
+  decamelize 'FooBar::Baz';
+
+  # "foo_bar-baz"
+  decamelize 'foo_bar-baz';
+
+=head2 decode
+
+  my $chars = decode 'UTF-8', $bytes;
+
+Decode bytes to characters and return C<undef> if decoding failed.
+
+=head2 deprecated
+
+  deprecated 'foo is DEPRECATED in favor of bar';
+
+Warn about deprecated feature from perspective of caller. You can also set the
+C<MOJO_FATAL_DEPRECATIONS> environment variable to make them die instead.
+
+=head2 dumper
+
+  my $perl = dumper {some => 'data'};
+
+Dump a Perl data structure with L<Data::Dumper>.
+
+=head2 encode
+
+  my $bytes = encode 'UTF-8', $chars;
+
+Encode characters to bytes.
+
+=head2 hmac_sha1_sum
+
+  my $checksum = hmac_sha1_sum $bytes, 'passw0rd';
+
+Generate HMAC-SHA1 checksum for bytes.
+
+=head2 html_unescape
+
+  my $str = html_unescape $escaped;
+
+Unescape all HTML entities in string.
+
+=head2 md5_bytes
+
+  my $checksum = md5_bytes $bytes;
+
+Generate binary MD5 checksum for bytes.
+
+=head2 md5_sum
+
+  my $checksum = md5_sum $bytes;
+
+Generate MD5 checksum for bytes.
+
+=head2 monkey_patch
+
+  monkey_patch $package, foo => sub {...};
+  monkey_patch $package, foo => sub {...}, bar => sub {...};
+
+Monkey patch functions into package.
+
+  monkey_patch 'MyApp',
+    one   => sub { say 'One!' },
+    two   => sub { say 'Two!' },
+    three => sub { say 'Three!' };
+
+=head2 punycode_decode
+
+  my $str = punycode_decode $punycode;
+
+Punycode decode string as described in
+L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
+
+=head2 punycode_encode
+
+  my $punycode = punycode_encode $str;
+
+Punycode encode string as described in
+L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
+
+=head2 quote
+
+  my $quoted = quote $str;
+
+Quote string.
+
+=head2 secure_compare
+
+  my $bool = secure_compare $str1, $str2;
+
+Constant time comparison algorithm to prevent timing attacks.
+
+=head2 sha1_bytes
+
+  my $checksum = sha1_bytes $bytes;
+
+Generate binary SHA1 checksum for bytes.
+
+=head2 sha1_sum
+
+  my $checksum = sha1_sum $bytes;
+
+Generate SHA1 checksum for bytes.
+
+=head2 slurp
+
+  my $bytes = slurp '/etc/passwd';
+
+Read all data at once from file.
+
+=head2 split_header
+
+   my $tree = split_header 'foo="bar baz"; test=123, yada';
+
+Split HTTP header value.
+
+  # "one"
+  split_header('one; two="three four", five=six')->[0][0];
+
+  # "three four"
+  split_header('one; two="three four", five=six')->[0][3];
+
+  # "five"
+  split_header('one; two="three four", five=six')->[1][0];
+
+=head2 spurt
+
+  $bytes = spurt $bytes, '/etc/passwd';
+
+Write all data at once to file.
+
+=head2 squish
+
+  my $squished = squish $str;
+
+Trim whitespace characters from both ends of string and then change all
+consecutive groups of whitespace into one space each.
+
+=head2 steady_time
+
+  my $time = steady_time;
+
+High resolution time elapsed from an arbitrary fixed point in the past,
+resilient to time jumps if a monotonic clock is available through
+L<Time::HiRes>.
+
+=head2 tablify
+
+  my $table = tablify [['foo', 'bar'], ['baz', 'yada']];
+
+Row-oriented generator for text tables.
+
+  # "foo   bar\nyada  yada\nbaz   yada\n"
+  tablify [['foo', 'bar'], ['yada', 'yada'], ['baz', 'yada']];
+
+=head2 trim
+
+  my $trimmed = trim $str;
+
+Trim whitespace characters from both ends of string.
+
+=head2 unindent
+
+  my $unindented = unindent $str;
+
+Unindent multiline string.
+
+=head2 unquote
+
+  my $str = unquote $quoted;
+
+Unquote string.
+
+=head2 url_escape
+
+  my $escaped = url_escape $str;
+  my $escaped = url_escape $str, '^A-Za-z0-9\-._~';
+
+Percent encode unsafe characters in string as described in
+L<RFC 3986|http://tools.ietf.org/html/rfc3986>, the pattern used defaults to
+C<^A-Za-z0-9\-._~>.
+
+=head2 url_unescape
+
+  my $str = url_unescape $escaped;
+
+Decode percent encoded characters in string as described in
+L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
+
+=head2 xml_escape
+
+  my $escaped = xml_escape $str;
+
+Escape unsafe characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string.
+
+=head2 xor_encode
+
+  my $encoded = xor_encode $str, $key;
+
+XOR encode string with variable length key.
+
+=head2 xss_escape
+
+  my $escaped = xss_escape $str;
+
+Same as L</"xml_escape">, but does not escape L<Mojo::ByteStream> objects.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=cut
+
 __DATA__
 Aacute; U+000C1
 Aacute U+000C1
@@ -2660,309 +2966,3 @@ Zscr; U+1D4B5
 zscr; U+1D4CF
 zwj; U+0200D
 zwnj; U+0200C
-__END__
-
-=encoding utf8
-
-=head1 NAME
-
-Mojo::Util - Portable utility functions
-
-=head1 SYNOPSIS
-
-  use Mojo::Util qw(b64_encode url_escape url_unescape);
-
-  my $str = 'test=23';
-  my $escaped = url_escape $str;
-  say url_unescape $escaped;
-  say b64_encode $escaped, '';
-
-=head1 DESCRIPTION
-
-L<Mojo::Util> provides portable utility functions for L<Mojo>.
-
-=head1 FUNCTIONS
-
-L<Mojo::Util> implements the following functions, which can be imported
-individually.
-
-=head2 b64_decode
-
-  my $bytes = b64_decode $b64;
-
-Base64 decode bytes.
-
-=head2 b64_encode
-
-  my $b64 = b64_encode $bytes;
-  my $b64 = b64_encode $bytes, "\n";
-
-Base64 encode bytes, the line ending defaults to a newline.
-
-=head2 camelize
-
-  my $camelcase = camelize $snakecase;
-
-Convert snake_case string to CamelCase and replace C<-> with C<::>.
-
-  # "FooBar"
-  camelize 'foo_bar';
-
-  # "FooBar::Baz"
-  camelize 'foo_bar-baz';
-
-  # "FooBar::Baz"
-  camelize 'FooBar::Baz';
-
-=head2 class_to_file
-
-  my $file = class_to_file 'Foo::Bar';
-
-Convert a class name to a file.
-
-  # "foo_bar"
-  class_to_file 'Foo::Bar';
-
-  # "foobar"
-  class_to_file 'FOO::Bar';
-
-  # "foo_bar"
-  class_to_file 'FooBar';
-
-  # "foobar"
-  class_to_file 'FOOBar';
-
-=head2 class_to_path
-
-  my $path = class_to_path 'Foo::Bar';
-
-Convert class name to path.
-
-  # "Foo/Bar.pm"
-  class_to_path 'Foo::Bar';
-
-  # "FooBar.pm"
-  class_to_path 'FooBar';
-
-=head2 decamelize
-
-  my $snakecase = decamelize $camelcase;
-
-Convert CamelCase string to snake_case and replace C<::> with C<->.
-
-  # "foo_bar"
-  decamelize 'FooBar';
-
-  # "foo_bar-baz"
-  decamelize 'FooBar::Baz';
-
-  # "foo_bar-baz"
-  decamelize 'foo_bar-baz';
-
-=head2 decode
-
-  my $chars = decode 'UTF-8', $bytes;
-
-Decode bytes to characters and return C<undef> if decoding failed.
-
-=head2 deprecated
-
-  deprecated 'foo is DEPRECATED in favor of bar';
-
-Warn about deprecated feature from perspective of caller. You can also set the
-C<MOJO_FATAL_DEPRECATIONS> environment variable to make them die instead.
-
-=head2 dumper
-
-  my $perl = dumper {some => 'data'};
-
-Dump a Perl data structure with L<Data::Dumper>.
-
-=head2 encode
-
-  my $bytes = encode 'UTF-8', $chars;
-
-Encode characters to bytes.
-
-=head2 hmac_sha1_sum
-
-  my $checksum = hmac_sha1_sum $bytes, 'passw0rd';
-
-Generate HMAC-SHA1 checksum for bytes.
-
-=head2 html_unescape
-
-  my $str = html_unescape $escaped;
-
-Unescape all HTML entities in string.
-
-=head2 md5_bytes
-
-  my $checksum = md5_bytes $bytes;
-
-Generate binary MD5 checksum for bytes.
-
-=head2 md5_sum
-
-  my $checksum = md5_sum $bytes;
-
-Generate MD5 checksum for bytes.
-
-=head2 monkey_patch
-
-  monkey_patch $package, foo => sub {...};
-  monkey_patch $package, foo => sub {...}, bar => sub {...};
-
-Monkey patch functions into package.
-
-  monkey_patch 'MyApp',
-    one   => sub { say 'One!' },
-    two   => sub { say 'Two!' },
-    three => sub { say 'Three!' };
-
-=head2 punycode_decode
-
-  my $str = punycode_decode $punycode;
-
-Punycode decode string as described in
-L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
-
-=head2 punycode_encode
-
-  my $punycode = punycode_encode $str;
-
-Punycode encode string as described in
-L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
-
-=head2 quote
-
-  my $quoted = quote $str;
-
-Quote string.
-
-=head2 secure_compare
-
-  my $bool = secure_compare $str1, $str2;
-
-Constant time comparison algorithm to prevent timing attacks.
-
-=head2 sha1_bytes
-
-  my $checksum = sha1_bytes $bytes;
-
-Generate binary SHA1 checksum for bytes.
-
-=head2 sha1_sum
-
-  my $checksum = sha1_sum $bytes;
-
-Generate SHA1 checksum for bytes.
-
-=head2 slurp
-
-  my $bytes = slurp '/etc/passwd';
-
-Read all data at once from file.
-
-=head2 split_header
-
-   my $tree = split_header 'foo="bar baz"; test=123, yada';
-
-Split HTTP header value.
-
-  # "one"
-  split_header('one; two="three four", five=six')->[0][0];
-
-  # "three four"
-  split_header('one; two="three four", five=six')->[0][3];
-
-  # "five"
-  split_header('one; two="three four", five=six')->[1][0];
-
-=head2 spurt
-
-  $bytes = spurt $bytes, '/etc/passwd';
-
-Write all data at once to file.
-
-=head2 squish
-
-  my $squished = squish $str;
-
-Trim whitespace characters from both ends of string and then change all
-consecutive groups of whitespace into one space each.
-
-=head2 steady_time
-
-  my $time = steady_time;
-
-High resolution time elapsed from an arbitrary fixed point in the past,
-resilient to time jumps if a monotonic clock is available through
-L<Time::HiRes>.
-
-=head2 tablify
-
-  my $table = tablify [['foo', 'bar'], ['baz', 'yada']];
-
-Row-oriented generator for text tables.
-
-  # "foo   bar\nyada  yada\nbaz   yada\n"
-  tablify [['foo', 'bar'], ['yada', 'yada'], ['baz', 'yada']];
-
-=head2 trim
-
-  my $trimmed = trim $str;
-
-Trim whitespace characters from both ends of string.
-
-=head2 unindent
-
-  my $unindented = unindent $str;
-
-Unindent multiline string.
-
-=head2 unquote
-
-  my $str = unquote $quoted;
-
-Unquote string.
-
-=head2 url_escape
-
-  my $escaped = url_escape $str;
-  my $escaped = url_escape $str, '^A-Za-z0-9\-._~';
-
-Percent encode unsafe characters in string as described in
-L<RFC 3986|http://tools.ietf.org/html/rfc3986>, the pattern used defaults to
-C<^A-Za-z0-9\-._~>.
-
-=head2 url_unescape
-
-  my $str = url_unescape $escaped;
-
-Decode percent encoded characters in string as described in
-L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
-
-=head2 xml_escape
-
-  my $escaped = xml_escape $str;
-
-Escape unsafe characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string.
-
-=head2 xor_encode
-
-  my $encoded = xor_encode $str, $key;
-
-XOR encode string with variable length key.
-
-=head2 xss_escape
-
-  my $escaped = xss_escape $str;
-
-Same as L</"xml_escape">, but does not escape L<Mojo::ByteStream> objects.
-
-=head1 SEE ALSO
-
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
-
-=cut

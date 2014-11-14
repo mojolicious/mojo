@@ -9,7 +9,7 @@ perl:
 env:
   - "HARNESS_OPTIONS=j9 TEST_EV=1 TEST_IPV6=1 TEST_POD=1 TEST_SOCKS=1 TEST_TLS=1"
 install:
-  - "cpanm EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Pod Test::Pod::Coverage"
+  - "cpanm EV IO::Socket::Socks IO::Socket::SSL Test::Pod Test::Pod::Coverage"
   - "cpanm --installdeps ."
 notifications:
   email: false

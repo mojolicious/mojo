@@ -1,4 +1,6 @@
 
+5.62  2014-11-15
+
 5.61  2014-11-14
   - Moved entities.txt into the DATA section of Mojo::Util to avoid
     gratuitously breaking module bundlers.

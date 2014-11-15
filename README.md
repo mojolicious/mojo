@@ -34,7 +34,7 @@
 
   All you need is a one-liner, it takes less than a minute.
 
-    $ curl -L cpanmin.us | perl - -n Mojolicious
+    $ curl -L https://cpanmin.us | perl - -n Mojolicious
 
   And if you already have `cpanm` installed with a secure toolchain.
 

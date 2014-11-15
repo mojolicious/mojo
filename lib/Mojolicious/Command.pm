@@ -130,7 +130,7 @@ L<Mojolicious::Command> implements the following attributes.
 =head2 app
 
   my $app  = $command->app;
-  $command = $command->app(MyApp->new);
+  $command = $command->app(Mojolicious->new);
 
 Application for command, defaults to a L<Mojo::HelloWorld> object.
 

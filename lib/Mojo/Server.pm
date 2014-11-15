@@ -184,7 +184,7 @@ the following new ones.
 
 =head2 build_app
 
-  my $app = $server->build_app('Mojo::HelloWorld');
+  my $app = $server->build_app('MyApp');
 
 Build application from class.
 

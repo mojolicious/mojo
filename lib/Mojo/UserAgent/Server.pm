@@ -95,9 +95,9 @@ implements the following new ones.
 =head2 app
 
   my $app = Mojo::UserAgent::Server->app;
-            Mojo::UserAgent::Server->app(MyApp->new);
+            Mojo::UserAgent::Server->app(Mojolicious->new);
   my $app = $server->app;
-  $server = $server->app(MyApp->new);
+  $server = $server->app(Mojolicious->new);
 
 Application this server handles, instance specific applications override the
 global default.

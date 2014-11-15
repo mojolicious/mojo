@@ -420,9 +420,8 @@ Test::Mojo - Testing Mojo!
 
 =head1 DESCRIPTION
 
-L<Test::Mojo> is a collection of testing helpers for everyone developing
-L<Mojo> and L<Mojolicious> applications, it is usually used together with
-L<Test::More>.
+L<Test::Mojo> is a test user agent based on L<Mojo::UserAgent>, it is usually
+used together with L<Test::More> to test L<Mojolicious> applications.
 
 =head1 ATTRIBUTES
 
@@ -511,7 +510,7 @@ following new ones.
 =head2 app
 
   my $app = $t->app;
-  $t      = $t->app(MyApp->new);
+  $t      = $t->app(Mojolicious->new);
 
 Access application with L<Mojo::UserAgent::Server/"app">.
 

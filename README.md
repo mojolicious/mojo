@@ -34,11 +34,7 @@
 
   All you need is a one-liner, it takes less than a minute.
 
-    $ curl -L https://cpanmin.us | perl - -n Mojolicious
-
-  And if you already have `cpanm` installed with a secure toolchain.
-
-    $ cpanm --mirror https://cpan.metacpan.org --mirror-only -n Mojolicious
+    $ curl -L https://cpanmin.us | perl - --mirror https://cpan.metacpan.org --mirror-only -n Mojolicious
 
   We recommend the use of a [Perlbrew](http://perlbrew.pl) environment.
 

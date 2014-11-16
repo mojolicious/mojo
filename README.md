@@ -34,7 +34,7 @@
 
   All you need is a one-liner, it takes less than a minute.
 
-    $ curl -L https://cpanmin.us | perl - --mirror https://cpan.metacpan.org --mirror-only -n Mojolicious
+    $ curl -L https://cpanmin.us | perl - -M https://cpan.metacpan.org -n Mojolicious
 
   We recommend the use of a [Perlbrew](http://perlbrew.pl) environment.
 

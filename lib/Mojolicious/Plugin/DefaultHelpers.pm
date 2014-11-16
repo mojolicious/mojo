@@ -437,7 +437,7 @@ Alias for L<Mojolicious::Controller/"stash">.
   % title 'Welcome!';
   % title 'Welcome!', foo => 'bar';
 
-Get of set C<title> stash value, all additional pairs get merged into the
+Get or set C<title> stash value, all additional pairs get merged into the
 L</"stash">.
 
 =head2 ua

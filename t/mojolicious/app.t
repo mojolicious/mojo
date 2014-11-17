@@ -106,7 +106,6 @@ ok $t->app->routes->is_hidden('every_param'),         'is hidden';
 ok $t->app->routes->is_hidden('every_signed_cookie'), 'is hidden';
 ok $t->app->routes->is_hidden('finish'),              'is hidden';
 ok $t->app->routes->is_hidden('flash'),               'is hidden';
-ok $t->app->routes->is_hidden('handler'),             'is hidden';
 ok $t->app->routes->is_hidden('has'),                 'is hidden';
 ok $t->app->routes->is_hidden('helpers'),             'is hidden';
 ok $t->app->routes->is_hidden('match'),               'is hidden';

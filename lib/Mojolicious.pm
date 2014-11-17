@@ -157,13 +157,13 @@ sub new {
   # Default to controller and application namespace
   my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
 
-  # Hide controller attributes/methods and "handler"
+  # Hide controller attributes/methods
   $r->hide(qw(app continue cookie every_cookie every_param));
-  $r->hide(qw(every_signed_cookie finish flash handler helpers match on));
-  $r->hide(qw(param redirect_to render render_exception render_later));
-  $r->hide(qw(render_maybe render_not_found render_to_string rendered req));
-  $r->hide(qw(res respond_to send session signed_cookie stash tx url_for));
-  $r->hide(qw(validation write write_chunk));
+  $r->hide(qw(every_signed_cookie finish flash helpers match on param));
+  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
+  $r->hide(qw(render_not_found render_to_string rendered req res respond_to));
+  $r->hide(qw(send session signed_cookie stash tx url_for validation write));
+  $r->hide(qw(write_chunk));
 
   # DEPRECATED in Tiger Face!
   $r->hide('render_static');

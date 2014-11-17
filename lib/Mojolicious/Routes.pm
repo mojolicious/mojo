@@ -167,7 +167,7 @@ sub _controller {
   my $class = ref $new;
   my $app   = $old->app;
   my $log   = $app->log;
-  if (my $sub = $new->can('handler')) {
+  if ($new->isa('Mojo')) {
     $log->debug(qq{Routing to application "$class".});
 
     # Try to connect routes
@@ -175,7 +175,7 @@ sub _controller {
       my $r = $new->$sub;
       weaken $r->parent($old->match->endpoint)->{parent} unless $r->parent;
     }
-    $new->$sub($old);
+    $new->handler($old);
     $old->stash->{'mojo.routed'}++;
   }
 

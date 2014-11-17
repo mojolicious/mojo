@@ -16,9 +16,6 @@ sub startup {
   push @{$self->renderer->classes}, 'SingleFileTestApp::Foo';
   push @{$self->static->classes},   'SingleFileTestApp::Foo';
 
-  # Allow redispatching controller
-  push @{$self->routes->base_classes}, 'Mojo::Base';
-
   # Helper route
   $self->routes->route('/helper')->to(
     cb => sub {
@@ -32,7 +29,7 @@ sub startup {
 }
 
 package SingleFileTestApp::Redispatch;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo';
 
 sub handler {
   my ($self, $c) = @_;

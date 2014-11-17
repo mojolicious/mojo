@@ -1,7 +1,8 @@
 
-5.62  2014-11-17
+5.62  2014-11-18
   - Fixed bug in Mojolicious::Routes::Pattern where optional placeholders in
     nested routes would sometimes not work correctly.
+  - Fixed bug where "handler" was not an allowed name for controller methods.
 
 5.61  2014-11-14
   - Moved entities.txt into the DATA section of Mojo::Util to avoid

@@ -38,6 +38,12 @@ $r->route('/alternatives4/:foo', foo => [qw(foo foo.bar)]);
 # /optional/*/*
 $r->route('/optional/:foo/:bar')->to(bar => 'test');
 
+# /optional2
+# /optional2/*
+# /optional2/*/*
+$r->route('/optional2/:foo')->to(foo => 'one')->route('/:bar')
+  ->to(bar => 'two');
+
 # /*/test
 my $test = $r->route('/:controller/test')->to(action => 'test');
 
@@ -371,6 +377,20 @@ is $m->path_for(format => 'txt')->{path}, '/optional/23/24.txt', 'right path';
 is $m->path_for('optionalfoobar')->{path}, '/optional/23/24', 'right path';
 is $m->path_for('optionalfoobar', foo => 0)->{path}, '/optional/0/24',
   'right path';
+
+# Optional placeholders in nested routes
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/optional2'});
+is_deeply $m->stack, [{foo => 'one', bar => 'two'}], 'right structure';
+is $m->path_for->{path}, '/optional2', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/optional2/three'});
+is_deeply $m->stack, [{foo => 'three', bar => 'two'}], 'right structure';
+is $m->path_for->{path}, '/optional2/three', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/optional2/three/four'});
+is_deeply $m->stack, [{foo => 'three', bar => 'four'}], 'right structure';
+is $m->path_for->{path}, '/optional2/three/four', 'right path';
 
 # Real world example using most features at once
 $m = Mojolicious::Routes::Match->new(root => $r);

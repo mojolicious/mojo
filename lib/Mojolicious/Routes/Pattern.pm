@@ -204,7 +204,7 @@ sub _tokenize {
     # Placeholder, relaxed or wildcard
     elsif ($inside) { $tree[-1][-1] .= $char }
 
-    # Text (optimize slash-text and *-text-slash-text)
+    # Text (optimize slash+text and *+text+slash+text)
     elsif ($tree[-1][0] eq 'text') { $tree[-1][-1] .= $char }
     elsif (!$tree[-2] && $tree[-1][0] eq 'slash') {
       @tree = (['text', "/$char"]);

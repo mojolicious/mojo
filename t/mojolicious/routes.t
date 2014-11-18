@@ -384,12 +384,22 @@ $m->match($c => {method => 'GET', path => '/optional2'});
 is_deeply $m->stack, [{foo => 'one', bar => 'two'}], 'right structure';
 is $m->path_for->{path}, '/optional2', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/optional2.txt'});
+is_deeply $m->stack, [{foo => 'one', bar => 'two', format => 'txt'}],
+  'right structure';
+is $m->path_for->{path}, '/optional2', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/optional2/three'});
 is_deeply $m->stack, [{foo => 'three', bar => 'two'}], 'right structure';
 is $m->path_for->{path}, '/optional2/three', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/optional2/three/four'});
 is_deeply $m->stack, [{foo => 'three', bar => 'four'}], 'right structure';
+is $m->path_for->{path}, '/optional2/three/four', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/optional2/three/four.txt'});
+is_deeply $m->stack, [{foo => 'three', bar => 'four', format => 'txt'}],
+  'right structure';
 is $m->path_for->{path}, '/optional2/three/four', 'right path';
 
 # Real world example using most features at once

@@ -1,4 +1,6 @@
 
+5.63  2014-11-19
+
 5.62  2014-11-18
   - Fixed bug in Mojolicious::Routes::Pattern where optional placeholders in
     nested routes would sometimes not work correctly.

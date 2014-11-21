@@ -214,9 +214,8 @@ get '/too_long' => sub {
   my $c = shift;
   $c->res->code(200);
   $c->res->headers->content_type('text/plain');
-  $c->res->headers->content_length(12);
-  $c->write('how');
-  Mojo::IOLoop->timer(5 => sub { $c->write('dy plain!') });
+  $c->res->headers->content_length(17);
+  $c->write('Waiting forever!');
 };
 
 my $steps;
@@ -424,33 +423,14 @@ ok !$stash->{writing}, 'finish event timing is right';
 ok $stash->{destroyed}, 'controller has been destroyed';
 
 # Request timeout
-$tx = $t->ua->request_timeout(0.5)->build_tx(GET => '/too_long');
-$buffer = '';
-$tx->res->content->unsubscribe('read')->on(
-  read => sub {
-    my ($content, $chunk) = @_;
-    $buffer .= $chunk;
-  }
-);
-$t->ua->start($tx);
-is $tx->res->code, 200, 'right status';
+$tx = $t->ua->request_timeout(0.5)->get('/too_long');
 is $tx->error->{message}, 'Request timeout', 'right error';
-is $buffer, 'how', 'right content';
 $t->ua->request_timeout(0);
 
 # Inactivity timeout
-$tx = $t->ua->inactivity_timeout(0.5)->build_tx(GET => '/too_long');
-$buffer = '';
-$tx->res->content->unsubscribe('read')->on(
-  read => sub {
-    my ($content, $chunk) = @_;
-    $buffer .= $chunk;
-  }
-);
-$t->ua->start($tx);
-is $tx->res->code, 200, 'right status';
+$tx = $t->ua->inactivity_timeout(0.5)->get('/too_long');
 is $tx->error->{message}, 'Inactivity timeout', 'right error';
-is $buffer, 'how', 'right content';
+$t->ua->inactivity_timeout(20);
 
 # Transaction is available after rendering early in steps
 $t->get_ok('/steps')->status_is(200)->content_is('second');

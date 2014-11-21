@@ -1,8 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Spec::Functions 'catdir';
-use FindBin;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Transaction::WebSocket;
@@ -203,9 +201,8 @@ is_deeply $tx->req->every_param('a'), [1, 2, 3], 'right values';
 is_deeply [$tx->req->param('b')], [4], 'right values';
 
 # Multipart form with real file and custom header
-my $path = catdir $FindBin::Bin, 'transactor.t';
 $tx = $t->tx(POST => 'http://example.com/foo' => form =>
-    {mytext => {file => $path, DNT => 1}});
+    {mytext => {file => __FILE__, DNT => 1}});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -224,7 +221,7 @@ is $tx->req->content->parts->[1], undef, 'no more parts';
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/mojo-form'} => form =>
-    {mytext => {file => Mojo::Asset::File->new(path => $path)}});
+    {mytext => {file => Mojo::Asset::File->new(path => __FILE__)}});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/mojo-form',

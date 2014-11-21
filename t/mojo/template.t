@@ -16,8 +16,9 @@ package main;
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Spec::Functions qw(catfile splitdir);
-use FindBin;
+use Cwd 'abs_path';
+use File::Basename 'dirname';
+use File::Spec::Functions 'catfile';
 use Mojo::Template;
 
 # Capture helper
@@ -1066,13 +1067,13 @@ EOF
 
 # File
 $mt = Mojo::Template->new;
-my $file = catfile(splitdir($FindBin::Bin), qw(templates test.mt));
+my $file = abs_path catfile(dirname(__FILE__), 'templates', 'test.mt');
 $output = $mt->render_file($file, 3);
 like $output, qr/23\nHello World!/, 'file';
 
 # Exception in file
 $mt     = Mojo::Template->new;
-$file   = catfile(splitdir($FindBin::Bin), qw(templates exception.mt));
+$file   = abs_path catfile(dirname(__FILE__), 'templates', 'exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt line 2/, 'message contains filename';
@@ -1099,8 +1100,8 @@ is $output->lines_after->[0][1], '123', 'right line';
 like "$output", qr/foo\.mt from DATA section line 2/, 'right result';
 
 # Exception with UTF-8 context
-$mt     = Mojo::Template->new;
-$file   = catfile(splitdir($FindBin::Bin), qw(templates utf8_exception.mt));
+$mt = Mojo::Template->new;
+$file = abs_path catfile(dirname(__FILE__), 'templates', 'utf8_exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->lines_before->[0][1], '☃', 'right line';
@@ -1119,7 +1120,7 @@ is $output->lines_after->[0], undef, 'no lines after';
 
 # Different encodings
 $mt = Mojo::Template->new(encoding => 'shift_jis');
-$file = catfile(splitdir($FindBin::Bin), qw(templates utf8_exception.mt));
+$file = abs_path catfile(dirname(__FILE__), 'templates', 'utf8_exception.mt');
 ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';
 

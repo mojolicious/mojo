@@ -1433,7 +1433,7 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
 is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1', 'right "Host" value';
-is $req->headers->content_length, '104', 'right "Content-Length" value';
+is $req->headers->content_length, '106', 'right "Content-Length" value';
 is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
   'right "Content-Type" value';
 is $req->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
@@ -1463,7 +1463,7 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
 is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1', 'right "Host" value';
-is $req->headers->content_length, '104', 'right "Content-Length" value';
+is $req->headers->content_length, '106', 'right "Content-Length" value';
 is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
   'right "Content-Type" value';
 is $req->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
@@ -1479,7 +1479,7 @@ is $clone->version,     '1.1', 'right version';
 is $clone->url,         '/foo/bar', 'right URL';
 is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $clone->headers->host, '127.0.0.1', 'right "Host" value';
-is $clone->headers->content_length, '104', 'right "Content-Length" value';
+is $clone->headers->content_length, '106', 'right "Content-Length" value';
 is $clone->headers->content_type, 'multipart/mixed; boundary=7am1X',
   'right "Content-Type" value';
 is $clone->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
@@ -1675,12 +1675,15 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/example/testform_handler', 'right URL';
-isnt $req->headers->content_length, 318, 'different "Content-Length" value';
+is $req->headers->content_length, 323, 'right "Content-Length" value';
 is $req->param('Vorname'), 'T', 'right value';
 is $req->param('Zuname'),  '',  'right value';
 is $req->param('Text'),    '',  'right value';
 is $req->content->parts->[0]->asset->slurp, 'T', 'right content';
 is $req->content->leftovers, '', 'no leftovers';
+is $req->content->get_body_chunk(322), "\x0a",      'right chunk';
+is $req->content->get_body_chunk(321), "\x0d\x0a",  'right chunk';
+is $req->content->get_body_chunk(320), "-\x0d\x0a", 'right chunk';
 
 # Parse multipart/form-data request with charset
 $req = Mojo::Message::Request->new;

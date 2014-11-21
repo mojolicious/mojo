@@ -771,7 +771,7 @@ is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
-is $res->headers->content_length, '108', 'right "Content-Length" value';
+is $res->headers->content_length, '110', 'right "Content-Length" value';
 is $res->headers->content_type, 'multipart/mixed; boundary=7am1X',
   'right "Content-Type" value';
 is $res->content->parts->[0]->asset->slurp, 'Hallo Welt lalalalalala!',

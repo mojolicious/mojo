@@ -18,12 +18,10 @@ sub body_size {
   my $self = shift;
 
   # Check for existing Content-Lenght header
-  my $content_len = $self->headers->content_length;
-  return $content_len if $content_len;
+  if (my $len = $self->headers->content_length) { return $len }
 
   # Calculate length of whole body
-  my $boundary_len = length($self->build_boundary) + 6;
-  my $len          = $boundary_len - 2;
+  my $len = my $boundary_len = length($self->build_boundary) + 6;
   $len += $_->header_size + $_->body_size + $boundary_len for @{$self->parts};
 
   return $len;
@@ -33,16 +31,15 @@ sub build_boundary {
   my $self = shift;
 
   # Check for existing boundary
-  if (defined(my $boundary = $self->boundary)) { return $boundary }
+  my $boundary;
+  return $boundary if defined($boundary = $self->boundary);
 
   # Generate and check boundary
-  my $boundary;
   my $size = 1;
-  while (1) {
+  do {
     $boundary = b64_encode join('', map chr(rand 256), 1 .. $size++ * 3);
     $boundary =~ s/\W/X/g;
-    last unless $self->body_contains($boundary);
-  }
+  } while $self->body_contains($boundary);
 
   # Add boundary to Content-Type header
   my $headers = $self->headers;
@@ -90,6 +87,10 @@ sub get_body_chunk {
     $len += $content_len;
 
     # Boundary
+    if ($#$parts == $i) {
+      $boundary .= '--';
+      $boundary_len += 2;
+    }
     return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $len
       if ($len + $boundary_len) > $offset;
     $len += $boundary_len;

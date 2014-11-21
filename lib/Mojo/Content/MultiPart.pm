@@ -90,15 +90,8 @@ sub get_body_chunk {
     $len += $content_len;
 
     # Boundary
-    if (($len + $boundary_len) > $offset) {
-
-      # Last boundary
-      return substr "\x0d\x0a--$boundary--", $offset - $len
-        if $#{$parts} == $i;
-
-      # Middle boundary
-      return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $len;
-    }
+    return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $len
+      if ($len + $boundary_len) > $offset;
     $len += $boundary_len;
   }
 }

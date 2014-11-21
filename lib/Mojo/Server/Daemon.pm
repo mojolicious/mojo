@@ -182,7 +182,9 @@ sub _read {
   # Make sure we have a transaction and parse chunk
   return unless my $c = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
-  warn "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
+  warn
+    "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n@{[Mojo::Util::dumper $chunk]}\n"
+    if DEBUG;
   $tx->server_read($chunk);
 
   # Last keep-alive request or corrupted connection

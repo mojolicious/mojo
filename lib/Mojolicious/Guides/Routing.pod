@@ -72,7 +72,7 @@ will learn more about this later on. Internally routes get compiled to regular
 expressions, so you can get the best of both worlds with a little bit of
 experience.
 
-  /user/show/:id -> qr/(?-xism:^\/user\/show/([^\/\.]+))/
+  /user/show/:id -> qr/(?-xism:^\/user\/show/([^\/.]+))/
 
 A trailing slash in the path is always optional.
 

@@ -386,7 +386,7 @@ spurt "just\nworks!", $file;
 is slurp($file), "just\nworks!", 'successful roundtrip';
 
 # steady_time
-like steady_time, qr/^\d+\.\d+$/, 'high resolution time';
+like steady_time, qr/^[\d.]+$/, 'high resolution time';
 
 # monkey_patch
 {

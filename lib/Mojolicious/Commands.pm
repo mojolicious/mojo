@@ -54,6 +54,8 @@ sub run {
     $name = shift @args if my $help = $name eq 'help';
     $help = $ENV{MOJO_HELP} = $ENV{MOJO_HELP} ? 1 : $help;
 
+    # Remove options shared by all commands before loading the command
+    _args(\@args);
     my $module;
     $module = _command("${_}::$name", 1) and last for @{$self->namespaces};
 
@@ -61,8 +63,7 @@ sub run {
     die qq{Unknown command "$name", maybe you need to install it?\n}
       unless $module;
 
-    # Run command (remove options shared by all commands)
-    _args(\@args);
+    # Run command
     my $command = $module->new(app => $self->app);
     return $help ? $command->help(@args) : $command->run(@args);
   }

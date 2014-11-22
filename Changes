@@ -1,5 +1,7 @@
 
 5.64  2014-11-22
+  - Fixed bug in Mojolicious::Commands where the global Getopt::Long
+    configuration would be changed after a command had already been loaded.
 
 5.63  2014-11-21
   - Improved portability of some tests.

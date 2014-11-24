@@ -612,9 +612,9 @@ allow running tests again.
   use warnings;
 
   use lib 'lib';
-  use Mojolicious::Commands;
 
   # Start command line interface for application
+  require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
 And the directory structure of our hybrid application should be looking like
@@ -718,30 +718,6 @@ moved into the appropriate directories.
   $ mkdir templates/login
   $ mv templates/index.html.ep templates/login/index.html.ep
   $ mv templates/protected.html.ep templates/login/protected.html.ep
-
-=head2 Script
-
-Finally C<myapp.pl> can be replaced with a proper L<Mojolicious> script.
-
-  $ rm myapp.pl
-  $ mkdir script
-  $ touch script/myapp
-  $ chmod 744 script/myapp
-
-Only a few small details change, since installable scripts can't use L<lib>
-without breaking updated dual-life modules.
-
-  #!/usr/bin/env perl
-
-  use strict;
-  use warnings;
-
-  use FindBin;
-  BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
-
-  # Start command line interface for application
-  require Mojolicious::Commands;
-  Mojolicious::Commands->start_app('MyApp');
 
 =head2 Simplified tests
 

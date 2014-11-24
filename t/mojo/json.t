@@ -146,7 +146,7 @@ is b($bytes)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
 $bytes = encode_json ["123abc"];
 is $bytes, '["123abc"]', 'encode ["123abc"]';
 $bytes = encode_json ["\x00\x1f \a\b/\f\r"];
-is $bytes, '["\\u0000\\u001F \\u0007\\b/\f\r"]',
+is $bytes, '["\\u0000\\u001F \\u0007\\b\/\f\r"]',
   'encode ["\x00\x1f \a\b/\f\r"]';
 $bytes = encode_json '';
 is $bytes, '""', 'encode ""';
@@ -242,11 +242,11 @@ is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
 $bytes = encode_json(['a' x 32768]);
 is_deeply decode_json($bytes), ['a' x 32768], 'successful roundtrip';
 
-# u2028 and u2029
-$bytes = encode_json ["\x{2028}test\x{2029}123"];
-is index($bytes, b("\x{2028}")->encode), -1, 'properly escaped';
-is index($bytes, b("\x{2029}")->encode), -1, 'properly escaped';
-is_deeply decode_json($bytes), ["\x{2028}test\x{2029}123"],
+# u2028, u2029 and slash
+$bytes = encode_json ["\x{2028}test\x{2029}123</script>"];
+is $bytes, '["\u2028test\u2029123<\/script>"]',
+  'escaped u2028, u2029 and slash';
+is_deeply decode_json($bytes), ["\x{2028}test\x{2029}123</script>"],
   'successful roundtrip';
 
 # JSON without UTF-8 encoding

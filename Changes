@@ -1,6 +1,7 @@
 
 5.65  2014-11-24
   - Improved installable scripts to use #!perl. (jberger)
+  - Improved Mojo::JSON security by escaping the "/" character.
   - Fixed bug in Mojo::DOM::CSS where selected results would also include the
     current root element.
 

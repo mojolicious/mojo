@@ -244,7 +244,7 @@ sub _encode_object {
 
 sub _encode_string {
   my $str = shift;
-  $str =~ s!([\x00-\x1f\x{2028}\x{2029}\\"])!$REVERSE{$1}!gs;
+  $str =~ s!([\x00-\x1f\x{2028}\x{2029}\\"/])!$REVERSE{$1}!gs;
   return "\"$str\"";
 }
 
@@ -347,7 +347,9 @@ their values are true or false.
   \0 -> false
 
 The two Unicode whitespace characters C<u2028> and C<u2029> will always be
-escaped to make JSONP easier.
+escaped to make JSONP easier, and the character C</> to prevent XSS attacks.
+
+  "\x{2028}\x{2029}</script>" -> "\u2028\u2029<\/script>"
 
 =head1 FUNCTIONS
 

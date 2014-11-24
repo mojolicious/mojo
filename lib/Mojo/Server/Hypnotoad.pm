@@ -40,7 +40,7 @@ sub run {
   _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
 
   # Remember executable and application for later
-  $ENV{HYPNOTOAD_EXE} ||= $0;
+  $ENV{HYPNOTOAD_EXE} ||= "$^X $0";
   $0 = $ENV{HYPNOTOAD_APP} ||= abs_path $app;
 
   # This is a production server

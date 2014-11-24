@@ -612,9 +612,9 @@ allow running tests again.
   use warnings;
 
   use lib 'lib';
-  use Mojolicious::Commands;
 
   # Start command line interface for application
+  require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
 And the directory structure of our hybrid application should be looking like
@@ -721,27 +721,11 @@ moved into the appropriate directories.
 
 =head2 Script
 
-Finally C<myapp.pl> can be replaced with a proper L<Mojolicious> script.
+Finally C<myapp.pl> can be moved into a C<script> directory and renamed to
+C<my_app> to follow the CPAN standard.
 
-  $ rm myapp.pl
   $ mkdir script
-  $ touch script/my_app
-  $ chmod 744 script/my_app
-
-Only a few small details change, since installable scripts can't use L<lib>
-without breaking updated dual-life modules.
-
-  #!/usr/bin/env perl
-
-  use strict;
-  use warnings;
-
-  use FindBin;
-  BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
-
-  # Start command line interface for application
-  require Mojolicious::Commands;
-  Mojolicious::Commands->start_app('MyApp');
+  $ mv myapp.pl script/my_app
 
 =head2 Simplified tests
 

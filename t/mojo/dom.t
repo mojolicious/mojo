@@ -461,6 +461,10 @@ $dom->replace('A<div>B<p>C<b>D<i><u>E</u></i>F</b>G</p><div>H</div></div>I');
 is $dom->find(':not(div):not(i):not(u)')->map('strip')->first->root,
   'A<div>BCD<i><u>E</u></i>FG<div>H</div></div>I', 'right result';
 is $dom->at('i')->to_string, '<i><u>E</u></i>', 'right result';
+$dom = Mojo::DOM->new('<div><div>A</div><div>B</div>C</div>');
+is $dom->at('div')->at('div')->text, 'A', 'right text';
+$dom->at('div')->find('div')->map('strip');
+is "$dom", '<div>ABC</div>', 'right result';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');

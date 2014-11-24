@@ -235,7 +235,7 @@ sub _select {
     # Tag
     if ($type eq 'tag') {
       unshift @queue, @$current[4 .. $#$current];
-      next unless _match($pattern, $current, $tree);
+      next if $current eq $tree || !_match($pattern, $current, $tree);
       $one ? return $current : push @results, $current;
     }
 

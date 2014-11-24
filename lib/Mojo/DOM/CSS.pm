@@ -228,19 +228,13 @@ sub _select {
   my ($one, $tree, $pattern) = @_;
 
   my @results;
-  my @queue = ($tree);
+  my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
   while (my $current = shift @queue) {
-    my $type = $current->[0];
+    next unless $current->[0] eq 'tag';
 
-    # Tag
-    if ($type eq 'tag') {
-      unshift @queue, @$current[4 .. $#$current];
-      next if $current eq $tree || !_match($pattern, $current, $tree);
-      $one ? return $current : push @results, $current;
-    }
-
-    # Root
-    elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
+    unshift @queue, @$current[4 .. $#$current];
+    next unless _match($pattern, $current, $tree);
+    $one ? return $current : push @results, $current;
   }
 
   return $one ? undef : \@results;

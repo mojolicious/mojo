@@ -1430,9 +1430,9 @@ get automatically installed with the modules.
 
   1;
 
-Finally a few small changes should be made to the application script. The 
+Finally a few small changes should be made to the application script. The
 shebang becomes the recommended C<#!perl>, which the toolchain rewrites to the
-proper shebang during installation. Also use L<FindBin> rather than L<lib>
+proper shebang during installation. Also use L<FindBin> rather than L<lib>,
 since installable scripts can't use L<lib> without breaking updated dual-life
 modules.
 

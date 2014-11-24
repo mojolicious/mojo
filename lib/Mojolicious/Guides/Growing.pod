@@ -726,7 +726,6 @@ C<my_app> to follow the CPAN standard.
 
   $ mkdir script
   $ mv myapp.pl script/my_app
-  $ chmod 744 script/my_app
 
 =head2 Simplified tests
 

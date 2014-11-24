@@ -603,14 +603,7 @@ applications can use nested routes they have no need for C<group> blocks.
 
 =head2 Simplified application script
 
-C<myapp.pl> can be moved into a C<script> directory and renamed to C<my_app> to
-follow the CPAN standard.
-
-  $ mkdir script
-  $ mv myapp.pl script/my_app
-  $ chmod 744 script/my_app
-
-The script itself can now be turned into a simplified application script to
+C<myapp.pl> itself can now be turned into a simplified application script to
 allow running tests again.
 
   #!/usr/bin/env perl
@@ -621,15 +614,15 @@ allow running tests again.
   use lib 'lib';
 
   # Start command line interface for application
+
   require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
-The resulting directory structure of our hybrid application should be looking
-like this.
+And the directory structure of our hybrid application should be looking like
+this.
 
   myapp
-  |- script
-     +- my_app
+  |- myapp.pl
   |- lib
   |  |- MyApp.pm
   |  +- MyApp
@@ -726,6 +719,15 @@ moved into the appropriate directories.
   $ mkdir templates/login
   $ mv templates/index.html.ep templates/login/index.html.ep
   $ mv templates/protected.html.ep templates/login/protected.html.ep
+
+=head2 Script
+
+Finally C<myapp.pl> can be moved into a C<script> directory and renamed to
+C<my_app> follow the CPAN standard.
+
+  $ mkdir script
+  $ mv myapp.pl script/my_app
+  $ chmod 744 script/my_app
 
 =head2 Simplified tests
 

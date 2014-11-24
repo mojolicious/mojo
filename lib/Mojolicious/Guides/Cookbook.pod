@@ -1430,11 +1430,11 @@ get automatically installed with the modules.
 
   1;
 
-Finally C<myapp.pl> can be replaced with an installable L<Mojolicious> script.
-Only a few small details change. The shebang becomes the recommended C<#!perl>,
-which the toolchain rewrites to the proper shebang during installation. Also
-use C<FindBin> rather than L<lib> since installable scripts can't use L<lib>
-without breaking updated dual-life modules.
+Finally a few small changes should be made to the application script. The 
+shebang becomes the recommended C<#!perl>, which the toolchain rewrites to the
+proper shebang during installation. Also use C<FindBin> rather than L<lib>
+since installable scripts can't use L<lib> without breaking updated dual-life
+modules.
 
   #!perl
 

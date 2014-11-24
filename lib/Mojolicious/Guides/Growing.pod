@@ -752,8 +752,7 @@ can be simplified.
 And our final directory structure should be looking like this.
 
   myapp
-  |- script
-  |  +- myapp
+  |- myapp.pl
   |- lib
   |  |- MyApp.pm
   |  +- MyApp

@@ -1457,7 +1457,7 @@ scripts can't use L<lib> without breaking updated dual-life modules.
 That's really everything, now you can package your application like any other
 CPAN module.
 
-  $ ./script/my_app generate makefile
+  $ ./script/myapp generate makefile
   $ perl Makefile.PL
   $ make test
   $ make manifest

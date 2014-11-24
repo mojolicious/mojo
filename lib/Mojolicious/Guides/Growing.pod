@@ -617,11 +617,19 @@ allow running tests again.
   require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
-And the directory structure of our hybrid application should be looking like
-this.
+Move the file into a C<script> directory and rename it to C<my_app> to follow
+the CPAN standard.
+
+  $ mkdir script
+  $ mv myapp.pl script/my_app
+  $ chmod 744 script/my_app
+
+The resulting directory structure of our hybrid application should be looking
+like this.
 
   myapp
-  |- myapp.pl
+  |- script
+     +- my_app
   |- lib
   |  |- MyApp.pm
   |  +- MyApp
@@ -752,7 +760,8 @@ can be simplified.
 And our final directory structure should be looking like this.
 
   myapp
-  |- myapp.pl
+  |- script
+  |  +- my_app
   |- lib
   |  |- MyApp.pm
   |  +- MyApp

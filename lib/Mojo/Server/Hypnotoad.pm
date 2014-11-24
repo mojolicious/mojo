@@ -40,14 +40,15 @@ sub run {
   _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
 
   # Remember executable and application for later
-  $ENV{HYPNOTOAD_EXE} ||= "$^X $0";
+  $ENV{HYPNOTOAD_EXE} ||= $0;
   $0 = $ENV{HYPNOTOAD_APP} ||= abs_path $app;
 
   # This is a production server
   $ENV{MOJO_MODE} ||= 'production';
 
   # Clean start (to make sure everything works)
-  die "Can't exec: $!" if !$ENV{HYPNOTOAD_REV}++ && !exec $ENV{HYPNOTOAD_EXE};
+  die "Can't exec: $!"
+    if !$ENV{HYPNOTOAD_REV}++ && !exec $^X, $ENV{HYPNOTOAD_EXE};
 
   # Preload application and configure server
   my $prefork = $self->prefork->cleanup(0);
@@ -107,7 +108,7 @@ sub _manage {
     unless ($self->{new}) {
       $log->info('Starting zero downtime software upgrade.');
       die "Can't fork: $!" unless defined(my $pid = $self->{new} = fork);
-      exec($ENV{HYPNOTOAD_EXE}) or die("Can't exec: $!") unless $pid;
+      exec $^X, $ENV{HYPNOTOAD_EXE} or die "Can't exec: $!" unless $pid;
     }
 
     # Timeout

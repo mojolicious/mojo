@@ -145,7 +145,7 @@ organized CPAN distribution to maximize maintainability.
 
   myapp                      # Application directory
   |- script                  # Script directory
-  |  +- myapp                # Application script
+  |  +- my_app               # Application script
   |- lib                     # Library directory
   |  |- MyApp.pm             # Application class
   |  +- MyApp                # Application namespace
@@ -725,8 +725,8 @@ Finally C<myapp.pl> can be replaced with a proper L<Mojolicious> script.
 
   $ rm myapp.pl
   $ mkdir script
-  $ touch script/myapp
-  $ chmod 744 script/myapp
+  $ touch script/my_app
+  $ chmod 744 script/my_app
 
 Only a few small details change, since installable scripts can't use L<lib>
 without breaking updated dual-life modules.
@@ -777,7 +777,7 @@ And our final directory structure should be looking like this.
 
   myapp
   |- script
-  |  +- myapp
+  |  +- my_app
   |- lib
   |  |- MyApp.pm
   |  +- MyApp

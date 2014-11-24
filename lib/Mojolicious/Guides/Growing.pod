@@ -722,7 +722,7 @@ moved into the appropriate directories.
 =head2 Script
 
 Finally C<myapp.pl> can be moved into a C<script> directory and renamed to
-C<my_app> follow the CPAN standard.
+C<my_app> to follow the CPAN standard.
 
   $ mkdir script
   $ mv myapp.pl script/my_app

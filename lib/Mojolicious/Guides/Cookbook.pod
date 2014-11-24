@@ -1430,6 +1430,24 @@ get automatically installed with the modules.
 
   1;
 
+Finally a few small changes should be made to the application script. The 
+shebang becomes the recommended C<#!perl>, which the toolchain rewrites to the
+proper shebang during installation. Also use L<FindBin> rather than L<lib>
+since installable scripts can't use L<lib> without breaking updated dual-life
+modules.
+
+  #!perl
+
+  use strict;
+  use warnings;
+
+  use FindBin;
+  BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+
+  # Start command line interface for application
+  require Mojolicious::Commands;
+  Mojolicious::Commands->start_app('MyApp');
+
 That's really everything, now you can package your application like any other
 CPAN module.
 

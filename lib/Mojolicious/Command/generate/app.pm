@@ -114,8 +114,7 @@ __DATA__
 use strict;
 use warnings;
 
-use FindBin;
-BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+use lib 'lib';
 
 # Start command line interface for application
 require Mojolicious::Commands;

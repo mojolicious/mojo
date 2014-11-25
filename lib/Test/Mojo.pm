@@ -97,7 +97,7 @@ sub element_exists_not {
 
 sub finish_ok {
   my $self = shift;
-  $self->tx->finish(@_);
+  $self->tx->finish(@_) if $self->tx->is_websocket;
   Mojo::IOLoop->one_tick while !$self->{finished};
   return $self->_test('ok', 1, 'closed WebSocket');
 }
@@ -332,7 +332,7 @@ sub _message {
   }
 
   # Decode text frame if there is no type check
-  else { $msg = decode 'UTF-8', $msg if $type eq 'text' }
+  else { $msg = decode 'UTF-8', $msg if ($type // '') eq 'text' }
 
   return $self->_test($name, $msg // '', $value, $desc);
 }
@@ -348,7 +348,7 @@ sub _request_ok {
     $self->ua->start(
       $tx => sub {
         my ($ua, $tx) = @_;
-        $self->tx($tx);
+        $self->{finished} = [] unless $self->tx($tx)->tx->is_websocket;
         $tx->on(finish => sub { shift; $self->{finished} = [@_] });
         $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });
         $tx->on(text   => sub { push @{$self->{messages}}, [text   => pop] });

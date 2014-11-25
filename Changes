@@ -1,4 +1,6 @@
 
+5.66  2014-11-25
+
 5.65  2014-11-24
   - Improved installable scripts to use #!perl. (jberger)
   - Improved Mojo::JSON security by escaping the "/" character.

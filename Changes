@@ -1,5 +1,7 @@
 
 5.66  2014-11-25
+  - Fixed bug in Mojo::DOM::CSS where the :empty pseudo class would not ignore
+    comments and processing instructions.
 
 5.65  2014-11-24
   - Improved installable scripts to use #!perl. (jberger)

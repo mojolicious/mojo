@@ -125,6 +125,8 @@ sub _compile {
   return $pattern;
 }
 
+sub _empty { $_[0][0] eq 'comment' || $_[0][0] eq 'pi' }
+
 sub _equation {
   my $equation = shift;
 
@@ -161,7 +163,7 @@ sub _pc {
   my ($class, $args, $current) = @_;
 
   # ":empty"
-  return !defined $current->[4] if $class eq 'empty';
+  return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
 
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';

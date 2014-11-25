@@ -826,6 +826,8 @@ $dom = Mojo::DOM->new->parse(<<EOF);
     </select>
     <input type="submit" value="Ok!" />
     <input type="checkbox" checked name="I">
+    <p id="content">test 123</p>
+    <p id="no_content"><? test ?><!-- 123 --></p>
 </form>
 EOF
 is $dom->find(':root')->[0]->type,     'form', 'right type';
@@ -854,7 +856,9 @@ is $dom->at('optgroup > *:checked[value="e"]')->text,    'E', 'right text';
 is $dom->find(':checked[value="e"]')->[1], undef, 'no result';
 is $dom->find(':empty')->[0]->attr->{name},      'user', 'right name';
 is $dom->find('input:empty')->[0]->attr->{name}, 'user', 'right name';
-is $dom->at(':empty[type^="ch"]')->attr->{name}, 'groovy', 'right name';
+is $dom->at(':empty[type^="ch"]')->attr->{name}, 'groovy',  'right name';
+is $dom->at('p')->attr->{id},                    'content', 'right attribute';
+is $dom->at('p:empty')->attr->{id}, 'no_content', 'right attribute';
 
 # More pseudo classes
 $dom = Mojo::DOM->new->parse(<<EOF);

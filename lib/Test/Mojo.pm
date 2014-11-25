@@ -258,9 +258,13 @@ sub reset_session {
 
 sub send_ok {
   my ($self, $msg, $desc) = @_;
+
+  $desc ||= 'send message';
+  return $self->_test('ok', 0, $desc) unless $self->tx->is_websocket;
+
   $self->tx->send($msg => sub { Mojo::IOLoop->stop });
   Mojo::IOLoop->start;
-  return $self->_test('ok', 1, $desc || 'send message');
+  return $self->_test('ok', 1, $desc);
 }
 
 sub status_is {

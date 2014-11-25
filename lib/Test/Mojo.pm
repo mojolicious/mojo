@@ -471,7 +471,8 @@ True if the last test was successful.
   my $tx = $t->tx;
   $t     = $t->tx(Mojo::Transaction::HTTP->new);
 
-Current transaction, usually a L<Mojo::Transaction::HTTP> object.
+Current transaction, usually a L<Mojo::Transaction::HTTP> or
+L<Mojo::Transaction::WebSocket> object.
 
   # More specific tests
   is $t->tx->res->json->{foo}, 'bar', 'right value';

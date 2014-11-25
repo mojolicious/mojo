@@ -28,12 +28,14 @@ sub detect {
 # Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
 sub _args {
   return if __PACKAGE__->detect;
-  Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
+
+  my $save
+    = Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
   GetOptionsFromArray shift,
     'h|help'   => \$ENV{MOJO_HELP},
     'home=s'   => \$ENV{MOJO_HOME},
     'm|mode=s' => \$ENV{MOJO_MODE};
-  Getopt::Long::Configure('default');
+  Getopt::Long::Configure($save);
 }
 
 BEGIN { _args([@ARGV]) }

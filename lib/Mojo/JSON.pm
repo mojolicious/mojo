@@ -48,7 +48,7 @@ sub encode { encode_json($_[1]) }
 
 sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 
-sub false {$FALSE}
+sub false () {$FALSE}
 
 sub from_json {
   my $err = _catch(\my $value, shift, 1);
@@ -68,7 +68,7 @@ sub new {
 
 sub to_json { _encode_value(shift) }
 
-sub true {$TRUE}
+sub true () {$TRUE}
 
 sub _catch {
   my $valueref = shift;

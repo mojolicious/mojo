@@ -480,8 +480,8 @@ Return a L<Mojo::Collection> object containing all nodes in DOM structure as
 L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
-  $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')->all_contents
-    ->grep(sub { $_->node eq 'comment' })->map('remove')->first;
+  $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')
+    ->all_contents->grep(sub { $_->node eq 'comment' })->map('remove')->first;
 
 =head2 all_text
 
@@ -516,8 +516,8 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 Append HTML/XML fragment to this node.
 
   # "<div><h1>Test</h1><h2>123</h2></div>"
-  $dom->parse('<div><h1>Test</h1></div>')->at('h1')
-    ->append('<h2>123</h2>')->root;
+  $dom->parse('<div><h1>Test</h1></div>')
+    ->at('h1')->append('<h2>123</h2>')->root;
 
   # "<p>Test 123</p>"
   $dom->parse('<p>Test</p>')->at('p')->contents->first->append(' 123')->root;
@@ -530,8 +530,8 @@ Append HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to this
 node's content.
 
   # "<div><h1>Test123</h1></div>"
-  $dom->parse('<div><h1>Test</h1></div>')->at('h1')
-    ->append_content('123')->root;
+  $dom->parse('<div><h1>Test</h1></div>')
+    ->at('h1')->append_content('123')->root;
 
   # "<!-- Test 123 --><br>"
   $dom->parse('<!-- Test --><br>')
@@ -599,8 +599,8 @@ and C<tag> nodes) or raw content.
   $dom->parse('<!-- Test --><br>')->contents->first->content;
 
   # "<div><!-- 123 -->456</div>"
-  $dom->parse('<div><!-- Test -->456</div>')->at('div')
-    ->contents->first->content(' 123 ')->root;
+  $dom->parse('<div><!-- Test -->456</div>')
+    ->at('div')->contents->first->content(' 123 ')->root;
 
 =head2 contents
 
@@ -681,12 +681,12 @@ Return L<Mojo::DOM> object for next sibling node or C<undef> if there are no
 more siblings.
 
   # "456"
-  $dom->parse('<p><b>123</b><!-- Test -->456</p>')->at('b')
-    ->next_sibling->next_sibling;
+  $dom->parse('<p><b>123</b><!-- Test -->456</p>')
+    ->at('b')->next_sibling->next_sibling;
 
   # " Test "
-  $dom->parse('<p><b>123</b><!-- Test -->456</p>')->at('b')
-    ->next_sibling->content;
+  $dom->parse('<p><b>123</b><!-- Test -->456</p>')
+    ->at('b')->next_sibling->content;
 
 =head2 node
 
@@ -718,8 +718,8 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 Prepend HTML/XML fragment to this node.
 
   # "<div><h1>Test</h1><h2>123</h2></div>"
-  $dom->parse('<div><h2>123</h2></div>')->at('h2')
-    ->prepend('<h1>Test</h1>')->root;
+  $dom->parse('<div><h2>123</h2></div>')
+    ->at('h2')->prepend('<h1>Test</h1>')->root;
 
   # "<p>Test 123</p>"
   $dom->parse('<p>123</p>')->at('p')->contents->first->prepend('Test ')->root;
@@ -732,8 +732,8 @@ Prepend HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to
 this node's content.
 
   # "<div><h2>Test123</h2></div>"
-  $dom->parse('<div><h2>123</h2></div>')->at('h2')
-    ->prepend_content('Test')->root;
+  $dom->parse('<div><h2>123</h2></div>')
+    ->at('h2')->prepend_content('Test')->root;
 
   # "<!-- Test 123 --><br>"
   $dom->parse('<!-- 123 --><br>')
@@ -760,12 +760,12 @@ Return L<Mojo::DOM> object for previous sibling node or C<undef> if there are
 no more siblings.
 
   # "123"
-  $dom->parse('<p>123<!-- Test --><b>456</b></p>')->at('b')
-    ->previous_sibling->previous_sibling;
+  $dom->parse('<p>123<!-- Test --><b>456</b></p>')
+    ->at('b')->previous_sibling->previous_sibling;
 
   # " Test "
-  $dom->parse('<p>123<!-- Test --><b>456</b></p>')->at('b')
-    ->previous_sibling->content;
+  $dom->parse('<p>123<!-- Test --><b>456</b></p>')
+    ->at('b')->previous_sibling->content;
 
 =head2 remove
 
@@ -789,8 +789,8 @@ Replace this node with HTML/XML fragment and return L</"parent">.
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->replace('<h2>123</h2>');
 
   # "<p><b>123</b></p>"
-  $dom->parse('<p>Test</p>')->at('p')
-    ->contents->[0]->replace('<b>123</b>')->root;
+  $dom->parse('<p>Test</p>')
+    ->at('p')->contents->[0]->replace('<b>123</b>')->root;
 
 =head2 root
 

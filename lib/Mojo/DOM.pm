@@ -684,6 +684,10 @@ more siblings.
   $dom->parse('<p><b>123</b><!-- Test -->456</p>')->at('b')
     ->next_sibling->next_sibling;
 
+  # " Test "
+  $dom->parse('<p><b>123</b><!-- Test -->456</p>')->at('b')
+    ->next_sibling->content;
+
 =head2 node
 
   my $type = $dom->node;
@@ -758,6 +762,10 @@ no more siblings.
   # "123"
   $dom->parse('<p>123<!-- Test --><b>456</b></p>')->at('b')
     ->previous_sibling->previous_sibling;
+
+  # " Test "
+  $dom->parse('<p>123<!-- Test --><b>456</b></p>')->at('b')
+    ->previous_sibling->content;
 
 =head2 remove
 

@@ -219,6 +219,9 @@ and is also available as C<$_>.
   # Longer version
   $object = $object->tap(sub { $_->$method(@args) });
 
+  # Inject side effects into a method chain
+  my $object = SubClass->new(foo => 'A')->tap(sub { say $_->foo })->foo('B');
+
 =head1 DEBUGGING
 
 You can set the C<MOJO_BASE_DEBUG> environment variable to get some advanced

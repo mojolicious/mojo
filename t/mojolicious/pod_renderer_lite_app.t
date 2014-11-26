@@ -47,32 +47,35 @@ $t->get_ok('/empty')->status_is(200)->content_is('');
 # Perldoc browser (Welcome)
 $t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
   ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
-  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/galaxy/);
+  ->text_is('a[id="GUIDES"]',   'GUIDES')
+  ->content_like(qr/Mojolicious guide to the galaxy/);
 
 # Perldoc browser (Welcome with slash)
 $t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
   ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
-  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/galaxy/)
-  ->content_unlike(qr/Gray/);
+  ->text_is('a[id="GUIDES"]',   'GUIDES')
+  ->content_like(qr/Mojolicious guide to the galaxy/)
+  ->content_unlike(qr/Pirates/);
 
-# Perldoc browser (Mojolicious documentation)
-$t->get_ok('/perldoc/Mojolicious')->status_is(200)
+# Perldoc browser (Mojo documentation)
+$t->get_ok('/perldoc/Mojo')->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
-  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
+  ->text_like('p', qr/Duct tape for the HTML5 web!/);
 
-# Perldoc browser (Mojolicious documentation with format)
-$t->get_ok('/perldoc/Mojolicious.html')->status_is(200)
+# Perldoc browser (Mojo documentation with format)
+$t->get_ok('/perldoc/Mojo.html')->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
-  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
+  ->text_like('p', qr/Duct tape for the HTML5 web!/);
 
-# Perldoc browser (negotiated Mojolicious documentation)
-$t->get_ok('/perldoc/Mojolicious' => {Accept => 'text/html'})->status_is(200)
+# Perldoc browser (negotiated Mojo documentation)
+$t->get_ok('/perldoc/Mojo' => {Accept => 'text/html'})->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
-  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
+  ->text_like('p', qr/Duct tape for the HTML5 web!/);
 
-# Perldoc browser (Mojolicious source with format)
-$t->get_ok('/perldoc/Mojolicious.txt')->status_is(200)
-  ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
+# Perldoc browser (Mojo source with format)
+$t->get_ok('/perldoc/Mojo.txt')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_like(qr/package Mojo;/);
 
 # Perldoc browser (negotiated Mojolicious source again)
 $t->get_ok('/perldoc/Mojolicious' => {Accept => 'text/plain'})->status_is(200)

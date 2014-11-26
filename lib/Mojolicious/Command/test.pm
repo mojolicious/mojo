@@ -35,9 +35,9 @@ Mojolicious::Command::test - Test command
 
   Usage: APPLICATION test [OPTIONS] [TESTS]
 
-    ./myapp.pl test -v
+    ./myapp.pl test
     ./myapp.pl test t/foo.t
-    ./myapp.pl test t/foo/*.t
+    ./myapp.pl test -v t/foo/*.t
 
   Options:
     -v, --verbose   Print verbose debug information to STDERR.

@@ -425,7 +425,15 @@ Test::Mojo - Testing Mojo!
 =head1 DESCRIPTION
 
 L<Test::Mojo> is a test user agent based on L<Mojo::UserAgent>, it is usually
-used together with L<Test::More> to test L<Mojolicious> applications.
+used together with L<Test::More> to test L<Mojolicious> applications. Just run
+your tests with the command L<Mojolicious::Command::test>.
+
+  $ ./myapp.pl test t/foo.t
+  $ ./myapp.pl test -v t/foo.t
+
+If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
+be set to C<debug> or C<fatal>, depending on the value of the
+C<HARNESS_IS_VERBOSE> environment variable.
 
 =head1 ATTRIBUTES
 

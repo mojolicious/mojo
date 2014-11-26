@@ -34,7 +34,7 @@ morbo - Morbo HTTP and WebSocket development server
 
   Usage: morbo [OPTIONS] [APPLICATION]
 
-    morbo ./script/myapp
+    morbo ./script/my_app
     morbo ./myapp.pl
     morbo -m production -l https://*:443 -l http://[::]:3000 ./myapp.pl
     morbo -l 'https://*:443?cert=./server.crt&key=./server.key' ./myapp.pl

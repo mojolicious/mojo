@@ -146,7 +146,7 @@ L<Mojo::Server::Morbo> implements the following attributes.
 =head2 watch
 
   my $watch = $morbo->watch;
-  $morbo    = $morbo->watch(['/home/sri/myapp']);
+  $morbo    = $morbo->watch(['/home/sri/my_app']);
 
 Files and directories to watch for changes, defaults to the application script
 as well as the C<lib> and C<templates> directories in the current working
@@ -166,7 +166,7 @@ its name or C<undef> if there have been no changes.
 
 =head2 run
 
-  $morbo->run('script/myapp');
+  $morbo->run('script/my_app');
 
 Run server for application.
 

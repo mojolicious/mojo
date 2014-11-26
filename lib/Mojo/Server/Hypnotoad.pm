@@ -421,7 +421,7 @@ Configure server from application settings.
 
 =head2 run
 
-  $hypnotoad->run('script/myapp');
+  $hypnotoad->run('script/my_app');
 
 Run server for application.
 

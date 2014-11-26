@@ -141,14 +141,14 @@ Path to C<lib> directory in which L<Mojolicious> is installed.
 =head2 new
 
   my $home = Mojo::Home->new;
-  my $home = Mojo::Home->new('/home/sri/myapp');
+  my $home = Mojo::Home->new('/home/sri/my_app');
 
 Construct a new L<Mojo::Home> object and L</"parse"> home directory if
 necessary.
 
 =head2 parse
 
-  $home = $home->parse('/home/sri/myapp');
+  $home = $home->parse('/home/sri/my_app');
 
 Parse home directory.
 

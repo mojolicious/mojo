@@ -23,7 +23,7 @@ server with L<Mojo::Server::Daemon>. It is usually used during development and
 in the construction of more advanced web servers, but is solid and fast enough
 for small to mid sized applications.
 
-  $ ./script/myapp daemon
+  $ ./script/my_app daemon
   Server available at http://127.0.0.1:3000.
 
 It is available to every application through the command
@@ -31,7 +31,7 @@ L<Mojolicious::Command::daemon>, which has many configuration options and is
 known to work on every platform Perl works on with its single-process
 architecture.
 
-  $ ./script/myapp daemon -h
+  $ ./script/my_app daemon -h
   ...List of available options...
 
 Another huge advantage is that it supports TLS and WebSockets out of the box,
@@ -39,14 +39,14 @@ a development certificate for testing purposes is built right in, so it just
 works, but you can specify all listen locations supported by
 L<Mojo::Server::Daemon/"listen">.
 
-  $ ./script/myapp daemon -l https://[::]:3000
+  $ ./script/my_app daemon -l https://[::]:3000
   Server available at https://[::]:3000.
 
 On UNIX platforms you can also add preforking and switch to a multi-process
 architecture with L<Mojolicious::Command::prefork>, to take advantage of
 multiple CPU cores and copy-on-write.
 
-  $ ./script/myapp prefork
+  $ ./script/my_app prefork
   Server available at http://127.0.0.1:3000.
 
 Since all built-in web servers are based on the L<Mojo::IOLoop> event loop,
@@ -56,7 +56,7 @@ by increasing the number of worker processes and decreasing the number of
 concurrent connections each worker is allowed to handle (often as low as
 C<1>).
 
-  $ ./script/myapp prefork -m production -w 10 -c 1
+  $ ./script/my_app prefork -m production -w 10 -c 1
   Server available at http://127.0.0.1:3000.
 
 Your application is preloaded in the manager process during startup, to run
@@ -85,7 +85,7 @@ It is basically a restarter that forks a new L<Mojo::Server::Daemon> web
 server whenever a file in your project changes, and should therefore only be
 used during development.
 
-  $ morbo ./script/myapp
+  $ morbo ./script/my_app
   Server available at http://127.0.0.1:3000.
 
 =head2 Hypnotoad
@@ -105,7 +105,7 @@ It is based on the L<Mojo::Server::Prefork> web server, which adds preforking
 to L<Mojo::Server::Daemon>, but optimized specifically for production
 environments out of the box.
 
-  $ hypnotoad ./script/myapp
+  $ hypnotoad ./script/my_app
   Server available at http://127.0.0.1:8080.
 
 It automatically sets the operating mode to C<production> and you can tweak
@@ -136,7 +136,7 @@ software upgrades (hot deployment). That means you can upgrade L<Mojolicious>,
 Perl or even system libraries at runtime without ever stopping the server or
 losing a single incoming connection, just by running the command above again.
 
-  $ hypnotoad ./script/myapp
+  $ hypnotoad ./script/my_app
   Starting hot deployment for Hypnotoad server 31841.
 
 You might also want to enable proxy support if you're using Hypnotoad behind a
@@ -153,13 +153,13 @@ as you can see above, but on modern operating systems that support the
 C<SO_REUSEPORT> socket option, there is also another method available that
 works with all built-in web servers.
 
-  $ ./script/myapp prefork -P /tmp/first.pid -l http://*:8080?reuse=1
+  $ ./script/my_app prefork -P /tmp/first.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080.
 
 All you have to do is start a second web server listening to the same port and
 stop the first web server gracefully afterwards.
 
-  $ ./script/myapp prefork -P /tmp/second.pid -l http://*:8080?reuse=1
+  $ ./script/my_app prefork -P /tmp/second.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080.
   $ kill -s TERM `cat /tmp/first.pid`
 
@@ -215,7 +215,7 @@ production environments is discouraged though, because as a result of how
 C<CGI> works, it is very slow and many web servers are making it exceptionally
 hard to configure properly.
 
-  ScriptAlias / /home/sri/myapp/script/myapp/
+  ScriptAlias / /home/sri/my_app/script/my_app/
 
 =head2 PSGI/Plack
 
@@ -225,23 +225,23 @@ helpers and adapters to web servers. L<PSGI> and L<Plack> are inspired by
 Python's WSGI and Ruby's Rack. L<Mojolicious> applications are ridiculously
 simple to deploy with L<Plack>.
 
-  $ plackup ./script/myapp
+  $ plackup ./script/my_app
 
 L<Plack> provides many server and protocol adapters for you to choose from,
 such as C<FCGI>, C<uWSGI> and C<mod_perl>.
 
-  $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
+  $ plackup ./script/my_app -s FCGI -l /tmp/myapp.sock
 
 The C<MOJO_REVERSE_PROXY> environment variable can be used to enable proxy
 support, this allows L<Mojolicious> to automatically pick up the
 C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
 
-  $ MOJO_REVERSE_PROXY=1 plackup ./script/myapp
+  $ MOJO_REVERSE_PROXY=1 plackup ./script/my_app
 
 If an older server adapter is unable to correctly detect the application home
 directory, you can simply use the C<MOJO_HOME> environment variable.
 
-  $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
+  $ MOJO_HOME=/home/sri/my_app plackup ./script/my_app
 
 There is no need for a C<.psgi> file, just point the server adapter at your
 application script, it will automatically act like one if it detects the
@@ -257,7 +257,7 @@ application logic.
 
   builder {
     enable 'Deflater';
-    require './script/myapp';
+    require './script/my_app';
   };
 
 L<Mojo::Server::PSGI> can be used directly to load and customize applications
@@ -270,7 +270,7 @@ in the wrapper script.
   builder {
     enable 'Deflater';
     my $server = Mojo::Server::PSGI->new;
-    $server->load_app('./script/myapp');
+    $server->load_app('./script/my_app');
     $server->app->config(foo => 'bar');
     $server->to_psgi_app;
   };

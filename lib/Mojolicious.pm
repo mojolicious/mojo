@@ -111,9 +111,7 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  my $res = $tx->res;
-  return if $res->code;
-  if (my $code = ($tx->req->error // {})->{advice}) { $res->code($code) }
+  return if $tx->res->code;
   $c->render_not_found unless $self->routes->dispatch($c) || $tx->res->code;
 }
 

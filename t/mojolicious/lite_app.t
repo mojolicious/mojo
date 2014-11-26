@@ -788,10 +788,10 @@ $t->app->log->unsubscribe(message => $cb);
 # With body and max message size
 {
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
-  $t->get_ok('/', '1234' x 1024)->status_is(413)
+  $t->get_ok('/', '1234' x 1024)->status_is(200)
     ->header_is(Connection => 'close')
     ->content_is(
-    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+    "413\n/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 }
 
 # Relaxed placeholder
@@ -1103,6 +1103,7 @@ Test ok!
 
 @@ root.html.epl
 % my $c = shift;
+<% if (my $err = $c->req->error) { =%><%= "$err->{advice}\n" %><% } =%>
 %== $c->url_for('root_path')
 %== $c->url_for('root_path')
 %== $c->url_for('root_path')

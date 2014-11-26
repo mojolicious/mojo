@@ -280,10 +280,12 @@ is encode_json({false => \$bytes}), '{"false":false}',
   'encode false boolean from reference';
 
 # Booleans in different contexts
-is(true,      1, 'right string value');
-is(true + 0,  1, 'right numeric value');
-is(false,     0, 'right string value');
-is(false + 0, 0, 'right numeric value');
+ok true, 'true';
+is true, 1, 'right string value';
+is true + 0, 1, 'right numeric value';
+ok !false, 'false';
+is false, 0, 'right string value';
+is false + 0, 0, 'right numeric value';
 
 # Upgraded numbers
 my $num = 3;

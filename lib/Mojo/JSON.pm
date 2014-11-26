@@ -34,12 +34,12 @@ for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
 # DEPRECATED in Tiger Face!
 sub decode {
-  shift->error(my $err = _catch(\my $value, pop));
+  shift->error(my $err = _decode(\my $value, pop));
   return defined $err ? undef : $value;
 }
 
 sub decode_json {
-  my $err = _catch(\my $value, shift);
+  my $err = _decode(\my $value, shift);
   return defined $err ? croak $err : $value;
 }
 
@@ -51,13 +51,13 @@ sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 sub false () {$FALSE}
 
 sub from_json {
-  my $err = _catch(\my $value, shift, 1);
+  my $err = _decode(\my $value, shift, 1);
   return defined $err ? croak $err : $value;
 }
 
 sub j {
   return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
-  return eval { _decode($_[0]) };
+  return eval { decode_json($_[0]) };
 }
 
 # DEPRECATED in Tiger Face!
@@ -70,28 +70,26 @@ sub to_json { _encode_value(shift) }
 
 sub true () {$TRUE}
 
-sub _catch {
-  my $valueref = shift;
-  eval { $$valueref = _decode(@_); 1 } ? return undef : chomp $@;
-  return $@;
-}
-
 sub _decode {
+  my $valueref = shift;
 
-  # Missing input
-  die "Missing or empty input\n" unless length(local $_ = shift);
+  eval {
 
-  # UTF-8
-  $_ = Mojo::Util::decode 'UTF-8', $_ unless shift;
-  die "Input is not UTF-8 encoded\n" unless defined;
+    # Missing input
+    die "Missing or empty input\n" unless length(local $_ = shift);
 
-  # Value
-  my $value = _decode_value();
+    # UTF-8
+    $_ = Mojo::Util::decode 'UTF-8', $_ unless shift;
+    die "Input is not UTF-8 encoded\n" unless defined;
 
-  # Leftover data
-  _throw('Unexpected data') unless m/\G[\x20\x09\x0a\x0d]*\z/gc;
+    # Value
+    $$valueref = _decode_value();
 
-  return $value;
+    # Leftover data
+    return m/\G[\x20\x09\x0a\x0d]*\z/gc || _throw('Unexpected data');
+  } ? return undef : chomp $@;
+
+  return $@;
 }
 
 sub _decode_array {

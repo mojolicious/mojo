@@ -114,7 +114,6 @@ sub dispatch {
   my $res = $tx->res;
   return if $res->code;
   if (my $code = ($tx->req->error // {})->{advice}) { $res->code($code) }
-  elsif ($tx->is_websocket) { $res->code(426) }
   $c->render_not_found unless $self->routes->dispatch($c) || $tx->res->code;
 }
 

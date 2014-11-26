@@ -1,6 +1,6 @@
 
-5.66  2014-11-25
-  - Improved send_ok method in Test::Mojo to be able to fail gracefully.
+5.66  2014-11-26
+  - Improved many WebSocket tests in Test::Mojo to be able to fail gracefully.
   - Fixed bug in Mojo::DOM::CSS where the :empty pseudo class would not ignore
     comments and processing instructions.
 

@@ -220,7 +220,7 @@ and is also available as C<$_>.
   $object = $object->tap(sub { $_->$method(@args) });
 
   # Inject side effects into a method chain
-  my $object = SubClass->new(foo => 'A')->tap(sub { say $_->foo })->foo('B');
+  $object->foo('A')->tap(sub { say $_->foo })->foo('B');
 
 =head1 DEBUGGING
 

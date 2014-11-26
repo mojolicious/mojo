@@ -86,7 +86,7 @@ sub _decode {
     $$valueref = _decode_value();
 
     # Leftover data
-    return m/\G[\x20\x09\x0a\x0d]*\z/gc || _throw('Unexpected data');
+    m/\G[\x20\x09\x0a\x0d]*\z/gc or _throw('Unexpected data');
   } ? return undef : chomp $@;
 
   return $@;

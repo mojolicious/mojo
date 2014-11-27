@@ -665,9 +665,7 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
   my $bool = $c->render('foo/index');
 
 Render content with L<Mojolicious::Renderer/"render"> and emit hooks
-L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">. If no
-template is provided a default one based on controller and action or route
-name will be generated with L<Mojolicious::Renderer/"template_for">, all
+L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">, all
 additional pairs get merged into the L</"stash">.
 
   # Render characters

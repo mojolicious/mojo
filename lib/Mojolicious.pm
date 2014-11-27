@@ -89,8 +89,6 @@ sub defaults { Mojo::Util::_stash(defaults => @_) }
 sub dispatch {
   my ($self, $c) = @_;
 
-  my $stash = $c->stash;
-  $self->sessions->load($c) unless exists $stash->{'mojo.active_session'};
   my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
 
   # Try to find a static file
@@ -99,6 +97,7 @@ sub dispatch {
     unless $tx->res->code;
 
   # Start timer (ignore static files)
+  my $stash = $c->stash;
   unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
     my $req    = $c->req;
     my $method = $req->method;

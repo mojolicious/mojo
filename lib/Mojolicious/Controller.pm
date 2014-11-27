@@ -255,8 +255,12 @@ sub send {
 sub session {
   my $self = shift;
 
+  my $stash = $self->stash;
+  $self->app->sessions->load($self)
+    unless exists $stash->{'mojo.active_session'};
+
   # Hash
-  my $session = $self->stash->{'mojo.session'} ||= {};
+  my $session = $stash->{'mojo.session'} ||= {};
   return $session unless @_;
 
   # Get

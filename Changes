@@ -1,5 +1,6 @@
 
 5.67  2014-11-27
+  - Improved overall performance by deserializing sessions only on demand.
   - Fixed bug where embedded applications would deserialize sessions twice.
 
 5.66  2014-11-26

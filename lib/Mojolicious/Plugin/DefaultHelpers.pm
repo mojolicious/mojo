@@ -339,7 +339,7 @@ timeout if possible.
   %= include 'menubar'
   %= include 'menubar', format => 'txt'
 
-Alias for C<Mojolicious::Controller/"render_to_string">.
+Alias for L<Mojolicious::Controller/"render_to_string">.
 
 =head2 is_fresh
 

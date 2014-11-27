@@ -108,8 +108,8 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  return if $tx->res->code;
-  $c->render_not_found unless $self->routes->dispatch($c) || $tx->res->code;
+  $c->render_not_found
+    unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
 }
 
 sub handler {

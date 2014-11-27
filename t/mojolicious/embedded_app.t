@@ -20,6 +20,13 @@ plugin(Mount => ('/x/♥' => $external));
 plugin Mount => {'MOJOLICIO.US/' => $external};
 plugin(Mount => ('*.foo-bar.de/♥/123' => $external));
 
+# Make sure session can be modified from both apps
+hook before_routes => sub {
+  my $c = shift;
+  return unless $c->req->url->path->contains('/x/1/secondary');
+  $c->session->{secondary} += 10;
+};
+
 get '/hello' => 'works';
 
 get '/primary' => sub {
@@ -39,13 +46,13 @@ $t->get_ok('/primary')->status_is(200)->content_is(1);
 $t->get_ok('/primary')->status_is(200)->content_is(2);
 
 # Session in external app
-$t->get_ok('/x/1/secondary')->status_is(200)->content_is(1);
+$t->get_ok('/x/1/secondary')->status_is(200)->content_is(11);
 
 # Session again
 $t->get_ok('/primary')->status_is(200)->content_is(3);
 
 # Session in external app again
-$t->get_ok('/x/1/secondary')->status_is(200)->content_is(2);
+$t->get_ok('/x/1/secondary')->status_is(200)->content_is(22);
 
 # External app
 $t->get_ok('/x/1')->status_is(200)->content_is('too%21');

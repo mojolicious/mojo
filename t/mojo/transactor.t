@@ -451,6 +451,7 @@ ok $tx->req->headers->sec_websocket_version,
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 is $t->upgrade($tx), undef, 'not upgraded';
 Mojo::Transaction::WebSocket->new(handshake => $tx)->server_handshake;
+$tx->res->code(101);
 $tx = $t->upgrade($tx);
 ok $tx->is_websocket, 'is a WebSocket';
 

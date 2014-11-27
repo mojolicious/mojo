@@ -238,7 +238,7 @@ sub server_close {
 sub server_handshake {
   my $self = shift;
 
-  my $res_headers = $self->res->code(101)->headers;
+  my $res_headers = $self->res->headers;
   $res_headers->upgrade('websocket')->connection('Upgrade');
   my $req_headers = $self->req->headers;
   ($req_headers->sec_websocket_protocol // '') =~ /^\s*([^,]+)/

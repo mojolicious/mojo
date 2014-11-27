@@ -357,7 +357,7 @@ sub _request_ok {
     );
     Mojo::IOLoop->start;
 
-    my $desc = encode 'UTF-8', "WebSocket $url";
+    my $desc = encode 'UTF-8', "WebSocket handshake with $url";
     return $self->_test('ok', $self->tx->is_websocket, $desc);
   }
 

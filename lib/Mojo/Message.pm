@@ -503,6 +503,15 @@ make sure it is not excessively large, there's a 10MB limit by default.
 Get or set message error, an C<undef> return value indicates that there is no
 error.
 
+  # Connection error
+  $msg->error({message => 'Connection refused'});
+
+  # Parser error
+  $msg->error({message => 'Maximum message size exceeded', advice => 413});
+
+  # 4xx/5xx response
+  $msg->error({message => 'Internal Server Error', code => 500});
+
 =head2 every_cookie
 
   my $cookies = $msg->every_cookie('foo');

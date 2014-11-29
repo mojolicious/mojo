@@ -1,5 +1,5 @@
 
-5.68  2014-11-29
+5.68  2014-11-30
 
 5.67  2014-11-27
   - Improved overall performance by deserializing sessions only on demand.

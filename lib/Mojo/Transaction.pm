@@ -217,6 +217,12 @@ Connection identifier or socket.
 Return transaction error or C<undef> if there is no error, commonly used
 together with L</"success">.
 
+  # Check for different kinds of errors
+  if (my $err = $tx->error) {
+    die "$err->{code} response: $err->{message}" if $err->{code};
+    die "Connection error: $err->{message}";
+  }
+
 =head2 is_finished
 
   my $bool = $tx->is_finished;

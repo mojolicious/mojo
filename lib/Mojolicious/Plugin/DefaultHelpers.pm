@@ -384,6 +384,12 @@ C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
   $c->res->headers->content_type('text/plain');
   $c->reply->asset($asset);
 
+  # Serve static file if it exists
+  if (my $asset = $c->app->static->file('/foo/index.html')) {
+    $c->res->headers->content_type('text/html');
+    $c->reply->static($asset);
+  }
+
 =head2 reply->exception
 
   $c = $c->reply->exception('Oops!');

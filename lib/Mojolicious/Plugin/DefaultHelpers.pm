@@ -385,9 +385,9 @@ C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
   $c->reply->asset($asset);
 
   # Serve static file if it exists
-  if (my $asset = $c->app->static->file('/foo/index.html')) {
-    $c->res->headers->content_type('text/html');
-    $c->reply->static($asset);
+  if (my $asset = $c->app->static->file('images/logo.png')) {
+    $c->res->headers->content_type('image/png');
+    $c->reply->asset($asset);
   }
 
 =head2 reply->exception

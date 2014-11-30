@@ -45,13 +45,13 @@ $t->post_ok('/block')->status_is(200)
 $t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Perldoc browser (Welcome)
-$t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
+$t->get_ok('/perldoc')->status_is(200)
   ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
   ->text_is('a[id="GUIDES"]',   'GUIDES')
   ->content_like(qr/Mojolicious guide to the galaxy/);
 
 # Perldoc browser (Welcome with slash)
-$t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
+$t->get_ok('/perldoc/')->status_is(200)
   ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
   ->text_is('a[id="GUIDES"]',   'GUIDES')
   ->content_like(qr/Mojolicious guide to the galaxy/)
@@ -59,17 +59,20 @@ $t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
 
 # Perldoc browser (Mojo documentation)
 $t->get_ok('/perldoc/Mojo')->status_is(200)
-  ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
+  ->text_is('h1 a[id="SYNOPSIS"]', 'SYNOPSIS')
+  ->text_is('a[id="handler"]',     'handler')
   ->text_like('p', qr/Duct tape for the HTML5 web!/);
 
 # Perldoc browser (Mojo documentation with format)
 $t->get_ok('/perldoc/Mojo.html')->status_is(200)
-  ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
+  ->text_is('h1 a[id="SYNOPSIS"]', 'SYNOPSIS')
+  ->text_is('a[id="handler"]',     'handler')
   ->text_like('p', qr/Duct tape for the HTML5 web!/);
 
 # Perldoc browser (negotiated Mojo documentation)
 $t->get_ok('/perldoc/Mojo' => {Accept => 'text/html'})->status_is(200)
-  ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
+  ->text_is('h1 a[id="SYNOPSIS"]', 'SYNOPSIS')
+  ->text_is('a[id="handler"]',     'handler')
   ->text_like('p', qr/Duct tape for the HTML5 web!/);
 
 # Perldoc browser (Mojo source with format)

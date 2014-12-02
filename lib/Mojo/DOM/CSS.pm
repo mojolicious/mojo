@@ -106,7 +106,7 @@ sub _compile {
     }
 
     # Pseudo classes (":not" contains more selectors)
-    push @$selector, ['pc', "$1", $1 eq 'not' ? _compile($2) : $2]
+    push @$selector, ['pc', "$1", $1 eq 'not' ? _compile($2) : _equation($2)]
       while $pc =~ /$PSEUDO_CLASS_RE/go;
 
     # Attributes
@@ -123,7 +123,7 @@ sub _compile {
 sub _empty { $_[0][0] eq 'comment' || $_[0][0] eq 'pi' }
 
 sub _equation {
-  my $equation = shift;
+  return [] unless my $equation = shift;
 
   # "even"
   return [2, 2] if $equation =~ /^even$/i;
@@ -171,7 +171,7 @@ sub _pc {
     if $class eq 'checked';
 
   # ":first-*" or ":last-*" (rewrite with equation)
-  ($class, $args) = $1 ? ("nth-$class", 1) : ("nth-last-$class", '-n+1')
+  ($class, $args) = $1 ? ("nth-$class", [0, 1]) : ("nth-last-$class", [-1, 1])
     if $class =~ s/^(?:(first)|last)-//;
 
   # ":nth-*"
@@ -182,7 +182,6 @@ sub _pc {
     # ":nth-last-*"
     @siblings = reverse @siblings if $class =~ /^nth-last/;
 
-    $args = _equation($args) unless ref $args;
     for my $i (0 .. $#siblings) {
       next if (my $result = $args->[0] * $i + $args->[1]) < 1;
       last unless my $sibling = $siblings[$result - 1];

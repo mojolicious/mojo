@@ -1,4 +1,6 @@
 
+5.69  2014-12-03
+
 5.68  2014-12-02
   - Improved Mojo::DOM::CSS performance significantly.
   - Fixed deprecation warnings in get command.

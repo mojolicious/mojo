@@ -194,7 +194,7 @@ sub rendered {
 
   # Finish transaction
   my $stash = $self->stash;
-  unless ($stash->{'mojo.finished'}++) {
+  if (!$stash->{'mojo.finished'} && ++$stash->{'mojo.finished'}) {
 
     # Disable auto rendering and stop timer
     my $app = $self->render_later->app;

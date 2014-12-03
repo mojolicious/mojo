@@ -134,7 +134,7 @@ sub _get_data_file {
 sub _get_file {
   my ($self, $path) = @_;
   no warnings 'newline';
-  return -f $path && -r $path ? Mojo::Asset::File->new(path => $path) : undef;
+  return -f $path && -r _ ? Mojo::Asset::File->new(path => $path) : undef;
 }
 
 sub _warmup {

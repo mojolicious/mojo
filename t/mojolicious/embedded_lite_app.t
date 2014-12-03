@@ -202,6 +202,12 @@ $t->get_ok('/x/1/template/menubar')->status_is(200)
 # Missing template from myapp.pl
 $t->get_ok('/x/1/template/does_not_exist')->status_is(404);
 
+# Embedded WebSocket
+$t->websocket_ok('/x/1/url_for')->send_ok('ws_test')
+  ->message_ok->message_like(qr!^ws://localhost:\d+/x/1/url_for$!)
+  ->send_ok('index')->message_ok->message_like(qr!^http://localhost:\d+/x/1$!)
+  ->finish_ok;
+
 # Template from myapp.pl with unicode prefix
 $t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
 myapp

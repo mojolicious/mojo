@@ -53,6 +53,16 @@ get '/one/two' => {text => 'Two'};
 
 get '/template/:template';
 
+websocket '/url_for' => sub {
+  my $c = shift;
+  $c->on(
+    message => sub {
+      my ($c, $msg) = @_;
+      $c->send($c->url_for($msg)->to_abs);
+    }
+  );
+} => 'ws_test';
+
 app->start;
 __DATA__
 

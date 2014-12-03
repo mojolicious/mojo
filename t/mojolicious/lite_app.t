@@ -526,7 +526,7 @@ $t->get_ok('/alternatives/☃')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('/alternatives/%E2%98%83');
 
-# Different unicode alternative
+# Different Unicode alternative
 $t->get_ok('/alternatives/♥')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('/alternatives/%E2%99%A5');

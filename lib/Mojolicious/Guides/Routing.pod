@@ -236,7 +236,7 @@ but content will not be sent with the response even if it is present.
 IRIs are handled transparently, that means paths are guaranteed to be
 unescaped and decoded from bytes to characters.
 
-  # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
+  # GET /☃ (Unicode snowman) -> {controller => 'foo', action => 'snowman'}
   $r->get('/☃')->to(controller => 'foo', action => 'snowman');
 
 =head2 Stash

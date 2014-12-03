@@ -188,16 +188,16 @@ sub render_to_string { shift->render(@_, 'mojo.to_string' => 1) }
 sub rendered {
   my ($self, $status) = @_;
 
-  # Disable auto rendering and make sure we have a status
-  my $res = $self->render_later->res;
+  # Make sure we have a status
+  my $res = $self->res;
   $res->code($status || 200) if $status || !$res->code;
 
   # Finish transaction
   my $stash = $self->stash;
   unless ($stash->{'mojo.finished'}++) {
 
-    # Stop timer
-    my $app = $self->app;
+    # Disable auto rendering and stop timer
+    my $app = $self->render_later->app;
     if (my $started = delete $stash->{'mojo.started'}) {
       my $elapsed = sprintf '%f',
         Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
@@ -249,7 +249,7 @@ sub send {
   Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
   $tx->send($msg, $cb ? sub { shift; $self->$cb(@_) } : ());
-  return $self->rendered(101);
+  return $self;
 }
 
 sub session {
@@ -821,9 +821,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
   $c = $c->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
-will be invoked once all data has been written. Note that this method will
-automatically respond to WebSocket handshake requests with a C<101> response
-status.
+will be invoked once all data has been written.
 
   # Send "Text" message
   $c->send('I ♥ Mojolicious!');

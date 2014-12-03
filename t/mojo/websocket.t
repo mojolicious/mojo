@@ -54,7 +54,7 @@ websocket '/socket' => sub {
       $c->send(Mojo::IOLoop->stream($c->tx->connection)->timeout);
       $c->finish(1000 => 'I ♥ Mojolicious!');
     }
-  );
+  )->rendered(101);
 };
 
 websocket '/early_start' => sub {

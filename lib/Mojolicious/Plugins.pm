@@ -33,8 +33,9 @@ sub load_plugin {
   my ($self, $name) = @_;
 
   # Try all namespaces
-  my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
-  _load($_) and return $_->new for map {"${_}::$class"} @{$self->namespaces};
+  my $suffix = $name =~ /^[a-z]/ ? camelize($name) : $name;
+  my @classes = map {"${_}::$suffix"} @{$self->namespaces};
+  for my $class (@classes) { return $class->new if _load($class) }
 
   # Full module name
   return $name->new if _load($name);

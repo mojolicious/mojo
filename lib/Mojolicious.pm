@@ -251,7 +251,8 @@ parsed.
 
 This is a very powerful hook and should not be used lightly, it makes some
 rather advanced features such as upload progress bars possible. Note that this
-hook will not work for embedded applications. (Passed the transaction and
+hook will not work for embedded applications, because only the host
+application gets to build transactions. (Passed the transaction and
 application object)
 
 =head2 before_dispatch

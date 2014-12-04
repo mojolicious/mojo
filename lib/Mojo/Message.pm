@@ -429,8 +429,8 @@ entire message body has been received. Parts of the message body need to be
 loaded into memory to parse C<POST> parameters, so you have to make sure it is
 not excessively large, there's a 10MB limit by default.
 
-  # Get POST parameter value
-  say $msg->body_params->param('foo');
+  # Get POST parameter names and values
+  my $hash = $msg->body_params->to_hash;
 
 =head2 body_size
 

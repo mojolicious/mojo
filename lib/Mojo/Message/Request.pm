@@ -426,8 +426,8 @@ Parts of the request body need to be loaded into memory to parse C<POST>
 parameters, so you have to make sure it is not excessively large, there's a
 10MB limit by default.
 
-  # Get parameter value
-  say $req->params->param('foo');
+  # Get parameter names and values
+  my $hash = $req->params->to_hash;
 
 =head2 parse
 

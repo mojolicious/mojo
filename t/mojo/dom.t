@@ -1974,6 +1974,9 @@ $dom->find('b')->each(
   }
 );
 is_deeply \@results, [qw(baz yada)], 'right results';
+is $dom->at('b')->at('a')->text, 'bar', 'right text';
+is $dom->at('c > b > a')->text, 'bar', 'right text';
+is $dom->at('b')->at('c > b > a'), undef, 'no result';
 
 # Direct hash access to attributes in XML mode
 $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);

@@ -150,7 +150,7 @@ sub _match {
 sub _parent {
   my ($selectors, $current, $tree, $pos) = @_;
   return undef unless my $parent = $current->[3];
-  return undef if $parent->[0] eq 'root';
+  return undef if $parent->[0] eq 'root' || $parent eq $tree;
   return _combinator($selectors, $parent, $tree, $pos);
 }
 

@@ -80,6 +80,9 @@ Every L<ojo> one-liner is also a L<Mojolicious::Lite> application.
 
   $ perl -Mojo -E 'get "/" => {inline => "%= time"}; app->start' get /
 
+If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
+be set to C<fatal>.
+
 =head1 FUNCTIONS
 
 L<ojo> implements the following functions, which are automatically exported.

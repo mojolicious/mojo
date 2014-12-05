@@ -1,7 +1,6 @@
 package Mojo::EventEmitter;
 use Mojo::Base -base;
 
-use Mojo::Util 'deprecated';
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
@@ -19,22 +18,6 @@ sub emit {
     warn "-- Emit $name in @{[blessed $self]} (0)\n" if DEBUG;
     die "@{[blessed $self]}: $_[0]" if $name eq 'error';
   }
-
-  return $self;
-}
-
-# DEPRECATED in Tiger Face!
-sub emit_safe {
-  deprecated 'Mojo::EventEmitter::emit_safe is DEPRECATED';
-  my ($self, $name) = (shift, shift);
-
-  if (my $s = $self->{events}{$name}) {
-    for my $cb (@$s) {
-      $self->emit(error => qq{Event "$name" failed: $@})
-        unless eval { $self->$cb(@_); 1 };
-    }
-  }
-  else { die "@{[blessed $self]}: $_[0]" if $name eq 'error' }
 
   return $self;
 }

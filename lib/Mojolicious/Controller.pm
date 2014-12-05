@@ -176,13 +176,6 @@ sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
 sub render_not_found { shift->helpers->reply->not_found }
 
-# DEPRECATED in Tiger Face!
-sub render_static {
-  Mojo::Util::deprecated 'Mojolicious::Controller::render_static is DEPRECATED'
-    . ' in favor of the reply->static helper';
-  shift->helpers->reply->static(@_);
-}
-
 sub render_to_string { shift->render(@_, 'mojo.to_string' => 1) }
 
 sub rendered {

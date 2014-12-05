@@ -1,5 +1,7 @@
 
 5.69  2014-12-05
+  - Removed deprecated emit_safe method from Mojo::EventEmitter.
+  - Removed deprecated render_static method from Mojolicious::Controller.
   - Fixed parent combinator bug in Mojo::DOM::CSS.
 
 5.68  2014-12-02

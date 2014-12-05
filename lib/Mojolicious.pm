@@ -159,9 +159,6 @@ sub new {
   $r->hide(qw(send session signed_cookie stash tx url_for validation write));
   $r->hide(qw(write_chunk));
 
-  # DEPRECATED in Tiger Face!
-  $r->hide('render_static');
-
   # Check if we have a log directory that is writable
   my $mode = $self->mode;
   $self->log->path($home->rel_file("log/$mode.log"))

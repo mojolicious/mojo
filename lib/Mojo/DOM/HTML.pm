@@ -117,10 +117,10 @@ sub parse {
     if (defined $tag) {
 
       # End
-      if ($tag =~ /^\/\s*(.+)/) { _end($xml ? $1 : lc $1, $xml, \$current) }
+      if ($tag =~ /^\/\s*(\S+)/) { _end($xml ? $1 : lc $1, $xml, \$current) }
 
       # Start
-      elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {
+      elsif ($tag =~ m!^([^\s/]+)([\s\S]*)!) {
         my ($start, $attr) = ($xml ? $1 : lc $1, $2);
 
         # Attributes

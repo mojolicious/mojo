@@ -2320,9 +2320,9 @@ is $dom->parse('<![CDATA[0]]>'), '<![CDATA[0]]>', 'successful roundtrip';
 is $dom->parse('<?0?>'),         '<?0?>',         'successful roundtrip';
 
 # Not self-closing
-$dom = Mojo::DOM->new('<div /><div><pre />test</div>');
+$dom = Mojo::DOM->new('<div />< div ><pre />test</div >123');
 is $dom->at('div > div > pre')->text, 'test', 'right text';
-is "$dom", '<div><div><pre>test</pre></div></div>', 'right result';
+is "$dom", '<div><div><pre>test</pre></div>123</div>', 'right result';
 $dom = Mojo::DOM->new('<p /><svg><circle /><circle /></svg>');
 is $dom->find('p > svg > circle')->size, 2, 'two circles';
 is "$dom", '<p><svg><circle></circle><circle></circle></svg></p>',

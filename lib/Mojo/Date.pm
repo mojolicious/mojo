@@ -2,7 +2,7 @@ package Mojo::Date;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-use Time::Local 1.2 'timegm';
+use Time::Local 'timegm';
 
 has epoch => sub {time};
 

@@ -6,7 +6,7 @@ use Mojo::ByteStream 'b';
 use Mojo::DOM;
 use Mojo::URL;
 use Mojo::Util qw(slurp unindent url_escape);
-use Pod::Simple::XHTML 3.09;
+use Pod::Simple::XHTML;
 use Pod::Simple::Search;
 
 sub register {

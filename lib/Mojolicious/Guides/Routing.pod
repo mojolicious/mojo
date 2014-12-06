@@ -537,7 +537,7 @@ Broken dispatch chains can be continued by calling the method
 L<Mojolicious::Controller/"continue">, this allows for example non-blocking
 operations to finish before reaching the next dispatch cycle.
 
-  my $foo = $r->under('/foo' => sub {
+  my $maybe = $r->under('/maybe' => sub {
     my $c = shift;
 
     # Wait 3 seconds and then give visitors a 50% chance to continue
@@ -552,7 +552,7 @@ operations to finish before reaching the next dispatch cycle.
 
     return undef;
   });
-  $foo->get('/bar')->to('foo#bar');
+  $maybe->get('/')->to('maybe#winner');
 
 Every destination is just a snapshot of the stash at the time the route
 matched, and only the C<format> value is shared by all of them. For a little

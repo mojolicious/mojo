@@ -519,9 +519,9 @@ The actual action code for this destination needs to return a true value or
 the dispatch chain will be broken, this can be a very powerful tool for
 authentication.
 
-  # /bar -> {cb => sub {...}}
-  #         {controller => 'foo', action => 'bar'}
-  my $foo = $r->under('/' => sub {
+  # /blackjack -> {cb => sub {...}}
+  #               {controller => 'hideout', action => 'blackjack'}
+  my $auth = $r->under('/' => sub {
     my $c = shift;
 
     # Authenticated
@@ -531,7 +531,7 @@ authentication.
     $c->render(text => "You're not Bender.");
     return undef;
   });
-  $foo->get('/bar')->to('foo#bar');
+  $auth->get('/blackjack')->to('hideout#blackjack');
 
 Broken dispatch chains can be continued by calling the method
 L<Mojolicious::Controller/"continue">, this allows for example non-blocking

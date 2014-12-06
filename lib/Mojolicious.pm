@@ -42,8 +42,8 @@ has static    => sub { Mojolicious::Static->new };
 has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Tiger Face';
-our $VERSION  = '5.69';
+our $CODENAME = $Mojo::Base::CODENAME;
+our $VERSION  = $Mojo::Base::VERSION;
 
 sub AUTOLOAD {
   my $self = shift;

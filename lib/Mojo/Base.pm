@@ -11,6 +11,9 @@ use Carp ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
+our $CODENAME = 'Tiger Face';
+our $VERSION  = '5.69';
+
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
 

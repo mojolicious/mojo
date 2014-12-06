@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker;
 # IO::Socket::IP 0.26 first shipped with Perl 5.19.8
 WriteMakefile(
   NAME         => 'Mojolicious',
-  VERSION_FROM => 'lib/Mojolicious.pm',
+  VERSION_FROM => 'lib/Mojo/Base.pm',
   ABSTRACT     => 'Real-time web framework',
   AUTHOR       => 'Sebastian Riedel <sri@cpan.org>',
   LICENSE      => 'artistic_2',

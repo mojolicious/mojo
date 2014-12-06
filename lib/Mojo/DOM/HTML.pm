@@ -39,8 +39,7 @@ my $TOKEN_RE = qr/
     |
       \?(.*?)\?                                       # Processing Instruction
     |
-      (\s*[^<>\s]+                                    # Tag
-      \s*(?:(?:$ATTR_RE){0,32766})*+)                 # Attributes
+      \s*([^<>\s]+\s*(?:(?:$ATTR_RE){0,32766})*+)     # Tag
     )>
   |
     (<)                                               # Runaway "<"
@@ -118,7 +117,7 @@ sub parse {
     if (defined $tag) {
 
       # End
-      if ($tag =~ /^\s*\/\s*(.+)/) { _end($xml ? $1 : lc $1, $xml, \$current) }
+      if ($tag =~ /^\/\s*(.+)/) { _end($xml ? $1 : lc $1, $xml, \$current) }
 
       # Start
       elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {

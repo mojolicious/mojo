@@ -1,5 +1,5 @@
 
-5.69  2014-12-07
+5.69  2014-12-08
   - Removed deprecated emit_safe method from Mojo::EventEmitter.
   - Removed deprecated render_static method from Mojolicious::Controller.
   - Reverted deprecation of Mojo::DOM::val.

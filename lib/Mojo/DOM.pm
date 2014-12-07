@@ -876,14 +876,17 @@ C<selected> attribute and extract their values.
   # "b"
   $dom->parse('<input name="a" value="b">')->at('input')->val->first;
 
-  # "c"
-  $dom->parse('<option value="c">Test</option>')->at('option')->val->first;
-
   # "d"
-  $dom->parse('<option>d</option>')->at('option')->val->first;
+  $dom->parse('<textarea name="c">d</textarea>')->at('[name=c]')->val->first;
 
   # "e"
-  $dom->parse('<select><option selected>e</option></select>')
+  $dom->parse('<option value="e">Test</option>')->at('option')->val->first;
+
+  # "f"
+  $dom->parse('<option>f</option>')->at('option')->val->first;
+
+  # "g"
+  $dom->parse('<select><option selected>g</option></select>')
     ->at('select')->val->first;
 
 =head2 wrap

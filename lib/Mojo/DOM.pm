@@ -882,9 +882,9 @@ C<selected> attribute and extract their values.
   # "d"
   $dom->parse('<option>d</option>')->at('option')->val->first;
 
-  # "e,f"
-  $dom->parse('<select><option>e</option><option>f</option></select>')
-    ->at('select')->val->join(',');
+  # "e"
+  $dom->parse('<select><option selected>e</option></select>')
+    ->at('select')->val->first;
 
 =head2 wrap
 

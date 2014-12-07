@@ -662,7 +662,7 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
 
   # Run additional tests on the transaction
   $t->get_ok('/foo')->status_is(200);
-  is $t->tx->res->dom->at('input')->{value}, 'whatever', 'right value';
+  is $t->tx->res->dom->at('input')->val->first, 'whatever', 'right value';
 
 =head2 head_ok
 

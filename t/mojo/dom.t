@@ -2289,6 +2289,47 @@ is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
+# Form values
+$dom = Mojo::DOM->new(<<EOF);
+<form action="/foo">
+  <p>Test</p>
+  <input type="text" name="a" value="A" />
+  <input type="checkbox" checked name="b" value="B">
+  <input type="radio" checked name="c" value="C">
+  <select name="f">
+    <option value="F">G</option>
+    <optgroup>
+      <option>H</option>
+      <option selected>I</option>
+    </optgroup>
+    <option value="J" selected>K</option>
+  </select>
+  <select name="n"><option>N</option></select>
+  <select name="d"><option selected>D</option></select>
+  <textarea name="m">M</textarea>
+  <button name="o" value="O">No!</button>
+  <input type="submit" name="p" value="P" />
+</form>
+EOF
+is_deeply [$dom->at('p')->val->each], [], 'no values';
+is $dom->at('input')->val->size,                      1,   'one value';
+is $dom->at('input')->val->first,                     'A', 'right value';
+is $dom->at('input:checked')->val->first,             'B', 'right value';
+is $dom->at('input:checked[type=radio]')->val->first, 'C', 'right value';
+is $dom->find('select')->first->val->join(':'), 'I:J', 'right value';
+is_deeply [$dom->find('select')->first->val->each], ['I', 'J'], 'right values';
+is $dom->at('select option')->val->size,  1,   'one value';
+is $dom->at('select option')->val->first, 'F', 'right value';
+is $dom->at('select optgroup option:not([selected])')->val->first, 'H',
+  'right value';
+is $dom->find('select')->[1]->val->size, 0, 'no values';
+is $dom->find('select')->[1]->at('option')->val->first, 'N', 'right value';
+is $dom->find('select')->last->val->first, 'D', 'right value';
+is $dom->at('textarea')->val->size,  1,   'one value';
+is $dom->at('textarea')->val->first, 'M', 'right value';
+is $dom->at('button')->val->first,   'O', 'right value';
+is $dom->find('form input')->last->val->first, 'P', 'right value';
+
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');
 is_deeply $dom->at('input')->attr,

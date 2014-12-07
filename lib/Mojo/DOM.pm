@@ -180,9 +180,7 @@ sub type {
   return $self;
 }
 
-# DEPRECATED in Tiger Face!
 sub val {
-  deprecated 'Mojo::DOM::val is DEPRECATED';
   my $self = shift;
 
   # "option"
@@ -865,6 +863,28 @@ This element's type.
 
   # List types of child elements
   say $dom->children->map('type')->join("\n");
+
+=head2 val
+
+  my $collection = $dom->val;
+
+Extract values from C<button>, C<input>, C<option>, C<select> or C<textarea>
+element and return a L<Mojo::Collection> object containing these values. In
+the case of C<select>, find all C<option> elements it contains that have a
+C<selected> attribute and extract their values.
+
+  # "b"
+  $dom->parse('<input name="a" value="b">')->at('input')->val->first;
+
+  # "c"
+  $dom->parse('<option value="c">Test</option>')->at('option')->val->first;
+
+  # "d"
+  $dom->parse('<option>d</option>')->at('option')->val->first;
+
+  # "e,f"
+  $dom->parse('<select><option>e</option><option>f</option></select>')
+    ->at('select')->val->join(',');
 
 =head2 wrap
 

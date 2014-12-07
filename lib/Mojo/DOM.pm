@@ -133,7 +133,7 @@ sub parent {
   return _build($self, $self->_parent, $self->xml);
 }
 
-sub parse { shift->_delegate(parse => shift) }
+sub parse { shift->_delegate(parse => "$_[0]") }
 
 sub prepend { shift->_add(0, @_) }
 

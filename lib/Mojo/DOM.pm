@@ -133,7 +133,7 @@ sub parent {
   return _build($self, $self->_parent, $self->xml);
 }
 
-sub parse { shift->_delegate(parse => "$_[0]") }
+sub parse { shift->_delegate(parse => @_) }
 
 sub prepend { shift->_add(0, @_) }
 
@@ -147,7 +147,7 @@ sub remove { shift->replace('') }
 sub replace {
   my ($self, $new) = @_;
   return $self->parse($new) if (my $tree = $self->tree)->[0] eq 'root';
-  return $self->_replace($self->_parent, $tree, $self->_parse("$new"));
+  return $self->_replace($self->_parent, $tree, $self->_parse($new));
 }
 
 sub root {
@@ -211,7 +211,7 @@ sub _add {
 
   my $parent = $self->_parent;
   splice @$parent, _offset($parent, $tree) + $offset, 0,
-    _link($self->_parse("$new"), $parent);
+    _link($self->_parse($new), $parent);
 
   return $self;
 }
@@ -264,7 +264,7 @@ sub _content {
 
   $start  = $start  ? ($#$tree + 1) : _start($tree);
   $offset = $offset ? $#$tree       : 0;
-  splice @$tree, $start, $offset, _link($self->_parse("$new"), $tree);
+  splice @$tree, $start, $offset, _link($self->_parse($new), $tree);
 
   return $self;
 }
@@ -386,7 +386,7 @@ sub _wrap {
 
   # Find innermost tag
   my $current;
-  my $first = $new = $self->_parse("$new");
+  my $first = $new = $self->_parse($new);
   $current = $first while $first = first { $_->[0] eq 'tag' } _nodes($first);
   return $self unless $current;
 

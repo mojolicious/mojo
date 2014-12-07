@@ -78,7 +78,7 @@ sub _combinator {
 }
 
 sub _compile {
-  my $css = shift;
+  my $css = "$_[0]";
 
   my $pattern = [[]];
   while ($css =~ /$TOKEN_RE/go) {

@@ -132,8 +132,7 @@ is $tx->req->body, 'a=1&a=2&a=3&b=4', 'right content';
 
 # Existing query string (lowercase HEAD)
 $tx = $t->tx(head => 'http://example.com?foo=bar' => form => {baz => [1, 2]});
-is $tx->req->url->to_abs, 'http://example.com?foo=bar&baz=1&baz=2',
-  'right URL';
+is $tx->req->url->to_abs, 'http://example.com?baz=1&baz=2', 'right URL';
 is $tx->req->method, 'head', 'right method';
 is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
 ok $tx->is_empty, 'transaction is empty';

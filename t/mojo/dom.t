@@ -4,7 +4,7 @@ use Test::More;
 use Mojo::DOM;
 
 # Simple (basics)
-my $dom = Mojo::DOM->new->parse(
+my $dom = Mojo::DOM->new(
   '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
 is $dom->at('#b')->text, 'B', 'right text';
 my @div;
@@ -26,7 +26,7 @@ is $dom->tap(sub { $_->at('#b')->remove }), '<div id="a">A</div>',
   'right result';
 
 # Simple nesting with healing (tree structure)
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</bar>works</foo>
 EOF
 is $dom->tree->[0], 'root', 'right element';
@@ -63,7 +63,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 
 # Select based on parent
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <body>
   <div>test1</div>
   <div><div>test2</div></div>
@@ -246,11 +246,11 @@ is $dom->contents->first->text,      '', 'no text';
 is $dom->contents->first->all_text,  '', 'no text';
 
 # Class and ID
-$dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');
+$dom = Mojo::DOM->new('<div id="id" class="class">a</div>');
 is $dom->at('div#id.class')->text, 'a', 'right text';
 
 # Deep nesting (parent combinator)
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head>
     <title>Foo</title>
@@ -298,13 +298,13 @@ is_deeply [$dom->at('#header')->siblings->map('type')->each], [qw(form div)],
   'right results';
 
 # Script tag
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <script charset="utf-8">alert('lalala');</script>
 EOF
 is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
 # HTML5 (unquoted values)
-$dom = Mojo::DOM->new->parse(
+$dom = Mojo::DOM->new(
   '<div id = test foo ="bar" class=tset bar=/baz/ baz=//>works</div>');
 is $dom->at('#test')->text,                'works', 'right text';
 is $dom->at('div')->text,                  'works', 'right text';
@@ -317,8 +317,8 @@ is $dom->at('[bar=/baz/]')->text, 'works', 'right text';
 is $dom->at('[baz=//]')->text,    'works', 'right text';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
-$dom = Mojo::DOM->new->parse(
-  q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
+$dom
+  = Mojo::DOM->new(q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
 is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
@@ -328,7 +328,7 @@ is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
 # Already decoded Unicode snowman and quotes in selector
-$dom = Mojo::DOM->new->parse('<div id="snowm&quot;an">☃</div>');
+$dom = Mojo::DOM->new('<div id="snowm&quot;an">☃</div>');
 is $dom->at('[id="snowm\"an"]')->text,      '☃', 'right text';
 is $dom->at('[id="snowm\22 an"]')->text,    '☃', 'right text';
 is $dom->at('[id="snowm\000022an"]')->text, '☃', 'right text';
@@ -410,23 +410,23 @@ is $dom->to_string, $html, 'right result';
 is $dom->content,   $html, 'right result';
 
 # Looks remotely like HTML
-$dom = Mojo::DOM->new->parse(
+$dom = Mojo::DOM->new(
   '<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');
 is $dom->at('title')->text, '♥', 'right text';
 is $dom->at('*')->text,     '♥', 'right text';
 is $dom->at('.test')->text, '♥', 'right text';
 
 # Replace elements
-$dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
+$dom = Mojo::DOM->new('<div>foo<p>lalala</p>bar</div>');
 is $dom->at('p')->replace('<foo>bar</foo>'),
   '<div>foo<foo>bar</foo>bar</div>', 'right result';
 is "$dom", '<div>foo<foo>bar</foo>bar</div>', 'right result';
-$dom->at('foo')->replace(Mojo::DOM->new->parse('text'));
+$dom->at('foo')->replace(Mojo::DOM->new('text'));
 is "$dom", '<div>footextbar</div>', 'right result';
-$dom = Mojo::DOM->new->parse('<div>foo</div><div>bar</div>');
+$dom = Mojo::DOM->new('<div>foo</div><div>bar</div>');
 $dom->find('div')->each(sub { shift->replace('<p>test</p>') });
 is "$dom", '<p>test</p><p>test</p>', 'right result';
-$dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
+$dom = Mojo::DOM->new('<div>foo<p>lalala</p>bar</div>');
 is $dom->replace('♥'), '♥', 'right result';
 is "$dom", '♥', 'right result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
@@ -439,10 +439,10 @@ $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
 $dom->find('p')->map(replace => '');
 is "$dom", '<div>foobar</div>', 'right result';
-$dom = Mojo::DOM->new->parse('<div>♥</div>');
+$dom = Mojo::DOM->new('<div>♥</div>');
 $dom->at('div')->content('☃');
 is "$dom", '<div>☃</div>', 'right result';
-$dom = Mojo::DOM->new->parse('<div>♥</div>');
+$dom = Mojo::DOM->new('<div>♥</div>');
 $dom->at('div')->content("\x{2603}");
 is $dom->to_string, '<div>☃</div>', 'right result';
 is $dom->at('div')->replace('<p>♥</p>')->root, '<p>♥</p>', 'right result';
@@ -467,20 +467,20 @@ $dom->at('div')->find('div')->map('strip');
 is "$dom", '<div>ABC</div>', 'right result';
 
 # Replace element content
-$dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
+$dom = Mojo::DOM->new('<div>foo<p>lalala</p>bar</div>');
 is $dom->at('p')->content('bar'), '<p>bar</p>', 'right result';
 is "$dom", '<div>foo<p>bar</p>bar</div>', 'right result';
-$dom->at('p')->content(Mojo::DOM->new->parse('text'));
+$dom->at('p')->content(Mojo::DOM->new('text'));
 is "$dom", '<div>foo<p>text</p>bar</div>', 'right result';
-$dom = Mojo::DOM->new->parse('<div>foo</div><div>bar</div>');
+$dom = Mojo::DOM->new('<div>foo</div><div>bar</div>');
 $dom->find('div')->each(sub { shift->content('<p>test</p>') });
 is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right result';
 $dom->find('p')->each(sub { shift->content('') });
 is "$dom", '<div><p></p></div><div><p></p></div>', 'right result';
-$dom = Mojo::DOM->new->parse('<div><p id="☃" /></div>');
+$dom = Mojo::DOM->new('<div><p id="☃" /></div>');
 $dom->at('#☃')->content('♥');
 is "$dom", '<div><p id="☃">♥</p></div>', 'right result';
-$dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
+$dom = Mojo::DOM->new('<div>foo<p>lalala</p>bar</div>');
 $dom->content('♥');
 is "$dom", '♥', 'right result';
 is $dom->content('<div>foo<p>lalala</p>bar</div>'),
@@ -493,7 +493,7 @@ is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
 is $dom->at('p')->content(''), '<p></p>', 'right result';
 
 # Mixed search and tree walk
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <table>
   <tr>
     <td>text1</td>
@@ -514,7 +514,7 @@ is $data[3], 'text2', 'right text';
 is $data[4], undef,   'no tag';
 
 # RSS
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   <channel>
@@ -559,7 +559,7 @@ ok $dom->children('rss')->first->xml,  'XML mode active';
 ok $dom->at('title')->ancestors->first->xml, 'XML mode active';
 
 # Namespace
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <?xml version="1.0"?>
 <bk:book xmlns='uri:default-ns'
          xmlns:bk='uri:book-ns'
@@ -621,7 +621,7 @@ is $dom->at('[xml\.s]'), undef, 'no result';
 is $dom->at('b\.z'),     undef, 'no result';
 
 # Yadis
-$dom = Mojo::DOM->new->parse(<<'EOF');
+$dom = Mojo::DOM->new(<<'EOF');
 <?xml version="1.0" encoding="UTF-8"?>
 <XRDS xmlns="xri://$xrds">
   <XRD xmlns="xri://$xrd*($v*2.0)">
@@ -667,7 +667,7 @@ my $yadis = <<'EOF';
   </XRD>
 </xrds:XRDS>
 EOF
-$dom = Mojo::DOM->new->parse($yadis);
+$dom = Mojo::DOM->new($yadis);
 ok $dom->xml, 'XML mode detected';
 is $dom->at('XRDS')->namespace, 'xri://$xrds',         'right namespace';
 is $dom->at('XRD')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace';
@@ -702,27 +702,26 @@ is $dom->find('xrds\00003A Service > Type')->[1], undef, 'no result';
 is "$dom", $yadis, 'successful roundtrip';
 
 # Result and iterator order
-$dom = Mojo::DOM->new->parse('<a><b>1</b></a><b>2</b><b>3</b>');
+$dom = Mojo::DOM->new('<a><b>1</b></a><b>2</b><b>3</b>');
 my @numbers;
 $dom->find('b')->each(sub { push @numbers, pop, shift->text });
 is_deeply \@numbers, [1, 1, 2, 2, 3, 3], 'right order';
 
 # Attributes on multiple lines
-$dom = Mojo::DOM->new->parse("<div test=23 id='a' \n class='x' foo=bar />");
+$dom = Mojo::DOM->new("<div test=23 id='a' \n class='x' foo=bar />");
 is $dom->at('div.x')->attr('test'),        23,  'right attribute';
 is $dom->at('[foo="bar"]')->attr('class'), 'x', 'right attribute';
 is $dom->at('div')->attr(baz => undef)->root->to_string,
   '<div baz class="x" foo="bar" id="a" test="23"></div>', 'right result';
 
 # Markup characters in attribute values
-$dom = Mojo::DOM->new->parse(
-  qq{<div id="<a>" \n test='='>Test<div id='><' /></div>});
+$dom = Mojo::DOM->new(qq{<div id="<a>" \n test='='>Test<div id='><' /></div>});
 is $dom->at('div[id="<a>"]')->attr->{test}, '=', 'right attribute';
 is $dom->at('[id="<a>"]')->text, 'Test', 'right text';
 is $dom->at('[id="><"]')->attr->{id}, '><', 'right attribute';
 
 # Empty attributes
-$dom = Mojo::DOM->new->parse(qq{<div test="" test2='' />});
+$dom = Mojo::DOM->new(qq{<div test="" test2='' />});
 is $dom->at('div')->attr->{test},  '', 'empty attribute value';
 is $dom->at('div')->attr->{test2}, '', 'empty attribute value';
 is $dom->at('[test]')->type,  'div', 'right type';
@@ -733,14 +732,13 @@ is $dom->at('[test2=""]')->type, 'div', 'right type';
 is $dom->at('[test3=""]'), undef, 'no result';
 
 # Whitespaces before closing bracket
-$dom = Mojo::DOM->new->parse('<div >content</div>');
+$dom = Mojo::DOM->new('<div >content</div>');
 ok $dom->at('div'), 'tag found';
 is $dom->at('div')->text,    'content', 'right text';
 is $dom->at('div')->content, 'content', 'right text';
 
 # Class with hyphen
-$dom
-  = Mojo::DOM->new->parse('<div class="a">A</div><div class="a-1">A1</div>');
+$dom = Mojo::DOM->new('<div class="a">A</div><div class="a-1">A1</div>');
 @div = ();
 $dom->find('.a')->each(sub { push @div, shift->text });
 is_deeply \@div, ['A'], 'found first element only';
@@ -749,24 +747,24 @@ $dom->find('.a-1')->each(sub { push @div, shift->text });
 is_deeply \@div, ['A1'], 'found last element only';
 
 # Defined but false text
-$dom = Mojo::DOM->new->parse(
+$dom = Mojo::DOM->new(
   '<div><div id="a">A</div><div id="b">B</div></div><div id="0">0</div>');
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw(A B 0)], 'found all div elements with id';
 
 # Empty tags
-$dom = Mojo::DOM->new->parse('<hr /><br/><br id="br"/><br />');
+$dom = Mojo::DOM->new('<hr /><br/><br id="br"/><br />');
 is "$dom", '<hr><br><br id="br"><br>', 'right result';
 is $dom->at('br')->content, '', 'empty result';
 
 # Inner XML
-$dom = Mojo::DOM->new->parse('<a>xxx<x>x</x>xxx</a>');
+$dom = Mojo::DOM->new('<a>xxx<x>x</x>xxx</a>');
 is $dom->at('a')->content, 'xxx<x>x</x>xxx', 'right result';
 is $dom->content, '<a>xxx<x>x</x>xxx</a>', 'right result';
 
 # Multiple selectors
-$dom = Mojo::DOM->new->parse(
+$dom = Mojo::DOM->new(
   '<div id="a">A</div><div id="b">B</div><div id="c">C</div>');
 @div = ();
 $dom->find('#a, #c')->each(sub { push @div, shift->text });
@@ -777,7 +775,7 @@ is_deeply \@div, [qw(A B)], 'found all div elements with the right ids';
 @div = ();
 $dom->find('div[id="a"], div[id="c"]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw(A C)], 'found all div elements with the right ids';
-$dom = Mojo::DOM->new->parse(
+$dom = Mojo::DOM->new(
   '<div id="☃">A</div><div id="b">B</div><div id="♥x">C</div>');
 @div = ();
 $dom->find('#☃, #♥x')->each(sub { push @div, shift->text });
@@ -791,7 +789,7 @@ $dom->find('div[id="☃"], div[id="♥x"]')
 is_deeply \@div, [qw(A C)], 'found all div elements with the right ids';
 
 # Multiple attributes
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <div foo="bar" bar="baz">A</div>
 <div foo="bar">B</div>
 <div foo="bar" bar="baz">C</div>
@@ -810,7 +808,7 @@ is $dom->at('[foo="bar"]')->next->previous->text, 'A', 'right text';
 is $dom->at('[foo="bar"]')->next->next->next->next, undef, 'no next sibling';
 
 # Pseudo classes
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <form action="/foo">
     <input type="text" name="user" value="test" />
     <input type="checkbox" checked="checked" name="groovy">
@@ -861,7 +859,7 @@ is $dom->at('p')->attr->{id},                    'content', 'right attribute';
 is $dom->at('p:empty')->attr->{id}, 'no_content', 'right attribute';
 
 # More pseudo classes
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <ul>
     <li>A</li>
     <li>B</li>
@@ -1000,7 +998,7 @@ $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(A B C D E F G)], 'found first three li elements';
 
 # Even more pseudo classes
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <ul>
     <li>A</li>
     <p>B</p>
@@ -1121,7 +1119,7 @@ $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(J K)], 'found only child';
 
 # Sibling combinator
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <ul>
     <li>A</li>
     <p>B</p>
@@ -1169,7 +1167,7 @@ is $dom->at('#♥ + *:nth-last-child(2)')->text,        'F', 'right text';
 is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
 
 # Adding nodes
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <ul>
     <li>A</li>
     <p>B</p>
@@ -1247,7 +1245,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 
 # Optional "head" and "body" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head>
     <title>foo</title>
@@ -1257,7 +1255,7 @@ is $dom->at('html > head > title')->text, 'foo', 'right text';
 is $dom->at('html > body')->text,         'bar', 'right text';
 
 # Optional "li" tag
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <ul>
   <li>
     <ol>
@@ -1280,7 +1278,7 @@ is $dom->find('ul > li')->[4]->text,           'D', 'right text';
 is $dom->find('ul > li')->[5]->text,           'E', 'right text';
 
 # Optional "p" tag
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <div>
   <p>A</p>
   <P>B
@@ -1303,7 +1301,7 @@ is $dom->at('div > p > img')->attr->{src}, 'foo.png', 'right attribute';
 is $dom->at('div > div')->text, 'X', 'right text';
 
 # Optional "dt" and "dd" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <dl>
   <dt>A</dt>
   <DD>B
@@ -1321,7 +1319,7 @@ is $dom->find('dl > dt')->[2]->text, 'E', 'right text';
 is $dom->find('dl > dd')->[2]->text, 'F', 'right text';
 
 # Optional "rp" and "rt" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <ruby>
   <rp>A</rp>
   <RT>B
@@ -1339,7 +1337,7 @@ is $dom->find('ruby > rp')->[2]->text, 'E', 'right text';
 is $dom->find('ruby > rt')->[2]->text, 'F', 'right text';
 
 # Optional "optgroup" and "option" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <div>
   <optgroup>A
     <option id="foo">B
@@ -1361,7 +1359,7 @@ is $dom->find('div > optgroup')->[2]->text,          'G', 'right text';
 is $dom->find('div > optgroup > option')->[4]->text, 'H', 'right text';
 
 # Optional "colgroup" tag
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <table>
   <col id=morefail>
   <col id=fail>
@@ -1382,7 +1380,7 @@ is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
 
 # Optional "thead", "tbody", "tfoot", "tr", "th" and "td" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <table>
   <thead>
     <tr>
@@ -1402,7 +1400,7 @@ is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
 is $dom->at('table > tfoot > tr > td')->text, 'C', 'right text';
 
 # Optional "colgroup", "thead", "tbody", "tr", "th" and "td" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <table>
   <col id=morefail>
   <col id=fail>
@@ -1439,7 +1437,7 @@ is $dom->find('table > tbody > tr > td')->map('text')->join("\n"), "B\nE",
   'right text';
 
 # Optional "colgroup", "tbody", "tr", "th" and "td" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <table>
   <colgroup>
     <col id=foo />
@@ -1461,7 +1459,7 @@ is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
 is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
 
 # Optional "tr" and "td" tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <table>
     <tr>
       <td>A
@@ -1479,7 +1477,7 @@ is $dom->find('table > tr > td')->[2]->text, 'C', 'right text';
 is $dom->find('table > tr > td')->[3]->text, 'D', 'right text';
 
 # Real world table
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head>
     <title>Real World!</title>
@@ -1522,7 +1520,7 @@ is_deeply \@siblings, ['Beta', 'Delta', 'Beta Two', 'Delta Two'],
   'right results';
 
 # Real world list
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head>
     <title>Real World!</title>
@@ -1560,7 +1558,7 @@ is $dom->find('body > ul > li')->[2]->all_text,     'Test 3 2 1', 'right text';
 is $dom->find('body > ul > li > p')->[2]->all_text, '',           'no text';
 
 # Advanced whitespace trimming (punctuation)
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head>
     <title>Real World!</title>
@@ -1579,7 +1577,7 @@ is $dom->find('body > div')->[2]->all_text, 'foo: bar baz? yada!',
 is $dom->find('body > div')->[2]->text, 'foo baz!', 'right text';
 
 # Real world JavaScript and CSS
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head>
     <style test=works>#style { foo: style('<test>'); }</style>
@@ -1600,7 +1598,7 @@ is $dom->find('html > head > script')->[1]->text,
   "if (b > c) { alert('&<ohoh>') }", 'right text';
 
 # More real world JavaScript
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <!DOCTYPE html>
 <html>
   <head>
@@ -1623,7 +1621,7 @@ is $dom->find('html > head > script')->[2]->text, '', 'no text';
 is $dom->at('html > body')->text, 'Bar', 'right text';
 
 # Even more real world JavaScript
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <!DOCTYPE html>
 <html>
   <head>
@@ -1646,7 +1644,7 @@ is $dom->find('html > head > script')->[2]->text, '', 'no text';
 is $dom->at('html > body')->text, 'Bar', 'right text';
 
 # Inline DTD
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <?xml version="1.0"?>
 <!-- This is a Test! -->
 <!DOCTYPE root [
@@ -1664,7 +1662,7 @@ is $dom->tree->[5][1], ' root [
   <!ATTLIST root att CDATA #REQUIRED>
 ]', 'right doctype';
 is $dom->at('root')->text, '<hello>world</hello>', 'right text';
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <!doctype book
 SYSTEM "usr.dtd"
 [
@@ -1679,7 +1677,7 @@ SYSTEM "usr.dtd"
 ]', 'right doctype';
 ok !$dom->xml, 'XML mode not detected';
 is $dom->at('foo'), '<foo></foo>', 'right element';
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <?xml version="1.0" encoding = 'utf-8'?>
 <!DOCTYPE foo [
   <!ELEMENT foo ANY>
@@ -1698,7 +1696,7 @@ is $dom->tree->[3][1], ' foo [
 ]  ', 'right doctype';
 is $dom->at('foo')->attr->{'xml:lang'}, 'de', 'right attribute';
 is $dom->at('foo')->text, 'Check!', 'right text';
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <!DOCTYPE TESTSUITE PUBLIC "my.dtd" 'mhhh' [
   <!ELEMENT foo ANY>
   <!ATTLIST foo bar ENTITY 'true'>
@@ -1721,7 +1719,7 @@ is $dom->tree->[1][1], ' TESTSUITE PUBLIC "my.dtd" \'mhhh\' [
 is $dom->at('foo')->attr('bar'), 'false', 'right attribute';
 
 # Broken "font" block and useless end tags
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1736,7 +1734,7 @@ is $dom->at('html > head > title')->text,          'Test', 'right text';
 is $dom->at('html body table tr td > font')->text, 'test', 'right text';
 
 # Different broken "font" block
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1756,7 +1754,7 @@ is $dom->find('html > body > font > table > tr > td')->[1]->text, 'test2',
   'right text';
 
 # Broken "font" and "div" blocks
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1772,7 +1770,7 @@ is $dom->at('html body font > div')->text,       'test1', 'right text';
 is $dom->at('html body font > div > div')->text, 'test2', 'right text';
 
 # Broken "div" blocks
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1788,7 +1786,7 @@ is $dom->at('html head title')->text,                 'Test', 'right text';
 is $dom->at('html body div table tr td > div')->text, 'test', 'right text';
 
 # And another broken "font" block
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1831,7 +1829,7 @@ is $dom, <<EOF, 'right result';
 EOF
 
 # A collection of wonderful screwups
-$dom = Mojo::DOM->new->parse(<<'EOF');
+$dom = Mojo::DOM->new(<<'EOF');
 <!DOCTYPE html>
 <html lang="en">
   <head><title>Wonderful Screwups</title></head>
@@ -1862,7 +1860,7 @@ $dom = Mojo::DOM->new('<br< abc abc abc abc abc abc abc abc<p>Test</p>');
 is $dom->at('p')->text, 'Test', 'right text';
 
 # Modifying an XML document
-$dom = Mojo::DOM->new->parse(<<'EOF');
+$dom = Mojo::DOM->new(<<'EOF');
 <?xml version='1.0' encoding='UTF-8'?>
 <XMLTest />
 EOF
@@ -1888,7 +1886,7 @@ is $dom->at('div:root')->text, 'Test', 'right text';
 
 # Ensure XML semantics
 ok !!Mojo::DOM->new->xml(1)->parse('<foo />')->xml, 'XML mode active';
-$dom = Mojo::DOM->new->parse(<<'EOF');
+$dom = Mojo::DOM->new(<<'EOF');
 <?xml version='1.0' encoding='UTF-8'?>
 <script>
   <table>
@@ -1924,7 +1922,7 @@ is $dom->find('table > td > tr > thead')->[2], undef, 'no result';
 is $dom->find('table > td > tr > thead')->size, 2, 'right number of elements';
 
 # Nested tables
-$dom = Mojo::DOM->new->parse(<<'EOF');
+$dom = Mojo::DOM->new(<<'EOF');
 <table id="foo">
   <tr>
     <td>
@@ -2228,7 +2226,7 @@ is $dom->find('a[accesskey*=1]')->[1], undef, 'no result';
 is $dom->at('a[accesskey*="."]'), undef, 'no result';
 
 # Empty attribute value
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <foo bar=>
   test
 </foo>
@@ -2252,7 +2250,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 
 # Nested description lists
-$dom = Mojo::DOM->new->parse(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
 <dl>
   <dt>A</dt>
   <DD>

@@ -6,6 +6,8 @@
   - Improved Mojo::DOM::HTML performance slightly.
   - Fixed parent combinator bug in Mojo::DOM::CSS.
   - Fixed whitespace bug in Mojo::DOM::HTML.
+  - Fixed Mojo::UserAgent::Transactor to handle query parameters more like
+    most common browsers.
 
 5.68  2014-12-02
   - Improved Mojo::DOM::CSS performance significantly.

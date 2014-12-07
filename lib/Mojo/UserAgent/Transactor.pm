@@ -177,7 +177,7 @@ sub _form {
   my $p = Mojo::Parameters->new(map { $_ => $form->{$_} } sort keys %$form);
   $p->charset($options{charset}) if defined $options{charset};
   my $method = uc $req->method;
-  if ($method eq 'GET' || $method eq 'HEAD') { $req->url->query->merge($p) }
+  if ($method eq 'GET' || $method eq 'HEAD') { $req->url->query($p) }
   else {
     $req->body($p->to_string);
     _type($headers, 'application/x-www-form-urlencoded');

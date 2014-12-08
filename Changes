@@ -1,5 +1,5 @@
 
-5.69  2014-12-08
+5.69  2014-12-09
   - Removed deprecated emit_safe method from Mojo::EventEmitter.
   - Removed deprecated render_static method from Mojolicious::Controller.
   - Removed deprecated has_conditions method from Mojolicious::Routes::Route.

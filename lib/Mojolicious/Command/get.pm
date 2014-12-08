@@ -131,7 +131,7 @@ Mojolicious::Command::get - Get command
     mojo get mojolicio.us
     mojo get -v -r google.com
     mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicio.us
-    mojo get -M POST -c 'trololo' mojolicio.us
+    mojo get -M POST -H 'Content-Type: text/trololo' -c 'trololo' mojolicio.us
     mojo get mojolicio.us 'head > title' text
     mojo get mojolicio.us .footer all
     mojo get mojolicio.us a attr href

@@ -2,6 +2,7 @@
 5.69  2014-12-08
   - Removed deprecated emit_safe method from Mojo::EventEmitter.
   - Removed deprecated render_static method from Mojolicious::Controller.
+  - Removed deprecated has_conditions method from Mojolicious::Routes::Route.
   - Improved Mojo::DOM::HTML performance slightly.
   - Fixed parent combinator bug in Mojo::DOM::CSS.
   - Fixed whitespace bug in Mojo::DOM::HTML.

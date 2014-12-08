@@ -58,16 +58,6 @@ sub find {
 
 sub get { shift->_generate_route(GET => @_) }
 
-# DEPRECATED in Tiger Face!
-sub has_conditions {
-  Mojo::Util::deprecated
-    'Mojolicious::Routes::Route::has_conditions is DEPRECATED';
-  my $self = shift;
-  return 1 if @{$self->over || []};
-  return undef unless my $parent = $self->parent;
-  return $parent->has_conditions;
-}
-
 sub has_custom_name { !!shift->{custom} }
 
 sub has_websocket {

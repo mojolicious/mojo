@@ -70,7 +70,7 @@ sub websocket {
 
 sub _cleanup {
   my $self = shift;
-  return unless my $loop = $self->_loop(0);
+  return $self unless my $loop = $self->_loop(0);
 
   # Clean up active connections (by closing them)
   delete $self->{pid};
@@ -78,7 +78,7 @@ sub _cleanup {
 
   # Clean up keep-alive connections
   $loop->remove($_->[1]) for @{delete $self->{queue} || []};
-  $loop = $self->_loop(1);
+  return $self unless $loop = $self->_loop(1);
   $loop->remove($_->[1]) for @{delete $self->{nb_queue} || []};
 
   return $self;

@@ -308,7 +308,7 @@ TLS verification mode, defaults to C<0x03>.
 
   my $port = $server->port;
 
-Get TCP port this server is listening on, primarily used for tests.
+Get TCP port this server is listening on.
 
 =head2 start
 

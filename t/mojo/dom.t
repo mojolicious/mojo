@@ -159,14 +159,14 @@ is $dom->at('p')->contents->last->preceding_siblings->last->content, '123',
   'right content';
 is $dom->at('p')->contents->last->preceding_siblings->size, 2,
   'right number of nodes';
-is $dom->contents->first->preceding_siblings->size, 0, 'no preceding nodes';
+is $dom->preceding_siblings->size, 0, 'no preceding nodes';
 is $dom->at('p')->following_siblings->first->content, 'after', 'right content';
 is $dom->at('p')->following_siblings->size, 1, 'right number of nodes';
 is $dom->contents->first->following_siblings->first->type, 'p', 'right type';
 is $dom->contents->first->following_siblings->last->content, 'after',
   'right content';
 is $dom->contents->first->following_siblings->size, 2, 'right number of nodes';
-is $dom->contents->last->following_siblings->size,  0, 'no following nodes';
+is $dom->following_siblings->size, 0, 'no following nodes';
 is $dom->at('p')->previous_sibling->content, ' before', 'right content';
 is $dom->at('p')->previous_sibling->previous_sibling, undef,
   'no more siblings';
@@ -239,13 +239,16 @@ is $dom->at('b')->contents->first->prepend_content('h')->content, 'h:)g',
   'right content';
 is "$dom", '<script><i><b>h:)g</b>a</i><b>fce</b>1<b>d</b></script>',
   'right result';
+is $dom->at('script > b:last-of-type')->append('<!--y-->')
+  ->following_siblings->first->content, 'y', 'right content';
+is $dom->at('i')->prepend('z')->preceding_siblings->first->content, 'z',
+  'right content';
 is $dom->at('i')->following->last->text, 'd', 'right text';
 is $dom->at('i')->following->size, 2, 'right number of following elements';
 is $dom->at('i')->following('b:last-of-type')->first->text, 'd', 'right text';
 is $dom->at('i')->following('b:last-of-type')->size, 1,
   'right number of following elements';
-is $dom->at('script > b:last-of-type')->following->size, 0,
-  'no following elements';
+is $dom->following->size, 0, 'no following elements';
 is $dom->at('script > b:last-of-type')->preceding->first->type, 'i',
   'right type';
 is $dom->at('script > b:last-of-type')->preceding->size, 2,
@@ -254,7 +257,9 @@ is $dom->at('script > b:last-of-type')->preceding('b')->first->type, 'b',
   'right type';
 is $dom->at('script > b:last-of-type')->preceding('b')->size, 1,
   'right number of preceding elements';
-is $dom->at('i')->preceding->size, 0, 'no preceding elements';
+is $dom->preceding->size, 0, 'no preceding elements';
+is "$dom", '<script>z<i><b>h:)g</b>a</i><b>fce</b>1<b>d</b><!--y--></script>',
+  'right result';
 
 # XML nodes
 $dom = Mojo::DOM->new->xml(1)->parse('<b>test<image /></b>');

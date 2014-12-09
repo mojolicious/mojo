@@ -459,10 +459,12 @@ $ua->websocket(
     $tx->on(
       frame => sub {
         my ($tx, $frame) = @_;
-        $pong = $frame->[5] if $frame->[4] == 10;
-        Mojo::IOLoop->stop;
+        return unless $frame->[4] == 10;
+        $pong = $frame->[5];
+        $tx->finish;
       }
     );
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->send([1, 0, 0, 0, 9, 'test']);
   }
 );

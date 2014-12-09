@@ -42,7 +42,6 @@ sub all_text { shift->_all_text(1, @_) }
 sub ancestors { _select($_[0]->_collect($_[0]->_ancestors), $_[1]) }
 
 sub append { shift->_add(1, @_) }
-
 sub append_content { shift->_content(1, 0, @_) }
 
 sub at {
@@ -142,7 +141,6 @@ sub preceding { _select($_[0]->_collect(@{_siblings($_[0], 1)->[0]}), $_[1]) }
 sub preceding_siblings { $_[0]->_collect(@{_siblings($_[0])->[0]}) }
 
 sub prepend { shift->_add(0, @_) }
-
 sub prepend_content { shift->_content(0, 0, @_) }
 
 sub previous         { _maybe($_[0], $_[0]->_siblings(1)->[0][-1]) }

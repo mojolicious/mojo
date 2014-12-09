@@ -162,7 +162,12 @@ sub root {
   return _build($self, $tree, $self->xml);
 }
 
-sub siblings { _select($_[0]->_collect(@{_siblings($_[0], 1, 1)}), $_[1]) }
+# DEPRECATED in Tiger Face!
+sub siblings {
+  deprecated 'Mojo::DOM::siblings is DEPRECATED';
+  my $siblings = _siblings($_[0], 1);
+  return _select($_[0]->_collect(@{$siblings->[0]}, @{$siblings->[1]}), $_[1]);
+}
 
 sub strip {
   my $self = shift;
@@ -332,9 +337,9 @@ sub _select {
 }
 
 sub _siblings {
-  my ($self, $tags, $all) = @_;
+  my ($self, $tags) = @_;
 
-  return [] unless my $parent = $self->parent;
+  return [[], []] unless my $parent = $self->parent;
 
   my $tree = $self->tree;
   my (@before, @after, $match);
@@ -344,7 +349,7 @@ sub _siblings {
     $match ? push @after, $node : push @before, $node;
   }
 
-  return $all ? [@before, @after] : [\@before, \@after];
+  return [\@before, \@after];
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
@@ -849,18 +854,6 @@ Replace this node with HTML/XML fragment and return L</"parent">.
   my $root = $dom->root;
 
 Return L<Mojo::DOM> object for root node.
-
-=head2 siblings
-
-  my $collection = $dom->siblings;
-  my $collection = $dom->siblings('div > p');
-
-Find all sibling elements of this node matching the CSS selector and return a
-L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
-All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
-
-  # List types of sibling elements
-  say $dom->siblings->map('type')->join("\n");
 
 =head2 strip
 

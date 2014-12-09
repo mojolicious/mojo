@@ -220,7 +220,7 @@ is "$dom", '<script>a<b>c</b>1<b>d</b></script>', 'right result';
 is $dom->at('b')->contents->first->append('e')->content, 'c', 'right content';
 is $dom->at('b')->contents->first->prepend('f')->node, 'text', 'right node';
 is "$dom", '<script>a<b>fce</b>1<b>d</b></script>', 'right result';
-is $dom->at('script')->contents->first->siblings->first->type, 'b',
+is $dom->at('script')->contents->first->following->first->type, 'b',
   'right type';
 is $dom->at('script')->contents->first->next->content, 'fce', 'right content';
 is $dom->at('script')->contents->first->previous, undef, 'no siblings';
@@ -326,14 +326,6 @@ is_deeply [$dom->at('p')->ancestors->map('type')->each],
   [qw(div div div body html)], 'right results';
 is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
 is_deeply [$dom->ancestors->each],             [], 'no results';
-is_deeply [$dom->siblings->each],              [], 'no results';
-ok $dom->at('form')->siblings->[0]->match('#header'),  'right sibling';
-ok $dom->at('form')->siblings->[1]->match('#content'), 'right sibling';
-is $dom->at('form')->siblings('#content')->first->text, 'More stuff',
-  'right text';
-is_deeply [$dom->at('form')->siblings('#nothing')->each], [], 'no results';
-is_deeply [$dom->at('#header')->siblings->map('type')->each], [qw(form div)],
-  'right results';
 
 # Script tag
 $dom = Mojo::DOM->new(<<EOF);
@@ -1551,10 +1543,10 @@ is $dom->find('tbody > tr > .gamma')->[0]->text, '',            'no text';
 is $dom->find('tbody > tr > .gamma > a')->[0]->text, 'Gamma',     'right text';
 is $dom->find('tbody > tr > .alpha')->[1]->text,     'Alpha Two', 'right text';
 is $dom->find('tbody > tr > .gamma > a')->[1]->text, 'Gamma Two', 'right text';
-my @siblings
-  = $dom->find('tr > td:nth-child(1)')->map(siblings => ':nth-child(even)')
+my @following
+  = $dom->find('tr > td:nth-child(1)')->map(following => ':nth-child(even)')
   ->flatten->map('all_text')->each;
-is_deeply \@siblings, ['Beta', 'Delta', 'Beta Two', 'Delta Two'],
+is_deeply \@following, ['Beta', 'Delta', 'Beta Two', 'Delta Two'],
   'right results';
 
 # Real world list

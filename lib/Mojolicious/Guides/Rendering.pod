@@ -642,6 +642,9 @@ A naive translation to Perl code could look like this.
   }
   return $output;
 
+While template blocks cannot be shared between templates, they are most
+commonly used to pass parts of a template to helpers.
+
 =head2 Adding helpers
 
 You should always try to keep your actions small and reuse as much code as

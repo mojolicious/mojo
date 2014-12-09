@@ -1,5 +1,5 @@
 
-5.69  2014-12-09
+5.69  2014-12-10
   - Deprecated Mojo::DOM::siblings.
   - Added following, following_siblings, preceding and preceding_siblings
     methods to Mojo::DOM.

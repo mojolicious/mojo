@@ -94,6 +94,9 @@ sub contents { $_[0]->_collect(_nodes($_[0]->tree)) }
 
 sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
 
+sub following_siblings { $_[0]->_collect(@{_siblings($_[0])->[1]}) }
+sub following { _select($_[0]->_collect(@{_siblings($_[0], 1)->[1]}), $_[1]) }
+
 sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
 
 sub namespace {
@@ -122,8 +125,8 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next         { _maybe($_[0], $_[0]->_siblings(1)->[1]) }
-sub next_sibling { _maybe($_[0], $_[0]->_siblings->[1]) }
+sub next         { _maybe($_[0], $_[0]->_siblings(1)->[1][0]) }
+sub next_sibling { _maybe($_[0], $_[0]->_siblings->[1][0]) }
 
 sub node { shift->tree->[0] }
 
@@ -135,12 +138,15 @@ sub parent {
 
 sub parse { shift->_delegate(parse => @_) }
 
+sub preceding { _select($_[0]->_collect(@{_siblings($_[0], 1)->[0]}), $_[1]) }
+sub preceding_siblings { $_[0]->_collect(@{_siblings($_[0])->[0]}) }
+
 sub prepend { shift->_add(0, @_) }
 
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous         { _maybe($_[0], $_[0]->_siblings(1)->[0]) }
-sub previous_sibling { _maybe($_[0], $_[0]->_siblings->[0]) }
+sub previous         { _maybe($_[0], $_[0]->_siblings(1)->[0][-1]) }
+sub previous_sibling { _maybe($_[0], $_[0]->_siblings->[0][-1]) }
 
 sub remove { shift->replace('') }
 
@@ -338,7 +344,7 @@ sub _siblings {
     $match ? push @after, $node : push @before, $node;
   }
 
-  return $all ? [@before, @after] : [$before[-1], $after[0]];
+  return $all ? [@before, @after] : [\@before, \@after];
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
@@ -635,6 +641,29 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # Find elements with a class that contains dots
   my @divs = $dom->find('div.foo\.bar')->each;
 
+=head2 following
+
+  my $collection = $dom->following;
+  my $collection = $dom->following('div > p');
+
+Find all sibling elements after this node matching the CSS selector and return
+a L<Mojo::Collection> object containing these elements as L<Mojo::DOM>
+objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+
+  # List types of sibling elements after this node
+  say $dom->following->map('type')->join("\n");
+
+=head2 following_siblings
+
+  my $collection = $dom->following_siblings;
+
+Return a L<Mojo::Collection> object containing the sibling nodes after this
+element as L<Mojo::DOM> objects.
+
+  # " C "
+  $dom->parse('<p>A</p>B<!-- C -->')
+    ->at('p')->following_siblings->last->content;
+
 =head2 match
 
   my $result = $dom->match('html title');
@@ -710,6 +739,29 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   # Parse XML
   my $dom = Mojo::DOM->new->xml(1)->parse($xml);
+
+=head2 preceding
+
+  my $collection = $dom->preceding;
+  my $collection = $dom->preceding('div > p');
+
+Find all sibling elements before this node matching the CSS selector and
+return a L<Mojo::Collection> object containing these elements as L<Mojo::DOM>
+objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+
+  # List types of sibling elements before this node
+  say $dom->preceding->map('type')->join("\n");
+
+=head2 preceding_siblings
+
+  my $collection = $dom->preceding_siblings;
+
+Return a L<Mojo::Collection> object containing the sibling nodes before this
+element as L<Mojo::DOM> objects.
+
+  # "B"
+  $dom->parse('<!-- A -->B<p>C</p>D')
+    ->at('p')->preceding_siblings->last->content;
 
 =head2 prepend
 

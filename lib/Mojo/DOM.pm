@@ -94,8 +94,8 @@ sub contents { $_[0]->_collect(_nodes($_[0]->tree)) }
 
 sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
 
-sub following_siblings { $_[0]->_collect(@{_siblings($_[0])->[1]}) }
 sub following { _select($_[0]->_collect(@{_siblings($_[0], 1)->[1]}), $_[1]) }
+sub following_siblings { $_[0]->_collect(@{_siblings($_[0])->[1]}) }
 
 sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
 
@@ -663,7 +663,7 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my $collection = $dom->following_siblings;
 
 Return a L<Mojo::Collection> object containing the sibling nodes after this
-element as L<Mojo::DOM> objects.
+node as L<Mojo::DOM> objects.
 
   # " C "
   $dom->parse('<p>A</p>B<!-- C -->')
@@ -762,7 +762,7 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my $collection = $dom->preceding_siblings;
 
 Return a L<Mojo::Collection> object containing the sibling nodes before this
-element as L<Mojo::DOM> objects.
+node as L<Mojo::DOM> objects.
 
   # "B"
   $dom->parse('<!-- A -->B<p>C</p>D')

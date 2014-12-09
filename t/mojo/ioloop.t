@@ -82,7 +82,7 @@ $id = Mojo::IOLoop->server(
     Mojo::IOLoop->stop;
   }
 );
-my $port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+my $port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->acceptor($id)->on(accept => sub { $handle2 = pop });
 $id2
   = Mojo::IOLoop->client((address => 'localhost', port => $port) => sub { });
@@ -127,7 +127,7 @@ $id = Mojo::IOLoop->server(
     );
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 my $delay = Mojo::IOLoop->delay;
 my $end   = $delay->begin;
 $handle = undef;
@@ -158,7 +158,7 @@ is $buffer, 'acceptedhelloworld', 'right result';
 
 # Removed listen socket
 $id = $loop->server({address => '127.0.0.1'} => sub { });
-$port = $loop->acceptor($id)->handle->sockport;
+$port = $loop->acceptor($id)->port;
 my $connected;
 $loop->client(
   {port => $port} => sub {
@@ -186,7 +186,7 @@ $id    = Mojo::IOLoop->server(
     $stream->on(close => $end);
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 my $end2 = $delay->begin;
 $id = Mojo::IOLoop->client(
   (port => $port) => sub {
@@ -226,7 +226,7 @@ $id = Mojo::IOLoop->server(
     );
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;
@@ -256,7 +256,7 @@ is $loop->max_connections, 0, 'right value';
 $err  = '';
 $loop = Mojo::IOLoop->new(max_accepts => 1);
 $id   = $loop->server({address => '127.0.0.1'} => sub { shift; shift->close });
-$port = $loop->acceptor($id)->handle->sockport;
+$port = $loop->acceptor($id)->port;
 $loop->client({port => $port} => sub { });
 $loop->timer(3 => sub { shift->stop; $err = 'failed' });
 $loop->start;

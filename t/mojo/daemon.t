@@ -229,7 +229,7 @@ ok $remote_port > 0, 'has remote port';
 my $daemon
   = Mojo::Server::Daemon->new(listen => ['http://127.0.0.1'], silent => 1);
 $daemon->start;
-my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
+my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 is $daemon->app->moniker, 'HelloWorld', 'right moniker';
 my $buffer = '';
 my $id;

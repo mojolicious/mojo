@@ -526,7 +526,7 @@ $id  = Mojo::IOLoop->server(
     );
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 $tx = $ua->build_tx(GET => "http://localhost:$port/");
 my @unexpected;
 $tx->on(unexpected => sub { push @unexpected, pop });

@@ -56,7 +56,7 @@ my $listen
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt';
 $daemon->listen([$listen])->start;
-my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
+my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # Connect proxy server for testing
 my (%buffer, $connected, $read, $sent);
@@ -134,7 +134,7 @@ my $id = Mojo::IOLoop->server(
     );
   }
 );
-my $proxy = Mojo::IOLoop->acceptor($id)->handle->sockport;
+my $proxy = Mojo::IOLoop->acceptor($id)->port;
 
 # Fake server to test failed TLS handshake
 $id = Mojo::IOLoop->server(
@@ -143,11 +143,11 @@ $id = Mojo::IOLoop->server(
     $stream->on(read => sub { shift->close });
   }
 );
-my $close = Mojo::IOLoop->acceptor($id)->handle->sockport;
+my $close = Mojo::IOLoop->acceptor($id)->port;
 
 # Fake server to test idle connection
 $id = Mojo::IOLoop->server(sub { });
-my $idle = Mojo::IOLoop->acceptor($id)->handle->sockport;
+my $idle = Mojo::IOLoop->acceptor($id)->port;
 
 # User agent with valid certificates
 my $ua = Mojo::UserAgent->new(

@@ -248,7 +248,7 @@ $id = Mojo::IOLoop->server(
     $server_err = $@;
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;

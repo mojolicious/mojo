@@ -37,7 +37,7 @@ websocket '/test' => sub {
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 $daemon->listen(['http://127.0.0.1'])->start;
-my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
+my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # CONNECT proxy server for testing
 my (%buffer, $connected, $read, $sent);
@@ -115,7 +115,7 @@ my $id = Mojo::IOLoop->server(
     );
   }
 );
-my $proxy = Mojo::IOLoop->acceptor($id)->handle->sockport;
+my $proxy = Mojo::IOLoop->acceptor($id)->port;
 
 # Normal non-blocking request
 my $result;

@@ -588,7 +588,7 @@ as L<Mojo::IOLoop::Server/"listen">.
     my ($loop, $stream, $id) = @_;
     ...
   });
-  my $port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+  my $port = Mojo::IOLoop->acceptor($id)->port;
 
 =head2 singleton
 

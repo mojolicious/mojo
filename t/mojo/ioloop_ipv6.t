@@ -22,7 +22,7 @@ my $id  = Mojo::IOLoop->server(
     $stream->on(read => sub { $server .= pop });
   }
 );
-my $port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+my $port = Mojo::IOLoop->acceptor($id)->port;
 my $end2 = $delay->begin;
 Mojo::IOLoop->client(
   {address => '[::1]', port => $port} => sub {

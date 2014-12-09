@@ -32,7 +32,7 @@ my $listen
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt';
 $daemon->listen([$listen])->start;
-my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
+my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # No certificate
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
@@ -113,7 +113,7 @@ $listen
   . '&ciphers=RC4-SHA:ALL'
   . '&verify=0x00';
 $daemon->listen([$listen])->start;
-$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->handle->sockport;
+$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # Invalid certificate
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);

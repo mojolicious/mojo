@@ -3,6 +3,7 @@
   - Deprecated Mojo::DOM::siblings.
   - Added following, following_siblings, preceding and preceding_siblings
     methods to Mojo::DOM.
+  - Added port method to Mojo::IOLoop::Server.
   - Removed deprecated emit_safe method from Mojo::EventEmitter.
   - Removed deprecated render_static method from Mojolicious::Controller.
   - Removed deprecated has_conditions method from Mojolicious::Routes::Route.

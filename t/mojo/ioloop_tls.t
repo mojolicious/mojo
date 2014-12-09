@@ -45,7 +45,7 @@ my $id  = $loop->server(
     $stream->on(read => sub { $server .= pop });
   }
 );
-my $port = $loop->acceptor($id)->handle->sockport;
+my $port = $loop->acceptor($id)->port;
 my $end2 = $delay->begin;
 $loop->client(
   {port => $port, tls => 1} => sub {
@@ -88,7 +88,7 @@ $id  = Mojo::IOLoop->server(
     $stream->timeout(0.5);
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 $end2 = $delay->begin;
 Mojo::IOLoop->client(
   port     => $port,
@@ -155,7 +155,7 @@ $id = $loop->server(
   tls_key  => 't/mojo/certs/server.key',
   sub { $server_err = 'accepted' }
 );
-$port = $loop->acceptor($id)->handle->sockport;
+$port = $loop->acceptor($id)->port;
 $loop->client(
   port     => $port,
   tls      => 1,
@@ -195,7 +195,7 @@ $id  = Mojo::IOLoop->server(
     $stream->on(read => sub { $server .= pop });
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 $end2 = $delay->begin;
 Mojo::IOLoop->client(
   port     => $port,
@@ -236,7 +236,7 @@ $id = $loop->server(
   tls_key  => 't/mojo/certs/badclient.key',
   sub { $server_err = 'accepted' }
 );
-$port = $loop->acceptor($id)->handle->sockport;
+$port = $loop->acceptor($id)->port;
 $loop->client(
   port   => $port,
   tls    => 1,
@@ -260,7 +260,7 @@ $id = $loop->server(
   tls_key  => 't/mojo/certs/server.key',
   sub { $server_err = 'accepted' }
 );
-$port = $loop->acceptor($id)->handle->sockport;
+$port = $loop->acceptor($id)->port;
 $loop->client(
   address => '127.0.0.1',
   port    => $port,
@@ -285,7 +285,7 @@ $id = $loop->server(
   tls_key  => 't/mojo/certs/badclient.key',
   sub { $server_err = 'accepted' }
 );
-$port = $loop->acceptor($id)->handle->sockport;
+$port = $loop->acceptor($id)->port;
 $loop->client(
   port   => $port,
   tls    => 1,
@@ -317,7 +317,7 @@ $id = $loop->server(
     $server = 'accepted';
   }
 );
-$port = $loop->acceptor($id)->handle->sockport;
+$port = $loop->acceptor($id)->port;
 $loop->client(
   port     => $port,
   tls      => 1,
@@ -348,7 +348,7 @@ $id = Mojo::IOLoop->server(
   tls_verify => 0x01,
   sub { $server = 'accepted' }
 );
-$port = Mojo::IOLoop->acceptor($id)->handle->sockport;
+$port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->client(
   {port => $port, tls => 1} => sub {
     shift->stop;

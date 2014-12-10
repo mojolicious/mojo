@@ -659,8 +659,8 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 Return a L<Mojo::Collection> object containing the sibling nodes after this
 node as L<Mojo::DOM> objects.
 
-  # " C "
-  $dom->parse('<p>A</p>B<!-- C -->')
+  # "D"
+  $dom->parse('A<p>B</p><!-- C -->D')
     ->at('p')->following_siblings->last->content;
 
 =head2 match
@@ -758,9 +758,9 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 Return a L<Mojo::Collection> object containing the sibling nodes before this
 node as L<Mojo::DOM> objects.
 
-  # "B"
-  $dom->parse('<!-- A -->B<p>C</p>D')
-    ->at('p')->preceding_siblings->last->content;
+  # "A"
+  $dom->parse('A<!-- B --><p>C</p>D')
+    ->at('p')->preceding_siblings->first->content;
 
 =head2 prepend
 

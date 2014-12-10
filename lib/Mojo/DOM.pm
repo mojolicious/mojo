@@ -10,7 +10,6 @@ use overload
 # "Fry: This snow is beautiful. I'm glad global warming never happened.
 #  Leela: Actually, it did. But thank God nuclear winter canceled it out."
 use Carp 'croak';
-use List::Util 'first';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
@@ -68,11 +67,7 @@ sub attr {
   return $self;
 }
 
-sub children {
-  my $self = shift;
-  return _select(
-    $self->_collect(grep { $_->[0] eq 'tag' } _nodes($self->tree)), @_);
-}
+sub children { _select($_[0]->_collect(_nodes($_[0]->tree, 1)), $_[1]) }
 
 sub content {
   my $self = shift;
@@ -308,7 +303,8 @@ sub _maybe { $_[1] ? _build($_[0], $_[1], $_[0]->xml) : undef }
 
 sub _nodes {
   return unless my $tree = shift;
-  return @$tree[_start($tree) .. $#$tree];
+  my @nodes = @$tree[_start($tree) .. $#$tree];
+  return shift() ? grep { $_->[0] eq 'tag' } @nodes : @nodes;
 }
 
 sub _offset {
@@ -398,7 +394,7 @@ sub _wrap {
   # Find innermost tag
   my $current;
   my $first = $new = $self->_parse($new);
-  $current = $first while $first = first { $_->[0] eq 'tag' } _nodes($first);
+  $current = $first while $first = (_nodes($first, 1))[0];
   return $self unless $current;
 
   # Wrap content

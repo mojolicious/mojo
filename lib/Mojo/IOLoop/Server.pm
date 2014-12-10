@@ -100,7 +100,7 @@ sub listen {
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
 }
 
-sub port { shift->handle->sockport }
+sub port { shift->{handle}->sockport }
 
 sub start {
   my $self = shift;
@@ -308,7 +308,7 @@ TLS verification mode, defaults to C<0x03>.
 
   my $port = $server->port;
 
-Get TCP port this server is listening on.
+Get port this server is listening on.
 
 =head2 start
 

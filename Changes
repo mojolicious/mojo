@@ -7,6 +7,7 @@
   - Removed deprecated emit_safe method from Mojo::EventEmitter.
   - Removed deprecated render_static method from Mojolicious::Controller.
   - Removed deprecated has_conditions method from Mojolicious::Routes::Route.
+  - Updated Net::DNS::Native requirement to 0.13 for some important bug fixes.
   - Improved Mojo::DOM::HTML performance slightly.
   - Fixed parent combinator bug in Mojo::DOM::CSS.
   - Fixed whitespace bug in Mojo::DOM::HTML.

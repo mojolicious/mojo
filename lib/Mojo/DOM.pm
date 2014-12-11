@@ -88,8 +88,8 @@ sub contents { $_[0]->_collect(_nodes($_[0]->tree)) }
 
 sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
 
-sub following { _select($_[0]->_collect(@{_siblings($_[0], 1)->[1]}), $_[1]) }
-sub following_siblings { $_[0]->_collect(@{_siblings($_[0])->[1]}) }
+sub following { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[1]}), $_[1]) }
+sub following_siblings { $_[0]->_collect(@{$_[0]->_siblings->[1]}) }
 
 sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
 
@@ -119,8 +119,8 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next         { _maybe($_[0], $_[0]->_siblings(1)->[1][0]) }
-sub next_sibling { _maybe($_[0], $_[0]->_siblings->[1][0]) }
+sub next         { _maybe($_[0], $_[0]->_siblings(1, 0)->[1]) }
+sub next_sibling { _maybe($_[0], $_[0]->_siblings(0, 0)->[1]) }
 
 sub node { shift->tree->[0] }
 
@@ -132,14 +132,14 @@ sub parent {
 
 sub parse { shift->_delegate(parse => @_) }
 
-sub preceding { _select($_[0]->_collect(@{_siblings($_[0], 1)->[0]}), $_[1]) }
-sub preceding_siblings { $_[0]->_collect(@{_siblings($_[0])->[0]}) }
+sub preceding { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[0]}), $_[1]) }
+sub preceding_siblings { $_[0]->_collect(@{$_[0]->_siblings->[0]}) }
 
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous         { _maybe($_[0], $_[0]->_siblings(1)->[0][-1]) }
-sub previous_sibling { _maybe($_[0], $_[0]->_siblings->[0][-1]) }
+sub previous         { _maybe($_[0], $_[0]->_siblings(1, -1)->[0]) }
+sub previous_sibling { _maybe($_[0], $_[0]->_siblings(0, -1)->[0]) }
 
 sub remove { shift->replace('') }
 
@@ -158,7 +158,7 @@ sub root {
 # DEPRECATED in Tiger Face!
 sub siblings {
   deprecated 'Mojo::DOM::siblings is DEPRECATED';
-  my $siblings = _siblings($_[0], 1);
+  my $siblings = $_[0]->_siblings(1);
   return _select($_[0]->_collect(@{$siblings->[0]}, @{$siblings->[1]}), $_[1]);
 }
 
@@ -331,9 +331,9 @@ sub _select {
 }
 
 sub _siblings {
-  my ($self, $tags) = @_;
+  my ($self, $tags, $i) = @_;
 
-  return [[], []] unless my $parent = $self->parent;
+  return [] unless my $parent = $self->parent;
 
   my $tree = $self->tree;
   my (@before, @after, $match);
@@ -343,7 +343,7 @@ sub _siblings {
     $match ? push @after, $node : push @before, $node;
   }
 
-  return [\@before, \@after];
+  return defined $i ? [$before[$i], $after[$i]] : [\@before, \@after];
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }

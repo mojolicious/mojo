@@ -29,7 +29,7 @@ use constant {
 
 # Will be shipping with Perl 5.22
 my $NAME
-  = eval { require Sub::Util; \&Sub::Util::set_subname } || sub { $_[1] };
+  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
 
 # To generate a new HTML entity table run this command
 # perl examples/entities.pl

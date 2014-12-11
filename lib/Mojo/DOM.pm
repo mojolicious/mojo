@@ -46,7 +46,7 @@ sub append_content { shift->_content(1, 0, @_) }
 sub at {
   my $self = shift;
   return undef unless my $result = $self->_css->select_one(@_);
-  return _build($self, $result, $self->xml);
+  return $self->_build($result, $self->xml);
 }
 
 sub attr {
@@ -119,15 +119,15 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next         { _maybe($_[0], $_[0]->_siblings(1, 0)->[1]) }
-sub next_sibling { _maybe($_[0], $_[0]->_siblings(0, 0)->[1]) }
+sub next         { $_[0]->_maybe($_[0]->_siblings(1, 0)->[1]) }
+sub next_sibling { $_[0]->_maybe($_[0]->_siblings(0, 0)->[1]) }
 
 sub node { shift->tree->[0] }
 
 sub parent {
   my $self = shift;
   return undef if $self->tree->[0] eq 'root';
-  return _build($self, $self->_parent, $self->xml);
+  return $self->_build($self->_parent, $self->xml);
 }
 
 sub parse { shift->_delegate(parse => @_) }
@@ -138,8 +138,8 @@ sub preceding_siblings { $_[0]->_collect(@{$_[0]->_siblings->[0]}) }
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous         { _maybe($_[0], $_[0]->_siblings(1, -1)->[0]) }
-sub previous_sibling { _maybe($_[0], $_[0]->_siblings(0, -1)->[0]) }
+sub previous         { $_[0]->_maybe($_[0]->_siblings(1, -1)->[0]) }
+sub previous_sibling { $_[0]->_maybe($_[0]->_siblings(0, -1)->[0]) }
 
 sub remove { shift->replace('') }
 
@@ -152,7 +152,7 @@ sub replace {
 sub root {
   my $self = shift;
   return $self unless my $tree = $self->_ancestors(1);
-  return _build($self, $tree, $self->xml);
+  return $self->_build($tree, $self->xml);
 }
 
 # DEPRECATED in Tiger Face!
@@ -256,7 +256,7 @@ sub _build { shift->new->tree(shift)->xml(shift) }
 sub _collect {
   my $self = shift;
   my $xml  = $self->xml;
-  return Mojo::Collection->new(map { _build($self, $_, $xml) } @_);
+  return Mojo::Collection->new(map { $self->_build($_, $xml) } @_);
 }
 
 sub _content {
@@ -299,7 +299,7 @@ sub _link {
   return @new;
 }
 
-sub _maybe { $_[1] ? _build($_[0], $_[1], $_[0]->xml) : undef }
+sub _maybe { $_[1] ? $_[0]->_build($_[1], $_[0]->xml) : undef }
 
 sub _nodes {
   return unless my $tree = shift;
@@ -659,8 +659,8 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 Return a L<Mojo::Collection> object containing the sibling nodes after this
 node as L<Mojo::DOM> objects.
 
-  # "D"
-  $dom->parse('A<p>B</p><!-- C -->D')
+  # "C"
+  $dom->parse('<p>A</p><!-- B -->C')
     ->at('p')->following_siblings->last->content;
 
 =head2 match
@@ -759,7 +759,7 @@ Return a L<Mojo::Collection> object containing the sibling nodes before this
 node as L<Mojo::DOM> objects.
 
   # "A"
-  $dom->parse('A<!-- B --><p>C</p>D')
+  $dom->parse('A<!-- B --><p>C</p>')
     ->at('p')->preceding_siblings->first->content;
 
 =head2 prepend

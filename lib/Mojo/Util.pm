@@ -13,8 +13,8 @@ use Symbol 'delete_package';
 use Time::HiRes ();
 
 # Check for monotonic clock support
-use constant MONOTONIC => eval
-  '!!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC())';
+use constant MONOTONIC =>
+  eval { !!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
 
 # Punycode bootstring parameters
 use constant {
@@ -28,7 +28,8 @@ use constant {
 };
 
 # Will be shipping with Perl 5.22
-my $NAME = eval 'use Sub::Util; 1' ? \&Sub::Util::set_subname : sub { $_[1] };
+my $NAME
+  = eval { require Sub::Util; \&Sub::Util::set_subname } || sub { $_[1] };
 
 # To generate a new HTML entity table run this command
 # perl examples/entities.pl

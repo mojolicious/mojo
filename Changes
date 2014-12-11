@@ -1,13 +1,14 @@
 
-5.69  2014-12-11
+5.69  2014-12-12
   - Deprecated Mojo::DOM::siblings.
   - Added following, following_siblings, preceding and preceding_siblings
     methods to Mojo::DOM.
   - Added port method to Mojo::IOLoop::Server.
+  - Removed support for non-blocking name resolution with Net::DNS::Native
+    again, because there have been too many problems with segmentation faults.
   - Removed deprecated emit_safe method from Mojo::EventEmitter.
   - Removed deprecated render_static method from Mojolicious::Controller.
   - Removed deprecated has_conditions method from Mojolicious::Routes::Route.
-  - Updated Net::DNS::Native requirement to 0.13 for some important bug fixes.
   - Improved Mojo::DOM::HTML performance slightly.
   - Fixed parent combinator bug in Mojo::DOM::CSS.
   - Fixed whitespace bug in Mojo::DOM::HTML.
@@ -3460,7 +3461,7 @@
   - Added ".gitignore" generator command. (marcus)
   - Added automatic CGI/FastCGI environment detection to Mojo::Commands.
   - Renamed Mojolicious::Book to Mojolicious::Guides.
-  - Removed hot deployment support for Windows because of incompatibilities
+  - Removed hot deployment support for Windows, because of incompatibilities
     between Active Perl and Strawberry Perl.
   - Made process id and lock file defaults more user-friendly in
     Mojo::Server::Daemon.
@@ -4112,7 +4113,7 @@
   - Added workaround for missing IO::Seekable support in older versions of
     File::Temp (Perl 5.8).
   - script/mojo.pl got renamed to bin/mojo.
-  - Mojo::Cache got renamed to Mojo::File because there will be a cache
+  - Mojo::Cache got renamed to Mojo::File, because there will be a cache
     module named MojoX::Cache, and that could cause confusion later on.
   - Fixed many escaping related bugs around Mojo::URL.
   - Fixed 100-Continue support in Mojo::Server::Daemon and Mojo::Client.

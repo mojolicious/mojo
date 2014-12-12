@@ -50,13 +50,10 @@ sub _connect {
   my ($self, $args) = @_;
 
   my $handle;
-  my $address = $args->{socks_address} || ($args->{address} ||= 'localhost');
+  my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
   unless ($handle = $self->{handle} = $args->{handle}) {
-    my %options = (
-      Blocking => 0,
-      PeerAddr => $address eq 'localhost' ? '127.0.0.1' : $address,
-      PeerPort => _port($args)
-    );
+    my %options
+      = (Blocking => 0, PeerAddr => $address, PeerPort => _port($args));
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     return $self->emit(error => "Can't connect: $@")
       unless $self->{handle} = $handle = IO::Socket::IP->new(%options);
@@ -251,7 +248,7 @@ These options are currently available:
 
   address => 'mojolicio.us'
 
-Address or host name of the peer to connect to, defaults to C<localhost>.
+Address or host name of the peer to connect to, defaults to C<127.0.0.1>.
 
 =item handle
 

@@ -316,7 +316,7 @@ L<Mojo::IOLoop> singleton.
 =head2 listen
 
   my $listen = $daemon->listen;
-  $daemon    = $daemon->listen(['https://localhost:3000']);
+  $daemon    = $daemon->listen(['https://127.0.0.1:3000']);
 
 List of one or more locations to listen on, defaults to the value of the
 C<MOJO_LISTEN> environment variable or C<http://*:3000>.

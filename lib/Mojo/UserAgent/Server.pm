@@ -52,7 +52,7 @@ sub _url {
   my ($self, $nb) = (shift, shift);
   $self->_restart(0, @_) if !$self->{server} || @_;
   my $port = $nb ? $self->{nb_port} : $self->{port};
-  return Mojo::URL->new("$self->{proto}://localhost:$port/");
+  return Mojo::URL->new("$self->{proto}://127.0.0.1:$port/");
 }
 
 1;

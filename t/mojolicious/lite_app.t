@@ -688,7 +688,7 @@ $t->get_ok('/regex/in/template')->status_is(200)
 my $url = $t->ua->server->url->userinfo('sri:foo')->path('/stream')
   ->query(foo => 'bar');
 $t->get_ok($url)->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr!^foobarsri:foohttp://localhost:\d+/stream$!);
+  ->content_like(qr!^foobarsri:foohttp://127\.0\.0\.1:\d+/stream$!);
 
 # Not ajax
 $t->get_ok('/maybe/ajax')->status_is(200)
@@ -732,7 +732,7 @@ $t->get_ok('/.html')->status_is(200)
   $t->ua->server->restart;
   $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
     ->status_is(200)->header_unlike('X-Original' => qr/192\.0\.2\.1/)
-    ->content_like(qr!http://localhost:\d+/0-192\.0\.2\.1-0$!);
+    ->content_like(qr!http://127\.0\.0\.1:\d+/0-192\.0\.2\.1-0$!);
 }
 
 # Reverse proxy with "X-Forwarded-Proto"
@@ -740,19 +740,19 @@ $t->get_ok('/.html')->status_is(200)
   local $ENV{MOJO_REVERSE_PROXY} = 1;
   $t->ua->server->restart;
   $t->get_ok('/0' => {'X-Forwarded-Proto' => 'https'})->status_is(200)
-    ->content_like(qr!^https://localhost:\d+/0-!)->content_like(qr/-0$/)
+    ->content_like(qr!^https://127\.0\.0\.1:\d+/0-!)->content_like(qr/-0$/)
     ->content_unlike(qr!-192\.0\.2\.1-0$!);
 }
 
 # "X-Forwarded-For"
 $t->ua->server->restart;
 $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
-  ->status_is(200)->content_like(qr!^http://localhost:\d+/0-!)
+  ->status_is(200)->content_like(qr!^http://127\.0\.0\.1:\d+/0-!)
   ->content_like(qr/-0$/)->content_unlike(qr!-192\.0\.2\.1-0$!);
 
 # "X-Forwarded-Proto"
 $t->get_ok('/0' => {'X-Forwarded-Proto' => 'https'})->status_is(200)
-  ->content_like(qr!^http://localhost:\d+/0-!)->content_like(qr/-0$/)
+  ->content_like(qr!^http://127\.0\.0\.1:\d+/0-!)->content_like(qr/-0$/)
   ->content_unlike(qr!-192\.0\.2\.1-0$!);
 
 # Inline "epl" template
@@ -1060,7 +1060,7 @@ http://mojolicio.us/test?foo=23&bar=24&baz=25
 /bar/23?bar=24&baz=25&foo=yada
 EOF
 $t->get_ok('/url_with/foo?foo=bar')->status_is(200)
-  ->content_like(qr!http://localhost:\d+/url_with/bar\?foo\=bar!);
+  ->content_like(qr!http://127\.0\.0\.1:\d+/url_with/bar\?foo\=bar!);
 
 # Dynamic inline template
 $t->get_ok('/dynamic/inline')->status_is(200)

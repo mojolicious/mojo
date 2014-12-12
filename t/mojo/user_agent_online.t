@@ -64,7 +64,7 @@ $ua = Mojo::UserAgent->new;
 
 # Connection refused
 my $port = Mojo::IOLoop::Server->generate_port;
-$tx = $ua->build_tx(GET => "http://localhost:$port");
+$tx = $ua->build_tx(GET => "http://127.0.0.1:$port");
 $ua->start($tx);
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->error,       'has error';

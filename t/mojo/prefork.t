@@ -47,7 +47,7 @@ $prefork->once(
   heartbeat => sub {
     my ($prefork, $pid) = @_;
     $worker = $pid;
-    $tx     = Mojo::UserAgent->new->get("http://localhost:$port");
+    $tx     = Mojo::UserAgent->new->get("http://127.0.0.1:$port");
     kill 'QUIT', $$;
   }
 );
@@ -100,7 +100,7 @@ my $count = $tx = $graceful, undef;
 $prefork->on(spawn => sub { push @spawn, pop });
 $prefork->once(
   heartbeat => sub {
-    $tx = Mojo::UserAgent->new->get("http://localhost:$port");
+    $tx = Mojo::UserAgent->new->get("http://127.0.0.1:$port");
     kill 'TERM', $$;
   }
 );

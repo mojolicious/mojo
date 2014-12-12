@@ -120,18 +120,18 @@ my $proxy = Mojo::IOLoop->acceptor($id)->port;
 # Normal non-blocking request
 my $result;
 $ua->get(
-  "http://localhost:$port/" => sub {
+  "http://127.0.0.1:$port/" => sub {
     $result = pop->res->body;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-is $result, "Hello World! / http://localhost:$port/", 'right content';
+is $result, "Hello World! / http://127.0.0.1:$port/", 'right content';
 
 # Normal WebSocket
 $result = undef;
 $ua->websocket(
-  "ws://localhost:$port/test" => sub {
+  "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
@@ -148,7 +148,7 @@ Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
 # Non-blocking proxy request
-$ua->proxy->http("http://localhost:$port");
+$ua->proxy->http("http://127.0.0.1:$port");
 my $kept_alive;
 $result = undef;
 $ua->get(
@@ -166,7 +166,7 @@ is $result, 'http://example.com/proxy', 'right content';
 # Kept alive proxy WebSocket
 ($kept_alive, $result) = ();
 $ua->websocket(
-  "ws://localhost:$port/test" => sub {
+  "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
@@ -191,10 +191,10 @@ is $tx->res->body, 'http://example.com/proxy', 'right content';
 
 # Proxy WebSocket
 $ua = Mojo::UserAgent->new;
-$ua->proxy->http("http://localhost:$proxy");
+$ua->proxy->http("http://127.0.0.1:$proxy");
 $result = undef;
 $ua->websocket(
-  "ws://localhost:$port/test" => sub {
+  "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
@@ -208,17 +208,17 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $connected, "localhost:$port", 'connected';
+is $connected, "127.0.0.1:$port", 'connected';
 is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
 # Proxy WebSocket with bad target
-$ua->proxy->http("http://localhost:$proxy");
+$ua->proxy->http("http://127.0.0.1:$proxy");
 my $port2 = $port + 1;
 my ($success, $err);
 $ua->websocket(
-  "ws://localhost:$port2/test" => sub {
+  "ws://127.0.0.1:$port2/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
     $err     = $tx->error;

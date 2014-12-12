@@ -131,7 +131,7 @@ websocket '/timeout' => sub {
 my $ua  = app->ua;
 my $res = $ua->get('/link')->success;
 is $res->code, 200, 'right status';
-like $res->body, qr!ws://localhost:\d+/!, 'right content';
+like $res->body, qr!ws://127\.0\.0\.1:\d+/!, 'right content';
 
 # Plain HTTP request
 $res = $ua->get('/socket')->res;
@@ -158,7 +158,7 @@ $ua->websocket(
 Mojo::IOLoop->start;
 Mojo::IOLoop->one_tick until exists $stash->{finished};
 is $stash->{finished}, 1, 'finish event has been emitted once';
-like $result, qr!test1test2ws://localhost:\d+/!, 'right result';
+like $result, qr!test1test2ws://127\.0\.0\.1:\d+/!, 'right result';
 
 # Failed WebSocket connection
 my ($code, $body, $ws);

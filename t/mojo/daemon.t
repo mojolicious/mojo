@@ -45,9 +45,9 @@ is $tx->res->body, 'Hello TestApp!', 'right content';
 {
   is_deeply(Mojo::Server::Daemon->new->listen,
     ['http://*:3000'], 'right value');
-  local $ENV{MOJO_LISTEN} = 'http://localhost:8080';
+  local $ENV{MOJO_LISTEN} = 'http://127.0.0.1:8080';
   is_deeply(Mojo::Server::Daemon->new->listen,
-    ['http://localhost:8080'], 'right value');
+    ['http://127.0.0.1:8080'], 'right value');
   $ENV{MOJO_LISTEN} = 'http://*:80,https://*:443';
   is_deeply(
     Mojo::Server::Daemon->new->listen,

@@ -320,7 +320,8 @@ L<Mojo::IOLoop> singleton.
   $daemon    = $daemon->listen(['https://127.0.0.1:8080']);
 
 List of one or more locations to listen on, defaults to the value of the
-C<MOJO_LISTEN> environment variable or C<http://*:3000>.
+C<MOJO_LISTEN> environment variable or C<http://*:3000> (shortcut for
+C<http://0.0.0.0:3000>).
 
   # Listen on all IPv4 interfaces
   $daemon->listen(['http://*:3000']);

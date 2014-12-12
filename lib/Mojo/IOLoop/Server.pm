@@ -245,7 +245,7 @@ These options are currently available:
 
   address => '127.0.0.1'
 
-Local address to listen on, defaults to all.
+Local address to listen on, defaults to C<0.0.0.0>.
 
 =item backlog
 

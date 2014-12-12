@@ -2,6 +2,7 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno 'EINPROGRESS';
+use IO::Socket::IP;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
@@ -11,9 +12,6 @@ use constant NDN => $ENV{MOJO_NO_NDN}
   ? 0
   : eval 'use Net::DNS::Native 0.14 (); 1';
 my $NDN = NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
-
-# Needs to be loaded after Net::DNS::Native
-use IO::Socket::IP;
 
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}

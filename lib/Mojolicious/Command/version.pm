@@ -15,6 +15,7 @@ sub run {
   my $class = 'Mojo::IOLoop::Client';
   my $socks = $class->SOCKS ? $IO::Socket::Socks::VERSION : 'not installed';
   my $tls   = $class->TLS ? $IO::Socket::SSL::VERSION : 'not installed';
+  my $ndn   = $class->NDN ? $Net::DNS::Native::VERSION : 'not installed';
 
   print <<EOF;
 CORE
@@ -25,6 +26,7 @@ OPTIONAL
   EV 4.0+                 ($ev)
   IO::Socket::Socks 0.64+ ($socks)
   IO::Socket::SSL 1.84+   ($tls)
+  Net::DNS::Native 0.14+  ($ndn)
 
 EOF
 

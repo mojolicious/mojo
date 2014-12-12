@@ -2,10 +2,18 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno 'EINPROGRESS';
-use IO::Socket::IP;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
+
+# Non-blocking name resolution requires Net::DNS::Native
+use constant NDN => $ENV{MOJO_NO_NDN}
+  ? 0
+  : eval 'use Net::DNS::Native 0.14 (); 1';
+my $NDN = NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
+
+# Needs to be loaded after Net::DNS::Native
+use IO::Socket::IP;
 
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
@@ -35,14 +43,34 @@ sub connect {
   $self->{timer} = $reactor->timer($args->{timeout} || 10,
     sub { $self->emit(error => 'Connect timeout') });
 
+  # Blocking name resolution
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
-  $reactor->next_tick(sub { $self && $self->_connect($args) });
+  my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
+  return $reactor->next_tick(sub { $self && $self->_connect($args) })
+    if !NDN || $args->{handle};
+
+  # Non-blocking name resolution
+  my $handle = $self->{dns}
+    = $NDN->getaddrinfo($address, _port($args), {protocol => IPPROTO_TCP});
+  $reactor->io(
+    $handle => sub {
+      my $reactor = shift;
+
+      $reactor->remove($self->{dns});
+      my ($err, @res) = $NDN->get_result(delete $self->{dns});
+      return $self->emit(error => "Can't resolve: $err") if $err;
+
+      $args->{addr_info} = \@res;
+      $self->_connect($args);
+    }
+  )->watch($handle, 1, 0);
 }
 
 sub _cleanup {
   my $self = shift;
   return $self unless my $reactor = $self->reactor;
-  $self->{$_} && $reactor->remove(delete $self->{$_}) for qw(timer handle);
+  $NDN->timedout($self->{dns}) if $self->{dns};
+  $self->{$_} && $reactor->remove(delete $self->{$_}) for qw(dns timer handle);
   return $self;
 }
 
@@ -50,10 +78,11 @@ sub _connect {
   my ($self, $args) = @_;
 
   my $handle;
-  my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
-  my $port = $args->{socks_port} || $args->{port} || ($args->{tls} ? 443 : 80);
+  my $address = $args->{socks_address} || $args->{address};
   unless ($handle = $self->{handle} = $args->{handle}) {
-    my %options = (Blocking => 0, PeerAddr => $address, PeerPort => $port);
+    my %options = (PeerAddr => $address, PeerPort => _port($args));
+    %options = (PeerAddrInfo => $args->{addr_info}) if $args->{addr_info};
+    $options{Blocking} = 0;
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     return $self->emit(error => "Can't connect: $@")
       unless $self->{handle} = $handle = IO::Socket::IP->new(%options);
@@ -65,6 +94,8 @@ sub _connect {
   $self->reactor->io($handle => sub { $self->_ready($args) })
     ->watch($handle, 0, 1);
 }
+
+sub _port { $_[0]->{socks_port} || $_[0]->{port} || ($_[0]->{tls} ? 443 : 80) }
 
 sub _ready {
   my ($self, $args) = @_;
@@ -235,7 +266,8 @@ implements the following new ones.
 
   $client->connect(address => '127.0.0.1', port => 3000);
 
-Open a socket connection to a remote host. Note that TLS support depends on
+Open a socket connection to a remote host. Note that non-blocking name
+resolution depends on L<Net::DNS::Native> (0.14+) and TLS support on
 L<IO::Socket::SSL> (1.84+).
 
 These options are currently available:

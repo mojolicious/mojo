@@ -4,11 +4,10 @@
   - Added following, following_siblings, preceding and preceding_siblings
     methods to Mojo::DOM.
   - Added port method to Mojo::IOLoop::Server.
-  - Removed support for non-blocking name resolution with Net::DNS::Native
-    again, because there have been too many problems with segmentation faults.
   - Removed deprecated emit_safe method from Mojo::EventEmitter.
   - Removed deprecated render_static method from Mojolicious::Controller.
   - Removed deprecated has_conditions method from Mojolicious::Routes::Route.
+  - Updated Net::DNS::Native requirement to 0.14 for some important bug fixes.
   - Improved Mojo::DOM::HTML performance slightly.
   - Fixed parent combinator bug in Mojo::DOM::CSS.
   - Fixed whitespace bug in Mojo::DOM::HTML.

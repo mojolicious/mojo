@@ -51,9 +51,9 @@ sub _connect {
 
   my $handle;
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
+  my $port = $args->{socks_port} || $args->{port} || ($args->{tls} ? 443 : 80);
   unless ($handle = $self->{handle} = $args->{handle}) {
-    my %options
-      = (Blocking => 0, PeerAddr => $address, PeerPort => _port($args));
+    my %options = (Blocking => 0, PeerAddr => $address, PeerPort => $port);
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     return $self->emit(error => "Can't connect: $@")
       unless $self->{handle} = $handle = IO::Socket::IP->new(%options);
@@ -80,8 +80,6 @@ sub _ready {
 
   $self->_try_socks($args);
 }
-
-sub _port { $_[0]->{socks_port} || $_[0]->{port} || ($_[0]->{tls} ? 443 : 80) }
 
 sub _socks {
   my ($self, $args) = @_;

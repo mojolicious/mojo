@@ -4,7 +4,9 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use Test::More;
-use File::Spec::Functions qw(catfile splitdir);
+use Cwd 'abs_path';
+use File::Basename 'dirname';
+use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use Mojo::ByteStream 'b';
 use Mojo::DeprecationTest;
@@ -376,7 +378,7 @@ is xor_encode('hello', '123456789'), "\x59\x57\x5f\x58\x5a", 'right result';
 is xor_encode("\x59\x57\x5f\x58\x5a", '123456789'), 'hello', 'right result';
 
 # slurp
-is slurp(catfile(splitdir($FindBin::Bin), qw(templates exception.mt))),
+is slurp(abs_path catfile(dirname(__FILE__), 'templates', 'exception.mt')),
   "test\n% die;\n123\n", 'right content';
 
 # spurt

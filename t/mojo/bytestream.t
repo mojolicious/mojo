@@ -1,7 +1,9 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Spec::Functions qw(catfile splitdir);
+use Cwd 'abs_path';
+use File::Basename 'dirname';
+use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use FindBin;
 use Mojo::ByteStream 'b';
@@ -138,7 +140,7 @@ b('te', 'st')->say($handle);
 is $buffer, "test\n123\n\"123\"\n", 'right output';
 
 # slurp
-my $file = catfile splitdir($FindBin::Bin), qw(templates exception.mt);
+my $file = abs_path catfile(dirname(__FILE__), 'templates', 'exception.mt');
 $stream = b($file)->slurp;
 is $stream, "test\n% die;\n123\n", 'right content';
 $stream = b($file)->slurp->split("\n")->grep(qr/die/)->join;

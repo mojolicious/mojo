@@ -129,6 +129,8 @@ sub parse {
   my $end     = $self->tag_end;
   my $start   = $self->line_start;
 
+  my $r_re     = qr/^(\s*)\Q$start$replace\E/;
+  my $line_re  = qr/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?/;
   my $token_re = qr/
     (
       \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                   # Replace
@@ -142,6 +144,10 @@ sub parse {
   /x;
   my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E/;
   my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
+  my $code_re = qr/^\Q$tag\E$/;
+  my $expr_re = qr/^\Q$tag$expr\E$/;
+  my $escp_re = qr/^\Q$tag$expr$escp\E$/;
+  my $cmnt_re = qr/^\Q$tag$cmnt\E$/;
 
   # Split lines
   my $op = 'text';
@@ -149,15 +155,13 @@ sub parse {
   for my $line (split "\n", $template) {
 
     # Turn Perl line into mixed line
-    if ($op eq 'text' && $line !~ s/^(\s*)\Q$start$replace\E/$1$start/) {
-      if ($line =~ s/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?//) {
+    if ($op eq 'text' && $line !~ s/$r_re/$1$start/ && $line =~ s/$line_re//) {
 
-        # Comment
-        if ($2) { $line = "$tag$2 $trim$end" }
+      # Comment
+      if ($2) { $line = "$tag$2 $trim$end" }
 
-        # Expression or code
-        else { $line = $3 ? "$1$tag$3$line $end" : "$tag$line $trim$end" }
-      }
+      # Expression or code
+      else { $line = $3 ? "$1$tag$3$line $end" : "$tag$line $trim$end" }
     }
 
     # Escaped line ending
@@ -184,16 +188,16 @@ sub parse {
       }
 
       # Code
-      elsif ($token =~ /^\Q$tag\E$/) { $op = 'code' }
+      elsif ($token =~ $code_re) { $op = 'code' }
 
       # Expression
-      elsif ($token =~ /^\Q$tag$expr\E$/) { $op = 'expr' }
+      elsif ($token =~ $expr_re) { $op = 'expr' }
 
       # Expression that needs to be escaped
-      elsif ($token =~ /^\Q$tag$expr$escp\E$/) { $op = 'escp' }
+      elsif ($token =~ $escp_re) { $op = 'escp' }
 
       # Comment
-      elsif ($token =~ /^\Q$tag$cmnt\E$/) { $op = 'cmnt' }
+      elsif ($token =~ $cmnt_re) { $op = 'cmnt' }
 
       # Text (comments are just ignored)
       elsif ($op ne 'cmnt') {

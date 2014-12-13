@@ -1,5 +1,6 @@
 
 5.70  2014-12-14
+  - Improved Mojo::Template performance.
 
 5.69  2014-12-13
   - Deprecated Mojo::DOM::siblings.

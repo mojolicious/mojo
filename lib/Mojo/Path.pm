@@ -207,6 +207,12 @@ Check if path contains given prefix.
 Path has a leading slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.
 
+  # "/foo/bar"
+  $path->parse('foo/bar')->leading_slash(1);
+
+  # "foo/bar"
+  $path->parse('/foo/bar')->leading_slash(0);
+
 =head2 merge
 
   $path = $path->merge('/foo/bar');
@@ -300,6 +306,12 @@ Turn path into a string.
 
 Path has a trailing slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.
+
+  # "/foo/bar/"
+  $path->parse('/foo/bar')->trailing_slash(1);
+
+  # "/foo/bar"
+  $path->parse('/foo/bar/')->trailing_slash(0);
 
 =head1 OPERATORS
 

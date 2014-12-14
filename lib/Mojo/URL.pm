@@ -344,6 +344,9 @@ Parse relative or absolute URL.
 Path part of this URL, relative paths will be merged with the existing path,
 defaults to a L<Mojo::Path> object.
 
+  # "perldoc"
+  Mojo::URL->new('http://example.com/perldoc/Mojo')->path->parts->[0];
+
   # "http://example.com/DOM/HTML"
   Mojo::URL->new('http://example.com/perldoc/Mojo')->path('/DOM/HTML');
 

@@ -129,9 +129,9 @@ sub parse {
   my $end     = $self->tag_end;
   my $start   = $self->line_start;
 
-  my $replace_re = qr/^(\s*)\Q$start$replace\E(.*)$/;
-  my $line_re    = qr/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?(.*)$/;
-  my $token_re   = qr/
+  my $line_re
+    = qr/^(\s*)\Q$start\E(?:(\Q$replace\E)|(\Q$cmnt\E)|(\Q$expr\E))?(.*)$/;
+  my $token_re = qr/
     (
       \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                   # Replace
     |
@@ -155,16 +155,16 @@ sub parse {
   for my $line (split "\n", $template) {
 
     # Turn Perl line into mixed line
-    if ($op eq 'text') {
-      if ($line =~ $replace_re) { $line = "$1$start$2" }
-      elsif ($line =~ $line_re) {
+    if ($op eq 'text' && $line =~ $line_re) {
 
-        # Comment
-        if ($2) { $line = "$tag$2 $trim$end" }
+      # Escaped start
+      if ($2) { $line = "$1$start$5" }
 
-        # Expression or code
-        else { $line = $3 ? "$1$tag$3$4 $end" : "$tag$4 $trim$end" }
-      }
+      # Comment
+      elsif ($3) { $line = "$tag$3 $trim$end" }
+
+      # Expression or code
+      else { $line = $4 ? "$1$tag$4$5 $end" : "$tag$5 $trim$end" }
     }
 
     # Escaped line ending

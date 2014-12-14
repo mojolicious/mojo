@@ -129,9 +129,9 @@ sub parse {
   my $end     = $self->tag_end;
   my $start   = $self->line_start;
 
-  my $r_re     = qr/^(\s*)\Q$start$replace\E/;
-  my $line_re  = qr/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?/;
-  my $token_re = qr/
+  my $replace_re = qr/^(\s*)\Q$start$replace\E(.*)$/;
+  my $line_re    = qr/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?(.*)$/;
+  my $token_re   = qr/
     (
       \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                   # Replace
     |
@@ -142,7 +142,7 @@ sub parse {
       (?:(?<!\w)\Q$cpst\E\s*)?(?:\Q$trim\E)?\Q$end\E       # End
     )
   /x;
-  my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E/;
+  my $cpen_re = qr/^\Q$tag\E(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E(.*)$/;
   my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
   my $code_re = qr/^\Q$tag\E$/;
   my $expr_re = qr/^\Q$tag$expr\E$/;
@@ -155,13 +155,16 @@ sub parse {
   for my $line (split "\n", $template) {
 
     # Turn Perl line into mixed line
-    if ($op eq 'text' && $line !~ s/$r_re/$1$start/ && $line =~ s/$line_re//) {
+    if ($op eq 'text') {
+      if ($line =~ $replace_re) { $line = "$1$start$2" }
+      elsif ($line =~ $line_re) {
 
-      # Comment
-      if ($2) { $line = "$tag$2 $trim$end" }
+        # Comment
+        if ($2) { $line = "$tag$2 $trim$end" }
 
-      # Expression or code
-      else { $line = $3 ? "$1$tag$3$line $end" : "$tag$line $trim$end" }
+        # Expression or code
+        else { $line = $3 ? "$1$tag$3$4 $end" : "$tag$4 $trim$end" }
+      }
     }
 
     # Escaped line ending
@@ -171,7 +174,7 @@ sub parse {
     for my $token (split $token_re, $line) {
 
       # Capture end
-      $capture = 1 if $token =~ s/$cpen_re/$1/;
+      ($token, $capture) = ("$tag$1", 1) if $token =~ $cpen_re;
 
       # End
       if ($op ne 'text' && $token =~ $end_re) {

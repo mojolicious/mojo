@@ -52,6 +52,12 @@ is $t->app->plugins->registered('test-some_plugin2'), 'new',
 is $t->app->plugins->registered('MojoliciousTest::Plugin::Test::SomePlugin2'),
   'new', 'right unchanged value';
 
+$t->app->plugins->registered('Test::SomePlugin2', 0);
+is $t->app->plugins->registered('Test::SomePlugin2'), 0, 'right value';
+
+$t->app->plugins->registered('Test::SomePlugin2', undef);
+is $t->app->plugins->registered('Test::SomePlugin2'), undef, 'right value';
+
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something',
   'right pattern';

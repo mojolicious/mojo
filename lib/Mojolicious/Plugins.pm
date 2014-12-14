@@ -40,10 +40,10 @@ sub load_plugin {
 }
 
 sub registered {
-  my ($self, $name, $v) = @_;
+  my ($self, $name) = (shift, shift);
   my $key = _load($self, camelize($name)) or return;
-  return $self->{registered}->{$key} unless $v;
-  $self->{registered}->{$key} = $v;
+  return $self->{registered}->{$key} unless @_;
+  $self->{registered}->{$key} = shift;
   $self;
 }
 
@@ -195,15 +195,15 @@ Load a plugin from the configured namespaces or by full module name.
 
 =head2 registered
 
-  $plugins = $plugins->registered('some_thing', 1);
-  $plugins = $plugins->registered('SomeThing', {foo => 'bar'});
-  $plugins = $plugins->registered('MyApp::Plugin::SomeThing', 1);
+  $plugins = $plugins->registered('some_thing',               'foo');
+  $plugins = $plugins->registered('SomeThing',                'foo');
+  $plugins = $plugins->registered('MyApp::Plugin::SomeThing', 'foo');
   my $registered = $plugins->registered('some_thing');
   my $registered = $plugins->registered('SomeThing');
   my $registered = $plugins->registered('MyApp::Plugin::SomeThing');
 
-Check if plugin is already registered. Useful to prevent loading plugin
-more than once.
+Check if a plugin is already registered or set a provided value.
+Useful to prevent loading plugins more than once.
 
 =head2 register_plugin
 
@@ -220,7 +220,9 @@ more than once.
     'MyApp::Plugin::SomeThing', Mojolicious->new, {foo => 23});
 
 Load a plugin from the configured namespaces or by full module name and run
-C<register>, optional arguments are passed through.
+C<register>, optional arguments are passed through. This method invokes
+L</registered> with a plugin's name and a true value as arguments if
+invocation of C<register> didn't already set it to some defined value.
 
 =head1 SEE ALSO
 

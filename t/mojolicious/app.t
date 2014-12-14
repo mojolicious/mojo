@@ -40,7 +40,7 @@ use Test::Mojo;
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # registered?
-is $t->app->plugins->registered('Test::SomePlugin2'), 1, 'right value';
+ok $t->app->plugins->registered('Test::SomePlugin2'), 'right value';
 
 # change registered value by force, register method must leave it as is
 $t->app->plugins->registered('Test::SomePlugin2', 'new');

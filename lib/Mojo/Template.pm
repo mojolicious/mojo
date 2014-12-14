@@ -144,10 +144,6 @@ sub parse {
   /x;
   my $cpen_re = qr/^\Q$tag\E(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E(.*)$/;
   my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
-  my $code_re = qr/^\Q$tag\E$/;
-  my $expr_re = qr/^\Q$tag$expr\E$/;
-  my $escp_re = qr/^\Q$tag$expr$escp\E$/;
-  my $cmnt_re = qr/^\Q$tag$cmnt\E$/;
 
   # Split lines
   my $op = 'text';
@@ -191,16 +187,16 @@ sub parse {
       }
 
       # Code
-      elsif ($token =~ $code_re) { $op = 'code' }
+      elsif ($token eq $tag) { $op = 'code' }
 
       # Expression
-      elsif ($token =~ $expr_re) { $op = 'expr' }
+      elsif ($token eq "$tag$expr") { $op = 'expr' }
 
       # Expression that needs to be escaped
-      elsif ($token =~ $escp_re) { $op = 'escp' }
+      elsif ($token eq "$tag$expr$escp") { $op = 'escp' }
 
       # Comment
-      elsif ($token =~ $cmnt_re) { $op = 'cmnt' }
+      elsif ($token eq "$tag$cmnt") { $op = 'cmnt' }
 
       # Text (comments are just ignored)
       elsif ($op ne 'cmnt') {

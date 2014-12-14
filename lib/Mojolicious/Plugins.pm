@@ -32,24 +32,44 @@ sub emit_hook_reverse {
 sub load_plugin {
   my ($self, $name) = @_;
 
-  # Try all namespaces and full module name
-  my $suffix = $name =~ /^[a-z]/ ? camelize($name) : $name;
-  my @classes = map {"${_}::$suffix"} @{$self->namespaces};
-  for my $class (@classes, $name) { return $class->new if _load($class) }
+  my $class = _load($self, $name);
+  return $class->new if $class;
 
   # Not found
   die qq{Plugin "$name" missing, maybe you need to install it?\n};
 }
 
+sub registered {
+  my ($self, $name, $v) = @_;
+  my $key = _load($self, camelize($name)) or return;
+  return $self->{registered}->{$key} unless $v;
+  $self->{registered}->{$key} = $v;
+  $self;
+}
+
 sub register_plugin {
-  shift->load_plugin(shift)->register(shift, ref $_[0] ? $_[0] : {@_});
+  my ($self, $plugin, $app) = (shift, shift, shift);
+  my $conf = ref $_[0] ? $_[0] : {@_};
+  my $return = $self->load_plugin($plugin)->register($app, $conf);
+  $self->registered($plugin, 1) unless defined $self->registered($plugin);
+  return $return;
 }
 
 sub _load {
-  my $module = shift;
-  return $module->isa('Mojolicious::Plugin')
-    unless my $e = Mojo::Loader->new->load($module);
-  ref $e ? die $e : return undef;
+  my ($self, $name) = @_;
+
+  # Try all namespaces and full module name
+  my $suffix = $name =~ /^[a-z]/ ? camelize($name) : $name;
+  my @classes = map {"${_}::$suffix"} @{$self->namespaces};
+
+  for my $module (@classes, $name) {
+    if (my $e = Mojo::Loader->new->load($module)) {
+      ref $e ? die $e : next;
+    }
+    return $module->isa('Mojolicious::Plugin') && $module;
+  }
+
+  return;
 }
 
 1;
@@ -172,6 +192,18 @@ Emit events as hooks in reverse order.
   my $plugin = $plugins->load_plugin('MyApp::Plugin::SomeThing');
 
 Load a plugin from the configured namespaces or by full module name.
+
+=head2 registered
+
+  $plugins = $plugins->registered('some_thing', 1);
+  $plugins = $plugins->registered('SomeThing', {foo => 'bar'});
+  $plugins = $plugins->registered('MyApp::Plugin::SomeThing', 1);
+  my $registered = $plugins->registered('some_thing');
+  my $registered = $plugins->registered('SomeThing');
+  my $registered = $plugins->registered('MyApp::Plugin::SomeThing');
+
+Check if plugin is already registered. Useful to prevent loading plugin
+more than once.
 
 =head2 register_plugin
 

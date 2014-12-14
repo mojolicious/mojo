@@ -39,6 +39,19 @@ use Test::Mojo;
 
 my $t = Test::Mojo->new('MojoliciousTest');
 
+# registered?
+is $t->app->plugins->registered('Test::SomePlugin2'), 1, 'right value';
+
+# change registered value by force, register method must leave it as is
+$t->app->plugins->registered('Test::SomePlugin2', 'new');
+$t->app->plugin('Test::SomePlugin2');
+is $t->app->plugins->registered('Test::SomePlugin2'), 'new',
+  'right unchanged value';
+is $t->app->plugins->registered('test-some_plugin2'), 'new',
+  'right unchanged value';
+is $t->app->plugins->registered('MojoliciousTest::Plugin::Test::SomePlugin2'),
+  'new', 'right unchanged value';
+
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something',
   'right pattern';

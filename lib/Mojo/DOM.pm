@@ -547,7 +547,7 @@ node's content.
 
 =head2 at
 
-  my $result = $dom->at('html title');
+  my $result = $dom->at('div > p');
 
 Find first element in DOM structure matching the CSS selector and return it as
 a L<Mojo::DOM> object or return C<undef> if none could be found. All selectors
@@ -622,7 +622,7 @@ as L<Mojo::DOM> objects.
 
 =head2 find
 
-  my $collection = $dom->find('html title');
+  my $collection = $dom->find('div > p');
 
 Find all elements in DOM structure matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
@@ -665,10 +665,10 @@ node as L<Mojo::DOM> objects.
 
 =head2 match
 
-  my $result = $dom->match('html title');
+  my $result = $dom->match('div > p');
 
-Match the CSS selector against this element and return it as a L<Mojo::DOM>
-object or return C<undef> if it didn't match. All selectors from
+Match the CSS selector against this element and return the L<Mojo::DOM> object
+or return C<undef> if it didn't match. All selectors from
 L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # True

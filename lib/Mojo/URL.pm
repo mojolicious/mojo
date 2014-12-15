@@ -312,6 +312,15 @@ Host part of this URL in punycode format.
 
 Check if URL is absolute.
 
+  # True
+  Mojo::URL->new('http://example.com')->is_abs;
+  Mojo::URL->new('http://example.com/test/index.html')->is_abs;
+
+  # False
+  Mojo::URL->new('test/index.html')->is_abs;
+  Mojo::URL->new('/test/index.html')->is_abs;
+  Mojo::URL->new('//example.com/test/index.html')->is_abs;
+
 =head2 new
 
   my $url = Mojo::URL->new;
@@ -361,6 +370,9 @@ defaults to a L<Mojo::Path> object.
   my $path_query = $url->path_query;
 
 Normalized version of L</"path"> and L</"query">.
+
+  # "/test?a=1&b=2"
+  Mojo::URL->new('http://example.com/test?a=1&b=2')->path_query;
 
 =head2 protocol
 

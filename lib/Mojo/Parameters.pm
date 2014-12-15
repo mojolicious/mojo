@@ -269,6 +269,9 @@ array reference. Note that this method will normalize the parameters.
 Merge L<Mojo::Parameters> objects. Note that this method will normalize the
 parameters.
 
+  # "foo=bar&foo=baz"
+  Mojo::Parameters->new('foo=bar')->merge(Mojo::Parameters->new('foo=baz'));
+
 =head2 new
 
   my $params = Mojo::Parameters->new;

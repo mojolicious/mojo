@@ -671,6 +671,14 @@ Match the CSS selector against this element and return it as a L<Mojo::DOM>
 object or return C<undef> if it didn't match. All selectors from
 L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
+  # True
+  !!$dom->parse('<p class="a">A</p>')->at('p')->match('.a');
+  !!$dom->parse('<p class="a">A</p>')->at('p')->match('p[class]');
+
+  # False
+  !!$dom->parse('<p class="a">A</p>')->at('p')->match('.b');
+  !!$dom->parse('<p class="a">A</p>')->at('p')->match('p[id]');
+
 =head2 namespace
 
   my $namespace = $dom->namespace;

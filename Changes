@@ -1,6 +1,7 @@
 
 5.70  2014-12-16
   - Improved Mojo::Template performance.
+  - Fixed Windows bug in Mojo::IOLoop::Client. (OlegG)
 
 5.69  2014-12-13
   - Deprecated Mojo::DOM::siblings.

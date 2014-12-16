@@ -368,14 +368,16 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
   $res->parse("HTTP/1.1 200 OK\x0d\x0a");
   $res->parse("Content-Type: text/plain\x0d\x0a");
   $res->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
+  ok !$res->is_limit_exceeded, 'limit is not exceeded';
   $res->parse('a' x 1000);
   ok $res->is_finished, 'response is finished';
   ok $res->content->is_finished, 'content is finished';
   is $res->error->{message}, 'Maximum buffer size exceeded', 'right error';
   is $res->error->{advice}, 400, 'right advice';
-  is $res->code,    200,   'right status';
-  is $res->message, 'OK',  'right message';
-  is $res->version, '1.1', 'right version';
+  ok $res->is_limit_exceeded, 'limit is not exceeded';
+  is $res->code,              200, 'right status';
+  is $res->message,           'OK', 'right message';
+  is $res->version,           '1.1', 'right version';
   is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 }
 

@@ -13,16 +13,19 @@ use Mojo::Util 'encode';
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding all limits
 my $req = Mojo::Message::Request->new;
 my $finished;
+$req->max_message_size($req->headers->max_line_size);
+my $huge = 'a=b; ' x $req->max_message_size;
 $req->on(finish => sub { $finished = shift->is_finished });
-$req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse('Cookie: ' . ('a=b; ' x (1024 * 1024 * 2)) . "\x0d\x0a");
+$req->parse("PUT /upload HTTP/1.1\x0d\x0aCookie: $huge\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
+is $req->content->leftovers, '', 'no leftovers';
 is $req->error->{message}, 'Maximum message size exceeded', 'right error';
-is $req->method,  'GET', 'right method';
-is $req->version, '1.1', 'right version';
-is $req->url,     '/',   'right URL';
+ok $req->is_limit_exceeded, 'limit is exceeded';
+is $req->method,            'PUT', 'right method';
+is $req->version,           '1.1', 'right version';
+is $req->url,               '/upload', 'right URL';
 is $req->cookie('a'), undef, 'no value';
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding line limit
@@ -33,9 +36,10 @@ $req->parse('Cookie: ' . ('a=b; ' x 131072) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->error->{message}, 'Maximum line size exceeded', 'right error';
-is $req->method,  'GET', 'right method';
-is $req->version, '1.1', 'right version';
-is $req->url,     '/',   'right URL';
+ok $req->is_limit_exceeded, 'limit is exceeded';
+is $req->method,            'GET', 'right method';
+is $req->version,           '1.1', 'right version';
+is $req->url,               '/', 'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -48,9 +52,10 @@ $req->parse("Content-Length: 4\x0d\x0aCookie: "
     . "\x0d\x0aX-Test: 23\x0d\x0a\x0d\x0aabcd");
 ok $req->is_finished, 'request is finished';
 is $req->error->{message}, 'Maximum line size exceeded', 'right error';
-is $req->method,  'GET', 'right method';
-is $req->version, '1.1', 'right version';
-is $req->url,     '/',   'right URL';
+ok $req->is_limit_exceeded, 'limit is exceeded';
+is $req->method,            'GET', 'right method';
+is $req->version,           '1.1', 'right version';
+is $req->url,               '/', 'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -72,6 +77,7 @@ $req->parse("12345\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->error->{message}, 'Bad request start line', 'right error';
 is $req->error->{advice}, 400, 'right advice';
+ok !$req->is_limit_exceeded, 'limit is not exceeded';
 
 # Parse broken HTTP 1.1 message with header exceeding line limit
 $req = Mojo::Message::Request->new;

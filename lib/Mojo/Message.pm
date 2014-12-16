@@ -144,13 +144,10 @@ sub json {
 }
 
 sub parse {
-  my ($self, $chunk) = @_;
+  my $self = shift;
 
-  # Check message size
-  my $max = $self->max_message_size;
-  return $self->_limit('Maximum message size exceeded', 413)
-    if $max && ($self->{raw_size} += length($chunk //= '')) > $max;
-
+  return $self if $self->{limit};
+  $self->{raw_size} += length(my $chunk = shift // '');
   $self->{buffer} .= $chunk;
 
   # Start line
@@ -170,13 +167,17 @@ sub parse {
   $self->content($self->content->parse(delete $self->{buffer}))
     if $state eq 'content' || $state eq 'finished';
 
+  # Check message size
+  my $max = $self->max_message_size;
+  return $self->_limit('Maximum message size exceeded', 413)
+    if $max && $max < $self->{raw_size};
+
   # Check line size
   return $self->_limit('Maximum line size exceeded', 431)
     if $self->headers->is_limit_exceeded;
 
   # Check buffer size
-  return $self->error(
-    {message => 'Maximum buffer size exceeded', advice => 400})
+  return $self->_limit('Maximum buffer size exceeded', 400)
     if $self->content->is_limit_exceeded;
 
   return $self->emit('progress')->content->is_finished ? $self->finish : $self;
@@ -591,7 +592,8 @@ Check if message parser/generator is finished.
 
   my $bool = $msg->is_limit_exceeded;
 
-Check if message has exceeded L</"max_line_size"> or L</"max_message_size">.
+Check if message has exceeded L</"max_line_size">, L</"max_message_size">,
+L<Mojo::Content/"max_buffer_size"> or L<Mojo::Headers/"max_line_size">.
 
 =head2 json
 

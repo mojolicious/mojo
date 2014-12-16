@@ -146,7 +146,7 @@ sub json {
 sub parse {
   my $self = shift;
 
-  return $self if $self->{limit};
+  return $self if $self->{error};
   $self->{raw_size} += length(my $chunk = shift // '');
   $self->{buffer} .= $chunk;
 

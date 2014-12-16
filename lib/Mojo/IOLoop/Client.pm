@@ -5,7 +5,7 @@ use Errno 'EINPROGRESS';
 use IO::Socket::IP;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
-use Socket qw(IPPROTO_TCP TCP_NODELAY);
+use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native
 use constant NDN => $ENV{MOJO_NO_NDN}
@@ -48,8 +48,8 @@ sub connect {
     if !NDN || $args->{handle};
 
   # Non-blocking name resolution
-  my $handle = $self->{dns}
-    = $NDN->getaddrinfo($address, _port($args), {protocol => IPPROTO_TCP});
+  my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
+    {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
   $reactor->io(
     $handle => sub {
       my $reactor = shift;

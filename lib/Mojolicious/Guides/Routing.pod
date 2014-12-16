@@ -669,12 +669,18 @@ especially for plugins.
 
   1;
 
-Post-processing the response to set additional headers is a very common use.
+Post-processing the response to add or remove headers is a very common use.
 
   # Make sure static files are cached
   $app->hook(after_static => sub {
     my $c = shift;
     $c->res->headers->cache_control('max-age=3600, must-revalidate');
+  });
+
+  # Remove a default header
+  $app->hook(after_dispatch => sub {
+    my $c = shift;
+    $c->res->headers->remove('Server');
   });
 
 Same for pre-processing the request.

@@ -150,8 +150,8 @@ Mojo::Collection - Collection
 
   # Chain methods
   $collection->map(sub { ucfirst })->shuffle->each(sub {
-    my ($word, $count) = @_;
-    say "$count: $word";
+    my ($word, $num) = @_;
+    say "$num: $word";
   });
 
   # Use the alternative constructor
@@ -200,8 +200,8 @@ to the callback and is also available as C<$_>.
 
   # Make a numbered list
   $collection->each(sub {
-    my ($e, $count) = @_;
-    say "$count: $e";
+    my ($e, $num) = @_;
+    say "$num: $e";
   });
 
 =head2 first
@@ -214,6 +214,9 @@ Evaluate regular expression or callback for each element in collection and
 return the first one that matched the regular expression, or for which the
 callback returned true. The element will be the first argument passed to the
 callback and is also available as C<$_>.
+
+  # Find first value that contains the word "mojo"
+  my $interesting = $collection->first(qr/mojo/i);
 
   # Find first value that is greater than 5
   my $greater = $collection->first(sub { $_ > 5 });
@@ -237,6 +240,9 @@ argument passed to the callback and is also available as C<$_>.
 
   # Find all values that contain the word "mojo"
   my $interesting = $collection->grep(qr/mojo/i);
+
+  # Find all values that are greater than 5
+  my $greater = $collection->grep(sub { $_ > 5 });
 
 =head2 join
 

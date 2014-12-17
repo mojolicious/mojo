@@ -1,5 +1,5 @@
 
-5.70  2014-12-17
+5.70  2014-12-18
   - Improved Mojo::Template performance.
   - Fixed error handling bugs in Mojo::IOLoop::Stream.
   - Fixed a few limit bugs in Mojo::Message.

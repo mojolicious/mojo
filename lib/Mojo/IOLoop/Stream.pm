@@ -98,9 +98,9 @@ sub _again { $_[0]->reactor->again($_[0]{timer}) if $_[0]{timer} }
 sub _read {
   my $self = shift;
 
-  if (defined(my $read = $self->{handle}->sysread(my $buffer, 131072, 0))) {
-    return $read == 0 ? $self->close : $self->emit(read => $buffer)->_again;
-  }
+  my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
+  return $read == 0 ? $self->close : $self->emit(read => $buffer)->_again
+    if defined $read;
 
   # Retry
   return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;

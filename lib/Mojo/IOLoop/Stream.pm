@@ -99,8 +99,7 @@ sub _read {
   my $self = shift;
 
   if (defined(my $read = $self->{handle}->sysread(my $buffer, 131072, 0))) {
-    return $self->close if $read == 0;
-    return $self->emit(read => $buffer)->_again;
+    return $read == 0 ? $self->close : $self->emit(read => $buffer)->_again;
   }
 
   # Retry

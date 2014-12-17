@@ -106,11 +106,8 @@ sub _read {
   # Retry
   return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
-  # Closed
-  return $self->close if $! == ECONNRESET;
-
-  # Error
-  $self->emit(error => $!)->close;
+  # Closed (maybe real error)
+  $! == ECONNRESET ? $self->close : $self->emit(error => $!)->close;
 }
 
 sub _write {

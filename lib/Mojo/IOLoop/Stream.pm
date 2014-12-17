@@ -1,7 +1,7 @@
 package Mojo::IOLoop::Stream;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK);
+use Errno qw(EAGAIN ECONNRESET EINTR EWOULDBLOCK);
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 
@@ -95,25 +95,22 @@ sub write {
 
 sub _again { $_[0]->reactor->again($_[0]{timer}) if $_[0]{timer} }
 
-sub _error {
+sub _read {
   my $self = shift;
+
+  if (defined(my $read = $self->{handle}->sysread(my $buffer, 131072, 0))) {
+    return $self->close if $read == 0;
+    return $self->emit(read => $buffer)->_again;
+  }
 
   # Retry
   return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
   # Closed
-  return $self->close if $! == ECONNRESET || $! == EPIPE;
+  return $self->close if $! == ECONNRESET;
 
   # Error
   $self->emit(error => $!)->close;
-}
-
-sub _read {
-  my $self = shift;
-  my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
-  return $self->_error unless defined $read;
-  return $self->close if $read == 0;
-  $self->emit(read => $buffer)->_again;
 }
 
 sub _write {
@@ -121,8 +118,7 @@ sub _write {
 
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
-    my $written = $handle->syswrite($self->{buffer});
-    return $self->_error unless defined $written;
+    return unless defined(my $written = $handle->syswrite($self->{buffer}));
     $self->emit(write => substr($self->{buffer}, 0, $written, ''))->_again;
   }
 

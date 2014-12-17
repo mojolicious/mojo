@@ -90,7 +90,7 @@ sub parse {
     my $line = $1;
 
     # Check line size limit
-    if (length $line > $max) {
+    if ($+[0] > $max) {
       @$self{qw(state limit)} = ('finished', 1);
       return $self;
     }

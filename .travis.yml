@@ -11,6 +11,5 @@ env:
 install:
   - "cpanm -n EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Pod Test::Pod::Coverage"
   - "cpanm -n --installdeps ."
-sudo: false
 notifications:
   email: false

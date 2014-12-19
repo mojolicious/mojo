@@ -37,6 +37,7 @@ Mojolicious::Command::daemon - Daemon command
 
   Usage: APPLICATION daemon [OPTIONS]
 
+    ./myapp.pl daemon
     ./myapp.pl daemon -m production -l http://*:8080
     ./myapp.pl daemon -l http://127.0.0.1:8080 -l https://[::]:8081
     ./myapp.pl daemon -l 'https://*:443?cert=./server.crt&key=./server.key'

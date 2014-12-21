@@ -13,6 +13,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
+use Mojo::URL;
 use Mojo::Util qw(deprecated squish);
 use Scalar::Util qw(blessed weaken);
 
@@ -182,6 +183,15 @@ sub type {
   return $tree->[1] unless $type;
   $tree->[1] = $type;
   return $self;
+}
+
+sub url {
+  my $self = shift;
+  for my $attr (@_ ? @_ : qw/href src/) {
+    next unless my $url = $self->attr($attr);
+    return Mojo::URL->new($url);
+  }
+  return undef;
 }
 
 # DEPRECATED in Tiger Face!
@@ -912,6 +922,18 @@ This element's type.
 
   # List types of child elements
   say $dom->children->map('type')->join("\n");
+
+=head2 url
+
+  my $url = $dom->url;
+  my $url = $dom->url(qw/myattr href src/);
+
+Returns a L<Mojo::URL> object for the C<href> or C<src> attribute of the node
+or C<undef> if the node does not have the attributes. Optionally pass a list of
+alternative attributes to search.
+
+  # "bender"
+  $dom->parse('<a href="/page.html#bender"></a>')->at('a')->url->fragment;
 
 =head2 wrap
 

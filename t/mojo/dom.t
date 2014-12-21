@@ -2393,4 +2393,17 @@ $dom = Mojo::DOM->new($huge);
 is $dom->all_text, 'works', 'right text';
 is "$dom", $huge, 'right result';
 
+# url
+$dom = Mojo::DOM->new('<a href="http://mojolicio.us">Mojo</a>');
+my $url = $dom->at('a')->url;
+isa_ok $url, 'Mojo::URL';
+is $url->to_string, 'http://mojolicio.us', 'right url content';
+$dom = Mojo::DOM->new('<img src="/image.png"></img>')->at('img');
+is $dom->url('src')->path->parts->[-1], 'image.png', 'found src';
+
+$dom = Mojo::DOM->new('<img src="/image.png" href="/page.html"></img>')->at('img');
+is $dom->url->path->parts->[-1], 'page.html', 'found href';
+is $dom->url('src')->path->parts->[-1], 'image.png', 'found src';
+is $dom->url('myattr'), undef, 'attribute not found';
+
 done_testing();

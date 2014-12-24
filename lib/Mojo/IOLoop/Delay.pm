@@ -181,11 +181,10 @@ implements the following new ones.
   my $cb = $delay->begin($offset);
   my $cb = $delay->begin($offset, $len);
 
-Increment active event counter, the returned callback can be used to decrement
-the active event counter again. Arguments passed to the callback are spliced
-and queued in the right order for the next step or L</"finish"> event and
-L</"wait"> method, the argument offset defaults to C<1> with no default
-length.
+Indicate an active event by incrementing the active event counter, the
+returned callback needs to be called when the event has completed, to
+decrement the active event counter again. When all callbacks have been called
+and the active event counter reached zero, L</"steps"> will continue.
 
   # Capture all arguments except for the first one (invocant)
   my $delay = Mojo::IOLoop->delay(sub {
@@ -194,6 +193,11 @@ length.
   });
   Mojo::IOLoop->client({port => 3000} => $delay->begin);
   $delay->wait;
+
+Arguments passed to the returned callback are spliced with the given offset
+and length, defaulting to an offset of C<1> with no default length. The
+arguments are then combined in the same order C</"begin"> was called, and
+passed together to the next step or L</"finish"> event.
 
   # Capture all arguments
   my $delay = Mojo::IOLoop->delay(sub {

@@ -411,8 +411,6 @@ latency backend web services.
     </body>
   </html>
 
-=head2 Parallel Processing
-
 Multiple events such as concurrent requests can be easily synchronized with
 L<Mojolicious::Plugin::DefaultHelpers/"delay">, which can help you avoid deep
 nested closures and memory leaks that often result from continuation-passing

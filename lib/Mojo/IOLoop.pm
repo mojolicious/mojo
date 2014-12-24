@@ -454,6 +454,10 @@ of events for this event loop, which can help you avoid deep nested closures
 and memory leaks that often result from continuation-passing style. Callbacks
 will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
+Use L<Mojo::IOLoop::Delay/"begin"> to provide synchronized continuation
+callbacks to non-blocking code. To manage delayed rendering, see
+L<Mojolicious::Plugin::DefaultHelpers/"delay">.
+
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
   for my $i (1 .. 10) {

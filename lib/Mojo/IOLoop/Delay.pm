@@ -215,6 +215,15 @@ passed together to the next step or L</"finish"> event.
   Mojo::IOLoop->client({port => 3000} => $delay->begin(1, 1));
   $delay->wait;
 
+  # Capture and combine arguments
+  my $delay = Mojo::IOLoop->delay(sub {
+    my ($delay, $three_err, $three_stream, $four_err, $four_stream) = @_;
+    ...
+  });
+  Mojo::IOLoop->client({port => 3000} => $delay->begin);
+  Mojo::IOLoop->client({port => 4000} => $delay->begin);
+  $delay->wait;
+
 =head2 data
 
   my $hash = $delay->data;

@@ -522,6 +522,12 @@ L<Mojolicious::Types> object.
 
 Validate parameters, defaults to a L<Mojolicious::Validator> object.
 
+  # Add validation check
+  $app->validator->add_check(foo => sub {
+    my ($validation, $name, $value) = @_;
+    return $value ne 'foo';
+  });
+
 =head1 METHODS
 
 L<Mojolicious> inherits all methods from L<Mojo> and implements the following

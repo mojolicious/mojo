@@ -44,7 +44,7 @@ L<Mojo::Server::Daemon/"listen">.
 
 On UNIX platforms you can also add preforking and switch to a multi-process
 architecture with L<Mojolicious::Command::prefork>, to take advantage of
-multiple CPU cores and copy-on-write.
+multiple CPU cores and copy-on-write memory management.
 
   $ ./script/my_app prefork
   Server available at http://127.0.0.1:3000.
@@ -92,8 +92,8 @@ used during development.
 
 For bigger applications L<Mojolicious> contains the UNIX optimized preforking
 web server L<Mojo::Server::Hypnotoad>, which can take advantage of multiple
-CPU cores and copy-on-write to scale up to thousands of concurrent client
-connections.
+CPU cores and copy-on-write memory management to scale up to thousands of
+concurrent client connections.
 
   Mojo::Server::Hypnotoad
   |- Mojo::Server::Daemon [1]

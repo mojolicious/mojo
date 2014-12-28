@@ -10,7 +10,7 @@ use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 # Non-blocking name resolution requires Net::DNS::Native
 use constant NDN => $ENV{MOJO_NO_NDN}
   ? 0
-  : eval 'use Net::DNS::Native 0.14 (); 1';
+  : eval 'use Net::DNS::Native 0.15 (); 1';
 my $NDN = NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 
 # TLS support requires IO::Socket::SSL
@@ -265,7 +265,7 @@ implements the following new ones.
   $client->connect(address => '127.0.0.1', port => 3000);
 
 Open a socket connection to a remote host. Note that non-blocking name
-resolution depends on L<Net::DNS::Native> (0.14+), SOCKS5 support on
+resolution depends on L<Net::DNS::Native> (0.15+), SOCKS5 support on
 L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (1.84+).
 
 These options are currently available:

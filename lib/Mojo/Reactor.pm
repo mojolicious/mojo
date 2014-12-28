@@ -179,6 +179,9 @@ Start watching for I/O and timer events, this will block until L</"stop"> is
 called. Note that some reactors stop automatically if there are no events
 being watched anymore. Meant to be overloaded in a subclass.
 
+  # Start reactor only if it is not running already
+  $reactor->start unless $reactor->is_running;
+
 =head2 stop
 
   $reactor->stop;

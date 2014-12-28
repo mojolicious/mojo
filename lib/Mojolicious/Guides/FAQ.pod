@@ -35,8 +35,8 @@ L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently
 discourage adding non-optional ones in favor of a faster and more painless
 installation process. And we do in fact already use several optional CPAN
 modules such as L<EV>, L<IO::Socket::Socks>, L<IO::Socket::SSL>,
-L<Net::DNS::Native> and L<Plack> to provide advanced functionality if they are
-installed.
+L<Net::DNS::Native> and L<Plack> to provide advanced functionality if
+possible.
 
 =head2 Why reinvent wheels?
 
@@ -163,7 +163,7 @@ variable to change this value.
 
 The L<Mojolicious> user agent and web servers are based on an event loop that
 supports multiple reactor backends. One of these backends is L<EV>, it is very
-fast and will be automatically used if installed. On Windows however, the
+fast and will be automatically used if possible. On Windows however, the
 C<ithreads> based C<fork()> emulation can interfere with it, and you may have
 to use the C<MOJO_REACTOR> environment variable to enforce a more portable
 one.

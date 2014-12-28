@@ -5,17 +5,17 @@ use Mojo::IOLoop::Client;
 use Mojo::UserAgent;
 use Mojolicious;
 
-has description => 'Show versions of installed modules.';
+has description => 'Show versions of available modules.';
 has usage => sub { shift->extract_usage };
 
 sub run {
   my $self = shift;
 
-  my $ev    = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'not installed';
+  my $ev    = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'n/a';
   my $class = 'Mojo::IOLoop::Client';
-  my $socks = $class->SOCKS ? $IO::Socket::Socks::VERSION : 'not installed';
-  my $tls   = $class->TLS ? $IO::Socket::SSL::VERSION : 'not installed';
-  my $ndn   = $class->NDN ? $Net::DNS::Native::VERSION : 'not installed';
+  my $socks = $class->SOCKS ? $IO::Socket::Socks::VERSION : 'n/a';
+  my $tls   = $class->TLS ? $IO::Socket::SSL::VERSION : 'n/a';
+  my $ndn   = $class->NDN ? $Net::DNS::Native::VERSION : 'n/a';
 
   print <<EOF;
 CORE
@@ -58,7 +58,7 @@ Mojolicious::Command::version - Version command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::version> shows version information for installed core
+L<Mojolicious::Command::version> shows version information for available core
 and optional modules.
 
 This is a core command, that means it is always enabled and its code a good

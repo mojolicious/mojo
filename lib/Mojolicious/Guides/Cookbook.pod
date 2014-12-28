@@ -786,8 +786,8 @@ which can be combined to solve some of hardest problems in web development.
 =head2 Event loops
 
 Internally the L<Mojo::IOLoop> event loop can use multiple reactor backends,
-L<EV> for example will be automatically used if installed. Which in turn
-allows other event loops like L<AnyEvent> to just work.
+L<EV> for example will be automatically used if possible. Which in turn allows
+other event loops like L<AnyEvent> to just work.
 
   use Mojolicious::Lite;
   use EV;

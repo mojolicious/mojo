@@ -259,7 +259,7 @@ directory.
   $ mojo version
   $ ./myapp.pl version
 
-Use L<Mojolicious::Command::version> to show version information for installed
+Use L<Mojolicious::Command::version> to show version information for available
 core and optional modules, very useful for debugging.
 
 =head1 ATTRIBUTES

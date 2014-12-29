@@ -18,10 +18,7 @@ sub authority {
     return $self unless defined(my $authority = shift);
 
     # Userinfo
-    if ($authority =~ s/^([^\@]+)\@//) {
-      my $info = url_unescape $1;
-      $self->userinfo(decode('UTF-8', $info) // $info);
-    }
+    $self->userinfo(_decode(url_unescape $1)) if $authority =~ s/^([^\@]+)\@//;
 
     # Port
     $authority =~ s/:(\d+)$// and $self->port($1);
@@ -80,7 +77,8 @@ sub parse {
 
   # Official regex from RFC 3986
   $url =~ m!^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?!;
-  return $self->scheme($2)->authority($4)->path($5)->query($7)->fragment($9);
+  $self->scheme($2)->authority($4)->path($5)->query($7);
+  return defined $9 ? $self->fragment(_decode(url_unescape $9)) : $self;
 }
 
 sub path {
@@ -184,8 +182,11 @@ sub to_string {
 
   # Fragment
   return $url unless defined(my $fragment = $self->fragment);
-  return $url . '#' . url_escape $fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
+  return $url . '#' . url_escape encode('UTF-8', $fragment),
+    '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
 }
+
+sub _decode { decode('UTF-8', $_[0]) // $_[0] }
 
 1;
 
@@ -243,7 +244,7 @@ Base of this URL, defaults to a L<Mojo::URL> object.
 =head2 fragment
 
   my $fragment = $url->fragment;
-  $url         = $url->fragment('foo');
+  $url         = $url->fragment('♥mojolicious♥');
 
 Fragment part of this URL.
 

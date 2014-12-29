@@ -348,14 +348,18 @@ is $url->port,     3000,               'right port';
 is "$url", 'https://%E2%99%A5:%E2%99%A5@xn--krih-moa.com:3000', 'right format';
 
 # IDNA (snowman)
-$url = Mojo::URL->new('http://☃:☃@☃.net/');
+$url = Mojo::URL->new('http://☃:☃@☃.net/☃?☃#☃');
 ok $url->is_abs,   'is absolute';
 is $url->scheme,   'http', 'right scheme';
 is $url->userinfo, '☃:☃', 'right userinfo';
 is $url->host,     '☃.net', 'right host';
 is $url->ihost,    'xn--n3h.net', 'right internationalized host';
-is $url->path,     '/', 'right path';
-is "$url", 'http://%E2%98%83:%E2%98%83@xn--n3h.net/', 'right format';
+is $url->path,     '/%E2%98%83', 'right path';
+is $url->query,    '%E2%98%83', 'right query';
+is $url->fragment, '☃', 'right fragment';
+is "$url",
+  'http://%E2%98%83:%E2%98%83@xn--n3h.net/%E2%98%83?%E2%98%83#%E2%98%83',
+  'right format';
 
 # IRI/IDNA
 $url = Mojo::URL->new('http://☃.net/♥/?q=♥☃');
@@ -390,11 +394,12 @@ $url = Mojo::URL->new('http://foo.com/');
 is $url->to_abs, 'http://foo.com/', 'right absolute version';
 
 # "0"
-$url = Mojo::URL->new('http://0@foo.com');
+$url = Mojo::URL->new('http://0@foo.com#0');
 is $url->scheme,   'http',    'right scheme';
 is $url->userinfo, '0',       'right userinfo';
 is $url->host,     'foo.com', 'right host';
-is "$url", 'http://0@foo.com', 'right format';
+is $url->fragment, '0',       'right fragment';
+is "$url", 'http://0@foo.com#0', 'right format';
 
 # Empty path elements
 $url = Mojo::URL->new('http://example.com/foo//bar/23/');

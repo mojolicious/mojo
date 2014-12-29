@@ -287,6 +287,12 @@ following new ones.
 
 Authority part of this URL.
 
+  # "root:%E2%99%A5@xn--n3h.net:8080"
+  Mojo::URL->new('http://root:♥@☃.net:8080/test')->authority;
+
+  # "root@example.com"
+  Mojo::URL->new('http://root@example.com/test')->authority;
+
 =head2 clone
 
   my $url2 = $url->clone;
@@ -302,6 +308,9 @@ Normalized version of L</"host"> and L</"port">.
   # "xn--n3h.net:8080"
   Mojo::URL->new('http://☃.net:8080/test')->host_port;
 
+  # "example.com"
+  Mojo::URL->new('http://example.com/test')->host_port;
+
 =head2 ihost
 
   my $ihost = $url->ihost;
@@ -311,6 +320,9 @@ Host part of this URL in punycode format.
 
   # "xn--n3h.net"
   Mojo::URL->new('http://☃.net')->ihost;
+
+  # "example.com"
+  Mojo::URL->new('http://example.com')->ihost;
 
 =head2 is_abs
 
@@ -379,6 +391,9 @@ Normalized version of L</"path"> and L</"query">.
 
   # "/test?a=1&b=2"
   Mojo::URL->new('http://example.com/test?a=1&b=2')->path_query;
+
+  # "/"
+  Mojo::URL->new('http://example.com/')->path_query;
 
 =head2 protocol
 

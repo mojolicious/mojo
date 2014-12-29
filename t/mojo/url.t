@@ -340,20 +340,22 @@ is "$url", 'http://xn--bcher-kva.xn--bcher-kva.xn--bcher-kva.ch:3000/foo',
   'right format';
 
 # IDNA (escaped userinfo and host)
-$url = Mojo::URL->new('https://foo:b%E4r@kr%E4ih.com:3000');
-is $url->host,  "kr\xe4ih.com",     'right host';
-is $url->ihost, 'xn--krih-moa.com', 'right internationalized host';
-is $url->port,  3000,               'right port';
-is "$url", 'https://foo:b%E4r@xn--krih-moa.com:3000', 'right format';
+$url = Mojo::URL->new('https://%E2%99%A5:%E2%99%A5@kr%E4ih.com:3000');
+is $url->userinfo, '♥:♥',          'right userinfo';
+is $url->host,     "kr\xe4ih.com",     'right host';
+is $url->ihost,    'xn--krih-moa.com', 'right internationalized host';
+is $url->port,     3000,               'right port';
+is "$url", 'https://%E2%99%A5:%E2%99%A5@xn--krih-moa.com:3000', 'right format';
 
 # IDNA (snowman)
-$url = Mojo::URL->new('http://☃.net/');
-ok $url->is_abs, 'is absolute';
-is $url->scheme, 'http', 'right scheme';
-is $url->host,   '☃.net', 'right host';
-is $url->ihost,  'xn--n3h.net', 'right internationalized host';
-is $url->path,   '/', 'right path';
-is "$url", 'http://xn--n3h.net/', 'right format';
+$url = Mojo::URL->new('http://☃:☃@☃.net/');
+ok $url->is_abs,   'is absolute';
+is $url->scheme,   'http', 'right scheme';
+is $url->userinfo, '☃:☃', 'right userinfo';
+is $url->host,     '☃.net', 'right host';
+is $url->ihost,    'xn--n3h.net', 'right internationalized host';
+is $url->path,     '/', 'right path';
+is "$url", 'http://%E2%98%83:%E2%98%83@xn--n3h.net/', 'right format';
 
 # IRI/IDNA
 $url = Mojo::URL->new('http://☃.net/♥/?q=♥☃');
@@ -386,6 +388,13 @@ is "$url", 'http://xn--n3h.net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83',
 # Already absolute
 $url = Mojo::URL->new('http://foo.com/');
 is $url->to_abs, 'http://foo.com/', 'right absolute version';
+
+# "0"
+$url = Mojo::URL->new('http://0@foo.com');
+is $url->scheme,   'http',    'right scheme';
+is $url->userinfo, '0',       'right userinfo';
+is $url->host,     'foo.com', 'right host';
+is "$url", 'http://0@foo.com', 'right format';
 
 # Empty path elements
 $url = Mojo::URL->new('http://example.com/foo//bar/23/');

@@ -4,7 +4,8 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Parameters;
 use Mojo::Path;
-use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
+use Mojo::Util
+  qw(decode encode punycode_decode punycode_encode url_escape url_unescape);
 
 has base => sub { Mojo::URL->new };
 has [qw(fragment host port scheme userinfo)];
@@ -17,7 +18,10 @@ sub authority {
     return $self unless defined(my $authority = shift);
 
     # Userinfo
-    $authority =~ s/^([^\@]+)\@// and $self->userinfo(url_unescape $1);
+    if ($authority =~ s/^([^\@]+)\@//) {
+      my $info = url_unescape $1;
+      $self->userinfo(decode('UTF-8', $info) // $info);
+    }
 
     # Port
     $authority =~ s/:(\d+)$// and $self->port($1);
@@ -28,9 +32,10 @@ sub authority {
   }
 
   # Build authority
-  return undef unless defined(my $authority = $self->host_port);
-  return $authority unless my $info = $self->userinfo;
-  return url_escape($info, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $authority;
+  return undef      unless defined(my $authority = $self->host_port);
+  return $authority unless defined(my $info      = $self->userinfo);
+  $info = url_escape encode('UTF-8', $info), '^A-Za-z0-9\-._~!$&\'()*+,;=:';
+  return "$info\@$authority";
 }
 
 sub host_port {
@@ -219,9 +224,10 @@ Mojo::URL - Uniform Resource Locator
 =head1 DESCRIPTION
 
 L<Mojo::URL> implements a subset of
-L<RFC 3986|http://tools.ietf.org/html/rfc3986> and
-L<RFC 3987|http://tools.ietf.org/html/rfc3987> for Uniform Resource Locators
-with support for IDNA and IRIs.
+L<RFC 3986|http://tools.ietf.org/html/rfc3986>,
+L<RFC 3987|http://tools.ietf.org/html/rfc3987> and the
+L<URL Living Standard|https://url.spec.whatwg.org> for Uniform Resource
+Locators with support for IDNA and IRIs.
 
 =head1 ATTRIBUTES
 
@@ -265,7 +271,7 @@ Scheme part of this URL.
 =head2 userinfo
 
   my $info = $url->userinfo;
-  $url     = $url->userinfo('root:pass%3Bw0rd');
+  $url     = $url->userinfo('root:♥');
 
 Userinfo part of this URL.
 
@@ -277,7 +283,7 @@ following new ones.
 =head2 authority
 
   my $authority = $url->authority;
-  $url          = $url->authority('root:pass%3Bw0rd@localhost:8080');
+  $url          = $url->authority('root:%E2%99%A5@localhost:8080');
 
 Authority part of this URL.
 

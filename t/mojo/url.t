@@ -77,10 +77,14 @@ is "$url", 'http://sri:foobar@example.com:8080?foo=23&bar=24&baz=25#23',
   'right format';
 $url->query([foo => 26, bar => undef, baz => undef]);
 is "$url", 'http://sri:foobar@example.com:8080?foo=26#23', 'right format';
-$url->query(Mojo::Parameters->new('a=1&b=2'));
-is "$url", 'http://sri:foobar@example.com:8080?a=1&b=2#23', 'right format';
 $url->query(c => 3);
 is "$url", 'http://sri:foobar@example.com:8080?c=3#23', 'right format';
+$url->query(Mojo::Parameters->new('a=1&b=2'));
+is_deeply $url->query->to_hash, {a => 1, b => 2}, 'right structure';
+is "$url", 'http://sri:foobar@example.com:8080?a=1&b=2#23', 'right format';
+$url->query(Mojo::Parameters->new('%E5=%E4')->charset(undef));
+is_deeply $url->query->to_hash, {"\xe5" => "\xe4"}, 'right structure';
+is "$url", 'http://sri:foobar@example.com:8080?%E5=%E4#23', 'right format';
 
 # Query string
 $url = Mojo::URL->new(

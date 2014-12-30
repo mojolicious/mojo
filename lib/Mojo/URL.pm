@@ -93,8 +93,7 @@ sub path {
   return $self->{path} unless @_;
 
   # New path
-  my $path = shift;
-  $self->{path} = ref $path ? $path : $self->{path}->merge($path);
+  $self->{path} = ref $_[0] ? $_[0] : $self->{path}->merge($_[0]);
 
   return $self;
 }
@@ -128,8 +127,8 @@ sub query {
   # Append hash
   elsif (ref $_[0] eq 'HASH') { $q->append(%{$_[0]}) }
 
-  # Replace with string
-  else { $q->parse($_[0]) }
+  # New parameters
+  else { $self->{query} = ref $_[0] ? $_[0] : $q->parse($_[0]) }
 
   return $self;
 }
@@ -413,9 +412,10 @@ Normalized version of L</"scheme">.
 =head2 query
 
   my $query = $url->query;
-  $url      = $url->query(replace => 'with');
   $url      = $url->query([merge => 'with']);
   $url      = $url->query({append => 'to'});
+  $url      = $url->query(replace => 'with');
+  $url      = $url->query('a=1&b=2');
   $url      = $url->query(Mojo::Parameters->new);
 
 Query part of this URL, pairs in an array will be merged and pairs in a hash

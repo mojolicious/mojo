@@ -58,7 +58,7 @@ sub attr {
   return $attrs unless @_;
 
   # Get
-  return $attrs->{$_[0]} // '' unless @_ > 1 || ref $_[0];
+  return $attrs->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};
@@ -96,7 +96,7 @@ sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
 sub namespace {
   my $self = shift;
 
-  return '' if (my $tree = $self->tree)->[0] ne 'tag';
+  return undef if (my $tree = $self->tree)->[0] ne 'tag';
 
   # Extract namespace prefix and search parents
   my $ns = $tree->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
@@ -110,7 +110,7 @@ sub namespace {
     elsif (defined $attrs->{xmlns}) { return $attrs->{xmlns} }
   }
 
-  return '';
+  return undef;
 }
 
 sub new {
@@ -178,7 +178,7 @@ sub tree { shift->_delegate(tree => @_) }
 
 sub type {
   my ($self, $type) = @_;
-  return '' if (my $tree = $self->tree)->[0] ne 'tag';
+  return undef if (my $tree = $self->tree)->[0] ne 'tag';
   return $tree->[1] unless $type;
   $tree->[1] = $type;
   return $self;
@@ -683,7 +683,7 @@ L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   my $namespace = $dom->namespace;
 
-Find this element's namespace.
+Find this element's namespace or return C<undef> if none could be found.
 
   # Find namespace for an element with namespace prefix
   my $namespace = $dom->at('svg > svg\:circle')->namespace;

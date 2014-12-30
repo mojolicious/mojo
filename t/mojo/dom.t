@@ -95,9 +95,9 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </foo>
 EOF
 ok !$dom->xml, 'XML mode not detected';
-is $dom->type, '', 'no type';
-is $dom->attr('foo'), '', 'no attribute';
-is $dom->attr(foo => 'bar')->attr('foo'), '', 'no attribute';
+is $dom->type, undef, 'no type';
+is $dom->attr('foo'), undef, 'no attribute';
+is $dom->attr(foo => 'bar')->attr('foo'), undef, 'no attribute';
 is $dom->tree->[1][0], 'doctype', 'right element';
 is $dom->tree->[1][1], ' foo',    'right doctype';
 is "$dom", <<EOF, 'right result';
@@ -278,10 +278,10 @@ is $dom->contents->first->at('b'), undef, 'no result';
 is $dom->contents->first->find('*')->size, 0, 'no results';
 is $dom->contents->first->match('*'), undef, 'no match';
 is_deeply $dom->contents->first->attr, {}, 'no attributes';
-is $dom->contents->first->namespace, '', 'no namespace';
-is $dom->contents->first->type,      '', 'no type';
-is $dom->contents->first->text,      '', 'no text';
-is $dom->contents->first->all_text,  '', 'no text';
+is $dom->contents->first->namespace, undef, 'no namespace';
+is $dom->contents->first->type,      undef, 'no type';
+is $dom->contents->first->text,      '',    'no text';
+is $dom->contents->first->all_text,  '',    'no text';
 
 # Class and ID
 $dom = Mojo::DOM->new('<div id="id" class="class">a</div>');
@@ -605,7 +605,7 @@ $dom = Mojo::DOM->new(<<EOF);
 </bk:book>
 EOF
 ok $dom->xml, 'XML mode detected';
-is $dom->namespace, '', 'no namespace';
+is $dom->namespace, undef, 'no namespace';
 is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
 is $dom->at('book comment')->text,      'rocks!',         'right text';
 is $dom->at('book nons section')->namespace, '',            'no namespace';
@@ -622,9 +622,9 @@ is $dom->at('ook'),     undef, 'no result';
 is $dom->at('[xmlns\:bk]')->{'xmlns:bk'}, 'uri:book-ns', 'right attribute';
 is $dom->at('[bk]')->{'xmlns:bk'},        'uri:book-ns', 'right attribute';
 is $dom->at('[bk]')->attr('xmlns:bk'), 'uri:book-ns', 'right attribute';
-is $dom->at('[bk]')->attr('s:bk'),     '',            'no attribute';
-is $dom->at('[bk]')->attr('bk'),       '',            'no attribute';
-is $dom->at('[bk]')->attr('k'),        '',            'no attribute';
+is $dom->at('[bk]')->attr('s:bk'),     undef,         'no attribute';
+is $dom->at('[bk]')->attr('bk'),       undef,         'no attribute';
+is $dom->at('[bk]')->attr('k'),        undef,         'no attribute';
 is $dom->at('[s\:bk]'), undef, 'no result';
 is $dom->at('[k]'),     undef, 'no result';
 is $dom->at('number')->ancestors('meta')->first->{xmlns}, 'uri:meta-ns',
@@ -646,7 +646,7 @@ is $dom->at('foo bar baz')->text,    'First',      'right text';
 is $dom->at('baz')->namespace,       'uri:first',  'right namespace';
 is $dom->at('foo bar ya\.da')->text, 'Second',     'right text';
 is $dom->at('ya\.da')->namespace,    'uri:second', 'right namespace';
-is $dom->at('foo')->namespace,       '',           'no namespace';
+is $dom->at('foo')->namespace,       undef,        'no namespace';
 is $dom->at('[xml\.s]'), undef, 'no result';
 is $dom->at('b\.z'),     undef, 'no result';
 

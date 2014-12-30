@@ -448,8 +448,8 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 =head1 DESCRIPTION
 
 L<Mojo::DOM> is a minimalistic and relaxed HTML/XML DOM parser with CSS
-selector support. It will even try to interpret broken XML, so you should not
-use it for validation.
+selector support. It will even try to interpret broken HTML and XML, so you
+should not use it for validation.
 
 =head1 CASE SENSITIVITY
 

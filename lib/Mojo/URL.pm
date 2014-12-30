@@ -15,7 +15,7 @@ sub authority {
 
   # New authority
   if (@_) {
-    return $self unless defined(my $authority = shift);
+    my $authority = shift;
 
     # Userinfo
     $self->userinfo(_decode(url_unescape $1)) if $authority =~ s/^([^\@]+)\@//;
@@ -31,8 +31,7 @@ sub authority {
   # Build authority
   return undef      unless defined(my $authority = $self->host_port);
   return $authority unless defined(my $info      = $self->userinfo);
-  $info = url_escape encode('UTF-8', $info), '^A-Za-z0-9\-._~!$&\'()*+,;=:';
-  return "$info\@$authority";
+  return _encode($info, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $authority;
 }
 
 sub host_port {
@@ -77,8 +76,13 @@ sub parse {
 
   # Official regex from RFC 3986
   $url =~ m!^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?!;
-  $self->scheme($2)->authority($4)->path($5)->query($7);
-  return defined $9 ? $self->fragment(_decode(url_unescape $9)) : $self;
+  $self->scheme($2)                         if defined $2;
+  $self->authority($4)                      if defined $4;
+  $self->path($5)                           if defined $5;
+  $self->query($7)                          if defined $7;
+  $self->fragment(_decode(url_unescape $9)) if defined $9;
+
+  return $self;
 }
 
 sub path {
@@ -182,11 +186,12 @@ sub to_string {
 
   # Fragment
   return $url unless defined(my $fragment = $self->fragment);
-  return $url . '#' . url_escape encode('UTF-8', $fragment),
-    '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
+  return $url . '#' . _encode($fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?');
 }
 
 sub _decode { decode('UTF-8', $_[0]) // $_[0] }
+
+sub _encode { url_escape encode('UTF-8', $_[0]), $_[1] }
 
 1;
 

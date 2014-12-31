@@ -61,21 +61,21 @@ is "$url", 'http://sri:foobar@example.com:8080?_monkey=biz%3B&_monkey=23#23',
   'right format';
 $url->query(monkey => 'foo');
 is "$url", 'http://sri:foobar@example.com:8080?monkey=foo#23', 'right format';
-$url->query([monkey => 'bar']);
+$url->query({monkey => 'bar'});
 is "$url", 'http://sri:foobar@example.com:8080?monkey=bar#23', 'right format';
-$url->query({foo => 'bar'});
+$url->query([foo => 'bar']);
 is "$url", 'http://sri:foobar@example.com:8080?monkey=bar&foo=bar#23',
   'right format';
 $url->query('foo');
 is "$url", 'http://sri:foobar@example.com:8080?foo#23', 'right format';
 $url->query('foo=bar');
 is "$url", 'http://sri:foobar@example.com:8080?foo=bar#23', 'right format';
-$url->query([foo => undef]);
+$url->query({foo => undef});
 is "$url", 'http://sri:foobar@example.com:8080#23', 'right format';
 $url->query([foo => 23, bar => 24, baz => 25]);
 is "$url", 'http://sri:foobar@example.com:8080?foo=23&bar=24&baz=25#23',
   'right format';
-$url->query([foo => 26, bar => undef, baz => undef]);
+$url->query({foo => 26, bar => undef, baz => undef});
 is "$url", 'http://sri:foobar@example.com:8080?foo=26#23', 'right format';
 $url->query(c => 3);
 is "$url", 'http://sri:foobar@example.com:8080?c=3#23', 'right format';

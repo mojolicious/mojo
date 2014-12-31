@@ -44,6 +44,13 @@ sub cookie {
   # Multiple names
   return map { $self->cookie($_) } @$name if ref $name eq 'ARRAY';
 
+  # List names
+  unless (defined $name) {
+    my %keys = map { $_->name => 1 } @{$self->req->cookies};
+    my @keys = map { $_ } keys %keys;
+    return sort @keys;
+  }
+
   # Response cookie
   if (@_) {
 

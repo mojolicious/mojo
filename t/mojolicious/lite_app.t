@@ -1157,10 +1157,10 @@ app layout <%= content %><%= app->mode %>
 Not a favicon!
 
 @@ url_with.html.ep
-%== url_with->query([foo => 'bar'])
+%== url_with->query({foo => 'bar'})
 %== url_with('http://mojolicio.us/test')
-%== url_with('/test')->query([foo => undef])
-%== url_with('bartest', test => 23)->query([foo => 'yada'])
+%== url_with('/test')->query({foo => undef})
+%== url_with('bartest', test => 23)->query({foo => 'yada'})
 
 __END__
 This is not a template!

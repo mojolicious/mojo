@@ -116,16 +116,16 @@ sub query {
   # Replace with list
   if (@_ > 1) { $q->params([])->parse(@_) }
 
-  # Merge with array
-  elsif (ref $_[0] eq 'ARRAY') {
-    while (my $name = shift @{$_[0]}) {
-      my $value = shift @{$_[0]};
+  # Append array
+  elsif (ref $_[0] eq 'ARRAY') { $q->append(@{$_[0]}) }
+
+  # Merge with hash
+  elsif (ref $_[0] eq 'HASH') {
+    for my $name (keys %{$_[0]}) {
+      my $value = $_[0]->{$name};
       defined $value ? $q->param($name => $value) : $q->remove($name);
     }
   }
-
-  # Append hash
-  elsif (ref $_[0] eq 'HASH') { $q->append(%{$_[0]}) }
 
   # New parameters
   else { $self->{query} = ref $_[0] ? $_[0] : $q->parse($_[0]) }
@@ -411,14 +411,14 @@ Normalized version of L</"scheme">.
 =head2 query
 
   my $query = $url->query;
-  $url      = $url->query([merge => 'with']);
-  $url      = $url->query({append => 'to'});
+  $url      = $url->query({merge => 'with'});
+  $url      = $url->query([append => 'to']);
   $url      = $url->query(replace => 'with');
   $url      = $url->query('a=1&b=2');
   $url      = $url->query(Mojo::Parameters->new);
 
-Query part of this URL, pairs in an array will be merged and pairs in a hash
-appended, defaults to a L<Mojo::Parameters> object.
+Query part of this URL, pairs in an array will be appended and pairs in a hash
+merged, defaults to a L<Mojo::Parameters> object.
 
   # "2"
   Mojo::URL->new('http://example.com?a=1&b=2')->query->param('b');
@@ -430,13 +430,13 @@ appended, defaults to a L<Mojo::Parameters> object.
   Mojo::URL->new('http://example.com?a=1&b=2')->query(a => [2, 3]);
 
   # "http://example.com?a=2&b=2&c=3"
-  Mojo::URL->new('http://example.com?a=1&b=2')->query([a => 2, c => 3]);
+  Mojo::URL->new('http://example.com?a=1&b=2')->query({a => 2, c => 3});
 
   # "http://example.com?b=2"
-  Mojo::URL->new('http://example.com?a=1&b=2')->query([a => undef]);
+  Mojo::URL->new('http://example.com?a=1&b=2')->query({a => undef});
 
   # "http://example.com?a=1&b=2&a=2&c=3"
-  Mojo::URL->new('http://example.com?a=1&b=2')->query({a => 2, c => 3});
+  Mojo::URL->new('http://example.com?a=1&b=2')->query([a => 2, c => 3]);
 
 =head2 to_abs
 

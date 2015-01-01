@@ -112,18 +112,24 @@ Mojolicious::Plugin::PODRenderer - POD renderer plugin
 
 =head1 SYNOPSIS
 
-  # Mojolicious
+  # Mojolicious (with documentation browser under "/perldoc")
   my $route = $self->plugin('PODRenderer');
   my $route = $self->plugin(PODRenderer => {name => 'foo'});
   my $route = $self->plugin(PODRenderer => {preprocess => 'epl'});
 
-  # Mojolicious::Lite
+  # Mojolicious::Lite (with documentation browser under "/perldoc")
   my $route = plugin 'PODRenderer';
   my $route = plugin PODRenderer => {name => 'foo'};
   my $route = plugin PODRenderer => {preprocess => 'epl'};
 
+  # Without documentation browser
+  plugin PODRenderer => {no_perldoc => 1};
+
   # foo.html.ep
   %= pod_to_html "=head1 TEST\n\nC<123>"
+
+  # foo.html.pod
+  =head1 <%= uc 'test' %>
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,6 @@
 
+5.72  2015-01-02
+
 5.71  2015-01-01
   - Updated Net::DNS::Native requirement to 0.15 for some important bug fixes.
   - Updated jQuery to version 2.1.3.

@@ -14,13 +14,14 @@ sub append {
   my $self = shift;
 
   my $params = $self->params;
-  while (my ($name, $value) = splice @_, 0, 2) {
-
-    # Single value
-    if (ref $value ne 'ARRAY') { push @$params, $name => $value }
+  my @pairs = @_ == 1 ? @{shift->params} : @_;
+  while (my ($name, $value) = splice @pairs, 0, 2) {
 
     # Multiple values
-    else { push @$params, $name => (defined $_ ? "$_" : '') for @$value }
+    if (ref $value eq 'ARRAY') { push @$params, $name => $_ // '' for @$value }
+
+    # Single value
+    else { push @$params, $name => $value }
   }
 
   return $self;
@@ -41,7 +42,12 @@ sub every_param { shift->_param(@_) }
 
 sub merge {
   my $self = shift;
-  push @{$self->params}, @{$_->params} for @_;
+
+  my @pairs = @_ == 1 ? @{shift->params} : @_;
+  while (my ($name, $value) = splice @pairs, 0, 2) {
+    defined $value ? $self->param($name => $value) : $self->remove($name);
+  }
+
   return $self;
 }
 
@@ -234,8 +240,12 @@ following new ones.
   $params = $params->append(foo => 'ba&r');
   $params = $params->append(foo => ['ba&r', 'baz']);
   $params = $params->append(foo => ['bar', 'baz'], bar => 23);
+  $params = $params->append(Mojo::Parameters->new);
 
 Append parameters. Note that this method will normalize the parameters.
+
+  # "foo=bar&foo=baz"
+  Mojo::Parameters->new('foo=bar')->append(Mojo::Parameters->new('foo=baz'));
 
   # "foo=bar&foo=baz"
   Mojo::Parameters->new('foo=bar')->append(foo => 'baz');
@@ -264,13 +274,21 @@ array reference. Note that this method will normalize the parameters.
 
 =head2 merge
 
-  $params = $params->merge(Mojo::Parameters->new(foo => 'b&ar', baz => 23));
+  $params = $params->merge(foo => 'ba&r');
+  $params = $params->merge(foo => ['ba&r', 'baz']);
+  $params = $params->merge(foo => ['bar', 'baz'], bar => 23);
+  $params = $params->merge(Mojo::Parameters->new);
 
-Merge L<Mojo::Parameters> objects. Note that this method will normalize the
-parameters.
+Merge parameters. Note that this method will normalize the parameters.
 
-  # "foo=bar&foo=baz"
+  # "foo=baz"
   Mojo::Parameters->new('foo=bar')->merge(Mojo::Parameters->new('foo=baz'));
+
+  # "yada=yada&foo=baz"
+  Mojo::Parameters->new('foo=bar&yada=yada')->merge(foo => 'baz');
+
+  # "yada=yada"
+  Mojo::Parameters->new('foo=bar&yada=yada')->merge(foo => undef);
 
 =head2 new
 

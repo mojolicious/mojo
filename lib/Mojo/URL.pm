@@ -117,12 +117,7 @@ sub query {
   if (@_ > 1) { $q->params([])->parse(@_) }
 
   # Merge with array
-  elsif (ref $_[0] eq 'ARRAY') {
-    while (my $name = shift @{$_[0]}) {
-      my $value = shift @{$_[0]};
-      defined $value ? $q->param($name => $value) : $q->remove($name);
-    }
-  }
+  elsif (ref $_[0] eq 'ARRAY') { $q->merge(@{$_[0]}) }
 
   # Append hash
   elsif (ref $_[0] eq 'HASH') { $q->append(%{$_[0]}) }
@@ -378,6 +373,9 @@ defaults to a L<Mojo::Path> object.
   # "perldoc"
   Mojo::URL->new('http://example.com/perldoc/Mojo')->path->parts->[0];
 
+  # "/perldoc/DOM/HTML"
+  Mojo::URL->new('http://example.com/perldoc/Mojo')->path->merge('DOM/HTML');
+
   # "http://example.com/DOM/HTML"
   Mojo::URL->new('http://example.com/perldoc/Mojo')->path('/DOM/HTML');
 
@@ -417,11 +415,14 @@ Normalized version of L</"scheme">.
   $url      = $url->query('a=1&b=2');
   $url      = $url->query(Mojo::Parameters->new);
 
-Query part of this URL, pairs in an array will be merged and pairs in a hash
-appended, defaults to a L<Mojo::Parameters> object.
+Query part of this URL, pairs in an array reference will be merged and pairs
+in a hash reference appended, defaults to a L<Mojo::Parameters> object.
 
   # "2"
   Mojo::URL->new('http://example.com?a=1&b=2')->query->param('b');
+
+  # "a=2&b=2&c=3"
+  Mojo::URL->new('http://example.com?a=1&b=2')->query->merge(a => 2, c => 3);
 
   # "http://example.com?a=2&c=3"
   Mojo::URL->new('http://example.com?a=1&b=2')->query(a => 2, c => 3);

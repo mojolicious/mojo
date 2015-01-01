@@ -217,7 +217,7 @@ that C<%2F> will be treated as C</> for security reasons.
 
   $path = $path->merge('/foo/bar');
   $path = $path->merge('foo/bar');
-  $path = $path->merge(Mojo::Path->new('foo/bar'));
+  $path = $path->merge(Mojo::Path->new);
 
 Merge paths. Note that this method will normalize both paths if necessary and
 that C<%2F> will be treated as C</> for security reasons.

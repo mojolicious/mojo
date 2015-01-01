@@ -133,7 +133,7 @@ sub param { shift->params->param(@_) }
 sub params {
   my $self = shift;
   return $self->{params}
-    ||= $self->body_params->clone->merge($self->query_params);
+    ||= $self->body_params->clone->append($self->query_params);
 }
 
 sub parse {

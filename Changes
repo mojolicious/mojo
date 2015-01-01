@@ -5,6 +5,7 @@
   - Improved Mojo::URL performance.
   - Fixed fragment and userinfo normalization bugs in Mojo::URL.
   - Fixed query charset bug in Mojo::URL.
+  - Fixed a few merge bugs in Mojo::Parameters.
 
 5.70  2014-12-18
   - Improved Mojo::Template performance.

@@ -363,12 +363,12 @@ Parse relative or absolute URL.
 =head2 path
 
   my $path = $url->path;
-  $url     = $url->path('/foo/bar');
   $url     = $url->path('foo/bar');
+  $url     = $url->path('/foo/bar');
   $url     = $url->path(Mojo::Path->new);
 
-Path part of this URL, relative paths will be merged with the existing path,
-defaults to a L<Mojo::Path> object.
+Path part of this URL, relative paths will be merged with
+L<Mojo::Path/"merge">, defaults to a L<Mojo::Path> object.
 
   # "perldoc"
   Mojo::URL->new('http://example.com/perldoc/Mojo')->path->parts->[0];
@@ -415,8 +415,9 @@ Normalized version of L</"scheme">.
   $url      = $url->query('a=1&b=2');
   $url      = $url->query(Mojo::Parameters->new);
 
-Query part of this URL, pairs in an array reference will be merged and pairs
-in a hash reference appended, defaults to a L<Mojo::Parameters> object.
+Query part of this URL, pairs in an array reference will be merged with
+L<Mojo::Parameters/"merge"> and pairs in a hash reference appended with
+L<Mojo::Parameters/"append">, defaults to a L<Mojo::Parameters> object.
 
   # "2"
   Mojo::URL->new('http://example.com?a=1&b=2')->query->param('b');

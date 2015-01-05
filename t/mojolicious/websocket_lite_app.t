@@ -183,7 +183,7 @@ $t->tx->once(
   }
 );
 $t->message_ok->message_is({binary => 'a' x 50000});
-ok length $payload < 262145, 'message has been compressed';
+ok length $payload < 50000, 'message has been compressed';
 $t->finish_ok->finished_ok(1005);
 
 # Compressed message exceeding the limit when decompressed

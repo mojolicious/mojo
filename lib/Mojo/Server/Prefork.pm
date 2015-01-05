@@ -400,11 +400,12 @@ performance and idle CPU usage.
   $prefork    = $prefork->accepts(100);
 
 Maximum number of connections a worker is allowed to accept before stopping
-gracefully, passed along to L<Mojo::IOLoop/"max_accepts">, defaults to
-C<1000>. Setting the value to C<0> will allow workers to accept new
-connections indefinitely. Note that up to half of this value can be subtracted
-randomly to improve load balancing, and that worker processes will stop
-sending heartbeat messages once the limit has been reached.
+gracefully and then getting replaced with a newly started worker, passed along
+to L<Mojo::IOLoop/"max_accepts">, defaults to C<1000>. Setting the value to
+C<0> will allow workers to accept new connections indefinitely. Note that up
+to half of this value can be subtracted randomly to improve load balancing,
+and that worker processes will stop sending heartbeat messages once the limit
+has been reached.
 
 =head2 cleanup
 

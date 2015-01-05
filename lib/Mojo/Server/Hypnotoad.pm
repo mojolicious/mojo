@@ -252,10 +252,10 @@ affect performance and idle CPU usage.
   accepts => 100
 
 Maximum number of connections a worker is allowed to accept before stopping
-gracefully, defaults to the value of L<Mojo::Server::Prefork/"accepts">.
-Setting the value to C<0> will allow workers to accept new connections
-indefinitely. Note that up to half of this value can be subtracted randomly to
-improve load balancing.
+gracefully and then getting replaced with a newly started worker, defaults to
+the value of L<Mojo::Server::Prefork/"accepts">. Setting the value to C<0>
+will allow workers to accept new connections indefinitely. Note that up to
+half of this value can be subtracted randomly to improve load balancing.
 
 =head2 backlog
 

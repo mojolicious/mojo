@@ -196,7 +196,7 @@ sub _spawn {
   );
   $loop->unlock(sub { flock $handle, LOCK_UN });
 
-  # Heartbeat messages (stop sending during graceful stop)
+  # Heartbeat messages
   weaken $self;
   $loop->recurring(
     $self->heartbeat_interval => sub {
@@ -403,9 +403,7 @@ Maximum number of connections a worker is allowed to accept before stopping
 gracefully and then getting replaced with a newly started worker, passed along
 to L<Mojo::IOLoop/"max_accepts">, defaults to C<1000>. Setting the value to
 C<0> will allow workers to accept new connections indefinitely. Note that up
-to half of this value can be subtracted randomly to improve load balancing,
-and that worker processes will stop sending heartbeat messages once the limit
-has been reached.
+to half of this value can be subtracted randomly to improve load balancing.
 
 =head2 cleanup
 

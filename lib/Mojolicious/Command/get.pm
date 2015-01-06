@@ -128,6 +128,7 @@ Mojolicious::Command::get - Get command
   Usage: APPLICATION get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 
     ./myapp.pl get /
+    ./myapp.pl get -H 'Accept: text/html' /hello.html 'head > title' text
     ./myapp.pl get //sri:secr3t@/secrets.json /1/content
     mojo get mojolicio.us
     mojo get -v -r google.com

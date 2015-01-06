@@ -1,5 +1,5 @@
 
-5.72  2015-01-06
+5.72  2015-01-07
 
 5.71  2015-01-01
   - Updated Net::DNS::Native requirement to 0.15 for some important bug fixes.

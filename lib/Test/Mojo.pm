@@ -660,6 +660,11 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
   # Run tests against remote host
   $t->get_ok('http://mojolicio.us/perldoc')->status_is(200);
 
+  # Use relative URL for request with Basic authentication
+  $t->get_ok('//sri:secr3t@/secrets.json')
+    ->status_is(200)
+    ->json_is('/1/content', 'Mojo rocks!');
+
   # Run additional tests on the transaction
   $t->get_ok('/foo')->status_is(200);
   is $t->tx->res->dom->at('input')->{value}, 'whatever', 'right value';

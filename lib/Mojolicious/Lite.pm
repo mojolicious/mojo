@@ -13,7 +13,7 @@ sub import {
   $ENV{MOJO_EXE} ||= (caller)[1];
 
   # Reuse home directory if possible
-  local $ENV{MOJO_HOME} = catdir(split '/', dirname $ENV{MOJO_EXE})
+  local $ENV{MOJO_HOME} = catdir split('/', dirname $ENV{MOJO_EXE})
     unless $ENV{MOJO_HOME};
 
   # Initialize application class

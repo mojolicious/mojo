@@ -15,7 +15,7 @@ sub run {
   my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
   $class = "Mojolicious::Plugin::$class";
   my $app = class_to_path $class;
-  my $dir = join '-', split '::', $class;
+  my $dir = join '-', split('::', $class);
   $self->render_to_rel_file('class', "$dir/lib/$app", $class, $name);
 
   # Test

@@ -142,10 +142,10 @@ sub _listen {
   my $options = {
     address => $url->host,
     backlog => $self->backlog,
-    reuse   => scalar $query->param('reuse'),
+    reuse   => $query->param('reuse')
   };
   if (my $port = $url->port) { $options->{port} = $port }
-  $options->{"tls_$_"} = scalar $query->param($_) for qw(ca cert ciphers key);
+  $options->{"tls_$_"} = $query->param($_) for qw(ca cert ciphers key);
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
   delete $options->{address} if $options->{address} eq '*';

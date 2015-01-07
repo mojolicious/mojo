@@ -15,7 +15,7 @@ sub detect {
   my $self = shift;
 
   # Environment variable
-  return $self->parts([splitdir(abs_path $ENV{MOJO_HOME})]) if $ENV{MOJO_HOME};
+  return $self->parts([splitdir abs_path $ENV{MOJO_HOME}]) if $ENV{MOJO_HOME};
 
   # Try to find home from lib directory
   if (my $class = @_ ? shift : 'Mojo::HelloWorld') {
@@ -28,7 +28,7 @@ sub detect {
       pop @home while @home && ($home[-1] =~ /^b?lib$/ || $home[-1] eq '');
 
       # Turn into absolute path
-      return $self->parts([splitdir(abs_path(catdir(@home) || '.'))]);
+      return $self->parts([splitdir abs_path catdir(@home) || '.']);
     }
   }
 
@@ -44,12 +44,12 @@ sub lib_dir {
 sub list_files {
   my ($self, $dir) = @_;
 
-  $dir = catdir @{$self->parts}, split '/', ($dir // '');
+  $dir = catdir @{$self->parts}, split('/', $dir // '');
   return [] unless -d $dir;
   my @files;
   find {
     wanted => sub {
-      my @parts = splitdir(abs2rel($File::Find::name, $dir));
+      my @parts = splitdir abs2rel($File::Find::name, $dir);
       push @files, join '/', @parts unless grep {/^\./} @parts;
     },
     no_chdir => 1
@@ -58,16 +58,16 @@ sub list_files {
   return [sort @files];
 }
 
-sub mojo_lib_dir { catdir(dirname(__FILE__), '..') }
+sub mojo_lib_dir { catdir dirname(__FILE__), '..' }
 
 sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub parse { shift->parts([splitdir shift]) }
 
-sub rel_dir { catdir(@{shift->parts}, split '/', shift) }
-sub rel_file { catfile(@{shift->parts}, split '/', shift) }
+sub rel_dir  { catdir @{shift->parts},  split('/', shift) }
+sub rel_file { catfile @{shift->parts}, split('/', shift) }
 
-sub to_string { catdir(@{shift->parts}) }
+sub to_string { catdir @{shift->parts} }
 
 1;
 

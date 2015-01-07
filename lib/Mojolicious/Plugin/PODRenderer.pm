@@ -80,7 +80,7 @@ sub _perldoc {
   my $c = shift;
 
   # Find module or redirect to CPAN
-  my $module = join '::', split '/', scalar $c->param('module');
+  my $module = join '::', split('/', $c->param('module'));
   my $path
     = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
   return $c->redirect_to("https://metacpan.org/pod/$module")

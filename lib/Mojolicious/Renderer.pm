@@ -199,7 +199,7 @@ sub template_path {
 
   # Search all paths
   for my $path (@{$self->paths}) {
-    my $file = catfile($path, split '/', $name);
+    my $file = catfile $path, split('/', $name);
     return $file if -r $file;
   }
 

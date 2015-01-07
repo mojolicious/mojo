@@ -80,7 +80,7 @@ sub class_to_file {
   return decamelize($class);
 }
 
-sub class_to_path { join '.', join('/', split /::|'/, shift), 'pm' }
+sub class_to_path { join '.', join('/', split(/::|'/, shift)), 'pm' }
 
 sub decamelize {
   my $str = shift;
@@ -139,7 +139,7 @@ sub punycode_decode {
   my @output;
 
   # Consume all code points before the last delimiter
-  push @output, split '', $1 if $input =~ s/(.*)\x2d//s;
+  push @output, split('', $1) if $input =~ s/(.*)\x2d//s;
 
   while (length $input) {
     my $oldi = $i;

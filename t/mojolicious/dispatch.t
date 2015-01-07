@@ -76,8 +76,7 @@ is_deeply $c->every_param('bar'), [], 'no values';
 is $c->param(foo => undef)->param('foo'), undef, 'no value';
 is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name,
   'bar', 'right value';
-is scalar $c->param(foo => ['ba;r', 'baz'])->param('foo'), 'baz',
-  'right value';
+is $c->param(foo => ['ba;r', 'baz'])->param('foo'), 'baz', 'right value';
 is_deeply $c->every_param('foo'), ['ba;r', 'baz'], 'right values';
 
 # Reserved stash values are hidden

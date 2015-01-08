@@ -32,8 +32,8 @@ C<handler> to C<ep>.
   {template => 'foo', format => 'txt'}      -> 'foo.txt.ep'
   {template => 'foo', handler => 'epl'}     -> 'foo.html.epl'
 
-The C<controller> value gets decamelized using L<Mojo::Util/"decamelize"> and
-C<-> characters replaced with C</>.
+The C<controller> value gets converted from C<CamelCase> to C<snake_case>
+using L<Mojo::Util/"decamelize"> and C<-> characters replaced with C</>.
 
   {controller => 'My::Users', action => 'add'} -> 'my/users/add.html.ep'
   {controller => 'my-users', action => 'show'} -> 'my/users/show.html.ep'

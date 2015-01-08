@@ -471,7 +471,7 @@ Base64 encode bytes, the line ending defaults to a newline.
 
   my $camelcase = camelize $snakecase;
 
-Convert snake_case string to CamelCase and replace C<-> with C<::>.
+Convert C<snake_case> string to C<CamelCase> and replace C<-> with C<::>.
 
   # "FooBar"
   camelize 'foo_bar';
@@ -516,7 +516,7 @@ Convert class name to path.
 
   my $snakecase = decamelize $camelcase;
 
-Convert CamelCase string to snake_case and replace C<::> with C<->.
+Convert C<CamelCase> string to C<snake_case> and replace C<::> with C<->.
 
   # "foo_bar"
   decamelize 'FooBar';

@@ -513,6 +513,16 @@ L<Mojo::UserAgent::CookieJar> object.
   # Disable extraction of cookies from responses
   $ua->cookie_jar->extracting(0);
 
+  # Add custom cookie to the jar
+  $ua->cookie_jar->add(
+    Mojo::Cookie::Response->new(
+      name   => 'foo',
+      value  => 'bar',
+      domain => 'mojolicio.us',
+      path   => '/perldoc'
+    )
+  );
+
 =head2 inactivity_timeout
 
   my $timeout = $ua->inactivity_timeout;

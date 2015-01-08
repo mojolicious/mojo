@@ -38,6 +38,7 @@ On a MacBook Air this results in about 18k req/s.
 EOF
 
 # Start event loop
+local $SIG{INT} = local $SIG{TERM} = sub { Mojo::IOLoop->stop };
 Mojo::IOLoop->start;
 
 1;

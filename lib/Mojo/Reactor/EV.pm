@@ -37,7 +37,7 @@ sub watch {
   my $fd = fileno $handle;
   my $io = $self->{io}{$fd};
   if ($mode == 0) { delete $io->{watcher} }
-  elsif (my $w = $io->{watcher}) { $w->set($fd, $mode) }
+  elsif (my $w = $io->{watcher}) { $w->events($mode) }
   else {
     weaken $self;
     $io->{watcher} = EV::io($fd, $mode, sub { $self->_io($fd, @_) });

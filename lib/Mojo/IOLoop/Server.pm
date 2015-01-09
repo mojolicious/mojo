@@ -39,8 +39,7 @@ sub generate_port {
 sub handle { shift->{handle} }
 
 sub listen {
-  my $self = shift;
-  my $args = ref $_[0] ? $_[0] : {@_};
+  my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
   # Look for reusable file descriptor
   my $address = $args->{address} || '0.0.0.0';

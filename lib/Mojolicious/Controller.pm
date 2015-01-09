@@ -211,8 +211,7 @@ sub req { shift->tx->req }
 sub res { shift->tx->res }
 
 sub respond_to {
-  my $self = shift;
-  my $args = ref $_[0] ? $_[0] : {@_};
+  my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
   # Find target
   my $target;

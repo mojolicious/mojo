@@ -111,8 +111,9 @@ sub watch {
 }
 
 sub _id {
+  my $self = shift;
   my $id;
-  do { $id = md5_sum 't' . steady_time . rand 999 } while $_[0]->{timers}{$id};
+  do { $id = md5_sum 't' . steady_time . rand 999 } while $self->{timers}{$id};
   return $id;
 }
 
@@ -125,9 +126,12 @@ sub _sandbox {
 
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
-  my $timer = $self->{timers}{my $id = $self->_id}
+
+  my $id    = $self->_id;
+  my $timer = $self->{timers}{$id}
     = {cb => $cb, after => $after, time => steady_time + $after};
   $timer->{recurring} = $after if $recurring;
+
   return $id;
 }
 

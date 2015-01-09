@@ -173,9 +173,10 @@ sub _accepting {
 }
 
 sub _id {
+  my $self = shift;
   my $id;
   do { $id = md5_sum 'c' . steady_time . rand 999 }
-    while $_[0]->{connections}{$id} || $_[0]->{acceptors}{$id};
+    while $self->{connections}{$id} || $self->{acceptors}{$id};
   return $id;
 }
 

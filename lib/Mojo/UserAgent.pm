@@ -447,11 +447,6 @@ L<IO::Socket::SSL> (1.84+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NDN>, C<MOJO_NO_SOCKS> and
 C<MOJO_NO_TLS> environment variables.
 
-You can check which optional modules are currently being used with the command
-L<Mojolicious::Command::version>.
-
-  $ mojo version
-
 See L<Mojolicious::Guides::Cookbook/"USER AGENT"> for more.
 
 =head1 EVENTS

@@ -2,7 +2,6 @@ package Mojo::Reactor::EV;
 use Mojo::Base 'Mojo::Reactor::Poll';
 
 use EV 4.0;
-use Scalar::Util 'weaken';
 
 my $EV;
 
@@ -39,7 +38,6 @@ sub watch {
   if ($mode == 0) { delete $io->{watcher} }
   elsif (my $w = $io->{watcher}) { $w->events($mode) }
   else {
-    weaken $self;
     $io->{watcher} = EV::io($fd, $mode, sub { $self->_io($fd, @_) });
   }
 
@@ -58,14 +56,12 @@ sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
   $after ||= 0.0001 if $recurring;
 
-  my $id = $self->SUPER::_timer(0, 0, $cb);
+  my $id = $self->_id;
   EV::now_update() if $after > 0;
-  weaken $self;
   $self->{timers}{$id}{watcher} = EV::timer(
     $after => $after => sub {
-      my $timer = $self->{timers}{$id};
-      delete delete($self->{timers}{$id})->{watcher} unless $recurring;
-      $self->_sandbox("Timer $id", $timer->{cb});
+      delete $self->{timers}{$id} unless $recurring;
+      $self->_sandbox("Timer $id", $cb);
     }
   );
 

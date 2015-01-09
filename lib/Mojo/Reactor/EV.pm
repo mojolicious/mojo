@@ -59,7 +59,7 @@ sub _timer {
   $after ||= 0.0001 if $recurring;
 
   my $id = $self->SUPER::_timer(0, 0, $cb);
-  EV::now_update();
+  EV::now_update() if $after > 0;
   weaken $self;
   $self->{timers}{$id}{watcher} = EV::timer(
     $after => $after => sub {

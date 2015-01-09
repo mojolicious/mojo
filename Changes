@@ -1,8 +1,8 @@
 
 5.72  2015-01-09
   - Improved Mojo::Reactor::EV performance slightly.
-  - Improved Mojo::IOLoop::Client not to start timers before the event loop
-    is running.
+  - Improved Mojo::Reactor::EV to update the current time before starting a
+    timer if EV is not running already.
 
 5.71  2015-01-01
   - Updated Net::DNS::Native requirement to 0.15 for some important bug fixes.

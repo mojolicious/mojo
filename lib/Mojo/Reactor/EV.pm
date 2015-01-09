@@ -58,6 +58,9 @@ sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
   $after ||= 0.0001 if $recurring;
 
+  # Update current time if EV is not running already
+  EV::now_update() unless $self->is_running;
+
   my $id = $self->SUPER::_timer(0, 0, $cb);
   weaken $self;
   $self->{timers}{$id}{watcher} = EV::timer(

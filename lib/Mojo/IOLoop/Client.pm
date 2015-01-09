@@ -33,8 +33,34 @@ sub DESTROY { shift->_cleanup }
 
 sub connect {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
+
+  # Timeout
   weaken $self;
-  $self->reactor->next_tick(sub { $self && $self->_resolve($args) });
+  my $reactor = $self->reactor;
+  $self->{timer} = $reactor->timer($args->{timeout} || 10,
+    sub { $self->emit(error => 'Connect timeout') });
+
+  # Blocking name resolution
+  $_ && s/[[\]]//g for @$args{qw(address socks_address)};
+  my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
+  return $reactor->next_tick(sub { $self && $self->_connect($args) })
+    if !NDN || $args->{handle};
+
+  # Non-blocking name resolution
+  my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
+    {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
+  $reactor->io(
+    $handle => sub {
+      my $reactor = shift;
+
+      $reactor->remove($self->{dns});
+      my ($err, @res) = $NDN->get_result(delete $self->{dns});
+      return $self->emit(error => "Can't resolve: $err") if $err;
+
+      $args->{addr_info} = \@res;
+      $self->_connect($args);
+    }
+  )->watch($handle, 1, 0);
 }
 
 sub _cleanup {
@@ -81,37 +107,6 @@ sub _ready {
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
   $self->_try_socks($args);
-}
-
-sub _resolve {
-  my ($self, $args) = @_;
-
-  # Timeout
-  weaken $self;
-  my $reactor = $self->reactor;
-  $self->{timer} = $reactor->timer($args->{timeout} || 10,
-    sub { $self->emit(error => 'Connect timeout') });
-
-  # Blocking name resolution
-  $_ && s/[[\]]//g for @$args{qw(address socks_address)};
-  my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
-  return $self->_connect($args) if !NDN || $args->{handle};
-
-  # Non-blocking name resolution
-  my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
-    {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
-  $reactor->io(
-    $handle => sub {
-      my $reactor = shift;
-
-      $reactor->remove($self->{dns});
-      my ($err, @res) = $NDN->get_result(delete $self->{dns});
-      return $self->emit(error => "Can't resolve: $err") if $err;
-
-      $args->{addr_info} = \@res;
-      $self->_connect($args);
-    }
-  )->watch($handle, 1, 0);
 }
 
 sub _socks {

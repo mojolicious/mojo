@@ -347,6 +347,7 @@ An C<E> element with a C<foo> attribute.
 An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
   my $case_sensitive = $css->select('input[type="hidden"]');
+  my $case_sensitive = $css->select('input[type=hidden]');
 
 =head2 E[foo="bar" i]
 
@@ -355,6 +356,8 @@ An C<E> element whose C<foo> attribute value is exactly equal to any
 EXPERIMENTAL and might change without warning!
 
   my $case_insensitive = $css->select('input[type="hidden" i]');
+  my $case_insensitive = $css->select('input[type=hidden i]');
+  my $case_insensitive = $css->select('input[class~="foo" i]');
 
 This selector is part of
 L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a
@@ -366,6 +369,7 @@ An C<E> element whose C<foo> attribute value is a list of
 whitespace-separated values, one of which is exactly equal to C<bar>.
 
   my $foo = $css->select('input[class~="foo"]');
+  my $foo = $css->select('input[class~=foo]');
 
 =head2 E[foo^="bar"]
 
@@ -373,6 +377,7 @@ An C<E> element whose C<foo> attribute value begins exactly with the string
 C<bar>.
 
   my $begins_with = $css->select('input[name^="f"]');
+  my $begins_with = $css->select('input[name^=f]');
 
 =head2 E[foo$="bar"]
 
@@ -380,12 +385,14 @@ An C<E> element whose C<foo> attribute value ends exactly with the string
 C<bar>.
 
   my $ends_with = $css->select('input[name$="o"]');
+  my $ends_with = $css->select('input[name$=o]');
 
 =head2 E[foo*="bar"]
 
 An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
   my $contains = $css->select('input[name*="fo"]');
+  my $contains = $css->select('input[name*=fo]');
 
 =head2 E:root
 

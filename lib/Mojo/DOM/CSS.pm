@@ -8,9 +8,9 @@ my $ATTR_RE   = qr/
   \[
   ((?:$ESCAPE_RE|[\w\-])+)           # Key
   (?:
-    (\W)?                            # Operator
-    =
-    (?:"((?:\\"|[^"])*)"|([^\]]+))   # Value
+    (\W)?=                           # Operator
+    (?:"((?:\\"|[^"])*)"|([^\]]+?))  # Value
+    (?:\s+(i))?                      # Case-sensitivity
   )?
   \]
 /x;
@@ -82,7 +82,7 @@ sub _compile {
   my $pattern = [[]];
   while ($css =~ /$TOKEN_RE/go) {
     my ($separator, $element, $pc, $attrs, $combinator)
-      = ($1, $2 // '', $3, $6, $11);
+      = ($1, $2 // '', $3, $6, $12);
 
     next unless $separator || $element || $pc || $attrs || $combinator;
 
@@ -109,7 +109,7 @@ sub _compile {
       while $pc =~ /$PSEUDO_CLASS_RE/go;
 
     # Attributes
-    push @$selector, ['attr', _name($1), _value($2 // '', $3 // $4)]
+    push @$selector, ['attr', _name($1), _value($2 // '', $3 // $4, $5)]
       while $attrs =~ /$ATTR_RE/go;
 
     # Combinator
@@ -279,24 +279,25 @@ sub _unescape {
 }
 
 sub _value {
-  my ($op, $value) = @_;
+  my ($op, $value, $ci) = @_;
   return undef unless defined $value;
   $value = quotemeta _unescape($value);
 
   # "~=" (word)
+  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/i if $op eq '~' && $ci;
   return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
 
   # "*=" (contains)
-  return qr/$value/ if $op eq '*';
+  return $ci ? qr/$value/i : qr/$value/ if $op eq '*';
 
   # "^=" (begins with)
-  return qr/^$value/ if $op eq '^';
+  return $ci ? qr/^$value/i : qr/^$value/ if $op eq '^';
 
   # "$=" (ends with)
-  return qr/$value$/ if $op eq '$';
+  return $ci ? qr/$value$/i : qr/$value$/ if $op eq '$';
 
   # Everything else
-  return qr/^$value$/;
+  return $ci ? qr/^$value$/i : qr/^$value$/;
 }
 
 1;
@@ -347,6 +348,18 @@ An C<E> element with a C<foo> attribute.
 An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
   my $fields = $css->select('input[name="foo"]');
+
+=head2 E[foo="bar" i]
+
+An C<E> element whose C<foo> attribute value is exactly equal to any
+(ASCII-range) case-permutation of C<bar>. Note that this selector is
+EXPERIMENTAL and might change without warning!
+
+  my $fields = $css->select('input[type="hidden" i]');
+
+This selector is part of
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a
+work in progress.
 
 =head2 E[foo~="bar"]
 

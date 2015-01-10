@@ -96,15 +96,15 @@ sub parse {
     }
 
     # New header
-    if ($line =~ /^(\S[^:]*)\s*:\s*(.*)$/) { push @$headers, $1, $2 }
+    if ($line =~ /^(\S[^:]*)\s*:\s*(.*)$/) { push @$headers, [$1, $2] }
 
     # Multiline
-    elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
+    elsif ($line =~ s/^\s+// && @$headers) { $headers->[-1][1] .= " $line" }
 
     # Empty line
     else {
-      $self->add(splice @$headers, 0, 2) while @$headers;
-      $self->{state} = 'finished';
+      $self->add(@$_) for @$headers;
+      @$self{qw(state cache)} = ('finished', []);
       return $self;
     }
   }

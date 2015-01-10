@@ -4,8 +4,7 @@ use Mojo::Base -base;
 use Mojo::Util qw(html_unescape xml_escape);
 use Scalar::Util 'weaken';
 
-has 'xml';
-has tree => sub { ['root'] };
+has [qw(tree xml)];
 
 my $ATTR_RE = qr/
   ([^<>=\s\/]+|\/)   # Key
@@ -200,7 +199,7 @@ sub _render {
   my ($tree, $xml) = @_;
 
   # Text (escaped)
-  my $type = $tree->[0];
+  return '' unless my $type = $tree->[0];
   return xml_escape $tree->[1] if $type eq 'text';
 
   # Raw text

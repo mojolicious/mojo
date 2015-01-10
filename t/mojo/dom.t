@@ -3,6 +3,9 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::DOM;
 
+# Empty
+is(Mojo::DOM->new, '', 'right result');
+
 # Simple (basics)
 my $dom = Mojo::DOM->new(
   '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');

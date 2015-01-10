@@ -41,14 +41,13 @@ sub _ancestor {
 }
 
 sub _attr {
-  my ($key, $regex, $current) = @_;
+  my ($name_re, $value_re, $current) = @_;
 
-  # Ignore namespace prefix
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
-    next unless $name =~ /(?:^|:)\Q$key\E$/;
-    return 1 unless defined $attrs->{$name} && defined $regex;
-    return 1 if $attrs->{$name} =~ $regex;
+    next unless $name =~ $name_re;
+    return 1 unless defined $attrs->{$name} && defined $value_re;
+    return 1 if $attrs->{$name} =~ $value_re;
   }
 
   return undef;
@@ -96,21 +95,21 @@ sub _compile {
 
     # Tag
     push @$part, my $selector = [];
-    push @$selector, ['tag', qr/(?:^|:)\Q@{[_unescape($1)]}\E$/]
+    push @$selector, ['tag', _name($1)]
       if $element =~ s/^((?:\\\.|\\\#|[^.#])+)// && $1 ne '*';
 
     # Class or ID
     while ($element =~ /(?:([.#])((?:\\[.\#]|[^\#.])+))/g) {
       my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
-      push @$selector, ['attr', $name, _regex($op, $2)];
+      push @$selector, ['attr', _name($name), _value($op, $2)];
     }
 
     # Pseudo classes (":not" contains more selectors)
-    push @$selector, ['pc', "$1", $1 eq 'not' ? _compile($2) : _equation($2)]
+    push @$selector, ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)]
       while $pc =~ /$PSEUDO_CLASS_RE/go;
 
     # Attributes
-    push @$selector, ['attr', _unescape($1), _regex($2 // '', $3 // $4)]
+    push @$selector, ['attr', _name($1), _value($2 // '', $3 // $4)]
       while $attrs =~ /$ATTR_RE/go;
 
     # Combinator
@@ -146,6 +145,8 @@ sub _match {
   _combinator([reverse @$_], $current, $tree, 0) and return 1 for @$pattern;
   return undef;
 }
+
+sub _name {qr/(?:^|:)\Q@{[_unescape(shift)]}\E$/}
 
 sub _parent {
   my ($selectors, $current, $tree, $pos) = @_;
@@ -199,27 +200,6 @@ sub _pc {
   return undef;
 }
 
-sub _regex {
-  my ($op, $value) = @_;
-  return undef unless defined $value;
-  $value = quotemeta _unescape($value);
-
-  # "~=" (word)
-  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
-
-  # "*=" (contains)
-  return qr/$value/ if $op eq '*';
-
-  # "^=" (begins with)
-  return qr/^$value/ if $op eq '^';
-
-  # "$=" (ends with)
-  return qr/$value$/ if $op eq '$';
-
-  # Everything else
-  return qr/^$value$/;
-}
-
 sub _select {
   my ($one, $tree, $pattern) = @_;
 
@@ -242,16 +222,14 @@ sub _selector {
   for my $s (@$selector) {
     my $type = $s->[0];
 
-    # Tag (ignore namespace prefix)
+    # Tag
     if ($type eq 'tag') { return undef unless $current->[1] =~ $s->[1] }
 
     # Attribute
     elsif ($type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
 
     # Pseudo class
-    elsif ($type eq 'pc') {
-      return undef unless _pc(lc $s->[1], $s->[2], $current);
-    }
+    elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current) }
   }
 
   return 1;
@@ -298,6 +276,27 @@ sub _unescape {
   $value =~ s/\\//g;
 
   return $value;
+}
+
+sub _value {
+  my ($op, $value) = @_;
+  return undef unless defined $value;
+  $value = quotemeta _unescape($value);
+
+  # "~=" (word)
+  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
+
+  # "*=" (contains)
+  return qr/$value/ if $op eq '*';
+
+  # "^=" (begins with)
+  return qr/^$value/ if $op eq '^';
+
+  # "$=" (ends with)
+  return qr/$value$/ if $op eq '$';
+
+  # Everything else
+  return qr/^$value$/;
 }
 
 1;

@@ -457,13 +457,13 @@ L<Mojo::DOM> defaults to HTML semantics, that means all tags and attribute
 names are lowercased and selectors need to be lowercase as well.
 
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
-  say $dom->at('p')->text;
+  say $dom->at('p[id]')->text;
 
 If XML processing instructions are found, the parser will automatically switch
 into XML mode and everything becomes case-sensitive.
 
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
-  say $dom->at('P')->text;
+  say $dom->at('P[ID]')->text;
 
 XML detection can also be disabled with the L</"xml"> method.
 

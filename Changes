@@ -566,7 +566,7 @@
   - Deprecated Mojo::Util::get_line.
   - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML
     Living Standard.
-  - Fixed case sensitivity bug in Mojolicious::Types.
+  - Fixed case-sensitivity bug in Mojolicious::Types.
 
 4.77  2014-02-06
   - Deprecated Mojo::DOM::text_after and Mojo::DOM::text_before in favor of
@@ -1328,7 +1328,7 @@
   - Added charset attribute to Mojo::Path.
   - Improved support for relative redirects in Mojo::UserAgent::Transactor.
   - Fixed clone bugs in Mojo::Parameters and Mojo::URL.
-  - Fixed case sensitivity bugs in Mojo::UserAgent::Transactor.
+  - Fixed case-sensitivity bugs in Mojo::UserAgent::Transactor.
 
 3.60  2012-11-22
   - Added unexpected event to Mojo::Transaction::HTTP.
@@ -2866,7 +2866,7 @@
 1.31  2011-05-08
   - Reverted deprecation of Perl 5.8.x support, by popular demand.
   - Added FAQ entry to clarify the Perl 5.8.x situation.
-  - Fixed case sensitivity of Mojo::DOM in XML mode.
+  - Fixed case-sensitivity of Mojo::DOM in XML mode.
   - Fixed pseudo class case handling in Mojo::DOM. (Akron)
 
 1.3  2011-05-05

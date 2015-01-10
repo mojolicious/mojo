@@ -298,7 +298,7 @@ L<Mojo::Util/"camelize"> and appended to one or more namespaces, defaulting to
 a controller namespace based on the application class (C<MyApp::Controller>),
 as well as the bare application class (C<MyApp>), and these namespaces are
 searched in that order. The action value is not changed at all, so both values
-are case sensitive.
+are case-sensitive.
 
   # Application
   package MyApp;

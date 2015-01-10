@@ -322,7 +322,7 @@ carefully since it is very dynamic.
   my $bool = $html->xml;
   $html    = $html->xml($bool);
 
-Disable HTML semantics in parser and activate case sensitivity, defaults to
+Disable HTML semantics in parser and activate case-sensitivity, defaults to
 auto detection based on processing instructions.
 
 =head1 METHODS

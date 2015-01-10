@@ -337,8 +337,8 @@ Number of elements in collection.
 Sort elements based on return value of callback and create a new collection
 from the results.
 
-  # Sort values case insensitive
-  my $insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
+  # Sort values case-insensitive
+  my $case_insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
 
 =head2 tap
 

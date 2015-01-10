@@ -451,7 +451,7 @@ L<Mojo::DOM> is a minimalistic and relaxed HTML/XML DOM parser with CSS
 selector support. It will even try to interpret broken HTML and XML, so you
 should not use it for validation.
 
-=head1 CASE SENSITIVITY
+=head1 CASE-SENSITIVITY
 
 L<Mojo::DOM> defaults to HTML semantics, that means all tags and attribute
 names are lowercased and selectors need to be lowercase as well.
@@ -460,7 +460,7 @@ names are lowercased and selectors need to be lowercase as well.
   say $dom->at('p')->text;
 
 If XML processing instructions are found, the parser will automatically switch
-into XML mode and everything becomes case sensitive.
+into XML mode and everything becomes case-sensitive.
 
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
   say $dom->at('P')->text;
@@ -950,7 +950,7 @@ children of the first innermost element.
   my $bool = $dom->xml;
   $dom     = $dom->xml($bool);
 
-Disable HTML semantics in parser and activate case sensitivity, defaults to
+Disable HTML semantics in parser and activate case-sensitivity, defaults to
 auto detection based on processing instructions.
 
 =head1 OPERATORS

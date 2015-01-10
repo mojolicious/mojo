@@ -279,24 +279,24 @@ sub _unescape {
 }
 
 sub _value {
-  my ($op, $value, $ci) = @_;
+  my ($op, $value, $insensitive) = @_;
   return undef unless defined $value;
-  $value = quotemeta _unescape($value);
+  $value = ($insensitive ? '(?i)' : '') . quotemeta _unescape($value);
 
   # "~=" (word)
-  return qr/@{[$ci ? '(?i)' : '']}(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
+  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
 
   # "*=" (contains)
-  return qr/@{[$ci ? '(?i)' : '']}$value/ if $op eq '*';
+  return qr/$value/ if $op eq '*';
 
   # "^=" (begins with)
-  return qr/@{[$ci ? '(?i)' : '']}^$value/ if $op eq '^';
+  return qr/^$value/ if $op eq '^';
 
   # "$=" (ends with)
-  return qr/@{[$ci ? '(?i)' : '']}$value$/ if $op eq '$';
+  return qr/$value$/ if $op eq '$';
 
   # Everything else
-  return qr/@{[$ci ? '(?i)' : '']}^$value$/;
+  return qr/^$value$/;
 }
 
 1;

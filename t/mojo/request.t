@@ -73,6 +73,23 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
 is $req->body,        'a=b; ' x 131072, 'right content';
 
+# Parse HTTP 1.1 message with headers combined exceeding line limit
+$req = Mojo::Message::Request->new;
+is $req->headers->max_line_size, 10240, 'right size';
+$req->parse("GET / HTTP/1.1\x0d\x0a");
+$req->parse("Foo: @{['a' x 3413]}\x0d\x0a");
+ok !$req->is_limit_exceeded, 'limit is not exceeded';
+$req->parse("Bar: @{['b' x 3413]}\x0d\x0a");
+ok !$req->is_limit_exceeded, 'limit is not exceeded';
+$req->parse("Baz: @{['c' x 3413]}\x0d\x0a\x0d\x0a");
+ok $req->is_finished, 'request is finished';
+is $req->error->{message}, 'Maximum line size exceeded', 'right error';
+is $req->error->{advice}, 431, 'right advice';
+ok $req->is_limit_exceeded, 'limit is exceeded';
+is $req->method,            'GET', 'right method';
+is $req->version,           '1.1', 'right version';
+is $req->url,               '/', 'right URL';
+
 # Parse broken start line
 $req = Mojo::Message::Request->new;
 $req->parse("12345\x0d\x0a");

@@ -90,7 +90,7 @@ sub parse {
     my $line = $1;
 
     # Check line size limit
-    if ($+[0] > $max) {
+    if (($self->{size} += $+[0]) > $max) {
       @$self{qw(state limit)} = ('finished', 1);
       return $self;
     }
@@ -110,7 +110,8 @@ sub parse {
   }
 
   # Check line size limit
-  @$self{qw(state limit)} = ('finished', 1) if length $self->{buffer} > $max;
+  @$self{qw(state limit)} = ('finished', 1)
+    if (($self->{size} ||= 0) + length $self->{buffer}) > $max;
 
   return $self;
 }
@@ -181,8 +182,8 @@ L<Mojo::Headers> implements the following attributes.
   my $size = $headers->max_line_size;
   $headers = $headers->max_line_size(1024);
 
-Maximum header line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
+Maximum size of all header lines combined in bytes, defaults to the value of
+the C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
 
 =head1 METHODS
 
@@ -429,7 +430,7 @@ Check if header parser is finished.
 
   my $bool = $headers->is_limit_exceeded;
 
-Check if a header has exceeded C<max_line_size>.
+Check if a header has exceeded L</"max_line_size">.
 
 =head2 last_modified
 

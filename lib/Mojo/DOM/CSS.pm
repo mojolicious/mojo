@@ -125,10 +125,10 @@ sub _equation {
   return [] unless my $equation = shift;
 
   # "even"
-  return [2, 2] if $equation =~ /^even$/i;
+  return [2, 2] if $equation =~ /^\s*even\s*$/i;
 
   # "odd"
-  return [2, 1] if $equation =~ /^odd$/i;
+  return [2, 1] if $equation =~ /^\s*odd\s*$/i;
 
   # Equation
   my $num = [1, 1];

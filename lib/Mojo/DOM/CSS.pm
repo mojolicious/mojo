@@ -284,20 +284,19 @@ sub _value {
   $value = quotemeta _unescape($value);
 
   # "~=" (word)
-  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/i if $op eq '~' && $ci;
-  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
+  return qr/@{[$ci ? '(?i)' : '']}(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
 
   # "*=" (contains)
-  return $ci ? qr/$value/i : qr/$value/ if $op eq '*';
+  return qr/@{[$ci ? '(?i)' : '']}$value/ if $op eq '*';
 
   # "^=" (begins with)
-  return $ci ? qr/^$value/i : qr/^$value/ if $op eq '^';
+  return qr/@{[$ci ? '(?i)' : '']}^$value/ if $op eq '^';
 
   # "$=" (ends with)
-  return $ci ? qr/$value$/i : qr/$value$/ if $op eq '$';
+  return qr/@{[$ci ? '(?i)' : '']}$value$/ if $op eq '$';
 
   # Everything else
-  return $ci ? qr/^$value$/i : qr/^$value$/;
+  return qr/@{[$ci ? '(?i)' : '']}^$value$/;
 }
 
 1;

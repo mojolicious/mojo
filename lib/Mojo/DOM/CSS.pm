@@ -284,7 +284,7 @@ sub _value {
   $value = ($insensitive ? '(?i)' : '') . quotemeta _unescape($value);
 
   # "~=" (word)
-  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
+  return qr/(?:^|\s+)$value(?:\s+|$)/ if $op eq '~';
 
   # "*=" (contains)
   return qr/$value/ if $op eq '*';

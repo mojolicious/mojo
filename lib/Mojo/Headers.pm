@@ -439,7 +439,7 @@ Check if header parser is finished.
 
   my $bool = $headers->is_limit_exceeded;
 
-Check if headers have exceeded L</"max_line_size">.
+Check if headers have exceeded L</"max_line_size"> or L</"max_lines">.
 
 =head2 last_modified
 

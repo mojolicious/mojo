@@ -23,7 +23,7 @@ sub run {
   # Handle request
   $self->emit(request => $tx);
 
-  # Response start line
+  # Response start-line
   STDOUT->autoflush(1);
   binmode STDOUT;
   my $res = $tx->res->fix_headers;

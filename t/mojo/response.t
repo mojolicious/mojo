@@ -109,7 +109,7 @@ is $res->code(400)->default_message, 'Bad Request', 'right default message';
 $res = Mojo::Message::Response->new;
 is $res->code(1)->default_message, '', 'empty default message';
 
-# Parse HTTP 1.1 response start line, no headers and body
+# Parse HTTP 1.1 response start-line, no headers and body
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
@@ -117,7 +117,7 @@ is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
 
-# Parse HTTP 1.1 response start line, no headers and body (small chunks)
+# Parse HTTP 1.1 response start-line, no headers and body (small chunks)
 $res = Mojo::Message::Response->new;
 $res->parse('H');
 ok !$res->is_finished, 'response is not finished';
@@ -161,7 +161,7 @@ is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
 
-# Parse HTTP 1.1 response start line, no headers and body (no message)
+# Parse HTTP 1.1 response start-line, no headers and body (no message)
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
@@ -169,7 +169,7 @@ is $res->code,        200, 'right status';
 is $res->message,     undef, 'no message';
 is $res->version,     '1.1', 'right version';
 
-# Parse HTTP 1.0 response start line and headers but no body
+# Parse HTTP 1.0 response start-line and headers but no body
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 404 Damn it\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
@@ -227,11 +227,11 @@ is $res->content->leftovers, "HTTP/1.0 200 OK\x0d\x0a\x0d\x0a",
   is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 }
 
-# Parse broken start line
+# Parse broken start-line
 $res = Mojo::Message::Response->new;
 $res->parse("12345\x0d\x0a");
 ok $res->is_finished, 'response is finished';
-is $res->error->{message}, 'Bad response start line', 'right error';
+is $res->error->{message}, 'Bad response start-line', 'right error';
 
 # Parse full HTTP 1.0 response (missing Content-Length)
 $res = Mojo::Message::Response->new;
@@ -664,7 +664,7 @@ is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $res->headers->content_encoding,  undef, 'no "Content-Encoding" value';
 is $res->body, $uncompressed, 'right content';
 
-# Build HTTP 1.1 response start line with minimal headers
+# Build HTTP 1.1 response start-line with minimal headers
 $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
@@ -676,7 +676,7 @@ is $res->version,     '1.1', 'right version';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
-# Build HTTP 1.1 response start line with minimal headers (strange message)
+# Build HTTP 1.1 response start-line with minimal headers (strange message)
 $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->message('Looks-0k!@ ;\':" #$%^<>,.\\o/ &*()');
@@ -689,7 +689,7 @@ is $res->version,     '1.1', 'right version';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
-# Build HTTP 1.1 response start line and header
+# Build HTTP 1.1 response start-line and header
 $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->connection('keep-alive');
@@ -737,7 +737,7 @@ $res->body("Hello World!\n");
 ok !$state,    'no state';
 ok !$progress, 'no progress';
 ok !$finished, 'not finished';
-ok $res->build_start_line, 'built start line';
+ok $res->build_start_line, 'built start-line';
 is $state, 'start_line', 'made progress on start_line';
 ok $progress, 'made progress';
 $progress = 0;

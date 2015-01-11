@@ -94,7 +94,7 @@ sub extract_start_line {
 
   # We have a full response line
   return undef unless $$bufref =~ s/^(.*?)\x0d?\x0a//;
-  return !$self->error({message => 'Bad response start line'})
+  return !$self->error({message => 'Bad response start-line'})
     unless $1 =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
 
   my $content = $self->content;
@@ -223,7 +223,7 @@ L</"code">.
 
   my $bool = $res->extract_start_line(\$str);
 
-Extract status line from string.
+Extract status-line from string.
 
 =head2 fix_headers
 
@@ -235,7 +235,7 @@ Make sure response has all required headers.
 
   my $bytes = $res->get_start_line_chunk($offset);
 
-Get a chunk of status line data starting from a specific position.
+Get a chunk of status-line data starting from a specific position.
 
 =head2 is_empty
 

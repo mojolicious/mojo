@@ -4,6 +4,7 @@
     [foo="bar" i] to Mojo::DOM::CSS.
   - Improved Mojo::Reactor::EV to update the current time before starting a
     timer.
+  - Improved error messages for start-line and header limits.
   - Fixed bug in Mojo::Headers where max_line_size was not checked correctly.
   - Fixed whitespace bug in Mojo::DOM::CSS.
 
@@ -3172,7 +3173,7 @@
   - Made automatic file storage upgrade smarter.
   - Fixed overload stringification and improved overall performance by about
     25%.
-  - Fixed start line/header buffering and improved performance by 8%.
+  - Fixed start-line/header buffering and improved performance by 8%.
 
 0.999934  2010-11-01
   - Fixed relaxed HTTP parsing.
@@ -4130,7 +4131,7 @@
   - Hooks for upload progress and stuff added.
   - Refactored transfer encoding code into Mojo::Filter and
     Mojo::Filter::Chunked.
-  - Added callbacks for start line and header generators.
+  - Added callbacks for start-line and header generators.
   - Added workaround for missing IO::Seekable support in older versions of
     File::Temp (Perl 5.8).
   - script/mojo.pl got renamed to bin/mojo.

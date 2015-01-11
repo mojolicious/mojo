@@ -14,7 +14,7 @@ Mojo::IOLoop->server(
         # Append chunk to buffer
         $buffer{$id} .= $chunk;
 
-        # Check if we got start line and headers (no body support)
+        # Check if we got start-line and headers (no body support)
         if (index($buffer{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
 
           # Clean buffer

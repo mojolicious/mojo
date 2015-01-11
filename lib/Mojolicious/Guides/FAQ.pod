@@ -140,13 +140,19 @@ around 10MB by default, you can use the attribute
 L<Mojo::Message/"max_message_size"> or C<MOJO_MAX_MESSAGE_SIZE> environment
 variable to change this value.
 
-=head2 What does the error "Maximum line size exceeded" mean?
+=head2 What does the error "Maximum start-line size exceeded" mean?
 
 This is a very similar protection mechanism to the one described in the
 previous answer, but a little more specific. It limits the maximum length of
-the C<\x0d\x0a> terminated parts of a HTTP message, such as request line,
-status line and headers. This limit is around 10KB by default, you can use the
-attributes L<Mojo::Message/"max_line_size"> and
+the start-line for HTTP requests and responses. This limit is around 10KB by
+default, you can use the attribute L<Mojo::Message/"max_line_size"> or
+C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
+
+=head2 What does the error "Maximum header size exceeded" mean?
+
+Almost the same as the previous answer, but this protection mechanism limits
+the maximum length of the HTTP request and response headers. This limit is
+around 10KB by default, you can use the attribute
 L<Mojo::Headers/"max_line_size"> or C<MOJO_MAX_LINE_SIZE> environment variable
 to change this value.
 

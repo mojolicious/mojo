@@ -150,13 +150,13 @@ sub parse {
   $self->{raw_size} += length(my $chunk = shift // '');
   $self->{buffer} .= $chunk;
 
-  # Start line
+  # Start-line
   unless ($self->{state}) {
 
-    # Check line size
+    # Check start-line size
     my $len = index $self->{buffer}, "\x0a";
     $len = length $self->{buffer} if $len < 0;
-    return $self->_limit('Maximum line size exceeded', 431)
+    return $self->_limit('Maximum start-line size exceeded', 431)
       if $len > $self->max_line_size;
 
     $self->{state} = 'content' if $self->extract_start_line(\$self->{buffer});
@@ -172,8 +172,8 @@ sub parse {
   return $self->_limit('Maximum message size exceeded', 413)
     if $max && $max < $self->{raw_size};
 
-  # Check line size
-  return $self->_limit('Maximum line size exceeded', 431)
+  # Check header size
+  return $self->_limit('Maximum header size exceeded', 431)
     if $self->headers->is_limit_exceeded;
 
   # Check buffer size
@@ -384,7 +384,7 @@ Default charset used for form-data parsing, defaults to C<UTF-8>.
   my $size = $msg->max_line_size;
   $msg     = $msg->max_line_size(1024);
 
-Maximum start line size in bytes, defaults to the value of the
+Maximum start-line size in bytes, defaults to the value of the
 C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
 
 =head2 max_message_size
@@ -455,7 +455,7 @@ Render all headers.
 
   my $bytes = $msg->build_start_line;
 
-Render start line.
+Render start-line.
 
 =head2 cookie
 
@@ -537,7 +537,7 @@ an array reference.
 
   my $bool = $msg->extract_start_line(\$str);
 
-Extract start line from string. Meant to be overloaded in a subclass.
+Extract start-line from string. Meant to be overloaded in a subclass.
 
 =head2 finish
 
@@ -567,7 +567,7 @@ Get a chunk of header data, starting from a specific position.
 
   my $bytes = $msg->get_start_line_chunk($offset);
 
-Get a chunk of start line data starting from a specific position. Meant to be
+Get a chunk of start-line data starting from a specific position. Meant to be
 overloaded in a subclass.
 
 =head2 header_size
@@ -622,7 +622,7 @@ Parse message chunk.
 
   my $size = $msg->start_line_size;
 
-Size of the start line in bytes.
+Size of the start-line in bytes.
 
 =head2 text
 

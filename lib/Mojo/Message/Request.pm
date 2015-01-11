@@ -59,8 +59,8 @@ sub extract_start_line {
   # Ignore any leading empty lines
   return undef unless $$bufref =~ s/^\s*(.*?)\x0d?\x0a//;
 
-  # We have a (hopefully) full request line
-  return !$self->error({message => 'Bad request start line', advice => 400})
+  # We have a (hopefully) full request-line
+  return !$self->error({message => 'Bad request start-line', advice => 400})
     unless $1 =~ $START_LINE_RE;
   my $url = $self->method($1)->version($3)->url;
   return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
@@ -367,7 +367,7 @@ array reference.
 
   my $bool = $req->extract_start_line(\$str);
 
-Extract request line from string.
+Extract request-line from string.
 
 =head2 fix_headers
 
@@ -379,7 +379,7 @@ Make sure request has all required headers.
 
   my $bytes = $req->get_start_line_chunk($offset);
 
-Get a chunk of request line data starting from a specific position.
+Get a chunk of request-line data starting from a specific position.
 
 =head2 is_handshake
 

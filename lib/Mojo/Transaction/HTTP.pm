@@ -119,7 +119,7 @@ sub _headers {
 sub _start_line {
   my ($self, $msg) = @_;
 
-  # Prepare start line chunk
+  # Prepare start-line chunk
   my $buffer = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} -= $written;
@@ -149,11 +149,11 @@ sub _write {
     $headers->connection($self->keep_alive ? 'keep-alive' : 'close')
       unless $headers->connection;
 
-    # Switch to start line
+    # Switch to start-line
     @$self{qw(http_state write)} = ('start_line', $msg->start_line_size);
   }
 
-  # Start line
+  # Start-line
   my $chunk = '';
   $chunk .= $self->_start_line($msg) if $self->{http_state} eq 'start_line';
 

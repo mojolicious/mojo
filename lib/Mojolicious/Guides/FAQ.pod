@@ -151,7 +151,7 @@ C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
 
 Almost the same as the previous answer, but this protection mechanism limits
 the number and maximum length of HTTP request and response headers. The limits
-are 128 headers with 10KB each by default, you can use the attributes
+are 100 headers with 10KB each by default, you can use the attributes
 L<Mojo::Headers/"max_lines"> and L<Mojo::Headers/"max_line_size"> or the
 C<MOJO_MAX_LINES> and C<MOJO_MAX_LINE_SIZE> environment variables to change
 these values.

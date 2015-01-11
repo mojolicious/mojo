@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::Util 'monkey_patch';
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
-has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 128 };
+has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 100 };
 
 # Common headers
 my %NORMALCASE = map { lc($_) => $_ } (
@@ -189,10 +189,10 @@ C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
 =head2 max_lines
 
   my $num  = $headers->max_lines;
-  $headers = $headers->max_lines(256);
+  $headers = $headers->max_lines(200);
 
 Maximum number of header lines, defaults to the value of the C<MOJO_MAX_LINES>
-environment variable or C<128>.
+environment variable or C<100>.
 
 =head1 METHODS
 

@@ -1,4 +1,6 @@
 
+5.73  2015-01-12
+
 5.72  2015-01-11
   - Added EXPERIMENTAL support for case-insensitive attribute selectors like
     [foo="bar" i] to Mojo::DOM::CSS.

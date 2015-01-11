@@ -60,8 +60,8 @@ our @EXPORT_OK = (
   qw(xml_escape xor_encode xss_escape)
 );
 
-sub b64_decode { decode_base64($_[0]) }
-sub b64_encode { encode_base64($_[0], $_[1]) }
+sub b64_decode { decode_base64 $_[0] }
+sub b64_encode { encode_base64 $_[0], $_[1] }
 
 sub camelize {
   my $str = shift;
@@ -101,7 +101,7 @@ sub decode {
 
 sub deprecated {
   local $Carp::CarpLevel = 1;
-  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak(@_) : carp(@_);
+  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak @_ : carp @_;
 }
 
 sub dumper {
@@ -110,7 +110,7 @@ sub dumper {
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
 
-sub hmac_sha1_sum { hmac_sha1_hex(@_) }
+sub hmac_sha1_sum { hmac_sha1_hex @_ }
 
 sub html_unescape {
   my $str = shift;
@@ -118,8 +118,8 @@ sub html_unescape {
   return $str;
 }
 
-sub md5_bytes { md5(@_) }
-sub md5_sum   { md5_hex(@_) }
+sub md5_bytes { md5 @_ }
+sub md5_sum   { md5_hex @_ }
 
 sub monkey_patch {
   my ($class, %patch) = @_;
@@ -232,8 +232,8 @@ sub secure_compare {
   return $r == 0;
 }
 
-sub sha1_bytes { sha1(@_) }
-sub sha1_sum   { sha1_hex(@_) }
+sub sha1_bytes { sha1 @_ }
+sub sha1_sum   { sha1_hex @_ }
 
 sub slurp {
   my $path = shift;

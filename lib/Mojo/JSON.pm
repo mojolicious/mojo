@@ -1,14 +1,11 @@
 package Mojo::JSON;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 
 use B;
 use Carp 'croak';
 use Exporter 'import';
-use Mojo::Util 'deprecated';
+use Mojo::Util;
 use Scalar::Util 'blessed';
-
-# DEPRECATED in Tiger Face!
-has 'error';
 
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
@@ -32,19 +29,10 @@ my %ESCAPE = (
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
-# DEPRECATED in Tiger Face!
-sub decode {
-  shift->error(my $err = _decode(\my $value, pop));
-  return defined $err ? undef : $value;
-}
-
 sub decode_json {
   my $err = _decode(\my $value, shift);
   return defined $err ? croak $err : $value;
 }
-
-# DEPRECATED in Tiger Face!
-sub encode { encode_json($_[1]) }
 
 sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 
@@ -58,12 +46,6 @@ sub from_json {
 sub j {
   return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
   return eval { decode_json($_[0]) };
-}
-
-# DEPRECATED in Tiger Face!
-sub new {
-  deprecated 'Object-oriented Mojo::JSON API is DEPRECATED';
-  return shift->SUPER::new(@_);
 }
 
 sub to_json { _encode_value(shift) }

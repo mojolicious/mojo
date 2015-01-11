@@ -1,5 +1,7 @@
 
 5.73  2015-01-12
+  - Removed deprecated object-oriented Mojo::JSON API.
+  - Removed deprecated support for data arguments from Mojo::JSON::Pointer.
 
 5.72  2015-01-11
   - Added EXPERIMENTAL support for case-insensitive attribute selectors like

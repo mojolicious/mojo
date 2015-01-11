@@ -1,8 +1,6 @@
 package Mojo::JSON::Pointer;
 use Mojo::Base -base;
 
-use Mojo::Util 'deprecated';
-
 has 'data';
 
 sub contains { shift->_pointer(1, @_) }
@@ -12,13 +10,8 @@ sub new { @_ > 1 ? shift->SUPER::new(data => shift) : shift->SUPER::new }
 
 sub _pointer {
   my ($self, $contains, $pointer) = @_;
+
   my $data = $self->data;
-
-  # DEPRECATED in Tiger Face!
-  deprecated 'Support for data arguments in Mojo::JSON::Pointer is DEPRECATED'
-    and (($pointer, $data) = ($_[3], $pointer))
-    if defined $_[3];
-
   return $data unless $pointer =~ s!^/!!;
   for my $p ($pointer eq '' ? ($pointer) : (split '/', $pointer)) {
     $p =~ s/~0/~/g;

@@ -196,7 +196,7 @@ and the active event counter reached zero, L</"steps"> will continue.
 
 Arguments passed to the returned callback are spliced with the given offset
 and length, defaulting to an offset of C<1> with no default length. The
-arguments are then combined in the same order C</"begin"> was called, and
+arguments are then combined in the same order L</"begin"> was called, and
 passed together to the next step or L</"finish"> event.
 
   # Capture all arguments

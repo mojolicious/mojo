@@ -104,7 +104,7 @@ implements the following new ones.
   $single   = $single->asset(Mojo::Asset::Memory->new);
 
 The actual content, defaults to a L<Mojo::Asset::Memory> object with
-C<auto_upgrade> enabled.
+L<Mojo::Asset::Memory/"auto_upgrade"> enabled.
 
 =head2 auto_upgrade
 

@@ -4,6 +4,7 @@ use Mojo::Base -base;
 use Mojo::Util 'monkey_patch';
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
+has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 128 };
 
 # Common headers
 my %NORMALCASE = map { lc($_) => $_ } (
@@ -85,12 +86,13 @@ sub parse {
   $self->{state} = 'headers';
   $self->{buffer} .= shift // '';
   my $headers = $self->{cache} ||= [];
-  my $max = $self->max_line_size;
+  my $size    = $self->max_line_size;
+  my $lines   = $self->max_lines;
   while ($self->{buffer} =~ s/^(.*?)\x0d?\x0a//) {
     my $line = $1;
 
     # Check line size limit
-    if (($self->{size} += $+[0]) > $max) {
+    if ($+[0] > $size || @$headers >= $lines) {
       @$self{qw(state limit)} = ('finished', 1);
       return $self;
     }
@@ -110,8 +112,7 @@ sub parse {
   }
 
   # Check line size limit
-  @$self{qw(state limit)} = ('finished', 1)
-    if (($self->{size} ||= 0) + length $self->{buffer}) > $max;
+  @$self{qw(state limit)} = ('finished', 1) if length $self->{buffer} > $size;
 
   return $self;
 }
@@ -182,8 +183,16 @@ L<Mojo::Headers> implements the following attributes.
   my $size = $headers->max_line_size;
   $headers = $headers->max_line_size(1024);
 
-Maximum size of all header lines combined in bytes, defaults to the value of
-the C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
+Maximum header line size in bytes, defaults to the value of the
+C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
+
+=head2 max_lines
+
+  my $num  = $headers->max_lines;
+  $headers = $headers->max_lines(256);
+
+Maximum number of header lines, defaults to the value of the C<MOJO_MAX_LINES>
+environment variable or C<128>.
 
 =head1 METHODS
 

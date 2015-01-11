@@ -2,6 +2,7 @@
 5.72  2015-01-11
   - Added EXPERIMENTAL support for case-insensitive attribute selectors like
     [foo="bar" i] to Mojo::DOM::CSS.
+  - Added max_lines attribute to Mojo::Headers.
   - Improved Mojo::Reactor::EV to update the current time before starting a
     timer.
   - Improved error messages for start-line and header limits.

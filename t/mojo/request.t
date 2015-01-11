@@ -72,23 +72,6 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
 is $req->body,        'a=b; ' x 131072, 'right content';
 
-# Parse HTTP 1.1 message with headers combined exceeding line limit
-$req = Mojo::Message::Request->new;
-is $req->headers->max_line_size, 10240, 'right size';
-$req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse("Foo: @{['a' x 3413]}\x0d\x0a");
-ok !$req->is_limit_exceeded, 'limit is not exceeded';
-$req->parse("Bar: @{['b' x 3413]}\x0d\x0a");
-ok !$req->is_limit_exceeded, 'limit is not exceeded';
-$req->parse("Baz: @{['c' x 3413]}\x0d\x0a\x0d\x0a");
-ok $req->is_finished, 'request is finished';
-is $req->error->{message}, 'Maximum header size exceeded', 'right error';
-is $req->error->{advice}, 431, 'right advice';
-ok $req->is_limit_exceeded, 'limit is exceeded';
-is $req->method,            'GET', 'right method';
-is $req->version,           '1.1', 'right version';
-is $req->url,               '/', 'right URL';
-
 # Parse broken start-line
 $req = Mojo::Message::Request->new;
 $req->parse("12345\x0d\x0a");
@@ -102,7 +85,7 @@ $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a");
 ok !$req->is_limit_exceeded, 'limit is not exceeded';
-$req->parse("Foo: @{['a' x 10220]}");
+$req->parse("Foo: @{['a' x 10240]}");
 ok $req->is_finished, 'request is finished';
 is $req->error->{message}, 'Maximum header size exceeded', 'right error';
 is $req->error->{advice}, 431, 'right advice';
@@ -428,6 +411,24 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is $req->error->{message}, 'Maximum message size exceeded', 'right error';
   is $req->error->{advice}, 413, 'right advice';
   ok $req->is_limit_exceeded, 'limit is exceeded';
+}
+
+# Parse HTTP 1.1 message with headers exceeding line limit
+{
+  local $ENV{MOJO_MAX_LINES} = 5;
+  $req = Mojo::Message::Request->new;
+  is $req->headers->max_lines, 5, 'right number';
+  $req->parse("GET / HTTP/1.1\x0d\x0a");
+  $req->parse("A: a\x0d\x0aB: b\x0d\x0aC: c\x0d\x0aD: d\x0d\x0a");
+  ok !$req->is_limit_exceeded, 'limit is not exceeded';
+  $req->parse("D: d\x0d\x0a\x0d\x0a");
+  ok $req->is_finished, 'request is finished';
+  is $req->error->{message}, 'Maximum header size exceeded', 'right error';
+  is $req->error->{advice}, 431, 'right advice';
+  ok $req->is_limit_exceeded, 'limit is exceeded';
+  is $req->method,            'GET', 'right method';
+  is $req->version,           '1.1', 'right version';
+  is $req->url,               '/', 'right URL';
 }
 
 # Parse full HTTP 1.0 request (solitary LF)

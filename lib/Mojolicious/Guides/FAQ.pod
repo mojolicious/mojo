@@ -135,7 +135,7 @@ In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
 To protect your applications from excessively large requests and responses,
 our HTTP parser has a cap after which it will automatically stop accepting new
-data, and in most cases force the connection to be closed. This limit is 10MB
+data, and in most cases force the connection to be closed. The limit is 10MB
 by default, you can use the attribute L<Mojo::Message/"max_message_size"> or
 C<MOJO_MAX_MESSAGE_SIZE> environment variable to change this value.
 
@@ -143,7 +143,7 @@ C<MOJO_MAX_MESSAGE_SIZE> environment variable to change this value.
 
 This is a very similar protection mechanism to the one described in the
 previous answer, but a little more specific. It limits the maximum length of
-the start-line for HTTP requests and responses. This limit is 10KB by default,
+the start-line for HTTP requests and responses. The limit is 10KB by default,
 you can use the attribute L<Mojo::Message/"max_line_size"> or
 C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
 
@@ -158,10 +158,9 @@ these values.
 
 =head2 What does the error "Maximum buffer size exceeded" mean?
 
-This protection mechanism is very similar to those mentioned in the two
-previous answers. It limits how much content the HTTP parser is allowed to
-buffer when parsing chunked, compressed and multipart messages. This limit is
-around 256KB by default, you can use the attribute
+This protection mechanism limits how much content the HTTP parser is allowed
+to buffer when parsing chunked, compressed and multipart messages. The limit
+is around 256KB by default, you can use the attribute
 L<Mojo::Content/"max_buffer_size"> or C<MOJO_MAX_BUFFER_SIZE> environment
 variable to change this value.
 

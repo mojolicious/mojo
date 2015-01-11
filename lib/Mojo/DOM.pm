@@ -16,24 +16,6 @@ use Mojo::DOM::HTML;
 use Mojo::Util qw(deprecated squish);
 use Scalar::Util qw(blessed weaken);
 
-# DEPRECATED in Tiger Face!
-sub AUTOLOAD {
-  my $self = shift;
-
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  deprecated "Mojo::DOM::AUTOLOAD ($method) is DEPRECATED"
-    . ' in favor of Mojo::DOM::children';
-  croak "Undefined subroutine &${package}::$method called"
-    unless blessed $self && $self->isa(__PACKAGE__);
-
-  my $children = $self->children($method);
-  return @$children > 1 ? $children : $children->[0] if @$children;
-  croak qq{Can't locate object method "$method" via package "$package"};
-}
-
-# DEPRECATED in Tiger Face!
-sub DESTROY { }
-
 sub all_contents { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
 sub all_text { shift->_all_text(1, @_) }
@@ -182,27 +164,6 @@ sub type {
   return $tree->[1] unless $type;
   $tree->[1] = $type;
   return $self;
-}
-
-# DEPRECATED in Tiger Face!
-sub val {
-  deprecated 'Mojo::DOM::val is DEPRECATED';
-  my $self = shift;
-
-  # "option"
-  my $type = $self->type;
-  return Mojo::Collection->new($self->{value} // $self->text)
-    if $type eq 'option';
-
-  # "select"
-  return $self->find('option[selected]')->map('val')->flatten
-    if $type eq 'select';
-
-  # "textarea"
-  return Mojo::Collection->new($self->text) if $type eq 'textarea';
-
-  # "input" or "button"
-  return Mojo::Collection->new($self->{value} // ());
 }
 
 sub wrap         { shift->_wrap(0, @_) }

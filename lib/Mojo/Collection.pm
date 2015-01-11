@@ -5,32 +5,9 @@ use Carp 'croak';
 use Exporter 'import';
 use List::Util;
 use Mojo::ByteStream;
-use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
 
-# DEPRECATED in Tiger Face!
-use overload '""' => sub {
-  deprecated 'Stringification support in Mojo::Collection is DEPRECATED'
-    . ' in favor of Mojo::Collection::join';
-  shift->join("\n");
-};
-use overload bool => sub {1}, fallback => 1;
-
 our @EXPORT_OK = ('c');
-
-# DEPRECATED in Tiger Face!
-sub AUTOLOAD {
-  my $self = shift;
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  deprecated "Mojo::Collection::AUTOLOAD ($method) is DEPRECATED"
-    . ' in favor of Mojo::Collection::map';
-  croak "Undefined subroutine &${package}::$method called"
-    unless blessed $self && $self->isa(__PACKAGE__);
-  return $self->map($method, @_);
-}
-
-# DEPRECATED in Tiger Face!
-sub DESTROY { }
 
 sub c { __PACKAGE__->new(@_) }
 
@@ -75,14 +52,6 @@ sub map {
 sub new {
   my $class = shift;
   return bless [@_], ref $class || $class;
-}
-
-# DEPRECATED in Tiger Face!
-sub pluck {
-  deprecated
-    'Mojo::Collection::pluck is DEPRECATED in favor of Mojo::Collection::map';
-  my ($self, $key) = (shift, shift);
-  return $self->new(map { ref eq 'HASH' ? $_->{$key} : $_->$key(@_) } @$self);
 }
 
 sub reduce {

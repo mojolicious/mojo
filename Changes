@@ -1,7 +1,10 @@
 
 5.73  2015-01-12
   - Removed deprecated object-oriented Mojo::JSON API.
+  - Removed deprecated stringification support from Mojo::Collection.
   - Removed deprecated support for data arguments from Mojo::JSON::Pointer.
+  - Removed deprecated AUTOLOAD and pluck methods from Mojo::Collection.
+  - Removed deprecated AUTOLOAD and val methods from Mojo::DOM.
 
 5.72  2015-01-11
   - Added EXPERIMENTAL support for case-insensitive attribute selectors like

@@ -358,7 +358,7 @@ possible.
 
   my $tx = $t->redirect(Mojo::Transaction::HTTP->new);
 
-Build L<Mojo::Transaction::HTTP> followup request for C<301>, C<302>, C<303>,
+Build L<Mojo::Transaction::HTTP> follow-up request for C<301>, C<302>, C<303>,
 C<307> or C<308> redirect response if possible.
 
 =head2 tx
@@ -473,7 +473,7 @@ C<Content-Type> header manually.
 
   my $tx = $t->upgrade(Mojo::Transaction::HTTP->new);
 
-Build L<Mojo::Transaction::WebSocket> followup transaction for WebSocket
+Build L<Mojo::Transaction::WebSocket> follow-up transaction for WebSocket
 handshake if possible.
 
 =head2 websocket

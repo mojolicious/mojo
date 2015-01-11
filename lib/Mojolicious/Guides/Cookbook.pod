@@ -907,7 +907,7 @@ will be automatically generated.
   my $ua = Mojo::UserAgent->new;
   say $ua->get('https://sri:secret@example.com/hideout')->res->body;
 
-=head2 Decorating followup requests
+=head2 Decorating follow-up requests
 
 L<Mojo::UserAgent> can automatically follow redirects, the event
 L<Mojo::UserAgent/"start"> allows you direct access to each transaction right

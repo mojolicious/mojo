@@ -234,7 +234,7 @@ Emitted for unexpected C<1xx> responses that will be ignored.
 
   $tx->on(unexpected => sub {
     my $tx = shift;
-    $tx->res->on(finish => sub { say 'Followup response is finished.' });
+    $tx->res->on(finish => sub { say 'Follow-up response is finished.' });
   });
 
 =head2 upgrade
@@ -262,7 +262,7 @@ and implements the following new ones.
   my $previous = $tx->previous;
   $tx          = $tx->previous(Mojo::Transaction::HTTP->new);
 
-Previous transaction that triggered this followup transaction, usually a
+Previous transaction that triggered this follow-up transaction, usually a
 L<Mojo::Transaction::HTTP> object.
 
   # Paths of previous requests
@@ -302,7 +302,7 @@ Check if connection can be kept alive.
 
   my $redirects = $tx->redirects;
 
-Return a list of all previous transactions that preceded this followup
+Return a list of all previous transactions that preceded this follow-up
 transaction.
 
   # Paths of all previous requests

@@ -6,6 +6,7 @@
   - Removed deprecated AUTOLOAD and pluck methods from Mojo::Collection.
   - Removed deprecated AUTOLOAD and val methods from Mojo::DOM.
   - Fixed JSON Pointer escaping bug.
+  - Fixed portability bug in monkey_patch tests.
 
 5.72  2015-01-11
   - Added EXPERIMENTAL support for case-insensitive attribute selectors like

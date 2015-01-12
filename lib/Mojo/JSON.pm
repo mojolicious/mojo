@@ -9,9 +9,8 @@ use Scalar::Util 'blessed';
 
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
-# Literal names
-my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
-my $TRUE  = bless \(my $true  = 1), 'Mojo::JSON::_Bool';
+# Booleans
+my ($FALSE, $TRUE) = map { bless \(my $dummy = $_), 'Mojo::JSON::_Bool' } 0, 1;
 
 # Escaped special character map (with u2028 and u2029)
 my %ESCAPE = (

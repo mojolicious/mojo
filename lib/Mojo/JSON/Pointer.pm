@@ -14,8 +14,8 @@ sub _pointer {
   my $data = $self->data;
   return $data unless $pointer =~ s!^/!!;
   for my $p ($pointer eq '' ? ($pointer) : (split '/', $pointer)) {
-    $p =~ s/~0/~/g;
     $p =~ s!~1!/!g;
+    $p =~ s/~0/~/g;
 
     # Hash
     if (ref $data eq 'HASH' && exists $data->{$p}) { $data = $data->{$p} }

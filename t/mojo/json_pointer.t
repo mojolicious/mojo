@@ -47,6 +47,7 @@ is $pointer->new([{'foo~/bar' => 'bar'}])->get('/0/foo~0~1bar'), 'bar',
 is $pointer->new([{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}])
   ->get('/0/f~0o~0o~0~1b~0/a~0/r'), 'baz',
   '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
+is $pointer->new({'~1' => 'foo'})->get('/~01'), 'foo', '"/~01" is "foo"';
 
 # Unicode
 is $pointer->new({'☃' => 'snowman'})->get('/☃'), 'snowman',

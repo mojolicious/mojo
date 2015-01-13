@@ -1,5 +1,5 @@
 
-5.73  2015-01-12
+5.73  2015-01-13
   - Removed deprecated object-oriented Mojo::JSON API.
   - Removed deprecated stringification support from Mojo::Collection.
   - Removed deprecated support for data arguments from Mojo::JSON::Pointer.

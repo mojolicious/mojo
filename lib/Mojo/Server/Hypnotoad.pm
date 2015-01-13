@@ -157,9 +157,9 @@ keep-alive, multiple event loop and hot deployment support that just works.
 Note that the server uses signals for process management, so you should avoid
 modifying signal handlers in your applications.
 
-To start applications with it you can use the L<hypnotoad> script, for
-L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
-C<production> mode.
+To start applications with it you can use the L<hypnotoad> script, which
+automatically daemonizes the server process and defaults to C<production> mode
+for L<Mojolicious> and L<Mojolicious::Lite> applications.
 
   $ hypnotoad ./myapp.pl
   Server available at http://127.0.0.1:8080.

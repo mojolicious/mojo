@@ -80,7 +80,32 @@ sub every_param {
   return @$uploads ? $uploads : $req->every_param($name);
 }
 
-sub every_signed_cookie { _signed_cookie(@_) }
+sub every_signed_cookie {
+  my ($self, $name) = @_;
+
+  my $secrets = $self->stash->{'mojo.secrets'};
+  my @results;
+  for my $value (@{$self->every_cookie($name)}) {
+
+    # Check signature with rotating secrets
+    if ($value =~ s/--([^\-]+)$//) {
+      my $signature = $1;
+
+      my $valid;
+      for my $secret (@$secrets) {
+        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
+        ++$valid and last if Mojo::Util::secure_compare($signature, $check);
+      }
+      if ($valid) { push @results, $value }
+
+      else { $self->app->log->debug(qq{Cookie "$name" has bad signature.}) }
+    }
+
+    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
+  }
+
+  return \@results;
+}
 
 sub finish {
   my $self = shift;
@@ -285,7 +310,7 @@ sub signed_cookie {
   return map { $self->signed_cookie($_) } @$name if ref $name eq 'ARRAY';
 
   # Request cookie
-  return _signed_cookie($self, $name)->[-1] unless defined $value;
+  return $self->every_signed_cookie($name)->[-1] unless defined $value;
 
   # Response cookie
   my $checksum
@@ -363,33 +388,6 @@ sub write_chunk {
   my $content = $self->res->content;
   $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
-}
-
-sub _signed_cookie {
-  my ($self, $name) = @_;
-
-  my $secrets = $self->stash->{'mojo.secrets'};
-  my @results;
-  for my $value (@{$self->every_cookie($name)}) {
-
-    # Check signature with rotating secrets
-    if ($value =~ s/--([^\-]+)$//) {
-      my $signature = $1;
-
-      my $valid;
-      for my $secret (@$secrets) {
-        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
-        ++$valid and last if Mojo::Util::secure_compare($signature, $check);
-      }
-      if ($valid) { push @results, $value }
-
-      else { $self->app->log->debug(qq{Cookie "$name" has bad signature.}) }
-    }
-
-    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
-  }
-
-  return \@results;
 }
 
 1;

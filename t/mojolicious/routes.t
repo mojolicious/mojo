@@ -57,10 +57,10 @@ $r->route('/:controller/testedit')->to(action => 'testedit');
 $test->route('/delete/(id)', id => qr/\d+/)->to(action => 'delete', id => 23);
 
 # /test2
-my $test2 = $r->bridge('/test2/')->to(controller => 'test2');
+my $test2 = $r->route('/test2/')->inline(1)->to(controller => 'test2');
 
 # /test2 (inline)
-my $test4 = $test2->bridge('/')->to(controller => 'index');
+my $test4 = $test2->route('/')->inline(1)->to(controller => 'index');
 
 # /test2/foo
 $test4->route('/foo')->to(controller => 'baz');
@@ -122,10 +122,10 @@ $r->route('/format7', format => [qw(foo foobar)])->to('perl#rocks');
 
 # /articles/1/edit
 # /articles/1/delete
-my $bridge = $r->bridge('/articles/:id')
+my $inline = $r->route('/articles/:id')->inline(1)
   ->to(controller => 'articles', action => 'load', format => 'html');
-$bridge->route('/edit')->to(controller => 'articles', action => 'edit');
-$bridge->route('/delete')
+$inline->route('/edit')->to(controller => 'articles', action => 'edit');
+$inline->route('/delete')
   ->to(controller => 'articles', action => 'delete', format => undef)
   ->name('articles_delete');
 
@@ -213,7 +213,7 @@ $r->route('/partial')->detour('foo#bar');
 
 # GET  /similar/*
 # POST /similar/too
-my $similar = $r->bridge('/similar');
+my $similar = $r->route('/similar')->inline(1);
 $similar->route('/:something')->via('GET')->to('similar#get');
 $similar->route('/too')->via('POST')->to('similar#post');
 
@@ -711,7 +711,7 @@ is_deeply $m->stack, [{controller => 'test-test', action => 'test'}],
 is $m->path_for->{path}, '/simple/form', 'right path';
 is $m->path_for('current')->{path}, '/simple/form', 'right path';
 
-# Special edge case with nested bridges (regex)
+# Special edge case with intermediate destinations (regex)
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/regex/alternatives/foo'});
 is_deeply $m->stack,

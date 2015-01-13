@@ -68,8 +68,8 @@ sub startup {
   $r->route('/exceptional/:action')->to('exceptional#');
 
   # /exceptional_too/*
-  $r->bridge('/exceptional_too')->to('exceptional#this_one_might_die')
-    ->route('/:action');
+  $r->route('/exceptional_too')->inline(1)
+    ->to('exceptional#this_one_might_die')->route('/:action');
 
   # /fun/time
   $r->fun('/time')->to('foo#fun');
@@ -128,13 +128,13 @@ sub startup {
   # /withblock (template with blocks)
   $r->route('/withblock')->to('foo#withBlock');
 
-  # /staged (authentication with bridges)
-  my $b = $r->bridge('/staged')->to('foo#stage1', return => 1);
+  # /staged (authentication with intermediate destination)
+  my $b = $r->route('/staged')->inline(1)->to('foo#stage1', return => 1);
   $b->route->to(action => 'stage2');
 
-  # /suspended (suspended bridge)
-  $r->bridge('/suspended')->to('foo#suspended')->bridge->to('foo#suspended')
-    ->route->to('foo#fun');
+  # /suspended (suspended intermediate destination)
+  $r->route('/suspended')->inline(1)->to('foo#suspended')->route->inline(1)
+    ->to('foo#suspended')->route->to('foo#fun');
 
   # /longpoll (long polling)
   $r->route('/longpoll')->to('foo#longpoll');

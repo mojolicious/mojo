@@ -32,7 +32,12 @@ sub add_child {
 
 sub any { shift->_generate_route(ref $_[0] eq 'ARRAY' ? shift : [], @_) }
 
-sub bridge { shift->route(@_)->inline(1) }
+# DEPRECATED in Tiger Face!
+sub bridge {
+  Mojo::Util::deprecated 'Mojolicious::Routes::Route::bridge is DEPRECATED in'
+    . ' favor of Mojolicious::Routes::Route::under';
+  shift->route(@_)->inline(1);
+}
 
 sub delete { shift->_generate_route(DELETE => @_) }
 
@@ -301,20 +306,6 @@ request methods or all. See also the L<Mojolicious::Lite> tutorial for many
 more argument variations.
 
   $r->any('/user')->to('user#whatever');
-
-=head2 bridge
-
-  my $route = $r->bridge;
-  my $route = $r->bridge('/:action');
-  my $route = $r->bridge('/:action', action => qr/\w+/);
-  my $route = $r->bridge(format => 0);
-
-Low-level generator for nested routes with their own intermediate destination,
-returns a L<Mojolicious::Routes::Route> object.
-
-  my $auth = $r->bridge('/user')->to('user#auth');
-  $auth->get('/show')->to('#show');
-  $auth->post('/create')->to('#create');
 
 =head2 delete
 

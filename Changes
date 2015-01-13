@@ -1,5 +1,7 @@
 
-5.73  2015-01-13
+5.73  2015-01-14
+  - Deprecated Mojolicious::Routes::Route::bridge in favor of
+    Mojolicious::Routes::Route::under.
   - Removed deprecated object-oriented Mojo::JSON API.
   - Removed deprecated stringification support from Mojo::Collection.
   - Removed deprecated support for data arguments from Mojo::JSON::Pointer.

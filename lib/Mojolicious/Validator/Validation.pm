@@ -54,7 +54,10 @@ sub error {
   return $self;
 }
 
-sub every_param { shift->_param(@_) }
+sub every_param {
+  return [] unless defined(my $value = shift->output->{shift()});
+  return [ref $value eq 'ARRAY' ? @$value : $value];
+}
 
 sub has_data { !!keys %{shift->input} }
 
@@ -82,18 +85,13 @@ sub param {
   # List names
   return sort keys %{$self->output} unless defined $name;
 
-  return $self->_param($name)->[-1];
+  return $self->every_param($name)->[-1];
 }
 
 sub required {
   my ($self, $name) = @_;
   return $self if $self->optional($name)->is_valid;
   return $self->error($name => ['required']);
-}
-
-sub _param {
-  return [] unless defined(my $value = shift->output->{shift()});
-  return [ref $value eq 'ARRAY' ? @$value : $value];
 }
 
 1;

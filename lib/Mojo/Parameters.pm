@@ -38,7 +38,17 @@ sub clone {
   return $clone;
 }
 
-sub every_param { shift->_param(@_) }
+sub every_param {
+  my ($self, $name) = @_;
+
+  my @values;
+  my $params = $self->params;
+  for (my $i = 0; $i < @$params; $i += 2) {
+    push @values, $params->[$i + 1] if $params->[$i] eq $name;
+  }
+
+  return \@values;
+}
 
 sub merge {
   my $self = shift;
@@ -63,7 +73,7 @@ sub param {
   return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # Last value
-  return $self->_param($name)->[-1] unless @_;
+  return $self->every_param($name)->[-1] unless @_;
 
   # Replace values
   $self->remove($name);
@@ -175,18 +185,6 @@ sub to_string {
   }
 
   return join '&', @pairs;
-}
-
-sub _param {
-  my ($self, $name) = @_;
-
-  my @values;
-  my $params = $self->params;
-  for (my $i = 0; $i < @$params; $i += 2) {
-    push @values, $params->[$i + 1] if $params->[$i] eq $name;
-  }
-
-  return \@values;
 }
 
 1;

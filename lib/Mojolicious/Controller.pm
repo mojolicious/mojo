@@ -65,7 +65,20 @@ sub every_cookie {
   [map { $_->value } @{shift->req->every_cookie(shift)}];
 }
 
-sub every_param { _param(@_) }
+sub every_param {
+  my ($self, $name) = @_;
+
+  # Captured unreserved values
+  my $captures = $self->stash->{'mojo.captures'} ||= {};
+  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
+    return ref $value eq 'ARRAY' ? $value : [$value];
+  }
+
+  # Uploads or param values
+  my $req     = $self->req;
+  my $uploads = $req->every_upload($name);
+  return @$uploads ? $uploads : $req->every_param($name);
+}
 
 sub every_signed_cookie { _signed_cookie(@_) }
 
@@ -126,7 +139,7 @@ sub param {
   }
 
   # Value
-  return _param($self, $name)->[-1] unless @_;
+  return $self->every_param($name)->[-1] unless @_;
 
   # Override values
   $captures->{$name} = @_ > 1 ? [@_] : $_[0];
@@ -350,21 +363,6 @@ sub write_chunk {
   my $content = $self->res->content;
   $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
-}
-
-sub _param {
-  my ($self, $name) = @_;
-
-  # Captured unreserved values
-  my $captures = $self->stash->{'mojo.captures'} ||= {};
-  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
-    return ref $value eq 'ARRAY' ? $value : [$value];
-  }
-
-  # Uploads or param values
-  my $req     = $self->req;
-  my $uploads = $req->every_upload($name);
-  return @$uploads ? $uploads : $req->every_param($name);
 }
 
 sub _signed_cookie {

@@ -390,7 +390,9 @@ the current route.
 =head2 new
 
   my $r = Mojolicious::Routes::Route->new;
-  my $r = Mojolicious::Routes::Route->new('/:controller/:action');
+  my $r = Mojolicious::Routes::Route->new('/:action');
+  my $r = Mojolicious::Routes::Route->new('/:action', action => qr/\w+/);
+  my $r = Mojolicious::Routes::Route->new(format => 0);
 
 Construct a new L<Mojolicious::Routes::Route> object and L</"parse"> pattern
 if necessary.

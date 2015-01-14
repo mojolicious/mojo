@@ -1,5 +1,5 @@
 
-5.73  2015-01-14
+5.73  2015-01-15
   - Deprecated Mojolicious::Routes::Route::bridge in favor of
     Mojolicious::Routes::Route::under.
   - Removed deprecated object-oriented Mojo::JSON API.

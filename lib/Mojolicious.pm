@@ -648,7 +648,7 @@ L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
 Start the command line interface for your application, for a full list of
 commands available by default see L<Mojolicious::Commands/"COMMANDS">.
 
-  # Always start daemon and ignore @ARGV
+  # Always start daemon
   $app->start('daemon', '-l', 'http://*:8080');
 
 =head2 startup

@@ -318,7 +318,7 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
 
 Load application from class and start the command line interface for it.
 
-  # Always start daemon for application and ignore @ARGV
+  # Always start daemon for application
   Mojolicious::Commands->start_app('MyApp', 'daemon', '-l', 'http://*:8080');
 
 =head1 SEE ALSO

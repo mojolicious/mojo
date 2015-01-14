@@ -306,12 +306,12 @@ Mojo::Template - Perl-ish templates!
   say $output;
 
   # More advanced
-  my $output = $mt->render(<<'EOF', 23, 'foo bar');
-  % my ($num, $text) = @_;
+  my $output = $mt->render(<<'EOF', 23, 'More advanced');
+  % my ($num, $title) = @_;
   %= 5 * 5
   <!DOCTYPE html>
   <html>
-    <head><title>More advanced</title></head>
+    <head><title><%= $title %></title></head>
     <body>
       test 123
       foo <% my $i = $num + 2; %>

@@ -31,6 +31,9 @@ All web development starts with HTML, CSS and JavaScript, to learn the basics
 we recommend the
 L<Mozilla Developer Network|https://developer.mozilla.org/en-US/docs/Web>.
 
+=item Learning Hypertext Transfer Protocol
+http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+
 =back
 
 =head1 TUTORIAL

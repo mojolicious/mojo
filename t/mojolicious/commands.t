@@ -33,6 +33,10 @@ my $commands = Mojolicious::Commands->new;
   local $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
   is $commands->detect, 'cgi', 'right environment';
 }
+{
+  local @ENV{qw(PLACK_ENV PATH_INFO GATEWAY_INTERFACE)};
+  is $commands->detect, undef, 'no environment';
+}
 
 # Run command
 is ref Mojolicious::Commands->new->run('psgi'), 'CODE', 'right reference';

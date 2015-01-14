@@ -24,21 +24,6 @@ sub detect {
   return undef;
 }
 
-# Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
-sub _args {
-  return if __PACKAGE__->detect;
-
-  my $save
-    = Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
-  GetOptionsFromArray shift,
-    'h|help'   => \$ENV{MOJO_HELP},
-    'home=s'   => \$ENV{MOJO_HOME},
-    'm|mode=s' => \$ENV{MOJO_MODE};
-  Getopt::Long::Configure($save);
-}
-
-BEGIN { _args([@ARGV]) }
-
 sub run {
   my ($self, $name, @args) = @_;
 
@@ -89,6 +74,21 @@ sub run {
 }
 
 sub start_app { shift; Mojo::Server->new->build_app(shift)->start(@_) }
+
+# Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
+sub _args {
+  return if __PACKAGE__->detect;
+
+  my $save
+    = Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
+  GetOptionsFromArray shift,
+    'h|help'   => \$ENV{MOJO_HELP},
+    'home=s'   => \$ENV{MOJO_HOME},
+    'm|mode=s' => \$ENV{MOJO_MODE};
+  Getopt::Long::Configure($save);
+}
+
+BEGIN { _args([@ARGV]) }
 
 sub _command {
   my ($module, $fatal) = @_;

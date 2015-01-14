@@ -6,7 +6,6 @@ use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON qw(encode_json j);
 use Mojo::JSON::Pointer;
-use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
 use Scalar::Util 'weaken';
 
@@ -32,8 +31,9 @@ sub run {
   my %headers = map { /^\s*([^:]+)\s*:\s*(.+)$/ ? ($1, $2) : () } @headers;
 
   # Detect proxy for absolute URLs
-  my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-  $url !~ m!^/! ? $ua->proxy->detect : $ua->server->app($self->app);
+  my $ua = $self->app->ua->ioloop(Mojo::IOLoop->singleton);
+  $ua->server->ioloop(Mojo::IOLoop->singleton);
+  $ua->proxy->detect unless $url !~ m!^/!;
   $ua->max_redirects(10) if $redirect;
 
   my $buffer = '';

@@ -7,6 +7,7 @@
   - Removed deprecated support for data arguments from Mojo::JSON::Pointer.
   - Removed deprecated AUTOLOAD and pluck methods from Mojo::Collection.
   - Removed deprecated AUTOLOAD and val methods from Mojo::DOM.
+  - Improved get command to use the user agent of the application.
   - Fixed JSON Pointer escaping bug.
   - Fixed portability bug in monkey_patch tests.
 

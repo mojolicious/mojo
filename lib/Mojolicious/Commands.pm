@@ -13,7 +13,6 @@ has message    => sub { shift->extract_usage . "\nCommands:\n" };
 has namespaces => sub { ['Mojolicious::Command'] };
 
 sub detect {
-  my ($self, $guess) = @_;
 
   # PSGI (Plack only for now)
   return 'psgi' if defined $ENV{PLACK_ENV};
@@ -22,7 +21,7 @@ sub detect {
   return 'cgi' if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
 
   # Nothing
-  return $guess;
+  return undef;
 }
 
 # Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
@@ -47,7 +46,7 @@ sub run {
   return $self->app if defined $ENV{MOJO_APP_LOADER};
 
   # Try to detect environment
-  $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};
+  if (!$ENV{MOJO_NO_DETECT} && (my $env = $self->detect)) { $name = $env }
 
   # Run command
   if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
@@ -299,7 +298,6 @@ implements the following new ones.
 =head2 detect
 
   my $env = $commands->detect;
-  my $env = $commands->detect($guess);
 
 Try to detect environment.
 

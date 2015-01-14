@@ -646,7 +646,9 @@ L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
   $app->start(@ARGV);
 
 Start the command line interface for your application, for a full list of
-commands available by default see L<Mojolicious::Commands/"COMMANDS">.
+commands available by default see L<Mojolicious::Commands/"COMMANDS">. Note
+that the options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode>, which are
+shared by all commands, will be parsed from C<@ARGV> during compile time.
 
   # Always start daemon
   $app->start('daemon', '-l', 'http://*:8080');

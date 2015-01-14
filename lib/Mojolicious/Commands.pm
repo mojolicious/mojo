@@ -54,7 +54,7 @@ sub run {
 
     # Help
     $name = shift @args if my $help = $name eq 'help';
-    $help = $ENV{MOJO_HELP} = $ENV{MOJO_HELP} ? 1 : $help;
+    $help = $ENV{MOJO_HELP} ||= $help;
 
     # Remove options shared by all commands before loading the command
     _args(\@args);
@@ -316,7 +316,9 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
   Mojolicious::Commands->start_app('MyApp');
   Mojolicious::Commands->start_app(MyApp => @ARGV);
 
-Load application from class and start the command line interface for it.
+Load application from class and start the command line interface for it. Note
+that the options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode>, which are
+shared by all commands, will be parsed from C<@ARGV> during compile time.
 
   # Always start daemon for application
   Mojolicious::Commands->start_app('MyApp', 'daemon', '-l', 'http://*:8080');

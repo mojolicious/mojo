@@ -88,6 +88,7 @@ sub _args {
   Getopt::Long::Configure($save);
 }
 
+# Do not remove options from @ARGV
 BEGIN { _args([@ARGV]) }
 
 sub _command {

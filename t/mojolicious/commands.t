@@ -104,6 +104,13 @@ $buffer = '';
 }
 like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
   'right output';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $commands->run('generate', 'lite_app', '--help');
+}
+like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
+  'right output';
 
 # cgi
 require Mojolicious::Command::cgi;

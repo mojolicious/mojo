@@ -69,7 +69,6 @@ sub _manage {
   }
 
   $self->_reap;
-  delete $self->{running} if $self->{running} && !kill 0, $self->{running};
   $self->_spawn if !$self->{running} && delete $self->{modified};
   sleep 1;
 }

@@ -81,6 +81,24 @@ ok $commands->description, 'has a description';
 like $commands->message,   qr/COMMAND/, 'has a message';
 like $commands->hint,      qr/help/, 'has a hint';
 
+# help
+my $buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $commands->run('help', 'generate', 'lite_app');
+}
+like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
+  'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $commands->run('generate', 'lite_app', '-h');
+}
+like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
+  'right output';
+
 # cgi
 require Mojolicious::Command::cgi;
 my $cgi = Mojolicious::Command::cgi->new;
@@ -104,6 +122,13 @@ require Mojolicious::Command::eval;
 my $eval = Mojolicious::Command::eval->new;
 ok $eval->description, 'has a description';
 like $eval->usage, qr/eval/, 'has usage information';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $eval->run('-v', 'app->controller_class');
+}
+like $buffer, qr/Mojolicious::Controller/, 'right output';
 
 # generate
 require Mojolicious::Command::generate;
@@ -141,6 +166,13 @@ require Mojolicious::Command::get;
 my $get = Mojolicious::Command::get->new;
 ok $get->description, 'has a description';
 like $get->usage, qr/get/, 'has usage information';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $get->run('/');
+}
+like $buffer, qr/Your Mojo is working!/, 'right output';
 
 # inflate
 require Mojolicious::Command::inflate;
@@ -165,6 +197,13 @@ require Mojolicious::Command::routes;
 my $routes = Mojolicious::Command::routes->new;
 ok $routes->description, 'has a description';
 like $routes->usage, qr/routes/, 'has usage information';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $routes->run('-v');
+}
+like $buffer, qr!/\*whatever.*\Q/(.+)?\E!, 'right output';
 
 # test
 require Mojolicious::Command::test;

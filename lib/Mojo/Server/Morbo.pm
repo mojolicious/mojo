@@ -35,7 +35,7 @@ sub run {
   local $SIG{CHLD} = sub { $self->_reap };
   local $SIG{INT} = local $SIG{TERM} = local $SIG{QUIT} = sub {
     $self->{finished} = 1;
-    kill 'TERM', $self->{running} if $self->{running};
+    kill 'TERM', $self->{worker} if $self->{worker};
   };
   unshift @{$self->watch}, $app;
   $self->{modified} = 1;
@@ -43,7 +43,7 @@ sub run {
   # Prepare and cache listen sockets for smooth restarting
   my $daemon = Mojo::Server::Daemon->new(silent => 1)->start->stop;
 
-  $self->_manage while !$self->{finished} || $self->{running};
+  $self->_manage while !$self->{finished} || $self->{worker};
   exit 0;
 }
 
@@ -64,16 +64,16 @@ sub _manage {
 
   if (defined(my $file = $self->check)) {
     say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
-    kill 'TERM', $self->{running} if $self->{running};
+    kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;
   }
 
   $self->_reap;
-  $self->_spawn if !$self->{running} && delete $self->{modified};
+  $self->_spawn if !$self->{worker} && delete $self->{modified};
   sleep 1;
 }
 
-sub _reap { delete $_[0]{running} while (waitpid -1, WNOHANG) > 0 }
+sub _reap { delete $_[0]{worker} while (waitpid -1, WNOHANG) > 0 }
 
 sub _spawn {
   my $self = shift;
@@ -81,10 +81,10 @@ sub _spawn {
   # Fork
   my $manager = $$;
   $ENV{MORBO_REV}++;
-  die "Can't fork: $!" unless defined(my $pid = fork);
+  die "Can't fork: $!" unless defined(my $pid = $self->{worker} = fork);
 
   # Manager
-  return $self->{running} = $pid if $pid;
+  return if $pid;
 
   # Worker
   $SIG{CHLD} = 'DEFAULT';

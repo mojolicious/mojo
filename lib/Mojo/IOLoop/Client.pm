@@ -92,7 +92,7 @@ sub _connect {
     ->watch($handle, 0, 1);
 }
 
-sub _port { $_[0]->{socks_port} || $_[0]->{port} || ($_[0]->{tls} ? 443 : 80) }
+sub _port { $_[0]{socks_port} || $_[0]{port} || ($_[0]{tls} ? 443 : 80) }
 
 sub _ready {
   my ($self, $args) = @_;

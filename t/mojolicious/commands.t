@@ -37,6 +37,12 @@ my $commands = Mojolicious::Commands->new;
   local @ENV{qw(PLACK_ENV PATH_INFO GATEWAY_INTERFACE)};
   is $commands->detect, undef, 'no environment';
 }
+{
+  local $ENV{PLACK_ENV} = 'production';
+  is ref Mojolicious::Commands->new->run, 'CODE', 'right reference';
+  local $ENV{MOJO_NO_DETECT} = 1;
+  isnt ref Mojolicious::Commands->new->run, 'CODE', 'not a CODE reference';
+}
 
 # Run command
 is ref Mojolicious::Commands->new->run('psgi'), 'CODE', 'right reference';

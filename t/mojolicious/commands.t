@@ -186,6 +186,29 @@ $buffer = '';
   $get->run('/');
 }
 like $buffer, qr/Your Mojo is working!/, 'right output';
+$get->app->hook(
+  before_dispatch => sub {
+    my $c = shift;
+    return $c->render(text => '<p>works</p>')
+      if $c->req->url->path->contains('/html');
+    $c->render(json => {works => 'too'})
+      if $c->req->url->path->contains('/json');
+  }
+);
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $get->run('/html', 'p', 'text');
+}
+like $buffer, qr/works/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $get->run('/json', '/works');
+}
+like $buffer, qr/too/, 'right output';
 
 # inflate
 require Mojolicious::Command::inflate;

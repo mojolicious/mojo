@@ -68,6 +68,9 @@ sub _manage {
     $self->{modified} = 1;
   }
 
+  # Windows workaround
+  delete $self->{worker} if $self->{worker} && !kill 0, $self->{worker};
+
   $self->_reap;
   $self->_spawn if !$self->{worker} && delete $self->{modified};
   sleep 1;

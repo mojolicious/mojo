@@ -5,7 +5,7 @@ use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
 use Config;
 use Mojo::JSON qw(encode_json j);
 use Mojo::Transaction::HTTP;
-use Mojo::Util qw(b64_encode decode encode sha1_bytes xor_encode);
+use Mojo::Util qw(b64_encode decode dumper encode sha1_bytes xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
@@ -45,19 +45,19 @@ sub build_frame {
   my $len    = length $payload;
   my $masked = $self->masked;
   if ($len < 126) {
-    warn "-- Small payload ($len)\n$payload\n" if DEBUG;
+    warn "-- Small payload ($len)\n@{[dumper $payload]}" if DEBUG;
     $frame .= pack 'C', $masked ? ($len | 128) : $len;
   }
 
   # Extended payload (16-bit)
   elsif ($len < 65536) {
-    warn "-- Extended 16-bit payload ($len)\n$payload\n" if DEBUG;
+    warn "-- Extended 16-bit payload ($len)\n@{[dumper $payload]}" if DEBUG;
     $frame .= pack 'Cn', $masked ? (126 | 128) : 126, $len;
   }
 
   # Extended payload (64-bit with 32-bit fallback)
   else {
-    warn "-- Extended 64-bit payload ($len)\n$payload\n" if DEBUG;
+    warn "-- Extended 64-bit payload ($len)\n@{[dumper $payload]}" if DEBUG;
     $frame .= pack 'C', $masked ? (127 | 128) : 127;
     $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xffffffff);
   }
@@ -202,7 +202,7 @@ sub parse_frame {
   # Payload
   my $payload = $len ? substr($$buffer, 0, $len, '') : '';
   $payload = xor_encode($payload, substr($payload, 0, 4, '') x 128) if $masked;
-  warn "$payload\n" if DEBUG;
+  warn dumper $payload if DEBUG;
 
   return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];
 }

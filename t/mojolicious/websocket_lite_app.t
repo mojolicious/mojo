@@ -10,7 +10,7 @@ use Test::Mojo;
 
 websocket '/echo' => sub {
   my $c = shift;
-  $c->tx->max_websocket_size(262145)->with_compression;
+  $c->tx->max_websocket_size(65538)->with_compression;
   $c->on(binary => sub { shift->send({binary => shift}) });
   $c->on(
     text => sub {
@@ -139,21 +139,25 @@ $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
   ->send_ok(0)->message_ok->message_like({text => qr/0/})->finish_ok(1000)
   ->finished_ok(1000);
 
-# 64-bit binary message (extended limit)
+# 64-bit binary message
 $t->request_ok($t->ua->build_websocket_tx('/echo'));
 is $t->tx->max_websocket_size, 262144, 'right size';
-$t->tx->max_websocket_size(262145);
-$t->send_ok({binary => 'a' x 262145})
-  ->message_ok->message_is({binary => 'a' x 262145})
+$t->tx->max_websocket_size(65538);
+$t->send_ok({binary => 'a' x 65538})
+  ->message_ok->message_is({binary => 'a' x 65538})
   ->finish_ok->finished_ok(1005);
 
-# 64-bit binary message (too large)
-$t->websocket_ok('/echo')->send_ok({binary => 'b' x 262145})
-  ->finished_ok(1009);
+# 64-bit binary message (too large for server)
+$t->websocket_ok('/echo')->send_ok({binary => 'b' x 65539})->finished_ok(1009);
 
-# Binary message in two 64-bit frames without FIN bit (too large)
-$t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'c' x 100000])
-  ->send_ok([0, 0, 0, 0, 0, 'c' x 162146])->finished_ok(1009);
+# 64-bit binary message (too large for client)
+$t->websocket_ok('/echo');
+$t->tx->max_websocket_size(65536);
+$t->send_ok({binary => 'c' x 65537})->finished_ok(1009);
+
+# Binary message in two 64-bit frames without FIN bit (too large for server)
+$t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'd' x 30000])
+  ->send_ok([0, 0, 0, 0, 0, 'd' x 35539])->finished_ok(1009);
 
 # Plain alternative
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
@@ -171,7 +175,7 @@ $t->send_ok({binary => 'a' x 500})
 $t->websocket_ok(
   '/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'});
 ok $t->tx->compressed, 'WebSocket has compression';
-$t->send_ok({binary => 'a' x 50000})
+$t->send_ok({binary => 'a' x 10000})
   ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate');
 is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
   'right "Sec-WebSocket-Extensions" value';
@@ -182,8 +186,8 @@ $t->tx->once(
     $payload = $frame->[5];
   }
 );
-$t->message_ok->message_is({binary => 'a' x 50000});
-ok length $payload < 50000, 'message has been compressed';
+$t->message_ok->message_is({binary => 'a' x 10000});
+ok length $payload < 10000, 'message has been compressed';
 $t->finish_ok->finished_ok(1005);
 
 # Compressed message exceeding the limit when decompressed
@@ -193,7 +197,7 @@ $t->websocket_ok(
   ->send_ok({binary => 'a' x 1000000})->finished_ok(1009);
 
 # Huge message that doesn't compress very well
-my $huge = join '', map { int rand(9) } 1 .. 262144;
+my $huge = join '', map { int rand(9) } 1 .. 65538;
 $t->websocket_ok(
   '/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
   ->send_ok({binary => $huge})->message_ok->message_is({binary => $huge})

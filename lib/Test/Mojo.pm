@@ -328,7 +328,7 @@ sub _message {
   if (ref $value eq 'HASH') {
     my $expect = exists $value->{text} ? 'text' : 'binary';
     $value = $value->{$expect};
-    $msg = '' unless $type eq $expect;
+    $msg = '' unless ($type // '') eq $expect;
   }
 
   # Decode text frame if there is no type check

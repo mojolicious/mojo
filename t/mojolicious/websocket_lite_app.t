@@ -155,7 +155,7 @@ $t->websocket_ok('/echo');
 $t->tx->max_websocket_size(65536);
 $t->send_ok({binary => 'c' x 65537})->finished_ok(1009);
 
-# Binary message in two 64-bit frames without FIN bit (too large for server)
+# Binary message in two frames without FIN bit (too large for server)
 $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'd' x 30000])
   ->send_ok([0, 0, 0, 0, 0, 'd' x 35539])->finished_ok(1009);
 

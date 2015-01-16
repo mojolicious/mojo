@@ -23,7 +23,6 @@ sub check {
     elsif (-r $watch) { push @files, $watch }
   }
 
-  # Check files
   $self->_check($_) and return $_ for @files;
   return undef;
 }
@@ -81,12 +80,10 @@ sub _reap { delete $_[0]{worker} while (waitpid -1, WNOHANG) > 0 }
 sub _spawn {
   my $self = shift;
 
-  # Fork
+  # Manager
   my $manager = $$;
   $ENV{MORBO_REV}++;
   die "Can't fork: $!" unless defined(my $pid = $self->{worker} = fork);
-
-  # Manager
   return if $pid;
 
   # Worker

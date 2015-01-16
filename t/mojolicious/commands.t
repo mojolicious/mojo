@@ -100,10 +100,10 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $commands->run('generate', 'lite_app', '-h');
+  $commands->run('generate', 'app', '-h');
 }
-like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
-  'right output';
+like $buffer, qr/Usage: APPLICATION generate app \[NAME\]/, 'right output';
+$buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
@@ -237,9 +237,18 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
+  $routes->run;
+}
+like $buffer,   qr!/\*whatever!, 'right output';
+unlike $buffer, qr!/\(\.\+\)\?!, 'not verbose';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
   $routes->run('-v');
 }
-like $buffer, qr!/\*whatever.*\Q/(.+)?\E!, 'right output';
+like $buffer, qr!/\*whatever!, 'right output';
+like $buffer, qr!/\(\.\+\)\?!, 'verbose';
 
 # test
 require Mojolicious::Command::test;

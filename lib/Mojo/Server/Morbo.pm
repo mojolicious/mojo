@@ -32,7 +32,7 @@ sub run {
   my ($self, $app) = @_;
 
   # Clean manager environment
-  local $SIG{CHLD} = sub { $self->_reap };
+  local $SIG{CHLD} = sub { $self->_reap if $self->{worker} };
   local $SIG{INT} = local $SIG{TERM} = local $SIG{QUIT} = sub {
     $self->{finished} = 1;
     kill 'TERM', $self->{worker} if $self->{worker};

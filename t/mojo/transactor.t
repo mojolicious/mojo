@@ -859,4 +859,14 @@ is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
+# Abstract methods
+eval { Mojo::Transaction->client_read };
+like $@, qr/Method "client_read" not implemented by subclass/, 'right error';
+eval { Mojo::Transaction->client_write };
+like $@, qr/Method "client_write" not implemented by subclass/, 'right error';
+eval { Mojo::Transaction->server_read };
+like $@, qr/Method "server_read" not implemented by subclass/, 'right error';
+eval { Mojo::Transaction->server_write };
+like $@, qr/Method "server_write" not implemented by subclass/, 'right error';
+
 done_testing();

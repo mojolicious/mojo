@@ -448,4 +448,10 @@ is $cookies->[0]->expires->epoch, 942189160, 'right expires epoch value';
 is $cookies->[0]->secure, 1, 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
+# Abstract methods
+eval { Mojo::Cookie->parse };
+like $@, qr/Method "parse" not implemented by subclass/, 'right error';
+eval { Mojo::Cookie->to_string };
+like $@, qr/Method "to_string" not implemented by subclass/, 'right error';
+
 done_testing();

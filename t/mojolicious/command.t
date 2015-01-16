@@ -9,7 +9,7 @@ use File::Temp 'tempdir';
 use Mojolicious::Command;
 
 # Application
-my $command = Mojolicious::Command->new;
+my $command = Mojolicious::Command->new(quiet => 1);
 isa_ok $command->app, 'Mojo',        'right application';
 isa_ok $command->app, 'Mojolicious', 'right application';
 
@@ -32,5 +32,9 @@ $command->write_rel_file('123.xml', "seems\nto\nwork");
 open my $xml, '<', $command->rel_file('123.xml');
 is join('', <$xml>), "seems\nto\nwork", 'right result';
 chdir $cwd;
+
+# Abstract methods
+eval { Mojolicious::Command->run };
+like $@, qr/Method "run" not implemented by subclass/, 'right error';
 
 done_testing();

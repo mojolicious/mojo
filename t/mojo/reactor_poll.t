@@ -269,4 +269,28 @@ like $client_err, qr/^Mojo::IOLoop already running/, 'right error';
 ok $server_running, 'loop is running';
 ok $client_running, 'loop is running';
 
+# Abstract methods
+eval { Mojo::Reactor->again };
+like $@, qr/Method "again" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->io };
+like $@, qr/Method "io" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->is_running };
+like $@, qr/Method "is_running" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->one_tick };
+like $@, qr/Method "one_tick" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->recurring };
+like $@, qr/Method "recurring" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->remove };
+like $@, qr/Method "remove" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->reset };
+like $@, qr/Method "reset" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->start };
+like $@, qr/Method "start" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->stop };
+like $@, qr/Method "stop" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->timer };
+like $@, qr/Method "timer" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->watch };
+like $@, qr/Method "watch" not implemented by subclass/, 'right error';
+
 done_testing();

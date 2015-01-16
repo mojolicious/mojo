@@ -232,4 +232,20 @@ ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';
 
+# Abstract methods
+eval { Mojo::Asset->add_chunk };
+like $@, qr/Method "add_chunk" not implemented by subclass/, 'right error';
+eval { Mojo::Asset->contains };
+like $@, qr/Method "contains" not implemented by subclass/, 'right error';
+eval { Mojo::Asset->get_chunk };
+like $@, qr/Method "get_chunk" not implemented by subclass/, 'right error';
+eval { Mojo::Asset->move_to };
+like $@, qr/Method "move_to" not implemented by subclass/, 'right error';
+eval { Mojo::Asset->mtime };
+like $@, qr/Method "mtime" not implemented by subclass/, 'right error';
+eval { Mojo::Asset->size };
+like $@, qr/Method "size" not implemented by subclass/, 'right error';
+eval { Mojo::Asset->slurp };
+like $@, qr/Method "slurp" not implemented by subclass/, 'right error';
+
 done_testing();

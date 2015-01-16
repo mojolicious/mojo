@@ -271,4 +271,8 @@ ok !!Mojo::IOLoop->acceptor($id), 'acceptor has been added';
 undef $daemon;
 ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
 
+# Abstract methods
+eval { Mojo::Server->run };
+like $@, qr/Method "run" not implemented by subclass/, 'right error';
+
 done_testing();

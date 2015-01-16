@@ -2089,4 +2089,14 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/#09azAZ!$%&\'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~',
   'right URL';
 
+# Abstract methods
+eval { Mojo::Message->cookies };
+like $@, qr/Method "cookies" not implemented by subclass/, 'right error';
+eval { Mojo::Message->extract_start_line };
+like $@, qr/Method "extract_start_line" not implemented by subclass/,
+  'right error';
+eval { Mojo::Message->get_start_line_chunk };
+like $@, qr/Method "get_start_line_chunk" not implemented by subclass/,
+  'right error';
+
 done_testing();

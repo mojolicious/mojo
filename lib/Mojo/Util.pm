@@ -301,7 +301,7 @@ sub tablify {
 
 sub term_escape {
   my $str = shift;
-  $str =~ s/([\x00-\x09\x0b-\x1f\x7f])/sprintf '\\x%02x', ord $1/ge;
+  $str =~ s/([\x00-\x09\x0b-\x1f\x7f\x80-\x9f])/sprintf '\\x%02x', ord $1/ge;
   return $str;
 }
 

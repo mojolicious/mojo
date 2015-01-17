@@ -270,7 +270,7 @@ sub _unescape {
   $value =~ s/\\\n//g;
 
   # Unescape Unicode characters
-  $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/ge;
+  $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack 'U', hex $1/ge;
 
   # Remove backslash
   $value =~ s/\\//g;

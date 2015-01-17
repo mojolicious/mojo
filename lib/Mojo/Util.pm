@@ -76,7 +76,7 @@ sub camelize {
 sub class_to_file {
   my $class = shift;
   $class =~ s/::|'//g;
-  $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/ge;
+  $class =~ s/([A-Z])([A-Z]*)/$1 . lc $2/ge;
   return decamelize($class);
 }
 
@@ -301,7 +301,7 @@ sub tablify {
 
 sub term_escape {
   my $str = shift;
-  $str =~ s/([[:cntrl:]])/$1 eq "\n" ? $1 : sprintf('\\x%02x', ord($1))/ge;
+  $str =~ s/([[:cntrl:]])/$1 eq "\n" ? $1 : sprintf '\\x%02x', ord $1/ge;
   return $str;
 }
 
@@ -329,14 +329,14 @@ sub unquote {
 
 sub url_escape {
   my ($str, $pattern) = @_;
-  if ($pattern) { $str =~ s/([$pattern])/sprintf('%%%02X',ord($1))/ge }
-  else          { $str =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X',ord($1))/ge }
+  if   ($pattern) { $str =~ s/([$pattern])/sprintf '%%%02X', ord $1/ge }
+  else            { $str =~ s/([^A-Za-z0-9\-._~])/sprintf '%%%02X', ord $1/ge }
   return $str;
 }
 
 sub url_unescape {
   my $str = shift;
-  $str =~ s/%([0-9a-fA-F]{2})/chr(hex($1))/ge;
+  $str =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
   return $str;
 }
 

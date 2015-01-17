@@ -563,6 +563,9 @@ request.
   # Remove value
   my $foo = delete $app->defaults->{foo};
 
+  # Assign multiple values at once
+  $app->defaults(foo => 'test', bar => 23);
+
 =head2 dispatch
 
   $app->dispatch(Mojolicious::Controller->new);

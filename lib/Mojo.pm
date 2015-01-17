@@ -124,6 +124,9 @@ Application configuration.
   # Remove value
   my $foo = delete $app->config->{foo};
 
+  # Assign multiple values at once
+  $app->config(foo => 'test', bar => 23);
+
 =head2 handler
 
   $app->handler(Mojo::Transaction::HTTP->new);

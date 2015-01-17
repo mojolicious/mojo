@@ -896,6 +896,9 @@ reserved for internal use.
   # Remove value
   my $foo = delete $c->stash->{foo};
 
+  # Assign multiple values at once
+  $c->stash(foo => 'test', bar => 23);
+
 =head2 url_for
 
   my $url = $c->url_for;

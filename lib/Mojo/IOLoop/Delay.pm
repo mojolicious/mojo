@@ -236,6 +236,9 @@ Data shared between all L</"steps">.
   # Remove value
   my $foo = delete $delay->data->{foo};
 
+  # Assign multiple values at once
+  $delay->data(foo => 'test', bar => 23);
+
 =head2 pass
 
   $delay = $delay->pass;

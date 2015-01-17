@@ -457,5 +457,6 @@ is dumper([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
 # term_escape
 is term_escape("Accept: */*\x0d\x0a"), "Accept: */*\\x0d\x0a", 'right result';
 is term_escape("\t\b\r\n\f"), "\\x09\\x08\\x0d\n\\x0c", 'right result';
+is term_escape("\x00\x09\x0b\x1f\x7f"), '\x00\x09\x0b\x1f\x7f', 'right result';
 
 done_testing();

@@ -16,8 +16,8 @@ use Mojo::Util
   qw(decode dumper encode hmac_sha1_sum html_unescape md5_bytes md5_sum),
   qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time tablify trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode xss_escape);
+  qw(steady_time tablify term_escape trim unindent unquote url_escape),
+  qw(url_unescape xml_escape xor_encode xss_escape);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -453,5 +453,9 @@ is tablify([['a', '', 'b'], ['c', '', 'd']]), "a    b\nc    d\n",
 
 # dumper
 is dumper([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
+
+# term_escape
+is term_escape("Accept: */*\x0d\x0a"), "Accept: */*\\x0d\x0a", 'right result';
+is term_escape("\t\b\r\n\f"), "\\x09\\x08\\x0d\n\\x0c", 'right result';
 
 done_testing();

@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
 use Mojo::IOLoop;
-use Mojo::Util 'monkey_patch';
+use Mojo::Util qw(monkey_patch term_escape);
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Proxy;
 use Mojo::UserAgent::Server;
@@ -279,7 +279,7 @@ sub _read {
   return $self->_remove($id) unless my $tx = $c->{tx};
 
   # Process incoming data
-  warn "-- Client <<< Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
+  warn term_escape "-- Client <<< Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $tx->client_read($chunk);
   if    ($tx->is_finished) { $self->_finish($id) }
   elsif ($tx->is_writing)  { $self->_write($id) }
@@ -329,6 +329,8 @@ sub _start {
   return $id;
 }
 
+sub _url { shift->req->url->to_abs }
+
 sub _write {
   my ($self, $id) = @_;
 
@@ -338,7 +340,7 @@ sub _write {
   return if !$tx->is_writing || $c->{writing}++;
   my $chunk = $tx->client_write;
   delete $c->{writing};
-  warn "-- Client >>> Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
+  warn term_escape "-- Client >>> Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   my $stream = $self->_loop($c->{nb})->stream($id)->write($chunk);
   $self->_finish($id) if $tx->is_finished;
 

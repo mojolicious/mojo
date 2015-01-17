@@ -12,8 +12,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
-  qw(sha1_sum slurp spurt squish trim unindent unquote url_escape),
-  qw(url_unescape xml_escape xor_encode)
+  qw(sha1_sum slurp spurt squish term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);
@@ -285,6 +285,13 @@ L<Mojo::Util/"squish">.
   $stream = $stream->tap(sub {...});
 
 Alias for L<Mojo::Base/"tap">.
+
+=head2 term_escape
+
+  $stream = $stream->term_escape;
+
+Escape POSIX control characters in bytestream with
+L<Mojo::Util/"term_escape">.
 
 =head2 to_string
 

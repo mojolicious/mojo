@@ -1,5 +1,5 @@
 
-5.73  2015-01-17
+5.73  2015-01-18
   - Deprecated Mojolicious::Routes::Route::bridge in favor of
     Mojolicious::Routes::Route::under.
   - Removed deprecated object-oriented Mojo::JSON API.
@@ -7,8 +7,11 @@
   - Removed deprecated support for data arguments from Mojo::JSON::Pointer.
   - Removed deprecated AUTOLOAD and pluck methods from Mojo::Collection.
   - Removed deprecated AUTOLOAD and val methods from Mojo::DOM.
+  - Added term_escape method to Mojo::ByteStream.
+  - Added term_escape function to Mojo::Util.
   - Improved get command to use the user agent of the application.
-  - Improved WebSocket debug messages.
+  - Improved diagnostics information for MOJO_DAEMON_DEBUG,
+    MOJO_USERAGENT_DEBUG and MOJO_WEBSOCKET_DEBUG environment variables.
   - Fixed JSON Pointer escaping bug.
   - Fixed portability bug in monkey_patch tests.
 

@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::Server';
 
 use Mojo::IOLoop;
 use Mojo::URL;
+use Mojo::Util 'term_escape';
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
@@ -182,7 +183,7 @@ sub _read {
   # Make sure we have a transaction and parse chunk
   return unless my $c = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
-  warn "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
+  warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
 
   # Last keep-alive request or corrupted connection
@@ -200,6 +201,8 @@ sub _remove {
   $self->_close($id);
 }
 
+sub _url { shift->req->url->to_abs }
+
 sub _write {
   my ($self, $id) = @_;
 
@@ -209,7 +212,7 @@ sub _write {
   return if !$tx->is_writing || $c->{writing}++;
   my $chunk = $tx->server_write;
   delete $c->{writing};
-  warn "-- Server >>> Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
+  warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   my $stream = $self->ioloop->stream($id)->write($chunk);
 
   # Finish or continue writing

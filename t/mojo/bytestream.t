@@ -152,4 +152,7 @@ $file = catfile $dir, 'test.txt';
 is b("just\nworks!")->spurt($file)->quote, qq{"just\nworks!"}, 'right result';
 is b($file)->slurp, "just\nworks!", 'successful roundtrip';
 
+# term_escape
+is b("\t\b\r\n\f")->term_escape, "\\x09\\x08\\x0d\n\\x0c", 'right result';
+
 done_testing();

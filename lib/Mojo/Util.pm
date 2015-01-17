@@ -56,8 +56,8 @@ our @EXPORT_OK = (
   qw(decode deprecated dumper encode hmac_sha1_sum html_unescape md5_bytes),
   qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time tablify trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode xss_escape)
+  qw(steady_time tablify term_escape trim unindent unquote url_escape),
+  qw(url_unescape xml_escape xor_encode xss_escape)
 );
 
 sub b64_decode { decode_base64 $_[0] }
@@ -297,6 +297,12 @@ sub tablify {
 
   my $format = join '  ', map({"\%-${_}s"} @spec[0 .. $#spec - 1]), '%s';
   return join '', map { sprintf "$format\n", @$_ } @$rows;
+}
+
+sub term_escape {
+  my $str = shift;
+  $str =~ s/([[:cntrl:]])/$1 eq "\n" ? $1 : sprintf('\\x%02x', ord($1))/ge;
+  return $str;
 }
 
 sub trim {
@@ -676,6 +682,12 @@ Row-oriented generator for text tables.
 
   # "foo   bar\nyada  yada\nbaz   yada\n"
   tablify [['foo', 'bar'], ['yada', 'yada'], ['baz', 'yada']];
+
+=head2 term_escape
+
+  my $escaped = term_escape $str;
+
+Escape all POSIX control characters except for C<\n>.
 
 =head2 trim
 

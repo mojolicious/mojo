@@ -431,7 +431,7 @@ Alias for L<Mojolicious::Controller/"session">.
 =head2 stash
 
   %= stash 'foo'
-  % stash foo => 'bar', baz => 'yada';
+  % stash foo => 'bar';
 
 Alias for L<Mojolicious::Controller/"stash">.
 

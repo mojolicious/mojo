@@ -882,8 +882,8 @@ HMAC-SHA1 signature verification will be automatically discarded.
 
   my $hash = $c->stash;
   my $foo  = $c->stash('foo');
-  $c       = $c->stash({foo => 'bar', baz => 'yada'});
-  $c       = $c->stash(foo => 'bar', baz => 'yada');
+  $c       = $c->stash({foo => 'bar'});
+  $c       = $c->stash(foo => 'bar');
 
 Non-persistent data storage and exchange for the current request, application
 wide default values can be set with L<Mojolicious/"defaults">. Some stash

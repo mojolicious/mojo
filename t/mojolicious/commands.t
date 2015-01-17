@@ -10,6 +10,9 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
+use Cwd 'cwd';
+use File::Temp 'tempdir';
+
 # Make sure @ARGV is not changed
 {
   local $ENV{MOJO_MODE};
@@ -155,24 +158,83 @@ require Mojolicious::Command::generate::app;
 $app = Mojolicious::Command::generate::app->new;
 ok $app->description, 'has a description';
 like $app->usage, qr/app/, 'has usage information';
+my $cwd = cwd;
+my $dir = tempdir CLEANUP => 1;
+chdir $dir;
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $app->run;
+}
+like $buffer, qr/my_app/, 'right output';
+ok -e $app->rel_file('my_app/script/my_app'), 'script exists';
+ok -e $app->rel_file('my_app/lib/MyApp.pm'),  'application class exists';
+ok -e $app->rel_file('my_app/lib/MyApp/Controller/Example.pm'),
+  'controller exists';
+ok -e $app->rel_file('my_app/t/basic.t'),         'test exists';
+ok -e $app->rel_file('my_app/public/index.html'), 'static file exists';
+ok -e $app->rel_file('my_app/templates/layouts/default.html.ep'),
+  'layout exists';
+ok -e $app->rel_file('my_app/templates/example/welcome.html.ep'),
+  'template exists';
+chdir $cwd;
 
 # generate lite_app
 require Mojolicious::Command::generate::lite_app;
 $app = Mojolicious::Command::generate::lite_app->new;
 ok $app->description, 'has a description';
 like $app->usage, qr/lite_app/, 'has usage information';
+$dir = tempdir CLEANUP => 1;
+chdir $dir;
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $app->run;
+}
+like $buffer, qr/myapp\.pl/, 'right output';
+ok -e $app->rel_file('myapp.pl'), 'app exists';
+chdir $cwd;
 
 # generate makefile
 require Mojolicious::Command::generate::makefile;
 my $makefile = Mojolicious::Command::generate::makefile->new;
 ok $makefile->description, 'has a description';
 like $makefile->usage, qr/makefile/, 'has usage information';
+$dir = tempdir CLEANUP => 1;
+chdir $dir;
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $makefile->run;
+}
+like $buffer, qr/Makefile\.PL/, 'right output';
+ok -e $app->rel_file('Makefile.PL'), 'Makefile.PL exists';
+chdir $cwd;
 
 # generate plugin
 require Mojolicious::Command::generate::plugin;
 my $plugin = Mojolicious::Command::generate::plugin->new;
 ok $plugin->description, 'has a description';
 like $plugin->usage, qr/plugin/, 'has usage information';
+$dir = tempdir CLEANUP => 1;
+chdir $dir;
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $plugin->run;
+}
+like $buffer, qr/MyPlugin\.pm/, 'right output';
+ok -e $app->rel_file(
+  'Mojolicious-Plugin-MyPlugin/lib/Mojolicious/Plugin/MyPlugin.pm'),
+  'class exists';
+ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/t/basic.t'), 'test exists';
+ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/Makefile.PL'),
+  'Makefile.PL exists';
+chdir $cwd;
 
 # get
 require Mojolicious::Command::get;

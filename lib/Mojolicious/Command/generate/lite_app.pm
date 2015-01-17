@@ -81,7 +81,7 @@ plugin 'PODRenderer';
 
 get '/' => sub {
   my $c = shift;
-  $c->render('index');
+  $c->render(template => 'index');
 };
 
 app->start;

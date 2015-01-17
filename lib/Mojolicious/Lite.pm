@@ -159,7 +159,7 @@ request and response.
 
   use Mojolicious::Lite;
 
-  # Route leading to an action
+  # Route leading to an action that renders some text
   get '/foo' => sub {
     my $c = shift;
     $c->render(text => 'Hello World!');
@@ -189,21 +189,24 @@ L<Mojolicious::Controller/"param">.
 =head2 Stash and templates
 
 The L<Mojolicious::Controller/"stash"> is used to pass data to templates,
-which can be inlined in the C<DATA> section.
+which can be inlined in the C<DATA> section. A few stash values like
+C<template> and C<text> are reserved and will be used by
+L<Mojolicious::Controller/"render"> to decide how a response should be
+generated.
 
   use Mojolicious::Lite;
 
   # Route leading to an action that renders a template
-  get '/bar' => sub {
+  get '/foo' => sub {
     my $c = shift;
     $c->stash(one => 23);
-    $c->render('baz', two => 24);
+    $c->render(template => 'magic', two => 24);
   };
 
   app->start;
   __DATA__
 
-  @@ baz.html.ep
+  @@ magic.html.ep
   The magic numbers are <%= $one %> and <%= $two %>.
 
 For more information about templates see also
@@ -247,7 +250,7 @@ in debugging your application.
   use Mojolicious::Lite;
 
   # Not found (404)
-  get '/missing' => sub { shift->render('does_not_exist') };
+  get '/missing' => sub { shift->render(template => 'does_not_exist') };
 
   # Exception (500)
   get '/dies' => sub { die 'Intentional error' };
@@ -483,7 +486,7 @@ make capturing optional.
   # /hello/Sara
   get '/hello/:name' => {name => 'Sebastian', day => 'Monday'} => sub {
     my $c = shift;
-    $c->render('groovy', format => 'txt');
+    $c->render(template => 'groovy', format => 'txt');
   };
 
   app->start;
@@ -548,7 +551,7 @@ only evaluated if the callback returned a true value.
     return 1 if $name eq 'Bender';
 
     # Not authenticated
-    $c->render('denied');
+    $c->render(template => 'denied');
     return undef;
   };
 
@@ -630,7 +633,7 @@ find the right template and generate the correct C<Content-Type> header.
   # /detection.txt
   get '/detection' => sub {
     my $c = shift;
-    $c->render('detected');
+    $c->render(template => 'detected');
   };
 
   app->start;
@@ -751,7 +754,7 @@ section.
   # Render template "templates/foo/bar.html.ep"
   any '/external' => sub {
     my $c = shift;
-    $c->render('foo/bar');
+    $c->render(template => 'foo/bar');
   };
 
   app->start;

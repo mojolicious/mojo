@@ -89,9 +89,18 @@ is $app->start('test_command'), 'works!', 'right result';
 ok $commands->description, 'has a description';
 like $commands->message,   qr/COMMAND/, 'has a message';
 like $commands->hint,      qr/help/, 'has a hint';
+my $buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  local $ENV{HARNESS_ACTIVE} = 0;
+  $commands->run;
+}
+like $buffer, qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*version/s,
+  'right output';
 
 # help
-my $buffer = '';
+$buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
@@ -151,7 +160,17 @@ require Mojolicious::Command::generate;
 my $generator = Mojolicious::Command::generate->new;
 ok $generator->description, 'has a description';
 like $generator->message,   qr/generate/, 'has a message';
-like $commands->hint,       qr/help/, 'has a hint';
+like $generator->hint,      qr/help/, 'has a hint';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  local $ENV{HARNESS_ACTIVE} = 0;
+  $generator->run;
+}
+like $buffer,
+  qr/Usage: APPLICATION generate GENERATOR \[OPTIONS\].*lite_app.*plugin/s,
+  'right output';
 
 # generate app
 require Mojolicious::Command::generate::app;

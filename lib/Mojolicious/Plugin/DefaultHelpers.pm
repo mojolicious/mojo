@@ -15,14 +15,14 @@ sub register {
     render_exception => sub {
       deprecated 'Mojolicious::Controller::render_exception is DEPRECATED in'
         . ' favor of the reply->exception helper';
-      shift->reply->exception(@_);
+      shift->helpers->reply->exception(@_);
     }
   );
   $app->helper(
     render_not_found => sub {
       deprecated 'Mojolicious::Controller::render_not_found is DEPRECATED in'
         . ' favor of the reply->not_found helper';
-      shift->reply->not_found;
+      shift->helpers->reply->not_found;
     }
   );
 

@@ -552,9 +552,6 @@ C<MOJO_FATAL_DEPRECATIONS> environment variable to make them die instead.
 
 Dump a Perl data structure with L<Data::Dumper>.
 
-  # "[\n  23\n]\n"
-  dumper [23];
-
 =head2 encode
 
   my $bytes = encode 'UTF-8', $chars;
@@ -713,8 +710,8 @@ Row-oriented generator for text tables.
 
 Escape all POSIX control characters except for C<\n>.
 
-  # "foo\\x09bar\n"
-  term_escape "foo\tbar\n";
+  # "foo\\x09bar\\x0d\n"
+  term_escape "foo\tbar\r\n";
 
 =head2 trim
 

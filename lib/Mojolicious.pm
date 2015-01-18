@@ -108,7 +108,7 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  $c->render_not_found
+  $c->helpers->reply->not_found
     unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
 }
 
@@ -154,10 +154,9 @@ sub new {
   # Hide controller attributes/methods
   $r->hide(qw(app continue cookie every_cookie every_param));
   $r->hide(qw(every_signed_cookie finish flash helpers match on param));
-  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
-  $r->hide(qw(render_not_found render_to_string rendered req res respond_to));
-  $r->hide(qw(send session signed_cookie stash tx url_for validation write));
-  $r->hide(qw(write_chunk));
+  $r->hide(qw(redirect_to render render_later render_maybe render_to_string));
+  $r->hide(qw(rendered req res respond_to send session signed_cookie stash));
+  $r->hide(qw(tx url_for validation write write_chunk));
 
   # Check if we have a log directory that is writable
   my $mode = $self->mode;
@@ -195,7 +194,7 @@ sub _exception {
   my ($next, $c) = @_;
   local $SIG{__DIE__}
     = sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
-  $c->render_exception($@) unless eval { $next->(); 1 };
+  $c->helpers->reply->exception($@) unless eval { $next->(); 1 };
 }
 
 1;

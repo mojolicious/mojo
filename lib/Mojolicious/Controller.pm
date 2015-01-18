@@ -196,7 +196,8 @@ sub render {
   return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
 
   # Maybe
-  return $maybe ? undef : !$self->render_not_found unless defined $output;
+  return $maybe ? undef : !$self->helpers->reply->not_found
+    unless defined $output;
 
   # Prepare response
   $plugins->emit_hook(after_render => $self, \$output, $format);
@@ -206,13 +207,9 @@ sub render {
   return !!$self->rendered($self->stash->{status});
 }
 
-sub render_exception { shift->helpers->reply->exception(@_) }
-
 sub render_later { shift->stash('mojo.rendered' => 1) }
 
 sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
-
-sub render_not_found { shift->helpers->reply->not_found }
 
 sub render_to_string { shift->render(@_, 'mojo.to_string' => 1) }
 
@@ -680,13 +677,6 @@ L</"stash">.
   # Render template "test.xml.*"
   $c->render('test', format => 'xml');
 
-=head2 render_exception
-
-  $c = $c->render_exception('Oops!');
-  $c = $c->render_exception(Mojo::Exception->new('Oops!'));
-
-Alias for L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception">.
-
 =head2 render_later
 
   $c = $c->render_later;
@@ -712,12 +702,6 @@ could be generated, takes the same arguments as L</"render">.
 
   # Render template "index_local" only if it exists
   $c->render_maybe('index_local') or $c->render('index');
-
-=head2 render_not_found
-
-  $c = $c->render_not_found;
-
-Alias for L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
 =head2 render_to_string
 

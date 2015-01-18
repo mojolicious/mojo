@@ -2,6 +2,10 @@
 5.73  2015-01-18
   - Deprecated Mojolicious::Routes::Route::bridge in favor of
     Mojolicious::Routes::Route::under.
+  - Deprecated Mojolicious::Controller::render_exception in favor of
+    reply->exception helper.
+  - Deprecated Mojolicious::Controller::render_not_found in favor of
+    reply->not_found helper.
   - Removed deprecated object-oriented Mojo::JSON API.
   - Removed deprecated stringification support from Mojo::Collection.
   - Removed deprecated support for data arguments from Mojo::JSON::Pointer.

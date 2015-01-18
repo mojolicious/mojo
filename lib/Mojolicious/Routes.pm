@@ -21,7 +21,7 @@ sub auto_render {
   my ($self, $c) = @_;
   my $stash = $c->stash;
   return if $stash->{'mojo.rendered'};
-  $c->render_maybe or $stash->{'mojo.routed'} or $c->render_not_found;
+  $c->render_maybe or $stash->{'mojo.routed'} or $c->helpers->reply->not_found;
 }
 
 sub continue {

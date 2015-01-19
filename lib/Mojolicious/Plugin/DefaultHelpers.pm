@@ -11,8 +11,8 @@ sub register {
   my ($self, $app) = @_;
 
   # DEPRECATED in Tiger Face!
-  $app->helper(render_exception => \&_render_exception);
-  $app->helper(render_not_found => \&_render_not_found);
+  $app->helper(render_exception => sub { _render('exception', @_) });
+  $app->helper(render_not_found => sub { _render('not_found', @_) });
 
   # Controller alias helpers
   for my $name (qw(app flash param stash session url_for validation)) {
@@ -150,17 +150,11 @@ sub _is_fresh {
 }
 
 # DEPRECATED in Tiger Face!
-sub _render_exception {
-  deprecated 'Mojolicious::Controller::render_exception is DEPRECATED in'
-    . ' favor of the reply->exception helper';
-  shift->helpers->reply->exception(@_);
-}
-
-# DEPRECATED in Tiger Face!
-sub _render_not_found {
-  deprecated 'Mojolicious::Controller::render_not_found is DEPRECATED in'
-    . ' favor of the reply->not_found helper';
-  shift->helpers->reply->not_found;
+sub _render {
+  my $page = shift;
+  deprecated "Mojolicious::Controller::render_$page is DEPRECATED in favor of"
+    . " the reply->$page helper";
+  shift->helpers->reply->$page(@_);
 }
 
 sub _static {

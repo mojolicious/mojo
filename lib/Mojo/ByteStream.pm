@@ -149,7 +149,7 @@ Decamelize bytestream with L<Mojo::Util/"decamelize">.
   $stream = $stream->decode;
   $stream = $stream->decode('iso-8859-1');
 
-Decode bytestream with L<Mojo::Util/"decode">, defaults to C<UTF-8>.
+Decode bytestream with L<Mojo::Util/"decode">, defaults to using C<UTF-8>.
 
   $stream->decode('UTF-16LE')->unquote->trim->say;
 
@@ -158,7 +158,7 @@ Decode bytestream with L<Mojo::Util/"decode">, defaults to C<UTF-8>.
   $stream = $stream->encode;
   $stream = $stream->encode('iso-8859-1');
 
-Encode bytestream with L<Mojo::Util/"encode">, defaults to C<UTF-8>.
+Encode bytestream with L<Mojo::Util/"encode">, defaults to using C<UTF-8>.
 
   $stream->trim->quote->encode->say;
 
@@ -219,7 +219,7 @@ Quote bytestream with L<Mojo::Util/"quote">.
   $stream = $stream->say;
   $stream = $stream->say(*STDERR);
 
-Print bytestream to handle and append a newline, defaults to C<STDOUT>.
+Print bytestream to handle and append a newline, defaults to using C<STDOUT>.
 
 =head2 secure_compare
 
@@ -293,6 +293,8 @@ Alias for L<Mojo::Base/"tap">.
 Escape POSIX control characters in bytestream with
 L<Mojo::Util/"term_escape">.
 
+  b('foo')->sha1_bytes->term_escape->say;
+
 =head2 to_string
 
   my $str = $stream->to_string;
@@ -349,6 +351,8 @@ bytestream with L<Mojo::Util/"xml_escape">.
   $stream = $stream->xor_encode($key);
 
 XOR encode bytestream with L<Mojo::Util/"xor_encode">.
+
+  b('foo bar')->xor_encode('baz')->url_escape->say;
 
 =head1 OPERATORS
 

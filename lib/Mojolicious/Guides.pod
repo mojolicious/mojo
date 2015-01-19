@@ -29,7 +29,10 @@ L<learn.perl.org|http://learn.perl.org/>.
 
 All web development starts with HTML, CSS and JavaScript, to learn the basics
 we recommend the
-L<Mozilla Developer Network|https://developer.mozilla.org/en-US/docs/Web>.
+L<Mozilla Developer Network|https://developer.mozilla.org/en-US/docs/Web>. And
+if you want to know how browsers and web servers actually communicate, there's
+also a very nice introduction to
+L<HTTP|https://developer.mozilla.org/en-US/docs/Web/HTTP>.
 
 =back
 

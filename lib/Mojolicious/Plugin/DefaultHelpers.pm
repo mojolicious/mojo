@@ -11,7 +11,7 @@ sub register {
   my ($self, $app) = @_;
 
   # DEPRECATED in Tiger Face!
-  $app->helper(render_exception => \&_render_esception);
+  $app->helper(render_exception => \&_render_exception);
   $app->helper(render_not_found => \&_render_not_found);
 
   # Controller alias helpers

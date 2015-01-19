@@ -11,20 +11,8 @@ sub register {
   my ($self, $app) = @_;
 
   # DEPRECATED in Tiger Face!
-  $app->helper(
-    render_exception => sub {
-      deprecated 'Mojolicious::Controller::render_exception is DEPRECATED in'
-        . ' favor of the reply->exception helper';
-      shift->helpers->reply->exception(@_);
-    }
-  );
-  $app->helper(
-    render_not_found => sub {
-      deprecated 'Mojolicious::Controller::render_not_found is DEPRECATED in'
-        . ' favor of the reply->not_found helper';
-      shift->helpers->reply->not_found;
-    }
-  );
+  $app->helper(render_exception => \&_render_esception);
+  $app->helper(render_not_found => \&_render_not_found);
 
   # Controller alias helpers
   for my $name (qw(app flash param stash session url_for validation)) {
@@ -159,6 +147,20 @@ sub _inactivity_timeout {
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
+}
+
+# DEPRECATED in Tiger Face!
+sub _render_exception {
+  deprecated 'Mojolicious::Controller::render_exception is DEPRECATED in'
+    . ' favor of the reply->exception helper';
+  shift->helpers->reply->exception(@_);
+}
+
+# DEPRECATED in Tiger Face!
+sub _render_not_found {
+  deprecated 'Mojolicious::Controller::render_not_found is DEPRECATED in'
+    . ' favor of the reply->not_found helper';
+  shift->helpers->reply->not_found;
 }
 
 sub _static {

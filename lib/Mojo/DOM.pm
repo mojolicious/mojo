@@ -54,8 +54,8 @@ sub children { _select($_[0]->_collect(_nodes($_[0]->tree, 1)), $_[1]) }
 sub content {
   my $self = shift;
 
-  my $node = $self->node;
-  if ($node eq 'root' || $node eq 'tag') {
+  my $type = $self->node;
+  if ($type eq 'root' || $type eq 'tag') {
     return $self->_content(0, 1, @_) if @_;
     my $html = Mojo::DOM::HTML->new(xml => $self->xml);
     return join '', map { $html->tree($_)->render } _nodes($self->tree);
@@ -82,10 +82,10 @@ sub namespace {
 
   # Extract namespace prefix and search parents
   my $ns = $tree->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
-  for my $n ($tree, $self->_ancestors) {
+  for my $node ($tree, $self->_ancestors) {
 
     # Namespace for prefix
-    my $attrs = $n->[2];
+    my $attrs = $node->[2];
     if ($ns) { $_ eq $ns and return $attrs->{$_} for keys %$attrs }
 
     # Namespace attribute
@@ -249,12 +249,11 @@ sub _link {
   my ($children, $parent) = @_;
 
   # Link parent to children
-  my @new;
-  for my $n (@$children[1 .. $#$children]) {
-    push @new, $n;
-    my $offset = $n->[0] eq 'tag' ? 3 : 2;
-    $n->[$offset] = $parent;
-    weaken $n->[$offset];
+  my @new = @$children[1 .. $#$children];
+  for my $node (@new) {
+    my $offset = $node->[0] eq 'tag' ? 3 : 2;
+    $node->[$offset] = $parent;
+    weaken $node->[$offset];
   }
 
   return @new;
@@ -320,27 +319,27 @@ sub _text {
   }
 
   my $text = '';
-  for my $n (@$nodes) {
-    my $type = $n->[0];
-
-    # Nested tag
-    my $content = '';
-    if ($type eq 'tag' && $recurse) {
-      no warnings 'recursion';
-      $content = _text([_nodes($n)], 1, $n->[1] eq 'pre' ? 0 : $trim);
-    }
+  for my $node (@$nodes) {
+    my $type = $node->[0];
 
     # Text
-    elsif ($type eq 'text') { $content = $trim ? squish($n->[1]) : $n->[1] }
+    my $chunk = '';
+    if ($type eq 'text') { $chunk = $trim ? squish($node->[1]) : $node->[1] }
 
     # CDATA or raw text
-    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $n->[1] }
+    elsif ($type eq 'cdata' || $type eq 'raw') { $chunk = $node->[1] }
+
+    # Nested tag
+    elsif ($type eq 'tag' && $recurse) {
+      no warnings 'recursion';
+      $chunk = _text([_nodes($node)], 1, $node->[1] eq 'pre' ? 0 : $trim);
+    }
 
     # Add leading whitespace if punctuation allows it
-    $content = " $content" if $text =~ /\S\z/ && $content =~ /^[^.!?,;:\s]+/;
+    $chunk = " $chunk" if $text =~ /\S\z/ && $chunk =~ /^[^.!?,;:\s]+/;
 
     # Trim whitespace blocks
-    $text .= $content if $content =~ /\S+/ || !$trim;
+    $text .= $chunk if $chunk =~ /\S+/ || !$trim;
   }
 
   return $text;

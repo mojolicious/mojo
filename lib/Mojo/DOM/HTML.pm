@@ -217,43 +217,30 @@ sub _render {
   # Processing instruction
   return '<?' . $tree->[1] . '?>' if $type eq 'pi';
 
+  # Root
+  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
+    if $type eq 'root';
+
   # Start tag
-  my $result = '';
-  if ($type eq 'tag') {
+  my $tag    = $tree->[1];
+  my $result = "<$tag";
 
-    # Open tag
-    my $tag = $tree->[1];
-    $result .= "<$tag";
-
-    # Attributes
-    my @attrs;
-    for my $key (sort keys %{$tree->[2]}) {
-
-      # No value
-      push @attrs, $key and next unless defined(my $value = $tree->[2]{$key});
-
-      # Key and value
-      push @attrs, $key . '="' . xml_escape($value) . '"';
-    }
-    $result .= join ' ', '', @attrs if @attrs;
-
-    # Element without end tag
-    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
-      unless $tree->[4];
-
-    # Close tag
-    $result .= '>';
+  # Attributes
+  for my $key (sort keys %{$tree->[2]}) {
+    $result .= " $key" and next unless defined(my $value = $tree->[2]{$key});
+    $result .= " $key" . '="' . xml_escape($value) . '"';
   }
 
-  # Render whole tree
+  # No children
+  return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
+    unless $tree->[4];
+
+  # Children
   no warnings 'recursion';
-  $result .= _render($tree->[$_], $xml)
-    for ($type eq 'root' ? 1 : 4) .. $#$tree;
+  $result .= '>' . join '', map { _render($_, $xml) } @$tree[4 .. $#$tree];
 
   # End tag
-  $result .= '</' . $tree->[1] . '>' if $type eq 'tag';
-
-  return $result;
+  return "$result</$tag>";
 }
 
 sub _start {

@@ -86,7 +86,7 @@ sub namespace {
 
     # Namespace for prefix
     my $attrs = $n->[2];
-    if ($ns) { /^\Q$ns\E$/ and return $attrs->{$_} for keys %$attrs }
+    if ($ns) { $_ eq $ns and return $attrs->{$_} for keys %$attrs }
 
     # Namespace attribute
     elsif (defined $attrs->{xmlns}) { return $attrs->{xmlns} }

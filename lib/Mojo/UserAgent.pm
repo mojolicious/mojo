@@ -50,12 +50,12 @@ sub start {
 
   # Non-blocking
   if ($cb) {
-    warn "-- Non-blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
+    warn "-- Non-blocking request (@{[_url($tx)]})\n" if DEBUG;
     return $self->_start(1, $tx, $cb);
   }
 
   # Blocking
-  warn "-- Blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
+  warn "-- Blocking request (@{[_url($tx)]})\n" if DEBUG;
   $self->_start(0, $tx => sub { shift->ioloop->stop; $tx = shift });
   $self->ioloop->start;
 
@@ -187,7 +187,7 @@ sub _connection {
   my ($proto, $host, $port) = $self->transactor->endpoint($tx);
   $id ||= $self->_dequeue($nb, "$proto:$host:$port", 1);
   if ($id && !ref $id) {
-    warn "-- Reusing connection ($proto:$host:$port)\n" if DEBUG;
+    warn "-- Reusing connection ($proto://$host:$port)\n" if DEBUG;
     $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
     $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
@@ -198,7 +198,7 @@ sub _connection {
   if (my $id = $self->_connect_proxy($nb, $tx, $cb)) { return $id }
 
   # Connect
-  warn "-- Connect ($proto:$host:$port)\n" if DEBUG;
+  warn "-- Connect ($proto://$host:$port)\n" if DEBUG;
   $id = $self->_connect($nb, 1, $tx, $id, \&_connected);
   $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
 

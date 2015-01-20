@@ -11,6 +11,7 @@
   - Removed deprecated support for data arguments from Mojo::JSON::Pointer.
   - Removed deprecated AUTOLOAD and pluck methods from Mojo::Collection.
   - Removed deprecated AUTOLOAD and val methods from Mojo::DOM.
+  - Moved tutorial from Mojolicious::Lite to Mojolicious::Guides::Tutorial.
   - Added term_escape method to Mojo::ByteStream.
   - Added term_escape function to Mojo::Util.
   - Improved get command to use the user agent of the application.

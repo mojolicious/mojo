@@ -75,7 +75,7 @@ L<Mojo::IOLoop/"next_tick">.
 
 =head2 Morbo
 
-After reading the L<Mojolicious::Lite> tutorial, you should already be
+After reading the L<Mojolicious::Guides::Tutorial>, you should already be
 familiar with L<Mojo::Server::Morbo>.
 
   Mojo::Server::Morbo

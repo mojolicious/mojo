@@ -40,7 +40,7 @@ L<HTTP|https://developer.mozilla.org/en-US/docs/Web/HTTP>.
 
 =over 2
 
-=item L<Mojolicious::Lite>
+=item L<Mojolicious::Guides::Tutorial>
 
 A fast and fun way to get started developing web applications with Mojolicious
 is the L<Mojolicious::Lite> tutorial. This micro web framework is only a thin

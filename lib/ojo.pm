@@ -93,7 +93,7 @@ L<ojo> implements the following functions, which are automatically exported.
 
 Create a route with L<Mojolicious::Lite/"any"> and return the current
 L<Mojolicious::Lite> object. The current controller object is also available
-to actions as C<$_>. See also the L<Mojolicious::Lite> tutorial for more
+to actions as C<$_>. See also L<Mojolicious::Guides::Tutorial> for more
 argument variations.
 
   $ perl -Mojo -E 'a("/hello" => {text => "Hello Mojo!"})->start' daemon

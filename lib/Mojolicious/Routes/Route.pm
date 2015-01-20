@@ -302,7 +302,7 @@ current parent if necessary.
   my $route = $r->any([qw(GET POST)] => '/:foo' => [foo => qr/\w+/]);
 
 Generate L<Mojolicious::Routes::Route> object matching any of the listed HTTP
-request methods or all. See also the L<Mojolicious::Lite> tutorial for many
+request methods or all. See also L<Mojolicious::Guides::Tutorial> for many
 more argument variations.
 
   $r->any('/user')->to('user#whatever');
@@ -315,7 +315,7 @@ more argument variations.
   my $route = $r->delete('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<DELETE>
-requests. See also the L<Mojolicious::Lite> tutorial for many more argument
+requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
 variations.
 
   $r->delete('/user')->to('user#remove');
@@ -347,7 +347,7 @@ generated ones.
   my $route = $r->get('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<GET> requests.
-See also the L<Mojolicious::Lite> tutorial for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
 
   $r->get('/user')->to('user#show');
 
@@ -405,7 +405,7 @@ if necessary.
   my $route = $r->options('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<OPTIONS>
-requests. See also the L<Mojolicious::Lite> tutorial for many more argument
+requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
 variations.
 
   $r->options('/user')->to('user#overview');
@@ -438,7 +438,7 @@ Parse pattern.
   my $route = $r->patch('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<PATCH> requests.
-See also the L<Mojolicious::Lite> tutorial for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
 
   $r->patch('/user')->to('user#update');
 
@@ -450,7 +450,7 @@ See also the L<Mojolicious::Lite> tutorial for many more argument variations.
   my $route = $r->post('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<POST> requests.
-See also the L<Mojolicious::Lite> tutorial for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
 
   $r->post('/user')->to('user#create');
 
@@ -462,7 +462,7 @@ See also the L<Mojolicious::Lite> tutorial for many more argument variations.
   my $route = $r->put('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<PUT> requests.
-See also the L<Mojolicious::Lite> tutorial for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
 
   $r->put('/user')->to('user#replace');
 
@@ -532,7 +532,7 @@ Stringify the whole route.
   my $route = $r->under([format => 0]);
 
 Generate L<Mojolicious::Routes::Route> object for a nested route with its own
-intermediate destination. See also the L<Mojolicious::Lite> tutorial for many
+intermediate destination. See also L<Mojolicious::Guides::Tutorial> for many
 more argument variations.
 
   my $auth = $r->under('/user')->to('user#auth');
@@ -559,7 +559,7 @@ restrictions.
   my $route = $r->websocket('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only WebSocket
-handshakes. See also the L<Mojolicious::Lite> tutorial for many more argument
+handshakes. See also L<Mojolicious::Guides::Tutorial> for many more argument
 variations.
 
   $r->websocket('/echo')->to('example#echo');

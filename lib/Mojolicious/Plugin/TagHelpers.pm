@@ -5,12 +5,6 @@ use Mojo::ByteStream;
 use Mojo::DOM::HTML;
 use Scalar::Util 'blessed';
 
-# HTML elements without end tags
-my %EMPTY = map { $_ => 1 } (
-  qw(area base br col embed hr img input keygen link menuitem meta param),
-  qw(source track wbr)
-);
-
 sub register {
   my ($self, $app) = @_;
 

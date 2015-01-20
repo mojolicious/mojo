@@ -142,7 +142,7 @@
         <div id="nothing" class="box spaced"></div>
         % my $cv = begin
           % my ($key, $value, $i) = @_;
-          %= tag 'tr', $i ? (class => 'important') : undef, begin
+          %= tag 'tr', $i ? (class => 'important') : (), begin
             <td class="key"><%= $key %></td>
             <td class="value wide">
               <pre class="prettyprint"><%= $value %></pre>

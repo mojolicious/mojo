@@ -12,8 +12,6 @@ patch 'more_tags';
 
 get 'small_tags';
 
-get 'circle';
-
 get 'tags_with_error';
 
 any [qw(GET POST)] => 'links';
@@ -53,8 +51,8 @@ is app->select_field(country => $values),
 
 # Basic tags
 $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
-<foo />
-<foo bar="baz" />
+<foo></foo>
+<foo bar="baz"></foo>
 <foo one="t&lt;wo" three="four">Hello</foo>
 <div data-my-test-id="1" data-name="test">some content</div>
 <div data="bar">some content</div>
@@ -69,19 +67,11 @@ EOF
 # Shortcut
 $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
 <div id="&amp;lt;">test &amp; 123</div>
-<div id="&lt;">test&nbsp;321</div>
 <div>
   <p id="0">just</p>
   <p>0</p>
 </div>
 <div>works</div>
-EOF
-
-# XML
-$t->get_ok('/circle.svg')->status_is(200)->content_is(<<EOF);
-<svg>
-<circle cx="75" cy="55" fill="red" r="35" stroke="black" stroke-width="2" />
-</svg>
 EOF
 
 # Tags with error
@@ -132,7 +122,7 @@ EOF
 
 # Stylesheets
 $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
-<link href="/foo.css" rel="stylesheet" />
+<link href="/foo.css" rel="stylesheet">
 <style>/*<![CDATA[*/
 
   body {color: #000}
@@ -149,33 +139,33 @@ EOF
 $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 <form action="/links">
   <label for="foo">&lt;Foo&gt;</label>
-  <input name="foo" type="text" value="bar" />
+  <input name="foo" type="text" value="bar">
   <label for="bar">
     Bar<br>
   </label>
-  <input class="test" name="bar" type="text" value="baz" />
-  <input name="yada" type="text" value="" />
-  <input class="tset" name="baz" value="yada" />
-  <input type="submit" value="Ok" />
+  <input class="test" name="bar" type="text" value="baz">
+  <input name="yada" type="text" value="">
+  <input class="tset" name="baz" value="yada">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
 # Text input fields
 $t->post_ok('/text')->status_is(200)->content_is(<<'EOF');
 <form action="/text" method="POST">
-  <input class="foo" name="color" type="color" value="#ffffff" />
-  <input class="foo" name="date" type="date" value="2012-12-12" />
-  <input class="foo" name="dt" type="datetime" value="2012-12-12T23:59:59Z" />
-  <input class="foo" name="email" type="email" value="nospam@example.com" />
-  <input class="foo" name="month" type="month" value="2012-12" />
-  <input class="foo" name="number" type="number" value="23" />
-  <input class="foo" name="range" type="range" value="24" />
-  <input class="foo" name="search" type="search" value="perl" />
-  <input class="foo" name="tel" type="tel" value="123456789" />
-  <input class="foo" name="time" type="time" value="23:59:59" />
-  <input class="foo" name="url" type="url" value="http://mojolicio.us" />
-  <input class="foo" name="week" type="week" value="2012-W16" />
-  <input type="submit" value="Ok" />
+  <input class="foo" name="color" type="color" value="#ffffff">
+  <input class="foo" name="date" type="date" value="2012-12-12">
+  <input class="foo" name="dt" type="datetime" value="2012-12-12T23:59:59Z">
+  <input class="foo" name="email" type="email" value="nospam@example.com">
+  <input class="foo" name="month" type="month" value="2012-12">
+  <input class="foo" name="number" type="number" value="23">
+  <input class="foo" name="range" type="range" value="24">
+  <input class="foo" name="search" type="search" value="perl">
+  <input class="foo" name="tel" type="tel" value="123456789">
+  <input class="foo" name="time" type="time" value="23:59:59">
+  <input class="foo" name="url" type="url" value="http://mojolicio.us">
+  <input class="foo" name="week" type="week" value="2012-W16">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
@@ -197,64 +187,64 @@ $t->post_ok(
   }
 )->status_is(200)->content_is(<<'EOF');
 <form action="/text" method="POST">
-  <input class="foo" name="color" type="color" value="#000000" />
-  <input class="foo" name="date" type="date" value="2012-12-13" />
-  <input class="foo" name="dt" type="datetime" value="2012-12-13T23:59:59Z" />
-  <input class="foo" name="email" type="email" value="spam@example.com" />
-  <input class="foo" name="month" type="month" value="2012-11" />
-  <input class="foo" name="number" type="number" value="25" />
-  <input class="foo" name="range" type="range" value="26" />
-  <input class="foo" name="search" type="search" value="c" />
-  <input class="foo" name="tel" type="tel" value="987654321" />
-  <input class="foo" name="time" type="time" value="23:59:58" />
-  <input class="foo" name="url" type="url" value="http://example.com" />
-  <input class="foo" name="week" type="week" value="2012-W17" />
-  <input type="submit" value="Ok" />
+  <input class="foo" name="color" type="color" value="#000000">
+  <input class="foo" name="date" type="date" value="2012-12-13">
+  <input class="foo" name="dt" type="datetime" value="2012-12-13T23:59:59Z">
+  <input class="foo" name="email" type="email" value="spam@example.com">
+  <input class="foo" name="month" type="month" value="2012-11">
+  <input class="foo" name="number" type="number" value="25">
+  <input class="foo" name="range" type="range" value="26">
+  <input class="foo" name="search" type="search" value="c">
+  <input class="foo" name="tel" type="tel" value="987654321">
+  <input class="foo" name="time" type="time" value="23:59:58">
+  <input class="foo" name="url" type="url" value="http://example.com">
+  <input class="foo" name="week" type="week" value="2012-W17">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
 # Checkboxes
 $t->get_ok('/multibox')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
-  <input name="foo" type="checkbox" value="one" />
-  <input name="foo" type="checkbox" value="two" />
-  <input type="submit" value="Ok" />
+  <input name="foo" type="checkbox" value="one">
+  <input name="foo" type="checkbox" value="two">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
 # Checkboxes with one value
 $t->get_ok('/multibox?foo=two')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
-  <input name="foo" type="checkbox" value="one" />
-  <input checked="checked" name="foo" type="checkbox" value="two" />
-  <input type="submit" value="Ok" />
+  <input name="foo" type="checkbox" value="one">
+  <input checked name="foo" type="checkbox" value="two">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
 # Checkboxes with one right and one wrong value
 $t->get_ok('/multibox?foo=one&foo=three')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
-  <input checked="checked" name="foo" type="checkbox" value="one" />
-  <input name="foo" type="checkbox" value="two" />
-  <input type="submit" value="Ok" />
+  <input checked name="foo" type="checkbox" value="one">
+  <input name="foo" type="checkbox" value="two">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
 # Checkboxes with wrong value
 $t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
-  <input name="foo" type="checkbox" value="one" />
-  <input name="foo" type="checkbox" value="two" />
-  <input type="submit" value="Ok" />
+  <input name="foo" type="checkbox" value="one">
+  <input name="foo" type="checkbox" value="two">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
 # Checkboxes with two values
 $t->get_ok('/multibox?foo=two&foo=one')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
-  <input checked="checked" name="foo" type="checkbox" value="one" />
-  <input checked="checked" name="foo" type="checkbox" value="two" />
-  <input type="submit" value="Ok" />
+  <input checked name="foo" type="checkbox" value="one">
+  <input checked name="foo" type="checkbox" value="two">
+  <input type="submit" value="Ok">
 </form>
 EOF
 
@@ -262,63 +252,63 @@ EOF
 $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   ->content_is(<<EOF);
 <form action="/links" method="post">
-  <input name="foo" />
+  <input name="foo">
 </form>
 <form action="/form/24" method="post">
-  <input name="foo" type="text" />
-  <input data-id="1" data-name="test" name="foo" type="text" value="1" />
-  <input data="ok" name="foo" type="text" value="1" />
-  <input name="foo" type="checkbox" value="1" />
-  <input checked="checked" name="a" type="checkbox" value="2" />
-  <input name="b" type="radio" value="1" />
-  <input checked="checked" name="b" type="radio" value="0" />
-  <input name="c" type="hidden" value="foo" />
-  <input name="d" type="file" />
+  <input name="foo" type="text">
+  <input data-id="1" data-name="test" name="foo" type="text" value="1">
+  <input data="ok" name="foo" type="text" value="1">
+  <input name="foo" type="checkbox" value="1">
+  <input checked name="a" type="checkbox" value="2">
+  <input name="b" type="radio" value="1">
+  <input checked name="b" type="radio" value="0">
+  <input name="c" type="hidden" value="foo">
+  <input name="d" type="file">
   <textarea cols="40" name="e" rows="50">
     default!
   </textarea>
   <textarea name="f"></textarea>
-  <input name="g" type="password" />
-  <input id="foo" name="h" type="password" />
-  <input type="submit" value="Ok!" />
-  <input id="bar" type="submit" value="Ok too!" />
+  <input name="g" type="password">
+  <input id="foo" name="h" type="password">
+  <input type="submit" value="Ok!">
+  <input id="bar" type="submit" value="Ok too!">
 </form>
 <form action="/">
-  <input name="foo" />
+  <input name="foo">
 </form>
-<input name="escaped" value="1&quot; &quot;2" />
-<input name="a" value="2" />
-<input name="a" value="2" />
+<input name="escaped" value="1&quot; &quot;2">
+<input name="a" value="2">
+<input name="a" value="2">
 EOF
 
 # Advanced form with different values
 $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
 <form action="/links" method="post">
-  <input name="foo" />
+  <input name="foo">
 </form>
 <form action="/form/24" method="post">
-  <input name="foo" type="text" />
-  <input data-id="1" data-name="test" name="foo" type="text" value="1" />
-  <input data="ok" name="foo" type="text" value="1" />
-  <input name="foo" type="checkbox" value="1" />
-  <input name="a" type="checkbox" value="2" />
-  <input name="b" type="radio" value="1" />
-  <input name="b" type="radio" value="0" />
-  <input name="c" type="hidden" value="foo" />
-  <input name="d" type="file" />
+  <input name="foo" type="text">
+  <input data-id="1" data-name="test" name="foo" type="text" value="1">
+  <input data="ok" name="foo" type="text" value="1">
+  <input name="foo" type="checkbox" value="1">
+  <input name="a" type="checkbox" value="2">
+  <input name="b" type="radio" value="1">
+  <input name="b" type="radio" value="0">
+  <input name="c" type="hidden" value="foo">
+  <input name="d" type="file">
   <textarea cols="40" name="e" rows="50">4</textarea>
   <textarea name="f">&lt;5</textarea>
-  <input name="g" type="password" />
-  <input id="foo" name="h" type="password" />
-  <input type="submit" value="Ok!" />
-  <input id="bar" type="submit" value="Ok too!" />
+  <input name="g" type="password">
+  <input id="foo" name="h" type="password">
+  <input type="submit" value="Ok!">
+  <input id="bar" type="submit" value="Ok too!">
 </form>
 <form action="/">
-  <input name="foo" />
+  <input name="foo">
 </form>
-<input name="escaped" />
-<input name="a" />
-<input name="a" value="c" />
+<input name="escaped">
+<input name="a">
+<input name="a" value="c">
 EOF
 
 # Empty selection
@@ -347,7 +337,7 @@ $t->put_ok('/selection')->status_is(200)
     . '<option value="b">b</option>'
     . '</optgroup>'
     . "</select>\n  "
-    . '<input type="submit" value="Ok" />'
+    . '<input type="submit" value="Ok">'
     . "\n</form>\n");
 
 # Selection with values
@@ -357,26 +347,26 @@ $t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b')->status_is(200)
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
     . '<option value="&lt;d">&lt;d</option>'
-    . '<option selected="selected" value="e">E</option>'
+    . '<option selected value="e">E</option>'
     . '<option value="f">f</option>'
     . '</optgroup>'
     . '<option value="g">g</option>'
     . "</select>\n  "
     . '<select multiple="multiple" name="foo">'
-    . '<option selected="selected" value="bar">bar</option>'
+    . '<option selected value="bar">bar</option>'
     . '<option value="baz">baz</option>'
     . "</select>\n  "
     . '<select name="bar">'
     . '<option disabled="disabled" value="d">D</option>'
-    . '<option selected="selected" value="baz">baz</option>'
+    . '<option selected value="baz">baz</option>'
     . "</select>\n  "
     . '<select name="yada">'
     . '<optgroup class="x" label="test">'
     . '<option value="a">a</option>'
-    . '<option selected="selected" value="b">b</option>'
+    . '<option selected value="b">b</option>'
     . '</optgroup>'
     . "</select>\n  "
-    . '<input type="submit" value="Ok" />'
+    . '<input type="submit" value="Ok">'
     . "\n</form>\n");
 
 # Selection with multiple values
@@ -387,39 +377,39 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b')
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
     . '<option value="&lt;d">&lt;d</option>'
-    . '<option selected="selected" value="e">E</option>'
+    . '<option selected value="e">E</option>'
     . '<option value="f">f</option>'
     . '</optgroup>'
     . '<option value="g">g</option>'
     . "</select>\n  "
     . '<select multiple="multiple" name="foo">'
-    . '<option selected="selected" value="bar">bar</option>'
-    . '<option selected="selected" value="baz">baz</option>'
+    . '<option selected value="bar">bar</option>'
+    . '<option selected value="baz">baz</option>'
     . "</select>\n  "
     . '<select name="bar">'
-    . '<option disabled="disabled" selected="selected" value="d">D</option>'
+    . '<option disabled="disabled" selected value="d">D</option>'
     . '<option value="baz">baz</option>'
     . "</select>\n  "
     . '<select name="yada">'
     . '<optgroup class="x" label="test">'
-    . '<option selected="selected" value="a">a</option>'
-    . '<option selected="selected" value="b">b</option>'
+    . '<option selected value="a">a</option>'
+    . '<option selected value="b">b</option>'
     . '</optgroup>'
     . "</select>\n  "
-    . '<input type="submit" value="Ok" />'
+    . '<input type="submit" value="Ok">'
     . "\n</form>\n");
 
 # Selection with multiple values preselected
 $t->put_ok('/selection?preselect=1')->status_is(200)
   ->content_is("<form action=\"/selection\">\n  "
     . '<select name="a">'
-    . '<option selected="selected" value="b">b</option>'
+    . '<option selected value="b">b</option>'
     . '<optgroup label="c">'
     . '<option value="&lt;d">&lt;d</option>'
     . '<option value="e">E</option>'
     . '<option value="f">f</option>'
     . '</optgroup>'
-    . '<option selected="selected" value="g">g</option>'
+    . '<option selected value="g">g</option>'
     . "</select>\n  "
     . '<select multiple="multiple" name="foo">'
     . '<option value="bar">bar</option>'
@@ -435,14 +425,14 @@ $t->put_ok('/selection?preselect=1')->status_is(200)
     . '<option value="b">b</option>'
     . '</optgroup>'
     . "</select>\n  "
-    . '<input type="submit" value="Ok" />'
+    . '<input type="submit" value="Ok">'
     . "\n</form>\n");
 
 # Snowman form
 $t->post_ok('/☃')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo">b&lt;a&gt;r</textarea>
-  <input type="submit" value="☃" />
+  <input type="submit" value="☃">
 </form>
 EOF
 
@@ -450,7 +440,7 @@ EOF
 $t->post_ok('/☃?foo=ba<z')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo">ba&lt;z</textarea>
-  <input type="submit" value="☃" />
+  <input type="submit" value="☃">
 </form>
 EOF
 
@@ -458,7 +448,7 @@ EOF
 $t->patch_ok('/☃?foo=')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo"></textarea>
-  <input type="submit" value="☃" />
+  <input type="submit" value="☃">
 </form>
 EOF
 
@@ -466,7 +456,7 @@ EOF
 $t->post_ok('/no_snowman')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="bar"></textarea>
-  <input type="submit" value="whatever" />
+  <input type="submit" value="whatever">
 </form>
 EOF
 
@@ -474,7 +464,7 @@ EOF
 $t->post_ok('/no_snowman?foo=1')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="PATCH">
   <textarea cols="40" name="bar"></textarea>
-  <input type="submit" value="whatever" />
+  <input type="submit" value="whatever">
 </form>
 EOF
 
@@ -496,7 +486,6 @@ __DATA__
 
 @@ small_tags.html.ep
 %=t div => (id => '&lt;') => 'test & 123'
-%=t div => (id => b('&lt;')) => b('test&nbsp;321')
 %=t div => begin
   %=t p => (id => 0) => 'just'
   %=t p => 0
@@ -508,14 +497,6 @@ __DATA__
 %= tag_with_error 'bar', class => 'test', 0
 %= tag_with_error 'bar', (class => 'test') => begin
   0
-%= end
-
-@@ circle.svg.ep
-%= tag svg => begin
-<%=
-  tag 'circle', cx => 75, cy => 55, r => 35, stroke => 'black',
-    'stroke-width' => 2, fill => 'red'
-%>
 %= end
 
 @@ links.html.ep
@@ -554,7 +535,7 @@ __DATA__
     Bar<br>
   %= end
   %= text_field bar => 'baz', class => 'test'
-  %= text_field yada => undef
+  %= text_field yada => ''
   %= input_tag baz => 'yada', class => 'tset'
   %= submit_button
 %= end

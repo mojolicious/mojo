@@ -22,7 +22,7 @@ works ♥!Insecure!Insecure!
 too!works!!!Mojolicious::Plugin::Config::Sandbox
 <a href="/">Test</a>
 <form action="/%E2%98%83">
-  <input type="submit" value="☃" />
+  <input type="submit" value="☃">
 </form>
 EOF
 

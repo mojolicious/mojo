@@ -17,6 +17,7 @@
   - Improved get command to use the user agent of the application.
   - Improved diagnostics information for MOJO_DAEMON_DEBUG,
     MOJO_USERAGENT_DEBUG and MOJO_WEBSOCKET_DEBUG environment variables.
+  - Fixed tag helpers to generate correct HTML5. (batman, sri)
   - Fixed JSON Pointer escaping bug.
   - Fixed portability bug in monkey_patch tests.
 

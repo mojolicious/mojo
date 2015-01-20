@@ -858,7 +858,7 @@ to make styling with CSS easier.
   <label class="field-with-error" for="user">
     Username (required, only characters e-t)
   </label>
-  <input class="field-with-error" type="text" name="user" value="sri" />
+  <input class="field-with-error" type="text" name="user" value="sri">
 
 For a full list of available checks see also
 L<Mojolicious::Validator/"CHECKS">.

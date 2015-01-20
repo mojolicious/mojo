@@ -1,5 +1,5 @@
 
-5.73  2015-01-20
+5.73  2015-01-21
   - Deprecated Mojolicious::Routes::Route::bridge in favor of
     Mojolicious::Routes::Route::under.
   - Deprecated Mojolicious::Controller::render_exception in favor of

@@ -1080,8 +1080,9 @@ plugins, even if you plan to release them to CPAN.
   $ mkdir templates
   $ echo '%= javascript "/alertassets.js"' > templates/alertassets.html.ep
 
-Just append their respective directories to the list of search paths when
-C<register> is called.
+Just give them reasonably unique names, ideally based on the name of your
+plugin, and append their respective directories to the list of search paths
+when C<register> is called.
 
   package Mojolicious::Plugin::AlertAssets;
   use Mojo::Base 'Mojolicious::Plugin';

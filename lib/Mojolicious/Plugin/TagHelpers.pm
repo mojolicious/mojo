@@ -651,6 +651,7 @@ Alias for L</"tag">.
 
   %= tag 'meta'
   %= tag 'meta', charset => 'UTF-8'
+  %= tag 'input', name => 'foo', type => 'checkbox', disabled => undef
   %= tag 'div'
   %= tag div => 'test & 123'
   %= tag div => (id => 'foo') => 'test & 123'
@@ -664,6 +665,7 @@ HTML tag generator.
 
   <meta>
   <meta charset="UTF-8">
+  <input disabled name="foo" type="checkbox">
   <div></div>
   <div>test &amp; 123</div>
   <div id="foo">test &amp; 123</div>

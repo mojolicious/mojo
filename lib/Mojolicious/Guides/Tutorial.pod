@@ -488,8 +488,7 @@ are only evaluated if the callback returned a true value.
   @@ index.html.ep
   Hi Bender.
 
-Prefixing multiple routes is another good use for
-L<Mojolicious::Lite/"under">.
+Prefixing multiple routes is another good use for it.
 
   use Mojolicious::Lite;
 

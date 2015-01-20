@@ -649,10 +649,9 @@ Alias for L</"tag">.
 
 =head2 tag
 
-  %= tag 'meta'
-  %= tag 'meta', charset => 'UTF-8'
-  %= tag 'input', name => 'foo', type => 'checkbox', disabled => undef
+  %= tag 'br'
   %= tag 'div'
+  %= tag 'div', id => 'invisible', hidden => undef
   %= tag div => 'test & 123'
   %= tag div => (id => 'foo') => 'test & 123'
   %= tag div => (data => {my_id => 1, Name => 'test'}) => 'test & 123'
@@ -663,10 +662,9 @@ Alias for L</"tag">.
 
 HTML tag generator.
 
-  <meta>
-  <meta charset="UTF-8">
-  <input disabled name="foo" type="checkbox">
+  <br>
   <div></div>
+  <div id="invisible" hidden></div>
   <div>test &amp; 123</div>
   <div id="foo">test &amp; 123</div>
   <div data-my-id="1" data-name="test">test &amp; 123</div>

@@ -660,8 +660,9 @@ Alias for L</"tag">.
 
 =head2 tag
 
-  %= tag 'div'
-  %= tag 'div', id => 'foo'
+  %= tag 'meta'
+  %= tag 'meta', charset => 'UTF-8'
+  %= tag div => ''
   %= tag div => 'test & 123'
   %= tag div => (id => 'foo') => 'test & 123'
   %= tag div => (data => {my_id => 1, Name => 'test'}) => 'test & 123'
@@ -672,8 +673,9 @@ Alias for L</"tag">.
 
 HTML/XML tag generator.
 
-  <div />
-  <div id="foo" />
+  <meta />
+  <meta charset="UTF-8" />
+  <div></div>
   <div>test &amp; 123</div>
   <div id="foo">test &amp; 123</div>
   <div data-my-id="1" data-name="test">test &amp; 123</div>
@@ -684,8 +686,8 @@ HTML/XML tag generator.
 
 Very useful for reuse in more specific tag helpers.
 
-  my $output = $c->tag('div');
-  my $output = $c->tag('div', id => 'foo');
+  my $output = $c->tag('meta');
+  my $output = $c->tag('meta', charset => 'UTF-8');
   my $output = $c->tag(div => '<p>This will be escaped</p>');
   my $output = $c->tag(div => sub { '<p>This will not be escaped</p>' });
 

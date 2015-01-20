@@ -62,7 +62,7 @@ sub import {
 
 =head1 NAME
 
-Mojolicious::Lite - Real-time micro web framework
+Mojolicious::Lite - Micro real-time web framework
 
 =head1 SYNOPSIS
 

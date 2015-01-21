@@ -91,22 +91,15 @@ sub _input {
     else { $attrs{value} = $values[0] }
   }
 
-  return _validation($c, $name, 'input', %attrs, name => $name);
+  return _validation($c, $name, 'input', name => $name, %attrs);
 }
 
 sub _javascript {
   my $c = shift;
-
-  # CDATA
-  my $cb = sub {''};
-  if (ref $_[-1] eq 'CODE' && (my $old = pop)) {
-    $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
-  }
-
-  # URL
-  my $src = @_ % 2 ? $c->url_for(shift) : undef;
-
-  return _tag('script', @_, $src ? (src => $src) : (), $cb);
+  my $content
+    = ref $_[-1] eq 'CODE' ? "//<![CDATA[\n" . pop->() . "\n//]]>" : '';
+  my @src = @_ % 2 ? (src => $c->url_for(shift)) : ();
+  return _tag('script', @src, @_, sub {$content});
 }
 
 sub _label_for {
@@ -134,18 +127,14 @@ sub _link_to {
 sub _option {
   my ($values, $pair) = @_;
   $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
-
-  # Attributes
   my %attrs = (value => $pair->[1]);
   $attrs{selected} = undef if exists $values->{$pair->[1]};
-  %attrs = (%attrs, @$pair[2 .. $#$pair]);
-
-  return _tag('option', %attrs, $pair->[0]);
+  return _tag('option', %attrs, @$pair[2 .. $#$pair], $pair->[0]);
 }
 
 sub _password_field {
   my ($c, $name) = (shift, shift);
-  return _validation($c, $name, 'input', @_, name => $name,
+  return _validation($c, $name, 'input', name => $name, @_,
     type => 'password');
 }
 
@@ -168,24 +157,16 @@ sub _select_field {
     else { $groups .= _option(\%values, $group) }
   }
 
-  return _validation($c, $name, 'select', %attrs, name => $name,
+  return _validation($c, $name, 'select', name => $name, %attrs,
     sub {$groups});
 }
 
 sub _stylesheet {
   my $c = shift;
-
-  # CDATA
-  my $cb;
-  if (ref $_[-1] eq 'CODE' && (my $old = pop)) {
-    $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
-  }
-
-  # "link" or "style" tag
-  my $href = @_ % 2 ? $c->url_for(shift) : undef;
-  return $href
-    ? _tag('link', rel => 'stylesheet', href => $href, @_)
-    : _tag('style', @_, $cb);
+  my $content
+    = ref $_[-1] eq 'CODE' ? "/*<![CDATA[*/\n" . pop->() . "\n/*]]>*/" : '';
+  return _tag('style', @_, sub {$content}) unless @_ % 2;
+  return _tag('link', rel => 'stylesheet', href => $c->url_for(shift), @_);
 }
 
 sub _submit_button {
@@ -227,7 +208,7 @@ sub _text_area {
   my $content = @_ % 2 ? shift : undef;
   $content = $c->param($name) // $content // $cb // '';
 
-  return _validation($c, $name, 'textarea', @_, name => $name, $content);
+  return _validation($c, $name, 'textarea', name => $name, @_, $content);
 }
 
 sub _validation {

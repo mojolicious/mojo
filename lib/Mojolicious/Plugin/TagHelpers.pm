@@ -632,7 +632,7 @@ Alias for L</"tag">.
 
   %= tag 'br'
   %= tag 'div'
-  %= tag 'div', id => 'invisible', hidden => undef
+  %= tag 'div', id => 'foo', hidden => undef
   %= tag div => 'test & 123'
   %= tag div => (id => 'foo') => 'test & 123'
   %= tag div => (data => {my_id => 1, Name => 'test'}) => 'test & 123'
@@ -645,7 +645,7 @@ HTML tag generator.
 
   <br>
   <div></div>
-  <div id="invisible" hidden></div>
+  <div id="foo" hidden></div>
   <div>test &amp; 123</div>
   <div id="foo">test &amp; 123</div>
   <div data-my-id="1" data-name="test">test &amp; 123</div>

@@ -789,8 +789,8 @@ $t->app->log->unsubscribe(message => $cb);
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
   $t->get_ok('/', '1234' x 1024)->status_is(200)
     ->header_is(Connection => 'close')
-    ->content_is(
-    "413\n/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+    ->content_is("Maximum message size exceeded\n"
+      . "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 }
 
 # Relaxed placeholder
@@ -1102,7 +1102,7 @@ Test ok!
 
 @@ root.html.epl
 % my $c = shift;
-<% if (my $err = $c->req->error) { =%><%= "$err->{advice}\n" %><% } =%>
+<% if (my $err = $c->req->error) { =%><%= "$err->{message}\n" %><% } =%>
 %== $c->url_for('root_path')
 %== $c->url_for('root_path')
 %== $c->url_for('root_path')

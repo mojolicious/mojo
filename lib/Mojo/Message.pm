@@ -156,7 +156,7 @@ sub parse {
     # Check start-line size
     my $len = index $self->{buffer}, "\x0a";
     $len = length $self->{buffer} if $len < 0;
-    return $self->_limit('Maximum start-line size exceeded', 431)
+    return $self->_limit('Maximum start-line size exceeded')
       if $len > $self->max_line_size;
 
     $self->{state} = 'content' if $self->extract_start_line(\$self->{buffer});
@@ -169,15 +169,15 @@ sub parse {
 
   # Check message size
   my $max = $self->max_message_size;
-  return $self->_limit('Maximum message size exceeded', 413)
+  return $self->_limit('Maximum message size exceeded')
     if $max && $max < $self->{raw_size};
 
   # Check header size
-  return $self->_limit('Maximum header size exceeded', 431)
+  return $self->_limit('Maximum header size exceeded')
     if $self->headers->is_limit_exceeded;
 
   # Check buffer size
-  return $self->_limit('Maximum buffer size exceeded', 400)
+  return $self->_limit('Maximum buffer size exceeded')
     if $self->content->is_limit_exceeded;
 
   return $self->emit('progress')->content->is_finished ? $self->finish : $self;
@@ -253,11 +253,7 @@ sub _cache {
   return $all ? $objects : $objects->[-1];
 }
 
-sub _limit {
-  my ($self, $msg, $code) = @_;
-  $self->{limit} = 1;
-  return $self->error({message => $msg, advice => $code});
-}
+sub _limit { ++$_[0]{limit} and return $_[0]->error({message => $_[1]}) }
 
 sub _parse_formdata {
   my ($self, $upload) = @_;
@@ -499,16 +495,13 @@ make sure it is not excessively large, there's a 10MB limit by default.
 =head2 error
 
   my $err = $msg->error;
-  $msg    = $msg->error({message => 'Parser error', advice => 500});
+  $msg    = $msg->error({message => 'Parser error'});
 
 Get or set message error, an C<undef> return value indicates that there is no
 error.
 
-  # Connection error
+  # Connection or parser error
   $msg->error({message => 'Connection refused'});
-
-  # Parser error (recommending a 413 response)
-  $msg->error({message => 'Maximum message size exceeded', advice => 413});
 
   # 4xx/5xx response
   $msg->error({message => 'Internal Server Error', code => 500});

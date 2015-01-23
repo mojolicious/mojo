@@ -214,7 +214,7 @@ Connection identifier or socket.
 
   my $err = $tx->error;
 
-Get request or response error, or return C<undef> if there is no error,
+Get request or response error and return C<undef> if there is no error,
 commonly used together with L</"success">.
 
   # Longer version

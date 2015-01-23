@@ -14,9 +14,8 @@ sub AUTOLOAD {
   Carp::croak "Undefined subroutine &${package}::$method called"
     unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
 
-  Carp::croak qq{Can't locate object method "$method" via package "$package"}
-    unless $self->validator->checks->{$method};
-  return $self->check($method => @_);
+  return $self->check($method => @_) if $self->validator->checks->{$method};
+  Carp::croak qq{Can't locate object method "$method" via package "$package"};
 }
 
 sub check {

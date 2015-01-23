@@ -507,7 +507,7 @@ error.
   # Connection error
   $msg->error({message => 'Connection refused'});
 
-  # Parser error
+  # Parser error (recommending a 413 response)
   $msg->error({message => 'Maximum message size exceeded', advice => 413});
 
   # 4xx/5xx response

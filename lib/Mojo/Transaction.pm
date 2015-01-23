@@ -214,8 +214,8 @@ Connection identifier or socket.
 
   my $err = $tx->error;
 
-Return request or response error from L<Mojo::Message/"error"> or C<undef> if
-there is no error, commonly used together with L</"success">.
+Get request or response error, or return C<undef> if there is no error,
+commonly used together with L</"success">.
 
   # Longer version
   my $err = $tx->req->error || $tx->res->error;

@@ -1,4 +1,6 @@
 
+5.74  2015-01-25
+
 5.73  2015-01-24
   - Deprecated Mojolicious::Routes::Route::bridge in favor of
     Mojolicious::Routes::Route::under.

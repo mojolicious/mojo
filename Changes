@@ -1,7 +1,9 @@
 
-5.74  2015-01-25
+5.74  2015-01-24
   - Improved parser errors to be more consistent with connection errors in
     Mojo::Message::Request and Mojo::Message::Response.
+  - Fixed bug where placeholder default values would not always have
+    precedence.
 
 5.73  2015-01-24
   - Deprecated Mojolicious::Routes::Route::bridge in favor of

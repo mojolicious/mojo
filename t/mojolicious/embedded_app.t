@@ -41,8 +41,6 @@ $t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
 
 # Session
 $t->get_ok('/primary')->status_is(200)->content_is(1);
-
-# Session again
 $t->get_ok('/primary')->status_is(200)->content_is(2);
 
 # Session in external app

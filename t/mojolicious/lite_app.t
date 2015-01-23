@@ -80,6 +80,9 @@ get '/alternatives/:char' => [char => [qw(☃ ♥)]] => sub {
 get '/optional/:middle/placeholder' =>
   {middle => 'none', inline => '<%= $middle %>-<%= url_for =%>'};
 
+get '/optional/:param' =>
+  {param => undef, inline => '%= param("param") // "undef"'};
+
 get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
   my $c = shift;
   $c->render(text => $c->stash('format'));
@@ -479,11 +482,7 @@ $t->get_ok('/☃')->status_is(200)
 
 # Umlaut
 $t->get_ok('/uni/aäb')->status_is(200)->content_is('/uni/a%C3%A4b');
-
-# Escaped umlaut
 $t->get_ok('/uni/a%E4b')->status_is(200)->content_is('/uni/a%C3%A4b');
-
-# Escaped umlaut again
 $t->get_ok('/uni/a%C3%A4b')->status_is(200)->content_is('/uni/a%C3%A4b');
 
 # Captured snowman
@@ -525,21 +524,13 @@ $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/alternatives/☃')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('/alternatives/%E2%98%83');
-
-# Different Unicode alternative
 $t->get_ok('/alternatives/♥')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('/alternatives/%E2%99%A5');
-
-# Invalid alternative
 $t->get_ok('/alternatives/☃23')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
-
-# Invalid alternative
 $t->get_ok('/alternatives')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
-
-# Invalid alternative
 $t->get_ok('/alternatives/test')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
@@ -547,29 +538,29 @@ $t->get_ok('/alternatives/test')->status_is(404)
 $t->get_ok('/optional/test/placeholder')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('test-/optional/test/placeholder');
-
-# Optional placeholder in the middle without value
 $t->get_ok('/optional/placeholder')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('none-/optional/none/placeholder');
 
+# Optional placeholder
+$t->get_ok('/optional')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("undef\n");
+$t->get_ok('/optional/test')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("test\n");
+$t->get_ok('/optional?param=test')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("undef\n");
+
 # No format
 $t->get_ok('/alterformat')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('json');
-
-# Format alternative
 $t->get_ok('/alterformat.json')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('json');
-
-# Invalid format alternative
 $t->get_ok('/alterformat.html')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
 # No format
 $t->get_ok('/noformat')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('xml/noformat');
-
-# Invalid format
 $t->get_ok('/noformat.xml')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
@@ -604,11 +595,9 @@ $t->get_ok('/multi/B?foo=A&foo=E&baz=C&yada=D&yada=text&yada=fail')
 $t->get_ok('/multi/B?baz=C')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('BC');
 
-# Reserved stash value
+# Reserved stash values
 $t->get_ok('/reserved?data=just-works')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('just-worksdata');
-
-# More reserved stash values
 $t->get_ok('/reserved?data=just-works&json=test')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('just-worksdata,json');
@@ -689,11 +678,9 @@ $t->get_ok('//sri:foo@/stream' => form => {foo => 'bar'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr!^foobarsri:foohttp://127\.0\.0\.1:\d+/stream$!);
 
-# Not ajax
+# Ajax
 $t->get_ok('/maybe/ajax')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('not ajax');
-
-# Ajax
 $t->get_ok('/maybe/ajax' => {'X-Requested-With' => 'XMLHttpRequest'})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('is ajax');
@@ -810,19 +797,13 @@ $t->get_ok('/foo_wildcard_too/')->status_is(404);
 $t->get_ok('/with/header/condition',
   {'X-Secret-Header' => 'bar', 'X-Another-Header' => 'baz'})->status_is(200)
   ->content_is("Test ok!\n");
-
-# Missing headers
 $t->get_ok('/with/header/condition')->status_is(404)->content_like(qr/Oops!/);
-
-# Missing header
 $t->get_ok('/with/header/condition' => {'X-Secret-Header' => 'bar'})
   ->status_is(404)->content_like(qr/Oops!/);
 
 # Single header condition
 $t->post_ok('/with/header/condition' => {'X-Secret-Header' => 'bar'} => 'bar')
   ->status_is(200)->content_is('foo bar');
-
-# Missing header
 $t->post_ok('/with/header/condition' => {} => 'bar')->status_is(404)
   ->content_like(qr/Oops!/);
 

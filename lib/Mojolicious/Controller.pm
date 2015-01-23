@@ -70,7 +70,8 @@ sub every_param {
 
   # Captured unreserved values
   my $captures = $self->stash->{'mojo.captures'} ||= {};
-  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
+  if (!$RESERVED{$name} && exists $captures->{$name}) {
+    my $value = $captures->{$name};
     return ref $value eq 'ARRAY' ? $value : [$value];
   }
 

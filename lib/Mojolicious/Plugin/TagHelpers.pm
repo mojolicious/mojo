@@ -249,8 +249,8 @@ necessary attributes always be generated automatically.
   <%= radio_button country => 'uk'      %> UK
 
 For fields that failed validation with L<Mojolicious::Controller/"validation">
-the C<field-with-error> class will be automatically added through the
-C<tag_with_error> helper, to make styling with CSS easier.
+the C<field-with-error> class will be automatically added through
+L</"tag_with_error">, to make styling with CSS easier.
 
   <input class="field-with-error" name="age" type="text" value="250">
 
@@ -641,7 +641,8 @@ Alias for L</"tag">.
   % end
   <%= tag div => (id => 'foo') => begin %>test & 123<% end %>
 
-HTML tag generator.
+HTML tag generator, the C<data> attribute may contain a hash reference with
+pairs to generate attributes from.
 
   <br>
   <div></div>

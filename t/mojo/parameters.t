@@ -66,17 +66,17 @@ is $params->append($params2)->to_string, 'bar=bar&foo=&x=1&y=2',
 is $params2->to_string, 'x=1&y=2', 'right format';
 
 # "0"
-$params = Mojo::Parameters->new(foo => 0);
-is $params->param('foo'), 0, 'right value';
-is_deeply $params->every_param('foo'), [0], 'right value';
-is_deeply $params->every_param('bar'), [], 'no values';
-is $params->to_string, 'foo=0', 'right format';
+$params = Mojo::Parameters->new(0 => 0);
+is $params->param(0), 0, 'right value';
+is_deeply $params->every_param(0), [0], 'right value';
+is_deeply $params->every_param('foo'), [], 'no values';
+is $params->to_string, '0=0', 'right format';
 $params = Mojo::Parameters->new($params->to_string);
-is $params->param('foo'), 0, 'right value';
-is_deeply $params->every_param('foo'), [0], 'right value';
-is $params->to_hash->{foo}, 0, 'right value';
-is_deeply $params->to_hash, {foo => 0}, 'right structure';
-is $params->to_string, 'foo=0', 'right format';
+is $params->param(0), 0, 'right value';
+is_deeply $params->every_param(0), [0], 'right value';
+is $params->to_hash->{0}, 0, 'right value';
+is_deeply $params->to_hash, {0 => 0}, 'right structure';
+is $params->to_string, '0=0', 'right format';
 
 # Semicolon
 $params = Mojo::Parameters->new('foo=bar;baz');

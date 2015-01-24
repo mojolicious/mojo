@@ -2,6 +2,7 @@
 5.74  2015-01-25
   - Improved parser errors to be more consistent with connection errors in
     Mojo::Message::Request and Mojo::Message::Response.
+  - Fixed "0" value bug in Mojo::Parameters.
   - Fixed bug where placeholder default values would not always have
     precedence.
   - Fixed proxy detection in get command.

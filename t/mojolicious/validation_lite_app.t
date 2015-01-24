@@ -128,9 +128,9 @@ is_deeply $validation->error('foo'), ['required'], 'right error';
 # "0"
 $validation = $t->app->validation->input({0 => 0});
 ok $validation->has_data, 'has data';
-ok $validation->required('0')->size(1, 1)->is_valid, 'valid';
+ok $validation->required(0)->size(1, 1)->is_valid, 'valid';
 is_deeply $validation->output, {0 => 0}, 'right result';
-is $validation->param('0'), 0, 'right value';
+is $validation->param(0), 0, 'right value';
 
 # Custom error
 $validation = $t->app->validation->input({foo => 'bar'});

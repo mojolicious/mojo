@@ -66,11 +66,11 @@ sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 sub param {
   my ($self, $name) = (shift, shift);
 
-  # List names
-  return sort keys %{$self->to_hash} unless $name;
-
   # Multiple names
   return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
+
+  # List names
+  return sort keys %{$self->to_hash} unless defined $name;
 
   # Last value
   return $self->every_param($name)->[-1] unless @_;

@@ -155,13 +155,13 @@ sub param {
 
   # List names
   my $captures = $self->stash->{'mojo.captures'} ||= {};
-  my $req = $self->req;
   unless (defined $name) {
+    my $req  = $self->req;
+    my @keys = $req->param;
+    push @keys, map  { $_->name } @{$req->uploads};
+    push @keys, grep { !$RESERVED{$_} } keys %$captures;
     my %seen;
-    my @keys = grep { !$seen{$_}++ } $req->param;
-    push @keys, grep { !$seen{$_}++ } map { $_->name } @{$req->uploads};
-    push @keys, grep { !$RESERVED{$_} && !$seen{$_}++ } keys %$captures;
-    return sort @keys;
+    return sort grep { !$seen{$_}++ } @keys;
   }
 
   # Value

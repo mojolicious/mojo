@@ -33,7 +33,7 @@ sub run {
   # Detect proxy for absolute URLs
   my $ua = $self->app->ua->ioloop(Mojo::IOLoop->singleton);
   $ua->server->ioloop(Mojo::IOLoop->singleton);
-  $ua->proxy->detect unless $url !~ m!^/!;
+  $ua->proxy->detect unless $url =~ m!^/!;
   $ua->max_redirects(10) if $redirect;
 
   my $buffer = '';

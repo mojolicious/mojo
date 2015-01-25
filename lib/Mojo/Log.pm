@@ -20,7 +20,7 @@ has level => 'debug';
 has max_history_size => 10;
 has 'path';
 
-# Supported log level
+# Supported log levels
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 
 sub append {

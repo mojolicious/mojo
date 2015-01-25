@@ -169,7 +169,7 @@ sub _accepting {
   # Check if multi-accept is desirable
   my $multi = $self->multi_accept;
   $_->multi_accept($max < $multi ? 1 : $multi)->start for values %$acceptors;
-  $self->{accepting}++;
+  $self->{accepting} = 1;
 }
 
 sub _id {

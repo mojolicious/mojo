@@ -84,7 +84,7 @@ sub run {
     while ((my $pid = waitpid -1, WNOHANG) > 0) {
       next unless my $w = delete $self->emit(reap => $pid)->{pool}{$pid};
       $self->app->log->debug("Worker $pid stopped.");
-      $self->{finished}++ unless $w->{healthy};
+      $self->{finished} = 1 unless $w->{healthy};
     }
   };
   local $SIG{QUIT} = sub { $self->_term(1) };

@@ -34,7 +34,7 @@ sub dispatch {
 
   # Serve static file and prevent directory traversal
   return undef if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));
-  $stash->{'mojo.static'}++;
+  $stash->{'mojo.static'} = 1;
   return !!$c->rendered;
 }
 

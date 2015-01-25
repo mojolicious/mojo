@@ -111,7 +111,7 @@ sub _add {
 
 sub _callback {
   my ($self, $c, $cb, $last) = @_;
-  $c->stash->{'mojo.routed'}++ if $last;
+  $c->stash->{'mojo.routed'} = 1 if $last;
   my $app = $c->app;
   $app->log->debug('Routing to a callback.');
   return _action($app, $c, $cb, $last);
@@ -176,7 +176,7 @@ sub _controller {
       weaken $r->parent($old->match->endpoint)->{parent} unless $r->parent;
     }
     $new->handler($old);
-    $old->stash->{'mojo.routed'}++;
+    $old->stash->{'mojo.routed'} = 1;
   }
 
   # Action
@@ -185,7 +185,7 @@ sub _controller {
       $log->debug(qq{Routing to controller "$class" and action "$method".});
 
       if (my $sub = $new->can($method)) {
-        $old->stash->{'mojo.routed'}++ if $last;
+        $old->stash->{'mojo.routed'} = 1 if $last;
         return 1 if _action($app, $new, $sub, $last);
       }
 
@@ -206,7 +206,7 @@ sub _load {
 
   # Check base classes
   return 0 unless first { $app->isa($_) } @{$self->base_classes};
-  return ++$self->{loaded}{$app};
+  return $self->{loaded}{$app} = 1;
 }
 
 1;

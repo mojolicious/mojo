@@ -287,7 +287,7 @@ L<Mojo::Server::Prefork/"graceful_timeout">.
   group => 'staff'
 
 Group name for worker processes, defaults to the value of
-L<Mojo::Server::Prefork/"group">.
+L<Mojo::Server/"group">.
 
 =head2 heartbeat_interval
 
@@ -377,7 +377,7 @@ before getting canceled, defaults to the value of L</"upgrade_timeout">.
   user => 'sri'
 
 Username for worker processes, defaults to the value of
-L<Mojo::Server::Prefork/"user">.
+L<Mojo::Server/"user">.
 
 =head2 workers
 

@@ -1,10 +1,5 @@
 
 5.75  2015-01-26
-  - Removed -g and -u options from daemon command.
-  - Moved group and user attributes from Mojo::Server to
-    Mojo::Server::Prefork.
-  - Moved daemonize and setuidgid methods from Mojo::Server to
-    Mojo::Server::Prefork.
   - Fixed race condition in Mojo::Server::Prefork.
 
 5.74  2015-01-25

@@ -5,9 +5,11 @@ use Carp 'croak';
 use Cwd 'abs_path';
 use Mojo::Loader;
 use Mojo::Util 'md5_sum';
+use POSIX;
 use Scalar::Util 'blessed';
 
-has app           => sub { shift->build_app('Mojo::HelloWorld') };
+has app => sub { shift->build_app('Mojo::HelloWorld') };
+has [qw(group user)];
 has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };
 
 sub build_app {
@@ -22,6 +24,19 @@ sub build_tx {
   my $tx   = $self->app->build_tx;
   $tx->req->reverse_proxy(1) if $self->reverse_proxy;
   return $tx;
+}
+
+sub daemonize {
+
+  # Fork and kill parent
+  die "Can't fork: $!" unless defined(my $pid = fork);
+  exit 0 if $pid;
+  POSIX::setsid or die "Can't start a new session: $!";
+
+  # Close filehandles
+  open STDIN,  '</dev/null';
+  open STDOUT, '>/dev/null';
+  open STDERR, '>&STDOUT';
 }
 
 sub load_app {
@@ -55,6 +70,29 @@ sub new {
 }
 
 sub run { croak 'Method "run" not implemented by subclass' }
+
+sub setuidgid {
+  my $self = shift;
+
+  # Group (make sure secondary groups are reassigned too)
+  if (my $group = $self->group) {
+    return $self->_log(qq{Group "$group" does not exist.})
+      unless defined(my $gid = getgrnam $group);
+    return $self->_log(qq{Can't switch to group "$group": $!})
+      unless ($( = $) = "$gid $gid") && $) eq "$gid $gid" && $( eq "$gid $gid";
+  }
+
+  # User
+  return $self unless my $user = $self->user;
+  return $self->_log(qq{User "$user" does not exist.})
+    unless defined(my $uid = getpwnam $user);
+  return $self->_log(qq{Can't switch to user "$user": $!})
+    unless POSIX::setuid($uid);
+
+  return $self;
+}
+
+sub _log { $_[0]->app->log->error($_[1]) and return $_[0] }
 
 1;
 
@@ -117,6 +155,13 @@ L<Mojo::Server> implements the following attributes.
 
 Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 
+=head2 group
+
+  my $group = $server->group;
+  $server   = $server->group('users');
+
+Group for server process.
+
 =head2 reverse_proxy
 
   my $bool = $server->reverse_proxy;
@@ -124,6 +169,13 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 
 This server operates behind a reverse proxy, defaults to the value of the
 C<MOJO_REVERSE_PROXY> environment variable.
+
+=head2 user
+
+  my $user = $server->user;
+  $server  = $server->user('web');
+
+User for the server process.
 
 =head1 METHODS
 
@@ -141,6 +193,12 @@ Build application from class.
   my $tx = $server->build_tx;
 
 Let application build a transaction.
+
+=head2 daemonize
+
+  $server->daemonize;
+
+Daemonize server process.
 
 =head2 load_app
 
@@ -162,6 +220,12 @@ with default request handling.
   $server->run;
 
 Run server. Meant to be overloaded in a subclass.
+
+=head2 setuidgid
+
+  $server = $server->setuidgid;
+
+Set L</"user"> and L</"group"> for process.
 
 =head1 SEE ALSO
 

@@ -57,7 +57,7 @@ sub run {
   $self->configure('hypnotoad');
   weaken $self;
   $prefork->on(wait   => sub { $self->_manage });
-  $prefork->on(reap   => sub { $self->_cleanup(pop) });
+  $prefork->on(reap   => sub { $self->_reap(pop) });
   $prefork->on(finish => sub { $self->{finished} = 1 });
 
   # Testing
@@ -76,15 +76,6 @@ sub run {
   # Start accepting connections
   local $SIG{USR2} = sub { $self->{upgrade} ||= steady_time };
   $prefork->cleanup(1)->run;
-}
-
-sub _cleanup {
-  my ($self, $pid) = @_;
-
-  # Clean up failed upgrade
-  return unless ($self->{new} || '') eq $pid;
-  $self->prefork->app->log->error('Zero downtime software upgrade failed.');
-  delete @$self{qw(new upgrade)};
 }
 
 sub _exit { say shift and exit 0 }
@@ -124,6 +115,15 @@ sub _manage {
     kill 'KILL', $self->{new}
       if $self->{upgrade} + $self->upgrade_timeout <= steady_time;
   }
+}
+
+sub _reap {
+  my ($self, $pid) = @_;
+
+  # Clean up failed upgrade
+  return unless ($self->{new} || '') eq $pid;
+  $self->prefork->app->log->error('Zero downtime software upgrade failed.');
+  delete @$self{qw(new upgrade)};
 }
 
 sub _stop {

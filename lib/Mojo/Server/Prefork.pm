@@ -76,7 +76,12 @@ sub run {
 
   # Clean manager environment
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
-  local $SIG{CHLD} = sub { $self->_reap unless $self->{forking} };
+  local $SIG{CHLD} = sub {
+    while ((my $pid = waitpid -1, WNOHANG) > 0) {
+      $self->app->log->debug("Worker $pid stopped.")
+        if delete $self->emit(reap => $pid)->{pool}{$pid};
+    }
+  };
   local $SIG{QUIT} = sub { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
   local $SIG{TTOU} = sub {
@@ -113,7 +118,6 @@ sub _manage {
   my $self = shift;
 
   # Spawn more workers if necessary and check PID file
-  $self->_reap;
   if (!$self->{finished}) {
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
     $self->ensure_pid_file;
@@ -142,21 +146,14 @@ sub _manage {
     # Graceful stop with timeout
     my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
     $log->debug("Trying to stop worker $pid gracefully.")
-      and kill 'QUIT', $pid
+      and (kill('QUIT', $pid) or delete $self->{pool}{$pid})
       if $graceful && !$w->{quit}++;
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
-    $log->debug("Stopping worker $pid.") and kill 'KILL', $pid
+    $log->debug("Stopping worker $pid.")
+      and (kill('KILL', $pid) or delete $self->{pool}{$pid})
       if $w->{force} || ($self->{finished} && !$graceful);
-  }
-}
-
-sub _reap {
-  my $self = shift;
-  while ((my $pid = waitpid -1, WNOHANG) > 0) {
-    $self->app->log->debug("Worker $pid stopped.")
-      if delete $self->emit(reap => $pid)->{pool}{$pid};
   }
 }
 
@@ -164,7 +161,6 @@ sub _spawn {
   my $self = shift;
 
   # Manager
-  local $self->{forking} = 1;
   die "Can't fork: $!" unless defined(my $pid = fork);
   return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time}
     if $pid;

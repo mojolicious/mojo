@@ -11,7 +11,7 @@ use Scalar::Util 'weaken';
 use Time::HiRes ();
 
 has accepts => 1000;
-has [qw(accept_interval multi_accept)];
+has [qw(accept_interval group multi_accept user)];
 has [qw(cleanup lock_timeout)] => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
@@ -42,6 +42,19 @@ sub check_pid {
   # Not running
   unlink $file if -w $file;
   return undef;
+}
+
+sub daemonize {
+
+  # Fork and kill parent
+  die "Can't fork: $!" unless defined(my $pid = fork);
+  exit 0 if $pid;
+  POSIX::setsid or die "Can't start a new session: $!";
+
+  # Close filehandles
+  open STDIN,  '</dev/null';
+  open STDOUT, '>/dev/null';
+  open STDERR, '>&STDOUT';
 }
 
 sub ensure_pid_file {
@@ -95,6 +108,29 @@ sub run {
   $self->{running} = 1;
   $self->_manage while $self->{running};
 }
+
+sub setuidgid {
+  my $self = shift;
+
+  # Group (make sure secondary groups are reassigned too)
+  if (my $group = $self->group) {
+    return $self->_error(qq{Group "$group" does not exist.})
+      unless defined(my $gid = getgrnam $group);
+    return $self->_error(qq{Can't switch to group "$group": $!})
+      unless ($( = $) = "$gid $gid") && $) eq "$gid $gid" && $( eq "$gid $gid";
+  }
+
+  # User
+  return $self unless my $user = $self->user;
+  return $self->_error(qq{User "$user" does not exist.})
+    unless defined(my $uid = getpwnam $user);
+  return $self->_error(qq{Can't switch to user "$user": $!})
+    unless POSIX::setuid($uid);
+
+  return $self;
+}
+
+sub _error { $_[0]->app->log->error($_[1]) and return $_[0] }
 
 sub _heartbeat {
   my $self = shift;
@@ -171,7 +207,7 @@ sub _spawn {
     unless open my $handle, '>', $file;
 
   # Change user/group
-  $self->setuidgid->cleanup(0);
+  $self->cleanup(0)->setuidgid;
 
   # Accept mutex
   my $loop = $self->ioloop->lock(
@@ -422,6 +458,20 @@ needed anymore, defaults to a true value.
 Maximum amount of time in seconds stopping a worker gracefully may take before
 being forced, defaults to C<20>.
 
+=head2 group
+
+  my $group = $prefork->group;
+  $prefork  = $prefork->group('users');
+
+Group for worker process.
+
+=head2 user
+
+  my $user = $prefork->user;
+  $prefork = $prefork->user('web');
+
+User for the worker process.
+
 =head2 heartbeat_interval
 
   my $interval = $prefork->heartbeat_intrval;
@@ -494,6 +544,12 @@ is not running.
 
   say 'Server is not running' unless $prefork->check_pid;
 
+=head2 daemonize
+
+  $prefork->daemonize;
+
+Daemonize server process.
+
 =head2 ensure_pid_file
 
   $prefork->ensure_pid_file;
@@ -505,6 +561,12 @@ Ensure L</"pid_file"> exists.
   $prefork->run;
 
 Run server.
+
+=head2 setuidgid
+
+  $prefork->setuidgid;
+
+Set L</"user"> and L</"group"> for process.
 
 =head1 SEE ALSO
 

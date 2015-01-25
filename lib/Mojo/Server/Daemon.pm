@@ -25,7 +25,7 @@ sub DESTROY {
 sub run {
   my $self = shift;
   local $SIG{INT} = local $SIG{TERM} = sub { $self->ioloop->stop };
-  $self->start->setuidgid->ioloop->start;
+  $self->start->ioloop->start;
 }
 
 sub start {

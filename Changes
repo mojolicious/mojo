@@ -1,6 +1,6 @@
 
 5.75  2015-01-26
-  - Fixed race condition in Mojo::Server::Prefork.
+  - Fixed race condition and memory leak in Mojo::Server::Prefork.
 
 5.74  2015-01-25
   - Improved parser errors to be more consistent with connection errors in

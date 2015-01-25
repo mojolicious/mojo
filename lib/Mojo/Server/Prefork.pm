@@ -174,31 +174,28 @@ sub _spawn {
   $self->setuidgid->cleanup(0);
 
   # Accept mutex
+  weaken $self;
   my $loop = $self->ioloop->lock(
     sub {
 
+      # Non-blocking
+      return flock $handle, LOCK_EX | LOCK_NB unless shift;
+
       # Blocking ("ualarm" can't be imported on Windows)
       my $lock;
-      if ($_[0]) {
-        eval {
-          local $SIG{ALRM} = sub { die "alarm\n" };
-          my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;
-          $lock = flock $handle, LOCK_EX;
-          Time::HiRes::ualarm $old;
-          1;
-        } or $lock = $@ eq "alarm\n" ? 0 : die $@;
-      }
-
-      # Non-blocking
-      else { $lock = flock $handle, LOCK_EX | LOCK_NB }
-
+      eval {
+        local $SIG{ALRM} = sub { die "alarm\n" };
+        my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;
+        $lock = flock $handle, LOCK_EX;
+        Time::HiRes::ualarm $old;
+        1;
+      } or $lock = $@ eq "alarm\n" ? 0 : die $@;
       return $lock;
     }
   );
   $loop->unlock(sub { flock $handle, LOCK_UN });
 
   # Heartbeat messages
-  weaken $self;
   $loop->recurring(
     $self->heartbeat_interval => sub {
       my $graceful = shift->max_connections ? 0 : 1;

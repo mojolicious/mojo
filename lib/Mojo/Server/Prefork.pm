@@ -76,12 +76,7 @@ sub run {
 
   # Clean manager environment
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
-  local $SIG{CHLD} = sub {
-    while ((my $pid = waitpid -1, WNOHANG) > 0) {
-      $self->app->log->debug("Worker $pid stopped.")
-        if delete $self->emit(reap => $pid)->{pool}{$pid};
-    }
-  };
+  local $SIG{CHLD} = sub { $self->_reap unless $self->{forking} };
   local $SIG{QUIT} = sub { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
   local $SIG{TTOU} = sub {
@@ -117,7 +112,8 @@ sub _heartbeat {
 sub _manage {
   my $self = shift;
 
-  # Spawn more workers and check PID file
+  # Spawn more workers if necessary and check PID file
+  $self->_reap;
   if (!$self->{finished}) {
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
     $self->ensure_pid_file;
@@ -156,10 +152,19 @@ sub _manage {
   }
 }
 
+sub _reap {
+  my $self = shift;
+  while ((my $pid = waitpid -1, WNOHANG) > 0) {
+    $self->app->log->debug("Worker $pid stopped.")
+      if delete $self->emit(reap => $pid)->{pool}{$pid};
+  }
+}
+
 sub _spawn {
   my $self = shift;
 
   # Manager
+  local $self->{forking} = 1;
   die "Can't fork: $!" unless defined(my $pid = fork);
   return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time}
     if $pid;

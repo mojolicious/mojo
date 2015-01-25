@@ -23,7 +23,8 @@ requests with code generating the appropriate response.
 
 This black box is usually called a dispatcher. There are many implementations
 using different strategies to establish these connections, but pretty much all
-are based around mapping the requests path to some kind of response generator.
+are based around mapping the path part of the request URL to some kind of
+response generator.
 
   /user/show/2 -> $c->render(text => 'Daniel');
   /user/show/3 -> $c->render(text => 'Sara');

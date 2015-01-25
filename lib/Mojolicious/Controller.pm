@@ -763,6 +763,10 @@ Get L<Mojo::Message::Response> object from L</"tx">.
   # Force file download by setting a custom response header
   $c->res->headers->content_disposition('attachment; filename=foo.png;');
 
+  # Make sure response is cached correctly
+  $c->res->headers->cache_control('public, max-age=300');
+  $c->res->headers->append(Vary => 'Accept-Encoding');
+
 =head2 respond_to
 
   $c = $c->respond_to(

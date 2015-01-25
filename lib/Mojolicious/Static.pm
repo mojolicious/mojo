@@ -48,6 +48,7 @@ sub file {
       $c->app->log->debug("Did not find $rel in $path") if $c;
       next;
     }
+    $c->app->log->debug("Found $rel in $path") if $c;
     return $asset;
   }
 

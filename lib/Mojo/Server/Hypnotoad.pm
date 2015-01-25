@@ -94,8 +94,10 @@ sub _manage {
   my $self = shift;
 
   # Upgraded
-  my $log = $self->prefork->app->log;
+  my $prefork = $self->prefork;
+  my $log     = $prefork->app->log;
   if ($ENV{HYPNOTOAD_PID} && $ENV{HYPNOTOAD_PID} ne $$) {
+    return unless $prefork->healthy == $prefork->workers;
     $log->info("Upgrade successful, stopping $ENV{HYPNOTOAD_PID}.");
     kill 'QUIT', $ENV{HYPNOTOAD_PID};
   }

@@ -76,23 +76,23 @@ sub setuidgid {
 
   # Group (make sure secondary groups are reassigned too)
   if (my $group = $self->group) {
-    return $self->_log(qq{Group "$group" does not exist.})
+    $self->_error(qq{Group "$group" does not exist})
       unless defined(my $gid = getgrnam $group);
-    return $self->_log(qq{Can't switch to group "$group": $!})
+    $self->_error(qq{Can't switch to group "$group": $!})
       unless ($( = $) = "$gid $gid") && $) eq "$gid $gid" && $( eq "$gid $gid";
   }
 
   # User
   return $self unless my $user = $self->user;
-  return $self->_log(qq{User "$user" does not exist.})
+  $self->_error(qq{User "$user" does not exist})
     unless defined(my $uid = getpwnam $user);
-  return $self->_log(qq{Can't switch to user "$user": $!})
+  $self->_error(qq{Can't switch to user "$user": $!})
     unless POSIX::setuid($uid);
 
   return $self;
 }
 
-sub _log { $_[0]->app->log->error($_[1]) and return $_[0] }
+sub _error { $_[0]->app->log->error("$_[1].") and croak $_[1] }
 
 1;
 

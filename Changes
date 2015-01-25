@@ -1,5 +1,10 @@
 
 5.75  2015-01-26
+  - Added healthy method to Mojo::Server::Prefork.
+  - Improved all built-in web servers to die if group or user assignment
+    failed.
+  - Improved Hypnotoad to wait for new workers to be ready before stopping the
+    old ones during hot deployment.
   - Fixed race condition and memory leak in Mojo::Server::Prefork.
 
 5.74  2015-01-25

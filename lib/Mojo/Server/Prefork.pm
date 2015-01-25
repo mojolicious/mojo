@@ -58,6 +58,10 @@ sub ensure_pid_file {
   print $handle $$;
 }
 
+sub healthy {
+  scalar grep { $_->{healthy} } values %{$_[0]{pool}};
+}
+
 sub run {
   my $self = shift;
 
@@ -78,8 +82,9 @@ sub run {
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
   local $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) {
-      $self->app->log->debug("Worker $pid stopped.")
-        if delete $self->emit(reap => $pid)->{pool}{$pid};
+      next unless my $w = delete $self->emit(reap => $pid)->{pool}{$pid};
+      $self->app->log->debug("Worker $pid stopped.");
+      $self->{finished}++ unless $w->{healthy};
     }
   };
   local $SIG{QUIT} = sub { $self->_term(1) };
@@ -96,7 +101,9 @@ sub run {
   $self->_manage while $self->{running};
 }
 
-sub _heartbeat {
+sub _heartbeat { shift->{writer}->syswrite("$$:$_[0]\n") or exit 0 }
+
+sub _heartbeats {
   my $self = shift;
 
   # Poll for heartbeats
@@ -109,7 +116,7 @@ sub _heartbeat {
   my $time = steady_time;
   while ($chunk =~ /(\d+):(\d)\n/g) {
     next unless my $w = $self->{pool}{$1};
-    $self->emit(heartbeat => $1) and $w->{time} = $time;
+    @$w{qw(healthy time)} = (1, $time) and $self->emit(heartbeat => $1);
     $w->{graceful} ||= $time if $2;
   }
 }
@@ -127,7 +134,7 @@ sub _manage {
   elsif (!keys %{$self->{pool}}) { return delete $self->{running} }
 
   # Wait for heartbeats
-  $self->emit('wait')->_heartbeat;
+  $self->emit('wait')->_heartbeats;
 
   my $interval = $self->heartbeat_interval;
   my $ht       = $self->heartbeat_timeout;
@@ -196,12 +203,9 @@ sub _spawn {
   $loop->unlock(sub { flock $handle, LOCK_UN });
 
   # Heartbeat messages
-  $loop->recurring(
-    $self->heartbeat_interval => sub {
-      my $graceful = shift->max_connections ? 0 : 1;
-      $self->{writer}->syswrite("$$:$graceful\n") or exit 0;
-    }
-  );
+  $loop->next_tick(sub { $self->_heartbeat(0) });
+  my $cb = sub { $self->_heartbeat(shift->max_connections ? 0 : 1) };
+  $loop->recurring($self->heartbeat_interval => $cb);
 
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(INT TERM CHLD TTIN TTOU);
@@ -496,6 +500,12 @@ is not running.
   $prefork->ensure_pid_file;
 
 Ensure L</"pid_file"> exists.
+
+=head2 healthy
+
+  my $healthy = $prefork->healthy;
+
+Number of active worker processes with a heartbeat.
 
 =head2 run
 

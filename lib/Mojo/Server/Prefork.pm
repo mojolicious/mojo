@@ -160,7 +160,7 @@ sub _spawn {
     unless open my $handle, '>', $file;
 
   # Change user/group
-  $self->setuidgid->cleanup(0);
+  $self->cleanup(0)->setuidgid;
 
   # Accept mutex
   weaken $self;

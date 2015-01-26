@@ -160,8 +160,9 @@ Note that the server uses signals for process management, so you should avoid
 modifying signal handlers in your applications.
 
 To start applications with it you can use the L<hypnotoad> script, which
-automatically daemonizes the server process and defaults to C<production> mode
-for L<Mojolicious> and L<Mojolicious::Lite> applications.
+listens on port C<8080>, automatically daemonizes the server process and
+defaults to C<production> mode for L<Mojolicious> and L<Mojolicious::Lite>
+applications.
 
   $ hypnotoad ./myapp.pl
 

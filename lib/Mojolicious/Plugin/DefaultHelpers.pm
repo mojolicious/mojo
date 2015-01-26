@@ -160,7 +160,7 @@ sub _render {
 sub _static {
   my ($c, $file) = @_;
   return !!$c->rendered if $c->app->static->serve($c, $file);
-  $c->app->log->debug(qq{File "$file" not found, public directory missing?});
+  $c->app->log->debug(qq{Static file "$file" not found});
   return !$c->helpers->reply->not_found;
 }
 

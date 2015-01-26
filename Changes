@@ -6,6 +6,8 @@
   - Improved Hypnotoad to wait for new workers to be ready before stopping the
     old ones during hot deployment.
   - Improved commands and log messages to use less punctuation.
+  - Fixed bug in Mojo::IOLoop where the callback passed to next_tick would
+    receive the wrong invocant.
   - Fixed race condition and memory leak in Mojo::Server::Prefork.
 
 5.74  2015-01-25

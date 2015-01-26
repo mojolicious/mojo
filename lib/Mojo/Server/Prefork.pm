@@ -155,12 +155,12 @@ sub _spawn {
     if $pid;
 
   # Prepare lock file
-  my $file = $self->{lock_file};
+  my $file = $self->cleanup(0)->{lock_file};
   $self->app->log->error(qq{Can't open lock file "$file": $!})
     unless open my $handle, '>', $file;
 
   # Change user/group
-  $self->cleanup(0)->setuidgid;
+  $self->setuidgid;
 
   # Accept mutex
   weaken $self;
@@ -185,8 +185,8 @@ sub _spawn {
   $loop->unlock(sub { flock $handle, LOCK_UN });
 
   # Heartbeat messages
-  $loop->next_tick(sub { $self->_heartbeat(0) });
   my $cb = sub { $self->_heartbeat(shift->max_connections ? 0 : 1) };
+  $loop->next_tick($cb);
   $loop->recurring($self->heartbeat_interval => $cb);
 
   # Clean worker environment

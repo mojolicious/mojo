@@ -86,8 +86,14 @@ sub delay {
 }
 
 sub is_running { _instance(shift)->reactor->is_running }
-sub next_tick  { _instance(shift)->reactor->next_tick(@_) }
-sub one_tick   { _instance(shift)->reactor->one_tick }
+
+sub next_tick {
+  my ($self, $cb) = (_instance(shift), @_);
+  weaken $self;
+  return $self->reactor->next_tick(sub { $self->$cb });
+}
+
+sub one_tick { _instance(shift)->reactor->one_tick }
 
 sub recurring { shift->_timer(recurring => @_) }
 

@@ -27,9 +27,10 @@ is ref $loop->reactor, 'MyReactor', 'right class';
 my $err;
 Mojo::IOLoop->next_tick(
   sub {
-    eval { Mojo::IOLoop->start };
+    my $loop = shift;
+    eval { $loop->start };
     $err = $@;
-    Mojo::IOLoop->stop;
+    $loop->stop;
   }
 );
 Mojo::IOLoop->start;

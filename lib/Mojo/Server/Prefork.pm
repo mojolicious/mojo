@@ -103,24 +103,6 @@ sub run {
 
 sub _heartbeat { shift->{writer}->syswrite("$$:$_[0]\n") or exit 0 }
 
-sub _heartbeats {
-  my $self = shift;
-
-  # Poll for heartbeats
-  my $poll = $self->{poll};
-  $poll->poll(1);
-  return unless $poll->handles(POLLIN | POLLPRI);
-  return unless $self->{reader}->sysread(my $chunk, 4194304);
-
-  # Update heartbeats (and stop gracefully if necessary)
-  my $time = steady_time;
-  while ($chunk =~ /(\d+):(\d)\n/g) {
-    next unless my $w = $self->{pool}{$1};
-    @$w{qw(healthy time)} = (1, $time) and $self->emit(heartbeat => $1);
-    $w->{graceful} ||= $time if $2;
-  }
-}
-
 sub _manage {
   my $self = shift;
 
@@ -134,7 +116,7 @@ sub _manage {
   elsif (!keys %{$self->{pool}}) { return delete $self->{running} }
 
   # Wait for heartbeats
-  $self->emit('wait')->_heartbeats;
+  $self->_wait;
 
   my $interval = $self->heartbeat_interval;
   my $ht       = $self->heartbeat_timeout;
@@ -221,6 +203,24 @@ sub _term {
   my ($self, $graceful) = @_;
   $self->emit(finish => $graceful)->{finished} = 1;
   $self->{graceful} = 1 if $graceful;
+}
+
+sub _wait {
+  my $self = shift;
+
+  # Poll for heartbeats
+  my $poll = $self->emit('wait')->{poll};
+  $poll->poll(1);
+  return unless $poll->handles(POLLIN | POLLPRI);
+  return unless $self->{reader}->sysread(my $chunk, 4194304);
+
+  # Update heartbeats (and stop gracefully if necessary)
+  my $time = steady_time;
+  while ($chunk =~ /(\d+):(\d)\n/g) {
+    next unless my $w = $self->{pool}{$1};
+    @$w{qw(healthy time)} = (1, $time) and $self->emit(heartbeat => $1);
+    $w->{graceful} ||= $time if $2;
+  }
 }
 
 1;
@@ -505,7 +505,7 @@ Ensure L</"pid_file"> exists.
 
   my $healthy = $prefork->healthy;
 
-Number of active worker processes with a heartbeat.
+Number of currently active worker processes with a heartbeat.
 
 =head2 run
 

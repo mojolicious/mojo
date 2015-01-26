@@ -556,6 +556,9 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
   # Make sure to use the "title" helper and not the controller method
   $c->helpers->title('Welcome!');
 
+  # Use a nested helper instead of the "reply" controller method
+  $c->helpers->reply->not_found;
+
 =head2 on
 
   my $cb = $c->on(finish => sub {...});
@@ -666,6 +669,9 @@ L</"stash">.
   # Render JSON
   $c->render(json => {test => 'I ♥ Mojolicious!'});
 
+  # Render inline template
+  $c->render(inline => '<%= 1 + 1 %>');
+
   # Render template "foo/bar.html.ep"
   $c->render(template => 'foo/bar', format => 'html', handler => 'ep');
 
@@ -712,6 +718,9 @@ Try to render content and return it wrapped in a L<Mojo::ByteStream> object or
 return C<undef>, all arguments get localized automatically and are only
 available during this render operation, takes the same arguments as
 L</"render">.
+
+  # Render inline template
+  my $two = $c->render_to_string(inline => '<%= 1 + 1 %>');
 
 =head2 rendered
 

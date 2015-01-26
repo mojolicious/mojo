@@ -51,7 +51,7 @@ sub ensure_pid_file {
   return if -e (my $file = $self->pid_file);
 
   # Create PID file
-  $self->app->log->info(qq{Creating process id file "$file".});
+  $self->app->log->info(qq{Creating process id file "$file"});
   die qq{Can't create process id file "$file": $!}
     unless open my $handle, '>', $file;
   chmod 0644, $handle;
@@ -83,7 +83,7 @@ sub run {
   local $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) {
       next unless my $w = delete $self->emit(reap => $pid)->{pool}{$pid};
-      $self->app->log->debug("Worker $pid stopped.");
+      $self->app->log->debug("Worker $pid stopped");
       $self->{finished} = 1 unless $w->{healthy};
     }
   };
@@ -96,7 +96,7 @@ sub run {
   };
 
   # Preload application before starting workers
-  $self->start->app->log->info("Manager $$ started.");
+  $self->start->app->log->info("Manager $$ started");
   $self->{running} = 1;
   $self->_manage while $self->{running};
 }
@@ -128,19 +128,19 @@ sub _manage {
     next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
-    $log->error("Worker $pid has no heartbeat, restarting.")
+    $log->error("Worker $pid has no heartbeat, restarting")
       and $w->{graceful} = $time
       if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 
     # Graceful stop with timeout
     my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
-    $log->debug("Trying to stop worker $pid gracefully.")
+    $log->debug("Trying to stop worker $pid gracefully")
       and (kill('QUIT', $pid) or delete $self->{pool}{$pid})
       if $graceful && !$w->{quit}++;
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
-    $log->debug("Stopping worker $pid.")
+    $log->debug("Stopping worker $pid")
       and (kill('KILL', $pid) or delete $self->{pool}{$pid})
       if $w->{force} || ($self->{finished} && !$graceful);
   }
@@ -194,7 +194,7 @@ sub _spawn {
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete @$self{qw(poll reader)};
 
-  $self->app->log->debug("Worker $$ started.");
+  $self->app->log->debug("Worker $$ started");
   $loop->start;
   exit 0;
 }

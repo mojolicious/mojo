@@ -49,7 +49,7 @@ sub cookie {
 
     # Cookie too big
     my $cookie = {name => $name, value => shift, %{shift || {}}};
-    $self->app->log->error(qq{Cookie "$name" is bigger than 4096 bytes.})
+    $self->app->log->error(qq{Cookie "$name" is bigger than 4096 bytes})
       if length $cookie->{value} > 4096;
 
     $self->res->cookies($cookie);
@@ -99,10 +99,10 @@ sub every_signed_cookie {
       }
       if ($valid) { push @results, $value }
 
-      else { $self->app->log->debug(qq{Cookie "$name" has bad signature.}) }
+      else { $self->app->log->debug(qq{Cookie "$name" has bad signature}) }
     }
 
-    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
+    else { $self->app->log->debug(qq{Cookie "$name" not signed}) }
   }
 
   return \@results;
@@ -233,7 +233,7 @@ sub rendered {
       my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
       my $code = $res->code;
       my $msg  = $res->message || $res->default_message($code);
-      $app->log->debug("$code $msg (${elapsed}s, $rps/s).");
+      $app->log->debug("$code $msg (${elapsed}s, $rps/s)");
     }
 
     $app->plugins->emit_hook_reverse(after_dispatch => $self);
@@ -430,7 +430,7 @@ A reference back to the application that dispatched to this controller,
 defaults to a L<Mojolicious> object.
 
   # Use application logger
-  $c->app->log->debug('Hello Mojo!');
+  $c->app->log->debug('Hello Mojo');
 
   # Generate path
   my $path = $c->app->home->rel_file('templates/foo/bar.html.ep');
@@ -465,7 +465,7 @@ underlying connection might get closed early.
   # Perform non-blocking operation without knowing the connection status
   my $tx = $c->tx;
   Mojo::IOLoop->timer(2 => sub {
-    $c->app->log->debug($tx->is_finished ? 'Finished.' : 'In progress.');
+    $c->app->log->debug($tx->is_finished ? 'Finished' : 'In progress');
   });
 
 =head1 METHODS
@@ -571,7 +571,7 @@ status.
   # Do something after the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
-    $c->app->log->debug('We are done!');
+    $c->app->log->debug('We are done');
   });
 
   # Receive WebSocket message
@@ -590,7 +590,7 @@ status.
   $c->on(binary => sub {
     my ($c, $bytes) = @_;
     my $len = length $bytes;
-    $c->app->log->debug("Received $len bytes.");
+    $c->app->log->debug("Received $len bytes");
   });
 
 =head2 param

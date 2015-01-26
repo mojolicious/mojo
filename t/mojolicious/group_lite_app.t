@@ -213,11 +213,11 @@ my $log = '';
 my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended?ok=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('suspended!');
-like $log, qr!GET "/suspended"\.!,      'right message';
-like $log, qr/Routing to a callback\./, 'right message';
-like $log, qr/Nothing has been rendered, expecting delayed response\./,
+like $log, qr!GET "/suspended"!,      'right message';
+like $log, qr/Routing to a callback/, 'right message';
+like $log, qr/Nothing has been rendered, expecting delayed response/,
   'right message';
-like $log, qr/Rendering inline template "f75d6f5993c626fa8049366389f77928"\./,
+like $log, qr/Rendering inline template "f75d6f5993c626fa8049366389f77928"/,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -271,8 +271,8 @@ $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
   "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
-like $log, qr/Cookie "foo" not signed\./,        'right message';
-like $log, qr/Cookie "bad" has bad signature\./, 'right message';
+like $log, qr/Cookie "foo" not signed/,        'right message';
+like $log, qr/Cookie "bad" has bad signature/, 'right message';
 ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
 $t->app->log->unsubscribe(message => $cb);

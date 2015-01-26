@@ -94,11 +94,11 @@ Mojo::Log - Simple logger
   my $log = Mojo::Log->new(path => '/var/log/mojo.log', level => 'warn');
 
   # Log messages
-  $log->debug('Why is this not working?');
-  $log->info('FYI: it happened again.');
-  $log->warn('This might be a problem.');
-  $log->error('Garden variety error.');
-  $log->fatal('Boom!');
+  $log->debug('Not sure what is happening here');
+  $log->info('FYI: it happened again');
+  $log->warn('This might be a problem');
+  $log->error('Garden variety error');
+  $log->fatal('Boom');
 
 =head1 DESCRIPTION
 
@@ -137,7 +137,7 @@ A callback for formatting log messages.
 
   $log->format(sub {
     my ($time, $level, @lines) = @_;
-    return "[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious.\n";
+    return "[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious\n";
   });
 
 =head2 handle
@@ -151,7 +151,7 @@ L</"path"> or C<STDERR>.
 =head2 history
 
   my $history = $log->history;
-  $log        = $log->history([[time, 'debug', 'That went wrong.']]);
+  $log        = $log->history([[time, 'debug', 'That went wrong']]);
 
 The last few logged messages.
 
@@ -186,35 +186,35 @@ the following new ones.
 
 =head2 append
 
-  $log->append("[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious.\n");
+  $log->append("[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious\n");
 
 Append message to L</"handle">.
 
 =head2 debug
 
-  $log = $log->debug('You screwed up, but that is ok.');
-  $log = $log->debug('All', 'cool!');
+  $log = $log->debug('You screwed up, but that is ok');
+  $log = $log->debug('All', 'cool');
 
 Log debug message.
 
 =head2 error
 
-  $log = $log->error('You really screwed up this time.');
-  $log = $log->error('Wow', 'seriously!');
+  $log = $log->error('You really screwed up this time');
+  $log = $log->error('Wow', 'seriously');
 
 Log error message.
 
 =head2 fatal
 
   $log = $log->fatal('Its over...');
-  $log = $log->fatal('Bye', 'bye!');
+  $log = $log->fatal('Bye', 'bye');
 
 Log fatal message.
 
 =head2 info
 
-  $log = $log->info('You are bad, but you prolly know already.');
-  $log = $log->info('Ok', 'then!');
+  $log = $log->info('You are bad, but you prolly know already');
+  $log = $log->info('Ok', 'then');
 
 Log info message.
 
@@ -256,8 +256,8 @@ Check for warn log level.
 
 =head2 log
 
-  $log = $log->log(debug => 'This should work.');
-  $log = $log->log(debug => 'This', 'too!');
+  $log = $log->log(debug => 'This should work');
+  $log = $log->log(debug => 'This', 'too');
 
 Emit L</"message"> event.
 
@@ -271,7 +271,7 @@ default logger.
 =head2 warn
 
   $log = $log->warn('Dont do that Dave...');
-  $log = $log->warn('No', 'really!');
+  $log = $log->warn('No', 'really');
 
 Log warn message.
 

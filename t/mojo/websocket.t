@@ -448,7 +448,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 is $stash->{finished}, 1, 'finish event has been emitted once';
-like $log, qr/Inactivity timeout\./, 'right log message';
+like $log, qr/Inactivity timeout/, 'right log message';
 app->log->unsubscribe(message => $msg);
 
 # Ping/pong

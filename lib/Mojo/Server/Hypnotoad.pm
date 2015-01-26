@@ -98,7 +98,7 @@ sub _manage {
   my $log     = $prefork->app->log;
   if ($ENV{HYPNOTOAD_PID} && $ENV{HYPNOTOAD_PID} ne $$) {
     return unless $prefork->healthy == $prefork->workers;
-    $log->info("Upgrade successful, stopping $ENV{HYPNOTOAD_PID}.");
+    $log->info("Upgrade successful, stopping $ENV{HYPNOTOAD_PID}");
     kill 'QUIT', $ENV{HYPNOTOAD_PID};
   }
   $ENV{HYPNOTOAD_PID} = $$ unless ($ENV{HYPNOTOAD_PID} // '') eq $$;
@@ -108,7 +108,7 @@ sub _manage {
 
     # Fresh start
     unless ($self->{new}) {
-      $log->info('Starting zero downtime software upgrade.');
+      $log->info('Starting zero downtime software upgrade');
       die "Can't fork: $!" unless defined(my $pid = $self->{new} = fork);
       exec $^X, $ENV{HYPNOTOAD_EXE} or die "Can't exec: $!" unless $pid;
     }
@@ -124,7 +124,7 @@ sub _reap {
 
   # Clean up failed upgrade
   return unless ($self->{new} || '') eq $pid;
-  $self->prefork->app->log->error('Zero downtime software upgrade failed.');
+  $self->prefork->app->log->error('Zero downtime software upgrade failed');
   delete @$self{qw(new upgrade)};
 }
 
@@ -164,7 +164,6 @@ automatically daemonizes the server process and defaults to C<production> mode
 for L<Mojolicious> and L<Mojolicious::Lite> applications.
 
   $ hypnotoad ./myapp.pl
-  Server available at http://127.0.0.1:8080.
 
 You can run the same command again for automatic hot deployment.
 

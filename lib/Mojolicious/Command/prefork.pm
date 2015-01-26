@@ -5,7 +5,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Prefork;
 
 has description =>
-  'Start application with preforking HTTP and WebSocket server.';
+  'Start application with preforking HTTP and WebSocket server';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -55,37 +55,37 @@ Mojolicious::Command::prefork - Prefork command
 
   Options:
     -A, --accepts <number>               Number of connections for workers to
-                                         accept, defaults to 1000.
-    -a, --accept-interval <seconds>      Accept interval, defaults to 0.025.
+                                         accept, defaults to 1000
+    -a, --accept-interval <seconds>      Accept interval, defaults to 0.025
     -b, --backlog <size>                 Listen backlog size, defaults to
-                                         SOMAXCONN.
+                                         SOMAXCONN
     -c, --clients <number>               Maximum number of concurrent clients,
-                                         defaults to 1000.
+                                         defaults to 1000
     -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 20.
-    -g, --group <name>                   Group name for process.
-        --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5.
-    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20.
+    -g, --group <name>                   Group name for process
+        --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
+    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
     -i, --inactivity <seconds>           Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or
-                                         15.
+                                         15
         --lock-file <path>               Path to lock file, defaults to a
-                                         random file.
-    -L, --lock-timeout <seconds>         Lock timeout, defaults to 1.
+                                         random file
+    -L, --lock-timeout <seconds>         Lock timeout, defaults to 1
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
-                                         MOJO_LISTEN or "http://*:3000".
+                                         MOJO_LISTEN or "http://*:3000"
         --multi-accept <number>          Number of connection to accept at
-                                         once, defaults to 50.
+                                         once, defaults to 50
     -P, --pid-file <path>                Path to process id file, defaults to
-                                         a random file.
+                                         a random file
     -p, --proxy                          Activate reverse proxy support,
                                          defaults to the value of
-                                         MOJO_REVERSE_PROXY.
+                                         MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
                                          keep-alive connection, defaults to
-                                         25.
-    -u, --user <name>                    Username for process.
-    -w, --workers <number>               Number of workers, defaults to 4.
+                                         25
+    -u, --user <name>                    Username for process
+    -w, --workers <number>               Number of workers, defaults to 4
 
 =head1 DESCRIPTION
 
@@ -106,14 +106,14 @@ L<Mojolicious::Command> and implements the following new ones.
 =head2 description
 
   my $description = $prefork->description;
-  $prefork        = $prefork->description('Foo!');
+  $prefork        = $prefork->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $prefork->usage;
-  $prefork  = $prefork->usage('Foo!');
+  $prefork  = $prefork->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

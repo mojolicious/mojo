@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 
-has description => 'Run code against application.';
+has description => 'Run code against application';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -37,8 +37,8 @@ Mojolicious::Command::eval - Eval command
     ./myapp.pl eval -V 'app->renderer->paths'
 
   Options:
-    -v, --verbose   Print return value to STDOUT.
-    -V              Print returned data structure to STDOUT.
+    -v, --verbose   Print return value to STDOUT
+    -V              Print returned data structure to STDOUT
 
 =head1 DESCRIPTION
 
@@ -58,14 +58,14 @@ L<Mojolicious::Command> and implements the following new ones.
 =head2 description
 
   my $description = $eval->description;
-  $eval           = $eval->description('Foo!');
+  $eval           = $eval->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $eval->usage;
-  $eval     = $eval->usage('Foo!');
+  $eval     = $eval->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

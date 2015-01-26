@@ -1046,8 +1046,8 @@ helper to the application you can use L<Mojolicious/"helper">.
 
   get '/' => sub {
     my $c = shift;
-    $c->debug('It works.');
-    $c->render(text => 'Hello.');
+    $c->debug('It works!');
+    $c->render(text => 'Hello!');
   };
 
   app->start;

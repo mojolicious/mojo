@@ -54,7 +54,7 @@ app->start;
   code into a file and start it with `morbo`.
 
     $ morbo hello.pl
-    Server available at http://127.0.0.1:3000.
+    Server available at http://127.0.0.1:3000
 
     $ curl http://127.0.0.1:3000/
     I ♥ Mojolicious!

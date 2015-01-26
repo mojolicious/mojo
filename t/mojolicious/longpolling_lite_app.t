@@ -248,7 +248,7 @@ ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
-unlike $log, qr/Nothing has been rendered, expecting delayed response\./,
+unlike $log, qr/Nothing has been rendered, expecting delayed response/,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -393,7 +393,7 @@ $t->get_ok('/longpoll/static/delayed')->status_is(200)
   ->content_is("Hello Mojo from a static file!\n");
 is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
-like $log, qr/Nothing has been rendered, expecting delayed response\./,
+like $log, qr/Nothing has been rendered, expecting delayed response/,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 

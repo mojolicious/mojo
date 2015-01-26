@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path);
 
-has description => 'Generate Mojolicious application directory structure.';
+has description => 'Generate Mojolicious application directory structure';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -77,14 +77,14 @@ L<Mojolicious::Command> and implements the following new ones.
 =head2 description
 
   my $description = $app->description;
-  $app            = $app->description('Foo!');
+  $app            = $app->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $app->usage;
-  $app      = $app->usage('Foo!');
+  $app      = $app->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

@@ -32,7 +32,7 @@ has secrets  => sub {
   my $self = shift;
 
   # Warn developers about insecure default
-  $self->log->debug('Your secret passphrase needs to be changed!!!');
+  $self->log->debug('Your secret passphrase needs to be changed');
 
   # Default to moniker
   return [$self->moniker];
@@ -102,7 +102,7 @@ sub dispatch {
     my $req    = $c->req;
     my $method = $req->method;
     my $path   = $req->url->path->to_abs_string;
-    $self->log->debug(qq{$method "$path".});
+    $self->log->debug(qq{$method "$path"});
     $stash->{'mojo.started'} = [Time::HiRes::gettimeofday];
   }
 
@@ -127,14 +127,14 @@ sub handler {
   $self->plugins->emit_chain(around_dispatch => $c);
 
   # Delayed response
-  $self->log->debug('Nothing has been rendered, expecting delayed response.')
+  $self->log->debug('Nothing has been rendered, expecting delayed response')
     unless $c->tx->is_writing;
 }
 
 sub helper {
   my ($self, $name, $cb) = @_;
   my $r = $self->renderer;
-  $self->log->debug(qq{Helper "$name" already exists, replacing.})
+  $self->log->debug(qq{Helper "$name" already exists, replacing})
     if exists $r->helpers->{$name};
   $r->add_helper($name => $cb);
 }

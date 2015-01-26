@@ -41,20 +41,20 @@ morbo - Morbo HTTP and WebSocket development server
     morbo -w /usr/local/lib -w public ./myapp.pl
 
   Options:
-    -h, --help                     Show this message.
+    -h, --help                     Show this message
     -l, --listen <location>        One or more locations you want to listen
                                    on, defaults to the value of MOJO_LISTEN or
-                                   "http://*:3000".
+                                   "http://*:3000"
     -m, --mode <name>              Operating mode for your application,
                                    defaults to the value of
-                                   MOJO_MODE/PLACK_ENV or "development".
+                                   MOJO_MODE/PLACK_ENV or "development"
     -v, --verbose                  Print details about what files changed to
-                                   STDOUT.
+                                   STDOUT
     -w, --watch <directory/file>   One or more directories and files to watch
                                    for changes, defaults to the application
                                    script as well as the "lib" and "templates"
                                    directories in the current working
-                                   directory.
+                                   directory
 
 =head1 DESCRIPTION
 

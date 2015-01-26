@@ -166,15 +166,15 @@ sub _listen {
           sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read => sub { $self->_read($id => pop) });
       $stream->on(timeout =>
-          sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
+          sub { $self->app->log->debug('Inactivity timeout') if $c->{tx} });
     }
   );
 
   return if $self->silent;
-  $self->app->log->info(qq{Listening at "$url".});
+  $self->app->log->info(qq{Listening at "$url"});
   $query->params([]);
   $url->host('127.0.0.1') if $url->host eq '*';
-  say "Server available at $url.";
+  say "Server available at $url";
 }
 
 sub _read {

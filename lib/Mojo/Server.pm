@@ -92,7 +92,7 @@ sub setuidgid {
   return $self;
 }
 
-sub _error { $_[0]->app->log->error("$_[1].") and croak $_[1] }
+sub _error { $_[0]->app->log->error($_[1]) and croak $_[1] }
 
 1;
 

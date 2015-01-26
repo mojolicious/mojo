@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Util qw(camelize class_to_path);
 use Mojolicious;
 
-has description => 'Generate Mojolicious plugin directory structure.';
+has description => 'Generate Mojolicious plugin directory structure';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -56,14 +56,14 @@ L<Mojolicious::Command> and implements the following new ones.
 =head2 description
 
   my $description = $plugin->description;
-  $plugin         = $plugin->description('Foo!');
+  $plugin         = $plugin->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $plugin->usage;
-  $plugin   = $plugin->usage('Foo!');
+  $plugin   = $plugin->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

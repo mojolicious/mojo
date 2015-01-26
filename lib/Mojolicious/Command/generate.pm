@@ -1,7 +1,7 @@
 package Mojolicious::Command::generate;
 use Mojo::Base 'Mojolicious::Commands';
 
-has description => 'Generate files and directories from templates.';
+has description => 'Generate files and directories from templates';
 has hint        => <<EOF;
 
 See 'APPLICATION generate help GENERATOR' for more information on a specific
@@ -42,21 +42,21 @@ L<Mojolicious::Commands> and implements the following new ones.
 =head2 description
 
   my $description = $generator->description;
-  $generator      = $generator->description('Foo!');
+  $generator      = $generator->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 hint
 
   my $hint   = $generator->hint;
-  $generator = $generator->hint('Foo!');
+  $generator = $generator->hint('Foo');
 
 Short hint shown after listing available generator commands.
 
 =head2 message
 
   my $msg    = $generator->message;
-  $generator = $generator->message('Bar!');
+  $generator = $generator->message('Bar');
 
 Short usage message shown before listing available generator commands.
 

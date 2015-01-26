@@ -9,7 +9,7 @@ use Mojo::JSON::Pointer;
 use Mojo::Util qw(decode encode);
 use Scalar::Util 'weaken';
 
-has description => 'Perform HTTP request.';
+has description => 'Perform HTTP request';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -143,12 +143,12 @@ Mojolicious::Command::get - Get command
 
   Options:
     -C, --charset <charset>     Charset of HTML/XML content, defaults to auto
-                                detection.
-    -c, --content <content>     Content to send with request.
-    -H, --header <name:value>   Additional HTTP header.
-    -M, --method <method>       HTTP method to use, defaults to "GET".
-    -r, --redirect              Follow up to 10 redirects.
-    -v, --verbose               Print request and response headers to STDERR.
+                                detection
+    -c, --content <content>     Content to send with request
+    -H, --header <name:value>   Additional HTTP header
+    -M, --method <method>       HTTP method to use, defaults to "GET"
+    -r, --redirect              Follow up to 10 redirects
+    -v, --verbose               Print request and response headers to STDERR
 
 =head1 DESCRIPTION
 
@@ -169,14 +169,14 @@ applications.
 =head2 description
 
   my $description = $get->description;
-  $get            = $get->description('Foo!');
+  $get            = $get->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $get->usage;
-  $get      = $get->usage('Foo!');
+  $get      = $get->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

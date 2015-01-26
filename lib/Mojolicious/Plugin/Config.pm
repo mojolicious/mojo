@@ -6,7 +6,7 @@ use Mojo::Util qw(decode slurp);
 
 sub load {
   my ($self, $file, $conf, $app) = @_;
-  $app->log->debug(qq{Reading configuration file "$file".});
+  $app->log->debug(qq{Reading configuration file "$file"});
   return $self->parse(decode('UTF-8', slurp $file), $file, $conf, $app);
 }
 

@@ -10,14 +10,14 @@ use Mojo::Util qw(decode slurp);
 my $dir = tempdir CLEANUP => 1;
 my $path = catdir $dir, 'test.log';
 my $log = Mojo::Log->new(level => 'error', path => $path);
-$log->error('Just works.');
-$log->fatal('I ♥ Mojolicious.');
-$log->debug('Does not work.');
+$log->error('Just works');
+$log->fatal('I ♥ Mojolicious');
+$log->debug('Does not work');
 undef $log;
 my $content = decode 'UTF-8', slurp($path);
-like $content, qr/\[.*\] \[error\] Just works\./,        'right error message';
-like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\./, 'right fatal message';
-unlike $content, qr/\[.*\] \[debug\] Does not work\./, 'no debug message';
+like $content,   qr/\[.*\] \[error\] Just works/,        'right error message';
+like $content,   qr/\[.*\] \[fatal\] I ♥ Mojolicious/, 'right fatal message';
+unlike $content, qr/\[.*\] \[debug\] Does not work/,     'no debug message';
 
 # Logging to STDERR
 my $buffer = '';
@@ -25,24 +25,23 @@ my $buffer = '';
   open my $handle, '>', \$buffer;
   local *STDERR = $handle;
   my $log = Mojo::Log->new;
-  $log->error('Just works.');
-  $log->fatal('I ♥ Mojolicious.');
-  $log->debug('Works too.');
+  $log->error('Just works');
+  $log->fatal('I ♥ Mojolicious');
+  $log->debug('Works too');
 }
 $content = decode 'UTF-8', $buffer;
-like $content, qr/\[.*\] \[error\] Just works\.\n/, 'right error message';
-like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\.\n/,
-  'right fatal message';
-like $content, qr/\[.*\] \[debug\] Works too\.\n/, 'right debug message';
+like $content, qr/\[.*\] \[error\] Just works\n/,        'right error message';
+like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\n/, 'right fatal message';
+like $content, qr/\[.*\] \[debug\] Works too\n/,         'right debug message';
 
 # Formatting
 $log = Mojo::Log->new;
-like $log->format->(time, 'debug', 'Test 123.'),
-  qr/^\[.*\] \[debug\] Test 123\.\n$/, 'right format';
+like $log->format->(time, 'debug', 'Test 123'),
+  qr/^\[.*\] \[debug\] Test 123\n$/, 'right format';
 like $log->format->(time, 'debug', qw(Test 1 2 3)),
   qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
-like $log->format->(time, 'error', 'I ♥ Mojolicious.'),
-  qr/^\[.*\] \[error\] I ♥ Mojolicious\.\n$/, 'right format';
+like $log->format->(time, 'error', 'I ♥ Mojolicious'),
+  qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
 $log->format(
   sub {
     my ($time, $level, @lines) = @_;
@@ -86,22 +85,22 @@ my $history;
   open my $handle, '>', \$buffer;
   local *STDERR = $handle;
   my $log = Mojo::Log->new->max_history_size(2)->level('info');
-  $log->error('First.');
-  $log->fatal('Second.');
-  $log->debug('Third.');
-  $log->info('Fourth.', 'Fifth.');
+  $log->error('First');
+  $log->fatal('Second');
+  $log->debug('Third');
+  $log->info('Fourth', 'Fifth');
   $history = $log->history;
 }
 $content = decode 'UTF-8', $buffer;
-like $content,   qr/\[.*\] \[error\] First\.\n/,         'right error message';
-like $content,   qr/\[.*\] \[info\] Fourth\.\nFifth.\n/, 'right info message';
-unlike $content, qr/debug/,                              'no debug message';
+like $content,   qr/\[.*\] \[error\] First\n/,        'right error message';
+like $content,   qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
+unlike $content, qr/debug/,                           'no debug message';
 like $history->[0][0], qr/^\d+$/, 'right epoch time';
 is $history->[0][1],   'fatal',   'right level';
-is $history->[0][2],   'Second.', 'right message';
+is $history->[0][2],   'Second',  'right message';
 is $history->[1][1],   'info',    'right level';
-is $history->[1][2],   'Fourth.', 'right message';
-is $history->[1][3],   'Fifth.',  'right message';
+is $history->[1][2],   'Fourth',  'right message';
+is $history->[1][3],   'Fifth',   'right message';
 ok !$history->[2], 'no more messages';
 
 # "debug"

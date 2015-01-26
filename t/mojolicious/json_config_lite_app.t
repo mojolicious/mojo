@@ -28,7 +28,7 @@ my $log = '';
 my $cb = app->log->on(message => sub { $log .= pop });
 $path = abs_path catfile(dirname(__FILE__), 'json_config_lite_app_abs.json');
 plugin JSONConfig => {file => $path};
-like $log, qr/Reading configuration file "\Q$path\E"\./, 'right message';
+like $log, qr/Reading configuration file "\Q$path\E"/, 'right message';
 app->log->unsubscribe(message => $cb);
 is $config->{foo},          'bar',            'right value';
 is $config->{hello},        'there',          'right value';

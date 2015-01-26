@@ -113,7 +113,7 @@ sub _callback {
   my ($self, $c, $cb, $last) = @_;
   $c->stash->{'mojo.routed'} = 1 if $last;
   my $app = $c->app;
-  $app->log->debug('Routing to a callback.');
+  $app->log->debug('Routing to a callback');
   return _action($app, $c, $cb, $last);
 }
 
@@ -143,7 +143,7 @@ sub _class {
 
     # Failed
     next unless defined(my $found = $self->_load($class));
-    return !$log->debug(qq{Class "$class" is not a controller.}) unless $found;
+    return !$log->debug(qq{Class "$class" is not a controller}) unless $found;
 
     # Success
     my $new = $class->new(%$c);
@@ -152,7 +152,7 @@ sub _class {
   }
 
   # Nothing found
-  $log->debug(qq{Controller "$classes[-1]" does not exist.}) if @classes;
+  $log->debug(qq{Controller "$classes[-1]" does not exist}) if @classes;
   return @classes ? undef : 0;
 }
 
@@ -168,7 +168,7 @@ sub _controller {
   my $app   = $old->app;
   my $log   = $app->log;
   if ($new->isa('Mojo')) {
-    $log->debug(qq{Routing to application "$class".});
+    $log->debug(qq{Routing to application "$class"});
 
     # Try to connect routes
     if (my $sub = $new->can('routes')) {
@@ -182,16 +182,16 @@ sub _controller {
   # Action
   elsif (my $method = $field->{action}) {
     if (!$self->is_hidden($method)) {
-      $log->debug(qq{Routing to controller "$class" and action "$method".});
+      $log->debug(qq{Routing to controller "$class" and action "$method"});
 
       if (my $sub = $new->can($method)) {
         $old->stash->{'mojo.routed'} = 1 if $last;
         return 1 if _action($app, $new, $sub, $last);
       }
 
-      else { $log->debug('Action not found in controller.') }
+      else { $log->debug('Action not found in controller') }
     }
-    else { $log->debug(qq{Action "$method" is not allowed.}) }
+    else { $log->debug(qq{Action "$method" is not allowed}) }
   }
 
   return undef;

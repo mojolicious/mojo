@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 
-has description => 'Run tests.';
+has description => 'Run tests';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -40,7 +40,7 @@ Mojolicious::Command::test - Test command
     ./myapp.pl test -v t/foo/*.t
 
   Options:
-    -v, --verbose   Print verbose debug information to STDERR.
+    -v, --verbose   Print verbose debug information to STDERR
 
 =head1 DESCRIPTION
 
@@ -60,14 +60,14 @@ L<Mojolicious::Command> and implements the following new ones.
 =head2 description
 
   my $description = $test->description;
-  $test           = $test->description('Foo!');
+  $test           = $test->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $test->usage;
-  $test     = $test->usage('Foo!');
+  $test     = $test->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

@@ -13,7 +13,7 @@ use Mojo::Util qw(spurt unindent);
 use Pod::Usage 'pod2usage';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
-has description => 'No description.';
+has description => 'No description';
 has 'quiet';
 has usage => "Usage: APPLICATION\n";
 
@@ -99,14 +99,14 @@ Mojolicious::Command - Command base class
   use Mojo::Base 'Mojolicious::Command';
 
   # Short description
-  has description => 'My first Mojo command.';
+  has description => 'My first Mojo command';
 
   # Short usage message
   has usage => <<EOF;
   Usage: APPLICATION mycommand [OPTIONS]
 
   Options:
-    -s, --something   Does something.
+    -s, --something   Does something
   EOF
 
   sub run {
@@ -139,7 +139,7 @@ Application for command, defaults to a L<Mojo::HelloWorld> object.
 =head2 description
 
   my $description = $command->description;
-  $command        = $command->description('Foo!');
+  $command        = $command->description('Foo');
 
 Short description of command, used for the command list.
 
@@ -153,7 +153,7 @@ Limited command output.
 =head2 usage
 
   my $usage = $command->usage;
-  $command  = $command->usage('Foo!');
+  $command  = $command->usage('Foo');
 
 Usage information for command, used for the help screen.
 

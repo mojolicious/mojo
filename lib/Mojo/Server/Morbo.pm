@@ -127,7 +127,7 @@ applications.
 To start applications with it you can use the L<morbo> script.
 
   $ morbo ./myapp.pl
-  Server available at http://127.0.0.1:3000.
+  Server available at http://127.0.0.1:3000
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
 resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),

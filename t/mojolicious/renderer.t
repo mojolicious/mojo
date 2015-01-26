@@ -48,7 +48,7 @@ my $log = '';
 my $cb = $c->app->log->on(message => sub { $log .= pop });
 $c->stash->{handler} = 'not_defined';
 is $renderer->render($c), undef, 'return undef for unrecognized handler';
-like $log, qr/No handler for "not_defined" available\./, 'right message';
+like $log, qr/No handler for "not_defined" available/, 'right message';
 $c->app->log->unsubscribe(message => $cb);
 
 # Default template name
@@ -59,7 +59,7 @@ is $c->app->renderer->template_for($c), 'foo/bar', 'right template name';
 $log = '';
 $cb = $c->app->log->on(message => sub { $log .= pop });
 $c->cookie(foo => 'x' x 4097);
-like $log, qr/Cookie "foo" is bigger than 4096 bytes\./, 'right message';
+like $log, qr/Cookie "foo" is bigger than 4096 bytes/, 'right message';
 $c->app->log->unsubscribe(message => $cb);
 
 # Nested helpers

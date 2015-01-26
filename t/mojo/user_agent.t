@@ -294,7 +294,7 @@ app->log->unsubscribe(message => $msg);
 ok !$tx->success, 'not successful';
 is $tx->error->{message}, 'Premature connection close', 'right error';
 is $timeout, 1, 'finish event has been emitted';
-like $log, qr/Inactivity timeout\./, 'right log message';
+like $log, qr/Inactivity timeout/, 'right log message';
 
 # Client times out
 $ua->once(

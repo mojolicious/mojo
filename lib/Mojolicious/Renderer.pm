@@ -233,7 +233,7 @@ sub _render_template {
   }
 
   # No handler
-  else { $c->app->log->error(qq{No handler for "$handler" available.}) }
+  else { $c->app->log->error(qq{No handler for "$handler" available}) }
   return undef;
 }
 

@@ -144,7 +144,7 @@ my $log = '';
 my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->app->helper(replaced_helper => sub { });
 $t->app->helper(replaced_helper => sub { });
-like $log, qr/Helper "replaced_helper" already exists, replacing\./,
+like $log, qr/Helper "replaced_helper" already exists, replacing/,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -174,7 +174,7 @@ $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
   ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
   ->content_unlike(qr/Something/)->content_like(qr/Page not found/);
 like $log,
-  qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller\./,
+  qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -194,7 +194,7 @@ $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
   ->content_like(qr/Page not found/);
-like $log, qr/Action not found in controller\./, 'right message';
+like $log, qr/Action not found in controller/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Foo::render (action not allowed)
@@ -203,7 +203,7 @@ $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/render')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
-like $log, qr/Action "render" is not allowed\./, 'right message';
+like $log, qr/Action "render" is not allowed/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Foo::yada (action-less template)
@@ -222,11 +222,11 @@ $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Missing right curly/);
-like $log, qr/Rendering template "syntaxerror.html.epl"\./, 'right message';
+like $log, qr/Rendering template "syntaxerror.html.epl"/, 'right message';
 like $log, qr/Missing right curly/, 'right message';
-like $log, qr/Template "exception.development.html.ep" not found\./,
+like $log, qr/Template "exception.development.html.ep" not found/,
   'right message';
-like $log, qr/Rendering template "exception.html.epl"\./, 'right message';
+like $log, qr/Rendering template "exception.html.epl"/, 'right message';
 like $log, qr/500 Internal Server Error/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -266,8 +266,7 @@ $url->path('/fun/time');
 $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
-like $log,
-  qr!Rendering cached template "foo/fun\.html\.ep" from DATA section\.!,
+like $log, qr!Rendering cached template "foo/fun\.html\.ep" from DATA section!,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -370,7 +369,7 @@ $log = '';
 $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/another')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)');
-like $log, qr/Controller "MojoliciousTest::Another" does not exist\./,
+like $log, qr/Controller "MojoliciousTest::Another" does not exist/,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -496,7 +495,7 @@ $log = '';
 $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/redispatch')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Redispatch!');
-like $log, qr/Routing to application "SingleFileTestApp::Redispatch"\./,
+like $log, qr/Routing to application "SingleFileTestApp::Redispatch"/,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -536,13 +535,13 @@ $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended')->status_is(200)
   ->header_is(Server        => 'Mojolicious (Perl)')
   ->header_is('X-Suspended' => '0, 1, 1, 2')->content_is('Have fun!');
-like $log, qr!GET "/suspended"\.!, 'right message';
+like $log, qr!GET "/suspended"!, 'right message';
 like $log,
-  qr/Routing to controller "MojoliciousTest::Foo" and action "suspended"\./,
+  qr/Routing to controller "MojoliciousTest::Foo" and action "suspended"/,
   'right message';
-like $log, qr/Routing to controller "MojoliciousTest::Foo" and action "fun"\./,
+like $log, qr/Routing to controller "MojoliciousTest::Foo" and action "fun"/,
   'right message';
-like $log, qr!Rendering template "foo/fun.html.ep" from DATA section\.!,
+like $log, qr!Rendering template "foo/fun.html.ep" from DATA section!,
   'right message';
 like $log, qr/200 OK/, 'right message';
 $t->app->log->unsubscribe(message => $cb);

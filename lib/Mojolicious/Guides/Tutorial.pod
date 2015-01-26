@@ -39,10 +39,10 @@ Note that CGI and L<PSGI> environments can usually be auto detected and will
 just work without commands.
 
   $ ./myapp.pl daemon
-  Server available at http://127.0.0.1:3000.
+  Server available at http://127.0.0.1:3000
 
   $ ./myapp.pl daemon -l http://*:8080
-  Server available at http://127.0.0.1:8080.
+  Server available at http://127.0.0.1:8080
 
   $ ./myapp.pl cgi
   ...CGI output...
@@ -66,7 +66,7 @@ C<morbo> development web server, so you don't have to restart the server after
 every change.
 
   $ morbo ./myapp.pl
-  Server available at http://127.0.0.1:3000.
+  Server available at http://127.0.0.1:3000
 
 For more information about how to deploy your application see also
 L<Mojolicious::Guides::Cookbook/"DEPLOYMENT">.
@@ -290,7 +290,7 @@ from actions to templates.
   get '/secret' => sub {
     my $c    = shift;
     my $user = $c->whois;
-    $c->app->log->debug("Request from $user.");
+    $c->app->log->debug("Request from $user");
   };
 
   app->start;
@@ -892,11 +892,11 @@ the attribute L<Mojolicious/"mode">.
 
   get '/' => sub {
     my $c = shift;
-    $c->app->log->debug('Rendering mode specific message.');
+    $c->app->log->debug('Rendering mode specific message');
     $c->render(text => $msg);
   };
 
-  app->log->debug('Starting application.');
+  app->log->debug('Starting application');
   app->start;
 
 The default operating mode will usually be C<development> and can be changed

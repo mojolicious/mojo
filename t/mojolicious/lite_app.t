@@ -24,7 +24,7 @@ app->defaults(default => 23);
 my $log = '';
 my $cb = app->log->on(message => sub { $log .= pop });
 is app->secrets->[0], app->moniker, 'secret defaults to moniker';
-like $log, qr/Your secret passphrase needs to be changed!!!/, 'right message';
+like $log, qr/Your secret passphrase needs to be changed/, 'right message';
 app->log->unsubscribe(message => $cb);
 
 # Test helpers

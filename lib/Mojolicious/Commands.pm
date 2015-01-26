@@ -114,11 +114,11 @@ Mojolicious::Commands - Command line interface
        work without commands.
 
   Options (for all commands):
-    -h, --help          Get more information on a specific command.
+    -h, --help          Get more information on a specific command
         --home <path>   Path to your applications home directory, defaults to
-                        the value of MOJO_HOME or auto detection.
+                        the value of MOJO_HOME or auto detection
     -m, --mode <name>   Operating mode for your application, defaults to the
-                        value of MOJO_MODE/PLACK_ENV or "development".
+                        value of MOJO_MODE/PLACK_ENV or "development"
 
 =head1 DESCRIPTION
 
@@ -270,7 +270,7 @@ and implements the following new ones.
 =head2 hint
 
   my $hint  = $commands->hint;
-  $commands = $commands->hint('Foo!');
+  $commands = $commands->hint('Foo');
 
 Short hint shown after listing available commands.
 

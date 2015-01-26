@@ -1,7 +1,7 @@
 package Mojolicious::Command::generate::lite_app;
 use Mojo::Base 'Mojolicious::Command';
 
-has description => 'Generate Mojolicious::Lite application.';
+has description => 'Generate Mojolicious::Lite application';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -42,14 +42,14 @@ L<Mojolicious::Command> and implements the following new ones.
 =head2 description
 
   my $description = $app->description;
-  $app            = $app->description('Foo!');
+  $app            = $app->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $app->usage;
-  $app      = $app->usage('Foo!');
+  $app      = $app->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

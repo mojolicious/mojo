@@ -5,7 +5,7 @@ use Mojo::IOLoop::Client;
 use Mojo::UserAgent;
 use Mojolicious;
 
-has description => 'Show versions of available modules.';
+has description => 'Show versions of available modules';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -39,7 +39,7 @@ EOF
   my $msg = 'This version is up to date, have fun!';
   $msg = 'Thanks for testing a development release, you are awesome!'
     if $latest < $Mojolicious::VERSION;
-  $msg = "You might want to update your Mojolicious to $latest."
+  $msg = "You might want to update your Mojolicious to $latest!"
     if $latest > $Mojolicious::VERSION;
   say $msg;
 }
@@ -75,14 +75,14 @@ L<Mojolicious::Command> and implements the following new ones.
 =head2 description
 
   my $description = $v->description;
-  $v              = $v->description('Foo!');
+  $v              = $v->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 usage
 
   my $usage = $v->usage;
-  $v        = $v->usage('Foo!');
+  $v        = $v->usage('Foo');
 
 Usage information for this command, used for the help screen.
 

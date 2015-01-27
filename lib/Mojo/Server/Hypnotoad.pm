@@ -102,7 +102,7 @@ sub _hot_deploy {
 sub _manage {
   my $self = shift;
 
-  # Upgraded
+  # Upgraded (wait for all workers to send a heartbeat)
   my $prefork = $self->prefork;
   my $log     = $prefork->app->log;
   if ($ENV{HYPNOTOAD_PID} && $ENV{HYPNOTOAD_PID} ne $$) {

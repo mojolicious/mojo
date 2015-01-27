@@ -16,11 +16,11 @@ my $ATTR_RE   = qr/
 /x;
 my $PSEUDO_CLASS_RE = qr/(?::([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
 my $TOKEN_RE        = qr/
-  (\s*,\s*)?                         # Separator
-  ((?:[^[\\:\s,]|$ESCAPE_RE\s?)+)?   # Element
-  ($PSEUDO_CLASS_RE*)?               # Pseudoclass
-  ((?:$ATTR_RE)*)?                   # Attributes
-  (?:\s*([>+~]))?                    # Combinator
+  (\s*,\s*)?                            # Separator
+  ((?:[^[\\:\s,>+~]|$ESCAPE_RE\s?)+)?   # Element
+  ($PSEUDO_CLASS_RE*)?                  # Pseudoclass
+  ((?:$ATTR_RE)*)?                      # Attributes
+  (?:\s*([>+~]))?                       # Combinator
 /x;
 
 sub match {

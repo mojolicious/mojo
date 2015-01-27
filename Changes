@@ -1,7 +1,9 @@
 
-5.76  2015-01-27
+5.76  2015-01-28
   - Improved Hypnotoad load balancing by calling srand() after starting a new
     worker in Mojo::Server::Prefork.
+  - Fixed bug in Mojo::DOM::CSS where combinators needed to be surrounded by
+    whitespace.
 
 5.75  2015-01-26
   - Added healthy method to Mojo::Server::Prefork.

@@ -81,7 +81,9 @@ sub run {
   # Clean manager environment
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
   local $SIG{CHLD} = sub {
-    while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
+    while ((my $pid = waitpid -1, WNOHANG) > 0) {
+      $self->emit(reap => $pid)->_stopped($pid);
+    }
   };
   local $SIG{QUIT} = sub { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
@@ -103,7 +105,7 @@ sub _manage {
   my $self = shift;
 
   # Spawn more workers if necessary and check PID file
-  if (!$self->{stop}) {
+  if (!$self->{finished}) {
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
     $self->ensure_pid_file;
   }
@@ -138,11 +140,9 @@ sub _manage {
     # Normal stop
     $log->debug("Stopping worker $pid")
       and (kill 'KILL', $pid or $self->_stopped($pid))
-      if $w->{force} || ($self->{stop} && !$graceful);
+      if $w->{force} || ($self->{finished} && !$graceful);
   }
 }
-
-sub _reap { shift->emit(reap => $_[0])->_stopped($_[0]) }
 
 sub _spawn {
   my $self = shift;
@@ -208,7 +208,10 @@ sub _stopped {
     unless $w->{healthy};
 }
 
-sub _term { @{$_[0]->emit(finish => $_[1])}{qw(stop graceful)} = (1, $_[1]) }
+sub _term {
+  my ($self, $graceful) = @_;
+  @{$self->emit(finish => $graceful)}{qw(finished graceful)} = (1, $graceful);
+}
 
 sub _wait {
   my $self = shift;

@@ -33,7 +33,7 @@ sub run {
   # Clean manager environment
   local $SIG{CHLD} = sub { $self->_reap if $self->{worker} };
   local $SIG{INT} = local $SIG{TERM} = local $SIG{QUIT} = sub {
-    $self->{stop} = 1;
+    $self->{finished} = 1;
     kill 'TERM', $self->{worker} if $self->{worker};
   };
   unshift @{$self->watch}, $app;
@@ -42,7 +42,7 @@ sub run {
   # Prepare and cache listen sockets for smooth restarting
   my $daemon = Mojo::Server::Daemon->new(silent => 1)->start->stop;
 
-  $self->_manage while !$self->{stop} || $self->{worker};
+  $self->_manage while !$self->{finished} || $self->{worker};
   exit 0;
 }
 
@@ -88,14 +88,14 @@ sub _spawn {
 
   # Worker
   $SIG{CHLD} = 'DEFAULT';
-  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{stop} = 1 };
+  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{finished} = 1 };
   my $daemon = Mojo::Server::Daemon->new;
   $daemon->load_app($self->watch->[0]);
   $daemon->silent(1) if $ENV{MORBO_REV} > 1;
   $daemon->start;
   my $loop = $daemon->ioloop;
   $loop->recurring(
-    1 => sub { shift->stop if !kill(0, $manager) || $self->{stop} });
+    1 => sub { shift->stop if !kill(0, $manager) || $self->{finished} });
   $loop->start;
   exit 0;
 }

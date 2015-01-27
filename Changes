@@ -1,4 +1,6 @@
 
+5.76  2015-01-27
+
 5.75  2015-01-26
   - Added healthy method to Mojo::Server::Prefork.
   - Improved all built-in web servers to die if group or user assignment

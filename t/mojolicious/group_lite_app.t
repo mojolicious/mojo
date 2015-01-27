@@ -271,8 +271,8 @@ $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
   "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
-like $log, qr/Cookie "foo" not signed/,        'right message';
-like $log, qr/Cookie "bad" has bad signature/, 'right message';
+like $log, qr/Cookie "foo" is not signed/,       'right message';
+like $log, qr/Cookie "bad" has a bad signature/, 'right message';
 ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
 $t->app->log->unsubscribe(message => $cb);

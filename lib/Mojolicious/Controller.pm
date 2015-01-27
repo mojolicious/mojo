@@ -99,10 +99,10 @@ sub every_signed_cookie {
       }
       if ($valid) { push @results, $value }
 
-      else { $self->app->log->debug(qq{Cookie "$name" has bad signature}) }
+      else { $self->app->log->debug(qq{Cookie "$name" has a bad signature}) }
     }
 
-    else { $self->app->log->debug(qq{Cookie "$name" not signed}) }
+    else { $self->app->log->debug(qq{Cookie "$name" is not signed}) }
   }
 
   return \@results;

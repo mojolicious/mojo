@@ -203,10 +203,8 @@ sub _all_text {
 sub _ancestors {
   my ($self, $root) = @_;
 
-  return if $self->node eq 'root';
-
+  return unless my $tree = $self->_parent;
   my @ancestors;
-  my $tree = $self->_parent;
   do { push @ancestors, $tree }
     while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
   return $root ? $ancestors[-1] : @ancestors[0 .. $#ancestors - 1];

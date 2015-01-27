@@ -33,7 +33,7 @@ Mojo::IOLoop->server(
 
 print <<'EOF';
 Starting server on port 8080.
-Try something like "wrk -c 100 -d 10s http://127.0.0.1:8080/" for testing.
+For testing use something like "wrk -c 100 -d 10s http://127.0.0.1:8080/".
 On a MacBook Air this results in about 18k req/s.
 EOF
 

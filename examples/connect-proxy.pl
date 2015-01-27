@@ -37,7 +37,7 @@ Mojo::IOLoop->server(
                 }
 
                 # Start forwarding data in both directions
-                say "Forwarding to $address:$port.";
+                say "Forwarding to $address:$port";
                 Mojo::IOLoop->stream($client)
                   ->write("HTTP/1.1 200 OK\x0d\x0a"
                     . "Connection: keep-alive\x0d\x0a\x0d\x0a");

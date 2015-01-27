@@ -48,12 +48,13 @@ quest is to develop the best possible solutions for these two criteria.
 =head2 What about backwards compatibility?
 
 In conformance with L<Mojolicious::Guides::Contributing>, we will always
-deprecate a feature before removing or changing it in incompatible ways
-between major releases. New features can however be marked as experimental to
-explicitly exclude them from these rules. This gives us the necessary freedom
-to ensure a healthy future for L<Mojolicious>. So, as long as you are not
-using anything marked experimental, untested or undocumented, you can always
-count on backwards compatibility, everything else would be considered a bug.
+deprecate a feature for 3 months, before removing or changing it in
+incompatible ways between major releases. New features can however be marked
+as experimental to explicitly exclude them from these rules. This gives us the
+necessary freedom to ensure a healthy future for L<Mojolicious>. So, as long
+as you are not using anything marked experimental, untested or undocumented,
+you can always count on backwards compatibility, everything else would be
+considered a bug.
 
 =head2 Why not split up Mojolicious into many smaller distributions?
 

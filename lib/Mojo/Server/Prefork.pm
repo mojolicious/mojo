@@ -82,9 +82,7 @@ sub run {
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
   local $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) {
-      next unless my $w = delete $self->emit(reap => $pid)->{pool}{$pid};
-      $self->app->log->debug("Worker $pid stopped");
-      $self->{finished} = 1 unless $w->{healthy};
+      $self->emit(reap => $pid)->_stopped($pid);
     }
   };
   local $SIG{QUIT} = sub { $self->_term(1) };
@@ -121,8 +119,8 @@ sub _manage {
   my $interval = $self->heartbeat_interval;
   my $ht       = $self->heartbeat_timeout;
   my $gt       = $self->graceful_timeout;
-  my $time     = steady_time;
   my $log      = $self->app->log;
+  my $time     = steady_time;
 
   for my $pid (keys %{$self->{pool}}) {
     next unless my $w = $self->{pool}{$pid};
@@ -134,14 +132,14 @@ sub _manage {
 
     # Graceful stop with timeout
     my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
-    $log->debug("Trying to stop worker $pid gracefully")
-      and (kill('QUIT', $pid) or delete $self->{pool}{$pid})
+    $log->debug("Stopping worker $pid gracefully")
+      and (kill 'QUIT', $pid or $self->_stopped($pid))
       if $graceful && !$w->{quit}++;
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
     $log->debug("Stopping worker $pid")
-      and (kill('KILL', $pid) or delete $self->{pool}{$pid})
+      and (kill 'KILL', $pid or $self->_stopped($pid))
       if $w->{force} || ($self->{finished} && !$graceful);
   }
 }
@@ -197,6 +195,13 @@ sub _spawn {
   $self->app->log->debug("Worker $$ started");
   $loop->start;
   exit 0;
+}
+
+sub _stopped {
+  my ($self, $pid) = @_;
+  return unless my $w = delete $self->{pool}{$pid};
+  $self->app->log->debug("Worker $pid stopped");
+  $self->{finished} = 1 unless $w->{healthy};
 }
 
 sub _term {

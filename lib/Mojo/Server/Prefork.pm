@@ -191,6 +191,7 @@ sub _spawn {
   $SIG{$_} = 'DEFAULT' for qw(INT TERM CHLD TTIN TTOU);
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete @$self{qw(poll reader)};
+  srand;
 
   $self->app->log->debug("Worker $$ started");
   $loop->start;

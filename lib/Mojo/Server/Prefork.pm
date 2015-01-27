@@ -59,7 +59,7 @@ sub ensure_pid_file {
 }
 
 sub healthy {
-  scalar grep { $_->{healthy} } values %{$_[0]{pool}};
+  scalar grep { $_->{healthy} } values %{shift->{pool}};
 }
 
 sub run {
@@ -81,9 +81,7 @@ sub run {
   # Clean manager environment
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
   local $SIG{CHLD} = sub {
-    while ((my $pid = waitpid -1, WNOHANG) > 0) {
-      $self->emit(reap => $pid)->_stopped($pid);
-    }
+    while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
   };
   local $SIG{QUIT} = sub { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
@@ -105,7 +103,7 @@ sub _manage {
   my $self = shift;
 
   # Spawn more workers if necessary and check PID file
-  if (!$self->{finished}) {
+  if (!$self->{stop}) {
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
     $self->ensure_pid_file;
   }
@@ -140,9 +138,11 @@ sub _manage {
     # Normal stop
     $log->debug("Stopping worker $pid")
       and (kill 'KILL', $pid or $self->_stopped($pid))
-      if $w->{force} || ($self->{finished} && !$graceful);
+      if $w->{force} || ($self->{stop} && !$graceful);
   }
 }
+
+sub _reap { shift->emit(reap => $_[0])->_stopped($_[0]) }
 
 sub _spawn {
   my $self = shift;
@@ -199,16 +199,16 @@ sub _spawn {
 
 sub _stopped {
   my ($self, $pid) = @_;
+
   return unless my $w = delete $self->{pool}{$pid};
-  $self->app->log->debug("Worker $pid stopped");
-  $self->{finished} = 1 unless $w->{healthy};
+
+  my $log = $self->app->log;
+  $log->debug("Worker $pid stopped");
+  $log->error("Worker $pid stopped too early, shutting down") and $self->_term
+    unless $w->{healthy};
 }
 
-sub _term {
-  my ($self, $graceful) = @_;
-  $self->emit(finish => $graceful)->{finished} = 1;
-  $self->{graceful} = 1 if $graceful;
-}
+sub _term { @{$_[0]->emit(finish => $_[1])}{qw(stop graceful)} = (1, $_[1]) }
 
 sub _wait {
   my $self = shift;
@@ -284,11 +284,11 @@ the following signals.
 
 =head2 INT, TERM
 
-Shutdown server immediately.
+Shut down server immediately.
 
 =head2 QUIT
 
-Shutdown server gracefully.
+Shut down server gracefully.
 
 =head2 TTIN
 

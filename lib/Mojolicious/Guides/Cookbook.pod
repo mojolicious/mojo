@@ -986,7 +986,7 @@ file with L<Mojo::Asset::File/"move_to">.
   my $tx = $ua->get('https://www.github.com/kraih/mojo/tarball/master');
   $tx->res->content->asset->move_to('mojo.tar.gz');
 
-To protect you from excessively large files there is also a limit of 10MB by
+To protect you from excessively large files there is also a limit of 16MB by
 default, which you can tweak with the attribute
 L<Mojo::Message/"max_message_size"> or C<MOJO_MAX_MESSAGE_SIZE> environment
 variable.

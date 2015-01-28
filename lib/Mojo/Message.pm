@@ -13,8 +13,8 @@ use Mojo::Util 'decode';
 
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
-has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
-has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} // 10485760 };
+has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
+has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} // 16777216 };
 has version          => '1.1';
 
 sub body {
@@ -381,7 +381,7 @@ Default charset used for form-data parsing, defaults to C<UTF-8>.
   $msg     = $msg->max_line_size(1024);
 
 Maximum start-line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
+C<MOJO_MAX_LINE_SIZE> environment variable or C<8192> (8KB).
 
 =head2 max_message_size
 
@@ -389,7 +389,7 @@ C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
   $msg     = $msg->max_message_size(1024);
 
 Maximum message size in bytes, defaults to the value of the
-C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<10485760> (10MB). Setting
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<16777216> (16MB). Setting
 the value to C<0> will allow messages of indefinite size. Note that increasing
 this value can also drastically increase memory usage, should you for example
 attempt to parse an excessively large message body with the L</"body_params">,
@@ -424,7 +424,7 @@ C<multipart/form-data> message body, usually a L<Mojo::Parameters> object.
 Note that this method caches all data, so it should not be called before the
 entire message body has been received. Parts of the message body need to be
 loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large, there's a 10MB limit by default.
+not excessively large, there's a 16MB limit by default.
 
   # Get POST parameter names and values
   my $hash = $msg->body_params->to_hash;
@@ -483,7 +483,7 @@ to call the method L<Mojo::DOM/"find"> on it right away, which returns a
 L<Mojo::Collection> object. Note that this method caches all data, so it
 should not be called before the entire message body has been received. The
 whole message body needs to be loaded into memory to parse it, so you have to
-make sure it is not excessively large, there's a 10MB limit by default.
+make sure it is not excessively large, there's a 16MB limit by default.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->map('text')->join("\n");
@@ -599,7 +599,7 @@ JSON Pointer can be used to extract a specific value with
 L<Mojo::JSON::Pointer>. Note that this method caches all data, so it should
 not be called before the entire message body has been received. The whole
 message body needs to be loaded into memory to parse it, so you have to make
-sure it is not excessively large, there's a 10MB limit by default.
+sure it is not excessively large, there's a 16MB limit by default.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];

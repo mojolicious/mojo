@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::Util 'monkey_patch';
 
-has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
+has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
 has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 100 };
 
 # Common headers
@@ -184,7 +184,7 @@ L<Mojo::Headers> implements the following attributes.
   $headers = $headers->max_line_size(1024);
 
 Maximum header line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<10240> (10KB).
+C<MOJO_MAX_LINE_SIZE> environment variable or C<8192> (8KB).
 
 =head2 max_lines
 

@@ -462,6 +462,9 @@ underlying connection might get closed early.
   my $address = $c->tx->remote_address;
   my $port    = $c->tx->remote_port;
 
+  # Increase size limit for WebSocket messages to 16MB
+  $c->tx->max_websocket_size(16777216) if $c->tx->is_websocket;
+
   # Perform non-blocking operation without knowing the connection status
   my $tx = $c->tx;
   Mojo::IOLoop->timer(2 => sub {

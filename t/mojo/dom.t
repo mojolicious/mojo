@@ -1171,7 +1171,7 @@ is $dom->at('h1 ~ p ~ p')->text,   'F', 'right text';
 is $dom->at('h1 + p ~ p')->text,   'F', 'right text';
 is $dom->at('h1 ~ p + p')->text,   'F', 'right text';
 is $dom->at('h1 + p + p')->text,   'F', 'right text';
-is $dom->at('h1+p+p')->text,       'F', 'right text';
+is $dom->at('h1  +  p+p')->text,   'F', 'right text';
 is $dom->at('ul > li ~ li')->text, 'C', 'right text';
 is $dom->at('ul li ~ li')->text,   'C', 'right text';
 is $dom->at('ul>li~li')->text,     'C', 'right text';

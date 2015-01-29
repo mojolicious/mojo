@@ -22,7 +22,7 @@ sub run {
     'u|user=s'       => sub { $daemon->user($_[1]) };
 
   $daemon->listen(\@listen) if @listen;
-  $daemon->setuidgid->run;
+  $daemon->run;
 }
 
 1;

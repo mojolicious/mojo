@@ -107,8 +107,7 @@ sub _manage {
 
   # Spawn more workers if necessary and check PID file
   if (!$self->{finished}) {
-    $self->_spawn
-      while grep({ !$_->{graceful} } values %{$self->{pool}}) < $self->workers;
+    $self->_spawn while keys %{$self->{pool}} < $self->workers;
     $self->ensure_pid_file;
   }
 

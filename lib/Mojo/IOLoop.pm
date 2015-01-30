@@ -41,7 +41,6 @@ sub acceptor {
   my $id = $self->_id;
   $self->{acceptors}{$id} = $acceptor;
   weaken $acceptor->reactor($self->reactor)->{reactor};
-  $self->{accepts} = $self->max_accepts if $self->max_accepts;
 
   # Allow new acceptor to get picked up
   $self->_not_accepting;
@@ -119,6 +118,16 @@ sub server {
   weaken $self;
   $server->on(
     accept => sub {
+
+      # Release accept mutex
+      $self->_not_accepting;
+
+      # Enforce connection limit (randomize to improve load balancing)
+      if (my $max = $self->max_accepts) {
+        $self->{accepts} //= $max - int rand $max / 2;
+        $self->max_connections(0) if ($self->{accepts} -= 1) <= 0;
+      }
+
       my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->$cb($stream, $self->stream($stream));
     }
@@ -140,18 +149,8 @@ sub stop { _instance(shift)->reactor->stop }
 
 sub stream {
   my ($self, $stream) = (_instance(shift), @_);
-
-  # Find stream for id
   return ($self->{connections}{$stream} || {})->{stream} unless ref $stream;
-
-  # Release accept mutex
-  $self->_not_accepting;
-
-  # Enforce connection limit (randomize to improve load balancing)
-  $self->max_connections(0)
-    if defined $self->{accepts} && ($self->{accepts} -= int(rand 2) + 1) <= 0;
-
-  return $self->_stream($stream, $self->_id);
+  return $self->_stream($stream => $self->_id);
 }
 
 sub timer { shift->_timer(timer => @_) }

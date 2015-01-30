@@ -1,10 +1,11 @@
 
-5.76  2015-01-30
+5.76  2015-01-31
   - Increased default max_message_size from 10MB to 16MB in Mojo::Message.
   - Reduced default max_line_size from 10KB to 8KB in Mojo::Headers and
     Mojo::Message.
   - Improved Hypnotoad load balancing by calling srand() after starting a new
     worker in Mojo::Server::Prefork.
+  - Fixed bug in Mojo::IOLoop where the accept limit was applied to broadly.
   - Fixed bug in Mojo::DOM::CSS where combinators needed to be surrounded by
     whitespace.
 

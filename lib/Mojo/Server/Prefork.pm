@@ -66,7 +66,8 @@ sub run {
   my $self = shift;
 
   # No Windows support
-  say 'Preforking not available for Windows.' and exit 0 if $^O eq 'MSWin32';
+  say 'Preforking is not available for Windows.' and exit 0
+    if $^O eq 'MSWin32';
 
   # Prepare lock file and event loop
   $self->{lock_file} = $self->lock_file . ".$$";

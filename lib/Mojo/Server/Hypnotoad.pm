@@ -37,7 +37,7 @@ sub run {
   my ($self, $app) = @_;
 
   # No Windows support
-  _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
+  _exit('Hypnotoad is not available for Windows.') if $^O eq 'MSWin32';
 
   # Remember executable and application for later
   $ENV{HYPNOTOAD_EXE} ||= $0;

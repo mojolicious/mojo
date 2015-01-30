@@ -711,11 +711,10 @@ constructs.
 
 =head2 Sessions
 
-Cookie based sessions just work out of the box, as soon as you start using them
-through the helper L<Mojolicious::Plugin::DefaultHelpers/"session">. Just be
-aware that all session data gets serialized with L<Mojo::JSON>, before being
-Base64 encoded and cryptographically signed with HMAC-SHA1, to prevent
-tampering.
+Cookie based sessions just work out of the box, as soon as you start using
+them through the helper L<Mojolicious::Plugin::DefaultHelpers/"session">. Just
+be aware that all session data gets serialized with L<Mojo::JSON> and stored
+client-side, with a cryptographic signature to prevent tampering.
 
   use Mojolicious::Lite;
 

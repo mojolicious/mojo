@@ -80,12 +80,12 @@ sub run {
   $self->{poll}->mask($self->{reader}, POLLIN | POLLPRI);
 
   # Clean manager environment
-  local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
   local $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) {
       $self->emit(reap => $pid)->_stopped($pid);
     }
   };
+  local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
   local $SIG{QUIT} = sub { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
   local $SIG{TTOU} = sub {
@@ -189,7 +189,7 @@ sub _spawn {
   $loop->recurring($self->heartbeat_interval => $cb);
 
   # Clean worker environment
-  $SIG{$_} = 'DEFAULT' for qw(INT TERM CHLD TTIN TTOU);
+  $SIG{$_} = 'DEFAULT' for qw(CHLD INT TERM TTIN TTOU);
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete @$self{qw(poll reader)};
   srand;

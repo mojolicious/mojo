@@ -98,7 +98,7 @@ $prefork->on(
     $tx->resume;
   }
 );
-my $count = $tx = $graceful, undef;
+my $count = $tx = $graceful = undef;
 @spawn = @reap = ();
 $prefork->on(spawn => sub { push @spawn, pop });
 $prefork->once(

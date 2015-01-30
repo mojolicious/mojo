@@ -850,8 +850,8 @@ which usually defaults to C<15> seconds.
 
 Persistent data storage for the next few requests, all session data gets
 serialized with L<Mojo::JSON> and stored Base64 encoded in HMAC-SHA1 signed
-cookies. Note that cookies usually have a C<4096> byte (4KB) limit, depending
-on browser.
+cookies, to prevent tampering. Note that cookies usually have a C<4096> byte
+(4KB) limit, depending on browser.
 
   # Manipulate session
   $c->session->{foo} = 'bar';
@@ -876,8 +876,9 @@ on browser.
 
 Access signed request cookie values and create new signed response cookies. If
 there are multiple values sharing the same name, and you want to access more
-than just the last one, you can use L</"every_signed_cookie">. Cookies failing
-HMAC-SHA1 signature verification will be automatically discarded.
+than just the last one, you can use L</"every_signed_cookie">. Cookies are
+cryptographically signed with HMAC-SHA1, to prevent tampering, and the ones
+failing signature verification will be automatically discarded.
 
 =head2 stash
 

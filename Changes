@@ -1,5 +1,5 @@
 
-5.76  2015-01-29
+5.76  2015-01-30
   - Increased default max_message_size from 10MB to 16MB in Mojo::Message.
   - Reduced default max_line_size from 10KB to 8KB in Mojo::Headers and
     Mojo::Message.

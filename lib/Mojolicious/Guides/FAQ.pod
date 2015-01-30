@@ -87,19 +87,23 @@ recommend using an environment which does not set these variables.
 A I<blocking> operation is a subroutine that blocks the execution of the
 calling subroutine until the subroutine is finished.
 
-  my $result = blocking_subroutine();
-  ...
+  sub foo {
+    my $result = blocking_subroutine();
+    ...
+  }
 
 A I<non-blocking> operation on the other hand lets the calling subroutine
 continue execution even though the subroutine is not yet finished. Instead of
 waiting, the calling subroutine passes along a callback to be executed once
 the subroutine is finished, this is called continuation-passing style.
 
-  non_blocking_subroutine(sub {
-    my $result = shift;
+  sub foo {
+    non_blocking_subroutine(sub {
+      my $result = shift;
+      ...
+    });
     ...
-  });
-  ...
+  }
 
 =head2 Will my code magically become non-blocking with Mojolicious?
 

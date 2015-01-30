@@ -389,7 +389,9 @@ Number of worker processes, defaults to the value of
 L<Mojo::Server::Prefork/"workers">. A good rule of thumb is two worker
 processes per CPU core for applications that perform mostly non-blocking
 operations, blocking operations often require more and benefit from decreasing
-the number of concurrent L</"clients"> (often as low as C<1>).
+the number of concurrent L</"clients"> (often as low as C<1>). Note that
+during zero downtime software upgrades there will be twice as many workers
+active for a short amount of time.
 
 =head1 ATTRIBUTES
 

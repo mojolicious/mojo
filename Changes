@@ -5,6 +5,8 @@
     Mojo::Message.
   - Improved Hypnotoad load balancing by calling srand() after starting a new
     worker in Mojo::Server::Prefork.
+  - Improved Mojo::Server::Prefork to start a new worker as soon as and old
+    one signals that it is shutting down gracefully.
   - Fixed bug in Mojo::DOM::CSS where combinators needed to be surrounded by
     whitespace.
 

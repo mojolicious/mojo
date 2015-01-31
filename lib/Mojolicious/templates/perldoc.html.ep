@@ -2,8 +2,9 @@
 <html>
   <head>
     <title><%= $title %></title>
-    %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo-light.css'
+    %= javascript '/mojo/highlight.js/highlight.min.js'
+    %= stylesheet '/mojo/highlight.js/highlight-mojo-light.css'
+    <script>hljs.initHighlightingOnLoad();</script>
     <style>
       a { color: inherit }
       a:hover { color: #2a2a2a }

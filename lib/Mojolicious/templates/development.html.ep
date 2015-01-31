@@ -18,7 +18,7 @@
         line-height: 1.5em;
         margin: 0;
       }
-      code {
+      :not(pre) > code {
         background-color: #eef9ff;
         border: solid #cce4ff 1px;
         border-radius: 5px;
@@ -35,6 +35,12 @@
         font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
         margin: 0;
         white-space: pre-wrap;
+      }
+      pre > code {
+        display: block;
+        font: 1.0em Consolas, Menlo, Monaco, Courier, monospace;
+        margin-bottom: 0.7em;
+        margin-top: 0.7em;
       }
       table {
         border-collapse: collapse;
@@ -145,7 +151,7 @@
           %= tag 'tr', $i ? (class => 'important') : (), begin
             <td class="key"><%= $key %></td>
             <td class="value wide">
-              <pre class="prettyprint"><%= $value %></pre>
+              <pre><code class="prettyprint"><%= $value %></code></pre>
             </td>
           % end
         % end

@@ -5,6 +5,7 @@
     Mojo::Message.
   - Improved Hypnotoad load balancing by calling srand() after starting a new
     worker in Mojo::Server::Prefork.
+  - Improved design of built-in templates.
   - Fixed bug in Mojo::IOLoop where the accept limit was applied too broadly.
   - Fixed bug in Mojo::Server::Prefork where the TTOU signal would not always
     stop a worker.

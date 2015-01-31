@@ -49,7 +49,7 @@
       td { padding: 0.5em }
       .box {
         background-color: #fff;
-        box-shadow: 0px 0px 2px #999;
+        border: solid #ccb 1px;
         overflow: hidden;
         padding: 1em;
       }
@@ -86,7 +86,14 @@
         padding-top: 1em;
         text-align: center;
       }
-      #nothing { padding-top: 60px }
+      #nothing {
+        border-bottom: 0;
+        padding-top: 60px;
+      }
+      #showcase {
+        border-bottom: 0;
+        border-top: 0;
+      }
       #showcase table { margin-top: 1em }
       #showcase td {
         padding-top: 0;
@@ -104,6 +111,7 @@
       }
       #more .tap, #trace .tap { text-shadow: #ddd 0 1px 0 }
       #request {
+        border-bottom: 0;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
         margin-top: 1em;
@@ -113,6 +121,7 @@
         border-bottom-right-radius: 5px;
         padding-top: 70px;
       }
+      #trace { border-top: 0 }
       #wrapperlicious {
         max-width: 1000px;
         margin: 0 auto;

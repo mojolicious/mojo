@@ -476,6 +476,13 @@ production. The renderer will always try to find C<exception.$mode.$format.*>
 or C<not_found.$mode.$format.*> before falling back to the built-in default
 templates.
 
+  use Mojolicious::Lite;
+
+  get '/dies' => sub { die 'Intentional error' };
+
+  app->start;
+  __DATA__
+
   @@ exception.production.html.ep
   <!DOCTYPE html>
   <html>
@@ -516,6 +523,13 @@ Most of the time when using C<ep> templates you will want to wrap your
 generated content in an HTML skeleton, thanks to layouts that's absolutely
 trivial.
 
+  use Mojolicious::Lite;
+
+  get '/' => {template => 'foo/bar'};
+
+  app->start;
+  __DATA__
+
   @@ foo/bar.html.ep
   % layout 'mylayout';
   Hello World!
@@ -532,6 +546,13 @@ L<Mojolicious::Plugin::DefaultHelpers/"layout"> and place the result of the
 current template with the helper
 L<Mojolicious::Plugin::DefaultHelpers/"content">. You can also pass along
 normal stash values to the C<layout> helper.
+
+  use Mojolicious::Lite;
+
+  get '/' => {template => 'foo/bar'};
+
+  app->start;
+  __DATA__
 
   @@ foo/bar.html.ep
   % layout 'mylayout', title => 'Hi there';
@@ -577,7 +598,14 @@ value).
 Like most helpers L<Mojolicious::Plugin::DefaultHelpers/"include"> is just a
 shortcut to make your life a little easier.
 
-  @@ foo/bar.html.ep
+  use Mojolicious::Lite;
+
+  get '/' => 'foo';
+
+  app->start;
+  __DATA__
+
+  @@ foo.html.ep
   <!DOCTYPE html>
   <html>
     %= include 'header', title => 'Howdy'
@@ -591,7 +619,14 @@ Instead of C<include> you could also just call
 L<Mojolicious::Controller/"render_to_string"> to include one template into
 another.
 
-  @@ foo/bar.html.ep
+  use Mojolicious::Lite;
+
+  get '/' => 'foo';
+
+  app->start;
+  __DATA__
+
+  @@ foo.html.ep
   <!DOCTYPE html>
   <html>
     %= $c->render_to_string('header', title => 'Howdy')
@@ -604,30 +639,26 @@ another.
 =head2 Reusable template blocks
 
 It's never fun to repeat yourself, that's why you can build reusable template
-blocks in C<ep> that work very similar to normal Perl functions.
+blocks in C<ep> that work very similar to normal Perl functions, with the
+C<begin> and C<end> keywords.
+
+  use Mojolicious::Lite;
+
+  get '/' => 'welcome';
+
+  app->start;
+  __DATA__
 
   @@ welcome.html.ep
   <% my $block = begin %>
-    <% my $name = shift; %>
+    % my $name = shift;
     Hello <%= $name %>.
   <% end %>
   <%= $block->('Sebastian') %>
   <%= $block->('Sara') %>
 
-Blocks are always delimited by the C<begin> and C<end> keywords.
+A naive translation of the template to Perl code could look like this.
 
-  @@ welcome.html.ep
-  % my $block = begin
-    % my $name = shift;
-    Hello <%= $name %>.
-  % end
-  % for (1 .. 10) {
-    %== $block->('Sebastian')
-  % }
-
-A naive translation to Perl code could look like this.
-
-  @@ welcome.html.pl
   my $output = '';
   my $block  = sub {
     my $name   = shift;
@@ -736,7 +767,14 @@ to avoid conflicts.
 Blocks and the helper L<Mojolicious::Plugin::DefaultHelpers/"content_for">
 can also be used to pass whole sections of the template to the layout.
 
-  @@ foo/bar.html.ep
+  use Mojolicious::Lite;
+
+  get '/' => 'foo';
+
+  app->start;
+  __DATA__
+
+  @@ foo.html.ep
   % layout 'mylayout';
   % content_for header => begin
     <meta http-equiv="Content-Type" content="text/html">
@@ -759,6 +797,13 @@ Inheritance takes the layout concept above one step further, the helpers
 L<Mojolicious::Plugin::DefaultHelpers/"content"> and
 L<Mojolicious::Plugin::DefaultHelpers/"extends"> allow you to build a skeleton
 template with named blocks that child templates can override.
+
+  use Mojolicious::Lite;
+
+  get '/' => 'third';
+
+  app->start;
+  __DATA__
 
   @@ first.html.ep
   <!DOCTYPE html>
@@ -1249,8 +1294,8 @@ script.
   get '/heart';
 
   app->start;
-
   __DATA__
+
   @@ heart.html.ep
   I ♥ Mojolicious!
 
@@ -1258,6 +1303,13 @@ script.
 
 Base64 encoded static files such as images can be easily stored in the C<DATA>
 section of your application, similar to templates.
+
+  use Mojolicious::Lite;
+
+  get '/' => {text => 'I ♥ Mojolicious!'};
+
+  app->start;
+  __DATA__
 
   @@ favicon.ico (base64)
   ...base64 encoded image...

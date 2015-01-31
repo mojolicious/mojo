@@ -241,7 +241,7 @@ ok !$snapshot->{exception}, 'no exception in snapshot';
 # Bundled static files
 $t->get_ok('/mojo/jquery/jquery.js')->status_is(200)
   ->content_type_is('application/javascript');
-$t->get_ok('/mojo/prettify/prettify.js')->status_is(200)
+$t->get_ok('/mojo/prettify/run_prettify.js')->status_is(200)
   ->content_type_is('application/javascript');
 $t->get_ok('/mojo/prettify/prettify-mojo-dark.css')->status_is(200)
   ->content_type_is('text/css');

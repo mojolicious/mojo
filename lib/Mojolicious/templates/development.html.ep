@@ -194,17 +194,18 @@
             <div class="tap">tap for more</div>
             <script>
               var current = '#context';
-              $('#showcase').click(function () {
-                $(current).slideToggle('slow', function () {
-                  if (current == '#context') {
-                    current = '#insight';
-                  }
-                  else {
-                    current = '#context';
-                  }
-                  $(current).slideToggle('slow');
+              function mojoShowcase () {
+                $('#showcase').click(function () {
+                  $(this).unbind('click');
+                  $(current).slideToggle('slow', function () {
+                    current = current == '#context' ? '#insight' : '#context';
+                    $(current).slideToggle('slow', function () {
+                      mojoShowcase();
+                    });
+                  });
                 });
-              });
+              }
+              mojoShowcase();
               $('#insight').toggle();
             </script>
           % }

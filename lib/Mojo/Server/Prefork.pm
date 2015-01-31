@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::Server::Daemon';
 use Fcntl ':flock';
 use File::Spec::Functions qw(catfile tmpdir);
 use IO::Poll qw(POLLIN POLLPRI);
-use List::Util 'shuffle';
 use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
@@ -89,9 +88,10 @@ sub run {
   local $SIG{QUIT} = sub { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
   local $SIG{TTOU} = sub {
-    $self->workers($self->workers - 1) if $self->workers > 0;
-    return unless $self->workers;
-    $self->{pool}{shuffle keys %{$self->{pool}}}{graceful} ||= steady_time;
+    $self->workers > 0 ? $self->workers($self->workers - 1) : return;
+    for my $w (values %{$self->{pool}}) {
+      ($w->{graceful} = steady_time) and last unless $w->{graceful};
+    }
   };
 
   # Preload application before starting workers

@@ -37,13 +37,18 @@
     }
     #mojobar-links a:hover { color: #fff }
     #mojobar-links input {
+      background-color: #3a3a3a;
       border: 0;
-      border-radius: 10px;
+      border-radius: 3px;
       display: inline;
       margin-left: 1em;
-      padding: 3px;
+      padding: 5px;
+      transition: all 0.15s;
     }
-    #mojobar-links input:focus { outline: 0 }
+    #mojobar-links input:focus {
+      background-color: #fff;
+      outline: 0;
+    }
     #mojobar-links form { display: inline }
     .animated { transition: top 0.2s ease-in-out }
   </style>

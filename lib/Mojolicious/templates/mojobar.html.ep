@@ -40,6 +40,7 @@
       background-color: #3a3a3a;
       border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 3px;
+      color: #eee;
       display: inline;
       margin-left: 1em;
       padding: 4px;
@@ -47,6 +48,7 @@
     }
     #mojobar-links input:focus {
       background-color: #fff;
+      color: #111;
       outline: 0;
     }
     #mojobar-links form { display: inline }

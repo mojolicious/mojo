@@ -38,11 +38,11 @@
     #mojobar-links a:hover { color: #fff }
     #mojobar-links input {
       background-color: #3a3a3a;
-      border: 0;
+      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 3px;
       display: inline;
       margin-left: 1em;
-      padding: 5px;
+      padding: 4px;
       transition: all 0.15s;
     }
     #mojobar-links input:focus {

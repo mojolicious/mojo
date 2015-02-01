@@ -2,10 +2,7 @@
 <div id="mojobar">
   <style scoped="scoped">
     #mojobar {
-      background-color: #1a1a1a;
-      background: -webkit-linear-gradient(top, #323232 0%, #000 50%);
-      background: -moz-linear-gradient(top, #323232 0%, #000 50%);
-      background: linear-gradient(top, #323232 0%, #000 50%);
+      background-color: #000;
       height: 46px;
       overflow: hidden;
       position: absolute;

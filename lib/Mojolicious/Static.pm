@@ -32,7 +32,7 @@ sub dispatch {
   $path = $stash->{path} ? $path->new($stash->{path}) : $path->clone;
   return undef unless my @parts = @{$path->canonicalize->parts};
 
-  # Serve static file and prevent directory traversal
+  # Serve static file and prevent path traversal
   return undef if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));
   $stash->{'mojo.static'} = 1;
   return !!$c->rendered;

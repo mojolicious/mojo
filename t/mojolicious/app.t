@@ -392,6 +392,12 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
 
+# Try to access a file which is not under the web root via path
+# traversal (triple dot)
+$t->get_ok('/.../mojolicious/secret.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Page not found/);
+
 # Check If-Modified-Since
 $t->get_ok('/hello.txt' => {'If-Modified-Since' => $mtime})->status_is(304)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('');

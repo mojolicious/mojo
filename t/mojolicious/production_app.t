@@ -100,6 +100,12 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
 
+# Try to access a file which is not under the web root via path
+# traversal in production mode (triple dot)
+$t->get_ok('/.../mojolicious/secret.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Page not found/);
+
 # Embedded production static file
 $t->get_ok('/some/static/file.txt')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')

@@ -13,6 +13,7 @@
       text-align: right;
       vertical-align: middle;
       width: 100%;
+      z-index: 1000;
     }
     #mojobar-logo {
       float: left;
@@ -51,7 +52,7 @@
       outline: 0;
     }
     #mojobar-links form { display: inline }
-    .animated { transition: top 0.2s ease-in-out }
+    .animated { transition: all 0.2s ease }
   </style>
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin
@@ -89,6 +90,7 @@
     var start = mojobar.offset().top;
     var fixed;
     var lastScrollTop = start;
+    var hidden = mojobarHeight + 3;
     $(window).scroll(function () {
       var st = $(window).scrollTop();
       if (fixed) {
@@ -102,10 +104,10 @@
             mojobar.addClass('animated');
           }
           if (st > lastScrollTop && st > (mojobarHeight + start + 250)) {
-            mojobar.css('top', 0 - (mojobarHeight + 3));
+            mojobar.css('transform', 'translateY(-' + hidden + 'px)');
           }
           else if (st < lastScrollTop) {
-            mojobar.css('top', 0);
+            mojobar.css('transform', 'translateY(0px)');
           }
           lastScrollTop = st;
         }

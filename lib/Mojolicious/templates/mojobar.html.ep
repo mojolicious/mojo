@@ -13,7 +13,6 @@
       text-align: right;
       vertical-align: middle;
       width: 100%;
-      z-index: 1000;
     }
     #mojobar-logo {
       float: left;
@@ -92,24 +91,28 @@
     var lastScrollTop = start;
     $(window).scroll(function () {
       var st = $(window).scrollTop();
-      if (!fixed && st > start) {
+      if (fixed) {
+        if (st <= start) {
+          fixed = false;
+          mojobar.removeClass('animated');
+          mojobar.css('position', 'absolute').css('top', start + 'px');
+        }
+        else if (Math.abs(lastScrollTop - st) > 100) {
+          if (!mojobar.hasClass('animated')) {
+            mojobar.addClass('animated');
+          }
+          if (st > lastScrollTop && st > (mojobarHeight + start + 250)) {
+            mojobar.css('top', 0 - (mojobarHeight + 3));
+          }
+          else if (st < lastScrollTop) {
+            mojobar.css('top', 0);
+          }
+          lastScrollTop = st;
+        }
+      }
+      else if (st > start) {
         fixed = true;
         mojobar.css('position', 'fixed').css('top', 0);
-      } else if (fixed && st <= start) {
-        fixed = false;
-        mojobar.removeClass('animated');
-        mojobar.css('position', 'absolute').css('top', start + 'px');
-      }
-      else if (fixed && (Math.abs(lastScrollTop - st) > 100)) {
-        if (!mojobar.hasClass('animated')) {
-          mojobar.addClass('animated');
-        }
-        if (st > lastScrollTop && st > (mojobarHeight + start + 250)) {
-          mojobar.css('top', 0 - (mojobarHeight + 5));
-        } else if (st + $(window).height() < $(document).height()) {
-          mojobar.css('top', 0);
-        }
-        lastScrollTop = st;
       }
     });
   });

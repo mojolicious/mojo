@@ -15,7 +15,9 @@ sub canonicalize {
 
   my $parts = $self->parts;
   for (my $i = 0; $i <= $#$parts;) {
-    if ($parts->[$i] =~ /^(?:\.||\.{3,})$/) { splice @$parts, $i, 1 }
+    if ($parts->[$i] eq '' || $parts->[$i] eq '.' || $parts->[$i] eq '...') {
+      splice @$parts, $i, 1;
+    }
     elsif ($i < 1 || $parts->[$i] ne '..' || $parts->[$i - 1] eq '..') { $i++ }
     else { splice @$parts, --$i, 2 }
   }
@@ -169,9 +171,8 @@ following new ones.
 
   $path = $path->canonicalize;
 
-Canonicalize path by resolving C<.> and C<..>, parts comprised solely of three
-or more dots are treated as a single dot to protect from path traversal
-attacks.
+Canonicalize path by resolving C<.> and C<..>, in addition C<...> will be
+treated as C<.> to protect from path traversal attacks.
 
   # "/foo/baz"
   Mojo::Path->new('/foo/./bar/../baz')->canonicalize;
@@ -181,9 +182,6 @@ attacks.
 
   # "/foo/bar"
   Mojo::Path->new('/foo/.../bar')->canonicalize;
-
-  # "/foo/bar"
-  Mojo::Path->new('/foo/...../bar')->canonicalize;
 
 =head2 clone
 

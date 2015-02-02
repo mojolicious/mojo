@@ -97,15 +97,6 @@ is_deeply $path->parts, [qw(foo windows win.ini)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 
-# Canonicalize (more dots)
-$path = Mojo::Path->new('/foo/....../windows/win.ini');
-is "$path", '/foo/....../windows/win.ini', 'same path';
-is_deeply $path->parts, [qw(foo ...... windows win.ini)], 'right structure';
-is $path->canonicalize, '/foo/windows/win.ini', 'canonicalized path';
-is_deeply $path->parts, [qw(foo windows win.ini)], 'right structure';
-ok $path->leading_slash, 'has leading slash';
-ok !$path->trailing_slash, 'no trailing slash';
-
 # Canonicalizing (with escaped "%")
 $path = Mojo::Path->new('%2ftest%2f..%252f..%2f..%2f..%2f..%2fetc%2fpasswd');
 is "$path", '%2ftest%2f..%252f..%2f..%2f..%2f..%2fetc%2fpasswd', 'same path';

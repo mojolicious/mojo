@@ -52,7 +52,7 @@
       outline: 0;
     }
     #mojobar-links form { display: inline }
-    .animated { transition: all 0.2s ease }
+    .animated { transition: all 0.25s ease }
   </style>
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin

@@ -169,8 +169,8 @@ following new ones.
 
   $path = $path->canonicalize;
 
-Canonicalize path, parts comprised solely of three or more dots are treated as
-a single dot, to protect certain operating systems from path traversal
+Canonicalize path by resolving C<.> and C<..>, parts comprised solely of three
+or more dots are treated as a single dot to protect from path traversal
 attacks.
 
   # "/foo/baz"

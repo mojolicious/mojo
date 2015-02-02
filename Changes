@@ -1,4 +1,6 @@
 
+5.77  2015-02-03
+
 5.76  2015-02-02
   - Emergency release for a critical security issue that can expose files on
     Windows systems, everybody should update!

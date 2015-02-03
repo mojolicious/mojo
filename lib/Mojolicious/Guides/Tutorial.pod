@@ -336,10 +336,9 @@ to the regular expression C<([^/]+)>.
 
   use Mojolicious::Lite;
 
-  # /test/hello
-  # /test123/hello
-  # /test.123/hello
-  get '/#you/hello' => 'groovy';
+  # /hello/test
+  # /hello/test.html
+  get '/hello/#you' => 'groovy';
 
   app->start;
   __DATA__

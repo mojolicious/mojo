@@ -781,6 +781,7 @@ $t->app->log->unsubscribe(message => $cb);
 
 # Relaxed placeholder
 $t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('1230');
+$t->get_ok('/foo_relaxed/123.html')->status_is(200)->content_is('123.html0');
 $t->get_ok('/foo_relaxed/123' => {DNT => 1})->status_is(200)
   ->content_is('1231');
 $t->get_ok('/foo_relaxed/')->status_is(404);

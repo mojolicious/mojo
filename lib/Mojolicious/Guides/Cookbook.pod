@@ -1117,10 +1117,11 @@ work inside an already running event loop or start one on demand.
 
 WebSockets are not just for the server-side, you can use
 L<Mojo::UserAgent/"websocket"> to open new connections, which are always
-non-blocking. The handshake is a normal HTTP request with a few additional
-headers, it can even contain cookies, followed by a C<101> response from the
-server notifying our user agent that the connection has been established and
-it can start using the bi-directional WebSocket protocol.
+non-blocking. The WebSocket handshake uses HTTP, and is a normal C<GET>
+request with a few additional headers. It can even contain cookies, and is
+followed by a C<101> response from the server, notifying our user agent that
+the connection has been established and it can start using the bi-directional
+WebSocket protocol.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;

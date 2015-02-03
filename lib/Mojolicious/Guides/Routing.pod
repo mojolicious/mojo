@@ -629,6 +629,21 @@ request with a C<101> response status, which happens automatically if you
 subscribe to an event with L<Mojolicious::Controller/"on"> or send a message
 with L<Mojolicious::Controller/"send"> right away.
 
+  GET /echo HTTP/1.1
+  Host: mojolicio.us
+  User-Agent: Mozilla/5.0 (compatible; Mojolicious; Perl)
+  Connection: Upgrade
+  Upgrade: websocket
+  Sec-WebSocket-Key: IDM3ODE4NDk2MjA1OTcxOQ==
+  Sec-WebSocket-Version: 13
+
+  HTTP/1.1 101 Switching Protocols
+  Server: Mojolicious (Perl)
+  Date: Tue, 03 Feb 2015 17:08:24 GMT
+  Connection: Upgrade
+  Upgrade: websocket
+  Sec-WebSocket-Accept: SWsp5N2iNxPbHlcOTIw8ERvyVPY=
+
 =head2 Catch-all route
 
 Since routes match in the order in which they were defined, you can catch all

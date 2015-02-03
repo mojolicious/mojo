@@ -112,7 +112,7 @@ L<Mojolicious::Controller/"param">.
 
 The L<Mojolicious::Controller/"stash"> is used to pass data to templates,
 which can be inlined in the C<DATA> section. A few stash values like
-C<template> and C<text> are reserved and will be used by
+C<template>, C<text> and C<data> are reserved and will be used by
 L<Mojolicious::Controller/"render"> to decide how a response should be
 generated.
 

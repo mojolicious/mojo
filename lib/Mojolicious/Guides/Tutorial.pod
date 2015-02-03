@@ -305,8 +305,9 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 =head2 Placeholders
 
 Route placeholders allow capturing parts of a request path until a C</> or
-C<.> separator occurs, results are accessible via
-L<Mojolicious::Controller/"stash"> and L<Mojolicious::Controller/"param">.
+C<.> separator occurs, similar to the regular expression C<([^/.]+)>. Results
+are accessible via L<Mojolicious::Controller/"stash"> and
+L<Mojolicious::Controller/"param">.
 
   use Mojolicious::Lite;
 
@@ -330,7 +331,8 @@ L<Mojolicious::Controller/"stash"> and L<Mojolicious::Controller/"param">.
 
 =head2 Relaxed Placeholders
 
-Relaxed placeholders allow matching of everything until a C</> occurs.
+Relaxed placeholders allow matching of everything until a C</> occurs, similar
+to the regular expression C<([^/]+)>.
 
   use Mojolicious::Lite;
 
@@ -348,7 +350,7 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 =head2 Wildcard placeholders
 
 Wildcard placeholders allow matching absolutely everything, including C</> and
-C<.>.
+C<.>, similar to the regular expression C<(.+)>.
 
   use Mojolicious::Lite;
 

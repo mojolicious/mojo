@@ -58,11 +58,13 @@ is $headers->connection('foo')->connection,       'foo', 'right value';
 is $headers->cache_control('foo')->cache_control, 'foo', 'right value';
 is $headers->content_disposition('foo')->content_disposition, 'foo',
   'right value';
-is $headers->content_encoding('foo')->content_encoding,   'foo', 'right value';
-is $headers->content_language('foo')->content_language,   'foo', 'right value';
-is $headers->content_length('foo')->content_length,       'foo', 'right value';
-is $headers->content_location('foo')->content_location,   'foo', 'right value';
-is $headers->content_range('foo')->content_range,         'foo', 'right value';
+is $headers->content_encoding('foo')->content_encoding, 'foo', 'right value';
+is $headers->content_language('foo')->content_language, 'foo', 'right value';
+is $headers->content_length('foo')->content_length,     'foo', 'right value';
+is $headers->content_location('foo')->content_location, 'foo', 'right value';
+is $headers->content_range('foo')->content_range,       'foo', 'right value';
+is $headers->content_security_policy('foo')->content_security_policy, 'foo',
+  'right value';
 is $headers->content_type('foo')->content_type,           'foo', 'right value';
 is $headers->cookie('foo')->cookie,                       'foo', 'right value';
 is $headers->dnt('foo')->dnt,                             'foo', 'right value';

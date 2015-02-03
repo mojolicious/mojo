@@ -11,12 +11,13 @@ my %NORMALCASE = map { lc($_) => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Access-Control-Allow-Origin Allow Authorization Cache-Control Connection),
   qw(Content-Disposition Content-Encoding Content-Language Content-Length),
-  qw(Content-Location Content-Range Content-Type Cookie DNT Date ETag Expect),
-  qw(Expires Host If-Modified-Since If-None-Match Last-Modified Link Location),
-  qw(Origin Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept),
-  qw(Sec-WebSocket-Extensions Sec-WebSocket-Key Sec-WebSocket-Protocol),
-  qw(Sec-WebSocket-Version Server Set-Cookie Status Strict-Transport-Security),
-  qw(TE Trailer Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
+  qw(Content-Location Content-Range Content-Security-Policy Content-Type),
+  qw(Cookie DNT Date ETag Expect Expires Host If-Modified-Since If-None-Match),
+  qw(Last-Modified Link Location Origin Proxy-Authenticate),
+  qw(Proxy-Authorization Range Sec-WebSocket-Accept Sec-WebSocket-Extensions),
+  qw(Sec-WebSocket-Key Sec-WebSocket-Protocol Sec-WebSocket-Version Server),
+  qw(Set-Cookie Status Strict-Transport-Security TE Trailer Transfer-Encoding),
+  qw(Upgrade User-Agent Vary WWW-Authenticate)
 );
 for my $header (values %NORMALCASE) {
   my $name = lc $header;
@@ -340,6 +341,14 @@ Shortcut for the C<Content-Location> header.
   $headers  = $headers->content_range('bytes 2-8/100');
 
 Shortcut for the C<Content-Range> header.
+
+=head2 content_security_policy
+
+  my $policy = $headers->content_security_policy;
+  $headers   = $headers->content_security_policy('default-src https:');
+
+Shortcut for the C<Content-Security-Policy> header from
+L<Content Security Policy 1.0|http://www.w3.org/TR/CSP/>.
 
 =head2 content_type
 

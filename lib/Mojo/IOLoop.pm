@@ -410,6 +410,9 @@ L<Mojo::Reactor/"error">.
   # Change to watching only if handle becomes writable
   $loop->reactor->watch($handle, 0, 1);
 
+  # Remove handle again
+  $loop->reactor->remove($handle);
+
 =head2 unlock
 
   my $cb = $loop->unlock;

@@ -43,7 +43,7 @@ request method and headers like C<Host>, C<User-Agent> and C<Accept>.
 
   GET /user/show/23 HTTP/1.1
   Host: mojolicio.us
-  User-Agent: Mozilla/5.0 (compatible; Mojolicious; Perl)
+  User-Agent: Mojolicious (Perl)
   Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 
 =head2 Routes
@@ -631,7 +631,7 @@ with L<Mojolicious::Controller/"send"> right away.
 
   GET /echo HTTP/1.1
   Host: mojolicio.us
-  User-Agent: Mozilla/5.0 (compatible; Mojolicious; Perl)
+  User-Agent: Mojolicious (Perl)
   Connection: Upgrade
   Upgrade: websocket
   Sec-WebSocket-Key: IDM3ODE4NDk2MjA1OTcxOQ==

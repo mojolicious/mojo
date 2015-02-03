@@ -1,4 +1,6 @@
 
+5.78  2015-02-04
+
 5.77  2015-02-03
   - Added content_security_policy method to Mojo::Headers.
   - Fixed canonicalize in Mojo::Path to not remove parts with more than three

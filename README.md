@@ -15,8 +15,9 @@
     file prototypes into well-structured web applications.
     * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish
       templates, content negotiation, session management, form validation,
-      testing framework, static file server, first class Unicode support and
-      much more for you to discover.
+      testing framework, static file server, CGI/[PSGI](http://plackperl.org)
+      detection, first class Unicode support and much more for you to
+      discover.
   * Very clean, portable and object-oriented pure-Perl API with no hidden
     magic and no requirements besides Perl 5.20.0 (versions as old as 5.10.1
     can be used too, but may require additional CPAN modules to be installed)
@@ -24,8 +25,8 @@
     SNI, IDNA, HTTP/SOCKS5 proxy, Comet (long polling), keep-alive, connection
     pooling, timeout, cookie, multipart, and gzip compression support.
   * Built-in non-blocking I/O web server, supporting multiple event loops as
-    well as optional preforking and hot deployment, perfect for embedding.
-  * Automatic CGI and [PSGI](http://plackperl.org) detection.
+    well as optional preforking and hot deployment, perfect for building
+    highly scalable web services.
   * JSON and HTML/XML parser with CSS selector support.
   * Fresh code based upon years of experience developing
     [Catalyst](http://www.catalystframework.org).

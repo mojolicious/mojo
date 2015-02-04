@@ -456,8 +456,8 @@ the regular expression C<([^/.]+)?>.
   # /test/bye/123 -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
   $r->get('/test/:mymessage/123')->to('foo#bar', mymessage => 'hi');
 
-This is also the case if multiple placeholders are right after another and not
-separated by other characters than C</>.
+And if two optional placeholders are only separated by a slash, that slash can
+become optional as well.
 
   # /           -> {controller => 'foo',   action => 'bar'}
   # /users      -> {controller => 'users', action => 'bar'}

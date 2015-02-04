@@ -15,7 +15,7 @@ sub authority {
 
   # New authority
   if (@_) {
-    my $authority = shift;
+    return $self unless defined(my $authority = shift);
 
     # Userinfo
     $self->userinfo(_decode(url_unescape $1)) if $authority =~ s/^([^\@]+)\@//;

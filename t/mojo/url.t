@@ -175,6 +175,7 @@ is $url->path,     '0',   'right path';
 is "$url", 'foo:0', 'right format';
 
 # Relative
+is(Mojo::URL->new->to_abs, '', 'no result');
 $url = Mojo::URL->new('foo?foo=bar#23');
 is $url->path_query, 'foo?foo=bar', 'right path and query';
 ok !$url->is_abs, 'is not absolute';

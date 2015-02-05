@@ -15,6 +15,10 @@
       width: 100%;
       z-index: 1000;
     }
+    #mojobar-content {
+      margin: 0 auto;
+      width: 1000px;
+    }
     #mojobar-logo {
       float: left;
       margin-left: 5em;
@@ -54,24 +58,26 @@
     #mojobar-links form { display: inline }
     .animated { transition: all 0.25s ease }
   </style>
-  <div id="mojobar-logo">
-    %= link_to 'http://mojolicio.us' => begin
-      %= image '/mojo/logo-white.png', alt => 'Mojolicious logo'
-    % end
-  </div>
-  <div id="mojobar-links">
-    %= link_to Documentation => 'http://mojolicio.us/perldoc'
-    %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
-    %= link_to GitHub => 'https://github.com/kraih/mojo'
-    %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'
-    %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
-    %= link_to Blog => 'http://blog.kraih.com'
-    %= link_to Twitter => 'https://twitter.com/kraih'
-    %= form_for 'https://www.google.com/cse' => (target => '_blank') => begin
-      %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
-      %= hidden_field ie => 'UTF-8'
-      %= search_field 'q', placeholder => 'Search'
-    %= end
+  <div id="mojobar-content">
+    <div id="mojobar-logo">
+      %= link_to 'http://mojolicio.us' => begin
+        %= image '/mojo/logo-white.png', alt => 'Mojolicious logo'
+      % end
+    </div>
+    <div id="mojobar-links">
+      %= link_to Documentation => 'http://mojolicio.us/perldoc'
+      %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
+      %= link_to GitHub => 'https://github.com/kraih/mojo'
+      %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'
+      %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
+      %= link_to Blog => 'http://blog.kraih.com'
+      %= link_to Twitter => 'https://twitter.com/kraih'
+      %= form_for 'https://www.google.com/cse' => (target => '_blank') => begin
+        %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
+        %= hidden_field ie => 'UTF-8'
+        %= search_field 'q', placeholder => 'Search'
+      %= end
+    </div>
   </div>
 </div>
 <script>

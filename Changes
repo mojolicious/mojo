@@ -1,5 +1,6 @@
 
 5.78  2015-02-05
+  - Improved design of built-in templates.
   - Fixed warnings in Mojo::URL.
 
 5.77  2015-02-03

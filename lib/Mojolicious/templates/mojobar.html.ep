@@ -17,7 +17,7 @@
     }
     #mojobar-content {
       margin: 0 auto;
-      width: 1000px;
+      max-width: 1000px;
     }
     #mojobar-logo {
       float: left;

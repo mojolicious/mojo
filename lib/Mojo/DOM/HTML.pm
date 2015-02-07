@@ -200,7 +200,7 @@ sub _render {
   my ($tree, $xml) = @_;
 
   # Text (escaped)
-  return '' unless my $type = $tree->[0];
+  my $type = $tree->[0];
   return xml_escape $tree->[1] if $type eq 'text';
 
   # Raw text

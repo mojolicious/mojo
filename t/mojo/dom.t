@@ -4,9 +4,12 @@ use Test::More;
 use Mojo::DOM;
 
 # Empty
-is(Mojo::DOM->new,            '', 'right result');
-is(Mojo::DOM->new(''),        '', 'right result');
-is(Mojo::DOM->new->parse(''), '', 'right result');
+is(Mojo::DOM->new,                      '',    'right result');
+is(Mojo::DOM->new(''),                  '',    'right result');
+is(Mojo::DOM->new->parse(''),           '',    'right result');
+is(Mojo::DOM->new->at('p'),             undef, 'no result');
+is(Mojo::DOM->new->append_content(''),  '',    'right result');
+is(Mojo::DOM->new->append_content('0'), '0',   'right result');
 
 # Simple (basics)
 my $dom = Mojo::DOM->new(

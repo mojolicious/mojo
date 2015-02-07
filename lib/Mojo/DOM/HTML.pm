@@ -4,7 +4,8 @@ use Mojo::Base -base;
 use Mojo::Util qw(html_unescape xml_escape);
 use Scalar::Util 'weaken';
 
-has [qw(tree xml)];
+has tree => sub { ['root'] };
+has 'xml';
 
 my $ATTR_RE = qr/
   ([^<>=\s\/]+|\/)   # Key

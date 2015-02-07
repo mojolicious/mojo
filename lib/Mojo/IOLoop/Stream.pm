@@ -112,7 +112,7 @@ sub _read {
 sub _write {
   my $self = shift;
 
-  # Handle errors when reading, to avoid timing problems
+  # Handle errors only when reading (to avoid timing problems)
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
     return unless defined(my $written = $handle->syswrite($self->{buffer}));

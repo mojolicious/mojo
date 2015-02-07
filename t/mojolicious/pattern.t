@@ -11,7 +11,8 @@ is_deeply $pattern->match('/test'), undef, 'no result';
 is $pattern->tree->[0][1], '/test/123', 'optimized pattern';
 
 # Normal pattern with text, placeholders and a default value
-$pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action');
+$pattern
+  = Mojolicious::Routes::Pattern->new->parse('/test/(controller)/:action');
 $pattern->defaults({action => 'index'});
 is_deeply $pattern->match('/test/foo/bar', 1),
   {controller => 'foo', action => 'bar'}, 'right structure';

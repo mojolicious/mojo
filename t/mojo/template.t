@@ -1026,6 +1026,7 @@ test
 EOF
 is $mt->tree->[0][1], "test\n123\n456", 'optimized text lines';
 $output = $mt->build->compile || $mt->interpret;
+is_deeply $mt->tree, [], 'has been consumed';
 is $output, "test\n123\n456789\\\n987\n654\n321\n", 'just text';
 
 # Scoped scalar

@@ -4,12 +4,11 @@ use Test::More;
 use Mojo::DOM;
 
 # Empty
-is(Mojo::DOM->new,                      '',    'right result');
-is(Mojo::DOM->new(''),                  '',    'right result');
-is(Mojo::DOM->new->parse(''),           '',    'right result');
-is(Mojo::DOM->new->at('p'),             undef, 'no result');
-is(Mojo::DOM->new->append_content(''),  '',    'right result');
-is(Mojo::DOM->new->append_content('0'), '0',   'right result');
+is(Mojo::DOM->new,                     '',    'right result');
+is(Mojo::DOM->new(''),                 '',    'right result');
+is(Mojo::DOM->new->parse(''),          '',    'right result');
+is(Mojo::DOM->new->at('p'),            undef, 'no result');
+is(Mojo::DOM->new->append_content(''), '',    'right result');
 
 # Simple (basics)
 my $dom = Mojo::DOM->new(
@@ -32,6 +31,10 @@ is_deeply [$dom->find('[id]')->map(attr => 'id')->each], [qw(a b)],
   'right result';
 is $dom->tap(sub { $_->at('#b')->remove }), '<div id="a">A</div>',
   'right result';
+
+# Build tree from scratch
+is(Mojo::DOM->new->append_content('<p>')->at('p')->append_content('0')->text,
+  '0', 'right text');
 
 # Simple nesting with healing (tree structure)
 $dom = Mojo::DOM->new(<<EOF);

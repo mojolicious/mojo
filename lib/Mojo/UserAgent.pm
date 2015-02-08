@@ -655,8 +655,8 @@ Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"tx">.
 
   # Request with custom cookie
-  my $tx = $ua->build_tx(GET => 'example.com');
-  $tx->req->cookies({name => 'foo', value => 'bar'});
+  my $tx = $ua->build_tx(GET => 'http://example.com/account');
+  $tx->req->cookies({name => 'user', value => 'sri'});
   $tx = $ua->start($tx);
 
   # Deactivate gzip compression
@@ -665,7 +665,7 @@ L<Mojo::UserAgent::Transactor/"tx">.
   $tx = $ua->start($tx);
 
   # Interrupt response by raising an error
-  my $tx = $ua->build_tx(GET => 'example.com');
+  my $tx = $ua->build_tx(GET => 'http://example.com');
   $tx->res->on(progress => sub {
     my $res = shift;
     return unless my $server = $res->headers->server;

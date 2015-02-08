@@ -913,10 +913,15 @@ Perform request and check for transport errors.
   my $tx = $t->ua->build_tx(FOO => '/test.json' => json => {foo => 1});
   $t->request_ok($tx)->status_is(200)->json_is({success => 1});
 
+  # Request with custom cookie
+  my $tx = $t->ua->build_tx(GET => '/account');
+  $tx->req->cookies({name => 'user', value => 'sri'});
+  $t->request_ok($tx)->status_is(200)->text_is('head > title' => 'Hello sri');
+
   # Custom WebSocket handshake
- my $tx = $t->ua->build_websocket_tx('/foo');
- $tx->req->headers->remove('User-Agent');
- $t->request_ok($tx)->message_ok->message_is('bar')->finish_ok;
+  my $tx = $t->ua->build_websocket_tx('/foo');
+  $tx->req->headers->remove('User-Agent');
+  $t->request_ok($tx)->message_ok->message_is('bar')->finish_ok;
 
 =head2 reset_session
 

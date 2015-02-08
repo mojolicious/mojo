@@ -655,7 +655,7 @@ Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"tx">.
 
   # Request with custom cookie
-  my $tx = $ua->build_tx(GET => 'http://example.com/account');
+  my $tx = $ua->build_tx(GET => 'https://example.com/account');
   $tx->req->cookies({name => 'user', value => 'sri'});
   $tx = $ua->start($tx);
 
@@ -681,6 +681,21 @@ L<Mojo::UserAgent::Transactor/"tx">.
 
 Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"websocket">.
+
+  # Custom WebSocket handshake with cookie
+  my $tx = $ua->build_websocket_tx('https://example.com/echo');
+  $tx->req->cookies({name => 'user', value => 'sri'});
+  $ua->start($tx => sub {
+    my ($ua, $tx) = @_;
+    say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
+    $tx->on(message => sub {
+      my ($tx, $msg) = @_;
+      say "WebSocket message: $msg";
+      $tx->finish;
+    });
+    $tx->send('Hi!');
+  });
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 delete
 

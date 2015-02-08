@@ -439,9 +439,8 @@ just make a list of possible values.
   app->start;
 
 All placeholders get compiled to a regular expression internally, this process
-can also be easily customized. Just make sure not to use C<^> and C<$> or
-capturing groups (C<(...)>), non-capturing groups (C<(?:...)>) are fine
-though.
+can also be customized. Just make sure not to use C<^> and C<$>, or capturing
+groups C<(...)>, non-capturing groups C<(?:...)> are fine though.
 
   use Mojolicious::Lite;
 

@@ -1,5 +1,5 @@
 
-5.78  2015-02-08
+5.78  2015-02-09
   - Improved design of built-in templates.
   - Fixed bug in Mojo::DOM that made parsing a requirement.
   - Fixed warnings in Mojo::URL.

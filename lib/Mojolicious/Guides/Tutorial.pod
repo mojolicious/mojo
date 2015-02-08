@@ -439,7 +439,9 @@ just make a list of possible values.
   app->start;
 
 All placeholders get compiled to a regular expression internally, this process
-can also be easily customized.
+can also be easily customized. Just make sure not to use C<^> and C<$> or
+capturing groups (C<(...)>), non-capturing groups (C<(?:...)>) are fine
+though.
 
   use Mojolicious::Lite;
 
@@ -453,9 +455,10 @@ can also be easily customized.
 
   app->start;
 
-Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally, C<(?:...)>
-is fine though.
+You can take a closer look at all the generated regular expressions with the
+command L<Mojolicious::Command::routes>.
+
+  $ ./myapp.pl routes -v
 
 =head2 Under
 

@@ -683,7 +683,7 @@ Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"websocket">.
 
   # Custom WebSocket handshake with cookie
-  my $tx = $ua->build_websocket_tx('https://example.com/echo');
+  my $tx = $ua->build_websocket_tx('wss://example.com/echo');
   $tx->req->cookies({name => 'user', value => 'sri'});
   $ua->start($tx => sub {
     my ($ua, $tx) = @_;
@@ -864,7 +864,7 @@ will receive either a L<Mojo::Transaction::WebSocket> or
 L<Mojo::Transaction::HTTP> object, depending on if the handshake was
 successful.
 
-  $ua->websocket('ws://example.com/echo' => sub {
+  $ua->websocket('wss://example.com/echo' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(finish => sub {

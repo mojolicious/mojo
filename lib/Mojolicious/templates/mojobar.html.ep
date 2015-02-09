@@ -1,6 +1,5 @@
 %= javascript '/mojo/jquery/jquery.js'
 <div id="mojobar">
-  %= stylesheet 'http://fonts.googleapis.com/css?family=Roboto+Condensed'
   <style scoped="scoped">
     #mojobar {
       background-color: #1a1a1a;
@@ -34,7 +33,7 @@
     }
     #mojobar-links a {
       color: #bbb;
-      font: 1em 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;
+      font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
       margin-left: 0.5em;
       text-decoration: none;
       transition: all 200ms ease-in-out;

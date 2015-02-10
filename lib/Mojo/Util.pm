@@ -386,7 +386,7 @@ sub _header {
   while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
     push @token, $1, undef;
 
-    # Special "expires" value
+    # Special "expires" value (Sun, 06 Nov 1994 08:49:37 GMT)
     my $e = $cookie && lc $1 eq 'expires';
     if ($e && $str =~ s/^=\s*(\w+\,\s+\d+\W+\w+\D+\d+\s+\d+:\d+:\d+\s+GMT)//) {
       $token[-1] = $1;

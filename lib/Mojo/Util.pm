@@ -386,22 +386,22 @@ sub _header {
   my ($str, $cookie) = @_;
 
   my (@tree, @token);
-  while ($str =~ /\G[,;\s]*([^=;, ]+)\s*/gc) {
+  while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
     push @token, my $name = $1, undef;
 
     # Special "expires" value
-    if ($cookie && lc $name eq 'expires' && $str =~ /\G=\s*$EXPIRES_RE/gco) {
+    if ($cookie && lc $name eq 'expires' && $str =~ s/^=\s*$EXPIRES_RE//o) {
       $token[-1] = $1;
     }
 
     # Normal value
-    elsif ($str =~ /\G=\s*("(?:\\\\|\\"|[^"])*"|[^;, ]*)\s*/gc) {
+    elsif ($str =~ s/^=\s*("(?:\\\\|\\"|[^"])*"|[^;, ]*)\s*//) {
       $token[-1] = unquote $1;
     }
 
     # Separator
-    $str =~ /\G;\s*/gc;
-    next unless $str =~ /\G,\s*/gc;
+    $str =~ s/^;\s*//;
+    next unless $str =~ s/^,\s*//;
     push @tree, [@token];
     @token = ();
   }

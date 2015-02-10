@@ -670,7 +670,7 @@ Read all data at once from file.
 
 =head2 split_cookie_header
 
-  my $tree = splie_cookie_header 'a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT';
+  my $tree = split_cookie_header 'a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT';
 
 Same as L</"split_header">, but handles C<expires> values from
 L<RFC 6265|http://tools.ietf.org/html/rfc6265>.

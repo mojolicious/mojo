@@ -335,7 +335,7 @@ Dump a Perl data structure with L<Mojo::Util/"dumper">.
   % extends 'blue';
   % extends 'blue', title => 'Blue!';
 
-Set C<extends> stash value, all additional pairs get merged into the
+Set C<extends> stash value, all additional key/value pairs get merged into the
 L</"stash">.
 
 =head2 flash
@@ -381,7 +381,7 @@ response headers with L<Mojolicious::Static/"is_fresh">.
   % layout 'green';
   % layout 'green', title => 'Green!';
 
-Set C<layout> stash value, all additional pairs get merged into the
+Set C<layout> stash value, all additional key/value pairs get merged into the
 L</"stash">.
 
 =head2 param
@@ -463,8 +463,8 @@ Alias for L<Mojolicious::Controller/"stash">.
   % title 'Welcome!';
   % title 'Welcome!', foo => 'bar';
 
-Get or set C<title> stash value, all additional pairs get merged into the
-L</"stash">.
+Get or set C<title> stash value, all additional key/value pairs get merged
+into the L</"stash">.
 
 =head2 ua
 

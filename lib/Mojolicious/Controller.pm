@@ -659,8 +659,8 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 Render content with L<Mojolicious::Renderer/"render"> and emit hooks
 L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">, or
 call L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found"> if no
-response could be generated, all additional pairs get merged into the
-L</"stash">.
+response could be generated, all additional key/value pairs get merged into
+the L</"stash">.
 
   # Render characters
   $c->render(text => 'I ♥ Mojolicious!');

@@ -642,7 +642,7 @@ Alias for L</"tag">.
   <%= tag div => (id => 'foo') => begin %>test & 123<% end %>
 
 HTML tag generator, the C<data> attribute may contain a hash reference with
-pairs to generate attributes from.
+key/value pairs to generate attributes from.
 
   <br>
   <div></div>

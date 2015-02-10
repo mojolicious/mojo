@@ -69,7 +69,7 @@ sub header_size { length shift->build_headers }
 
 sub is_chunked { !!shift->headers->transfer_encoding }
 
-sub is_compressed { (shift->headers->content_encoding // '') =~ /^gzip$/i }
+sub is_compressed { lc(shift->headers->content_encoding // '') eq 'gzip' }
 
 sub is_dynamic { $_[0]{dynamic} && !defined $_[0]->headers->content_length }
 

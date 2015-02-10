@@ -2,9 +2,11 @@ package Mojo::Cookie::Response;
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;
-use Mojo::Util qw(quote split_header);
+use Mojo::Util qw(quote split_cookie_header);
 
 has [qw(domain httponly max_age origin path secure)];
+
+my %ATTRS = map { $_ => 1 } qw(expires domain path secure max-age httponly);
 
 sub expires {
   my $self = shift;
@@ -22,26 +24,15 @@ sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  my $tree = split_header($str // '');
+  my $tree = split_cookie_header($str // '');
   while (my $pairs = shift @$tree) {
-    my $i = 0;
+    push @cookies,
+      $self->new(name => shift(@$pairs), value => shift(@$pairs) // '');
+
     while (@$pairs) {
       my ($name, $value) = (shift @$pairs, shift @$pairs);
 
-      # "expires" is a special case, thank you Netscape...
-      if ($name =~ /^expires$/i) {
-        push @$pairs, @{shift @$tree // []};
-        my $len = ($pairs->[0] // '') =~ /-/ ? 6 : 10;
-        $value .= join ' ', ',', grep {defined} splice @$pairs, 0, $len;
-      }
-
-      # This will only run once
-      push @cookies, $self->new(name => $name, value => $value // '') and next
-        unless $i++;
-
-      # Attributes (Netscape and RFC 6265)
-      next unless $name =~ /^(expires|domain|path|secure|max-age|httponly)$/i;
-      my $attr = lc $1;
+      next unless $ATTRS{my $attr = lc $name};
       $attr = 'max_age' if $attr eq 'max-age';
       $cookies[-1]
         ->$attr($attr eq 'secure' || $attr eq 'httponly' ? 1 : $value);
@@ -54,27 +45,27 @@ sub parse {
 sub to_string {
   my $self = shift;
 
-  # Name and value (Netscape)
+  # Name and value
   return '' unless length(my $name = $self->name // '');
   my $value = $self->value // '';
   my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote($value) : $value;
 
-  # "expires" (Netscape)
+  # "expires"
   if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
 
-  # "domain" (Netscape)
+  # "domain"
   if (my $domain = $self->domain) { $cookie .= "; domain=$domain" }
 
-  # "path" (Netscape)
+  # "path"
   if (my $path = $self->path) { $cookie .= "; path=$path" }
 
-  # "secure" (Netscape)
+  # "secure"
   $cookie .= "; secure" if $self->secure;
 
-  # "Max-Age" (RFC 6265)
+  # "Max-Age"
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
 
-  # "HttpOnly" (RFC 6265)
+  # "HttpOnly"
   $cookie .= "; HttpOnly" if $self->httponly;
 
   return $cookie;

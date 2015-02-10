@@ -15,9 +15,9 @@ use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode dumper encode hmac_sha1_sum html_unescape md5_bytes md5_sum),
   qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
-  qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time tablify term_escape trim unindent unquote url_escape),
-  qw(url_unescape xml_escape xor_encode xss_escape);
+  qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
+  qw(split_header spurt squish steady_time tablify term_escape trim unindent),
+  qw(unquote url_escape url_unescape xml_escape xor_encode xss_escape);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -75,15 +75,27 @@ is_deeply split_header('foo = "b a\" r\"\\\\"; bar="ba z"'),
 my $header = q{</foo/bar>; rel="x"; t*=UTF-8'de'a%20b};
 my $tree = [['</foo/bar>', undef, 'rel', 'x', 't*', 'UTF-8\'de\'a%20b']];
 is_deeply split_header($header), $tree, 'right result';
-$header = 'a=b c; A=b.c; D=/E; a-b=3; F=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
-$tree   = [
-  ['a', 'b', 'c', undef, 'A', 'b.c', 'D', '/E', 'a-b', '3', 'F', 'Thu'],
+$header
+  = 'a=b c; A=b.c; D=/E; a-b=3; expires=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
+$tree = [
+  ['a', 'b', 'c', undef, 'A', 'b.c', 'D', '/E', 'a-b', '3', 'expires', 'Thu'],
   [
     '07',       undef, 'Aug', undef, '2008', undef,
     '07:07:59', undef, 'GMT', undef, 'Ab',   undef
   ]
 ];
 is_deeply split_header($header), $tree, 'right result';
+
+# split_cookie_header
+is_deeply split_cookie_header(''), [], 'right result';
+is_deeply split_cookie_header(
+  'a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT,c=d'),
+  [['a', 'b', 'expires', 'Thu, 07 Aug 2008 07:07:59 GMT'], ['c', 'd']],
+  'right result';
+is_deeply split_cookie_header(
+  'a=b; expires=Tuesday, 09-Nov-1999 23:12:40 GMT, c=d'),
+  [['a', 'b', 'expires', 'Tuesday, 09-Nov-1999 23:12:40 GMT'], ['c', 'd']],
+  'right result';
 
 # unindent
 is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",

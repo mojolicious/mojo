@@ -109,7 +109,7 @@ sub _compare {
   return ($cookie->origin // '') ne $origin;
 }
 
-sub _path { $_[0] eq '/' || $_[0] eq $_[1] || $_[1] =~ m!^\Q$_[0]/! }
+sub _path { $_[0] eq '/' || $_[0] eq $_[1] || index($_[1], "$_[0]/") == 0 }
 
 1;
 

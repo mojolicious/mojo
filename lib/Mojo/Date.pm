@@ -25,9 +25,10 @@ sub parse {
   return $self->epoch($date) if $date =~ /^\d+$|^\d+\.\d+$/;
 
   # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
+  # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
   my $offset = 0;
   my ($day, $month, $year, $h, $m, $s);
-  if ($date =~ /^\w+\,\s+(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+GMT$/) {
+  if ($date =~ /^\w+\,\s+(\d+)\W+(\w+)\D+(\d+)\s+(\d+):(\d+):(\d+)\s+GMT$/) {
     ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
 
@@ -35,11 +36,6 @@ sub parse {
   elsif ($date =~ $RFC3339_RE) {
     ($year, $month, $day, $h, $m, $s) = ($1, $2 - 1, $3, $4, $5, $6);
     $offset = (($8 * 3600) + ($9 * 60)) * ($7 eq '+' ? -1 : 1) if $7;
-  }
-
-  # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
-  elsif ($date =~ /^\w+\,\s+(\d+)-(\w+)-(\d+)\s+(\d+):(\d+):(\d+)\s+GMT$/) {
-    ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
 
   # ANSI C asctime() (Sun Nov  6 08:49:37 1994)

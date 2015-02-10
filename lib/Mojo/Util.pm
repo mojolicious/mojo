@@ -55,9 +55,9 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode deprecated dumper encode hmac_sha1_sum html_unescape md5_bytes),
   qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time tablify term_escape trim unindent unquote url_escape),
-  qw(url_unescape xml_escape xor_encode xss_escape)
+  qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
+  qw(split_header spurt squish steady_time tablify term_escape trim unindent),
+  qw(unquote url_escape url_unescape xml_escape xor_encode xss_escape)
 );
 
 sub b64_decode { decode_base64 $_[0] }
@@ -243,25 +243,8 @@ sub slurp {
   return $content;
 }
 
-sub split_header {
-  my $str = shift;
-
-  my (@tree, @token);
-  while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
-    push @token, $1, undef;
-    $token[-1] = unquote($1)
-      if $str =~ s/^=\s*("(?:\\\\|\\"|[^"])*"|[^;, ]*)\s*//;
-
-    # Separator
-    $str =~ s/^;\s*//;
-    next unless $str =~ s/^,\s*//;
-    push @tree, [@token];
-    @token = ();
-  }
-
-  # Take care of final token
-  return [@token ? (@tree, \@token) : @tree];
-}
+sub split_cookie_header { _header(shift, 1) }
+sub split_header        { _header(shift, 0) }
 
 sub spurt {
   my ($content, $path) = @_;
@@ -394,6 +377,35 @@ sub _decode {
 
 sub _encoding {
   $CACHE{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
+}
+
+sub _header {
+  my ($str, $cookie) = @_;
+
+  my (@tree, @token);
+  while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
+    push @token, $1, undef;
+
+    # Special "expires" value
+    my $e = $cookie && lc $1 eq 'expires';
+    if ($e && $str =~ s/^=\s*(\w+\,\s+\d+\W+\w+\D+\d+\s+\d+:\d+:\d+\s+GMT)//) {
+      $token[-1] = $1;
+    }
+
+    # Normal value
+    elsif ($str =~ s/^=\s*("(?:\\\\|\\"|[^"])*"|[^;, ]*)\s*//) {
+      $token[-1] = unquote $1;
+    }
+
+    # Separator
+    $str =~ s/^;\s*//;
+    next unless $str =~ s/^,\s*//;
+    push @tree, [@token];
+    @token = ();
+  }
+
+  # Take care of final token
+  return [@token ? (@tree, \@token) : @tree];
 }
 
 sub _options {
@@ -655,6 +667,13 @@ Generate SHA1 checksum for bytes.
   my $bytes = slurp '/etc/passwd';
 
 Read all data at once from file.
+
+=head2 split_cookie_header
+
+  my $tree = splie_cookie_header 'a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT';
+
+Same as L</"split_header">, but handles C<expires> values from
+L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 =head2 split_header
 

@@ -1,5 +1,6 @@
 
-5.78  2015-02-09
+5.78  2015-02-10
+  - Added split_cookie_header function to Mojo::Util.
   - Improved design of built-in templates.
   - Fixed bug in Mojo::DOM that made parsing a requirement.
   - Fixed warnings in Mojo::URL.

@@ -48,6 +48,9 @@ my %XML = (
   '\'' => '&#39;'
 );
 
+# "Sun, 06 Nov 1994 08:49:37 GMT" or "Sunday, 06-Nov-94 08:49:37 GMT"
+my $EXPIRES_RE = qr/(\w+\,\s+\d+\W+\w+\D+\d+\s+\d+:\d+:\d+\s+GMT)/;
+
 # Encoding cache
 my %CACHE;
 
@@ -383,23 +386,22 @@ sub _header {
   my ($str, $cookie) = @_;
 
   my (@tree, @token);
-  while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
+  while ($str =~ /\G[,;\s]*([^=;, ]+)\s*/gc) {
     push @token, $1, undef;
 
-    # Special "expires" value (Sun, 06 Nov 1994 08:49:37 GMT)
-    my $e = $cookie && lc $1 eq 'expires';
-    if ($e && $str =~ s/^=\s*(\w+\,\s+\d+\W+\w+\D+\d+\s+\d+:\d+:\d+\s+GMT)//) {
+    # Special "expires" value
+    if ($cookie && lc $1 eq 'expires' && $str =~ /\G=\s*$EXPIRES_RE/gco) {
       $token[-1] = $1;
     }
 
     # Normal value
-    elsif ($str =~ s/^=\s*("(?:\\\\|\\"|[^"])*"|[^;, ]*)\s*//) {
+    elsif ($str =~ /\G=\s*("(?:\\\\|\\"|[^"])*"|[^;, ]*)\s*/gc) {
       $token[-1] = unquote $1;
     }
 
     # Separator
-    $str =~ s/^;\s*//;
-    next unless $str =~ s/^,\s*//;
+    $str =~ /\G;\s*/gc;
+    next unless $str =~ /\G,\s*/gc;
     push @tree, [@token];
     @token = ();
   }

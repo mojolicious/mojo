@@ -67,7 +67,7 @@ sub _decode {
     $$valueref = _decode_value();
 
     # Leftover data
-    m/\G[\x20\x09\x0a\x0d]*\z/gc or _throw('Unexpected data');
+    /\G[\x20\x09\x0a\x0d]*\z/gc or _throw('Unexpected data');
   } ? return undef : chomp $@;
 
   return $@;
@@ -81,10 +81,10 @@ sub _decode_array {
     push @array, _decode_value();
 
     # Separator
-    redo if m/\G[\x20\x09\x0a\x0d]*,/gc;
+    redo if /\G[\x20\x09\x0a\x0d]*,/gc;
 
     # End
-    last if m/\G[\x20\x09\x0a\x0d]*\]/gc;
+    last if /\G[\x20\x09\x0a\x0d]*\]/gc;
 
     # Invalid character
     _throw('Expected comma or right square bracket while parsing array');
@@ -98,24 +98,24 @@ sub _decode_object {
   until (m/\G[\x20\x09\x0a\x0d]*\}/gc) {
 
     # Quote
-    m/\G[\x20\x09\x0a\x0d]*"/gc
+    /\G[\x20\x09\x0a\x0d]*"/gc
       or _throw('Expected string while parsing object');
 
     # Key
     my $key = _decode_string();
 
     # Colon
-    m/\G[\x20\x09\x0a\x0d]*:/gc
+    /\G[\x20\x09\x0a\x0d]*:/gc
       or _throw('Expected colon while parsing object');
 
     # Value
     $hash{$key} = _decode_value();
 
     # Separator
-    redo if m/\G[\x20\x09\x0a\x0d]*,/gc;
+    redo if /\G[\x20\x09\x0a\x0d]*,/gc;
 
     # End
-    last if m/\G[\x20\x09\x0a\x0d]*\}/gc;
+    last if /\G[\x20\x09\x0a\x0d]*\}/gc;
 
     # Invalid character
     _throw('Expected comma or right curly bracket while parsing object');
@@ -134,7 +134,7 @@ sub _decode_string {
   # Invalid character
   unless (m/\G"/gc) {
     _throw('Unexpected character or invalid escape while parsing string')
-      if m/\G[\x00-\x1f\\]/;
+      if /\G[\x00-\x1f\\]/;
     _throw('Unterminated string');
   }
 
@@ -146,7 +146,7 @@ sub _decode_string {
 
   # Unescape everything else
   my $buffer = '';
-  while ($str =~ m/\G([^\\]*)\\(?:([^u])|u(.{4}))/gc) {
+  while ($str =~ /\G([^\\]*)\\(?:([^u])|u(.{4}))/gc) {
     $buffer .= $1;
 
     # Popular character
@@ -164,7 +164,7 @@ sub _decode_string {
           or pos($_) = $pos + pos($str), _throw('Missing high-surrogate');
 
         # Low surrogate
-        $str =~ m/\G\\u([Dd][C-Fc-f]..)/gc
+        $str =~ /\G\\u([Dd][C-Fc-f]..)/gc
           or pos($_) = $pos + pos($str), _throw('Missing low-surrogate');
 
         $ord = 0x10000 + ($ord - 0xd800) * 0x400 + (hex($1) - 0xdc00);
@@ -182,29 +182,29 @@ sub _decode_string {
 sub _decode_value {
 
   # Leading whitespace
-  m/\G[\x20\x09\x0a\x0d]*/gc;
+  /\G[\x20\x09\x0a\x0d]*/gc;
 
   # String
-  return _decode_string() if m/\G"/gc;
+  return _decode_string() if /\G"/gc;
 
   # Object
-  return _decode_object() if m/\G\{/gc;
+  return _decode_object() if /\G\{/gc;
 
   # Array
-  return _decode_array() if m/\G\[/gc;
+  return _decode_array() if /\G\[/gc;
 
   # Number
   return 0 + $1
-    if m/\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
+    if /\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
 
   # True
-  return $TRUE if m/\Gtrue/gc;
+  return $TRUE if /\Gtrue/gc;
 
   # False
-  return $FALSE if m/\Gfalse/gc;
+  return $FALSE if /\Gfalse/gc;
 
   # Null
-  return undef if m/\Gnull/gc;
+  return undef if /\Gnull/gc;
 
   # Invalid character
   _throw('Expected string, array, object, number, boolean or null');
@@ -265,7 +265,7 @@ sub _encode_value {
 sub _throw {
 
   # Leading whitespace
-  m/\G[\x20\x09\x0a\x0d]*/gc;
+  /\G[\x20\x09\x0a\x0d]*/gc;
 
   # Context
   my $context = 'Malformed JSON: ' . shift;

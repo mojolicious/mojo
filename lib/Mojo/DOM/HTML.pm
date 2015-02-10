@@ -105,7 +105,7 @@ sub parse {
 
   my $xml = $self->xml;
   my $current = my $tree = ['root'];
-  while ($html =~ m/\G$TOKEN_RE/gcso) {
+  while ($html =~ /\G$TOKEN_RE/gcso) {
     my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway)
       = ($1, $2, $3, $4, $5, $6, $11);
 

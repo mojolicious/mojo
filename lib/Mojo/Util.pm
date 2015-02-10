@@ -50,7 +50,6 @@ my %XML = (
 
 # "Sun, 06 Nov 1994 08:49:37 GMT" and "Sunday, 06-Nov-94 08:49:37 GMT"
 my $EXPIRES_RE = qr/(\w+\,\s+\d+\W+\w+\D+\d+\s+\d+:\d+:\d+\s+GMT)/;
-my $VALUE_RE   = qr/("(?:\\\\|\\"|[^"])*"|[^;, ]*)/;
 
 # Encoding cache
 my %CACHE;
@@ -394,12 +393,14 @@ sub _header {
     # Special "expires" value
     if ($expires && $str =~ s/^=\s*$EXPIRES_RE//o) { $token[-1] = $1 }
 
-    # Normal value
-    elsif ($str =~ s/^=\s*$VALUE_RE\s*//o) { $token[-1] = unquote $1 }
+    # Quoted value
+    elsif ($str =~ s/^=\s*("(?:\\\\|\\"|[^"])*")//) { $token[-1] = unquote $1 }
+
+    # Unquoted value
+    elsif ($str =~ s/^=\s*([^;, ]*)//) { $token[-1] = $1 }
 
     # Separator
-    $str =~ s/^;\s*//;
-    next unless $str =~ s/^,\s*//;
+    next unless $str =~ s/^\s*,\s*//;
     push @tree, [@token];
     @token = ();
   }
@@ -679,9 +680,8 @@ L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
    my $tree = split_header 'foo="bar baz"; test=123, yada';
 
-Split HTTP header value into key/value pairs, keys without a value get
-C<undef> assigned, and each comma separated part will get its own array
-reference.
+Split HTTP header value into key/value pairs, each comma separated part gets
+its own array reference, and keys without a value get C<undef> assigned.
 
   # "one"
   split_header('one; two="three four", five=six')->[0][0];

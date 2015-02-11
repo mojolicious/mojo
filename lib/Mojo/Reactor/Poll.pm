@@ -87,7 +87,7 @@ sub remove {
   return !!delete $self->{io}{fileno $remove};
 }
 
-sub reset { delete @{shift()}{qw(io poll timers)} }
+sub reset { delete @{shift()}{qw(io timers)} }
 
 sub start {
   my $self = shift;

@@ -103,7 +103,7 @@ is_deeply split_cookie_header(
   [['a', 'b', 'expires', 'Sun,06  Nov  1994  08:49:37  UTC', 'path', '/']],
   'right result';
 is_deeply split_cookie_header(
-  'a=b; expires=Sunday 06 Nov 94 08:49:37UTC; path=/'),
+  'a=b ; expires = Sunday 06 Nov 94 08:49:37UTC ; path=/'),
   [['a', 'b', 'expires', 'Sunday 06 Nov 94 08:49:37UTC', 'path', '/']],
   'right result';
 $header = 'expires=Thu, 07 Aug 2008 07:07:59 GMT, a=b';

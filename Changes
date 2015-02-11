@@ -2,6 +2,7 @@
 5.78  2015-02-11
   - Replaced expires method in Mojo::Cookie::Response with an attribute.
   - Added split_cookie_header function to Mojo::Util.
+  - Relaxed RFC 822/1123 and RFC 850/1036 handling in Mojo::Date.
   - Improved design of built-in templates.
   - Fixed bug in Mojo::DOM that made parsing a requirement.
   - Fixed warnings in Mojo::URL.

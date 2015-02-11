@@ -59,9 +59,10 @@ C<1>).
   $ ./script/my_app prefork -m production -w 10 -c 1
   Server available at http://127.0.0.1:3000
 
-Your application is preloaded in the manager process during startup, to run
-code whenever a new worker process has been forked you can use
-L<Mojo::IOLoop/"next_tick">.
+During startup your application is preloaded in the manager process, which
+does not run an event loop, so you can use L<Mojo::IOLoop/"next_tick"> to run
+code whenever a new worker process has been forked and its event loop gets
+started.
 
   use Mojolicious::Lite;
 

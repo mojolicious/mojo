@@ -480,7 +480,8 @@ implements the following new ones.
 
   $c->continue;
 
-Continue dispatch chain with L<Mojolicious::Routes/"continue">.
+Continue dispatch chain from an intermediate destination with
+L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
@@ -789,11 +790,14 @@ Get L<Mojo::Message::Response> object from L</"tx">.
 
 Automatically select best possible representation for resource from C<Accept>
 request header, C<format> stash value or C<format> C<GET>/C<POST> parameter,
-defaults to rendering an empty C<204> response. Since browsers often don't
-really know what they actually want, unspecific C<Accept> request headers with
-more than one MIME type will be ignored, unless the C<X-Requested-With> header
-is set to the value C<XMLHttpRequest>.
+defaults to rendering an empty C<204> response. Each representation can be
+handled with a callback or a hash reference containing arguments to be passed
+to L</"render">. Since browsers often don't really know what they actually
+want, unspecific C<Accept> request headers with more than one MIME type will
+be ignored, unless the C<X-Requested-With> header is set to the value
+C<XMLHttpRequest>.
 
+  # Everything else than "json" and "xml" gets a 204 response
   $c->respond_to(
     json => sub { $c->render(json => {just => 'works'}) },
     xml  => {text => '<just>works</just>'},

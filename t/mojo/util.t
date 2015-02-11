@@ -106,6 +106,13 @@ is_deeply split_cookie_header(
   'a=b; expires=Sunday 06 Nov 94 08:49:37UTC; path=/'),
   [['a', 'b', 'expires', 'Sunday 06 Nov 94 08:49:37UTC', 'path', '/']],
   'right result';
+$header = 'expires=Thu, 07 Aug 2008 07:07:59 GMT, a=b';
+$tree   = [
+  ['expires', 'Thu'],
+  ['07', undef, 'Aug', undef, '2008', undef, '07:07:59', undef, 'GMT', undef],
+  ['a',  'b']
+];
+is_deeply split_cookie_header($header), $tree, 'right result';
 
 # unindent
 is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",

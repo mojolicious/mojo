@@ -388,7 +388,7 @@ sub _header {
   my (@tree, @token);
   while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
     push @token, $1, undef;
-    my $expires = $cookie && lc $1 eq 'expires';
+    my $expires = $cookie && @token > 2 && lc $1 eq 'expires';
 
     # Special "expires" value
     if ($expires && $str =~ s/^=\s*$EXPIRES_RE//o) { $token[-1] = $1 }

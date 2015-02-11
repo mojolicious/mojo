@@ -40,7 +40,7 @@ is(Mojo::Date->new(784111777.33)->to_datetime,
   '1994-11-06T08:49:37.33Z', 'right format');
 
 # Special cases
-is(Mojo::Date->new('Sun,  06-Nov-1994  08:49:37  UTC')->epoch,
+is(Mojo::Date->new('Sun ,  06-Nov-1994  08:49:37  UTC')->epoch,
   784111777, 'right epoch value');
 is(Mojo::Date->new('Sunday,06  Nov  94  08:49:37  UTC')->epoch,
   784111777, 'right epoch value');

@@ -237,8 +237,8 @@ is $cookies->[1], undef, 'no more cookies';
 # Parse quoted response cookie (RFC 6265, alternative)
 $cookies
   = Mojo::Cookie::Response->parse(
-      'foo="b a\" ;r\"\\\\"; domain=example.com; path=/test; Max-Age=60;'
-    . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; secure');
+      'foo="b a\" ;r\"\\\\" ; domain=example.com ; path=/test ; Max-Age=60'
+    . ' ; expires=Thu, 07 Aug 2008 07:07:59 GMT ; secure');
 is $cookies->[0]->name,    'foo',         'right name';
 is $cookies->[0]->value,   'b a" ;r"\\',  'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';

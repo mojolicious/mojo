@@ -22,9 +22,8 @@ sub is_running { !!shift->{running} }
 sub one_tick {
   my $self = shift;
 
-  # Remember state for later
-  my $running = $self->{running};
-  $self->{running} = 1;
+  # Just one tick
+  local $self->{running} = 1 unless $self->{running};
 
   # Wait for one event
   my $i;
@@ -74,9 +73,6 @@ sub one_tick {
       ++$i and $self->_sandbox("Timer $id", $t->{cb}) if $t->{cb};
     }
   }
-
-  # Restore state if necessary
-  $self->{running} = $running if $self->{running};
 }
 
 sub recurring { shift->_timer(1, @_) }

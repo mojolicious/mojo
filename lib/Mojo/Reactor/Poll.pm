@@ -28,7 +28,6 @@ sub one_tick {
 
   # Wait for one event
   my $i;
-  my $poll = $self->_poll;
   until ($i) {
 
     # Stop automatically if there is nothing to watch
@@ -41,14 +40,21 @@ sub one_tick {
 
     # I/O
     if (keys %{$self->{io}}) {
-      $poll->poll($timeout);
-      for my $handle ($poll->handles(POLLIN | POLLPRI | POLLHUP | POLLERR)) {
-        next unless my $io = $self->{io}{fileno $handle};
-        ++$i and $self->_sandbox('Read', $io->{cb}, 0);
-      }
-      for my $handle ($poll->handles(POLLOUT)) {
-        next unless my $io = $self->{io}{fileno $handle};
-        ++$i and $self->_sandbox('Write', $io->{cb}, 1);
+      my @poll = map { $_ => $self->{io}{$_}{mode} } keys %{$self->{io}};
+
+      # This may break in the future, but is worth it for performance
+      if (IO::Poll::_poll($timeout, @poll) > 0) {
+        while (@poll) {
+          my ($fd, $mode) = (shift(@poll), shift(@poll));
+          if ($mode & (POLLIN | POLLPRI | POLLHUP | POLLERR)) {
+            next unless my $io = $self->{io}{$fd};
+            ++$i and $self->_sandbox('Read', $io->{cb}, 0);
+          }
+          if ($mode & POLLOUT) {
+            next unless my $io = $self->{io}{$fd};
+            ++$i and $self->_sandbox('Write', $io->{cb}, 1);
+          }
+        }
       }
     }
 
@@ -80,7 +86,6 @@ sub recurring { shift->_timer(1, @_) }
 sub remove {
   my ($self, $remove) = @_;
   return !!delete $self->{timers}{$remove} unless ref $remove;
-  $self->_poll->remove($remove);
   return !!delete $self->{io}{fileno $remove};
 }
 
@@ -102,10 +107,7 @@ sub watch {
   my $mode = 0;
   $mode |= POLLIN | POLLPRI if $read;
   $mode |= POLLOUT if $write;
-
-  my $poll = $self->_poll;
-  $poll->remove($handle);
-  $poll->mask($handle, $mode) if $mode != 0;
+  $self->{io}{fileno $handle}{mode} = $mode;
 
   return $self;
 }
@@ -116,8 +118,6 @@ sub _id {
   do { $id = md5_sum 't' . steady_time . rand 999 } while $self->{timers}{$id};
   return $id;
 }
-
-sub _poll { shift->{poll} ||= IO::Poll->new }
 
 sub _sandbox {
   my ($self, $event, $cb) = (shift, shift, shift);

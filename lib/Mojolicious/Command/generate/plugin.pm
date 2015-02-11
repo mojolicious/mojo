@@ -12,7 +12,7 @@ sub run {
   $name ||= 'MyPlugin';
 
   # Class
-  my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
+  my $class = $name =~ /^[a-z]/ ? camelize $name : $name;
   $class = "Mojolicious::Plugin::$class";
   my $app = class_to_path $class;
   my $dir = join '-', split('::', $class);

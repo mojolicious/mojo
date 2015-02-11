@@ -323,7 +323,7 @@ sub _message {
   $self->emit(json => j($msg)) if $self->has_subscribers('json');
   $op = delete $self->{op};
   $self->emit($op == TEXT ? 'text' : 'binary' => $msg);
-  $self->emit(message => $op == TEXT ? decode('UTF-8', $msg) : $msg)
+  $self->emit(message => $op == TEXT ? decode 'UTF-8', $msg : $msg)
     if $self->has_subscribers('message');
 }
 

@@ -48,7 +48,7 @@ sub store {
   $session->{expires} = $default || time + $expiration
     if $expiration || $default;
 
-  my $value = b64_encode($self->serialize->($session), '');
+  my $value = b64_encode $self->serialize->($session), '';
   $value =~ y/=/-/;
   my $options = {
     domain   => $self->cookie_domain,

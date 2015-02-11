@@ -22,8 +22,8 @@ sub parse {
 
       next unless $ATTRS{my $attr = lc $name};
       $value = Mojo::Date->new($value)->epoch if $attr eq 'expires';
-      $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr}
-        = $attr eq 'secure' || $attr eq 'httponly' ? 1 : $value;
+      $value = 1 if $attr eq 'secure' || $attr eq 'httponly';
+      $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr} = $value;
     }
   }
 

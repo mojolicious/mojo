@@ -33,7 +33,7 @@ sub register {
     for qw(content content_for csrf_token current_route delay),
     qw(inactivity_timeout is_fresh url_with);
 
-  $app->helper(dumper => sub { shift; dumper(@_) });
+  $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset static);
@@ -72,7 +72,7 @@ sub _content_for {
 sub _csrf_token {
   my $c = shift;
   $c->session->{csrf_token}
-    ||= sha1_sum($c->app->secrets->[0] . steady_time . rand 999);
+    ||= sha1_sum $c->app->secrets->[0] . steady_time . rand 999;
 }
 
 sub _current_route {

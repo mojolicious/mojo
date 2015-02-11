@@ -7,7 +7,7 @@ use File::Basename 'dirname';
 use File::Find 'find';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
-use Mojo::Util qw(class_to_path slurp);
+use Mojo::Util 'class_to_path';
 
 has parts => sub { [] };
 

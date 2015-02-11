@@ -69,7 +69,7 @@ sub _all {
   while (@files) {
     my ($name, $data) = splice @files, 0, 2;
     $all->{$name} = $name =~ s/\s*\(\s*base64\s*\)$//
-      && ++$BIN{$class}{$name} ? b64_decode($data) : $data;
+      && ++$BIN{$class}{$name} ? b64_decode $data : $data;
   }
 
   return $all;

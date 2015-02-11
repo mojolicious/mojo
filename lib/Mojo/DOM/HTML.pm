@@ -131,7 +131,7 @@ sub parse {
           # Empty tag
           ++$closing and next if $key eq '/';
 
-          $attrs{$key} = defined $value ? html_unescape($value) : $value;
+          $attrs{$key} = defined $value ? html_unescape $value : $value;
         }
 
         # "image" is an alias for "img"

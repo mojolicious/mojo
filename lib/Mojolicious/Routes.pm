@@ -125,7 +125,7 @@ sub _class {
 
   # Application class
   my @classes;
-  my $class = $field->{controller} ? camelize($field->{controller}) : '';
+  my $class = $field->{controller} ? camelize $field->{controller} : '';
   if ($field->{app}) { push @classes, $field->{app} }
 
   # Specific namespace

@@ -186,7 +186,7 @@ sub query_params { shift->url->query }
 
 sub _parse_basic_auth {
   return undef unless my $header = shift;
-  return $header =~ /Basic (.+)$/ ? b64_decode($1) : undef;
+  return $header =~ /Basic (.+)$/ ? b64_decode $1 : undef;
 }
 
 sub _parse_env {

@@ -322,7 +322,7 @@ sub _text {
 
     # Text
     my $chunk = '';
-    if ($type eq 'text') { $chunk = $trim ? squish($node->[1]) : $node->[1] }
+    if ($type eq 'text') { $chunk = $trim ? squish $node->[1] : $node->[1] }
 
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $chunk = $node->[1] }

@@ -5,7 +5,7 @@ use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
 use Mojo::DOM;
 use Mojo::URL;
-use Mojo::Util qw(slurp unindent url_escape);
+use Mojo::Util qw(slurp unindent);
 use Pod::Simple::XHTML;
 use Pod::Simple::Search;
 

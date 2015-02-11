@@ -44,6 +44,8 @@ is(Mojo::Date->new('Sun,  06-Nov-1994  08:49:37  UTC')->epoch,
   784111777, 'right epoch value');
 is(Mojo::Date->new('Sunday,06  Nov  94  08:49:37  UTC')->epoch,
   784111777, 'right epoch value');
+is(Mojo::Date->new('Sunday 06 Nov 94 08:49:37UTC')->epoch,
+  784111777, 'right epoch value');
 is(Mojo::Date->new('2014-08-20  20:45:00')->epoch,
   1408567500, 'right epoch value');
 

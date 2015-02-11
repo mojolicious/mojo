@@ -102,6 +102,10 @@ is_deeply split_cookie_header(
   'a=b; expires=Sun,06  Nov  1994  08:49:37  UTC; path=/'),
   [['a', 'b', 'expires', 'Sun,06  Nov  1994  08:49:37  UTC', 'path', '/']],
   'right result';
+is_deeply split_cookie_header(
+  'a=b; expires=Sunday 06 Nov 94 08:49:37UTC; path=/'),
+  [['a', 'b', 'expires', 'Sunday 06 Nov 94 08:49:37UTC', 'path', '/']],
+  'right result';
 
 # unindent
 is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",

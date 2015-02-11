@@ -28,7 +28,7 @@ sub parse {
   # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
   my $offset = 0;
   my ($day, $month, $year, $h, $m, $s);
-  if ($date =~ /^\w+\,\s*(\d+)\W+(\w+)\D+(\d+)\s+(\d+):(\d+):(\d+)\s+\w+$/) {
+  if ($date =~ /^\w+\W+(\d+)\W+(\w+)\D+(\d+)\W+(\d+):(\d+):(\d+)\W*\w+$/) {
     ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
 

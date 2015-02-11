@@ -49,7 +49,7 @@ my %XML = (
 );
 
 # "Sun, 06 Nov 1994 08:49:37 GMT" and "Sunday, 06-Nov-94 08:49:37 GMT"
-my $EXPIRES_RE = qr/(\w+\,\s+\d+\W+\w+\D+\d+\s+\d+:\d+:\d+\s+\w+)/;
+my $EXPIRES_RE = qr/(\w+\,\s*\d+\W+\w+\D+\d+\s+\d+:\d+:\d+\s+\w+)/;
 
 # Encoding cache
 my %CACHE;

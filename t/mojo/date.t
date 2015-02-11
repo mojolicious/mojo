@@ -9,6 +9,12 @@ is $date->epoch, 784111777, 'right epoch value';
 $date = Mojo::Date->new('Fri, 13 May 2011 10:00:24 GMT');
 is $date->epoch, 1305280824, 'right epoch value';
 
+# RFC 850/1036
+is(Mojo::Date->new('Sunday, 06-Nov-94 08:49:37 GMT')->epoch,
+  784111777, 'right epoch value');
+is(Mojo::Date->new('Friday, 13-May-11 10:00:24 GMT')->epoch,
+  1305280824, 'right epoch value');
+
 # RFC 3339
 is(Mojo::Date->new('2014-08-20T20:45:00')->epoch,
   1408567500, 'right epoch value');
@@ -30,16 +36,16 @@ is(Mojo::Date->new('1994-11-06T08:49:37Z')->epoch,
   784111777, 'right epoch value');
 is(Mojo::Date->new('1994-11-06t08:49:37.33z')->epoch,
   784111777.33, 'right epoch value');
-is(Mojo::Date->new('2014-08-20  20:45:00')->epoch,
-  1408567500, 'right epoch value');
 is(Mojo::Date->new(784111777.33)->to_datetime,
   '1994-11-06T08:49:37.33Z', 'right format');
 
-# RFC 850/1036
-is(Mojo::Date->new('Sunday, 06-Nov-94 08:49:37 GMT')->epoch,
+# Special cases
+is(Mojo::Date->new('Sun,  06-Nov-1994  08:49:37  UTC')->epoch,
   784111777, 'right epoch value');
-is(Mojo::Date->new('Friday, 13-May-11 10:00:24 GMT')->epoch,
-  1305280824, 'right epoch value');
+is(Mojo::Date->new('Sunday,06  Nov  94  08:49:37  UTC')->epoch,
+  784111777, 'right epoch value');
+is(Mojo::Date->new('2014-08-20  20:45:00')->epoch,
+  1408567500, 'right epoch value');
 
 # ANSI C asctime()
 is(Mojo::Date->new('Sun Nov  6 08:49:37 1994')->epoch,

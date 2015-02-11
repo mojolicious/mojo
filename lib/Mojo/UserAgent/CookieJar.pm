@@ -77,8 +77,7 @@ sub find {
       next unless $cookie->domain || $host eq $cookie->origin;
 
       # Check if cookie has expired
-      my $expires = $cookie->expires;
-      next if $expires && time > ($expires->epoch || 0);
+      if (my $expires = $cookie->expires) { next if time > ($expires || 0) }
       push @$new, $cookie;
 
       # Taste cookie

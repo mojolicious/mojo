@@ -1,5 +1,6 @@
 
-5.78  2015-02-10
+5.78  2015-02-11
+  - Replaced expires method in Mojo::Cookie::Response with an attribute.
   - Added split_cookie_header function to Mojo::Util.
   - Improved design of built-in templates.
   - Fixed bug in Mojo::DOM that made parsing a requirement.

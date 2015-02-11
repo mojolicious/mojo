@@ -314,7 +314,7 @@ $t->app->secrets(['test2', 'test1']);
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
   "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
-ok $t->tx->res->cookie('mojolicious')->expires->epoch < time,
+ok $t->tx->res->cookie('mojolicious')->expires < time,
   'session cookie expires';
 
 # With cookies and session cleared (rotating secrets)

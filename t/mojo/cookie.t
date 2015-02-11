@@ -174,10 +174,9 @@ is_deeply(Mojo::Cookie::Response->parse, [], 'no cookies');
 # Parse response cookie (Netscape)
 $cookies = Mojo::Cookie::Response->parse(
   'CUSTOMER=WILE_E_COYOTE; path=/; expires=Tuesday, 09-Nov-1999 23:12:40 GMT');
-is $cookies->[0]->name,  'CUSTOMER',      'right name';
-is $cookies->[0]->value, 'WILE_E_COYOTE', 'right value';
-is $cookies->[0]->expires, 'Tue, 09 Nov 1999 23:12:40 GMT',
-  'right expires value';
+is $cookies->[0]->name,    'CUSTOMER',      'right name';
+is $cookies->[0]->value,   'WILE_E_COYOTE', 'right value';
+is $cookies->[0]->expires, 942189160,       'right expires value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse multiple response cookies (Netscape)
@@ -185,14 +184,12 @@ $cookies
   = Mojo::Cookie::Response->parse(
   'CUSTOMER=WILE_E_COYOTE; expires=Tuesday, 09-Nov-1999 23:12:40 GMT; path=/'
     . ',SHIPPING=FEDEX; path=/; expires=Tuesday, 09-Nov-1999 23:12:41 GMT');
-is $cookies->[0]->name,  'CUSTOMER',      'right name';
-is $cookies->[0]->value, 'WILE_E_COYOTE', 'right value';
-is $cookies->[0]->expires, 'Tue, 09 Nov 1999 23:12:40 GMT',
-  'right expires value';
-is $cookies->[1]->name,  'SHIPPING', 'right name';
-is $cookies->[1]->value, 'FEDEX',    'right value';
-is $cookies->[1]->expires, 'Tue, 09 Nov 1999 23:12:41 GMT',
-  'right expires value';
+is $cookies->[0]->name,    'CUSTOMER',      'right name';
+is $cookies->[0]->value,   'WILE_E_COYOTE', 'right value';
+is $cookies->[0]->expires, 942189160,       'right expires value';
+is $cookies->[1]->name,    'SHIPPING',      'right name';
+is $cookies->[1]->value,   'FEDEX',         'right value';
+is $cookies->[1]->expires, 942189161,       'right expires value';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse response cookie (RFC 6265)
@@ -205,9 +202,8 @@ is $cookies->[0]->value,   'ba r',        'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie with invalid flag (RFC 6265)
@@ -220,9 +216,8 @@ is $cookies->[0]->value,   'ba r',        'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, undef, 'no secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  undef,         'no secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie (RFC 6265)
@@ -235,9 +230,8 @@ is $cookies->[0]->value,   'b a" r"\\',   'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie (RFC 6265, alternative)
@@ -250,9 +244,8 @@ is $cookies->[0]->value,   'b a" ;r"\\',  'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265)
@@ -265,9 +258,8 @@ is $cookies->[0]->value,   'b ,a";= r"\\', 'right value';
 is $cookies->[0]->domain,  'example.com',  'right domain';
 is $cookies->[0]->path,    '/test',        'right path';
 is $cookies->[0]->max_age, 60,             'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,     'right expires value';
+is $cookies->[0]->secure,  1,              'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 $cookies = Mojo::Cookie::Response->parse($cookies->[0]);
 is $cookies->[0]->name,    'foo',          'right name';
@@ -275,9 +267,8 @@ is $cookies->[0]->value,   'b ,a";= r"\\', 'right value';
 is $cookies->[0]->domain,  'example.com',  'right domain';
 is $cookies->[0]->path,    '/test',        'right path';
 is $cookies->[0]->max_age, 60,             'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,     'right expires value';
+is $cookies->[0]->secure,  1,              'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265, alternative)
@@ -290,9 +281,8 @@ is $cookies->[0]->value,   'b ,a" r"\\',  'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 $cookies = Mojo::Cookie::Response->parse($cookies->[0]);
 is $cookies->[0]->name,    'foo',         'right name';
@@ -300,9 +290,8 @@ is $cookies->[0]->value,   'b ,a" r"\\',  'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265, another alternative)
@@ -315,9 +304,8 @@ is $cookies->[0]->value,   'b ;a" r"\\',  'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 $cookies = Mojo::Cookie::Response->parse($cookies->[0]);
 is $cookies->[0]->name,    'foo',         'right name';
@@ -325,9 +313,8 @@ is $cookies->[0]->value,   'b ;a" r"\\',  'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265, yet another alternative)
@@ -340,9 +327,8 @@ is $cookies->[0]->value,   '"b a" r"',    'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 $cookies = Mojo::Cookie::Response->parse($cookies->[0]);
 is $cookies->[0]->name,    'foo',         'right name';
@@ -350,9 +336,8 @@ is $cookies->[0]->value,   '"b a" r"',    'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie without value (RFC 2965)
@@ -365,9 +350,8 @@ is $cookies->[0]->value,   '',            'no value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[0]->to_string,
   'foo=; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
   . ' path=/test; secure; Max-Age=60', 'right result';
@@ -381,9 +365,8 @@ is $cookies->[0]->value,   '',            'no value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/test',       'right path';
 is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
-  'right expires value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 1218092879,    'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[0]->to_string,
   'foo=; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
   . ' path=/test; secure; Max-Age=60', 'right result';
@@ -420,32 +403,26 @@ is $cookies->[0]->value,   'bar',         'right value';
 is $cookies->[0]->domain,  'example.com', 'right domain';
 is $cookies->[0]->path,    '/',           'right path';
 is $cookies->[0]->max_age, 0,             'right max age value';
-is $cookies->[0]->expires, 'Thu, 01 Jan 1970 00:00:00 GMT',
-  'right expires value';
-is $cookies->[0]->expires->epoch, 0, 'right expires epoch value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->expires, 0,             'right expires value';
+is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie with two digit year (RFC 6265)
 $cookies = Mojo::Cookie::Response->parse(
   'foo=bar; Path=/; Expires=Saturday, 09-Nov-19 23:12:40 GMT; Secure');
-is $cookies->[0]->name,  'foo', 'right name';
-is $cookies->[0]->value, 'bar', 'right value';
-is $cookies->[0]->path,  '/',   'right path';
-is $cookies->[0]->expires, 'Sat, 09 Nov 2019 23:12:40 GMT',
-  'right expires value';
-is $cookies->[0]->expires->epoch, 1573341160, 'right expires epoch value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->name,    'foo',      'right name';
+is $cookies->[0]->value,   'bar',      'right value';
+is $cookies->[0]->path,    '/',        'right path';
+is $cookies->[0]->expires, 1573341160, 'right expires value';
+is $cookies->[0]->secure,  1,          'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 $cookies = Mojo::Cookie::Response->parse(
   'foo=bar; Path=/; Expires=Tuesday, 09-Nov-99 23:12:40 GMT; Secure');
-is $cookies->[0]->name,  'foo', 'right name';
-is $cookies->[0]->value, 'bar', 'right value';
-is $cookies->[0]->path,  '/',   'right path';
-is $cookies->[0]->expires, 'Tue, 09 Nov 1999 23:12:40 GMT',
-  'right expires value';
-is $cookies->[0]->expires->epoch, 942189160, 'right expires epoch value';
-is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[0]->name,    'foo',     'right name';
+is $cookies->[0]->value,   'bar',     'right value';
+is $cookies->[0]->path,    '/',       'right path';
+is $cookies->[0]->expires, 942189160, 'right expires value';
+is $cookies->[0]->secure,  1,         'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Abstract methods

@@ -4,27 +4,15 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain httponly max_age origin path secure)];
+has [qw(domain expires httponly max_age origin path secure)];
 
-my %ATTRS = map { $_ => 1 } qw(expires domain path secure max-age httponly);
-
-sub expires {
-  my $self = shift;
-
-  # Upgrade
-  my $e = $self->{expires};
-  return $self->{expires} = defined $e && !ref $e ? Mojo::Date->new($e) : $e
-    unless @_;
-  $self->{expires} = shift;
-
-  return $self;
-}
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
 
 sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  my $tree = split_cookie_header($str // '');
+  my $tree = split_cookie_header $str // '';
   while (my $pairs = shift @$tree) {
     push @cookies,
       $self->new(name => shift(@$pairs), value => shift(@$pairs) // '');
@@ -33,9 +21,9 @@ sub parse {
       my ($name, $value) = (shift @$pairs, shift @$pairs);
 
       next unless $ATTRS{my $attr = lc $name};
-      $attr = 'max_age' if $attr eq 'max-age';
-      $cookies[-1]
-        ->$attr($attr eq 'secure' || $attr eq 'httponly' ? 1 : $value);
+      $value = Mojo::Date->new($value)->epoch if $attr eq 'expires';
+      $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr}
+        = $attr eq 'secure' || $attr eq 'httponly' ? 1 : $value;
     }
   }
 
@@ -48,10 +36,11 @@ sub to_string {
   # Name and value
   return '' unless length(my $name = $self->name // '');
   my $value = $self->value // '';
-  my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote($value) : $value;
+  my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote $value : $value;
 
   # "expires"
-  if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
+  my $expires = $self->expires;
+  if (defined $expires) { $cookie .= '; expires=' . Mojo::Date->new($expires) }
 
   # "domain"
   if (my $domain = $self->domain) { $cookie .= "; domain=$domain" }
@@ -105,6 +94,13 @@ implements the following new ones.
 
 Cookie domain.
 
+=head2 expires
+
+  my $expires = $cookie->expires;
+  $cookie     = $cookie->expires(time + 60);
+
+Expiration for cookie.
+
 =head2 httponly
 
   my $bool = $cookie->httponly;
@@ -146,14 +142,6 @@ connections.
 
 L<Mojo::Cookie::Response> inherits all methods from L<Mojo::Cookie> and
 implements the following new ones.
-
-=head2 expires
-
-  my $expires = $cookie->expires;
-  $cookie     = $cookie->expires(time + 60);
-  $cookie     = $cookie->expires(Mojo::Date->new(time + 60));
-
-Expiration for cookie.
 
 =head2 parse
 

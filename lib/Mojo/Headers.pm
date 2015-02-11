@@ -461,7 +461,7 @@ Shortcut for the C<Last-Modified> header.
 
   my $bytes = $headers->leftovers;
 
-Get leftover data from header parser.
+Get and remove leftover data from header parser.
 
 =head2 link
 

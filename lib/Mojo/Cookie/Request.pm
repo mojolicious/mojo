@@ -8,8 +8,7 @@ sub parse {
 
   my @cookies;
   my @pairs = map {@$_} @{split_header $str // ''};
-  while (@pairs) {
-    my ($name, $value) = (shift @pairs, shift @pairs);
+  while (my ($name, $value) = splice @pairs, 0, 2) {
     next if $name =~ /^\$/;
     push @cookies, $self->new(name => $name, value => $value // '');
   }

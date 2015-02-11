@@ -14,12 +14,10 @@ sub parse {
   my @cookies;
   my $tree = split_cookie_header $str // '';
   while (my $pairs = shift @$tree) {
-    push @cookies,
-      $self->new(name => shift(@$pairs), value => shift(@$pairs) // '');
+    my ($name, $value) = splice @$pairs, 0, 2;
+    push @cookies, $self->new(name => $name, value => $value // '');
 
-    while (@$pairs) {
-      my ($name, $value) = (shift @$pairs, shift @$pairs);
-
+    while (my ($name, $value) = splice @$pairs, 0, 2) {
       next unless $ATTRS{my $attr = lc $name};
       $value = Mojo::Date->new($value)->epoch if $attr eq 'expires';
       $value = 1 if $attr eq 'secure' || $attr eq 'httponly';

@@ -44,8 +44,7 @@ sub one_tick {
 
       # This may break in the future, but is worth it for performance
       if (IO::Poll::_poll($timeout, @poll) > 0) {
-        while (@poll) {
-          my ($fd, $mode) = (shift(@poll), shift(@poll));
+        while (my ($fd, $mode) = splice @poll, 0, 2) {
 
           if ($mode & (POLLIN | POLLPRI | POLLHUP | POLLERR)) {
             next unless my $io = $self->{io}{$fd};

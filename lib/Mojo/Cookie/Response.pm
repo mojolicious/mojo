@@ -40,7 +40,7 @@ sub to_string {
 
   # "expires"
   my $expires = $self->expires;
-  if (defined $expires) { $cookie .= '; expires=' . Mojo::Date->new($expires) }
+  $cookie .= '; expires=' . Mojo::Date->new($expires) if defined $expires;
 
   # "domain"
   if (my $domain = $self->domain) { $cookie .= "; domain=$domain" }
@@ -51,11 +51,11 @@ sub to_string {
   # "secure"
   $cookie .= "; secure" if $self->secure;
 
-  # "Max-Age"
-  if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
-
   # "HttpOnly"
   $cookie .= "; HttpOnly" if $self->httponly;
+
+  # "Max-Age"
+  if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
 
   return $cookie;
 }

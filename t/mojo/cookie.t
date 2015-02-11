@@ -166,7 +166,7 @@ $cookie->secure(1);
 $cookie->httponly(1);
 is $cookie->to_string,
   '0="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
-  . ' path=/test; secure; Max-Age=60; HttpOnly', 'right format';
+  . ' path=/test; secure; HttpOnly; Max-Age=60', 'right format';
 
 # Empty response cookie
 is_deeply(Mojo::Cookie::Response->parse, [], 'no cookies');

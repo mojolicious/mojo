@@ -46,14 +46,13 @@ sub one_tick {
       if (IO::Poll::_poll($timeout, @poll) > 0) {
         while (@poll) {
           my ($fd, $mode) = (shift(@poll), shift(@poll));
+
           if ($mode & (POLLIN | POLLPRI | POLLHUP | POLLERR)) {
             next unless my $io = $self->{io}{$fd};
             ++$i and $self->_sandbox('Read', $io->{cb}, 0);
           }
-          if ($mode & POLLOUT) {
-            next unless my $io = $self->{io}{$fd};
-            ++$i and $self->_sandbox('Write', $io->{cb}, 1);
-          }
+          next unless $mode & POLLOUT && (my $io = $self->{io}{$fd});
+          ++$i and $self->_sandbox('Write', $io->{cb}, 1);
         }
       }
     }

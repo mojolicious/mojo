@@ -432,10 +432,9 @@ L</"plugin"> method below if you want to load a plugin.
   my $renderer = $app->renderer;
   $app         = $app->renderer(Mojolicious::Renderer->new);
 
-Used in your application to render content, defaults to a
-L<Mojolicious::Renderer> object. The two main renderer plugins
-L<Mojolicious::Plugin::EPRenderer> and L<Mojolicious::Plugin::EPLRenderer>
-contain more information.
+Used to render content, defaults to a L<Mojolicious::Renderer> object. For
+more information about how to generate content see
+L<Mojolicious::Guides::Rendering>.
 
   # Add another "templates" directory
   push @{$app->renderer->paths}, '/home/sri/templates';

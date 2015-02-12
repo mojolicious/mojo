@@ -372,8 +372,9 @@ Message content, defaults to a L<Mojo::Content::Single> object.
   my $charset = $msg->default_charset;
   $msg        = $msg->default_charset('UTF-8');
 
-Default charset used by L</"text"> and for form-data parsing, defaults to
-C<UTF-8>.
+Default charset used by L</"text"> and to extract data from
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
+defaults to C<UTF-8>.
 
 =head2 max_line_size
 
@@ -575,6 +576,9 @@ Size of headers in bytes.
   my $headers = $msg->headers;
 
 Message headers, usually a L<Mojo::Headers> object.
+
+  # Longer version
+  my $headers = $msg->content->headers;
 
 =head2 is_finished
 

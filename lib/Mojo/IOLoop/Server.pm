@@ -12,7 +12,7 @@ use Socket qw(IPPROTO_TCP TCP_NODELAY);
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 2.0 (); 1';
+  : eval 'use IO::Socket::SSL 1.94 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -79,7 +79,7 @@ sub listen {
   $self->{handle} = $handle;
 
   return unless $args->{tls};
-  croak "IO::Socket::SSL 2.0 required for TLS support" unless TLS;
+  croak "IO::Socket::SSL 1.94 required for TLS support" unless TLS;
 
   weaken $self;
   my $tls = $self->{tls} = {
@@ -234,7 +234,7 @@ Get handle for server.
   $server->listen(port => 3000);
 
 Create a new listen socket. Note that TLS support depends on
-L<IO::Socket::SSL> (2.0+).
+L<IO::Socket::SSL> (1.94+).
 
 These options are currently available:
 

@@ -25,7 +25,7 @@ CORE
 OPTIONAL
   EV 4.0+                 ($ev)
   IO::Socket::Socks 0.64+ ($socks)
-  IO::Socket::SSL 2.0+    ($tls)
+  IO::Socket::SSL 1.94+   ($tls)
   Net::DNS::Native 0.15+  ($ndn)
 
 EOF

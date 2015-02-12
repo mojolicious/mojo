@@ -70,7 +70,7 @@ sub run {
   return _json($buffer, $selector) if $selector eq '' || $selector =~ m!^/!;
 
   # Selector
-  $charset //= $tx->res->content->charset // $tx->res->default_charset;
+  $charset //= $tx->res->content->charset || $tx->res->default_charset;
   _select($buffer, $selector, $charset, @args);
 }
 

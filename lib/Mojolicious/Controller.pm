@@ -657,7 +657,7 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
   my $bool = $c->render(handler => 'something');
   my $bool = $c->render('foo/index');
 
-Render content with L<Mojolicious::Renderer/"render"> and emit hooks
+Render content with L<Mojolicious/"renderer"> and emit hooks
 L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">, or
 call L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found"> if no
 response could be generated, all additional key/value pairs get merged into

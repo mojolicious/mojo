@@ -666,6 +666,9 @@ the L</"stash">.
   # Render characters
   $c->render(text => 'I ♥ Mojolicious!');
 
+  # Render characters (alternative)
+  $c->stash(text => 'I ♥ Mojolicious!')->render;
+
   # Render binary data
   use Mojo::JSON 'encode_json';
   $c->render(data => encode_json({test => 'I ♥ Mojolicious!'}));

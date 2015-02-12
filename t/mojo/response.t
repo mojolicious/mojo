@@ -991,10 +991,11 @@ is $res->body('hello!')->body, 'hello!', 'right content';
 $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';
-is $res->body(encode('UTF-8', '☃'))->text, encode('UTF-8', '☃'),
-  'right content';
-$res->headers->content_type('text/plain;charset=UTF-8');
-is $res->body(encode('UTF-8', '☃'))->text, '☃', 'right content';
+my $yatta = encode 'shift_jis', 'やった';
+is $res->body($yatta)->text, $yatta, 'right content';
+$res->headers->content_type('text/plain;charset=shift_jis');
+is $res->body($yatta)->text, 'やった', 'right content';
+is $res->body($yatta)->dom->text, 'やった', 'right text';
 
 # Body exceeding memory limit (no upgrade)
 {

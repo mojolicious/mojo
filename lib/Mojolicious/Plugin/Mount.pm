@@ -41,6 +41,7 @@ Mojolicious::Plugin::Mount - Application mount plugin
   $example->to(message => 'It works great!');
   my $app = $example->pattern->defaults->{app};
   $app->config(foo => 'bar');
+  $app->log(app->log);
 
   # Mount application with host
   plugin Mount => {'example.com' => '/home/sri/myapp.pl'};

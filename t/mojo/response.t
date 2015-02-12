@@ -975,7 +975,7 @@ ok $res->content->is_dynamic, 'dynamic content';
 is $count, length($body), 'right length';
 is $full, $body, 'right content';
 
-# Body helper
+# Body
 $res = Mojo::Message::Response->new;
 $res->body('hi there!');
 ok !$res->content->asset->is_file,      'stored in memory';
@@ -991,6 +991,13 @@ is $res->body('hello!')->body, 'hello!', 'right content';
 $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';
+
+# Text
+$res = Mojo::Message::Response->new;
+my $snowman = encode 'UTF-8', '☃';
+is $res->body($snowman)->text, '☃', 'right content';
+is $res->body($snowman)->dom->text, '☃', 'right text';
+$res = Mojo::Message::Response->new;
 my $yatta = encode 'shift_jis', 'やった';
 is $res->body($yatta)->text, $yatta, 'right content';
 $res->headers->content_type('text/plain;charset=shift_jis');

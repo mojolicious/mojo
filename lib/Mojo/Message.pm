@@ -188,7 +188,7 @@ sub start_line_size { length shift->build_start_line }
 sub text {
   my $self    = shift;
   my $body    = $self->body;
-  my $charset = $self->content->charset;
+  my $charset = $self->content->charset || $self->default_charset;
   return $charset ? decode($charset, $body) // $body : $body;
 }
 
@@ -372,7 +372,8 @@ Message content, defaults to a L<Mojo::Content::Single> object.
   my $charset = $msg->default_charset;
   $msg        = $msg->default_charset('UTF-8');
 
-Default charset used for form-data parsing, defaults to C<UTF-8>.
+Default charset used by L</"text"> and for form-data parsing, defaults to
+C<UTF-8>.
 
 =head2 max_line_size
 
@@ -621,8 +622,8 @@ Size of the start-line in bytes.
 
   my $str = $msg->text;
 
-Retrieve L</"body"> and try to decode it if a charset could be extracted with
-L<Mojo::Content/"charset">.
+Retrieve L</"body"> and try to decode it with L<Mojo::Content/"charset"> or
+L</"default_charset">.
 
 =head2 to_string
 

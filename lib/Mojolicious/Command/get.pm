@@ -44,11 +44,8 @@ sub run {
       # Verbose
       weaken $tx;
       $tx->res->content->on(
-        body => sub {
-          warn $tx->req->$_ for qw(build_start_line build_headers);
-          warn $tx->res->$_ for qw(build_start_line build_headers);
-        }
-      ) if $verbose;
+        body => sub { warn _header($tx->req), _header($tx->res) })
+        if $verbose;
 
       # Stream content (ignore redirects)
       $tx->res->content->unsubscribe('read')->on(
@@ -73,8 +70,11 @@ sub run {
   return _json($buffer, $selector) if $selector eq '' || $selector =~ m!^/!;
 
   # Selector
-  _select($buffer, $selector, $charset // $tx->res->content->charset, @args);
+  $charset //= $tx->res->content->charset // $tx->res->default_charset;
+  _select($buffer, $selector, $charset, @args);
 }
+
+sub _header { $_[0]->build_start_line, $_[0]->headers->to_string, "\n\n" }
 
 sub _json {
   return unless my $data = j(shift);

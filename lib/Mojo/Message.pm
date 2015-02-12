@@ -478,12 +478,13 @@ Access message cookies. Meant to be overloaded in a subclass.
   my $dom        = $msg->dom;
   my $collection = $msg->dom('a[href]');
 
-Turns message body into a L<Mojo::DOM> object and takes an optional selector
-to call the method L<Mojo::DOM/"find"> on it right away, which returns a
-L<Mojo::Collection> object. Note that this method caches all data, so it
-should not be called before the entire message body has been received. The
-whole message body needs to be loaded into memory to parse it, so you have to
-make sure it is not excessively large, there's a 16MB limit by default.
+Retrieve message body from L</"text"> and turn it into a L<Mojo::DOM> object,
+an optional selector can be used to call the method L<Mojo::DOM/"find"> on it
+right away, which then returns a L<Mojo::Collection> object. Note that this
+method caches all data, so it should not be called before the entire message
+body has been received. The whole message body needs to be loaded into memory
+to parse it, so you have to make sure it is not excessively large, there's a
+16MB limit by default.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->map('text')->join("\n");

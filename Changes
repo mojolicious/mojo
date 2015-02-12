@@ -2,6 +2,8 @@
 5.78  2015-02-12
   - Replaced expires method in Mojo::Cookie::Response with an attribute.
   - Added split_cookie_header function to Mojo::Util.
+  - Updated IO::Socket::SSL requirement to 2.0 for some important security
+    improvements.
   - Relaxed RFC 822/1123 and RFC 850/1036 handling in Mojo::Date.
   - Improved Mojo::Reactor::Poll performance significantly.
   - Improved text method in Mojo::Message to use default_charset as well.

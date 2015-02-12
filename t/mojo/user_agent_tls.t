@@ -7,7 +7,7 @@ use Mojo::IOLoop::Server;
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
-plan skip_all => 'IO::Socket::SSL 1.84 required for this test!'
+plan skip_all => 'IO::Socket::SSL 2.0 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
 
 use Mojo::IOLoop;

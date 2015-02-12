@@ -16,7 +16,7 @@ my $NDN = NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.84 (); 1';
+  : eval 'use IO::Socket::SSL 2.0 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -164,7 +164,7 @@ sub _try_tls {
   my $handle = $self->{handle};
   return $self->_cleanup->emit(connect => $handle)
     if !$args->{tls} || $handle->isa('IO::Socket::SSL');
-  return $self->emit(error => 'IO::Socket::SSL 1.84 required for TLS support')
+  return $self->emit(error => 'IO::Socket::SSL 2.0 required for TLS support')
     unless TLS;
 
   # Upgrade
@@ -265,7 +265,7 @@ implements the following new ones.
 
 Open a socket connection to a remote host. Note that non-blocking name
 resolution depends on L<Net::DNS::Native> (0.15+), SOCKS5 support on
-L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (1.84+).
+L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (2.0+).
 
 These options are currently available:
 

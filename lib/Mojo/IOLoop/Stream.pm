@@ -11,11 +11,9 @@ sub DESTROY { shift->close }
 
 sub close {
   my $self = shift;
-
   return unless my $reactor = $self->reactor;
   return unless my $handle  = delete $self->timeout(0)->{handle};
   $reactor->remove($handle);
-  close $handle;
   $self->emit('close');
 }
 

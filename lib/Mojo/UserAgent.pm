@@ -45,7 +45,7 @@ sub build_websocket_tx { shift->transactor->websocket(@_) }
 sub start {
   my ($self, $tx, $cb) = @_;
 
-  # Fork safety
+  # Fork-safety
   $self->_cleanup->server->restart unless ($self->{pid} //= $$) eq $$;
 
   # Non-blocking

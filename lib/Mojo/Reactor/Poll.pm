@@ -45,7 +45,7 @@ sub one_tick {
       if (IO::Poll::_poll($timeout * 1000, @poll) > 0) {
         while (my ($fd, $mode) = splice @poll, 0, 2) {
 
-          if ($mode & (POLLIN | POLLPRI | POLLHUP | POLLNVAL | POLLERR)) {
+          if ($mode & (POLLIN | POLLPRI | POLLNVAL | POLLHUP | POLLERR)) {
             next unless my $io = $self->{io}{$fd};
             ++$i and $self->_sandbox('Read', $io->{cb}, 0);
           }

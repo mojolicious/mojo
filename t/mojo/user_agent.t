@@ -360,7 +360,7 @@ is $tx->res->headers->content_encoding, 'gzip',
   'right "Content-Encoding" value';
 isnt $tx->res->body, 'Hello GZip!', 'different content';
 
-# Fork safety
+# Fork-safety
 $tx = $ua->get('/');
 is $tx->res->body, 'works!', 'right content';
 my $last = $tx->connection;

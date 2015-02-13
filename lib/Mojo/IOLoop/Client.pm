@@ -142,7 +142,7 @@ sub _try_socks {
   my $handle = $self->{handle};
   return $self->_try_tls($args) unless $args->{socks_address};
   return $self->emit(
-    error => 'IO::Socket::Socks 0.64 required for SOCKS support')
+    error => 'IO::Socket::Socks 0.64+ required for SOCKS support')
     unless SOCKS;
 
   my %options
@@ -164,7 +164,7 @@ sub _try_tls {
   my $handle = $self->{handle};
   return $self->_cleanup->emit(connect => $handle)
     if !$args->{tls} || $handle->isa('IO::Socket::SSL');
-  return $self->emit(error => 'IO::Socket::SSL 1.94 required for TLS support')
+  return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
     unless TLS;
 
   # Upgrade

@@ -1,7 +1,7 @@
 package Mojo::Reactor::Poll;
 use Mojo::Base 'Mojo::Reactor';
 
-use IO::Poll qw(POLLERR POLLHUP POLLIN POLLOUT POLLPRI);
+use IO::Poll qw(POLLERR POLLHUP POLLIN POLLNVAL POLLOUT POLLPRI);
 use List::Util 'min';
 use Mojo::Util qw(md5_sum steady_time);
 use Time::HiRes 'usleep';
@@ -45,7 +45,7 @@ sub one_tick {
       if (IO::Poll::_poll($timeout * 1000, @poll) > 0) {
         while (my ($fd, $mode) = splice @poll, 0, 2) {
 
-          if ($mode & (POLLIN | POLLPRI | POLLHUP | POLLERR)) {
+          if ($mode & (POLLIN | POLLPRI | POLLHUP | POLLNVAL | POLLERR)) {
             next unless my $io = $self->{io}{$fd};
             ++$i and $self->_sandbox('Read', $io->{cb}, 0);
           }

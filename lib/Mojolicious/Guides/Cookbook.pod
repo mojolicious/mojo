@@ -84,7 +84,8 @@ familiar with L<Mojo::Server::Morbo>.
 
 It is basically a restarter that forks a new L<Mojo::Server::Daemon> web
 server whenever a file in your project changes, and should therefore only be
-used during development.
+used during development. To start applications with it you can use the
+L<morbo> script.
 
   $ morbo ./script/my_app
   Server available at http://127.0.0.1:3000
@@ -104,13 +105,15 @@ concurrent client connections.
 
 It is based on the L<Mojo::Server::Prefork> web server, which adds preforking
 to L<Mojo::Server::Daemon>, but optimized specifically for production
-environments out of the box.
+environments out of the box. To start applications with it you can use the
+L<hypnotoad> script, which listens on port C<8080>, automatically daemonizes
+the server process and defaults to C<production> mode for L<Mojolicious> and
+L<Mojolicious::Lite> applications.
 
   $ hypnotoad ./script/my_app
 
-It automatically listens on port C<8080>, sets the operating mode to
-C<production> and you can tweak many configuration settings right from within
-your application with L<Mojo/"config">, for a full list see
+Many configuration settings can be tweaked right from within your application
+with L<Mojo/"config">, for a full list see
 L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   use Mojolicious::Lite;

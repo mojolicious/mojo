@@ -1,5 +1,6 @@
 
 5.79  2015-02-13
+  - Fixed bug in Mojo::Reactor::Poll that caused excessive idle CPU usage.
 
 5.78  2015-02-12
   - Replaced expires method in Mojo::Cookie::Response with an attribute.

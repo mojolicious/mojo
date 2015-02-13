@@ -42,7 +42,7 @@ sub one_tick {
       my @poll = map { $_ => $self->{io}{$_}{mode} } keys %{$self->{io}};
 
       # This may break in the future, but is worth it for performance
-      if (IO::Poll::_poll($timeout, @poll) > 0) {
+      if (IO::Poll::_poll($timeout * 1000, @poll) > 0) {
         while (my ($fd, $mode) = splice @poll, 0, 2) {
 
           if ($mode & (POLLIN | POLLPRI | POLLHUP | POLLERR)) {

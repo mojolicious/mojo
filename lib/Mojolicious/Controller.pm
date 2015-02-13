@@ -682,13 +682,13 @@ the L</"stash">.
   # Render template "foo/bar.html.ep"
   $c->render(template => 'foo/bar', format => 'html', handler => 'ep');
 
-  # Render template "foo/bar.*.*"
-  $c->render(template => 'foo/bar');
-
   # Render template "test.*.*" with arbitrary values "foo" and "bar"
   $c->render(template => 'test', foo => 'test', bar => 23);
 
   # Render template "test.xml.*"
+  $c->render(template => 'test', format => 'xml');
+
+  # Render template "test.xml.*" (alternative)
   $c->render('test', format => 'xml');
 
 =head2 render_later

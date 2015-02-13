@@ -80,7 +80,7 @@ sub recurring { shift->_timer(1, @_) }
 sub remove {
   my ($self, $remove) = @_;
   return !!delete $self->{timers}{$remove} unless ref $remove;
-  return !!delete $self->{io}{fileno $remove};
+  return !!delete $self->{io}{fileno($remove) // ''};
 }
 
 sub reset { delete @{shift()}{qw(io timers)} }

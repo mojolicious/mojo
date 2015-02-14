@@ -204,7 +204,7 @@ sub _not_accepting {
 sub _recurring {
   my $self = shift;
   $self->{accept} ||= $self->recurring($self->accept_interval => \&_accepting);
-  $self->{stop} ||= $self->recurring(2 => \&_stop);
+  $self->{stop} ||= $self->recurring(1 => \&_stop);
 }
 
 sub _remove {

@@ -141,8 +141,10 @@ Mojo::Reactor::Poll - Low-level event reactor with poll support
 
   use Mojo::Reactor::Poll;
 
-  # Watch if handle becomes readable or writable
+  # Turn file descriptor into handle and watch if it becomes readable or
+  # writable
   my $reactor = Mojo::Reactor::Poll->new;
+  my $handle  = IO::Handle->new_from_fd($fd, 'r');
   $reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';

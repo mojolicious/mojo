@@ -613,11 +613,11 @@ loop object from everywhere inside the process.
   my $id = Mojo::IOLoop->timer(3 => sub { say 'Timeout!' });
   Mojo::IOLoop->singleton->reactor->again($id);
 
-  # Watch if file descriptor becomes readable
+  # Turn file descriptor into handle and watch if it becomes readable
   my $handle = IO::Handle->new_from_fd($fd, 'r');
   Mojo::IOLoop->singleton->reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
-    say $writable ? 'Descriptor is writable' : 'Descriptor is readable';
+    say $writable ? 'Handle is writable' : 'Handle is readable';
   })->watch($handle, 1, 0);
 
 =head2 start

@@ -140,7 +140,7 @@ $ua->websocket(
   '/' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(message => sub { $result = pop; $tx->finish });
+    $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
   }
 );
@@ -341,7 +341,7 @@ $ua->websocket(
   '/squish' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(message => sub { $result = pop; $tx->finish });
+    $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send(b(' foo bar '));
   }
 );
@@ -400,7 +400,7 @@ $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(message => sub { $result = pop; $tx->finish });
+    $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('hi!' x 100);
   }
 );

@@ -83,7 +83,7 @@ Mojo::Reactor::EV - Low-level event reactor with libev support
   # Turn file descriptor into handle and watch if it becomes readable or
   # writable
   my $reactor = Mojo::Reactor::EV->new;
-  my $handle  = IO::Handle->new_from_fd($fd, 'r');
+  my $handle  = IO::Handle->new_from_fd($fd, 'r+');
   $reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';

@@ -25,12 +25,7 @@ get '/proxy' => sub {
 
 websocket '/test' => sub {
   my $c = shift;
-  $c->on(
-    message => sub {
-      my ($c, $msg) = @_;
-      $c->send("${msg}test2");
-    }
-  );
+  $c->on(message => sub { shift->send(shift . 'test2') });
 };
 
 # HTTP server for testing
@@ -121,7 +116,8 @@ my $proxy = Mojo::IOLoop->acceptor($id)->port;
 my $result;
 $ua->get(
   "http://127.0.0.1:$port/" => sub {
-    $result = pop->res->body;
+    my ($ua, $tx) = @_;
+    $result = $tx->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -134,13 +130,7 @@ $ua->websocket(
   "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send('test1');
   }
 );
@@ -170,13 +160,7 @@ $ua->websocket(
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send('test1');
   }
 );
@@ -197,13 +181,7 @@ $ua->websocket(
   "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send('test1');
   }
 );

@@ -40,12 +40,7 @@ get '/proxy' => sub {
 
 websocket '/test' => sub {
   my $c = shift;
-  $c->on(
-    message => sub {
-      my ($c, $msg) = @_;
-      $c->send("${msg}test2");
-    }
-  );
+  $c->on(message => sub { shift->send(shift . 'test2') });
 };
 
 # Web server with valid certificates
@@ -161,7 +156,8 @@ my $ua = Mojo::UserAgent->new(
 my $result;
 $ua->get(
   "https://127.0.0.1:$port/" => sub {
-    $result = pop->res->body;
+    my ($ua, $tx) = @_;
+    $result = $tx->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -171,11 +167,7 @@ is $result, "Hello World! / https://127.0.0.1:$port/", 'right content';
 # Broken redirect
 my $start;
 $ua->on(
-  start => sub {
-    $start++;
-    pop->req->headers->header('X-Works', 'it does!');
-  }
-);
+  start => sub { $start++; pop->req->headers->header('X-Works', 'it does!') });
 $result = undef;
 my $works;
 $ua->max_redirects(3)->get(
@@ -198,13 +190,7 @@ $ua->websocket(
   "wss://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send('test1');
   }
 );
@@ -251,13 +237,7 @@ $ua->websocket(
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send('test1');
   }
 );

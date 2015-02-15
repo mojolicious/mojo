@@ -60,12 +60,7 @@ websocket '/socket' => sub {
 websocket '/early_start' => sub {
   my $c = shift;
   $c->send('test1');
-  $c->on(
-    message => sub {
-      my ($c, $msg) = @_;
-      $c->send("${msg}test2")->finish;
-    }
-  );
+  $c->on(message => sub { shift->send(shift . 'test2')->finish });
 };
 
 websocket '/denied' => sub {
@@ -145,13 +140,7 @@ $ua->websocket(
   '/' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send('test1');
   }
 );
@@ -352,13 +341,7 @@ $ua->websocket(
   '/squish' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send(b(' foo bar '));
   }
 );
@@ -404,13 +387,7 @@ $status = undef;
 $ua->websocket(
   '/close' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(
-      finish => sub {
-        my ($tx, $code) = @_;
-        $status = $code;
-        Mojo::IOLoop->stop;
-      }
-    );
+    $tx->on(finish => sub { $status = pop; Mojo::IOLoop->stop });
     $tx->send('test1');
   }
 );
@@ -423,13 +400,7 @@ $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->finish;
-      }
-    );
+    $tx->on(message => sub { $result = pop; $tx->finish });
     $tx->send('hi!' x 100);
   }
 );

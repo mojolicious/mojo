@@ -141,12 +141,7 @@ $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
     $id = $tx->connection;
-    $tx->on(
-      message => sub {
-        $result = pop;
-        Mojo::IOLoop->stop;
-      }
-    );
+    $tx->on(message => sub { $result = pop; Mojo::IOLoop->stop });
     $tx->send('test');
   }
 );

@@ -636,8 +636,8 @@ For more control you can also access request information directly.
 
   $c = $c->redirect_to('named', foo => 'bar');
   $c = $c->redirect_to('named', {foo => 'bar'});
-  $c = $c->redirect_to('/perldoc');
-  $c = $c->redirect_to('http://mojolicio.us/perldoc');
+  $c = $c->redirect_to('/index.html');
+  $c = $c->redirect_to('http://example.com/index.html');
 
 Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 
@@ -915,21 +915,21 @@ reserved for internal use.
   my $url = $c->url_for({name => 'sebastian'});
   my $url = $c->url_for('test', name => 'sebastian');
   my $url = $c->url_for('test', {name => 'sebastian'});
-  my $url = $c->url_for('/perldoc');
-  my $url = $c->url_for('//mojolicio.us/perldoc');
-  my $url = $c->url_for('http://mojolicio.us/perldoc');
+  my $url = $c->url_for('/index.html');
+  my $url = $c->url_for('//example.com/index.html');
+  my $url = $c->url_for('http://example.com/index.html');
   my $url = $c->url_for('mailto:sri@example.com');
 
 Generate a portable L<Mojo::URL> object with base for a path, URL or route.
 
-  # "http://127.0.0.1:3000/perldoc" if application has been started with Morbo
-  $c->url_for('/perldoc')->to_abs;
+  # "http://127.0.0.1:3000/index.html" if application was started with Morbo
+  $c->url_for('/index.html')->to_abs;
 
-  # "/perldoc?foo=bar" if application is deployed under "/"
-  $c->url_for('/perldoc')->query(foo => 'bar');
+  # "/index.html?foo=bar" if application is deployed under "/"
+  $c->url_for('/index.html')->query(foo => 'bar');
 
-  # "/myapp/perldoc?foo=bar" if application is deployed under "/myapp"
-  $c->url_for('/perldoc')->query(foo => 'bar');
+  # "/myapp/index.html?foo=bar" if application is deployed under "/myapp"
+  $c->url_for('/index.html')->query(foo => 'bar');
 
 You can also use the helper L<Mojolicious::Plugin::DefaultHelpers/"url_with">
 to inherit query parameters from the current request.

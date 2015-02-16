@@ -181,6 +181,18 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
 </form>
 EOF
 
+# Template from myapp.pl (no trailing slash)
+$t->get_ok('/x/1')->status_is(200)->content_is(<<'EOF');
+myapp
+works ♥!Insecure!Insecure!
+
+too!works!!!Mojolicious::Plugin::Config::Sandbox
+<a href="/x/1/">Test</a>
+<form action="/x/1/%E2%98%83">
+  <input type="submit" value="☃">
+</form>
+EOF
+
 # Static file from myapp.pl
 $t->get_ok('/x/1/index.html')->status_is(200)
   ->content_is("External static file!\n");
@@ -204,6 +216,18 @@ $t->get_ok('/x/1/template/does_not_exist')->status_is(404);
 
 # Template from myapp.pl with Unicode prefix
 $t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
+myapp
+works ♥!Insecure!Insecure!
+
+too!works!!!Mojolicious::Plugin::Config::Sandbox
+<a href="/x/%E2%99%A5/">Test</a>
+<form action="/x/%E2%99%A5/%E2%98%83">
+  <input type="submit" value="☃">
+</form>
+EOF
+
+# Template from myapp.pl with Unicode prefix (no trailing slash)
+$t->get_ok('/x/♥')->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 

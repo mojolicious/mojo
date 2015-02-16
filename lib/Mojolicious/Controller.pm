@@ -334,7 +334,7 @@ sub url_for {
   # Relative URL
   my $path = $url->path;
   if ($target =~ m!^/!) {
-    if (my $prefix = $self->stash->{path}) {
+    if (defined(my $prefix = $self->stash->{path})) {
       my $real = $req->url->path->to_route;
       $real =~ s!/?\Q$prefix\E$!$target!;
       $target = $real;

@@ -1,5 +1,7 @@
 
 5.80  2015-02-16
+  - Fixed url_for to handle paths without trailing slash correctly in embedded
+    applications.
 
 5.79  2015-02-13
   - Fixed bug in Mojo::Reactor::Poll that caused excessive idle CPU usage.

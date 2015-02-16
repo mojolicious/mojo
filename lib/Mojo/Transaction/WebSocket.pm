@@ -397,7 +397,7 @@ Emitted once all data has been sent.
     ...
   });
 
-Emitted when transaction is finished.
+Emitted when the WebSocket connection has been closed.
 
 =head2 frame
 

@@ -1,5 +1,5 @@
 
-5.80  2015-02-16
+5.80  2015-02-17
   - Deprecated Mojo::IOLoop::max_connections in favor of
     Mojo::IOLoop::concurrency.
   - Removed accept_interval, lock and unlock attributes from Mojo::IOLoop.

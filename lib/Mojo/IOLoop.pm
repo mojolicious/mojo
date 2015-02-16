@@ -77,7 +77,7 @@ sub concurrency {
   my $self = _instance(shift);
   return $self->{concurrency} //= 1000 unless @_;
   my $concurrency = $self->{concurrency} = shift;
-  $self->{stop} ||= $self->recurring(1 => \&_stop) if $concurrency == 0;
+  $self->{stop} ||= $self->recurring(1 => \&_graceful) if $concurrency == 0;
   return $self;
 }
 
@@ -166,6 +166,13 @@ sub stream {
 
 sub timer { shift->_timer(timer => @_) }
 
+sub _graceful {
+  my $self = shift;
+  return if keys %{$self->{connections}};
+  $self->_remove(delete $self->{stop});
+  $self->stop;
+}
+
 sub _id {
   my $self = shift;
   my $id;
@@ -211,14 +218,6 @@ sub _remove {
   return unless delete $self->{acceptors}{$id};
   $self->_not_accepting;
   $self->_maybe_accepting;
-}
-
-sub _stop {
-  my $self = shift;
-  return                               if keys %{$self->{connections}};
-  $self->stop                          if $self->concurrency == 0;
-  return                               if keys %{$self->{acceptors}};
-  $self->_remove(delete $self->{stop}) if $self->{stop};
 }
 
 sub _stream {

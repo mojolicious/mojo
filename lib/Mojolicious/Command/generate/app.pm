@@ -194,5 +194,5 @@ done_testing();
 <h2><%%= $msg %></h2>
 This page was generated from the template "templates/example/welcome.html.ep"
 and the layout "templates/layouts/default.html.ep",
-<a href="<%%== url_for %>">click here</a> to reload the page or
-<a href="/index.html">here</a> to move forward to a static page.
+<%%= link_to 'click here' => url_for %> to reload the page or
+<%%= link_to 'here' => '/index.html' %> to move forward to a static page.

@@ -1,5 +1,6 @@
 
 5.80  2015-02-16
+  - Improved app generator command to use current best practices.
   - Fixed url_for to handle paths without trailing slash correctly in embedded
     applications.
 

@@ -41,7 +41,7 @@ sub start {
 
   # Start listening
   else { $self->_listen($_) for @{$self->listen} }
-  if (my $max = $self->max_clients) { $loop->concurrency($max) }
+  if (my $max = $self->max_clients) { $loop->max_connections($max) }
 
   return $self;
 }
@@ -401,7 +401,7 @@ TLS verification mode, defaults to C<0x03>.
   $daemon = $daemon->max_clients(1000);
 
 Maximum number of concurrent client connections, passed along to
-L<Mojo::IOLoop/"concurrency">.
+L<Mojo::IOLoop/"max_connections">.
 
 =head2 max_requests
 

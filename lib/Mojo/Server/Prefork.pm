@@ -154,14 +154,14 @@ sub _spawn {
 
   # Heartbeat messages
   weaken $self;
-  my $cb = sub { $self->_heartbeat(shift->concurrency ? 0 : 1) };
+  my $cb = sub { $self->_heartbeat(shift->max_connections ? 0 : 1) };
   my $loop = $self->ioloop;
   $loop->next_tick($cb);
   $loop->recurring($self->heartbeat_interval => $cb);
 
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(CHLD INT TERM TTIN TTOU);
-  $SIG{QUIT} = sub { $loop->concurrency(0) };
+  $SIG{QUIT} = sub { $loop->stop_gracefully };
   delete @$self{qw(poll reader)};
   srand;
 

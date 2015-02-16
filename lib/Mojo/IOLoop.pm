@@ -9,14 +9,15 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
-use Mojo::Util qw(deprecated md5_sum steady_time);
+use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
-has max_accepts  => 0;
-has multi_accept => 50;
-has reactor      => sub {
+has max_accepts     => 0;
+has max_connections => 1000;
+has multi_accept    => 50;
+has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
   return $class->new->catch(sub { warn "@{[blessed $_[0]]}: $_[1]" });
@@ -73,14 +74,6 @@ sub client {
   return $id;
 }
 
-sub concurrency {
-  my $self = _instance(shift);
-  return $self->{concurrency} //= 1000 unless @_;
-  my $concurrency = $self->{concurrency} = shift;
-  $self->{stop} ||= $self->recurring(1 => \&_graceful) if $concurrency == 0;
-  return $self;
-}
-
 sub delay {
   my $delay = Mojo::IOLoop::Delay->new;
   weaken $delay->ioloop(_instance(shift))->{ioloop};
@@ -88,13 +81,6 @@ sub delay {
 }
 
 sub is_running { _instance(shift)->reactor->is_running }
-
-# DEPRECATED in Tiger Face!
-sub max_connections {
-  deprecated 'Mojo::IOLoop::max_connections is DEPRECATED in favor of'
-    . ' Mojo::IOLoop::concurrency';
-  shift->concurrency(@_);
-}
 
 sub next_tick {
   my ($self, $cb) = (_instance(shift), @_);
@@ -136,7 +122,7 @@ sub server {
       # Enforce connection limit (randomize to improve load balancing)
       if (my $max = $self->max_accepts) {
         $self->{accepts} //= $max - int rand $max / 2;
-        $self->concurrency(0) if ($self->{accepts} -= 1) <= 0;
+        $self->stop_gracefully if ($self->{accepts} -= 1) <= 0;
       }
 
       my $stream = Mojo::IOLoop::Stream->new(pop);
@@ -158,6 +144,12 @@ sub start {
 
 sub stop { _instance(shift)->reactor->stop }
 
+sub stop_gracefully {
+  my $self = _instance(shift);
+  $self->_not_accepting;
+  $self->{stop} ||= $self->recurring(1 => \&_stop);
+}
+
 sub stream {
   my ($self, $stream) = (_instance(shift), @_);
   return ($self->{connections}{$stream} || {})->{stream} unless ref $stream;
@@ -165,13 +157,6 @@ sub stream {
 }
 
 sub timer { shift->_timer(timer => @_) }
-
-sub _graceful {
-  my $self = shift;
-  return if keys %{$self->{connections}};
-  $self->_remove(delete $self->{stop});
-  $self->stop;
-}
 
 sub _id {
   my $self = shift;
@@ -183,7 +168,9 @@ sub _id {
 
 sub _instance { ref $_[0] ? $_[0] : $_[0]->singleton }
 
-sub _limit { keys %{$_[0]->{connections}} >= $_[0]->concurrency }
+sub _limit {
+  $_[0]{stop} || keys %{$_[0]{connections}} >= $_[0]->max_connections;
+}
 
 sub _maybe_accepting {
   my $self = shift;
@@ -193,7 +180,7 @@ sub _maybe_accepting {
 
   # Check if multi-accept is desirable
   my $m = $self->multi_accept;
-  $m = 1 if $self->concurrency < $m;
+  $m = 1 if $self->max_connections < $m;
   $_->multi_accept($m)->start for values %{$self->{acceptors} || {}};
   $self->{accepting} = 1;
 }
@@ -218,6 +205,13 @@ sub _remove {
   return unless delete $self->{acceptors}{$id};
   $self->_not_accepting;
   $self->_maybe_accepting;
+}
+
+sub _stop {
+  my $self = shift;
+  return if keys %{$self->{connections}};
+  $self->_remove(delete $self->{stop});
+  $self->stop;
 }
 
 sub _stream {
@@ -337,6 +331,15 @@ to C<0>. Setting the value to C<0> will allow this event loop to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
 randomly to improve load balancing between multiple server processes.
 
+=head2 max_connections
+
+  my $max = $loop->max_connections;
+  $loop   = $loop->max_connections(1000);
+
+The maximum number of concurrent connections this event loop is allowed to
+handle before stopping to accept new incoming connections, defaults to
+C<1000>.
+
 =head2 multi_accept
 
   my $multi = $loop->multi_accept;
@@ -393,18 +396,6 @@ L<Mojo::IOLoop::Client/"connect">.
     my ($loop, $err, $stream) = @_;
     ...
   });
-
-=head2 concurrency
-
-  my $max = Mojo::IOLoop->concurrency;
-  my $max = $loop->concurrency;
-  $loop   = $loop->concurrency(1000);
-
-The maximum number of concurrent connections this event loop is allowed to
-handle before stopping to accept new incoming connections, defaults to
-C<1000>. Setting the value to C<0> will make this event loop stop accepting
-new connections and allow it to shut down gracefully without interrupting
-existing connections.
 
 =head2 delay
 
@@ -594,6 +585,14 @@ some reactors stop automatically if there are no events being watched anymore.
 
 Stop the event loop, this will not interrupt any existing connections and the
 event loop can be restarted by running L</"start"> again.
+
+=head2 stop_gracefully
+
+  Mojo::IOLoop->stop_gracefully;
+  $loop->stop_gracefully;
+
+Stop accepting new connections and wait for all existing connections to be
+closed before stopping the event loop.
 
 =head2 stream
 

@@ -243,15 +243,15 @@ ok length($server) > length($server_after), 'stream has been resumed';
 is $client, $client_after, 'stream was writable while paused';
 is $client, 'works!', 'full message has been written';
 
-# Graceful shutdown (concurrency)
+# Graceful shutdown
 $err  = '';
-$loop = Mojo::IOLoop->new->concurrency(0);
+$loop = Mojo::IOLoop->new;
+$loop->stop_gracefully;
 $loop->remove(
   $loop->client({port => Mojo::IOLoop::Server->generate_port} => sub { }));
 $loop->timer(3 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
-is $loop->concurrency, 0, 'right value';
 
 # Graceful shutdown (max_accepts)
 $err  = '';

@@ -263,7 +263,7 @@ L<Mojo::Server::Daemon/"backlog">.
   clients => 100
 
 Maximum number of concurrent client connections per worker process, defaults
-to the value of L<Mojo::IOLoop/"concurrency">. Note that high concurrency
+to the value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency
 works best with applications that perform mostly non-blocking operations, to
 optimize for blocking operations you can decrease this value and increase
 L</"workers"> instead for better performance.

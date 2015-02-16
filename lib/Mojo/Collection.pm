@@ -12,7 +12,8 @@ our @EXPORT_OK = ('c');
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
-  $_[0]->new(grep { defined && (ref || length) } @{$_[0]});
+  my $self = shift;
+  return $self->new(grep { defined && (ref || length) } @$self);
 }
 
 sub each {

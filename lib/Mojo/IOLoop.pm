@@ -169,7 +169,9 @@ sub _id {
 sub _instance { ref $_[0] ? $_[0] : $_[0]->singleton }
 
 sub _limit {
-  $_[0]{stop} || keys %{$_[0]{connections}} >= $_[0]->max_connections;
+  my $self = shift;
+  return 1 if $self->{stop};
+  return keys %{$self->{connections}} >= $self->max_connections;
 }
 
 sub _maybe_accepting {
@@ -179,9 +181,9 @@ sub _maybe_accepting {
   return if $self->{accepting} || $self->_limit;
 
   # Check if multi-accept is desirable
-  my $m = $self->multi_accept;
-  $m = 1 if $self->max_connections < $m;
-  $_->multi_accept($m)->start for values %{$self->{acceptors} || {}};
+  my $multi = $self->multi_accept;
+  $multi = 1 if $self->max_connections < $multi;
+  $_->multi_accept($multi)->start for values %{$self->{acceptors} || {}};
   $self->{accepting} = 1;
 }
 

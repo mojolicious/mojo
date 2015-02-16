@@ -37,7 +37,7 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
   };
 }
 
-sub DESTROY { shift->_cleanup }
+sub DESTROY { Mojo::Util::_global_destruction() or shift->_cleanup }
 
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
@@ -70,15 +70,15 @@ sub websocket {
 
 sub _cleanup {
   my $self = shift;
-  return $self unless my $loop = $self->_loop(0);
 
   # Clean up active connections (by closing them)
   delete $self->{pid};
   $self->_finish($_, 1) for keys %{$self->{connections} || {}};
 
   # Clean up keep-alive connections
+  my $loop = $self->_loop(0);
   $loop->remove($_->[1]) for @{delete $self->{queue} || []};
-  return $self unless $loop = $self->_loop(1);
+  $loop = $self->_loop(1);
   $loop->remove($_->[1]) for @{delete $self->{nb_queue} || []};
 
   return $self;
@@ -244,8 +244,8 @@ sub _finish {
   my ($self, $id, $close) = @_;
 
   # Remove request timeout
-  return unless my $c    = $self->{connections}{$id};
-  return unless my $loop = $self->_loop($c->{nb});
+  return unless my $c = $self->{connections}{$id};
+  my $loop = $self->_loop($c->{nb});
   $loop->remove($c->{timeout}) if $c->{timeout};
 
   return $self->_remove($id, $close) unless my $old = $c->{tx};

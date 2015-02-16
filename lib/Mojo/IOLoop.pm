@@ -9,17 +9,14 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
-use Mojo::Util qw(md5_sum steady_time);
+use Mojo::Util qw(deprecated md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
-has accept_interval => 0.025;
-has [qw(lock unlock)];
-has max_accepts     => 0;
-has max_connections => 1000;
-has multi_accept    => 50;
-has reactor         => sub {
+has max_accepts  => 0;
+has multi_accept => 50;
+has reactor      => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
   return $class->new->catch(sub { warn "@{[blessed $_[0]]}: $_[1]" });
@@ -44,15 +41,13 @@ sub acceptor {
 
   # Allow new acceptor to get picked up
   $self->_not_accepting;
+  $self->_maybe_accepting;
 
   return $id;
 }
 
 sub client {
   my ($self, $cb) = (_instance(shift), pop);
-
-  # Make sure timers are running
-  $self->_recurring;
 
   my $id = $self->_id;
   my $client = $self->{connections}{$id}{client} = Mojo::IOLoop::Client->new;
@@ -78,6 +73,14 @@ sub client {
   return $id;
 }
 
+sub concurrency {
+  my $self = _instance(shift);
+  return $self->{concurrency} //= 1000 unless @_;
+  my $concurrency = $self->{concurrency} = shift;
+  $self->{stop} ||= $self->recurring(1 => \&_stop) if $concurrency == 0;
+  return $self;
+}
+
 sub delay {
   my $delay = Mojo::IOLoop::Delay->new;
   weaken $delay->ioloop(_instance(shift))->{ioloop};
@@ -85,6 +88,13 @@ sub delay {
 }
 
 sub is_running { _instance(shift)->reactor->is_running }
+
+# DEPRECATED in Tiger Face!
+sub max_connections {
+  deprecated 'Mojo::IOLoop::max_connections is DEPRECATED in favor of'
+    . ' Mojo::IOLoop::concurrency';
+  shift->concurrency(@_);
+}
 
 sub next_tick {
   my ($self, $cb) = (_instance(shift), @_);
@@ -107,8 +117,9 @@ sub reset {
   my $self = _instance(shift);
   $self->_remove($_)
     for keys %{$self->{acceptors}}, keys %{$self->{connections}};
+  $self->_remove($self->{stop}) if $self->{stop};
   $self->reactor->reset;
-  $self->$_ for qw(_stop stop);
+  $self->stop;
 }
 
 sub server {
@@ -119,13 +130,13 @@ sub server {
   $server->on(
     accept => sub {
 
-      # Release accept mutex
-      $self->_not_accepting;
+      # Stop accepting if connection limit has been reached
+      $self->_not_accepting if $self->_limit;
 
       # Enforce connection limit (randomize to improve load balancing)
       if (my $max = $self->max_accepts) {
         $self->{accepts} //= $max - int rand $max / 2;
-        $self->max_connections(0) if ($self->{accepts} -= 1) <= 0;
+        $self->concurrency(0) if ($self->{accepts} -= 1) <= 0;
       }
 
       my $stream = Mojo::IOLoop::Stream->new(pop);
@@ -155,28 +166,6 @@ sub stream {
 
 sub timer { shift->_timer(timer => @_) }
 
-sub _accepting {
-  my $self = shift;
-
-  # Check if we have acceptors
-  my $acceptors = $self->{acceptors} ||= {};
-  return $self->_remove(delete $self->{accept}) unless keys %$acceptors;
-
-  # Check connection limit
-  my $i   = keys %{$self->{connections}};
-  my $max = $self->max_connections;
-  return unless $i < $max;
-
-  # Acquire accept mutex
-  if (my $cb = $self->lock) { return unless $cb->(!$i) }
-  $self->_remove(delete $self->{accept});
-
-  # Check if multi-accept is desirable
-  my $multi = $self->multi_accept;
-  $_->multi_accept($max < $multi ? 1 : $multi)->start for values %$acceptors;
-  $self->{accepting} = 1;
-}
-
 sub _id {
   my $self = shift;
   my $id;
@@ -187,24 +176,25 @@ sub _id {
 
 sub _instance { ref $_[0] ? $_[0] : $_[0]->singleton }
 
-sub _not_accepting {
+sub _limit { keys %{$_[0]->{connections}} >= $_[0]->concurrency }
+
+sub _maybe_accepting {
   my $self = shift;
 
-  # Make sure timers are running
-  $self->_recurring;
+  # Check connection limit
+  return if $self->{accepting} || $self->_limit;
 
-  # Release accept mutex
-  return unless delete $self->{accepting};
-  return unless my $cb = $self->unlock;
-  $cb->();
-
-  $_->stop for values %{$self->{acceptors} || {}};
+  # Check if multi-accept is desirable
+  my $m = $self->multi_accept;
+  $m = 1 if $self->concurrency < $m;
+  $_->multi_accept($m)->start for values %{$self->{acceptors} || {}};
+  $self->{accepting} = 1;
 }
 
-sub _recurring {
+sub _not_accepting {
   my $self = shift;
-  $self->{accept} ||= $self->recurring($self->accept_interval => \&_accepting);
-  $self->{stop} ||= $self->recurring(1 => \&_stop);
+  return unless delete $self->{accepting};
+  $_->stop for values %{$self->{acceptors} || {}};
 }
 
 sub _remove {
@@ -214,26 +204,25 @@ sub _remove {
   return unless my $reactor = $self->reactor;
   return if $reactor->remove($id);
 
-  # Acceptor
-  if (delete $self->{acceptors}{$id}) { $self->_not_accepting }
-
   # Connection
-  else { delete $self->{connections}{$id} }
+  return $self->_maybe_accepting if delete $self->{connections}{$id};
+
+  # Acceptor
+  return unless delete $self->{acceptors}{$id};
+  $self->_not_accepting;
+  $self->_maybe_accepting;
 }
 
 sub _stop {
   my $self = shift;
-  return      if keys %{$self->{connections}};
-  $self->stop if $self->max_connections == 0;
-  return      if keys %{$self->{acceptors}};
-  $self->{$_} && $self->_remove(delete $self->{$_}) for qw(accept stop);
+  return                               if keys %{$self->{connections}};
+  $self->stop                          if $self->concurrency == 0;
+  return                               if keys %{$self->{acceptors}};
+  $self->_remove(delete $self->{stop}) if $self->{stop};
 }
 
 sub _stream {
   my ($self, $stream, $id) = @_;
-
-  # Make sure timers are running
-  $self->_recurring;
 
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;
@@ -338,31 +327,6 @@ See L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB"> for more.
 
 L<Mojo::IOLoop> implements the following attributes.
 
-=head2 accept_interval
-
-  my $interval = $loop->accept_interval;
-  $loop        = $loop->accept_interval(0.5);
-
-Interval in seconds for trying to reacquire the accept mutex, defaults to
-C<0.025>. Note that changing this value can affect performance and idle CPU
-usage.
-
-=head2 lock
-
-  my $cb = $loop->lock;
-  $loop  = $loop->lock(sub {...});
-
-A callback for acquiring the accept mutex, used to sync multiple server
-processes. The callback should return true or false. Note that exceptions in
-this callback are not captured.
-
-  $loop->lock(sub {
-    my $blocking = shift;
-
-    # Got the accept mutex, start accepting new connections
-    return 1;
-  });
-
 =head2 max_accepts
 
   my $max = $loop->max_accepts;
@@ -373,17 +337,6 @@ shutting down gracefully without interrupting existing connections, defaults
 to C<0>. Setting the value to C<0> will allow this event loop to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
 randomly to improve load balancing between multiple server processes.
-
-=head2 max_connections
-
-  my $max = $loop->max_connections;
-  $loop   = $loop->max_connections(1000);
-
-The maximum number of concurrent connections this event loop is allowed to
-handle before stopping to accept new incoming connections, defaults to
-C<1000>. Setting the value to C<0> will make this event loop stop accepting
-new connections and allow it to shut down gracefully without interrupting
-existing connections.
 
 =head2 multi_accept
 
@@ -413,14 +366,6 @@ L<Mojo::Reactor/"error">.
   # Remove handle again
   $loop->reactor->remove($handle);
 
-=head2 unlock
-
-  my $cb = $loop->unlock;
-  $loop  = $loop->unlock(sub {...});
-
-A callback for releasing the accept mutex, used to sync multiple server
-processes. Note that exceptions in this callback are not captured.
-
 =head1 METHODS
 
 L<Mojo::IOLoop> inherits all methods from L<Mojo::Base> and implements the
@@ -449,6 +394,18 @@ L<Mojo::IOLoop::Client/"connect">.
     my ($loop, $err, $stream) = @_;
     ...
   });
+
+=head2 concurrency
+
+  my $max = Mojo::IOLoop->concurrency;
+  my $max = $loop->concurrency;
+  $loop   = $loop->concurrency(1000);
+
+The maximum number of concurrent connections this event loop is allowed to
+handle before stopping to accept new incoming connections, defaults to
+C<1000>. Setting the value to C<0> will make this event loop stop accepting
+new connections and allow it to shut down gracefully without interrupting
+existing connections.
 
 =head2 delay
 

@@ -1,5 +1,15 @@
 
 5.80  2015-02-16
+  - Deprecated Mojo::IOLoop::max_connections in favor of
+    Mojo::IOLoop::concurrency.
+  - Removed accept_interval, lock and unlock attributes from Mojo::IOLoop.
+  - Removed accept_interval, lock_file and lock_timeout attributes from
+    Mojo::Server::Prefork.
+  - Removed --accept-interval, --lock-file and --lock-timeout options from
+    prefork command.
+  - Removed accept_interval, lock_file and lock_timeout parameters from
+    Hypntoad.
+  - Reduced idle CPU usage of Mojo::IOLoop and Mojo::Server::Prefork.
   - Improved app generator command to use current best practices.
   - Fixed url_for to handle paths without trailing slash correctly in embedded
     applications.

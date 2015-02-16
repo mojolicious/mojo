@@ -13,8 +13,7 @@ sub run {
 
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
   GetOptionsFromArray \@args,
-    'A|accepts=i'           => sub { $prefork->accepts($_[1]) },
-    'a|accept-interval=f'   => sub { $prefork->accept_interval($_[1]) },
+    'a|accepts=i'           => sub { $prefork->accepts($_[1]) },
     'b|backlog=i'           => sub { $prefork->backlog($_[1]) },
     'c|clients=i'           => sub { $prefork->max_clients($_[1]) },
     'G|graceful-timeout=i'  => sub { $prefork->graceful_timeout($_[1]) },
@@ -22,8 +21,6 @@ sub run {
     'heartbeat-interval=i'  => sub { $prefork->heartbeat_interval($_[1]) },
     'H|heartbeat-timeout=i' => sub { $prefork->heartbeat_timeout($_[1]) },
     'i|inactivity=i'        => sub { $prefork->inactivity_timeout($_[1]) },
-    'lock-file=s'           => sub { $prefork->lock_file($_[1]) },
-    'L|lock-timeout=f'      => sub { $prefork->lock_timeout($_[1]) },
     'l|listen=s'     => \my @listen,
     'multi-accept=i' => sub { $prefork->multi_accept($_[1]) },
     'P|pid-file=s'   => sub { $prefork->pid_file($_[1]) },
@@ -54,9 +51,8 @@ Mojolicious::Command::prefork - Prefork command
     ./myapp.pl prefork -l 'https://*:443?cert=./server.crt&key=./server.key'
 
   Options:
-    -A, --accepts <number>               Number of connections for workers to
+    -a, --accepts <number>               Number of connections for workers to
                                          accept, defaults to 1000
-    -a, --accept-interval <seconds>      Accept interval, defaults to 0.025
     -b, --backlog <size>                 Listen backlog size, defaults to
                                          SOMAXCONN
     -c, --clients <number>               Maximum number of concurrent clients,
@@ -68,9 +64,6 @@ Mojolicious::Command::prefork - Prefork command
     -i, --inactivity <seconds>           Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or
                                          15
-        --lock-file <path>               Path to lock file, defaults to a
-                                         random file
-    -L, --lock-timeout <seconds>         Lock timeout, defaults to 1
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"

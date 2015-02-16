@@ -73,15 +73,12 @@ like $log, qr/Stopping worker $spawn[0] gracefully/, 'right message';
 like $log, qr/Worker $spawn[0] stopped/,             'right message';
 $prefork->app->log->unsubscribe(message => $cb);
 
-# Process id and lock files
+# Process id file
 is $prefork->check_pid, $$, 'right process id';
 my $pid = $prefork->pid_file;
 ok -e $pid, 'process id file has been created';
-my $lock = $prefork->lock_file;
-ok -e $lock, 'lock file has been created';
 undef $prefork;
-ok !-e $pid,  'process id file has been removed';
-ok !-e $lock, 'lock file has been removed';
+ok !-e $pid, 'process id file has been removed';
 
 # One worker and immediate shutdown
 $port    = Mojo::IOLoop::Server->generate_port;

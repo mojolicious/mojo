@@ -28,9 +28,9 @@ sub configure {
   $prefork->max_requests($c->{keep_alive_requests})
     if $c->{keep_alive_requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
-    for qw(accept_interval accepts backlog graceful_timeout group),
-    qw(heartbeat_interval heartbeat_timeout inactivity_timeout listen),
-    qw(lock_file lock_timeout multi_accept pid_file user workers);
+    for qw(accepts backlog graceful_timeout group heartbeat_interval),
+    qw(heartbeat_timeout inactivity_timeout listen multi_accept pid_file),
+    qw(user workers);
 }
 
 sub run {
@@ -241,14 +241,6 @@ Stop worker gracefully.
 L<Mojo::Server::Hypnotoad> can be configured with the following settings, see
 L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
-=head2 accept_interval
-
-  accept_interval => 0.5
-
-Interval in seconds for trying to reacquire the accept mutex, defaults to the
-value of L<Mojo::IOLoop/"accept_interval">. Note that changing this value can
-affect performance and idle CPU usage.
-
 =head2 accepts
 
   accepts => 100
@@ -271,7 +263,7 @@ L<Mojo::Server::Daemon/"backlog">.
   clients => 100
 
 Maximum number of concurrent client connections per worker process, defaults
-to the value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency
+to the value of L<Mojo::IOLoop/"concurrency">. Note that high concurrency
 works best with applications that perform mostly non-blocking operations, to
 optimize for blocking operations you can decrease this value and increase
 L</"workers"> instead for better performance.
@@ -327,22 +319,6 @@ L<Mojo::Server::Daemon/"max_requests">.
 
 List of one or more locations to listen on, defaults to C<http://*:8080>. See
 also L<Mojo::Server::Daemon/"listen"> for more examples.
-
-=head2 lock_file
-
-  lock_file => '/tmp/hypnotoad.lock'
-
-Full path of accept mutex lock file prefix, to which the process id will be
-appended, defaults to the value of L<Mojo::Server::Prefork/"lock_file">.
-
-=head2 lock_timeout
-
-  lock_timeout => 0.5
-
-Maximum amount of time in seconds a worker may block when waiting for the
-accept mutex, defaults to the value of
-L<Mojo::Server::Prefork/"lock_timeout">. Note that changing this value can
-affect performance and idle CPU usage.
 
 =head2 multi_accept
 

@@ -382,6 +382,11 @@ sub _encoding {
   $CACHE{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
 }
 
+# Supported on Perl 5.14+
+sub _global_destruction {
+  defined(${^GLOBAL_PHASE}) && ${^GLOBAL_PHASE} eq 'DESTRUCT';
+}
+
 sub _header {
   my ($str, $cookie) = @_;
 

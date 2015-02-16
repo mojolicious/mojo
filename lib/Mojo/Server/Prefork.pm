@@ -1,7 +1,6 @@
 package Mojo::Server::Prefork;
 use Mojo::Base 'Mojo::Server::Daemon';
 
-use Fcntl ':flock';
 use File::Spec::Functions qw(catfile tmpdir);
 use IO::Poll qw(POLLIN POLLPRI);
 use Mojo::Util 'steady_time';
@@ -10,13 +9,12 @@ use Scalar::Util 'weaken';
 use Time::HiRes ();
 
 has accepts => 1000;
-has [qw(accept_interval multi_accept)];
-has [qw(cleanup lock_timeout)] => 1;
+has cleanup => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
-has lock_file          => sub { catfile tmpdir, 'prefork.lock' };
-has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
-has workers            => 4;
+has 'multi_accept';
+has pid_file => sub { catfile tmpdir, 'prefork.pid' };
+has workers => 4;
 
 sub DESTROY {
   my $self = shift;
@@ -25,8 +23,7 @@ sub DESTROY {
   return unless $self->cleanup;
 
   # Manager
-  if (my $file = $self->{lock_file}) { unlink $file if -w $file }
-  if (my $file = $self->pid_file)    { unlink $file if -w $file }
+  if (my $file = $self->pid_file) { unlink $file if -w $file }
 }
 
 sub check_pid {
@@ -68,10 +65,9 @@ sub run {
   say 'Preforking is not available for Windows.' and exit 0
     if $^O eq 'MSWin32';
 
-  # Prepare lock file and event loop
-  $self->{lock_file} = $self->lock_file . ".$$";
+  # Prepare event loop
   my $loop = $self->ioloop->max_accepts($self->accepts);
-  $loop->$_($self->$_ // $loop->$_) for qw(accept_interval multi_accept);
+  if (defined(my $multi = $self->multi_accept)) { $loop->multi_accept($multi) }
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
@@ -153,44 +149,19 @@ sub _spawn {
   return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time}
     if $pid;
 
-  # Prepare lock file
-  my $file = $self->cleanup(0)->{lock_file};
-  $self->app->log->error(qq{Can't open lock file "$file": $!})
-    unless open my $handle, '>', $file;
-
   # Change user/group
-  $self->setuidgid;
-
-  # Accept mutex
-  weaken $self;
-  my $loop = $self->ioloop->lock(
-    sub {
-
-      # Non-blocking
-      return flock $handle, LOCK_EX | LOCK_NB unless shift;
-
-      # Blocking ("ualarm" can't be imported on Windows)
-      my $lock;
-      eval {
-        local $SIG{ALRM} = sub { die "alarm\n" };
-        my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;
-        $lock = flock $handle, LOCK_EX;
-        Time::HiRes::ualarm $old;
-        1;
-      } or $lock = $@ eq "alarm\n" ? 0 : die $@;
-      return $lock;
-    }
-  );
-  $loop->unlock(sub { flock $handle, LOCK_UN });
+  $self->cleanup(0)->setuidgid;
 
   # Heartbeat messages
-  my $cb = sub { $self->_heartbeat(shift->max_connections ? 0 : 1) };
+  weaken $self;
+  my $cb = sub { $self->_heartbeat(shift->concurrency ? 0 : 1) };
+  my $loop = $self->ioloop;
   $loop->next_tick($cb);
   $loop->recurring($self->heartbeat_interval => $cb);
 
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(CHLD INT TERM TTIN TTOU);
-  $SIG{QUIT} = sub { $loop->max_connections(0) };
+  $SIG{QUIT} = sub { $loop->concurrency(0) };
   delete @$self{qw(poll reader)};
   srand;
 
@@ -397,15 +368,6 @@ Emitted when the manager starts waiting for new heartbeat messages.
 L<Mojo::Server::Prefork> inherits all attributes from L<Mojo::Server::Daemon>
 and implements the following new ones.
 
-=head2 accept_interval
-
-  my $interval = $prefork->accept_interval;
-  $prefork     = $prefork->accept_interval(0.5);
-
-Interval in seconds for trying to reacquire the accept mutex, passed along to
-L<Mojo::IOLoop/"accept_interval">. Note that changing this value can affect
-performance and idle CPU usage.
-
 =head2 accepts
 
   my $accepts = $prefork->accepts;
@@ -422,8 +384,8 @@ to half of this value can be subtracted randomly to improve load balancing.
   my $bool = $prefork->cleanup;
   $prefork = $prefork->cleanup($bool);
 
-Delete L</"lock_file"> and L</"pid_file"> automatically once they are not
-needed anymore, defaults to a true value.
+Delete L</"pid_file"> automatically once it is not needed anymore, defaults to
+a true value.
 
 =head2 graceful_timeout
 
@@ -447,23 +409,6 @@ Heartbeat interval in seconds, defaults to C<5>.
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
 stopped gracefully, defaults to C<20>.
-
-=head2 lock_file
-
-  my $file = $prefork->lock_file;
-  $prefork = $prefork->lock_file('/tmp/prefork.lock');
-
-Full path of accept mutex lock file prefix, to which the process id will be
-appended, defaults to a random temporary path.
-
-=head2 lock_timeout
-
-  my $timeout = $prefork->lock_timeout;
-  $prefork    = $prefork->lock_timeout(0.5);
-
-Maximum amount of time in seconds a worker may block when waiting for the
-accept mutex, defaults to C<1>. Note that changing this value can affect
-performance and idle CPU usage.
 
 =head2 multi_accept
 

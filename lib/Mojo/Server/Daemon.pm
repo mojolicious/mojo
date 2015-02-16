@@ -16,9 +16,10 @@ has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_requests => 25;
 
 sub DESTROY {
+  return if Mojo::Util::_global_destruction();
   my $self = shift;
-  return unless my $loop = $self->ioloop;
   $self->_remove($_) for keys %{$self->{connections} || {}};
+  my $loop = $self->ioloop;
   $loop->remove($_) for @{$self->acceptors};
 }
 
@@ -40,7 +41,7 @@ sub start {
 
   # Start listening
   else { $self->_listen($_) for @{$self->listen} }
-  if (my $max = $self->max_clients) { $loop->max_connections($max) }
+  if (my $max = $self->max_clients) { $loop->concurrency($max) }
 
   return $self;
 }
@@ -400,7 +401,7 @@ TLS verification mode, defaults to C<0x03>.
   $daemon = $daemon->max_clients(1000);
 
 Maximum number of concurrent client connections, passed along to
-L<Mojo::IOLoop/"max_connections">.
+L<Mojo::IOLoop/"concurrency">.
 
 =head2 max_requests
 

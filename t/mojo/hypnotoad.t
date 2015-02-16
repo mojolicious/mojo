@@ -20,7 +20,6 @@ use Mojo::Util qw(slurp spurt);
 {
   my $hypnotoad = Mojo::Server::Hypnotoad->new;
   $hypnotoad->prefork->app->config->{myserver} = {
-    accept_interval     => 33,
     accepts             => 13,
     backlog             => 43,
     clients             => 1,
@@ -31,8 +30,6 @@ use Mojo::Util qw(slurp spurt);
     keep_alive_requests => 3,
     inactivity_timeout  => 5,
     listen              => ['http://*:8081'],
-    lock_file           => '/foo/bar.lock',
-    lock_timeout        => 14,
     multi_accept        => 16,
     pid_file            => '/foo/bar.pid',
     proxy               => 1,
@@ -44,7 +41,6 @@ use Mojo::Util qw(slurp spurt);
   $hypnotoad->configure('test');
   is_deeply $hypnotoad->prefork->listen, ['http://*:8080'], 'right value';
   $hypnotoad->configure('myserver');
-  is $hypnotoad->prefork->accept_interval,    33,        'right value';
   is $hypnotoad->prefork->accepts,            13,        'right value';
   is $hypnotoad->prefork->backlog,            43,        'right value';
   is $hypnotoad->prefork->graceful_timeout,   23,        'right value';
@@ -53,12 +49,10 @@ use Mojo::Util qw(slurp spurt);
   is $hypnotoad->prefork->heartbeat_timeout,  9,         'right value';
   is $hypnotoad->prefork->inactivity_timeout, 5,         'right value';
   is_deeply $hypnotoad->prefork->listen, ['http://*:8081'], 'right value';
-  is $hypnotoad->prefork->lock_file,    '/foo/bar.lock', 'right value';
-  is $hypnotoad->prefork->lock_timeout, 14,              'right value';
-  is $hypnotoad->prefork->max_clients,  1,               'right value';
-  is $hypnotoad->prefork->max_requests, 3,               'right value';
-  is $hypnotoad->prefork->multi_accept, 16,              'right value';
-  is $hypnotoad->prefork->pid_file,     '/foo/bar.pid',  'right value';
+  is $hypnotoad->prefork->max_clients,  1,              'right value';
+  is $hypnotoad->prefork->max_requests, 3,              'right value';
+  is $hypnotoad->prefork->multi_accept, 16,             'right value';
+  is $hypnotoad->prefork->pid_file,     '/foo/bar.pid', 'right value';
   ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
   is $hypnotoad->prefork->user,          'tester', 'right value';
   is $hypnotoad->prefork->workers,       7, 'right value';

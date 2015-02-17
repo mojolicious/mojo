@@ -283,6 +283,15 @@ C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
+=head1 SIGNALS
+
+The L<Mojo::Server::Daemon> process can be controlled at runtime with the
+following signals.
+
+=head2 INT, TERM
+
+Shut down server immediately.
+
 =head1 EVENTS
 
 L<Mojo::Server::Daemon> inherits all events from L<Mojo::Server>.

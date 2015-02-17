@@ -1,8 +1,9 @@
 
 5.80  2015-02-17
-  - Removed accept_interval, lock and unlock attributes from Mojo::IOLoop.
-  - Removed accept_interval, lock_file and lock_timeout attributes from
-    Mojo::Server::Prefork.
+  - Deprecated Mojo::IOLoop::accept_interval, Mojo::IOLoop::lock and
+    Mojo::IOLoop::unlock.
+  - Deprecated Mojo::Server::Prefork::accept_interval,
+    Mojo::Server::Prefork::lock_file and Mojo::Server::Prefork::lock_timeout.
   - Removed -a/--accept-interval, --lock-file and -L/--lock-timeout options
     from prefork command.
   - Removed accept_interval, lock_file and lock_timeout parameters from

@@ -9,7 +9,7 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
-use Mojo::Util qw(md5_sum steady_time);
+use Mojo::Util qw(deprecated md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
@@ -28,6 +28,12 @@ $SIG{PIPE} = 'IGNORE';
 
 # Initialize singleton reactor early
 __PACKAGE__->singleton->reactor;
+
+# DEPRECATED in Tiger Face!
+sub accept_interval {
+  deprecated 'Mojo::IOLoop::accept_interval is DEPRECATED';
+  @_ > 1 ? shift : undef;
+}
 
 sub acceptor {
   my ($self, $acceptor) = (_instance(shift), @_);
@@ -80,6 +86,12 @@ sub delay {
 }
 
 sub is_running { _instance(shift)->reactor->is_running }
+
+# DEPRECATED in Tiger Face!
+sub lock {
+  deprecated 'Mojo::IOLoop::lock is DEPRECATED';
+  @_ > 1 ? shift : undef;
+}
 
 sub next_tick {
   my ($self, $cb) = (_instance(shift), @_);
@@ -153,6 +165,12 @@ sub stream {
 }
 
 sub timer { shift->_timer(timer => @_) }
+
+# DEPRECATED in Tiger Face!
+sub unlock {
+  deprecated 'Mojo::IOLoop::unlock is DEPRECATED';
+  @_ > 1 ? shift : undef;
+}
 
 sub _id {
   my $self = shift;

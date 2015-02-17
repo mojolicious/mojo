@@ -3,8 +3,8 @@
   - Removed accept_interval, lock and unlock attributes from Mojo::IOLoop.
   - Removed accept_interval, lock_file and lock_timeout attributes from
     Mojo::Server::Prefork.
-  - Removed --accept-interval, --lock-file and --lock-timeout options from
-    prefork command.
+  - Removed -a/--accept-interval, --lock-file and -L/--lock-timeout options
+    from prefork command.
   - Removed accept_interval, lock_file and lock_timeout parameters from
     Hypntoad.
   - Added stop_gracefully method to Mojo::IOLoop.

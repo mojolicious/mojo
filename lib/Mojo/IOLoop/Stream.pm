@@ -3,11 +3,12 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno qw(EAGAIN ECONNRESET EINTR EWOULDBLOCK);
 use Mojo::IOLoop;
+use Mojo::Util;
 use Scalar::Util 'weaken';
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
-sub DESTROY { shift->close }
+sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
 
 sub close {
   my $self = shift;

@@ -41,8 +41,7 @@ sub acceptor {
   weaken $acceptor->reactor($self->reactor)->{reactor};
 
   # Allow new acceptor to get picked up
-  $self->_not_accepting;
-  $self->_maybe_accepting;
+  $self->_not_accepting->_maybe_accepting;
 
   return $id;
 }
@@ -114,9 +113,6 @@ sub server {
   $server->on(
     accept => sub {
 
-      # Stop accepting if connection limit has been reached
-      $self->_not_accepting if $self->_limit;
-
       # Enforce connection limit (randomize to improve load balancing)
       if (my $max = $self->max_accepts) {
         $self->{accepts} //= $max - int rand $max / 2;
@@ -125,6 +121,9 @@ sub server {
 
       my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->$cb($stream, $self->stream($stream));
+
+      # Stop accepting if connection limit has been reached
+      $self->_not_accepting if $self->_limit;
     }
   );
   $server->listen(@_);
@@ -187,8 +186,9 @@ sub _maybe_accepting {
 
 sub _not_accepting {
   my $self = shift;
-  return unless delete $self->{accepting};
+  return $self unless delete $self->{accepting};
   $_->stop for values %{$self->{acceptors} || {}};
+  return $self;
 }
 
 sub _remove {
@@ -198,13 +198,14 @@ sub _remove {
   return unless my $reactor = $self->reactor;
   return if $reactor->remove($id);
 
-  # Connection
-  return $self->_maybe_accepting if delete $self->{connections}{$id};
-
   # Acceptor
-  return unless delete $self->{acceptors}{$id};
-  $self->_not_accepting;
+  return $self->_not_accepting->_maybe_accepting
+    if delete $self->{acceptors}{$id};
+
+  # Connection
+  return unless delete $self->{connections}{$id};
   $self->_maybe_accepting;
+  warn "-- $id -- $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
 }
 
 sub _stop {
@@ -219,6 +220,7 @@ sub _stream {
 
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;
+  warn "-- $id ++ $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
   weaken $stream->reactor($self->reactor)->{reactor};
   weaken $self;
   $stream->on(close => sub { $self && $self->_remove($id) });

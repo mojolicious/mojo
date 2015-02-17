@@ -10,6 +10,8 @@
   - Added stop_gracefully method to Mojo::IOLoop.
   - Reduced idle CPU usage of Mojo::IOLoop and Mojo::Server::Prefork.
   - Improved app generator command to use current best practices.
+  - Fixed bug in Mojo::IOLoop where connection limits were not properly
+    enforced.
   - Fixed url_for to handle paths without trailing slash correctly in embedded
     applications.
 

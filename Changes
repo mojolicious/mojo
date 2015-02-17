@@ -1,12 +1,12 @@
 
-5.80  2015-02-17
+5.80  2015-02-18
   - Deprecated Mojo::IOLoop::accept_interval, Mojo::IOLoop::lock and
     Mojo::IOLoop::unlock.
   - Deprecated Mojo::Server::Prefork::accept_interval,
     Mojo::Server::Prefork::lock_file and Mojo::Server::Prefork::lock_timeout.
   - Removed -a/--accept-interval, --lock-file and -L/--lock-timeout options
     from prefork command.
-  - Removed accept_interval, lock_file and lock_timeout parameters from
+  - Removed accept_interval, lock_file and lock_timeout settings from
     Hypnotoad.
   - Added stop_gracefully method to Mojo::IOLoop.
   - Added finish event to Mojo::IOLoop.
@@ -2179,7 +2179,7 @@
   - Added EXPERIMENTAL support for RSV1-3 flags to
     Mojo::Transaction::WebSocket.
   - Added EXPERIMENTAL tls_ca option to Mojo::IOLoop::Client::connect.
-  - Added lock_timeout parameter to Hypnotoad.
+  - Added lock_timeout setting to Hypnotoad.
   - Removed experimental status from JSON Pointer support.
   - Removed Cygwin exception from Hypnotoad.
   - Replaced drop_handle and drop_timer methods in Mojo::IOWatcher with drop

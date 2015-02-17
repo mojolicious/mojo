@@ -106,16 +106,17 @@ sub _close {
 }
 
 sub _finish {
-  my ($self, $id, $tx) = @_;
+  my ($self, $id) = @_;
 
   # Always remove connection for WebSockets
+  my $c = $self->{connections}{$id};
+  return unless my $tx = $c->{tx};
   return $self->_remove($id) if $tx->is_websocket;
 
   # Finish transaction
   $tx->server_close;
 
   # Upgrade connection to WebSocket
-  my $c = $self->{connections}{$id};
   if (my $ws = $c->{tx} = delete $c->{ws}) {
 
     # Successful upgrade
@@ -197,8 +198,8 @@ sub _read {
     if (($c->{requests} || 0) >= $self->max_requests) || $tx->req->error;
 
   # Finish or start writing
-  if ($tx->is_finished) { $self->_finish($id, $tx) }
-  elsif ($tx->is_writing) { $self->_write($id) }
+  if    ($tx->is_finished) { $self->_finish($id) }
+  elsif ($tx->is_writing)  { $self->_write($id) }
 }
 
 sub _remove {
@@ -226,10 +227,10 @@ sub _write {
   my $cb = sub { $self->_write($id) };
   if ($tx->is_finished) {
     if ($tx->has_subscribers('finish')) {
-      $cb = sub { $self->_finish($id, $tx) }
+      $cb = sub { $self->_finish($id) }
     }
     else {
-      $self->_finish($id, $tx);
+      $self->_finish($id);
       return unless $c->{tx};
     }
   }

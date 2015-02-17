@@ -60,7 +60,7 @@ websocket '/socket' => sub {
 websocket '/early_start' => sub {
   my $c = shift;
   $c->send('test1');
-  $c->on(message => sub { shift->send(shift . 'test2')->finish });
+  $c->on(message => sub { shift->send(shift() . 'test2')->finish });
 };
 
 websocket '/denied' => sub {

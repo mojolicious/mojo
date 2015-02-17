@@ -323,7 +323,8 @@ the following new ones.
     ...
   });
 
-Emitted when the event loop shuts down gracefully.
+Emitted when the event loop wants to shut down gracefully and is just waiting
+for all existing connections to be closed.
 
 =head1 ATTRIBUTES
 

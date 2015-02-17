@@ -25,7 +25,7 @@ get '/proxy' => sub {
 
 websocket '/test' => sub {
   my $c = shift;
-  $c->on(message => sub { shift->send(shift . 'test2') });
+  $c->on(message => sub { shift->send(shift() . 'test2') });
 };
 
 # HTTP server for testing

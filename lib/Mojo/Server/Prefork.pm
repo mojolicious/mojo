@@ -153,10 +153,10 @@ sub _spawn {
   $self->cleanup(0)->setuidgid;
 
   # Heartbeat messages
-  weaken $self;
   my $loop     = $self->ioloop;
   my $finished = 0;
   $loop->on(finish => sub { $finished = 1 });
+  weaken $self;
   my $cb = sub { $self->_heartbeat($finished) };
   $loop->next_tick($cb);
   $loop->recurring($self->heartbeat_interval => $cb);

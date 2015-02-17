@@ -101,9 +101,7 @@ sub remove {
 
 sub reset {
   my $self = _instance(shift);
-  $self->_remove($_)
-    for keys %{$self->{acceptors}}, keys %{$self->{connections}};
-  $self->_remove($self->{stop}) if $self->{stop};
+  delete @$self{qw(accepting acceptors connections stop)};
   $self->reactor->reset;
   $self->stop;
 }

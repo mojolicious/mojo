@@ -12,6 +12,8 @@
   - Added finish event to Mojo::IOLoop.
   - Reduced idle CPU usage of Mojo::IOLoop and Mojo::Server::Prefork.
   - Improved app generator command to use current best practices.
+  - Fixed bug where semicolons at the end of a cookie were not parsed
+    correctly. (dmw397)
   - Fixed bug in Mojo::IOLoop where connection limits were not properly
     enforced.
   - Fixed url_for to handle paths without trailing slash correctly in embedded

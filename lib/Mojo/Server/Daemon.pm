@@ -25,8 +25,13 @@ sub DESTROY {
 
 sub run {
   my $self = shift;
-  local $SIG{INT} = local $SIG{TERM} = sub { $self->ioloop->stop };
+
+  # Make sure the event loop can be stopped in regular intervals
+  my $loop = $self->ioloop;
+  my $int = $loop->recurring(1 => sub { });
+  local $SIG{INT} = local $SIG{TERM} = sub { $loop->stop };
   $self->start->setuidgid->ioloop->start;
+  $loop->remove($int);
 }
 
 sub start {

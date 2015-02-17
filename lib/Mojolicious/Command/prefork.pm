@@ -13,7 +13,7 @@ sub run {
 
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
   GetOptionsFromArray \@args,
-    'a|accepts=i'           => sub { $prefork->accepts($_[1]) },
+    'A|accepts=i'           => sub { $prefork->accepts($_[1]) },
     'b|backlog=i'           => sub { $prefork->backlog($_[1]) },
     'c|clients=i'           => sub { $prefork->max_clients($_[1]) },
     'G|graceful-timeout=i'  => sub { $prefork->graceful_timeout($_[1]) },
@@ -51,7 +51,7 @@ Mojolicious::Command::prefork - Prefork command
     ./myapp.pl prefork -l 'https://*:443?cert=./server.crt&key=./server.key'
 
   Options:
-    -a, --accepts <number>               Number of connections for workers to
+    -A, --accepts <number>               Number of connections for workers to
                                          accept, defaults to 1000
     -b, --backlog <size>                 Listen backlog size, defaults to
                                          SOMAXCONN

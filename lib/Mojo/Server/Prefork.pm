@@ -154,8 +154,10 @@ sub _spawn {
 
   # Heartbeat messages
   weaken $self;
-  my $cb = sub { $self->_heartbeat(shift->max_connections ? 0 : 1) };
-  my $loop = $self->ioloop;
+  my $loop     = $self->ioloop;
+  my $finished = 0;
+  $loop->on(finish => sub { $finished = 1 });
+  my $cb = sub { $self->_heartbeat($finished) };
   $loop->next_tick($cb);
   $loop->recurring($self->heartbeat_interval => $cb);
 

@@ -260,12 +260,15 @@ is $client, 'works!', 'full message has been written';
 # Graceful shutdown
 $err  = '';
 $loop = Mojo::IOLoop->new;
+my $finish;
+$loop->on(finish => sub { $finish++ });
 $loop->stop_gracefully;
 $loop->remove(
   $loop->client({port => Mojo::IOLoop::Server->generate_port} => sub { }));
 $loop->timer(3 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
+is $finish, 1, 'finish event has been emitted once';
 
 # Graceful shutdown (max_accepts)
 $err  = '';

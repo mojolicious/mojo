@@ -1,5 +1,5 @@
 package Mojo::IOLoop;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 # "Professor: Amy, technology isn't intrinsically good or evil. It's how it's
 #             used. Like the death ray."
@@ -143,7 +143,7 @@ sub stop { _instance(shift)->reactor->stop }
 
 sub stop_gracefully {
   my $self = _instance(shift)->_not_accepting;
-  $self->{stop} ||= $self->recurring(1 => \&_stop);
+  $self->{stop} ||= $self->emit('finish')->recurring(1 => \&_stop);
 }
 
 sub stream {
@@ -311,6 +311,20 @@ C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB"> for more.
 
+=head1 EVENTS
+
+L<Mojo::IOLoop> inherits all events from L<Mojo::EventEmitter> and can emit
+the following new ones.
+
+=head2 finish
+
+  $loop->on(finish => sub {
+    my $loop = shift;
+    ...
+  });
+
+Emitted when the event loop shuts down gracefully.
+
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop> implements the following attributes.
@@ -366,8 +380,8 @@ L<Mojo::Reactor/"error">.
 
 =head1 METHODS
 
-L<Mojo::IOLoop> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::IOLoop> inherits all methods from L<Mojo::EventEmitter> and implements
+the following new ones.
 
 =head2 acceptor
 

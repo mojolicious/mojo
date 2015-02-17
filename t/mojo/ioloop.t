@@ -23,6 +23,20 @@ $ENV{MOJO_REACTOR} = 'MyReactor';
 $loop = Mojo::IOLoop->new;
 is ref $loop->reactor, 'MyReactor', 'right class';
 
+# Defaults
+$loop = Mojo::IOLoop->new;
+is $loop->max_connections, 1000, 'right default';
+is $loop->multi_accept,    50,   'right default';
+$loop = Mojo::IOLoop->new(max_connections => 51);
+is $loop->max_connections, 51, 'right value';
+is $loop->multi_accept,    50, 'right value';
+$loop = Mojo::IOLoop->new(max_connections => 10);
+is $loop->max_connections, 10, 'right value';
+is $loop->multi_accept,    1,  'right value';
+$loop = Mojo::IOLoop->new(multi_accept => 10);
+is $loop->max_connections, 1000, 'right value';
+is $loop->multi_accept,    10,   'right value';
+
 # Double start
 my $err;
 Mojo::IOLoop->next_tick(

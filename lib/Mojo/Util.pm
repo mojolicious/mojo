@@ -405,7 +405,7 @@ sub _header {
     elsif ($str =~ s/^=\s*([^;, ]*)//) { $token[-1] = $1 }
 
     # Separator
-    next unless $str =~ s/^\s*,\s*//;
+    next unless $str =~ s/^[;\s]*,\s*//;
     push @tree, [@token];
     @token = ();
   }

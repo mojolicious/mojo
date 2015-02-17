@@ -99,6 +99,10 @@ is_deeply split_cookie_header(
   [['a', 'b', 'expires', 'Tuesday, 09-Nov-1999 23:12:40 GMT'], ['c', 'd']],
   'right result';
 is_deeply split_cookie_header(
+  'a=b; expires=Tuesday, 09-Nov-1999 23:12:40 GMT;, c=d;'),
+  [['a', 'b', 'expires', 'Tuesday, 09-Nov-1999 23:12:40 GMT'], ['c', 'd']],
+  'right result';
+is_deeply split_cookie_header(
   'a=b; expires=Sun,06  Nov  1994  08:49:37  UTC; path=/'),
   [['a', 'b', 'expires', 'Sun,06  Nov  1994  08:49:37  UTC', 'path', '/']],
   'right result';

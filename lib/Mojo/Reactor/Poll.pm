@@ -27,7 +27,7 @@ sub one_tick {
 
   # Wait for one event
   my $i;
-  until ($i) {
+  until ($i || !$self->{running}) {
 
     # Stop automatically if there is nothing to watch
     return $self->stop unless keys %{$self->{timers}} || keys %{$self->{io}};

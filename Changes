@@ -7,10 +7,10 @@
   - Removed -a/--accept-interval, --lock-file and -L/--lock-timeout options
     from prefork command.
   - Removed accept_interval, lock_file and lock_timeout parameters from
-    Hypntoad.
+    Hypnotoad.
   - Added stop_gracefully method to Mojo::IOLoop.
   - Added finish event to Mojo::IOLoop.
-  - Reduced idle CPU usage of Mojo::IOLoop and Mojo::Server::Prefork.
+  - Reduced CPU usage of Mojo::IOLoop and Mojo::Server::Prefork significantly.
   - Improved app generator command to use current best practices.
   - Fixed bug where semicolons at the end of a cookie were not parsed
     correctly. (dmw397)

@@ -37,7 +37,7 @@ sub acceptor {
 
   # Connect acceptor with reactor
   my $id = $self->_id;
-  $self->{acceptors}{$id} = $acceptor;
+  $self->{acceptors}{$id} = $acceptor->multi_accept($self->multi_accept);
   weaken $acceptor->reactor($self->reactor)->{reactor};
 
   # Allow new acceptor to get picked up
@@ -172,13 +172,8 @@ sub _limit {
 
 sub _maybe_accepting {
   my $self = shift;
-
-  # Check connection limit
   return if $self->{accepting} || $self->_limit;
-
-  # Check if multi-accept is desirable
-  my $acceptors = $self->{acceptors} || {};
-  $_->multi_accept($self->multi_accept)->start for values %$acceptors;
+  $_->start for values %{$self->{acceptors} || {}};
   $self->{accepting} = 1;
 }
 
@@ -346,7 +341,7 @@ C<1000>.
   $loop     = $loop->multi_accept(100);
 
 Number of connections to accept at once, defaults to C<50> or C<1>, depending
-if the value of L</"max_connections"> is smaller than C<50>.
+on if the value of L</"max_connections"> is smaller than C<50>.
 
 =head2 reactor
 

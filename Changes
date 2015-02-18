@@ -1,4 +1,6 @@
 
+5.81  2015-02-19
+
 5.80  2015-02-18
   - Deprecated Mojo::IOLoop::accept_interval, Mojo::IOLoop::lock and
     Mojo::IOLoop::unlock.

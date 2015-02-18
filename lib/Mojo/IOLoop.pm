@@ -216,7 +216,7 @@ sub _remove {
   # Connection
   return unless delete $self->{connections}{$id};
   $self->_maybe_accepting;
-  warn "-- $id -- $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
+  warn "-- $id <<< $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
 }
 
 sub _stop {
@@ -231,7 +231,7 @@ sub _stream {
 
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;
-  warn "-- $id ++ $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
+  warn "-- $id >>> $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
   weaken $stream->reactor($self->reactor)->{reactor};
   weaken $self;
   $stream->on(close => sub { $self && $self->_remove($id) });

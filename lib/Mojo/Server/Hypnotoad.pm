@@ -348,7 +348,7 @@ value of L<Mojo::Server/"reverse_proxy">.
   upgrade_timeout => 45
 
 Maximum amount of time in seconds a zero downtime software upgrade may take
-before getting canceled, defaults to the value of L</"upgrade_timeout">.
+before getting canceled, defaults to C<60>.
 
 =head2 user
 

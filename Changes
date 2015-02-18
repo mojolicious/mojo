@@ -1892,7 +1892,7 @@
 2.77  2012-04-09
   - Improved Mojo::Transaction::WebSocket to allow custom message parsers.
   - Improved help command to be less strict.
-  - Fixed bug that prevented --help and -h flags from working for generator
+  - Fixed bug that prevented -h and --help options from working for generator
     commands.
   - Fixed small bug that prevented non-string secrets in Mojolicious.
 
@@ -2402,7 +2402,7 @@
   - Fixed empty path element bug in Mojo::Path.
 
 2.22  2011-11-03
-  - Added EXPERIMENTAL --verbose flag to routes command.
+  - Added EXPERIMENTAL --verbose option to routes command.
   - Fixed a few attribute without value selector bugs in Mojo::DOM::CSS.
   - Fixed template inheritance bug in Mojolicious::Renderer.
 
@@ -2451,7 +2451,7 @@
   - Renamed io method in Mojo::IOWatcher to watch.
   - Renamed cancel method in Mojo::IOWatcher to drop_timer.
   - Renamed remove method in Mojo::IOWatcher to drop_handle.
-  - Added EXPERIMENTAL --verbose flag to test command.
+  - Added EXPERIMENTAL --verbose option to test command.
 
 2.13  2011-10-28
   - Removed experimental status from many classes, methods, attributes and
@@ -2707,7 +2707,7 @@
   - Added EXPERIMENTAL CSS4 selector subject support to Mojo::DOM::CSS.
 
 1.74  2011-08-09
-  - Added EXPERIMENTAL --verbose flag to Morbo.
+  - Added EXPERIMENTAL --verbose option to Morbo.
 
 1.73  2011-08-09
   - Added EXPERIMENTAL -strict flag to Mojo::Base.
@@ -3610,7 +3610,7 @@
     use Mojo::Transaction::HTTP instead.
   - MOJO_RELOAD=1 now works with Mojolicious::Lite, have fun!
   - Allow reloading to be triggered once by a USR1 or WINCH (Windows) signal.
-  - Added --reload flag to all server bindings as an alternative to
+  - Added --reload option to all server bindings as an alternative to
     MOJO_RELOAD=1.
   - Added WebSocket support.
   - Added IPv6 support.

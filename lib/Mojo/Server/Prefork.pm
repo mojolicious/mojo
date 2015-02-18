@@ -6,7 +6,6 @@ use IO::Poll qw(POLLIN POLLPRI);
 use Mojo::Util qw(deprecated steady_time);
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
-use Time::HiRes ();
 
 has accepts => 1000;
 has cleanup => 1;

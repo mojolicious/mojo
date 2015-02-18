@@ -35,7 +35,7 @@ sub one_tick {
     # Calculate ideal timeout based on timers and round up to next millisecond
     my $min = min map { $_->{time} } values %{$self->{timers}};
     my $timeout = defined $min ? $min - steady_time : 0.5;
-    $timeout = $timeout < 0 ? 0 : int($timeout * 1000) + 1;
+    $timeout = $timeout <= 0 ? 0 : int($timeout * 1000) + 1;
 
     # I/O
     if (keys %{$self->{io}}) {

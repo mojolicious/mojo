@@ -85,24 +85,6 @@ is $app->start('test_command'), 'works!', 'right result';
   is $ENV{MOJO_MODE}, undef, 'no mode';
 }
 
-# List commands
-is_deeply $commands->namespaces, ['Mojolicious::Command'], 'right namespaces';
-my $list = [
-  ['cgi',      'Start application with CGI'],
-  ['cpanify',  'Upload distribution to CPAN'],
-  ['daemon',   'Start application with HTTP and WebSocket server'],
-  ['eval',     'Run code against application'],
-  ['generate', 'Generate files and directories from templates'],
-  ['get',      'Perform HTTP request'],
-  ['inflate',  'Inflate embedded files to real files'],
-  ['prefork',  'Start application with preforking HTTP and WebSocket server'],
-  ['psgi',     'Start application with PSGI'],
-  ['routes',   'Show available routes'],
-  ['test',     'Run tests'],
-  ['version',  'Show versions of available modules']
-];
-is_deeply $commands->list, $list, 'right command list';
-
 # mojo
 ok $commands->description, 'has a description';
 like $commands->message,   qr/COMMAND/, 'has a message';

@@ -24,14 +24,14 @@ helper dead_helper => sub { die "dead helper!\n" };
 hook before_render => sub {
   my ($c, $args) = @_;
   return unless ($args->{template} // '') eq 'not_found';
-  my $exception = $c->stash('snapshot')->{exception};
+  my $exception = $args->{snapshot}{exception};
   $args->{text} = "Missing template, $exception." if $args->{format} eq 'txt';
 };
 
 # Custom exception rendering for "txt"
 hook before_render => sub {
   my ($c, $args) = @_;
-  @$args{qw(text format)} = ($c->stash('exception'), 'txt')
+  @$args{qw(text format)} = ($args->{exception}, 'txt')
     if ($args->{template} // '') eq 'exception' && $c->accepts('txt');
 };
 

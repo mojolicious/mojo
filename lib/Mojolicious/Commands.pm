@@ -58,18 +58,14 @@ sub run {
   return 1 if $ENV{HARNESS_ACTIVE};
 
   # Find all available commands
-  my (@rows, %seen);
+  my %all;
   my $loader = Mojo::Loader->new;
   for my $ns (@{$self->namespaces}) {
-    for my $module (@{$loader->search($ns)}) {
-      next unless my $command = _command($module);
-      $command = substr $command, length "${ns}::";
-      next if $seen{$command}++;
-      push @rows, [" $command", $module->new->description];
-    }
+    $all{substr $_, length "${ns}::"} //= $_->new->description
+      for grep { _command($_) } @{$loader->search($ns)};
   }
-  @rows = sort { $a->[0] cmp $b->[0] } @rows;
 
+  my @rows = map { [" $_", $all{$_}] } sort keys %all;
   return print $self->message, tablify(\@rows), $self->hint;
 }
 

@@ -24,6 +24,23 @@ sub detect {
   return undef;
 }
 
+sub list {
+  my $self = shift;
+
+  my (@rows, %seen);
+  my $loader = Mojo::Loader->new;
+  for my $ns (@{$self->namespaces}) {
+    for my $module (@{$loader->search($ns)}) {
+      next unless my $command = _command($module);
+      $command = substr $command, length "${ns}::";
+      next if $seen{$command}++;
+      push @rows, {name => $command, description => $module->new->description};
+    }
+  }
+
+  return [sort { $a->{name} cmp $b->{name} } @rows];
+}
+
 sub run {
   my ($self, $name, @args) = @_;
 
@@ -57,20 +74,9 @@ sub run {
   # Hide list for tests
   return 1 if $ENV{HARNESS_ACTIVE};
 
-  # Find all available commands
-  my (@rows, %seen);
-  my $loader = Mojo::Loader->new;
-  for my $ns (@{$self->namespaces}) {
-    for my $module (@{$loader->search($ns)}) {
-      next unless my $command = _command($module);
-      $command = substr $command, length "${ns}::";
-      next if $seen{$command}++;
-      push @rows, [" $command", $module->new->description];
-    }
-  }
-  @rows = sort { $a->[0] cmp $b->[0] } @rows;
-
-  return print $self->message, tablify(\@rows), $self->hint;
+  # List all available commands
+  my @list = map { [" $_->{name}", $_->{description}] } @{$self->list};
+  return print $self->message, tablify(\@list), $self->hint;
 }
 
 sub start_app { shift; Mojo::Server->new->build_app(shift)->start(@_) }
@@ -301,6 +307,14 @@ implements the following new ones.
   my $env = $commands->detect;
 
 Try to detect environment or return C<undef> if none could be detected.
+
+=head2 list
+
+  my $list = $commands->list;
+
+List available commands in L</"namespaces">.
+
+  say $_->{name} for @{$commands->list};
 
 =head2 run
 

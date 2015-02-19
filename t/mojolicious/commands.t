@@ -85,6 +85,56 @@ is $app->start('test_command'), 'works!', 'right result';
   is $ENV{MOJO_MODE}, undef, 'no mode';
 }
 
+# List commands
+is_deeply $commands->namespaces, ['Mojolicious::Command'], 'right namespaces';
+my $list = [
+  {name => 'cgi',     description => 'Start application with CGI'},
+  {name => 'cpanify', description => 'Upload distribution to CPAN'},
+  {
+    name        => 'daemon',
+    description => 'Start application with HTTP and WebSocket server'
+  },
+  {name => 'eval', description => 'Run code against application'},
+  {
+    name        => 'generate',
+    description => 'Generate files and directories from templates'
+  },
+  {name => 'get',     description => 'Perform HTTP request'},
+  {name => 'inflate', description => 'Inflate embedded files to real files'},
+  {
+    name => 'prefork',
+    description =>
+      'Start application with preforking HTTP and WebSocket server'
+  },
+  {name => 'psgi',    description => 'Start application with PSGI'},
+  {name => 'routes',  description => 'Show available routes'},
+  {name => 'test',    description => 'Run tests'},
+  {name => 'version', description => 'Show versions of available modules'}
+];
+is_deeply $commands->list, $list, 'right command list';
+
+# List generator commands
+require Mojolicious::Command::generate;
+my $generator = Mojolicious::Command::generate->new;
+is_deeply $generator->namespaces, ['Mojolicious::Command::generate'],
+  'right namespaces';
+$list = [
+  {
+    name        => 'app',
+    description => 'Generate Mojolicious application directory structure'
+  },
+  {
+    name        => 'lite_app',
+    description => 'Generate Mojolicious::Lite application'
+  },
+  {name => 'makefile', description => 'Generate "Makefile.PL"'},
+  {
+    name        => 'plugin',
+    description => 'Generate Mojolicious plugin directory structure'
+  }
+];
+is_deeply $generator->list, $list, 'right command list';
+
 # mojo
 ok $commands->description, 'has a description';
 like $commands->message,   qr/COMMAND/, 'has a message';
@@ -156,8 +206,6 @@ $buffer = '';
 like $buffer, qr/Mojolicious::Controller/, 'right output';
 
 # generate
-require Mojolicious::Command::generate;
-my $generator = Mojolicious::Command::generate->new;
 ok $generator->description, 'has a description';
 like $generator->message,   qr/generate/, 'has a message';
 like $generator->hint,      qr/help/, 'has a hint';

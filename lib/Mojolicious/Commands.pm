@@ -63,7 +63,7 @@ sub run {
   for my $ns (@{$self->namespaces}) {
     for my $module (@{$loader->search($ns)}) {
       next unless my $command = _command($module);
-      $command =~ s/^\Q$ns\E:://;
+      $command = substr $command, length "${ns}::";
       next if $seen{$command}++;
       push @rows, [" $command", $module->new->description];
     }

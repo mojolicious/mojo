@@ -6,8 +6,23 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
-    %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo-dark.css'
+    %= javascript '/mojo/highlight.js/highlight.min.js'
+    %= stylesheet '/mojo/highlight.js/highlight-mojo-dark.css'
+    <script>
+      function highlightPre() {
+    if (highlightPre.called)
+      return;
+    highlightPre.called = true;
+
+    var blocks = document.querySelectorAll('pre.prettyprint');
+    Array.prototype.forEach.call(blocks, hljs.highlightBlock);
+
+      }
+      $(function() {
+    addEventListener('DOMContentLoaded', highlightPre, false);
+    addEventListener('load', highlightPre, false);
+      });
+    </script>
     <style>
       a img { border: 0 }
       body {
@@ -160,7 +175,7 @@
           %= tag 'tr', $i ? (class => 'important') : (), begin
             <td class="key"><%= $key %></td>
             <td class="value wide">
-              <pre><code class="prettyprint"><%= $value %></code></pre>
+              <pre class="prettyprint mojolicious"><%= $value %></pre>
             </td>
           % end
         % end

@@ -50,7 +50,7 @@ sub _html {
     next if $str =~ /^\s*(?:\$|Usage:)\s+/m || $str !~ /[\$\@\%]\w|-&gt;\w/m;
     my $attrs = $e->attr;
     my $class = $attrs->{class};
-    $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';
+    $attrs->{class} = defined $class ? "$class prettyprint mojolicious" : 'prettyprint mojolicious';
   }
 
   # Rewrite headers

@@ -1,7 +1,7 @@
 package Mojolicious::Command::inflate;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Loader;
+use Mojo::Loader qw(data_section file_is_binary);
 use Mojo::Util 'encode';
 
 has description => 'Inflate embedded files to real files';
@@ -12,12 +12,11 @@ sub run {
 
   # Find all embedded files
   my %all;
-  my $app    = $self->app;
-  my $loader = Mojo::Loader->new;
+  my $app = $self->app;
   for my $class (@{$app->renderer->classes}, @{$app->static->classes}) {
-    for my $name (keys %{$loader->data($class)}) {
-      my $data = $loader->data($class, $name);
-      $data = encode 'UTF-8', $data unless $loader->is_binary($class, $name);
+    for my $name (keys %{data_section $class}) {
+      my $data = data_section $class, $name;
+      $data = encode 'UTF-8', $data unless file_is_binary $class, $name;
       $all{$name} = $data;
     }
   }

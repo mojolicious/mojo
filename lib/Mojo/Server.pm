@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Cwd 'abs_path';
-use Mojo::Loader;
+use Mojo::Loader 'load_class';
 use Mojo::Util 'md5_sum';
 use POSIX;
 use Scalar::Util 'blessed';
@@ -15,7 +15,7 @@ has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };
 sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};
-  return $app->new unless my $e = Mojo::Loader->new->load($app);
+  return $app->new unless my $e = load_class $app;
   die ref $e ? $e : qq{Can't find application class "$app" in \@INC. (@INC)\n};
 }
 

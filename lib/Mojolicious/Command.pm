@@ -6,7 +6,7 @@ use Cwd 'getcwd';
 use File::Basename 'dirname';
 use File::Path 'mkpath';
 use File::Spec::Functions qw(catdir catfile);
-use Mojo::Loader;
+use Mojo::Loader 'data_section';
 use Mojo::Server;
 use Mojo::Template;
 use Mojo::Util qw(spurt unindent);
@@ -59,7 +59,7 @@ sub rel_file { catfile getcwd(), split('/', pop) }
 sub render_data {
   my ($self, $name) = (shift, shift);
   Mojo::Template->new->name("template $name from DATA section")
-    ->render(Mojo::Loader->new->data(ref $self, $name), @_);
+    ->render(data_section(ref $self, $name), @_);
 }
 
 sub render_to_file {

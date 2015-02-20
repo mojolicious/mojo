@@ -2,7 +2,7 @@ package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long 'GetOptionsFromArray';
-use Mojo::Loader;
+use Mojo::Loader qw(find_modules load_class);
 use Mojo::Server;
 use Mojo::Util 'tablify';
 
@@ -60,10 +60,9 @@ sub run {
 
   # Find all available commands
   my %all;
-  my $loader = Mojo::Loader->new;
   for my $ns (@{$self->namespaces}) {
     $all{substr $_, length "${ns}::"} //= $_->new->description
-      for grep { _command($_) } @{$loader->search($ns)};
+      for grep { _command($_) } @{find_modules $ns};
   }
 
   my @rows = map { [" $_", $all{$_}] } sort keys %all;
@@ -91,7 +90,7 @@ BEGIN { _args([@ARGV]) }
 sub _command {
   my ($module, $fatal) = @_;
   return $module->isa('Mojolicious::Command') ? $module : undef
-    unless my $e = Mojo::Loader->new->load($module);
+    unless my $e = load_class $module;
   $fatal && ref $e ? die $e : return undef;
 }
 

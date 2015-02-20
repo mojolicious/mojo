@@ -1,5 +1,8 @@
 
 5.81  2015-02-20
+  - Deprecated object-oriented Mojo::Loader API.
+  - Added data_file, fine_is_binary, load_class and find_modules functions to
+    Mojo::Loader.
 
 5.80  2015-02-18
   - Deprecated Mojo::IOLoop::accept_interval, Mojo::IOLoop::lock and

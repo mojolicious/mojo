@@ -9,8 +9,8 @@ plan skip_all => 'Test::Pod::Coverage 1.04+ required for this test!'
 
 # DEPRECATED in Tiger Face!
 my @tiger = (
-  qw(accept_interval bridge lock lock_file lock_timeout max_connections),
-  qw(siblings unlock)
+  qw(accept_interval bridge data is_binary load lock lock_file lock_timeout),
+  qw(max_connections new search siblings unlock)
 );
 
 all_pod_coverage_ok({also_private => [@tiger]});

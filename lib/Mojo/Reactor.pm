@@ -3,13 +3,13 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use IO::Poll qw(POLLIN POLLPRI);
-use Mojo::Loader;
+use Mojo::Loader 'load_class';
 
 sub again { croak 'Method "again" not implemented by subclass' }
 
 sub detect {
   my $try = $ENV{MOJO_REACTOR} || 'Mojo::Reactor::EV';
-  return Mojo::Loader->new->load($try) ? 'Mojo::Reactor::Poll' : $try;
+  return load_class($try) ? 'Mojo::Reactor::Poll' : $try;
 }
 
 sub io { croak 'Method "io" not implemented by subclass' }

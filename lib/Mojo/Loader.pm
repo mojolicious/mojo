@@ -1,35 +1,28 @@
 package Mojo::Loader;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 
+use Exporter 'import';
 use File::Basename 'fileparse';
 use File::Spec::Functions qw(catdir catfile splitdir);
 use Mojo::Exception;
-use Mojo::Util qw(b64_decode class_to_path);
+use Mojo::Util qw(b64_decode class_to_path deprecated);
+
+our @EXPORT_OK = qw(data_section file_is_binary find_modules load_class);
 
 my (%BIN, %CACHE);
 
-sub data { $_[1] ? $_[2] ? _all($_[1])->{$_[2]} : _all($_[1]) : undef }
+# DEPRECATED in Tiger Face!
+sub data { shift and data_section(@_) }
 
-sub is_binary { keys %{_all($_[1])} ? !!$BIN{$_[1]}{$_[2]} : undef }
+sub data_section { $_[0] ? $_[1] ? _all($_[0])->{$_[1]} : _all($_[0]) : undef }
 
-sub load {
-  my ($self, $module) = @_;
+# DEPRECATED in Tiger Face!
+sub is_binary { shift and file_is_binary(@_) }
 
-  # Check module name
-  return 1 if !$module || $module !~ /^\w(?:[\w:']*\w)?$/;
+sub file_is_binary { keys %{_all($_[0])} ? !!$BIN{$_[0]}{$_[1]} : undef }
 
-  # Load
-  return undef if $module->can('new') || eval "require $module; 1";
-
-  # Exists
-  return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $module]}\E in \@INC/;
-
-  # Real error
-  return Mojo::Exception->new($@);
-}
-
-sub search {
-  my ($self, $ns) = @_;
+sub find_modules {
+  my $ns = shift;
 
   my %modules;
   for my $directory (@INC) {
@@ -45,6 +38,34 @@ sub search {
 
   return [keys %modules];
 }
+
+# DEPRECATED in Tiger Face!
+sub load { shift and load_class(@_) }
+
+sub load_class {
+  my $class = shift;
+
+  # Check class name
+  return 1 if !$class || $class !~ /^\w(?:[\w:']*\w)?$/;
+
+  # Load
+  return undef if $class->can('new') || eval "require $class; 1";
+
+  # Exists
+  return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $class]}\E in \@INC/;
+
+  # Real error
+  return Mojo::Exception->new($@);
+}
+
+# DEPRECATED in Tiger Face!
+sub new {
+  deprecated 'Object-oriented Mojo::Loader API is DEPRECATED';
+  Mojo::Base::new(@_);
+}
+
+# DEPRECATED in Tiger Face!
+sub search { shift and find_modules(@_) }
 
 sub _all {
   my $class = shift;
@@ -85,61 +106,60 @@ Mojo::Loader - Loader
 
 =head1 SYNOPSIS
 
-  use Mojo::Loader;
+  use Mojo::Loader qw(data_section find_modules load_class);
 
   # Find modules in a namespace
-  my $loader = Mojo::Loader->new;
-  for my $module (@{$loader->search('Some::Namespace')}) {
+  for my $module (@{find_modules 'Some::Namespace'}) {
 
     # Load them safely
-    my $e = $loader->load($module);
+    my $e = load_class $module;
     warn qq{Loading "$module" failed: $e} and next if ref $e;
 
     # And extract files from the DATA section
-    say $loader->data($module, 'some_file.txt');
+    say data_section($module, 'some_file.txt');
   }
 
 =head1 DESCRIPTION
 
 L<Mojo::Loader> is a class loader and plugin framework.
 
-=head1 METHODS
+=head1 FUNCTIONS
 
-L<Mojo::Loader> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Loader> implements the following functions, which can be imported
+individually.
 
-=head2 data
+=head2 data_section
 
-  my $all   = $loader->data('Foo::Bar');
-  my $index = $loader->data('Foo::Bar', 'index.html');
+  my $all   = data_section 'Foo::Bar';
+  my $index = data_section 'Foo::Bar', 'index.html';
 
 Extract embedded file from the C<DATA> section of a class, all files will be
 cached once they have been accessed for the first time.
 
-  say for keys %{$loader->data('Foo::Bar')};
+  say for keys %{data_section 'Foo::Bar'};
 
-=head2 is_binary
+=head2 file_is_binary
 
-  my $bool = $loader->is_binary('Foo::Bar', 'test.png');
+  my $bool = file_is_binary 'Foo::Bar', 'test.png';
 
 Check if embedded file from the C<DATA> section of a class was Base64 encoded.
 
-=head2 load
+=head2 find_modules
 
-  my $e = $loader->load('Foo::Bar');
+  my $modules = find_modules 'MyApp::Namespace';
+
+Search for modules in a namespace non-recursively.
+
+=head2 load_class
+
+  my $e = load_class 'Foo::Bar';
 
 Load a class and catch exceptions. Note that classes are checked for a C<new>
 method to see if they are already loaded.
 
-  if (my $e = $loader->load('Foo::Bar')) {
+  if (my $e = load_class 'Foo::Bar') {
     die ref $e ? "Exception: $e" : 'Not found!';
   }
-
-=head2 search
-
-  my $modules = $loader->search('MyApp::Namespace');
-
-Search for modules in a namespace non-recursively.
 
 =head1 SEE ALSO
 

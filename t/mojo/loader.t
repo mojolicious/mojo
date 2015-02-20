@@ -7,15 +7,14 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Mojo::Loader;
+use Mojo::Loader qw(data_section file_is_binary find_modules load_class);
 
 # Single character core module
-my $loader = Mojo::Loader->new;
-ok !$loader->load('B');
-ok !!UNIVERSAL::can(B => 'svref_2object');
+ok !load_class('B'), 'loaded';
+ok !!UNIVERSAL::can(B => 'svref_2object'), 'method found';
 
 # Exception
-my $e = $loader->load('Mojo::LoaderException');
+my $e = load_class 'Mojo::LoaderException';
 isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Missing right curly/, 'right message';
 is $e->lines_before->[0][0], 2,                       'right number';
@@ -33,8 +32,7 @@ is $e->line->[1], "1;", 'right line';
 like "$e", qr/Missing right curly/, 'right message';
 
 # Complicated exception
-$loader = Mojo::Loader->new;
-$e      = $loader->load('Mojo::LoaderException2');
+$e = load_class 'Mojo::LoaderException2';
 isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Exception/, 'right message';
 is $e->lines_before->[0][0], 1,                                 'right number';
@@ -52,34 +50,33 @@ is $e->lines_after->[1][1], '1;', 'right line';
 like "$e", qr/Exception/, 'right message';
 
 # Search
-$loader = Mojo::Loader->new;
-my @modules = sort @{$loader->search('Mojo::LoaderTest')};
+my @modules = sort @{find_modules 'Mojo::LoaderTest'};
 is_deeply \@modules,
   [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)],
   'found the right modules';
-is_deeply [sort @{$loader->search("Mojo'LoaderTest")}],
+is_deeply [sort @{find_modules "Mojo'LoaderTest"}],
   [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
   'found the right modules';
 
 # Load
-ok !$loader->load("Mojo'LoaderTest::A"), 'loaded successfully';
+ok !load_class("Mojo'LoaderTest::A"), 'loaded successfully';
 ok !!Mojo::LoaderTest::A->can('new'), 'loaded successfully';
-$loader->load($_) for @modules;
+load_class $_ for @modules;
 ok !!Mojo::LoaderTest::B->can('new'), 'loaded successfully';
 ok !!Mojo::LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
-is $loader->load('Mojo::LoaderTest'), 1, 'nothing to load';
+is load_class('Mojo::LoaderTest'), 1, 'nothing to load';
 
 # Invalid class
-is $loader->load('Mojolicious/Lite'),      1,     'nothing to load';
-is $loader->load('Mojolicious/Lite.pm'),   1,     'nothing to load';
-is $loader->load('Mojolicious\Lite'),      1,     'nothing to load';
-is $loader->load('Mojolicious\Lite.pm'),   1,     'nothing to load';
-is $loader->load('::Mojolicious::Lite'),   1,     'nothing to load';
-is $loader->load('Mojolicious::Lite::'),   1,     'nothing to load';
-is $loader->load('::Mojolicious::Lite::'), 1,     'nothing to load';
-is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';
+is load_class('Mojolicious/Lite'),      1,     'nothing to load';
+is load_class('Mojolicious/Lite.pm'),   1,     'nothing to load';
+is load_class('Mojolicious\Lite'),      1,     'nothing to load';
+is load_class('Mojolicious\Lite.pm'),   1,     'nothing to load';
+is load_class('::Mojolicious::Lite'),   1,     'nothing to load';
+is load_class('Mojolicious::Lite::'),   1,     'nothing to load';
+is load_class('::Mojolicious::Lite::'), 1,     'nothing to load';
+is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
 
 # UNIX DATA templates
 {
@@ -87,13 +84,13 @@ is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';
   open my $data, '<', \$unix;
   no strict 'refs';
   *{"Example::Package::UNIX::DATA"} = $data;
-  ok !$loader->is_binary('Example::Package::UNIX', 'template1'),
+  ok !file_is_binary('Example::Package::UNIX', 'template1'),
     'file is not binary';
-  is $loader->data('Example::Package::UNIX', 'template1'), "First Template\n",
+  is data_section('Example::Package::UNIX', 'template1'), "First Template\n",
     'right template';
-  is $loader->data('Example::Package::UNIX', 'template2'),
-    "Second Template\n", 'right template';
-  is_deeply [sort keys %{$loader->data('Example::Package::UNIX')}],
+  is data_section('Example::Package::UNIX', 'template2'), "Second Template\n",
+    'right template';
+  is_deeply [sort keys %{data_section 'Example::Package::UNIX'}],
     [qw(template1 template2)], 'right DATA files';
 }
 
@@ -104,11 +101,11 @@ is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';
   open my $data, '<', \$windows;
   no strict 'refs';
   *{"Example::Package::Windows::DATA"} = $data;
-  is $loader->data('Example::Package::Windows', 'template3'),
+  is data_section('Example::Package::Windows', 'template3'),
     "Third Template\r\n", 'right template';
-  is $loader->data('Example::Package::Windows', 'template4'),
+  is data_section('Example::Package::Windows', 'template4'),
     "Fourth Template\r\n", 'right template';
-  is_deeply [sort keys %{$loader->data('Example::Package::Windows')}],
+  is_deeply [sort keys %{data_section 'Example::Package::Windows'}],
     [qw(template3 template4)], 'right DATA files';
 }
 
@@ -118,13 +115,13 @@ is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';
   open my $data, '<', \$mixed;
   no strict 'refs';
   *{"Example::Package::Mixed::DATA"} = $data;
-  is $loader->data('Example::Package::Mixed', 'template5'), "5\n\n",
+  is data_section('Example::Package::Mixed', 'template5'), "5\n\n",
     'right template';
-  is $loader->data('Example::Package::Mixed', 'template6'), "6\n",
+  is data_section('Example::Package::Mixed', 'template6'), "6\n",
     'right template';
-  is $loader->data('Example::Package::Mixed', 'template7'), '7',
+  is data_section('Example::Package::Mixed', 'template7'), '7',
     'right template';
-  is_deeply [sort keys %{$loader->data('Example::Package::Mixed')}],
+  is_deeply [sort keys %{data_section 'Example::Package::Mixed'}],
     [qw(template5 template6 template7)], 'right DATA files';
 }
 
@@ -134,13 +131,12 @@ is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';
   open my $data, '<', \$b64;
   no strict 'refs';
   *{"Example::Package::Base64::DATA"} = $data;
-  ok !$loader->is_binary('Example::Package::DoesNotExist', 'test.bin'),
+  ok !file_is_binary('Example::Package::DoesNotExist', 'test.bin'),
     'file is not binary';
-  ok $loader->is_binary('Example::Package::Base64', 'test.bin'),
-    'file is binary';
-  is $loader->data('Example::Package::Base64', 'test.bin'), "\xe2\x99\xa5",
+  ok file_is_binary('Example::Package::Base64', 'test.bin'), 'file is binary';
+  is data_section('Example::Package::Base64', 'test.bin'), "\xe2\x99\xa5",
     'right template';
-  is_deeply [sort keys %{$loader->data('Example::Package::Base64')}],
+  is_deeply [sort keys %{data_section 'Example::Package::Base64'}],
     ['test.bin'], 'right DATA files';
 }
 

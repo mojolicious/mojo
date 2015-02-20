@@ -5,7 +5,7 @@ use File::Spec::Functions 'catfile';
 use Mojo::Cache;
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
-use Mojo::Loader;
+use Mojo::Loader 'data_section';
 use Mojo::Util qw(decamelize encode md5_sum monkey_patch slurp);
 
 has cache   => sub { Mojo::Cache->new };
@@ -28,8 +28,6 @@ my $HOME = Mojo::Home->new;
 $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
-
-my $LOADER = Mojo::Loader->new;
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 
@@ -59,7 +57,7 @@ sub get_data_template {
 
   # Find template
   return undef unless my $template = $self->template_name($options);
-  return $LOADER->data($self->{index}{$template}, $template);
+  return data_section $self->{index}{$template}, $template;
 }
 
 sub get_helper {
@@ -248,7 +246,7 @@ sub _warmup {
 
   # Handlers and classes for DATA templates
   for my $class (reverse @{$self->classes}) {
-    $index->{$_} = $class for my @keys = sort keys %{$LOADER->data($class)};
+    $index->{$_} = $class for my @keys = sort keys %{data_section $class};
     s/\.(\w+)$// and unshift @{$templates->{$_}}, $1 for reverse @keys;
   }
 }

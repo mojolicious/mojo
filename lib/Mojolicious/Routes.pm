@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Routes::Route';
 
 use List::Util 'first';
 use Mojo::Cache;
-use Mojo::Loader;
+use Mojo::Loader 'load_class';
 use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
 use Scalar::Util 'weaken';
@@ -202,7 +202,7 @@ sub _load {
 
   # Load unless already loaded
   return 1 if $self->{loaded}{$app};
-  if (my $e = Mojo::Loader->new->load($app)) { ref $e ? die $e : return undef }
+  if (my $e = load_class $app) { ref $e ? die $e : return undef }
 
   # Check base classes
   return 0 unless first { $app->isa($_) } @{$self->base_classes};

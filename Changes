@@ -1,7 +1,7 @@
 
 5.81  2015-02-20
   - Deprecated object-oriented Mojo::Loader API.
-  - Added data_file, fine_is_binary, load_class and find_modules functions to
+  - Added data_file, file_is_binary, load_class and find_modules functions to
     Mojo::Loader.
   - Improved design of built-in templates.
   - Fixed test command to not let Test::Harness enable global warnings by

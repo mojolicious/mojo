@@ -228,10 +228,6 @@ and take over serving requests after starting up successfully.
 L<Mojo::Server::Hypnotoad> worker processes can be controlled at runtime with
 the following signals.
 
-=head2 INT, TERM
-
-Stop worker immediately.
-
 =head2 QUIT
 
 Stop worker gracefully.

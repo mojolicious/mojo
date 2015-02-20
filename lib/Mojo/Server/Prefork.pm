@@ -298,10 +298,6 @@ Decrease worker pool by one.
 L<Mojo::Server::Prefork> worker processes can be controlled at runtime with
 the following signals.
 
-=head2 INT, TERM
-
-Stop worker immediately.
-
 =head2 QUIT
 
 Stop worker gracefully.

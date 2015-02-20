@@ -3,6 +3,8 @@
   - Deprecated object-oriented Mojo::Loader API.
   - Added data_file, fine_is_binary, load_class and find_modules functions to
     Mojo::Loader.
+  - Fixed test command to not let Test::Harness enable global warnings by
+    default. (OlegG)
 
 5.80  2015-02-18
   - Deprecated Mojo::IOLoop::accept_interval, Mojo::IOLoop::lock and

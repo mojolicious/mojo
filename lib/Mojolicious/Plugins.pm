@@ -1,6 +1,7 @@
 package Mojolicious::Plugins;
 use Mojo::Base 'Mojo::EventEmitter';
 
+use Mojo::Loader;
 use Mojo::Util 'camelize';
 
 has namespaces => sub { ['Mojolicious::Plugin'] };

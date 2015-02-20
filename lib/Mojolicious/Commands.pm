@@ -2,6 +2,7 @@ package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long 'GetOptionsFromArray';
+use Mojo::Loader;
 use Mojo::Server;
 use Mojo::Util 'tablify';
 

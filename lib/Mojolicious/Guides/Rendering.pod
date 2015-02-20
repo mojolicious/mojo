@@ -667,8 +667,8 @@ A naive translation of the template to Perl code could look like this.
     $output .= '.';
     return Mojo::ByteStream->new($output);
   };
-  $output .= scalar $block->('Sebastian');
-  $output .= scalar $block->('Sara');
+  $output .= xml_escape scalar $block->('Sebastian');
+  $output .= xml_escape scalar $block->('Sara');
   return $output;
 
 While template blocks cannot be shared between templates, they are most

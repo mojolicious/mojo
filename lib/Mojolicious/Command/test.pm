@@ -20,6 +20,7 @@ sub run {
 
   $ENV{HARNESS_OPTIONS} //= 'c';
   require Test::Harness;
+  $Test::Harness::switches = '';
   Test::Harness::runtests(sort @args);
 }
 

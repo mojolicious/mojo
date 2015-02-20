@@ -50,11 +50,11 @@ is $e->lines_after->[1][1], '1;', 'right line';
 like "$e", qr/Exception/, 'right message';
 
 # Search
-my @modules = sort @{find_modules 'Mojo::LoaderTest'};
+my @modules = find_modules 'Mojo::LoaderTest';
 is_deeply \@modules,
   [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)],
   'found the right modules';
-is_deeply [sort @{find_modules "Mojo'LoaderTest"}],
+is_deeply [find_modules "Mojo'LoaderTest"],
   [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
   'found the right modules';
 

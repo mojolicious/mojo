@@ -62,7 +62,7 @@ sub run {
   my %all;
   for my $ns (@{$self->namespaces}) {
     $all{substr $_, length "${ns}::"} //= $_->new->description
-      for grep { _command($_) } @{find_modules $ns};
+      for grep { _command($_) } find_modules $ns;
   }
 
   my @rows = map { [" $_", $all{$_}] } sort keys %all;

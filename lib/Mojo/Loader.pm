@@ -36,7 +36,7 @@ sub find_modules {
     }
   }
 
-  return [keys %modules];
+  return sort keys %modules;
 }
 
 # DEPRECATED in Tiger Face!
@@ -65,7 +65,7 @@ sub new {
 }
 
 # DEPRECATED in Tiger Face!
-sub search { shift; find_modules(@_) }
+sub search { shift; [find_modules(@_)] }
 
 sub _all {
   my $class = shift;
@@ -109,7 +109,7 @@ Mojo::Loader - Loader
   use Mojo::Loader qw(data_section find_modules load_class);
 
   # Find modules in a namespace
-  for my $module (@{find_modules 'Some::Namespace'}) {
+  for my $module (find_modules 'Some::Namespace') {
 
     # Load them safely
     my $e = load_class $module;
@@ -146,7 +146,7 @@ Check if embedded file from the C<DATA> section of a class was Base64 encoded.
 
 =head2 find_modules
 
-  my $modules = find_modules 'MyApp::Namespace';
+  my @modules = find_modules 'MyApp::Namespace';
 
 Search for modules in a namespace non-recursively.
 

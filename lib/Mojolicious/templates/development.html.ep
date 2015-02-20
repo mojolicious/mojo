@@ -49,7 +49,7 @@
       td { padding: 0.5em }
       .box {
         background-color: #fff;
-        border: 1px solid #d1d1d1;
+        border: 1px solid #c1c1c1;
         overflow: hidden;
         padding: 1em;
       }

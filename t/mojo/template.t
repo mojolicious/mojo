@@ -891,7 +891,7 @@ is $output, "23\n", 'right result';
 
 # Appending code
 $mt = Mojo::Template->new;
-$mt->append('$_M = "FOO!"');
+$mt->append('$_O = "FOO!"');
 $output = $mt->render('23');
 is $output, "FOO!", 'appending code';
 

@@ -40,7 +40,7 @@ sub build {
     if ($op eq 'text') {
       $value = join "\n", map { quotemeta $_ } split("\n", $value, -1);
       $value .= '\n' if $newline;
-      $blocks[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
+      $blocks[-1] .= "\$_O .= \"" . $value . "\";" if length $value;
     }
 
     # Code or multiline expression
@@ -48,7 +48,7 @@ sub build {
 
     # Capture end
     elsif ($op eq 'cpen') {
-      $blocks[-1] .= 'return Mojo::ByteStream->new($_M) }';
+      $blocks[-1] .= 'return Mojo::ByteStream->new($_O) }';
 
       # No following code
       $blocks[-1] .= ';' if ($next->[1] // '') =~ /^\s*$/;
@@ -59,11 +59,11 @@ sub build {
 
       # Escaped
       if (!$multi && ($op eq 'escp' && !$escape || $op eq 'expr' && $escape)) {
-        $blocks[-1] .= "\$_M .= _escape scalar $value";
+        $blocks[-1] .= "\$_O .= _escape scalar $value";
       }
 
       # Raw
-      elsif (!$multi) { $blocks[-1] .= "\$_M .= scalar $value" }
+      elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar $value" }
 
       # Multiline
       $multi = !$next || $next->[0] ne 'text';
@@ -75,7 +75,7 @@ sub build {
     # Capture start
     if ($op eq 'cpst') { $capture = 1 }
     elsif ($capture) {
-      $blocks[-1] .= " sub { my \$_M = ''; ";
+      $blocks[-1] .= " sub { my \$_O = ''; ";
       $capture = 0;
     }
   }
@@ -273,8 +273,8 @@ sub _wrap {
   my $num = () = $code =~ /\n/g;
   my $head = $self->_line(1);
   $head .= "\npackage @{[$self->namespace]}; use Mojo::Base -strict;";
-  $code = "$head sub { my \$_M = ''; @{[$self->prepend]}; { $code\n";
-  $code .= $self->_line($num + 1) . "\n@{[$self->append]}; } \$_M };";
+  $code = "$head sub { my \$_O = ''; @{[$self->prepend]}; { $code\n";
+  $code .= $self->_line($num + 1) . "\n@{[$self->append]}; } \$_O };";
 
   warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $code;

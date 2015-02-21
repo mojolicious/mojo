@@ -103,10 +103,20 @@ is $once, 1, 'event was not emitted again';
 $e->emit('one_time');
 is $once, 1, 'event was not emitted again';
 
+# One-time event used directly
+$e = Mojo::EventEmitter->new;
+ok !$e->has_subscribers('foo'), 'no subscribers';
+$once = 0;
+my $cb = $e->once(foo => sub { $once++ });
+ok $e->has_subscribers('foo'), 'has subscribers';
+$cb->();
+is $once, 1, 'event was emitted once';
+ok !$e->has_subscribers('foo'), 'no subscribers';
+
 # Unsubscribe
 $e = Mojo::EventEmitter->new;
 my $counter;
-my $cb = $e->on(foo => sub { $counter++ });
+$cb = $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->unsubscribe(foo => $e->once(foo => sub { $counter++ }));

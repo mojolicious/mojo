@@ -219,7 +219,7 @@ directory.
   my $data = $command->render_data('foo_bar', @args);
 
 Render a template from the C<DATA> section of the command class with
-L<Mojo::Template>.
+L<Mojo::Loader> and L<Mojo::Template>.
 
 =head2 render_to_file
 

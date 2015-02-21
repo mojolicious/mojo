@@ -121,7 +121,29 @@ Mojo::Loader - Loader
 
 =head1 DESCRIPTION
 
-L<Mojo::Loader> is a class loader and plugin framework.
+L<Mojo::Loader> is a class loader and plugin framework. It allows multiple
+files to be stored in the C<DATA> section of a class, which can then be
+accessed individually.
+
+  package Foo;
+
+  1;
+  __DATA__
+
+  @@ test.txt
+  This is the first file.
+
+  @@ test2.html (base64)
+  VGhpcyBpcyB0aGUgc2Vjb25kIGZpbGUu
+
+  @@ test
+  This is the
+  third file.
+
+Each file has a header starting with C<@@>, followed by the file name and
+optional instructions for decoding its content. Currently only the Base64
+encoding is supported, which can be quite convenient for the storage of binary
+data.
 
 =head1 FUNCTIONS
 

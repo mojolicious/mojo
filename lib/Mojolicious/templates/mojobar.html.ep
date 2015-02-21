@@ -6,7 +6,7 @@
       background: -webkit-linear-gradient(top, #2a2a2a 0%, #000 100%);
       background: -moz-linear-gradient(top, #2a2a2a 0%, #000 100%);
       background: linear-gradient(top, #2a2a2a 0%, #000 100%);
-      box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
+      box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
       height: 46px;
       overflow: hidden;
       position: absolute;
@@ -22,7 +22,7 @@
     #mojobar-logo {
       float: left;
       margin-left: 5em;
-      padding-top: 3px;
+      padding-top: 4px;
     }
     #mojobar-links {
       display:table-cell;
@@ -95,7 +95,7 @@
     var start = mojobar.offset().top;
     var fixed;
     var lastScrollTop = start;
-    var hidden = mojobarHeight + 3;
+    var hidden = mojobarHeight + 1;
     $(window).scroll(function () {
       var st = $(window).scrollTop();
       if (fixed) {

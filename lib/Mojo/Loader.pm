@@ -121,9 +121,9 @@ Mojo::Loader - Loader
 
 =head1 DESCRIPTION
 
-L<Mojo::Loader> is a class loader and plugin framework. It allows multiple
-files to be stored in the C<DATA> section of a class, which can then be
-accessed individually.
+L<Mojo::Loader> is a class loader and plugin framework. Aside from finding
+modules and loading classes, it allows multiple files to be stored in the
+C<DATA> section of a class, which can then be accessed individually.
 
   package Foo;
 

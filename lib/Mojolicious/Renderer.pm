@@ -49,8 +49,14 @@ sub accepts {
   return @exts ? undef : shift;
 }
 
-sub add_handler { shift->_add(handlers => @_) }
-sub add_helper  { shift->_add(helpers  => @_) }
+sub add_handler { $_[0]->handlers->{$_[1]} = $_[2] and return $_[0] }
+
+sub add_helper {
+  my ($self, $name, $cb) = @_;
+  $self->helpers->{$name} = $cb;
+  delete $self->{proxy};
+  return $self;
+}
 
 sub get_data_template {
   my ($self, $options) = @_;
@@ -202,13 +208,6 @@ sub template_path {
   }
 
   return undef;
-}
-
-sub _add {
-  my ($self, $attr, $name, $cb) = @_;
-  $self->$attr->{$name} = $cb;
-  delete $self->{proxy};
-  return $self;
 }
 
 sub _bundled { $TEMPLATES{"@{[pop]}.html.ep"} }

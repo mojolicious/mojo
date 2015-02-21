@@ -16,11 +16,7 @@ use Mojo::Util qw(encode url_escape);
 has generators => sub { {form => \&_form, json => \&_json} };
 has name => 'Mojolicious (Perl)';
 
-sub add_generator {
-  my ($self, $name, $cb) = @_;
-  $self->generators->{$name} = $cb;
-  return $self;
-}
+sub add_generator { $_[0]->generators->{$_[1]} = $_[2] and return $_[0] }
 
 sub endpoint {
   my ($self, $tx) = @_;

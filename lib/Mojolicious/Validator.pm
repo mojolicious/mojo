@@ -7,11 +7,7 @@ has checks => sub {
   {equal_to => \&_equal_to, in => \&_in, like => \&_like, size => \&_size};
 };
 
-sub add_check {
-  my ($self, $name, $cb) = @_;
-  $self->checks->{$name} = $cb;
-  return $self;
-}
+sub add_check { $_[0]->checks->{$_[1]} = $_[2] and return $_[0] }
 
 sub validation {
   Mojolicious::Validator::Validation->new(validator => shift);

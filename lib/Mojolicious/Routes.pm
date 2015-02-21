@@ -14,8 +14,8 @@ has [qw(conditions shortcuts)] => sub { {} };
 has hidden     => sub { [qw(attr has new tap)] };
 has namespaces => sub { [] };
 
-sub add_condition { shift->_add(conditions => @_) }
-sub add_shortcut  { shift->_add(shortcuts  => @_) }
+sub add_condition { $_[0]->conditions->{$_[1]} = $_[2] and return $_[0] }
+sub add_shortcut  { $_[0]->shortcuts->{$_[1]}  = $_[2] and return $_[0] }
 
 sub auto_render {
   my ($self, $c) = @_;
@@ -102,12 +102,6 @@ sub route {
 }
 
 sub _action { shift->plugins->emit_chain(around_action => @_) }
-
-sub _add {
-  my ($self, $attr, $name, $cb) = @_;
-  $self->$attr->{$name} = $cb;
-  return $self;
-}
 
 sub _callback {
   my ($self, $c, $cb, $last) = @_;

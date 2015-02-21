@@ -22,7 +22,7 @@ sub emit {
   return $self;
 }
 
-sub has_subscribers { !!@{shift->{events}{shift()} || []} }
+sub has_subscribers { !!shift->{events}{shift()} }
 
 sub on {
   my ($self, $name, $cb) = @_;

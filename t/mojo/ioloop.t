@@ -265,7 +265,7 @@ $loop->on(finish => sub { $finish++ });
 $loop->stop_gracefully;
 $loop->remove(
   $loop->client({port => Mojo::IOLoop::Server->generate_port} => sub { }));
-$loop->timer(3 => sub { shift->stop; $err = 'failed' });
+$loop->timer(5 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $finish, 1, 'finish event has been emitted once';
@@ -276,7 +276,7 @@ $loop = Mojo::IOLoop->new->max_accepts(1);
 $id   = $loop->server({address => '127.0.0.1'} => sub { shift; shift->close });
 $port = $loop->acceptor($id)->port;
 $loop->client({port => $port} => sub { });
-$loop->timer(3 => sub { shift->stop; $err = 'failed' });
+$loop->timer(5 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $loop->max_accepts, 1, 'right value';

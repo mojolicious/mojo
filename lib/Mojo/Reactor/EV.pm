@@ -34,36 +34,32 @@ sub watch {
   $mode |= EV::WRITE if $write;
 
   my $fd = fileno $handle;
-  my $io = $self->{io}{$fd};
-  if ($mode == 0) { delete $io->{watcher} }
-  elsif (my $w = $io->{watcher}) { $w->events($mode) }
+  if ($mode == 0) { delete $self->{io}{$fd}{watcher} }
+  elsif (my $w = $self->{io}{$fd}{watcher}) { $w->events($mode) }
   else {
-    $io->{watcher} = EV::io($fd, $mode, sub { $self->_io($fd, @_) });
+    my $cb = sub {
+      my ($w, $revents) = @_;
+      $self->_sandbox('Read', $self->{io}{$fd}{cb}, 0) if EV::READ & $revents;
+      $self->_sandbox('Write', $self->{io}{$fd}{cb}, 1)
+        if EV::WRITE & $revents && $self->{io}{$fd};
+    };
+    $self->{io}{$fd}{watcher} = EV::io($fd, $mode, $cb);
   }
 
   return $self;
-}
-
-sub _io {
-  my ($self, $fd, $w, $revents) = @_;
-  my $io = $self->{io}{$fd};
-  $self->_sandbox('Read', $io->{cb}, 0) if EV::READ & $revents;
-  $self->_sandbox('Write', $io->{cb}, 1)
-    if EV::WRITE & $revents && $self->{io}{$fd};
 }
 
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
   $after ||= 0.0001 if $recurring;
 
-  my $id = $self->_id;
+  my $id      = $self->_id;
+  my $wrapper = sub {
+    delete $self->{timers}{$id} unless $recurring;
+    $self->_sandbox("Timer $id", $cb);
+  };
   EV::now_update() if $after > 0;
-  $self->{timers}{$id}{watcher} = EV::timer(
-    $after => $after => sub {
-      delete $self->{timers}{$id} unless $recurring;
-      $self->_sandbox("Timer $id", $cb);
-    }
-  );
+  $self->{timers}{$id}{watcher} = EV::timer($after, $after, $wrapper);
 
   return $id;
 }

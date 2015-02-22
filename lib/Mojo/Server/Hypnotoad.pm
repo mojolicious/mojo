@@ -261,9 +261,10 @@ L<Mojo::Server::Daemon/"backlog">.
 
   clients => 100
 
-Maximum number of concurrent client connections per worker process, defaults
-to the value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency
-works best with applications that perform mostly non-blocking operations, to
+Maximum number of concurrent connections each worker process is allowed to
+handle before stopping to accept new incoming connections, defaults to the
+value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency works
+best with applications that perform mostly non-blocking operations, to
 optimize for blocking operations you can decrease this value and increase
 L</"workers"> instead for better performance.
 
@@ -364,9 +365,9 @@ Number of worker processes, defaults to the value of
 L<Mojo::Server::Prefork/"workers">. A good rule of thumb is two worker
 processes per CPU core for applications that perform mostly non-blocking
 operations, blocking operations often require more and benefit from decreasing
-the number of concurrent L</"clients"> (often as low as C<1>). Note that
-during zero downtime software upgrades there will be twice as many workers
-active for a short amount of time.
+concurrency with L</"clients"> (often as low as C<1>). Note that during zero
+downtime software upgrades there will be twice as many workers active for a
+short amount of time.
 
 =head1 ATTRIBUTES
 

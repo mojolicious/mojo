@@ -178,15 +178,38 @@ like $log,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
-# Foo::fun
+# Foo::fun (with a lot of different tests)
 my $url = $t->ua->server->url;
 $url->path('/fun/time');
 $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)
-  ->status_is(200)->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
-  ->header_unlike('X-Bender' => qr/shiny metal/)
-  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_unlike(Server => qr/Bender/)->content_isnt('Have')
-  ->content_is('Have fun!');
+  ->status_is(200)->status_is(200, 'with description')->status_isnt(500)
+  ->status_isnt(500, 'with description')->header_is('X-Bender' => undef)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is(Server => 'Mojolicious (Perl)', 'with description')
+  ->header_isnt(Server => 'Whatever')
+  ->header_isnt(Server => 'Whatever', 'with description')
+  ->header_like(Server => qr/Mojolicious/)
+  ->header_like(Server => qr/Mojolicious/, 'with description')
+  ->header_unlike(Server => qr/Bender/)
+  ->header_unlike(Server => qr/Bender/, 'with description')
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_type_is('text/html;charset=UTF-8', 'with description')
+  ->content_type_isnt('text/plain')
+  ->content_type_isnt('text/plain', 'with description')
+  ->content_type_like(qr/html/)
+  ->content_type_like(qr/html/, 'with description')
+  ->content_type_unlike(qr/plain/)
+  ->content_type_unlike(qr/plain/, 'with description')->content_isnt('Have')
+  ->content_isnt('Have', 'with description')->content_is('<p>Have fun!</p>')
+  ->content_is('<p>Have fun!</p>', 'with description')->content_like(qr/fun/)
+  ->content_like(qr/fun/, 'with description')->content_unlike(qr/boring/)
+  ->content_unlike(qr/boring/, 'with description')->element_exists('p')
+  ->element_exists('p', 'with description')->element_exists_not('b')
+  ->element_exists_not('b', 'with description')->text_is('p', 'Have fun!')
+  ->text_is('p', 'Have fun!', 'with description')->text_isnt('p', 'Have')
+  ->text_isnt('p', 'Have', 'with description')->text_like('p', qr/fun/)
+  ->text_like('p', qr/fun/, 'with description')->text_unlike('p', qr/boring/)
+  ->text_unlike('p', qr/boring/, 'with description');
 
 # Foo::baz (missing action without template)
 $log = '';
@@ -256,7 +279,7 @@ $t->get_ok('/exceptional_too/this_one_does_not_exist' => {'X-DoNotDie' => 1})
 # Foo::fun
 $t->get_ok('/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('Have fun!');
+  ->content_is('<p>Have fun!</p>');
 
 # Foo::fun
 $url = $t->ua->server->url;
@@ -265,7 +288,7 @@ $cb  = $t->app->log->on(message => sub { $log .= pop });
 $url->path('/fun/time');
 $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('Have fun!');
+  ->content_is('<p>Have fun!</p>');
 like $log, qr!Rendering cached template "foo/fun\.html\.ep" from DATA section!,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
@@ -273,7 +296,7 @@ $t->app->log->unsubscribe(message => $cb);
 # Foo::fun
 $t->get_ok('/happy/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('Have fun!');
+  ->content_is('<p>Have fun!</p>');
 
 # Foo::test
 $t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)
@@ -542,7 +565,7 @@ $log = '';
 $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended')->status_is(200)
   ->header_is(Server        => 'Mojolicious (Perl)')
-  ->header_is('X-Suspended' => '0, 1, 1, 2')->content_is('Have fun!');
+  ->header_is('X-Suspended' => '0, 1, 1, 2')->content_is('<p>Have fun!</p>');
 like $log, qr!GET "/suspended"!, 'right message';
 like $log,
   qr/Routing to controller "MojoliciousTest::Foo" and action "suspended"/,

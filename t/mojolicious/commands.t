@@ -270,15 +270,8 @@ $buffer = '';
   $get->run('/');
 }
 like $buffer, qr/Your Mojo is working!/, 'right output';
-$get->app->hook(
-  before_dispatch => sub {
-    my $c = shift;
-    return $c->render(text => '<p>works</p>')
-      if $c->req->url->path->contains('/html');
-    $c->render(json => {works => 'too'})
-      if $c->req->url->path->contains('/json');
-  }
-);
+$get->app->plugins->once(
+  before_dispatch => sub { shift->render(text => '<p>works</p>') });
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
@@ -286,6 +279,8 @@ $buffer = '';
   $get->run('/html', 'p', 'text');
 }
 like $buffer, qr/works/, 'right output';
+$get->app->plugins->once(
+  before_dispatch => sub { shift->render(json => {works => 'too'}) });
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
@@ -345,5 +340,21 @@ require Mojolicious::Command::version;
 my $version = Mojolicious::Command::version->new;
 ok $version->description, 'has a description';
 like $version->usage, qr/version/, 'has usage information';
+$version->app->ua->unsubscribe('start')->once(
+  start => sub {
+    my ($ua, $tx) = @_;
+    $tx->req->proxy(0)->url($ua->server->url->path('/'));
+  }
+);
+$version->app->plugins->once(
+  before_dispatch => sub { shift->render(json => {version => 1000}) });
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $version->run;
+}
+like $buffer, qr/You might want to update your Mojolicious to 1000!/,
+  'right output';
 
 done_testing();

@@ -100,7 +100,7 @@ sub withlayout { shift->stash(template => 'WithGreenLayout') }
 __DATA__
 
 @@ foo/fun.html.ep
-Have fun!\
+<p>Have fun!</p>\
 
 @@ just/some/template.html.epl
 Development template with high precedence.

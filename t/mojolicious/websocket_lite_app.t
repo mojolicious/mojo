@@ -105,8 +105,8 @@ post {data => 'plain nested too!'};
 my $t = Test::Mojo->new;
 
 # Simple roundtrip
-$t->websocket_ok('/echo')->send_ok('hello')->message_ok('got a message')
-  ->message_is('echo: hello')->finish_ok;
+$t->websocket_ok('/echo')->send_ok('hello')
+  ->message_ok->message_is('echo: hello')->finish_ok;
 
 # Multiple roundtrips
 $t->websocket_ok('/echo')->send_ok('hello again')
@@ -203,23 +203,28 @@ $t->websocket_ok(
   ->send_ok({binary => $huge})->message_ok->message_is({binary => $huge})
   ->finish_ok;
 
-# JSON roundtrips
+# JSON roundtrips (with a lot of different tests)
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})
   ->message_ok->json_message_is('' => {test => 24, snowman => '☃'})
   ->json_message_is('' => {test => 24, snowman => '☃'})
   ->json_message_has('/test')->json_message_hasnt('/test/2')
-  ->send_ok({binary => encode_json([1, 2, 3])})
-  ->message_ok->json_message_is([1, 2, 3, 4])->json_message_is([1, 2, 3, 4])
-  ->send_ok({binary => encode_json([1, 2, 3])})
-  ->message_ok->json_message_has('/2', 'has two elements')
-  ->json_message_is('/2' => 3, 'right value')
-  ->json_message_hasnt('/5', 'not five elements')
+  ->send_ok({binary => encode_json([1, 2, 3])}, 'with description')
+  ->message_ok('with description')->message_is('[1,2,3,4]')
+  ->message_is('[1,2,3,4]', 'with description')->message_isnt('[1,2,3]')
+  ->message_isnt('[1,2,3]', 'with description')->message_like(qr/3/)
+  ->message_like(qr/3/, 'with description')->message_unlike(qr/5/)
+  ->message_unlike(qr/5/, 'with description')->json_message_is([1, 2, 3, 4])
+  ->json_message_is([1, 2, 3, 4])->send_ok({binary => encode_json([1, 2, 3])})
+  ->message_ok->json_message_has('/2')
+  ->json_message_has('/2', 'with description')->json_message_hasnt('/5')
+  ->json_message_hasnt('/5', 'with description')->json_message_is('/2' => 3)
+  ->json_message_is('/2' => 3, 'with description')
   ->send_ok({json => {'☃' => [1, 2, 3]}})
   ->message_ok->json_message_is('/☃', [1, 2, 3])
   ->json_message_like('/☃/1' => qr/\d/)
+  ->json_message_like('/☃/2' => qr/3/, 'with description')
   ->json_message_unlike('/☃/1' => qr/[a-z]/)
-  ->json_message_like('/☃/2' => qr/3/, 'right value')
-  ->json_message_unlike('/☃/2' => qr/2/, 'different value')
+  ->json_message_unlike('/☃/2' => qr/2/, 'with description')
   ->send_ok({json => 'works'})->message_ok->json_message_is('works')
   ->send_ok({json => undef})->message_ok->json_message_is(undef)->finish_ok;
 

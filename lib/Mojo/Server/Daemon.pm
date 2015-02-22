@@ -415,7 +415,8 @@ TLS verification mode, defaults to C<0x03>.
   my $max = $daemon->max_clients;
   $daemon = $daemon->max_clients(1000);
 
-Maximum number of concurrent client connections, passed along to
+Maximum number of concurrent connections this server is allowed to handle
+before stopping to accept new incoming connections, passed along to
 L<Mojo::IOLoop/"max_connections">.
 
 =head2 max_requests

@@ -2,7 +2,6 @@ package Mojolicious::Command::version;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::IOLoop::Client;
-use Mojo::UserAgent;
 use Mojolicious;
 
 has description => 'Show versions of available modules';
@@ -32,7 +31,7 @@ EOF
 
   # Check latest version on CPAN
   my $latest = eval {
-    Mojo::UserAgent->new(max_redirects => 10)->tap(sub { $_->proxy->detect })
+    $self->app->ua->max_redirects(10)->tap(sub { $_->proxy->detect })
       ->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
   } or return;
 

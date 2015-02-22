@@ -23,10 +23,8 @@ sub configure {
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
   # DEPRECATED in Tiger Face!
-  deprecated
-    'The keep_alive_requests setting is DEPRECATED in favor of requests'
-    and $c->{requests} = $c->{keep_alive_requests}
-    if $c->{keep_alive_requests};
+  deprecated 'keep_alive_requests setting is DEPRECATED in favor of requests'
+    if !$c->{requests} && ($c->{requests} ||= $c->{keep_alive_requests});
 
   # Prefork settings
   $prefork->reverse_proxy($c->{proxy})   if defined $c->{proxy};

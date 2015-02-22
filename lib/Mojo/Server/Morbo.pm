@@ -135,6 +135,15 @@ C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
+=head1 SIGNALS
+
+The L<Mojo::Server::Morbo> process can be controlled at runtime with the
+following signals.
+
+=head2 INT, QUIT, TERM
+
+Shut down server immediately.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Server::Morbo> implements the following attributes.

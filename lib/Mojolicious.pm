@@ -619,6 +619,8 @@ requests indiscriminately, for a full list of available hooks see L</"HOOKS">.
 =head2 new
 
   my $app = Mojolicious->new;
+  my $app = Mojolicious->new(moniker => 'foo_bar');
+  my $app = Mojolicious->new({moniker => 'foo_bar'});
 
 Construct a new L<Mojolicious> application and call L</"startup">. Will
 automatically detect your home directory and set up logging based on your

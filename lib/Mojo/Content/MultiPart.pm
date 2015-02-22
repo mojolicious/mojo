@@ -291,6 +291,10 @@ True.
 =head2 new
 
   my $multi = Mojo::Content::MultiPart->new;
+  my $multi
+    = Mojo::Content::MultiPart->new(parts => [Mojo::Content::Single->new]);
+  my $multi
+    = Mojo::Content::MultiPart->new({parts => [Mojo::Content::Single->new]});
 
 Construct a new L<Mojo::Content::MultiPart> object and subscribe to L</"read">
 event with default content parser.

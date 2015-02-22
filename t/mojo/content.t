@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 
@@ -11,12 +12,22 @@ ok !$content->body_contains('a'), 'content does not contain "a"';
 ok $content->body_contains('f'),   'content contains "f"';
 ok $content->body_contains('o'),   'content contains "o"';
 ok $content->body_contains('foo'), 'content contains "foo"';
+$content = Mojo::Content::Single->new(
+  asset => Mojo::Asset::Memory->new->add_chunk('bar'));
+ok !$content->body_contains('foo'), 'content does not contain "foo"';
+ok $content->body_contains('bar'), 'content contains "bar"';
+$content = Mojo::Content::Single->new(
+  {asset => Mojo::Asset::Memory->new->add_chunk('foo')});
+ok !$content->body_contains('bar'), 'content does not contain "bar"';
+ok $content->body_contains('foo'), 'content contains "foo"';
 
 # Multipart
 $content = Mojo::Content::MultiPart->new(parts => [$content]);
 ok !$content->body_contains('a'), 'content does not contain "a"';
 ok $content->body_contains('f'),   'content contains "f"';
 ok $content->body_contains('o'),   'content contains "o"';
+ok $content->body_contains('foo'), 'content contains "foo"';
+$content = Mojo::Content::MultiPart->new({parts => [$content]});
 ok $content->body_contains('foo'), 'content contains "foo"';
 push @{$content->parts}, Mojo::Content::Single->new;
 $content->parts->[1]->asset->add_chunk('.*?foo+');

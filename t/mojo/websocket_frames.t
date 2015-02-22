@@ -220,7 +220,7 @@ isnt(Mojo::Transaction::WebSocket->new->build_frame(1, 0, 0, 0, 2, ''),
   $bytes, 'frames are not equal');
 
 # Compressed binary message roundtrip
-$ws = Mojo::Transaction::WebSocket->new(compressed => 1);
+$ws = Mojo::Transaction::WebSocket->new({compressed => 1});
 $bytes = $ws->build_message({binary => 'just works'});
 $frame = $ws->parse_frame(\($dummy = $bytes));
 is $frame->[0], 1, 'fin flag is set';

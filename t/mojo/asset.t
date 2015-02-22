@@ -39,10 +39,16 @@ is $mem->mtime($mtime + 23)->mtime, $mtime + 23, 'right mtime';
 
 # Empty file asset
 $file = Mojo::Asset::File->new;
+is $file->size, 0, 'asset is empty';
+is $file->get_chunk(0), '', 'no content';
+is $file->slurp, '', 'no content';
 is $file->contains('a'), -1, 'does not contain "a"';
 
 # Empty memory asset
 $mem = Mojo::Asset::Memory->new;
+is $mem->size, 0, 'asset is empty';
+is $mem->get_chunk(0), '', 'no content';
+is $mem->slurp, '', 'no content';
 ok !$mem->is_range, 'no range';
 is $mem->contains('a'), -1, 'does not contain "a"';
 

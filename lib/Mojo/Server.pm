@@ -211,6 +211,8 @@ Load application from script.
 =head2 new
 
   my $server = Mojo::Server->new;
+  my $server = Mojo::Server->new(reverse_proxy => 1);
+  my $server = Mojo::Server->new({reverse_proxy => 1});
 
 Construct a new L<Mojo::Server> object and subscribe to L</"request"> event
 with default request handling.

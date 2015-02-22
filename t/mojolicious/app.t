@@ -439,6 +439,8 @@ my $app = Mojolicious->new;
 is $app->log->level, 'debug', 'right log level';
 
 # Make sure we can override attributes with constructor arguments
+$app = MojoliciousTest->new(mode => 'test');
+is $app->mode, 'test', 'right mode';
 $app = MojoliciousTest->new({mode => 'test'});
 is $app->mode, 'test', 'right mode';
 

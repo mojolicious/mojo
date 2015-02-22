@@ -8,10 +8,7 @@ has [qw(frames line lines_before lines_after)] => sub { [] };
 has message => 'Exception!';
 has 'verbose';
 
-sub new {
-  my $self = shift->SUPER::new;
-  return @_ ? $self->_detect(@_) : $self;
-}
+sub new { @_ > 1 ? shift->SUPER::new->_detect(@_) : shift->SUPER::new }
 
 sub throw { die shift->new->trace(2)->_detect(@_) }
 
@@ -174,6 +171,7 @@ following new ones.
 
 =head2 new
 
+  my $e = Mojo::Exception->new;
   my $e = Mojo::Exception->new('Oops!');
   my $e = Mojo::Exception->new('Oops!', $files);
 

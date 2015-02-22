@@ -146,6 +146,8 @@ Get a chunk of content starting from a specific position.
 =head2 new
 
   my $single = Mojo::Content::Single->new;
+  my $single = Mojo::Content::Single->new(asset => Mojo::Asset::File->new);
+  my $single = Mojo::Content::Single->new({asset => Mojo::Asset::File->new});
 
 Construct a new L<Mojo::Content::Single> object and subscribe to L</"read">
 event with default content parser.

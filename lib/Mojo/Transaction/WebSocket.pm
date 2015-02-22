@@ -604,6 +604,8 @@ Local interface port.
 =head2 new
 
   my $ws = Mojo::Transaction::WebSocket->new;
+  my $ws = Mojo::Transaction::WebSocket->new(compressed => 1);
+  my $ws = Mojo::Transaction::WebSocket->new({compressed => 1});
 
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
 L</"frame"> event with default message parser, which also handles C<PING> and

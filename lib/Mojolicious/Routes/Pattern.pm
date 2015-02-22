@@ -352,6 +352,7 @@ disabled by default.
 
 =head2 new
 
+  my $pattern = Mojolicious::Routes::Pattern->new;
   my $pattern = Mojolicious::Routes::Pattern->new('/:action');
   my $pattern
     = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);

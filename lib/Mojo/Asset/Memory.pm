@@ -26,7 +26,7 @@ sub contains {
   my ($self, $str) = @_;
 
   my $start = $self->start_range;
-  my $pos = index $self->{content}, $str, $start;
+  my $pos = index $self->{content} // '', $str, $start;
   $pos -= $start if $start && $pos >= 0;
   my $end = $self->end_range;
 
@@ -42,7 +42,7 @@ sub get_chunk {
     $max = $end + 1 - $offset if ($offset + $max) > $end;
   }
 
-  return substr shift->{content}, $offset, $max;
+  return substr shift->{content} // '', $offset, $max;
 }
 
 sub move_to {
@@ -51,11 +51,9 @@ sub move_to {
   return $self;
 }
 
-sub new { shift->SUPER::new(@_, content => '') }
+sub size { length(shift->{content} // '') }
 
-sub size { length shift->{content} }
-
-sub slurp { shift->{content} }
+sub slurp { shift->{content} // '' }
 
 1;
 
@@ -156,12 +154,6 @@ chunk size of C<131072> bytes (128KB).
   $mem = $mem->move_to('/home/sri/foo.txt');
 
 Move asset data into a specific file.
-
-=head2 new
-
-  my $mem = Mojo::Asset::Memory->new;
-
-Construct a new L<Mojo::Asset::Memory> object.
 
 =head2 size
 

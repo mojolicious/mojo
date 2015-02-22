@@ -583,7 +583,7 @@ Characters indicating the end of a tag, defaults to C<%E<gt>>.
 =head2 template
 
   my $template = $mt->template;
-  $mt          = $mt->template($template);
+  $mt          = $mt->template('<%= 1 + 1 %>');
 
 Raw unparsed template.
 
@@ -635,14 +635,14 @@ Interpret L</"compiled"> template code.
 
 =head2 parse
 
-  $mt = $mt->parse($template);
+  $mt = $mt->parse('<%= 1 + 1 %>');
 
 Parse template into L</"tree">.
 
 =head2 render
 
-  my $output = $mt->render($template);
-  my $output = $mt->render($template, @args);
+  my $output = $mt->render('<%= 1 + 1 %>');
+  my $output = $mt->render('<%= shift() + shift() %>', @args);
 
 Render template.
 

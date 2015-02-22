@@ -18,11 +18,7 @@ sub close {
   $self->emit('close');
 }
 
-sub close_gracefully {
-  my $self = shift;
-  return $self->{graceful} = 1 if $self->is_writing;
-  $self->close;
-}
+sub close_gracefully { $_[0]->is_writing ? $_[0]{graceful}++ : $_[0]->close }
 
 sub handle { shift->{handle} }
 

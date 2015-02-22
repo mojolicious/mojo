@@ -125,6 +125,37 @@ $buffer = '';
 like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
   'right output';
 
+# get
+require Mojolicious::Command::get;
+my $get = Mojolicious::Command::get->new;
+ok $get->description, 'has a description';
+like $get->usage, qr/get/, 'has usage information';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $get->run('/');
+}
+like $buffer, qr/Your Mojo is working!/, 'right output';
+$get->app->plugins->once(
+  before_dispatch => sub { shift->render(text => '<p>works</p>') });
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $get->run('/html', 'p', 'text');
+}
+like $buffer, qr/works/, 'right output';
+$get->app->plugins->once(
+  before_dispatch => sub { shift->render(json => {works => 'too'}) });
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $get->run('/json', '/works');
+}
+like $buffer, qr/too/, 'right output';
+
 # cgi
 require Mojolicious::Command::cgi;
 my $cgi = Mojolicious::Command::cgi->new;
@@ -136,6 +167,21 @@ require Mojolicious::Command::cpanify;
 my $cpanify = Mojolicious::Command::cpanify->new;
 ok $cpanify->description, 'has a description';
 like $cpanify->usage, qr/cpanify/, 'has usage information';
+$cpanify->app->ua->unsubscribe('start')->once(
+  start => sub {
+    my ($ua, $tx) = @_;
+    $tx->req->proxy(0)->url($ua->server->url->path('/'));
+  }
+);
+$cpanify->app->plugins->once(
+  before_dispatch => sub { shift->render(data => '', status => 200) });
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $cpanify->run('-u', 'sri', '-p', 's3cret', __FILE__);
+}
+like $buffer, qr/Upload successful!/, 'right output';
 
 # daemon
 require Mojolicious::Command::daemon;
@@ -258,37 +304,6 @@ ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/Makefile.PL'),
   'Makefile.PL exists';
 chdir $cwd;
 
-# get
-require Mojolicious::Command::get;
-my $get = Mojolicious::Command::get->new;
-ok $get->description, 'has a description';
-like $get->usage, qr/get/, 'has usage information';
-$buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDOUT = $handle;
-  $get->run('/');
-}
-like $buffer, qr/Your Mojo is working!/, 'right output';
-$get->app->plugins->once(
-  before_dispatch => sub { shift->render(text => '<p>works</p>') });
-$buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDOUT = $handle;
-  $get->run('/html', 'p', 'text');
-}
-like $buffer, qr/works/, 'right output';
-$get->app->plugins->once(
-  before_dispatch => sub { shift->render(json => {works => 'too'}) });
-$buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDOUT = $handle;
-  $get->run('/json', '/works');
-}
-like $buffer, qr/too/, 'right output';
-
 # inflate
 require Mojolicious::Command::inflate;
 my $inflate = Mojolicious::Command::inflate->new;
@@ -340,7 +355,7 @@ require Mojolicious::Command::version;
 my $version = Mojolicious::Command::version->new;
 ok $version->description, 'has a description';
 like $version->usage, qr/version/, 'has usage information';
-$version->app->ua->unsubscribe('start')->once(
+$version->app->ua->once(
   start => sub {
     my ($ua, $tx) = @_;
     $tx->req->proxy(0)->url($ua->server->url->path('/'));
@@ -354,6 +369,7 @@ $buffer = '';
   local *STDOUT = $handle;
   $version->run;
 }
+like $buffer, qr/Perl/, 'right output';
 like $buffer, qr/You might want to update your Mojolicious to 1000!/,
   'right output';
 

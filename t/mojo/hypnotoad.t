@@ -20,22 +20,22 @@ use Mojo::Util qw(slurp spurt);
 {
   my $hypnotoad = Mojo::Server::Hypnotoad->new;
   $hypnotoad->prefork->app->config->{myserver} = {
-    accepts             => 13,
-    backlog             => 43,
-    clients             => 1,
-    graceful_timeout    => 23,
-    group               => 'testers',
-    heartbeat_interval  => 7,
-    heartbeat_timeout   => 9,
-    keep_alive_requests => 3,
-    inactivity_timeout  => 5,
-    listen              => ['http://*:8081'],
-    multi_accept        => 16,
-    pid_file            => '/foo/bar.pid',
-    proxy               => 1,
-    upgrade_timeout     => 45,
-    user                => 'tester',
-    workers             => 7
+    accepts            => 13,
+    backlog            => 43,
+    clients            => 1,
+    graceful_timeout   => 23,
+    group              => 'testers',
+    heartbeat_interval => 7,
+    heartbeat_timeout  => 9,
+    inactivity_timeout => 5,
+    listen             => ['http://*:8081'],
+    multi_accept       => 16,
+    pid_file           => '/foo/bar.pid',
+    proxy              => 1,
+    requests           => 3,
+    upgrade_timeout    => 45,
+    user               => 'tester',
+    workers            => 7
   };
   is $hypnotoad->upgrade_timeout, 60, 'right default';
   $hypnotoad->configure('test');

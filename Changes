@@ -1,5 +1,7 @@
 
 5.82  2015-02-22
+  - Deprecated keep_alive_requests setting in Hypnotoad in favor of requests.
+  - Improved Morbo to restart slightly faster.
 
 5.81  2015-02-20
   - Deprecated object-oriented Mojo::Loader API.

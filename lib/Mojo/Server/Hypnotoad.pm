@@ -7,7 +7,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
-use Mojo::Util 'steady_time';
+use Mojo::Util qw(deprecated steady_time);
 use Scalar::Util 'weaken';
 
 has prefork => sub { Mojo::Server::Prefork->new };
@@ -22,11 +22,16 @@ sub configure {
   $c->{listen} ||= ['http://*:8080'];
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
-  # Prefork settings
-  $prefork->reverse_proxy($c->{proxy}) if defined $c->{proxy};
-  $prefork->max_clients($c->{clients}) if $c->{clients};
-  $prefork->max_requests($c->{keep_alive_requests})
+  # DEPRECATED in Tiger Face!
+  deprecated
+    'The keep_alive_requests setting is DEPRECATED in favor of requests'
+    and $c->{requests} = $c->{keep_alive_requests}
     if $c->{keep_alive_requests};
+
+  # Prefork settings
+  $prefork->reverse_proxy($c->{proxy})   if defined $c->{proxy};
+  $prefork->max_clients($c->{clients})   if $c->{clients};
+  $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout group heartbeat_interval),
     qw(heartbeat_timeout inactivity_timeout listen multi_accept pid_file),
@@ -302,13 +307,6 @@ Maximum amount of time in seconds a connection can be inactive before getting
 closed, defaults to the value of L<Mojo::Server::Daemon/"inactivity_timeout">.
 Setting the value to C<0> will allow connections to be inactive indefinitely.
 
-=head2 keep_alive_requests
-
-  keep_alive_requests => 50
-
-Number of keep-alive requests per connection, defaults to the value of
-L<Mojo::Server::Daemon/"max_requests">.
-
 =head2 listen
 
   listen => ['http://*:80']
@@ -338,6 +336,13 @@ the server has been stopped.
 Activate reverse proxy support, which allows for the C<X-Forwarded-For> and
 C<X-Forwarded-Proto> headers to be picked up automatically, defaults to the
 value of L<Mojo::Server/"reverse_proxy">.
+
+=head2 requests
+
+  requests => 50
+
+Number of keep-alive requests per connection, defaults to the value of
+L<Mojo::Server::Daemon/"max_requests">.
 
 =head2 upgrade_timeout
 

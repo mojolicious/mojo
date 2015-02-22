@@ -40,7 +40,7 @@ sub run {
   $self->{modified} = 1;
 
   # Prepare and cache listen sockets for smooth restarting
-  my $daemon = Mojo::Server::Daemon->new(silent => 1)->start->stop;
+  $self->{daemon} = Mojo::Server::Daemon->new->start->stop;
 
   $self->_manage while !$self->{finished} || $self->{worker};
   exit 0;
@@ -82,18 +82,15 @@ sub _spawn {
 
   # Manager
   my $manager = $$;
-  $ENV{MORBO_REV}++;
   die "Can't fork: $!" unless defined(my $pid = $self->{worker} = fork);
   return if $pid;
 
   # Worker
   $SIG{CHLD} = 'DEFAULT';
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{finished} = 1 };
-  my $daemon = Mojo::Server::Daemon->new;
+  my $daemon = $self->{daemon};
   $daemon->load_app($self->watch->[0]);
-  $daemon->silent(1) if $ENV{MORBO_REV} > 1;
-  $daemon->start;
-  my $loop = $daemon->ioloop;
+  my $loop = $daemon->start->ioloop;
   $loop->recurring(
     1 => sub { shift->stop if !kill(0, $manager) || $self->{finished} });
   $loop->start;

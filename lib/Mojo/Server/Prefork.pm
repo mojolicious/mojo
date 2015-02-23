@@ -2,7 +2,7 @@ package Mojo::Server::Prefork;
 use Mojo::Base 'Mojo::Server::Daemon';
 
 use File::Spec::Functions qw(catfile tmpdir);
-use Mojo::Util qw(deprecated steady_time);
+use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 
@@ -22,12 +22,6 @@ sub DESTROY {
 
   # Manager
   if (my $file = $self->pid_file) { unlink $file if -w $file }
-}
-
-# DEPRECATED in Tiger Face!
-sub accept_interval {
-  deprecated 'Mojo::Server::Prefork::accept_interval is DEPRECATED';
-  @_ > 1 ? shift : undef;
 }
 
 sub check_pid {
@@ -60,18 +54,6 @@ sub ensure_pid_file {
 
 sub healthy {
   scalar grep { $_->{healthy} } values %{shift->{pool}};
-}
-
-# DEPRECATED in Tiger Face!
-sub lock_file {
-  deprecated 'Mojo::Server::Prefork::lock_file is DEPRECATED';
-  @_ > 1 ? shift : undef;
-}
-
-# DEPRECATED in Tiger Face!
-sub lock_timeout {
-  deprecated 'Mojo::Server::Prefork::lock_timeout is DEPRECATED';
-  @_ > 1 ? shift : undef;
 }
 
 sub run {

@@ -1,5 +1,17 @@
 
-5.83  2015-02-23
+6.0  2015-02-24
+  - Code name "Clinking Beer Mugs", this is a major release.
+  - Removed deprecated object-oriented Mojo::Loader API.
+  - Removed deprecated accept_interval, lock and unlock attributes from
+    Mojo::IOLoop.
+  - Removed deprecated accept_interval, lock_file and lock_timeout attributes
+    from Mojo::Server::Prefork.
+  - Removed deprecated bridge method from Mojolicious::Routes::Route.
+  - Removed deprecated is_readable method from Mojo::Reactor.
+  - Removed deprecated siblings method from Mojo::DOM.
+  - Removed deprecated render_exception and render_not_found methods from
+    Mojolicious::Controller.
+  - Removed deprecated keep_alive_requests setting from Hypnotoad.
 
 5.82  2015-02-22
   - Deprecated Mojo::Reactor::is_readable.

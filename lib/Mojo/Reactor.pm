@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Mojo::Loader 'load_class';
-use Mojo::Util 'deprecated';
 
 sub again { croak 'Method "again" not implemented by subclass' }
 
@@ -12,14 +11,7 @@ sub detect {
   return load_class($try) ? 'Mojo::Reactor::Poll' : $try;
 }
 
-sub io { croak 'Method "io" not implemented by subclass' }
-
-# DEPRECATED in Tiger Face!
-sub is_readable {
-  deprecated 'Mojo::Reactor::is_readable is DEPRECATED';
-  Mojo::Util::_readable(0, fileno pop);
-}
-
+sub io         { croak 'Method "io" not implemented by subclass' }
 sub is_running { croak 'Method "is_running" not implemented by subclass' }
 
 sub next_tick { shift->timer(0 => @_) and return undef }

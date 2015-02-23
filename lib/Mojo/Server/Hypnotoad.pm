@@ -7,7 +7,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
-use Mojo::Util qw(deprecated steady_time);
+use Mojo::Util qw(steady_time);
 use Scalar::Util 'weaken';
 
 has prefork => sub { Mojo::Server::Prefork->new };
@@ -21,10 +21,6 @@ sub configure {
   my $c = $prefork->app->config($name) || {};
   $c->{listen} ||= ['http://*:8080'];
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
-
-  # DEPRECATED in Tiger Face!
-  deprecated 'keep_alive_requests setting is DEPRECATED in favor of requests'
-    if !$c->{requests} && ($c->{requests} ||= $c->{keep_alive_requests});
 
   # Prefork settings
   $prefork->reverse_proxy($c->{proxy})   if defined $c->{proxy};

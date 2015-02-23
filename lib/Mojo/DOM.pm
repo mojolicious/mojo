@@ -13,7 +13,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Mojo::Util qw(deprecated squish);
+use Mojo::Util 'squish';
 use Scalar::Util qw(blessed weaken);
 
 sub all_contents { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
@@ -135,13 +135,6 @@ sub root {
   my $self = shift;
   return $self unless my $tree = $self->_ancestors(1);
   return $self->_build($tree, $self->xml);
-}
-
-# DEPRECATED in Tiger Face!
-sub siblings {
-  deprecated 'Mojo::DOM::siblings is DEPRECATED';
-  my $siblings = $_[0]->_siblings(1);
-  return _select($_[0]->_collect(@{$siblings->[0]}, @{$siblings->[1]}), $_[1]);
 }
 
 sub strip {

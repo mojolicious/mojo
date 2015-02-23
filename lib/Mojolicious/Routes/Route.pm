@@ -32,13 +32,6 @@ sub add_child {
 
 sub any { shift->_generate_route(ref $_[0] eq 'ARRAY' ? shift : [], @_) }
 
-# DEPRECATED in Tiger Face!
-sub bridge {
-  Mojo::Util::deprecated 'Mojolicious::Routes::Route::bridge is DEPRECATED in'
-    . ' favor of Mojolicious::Routes::Route::under';
-  shift->route(@_)->inline(1);
-}
-
 sub delete { shift->_generate_route(DELETE => @_) }
 
 sub detour { shift->partial(1)->to(@_) }

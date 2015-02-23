@@ -5,19 +5,13 @@ use Exporter 'import';
 use File::Basename 'fileparse';
 use File::Spec::Functions qw(catdir catfile splitdir);
 use Mojo::Exception;
-use Mojo::Util qw(b64_decode class_to_path deprecated);
+use Mojo::Util qw(b64_decode class_to_path);
 
 our @EXPORT_OK = qw(data_section file_is_binary find_modules load_class);
 
 my (%BIN, %CACHE);
 
-# DEPRECATED in Tiger Face!
-sub data { shift; data_section(@_) }
-
 sub data_section { $_[0] ? $_[1] ? _all($_[0])->{$_[1]} : _all($_[0]) : undef }
-
-# DEPRECATED in Tiger Face!
-sub is_binary { shift; file_is_binary(@_) }
 
 sub file_is_binary { keys %{_all($_[0])} ? !!$BIN{$_[0]}{$_[1]} : undef }
 
@@ -39,9 +33,6 @@ sub find_modules {
   return sort keys %modules;
 }
 
-# DEPRECATED in Tiger Face!
-sub load { shift; load_class(@_) }
-
 sub load_class {
   my $class = shift;
 
@@ -57,15 +48,6 @@ sub load_class {
   # Real error
   return Mojo::Exception->new($@);
 }
-
-# DEPRECATED in Tiger Face!
-sub new {
-  deprecated 'Object-oriented Mojo::Loader API is DEPRECATED';
-  Mojo::Base::new(@_);
-}
-
-# DEPRECATED in Tiger Face!
-sub search { shift; [find_modules(@_)] }
 
 sub _all {
   my $class = shift;

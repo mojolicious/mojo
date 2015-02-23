@@ -5,14 +5,10 @@ use Mojo::ByteStream;
 use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
-use Mojo::Util qw(deprecated dumper sha1_sum steady_time);
+use Mojo::Util qw(dumper sha1_sum steady_time);
 
 sub register {
   my ($self, $app) = @_;
-
-  # DEPRECATED in Tiger Face!
-  $app->helper(render_exception => sub { _render('exception', @_) });
-  $app->helper(render_not_found => sub { _render('not_found', @_) });
 
   # Controller alias helpers
   for my $name (qw(app flash param stash session url_for validation)) {
@@ -91,13 +87,6 @@ sub _delay {
 sub _development {
   my ($page, $c, $e) = @_;
 
-  # DEPRECATED in Tiger Face!
-  if (my $sub = $c->can("render_$page")) {
-    deprecated "Mojolicious::Controller::render_$page is DEPRECATED in favor"
-      . " of the reply->$page helper";
-    return $c->$sub($page eq 'exception' ? $e : ());
-  }
-
   my $app = $c->app;
   $app->log->error($e = Mojo::Exception->new($e)) if $page eq 'exception';
 
@@ -147,14 +136,6 @@ sub _inactivity_timeout {
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
-}
-
-# DEPRECATED in Tiger Face!
-sub _render {
-  my $page = shift;
-  deprecated "Mojolicious::Controller::render_$page is DEPRECATED in favor of"
-    . " the reply->$page helper";
-  shift->helpers->reply->$page(@_);
 }
 
 sub _static {

@@ -225,15 +225,16 @@ is(Mojo::Reactor->detect, 'Mojo::Reactor::EV', 'right class');
 # Dummy reactor
 package Mojo::Reactor::Test;
 use Mojo::Base 'Mojo::Reactor::Poll';
-$ENV{MOJO_REACTOR} = 'Mojo::Reactor::Test';
 
 package main;
 
 # Detection (env)
-is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
+{
+  local $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Test';
+  is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
+}
 
 # EV in control
-$ENV{MOJO_REACTOR} = 'Mojo::Reactor::EV';
 is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::EV', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 my ($buffer, $server_err, $server_running, $client_err, $client_running);

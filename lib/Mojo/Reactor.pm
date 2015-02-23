@@ -38,8 +38,6 @@ Mojo::Reactor - Low-level event reactor base class
   package Mojo::Reactor::MyEventLoop;
   use Mojo::Base 'Mojo::Reactor';
 
-  $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::MyEventLoop';
-
   sub again      {...}
   sub io         {...}
   sub is_running {...}

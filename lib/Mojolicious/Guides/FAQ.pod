@@ -223,7 +223,7 @@ at regular intervals, to signal that they are still responsive. A blocking
 operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute
-L<Mojo::Server::Prefork/"heartbeat_interval"> if your application requires it.
+L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
 
 =head1 MORE
 

@@ -2,8 +2,8 @@ package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use IO::Poll qw(POLLIN POLLPRI);
 use Mojo::Loader 'load_class';
+use Mojo::Util 'deprecated';
 
 sub again { croak 'Method "again" not implemented by subclass' }
 
@@ -14,9 +14,10 @@ sub detect {
 
 sub io { croak 'Method "io" not implemented by subclass' }
 
-# This may break in the future, but is worth it for performance
+# DEPRECATED in Tiger Face!
 sub is_readable {
-  !!(IO::Poll::_poll(0, fileno(pop), my $mode = POLLIN | POLLPRI) > 0);
+  deprecated 'Mojo::Reactor::is_readable is DEPRECATED';
+  Mojo::Util::_readable(0, fileno pop);
 }
 
 sub is_running { croak 'Method "is_running" not implemented by subclass' }
@@ -118,13 +119,6 @@ readable or writable. Meant to be overloaded in a subclass.
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
-
-=head2 is_readable
-
-  my $bool = $reactor->is_readable($handle);
-
-Quick non-blocking check if a handle is readable, useful for identifying
-tainted sockets.
 
 =head2 is_running
 

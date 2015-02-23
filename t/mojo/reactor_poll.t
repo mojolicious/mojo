@@ -36,7 +36,6 @@ $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok !$readable, 'handle is not readable';
 ok !$writable, 'handle is not writable';
-ok !$reactor->is_readable($listen), 'handle is not readable';
 
 # Connect
 my $client = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
@@ -44,7 +43,6 @@ $reactor->timer(1 => sub { shift->stop });
 $reactor->start;
 ok $readable, 'handle is readable';
 ok !$writable, 'handle is not writable';
-ok $reactor->is_readable($listen), 'handle is readable';
 
 # Accept
 my $server = $listen->accept;

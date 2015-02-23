@@ -7,6 +7,7 @@ use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use Exporter 'import';
+use IO::Poll qw(POLLIN POLLPRI);
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Symbol 'delete_package';
@@ -425,6 +426,9 @@ sub _options {
   # Name and hash or just values (even)
   return ref $_[1] eq 'HASH' ? (shift, %{shift()}) : (undef, @_);
 }
+
+# This may break in the future, but is worth it for performance
+sub _readable { !!(IO::Poll::_poll(@_[0, 1], my $m = POLLIN | POLLPRI) > 0) }
 
 sub _stash {
   my ($name, $object) = (shift, shift);

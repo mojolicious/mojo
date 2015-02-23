@@ -1,5 +1,6 @@
 
 5.82  2015-02-22
+  - Deprecated Mojo::Reactor::is_readable.
   - Deprecated keep_alive_requests setting in Hypnotoad in favor of requests.
   - Improved Morbo to restart slightly faster.
   - Fixed bug in daemon and prefork commands where --inactivity-timeout option

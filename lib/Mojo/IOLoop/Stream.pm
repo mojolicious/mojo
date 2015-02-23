@@ -25,7 +25,7 @@ sub handle { shift->{handle} }
 sub is_readable {
   my $self = shift;
   $self->_again;
-  return $self->{handle} && $self->reactor->is_readable($self->{handle});
+  return $self->{handle} && Mojo::Util::_readable(0, fileno $self->{handle});
 }
 
 sub is_writing {

@@ -2,7 +2,6 @@ package Mojo::Server::Prefork;
 use Mojo::Base 'Mojo::Server::Daemon';
 
 use File::Spec::Functions qw(catfile tmpdir);
-use IO::Poll qw(POLLIN POLLPRI);
 use Mojo::Util qw(deprecated steady_time);
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
@@ -206,10 +205,9 @@ sub _term {
 sub _wait {
   my $self = shift;
 
-  # This may break in the future, but is worth it for performance
+  # Poll for heartbeats
   my $reader = $self->emit('wait')->{reader};
-  my $mode   = POLLIN | POLLPRI;
-  return unless IO::Poll::_poll(1000, fileno($reader), $mode) > 0;
+  return unless Mojo::Util::_readable(1000, fileno($reader));
   return unless $reader->sysread(my $chunk, 4194304);
 
   # Update heartbeats (and stop gracefully if necessary)

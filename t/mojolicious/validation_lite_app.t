@@ -32,20 +32,20 @@ my $t = Test::Mojo->new;
 
 # Required and optional values
 my $validation = $t->app->validation->input({foo => 'bar', baz => 'yada'});
-is_deeply $validation->names, [], 'no names';
-is_deeply $validation->error, [], 'no names';
+is_deeply $validation->passed, [], 'no names';
+is_deeply $validation->failed, [], 'no names';
 is $validation->param('foo'), undef, 'no value';
 is_deeply $validation->every_param('foo'), [], 'no values';
 ok $validation->required('foo')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 is $validation->param('foo'), 'bar', 'right value';
 is_deeply $validation->every_param('foo'), ['bar'], 'right values';
-is_deeply $validation->names,              ['foo'], 'right names';
+is_deeply $validation->passed,             ['foo'], 'right names';
 ok !$validation->has_error, 'no error';
 ok $validation->optional('baz')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
 is $validation->param('baz'), 'yada', 'right value';
-is_deeply $validation->names, [qw(baz foo)], 'right names';
+is_deeply $validation->passed, [qw(baz foo)], 'right names';
 ok !$validation->has_error, 'no error';
 ok !$validation->optional('does_not_exist')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
@@ -71,7 +71,7 @@ ok !$validation->optional('yada')->equal_to('foo')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('yada'), [qw(equal_to 1 foo)], 'right error';
-is_deeply $validation->error,         [qw(baz yada)],       'right names';
+is_deeply $validation->failed,        [qw(baz yada)],       'right names';
 
 # In
 $validation = $t->app->validation->input(
@@ -85,7 +85,7 @@ ok !$validation->required('baz')->in(qw(yada whatever))->is_valid, 'not valid';
 is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('baz'), [qw(in 1 yada whatever)], 'right error';
-is_deeply $validation->error, ['baz'], 'right names';
+is_deeply $validation->failed, ['baz'], 'right names';
 
 # Like
 $validation = $t->app->validation->input({foo => 'bar', baz => 'yada'});

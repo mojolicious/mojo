@@ -3,7 +3,7 @@
   - Code name "Clinking Beer Mugs", this is a major release.
   - Removed name listing support from param method in Mojolicious::Controller.
   - Removed name listing support from param method in Mojo::Parameters.
-  - Removed name listing support from param method in
+  - Removed name listing support from error and param methods in
     Mojolicious::Validator::Validation.
   - Removed multi-name support from cookie, param and signed_cookie methods in
     Mojolicious::Controller.
@@ -24,7 +24,7 @@
     Mojolicious::Controller.
   - Removed deprecated keep_alive_requests setting from Hypnotoad.
   - Added names method to Mojo::Parameters.
-  - Added names method to Mojolicious::Validator::Validation.
+  - Added failed and passed methods to Mojolicious::Validator::Validation.
 
 5.82  2015-02-22
   - Deprecated Mojo::Reactor::is_readable.

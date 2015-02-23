@@ -43,13 +43,10 @@ sub csrf_protect {
 }
 
 sub error {
-  my $self = shift;
-
-  return [sort keys %{$self->{error}}] unless defined(my $name = shift);
+  my ($self, $name) = (shift, shift);
   return $self->{error}{$name} unless @_;
   $self->{error}{$name} = shift;
   delete $self->output->{$name};
-
   return $self;
 }
 
@@ -58,13 +55,13 @@ sub every_param {
   return [ref $value eq 'ARRAY' ? @$value : $value];
 }
 
+sub failed { [sort keys %{shift->{error}}] }
+
 sub has_data { !!keys %{shift->input} }
 
 sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
 
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
-
-sub names { [sort keys %{shift->output}] }
 
 sub optional {
   my ($self, $name) = @_;
@@ -78,6 +75,8 @@ sub optional {
 }
 
 sub param { shift->every_param(shift)->[-1] }
+
+sub passed { [sort keys %{shift->output}] }
 
 sub required {
   my ($self, $name) = @_;
@@ -169,15 +168,11 @@ Validate C<csrf_token> and protect from cross-site request forgery.
 
 =head2 error
 
-  my $names   = $validation->error;
   my $err     = $validation->error('foo');
   $validation = $validation->error(foo => ['custom_check']);
 
 Get or set details for failed validation check, at any given time there can
 only be one per field.
-
-  # Names of all parameters that failed validation
-  say for @{$validation->error};
 
   # Details about failed validation
   my ($check, $result, @args) = @{$validation->error('foo')};
@@ -191,6 +186,15 @@ array reference.
 
   # Get first value
   my $first = $validation->every_param('foo')->[0];
+
+=head2 failed
+
+  my $names = $validation->failed;
+
+Return a list of all names for parameters that failed validation.
+
+  # Names of all parameters that failed
+  say for @{$validation->failed};
 
 =head2 has_data
 
@@ -213,15 +217,6 @@ Check if validation resulted in errors, defaults to checking all fields.
 Check if validation was successful and field has a value, defaults to checking
 the current L</"topic">.
 
-=head2 names
-
-  my $names = $validation->names;
-
-Return a list of all validated parameter names.
-
-  # Names of all parameters that passed validation
-  say for @{$validation->names};
-
 =head2 optional
 
   $validation = $validation->optional('foo');
@@ -235,6 +230,15 @@ Change validation L</"topic">.
 Access validated parameters. If there are multiple values sharing the same
 name, and you want to access more than just the last one, you can use
 L</"every_param">.
+
+=head2 passed
+
+  my $names = $validation->passed;
+
+Return a list of all names for parameters that passed validation.
+
+  # Names of all parameters that passed
+  say for @{$validation->passed};
 
 =head2 required
 

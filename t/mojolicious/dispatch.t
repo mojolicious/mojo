@@ -100,7 +100,6 @@ is $c->param(template => 'test')->param('template'), undef,
   'value is reserved';
 is $c->param(text    => 'test')->param('text'),    undef, 'value is reserved';
 is $c->param(variant => 'test')->param('variant'), undef, 'value is reserved';
-is_deeply [$c->param], [], 'values are hidden';
 
 # Controller with application and routes
 $c = Test::Controller->new;
@@ -173,37 +172,31 @@ is $c->stash->{test},       23,      'right value';
 is $c->param('controller'), undef,   'no value';
 is $c->param('action'),     undef,   'no value';
 is $c->param('capture'),    'hello', 'right value';
-is_deeply [$c->param], ['capture'], 'right names';
 $c->param(capture => 'bye');
 is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     undef, 'no value';
 is $c->param('capture'),    'bye', 'right value';
-is_deeply [$c->param], ['capture'], 'right names';
 $c->param(capture => undef);
 is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     undef, 'no value';
 is $c->param('capture'),    undef, 'no value';
-is_deeply [$c->param], ['capture'], 'no names';
 $c->req->param(foo => 'bar');
 is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     undef, 'no value';
 is $c->param('capture'),    undef, 'no value';
 is $c->param('foo'),        'bar', 'right value';
-is_deeply [$c->param], [qw(capture foo)], 'right names';
 $c->req->param(bar => 'baz');
 is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     undef, 'no value';
 is $c->param('capture'),    undef, 'no value';
 is $c->param('foo'),        'bar', 'right value';
 is $c->param('bar'),        'baz', 'right value';
-is_deeply [$c->param], [qw(bar capture foo)], 'right names';
 $c->req->param(action => 'baz');
 is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     'baz', 'no value';
 is $c->param('capture'),    undef, 'no value';
 is $c->param('foo'),        'bar', 'right value';
 is $c->param('bar'),        'baz', 'right value';
-is_deeply [$c->param], [qw(action bar capture foo)], 'right names';
 ok $c->render_called, 'rendered';
 
 # Escaping

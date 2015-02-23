@@ -401,7 +401,6 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
 =head2 param
 
-  my @names = $req->param;
   my $value = $req->param('foo');
 
 Access C<GET> and C<POST> parameters extracted from the query string and

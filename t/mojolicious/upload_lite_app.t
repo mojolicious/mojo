@@ -17,8 +17,7 @@ post '/upload' => sub {
       . $file->asset->slurp
       . $c->param('test')
       . ($headers->content_type  // '')
-      . ($headers->header('X-X') // '')
-      . join(',', $c->param));
+      . ($headers->header('X-X') // ''));
 };
 
 post '/multi' => sub {
@@ -33,22 +32,22 @@ my $t = Test::Mojo->new;
 my $file = Mojo::Asset::File->new->add_chunk('lalala');
 $t->post_ok('/upload' => form =>
     {file => {file => $file, filename => 'x'}, test => 'tset'})
-  ->status_is(200)->content_is('xlalalatsetfile,test');
+  ->status_is(200)->content_is('xlalalatset');
 
 # Path
 $t->post_ok(
   '/upload' => form => {file => {file => $file->path}, test => 'foo'})
-  ->status_is(200)->content_like(qr!lalalafoofile,test$!);
+  ->status_is(200)->content_like(qr!lalalafoo$!);
 
 # Memory
 $t->post_ok(
   '/upload' => form => {file => {content => 'alalal'}, test => 'tset'})
-  ->status_is(200)->content_is('filealalaltsetfile,test');
+  ->status_is(200)->content_is('filealalaltset');
 
 # Memory with headers
 my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
 $t->post_ok('/upload' => form => {file => $hash, test => 'tset'})
-  ->status_is(200)->content_is('filealalaltsetfoo/barYfile,test');
+  ->status_is(200)->content_is('filealalaltsetfoo/barY');
 
 # Multiple file uploads
 $t->post_ok('/multi?name=file1&name=file2' => form =>

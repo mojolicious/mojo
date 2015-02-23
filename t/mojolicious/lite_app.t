@@ -115,7 +115,7 @@ get '/query_string' => sub {
 
 get '/reserved' => sub {
   my $c = shift;
-  $c->render(text => $c->param('data') . join(',', $c->param));
+  $c->render(text => $c->param('data'));
 };
 
 get '/custom_name' => 'auto_name';
@@ -575,10 +575,9 @@ $t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=bar')
 
 # Reserved stash values
 $t->get_ok('/reserved?data=just-works')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('just-worksdata');
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('just-works');
 $t->get_ok('/reserved?data=just-works&json=test')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('just-worksdata,json');
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('just-works');
 
 # Exception in inline template
 $t->get_ok('/inline/exception')->status_is(500)

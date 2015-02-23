@@ -146,23 +146,8 @@ sub on {
 
 sub param {
   my ($self, $name) = (shift, shift);
-
-  # List names
-  my $captures = $self->stash->{'mojo.captures'} ||= {};
-  unless (defined $name) {
-    my $req  = $self->req;
-    my @keys = $req->param;
-    push @keys, map  { $_->name } @{$req->uploads};
-    push @keys, grep { !$RESERVED{$_} } keys %$captures;
-    my %seen;
-    return sort grep { !$seen{$_}++ } @keys;
-  }
-
-  # Value
   return $self->every_param($name)->[-1] unless @_;
-
-  # Override values
-  $captures->{$name} = @_ > 1 ? [@_] : $_[0];
+  $self->stash->{'mojo.captures'}{$name} = @_ > 1 ? [@_] : $_[0];
   return $self;
 }
 
@@ -589,7 +574,6 @@ status.
 
 =head2 param
 
-  my @names = $c->param;
   my $value = $c->param('foo');
   $c        = $c->param(foo => 'ba;r');
   $c        = $c->param(foo => qw(ba;r baz));

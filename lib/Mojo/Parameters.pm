@@ -61,18 +61,13 @@ sub merge {
   return $self;
 }
 
+sub names { [sort keys %{shift->to_hash}] }
+
 sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub param {
   my ($self, $name) = (shift, shift);
-
-  # List names
-  return sort keys %{$self->to_hash} unless defined $name;
-
-  # Last value
   return $self->every_param($name)->[-1] unless @_;
-
-  # Replace values
   $self->remove($name);
   return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]);
 }
@@ -284,6 +279,15 @@ Merge parameters. Note that this method will normalize the parameters.
 
   # "yada=yada"
   Mojo::Parameters->new('foo=bar&yada=yada')->merge(foo => undef);
+
+=head2 names
+
+  my $names = $params->names;
+
+Return a list of all parameter names.
+
+  # Names of all parameters
+  say for @{$params->names};
 
 =head2 new
 

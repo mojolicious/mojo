@@ -47,14 +47,14 @@ $params->param(foo => 'bar');
 is_deeply [$params->param('foo')], ['bar'], 'right structure';
 is_deeply $params->param(foo => qw(baz yada))->every_param('foo'),
   [qw(baz yada)], 'right structure';
-is_deeply [$params->param], [qw(a b c foo x y z)], 'right structure';
+is_deeply $params->names, [qw(a b c foo x y z)], 'right structure';
 
 # Append
 $params = Mojo::Parameters->new('q=1');
 $params->append(a => 4, a => 5, b => 6, b => 7);
 is_deeply $params->to_hash, {a => [4, 5], b => [6, 7], q => 1},
   'right structure';
-is_deeply [$params->param], [qw(a b q)], 'right structure';
+is_deeply $params->names, [qw(a b q)], 'right structure';
 $params = Mojo::Parameters->new(foo => '', bar => 'bar');
 is $params->to_string, 'foo=&bar=bar', 'right format';
 $params = Mojo::Parameters->new(bar => 'bar', foo => '');

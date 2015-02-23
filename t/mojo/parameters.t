@@ -9,7 +9,7 @@ my $params2 = Mojo::Parameters->new('x', 1, 'y', 2);
 is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
 is $params2->to_string, 'x=1&y=2',           'right format';
 is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
-is_deeply $params->params, ['foo', 'b;ar', 'baz', 23], 'right structure';
+is_deeply $params->pairs, ['foo', 'b;ar', 'baz', 23], 'right structure';
 $params->append(a => 4, a => 5, b => 6, b => 7);
 is $params->to_string, 'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7', 'right format';
 push @$params, c => 'f;oo';
@@ -79,11 +79,11 @@ is $params->to_string, '0=0', 'right format';
 # Semicolon
 $params = Mojo::Parameters->new('foo=bar;baz');
 is $params->to_string, 'foo=bar;baz', 'right format';
-is_deeply $params->params, [foo => 'bar;baz'], 'right structure';
+is_deeply $params->pairs, [foo => 'bar;baz'], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
 is $params->to_string, 'foo=bar%3Bbaz', 'right format';
 $params = Mojo::Parameters->new($params->to_string);
-is_deeply $params->params, [foo => 'bar;baz'], 'right structure';
+is_deeply $params->pairs, [foo => 'bar;baz'], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
 is $params->to_string, 'foo=bar%3Bbaz', 'right format';
 
@@ -152,15 +152,15 @@ is $params->param(foo => ['ba;r', 'baz'])->to_string, 'foo=ba%3Br&foo=baz',
 # Unicode
 $params = Mojo::Parameters->new;
 $params->parse('input=say%20%22%C2%AB~%22;');
-is_deeply $params->params, ['input', 'say "«~";'], 'right structure';
+is_deeply $params->pairs, ['input', 'say "«~";'], 'right structure';
 is $params->param('input'), 'say "«~";', 'right value';
 is "$params", 'input=say+%22%C2%AB~%22%3B', 'right result';
 $params = Mojo::Parameters->new('♥=☃');
-is_deeply $params->params, ['♥', '☃'], 'right structure';
+is_deeply $params->pairs, ['♥', '☃'], 'right structure';
 is $params->param('♥'), '☃', 'right value';
 is "$params", '%E2%99%A5=%E2%98%83', 'right result';
 $params = Mojo::Parameters->new('%E2%99%A5=%E2%98%83');
-is_deeply $params->params, ['♥', '☃'], 'right structure';
+is_deeply $params->pairs, ['♥', '☃'], 'right structure';
 is $params->param('♥'), '☃', 'right value';
 is "$params", '%E2%99%A5=%E2%98%83', 'right result';
 
@@ -171,7 +171,7 @@ is "$params", 'foo=bar&baz=23', 'right result';
 
 # Replace
 $params = Mojo::Parameters->new('a=1&b=2');
-$params->params([a => 2, b => 3]);
+$params->pairs([a => 2, b => 3]);
 is $params->to_string, 'a=2&b=3', 'right result';
 
 # Query string

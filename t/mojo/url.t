@@ -96,7 +96,7 @@ is $url->host,     'example.com', 'right host';
 is $url->port,     '8080', 'right port';
 is $url->path,     '', 'no path';
 is $url->query,    '_monkeybiz%3B&_monkey;23', 'right query';
-is_deeply $url->query->params, ['_monkeybiz;', '', '_monkey;23', ''],
+is_deeply $url->query->pairs, ['_monkeybiz;', '', '_monkey;23', ''],
   'right structure';
 is $url->query, '_monkeybiz%3B=&_monkey%3B23=', 'right query';
 is $url->fragment, '23', 'right fragment';

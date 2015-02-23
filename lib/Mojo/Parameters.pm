@@ -1,7 +1,7 @@
 package Mojo::Parameters;
 use Mojo::Base -base;
 use overload
-  '@{}'    => sub { shift->params },
+  '@{}'    => sub { shift->pairs },
   bool     => sub {1},
   '""'     => sub { shift->to_string },
   fallback => 1;
@@ -13,15 +13,15 @@ has charset => 'UTF-8';
 sub append {
   my $self = shift;
 
-  my $params = $self->params;
-  my @pairs = @_ == 1 ? @{shift->params} : @_;
-  while (my ($name, $value) = splice @pairs, 0, 2) {
+  my $old = $self->pairs;
+  my @new = @_ == 1 ? @{shift->pairs} : @_;
+  while (my ($name, $value) = splice @new, 0, 2) {
 
     # Multiple values
-    if (ref $value eq 'ARRAY') { push @$params, $name => $_ // '' for @$value }
+    if (ref $value eq 'ARRAY') { push @$old, $name => $_ // '' for @$value }
 
     # Single value
-    else { push @$params, $name => $value }
+    else { push @$old, $name => $value }
   }
 
   return $self;
@@ -33,7 +33,7 @@ sub clone {
   my $clone = $self->new;
   if   (exists $self->{charset}) { $clone->{charset} = $self->{charset} }
   if   (defined $self->{string}) { $clone->{string}  = $self->{string} }
-  else                           { $clone->{params}  = [@{$self->params}] }
+  else                           { $clone->{pairs}   = [@{$self->pairs}] }
 
   return $clone;
 }
@@ -42,9 +42,9 @@ sub every_param {
   my ($self, $name) = @_;
 
   my @values;
-  my $params = $self->params;
-  for (my $i = 0; $i < @$params; $i += 2) {
-    push @values, $params->[$i + 1] if $params->[$i] eq $name;
+  my $pairs = $self->pairs;
+  for (my $i = 0; $i < @$pairs; $i += 2) {
+    push @values, $pairs->[$i + 1] if $pairs->[$i] eq $name;
   }
 
   return \@values;
@@ -53,7 +53,7 @@ sub every_param {
 sub merge {
   my $self = shift;
 
-  my @pairs = @_ == 1 ? @{shift->params} : @_;
+  my @pairs = @_ == 1 ? @{shift->pairs} : @_;
   while (my ($name, $value) = splice @pairs, 0, 2) {
     defined $value ? $self->param($name => $value) : $self->remove($name);
   }
@@ -65,27 +65,20 @@ sub names { [sort keys %{shift->to_hash}] }
 
 sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
-sub param {
-  my ($self, $name) = (shift, shift);
-  return $self->every_param($name)->[-1] unless @_;
-  $self->remove($name);
-  return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]);
-}
-
-sub params {
+sub pairs {
   my $self = shift;
 
   # Replace parameters
   if (@_) {
-    $self->{params} = shift;
+    $self->{pairs} = shift;
     delete $self->{string};
     return $self;
   }
 
   # Parse string
   if (defined(my $str = delete $self->{string})) {
-    my $params = $self->{params} = [];
-    return $params unless length $str;
+    my $pairs = $self->{pairs} = [];
+    return $pairs unless length $str;
 
     my $charset = $self->charset;
     for my $pair (split '&', $str) {
@@ -99,11 +92,18 @@ sub params {
       $value = url_unescape $value;
       $value = decode($charset, $value) // $value if $charset;
 
-      push @$params, $name, $value;
+      push @$pairs, $name, $value;
     }
   }
 
-  return $self->{params} ||= [];
+  return $self->{pairs} ||= [];
+}
+
+sub param {
+  my ($self, $name) = (shift, shift);
+  return $self->every_param($name)->[-1] unless @_;
+  $self->remove($name);
+  return $self->append($name => ref $_[0] eq 'ARRAY' ? $_[0] : [@_]);
 }
 
 sub parse {
@@ -120,10 +120,9 @@ sub parse {
 sub remove {
   my ($self, $name) = @_;
 
-  my $params = $self->params;
-  my $i      = 0;
-  $params->[$i] eq $name ? splice @$params, $i, 2 : ($i += 2)
-    while $i < @$params;
+  my $pairs = $self->pairs;
+  my $i     = 0;
+  $pairs->[$i] eq $name ? splice @$pairs, $i, 2 : ($i += 2) while $i < @$pairs;
 
   return $self;
 }
@@ -132,9 +131,9 @@ sub to_hash {
   my $self = shift;
 
   my %hash;
-  my $params = $self->params;
-  for (my $i = 0; $i < @$params; $i += 2) {
-    my ($name, $value) = @{$params}[$i, $i + 1];
+  my $pairs = $self->pairs;
+  for (my $i = 0; $i < @$pairs; $i += 2) {
+    my ($name, $value) = @{$pairs}[$i, $i + 1];
 
     # Array
     if (exists $hash{$name}) {
@@ -160,11 +159,11 @@ sub to_string {
   }
 
   # Build pairs
-  my $params = $self->params;
-  return '' unless @$params;
+  my $pairs = $self->pairs;
+  return '' unless @$pairs;
   my @pairs;
-  for (my $i = 0; $i < @$params; $i += 2) {
-    my ($name, $value) = @{$params}[$i, $i + 1];
+  for (my $i = 0; $i < @$pairs; $i += 2) {
+    my ($name, $value) = @{$pairs}[$i, $i + 1];
 
     # Escape and replace whitespace with "+"
     $name  = encode $charset,   $name if $charset;
@@ -300,6 +299,13 @@ Return a list of all parameter names.
 Construct a new L<Mojo::Parameters> object and L</"parse"> parameters if
 necessary.
 
+=head2 pairs
+
+  my $array = $params->pairs;
+  $params   = $params->pairs([foo => 'b&ar', baz => 23]);
+
+Parsed parameter pairs. Note that this method will normalize the parameters.
+
 =head2 param
 
   my @names = $params->param;
@@ -311,13 +317,6 @@ necessary.
 Access parameter values. If there are multiple values sharing the same name,
 and you want to access more than just the last one, you can use
 L</"every_param">. Note that this method will normalize the parameters.
-
-=head2 params
-
-  my $array = $params->params;
-  $params   = $params->params([foo => 'b&ar', baz => 23]);
-
-Parsed parameters. Note that this method will normalize the parameters.
 
 =head2 parse
 
@@ -356,9 +355,9 @@ L<Mojo::Parameters> overloads the following operators.
 
 =head2 array
 
-  my @params = @$params;
+  my @pairs = @$params;
 
-Alias for L</"params">. Note that this will normalize the parameters.
+Alias for L</"pairs">. Note that this will normalize the parameters.
 
   say $params->[0];
   say for @$params;

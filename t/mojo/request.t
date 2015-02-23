@@ -2066,7 +2066,7 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/perldoc?Mojo::Message::Request', 'right URL';
-is $req->url->query->params->[0], 'Mojo::Message::Request', 'right value';
+is $req->url->query->pairs->[0], 'Mojo::Message::Request', 'right value';
 
 # Parse lots of special characters in URL
 $req = Mojo::Message::Request->new;

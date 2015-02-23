@@ -88,8 +88,6 @@ sub run {
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
-  $self->{poll} = IO::Poll->new;
-  $self->{poll}->mask($self->{reader}, POLLIN | POLLPRI);
 
   # Clean manager environment
   local $SIG{CHLD} = sub {
@@ -181,7 +179,7 @@ sub _spawn {
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(CHLD INT TERM TTIN TTOU);
   $SIG{QUIT} = sub { $loop->stop_gracefully };
-  delete @$self{qw(poll reader)};
+  delete $self->{reader};
   srand;
 
   $self->app->log->debug("Worker $$ started");
@@ -208,11 +206,11 @@ sub _term {
 sub _wait {
   my $self = shift;
 
-  # Poll for heartbeats
-  my $poll = $self->emit('wait')->{poll};
-  $poll->poll(1);
-  return unless $poll->handles(POLLIN | POLLPRI);
-  return unless $self->{reader}->sysread(my $chunk, 4194304);
+  # This may break in the future, but is worth it for performance
+  my $reader = $self->emit('wait')->{reader};
+  my $mode   = POLLIN | POLLPRI;
+  return unless IO::Poll::_poll(1000, fileno($reader), $mode) > 0;
+  return unless $reader->sysread(my $chunk, 4194304);
 
   # Update heartbeats (and stop gracefully if necessary)
   my $time = steady_time;

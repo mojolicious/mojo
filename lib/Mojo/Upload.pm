@@ -8,11 +8,7 @@ has asset => sub { Mojo::Asset::File->new };
 has [qw(filename name)];
 has headers => sub { Mojo::Headers->new };
 
-sub move_to {
-  my $self = shift;
-  $self->asset->move_to(@_);
-  return $self;
-}
+sub move_to { $_[0]->asset->move_to($_[1]) and return $_[0] }
 
 sub size  { shift->asset->size }
 sub slurp { shift->asset->slurp }

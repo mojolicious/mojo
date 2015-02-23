@@ -43,8 +43,6 @@ $params
 is_deeply $params->param('foo'), 'b;ar', 'right structure';
 is_deeply $params->every_param('foo'), ['b;ar'], 'right structure';
 is_deeply $params->every_param('a'), [4, 5], 'right structure';
-is_deeply [$params->param(['a'])], [5], 'right structure';
-is_deeply [$params->param([qw(a foo)])], [5, 'b;ar'], 'right structure';
 $params->param(foo => 'bar');
 is_deeply [$params->param('foo')], ['bar'], 'right structure';
 is_deeply $params->param(foo => qw(baz yada))->every_param('foo'),

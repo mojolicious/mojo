@@ -66,9 +66,6 @@ sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 sub param {
   my ($self, $name) = (shift, shift);
 
-  # Multiple names
-  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
-
   # List names
   return sort keys %{$self->to_hash} unless defined $name;
 
@@ -301,12 +298,11 @@ necessary.
 
 =head2 param
 
-  my @names       = $params->param;
-  my $value       = $params->param('foo');
-  my ($foo, $bar) = $params->param(['foo', 'bar']);
-  $params         = $params->param(foo => 'ba&r');
-  $params         = $params->param(foo => qw(ba&r baz));
-  $params         = $params->param(foo => ['ba;r', 'baz']);
+  my @names = $params->param;
+  my $value = $params->param('foo');
+  $params   = $params->param(foo => 'ba&r');
+  $params   = $params->param(foo => qw(ba&r baz));
+  $params   = $params->param(foo => ['ba;r', 'baz']);
 
 Access parameter values. If there are multiple values sharing the same name,
 and you want to access more than just the last one, you can use

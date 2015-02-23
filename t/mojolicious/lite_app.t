@@ -113,15 +113,6 @@ get '/query_string' => sub {
   $c->render(text => b($c->req->url->query)->url_unescape);
 };
 
-get '/multi/:bar' => sub {
-  my $c = shift;
-  my ($foo, $bar, $baz) = $c->param([qw(foo bar baz)]);
-  $c->render(
-    data => join('', map { $_ // '' } $foo, $bar, $baz),
-    test => $c->param(['yada'])
-  );
-};
-
 get '/reserved' => sub {
   my $c = shift;
   $c->render(text => $c->param('data') . join(',', $c->param));
@@ -581,19 +572,6 @@ $t->get_ok('/auto_name')->status_is(200)
 $t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=bar')
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('http://mojolicio.us/perldoc?foo=bar');
-
-# Normal parameters
-$t->get_ok('/multi/B?foo=A&baz=C')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('ABC');
-
-# Injection attack
-$t->get_ok('/multi/B?foo=A&foo=E&baz=C&yada=D&yada=text&yada=fail')
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('EBC');
-
-# Missing parameter
-$t->get_ok('/multi/B?baz=C')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('BC');
 
 # Reserved stash values
 $t->get_ok('/reserved?data=just-works')->status_is(200)

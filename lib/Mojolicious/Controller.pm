@@ -41,9 +41,6 @@ sub continue { $_[0]->app->routes->continue($_[0]) }
 sub cookie {
   my ($self, $name) = (shift, shift);
 
-  # Multiple names
-  return map { $self->cookie($_) } @$name if ref $name eq 'ARRAY';
-
   # Response cookie
   if (@_) {
 
@@ -149,9 +146,6 @@ sub on {
 
 sub param {
   my ($self, $name) = (shift, shift);
-
-  # Multiple names
-  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # List names
   my $captures = $self->stash->{'mojo.captures'} ||= {};
@@ -303,9 +297,6 @@ sub session {
 
 sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
-
-  # Multiple names
-  return map { $self->signed_cookie($_) } @$name if ref $name eq 'ARRAY';
 
   # Request cookie
   return $self->every_signed_cookie($name)->[-1] unless defined $value;
@@ -485,10 +476,9 @@ L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 
-  my $value       = $c->cookie('foo');
-  my ($foo, $bar) = $c->cookie(['foo', 'bar']);
-  $c              = $c->cookie(foo => 'bar');
-  $c              = $c->cookie(foo => 'bar', {path => '/'});
+  my $value = $c->cookie('foo');
+  $c        = $c->cookie(foo => 'bar');
+  $c        = $c->cookie(foo => 'bar', {path => '/'});
 
 Access request cookie values and create new response cookies. If there are
 multiple values sharing the same name, and you want to access more than just
@@ -599,12 +589,11 @@ status.
 
 =head2 param
 
-  my @names       = $c->param;
-  my $value       = $c->param('foo');
-  my ($foo, $bar) = $c->param(['foo', 'bar']);
-  $c              = $c->param(foo => 'ba;r');
-  $c              = $c->param(foo => qw(ba;r baz));
-  $c              = $c->param(foo => ['ba;r', 'baz']);
+  my @names = $c->param;
+  my $value = $c->param('foo');
+  $c        = $c->param(foo => 'ba;r');
+  $c        = $c->param(foo => qw(ba;r baz));
+  $c        = $c->param(foo => ['ba;r', 'baz']);
 
 Access route placeholder values that are not reserved stash values, file
 uploads as well as C<GET> and C<POST> parameters extracted from the query
@@ -876,10 +865,9 @@ cookies, to prevent tampering. Note that cookies usually have a C<4096> byte
 
 =head2 signed_cookie
 
-  my $value       = $c->signed_cookie('foo');
-  my ($foo, $bar) = $c->signed_cookie(['foo', 'bar']);
-  $c              = $c->signed_cookie(foo => 'bar');
-  $c              = $c->signed_cookie(foo => 'bar', {path => '/'});
+  my $value = $c->signed_cookie('foo');
+  $c        = $c->signed_cookie(foo => 'bar');
+  $c        = $c->signed_cookie(foo => 'bar', {path => '/'});
 
 Access signed request cookie values and create new signed response cookies. If
 there are multiple values sharing the same name, and you want to access more

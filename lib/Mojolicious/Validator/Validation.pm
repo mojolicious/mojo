@@ -77,13 +77,7 @@ sub optional {
 
 sub param {
   my ($self, $name) = @_;
-
-  # Multiple names
-  return map { $self->param($_) } @$name if ref $name eq 'ARRAY';
-
-  # List names
   return sort keys %{$self->output} unless defined $name;
-
   return $self->every_param($name)->[-1];
 }
 
@@ -225,9 +219,8 @@ Change validation L</"topic">.
 
 =head2 param
 
-  my @names       = $validation->param;
-  my $value       = $validation->param('foo');
-  my ($foo, $bar) = $validation->param(['foo', 'bar']);
+  my @names = $validation->param;
+  my $value = $validation->param('foo');
 
 Access validated parameters. If there are multiple values sharing the same
 name, and you want to access more than just the last one, you can use

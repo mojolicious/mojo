@@ -1,6 +1,13 @@
 
 6.0  2015-02-24
   - Code name "Clinking Beer Mugs", this is a major release.
+  - Removed multi-name support from cookie, param and signed_cookie methods in
+    Mojolicious::Controller.
+  - Removed multi-name support from param method in
+    Mojolicious::Validator::Validation.
+  - Removed multi-name support from param method in Mojo::Parameters.
+  - Removed multi-name support from cookie and upload methods in
+    Mojo::Message.
   - Removed deprecated object-oriented Mojo::Loader API.
   - Removed deprecated accept_interval, lock and unlock attributes from
     Mojo::IOLoop.

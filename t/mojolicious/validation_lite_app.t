@@ -45,7 +45,6 @@ ok $validation->optional('baz')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
 is $validation->param('baz'), 'yada', 'right value';
 is_deeply [$validation->param], [qw(baz foo)], 'right names';
-is_deeply [$validation->param([qw(foo baz)])], [qw(bar yada)], 'right values';
 ok !$validation->has_error, 'no error';
 ok !$validation->optional('does_not_exist')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';

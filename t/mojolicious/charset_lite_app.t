@@ -46,7 +46,7 @@ get '/привет/мир' => sub { shift->render(json => {foo => $yatta}) };
 get '/params' => sub {
   my $c = shift;
   $c->render(json =>
-      {params => $c->req->url->query->to_hash, yatta => $c->param(['yatta'])});
+      {params => $c->req->url->query->to_hash, yatta => $c->param('yatta')});
 };
 
 my $t = Test::Mojo->new;

@@ -238,9 +238,6 @@ sub _build {
 sub _cache {
   my ($self, $method, $all, $name) = @_;
 
-  # Multiple names
-  return map { $self->$method($_) } @$name if ref $name eq 'ARRAY';
-
   # Cache objects by name
   $method .= 's';
   unless ($self->{$method}) {
@@ -456,8 +453,7 @@ Render start-line.
 
 =head2 cookie
 
-  my $cookie      = $msg->cookie('foo');
-  my ($foo, $bar) = $msg->cookie(['foo', 'bar']);
+  my $cookie = $msg->cookie('foo');
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
 L<Mojo::Cookie::Response> objects. If there are multiple cookies sharing the
@@ -637,8 +633,7 @@ Render whole message.
 
 =head2 upload
 
-  my $upload      = $msg->upload('foo');
-  my ($foo, $bar) = $msg->upload(['foo', 'bar']);
+  my $upload = $msg->upload('foo');
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 If there are multiple uploads sharing the same name, and you want to access

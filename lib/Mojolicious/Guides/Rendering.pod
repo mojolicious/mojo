@@ -455,7 +455,9 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
   get '/divide/:dividend/by/:divisor' => sub {
     my $c = shift;
-    my ($dividend, $divisor) = $c->param(['dividend', 'divisor']);
+
+    my $dividend = $c->param('dividend');
+    my $divisor  = $c->param('divisor');
 
     # 404
     return $c->reply->not_found

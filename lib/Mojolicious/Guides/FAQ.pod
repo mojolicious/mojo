@@ -136,6 +136,18 @@ connections concurrently.
 
 In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
+=head2 Where did my file extension go?
+
+Standard route placeholders will not match the C<.> character, however
+L<Mojolicious> routes automatically take file extensions like C<.html>, remove
+the leading C<.>, and store the result in the C<format> stash value. This can
+be useful for URL-based content negotiation, such as automatically rendering
+different templates based on the file extension. See
+<Mojolicious::Guides::Routing/"Formats"> for information on customizing format
+detection, or consider using
+L<relaxed placeholders|Mojolicious::Guides::Routing/"Relaxed placeholders"> to
+allow matching of the C<.> character.
+
 =head2 What does the error "Maximum message size exceeded" mean?
 
 To protect your applications from excessively large requests and responses,

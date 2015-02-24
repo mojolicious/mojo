@@ -12,6 +12,7 @@
   - Removed multi-name support from param method in Mojo::Parameters.
   - Removed multi-name support from cookie and upload methods in
     Mojo::Message.
+  - Removed auto_render method from Mojolicious::Routes.
   - Removed deprecated object-oriented Mojo::Loader API.
   - Removed deprecated accept_interval, lock and unlock attributes from
     Mojo::IOLoop.

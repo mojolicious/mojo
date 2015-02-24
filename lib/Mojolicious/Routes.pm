@@ -17,20 +17,13 @@ has namespaces => sub { [] };
 sub add_condition { $_[0]->conditions->{$_[1]} = $_[2] and return $_[0] }
 sub add_shortcut  { $_[0]->shortcuts->{$_[1]}  = $_[2] and return $_[0] }
 
-sub auto_render {
-  my ($self, $c) = @_;
-  my $stash = $c->stash;
-  return if $stash->{'mojo.rendered'};
-  $c->render_maybe or $stash->{'mojo.routed'} or $c->helpers->reply->not_found;
-}
-
 sub continue {
   my ($self, $c) = @_;
 
   my $match   = $c->match;
   my $stack   = $match->stack;
   my $current = $match->current;
-  return $self->auto_render($c) unless my $field = $stack->[$current];
+  return $self->_render($c) unless my $field = $stack->[$current];
 
   # Merge captures into stash
   my $stash = $c->stash;
@@ -199,6 +192,13 @@ sub _load {
   return $self->{loaded}{$app} = 1;
 }
 
+sub _render {
+  my ($self, $c) = @_;
+  my $stash = $c->stash;
+  return if $stash->{'mojo.rendered'};
+  $c->render_maybe or $stash->{'mojo.routed'} or $c->helpers->reply->not_found;
+}
+
 1;
 
 =encoding utf8
@@ -295,12 +295,6 @@ Add a new condition.
   $r = $r->add_shortcut(foo => sub {...});
 
 Add a new shortcut.
-
-=head2 auto_render
-
-  $r->auto_render(Mojolicious::Controller->new);
-
-Automatic rendering.
 
 =head2 continue
 

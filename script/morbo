@@ -42,8 +42,8 @@ morbo - Morbo HTTP and WebSocket development server
 
   Options:
     -h, --help                     Show this message
-    -l, --listen <location>        One or more locations you want to listen
-                                   on, defaults to the value of MOJO_LISTEN or
+    -l, --listen <location>        One or more locations you want to listen on,
+                                   defaults to the value of MOJO_LISTEN or
                                    "http://*:3000"
     -m, --mode <name>              Operating mode for your application,
                                    defaults to the value of

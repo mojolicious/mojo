@@ -1,5 +1,5 @@
 
-6.0  2015-02-24
+6.0  2015-02-25
   - Code name "Clinking Beer Mugs", this is a major release.
   - Removed name listing support from param method in Mojolicious::Controller.
   - Removed name listing support from param method in Mojo::Parameters.
@@ -10,8 +10,7 @@
   - Removed multi-name support from param method in
     Mojolicious::Validator::Validation.
   - Removed multi-name support from param method in Mojo::Parameters.
-  - Removed multi-name support from cookie and upload methods in
-    Mojo::Message.
+  - Removed multi-name support from cookie and upload methods in Mojo::Message.
   - Removed auto_render method from Mojolicious::Routes.
   - Removed deprecated object-oriented Mojo::Loader API.
   - Removed deprecated accept_interval, lock and unlock attributes from
@@ -295,8 +294,8 @@
     Mojolicious::Controller.
   - Added every_param method to Mojolicious::Validator::Validation.
   - Added from_json and to_json functions to Mojo::JSON.
-  - Improved pluck method in Mojo::Collection to be able to extract values
-    from hash references.
+  - Improved pluck method in Mojo::Collection to be able to extract values from
+    hash references.
 
 5.47  2014-09-28
   - Improved url_for performance.
@@ -400,8 +399,8 @@
   - Added support for nested helpers.
   - Added get_helper method to Mojolicious::Renderer.
   - Added n function to ojo.
-  - Fixed bug in Mojolicious::Routes::Match where placeholder values got
-    merged too early.
+  - Fixed bug in Mojolicious::Routes::Match where placeholder values got merged
+    too early.
 
 5.26  2014-08-09
   - Improved WebSocket performance.
@@ -518,8 +517,8 @@
 5.06  2014-06-11
   - Added deserialize and serialize attributes to Mojolicious::Sessions.
   - Improved redirect_to to behave more like url_for.
-  - Fixed bug in Mojo::UserAgent where HTTP/1.0 connections were sometimes
-    kept alive.
+  - Fixed bug in Mojo::UserAgent where HTTP/1.0 connections were sometimes kept
+    alive.
 
 5.05  2014-06-08
   - Fixed parsing of header fields with single character names in
@@ -577,11 +576,11 @@
   - Fixed warnings in Mojo::IOLoop::Delay.
 
 4.99  2014-05-12
-  - Added support for performing blocking and non-blocking requests at the
-    same time with Mojo::UserAgent.
+  - Added support for performing blocking and non-blocking requests at the same
+    time with Mojo::UserAgent.
   - Added nb_url method to Mojo::UserAgent::Server.
-  - Improved Mojo::IOLoop::Server and Mojo::Server::Daemon to be able to
-    listen on random ports.
+  - Improved Mojo::IOLoop::Server and Mojo::Server::Daemon to be able to listen
+    on random ports.
 
 4.98  2014-05-09
   - Removed deprecated get_line function from Mojo::Util.
@@ -704,13 +703,13 @@
   - Fixed list parsing bug in Mojo::DOM::HTML.
 
 4.79  2014-02-11
-  - Improved not found page to show request information and the exact path
-    used for route matching.
+  - Improved not found page to show request information and the exact path used
+    for route matching.
 
 4.78  2014-02-08
   - Deprecated Mojo::Util::get_line.
-  - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML
-    Living Standard.
+  - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML Living
+    Standard.
   - Fixed case-sensitivity bug in Mojolicious::Types.
 
 4.77  2014-02-06
@@ -740,8 +739,8 @@
 4.73  2014-02-01
   - Improved xml_escape performance significantly.
   - Improved html_unescape and url_unescape performance.
-  - Fixed Mojo::UserAgent::Transactor to handle redirects more like most
-    common browsers.
+  - Fixed Mojo::UserAgent::Transactor to handle redirects more like most common
+    browsers.
 
 4.72  2014-01-29
   - Added accepts, template_for and template_handler methods to
@@ -803,8 +802,8 @@
   - Fixed escaping bugs in Mojo::DOM::CSS.
 
 4.65  2014-01-02
-  - Deprecated use of hash references for optgroup generation with
-    select_field helper in favor of Mojo::Collection objects.
+  - Deprecated use of hash references for optgroup generation with select_field
+    helper in favor of Mojo::Collection objects.
   - Added b and c helpers to Mojolicious::Plugin::DefaultHelpers.
   - Fixed reference handling bug in Mojo::Collection.
 
@@ -881,8 +880,7 @@
   - Fixed a few multipart form handling bugs.
 
 4.50  2013-10-22
-  - Deprecated Mojo::UserAgent::app in favor of
-    Mojo::UserAgent::Server::app.
+  - Deprecated Mojo::UserAgent::app in favor of Mojo::UserAgent::Server::app.
   - Deprecated Mojo::UserAgent::app_url in favor of
     Mojo::UserAgent::Server::url.
   - Deprecated Mojo::UserAgent::detect_proxy in favor of
@@ -1074,8 +1072,8 @@
 
 4.15  2013-06-18
   - Added around_action hook.
-  - Improved ojo to make the current controller object available to actions
-    as $_. (jberger, sri)
+  - Improved ojo to make the current controller object available to actions as
+    $_. (jberger, sri)
   - Fixed a few error reporting bugs in Mojo::IOLoop::Client and
     Mojo::IOLoop::Server.
   - Fixed small emit_chain bug in Mojolicious::Plugins.
@@ -1151,8 +1149,8 @@
   - Changed types in Mojolicious::Types to consistently use arrays.
   - Changed heuristics for number detection in Mojo::JSON to better line up
     with user expectations.
-  - Changed render and render_static methods in Mojolicious::Controller to
-    call render_not_found if no response could be generated.
+  - Changed render and render_static methods in Mojolicious::Controller to call
+    render_not_found if no response could be generated.
   - Removed callback support from body method in Mojo::Message.
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.
@@ -1460,8 +1458,7 @@
   - Added support for smooth restarting to Morbo.
   - Added acceptor method to Mojo::IOLoop.
   - Added stop method to Mojo::Server::Daemon.
-  - Improved memory usage of chunked transfer encoding parser in
-    Mojo::Content.
+  - Improved memory usage of chunked transfer encoding parser in Mojo::Content.
 
 3.62  2012-11-26
   - Improved compatibility with IO::Socket::SSL 1.79.
@@ -1489,14 +1486,12 @@
 
 3.57  2012-11-12
   - Deprecated Mojo::Exception::raw_message.
-  - Improved error message accuracy in Mojo::Template by using line
-    directives.
+  - Improved error message accuracy in Mojo::Template by using line directives.
   - Improved performance of contains method in Mojo::Asset::File by 100%.
   - Fixed range bug in Mojo::Asset::Memory.
 
 3.56  2012-11-09
-  - Improved performance of contains method in Mojo::Asset::File
-    significantly.
+  - Improved performance of contains method in Mojo::Asset::File significantly.
   - Fixed offset bug in Mojo::Asset::File.
 
 3.55  2012-11-08
@@ -1754,8 +1749,7 @@
 3.03  2012-07-06
   - Improved load balancing between Hypnotoad worker processes.
   - Improved Hypnotoad log messages.
-  - Fixed default format handling bug in render_exception and
-    render_not_found.
+  - Fixed default format handling bug in render_exception and render_not_found.
   - Fixed small namespace detection bug in Mojo::DOM.
   - Fixed small session reset bug in Test::Mojo.
 
@@ -1777,8 +1771,7 @@
   - Removed app_class attribute from Mojo::Server.
   - Removed qp_decode and qp_encode methods from Mojo::ByteStream.
   - Removed qp_decode and qp_encode functions from Mojo::Util.
-  - Removed render_to_file and render_file_to_file methods from
-    Mojo::Template.
+  - Removed render_to_file and render_file_to_file methods from Mojo::Template.
   - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.
   - Renamed Mojo::Command to Mojolicious::Command.
   - Renamed format, reqs, symbol_start and symbols attributes in
@@ -1797,8 +1790,8 @@
   - Added accept_interval attribute to Mojo::IOLoop.
   - Added support for new HTTP status code.
   - Modernized ".perltidyrc".
-  - Improved Mojo::IOLoop::Server to prioritize RC4 cipher, which mitigates
-    the BEAST attack. (Danny Thomas)
+  - Improved Mojo::IOLoop::Server to prioritize RC4 cipher, which mitigates the
+    BEAST attack. (Danny Thomas)
   - Improved not found page to highlight custom route names.
   - Improved to method in Mojolicious::Routes::Route to give easier access to
     default parameters.
@@ -2021,8 +2014,8 @@
   - Renamed Mojo::IOWatcher to Mojo::Reactor.
   - Added module Mojolicious::Routes::Route.
   - Added find and root methods to Mojolicious::Routes::Route.
-  - Improved form_for helper to automatically add method="POST" attributes
-    when necessary.
+  - Improved form_for helper to automatically add method="POST" attributes when
+    necessary.
   - Improved memory usage of Mojolicious::Routes.
   - Improved Mojolicious::Renderer performance.
   - Fixed bug that slowed down Mojolicious::Renderer.
@@ -2045,19 +2038,17 @@
   - Removed experimental status from Mojo::Transaction::WebSocket.
   - Removed experimental status from Mojo::UserAgent::Transactor.
   - Removed experimental status from Mojolicious::Command::cpanify.
-  - Removed experimental status from upgrade event in
-    Mojo::Transaction::HTTP.
+  - Removed experimental status from upgrade event in Mojo::Transaction::HTTP.
   - Removed experimental status from t helper in
     Mojolicious::Plugin::TagHelpers.
   - Removed experimental status from current_route and url_with helpers in
     Mojolicious::Plugin::DefaultHelpers.
   - Removed experimental status from websocket function in Mojolicious::Lite.
-  - Removed experimental status from cache attribute in
-    Mojolicious::Renderer.
+  - Removed experimental status from cache attribute in Mojolicious::Renderer.
   - Removed experimental status from format attribute in
     Mojolicious::Routes::Pattern.
-  - Removed experimental status from ca and local_address,
-    request_timeout and transactor attributes in Mojo::UserAgent.
+  - Removed experimental status from ca and local_address, request_timeout and
+    transactor attributes in Mojo::UserAgent.
   - Removed experimental status from cache attribute in Mojolicious::Routes.
   - Removed experimental status from send method in Mojolicious::Controller.
   - Removed experimental status from finish_ok, message_is, message_isnt,
@@ -2067,19 +2058,17 @@
   - Removed experimental status from app_url, build_websocket_tx and
     websocket methods in Mojo::UserAgent.
   - Removed experimental status from emit_safe method in Mojo::EventEmitter.
-  - Removed experimental status from to_psgi_app method in
-    Mojo::Server::PSGI.
+  - Removed experimental status from to_psgi_app method in Mojo::Server::PSGI.
   - Removed experimental status from clone method in Mojo::Message::Request.
   - Removed experimental status from has_conditions, has_custom_name,
     has_websocket, is_websocket and websocket methods in Mojolicious::Routes.
-  - Removed experimental status from clone, is_limit_exceeded and
-    max_line_size methods in Mojo::Headers.
-  - Removed experimental status from text_after, text_before and xml
-    methods, as well as trim arguments in Mojo::DOM.
+  - Removed experimental status from clone, is_limit_exceeded and max_line_size
+    methods in Mojo::Headers.
+  - Removed experimental status from text_after, text_before and xml methods,
+    as well as trim arguments in Mojo::DOM.
   - Removed experimental status from boundary, charset, clone, is_dynamic,
     progress and max_leftover_size methods in Mojo::Content.
-  - Removed experimental status from clone method in
-    Mojo::Content::MultiPart.
+  - Removed experimental status from clone method in Mojo::Content::MultiPart.
   - Removed experimental status from clone method in Mojo::Content::Single.
   - Removed experimental status from is_dynamic, is_limit_exceeded and
     max_line_size methods in Mojo::Message.
@@ -2137,18 +2126,15 @@
   - Combined WebSocket timeout with normal inactivity timeout.
 
 2.54  2012-02-27
-  - Deprecated class and method stash values in favor of controller and
-    action.
+  - Deprecated class and method stash values in favor of controller and action.
   - Added EXPERIMENTAL patch function to Mojolicious::Lite.
   - Added EXPERIMENTAL patch method to Mojolicious::Routes.
   - Added EXPERIMENTAL patch method to Mojo::UserAgent.
   - Added EXPERIMENTAL patch_ok method to Test::Mojo.
   - Added EXPERIMENTAL t function to ojo.
   - Added support for MOJO_CONNECT_TIMEOUT, MOJO_INACTIVITY_TIMEOUT,
-    MOJO_REQUEST_TIMEOUT and MOJO_WEBSOCKET_TIMEOUT environment
-    variables.
-  - Split up Mojolicious::Guides::Cheatsheet into more reference
-    documentation.
+    MOJO_REQUEST_TIMEOUT and MOJO_WEBSOCKET_TIMEOUT environment variables.
+  - Split up Mojolicious::Guides::Cheatsheet into more reference documentation.
   - Increased default connect timeout from 3 to 10 seconds in Mojo::UserAgent
     and Mojo::IOLoop::Client.
   - Improved resilience of Mojo::IOLoop::Stream.
@@ -2176,8 +2162,7 @@
 2.51  2012-02-19
   - Added EXPERIMENTAL to_psgi method to Mojo::Server::PSGI.
   - Removed experimental status from around_dispatch hook.
-  - Removed experimental status from emit_chain method in
-    Mojolicious::Plugins.
+  - Removed experimental status from emit_chain method in Mojolicious::Plugins.
   - Removed experimental status from drain event in Mojo::Content.
   - Improved portability of scripts.
   - Fixed bug that can prevent foreign event loops from being able to control
@@ -2209,8 +2194,8 @@
 2.48  2012-02-09
   - Fixed Hypnotoad HTTPS bug.
   - Fixed small URL escaping bug in Mojo::UserAgent::Transactor.
-  - Fixed small MIME::Base64 and MIME::QuotedPrint related bugs in
-    Mojo::Util. (sestegra, sri)
+  - Fixed small MIME::Base64 and MIME::QuotedPrint related bugs in Mojo::Util.
+    (sestegra, sri)
 
 2.47  2012-02-06
   - Deprecated Hypnotoad configuration files in favor of more powerful
@@ -2231,10 +2216,8 @@
   - Replaced drop_handle and drop_timer methods in Mojo::IOWatcher with drop
     method.
   - Renamed change and watch methods in Mojo::IOWatcher to watch and io.
-  - Renamed resume and pause methods in Mojo::IOLoop::Server to start and
-    stop.
-  - Renamed resume and pause methods in Mojo::IOLoop::Stream to start
-    and stop.
+  - Renamed resume and pause methods in Mojo::IOLoop::Server to start and stop.
+  - Renamed resume and pause methods in Mojo::IOLoop::Stream to start and stop.
   - Added pdf MIME type. (bfaist)
   - Improved CSS of some built-in templates.
   - Fixed bug that prevented newer dual-life modules to be loaded.
@@ -2257,8 +2240,8 @@
 
 2.44  2012-01-18
   - Added new not found page for development mode.
-  - Added EXPERIMENTAL url_with helper to
-    Mojolicious::Plugin::DefaultHelpers. (diegok, marcus, judofyr, sri)
+  - Added EXPERIMENTAL url_with helper to Mojolicious::Plugin::DefaultHelpers.
+    (diegok, marcus, judofyr, sri)
   - Added EXPERIMENTAL support for removing query parameters while merging to
     query method of Mojo::URL. (marcus, judofyr, sri)
   - Removed experimental status from Mojo::IOLoop::Delay.
@@ -2266,8 +2249,8 @@
   - Improved exception page for development mode.
   - Improved syntax highlighting in documentation browser slightly.
   - Fixed Mojo::Command::app to be an attribute and not a method.
-  - Fixed Mojo::ByteStream, Mojo::Collection and Mojo::DOM to not be
-    subclasses of Mojo::Base.
+  - Fixed Mojo::ByteStream, Mojo::Collection and Mojo::DOM to not be subclasses
+    of Mojo::Base.
 
 2.43  2012-01-08
   - Improved most commands with shortcut options.
@@ -2290,8 +2273,8 @@
   - Removed experimental status from auto_upgrade attribute in
     Mojo::Content::Single.
   - Removed experimental status from body event in Mojo::Content.
-  - Removed experimental status from mojo_lib_dir and slurp_rel_file methods
-    in Mojo::Home.
+  - Removed experimental status from mojo_lib_dir and slurp_rel_file methods in
+    Mojo::Home.
   - Removed experimental status from message event in Mojo::Log.
   - Removed experimental status from contains method in Mojo::Path.
   - Removed test_server method from Test::Mojo.
@@ -2307,8 +2290,7 @@
   - Removed experimental status from Mojo::Collection.
   - Removed experimental status from Mojolicious::Plugin::Mount.
   - Removed experimental status from dnt and etag methods in Mojo::Headers.
-  - Improved session expiration by allowing it to be disabled.
-    (nwatkiss, sri)
+  - Improved session expiration by allowing it to be disabled. (nwatkiss, sri)
   - Improved session cookies to always enable the HttpOnly flag.
     (nwatkiss, sri)
   - Improved RFC 6265 compliance of cookie implementation.
@@ -2352,8 +2334,7 @@
   - Welcome to the Mojolicious core team Marcus Ramberg, Glen Hinkle and
     Abhijit Menon-Sen.
   - Removed cleanup_interval attribute from Mojo::IOLoop.
-  - Deprecated Mojo::IOLoop::timeout in favor of
-    Mojo::IOLoop::Stream::timeout.
+  - Deprecated Mojo::IOLoop::timeout in favor of Mojo::IOLoop::Stream::timeout.
   - Added EXPERIMENTAL timeout event to Mojo::IOLoop::Stream.
   - Added EXPERIMENTAL timeout attribute to Mojo::IOLoop::Stream.
   - Changed default keep-alive timeout of Mojo::UserAgent from 15 to 20
@@ -2383,8 +2364,8 @@
 2.32  2011-11-24
   - Added EXPERIMENTAL error event to Mojo::IOWatcher.
   - Updated jQuery to version 1.7.1.
-  - Improved Mojo::IOLoop performance by changing the default cleanup
-    interval from 0 to 0.025 seconds.
+  - Improved Mojo::IOLoop performance by changing the default cleanup interval
+    from 0 to 0.025 seconds.
 
 2.31  2011-11-21
   - Improved stacktraces by making them a lot simpler.
@@ -2395,8 +2376,7 @@
 
 2.29  2011-11-19
   - Deprecated Mojolicious::on_process in favor of around_dispatch hook.
-  - Added EXPERIMENTAL emit_chain method to Mojolicious::Plugins.
-    (Akron, sri)
+  - Added EXPERIMENTAL emit_chain method to Mojolicious::Plugins. (Akron, sri)
   - Added EXPERIMENTAL around_dispatch hook.
   - Fixed small bug in boundary and charset methods of Mojo::Content.
 
@@ -2454,8 +2434,8 @@
 
 2.21  2011-11-02
   - Removed profile helper.
-  - Removed CSS4 selector subject support from Mojo::DOM::CSS until we
-    actually know the exact semantics.
+  - Removed CSS4 selector subject support from Mojo::DOM::CSS until we actually
+    know the exact semantics.
   - Improved Mojo::ByteStream to generate most Mojo::Util based methods
     automatically.
   - Fixed route pattern bug.
@@ -2609,8 +2589,8 @@
   - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
   - Updated WebSocket implementation to ietf-16.
   - Changed default upgrade timeout of Hypnotoad from 30 to 60 seconds.
-  - Improved accept performance of all built-in web servers by up to 1000%
-    with the EV backend.
+  - Improved accept performance of all built-in web servers by up to 1000% with
+    the EV backend.
   - Improved connection_timeout method in Mojo::IOLoop by allowing it to be
     called as a class method.
   - Improved CSS of some built-in templates.
@@ -2664,14 +2644,14 @@
 
 1.91  2011-08-25
   - Added EXPERIMENTAL support for cloning Mojo::Message::Request objects.
-  - Improved redirect support in Mojo::UserAgent to be closer to commonly
-    used browsers.
+  - Improved redirect support in Mojo::UserAgent to be closer to commonly used
+    browsers.
 
 1.90  2011-08-24
   - Improved respond_to to automatically render an empty 204 response for
     unknown formats.
-  - Improved render_exception and render_not_found to use the current
-    format if available. (alnewkirk)
+  - Improved render_exception and render_not_found to use the current format if
+    available. (alnewkirk)
 
 1.89  2011-08-23
   - Improved Mojo::Home portability. (omega)
@@ -2719,8 +2699,7 @@
     Mojolicious::Plugin::EPRenderer.
   - Deprecated Mojolicious::Plugin::EplRenderer in favor of
     Mojolicious::Plugin::EPLRenderer.
-  - Deprecated Mojolicious::Plugin::I18n in favor of
-    Mojolicious::Plugin::I18N.
+  - Deprecated Mojolicious::Plugin::I18n in favor of Mojolicious::Plugin::I18N.
   - Deprecated Mojolicious::Plugin::JsonConfig in favor of
     Mojolicious::Plugin::JSONConfig.
   - Deprecated Mojolicious::Plugin::PodRenderer in favor of
@@ -2737,8 +2716,7 @@
   - Fixed small command bug.
 
 1.77  2011-08-14
-  - Deprecated Mojo::Path::append in favor of using Mojo::Path::parts
-    directly.
+  - Deprecated Mojo::Path::append in favor of using Mojo::Path::parts directly.
   - Improved handling of preformatted text in Mojo::DOM.
   - Improved Mojo::DOM to allow smart whitespace trimming to be disabled.
     (Akron)
@@ -2748,8 +2726,8 @@
   - Fixed small Mojo::URL escaping bug.
 
 1.75  2011-08-12
-  - Added secure_compare function to Mojo::Util as a precaution against
-    timing attacks in the future. (judofyr)
+  - Added secure_compare function to Mojo::Util as a precaution against timing
+    attacks in the future. (judofyr)
   - Added EXPERIMENTAL CSS4 selector subject support to Mojo::DOM::CSS.
 
 1.74  2011-08-09
@@ -2789,8 +2767,7 @@
   - Fixed small bug in Mojo::IOLoop::Server.
 
 1.68  2011-07-29
-  - Moved is_ipv4 and is_ipv6 methods from Mojo::URL to
-    Mojo::IOLoop::Resolver.
+  - Moved is_ipv4 and is_ipv6 methods from Mojo::URL to Mojo::IOLoop::Resolver.
 
 1.67  2011-07-27
   - Fixed version command.
@@ -2806,11 +2783,11 @@
     Mojo::IOLoop::Stream, which contain extracted functionality from
     Mojo::IOLoop.
   - Added EXPERIMENTAL module Mojo::IOWatcher::EV. (xantus)
-  - Removed modules Mojo::IOWatcher::Epoll and Mojo::IOWatcher::KQueue,
-    since Mojo::IOWatcher::EV is a much better alternative.
+  - Removed modules Mojo::IOWatcher::Epoll and Mojo::IOWatcher::KQueue, since
+    Mojo::IOWatcher::EV is a much better alternative.
   - Renamed Mojo::Resolver to Mojo::IOLoop::Resolver.
-  - Improved Mojolicious::Routes to automatically disable the routing cache
-    if conditions are used.
+  - Improved Mojolicious::Routes to automatically disable the routing cache if
+    conditions are used.
   - Improved route constraint alternatives.
   - Improved documentation browser CSS. (judofyr)
   - Fixed small bug in get command.
@@ -2857,8 +2834,8 @@
   - Fixed small Windows issue.
 
 1.53  2011-07-02
-  - Added EXPERIMENTAL format method to Mojo::Log and simplified the
-    default log file format.
+  - Added EXPERIMENTAL format method to Mojo::Log and simplified the default
+    log file format.
   - Improved include helper argument localization. (miyagawa)
 
 1.52  2011-07-01
@@ -2882,8 +2859,8 @@
     functionality from Mojo::UserAgent.
   - Added EXPERIMENTAL support for simple alternative placeholder values to
     routes.
-  - Improved Morbo restarter to also check for changed file size in addition
-    to mtime.
+  - Improved Morbo restarter to also check for changed file size in addition to
+    mtime.
   - Fixed many small routes bugs.
   - Fixed small reparse bug in Mojo::Parameters. (dmw397)
   - Fixed url_for to incorporate trailing slash for current route.
@@ -2899,18 +2876,17 @@
 
 1.47  2011-06-22
   - Added EXPERIMENTAL callback condition plugin.
-  - Added EXPERIMENTAL host condition to
-    Mojolicious::Plugin::HeaderCondition.
+  - Added EXPERIMENTAL host condition to Mojolicious::Plugin::HeaderCondition.
   - Added host support to Mojolicious::Plugin::Mount. (sri, alnewkirk)
-  - Removed Mojolicious::Plugin::AgentCondition and added its functionality
-    to Mojolicious::Plugin::HeaderCondition.
+  - Removed Mojolicious::Plugin::AgentCondition and added its functionality to
+    Mojolicious::Plugin::HeaderCondition.
   - Improved overall performance slightly.
   - Fixed render_static return value.
   - Fixed dispatcher return values.
 
 1.46  2011-06-21
-  - Improved Morbo to only attempt restarting applications after a file
-    change has been detected.
+  - Improved Morbo to only attempt restarting applications after a file change
+    has been detected.
   - Improved overall performance by about 3% with many small optimizations.
   - Improved query string support in Mojo::Parameters.
   - Fixed Windows restart issues in Morbo. (lammel)
@@ -2922,9 +2898,9 @@
 
 1.44  2011-06-18
   - Added EXPERIMENTAL self-restarting Morbo development web server and
-    removed old "--reload" support since there have been too many negative
-    side effects. This also improves overall performance by about 5-10% and
-    reduces memory usage by about 10%.
+    removed old "--reload" support since there have been too many negative side
+    effects. This also improves overall performance by about 5-10% and reduces
+    memory usage by about 10%.
   - Added EXPERIMENTAL application mount plugin.
   - Added EXPERIMENTAL --help support for all commands.
   - Updated prettify.js to version 1-Jun-2011.
@@ -2999,9 +2975,9 @@
 
 1.32  2011-05-11
   - Added EXPERIMENTAL name support for template exceptions.
-  - Updated IO::Socket::SSL requirement to 1.43 due to bugs in older
-    versions. Note that the version requirement will keep getting updated
-    until we encounter a version that is not broken most of the time.
+  - Updated IO::Socket::SSL requirement to 1.43 due to bugs in older versions.
+    Note that the version requirement will keep getting updated until we
+    encounter a version that is not broken most of the time.
   - Improved reloading slightly by allowing it to clean up the main
     namespace.
   - Fixed enabling of Perl 5.10 features in Mojo::Base and Mojolicious::Lite.
@@ -3017,8 +2993,8 @@
 1.3  2011-05-05
   - Code name "Tropical Drink", this is a major release.
   - Deprecated Perl 5.8.x support.
-  - Deprecated Mojolicious::Renderer get_inline_template method in favor of
-    the get_data_template method.
+  - Deprecated Mojolicious::Renderer get_inline_template method in favor of the
+    get_data_template method.
   - Added EXPERIMENTAL before_render hook.
   - Added EXPERIMENTAL hook function to Mojolicious::Lite.
   - Added workaround for uWSGI bug. (miyagawa)
@@ -3066,11 +3042,9 @@
   - Fixed test case.
 
 1.17  2011-04-18
-  - Deprecated Mojolicious process method in favor of the on_process
-    attribute.
+  - Deprecated Mojolicious process method in favor of the on_process attribute.
   - Added Failraptor.
-  - Added support for MOJO_CERT_FILE and MOJO_KEY_FILE environment
-    variables.
+  - Added support for MOJO_CERT_FILE and MOJO_KEY_FILE environment variables.
   - Added EXPERIMENTAL xml attribute to Mojo::DOM.
   - Added EXPERIMENTAL build_url method to Test::Mojo.
   - Added EXPERIMENTAL dnt (Do Not Track) method to Mojo::Headers.
@@ -3171,8 +3145,8 @@
   - Added image helper to Mojolicious::Plugin::TagHelpers.
   - Added support for secure session cookies. (crab)
   - Improved HTML5 compatibility of Mojo::DOM.
-  - Replaced Mojo::JSON parser with a much faster and stricter
-    implementation. (chansen)
+  - Replaced Mojo::JSON parser with a much faster and stricter implementation.
+    (chansen)
   - Improved Mojo::JSON string encoding. (chansen)
   - Updated to jQuery to version 1.5.
   - Removed experimental status from Mojo::DOM and ojo.
@@ -3210,10 +3184,9 @@
   - Fixed Mojo::Client cloning.
 
 1.01  2011-01-06
-  - Relicensed some of the images to make sure Mojolicious can be shipped
-    with commercial products.
-  - Updated IO::Socket::SSL requirement to 1.37 due to bugs in older
-    versions.
+  - Relicensed some of the images to make sure Mojolicious can be shipped with
+    commercial products.
+  - Updated IO::Socket::SSL requirement to 1.37 due to bugs in older versions.
   - Added EXPERIMENTAL TLS certificate authentication support. (tempire)
   - Added EXPERIMENTAL title helper.
   - Added EXPERIMENTAL render_later method to Mojolicious::Controller.
@@ -3352,21 +3325,21 @@
   - Deprecated old Mojo::Template block syntax and added a very pretty
     replacement. (See documentation for more)
   - Deprecated helper method in Mojolicious::Controller.
-  - Deprecated all *_cb methods (and finished/receive_message) in favor of
-    on_* methods.
+  - Deprecated all *_cb methods (and finished/receive_message) in favor of on_*
+    methods.
   - Deprecated process method in Mojo::Client and added new start method.
   - Replaced the "mojolicious" command with "mojo", for convenience.
   - Removed Mojo::Command::Generate::App.
   - Renamed the methods name and replace_content to type and replace_inner in
     Mojo::DOM.
   - Added EXPERIMENTAL support for indented Perl lines in Mojo::Template.
-  - Added EXPERIMENTAL support for --mode and --home options to all
-    Mojolicious commands.
+  - Added EXPERIMENTAL support for --mode and --home options to all Mojolicious
+    commands.
   - Added EXPERIMENTAL support for helper methods.
   - Added EXPERIMENTAL helper method to Mojolicious.
   - Added EXPERIMENTAL support for inline rendering to Mojolicious.
-  - Added EXPERIMENTAL memorize helper to
-    Mojolicious::Plugin::DefaultHelpers. (ptomli)
+  - Added EXPERIMENTAL memorize helper to Mojolicious::Plugin::DefaultHelpers.
+    (ptomli)
   - Added EXPERIMENTAL write, write_chunk and rendered methods to
     Mojolicious::Controller.
   - Added EXPERIMENTAL support for loading of plugins by full module name.
@@ -3507,16 +3480,14 @@
   - Fixed small renderer bug.
 
 0.999925  2010-06-07
-  - Updated WebSocket implementation to draft 76, NOTE THAT THIS CHANGE IS
-    NOT BACKWARDS COMPATIBLE!!!
-    (sadly we have no choice when the spec changes)
+  - Updated WebSocket implementation to draft 76, NOTE THAT THIS CHANGE IS NOT
+    BACKWARDS COMPATIBLE!!! (sadly we have no choice when the spec changes)
   - Increased Perl version requirement to 5.8.7 due to Unicode bugs in earlier
     releases.
   - Switched to app->start instead of shagadelic as default way to start
     Mojolicious::Lite apps in the documentation.
   - Made tutorial examples more business friendly.
-  - Added the ability to use Mojolicious::Lite apps as Mojolicious
-    controllers.
+  - Added the ability to use Mojolicious::Lite apps as Mojolicious controllers.
   - Added EXPERIMENTAL XML DOM parser with CSS3 selector support.
   - Added EXPERIMENTAL tag_helper plugin to Mojolicious. (vti)
   - Added EXPERIMENTAL success method to Mojo::Transaction.
@@ -3535,8 +3506,7 @@
     names in the stash.
   - Converted README to markdown. (memowe)
   - Fixed connection keep-alive with epoll.
-  - Fixed bridge bug in MojoX::Routes::Match.
-    (Oleg Zhelo, Dmitry Konstantinov)
+  - Fixed bridge bug in MojoX::Routes::Match. (Oleg Zhelo, Dmitry Konstantinov)
   - Fixed argument handling of Mojo::Template blocks. (afresh1)
   - Fixed a stash localization bug. (und3f)
   - Fixed Mojo::Log to use flock to sync log file writing.
@@ -3575,8 +3545,8 @@
   - Fixed ioloop timers to actually work.
   - Fixed PSGI environment auto detection and removed .psgi file generator
     since it has become obsolete.
-  - Fixed Mojolicious sessions to remove the session cookie immediately if
-    it's not needed anymore. (ask)
+  - Fixed Mojolicious sessions to remove the session cookie immediately if it's
+    not needed anymore. (ask)
   - Fixed routes method condition to consider GET and HEAD equal.
   - Fixed test requiring Perl 5.10.
   - Fixed a loader bug. (mvuets)
@@ -3592,9 +3562,9 @@
       my $tx = $client->post_form('http://kraih.com', {q => 'mojo'});
   - Made plugins much more configurable.
   - Improved PSGI support and added psgi command.
-  - Added automatic environment detection for Plack based servers, there is
-    no technical way to detect all PSGI compliant servers yet though. That
-    means "plackup myapp.pl" and "plackup script/my_app" should just work.
+  - Added automatic environment detection for Plack based servers, there is no
+    technical way to detect all PSGI compliant servers yet though. That means
+    "plackup myapp.pl" and "plackup script/my_app" should just work.
   - Added session and flash helpers.
   - Added finished callback to WebSocket client and server.
   - Added referrer method to Mojo::Headers. (esskar)
@@ -3617,8 +3587,8 @@
   - Added signed cookie support.
   - Added I18N support. (vti, memowe)
   - Added template detection again, you can now just mix multiple template
-    engines and the renderer will automatically pick the right template. So
-    you don't have to use the handler argument anymore, even though it's still
+    engines and the renderer will automatically pick the right template. So you
+    don't have to use the handler argument anymore, even though it's still
     available and overrides auto detection.
   - Added Flash Policy Server example. (xantus)
   - Added more reference docs.
@@ -3687,8 +3657,7 @@
   - Added version command.
   - Added after_build_tx plugin hook.
   - Added timer support to Mojo::IOLoop.
-  - Added the ability to run multiple concurrent ioloops that block each
-    other.
+  - Added the ability to run multiple concurrent ioloops that block each other.
   - Added default_template_class attribute to MojoX::Renderer.
   - Added render_static method to Mojolicious::Controller.
   - Added support for embedded Mojolicious applications.
@@ -3718,8 +3687,8 @@
     and TCP connections.
   - Changed exceptions to stay out of your way as much as possible.
   - Made all Mojolicious after_* plugin hooks run in reverse order.
-  - Made param decoding more defensive and allow malformed data to pass
-    through for debugging.
+  - Made param decoding more defensive and allow malformed data to pass through
+    for debugging.
   - Made Mojo::IOLoop very hard to kill.
   - Reduced Mojolicious log output outside of development mode.
   - Polished Mojo::Client API.
@@ -3737,13 +3706,12 @@
   - Fixed format detection bug. (marcus)
   - Fixed named url_for. (marcus)
   - Fixed decamelize of multiple uppercase characters.
-  - Fixed plugins and commands to work with multiple namespaces and
-    reloading.
+  - Fixed plugins and commands to work with multiple namespaces and reloading.
   - Fixed multiple process calls in Mojo::Client.
   - Fixed a routes parser bug.
   - Fixed a bug that caused waypoint actions to run twice.
-  - Fixed a bug where to_abs and to_rel could not be called multiple times on
-    a Mojo::URL object. (vti)
+  - Fixed a bug where to_abs and to_rel could not be called multiple times on a
+    Mojo::URL object. (vti)
   - Fixed development mode log level. (ka2u)
   - Fixed query string support in Mojo::URL. (vti)
   - Fixed rendering without template name.
@@ -3826,10 +3794,10 @@
     (Andre Vieth)
 
 0.999901  2009-09-01
-  - Added new Mojo::Client, because the old one had bugs that prevented
-    proper scaling and could not be fixed otherwise. Note that this change is
-    not backwards compatible, the decision to make it so close to the 1.0
-    release was not easy but the bugs were simply too serious.
+  - Added new Mojo::Client, because the old one had bugs that prevented proper
+    scaling and could not be fixed otherwise. Note that this change is not
+    backwards compatible, the decision to make it so close to the 1.0 release
+    was not easy but the bugs were simply too serious.
   - Added native JSON support.
   - Added more designer friendly .ep templates to Mojolicious. The default
     template format for your application can be controlled with the
@@ -3883,12 +3851,12 @@
 
 0.991250  2009-08-18
   - This release contains many substantial changes that are not backwards
-    compatible, but good news is that it's also the last major feature
-    breaking release before 1.0. ;) Older releases of Mojo did contain
-    additional Mojo::Script::* and Mojolicious::Script::* modules that are
-    obsolete now and might break this version if they are still present on
-    your system. Because of this we highly suggest that you DELETE ALL
-    MODULES IN THE "Mojo", "MojoX" AND "Mojolicious" NAMESPACES MANUALLY!!!
+    compatible, but good news is that it's also the last major feature breaking
+    release before 1.0. ;) Older releases of Mojo did contain additional
+    Mojo::Script::* and Mojolicious::Script::* modules that are obsolete now
+    and might break this version if they are still present on your system.
+    Because of this we highly suggest that you DELETE ALL MODULES IN THE
+    "Mojo", "MojoX" AND "Mojolicious" NAMESPACES MANUALLY!!!
   - Mojo::Script has been renamed to Mojo::Command, this change is not
     backwards compatible! You will have to regenerate application scripts or
     replace "Mojo(licious)::Script" with "Mojo(licious)::Command" manually.
@@ -3901,8 +3869,8 @@
     have to rename all your eplite templates to epl.
   - Simplified MojoX::Renderer, this change is not backwards compatible!
     Handler can no longer be detected, that means default_handler or the
-    handler argument are required. The template argument can no longer
-    contain format or handler.
+    handler argument are required. The template argument can no longer contain
+    format or handler.
       $self->render(template => 'foo.html.epl');
     becomes
       $self->render('foo', format => 'html', handler => 'epl');
@@ -3931,8 +3899,8 @@
     attribute can now be used to set the default controller in Mojolicious.
     There is also no $c argument anymore actions get called with, since
     everything is in $self now.
-  - Refactored and renamed Mojo::Transaction and Mojo::Pipeline, this change
-    is not backwards compatible!
+  - Refactored and renamed Mojo::Transaction and Mojo::Pipeline, this change is
+    not backwards compatible!
       Mojo::Transaction -> Mojo::Transaction::Single
       Mojo::Pipeline -> Mojo::Transaction::Pipeline
   - Refactored and renamed Mojo::File and Mojo::File::Memory, this change is
@@ -3997,8 +3965,8 @@
 0.991241  2009-07-20
   - Mojolicious::Lite has been introduced as a new entry level web framework
     example.
-  - Mojo::Message::Response will now default to response code 200, this
-    change is not backwards compatible. In Mojolicious you should use
+  - Mojo::Message::Response will now default to response code 200, this change
+    is not backwards compatible. In Mojolicious you should use
     ->render(text => 'Hello!') instead of ->res->body('Hello!') now.
   - Changed routes syntax again, this change is not entirely backwards
     compatible but will only affect you if you are using the relaxed and
@@ -4034,8 +4002,8 @@
     Mojo::Template directly.
   - Added setuid/setgid support to Mojo::Server::Daemon and
     Mojo::Server::Daemon::Prefork. (James Duncan)
-  - Updated Mojo::Server::FastCGI and Mojo::Server::Daemon::Prefork to use
-    the application logger.
+  - Updated Mojo::Server::FastCGI and Mojo::Server::Daemon::Prefork to use the
+    application logger.
   - Fixed import problem in Mojo::Server::Daemon::Prefork. (James Duncan)
   - Fixed warning in "template.t".
 
@@ -4089,13 +4057,13 @@
   - Fixed tarball.
 
 0.991231  2009-06-29
-  - Rewrote MojoX::Renderer, it is not backwards compatible and templates
-    need to be renamed in the following 3 part format "index.html.tt"!
+  - Rewrote MojoX::Renderer, it is not backwards compatible and templates need
+    to be renamed in the following 3 part format "index.html.tt"!
   - Added exception support to MojoX::Dispatcher::Routes, this change is not
-    backwards compatible and "dispatch" calls now return exception objects
-    for errors and false otherwise.
-  - Changed routes syntax, this change is not backwards compatible and you
-    need to change all your existing routes.
+    backwards compatible and "dispatch" calls now return exception objects for
+    errors and false otherwise.
+  - Changed routes syntax, this change is not backwards compatible and you need
+    to change all your existing routes.
       "/:foo" becomes "/(foo)"
       "/^foo" becomes "/((foo))"
       "/*foo" becomes "/(((foo)))"
@@ -4109,8 +4077,7 @@
   - Added Makefile.PL generator.
   - Added HttpOnly support to Mojo::Cookie. (burak)
   - Support more CGI implementations.
-  - Added support for namespaces only dispatching in
-    MojoX::Dispatcher::Routes.
+  - Added support for namespaces only dispatching in MojoX::Dispatcher::Routes.
   - Added encoding support to Mojo::Template and made "utf8" the default.
   - Added HEAD support to Mojo::Server::Daemon. (acajou)
   - Added new relaxed placeholder to MojoX::Routes::Pattern.
@@ -4134,15 +4101,15 @@
   - Fixed empty cookie parsing. (vti)
   - Fixed a case where child processes migth hang in
     Mojo::Server::Daemon::Prefork. (gbarr)
-  - Fixed a bug in MojoX::Dispatcher::Routes where the renderer would be
-    called with an empty stack. (melo)
+  - Fixed a bug in MojoX::Dispatcher::Routes where the renderer would be called
+    with an empty stack. (melo)
   - Fixed a escaping problem in Mojo::Parameters. (vti)
   - Updated Mojo::URL to be more template friendly.
   - Improved Solaris compatibility.
 
 0.9002  2009-02-16
-  - Added local_address(), local_port(), remote_address() and remote_port()
-    to Mojo::Transaction.
+  - Added local_address(), local_port(), remote_address() and remote_port() to
+    Mojo::Transaction.
 
 0.9001  2009-01-28
   - Added proper home detection to Mojo itself. (charsbar)
@@ -4174,8 +4141,7 @@
   - Fixed / routes matching too much.
   - New Windows workaround in Mojo::Client and Mojo::Server::Daemon.
   - Added ".perltidyrc". (Ask Bjoern Hansen)
-  - Allow chains to be broken with return values in
-    MojoX::Dispatcher::Routes.
+  - Allow chains to be broken with return values in MojoX::Dispatcher::Routes.
   - The stack in MojoX::Routes resets now.
   - Renamed default_handler to default_format in MojoX::Renderer.
   - Disallow actions beginning with _ in MojoX::Dispatcher::Routes.
@@ -4233,8 +4199,7 @@
 0.8.4  2008-11-04
   - Improved caching in Mojo::Message.
   - Added upload and cookie method to Mojo::Message.
-  - Changed uploads behavior in Mojo::Message to bring it in line with
-    cookies.
+  - Changed uploads behavior in Mojo::Message to bring it in line with cookies.
 
 0.8.3  2008-11-03
   - Removed filter from Mojo::Base and added warnings.
@@ -4250,8 +4215,8 @@
   - Fixed Mojo::Server::Daemon Windows support.
   - Generated applications now have individually named executables.
   - Changed Mojolicious default application templates to something more sane.
-  - Mojo::Base accessors don't take multiple arguments anymore, this results
-    in a 25% speed increase.
+  - Mojo::Base accessors don't take multiple arguments anymore, this results in
+    a 25% speed increase.
   - Added MOJO_MAX_MEMORY_SIZE environment variable.
   - Added prepare_parser and prepare_builder callbacks to Mojo::Message.
   - Added done and is_done to Mojo::Stateful.

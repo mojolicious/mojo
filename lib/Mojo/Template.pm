@@ -8,7 +8,7 @@ use Mojo::Util qw(decode encode monkey_patch slurp);
 
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
-has [qw(append code prepend template)] => '';
+has [qw(append code prepend unparsed)] => '';
 has [qw(auto_escape compiled)];
 has capture_end   => 'end';
 has capture_start => 'begin';
@@ -92,7 +92,7 @@ sub compile {
   $self->compiled($compiled) and return undef unless $@;
 
   # Use local stacktrace for compile exceptions
-  return Mojo::Exception->new($@, [$self->template, $code])->trace->verbose(1);
+  return Mojo::Exception->new($@, [$self->unparsed, $code])->trace->verbose(1);
 }
 
 sub interpret {
@@ -101,7 +101,7 @@ sub interpret {
   # Stacktrace
   local $SIG{__DIE__} = sub {
     CORE::die($_[0]) if ref $_[0];
-    Mojo::Exception->throw(shift, [$self->template, $self->code]);
+    Mojo::Exception->throw(shift, [$self->unparsed, $self->code]);
   };
 
   return undef unless my $compiled = $self->compiled;
@@ -109,14 +109,14 @@ sub interpret {
   return $output if eval { $output = $compiled->(@_); 1 };
 
   # Exception with template context
-  return Mojo::Exception->new($@, [$self->template])->verbose(1);
+  return Mojo::Exception->new($@, [$self->unparsed])->verbose(1);
 }
 
 sub parse {
   my ($self, $template) = @_;
 
   # Clean start
-  $self->template($template)->tree(\my @tree);
+  $self->unparsed($template)->tree(\my @tree);
 
   my $tag     = $self->tag_start;
   my $replace = $self->replace_mark;
@@ -580,13 +580,6 @@ Characters indicating the end of a tag, defaults to C<%E<gt>>.
 
   <%= $foo %>
 
-=head2 template
-
-  my $template = $mt->template;
-  $mt          = $mt->template('<%= 1 + 1 %>');
-
-Raw unparsed template.
-
 =head2 tree
 
   my $tree = $mt->tree;
@@ -603,6 +596,13 @@ carefully since it is very dynamic.
 Character activating automatic whitespace trimming, defaults to C<=>.
 
   <%= $foo =%>
+
+=head2 unparsed
+
+  my $unparsed = $mt->unparsed;
+  $mt          = $mt->unparsed('<%= 1 + 1 %>');
+
+Raw unparsed template.
 
 =head1 METHODS
 

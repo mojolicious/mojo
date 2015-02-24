@@ -240,7 +240,7 @@
             % my ($walk, $route, $depth) = @_;
             <tr>
               <td class="striped value">
-                % my $pattern = $route->pattern->pattern || '/';
+                % my $pattern = $route->pattern->unparsed || '/';
                 % $pattern = "+$pattern" if $depth;
                 <pre><%= '  ' x $depth %><%= $pattern %></pre>
               </td>

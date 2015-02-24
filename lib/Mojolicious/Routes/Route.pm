@@ -94,7 +94,7 @@ sub over {
 
 sub parse {
   my $self = shift;
-  $self->{name} = $self->pattern->parse(@_)->pattern // '';
+  $self->{name} = $self->pattern->parse(@_)->unparsed // '';
   $self->{name} =~ s/\W+//g;
   return $self;
 }
@@ -155,7 +155,7 @@ sub to {
 }
 
 sub to_string {
-  join '', map { $_->pattern->pattern // '' } @{shift->_chain};
+  join '', map { $_->pattern->unparsed // '' } @{shift->_chain};
 }
 
 sub under { shift->_generate_route(under => @_) }

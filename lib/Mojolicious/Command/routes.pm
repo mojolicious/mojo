@@ -24,7 +24,7 @@ sub _walk {
   # Pattern
   my $prefix = '';
   if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
-  push @$rows, my $row = [$prefix . ($route->pattern->pattern || '/')];
+  push @$rows, my $row = [$prefix . ($route->pattern->unparsed || '/')];
 
   # Flags
   my @flags;

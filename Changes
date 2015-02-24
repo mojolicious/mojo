@@ -23,6 +23,8 @@
   - Removed deprecated render_exception and render_not_found methods from
     Mojolicious::Controller.
   - Removed deprecated keep_alive_requests setting from Hypnotoad.
+  - Renamed pattern attribute in Mojolicious::Routes::Route to unparsed.
+  - Renamed template attribute in Mojo::Template to unparsed.
   - Renamed params method in Mojo::Parameters to pairs.
   - Added names method to Mojo::Parameters.
   - Added failed and passed methods to Mojolicious::Validator::Validation.

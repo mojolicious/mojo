@@ -2,7 +2,7 @@ package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
 has [qw(constraints defaults)] => sub { {} };
-has [qw(format_regex pattern regex)];
+has [qw(format_regex regex unparsed)];
 has placeholder_start => ':';
 has [qw(placeholders tree)] => sub { [] };
 has quote_end      => ')';
@@ -215,7 +215,7 @@ sub _tokenize {
     else { push @tree, ['text', $char] }
   }
 
-  return $self->pattern($pattern)->tree(\@tree);
+  return $self->unparsed($pattern)->tree(\@tree);
 }
 
 1;
@@ -266,13 +266,6 @@ Default parameters.
 
 Compiled regular expression for format matching.
 
-=head2 pattern
-
-  my $raw  = $pattern->pattern;
-  $pattern = $pattern->pattern('/(foo)/(bar)');
-
-Raw unparsed pattern.
-
 =head2 placeholder_start
 
   my $start = $pattern->placeholder_start;
@@ -322,6 +315,13 @@ Character indicating a relaxed placeholder, defaults to C<#>.
 
 Pattern in parsed form. Note that this structure should only be used very
 carefully since it is very dynamic.
+
+=head2 unparsed
+
+  my $unparsed = $pattern->unparsed;
+  $pattern     = $pattern->unparsed('/(foo)/(bar)');
+
+Raw unparsed pattern.
 
 =head2 wildcard_start
 

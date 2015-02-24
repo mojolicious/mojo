@@ -90,9 +90,9 @@ any time.
 
 Every placeholder has a name, even if it's just an empty string.
 
-=head2 Generic placeholders
+=head2 Standard placeholders
 
-Generic placeholders are the simplest form of placeholders, they use a colon
+Standard placeholders are the simplest form of placeholders, they use a colon
 prefix and match all characters except C</> and C<.>, similar to the regular
 expression C<([^/.]+)>.
 
@@ -113,14 +113,14 @@ surrounding text.
   /sebastian23hello  -> /(:name)hello -> {name => 'sebastian23'}
   /sebastian 23hello -> /(:name)hello -> {name => 'sebastian 23'}
 
-The colon prefix is optional for generic placeholders that are surrounded by
+The colon prefix is optional for standard placeholders that are surrounded by
 parentheses.
 
   /i♥mojolicious -> /(one)♥(two) -> {one => 'i', two => 'mojolicious'}
 
 =head2 Relaxed placeholders
 
-Relaxed placeholders are just like generic placeholders, but use a hash prefix
+Relaxed placeholders are just like standard placeholders, but use a hash prefix
 and match all characters except C</>, similar to the regular expression
 C<([^/]+)>.
 

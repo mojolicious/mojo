@@ -247,9 +247,8 @@ parsed.
 
 This is a very powerful hook and should not be used lightly, it makes some
 rather advanced features such as upload progress bars possible. Note that this
-hook will not work for embedded applications, because only the host
-application gets to build transactions. (Passed the transaction and
-application object)
+hook will not work for embedded applications, because only the host application
+gets to build transactions. (Passed the transaction and application object)
 
 =head2 before_dispatch
 
@@ -291,10 +290,9 @@ controller object)
 
 =head2 around_action
 
-Emitted right before an action gets invoked and wraps around it, so you have
-to manually forward to the next hook if you want to continue the chain.
-Default action dispatching is the last hook in the chain, yours will run
-before it.
+Emitted right before an action gets invoked and wraps around it, so you have to
+manually forward to the next hook if you want to continue the chain. Default
+action dispatching is the last hook in the chain, yours will run before it.
 
   $app->hook(around_action => sub {
     my ($next, $c, $action, $last) = @_;
@@ -356,9 +354,8 @@ Useful for rewriting outgoing responses and other post-processing tasks.
 Emitted right before the L</"before_dispatch"> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you want
 to continue the chain. Default exception handling with
-L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> is the first
-hook in the chain and a call to L</"dispatch"> the last, yours will be in
-between.
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> is the first hook
+in the chain and a call to L</"dispatch"> the last, yours will be in between.
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;
@@ -432,8 +429,8 @@ L</"plugin"> method below if you want to load a plugin.
   my $renderer = $app->renderer;
   $app         = $app->renderer(Mojolicious::Renderer->new);
 
-Used to render content, defaults to a L<Mojolicious::Renderer> object. For
-more information about how to generate content see
+Used to render content, defaults to a L<Mojolicious::Renderer> object. For more
+information about how to generate content see
 L<Mojolicious::Guides::Rendering>.
 
   # Add another "templates" directory
@@ -469,8 +466,8 @@ change it!!! As long as you are using the insecure default there will be debug
 messages in the log file reminding you to change your passphrase. Only the
 first passphrase is used to create new signatures, but all of them for
 verification. So you can increase security without invalidating all your
-existing signed cookies by rotating passphrases, just add new ones to the
-front and remove old ones from the back.
+existing signed cookies by rotating passphrases, just add new ones to the front
+and remove old ones from the back.
 
   # Rotate passphrases
   $app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);

@@ -109,8 +109,7 @@ new ones.
 
   my $tx = $app->build_tx;
 
-Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
-object.
+Transaction builder, defaults to building a L<Mojo::Transaction::HTTP> object.
 
 =head2 config
 

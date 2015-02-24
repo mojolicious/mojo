@@ -62,21 +62,19 @@ Mojolicious::Command::prefork - Prefork command
         --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
     -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
-                                         value of MOJO_INACTIVITY_TIMEOUT or
-                                         15
+                                         value of MOJO_INACTIVITY_TIMEOUT or 15
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"
         --multi-accept <number>          Number of connections to accept at
                                          once, defaults to 50
-    -P, --pid-file <path>                Path to process id file, defaults to
-                                         a random file
+    -P, --pid-file <path>                Path to process id file, defaults to a
+                                         random file
     -p, --proxy                          Activate reverse proxy support,
                                          defaults to the value of
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
-                                         keep-alive connection, defaults to
-                                         25
+                                         keep-alive connection, defaults to 25
     -u, --user <name>                    Username for process
     -w, --workers <number>               Number of workers, defaults to 4
 

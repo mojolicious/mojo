@@ -89,8 +89,8 @@ Mojo::ByteStream - ByteStream
 
 =head1 DESCRIPTION
 
-L<Mojo::ByteStream> is a scalar-based container for bytestreams that provides
-a more friendly API for many of the functions in L<Mojo::Util>.
+L<Mojo::ByteStream> is a scalar-based container for bytestreams that provides a
+more friendly API for many of the functions in L<Mojo::Util>.
 
   # Access scalar directly to manipulate bytestream
   my $stream = Mojo::ByteStream->new('foo');
@@ -296,8 +296,7 @@ Alias for L<Mojo::Base/"tap">.
 
   $stream = $stream->term_escape;
 
-Escape POSIX control characters in bytestream with
-L<Mojo::Util/"term_escape">.
+Escape POSIX control characters in bytestream with L<Mojo::Util/"term_escape">.
 
   # Print binary checksum to terminal
   b('foo')->sha1_bytes->term_escape->say;

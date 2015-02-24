@@ -201,8 +201,8 @@ Mojo::Parameters - Parameters
 
 =head1 DESCRIPTION
 
-L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>
-and based on L<RFC 3986|http://tools.ietf.org/html/rfc3986> as well as the
+L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL> and
+based on L<RFC 3986|http://tools.ietf.org/html/rfc3986> as well as the
 L<HTML Living Standard|https://html.spec.whatwg.org>.
 
 =head1 ATTRIBUTES
@@ -337,8 +337,8 @@ Remove parameters. Note that this method will normalize the parameters.
 
   my $hash = $params->to_hash;
 
-Turn parameters into a hash reference. Note that this method will normalize
-the parameters.
+Turn parameters into a hash reference. Note that this method will normalize the
+parameters.
 
   # "baz"
   Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}[1];

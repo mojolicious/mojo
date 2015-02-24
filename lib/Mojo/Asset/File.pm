@@ -161,8 +161,8 @@ L<Mojo::Asset::File> inherits all events from L<Mojo::Asset>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and
-implements the following new ones.
+L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and implements
+the following new ones.
 
 =head2 cleanup
 

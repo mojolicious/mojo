@@ -402,8 +402,8 @@ HTTP version of message, defaults to C<1.1>.
 
 =head1 METHODS
 
-L<Mojo::Message> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::Message> inherits all methods from L<Mojo::EventEmitter> and implements
+the following new ones.
 
 =head2 body
 
@@ -418,11 +418,11 @@ automatically downgraded to L<Mojo::Content::Single>.
   my $params = $msg->body_params;
 
 C<POST> parameters extracted from C<application/x-www-form-urlencoded> or
-C<multipart/form-data> message body, usually a L<Mojo::Parameters> object.
-Note that this method caches all data, so it should not be called before the
-entire message body has been received. Parts of the message body need to be
-loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large, there's a 16MB limit by default.
+C<multipart/form-data> message body, usually a L<Mojo::Parameters> object. Note
+that this method caches all data, so it should not be called before the entire
+message body has been received. Parts of the message body need to be loaded
+into memory to parse C<POST> parameters, so you have to make sure it is not
+excessively large, there's a 16MB limit by default.
 
   # Get POST parameter names and values
   my $hash = $msg->body_params->to_hash;
@@ -595,12 +595,12 @@ L<Mojo::Content/"max_buffer_size"> or L<Mojo::Headers/"max_line_size">.
   my $value = $msg->json('/foo/bar');
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, an C<undef>
-return value indicates a bare C<null> or that decoding failed. An optional
-JSON Pointer can be used to extract a specific value with
-L<Mojo::JSON::Pointer>. Note that this method caches all data, so it should
-not be called before the entire message body has been received. The whole
-message body needs to be loaded into memory to parse it, so you have to make
-sure it is not excessively large, there's a 16MB limit by default.
+return value indicates a bare C<null> or that decoding failed. An optional JSON
+Pointer can be used to extract a specific value with L<Mojo::JSON::Pointer>.
+Note that this method caches all data, so it should not be called before the
+entire message body has been received. The whole message body needs to be
+loaded into memory to parse it, so you have to make sure it is not excessively
+large, there's a 16MB limit by default.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];
@@ -635,11 +635,11 @@ Render whole message.
 
   my $upload = $msg->upload('foo');
 
-Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
-If there are multiple uploads sharing the same name, and you want to access
-more than just the last one, you can use L</"every_upload">. Note that this
-method caches all data, so it should not be called before the entire message
-body has been received.
+Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects. If
+there are multiple uploads sharing the same name, and you want to access more
+than just the last one, you can use L</"every_upload">. Note that this method
+caches all data, so it should not be called before the entire message body has
+been received.
 
   # Get content of uploaded file
   say $msg->upload('foo')->asset->slurp;

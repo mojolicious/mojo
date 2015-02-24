@@ -153,8 +153,7 @@ over HTTPS connections.
   my $cb    = $sessions->serialize;
   $sessions = $sessions->serialize(sub {...});
 
-A callback used to serialize sessions, defaults to
-L<Mojo::JSON/"encode_json">.
+A callback used to serialize sessions, defaults to L<Mojo::JSON/"encode_json">.
 
   $sessions->serialize(sub {
     my $hash = shift;
@@ -163,8 +162,8 @@ L<Mojo::JSON/"encode_json">.
 
 =head1 METHODS
 
-L<Mojolicious::Sessions> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojolicious::Sessions> inherits all methods from L<Mojo::Base> and implements
+the following new ones.
 
 =head2 load
 

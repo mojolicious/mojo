@@ -325,10 +325,10 @@ Mojo::Template - Perl-ish templates!
 
 =head1 DESCRIPTION
 
-L<Mojo::Template> is a minimalistic and very Perl-ish template engine,
-designed specifically for all those small tasks that come up during big
-projects. Like preprocessing a configuration file, generating text from
-heredocs and stuff like that.
+L<Mojo::Template> is a minimalistic and very Perl-ish template engine, designed
+specifically for all those small tasks that come up during big projects. Like
+preprocessing a configuration file, generating text from heredocs and stuff
+like that.
 
 See L<Mojolicious::Guides::Rendering> for information on how to generate
 content with the L<Mojolicious> renderer.
@@ -349,8 +349,8 @@ automatically enabled.
   %# Comment line, useful for debugging
   %% Replaced with "%", useful for generating templates
 
-Escaping behavior can be reversed with the L</"auto_escape"> attribute, this
-is the default in L<Mojolicious> C<.ep> templates for example.
+Escaping behavior can be reversed with the L</"auto_escape"> attribute, this is
+the default in L<Mojolicious> C<.ep> templates for example.
 
   <%= Perl expression, replaced with XML escaped result %>
   <%== Perl expression, replaced with result %>
@@ -431,8 +431,7 @@ Activate automatic escaping.
   $mt      = $mt->append('warn "Processed template"');
 
 Append Perl code to compiled template. Note that this code should not contain
-newline characters, or line numbers in error messages might end up being
-wrong.
+newline characters, or line numbers in error messages might end up being wrong.
 
 =head2 capture_end
 
@@ -550,8 +549,7 @@ since functions and global variables will not be cleared automatically.
   $mt      = $mt->prepend('my $self = shift;');
 
 Prepend Perl code to compiled template. Note that this code should not contain
-newline characters, or line numbers in error messages might end up being
-wrong.
+newline characters, or line numbers in error messages might end up being wrong.
 
 =head2 replace_mark
 

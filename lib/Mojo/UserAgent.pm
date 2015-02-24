@@ -548,8 +548,8 @@ L<Mojo::IOLoop> object.
   my $key = $ua->key;
   $ua     = $ua->key('/etc/tls/client.crt');
 
-Path to TLS key file, defaults to the value of the C<MOJO_KEY_FILE>
-environment variable.
+Path to TLS key file, defaults to the value of the C<MOJO_KEY_FILE> environment
+variable.
 
 =head2 local_address
 
@@ -563,9 +563,9 @@ Local address to bind to.
   my $max = $ua->max_connections;
   $ua     = $ua->max_connections(5);
 
-Maximum number of keep-alive connections that the user agent will retain
-before it starts closing the oldest ones, defaults to C<5>. Setting the value
-to C<0> will prevent any connections from being kept alive.
+Maximum number of keep-alive connections that the user agent will retain before
+it starts closing the oldest ones, defaults to C<5>. Setting the value to C<0>
+will prevent any connections from being kept alive.
 
 =head2 max_redirects
 
@@ -600,8 +600,8 @@ Proxy manager, defaults to a L<Mojo::UserAgent::Proxy> object.
 Maximum amount of time in seconds establishing a connection, sending the
 request and receiving a whole response may take before getting canceled,
 defaults to the value of the C<MOJO_REQUEST_TIMEOUT> environment variable or
-C<0>. Setting the value to C<0> will allow the user agent to wait
-indefinitely. The timeout will reset for every followed redirect.
+C<0>. Setting the value to C<0> will allow the user agent to wait indefinitely.
+The timeout will reset for every followed redirect.
 
   # Total limit of 5 seconds, of which 3 seconds may be spent connecting
   $ua->max_redirects(0)->connect_timeout(3)->request_timeout(5);
@@ -726,10 +726,10 @@ implied). You can also append a callback to perform requests non-blocking.
   my $tx = $ua->get(
     'http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform blocking C<GET> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the C<GET> method, which is
-implied). You can also append a callback to perform requests non-blocking.
+Perform blocking C<GET> request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx"> (except
+for the C<GET> method, which is implied). You can also append a callback to
+perform requests non-blocking.
 
   $ua->get('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -768,8 +768,8 @@ implied). You can also append a callback to perform requests non-blocking.
 
 Perform blocking C<OPTIONS> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the C<OPTIONS> method, which
-is implied). You can also append a callback to perform requests non-blocking.
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<OPTIONS> method, which is
+implied). You can also append a callback to perform requests non-blocking.
 
   $ua->options('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -826,10 +826,10 @@ implied). You can also append a callback to perform requests non-blocking.
   my $tx = $ua->put(
     'http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform blocking C<PUT> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PUT> method, which is
-implied). You can also append a callback to perform requests non-blocking.
+Perform blocking C<PUT> request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx"> (except
+for the C<PUT> method, which is implied). You can also append a callback to
+perform requests non-blocking.
 
   $ua->put('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -842,8 +842,8 @@ implied). You can also append a callback to perform requests non-blocking.
   my $tx = $ua->start(Mojo::Transaction::HTTP->new);
 
 Perform blocking request for a custom L<Mojo::Transaction::HTTP> object, which
-can be prepared manually or with L</"build_tx">. You can also append a
-callback to perform requests non-blocking.
+can be prepared manually or with L</"build_tx">. You can also append a callback
+to perform requests non-blocking.
 
   my $tx = $ua->build_tx(GET => 'http://example.com');
   $ua->start($tx => sub {
@@ -859,10 +859,9 @@ callback to perform requests non-blocking.
     'ws://example.com' => {DNT => 1} => ['v1.proto'] => sub {...});
 
 Open a non-blocking WebSocket connection with transparent handshake, takes the
-same arguments as L<Mojo::UserAgent::Transactor/"websocket">. The callback
-will receive either a L<Mojo::Transaction::WebSocket> or
-L<Mojo::Transaction::HTTP> object, depending on if the handshake was
-successful.
+same arguments as L<Mojo::UserAgent::Transactor/"websocket">. The callback will
+receive either a L<Mojo::Transaction::WebSocket> or L<Mojo::Transaction::HTTP>
+object, depending on if the handshake was successful.
 
   $ua->websocket('wss://example.com/echo' => sub {
     my ($ua, $tx) = @_;
@@ -881,8 +880,8 @@ successful.
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 You can activate C<permessage-deflate> compression by setting the
-C<Sec-WebSocket-Extensions> header, this can result in much better
-performance, but also increases memory usage by up to 300KB per connection.
+C<Sec-WebSocket-Extensions> header, this can result in much better performance,
+but also increases memory usage by up to 300KB per connection.
 
   my $headers = {'Sec-WebSocket-Extensions' => 'permessage-deflate'};
   $ua->websocket('ws://example.com/foo' => $headers => sub {...});

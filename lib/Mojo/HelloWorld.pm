@@ -22,8 +22,8 @@ Mojo::HelloWorld - Hello World!
 
 =head1 DESCRIPTION
 
-L<Mojo::HelloWorld> is the default L<Mojolicious> application, used mostly
-for testing.
+L<Mojo::HelloWorld> is the default L<Mojolicious> application, used mostly for
+testing.
 
 =head1 SEE ALSO
 

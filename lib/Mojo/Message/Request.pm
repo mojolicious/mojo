@@ -404,13 +404,13 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
   my $value = $req->param('foo');
 
 Access C<GET> and C<POST> parameters extracted from the query string and
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
-If there are multiple values sharing the same name, and you want to access
-more than just the last one, you can use L</"every_param">. Note that this
-method caches all data, so it should not be called before the entire request
-body has been received. Parts of the request body need to be loaded into
-memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large, there's a 16MB limit by default.
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body. If
+there are multiple values sharing the same name, and you want to access more
+than just the last one, you can use L</"every_param">. Note that this method
+caches all data, so it should not be called before the entire request body has
+been received. Parts of the request body need to be loaded into memory to parse
+C<POST> parameters, so you have to make sure it is not excessively large,
+there's a 16MB limit by default.
 
 =head2 params
 
@@ -418,11 +418,11 @@ excessively large, there's a 16MB limit by default.
 
 All C<GET> and C<POST> parameters extracted from the query string and
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
-usually a L<Mojo::Parameters> object. Note that this method caches all data,
-so it should not be called before the entire request body has been received.
-Parts of the request body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large, there's a
-16MB limit by default.
+usually a L<Mojo::Parameters> object. Note that this method caches all data, so
+it should not be called before the entire request body has been received. Parts
+of the request body need to be loaded into memory to parse C<POST> parameters,
+so you have to make sure it is not excessively large, there's a 16MB limit by
+default.
 
   # Get parameter names and values
   my $hash = $req->params->to_hash;

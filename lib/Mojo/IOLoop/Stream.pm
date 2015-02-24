@@ -156,8 +156,7 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Stream> is a container for I/O streams used by
-L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Stream> is a container for I/O streams used by L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
@@ -305,8 +304,8 @@ stream to be inactive indefinitely.
   $stream = $stream->write($bytes);
   $stream = $stream->write($bytes => sub {...});
 
-Write data to stream, the optional drain callback will be invoked once all
-data has been written.
+Write data to stream, the optional drain callback will be invoked once all data
+has been written.
 
 =head1 SEE ALSO
 

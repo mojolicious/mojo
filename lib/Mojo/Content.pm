@@ -435,8 +435,8 @@ Skip body parsing and finish after headers.
 
 =head1 METHODS
 
-L<Mojo::Content> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::Content> inherits all methods from L<Mojo::EventEmitter> and implements
+the following new ones.
 
 =head2 body_contains
 
@@ -522,8 +522,8 @@ Check if content is gzip compressed.
 
   my $bool = $content->is_dynamic;
 
-Check if content will be dynamically generated, which prevents L</"clone">
-from working.
+Check if content will be dynamically generated, which prevents L</"clone"> from
+working.
 
 =head2 is_finished
 
@@ -579,8 +579,8 @@ Size of content already received from message in bytes.
   $content = $content->write($bytes);
   $content = $content->write($bytes => sub {...});
 
-Write dynamic content non-blocking, the optional drain callback will be
-invoked once all data has been written.
+Write dynamic content non-blocking, the optional drain callback will be invoked
+once all data has been written.
 
 =head2 write_chunk
 

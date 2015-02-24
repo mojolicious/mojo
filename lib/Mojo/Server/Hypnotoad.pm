@@ -242,9 +242,9 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
 Maximum number of connections a worker is allowed to accept before stopping
 gracefully and then getting replaced with a newly started worker, defaults to
-the value of L<Mojo::Server::Prefork/"accepts">. Setting the value to C<0>
-will allow workers to accept new connections indefinitely. Note that up to
-half of this value can be subtracted randomly to improve load balancing.
+the value of L<Mojo::Server::Prefork/"accepts">. Setting the value to C<0> will
+allow workers to accept new connections indefinitely. Note that up to half of
+this value can be subtracted randomly to improve load balancing.
 
 =head2 backlog
 
@@ -260,9 +260,9 @@ L<Mojo::Server::Daemon/"backlog">.
 Maximum number of concurrent connections each worker process is allowed to
 handle before stopping to accept new incoming connections, defaults to the
 value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency works
-best with applications that perform mostly non-blocking operations, to
-optimize for blocking operations you can decrease this value and increase
-L</"workers"> instead for better performance.
+best with applications that perform mostly non-blocking operations, to optimize
+for blocking operations you can decrease this value and increase L</"workers">
+instead for better performance.
 
 =head2 graceful_timeout
 
@@ -350,8 +350,7 @@ before getting canceled, defaults to C<60>.
 
   user => 'sri'
 
-Username for worker processes, defaults to the value of
-L<Mojo::Server/"user">.
+Username for worker processes, defaults to the value of L<Mojo::Server/"user">.
 
 =head2 workers
 

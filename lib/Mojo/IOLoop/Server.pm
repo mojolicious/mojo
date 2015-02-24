@@ -233,8 +233,8 @@ Get handle for server.
 
   $server->listen(port => 3000);
 
-Create a new listen socket. Note that TLS support depends on
-L<IO::Socket::SSL> (1.94+).
+Create a new listen socket. Note that TLS support depends on L<IO::Socket::SSL>
+(1.94+).
 
 These options are currently available:
 

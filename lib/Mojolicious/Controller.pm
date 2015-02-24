@@ -429,8 +429,8 @@ L<Mojolicious::Routes::Match> object.
   $c     = $c->tx(Mojo::Transaction::HTTP->new);
 
 The transaction that is currently being processed, usually a
-L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note
-that this reference is usually weakened, so the object needs to be referenced
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note that
+this reference is usually weakened, so the object needs to be referenced
 elsewhere as well when you're performing non-blocking operations and the
 underlying connection might get closed early.
 
@@ -476,8 +476,8 @@ the last one, you can use L</"every_cookie">.
 
   my $values = $c->every_cookie('foo');
 
-Similar to L</"cookie">, but returns all request cookie values sharing the
-same name as an array reference.
+Similar to L</"cookie">, but returns all request cookie values sharing the same
+name as an array reference.
 
   $ Get first cookie value
   my $first = $c->every_cookie('foo')->[0];
@@ -517,8 +517,7 @@ Close WebSocket connection or long poll stream gracefully.
   $c      = $c->flash({foo => 'bar'});
   $c      = $c->flash(foo => 'bar');
 
-Data storage persistent only for the next request, stored in the
-L</"session">.
+Data storage persistent only for the next request, stored in the L</"session">.
 
   # Show message after redirect
   $c->flash(message => 'User created successfully!');
@@ -585,8 +584,8 @@ string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
 message body, in that order. If there are multiple values sharing the same
 name, and you want to access more than just the last one, you can use
 L</"every_param">. Parts of the request body need to be loaded into memory to
-parse C<POST> parameters, so you have to make sure it is not excessively
-large, there's a 16MB limit by default.
+parse C<POST> parameters, so you have to make sure it is not excessively large,
+there's a 16MB limit by default.
 
   # Get first value
   my $first = $c->every_param('foo')->[0];
@@ -633,8 +632,8 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 Render content with L<Mojolicious/"renderer"> and emit hooks
 L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">, or
 call L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found"> if no
-response could be generated, all additional key/value pairs get merged into
-the L</"stash">.
+response could be generated, all additional key/value pairs get merged into the
+L</"stash">.
 
   # Render characters
   $c->render(text => 'I ♥ Mojolicious!');
@@ -769,8 +768,8 @@ request header, C<format> stash value or C<format> C<GET>/C<POST> parameter,
 defaults to rendering an empty C<204> response. Each representation can be
 handled with a callback or a hash reference containing arguments to be passed
 to L</"render">. Since browsers often don't really know what they actually
-want, unspecific C<Accept> request headers with more than one MIME type will
-be ignored, unless the C<X-Requested-With> header is set to the value
+want, unspecific C<Accept> request headers with more than one MIME type will be
+ignored, unless the C<X-Requested-With> header is set to the value
 C<XMLHttpRequest>.
 
   # Everything else than "json" and "xml" gets a 204 response
@@ -815,8 +814,8 @@ will be invoked once all data has been written.
   });
 
 For mostly idle WebSockets you might also want to increase the inactivity
-timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">,
-which usually defaults to C<15> seconds.
+timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which
+usually defaults to C<15> seconds.
 
   # Increase inactivity timeout for connection to 300 seconds
   $c->inactivity_timeout(300);
@@ -931,8 +930,8 @@ parameters, so you have to make sure it is not excessively large, there's a
   $c = $c->write(sub {...});
   $c = $c->write($bytes => sub {...});
 
-Write dynamic content non-blocking, the optional drain callback will be
-invoked once all data has been written.
+Write dynamic content non-blocking, the optional drain callback will be invoked
+once all data has been written.
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
@@ -950,9 +949,9 @@ invoked once all data has been written.
     });
   });
 
-For Comet (long polling) you might also want to increase the inactivity
-timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">,
-which usually defaults to C<15> seconds.
+For Comet (long polling) you might also want to increase the inactivity timeout
+with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which usually
+defaults to C<15> seconds.
 
   # Increase inactivity timeout for connection to 300 seconds
   $c->inactivity_timeout(300);

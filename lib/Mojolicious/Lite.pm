@@ -184,9 +184,9 @@ Load a plugin with L<Mojolicious/"plugin">.
   my $route = post '/:foo' => {foo => 'bar'} => sub {...};
   my $route = post '/:foo' => [foo => qr/\w+/] => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"post">, matching only
-C<POST> requests. See also L<Mojolicious::Guides::Tutorial> for many more
-argument variations.
+Generate route with L<Mojolicious::Routes::Route/"post">, matching only C<POST>
+requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
+variations.
 
 =head2 put
 

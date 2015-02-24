@@ -77,8 +77,8 @@ careful.
 
 =head1 METHODS
 
-L<Mojo::Reactor> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::Reactor> inherits all methods from L<Mojo::EventEmitter> and implements
+the following new ones.
 
 =head2 again
 
@@ -160,8 +160,8 @@ Remove all handles and timers. Meant to be overloaded in a subclass.
   $reactor->start;
 
 Start watching for I/O and timer events, this will block until L</"stop"> is
-called. Note that some reactors stop automatically if there are no events
-being watched anymore. Meant to be overloaded in a subclass.
+called. Note that some reactors stop automatically if there are no events being
+watched anymore. Meant to be overloaded in a subclass.
 
   # Start reactor only if it is not running already
   $reactor->start unless $reactor->is_running;
@@ -184,8 +184,7 @@ seconds. Meant to be overloaded in a subclass.
   $reactor = $reactor->watch($handle, $readable, $writable);
 
 Change I/O events to watch handle for with true and false values. Meant to be
-overloaded in a subclass. Note that this method requires an active I/O
-watcher.
+overloaded in a subclass. Note that this method requires an active I/O watcher.
 
   # Watch only for readable events
   $reactor->watch($handle, 1, 0);

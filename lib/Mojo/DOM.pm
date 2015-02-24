@@ -597,8 +597,8 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my $collection = $dom->following('div > p');
 
 Find all sibling elements after this node matching the CSS selector and return
-a L<Mojo::Collection> object containing these elements as L<Mojo::DOM>
-objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+a L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of sibling elements after this node
   say $dom->following->map('type')->join("\n");
@@ -654,8 +654,8 @@ fragment if necessary.
 
   my $sibling = $dom->next;
 
-Return L<Mojo::DOM> object for next sibling element or C<undef> if there are
-no more siblings.
+Return L<Mojo::DOM> object for next sibling element or C<undef> if there are no
+more siblings.
 
   # "<h2>123</h2>"
   $dom->parse('<div><h1>Test</h1><h2>123</h2></div>')->at('h1')->next;
@@ -686,8 +686,8 @@ C<root>, C<tag> or C<text>.
 
   my $parent = $dom->parent;
 
-Return L<Mojo::DOM> object for parent of this node or C<undef> if this node
-has no parent.
+Return L<Mojo::DOM> object for parent of this node or C<undef> if this node has
+no parent.
 
 =head2 parse
 
@@ -703,9 +703,9 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
   my $collection = $dom->preceding;
   my $collection = $dom->preceding('div > p');
 
-Find all sibling elements before this node matching the CSS selector and
-return a L<Mojo::Collection> object containing these elements as L<Mojo::DOM>
-objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+Find all sibling elements before this node matching the CSS selector and return
+a L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of sibling elements before this node
   say $dom->preceding->map('type')->join("\n");
@@ -738,8 +738,8 @@ Prepend HTML/XML fragment to this node.
 
   $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
 
-Prepend HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to
-this node's content.
+Prepend HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to this
+node's content.
 
   # "<div><h2>Test123</h2></div>"
   $dom->parse('<div><h2>123</h2></div>')

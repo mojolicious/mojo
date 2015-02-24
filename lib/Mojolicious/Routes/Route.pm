@@ -295,8 +295,8 @@ current parent if necessary.
   my $route = $r->any([qw(GET POST)] => '/:foo' => [foo => qr/\w+/]);
 
 Generate L<Mojolicious::Routes::Route> object matching any of the listed HTTP
-request methods or all. See also L<Mojolicious::Guides::Tutorial> for many
-more argument variations.
+request methods or all. See also L<Mojolicious::Guides::Tutorial> for many more
+argument variations.
 
   $r->any('/user')->to('user#whatever');
 
@@ -307,9 +307,8 @@ more argument variations.
   my $route = $r->delete('/:foo' => {foo => 'bar'} => sub {...});
   my $route = $r->delete('/:foo' => [foo => qr/\w+/] => sub {...});
 
-Generate L<Mojolicious::Routes::Route> object matching only C<DELETE>
-requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
-variations.
+Generate L<Mojolicious::Routes::Route> object matching only C<DELETE> requests.
+See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
 
   $r->delete('/user')->to('user#remove');
 
@@ -387,8 +386,8 @@ the current route.
   my $r = Mojolicious::Routes::Route->new('/:action', action => qr/\w+/);
   my $r = Mojolicious::Routes::Route->new(format => 0);
 
-Construct a new L<Mojolicious::Routes::Route> object and L</"parse"> pattern
-if necessary.
+Construct a new L<Mojolicious::Routes::Route> object and L</"parse"> pattern if
+necessary.
 
 =head2 options
 

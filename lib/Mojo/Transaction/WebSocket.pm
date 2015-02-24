@@ -353,9 +353,9 @@ Mojo::Transaction::WebSocket - WebSocket transaction
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions
-based on L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64-bit
-frames require a Perl with support for quads or they are limited to 32-bit.
+L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions based
+on L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64-bit frames
+require a Perl with support for quads or they are limited to 32-bit.
 
 =head1 EVENTS
 
@@ -442,9 +442,9 @@ gets emitted when it has at least one subscriber.
     ...
   });
 
-Emitted when a complete WebSocket message has been received, text messages
-will be automatically decoded. Note that this event only gets emitted when it
-has at least one subscriber.
+Emitted when a complete WebSocket message has been received, text messages will
+be automatically decoded. Note that this event only gets emitted when it has at
+least one subscriber.
 
   $ws->on(message => sub {
     my ($ws, $msg) = @_;
@@ -502,8 +502,8 @@ C<MOJO_MAX_WEBSOCKET_SIZE> environment variable or C<262144> (256KB).
 
 =head1 METHODS
 
-L<Mojo::Transaction::WebSocket> inherits all methods from
-L<Mojo::Transaction> and implements the following new ones.
+L<Mojo::Transaction::WebSocket> inherits all methods from L<Mojo::Transaction>
+and implements the following new ones.
 
 =head2 build_frame
 
@@ -542,8 +542,7 @@ Build WebSocket message.
 
   my $bool = $ws->client_challenge;
 
-Check WebSocket handshake challenge client-side, used to implement user
-agents.
+Check WebSocket handshake challenge client-side, used to implement user agents.
 
 =head2 client_handshake
 

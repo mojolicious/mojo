@@ -211,8 +211,8 @@ all elements.
 
 Evaluate regular expression or callback for each element in collection and
 create a new collection with all elements that matched the regular expression,
-or for which the callback returned true. The element will be the first
-argument passed to the callback and is also available as C<$_>.
+or for which the callback returned true. The element will be the first argument
+passed to the callback and is also available as C<$_>.
 
   # Find all values that contain the word "mojo"
   my $interesting = $collection->grep(qr/mojo/i);
@@ -242,9 +242,9 @@ Return the last element in collection.
   my $new = $collection->map($method);
   my $new = $collection->map($method, @args);
 
-Evaluate callback for, or call method on, each element in collection and
-create a new collection from the results. The element will be the first
-argument passed to the callback and is also available as C<$_>.
+Evaluate callback for, or call method on, each element in collection and create
+a new collection from the results. The element will be the first argument
+passed to the callback and is also available as C<$_>.
 
   # Longer version
   my $new = $collection->map(sub { $_->$method(@args) });

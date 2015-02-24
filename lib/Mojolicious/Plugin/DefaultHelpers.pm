@@ -186,8 +186,8 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
   my $formats = $c->accepts;
   my $format  = $c->accepts('html', 'json', 'txt');
 
-Select best possible representation for resource from C<Accept> request
-header, C<format> stash value or C<format> C<GET>/C<POST> parameter with
+Select best possible representation for resource from C<Accept> request header,
+C<format> stash value or C<format> C<GET>/C<POST> parameter with
 L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension
 if no preference could be detected.
 
@@ -280,12 +280,12 @@ Check or get name of current route.
 
   $c->delay(sub {...}, sub {...});
 
-Disable automatic rendering and use L<Mojo::IOLoop/"delay"> to manage
-callbacks and control the flow of events, which can help you avoid deep nested
-closures and memory leaks that often result from continuation-passing style.
-Also keeps a reference to L<Mojolicious::Controller/"tx"> in case the
-underlying connection gets closed early, and calls L</"reply-E<gt>exception">
-if an exception gets thrown in one of the steps, breaking the chain.
+Disable automatic rendering and use L<Mojo::IOLoop/"delay"> to manage callbacks
+and control the flow of events, which can help you avoid deep nested closures
+and memory leaks that often result from continuation-passing style. Also keeps
+a reference to L<Mojolicious::Controller/"tx"> in case the underlying
+connection gets closed early, and calls L</"reply-E<gt>exception"> if an
+exception gets thrown in one of the steps, breaking the chain.
 
   # Longer version
   $c->render_later;
@@ -398,8 +398,8 @@ C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
 
 Render the exception template C<exception.$mode.$format.*> or
 C<exception.$format.*> and set the response status code to C<500>. Also sets
-the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot>
-to a copy of the L</"stash"> for use in the templates.
+the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot> to
+a copy of the L</"stash"> for use in the templates.
 
 =head2 reply->not_found
 
@@ -444,8 +444,8 @@ Alias for L<Mojolicious::Controller/"stash">.
   % title 'Welcome!';
   % title 'Welcome!', foo => 'bar';
 
-Get or set C<title> stash value, all additional key/value pairs get merged
-into the L</"stash">.
+Get or set C<title> stash value, all additional key/value pairs get merged into
+the L</"stash">.
 
 =head2 ua
 

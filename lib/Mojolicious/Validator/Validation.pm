@@ -244,8 +244,8 @@ Return a list of all names for parameters that passed validation.
 
   $validation = $validation->required('foo');
 
-Change validation L</"topic"> and make sure a value is present and not an
-empty string.
+Change validation L</"topic"> and make sure a value is present and not an empty
+string.
 
 =head1 AUTOLOAD
 

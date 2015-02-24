@@ -193,8 +193,8 @@ default, used to implement user agents.
 
   $tx->client_read($bytes);
 
-Read data client-side, used to implement user agents. Meant to be overloaded
-in a subclass.
+Read data client-side, used to implement user agents. Meant to be overloaded in
+a subclass.
 
 =head2 client_write
 
@@ -269,8 +269,8 @@ Transaction closed server-side, used to implement web servers.
 
   $tx->server_read($bytes);
 
-Read data server-side, used to implement web servers. Meant to be overloaded
-in a subclass.
+Read data server-side, used to implement web servers. Meant to be overloaded in
+a subclass.
 
 =head2 server_write
 
@@ -283,8 +283,8 @@ in a subclass.
 
   my $res = $tx->success;
 
-Returns the L<Mojo::Message::Response> object from L</"res"> if transaction
-was successful or C<undef> otherwise. Connection and parser errors have only a
+Returns the L<Mojo::Message::Response> object from L</"res"> if transaction was
+successful or C<undef> otherwise. Connection and parser errors have only a
 message in L</"error">, 400 and 500 responses also a code.
 
   # Sensible exception handling

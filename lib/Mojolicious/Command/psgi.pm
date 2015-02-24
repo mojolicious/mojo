@@ -52,8 +52,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::psgi> inherits all methods from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::psgi> inherits all methods from L<Mojolicious::Command>
+and implements the following new ones.
 
 =head2 run
 

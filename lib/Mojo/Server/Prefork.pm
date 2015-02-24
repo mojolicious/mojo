@@ -273,8 +273,8 @@ Decrease worker pool by one.
 
 =head1 WORKER SIGNALS
 
-L<Mojo::Server::Prefork> worker processes can be controlled at runtime with
-the following signals.
+L<Mojo::Server::Prefork> worker processes can be controlled at runtime with the
+following signals.
 
 =head2 QUIT
 
@@ -369,8 +369,8 @@ and implements the following new ones.
 Maximum number of connections a worker is allowed to accept before stopping
 gracefully and then getting replaced with a newly started worker, passed along
 to L<Mojo::IOLoop/"max_accepts">, defaults to C<1000>. Setting the value to
-C<0> will allow workers to accept new connections indefinitely. Note that up
-to half of this value can be subtracted randomly to improve load balancing.
+C<0> will allow workers to accept new connections indefinitely. Note that up to
+half of this value can be subtracted randomly to improve load balancing.
 
 =head2 cleanup
 
@@ -424,10 +424,9 @@ Full path of process id file, defaults to a random temporary path.
   $prefork    = $prefork->workers(10);
 
 Number of worker processes, defaults to C<4>. A good rule of thumb is two
-worker processes per CPU core for applications that perform mostly
-non-blocking operations, blocking operations often require more and benefit
-from decreasing concurrency with L<Mojo::Server::Daemon/"clients"> (often as
-low as C<1>).
+worker processes per CPU core for applications that perform mostly non-blocking
+operations, blocking operations often require more and benefit from decreasing
+concurrency with L<Mojo::Server::Daemon/"clients"> (often as low as C<1>).
 
 =head1 METHODS
 
@@ -438,8 +437,8 @@ implements the following new ones.
 
   my $pid = $prefork->check_pid;
 
-Get process id for running server from L</"pid_file"> or delete it if server
-is not running.
+Get process id for running server from L</"pid_file"> or delete it if server is
+not running.
 
   say 'Server is not running' unless $prefork->check_pid;
 

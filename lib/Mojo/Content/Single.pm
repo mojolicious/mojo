@@ -75,8 +75,8 @@ L<RFC 7231|http://tools.ietf.org/html/rfc7231>.
 
 =head1 EVENTS
 
-L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can
-emit the following new ones.
+L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can emit
+the following new ones.
 
 =head2 upgrade
 

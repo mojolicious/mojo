@@ -238,8 +238,8 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 L<Mojolicious::Plugin::TagHelpers> is a collection of HTML tag helpers for
 L<Mojolicious>.
 
-Most form helpers can automatically pick up previous input values and will
-show them as default. You can also use
+Most form helpers can automatically pick up previous input values and will show
+them as default. You can also use
 L<Mojolicious::Plugin::DefaultHelpers/"param"> to set them manually and let
 necessary attributes always be generated automatically.
 
@@ -303,8 +303,8 @@ L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">.
   %= date_field end => '2012-12-21'
   %= date_field end => '2012-12-21', id => 'foo'
 
-Generate C<input> tag of type C<date>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<date>. Previous input values will automatically
+get picked up and shown as default.
 
   <input name="end" type="date">
   <input name="end" type="date" value="2012-12-21">
@@ -564,8 +564,8 @@ automatically get picked up and shown as default.
   %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
 
 Generate C<select> and C<option> tags from array references and C<optgroup>
-tags from L<Mojo::Collection> objects. Previous input values will
-automatically get picked up and shown as default.
+tags from L<Mojo::Collection> objects. Previous input values will automatically
+get picked up and shown as default.
 
   <select name="country">
     <option value="de">de</option>
@@ -711,8 +711,8 @@ up and shown as default.
   %= text_field first_name => 'Default name'
   %= text_field first_name => 'Default name', class => 'user'
 
-Generate C<input> tag of type C<text>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<text>. Previous input values will automatically
+get picked up and shown as default.
 
   <input name="first_name" type="text">
   <input name="first_name" type="text" value="Default name">
@@ -724,8 +724,8 @@ automatically get picked up and shown as default.
   %= time_field start => '23:59:59'
   %= time_field start => '23:59:59', id => 'foo'
 
-Generate C<input> tag of type C<time>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<time>. Previous input values will automatically
+get picked up and shown as default.
 
   <input name="start" type="time">
   <input name="start" type="time" value="23:59:59">
@@ -750,8 +750,8 @@ get picked up and shown as default.
   %= week_field vacation => '2012-W17'
   %= week_field vacation => '2012-W17', id => 'foo'
 
-Generate C<input> tag of type C<week>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<week>. Previous input values will automatically
+get picked up and shown as default.
 
   <input name="vacation" type="week">
   <input name="vacation" type="week" value="2012-W17">

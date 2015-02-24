@@ -130,8 +130,8 @@ These commands are available by default.
 
   $ ./myapp.pl cgi
 
-Use L<Mojolicious::Command::cgi> to start application with CGI backend,
-usually auto detected.
+Use L<Mojolicious::Command::cgi> to start application with CGI backend, usually
+auto detected.
 
 =head2 cpanify
 
@@ -184,8 +184,8 @@ L<Mojolicious::Lite> application.
   $ mojo generate makefile
   $ ./myapp.pl generate makefile
 
-Use L<Mojolicious::Command::generate::makefile> to generate C<Makefile.PL>
-file for application.
+Use L<Mojolicious::Command::generate::makefile> to generate C<Makefile.PL> file
+for application.
 
 =head2 generate plugin
 

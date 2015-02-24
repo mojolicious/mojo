@@ -123,8 +123,8 @@ L<Mojo::Server> is an abstract HTTP server base class.
 
 =head1 EVENTS
 
-L<Mojo::Server> inherits all events from L<Mojo::EventEmitter> and can emit
-the following new ones.
+L<Mojo::Server> inherits all events from L<Mojo::EventEmitter> and can emit the
+following new ones.
 
 =head2 request
 

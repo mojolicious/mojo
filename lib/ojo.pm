@@ -92,9 +92,9 @@ L<ojo> implements the following functions, which are automatically exported.
   my $app = a('/hello' => sub { $_->render(json => {hello => 'world'}) });
 
 Create a route with L<Mojolicious::Lite/"any"> and return the current
-L<Mojolicious::Lite> object. The current controller object is also available
-to actions as C<$_>. See also L<Mojolicious::Guides::Tutorial> for more
-argument variations.
+L<Mojolicious::Lite> object. The current controller object is also available to
+actions as C<$_>. See also L<Mojolicious::Guides::Tutorial> for more argument
+variations.
 
   $ perl -Mojo -E 'a("/hello" => {text => "Hello Mojo!"})->start' daemon
 
@@ -117,8 +117,8 @@ Turn list into a L<Mojo::Collection> object.
   my $res = d('example.com');
   my $res = d('http://example.com' => {Accept => '*/*'} => 'Hi!');
 
-Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return
-resulting L<Mojo::Message::Response> object.
+Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return resulting
+L<Mojo::Message::Response> object.
 
 =head2 g
 

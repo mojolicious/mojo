@@ -191,9 +191,9 @@ L<Mojo::Base> implements the following methods.
   SubClass->attr([qw(name1 name2 name3)] => sub {...});
 
 Create attribute accessor for hash-based objects, an array reference can be
-used to create more than one at a time. Pass an optional second argument to
-set a default value, it should be a constant or a callback. The callback will
-be executed at accessor read time if there's no set value. Accessors can be
+used to create more than one at a time. Pass an optional second argument to set
+a default value, it should be a constant or a callback. The callback will be
+executed at accessor read time if there's no set value. Accessors can be
 chained, that means they return their invocant when they are called with an
 argument.
 
@@ -212,9 +212,9 @@ pass it either a hash or a hash reference with attribute values.
   $object = $object->tap($method);
   $object = $object->tap($method, @args);
 
-K combinator, tap into a method chain to perform operations on an object
-within the chain. The object will be the first argument passed to the callback
-and is also available as C<$_>.
+K combinator, tap into a method chain to perform operations on an object within
+the chain. The object will be the first argument passed to the callback and is
+also available as C<$_>.
 
   # Longer version
   $object = $object->tap(sub { $_->$method(@args) });

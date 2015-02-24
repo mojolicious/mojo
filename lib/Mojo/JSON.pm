@@ -302,12 +302,12 @@ Mojo::JSON - Minimalistic JSON
 L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl
 implementation of L<RFC 7159|http://tools.ietf.org/html/rfc7159>.
 
-It supports normal Perl data types like scalar, array reference, hash
-reference and will try to call the C<TO_JSON> method on blessed references, or
-stringify them if it doesn't exist. Differentiating between strings and
-numbers in Perl is hard, depending on how it has been used, a scalar can be
-both at the same time. The string value has a higher precedence unless both
-representations are equivalent.
+It supports normal Perl data types like scalar, array reference, hash reference
+and will try to call the C<TO_JSON> method on blessed references, or stringify
+them if it doesn't exist. Differentiating between strings and numbers in Perl
+is hard, depending on how it has been used, a scalar can be both at the same
+time. The string value has a higher precedence unless both representations are
+equivalent.
 
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}
@@ -357,8 +357,8 @@ False value, used because Perl has no native equivalent.
 
   my $value = from_json $chars;
 
-Decode JSON text that is not C<UTF-8> encoded to Perl value and die if
-decoding fails.
+Decode JSON text that is not C<UTF-8> encoded to Perl value and die if decoding
+fails.
 
 =head2 j
 
@@ -367,8 +367,8 @@ decoding fails.
   my $value = j $bytes;
 
 Encode Perl data structure (which may only be an array reference or hash
-reference) or decode JSON, an C<undef> return value indicates a bare C<null>
-or that decoding failed.
+reference) or decode JSON, an C<undef> return value indicates a bare C<null> or
+that decoding failed.
 
 =head2 to_json
 

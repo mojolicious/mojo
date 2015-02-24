@@ -77,8 +77,8 @@ L<Mojo::Asset::Memory> is an in-memory storage backend for HTTP content.
 
 =head1 EVENTS
 
-L<Mojo::Asset::Memory> inherits all events from L<Mojo::Asset> and can emit
-the following new ones.
+L<Mojo::Asset::Memory> inherits all events from L<Mojo::Asset> and can emit the
+following new ones.
 
 =head2 upgrade
 

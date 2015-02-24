@@ -49,8 +49,7 @@ Mojolicious::Command::daemon - Daemon command
                                          connections, defaults to 1000
     -g, --group <name>                   Group name for process
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
-                                         value of MOJO_INACTIVITY_TIMEOUT or
-                                         15
+                                         value of MOJO_INACTIVITY_TIMEOUT or 15
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"

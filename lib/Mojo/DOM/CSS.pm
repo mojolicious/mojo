@@ -360,13 +360,13 @@ EXPERIMENTAL and might change without warning!
   my $case_insensitive = $css->select('input[class~="foo" i]');
 
 This selector is part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a
-work in progress.
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
 
 =head2 E[foo~="bar"]
 
-An C<E> element whose C<foo> attribute value is a list of
-whitespace-separated values, one of which is exactly equal to C<bar>.
+An C<E> element whose C<foo> attribute value is a list of whitespace-separated
+values, one of which is exactly equal to C<bar>.
 
   my $foo = $css->select('input[class~="foo"]');
   my $foo = $css->select('input[class~=foo]');
@@ -572,8 +572,7 @@ Run CSS selector against L</"tree">.
 
   my $result = $css->select_one('head > title');
 
-Run CSS selector against L</"tree"> and stop as soon as the first node
-matched.
+Run CSS selector against L</"tree"> and stop as soon as the first node matched.
 
 =head1 SEE ALSO
 

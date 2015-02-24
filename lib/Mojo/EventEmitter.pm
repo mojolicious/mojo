@@ -112,8 +112,8 @@ class but is fatal if unhandled.
 
 =head1 METHODS
 
-L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and implements
+the following new ones.
 
 =head2 catch
 

@@ -169,8 +169,7 @@ C<MOJO_LOG_LEVEL> environment variable can override this value.
   my $size = $log->max_history_size;
   $log     = $log->max_history_size(5);
 
-Maximum number of logged messages to store in L</"history">, defaults to
-C<10>.
+Maximum number of logged messages to store in L</"history">, defaults to C<10>.
 
 =head2 path
 
@@ -181,8 +180,8 @@ Log file path used by L</"handle">.
 
 =head1 METHODS
 
-L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements
-the following new ones.
+L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements the
+following new ones.
 
 =head2 append
 

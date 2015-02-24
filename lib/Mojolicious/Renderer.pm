@@ -307,8 +307,8 @@ The default format to render if C<format> is not set in the stash.
   my $default = $renderer->default_handler;
   $renderer   = $renderer->default_handler('ep');
 
-The default template handler to use for rendering in cases where auto
-detection doesn't work, like for C<inline> templates.
+The default template handler to use for rendering in cases where auto detection
+doesn't work, like for C<inline> templates.
 
 =head2 encoding
 
@@ -346,8 +346,8 @@ Directories to look for templates in, first one has the highest precedence.
 
 =head1 METHODS
 
-L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and implements
+the following new ones.
 
 =head2 accepts
 
@@ -388,10 +388,10 @@ Get a C<DATA> section template by name, usually used by handlers.
 
   my $helper = $renderer->get_helper('url_for');
 
-Get a helper by full name, generate a helper dynamically for a prefix or
-return C<undef> if no helper or prefix could be found. Generated helpers
-return a proxy object containing the current controller object and on which
-nested helpers can be called.
+Get a helper by full name, generate a helper dynamically for a prefix or return
+C<undef> if no helper or prefix could be found. Generated helpers return a
+proxy object containing the current controller object and on which nested
+helpers can be called.
 
 =head2 render
 

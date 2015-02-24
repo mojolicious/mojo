@@ -288,8 +288,8 @@ Mojo::DOM::HTML - HTML/XML engine
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM> and based on
-the L<HTML Living Standard|https://html.spec.whatwg.org> as well as the
+L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM> and based on the
+L<HTML Living Standard|https://html.spec.whatwg.org> as well as the
 L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/xml/>.
 
 =head1 ATTRIBUTES

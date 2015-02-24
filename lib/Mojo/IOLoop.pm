@@ -281,9 +281,9 @@ Mojo::IOLoop - Minimalistic event loop
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>,
-it has been reduced to the absolute minimal feature set required to build
-solid and scalable non-blocking TCP clients and servers.
+L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>, it
+has been reduced to the absolute minimal feature set required to build solid
+and scalable non-blocking TCP clients and servers.
 
 Depending on operating system, the default per-process and system-wide file
 descriptor limits are often very low and need to be tuned for better
@@ -299,8 +299,8 @@ scalable C<select>.
 The event loop will be resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>. A TLS certificate and key are also built
 right in, to make writing test servers as easy as possible. Also note that for
-convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop>
-is loaded.
+convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop> is
+loaded.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
 resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
@@ -313,8 +313,8 @@ See L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB"> for more.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop> inherits all events from L<Mojo::EventEmitter> and can emit
-the following new ones.
+L<Mojo::IOLoop> inherits all events from L<Mojo::EventEmitter> and can emit the
+following new ones.
 
 =head2 finish
 
@@ -336,8 +336,8 @@ L<Mojo::IOLoop> implements the following attributes.
   $loop   = $loop->max_accepts(1000);
 
 The maximum number of connections this event loop is allowed to accept before
-shutting down gracefully without interrupting existing connections, defaults
-to C<0>. Setting the value to C<0> will allow this event loop to accept new
+shutting down gracefully without interrupting existing connections, defaults to
+C<0>. Setting the value to C<0> will allow this event loop to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
 randomly to improve load balancing between multiple server processes.
 
@@ -347,8 +347,7 @@ randomly to improve load balancing between multiple server processes.
   $loop   = $loop->max_connections(1000);
 
 The maximum number of concurrent connections this event loop is allowed to
-handle before stopping to accept new incoming connections, defaults to
-C<1000>.
+handle before stopping to accept new incoming connections, defaults to C<1000>.
 
 =head2 multi_accept
 
@@ -415,10 +414,10 @@ L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay(sub {...});
   my $delay = $loop->delay(sub {...}, sub {...});
 
-Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow
-of events for this event loop, which can help you avoid deep nested closures
-and memory leaks that often result from continuation-passing style. Callbacks
-will be passed along to L<Mojo::IOLoop::Delay/"steps">.
+Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow of
+events for this event loop, which can help you avoid deep nested closures and
+memory leaks that often result from continuation-passing style. Callbacks will
+be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
@@ -560,8 +559,8 @@ as L<Mojo::IOLoop::Server/"listen">.
 
   my $loop = Mojo::IOLoop->singleton;
 
-The global L<Mojo::IOLoop> singleton, used to access a single shared event
-loop object from everywhere inside the process.
+The global L<Mojo::IOLoop> singleton, used to access a single shared event loop
+object from everywhere inside the process.
 
   # Many methods also allow you to take shortcuts
   Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });

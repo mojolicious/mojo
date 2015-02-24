@@ -42,8 +42,8 @@ the following new ones.
   $plugin->register(Mojolicious->new);
   $plugin->register(Mojolicious->new, {foo => 'bar'});
 
-This method will be called by L<Mojolicious::Plugins> at startup time. Meant
-to be overloaded in a subclass.
+This method will be called by L<Mojolicious::Plugins> at startup time. Meant to
+be overloaded in a subclass.
 
 =head1 SEE ALSO
 

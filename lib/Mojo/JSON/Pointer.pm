@@ -73,8 +73,8 @@ the following new ones.
 
   my $bool = $pointer->contains('/foo/1');
 
-Check if L</"data"> contains a value that can be identified with the given
-JSON Pointer.
+Check if L</"data"> contains a value that can be identified with the given JSON
+Pointer.
 
   # True
   Mojo::JSON::Pointer->new({'♥' => 'mojolicious'})->contains('/♥');

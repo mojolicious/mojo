@@ -23,7 +23,7 @@ sub continue {
   my $match   = $c->match;
   my $stack   = $match->stack;
   my $current = $match->current;
-  return $self->_render($c) unless my $field = $stack->[$current];
+  return _render($c) unless my $field = $stack->[$current];
 
   # Merge captures into stash
   my $stash = $c->stash;
@@ -193,7 +193,7 @@ sub _load {
 }
 
 sub _render {
-  my ($self, $c) = @_;
+  my $c     = shift;
   my $stash = $c->stash;
   return if $stash->{'mojo.rendered'};
   $c->render_maybe or $stash->{'mojo.routed'} or $c->helpers->reply->not_found;

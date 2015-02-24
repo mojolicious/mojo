@@ -143,8 +143,8 @@ L<Mojolicious> routes automatically take file extensions like C<.html>, remove
 the leading C<.>, and store the result in the C<format> stash value. This can
 be useful for URL-based content negotiation, such as automatically rendering
 different templates based on the file extension. See
-L<Mojolicious::Guides::Routing/"Formats"> for information on customizing format
-detection, or consider using
+L<Mojolicious::Guides::Routing/"Formats"> for information on customizing
+format detection, or consider using
 L<relaxed placeholders|Mojolicious::Guides::Routing/"Relaxed placeholders"> to
 allow matching of the C<.> character.
 

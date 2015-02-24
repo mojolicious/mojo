@@ -120,8 +120,8 @@ parentheses.
 
 =head2 Relaxed placeholders
 
-Relaxed placeholders are just like standard placeholders, but use a hash prefix
-and match all characters except C</>, similar to the regular expression
+Relaxed placeholders are just like standard placeholders, but use a hash
+prefix and match all characters except C</>, similar to the regular expression
 C<([^/]+)>.
 
   /hello              -> /#name/hello -> undef

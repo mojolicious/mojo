@@ -225,6 +225,14 @@ will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
 
+=head2 Why is the file extension missing from the stash value?
+
+Mojolicious detects file formats by default (see
+L<Mojolicious::Guides::Routing/Formats>). The file extension is then available
+via the stash value C<format>. To match a file name with an extension
+manually, consider using
+L<Mojolicious::Guides::Routing/"Relaxed placeholders">.
+
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the

@@ -7,9 +7,8 @@ Mojolicious::Guides::Growing - Growing
 
 =head1 OVERVIEW
 
-This document explains the process of starting a L<Mojolicious::Lite>
-prototype from scratch and growing it into a well-structured L<Mojolicious>
-application.
+This document explains the process of starting a L<Mojolicious::Lite> prototype
+from scratch and growing it into a well-structured L<Mojolicious> application.
 
 =head1 CONCEPTS
 
@@ -59,9 +58,9 @@ I<resource>.
   +--------+                                +--------+
 
 The fundamental idea here is that all resources are uniquely addressable with
-URLs and every resource can have different representations such as HTML, RSS
-or JSON. User interface concerns are separated from data storage concerns and
-all session state is kept client-side.
+URLs and every resource can have different representations such as HTML, RSS or
+JSON. User interface concerns are separated from data storage concerns and all
+session state is kept client-side.
 
   +---------+                        +------------+
   |         | ->    PUT /foo      -> |            |
@@ -122,15 +121,15 @@ infrastructure requirements.
 TDD is a software development process where the developer starts writing
 failing test cases that define the desired functionality and then moves on to
 producing code that passes these tests. There are many advantages such as
-always having good test coverage and code being designed for testability,
-which will in turn often prevent future changes from breaking old code. Much
-of L<Mojolicious> was developed using TDD.
+always having good test coverage and code being designed for testability, which
+will in turn often prevent future changes from breaking old code. Much of
+L<Mojolicious> was developed using TDD.
 
 =head1 PROTOTYPE
 
 One of the main differences between L<Mojolicious> and other web frameworks is
-that it also includes L<Mojolicious::Lite>, a micro web framework optimized
-for rapid prototyping.
+that it also includes L<Mojolicious::Lite>, a micro web framework optimized for
+rapid prototyping.
 
 =head2 Differences
 
@@ -210,9 +209,9 @@ It all starts with an HTTP request like this, sent by your browser.
   GET / HTTP/1.1
   Host: localhost:3000
 
-Once the request has been received by the web server through the event loop,
-it will be passed on to L<Mojolicious>, where it will be handled in a few
-simple steps.
+Once the request has been received by the web server through the event loop, it
+will be passed on to L<Mojolicious>, where it will be handled in a few simple
+steps.
 
   1. Check if a static file exists that would meet the requirements.
   2. Try to find a route that would meet the requirements.
@@ -314,8 +313,8 @@ experience.
   $ chmod 644 t/login.t
 
 L<Test::Mojo> is a scriptable HTTP user agent designed specifically for
-testing, with many fun state of the art features such as CSS selectors based
-on L<Mojo::DOM>.
+testing, with many fun state of the art features such as CSS selectors based on
+L<Mojo::DOM>.
 
   use Test::More;
   use Test::Mojo;
@@ -395,8 +394,8 @@ secure and can be changed at any time to invalidate all existing sessions.
   $c->session(user => 'sebastian');
   my $user = $c->session('user');
 
-By default all sessions expire after one hour, for more control you can use
-the C<expiration> session value to set an expiration date in seconds from now.
+By default all sessions expire after one hour, for more control you can use the
+C<expiration> session value to set an expiration date in seconds from now.
 
   $c->session(expiration => 3600);
 
@@ -598,8 +597,8 @@ actual action code needs to be changed.
   1;
 
 The C<startup> method gets called right after instantiation and is the place
-where the whole application gets set up. Since full L<Mojolicious>
-applications can use nested routes they have no need for C<group> blocks.
+where the whole application gets set up. Since full L<Mojolicious> applications
+can use nested routes they have no need for C<group> blocks.
 
 =head2 Simplified application script
 
@@ -644,8 +643,8 @@ makes sense to split our action code from its routing information.
   $ touch lib/MyApp/Controller/Login.pm
   $ chmod 644 lib/MyApp/Controller/Login.pm
 
-Once again the actual action code does not need to change, we just rename
-C<$c> to C<$self> since the controller is now the invocant.
+Once again the actual action code does not need to change, we just rename C<$c>
+to C<$self> since the controller is now the invocant.
 
   package MyApp::Controller::Login;
   use Mojo::Base 'Mojolicious::Controller';

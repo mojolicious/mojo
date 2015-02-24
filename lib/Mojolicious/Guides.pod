@@ -46,8 +46,8 @@ A fast and fun way to get started developing web applications with
 L<Mojolicious>. The tutorial introduces the L<Mojolicious::Lite> micro web
 framework, which is only a thin wrapper around the full web framework. The
 simplified notation introduced in the tutorial is commonly used throughout the
-guides and is therefore considered a prerequisite, you should definitely take
-a look!
+guides and is therefore considered a prerequisite, you should definitely take a
+look!
 
 =back
 
@@ -104,9 +104,9 @@ Minimalistic JSON implementation that just works.
 
 =item L<Mojo::Server::Daemon>
 
-Full featured, highly portable non-blocking I/O HTTP and WebSocket server,
-with self-restart support through L<Mojo::Server::Morbo>, perfect for
-development and testing.
+Full featured, highly portable non-blocking I/O HTTP and WebSocket server, with
+self-restart support through L<Mojo::Server::Morbo>, perfect for development
+and testing.
 
 =item L<Mojo::Server::Prefork>
 
@@ -449,8 +449,8 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =head1 MORE
 
-A lot more documentation and examples by many different authors can be found
-in the L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
+A lot more documentation and examples by many different authors can be found in
+the L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
 
 =head1 SUPPORT
 

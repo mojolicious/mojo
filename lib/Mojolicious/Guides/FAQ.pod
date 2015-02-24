@@ -16,16 +16,16 @@ We hope these answers are to your satisfaction.
 
 =head2 How does Mojolicious compare to other Perl web frameworks?
 
-The short answer is "it doesn't", because we interpret the term
-"web framework" much more literally than others. With the emergence of the
-real-time web and new technologies such as WebSockets, we are facing new
-challenges that go way beyond what commonly used modules like L<LWP> were
-designed for. Because of this, L<Mojolicious> contains a whole new HTTP
-client/server stack called L<Mojo>, which was heavily inspired by the original
-LWPng effort and carefully designed with these new requirements in mind. So
-while some of the higher abstraction layers might look similar to other web
-frameworks, it is more of a web toolkit and can even be used as the foundation
-for more advanced web frameworks.
+The short answer is "it doesn't", because we interpret the term "web framework"
+much more literally than others. With the emergence of the real-time web and
+new technologies such as WebSockets, we are facing new challenges that go way
+beyond what commonly used modules like L<LWP> were designed for. Because of
+this, L<Mojolicious> contains a whole new HTTP client/server stack called
+L<Mojo>, which was heavily inspired by the original LWPng effort and carefully
+designed with these new requirements in mind. So while some of the higher
+abstraction layers might look similar to other web frameworks, it is more of a
+web toolkit and can even be used as the foundation for more advanced web
+frameworks.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 
@@ -35,8 +35,7 @@ L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently
 discourage adding non-optional ones in favor of a faster and more painless
 installation process. And we do in fact already use several optional CPAN
 modules such as L<EV>, L<IO::Socket::Socks>, L<IO::Socket::SSL>,
-L<Net::DNS::Native> and L<Plack> to provide advanced functionality if
-possible.
+L<Net::DNS::Native> and L<Plack> to provide advanced functionality if possible.
 
 =head2 Why reinvent wheels?
 
@@ -49,19 +48,19 @@ quest is to develop the best possible solutions for these two criteria.
 
 In conformance with L<Mojolicious::Guides::Contributing>, we will always
 deprecate a feature for 3 months, before removing or changing it in
-incompatible ways between major releases. New features can however be marked
-as experimental to explicitly exclude them from these rules. This gives us the
-necessary freedom to ensure a healthy future for L<Mojolicious>. So, as long
-as you are not using anything marked experimental, untested or undocumented,
-you can always count on backwards compatibility, everything else would be
+incompatible ways between major releases. New features can however be marked as
+experimental to explicitly exclude them from these rules. This gives us the
+necessary freedom to ensure a healthy future for L<Mojolicious>. So, as long as
+you are not using anything marked experimental, untested or undocumented, you
+can always count on backwards compatibility, everything else would be
 considered a bug.
 
 =head2 Why not split up Mojolicious into many smaller distributions?
 
-Because there are no advantages, it drastically increases maintenance costs
-and installation times without giving us anything in return. It would only
-make sense if we wanted to pass ownership of a module to a new maintainer,
-which we already have done in the past.
+Because there are no advantages, it drastically increases maintenance costs and
+installation times without giving us anything in return. It would only make
+sense if we wanted to pass ownership of a module to a new maintainer, which we
+already have done in the past.
 
 =head2 Which versions of Perl are supported by Mojolicious?
 
@@ -70,17 +69,17 @@ the two most recent stable release series of Perl are supported by the
 community and receive bug fixes, which are currently 5.20.x and 5.18.x.
 L<Mojolicious> follows this model and fully supports these two release series.
 In addition we will also keep the distribution installable up to a certain
-legacy version that we deem worthy of supporting, but not specifically
-optimize for it, this is currently 5.10.1.
+legacy version that we deem worthy of supporting, but not specifically optimize
+for it, this is currently 5.10.1.
 
 =head2 Do I need to clean my environment before testing Mojolicious?
 
 Mojolicious uses many environment variables both internally and externally,
 notably (but not exclusively) those starting with the prefix C<MOJO_*>. The
-test suite expects a clean environment; testing with a non-standard
-environment is unsupported and is unlikely to succeed. Therefore when
-installing or upgrading L<Mojolicious> and when running its tests, we highly
-recommend using an environment which does not set these variables.
+test suite expects a clean environment; testing with a non-standard environment
+is unsupported and is unlikely to succeed. Therefore when installing or
+upgrading L<Mojolicious> and when running its tests, we highly recommend using
+an environment which does not set these variables.
 
 =head2 What is the difference between blocking and non-blocking operations?
 
@@ -94,8 +93,8 @@ calling subroutine until the subroutine is finished.
 
 A I<non-blocking> operation on the other hand lets the calling subroutine
 continue execution even though the subroutine is not yet finished. Instead of
-waiting, the calling subroutine passes along a callback to be executed once
-the subroutine is finished, this is called continuation-passing style.
+waiting, the calling subroutine passes along a callback to be executed once the
+subroutine is finished, this is called continuation-passing style.
 
   sub foo {
     non_blocking_subroutine(sub {
@@ -143,17 +142,17 @@ L<Mojolicious> routes automatically take file extensions like C<.html>, remove
 the leading C<.>, and store the result in the C<format> stash value. This can
 be useful for URL-based content negotiation, such as automatically rendering
 different templates based on the file extension. See
-L<Mojolicious::Guides::Routing/"Formats"> for information on customizing
-format detection, or consider using
+L<Mojolicious::Guides::Routing/"Formats"> for information on customizing format
+detection, or consider using
 L<relaxed placeholders|Mojolicious::Guides::Routing/"Relaxed placeholders"> to
 allow matching of the C<.> character.
 
 =head2 What does the error "Maximum message size exceeded" mean?
 
-To protect your applications from excessively large requests and responses,
-our HTTP parser has a cap after which it will automatically stop accepting new
-data, and in most cases force the connection to be closed. The limit is 16MB
-by default, you can use the attribute L<Mojo::Message/"max_message_size"> or
+To protect your applications from excessively large requests and responses, our
+HTTP parser has a cap after which it will automatically stop accepting new
+data, and in most cases force the connection to be closed. The limit is 16MB by
+default, you can use the attribute L<Mojo::Message/"max_message_size"> or
 C<MOJO_MAX_MESSAGE_SIZE> environment variable to change this value.
 
 =head2 What does the error "Maximum start-line size exceeded" mean?
@@ -175,9 +174,9 @@ these values.
 
 =head2 What does the error "Maximum buffer size exceeded" mean?
 
-This protection mechanism limits how much content the HTTP parser is allowed
-to buffer when parsing chunked, compressed and multipart messages. The limit
-is around 256KB by default, you can use the attribute
+This protection mechanism limits how much content the HTTP parser is allowed to
+buffer when parsing chunked, compressed and multipart messages. The limit is
+around 256KB by default, you can use the attribute
 L<Mojo::Content/"max_buffer_size"> or C<MOJO_MAX_BUFFER_SIZE> environment
 variable to change this value.
 
@@ -187,8 +186,7 @@ The L<Mojolicious> user agent and web servers are based on an event loop that
 supports multiple reactor backends. One of these backends is L<EV>, it is very
 fast and will be automatically used if possible. On Windows however, the
 C<ithreads> based C<fork()> emulation can interfere with it, and you may have
-to use the C<MOJO_REACTOR> environment variable to enforce a more portable
-one.
+to use the C<MOJO_REACTOR> environment variable to enforce a more portable one.
 
   MOJO_REACTOR=Mojo::Reactor::Poll
 
@@ -229,9 +227,9 @@ be closed immediately.
 
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 
-As long as they are accepting new connections, worker processes of all
-built-in preforking web servers send heartbeat messages to the manager process
-at regular intervals, to signal that they are still responsive. A blocking
+As long as they are accepting new connections, worker processes of all built-in
+preforking web servers send heartbeat messages to the manager process at
+regular intervals, to signal that they are still responsive. A blocking
 operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute

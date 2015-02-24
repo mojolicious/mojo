@@ -31,9 +31,9 @@ response generator.
   /user/show/4 -> $c->render(text => 'Baerbel');
   /user/show/5 -> $c->render(text => 'Wolfgang');
 
-While it is very well possible to make all these connections static, it is
-also rather inefficient. That's why regular expressions are commonly used to
-make the dispatch process more dynamic.
+While it is very well possible to make all these connections static, it is also
+rather inefficient. That's why regular expressions are commonly used to make
+the dispatch process more dynamic.
 
   qr!/user/show/(\d+)! -> $c->render(text => $users{$1});
 
@@ -48,13 +48,13 @@ request method and headers like C<Host>, C<User-Agent> and C<Accept>.
 
 =head2 Routes
 
-While regular expressions are quite powerful they also tend to be unpleasant
-to look at and are generally overkill for ordinary path matching.
+While regular expressions are quite powerful they also tend to be unpleasant to
+look at and are generally overkill for ordinary path matching.
 
   qr!/user/show/(\d+)! -> $c->render(text => $users{$1});
 
-This is where routes come into play, they have been designed from the ground
-up to represent paths with placeholders.
+This is where routes come into play, they have been designed from the ground up
+to represent paths with placeholders.
 
   /user/show/:id -> $c->render(text => $users{$id});
 
@@ -68,8 +68,8 @@ placeholder values are turned into a hash.
 
   /user/show/23 -> /user/:action/:id -> {action => 'show', id => 23}
 
-This hash is basically the center of every L<Mojolicious> application, you
-will learn more about this later on. Internally routes get compiled to regular
+This hash is basically the center of every L<Mojolicious> application, you will
+learn more about this later on. Internally routes get compiled to regular
 expressions, so you can get the best of both worlds with a little bit of
 experience.
 
@@ -82,8 +82,8 @@ A trailing slash in the path is always optional.
 =head2 Reversibility
 
 One more huge advantage routes have over regular expressions is that they are
-easily reversible, extracted placeholders can be turned back into a path at
-any time.
+easily reversible, extracted placeholders can be turned back into a path at any
+time.
 
   /sebastian -> /:name -> {name => 'sebastian'}
   {name => 'sebastian'} -> /:name -> /sebastian
@@ -120,8 +120,8 @@ parentheses.
 
 =head2 Relaxed placeholders
 
-Relaxed placeholders are just like standard placeholders, but use a hash
-prefix and match all characters except C</>, similar to the regular expression
+Relaxed placeholders are just like standard placeholders, but use a hash prefix
+and match all characters except C</>, similar to the regular expression
 C<([^/]+)>.
 
   /hello              -> /#name/hello -> undef
@@ -131,8 +131,8 @@ C<([^/]+)>.
   /sebastian23/hello  -> /#name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /#name/hello -> {name => 'sebastian 23'}
 
-They can be especially useful for manually matching file names with
-extensions, rather than using L<format detection|/"Formats">.
+They can be especially useful for manually matching file names with extensions,
+rather than using L<format detection|/"Formats">.
 
   /music/song.mp3 -> /music/#filename -> {filename => 'song.mp3'}
 
@@ -155,9 +155,8 @@ Most commonly used features every L<Mojolicious> developer should know about.
 
 =head2 Minimal route
 
-The attribute L<Mojolicious/"routes"> contains a router you can use to
-generate route structures, they match in the same order in which they were
-defined.
+The attribute L<Mojolicious/"routes"> contains a router you can use to generate
+route structures, they match in the same order in which they were defined.
 
   # Application
   package MyApp;
@@ -239,8 +238,8 @@ but content will not be sent with the response even if it is present.
 
 =head2 IRIs
 
-IRIs are handled transparently, that means paths are guaranteed to be
-unescaped and decoded from bytes to characters.
+IRIs are handled transparently, that means paths are guaranteed to be unescaped
+and decoded from bytes to characters.
 
   # GET /☃ (Unicode snowman) -> {controller => 'foo', action => 'snowman'}
   $r->get('/☃')->to(controller => 'foo', action => 'snowman');
@@ -284,8 +283,8 @@ endpoints of these nested routes can.
   my $foo = $r->any('/foo')->to(controller => 'foo');
   $foo->get('/bar')->to(action => 'bar');
 
-The stash is simply inherited from route to route and newer values override
-old ones.
+The stash is simply inherited from route to route and newer values override old
+ones.
 
   # /cats      -> {controller => 'cats', action => 'index'}
   # /cats/nyan -> {controller => 'cats', action => 'nyan'}
@@ -335,8 +334,7 @@ are case-sensitive.
 
 Controller classes are perfect for organizing code in larger projects. There
 are more dispatch strategies, but because controllers are the most commonly
-used ones they also got a special shortcut in the form of
-C<controller#action>.
+used ones they also got a special shortcut in the form of C<controller#action>.
 
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye'}
   $r->get('/bye')->to('foo#bye', mymessage => 'Bye');
@@ -354,8 +352,8 @@ snake_case.
   $r->get('/')->to('Foo::Bar#hi');
 
 For security reasons the dispatcher will always check if the C<controller> is
-actually a subclass of L<Mojolicious::Controller> or L<Mojo> before
-dispatching to it.
+actually a subclass of L<Mojolicious::Controller> or L<Mojo> before dispatching
+to it.
 
 =head2 Namespaces
 
@@ -469,11 +467,11 @@ become optional as well.
   # /users/list -> {controller => 'users', action => 'list'}
   $r->get('/:controller/:action')->to('foo#bar');
 
-Special stash values like C<controller> and C<action> can also be
-placeholders, which is very convenient especially during development, but
-should only be used very carefully, because every controller method becomes a
-potential route. All uppercase methods as well as those starting with an
-underscore are automatically hidden from the router and you can use
+Special stash values like C<controller> and C<action> can also be placeholders,
+which is very convenient especially during development, but should only be used
+very carefully, because every controller method becomes a potential route. All
+uppercase methods as well as those starting with an underscore are
+automatically hidden from the router and you can use
 L<Mojolicious::Routes/"hide"> to add additional ones.
 
   # Hide "create" method in all controllers
@@ -512,9 +510,9 @@ expressions.
 =head2 Under
 
 To share code with multiple nested routes you can use
-L<Mojolicious::Routes::Route/"under">, because unlike normal nested routes,
-the routes generated with it have their own intermediate destination and
-result in additional dispatch cycles when they match.
+L<Mojolicious::Routes::Route/"under">, because unlike normal nested routes, the
+routes generated with it have their own intermediate destination and result in
+additional dispatch cycles when they match.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}
@@ -522,8 +520,8 @@ result in additional dispatch cycles when they match.
   my $foo = $r->under('/foo')->to('foo#baz');
   $foo->get('/bar')->to('#bar');
 
-The actual action code for this destination needs to return a true value or
-the dispatch chain will be broken, this can be a very powerful tool for
+The actual action code for this destination needs to return a true value or the
+dispatch chain will be broken, this can be a very powerful tool for
 authentication.
 
   # /blackjack -> {cb => sub {...}}
@@ -588,8 +586,8 @@ allowed formats.
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
   $r->get('/foo' => [format => [qw(rss xml)]])->to('foo#bar');
 
-Or you can just disable format detection, which gets inherited by nested
-routes and allows selective re-enabling.
+Or you can just disable format detection, which gets inherited by nested routes
+and allows selective re-enabling.
 
   # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef
@@ -664,10 +662,10 @@ placeholder.
 
 =head2 Hooks
 
-Hooks operate outside the routing system and allow you to extend
-the framework itself by sharing code with all requests indiscriminately
-through L<Mojolicious/"hook">, which makes them a very powerful tool
-especially for plugins.
+Hooks operate outside the routing system and allow you to extend the framework
+itself by sharing code with all requests indiscriminately through
+L<Mojolicious/"hook">, which makes them a very powerful tool especially for
+plugins.
 
   # Application
   package MyApp;
@@ -799,8 +797,8 @@ to make route generation more expressive.
 =head2 Rearranging routes
 
 Until the first request has been handled, all routes can still be moved around
-or even removed with methods like L<Mojolicious::Routes::Route/"add_child">
-and L<Mojolicious::Routes::Route/"remove">.
+or even removed with methods like L<Mojolicious::Routes::Route/"add_child"> and
+L<Mojolicious::Routes::Route/"remove">.
 
   # GET /example/show -> {controller => 'example', action => 'show'}
   my $show = $r->get('/show')->to('example#show');
@@ -817,8 +815,8 @@ to find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
 Sometimes you might need a little more power, for example to check the
 C<User-Agent> header in multiple routes. This is where conditions come into
-play, they are basically router plugins and need to return a true value for
-the route to match.
+play, they are basically router plugins and need to return a true value for the
+route to match.
 
   # Simple "User-Agent" condition
   $r->add_condition(
@@ -910,10 +908,10 @@ specific language in normal L<Mojolicious> controllers.
 
   1;
 
-With the method L<Mojolicious::Routes::Route/"detour"> which is very similar
-to L<Mojolicious::Routes::Route/"to">, you can allow the route to partially
-match and use only the remaining path in the embedded application, the base
-path will be passed along in the C<path> stash value.
+With the method L<Mojolicious::Routes::Route/"detour"> which is very similar to
+L<Mojolicious::Routes::Route/"to">, you can allow the route to partially match
+and use only the remaining path in the embedded application, the base path will
+be passed along in the C<path> stash value.
 
   # /foo/*
   $r->any('/foo')->detour('bar#', name => 'Mojo');

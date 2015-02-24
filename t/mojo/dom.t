@@ -161,61 +161,60 @@ ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 # Nodes
 $dom = Mojo::DOM->new(
   '<!DOCTYPE before><p>test<![CDATA[123]]><!-- 456 --></p><?after?>');
-is $dom->at('p')->preceding_siblings->first->content, ' before',
+is $dom->at('p')->preceding_nodes->first->content, ' before', 'right content';
+is $dom->at('p')->preceding_nodes->size, 1, 'right number of nodes';
+is $dom->at('p')->child_nodes->last->preceding_nodes->first->content, 'test',
   'right content';
-is $dom->at('p')->preceding_siblings->size, 1, 'right number of nodes';
-is $dom->at('p')->contents->last->preceding_siblings->first->content, 'test',
+is $dom->at('p')->child_nodes->last->preceding_nodes->last->content, '123',
   'right content';
-is $dom->at('p')->contents->last->preceding_siblings->last->content, '123',
-  'right content';
-is $dom->at('p')->contents->last->preceding_siblings->size, 2,
+is $dom->at('p')->child_nodes->last->preceding_nodes->size, 2,
   'right number of nodes';
-is $dom->preceding_siblings->size, 0, 'no preceding nodes';
-is $dom->at('p')->following_siblings->first->content, 'after', 'right content';
-is $dom->at('p')->following_siblings->size, 1, 'right number of nodes';
-is $dom->contents->first->following_siblings->first->type, 'p', 'right type';
-is $dom->contents->first->following_siblings->last->content, 'after',
+is $dom->preceding_nodes->size, 0, 'no preceding nodes';
+is $dom->at('p')->following_nodes->first->content, 'after', 'right content';
+is $dom->at('p')->following_nodes->size, 1, 'right number of nodes';
+is $dom->child_nodes->first->following_nodes->first->type, 'p', 'right type';
+is $dom->child_nodes->first->following_nodes->last->content, 'after',
   'right content';
-is $dom->contents->first->following_siblings->size, 2, 'right number of nodes';
-is $dom->following_siblings->size, 0, 'no following nodes';
-is $dom->at('p')->previous_sibling->content, ' before', 'right content';
-is $dom->at('p')->previous_sibling->previous_sibling, undef,
-  'no more siblings';
-is $dom->at('p')->next_sibling->content,      'after', 'right content';
-is $dom->at('p')->next_sibling->next_sibling, undef,   'no more siblings';
-is $dom->at('p')->contents->last->previous_sibling->previous_sibling->content,
+is $dom->child_nodes->first->following_nodes->size, 2, 'right number of nodes';
+is $dom->following_nodes->size, 0, 'no following nodes';
+is $dom->at('p')->previous_node->content,       ' before', 'right content';
+is $dom->at('p')->previous_node->previous_node, undef,     'no more siblings';
+is $dom->at('p')->next_node->content,           'after',   'right content';
+is $dom->at('p')->next_node->next_node,         undef,     'no more siblings';
+is $dom->at('p')->child_nodes->last->previous_node->previous_node->content,
   'test', 'right content';
-is $dom->at('p')->contents->first->next_sibling->next_sibling->content,
-  ' 456 ', 'right content';
-is $dom->all_contents->[0]->node,    'doctype', 'right node';
-is $dom->all_contents->[0]->content, ' before', 'right content';
-is $dom->all_contents->[0], '<!DOCTYPE before>', 'right content';
-is $dom->all_contents->[1]->type,    'p',     'right type';
-is $dom->all_contents->[2]->node,    'text',  'right node';
-is $dom->all_contents->[2]->content, 'test',  'right content';
-is $dom->all_contents->[5]->node,    'pi',    'right node';
-is $dom->all_contents->[5]->content, 'after', 'right content';
-is $dom->at('p')->all_contents->[0]->node,    'text', 'right node';
-is $dom->at('p')->all_contents->[0]->content, 'test', 'right node';
-is $dom->at('p')->all_contents->last->node,    'comment', 'right node';
-is $dom->at('p')->all_contents->last->content, ' 456 ',   'right node';
-is $dom->contents->[1]->contents->first->parent->type, 'p', 'right type';
-is $dom->contents->[1]->contents->first->content, 'test', 'right content';
-is $dom->contents->[1]->contents->first, 'test', 'right content';
-is $dom->at('p')->contents->first->node, 'text', 'right node';
-is $dom->at('p')->contents->first->remove->type, 'p', 'right type';
-is $dom->at('p')->contents->first->node,    'cdata', 'right node';
-is $dom->at('p')->contents->first->content, '123',   'right content';
-is $dom->at('p')->contents->[1]->node,    'comment', 'right node';
-is $dom->at('p')->contents->[1]->content, ' 456 ',   'right content';
+is $dom->at('p')->child_nodes->first->next_node->next_node->content, ' 456 ',
+  'right content';
+is $dom->descendant_nodes->[0]->node,    'doctype', 'right node';
+is $dom->descendant_nodes->[0]->content, ' before', 'right content';
+is $dom->descendant_nodes->[0], '<!DOCTYPE before>', 'right content';
+is $dom->descendant_nodes->[1]->type,    'p',     'right type';
+is $dom->descendant_nodes->[2]->node,    'text',  'right node';
+is $dom->descendant_nodes->[2]->content, 'test',  'right content';
+is $dom->descendant_nodes->[5]->node,    'pi',    'right node';
+is $dom->descendant_nodes->[5]->content, 'after', 'right content';
+is $dom->at('p')->descendant_nodes->[0]->node,    'text', 'right node';
+is $dom->at('p')->descendant_nodes->[0]->content, 'test', 'right node';
+is $dom->at('p')->descendant_nodes->last->node,    'comment', 'right node';
+is $dom->at('p')->descendant_nodes->last->content, ' 456 ',   'right node';
+is $dom->child_nodes->[1]->child_nodes->first->parent->type, 'p', 'right type';
+is $dom->child_nodes->[1]->child_nodes->first->content, 'test',
+  'right content';
+is $dom->child_nodes->[1]->child_nodes->first, 'test', 'right content';
+is $dom->at('p')->child_nodes->first->node, 'text', 'right node';
+is $dom->at('p')->child_nodes->first->remove->type, 'p', 'right type';
+is $dom->at('p')->child_nodes->first->node,    'cdata', 'right node';
+is $dom->at('p')->child_nodes->first->content, '123',   'right content';
+is $dom->at('p')->child_nodes->[1]->node,    'comment', 'right node';
+is $dom->at('p')->child_nodes->[1]->content, ' 456 ',   'right content';
 is $dom->[0]->node,    'doctype', 'right node';
 is $dom->[0]->content, ' before', 'right content';
-is $dom->contents->[2]->node,    'pi',    'right node';
-is $dom->contents->[2]->content, 'after', 'right content';
-is $dom->contents->first->content(' again')->content, ' again',
+is $dom->child_nodes->[2]->node,    'pi',    'right node';
+is $dom->child_nodes->[2]->content, 'after', 'right content';
+is $dom->child_nodes->first->content(' again')->content, ' again',
   'right content';
-is $dom->contents->grep(sub { $_->node eq 'pi' })->map('remove')->first->node,
-  'root', 'right node';
+is $dom->child_nodes->grep(sub { $_->node eq 'pi' })->map('remove')
+  ->first->node, 'root', 'right node';
 is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
   'right result';
 
@@ -225,34 +224,36 @@ is $dom->at('script')->node, 'tag', 'right node';
 is $dom->at('script')->[0]->node,    'raw',      'right node';
 is $dom->at('script')->[0]->content, 'la<la>la', 'right content';
 is "$dom", '<script>la<la>la</script>', 'right result';
-is $dom->at('script')->contents->first->replace('a<b>c</b>1<b>d</b>')->type,
+is $dom->at('script')->child_nodes->first->replace('a<b>c</b>1<b>d</b>')->type,
   'script', 'right type';
 is "$dom", '<script>a<b>c</b>1<b>d</b></script>', 'right result';
-is $dom->at('b')->contents->first->append('e')->content, 'c', 'right content';
-is $dom->at('b')->contents->first->prepend('f')->node, 'text', 'right node';
+is $dom->at('b')->child_nodes->first->append('e')->content, 'c',
+  'right content';
+is $dom->at('b')->child_nodes->first->prepend('f')->node, 'text', 'right node';
 is "$dom", '<script>a<b>fce</b>1<b>d</b></script>', 'right result';
-is $dom->at('script')->contents->first->following->first->type, 'b',
+is $dom->at('script')->child_nodes->first->following->first->type, 'b',
   'right type';
-is $dom->at('script')->contents->first->next->content, 'fce', 'right content';
-is $dom->at('script')->contents->first->previous, undef, 'no siblings';
-is $dom->at('script')->contents->[2]->previous->content, 'fce',
+is $dom->at('script')->child_nodes->first->next->content, 'fce',
   'right content';
-is $dom->at('b')->contents->[1]->next, undef, 'no siblings';
-is $dom->at('script')->contents->first->wrap('<i>:)</i>')->root,
+is $dom->at('script')->child_nodes->first->previous, undef, 'no siblings';
+is $dom->at('script')->child_nodes->[2]->previous->content, 'fce',
+  'right content';
+is $dom->at('b')->child_nodes->[1]->next, undef, 'no siblings';
+is $dom->at('script')->child_nodes->first->wrap('<i>:)</i>')->root,
   '<script><i>:)a</i><b>fce</b>1<b>d</b></script>', 'right result';
-is $dom->at('i')->contents->first->wrap_content('<b></b>')->root,
+is $dom->at('i')->child_nodes->first->wrap_content('<b></b>')->root,
   '<script><i><b>:)</b>a</i><b>fce</b>1<b>d</b></script>', 'right result';
-is $dom->at('b')->contents->first->ancestors->map('type')->join(','),
+is $dom->at('b')->child_nodes->first->ancestors->map('type')->join(','),
   'b,i,script', 'right result';
-is $dom->at('b')->contents->first->append_content('g')->content, ':)g',
+is $dom->at('b')->child_nodes->first->append_content('g')->content, ':)g',
   'right content';
-is $dom->at('b')->contents->first->prepend_content('h')->content, 'h:)g',
+is $dom->at('b')->child_nodes->first->prepend_content('h')->content, 'h:)g',
   'right content';
 is "$dom", '<script><i><b>h:)g</b>a</i><b>fce</b>1<b>d</b></script>',
   'right result';
 is $dom->at('script > b:last-of-type')->append('<!--y-->')
-  ->following_siblings->first->content, 'y', 'right content';
-is $dom->at('i')->prepend('z')->preceding_siblings->first->content, 'z',
+  ->following_nodes->first->content, 'y', 'right content';
+is $dom->at('i')->prepend('z')->preceding_nodes->first->content, 'z',
   'right content';
 is $dom->at('i')->following->last->text, 'd', 'right text';
 is $dom->at('i')->following->size, 2, 'right number of following elements';
@@ -274,25 +275,25 @@ is "$dom", '<script>z<i><b>h:)g</b>a</i><b>fce</b>1<b>d</b><!--y--></script>',
 
 # XML nodes
 $dom = Mojo::DOM->new->xml(1)->parse('<b>test<image /></b>');
-ok $dom->at('b')->contents->first->xml, 'XML mode active';
-ok $dom->at('b')->contents->first->replace('<br>')->contents->first->xml,
+ok $dom->at('b')->child_nodes->first->xml, 'XML mode active';
+ok $dom->at('b')->child_nodes->first->replace('<br>')->child_nodes->first->xml,
   'XML mode active';
 is "$dom", '<b><br /><image /></b>', 'right result';
 
 # Treating nodes as elements
 $dom = Mojo::DOM->new('foo<b>bar</b>baz');
-is $dom->contents->first->contents->size,     0, 'no contents';
-is $dom->contents->first->all_contents->size, 0, 'no contents';
-is $dom->contents->first->children->size,     0, 'no children';
-is $dom->contents->first->strip->parent, 'foo<b>bar</b>baz', 'no changes';
-is $dom->contents->first->at('b'), undef, 'no result';
-is $dom->contents->first->find('*')->size, 0, 'no results';
-is $dom->contents->first->match('*'), undef, 'no match';
-is_deeply $dom->contents->first->attr, {}, 'no attributes';
-is $dom->contents->first->namespace, undef, 'no namespace';
-is $dom->contents->first->type,      undef, 'no type';
-is $dom->contents->first->text,      '',    'no text';
-is $dom->contents->first->all_text,  '',    'no text';
+is $dom->child_nodes->first->child_nodes->size,      0, 'no nodes';
+is $dom->child_nodes->first->descendant_nodes->size, 0, 'no nodes';
+is $dom->child_nodes->first->children->size,         0, 'no children';
+is $dom->child_nodes->first->strip->parent, 'foo<b>bar</b>baz', 'no changes';
+is $dom->child_nodes->first->at('b'), undef, 'no result';
+is $dom->child_nodes->first->find('*')->size, 0, 'no results';
+is $dom->child_nodes->first->match('*'), undef, 'no match';
+is_deeply $dom->child_nodes->first->attr, {}, 'no attributes';
+is $dom->child_nodes->first->namespace, undef, 'no namespace';
+is $dom->child_nodes->first->type,      undef, 'no type';
+is $dom->child_nodes->first->text,      '',    'no text';
+is $dom->child_nodes->first->all_text,  '',    'no text';
 
 # Class and ID
 $dom = Mojo::DOM->new('<div id="id" class="class">a</div>');

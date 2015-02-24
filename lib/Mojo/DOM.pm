@@ -1,7 +1,7 @@
 package Mojo::DOM;
 use Mojo::Base -strict;
 use overload
-  '@{}'    => sub { shift->contents },
+  '@{}'    => sub { shift->child_nodes },
   '%{}'    => sub { shift->attr },
   bool     => sub {1},
   '""'     => sub { shift->to_string },
@@ -15,8 +15,6 @@ use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
 use Mojo::Util 'squish';
 use Scalar::Util qw(blessed weaken);
-
-sub all_contents { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
 sub all_text { shift->_all_text(1, @_) }
 
@@ -51,6 +49,8 @@ sub attr {
 
 sub children { _select($_[0]->_collect(_nodes($_[0]->tree, 1)), $_[1]) }
 
+sub child_nodes { $_[0]->_collect(_nodes($_[0]->tree)) }
+
 sub content {
   my $self = shift;
 
@@ -66,12 +66,12 @@ sub content {
   return $self;
 }
 
-sub contents { $_[0]->_collect(_nodes($_[0]->tree)) }
+sub descendant_nodes { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
 sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
 
 sub following { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[1]}), $_[1]) }
-sub following_siblings { $_[0]->_collect(@{$_[0]->_siblings->[1]}) }
+sub following_nodes { $_[0]->_collect(@{$_[0]->_siblings->[1]}) }
 
 sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
 
@@ -101,8 +101,8 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next         { $_[0]->_maybe($_[0]->_siblings(1, 0)->[1]) }
-sub next_sibling { $_[0]->_maybe($_[0]->_siblings(0, 0)->[1]) }
+sub next      { $_[0]->_maybe($_[0]->_siblings(1, 0)->[1]) }
+sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 0)->[1]) }
 
 sub node { shift->tree->[0] }
 
@@ -115,13 +115,13 @@ sub parent {
 sub parse { shift->_delegate(parse => @_) }
 
 sub preceding { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[0]}), $_[1]) }
-sub preceding_siblings { $_[0]->_collect(@{$_[0]->_siblings->[0]}) }
+sub preceding_nodes { $_[0]->_collect(@{$_[0]->_siblings->[0]}) }
 
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous         { $_[0]->_maybe($_[0]->_siblings(1, -1)->[0]) }
-sub previous_sibling { $_[0]->_maybe($_[0]->_siblings(0, -1)->[0]) }
+sub previous      { $_[0]->_maybe($_[0]->_siblings(1, -1)->[0]) }
+sub previous_node { $_[0]->_maybe($_[0]->_siblings(0, -1)->[0]) }
 
 sub remove { shift->replace('') }
 
@@ -428,17 +428,6 @@ XML detection can also be disabled with the L</"xml"> method.
 
 L<Mojo::DOM> implements the following methods.
 
-=head2 all_contents
-
-  my $collection = $dom->all_contents;
-
-Return a L<Mojo::Collection> object containing all descendant nodes of this
-element as L<Mojo::DOM> objects.
-
-  # "<p><b>123</b></p>"
-  $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')
-    ->all_contents->grep(sub { $_->node eq 'comment' })->map('remove')->first;
-
 =head2 all_text
 
   my $trimmed   = $dom->all_text;
@@ -476,7 +465,8 @@ Append HTML/XML fragment to this node.
     ->at('h1')->append('<h2>123</h2>')->root;
 
   # "<p>Test 123</p>"
-  $dom->parse('<p>Test</p>')->at('p')->contents->first->append(' 123')->root;
+  $dom->parse('<p>Test</p>')->at('p')
+    ->child_nodes->first->append(' 123')->root;
 
 =head2 append_content
 
@@ -491,7 +481,7 @@ node's content.
 
   # "<!-- Test 123 --><br>"
   $dom->parse('<!-- Test --><br>')
-    ->contents->first->append_content('123 ')->root;
+    ->child_nodes->first->append_content('123 ')->root;
 
   # "<p>Test<i>123</i></p>"
   $dom->parse('<p>Test</p>')->at('p')->append_content('<i>123</i>')->root;
@@ -531,6 +521,19 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # Show type of random child element
   say $dom->children->shuffle->first->type;
 
+=head2 child_nodes
+
+  my $collection = $dom->child_nodes;
+
+Return a L<Mojo::Collection> object containing the child nodes of this element
+as L<Mojo::DOM> objects.
+
+  # "<p><b>123</b></p>"
+  $dom->parse('<p>Test<b>123</b></p>')->at('p')->child_nodes->first->remove;
+
+  # "<!-- Test -->"
+  $dom->parse('<!-- Test --><b>123</b>')->child_nodes->first;
+
 =head2 content
 
   my $str = $dom->content;
@@ -552,24 +555,23 @@ and C<tag> nodes) or raw content.
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->content('')->root;
 
   # " Test "
-  $dom->parse('<!-- Test --><br>')->contents->first->content;
+  $dom->parse('<!-- Test --><br>')->child_nodes->first->content;
 
   # "<div><!-- 123 -->456</div>"
   $dom->parse('<div><!-- Test -->456</div>')
-    ->at('div')->contents->first->content(' 123 ')->root;
+    ->at('div')->child_nodes->first->content(' 123 ')->root;
 
-=head2 contents
+=head2 descendant_nodes
 
-  my $collection = $dom->contents;
+  my $collection = $dom->descendant_nodes;
 
-Return a L<Mojo::Collection> object containing the child nodes of this element
-as L<Mojo::DOM> objects.
+Return a L<Mojo::Collection> object containing all descendant nodes of this
+element as L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
-  $dom->parse('<p>Test<b>123</b></p>')->at('p')->contents->first->remove;
-
-  # "<!-- Test -->"
-  $dom->parse('<!-- Test --><b>123</b>')->contents->first;
+  $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')
+    ->descendant_nodes->grep(sub { $_->node eq 'comment' })
+    ->map('remove')->first;
 
 =head2 find
 
@@ -603,16 +605,15 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # List types of sibling elements after this node
   say $dom->following->map('type')->join("\n");
 
-=head2 following_siblings
+=head2 following_nodes
 
-  my $collection = $dom->following_siblings;
+  my $collection = $dom->following_nodes;
 
 Return a L<Mojo::Collection> object containing the sibling nodes after this
 node as L<Mojo::DOM> objects.
 
   # "C"
-  $dom->parse('<p>A</p><!-- B -->C')
-    ->at('p')->following_siblings->last->content;
+  $dom->parse('<p>A</p><!-- B -->C')->at('p')->following_nodes->last->content;
 
 =head2 match
 
@@ -660,20 +661,20 @@ more siblings.
   # "<h2>123</h2>"
   $dom->parse('<div><h1>Test</h1><h2>123</h2></div>')->at('h1')->next;
 
-=head2 next_sibling
+=head2 next_node
 
-  my $sibling = $dom->next_sibling;
+  my $sibling = $dom->next_node;
 
 Return L<Mojo::DOM> object for next sibling node or C<undef> if there are no
 more siblings.
 
   # "456"
   $dom->parse('<p><b>123</b><!-- Test -->456</p>')
-    ->at('b')->next_sibling->next_sibling;
+    ->at('b')->next_node->next_node;
 
   # " Test "
   $dom->parse('<p><b>123</b><!-- Test -->456</p>')
-    ->at('b')->next_sibling->content;
+    ->at('b')->next_node->content;
 
 =head2 node
 
@@ -710,16 +711,15 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # List types of sibling elements before this node
   say $dom->preceding->map('type')->join("\n");
 
-=head2 preceding_siblings
+=head2 preceding_nodes
 
-  my $collection = $dom->preceding_siblings;
+  my $collection = $dom->preceding_nodes;
 
 Return a L<Mojo::Collection> object containing the sibling nodes before this
 node as L<Mojo::DOM> objects.
 
   # "A"
-  $dom->parse('A<!-- B --><p>C</p>')
-    ->at('p')->preceding_siblings->first->content;
+  $dom->parse('A<!-- B --><p>C</p>')->at('p')->preceding_nodes->first->content;
 
 =head2 prepend
 
@@ -732,7 +732,8 @@ Prepend HTML/XML fragment to this node.
     ->at('h2')->prepend('<h1>Test</h1>')->root;
 
   # "<p>Test 123</p>"
-  $dom->parse('<p>123</p>')->at('p')->contents->first->prepend('Test ')->root;
+  $dom->parse('<p>123</p>')
+    ->at('p')->child_nodes->first->prepend('Test ')->root;
 
 =head2 prepend_content
 
@@ -747,7 +748,7 @@ node's content.
 
   # "<!-- Test 123 --><br>"
   $dom->parse('<!-- 123 --><br>')
-    ->contents->first->prepend_content(' Test')->root;
+    ->child_nodes->first->prepend_content(' Test')->root;
 
   # "<p><i>123</i>Test</p>"
   $dom->parse('<p>Test</p>')->at('p')->prepend_content('<i>123</i>')->root;
@@ -762,20 +763,20 @@ are no more siblings.
   # "<h1>Test</h1>"
   $dom->parse('<div><h1>Test</h1><h2>123</h2></div>')->at('h2')->previous;
 
-=head2 previous_sibling
+=head2 previous_node
 
-  my $sibling = $dom->previous_sibling;
+  my $sibling = $dom->previous_node;
 
 Return L<Mojo::DOM> object for previous sibling node or C<undef> if there are
 no more siblings.
 
   # "123"
   $dom->parse('<p>123<!-- Test --><b>456</b></p>')
-    ->at('b')->previous_sibling->previous_sibling;
+    ->at('b')->previous_node->previous_node;
 
   # " Test "
   $dom->parse('<p>123<!-- Test --><b>456</b></p>')
-    ->at('b')->previous_sibling->content;
+    ->at('b')->previous_node->content;
 
 =head2 remove
 
@@ -787,7 +788,8 @@ Remove this node and return L</"parent">.
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->remove;
 
   # "<p><b>456</b></p>"
-  $dom->parse('<p>123<b>456</b></p>')->at('p')->contents->first->remove->root;
+  $dom->parse('<p>123<b>456</b></p>')
+    ->at('p')->child_nodes->first->remove->root;
 
 =head2 replace
 
@@ -800,7 +802,7 @@ Replace this node with HTML/XML fragment and return L</"parent">.
 
   # "<p><b>123</b></p>"
   $dom->parse('<p>Test</p>')
-    ->at('p')->contents->[0]->replace('<b>123</b>')->root;
+    ->at('p')->child_nodes->[0]->replace('<b>123</b>')->root;
 
 =head2 root
 
@@ -881,7 +883,7 @@ first innermost element.
   $dom->parse('<b>Test</b>')->at('b')->wrap('<p></p><p>123</p>')->root;
 
   # "<p><b>Test</b></p>"
-  $dom->parse('<p>Test</p>')->at('p')->contents->first->wrap('<b>')->root;
+  $dom->parse('<p>Test</p>')->at('p')->child_nodes->first->wrap('<b>')->root;
 
 =head2 wrap_content
 
@@ -912,7 +914,7 @@ L<Mojo::DOM> overloads the following operators.
 
   my @nodes = @$dom;
 
-Alias for L</"contents">.
+Alias for L</"child_nodes">.
 
   # "<!-- Test -->"
   $dom->parse('<!-- Test --><b>123</b>')->[0];

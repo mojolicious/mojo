@@ -25,6 +25,10 @@
   - Removed deprecated keep_alive_requests setting from Hypnotoad.
   - Renamed pattern attribute in Mojolicious::Routes::Route to unparsed.
   - Renamed template attribute in Mojo::Template to unparsed.
+  - Renamed all_contents, contents, following_siblings, next_sibling,
+    preceding_siblings and previous_sibling methods in Mojo::DOM to
+    descendant_nodes, child_nodes, following_nodes, next_node, preceding_nodes
+    and previous_node.
   - Renamed params method in Mojo::Parameters to pairs.
   - Added names method to Mojo::Parameters.
   - Added failed and passed methods to Mojolicious::Validator::Validation.

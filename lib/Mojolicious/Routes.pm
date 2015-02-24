@@ -97,10 +97,6 @@ sub match {
     "$method:$path:$ws" => {endpoint => $route, stack => $match->stack});
 }
 
-sub route {
-  shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
-}
-
 sub _action { shift->plugins->emit_chain(around_action => @_) }
 
 sub _callback {
@@ -343,16 +339,6 @@ results for future lookups.
   $r->match(Mojolicious::Controller->new);
 
 Match routes with L<Mojolicious::Routes::Match>.
-
-=head2 route
-
-  my $route = $r->route;
-  my $route = $r->route('/:action');
-  my $route = $r->route('/:action', action => qr/\w+/);
-  my $route = $r->route(format => 0);
-
-Low-level generator for routes matching all HTTP request methods, returns a
-L<Mojolicious::Routes::Route> object.
 
 =head1 SEE ALSO
 

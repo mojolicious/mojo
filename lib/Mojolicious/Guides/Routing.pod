@@ -131,16 +131,16 @@ C<([^/]+)>.
   /sebastian23/hello  -> /#name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /#name/hello -> {name => 'sebastian 23'}
 
-Relaxed placeholders are especially useful for manually matching file names
-with extensions rather than using L<"Format detection"|/"Formats">.
+They can be especially useful for manually matching file names with
+extensions, rather than using L<format detection|/"Formats">.
 
   /music/song.mp3 -> /music/#filename -> {filename => 'song.mp3'}
 
 =head2 Wildcard placeholders
 
-Wildcard placeholders are just like the two placeholders above, but use an
-asterisk prefix and match absolutely everything, including C</> and C<.>,
-similar to the regular expression C<(.+)>.
+Wildcard placeholders are just like the two types of placeholders above, but
+use an asterisk prefix and match absolutely everything, including C</> and
+C<.>, similar to the regular expression C<(.+)>.
 
   /hello              -> /*name/hello -> undef
   /sebastian/23/hello -> /*name/hello -> {name => 'sebastian/23'}

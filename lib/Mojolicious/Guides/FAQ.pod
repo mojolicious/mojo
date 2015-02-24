@@ -136,7 +136,7 @@ connections concurrently.
 
 In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
-=head2 Why is the file extension missing from my placeholder value?
+=head2 Where did my file extension go?
 
 Standard route placeholders will not match the C<.> character, however
 L<Mojolicious> routes automatically take file extensions like C<.html>, remove

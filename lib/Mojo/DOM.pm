@@ -432,8 +432,8 @@ L<Mojo::DOM> implements the following methods.
 
   my $collection = $dom->all_contents;
 
-Return a L<Mojo::Collection> object containing all nodes in DOM structure as
-L<Mojo::DOM> objects.
+Return a L<Mojo::Collection> object containing all descendant nodes of this
+element as L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
   $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')

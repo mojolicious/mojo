@@ -136,6 +136,18 @@ connections concurrently.
 
 In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
+=head2 Why is the file extension missing from my placeholder value?
+
+Standard route placeholders will not match a C<.> character, however
+Mojolicious routes automatically take file extensions like C<.html>, remove the
+leading C<.>, and store the result in the C<format> stash value. This can be
+useful for URL-based content negotiation, such as automatically rendering
+different templates based on the file extension. See
+<Mojolicious::Guides::Routing/Formats> for information on configuring format
+detection, or consider using
+L<Mojolicious::Guides::Routing/"Relaxed placeholders"> to match the C<.>
+character.
+
 =head2 What does the error "Maximum message size exceeded" mean?
 
 To protect your applications from excessively large requests and responses,
@@ -224,14 +236,6 @@ operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
-
-=head2 Why is the file extension missing from the stash value?
-
-Mojolicious detects file formats by default (see
-L<Mojolicious::Guides::Routing/Formats>). The file extension is then available
-via the stash value C<format>. To match a file name with an extension
-manually, consider using
-L<Mojolicious::Guides::Routing/"Relaxed placeholders">.
 
 =head1 MORE
 

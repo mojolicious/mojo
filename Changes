@@ -42,6 +42,7 @@
   - Added names method to Mojo::Parameters.
   - Added failed and passed methods to Mojolicious::Validator::Validation.
   - Added -I and -M options to prefork command.
+  - Fixed Mojo::Template support for parentheses in expressions. (jberger, sri)
 
 5.82  2015-02-22
   - Deprecated Mojo::Reactor::is_readable.

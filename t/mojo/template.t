@@ -30,6 +30,11 @@ $mt->prepend('my @foo = (3, 4);')->parse('<%= @foo %>:<%== @foo %>');
 my $output = $mt->build->compile || $mt->interpret;
 is $output, "2:2\n", 'same context';
 
+# Parentheses
+$mt     = Mojo::Template->new;
+$output = $mt->render('<%= (1,2,3)[1] %><%== (1,2,3)[2] %>');
+is $output, "23\n", 'no ambiguity';
+
 # Trim tag
 $mt     = Mojo::Template->new;
 $output = $mt->render(" ♥    <%= 'test♥' =%> \n");

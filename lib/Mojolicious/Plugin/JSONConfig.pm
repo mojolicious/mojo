@@ -20,8 +20,9 @@ sub render {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Application instance and helper
-  my $prepend = q[my $app = shift; no strict 'refs'; no warnings 'redefine';];
-  $prepend .= q[sub app; local *app = sub { $app }; use Mojo::Base -strict;];
+  my $prepend = q[no strict 'refs'; no warnings 'redefine';];
+  $prepend .= q[my $app = shift; sub app; local *app = sub { $app };];
+  $prepend .= q[use Mojo::Base -strict; no warnings 'ambiguous';];
 
   my $mt = Mojo::Template->new($conf->{template} || {})->name($file);
   my $output = $mt->prepend($prepend . $mt->prepend)->render($content, $app);

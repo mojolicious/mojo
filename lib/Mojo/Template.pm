@@ -59,11 +59,11 @@ sub build {
 
       # Escaped
       if (!$multi && ($op eq 'escp' && !$escape || $op eq 'expr' && $escape)) {
-        $blocks[-1] .= "\$_O .= _escape scalar $value";
+        $blocks[-1] .= "\$_O .= _escape scalar + $value";
       }
 
       # Raw
-      elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar $value" }
+      elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar + $value" }
 
       # Multiline
       $multi = !$next || $next->[0] ne 'text';
@@ -271,8 +271,8 @@ sub _wrap {
 
   # Wrap lines
   my $num = () = $code =~ /\n/g;
-  my $head = $self->_line(1);
-  $head .= "\npackage @{[$self->namespace]}; use Mojo::Base -strict;";
+  my $head = $self->_line(1) . "\npackage @{[$self->namespace]};";
+  $head .= " use Mojo::Base -strict; no warnings 'ambiguous';";
   $code = "$head sub { my \$_O = ''; @{[$self->prepend]}; { $code\n";
   $code .= $self->_line($num + 1) . "\n@{[$self->append]}; } \$_O };";
 

@@ -108,7 +108,7 @@ Perl code, a naive translation could look like this.
   $output .= '<ul>';
   for my $j (1 .. $i) {
     $output .= '<li>';
-    $output .= xml_escape scalar $j;
+    $output .= xml_escape scalar + $j;
     $output .= '</li>';
   }
   $output .= '</ul>';
@@ -661,12 +661,12 @@ A naive translation of the template to Perl code could look like this.
     my $name   = shift;
     my $output = '';
     $output .= 'Hello ';
-    $output .= xml_escape scalar $name;
+    $output .= xml_escape scalar + $name;
     $output .= '.';
     return Mojo::ByteStream->new($output);
   };
-  $output .= xml_escape scalar $block->('Sebastian');
-  $output .= xml_escape scalar $block->('Sara');
+  $output .= xml_escape scalar + $block->('Sebastian');
+  $output .= xml_escape scalar + $block->('Sara');
   return $output;
 
 While template blocks cannot be shared between templates, they are most

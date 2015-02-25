@@ -95,7 +95,7 @@ sub find {
   return \@found;
 }
 
-sub inject {
+sub prepare {
   my ($self, $tx) = @_;
   return unless keys %{$self->{jar}};
   my $req = $tx->req;
@@ -205,11 +205,11 @@ Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
   # Names of all cookies found
   say $_->name for @{$jar->find(Mojo::URL->new('http://example.com/foo'))};
 
-=head2 inject
+=head2 prepare
 
-  $jar->inject(Mojo::Transaction::HTTP->new);
+  $jar->prepare(Mojo::Transaction::HTTP->new);
 
-Inject request cookies into transaction.
+Prepare request cookies for transaction.
 
 =head1 SEE ALSO
 

@@ -302,7 +302,7 @@ is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';
 is $cookies->[1], undef, 'no second cookie';
 
-# Extract and inject cookies without domain and path
+# Extract and prepare cookies without domain and path
 $jar = Mojo::UserAgent::CookieJar->new;
 my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicio.us/perldoc/Mojolicious');
@@ -311,24 +311,24 @@ $tx->res->cookies(
 $jar->extract($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicio.us/perldoc');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo')->name,  'foo',     'right name';
 is $tx->req->cookie('foo')->value, 'without', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicio.us/perldoc');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo')->name,  'foo',     'right name';
 is $tx->req->cookie('foo')->value, 'without', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://www.mojolicio.us/perldoc');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicio.us/whatever');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 
-# Extract and inject cookies with same name (with and without domain)
+# Extract and prepare cookies with same name (with and without domain)
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://example.com/test');
@@ -343,7 +343,7 @@ $tx->res->cookies(
 $jar->extract($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://example.com/test');
-$jar->inject($tx);
+$jar->prepare($tx);
 $cookies = $tx->req->every_cookie('foo');
 is $cookies->[0]->name,  'foo',     'right name';
 is $cookies->[0]->value, 'without', 'right value';
@@ -352,13 +352,13 @@ is $cookies->[1]->value, 'with',    'right value';
 is $cookies->[2], undef, 'no third cookie';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://www.example.com/test');
-$jar->inject($tx);
+$jar->prepare($tx);
 $cookies = $tx->req->every_cookie('foo');
 is $cookies->[0]->name,  'foo',  'right name';
 is $cookies->[0]->value, 'with', 'right value';
 is $cookies->[1], undef, 'no second cookie';
 
-# Extract and inject cookies for "localhost" (valid and invalid)
+# Extract and prepare cookies for "localhost" (valid and invalid)
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://localhost:3000');
@@ -377,12 +377,12 @@ $tx->res->cookies(
 $jar->extract($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://localhost:8080');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo')->name,  'foo',   'right name';
 is $tx->req->cookie('foo')->value, 'local', 'right value';
 is $tx->req->cookie('bar'), undef, 'no cookie';
 
-# Extract and inject cookies with domain and path
+# Extract and prepare cookies with domain and path
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://LABS.bücher.Com/perldoc/Mojolicious');
@@ -409,7 +409,7 @@ $tx->res->cookies(
 $jar->extract($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://labs.bücher.COM/perldoc/Mojolicious/Lite');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo')->name,  'foo',  'right name';
 is $tx->req->cookie('foo')->value, 'with', 'right value';
 is $tx->req->cookie('bar')->name,  'bar',  'right name';
@@ -418,7 +418,7 @@ is $tx->req->cookie('0')->name,    '0',    'right name';
 is $tx->req->cookie('0')->value,   'with', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://bücher.COM/perldoc/Mojolicious/Lite');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 is $tx->req->cookie('bar')->name,  'bar',  'right name';
 is $tx->req->cookie('bar')->value, 'with', 'right value';
@@ -426,12 +426,12 @@ is $tx->req->cookie('0')->name,    '0',    'right name';
 is $tx->req->cookie('0')->value,   'with', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://labs.bücher.COM/Perldoc');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 is $tx->req->cookie('bar')->name,  'bar',  'right name';
 is $tx->req->cookie('bar')->value, 'with', 'right value';
 
-# Extract and inject cookies with IP address
+# Extract and prepare cookies with IP address
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
@@ -446,7 +446,7 @@ $tx->res->cookies(
 $jar->extract($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
-$jar->inject($tx);
+$jar->prepare($tx);
 is $tx->req->cookie('foo')->name,  'foo',   'right name';
 is $tx->req->cookie('foo')->value, 'valid', 'right value';
 is $tx->req->cookie('bar')->name,  'bar',   'right name';

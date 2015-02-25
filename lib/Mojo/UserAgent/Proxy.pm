@@ -10,7 +10,11 @@ sub detect {
   return $self->not([split ',', $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
 }
 
-sub inject {
+sub is_needed {
+  !grep { $_[1] =~ /\Q$_\E$/ } @{$_[0]->not || []};
+}
+
+sub prepare {
   my ($self, $tx) = @_;
 
   $self->detect if $ENV{MOJO_PROXY};
@@ -26,10 +30,6 @@ sub inject {
   # HTTPS proxy
   my $https = $self->https;
   $req->proxy($https) if $https && $proto eq 'https';
-}
-
-sub is_needed {
-  !grep { $_[1] =~ /\Q$_\E$/ } @{$_[0]->not || []};
 }
 
 1;
@@ -90,17 +90,17 @@ Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>,
 C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information. Automatic
 proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
 
-=head2 inject
-
-  $proxy->inject(Mojo::Transaction::HTTP->new);
-
-Inject proxy server information into transaction.
-
 =head2 is_needed
 
   my $bool = $proxy->is_needed('intranet.example.com');
 
 Check if request for domain would use a proxy server.
+
+=head2 prepare
+
+  $proxy->prepare(Mojo::Transaction::HTTP->new);
+
+Prepare proxy server information for transaction.
 
 =head1 SEE ALSO
 

@@ -33,6 +33,8 @@
     preceding_siblings and previous_sibling methods in Mojo::DOM to
     descendant_nodes, child_nodes, following_nodes, next_node, preceding_nodes
     and previous_node.
+  - Renamed inject method in Mojo::UserAgent::CookieJar to prepare.
+  - Renamed inject method in Mojo::UserAgent::Proxy to prepare.
   - Renamed params method in Mojo::Parameters to pairs.
   - Renamed -A option of prefork command to -a.
   - Added names method to Mojo::Parameters.

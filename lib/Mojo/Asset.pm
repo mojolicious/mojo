@@ -42,7 +42,8 @@ Mojo::Asset - HTTP content storage base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Asset> is an abstract base class for HTTP content storage.
+L<Mojo::Asset> is an abstract base class for HTTP content storage backends,
+like L<Mojo::Asset::File> and L<Mojo::Asset::Memory>.
 
 =head1 EVENTS
 

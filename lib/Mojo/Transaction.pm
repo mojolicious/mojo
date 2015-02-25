@@ -89,7 +89,8 @@ Mojo::Transaction - Transaction base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction> is an abstract base class for transactions.
+L<Mojo::Transaction> is an abstract base class for transactions, like
+L<Mojo::Transaction::HTTP> and L<Mojo::Transaction::WebSocket>.
 
 =head1 EVENTS
 

@@ -52,7 +52,8 @@ Mojo::Reactor - Low-level event reactor base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor> is an abstract base class for low-level event reactors.
+L<Mojo::Reactor> is an abstract base class for low-level event reactors, like
+L<Mojo::Reactor::EV> and L<Mojo::Reactor::Poll>.
 
 =head1 EVENTS
 

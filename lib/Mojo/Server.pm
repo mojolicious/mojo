@@ -100,7 +100,7 @@ sub _error { $_[0]->app->log->error($_[1]) and croak $_[1] }
 
 =head1 NAME
 
-Mojo::Server - HTTP server base class
+Mojo::Server - HTTP/WebSocket server base class
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,10 @@ Mojo::Server - HTTP server base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Server> is an abstract HTTP server base class.
+L<Mojo::Server> is an abstract base class for HTTP/WebSocket servers and server
+interfaces, like L<Mojo::Server::CGI>, L<Mojo::Server::Daemon>,
+L<Mojo::Server::Hypnotoad>, L<Mojo::Server::Morbo>, L<Mojo::Server::Prefork>
+and L<Mojo::Server::PSGI>.
 
 =head1 EVENTS
 

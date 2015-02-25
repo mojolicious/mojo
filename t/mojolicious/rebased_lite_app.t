@@ -68,11 +68,11 @@ foo
 EOF
 
 # Rebased route with flash
-ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo')),
+ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0],
   'no session cookie';
 $t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')
   ->header_is(Location => '/rebased/foo');
-ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo')),
+ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0],
   'session cookie';
 
 # Rebased route with message from flash

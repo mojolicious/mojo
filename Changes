@@ -23,6 +23,8 @@
   - Removed deprecated render_exception and render_not_found methods from
     Mojolicious::Controller.
   - Removed deprecated keep_alive_requests setting from Hypnotoad.
+  - Changed return values of all and find methods in
+    Mojo::UserAgent::CookieJar.
   - Renamed types attribute in Mojolicious::Types to mapping.
   - Renamed current attribute in Mojolicious::Routes::Match to position.
   - Renamed pattern attribute in Mojolicious::Routes::Route to unparsed.

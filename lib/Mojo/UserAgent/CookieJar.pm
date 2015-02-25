@@ -34,7 +34,7 @@ sub add {
 
 sub all {
   my $jar = shift->{jar};
-  return map { @{$jar->{$_}} } sort keys %$jar;
+  return [map { @{$jar->{$_}} } sort keys %$jar];
 }
 
 sub empty { delete shift->{jar} }
@@ -65,9 +65,9 @@ sub extract {
 sub find {
   my ($self, $url) = @_;
 
-  return unless my $domain = my $host = $url->ihost;
-  my $path = $url->path->to_abs_string;
   my @found;
+  return \@found unless my $domain = my $host = $url->ihost;
+  my $path = $url->path->to_abs_string;
   while ($domain =~ /[^.]+\.[^.]+|localhost$/) {
     next unless my $old = $self->{jar}{$domain};
 
@@ -92,14 +92,14 @@ sub find {
   # Remove another part
   continue { $domain =~ s/^[^.]+\.?// }
 
-  return @found;
+  return \@found;
 }
 
 sub inject {
   my ($self, $tx) = @_;
   return unless keys %{$self->{jar}};
   my $req = $tx->req;
-  $req->cookies($self->find($req->url));
+  $req->cookies(@{$self->find($req->url)});
 }
 
 sub _compare {
@@ -134,7 +134,7 @@ Mojo::UserAgent::CookieJar - Cookie jar for HTTP user agents
   );
 
   # Find request cookies
-  for my $cookie ($jar->find(Mojo::URL->new('http://localhost/test'))) {
+  for my $cookie (@{$jar->find(Mojo::URL->new('http://localhost/test'))}) {
     say $cookie->name;
     say $cookie->value;
   }
@@ -176,7 +176,7 @@ Add multiple L<Mojo::Cookie::Response> objects to the jar.
 
 =head2 all
 
-  my @cookies = $jar->all;
+  my $cookies = $jar->all;
 
 Return all L<Mojo::Cookie::Response> objects that are currently stored in the
 jar.
@@ -195,7 +195,7 @@ Extract response cookies from transaction.
 
 =head2 find
 
-  my @cookies = $jar->find(Mojo::URL->new);
+  my $cookies = $jar->find(Mojo::URL->new);
 
 Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 

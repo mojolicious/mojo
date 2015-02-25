@@ -547,8 +547,9 @@ allows nesting of routes generated with L<Mojolicious::Lite/"under">.
 
 =head2 Formats
 
-Formats can be automatically detected from file extensions, they are used to
-find the right template and generate the correct C<Content-Type> header.
+Formats can be automatically detected from file extensions like C<.html>, they
+are used to find the right template and generate the correct C<Content-Type>
+header.
 
   use Mojolicious::Lite;
 
@@ -573,8 +574,8 @@ find the right template and generate the correct C<Content-Type> header.
   @@ detected.txt.ep
   TXT was detected.
 
-The default format is C<html>, restrictive placeholders can be used to limit
-possible values.
+The default format is C<html>, and restrictive placeholders can be used to
+limit possible values.
 
   use Mojolicious::Lite;
 

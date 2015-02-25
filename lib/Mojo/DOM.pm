@@ -433,8 +433,8 @@ L<Mojo::DOM> implements the following methods.
   my $trimmed   = $dom->all_text;
   my $untrimmed = $dom->all_text(0);
 
-Extract all text content from DOM structure, smart whitespace trimming is
-enabled by default.
+Extract text content from all descendant nodes of this element, smart
+whitespace trimming is enabled by default.
 
   # "foo bar baz"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->all_text;
@@ -447,7 +447,7 @@ enabled by default.
   my $collection = $dom->ancestors;
   my $collection = $dom->ancestors('div > p');
 
-Find all ancestors of this node matching the CSS selector and return a
+Find all ancestor elements of this node matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
@@ -490,9 +490,9 @@ node's content.
 
   my $result = $dom->at('div > p');
 
-Find first element in DOM structure matching the CSS selector and return it as
-a L<Mojo::DOM> object or return C<undef> if none could be found. All selectors
-from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+Find first descendant element of this element matching the CSS selector and
+return it as a L<Mojo::DOM> object or return C<undef> if none could be found.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
@@ -514,7 +514,7 @@ This element's attributes.
   my $collection = $dom->children;
   my $collection = $dom->children('div > p');
 
-Find all children of this element matching the CSS selector and return a
+Find all child elements of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
@@ -525,7 +525,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   my $collection = $dom->child_nodes;
 
-Return a L<Mojo::Collection> object containing the child nodes of this element
+Return a L<Mojo::Collection> object containing all child nodes of this element
 as L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
@@ -577,9 +577,9 @@ element as L<Mojo::DOM> objects.
 
   my $collection = $dom->find('div > p');
 
-Find all elements in DOM structure matching the CSS selector and return a
-L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
-All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+Find all descendant elements of this element matching the CSS selector and
+return a L<Mojo::Collection> object containing these elements as L<Mojo::DOM>
+objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # Find a specific element and extract information
   my $id = $dom->find('div')->[23]{id};
@@ -609,7 +609,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   my $collection = $dom->following_nodes;
 
-Return a L<Mojo::Collection> object containing the sibling nodes after this
+Return a L<Mojo::Collection> object containing all sibling nodes after this
 node as L<Mojo::DOM> objects.
 
   # "C"
@@ -715,7 +715,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   my $collection = $dom->preceding_nodes;
 
-Return a L<Mojo::Collection> object containing the sibling nodes before this
+Return a L<Mojo::Collection> object containing all sibling nodes before this
 node as L<Mojo::DOM> objects.
 
   # "A"

@@ -254,7 +254,7 @@ sub _finish {
   # Finish WebSocket
   return $self->_remove($id, 1) if $old->is_websocket;
 
-  if (my $jar = $self->cookie_jar) { $jar->nomnomnom($old) }
+  if (my $jar = $self->cookie_jar) { $jar->collect($old) }
 
   # Upgrade connection to WebSocket
   if (my $new = $self->transactor->upgrade($old)) {
@@ -512,8 +512,8 @@ environment variable or C<10>.
 Cookie jar to use for requests performed by this user agent, defaults to a
 L<Mojo::UserAgent::CookieJar> object.
 
-  # Disable gathering of cookies from responses
-  $ua->cookie_jar->gathering(0);
+  # Disable collecting cookies from responses
+  $ua->cookie_jar->collecting(0);
 
   # Add custom cookie to the jar
   $ua->cookie_jar->add(

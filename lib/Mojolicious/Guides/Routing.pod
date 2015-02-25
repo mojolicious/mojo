@@ -586,9 +586,9 @@ allowed formats.
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
   $r->get('/foo' => [format => [qw(rss xml)]])->to('foo#bar');
 
-Or you can just disable format detection, which gets inherited by nested
-routes, and then re-enable it selectively on demand with restrictive
-placeholders.
+Or you can just disable format detection with a special type of restrictive
+placeholder, which gets inherited by nested routes, and then re-enable it on
+demand.
 
   # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef

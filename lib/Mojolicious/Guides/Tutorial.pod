@@ -590,14 +590,15 @@ limit possible values.
 
   app->start;
 
-Or you can just disable format detection.
+Or you can just disable format detection with a special type of restrictive
+placeholder.
 
   use Mojolicious::Lite;
 
   # /hello
   get '/hello' => [format => 0] => {text => 'No format detection.'};
 
-  # Disable detection and allow the following routes selective re-enabling
+  # Disable detection and allow the following routes to re-enable it on demand
   under [format => 0];
 
   # /foo

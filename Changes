@@ -32,8 +32,10 @@
     descendant_nodes, child_nodes, following_nodes, next_node, preceding_nodes
     and previous_node.
   - Renamed params method in Mojo::Parameters to pairs.
+  - Renamed -A option of prefork command to -a.
   - Added names method to Mojo::Parameters.
   - Added failed and passed methods to Mojolicious::Validator::Validation.
+  - Added -I and -M options to prefork command.
 
 5.82  2015-02-22
   - Deprecated Mojo::Reactor::is_readable.

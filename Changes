@@ -23,8 +23,9 @@
   - Removed deprecated render_exception and render_not_found methods from
     Mojolicious::Controller.
   - Removed deprecated keep_alive_requests setting from Hypnotoad.
-  - Renamed pattern attribute in Mojolicious::Routes::Route to unparsed.
   - Renamed types attribute in Mojolicious::Types to mapping.
+  - Renamed current attribute in Mojolicious::Routes::Match to position.
+  - Renamed pattern attribute in Mojolicious::Routes::Route to unparsed.
   - Renamed template attribute in Mojo::Template to unparsed.
   - Renamed all_contents, contents, following_siblings, next_sibling,
     preceding_siblings and previous_sibling methods in Mojo::DOM to

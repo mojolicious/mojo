@@ -3,8 +3,8 @@ use Mojo::Base -base;
 
 use Mojo::Util;
 
-has current => 0;
 has [qw(endpoint root)];
+has position => 0;
 has stack => sub { [] };
 
 sub match { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
@@ -130,13 +130,6 @@ structures.
 
 L<Mojolicious::Routes::Match> implements the following attributes.
 
-=head2 current
-
-  my $current = $match->current;
-  $match      = $match->current(2);
-
-Current position on the L</"stack">, defaults to C<0>.
-
 =head2 endpoint
 
   my $route = $match->endpoint;
@@ -144,6 +137,13 @@ Current position on the L</"stack">, defaults to C<0>.
 
 The route endpoint that matched, usually a L<Mojolicious::Routes::Route>
 object.
+
+=head2 position
+
+  my $position = $match->position;
+  $match       = $match->position(2);
+
+Current position on the L</"stack">, defaults to C<0>.
 
 =head2 root
 

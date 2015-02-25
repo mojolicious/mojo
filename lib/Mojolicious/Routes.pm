@@ -20,10 +20,10 @@ sub add_shortcut  { $_[0]->shortcuts->{$_[1]}  = $_[2] and return $_[0] }
 sub continue {
   my ($self, $c) = @_;
 
-  my $match   = $c->match;
-  my $stack   = $match->stack;
-  my $current = $match->current;
-  return _render($c) unless my $field = $stack->[$current];
+  my $match    = $c->match;
+  my $stack    = $match->stack;
+  my $position = $match->position;
+  return _render($c) unless my $field = $stack->[$position];
 
   # Merge captures into stash
   my $stash = $c->stash;
@@ -31,10 +31,10 @@ sub continue {
   @$stash{keys %$field} = values %$field;
 
   my $continue;
-  my $last = !$stack->[++$current];
+  my $last = !$stack->[++$position];
   if (my $cb = $field->{cb}) { $continue = $self->_callback($c, $cb, $last) }
   else { $continue = $self->_controller($c, $field, $last) }
-  $match->current($current);
+  $match->position($position);
   $self->continue($c) if $last || $continue;
 }
 

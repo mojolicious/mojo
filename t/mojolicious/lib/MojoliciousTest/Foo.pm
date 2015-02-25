@@ -64,10 +64,10 @@ sub stage2 { return shift->some_plugin }
 sub suspended {
   my $self = shift;
 
-  $self->res->headers->append('X-Suspended' => $self->match->current);
+  $self->res->headers->append('X-Suspended' => $self->match->position);
   Mojo::IOLoop->next_tick(
     sub {
-      $self->res->headers->append('X-Suspended' => $self->match->current);
+      $self->res->headers->append('X-Suspended' => $self->match->position);
       $self->continue;
     }
   );

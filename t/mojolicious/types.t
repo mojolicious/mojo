@@ -54,11 +54,11 @@ is_deeply $t->detect('TEXT/HTML;Q=0.8,*/*;Q=0.9'), [], 'no formats';
 
 # Alternatives
 $t->type(json => ['application/json', 'text/x-json']);
-is $t->types->{json}[0], 'application/json', 'right type';
-is $t->types->{json}[1], 'text/x-json',      'right type';
-ok !$t->types->{json}[2], 'no type';
-is_deeply $t->types->{htm}, ['text/html'], 'right type';
-is_deeply $t->types->{html}, ['text/html;charset=UTF-8'], 'right type';
+is $t->mapping->{json}[0], 'application/json', 'right type';
+is $t->mapping->{json}[1], 'text/x-json',      'right type';
+ok !$t->mapping->{json}[2], 'no type';
+is_deeply $t->mapping->{htm}, ['text/html'], 'right type';
+is_deeply $t->mapping->{html}, ['text/html;charset=UTF-8'], 'right type';
 is_deeply $t->detect('application/json'),  ['json'], 'right formats';
 is_deeply $t->detect('text/x-json'),       ['json'], 'right formats';
 is_deeply $t->detect('TEXT/X-JSON;q=0.1'), ['json'], 'right formats';

@@ -284,15 +284,15 @@ my $hmac    = $session->clone->hmac_sha1_sum($t->app->secrets->[0]);
 $t->get_ok('/bridge2stash' => {Cookie => "mojolicious=$session--$hmac"})
   ->status_is(200)->content_is("stash too!!!!!!!!\n");
 
-# Not extracting cookies
-$t->reset_session->ua->cookie_jar->extracting(0);
+# Not gathering cookies
+$t->reset_session->ua->cookie_jar->gathering(0);
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
 
-# Still not extracting cookies
+# Still not gathering cookies
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
-$t->ua->cookie_jar->extracting(1);
+$t->ua->cookie_jar->gathering(1);
 
 # Fresh start without cookies, session or flash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)

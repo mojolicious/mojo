@@ -29,11 +29,13 @@
   - Renamed current attribute in Mojolicious::Routes::Match to position.
   - Renamed pattern attribute in Mojolicious::Routes::Route to unparsed.
   - Renamed template attribute in Mojo::Template to unparsed.
+  - Renamed extracting attribute in Mojo::UserAgent::CookieJar to gathering.
   - Renamed all_contents, contents, following_siblings, next_sibling,
     preceding_siblings and previous_sibling methods in Mojo::DOM to
     descendant_nodes, child_nodes, following_nodes, next_node, preceding_nodes
     and previous_node.
-  - Renamed inject method in Mojo::UserAgent::CookieJar to prepare.
+  - Renamed extract and inject methods in Mojo::UserAgent::CookieJar to
+    nomnomnom and prepare.
   - Renamed inject method in Mojo::UserAgent::Proxy to prepare.
   - Renamed params method in Mojo::Parameters to pairs.
   - Renamed -A option of prefork command to -a.

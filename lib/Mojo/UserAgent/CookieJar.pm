@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::Cookie::Request;
 use Mojo::Path;
 
-has extracting      => 1;
+has gathering       => 1;
 has max_cookie_size => 4096;
 
 sub add {
@@ -39,29 +39,6 @@ sub all {
 
 sub empty { delete shift->{jar} }
 
-sub extract {
-  my ($self, $tx) = @_;
-
-  return unless $self->extracting;
-
-  my $url = $tx->req->url;
-  for my $cookie (@{$tx->res->cookies}) {
-
-    # Validate domain
-    my $host = $url->ihost;
-    my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
-    $domain =~ s/^\.//;
-    next
-      if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
-
-    # Validate path
-    my $path = $cookie->path // $url->path->to_dir->to_abs_string;
-    $path = Mojo::Path->new($path)->trailing_slash(0)->to_abs_string;
-    next unless _path($path, $url->path->to_abs_string);
-    $self->add($cookie->path($path));
-  }
-}
-
 sub find {
   my ($self, $url) = @_;
 
@@ -93,6 +70,29 @@ sub find {
   continue { $domain =~ s/^[^.]+\.?// }
 
   return \@found;
+}
+
+sub nomnomnom {
+  my ($self, $tx) = @_;
+
+  return unless $self->gathering;
+
+  my $url = $tx->req->url;
+  for my $cookie (@{$tx->res->cookies}) {
+
+    # Validate domain
+    my $host = $url->ihost;
+    my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
+    $domain =~ s/^\.//;
+    next
+      if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
+
+    # Validate path
+    my $path = $cookie->path // $url->path->to_dir->to_abs_string;
+    $path = Mojo::Path->new($path)->trailing_slash(0)->to_abs_string;
+    next unless _path($path, $url->path->to_abs_string);
+    $self->add($cookie->path($path));
+  }
 }
 
 sub prepare {
@@ -148,12 +148,12 @@ L<Mojo::UserAgent> and based on L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 L<Mojo::UserAgent::CookieJar> implements the following attributes.
 
-=head2 extracting
+=head2 gathering
 
-  my $bool = $jar->extracting;
-  $jar     = $jar->extracting($bool);
+  my $bool = $jar->gathering;
+  $jar     = $jar->gathering($bool);
 
-Allow L</"extract"> to L</"add"> new cookies to the jar, defaults to a true
+Allow L</"nomnomnom"> to L</"add"> new cookies to the jar, defaults to a true
 value.
 
 =head2 max_cookie_size
@@ -190,12 +190,6 @@ jar.
 
 Empty the jar.
 
-=head2 extract
-
-  $jar->extract(Mojo::Transaction::HTTP->new);
-
-Extract response cookies from transaction.
-
 =head2 find
 
   my $cookies = $jar->find(Mojo::URL->new);
@@ -204,6 +198,12 @@ Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
   # Names of all cookies found
   say $_->name for @{$jar->find(Mojo::URL->new('http://example.com/foo'))};
+
+=head2 nomnomnom
+
+  $jar->nomnomnom(Mojo::Transaction::HTTP->new);
+
+Consume response cookies from transaction.
 
 =head2 prepare
 

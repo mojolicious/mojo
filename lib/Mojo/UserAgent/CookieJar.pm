@@ -181,6 +181,9 @@ Add multiple L<Mojo::Cookie::Response> objects to the jar.
 Return all L<Mojo::Cookie::Response> objects that are currently stored in the
 jar.
 
+  # Names of all cookies
+  say $_->name for @{$jar->all};
+
 =head2 empty
 
   $jar->empty;
@@ -198,6 +201,9 @@ Extract response cookies from transaction.
   my $cookies = $jar->find(Mojo::URL->new);
 
 Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
+
+  # Names of all cookies found
+  say $_->name for @{$jar->find(Mojo::URL->new('http://example.com/foo'))};
 
 =head2 inject
 

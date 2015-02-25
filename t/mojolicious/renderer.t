@@ -2,10 +2,11 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Util 'decode';
-use Mojolicious::Controller;
+use Mojolicious;
 
 # Partial rendering
-my $c = Mojolicious::Controller->new;
+my $app = Mojolicious->new(secrets => ['works']);
+my $c = $app->build_controller;
 $c->app->log->level('fatal');
 is $c->render_to_string(text => 'works'), 'works', 'renderer is working';
 
@@ -63,7 +64,7 @@ like $log, qr/Cookie "foo" is bigger than 4096 bytes/, 'right message';
 $c->app->log->unsubscribe(message => $cb);
 
 # Nested helpers
-my $first = Mojolicious::Controller->new;
+my $first = $app->build_controller;
 $first->helpers->app->log->level('fatal');
 $first->app->helper('myapp.multi_level.test' => sub {'works!'});
 ok $first->app->renderer->get_helper('myapp'),                  'found helper';
@@ -79,7 +80,8 @@ $first->myapp->defaults(foo => 'bar');
 is $first->myapp->defaults('foo'), 'bar', 'right result';
 is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
 is $first->app->myapp->defaults('foo'),     'bar', 'right result';
-my $second = Mojolicious::Controller->new;
+my $app2 = Mojolicious->new(secrets => ['works']);
+my $second = $app2->build_controller;
 $second->app->log->level('fatal');
 is $second->app->renderer->get_helper('myapp'),          undef, 'no helper';
 is $second->app->renderer->get_helper('myapp.defaults'), undef, 'no helper';
@@ -114,7 +116,7 @@ my $template_class = decode 'UTF-8',
 is decode('UTF-8', $second->render_to_string(inline => "<%= __PACKAGE__ =%>")),
   $template_class, 'same class';
 ok $template_class->can('stash'), 'helpers are active';
-undef $second;
+undef $app2;
 ok !$helper_class->can('defaults'), 'helpers have been cleaned up';
 ok !$template_class->can('stash'),  'helpers have been cleaned up';
 

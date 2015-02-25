@@ -4,18 +4,15 @@ use Mojo::Base -base;
 # No imports, for security reasons!
 use Carp ();
 use Mojo::ByteStream;
-use Mojo::Transaction::HTTP;
 use Mojo::URL;
 use Mojo::Util;
-use Mojolicious;
 use Mojolicious::Routes::Match;
 use Scalar::Util ();
 use Time::HiRes  ();
 
-has app => sub { Mojolicious->new };
+has [qw(app tx)];
 has match =>
   sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
-has tx => sub { Mojo::Transaction::HTTP->new };
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -402,8 +399,8 @@ implements the following new ones.
   my $app = $c->app;
   $c      = $c->app(Mojolicious->new);
 
-A reference back to the application that dispatched to this controller,
-defaults to a L<Mojolicious> object.
+A reference back to the application that dispatched to this controller, usually
+a L<Mojolicious> object.
 
   # Use application logger
   $c->app->log->debug('Hello Mojo');

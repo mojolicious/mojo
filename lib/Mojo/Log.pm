@@ -51,10 +51,8 @@ sub new {
 sub warn { shift->_log(warn => @_) }
 
 sub _format {
-  '[' . localtime(shift) . '] [' . shift() . '] ' . join("\n", @_, '');
+  '[' . localtime(shift) . '] [' . shift() . '] ' . join "\n", @_, '';
 }
-
-sub _now { $LEVEL->{pop()} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || shift->level} }
 
 sub _log { shift->emit('message', shift, @_) }
 
@@ -70,6 +68,8 @@ sub _message {
 
   $self->append($self->format->(@$msg));
 }
+
+sub _now { $LEVEL->{pop()} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || shift->level} }
 
 1;
 

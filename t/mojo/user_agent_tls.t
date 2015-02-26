@@ -64,6 +64,7 @@ $ua->ioloop->client(
   } => sub {
     my ($loop, $err, $stream) = @_;
     $sock = $stream->steal_handle;
+    $stream->close;
     $loop->stop;
   }
 );

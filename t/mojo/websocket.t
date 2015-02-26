@@ -3,7 +3,6 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use IO::Socket::INET;
 use Mojo::ByteStream 'b';
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
@@ -171,13 +170,19 @@ is $code, 200, 'right status';
 ok $body =~ /^(\d+)failed!$/ && $1 == 15, 'right content';
 
 # Using an already prepared socket
-my $tx = $ua->build_websocket_tx('ws://lalala/socket');
+my $sock;
+Mojo::IOLoop->client(
+  {address => '127.0.0.1', port => $ua->server->nb_url->port} => sub {
+    my ($loop, $err, $stream) = @_;
+    $sock = $stream->steal_handle;
+    $stream->close;
+    Mojo::IOLoop->stop;
+  }
+);
+Mojo::IOLoop->start;
+my $tx = $ua->build_websocket_tx('ws://lalala/socket')->connection($sock);
 my $finished;
 $tx->on(finish => sub { $finished++ });
-my $port = $ua->server->nb_url->port;
-my $sock = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
-$sock->blocking(0);
-$tx->connection($sock);
 $result = '';
 my $early;
 $ua->start(

@@ -54,7 +54,7 @@ sub child_nodes { $_[0]->_collect(_nodes($_[0]->tree)) }
 sub content {
   my $self = shift;
 
-  my $type = $self->node;
+  my $type = $self->type;
   if ($type eq 'root' || $type eq 'tag') {
     return $self->_content(0, 1, @_) if @_;
     my $html = Mojo::DOM::HTML->new(xml => $self->xml);
@@ -104,8 +104,6 @@ sub new {
 sub next      { $_[0]->_maybe($_[0]->_siblings(1, 0)->[1]) }
 sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 0)->[1]) }
 
-sub node { shift->tree->[0] }
-
 sub parent {
   my $self = shift;
   return undef if $self->tree->[0] eq 'root';
@@ -143,6 +141,14 @@ sub strip {
   return $self->_replace($tree->[3], $tree, ['root', _nodes($tree)]);
 }
 
+sub tag {
+  my ($self, $tag) = @_;
+  return undef if (my $tree = $self->tree)->[0] ne 'tag';
+  return $tree->[1] unless $tag;
+  $tree->[1] = $tag;
+  return $self;
+}
+
 sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { shift->_all_text(0, @_) }
@@ -151,13 +157,7 @@ sub to_string { shift->_delegate('render') }
 
 sub tree { shift->_delegate(tree => @_) }
 
-sub type {
-  my ($self, $type) = @_;
-  return undef if (my $tree = $self->tree)->[0] ne 'tag';
-  return $tree->[1] unless $type;
-  $tree->[1] = $type;
-  return $self;
-}
+sub type { shift->tree->[0] }
 
 sub wrap         { shift->_wrap(0, @_) }
 sub wrap_content { shift->_wrap(1, @_) }
@@ -265,7 +265,7 @@ sub _offset {
   return $i;
 }
 
-sub _parent { $_[0]->tree->[$_[0]->node eq 'tag' ? 3 : 2] }
+sub _parent { $_[0]->tree->[$_[0]->type eq 'tag' ? 3 : 2] }
 
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 
@@ -451,8 +451,8 @@ Find all ancestor elements of this node matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
-  # List types of ancestor elements
-  say $dom->ancestors->map('type')->join("\n");
+  # List tag names of ancestor elements
+  say $dom->ancestors->map('tag')->join("\n");
 
 =head2 append
 
@@ -518,8 +518,8 @@ Find all child elements of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
-  # Show type of random child element
-  say $dom->children->shuffle->first->type;
+  # Show tag name of random child element
+  say $dom->children->shuffle->first->tag;
 
 =head2 child_nodes
 
@@ -570,7 +570,7 @@ element as L<Mojo::DOM> objects.
 
   # "<p><b>123</b></p>"
   $dom->parse('<p><!-- Test --><b>123<!-- 456 --></b></p>')
-    ->descendant_nodes->grep(sub { $_->node eq 'comment' })
+    ->descendant_nodes->grep(sub { $_->type eq 'comment' })
     ->map('remove')->first;
 
 =head2 find
@@ -588,7 +588,7 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my @headers = $dom->find('h1, h2, h3')->map('text')->each;
 
   # Count all the different tags
-  my $hash = $dom->find('*')->reduce(sub { $a->{$b->type}++; $a }, {});
+  my $hash = $dom->find('*')->reduce(sub { $a->{$b->tag}++; $a }, {});
 
   # Find elements with a class that contains dots
   my @divs = $dom->find('div.foo\.bar')->each;
@@ -602,8 +602,8 @@ Find all sibling elements after this node matching the CSS selector and return
 a L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
-  # List types of sibling elements after this node
-  say $dom->following->map('type')->join("\n");
+  # List tags of sibling elements after this node
+  say $dom->following->map('tag')->join("\n");
 
 =head2 following_nodes
 
@@ -676,13 +676,6 @@ more siblings.
   $dom->parse('<p><b>123</b><!-- Test -->456</p>')
     ->at('b')->next_node->content;
 
-=head2 node
-
-  my $type = $dom->node;
-
-This node's type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw>,
-C<root>, C<tag> or C<text>.
-
 =head2 parent
 
   my $parent = $dom->parent;
@@ -708,8 +701,8 @@ Find all sibling elements before this node matching the CSS selector and return
 a L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
 All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
-  # List types of sibling elements before this node
-  say $dom->preceding->map('type')->join("\n");
+  # List tags of sibling elements before this node
+  say $dom->preceding->map('tag')->join("\n");
 
 =head2 preceding_nodes
 
@@ -819,6 +812,16 @@ Remove this element while preserving its content and return L</"parent">.
   # "<div>Test</div>"
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->strip;
 
+=head2 tag
+
+  my $tag = $dom->tag;
+  $dom    = $dom->tag('div');
+
+This element's tag name.
+
+  # List tag names of child elements
+  say $dom->children->map('tag')->join("\n");
+
 =head2 tap
 
   $dom = $dom->tap(sub {...});
@@ -859,12 +862,9 @@ carefully since it is very dynamic.
 =head2 type
 
   my $type = $dom->type;
-  $dom     = $dom->type('div');
 
-This element's type.
-
-  # List types of child elements
-  say $dom->children->map('type')->join("\n");
+This node's type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw>,
+C<root>, C<tag> or C<text>.
 
 =head2 wrap
 

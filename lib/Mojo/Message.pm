@@ -489,7 +489,7 @@ to parse it, so you have to make sure it is not excessively large, there's a
 
   # Use everything else Mojo::DOM has to offer
   say $msg->dom->at('title')->text;
-  say $msg->dom->at('body')->children->map('type')->uniq->join("\n");
+  say $msg->dom->at('body')->children->map('tag')->uniq->join("\n");
 
 =head2 error
 

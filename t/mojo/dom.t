@@ -40,33 +40,33 @@ is(Mojo::DOM->new->append_content('<p>')->at('p')->append_content('0')->text,
 $dom = Mojo::DOM->new(<<EOF);
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</bar>works</foo>
 EOF
-is $dom->tree->[0], 'root', 'right element';
-is $dom->tree->[1][0], 'tag', 'right element';
+is $dom->tree->[0], 'root', 'right type';
+is $dom->tree->[1][0], 'tag', 'right type';
 is $dom->tree->[1][1], 'foo', 'right tag';
 is_deeply $dom->tree->[1][2], {}, 'empty attributes';
 is $dom->tree->[1][3], $dom->tree, 'right parent';
-is $dom->tree->[1][4][0], 'tag', 'right element';
+is $dom->tree->[1][4][0], 'tag', 'right type';
 is $dom->tree->[1][4][1], 'bar', 'right tag';
 is_deeply $dom->tree->[1][4][2], {a => 'b<c'}, 'right attributes';
 is $dom->tree->[1][4][3], $dom->tree->[1], 'right parent';
-is $dom->tree->[1][4][4][0], 'text', 'right element';
+is $dom->tree->[1][4][4][0], 'text', 'right type';
 is $dom->tree->[1][4][4][1], 'ju',   'right text';
 is $dom->tree->[1][4][4][2], $dom->tree->[1][4], 'right parent';
-is $dom->tree->[1][4][5][0], 'tag', 'right element';
+is $dom->tree->[1][4][5][0], 'tag', 'right type';
 is $dom->tree->[1][4][5][1], 'baz', 'right tag';
 is_deeply $dom->tree->[1][4][5][2], {a23 => undef}, 'right attributes';
 is $dom->tree->[1][4][5][3], $dom->tree->[1][4], 'right parent';
-is $dom->tree->[1][4][5][4][0], 'text', 'right element';
+is $dom->tree->[1][4][5][4][0], 'text', 'right type';
 is $dom->tree->[1][4][5][4][1], 's',    'right text';
 is $dom->tree->[1][4][5][4][2], $dom->tree->[1][4][5], 'right parent';
-is $dom->tree->[1][4][5][5][0], 'tag',  'right element';
+is $dom->tree->[1][4][5][5][0], 'tag',  'right type';
 is $dom->tree->[1][4][5][5][1], 'bazz', 'right tag';
 is_deeply $dom->tree->[1][4][5][5][2], {}, 'empty attributes';
 is $dom->tree->[1][4][5][5][3], $dom->tree->[1][4][5], 'right parent';
-is $dom->tree->[1][4][5][6][0], 'text', 'right element';
+is $dom->tree->[1][4][5][6][0], 'text', 'right type';
 is $dom->tree->[1][4][5][6][1], 't',    'right text';
 is $dom->tree->[1][4][5][6][2], $dom->tree->[1][4][5], 'right parent';
-is $dom->tree->[1][5][0], 'text',  'right element';
+is $dom->tree->[1][5][0], 'text',  'right type';
 is $dom->tree->[1][5][1], 'works', 'right text';
 is $dom->tree->[1][5][2], $dom->tree->[1], 'right parent';
 is "$dom", <<EOF, 'right result';
@@ -106,10 +106,10 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </foo>
 EOF
 ok !$dom->xml, 'XML mode not detected';
-is $dom->type, undef, 'no type';
+is $dom->tag, undef, 'no tag';
 is $dom->attr('foo'), undef, 'no attribute';
 is $dom->attr(foo => 'bar')->attr('foo'), undef, 'no attribute';
-is $dom->tree->[1][0], 'doctype', 'right element';
+is $dom->tree->[1][0], 'doctype', 'right type';
 is $dom->tree->[1][1], ' foo',    'right doctype';
 is "$dom", <<EOF, 'right result';
 <!DOCTYPE foo>
@@ -130,31 +130,31 @@ EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
 is $simple->parent->all_text,
   'test easy works well yada yada < very broken more text', 'right text';
-is $simple->type, 'simple', 'right type';
+is $simple->tag, 'simple', 'right tag';
 is $simple->attr('class'), 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
-is $simple->parent->type, 'foo', 'right parent type';
+is $simple->parent->tag, 'foo', 'right parent tag';
 is $simple->parent->attr->{bar}, 'ba<z', 'right parent attribute';
-is $simple->parent->children->[1]->type, 'test', 'right sibling';
+is $simple->parent->children->[1]->tag, 'test', 'right sibling';
 is $simple->to_string, '<simple class="working">easy</simple>',
   'stringified right';
 $simple->parent->attr(bar => 'baz')->attr({this => 'works', too => 'yea'});
 is $simple->parent->attr('bar'),  'baz',   'right parent attribute';
 is $simple->parent->attr('this'), 'works', 'right parent attribute';
 is $simple->parent->attr('too'),  'yea',   'right parent attribute';
-is $dom->at('test#test')->type,              'test',   'right type';
-is $dom->at('[class$="ing"]')->type,         'simple', 'right type';
-is $dom->at('[class="working"]')->type,      'simple', 'right type';
-is $dom->at('[class$=ing]')->type,           'simple', 'right type';
-is $dom->at('[class=working][class]')->type, 'simple', 'right type';
-is $dom->at('foo > simple')->next->type, 'test', 'right type';
-is $dom->at('foo > simple')->next->next->type, 'a', 'right type';
-is $dom->at('foo > test')->previous->type, 'simple', 'right type';
+is $dom->at('test#test')->tag,              'test',   'right tag';
+is $dom->at('[class$="ing"]')->tag,         'simple', 'right tag';
+is $dom->at('[class="working"]')->tag,      'simple', 'right tag';
+is $dom->at('[class$=ing]')->tag,           'simple', 'right tag';
+is $dom->at('[class=working][class]')->tag, 'simple', 'right tag';
+is $dom->at('foo > simple')->next->tag, 'test', 'right tag';
+is $dom->at('foo > simple')->next->next->tag, 'a', 'right tag';
+is $dom->at('foo > test')->previous->tag, 'simple', 'right tag';
 is $dom->next,     undef, 'no siblings';
 is $dom->previous, undef, 'no siblings';
 is $dom->at('foo > a')->next,          undef, 'no next sibling';
 is $dom->at('foo > simple')->previous, undef, 'no previous sibling';
-is_deeply [$dom->at('simple')->ancestors->map('type')->each], ['foo'],
+is_deeply [$dom->at('simple')->ancestors->map('tag')->each], ['foo'],
   'right results';
 ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 
@@ -172,7 +172,7 @@ is $dom->at('p')->child_nodes->last->preceding_nodes->size, 2,
 is $dom->preceding_nodes->size, 0, 'no preceding nodes';
 is $dom->at('p')->following_nodes->first->content, 'after', 'right content';
 is $dom->at('p')->following_nodes->size, 1, 'right number of nodes';
-is $dom->child_nodes->first->following_nodes->first->type, 'p', 'right type';
+is $dom->child_nodes->first->following_nodes->first->tag, 'p', 'right tag';
 is $dom->child_nodes->first->following_nodes->last->content, 'after',
   'right content';
 is $dom->child_nodes->first->following_nodes->size, 2, 'right number of nodes';
@@ -185,54 +185,54 @@ is $dom->at('p')->child_nodes->last->previous_node->previous_node->content,
   'test', 'right content';
 is $dom->at('p')->child_nodes->first->next_node->next_node->content, ' 456 ',
   'right content';
-is $dom->descendant_nodes->[0]->node,    'doctype', 'right node';
+is $dom->descendant_nodes->[0]->type,    'doctype', 'right type';
 is $dom->descendant_nodes->[0]->content, ' before', 'right content';
 is $dom->descendant_nodes->[0], '<!DOCTYPE before>', 'right content';
-is $dom->descendant_nodes->[1]->type,    'p',     'right type';
-is $dom->descendant_nodes->[2]->node,    'text',  'right node';
+is $dom->descendant_nodes->[1]->tag,     'p',     'right tag';
+is $dom->descendant_nodes->[2]->type,    'text',  'right type';
 is $dom->descendant_nodes->[2]->content, 'test',  'right content';
-is $dom->descendant_nodes->[5]->node,    'pi',    'right node';
+is $dom->descendant_nodes->[5]->type,    'pi',    'right type';
 is $dom->descendant_nodes->[5]->content, 'after', 'right content';
-is $dom->at('p')->descendant_nodes->[0]->node,    'text', 'right node';
-is $dom->at('p')->descendant_nodes->[0]->content, 'test', 'right node';
-is $dom->at('p')->descendant_nodes->last->node,    'comment', 'right node';
-is $dom->at('p')->descendant_nodes->last->content, ' 456 ',   'right node';
-is $dom->child_nodes->[1]->child_nodes->first->parent->type, 'p', 'right type';
+is $dom->at('p')->descendant_nodes->[0]->type,    'text', 'right type';
+is $dom->at('p')->descendant_nodes->[0]->content, 'test', 'right type';
+is $dom->at('p')->descendant_nodes->last->type,    'comment', 'right type';
+is $dom->at('p')->descendant_nodes->last->content, ' 456 ',   'right type';
+is $dom->child_nodes->[1]->child_nodes->first->parent->tag, 'p', 'right tag';
 is $dom->child_nodes->[1]->child_nodes->first->content, 'test',
   'right content';
 is $dom->child_nodes->[1]->child_nodes->first, 'test', 'right content';
-is $dom->at('p')->child_nodes->first->node, 'text', 'right node';
-is $dom->at('p')->child_nodes->first->remove->type, 'p', 'right type';
-is $dom->at('p')->child_nodes->first->node,    'cdata', 'right node';
+is $dom->at('p')->child_nodes->first->type, 'text', 'right type';
+is $dom->at('p')->child_nodes->first->remove->tag, 'p', 'right tag';
+is $dom->at('p')->child_nodes->first->type,    'cdata', 'right type';
 is $dom->at('p')->child_nodes->first->content, '123',   'right content';
-is $dom->at('p')->child_nodes->[1]->node,    'comment', 'right node';
+is $dom->at('p')->child_nodes->[1]->type,    'comment', 'right type';
 is $dom->at('p')->child_nodes->[1]->content, ' 456 ',   'right content';
-is $dom->[0]->node,    'doctype', 'right node';
+is $dom->[0]->type,    'doctype', 'right type';
 is $dom->[0]->content, ' before', 'right content';
-is $dom->child_nodes->[2]->node,    'pi',    'right node';
+is $dom->child_nodes->[2]->type,    'pi',    'right type';
 is $dom->child_nodes->[2]->content, 'after', 'right content';
 is $dom->child_nodes->first->content(' again')->content, ' again',
   'right content';
-is $dom->child_nodes->grep(sub { $_->node eq 'pi' })->map('remove')
-  ->first->node, 'root', 'right node';
+is $dom->child_nodes->grep(sub { $_->type eq 'pi' })->map('remove')
+  ->first->type, 'root', 'right type';
 is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
   'right result';
 
 # Modify nodes
 $dom = Mojo::DOM->new('<script>la<la>la</script>');
-is $dom->at('script')->node, 'tag', 'right node';
-is $dom->at('script')->[0]->node,    'raw',      'right node';
+is $dom->at('script')->type, 'tag', 'right type';
+is $dom->at('script')->[0]->type,    'raw',      'right type';
 is $dom->at('script')->[0]->content, 'la<la>la', 'right content';
 is "$dom", '<script>la<la>la</script>', 'right result';
-is $dom->at('script')->child_nodes->first->replace('a<b>c</b>1<b>d</b>')->type,
-  'script', 'right type';
+is $dom->at('script')->child_nodes->first->replace('a<b>c</b>1<b>d</b>')->tag,
+  'script', 'right tag';
 is "$dom", '<script>a<b>c</b>1<b>d</b></script>', 'right result';
 is $dom->at('b')->child_nodes->first->append('e')->content, 'c',
   'right content';
-is $dom->at('b')->child_nodes->first->prepend('f')->node, 'text', 'right node';
+is $dom->at('b')->child_nodes->first->prepend('f')->type, 'text', 'right type';
 is "$dom", '<script>a<b>fce</b>1<b>d</b></script>', 'right result';
-is $dom->at('script')->child_nodes->first->following->first->type, 'b',
-  'right type';
+is $dom->at('script')->child_nodes->first->following->first->tag, 'b',
+  'right tag';
 is $dom->at('script')->child_nodes->first->next->content, 'fce',
   'right content';
 is $dom->at('script')->child_nodes->first->previous, undef, 'no siblings';
@@ -243,7 +243,7 @@ is $dom->at('script')->child_nodes->first->wrap('<i>:)</i>')->root,
   '<script><i>:)a</i><b>fce</b>1<b>d</b></script>', 'right result';
 is $dom->at('i')->child_nodes->first->wrap_content('<b></b>')->root,
   '<script><i><b>:)</b>a</i><b>fce</b>1<b>d</b></script>', 'right result';
-is $dom->at('b')->child_nodes->first->ancestors->map('type')->join(','),
+is $dom->at('b')->child_nodes->first->ancestors->map('tag')->join(','),
   'b,i,script', 'right result';
 is $dom->at('b')->child_nodes->first->append_content('g')->content, ':)g',
   'right content';
@@ -261,12 +261,12 @@ is $dom->at('i')->following('b:last-of-type')->first->text, 'd', 'right text';
 is $dom->at('i')->following('b:last-of-type')->size, 1,
   'right number of following elements';
 is $dom->following->size, 0, 'no following elements';
-is $dom->at('script > b:last-of-type')->preceding->first->type, 'i',
-  'right type';
+is $dom->at('script > b:last-of-type')->preceding->first->tag, 'i',
+  'right tag';
 is $dom->at('script > b:last-of-type')->preceding->size, 2,
   'right number of preceding elements';
-is $dom->at('script > b:last-of-type')->preceding('b')->first->type, 'b',
-  'right type';
+is $dom->at('script > b:last-of-type')->preceding('b')->first->tag, 'b',
+  'right tag';
 is $dom->at('script > b:last-of-type')->preceding('b')->size, 1,
   'right number of preceding elements';
 is $dom->preceding->size, 0, 'no preceding elements';
@@ -291,7 +291,7 @@ is $dom->child_nodes->first->find('*')->size, 0, 'no results';
 is $dom->child_nodes->first->match('*'), undef, 'no match';
 is_deeply $dom->child_nodes->first->attr, {}, 'no attributes';
 is $dom->child_nodes->first->namespace, undef, 'no namespace';
-is $dom->child_nodes->first->type,      undef, 'no type';
+is $dom->child_nodes->first->tag,       undef, 'no tag';
 is $dom->child_nodes->first->text,      '',    'no text';
 is $dom->child_nodes->first->all_text,  '',    'no text';
 
@@ -334,7 +334,7 @@ $dom->find('p')->each(sub { push @p, $_->attr('id') });
 is_deeply \@p, [qw(foo bar)], 'found all p elements';
 my $ids = [qw(container header logo buttons buttons content)];
 is_deeply \@div, $ids, 'found all div elements';
-is_deeply [$dom->at('p')->ancestors->map('type')->each],
+is_deeply [$dom->at('p')->ancestors->map('tag')->each],
   [qw(div div div body html)], 'right results';
 is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
 is_deeply [$dom->ancestors->each],             [], 'no results';
@@ -546,7 +546,7 @@ EOF
 my @data;
 for my $tr ($dom->find('table tr')->each) {
   for my $td (@{$tr->children}) {
-    push @data, $td->type, $td->all_text;
+    push @data, $td->tag, $td->all_text;
   }
 }
 is $data[0], 'td',    'right tag';
@@ -583,8 +583,8 @@ $dom = Mojo::DOM->new(<<EOF);
 EOF
 ok $dom->xml, 'XML mode detected';
 is $dom->find('rss')->[0]->attr('version'), '2.0', 'right version';
-is_deeply [$dom->at('title')->ancestors->map('type')->each],
-  [qw(channel rss)], 'right results';
+is_deeply [$dom->at('title')->ancestors->map('tag')->each], [qw(channel rss)],
+  'right results';
 is $dom->at('extension')->attr('foo:id'), 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
@@ -766,11 +766,11 @@ is $dom->at('[id="><"]')->attr->{id}, '><', 'right attribute';
 $dom = Mojo::DOM->new(qq{<div test="" test2='' />});
 is $dom->at('div')->attr->{test},  '', 'empty attribute value';
 is $dom->at('div')->attr->{test2}, '', 'empty attribute value';
-is $dom->at('[test]')->type,  'div', 'right type';
-is $dom->at('[test2]')->type, 'div', 'right type';
+is $dom->at('[test]')->tag,  'div', 'right tag';
+is $dom->at('[test2]')->tag, 'div', 'right tag';
 is $dom->at('[test3]'), undef, 'no result';
-is $dom->at('[test=""]')->type,  'div', 'right type';
-is $dom->at('[test2=""]')->type, 'div', 'right type';
+is $dom->at('[test=""]')->tag,  'div', 'right tag';
+is $dom->at('[test2=""]')->tag, 'div', 'right tag';
 is $dom->at('[test3=""]'), undef, 'no result';
 
 # Whitespaces before closing bracket
@@ -870,9 +870,9 @@ $dom = Mojo::DOM->new(<<EOF);
     <p id="no_content"><? test ?><!-- 123 --></p>
 </form>
 EOF
-is $dom->find(':root')->[0]->type,     'form', 'right type';
-is $dom->find('*:root')->[0]->type,    'form', 'right type';
-is $dom->find('form:root')->[0]->type, 'form', 'right type';
+is $dom->find(':root')->[0]->tag,     'form', 'right tag';
+is $dom->find('*:root')->[0]->tag,    'form', 'right tag';
+is $dom->find('form:root')->[0]->tag, 'form', 'right tag';
 is $dom->find(':root')->[1], undef, 'no result';
 is $dom->find(':checked')->[0]->attr->{name},        'groovy', 'right name';
 is $dom->find('option:checked')->[0]->attr->{value}, 'e',      'right value';
@@ -922,13 +922,13 @@ is_deeply \@li, [qw(A C E G)], 'found all odd li elements';
 @li = ();
 $dom->find('li:nth-last-child(odd)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(B D F H)], 'found all odd li elements';
-is $dom->find(':nth-child(odd)')->[0]->type,      'ul', 'right type';
-is $dom->find(':nth-child(odd)')->[1]->text,      'A',  'right text';
-is $dom->find(':nth-child(1)')->[0]->type,        'ul', 'right type';
-is $dom->find(':nth-child(1)')->[1]->text,        'A',  'right text';
-is $dom->find(':nth-last-child(odd)')->[0]->type, 'ul', 'right type';
+is $dom->find(':nth-child(odd)')->[0]->tag,      'ul', 'right tag';
+is $dom->find(':nth-child(odd)')->[1]->text,     'A',  'right text';
+is $dom->find(':nth-child(1)')->[0]->tag,        'ul', 'right tag';
+is $dom->find(':nth-child(1)')->[1]->text,       'A',  'right text';
+is $dom->find(':nth-last-child(odd)')->[0]->tag, 'ul', 'right tag';
 is $dom->find(':nth-last-child(odd)')->last->text, 'H', 'right text';
-is $dom->find(':nth-last-child(1)')->[0]->type, 'ul', 'right type';
+is $dom->find(':nth-last-child(1)')->[0]->tag,  'ul', 'right tag';
 is $dom->find(':nth-last-child(1)')->[1]->text, 'H',  'right text';
 @li = ();
 $dom->find('li:nth-child(2n+1)')->each(sub { push @li, shift->text });
@@ -1911,11 +1911,11 @@ EOF
 ok $dom->xml, 'XML mode detected';
 $dom->at('XMLTest')->content('<Element />');
 my $element = $dom->at('Element');
-is $element->type, 'Element', 'right type';
+is $element->tag, 'Element', 'right tag';
 ok $element->xml, 'XML mode active';
 $element = $dom->at('XMLTest')->children->[0];
-is $element->type, 'Element', 'right child';
-is $element->parent->type, 'XMLTest', 'right parent';
+is $element->tag, 'Element', 'right child';
+is $element->parent->tag, 'XMLTest', 'right parent';
 ok $element->root->xml, 'XML mode active';
 $dom->replace('<XMLTest2 /><XMLTest3 just="works" />');
 ok $dom->xml, 'XML mode active';
@@ -2087,37 +2087,37 @@ is $dom->find('#nothing')->join, '', 'no result';
 # Append and prepend content
 $dom = Mojo::DOM->new('<a><b>Test<c /></b></a>');
 $dom->at('b')->append_content('<d />');
-is $dom->children->[0]->type, 'a', 'right element';
+is $dom->children->[0]->tag, 'a', 'right tag';
 is $dom->all_text, 'Test', 'right text';
-is $dom->at('c')->parent->type, 'b', 'right element';
-is $dom->at('d')->parent->type, 'b', 'right element';
+is $dom->at('c')->parent->tag, 'b', 'right tag';
+is $dom->at('d')->parent->tag, 'b', 'right tag';
 $dom->at('b')->prepend_content('<e>Mojo</e>');
-is $dom->at('e')->parent->type, 'b', 'right element';
+is $dom->at('e')->parent->tag, 'b', 'right tag';
 is $dom->all_text, 'Mojo Test', 'right text';
 
 # Wrap elements
 $dom = Mojo::DOM->new('<a>Test</a>');
-is $dom->wrap('<b></b>')->node, 'root', 'right node';
+is $dom->wrap('<b></b>')->type, 'root', 'right type';
 is "$dom", '<b><a>Test</a></b>', 'right result';
-is $dom->at('b')->strip->at('a')->wrap('A')->type, 'a', 'right element';
+is $dom->at('b')->strip->at('a')->wrap('A')->tag, 'a', 'right tag';
 is "$dom", '<a>Test</a>', 'right result';
-is $dom->at('a')->wrap('<b></b>')->type, 'a', 'right element';
+is $dom->at('a')->wrap('<b></b>')->tag, 'a', 'right tag';
 is "$dom", '<b><a>Test</a></b>', 'right result';
-is $dom->at('a')->wrap('C<c><d>D</d><e>E</e></c>F')->parent->type, 'd',
-  'right element';
+is $dom->at('a')->wrap('C<c><d>D</d><e>E</e></c>F')->parent->tag, 'd',
+  'right tag';
 is "$dom", '<b>C<c><d>D<a>Test</a></d><e>E</e></c>F</b>', 'right result';
 
 # Wrap content
 $dom = Mojo::DOM->new('<a>Test</a>');
-is $dom->at('a')->wrap_content('A')->type, 'a', 'right element';
+is $dom->at('a')->wrap_content('A')->tag, 'a', 'right tag';
 is "$dom", '<a>Test</a>', 'right result';
-is $dom->wrap_content('<b></b>')->node, 'root', 'right node';
+is $dom->wrap_content('<b></b>')->type, 'root', 'right type';
 is "$dom", '<b><a>Test</a></b>', 'right result';
-is $dom->at('b')->strip->at('a')->type('e:a')->wrap_content('1<b c="d"></b>')
-  ->type, 'e:a', 'right element';
+is $dom->at('b')->strip->at('a')->tag('e:a')->wrap_content('1<b c="d"></b>')
+  ->tag, 'e:a', 'right tag';
 is "$dom", '<e:a>1<b c="d">Test</b></e:a>', 'right result';
-is $dom->at('a')->wrap_content('C<c><d>D</d><e>E</e></c>F')->parent->node,
-  'root', 'right node';
+is $dom->at('a')->wrap_content('C<c><d>D</d><e>E</e></c>F')->parent->type,
+  'root', 'right type';
 is "$dom", '<e:a>C<c><d>D1<b c="d">Test</b></d><e>E</e></c>F</e:a>',
   'right result';
 
@@ -2276,15 +2276,15 @@ $dom = Mojo::DOM->new(<<EOF);
 </foo>
 <bar>after</bar>
 EOF
-is $dom->tree->[0], 'root', 'right element';
-is $dom->tree->[1][0], 'tag', 'right element';
+is $dom->tree->[0], 'root', 'right type';
+is $dom->tree->[1][0], 'tag', 'right type';
 is $dom->tree->[1][1], 'foo', 'right tag';
 is_deeply $dom->tree->[1][2], {bar => ''}, 'right attributes';
-is $dom->tree->[1][4][0], 'text',       'right element';
+is $dom->tree->[1][4][0], 'text',       'right type';
 is $dom->tree->[1][4][1], "\n  test\n", 'right text';
-is $dom->tree->[3][0], 'tag', 'right element';
+is $dom->tree->[3][0], 'tag', 'right type';
 is $dom->tree->[3][1], 'bar', 'right tag';
-is $dom->tree->[3][4][0], 'text',  'right element';
+is $dom->tree->[3][4][0], 'text',  'right type';
 is $dom->tree->[3][4][1], 'after', 'right text';
 is "$dom", <<EOF, 'right result';
 <foo bar="">

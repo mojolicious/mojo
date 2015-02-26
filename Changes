@@ -31,10 +31,10 @@
   - Renamed types attribute in Mojolicious::Types to mapping.
   - Renamed current attribute in Mojolicious::Routes::Match to position.
   - Renamed pattern attribute in Mojolicious::Routes::Route to unparsed.
-  - Renamed all_contents, contents, following_siblings, next_sibling,
-    preceding_siblings and previous_sibling methods in Mojo::DOM to
-    descendant_nodes, child_nodes, following_nodes, next_node, preceding_nodes
-    and previous_node.
+  - Renamed all_contents, contents, following_siblings, next_sibling, node,
+    preceding_siblings, previous_sibling and type methods in Mojo::DOM to
+    descendant_nodes, child_nodes, following_nodes, next_node, type,
+    preceding_nodes, previous_node and tag.
   - Renamed extract and inject methods in Mojo::UserAgent::CookieJar to collect
     and prepare.
   - Renamed inject method in Mojo::UserAgent::Proxy to prepare.

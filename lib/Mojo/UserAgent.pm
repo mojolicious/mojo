@@ -183,10 +183,9 @@ sub _connection {
   my ($self, $nb, $tx, $cb) = @_;
 
   # Reuse connection
-  my $id = $tx->connection;
   my ($proto, $host, $port) = $self->transactor->endpoint($tx);
-  $id ||= $self->_dequeue($nb, "$proto:$host:$port", 1);
-  if ($id && !ref $id) {
+  my $id = $tx->connection || $self->_dequeue($nb, "$proto:$host:$port", 1);
+  if ($id) {
     warn "-- Reusing connection $id ($proto://$host:$port)\n" if DEBUG;
     $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
     $tx->kept_alive(1) unless $tx->connection;
@@ -198,7 +197,7 @@ sub _connection {
   if (my $id = $self->_connect_proxy($nb, $tx, $cb)) { return $id }
 
   # Connect
-  $id = $self->_connect($nb, 1, $tx, $id, \&_connected);
+  $id = $self->_connect($nb, 1, $tx, undef, \&_connected);
   warn "-- Connect $id ($proto://$host:$port)\n" if DEBUG;
   $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
 

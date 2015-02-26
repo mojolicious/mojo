@@ -377,10 +377,6 @@ requests, with support for L</"GENERATORS">.
   # Generate and inspect custom GET request with DNT header and content
   say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;
 
-  # Use a custom socket for processing this transaction
-  my $tx = $t->tx(GET => 'http://example.com');
-  $tx->connection($sock);
-
   # Stream response content to STDOUT
   my $tx = $t->tx(GET => 'http://example.com');
   $tx->res->content->unsubscribe('read')->on(read => sub { say $_[1] });

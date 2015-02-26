@@ -51,32 +51,6 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# Valid certificates (using an already prepared socket)
-my $sock;
-$ua->ioloop->client(
-  {
-    address  => '127.0.0.1',
-    port     => $port,
-    tls      => 1,
-    tls_ca   => 't/mojo/certs/ca.crt',
-    tls_cert => 't/mojo/certs/client.crt',
-    tls_key  => 't/mojo/certs/client.key'
-  } => sub {
-    my ($loop, $err, $stream) = @_;
-    $sock = $stream->steal_handle;
-    $stream->close;
-    $loop->stop;
-  }
-);
-$ua->ioloop->start;
-$tx = $ua->build_tx(GET => 'https://lalala/')->connection($sock);
-$ua->start($tx);
-ok $tx->success, 'successful';
-is $tx->req->method, 'GET',             'right method';
-is $tx->req->url,    'https://lalala/', 'right url';
-is $tx->res->code,   200,               'right status';
-is $tx->res->body,   'works!',          'right content';
-
 # Valid certificates (env)
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
 {

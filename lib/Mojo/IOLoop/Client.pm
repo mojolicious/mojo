@@ -162,8 +162,7 @@ sub _try_tls {
   my ($self, $args) = @_;
 
   my $handle = $self->{handle};
-  return $self->_cleanup->emit(connect => $handle)
-    if !$args->{tls} || $handle->isa('IO::Socket::SSL');
+  return $self->_cleanup->emit(connect => $handle) unless $args->{tls};
   return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
     unless TLS;
 

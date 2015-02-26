@@ -206,10 +206,10 @@ in a subclass.
 
 =head2 connection
 
-  my $connection = $tx->connection;
-  $tx            = $tx->connection($connection);
+  my $id = $tx->connection;
+  $tx    = $tx->connection($id);
 
-Connection identifier or socket.
+Connection identifier.
 
 =head2 error
 

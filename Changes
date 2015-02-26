@@ -11,6 +11,7 @@
     Mojolicious::Validator::Validation.
   - Removed multi-name support from param method in Mojo::Parameters.
   - Removed multi-name support from cookie and upload methods in Mojo::Message.
+  - Removed custom socket support from Mojo::UserAgent.
   - Removed is_fatal, is_level and log methods from Mojo::Log.
   - Removed auto_render method from Mojolicious::Routes.
   - Removed deprecated object-oriented Mojo::Loader API.

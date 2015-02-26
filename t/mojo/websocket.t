@@ -45,16 +45,6 @@ get '/something/else' => sub {
   $c->render(text => "${timeout}failed!");
 };
 
-websocket '/socket' => sub {
-  my $c = shift;
-  $c->send(
-    $c->req->headers->host => sub {
-      my $c = shift;
-      $c->send(Mojo::IOLoop->stream($c->tx->connection)->timeout)->finish;
-    }
-  )->rendered(101);
-};
-
 websocket '/early_start' => sub {
   my $c = shift;
   $c->send('test1');
@@ -133,7 +123,7 @@ is $res->code, 200, 'right status';
 like $res->body, qr!ws://127\.0\.0\.1:\d+/!, 'right content';
 
 # Plain HTTP request
-$res = $ua->get('/socket')->res;
+$res = $ua->get('/early_start')->res;
 is $res->code, 404, 'right status';
 like $res->body, qr/Page not found/, 'right content';
 
@@ -168,37 +158,6 @@ Mojo::IOLoop->start;
 ok !$ws, 'not a WebSocket';
 is $code, 200, 'right status';
 ok $body =~ /^(\d+)failed!$/ && $1 == 15, 'right content';
-
-# Using an already prepared socket
-my $sock;
-Mojo::IOLoop->client(
-  {address => '127.0.0.1', port => $ua->server->nb_url->port} => sub {
-    my ($loop, $err, $stream) = @_;
-    $sock = $stream->steal_handle;
-    $stream->close;
-    Mojo::IOLoop->stop;
-  }
-);
-Mojo::IOLoop->start;
-my $tx = $ua->build_websocket_tx('ws://lalala/socket')->connection($sock);
-my $finished;
-$tx->on(finish => sub { $finished++ });
-$result = '';
-my $early;
-$ua->start(
-  $tx => sub {
-    my ($ua, $tx) = @_;
-    $early = $finished;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
-    $tx->on(message => sub { $result .= pop });
-  }
-);
-Mojo::IOLoop->start;
-is $finished, 1, 'finish event has been emitted once';
-is $early,    1, 'finish event has been emitted at the right time';
-ok $result =~ /^lalala(\d+)$/ && $1 == 15, 'right result';
-is(Mojo::IOLoop->stream($tx->connection)->handle, $sock,
-  'right connection id');
 
 # Server directly sends a message
 $result = undef;
@@ -355,7 +314,8 @@ Mojo::IOLoop->start;
 is $result, 'foo bar', 'right result';
 
 # Dies
-($finished, $ws, $code, $msg) = ();
+($ws, $code, $msg) = ();
+my $finished;
 $ua->websocket(
   '/dead' => sub {
     my ($ua, $tx) = @_;

@@ -1,4 +1,6 @@
 
+6.01  2015-02-27
+
 6.0  2015-02-26
   - Code name "Clinking Beer Mugs", this is a major release.
   - Removed name listing support from param method in Mojolicious::Controller.

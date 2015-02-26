@@ -7,7 +7,7 @@ has [qw(endpoint root)];
 has position => 0;
 has stack => sub { [] };
 
-sub match { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
+sub find { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
 
 sub path_for {
   my ($self, $name, %values) = (shift, Mojo::Util::_options(@_));
@@ -113,7 +113,7 @@ Mojolicious::Routes::Match - Find routes
   # Match
   my $c = Mojolicious::Controller->new;
   my $match = Mojolicious::Routes::Match->new(root => $r);
-  $match->match($c => {method => 'PUT', path => '/foo/bar'});
+  $match->find($c => {method => 'PUT', path => '/foo/bar'});
   say $match->stack->[0]{controller};
   say $match->stack->[0]{action};
 
@@ -164,11 +164,11 @@ Captured parameters with nesting history.
 L<Mojolicious::Routes::Match> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 match
+=head2 find
 
-  $match->match(Mojolicious::Controller->new, {method => 'GET', path => '/'});
+  $match->find(Mojolicious::Controller->new, {method => 'GET', path => '/'});
 
-Match controller and options against L</"root"> to find appropriate
+Match controller and options against L</"root"> to find an appropriate
 L</"endpoint">.
 
 =head2 path_for

@@ -39,7 +39,7 @@ get '/logger' => sub {
   my $c     = shift;
   my $level = $c->param('level');
   my $msg   = $c->param('message');
-  $c->app->log->log($level => $msg);
+  $c->app->log->$level($msg);
   $c->render(text => "$level: $msg");
 };
 

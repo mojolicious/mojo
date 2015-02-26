@@ -32,23 +32,15 @@ sub append {
   flock $handle, LOCK_UN;
 }
 
-sub debug { shift->log(debug => @_) }
-sub error { shift->log(error => @_) }
-sub fatal { shift->log(fatal => @_) }
-sub info  { shift->log(info  => @_) }
+sub debug { shift->_log(debug => @_) }
+sub error { shift->_log(error => @_) }
+sub fatal { shift->_log(fatal => @_) }
+sub info  { shift->_log(info  => @_) }
 
-sub is_debug { shift->is_level('debug') }
-sub is_error { shift->is_level('error') }
-sub is_fatal { shift->is_level('fatal') }
-sub is_info  { shift->is_level('info') }
-
-sub is_level {
-  $LEVEL->{lc pop} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || shift->level};
-}
-
-sub is_warn { shift->is_level('warn') }
-
-sub log { shift->emit('message', lc shift, @_) }
+sub is_debug { shift->_now('debug') }
+sub is_error { shift->_now('error') }
+sub is_info  { shift->_now('info') }
+sub is_warn  { shift->_now('warn') }
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -56,16 +48,20 @@ sub new {
   return $self;
 }
 
-sub warn { shift->log(warn => @_) }
+sub warn { shift->_log(warn => @_) }
 
 sub _format {
   '[' . localtime(shift) . '] [' . shift() . '] ' . join("\n", @_, '');
 }
 
+sub _now { $LEVEL->{pop()} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || shift->level} }
+
+sub _log { shift->emit('message', shift, @_) }
+
 sub _message {
   my ($self, $level) = (shift, shift);
 
-  return unless $self->is_level($level);
+  return unless $self->_now($level);
 
   my $max     = $self->max_history_size;
   my $history = $self->history;
@@ -194,34 +190,28 @@ Append message to L</"handle">.
   $log = $log->debug('You screwed up, but that is ok');
   $log = $log->debug('All', 'cool');
 
-Log debug message.
+Emit L</"message"> event and log debug message.
 
 =head2 error
 
   $log = $log->error('You really screwed up this time');
   $log = $log->error('Wow', 'seriously');
 
-Log error message.
+Emit L</"message"> event and log error message.
 
 =head2 fatal
 
   $log = $log->fatal('Its over...');
   $log = $log->fatal('Bye', 'bye');
 
-Log fatal message.
+Emit L</"message"> event and log fatal message.
 
 =head2 info
 
   $log = $log->info('You are bad, but you prolly know already');
   $log = $log->info('Ok', 'then');
 
-Log info message.
-
-=head2 is_level
-
-  my $bool = $log->is_level('debug');
-
-Check log level.
+Emit L</"message"> event and log info message.
 
 =head2 is_debug
 
@@ -235,12 +225,6 @@ Check for debug log level.
 
 Check for error log level.
 
-=head2 is_fatal
-
-  my $bool = $log->is_fatal;
-
-Check for fatal log level.
-
 =head2 is_info
 
   my $bool = $log->is_info;
@@ -252,13 +236,6 @@ Check for info log level.
   my $bool = $log->is_warn;
 
 Check for warn log level.
-
-=head2 log
-
-  $log = $log->log(debug => 'This should work');
-  $log = $log->log(debug => 'This', 'too');
-
-Emit L</"message"> event.
 
 =head2 new
 
@@ -272,7 +249,7 @@ default logger.
   $log = $log->warn('Dont do that Dave...');
   $log = $log->warn('No', 'really');
 
-Log warn message.
+Emit L</"message"> event and log warn message.
 
 =head1 SEE ALSO
 

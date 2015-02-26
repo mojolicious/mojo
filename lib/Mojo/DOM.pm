@@ -623,12 +623,12 @@ Check if this element matches the CSS selector. All selectors from
 L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # True
-  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('.a');
-  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('p[class]');
+  $dom->parse('<p class="a">A</p>')->at('p')->matches('.a');
+  $dom->parse('<p class="a">A</p>')->at('p')->matches('p[class]');
 
   # False
-  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('.b');
-  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('p[id]');
+  $dom->parse('<p class="a">A</p>')->at('p')->matches('.b');
+  $dom->parse('<p class="a">A</p>')->at('p')->matches('p[id]');
 
 =head2 namespace
 

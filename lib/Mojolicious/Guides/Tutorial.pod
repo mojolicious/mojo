@@ -920,7 +920,8 @@ specific C<exception> and C<not_found> templates.
 =head2 Testing
 
 Testing your application is as easy as creating a C<t> directory and filling it
-with normal Perl tests, which can be a lot of fun thanks to L<Test::Mojo>.
+with normal Perl tests like C<t/basic.t>, which can be a lot of fun thanks to
+L<Test::Mojo>.
 
   use Test::More;
   use Test::Mojo;

@@ -352,8 +352,8 @@ Check freshness of request by comparing the C<If-None-Match> and
 C<If-Modified-Since> request headers to the C<ETag> and C<Last-Modified>
 response headers with L<Mojolicious::Static/"is_fresh">.
 
-  # Add ETag header and check freshness before rendering
-  $c->is_fresh(etag => 'abc')
+  # Add ETag/Last-Modified headers and check freshness before rendering
+  $c->is_fresh(etag => 'abc', last_modified => 1424985708)
     ? $c->rendered(304)
     : $c->render(text => 'I ♥ Mojolicious!');
 

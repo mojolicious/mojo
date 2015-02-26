@@ -288,7 +288,7 @@ is $dom->child_nodes->first->children->size,         0, 'no children';
 is $dom->child_nodes->first->strip->parent, 'foo<b>bar</b>baz', 'no changes';
 is $dom->child_nodes->first->at('b'), undef, 'no result';
 is $dom->child_nodes->first->find('*')->size, 0, 'no results';
-is $dom->child_nodes->first->match('*'), undef, 'no match';
+ok !$dom->child_nodes->first->matches('*'), 'no match';
 is_deeply $dom->child_nodes->first->attr, {}, 'no attributes';
 is $dom->child_nodes->first->namespace, undef, 'no namespace';
 is $dom->child_nodes->first->tag,       undef, 'no tag';
@@ -641,8 +641,9 @@ is $dom->at('[s\:bk]'), undef, 'no result';
 is $dom->at('[k]'),     undef, 'no result';
 is $dom->at('number')->ancestors('meta')->first->{xmlns}, 'uri:meta-ns',
   'right attribute';
-ok !!$dom->at('nons')->match('book > nons'),           'element did match';
-ok !$dom->at('title')->match('book > nons > section'), 'element did not match';
+ok $dom->at('nons')->matches('book > nons'), 'element did match';
+ok !$dom->at('title')->matches('book > nons > section'),
+  'element did not match';
 
 # Dots
 $dom = Mojo::DOM->new(<<EOF);

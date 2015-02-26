@@ -73,7 +73,7 @@ sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
 sub following { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[1]}), $_[1]) }
 sub following_nodes { $_[0]->_collect(@{$_[0]->_siblings->[1]}) }
 
-sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
+sub matches { $_[0]->_css->matches($_[1]) ? $_[0] : undef }
 
 sub namespace {
   my $self = shift;
@@ -278,7 +278,7 @@ sub _replace {
 sub _select {
   my ($collection, $selector) = @_;
   return $collection unless $selector;
-  return $collection->new(grep { $_->match($selector) } @$collection);
+  return $collection->new(grep { $_->matches($selector) } @$collection);
 }
 
 sub _siblings {
@@ -615,21 +615,20 @@ node as L<Mojo::DOM> objects.
   # "C"
   $dom->parse('<p>A</p><!-- B -->C')->at('p')->following_nodes->last->content;
 
-=head2 match
+=head2 matches
 
-  my $result = $dom->match('div > p');
+  my $bool = $dom->matches('div > p');
 
-Match the CSS selector against this element and return the L<Mojo::DOM> object
-or return C<undef> if it didn't match. All selectors from
+Check if this element matches the CSS selector. All selectors from
 L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # True
-  !!$dom->parse('<p class="a">A</p>')->at('p')->match('.a');
-  !!$dom->parse('<p class="a">A</p>')->at('p')->match('p[class]');
+  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('.a');
+  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('p[class]');
 
   # False
-  !!$dom->parse('<p class="a">A</p>')->at('p')->match('.b');
-  !!$dom->parse('<p class="a">A</p>')->at('p')->match('p[id]');
+  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('.b');
+  !!$dom->parse('<p class="a">A</p>')->at('p')->matches('p[id]');
 
 =head2 namespace
 

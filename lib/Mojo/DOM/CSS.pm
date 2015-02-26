@@ -23,7 +23,7 @@ my $TOKEN_RE        = qr/
   (?:\s*([>+~]))?                       # Combinator
 /x;
 
-sub match {
+sub matches {
   my $tree = shift->tree;
   return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, $tree);
 }
@@ -556,11 +556,11 @@ carefully since it is very dynamic.
 L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 match
+=head2 matches
 
-  my $bool = $css->match('head > title');
+  my $bool = $css->matches('head > title');
 
-Match CSS selector against first node in L</"tree">.
+Check if first node in L</"tree"> matches the CSS selector.
 
 =head2 select
 

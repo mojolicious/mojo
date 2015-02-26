@@ -68,8 +68,7 @@ $ua->ioloop->client(
   }
 );
 $ua->ioloop->start;
-$tx = $ua->build_tx(GET => 'https://lalala/');
-$tx->connection($sock);
+$tx = $ua->build_tx(GET => 'https://lalala/')->connection($sock);
 $ua->start($tx);
 ok $tx->success, 'successful';
 is $tx->req->method, 'GET',             'right method';

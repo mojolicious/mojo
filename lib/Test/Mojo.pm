@@ -885,8 +885,8 @@ Perform a C<POST> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"post">, except for the callback.
 
   # Test file upload
-  $t->post_ok('/upload' => form => {foo => {content => 'bar'}})
-    ->status_is(200);
+  my $upload = {foo => {content => 'bar', filename => 'baz.txt'}};
+  $t->post_ok('/upload' => form => $upload)->status_is(200);
 
   # Test JSON API
   $t->post_ok('/hello.json' => json => {hello => 'world'})

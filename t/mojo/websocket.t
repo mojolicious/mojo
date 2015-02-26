@@ -51,8 +51,7 @@ websocket '/socket' => sub {
   $c->send(
     $c->req->headers->host => sub {
       my $c = shift;
-      $c->send(Mojo::IOLoop->stream($c->tx->connection)->timeout);
-      $c->finish(1000 => 'I ♥ Mojolicious!');
+      $c->send(Mojo::IOLoop->stream($c->tx->connection)->timeout)->finish;
     }
   )->rendered(101);
 };
@@ -60,7 +59,13 @@ websocket '/socket' => sub {
 websocket '/early_start' => sub {
   my $c = shift;
   $c->send('test1');
-  $c->on(message => sub { shift->send(shift() . 'test2')->finish });
+  $c->on(
+    message => sub {
+      my ($c, $msg) = @_;
+      $c->send("${msg}test2");
+      $c->finish(1000 => 'I ♥ Mojolicious!');
+    }
+  );
 };
 
 websocket '/denied' => sub {
@@ -163,52 +168,46 @@ $ua->websocket(
 Mojo::IOLoop->start;
 ok !$ws, 'not a WebSocket';
 is $code, 200, 'right status';
-ok $body =~ /^(\d+)failed!$/, 'right content';
-is $1, 15, 'right timeout';
+ok $body =~ /^(\d+)failed!$/ && $1 == 15, 'right content';
 
 # Using an already prepared socket
-my $port = $ua->server->nb_url->port;
-my $tx   = $ua->build_websocket_tx('ws://lalala/socket');
+my $tx = $ua->build_websocket_tx('ws://lalala/socket');
 my $finished;
 $tx->on(finish => sub { $finished++ });
+my $port = $ua->server->nb_url->port;
 my $sock = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $sock->blocking(0);
 $tx->connection($sock);
 $result = '';
-my ($local, $early, $status, $msg);
+my $early;
 $ua->start(
   $tx => sub {
     my ($ua, $tx) = @_;
     $early = $finished;
-    $tx->on(
-      finish => sub {
-        my ($tx, $code, $reason) = @_;
-        $status = $code;
-        $msg    = $reason;
-        Mojo::IOLoop->stop;
-      }
-    );
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { $result .= pop });
-    $local = Mojo::IOLoop->stream($tx->connection)->handle->sockport;
   }
 );
 Mojo::IOLoop->start;
-is $finished, 1,    'finish event has been emitted once';
-is $early,    1,    'finish event has been emitted at the right time';
-is $status,   1000, 'right status';
-is $msg, 'I ♥ Mojolicious!', 'right message';
-ok $result =~ /^lalala(\d+)$/, 'right result';
-is $1, 15, 'right timeout';
-ok $local, 'local port';
+is $finished, 1, 'finish event has been emitted once';
+is $early,    1, 'finish event has been emitted at the right time';
+ok $result =~ /^lalala(\d+)$/ && $1 == 15, 'right result';
 is(Mojo::IOLoop->stream($tx->connection)->handle, $sock,
   'right connection id');
 
 # Server directly sends a message
 $result = undef;
+my ($status, $msg);
 $ua->websocket(
   '/early_start' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      finish => sub {
+        my ($tx, $code, $reason) = @_;
+        ($status, $msg) = ($code, $reason);
+        Mojo::IOLoop->stop;
+      }
+    );
     $tx->on(
       message => sub {
         my ($tx, $msg) = @_;
@@ -219,7 +218,9 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $result, 'test3test2', 'right result';
+is $status, 1000,                 'right status';
+is $msg,    'I ♥ Mojolicious!', 'right message';
+is $result, 'test3test2',         'right result';
 
 # Connection denied
 ($stash, $code, $ws) = ();

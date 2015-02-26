@@ -165,7 +165,7 @@ sub _listen {
       my ($loop, $stream, $id) = @_;
 
       my $c = $self->{connections}{$id} = {tls => $tls};
-      warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
+      warn "-- Accept $id (@{[$stream->handle->peerhost]})\n" if DEBUG;
       $stream->timeout($self->inactivity_timeout);
 
       $stream->on(close => sub { $self && $self->_close($id) });

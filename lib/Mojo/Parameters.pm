@@ -308,7 +308,6 @@ Parsed parameter pairs. Note that this method will normalize the parameters.
 
 =head2 param
 
-  my @names = $params->param;
   my $value = $params->param('foo');
   $params   = $params->param(foo => 'ba&r');
   $params   = $params->param(foo => qw(ba&r baz));

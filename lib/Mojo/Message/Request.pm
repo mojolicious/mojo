@@ -353,6 +353,9 @@ Clone request if possible, otherwise return C<undef>.
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
+  # Names of all cookies
+  say $_->name for @{$req->cookies};
+
 =head2 every_param
 
   my $values = $req->every_param('foo');

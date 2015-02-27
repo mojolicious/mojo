@@ -651,6 +651,9 @@ been received.
 
 All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
+  # Names of all uploads
+  say $_->name for @{$msg->uploads};
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

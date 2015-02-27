@@ -211,6 +211,9 @@ implements the following new ones.
 
 Access response cookies, usually L<Mojo::Cookie::Response> objects.
 
+  # Names of all cookies
+  say $_->name for @{$res->cookies};
+
 =head2 default_message
 
   my $msg = $res->default_message;

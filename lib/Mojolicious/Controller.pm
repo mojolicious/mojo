@@ -590,7 +590,7 @@ there's a 16MB limit by default.
 For more control you can also access request information directly.
 
   # Only GET parameters
-  my $foo = $c->req->url->query->param('foo');
+  my $foo = $c->req->query_params->param('foo');
 
   # Only POST parameters
   my $foo = $c->req->body_params->param('foo');

@@ -1,6 +1,5 @@
 
 6.01  2015-02-27
-  - Deprecated Mojo::Messages::Request::query_params.
 
 6.0  2015-02-26
   - Code name "Clinking Beer Mugs", this is a major release.

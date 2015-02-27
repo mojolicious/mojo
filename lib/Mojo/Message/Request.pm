@@ -2,7 +2,7 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode deprecated);
+use Mojo::Util qw(b64_encode b64_decode);
 use Mojo::URL;
 
 has env => sub { {} };
@@ -133,7 +133,7 @@ sub param { shift->params->param(@_) }
 sub params {
   my $self = shift;
   return $self->{params}
-    ||= $self->body_params->clone->append($self->url->query);
+    ||= $self->body_params->clone->append($self->query_params);
 }
 
 sub parse {
@@ -182,11 +182,7 @@ sub proxy {
   return $self;
 }
 
-# DEPRECATED in Clinking Beer Mugs!
-sub query_params {
-  deprecated 'Mojo::Message::Request::query_params is DEPRECATED';
-  shift->url->query;
-}
+sub query_params { shift->url->query }
 
 sub _parse_basic_auth {
   return undef unless my $header = shift;
@@ -327,11 +323,9 @@ HTTP request method, defaults to C<GET>.
 HTTP request URL, defaults to a L<Mojo::URL> object.
 
   # Get request information
-  my $info  = $req->url->to_abs->userinfo;
-  my $host  = $req->url->to_abs->host;
-  my $path  = $req->url->to_abs->path;
-  my $query = $req->url->query;
-  my $hash  = $req->url->query->to_hash;
+  my $info = $req->url->to_abs->userinfo;
+  my $host = $req->url->to_abs->host;
+  my $path = $req->url->to_abs->path;
 
 =head2 reverse_proxy
 
@@ -454,6 +448,15 @@ Proxy URL for request.
 
   # Disable proxy
   $req->proxy(0);
+
+=head2 query_params
+
+  my $params = $req->query_params;
+
+All C<GET> parameters, usually a L<Mojo::Parameters> object.
+
+  # Turn GET parameters to hash and extract value
+  say $req->query_params->to_hash->{foo};
 
 =head1 SEE ALSO
 

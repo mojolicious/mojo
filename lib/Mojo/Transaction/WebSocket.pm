@@ -566,7 +566,7 @@ Write data client-side, used to implement user agents.
 
   my $connection = $ws->connection;
 
-Connection identifier or socket.
+Connection identifier.
 
 =head2 finish
 

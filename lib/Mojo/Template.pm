@@ -378,7 +378,9 @@ backslash.
   lines
 
 You can capture whole template blocks for reuse later with the C<begin> and
-C<end> keywords.
+C<end> keywords. Just be aware that both keywords are part of the surrounding
+tag and not actual Perl code, so there can only be whitespace after C<begin>
+and before C<end>.
 
   <% my $block = begin %>
     <% my $name = shift; =%>

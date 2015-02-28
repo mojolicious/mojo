@@ -309,7 +309,8 @@ exception gets thrown in one of the steps, breaking the chain.
 
   %= dumper {some => 'data'}
 
-Dump a Perl data structure with L<Mojo::Util/"dumper">.
+Dump a Perl data structure with L<Mojo::Util/"dumper">, very useful for
+debugging.
 
 =head2 extends
 

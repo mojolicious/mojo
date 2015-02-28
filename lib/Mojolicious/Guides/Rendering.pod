@@ -350,15 +350,12 @@ and controller code.
   # Controller
   my $serialized = $c->dumper([1, 2, 3]);
 
-The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will use
-L<Data::Dumper> to serialize whatever data structure you pass it, this can be
-very useful for debugging. We differentiate between default helpers which are
-more general purpose like C<dumper> and tag helpers, which are template
-specific and mostly used to generate HTML tags.
+We differentiate between default helpers, which are more general purpose like
+L<Mojolicious::Plugin::DefaultHelpers/"dumper">, and tag helpers like
+L<Mojolicious::Plugin::TagHelpers/"link_to">, which are template specific and
+mostly used to generate HTML tags.
 
-  %= link_to 'http://mojolicio.us' => begin
-    Mojolicious
-  % end
+  %= link_to Mojolicious => 'http://mojolicio.us'
 
 In controllers you can also use the method L<Mojolicious::Controller/"helpers">
 to fully qualify helper calls and ensure that they don't conflict with existing
@@ -637,7 +634,9 @@ another.
 
 It's never fun to repeat yourself, that's why you can build reusable template
 blocks in C<ep> that work very similar to normal Perl functions, with the
-C<begin> and C<end> keywords.
+C<begin> and C<end> keywords. Just be aware that both keywords are part of the
+surrounding tag and not actual Perl code, so there can only be whitespace after
+C<begin> and before C<end>.
 
   use Mojolicious::Lite;
 

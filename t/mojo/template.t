@@ -85,6 +85,11 @@ $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= "one" =%><%= "two" %>  three');
 is $output, "onetwo  three\n", 'expression tags trimmed';
 
+# Trim expression comments
+$mt     = Mojo::Template->new;
+$output = $mt->render('    <%= "one" # evil =%><%= "two" ## evil ## %>  three');
+is $output, "onetwo  three\n", 'expression comments trimmed';
+
 # Nothing to trim
 $mt     = Mojo::Template->new;
 $output = $mt->render('<% =%>');

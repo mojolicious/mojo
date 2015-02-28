@@ -440,7 +440,7 @@ asset object, like L<Mojo::Asset::File> or L<Mojo::Asset::Memory>.
     POST => 'http://example.com' => form => {mytext => {file => $asset}});
 
 A C<filename> value will be generated automatically, but can also be set
-manually if necessary. All remainging values in the hash reference get merged
+manually if necessary. All remaining values in the hash reference get merged
 into the C<multipart/form-data> content as headers.
 
   # POST request with form values and customized upload (filename and header)

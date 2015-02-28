@@ -42,8 +42,8 @@ is $output, ' ♥test♥', 'tag trimmed';
 
 # Trim expression
 $mt     = Mojo::Template->new;
-$output = $mt->render("<%= '123' %><%= 'test' =%>\n");
-is $output, '123test', 'expression trimmed';
+$output = $mt->render("<%= '123' %><%= 'begin#test' =%>\n");
+is $output, '123begin#test', 'expression trimmed';
 
 # Trim expression (multiple lines)
 $mt     = Mojo::Template->new;
@@ -842,14 +842,14 @@ $mt = Mojo::Template->new;
 $mt->auto_escape(1);
 $output = $mt->render(<<'EOF');
 <html><%= '<html>' %>
-%= '&lt;'
-%== '&lt;'
+%= 'begin#&lt;'
+%== 'begin#&lt;'
 </html>
 EOF
 is $output, <<EOF, 'XML auto escape';
 <html>&lt;html&gt;
-&amp;lt;
-&lt;
+begin#&amp;lt;
+begin#&lt;
 </html>
 EOF
 

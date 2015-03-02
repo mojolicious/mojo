@@ -1,6 +1,6 @@
 
-6.01  2015-02-28
-  - Fixed code name in Mojolicious.
+6.01  2015-03-02
+  - Fixed code name in version command and built-in templates.
 
 6.0  2015-02-26
   - Code name "Clinking Beer Mugs", this is a major release.

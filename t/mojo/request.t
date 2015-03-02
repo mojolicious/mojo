@@ -2070,12 +2070,12 @@ is $req->url->query->pairs->[0], 'Mojo::Message::Request', 'right value';
 
 # Parse lots of special characters in URL
 $req = Mojo::Message::Request->new;
-$req->parse('GET /#09azAZ!$%&\'()*+,-./:;=?@[\\]^_`{|}~ ');
+$req->parse("GET /#09azAZ!\$%&'()*+,-./:;=?@[\\]^_`{|}~\xC3\x9F ");
 $req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '/#09azAZ!$%&\'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~',
+is $req->url, "/#09azAZ!\$%&\'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~%C3%9F",
   'right URL';
 
 # Abstract methods

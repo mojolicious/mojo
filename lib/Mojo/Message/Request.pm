@@ -10,12 +10,6 @@ has method => 'GET';
 has url => sub { Mojo::URL->new };
 has 'reverse_proxy';
 
-my $START_LINE_RE = qr/
-  ^([a-zA-Z]+)                                              # Method
-  \s+([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
-  \s+HTTP\/(\d\.\d)$                                        # Version
-/x;
-
 sub clone {
   my $self = shift;
 
@@ -61,7 +55,7 @@ sub extract_start_line {
 
   # We have a (hopefully) full request-line
   return !$self->error({message => 'Bad request start-line'})
-    unless $1 =~ $START_LINE_RE;
+    unless $1 =~ /^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$/;
   my $url = $self->method($1)->version($3)->url;
   return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
 }

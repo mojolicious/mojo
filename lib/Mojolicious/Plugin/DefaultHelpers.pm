@@ -238,8 +238,8 @@ Alias for L<Mojo/"config">.
 
 Store partial rendered content in a named buffer and retrieve it later,
 defaults to retrieving the named buffer C<content>, which is commonly used for
-the renderers C<layout> and C<extends> features. Note that new content will be
-ignored if the named buffer is already in use.
+the renderers C<layout> and C<extends> features. New content will be ignored if
+the named buffer is already in use.
 
 =head2 content_for
 
@@ -248,8 +248,8 @@ ignored if the named buffer is already in use.
   % end
   %= content_for 'foo'
 
-Same as the L</"content"> helper, but appends more and more content to a named
-buffer.
+Same as the L</"content"> helper, but append content to named buffers if they
+are already in use.
 
   % content_for message => begin
     Hello

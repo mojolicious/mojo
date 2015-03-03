@@ -25,8 +25,9 @@ sub register {
   $app->helper(c       => sub { shift; Mojo::Collection->new(@_) });
   $app->helper(config  => sub { shift->app->config(@_) });
 
-  $app->helper(content     => sub { _content(shift, 0, @_) });
-  $app->helper(content_for => sub { _content(shift, 1, @_) });
+  $app->helper(content      => sub { _content(shift, 0, 0, @_) });
+  $app->helper(content_for  => sub { _content(shift, 1, 0, @_) });
+  $app->helper(content_with => sub { _content(shift, 0, 1, @_) });
 
   $app->helper($_ => $self->can("_$_"))
     for
@@ -39,7 +40,8 @@ sub register {
 
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
-  $app->helper(ua                => sub { shift->app->ua });
+
+  $app->helper(ua => sub { shift->app->ua });
 }
 
 sub _asset {
@@ -51,13 +53,14 @@ sub _asset {
 sub _block { ref $_[0] eq 'CODE' ? $_[0]() : $_[0] }
 
 sub _content {
-  my ($c, $append, $name, $content) = @_;
+  my ($c, $append, $replace, $name, $content) = @_;
   $name ||= 'content';
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {
     if ($append) { $hash->{$name} .= _block($content) }
-    else         { $hash->{$name} //= _block($content) }
+    if ($replace) { $hash->{$name} = _block($content) }
+    else          { $hash->{$name} //= _block($content) }
   }
 
   return Mojo::ByteStream->new($hash->{$name} // '');
@@ -257,7 +260,25 @@ are already in use.
   % content_for message => begin
     world!
   % end
-  %= content_for 'message'
+  %= content 'message'
+
+=head2 content_with
+
+  % content_with foo => begin
+    test
+  % end
+  %= content_with 'foo'
+
+Same as the L</"content"> helper, but replace content of named buffers if they
+are already in use.
+
+  % content message => begin
+    world!
+  % end
+  % content_with message => begin
+    Hello <%= content 'message' %>
+  % end
+  %= content 'message'
 
 =head2 csrf_token
 

@@ -97,6 +97,8 @@ get '/withblocklayout' => sub {
 
 get '/content_for';
 
+get '/content_with';
+
 get '/inline' => {inline => '<%= "inline!" %>'};
 
 get '/inline/again' => {inline => 0};
@@ -235,6 +237,9 @@ $t->get_ok('/withblocklayout')->status_is(200)
 $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\n\n");
+$t->get_ok('/content_with')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("Default\n\nSomething else!\n\n\nHello world!\n\n");
 
 # Inline template
 $t->get_ok('/inline')->status_is(200)
@@ -398,6 +403,16 @@ seems
 to
 <%= content_for 'message' %>
 work!
+
+@@ content_with.html.ep
+<% content first => begin %>Something<% end %>
+<% content_for first => begin %> else!<% end %>
+%= content_with 'first'
+% content_with first => '';
+%= content_with 'first'
+<% content second => begin %>world<% end %>
+<%= content_with second => begin %>Hello <%= content 'second' %>!<% end %>
+% content_with 'second'
 
 @@ layouts/variants.txt.ep
 Variant: <%= content %>\

@@ -251,8 +251,8 @@ the named buffer is already in use.
   % end
   %= content_for 'foo'
 
-Same as the L</"content"> helper, but append content to named buffers if they
-are already in use.
+Same as L</"content">, but append content to named buffers if they are already
+in use.
 
   % content_for message => begin
     Hello
@@ -269,8 +269,8 @@ are already in use.
   % end
   %= content_with 'foo'
 
-Same as the L</"content"> helper, but replace content of named buffers if they
-are already in use.
+Same as L</"content">, but replace content of named buffers if they are already
+in use.
 
   % content message => begin
     world!

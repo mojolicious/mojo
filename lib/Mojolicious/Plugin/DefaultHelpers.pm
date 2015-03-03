@@ -25,9 +25,9 @@ sub register {
   $app->helper(c       => sub { shift; Mojo::Collection->new(@_) });
   $app->helper(config  => sub { shift->app->config(@_) });
 
-  $app->helper(content      => sub { _content(shift, 0, 0, @_) });
-  $app->helper(content_for  => sub { _content(shift, 1, 0, @_) });
-  $app->helper(content_with => sub { _content(shift, 0, 1, @_) });
+  $app->helper(content      => sub { _content(0, 0, @_) });
+  $app->helper(content_for  => sub { _content(1, 0, @_) });
+  $app->helper(content_with => sub { _content(0, 1, @_) });
 
   $app->helper($_ => $self->can("_$_"))
     for
@@ -53,7 +53,7 @@ sub _asset {
 sub _block { ref $_[0] eq 'CODE' ? $_[0]() : $_[0] }
 
 sub _content {
-  my ($c, $append, $replace, $name, $content) = @_;
+  my ($append, $replace, $c, $name, $content) = @_;
   $name ||= 'content';
 
   my $hash = $c->stash->{'mojo.content'} ||= {};

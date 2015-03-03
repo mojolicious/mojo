@@ -170,6 +170,7 @@ resulting L<Mojo::Message::Response> object.
 
   my $res = p('example.com');
   my $res = p('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = p('http://example.com', form => { foo => 'bar' });
 
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.

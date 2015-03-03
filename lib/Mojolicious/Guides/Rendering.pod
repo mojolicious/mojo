@@ -782,7 +782,7 @@ also be used to pass whole sections of the template to the layout.
   @@ layouts/mylayout.html.ep
   <!DOCTYPE html>
   <html>
-    <head><%= content_for 'header' %></head>
+    <head><%= content 'header' %></head>
     <body><%= content %></body>
   </html>
 

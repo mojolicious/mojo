@@ -468,8 +468,7 @@ is tablify([[undef, 'yada'], ['yada', undef]]), "      yada\nyada  \n",
   'right result';
 is tablify([['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]),
   "foo   bar   baz\nyada  yada  yada\n", 'right result';
-is tablify([['a', '', 'b'], ['c', '', 'd']]), "a    b\nc    d\n",
-  'right result';
+is tablify([['a', '', 0], [0, '', 'b']]), "a    0\n0    b\n", 'right result';
 
 # deprecated
 {

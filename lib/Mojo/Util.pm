@@ -276,8 +276,7 @@ sub tablify {
   my @spec;
   for my $row (@$rows) {
     for my $i (0 .. $#$row) {
-      $row->[$i] //= '';
-      $row->[$i] =~ s/[\r\n]//g;
+      ($row->[$i] //= '') =~ s/[\r\n]//g;
       my $len = length $row->[$i];
       $spec[$i] = $len if $len >= ($spec[$i] // 0);
     }

@@ -116,6 +116,8 @@ Turn list into a L<Mojo::Collection> object.
 
   my $res = d('example.com');
   my $res = d('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = d('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = d('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return resulting
 L<Mojo::Message::Response> object.
@@ -124,6 +126,8 @@ L<Mojo::Message::Response> object.
 
   my $res = g('example.com');
   my $res = g('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = g('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = g('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
 L<Mojo::Message::Response> object.
@@ -134,6 +138,8 @@ L<Mojo::Message::Response> object.
 
   my $res = h('example.com');
   my $res = h('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = h('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = h('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
@@ -162,6 +168,8 @@ iterations, which defaults to C<1>.
 
   my $res = o('example.com');
   my $res = o('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = o('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = o('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<OPTIONS> request with L<Mojo::UserAgent/"options"> and return
 resulting L<Mojo::Message::Response> object.
@@ -170,6 +178,8 @@ resulting L<Mojo::Message::Response> object.
 
   my $res = p('example.com');
   my $res = p('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = p('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = p('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
@@ -186,6 +196,8 @@ Dump a Perl data structure with L<Mojo::Util/"dumper">.
 
   my $res = t('example.com');
   my $res = t('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = t('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = t('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
 L<Mojo::Message::Response> object.
@@ -194,6 +206,8 @@ L<Mojo::Message::Response> object.
 
   my $res = u('example.com');
   my $res = u('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = u('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = u('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<PUT> request with L<Mojo::UserAgent/"put"> and return resulting
 L<Mojo::Message::Response> object.

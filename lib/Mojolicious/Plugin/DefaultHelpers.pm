@@ -25,9 +25,12 @@ sub register {
   $app->helper(c       => sub { shift; Mojo::Collection->new(@_) });
   $app->helper(config  => sub { shift->app->config(@_) });
 
+  $app->helper(content     => sub { _content(shift, 0, @_) });
+  $app->helper(content_for => sub { _content(shift, 1, @_) });
+
   $app->helper($_ => $self->can("_$_"))
-    for qw(content content_for csrf_token current_route delay),
-    qw(inactivity_timeout is_fresh url_with);
+    for
+    qw(csrf_token current_route delay inactivity_timeout is_fresh url_with);
 
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
@@ -45,24 +48,19 @@ sub _asset {
   $c->rendered;
 }
 
+sub _block { ref $_[0] eq 'CODE' ? $_[0]() : $_[0] }
+
 sub _content {
-  my ($c, $name, $content) = @_;
+  my ($c, $append, $name, $content) = @_;
   $name ||= 'content';
 
-  # Set (first come)
   my $hash = $c->stash->{'mojo.content'} ||= {};
-  $hash->{$name} //= ref $content eq 'CODE' ? $content->() : $content
-    if defined $content;
+  if (defined $content) {
+    if ($append) { $hash->{$name} .= _block($content) }
+    else         { $hash->{$name} //= _block($content) }
+  }
 
-  # Get
   return Mojo::ByteStream->new($hash->{$name} // '');
-}
-
-sub _content_for {
-  my ($c, $name, $content) = @_;
-  return _content($c, $name) unless defined $content;
-  my $hash = $c->stash->{'mojo.content'} ||= {};
-  return $hash->{$name} .= ref $content eq 'CODE' ? $content->() : $content;
 }
 
 sub _csrf_token {
@@ -238,9 +236,9 @@ Alias for L<Mojo/"config">.
   %= content 'bar'
   %= content
 
-Store partial rendered content in named buffer and retrieve it, defaults to
-retrieving the named buffer C<content>, which is commonly used for the
-renderers C<layout> and C<extends> features. Note that new content will be
+Store partial rendered content in a named buffer and retrieve it later,
+defaults to retrieving the named buffer C<content>, which is commonly used for
+the renderers C<layout> and C<extends> features. Note that new content will be
 ignored if the named buffer is already in use.
 
 =head2 content_for
@@ -250,8 +248,8 @@ ignored if the named buffer is already in use.
   % end
   %= content_for 'foo'
 
-Append partial rendered content to named buffer and retrieve it. Note that
-named buffers are shared with the L</"content"> helper.
+Same as the L</"content"> helper, but appends more and more content to a named
+buffer.
 
   % content_for message => begin
     Hello

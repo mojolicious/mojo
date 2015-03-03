@@ -112,20 +112,20 @@ sub render {
   # Data
   my $output;
   if (defined(my $data = delete $stash->{data})) {
-    $self->handlers->{data}->($self, $c, \$output, {data => $data});
+    $self->handlers->{data}($self, $c, \$output, {data => $data});
     return $output, $options->{format};
   }
 
   # JSON
   elsif (exists $stash->{json}) {
     my $json = delete $stash->{json};
-    $self->handlers->{json}->($self, $c, \$output, {json => $json});
+    $self->handlers->{json}($self, $c, \$output, {json => $json});
     return $output, 'json';
   }
 
   # Text
   elsif (defined(my $text = delete $stash->{text})) {
-    $self->handlers->{text}->($self, $c, \$output, {text => $text});
+    $self->handlers->{text}($self, $c, \$output, {text => $text});
   }
 
   # Template or templateless handler

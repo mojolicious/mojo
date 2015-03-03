@@ -1,5 +1,5 @@
 
-6.01  2015-03-02
+6.01  2015-03-03
   - Relaxed request-line handling in Mojo::Message::Request.
   - Fixed code name in version command and built-in templates.
 

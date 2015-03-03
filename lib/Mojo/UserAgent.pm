@@ -259,13 +259,13 @@ sub _finish {
   if (my $new = $self->transactor->upgrade($old)) {
     weaken $self;
     $new->on(resume => sub { $self->_write($id) });
-    $c->{cb}->($self, $c->{tx} = $new);
+    $c->{cb}($self, $c->{tx} = $new);
     return $new->client_read($old->res->content->leftovers);
   }
 
   # Finish normal connection and handle redirects
   $self->_remove($id, $close);
-  $c->{cb}->($self, $old) unless $self->_redirect($c, $old);
+  $c->{cb}($self, $old) unless $self->_redirect($c, $old);
 }
 
 sub _loop { $_[1] ? Mojo::IOLoop->singleton : $_[0]->ioloop }

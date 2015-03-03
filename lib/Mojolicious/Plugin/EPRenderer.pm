@@ -47,7 +47,7 @@ sub register {
       local *{"${ns}::_C"} = sub {$c};
 
       # Render with "epl" handler
-      return $renderer->handlers->{epl}->($renderer, $c, $output, $options);
+      return $renderer->handlers->{epl}($renderer, $c, $output, $options);
     }
   );
 }

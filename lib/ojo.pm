@@ -17,7 +17,7 @@ sub import {
   my $caller = caller;
   eval "package $caller; use Mojolicious::Lite; 1" or die $@;
   my $ua = $caller->app->ua;
-  $ua->server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
+  $ua->server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]() });
 
   $ua->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
   $ua->proxy->detect unless defined $ENV{MOJO_PROXY};

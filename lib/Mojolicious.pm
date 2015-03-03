@@ -117,7 +117,7 @@ sub handler {
 
   # Dispatcher has to be last in the chain
   ++$self->{dispatch}
-    and $self->hook(around_action   => sub { $_[2]->($_[1]) })
+    and $self->hook(around_action   => sub { $_[2]($_[1]) })
     and $self->hook(around_dispatch => sub { $_[1]->app->dispatch($_[1]) })
     unless $self->{dispatch};
 

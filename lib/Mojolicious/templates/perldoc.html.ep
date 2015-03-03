@@ -109,7 +109,7 @@
             </li>
           % }
         </ul>
-        %= content_for 'perldoc'
+        %= content 'perldoc'
       </div>
     </div>
     <div id="footer">

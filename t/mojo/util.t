@@ -464,6 +464,8 @@ is tablify([["  foo",        '  b a r']]), "  foo    b a r\n", 'right result';
 is tablify([['foo']]), "foo\n", 'right result';
 is tablify([['foo', 'yada'], ['yada', 'yada']]), "foo   yada\nyada  yada\n",
   'right result';
+is tablify([[undef, 'yada'], ['yada', undef]]), "      yada\nyada  \n",
+  'right result';
 is tablify([['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]),
   "foo   bar   baz\nyada  yada  yada\n", 'right result';
 is tablify([['a', '', 'b'], ['c', '', 'd']]), "a    b\nc    d\n",

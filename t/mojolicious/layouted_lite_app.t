@@ -239,7 +239,7 @@ $t->get_ok('/content_for')->status_is(200)
   ->content_is("DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\n\n");
 $t->get_ok('/content_with')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("Default\n\nSomething else!\n\n\nHello world!\n\n");
+  ->content_is("Default\n\nSomething <b>else</b>!\n\n\n<br>Hello world!\n\n");
 
 # Inline template
 $t->get_ok('/inline')->status_is(200)
@@ -406,12 +406,13 @@ work!
 
 @@ content_with.html.ep
 <% content first => begin %>Something<% end %>
-<% content_for first => begin %> else!<% end %>
+<% content_for first => begin %> <b>else<% end %>
+% content_for first => '</b>!';
 %= content_with 'first'
 % content_with first => '';
 %= content_with 'first'
 <% content second => begin %>world<% end %>
-<%= content_with second => begin %>Hello <%= content 'second' %>!<% end %>
+<%= content_with second => begin %><br>Hello <%= content 'second' %>!<% end %>
 % content_with 'second'
 
 @@ layouts/variants.txt.ep

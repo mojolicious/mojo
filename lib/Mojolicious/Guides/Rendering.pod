@@ -1017,7 +1017,12 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
 
   use Mojolicious::Lite;
 
-  get '/some_static_file' => sub {
+  get '/' => sub {
+    my $c = shift;
+    $c->reply->static('index.html');
+  };
+
+  get '/some_download' => sub {
     my $c = shift;
     $c->res->headers->content_disposition('attachment; filename=bar.png;');
     $c->reply->static('foo/bar.png');

@@ -31,7 +31,6 @@ sub run {
   my ($self, $app) = @_;
 
   # Clean manager environment
-  local $SIG{CHLD} = sub { $self->_reap if $self->{worker} };
   local $SIG{INT} = local $SIG{TERM} = local $SIG{QUIT} = sub {
     $self->{finished} = 1;
     kill 'TERM', $self->{worker} if $self->{worker};
@@ -67,15 +66,13 @@ sub _manage {
     $self->{modified} = 1;
   }
 
-  # Windows workaround
-  delete $self->{worker} if $self->{worker} && !kill 0, $self->{worker};
+  if (my $pid = $self->{worker}) {
+    delete $self->{worker} if waitpid($pid, WNOHANG) == $pid;
+  }
 
-  $self->_reap;
   $self->_spawn if !$self->{worker} && delete $self->{modified};
   sleep 1;
 }
-
-sub _reap { delete $_[0]{worker} while (waitpid -1, WNOHANG) > 0 }
 
 sub _spawn {
   my $self = shift;
@@ -86,7 +83,6 @@ sub _spawn {
   return if $pid;
 
   # Worker
-  $SIG{CHLD} = 'DEFAULT';
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{finished} = 1 };
   my $daemon = $self->{daemon};
   $daemon->load_app($self->watch->[0]);

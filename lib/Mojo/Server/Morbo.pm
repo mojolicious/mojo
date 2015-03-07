@@ -31,7 +31,7 @@ sub run {
   my ($self, $app) = @_;
 
   # Clean manager environment
-  local $SIG{INT} = local $SIG{TERM} = local $SIG{QUIT} = sub {
+  local $SIG{INT} = local $SIG{TERM} = sub {
     $self->{finished} = 1;
     kill 'TERM', $self->{worker} if $self->{worker};
   };
@@ -83,13 +83,10 @@ sub _spawn {
   return if $pid;
 
   # Worker
-  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{finished} = 1 };
   my $daemon = $self->{daemon};
   $daemon->load_app($self->watch->[0]);
-  my $loop = $daemon->start->ioloop;
-  $loop->recurring(
-    1 => sub { shift->stop if !kill(0, $manager) || $self->{finished} });
-  $loop->start;
+  $daemon->ioloop->recurring(1 => sub { shift->stop unless kill 0, $manager });
+  $daemon->run;
   exit 0;
 }
 
@@ -135,7 +132,7 @@ See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 The L<Mojo::Server::Morbo> process can be controlled at runtime with the
 following signals.
 
-=head2 INT, QUIT, TERM
+=head2 INT, TERM
 
 Shut down server immediately.
 

@@ -87,7 +87,7 @@ sub compile {
   my $self = shift;
 
   # Compile with line directive
-  return undef unless my $code = $self->code;
+  return undef unless defined(my $code = $self->code);
   my $compiled = eval $self->_wrap($code);
   $self->compiled($compiled) and return undef unless $@;
 

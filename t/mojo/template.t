@@ -24,10 +24,14 @@ use Mojo::Template;
 # Capture helper
 my $capture = 'no warnings "redefine"; sub capture { shift->(@_) }';
 
+# Empty template
+my $mt     = Mojo::Template->new;
+my $output = $mt->render('');
+is $output, '', 'empty string';
+
 # Consistent scalar context
-my $mt = Mojo::Template->new;
 $mt->prepend('my @foo = (3, 4);')->parse('<%= @foo %>:<%== @foo %>');
-my $output = $mt->build->compile || $mt->interpret;
+$output = $mt->build->compile || $mt->interpret;
 is $output, "2:2\n", 'same context';
 
 # Parentheses

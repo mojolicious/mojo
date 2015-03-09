@@ -36,7 +36,7 @@ sub register {
         # Stash values (every time)
         my $prepend = 'my $self = my $c = shift; my $_S = $c->stash; {';
         $prepend .= join '', map {" my \$$_ = \$_S->{'$_'};"} @keys;
-        $mt->prepend($prepend . $mt->prepend)->append('}' . $mt->append);
+        $mt->prepend($prepend . $mt->prepend)->append(';}' . $mt->append);
 
         $cache->set($key => $mt);
       }

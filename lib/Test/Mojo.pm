@@ -626,6 +626,14 @@ arguments as L<Mojo::UserAgent/"delete">, except for the callback.
 Checks for existence of the CSS selectors first matching HTML/XML element with
 L<Mojo::DOM/"at">.
 
+  # Check attribute values
+  $t->get_ok('/login')
+    ->element_exists('label[for=foo]')
+    ->element_exists('input[name=foo][type=text][value*=example]')
+    ->element_exists('label[for=bar]')
+    ->element_exists('input[name=bar][type=password]')
+    ->element_exists('input[type=submit][value]');
+
 =head2 element_exists_not
 
   $t = $t->element_exists_not('div.foo[x=y]');

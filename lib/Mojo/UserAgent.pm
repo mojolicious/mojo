@@ -361,7 +361,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   use Mojo::UserAgent;
 
-  # Say hello to the Unicode snowman with Accept header
+  # Say hello to the Unicode snowman and include an Accept header
   my $ua = Mojo::UserAgent->new;
   say $ua->get('www.☃.net?hello=there' => {Accept => '*/*'})->res->body;
 
@@ -385,8 +385,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hi!');
 
   # Quick JSON API request with Basic authentication
-  say $ua->get('https://sri:s3cret@example.com/search.json?q=perl')
-    ->res->json('/results/0/title');
+  my $value = $ua->get('https://sri:s3cret@example.com/test.json')->res->json;
 
   # JSON POST (application/json) with TLS certificate authentication
   my $tx = $ua->cert('tls.crt')->key('tls.key')

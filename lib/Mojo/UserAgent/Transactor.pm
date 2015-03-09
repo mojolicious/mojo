@@ -265,12 +265,9 @@ Mojo::UserAgent::Transactor - User agent transactor
 
   use Mojo::UserAgent::Transactor;
 
-  # Simple GET request
+  # GET request with Accept header
   my $t = Mojo::UserAgent::Transactor->new;
-  say $t->tx(GET => 'http://example.com')->req->to_string;
-
-  # PATCH request with "Do Not Track" header and content
-  say $t->tx(PATCH => 'example.com' => {DNT => 1} => 'Hi!')->req->to_string;
+  say $t->tx(GET => 'http://example.com' => {Accept => '*/*'})->req->to_string;
 
   # POST request with form-data
   say $t->tx(POST => 'example.com' => form => {a => 'b'})->req->to_string;
@@ -367,9 +364,9 @@ C<307> or C<308> redirect response if possible.
   my $tx = $t->tx(PUT  => 'http://example.com' => json => {a => 'b'});
   my $tx = $t->tx(POST => 'http://example.com' => {Accept => '*/*'} => 'Hi!');
   my $tx = $t->tx(
-    PUT  => 'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+    PUT => 'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $t->tx(
-    PUT  => 'http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
+    PUT => 'http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
 requests, with support for L</"GENERATORS">.

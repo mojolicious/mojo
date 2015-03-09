@@ -361,11 +361,11 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   use Mojo::UserAgent;
 
-  # Say hello to the Unicode snowman with "Do Not Track" header
+  # Say hello to the Unicode snowman with Accept header
   my $ua = Mojo::UserAgent->new;
-  say $ua->get('www.☃.net?hello=there' => {DNT => 1})->res->body;
+  say $ua->get('www.☃.net?hello=there' => {Accept => '*/*'})->res->body;
 
-  # Form POST with exception handling
+  # Form POST (application/x-www-form-urlencoded) with exception handling
   my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {
@@ -378,10 +378,10 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('https://sri:s3cret@example.com/search.json?q=perl')
     ->res->json('/results/0/title');
 
-  # Extract data from HTML and XML resources
+  # Extract data from HTML and XML resources with CSS selectors
   say $ua->get('www.perl.org')->res->dom->at('title')->text;
 
-  # Scrape the latest headlines from a news site with CSS selectors
+  # Scrape the latest headlines from a news site
   say $ua->get('blogs.perl.org')
     ->res->dom->find('h2 > a')->map('text')->join("\n");
 
@@ -390,7 +390,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')
     ->res->json('/Abstract');
 
-  # IPv6 PUT request with content
+  # IPv6 PUT request with Content-Type header and content
   my $tx
     = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');
 

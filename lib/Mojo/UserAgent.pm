@@ -374,10 +374,6 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     die "Connection error: $err->{message}";
   }
 
-  # Quick JSON API request with Basic authentication
-  say $ua->get('https://sri:s3cret@example.com/search.json?q=perl')
-    ->res->json('/results/0/title');
-
   # Extract data from HTML and XML resources with CSS selectors
   say $ua->get('www.perl.org')->res->dom->at('title')->text;
 
@@ -385,23 +381,26 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('blogs.perl.org')
     ->res->dom->find('h2 > a')->map('text')->join("\n");
 
+  # IPv6 PUT request with Content-Type header and content
+  my $tx = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hi!');
+
+  # Quick JSON API request with Basic authentication
+  say $ua->get('https://sri:s3cret@example.com/search.json?q=perl')
+    ->res->json('/results/0/title');
+
+  # JSON POST (application/json) with TLS certificate authentication
+  my $tx = $ua->cert('tls.crt')->key('tls.key')
+    ->post('https://example.com' => json => {top => 'secret'});
+
   # Search DuckDuckGo anonymously through Tor
   $ua->proxy->http('socks://127.0.0.1:9050');
   say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')
     ->res->json('/Abstract');
 
-  # IPv6 PUT request with Content-Type header and content
-  my $tx
-    = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');
-
   # Follow redirects to download Mojolicious from GitHub
   $ua->max_redirects(5)
     ->get('https://www.github.com/kraih/mojo/tarball/master')
     ->res->content->asset->move_to('/home/sri/mojo.tar.gz');
-
-  # TLS certificate authentication and JSON POST
-  my $tx = $ua->cert('tls.crt')->key('tls.key')
-    ->post('https://example.com' => json => {top => 'secret'});
 
   # Non-blocking concurrent requests
   Mojo::IOLoop->delay(

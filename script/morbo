@@ -18,9 +18,9 @@ if ($help || !$app) {
   die Mojolicious::Command->new->extract_usage;
 }
 
-$ENV{MOJO_LISTEN} = join ',', @listen if @listen;
 require Mojo::Server::Morbo;
 my $morbo = Mojo::Server::Morbo->new;
+$morbo->daemon->listen(\@listen) if @listen;
 $morbo->watch(\@watch) if @watch;
 $morbo->run($app);
 

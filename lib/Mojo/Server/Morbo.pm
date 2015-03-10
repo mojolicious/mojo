@@ -8,7 +8,8 @@ use Mojo::Home;
 use Mojo::Server::Daemon;
 use POSIX 'WNOHANG';
 
-has watch => sub { [qw(lib templates)] };
+has daemon => sub { Mojo::Server::Daemon->new };
+has watch  => sub { [qw(lib templates)] };
 
 sub check {
   my $self = shift;
@@ -39,9 +40,9 @@ sub run {
   $self->{modified} = 1;
 
   # Prepare and cache listen sockets for smooth restarting
-  $self->{daemon} = Mojo::Server::Daemon->new->start->stop;
+  $self->daemon->start->stop;
 
-  $self->_manage while !$self->{finished} || $self->{worker};
+  $self->_manage until $self->{finished} && !$self->{worker};
   exit 0;
 }
 
@@ -83,7 +84,7 @@ sub _spawn {
   return if $pid;
 
   # Worker
-  my $daemon = $self->{daemon};
+  my $daemon = $self->daemon;
   $daemon->load_app($self->watch->[0]);
   $daemon->ioloop->recurring(1 => sub { shift->stop unless kill 0, $manager });
   $daemon->run;
@@ -139,6 +140,13 @@ Shut down server immediately.
 =head1 ATTRIBUTES
 
 L<Mojo::Server::Morbo> implements the following attributes.
+
+=head2 daemon
+
+  my $daemon = $morbo->daemon;
+  $morbo     = $morbo->daemon(Mojo::Server::Daemon->new);
+
+L<Mojo::Server::Daemon> object this server manages.
 
 =head2 watch
 

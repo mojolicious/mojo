@@ -1,6 +1,7 @@
 
 6.02  2015-03-09
-  - Improved portability of Morbo.
+  - Added daemon attribute to Mojo::Server::Morbo.
+  - Improved portability of Mojo::Server::Morbo.
   - Fixed empty template handling in Mojo::Template.
 
 6.01  2015-03-03

@@ -1,4 +1,6 @@
 
+6.03  2015-03-10
+
 6.02  2015-03-09
   - Added daemon attribute to Mojo::Server::Morbo.
   - Improved portability of Mojo::Server::Morbo.

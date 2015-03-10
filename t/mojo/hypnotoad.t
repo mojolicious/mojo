@@ -94,9 +94,8 @@ sleep 3;
 sleep 1 while !_port($port2);
 my $old = _pid();
 
-my $ua = Mojo::UserAgent->new;
-
 # Application is alive
+my $ua = Mojo::UserAgent->new;
 my $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';

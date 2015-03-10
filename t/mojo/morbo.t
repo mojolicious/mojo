@@ -40,9 +40,8 @@ my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
   "http://127.0.0.1:$port", $script;
 sleep 1 while !_port($port);
 
-my $ua = Mojo::UserAgent->new;
-
 # Application is alive
+my $ua = Mojo::UserAgent->new;
 my $tx = $ua->get("http://127.0.0.1:$port/hello");
 ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,            'right status';

@@ -1,3 +1,11 @@
+use Mojo::Base -strict;
+
+use Test::More;
+use Cwd 'abs_path';
+use File::Basename 'dirname';
+use File::Spec::Functions 'catfile';
+use Mojo::Template;
+
 package MyTemplateExporter;
 use Mojo::Base -strict;
 
@@ -13,16 +21,6 @@ use Mojo::Base -strict;
 sub exception { die 'ohoh' }
 
 package main;
-use Mojo::Base -strict;
-
-use Test::More;
-use Cwd 'abs_path';
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
-use Mojo::Template;
-
-# Capture helper
-my $capture = 'no warnings "redefine"; sub capture { shift->(@_) }';
 
 # Empty template
 my $mt     = Mojo::Template->new;
@@ -70,6 +68,7 @@ $output = $mt->render("    \n<%= 'test' =%>\n    ");
 is $output, "    \ntest    \n", 'expression trimmed';
 
 # Trim expression tags
+my $capture = 'no warnings "redefine"; sub capture { shift->(@_) }';
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render('    <%= capture begin =%><html><% end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
@@ -645,21 +644,21 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
-is $output->lines_before->[0][0], 8,   'right number';
+is $output->lines_before->[0][0], 16,  'right number';
 is $output->lines_before->[0][1], '}', 'right line';
-is $output->lines_before->[1][0], 9,   'right number';
+is $output->lines_before->[1][0], 17,  'right number';
 is $output->lines_before->[1][1], '',  'right line';
-is $output->lines_before->[2][0], 10,  'right number';
+is $output->lines_before->[2][0], 18,  'right number';
 is $output->lines_before->[2][1], 'package MyTemplateException;', 'right line';
-is $output->lines_before->[3][0], 11,                        'right number';
+is $output->lines_before->[3][0], 19,                        'right number';
 is $output->lines_before->[3][1], 'use Mojo::Base -strict;', 'right line';
-is $output->lines_before->[4][0], 12,                        'right number';
+is $output->lines_before->[4][0], 20,                        'right number';
 is $output->lines_before->[4][1], '',                        'right line';
-is $output->line->[0], 13, 'right number';
+is $output->line->[0], 21, 'right number';
 is $output->line->[1], "sub exception { die 'ohoh' }", 'right line';
-is $output->lines_after->[0][0], 14,              'right number';
+is $output->lines_after->[0][0], 22,              'right number';
 is $output->lines_after->[0][1], '',              'right line';
-is $output->lines_after->[1][0], 15,              'right number';
+is $output->lines_after->[1][0], 23,              'right number';
 is $output->lines_after->[1][1], 'package main;', 'right line';
 like "$output", qr/ohoh/, 'right result';
 

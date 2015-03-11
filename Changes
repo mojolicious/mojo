@@ -1,6 +1,5 @@
 
 6.03  2015-03-11
-  - Fixed Mojo::JSON to use the true and false functions for decoding. (Grinnz)
 
 6.02  2015-03-09
   - Added daemon attribute to Mojo::Server::Morbo.

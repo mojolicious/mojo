@@ -198,10 +198,10 @@ sub _decode_value {
     if /\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
 
   # True
-  return $TRUE if /\Gtrue/gc;
+  return true() if /\Gtrue/gc;
 
   # False
-  return $FALSE if /\Gfalse/gc;
+  return false() if /\Gfalse/gc;
 
   # Null
   return undef if /\Gnull/gc;

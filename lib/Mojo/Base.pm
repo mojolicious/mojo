@@ -95,7 +95,7 @@ sub tap {
 
 =head1 NAME
 
-Mojo::Base - Minimal base class for Mojo projects
+Mojo::Base - Minimal base class for Mojo projects with fluent interfaces
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,8 @@ Mojo::Base - Minimal base class for Mojo projects
 
 =head1 DESCRIPTION
 
-L<Mojo::Base> is a simple base class for L<Mojo> projects.
+L<Mojo::Base> is a simple base class for L<Mojo> projects with fluent
+interfaces.
 
   # Automatically enables "strict", "warnings", "utf8" and Perl 5.10 features
   use Mojo::Base -strict;

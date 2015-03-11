@@ -95,7 +95,7 @@ sub tap {
 
 =head1 NAME
 
-Mojo::Base - Minimal base class for Mojo projects with fluent interfaces
+Mojo::Base - Minimal base class for Mojo projects
 
 =head1 SYNOPSIS
 

@@ -12,6 +12,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use File::Spec::Functions 'catdir';
+use Mojo::Asset::File;
 use Mojo::Date;
 use Mojolicious;
 use Test::Mojo;
@@ -397,9 +398,10 @@ like $log, qr/Controller "MojoliciousTest::Another" does not exist/,
 $t->app->log->unsubscribe(message => $cb);
 
 # Check Last-Modified header for static files
-my $path  = catdir($FindBin::Bin, 'public_dev', 'hello.txt');
-my $size  = (stat $path)[7];
-my $mtime = Mojo::Date->new((stat $path)[9])->to_string;
+my $path = catdir($FindBin::Bin, 'public_dev', 'hello.txt');
+my $size = Mojo::Asset::File->new(path => $path)->size;
+my $mtime
+  = Mojo::Date->new(Mojo::Asset::File->new(path => $path)->mtime)->to_string;
 
 # Static file /hello.txt
 $t->get_ok('/hello.txt')->status_is(200)

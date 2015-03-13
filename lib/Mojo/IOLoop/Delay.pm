@@ -254,7 +254,9 @@ to the next step.
   $delay        = $delay->remaining([]);
 
 Remaining L</"steps"> in chain, stored outside the object to protect from
-circular references.
+circular references. Just make sure to use the invocant in your callbacks, so
+you don't accidentally close over an outer C<$delay>, which can cause a very
+hard to detect memory leak.
 
 =head2 steps
 
@@ -263,8 +265,8 @@ circular references.
 Sequentialize multiple events, every time the active event counter reaches zero
 a callback will run, the first one automatically runs during the next reactor
 tick unless it is delayed by incrementing the active event counter. This chain
-will continue until there are no more callbacks, a callback does not increment
-the active event counter or an exception gets thrown in a callback.
+will continue until there are no L</"remaining"> callbacks, a callback does not
+increment the active event counter or an exception gets thrown in a callback.
 
 =head2 wait
 

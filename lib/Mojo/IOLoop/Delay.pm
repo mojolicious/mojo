@@ -1,9 +1,10 @@
 package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
+use Hash::Util::FieldHash 'fieldhash';
 use Mojo::IOLoop;
 use Mojo::Util;
-use Hash::Util::FieldHash 'fieldhash';
+use Scalar::Util 'weaken';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
@@ -22,8 +23,9 @@ sub pass { $_[0]->begin->(@_) }
 
 sub remaining {
   my $self = shift;
-  return $REMAINING{$self} //= [] unless @_;
-  $REMAINING{$self} = shift;
+  weaken($self->{remaining} = $REMAINING{$self} = []) if !$self->{remaining};
+  return $REMAINING{$self} unless @_;
+  weaken($self->{remaining} = $REMAINING{$self} = shift);
   return $self;
 }
 
@@ -253,10 +255,7 @@ to the next step.
   my $remaining = $delay->remaining;
   $delay        = $delay->remaining([]);
 
-Remaining L</"steps"> in chain, stored outside the object to protect from
-circular references. Just make sure to use the invocant in your callbacks, so
-you don't accidentally close over an outer C<$delay>, which can cause a very
-hard to detect memory leak.
+Remaining L</"steps"> in chain.
 
 =head2 steps
 

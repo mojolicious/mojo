@@ -240,6 +240,10 @@ You can also use the C<_method> query parameter to override the request method,
 this can be very useful when submitting forms with browsers that only support
 C<GET> and C<POST>.
 
+  # PUT  /stuff             -> {controller => 'baz', action => 'stuff'}
+  # POST /stuff?_method=PUT -> {controller => 'baz', action => 'stuff'}
+  $r->put('/stuff')->to(controller => 'baz', action => 'stuff');
+
 =head2 IRIs
 
 IRIs are handled transparently, that means paths are guaranteed to be unescaped

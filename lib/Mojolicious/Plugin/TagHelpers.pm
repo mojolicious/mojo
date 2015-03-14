@@ -364,7 +364,7 @@ Generate C<input> tag of type C<file>.
 
 Generate portable C<form> tag with L<Mojolicious::Controller/"url_for">. For
 routes that do not allow C<GET>, a C<method> attribute with the value C<POST>
-will be automatically added. And for methods other than C<GET> or C<POST>, a
+will be automatically added. And for methods other than C<GET> or C<POST>, an
 C<_method> query parameter will be added as well.
 
   <form action="/path/to/login">

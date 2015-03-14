@@ -213,7 +213,7 @@ $r->route('/partial')->detour('foo#bar');
 
 # GET   /similar/*
 # PATCH /similar/too
-my $similar = $r->route('/similar')->inline(1);
+my $similar = $r->route('/similar')->via(qw(DELETE GET PATCH))->inline(1);
 $similar->route('/:something')->via('GET')->to('similar#get');
 $similar->route('/too')->via('PATCH')->to('similar#post');
 
@@ -941,5 +941,8 @@ $m->find($c => {method => 'PATCH', path => '/similar/too'});
 is_deeply $m->stack, [{}, {controller => 'similar', action => 'post'}],
   'right structure';
 is $m->endpoint->suggested_method, 'PATCH', 'right method';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'DELETE', path => '/similar/too'});
+is_deeply $m->stack, [], 'empty stack';
 
 done_testing();

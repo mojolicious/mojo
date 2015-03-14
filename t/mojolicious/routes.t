@@ -936,6 +936,7 @@ $m->find($c => {method => 'GET', path => '/similar/too'});
 is_deeply $m->stack,
   [{}, {controller => 'similar', action => 'get', 'something' => 'too'}],
   'right structure';
+is $m->endpoint->suggested_method, 'GET', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'PATCH', path => '/similar/too'});
 is_deeply $m->stack, [{}, {controller => 'similar', action => 'post'}],

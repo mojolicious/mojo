@@ -211,11 +211,11 @@ $r->route('/missing/too/*', '' => ['test'])
 # /partial/*
 $r->route('/partial')->detour('foo#bar');
 
-# GET  /similar/*
-# POST /similar/too
+# GET   /similar/*
+# PATCH /similar/too
 my $similar = $r->route('/similar')->inline(1);
 $similar->route('/:something')->via('GET')->to('similar#get');
-$similar->route('/too')->via('POST')->to('similar#post');
+$similar->route('/too')->via('PATCH')->to('similar#post');
 
 # Cached lookup
 my $fast = $r->route('/fast');
@@ -676,11 +676,13 @@ is_deeply $m->stack,
   [{controller => 'method', action => 'get', format => 'html'}],
   'right structure';
 is $m->path_for->{path}, '/method/get', 'right path';
+is $m->endpoint->suggested_method, 'GET', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'POST', path => '/method/post'});
 is_deeply $m->stack, [{controller => 'method', action => 'post'}],
   'right structure';
 is $m->path_for->{path}, '/method/post', 'right path';
+is $m->endpoint->suggested_method, 'POST', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/method/post_get'});
 is_deeply $m->stack, [{controller => 'method', action => 'post_get'}],
@@ -691,6 +693,7 @@ $m->find($c => {method => 'POST', path => '/method/post_get'});
 is_deeply $m->stack, [{controller => 'method', action => 'post_get'}],
   'right structure';
 is $m->path_for->{path}, '/method/post_get', 'right path';
+is $m->endpoint->suggested_method, 'GET', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'DELETE', path => '/method/post_get'});
 is_deeply $m->stack, [], 'empty stack';
@@ -934,8 +937,9 @@ is_deeply $m->stack,
   [{}, {controller => 'similar', action => 'get', 'something' => 'too'}],
   'right structure';
 $m = Mojolicious::Routes::Match->new(root => $r);
-$m->find($c => {method => 'POST', path => '/similar/too'});
+$m->find($c => {method => 'PATCH', path => '/similar/too'});
 is_deeply $m->stack, [{}, {controller => 'similar', action => 'post'}],
   'right structure';
+is $m->endpoint->suggested_method, 'PATCH', 'right method';
 
 done_testing();

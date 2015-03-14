@@ -1,5 +1,8 @@
 
-6.03  2015-03-13
+6.03  2015-03-14
+  - Added support for overriding the HTTP request method with the _method query
+    parameter.
+  - Added suggested_method method to Mojolicious::Routes::Route.
   - Improved portability of content negotiation tests.
 
 6.02  2015-03-09

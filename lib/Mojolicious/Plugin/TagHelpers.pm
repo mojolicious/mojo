@@ -52,18 +52,15 @@ sub _form_for {
   my ($c, @url) = (shift, shift);
   push @url, shift if ref $_[0] eq 'HASH';
 
-  # POST detection
-  my @post;
+  # Method detection
+  my (@post, $method);
   if (my $r = $c->app->routes->lookup($url[0])) {
-    my %methods = (GET => 1, POST => 1);
-    do {
-      my @via = @{$r->via || []};
-      %methods = map { $_ => 1 } grep { $methods{$_} } @via if @via;
-    } while $r = $r->parent;
-    @post = (method => 'POST') if $methods{POST} && !$methods{GET};
+    @post = (method => 'POST') if ($method = $r->suggested_method) ne 'GET';
   }
 
-  return _tag('form', action => $c->url_for(@url), @post, @_);
+  my $url = $c->url_for(@url);
+  $url->query({_method => $method}) if @post && $method ne 'POST';
+  return _tag('form', action => $url, @post, @_);
 }
 
 sub _hidden_field {
@@ -366,8 +363,9 @@ Generate C<input> tag of type C<file>.
   % end
 
 Generate portable C<form> tag with L<Mojolicious::Controller/"url_for">. For
-routes that allow C<POST> but not C<GET>, a C<method> attribute will be
-automatically added.
+routes that do not allow C<GET>, a C<method> attribute with the value C<POST>
+will be automatically added. And for methods other than C<GET> or C<POST>, a
+C<_method> query parameter will be added as well.
 
   <form action="/path/to/login">
     <input name="first_name" type="text">

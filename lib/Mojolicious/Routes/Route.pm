@@ -128,6 +128,19 @@ sub route {
   return $route;
 }
 
+sub suggested_method {
+  my $self = shift;
+
+  my %via;
+  for my $route (@{$self->_chain}) {
+    next unless my @via = @{$route->via || []};
+    %via = map { $_ => 1 } keys %via ? grep { $via{$_} } @via : @via;
+  }
+
+  return 'POST' if $via{POST} && !$via{GET};
+  return $via{GET} ? 'GET' : (sort keys %via)[0] || 'GET';
+}
+
 sub to {
   my $self = shift;
 
@@ -491,6 +504,13 @@ The L<Mojolicious::Routes> object this route is a descendant of.
 
 Low-level generator for routes matching all HTTP request methods, returns a
 L<Mojolicious::Routes::Route> object.
+
+=head2 suggested_method
+
+  my $method = $r->suggested_method;
+
+Suggested HTTP method for reaching this route, C<GET> and C<POST> are
+preferred.
 
 =head2 to
 

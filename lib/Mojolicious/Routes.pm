@@ -71,7 +71,7 @@ sub match {
   else               { $path = $req->url->path->to_route }
 
   # Method (HEAD will be treated as GET)
-  my $method = uc $req->method;
+  my $method = uc($req->url->query->clone->param('_method') || $req->method);
   $method = 'GET' if $method eq 'HEAD';
 
   # Check cache

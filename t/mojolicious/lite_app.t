@@ -506,6 +506,8 @@ $t->get_ok('/', '1234' x 1024)->status_is(200)
 # DELETE request
 $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Hello!');
+$t->post_ok('/?_method=DELETE')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Hello!');
 
 # POST request
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

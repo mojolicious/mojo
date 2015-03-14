@@ -313,7 +313,7 @@ EOF
 
 # Empty selection
 $t->put_ok('/selection')->status_is(200)
-  ->content_is("<form action=\"/selection\">\n  "
+  ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
@@ -342,7 +342,7 @@ $t->put_ok('/selection')->status_is(200)
 
 # Selection with values
 $t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b')->status_is(200)
-  ->content_is("<form action=\"/selection\">\n  "
+  ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
@@ -372,7 +372,7 @@ $t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b')->status_is(200)
 # Selection with multiple values
 $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b')
   ->status_is(200)
-  ->content_is("<form action=\"/selection\">\n  "
+  ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
@@ -401,7 +401,7 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b')
 
 # Selection with multiple values preselected
 $t->put_ok('/selection?preselect=1')->status_is(200)
-  ->content_is("<form action=\"/selection\">\n  "
+  ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option selected value="b">b</option>'
     . '<optgroup label="c">'

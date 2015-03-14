@@ -236,6 +236,10 @@ but content will not be sent with the response even if it is present.
   # HEAD /test -> {controller => 'bar', action => 'test'}
   $r->get('/test')->to(controller => 'bar', action => 'test');
 
+You can also use the C<_method> query parameter to override the request method,
+this can be very useful when submitting forms with browsers that only support
+C<GET> and C<POST>.
+
 =head2 IRIs
 
 IRIs are handled transparently, that means paths are guaranteed to be unescaped
@@ -706,13 +710,6 @@ Post-processing the response to add or remove headers is a very common use.
 
 Same for pre-processing the request.
 
-  # Allow "_method" query parameter to override request method
-  $app->hook(before_dispatch => sub {
-    my $c = shift;
-    return unless my $method = $c->req->url->query->param('_method');
-    $c->req->method($method);
-  });
-
   # Choose template variant based on request headers
   $app->hook(before_dispatch => sub {
     my $c = shift;
@@ -771,29 +768,41 @@ to make route generation more expressive.
   $r->add_shortcut(resource => sub {
     my ($r, $name) = @_;
 
-    # Generate "/$name" route
+    # Prefix for resource
     my $resource = $r->any("/$name")->to("$name#");
 
-    # Handle POST requests
-    $resource->post->to('#create')->name("create_$name");
+    # Render a list of resources
+    $resource->get->to('#index')->name($name);
 
-    # Handle GET requests
-    $resource->get->to('#show')->name("show_$name");
+    # Render a form to create a new resource (submitted to "store")
+    $resource->get('/create')->to('#create')->name("create_$name");
 
-    # Handle OPTIONS requests
-    $resource->options(sub {
-      my $c = shift;
-      $c->res->headers->allow('POST, GET, OPTIONS');
-      $c->render(data => '', status => 204);
-    });
+    # Store newly create resource (submitted by "create")
+    $resource->post->to('#store')->name("store_$name");
+
+    # Render a specific resource
+    $resource->get('/:id')->to('#show')->name("show_$name");
+
+    # Render a form to edit a resource (submitted to "update")
+    $resource->get('/:id/edit')->to('#edit')->name("edit_$name");
+
+    # Store updated resource (submitted by "edit")
+    $resource->put('/:id')->to('#update')->name("update_$name");
+
+    # Remove a resource
+    $resource->delete('/:id')->to('#remove')->name("remove_$name");
 
     return $resource;
   });
 
-  # POST    /user -> {controller => 'user', action => 'create'}
-  # GET     /user -> {controller => 'user', action => 'show'}
-  # OPTIONS /user -> {cb => sub {...}}
-  $r->resource('user');
+  # GET /users         -> {controller => 'users', action => 'index'}
+  # GET /users/create  -> {controller => 'users', action => 'create'}
+  # POST /users        -> {controller => 'users', action => 'store'}
+  # GET /users/23      -> {controller => 'users', action => 'show', id => 23}
+  # GET /users/23/edit -> {controller => 'users', action => 'edit', id => 23}
+  # PUT /users/23      -> {controller => 'users', action => 'update', id => 23}
+  # DELETE /users/23   -> {controller => 'users', action => 'remove', id => 23}
+  $r->resource('users');
 
 =head2 Rearranging routes
 

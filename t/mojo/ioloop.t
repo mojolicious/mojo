@@ -273,9 +273,9 @@ is $finish, 1, 'finish event has been emitted once';
 # Graceful shutdown (max_accepts)
 $err  = '';
 $loop = Mojo::IOLoop->new->max_accepts(1);
-$id   = $loop->server({address => '127.0.0.1'} => sub { shift; shift->close });
+$id   = $loop->server({address => '127.0.0.1'} => sub { });
 $port = $loop->acceptor($id)->port;
-$loop->client({port => $port} => sub { });
+$loop->client({port => $port} => sub { pop->close });
 $loop->timer(30 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';

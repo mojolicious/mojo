@@ -3,7 +3,7 @@
   - Added support for overriding the HTTP request method with the _method query
     parameter.
   - Added suggested_method method to Mojolicious::Routes::Route.
-  - Improved portability of content negotiation tests.
+  - Improved portability of some tests.
 
 6.02  2015-03-09
   - Added daemon attribute to Mojo::Server::Morbo.

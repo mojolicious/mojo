@@ -1,14 +1,11 @@
 package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Hash::Util::FieldHash 'fieldhash';
 use Mojo::IOLoop;
 use Mojo::Util;
-use Scalar::Util 'weaken';
 
-has ioloop => sub { Mojo::IOLoop->singleton };
-
-fieldhash my %REMAINING;
+has ioloop    => sub { Mojo::IOLoop->singleton };
+has remaining => sub { [] };
 
 sub begin {
   my ($self, $offset, $len) = @_;
@@ -20,14 +17,6 @@ sub begin {
 sub data { Mojo::Util::_stash(data => @_) }
 
 sub pass { $_[0]->begin->(@_) }
-
-sub remaining {
-  my $self = shift;
-  weaken($self->{remaining} = $REMAINING{$self} = []) if !$self->{remaining};
-  return $REMAINING{$self} unless @_;
-  weaken($self->{remaining} = $REMAINING{$self} = shift);
-  return $self;
-}
 
 sub steps {
   my $self = shift->remaining([@_]);
@@ -132,8 +121,8 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Delay> manages callbacks and controls the flow of events for
-L<Mojo::IOLoop>, which can help you avoid deep nested closures and memory leaks
-that often result from continuation-passing style.
+L<Mojo::IOLoop>, which can help you avoid deep nested closures that often
+result from continuation-passing style.
 
 =head1 EVENTS
 
@@ -169,6 +158,13 @@ L<Mojo::IOLoop::Delay> implements the following attributes.
   $delay   = $delay->ioloop(Mojo::IOLoop->new);
 
 Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
+
+=head2 remaining
+
+  my $remaining = $delay->remaining;
+  $delay        = $delay->remaining([]);
+
+Remaining L</"steps"> in chain.
 
 =head1 METHODS
 
@@ -249,13 +245,6 @@ to the next step.
 
   # Longer version
   $delay->begin(0)->(@args);
-
-=head2 remaining
-
-  my $remaining = $delay->remaining;
-  $delay        = $delay->remaining([]);
-
-Remaining L</"steps"> in chain.
 
 =head2 steps
 

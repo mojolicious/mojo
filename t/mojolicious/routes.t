@@ -238,6 +238,7 @@ is $m->root, $r, 'right root';
 is $m->endpoint->name, 'very_clean', 'right name';
 is_deeply $m->stack, [{clean => 1}], 'right strucutre';
 is $m->path_for->{path}, '/clean', 'right path';
+is $m->endpoint->suggested_method, 'GET', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/clean/too'});
 is_deeply $m->stack, [{something => 1}], 'right strucutre';
@@ -453,6 +454,7 @@ $m->find($c => {method => 'GET', path => '/foo/testedit'});
 is_deeply $m->stack, [{controller => 'foo', action => 'testedit'}],
   'right structure';
 is $m->path_for->{path}, '/foo/testedit', 'right path';
+is $m->endpoint->suggested_method, 'GET', 'right method';
 
 # Optional captures in sub route with requirement
 $m = Mojolicious::Routes::Match->new(root => $r);

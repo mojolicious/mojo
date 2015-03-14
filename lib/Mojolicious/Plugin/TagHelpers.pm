@@ -53,10 +53,9 @@ sub _form_for {
   push @url, shift if ref $_[0] eq 'HASH';
 
   # Method detection
-  my (@post, $method);
-  if (my $r = $c->app->routes->lookup($url[0])) {
-    @post = (method => 'POST') if ($method = $r->suggested_method) ne 'GET';
-  }
+  my $r      = $c->app->routes->lookup($url[0]);
+  my $method = $r ? $r->suggested_method : 'GET';
+  my @post   = $method ne 'GET' ? (method => 'POST') : ();
 
   my $url = $c->url_for(@url);
   $url->query({_method => $method}) if @post && $method ne 'POST';

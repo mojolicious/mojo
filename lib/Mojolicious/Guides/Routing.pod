@@ -777,7 +777,7 @@ to make route generation more expressive.
     # Render a form to create a new resource (submitted to "store")
     $resource->get('/create')->to('#create')->name("create_$name");
 
-    # Store newly create resource (submitted by "create")
+    # Store newly created resource (submitted by "create")
     $resource->post->to('#store')->name("store_$name");
 
     # Render a specific resource

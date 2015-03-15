@@ -835,13 +835,15 @@ To build HTML forms more efficiently you can use tag helpers like
 L<Mojolicious::Plugin::TagHelpers/"form_for">, which can automatically select a
 request method for you if a route name is provided. And since most browsers
 only allow forms to be submitted with C<GET> and C<POST>, but not request
-methods like C<PUT> or C<DELETE>, they are spoofed with a C<_method> query
+methods like C<PUT> or C<DELETE>, they are spoofed with an C<_method> query
 parameter.
 
   use Mojolicious::Lite;
 
   get '/' => 'form';
 
+  # PUT  /title
+  # POST /title?_method=PUT
   put '/title' => sub {
     my $c = shift;
 

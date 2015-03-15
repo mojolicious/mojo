@@ -842,16 +842,16 @@ parameter.
 
   get '/' => 'form';
 
-  # PUT  /title
-  # POST /title?_method=PUT
-  put '/title' => sub {
+  # PUT  /surprise
+  # POST /surprise?_method=PUT
+  put '/surprise' => sub {
     my $c = shift;
 
     my $url   = $c->param('url');
     my $title = $c->ua->get($url)->res->dom->at('title')->text;
 
     # Prevent double submit with redirect
-    $c->flash(title => qq{The title of "$url" is "$title".});
+    $c->flash(confirmation => qq{The title of "$url" was "$title".});
     $c->redirect_to('form');
   };
 
@@ -862,12 +862,12 @@ parameter.
   <!DOCTYPE html>
   <html>
     <body>
-      % if (my $title = flash 'title') {
-        <p><%= $title %></p>
+      % if (my $confirmation = flash 'confirmation') {
+        <p><%= $confirmation %></p>
       % }
-      %= form_for title => begin
+      %= form_for surprise => begin
         %= text_field 'url', value => 'http://mojolicio.us'
-        %= submit_button 'Get title'
+        %= submit_button
       % end
     </body>
   </html>

@@ -876,7 +876,8 @@ parameter.
 
 The methods L<Mojolicious::Controller/"flash"> and
 L<Mojolicious::Controller/"redirect_to"> are often used together to prevent
-double form submission.
+double form submission, allowing users to receive a confirmation message that
+will vanish if they decide to reload the page they've been redirected to.
 
 =head2 Form validation
 

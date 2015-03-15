@@ -829,6 +829,50 @@ template with named blocks that child templates can override.
 
 This chain could go on and on to allow a very high level of template reuse.
 
+=head2 Forms
+
+To build HTML forms more efficiently you can use tag helpers like
+L<Mojolicious::Plugin::TagHelpers/"form_for">, which can automatically select a
+request method for you if a route name is provided. And since most browsers do
+not allow request methods like C<PUT> or C<DELETE> for forms, they are spoofed
+with a C<_method> query parameter.
+
+  use Mojolicious::Lite;
+
+  get '/' => 'form';
+
+  put '/title' => sub {
+    my $c = shift;
+
+    my $url   = $c->param('url');
+    my $title = $c->ua->get($url)->res->dom->at('title')->text;
+
+    # Prevent double submit with redirect
+    $c->flash(title => qq{The title of "$url" is "$title".});
+    $c->redirect_to('form');
+  };
+
+  app->start;
+  __DATA__
+
+  @@ form.html.ep
+  <!DOCTYPE html>
+  <html>
+    <body>
+      % if (my $title = flash 'title') {
+        <p><%= $title %></p>
+      % }
+      %= form_for title => begin
+        %= text_field 'url', value => 'http://mojolicio.us'
+        %= submit_button 'Get title'
+      % end
+    </body>
+  </html>
+
+The methods L<Mojolicious::Controller/"flash"> and
+L<Mojolicious::Controller/"redirect_to"> are often used together to prevent
+double form submission.
+
 =head2 Form validation
 
 You can use L<Mojolicious::Controller/"validation"> to validate C<GET> and
@@ -957,10 +1001,6 @@ L<Mojolicious::Validator::Validation/"error">.
       % end
     </body>
   </html>
-
-The methods L<Mojolicious::Controller/"flash"> and
-L<Mojolicious::Controller/"redirect_to"> are often used together to prevent
-double form submission.
 
 =head2 Cross-site request forgery
 

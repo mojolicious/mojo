@@ -846,16 +846,14 @@ parameter.
 
   get '/' => 'form';
 
-  # PUT  /surprise
-  # POST /surprise?_method=PUT
-  put '/surprise' => sub {
-    my $c = shift;
-
-    my $url   = $c->param('url');
-    my $title = $c->ua->get($url)->res->dom->at('title')->text;
+  # PUT  /nothing
+  # POST /nothing?_method=PUT
+  put '/nothing' => sub {
+    my $c     = shift;
+    my $value = $c->param('whatever');
 
     # Prevent double submit with redirect
-    $c->flash(confirmation => qq{The title of "$url" was "$title".});
+    $c->flash(confirmation => "We did nothing with your value ($value).");
     $c->redirect_to('form');
   };
 
@@ -869,8 +867,8 @@ parameter.
       % if (my $confirmation = flash 'confirmation') {
         <p><%= $confirmation %></p>
       % }
-      %= form_for surprise => begin
-        %= text_field 'url', value => 'http://mojolicio.us'
+      %= form_for nothing => begin
+        %= text_field 'whatever', value => 'I ♥ Mojolicious!'
         %= submit_button
       % end
     </body>

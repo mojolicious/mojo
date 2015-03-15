@@ -312,7 +312,7 @@ through the L<Mojolicious::Controller/"stash">.
 
   $c->stash(description => 'web framework');
   $c->stash(frameworks  => [qw(Catalyst Mojolicious)]);
-  $c->stash(spinoffs    => {minion => 'a job queue'});
+  $c->stash(spinoffs    => {minion => 'job queue'});
 
   %= $description
   %= $frameworks->[1]

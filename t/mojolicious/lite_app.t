@@ -110,7 +110,7 @@ get '/auto_name' => sub {
 
 get '/query_string' => sub {
   my $c = shift;
-  $c->render(text => b($c->req->url->query)->url_unescape);
+  $c->render(text => $c->req->url->query);
 };
 
 get '/reserved' => sub {
@@ -571,9 +571,9 @@ $t->get_ok('/auto_name')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/custom_name');
 
 # Query string roundtrip
-$t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=bar')
+$t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=%62ar')
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('http://mojolicio.us/perldoc?foo=bar');
+  ->content_is('http://mojolicio.us/perldoc?foo=%62ar');
 
 # Reserved stash values
 $t->get_ok('/reserved?data=just-works')->status_is(200)

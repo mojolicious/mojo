@@ -86,7 +86,7 @@ sub startup {
     ->name('something');
 
   # /somethingtest (refer to another route with url_for)
-  $r->route('/somethingtest')->to('foo#something');
+  $r->put('/somethingtest')->to('foo#something');
 
   # /something_missing (refer to a non-existing route with url_for)
   $r->route('/something_missing')->to('foo#url_for_missing');

@@ -23,11 +23,9 @@ sub match_partial {
   $self->_compile unless $self->{regex};
   $self->_compile_format if $detect && !$self->{format_regex};
 
-  # Match
+  # Path
   return undef unless my @captures = $$pathref =~ $self->regex;
   $$pathref = ${^POSTMATCH};
-
-  # Merge captures
   my $captures = {%{$self->defaults}};
   for my $placeholder (@{$self->placeholders}) {
     last unless @captures;

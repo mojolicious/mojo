@@ -20,7 +20,6 @@ sub run {
     last if ($len -= $read) <= 0;
   }
 
-  # Handle request
   $self->emit(request => $tx);
 
   # Response start-line

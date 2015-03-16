@@ -13,7 +13,7 @@ sub load {
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
-  # Run Perl code
+  # Run Perl code in sandbox
   my $config
     = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
     . "sub app; local *app = sub { \$app }; use Mojo::Base -strict; $content";

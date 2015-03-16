@@ -43,11 +43,9 @@ sub find {
   my $candidate;
   while (my $child = shift @children) {
 
-    # Match
+    # Custom names have priority
     $candidate = $child->has_custom_name ? return $child : $child
       if $child->name eq $name;
-
-    # Search children too
     push @children, @{$child->children};
   }
 

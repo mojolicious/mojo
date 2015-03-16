@@ -167,16 +167,14 @@ sub render {
   my $plugins = $app->plugins->emit_hook(before_render => $self, $args);
   my $maybe   = delete $args->{'mojo.maybe'};
 
-  # Render
   my $ts = $args->{'mojo.to_string'};
   my ($output, $format) = $app->renderer->render($self, $args);
-  return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
 
-  # Maybe
+  # Maybe no 404
+  return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
   return $maybe ? undef : !$self->helpers->reply->not_found
     unless defined $output;
 
-  # Prepare response
   $plugins->emit_hook(after_render => $self, \$output, $format);
   my $headers = $self->res->body($output)->headers;
   $headers->content_type($app->types->type($format) || 'text/plain')

@@ -315,8 +315,11 @@ $t->get_ok('/foo-bar' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->content_like(qr|Hello Mojo from the other template /foo-bar!|);
 
 # Foo::something
-$t->get_ok('/somethingtest' => {'X-Test' => 'Hi there!'})->status_is(200)
+$t->put_ok('/somethingtest' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/test4/42');
+$t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('/test4/42');
 
 # Foo::url_for_missing
 $t->get_ok('/something_missing' => {'X-Test' => 'Hi there!'})->status_is(200)

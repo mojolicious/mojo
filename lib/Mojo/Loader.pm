@@ -36,13 +36,13 @@ sub find_modules {
 sub load_class {
   my $class = shift;
 
-  # Check class name
-  return 1 if !$class || $class !~ /^\w(?:[\w:']*\w)?$/;
+  # Check for a valid class name
+  return 1 if ($class || '') !~ /^\w(?:[\w:']*\w)?$/;
 
-  # Load
+  # Load if not already loaded
   return undef if $class->can('new') || eval "require $class; 1";
 
-  # Exists
+  # Does not exist
   return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $class]}\E in \@INC/;
 
   # Real error

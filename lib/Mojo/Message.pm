@@ -20,7 +20,7 @@ has version          => '1.1';
 sub body {
   my $self = shift;
 
-  # Downgrade multipart content
+  # Multipart content needs to be downgraded
   my $content = $self->content;
   $content = $self->content(Mojo::Content::Single->new)->content
     if $content->is_multipart;

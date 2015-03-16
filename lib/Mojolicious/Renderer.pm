@@ -96,7 +96,7 @@ sub render {
   local @{$stash}{keys %$args} if my $ts = delete $args->{'mojo.to_string'};
   delete @{$stash}{qw(layout extends)} if $ts;
 
-  # Merge stash and arguments
+  # All other arguments just become part of the stash
   @$stash{keys %$args} = values %$args;
 
   my $options = {

@@ -849,10 +849,10 @@ parameter.
   # PUT  /nothing
   # POST /nothing?_method=PUT
   put '/nothing' => sub {
-    my $c     = shift;
-    my $value = $c->param('whatever');
+    my $c = shift;
 
-    # Prevent double submit with redirect
+    # Prevent double form submission with redirect
+    my $value = $c->param('whatever');
     $c->flash(confirmation => "We did nothing with your value ($value).");
     $c->redirect_to('form');
   };
@@ -868,7 +868,7 @@ parameter.
         <p><%= $confirmation %></p>
       % }
       %= form_for nothing => begin
-        %= text_field 'whatever', value => 'I ♥ Mojolicious!'
+        %= text_field whatever => 'I ♥ Mojolicious!'
         %= submit_button
       % end
     </body>
@@ -980,7 +980,7 @@ L<Mojolicious::Validator::Validation/"error">.
     # Render form again if validation failed
     return $c->render('form') if $validation->has_error;
 
-    # Prevent double submit with redirect
+    # Prevent double form submission with redirect
     $c->flash(number => $validation->param('number'));
     $c->redirect_to('form');
   };

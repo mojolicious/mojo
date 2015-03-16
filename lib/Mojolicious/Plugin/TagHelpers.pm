@@ -406,14 +406,14 @@ Generate portable C<img> tag.
 =head2 input_tag
 
   %= input_tag 'first_name'
-  %= input_tag first_name => 'Default name'
+  %= input_tag first_name => 'Default'
   %= input_tag 'employed', type => 'checkbox'
 
 Generate C<input> tag. Previous input values will automatically get picked up
 and shown as default.
 
   <input name="first_name">
-  <input name="first_name" value="Default name">
+  <input name="first_name" value="Default">
   <input name="employed" type="checkbox">
 
 =head2 javascript
@@ -685,35 +685,35 @@ get picked up and shown as default.
 
 =head2 text_area
 
-  %= text_area 'foo'
-  %= text_area 'foo', cols => 40
-  %= text_area foo => 'Default!', cols => 40
-  %= text_area foo => (cols => 40) => begin
-    Default!
+  %= text_area 'story'
+  %= text_area 'story', cols => 40
+  %= text_area story => 'Default', cols => 40
+  %= text_area story => (cols => 40) => begin
+    Default
   % end
 
 Generate C<textarea> tag. Previous input values will automatically get picked
 up and shown as default.
 
-  <textarea name="foo"></textarea>
-  <textarea cols="40" name="foo"></textarea>
-  <textarea cols="40" name="foo">Default!</textarea>
-  <textarea cols="40" name="foo">
-    Default!
+  <textarea name="story"></textarea>
+  <textarea cols="40" name="story"></textarea>
+  <textarea cols="40" name="story">Default</textarea>
+  <textarea cols="40" name="story">
+    Default
   </textarea>
 
 =head2 text_field
 
   %= text_field 'first_name'
-  %= text_field first_name => 'Default name'
-  %= text_field first_name => 'Default name', class => 'user'
+  %= text_field first_name => 'Default'
+  %= text_field first_name => 'Default', class => 'user'
 
 Generate C<input> tag of type C<text>. Previous input values will automatically
 get picked up and shown as default.
 
   <input name="first_name" type="text">
-  <input name="first_name" type="text" value="Default name">
-  <input class="user" name="first_name" type="text" value="Default name">
+  <input name="first_name" type="text" value="Default">
+  <input class="user" name="first_name" type="text" value="Default">
 
 =head2 time_field
 

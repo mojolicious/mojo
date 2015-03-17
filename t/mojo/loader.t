@@ -15,7 +15,7 @@ ok !!UNIVERSAL::can(B => 'svref_2object'), 'method found';
 
 # Exception
 my $e = load_class 'Mojo::LoaderException';
-isa_ok $e, 'Mojo::Exception', 'right object';
+isa_ok $e, 'Mojo::Exception', 'right exception';
 like $e->message, qr/Missing right curly/, 'right message';
 is $e->lines_before->[0][0], 2,                       'right number';
 is $e->lines_before->[0][1], '',                      'right line';
@@ -33,7 +33,7 @@ like "$e", qr/Missing right curly/, 'right message';
 
 # Complicated exception
 $e = load_class 'Mojo::LoaderException2';
-isa_ok $e, 'Mojo::Exception', 'right object';
+isa_ok $e, 'Mojo::Exception', 'right exception';
 like $e->message, qr/Exception/, 'right message';
 is $e->lines_before->[0][0], 1,                                 'right number';
 is $e->lines_before->[0][1], 'package Mojo::LoaderException2;', 'right line';

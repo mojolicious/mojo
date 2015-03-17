@@ -97,7 +97,7 @@ like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/,
   'right error';
 
 # Transaction
-isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';
+isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right transaction';
 
 # Fresh application
 $app = Mojolicious->new;

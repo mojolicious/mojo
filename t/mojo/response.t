@@ -470,9 +470,9 @@ is $res->version,     '1.1', 'right version';
 is $res->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
-isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
-isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
+ok !$res->content->parts->[0]->is_multipart, 'no multipart content';
+ok !$res->content->parts->[1]->is_multipart, 'no multipart content';
+ok !$res->content->parts->[2]->is_multipart, 'no multipart content';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 
@@ -511,13 +511,13 @@ is $res->headers->content_type,
 is $res->headers->content_length,    418,   'right "Content-Length" value';
 is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $res->body_size, 418, 'right size';
-isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
-isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
-isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
+ok !$res->content->parts->[0]->is_multipart, 'no multipart content';
+ok !$res->content->parts->[1]->is_multipart, 'no multipart content';
+ok !$res->content->parts->[2]->is_multipart, 'no multipart content';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
-is $res->upload('upload')->filename,  'hello.pl',            'right filename';
-isa_ok $res->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
+is $res->upload('upload')->filename, 'hello.pl', 'right filename';
+ok !$res->upload('upload')->asset->is_file, 'stored in memory';
 is $res->upload('upload')->asset->size, 69, 'right size';
 is $res->content->parts->[2]->headers->content_type,
   'application/octet-stream', 'right "Content-Type" value';
@@ -561,8 +561,8 @@ is $res->headers->content_type,
 is $res->headers->content_length,    129,   'right "Content-Length" value';
 is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $res->body_size, 129, 'right size';
-isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
-isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
+ok !$res->content->parts->[0]->is_multipart, 'no multipart content';
+ok !$res->content->parts->[1]->is_multipart, 'no multipart content';
 is $res->content->parts->[0]->asset->slurp, 'abcd', 'right content';
 is $res->content->parts->[0]->headers->content_type, 'image/jpeg',
   'right "Content-Type" value';
@@ -599,7 +599,7 @@ is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->content_type, 'multipart/form-data; bo',
   'right "Content-Type" value';
-isa_ok $res->content, 'Mojo::Content::Single', 'right content';
+ok !$res->content->is_multipart, 'no multipart content';
 like $res->content->asset->slurp, qr/hallo welt/, 'right content';
 
 # Parse HTTP 1.1 gzip compressed response

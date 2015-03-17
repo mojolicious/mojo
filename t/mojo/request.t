@@ -749,19 +749,20 @@ is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
 is $req->headers->content_length, 416, 'right "Content-Length" value';
-isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[0]->asset->is_file, 'stored in memory';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
 is $req->body_params->to_hash->{text2}, '', 'right value';
-is $req->upload('upload')->filename,  'hello.pl',            'right filename';
-isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
+is $req->upload('upload')->filename, 'hello.pl', 'right filename';
+ok !$req->upload('upload')->asset->is_file, 'stored in memory';
 is $req->upload('upload')->asset->size, 69, 'right size';
 my $file = catfile(tempdir(CLEANUP => 1), ("MOJO_TMP." . time . ".txt"));
-isa_ok $req->upload('upload')->move_to($file), 'Mojo::Upload', 'moved file';
+is $req->upload('upload')->move_to($file)->filename, 'hello.pl',
+  'right filename';
 ok unlink($file), 'unlinked file';
 is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';
 
@@ -815,9 +816,9 @@ is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
 is $req->headers->content_length, 562, 'right "Content-Length" value';
-isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 ok $req->content->parts->[0]->asset->is_file, 'stored in file';
 is $req->content->parts->[0]->asset->slurp,   "hallo welt test123\n",
   'right content';
@@ -826,12 +827,10 @@ is $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename, 'bye.txt', 'right filename';
 is $req->upload('upload')->asset->size, 4, 'right size';
 is $req->every_upload('upload')->[0]->filename, 'hello.pl', 'right filename';
-isa_ok $req->every_upload('upload')->[0]->asset, 'Mojo::Asset::File',
-  'right file';
+ok $req->every_upload('upload')->[0]->asset->is_file, 'stored in file';
 is $req->every_upload('upload')->[0]->asset->size, 69, 'right size';
 is $req->every_upload('upload')->[1]->filename, 'bye.txt', 'right filename';
-isa_ok $req->every_upload('upload')->[1]->asset, 'Mojo::Asset::Memory',
-  'right file';
+ok !$req->every_upload('upload')->[1]->asset->is_file, 'stored in memory';
 is $req->every_upload('upload')->[1]->asset->size, 4, 'right size';
 
 # Parse HTTP 1.1 multipart request (with callbacks and stream)
@@ -898,9 +897,9 @@ is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
 is $req->headers->content_length, 418, 'right "Content-Length" value';
-isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
@@ -942,7 +941,7 @@ is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
 is $req->headers->content_length, 418, 'right "Content-Length" value';
-isa_ok $req->content, 'Mojo::Content::Single', 'right content';
+ok !$req->content->is_multipart, 'no multipart content';
 like $req->content->asset->slurp, qr/------------0xKhTmLbOuNdArY--$/,
   'right content';
 
@@ -976,16 +975,16 @@ is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
 is $req->headers->content_length, 410, 'right "Content-Length" value';
-isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
-isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
+ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
 is $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->body_params->to_hash->{upload}, undef, 'not a body parameter';
 is $req->upload('upload')->filename, '0', 'right filename';
-isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
+ok !$req->upload('upload')->asset->is_file, 'stored in memory';
 is $req->upload('upload')->asset->size, 69, 'right size';
 
 # Parse full HTTP 1.1 proxy request with basic authentication

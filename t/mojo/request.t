@@ -784,7 +784,7 @@ $req->content->on(
   }
 );
 $req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
-$req->parse("Content-Length: 418\x0d\x0a");
+$req->parse("Content-Length: 562\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
@@ -800,7 +800,11 @@ $req->parse("#!/usr/bin/perl\n\n");
 $req->parse("use strict;\n");
 $req->parse("use warnings;\n\n");
 $req->parse("print \"Hello World :)\\n\"\n");
-$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
+$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$req->parse('Content-Disposition: form-data; name="upload"; filename');
+$req->parse("=\"bye.txt\"\x0d\x0a");
+$req->parse("Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+$req->parse("Bye!\x0d\x0a------------0xKhTmLbOuNdArY--");
 ok $req->is_finished, 'request is finished';
 ok $req->content->is_multipart, 'multipart content';
 is $req->method,       'GET',                        'right method';
@@ -810,7 +814,7 @@ is $req->query_params, 'foo13',                      'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $req->headers->content_length, 418, 'right "Content-Length" value';
+is $req->headers->content_length, 562, 'right "Content-Length" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
@@ -819,9 +823,16 @@ is $req->content->parts->[0]->asset->slurp,   "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
 is $req->body_params->to_hash->{text2}, '', 'right value';
-is $req->upload('upload')->filename,  'hello.pl',          'right filename';
-isa_ok $req->upload('upload')->asset, 'Mojo::Asset::File', 'right file';
-is $req->upload('upload')->asset->size, 69, 'right size';
+is $req->upload('upload')->filename, 'bye.txt', 'right filename';
+is $req->upload('upload')->asset->size, 4, 'right size';
+is $req->every_upload('upload')->[0]->filename, 'hello.pl', 'right filename';
+isa_ok $req->every_upload('upload')->[0]->asset, 'Mojo::Asset::File',
+  'right file';
+is $req->every_upload('upload')->[0]->asset->size, 69, 'right size';
+is $req->every_upload('upload')->[1]->filename, 'bye.txt', 'right filename';
+isa_ok $req->every_upload('upload')->[1]->asset, 'Mojo::Asset::Memory',
+  'right file';
+is $req->every_upload('upload')->[1]->asset->size, 4, 'right size';
 
 # Parse HTTP 1.1 multipart request (with callbacks and stream)
 $req = Mojo::Message::Request->new;

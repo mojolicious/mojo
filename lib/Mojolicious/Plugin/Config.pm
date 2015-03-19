@@ -66,7 +66,7 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
 
   # myapp.conf (it's just Perl returning a hash)
   {
-    # A random value
+    # Just a value
     foo => "bar",
 
     # Nested data structures are fine too

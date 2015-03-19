@@ -41,7 +41,7 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
 
   # myapp.json (it's just JSON with embedded Perl)
   {
-    %# A random value
+    %# Just a value
     "foo": "bar",
 
     %# Nested data structures are fine too

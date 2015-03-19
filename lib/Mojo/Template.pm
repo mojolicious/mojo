@@ -339,8 +339,8 @@ For all templates L<strict>, L<warnings>, L<utf8> and Perl 5.10 features are
 automatically enabled.
 
   <% Perl code %>
-  <%= Perl expression, replaced with result %>
-  <%== Perl expression, replaced with XML escaped result %>
+  <%= Perl expression, replaced with XML escaped result %>
+  <%== Perl expression, replaced with result %>
   <%# Comment, useful for debugging %>
   <%% Replaced with "<%", useful for generating templates %>
   % Perl code line, treated as "<% line =%>"

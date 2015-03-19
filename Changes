@@ -1,5 +1,5 @@
 
-6.04  2015-03-17
+6.04  2015-03-19
 
 6.03  2015-03-16
   - Added support for overriding the HTTP request method with the _method query

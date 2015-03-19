@@ -66,7 +66,13 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
 
   # myapp.conf (it's just Perl returning a hash)
   {
-    foo       => "bar",
+    # A random value
+    foo => "bar",
+
+    # Nested data structures are fine too
+    baz => ['♥'],
+
+    # You have full access to the application
     music_dir => app->home->rel_dir('music')
   };
 

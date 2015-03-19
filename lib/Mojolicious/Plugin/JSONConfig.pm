@@ -41,8 +41,14 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
 
   # myapp.json (it's just JSON with embedded Perl)
   {
-    "foo"       : "bar",
-    "music_dir" : "<%= app->home->rel_dir('music') %>"
+    %# A random value
+    "foo": "bar",
+
+    %# Nested data structures are fine too
+    "baz": ["♥"],
+
+    %# You have full access to the application
+    "music_dir": "<%= app->home->rel_dir('music') %>"
   }
 
   # Mojolicious

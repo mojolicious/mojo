@@ -18,9 +18,9 @@ my $PSEUDO_CLASS_RE = qr/(?::([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
 my $TOKEN_RE        = qr/
   (\s*,\s*)?                            # Separator
   ((?:[^[\\:\s,>+~]|$ESCAPE_RE\s?)+)?   # Element
-  ($PSEUDO_CLASS_RE*)?                  # Pseudoclass
+  ($PSEUDO_CLASS_RE*)?                  # Pseudo-class
   ((?:$ATTR_RE)*)?                      # Attributes
-  ($PSEUDO_CLASS_RE*)?                  # Pseudoclass (again)
+  ($PSEUDO_CLASS_RE*)?                  # Pseudo-class (again)
   (?:\s*([>+~]))?                       # Combinator
 /x;
 

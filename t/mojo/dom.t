@@ -850,7 +850,7 @@ is $dom->at('[foo="bar"]')->next->text, 'B', 'right text';
 is $dom->at('[foo="bar"]')->next->previous->text, 'A', 'right text';
 is $dom->at('[foo="bar"]')->next->next->next->next, undef, 'no next sibling';
 
-# Pseudo classes
+# Pseudo-classes
 $dom = Mojo::DOM->new(<<EOF);
 <form action="/foo">
     <input type="text" name="user" value="test" />
@@ -901,7 +901,7 @@ is $dom->at(':empty[type^="ch"]')->attr->{name}, 'groovy',  'right name';
 is $dom->at('p')->attr->{id},                    'content', 'right attribute';
 is $dom->at('p:empty')->attr->{id}, 'no_content', 'right attribute';
 
-# More pseudo classes
+# More pseudo-classes
 $dom = Mojo::DOM->new(<<EOF);
 <ul>
     <li>A</li>
@@ -1040,7 +1040,7 @@ is_deeply \@li, [qw(A B C D E F G)], 'found first three li elements';
 $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(A B C D E F G)], 'found first three li elements';
 
-# Even more pseudo classes
+# Even more pseudo-classes
 $dom = Mojo::DOM->new(<<EOF);
 <ul>
     <li>A</li>
@@ -1160,6 +1160,19 @@ is_deeply \@e, ['J'], 'found only child';
 @e = ();
 $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(J K)], 'found only child';
+
+# Pseudo-classes in different places
+$dom = Mojo::DOM->new('<a href="http://foo">It works!</a>');
+is $dom->at('a:not([href*="example.com"])[href^="http"]')->text, 'It works!',
+  'right text';
+is $dom->at(':not([href*="foo"])a[href^="http"]'), undef, 'no result';
+is $dom->at('a[href^="http"]:not([href*="example.com"])')->text, 'It works!',
+  'right text';
+is $dom->at('a[href^="http"]:not([href*="foo"])'), undef, 'no result';
+is $dom->at('a:not(b)[href^="h"]:not([href*="e"])')->text, 'It works!',
+  'right text';
+is $dom->at('a:not(a)[href^="h"]:not([href*="e"])'), undef, 'no result';
+is $dom->at('a:not(b)[href^="h"]:not([href*="f"])'), undef, 'no result';
 
 # Sibling combinator
 $dom = Mojo::DOM->new(<<EOF);

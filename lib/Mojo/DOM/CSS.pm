@@ -20,6 +20,7 @@ my $TOKEN_RE        = qr/
   ((?:[^[\\:\s,>+~]|$ESCAPE_RE\s?)+)?   # Element
   ($PSEUDO_CLASS_RE*)?                  # Pseudoclass
   ((?:$ATTR_RE)*)?                      # Attributes
+  ($PSEUDO_CLASS_RE*)?                  # Pseudoclass (again)
   (?:\s*([>+~]))?                       # Combinator
 /x;
 
@@ -81,10 +82,10 @@ sub _compile {
 
   my $pattern = [[]];
   while ($css =~ /$TOKEN_RE/go) {
-    my ($separator, $element, $pc, $attrs, $combinator)
-      = ($1, $2 // '', $3, $6, $12);
+    my ($separator, $element, $pc, $attrs, $pc2, $combinator)
+      = ($1, $2 // '', $3, $6, $12, $15);
 
-    next unless $separator || $element || $pc || $attrs || $combinator;
+    next unless $separator || $element || $pc || $attrs || $pc2 || $combinator;
 
     # New selector
     push @$pattern, [] if $separator;
@@ -104,7 +105,8 @@ sub _compile {
       push @$selector, ['attr', _name($name), _value($op, $2)];
     }
 
-    # Pseudo classes (":not" contains more selectors)
+    # Pseudo-classes (":not" contains more selectors)
+    $pc = $pc && $pc2 ? "$pc$pc2" : $pc || $pc2;
     push @$selector, ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)]
       while $pc =~ /$PSEUDO_CLASS_RE/go;
 
@@ -228,7 +230,7 @@ sub _selector {
     # Attribute
     elsif ($type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
 
-    # Pseudo class
+    # Pseudo-class
     elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current) }
   }
 

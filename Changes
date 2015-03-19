@@ -1,5 +1,7 @@
 
-6.04  2015-03-19
+6.04  2015-03-20
+  - Fixed bug in Mojo::DOM::CSS where pseudo-classes following attribute
+    selectors were not handled correctly.
 
 6.03  2015-03-16
   - Added support for overriding the HTTP request method with the _method query
@@ -227,7 +229,7 @@
 
 5.66  2014-11-26
   - Improved many WebSocket tests in Test::Mojo to be able to fail gracefully.
-  - Fixed bug in Mojo::DOM::CSS where the :empty pseudo class would not ignore
+  - Fixed bug in Mojo::DOM::CSS where the :empty pseudo-class would not ignore
     comments and processing instructions.
 
 5.65  2014-11-24
@@ -3025,7 +3027,7 @@
   - Reverted deprecation of Perl 5.8.x support, by popular demand.
   - Added FAQ entry to clarify the Perl 5.8.x situation.
   - Fixed case-sensitivity of Mojo::DOM in XML mode.
-  - Fixed pseudo class case handling in Mojo::DOM. (Akron)
+  - Fixed pseudo-class case handling in Mojo::DOM. (Akron)
 
 1.3  2011-05-05
   - Code name "Tropical Drink", this is a major release.
@@ -3392,7 +3394,7 @@
   - Added x function to ojo. (DaTa)
   - Added failed request warnings to ojo. (marcus)
   - Added support for selector groups to Mojo::DOM.
-  - Added more attribute selectors, pseudo classes and combinators to
+  - Added more attribute selectors, pseudo-classes and combinators to
     Mojo::DOM.
   - Added support for mode specific configuration files to
     Mojolicious::Plugin::JsonConfig. (marcus)

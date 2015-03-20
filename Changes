@@ -1,7 +1,7 @@
 
 6.04  2015-03-20
-  - Fixed bug in Mojo::DOM::CSS where pseudo-classes following attribute
-    selectors were not handled correctly.
+  - Fixed a few bugs in Mojo::DOM::CSS that required class, id and attribute
+    selectors, as well as pseudo-classes, to be in a specific order.
 
 6.03  2015-03-16
   - Added support for overriding the HTTP request method with the _method query

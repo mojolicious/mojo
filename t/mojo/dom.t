@@ -808,7 +808,10 @@ is $dom->content, '<a>xxx<x>x</x>xxx</a>', 'right result';
 
 # Multiple selectors
 $dom = Mojo::DOM->new(
-  '<div id="a">A</div><div id="b">B</div><div id="c">C</div>');
+  '<div id="a">A</div><div id="b">B</div><div id="c">C</div><p>D</p>');
+@div = ();
+$dom->find('p, div')->each(sub { push @div, shift->text });
+is_deeply \@div, [qw(A B C D)], 'found all elements';
 @div = ();
 $dom->find('#a, #c')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw(A C)], 'found all div elements with the right ids';
@@ -1161,19 +1164,6 @@ is_deeply \@e, ['J'], 'found only child';
 $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(J K)], 'found only child';
 
-# Pseudo-classes in different places
-$dom = Mojo::DOM->new('<a href="http://foo">It works!</a>');
-is $dom->at('a:not([href*="example.com"])[href^="http"]')->text, 'It works!',
-  'right text';
-is $dom->at(':not([href*="foo"])a[href^="http"]'), undef, 'no result';
-is $dom->at('a[href^="http"]:not([href*="example.com"])')->text, 'It works!',
-  'right text';
-is $dom->at('a[href^="http"]:not([href*="foo"])'), undef, 'no result';
-is $dom->at('a:not(b)[href^="h"]:not([href*="e"])')->text, 'It works!',
-  'right text';
-is $dom->at('a:not(a)[href^="h"]:not([href*="e"])'), undef, 'no result';
-is $dom->at('a:not(b)[href^="h"]:not([href*="f"])'), undef, 'no result';
-
 # Sibling combinator
 $dom = Mojo::DOM->new(<<EOF);
 <ul>
@@ -1183,7 +1173,7 @@ $dom = Mojo::DOM->new(<<EOF);
 </ul>
 <h1>D</h1>
 <p id="♥">E</p>
-<p id="☃">F</p>
+<p id="☃">F<b>H</b></p>
 <div>G</div>
 EOF
 is $dom->at('li ~ p')->text,       'B', 'right text';
@@ -1207,8 +1197,9 @@ is $dom->at('ul + h1 + p + p + div')->text, 'G', 'right text';
 is $dom->at('ul + h1 ~ p + div')->text,     'G', 'right text';
 is $dom->at('h1 ~ #♥')->text,             'E', 'right text';
 is $dom->at('h1 + #♥')->text,             'E', 'right text';
-is $dom->at('#♥ ~ #☃')->text,           'F', 'right text';
-is $dom->at('#♥ + #☃')->text,           'F', 'right text';
+is $dom->at('#♥~#☃')->text,             'F', 'right text';
+is $dom->at('#♥+#☃')->text,             'F', 'right text';
+is $dom->at('#♥+#☃>b')->text,           'H', 'right text';
 is $dom->at('#♥ > #☃'), undef, 'no result';
 is $dom->at('#♥ #☃'),   undef, 'no result';
 is $dom->at('#♥ + #☃ + :nth-last-child(1)')->text,  'G', 'right text';
@@ -2369,6 +2360,20 @@ is $dom->find('div > ul li')->[1]->text, 'B', 'right text';
 is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
+
+# Unusual order
+$dom = Mojo::DOM->new(
+  '<a href="http://example.com" id="foo" class="bar">Ok!</a>');
+is $dom->at('a:not([href$=foo])[href^=h]')->text, 'Ok!', 'right text';
+is $dom->at('a:not([href$=example.com])[href^=h]'), undef, 'no result';
+is $dom->at('a[href^=h]#foo.bar')->text, 'Ok!', 'right text';
+is $dom->at('a[href^=h]#foo.baz'), undef, 'no result';
+is $dom->at('a[href^=h]#foo:not(b)')->text, 'Ok!', 'right text';
+is $dom->at('a[href^=h]#foo:not(a)'), undef, 'no result';
+is $dom->at('[href^=h].bar:not(b)[href$=m]#foo')->text, 'Ok!', 'right text';
+is $dom->at('[href^=h].bar:not(b)[href$=m]#bar'), undef, 'no result';
+is $dom->at(':not(b)#foo#foo')->text, 'Ok!', 'right text';
+is $dom->at(':not(b)#foo#bar'), undef, 'no result';
 
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');

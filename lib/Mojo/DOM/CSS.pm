@@ -14,15 +14,7 @@ my $ATTR_RE   = qr/
   )?
   \]
 /x;
-my $PSEUDO_CLASS_RE = qr/(?::([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
-my $TOKEN_RE        = qr/
-  (\s*,\s*)?                            # Separator
-  ((?:[^[\\:\s,>+~]|$ESCAPE_RE\s?)+)?   # Element
-  ($PSEUDO_CLASS_RE*)?                  # Pseudo-class
-  ((?:$ATTR_RE)*)?                      # Attributes
-  ($PSEUDO_CLASS_RE*)?                  # Pseudo-class (again)
-  (?:\s*([>+~]))?                       # Combinator
-/x;
+my $PSEUDO_CLASS_RE = qr/:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/;
 
 sub matches {
   my $tree = shift->tree;
@@ -81,41 +73,41 @@ sub _compile {
   my $css = "$_[0]";
 
   my $pattern = [[]];
-  while ($css =~ /$TOKEN_RE/go) {
-    my ($separator, $element, $pc, $attrs, $pc2, $combinator)
-      = ($1, $2 // '', $3, $6, $12, $15);
+  while ($css) {
 
-    next unless $separator || $element || $pc || $attrs || $pc2 || $combinator;
-
-    # New selector
-    push @$pattern, [] if $separator;
+    # Separator
     my $part = $pattern->[-1];
+    push @$part, [] unless @$part && ref $part->[-1];
+    my $selector = $part->[-1];
+    if ($css =~ s/^\s*,\s*//) { push @$pattern, [] }
 
-    # Empty combinator
-    push @$part, ' ' if $part->[-1] && ref $part->[-1];
-
-    # Tag
-    push @$part, my $selector = [];
-    push @$selector, ['tag', _name($1)]
-      if $element =~ s/^((?:\\\.|\\\#|[^.#])+)// && $1 ne '*';
+    # Combinator
+    elsif ($css =~ s/^\s*([ >+~])\s*//) { push @$part, $1 }
 
     # Class or ID
-    while ($element =~ /(?:([.#])((?:\\[.\#]|[^\#.])+))/g) {
+    elsif ($css =~ s/^([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)//o) {
       my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
       push @$selector, ['attr', _name($name), _value($op, $2)];
     }
 
-    # Pseudo-classes (":not" contains more selectors)
-    $pc = $pc && $pc2 ? "$pc$pc2" : $pc || $pc2;
-    push @$selector, ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)]
-      while $pc =~ /$PSEUDO_CLASS_RE/go;
-
     # Attributes
-    push @$selector, ['attr', _name($1), _value($2 // '', $3 // $4, $5)]
-      while $attrs =~ /$ATTR_RE/go;
+    elsif ($css =~ s/^$ATTR_RE//o) {
+      push @$selector, ['attr', _name($1), _value($2 // '', $3 // $4, $5)];
+    }
 
-    # Combinator
-    push @$part, $combinator if $combinator;
+    # Pseudo-class (":not" contains more selectors)
+    elsif ($css =~ s/^$PSEUDO_CLASS_RE//o) {
+      push @$selector,
+        ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)];
+    }
+
+    # Tag
+    elsif ($css =~ s/^((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)//o) {
+      push @$selector, ['tag', _name($1)] unless $1 eq '*';
+    }
+
+    else {last}
+
   }
 
   return $pattern;

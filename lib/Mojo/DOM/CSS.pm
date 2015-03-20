@@ -71,43 +71,42 @@ sub _combinator {
 sub _compile {
   my $css = "$_[0]";
 
-  my $pattern = [[]];
-  while (my $part = $pattern->[-1]) {
-    push @$part, [] unless @$part && ref $part->[-1];
-    my $selector = $part->[-1];
+  my $group = [[]];
+  while (my $selectors = $group->[-1]) {
+    push @$selectors, [] unless @$selectors && ref $selectors->[-1];
+    my $last = $selectors->[-1];
 
     # Separator
-    if ($css =~ /\G\s*,\s*/gc) { push @$pattern, [] }
+    if ($css =~ /\G\s*,\s*/gc) { push @$group, [] }
 
     # Combinator
-    elsif ($css =~ /\G\s*([ >+~])\s*/gc) { push @$part, $1 }
+    elsif ($css =~ /\G\s*([ >+~])\s*/gc) { push @$selectors, $1 }
 
     # Class or ID
     elsif ($css =~ /\G([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
       my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
-      push @$selector, ['attr', _name($name), _value($op, $2)];
+      push @$last, ['attr', _name($name), _value($op, $2)];
     }
 
     # Attributes
     elsif ($css =~ /\G$ATTR_RE/gco) {
-      push @$selector, ['attr', _name($1), _value($2 // '', $3 // $4, $5)];
+      push @$last, ['attr', _name($1), _value($2 // '', $3 // $4, $5)];
     }
 
     # Pseudo-class (":not" contains more selectors)
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
-      push @$selector,
-        ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)];
+      push @$last, ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)];
     }
 
     # Tag
     elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
-      push @$selector, ['tag', _name($1)] unless $1 eq '*';
+      push @$last, ['tag', _name($1)] unless $1 eq '*';
     }
 
     else {last}
   }
 
-  return $pattern;
+  return $group;
 }
 
 sub _empty { $_[0][0] eq 'comment' || $_[0][0] eq 'pi' }
@@ -132,8 +131,8 @@ sub _equation {
 }
 
 sub _match {
-  my ($pattern, $current, $tree) = @_;
-  _combinator([reverse @$_], $current, $tree, 0) and return 1 for @$pattern;
+  my ($group, $current, $tree) = @_;
+  _combinator([reverse @$_], $current, $tree, 0) and return 1 for @$group;
   return undef;
 }
 
@@ -192,7 +191,7 @@ sub _pc {
 }
 
 sub _select {
-  my ($one, $tree, $pattern) = @_;
+  my ($one, $tree, $group) = @_;
 
   my @results;
   my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
@@ -200,7 +199,7 @@ sub _select {
     next unless $current->[0] eq 'tag';
 
     unshift @queue, @$current[4 .. $#$current];
-    next unless _match($pattern, $current, $tree);
+    next unless _match($group, $current, $tree);
     $one ? return $current : push @results, $current;
   }
 

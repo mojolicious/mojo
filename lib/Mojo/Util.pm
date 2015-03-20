@@ -391,28 +391,28 @@ sub _global_destruction {
 sub _header {
   my ($str, $cookie) = @_;
 
-  my (@tree, @token);
-  while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
-    push @token, $1, undef;
-    my $expires = $cookie && @token > 2 && lc $1 eq 'expires';
+  my (@tree, @part);
+  while ($str =~ /\G[,;\s]*([^=;, ]+)\s*/gc) {
+    push @part, $1, undef;
+    my $expires = $cookie && @part > 2 && lc $1 eq 'expires';
 
     # Special "expires" value
-    if ($expires && $str =~ s/^=\s*$EXPIRES_RE//o) { $token[-1] = $1 }
+    if ($expires && $str =~ /\G=\s*$EXPIRES_RE/gco) { $part[-1] = $1 }
 
     # Quoted value
-    elsif ($str =~ s/^=\s*("(?:\\\\|\\"|[^"])*")//) { $token[-1] = unquote $1 }
+    elsif ($str =~ /\G=\s*("(?:\\\\|\\"|[^"])*")/gc) { $part[-1] = unquote $1 }
 
     # Unquoted value
-    elsif ($str =~ s/^=\s*([^;, ]*)//) { $token[-1] = $1 }
+    elsif ($str =~ /\G=\s*([^;, ]*)/gc) { $part[-1] = $1 }
 
     # Separator
-    next unless $str =~ s/^[;\s]*,\s*//;
-    push @tree, [@token];
-    @token = ();
+    next unless $str =~ /\G[;\s]*,\s*/gc;
+    push @tree, [@part];
+    @part = ();
   }
 
-  # Take care of final token
-  return [@token ? (@tree, \@token) : @tree];
+  # Take care of final part
+  return [@part ? (@tree, \@part) : @tree];
 }
 
 sub _options {

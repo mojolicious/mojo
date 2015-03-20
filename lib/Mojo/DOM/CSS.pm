@@ -72,36 +72,36 @@ sub _compile {
   my $css = "$_[0]";
 
   my $pattern = [[]];
-  while ($css) {
+  while (1) {
 
     # Separator
     my $part = $pattern->[-1];
     push @$part, [] unless @$part && ref $part->[-1];
     my $selector = $part->[-1];
-    if ($css =~ s/^\s*,\s*//) { push @$pattern, [] }
+    if ($css =~ /\G\s*,\s*/gc) { push @$pattern, [] }
 
     # Combinator
-    elsif ($css =~ s/^\s*([ >+~])\s*//) { push @$part, $1 }
+    elsif ($css =~ /\G\s*([ >+~])\s*/gc) { push @$part, $1 }
 
     # Class or ID
-    elsif ($css =~ s/^([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)//o) {
+    elsif ($css =~ /\G([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
       my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
       push @$selector, ['attr', _name($name), _value($op, $2)];
     }
 
     # Attributes
-    elsif ($css =~ s/^$ATTR_RE//o) {
+    elsif ($css =~ /\G$ATTR_RE/gco) {
       push @$selector, ['attr', _name($1), _value($2 // '', $3 // $4, $5)];
     }
 
     # Pseudo-class (":not" contains more selectors)
-    elsif ($css =~ s/^:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?//) {
+    elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       push @$selector,
         ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)];
     }
 
     # Tag
-    elsif ($css =~ s/^((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)//o) {
+    elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
       push @$selector, ['tag', _name($1)] unless $1 eq '*';
     }
 

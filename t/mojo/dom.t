@@ -10,6 +10,9 @@ is(Mojo::DOM->new->parse(''),          '',    'right result');
 is(Mojo::DOM->new->at('p'),            undef, 'no result');
 is(Mojo::DOM->new->append_content(''), '',    'right result');
 
+# Invalid selector
+is(Mojo::DOM->new->at('...'), undef, 'no result');
+
 # Simple (basics)
 my $dom = Mojo::DOM->new(
   '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');

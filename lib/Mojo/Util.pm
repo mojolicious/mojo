@@ -392,21 +392,21 @@ sub _header {
   my ($str, $cookie) = @_;
 
   my (@tree, @part);
-  while ($str =~ /\G[,;\s]*([^=;, ]+)\s*/gc) {
+  while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
     push @part, $1, undef;
     my $expires = $cookie && @part > 2 && lc $1 eq 'expires';
 
     # Special "expires" value
-    if ($expires && $str =~ /\G=\s*$EXPIRES_RE/gco) { $part[-1] = $1 }
+    if ($expires && $str =~ s/^=\s*$EXPIRES_RE//o) { $part[-1] = $1 }
 
     # Quoted value
-    elsif ($str =~ /\G=\s*("(?:\\\\|\\"|[^"])*")/gc) { $part[-1] = unquote $1 }
+    elsif ($str =~ s/^=\s*("(?:\\\\|\\"|[^"])*")//) { $part[-1] = unquote $1 }
 
     # Unquoted value
-    elsif ($str =~ /\G=\s*([^;, ]*)/gc) { $part[-1] = $1 }
+    elsif ($str =~ s/^=\s*([^;, ]*)//) { $part[-1] = $1 }
 
     # Separator
-    next unless $str =~ /\G[;\s]*,\s*/gc;
+    next unless $str =~ s/^[;\s]*,\s*//;
     push @tree, [@part];
     @part = ();
   }

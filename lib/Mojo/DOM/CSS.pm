@@ -14,7 +14,6 @@ my $ATTR_RE   = qr/
   )?
   \]
 /x;
-my $PSEUDO_CLASS_RE = qr/:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/;
 
 sub matches {
   my $tree = shift->tree;
@@ -96,7 +95,7 @@ sub _compile {
     }
 
     # Pseudo-class (":not" contains more selectors)
-    elsif ($css =~ s/^$PSEUDO_CLASS_RE//o) {
+    elsif ($css =~ s/^:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?//) {
       push @$selector,
         ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)];
     }
@@ -107,7 +106,6 @@ sub _compile {
     }
 
     else {last}
-
   }
 
   return $pattern;

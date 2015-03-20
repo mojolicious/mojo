@@ -49,7 +49,8 @@ ok !$writable, 'handle is not writable';
 
 # Accept
 my $server = $listen->accept;
-$reactor->remove($listen);
+ok $reactor->remove($listen), 'removed';
+ok !$reactor->remove($listen), 'not removed again';
 ($readable, $writable) = ();
 $reactor->io($client => sub { pop() ? $writable++ : $readable++ });
 $reactor->again($reactor->timer(0.025 => sub { shift->stop }));
@@ -58,7 +59,7 @@ ok !$readable, 'handle is not readable';
 ok $writable, 'handle is writable';
 print $client "hello!\n";
 sleep 1;
-$reactor->remove($client);
+ok $reactor->remove($client), 'removed';
 ($readable, $writable) = ();
 $reactor->io($server => sub { pop() ? $writable++ : $readable++ });
 $reactor->watch($server, 1, 0);
@@ -94,7 +95,7 @@ ok $writable, 'handle is writable';
 # Timers
 my ($timer, $recurring);
 $reactor->timer(0 => sub { $timer++ });
-$reactor->remove($reactor->timer(0 => sub { $timer++ }));
+ok $reactor->remove($reactor->timer(0 => sub { $timer++ })), 'removed';
 my $id = $reactor->recurring(0 => sub { $recurring++ });
 ($readable, $writable) = ();
 $reactor->timer(0.025 => sub { shift->stop });
@@ -118,7 +119,8 @@ ok $readable, 'handle is readable again';
 ok $writable, 'handle is writable again';
 ok !$timer, 'timer was not triggered';
 ok $recurring, 'recurring was triggered again';
-$reactor->remove($id);
+ok $reactor->remove($id), 'removed';
+ok !$reactor->remove($id), 'not removed again';
 ($readable, $writable, $timer, $recurring) = ();
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
@@ -199,6 +201,17 @@ $reactor->start;
 is $pair, 2, 'timer pair was triggered';
 ok $single, 'single timer was triggered';
 ok $last,   'timers were triggered in the right order';
+
+# Restart inactive timer
+$id = $reactor->timer(0 => sub { });
+ok $reactor->remove($id), 'removed';
+eval { $reactor->again($id) };
+like $@, qr/Timer not active/, 'right error';
+
+# Change inactive I/O watcher
+ok !$reactor->remove($listen), 'not removed again';
+eval { $reactor->watch($listen, 1, 1) };
+like $@, qr!I/O watcher not active!, 'right error';
 
 # Error
 my $err;

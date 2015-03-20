@@ -1,5 +1,7 @@
 
 6.04  2015-03-20
+  - Improved Mojo::Reactor::EV and Mojo::Reactor::Poll to fail more
+    consistently.
   - Fixed a few bugs in Mojo::DOM::CSS that required class, id and attribute
     selectors, as well as pseudo-classes, to be in a specific order.
 

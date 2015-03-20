@@ -1,6 +1,7 @@
 package Mojo::Reactor::EV;
 use Mojo::Base 'Mojo::Reactor::Poll';
 
+use Carp 'croak';
 use EV 4.0;
 
 my $EV;
@@ -9,7 +10,10 @@ sub CLONE { die "EV does not work with ithreads.\n" }
 
 sub DESTROY { undef $EV }
 
-sub again { shift->{timers}{shift()}{watcher}->again }
+sub again {
+  croak 'Timer not active' unless my $timer = shift->{timers}{shift()};
+  $timer->{watcher}->again;
+}
 
 sub is_running { !!EV::depth }
 
@@ -29,13 +33,15 @@ sub timer { shift->_timer(0, @_) }
 sub watch {
   my ($self, $handle, $read, $write) = @_;
 
+  my $fd = fileno $handle;
+  croak 'I/O watcher not active' unless my $io = $self->{io}{$fd};
+
   my $mode = 0;
   $mode |= EV::READ  if $read;
   $mode |= EV::WRITE if $write;
 
-  my $fd = fileno $handle;
-  if ($mode == 0) { delete $self->{io}{$fd}{watcher} }
-  elsif (my $w = $self->{io}{$fd}{watcher}) { $w->events($mode) }
+  if ($mode == 0) { delete $io->{watcher} }
+  elsif (my $w = $io->{watcher}) { $w->events($mode) }
   else {
     my $cb = sub {
       my ($w, $revents) = @_;
@@ -43,7 +49,7 @@ sub watch {
       $self->_sandbox('Write', $self->{io}{$fd}{cb}, 1)
         if EV::WRITE & $revents && $self->{io}{$fd};
     };
-    $self->{io}{$fd}{watcher} = EV::io($fd, $mode, $cb);
+    $io->{watcher} = EV::io($fd, $mode, $cb);
   }
 
   return $self;
@@ -121,7 +127,7 @@ implements the following new ones.
 
   $reactor->again($id);
 
-Restart active timer.
+Restart timer. Note that this method requires an active timer.
 
 =head2 is_running
 

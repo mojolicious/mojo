@@ -1,13 +1,14 @@
 package Mojo::Reactor::Poll;
 use Mojo::Base 'Mojo::Reactor';
 
+use Carp 'croak';
 use IO::Poll qw(POLLERR POLLHUP POLLIN POLLNVAL POLLOUT POLLPRI);
 use List::Util 'min';
 use Mojo::Util qw(md5_sum steady_time);
 use Time::HiRes 'usleep';
 
 sub again {
-  my $timer = shift->{timers}{shift()};
+  croak 'Timer not active' unless my $timer = shift->{timers}{shift()};
   $timer->{time} = steady_time + $timer->{after};
 }
 
@@ -98,10 +99,10 @@ sub timer { shift->_timer(0, @_) }
 sub watch {
   my ($self, $handle, $read, $write) = @_;
 
-  my $mode = 0;
-  $mode |= POLLIN | POLLPRI if $read;
-  $mode |= POLLOUT if $write;
-  $self->{io}{fileno $handle}{mode} = $mode;
+  croak 'I/O watcher not active' unless my $io = $self->{io}{fileno $handle};
+  $io->{mode} = 0;
+  $io->{mode} |= POLLIN | POLLPRI if $read;
+  $io->{mode} |= POLLOUT if $write;
 
   return $self;
 }
@@ -186,7 +187,7 @@ implements the following new ones.
 
   $reactor->again($id);
 
-Restart active timer.
+Restart timer. Note that this method requires an active timer.
 
 =head2 io
 

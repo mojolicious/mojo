@@ -577,19 +577,31 @@ Size of content already received from message in bytes.
 
 =head2 write
 
+  $content = $content->write;
+  $content = $content->write('');
   $content = $content->write($bytes);
   $content = $content->write($bytes => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be invoked
-once all data has been written.
+once all data has been written. You can write an empty chunk at any time to end
+the stream.
+
+  # Start dynamic content, but do not write anything yet
+  $content->write;
 
 =head2 write_chunk
 
+  $content = $content->write_chunk;
+  $content = $content->write_chunk('');
   $content = $content->write_chunk($bytes);
   $content = $content->write_chunk($bytes => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
-optional drain callback will be invoked once all data has been written.
+optional drain callback will be invoked once all data has been written. You can
+write an empty chunk at any time to end the stream.
+
+  # Start dynamic content, but do not write anything yet
+  $content->write_chunk;
 
 =head1 SEE ALSO
 

@@ -921,12 +921,16 @@ parameters, so you have to make sure it is not excessively large, there's a
 =head2 write
 
   $c = $c->write;
+  $c = $c->write('');
   $c = $c->write($bytes);
   $c = $c->write(sub {...});
   $c = $c->write($bytes => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be invoked
 once all data has been written.
+
+  # Start dynamic content, but do not write anything yet
+  $c->write;
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
@@ -944,6 +948,24 @@ once all data has been written.
     });
   });
 
+You can call L</"finish"> or write an empty chunk at any time to end the
+stream.
+
+  HTTP/1.1 200 OK
+  Connection: keep-alive
+  Date: Sat, 13 Sep 2014 16:48:29 GMT
+  Content-Length: 6
+  Server: Mojolicious (Perl)
+
+  Hello!
+
+  HTTP/1.1 200 OK
+  Connection: close
+  Date: Sat, 13 Sep 2014 16:48:29 GMT
+  Server: Mojolicious (Perl)
+
+  Hello!
+
 For Comet (long polling) you might also want to increase the inactivity timeout
 with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which usually
 defaults to C<15> seconds.
@@ -954,12 +976,16 @@ defaults to C<15> seconds.
 =head2 write_chunk
 
   $c = $c->write_chunk;
+  $c = $c->write_chunk('');
   $c = $c->write_chunk($bytes);
   $c = $c->write_chunk(sub {...});
   $c = $c->write_chunk($bytes => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.
+
+  # Start dynamic content, but do not write anything yet
+  $c->write_chunk;
 
   # Make sure previous chunk has been written before continuing
   $c->write_chunk('He' => sub {
@@ -970,7 +996,14 @@ optional drain callback will be invoked once all data has been written.
     });
   });
 
-You can call L</"finish"> at any time to end the stream.
+You can call L</"finish"> or write an empty chunk at any time to end the
+stream.
+
+  HTTP/1.1 200 OK
+  Connection: keep-alive
+  Date: Sat, 13 Sep 2014 16:48:29 GMT
+  Transfer-Encoding: chunked
+  Server: Mojolicious (Perl)
 
   2
   He

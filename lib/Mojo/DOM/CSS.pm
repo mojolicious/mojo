@@ -72,12 +72,11 @@ sub _compile {
   my $css = "$_[0]";
 
   my $pattern = [[]];
-  while (1) {
-
-    # Separator
-    my $part = $pattern->[-1];
+  while (my $part = $pattern->[-1]) {
     push @$part, [] unless @$part && ref $part->[-1];
     my $selector = $part->[-1];
+
+    # Separator
     if ($css =~ /\G\s*,\s*/gc) { push @$pattern, [] }
 
     # Combinator

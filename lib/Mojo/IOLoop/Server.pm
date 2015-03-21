@@ -49,7 +49,7 @@ sub listen {
   $fd = $1 if $port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/;
 
   # Allow file descriptor inheritance
-  local $^F = 1000;
+  local $^F = 1023;
 
   # Reuse file descriptor
   my $handle;

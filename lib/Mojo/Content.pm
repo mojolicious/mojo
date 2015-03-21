@@ -589,6 +589,15 @@ the stream.
   # Start dynamic content, but do not write anything yet
   $content->write;
 
+  # Make sure previous chunk has been written before continuing
+  $content->write('He' => sub {
+    my $content = shift;
+    $content->write('llo!' => sub {
+      my $content = shift;
+      $content->write('');
+    });
+  });
+
 =head2 write_chunk
 
   $content = $content->write_chunk;
@@ -602,6 +611,15 @@ write an empty chunk at any time to end the stream.
 
   # Start dynamic content, but do not write anything yet
   $content->write_chunk;
+
+  # Make sure previous chunk has been written before continuing
+  $content->write_chunk('He' => sub {
+    my $content = shift;
+    $content->write_chunk('llo!' => sub {
+      my $content = shift;
+      $content->write_chunk('');
+    });
+  });
 
 =head1 SEE ALSO
 

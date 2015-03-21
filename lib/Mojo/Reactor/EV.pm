@@ -62,7 +62,7 @@ sub _timer {
   my $id      = $self->_id;
   my $wrapper = sub {
     delete $self->{timers}{$id} unless $recurring;
-    $self->_sandbox("Timer $id", $cb);
+    $self->_sandbox('Timer', $cb);
   };
   EV::now_update() if $after > 0;
   $self->{timers}{$id}{watcher} = EV::timer($after, $after, $wrapper);

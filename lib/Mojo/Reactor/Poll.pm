@@ -71,7 +71,7 @@ sub one_tick {
       # Normal timer
       else { $self->remove($id) }
 
-      ++$i and $self->_sandbox("Timer $id", $t->{cb}) if $t->{cb};
+      ++$i and $self->_sandbox('Timer', $t->{cb}) if $t->{cb};
     }
   }
 }

@@ -225,16 +225,6 @@ server closed the connection before the user agent could receive the whole
 response or that the user agent got destroyed, which forces all connections to
 be closed immediately.
 
-  # The user agent goes out of scope and gets destroyed
-  {
-    my $ua = Mojo::UserAgent->new;
-    $ua->get('mojolicio.us' => sub {
-      my ($ua, $tx) = @_;
-      ...
-    });
-  }
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in

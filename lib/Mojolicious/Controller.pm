@@ -927,10 +927,9 @@ parameters, so you have to make sure it is not excessively large, there's a
   $c = $c->write($bytes => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be invoked
-once all data has been written.
-
-  # Finalize response headers and wait for dynamic content
-  $c->write;
+once all data has been written. Calling this method without a chunk of data
+will finalize the response headers and allow for dynamic content to be written
+later.
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
@@ -948,8 +947,8 @@ once all data has been written.
     });
   });
 
-You can call L</"finish"> or write an empty chunk at any time to end the
-stream.
+You can call L</"finish"> or write an empty chunk of data at any time to end
+the stream.
 
   HTTP/1.1 200 OK
   Connection: keep-alive
@@ -982,10 +981,9 @@ defaults to C<15> seconds.
   $c = $c->write_chunk($bytes => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
-optional drain callback will be invoked once all data has been written.
-
-  # Finalize response headers and wait for dynamic content
-  $c->write_chunk;
+optional drain callback will be invoked once all data has been written. Calling
+this method without a chunk of data will finalize the response headers and
+allow for dynamic content to be written later.
 
   # Make sure previous chunk has been written before continuing
   $c->write_chunk('H' => sub {
@@ -996,8 +994,8 @@ optional drain callback will be invoked once all data has been written.
     });
   });
 
-You can call L</"finish"> or write an empty chunk at any time to end the
-stream.
+You can call L</"finish"> or write an empty chunk of data at any time to end
+the stream.
 
   HTTP/1.1 200 OK
   Connection: keep-alive

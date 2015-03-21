@@ -583,13 +583,11 @@ Size of content already received from message in bytes.
   $content = $content->write($bytes => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be invoked
-once all data has been written. You can write an empty chunk at any time to end
-the stream.
+once all data has been written. Calling this method without a chunk of data
+will finalize the response headers and allow for dynamic content to be written
+later. You can write an empty chunk of data at any time to end the stream.
 
-  # Finalize response headers and wait for dynamic content
-  $content->write;
-
-  # Make sure previous chunk has been written before continuing
+  # Make sure previous chunk of data has been written before continuing
   $content->write('He' => sub {
     my $content = shift;
     $content->write('llo!' => sub {
@@ -606,13 +604,12 @@ the stream.
   $content = $content->write_chunk($bytes => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
-optional drain callback will be invoked once all data has been written. You can
-write an empty chunk at any time to end the stream.
+optional drain callback will be invoked once all data has been written. Calling
+this method without a chunk of data will finalize the response headers and
+allow for dynamic content to be written later. You can write an empty chunk of
+data at any time to end the stream.
 
-  # Finalize response headers and wait for dynamic content
-  $content->write_chunk;
-
-  # Make sure previous chunk has been written before continuing
+  # Make sure previous chunk of data has been written before continuing
   $content->write_chunk('He' => sub {
     my $content = shift;
     $content->write_chunk('llo!' => sub {

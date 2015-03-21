@@ -1063,7 +1063,7 @@ Sending a streaming request is almost just as easy.
   $tx = $ua->start($tx);
 
 The drain callback passed to L<Mojo::Content/"write"> will be invoked whenever
-the entire previous chunk has actually been written.
+the entire previous chunk of data has actually been written.
 
 =head2 Non-blocking
 

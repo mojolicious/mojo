@@ -683,8 +683,9 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     # Increase inactivity timeout for connection a bit
     $c->inactivity_timeout(300);
 
-    # Change content type
+    # Change content type and finalize response headers
     $c->res->headers->content_type('text/event-stream');
+    $c->write;
 
     # Subscribe to "message" event and forward "log" events to browser
     my $cb = $c->app->log->on(message => sub {

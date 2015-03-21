@@ -929,14 +929,14 @@ parameters, so you have to make sure it is not excessively large, there's a
 Write dynamic content non-blocking, the optional drain callback will be invoked
 once all data has been written.
 
-  # Start dynamic content, but do not write anything yet
+  # Finalize response headers and wait for dynamic content
   $c->write;
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
   $c->write('Hel' => sub {
     my $c = shift;
-    $c->write('lo!')
+    $c->write('lo!');
   });
 
   # Close connection when finished (without Content-Length header)
@@ -984,13 +984,13 @@ defaults to C<15> seconds.
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.
 
-  # Start dynamic content, but do not write anything yet
+  # Finalize response headers and wait for dynamic content
   $c->write_chunk;
 
   # Make sure previous chunk has been written before continuing
-  $c->write_chunk('He' => sub {
+  $c->write_chunk('H' => sub {
     my $c = shift;
-    $c->write_chunk('ll' => sub {
+    $c->write_chunk('ell' => sub {
       my $c = shift;
       $c->finish('o!');
     });
@@ -1005,10 +1005,10 @@ stream.
   Transfer-Encoding: chunked
   Server: Mojolicious (Perl)
 
-  2
-  He
-  2
-  ll
+  1
+  H
+  3
+  ell
   2
   o!
   0

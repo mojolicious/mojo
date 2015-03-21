@@ -586,7 +586,7 @@ Write dynamic content non-blocking, the optional drain callback will be invoked
 once all data has been written. You can write an empty chunk at any time to end
 the stream.
 
-  # Start dynamic content, but do not write anything yet
+  # Finalize response headers and wait for dynamic content
   $content->write;
 
   # Make sure previous chunk has been written before continuing
@@ -609,7 +609,7 @@ Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written. You can
 write an empty chunk at any time to end the stream.
 
-  # Start dynamic content, but do not write anything yet
+  # Finalize response headers and wait for dynamic content
   $content->write_chunk;
 
   # Make sure previous chunk has been written before continuing

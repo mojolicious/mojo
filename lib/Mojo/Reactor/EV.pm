@@ -148,6 +148,11 @@ Construct a new L<Mojo::Reactor::EV> object.
 Run reactor until an event occurs or no events are being watched anymore. Note
 that this method can recurse back into the reactor, so you need to be careful.
 
+  # Don't block longer than 0.5 seconds
+  my $id = $reactor->timer(0.5 => sub {});
+  $reactor->one_tick;
+  $reactor->remove($id);
+
 =head2 recurring
 
   my $id = $reactor->recurring(0.25 => sub {...});
@@ -161,6 +166,9 @@ amount of time in seconds.
 
 Start watching for I/O and timer events, this will block until L</"stop"> is
 called or no events are being watched anymore.
+
+  # Start reactor only if it is not running already
+  $reactor->start unless $reactor->is_running;
 
 =head2 stop
 
@@ -181,6 +189,18 @@ seconds.
 
 Change I/O events to watch handle for with true and false values. Note that
 this method requires an active I/O watcher.
+
+  # Watch only for readable events
+  $reactor->watch($handle, 1, 0);
+
+  # Watch only for writable events
+  $reactor->watch($handle, 0, 1);
+
+  # Watch for readable and writable events
+  $reactor->watch($handle, 1, 1);
+
+  # Pause watching for events
+  $reactor->watch($handle, 0, 0);
 
 =head1 SEE ALSO
 

@@ -48,10 +48,10 @@ sub one_tick {
 
           if ($mode & (POLLIN | POLLPRI | POLLNVAL | POLLHUP | POLLERR)) {
             next unless my $io = $self->{io}{$fd};
-            ++$i and $self->_sandbox('Read', $io->{cb}, 0);
+            ++$i and $self->_try('I/O watcher', $io->{cb}, 0);
           }
           next unless $mode & POLLOUT && (my $io = $self->{io}{$fd});
-          ++$i and $self->_sandbox('Write', $io->{cb}, 1);
+          ++$i and $self->_try('I/O watcher', $io->{cb}, 1);
         }
       }
     }
@@ -71,7 +71,7 @@ sub one_tick {
       # Normal timer
       else { $self->remove($id) }
 
-      ++$i and $self->_sandbox('Timer', $t->{cb}) if $t->{cb};
+      ++$i and $self->_try('Timer', $t->{cb}) if $t->{cb};
     }
   }
 }
@@ -114,11 +114,6 @@ sub _id {
   return $id;
 }
 
-sub _sandbox {
-  my ($self, $event, $cb) = (shift, shift, shift);
-  eval { $self->$cb(@_); 1 } or $self->emit(error => "$event failed: $@");
-}
-
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
 
@@ -128,6 +123,11 @@ sub _timer {
   $timer->{recurring} = $after if $recurring;
 
   return $id;
+}
+
+sub _try {
+  my ($self, $what, $cb) = (shift, shift, shift);
+  eval { $self->$cb(@_); 1 } or $self->emit(error => "$what failed: $@");
 }
 
 1;

@@ -45,8 +45,9 @@ sub watch {
   else {
     my $cb = sub {
       my ($w, $revents) = @_;
-      $self->_sandbox('Read', $self->{io}{$fd}{cb}, 0) if EV::READ & $revents;
-      $self->_sandbox('Write', $self->{io}{$fd}{cb}, 1)
+      $self->_try('I/O watcher', $self->{io}{$fd}{cb}, 0)
+        if EV::READ & $revents;
+      $self->_try('I/O watcher', $self->{io}{$fd}{cb}, 1)
         if EV::WRITE & $revents && $self->{io}{$fd};
     };
     $io->{watcher} = EV::io($fd, $mode, $cb);
@@ -62,7 +63,7 @@ sub _timer {
   my $id      = $self->_id;
   my $wrapper = sub {
     delete $self->{timers}{$id} unless $recurring;
-    $self->_sandbox('Timer', $cb);
+    $self->_try('Timer', $cb);
   };
   EV::now_update() if $after > 0;
   $self->{timers}{$id}{watcher} = EV::timer($after, $after, $wrapper);

@@ -2374,6 +2374,8 @@ is $dom->at('[href^=h].bar:not(b)[href$=m]#foo')->text, 'Ok!', 'right text';
 is $dom->at('[href^=h].bar:not(b)[href$=m]#bar'), undef, 'no result';
 is $dom->at(':not(b)#foo#foo')->text, 'Ok!', 'right text';
 is $dom->at(':not(b)#foo#bar'), undef, 'no result';
+is $dom->at(':not([href^=h]#foo#bar)')->text, 'Ok!', 'right text';
+is $dom->at(':not([href^=h]#foo#foo)'), undef, 'no result';
 
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');

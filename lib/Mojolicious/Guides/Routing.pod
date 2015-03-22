@@ -922,7 +922,7 @@ applications under a domain and/or prefix.
 
   app->start;
 
-=head2 Embedding applications
+=head2 Embed applications
 
 For a litte more power you can also embed applications by using them instead of
 a controller. This allows for example the use of the L<Mojolicious::Lite>

@@ -104,7 +104,7 @@ Mojo::Base - Minimal base class for Mojo projects
   use Mojo::Base -base;
 
   has name => 'Nyan';
-  has [qw(birds mice)] => 2;
+  has [qw(age weight)] => 4;
 
   package Tiger;
   use Mojo::Base 'Cat';
@@ -116,11 +116,11 @@ Mojo::Base - Minimal base class for Mojo projects
   use Mojo::Base -strict;
 
   my $mew = Cat->new(name => 'Longcat');
-  say $mew->mice;
-  say $mew->mice(3)->birds(4)->mice;
+  say $mew->age;
+  say $mew->age(3)->weight(5)->age;
 
-  my $rawr = Tiger->new(stripes => 23, mice => 0);
-  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->mice;
+  my $rawr = Tiger->new(stripes => 38, weight => 250);
+  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->weight;
 
 =head1 DESCRIPTION
 

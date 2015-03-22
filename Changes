@@ -1,5 +1,5 @@
 
-6.04  2015-03-22
+6.04  2015-03-23
   - Improved Mojo::Reactor::EV and Mojo::Reactor::Poll to fail more
     consistently.
   - Improved Mojo::Base performance slightly.

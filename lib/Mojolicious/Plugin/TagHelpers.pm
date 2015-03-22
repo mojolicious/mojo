@@ -360,6 +360,9 @@ Generate C<input> tag of type C<file>.
     %= text_field 'first_name'
     %= submit_button
   % end
+  %= form_for some_delete_route => begin
+    %= submit_button 'Remove'
+  % end
 
 Generate portable C<form> tag with L<Mojolicious::Controller/"url_for">. For
 routes that do not allow C<GET>, a C<method> attribute with the value C<POST>
@@ -381,6 +384,9 @@ C<_method> query parameter will be added as well.
   <form action="http://example.com/login" method="POST">
     <input name="first_name" type="text">
     <input value="Ok" type="submit">
+  </form>
+  <form action="/path/to/delete/route?_method=DELETE" method="POST">
+    <input value="Remove" type="submit">
   </form>
 
 =head2 hidden_field

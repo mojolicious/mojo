@@ -36,7 +36,7 @@ sub import {
     my $caller = caller;
     no strict 'refs';
     push @{"${caller}::ISA"}, $flag;
-    *{"${caller}::has"} = sub { attr($caller, @_) };
+    Mojo::Util::monkey_patch $caller, 'has', sub { attr($caller, @_) };
   }
 
   # Mojo modules are strict!

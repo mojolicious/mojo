@@ -1,7 +1,7 @@
 package Mojo::BaseTest::Base2;
 use Mojo::Base 'Mojo::BaseTest::Base1';
 
-has [qw(ears eyes)] => sub {2};
-has coconuts => 0;
+has [qw(bar baz)] => sub {2};
+has yada => 0;
 
 1;

@@ -591,7 +591,7 @@ value).
 
   my $html = $c->render_to_string('reminder', layout => 'mail');
 
-=head2 Including templates
+=head2 Include templates
 
 Like most helpers L<Mojolicious::Plugin::DefaultHelpers/"include"> is just a
 shortcut to make your life a little easier.

@@ -5,11 +5,12 @@ use warnings;
 use utf8;
 use feature ();
 
-# No imports because we get subclassed, a lot!
-use Carp ();
-
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
+
+# No imports because we get subclassed, a lot!
+use Carp ();
+use Mojo::Util;
 
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
@@ -44,37 +45,37 @@ sub import {
 }
 
 sub attr {
-  my ($self, $attrs, $default) = @_;
+  my ($self, $attrs, $value) = @_;
   return unless (my $class = ref $self || $self) && $attrs;
 
   Carp::croak 'Default has to be a code reference or constant value'
-    if ref $default && ref $default ne 'CODE';
+    if ref $value && ref $value ne 'CODE';
 
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
-    # Header (check arguments)
-    my $code = "sub ${class}::$attr {\n  if (\@_ == 1) {\n";
-
-    # No default value (return value)
-    unless (defined $default) { $code .= "    return \$_[0]{'$attr'};" }
-
-    # Default value
-    else {
-
-      # Return value
-      $code .= "    return \$_[0]{'$attr'} if exists \$_[0]{'$attr'};\n";
-
-      # Return default value
-      $code .= "    return \$_[0]{'$attr'} = ";
-      $code .= ref $default eq 'CODE' ? '$default->($_[0]);' : '$default;';
+    # Very performance sensitive code with lots of micro-optimizations
+    if (ref $value) {
+      Mojo::Util::monkey_patch $class, $attr, sub {
+        return
+          exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
+          if @_ == 1;
+        $_[0]{$attr} = $_[1];
+        $_[0];
+      };
     }
-
-    # Footer (store value and return invocant)
-    $code .= "\n  }\n  \$_[0]{'$attr'} = \$_[1];\n  \$_[0];\n}";
-
-    warn "-- Attribute $attr in $class\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
-    Carp::croak "Mojo::Base error: $@" unless eval "$code;1";
+    elsif (defined $value) {
+      Mojo::Util::monkey_patch $class, $attr, sub {
+        return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
+          if @_ == 1;
+        $_[0]{$attr} = $_[1];
+        $_[0];
+      };
+    }
+    else {
+      Mojo::Util::monkey_patch $class, $attr,
+        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
+    }
   }
 }
 

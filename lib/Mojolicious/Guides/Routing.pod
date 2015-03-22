@@ -903,11 +903,30 @@ applications.
 
   1;
 
+=head2 Mount applications
+
+The easiest way to embed one application into another is
+L<Mojolicious::Plugin::Mount>, which allows you to mount whole self-contained
+applications under a domain and/or prefix.
+
+  use Mojolicious::Lite;
+
+  # Whole application mounted under "/prefix"
+  plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
+
+  # Mount application with subdomain
+  plugin Mount => {'test.example.com' => '/home/sri/myapp2.pl'};
+
+  # Normal route
+  get '/' => sub { shift->render(text => 'Hello World!') };
+
+  app->start;
+
 =head2 Embedding applications
 
-You can easily embed whole applications simply by using them instead of a
-controller. This allows for example the use of the L<Mojolicious::Lite> domain
-specific language in normal L<Mojolicious> controllers.
+For a litte more power you can also embed applications by using them instead of
+a controller. This allows for example the use of the L<Mojolicious::Lite>
+domain specific language in normal L<Mojolicious> controllers.
 
   # Controller
   package MyApp::Controller::Bar;
@@ -945,26 +964,9 @@ containing a C<handler> method accepting L<Mojolicious::Controller> objects.
 
   1;
 
-You can also just use L<Mojolicious::Plugin::Mount> to mount whole
-self-contained applications under a domain and/or prefix.
-
-  use Mojolicious::Lite;
-
-  # Whole application mounted under "/prefix"
-  plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
-
-  # Mount application with subdomain
-  plugin Mount => {'test.example.com' => '/home/sri/myapp2.pl'};
-
-  # Normal route
-  get '/' => sub { shift->render(text => 'Hello World!') };
-
-  app->start;
-
 =head2 Application plugins
 
-Embedding L<Mojolicious> applications is easy, but it gets even easier if you
-package the whole thing as a self-contained reusable plugin.
+You can even package applications as self-contained reusable plugins.
 
   # Plugin
   package Mojolicious::Plugin::MyEmbeddedApp;

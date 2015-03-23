@@ -59,7 +59,7 @@
     node, preceding_siblings, previous_sibling and type methods in Mojo::DOM to
     descendant_nodes, child_nodes, following_nodes, matches, next_node, type,
     preceding_nodes, previous_node and tag.
-  - Renamed match method in Mojo::DOM::CSS to matches.
+  - Renamed match method in Mojo::DOM and Mojo::DOM::CSS to matches.
   - Renamed extract and inject methods in Mojo::UserAgent::CookieJar to collect
     and prepare.
   - Renamed inject method in Mojo::UserAgent::Proxy to prepare.

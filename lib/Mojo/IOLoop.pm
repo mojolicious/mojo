@@ -62,12 +62,7 @@ sub client {
       $self->$cb(undef, $stream);
     }
   );
-  $client->on(
-    error => sub {
-      $self->_remove($id);
-      $self->$cb(pop, undef);
-    }
-  );
+  $client->on(error => sub { $self->_remove($id); $self->$cb(pop, undef) });
   $client->connect(@_);
 
   return $id;

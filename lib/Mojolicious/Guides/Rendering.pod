@@ -1295,8 +1295,8 @@ speed up preloading of referenced images and stylesheets.
   app->start;
 
 The optional drain callback ensures that all previous chunks have been written
-before processing continues. An empty chunk or call to
-L<Mojolicious::Controller/"finish"> marks the end of the stream.
+before processing continues. To end the stream you can call
+L<Mojolicious::Controller/"finish"> or write an empty chunk of data.
 
   HTTP/1.1 200 OK
   Connection: keep-alive

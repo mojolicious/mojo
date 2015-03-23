@@ -300,7 +300,7 @@ any '/something' => sub {
   $c->render(text => 'Just works!');
 };
 
-any [qw(get post)] => '/something/else' => sub {
+any [qw(get post whatever)] => '/something/else' => sub {
   my $c = shift;
   $c->render(text => 'Yay!');
 };
@@ -817,11 +817,14 @@ $t->post_ok('/something')->status_is(200)
 $t->delete_ok('/something')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Just works!');
 
-# Only GET and POST
+# Only GET, POST and a custom request method
 $t->get_ok('/something/else')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
 $t->post_ok('/something/else')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
+$t->request_ok($t->ua->build_tx(WHATEVER => '/something/else'))
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('Yay!');
 $t->delete_ok('/something/else')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 

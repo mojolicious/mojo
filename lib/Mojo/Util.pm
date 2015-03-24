@@ -121,6 +121,7 @@ sub html_unescape {
 sub md5_bytes { md5 @_ }
 sub md5_sum   { md5_hex @_ }
 
+# Declared in Mojo::Base to avoid circular require problems
 sub monkey_patch { Mojo::Base::_monkey_patch(@_) }
 
 # Direct translation of RFC 3492

@@ -18,6 +18,7 @@ my $NAME
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
 
+# Declared here to avoid circular require problems in Mojo::Util
 sub _monkey_patch {
   my ($class, %patch) = @_;
   no strict 'refs';

@@ -1,5 +1,6 @@
 
 6.05  2015-03-24
+  - Fixed warnings in Mojo::Base.
 
 6.04  2015-03-23
   - Improved Mojo::Reactor::EV and Mojo::Reactor::Poll to fail more

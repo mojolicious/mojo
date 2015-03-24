@@ -5,15 +5,25 @@ use warnings;
 use utf8;
 use feature ();
 
+# No imports because we get subclassed, a lot!
+use Carp ();
+
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
-# No imports because we get subclassed, a lot!
-use Carp ();
-use Mojo::Util;
+# Will be shipping with Perl 5.22
+my $NAME
+  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
 
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
+
+sub _monkey_patch {
+  my ($class, %patch) = @_;
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
+}
 
 sub import {
   my $class = shift;
@@ -36,7 +46,7 @@ sub import {
     my $caller = caller;
     no strict 'refs';
     push @{"${caller}::ISA"}, $flag;
-    Mojo::Util::monkey_patch $caller, 'has', sub { attr($caller, @_) };
+    _monkey_patch $caller, 'has', sub { attr($caller, @_) };
   }
 
   # Mojo modules are strict!
@@ -56,7 +66,7 @@ sub attr {
 
     # Very performance sensitive code with lots of micro-optimizations
     if (ref $value) {
-      Mojo::Util::monkey_patch $class, $attr, sub {
+      _monkey_patch $class, $attr, sub {
         return
           exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
           if @_ == 1;
@@ -65,7 +75,7 @@ sub attr {
       };
     }
     elsif (defined $value) {
-      Mojo::Util::monkey_patch $class, $attr, sub {
+      _monkey_patch $class, $attr, sub {
         return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
           if @_ == 1;
         $_[0]{$attr} = $_[1];
@@ -73,7 +83,7 @@ sub attr {
       };
     }
     else {
-      Mojo::Util::monkey_patch $class, $attr,
+      _monkey_patch $class, $attr,
         sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
     }
   }

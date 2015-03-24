@@ -28,10 +28,6 @@ use constant {
   PC_INITIAL_N    => 128
 };
 
-# Will be shipping with Perl 5.22
-my $NAME
-  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
-
 # To generate a new HTML entity table run this command
 # perl examples/entities.pl
 my %ENTITIES;
@@ -125,12 +121,7 @@ sub html_unescape {
 sub md5_bytes { md5 @_ }
 sub md5_sum   { md5_hex @_ }
 
-sub monkey_patch {
-  my ($class, %patch) = @_;
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
-}
+sub monkey_patch { Mojo::Base::_monkey_patch(@_) }
 
 # Direct translation of RFC 3492
 sub punycode_decode {

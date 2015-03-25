@@ -1,4 +1,6 @@
 
+6.06  2015-03-25
+
 6.05  2015-03-24
   - Fixed circular require bug in Mojo::Base and Mojo::Util.
 

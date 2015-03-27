@@ -671,12 +671,19 @@ placeholder.
 
 =head2 Conditions
 
-Conditions such as C<headers> and C<host> from
-L<Mojolicious::Plugin::HeaderCondition> allow even more powerful route
+Conditions such as C<headers>, C<agent> and C<host> from
+L<Mojolicious::Plugin::HeaderCondition>, can be applied to any route with the
+method L<Mojolicious::Routes::Route/"over">, and allow even more powerful route
 constructs.
 
   # / (Origin: http://mojolicio.us)
   $r->get('/')->over(headers => {Origin => qr/mojolicio\.us/})->to('foo#bar');
+
+  # / (Firefox)
+  $r->get('/')->over(agent => qr/Firefox/)->to('browser-test#firefox');
+
+  # / (Internet Explorer)
+  $r->get('/')->over(agent => qr/Internet Explorer/)->to('browser-test#ie');
 
   # http://mojolicio.us/perldoc
   $r->get('/perldoc')->over(host => 'mojolicio.us')->to('perldoc#index');
@@ -842,34 +849,26 @@ to find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
 =head2 Adding conditions
 
-Sometimes you might need a little more power, for example to check the
-C<User-Agent> header in multiple routes. This is where conditions come into
-play, they are basically router plugins and need to return a true value for the
-route to match.
+You can also add your own conditions with
+L<Mojolicious::Routes/"add_condition">. All conditions are basically router
+plugins that run every time a new request arrives, and which need to return a
+true value for the route to match.
 
-  # Simple "User-Agent" condition
+  # A condition randomly allows a route to match
   $r->add_condition(
-    agent => sub {
-      my ($route, $c, $captures, $pattern) = @_;
+    random => sub {
+      my ($route, $c, $captures, $num) = @_;
 
-      # User supplied regular expression
-      return undef unless $pattern && ref $pattern eq 'Regexp';
+      # Loser
+      return undef unless int rand $num;
 
-      # Match "User-Agent" header and return true on success
-      my $agent = $c->req->headers->user_agent;
-      return 1 if $agent && $agent =~ $pattern;
-
-      # No success
+      # Winner
       return undef;
     }
   );
 
-  # /firefox_only (Firefox) -> {controller => 'foo', action => 'bar'}
-  $r->get('/firefox_only')->over(agent => qr/Firefox/)->to('foo#bar');
-
-The method L<Mojolicious::Routes/"add_condition"> registers the new condition
-in the router, while L<Mojolicious::Routes::Route/"over"> actually applies it
-to the route.
+  # /maybe (25% chance)
+  $r->get('/maybe')->over(random => 4)->to('foo#bar');
 
 =head2 Condition plugins
 

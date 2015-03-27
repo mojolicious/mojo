@@ -669,6 +669,21 @@ placeholder.
     $c->render(text => "/$whatever did not match.", status => 404);
   });
 
+=head2 Conditions
+
+Conditions such as C<headers> and C<host> from
+L<Mojolicious::Plugin::HeaderCondition> allow even more powerful route
+constructs.
+
+  # / (Origin: http://mojolicio.us)
+  $r->get('/')->over(headers => {Origin => qr/mojolicio\.us/})->to('foo#bar');
+
+  # http://mojolicio.us/perldoc
+  $r->get('/perldoc')->over(host => 'mojolicio.us')->to('perldoc#index');
+
+Just be aware that conditions are too complex for the routing cache, which
+normally speeds up recurring requests, and can therefore reduce performance.
+
 =head2 Hooks
 
 Hooks operate outside the routing system and allow you to extend the framework
@@ -825,7 +840,7 @@ L<Mojolicious::Routes::Route/"remove">.
 Especially for rearranging routes created by plugins this can be very useful,
 to find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
-=head2 Conditions
+=head2 Adding conditions
 
 Sometimes you might need a little more power, for example to check the
 C<User-Agent> header in multiple routes. This is where conditions come into

@@ -24,7 +24,7 @@ sub _headers {
 
   # All headers need to match
   my $headers = $c->req->headers;
-  _check(scalar $headers->header($_), $patterns->{$_}) || return undef
+  _check($headers->header($_), $patterns->{$_}) || return undef
     for keys %$patterns;
   return 1;
 }

@@ -672,7 +672,7 @@ placeholder.
 =head2 Conditions
 
 Conditions such as C<headers>, C<agent> and C<host> from
-L<Mojolicious::Plugin::HeaderCondition>, can be applied to any route with the
+L<Mojolicious::Plugin::HeaderCondition> can be applied to any route with the
 method L<Mojolicious::Routes::Route/"over">, and allow even more powerful route
 constructs.
 
@@ -849,12 +849,12 @@ to find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
 =head2 Adding conditions
 
-You can also add your own conditions with
+You can also add your own conditions with the method
 L<Mojolicious::Routes/"add_condition">. All conditions are basically router
 plugins that run every time a new request arrives, and which need to return a
 true value for the route to match.
 
-  # A condition randomly allows a route to match
+  # A condition that randomly allows a route to match
   $r->add_condition(
     random => sub {
       my ($route, $c, $captures, $num) = @_;

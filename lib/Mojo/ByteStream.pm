@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use overload bool => sub {1}, '""' => sub { ${$_[0]} }, fallback => 1;
 
 use Exporter 'import';
-use Mojo::Collection;
+require Mojo::Collection;
 use Mojo::Util;
 
 our @EXPORT_OK = ('b');

@@ -2,7 +2,7 @@ package Mojo::IOLoop::Stream;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno qw(EAGAIN ECONNRESET EINTR EWOULDBLOCK);
-use Mojo::IOLoop;
+require Mojo::IOLoop;
 use Mojo::Util;
 use Scalar::Util 'weaken';
 

@@ -1,7 +1,7 @@
 package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Mojo::IOLoop;
+require Mojo::IOLoop;
 use Mojo::Util;
 
 has ioloop    => sub { Mojo::IOLoop->singleton };

@@ -1,7 +1,7 @@
 package Mojo::Transaction::HTTP;
 use Mojo::Base 'Mojo::Transaction';
 
-use Mojo::Transaction::WebSocket;
+require Mojo::Transaction::WebSocket;
 
 has 'previous';
 

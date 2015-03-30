@@ -377,7 +377,7 @@ sub _encoding {
 
 # Supported on Perl 5.14+
 sub _global_destruction {
-  defined(${^GLOBAL_PHASE}) && ${^GLOBAL_PHASE} eq 'DESTRUCT';
+  defined ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT';
 }
 
 sub _header {

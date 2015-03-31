@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 use Mojo::IOLoop;
 
-# Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
+# Minimal event loop example demonstrating how to cheat at HTTP benchmarks :)
 my %buffer;
 Mojo::IOLoop->server(
   {port => 8080} => sub {
@@ -11,13 +11,9 @@ Mojo::IOLoop->server(
       read => sub {
         my ($stream, $chunk) = @_;
 
-        # Append chunk to buffer
-        $buffer{$id} .= $chunk;
-
         # Check if we got start-line and headers (no body support)
+        $buffer{$id} .= $chunk;
         if (index($buffer{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
-
-          # Clean buffer
           delete $buffer{$id};
 
           # Write a minimal HTTP response
@@ -37,7 +33,7 @@ For testing use something like "wrk -c 100 -d 10s http://127.0.0.1:8080/".
 On a MacBook Air this results in about 18k req/s.
 EOF
 
-# Start event loop
+# Stop gracefully to make profiling easier
 Mojo::IOLoop->recurring(1 => sub { });
 local $SIG{INT} = local $SIG{TERM} = sub { Mojo::IOLoop->stop };
 Mojo::IOLoop->start;

@@ -16,8 +16,6 @@ get 'tags_with_error';
 
 any [qw(GET POST)] => 'links';
 
-get '/buttons';
-
 get 'script';
 
 get 'style';
@@ -106,24 +104,6 @@ $t->post_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/form/23" title="Foo">Foo</a>
 <a href="/form/23" title="Foo">Foo</a>
 EOF
-
-# Buttons
-$t->get_ok('/buttons')->status_is(200)
-  ->content_is('<form action="/links">'
-    . '<input type="submit" value="First test">'
-    . "</form>\n"
-    . '<form action="/links.txt">'
-    . '<input type="submit" value="Second">'
-    . "</form>\n"
-    . '<form action="/" class="menu">'
-    . '<input type="submit" value="Third">'
-    . "</form>\n"
-    . '<form action="http://example.com">'
-    . '<input type="submit" value="Fourth">'
-    . "</form>\n"
-    . '<form action="/selection?_method=PUT" method="POST">'
-    . '<input type="submit" value="Fifth">'
-    . "</form>\n");
 
 # Scripts
 $t->get_ok('/script')->status_is(200)->content_is(<<EOF);
@@ -528,13 +508,6 @@ __DATA__
 <%= link_to Home => 'links' %>
 <%= link_to Foo => 'form', {test => 23}, title => 'Foo' %>
 <%= link_to form => {test => 23} => (title => 'Foo') => begin %>Foo<% end %>
-
-@@ buttons.html.ep
-%= button_to 'First test' => 'links'
-%= button_to 'Second' => 'links' => {format => 'txt'}
-%= button_to 'Third' => '/' => (class => 'menu')
-%= button_to 'Fourth' => 'http://example.com'
-%= button_to 'Fifth' => 'selection'
 
 @@ script.html.ep
 <%= javascript '/script.js' %>

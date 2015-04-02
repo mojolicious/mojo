@@ -15,9 +15,9 @@ sub register {
   }
 
   my @helpers = (
-    qw(button_to csrf_field form_for hidden_field javascript label_for),
-    qw(link_to password_field select_field stylesheet submit_button),
-    qw(tag_with_error text_area)
+    qw(csrf_field form_for hidden_field javascript label_for link_to),
+    qw(password_field select_field stylesheet submit_button tag_with_error),
+    qw(text_area)
   );
   $app->helper($_ => __PACKAGE__->can("_$_")) for @helpers;
 
@@ -32,11 +32,6 @@ sub register {
 
   # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
-}
-
-sub _button_to {
-  my ($c, $text) = (shift, shift);
-  return $c->helpers->form_for(@_, sub { _submit_button($c, $text) });
 }
 
 sub _csrf_field {
@@ -255,28 +250,6 @@ by default.
 =head1 HELPERS
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
-
-=head2 button_to
-
-  %= button_to 'Test' => 'some_get_route'
-  %= button_to 'Test' => some_get_route => {id => 23} => (class => 'menu')
-  %= button_to 'Test' => 'http://example.com/test' => (class => 'menu')
-  %= button_to 'Remove' => 'some_delete_route'
-
-Generate portable C<form> tag with L</"form_for"> containing a single button.
-
-  <form action="/path/to/get/route">
-    <input type="submit" value="Test">
-  </form>
-  <form action="/path/to/get/route/23" class="menu">
-    <input type="submit" value="Test">
-  </form>
-  <form action="http://example.com/test" class="menu">
-    <input type="submit" value="Test">
-  </form>
-  <form action="/path/to/delete/route?_method=DELETE" method="POST">
-    <input type="submit" value="Remove">
-  </form>
 
 =head2 check_box
 

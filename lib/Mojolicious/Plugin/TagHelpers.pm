@@ -36,7 +36,7 @@ sub register {
 
 sub _button_to {
   my ($c, $text) = (shift, shift);
-  return _form_for($c, @_, sub { _submit_button($c, $text) });
+  return $c->helpers->form_for(@_, sub { _submit_button($c, $text) });
 }
 
 sub _csrf_field {

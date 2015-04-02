@@ -1,5 +1,6 @@
 
 6.06  2015-04-02
+  - Added button_to helper to Mojolicious::Plugin::TagHelpers.
   - Added "chat.pl" to example scripts.
 
 6.05  2015-03-24

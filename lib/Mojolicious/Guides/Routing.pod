@@ -863,7 +863,7 @@ true value for the route to match.
       return undef unless int rand $num;
 
       # Winner
-      return undef;
+      return 1;
     }
   );
 

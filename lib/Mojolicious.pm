@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp ();
 use Mojo::Exception;
+use Mojo::Loader qw(load_class);
 use Mojo::Util;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
@@ -68,10 +69,12 @@ sub build_controller {
   $stash->{'mojo.secrets'} //= $self->secrets;
 
   # Build default controller
+  my $class = $self->controller_class;
+  my $e = load_class($class);
+  die ref $e ? $e : qq{Can't find controller class "$class" in \@INC. (@INC)\n} if $e;
   my $defaults = $self->defaults;
   @$stash{keys %$defaults} = values %$defaults;
-  my $c
-    = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+  my $c = $class->new(app => $self, stash => $stash, tx => $tx);
   Scalar::Util::weaken $c->{app};
 
   return $c;

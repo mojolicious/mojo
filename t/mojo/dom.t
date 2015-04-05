@@ -370,14 +370,16 @@ is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
 # Already decoded Unicode snowman and quotes in selector
-$dom = Mojo::DOM->new('<div id="snowm&quot;an">☃</div>');
-is $dom->at('[id="snowm\"an"]')->text,      '☃', 'right text';
-is $dom->at('[id="snowm\22 an"]')->text,    '☃', 'right text';
-is $dom->at('[id="snowm\000022an"]')->text, '☃', 'right text';
-is $dom->at('[id="snowm\22an"]'),      undef, 'no result';
-is $dom->at('[id="snowm\21 an"]'),     undef, 'no result';
-is $dom->at('[id="snowm\000021an"]'),  undef, 'no result';
-is $dom->at('[id="snowm\000021 an"]'), undef, 'no result';
+$dom = Mojo::DOM->new('<div id="snow&apos;m&quot;an">☃</div>');
+is $dom->at('[id="snow\'m\"an"]')->text,      '☃', 'right text';
+is $dom->at('[id="snow\'m\22 an"]')->text,    '☃', 'right text';
+is $dom->at('[id="snow\'m\000022an"]')->text, '☃', 'right text';
+is $dom->at('[id="snow\'m\22an"]'),      undef, 'no result';
+is $dom->at('[id="snow\'m\21 an"]'),     undef, 'no result';
+is $dom->at('[id="snow\'m\000021an"]'),  undef, 'no result';
+is $dom->at('[id="snow\'m\000021 an"]'), undef, 'no result';
+is $dom->at("[id='snow\\'m\"an']")->text,  '☃', 'right text';
+is $dom->at("[id='snow\\27m\"an']")->text, '☃', 'right text';
 
 # Unicode and escaped selectors
 my $html

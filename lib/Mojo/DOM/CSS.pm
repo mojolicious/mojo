@@ -6,11 +6,11 @@ has 'tree';
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
-  ((?:$ESCAPE_RE|[\w\-])+)           # Key
+  ((?:$ESCAPE_RE|[\w\-])+)                             # Key
   (?:
-    (\W)?=                           # Operator
-    (?:"((?:\\"|[^"])*)"|([^\]]+?))  # Value
-    (?:\s+(i))?                      # Case-sensitivity
+    (\W)?=                                             # Operator
+    (?:"((?:\\"|[^"])*)"|'((?:\\'|[^'])*)'|([^\]]+?))  # Value
+    (?:\s+(i))?                                        # Case-sensitivity
   )?
   \]
 /x;
@@ -90,7 +90,7 @@ sub _compile {
 
     # Attributes
     elsif ($css =~ /\G$ATTR_RE/gco) {
-      push @$last, ['attr', _name($1), _value($2 // '', $3 // $4, $5)];
+      push @$last, ['attr', _name($1), _value($2 // '', $3 // $4 // $5, $6)];
     }
 
     # Pseudo-class (":not" contains more selectors)

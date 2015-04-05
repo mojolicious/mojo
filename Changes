@@ -1,6 +1,8 @@
 
-6.06  2015-04-02
+6.06  2015-04-05
   - Added "chat.pl" to example scripts.
+  - Improved Mojo::DOM::CSS to handle attribute selectors with single quotes
+    correctly.
 
 6.05  2015-03-24
   - Fixed circular require bug in Mojo::Base and Mojo::Util.

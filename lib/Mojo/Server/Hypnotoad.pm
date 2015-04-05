@@ -3,9 +3,8 @@ use Mojo::Base -base;
 
 # "Bender: I was God once.
 #  God: Yes, I saw. You were doing well, until everyone died."
-use Cwd 'abs_path';
 use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
+use File::Spec::Functions qw(catfile rel2abs);
 use Mojo::Server::Prefork;
 use Mojo::Util qw(steady_time);
 use Scalar::Util 'weaken';
@@ -40,7 +39,7 @@ sub run {
 
   # Remember executable and application for later
   $ENV{HYPNOTOAD_EXE} ||= $0;
-  $0 = $ENV{HYPNOTOAD_APP} ||= abs_path $app;
+  $0 = $ENV{HYPNOTOAD_APP} ||= rel2abs $app;
 
   # This is a production server
   $ENV{MOJO_MODE} ||= 'production';

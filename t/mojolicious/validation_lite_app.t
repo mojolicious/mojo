@@ -191,7 +191,8 @@ $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
   ->element_exists_not('textarea.field-with-error')
   ->element_exists_not('label.custom.field-with-error[for="baz"]')
   ->element_exists_not('select.field-with-error')
-  ->element_exists_not('input.field-with-error[type="password"]');
+  ->element_exists_not('input.field-with-error[type="password"]')
+  ->element_count_is('.field-with-error', 2);
 
 # Missing CSRF token
 $t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)

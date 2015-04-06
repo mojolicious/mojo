@@ -83,6 +83,13 @@ sub content_type_unlike {
 
 sub delete_ok { shift->_build_ok(DELETE => @_) }
 
+sub element_count_is {
+  my ($self, $selector, $wanted_count, $desc) = @_;
+  $desc ||= encode 'UTF-8', qq{element count for selector "$selector"};
+  my $count = $self->tx->res->dom->find($selector)->size;
+  return $self->_test('is', $count, $wanted_count, $desc);
+}
+
 sub element_exists {
   my ($self, $selector, $desc) = @_;
   $desc ||= encode 'UTF-8', qq{element for selector "$selector" exists};
@@ -617,6 +624,14 @@ Opposite of L</"content_type_like">.
 
 Perform a C<DELETE> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"delete">, except for the callback.
+
+=head2 element_count_is
+
+  $t = $t->element_count_is('.product', 6, 'we have 6 elements');
+
+Check the count of elements specified by the selector. Second argument
+is the number of elements you expect to find. Third argument is optional,
+and specifies the description of the test.
 
 =head2 element_exists
 

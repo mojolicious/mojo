@@ -84,10 +84,10 @@ sub content_type_unlike {
 sub delete_ok { shift->_build_ok(DELETE => @_) }
 
 sub element_count_is {
-  my ($self, $selector, $wanted_count, $desc) = @_;
+  my ($self, $selector, $count, $desc) = @_;
   $desc ||= encode 'UTF-8', qq{element count for selector "$selector"};
-  my $count = $self->tx->res->dom->find($selector)->size;
-  return $self->_test('is', $count, $wanted_count, $desc);
+  my $size = $self->tx->res->dom->find($selector)->size;
+  return $self->_test('is', $size, $count, $desc);
 }
 
 sub element_exists {
@@ -627,11 +627,11 @@ arguments as L<Mojo::UserAgent/"delete">, except for the callback.
 
 =head2 element_count_is
 
-  $t = $t->element_count_is('.product', 6, 'we have 6 elements');
+  $t = $t->element_count_is('div.foo[x=y]', 5);
+  $t = $t->element_count_is('html body div', 30, 'thirty elements');
 
-Check the count of elements specified by the selector. Second argument
-is the number of elements you expect to find. Third argument is optional,
-and specifies the description of the test.
+Checks the number of HTML/XML elements matched by the CSS selector with
+L<Mojo::DOM/"find">.
 
 =head2 element_exists
 

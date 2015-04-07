@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Transaction';
 use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
 use Config;
 use Mojo::JSON qw(encode_json j);
-use Mojo::Transaction::HTTP;
+require Mojo::Transaction::HTTP;
 use Mojo::Util qw(b64_encode decode dumper encode sha1_bytes xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;

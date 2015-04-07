@@ -5,7 +5,7 @@ use Carp 'croak';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use IO::Socket::IP;
-use Mojo::IOLoop;
+require Mojo::IOLoop;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 

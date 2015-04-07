@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 use Carp 'croak';
 use Exporter 'import';
 use List::Util;
-use Mojo::ByteStream;
+require Mojo::ByteStream;
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');

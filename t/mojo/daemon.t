@@ -3,7 +3,8 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use File::Spec::Functions qw(catdir rel2abs);
+use Cwd 'abs_path';
+use File::Spec::Functions 'catdir';
 use FindBin;
 use Mojo;
 use Mojo::IOLoop;
@@ -81,7 +82,7 @@ is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
 # Script name
 my $path = "$FindBin::Bin/lib/../lib/myapp.pl";
 is(Mojo::Server::Daemon->new->load_app($path)->config('script'),
-  rel2abs($path), 'right script name');
+  abs_path($path), 'right script name');
 
 # Load broken app
 eval {

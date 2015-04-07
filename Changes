@@ -1,5 +1,6 @@
 
 6.07  2015-04-07
+  - Fixed Windows bug in "daemon.t".
 
 6.06  2015-04-06
   - Added element_count_is method to Test::Mojo. (Zoffix)

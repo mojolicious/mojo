@@ -79,9 +79,9 @@ is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
   'right value';
 
 # Script name
-my $path = rel2abs "$FindBin::Bin/lib/../lib/myapp.pl";
+my $path = "$FindBin::Bin/lib/../lib/myapp.pl";
 is(Mojo::Server::Daemon->new->load_app($path)->config('script'),
-  $path, 'right script name');
+  rel2abs($path), 'right script name');
 
 # Load broken app
 eval {

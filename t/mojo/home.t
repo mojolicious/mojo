@@ -19,7 +19,7 @@ use Mojo::Home;
 }
 
 # Class detection
-my $original = catdir(splitdir($FindBin::Bin), '..', '..');
+my $original = catdir splitdir $FindBin::Bin;
 my $home     = Mojo::Home->new->detect;
 my $target   = realpath $original;
 is_deeply [split /\\|\//, $target], [split /\\|\//, $home],

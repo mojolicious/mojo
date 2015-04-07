@@ -12,24 +12,21 @@ use Mojo::Util 'class_to_path';
 has parts => sub { [] };
 
 sub detect {
-  my $self = shift;
+  my ($self, $class) = @_;
 
   # Environment variable
   return $self->parts([splitdir abs_path $ENV{MOJO_HOME}]) if $ENV{MOJO_HOME};
 
   # Try to find home from lib directory
-  if (my $class = @_ ? shift : 'Mojo::HelloWorld') {
-    my $file = class_to_path $class;
-    if (my $path = $INC{$file}) {
-      $path =~ s/\Q$file\E$//;
-      my @home = splitdir $path;
+  if ($class && (my $path = $INC{my $file = class_to_path $class})) {
+    $path =~ s/\Q$file\E$//;
+    my @home = splitdir $path;
 
-      # Remove "lib" and "blib"
-      pop @home while @home && ($home[-1] =~ /^b?lib$/ || $home[-1] eq '');
+    # Remove "lib" and "blib"
+    pop @home while @home && ($home[-1] =~ /^b?lib$/ || $home[-1] eq '');
 
-      # Turn into absolute path
-      return $self->parts([splitdir abs_path catdir(@home) || '.']);
-    }
+    # Turn into absolute path
+    return $self->parts([splitdir abs_path catdir(@home) || '.']);
   }
 
   # FindBin fallback

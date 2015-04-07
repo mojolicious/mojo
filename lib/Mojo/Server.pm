@@ -2,7 +2,7 @@ package Mojo::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use Cwd 'abs_path';
+use File::Spec::Functions 'rel2abs';
 use Mojo::Loader 'load_class';
 use Mojo::Util 'md5_sum';
 use POSIX;
@@ -44,7 +44,7 @@ sub load_app {
 
   # Clean environment (reset FindBin defensively)
   {
-    local $0 = $path = abs_path $path;
+    local $0 = $path = rel2abs $path;
     require FindBin;
     FindBin->again;
     local $ENV{MOJO_APP_LOADER} = 1;

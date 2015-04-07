@@ -134,8 +134,9 @@ File extension for generated configuration filenames, defaults to C<conf>.
   plugin Config => {file => 'myapp.conf'};
   plugin Config => {file => '/etc/foo.stuff'};
 
-Full path to configuration file, defaults to the value of the C<MOJO_CONFIG>
-environment variable or C<$moniker.conf> in the application home directory.
+Path to configuration file, absolute or relative to the application home
+directory, defaults to the value of the C<MOJO_CONFIG> environment variable or
+C<$moniker.conf> in the application home directory.
 
 =head1 METHODS
 

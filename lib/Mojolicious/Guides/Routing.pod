@@ -638,8 +638,7 @@ additional information.
 
 The connection gets established when you respond to the WebSocket handshake
 request with a C<101> response status, which happens automatically if you
-subscribe to an event with L<Mojolicious::Controller/"on"> or send a message
-with L<Mojolicious::Controller/"send"> right away.
+subscribe to an event with L<Mojolicious::Controller/"on">.
 
   GET /echo HTTP/1.1
   Host: mojolicio.us

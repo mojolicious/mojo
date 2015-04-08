@@ -543,9 +543,7 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
   my $cb = $c->on(finish => sub {...});
 
 Subscribe to events of L</"tx">, which is usually a L<Mojo::Transaction::HTTP>
-or L<Mojo::Transaction::WebSocket> object. Note that this method will
-automatically respond to WebSocket handshake requests with a C<101> response
-status.
+or L<Mojo::Transaction::WebSocket> object.
 
   # Do something after the transaction has been finished
   $c->on(finish => sub {
@@ -571,6 +569,16 @@ status.
     my $len = length $bytes;
     $c->app->log->debug("Received $len bytes");
   });
+
+This method will automatically respond to WebSocket handshake requests with a
+C<101> response status, to establish the WebSocket connection.
+
+  HTTP/1.1 101 Switching Protocols
+  Server: Mojolicious (Perl)
+  Date: Tue, 03 Feb 2015 17:08:24 GMT
+  Connection: Upgrade
+  Upgrade: websocket
+  Sec-WebSocket-Accept: SWsp5N2iNxPbHlcOTIw8ERvyVPY=
 
 =head2 param
 

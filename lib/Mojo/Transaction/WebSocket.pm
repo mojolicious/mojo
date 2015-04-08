@@ -214,11 +214,7 @@ sub remote_port    { shift->handshake->remote_port }
 sub req            { shift->handshake->req }
 sub res            { shift->handshake->res }
 
-sub resume {
-  my $self = shift;
-  $self->handshake->resume;
-  return $self;
-}
+sub resume { $_[0]->handshake->resume and return $_[0] }
 
 sub send {
   my ($self, $msg, $cb) = @_;

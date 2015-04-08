@@ -123,6 +123,7 @@ sub _finish {
     if ($ws->res->code == 101) {
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
+      $ws->server_open;
     }
 
     # Failed upgrade

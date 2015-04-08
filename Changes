@@ -1,5 +1,9 @@
 
-6.08  2015-04-08
+6.08  2015-04-09
+  - Added is_established and server_open methods to
+    Mojo::Transaction::WebSocket.
+  - Improved finish and send methods in Mojolicious::Controller to
+    automatically establish the WebSocket connection if necessary.
 
 6.07  2015-04-07
   - Fixed Windows bug in "daemon.t".

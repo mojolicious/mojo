@@ -139,6 +139,8 @@ sub finish {
   return $self;
 }
 
+sub is_established { !!shift->{open} }
+
 sub is_websocket {1}
 
 sub kept_alive    { shift->handshake->kept_alive }
@@ -246,6 +248,8 @@ sub server_handshake {
   $res_headers->sec_websocket_accept(
     _challenge($req_headers->sec_websocket_key));
 }
+
+sub server_open { shift->{open}++ }
 
 sub server_read {
   my ($self, $chunk) = @_;
@@ -576,6 +580,12 @@ Connection identifier.
 
 Close WebSocket connection gracefully.
 
+=head2 is_established
+
+ my $bool = $ws->is_established;
+
+Check if WebSocket connection has been established yet.
+
 =head2 is_websocket
 
   my $true = $ws->is_websocket;
@@ -681,6 +691,12 @@ Transaction closed server-side, used to implement web servers.
   $ws->server_handshake;
 
 Perform WebSocket handshake server-side, used to implement web servers.
+
+=head2 server_open
+
+  $ws->server_open;
+
+WebSocket connection established server-side, used to implement web servers.
 
 =head2 server_read
 

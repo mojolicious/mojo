@@ -47,11 +47,11 @@ get '/something/else' => sub {
 
 websocket '/early_start' => sub {
   my $c = shift;
-  $c->send('test1');
+  $c->send('test' . ($c->tx->is_established ? 1 : 0));
   $c->on(
     message => sub {
       my ($c, $msg) = @_;
-      $c->send("${msg}test2");
+      $c->send("${msg}test" . ($c->tx->is_established ? 1 : 0));
       $c->finish(1000 => 'I ♥ Mojolicious!');
     }
   );
@@ -160,7 +160,7 @@ is $code, 200, 'right status';
 ok $body =~ /^(\d+)failed!$/ && $1 == 15, 'right content';
 
 # Server directly sends a message
-$result = undef;
+$result = '';
 my ($status, $msg);
 $ua->websocket(
   '/early_start' => sub {
@@ -175,8 +175,8 @@ $ua->websocket(
     $tx->on(
       message => sub {
         my ($tx, $msg) = @_;
-        $result = $msg;
-        $tx->send('test3');
+        $result .= $msg;
+        $tx->send('test2');
       }
     );
   }
@@ -184,7 +184,7 @@ $ua->websocket(
 Mojo::IOLoop->start;
 is $status, 1000,                 'right status';
 is $msg,    'I ♥ Mojolicious!', 'right message';
-is $result, 'test3test2',         'right result';
+is $result, 'test0test2test1',    'right result';
 
 # Connection denied
 ($stash, $code, $ws) = ();

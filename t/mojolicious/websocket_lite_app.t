@@ -84,10 +84,11 @@ websocket '/once' => sub {
   );
 };
 
-websocket '/close' => sub { shift->rendered(101)->finish(1001) };
+websocket '/close' => sub { shift->finish(1001) };
 
-websocket '/one_sided' =>
-  sub { shift->rendered(101)->send('I ♥ Mojolicious!')->finish };
+websocket '/one_sided' => sub {
+  shift->send('I ♥ Mojolicious!' => sub { shift->finish });
+};
 
 under '/nested';
 

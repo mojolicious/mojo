@@ -107,7 +107,8 @@ sub finish {
 
   # WebSocket
   my $tx = $self->tx;
-  $tx->finish(@_) and return $self if $tx->is_websocket;
+  $tx->finish(@_) and return $tx->is_established ? $self : $self->rendered(101)
+    if $tx->is_websocket;
 
   # Chunked stream
   return @_ ? $self->write_chunk(@_)->write_chunk('') : $self->write_chunk('')
@@ -137,7 +138,7 @@ sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 sub on {
   my ($self, $name, $cb) = @_;
   my $tx = $self->tx;
-  $self->rendered(101) if $tx->is_websocket;
+  $self->rendered(101) if $tx->is_websocket && !$tx->is_established;
   return $tx->on($name => sub { shift; $self->$cb(@_) });
 }
 
@@ -251,7 +252,7 @@ sub send {
   Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
   $tx->send($msg, $cb ? sub { shift; $self->$cb(@_) } : ());
-  return $self;
+  return $tx->is_established ? $self : $self->rendered(101);
 }
 
 sub session {
@@ -507,10 +508,9 @@ sharing the same name as an array reference.
   $c = $c->finish(1003 => 'Cannot accept data!');
   $c = $c->finish('Bye!');
 
-Close WebSocket connection or long poll stream gracefully.
-
-  # Accept WebSocket handshake and close WebSocket connection immediately
-  $c->rendered(101)->finish(1001);
+Close WebSocket connection or long poll stream gracefully. This method will
+automatically respond to WebSocket handshake requests with a C<101> response
+status, to establish the WebSocket connection.
 
 =head2 flash
 
@@ -543,7 +543,9 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
   my $cb = $c->on(finish => sub {...});
 
 Subscribe to events of L</"tx">, which is usually a L<Mojo::Transaction::HTTP>
-or L<Mojo::Transaction::WebSocket> object.
+or L<Mojo::Transaction::WebSocket> object. This method will automatically
+respond to WebSocket handshake requests with a C<101> response status, to
+establish the WebSocket connection.
 
   # Do something after the transaction has been finished
   $c->on(finish => sub {
@@ -569,16 +571,6 @@ or L<Mojo::Transaction::WebSocket> object.
     my $len = length $bytes;
     $c->app->log->debug("Received $len bytes");
   });
-
-This method will automatically respond to WebSocket handshake requests with a
-C<101> response status, to establish the WebSocket connection.
-
-  HTTP/1.1 101 Switching Protocols
-  Server: Mojolicious (Perl)
-  Date: Tue, 03 Feb 2015 17:08:24 GMT
-  Connection: Upgrade
-  Upgrade: websocket
-  Sec-WebSocket-Accept: SWsp5N2iNxPbHlcOTIw8ERvyVPY=
 
 =head2 param
 
@@ -723,9 +715,6 @@ using a C<200> response code.
   $c->res->body('Hello World!');
   $c->rendered(200);
 
-  # Accept WebSocket handshake without subscribing to an event
-  $c->rendered(101);
-
 =head2 req
 
   my $req = $c->req;
@@ -801,7 +790,9 @@ L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
   $c = $c->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
-will be invoked once all data has been written.
+will be invoked once all data has been written. This method will automatically
+respond to WebSocket handshake requests with a C<101> response status, to
+establish the WebSocket connection.
 
   # Send "Text" message
   $c->send('I ♥ Mojolicious!');
@@ -821,9 +812,6 @@ will be invoked once all data has been written.
     my $c = shift;
     $c->send('Second message!');
   });
-
-  # Accept WebSocket handshake, send a message and close connection immediately
-  $c->rendered(101)->send('I ♥ Mojolicious!')->finish;
 
 For mostly idle WebSockets you might also want to increase the inactivity
 timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which

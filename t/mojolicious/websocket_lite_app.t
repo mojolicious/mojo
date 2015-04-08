@@ -84,6 +84,8 @@ websocket '/once' => sub {
   );
 };
 
+websocket '/close' => sub { shift->finish(1001) };
+
 under '/nested';
 
 websocket sub {
@@ -289,6 +291,9 @@ $t->websocket_ok('/once')->send_ok('hello')
   ->message_ok->message_is('ONE: hello')->message_ok->message_is('TWO: hello')
   ->send_ok('hello')->message_ok->message_is('ONE: hello')->send_ok('hello')
   ->message_ok->message_is('ONE: hello')->finish_ok;
+
+# WebSocket connection gets closed right away
+$t->websocket_ok('/close')->finished_ok(1001);
 
 # Nested WebSocket
 $t->websocket_ok('/nested')->send_ok('hello')

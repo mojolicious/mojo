@@ -107,7 +107,7 @@ sub finish {
 
   # WebSocket
   my $tx = $self->tx;
-  $tx->finish(@_) and return $self if $tx->is_websocket;
+  $tx->finish(@_) and return $self->rendered(101) if $tx->is_websocket;
 
   # Chunked stream
   return @_ ? $self->write_chunk(@_)->write_chunk('') : $self->write_chunk('')

@@ -467,6 +467,9 @@ the last one, you can use L</"every_cookie">.
   # Create response cookie with domain and expiration date
   $c->cookie(user => 'sri', {domain => 'example.com', expires => time + 60});
 
+  # Create secure response cookie
+  $c->cookie(secret => 'I <3 Mojolicious', {secure => 1, httponly => 1});
+
 =head2 every_cookie
 
   my $values = $c->every_cookie('foo');

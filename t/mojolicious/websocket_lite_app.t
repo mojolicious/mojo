@@ -84,7 +84,10 @@ websocket '/once' => sub {
   );
 };
 
-websocket '/close' => sub { shift->finish(1001) };
+websocket '/close' => sub { shift->rendered(101)->finish(1001) };
+
+websocket '/one_sided' =>
+  sub { shift->rendered(101)->send('I ♥ Mojolicious!')->finish };
 
 under '/nested';
 
@@ -294,6 +297,10 @@ $t->websocket_ok('/once')->send_ok('hello')
 
 # WebSocket connection gets closed right away
 $t->websocket_ok('/close')->finished_ok(1001);
+
+# WebSocket connection gets closed after one message
+$t->websocket_ok('/one_sided')->message_ok->message_is('I ♥ Mojolicious!')
+  ->finished_ok(1005);
 
 # Nested WebSocket
 $t->websocket_ok('/nested')->send_ok('hello')

@@ -1,7 +1,5 @@
 
 6.08  2015-04-08
-  - Improved finish method in Mojolicious::Controller to work before the
-    WebSocket connection has actually been established.
 
 6.07  2015-04-07
   - Fixed Windows bug in "daemon.t".

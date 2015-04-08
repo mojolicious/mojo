@@ -107,7 +107,7 @@ sub finish {
 
   # WebSocket
   my $tx = $self->tx;
-  $tx->finish(@_) and return $self->rendered(101) if $tx->is_websocket;
+  $tx->finish(@_) and return $self if $tx->is_websocket;
 
   # Chunked stream
   return @_ ? $self->write_chunk(@_)->write_chunk('') : $self->write_chunk('')
@@ -509,6 +509,9 @@ sharing the same name as an array reference.
 
 Close WebSocket connection or long poll stream gracefully.
 
+  # Accept WebSocket handshake and close WebSocket connection immediately
+  $c->rendered(101)->finish(1001);
+
 =head2 flash
 
   my $foo = $c->flash('foo');
@@ -810,6 +813,9 @@ will be invoked once all data has been written.
     my $c = shift;
     $c->send('Second message!');
   });
+
+  # Accept WebSocket handshake, send a message and close connection immediately
+  $c->rendered(101)->send('I ♥ Mojolicious!')->finish;
 
 For mostly idle WebSockets you might also want to increase the inactivity
 timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which

@@ -161,10 +161,11 @@ ok $body =~ /^(\d+)failed!$/ && $1 == 15, 'right content';
 
 # Server directly sends a message
 $result = '';
-my ($status, $msg);
+my ($established, $status, $msg);
 $ua->websocket(
   '/early_start' => sub {
     my ($ua, $tx) = @_;
+    $established = $tx->is_established;
     $tx->on(
       finish => sub {
         my ($tx, $code, $reason) = @_;
@@ -182,9 +183,10 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $status, 1000,                 'right status';
-is $msg,    'I ♥ Mojolicious!', 'right message';
-is $result, 'test0test2test1',    'right result';
+ok $established, 'connection established';
+is $status,      1000, 'right status';
+is $msg,         'I ♥ Mojolicious!', 'right message';
+is $result,      'test0test2test1', 'right result';
 
 # Connection denied
 ($stash, $code, $ws) = ();

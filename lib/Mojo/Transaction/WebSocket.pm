@@ -106,7 +106,7 @@ sub client_challenge {
     if ($headers->sec_websocket_extensions // '') =~ /permessage-deflate/;
 
   return _challenge($self->req->headers->sec_websocket_key) eq
-    $headers->sec_websocket_accept;
+    $headers->sec_websocket_accept && ++$self->{open};
 }
 
 sub client_handshake {

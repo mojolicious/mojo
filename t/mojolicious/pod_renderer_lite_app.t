@@ -39,6 +39,7 @@ $t->post_ok('/')->status_is(200)->content_like(qr!test123<h1 id="A">A</h1>!)
 # POD filter
 $t->post_ok('/block')->status_is(200)
   ->content_like(qr!test321<h2 id="lalala">lalala</h2>!)
+  ->content_like(qr!<pre><code>foo\(bar, bazz\)</code></pre>!)
   ->content_like(qr!<p><code>test</code></p>!)->content_like(qr/Gray/);
 
 # Empty
@@ -99,5 +100,7 @@ test123<%= pod_to_html "=head1 A\n\n=head1 B\n\nC<test>"%>
 
 @@ block.html.ep
 test321<%= pod_to_html begin %>=head2 lalala
+
+  foo(bar, bazz)
 
 C<test><% end %>

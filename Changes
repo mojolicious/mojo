@@ -1,4 +1,6 @@
 
+6.09  2015-04-10
+
 6.08  2015-04-09
   - Added is_established and server_open methods to
     Mojo::Transaction::WebSocket.

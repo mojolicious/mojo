@@ -5,7 +5,7 @@ use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
 use Mojo::DOM;
 use Mojo::URL;
-use Mojo::Util qw(slurp unindent);
+use Mojo::Util qw(slurp);
 use Pod::Simple::XHTML;
 use Pod::Simple::Search;
 
@@ -46,7 +46,7 @@ sub _html {
 
   # Rewrite code blocks for syntax highlighting and correct indentation
   for my $e ($dom->find('pre > code')->each) {
-    $e->content(my $str = unindent $e->content);
+    my $str = $e->content;
     next if $str =~ /^\s*(?:\$|Usage:)\s+/m || $str !~ /[\$\@\%]\w|-&gt;\w/m;
     my $attrs = $e->attr;
     my $class = $attrs->{class};
@@ -96,6 +96,11 @@ sub _pod_to_html {
   my $parser = Pod::Simple::XHTML->new;
   $parser->perldoc_url_prefix('https://metacpan.org/pod/');
   $parser->$_('') for qw(html_header html_footer);
+  $parser->strip_verbatim_indent(sub {
+    my $lines = shift;
+    my ($indent) = $lines->[0] =~ /^(\s+)/;
+    return $indent;
+  });
   $parser->output_string(\(my $output));
   return $@ unless eval { $parser->parse_string_document("$pod"); 1 };
 

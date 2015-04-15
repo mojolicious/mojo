@@ -5,6 +5,7 @@ use Mojo::IOLoop;
 use Mojo::URL;
 use Mojo::Util 'term_escape';
 use Scalar::Util 'weaken';
+use Carp 'croak';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
@@ -153,6 +154,10 @@ sub _listen {
     backlog => $self->backlog,
     reuse   => $query->param('reuse')
   };
+
+  croak("Invalid listen location '$listen': Specify scheme, address and port (eg: http://*:3000)")
+    if !($url->scheme && $url->port);
+
   if (my $port = $url->port) { $options->{port} = $port }
   $options->{"tls_$_"} = $query->param($_) for qw(ca cert ciphers key);
   my $verify = $query->param('verify');

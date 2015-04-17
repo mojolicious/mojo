@@ -1351,7 +1351,8 @@ attributes and methods in L<Mojolicious::Command> that you can use or overload.
   secr3t
 
 And to make your commands application specific, just add a custom namespace to
-L<Mojolicious::Commands/"namespaces">.
+L<Mojolicious::Commands/"namespaces"> and use a class name like
+C<MyApp::Command::spy> instead of C<Mojolicious::Command::spy>.
 
   # Application
   package MyApp;

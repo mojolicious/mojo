@@ -92,7 +92,7 @@ L<Mojolicious::Types> manages MIME types for L<Mojolicious>.
   jpeg     -> image/jpeg
   jpg      -> image/jpeg
   js       -> application/javascript
-  json     -> application/json
+  json     -> application/json;charset=UTF-8
   mp3      -> audio/mpeg
   mp4      -> video/mp4
   ogg      -> audio/ogg

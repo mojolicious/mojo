@@ -878,7 +878,8 @@ $t->post_ok('/malformed_utf8' =>
 
 # JSON (with a lot of different tests)
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_type_is('application/json')->json_is({foo => [1, -2, 3, 'b☃r']})
+  ->content_type_is('application/json;charset=UTF-8')
+  ->json_is({foo => [1, -2, 3, 'b☃r']})
   ->json_is('/foo' => [1, -2, 3, 'b☃r'])
   ->json_is('/foo/3', 'b☃r', 'with description')->json_has('/foo')
   ->json_has('/foo', 'with description')->json_hasnt('/bar')
@@ -890,7 +891,8 @@ $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # JSON ("null")
 $t->get_ok('/json' => json => undef)->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_type_is('application/json')->json_is(undef)->content_is('null');
+  ->content_type_is('application/json;charset=UTF-8')->json_is(undef)
+  ->content_is('null');
 
 # Stash values in template
 $t->get_ok('/autostash?bar=23')->status_is(200)

@@ -167,9 +167,9 @@ sub to_string {
 
     # Escape and replace whitespace with "+"
     $name  = encode $charset,   $name if $charset;
-    $name  = url_escape $name,  '^A-Za-z0-9\-._~!$\'()*,:@/?';
+    $name  = url_escape $name,  '^A-Za-z0-9\-._~';
     $value = encode $charset,   $value if $charset;
-    $value = url_escape $value, '^A-Za-z0-9\-._~!$\'()*,:@/?';
+    $value = url_escape $value, '^A-Za-z0-9\-._~';
     s/\%20/\+/g for $name, $value;
 
     push @pairs, "$name=$value";

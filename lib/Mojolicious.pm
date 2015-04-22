@@ -791,6 +791,8 @@ Andrew Fresh
 
 Andrey Khozov
 
+Andrey Kuzmin
+
 Andy Grundman
 
 Aristotle Pagaltzis
@@ -960,6 +962,8 @@ Quentin Carbonneaux
 Rafal Pocztarski
 
 Randal Schwartz
+
+Richard Elberger
 
 Rick Delaney
 

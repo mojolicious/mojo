@@ -65,8 +65,7 @@ $t->request_ok($tx)->status_is(200)
 $tx = $t->ua->build_tx(
   PUT => '/json/echo' => {Accept => 'application/json'} => json => [1, 2, 3]);
 $t->request_ok($tx)->status_is(200)
-  ->content_type_is('application/json;charset=UTF-8')
-  ->json_is([1, 2, 3]);
+  ->content_type_is('application/json;charset=UTF-8')->json_is([1, 2, 3]);
 
 # Nothing
 $t->get_ok('/accepts')->status_is(200)->json_is({best => 'html'});

@@ -189,7 +189,9 @@ is "$params", '%25foo%25=%25', 'right result';
 $params = Mojo::Parameters->new('!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23');
 is $params->param('!$\'()*,:@/foo?'), '!$\'()*,:@/?', 'right value';
 is $params->param('bar'),             23,             'right value';
-is "$params", '!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23', 'right result';
+is "$params",
+  '%21%24%27%28%29%2A%2C%3A%40%2Ffoo%3F=%21%24%27%28%29%2A%2C%3A%40%2F'
+  . '%3F&bar=23', 'right result';
 
 # No charset
 $params = Mojo::Parameters->new('%E5=%E4')->charset(undef);

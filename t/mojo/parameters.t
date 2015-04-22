@@ -154,7 +154,7 @@ $params = Mojo::Parameters->new;
 $params->parse('input=say%20%22%C2%AB~%22;');
 is_deeply $params->pairs, ['input', 'say "«~";'], 'right structure';
 is $params->param('input'), 'say "«~";', 'right value';
-is "$params", 'input=say+%22%C2%AB~%22%3B', 'right result';
+is "$params", 'input=say+%22%C2%AB%7E%22%3B', 'right result';
 $params = Mojo::Parameters->new('♥=☃');
 is_deeply $params->pairs, ['♥', '☃'], 'right structure';
 is $params->param('♥'), '☃', 'right value';
@@ -175,8 +175,8 @@ $params->pairs([a => 2, b => 3]);
 is $params->to_string, 'a=2&b=3', 'right result';
 
 # Query string
-$params = Mojo::Parameters->new('%AZaz09-._~&;=+!$\'()*,%:@/?');
-is "$params", '%AZaz09-._~&;=+!$\'()*,%:@/?', 'right result';
+$params = Mojo::Parameters->new('AZaz09-._~%!$&\'()*+,;=:@/?');
+is "$params", 'AZaz09-._~%!$&\'()*+,;=:@/?', 'right result';
 $params = Mojo::Parameters->new('foo{}bar');
 is "$params", 'foo%7B%7Dbar', 'right result';
 
@@ -189,7 +189,8 @@ is "$params", '%25foo%25=%25', 'right result';
 $params = Mojo::Parameters->new('!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23');
 is $params->param('!$\'()*,:@/foo?'), '!$\'()*,:@/?', 'right value';
 is $params->param('bar'),             23,             'right value';
-is "$params", '!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23', 'right result';
+is "$params", '%21%24%27%28%29*%2C%3A%40%2Ffoo%3F='
+  . '%21%24%27%28%29*%2C%3A%40%2F%3F&bar=23', 'right result';
 
 # No charset
 $params = Mojo::Parameters->new('%E5=%E4')->charset(undef);

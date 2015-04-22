@@ -1,5 +1,6 @@
 
-6.09  2015-04-17
+6.09  2015-04-22
+  - Improved HTML Living Standard compliance of Mojo::Parameters.
 
 6.08  2015-04-09
   - Added is_established and server_open methods to

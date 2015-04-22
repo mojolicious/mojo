@@ -90,12 +90,14 @@ $t->get_ok("/.$yatta")->status_is(404);
 $t->post_ok('/data', $yatta_sjis)->status_is(200)->content_is($yatta_sjis);
 
 # JSON data
-$t->get_ok('/json')->status_is(200)->content_type_is('application/json')
+$t->get_ok('/json')->status_is(200)
+  ->content_type_is('application/json;charset=UTF-8')
   ->json_is({test => $yatta});
 
 # IRI
 $t->get_ok('/привет/мир')->status_is(200)
-  ->content_type_is('application/json')->json_is({foo => $yatta});
+  ->content_type_is('application/json;charset=UTF-8')
+  ->json_is({foo => $yatta});
 
 # Shift_JIS parameters
 my $url

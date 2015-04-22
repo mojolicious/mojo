@@ -157,7 +157,7 @@ $msg = '';
 $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
 is $res->headers->status, '200 OK', 'right "Status" value';
-is $res->headers->content_type, 'application/json',
+is $res->headers->content_type, 'application/json;charset=UTF-8',
   'right "Content-Type" value';
 is $res->headers->content_length, 27, 'right "Content-Length" value';
 is $res->json->{lalala}, 23,    'right value';

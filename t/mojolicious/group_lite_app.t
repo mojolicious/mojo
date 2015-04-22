@@ -430,7 +430,8 @@ $t->get_ok('/some_formats.txt')->status_is(200)
 
 # Format "json" has been detected
 $t->get_ok('/some_formats.json')->status_is(200)
-  ->content_type_is('application/json')->content_is('Some format detection.');
+  ->content_type_is('application/json;charset=UTF-8')
+  ->content_is('Some format detection.');
 
 # Invalid format
 $t->get_ok('/some_formats.xml')->status_is(404)

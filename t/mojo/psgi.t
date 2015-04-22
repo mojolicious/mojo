@@ -68,7 +68,8 @@ my %headers = @{$res->[1]};
 ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date}, 'has "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
-is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
+is $headers{'Content-Type'}, 'application/json;charset=UTF-8',
+  'right "Content-Type" value';
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
@@ -104,7 +105,8 @@ is $res->[0], 200, 'right status';
 ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date}, 'has "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
-is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
+is $headers{'Content-Type'}, 'application/json;charset=UTF-8',
+  'right "Content-Type" value';
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';

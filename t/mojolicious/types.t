@@ -5,7 +5,7 @@ use Mojolicious::Types;
 
 # Basic functionality
 my $t = Mojolicious::Types->new;
-is $t->type('json'), 'application/json', 'right type';
+is $t->type('json'), 'application/json;charset=UTF-8', 'right type';
 is $t->type('foo'), undef, 'no type';
 $t->type(foo => 'foo/bar');
 is $t->type('foo'), 'foo/bar', 'right type';

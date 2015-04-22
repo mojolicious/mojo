@@ -151,14 +151,14 @@ sub to_hash {
 sub to_string {
   my $self = shift;
 
-  # String
+  # String (RFC 3986)
   my $charset = $self->charset;
   if (defined(my $str = $self->{string})) {
     $str = encode $charset, $str if $charset;
     return url_escape $str, '^A-Za-z0-9\-._~%!$&\'()*+,;=:@/?';
   }
 
-  # Build pairs
+  # Build pairs (HTML Living Standard)
   my $pairs = $self->pairs;
   return '' unless @$pairs;
   my @pairs;

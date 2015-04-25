@@ -421,9 +421,9 @@ L<Mojolicious::Controller/"url_for"> for this.
   # Generate URL "http://127.0.0.1:3000/foo/jan" for route "baz"
   my $url = $c->url_for('baz', user => 'jan')->to_abs;
 
-Nameless routes get an automatically generated one assigned that is simply
-equal to the route itself without non-word characters, custom names have a
-higher precedence though.
+You can assign a name with L<Mojolicious::Routes::Route/"name">, or let the
+router generate one automatically, which would be equal to the route itself
+without non-word characters, custom names have a higher precedence though.
 
   # /foo/bar ("foobar")
   $r->get('/foo/bar')->to('test#stuff');

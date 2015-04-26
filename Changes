@@ -2,7 +2,8 @@
 6.10  2015-04-26
   - Removed support for user/group switching, because it never worked
     correctly, which means that this security feature has become an attack
-    vector itself.
+    vector itself. If you depend on this functionality, you can now use the
+    CPAN module Mojolicious::Plugin::SetUserGroup instead.
   - Removed group and user attributes from Mojo::Server.
   - Removed setuidgid method from Mojo::Server.
   - Removed group and user settings from Hypnotoad.

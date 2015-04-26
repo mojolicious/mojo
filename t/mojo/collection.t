@@ -167,4 +167,22 @@ is_deeply $collection->uniq->to_array, [1, 2, 3, 4, 5], 'right result';
 is_deeply $collection->uniq->reverse->uniq->to_array, [5, 4, 3, 2, 1],
   'right result';
 
+# unshift
+$collection = c(1, 2, 3);
+is_deeply $collection->unshift(4, 5, 6), [4, 5, 6, 1, 2, 3], 'right result';
+$collection = c(1);
+is_deeply $collection->unshift([2])->flatten->to_array, [2, 1], 'right result';
+is_deeply $collection->unshift(3)->unshift(4), [4, 3, [2], 1], 'right result';
+$collection = c();
+is_deeply $collection->unshift(1)->unshift(2), [2, 1], 'right result';
+my $c2 = c(3, 4);
+my $c3 = c(5, 6);
+is_deeply $collection->unshift($c2)->unshift($c3)->flatten, [5, 6, 3, 4, 2, 1],
+  'right result';
+$collection = c(2, 1);
+is_deeply $collection
+  ->unshift($c2->reverse->to_array)
+  ->unshift($c3->reverse->to_array)->flatten, [6, 5, 4, 3, 2, 1],
+  'right result';
+
 done_testing();

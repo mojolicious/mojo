@@ -101,6 +101,12 @@ sub uniq {
   return $_[0]->new(grep { !$seen{$_}++ } @{$_[0]});
 }
 
+sub unshift {
+  my $self = shift;
+  unshift @$self, @_;
+  return $self;
+}
+
 sub _flatten {
   map { _ref($_) ? _flatten(@$_) : $_ } @_;
 }
@@ -342,6 +348,16 @@ Create a new collection without duplicate elements.
 
   # "foo bar baz"
   Mojo::Collection->new('foo', 'bar', 'bar', 'baz')->uniq->join(' ');
+
+=head2 unshift
+
+  my $collection = $collection->unshift(1, 2, 3);
+
+Prepends an array to the collection in the specified order.
+
+  my $coundown = Mojo::Collection->new('BAM!');
+  my $count = Mojo::Collection->new(1, 2, 3);
+  $countdown->unshift( $count->reverse );
 
 =head1 SEE ALSO
 

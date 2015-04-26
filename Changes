@@ -1,4 +1,6 @@
 
+6.10  2015-04-26
+
 6.09  2015-04-25
   - Improved HTML Living Standard compliance of Mojo::Parameters. (riche, sri)
   - Fixed bug in Mojolicious::Types where the json MIME type did not specify a

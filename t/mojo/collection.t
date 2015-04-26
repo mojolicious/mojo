@@ -98,6 +98,10 @@ is_deeply $collection->push([2])->flatten->to_array, [1, 2], 'right result';
 is_deeply $collection->push(3)->push(4), [1, [2], 3, 4], 'right result';
 $collection = c();
 is_deeply $collection->push(1)->push(2), [1, 2], 'right result';
+my $c2 = c(3, 4);
+my $c3 = c(5, 6);
+is_deeply $collection->push($c2)->push($c3)->flatten, [1, 2, 3, 4, 5, 6],
+  'right result';
 
 # reverse
 $collection = c(3, 2, 1);

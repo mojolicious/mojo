@@ -79,22 +79,22 @@ sub setuidgid {
   $self->_error(qq{User "$user" does not exist})
     unless defined(my $uid = getpwnam $user);
 
-  # User groups
-  my @gids;
-  while (my (undef,undef,$id,$members) = getgrent()) {
-    push @gids, $id if grep { $_ eq $user } split ' ', $members;
-  }
-
   # Group
   my $group = $self->group // $user;
   $self->_error(qq{Group "$group" does not exist})
     unless defined(my $gid = getgrnam $group);
-  unshift @gids, $gid unless grep { $_ == $gid } @gids;
+
+  # User groups
+  my @gids = ($gid);
+  while (my (undef, undef, $id, $members) = getgrent()) {
+    next if $id == $gid;
+    push @gids, $id if grep { $_ eq $user } split ' ', $members;
+  }
 
   $( = $gid;
-  $self->_error(qq{Can't switch to group "$group": $!}) if $!;
+  $self->_error(qq{Can't switch to real group "$group": $!}) if $!;
   $) = join ' ', $gid, @gids;
-  $self->_error(qq{Can't switch to groups "$gid @gids": $!}) if $!;
+  $self->_error(qq{Can't switch to effective groups "$gid @gids": $!}) if $!;
   $self->_error(qq{Can't switch to user "$user": $!})
     unless POSIX::setuid($uid);
 

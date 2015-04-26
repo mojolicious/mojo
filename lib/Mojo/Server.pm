@@ -92,8 +92,9 @@ sub setuidgid {
   unshift @gids, $gid unless grep { $_ == $gid } @gids;
 
   $( = $gid;
-  $) = join ' ', $gid, @gids;
   $self->_error(qq{Can't switch to group "$group": $!}) if $!;
+  $) = join ' ', $gid, @gids;
+  $self->_error(qq{Can't switch to groups "$gid @gids": $!}) if $!;
   $self->_error(qq{Can't switch to user "$user": $!})
     unless POSIX::setuid($uid);
 

@@ -175,8 +175,8 @@ is_deeply $collection->unshift([2])->flatten->to_array, [2, 1], 'right result';
 is_deeply $collection->unshift(3)->unshift(4), [4, 3, [2], 1], 'right result';
 $collection = c();
 is_deeply $collection->unshift(1)->unshift(2), [2, 1], 'right result';
-my $c2 = c(3, 4);
-my $c3 = c(5, 6);
+$c2 = c(3, 4);
+$c3 = c(5, 6);
 is_deeply $collection->unshift($c2)->unshift($c3)->flatten, [5, 6, 3, 4, 2, 1],
   'right result';
 $collection = c(2, 1);

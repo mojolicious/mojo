@@ -74,18 +74,27 @@ sub run { croak 'Method "run" not implemented by subclass' }
 sub setuidgid {
   my $self = shift;
 
-  # Group (make sure secondary groups are reassigned too)
-  if (my $group = $self->group) {
-    $self->_error(qq{Group "$group" does not exist})
-      unless defined(my $gid = getgrnam $group);
-    $self->_error(qq{Can't switch to group "$group": $!})
-      unless ($( = $) = "$gid $gid") && $) eq "$gid $gid" && $( eq "$gid $gid";
-  }
-
   # User
   return $self unless my $user = $self->user;
   $self->_error(qq{User "$user" does not exist})
     unless defined(my $uid = getpwnam $user);
+
+  # Group
+  my $group = $self->group // $user;
+  $self->_error(qq{Group "$group" does not exist})
+    unless defined(my $gid = getgrnam $group);
+
+  # User groups
+  my @gids = ($gid);
+  while (my (undef, undef, $id, $members) = getgrent()) {
+    next if $id == $gid;
+    push @gids, $id if grep { $_ eq $user } split ' ', $members;
+  }
+
+  $( = $gid;
+  $self->_error(qq{Can't switch to real group "$group": $!}) if $!;
+  $) = join ' ', $gid, @gids;
+  $self->_error(qq{Can't switch to effective groups "$gid @gids": $!}) if $!;
   $self->_error(qq{Can't switch to user "$user": $!})
     unless POSIX::setuid($uid);
 

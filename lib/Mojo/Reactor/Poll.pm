@@ -84,7 +84,7 @@ sub remove {
   return !!delete $self->{io}{fileno $remove};
 }
 
-sub reset { delete @{shift()}{qw(io timers)} }
+sub reset { delete @{shift()}{qw(io next_tick timers)} }
 
 sub start {
   my $self = shift;

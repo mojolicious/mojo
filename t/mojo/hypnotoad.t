@@ -24,7 +24,6 @@ use Mojo::Util qw(slurp spurt);
     backlog            => 43,
     clients            => 1,
     graceful_timeout   => 23,
-    group              => 'testers',
     heartbeat_interval => 7,
     heartbeat_timeout  => 9,
     inactivity_timeout => 5,
@@ -34,28 +33,25 @@ use Mojo::Util qw(slurp spurt);
     proxy              => 1,
     requests           => 3,
     upgrade_timeout    => 45,
-    user               => 'tester',
     workers            => 7
   };
   is $hypnotoad->upgrade_timeout, 60, 'right default';
   $hypnotoad->configure('test');
   is_deeply $hypnotoad->prefork->listen, ['http://*:8080'], 'right value';
   $hypnotoad->configure('myserver');
-  is $hypnotoad->prefork->accepts,            13,        'right value';
-  is $hypnotoad->prefork->backlog,            43,        'right value';
-  is $hypnotoad->prefork->graceful_timeout,   23,        'right value';
-  is $hypnotoad->prefork->group,              'testers', 'right value';
-  is $hypnotoad->prefork->heartbeat_interval, 7,         'right value';
-  is $hypnotoad->prefork->heartbeat_timeout,  9,         'right value';
-  is $hypnotoad->prefork->inactivity_timeout, 5,         'right value';
+  is $hypnotoad->prefork->accepts,            13, 'right value';
+  is $hypnotoad->prefork->backlog,            43, 'right value';
+  is $hypnotoad->prefork->graceful_timeout,   23, 'right value';
+  is $hypnotoad->prefork->heartbeat_interval, 7,  'right value';
+  is $hypnotoad->prefork->heartbeat_timeout,  9,  'right value';
+  is $hypnotoad->prefork->inactivity_timeout, 5,  'right value';
   is_deeply $hypnotoad->prefork->listen, ['http://*:8081'], 'right value';
   is $hypnotoad->prefork->max_clients,  1,              'right value';
   is $hypnotoad->prefork->max_requests, 3,              'right value';
   is $hypnotoad->prefork->multi_accept, 16,             'right value';
   is $hypnotoad->prefork->pid_file,     '/foo/bar.pid', 'right value';
   ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
-  is $hypnotoad->prefork->user,          'tester', 'right value';
-  is $hypnotoad->prefork->workers,       7, 'right value';
+  is $hypnotoad->prefork->workers, 7, 'right value';
   is $hypnotoad->upgrade_timeout, 45, 'right value';
 }
 

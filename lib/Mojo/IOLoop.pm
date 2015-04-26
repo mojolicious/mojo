@@ -476,8 +476,8 @@ Check if event loop is running.
   my $undef = Mojo::IOLoop->next_tick(sub {...});
   my $undef = $loop->next_tick(sub {...});
 
-Invoke callback as soon as possible, but not before returning, always returns
-C<undef>.
+Invoke callback as soon as possible, but not before returning or other
+callbacks that have been registered with this method, always returns C<undef>.
 
   # Perform operation on next reactor tick
   Mojo::IOLoop->next_tick(sub {

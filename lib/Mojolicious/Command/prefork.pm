@@ -17,7 +17,6 @@ sub run {
     'b|backlog=i'            => sub { $prefork->backlog($_[1]) },
     'c|clients=i'            => sub { $prefork->max_clients($_[1]) },
     'G|graceful-timeout=i'   => sub { $prefork->graceful_timeout($_[1]) },
-    'g|group=s'              => sub { $prefork->group($_[1]) },
     'I|heartbeat-interval=i' => sub { $prefork->heartbeat_interval($_[1]) },
     'H|heartbeat-timeout=i'  => sub { $prefork->heartbeat_timeout($_[1]) },
     'i|inactivity-timeout=i' => sub { $prefork->inactivity_timeout($_[1]) },
@@ -26,7 +25,6 @@ sub run {
     'P|pid-file=s'     => sub { $prefork->pid_file($_[1]) },
     'p|proxy'          => sub { $prefork->reverse_proxy(1) },
     'r|requests=i'     => sub { $prefork->max_requests($_[1]) },
-    'u|user=s'         => sub { $prefork->user($_[1]) },
     'w|workers=i'      => sub { $prefork->workers($_[1]) };
 
   $prefork->listen(\@listen) if @listen;
@@ -58,7 +56,6 @@ Mojolicious::Command::prefork - Prefork command
     -c, --clients <number>               Maximum number of concurrent
                                          connections, defaults to 1000
     -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 20.
-    -g, --group <name>                   Group name for process
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
     -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
@@ -75,7 +72,6 @@ Mojolicious::Command::prefork - Prefork command
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
                                          keep-alive connection, defaults to 25
-    -u, --user <name>                    Username for process
     -w, --workers <number>               Number of workers, defaults to 4
 
 =head1 DESCRIPTION

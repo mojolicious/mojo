@@ -14,12 +14,10 @@ sub run {
   GetOptionsFromArray \@args,
     'b|backlog=i'            => sub { $daemon->backlog($_[1]) },
     'c|clients=i'            => sub { $daemon->max_clients($_[1]) },
-    'g|group=s'              => sub { $daemon->group($_[1]) },
     'i|inactivity-timeout=i' => sub { $daemon->inactivity_timeout($_[1]) },
     'l|listen=s'   => \my @listen,
     'p|proxy'      => sub { $daemon->reverse_proxy(1) },
-    'r|requests=i' => sub { $daemon->max_requests($_[1]) },
-    'u|user=s'     => sub { $daemon->user($_[1]) };
+    'r|requests=i' => sub { $daemon->max_requests($_[1]) };
 
   $daemon->listen(\@listen) if @listen;
   $daemon->run;
@@ -47,7 +45,6 @@ Mojolicious::Command::daemon - Daemon command
                                          SOMAXCONN
     -c, --clients <number>               Maximum number of concurrent
                                          connections, defaults to 1000
-    -g, --group <name>                   Group name for process
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or 15
     -l, --listen <location>              One or more locations you want to
@@ -58,7 +55,6 @@ Mojolicious::Command::daemon - Daemon command
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
                                          keep-alive connection, defaults to 25
-    -u, --user <name>                    Username for process
 
 =head1 DESCRIPTION
 

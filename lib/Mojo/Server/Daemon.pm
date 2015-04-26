@@ -30,7 +30,7 @@ sub run {
   my $loop = $self->ioloop;
   my $int = $loop->recurring(1 => sub { });
   local $SIG{INT} = local $SIG{TERM} = sub { $loop->stop };
-  $self->start->setuidgid->ioloop->start;
+  $self->start->ioloop->start;
   $loop->remove($int);
 }
 

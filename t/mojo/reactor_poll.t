@@ -145,6 +145,16 @@ ok !$recurring, 'recurring was not triggered again';
 my $reactor2 = Mojo::Reactor::Poll->new;
 is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 
+# Ordered next_tick
+my $result = [];
+$reactor->next_tick(sub { push @$result, 1 });
+$reactor->next_tick(sub { push @$result, 2 });
+$reactor->next_tick(sub { push @$result, 3 });
+$reactor->next_tick(sub { push @$result, 4 });
+$reactor->next_tick(sub { push @$result, 5 });
+$reactor->start;
+is_deeply $result, [1, 2, 3, 4, 5], 'right result';
+
 # Reset while watchers are active
 $writable = undef;
 $reactor->io($_ => sub { ++$writable and shift->reset })->watch($_, 0, 1)

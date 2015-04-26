@@ -1,5 +1,14 @@
 
 6.10  2015-04-26
+  - Removed support for user/group switching, because it never worked
+    correctly, which means that this security feature has become an attack
+    vector itself.
+  - Removed group and user attributes from Mojo::Server.
+  - Removed setuidgid method from Mojo::Server.
+  - Removed group and user settings from Hypnotoad.
+  - Removed -g/--group and -u/--user options from daemon and prefork commands.
+  - Improved next_tick callbacks to run in the same order in which they were
+    registered.
 
 6.09  2015-04-25
   - Improved HTML Living Standard compliance of Mojo::Parameters. (riche, sri)

@@ -14,7 +14,11 @@ sub detect {
 sub io         { croak 'Method "io" not implemented by subclass' }
 sub is_running { croak 'Method "is_running" not implemented by subclass' }
 
-sub next_tick { shift->timer(0 => @_) and return undef }
+sub next_tick {
+  my ($self, $cb) = @_;
+  $self->timer(0 => \&_next) if push(@{$self->{next_tick}}, $cb) == 1;
+  return undef;
+}
 
 sub one_tick  { croak 'Method "one_tick" not implemented by subclass' }
 sub recurring { croak 'Method "recurring" not implemented by subclass' }
@@ -24,6 +28,11 @@ sub start     { croak 'Method "start" not implemented by subclass' }
 sub stop      { croak 'Method "stop" not implemented by subclass' }
 sub timer     { croak 'Method "timer" not implemented by subclass' }
 sub watch     { croak 'Method "watch" not implemented by subclass' }
+
+sub _next {
+  my $self = shift;
+  while (my $cb = shift @{$self->{next_tick}}) { $self->$cb }
+}
 
 1;
 
@@ -122,8 +131,8 @@ Check if reactor is running. Meant to be overloaded in a subclass.
 
   my $undef = $reactor->next_tick(sub {...});
 
-Invoke callback as soon as possible, but not before returning, always returns
-C<undef>.
+Invoke callback as soon as possible, but not before returning or other
+callbacks that have been registered with this method, always returns C<undef>.
 
 =head2 one_tick
 

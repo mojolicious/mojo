@@ -145,11 +145,8 @@ sub _spawn {
   return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time}
     if $pid;
 
-  # Change user/group
-  $self->cleanup(0)->setuidgid;
-
   # Heartbeat messages
-  my $loop     = $self->ioloop;
+  my $loop     = $self->cleanup(0)->ioloop;
   my $finished = 0;
   $loop->on(finish => sub { $finished = 1 });
   weaken $self;

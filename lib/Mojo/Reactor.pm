@@ -31,7 +31,8 @@ sub watch     { croak 'Method "watch" not implemented by subclass' }
 
 sub _next {
   my $self = shift;
-  while (my $cb = shift @{$self->{next_tick}}) { $self->$cb }
+  my $next = delete $self->{next_tick};
+  for my $cb (@$next) { $self->$cb }
 }
 
 1;

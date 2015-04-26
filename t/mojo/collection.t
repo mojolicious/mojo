@@ -90,6 +90,15 @@ is $collection->map('reverse')->map(join => "\n")->join("\n"),
 is $collection->map(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
   'right result';
 
+# push
+$collection = c(1, 2, 3);
+is_deeply $collection->push(4, 5, 6), [1, 2, 3, 4, 5, 6], 'right result';
+$collection = c(1);
+is_deeply $collection->push([2])->flatten->to_array, [1, 2], 'right result';
+is_deeply $collection->push(3)->push(4), [1, [2], 3, 4], 'right result';
+$collection = c();
+is_deeply $collection->push(1)->push(2), [1, 2], 'right result';
+
 # reverse
 $collection = c(3, 2, 1);
 is_deeply $collection->reverse->to_array, [1, 2, 3], 'right order';

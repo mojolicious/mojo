@@ -55,6 +55,12 @@ sub new {
   return bless [@_], ref $class || $class;
 }
 
+sub push {
+  my $self = shift;
+  push @$self, @_;
+  return $self;
+}
+
 sub reduce {
   my $self = shift;
   @_ = (@_, @$self);
@@ -257,6 +263,12 @@ passed to the callback and is also available as C<$_>.
   my $collection = Mojo::Collection->new(1, 2, 3);
 
 Construct a new array-based L<Mojo::Collection> object.
+
+=head2 push
+
+  $collection->push(6, 7, 8);
+
+Add elements to the existing L<Mojo::Collection> object.
 
 =head2 reduce
 

@@ -266,7 +266,7 @@ Construct a new array-based L<Mojo::Collection> object.
 
 =head2 push
 
-  $collection->push(6, 7, 8);
+  my $collection = $collection->push(6, 7, 8);
 
 Add elements to the existing L<Mojo::Collection> object.
 

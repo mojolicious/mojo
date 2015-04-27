@@ -23,7 +23,7 @@ sub is_running { !!shift->{running} }
 sub next_tick {
   my ($self, $cb) = @_;
   push @{$self->{next_tick}}, $cb;
-  $self->{next} //= $self->timer(0 => \&_tick);
+  $self->{next_timer} //= $self->timer(0 => \&_next);
   return undef;
 }
 
@@ -91,7 +91,7 @@ sub remove {
   return !!delete $self->{io}{fileno $remove};
 }
 
-sub reset { delete @{shift()}{qw(io next next_tick timers)} }
+sub reset { delete @{shift()}{qw(io next_tick next_timer timers)} }
 
 sub start {
   my $self = shift;
@@ -121,9 +121,9 @@ sub _id {
   return $id;
 }
 
-sub _tick {
+sub _next {
   my $self = shift;
-  delete $self->{next};
+  delete $self->{next_timer};
   while (my $cb = shift @{$self->{next_tick}}) { $self->$cb }
 }
 

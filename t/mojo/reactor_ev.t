@@ -138,9 +138,10 @@ ok !$timer, 'timer was not triggered';
 ok $recurring, 'recurring was triggered again';
 
 # Reset
+$reactor->next_tick(sub { die 'Reset failed' });
 $reactor->reset;
 ($readable, $writable, $recurring) = ();
-$reactor->timer(0.025 => sub { shift->stop });
+$reactor->next_tick(sub { shift->stop });
 $reactor->start;
 ok !$readable,  'io event was not triggered again';
 ok !$writable,  'io event was not triggered again';

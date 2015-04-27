@@ -1,4 +1,6 @@
 
+6.11  2015-04-27
+
 6.10  2015-04-26
   - Removed support for user/group switching, because it never worked
     correctly, which means that this security feature has become an attack

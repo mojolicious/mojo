@@ -147,11 +147,11 @@ is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 
 # Ordered next_tick
 my $result = [];
-for my $i (1 .. 50) {
+for my $i (1 .. 10) {
   $reactor->next_tick(sub { push @$result, $i });
 }
 $reactor->start;
-is_deeply $result, [1 .. 50], 'right result';
+is_deeply $result, [1 .. 10], 'right result';
 
 # Reset while watchers are active
 $writable = undef;
@@ -296,6 +296,8 @@ eval { Mojo::Reactor->io };
 like $@, qr/Method "io" not implemented by subclass/, 'right error';
 eval { Mojo::Reactor->is_running };
 like $@, qr/Method "is_running" not implemented by subclass/, 'right error';
+eval { Mojo::Reactor->next_tick };
+like $@, qr/Method "next_tick" not implemented by subclass/, 'right error';
 eval { Mojo::Reactor->one_tick };
 like $@, qr/Method "one_tick" not implemented by subclass/, 'right error';
 eval { Mojo::Reactor->recurring };

@@ -13,27 +13,15 @@ sub detect {
 
 sub io         { croak 'Method "io" not implemented by subclass' }
 sub is_running { croak 'Method "is_running" not implemented by subclass' }
-
-sub next_tick {
-  my ($self, $cb) = @_;
-  $self->timer(0 => \&_next) if push(@{$self->{next_tick}}, $cb) == 1;
-  return undef;
-}
-
-sub one_tick  { croak 'Method "one_tick" not implemented by subclass' }
-sub recurring { croak 'Method "recurring" not implemented by subclass' }
-sub remove    { croak 'Method "remove" not implemented by subclass' }
-sub reset     { croak 'Method "reset" not implemented by subclass' }
-sub start     { croak 'Method "start" not implemented by subclass' }
-sub stop      { croak 'Method "stop" not implemented by subclass' }
-sub timer     { croak 'Method "timer" not implemented by subclass' }
-sub watch     { croak 'Method "watch" not implemented by subclass' }
-
-sub _next {
-  my $self = shift;
-  my $next = delete $self->{next_tick};
-  for my $cb (@$next) { $self->$cb }
-}
+sub next_tick  { croak 'Method "next_tick" not implemented by subclass' }
+sub one_tick   { croak 'Method "one_tick" not implemented by subclass' }
+sub recurring  { croak 'Method "recurring" not implemented by subclass' }
+sub remove     { croak 'Method "remove" not implemented by subclass' }
+sub reset      { croak 'Method "reset" not implemented by subclass' }
+sub start      { croak 'Method "start" not implemented by subclass' }
+sub stop       { croak 'Method "stop" not implemented by subclass' }
+sub timer      { croak 'Method "timer" not implemented by subclass' }
+sub watch      { croak 'Method "watch" not implemented by subclass' }
 
 1;
 
@@ -51,6 +39,7 @@ Mojo::Reactor - Low-level event reactor base class
   sub again      {...}
   sub io         {...}
   sub is_running {...}
+  sub next_tick  {...}
   sub one_tick   {...}
   sub recurring  {...}
   sub remove     {...}
@@ -134,6 +123,7 @@ Check if reactor is running. Meant to be overloaded in a subclass.
 
 Invoke callback as soon as possible, but not before returning or other
 callbacks that have been registered with this method, always returns C<undef>.
+Meant to be overloaded in a subclass.
 
 =head2 one_tick
 

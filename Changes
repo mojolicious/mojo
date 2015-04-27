@@ -8,6 +8,7 @@
   - Removed setuidgid method from Mojo::Server.
   - Removed group and user settings from Hypnotoad.
   - Removed -g/--group and -u/--user options from daemon and prefork commands.
+  - Added next_tick method to Mojo::Reactor::Poll.
   - Improved next_tick callbacks to run in the same order in which they were
     registered.
 

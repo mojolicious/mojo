@@ -150,11 +150,11 @@ is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 
 # Ordered next_tick
 my $result = [];
-for my $i (1 .. 50) {
+for my $i (1 .. 10) {
   $reactor->next_tick(sub { push @$result, $i });
 }
 $reactor->start;
-is_deeply $result, [1 .. 50], 'right result';
+is_deeply $result, [1 .. 10], 'right result';
 
 # Reset while watchers are active
 $writable = undef;

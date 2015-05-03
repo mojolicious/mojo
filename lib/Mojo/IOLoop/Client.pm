@@ -41,6 +41,7 @@ sub connect {
     sub { $self->emit(error => 'Connect timeout') });
 
   # Blocking name resolution
+  $args->{proto} ||= 'tcp';
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
   return $reactor->next_tick(sub { $self && $self->_connect($args) })
@@ -79,6 +80,7 @@ sub _connect {
   unless ($handle = $self->{handle} = $args->{handle}) {
     my %options = (PeerAddr => $address, PeerPort => _port($args));
     %options = (PeerAddrInfo => $args->{addr_info}) if $args->{addr_info};
+    $options{Proto} = $args->{proto};
     $options{Blocking} = 0;
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     return $self->emit(error => "Can't connect: $@")
@@ -104,7 +106,8 @@ sub _ready {
   return $self->emit(error => $! || 'Not connected') unless $handle->connected;
 
   # Disable Nagle's algorithm
-  setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
+  setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1
+    if $args->{proto} eq 'tcp';
 
   $self->_try_socks($args);
 }
@@ -193,7 +196,7 @@ sub _try_tls {
 
 =head1 NAME
 
-Mojo::IOLoop::Client - Non-blocking TCP client
+Mojo::IOLoop::Client - Non-blocking TCP/UDP client
 
 =head1 SYNOPSIS
 
@@ -216,7 +219,7 @@ Mojo::IOLoop::Client - Non-blocking TCP client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Client> opens TCP/UDP connections for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
@@ -293,6 +296,12 @@ Local address to bind to.
   port => 80
 
 Port to connect to, defaults to C<80> or C<443> with C<tls> option.
+
+=item proto
+
+  proto => 'tcp'
+
+Protocol name or number ('tcp', 'udp').
 
 =item socks_address
 

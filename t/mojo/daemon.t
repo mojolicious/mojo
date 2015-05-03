@@ -277,4 +277,20 @@ ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
 eval { Mojo::Server->run };
 like $@, qr/Method "run" not implemented by subclass/, 'right error';
 
+# No scheme in listen location
+eval {
+  $daemon = Mojo::Server::Daemon->new({listen => ['127.0.0.1'], silent => 1});
+  $daemon->start;
+};
+like $@, qr/Scheme not specified or not one of http\/https in listen location/,
+  'right error';
+
+# Symbolic port name used in listen location
+eval {
+  $daemon
+    = Mojo::Server::Daemon->new({listen => ['http://*:http'], silent => 1});
+  $daemon->start;
+};
+like $@, qr/Invalid address in listen location/, 'right error';
+
 done_testing();

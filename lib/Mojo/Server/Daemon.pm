@@ -5,6 +5,7 @@ use Mojo::IOLoop;
 use Mojo::URL;
 use Mojo::Util 'term_escape';
 use Scalar::Util 'weaken';
+use Carp 'croak';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
@@ -146,7 +147,17 @@ sub _finish {
 sub _listen {
   my ($self, $listen) = @_;
 
-  my $url     = Mojo::URL->new($listen);
+  my $url = Mojo::URL->new($listen);
+
+  croak(
+    "Scheme not specified or not one of http/https in listen location '$listen'"
+  ) if !$url->scheme || $url->scheme !~ /^https*$/;
+
+  # Disallow symbolic port names
+  croak("Invalid address in listen location '$listen'")
+    if (!$url->host && !$url->port)
+    || $url->host =~ /:(?![^\[]*\])/;
+
   my $query   = $url->query;
   my $options = {
     address => $url->host,
@@ -179,9 +190,12 @@ sub _listen {
   );
 
   return if $self->silent;
+  my $aport
+    = $self->ioloop->acceptor($self->acceptors->[$#{$self->acceptors}])->port;
+  $url->port($aport) if !$url->port;
+  $url->host("*") if !$url->host;
   $self->app->log->info(qq{Listening at "$url"});
   $query->pairs([]);
-  $url->host('127.0.0.1') if $url->host eq '*';
   say "Server available at $url";
 }
 

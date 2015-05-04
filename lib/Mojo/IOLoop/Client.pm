@@ -83,6 +83,7 @@ sub _connect {
     $options{Proto} = $args->{proto};
     $options{Blocking} = 0;
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
+    $options{LocalPort} = $args->{local_port} if $args->{local_port};
     return $self->emit(error => "Can't connect: $@")
       unless $self->{handle} = $handle = IO::Socket::IP->new(%options);
   }
@@ -290,6 +291,12 @@ Use an already prepared handle.
   local_address => '127.0.0.1'
 
 Local address to bind to.
+
+=item local_port
+
+  local_address => 12345
+
+Local port to bind to.
 
 =item port
 

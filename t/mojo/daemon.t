@@ -96,6 +96,10 @@ eval { Mojo::Server::Daemon->new->build_app('Mojo::DoesNotExist') };
 like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/,
   'right error';
 
+# Invalid listen location
+eval { Mojo::Server::Daemon->new(listen => ['fail'])->start };
+like $@, qr/Invalid listen location/, 'right error';
+
 # Transaction
 isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right transaction';
 

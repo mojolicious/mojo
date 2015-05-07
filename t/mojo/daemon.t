@@ -294,11 +294,14 @@ foreach (
   eval { Mojo::Server::Daemon->new(listen => [$_], silent => 1)->start };
   like $@, qr/^Invalid listen location/, 'right error';
 }
+
 foreach (
-  'http://',          'http://*',
-  'http://127.0.0.1', 'http://[::1]',
-  'http://?reuse=1',  'http://127.0.0.1?reuse=1',
-  'http://[::]?reuse=1'
+  (
+    'http://',          'http://*',
+    'http://127.0.0.1', 'http://?reuse=1',
+    'http://127.0.0.1?reuse=1'
+  ),
+  $ENV{TEST_IPV6} ? ('http://[::1]', 'http://[::]?reuse=1') : ()
   )
 {
   my $daemon = Mojo::Server::Daemon->new(listen => [$_], silent => 1)->start;

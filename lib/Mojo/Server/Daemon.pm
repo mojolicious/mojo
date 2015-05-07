@@ -149,8 +149,7 @@ sub _listen {
 
   my $url   = Mojo::URL->new($listen);
   my $proto = $url->protocol;
-  croak qq{Invalid listen location "$listen"}
-    unless $proto eq 'http' || $proto eq 'https';
+  croak qq{Invalid listen location "$listen"} unless $proto =~ /^https?$/;
 
   my $query   = $url->query;
   my $options = {

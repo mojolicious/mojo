@@ -277,20 +277,32 @@ ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
 eval { Mojo::Server->run };
 like $@, qr/Method "run" not implemented by subclass/, 'right error';
 
-# No scheme in listen location
-eval {
-  $daemon = Mojo::Server::Daemon->new({listen => ['127.0.0.1'], silent => 1});
-  $daemon->start;
-};
-like $@, qr/Scheme not specified or not one of http\/https in listen location/,
-  'right error';
-
-# Symbolic port name used in listen location
-eval {
-  $daemon
-    = Mojo::Server::Daemon->new({listen => ['http://*:http'], silent => 1});
-  $daemon->start;
-};
-like $@, qr/Invalid address in listen location/, 'right error';
+# Listen strings
+foreach (
+  '127.0.0.1',                      '127.0.0.1:3000',
+  'httpss://127.0.0.1',             'ftp://127.0.0.1:3000',
+  'http://127.0.0.1:3000:tproxy',   'http://[::',
+  'http://::]:3000',                'http://:',
+  'http://*:',                      'http://[::]*',
+  'http://127.0.0.1:',              'http://////',
+  'http://u:p@localhost',           'http://u:p@localhost:3000',
+  'http://localhost/1/2/3',         'http://localhost:3000/1/2/3',
+  'http://u:p@localhost:300/1/2',   'http:/',
+  'http://127.0.0.1:3000/?reuse=1', 'http://[[::]]'
+  )
+{
+  eval { Mojo::Server::Daemon->new(listen => [$_], silent => 1)->start };
+  like $@, qr/^Invalid listen location/, 'right error';
+}
+foreach (
+  'http://',          'http://*',
+  'http://127.0.0.1', 'http://[::1]',
+  'http://?reuse=1',  'http://127.0.0.1?reuse=1',
+  'http://[::]?reuse=1'
+  )
+{
+  my $daemon = Mojo::Server::Daemon->new(listen => [$_], silent => 1)->start;
+  isa_ok $daemon, 'Mojo::Server::Daemon', 'right daemon';
+}
 
 done_testing();

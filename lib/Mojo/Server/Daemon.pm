@@ -149,14 +149,12 @@ sub _listen {
 
   my $url = Mojo::URL->new($listen);
 
-  croak(
-    "Scheme not specified or not one of http/https in listen location '$listen'"
-  ) if !$url->scheme || $url->scheme !~ /^https*$/;
-
-  # Disallow symbolic port names
-  croak("Invalid address in listen location '$listen'")
-    if (!$url->host && !$url->port)
-    || $url->host =~ /:(?![^\[]*\])/;
+  # Basic listen location checks
+  croak("Invalid listen location '$listen'")
+    if (!$url->scheme || $url->scheme !~ /^https?$/)
+    || ($url->host && $url->host =~ /:/ && $url->host !~ /^\[[^\[\]]*\]$/)
+    || ($url->path . '')
+    || (!defined $url->authority || $url->authority =~ /@/);
 
   my $query   = $url->query;
   my $options = {
@@ -190,8 +188,7 @@ sub _listen {
   );
 
   return if $self->silent;
-  my $aport
-    = $self->ioloop->acceptor($self->acceptors->[$#{$self->acceptors}])->port;
+  my $aport = $self->ioloop->acceptor($self->acceptors->[-1])->port;
   $url->port($aport) if !$url->port;
   $url->host("*") if !$url->host;
   $self->app->log->info(qq{Listening at "$url"});

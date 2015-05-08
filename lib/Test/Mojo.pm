@@ -580,13 +580,6 @@ Opposite of L</"content_is">.
 Check response content for similar match after retrieving it from
 L<Mojo::Message/"text">.
 
-=head2 content_unlike
-
-  $t = $t->content_unlike(qr/working!/);
-  $t = $t->content_unlike(qr/working!/, 'different content');
-
-Opposite of L</"content_like">.
-
 =head2 content_type_is
 
   $t = $t->content_type_is('text/html');
@@ -614,6 +607,13 @@ Check response C<Content-Type> header for similar match.
   $t = $t->content_type_unlike(qr/text/, 'different content type');
 
 Opposite of L</"content_type_like">.
+
+=head2 content_unlike
+
+  $t = $t->content_unlike(qr/working!/);
+  $t = $t->content_unlike(qr/working!/, 'different content');
+
+Opposite of L</"content_like">.
 
 =head2 delete_ok
 

@@ -278,17 +278,17 @@ Construct a new L<Mojo::IOLoop::Stream> object.
 
 Start watching for new data on the stream.
 
-=head2 stop
-
-  $stream->stop;
-
-Stop watching for new data on the stream.
-
 =head2 steal_handle
 
   my $handle = $stream->steal_handle;
 
 Steal handle from stream and prevent it from getting closed automatically.
+
+=head2 stop
+
+  $stream->stop;
+
+Stop watching for new data on the stream.
 
 =head2 timeout
 

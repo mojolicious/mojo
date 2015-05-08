@@ -47,9 +47,9 @@ sub attr {
   return $self;
 }
 
-sub children { _select($_[0]->_collect(_nodes($_[0]->tree, 1)), $_[1]) }
-
 sub child_nodes { $_[0]->_collect(_nodes($_[0]->tree)) }
+
+sub children { _select($_[0]->_collect(_nodes($_[0]->tree, 1)), $_[1]) }
 
 sub content {
   my $self = shift;

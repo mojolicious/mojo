@@ -49,16 +49,16 @@ sub start {
   $reactor->io($self->timeout($self->{timeout})->{handle} => $cb);
 }
 
-sub stop {
-  my $self = shift;
-  $self->reactor->watch($self->{handle}, 0, $self->is_writing)
-    unless $self->{paused}++;
-}
-
 sub steal_handle {
   my $self = shift;
   $self->reactor->remove($self->{handle});
   return delete $self->{handle};
+}
+
+sub stop {
+  my $self = shift;
+  $self->reactor->watch($self->{handle}, 0, $self->is_writing)
+    unless $self->{paused}++;
 }
 
 sub timeout {

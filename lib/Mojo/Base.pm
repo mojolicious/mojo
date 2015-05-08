@@ -26,35 +26,6 @@ sub _monkey_patch {
   *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
 }
 
-sub import {
-  my $class = shift;
-  return unless my $flag = shift;
-
-  # Base
-  if ($flag eq '-base') { $flag = $class }
-
-  # Strict
-  elsif ($flag eq '-strict') { $flag = undef }
-
-  # Module
-  elsif ((my $file = $flag) && !$flag->can('new')) {
-    $file =~ s!::|'!/!g;
-    require "$file.pm";
-  }
-
-  # ISA
-  if ($flag) {
-    my $caller = caller;
-    no strict 'refs';
-    push @{"${caller}::ISA"}, $flag;
-    _monkey_patch $caller, 'has', sub { attr($caller, @_) };
-  }
-
-  # Mojo modules are strict!
-  $_->import for qw(strict warnings utf8);
-  feature->import(':5.10');
-}
-
 sub attr {
   my ($self, $attrs, $value) = @_;
   return unless (my $class = ref $self || $self) && $attrs;
@@ -88,6 +59,35 @@ sub attr {
         sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
     }
   }
+}
+
+sub import {
+  my $class = shift;
+  return unless my $flag = shift;
+
+  # Base
+  if ($flag eq '-base') { $flag = $class }
+
+  # Strict
+  elsif ($flag eq '-strict') { $flag = undef }
+
+  # Module
+  elsif ((my $file = $flag) && !$flag->can('new')) {
+    $file =~ s!::|'!/!g;
+    require "$file.pm";
+  }
+
+  # ISA
+  if ($flag) {
+    my $caller = caller;
+    no strict 'refs';
+    push @{"${caller}::ISA"}, $flag;
+    _monkey_patch $caller, 'has', sub { attr($caller, @_) };
+  }
+
+  # Mojo modules are strict!
+  $_->import for qw(strict warnings utf8);
+  feature->import(':5.10');
 }
 
 sub new {

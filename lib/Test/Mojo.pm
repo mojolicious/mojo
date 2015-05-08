@@ -47,12 +47,6 @@ sub content_like {
   return $self->_test('like', $self->tx->res->text, $regex, $desc);
 }
 
-sub content_unlike {
-  my ($self, $regex, $desc) = @_;
-  $desc ||= 'content is not similar';
-  return $self->_test('unlike', $self->tx->res->text, $regex, $desc);
-}
-
 sub content_type_is {
   my ($self, $type, $desc) = @_;
   $desc ||= "Content-Type: $type";
@@ -79,6 +73,12 @@ sub content_type_unlike {
   $desc ||= 'Content-Type is not similar';
   return $self->_test('unlike', $self->tx->res->headers->content_type,
     $regex, $desc);
+}
+
+sub content_unlike {
+  my ($self, $regex, $desc) = @_;
+  $desc ||= 'content is not similar';
+  return $self->_test('unlike', $self->tx->res->text, $regex, $desc);
 }
 
 sub delete_ok { shift->_build_ok(DELETE => @_) }

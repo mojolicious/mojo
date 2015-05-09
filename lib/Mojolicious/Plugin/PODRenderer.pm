@@ -97,7 +97,7 @@ sub _pod_to_html {
   my $parser = Pod::Simple::XHTML->new;
   $parser->perldoc_url_prefix('https://metacpan.org/pod/');
   $parser->$_('') for qw(html_header html_footer);
-  $parser->strip_verbatim_indent(sub { my ($i) = $_[0][0] =~ /^(\s+)/; $i });
+  $parser->strip_verbatim_indent(sub { (sort map /^(\s+)/, @{$_[0]})[0] });
   $parser->output_string(\(my $output));
   return $@ unless eval { $parser->parse_string_document("$pod"); 1 };
 

@@ -2,7 +2,6 @@ package Mojolicious::Plugin::PODRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Asset::File;
-use Mojo::ByteStream 'b';
 use Mojo::DOM;
 use Mojo::URL;
 use Mojo::Util 'slurp';

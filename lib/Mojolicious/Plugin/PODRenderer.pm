@@ -2,6 +2,7 @@ package Mojolicious::Plugin::PODRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Asset::File;
+use Mojo::ByteStream;
 use Mojo::DOM;
 use Mojo::URL;
 use Mojo::Util 'slurp';
@@ -24,7 +25,8 @@ sub register {
     }
   );
 
-  $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
+  $app->helper(
+    pod_to_html => sub { shift; Mojo::ByteStream->new(_pod_to_html(@_)) });
 
   # Perldoc browser
   return undef if $conf->{no_perldoc};

@@ -1,6 +1,7 @@
 package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
+use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::URL;
 use Mojo::Util 'term_escape';
@@ -147,11 +148,11 @@ sub _finish {
 sub _listen {
   my ($self, $listen) = @_;
 
-  my $url = Mojo::URL->new($listen);
+  my $url   = Mojo::URL->new($listen);
+  my $proto = $url->protocol;
 
-  # Basic listen location checks
-  croak("Invalid listen location '$listen'")
-    if (!$url->scheme || $url->scheme !~ /^https?$/)
+  croak qq{Invalid listen location "$listen"}
+    if ($proto !~ /^https?$/)
     || ($url->host && $url->host =~ /:/ && $url->host !~ /^\[[^\[\]]*\]$/)
     || ($url->path . '')
     || (!defined $url->authority || $url->authority =~ /@/);
@@ -167,7 +168,7 @@ sub _listen {
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
   delete $options->{address} if $options->{address} eq '*';
-  my $tls = $options->{tls} = $url->protocol eq 'https';
+  my $tls = $options->{tls} = $proto eq 'https';
 
   weaken $self;
   push @{$self->acceptors}, $self->ioloop->server(

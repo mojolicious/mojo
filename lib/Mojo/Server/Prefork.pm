@@ -387,7 +387,7 @@ being forced, defaults to C<20>.
 
 =head2 heartbeat_interval
 
-  my $interval = $prefork->heartbeat_intrval;
+  my $interval = $prefork->heartbeat_interval;
   $prefork     = $prefork->heartbeat_interval(3);
 
 Heartbeat interval in seconds, defaults to C<5>.

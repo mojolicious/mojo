@@ -5,7 +5,7 @@ use Errno 'EINPROGRESS';
 use IO::Socket::IP;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
-use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
+use Socket qw(IPPROTO_TCP IPPROTO_UDP SOCK_DGRAM SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native
 use constant NDN => $ENV{MOJO_NO_NDN}
@@ -41,6 +41,8 @@ sub connect {
     sub { $self->emit(error => 'Connect timeout') });
 
   # Blocking name resolution
+  $args->{proto} ||= IPPROTO_TCP;
+  $args->{type} ||= ($args->{proto} eq 'udp' || $args->{proto} eq IPPROTO_UDP) ? SOCK_DGRAM : SOCK_STREAM;
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
   return $reactor->next_tick(sub { $self && $self->_connect($args) })
@@ -48,7 +50,7 @@ sub connect {
 
   # Non-blocking name resolution
   my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
-    {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
+    {protocol => $args->{proto}, socktype => $args->{type}});
   $reactor->io(
     $handle => sub {
       my $reactor = shift;
@@ -79,8 +81,11 @@ sub _connect {
   unless ($handle = $self->{handle} = $args->{handle}) {
     my %options = (PeerAddr => $address, PeerPort => _port($args));
     %options = (PeerAddrInfo => $args->{addr_info}) if $args->{addr_info};
+    $options{Proto} = $args->{proto};
+    $options{Type} = $args->{type};
     $options{Blocking} = 0;
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
+    $options{LocalPort} = $args->{local_port} if $args->{local_port};
     return $self->emit(error => "Can't connect: $@")
       unless $self->{handle} = $handle = IO::Socket::IP->new(%options);
   }
@@ -104,7 +109,8 @@ sub _ready {
   return $self->emit(error => $! || 'Not connected') unless $handle->connected;
 
   # Disable Nagle's algorithm
-  setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
+  setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1
+    if $args->{proto} eq 'tcp' or $args->{proto} eq IPPROTO_TCP;
 
   $self->_try_socks($args);
 }
@@ -193,7 +199,7 @@ sub _try_tls {
 
 =head1 NAME
 
-Mojo::IOLoop::Client - Non-blocking TCP client
+Mojo::IOLoop::Client - Non-blocking TCP/UDP client
 
 =head1 SYNOPSIS
 
@@ -216,7 +222,7 @@ Mojo::IOLoop::Client - Non-blocking TCP client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Client> opens TCP/UDP connections for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
@@ -288,11 +294,23 @@ Use an already prepared handle.
 
 Local address to bind to.
 
+=item local_port
+
+  local_address => 12345
+
+Local port to bind to.
+
 =item port
 
   port => 80
 
 Port to connect to, defaults to C<80> or C<443> with C<tls> option.
+
+=item proto
+
+  proto => 'tcp'
+
+Protocol name or number ('tcp', 'udp').
 
 =item socks_address
 
@@ -348,6 +366,12 @@ Path to the TLS certificate file.
   tls_key => '/etc/tls/client.key'
 
 Path to the TLS key file.
+
+=item type
+
+  type => SOCK_STREAM
+
+Socket type number (SOCK_STREAM, SOCK_DGRAM).
 
 =back
 

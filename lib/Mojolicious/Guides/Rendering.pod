@@ -243,7 +243,7 @@ correct name actually exists and falls back to the generic one otherwise.
 
 =head2 Rendering inline templates
 
-Some renderers such as C<ep> allow templates to be passed inline.
+Some renderers such as C<ep> allow templates to be passed C<inline>.
 
   $c->render(inline => 'The result is <%= 1 + 1 %>.');
 

@@ -94,6 +94,7 @@ is $c->param(data    => 'test')->param('data'),    undef, 'value is reserved';
 is $c->param(extends => 'test')->param('extends'), undef, 'value is reserved';
 is $c->param(format  => 'test')->param('format'),  undef, 'value is reserved';
 is $c->param(handler => 'test')->param('handler'), undef, 'value is reserved';
+is $c->param(inline  => 'test')->param('inline'),  undef, 'value is reserved';
 is $c->param(json    => 'test')->param('json'),    undef, 'value is reserved';
 is $c->param(layout  => 'test')->param('layout'),  undef, 'value is reserved';
 is $c->param(namespace => 'test')->param('namespace'), undef,

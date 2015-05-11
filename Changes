@@ -1,7 +1,8 @@
 
-6.11  2015-05-11
+6.11  2015-05-12
   - Updated jQuery to version 2.1.4.
   - Fixed indentation of ASCII art in documentation browser. (jberger)
+  - Fixed bug where inline was not considered a reserved stash value.
 
 6.10  2015-04-26
   - Removed support for user/group switching, because it never worked

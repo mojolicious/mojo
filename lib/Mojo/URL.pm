@@ -34,19 +34,19 @@ sub authority {
   return _encode($info, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $authority;
 }
 
-sub host_port {
-  my $self = shift;
-  return undef unless defined(my $host = $self->ihost);
-  return $host unless my $port = $self->port;
-  return "$host:$port";
-}
-
 sub clone {
   my $self  = shift;
   my $clone = $self->new;
   @$clone{keys %$self} = values %$self;
   $clone->{$_} && ($clone->{$_} = $clone->{$_}->clone) for qw(base path query);
   return $clone;
+}
+
+sub host_port {
+  my $self = shift;
+  return undef unless defined(my $host = $self->ihost);
+  return $host unless my $port = $self->port;
+  return "$host:$port";
 }
 
 sub ihost {

@@ -6,12 +6,6 @@ use Mojo::Util 'camelize';
 
 has namespaces => sub { ['Mojolicious::Plugin'] };
 
-sub emit_hook {
-  my $self = shift;
-  for my $cb (@{$self->subscribers(shift)}) { $cb->(@_) }
-  return $self;
-}
-
 sub emit_chain {
   my ($self, $name, @args) = @_;
 
@@ -22,6 +16,12 @@ sub emit_chain {
   }
 
   !$wrapper ? return : return $wrapper->();
+}
+
+sub emit_hook {
+  my $self = shift;
+  for my $cb (@{$self->subscribers(shift)}) { $cb->(@_) }
+  return $self;
 }
 
 sub emit_hook_reverse {

@@ -47,12 +47,6 @@ sub content_like {
   return $self->_test('like', $self->tx->res->text, $regex, $desc);
 }
 
-sub content_unlike {
-  my ($self, $regex, $desc) = @_;
-  $desc ||= 'content is not similar';
-  return $self->_test('unlike', $self->tx->res->text, $regex, $desc);
-}
-
 sub content_type_is {
   my ($self, $type, $desc) = @_;
   $desc ||= "Content-Type: $type";
@@ -79,6 +73,12 @@ sub content_type_unlike {
   $desc ||= 'Content-Type is not similar';
   return $self->_test('unlike', $self->tx->res->headers->content_type,
     $regex, $desc);
+}
+
+sub content_unlike {
+  my ($self, $regex, $desc) = @_;
+  $desc ||= 'content is not similar';
+  return $self->_test('unlike', $self->tx->res->text, $regex, $desc);
 }
 
 sub delete_ok { shift->_build_ok(DELETE => @_) }
@@ -580,13 +580,6 @@ Opposite of L</"content_is">.
 Check response content for similar match after retrieving it from
 L<Mojo::Message/"text">.
 
-=head2 content_unlike
-
-  $t = $t->content_unlike(qr/working!/);
-  $t = $t->content_unlike(qr/working!/, 'different content');
-
-Opposite of L</"content_like">.
-
 =head2 content_type_is
 
   $t = $t->content_type_is('text/html');
@@ -614,6 +607,13 @@ Check response C<Content-Type> header for similar match.
   $t = $t->content_type_unlike(qr/text/, 'different content type');
 
 Opposite of L</"content_type_like">.
+
+=head2 content_unlike
+
+  $t = $t->content_unlike(qr/working!/);
+  $t = $t->content_unlike(qr/working!/, 'different content');
+
+Opposite of L</"content_like">.
 
 =head2 delete_ok
 

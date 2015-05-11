@@ -47,9 +47,9 @@ sub attr {
   return $self;
 }
 
-sub children { _select($_[0]->_collect(_nodes($_[0]->tree, 1)), $_[1]) }
-
 sub child_nodes { $_[0]->_collect(_nodes($_[0]->tree)) }
+
+sub children { _select($_[0]->_collect(_nodes($_[0]->tree, 1)), $_[1]) }
 
 sub content {
   my $self = shift;
@@ -509,18 +509,6 @@ This element's attributes.
   # List id attributes
   say $dom->find('*')->map(attr => 'id')->compact->join("\n");
 
-=head2 children
-
-  my $collection = $dom->children;
-  my $collection = $dom->children('div > p');
-
-Find all child elements of this element matching the CSS selector and return a
-L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
-All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
-
-  # Show tag name of random child element
-  say $dom->children->shuffle->first->tag;
-
 =head2 child_nodes
 
   my $collection = $dom->child_nodes;
@@ -533,6 +521,18 @@ as L<Mojo::DOM> objects.
 
   # "<!-- Test -->"
   $dom->parse('<!-- Test --><b>123</b>')->child_nodes->first;
+
+=head2 children
+
+  my $collection = $dom->children;
+  my $collection = $dom->children('div > p');
+
+Find all child elements of this element matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+
+  # Show tag name of random child element
+  say $dom->children->shuffle->first->tag;
 
 =head2 content
 

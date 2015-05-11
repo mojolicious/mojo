@@ -20,7 +20,9 @@ get '/' => sub {
 
 post '/' => 'index';
 
-post '/block' => 'block';
+post '/block';
+
+get '/art';
 
 get '/empty' => {inline => '', handler => 'pod'};
 
@@ -41,6 +43,10 @@ $t->post_ok('/block')->status_is(200)
   ->content_like(qr!test321<h2 id="lalala">lalala</h2>!)
   ->content_like(qr!<pre><code>\{\n  foo\(\);\n\}</code></pre>!)
   ->content_like(qr!<p><code>test</code></p>!)->content_like(qr/Gray/);
+
+# Mixed indentation
+$t->get_ok('/art')->status_is(200)->text_like('h2[id="art"]' => qr/art/)
+  ->text_like('pre code' => qr/\s{2}#\n#\s{3}#\n\s{2}#/);
 
 # Empty
 $t->get_ok('/empty')->status_is(200)->content_is('');
@@ -106,3 +112,12 @@ test321<%= pod_to_html begin %>=head2 lalala
   }
 
 C<test><% end %>
+
+@@ art.html.ep
+<%= pod_to_html begin %>=head2 art
+
+    #
+  #   #
+    #
+
+<% end %>

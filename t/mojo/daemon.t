@@ -96,10 +96,6 @@ eval { Mojo::Server::Daemon->new->build_app('Mojo::DoesNotExist') };
 like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/,
   'right error';
 
-# Invalid listen location
-eval { Mojo::Server::Daemon->new(listen => ['fail'])->start };
-like $@, qr/Invalid listen location/, 'right error';
-
 # Transaction
 isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right transaction';
 
@@ -280,5 +276,29 @@ ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
 # Abstract methods
 eval { Mojo::Server->run };
 like $@, qr/Method "run" not implemented by subclass/, 'right error';
+
+# Invalid listen location
+foreach (
+  qw { 127.0.0.1 127.0.0.1:3000 httpss://127.0.0.1 ftp://127.0.0.1:3000 },
+  qw { http://127.0.0.1:3000:tproxy http://[:: http://::]:3000 http://:
+  http://*: http://[::]* http://127.0.0.1: http://[[::]] http:/ },
+  qw { http:////// http://127.0.0.1:3000/?param=1 http://localhost/1/2/3
+  http://localhost:3000/1/2/3 },
+  qw { http://u:p@localhost http://u:p@localhost:3000 http://u:p@localhost:300/1/2 }
+  )
+{
+  eval { Mojo::Server::Daemon->new(listen => [$_], silent => 1)->start };
+  like $@, qr/^Invalid listen location/, 'right error';
+}
+
+# Valid listen location
+foreach (
+  qw { http:// http://* HTTP:// http://127.0.0.1 http://?param=1 http://127.0.0.1?param=1 },
+  $ENV{TEST_IPV6} ? qw { http://[::1] http://[::]?param=1 } : ()
+  )
+{
+  my $daemon = Mojo::Server::Daemon->new(listen => [$_], silent => 1)->start;
+  isa_ok $daemon, 'Mojo::Server::Daemon', 'right daemon';
+}
 
 done_testing();

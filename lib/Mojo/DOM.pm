@@ -73,7 +73,7 @@ sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
 sub following { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[1]}), $_[1]) }
 sub following_nodes { $_[0]->_collect(@{$_[0]->_siblings->[1]}) }
 
-sub matches { $_[0]->_css->matches($_[1]) }
+sub matches { shift->_css->matches(@_) }
 
 sub namespace {
   my $self = shift;

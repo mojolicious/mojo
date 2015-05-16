@@ -630,7 +630,8 @@ L</"default_charset">.
 
   my $str = $msg->to_string;
 
-Render whole message.
+Render whole message. Note that this method finalizes the message, and that it
+might not be possible to render the same message twice.
 
 =head2 upload
 

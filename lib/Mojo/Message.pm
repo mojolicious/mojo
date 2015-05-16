@@ -183,7 +183,9 @@ sub parse {
   return $self->emit('progress')->content->is_finished ? $self->finish : $self;
 }
 
-sub start_line_size { length shift->build_start_line }
+sub start_line_size {
+  croak 'Method "start_line_size" not implemented by subclass';
+}
 
 sub text {
   my $self    = shift;
@@ -302,6 +304,7 @@ Mojo::Message - HTTP message base class
   sub cookies              {...}
   sub extract_start_line   {...}
   sub get_start_line_chunk {...}
+  sub start_line_size      {...}
 
 =head1 DESCRIPTION
 
@@ -438,19 +441,19 @@ Content size in bytes.
 
   my $bytes = $msg->build_body;
 
-Render whole body.
+Render whole body with L</"get_body_chunk">.
 
 =head2 build_headers
 
   my $bytes = $msg->build_headers;
 
-Render all headers.
+Render all headers with L</"get_header_chunk">.
 
 =head2 build_start_line
 
   my $bytes = $msg->build_start_line;
 
-Render start-line.
+Render start-line with L</"get_start_line_chunk">.
 
 =head2 cookie
 
@@ -617,7 +620,7 @@ Parse message chunk.
 
   my $size = $msg->start_line_size;
 
-Size of the start-line in bytes.
+Size of the start-line in bytes. Meant to be overloaded in a subclass.
 
 =head2 text
 
@@ -630,8 +633,7 @@ L</"default_charset">.
 
   my $str = $msg->to_string;
 
-Render whole message. Note that this method finalizes the message, and that it
-might not be possible to render the same message twice.
+Render whole message.
 
 =head2 upload
 

@@ -2095,5 +2095,8 @@ like $@, qr/Method "extract_start_line" not implemented by subclass/,
 eval { Mojo::Message->get_start_line_chunk };
 like $@, qr/Method "get_start_line_chunk" not implemented by subclass/,
   'right error';
+eval { Mojo::Message->start_line_size };
+like $@, qr/Method "start_line_size" not implemented by subclass/,
+  'right error';
 
 done_testing();

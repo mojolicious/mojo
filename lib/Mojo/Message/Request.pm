@@ -84,30 +84,7 @@ sub fix_headers {
 
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
-
-  unless (defined $self->{start_buffer}) {
-
-    # Path
-    my $url  = $self->url;
-    my $path = $url->path_query;
-    $path = "/$path" unless $path =~ m!^/!;
-
-    # CONNECT
-    my $method = uc $self->method;
-    if ($method eq 'CONNECT') {
-      my $port = $url->port || ($url->protocol eq 'https' ? '443' : '80');
-      $path = $url->ihost . ":$port";
-    }
-
-    # Proxy
-    elsif ($self->proxy && $url->protocol ne 'https') {
-      $path = $url->clone->userinfo(undef) unless $self->is_handshake;
-    }
-
-    $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";
-  }
-
-  $self->emit(progress => 'start_line', $offset);
+  $self->_start_line->emit(progress => 'start_line', $offset);
   return substr $self->{start_buffer}, $offset, 131072;
 }
 
@@ -178,6 +155,8 @@ sub proxy {
 
 sub query_params { shift->url->query }
 
+sub start_line_size { length shift->_start_line->{start_buffer} }
+
 sub _parse_basic_auth {
   return undef unless my $header = shift;
   return $header =~ /Basic (.+)$/ ? b64_decode $1 : undef;
@@ -242,6 +221,33 @@ sub _parse_env {
 
   # Bypass normal message parser
   $self->{state} = 'cgi';
+}
+
+sub _start_line {
+  my $self = shift;
+
+  return $self if defined $self->{start_buffer};
+
+  # Path
+  my $url  = $self->url;
+  my $path = $url->path_query;
+  $path = "/$path" unless $path =~ m!^/!;
+
+  # CONNECT
+  my $method = uc $self->method;
+  if ($method eq 'CONNECT') {
+    my $port = $url->port || ($url->protocol eq 'https' ? '443' : '80');
+    $path = $url->ihost . ":$port";
+  }
+
+  # Proxy
+  elsif ($self->proxy && $url->protocol ne 'https') {
+    $path = $url->clone->userinfo(undef) unless $self->is_handshake;
+  }
+
+  $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";
+
+  return $self;
 }
 
 1;
@@ -451,6 +457,12 @@ All C<GET> parameters, usually a L<Mojo::Parameters> object.
 
   # Turn GET parameters to hash and extract value
   say $req->query_params->to_hash->{foo};
+
+=head2 start_line_size
+
+  my $size = $req->start_line_size;
+
+Size of the request-line in bytes.
 
 =head1 SEE ALSO
 

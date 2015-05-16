@@ -117,14 +117,7 @@ sub fix_headers {
 
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
-
-  unless (defined $self->{start_buffer}) {
-    my $code = $self->code    || 404;
-    my $msg  = $self->message || $self->default_message;
-    $self->{start_buffer} = "HTTP/@{[$self->version]} $code $msg\x0d\x0a";
-  }
-
-  $self->emit(progress => 'start_line', $offset);
+  $self->_start_line->emit(progress => 'start_line', $offset);
   return substr $self->{start_buffer}, $offset, 131072;
 }
 
@@ -138,6 +131,19 @@ sub is_status_class {
   my ($self, $class) = @_;
   return undef unless my $code = $self->code;
   return $code >= $class && $code < ($class + 100);
+}
+
+sub start_line_size { length shift->_start_line->{start_buffer} }
+
+sub _start_line {
+  my $self = shift;
+
+  return $self if defined $self->{start_buffer};
+  my $code = $self->code    || 404;
+  my $msg  = $self->message || $self->default_message;
+  $self->{start_buffer} = "HTTP/@{[$self->version]} $code $msg\x0d\x0a";
+
+  return $self;
 }
 
 1;
@@ -251,6 +257,12 @@ Check if this is a C<1xx>, C<204> or C<304> response.
   my $bool = $res->is_status_class(200);
 
 Check response status class.
+
+=head2 start_line_size
+
+  my $size = $req->start_line_size;
+
+Size of the status-line in bytes.
 
 =head1 SEE ALSO
 

@@ -1,4 +1,6 @@
 
+6.12  2015-05-17
+
 6.11  2015-05-16
   - Deprecated build_body and build_headers methods in Mojo::Content.
   - Added headers_contain method to Mojo::Content.

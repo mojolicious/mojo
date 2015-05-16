@@ -630,7 +630,9 @@ L</"default_charset">.
 
   my $str = $msg->to_string;
 
-Render whole message.
+Render whole message. For performance optimization reasons, calling this
+method freezes the message representation or part of it, so that subsequent
+calls to other modification methods might not work as expected.
 
 =head2 upload
 

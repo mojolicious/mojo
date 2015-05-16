@@ -749,6 +749,25 @@ is $state, 'body', 'made progress on headers';
 ok $progress, 'made progress';
 ok $finished, 'finished';
 
+# Build HTTP 1.1 response with dynamic content
+$res = Mojo::Message::Response->new;
+$res->code(200);
+$res->content->write_chunk(
+  'Hello ' => sub {
+    shift->write_chunk(undef,
+      sub { shift->write_chunk('World!')->write_chunk('') });
+  }
+);
+ok $res->content->is_dynamic, 'dynamic content';
+$res = Mojo::Message::Response->new->parse($res->to_string);
+ok !$res->content->is_dynamic, 'no dynamic content';
+ok $res->is_finished, 'response is finished';
+is $res->code,        200, 'right status';
+is $res->message,     'OK', 'right message';
+is $res->version,     '1.1', 'right version';
+is $res->headers->content_length, '12', 'right "Content-Length" value';
+is $res->body, 'Hello World!', 'right content';
+
 # Build HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;
 $res->content(Mojo::Content::MultiPart->new);

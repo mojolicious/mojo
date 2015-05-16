@@ -1148,8 +1148,6 @@ ok $req->build_body, 'built body';
 is $state, 'body', 'made progress on headers';
 ok $progress, 'made progress';
 ok $finished, 'finished';
-is $req->build_headers, $req->content->build_headers, 'headers are equal';
-is $req->build_body,    $req->content->build_body,    'body is equal';
 
 # Build full HTTP 1.1 request (with clone)
 $req      = Mojo::Message::Request->new;

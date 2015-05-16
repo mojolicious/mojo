@@ -52,7 +52,7 @@ ok $content->is_dynamic, 'dynamic content';
 ok !$content->is_chunked, 'no chunked content';
 $content->write('');
 ok $content->is_dynamic, 'dynamic content';
-is $content->build_body, 'Hello World!', 'right content';
+is $content->get_body_chunk(0), 'Hello World!', 'right chunk';
 
 # Chunked content
 $content = Mojo::Content::Single->new;
@@ -61,9 +61,9 @@ ok $content->is_dynamic, 'dynamic content';
 ok $content->is_chunked, 'chunked content';
 $content->write_chunk('');
 ok $content->is_dynamic, 'dynamic content';
-is $content->build_body,
+is $content->get_body_chunk(0),
   "6\x0d\x0aHello \x0d\x0a6\x0d\x0aWorld!\x0d\x0a0\x0d\x0a\x0d\x0a",
-  'right content';
+  'right chunk';
 
 # Multipart boundary detection
 $content = Mojo::Content::MultiPart->new;

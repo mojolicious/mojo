@@ -1,5 +1,7 @@
 
 6.11  2015-05-16
+  - Deprecated build_body and build_headers methods in Mojo::Content.
+  - Added headers_contain method to Mojo::Content.
   - Updated jQuery to version 2.1.4.
   - Fixed indentation of ASCII art in documentation browser. (jberger)
   - Fixed bug where inline was not considered a reserved stash value.

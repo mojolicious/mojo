@@ -7,10 +7,8 @@ has parts => sub { [] };
 
 sub body_contains {
   my ($self, $chunk) = @_;
-  for my $part (@{$self->parts}) {
-    return 1 if index($part->build_headers, $chunk) >= 0;
-    return 1 if $part->body_contains($chunk);
-  }
+  ($_->headers_contain($chunk) or $_->body_contains($chunk)) and return 1
+    for @{$self->parts};
   return undef;
 }
 

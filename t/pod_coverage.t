@@ -7,4 +7,7 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 plan skip_all => 'Test::Pod::Coverage 1.04+ required for this test!'
   unless eval 'use Test::Pod::Coverage 1.04; 1';
 
-all_pod_coverage_ok();
+# DEPRECATED in Clinking Beer Mugs!
+my @mugs = qw(build_body build_headers);
+
+all_pod_coverage_ok({also_private => [@mugs]});

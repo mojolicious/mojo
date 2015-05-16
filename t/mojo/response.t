@@ -748,8 +748,6 @@ ok $res->build_body, 'built body';
 is $state, 'body', 'made progress on headers';
 ok $progress, 'made progress';
 ok $finished, 'finished';
-is $res->build_headers, $res->content->build_headers, 'headers are equal';
-is $res->build_body,    $res->content->build_body,    'body is equal';
 
 # Build HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;

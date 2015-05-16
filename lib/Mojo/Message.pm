@@ -550,13 +550,16 @@ Make sure message has all required headers.
 
   my $bytes = $msg->get_body_chunk($offset);
 
-Get a chunk of body data starting from a specific position.
+Get a chunk of body data starting from a specific position. Note that it might
+not be possible to get the same chunk twice if content was generated
+dynamically.
 
 =head2 get_header_chunk
 
   my $bytes = $msg->get_header_chunk($offset);
 
-Get a chunk of header data, starting from a specific position.
+Get a chunk of header data, starting from a specific position. Note that this
+method finalizes the message.
 
 =head2 get_start_line_chunk
 
@@ -569,7 +572,7 @@ overloaded in a subclass.
 
   my $size = $msg->header_size;
 
-Size of headers in bytes.
+Size of headers in bytes. Note that this method finalizes the message.
 
 =head2 headers
 
@@ -633,7 +636,9 @@ L</"default_charset">.
 
   my $str = $msg->to_string;
 
-Render whole message.
+Render whole message. Note that this method finalizes the message, and that it
+might not be possible to render the same message twice if content was generated
+dynamically.
 
 =head2 upload
 

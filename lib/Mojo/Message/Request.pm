@@ -382,7 +382,8 @@ Make sure request has all required headers.
 
   my $bytes = $req->get_start_line_chunk($offset);
 
-Get a chunk of request-line data starting from a specific position.
+Get a chunk of request-line data starting from a specific position. Note that
+this method finalizes the request.
 
 =head2 is_handshake
 
@@ -462,7 +463,7 @@ All C<GET> parameters, usually a L<Mojo::Parameters> object.
 
   my $size = $req->start_line_size;
 
-Size of the request-line in bytes.
+Size of the request-line in bytes. Note that this method finalizes the request.
 
 =head1 SEE ALSO
 

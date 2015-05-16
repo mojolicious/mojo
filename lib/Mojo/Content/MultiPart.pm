@@ -278,7 +278,9 @@ Clone content if possible, otherwise return C<undef>.
 
   my $bytes = $multi->get_body_chunk(0);
 
-Get a chunk of content starting from a specific position.
+Get a chunk of content starting from a specific position. Note that it might
+not be possible to get the same chunk twice if content was generated
+dynamically.
 
 =head2 is_multipart
 

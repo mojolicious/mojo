@@ -244,7 +244,8 @@ Make sure response has all required headers.
 
   my $bytes = $res->get_start_line_chunk($offset);
 
-Get a chunk of status-line data starting from a specific position.
+Get a chunk of status-line data starting from a specific position. Note that
+this method finalizes the response.
 
 =head2 is_empty
 
@@ -262,7 +263,7 @@ Check response status class.
 
   my $size = $req->start_line_size;
 
-Size of the status-line in bytes.
+Size of the status-line in bytes. Note that this method finalizes the response.
 
 =head1 SEE ALSO
 

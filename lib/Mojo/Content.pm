@@ -487,19 +487,21 @@ overloaded in a subclass.
 
   my $bytes = $content->get_header_chunk(13);
 
-Get a chunk of the headers starting from a specific position.
+Get a chunk of the headers starting from a specific position. Note that this
+method finalizes the content.
 
 =head2 header_size
 
   my $size = $content->header_size;
 
-Size of headers in bytes.
+Size of headers in bytes. Note that this method finalizes the content.
 
 =head2 headers_contain
 
   my $bool = $content->headers_contain('foo bar baz');
 
-Check if headers contain a specific string.
+Check if headers contain a specific string. Note that this method finalizes the
+content.
 
 =head2 is_chunked
 

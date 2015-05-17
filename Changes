@@ -1,8 +1,8 @@
 
-6.12  2015-05-17
+6.12  2015-05-18
 
 6.11  2015-05-16
-  - Deprecated build_body and build_headers methods in Mojo::Content.
+  - Deprecated Mojo::Content::build_body and Mojo::Content::build_headers.
   - Added headers_contain method to Mojo::Content.
   - Updated jQuery to version 2.1.4.
   - Fixed indentation of ASCII art in documentation browser. (jberger)

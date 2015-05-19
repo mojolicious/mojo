@@ -775,7 +775,7 @@ L<RFC 3986|http://tools.ietf.org/html/rfc3986>, the pattern used defaults to
 C<^A-Za-z0-9\-._~>.
 
   # "foo%3Bbar"
-  url_unescape 'foo;bar';
+  url_escape 'foo;bar';
 
 =head2 url_unescape
 

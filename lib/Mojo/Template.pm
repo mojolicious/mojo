@@ -343,7 +343,7 @@ automatically enabled.
   <%== Perl expression, replaced with XML escaped result %>
   <%# Comment, useful for debugging %>
   <%% Replaced with "<%", useful for generating templates %>
-  % Perl code line, treated as "<% line =%>"
+  % Perl code line, treated as "<% line =%>" (explained later)
   %= Perl expression line, treated as "<%= line %>"
   %== Perl expression line, treated as "<%== line %>"
   %# Comment line, useful for debugging

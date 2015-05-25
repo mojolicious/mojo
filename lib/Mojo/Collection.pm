@@ -90,6 +90,8 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub to_array { [@{shift()}] }
 
+sub TO_JSON { [@{shift()}] }
+
 sub uniq {
   my %seen;
   return $_[0]->new(grep { !$seen{$_}++ } @{$_[0]});

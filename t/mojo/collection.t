@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
+use Mojo::JSON 'encode_json';
 
 # Array
 is c(1, 2, 3)->[1], 2, 'right result';
@@ -153,5 +154,10 @@ $collection = c(1, 2, 3, 2, 3, 4, 5, 4);
 is_deeply $collection->uniq->to_array, [1, 2, 3, 4, 5], 'right result';
 is_deeply $collection->uniq->reverse->uniq->to_array, [5, 4, 3, 2, 1],
   'right result';
+
+# json
+$collection = c(1, 2, 3);
+my $bytes = encode_json $collection;
+is $bytes, '[1,2,3]', 'TO_JSON';
 
 done_testing();

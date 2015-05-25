@@ -363,7 +363,9 @@ L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 Whitespace characters around tags can be trimmed by adding an additional equal
 sign to the end of a tag.
 
-  <%= All whitespace characters around this expression will be trimmed =%>
+  <% for (1 .. 3) { %>
+    <%= 'Trim all whitespace characters around this expression' =%>
+  <% } %>
 
 Newline characters can be escaped with a backslash.
 

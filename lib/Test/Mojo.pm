@@ -510,6 +510,11 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
 
   # Allow redirects
   $t->ua->max_redirects(10);
+  $t->get_ok('/redirect')->status_is(200);
+
+  # Switch protocol from HTTP to HTTPS
+  $t->ua->server->url('https');
+  $t->get_ok('/secure')->status_is(200);
 
   # Use absolute URL for request with Basic authentication
   my $url = $t->ua->server->url->userinfo('sri:secr3t')->path('/secrets.json');

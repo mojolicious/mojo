@@ -510,11 +510,11 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
 
   # Allow redirects
   $t->ua->max_redirects(10);
-  $t->get_ok('/redirect')->status_is(200);
+  $t->get_ok('/redirect')->status_is(200)->content_like(qr/redirected/);
 
   # Switch protocol from HTTP to HTTPS
   $t->ua->server->url('https');
-  $t->get_ok('/secure')->status_is(200);
+  $t->get_ok('/secure')->status_is(200)->content_like(qr/secure/);
 
   # Use absolute URL for request with Basic authentication
   my $url = $t->ua->server->url->userinfo('sri:secr3t')->path('/secrets.json');
@@ -527,6 +527,7 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
     my ($ua, $tx) = @_;
     $tx->req->headers->accept_language('en-US');
   });
+  $t->get_ok('/hello')->status_is(200)->content_like(qr/Howdy/);
 
 =head1 METHODS
 
@@ -557,10 +558,13 @@ Access application with L<Mojo::UserAgent::Server/"app">.
     $c->render(text => 'This request did not reach the router.')
       if $c->req->url->path->contains('/user');
   });
+  $t->get_ok('/user')->status_is(200)->content_like(qr/not reach the router/);
 
   # Extract additional information
   my $stash;
   $t->app->hook(after_dispatch => sub { $stash = shift->stash });
+  $t->get_ok('/hello')->status_is(200);
+  is $stash->{foo}, 'bar', 'right value';
 
 =head2 content_is
 

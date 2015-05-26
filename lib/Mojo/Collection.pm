@@ -154,6 +154,12 @@ Construct a new array-based L<Mojo::Collection> object.
 
 L<Mojo::Collection> implements the following methods.
 
+=head2 TO_JSON
+
+  my $array = $collection->TO_JSON;
+
+Alias for L</"to_array">.
+
 =head2 compact
 
   my $new = $collection->compact;
@@ -323,12 +329,6 @@ Alias for L<Mojo::Base/"tap">.
   my $array = $collection->to_array;
 
 Turn collection into array reference.
-
-=head2 TO_JSON
-
-  my $array = $collection->TO_JSON;
-
-Alias for L</"to_array">.
 
 =head2 uniq
 

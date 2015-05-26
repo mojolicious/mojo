@@ -9,6 +9,8 @@ use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');
 
+sub TO_JSON { [@{shift()}] }
+
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
@@ -89,8 +91,6 @@ sub sort {
 sub tap { shift->Mojo::Base::tap(@_) }
 
 sub to_array { [@{shift()}] }
-
-sub TO_JSON { [@{shift()}] }
 
 sub uniq {
   my %seen;
@@ -328,11 +328,7 @@ Turn collection into array reference.
 
   my $array = $collection->TO_JSON;
 
-Turn collection into array reference allowing conversion to JSON by
-L<Mojo::JSON>.
-
-  # {"baz":["foo","bar"]}
-  $c->render(json => { baz => Mojo::Collection->new('foo', 'bar') });
+Alias for L</"to_array">.
 
 =head2 uniq
 

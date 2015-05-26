@@ -286,7 +286,7 @@ dynamically.
 
   my $true = $multi->is_multipart;
 
-True.
+True, this is a L<Mojo::Content::MultiPart> object.
 
 =head2 new
 

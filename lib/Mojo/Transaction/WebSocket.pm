@@ -586,7 +586,7 @@ Check if WebSocket connection has been established yet.
 
   my $true = $ws->is_websocket;
 
-True.
+True, this is a L<Mojo::Transaction::WebSocket> object.
 
 =head2 kept_alive
 

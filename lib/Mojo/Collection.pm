@@ -324,6 +324,16 @@ Alias for L<Mojo::Base/"tap">.
 
 Turn collection into array reference.
 
+=head2 TO_JSON
+
+  my $array = $collection->TO_JSON;
+
+Turn collection into array reference allowing conversion to JSON by
+L<Mojo::JSON>.
+
+  # {"baz":["foo","bar"]}
+  $c->render(json => { baz => Mojo::Collection->new('foo', 'bar') });
+
 =head2 uniq
 
   my $new = $collection->uniq;

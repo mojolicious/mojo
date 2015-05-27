@@ -1,5 +1,6 @@
 
 6.12  2015-05-27
+  - Added TO_JSON method to Mojo::Collection. (wttw)
 
 6.11  2015-05-16
   - Deprecated Mojo::Content::build_body and Mojo::Content::build_headers.

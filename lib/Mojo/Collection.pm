@@ -9,6 +9,8 @@ use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');
 
+sub TO_JSON { [@{shift()}] }
+
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
@@ -151,6 +153,12 @@ Construct a new array-based L<Mojo::Collection> object.
 =head1 METHODS
 
 L<Mojo::Collection> implements the following methods.
+
+=head2 TO_JSON
+
+  my $array = $collection->TO_JSON;
+
+Alias for L</"to_array">.
 
 =head2 compact
 

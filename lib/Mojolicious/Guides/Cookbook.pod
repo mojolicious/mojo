@@ -212,7 +212,7 @@ C<mod_proxy>, the configuration looks quite similar to the Nginx one above.
 =head2 Apache/CGI
 
 C<CGI> is supported out of the box and your L<Mojolicious> application will
-automatically detect that it is executed as a C<CGI> script. It's use in
+automatically detect that it is executed as a C<CGI> script. Its use in
 production environments is discouraged though, because as a result of how
 C<CGI> works, it is very slow and many web servers are making it exceptionally
 hard to configure properly.
@@ -452,7 +452,7 @@ nested closures that often result from continuation-passing style.
 
 =head2 Timers
 
-Another primary feature of the event loop are timers, which are created with
+Timers, another primary feature of the event loop, are created with
 L<Mojo::IOLoop/"timer"> and can for example be used to delay rendering of a
 response, and unlike C<sleep>, won't block any other requests that might be
 processed concurrently.

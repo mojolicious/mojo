@@ -127,13 +127,13 @@ use Mojo::Base 'Mojolicious';
 
 # This method will run once at server start
 sub startup {
-  my $self = shift;
+  my $app = shift;
 
   # Documentation browser under "/perldoc"
-  $self->plugin('PODRenderer');
+  $app->plugin('PODRenderer');
 
   # Router
-  my $r = $self->routes;
+  my $r = $app->routes;
 
   # Normal route to controller
   $r->get('/')->to('example#welcome');
@@ -148,10 +148,10 @@ use Mojo::Base 'Mojolicious::Controller';
 
 # This action will render a template
 sub welcome {
-  my $self = shift;
+  my $c = shift;
 
   # Render template "example/welcome.html.ep" with message
-  $self->render(msg => 'Welcome to the Mojolicious real-time web framework!');
+  $c->render(msg => 'Welcome to the Mojolicious real-time web framework!');
 }
 
 1;

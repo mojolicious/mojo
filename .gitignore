@@ -1,5 +1,6 @@
 .*
 *~
+!.gitattributes
 !.gitignore
 !.perltidyrc
 !.travis.yml

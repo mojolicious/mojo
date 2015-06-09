@@ -1,6 +1,8 @@
 
-6.12  2015-05-30
+6.12  2015-06-09
   - Added TO_JSON method to Mojo::Collection. (wttw)
+  - Fixed bug in Mojo::Message where multipart content would get downgraded
+    unnecessarily.
 
 6.11  2015-05-16
   - Deprecated Mojo::Content::build_body and Mojo::Content::build_headers.

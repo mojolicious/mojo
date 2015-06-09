@@ -20,15 +20,13 @@ has version          => '1.1';
 sub body {
   my $self = shift;
 
-  # Multipart content needs to be downgraded
+  # Get
   my $content = $self->content;
+  return $content->is_multipart ? '' : $content->asset->slurp unless @_;
+
+  # Set (multipart content needs to be downgraded)
   $content = $self->content(Mojo::Content::Single->new)->content
     if $content->is_multipart;
-
-  # Get
-  return $content->asset->slurp unless @_;
-
-  # Set
   $content->asset(Mojo::Asset::Memory->new->add_chunk(@_));
 
   return $self;

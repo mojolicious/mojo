@@ -751,6 +751,8 @@ Current members of the core team in alphabetical order:
 
 Abhijit Menon-Sen, C<ams@cpan.org>
 
+Dan Book, C<dbook@cpan.org>
+
 Glen Hinkle, C<tempire@cpan.org>
 
 Jan Henning Thorsen, C<jhthorsen@cpan.org>
@@ -830,8 +832,6 @@ Christian Hansen
 chromatic
 
 Curt Tilmes
-
-Dan Book
 
 Daniel Kimsey
 

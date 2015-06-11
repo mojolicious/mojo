@@ -265,7 +265,7 @@ C<attr>, C<has>, C<new> and C<tap>.
 =head2 namespaces
 
   my $namespaces = $r->namespaces;
-  $r             = $r->namespaces(['Foo::Bar::Controller']);
+  $r             = $r->namespaces(['MyApp::Controller', 'MyApp']);
 
 Namespaces to load controllers from.
 

@@ -26,6 +26,11 @@ my $mt     = Mojo::Template->new;
 my $output = $mt->render('');
 is $output, '', 'empty string';
 
+# Named template
+$mt     = Mojo::Template->new;
+$output = $mt->name('foo/bar.mt')->render('<%= __FILE__ %>');
+is $output, "foo/bar.mt\n", 'template name';
+
 # Consistent scalar context
 $mt->prepend('my @foo = (3, 4);')->parse('<%= @foo %>:<%== @foo %>');
 $output = $mt->build->compile || $mt->interpret;

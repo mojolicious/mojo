@@ -1,5 +1,5 @@
 
-6.12  2015-06-10
+6.12  2015-06-11
   - Welcome to the Mojolicious core team Dan Book.
   - Added TO_JSON method to Mojo::Collection. (wttw)
   - Fixed bug in Mojo::Message where multipart content would get downgraded

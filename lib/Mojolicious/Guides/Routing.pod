@@ -372,7 +372,8 @@ route with all its children.
   $r->get('/bye')
     ->to(namespace => 'MyApp::MyController::Foo::Bar', action => 'bye');
 
-The C<controller> is always appended to this C<namespace> if available.
+The C<controller> is always converted from C<snake_case> to C<CamelCase> with
+L<Mojo::Util/"camelize">, and then appended to this C<namespace>.
 
   # /bye -> MyApp::MyController::Foo::Bar->bye
   $r->get('/bye')->to('foo-bar#bye', namespace => 'MyApp::MyController');
@@ -381,7 +382,9 @@ The C<controller> is always appended to this C<namespace> if available.
   $r->get('/hey')->to('Foo::Bar#hey', namespace => 'MyApp::MyController');
 
 You can also change the default namespaces for all routes in the application
-with the router attribute L<Mojolicious::Routes/"namespaces">.
+with the router attribute L<Mojolicious::Routes/"namespaces">, which usually
+defaults to a namespace based on the application class (C<MyApp::Controller>),
+as well as the bare application class (C<MyApp>).
 
   $r->namespaces(['MyApp::MyController']);
 

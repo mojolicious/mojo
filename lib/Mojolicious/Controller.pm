@@ -896,6 +896,9 @@ Generate a portable L<Mojo::URL> object with base for a path, URL or route.
   # "http://127.0.0.1:3000/index.html" if application was started with Morbo
   $c->url_for('/index.html')->to_abs;
 
+  # "https://127.0.0.1:443/index.html" if application was started with Morbo
+  $c->url_for('/index.html')->to_abs->scheme('https')->port(443);
+
   # "/index.html?foo=bar" if application is deployed under "/"
   $c->url_for('/index.html')->query(foo => 'bar');
 

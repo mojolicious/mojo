@@ -391,7 +391,8 @@ L<Mojolicious::Commands> object.
   $app      = $app->controller_class('Mojolicious::Controller');
 
 Class to be used for the default controller, defaults to
-L<Mojolicious::Controller>.
+L<Mojolicious::Controller>. Note that this class needs to have already been
+loaded before the first request arrives.
 
 =head2 mode
 

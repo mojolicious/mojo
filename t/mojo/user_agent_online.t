@@ -240,14 +240,14 @@ ok $tx->remote_port > 0, 'has remote port';
 $ua->max_redirects(3);
 $tx = $ua->get('http://wikipedia.org/wiki/Perl');
 $ua->max_redirects(0);
-is $tx->req->method, 'GET',                               'right method';
-is $tx->req->url,    'http://en.wikipedia.org/wiki/Perl', 'right url';
-is $tx->res->code,   200,                                 'right status';
+is $tx->req->method, 'GET',                                'right method';
+is $tx->req->url,    'https://en.wikipedia.org/wiki/Perl', 'right url';
+is $tx->res->code,   200,                                  'right status';
 is $tx->previous->req->method, 'GET', 'right method';
-is $tx->previous->req->url, 'http://www.wikipedia.org/wiki/Perl', 'right url';
+is $tx->previous->req->url, 'http://en.wikipedia.org/wiki/Perl', 'right url';
 is $tx->previous->res->code, 301, 'right status';
 is $tx->redirects->[-1]->req->method, 'GET', 'right method';
-is $tx->redirects->[-1]->req->url, 'http://www.wikipedia.org/wiki/Perl',
+is $tx->redirects->[-1]->req->url, 'http://en.wikipedia.org/wiki/Perl',
   'right url';
 is $tx->redirects->[-1]->res->code, 301, 'right status';
 

@@ -1,7 +1,8 @@
 
-6.12  2015-06-14
+6.12  2015-06-16
   - Welcome to the Mojolicious core team Dan Book.
   - Added TO_JSON method to Mojo::Collection. (wttw)
+  - Added find_packages function to Mojo::Loader.
   - Fixed bug in Mojo::Message where multipart content would get downgraded
     unnecessarily.
 

@@ -13,6 +13,13 @@ use lib "$FindBin::Bin/lib";
 use Cwd 'cwd';
 use File::Temp 'tempdir';
 
+package Mojolicious::Command::my_fake_test_command;
+
+package Mojolicious::Command::my_test_command;
+use Mojo::Base 'Mojolicious::Command';
+
+package main;
+
 # Make sure @ARGV is not changed
 {
   local $ENV{MOJO_MODE};
@@ -97,8 +104,10 @@ my $buffer = '';
   local $ENV{HARNESS_ACTIVE} = 0;
   $commands->run;
 }
-like $buffer, qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*version/s,
+like $buffer,
+  qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*my_test_command.*version/s,
   'right output';
+unlike $buffer, qr/my_fake_test_command/, 'fake command has been ignored';
 
 # help
 $buffer = '';

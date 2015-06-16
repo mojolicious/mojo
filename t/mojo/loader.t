@@ -7,7 +7,14 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Mojo::Loader qw(data_section file_is_binary find_modules load_class);
+use Mojo::Loader
+  qw(data_section file_is_binary find_packages find_modules load_class);
+
+package MyLoaderTest::Foo::Bar;
+
+package MyLoaderTest::Foo::Baz;
+
+package main;
 
 # Single character core module
 ok !load_class('B'), 'loaded';
@@ -49,7 +56,7 @@ is $e->lines_after->[1][0], 6,    'right number';
 is $e->lines_after->[1][1], '1;', 'right line';
 like "$e", qr/Exception/, 'right message';
 
-# Search
+# Search modules
 my @modules = find_modules 'Mojo::LoaderTest';
 is_deeply \@modules,
   [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)],
@@ -57,6 +64,11 @@ is_deeply \@modules,
 is_deeply [find_modules "Mojo'LoaderTest"],
   [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
   'found the right modules';
+
+# Search packages
+my @pkgs = find_packages 'MyLoaderTest::Foo';
+is_deeply \@pkgs, ['MyLoaderTest::Foo::Bar', 'MyLoaderTest::Foo::Baz'],
+  'found the right packages';
 
 # Load
 ok !load_class("Mojo'LoaderTest::A"), 'loaded successfully';

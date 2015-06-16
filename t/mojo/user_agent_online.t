@@ -163,23 +163,23 @@ is $tx->req->url,    'http://google.com', 'right url';
 is $tx->res->code,   302,                 'right status';
 
 # Simple keep-alive requests
-$tx = $ua->get('http://www.wikipedia.org');
-is $tx->req->method, 'GET',                      'right method';
-is $tx->req->url,    'http://www.wikipedia.org', 'right url';
-is $tx->req->body,   '',                         'no content';
-is $tx->res->code,   200,                        'right status';
+$tx = $ua->get('https://www.wikipedia.org');
+is $tx->req->method, 'GET',                       'right method';
+is $tx->req->url,    'https://www.wikipedia.org', 'right url';
+is $tx->req->body,   '',                          'no content';
+is $tx->res->code,   200,                         'right status';
 ok $tx->keep_alive, 'connection will be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-$tx = $ua->get('http://www.wikipedia.org');
-is $tx->req->method, 'GET',                      'right method';
-is $tx->req->url,    'http://www.wikipedia.org', 'right url';
-is $tx->res->code,   200,                        'right status';
+$tx = $ua->get('https://www.wikipedia.org');
+is $tx->req->method, 'GET',                       'right method';
+is $tx->req->url,    'https://www.wikipedia.org', 'right url';
+is $tx->res->code,   200,                         'right status';
 ok $tx->keep_alive, 'connection will be kept alive';
 ok $tx->kept_alive, 'connection was kept alive';
-$tx = $ua->get('http://www.wikipedia.org');
-is $tx->req->method, 'GET',                      'right method';
-is $tx->req->url,    'http://www.wikipedia.org', 'right url';
-is $tx->res->code,   200,                        'right status';
+$tx = $ua->get('https://www.wikipedia.org');
+is $tx->req->method, 'GET',                       'right method';
+is $tx->req->url,    'https://www.wikipedia.org', 'right url';
+is $tx->res->code,   200,                         'right status';
 ok $tx->keep_alive, 'connection will be kept alive';
 ok $tx->kept_alive, 'connection was kept alive';
 
@@ -244,10 +244,10 @@ is $tx->req->method, 'GET',                                'right method';
 is $tx->req->url,    'https://en.wikipedia.org/wiki/Perl', 'right url';
 is $tx->res->code,   200,                                  'right status';
 is $tx->previous->req->method, 'GET', 'right method';
-is $tx->previous->req->url, 'http://en.wikipedia.org/wiki/Perl', 'right url';
+is $tx->previous->req->url, 'https://www.wikipedia.org/wiki/Perl', 'right url';
 is $tx->previous->res->code, 301, 'right status';
 is $tx->redirects->[-1]->req->method, 'GET', 'right method';
-is $tx->redirects->[-1]->req->url, 'http://en.wikipedia.org/wiki/Perl',
+is $tx->redirects->[-1]->req->url, 'https://www.wikipedia.org/wiki/Perl',
   'right url';
 is $tx->redirects->[-1]->res->code, 301, 'right status';
 

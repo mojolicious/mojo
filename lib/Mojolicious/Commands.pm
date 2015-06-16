@@ -2,7 +2,7 @@ package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long 'GetOptionsFromArray';
-use Mojo::Loader qw(find_modules load_class);
+use Mojo::Loader qw(find_modules find_packages load_class);
 use Mojo::Server;
 use Mojo::Util 'tablify';
 
@@ -62,7 +62,7 @@ sub run {
   my %all;
   for my $ns (@{$self->namespaces}) {
     $all{substr $_, length "${ns}::"} //= $_->new->description
-      for grep { _command($_) } find_modules $ns;
+      for grep { _command($_) } find_modules($ns), find_packages($ns);
   }
 
   my @rows = map { [" $_", $all{$_}] } sort keys %all;

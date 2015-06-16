@@ -935,10 +935,11 @@ L<Test::Mojo>.
 
   done_testing();
 
-Run all tests with the command L<Mojolicious::Command::test>.
+Just run your tests with the command L<Mojolicious::Command::test> or L<prove>.
 
   $ ./myapp.pl test
-  $ ./myapp.pl test -v
+  $ ./myapp.pl test -v t/basic.t
+  $ prove -l -v t/basic.t
 
 =head1 MORE
 

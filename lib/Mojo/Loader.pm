@@ -37,7 +37,7 @@ sub find_modules {
 sub find_packages {
   my $ns = shift;
   no strict 'refs';
-  return sort map { $_ =~ /^(.+)::$/ ? ("${ns}::$1") : () } keys %{"${ns}::"};
+  return sort map { /^(.+)::$/ ? "${ns}::$1" : () } keys %{"${ns}::"};
 }
 
 sub load_class {

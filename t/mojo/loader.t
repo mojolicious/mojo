@@ -64,11 +64,14 @@ is_deeply \@modules,
 is_deeply [find_modules "Mojo'LoaderTest"],
   [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
   'found the right modules';
+is_deeply [find_modules 'MyLoaderTest::DoesNotExist'], [], 'no modules found';
 
 # Search packages
 my @pkgs = find_packages 'MyLoaderTest::Foo';
 is_deeply \@pkgs, ['MyLoaderTest::Foo::Bar', 'MyLoaderTest::Foo::Baz'],
   'found the right packages';
+is_deeply [find_packages 'MyLoaderTest::DoesNotExist'], [],
+  'no packages found';
 
 # Load
 ok !load_class("Mojo'LoaderTest::A"), 'loaded successfully';

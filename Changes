@@ -1,4 +1,6 @@
 
+6.13  2015-06-18
+
 6.12  2015-06-18
   - Welcome to the Mojolicious core team Dan Book.
   - Added TO_JSON method to Mojo::Collection. (wttw)

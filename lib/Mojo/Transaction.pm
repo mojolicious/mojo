@@ -235,7 +235,7 @@ Check if transaction is finished.
 
 =head2 is_websocket
 
-  my $false = $tx->is_websocket;
+  my $bool = $tx->is_websocket;
 
 False, this is not a L<Mojo::Transaction::WebSocket> object.
 

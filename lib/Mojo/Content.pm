@@ -536,7 +536,7 @@ Check if buffer has exceeded L</"max_buffer_size">.
 
 =head2 is_multipart
 
-  my $false = $content->is_multipart;
+  my $bool = $content->is_multipart;
 
 False, this is not a L<Mojo::Content::MultiPart> object.
 

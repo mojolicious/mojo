@@ -95,7 +95,7 @@ chunk size of C<131072> bytes (128KB). Meant to be overloaded in a subclass.
 
 =head2 is_file
 
-  my $false = $asset->is_file;
+  my $bool = $asset->is_file;
 
 False, this is not a L<Mojo::Asset::File> object.
 

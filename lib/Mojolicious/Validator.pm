@@ -94,7 +94,7 @@ with file uploads for security reasons.
 
   $validation = $validation->size(2, 5);
 
-Value length in characters needs to be between these two values.
+Value length needs to be between these two values.
 
 =head1 ATTRIBUTES
 

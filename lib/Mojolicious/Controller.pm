@@ -930,7 +930,7 @@ excessively large, there's a 16MB limit by default.
 
   # Validate file upload
   my $validation = $c->validation;
-  $validation->required('tarball')->file->size(1, 1024 * 1024);
+  $validation->required('tarball')->file->size(1, 1048576);
   my $tarball = $validation->param('tarball');
 
 =head2 write

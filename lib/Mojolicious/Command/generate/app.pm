@@ -195,4 +195,6 @@ done_testing();
 This page was generated from the template "templates/example/welcome.html.ep"
 and the layout "templates/layouts/default.html.ep",
 <%%= link_to 'click here' => url_for %> to reload the page or
-<%%= link_to 'here' => '/index.html' %> to move forward to a static page.
+<%%= link_to 'here' => '/index.html' %> to move forward to a static page. To
+learn more, you can also browse through the documentation
+<%%= link_to 'here' => '/perldoc' %>.

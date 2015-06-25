@@ -90,7 +90,9 @@ app->start;
 <% %>@@ index.html.ep
 %% layout 'default';
 %% title 'Welcome';
-Welcome to the Mojolicious real-time web framework!
+<h1>Welcome to the Mojolicious real-time web framework!</h1>
+To learn more, you can browse through the documentation
+<%%= link_to 'here' => '/perldoc' %>.
 
 <% %>@@ layouts/default.html.ep
 <!DOCTYPE html>

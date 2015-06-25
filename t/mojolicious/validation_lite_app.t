@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+use Mojo::Upload;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -20,6 +21,13 @@ any '/' => sub {
   $validation->optional('baz')->two;
   $validation->optional('yada')->two;
 } => 'index';
+
+any '/upload' => sub {
+  my $c          = shift;
+  my $validation = $c->validation;
+  return $c->render unless $validation->has_data;
+  $validation->required('foo')->file;
+};
 
 any '/forgery' => sub {
   my $c          = shift;
@@ -73,6 +81,23 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('yada'), [qw(equal_to 1 foo)], 'right error';
 is_deeply $validation->failed,        [qw(baz yada)],       'right names';
 
+# File
+$validation = $t->app->validation->input(
+  {
+    foo => Mojo::Upload->new,
+    bar => [Mojo::Upload->new, Mojo::Upload->new],
+    baz => [Mojo::Upload->new, 'test']
+  }
+);
+ok $validation->required('foo')->file->is_valid, 'valid';
+ok $validation->required('bar')->file->is_valid, 'valid';
+ok $validation->required('baz')->is_valid, 'valid';
+ok !$validation->has_error, 'no error';
+ok !$validation->file->is_valid, 'not valid';
+ok $validation->has_error, 'has error';
+is_deeply $validation->error('baz'), [qw(file 1)], 'right error';
+is_deeply $validation->failed, ['baz'], 'right names';
+
 # In
 $validation = $t->app->validation->input(
   {foo => [qw(bar whatever)], baz => [qw(yada ohoh)]});
@@ -114,6 +139,20 @@ ok $validation->has_error('baz'), 'has error';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('yada'), [qw(size 1 5 10)], 'right error';
+
+# File size
+$validation = $t->app->validation->input(
+  {
+    foo => [Mojo::Upload->new->tap(sub { $_->asset->add_chunk('valid') })],
+    bar => [Mojo::Upload->new->tap(sub { $_->asset->add_chunk('not valid') })]
+  }
+);
+ok $validation->required('foo')->file->size(1, 6)->is_valid, 'valid';
+ok !$validation->has_error, 'no error';
+ok !$validation->required('bar')->file->size(1, 6)->is_valid, 'not valid';
+ok $validation->has_error, 'has error';
+is_deeply $validation->error('bar'), [qw(size 1 1 6)], 'right error';
+is_deeply $validation->failed, ['bar'], 'right names';
 
 # Multiple empty values
 $validation = $t->app->validation;
@@ -195,6 +234,29 @@ $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
   ->element_count_is('.field-with-error', 2)
   ->element_count_is('.field-with-error', 2, 'with description');
 
+# Successful file upload
+$t->post_ok(
+  '/upload' => form => {foo => {content => 'bar', filename => 'test.txt'}})
+  ->element_exists_not('.field-with-error');
+
+# Successful file upload (multiple files)
+$t->post_ok(
+  '/upload' => form => {
+    foo => [
+      {content => 'One', filename => 'one.txt'},
+      {content => 'Two', filename => 'two.txt'}
+    ]
+  }
+)->element_exists_not('.field-with-error');
+
+# Failed file upload
+$t->post_ok('/upload' => form => {foo => 'bar'})
+  ->element_exists('.field-with-error');
+
+# Failed file upload (multiple files)
+$t->post_ok('/upload' => form => {foo => ['one', 'two']})
+  ->element_exists('.field-with-error');
+
 # Missing CSRF token
 $t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
   ->content_like(qr/Wrong or missing CSRF token!/)
@@ -266,6 +328,12 @@ __DATA__
   % end
   %= select_field baz => [qw(yada yada)]
   %= password_field 'yada'
+% end
+
+@@ upload.html.ep
+%= form_for upload => begin
+  %= file_field 'foo'
+  %= submit_button
 % end
 
 @@ forgery.html.ep

@@ -4,7 +4,13 @@ use Mojo::Base -base;
 use Mojolicious::Validator::Validation;
 
 has checks => sub {
-  {equal_to => \&_equal_to, in => \&_in, like => \&_like, size => \&_size};
+  {
+    equal_to => \&_equal_to,
+    file     => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') },
+    in       => \&_in,
+    like => sub { $_[2] !~ $_[3] },
+    size => \&_size
+  };
 };
 
 sub add_check { $_[0]->checks->{$_[1]} = $_[2] and return $_[0] }
@@ -25,11 +31,9 @@ sub _in {
   return 1;
 }
 
-sub _like { $_[2] !~ $_[3] }
-
 sub _size {
   my ($validation, $name, $value, $min, $max) = @_;
-  my $len = length $value;
+  my $len = ref $value ? $value->size : length $value;
   return $len < $min || $len > $max;
 }
 
@@ -39,7 +43,7 @@ sub _size {
 
 =head1 NAME
 
-Mojolicious::Validator - Validate parameter
+Mojolicious::Validator - Validate values
 
 =head1 SYNOPSIS
 
@@ -53,7 +57,7 @@ Mojolicious::Validator - Validate parameter
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Validator> validates parameters for L<Mojolicious>.
+L<Mojolicious::Validator> validates values for L<Mojolicious>.
 
 =head1 CHECKS
 
@@ -61,25 +65,34 @@ These validation checks are available by default.
 
 =head2 equal_to
 
-  $validation->equal_to('foo');
+  $validation = $validation->equal_to('foo');
 
-Value needs to be equal to the value of another field.
+Value needs to be equal to the value of another field. Note that this check does
+not work with file uploads for security reasons.
+
+=head2 file
+
+  $validation = $validation->file;
+
+Value needs to be a L<Mojo::Upload> object, representing a file upload.
 
 =head2 in
 
-  $validation->in(qw(foo bar baz));
+  $validation = $validation->in(qw(foo bar baz));
 
-Value needs to match one of the values in the list.
+Value needs to match one of the values in the list. Note that this check does
+not work with file uploads for security reasons.
 
 =head2 like
 
-  $validation->like(qr/^[A-Z]/);
+  $validation = $validation->like(qr/^[A-Z]/);
 
-Value needs to match the regular expression.
+Value needs to match the regular expression. Note that this check does not work
+with file uploads for security reasons.
 
 =head2 size
 
-  $validation->size(2, 5);
+  $validation = $validation->size(2, 5);
 
 Value length in characters needs to be between these two values.
 
@@ -92,8 +105,8 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered validation checks, by default only L</"equal_to">, L</"in">,
-L</"like"> and L</"size"> are already defined.
+Registered validation checks, by default only L</"equal_to">, L</"file">,
+L</"in">, L</"like"> and L</"size"> are already defined.
 
 =head1 METHODS
 

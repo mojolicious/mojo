@@ -16,17 +16,16 @@ sub register {
 
   my @helpers = (
     qw(csrf_field form_for hidden_field javascript label_for link_to),
-    qw(password_field select_field stylesheet submit_button tag_with_error),
-    qw(text_area)
+    qw(select_field stylesheet submit_button tag_with_error text_area)
   );
   $app->helper($_ => __PACKAGE__->can("_$_")) for @helpers;
 
   $app->helper(check_box =>
       sub { _input(shift, shift, value => shift, @_, type => 'checkbox') });
-  $app->helper(file_field =>
-      sub { shift; _tag('input', name => shift, @_, type => 'file') });
+  $app->helper(file_field => sub { _empty_field('file', @_) });
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
   $app->helper(input_tag => sub { _input(@_) });
+  $app->helper(password_field => sub { _empty_field('password', @_) });
   $app->helper(radio_button =>
       sub { _input(shift, shift, value => shift, @_, type => 'radio') });
 
@@ -37,6 +36,11 @@ sub register {
 sub _csrf_field {
   my $c = shift;
   return _hidden_field($c, csrf_token => $c->helpers->csrf_token, @_);
+}
+
+sub _empty_field {
+  my ($type, $c, $name) = (shift, shift, shift);
+  return _validation($c, $name, 'input', name => $name, @_, type => $type);
 }
 
 sub _form_for {
@@ -117,12 +121,6 @@ sub _option {
   my %attrs = (value => $pair->[1]);
   $attrs{selected} = undef if exists $values->{$pair->[1]};
   return _tag('option', %attrs, @$pair[2 .. $#$pair], $pair->[0]);
-}
-
-sub _password_field {
-  my ($c, $name) = (shift, shift);
-  return _validation($c, $name, 'input', name => $name, @_,
-    type => 'password');
 }
 
 sub _select_field {

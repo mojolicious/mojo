@@ -191,9 +191,9 @@ array reference.
 
   my $names = $validation->failed;
 
-Return a list of all names for parameters that failed validation.
+Return a list of all names for values that failed validation.
 
-  # Names of all parameters that failed
+  # Names of all values that failed
   say for @{$validation->failed};
 
 =head2 has_data
@@ -227,17 +227,16 @@ Change validation L</"topic">.
 
   my $value = $validation->param('foo');
 
-Access validated parameters. If there are multiple values sharing the same
-name, and you want to access more than just the last one, you can use
-L</"every_param">.
+Access validated values. If there are multiple values sharing the same name, and
+you want to access more than just the last one, you can use L</"every_param">.
 
 =head2 passed
 
   my $names = $validation->passed;
 
-Return a list of all names for parameters that passed validation.
+Return a list of all names for values that passed validation.
 
-  # Names of all parameters that passed
+  # Names of all values that passed
   say for @{$validation->passed};
 
 =head2 required

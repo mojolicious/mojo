@@ -516,7 +516,7 @@ L<Mojolicious::Types> object.
   my $validator = $app->validator;
   $app          = $app->validator(Mojolicious::Validator->new);
 
-Validate parameters, defaults to a L<Mojolicious::Validator> object.
+Validate values, defaults to a L<Mojolicious::Validator> object.
 
   # Add validation check
   $app->validator->add_check(foo => sub {

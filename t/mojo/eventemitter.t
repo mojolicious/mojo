@@ -132,9 +132,21 @@ is scalar @{$e->subscribers('foo')}, 0, 'no subscribers';
 $e->emit('foo');
 is $counter, 5, 'event was not emitted again';
 
-# Pass by reference and assignment to $_
+# Manipulate events
 $e = Mojo::EventEmitter->new;
 my $buffer = '';
+push @{$e->subscribers('foo')}, sub { $buffer .= 'one' };
+push @{$e->subscribers('foo')}, sub { $buffer .= 'two' };
+push @{$e->subscribers('foo')}, sub { $buffer .= 'three' };
+$e->emit('foo');
+is $buffer, 'onetwothree', 'right result';
+@{$e->subscribers('foo')} = reverse @{$e->subscribers('foo')};
+$e->emit('foo');
+is $buffer, 'onetwothreethreetwoone', 'right result';
+
+# Pass by reference and assignment to $_
+$e      = Mojo::EventEmitter->new;
+$buffer = '';
 $e->on(one => sub { $_ = $_[1] .= 'abc' . $_[2] });
 $e->on(one => sub { $_[1] .= '123' . pop });
 is $buffer, '', 'no result';

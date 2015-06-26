@@ -41,7 +41,7 @@ sub once {
   return $wrapper;
 }
 
-sub subscribers { shift->{events}{shift()} || [] }
+sub subscribers { shift->{events}{shift()} ||= [] }
 
 sub unsubscribe {
   my ($self, $name, $cb) = @_;
@@ -167,6 +167,9 @@ All subscribers for event.
 
   # Unsubscribe last subscriber
   $e->unsubscribe(foo => $e->subscribers('foo')->[-1]);
+
+  # Change order of subscribers
+  @{$e->subscribers('foo')} = reverse @{$e->subscribers('foo')};
 
 =head2 unsubscribe
 

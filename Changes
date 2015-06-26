@@ -1,7 +1,7 @@
 
 6.13  2015-06-26
   - Added support for validating file uploads.
-  - Added file check to Mojolicious::Validator.
+  - Added upload check to Mojolicious::Validator.
 
 6.12  2015-06-18
   - Welcome to the Mojolicious core team Dan Book.

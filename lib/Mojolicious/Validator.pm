@@ -6,10 +6,10 @@ use Mojolicious::Validator::Validation;
 has checks => sub {
   {
     equal_to => \&_equal_to,
-    file     => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') },
     in       => \&_in,
-    like => sub { $_[2] !~ $_[3] },
-    size => \&_size
+    like     => sub { $_[2] !~ $_[3] },
+    size     => \&_size,
+    upload   => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') }
   };
 };
 
@@ -70,12 +70,6 @@ These validation checks are available by default.
 Value needs to be equal to the value of another field. Note that this check does
 not work with file uploads for security reasons.
 
-=head2 file
-
-  $validation = $validation->file;
-
-Value needs to be a L<Mojo::Upload> object, representing a file upload.
-
 =head2 in
 
   $validation = $validation->in(qw(foo bar baz));
@@ -96,6 +90,12 @@ with file uploads for security reasons.
 
 Value length needs to be between these two values.
 
+=head2 upload
+
+  $validation = $validation->upload;
+
+Value needs to be a L<Mojo::Upload> object, representing a file upload.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Validator> implements the following attributes.
@@ -105,8 +105,8 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered validation checks, by default only L</"equal_to">, L</"file">,
-L</"in">, L</"like"> and L</"size"> are already defined.
+Registered validation checks, by default only L</"equal_to">, L</"in">,
+L</"like">, L</"size"> and L</"upload"> are already defined.
 
 =head1 METHODS
 

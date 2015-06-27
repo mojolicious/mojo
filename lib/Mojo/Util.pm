@@ -175,8 +175,8 @@ sub punycode_encode {
   my @input = map {ord} split '', $output;
   my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
   $output =~ s/[^\x00-\x7f]+//gs;
-  my $h = my $b = length $output;
-  $output .= "\x2d" if $b > 0;
+  my $h = my $basic = length $output;
+  $output .= "\x2d" if $basic > 0;
 
   for my $m (@chars) {
     next if $m < $n;
@@ -201,7 +201,7 @@ sub punycode_encode {
         }
 
         $output .= chr $q + ($q < 26 ? 0x61 : 0x30 - 26);
-        $bias = _adapt($delta, $h + 1, $h == $b);
+        $bias = _adapt($delta, $h + 1, $h == $basic);
         $delta = 0;
         $h++;
       }

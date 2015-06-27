@@ -221,10 +221,10 @@ sub quote {
 }
 
 sub secure_compare {
-  my ($a, $b) = @_;
-  return undef if length $a != length $b;
+  my ($one, $two) = @_;
+  return undef if length $one != length $two;
   my $r = 0;
-  $r |= ord(substr $a, $_) ^ ord(substr $b, $_) for 0 .. length($a) - 1;
+  $r |= ord(substr $one, $_) ^ ord(substr $two, $_) for 0 .. length($one) - 1;
   return $r == 0;
 }
 

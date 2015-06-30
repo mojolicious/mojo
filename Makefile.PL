@@ -23,7 +23,7 @@ WriteMakefile(
       repository => 'https://github.com/kraih/mojo.git',
       x_IRC      => 'irc://irc.perl.org/#mojo'
     },
-    no_index => {directory => ['t']}
+    no_index => {directory => ['examples', 't']}
   },
   PREREQ_PM => {
     'IO::Socket::IP' => '0.26',

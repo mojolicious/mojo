@@ -306,6 +306,9 @@ necessary.
 
 Parsed parameter pairs. Note that this method will normalize the parameters.
 
+  # Remove all parameters
+  $params->pairs([]);
+
 =head2 param
 
   my $value = $params->param('foo');

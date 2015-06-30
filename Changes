@@ -1,5 +1,5 @@
 
-6.13  2015-06-26
+6.13  2015-06-30
   - Improved subscribers method in Mojo::EventEmitter to allow subscribers to be
     modified more easily.
 

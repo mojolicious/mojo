@@ -17,6 +17,8 @@ is $params->to_string, 'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo',
   'right format';
 is $params->remove('a')->to_string, 'foo=b%3Bar&baz=23&b=6&b=7&c=f%3Boo',
   'right format';
+is $params->remove_all->to_string, '',
+  'right format';
 
 # Clone
 my $clone = $params->clone;

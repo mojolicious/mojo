@@ -22,7 +22,7 @@ Mojolicious::Plugin::Charset - Charset plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin(Charset => {charset => 'Shift_JIS'});
+  $app->plugin(Charset => {charset => 'Shift_JIS'});
 
   # Mojolicious::Lite
   plugin Charset => {charset => 'Shift_JIS'};

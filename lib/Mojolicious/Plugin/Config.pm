@@ -77,7 +77,7 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
   };
 
   # Mojolicious
-  my $config = $self->plugin('Config');
+  my $config = $app->plugin('Config');
   say $config->{foo};
 
   # Mojolicious::Lite

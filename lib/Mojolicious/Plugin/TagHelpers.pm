@@ -213,7 +213,7 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('TagHelpers');
+  $app->plugin('TagHelpers');
 
   # Mojolicious::Lite
   plugin 'TagHelpers';

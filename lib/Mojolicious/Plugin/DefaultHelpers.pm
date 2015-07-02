@@ -162,7 +162,7 @@ Mojolicious::Plugin::DefaultHelpers - Default helpers plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('DefaultHelpers');
+  $app->plugin('DefaultHelpers');
 
   # Mojolicious::Lite
   plugin 'DefaultHelpers';

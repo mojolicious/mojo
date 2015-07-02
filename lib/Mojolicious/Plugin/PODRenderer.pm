@@ -119,9 +119,9 @@ Mojolicious::Plugin::PODRenderer - POD renderer plugin
 =head1 SYNOPSIS
 
   # Mojolicious (with documentation browser under "/perldoc")
-  my $route = $self->plugin('PODRenderer');
-  my $route = $self->plugin(PODRenderer => {name => 'foo'});
-  my $route = $self->plugin(PODRenderer => {preprocess => 'epl'});
+  my $route = $app->plugin('PODRenderer');
+  my $route = $app->plugin(PODRenderer => {name => 'foo'});
+  my $route = $app->plugin(PODRenderer => {preprocess => 'epl'});
 
   # Mojolicious::Lite (with documentation browser under "/perldoc")
   my $route = plugin 'PODRenderer';

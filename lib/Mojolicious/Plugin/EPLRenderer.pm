@@ -66,7 +66,7 @@ Mojolicious::Plugin::EPLRenderer - Embedded Perl Lite renderer plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('EPLRenderer');
+  $app->plugin('EPLRenderer');
 
   # Mojolicious::Lite
   plugin 'EPLRenderer';

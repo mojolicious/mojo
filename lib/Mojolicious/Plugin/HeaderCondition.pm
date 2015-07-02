@@ -40,8 +40,8 @@ Mojolicious::Plugin::HeaderCondition - Header condition plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('HeaderCondition');
-  $self->routes->get('/:controller/:action')
+  $app->plugin('HeaderCondition');
+  $app->routes->get('/:controller/:action')
     ->over(headers => {Referer => qr/example\.com/});
 
   # Mojolicious::Lite
@@ -49,7 +49,7 @@ Mojolicious::Plugin::HeaderCondition - Header condition plugin
   get '/' => (headers => {Referer => qr/example\.com/}) => sub {...};
 
   # All headers need to match
-  $self->routes->get('/:controller/:action')->over(headers => {
+  $app->routes->get('/:controller/:action')->over(headers => {
     'X-Secret-Header' => 'Foo',
     Referer => qr/example\.com/
   });

@@ -52,7 +52,7 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
   }
 
   # Mojolicious
-  my $config = $self->plugin('JSONConfig');
+  my $config = $app->plugin('JSONConfig');
   say $config->{foo};
 
   # Mojolicious::Lite

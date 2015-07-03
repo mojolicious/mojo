@@ -573,6 +573,11 @@ element as L<Mojo::DOM> objects.
     ->descendant_nodes->grep(sub { $_->type eq 'comment' })
     ->map('remove')->first;
 
+  # "<p><b>test</b>test</p>"
+  $dom->parse('<p><b>123</b>456</p>')
+    ->at('p')->descendant_nodes->grep(sub { $_->type eq 'text' })
+    ->map(content => 'test')->first->root;
+
 =head2 find
 
   my $collection = $dom->find('div ~ p');

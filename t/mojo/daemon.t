@@ -85,9 +85,11 @@ is(Mojo::Server::Daemon->new->load_app($path)->config('script'),
   abs_path($path), 'right script name');
 
 # Load broken app
+my $bin = $FindBin::Bin;
+eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderTest/A.pm"); };
+like $@, qr/did not return an application object/, 'right error';
 eval {
-  Mojo::Server::Daemon->new->load_app(
-    "$FindBin::Bin/lib/Mojo/LoaderException.pm");
+  Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderException.pm");
 };
 like $@, qr/^Can't load application/, 'right error';
 

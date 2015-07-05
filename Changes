@@ -1,5 +1,6 @@
 
-6.13  2015-07-03
+6.13  2015-07-05
+  - Improved error messages for broken applications in Mojo::Server. (mst)
   - Improved subscribers method in Mojo::EventEmitter to allow subscribers to be
     modified more easily.
 

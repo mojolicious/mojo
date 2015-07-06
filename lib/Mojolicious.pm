@@ -459,7 +459,7 @@ startup method to define the url endpoints for your application.
 =head2 secrets
 
   my $secrets = $app->secrets;
-  $app        = $app->secrets(['passw0rd']);
+  $app        = $app->secrets([$bytes]);
 
 Secret passphrases used for signed cookies and the like, defaults to the
 L</"moniker"> of this application, which is not very secure, so you should

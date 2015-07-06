@@ -291,8 +291,8 @@ Renderer cache, defaults to a L<Mojo::Cache> object.
 Classes to use for finding templates in C<DATA> sections with L<Mojo::Loader>,
 first one has the highest precedence, defaults to C<main>. Only files with
 exactly two extensions will be used, like C<index.html.ep>. Note that these
-classes need to have already been loaded during application startup for
-templates to be detected.
+classes need to have already been loaded and added during application startup
+for templates to be detected.
 
   # Add another class with templates in DATA section
   push @{$renderer->classes}, 'Mojolicious::Plugin::Fun';

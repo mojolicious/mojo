@@ -30,7 +30,9 @@ hardest part of fixing a bug, so the better your test case the faster it can be
 fixed. ;)
 
 And don't forget to add a descriptive title and text when you create a new
-issue.
+issue. If your issue does not contain enough information, it might get closed
+pretty quickly, but don't be disheartened, if there's new activity it will get
+reopened just as quickly.
 
 =head2 Reporting security issues
 

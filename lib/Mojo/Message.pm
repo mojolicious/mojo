@@ -59,7 +59,7 @@ sub build_body       { shift->_build('get_body_chunk') }
 sub build_headers    { shift->_build('get_header_chunk') }
 sub build_start_line { shift->_build('get_start_line_chunk') }
 
-sub cookie { shift->_cache('cookie', 0, @_) }
+sub cookie { shift->_cache('cookies', 0, @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
@@ -77,8 +77,8 @@ sub error {
   return $self->finish;
 }
 
-sub every_cookie { shift->_cache('cookie', 1, @_) }
-sub every_upload { shift->_cache('upload', 1, @_) }
+sub every_cookie { shift->_cache('cookies', 1, @_) }
+sub every_upload { shift->_cache('uploads', 1, @_) }
 
 sub extract_start_line {
   croak 'Method "extract_start_line" not implemented by subclass';
@@ -197,7 +197,7 @@ sub to_string {
   return $self->build_start_line . $self->build_headers . $self->build_body;
 }
 
-sub upload { shift->_cache('upload', 0, @_) }
+sub upload { shift->_cache('uploads', 0, @_) }
 
 sub uploads {
   my $self = shift;
@@ -239,7 +239,6 @@ sub _cache {
   my ($self, $method, $all, $name) = @_;
 
   # Cache objects by name
-  $method .= 's';
   unless ($self->{$method}) {
     $self->{$method} = {};
     push @{$self->{$method}{$_->name}}, $_ for @{$self->$method};

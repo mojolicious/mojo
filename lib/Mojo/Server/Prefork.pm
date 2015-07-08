@@ -413,7 +413,8 @@ L<Mojo::IOLoop/"multi_accept">.
   my $file = $prefork->pid_file;
   $prefork = $prefork->pid_file('/tmp/prefork.pid');
 
-Full path of process id file, defaults to a random temporary path.
+Full path of process id file, defaults to C<prefork.pid> in a temporary
+directory.
 
 =head2 workers
 

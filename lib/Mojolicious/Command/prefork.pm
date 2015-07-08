@@ -65,8 +65,8 @@ Mojolicious::Command::prefork - Prefork command
                                          MOJO_LISTEN or "http://*:3000"
     -M, --multi-accept <number>          Number of connections to accept at
                                          once, defaults to 50
-    -P, --pid-file <path>                Path to process id file, defaults to a
-                                         random file
+    -P, --pid-file <path>                Path to process id file, defaults to
+                                         "prefork.pid" in a temporary diretory
     -p, --proxy                          Activate reverse proxy support,
                                          defaults to the value of
                                          MOJO_REVERSE_PROXY

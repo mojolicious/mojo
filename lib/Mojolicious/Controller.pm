@@ -341,6 +341,7 @@ sub validation {
   my $header = $req->headers->header('X-CSRF-Token');
   my $hash   = $req->params->to_hash;
   $hash->{csrf_token} //= $header if $token && $header;
+  $hash->{$_} = $req->every_upload($_) for map { $_->name } @{$req->uploads};
   my $validation = $self->app->validator->validation->input($hash);
   return $stash->{'mojo.validation'} = $validation->csrf_token($token);
 }
@@ -916,16 +917,21 @@ to inherit query parameters from the current request.
   my $validation = $c->validation;
 
 Get L<Mojolicious::Validator::Validation> object for current request to
-validate C<GET> and C<POST> parameters extracted from the query string and
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message body.
-Parts of the request body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large, there's a 16MB
-limit by default.
+validate file uploads as well as C<GET> and C<POST> parameters extracted from
+the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body. Parts of the request body need to be loaded
+into memory to parse C<POST> parameters, so you have to make sure it is not
+excessively large, there's a 16MB limit by default.
 
   # Validate GET/POST parameter
   my $validation = $c->validation;
   $validation->required('title')->size(3, 50);
   my $title = $validation->param('title');
+
+  # Validate file upload
+  my $validation = $c->validation;
+  $validation->required('tarball')->upload->size(1, 1048576);
+  my $tarball = $validation->param('tarball');
 
 =head2 write
 

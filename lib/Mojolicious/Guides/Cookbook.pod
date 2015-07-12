@@ -613,12 +613,14 @@ L<Mojolicious::Controller/"send">.
         var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
 
         // Incoming messages
-        ws.onmessage = function(event) {
+        ws.onmessage = function (event) {
           document.body.innerHTML += event.data + '<br/>';
         };
 
         // Outgoing messages
-        window.setInterval(function () { ws.send('Hello Mojo!') }, 1000);
+        ws.onopen = function (event) {
+          window.setInterval(function () { ws.send('Hello Mojo!') }, 1000);
+        };
       </script>
     </body>
   </html>
@@ -712,7 +714,7 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
         var events = new EventSource('<%= url_for 'events' %>');
 
         // Subscribe to "log" event
-        events.addEventListener('log', function(event) {
+        events.addEventListener('log', function (event) {
           document.body.innerHTML += event.data + '<br/>';
         }, false);
       </script>

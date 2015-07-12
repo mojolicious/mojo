@@ -33,9 +33,6 @@ EOF
   # Test
   $self->render_to_rel_file('test', "$name/t/basic.t", $class);
 
-  # Log directory
-  $self->create_rel_dir("$name/log");
-
   # Static file
   $self->render_to_rel_file('static', "$name/public/index.html");
 

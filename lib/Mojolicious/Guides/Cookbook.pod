@@ -610,7 +610,7 @@ L<Mojolicious::Controller/"send">.
     <head><title>Echo</title></head>
     <body>
       <script>
-        var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
+        var ws = new WebSocket('<%= url_for('echo')->to_abs->scheme('ws') %>');
 
         // Incoming messages
         ws.onmessage = function(event) {
@@ -618,7 +618,9 @@ L<Mojolicious::Controller/"send">.
         };
 
         // Outgoing messages
-        window.setInterval(function () { ws.send('Hello Mojo!') }, 1000);
+        ws.onopen = function(event) {
+          window.setInterval(function () { ws.send('Hello Mojo!') }, 1000);
+        };
       </script>
     </body>
   </html>

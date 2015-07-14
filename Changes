@@ -1,4 +1,6 @@
 
+6.15  2015-07-14
+
 6.14  2015-07-12
   - Improved app generator command not to create a log directory.
 

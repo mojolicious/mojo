@@ -5,7 +5,7 @@ use Carp 'croak';
 use Cwd 'abs_path';
 use Mojo::Loader 'load_class';
 use Mojo::Util 'md5_sum';
-use POSIX;
+use POSIX ();
 use Scalar::Util 'blessed';
 
 has app           => sub { shift->build_app('Mojo::HelloWorld') };

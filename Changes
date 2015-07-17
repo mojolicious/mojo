@@ -1,5 +1,6 @@
 
-6.15  2015-07-16
+6.15  2015-07-17
+  - Fixed warnings in Mojo::DOM.
 
 6.14  2015-07-12
   - Improved app generator command not to create a log directory.

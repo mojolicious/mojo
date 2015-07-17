@@ -9,6 +9,7 @@ is(Mojo::DOM->new(''),                 '',    'right result');
 is(Mojo::DOM->new->parse(''),          '',    'right result');
 is(Mojo::DOM->new->at('p'),            undef, 'no result');
 is(Mojo::DOM->new->append_content(''), '',    'right result');
+is(Mojo::DOM->new->all_text,           '',    'right result');
 
 # Simple (basics)
 my $dom = Mojo::DOM->new(

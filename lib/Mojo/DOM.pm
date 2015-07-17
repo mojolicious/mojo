@@ -185,10 +185,9 @@ sub _all_text {
 
   # Detect "pre" tag
   my $tree = $self->tree;
-  if (!defined $trim || $trim) {
-    $trim = 1;
-    $_->[1] eq 'pre' and $trim = 0 for $self->_ancestors, $tree;
-  }
+  $trim = 1 unless defined $trim;
+  map { $_->[1] eq 'pre' and $trim = 0 } $self->_ancestors, $tree
+    if $trim && $tree->[0] ne 'root';
 
   return _text([_nodes($tree)], $recurse, $trim);
 }

@@ -26,7 +26,7 @@ sub check {
   my $cb          = $self->validator->checks->{$check};
   my $name        = $self->topic;
   my $input       = $self->input->{$name};
-  my $is_optional = $self->is_optional($name);
+  my $is_optional = $self->is_optional;
   for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
     next if $is_optional && (!defined($value) || !length($value));
     next unless my $result = $self->$cb($name, $value, @_);

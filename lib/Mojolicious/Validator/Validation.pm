@@ -72,7 +72,7 @@ sub optional {
   my @input = ref $input eq 'ARRAY' ? @$input : $input;
   $self->output->{$name} = $input if grep { defined($_) && length($_) } @input;
 
-  return $self->topic($name)->is_optional($name);
+  return $self->topic($name)->is_optional(1);
 }
 
 sub param { shift->every_param(shift)->[-1] }
@@ -160,7 +160,7 @@ L<Mojolicious::Validator> object this validation belongs to.
 =head2 is_optional
 
   my $is_optional = $validation->is_optional;
-  $validation     = $validation->is_optional('foo');
+  $validation     = $validation->is_optional(1);
 
 Flag, indicating optionality of field currently being validated.
 

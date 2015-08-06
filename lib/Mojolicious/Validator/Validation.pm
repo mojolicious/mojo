@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp         ();
 use Scalar::Util ();
 
-has [qw(csrf_token topic validator)];
+has [qw(csrf_token topic validator is_optional)];
 has [qw(input output)] => sub { {} };
 
 sub AUTOLOAD {
@@ -23,10 +23,12 @@ sub check {
 
   return $self unless $self->is_valid;
 
-  my $cb    = $self->validator->checks->{$check};
-  my $name  = $self->topic;
-  my $input = $self->input->{$name};
+  my $cb          = $self->validator->checks->{$check};
+  my $name        = $self->topic;
+  my $input       = $self->input->{$name};
+  my $is_optional = $self->is_optional;
   for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
+    next if $is_optional && (!defined($value) || !length($value));
     next unless my $result = $self->$cb($name, $value, @_);
     return $self->error($name => [$check, $result, @_]);
   }
@@ -68,10 +70,9 @@ sub optional {
 
   my $input = $self->input->{$name};
   my @input = ref $input eq 'ARRAY' ? @$input : $input;
-  $self->output->{$name} = $input
-    unless grep { !defined($_) || !length($_) } @input;
+  $self->output->{$name} = $input if grep { defined($_) && length($_) } @input;
 
-  return $self->topic($name);
+  return $self->topic($name)->is_optional(1);
 }
 
 sub param { shift->every_param(shift)->[-1] }
@@ -80,7 +81,15 @@ sub passed { [sort keys %{shift->output}] }
 
 sub required {
   my ($self, $name) = @_;
-  return $self if $self->optional($name)->is_valid;
+
+  my $input = $self->input->{$name};
+  my @input = ref $input eq 'ARRAY' ? @$input : $input;
+  $self->output->{$name} = $input
+    unless grep { !defined($_) || !length($_) } @input;
+
+  $self->topic($name);
+
+  return $self if $self->is_valid;
   return $self->error($name => ['required']);
 }
 
@@ -147,6 +156,13 @@ Name of field currently being validated.
   $validation   = $validation->validator(Mojolicious::Validator->new);
 
 L<Mojolicious::Validator> object this validation belongs to.
+
+=head2 is_optional
+
+  my $is_optional = $validation->is_optional;
+  $validation     = $validation->is_optional(1);
+
+Flag, indicating optionality of field currently being validated.
 
 =head1 METHODS
 

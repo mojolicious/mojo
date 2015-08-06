@@ -164,6 +164,12 @@ is_deeply $validation->output, {}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('foo'), ['required'], 'right error';
 
+# Multiple empty optional values with check
+$validation = $t->app->validation;
+$validation->input({foo => ['', 'bar', '']});
+ok $validation->optional('foo')->in('bar')->is_valid, 'valid';
+ok $validation->optional('foo')->in('baz')->has_error, 'has_error';
+
 # "0"
 $validation = $t->app->validation->input({0 => 0});
 ok $validation->has_data, 'has data';

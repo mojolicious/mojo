@@ -78,13 +78,12 @@ sub required {
 sub _copy {
   my ($self, $name, $all) = @_;
 
-  my $input  = $self->input->{$name};
-  my @input  = ref $input eq 'ARRAY' ? @$input : $input;
-  my @output = grep { defined && length } @input;
+  my $input = $self->input->{$name};
+  my @old   = ref $input eq 'ARRAY' ? @$input : $input;
+  my @new   = grep { defined && length } @old;
 
-  if ($all && @output && @input == @output) { $self->output->{$name} = $input }
-  elsif (!$all && @output > 1) { $self->output->{$name} = \@output }
-  elsif (!$all && @output)     { $self->output->{$name} = $output[0] }
+  if ($all && @new && @old == @new) { $self->output->{$name} = $input }
+  elsif (!$all && @new) { $self->output->{$name} = @new > 1 ? \@new : $new[0] }
 
   return $self->topic($name);
 }

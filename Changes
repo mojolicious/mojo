@@ -1,5 +1,7 @@
 
-6.15  2015-07-17
+6.15  2015-08-07
+  - Fixed bug in Mojolicious::Validator::Validation where empty optional values
+    were not being handled correctly.
   - Fixed warnings in Mojo::DOM.
 
 6.14  2015-07-12

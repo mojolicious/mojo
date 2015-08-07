@@ -7,7 +7,7 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
 has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 100 };
 
 # Common headers
-my %NORMALCASE = map { lc($_) => $_ } (
+my %NORMALCASE = map { lc() => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Access-Control-Allow-Origin Allow Authorization Cache-Control Connection),
   qw(Content-Disposition Content-Encoding Content-Language Content-Length),

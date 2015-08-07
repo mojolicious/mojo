@@ -161,11 +161,11 @@ sub _decode_string {
 
         # High surrogate
         ($ord & 0xfc00) == 0xd800
-          or pos($_) = $pos + pos($str), _throw('Missing high-surrogate');
+          or pos = $pos + pos($str), _throw('Missing high-surrogate');
 
         # Low surrogate
         $str =~ /\G\\u([Dd][C-Fc-f]..)/gc
-          or pos($_) = $pos + pos($str), _throw('Missing low-surrogate');
+          or pos = $pos + pos($str), _throw('Missing low-surrogate');
 
         $ord = 0x10000 + ($ord - 0xd800) * 0x400 + (hex($1) - 0xdc00);
       }

@@ -160,6 +160,7 @@ ok !$validation->has_data, 'no data';
 $validation->input({foo => ['', 'bar', ''], bar => ['', 'baz', '']});
 ok $validation->has_data, 'has data';
 ok $validation->optional('bar')->is_valid, 'valid';
+ok $validation->in('baz')->is_valid,       'still valid';
 is_deeply $validation->output, {bar => 'baz'}, 'right result';
 ok !$validation->has_error, 'no error';
 ok !$validation->required('foo')->is_valid, 'not valid';

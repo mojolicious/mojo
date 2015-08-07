@@ -23,10 +23,10 @@ sub check {
 
   return $self unless $self->is_valid;
 
-  my $cb    = $self->validator->checks->{$check};
-  my $name  = $self->topic;
-  my $input = $self->input->{$name};
-  for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
+  my $cb     = $self->validator->checks->{$check};
+  my $name   = $self->topic;
+  my $values = $self->output->{$name};
+  for my $value (ref $values eq 'ARRAY' ? @$values : $values) {
     next unless my $result = $self->$cb($name, $value, @_);
     return $self->error($name => [$check, $result, @_]);
   }

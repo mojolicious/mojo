@@ -159,12 +159,8 @@ $validation = $t->app->validation;
 ok !$validation->has_data, 'no data';
 $validation->input({foo => ['', 'bar', ''], bar => ['', 'baz', '']});
 ok $validation->has_data, 'has data';
-ok $validation->optional('bar')->is_valid, 'valid';
-ok $validation->in('baz')->is_valid,       'still valid';
-is_deeply $validation->output, {bar => 'baz'}, 'right result';
-ok !$validation->has_error, 'no error';
 ok !$validation->required('foo')->is_valid, 'not valid';
-is_deeply $validation->output, {bar => 'baz'}, 'right result';
+is_deeply $validation->output, {}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('foo'), ['required'], 'right error';
 
@@ -227,7 +223,7 @@ $t->get_ok('/' => form => {foo => '☃☃'})->status_is(200)
   ->element_exists('input[type="password"]');
 
 # Validation failed for required fields
-$t->post_ok('/' => form => {foo => ['no']})->status_is(200)
+$t->post_ok('/' => form => {foo => 'no'})->status_is(200)
   ->text_is('div:root'                                 => 'in 1')
   ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
   ->element_exists('input.custom.field-with-error[type="text"][value="no"]')

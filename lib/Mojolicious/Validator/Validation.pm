@@ -63,7 +63,16 @@ sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
 
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
-sub optional { shift->_copy(shift, 0) }
+sub optional {
+  my ($self, $name) = @_;
+
+  my $input = $self->input->{$name};
+  my @input = ref $input eq 'ARRAY' ? @$input : $input;
+  $self->output->{$name} = $input
+    unless grep { !defined($_) || !length($_) } @input;
+
+  return $self->topic($name);
+}
 
 sub param { shift->every_param(shift)->[-1] }
 
@@ -71,21 +80,8 @@ sub passed { [sort keys %{shift->output}] }
 
 sub required {
   my ($self, $name) = @_;
-  return $self if $self->_copy($name, 1)->is_valid;
+  return $self if $self->optional($name)->is_valid;
   return $self->error($name => ['required']);
-}
-
-sub _copy {
-  my ($self, $name, $all) = @_;
-
-  my $input = $self->input->{$name};
-  my @old   = ref $input eq 'ARRAY' ? @$input : $input;
-  my @new   = grep { defined && length } @old;
-
-  if ($all && @new && @old == @new) { $self->output->{$name} = $input }
-  elsif (!$all && @new) { $self->output->{$name} = @new > 1 ? \@new : $new[0] }
-
-  return $self->topic($name);
 }
 
 1;

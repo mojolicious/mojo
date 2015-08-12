@@ -99,8 +99,8 @@ sub fix_headers {
   my $headers = $content->headers;
   if ($content->is_multipart) { $headers->remove('Content-Length') }
   elsif ($content->is_chunked || $headers->content_length) { return $self }
-  if ($content->is_dynamic) { $headers->connection('close') }
-  elsif (my $size = $self->body_size) { $headers->content_length($size) }
+  if   ($content->is_dynamic) { $headers->connection('close') }
+  else                        { $headers->content_length($self->body_size) }
 
   return $self;
 }

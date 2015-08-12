@@ -1,5 +1,6 @@
 
 6.15  2015-08-12
+  - Removed deprecated build_body and build_headers methods from Mojo::Content.
   - Improved Mojo::Message and Mojo::Transaction::HTTP to generate slightly
     smaller HTTP messages.
   - Fixed warnings in Mojo::DOM.

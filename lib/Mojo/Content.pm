@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Compress::Raw::Zlib qw(WANT_GZIP Z_STREAM_END);
 use Mojo::Headers;
-use Mojo::Util 'deprecated';
 use Scalar::Util 'looks_like_number';
 
 has [qw(auto_decompress auto_relax expect_close relaxed skip_body)];
@@ -24,10 +23,6 @@ sub body_size { croak 'Method "body_size" not implemented by subclass' }
 sub boundary {
   (shift->headers->content_type // '') =~ $BOUNDARY_RE ? $1 // $2 : undef;
 }
-
-# DEPRECATED in Clinking Beer Mugs!
-sub build_body    { shift->_build('get_body_chunk') }
-sub build_headers { shift->_build('get_header_chunk') }
 
 sub charset {
   my $type = shift->headers->content_type // '';
@@ -167,23 +162,6 @@ sub write_chunk {
   $self->write(defined $chunk ? $self->_build_chunk($chunk) : $chunk, $cb);
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
   return $self;
-}
-
-# DEPRECATED in Clinking Beer Mugs!
-sub _build {
-  deprecated 'Mojo::Content::build_body and Mojo::Content::build_headers'
-    . ' are DEPRECATED';
-  my ($self, $method) = @_;
-
-  my ($buffer, $offset) = ('', 0);
-  while (1) {
-    next unless defined(my $chunk = $self->$method($offset));
-    last unless my $len = length $chunk;
-    $offset += $len;
-    $buffer .= $chunk;
-  }
-
-  return $buffer;
 }
 
 sub _build_chunk {

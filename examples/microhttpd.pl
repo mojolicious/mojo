@@ -18,8 +18,8 @@ Mojo::IOLoop->server(
 
           # Write a minimal HTTP response
           # (the "Hello World!" message has been optimized away!)
-          $stream->write("HTTP/1.1 200 OK\x0d\x0aContent-Length: 0\x0d\x0a"
-              . "Connection: keep-alive\x0d\x0a\x0d\x0a");
+          $stream->write(
+            "HTTP/1.1 200 OK\x0d\x0aContent-Length: 0\x0d\x0a\x0d\x0a");
         }
       }
     );

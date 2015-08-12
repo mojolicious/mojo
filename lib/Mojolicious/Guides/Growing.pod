@@ -367,7 +367,6 @@ L<Mojolicious::Command::get>.
   User-Agent: Mojolicious (Perl)
   Connection: keep-alive
   Accept-Encoding: gzip
-  Content-Length: 0
   Host: localhost:59472
 
   HTTP/1.1 200 OK

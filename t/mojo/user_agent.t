@@ -49,7 +49,12 @@ any '/method' => {inline => '<%= $c->req->method =%>'};
 
 get '/one' => sub {
   my $c = shift;
-  $c->res->version('1.0')->headers->connection('test');
+
+  $c->res->version('1.0');
+  if (my $connection = $c->param('connection')) {
+    $c->res->headers->connection($connection);
+  }
+
   $c->render(text => 'One!');
 };
 
@@ -141,18 +146,24 @@ like $tx->error->{message}, qr/IO::Socket::SSL/, 'right error';
 $tx = $ua->get('/');
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
-is $tx->res->code, 200,      'right status';
+is $tx->res->version, '1.1', 'right version';
+is $tx->res->code,    200,   'right status';
+ok !$tx->res->headers->connection, 'no "Connection" value';
 is $tx->res->body, 'works!', 'right content';
 
 # Again
 $tx = $ua->get('/');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
+is $tx->res->version, '1.1', 'right version';
+is $tx->res->code,    200,   'right status';
+ok !$tx->res->headers->connection, 'no "Connection" value';
 is $tx->res->body, 'works!', 'right content';
 $tx = $ua->get('/');
 ok $tx->success, 'successful';
-is $tx->res->code, 200,      'right status';
+is $tx->res->version, '1.1', 'right version';
+is $tx->res->code,    200,   'right status';
+ok !$tx->res->headers->connection, 'no "Connection" value';
 is $tx->res->body, 'works!', 'right content';
 
 # Shortcuts for common request methods
@@ -165,18 +176,28 @@ is $ua->post('/method')->res->body,    'POST',    'right method';
 is $ua->put('/method')->res->body,     'PUT',     'right method';
 
 # No keep-alive
-$tx = $ua->get('/one');
+$tx = $ua->get('/one?connection=test');
 ok $tx->success, 'successful';
 ok !$tx->keep_alive, 'connection will not be kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->version, '1.0', 'right version';
+is $tx->res->code,    200,   'right status';
+is $tx->res->headers->connection, 'test', 'right "Connection" value';
+is $tx->res->body, 'One!', 'right content';
+$tx = $ua->get('/one?connection=test');
+ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
+is $tx->res->version, '1.0', 'right version';
+is $tx->res->code,    200,   'right status';
 is $tx->res->headers->connection, 'test', 'right "Connection" value';
 is $tx->res->body, 'One!', 'right content';
 $tx = $ua->get('/one');
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok !$tx->keep_alive, 'connection will not be kept alive';
-is $tx->res->code, 200, 'right status';
-is $tx->res->headers->connection, 'test', 'right "Connection" value';
+is $tx->res->version, '1.0', 'right version';
+is $tx->res->code,    200,   'right status';
+ok !$tx->res->headers->connection, 'no "Connection" value';
 is $tx->res->body, 'One!', 'right content';
 
 # Error in callback

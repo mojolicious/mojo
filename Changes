@@ -1,5 +1,6 @@
 
-6.15  2015-08-08
+6.15  2015-08-12
+  - Improved Mojo::Message to generate slightly smaller HTTP messages.
   - Fixed warnings in Mojo::DOM.
 
 6.14  2015-07-12

@@ -671,7 +671,6 @@ is $res->code,        '404', 'right status';
 is $res->message,     'Not Found', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
-is $res->headers->content_length, 0, 'right "Content-Length" value';
 
 # Build HTTP 1.1 response start-line with minimal headers (strange message)
 $res = Mojo::Message::Response->new;
@@ -684,7 +683,6 @@ is $res->code,        '404', 'right status';
 is $res->message,     'Looks-0k!@ ;\':" #$%^<>,.\\o/ &*()', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
-is $res->headers->content_length, 0, 'right "Content-Length" value';
 
 # Build HTTP 1.1 response start-line and header
 $res = Mojo::Message::Response->new;
@@ -698,7 +696,6 @@ is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->connection, 'keep-alive', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
-is $res->headers->content_length, 0, 'right "Content-Length" value';
 
 # Build full HTTP 1.1 response
 $res = Mojo::Message::Response->new;
@@ -879,8 +876,7 @@ is $res->message,     'Switching Protocols', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->connection, 'Upgrade', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
-is $res->headers->upgrade,        'websocket', 'right "Upgrade" value';
-is $res->headers->content_length, 0,           'right "Content-Length" value';
+is $res->headers->upgrade, 'websocket', 'right "Upgrade" value';
 is $res->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Accept" value';
 is $res->headers->sec_websocket_protocol, 'sample',
@@ -902,7 +898,6 @@ $res2->parse($res->to_string);
 ok $res2->is_finished, 'response is finished';
 is $res2->code,        404, 'right status';
 is $res2->version,     '1.1', 'right version';
-is $res2->headers->content_length, 0, 'right "Content-Length" value';
 ok defined $res2->cookie('foo'),   'cookie "foo" exists';
 ok defined $res2->cookie('bar'),   'cookie "bar" exists';
 ok defined $res2->cookie('baz'),   'cookie "baz" exists';

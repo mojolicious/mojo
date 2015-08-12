@@ -1248,7 +1248,6 @@ is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
 is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
 is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
@@ -1276,7 +1275,6 @@ is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
 is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
 is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
@@ -1292,7 +1290,6 @@ is $clone->url->to_abs, 'http://example.com/demo', 'right absolute URL';
 is $clone->headers->connection, 'Upgrade',     'right "Connection" value';
 is $clone->headers->upgrade,    'websocket',   'right "Upgrade" value';
 is $clone->headers->host,       'example.com', 'right "Host" value';
-is $clone->headers->content_length, 0, 'right "Content-Length" value';
 is $clone->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $clone->headers->sec_websocket_protocol, 'sample',
@@ -1319,7 +1316,6 @@ is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
 is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
 is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',

@@ -173,8 +173,7 @@ $t->get_ok('/asset' => {'Range' => 'bytes=3-5'})->status_is(206)
 
 # Empty file
 $t->get_ok('/hello4.txt')->status_is(200)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 0)->content_is('');
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('');
 
 # Partial empty file
 $t->get_ok('/hello4.txt' => {Range => 'bytes=0-0'})->status_is(416)

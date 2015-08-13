@@ -1,4 +1,6 @@
 
+6.16  2015-08-14
+
 6.15  2015-08-13
   - Removed deprecated build_body and build_headers methods from Mojo::Content.
   - Improved Mojo::Transaction::HTTP performance slightly.

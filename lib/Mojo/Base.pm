@@ -11,7 +11,7 @@ use Carp ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
-# Will be shipping with Perl 5.22
+# Supported on Perl 5.22+
 my $NAME
   = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
 

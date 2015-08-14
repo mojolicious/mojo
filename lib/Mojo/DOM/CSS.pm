@@ -24,7 +24,7 @@ sub select     { _select(0, shift->tree, _compile(@_)) }
 sub select_one { _select(1, shift->tree, _compile(@_)) }
 
 sub _ancestor {
-  my ($selectors, $current, $tree, $pos, $one) = @_;
+  my ($selectors, $current, $tree, $one, $pos) = @_;
 
   while ($current = $current->[3]) {
     return undef if $current->[0] eq 'root' || $current eq $tree;
@@ -59,7 +59,7 @@ sub _combinator {
   }
 
   # ">" (parent only)
-  return _ancestor($selectors, $current, $tree, ++$pos, 1) if $c eq '>';
+  return _ancestor($selectors, $current, $tree, 1, ++$pos) if $c eq '>';
 
   # "~" (preceding siblings)
   return _sibling($selectors, $current, $tree, 0, ++$pos) if $c eq '~';
@@ -68,7 +68,7 @@ sub _combinator {
   return _sibling($selectors, $current, $tree, 1, ++$pos) if $c eq '+';
 
   # " " (ancestor)
-  return _ancestor($selectors, $current, $tree, ++$pos);
+  return _ancestor($selectors, $current, $tree, 0, ++$pos);
 }
 
 sub _compile {

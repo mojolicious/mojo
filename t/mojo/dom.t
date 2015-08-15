@@ -1304,6 +1304,7 @@ is $dom->at('div')->at(':scope > p')->text, 'One', 'right text';
 is $dom->at('div')->at('> p')->text, 'One', 'right text';
 is $dom->at('div')->at(':scope a')->text, 'Link', 'right text';
 ok !$dom->at('div')->at(':scope > a'), 'not a child';
+is $dom->at('div')->at(':scope > p > a')->text, 'Link','right text';
 is $dom->find('div')->last->at(':scope p')->text, 'Three', 'right text';
 is $dom->find('div')->last->at(':scope > p')->text, 'Three', 'right text';
 is $dom->find('div')->last->at('> p')->text, 'Three', 'right text';

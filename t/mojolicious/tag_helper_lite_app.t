@@ -208,6 +208,7 @@ $t->get_ok('/multibox')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input name="foo" type="checkbox" value="one">
   <input name="foo" type="checkbox" value="two">
+  <input checked name="foo" type="checkbox" value="three">
   <input type="submit" value="Ok">
 </form>
 EOF
@@ -217,15 +218,17 @@ $t->get_ok('/multibox?foo=two')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input name="foo" type="checkbox" value="one">
   <input checked name="foo" type="checkbox" value="two">
+  <input name="foo" type="checkbox" value="three">
   <input type="submit" value="Ok">
 </form>
 EOF
 
 # Checkboxes with one right and one wrong value
-$t->get_ok('/multibox?foo=one&foo=three')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/multibox?foo=one&foo=four')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input checked name="foo" type="checkbox" value="one">
   <input name="foo" type="checkbox" value="two">
+  <input name="foo" type="checkbox" value="three">
   <input type="submit" value="Ok">
 </form>
 EOF
@@ -235,6 +238,7 @@ $t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input name="foo" type="checkbox" value="one">
   <input name="foo" type="checkbox" value="two">
+  <input name="foo" type="checkbox" value="three">
   <input type="submit" value="Ok">
 </form>
 EOF
@@ -244,6 +248,7 @@ $t->get_ok('/multibox?foo=two&foo=one')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input checked name="foo" type="checkbox" value="one">
   <input checked name="foo" type="checkbox" value="two">
+  <input name="foo" type="checkbox" value="three">
   <input type="submit" value="Ok">
 </form>
 EOF
@@ -337,11 +342,15 @@ $t->put_ok('/selection')->status_is(200)
     . '<option value="b">b</option>'
     . '</optgroup>'
     . "</select>\n  "
+    . '<select name="h">'
+    . '<option selected value="i">I</option>'
+    . '<option value="j">J</option>'
+    . "</select>\n  "
     . '<input type="submit" value="Ok">'
     . "\n</form>\n");
 
 # Selection with values
-$t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b')->status_is(200)
+$t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b&h=j')->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
@@ -366,11 +375,15 @@ $t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b')->status_is(200)
     . '<option selected value="b">b</option>'
     . '</optgroup>'
     . "</select>\n  "
+    . '<select name="h">'
+    . '<option value="i">I</option>'
+    . '<option selected value="j">J</option>'
+    . "</select>\n  "
     . '<input type="submit" value="Ok">'
     . "\n</form>\n");
 
 # Selection with multiple values
-$t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b')
+$t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b&h=i&h=j')
   ->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
@@ -395,6 +408,10 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b')
     . '<option selected value="a">a</option>'
     . '<option selected value="b">b</option>'
     . '</optgroup>'
+    . "</select>\n  "
+    . '<select name="h">'
+    . '<option selected value="i">I</option>'
+    . '<option selected value="j">J</option>'
     . "</select>\n  "
     . '<input type="submit" value="Ok">'
     . "\n</form>\n");
@@ -424,6 +441,10 @@ $t->put_ok('/selection?preselect=1')->status_is(200)
     . '<option value="a">a</option>'
     . '<option value="b">b</option>'
     . '</optgroup>'
+    . "</select>\n  "
+    . '<select name="h">'
+    . '<option selected value="i">I</option>'
+    . '<option value="j">J</option>'
     . "</select>\n  "
     . '<input type="submit" value="Ok">'
     . "\n</form>\n");
@@ -561,6 +582,7 @@ __DATA__
 %= form_for multibox => begin
   %= check_box foo => 'one'
   %= check_box foo => 'two'
+  %= check_box foo => 'three', checked => undef
   %= submit_button
 %= end
 
@@ -601,6 +623,7 @@ __DATA__
   %= select_field foo => [qw(bar baz)], multiple => 'multiple'
   %= select_field bar => [['D' => 'd', disabled => 'disabled'], 'baz']
   %= select_field yada => [c(test => [qw(a b)], class => 'x')];
+  %= select_field h => [['I' => 'i', selected => undef], ['J' => 'j']]
   %= submit_button
 %= end
 

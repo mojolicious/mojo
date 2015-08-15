@@ -75,6 +75,7 @@ sub _input {
     my $value = $attrs{value} // '';
     if ($type eq 'checkbox' || $type eq 'radio') {
       $attrs{value} = $value;
+      delete $attrs{checked} if @values;
       $attrs{checked} = undef if grep { $_ eq $value } @values;
     }
 
@@ -117,10 +118,13 @@ sub _link_to {
 
 sub _option {
   my ($values, $pair) = @_;
+
   $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
-  my %attrs = (value => $pair->[1]);
-  $attrs{selected} = undef if exists $values->{$pair->[1]};
-  return _tag('option', %attrs, @$pair[2 .. $#$pair], $pair->[0]);
+  my %attrs = (value => $pair->[1], @$pair[2 .. $#$pair]);
+  delete $attrs{selected} if keys %$values;
+  $attrs{selected} = undef if $values->{$pair->[1]};
+
+  return _tag('option', %attrs, $pair->[0]);
 }
 
 sub _select_field {
@@ -253,12 +257,14 @@ L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
 
   %= check_box employed => 1
   %= check_box employed => 1, disabled => 'disabled'
+  %= check_box employed => 1, checked => undef
 
 Generate C<input> tag of type C<checkbox>. Previous input values will
 automatically get picked up and shown as default.
 
   <input name="employed" type="checkbox" value="1">
   <input disabled="disabled" name="employed" type="checkbox" value="1">
+  <input checked name="employed" type="checkbox" value="1">
 
 =head2 color_field
 
@@ -514,12 +520,14 @@ Generate C<input> tag of type C<password>.
 
   %= radio_button country => 'germany'
   %= radio_button country => 'germany', id => 'foo'
+  %= radio_button country => 'germany', checked => undef
 
 Generate C<input> tag of type C<radio>. Previous input values will
 automatically get picked up and shown as default.
 
   <input name="country" type="radio" value="germany">
   <input id="foo" name="country" type="radio" value="germany">
+  <input checked id="foo" name="country" type="radio" value="germany">
 
 =head2 range_field
 
@@ -552,6 +560,7 @@ automatically get picked up and shown as default.
   %= select_field country => [qw(de en)]
   %= select_field country => [[Germany => 'de'], 'en'], id => 'eu'
   %= select_field country => [[Germany => 'de', disabled => 'disabled'], 'en']
+  %= select_field country => [[Germany => 'de', selected => undef], 'en']
   %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
   %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
 
@@ -569,6 +578,10 @@ get picked up and shown as default.
   </select>
   <select name="country">
     <option disabled="disabled" value="de">Germany</option>
+    <option value="en">en</option>
+  </select>
+  <select name="country">
+    <option selected value="de">Germany</option>
     <option value="en">en</option>
   </select>
   <select name="country">

@@ -1287,6 +1287,33 @@ is $dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
 is $dom->at('#♥ + *:nth-last-child(2)')->text,        'F', 'right text';
 is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
 
+# Scoped selectors
+$dom = Mojo::DOM::->new(<<EOF);
+<div>
+  <p>One</p>
+  <p>Two</p>
+  <p><a href="#">Link</a></p>
+</div>
+<div>
+  <p>Three</p>
+  <p>Four</p>
+</div>
+EOF
+is $dom->at('div')->at(':scope p')->text, 'One', 'right text';
+is $dom->at('div')->at(':scope > p')->text, 'One', 'right text';
+is $dom->at('div')->at('> p')->text, 'One', 'right text';
+is $dom->at('div')->at(':scope a')->text, 'Link', 'right text';
+ok !$dom->at('div')->at(':scope > a'), 'not a child';
+is $dom->find('div')->last->at(':scope p')->text, 'Three', 'right text';
+is $dom->find('div')->last->at(':scope > p')->text, 'Three', 'right text';
+is $dom->find('div')->last->at('> p')->text, 'Three', 'right text';
+TODO: {
+  local $TODO = 'sibling :scope selectors are a work in progress';
+  #is $dom->at('p')->at(':scope + p')->text, 'Two', 'right text';
+  ok $dom->at('p')->at(':scope + p'), 'right text';
+}
+
+
 # Adding nodes
 $dom = Mojo::DOM->new(<<EOF);
 <ul>

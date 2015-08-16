@@ -147,6 +147,7 @@ individually.
 Extract embedded file from the C<DATA> section of a class, all files will be
 cached once they have been accessed for the first time.
 
+  # List embedded files
   say for keys %{data_section 'Foo::Bar'};
 
 =head2 file_is_binary
@@ -174,6 +175,7 @@ Search for modules in a namespace non-recursively.
 Load a class and catch exceptions. Note that classes are checked for a C<new>
 method to see if they are already loaded.
 
+  # Handle exceptions
   if (my $e = load_class 'Foo::Bar') {
     die ref $e ? "Exception: $e" : 'Not found!';
   }

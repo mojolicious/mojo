@@ -1,7 +1,8 @@
 
-6.16  2015-08-16
+6.16  2015-08-18
   - Improved check_box, radio_button and select_field tag helpers to handle the
     attributes "checked" and "selected" correctly.
+  - Improved performance of slurp function in Mojo::Util slightly.
 
 6.15  2015-08-13
   - Removed deprecated build_body and build_headers methods from Mojo::Content.

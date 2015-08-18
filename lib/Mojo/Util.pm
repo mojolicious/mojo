@@ -233,9 +233,9 @@ sub sha1_sum   { sha1_hex @_ }
 
 sub slurp {
   my $path = shift;
-  croak qq{Can't open file "$path": $!} unless open my $file, '<:unix', $path;
-  my $content = '';
-  while (read $file, my $buffer, 131072, 0) { $content .= $buffer }
+  open my $file, '<:unix', $path or croak qq{Can't open file "$path": $!};
+  defined read $file, my $content, -s $file, 0
+    or croak qq{Can't read from file "$path": $!};
   return $content;
 }
 
@@ -244,9 +244,8 @@ sub split_header        { _header(shift, 0) }
 
 sub spurt {
   my ($content, $path) = @_;
-  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
-  croak qq{Can't write to file "$path": $!}
-    unless defined $file->syswrite($content);
+  open my $file, '>:unix', $path or croak qq{Can't open file "$path": $!};
+  print $file $content or croak qq{Can't write to file "$path": $!};
   return $content;
 }
 

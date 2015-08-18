@@ -47,7 +47,7 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $to) = @_;
-  spurt $self->{content}, $to;
+  spurt $self->{content} // '', $to;
   return $self;
 }
 

@@ -292,18 +292,8 @@ mapping of the C<format> stash value.
 
 These mappings can be easily extended or changed with L<Mojolicious/"types">.
 
-  # Application
-  package MyApp;
-  use Mojo::Base 'Mojolicious';
-
-  sub startup {
-    my $self = shift;
-
-    # Add new MIME type
-    $self->types->type(txt => 'text/plain; charset=utf-8');
-  }
-
-  1;
+  # Add new MIME type
+  $app->types->type(md => 'text/markdown');
 
 =head2 Stash data
 
@@ -572,18 +562,7 @@ value, or call L<Mojolicious::Controller/"render"> with the C<layout> argument.
 To set a C<layout> stash value application wide you can use
 L<Mojolicious/"defaults">.
 
-  # Application
-  package MyApp;
-  use Mojo::Base 'Mojolicious';
-
-  sub startup {
-    my $self = shift;
-
-    # Default layout
-    $self->defaults(layout => 'mylayout');
-  }
-
-  1;
+  $app->defaults(layout => 'mylayout');
 
 Layouts can also be used with L<Mojolicious::Controller/"render_to_string">,
 but the C<layout> value needs to be passed as a render argument (not a stash
@@ -1319,18 +1298,7 @@ work perfectly in all deployment environments.
 Templates stored in files are expected to be C<UTF-8> by default, but that can
 be easily changed with L<Mojolicious::Renderer/"encoding">.
 
-  # Application
-  package MyApp;
-  use Mojo::Base 'Mojolicious';
-
-  sub startup {
-    my $self = shift;
-
-    # Different encoding
-    $self->renderer->encoding('koi8-r');
-  }
-
-  1;
+  $app->renderer->encoding('koi8-r');
 
 All templates from the C<DATA> section are bound to the encoding of the Perl
 script.

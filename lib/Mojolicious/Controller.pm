@@ -13,6 +13,7 @@ use Time::HiRes  ();
 has [qw(app tx)];
 has match =>
   sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
+has log => sub { shift->app->log };
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -408,6 +409,12 @@ a L<Mojolicious> object.
   # Generate path
   my $path = $c->app->home->rel_file('templates/foo/bar.html.ep');
 
+=head2 log
+
+A shortcut for $c->app->log
+
+  $c->log->debug('Hello Mojo');
+
 =head2 match
 
   my $m = $c->match;
@@ -441,7 +448,7 @@ underlying connection might get closed early.
   # Perform non-blocking operation without knowing the connection status
   my $tx = $c->tx;
   Mojo::IOLoop->timer(2 => sub {
-    $c->app->log->debug($tx->is_finished ? 'Finished' : 'In progress');
+    $c->log->debug($tx->is_finished ? 'Finished' : 'In progress');
   });
 
 =head1 METHODS
@@ -551,26 +558,26 @@ establish the WebSocket connection.
   # Do something after the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
-    $c->app->log->debug('We are done');
+    $c->log->debug('We are done');
   });
 
   # Receive WebSocket message
   $c->on(message => sub {
     my ($c, $msg) = @_;
-    $c->app->log->debug("Message: $msg");
+    $c->log->debug("Message: $msg");
   });
 
   # Receive JSON object via WebSocket message
   $c->on(json => sub {
     my ($c, $hash) = @_;
-    $c->app->log->debug("Test: $hash->{test}");
+    $c->log->debug("Test: $hash->{test}");
   });
 
   # Receive WebSocket "Binary" message
   $c->on(binary => sub {
     my ($c, $bytes) = @_;
     my $len = length $bytes;
-    $c->app->log->debug("Received $len bytes");
+    $c->log->debug("Received $len bytes");
   });
 
 =head2 param

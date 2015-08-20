@@ -13,7 +13,7 @@ use Time::HiRes  ();
 has [qw(app tx)];
 has match =>
   sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
-has log => sub { shift->app->log };
+sub log { $_[0]->app->log }
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -409,12 +409,6 @@ a L<Mojolicious> object.
   # Generate path
   my $path = $c->app->home->rel_file('templates/foo/bar.html.ep');
 
-=head2 log
-
-A shortcut for $c->app->log
-
-  $c->log->debug('Hello Mojo');
-
 =head2 match
 
   my $m = $c->match;
@@ -545,6 +539,12 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
   # Use a nested helper instead of the "reply" controller method
   $c->helpers->reply->not_found;
+
+=head2 log
+
+A shortcut for $c->app->log
+
+  $c->log->debug('Hello Mojo');
 
 =head2 on
 

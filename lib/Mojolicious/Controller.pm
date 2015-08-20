@@ -13,7 +13,6 @@ use Time::HiRes  ();
 has [qw(app tx)];
 has match =>
   sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
-sub log { $_[0]->app->log }
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -135,6 +134,8 @@ sub flash {
 }
 
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
+
+sub log { $_[0]->app->log }
 
 sub on {
   my ($self, $name, $cb) = @_;

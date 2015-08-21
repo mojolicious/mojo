@@ -665,7 +665,7 @@ action could do.
 
   helper debug => sub {
     my ($c, $str) = @_;
-    $c->app->log->debug($str);
+    $c->log->debug($str);
   };
 
   get '/' => sub {
@@ -1101,7 +1101,7 @@ applications, plugins make that very simple.
     my ($self, $app) = @_;
     $app->helper(debug => sub {
       my ($c, $str) = @_;
-      $c->app->log->debug($str);
+      $c->log->debug($str);
     });
   }
 

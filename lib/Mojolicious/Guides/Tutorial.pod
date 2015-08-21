@@ -289,7 +289,7 @@ from actions to templates.
   get '/secret' => sub {
     my $c    = shift;
     my $user = $c->whois;
-    $c->app->log->debug("Request from $user");
+    $c->log->debug("Request from $user");
   };
 
   app->start;
@@ -896,7 +896,7 @@ the attribute L<Mojolicious/"mode">.
 
   get '/' => sub {
     my $c = shift;
-    $c->app->log->debug('Rendering mode specific message');
+    $c->log->debug('Rendering mode specific message');
     $c->render(text => $msg);
   };
 

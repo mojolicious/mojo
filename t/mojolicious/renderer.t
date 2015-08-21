@@ -7,7 +7,7 @@ use Mojolicious;
 # Partial rendering
 my $app = Mojolicious->new(secrets => ['works']);
 my $c = $app->build_controller;
-$c->app->log->level('fatal');
+$c->log->level('fatal');
 is $c->render_to_string(text => 'works'), 'works', 'renderer is working';
 
 # Normal rendering with default format
@@ -46,11 +46,11 @@ is_deeply [$renderer->render($c)], ['Hello Mojo!', 'test'],
 
 # Unrecognized handler
 my $log = '';
-my $cb = $c->app->log->on(message => sub { $log .= pop });
+my $cb = $c->log->on(message => sub { $log .= pop });
 $c->stash->{handler} = 'not_defined';
 is $renderer->render($c), undef, 'return undef for unrecognized handler';
 like $log, qr/No handler for "not_defined" available/, 'right message';
-$c->app->log->unsubscribe(message => $cb);
+$c->log->unsubscribe(message => $cb);
 
 # Default template name
 $c->stash(controller => 'foo', action => 'bar');
@@ -58,10 +58,10 @@ is $c->app->renderer->template_for($c), 'foo/bar', 'right template name';
 
 # Big cookie
 $log = '';
-$cb = $c->app->log->on(message => sub { $log .= pop });
+$cb = $c->log->on(message => sub { $log .= pop });
 $c->cookie(foo => 'x' x 4097);
 like $log, qr/Cookie "foo" is bigger than 4096 bytes/, 'right message';
-$c->app->log->unsubscribe(message => $cb);
+$c->log->unsubscribe(message => $cb);
 
 # Nested helpers
 my $first = $app->build_controller;
@@ -82,7 +82,7 @@ is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
 is $first->app->myapp->defaults('foo'),     'bar', 'right result';
 my $app2 = Mojolicious->new(secrets => ['works']);
 my $second = $app2->build_controller;
-$second->app->log->level('fatal');
+$second->log->level('fatal');
 is $second->app->renderer->get_helper('myapp'),          undef, 'no helper';
 is $second->app->renderer->get_helper('myapp.defaults'), undef, 'no helper';
 $second->app->helper('myapp.defaults' => sub {'nothing'});

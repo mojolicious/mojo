@@ -11,7 +11,7 @@ use Scalar::Util 'weaken';
 has base_classes => sub { [qw(Mojolicious::Controller Mojo)] };
 has cache        => sub { Mojo::Cache->new };
 has [qw(conditions shortcuts)] => sub { {} };
-has hidden     => sub { [qw(attr has new tap)] };
+has hidden     => sub { [qw(attr has new tap log)] };
 has namespaces => sub { [] };
 
 sub add_condition { $_[0]->conditions->{$_[1]} = $_[2] and return $_[0] }

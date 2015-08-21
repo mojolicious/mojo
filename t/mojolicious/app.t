@@ -110,6 +110,7 @@ ok $t->app->routes->is_hidden('finish'),              'is hidden';
 ok $t->app->routes->is_hidden('flash'),               'is hidden';
 ok $t->app->routes->is_hidden('has'),                 'is hidden';
 ok $t->app->routes->is_hidden('helpers'),             'is hidden';
+ok $t->app->routes->is_hidden('log'),                 'is hidden';
 ok $t->app->routes->is_hidden('match'),               'is hidden';
 ok $t->app->routes->is_hidden('new'),                 'is hidden';
 ok $t->app->routes->is_hidden('on'),                  'is hidden';

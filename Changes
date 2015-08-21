@@ -1,5 +1,6 @@
 
-6.17  2015-08-20
+6.17  2015-08-21
+  - Improved slurp method in Mojo::Asset::File to only use one file descriptor.
 
 6.16  2015-08-19
   - Improved check_box, radio_button and select_field tag helpers to handle the

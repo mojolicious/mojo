@@ -124,8 +124,11 @@ sub mtime { (stat shift->handle)[9] }
 sub size { -s shift->handle }
 
 sub slurp {
-  return '' unless defined(my $file = shift->path);
-  return Mojo::Util::slurp $file;
+  my $handle = shift->handle;
+  $handle->sysseek(0, SEEK_SET);
+  defined $handle->sysread(my $content, -s $handle, 0)
+    or croak qq{Can't read from asset: $!};
+  return $content;
 }
 
 1;

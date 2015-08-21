@@ -244,8 +244,9 @@ sub split_header        { _header(shift, 0) }
 
 sub spurt {
   my ($content, $path) = @_;
-  open my $file, '>:unix', $path or croak qq{Can't open file "$path": $!};
-  print $file $content or croak qq{Can't write to file "$path": $!};
+  open my $file, '>', $path or croak qq{Can't open file "$path": $!};
+  defined $file->syswrite($content)
+    or croak qq{Can't write to file "$path": $!};
   return $content;
 }
 

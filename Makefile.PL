@@ -15,15 +15,21 @@ WriteMakefile(
   AUTHOR       => 'Sebastian Riedel <sri@cpan.org>',
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => '5.010001'},
-    resources => {
-      license    => 'http://www.opensource.org/licenses/artistic-license-2.0',
+    dynamic_config => 0,
+    'meta-spec'    => {version => 2},
+    no_index       => {directory => ['examples', 't']},
+    prereqs        => {runtime => {requires => {perl => '5.010001'}}},
+    resources      => {
+      license    => ['http://www.opensource.org/licenses/artistic-license-2.0'],
       homepage   => 'http://mojolicio.us',
-      bugtracker => 'https://github.com/kraih/mojo/issues',
-      repository => 'https://github.com/kraih/mojo.git',
+      bugtracker => {web => 'https://github.com/kraih/mojo/issues'},
+      repository => {
+        type => 'git',
+        url  => 'https://github.com/kraih/mojo.git',
+        web  => 'https://github.com/kraih/mojo',
+      },
       x_IRC      => 'irc://irc.perl.org/#mojo'
     },
-    no_index => {directory => ['examples', 't']}
   },
   PREREQ_PM => {
     'IO::Socket::IP' => '0.26',

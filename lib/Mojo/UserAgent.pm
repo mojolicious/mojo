@@ -116,7 +116,11 @@ sub _connect {
 
       # Connection error
       return unless $self;
-      return $self->_error($id, $err) if $err;
+      if ( $err ) {
+        return $self->_error( $id,
+          sprintf( 'Error connecting to %s://%s:%s/: %s',
+            $proto, $host, $port, $err ));
+      }
 
       # Connection established
       $stream->on(timeout => sub { $self->_error($id, 'Inactivity timeout') });

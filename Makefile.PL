@@ -20,9 +20,9 @@ WriteMakefile(
     no_index       => {directory => ['examples', 't']},
     prereqs        => {runtime => {requires => {perl => '5.010001'}}},
     resources      => {
-      license    => ['http://www.opensource.org/licenses/artistic-license-2.0'],
-      homepage   => 'http://mojolicio.us',
       bugtracker => {web => 'https://github.com/kraih/mojo/issues'},
+      homepage   => 'http://mojolicio.us',
+      license    => ['http://www.opensource.org/licenses/artistic-license-2.0'],
       repository => {
         type => 'git',
         url  => 'https://github.com/kraih/mojo.git',

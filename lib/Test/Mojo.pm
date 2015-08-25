@@ -626,6 +626,7 @@ Opposite of L</"content_like">.
 
 =head2 delete_ok
 
+  $t = $t->delete_ok('http://example.com/foo');
   $t = $t->delete_ok('/foo');
   $t = $t->delete_ok('/foo' => {Accept => '*/*'} => 'Hi!');
   $t = $t->delete_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
@@ -681,6 +682,7 @@ Wait for WebSocket connection to be closed gracefully and check status.
 
 =head2 get_ok
 
+  $t = $t->get_ok('http://example.com/foo');
   $t = $t->get_ok('/foo');
   $t = $t->get_ok('/foo' => {Accept => '*/*'} => 'Hi!');
   $t = $t->get_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
@@ -703,6 +705,7 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
 
 =head2 head_ok
 
+  $t = $t->head_ok('http://example.com/foo');
   $t = $t->head_ok('/foo');
   $t = $t->head_ok('/foo' => {Accept => '*/*'} => 'Hi!');
   $t = $t->head_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
@@ -878,6 +881,7 @@ Construct a new L<Test::Mojo> object.
 
 =head2 options_ok
 
+  $t = $t->options_ok('http://example.com/foo');
   $t = $t->options_ok('/foo');
   $t = $t->options_ok('/foo' => {Accept => '*/*'} => 'Hi!');
   $t = $t->options_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
@@ -898,6 +902,7 @@ Invoke callback if the value of L</"success"> is false.
 
 =head2 patch_ok
 
+  $t = $t->patch_ok('http://example.com/foo');
   $t = $t->patch_ok('/foo');
   $t = $t->patch_ok('/foo' => {Accept => '*/*'} => 'Hi!');
   $t = $t->patch_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
@@ -908,6 +913,7 @@ arguments as L<Mojo::UserAgent/"patch">, except for the callback.
 
 =head2 post_ok
 
+  $t = $t->post_ok('http://example.com/foo');
   $t = $t->post_ok('/foo');
   $t = $t->post_ok('/foo' => {Accept => '*/*'} => 'Hi!');
   $t = $t->post_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
@@ -927,6 +933,7 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
 
 =head2 put_ok
 
+  $t = $t->put_ok('http://example.com/foo');
   $t = $t->put_ok('/foo');
   $t = $t->put_ok('/foo' => {Accept => '*/*'} => 'Hi!');
   $t = $t->put_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
@@ -1025,6 +1032,7 @@ Opposite of L</"text_like">.
 
 =head2 websocket_ok
 
+  $t = $t->websocket_ok('http://example.com/echo');
   $t = $t->websocket_ok('/echo');
   $t = $t->websocket_ok('/echo' => {DNT => 1} => ['v1.proto']);
 

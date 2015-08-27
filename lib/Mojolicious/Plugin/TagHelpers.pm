@@ -618,7 +618,7 @@ Generate C<input> tag of type C<submit>.
 
 =head2 t
 
-  %=t div => 'test & 123'
+  %= t div => 'test & 123'
 
 Alias for L</"tag">.
 

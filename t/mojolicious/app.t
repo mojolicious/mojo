@@ -182,8 +182,8 @@ $t->app->log->unsubscribe(message => $cb);
 # Foo::fun (with a lot of different tests)
 my $url = $t->ua->server->url;
 $url->path('/fun/time');
-$t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)
-  ->status_is(200)->status_is(200, 'with description')->status_isnt(500)
+$t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
+  ->status_is(200, 'with description')->status_isnt(500)
   ->status_isnt(500, 'with description')->header_is('X-Bender' => undef)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_is(Server => 'Mojolicious (Perl)', 'with description')
@@ -225,8 +225,7 @@ $t->app->log->unsubscribe(message => $cb);
 $log = '';
 $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/render')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 like $log, qr/Action "render" is not allowed/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -269,8 +268,7 @@ $t->get_ok('/exceptional_too/this_one_dies' => {'X-DoNotDie' => 1})
 
 # Exceptional::this_one_does_not_exist (action does not exist)
 $t->get_ok('/exceptional/this_one_does_not_exist')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Exceptional::this_one_does_not_exist (action behind bridge does not exist)
 $t->get_ok('/exceptional_too/this_one_does_not_exist' => {'X-DoNotDie' => 1})
@@ -371,8 +369,7 @@ $t->get_ok('/test8' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Class works!\n");
 
 # MojoliciousTest3::Bar::index (controller class in development namespace)
-$t->get_ok('/test9')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/test9')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Development namespace works!');
 
 # MojoliciousTest3::Baz::index (controller class precedence)
@@ -382,8 +379,7 @@ $t->get_ok('/test10')->status_is(200)
 
 # 404
 $t->get_ok('/' => {'X-Test' => 'Hi there!'})->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Static file /another/file (no extension)
 $t->get_ok('/another/file')->status_is(200)
@@ -417,14 +413,12 @@ $t->get_ok('/hello.txt')->status_is(200)
 # Try to access a file which is not under the web root via path
 # traversal
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Try to access a file which is not under the web root via path
 # traversal (triple dot)
 $t->get_ok('/.../mojolicious/secret.txt')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Check If-Modified-Since
 $t->get_ok('/hello.txt' => {'If-Modified-Since' => $mtime})->status_is(304)
@@ -605,8 +599,7 @@ $t->get_ok('/shortcut/act')->status_is(200)
 # Session with domain
 $t->get_ok('/foo/session')->status_is(200)
   ->header_like('Set-Cookie' => qr/; domain=\.example\.com/)
-  ->header_like('Set-Cookie' => qr!; path=/bar!)
-  ->content_is('Bender rockzzz!');
+  ->header_like('Set-Cookie' => qr!; path=/bar!)->content_is('Bender rockzzz!');
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')

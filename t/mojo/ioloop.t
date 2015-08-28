@@ -99,8 +99,7 @@ $id = Mojo::IOLoop->server(
 );
 my $port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->acceptor($id)->on(accept => sub { $handle2 = pop });
-$id2
-  = Mojo::IOLoop->client((address => '127.0.0.1', port => $port) => sub { });
+$id2 = Mojo::IOLoop->client((address => '127.0.0.1', port => $port) => sub { });
 Mojo::IOLoop->start;
 $count = 0;
 Mojo::IOLoop->recurring(10 => sub { $timer++ });

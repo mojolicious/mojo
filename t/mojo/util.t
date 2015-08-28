@@ -60,8 +60,7 @@ is_deeply split_header(',,foo,, ,bar'), [['foo', undef], ['bar', undef]],
   'right result';
 is_deeply split_header(';;foo; ; ;bar'), [['foo', undef, 'bar', undef]],
   'right result';
-is_deeply split_header('foo=;bar=""'), [['foo', '', 'bar', '']],
-  'right result';
+is_deeply split_header('foo=;bar=""'), [['foo', '', 'bar', '']], 'right result';
 is_deeply split_header('foo=bar baz=yada'), [['foo', 'bar', 'baz', 'yada']],
   'right result';
 is_deeply split_header('foo,bar,baz'),
@@ -89,8 +88,7 @@ is_deeply split_header($header), $tree, 'right result';
 
 # split_cookie_header
 is_deeply split_cookie_header(''), [], 'right result';
-is_deeply split_cookie_header(
-  'a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT,c=d'),
+is_deeply split_cookie_header('a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT,c=d'),
   [['a', 'b', 'expires', 'Thu, 07 Aug 2008 07:07:59 GMT'], ['c', 'd']],
   'right result';
 is_deeply split_cookie_header(
@@ -160,8 +158,7 @@ is b64_encode('foobar$%^&3217', ''), 'Zm9vYmFyJCVeJjMyMTc=',
 is decode('UTF-8', "\x{1000}"), undef, 'decoding invalid UTF-8 worked';
 
 # decode (invalid encoding)
-is decode('does_not_exist', ''), undef,
-  'decoding with invalid encoding worked';
+is decode('does_not_exist', ''), undef, 'decoding with invalid encoding worked';
 
 # encode (invalid encoding)
 eval { encode('does_not_exist', '') };
@@ -193,8 +190,7 @@ is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'),
   "<foo>bar<baz>&\"", 'right HTML unescaped result';
 
 # html_unescape (special entities)
-is html_unescape(
-  'foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
+is html_unescape('foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
   "foo ☃ \x{2233} bar \x{00b9}baz", 'right HTML unescaped result';
 
 # html_unescape (multi-character entity)
@@ -349,11 +345,10 @@ is unquote('"foo 23 \"bar"'),     'foo 23 "bar',   'right unquoted result';
 is unquote('"\"foo 23 \"bar\""'), '"foo 23 "bar"', 'right unquoted result';
 
 # trim
-is trim(' la la  la '),      'la la  la', 'right trimmed result';
-is trim(" \n la la la \n "), 'la la la',  'right trimmed result';
-is trim("\n la\nla la \n"),  "la\nla la", 'right trimmed result';
-is trim(" \nla \n  \t\nla\nla\n "), "la \n  \t\nla\nla",
-  'right trimmed result';
+is trim(' la la  la '),             'la la  la',         'right trimmed result';
+is trim(" \n la la la \n "),        'la la la',          'right trimmed result';
+is trim("\n la\nla la \n"),         "la\nla la",         'right trimmed result';
+is trim(" \nla \n  \t\nla\nla\n "), "la \n  \t\nla\nla", 'right trimmed result';
 
 # squish
 is squish(' la la  la '),             'la la la', 'right squished result';
@@ -488,9 +483,9 @@ is tablify([['a', '', 0], [0, '', 'b']]), "a    0\n0    b\n", 'right result';
 is dumper([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
 
 # term_escape
-is term_escape("Accept: */*\x0d\x0a"), "Accept: */*\\x0d\x0a", 'right result';
-is term_escape("\t\b\r\n\f"), "\\x09\\x08\\x0d\n\\x0c", 'right result';
-is term_escape("\x00\x09\x0b\x1f\x7f\x80\x9f"),
-  '\x00\x09\x0b\x1f\x7f\x80\x9f', 'right result';
+is term_escape("Accept: */*\x0d\x0a"), "Accept: */*\\x0d\x0a",   'right result';
+is term_escape("\t\b\r\n\f"),          "\\x09\\x08\\x0d\n\\x0c", 'right result';
+is term_escape("\x00\x09\x0b\x1f\x7f\x80\x9f"), '\x00\x09\x0b\x1f\x7f\x80\x9f',
+  'right result';
 
 done_testing();

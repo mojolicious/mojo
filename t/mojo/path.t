@@ -38,8 +38,8 @@ is_deeply $path->parts, [qw(foo ♥ bar)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 is $path->to_route, '/foo/♥/bar', 'right route';
-is $path->parse('/foo/%E2%99%A5/~b@a:r+')->to_string,
-  '/foo/%E2%99%A5/~b@a:r+', 'right path';
+is $path->parse('/foo/%E2%99%A5/~b@a:r+')->to_string, '/foo/%E2%99%A5/~b@a:r+',
+  'right path';
 is_deeply $path->parts, [qw(foo ♥ ~b@a:r+)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
@@ -227,9 +227,9 @@ is_deeply $path->clone->parts, ["foob\xe4r", '-._~!$&\'()*+,;=:@'],
 ok $path->contains("/foob\xe4r"),                    'contains path';
 ok $path->contains("/foob\xe4r/-._~!\$&'()*+,;=:@"), 'contains path';
 ok !$path->contains("/foob\xe4r/-._~!\$&'()*+,;=:."), 'does not contain path';
-is $path->to_string,     '/foob%E4r/-._~!$&\'()*+,;=:@', 'right path';
-is $path->to_abs_string, '/foob%E4r/-._~!$&\'()*+,;=:@', 'right absolute path';
-is $path->to_route, "/foob\xe4r/-._~!\$&'()*+,;=:@", 'right route';
+is $path->to_string,     '/foob%E4r/-._~!$&\'()*+,;=:@',  'right path';
+is $path->to_abs_string, '/foob%E4r/-._~!$&\'()*+,;=:@',  'right absolute path';
+is $path->to_route,      "/foob\xe4r/-._~!\$&'()*+,;=:@", 'right route';
 is $path->clone->to_string, '/foob%E4r/-._~!$&\'()*+,;=:@', 'right path';
 is $path->clone->to_abs_string, '/foob%E4r/-._~!$&\'()*+,;=:@',
   'right absolute path';

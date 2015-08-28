@@ -275,8 +275,9 @@ $tx = $ua->get("https://127.0.0.1:$close");
 is $err->{message}, 'Proxy connection failed', 'right error';
 
 # Idle connection through proxy
-$ua->on(start =>
-    sub { shift->connect_timeout(0.25) if pop->req->method eq 'CONNECT' });
+$ua->on(
+  start => sub { shift->connect_timeout(0.25) if pop->req->method eq 'CONNECT' }
+);
 $tx = $ua->get("https://127.0.0.1:$idle");
 is $err->{message}, 'Proxy connection failed', 'right error';
 $ua->connect_timeout(10);

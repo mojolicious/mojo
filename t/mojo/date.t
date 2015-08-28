@@ -69,8 +69,8 @@ is(Mojo::Date->new('Sun Nov  6 08:49:37 1994 GARBAGE')->epoch,
   undef, 'no epoch value');
 is(Mojo::Date->new('Fri, 75 May 2011 99:99:99 GMT')->epoch,
   undef, 'no epoch value');
-is(Mojo::Date->new('0000-00-00T00:00:00+01:00')->epoch,
-  undef, 'no epoch value');
+is(Mojo::Date->new('0000-00-00T00:00:00+01:00')->epoch, undef,
+  'no epoch value');
 
 # to_string
 $date = Mojo::Date->new(784111777);

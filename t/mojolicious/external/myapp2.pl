@@ -20,8 +20,7 @@ hook around_dispatch => sub {
 
 get '/' => sub {
   my $c = shift;
-  $c->render(
-    text => $c->render_to_string('menubar') . app->defaults->{secret});
+  $c->render(text => $c->render_to_string('menubar') . app->defaults->{secret});
 };
 
 get '/cached' => sub {

@@ -111,8 +111,8 @@ is_deeply b('')->split(qr/,/)->to_array, [], 'no elements';
 $stream = b('1/2/3');
 is $stream->split('/')->map(sub { $_->quote })->join(', '), '"1", "2", "3"',
   'right result';
-is $stream->split('/')->map(sub { shift->quote })->join(', '),
-  '"1", "2", "3"', 'right result';
+is $stream->split('/')->map(sub { shift->quote })->join(', '), '"1", "2", "3"',
+  'right result';
 
 # length
 is b('foo bar baz')->size, 11, 'size is 11';

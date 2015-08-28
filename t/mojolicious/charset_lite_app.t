@@ -96,8 +96,7 @@ $t->get_ok('/json')->status_is(200)
 
 # IRI
 $t->get_ok('/привет/мир')->status_is(200)
-  ->content_type_is('application/json;charset=UTF-8')
-  ->json_is({foo => $yatta});
+  ->content_type_is('application/json;charset=UTF-8')->json_is({foo => $yatta});
 
 # Shift_JIS parameters
 my $url

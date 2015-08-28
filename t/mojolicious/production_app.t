@@ -76,8 +76,7 @@ $t->get_ok('/exceptional_too/this_one_dies' => {'X-DoNotDie' => 1})
 
 # Exceptional::this_one_does_not_exist (action does not exist)
 $t->get_ok('/exceptional/this_one_does_not_exist')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Exceptional::this_one_does_not_exist (action behind bridge does not exist)
 $t->get_ok('/exceptional_too/this_one_does_not_exist' => {'X-DoNotDie' => 1})
@@ -91,20 +90,17 @@ $t->get_ok('/hello.txt')->status_is(200)
 
 # Foo::bar in production mode (missing action)
 $t->get_ok('/foo/baz')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Try to access a file which is not under the web root via path
 # traversal in production mode
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Try to access a file which is not under the web root via path
 # traversal in production mode (triple dot)
 $t->get_ok('/.../mojolicious/secret.txt')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # Embedded production static file
 $t->get_ok('/some/static/file.txt')->status_is(200)
@@ -118,8 +114,7 @@ $t->get_ok('/just/some/template')->status_is(200)
 
 # MojoliciousTest3::Bar::index (controller class in development namespace)
 $t->get_ok('/test9' => {'X-Test' => 'Hi there!'})->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
 # MojoliciousTest::Baz::index (controller class precedence)
 $t->get_ok('/test10')->status_is(200)

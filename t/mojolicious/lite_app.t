@@ -456,8 +456,7 @@ my $t = Test::Mojo->new;
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
 is $t->app->moniker, 'lite_app', 'right moniker';
 is $t->app->stash->{default}, 23, 'right value';
-is $t->app, app->build_controller->app->commands->app,
-  'applications are equal';
+is $t->app, app->build_controller->app->commands->app, 'applications are equal';
 is $t->app->build_controller->req->url, '', 'no URL';
 is $t->app->build_controller->stash->{default}, 23, 'right value';
 is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url,
@@ -477,8 +476,7 @@ $t->get_ok('/uni/a%E4b')->status_is(200)->content_is('/uni/a%C3%A4b');
 $t->get_ok('/uni/a%C3%A4b')->status_is(200)->content_is('/uni/a%C3%A4b');
 
 # Captured snowman
-$t->get_ok('/unicode/☃')->status_is(200)
-  ->content_is('☃/unicode/%E2%98%83');
+$t->get_ok('/unicode/☃')->status_is(200)->content_is('☃/unicode/%E2%98%83');
 
 # Captured data with whitespace
 $t->get_ok('/unicode/a b')->status_is(200)->content_is('a b/unicode/a%20b');
@@ -687,8 +685,7 @@ $t->get_ok('/root.txt')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('root fallback!');
 
 # Root with format
-$t->get_ok('/.html')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # Reverse proxy with "X-Forwarded-For"
@@ -822,9 +819,8 @@ $t->get_ok('/something/else')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
 $t->post_ok('/something/else')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
-$t->request_ok($t->ua->build_tx(WHATEVER => '/something/else'))
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('Yay!');
+$t->request_ok($t->ua->build_tx(WHATEVER => '/something/else'))->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
 $t->delete_ok('/something/else')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 
@@ -955,8 +951,7 @@ $t->ua->max_redirects(0);
 
 # Non-blocking redirect
 $t->get_ok('/redirect_callback')->status_is(301)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 9)
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('Content-Length' => 9)
   ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Whatever!');
 
 # Static file
@@ -1017,8 +1012,7 @@ is b($t->tx->res->body)->url_unescape->decode('UTF-8'), '/captures/♥/☃',
 $t->get_ok('/favicon.ico')->status_is(200)->content_is("Not a favicon!\n\n");
 
 # Generate URL with query parameters
-$t->get_ok('/url_with?foo=23&bar=24&baz=25')->status_is(200)
-  ->content_is(<<EOF);
+$t->get_ok('/url_with?foo=23&bar=24&baz=25')->status_is(200)->content_is(<<EOF);
 /url_with?bar=24&baz=25&foo=bar
 http://mojolicio.us/test?foo=23&bar=24&baz=25
 /test?bar=24&baz=25
@@ -1028,10 +1022,8 @@ $t->get_ok('/url_with/foo?foo=bar')->status_is(200)
   ->content_like(qr!http://127\.0\.0\.1:\d+/url_with/bar\?foo\=bar!);
 
 # Dynamic inline template
-$t->get_ok('/dynamic/inline')->status_is(200)
-  ->content_is("dynamic inline 1\n");
-$t->get_ok('/dynamic/inline')->status_is(200)
-  ->content_is("dynamic inline 2\n");
+$t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 1\n");
+$t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
 
 done_testing();
 

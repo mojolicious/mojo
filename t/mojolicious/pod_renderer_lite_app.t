@@ -52,9 +52,8 @@ $t->get_ok('/art')->status_is(200)->text_like('h2[id="art"]' => qr/art/)
 $t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Perldoc browser (Welcome)
-$t->get_ok('/perldoc')->status_is(200)
-  ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
-  ->text_is('a[id="GUIDES"]',   'GUIDES')
+$t->get_ok('/perldoc')->status_is(200)->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
+  ->text_is('a[id="GUIDES"]', 'GUIDES')
   ->content_like(qr/Mojolicious guide to the galaxy/);
 
 # Perldoc browser (Welcome with slash)

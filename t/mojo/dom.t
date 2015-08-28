@@ -12,8 +12,8 @@ is(Mojo::DOM->new->append_content(''), '',    'right result');
 is(Mojo::DOM->new->all_text,           '',    'right result');
 
 # Simple (basics)
-my $dom = Mojo::DOM->new(
-  '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
+my $dom
+  = Mojo::DOM->new('<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
 is $dom->at('#b')->text, 'B', 'right text';
 my @div;
 push @div, $dom->find('div[id]')->map('text')->each;
@@ -199,8 +199,7 @@ is $dom->at('p')->descendant_nodes->[0]->content, 'test', 'right type';
 is $dom->at('p')->descendant_nodes->last->type,    'comment', 'right type';
 is $dom->at('p')->descendant_nodes->last->content, ' 456 ',   'right type';
 is $dom->child_nodes->[1]->child_nodes->first->parent->tag, 'p', 'right tag';
-is $dom->child_nodes->[1]->child_nodes->first->content, 'test',
-  'right content';
+is $dom->child_nodes->[1]->child_nodes->first->content, 'test', 'right content';
 is $dom->child_nodes->[1]->child_nodes->first, 'test', 'right content';
 is $dom->at('p')->child_nodes->first->type, 'text', 'right type';
 is $dom->at('p')->child_nodes->first->remove->tag, 'p', 'right tag';
@@ -216,8 +215,7 @@ is $dom->child_nodes->first->content(' again')->content, ' again',
   'right content';
 is $dom->child_nodes->grep(sub { $_->type eq 'pi' })->map('remove')
   ->first->type, 'root', 'right type';
-is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
-  'right result';
+is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>', 'right result';
 
 # Modify nodes
 $dom = Mojo::DOM->new('<script>la<la>la</script>');
@@ -262,8 +260,7 @@ is $dom->at('i')->following('b:last-of-type')->first->text, 'd', 'right text';
 is $dom->at('i')->following('b:last-of-type')->size, 1,
   'right number of following elements';
 is $dom->following->size, 0, 'no following elements';
-is $dom->at('script > b:last-of-type')->preceding->first->tag, 'i',
-  'right tag';
+is $dom->at('script > b:last-of-type')->preceding->first->tag, 'i', 'right tag';
 is $dom->at('script > b:last-of-type')->preceding->size, 2,
   'right number of preceding elements';
 is $dom->at('script > b:last-of-type')->preceding('b')->first->tag, 'b',
@@ -360,8 +357,7 @@ is $dom->at('[bar=/baz/]')->text, 'works', 'right text';
 is $dom->at('[baz=//]')->text,    'works', 'right text';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
-$dom
-  = Mojo::DOM->new(q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
+$dom = Mojo::DOM->new(q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
 is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
@@ -463,8 +459,8 @@ is $dom->at('.test')->text, '♥', 'right text';
 
 # Replace elements
 $dom = Mojo::DOM->new('<div>foo<p>lalala</p>bar</div>');
-is $dom->at('p')->replace('<foo>bar</foo>'),
-  '<div>foo<foo>bar</foo>bar</div>', 'right result';
+is $dom->at('p')->replace('<foo>bar</foo>'), '<div>foo<foo>bar</foo>bar</div>',
+  'right result';
 is "$dom", '<div>foo<foo>bar</foo>bar</div>', 'right result';
 $dom->at('foo')->replace(Mojo::DOM->new('text'));
 is "$dom", '<div>footextbar</div>', 'right result';
@@ -742,8 +738,8 @@ is $dom->find('xrds\3A Service > Type')->[1], undef, 'no result';
 is $dom->find('xrds\00003AService > Type')->[0]->text, 'http://o.r.g/sso/4.0',
   'right text';
 is $dom->find('xrds\00003AService > Type')->[1], undef, 'no result';
-is $dom->find('xrds\00003A Service > Type')->[0]->text,
-  'http://o.r.g/sso/4.0', 'right text';
+is $dom->find('xrds\00003A Service > Type')->[0]->text, 'http://o.r.g/sso/4.0',
+  'right text';
 is $dom->find('xrds\00003A Service > Type')->[1], undef, 'no result';
 is "$dom", $yadis, 'successful roundtrip';
 
@@ -849,8 +845,7 @@ $dom->find('div[foo="bar"][bar="baz"]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw(A C)], 'found all div elements with the right atributes';
 @div = ();
 $dom->find('div[foo^="b"][foo$="r"]')->each(sub { push @div, shift->text });
-is_deeply \@div, [qw(A B C)],
-  'found all div elements with the right atributes';
+is_deeply \@div, [qw(A B C)], 'found all div elements with the right atributes';
 is $dom->at('[foo="bar"]')->previous, undef, 'no previous sibling';
 is $dom->at('[foo="bar"]')->next->text, 'B', 'right text';
 is $dom->at('[foo="bar"]')->next->previous->text, 'A', 'right text';
@@ -1127,8 +1122,7 @@ $dom->find('ul :nth-child(-n+3):not(:first-child)')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(B C)], 'found second and third element';
 @e = ();
-$dom->find('ul :nth-child(-n+3):not(.♥)')
-  ->each(sub { push @e, shift->text });
+$dom->find('ul :nth-child(-n+3):not(.♥)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(A B)], 'found first and second element';
 @e = ();
 $dom->find('ul :nth-child(-n+3):not([class$="♥"])')
@@ -1597,17 +1591,17 @@ $dom = Mojo::DOM->new(<<EOF);
         <p>
     </ul>
 EOF
-is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
-is $dom->find('body > ul > li')->[0]->text,      'Test 123',    'right text';
-is $dom->find('body > ul > li > p')->[0]->text,  '',            'no text';
-is $dom->find('body > ul > li')->[1]->text,      'Test 321',    'right text';
-is $dom->find('body > ul > li > p')->[1]->text,  '',            'no text';
-is $dom->find('body > ul > li')->[1]->all_text,  'Test 321',    'right text';
-is $dom->find('body > ul > li > p')->[1]->all_text, '',           'no text';
-is $dom->find('body > ul > li')->[2]->text,         'Test 3 2 1', 'right text';
-is $dom->find('body > ul > li > p')->[2]->text,     '',           'no text';
-is $dom->find('body > ul > li')->[2]->all_text,     'Test 3 2 1', 'right text';
-is $dom->find('body > ul > li > p')->[2]->all_text, '',           'no text';
+is $dom->find('html > head > title')->[0]->text,    'Real World!', 'right text';
+is $dom->find('body > ul > li')->[0]->text,         'Test 123',    'right text';
+is $dom->find('body > ul > li > p')->[0]->text,     '',            'no text';
+is $dom->find('body > ul > li')->[1]->text,         'Test 321',    'right text';
+is $dom->find('body > ul > li > p')->[1]->text,     '',            'no text';
+is $dom->find('body > ul > li')->[1]->all_text,     'Test 321',    'right text';
+is $dom->find('body > ul > li > p')->[1]->all_text, '',            'no text';
+is $dom->find('body > ul > li')->[2]->text,         'Test 3 2 1',  'right text';
+is $dom->find('body > ul > li > p')->[2]->text,     '',            'no text';
+is $dom->find('body > ul > li')->[2]->all_text,     'Test 3 2 1',  'right text';
+is $dom->find('body > ul > li > p')->[2]->all_text, '',            'no text';
 
 # Advanced whitespace trimming (punctuation)
 $dom = Mojo::DOM->new(<<EOF);
@@ -1621,12 +1615,10 @@ $dom = Mojo::DOM->new(<<EOF);
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
 is $dom->find('body > div')->[0]->all_text,      'foo bar.',    'right text';
-is $dom->find('body > div')->[1]->all_text, 'foo, bar baz; yada.',
-  'right text';
-is $dom->find('body > div')->[1]->text, 'foo baz.', 'right text';
-is $dom->find('body > div')->[2]->all_text, 'foo: bar baz? yada!',
-  'right text';
-is $dom->find('body > div')->[2]->text, 'foo baz!', 'right text';
+is $dom->find('body > div')->[1]->all_text, 'foo, bar baz; yada.', 'right text';
+is $dom->find('body > div')->[1]->text,     'foo baz.',            'right text';
+is $dom->find('body > div')->[2]->all_text, 'foo: bar baz? yada!', 'right text';
+is $dom->find('body > div')->[2]->text,     'foo baz!',            'right text';
 
 # Real world JavaScript and CSS
 $dom = Mojo::DOM->new(<<EOF);
@@ -1904,8 +1896,7 @@ is $dom->at('#screw-up .ewww > a > img')->attr('src'), '/test.png',
 is $dom->find('#screw-up .ewww > a > img')->[1]->attr('src'), '/test2.png',
   'right attribute';
 is $dom->find('#screw-up .ewww > a > img')->[2], undef, 'no result';
-is $dom->find('#screw-up .ewww > a > img')->size, 2,
-  'right number of elements';
+is $dom->find('#screw-up .ewww > a > img')->size, 2, 'right number of elements';
 
 # Broken "br" tag
 $dom = Mojo::DOM->new('<br< abc abc abc abc abc abc abc abc<p>Test</p>');
@@ -1987,8 +1978,7 @@ $dom = Mojo::DOM->new(<<'EOF');
   </tr>
 </table>
 EOF
-is $dom->find('#foo > tr > td > #bar > tr >td')->[0]->text, 'baz',
-  'right text';
+is $dom->find('#foo > tr > td > #bar > tr >td')->[0]->text, 'baz', 'right text';
 is $dom->find('table > tr > td > table > tr >td')->[0]->text, 'baz',
   'right text';
 
@@ -2176,8 +2166,7 @@ is $dom->at('div')->all_text(0),
 is $dom->at('div pre')->text, "\n  ", 'right text';
 is $dom->at('div pre')->text(0), "\n  ", 'right text';
 is $dom->at('div pre')->all_text, "like\n  it\n    really\n  ", 'right text';
-is $dom->at('div pre')->all_text(0), "like\n  it\n    really\n  ",
-  'right text';
+is $dom->at('div pre')->all_text(0), "like\n  it\n    really\n  ", 'right text';
 is $dom->at('div pre code')->text, "like\n  it\n    really", 'right text';
 is $dom->at('div pre code')->text(0), "like\n  it\n    really", 'right text';
 is $dom->at('div pre code')->all_text, "like\n  it\n    really", 'right text';
@@ -2307,12 +2296,11 @@ $dom = Mojo::DOM->new(<<EOF);
 <p class="foo bAr">B</p>
 <p class="FOO">C</p>
 EOF
-is $dom->find('.foo')->map('text')->join(','),          'A,B', 'right result';
-is $dom->find('.FOO')->map('text')->join(','),          'C',   'right result';
-is $dom->find('[class=foo]')->map('text')->join(','),   'A',   'right result';
-is $dom->find('[class=foo i]')->map('text')->join(','), 'A,C', 'right result';
-is $dom->find('[class="foo" i]')->map('text')->join(','), 'A,C',
-  'right result';
+is $dom->find('.foo')->map('text')->join(','),            'A,B', 'right result';
+is $dom->find('.FOO')->map('text')->join(','),            'C',   'right result';
+is $dom->find('[class=foo]')->map('text')->join(','),     'A',   'right result';
+is $dom->find('[class=foo i]')->map('text')->join(','),   'A,C', 'right result';
+is $dom->find('[class="foo" i]')->map('text')->join(','), 'A,C', 'right result';
 is $dom->find('[class="foo bar"]')->size, 0, 'no results';
 is $dom->find('[class="foo bar" i]')->map('text')->join(','), 'B',
   'right result';
@@ -2365,8 +2353,8 @@ is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
 # Unusual order
-$dom = Mojo::DOM->new(
-  '<a href="http://example.com" id="foo" class="bar">Ok!</a>');
+$dom
+  = Mojo::DOM->new('<a href="http://example.com" id="foo" class="bar">Ok!</a>');
 is $dom->at('a:not([href$=foo])[href^=h]')->text, 'Ok!', 'right text';
 is $dom->at('a:not([href$=example.com])[href^=h]'), undef, 'no result';
 is $dom->at('a[href^=h]#foo.bar')->text, 'Ok!', 'right text';

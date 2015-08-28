@@ -71,10 +71,9 @@ is $res->code(503)->default_message, 'Service Unavailable',   'right message';
 is $res->code(504)->default_message, 'Gateway Timeout',       'right message';
 is $res->code(505)->default_message, 'HTTP Version Not Supported',
   'right message';
-is $res->code(506)->default_message, 'Variant Also Negotiates',
-  'right message';
-is $res->code(507)->default_message, 'Insufficient Storage', 'right message';
-is $res->code(508)->default_message, 'Loop Detected',        'right message';
+is $res->code(506)->default_message, 'Variant Also Negotiates', 'right message';
+is $res->code(507)->default_message, 'Insufficient Storage',    'right message';
+is $res->code(508)->default_message, 'Loop Detected',           'right message';
 is $res->code(509)->default_message, 'Bandwidth Limit Exceeded',
   'right message';
 is $res->code(510)->default_message, 'Not Extended', 'right message';
@@ -809,8 +808,7 @@ is $res->message,     'OK', 'right message';
 is $res->version,     '1.0', 'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27,           'right "Content-Length" value';
-is $res->headers->set_cookie, 'foo=bar; path=/test',
-  'right "Set-Cookie" value';
+is $res->headers->set_cookie, 'foo=bar; path=/test', 'right "Set-Cookie" value';
 my $cookies = $res->cookies;
 is $cookies->[0]->name,  'foo',   'right name';
 is $cookies->[0]->value, 'bar',   'right value';
@@ -941,8 +939,8 @@ isa_ok $invocant, 'Mojo::Content::Single', 'right invocant';
 $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->content_length(10);
-$res->content->write(
-  'lala' => sub { die "Body callback was called properly\n" });
+$res->content->write('lala' => sub { die "Body callback was called properly\n" }
+);
 $res->get_body_chunk(0);
 eval { $res->get_body_chunk(3) };
 is $@, "Body callback was called properly\n", 'right error';
@@ -1068,8 +1066,7 @@ my @text = $res->dom('a')->map(content => 'yada')->first->root->find('p > a')
 is_deeply \@text, [qw(yada yada)], 'right values';
 is_deeply $res->dom('p > a')->map('text')->to_array, [qw(yada yada)],
   'right values';
-@text
-  = $res->dom->find('a')->map(content => 'test')->first->root->find('p > a')
+@text = $res->dom->find('a')->map(content => 'test')->first->root->find('p > a')
   ->map('text')->each;
 is_deeply \@text, [qw(test test)], 'right values';
 is_deeply $res->dom->find('p > a')->map('text')->to_array, [qw(test test)],
@@ -1078,8 +1075,7 @@ is_deeply $res->dom->find('p > a')->map('text')->to_array, [qw(test test)],
 # Build DOM from response with charset
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 200 OK\x0a");
-$res->parse(
-  "Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
+$res->parse("Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
 $res->parse("\x0a");
 $res->body('<p>foo <a href="/">bar</a><a href="/baz">baz</a></p>');
 ok !$res->is_finished, 'response is not finished';

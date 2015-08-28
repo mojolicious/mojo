@@ -26,9 +26,8 @@ is $pattern->render({controller => 'foo'}), '/test/foo', 'right result';
 # Optional placeholder in the middle
 $pattern = Mojolicious::Routes::Pattern->new('/test(name)123');
 $pattern->defaults({name => 'foo'});
-is_deeply $pattern->match('/test123', 1), {name => 'foo'}, 'right structure';
-is_deeply $pattern->match('/testbar123', 1), {name => 'bar'},
-  'right structure';
+is_deeply $pattern->match('/test123',    1), {name => 'foo'}, 'right structure';
+is_deeply $pattern->match('/testbar123', 1), {name => 'bar'}, 'right structure';
 ok !$pattern->match('/test/123'), 'no result';
 is $pattern->render, '/testfoo123', 'right result';
 is $pattern->render({name => 'bar'}), '/testbar123', 'right result';
@@ -159,8 +158,7 @@ $pattern = Mojolicious::Routes::Pattern->new('/test.json');
 $pattern->defaults({action => 'index'});
 ok !$pattern->regex,        'no regex';
 ok !$pattern->format_regex, 'no format regex';
-is_deeply $pattern->match('/test.json'), {action => 'index'},
-  'right structure';
+is_deeply $pattern->match('/test.json'), {action => 'index'}, 'right structure';
 ok $pattern->regex, 'regex has been compiled on demand';
 ok !$pattern->format_regex, 'no format regex';
 is_deeply $pattern->match('/test.json', 1), {action => 'index'},
@@ -232,8 +230,7 @@ $pattern = Mojolicious::Routes::Pattern->new('/:/:0');
 $result = $pattern->match('/foo/bar', 1);
 is_deeply $result, {'' => 'foo', '0' => 'bar'}, 'right structure';
 is $pattern->render($result, 1), '/foo/bar', 'right result';
-is $pattern->render({'' => 'bar', '0' => 'baz'}, 1), '/bar/baz',
-  'right result';
+is $pattern->render({'' => 'bar', '0' => 'baz'}, 1), '/bar/baz', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('/(:)test/(0)');
 $result = $pattern->match('/footest/bar', 1);
 is_deeply $result, {'' => 'foo', '0' => 'bar'}, 'right structure';

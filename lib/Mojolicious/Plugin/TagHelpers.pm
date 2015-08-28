@@ -146,8 +146,7 @@ sub _select_field {
     else { $groups .= _option(\%values, $group) }
   }
 
-  return _validation($c, $name, 'select', name => $name, %attrs,
-    sub {$groups});
+  return _validation($c, $name, 'select', name => $name, %attrs, sub {$groups});
 }
 
 sub _stylesheet {

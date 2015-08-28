@@ -96,8 +96,7 @@ app->routes->add_condition(
     my ($route, $c) = @_;
     return 1 unless $c->param('res');
     $c->tx->res(
-      Mojo::Message::Response->new(code => 201)->body('Conditional response!')
-    );
+      Mojo::Message::Response->new(code => 201)->body('Conditional response!'));
     $c->rendered and return undef;
   }
 );

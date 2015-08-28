@@ -169,8 +169,7 @@ sub template_for {
 sub template_handler {
   my ($self, $options) = @_;
   return undef unless my $file = $self->template_name($options);
-  return $self->default_handler
-    unless my $handlers = $self->{templates}{$file};
+  return $self->default_handler unless my $handlers = $self->{templates}{$file};
   return $handlers->[0];
 }
 

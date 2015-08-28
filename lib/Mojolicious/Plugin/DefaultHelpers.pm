@@ -30,8 +30,7 @@ sub register {
   $app->helper(content_with => sub { _content(0, 1, @_) });
 
   $app->helper($_ => $self->can("_$_"))
-    for
-    qw(csrf_token current_route delay inactivity_timeout is_fresh url_with);
+    for qw(csrf_token current_route delay inactivity_timeout is_fresh url_with);
 
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
@@ -81,8 +80,7 @@ sub _delay {
   my $c     = shift;
   my $tx    = $c->render_later->tx;
   my $delay = Mojo::IOLoop->delay(@_);
-  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })
-    ->wait;
+  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
 }
 
 sub _development {

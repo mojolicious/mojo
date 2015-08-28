@@ -104,8 +104,7 @@ hook around_dispatch => sub {
   }
 };
 
-get '/reuse/exception' => {foo => 'bar'} =>
-  sub { die "Reusable exception.\n" };
+get '/reuse/exception' => {foo => 'bar'} => sub { die "Reusable exception.\n" };
 
 get '/custom' => sub { die "CUSTOM\n" };
 

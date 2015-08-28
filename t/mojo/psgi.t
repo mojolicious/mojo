@@ -75,8 +75,8 @@ while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
 $res->[2]->close;
 is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
-is_deeply decode_json($params),
-  {bar => 'baz', hello => 'world', lalala => 23}, 'right structure';
+is_deeply decode_json($params), {bar => 'baz', hello => 'world', lalala => 23},
+  'right structure';
 
 # Command
 $content = 'world=hello';
@@ -112,8 +112,8 @@ while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
 $res->[2]->close;
 is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
-is_deeply decode_json($params),
-  {bar => 'baz', world => 'hello', lalala => 23}, 'right structure';
+is_deeply decode_json($params), {bar => 'baz', world => 'hello', lalala => 23},
+  'right structure';
 
 # Simple
 $env = {

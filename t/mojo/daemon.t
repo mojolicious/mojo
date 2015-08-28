@@ -43,8 +43,8 @@ is $tx->res->body, 'Hello TestApp!', 'right content';
 
 # Listen
 {
-  is_deeply(Mojo::Server::Daemon->new->listen,
-    ['http://*:3000'], 'right value');
+  is_deeply(Mojo::Server::Daemon->new->listen, ['http://*:3000'],
+    'right value');
   local $ENV{MOJO_LISTEN} = 'http://127.0.0.1:8080';
   is_deeply(Mojo::Server::Daemon->new->listen,
     ['http://127.0.0.1:8080'], 'right value');
@@ -191,8 +191,8 @@ is $tx->res->body, 'Whatever!', 'right content';
 my ($tx2, $tx3);
 my $delay = Mojo::IOLoop->delay(sub { (undef, $tx, $tx2, $tx3) = @_ });
 $ua->get('/concurrent1/' => $delay->begin);
-$ua->post('/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 =>
-    $delay->begin);
+$ua->post(
+  '/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
 $ua->get('/concurrent3/' => $delay->begin);
 $delay->wait;
 ok $tx->is_finished, 'transaction is finished';

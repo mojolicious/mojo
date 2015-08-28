@@ -12,8 +12,8 @@ use Mojolicious::Lite;
 # Max WebSocket size
 {
   local $ENV{MOJO_MAX_WEBSOCKET_SIZE} = 1024;
-  is(Mojo::Transaction::WebSocket->new->max_websocket_size,
-    1024, 'right value');
+  is(Mojo::Transaction::WebSocket->new->max_websocket_size, 1024,
+    'right value');
 }
 
 # Silence

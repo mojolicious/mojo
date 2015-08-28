@@ -131,8 +131,7 @@ is $t->tx->req->headers->sec_websocket_protocol, 'foo, bar, baz',
 
 # Bytes
 $t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
-  ->message_ok->message_is({binary => 'bytes!'})
-  ->send_ok({binary => 'bytes!'})
+  ->message_ok->message_is({binary => 'bytes!'})->send_ok({binary => 'bytes!'})
   ->message_ok->message_isnt({text => 'bytes!'})->finish_ok;
 
 # Bytes in multiple frames

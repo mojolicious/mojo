@@ -329,9 +329,8 @@ is j('null'), undef, 'decode null';
 
 # Errors
 eval { decode_json 'test' };
-like $@, qr/Malformed JSON: Expected string, array, object/, 'right error';
-like $@, qr/object, number, boolean or null at line 0, offset 0/,
-  'right error';
+like $@, qr/Malformed JSON: Expected string, array, object/,      'right error';
+like $@, qr/object, number, boolean or null at line 0, offset 0/, 'right error';
 eval { decode_json b('["\\ud800"]')->encode };
 like $@, qr/Malformed JSON: Missing low-surrogate at line 1, offset 8/,
   'right error';
@@ -379,11 +378,9 @@ like $@, qr/Malformed JSON: Unexpected data at line 1, offset 13/,
 eval { decode_json '' };
 like $@, qr/Missing or empty input/, 'right error';
 eval { decode_json "[\"foo\",\n\"bar\"]lala" };
-like $@, qr/Malformed JSON: Unexpected data at line 2, offset 6/,
-  'right error';
+like $@, qr/Malformed JSON: Unexpected data at line 2, offset 6/, 'right error';
 eval { decode_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };
-like $@, qr/Malformed JSON: Unexpected data at line 3, offset 8/,
-  'right error';
+like $@, qr/Malformed JSON: Unexpected data at line 3, offset 8/, 'right error';
 eval { decode_json '["♥"]' };
 like $@, qr/Input is not UTF-8 encoded/, 'right error';
 eval { decode_json encode('Shift_JIS', 'やった') };

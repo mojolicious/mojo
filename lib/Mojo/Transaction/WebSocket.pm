@@ -82,7 +82,7 @@ sub build_message {
 
   # Raw text or binary
   if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }
-  else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
+  else                       { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
 
   # "permessage-deflate" extension
   return $self->build_frame(@$frame) unless $self->compressed;

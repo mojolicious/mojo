@@ -458,8 +458,7 @@ $drain = sub {
     0.25 => sub {
       $content->write_chunk('');
       $tx->resume;
-      $stream
-        += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};
+      $stream += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};
     }
   ) if $i >= 10;
   $content->write_chunk($i++, $drain);

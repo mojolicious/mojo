@@ -42,8 +42,7 @@ is_deeply \@results, [3, 1, 2, 2, 1, 3], 'right elements';
 # first
 $collection = c(5, 4, [3, 2], 1);
 is $collection->first, 5, 'right result';
-is_deeply $collection->first(sub { ref $_ eq 'ARRAY' }), [3, 2],
-  'right result';
+is_deeply $collection->first(sub { ref $_ eq 'ARRAY' }), [3, 2], 'right result';
 is $collection->first(sub { shift() < 5 }), 4, 'right result';
 is $collection->first(qr/[1-4]/), 4, 'right result';
 is $collection->first(sub { ref $_ eq 'CODE' }), undef, 'no result';

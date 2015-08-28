@@ -205,8 +205,7 @@ $r->route('/slash')->to(controller => 'just')->route('/')
 # /missing/too/test
 $r->route('/missing/:/name')->to('missing#placeholder');
 $r->route('/missing/*/name')->to('missing#wildcard');
-$r->route('/missing/too/*', '' => ['test'])
-  ->to('missing#too', '' => 'missing');
+$r->route('/missing/too/*', '' => ['test'])->to('missing#too', '' => 'missing');
 
 # /partial/*
 $r->route('/partial')->detour('foo#bar');
@@ -252,9 +251,9 @@ is $m->endpoint, undef, 'no endpoint';
 is_deeply $m->stack, [], 'empty stack';
 
 # Introspect
-is $r->find('very_clean')->to_string, '/clean', 'right pattern';
-is $r->find('0')->to_string,          '/0',     'right pattern';
-is $r->find('test_edit')->to_string, '/:controller/test/edit', 'right pattern';
+is $r->find('very_clean')->to_string, '/clean',                 'right pattern';
+is $r->find('0')->to_string,          '/0',                     'right pattern';
+is $r->find('test_edit')->to_string,  '/:controller/test/edit', 'right pattern';
 is $r->find('articles_delete')->to_string, '/articles/:id/delete',
   'right pattern';
 is $r->find('nodetect')->pattern->constraints->{format}, 0, 'right value';
@@ -364,8 +363,7 @@ $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/optional/23'});
 is_deeply $m->stack, [{foo => 23, bar => 'test'}], 'right structure';
 is $m->path_for->{path}, '/optional/23', 'right path';
-is $m->path_for(format => 'txt')->{path}, '/optional/23/test.txt',
-  'right path';
+is $m->path_for(format => 'txt')->{path}, '/optional/23/test.txt', 'right path';
 is $m->path_for(foo => 12, format => 'txt')->{path}, '/optional/12/test.txt',
   'right path';
 is $m->path_for('optionalfoobar', format => 'txt')->{path},
@@ -536,15 +534,11 @@ is_deeply $m->stack,
   'right structure';
 is $m->path_for->{path}, '/wildcards/1/♥', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
-$m->find(
-  $c => {method => 'GET', path => '/wildcards/1/http://www.google.com'});
-@stack = (
-  {
-    controller => 'wild',
-    action     => 'card',
-    wildcard   => 'http://www.google.com'
-  }
-);
+$m->find($c => {method => 'GET', path => '/wildcards/1/http://www.google.com'});
+@stack
+  = (
+  {controller => 'wild', action => 'card', wildcard => 'http://www.google.com'}
+  );
 is_deeply $m->stack, \@stack, 'right structure';
 is $m->path_for->{path}, '/wildcards/1/http://www.google.com', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
@@ -580,8 +574,7 @@ $m->find($c => {method => 'GET', path => '/format2'});
 is_deeply $m->stack, [], 'empty stack';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/format2.txt'});
-is_deeply $m->stack,
-  [{controller => 'we', action => 'howdy', format => 'txt'}],
+is_deeply $m->stack, [{controller => 'we', action => 'howdy', format => 'txt'}],
   'right structure';
 is $m->path_for->{path}, '/format2.txt', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
@@ -637,8 +630,7 @@ is_deeply $m->stack, [], 'empty stack';
 # Forbidden format
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/format5'});
-is_deeply $m->stack, [{controller => 'us', action => 'wow'}],
-  'right structure';
+is_deeply $m->stack, [{controller => 'us', action => 'wow'}], 'right structure';
 is $m->path_for->{path}, '/format5', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/format5.html'});
@@ -901,12 +893,10 @@ is_deeply $m->stack,
   [{controller => 'missing', action => 'wildcard', '' => 'foo/bar'}],
   'right structure';
 is $m->path_for->{path}, '/missing/foo/bar/name', 'right path';
-is $m->path_for('' => 'bar/baz')->{path}, '/missing/bar/baz/name',
-  'right path';
+is $m->path_for('' => 'bar/baz')->{path}, '/missing/bar/baz/name', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/missing/too/test'});
-is_deeply $m->stack,
-  [{controller => 'missing', action => 'too', '' => 'test'}],
+is_deeply $m->stack, [{controller => 'missing', action => 'too', '' => 'test'}],
   'right structure';
 is $m->path_for->{path}, '/missing/too/test', 'right path';
 is $m->path_for('' => 'bar/baz')->{path}, '/missing/too/bar/baz', 'right path';

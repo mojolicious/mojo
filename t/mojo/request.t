@@ -676,8 +676,7 @@ $req->parse("4\x0d\x0a");
 $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
-$req->parse(
-  "0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
+$req->parse("0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
 ok $req->is_finished,  'request is finished';
 is $req->method,       'POST', 'right method';
 is $req->version,      '1.1', 'right version';
@@ -699,8 +698,7 @@ $req->parse("4\x0d\x0a");
 $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
-$req->parse(
-  "0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
+$req->parse("0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
 ok $req->is_finished,  'request is finished';
 is $req->method,       'POST', 'right method';
 is $req->version,      '1.1', 'right version';
@@ -1245,10 +1243,10 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
 is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection, 'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
-is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
+is $req->headers->connection,     'Upgrade',     'right "Connection" value';
+is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
+is $req->headers->host,           'example.com', 'right "Host" value';
+is $req->headers->content_length, 0,             'right "Content-Length" value';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
@@ -1273,10 +1271,10 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
 is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection, 'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
-is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
+is $req->headers->connection,     'Upgrade',     'right "Connection" value';
+is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
+is $req->headers->host,           'example.com', 'right "Host" value';
+is $req->headers->content_length, 0,             'right "Content-Length" value';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
@@ -1289,10 +1287,10 @@ is $clone->method,      'GET', 'right method';
 is $clone->version,     '1.1', 'right version';
 is $clone->url,         '/demo', 'right URL';
 is $clone->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $clone->headers->connection, 'Upgrade',     'right "Connection" value';
-is $clone->headers->upgrade,    'websocket',   'right "Upgrade" value';
-is $clone->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
+is $clone->headers->connection,   'Upgrade',     'right "Connection" value';
+is $clone->headers->upgrade,      'websocket',   'right "Upgrade" value';
+is $clone->headers->host,         'example.com', 'right "Host" value';
+is $req->headers->content_length, 0,             'right "Content-Length" value';
 is $clone->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $clone->headers->sec_websocket_protocol, 'sample',
@@ -1316,10 +1314,10 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
 is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection, 'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
-is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
+is $req->headers->connection,     'Upgrade',     'right "Connection" value';
+is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
+is $req->headers->host,           'example.com', 'right "Host" value';
+is $req->headers->content_length, 0,             'right "Content-Length" value';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
@@ -1573,8 +1571,7 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar?0');
 $req->headers->expect('100-continue');
-$req->cookies({name => 'foo', value => 'bar'},
-  {name => 'bar', value => 'baz'});
+$req->cookies({name => 'foo', value => 'bar'}, {name => 'bar', value => 'baz'});
 $req->cookies(Mojo::Cookie::Request->new(name => 'baz', value => 'yada'));
 $req->body("Hello World!\n");
 ok !!$req->to_string, 'message built';
@@ -1586,8 +1583,7 @@ is $req2->version,     '1.1', 'right version';
 is $req2->headers->expect, '100-continue', 'right "Expect" value';
 is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
-is $req2->headers->cookie, 'foo=bar; bar=baz; baz=yada',
-  'right "Cookie" value';
+is $req2->headers->cookie, 'foo=bar; bar=baz; baz=yada', 'right "Cookie" value';
 is $req2->url, '/foo/bar?0', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar?0', 'right absolute URL';
 ok defined $req2->cookie('foo'),   'cookie "foo" exists';

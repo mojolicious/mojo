@@ -40,13 +40,12 @@ is $pointer->get('/foo/bar/6'), undef, '"/foo/bar/6" is "undef"';
 # "get" (encoded)
 is $pointer->new([{'foo/bar' => 'bar'}])->get('/0/foo~1bar'), 'bar',
   '"/0/foo~1bar" is "bar"';
-is $pointer->new([{'foo/bar/baz' => 'yada'}])->get('/0/foo~1bar~1baz'),
-  'yada', '"/0/foo~1bar~1baz" is "yada"';
+is $pointer->new([{'foo/bar/baz' => 'yada'}])->get('/0/foo~1bar~1baz'), 'yada',
+  '"/0/foo~1bar~1baz" is "yada"';
 is $pointer->new([{'foo~/bar' => 'bar'}])->get('/0/foo~0~1bar'), 'bar',
   '"/0/foo~0~1bar" is "bar"';
 is $pointer->new([{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}])
-  ->get('/0/f~0o~0o~0~1b~0/a~0/r'), 'baz',
-  '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
+  ->get('/0/f~0o~0o~0~1b~0/a~0/r'), 'baz', '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
 is $pointer->new({'~1' => 'foo'})->get('/~01'), 'foo', '"/~01" is "foo"';
 
 # Unicode

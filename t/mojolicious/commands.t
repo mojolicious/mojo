@@ -116,8 +116,7 @@ $buffer = '';
   local *STDOUT = $handle;
   $commands->run('help', 'generate', 'lite_app');
 }
-like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
-  'right output';
+like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/, 'right output';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
@@ -131,8 +130,7 @@ $buffer = '';
   local *STDOUT = $handle;
   $commands->run('generate', 'lite_app', '--help');
 }
-like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/,
-  'right output';
+like $buffer, qr/Usage: APPLICATION generate lite_app \[NAME\]/, 'right output';
 
 # get
 require Mojolicious::Command::get;

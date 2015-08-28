@@ -70,8 +70,8 @@ $t->head_ok('/hello.txt')->status_is(200)
 
 # Route for method other than GET and HEAD
 $t->options_ok('/hello.txt')->status_is(200)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 8)->content_is('Options!');
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('Content-Length' => 8)
+  ->content_is('Options!');
 
 # Unknown method
 $t->put_ok('/hello.txt')->status_is(404)
@@ -115,17 +115,15 @@ $t->get_ok('/hello.txt' => {Range => 'bytes=0-0'})->status_is(206)
 
 # Partial static file, end outside of range
 $t->get_ok('/hello.txt' => {Range => 'bytes=25-31'})->status_is(206)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 6)
-  ->header_is('Content-Range'  => 'bytes 25-30/31')
-  ->header_is('Accept-Ranges'  => 'bytes')->content_is("file!\n");
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('Content-Length' => 6)
+  ->header_is('Content-Range' => 'bytes 25-30/31')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is("file!\n");
 
 # Partial static file, end way outside of range
 $t->get_ok('/hello.txt' => {Range => 'bytes=25-300'})->status_is(206)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 6)
-  ->header_is('Content-Range'  => 'bytes 25-30/31')
-  ->header_is('Accept-Ranges'  => 'bytes')->content_is("file!\n");
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('Content-Length' => 6)
+  ->header_is('Content-Range' => 'bytes 25-30/31')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is("file!\n");
 
 # Partial static file, invalid range
 $t->get_ok('/hello.txt' => {Range => 'bytes=32-33'})->status_is(416)
@@ -159,8 +157,8 @@ $t->get_ok('/etag' => {'If-None-Match' => '"abc"'})->status_is(304)
   ->content_is('');
 
 # Fresh asset
-$t->get_ok('/asset')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('I <3 Assets!');
+$t->get_ok('/asset')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('I <3 Assets!');
 my $etag = $t->tx->res->headers->etag;
 
 # Stale asset
@@ -185,12 +183,12 @@ $t->get_ok('/hidden')->status_is(404)->content_unlike(qr/Unreachable file/);
 
 # Base64 static inline file, If-Modified-Since
 my $modified = Mojo::Date->new->epoch(time - 3600);
-$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})->status_is(200)
+  ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
 $modified = $t->tx->res->headers->last_modified;
-$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(304)->header_is(Server => 'Mojolicious (Perl)')->content_is('');
+$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})->status_is(304)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('');
 
 # Base64 static inline file
 $t->get_ok('/static.txt')->status_is(200)
@@ -199,12 +197,12 @@ $t->get_ok('/static.txt')->status_is(200)
 
 # Base64 static inline file, If-Modified-Since
 $modified = Mojo::Date->new->epoch(time - 3600);
-$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})->status_is(200)
+  ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
 $modified = $t->tx->res->headers->last_modified;
-$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(304)->header_is(Server => 'Mojolicious (Perl)')->content_is('');
+$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})->status_is(304)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('');
 
 # Base64 partial inline file
 $t->get_ok('/static.txt' => {Range => 'bytes=2-5'})->status_is(206)

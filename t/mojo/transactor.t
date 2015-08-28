@@ -84,10 +84,8 @@ is $tx->req->headers->content_type, 'application/json',
 is_deeply $tx->req->json, [1, 2, 3], 'right content';
 
 # JSON POST with headers
-$tx = $t->tx(
-  POST => 'http://example.com/foo' => {DNT => 1},
-  json => {test                    => 123}
-);
+$tx = $t->tx(POST => 'http://example.com/foo' => {DNT => 1},
+  json => {test => 123});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->dnt, 1, 'right "DNT" value';
@@ -206,8 +204,8 @@ is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/"mytext"/, 'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/"mytext"/,
+  'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/"transactor.t"/, 'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
@@ -225,8 +223,8 @@ is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/mojo-form',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/"mytext"/, 'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/"mytext"/,
+  'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/"transactor.t"/, 'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
@@ -234,8 +232,10 @@ ok $tx->req->content->parts->[0]->asset->is_file, 'stored in file';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with in-memory content
-$tx = $t->tx(POST => 'http://example.com/foo' => form =>
-    {mytext => {content => 'lalala'}});
+$tx
+  = $t->tx(
+  POST => 'http://example.com/foo' => form => {mytext => {content => 'lalala'}}
+  );
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -280,8 +280,8 @@ is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/$snowman/, 'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/$snowman/,
+  'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'snowman', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 is $tx->req->upload('%22☃%22')->filename, '%22☃%22.jpg', 'right filename';
@@ -303,13 +303,13 @@ is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition, qr/mytext/,
   'right "Content-Disposition" value';
-like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/one\.txt/, 'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/one\.txt/,
+  'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'just', 'right part';
 like $tx->req->content->parts->[1]->headers->content_disposition, qr/mytext/,
   'right "Content-Disposition" value';
-like $tx->req->content->parts->[1]->headers->content_disposition,
-  qr/two\.txt/, 'right "Content-Disposition" value';
+like $tx->req->content->parts->[1]->headers->content_disposition, qr/two\.txt/,
+  'right "Content-Disposition" value';
 is $tx->req->content->parts->[1]->asset->slurp, 'works', 'right part';
 is $tx->req->content->parts->[2], undef, 'no more parts';
 
@@ -528,8 +528,8 @@ $tx->req->proxy('socks://127.0.0.1:3000');
 is $t->proxy_connect($tx), undef, 'using a SOCKS proxy';
 
 # Simple 301 redirect
-$tx = $t->tx(
-  POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
+$tx
+  = $t->tx(POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
 $tx->res->code(301);
 $tx->res->headers->location('http://example.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
@@ -576,8 +576,8 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # Simple 302 redirect
-$tx = $t->tx(
-  POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
+$tx
+  = $t->tx(POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
 $tx->res->code(302);
 $tx->res->headers->location('http://example.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
@@ -597,9 +597,9 @@ $tx->res->code(302);
 $tx->res->headers->location('http://example.com/bar');
 $tx = $t->redirect($tx);
 is $tx->req->method, 'HEAD', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, undef, 'no "Accept" value';
-is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept,   undef,                    'no "Accept" value';
+is $tx->req->headers->location, undef,                    'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -611,9 +611,9 @@ $tx->res->headers->location('http://example.com/bar');
 $tx->req->content->write_chunk('whatever' => sub { shift->finish });
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, undef, 'no "Accept" value';
-is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept,   undef,                    'no "Accept" value';
+is $tx->req->headers->location, undef,                    'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -640,8 +640,8 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # Simple 303 redirect
-$tx = $t->tx(
-  POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
+$tx
+  = $t->tx(POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
 $tx->res->code(303);
 $tx->res->headers->location('http://example.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
@@ -662,9 +662,9 @@ $tx->res->headers->location('http://example.com/bar');
 $tx->req->content->write_chunk('whatever' => sub { shift->finish });
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, undef, 'no "Accept" value';
-is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept,   undef,                    'no "Accept" value';
+is $tx->req->headers->location, undef,                    'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -701,8 +701,8 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # Simple 307 redirect
-$tx = $t->tx(
-  POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
+$tx
+  = $t->tx(POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
 $tx->res->code(307);
 $tx->res->headers->location('http://example.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
@@ -771,8 +771,8 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # Simple 308 redirect
-$tx = $t->tx(
-  POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
+$tx
+  = $t->tx(POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
 $tx->res->code(308);
 $tx->res->headers->location('http://example.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
@@ -796,7 +796,7 @@ is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->url->to_abs, 'https://example.com/bar', 'right URL';
-is $tx->req->headers->accept,   '*/*', 'right "Accept" value';
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, 'whatever', 'right content';
 is $tx->res->code, undef,      'no status';
@@ -810,8 +810,8 @@ $tx->req->content->write_chunk('whatever' => sub { shift->finish });
 is $t->redirect($tx), undef, 'unsupported redirect';
 
 # 309 redirect (unsupported)
-$tx = $t->tx(
-  POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
+$tx
+  = $t->tx(POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
 $tx->res->code(309);
 $tx->res->headers->location('http://example.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
@@ -833,8 +833,7 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://mojolicio.us/foo/baz?f%23oo=bar',
-  'right URL';
+is $tx->req->url->to_abs, 'http://mojolicio.us/foo/baz?f%23oo=bar', 'right URL';
 is $tx->req->url->query,        'f%23oo=bar',       'right query';
 is $tx->req->headers->accept,   'application/json', 'right "Accept" value';
 is $tx->req->headers->location, undef,              'no "Location" value';

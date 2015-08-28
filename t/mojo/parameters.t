@@ -59,8 +59,7 @@ $params = Mojo::Parameters->new(foo => '', bar => 'bar');
 is $params->to_string, 'foo=&bar=bar', 'right format';
 $params = Mojo::Parameters->new(bar => 'bar', foo => '');
 is $params->to_string, 'bar=bar&foo=', 'right format';
-is $params->append($params2)->to_string, 'bar=bar&foo=&x=1&y=2',
-  'right format';
+is $params->append($params2)->to_string, 'bar=bar&foo=&x=1&y=2', 'right format';
 is $params2->to_string, 'x=1&y=2', 'right format';
 
 # "0"

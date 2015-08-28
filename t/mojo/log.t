@@ -48,8 +48,8 @@ $log->format(
     return join ':', $level, $time, @lines;
   }
 );
-like $log->format->(time, 'debug', qw(Test 1 2 3)),
-  qr/^debug:\d+:Test:1:2:3$/, 'right format';
+like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^debug:\d+:Test:1:2:3$/,
+  'right format';
 
 # Events
 $log = Mojo::Log->new;

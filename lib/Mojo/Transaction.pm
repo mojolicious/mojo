@@ -51,8 +51,9 @@ sub remote_address {
   return $self->original_remote_address unless $self->req->reverse_proxy;
 
   # Reverse proxy
-  return ($self->req->headers->header('X-Forwarded-For') // '')
-    =~ /([^,\s]+)$/ ? $1 : $self->original_remote_address;
+  return ($self->req->headers->header('X-Forwarded-For') // '') =~ /([^,\s]+)$/
+    ? $1
+    : $self->original_remote_address;
 }
 
 sub resume       { shift->_state(qw(write resume)) }

@@ -71,8 +71,8 @@ sub content_type_like {
 sub content_type_unlike {
   my ($self, $regex, $desc) = @_;
   $desc ||= 'Content-Type is not similar';
-  return $self->_test('unlike', $self->tx->res->headers->content_type,
-    $regex, $desc);
+  return $self->_test('unlike', $self->tx->res->headers->content_type, $regex,
+    $desc);
 }
 
 sub content_unlike {

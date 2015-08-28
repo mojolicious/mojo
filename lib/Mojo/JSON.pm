@@ -105,8 +105,7 @@ sub _decode_object {
     my $key = _decode_string();
 
     # Colon
-    /\G[\x20\x09\x0a\x0d]*:/gc
-      or _throw('Expected colon while parsing object');
+    /\G[\x20\x09\x0a\x0d]*:/gc or _throw('Expected colon while parsing object');
 
     # Value
     $hash{$key} = _decode_value();

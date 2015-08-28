@@ -13,12 +13,12 @@ $t->type(BAR => 'bar/baz');
 is $t->type('Bar'), 'bar/baz', 'right type';
 
 # Detect common MIME types
-is_deeply $t->detect('text/cache-manifest'),  ['appcache'], 'right formats';
-is_deeply $t->detect('application/atom+xml'), ['atom'],     'right formats';
-is_deeply $t->detect('application/octet-stream'), ['bin'], 'right formats';
-is_deeply $t->detect('text/css'),                 ['css'], 'right formats';
-is_deeply $t->detect('image/gif'),                ['gif'], 'right formats';
-is_deeply $t->detect('application/x-gzip'),       ['gz'],  'right formats';
+is_deeply $t->detect('text/cache-manifest'),      ['appcache'], 'right formats';
+is_deeply $t->detect('application/atom+xml'),     ['atom'],     'right formats';
+is_deeply $t->detect('application/octet-stream'), ['bin'],      'right formats';
+is_deeply $t->detect('text/css'),                 ['css'],      'right formats';
+is_deeply $t->detect('image/gif'),                ['gif'],      'right formats';
+is_deeply $t->detect('application/x-gzip'),       ['gz'],       'right formats';
 is_deeply $t->detect('text/html'), ['htm', 'html'], 'right formats';
 is_deeply $t->detect('image/x-icon'), ['ico'], 'right formats';
 is_deeply $t->detect('image/jpeg'), ['jpeg', 'jpg'], 'right formats';

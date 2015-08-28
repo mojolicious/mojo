@@ -260,8 +260,7 @@ $t->get_ok('/variants.txt')->status_is(200)
 
 # Variants (tablet)
 $t->get_ok('/variants.txt?device=tablet')->status_is(200)
-  ->content_type_is('text/plain;charset=UTF-8')
-  ->content_is('Variant: Tablet!');
+  ->content_type_is('text/plain;charset=UTF-8')->content_is('Variant: Tablet!');
 
 # Variants (desktop fallback)
 $t->get_ok('/variants.txt?device=phone')->status_is(200)

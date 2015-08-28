@@ -41,8 +41,7 @@ is $url->scheme,   'ws',                          'right scheme';
 is $url->userinfo, 'AZaz09-._~!$&\'()*+,;=:',     'right userinfo';
 is $url->host,     'localhost',                   'right host';
 is $url->fragment, 'AZaz09-._~!$&\'()*+,;=%:@/?', 'right fragment';
-is "$url",
-  'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?',
+is "$url", 'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?',
   'right format';
 
 # Parameters
@@ -197,8 +196,8 @@ is $url->to_abs(Mojo::URL->new('http://')), 'http://localhost/23/',
   'right absolute version';
 is $url->to_abs(Mojo::URL->new('https://')), 'https://localhost/23/',
   'right absolute version';
-is $url->to_abs(Mojo::URL->new('http://mojolicio.us')),
-  'http://localhost/23/', 'right absolute version';
+is $url->to_abs(Mojo::URL->new('http://mojolicio.us')), 'http://localhost/23/',
+  'right absolute version';
 is $url->to_abs(Mojo::URL->new('http://mojolicio.us:8080')),
   'http://localhost/23/', 'right absolute version';
 $url = Mojo::URL->new('///bar/23/');
@@ -527,7 +526,7 @@ is $url->host,     'foo.bar',                                  'right host';
 is $url->port,     undef,                                      'no port';
 is $url->path,     '/zzz',                                     'right path';
 is $url->query,    '',                                         'no query';
-is $url->fragment, 'test2', 'right fragment';
+is $url->fragment, 'test2',                                    'right fragment';
 is "$url", 'http://foo.bar/zzz#test2', 'right absolute URL';
 
 # Merge relative path with fragment
@@ -549,7 +548,7 @@ is $url->host,     'foo.bar',                                  'right host';
 is $url->port,     undef,                                      'no port';
 is $url->path,     '/baz/zzz',                                 'right path';
 is $url->query,    '',                                         'no query';
-is $url->fragment, 'test2', 'right fragment';
+is $url->fragment, 'test2',                                    'right fragment';
 is "$url", 'http://foo.bar/baz/zzz#test2', 'right absolute URL';
 
 # Merge absolute path without fragment

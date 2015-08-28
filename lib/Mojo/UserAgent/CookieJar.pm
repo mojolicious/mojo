@@ -49,8 +49,7 @@ sub collect {
     my $host = $url->ihost;
     my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
     $domain =~ s/^\.//;
-    next
-      if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
+    next if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
 
     # Validate path
     my $path = $cookie->path // $url->path->to_dir->to_abs_string;

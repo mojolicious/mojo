@@ -104,59 +104,48 @@ $t->get_ok(
   ->status_is(200)->json_is({best => 'json'});
 
 # Nothing
-$t->get_ok('/rest')->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
+$t->get_ok('/rest')->status_is(200)->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');
 
 # "html" format
 $t->get_ok('/rest.html')->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html"
 $t->get_ok('/rest' => {Accept => 'text/html'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html" again
 $t->get_ok('/rest' => {Accept => 'Text/Html'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html" with format
 $t->get_ok('/rest.html' => {Accept => 'text/html'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html" with wrong format
 $t->get_ok('/rest.json' => {Accept => 'text/html'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html" with quality
 $t->get_ok('/rest' => {Accept => 'text/html;q=9'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # "html" query
 $t->get_ok('/rest?format=html')->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # "html" format with query
 $t->get_ok('/rest.html?format=html')->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html" with query
 $t->get_ok('/rest?format=html' => {Accept => 'text/html'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html" with everything
-$t->get_ok('/rest.html?format=html' => {Accept => 'text/html'})
-  ->status_is(200)->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+$t->get_ok('/rest.html?format=html' => {Accept => 'text/html'})->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # "json" format
 $t->get_ok('/rest.json')->status_is(200)
@@ -241,9 +230,8 @@ $t->get_ok('/rest.xml?format=xml')->status_is(200)
   ->content_type_is('application/xml')->text_is(just => 'works');
 
 # Accept "json" with query
-$t->get_ok('/rest?format=xml' => {Accept => 'application/xml'})
-  ->status_is(200)->content_type_is('application/xml')
-  ->text_is(just => 'works');
+$t->get_ok('/rest?format=xml' => {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # Accept "json" with everything
 $t->get_ok('/rest.xml?format=xml' => {Accept => 'application/xml'})
@@ -484,8 +472,7 @@ $t->get_ok('/nothing' => {Accept => 'image/png'})->status_is(404);
 
 # Ajax
 $ajax = 'text/html;q=0.1,application/xml';
-$t->get_ok(
-  '/rest' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
+$t->get_ok('/rest' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
   ->status_is(200)->content_type_is('application/xml')
   ->text_is(just => 'works');
 
@@ -495,25 +482,21 @@ my $ie
   . ', image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash'
   . ', application/msword, */*';
 $t->get_ok('/rest.html' => {Accept => $ie})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Internet Explorer 8 with query
 $t->get_ok('/rest?format=html' => {Accept => $ie})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Chrome 11
 my $chrome = 'application/xml,application/xhtml+xml,text/html;q=0.9'
   . ',text/plain;q=0.8,image/png,*/*;q=0.5';
 $t->get_ok('/rest.html' => {Accept => $chrome})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Chrome 11 with query
 $t->get_ok('/rest?format=html' => {Accept => $chrome})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works');
+  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # jQuery 1.8
 my $jquery = 'application/json, text/javascript, */*; q=0.01';

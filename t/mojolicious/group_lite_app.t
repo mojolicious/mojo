@@ -197,12 +197,11 @@ ok !$t->tx->res->cookie('mojolicious')->expires, 'no expiration';
 $t->reset_session;
 
 # Multiple cookies with same name
-$t->get_ok('/multi')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is("\n\n\n\n\n\n\n\n");
+$t->get_ok('/multi')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("\n\n\n\n\n\n\n\n");
 
 # Multiple cookies with same name (again)
-$t->get_ok('/multi')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/multi')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("two\nthree\none\ntwo\nfive\nsix\nfour\nfive\n");
 
 # Missing action behind bridge
@@ -227,15 +226,13 @@ $t->get_ok('/suspended?ok=0')->status_is(200)
 
 # Authenticated with header
 $t->get_ok('/with_under' => {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
-  ->content_is('Unders are cool!');
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('X-Under' => '23, 24')
+  ->header_like('X-Under' => qr/23, 24/)->content_is('Unders are cool!');
 
 # Authenticated with header too
 $t->get_ok('/with_under_too' => {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
-  ->content_is('Unders are cool too!');
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('X-Under' => '23, 24')
+  ->header_like('X-Under' => qr/23, 24/)->content_is('Unders are cool too!');
 
 # Not authenticated with header
 $t->get_ok('/with_under_too')->status_is(401)
@@ -314,8 +311,7 @@ $t->app->secrets(['test2', 'test1']);
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
   "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
-ok $t->tx->res->cookie('mojolicious')->expires < time,
-  'session cookie expires';
+ok $t->tx->res->cookie('mojolicious')->expires < time, 'session cookie expires';
 
 # With cookies and session cleared (rotating secrets)
 $t->app->secrets(['test3', 'test2']);

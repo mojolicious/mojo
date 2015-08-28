@@ -31,12 +31,11 @@ my $t = Test::Mojo->new;
 # Asset and filename
 my $file = Mojo::Asset::File->new->add_chunk('lalala');
 $t->post_ok('/upload' => form =>
-    {file => {file => $file, filename => 'x'}, test => 'tset'})
-  ->status_is(200)->content_is('xlalalatset');
+    {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
+  ->content_is('xlalalatset');
 
 # Path
-$t->post_ok(
-  '/upload' => form => {file => {file => $file->path}, test => 'foo'})
+$t->post_ok('/upload' => form => {file => {file => $file->path}, test => 'foo'})
   ->status_is(200)->content_like(qr!lalalafoo$!);
 
 # Memory

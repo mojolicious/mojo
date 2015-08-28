@@ -77,8 +77,7 @@ app->routes->namespaces(['MyTestApp']);
 # Mount full external application a few times
 my $external = "$FindBin::Bin/external/myapp.pl";
 plugin Mount => {'/x/1' => $external};
-my $route
-  = plugin(Mount => ('/x/♥' => $external))->to(message => 'works 2!');
+my $route = plugin(Mount => ('/x/♥' => $external))->to(message => 'works 2!');
 is $route->to->{message}, 'works 2!', 'right message';
 is $route->pattern->defaults->{app}->same_name, 'myapp', 'right name';
 plugin Mount => {'/y/1'            => "$FindBin::Bin/external/myapp2.pl"};
@@ -100,8 +99,7 @@ get('/baz')->detour('test1#', name => 'fourth embedded');
 
 get('/yada')->to('test1#', name => 'fifth embedded');
 
-get('/yada/yada/yada')
-  ->to('test1#', path => '/yada', name => 'sixth embedded');
+get('/yada/yada/yada')->to('test1#', path => '/yada', name => 'sixth embedded');
 
 get('/basic')->detour(MyTestApp::Basic->new, test => 'lalala');
 
@@ -328,8 +326,7 @@ $t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
   ->header_is('X-Message' => 'it works!')->content_is('mojolicio.us');
 
 # Template from myapp.pl with wildcard domain
-$t->get_ok('/' => {Host => 'example.com'})->status_is(200)
-  ->content_is(<<'EOF');
+$t->get_ok('/' => {Host => 'example.com'})->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 

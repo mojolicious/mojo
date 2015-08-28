@@ -145,8 +145,7 @@ sub _try_socks {
     error => 'IO::Socket::Socks 0.64+ required for SOCKS support')
     unless SOCKS;
 
-  my %options
-    = (ConnectAddr => $args->{address}, ConnectPort => $args->{port});
+  my %options = (ConnectAddr => $args->{address}, ConnectPort => $args->{port});
   @options{qw(AuthType Username Password)}
     = ('userpass', @$args{qw(socks_user socks_pass)})
     if $args->{socks_user};

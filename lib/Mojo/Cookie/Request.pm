@@ -18,7 +18,7 @@ sub parse {
 
 sub to_string {
   my $self = shift;
-  return '' unless length(my $name = $self->name // '');
+  return '' if (my $name = $self->name // '') eq '';
   my $value = $self->value // '';
   return join '=', $name, $value =~ /[,;" ]/ ? quote $value : $value;
 }

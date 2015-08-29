@@ -32,7 +32,7 @@ sub to_string {
   my $self = shift;
 
   # Name and value
-  return '' unless length(my $name = $self->name // '');
+  return '' if (my $name = $self->name // '') eq '';
   my $value = $self->value // '';
   my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote $value : $value;
 

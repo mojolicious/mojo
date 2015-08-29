@@ -139,7 +139,7 @@ sub _finish {
   return $self->_remove($id) if $req->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return unless length(my $leftovers = $req->content->leftovers);
+  return if (my $leftovers = $req->content->leftovers) eq '';
   $tx = $c->{tx} = $self->_build_tx($id, $c);
   $tx->server_read($leftovers);
 }

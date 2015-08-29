@@ -69,7 +69,7 @@ sub optional {
   my $input = $self->input->{$name};
   my @input = ref $input eq 'ARRAY' ? @$input : $input;
   $self->output->{$name} = $input
-    unless grep { !defined($_) || !length($_) } @input;
+    unless grep { !defined($_) || $_ eq '' } @input;
 
   return $self->topic($name);
 }

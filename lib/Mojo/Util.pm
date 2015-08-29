@@ -137,7 +137,7 @@ sub punycode_decode {
   # Consume all code points before the last delimiter
   push @output, split('', $1) if $input =~ s/(.*)\x2d//s;
 
-  while (length $input) {
+  while ($input ne '') {
     my $oldi = $i;
     my $w    = 1;
 
@@ -364,7 +364,7 @@ sub _decode {
 
   # Find entity name
   my $rest = '';
-  while (length $name) {
+  while ($name ne '') {
     return "$ENTITIES{$name}$rest" if exists $ENTITIES{$name};
     $rest = chop($name) . $rest;
   }

@@ -78,7 +78,7 @@ sub pairs {
   # Parse string
   if (defined(my $str = delete $self->{string})) {
     my $pairs = $self->{pairs} = [];
-    return $pairs unless length $str;
+    return $pairs if $str eq '';
 
     my $charset = $self->charset;
     for my $pair (split '&', $str) {

@@ -57,7 +57,7 @@ sub _decode {
   eval {
 
     # Missing input
-    die "Missing or empty input\n" unless length(local $_ = shift);
+    die "Missing or empty input\n" if (local $_ = shift) eq '';
 
     # UTF-8
     $_ = Mojo::Util::decode 'UTF-8', $_ unless shift;

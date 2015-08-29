@@ -126,7 +126,7 @@ sub _equation {
   # Equation
   my $num = [1, 1];
   return $num if $equation !~ /(?:(-?(?:\d+)?)?(n))?\s*\+?\s*(-?\s*\d+)?\s*$/i;
-  $num->[0] = defined($1) && length($1) ? $1 : $2 ? 1 : 0;
+  $num->[0] = defined($1) && $1 ne '' ? $1 : $2 ? 1 : 0;
   $num->[0] = -1 if $num->[0] eq '-';
   $num->[1] = $3 // 0;
   $num->[1] =~ s/\s+//g;

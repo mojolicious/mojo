@@ -39,9 +39,9 @@ sub generate_body_chunk {
   my ($self, $offset) = @_;
 
   $self->emit(drain => $offset)
-    if !delete $self->{delay} && !length($self->{body_buffer} // '');
+    if !delete $self->{delay} && ($self->{body_buffer} // '') eq '';
   my $chunk = delete $self->{body_buffer} // '';
-  return $self->{eof} ? '' : undef unless length $chunk;
+  return $self->{eof} ? '' : undef if $chunk eq '';
 
   return $chunk;
 }
@@ -104,7 +104,7 @@ sub parse {
   # Relaxed parsing
   my $headers = $self->headers;
   my $len = $headers->content_length // '';
-  if ($self->auto_relax && !length $len) {
+  if ($self->auto_relax && $len eq '') {
     my $connection = lc($headers->connection // '');
     $self->relaxed(1)
       if $connection eq 'close' || (!$connection && $self->expect_close);
@@ -168,7 +168,7 @@ sub _build_chunk {
   my ($self, $chunk) = @_;
 
   # End
-  return "\x0d\x0a0\x0d\x0a\x0d\x0a" unless length $chunk;
+  return "\x0d\x0a0\x0d\x0a\x0d\x0a" if $chunk eq '';
 
   # First chunk has no leading CRLF
   my $crlf = $self->{chunks}++ ? "\x0d\x0a" : '';

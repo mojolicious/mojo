@@ -83,7 +83,7 @@ sub _json {
   say encode_json($data);
 }
 
-sub _say { length && say encode('UTF-8', $_) for @_ }
+sub _say { $_ ne '' && say encode('UTF-8', $_) for @_ }
 
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;

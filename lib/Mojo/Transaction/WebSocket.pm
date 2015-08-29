@@ -316,7 +316,7 @@ sub _message {
       WindowBits  => -15
     );
     $inflate->inflate(($msg .= "\x00\x00\xff\xff"), my $out);
-    return $self->finish(1009) if length $msg;
+    return $self->finish(1009) if $msg ne '';
     $msg = $out;
   }
 

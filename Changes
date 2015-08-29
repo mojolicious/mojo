@@ -1,5 +1,7 @@
 
 6.18  2015-08-29
+  - Fixed Makefile.PL to be compliant with version 2 of the CPAN distribution
+    metadata specification. (Grinnz)
 
 6.17  2015-08-21
   - Improved slurp method in Mojo::Asset::File to only use one file descriptor.

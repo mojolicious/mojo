@@ -1,5 +1,6 @@
 
-6.18  2015-08-29
+6.18  2015-08-31
+  - Improved portability of slurp function in Mojo::Util.
   - Fixed Makefile.PL to be compliant with version 2 of the CPAN distribution
     metadata specification. (Grinnz)
 

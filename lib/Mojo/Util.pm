@@ -233,9 +233,12 @@ sub sha1_sum   { sha1_hex @_ }
 
 sub slurp {
   my $path = shift;
+
   open my $file, '<', $path or croak qq{Can't open file "$path": $!};
-  defined $file->sysread(my $content, -s $file, 0)
-    or croak qq{Can't read from file "$path": $!};
+  my $ret = my $content = '';
+  while ($ret = $file->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
+  croak qq{Can't read from file "$path": $!} unless defined $ret;
+
   return $content;
 }
 

@@ -254,7 +254,7 @@ $t->get_ok('/multibox?foo=two&foo=one')->status_is(200)->content_is(<<EOF);
 EOF
 
 # Advanced form with values
-$t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
+$t->get_ok('/form/lala?a=3&a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   ->content_is(<<EOF);
 <form action="/links" method="post">
   <input name="foo">

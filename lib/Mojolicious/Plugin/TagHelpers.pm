@@ -80,7 +80,7 @@ sub _input {
     }
 
     # Others
-    else { $attrs{value} = $values[0] }
+    else { $attrs{value} = $values[-1] }
   }
 
   return _validation($c, $name, 'input', name => $name, %attrs);

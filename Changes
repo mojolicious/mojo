@@ -1,6 +1,8 @@
 
-6.18  2015-08-31
+6.18  2015-09-02
   - Improved portability of slurp function in Mojo::Util.
+  - Fixed handling of parameters with multiple values in
+    Mojolicious::Plugin::TagHelpers.
   - Fixed Makefile.PL to be compliant with version 2 of the CPAN distribution
     metadata specification. (Grinnz)
 

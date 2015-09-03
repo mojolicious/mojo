@@ -102,7 +102,7 @@ sub decode {
   my $fallback = sub {die};
   return undef
     unless (UUTF8 and $encoding eq 'UTF-8')
-    ? eval { $bytes = Unicode::UTF8::decode_utf8("$bytes", $fallback); 1 }
+    ? eval { $bytes = Unicode::UTF8::decode_utf8($bytes, $fallback); 1 }
     : eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
   return $bytes;
 }
@@ -118,7 +118,7 @@ sub dumper {
 
 sub encode {
   (UUTF8 and $_[0] eq 'UTF-8')
-    ? Unicode::UTF8::encode_utf8("$_[1]")
+    ? Unicode::UTF8::encode_utf8($_[1])
     : _encoding($_[0])->encode("$_[1]");
 }
 

@@ -13,6 +13,11 @@ use MIME::Base64 qw(decode_base64 encode_base64);
 use Symbol 'delete_package';
 use Time::HiRes ();
 
+# Faster UTF-8 processing requires Unicode::UTF8
+use constant UUTF8 => $ENV{MOJO_NO_UUTF8}
+  ? 0
+  : eval 'use Unicode::UTF8 0.60 (); 1';
+
 # Check for monotonic clock support
 use constant MONOTONIC =>
   eval { !!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
@@ -94,8 +99,11 @@ sub decamelize {
 
 sub decode {
   my ($encoding, $bytes) = @_;
+  my $fallback = sub {undef};
   return undef
-    unless eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
+    unless (UUTF8 and $encoding eq 'UTF-8')
+    ? eval { $bytes = Unicode::UTF8::decode_utf8("$bytes", $fallback); 1 }
+    : eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
   return $bytes;
 }
 
@@ -108,7 +116,11 @@ sub dumper {
   Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
 }
 
-sub encode { _encoding($_[0])->encode("$_[1]") }
+sub encode {
+  (UUTF8 and $_[0] eq 'UTF-8')
+    ? Unicode::UTF8::encode_utf8("$_[1]")
+    : _encoding($_[0])->encode("$_[1]");
+}
 
 sub hmac_sha1_sum { hmac_sha1_hex @_ }
 

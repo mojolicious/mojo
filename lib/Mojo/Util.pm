@@ -566,7 +566,10 @@ Convert C<CamelCase> string to C<snake_case> and replace C<::> with C<->.
 
   my $chars = decode 'UTF-8', $bytes;
 
-Decode bytes to characters and return C<undef> if decoding failed.
+Decode bytes to characters and return C<undef> if decoding failed. The optional
+module L<Unicode::UTF8> (0.58+) will be used automatically for UTF-8 decoding
+if possible. This feature can be disabled with the C<MOJO_NO_UUTF8> environment
+variable.
 
 =head2 deprecated
 
@@ -585,7 +588,9 @@ Dump a Perl data structure with L<Data::Dumper>.
 
   my $bytes = encode 'UTF-8', $chars;
 
-Encode characters to bytes.
+Encode characters to bytes. The optional module L<Unicode::UTF8> (0.58+) will
+be used automatically for UTF-8 encoding if possible. This feature can be
+disabled with the C<MOJO_NO_UUTF8> environment variable.
 
 =head2 hmac_sha1_sum
 

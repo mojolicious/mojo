@@ -16,7 +16,7 @@ use Time::HiRes ();
 # Faster UTF-8 processing requires Unicode::UTF8
 use constant UUTF8 => $ENV{MOJO_NO_UUTF8}
   ? 0
-  : eval 'use Unicode::UTF8 0.60 (); 1';
+  : eval 'use Unicode::UTF8 0.58 (); 1';
 
 # Check for monotonic clock support
 use constant MONOTONIC =>

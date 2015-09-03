@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::IOLoop::Client;
 use Mojolicious;
+use Mojo::Util;
 
 has description => 'Show versions of available modules';
 has usage => sub { shift->extract_usage };
@@ -15,6 +16,7 @@ sub run {
   my $socks = $class->SOCKS ? $IO::Socket::Socks::VERSION : 'n/a';
   my $tls   = $class->TLS ? $IO::Socket::SSL::VERSION : 'n/a';
   my $ndn   = $class->NDN ? $Net::DNS::Native::VERSION : 'n/a';
+  my $uutf8 = Mojo::Util->UUTF8 ? $Unicode::UTF8::VERSION : 'n/a';
 
   print <<EOF;
 CORE
@@ -26,6 +28,7 @@ OPTIONAL
   IO::Socket::Socks 0.64+ ($socks)
   IO::Socket::SSL 1.94+   ($tls)
   Net::DNS::Native 0.15+  ($ndn)
+  Unicode::UTF8 0.58+     ($uutf8)
 
 EOF
 

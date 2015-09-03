@@ -99,10 +99,10 @@ sub decamelize {
 
 sub decode {
   my ($encoding, $bytes) = @_;
-  my $fallback = sub {die};
+  use warnings FATAL => 'utf8';
   return undef
     unless (UUTF8 and $encoding eq 'UTF-8')
-    ? eval { $bytes = Unicode::UTF8::decode_utf8($bytes, $fallback); 1 }
+    ? eval { $bytes = Unicode::UTF8::decode_utf8($bytes); 1 }
     : eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
   return $bytes;
 }

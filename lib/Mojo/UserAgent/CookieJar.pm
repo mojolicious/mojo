@@ -6,7 +6,7 @@ use Mojo::Path;
 
 has collecting      => 1;
 has max_cookie_size => 4096;
-has public_suffixes => sub { ['com'] };
+has public_suffixes => sub { [] };
 
 sub add {
   my ($self, @cookies) = @_;
@@ -170,9 +170,9 @@ Maximum cookie size in bytes, defaults to C<4096> (4KB).
   my $suffixes = $jar->public_suffixes;
   $jar         = $jar->public_suffixes(['com', 'net', 'org']);
 
-Public suffixes for which cookies should always be ignored, defaults to C<com>.
-A comprehensive list of public suffixes currently being used across the internet
-can be found at L<https://publicsuffix.org>.
+Public suffixes for which cookies should always be ignored. A comprehensive list
+of public suffixes currently being used across the internet can be found at
+L<https://publicsuffix.org>.
 
 =head1 METHODS
 

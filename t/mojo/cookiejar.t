@@ -347,7 +347,7 @@ is $tx->req->cookie('foo')->name,  'foo',   'right name';
 is $tx->req->cookie('foo')->value, 'local', 'right value';
 is $tx->req->cookie('bar'), undef, 'no cookie';
 
-# Gather and prepare cookies for public suffix (with IDNA)
+# Gather and prepare cookies for unknown public suffix (with IDNA)
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://bücher.com/foo');
@@ -366,6 +366,33 @@ $tx->res->cookies(
   )
 );
 $jar->collect($tx);
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://bücher.com/foo');
+$jar->prepare($tx);
+is $tx->req->cookie('foo')->name,  'foo', 'right name';
+is $tx->req->cookie('foo')->value, 'bar', 'right value';
+is $tx->req->cookie('bar')->name,  'bar', 'right name';
+is $tx->req->cookie('bar')->value, 'baz', 'right value';
+
+# Gather and prepare cookies for public suffix (with IDNA)
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://bücher.com/foo');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    domain => 'com',
+    path   => '/foo',
+    name   => 'foo',
+    value  => 'bar'
+  ),
+  Mojo::Cookie::Response->new(
+    domain => 'xn--bcher-kva.com',
+    path   => '/foo',
+    name   => 'bar',
+    value  => 'baz'
+  )
+);
+$jar->public_suffixes(['com'])->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://bücher.com/foo');
 $jar->prepare($tx);

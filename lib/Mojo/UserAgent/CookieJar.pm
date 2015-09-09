@@ -6,6 +6,7 @@ use Mojo::Path;
 
 has collecting      => 1;
 has max_cookie_size => 4096;
+has public_suffixes => sub { ['com'] };
 
 sub add {
   my ($self, @cookies) = @_;
@@ -41,6 +42,7 @@ sub collect {
   my ($self, $tx) = @_;
 
   return unless $self->collecting;
+  my $ignore = $self->{ignore} ||= {map { $_ => 1 } @{$self->public_suffixes}};
 
   my $url = $tx->req->url;
   for my $cookie (@{$tx->res->cookies}) {
@@ -49,6 +51,7 @@ sub collect {
     my $host = $url->ihost;
     my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
     $domain =~ s/^\.//;
+    next if $ignore->{$domain};
     next if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
 
     # Validate path
@@ -67,7 +70,7 @@ sub find {
   my @found;
   return \@found unless my $domain = my $host = $url->ihost;
   my $path = $url->path->to_abs_string;
-  while ($domain =~ /[^.]+\.[^.]+|localhost$/) {
+  while ($domain) {
     next unless my $old = $self->{jar}{$domain};
 
     # Grab cookies
@@ -161,6 +164,15 @@ value.
   $jar     = $jar->max_cookie_size(4096);
 
 Maximum cookie size in bytes, defaults to C<4096> (4KB).
+
+=head2 public_suffixes
+
+  my $suffixes = $jar->public_suffixes;
+  $jar         = $jar->public_suffixes(['com', 'net', 'org']);
+
+Public suffixes for which cookies should always be ignored, defaults to C<com>.
+A comprehensive list of public suffixes currently being used across the internet
+can be found at L<https://publicsuffix.org>.
 
 =head1 METHODS
 

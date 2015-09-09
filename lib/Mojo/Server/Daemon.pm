@@ -380,7 +380,7 @@ These parameters are currently available:
 
   ca=/etc/tls/ca.crt
 
-Path to TLS certificate authority file.
+Path to TLS certificate authority file used to verify the peer certificate.
 
 =item cert
 

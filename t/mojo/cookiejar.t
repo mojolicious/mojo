@@ -392,7 +392,7 @@ $tx->res->cookies(
     value  => 'baz'
   )
 );
-$jar->public_suffixes(['com'])->collect($tx);
+$jar->ignore(sub { shift->domain eq 'com' })->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://bücher.com/foo');
 $jar->prepare($tx);

@@ -1,7 +1,7 @@
 
 6.19  2015-09-09
   - Added code of conduct to Mojolicious::Guides::Contributing.
-  - Added public_suffixes attribute to Mojo::UserAgent::CookieJar.
+  - Added ignore attribute to Mojo::UserAgent::CookieJar.
 
 6.18  2015-09-02
   - Improved portability of slurp function in Mojo::Util.

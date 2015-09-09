@@ -513,8 +513,12 @@ L<Mojo::UserAgent::CookieJar> object.
   # Disable collecting cookies from responses
   $ua->cookie_jar->collecting(0);
 
-  # Ignore cookies for certain public suffixes
-  $ua->cookie_jar->public_suffixes(['com', 'net', 'org']);
+  # Ignore cookies for public suffixes
+  my $ps = IO::Socket::SSL::PublicSuffix->default;
+  $ua->cookie_jar(sub {
+    my $cookie = shift;
+    return $ps->public_suffix($cookie->domain) eq $cookie->domain;
+  });
 
   # Add custom cookie to the jar
   $ua->cookie_jar->add(

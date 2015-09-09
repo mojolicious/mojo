@@ -4,9 +4,9 @@ use Mojo::Base -base;
 use Mojo::Cookie::Request;
 use Mojo::Path;
 
-has collecting      => 1;
+has collecting => 1;
+has 'ignore';
 has max_cookie_size => 4096;
-has public_suffixes => sub { [] };
 
 sub add {
   my ($self, @cookies) = @_;
@@ -42,7 +42,6 @@ sub collect {
   my ($self, $tx) = @_;
 
   return unless $self->collecting;
-  my $ignore = $self->{ignore} ||= {map { $_ => 1 } @{$self->public_suffixes}};
 
   my $url = $tx->req->url;
   for my $cookie (@{$tx->res->cookies}) {
@@ -51,7 +50,7 @@ sub collect {
     my $host = $url->ihost;
     my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
     $domain =~ s/^\.//;
-    next if $ignore->{$domain};
+    if (my $cb = $self->ignore) { next if $cb->($cookie) }
     next if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
 
     # Validate path
@@ -158,21 +157,24 @@ L<Mojo::UserAgent::CookieJar> implements the following attributes.
 Allow L</"collect"> to L</"add"> new cookies to the jar, defaults to a true
 value.
 
+=head2 ignore
+
+  my $ignore = $jar->ignore;
+  $jar       = $jar->ignore(sub {...});
+
+A callback used to decide if a cookie should be ignored.
+
+  $jar->ignore(sub {
+    my $cookie = shift;
+    return $cookie->domain =~ /^\.?com$/;
+  });
+
 =head2 max_cookie_size
 
   my $size = $jar->max_cookie_size;
   $jar     = $jar->max_cookie_size(4096);
 
 Maximum cookie size in bytes, defaults to C<4096> (4KB).
-
-=head2 public_suffixes
-
-  my $suffixes = $jar->public_suffixes;
-  $jar         = $jar->public_suffixes(['com', 'net', 'org']);
-
-Public suffixes for which cookies should always be ignored. A comprehensive list
-of public suffixes currently being used across the internet can be found at
-L<https://publicsuffix.org>.
 
 =head1 METHODS
 

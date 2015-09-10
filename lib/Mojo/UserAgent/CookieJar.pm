@@ -49,7 +49,6 @@ sub collect {
     # Validate domain
     my $host = $url->ihost;
     my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
-    $domain =~ s/^\.//;
     if (my $cb = $self->ignore) { next if $cb->($cookie) }
     next if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
 

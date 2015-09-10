@@ -517,7 +517,7 @@ L<Mojo::UserAgent::CookieJar> object.
   my $ps = IO::Socket::SSL::PublicSuffix->default;
   $ua->cookie_jar->ignore(sub {
     my $cookie = shift;
-    return unless my $domain = $cookie->domain;
+    return undef unless my $domain = $cookie->domain;
     return ($ps->public_suffix($domain))[0] eq '';
   });
 

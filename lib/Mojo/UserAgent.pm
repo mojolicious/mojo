@@ -515,7 +515,11 @@ L<Mojo::UserAgent::CookieJar> object.
 
   # Ignore cookies for public suffixes
   my $ps = IO::Socket::SSL::PublicSuffix->default;
-  $ua->cookie_jar->ignore(sub { ($ps->public_suffix(shift->domain))[0] eq '' });
+  $ua->cookie_jar->ignore(sub {
+    my $cookie = shift;
+    return unless my $domain = $cookie->domain;
+    return ($ps->public_suffix($domain))[0] eq '';
+  });
 
   # Add custom cookie to the jar
   $ua->cookie_jar->add(

@@ -209,7 +209,7 @@ is $cookies->[1], undef, 'no more cookies';
 # Parse response cookie with invalid flag (RFC 6265)
 $cookies
   = Mojo::Cookie::Response->parse(
-      'foo="ba r"; Domain=example.com; Path=/test; Max-Age=60;'
+      'foo="ba r"; Domain=.example.com; Path=/test; Max-Age=60;'
     . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; InSecure;');
 is $cookies->[0]->name,    'foo',         'right name';
 is $cookies->[0]->value,   'ba r',        'right value';

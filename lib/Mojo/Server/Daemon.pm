@@ -392,7 +392,8 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
   ciphers=AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
 
-Cipher specification string.
+Cipher specification string. For more information about the format see
+L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
 
 =item key
 

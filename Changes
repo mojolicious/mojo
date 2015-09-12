@@ -1,7 +1,9 @@
 
-6.19  2015-09-11
+6.19  2015-09-12
   - Added code of conduct to Mojolicious::Guides::Contributing.
   - Added ignore attribute to Mojo::UserAgent::CookieJar.
+  - Added tls_version option to Mojo::IOLoop::Server::listen.
+  - Added version parameter to Mojo::Server::Daemon::listen.
 
 6.18  2015-09-02
   - Improved portability of slurp function in Mojo::Util.

@@ -158,7 +158,7 @@ sub _listen {
     reuse   => $query->param('reuse')
   };
   if (my $port = $url->port) { $options->{port} = $port }
-  $options->{"tls_$_"} = $query->param($_) for qw(ca cert ciphers key);
+  $options->{"tls_$_"} = $query->param($_) for qw(ca cert ciphers key version);
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
   delete $options->{address} if $options->{address} eq '*';
@@ -392,7 +392,7 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
   ciphers=AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
 
-Cipher specification string. For more information about the format see
+TLS cipher specification string. For more information about the format see
 L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
 
 =item key
@@ -413,6 +413,12 @@ option.
   verify=0x00
 
 TLS verification mode, defaults to C<0x03>.
+
+=item version
+
+  version=TLSv1_2
+
+TLS protocol version.
 
 =back
 

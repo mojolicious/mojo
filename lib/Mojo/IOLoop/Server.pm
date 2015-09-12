@@ -97,6 +97,7 @@ sub listen {
   $tls->{SSL_ca_file} = $args->{tls_ca}
     if $args->{tls_ca} && -T $args->{tls_ca};
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
+  $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
 }
 
 sub port { shift->{handle}->sockport }
@@ -287,7 +288,7 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
   tls_ciphers => 'AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH'
 
-Cipher specification string. For more information about the format see
+TLS cipher specification string. For more information about the format see
 L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
 
 =item tls_key
@@ -301,6 +302,12 @@ Path to the TLS key file, defaults to a built-in test key.
   tls_verify => 0x00
 
 TLS verification mode, defaults to C<0x03>.
+
+=item tls_version
+
+  tls_version => 'TLSv1_2'
+
+TLS protocol version.
 
 =back
 

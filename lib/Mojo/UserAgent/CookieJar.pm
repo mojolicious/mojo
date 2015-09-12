@@ -23,7 +23,6 @@ sub add {
     # Replace cookie
     my $origin = $cookie->origin // '';
     next unless my $domain = lc($cookie->domain // $origin);
-    $domain =~ s/^\.//;
     next unless my $path = $cookie->path;
     next if (my $name = $cookie->name // '') eq '';
     my $jar = $self->{jar}{$domain} ||= [];

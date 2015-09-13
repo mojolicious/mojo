@@ -160,11 +160,12 @@ value.
   my $ignore = $jar->ignore;
   $jar       = $jar->ignore(sub {...});
 
-A callback used to decide if a cookie should be ignored.
+A callback used to decide if a cookie should be ignored by L</"collect">.
 
   $jar->ignore(sub {
     my $cookie = shift;
-    return $cookie->domain =~ /^\.?com$/;
+    return undef unless my $domain = $cookie->domain;
+    return $domain eq 'com';
   });
 
 =head2 max_cookie_size

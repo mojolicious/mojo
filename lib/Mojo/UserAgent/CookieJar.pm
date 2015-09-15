@@ -3,8 +3,8 @@ use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
 use Mojo::Path;
+use Mojo::Util 'deprecated';
 
-has collecting => 1;
 has 'ignore';
 has max_cookie_size => 4096;
 
@@ -40,7 +40,8 @@ sub all {
 sub collect {
   my ($self, $tx) = @_;
 
-  return unless $self->collecting;
+  # DEPRECATED in Clinking Beer Mugs!
+  return unless $self->{collecting} // 1;
 
   my $url = $tx->req->url;
   for my $cookie (@{$tx->res->cookies}) {
@@ -57,6 +58,16 @@ sub collect {
     next unless _path($path, $url->path->to_abs_string);
     $self->add($cookie->path($path));
   }
+}
+
+# DEPRECATED in Clinking Beer Mugs!
+sub collecting {
+  deprecated 'Mojo::UserAgent::CookieJar::collecting is DEPRECATED in favor of'
+    . ' Mojo::UserAgent::CookieJar::ignore';
+  my $self = shift;
+  return $self->{collecting} //= 1 unless @_;
+  $self->{collecting} = shift;
+  return $self;
 }
 
 sub empty { delete shift->{jar} }
@@ -147,14 +158,6 @@ L<Mojo::UserAgent> and based on L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 L<Mojo::UserAgent::CookieJar> implements the following attributes.
 
-=head2 collecting
-
-  my $bool = $jar->collecting;
-  $jar     = $jar->collecting($bool);
-
-Allow L</"collect"> to L</"add"> new cookies to the jar, defaults to a true
-value.
-
 =head2 ignore
 
   my $ignore = $jar->ignore;
@@ -162,6 +165,10 @@ value.
 
 A callback used to decide if a cookie should be ignored by L</"collect">.
 
+  # Ignore all cookies
+  $jar->ignore(sub { 1 });
+
+  # Ignore cookies with domain "com"
   $jar->ignore(sub {
     my $cookie = shift;
     return undef unless my $domain = $cookie->domain;

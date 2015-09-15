@@ -510,8 +510,8 @@ environment variable or C<10>.
 Cookie jar to use for requests performed by this user agent, defaults to a
 L<Mojo::UserAgent::CookieJar> object.
 
-  # Disable collecting cookies from responses
-  $ua->cookie_jar->collecting(0);
+  # Ignore all cookies
+  $ua->cookie_jar->ignore(sub { 1 });
 
   # Ignore cookies for public suffixes
   my $ps = IO::Socket::SSL::PublicSuffix->default;

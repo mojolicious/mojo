@@ -1,5 +1,7 @@
 
 6.20  2015-09-15
+  - Deprecated Mojo::UserAgent::CookieJar::collecting in favor of
+    Mojo::UserAgent::CookieJar::ignore.
   - Improved support for epoll/kqueue in Mojo::IOLoop::Client.
 
 6.19  2015-09-12

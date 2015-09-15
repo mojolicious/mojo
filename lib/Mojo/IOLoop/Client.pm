@@ -86,10 +86,7 @@ sub _connect {
   }
   $handle->blocking(0);
 
-  # Wait for handle to become writable
-  weaken $self;
-  $self->reactor->io($handle => sub { $self->_ready($args) })
-    ->watch($handle, 0, 1);
+  $self->_wait($handle, $args);
 }
 
 sub _port { $_[0]{socks_port} || $_[0]{port} || ($_[0]{tls} ? 443 : 80) }
@@ -99,8 +96,15 @@ sub _ready {
 
   # Retry or handle exceptions
   my $handle = $self->{handle};
-  return $! == EINPROGRESS ? undef : $self->emit(error => $!)
-    if $handle->isa('IO::Socket::IP') && !$handle->connect;
+
+  # Handle changes in between attempts and needs to be re-added for epoll/kqueue
+  if ($handle->isa('IO::Socket::IP')) {
+    $self->reactor->remove($handle);
+    my $res = $handle->connect;
+    $self->_wait($handle, $args);
+    return $! == EINPROGRESS ? undef : $self->emit(error => $!) unless $res;
+  }
+
   return $self->emit(error => $! || 'Not connected') unless $handle->connected;
 
   # Disable Nagle's algorithm
@@ -184,6 +188,13 @@ sub _try_tls {
   return $self->emit(error => 'TLS upgrade failed')
     unless IO::Socket::SSL->start_SSL($handle, %options);
   $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
+}
+
+sub _wait {
+  my ($self, $handle, $args) = @_;
+  weaken $self;
+  $self->reactor->io($handle => sub { $self->_ready($args) })
+    ->watch($handle, 0, 1);
 }
 
 1;

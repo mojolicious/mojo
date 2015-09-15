@@ -1,5 +1,6 @@
 
-6.20  2015-09-13
+6.20  2015-09-15
+  - Improved support for epoll/kqueue in Mojo::IOLoop::Client.
 
 6.19  2015-09-12
   - Added code of conduct to Mojolicious::Guides::Contributing.

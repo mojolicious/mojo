@@ -98,11 +98,10 @@ sub _ready {
   my $handle = $self->{handle};
 
   # Socket changes in between attempts and needs to be re-added for epoll/kqueue
-  if ($handle->isa('IO::Socket::IP')) {
+  if ($handle->isa('IO::Socket::IP') && !$handle->connect) {
+    return $self->emit(error => $!) unless $! == EINPROGRESS;
     $self->reactor->remove($handle);
-    my ($res, $err) = ($handle->connect, $!);
-    $self->_wait($handle, $args);
-    return $err == EINPROGRESS ? undef : $self->emit(error => $err) unless $res;
+    return $self->_wait($handle, $args);
   }
 
   return $self->emit(error => $! || 'Not connected') unless $handle->connected;

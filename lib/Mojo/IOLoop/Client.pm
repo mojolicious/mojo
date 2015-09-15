@@ -97,7 +97,7 @@ sub _ready {
   # Retry or handle exceptions
   my $handle = $self->{handle};
 
-  # Handle changes in between attempts and needs to be re-added for epoll/kqueue
+  # Socket changes in between attempts and needs to be re-added for epoll/kqueue
   if ($handle->isa('IO::Socket::IP')) {
     $self->reactor->remove($handle);
     my $res = $handle->connect;

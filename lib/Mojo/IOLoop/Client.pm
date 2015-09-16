@@ -94,10 +94,8 @@ sub _port { $_[0]{socks_port} || $_[0]{port} || ($_[0]{tls} ? 443 : 80) }
 sub _ready {
   my ($self, $args) = @_;
 
-  # Retry or handle exceptions
-  my $handle = $self->{handle};
-
   # Socket changes in between attempts and needs to be re-added for epoll/kqueue
+  my $handle = $self->{handle};
   if ($handle->isa('IO::Socket::IP') && !$handle->connect) {
     return $self->emit(error => $!) unless $! == EINPROGRESS;
     $self->reactor->remove($handle);

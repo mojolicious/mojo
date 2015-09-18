@@ -717,7 +717,7 @@ L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<DELETE> method, which is
 implied). You can also append a callback to perform requests non-blocking.
 
-  $ua->delete('http://example.com' => sub {
+  $ua->delete('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -737,7 +737,7 @@ object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx"> (except
 for the C<GET> method, which is implied). You can also append a callback to
 perform requests non-blocking.
 
-  $ua->get('http://example.com' => sub {
+  $ua->get('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -757,7 +757,7 @@ L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<HEAD> method, which is
 implied). You can also append a callback to perform requests non-blocking.
 
-  $ua->head('http://example.com' => sub {
+  $ua->head('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -777,7 +777,7 @@ L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<OPTIONS> method, which is
 implied). You can also append a callback to perform requests non-blocking.
 
-  $ua->options('http://example.com' => sub {
+  $ua->options('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -797,7 +797,7 @@ L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PATCH> method, which is
 implied). You can also append a callback to perform requests non-blocking.
 
-  $ua->patch('http://example.com' => sub {
+  $ua->patch('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -817,7 +817,7 @@ L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<POST> method, which is
 implied). You can also append a callback to perform requests non-blocking.
 
-  $ua->post('http://example.com' => sub {
+  $ua->post('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -837,7 +837,7 @@ object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx"> (except
 for the C<PUT> method, which is implied). You can also append a callback to
 perform requests non-blocking.
 
-  $ua->put('http://example.com' => sub {
+  $ua->put('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -869,7 +869,7 @@ same arguments as L<Mojo::UserAgent::Transactor/"websocket">. The callback will
 receive either a L<Mojo::Transaction::WebSocket> or L<Mojo::Transaction::HTTP>
 object, depending on if the handshake was successful.
 
-  $ua->websocket('wss://example.com/echo' => sub {
+  $ua->websocket('wss://example.com/echo' => ['v1.proto'] => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(finish => sub {

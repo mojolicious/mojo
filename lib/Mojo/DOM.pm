@@ -518,8 +518,11 @@ as L<Mojo::DOM> objects.
   # "<p><b>123</b></p>"
   $dom->parse('<p>Test<b>123</b></p>')->at('p')->child_nodes->first->remove;
 
-  # "<!-- Test -->"
-  $dom->parse('<!-- Test --><b>123</b>')->child_nodes->first;
+  # "<!DOCTYPE html>"
+  $dom->parse('<!DOCTYPE html><b>123</b>')->child_nodes->first;
+
+  # " Test "
+  $dom->parse('<b>123</b><!-- Test -->')->child_nodes->last->content;
 
 =head2 children
 

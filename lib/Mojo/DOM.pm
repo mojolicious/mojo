@@ -401,19 +401,19 @@ L<Mojo::DOM> is a minimalistic and relaxed HTML/XML DOM parser with CSS
 selector support. It will even try to interpret broken HTML and XML, so you
 should not use it for validation.
 
-=head1 ELEMENTS AND NODES
+=head1 NODES AND ELEMENTS
 
 When we parse an HTML/XML fragment, it gets turned into a tree of nodes.
 
   <!DOCTYPE html>
   <html>
     <head><title>Hello</title></head>
-    <body>World</body>
+    <body>World!</body>
   </html>
 
-There are currently eight different node types, called C<cdata>, C<comment>,
-C<doctype>, C<pi>, C<raw>, C<root>, C<tag> and C<text>. But only nodes of the
-type C<tag> are considered elements.
+There are currently eight different kinds of nodes, C<cdata>, C<comment>,
+C<doctype>, C<pi>, C<raw>, C<root>, C<tag> and C<text>. Elements are nodes of
+the type C<tag>.
 
   root
   |- doctype (html)
@@ -422,7 +422,7 @@ type C<tag> are considered elements.
      |  +- tag (title)
      |     +- raw (Hello)
      +- tag (body)
-        +- text (World)
+        +- text (World!)
 
 While all node types are represented as L<Mojo::DOM> objects, some methods like
 L</"attr"> and L</"namespace"> only apply to elements.

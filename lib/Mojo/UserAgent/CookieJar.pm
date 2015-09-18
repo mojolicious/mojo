@@ -168,11 +168,11 @@ A callback used to decide if a cookie should be ignored by L</"collect">.
   # Ignore all cookies
   $jar->ignore(sub { 1 });
 
-  # Ignore cookies with domain "com"
+  # Ignore cookies for domains "com", "net" and "org"
   $jar->ignore(sub {
     my $cookie = shift;
     return undef unless my $domain = $cookie->domain;
-    return $domain eq 'com';
+    return $domain eq 'com' || $domain eq 'net' || $domain eq 'org';
   });
 
 =head2 max_cookie_size

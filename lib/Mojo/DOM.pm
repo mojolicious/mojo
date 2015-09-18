@@ -432,22 +432,26 @@ L</"attr"> and L</"namespace"> only apply to elements.
 L<Mojo::DOM> defaults to HTML semantics, that means all tags and attribute
 names are lowercased and selectors need to be lowercase as well.
 
+  # HTML semantics
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
   say $dom->at('p[id]')->text;
 
 If XML processing instructions are found, the parser will automatically switch
 into XML mode and everything becomes case-sensitive.
 
+  # XML semantics
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
   say $dom->at('P[ID]')->text;
 
 XML detection can also be disabled with the L</"xml"> method.
 
   # Force XML semantics
-  $dom->xml(1);
+  my $dom = Mojo::DOM->new->xml(1)->parse('<P ID="greeting">Hi!</P>');
+  say $dom->at('P[ID]')->text;
 
   # Force HTML semantics
-  $dom->xml(0);
+  my $dom = Mojo::DOM->new->xml(0)->parse('<P ID="greeting">Hi!</P>');
+  say $dom->at('p[id]')->text;
 
 =head1 METHODS
 

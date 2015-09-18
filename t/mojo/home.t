@@ -11,25 +11,25 @@ use Mojo::HelloWorld;
 use Mojo::Home;
 
 # ENV detection
+my $target = canonpath realpath cwd;
 {
   local $ENV{MOJO_HOME} = '.';
   my $home = Mojo::Home->new->detect;
   is_deeply [split /\\|\//, canonpath($home->to_string)],
-    [split /\\|\//, canonpath(realpath cwd())], 'right path detected';
+    [split /\\|\//, $target], 'right path detected';
 }
 
 # Class detection
 my $original = catdir splitdir $FindBin::Bin;
 my $home     = Mojo::Home->new->detect;
-my $target   = realpath $original;
-is_deeply [split /\\|\//, $target], [split /\\|\//, $home],
+is_deeply [split /\\|\//, realpath $original], [split /\\|\//, $home],
   'right path detected';
 
 # Specific class detection
 $INC{'MyClass.pm'} = 'MyClass.pm';
 $home = Mojo::Home->new->detect('MyClass');
 is_deeply [split /\\|\//, canonpath($home->to_string)],
-  [split /\\|\//, canonpath(realpath cwd())], 'right path detected';
+  [split /\\|\//, $target], 'right path detected';
 
 # FindBin detection
 $home = Mojo::Home->new->detect(undef);

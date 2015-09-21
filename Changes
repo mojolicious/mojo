@@ -1,5 +1,5 @@
 
-6.21  2015-09-19
+6.21  2015-09-21
 
 6.20  2015-09-15
   - Deprecated Mojo::UserAgent::CookieJar::collecting in favor of

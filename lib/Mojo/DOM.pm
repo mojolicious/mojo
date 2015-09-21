@@ -902,6 +902,30 @@ carefully since it is very dynamic.
 This node's type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw>,
 C<root>, C<tag> or C<text>.
 
+  # "cdata"
+  $dom->parse('<![CDATA[Test]]>')->child_nodes->first->type;
+
+  # "comment"
+  $dom->parse('<!-- Test -->')->child_nodes->first->type;
+
+  # "doctype"
+  $dom->parse('<!DOCTYPE html>')->child_nodes->first->type;
+
+  # "pi"
+  $dom->parse('<?xml version="1.0"?>')->child_nodes->first->type;
+
+  # "raw"
+  $dom->parse('<title>Test</title>')->at('title')->child_nodes->first->type;
+
+  # "root"
+  $dom->parse('<p>Test</p>')->type;
+
+  # "tag"
+  $dom->parse('<p>Test</p>')->at('p')->type;
+
+  # "text"
+  $dom->parse('<p>Test</p>')->at('p')->child_nodes->first->type;
+
 =head2 wrap
 
   $dom = $dom->wrap('<div></div>');

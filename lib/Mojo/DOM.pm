@@ -838,7 +838,7 @@ nodes) or L</"parent">.
 
   my $root = $dom->root;
 
-Return L<Mojo::DOM> object for root node.
+Return L<Mojo::DOM> object for C<root> node.
 
 =head2 strip
 

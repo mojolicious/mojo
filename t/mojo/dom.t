@@ -2173,6 +2173,42 @@ is $dom->at('div pre code')->all_text, "like\n  it\n    really", 'right text';
 is $dom->at('div pre code')->all_text(0), "like\n  it\n    really",
   'right text';
 
+# Form values
+$dom = Mojo::DOM->new(<<EOF);
+<form action="/foo">
+  <p>Test</p>
+  <input type="text" name="a" value="A" />
+  <input type="checkbox" checked name="b" value="B">
+  <input type="radio" checked name="c" value="C">
+  <select name="f">
+    <option value="F">G</option>
+    <optgroup>
+      <option>H</option>
+      <option selected>I</option>
+    </optgroup>
+    <option value="J" selected>K</option>
+  </select>
+  <select name="n"><option>N</option></select>
+  <select name="d"><option selected>D</option></select>
+  <textarea name="m">M</textarea>
+  <button name="o" value="O">No!</button>
+  <input type="submit" name="p" value="P" />
+</form>
+EOF
+is $dom->at('p')->val,                         undef, 'no value';
+is $dom->at('input')->val,                     'A',   'right value';
+is $dom->at('input:checked')->val,             'B',   'right value';
+is $dom->at('input:checked[type=radio]')->val, 'C',   'right value';
+is_deeply $dom->at('select')->val, ['I', 'J'], 'right values';
+is $dom->at('select option')->val,                          'F', 'right value';
+is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
+is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
+is_deeply $dom->find('select')->[1]->val, [], 'no values';
+is_deeply $dom->find('select')->last->val, ['D'], 'right values';
+is $dom->at('textarea')->val, 'M', 'right value';
+is $dom->at('button')->val,   'O', 'right value';
+is $dom->find('form input')->last->val, 'P', 'right value';
+
 # PoCo example with whitespace sensitive text
 $dom = Mojo::DOM->new(<<EOF);
 <?xml version="1.0" encoding="UTF-8"?>

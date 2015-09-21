@@ -1,5 +1,6 @@
 
 6.21  2015-09-21
+  - Added val method to Mojo::DOM.
 
 6.20  2015-09-15
   - Deprecated Mojo::UserAgent::CookieJar::collecting in favor of

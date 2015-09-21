@@ -159,6 +159,21 @@ sub tree { shift->_delegate(tree => @_) }
 
 sub type { shift->tree->[0] }
 
+sub val {
+  my $self = shift;
+
+  # "option"
+  my $tag = $self->tag;
+  return $self->{value} // $self->text if $tag eq 'option';
+
+  # "select"
+  return $self->find('option[selected]')->map('val')->to_array
+    if $tag eq 'select';
+
+  # "textarea", "input" or "button"
+  return $tag eq 'textarea' ? $self->text : $self->{value};
+}
+
 sub wrap         { shift->_wrap(0, @_) }
 sub wrap_content { shift->_wrap(1, @_) }
 
@@ -926,6 +941,24 @@ C<root>, C<tag> or C<text>.
 
   # "text"
   $dom->parse('<p>Test</p>')->at('p')->child_nodes->first->type;
+
+=head2 val
+
+  my $value = $dom->val;
+
+Extract values from C<button>, C<input>, C<option>, C<select> and C<textarea>
+elements or return C<undef> if this element has no value. In the case of
+C<select>, find C<option> elements with C<selected> attribute and return an
+array reference with all values.
+
+  # "b"
+  $dom->parse('<input name="a" value="b">')->at('input')->val;
+
+  # "c"
+  $dom->parse('<option value="c">Test</option>')->at('option')->val;
+
+  # "d"
+  $dom->parse('<option>d</option>')->at('option')->val;
 
 =head2 wrap
 

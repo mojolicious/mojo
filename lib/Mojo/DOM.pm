@@ -167,7 +167,7 @@ sub val {
   return $self->{value} // $self->text if $tag eq 'option';
 
   # "select"
-  return $self->find('option[selected]')->map('val')->to_array
+  return $self->find('option:checked')->map('val')->to_array
     if $tag eq 'select';
 
   # "textarea", "input" or "button"

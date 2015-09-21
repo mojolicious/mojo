@@ -811,7 +811,7 @@ no more siblings.
 
   my $parent = $dom->remove;
 
-Remove this node and return L</"parent">.
+Remove this node and return L</"root"> (for C<root> nodes) or L</"parent">.
 
   # "<div></div>"
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->remove;
@@ -824,7 +824,8 @@ Remove this node and return L</"parent">.
 
   my $parent = $dom->replace('<div>I ♥ Mojolicious!</div>');
 
-Replace this node with HTML/XML fragment and return L</"parent">.
+Replace this node with HTML/XML fragment and return L</"root"> (for C<root>
+nodes) or L</"parent">.
 
   # "<div><h2>123</h2></div>"
   $dom->parse('<div><h1>Test</h1></div>')->at('h1')->replace('<h2>123</h2>');

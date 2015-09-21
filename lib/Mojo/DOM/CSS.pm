@@ -386,19 +386,6 @@ An C<E> element, root of the document.
 
   my $root = $css->select(':root');
 
-=head2 E:checked
-
-A user interface element C<E> which is checked (for instance a radio-button or
-checkbox).
-
-  my $input = $css->select(':checked');
-
-=head2 E:empty
-
-An C<E> element that has no children (including text nodes).
-
-  my $empty = $css->select(':empty');
-
 =head2 E:nth-child(n)
 
 An C<E> element, the C<n-th> child of its parent.
@@ -470,6 +457,19 @@ An C<E> element, only child of its parent.
 An C<E> element, only sibling of its type.
 
   my $lonely = $css->select('div p:only-of-type');
+
+=head2 E:empty
+
+An C<E> element that has no children (including text nodes).
+
+  my $empty = $css->select(':empty');
+
+=head2 E:checked
+
+A user interface element C<E> which is checked (for instance a radio-button or
+checkbox).
+
+  my $input = $css->select(':checked');
 
 =head2 E.warning
 

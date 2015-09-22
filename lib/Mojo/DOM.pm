@@ -945,11 +945,11 @@ C<root>, C<tag> or C<text>.
 
   my $value = $dom->val;
 
-Extract value from C<button>, C<input>, C<option>, C<select> and C<textarea>
-element or return C<undef> if this element has no value. In the case of
-C<select> with C<multiple> attribute, find C<option> elements with C<selected>
-attribute and return an array reference with all values or C<undef> if none
-could be found.
+Extract value from form element (such as C<button>, C<input>, C<option>,
+C<select> and C<textarea>) or return C<undef> if this element has no value. In
+the case of C<select> with C<multiple> attribute, find C<option> elements with
+C<selected> attribute and return an array reference with all values or C<undef>
+if none could be found.
 
   # "a"
   $dom->parse('<input name="test" value="a">')->at('input')->val;

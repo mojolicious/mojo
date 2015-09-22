@@ -263,7 +263,7 @@ $t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
   ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
 
 # Correct CSRF token
-my $token = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->{value};
+my $token = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->val;
 $t->post_ok('/forgery' => form => {csrf_token => $token, foo => 'bar'})
   ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
   ->element_exists('[value=bar]')->element_exists_not('.field-with-error');

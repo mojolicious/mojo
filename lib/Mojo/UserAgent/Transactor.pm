@@ -192,7 +192,7 @@ sub _multipart {
 
   my @parts;
   for my $name (sort keys %$form) {
-    my $values = $form->{$name};
+    next unless defined(my $values = $form->{$name});
     for my $value (ref $values eq 'ARRAY' ? @$values : ($values)) {
       push @parts, my $part = Mojo::Content::Single->new;
 

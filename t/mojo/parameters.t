@@ -51,7 +51,7 @@ is_deeply $params->names, [qw(a b c foo x y z)], 'right structure';
 
 # Append
 $params = Mojo::Parameters->new('q=1');
-$params->append(a => 4, a => 5, b => 6, b => 7);
+$params->append(a => 4, a => 5, b => 6, b => 7, c => undef, c => []);
 is_deeply $params->to_hash, {a => [4, 5], b => [6, 7], q => 1},
   'right structure';
 is_deeply $params->names, [qw(a b q)], 'right structure';

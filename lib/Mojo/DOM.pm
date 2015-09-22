@@ -165,12 +165,12 @@ sub val {
   # "option"
   return $self->{value} // $self->text if (my $tag = $self->tag) eq 'option';
 
-  # "select"
-  return $self->find('option:checked')->map('val')->to_array
-    if $tag eq 'select';
-
   # "textarea", "input" or "button"
-  return $tag eq 'textarea' ? $self->text : $self->{value};
+  return $tag eq 'textarea' ? $self->text : $self->{value} if $tag ne 'select';
+
+  # "select"
+  my $v = $self->find('option:checked')->map('val');
+  return exists $self->{multiple} ? $v->size ? $v->to_array : undef : $v->last;
 }
 
 sub wrap         { shift->_wrap(0, @_) }
@@ -945,10 +945,10 @@ C<root>, C<tag> or C<text>.
 
   my $value = $dom->val;
 
-Extract values from C<button>, C<input>, C<option>, C<select> and C<textarea>
-elements or return C<undef> if this element has no value. In the case of
-C<select>, find C<option> elements with C<selected> attribute and return an
-array reference with all values.
+Extract value from C<button>, C<input>, C<option>, C<select> and C<textarea>
+element or return C<undef> if this element has no value. In the case of
+C<select> with C<multiple> attribute, find C<option> elements with C<selected>
+attribute and return an array reference with all values.
 
   # "a"
   $dom->parse('<input name="test" value="a">')->at('input')->val;
@@ -964,6 +964,10 @@ array reference with all values.
 
   # "e"
   $dom->parse('<select><option selected>e</option></select>')
+    ->at('select')->val;
+
+  # "f"
+  $dom->parse('<select multiple><option selected>f</option></select>')
     ->at('select')->val->[0];
 
 =head2 wrap

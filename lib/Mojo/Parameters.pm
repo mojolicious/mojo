@@ -21,7 +21,7 @@ sub append {
     if (ref $value eq 'ARRAY') { push @$old, $name => $_ // '' for @$value }
 
     # Single value
-    else { push @$old, $name => $value }
+    elsif (defined $value) { push @$old, $name => $value }
   }
 
   return $self;

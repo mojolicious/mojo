@@ -2189,7 +2189,11 @@ $dom = Mojo::DOM->new(<<EOF);
     <option value="J" selected>K</option>
   </select>
   <select name="n"><option>N</option></select>
-  <select name="d"><option selected>D</option></select>
+  <select multiple name="q"><option>Q</option></select>
+  <select name="d">
+    <option selected>R</option>
+    <option selected>D</option>
+  </select>
   <textarea name="m">M</textarea>
   <button name="o" value="O">No!</button>
   <input type="submit" name="p" value="P" />
@@ -2203,8 +2207,11 @@ is_deeply $dom->at('select')->val, ['I', 'J'], 'right values';
 is $dom->at('select option')->val,                          'F', 'right value';
 is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
 is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
-is_deeply $dom->find('select')->[1]->val, [], 'no values';
-is_deeply $dom->find('select')->last->val, ['D'], 'right values';
+is $dom->find('select')->[1]->val,        undef, 'no value';
+is_deeply $dom->find('select')->[2]->val, undef, 'no value';
+is $dom->find('select')->[2]->at('option')->val, 'Q', 'right value';
+is_deeply $dom->find('select')->last->val, 'D', 'right value';
+is_deeply $dom->find('select')->last->at('option')->val, 'R', 'right value';
 is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('button')->val,   'O', 'right value';
 is $dom->find('form input')->last->val, 'P', 'right value';

@@ -150,7 +150,7 @@ is $tx->req->body, 'test=12345678912', 'right content';
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {Accept => '*/*', 'Content-Type' => 'application/mojo-form'} => form =>
-    {test => 123} => charset => 'UTF-8');
+    {test => 123, nothing => undef} => charset => 'UTF-8');
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/mojo-form',
@@ -159,8 +159,10 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'test=123', 'right content';
 
 # Multipart form
-$tx = $t->tx(POST => 'http://example.com/foo' =>
-    {'Content-Type' => 'multipart/form-data'} => form => {test => 123});
+$tx
+  = $t->tx(POST => 'http://example.com/foo' =>
+    {'Content-Type' => 'multipart/form-data'} => form =>
+    {test => 123, nothing => undef});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',

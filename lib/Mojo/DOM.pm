@@ -960,14 +960,11 @@ attribute and return an array reference with all values.
   $dom->parse('<option value="c">Test</option>')->at('option')->val;
 
   # "d"
-  $dom->parse('<option>d</option>')->at('option')->val;
-
-  # "e"
-  $dom->parse('<select><option selected>e</option></select>')
+  $dom->parse('<select><option selected>d</option></select>')
     ->at('select')->val;
 
-  # "f"
-  $dom->parse('<select multiple><option selected>f</option></select>')
+  # "e"
+  $dom->parse('<select multiple><option selected>e</option></select>')
     ->at('select')->val->[0];
 
 =head2 wrap

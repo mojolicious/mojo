@@ -950,14 +950,21 @@ elements or return C<undef> if this element has no value. In the case of
 C<select>, find C<option> elements with C<selected> attribute and return an
 array reference with all values.
 
+  # "a"
+  $dom->parse('<input name="test" value="a">')->at('input')->val;
+
   # "b"
-  $dom->parse('<input name="a" value="b">')->at('input')->val;
+  $dom->parse('<textarea>b</textarea>')->at('textarea')->val;
 
   # "c"
   $dom->parse('<option value="c">Test</option>')->at('option')->val;
 
   # "d"
   $dom->parse('<option>d</option>')->at('option')->val;
+
+  # "e"
+  $dom->parse('<select><option selected>e</option></select>')
+    ->at('select')->val->[0];
 
 =head2 wrap
 

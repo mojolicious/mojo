@@ -2180,7 +2180,7 @@ $dom = Mojo::DOM->new(<<EOF);
   <input type="text" name="a" value="A" />
   <input type="checkbox" checked name="b" value="B">
   <input type="radio" checked name="c" value="C">
-  <select name="f">
+  <select multiple name="f">
     <option value="F">G</option>
     <optgroup>
       <option>H</option>

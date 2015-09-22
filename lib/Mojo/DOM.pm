@@ -163,8 +163,7 @@ sub val {
   my $self = shift;
 
   # "option"
-  my $tag = $self->tag;
-  return $self->{value} // $self->text if $tag eq 'option';
+  return $self->{value} // $self->text if (my $tag = $self->tag) eq 'option';
 
   # "select"
   return $self->find('option:checked')->map('val')->to_array

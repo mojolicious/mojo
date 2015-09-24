@@ -228,8 +228,9 @@ sub _render {
 
   # Attributes
   for my $key (sort keys %{$tree->[2]}) {
-    $result .= " $key" and next unless defined(my $value = $tree->[2]{$key});
-    $result .= " $key" . '="' . xml_escape($value) . '"';
+    my $value = $tree->[2]{$key};
+    $result .= $xml ? qq{ $key="$key"} : " $key" and next unless defined $value;
+    $result .= qq{ $key="} . xml_escape($value) . '"';
   }
 
   # No children

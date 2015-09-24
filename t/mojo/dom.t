@@ -1918,7 +1918,8 @@ is $element->parent->tag, 'XMLTest', 'right parent';
 ok $element->root->xml, 'XML mode active';
 $dom->replace('<XMLTest2 /><XMLTest3 just="works" />');
 ok $dom->xml, 'XML mode active';
-is $dom, '<XMLTest2 /><XMLTest3 just="works" />', 'right result';
+$dom->at('XMLTest2')->{foo} = undef;
+is $dom, '<XMLTest2 foo="foo" /><XMLTest3 just="works" />', 'right result';
 
 # Ensure HTML semantics
 ok !Mojo::DOM->new->xml(undef)->parse('<?xml version="1.0"?>')->xml,

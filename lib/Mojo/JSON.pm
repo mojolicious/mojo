@@ -4,13 +4,11 @@ use Mojo::Base -strict;
 use B;
 use Carp 'croak';
 use Exporter 'import';
+use JSON::PP ();
 use Mojo::Util;
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
-
-# Booleans
-my ($FALSE, $TRUE) = map { bless \(my $dummy = $_), 'Mojo::JSON::_Bool' } 0, 1;
 
 # Escaped special character map (with u2028 and u2029)
 my %ESCAPE = (
@@ -35,7 +33,7 @@ sub decode_json {
 
 sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 
-sub false () {$FALSE}
+sub false () {JSON::PP::false}
 
 sub from_json {
   my $err = _decode(\my $value, shift, 1);
@@ -49,7 +47,7 @@ sub j {
 
 sub to_json { _encode_value(shift) }
 
-sub true () {$TRUE}
+sub true () {JSON::PP::true}
 
 sub _decode {
   my $valueref = shift;
@@ -197,10 +195,10 @@ sub _decode_value {
     if /\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
 
   # True
-  return $TRUE if /\Gtrue/gc;
+  return true() if /\Gtrue/gc;
 
   # False
-  return $FALSE if /\Gfalse/gc;
+  return false() if /\Gfalse/gc;
 
   # Null
   return undef if /\Gnull/gc;
@@ -240,7 +238,7 @@ sub _encode_value {
 
     # True or false
     return $$value ? 'true' : 'false' if $ref eq 'SCALAR';
-    return $value  ? 'true' : 'false' if $ref eq 'Mojo::JSON::_Bool';
+    return $value  ? 'true' : 'false' if $ref eq 'JSON::PP::Boolean';
 
     # Blessed reference with TO_JSON method
     if (blessed $value && (my $sub = $value->can('TO_JSON'))) {
@@ -276,10 +274,6 @@ sub _throw {
 
   die "$context\n";
 }
-
-# Emulate boolean type
-package Mojo::JSON::_Bool;
-use overload '""' => sub { ${$_[0]} }, fallback => 1;
 
 1;
 

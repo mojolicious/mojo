@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+use Mojo::JSON qw(false true);
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -88,14 +89,14 @@ $t->get_ok('/accepts.html?format=json' => {Accept => 'text/plain'})
   ->status_is(200)->json_is({best => 'txt'});
 
 # Nothing
-$t->get_ok('/wants_json')->status_is(200)->json_is({wants_json => 0});
+$t->get_ok('/wants_json')->status_is(200)->json_is({wants_json => false});
 
 # Unsupported
-$t->get_ok('/wants_json.xml')->status_is(200)->json_is({wants_json => 0});
+$t->get_ok('/wants_json.xml')->status_is(200)->json_is({wants_json => false});
 
 # Accept "json"
 $t->get_ok('/wants_json' => {Accept => 'application/json'})->status_is(200)
-  ->json_is({wants_json => 1});
+  ->json_is({wants_json => true});
 
 # Ajax
 my $ajax = 'text/html;q=0.1,application/json';

@@ -95,8 +95,7 @@ sub to_array { [@{shift()}] }
 sub uniq {
   my ($self, $cb) = @_;
   my %seen;
-  return $self->new(grep { !$seen{ $cb->($_) }++ } @$self)
-    if ref $cb eq 'CODE';
+  return $self->new(grep { !$seen{$cb->($_)}++ } @$self) if $cb;
   return $self->new(grep { !$seen{$_}++ } @$self);
 }
 
@@ -344,7 +343,7 @@ representation of either the elements or the return value of the callback.
   # "foo bar baz"
   Mojo::Collection->new('foo', 'bar', 'bar', 'baz')->uniq->join(' ');
 
-  # [[1, 2, 3]]
+  # "[[1, 2, 3]]"
   Mojo::Collection->new([1, 2, 3], [3, 2, 1])->uniq(sub{ $_->[1] })->to_array;
 
 =head1 SEE ALSO

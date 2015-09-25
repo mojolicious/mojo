@@ -1,6 +1,7 @@
 
 6.22  2015-09-25
   - Improved Mojo::JSON by reusing JSON::PP boolean constants.
+  - Improved uniq method in Mojo::Collection to accept a callback. (CandyAngel)
   - Improved support for empty attributes in Mojo::DOM::HTML.
 
 6.21  2015-09-23

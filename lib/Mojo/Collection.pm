@@ -27,18 +27,18 @@ sub each {
 }
 
 sub first {
-  my ($self, $cb) = @_;
+  my ($self, $cb) = (shift, shift);
   return $self->[0] unless $cb;
-  return List::Util::first { $cb->($_) } @$self if ref $cb eq 'CODE';
-  return List::Util::first { $_ =~ $cb } @$self;
+  return List::Util::first { $_ =~ $cb } @$self if ref $cb eq 'Regexp';
+  return List::Util::first { $_->$cb(@_) } @$self;
 }
 
 sub flatten { $_[0]->new(_flatten(@{$_[0]})) }
 
 sub grep {
-  my ($self, $cb) = @_;
-  return $self->new(grep { $cb->($_) } @$self) if ref $cb eq 'CODE';
-  return $self->new(grep { $_ =~ $cb } @$self);
+  my ($self, $cb) = (shift, shift);
+  return $self->new(grep { $_ =~ $cb } @$self) if ref $cb eq 'Regexp';
+  return $self->new(grep { $_->$cb(@_) } @$self);
 }
 
 sub join {
@@ -93,9 +93,9 @@ sub tap { shift->Mojo::Base::tap(@_) }
 sub to_array { [@{shift()}] }
 
 sub uniq {
-  my ($self, $cb) = @_;
+  my ($self, $cb) = (shift, shift);
   my %seen;
-  return $self->new(grep { !$seen{$cb->($_)}++ } @$self) if $cb;
+  return $self->new(grep { !$seen{$_->$cb(@_)}++ } @$self) if $cb;
   return $self->new(grep { !$seen{$_}++ } @$self);
 }
 
@@ -192,11 +192,16 @@ to the callback and is also available as C<$_>.
   my $first = $collection->first;
   my $first = $collection->first(qr/foo/);
   my $first = $collection->first(sub {...});
+  my $first = $collection->first($method);
+  my $first = $collection->first($method, @args);
 
-Evaluate regular expression or callback for each element in collection and
-return the first one that matched the regular expression, or for which the
-callback returned true. The element will be the first argument passed to the
-callback and is also available as C<$_>.
+Evaluate regular expression/callback for, or call method on, each element in
+collection and return the first one that matched the regular expression, or for
+which the callback/method returned true. The element will be the first argument
+passed to the callback and is also available as C<$_>.
+
+  # Longer version
+  my $first = $collection->first(sub { $_->$method(@args) });
 
   # Find first value that contains the word "mojo"
   my $interesting = $collection->first(qr/mojo/i);
@@ -218,11 +223,17 @@ all elements.
 
   my $new = $collection->grep(qr/foo/);
   my $new = $collection->grep(sub {...});
+  my $new = $collection->grep($method);
+  my $new = $collection->grep($method, @args);
 
-Evaluate regular expression or callback for each element in collection and
-create a new collection with all elements that matched the regular expression,
-or for which the callback returned true. The element will be the first argument
-passed to the callback and is also available as C<$_>.
+Evaluate regular expression/callback for, or call method on, each element in
+collection and create a new collection with all elements that matched the
+regular expression, or for which the callback/method returned true. The element
+will be the first argument passed to the callback and is also available as
+C<$_>.
+
+  # Longer version
+  my $new = $collection->grep(sub { $_->$method(@args) });
 
   # Find all values that contain the word "mojo"
   my $interesting = $collection->grep(qr/mojo/i);
@@ -336,9 +347,15 @@ Turn collection into array reference.
 
   my $new = $collection->uniq;
   my $new = $collection->uniq(sub {...});
+  my $new = $collection->uniq($method);
+  my $new = $collection->uniq($method, @args);
 
 Create a new collection without duplicate elements, using the string
-representation of either the elements or the return value of the callback.
+representation of either the elements or the return value of the
+callback/method.
+
+  # Longer version
+  my $new = $collection->uniq(sub { $_->$method(@args) });
 
   # "foo bar baz"
   Mojo::Collection->new('foo', 'bar', 'bar', 'baz')->uniq->join(' ');

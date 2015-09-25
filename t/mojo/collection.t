@@ -46,6 +46,9 @@ is_deeply $collection->first(sub { ref $_ eq 'ARRAY' }), [3, 2], 'right result';
 is $collection->first(sub { shift() < 5 }), 4, 'right result';
 is $collection->first(qr/[1-4]/), 4, 'right result';
 is $collection->first(sub { ref $_ eq 'CODE' }), undef, 'no result';
+$collection = c(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9));
+is_deeply $collection->first(first => sub { $_ == 5 })->to_array, [4, 5, 6],
+  'right result';
 $collection = c();
 is $collection->first, undef, 'no result';
 is $collection->first(sub {defined}), undef, 'no result';
@@ -69,6 +72,9 @@ is_deeply $collection->grep(sub { shift == 5 })->to_array, [5],
   'right elements';
 is_deeply $collection->grep(sub { $_ < 1 })->to_array, [], 'no elements';
 is_deeply $collection->grep(sub { $_ > 9 })->to_array, [], 'no elements';
+$collection = c(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9));
+is_deeply $collection->grep(first => sub { $_ >= 5 })->flatten->to_array,
+  [4, 5, 6, 7, 8, 9], 'right result';
 
 # join
 $collection = c(1, 2, 3);
@@ -155,6 +161,9 @@ is_deeply $collection->uniq->reverse->uniq->to_array, [5, 4, 3, 2, 1],
   'right result';
 $collection = c([1, 2, 3], [3, 2, 1], [3, 1, 2]);
 is_deeply $collection->uniq(sub { $_->[1] }), [[1, 2, 3], [3, 1, 2]],
+  'right result';
+$collection = c(c(1, 2), c(1, 2), c(2, 1));
+is_deeply $collection->uniq(join => ',')->flatten->to_array, [1, 2, 2, 1],
   'right result';
 
 # TO_JSON

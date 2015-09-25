@@ -153,6 +153,9 @@ $collection = c(1, 2, 3, 2, 3, 4, 5, 4);
 is_deeply $collection->uniq->to_array, [1, 2, 3, 4, 5], 'right result';
 is_deeply $collection->uniq->reverse->uniq->to_array, [5, 4, 3, 2, 1],
   'right result';
+$collection = c([1, 2, 3], [3, 2, 1], [3, 1, 2]);
+is_deeply $collection->uniq(sub { $_->[1] }), [[1, 2, 3], [3, 1, 2]],
+  'right result';
 
 # TO_JSON
 is encode_json(c(1, 2, 3)), '[1,2,3]', 'right result';

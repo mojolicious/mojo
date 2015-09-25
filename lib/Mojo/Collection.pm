@@ -93,8 +93,11 @@ sub tap { shift->Mojo::Base::tap(@_) }
 sub to_array { [@{shift()}] }
 
 sub uniq {
+  my ($self, $cb) = @_;
   my %seen;
-  return $_[0]->new(grep { !$seen{$_}++ } @{$_[0]});
+  return $self->new(grep { !$seen{ $cb->($_) }++ } @$self)
+    if ref $cb eq 'CODE';
+  return $self->new(grep { !$seen{$_}++ } @$self);
 }
 
 sub _flatten {
@@ -333,11 +336,16 @@ Turn collection into array reference.
 =head2 uniq
 
   my $new = $collection->uniq;
+  my $new = $collection->uniq(sub {...});
 
-Create a new collection without duplicate elements.
+Create a new collection without duplicate elements, using the string
+representation of either the elements or the return value of the callback.
 
   # "foo bar baz"
   Mojo::Collection->new('foo', 'bar', 'bar', 'baz')->uniq->join(' ');
+
+  # [[1, 2, 3]]
+  Mojo::Collection->new([1, 2, 3], [3, 2, 1])->uniq(sub{ $_->[1] })->to_array;
 
 =head1 SEE ALSO
 

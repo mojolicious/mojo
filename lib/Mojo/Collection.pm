@@ -360,8 +360,8 @@ callback/method.
   # "foo bar baz"
   Mojo::Collection->new('foo', 'bar', 'bar', 'baz')->uniq->join(' ');
 
-  # "[[1, 2, 3]]"
-  Mojo::Collection->new([1, 2, 3], [3, 2, 1])->uniq(sub{ $_->[1] })->to_array;
+  # "[[1, 2], [2, 1]]"
+  Mojo::Collection->new([1, 2], [2, 1], [3, 2])->uniq(sub{ $_->[1] })->to_array;
 
 =head1 SEE ALSO
 

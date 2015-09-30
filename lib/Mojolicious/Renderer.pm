@@ -301,7 +301,8 @@ for templates to be detected.
   my $default = $renderer->default_format;
   $renderer   = $renderer->default_format('html');
 
-The default format to render if C<format> is not set in the stash.
+The default format to render if C<format> is not set in the stash, defaults to
+C<html>.
 
 =head2 default_handler
 

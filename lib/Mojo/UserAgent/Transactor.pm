@@ -75,7 +75,7 @@ sub redirect {
   $location = Mojo::URL->new($location);
   $location = $location->base($old->req->url)->to_abs unless $location->is_abs;
   my $proto = $location->protocol;
-  return undef unless $proto eq 'http' || $proto eq 'https';
+  return undef if ($proto ne 'http' && $proto ne 'https') || !$location->host;
 
   # Clone request if necessary
   my $new = Mojo::Transaction::HTTP->new;

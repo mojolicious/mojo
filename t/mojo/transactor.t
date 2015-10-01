@@ -825,6 +825,10 @@ $tx = $t->tx(GET => 'http://mojolicio.us/foo');
 $tx->res->code(302);
 $tx->res->headers->location('data:image/png;base64,helloworld123');
 is $t->redirect($tx), undef, 'unsupported redirect';
+$tx = $t->tx(GET => 'http://mojolicio.us/foo');
+$tx->res->code(302);
+$tx->res->headers->location('http:');
+is $t->redirect($tx), undef, 'unsupported redirect';
 
 # 302 redirect (relative path and query)
 $tx = $t->tx(

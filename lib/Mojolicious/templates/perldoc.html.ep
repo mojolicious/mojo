@@ -16,11 +16,14 @@
         line-height: 1.5em;
         margin: 0;
       }
-      dd { margin: 0 }
-      dl { margin-left: 1em }
+      dd {
+        margin: 0;
+        margin-left: 2em;
+      }
       dt {
         color: #2a2a2a;
         font-weight: bold;
+        margin-left: 1em;
       }
       :not(pre) > code {
         background-color: rgba(0, 0, 0, 0.04);

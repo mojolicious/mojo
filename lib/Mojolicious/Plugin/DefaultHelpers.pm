@@ -477,6 +477,8 @@ Alias for L<Mojo/"ua">.
 
 Alias for L<Mojolicious::Controller/"url_for">.
 
+  %= url_for('/index.html')->query(foo => 'bar')
+
 =head2 url_with
 
   %= url_with 'named', controller => 'bar', action => 'baz'

@@ -16,6 +16,10 @@
         line-height: 1.5em;
         margin: 0;
       }
+      dt {
+        color: #2a2a2a;
+        font-weight: bold;
+      }
       :not(pre) > code {
         background-color: rgba(0, 0, 0, 0.04);
         border-radius: 3px;

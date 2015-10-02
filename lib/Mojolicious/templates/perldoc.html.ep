@@ -16,6 +16,8 @@
         line-height: 1.5em;
         margin: 0;
       }
+      dd { margin: 0 }
+      dl { margin-left: 1em }
       dt {
         color: #2a2a2a;
         font-weight: bold;

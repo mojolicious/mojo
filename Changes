@@ -1,5 +1,5 @@
 
-6.23  2015-10-02
+6.23  2015-10-04
   - Improved documentation browser CSS.
   - Fixed small redirect bug in Mojo::UserAgent::Transactor.
 

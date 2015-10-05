@@ -131,8 +131,8 @@ L<Mojo::Transaction> implements the following attributes.
 
 =head2 kept_alive
 
-  my $kept_alive = $tx->kept_alive;
-  $tx            = $tx->kept_alive(1);
+  my $bool = $tx->kept_alive;
+  $tx      = $tx->kept_alive($bool);
 
 Connection has been kept alive.
 

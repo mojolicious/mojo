@@ -586,7 +586,7 @@ True, this is a L<Mojo::Transaction::WebSocket> object.
 
 =head2 kept_alive
 
-  my $kept_alive = $ws->kept_alive;
+  my $bool = $ws->kept_alive;
 
 Connection has been kept alive.
 

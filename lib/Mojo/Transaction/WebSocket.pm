@@ -234,15 +234,11 @@ sub server_close {
 }
 
 sub server_handshake {
-  my $self = shift;
-
+  my $self        = shift;
   my $res_headers = $self->res->headers;
   $res_headers->upgrade('websocket')->connection('Upgrade');
-  my $req_headers = $self->req->headers;
-  ($req_headers->sec_websocket_protocol // '') =~ /^\s*([^,]+)/
-    and $res_headers->sec_websocket_protocol($1);
   $res_headers->sec_websocket_accept(
-    _challenge($req_headers->sec_websocket_key));
+    _challenge($self->req->headers->sec_websocket_key));
 }
 
 sub server_open { shift->{open}++ }

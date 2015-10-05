@@ -1,6 +1,8 @@
 
-6.23  2015-10-04
+6.23  2015-10-05
   - Improved documentation browser CSS.
+  - Fixed bug in Mojo::Transaction::WebSocket where an unsupported protocol
+    could be selected automatically.
   - Fixed small redirect bug in Mojo::UserAgent::Transactor.
 
 6.22  2015-09-26

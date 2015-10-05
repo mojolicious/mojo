@@ -123,7 +123,7 @@ $t->websocket_ok('/echo')->send_ok('hello again')
 my $headers = {DNT => 1, 'Sec-WebSocket-Key' => 'NTA2MDAyMDU1NjMzNjkwMg=='};
 $t->websocket_ok('/echo' => $headers => ['foo', 'bar', 'baz'])
   ->header_is('Sec-WebSocket-Accept'   => 'I+x5C3/LJxrmDrWw42nMP4pCSes=')
-  ->header_is('Sec-WebSocket-Protocol' => 'foo')->send_ok('hello')
+  ->header_is('Sec-WebSocket-Protocol' => undef)->send_ok('hello')
   ->message_ok->message_is('echo: hello')->finish_ok;
 is $t->tx->req->headers->dnt, 1, 'right "DNT" value';
 is $t->tx->req->headers->sec_websocket_protocol, 'foo, bar, baz',

@@ -350,7 +350,7 @@ Directories to look for templates in, first one has the highest precedence.
   push @{$renderer->paths}, '/home/sri/templates';
 
   # Add another "templates" directory with higher precedence
-  unshift @{$renderer->paths}, '/home/sri/theme/blue/templates';
+  unshift @{$renderer->paths}, '/home/sri/themes/blue/templates';
 
 =head1 METHODS
 

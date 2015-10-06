@@ -198,7 +198,7 @@ Directories to serve static files from, first one has the highest precedence.
   push @{$static->paths}, '/home/sri/public';
 
   # Add another "public" directory with higher precedence
-  unshift @{$static->paths}, '/home/sri/theme/blue/public';
+  unshift @{$static->paths}, '/home/sri/themes/blue/public';
 
 =head1 METHODS
 

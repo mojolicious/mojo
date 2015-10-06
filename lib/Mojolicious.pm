@@ -438,7 +438,7 @@ L<Mojolicious::Guides::Rendering>.
   push @{$app->renderer->paths}, '/home/sri/templates';
 
   # Add another "templates" directory with higher precedence
-  unshift @{$app->renderer->paths}, '/home/sri/theme/blue/templates';
+  unshift @{$app->renderer->paths}, '/home/sri/themes/blue/templates';
 
   # Add another class with templates in DATA section
   push @{$app->renderer->classes}, 'Mojolicious::Plugin::Fun';
@@ -501,7 +501,7 @@ L<Mojolicious::Static> object.
   push @{$app->static->paths}, '/home/sri/public';
 
   # Add another "public" directory with higher precedence
-  unshift @{$app->static->paths}, '/home/sri/theme/blue/public';
+  unshift @{$app->static->paths}, '/home/sri/themes/blue/public';
 
   # Add another class with static files in DATA section
   push @{$app->static->classes}, 'Mojolicious::Plugin::Fun';

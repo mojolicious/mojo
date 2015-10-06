@@ -296,6 +296,9 @@ for templates to be detected.
   # Add another class with templates in DATA section
   push @{$renderer->classes}, 'Mojolicious::Plugin::Fun';
 
+  # Add another class with templates in DATA section and higher precedence
+  unshift @{$renderer->classes}, 'Mojolicious::Plugin::MoreFun';
+
 =head2 default_format
 
   my $default = $renderer->default_format;
@@ -345,6 +348,9 @@ Directories to look for templates in, first one has the highest precedence.
 
   # Add another "templates" directory
   push @{$renderer->paths}, '/home/sri/templates';
+
+  # Add another "templates" directory with higher precedence
+  unshift @{$renderer->paths}, '/home/sri/theme/blue/templates';
 
 =head1 METHODS
 

@@ -184,6 +184,9 @@ to be detected.
   # Add another class with static files in DATA section
   push @{$static->classes}, 'Mojolicious::Plugin::Fun';
 
+  # Add another class with static files in DATA section and higher precedence
+  unshift @{$static->classes}, 'Mojolicious::Plugin::MoreFun';
+
 =head2 paths
 
   my $paths = $static->paths;
@@ -193,6 +196,9 @@ Directories to serve static files from, first one has the highest precedence.
 
   # Add another "public" directory
   push @{$static->paths}, '/home/sri/public';
+
+  # Add another "public" directory with higher precedence
+  unshift @{$static->paths}, '/home/sri/theme/blue/public';
 
 =head1 METHODS
 

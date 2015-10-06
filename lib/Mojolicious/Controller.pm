@@ -417,8 +417,9 @@ Router results for the current request, defaults to a
 L<Mojolicious::Routes::Match> object.
 
   # Introspect
-  my $controller = $c->match->endpoint->pattern->defaults->{controller};
-  my $action     = $c->match->stack->[-1]{action};
+  my $name   = $c->match->endpoint->name;
+  my $foo    = $c->match->endpoint->pattern->defaults->{foo};
+  my $action = $c->match->stack->[-1]{action};
 
 =head2 tx
 

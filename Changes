@@ -1,4 +1,6 @@
 
+6.24  2015-10-08
+
 6.23  2015-10-06
   - Improved documentation browser CSS.
   - Fixed bug in Mojo::Transaction::WebSocket where an unsupported protocol

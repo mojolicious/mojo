@@ -59,8 +59,8 @@ Mojolicious::Command::prefork - Prefork command
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
     -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
     -h, --help                           Show this summary of available options
-        --home <path>                    Path to your applications home
-                                         directory, defaults to the value of
+        --home <path>                    Path to home directory of your
+                                         application, defaults to the value of
                                          MOJO_HOME or auto detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or 15

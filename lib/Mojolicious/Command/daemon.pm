@@ -46,8 +46,8 @@ Mojolicious::Command::daemon - Daemon command
     -c, --clients <number>               Maximum number of concurrent
                                          connections, defaults to 1000
     -h, --help                           Show this summary of available options
-        --home <path>                    Path to your applications home
-                                         directory, defaults to the value of
+        --home <path>                    Path to home directory of your
+                                         application, defaults to the value of
                                          MOJO_HOME or auto detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or 15

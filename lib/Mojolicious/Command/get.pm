@@ -147,7 +147,7 @@ Mojolicious::Command::get - Get command
     -c, --content <content>     Content to send with request
     -H, --header <name:value>   Additional HTTP header
     -h, --help                  Show this summary of available options
-        --home <path>           Path to your applications home directory,
+        --home <path>           Path to home directory of your application,
                                 defaults to the value of MOJO_HOME or auto
                                 detection
     -M, --method <method>       HTTP method to use, defaults to "GET"

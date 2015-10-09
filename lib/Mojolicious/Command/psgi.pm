@@ -18,7 +18,14 @@ Mojolicious::Command::psgi - PSGI command
 
 =head1 SYNOPSIS
 
-  Usage: APPLICATION psgi
+  Usage: APPLICATION psgi [OPTIONS]
+
+  Options:
+    -h, --help          Show this summary of available options
+        --home <path>   Path to your applications home directory, defaults to
+                        the value of MOJO_HOME or auto detection
+    -m, --mode <name>   Operating mode for your application, defaults to the
+                        value of MOJO_MODE/PLACK_ENV or "development"
 
 =head1 DESCRIPTION
 

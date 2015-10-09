@@ -146,7 +146,14 @@ Mojolicious::Command::get - Get command
                                 detection
     -c, --content <content>     Content to send with request
     -H, --header <name:value>   Additional HTTP header
+    -h, --help                  Show this summary of available options
+        --home <path>           Path to your applications home directory,
+                                defaults to the value of MOJO_HOME or auto
+                                detection
     -M, --method <method>       HTTP method to use, defaults to "GET"
+    -m, --mode <name>           Operating mode for your application, defaults to
+                                the value of MOJO_MODE/PLACK_ENV or
+                                "development"
     -r, --redirect              Follow up to 10 redirects
     -v, --verbose               Print request and response headers to STDERR
 

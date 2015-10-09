@@ -37,8 +37,13 @@ Mojolicious::Command::eval - Eval command
     ./myapp.pl eval -V 'app->renderer->paths'
 
   Options:
-    -v, --verbose   Print return value to STDOUT
-    -V              Print returned data structure to STDOUT
+    -h, --help          Show this summary of available options
+        --home <path>   Path to your applications home directory, defaults to
+                        the value of MOJO_HOME or auto detection
+    -m, --mode <name>   Operating mode for your application, defaults to the
+                        value of MOJO_MODE/PLACK_ENV or "development"
+    -v, --verbose       Print return value to STDOUT
+    -V                  Print returned data structure to STDOUT
 
 =head1 DESCRIPTION
 

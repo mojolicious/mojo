@@ -58,6 +58,10 @@ Mojolicious::Command::prefork - Prefork command
     -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 20.
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
     -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
+    -h, --help                           Show this summary of available options
+        --home <path>                    Path to your applications home
+                                         directory, defaults to the value of
+                                         MOJO_HOME or auto detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or 15
     -l, --listen <location>              One or more locations you want to
@@ -65,6 +69,9 @@ Mojolicious::Command::prefork - Prefork command
                                          MOJO_LISTEN or "http://*:3000"
     -M, --multi-accept <number>          Number of connections to accept at
                                          once, defaults to 50
+    -m, --mode <name>                    Operating mode for your application,
+                                         defaults to the value of
+                                         MOJO_MODE/PLACK_ENV or "development"
     -P, --pid-file <path>                Path to process id file, defaults to
                                          "prefork.pid" in a temporary diretory
     -p, --proxy                          Activate reverse proxy support,

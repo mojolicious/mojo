@@ -21,7 +21,10 @@ Mojolicious::Command::generate::lite_app - Lite app generator command
 
 =head1 SYNOPSIS
 
-  Usage: APPLICATION generate lite_app [NAME]
+  Usage: APPLICATION generate lite_app [OPTIONS] [NAME]
+
+  Options:
+    -h, --help   Show this summary of available options
 
 =head1 DESCRIPTION
 

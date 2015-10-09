@@ -41,6 +41,7 @@ Mojolicious::Command::test - Test command
     ./myapp.pl test -v t/foo/*.t
 
   Options:
+    -h, --help      Show this summary of available options
     -v, --verbose   Print verbose debug information to STDERR
 
 =head1 DESCRIPTION

@@ -18,7 +18,10 @@ Mojolicious::Command::generate::makefile - Makefile generator command
 
 =head1 SYNOPSIS
 
-  Usage: APPLICATION generate makefile
+  Usage: APPLICATION generate makefile [OPTIONS]
+
+  Options:
+    -h, --help   Show this summary of available options
 
 =head1 DESCRIPTION
 

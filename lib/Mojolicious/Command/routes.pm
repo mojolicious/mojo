@@ -67,8 +67,13 @@ Mojolicious::Command::routes - Routes command
   Usage: APPLICATION routes [OPTIONS]
 
   Options:
-    -v, --verbose   Print additional details about routes, flags indicate
-                    C=Conditions, D=Detour, U=Under and W=WebSocket
+    -h, --help          Show this summary of available options
+        --home <path>   Path to your applications home directory, defaults to
+                        the value of MOJO_HOME or auto detection
+    -m, --mode <name>   Operating mode for your application, defaults to the
+                        value of MOJO_MODE/PLACK_ENV or "development"
+    -v, --verbose       Print additional details about routes, flags indicate
+                        C=Conditions, D=Detour, U=Under and W=WebSocket
 
 =head1 DESCRIPTION
 

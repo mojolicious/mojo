@@ -53,7 +53,10 @@ Mojolicious::Command::generate::app - App generator command
 
 =head1 SYNOPSIS
 
-  Usage: APPLICATION generate app [NAME]
+  Usage: APPLICATION generate app [OPTIONS] [NAME]
+
+  Options:
+    -h, --help   Show this summary of available options
 
 =head1 DESCRIPTION
 

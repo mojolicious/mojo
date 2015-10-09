@@ -52,6 +52,7 @@ Mojolicious::Command::cpanify - Cpanify command
     mojo cpanify -u sri -p secr3t Mojolicious-Plugin-MyPlugin-0.01.tar.gz
 
   Options:
+    -h, --help                  Show this summary of available options
     -p, --password <password>   PAUSE password
     -u, --user <name>           PAUSE username
 

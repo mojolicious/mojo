@@ -53,7 +53,10 @@ Mojolicious::Command::version - Version command
 
 =head1 SYNOPSIS
 
-  Usage: APPLICATION version
+  Usage: APPLICATION version [OPTIONS]
+
+  Options:
+    -h, --help   Show this summary of available options
 
 =head1 DESCRIPTION
 

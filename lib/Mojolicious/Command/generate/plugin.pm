@@ -35,7 +35,10 @@ Mojolicious::Command::generate::plugin - Plugin generator command
 
 =head1 SYNOPSIS
 
-  Usage: APPLICATION generate plugin [NAME]
+  Usage: APPLICATION generate plugin [OPTIONS] [NAME]
+
+  Options:
+    -h, --help   Show this summary of available options
 
 =head1 DESCRIPTION
 

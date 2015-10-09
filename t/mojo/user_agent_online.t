@@ -204,7 +204,9 @@ is $tx->res->code,   200,                       'right status';
 # HTTPS request that requires SNI
 SKIP: {
   skip 'SNI support required!', 1 unless IO::Socket::SSL->can_client_sni;
-  like $ua->get('https://sni.velox.ch')->res->body, qr/Great!/, 'with SNI';
+  $tx = $ua->get('https://cpanmin.us');
+  is $tx->res->code, 302, 'right status';
+  like $tx->res->headers->location, qr/github/, 'right "Location" header';
 }
 
 # Fresh user agent again

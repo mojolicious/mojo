@@ -204,10 +204,7 @@ is $tx->res->code,   200,                       'right status';
 # HTTPS request that requires SNI
 SKIP: {
   skip 'SNI support required!', 1 unless IO::Socket::SSL->can_client_sni;
-
-  $tx = $ua->get('https://google.de');
-  like $ua->ioloop->stream($tx->connection)
-    ->handle->peer_certificate('commonName'), qr/google\.de/, 'right name';
+  like $ua->get('https://sni.velox.ch')->res->body, qr/Great!/, 'with SNI';
 }
 
 # Fresh user agent again

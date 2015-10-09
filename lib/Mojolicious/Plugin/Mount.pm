@@ -8,6 +8,7 @@ sub register {
 
   my $path  = (keys %$conf)[0];
   my $embed = Mojo::Server->new->load_app($conf->{$path});
+  $embed->secrets($app->secrets);
 
   # Extract host
   my $host;

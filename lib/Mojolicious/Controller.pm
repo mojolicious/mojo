@@ -78,7 +78,7 @@ sub every_param {
 sub every_signed_cookie {
   my ($self, $name) = @_;
 
-  my $secrets = $self->stash->{'mojo.secrets'};
+  my $secrets = $self->app->secrets;
   my @results;
   for my $value (@{$self->every_cookie($name)}) {
 
@@ -283,8 +283,7 @@ sub signed_cookie {
   return $self->every_signed_cookie($name)->[-1] unless defined $value;
 
   # Response cookie
-  my $checksum
-    = Mojo::Util::hmac_sha1_sum($value, $self->stash->{'mojo.secrets'}[0]);
+  my $checksum = Mojo::Util::hmac_sha1_sum($value, $self->app->secrets->[0]);
   return $self->cookie($name, "$value--$checksum", $options);
 }
 

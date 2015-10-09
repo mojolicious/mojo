@@ -65,7 +65,6 @@ sub build_controller {
   # Embedded application
   my $stash = {};
   if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
-  $stash->{'mojo.secrets'} //= $self->secrets;
 
   # Build default controller
   my $defaults = $self->defaults;

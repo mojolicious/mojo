@@ -1,5 +1,6 @@
 
 6.24  2015-10-09
+  - Improved session security by not storing secrets in the stash.
   - Improved commands to show all options that can affect their behavior.
 
 6.23  2015-10-06

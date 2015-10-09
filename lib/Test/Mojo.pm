@@ -259,7 +259,7 @@ sub request_ok { shift->_request_ok($_[0], $_[0]->req->url->to_string) }
 
 sub reset_session {
   my $self = shift;
-  if (my $jar = $self->ua->cookie_jar) { $jar->empty }
+  $self->ua->cookie_jar->empty;
   return $self->tx(undef);
 }
 
@@ -497,9 +497,7 @@ L<Mojo::Transaction::WebSocket> object.
   # More specific tests
   is $t->tx->res->json->{foo}, 'bar', 'right value';
   ok $t->tx->res->content->is_multipart, 'multipart content';
-
-  # Test custom transactions
-  $t->tx($t->tx->previous)->status_is(302)->header_like(Location => qr/foo/);
+  is $t->tx->previous->res->code, 302, 'right status';
 
 =head2 ua
 

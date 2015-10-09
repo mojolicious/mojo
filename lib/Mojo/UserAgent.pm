@@ -253,7 +253,7 @@ sub _finish {
   # Finish WebSocket
   return $self->_remove($id, 1) if $old->is_websocket;
 
-  if (my $jar = $self->cookie_jar) { $jar->collect($old) }
+  $self->cookie_jar->collect($old);
 
   # Upgrade connection to WebSocket
   if (my $new = $self->transactor->upgrade($old)) {

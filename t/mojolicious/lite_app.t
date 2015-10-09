@@ -969,9 +969,10 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->text_is('div#☃' => 'Redirect works!')->text_unlike('div#☃' => qr/Foo/)
   ->text_like('div#☃' => qr/^Redirect/);
 $t->ua->max_redirects(0);
-Test::Mojo->new->tx($t->tx->previous)->status_is(302)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_like(Location => qr!/template.txt$!)->content_is('');
+is $t->tx->previous->res->code, 302, 'right status';
+like $t->tx->previous->res->headers->location, qr!/template.txt$!,
+  'right "Location" value';
+is $t->tx->previous->res->body, '', 'right content';
 
 # Request with koi8-r content
 my $koi8

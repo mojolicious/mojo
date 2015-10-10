@@ -66,9 +66,7 @@ sub _content {
 }
 
 sub _csrf_token {
-  my $c = shift;
-  $c->session->{csrf_token}
-    ||= sha1_sum $c->app->secrets->[0] . steady_time . rand 999;
+  shift->session->{csrf_token} ||= sha1_sum $$ . steady_time . rand 999;
 }
 
 sub _current_route {

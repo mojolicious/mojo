@@ -1,8 +1,7 @@
 package Mojolicious::Validator::Validation;
 use Mojo::Base -base;
 
-use Carp ();
-use Mojo::Util 'secure_compare';
+use Carp         ();
 use Scalar::Util ();
 
 has [qw(csrf_token topic validator)];
@@ -39,7 +38,7 @@ sub csrf_protect {
   my $self  = shift;
   my $token = $self->input->{csrf_token};
   $self->error(csrf_token => ['csrf_protect'])
-    unless $token && secure_compare($token, $self->csrf_token // '');
+    unless $token && $token eq ($self->csrf_token // '');
   return $self;
 }
 

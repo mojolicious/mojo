@@ -1442,9 +1442,20 @@ generating bytes instead.
     return 1;
   });
 
-  get '/' => {storable => {i => '♥ mojolicious'}, handler => 'storable'};
+  # Set "handler" value automatically if "storable" value is set already
+  app->hook(before_render => sub {
+    my ($c, $args) = @_;
+    $args->{handler} = 'storable'
+      if exists $args->{storable} || exists $c->stash->{storable};
+  });
+
+  get '/' => {storable => {i => '♥ mojolicious'}};
 
   app->start;
+
+The hook L<Mojolicious/"before_render"> can be used to make stash values like
+C<storable> special, so that they no longer require a C<handler> value to be set
+explicitly.
 
 =head1 MORE
 

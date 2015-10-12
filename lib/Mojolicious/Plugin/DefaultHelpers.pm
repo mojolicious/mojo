@@ -5,7 +5,7 @@ use Mojo::ByteStream;
 use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
-use Mojo::Util qw(dumper sha1_sum steady_time);
+use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
 
 sub register {
   my ($self, $app) = @_;
@@ -66,7 +66,9 @@ sub _content {
 }
 
 sub _csrf_token {
-  shift->session->{csrf_token} ||= sha1_sum $$ . steady_time . rand 999;
+  my $c = shift;
+  return $c->session->{csrf_token}
+    ||= hmac_sha1_sum $$ . steady_time . rand 999, $c->app->secrets->[0];
 }
 
 sub _current_route {

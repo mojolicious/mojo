@@ -1,7 +1,7 @@
 
-6.24  2015-10-10
-  - Improved session security by not storing secrets in the stash and not using
-    secrets to generate the CSRF token.
+6.24  2015-10-12
+  - Improved session security by not storing secrets in the stash and making
+    CSRF tokens much harder to guess.
   - Improved commands to show all options that can affect their behavior.
 
 6.23  2015-10-06

@@ -1457,6 +1457,12 @@ The hook L<Mojolicious/"before_render"> can be used to make stash values like
 C<storable> special, so that they no longer require a C<handler> value to be set
 explicitly.
 
+  # Explicit "handler" value
+  $c->render(storable => {i => '♥ mojolicious'}, handler => 'storable');
+
+  # Implicit "handler" value (with "before_render" hook)
+  $c->render(storable => {i => '♥ mojolicious'});
+
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the

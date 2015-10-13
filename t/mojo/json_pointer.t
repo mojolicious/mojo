@@ -32,6 +32,8 @@ is $pointer->new({foo => {bar => 42}})->get('/foo/bar'), 42,
 is_deeply $pointer->new({foo => {23 => {baz => 0}}})->get('/foo/23'),
   {baz => 0}, '"/foo/23" is "{baz => 0}"';
 is $pointer->new({foo => {'' => 42}})->get('/foo/'), 42, '"/foo/" is "42"';
+is $pointer->new({foo => {'' => {'' => 42}}})->get('/foo//'), 42,
+  '"/foo//" is "42"';
 
 # "get" (mixed)
 is_deeply $pointer->new({foo => {bar => [1, 2, 3]}})->get('/foo/bar'),

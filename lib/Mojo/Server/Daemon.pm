@@ -21,7 +21,9 @@ sub DESTROY {
   my $self = shift;
   $self->_remove($_) for keys %{$self->{connections} || {}};
   my $loop = $self->ioloop;
-  $loop->remove($_) for @{$self->acceptors};
+  if (defined $loop) {
+      $loop->remove($_) for @{$self->acceptors};
+  }
 }
 
 sub run {
@@ -209,7 +211,7 @@ sub _read {
 
 sub _remove {
   my ($self, $id) = @_;
-  $self->ioloop->remove($id);
+  $self->ioloop->remove($id) if (defined $self->ioloop);
   $self->_close($id);
 }
 

@@ -168,14 +168,14 @@ sub _limit {
 sub _maybe_accepting {
   my $self = shift;
   return if $self->{accepting} || $self->_limit;
-  $_->start for values %{$self->{acceptors} || {}};
+  defined $_ && $_->start for values %{$self->{acceptors} || {}};
   $self->{accepting} = 1;
 }
 
 sub _not_accepting {
   my $self = shift;
   return $self unless delete $self->{accepting};
-  $_->stop for values %{$self->{acceptors} || {}};
+  defined $_ && $_->stop for values %{$self->{acceptors} || {}};
   return $self;
 }
 

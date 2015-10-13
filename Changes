@@ -3,7 +3,7 @@
   - Improved session security by not storing secrets in the stash and making
     CSRF tokens much harder to guess.
   - Improved commands to show all options that can affect their behavior.
-  - Fixed bug in Mojo::JSON::Pointer that prevented JSON Pointers with traling
+  - Fixed bug in Mojo::JSON::Pointer that prevented JSON Pointers with trailing
     slash from working correctly. (dolmen)
 
 6.23  2015-10-06

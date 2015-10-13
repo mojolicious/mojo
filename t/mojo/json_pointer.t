@@ -4,9 +4,10 @@ use Test::More;
 use Mojo::JSON::Pointer;
 
 # "contains" (hash)
-my $pointer = Mojo::JSON::Pointer->new({foo => 23});
+my $pointer = Mojo::JSON::Pointer->new({foo => 23, '' => 'a'});
 ok $pointer->contains(''),     'contains ""';
 ok $pointer->contains('/foo'), 'contains "/foo"';
+ok $pointer->contains('/'), 'contains "/"'; # the zero-length key
 ok !$pointer->contains('/bar'), 'does not contains "/bar"';
 ok $pointer->new({foo => {bar => undef}})->contains('/foo/bar'),
   'contains "/foo/bar"';
@@ -15,16 +16,21 @@ ok $pointer->new({foo => {bar => undef}})->contains('/foo/bar'),
 $pointer = Mojo::JSON::Pointer->new({foo => [0, 1, 2]});
 ok $pointer->contains(''),       'contains ""';
 ok $pointer->contains('/foo/0'), 'contains "/foo/0"';
+ok !$pointer->contains('/'),        'does not contain "/"'; # the 0-length key
 ok !$pointer->contains('/foo/9'),   'does not contain "/foo/9"';
 ok !$pointer->contains('/foo/bar'), 'does not contain "/foo/bar"';
 ok !$pointer->contains('/0'),       'does not contain "/0"';
 
 # "get" (hash)
-$pointer = Mojo::JSON::Pointer->new({foo => 'bar'});
-is_deeply $pointer->get(''), {foo => 'bar'}, '"" is "{foo => "bar"}"';
+$pointer = Mojo::JSON::Pointer->new({foo => 'bar', '' => 'a'});
+is_deeply $pointer->get(''), {foo => 'bar', '' => 'a'},
+  '"" is "{foo => "bar", "" => "a"}"';
 is $pointer->get('/foo'), 'bar', '"/foo" is "bar"';
+is $pointer->get('/'),    'a', '"/" is "a"';
 is $pointer->new({foo => {bar => 42}})->get('/foo/bar'), 42,
   '"/foo/bar" is "42"';
+is $pointer->new({foo => {'' => 42}})->get('/foo/'), 42,
+  '"/foo/" is "42"';
 is_deeply $pointer->new({foo => {23 => {baz => 0}}})->get('/foo/23'),
   {baz => 0}, '"/foo/23" is "{baz => 0}"';
 

@@ -654,6 +654,12 @@ is $url->path->parts->[0], '100%_fun', 'right part';
 is $url->path, '/100%25_fun', 'right path';
 is "$url", 'http://mojolicio.us/100%25_fun', 'right format';
 
+# Trailing dot
+$url = Mojo::URL->new('http://☃.net./♥');
+is $url->ihost, 'xn--n3h.net.', 'right internationalized host';
+is $url->host,  '☃.net.',     'right host';
+is "$url", 'http://xn--n3h.net./%E2%99%A5', 'right format';
+
 # No charset
 $url = Mojo::URL->new;
 $url->path->charset(undef);

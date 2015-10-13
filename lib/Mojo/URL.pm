@@ -54,7 +54,7 @@ sub ihost {
 
   # Decode
   return $self->host(join '.',
-    map { /^xn--(.+)$/ ? punycode_decode($_) : $_ } split /\./, shift)
+    map { /^xn--(.+)$/ ? punycode_decode($_) : $_ } split(/\./, shift, -1))
     if @_;
 
   # Check if host needs to be encoded
@@ -63,8 +63,8 @@ sub ihost {
 
   # Encode
   return lc join '.',
-    map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ } split /\./,
-    $host;
+    map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ }
+    split(/\./, $host, -1);
 }
 
 sub is_abs { !!shift->scheme }

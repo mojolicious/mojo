@@ -1,5 +1,6 @@
 
 6.25  2015-10-14
+  - Fixed "0" value bug in Mojo::JSON::Pointer.
 
 6.24  2015-10-13
   - Improved session security by not storing secrets in the stash and making

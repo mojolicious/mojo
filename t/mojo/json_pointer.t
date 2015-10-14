@@ -12,6 +12,13 @@ ok !$pointer->contains('/bar'), 'does not contains "/bar"';
 ok $pointer->new({foo => {bar => undef}})->contains('/foo/bar'),
   'contains "/foo/bar"';
 
+# "contains" (string)
+$pointer = Mojo::JSON::Pointer->new('works');
+ok $pointer->contains(''), 'contains ""';
+ok !$pointer->contains('/'),    'does not contain "/"';
+ok !$pointer->contains('/foo'), 'does not contain "/foo"';
+ok $pointer->new('0')->contains(''), 'contains ""';
+
 # "contains" (mixed)
 $pointer = Mojo::JSON::Pointer->new({foo => [0, 1, 2]});
 ok $pointer->contains(''),       'contains ""';
@@ -35,14 +42,21 @@ is $pointer->new({foo => {'' => 42}})->get('/foo/'), 42, '"/foo/" is "42"';
 is $pointer->new({foo => {'' => {'' => 42}}})->get('/foo//'), 42,
   '"/foo//" is "42"';
 
+# "get" (string)
+$pointer = Mojo::JSON::Pointer->new('works');
+is $pointer->get(''),     'works', '"" is "works"';
+is $pointer->get('/'),    undef,   '"/" is undef';
+is $pointer->get('/foo'), undef,   '"/foo" is undef';
+is $pointer->new('0')->get(''), 0, '"/foo" is "0"';
+
 # "get" (mixed)
 is_deeply $pointer->new({foo => {bar => [1, 2, 3]}})->get('/foo/bar'),
   [1, 2, 3], '"/foo/bar" is "[1, 2, 3]"';
 $pointer = Mojo::JSON::Pointer->new({foo => {bar => [0, undef, 3]}});
 is $pointer->get('/foo/bar/0'), 0,     '"/foo/bar/0" is "0"';
-is $pointer->get('/foo/bar/1'), undef, '"/foo/bar/1" is "undef"';
+is $pointer->get('/foo/bar/1'), undef, '"/foo/bar/1" is undef';
 is $pointer->get('/foo/bar/2'), 3,     '"/foo/bar/2" is "3"';
-is $pointer->get('/foo/bar/6'), undef, '"/foo/bar/6" is "undef"';
+is $pointer->get('/foo/bar/6'), undef, '"/foo/bar/6" is undef';
 
 # "get" (encoded)
 is $pointer->new([{'foo/bar' => 'bar'}])->get('/0/foo~1bar'), 'bar',

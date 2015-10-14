@@ -12,7 +12,7 @@ sub _pointer {
   my ($self, $contains, $pointer) = @_;
 
   my $data = $self->data;
-  return $data unless $pointer =~ s!^/!!;
+  return $contains ? 1 : $data unless $pointer =~ s!^/!!;
   for my $p ($pointer eq '' ? ($pointer) : (split '/', $pointer, -1)) {
     $p =~ s!~1!/!g;
     $p =~ s/~0/~/g;
@@ -77,6 +77,7 @@ Check if L</"data"> contains a value that can be identified with the given JSON
 Pointer.
 
   # True
+  Mojo::JSON::Pointer->new('just a string')->contains('');
   Mojo::JSON::Pointer->new({'♥' => 'mojolicious'})->contains('/♥');
   Mojo::JSON::Pointer->new({foo => 'bar', baz => [4, 5]})->contains('/foo');
   Mojo::JSON::Pointer->new({foo => 'bar', baz => [4, 5]})->contains('/baz/1');
@@ -91,6 +92,9 @@ Pointer.
   my $value = $pointer->get('/foo/bar');
 
 Extract value from L</"data"> identified by the given JSON Pointer.
+
+  # "just a string"
+  Mojo::JSON::Pointer->new('just a string')->get('');
 
   # "mojolicious"
   Mojo::JSON::Pointer->new({'♥' => 'mojolicious'})->get('/♥');

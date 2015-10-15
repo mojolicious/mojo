@@ -1,6 +1,8 @@
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
+use Mojo::Util 'trim';
+
 has 'tree';
 
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
@@ -72,7 +74,7 @@ sub _combinator {
 }
 
 sub _compile {
-  my $css = "$_[0]";
+  my $css = trim "$_[0]";
 
   my $group = [[]];
   while (my $selectors = $group->[-1]) {

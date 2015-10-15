@@ -2432,6 +2432,11 @@ is $dom->at('span + b')->text, 'b', 'right text';
 is $dom->at('b + span')->text, 'c', 'right text';
 is "$dom", '<span>a</span><b>b</b><span>c</span>', 'right result';
 
+# Selectors with leading and trailing whitespace
+$dom = Mojo::DOM->new('<div id=foo><b>works</b></div>');
+is $dom->at(' div   b ')->text,          'works', 'right text';
+is $dom->at('  :not(  #foo  )  ')->text, 'works', 'right text';
+
 # "0"
 $dom = Mojo::DOM->new('0');
 is "$dom", '0', 'right result';

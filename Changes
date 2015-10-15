@@ -1,5 +1,7 @@
 
-6.25  2015-10-14
+6.25  2015-10-15
+  - Improved Mojo::DOM::CSS to support selectors with leading and trailing
+    whitespace.
   - Fixed "0" value bug in Mojo::JSON::Pointer.
 
 6.24  2015-10-13

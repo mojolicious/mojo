@@ -1036,8 +1036,10 @@ Less commonly used and more powerful features.
 
 =head2 Serving static files
 
-Static files are automatically served from your C<DATA> sections and C<public>
-directories, and if that's not enough you can also serve them manually with
+Static files are automatically served from the C<public> directories of the
+application, which can be customized with L<Mojolicious::Static/"paths">, or one
+of the C<DATA> sections from L<Mojolicious::Static/"classes">. And if that's not
+enough you can also serve them manually with
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
 
   use Mojolicious::Lite;

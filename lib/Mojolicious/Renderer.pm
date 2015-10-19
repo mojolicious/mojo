@@ -390,7 +390,9 @@ Register a new helper.
     handler        => 'epl'
   });
 
-Get a C<DATA> section template by name, usually used by handlers.
+Get a C<DATA> section template from L</"classes"> for an options hash reference
+with C<template>, C<format>, C<variant> and C<handler> values, usually used by
+handlers.
 
 =head2 get_helper
 
@@ -424,8 +426,8 @@ Generate default template name for L<Mojolicious::Controller> object.
     format   => 'html'
   });
 
-Detect handler based on an options hash reference with C<template> and
-C<format>.
+Detect handler for an options hash reference with C<template>, C<format> and
+C<variant> values.
 
 =head2 template_name
 
@@ -435,8 +437,8 @@ C<format>.
     handler  => 'epl'
   });
 
-Builds a template name based on an options hash reference with C<template>,
-C<format> and C<handler>, usually used by handlers.
+Build a template name for an options hash reference with C<template>, C<format>,
+C<variant> and C<handler> values, usually used by handlers.
 
 =head2 template_path
 
@@ -446,8 +448,8 @@ C<format> and C<handler>, usually used by handlers.
     handler  => 'epl'
   });
 
-Builds a full template path based on an options hash reference with
-C<template>, C<format> and C<handler>, usually used by handlers.
+Build a full template path for an options hash reference with C<template>,
+C<format>, C<variant> and C<handler> values, usually used by handlers.
 
 =head1 SEE ALSO
 

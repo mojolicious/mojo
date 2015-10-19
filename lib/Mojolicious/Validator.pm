@@ -85,8 +85,8 @@ String value needs to match the regular expression.
 
   $validation = $validation->size(2, 5);
 
-String value length or size of L<Mojo::Upload> object needs to be between these
-two values.
+String value length or size of L<Mojo::Upload> object in bytes needs to be
+between these two values.
 
 =head2 upload
 

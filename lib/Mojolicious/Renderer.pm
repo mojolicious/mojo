@@ -24,10 +24,8 @@ has helpers => sub { {} };
 has paths   => sub { [] };
 
 # Bundled templates
-my $HOME = Mojo::Home->new;
-$HOME->parse(
-  $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
-my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
+my $TEMPLATES = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
+  ->rel_dir('Mojolicious/templates');
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 
@@ -201,15 +199,13 @@ sub template_path {
   return undef unless my $name = $self->template_name(shift);
 
   # Search all paths
-  for my $path (@{$self->paths}) {
+  for my $path (@{$self->paths}, $TEMPLATES) {
     my $file = catfile $path, split('/', $name);
     return $file if -r $file;
   }
 
   return undef;
 }
-
-sub _bundled { $TEMPLATES{"@{[pop]}.html.ep"} }
 
 sub _extends {
   my ($self, $stash) = @_;
@@ -240,7 +236,8 @@ sub _warmup {
 
   # Handlers for templates
   s/\.(\w+)$// and push @{$templates->{$_}}, $1
-    for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
+    for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths},
+    $TEMPLATES;
 
   # Handlers and classes for DATA templates
   for my $class (reverse @{$self->classes}) {

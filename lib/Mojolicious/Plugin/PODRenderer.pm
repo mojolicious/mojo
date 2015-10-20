@@ -77,8 +77,7 @@ sub _html {
 
   # Combine everything to a proper response
   $c->content_for(perldoc => "$dom");
-  my $template = $c->app->renderer->_bundled('perldoc');
-  $c->render(inline => $template, title => $title, parts => \@parts);
+  $c->render('mojo/perldoc', title => $title, parts => \@parts);
 }
 
 sub _perldoc {

@@ -105,14 +105,14 @@ sub _development {
     status   => $page eq 'exception' ? 500 : 404,
     template => "$page.$mode"
   };
-  my $inline = $renderer->_bundled($mode eq 'development' ? $mode : $page);
-  return $c if _fallbacks($c, $options, $page, $inline);
-  _fallbacks($c, {%$options, format => 'html'}, $page, $inline);
+  my $bundled = 'mojo/' . ($mode eq 'development' ? $mode : $page);
+  return $c if _fallbacks($c, $options, $page, $bundled);
+  _fallbacks($c, {%$options, format => 'html'}, $page, $bundled);
   return $c;
 }
 
 sub _fallbacks {
-  my ($c, $options, $template, $inline) = @_;
+  my ($c, $options, $template, $bundled) = @_;
 
   # Mode specific template
   return 1 if $c->render_maybe(%$options);
@@ -124,7 +124,7 @@ sub _fallbacks {
   my $stash = $c->stash;
   return undef unless $stash->{format} eq 'html';
   delete @$stash{qw(extends layout)};
-  return $c->render_maybe(%$options, inline => $inline, handler => 'ep');
+  return $c->render_maybe($bundled, %$options, handler => 'ep');
 }
 
 sub _inactivity_timeout {

@@ -90,7 +90,7 @@
     </style>
   </head>
   <body>
-    %= include inline => app->renderer->_bundled('mojobar')
+    %= include 'mojo/mojobar'
     <div id="wrapperlicious">
       <div id="perldoc">
         <div id="source">

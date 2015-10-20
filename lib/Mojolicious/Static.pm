@@ -13,8 +13,8 @@ has classes => sub { ['main'] };
 has paths   => sub { [] };
 
 # Bundled files
-my $HOME   = Mojo::Home->new;
-my $PUBLIC = $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/public');
+my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
+  ->rel_dir('Mojolicious/public');
 
 sub dispatch {
   my ($self, $c) = @_;

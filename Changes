@@ -2,6 +2,8 @@
 6.25  2015-10-20
   - Improved Mojo::DOM::CSS to support selectors with leading and trailing
     whitespace.
+  - Improved rendering of built-in templates to show actual template names in
+    log messages.
   - Fixed "0" value bug in Mojo::JSON::Pointer.
 
 6.24  2015-10-13

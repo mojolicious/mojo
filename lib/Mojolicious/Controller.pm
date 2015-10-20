@@ -635,8 +635,7 @@ Render content with L<Mojolicious/"renderer"> and emit hooks
 L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render">, or
 call L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found"> if no
 response could be generated, all additional key/value pairs get merged into the
-L</"stash">. Note that all templates with a C<mojo/*> prefix are reserved for
-internal use.
+L</"stash">.
 
   # Render characters
   $c->render(text => 'I ♥ Mojolicious!');

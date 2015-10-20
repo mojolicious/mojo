@@ -1,5 +1,6 @@
 
-6.25  2015-10-20
+6.25  2015-10-21
+  - Moved all bundled files into "resources" directories.
   - Improved Mojo::DOM::CSS to support selectors with leading and trailing
     whitespace.
   - Improved rendering of built-in templates to show actual template names in

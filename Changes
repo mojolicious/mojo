@@ -1,7 +1,7 @@
 
 6.25  2015-10-21
-  - Deprecated boolean and string arguments of Mojo::Message::Request::proxy in
-    favor of Mojo::Message::Request::via_proxy.
+  - Deprecated Mojo::Message::Request::proxy with boolean and string arguments
+    in favor of Mojo::Message::Request::via_proxy.
   - Replaced proxy method in Mojo::Message::Request with an attribute.
   - Moved all bundled files into "resources" directories.
   - Added via_proxy attribute to Mojo::Message::Request.

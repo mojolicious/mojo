@@ -323,21 +323,28 @@ is(($t->endpoint($tx))[2], 80,             'right port');
 
 # Simple endpoint with proxy
 $tx = $t->tx(GET => 'http://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->endpoint($tx))[0], 'http',      'right scheme');
 is(($t->endpoint($tx))[1], '127.0.0.1', 'right host');
 is(($t->endpoint($tx))[2], 3000,        'right port');
 
+# Simple endpoint with deactivated proxy
+$tx = $t->tx(GET => 'http://mojolicio.us');
+$tx->req->via_proxy(0)->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
+is(($t->endpoint($tx))[0], 'http',         'right scheme');
+is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
+is(($t->endpoint($tx))[2], 80,             'right port');
+
 # Simple endpoint with SOCKS proxy
 $tx = $t->tx(GET => 'http://mojolicio.us');
-$tx->req->proxy('socks://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('socks://127.0.0.1:3000'));
 is(($t->endpoint($tx))[0], 'http',         'right scheme');
 is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 80,             'right port');
 
 # Simple WebSocket endpoint with proxy
 $tx = $t->websocket('ws://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->endpoint($tx))[0], 'http',         'right scheme');
 is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 80,             'right port');
@@ -350,21 +357,21 @@ is(($t->endpoint($tx))[2], 443,            'right port');
 
 # HTTPS endpoint with proxy
 $tx = $t->tx(GET => 'https://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->endpoint($tx))[0], 'https',        'right scheme');
 is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 443,            'right port');
 
 # HTTPS endpoint with SOCKS proxy
 $tx = $t->tx(GET => 'https://mojolicio.us');
-$tx->req->proxy('socks://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('socks://127.0.0.1:3000'));
 is(($t->endpoint($tx))[0], 'https',        'right scheme');
 is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 443,            'right port');
 
 # TLS WebSocket endpoint with proxy
 $tx = $t->websocket('WSS://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->endpoint($tx))[0], 'https',        'right scheme');
 is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 443,            'right port');
@@ -377,35 +384,35 @@ is(($t->peer($tx))[2], 80,             'right port');
 
 # Simple peer with proxy
 $tx = $t->tx(GET => 'http://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
 
 # Simple peer with SOCKS proxy
 $tx = $t->tx(GET => 'http://mojolicio.us');
-$tx->req->proxy('socks://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('socks://127.0.0.1:3000'));
 is(($t->peer($tx))[0], 'socks',     'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
 
 # Simple peer with proxy (no port)
 $tx = $t->tx(GET => 'http://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1'));
 is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 80,          'right port');
 
 # Simple peer with HTTPS proxy (no port)
 $tx = $t->tx(GET => 'http://mojolicio.us');
-$tx->req->proxy('HTTPS://127.0.0.1');
+$tx->req->proxy(Mojo::URL->new('HTTPS://127.0.0.1'));
 is(($t->peer($tx))[0], 'https',     'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 443,         'right port');
 
 # Simple WebSocket peer with proxy
 $tx = $t->websocket('ws://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
@@ -418,21 +425,21 @@ is(($t->peer($tx))[2], 443,            'right port');
 
 # HTTPS peer with proxy
 $tx = $t->tx(GET => 'https://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
 
 # HTTPS peer with SOCKS proxy
 $tx = $t->tx(GET => 'https://mojolicio.us');
-$tx->req->proxy('socks://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('socks://127.0.0.1:3000'));
 is(($t->peer($tx))[0], 'socks',     'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
 
 # TLS WebSocket peer with proxy
 $tx = $t->websocket('wss://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
@@ -501,7 +508,7 @@ is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 
 # Proxy CONNECT
 $tx = $t->tx(GET => 'HTTPS://sri:secr3t@mojolicio.us');
-$tx->req->proxy('http://sri:secr3t@127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('http://sri:secr3t@127.0.0.1:3000'));
 ok !$tx->req->headers->authorization,       'no "Authorization" header';
 ok !$tx->req->headers->proxy_authorization, 'no "Proxy-Authorization" header';
 $tx->req->fix_headers;
@@ -526,8 +533,12 @@ is $t->proxy_connect($tx), undef, 'already a CONNECT request';
 $tx->req->method('Connect');
 is $t->proxy_connect($tx), undef, 'already a CONNECT request';
 $tx = $t->tx(GET => 'https://mojolicio.us');
-$tx->req->proxy('socks://127.0.0.1:3000');
+$tx->req->proxy(Mojo::URL->new('socks://127.0.0.1:3000'));
 is $t->proxy_connect($tx), undef, 'using a SOCKS proxy';
+$tx = $t->tx(GET => 'https://mojolicio.us');
+ok $tx->req->via_proxy, 'proxy use is enabled by default';
+$tx->req->via_proxy(0)->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
+is $t->proxy_connect($tx), undef, 'proxy use is disabled';
 
 # Simple 301 redirect
 $tx

@@ -32,7 +32,7 @@ sub endpoint {
   my $socks;
   if (my $proxy = $req->proxy) { $socks = $proxy->protocol eq 'socks' }
   return $self->_proxy($tx, $proto, $host, $port)
-    if $proto eq 'http' && !$req->is_handshake && !$socks;
+    if $proto eq 'http' && $req->via_proxy && !$req->is_handshake && !$socks;
 
   return $proto, $host, $port;
 }
@@ -47,7 +47,7 @@ sub proxy_connect {
   return undef if uc $req->method eq 'CONNECT';
 
   # No proxy
-  return undef unless my $proxy = $req->proxy;
+  return undef unless $req->via_proxy && (my $proxy = $req->proxy);
   return undef if $proxy->protocol eq 'socks';
 
   # WebSocket and/or HTTPS

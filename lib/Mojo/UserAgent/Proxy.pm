@@ -1,6 +1,8 @@
 package Mojo::UserAgent::Proxy;
 use Mojo::Base -base;
 
+use Mojo::URL;
+
 has [qw(http https not)];
 
 sub detect {
@@ -20,16 +22,16 @@ sub prepare {
   $self->detect if $ENV{MOJO_PROXY};
   my $req = $tx->req;
   my $url = $req->url;
-  return if !$self->is_needed($url->host) || defined $req->proxy;
+  return unless $req->via_proxy && $self->is_needed($url->host);
 
   # HTTP proxy
   my $proto = $url->protocol;
   my $http  = $self->http;
-  $req->proxy($http) if $http && $proto eq 'http';
+  $req->proxy(Mojo::URL->new($http)) if $http && $proto eq 'http';
 
   # HTTPS proxy
   my $https = $self->https;
-  $req->proxy($https) if $https && $proto eq 'https';
+  $req->proxy(Mojo::URL->new($https)) if $https && $proto eq 'https';
 }
 
 1;

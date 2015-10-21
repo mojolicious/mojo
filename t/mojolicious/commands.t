@@ -180,7 +180,7 @@ like $cpanify->usage, qr/cpanify/, 'has usage information';
 $cpanify->app->ua->unsubscribe('start')->once(
   start => sub {
     my ($ua, $tx) = @_;
-    $tx->req->proxy(0)->url($ua->server->url->path('/'));
+    $tx->req->via_proxy(0)->url($ua->server->url->path('/'));
   }
 );
 $cpanify->app->plugins->once(
@@ -368,7 +368,7 @@ like $version->usage, qr/version/, 'has usage information';
 $version->app->ua->once(
   start => sub {
     my ($ua, $tx) = @_;
-    $tx->req->proxy(0)->url($ua->server->url->path('/'));
+    $tx->req->via_proxy(0)->url($ua->server->url->path('/'));
   }
 );
 $version->app->plugins->once(

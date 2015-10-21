@@ -100,7 +100,7 @@ sub _connect {
     ($proto, @options{qw(address port)}) = $t->endpoint($tx);
     my $req      = $tx->req;
     my $userinfo = $req->proxy->userinfo;
-    $req->proxy(0);
+    $req->via_proxy(0);
     @options{qw(socks_user socks_pass)} = split ':', $userinfo if $userinfo;
   }
 
@@ -143,7 +143,7 @@ sub _connect_proxy {
         if $tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive;
 
       # Start real transaction
-      $old->req->proxy(0);
+      $old->req->via_proxy(0);
       my $id = $tx->connection;
       return $self->_start($nb, $old->connection($id), $cb)
         unless $tx->req->url->protocol eq 'https';

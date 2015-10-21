@@ -1,6 +1,10 @@
 
 6.25  2015-10-21
+  - Deprecated boolean and string arguments of Mojo::Message::Request::proxy in
+    favor of Mojo::Message::Request::via_proxy.
+  - Replaced proxy method in Mojo::Message::Request with an attribute.
   - Moved all bundled files into "resources" directories.
+  - Added via_proxy attribute to Mojo::Message::Request.
   - Improved Mojo::DOM::CSS to support selectors with leading and trailing
     whitespace.
   - Improved rendering of built-in templates to show actual template names in

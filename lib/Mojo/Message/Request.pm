@@ -2,13 +2,14 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode);
+use Mojo::Util qw(b64_encode b64_decode deprecated);
 use Mojo::URL;
 
 has env => sub { {} };
 has method => 'GET';
-has url => sub { Mojo::URL->new };
 has 'reverse_proxy';
+has url => sub { Mojo::URL->new };
+has via_proxy => 1;
 
 sub clone {
   my $self = shift;
@@ -75,8 +76,8 @@ sub fix_headers {
   }
 
   # Basic proxy authentication
-  return $self unless my $proxy = $self->proxy;
-  return $self unless my $info  = $proxy->userinfo;
+  return $self unless $self->via_proxy && (my $proxy = $self->proxy);
+  return $self unless my $info = $proxy->userinfo;
   $headers->proxy_authorization('Basic ' . b64_encode($info, ''))
     unless $headers->proxy_authorization;
   return $self;
@@ -146,10 +147,21 @@ sub parse {
   return $self;
 }
 
+# DEPRECATED in Clinking Beer Mugs!
 sub proxy {
   my $self = shift;
+
   return $self->{proxy} unless @_;
-  $self->{proxy} = !$_[0] || ref $_[0] ? shift : Mojo::URL->new(shift);
+
+  deprecated 'Calling Mojo::Message::Request::proxy with a boolean argument is'
+    . ' DEPRECATED in favor of Mojo::Message::Request::via_proxy'
+    and return $self->via_proxy(0)
+    unless $_[0];
+  deprecated
+    'Calling Mojo::Message::Request::proxy with a string argument is DEPRECATED'
+    unless ref $_[0];
+
+  $self->{proxy} = ref $_[0] ? shift : Mojo::URL->new(shift);
   return $self;
 }
 
@@ -241,7 +253,7 @@ sub _start_line {
   }
 
   # Proxy
-  elsif ($self->proxy && $url->protocol ne 'https') {
+  elsif ($self->proxy && $self->via_proxy && $url->protocol ne 'https') {
     $path = $url->clone->userinfo(undef) unless $self->is_handshake;
   }
 
@@ -315,6 +327,20 @@ Direct access to the C<CGI> or C<PSGI> environment hash if available.
 
 HTTP request method, defaults to C<GET>.
 
+=head2 proxy
+
+  my $url = $req->proxy;
+  $req    = $req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
+
+Proxy URL for request.
+
+=head2 reverse_proxy
+
+  my $bool = $req->reverse_proxy;
+  $req     = $req->reverse_proxy($bool);
+
+Request has been performed through a reverse proxy.
+
 =head2 url
 
   my $url = $req->url;
@@ -327,12 +353,12 @@ HTTP request URL, defaults to a L<Mojo::URL> object.
   my $host = $req->url->to_abs->host;
   my $path = $req->url->to_abs->path;
 
-=head2 reverse_proxy
+=head2 via_proxy
 
-  my $bool = $req->reverse_proxy;
-  $req     = $req->reverse_proxy($bool);
+  my $bool = $req->via_proxy;
+  $req     = $req->via_proxy($bool);
 
-Request has been performed through a reverse proxy.
+Request can be performed through a proxy server.
 
 =head1 METHODS
 
@@ -438,17 +464,6 @@ default.
   $req = $req->parse({REQUEST_METHOD => 'GET'});
 
 Parse HTTP request chunks or environment hash.
-
-=head2 proxy
-
-  my $proxy = $req->proxy;
-  $req      = $req->proxy('http://foo:bar@127.0.0.1:3000');
-  $req      = $req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
-
-Proxy URL for request.
-
-  # Disable proxy
-  $req->proxy(0);
 
 =head2 query_params
 

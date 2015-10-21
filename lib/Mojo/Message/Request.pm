@@ -76,7 +76,7 @@ sub fix_headers {
   }
 
   # Basic proxy authentication
-  return $self unless $self->via_proxy && (my $proxy = $self->proxy);
+  return $self unless (my $proxy = $self->proxy) && $self->via_proxy;
   return $self unless my $info = $proxy->userinfo;
   $headers->proxy_authorization('Basic ' . b64_encode($info, ''))
     unless $headers->proxy_authorization;

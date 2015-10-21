@@ -47,7 +47,7 @@ sub proxy_connect {
   return undef if uc $req->method eq 'CONNECT';
 
   # No proxy
-  return undef unless $req->via_proxy && (my $proxy = $req->proxy);
+  return undef unless (my $proxy = $req->proxy) && $req->via_proxy;
   return undef if $proxy->protocol eq 'socks';
 
   # WebSocket and/or HTTPS

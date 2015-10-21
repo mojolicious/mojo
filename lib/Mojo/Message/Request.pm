@@ -36,12 +36,9 @@ sub cookies {
     unless @_;
 
   # Add cookies
-  my @cookies = $headers->cookie || ();
-  for my $cookie (@_) {
-    $cookie = Mojo::Cookie::Request->new($cookie) if ref $cookie eq 'HASH';
-    push @cookies, $cookie;
-  }
-  $headers->cookie(join('; ', @cookies));
+  my @cookies = map { ref $_ eq 'HASH' ? Mojo::Cookie::Request->new($_) : $_ }
+    $headers->cookie || (), @_;
+  $headers->cookie(join '; ', @cookies);
 
   return $self;
 }

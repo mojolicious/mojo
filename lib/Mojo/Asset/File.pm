@@ -177,15 +177,15 @@ Delete L</"path"> automatically once the file is not used anymore.
   my $handle = $file->handle;
   $file      = $file->handle(IO::File->new);
 
-Filehandle, created on demand.
+Filehandle, created on demand for L</"path">, which can be generated
+automatically and safely based on L</"tmpdir">.
 
 =head2 path
 
   my $path = $file->path;
   $file    = $file->path('/home/sri/foo.txt');
 
-File path used to create L</"handle">, can also be automatically generated if
-necessary.
+File path used to create L</"handle">.
 
 =head2 tmpdir
 

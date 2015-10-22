@@ -352,17 +352,17 @@ is $url->port,     3000,               'right port';
 is "$url", 'https://%E2%99%A5:%E2%99%A5@xn--krih-moa.com:3000', 'right format';
 
 # IDNA (snowman)
-$url = Mojo::URL->new('http://☃:☃@☃.net/☃?☃#☃');
+$url = Mojo::URL->new('http://☃:☃@☃.☃.de/☃?☃#☃');
 ok $url->is_abs,   'is absolute';
 is $url->scheme,   'http', 'right scheme';
 is $url->userinfo, '☃:☃', 'right userinfo';
-is $url->host,     '☃.net', 'right host';
-is $url->ihost,    'xn--n3h.net', 'right internationalized host';
+is $url->host,     '☃.☃.de', 'right host';
+is $url->ihost,    'xn--n3h.xn--n3h.de', 'right internationalized host';
 is $url->path,     '/%E2%98%83', 'right path';
 is $url->query,    '%E2%98%83', 'right query';
 is $url->fragment, '☃', 'right fragment';
 is "$url",
-  'http://%E2%98%83:%E2%98%83@xn--n3h.net/%E2%98%83?%E2%98%83#%E2%98%83',
+  'http://%E2%98%83:%E2%98%83@xn--n3h.xn--n3h.de/%E2%98%83?%E2%98%83#%E2%98%83',
   'right format';
 
 # IRI/IDNA

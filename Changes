@@ -9,6 +9,7 @@
     whitespace.
   - Improved rendering of built-in templates to show actual template names in
     log messages.
+  - Fixed punycode bug in Mojo::URL.
   - Fixed "0" value bug in Mojo::JSON::Pointer.
 
 6.24  2015-10-13

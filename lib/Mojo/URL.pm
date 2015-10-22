@@ -54,7 +54,7 @@ sub ihost {
 
   # Decode
   return $self->host(join '.',
-    map { /^xn--/ ? punycode_decode $_ : $_ } split(/\./, shift, -1))
+    map { /^xn--(.+)$/ ? punycode_decode $1 : $_ } split(/\./, shift, -1))
     if @_;
 
   # Check if host needs to be encoded

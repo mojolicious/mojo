@@ -342,6 +342,11 @@ is $url->port, 3000,   'right port';
 is $url->path, '/foo', 'right path';
 is "$url", 'http://xn--bcher-kva.xn--bcher-kva.xn--bcher-kva.ch:3000/foo',
   'right format';
+$url = Mojo::URL->new->scheme('http')->ihost('xn--n3h.xn--n3h.net');
+is $url->scheme, 'http',                'right scheme';
+is $url->host,   '☃.☃.net',         'right host';
+is $url->ihost,  'xn--n3h.xn--n3h.net', 'right internationalized host';
+is "$url", 'http://xn--n3h.xn--n3h.net', 'right format';
 
 # IDNA (escaped userinfo and host)
 $url = Mojo::URL->new('https://%E2%99%A5:%E2%99%A5@kr%E4ih.com:3000');

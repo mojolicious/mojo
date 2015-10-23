@@ -126,7 +126,7 @@ sub remove { shift->replace('') }
 sub replace {
   my ($self, $new) = @_;
   return $self->parse($new) if (my $tree = $self->tree)->[0] eq 'root';
-  return $self->_replace($self->_parent, $tree, $self->_parse($new))->parent;
+  return $self->_replace($self->_parent, $tree, _nodes($self->_parse($new)));
 }
 
 sub root {
@@ -138,7 +138,7 @@ sub root {
 sub strip {
   my $self = shift;
   return $self if (my $tree = $self->tree)->[0] ne 'tag';
-  return $self->_replace($tree->[3], $tree, ['root', _nodes($tree)])->parent;
+  return $self->_replace($tree->[3], $tree, _nodes($tree));
 }
 
 sub tag {
@@ -282,9 +282,9 @@ sub _parent { $_[0]->tree->[$_[0]->type eq 'tag' ? 3 : 2] }
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 
 sub _replace {
-  my ($self, $parent, $tree, $new) = @_;
-  splice @$parent, _offset($parent, $tree), 1, _link($parent, _nodes($new));
-  return $self;
+  my ($self, $parent, $tree, @nodes) = @_;
+  splice @$parent, _offset($parent, $tree), 1, _link($parent, @nodes);
+  return $self->parent;
 }
 
 sub _select {
@@ -368,7 +368,7 @@ sub _wrap {
   }
 
   # Wrap element
-  $self->_replace($self->_parent, $tree, $new);
+  $self->_replace($self->_parent, $tree, _nodes($new));
   push @$current, _link($current, $tree);
   return $self;
 }

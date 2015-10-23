@@ -126,7 +126,7 @@ sub remove { shift->replace('') }
 sub replace {
   my ($self, $new) = @_;
   return $self->parse($new) if (my $tree = $self->tree)->[0] eq 'root';
-  return $self->_replace($self->_parent, $tree, $self->_parse($new));
+  return $self->_replace($self->_parent, $tree, $self->_parse($new))->parent;
 }
 
 sub root {
@@ -138,7 +138,7 @@ sub root {
 sub strip {
   my $self = shift;
   return $self if (my $tree = $self->tree)->[0] ne 'tag';
-  return $self->_replace($tree->[3], $tree, ['root', _nodes($tree)]);
+  return $self->_replace($tree->[3], $tree, ['root', _nodes($tree)])->parent;
 }
 
 sub tag {
@@ -185,7 +185,7 @@ sub _add {
 
   my $parent = $self->_parent;
   splice @$parent, _offset($parent, $tree) + $offset, 0,
-    _link($self->_parse($new), $parent);
+    _link($parent, _nodes($self->_parse($new)));
 
   return $self;
 }
@@ -235,7 +235,7 @@ sub _content {
 
   $start  = $start  ? ($#$tree + 1) : _start($tree);
   $offset = $offset ? $#$tree       : 0;
-  splice @$tree, $start, $offset, _link($self->_parse($new), $tree);
+  splice @$tree, $start, $offset, _link($tree, _nodes($self->_parse($new)));
 
   return $self;
 }
@@ -250,17 +250,16 @@ sub _delegate {
 }
 
 sub _link {
-  my ($children, $parent) = @_;
+  my ($parent, @children) = @_;
 
   # Link parent to children
-  my @new = @$children[1 .. $#$children];
-  for my $node (@new) {
+  for my $node (@children) {
     my $offset = $node->[0] eq 'tag' ? 3 : 2;
     $node->[$offset] = $parent;
     weaken $node->[$offset];
   }
 
-  return @new;
+  return @children;
 }
 
 sub _maybe { $_[1] ? $_[0]->_build($_[1], $_[0]->xml) : undef }
@@ -284,8 +283,8 @@ sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 
 sub _replace {
   my ($self, $parent, $tree, $new) = @_;
-  splice @$parent, _offset($parent, $tree), 1, _link($new, $parent);
-  return $self->parent;
+  splice @$parent, _offset($parent, $tree), 1, _link($parent, _nodes($new));
+  return $self;
 }
 
 sub _select {
@@ -363,14 +362,14 @@ sub _wrap {
 
   # Wrap content
   if ($content) {
-    push @$current, _link(['root', _nodes($tree)], $current);
-    splice @$tree, _start($tree), $#$tree, _link($new, $tree);
+    push @$current, _link($current, _nodes($tree));
+    splice @$tree, _start($tree), $#$tree, _link($tree, _nodes($new));
     return $self;
   }
 
   # Wrap element
   $self->_replace($self->_parent, $tree, $new);
-  push @$current, _link(['root', $tree], $current);
+  push @$current, _link($current, $tree);
   return $self;
 }
 

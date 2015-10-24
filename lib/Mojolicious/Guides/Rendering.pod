@@ -431,12 +431,12 @@ L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
 
 =head2 Rendering C<exception> and C<not_found> pages
 
-By now you've probably already encountered the built-in 404 (Not Found) and 500
-(Server Error) pages, that get rendered automatically when you make a mistake.
-Those are fallbacks for when your own exception handling fails, which can be
-especially helpful during development. You can also render them manually with
-the helpers L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> and
-L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
+By now you've probably already encountered the built-in C<404> (Not Found) and
+C<500> (Server Error) pages, that get rendered automatically when you make a
+mistake. Those are fallbacks for when your own exception handling fails, which
+can be especially helpful during development. You can also render them manually
+with the helpers L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception">
+and L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
   use Mojolicious::Lite;
   use Scalar::Util 'looks_like_number';

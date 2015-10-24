@@ -548,6 +548,12 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
 This element's attributes.
 
+  # Remove an attribute
+  delete $dom->attr->{id};
+
+  # Attribute without value
+  $dom->attr(selected => undef);
+
   # List id attributes
   say $dom->find('*')->map(attr => 'id')->compact->join("\n");
 

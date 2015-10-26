@@ -249,6 +249,26 @@ rather advanced features such as upload progress bars possible. Note that this
 hook will not work for embedded applications, because only the host application
 gets to build transactions. (Passed the transaction and application object)
 
+=head2 around_dispatch
+
+Emitted right after a new request has been received and wraps around the whole
+dispatch process, so you have to manually forward to the next hook if you want
+to continue the chain. Default exception handling with
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> is the first hook
+in the chain and a call to L</"dispatch"> the last, yours will be in between.
+
+  $app->hook(around_dispatch => sub {
+    my ($next, $c) = @_;
+    ...
+    $next->();
+    ...
+  });
+
+This is a very powerful hook and should not be used lightly, it allows you for
+example to customize application wide exception handling, consider it the
+sledgehammer in your toolbox. (Passed a callback leading to the next hook and
+the default controller object)
+
 =head2 before_dispatch
 
 Emitted right before the static file server and router start their work.
@@ -347,26 +367,6 @@ applications will only work for the application that is rendering.
 
 Useful for rewriting outgoing responses and other post-processing tasks.
 (Passed the current controller object)
-
-=head2 around_dispatch
-
-Emitted right before the L</"before_dispatch"> hook and wraps around the whole
-dispatch process, so you have to manually forward to the next hook if you want
-to continue the chain. Default exception handling with
-L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> is the first hook
-in the chain and a call to L</"dispatch"> the last, yours will be in between.
-
-  $app->hook(around_dispatch => sub {
-    my ($next, $c) = @_;
-    ...
-    $next->();
-    ...
-  });
-
-This is a very powerful hook and should not be used lightly, it allows you for
-example to customize application wide exception handling, consider it the
-sledgehammer in your toolbox. (Passed a callback leading to the next hook and
-the default controller object)
 
 =head1 ATTRIBUTES
 

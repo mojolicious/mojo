@@ -86,7 +86,7 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
   # foo.html.ep
   %= $config->{foo}
 
-  # The configuration is available application wide
+  # The configuration is available application-wide
   my $config = app->config;
   say $config->{foo};
 

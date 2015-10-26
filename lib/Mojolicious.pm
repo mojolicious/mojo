@@ -265,7 +265,7 @@ in the chain and a call to L</"dispatch"> the last, yours will be in between.
   });
 
 This is a very powerful hook and should not be used lightly, it allows you for
-example to customize application wide exception handling, consider it the
+example to customize application-wide exception handling, consider it the
 sledgehammer in your toolbox. (Passed a callback leading to the next hook and
 the default controller object)
 

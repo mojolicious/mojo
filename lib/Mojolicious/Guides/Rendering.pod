@@ -559,7 +559,7 @@ value, or call L<Mojolicious::Controller/"render"> with the C<layout> argument.
 
   $c->render(template => 'mytemplate', layout => 'mylayout');
 
-To set a C<layout> stash value application wide you can use
+To set a C<layout> stash value application-wide you can use
 L<Mojolicious/"defaults">.
 
   $app->defaults(layout => 'mylayout');

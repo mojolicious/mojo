@@ -215,8 +215,11 @@ before being closed automatically. It defaults to C<20> seconds for the user
 agent and C<15> seconds for all built-in web servers, and can be changed with
 the attributes L<Mojo::UserAgent/"inactivity_timeout"> and
 L<Mojo::Server::Daemon/"inactivity_timeout"> or the C<MOJO_INACTIVITY_TIMEOUT>
-environment variable. This timeout always applies, so you might have to tweak
-it for applications that take a long time to process a request.
+environment variable. In L<Mojolicious> applications you can also use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout"> to change it on
+demand for each connection individually. This timeout always applies, so you
+might have to tweak it for applications that take a long time to process a
+request.
 
 =head2 What does "Premature connection close" mean?
 

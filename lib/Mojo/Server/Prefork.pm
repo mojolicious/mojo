@@ -455,7 +455,7 @@ Number of currently active worker processes with a heartbeat.
 
   $prefork->run;
 
-Run server and wait for L</"SIGNALS">.
+Run server and wait for L</"MANAGER SIGNALS">.
 
 =head1 SEE ALSO
 

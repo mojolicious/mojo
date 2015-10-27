@@ -1,5 +1,6 @@
 
 6.26  2015-10-27
+  - Renamed built-in templates with more descriptive names.
 
 6.25  2015-10-21
   - Deprecated Mojo::Message::Request::proxy with boolean and string arguments

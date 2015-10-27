@@ -129,7 +129,7 @@
     </style>
   </head>
   <body>
-    %= include 'mojo/mojobar'
+    %= include 'mojo/menubar'
     <script>
       function mojoDrawer (handle, drawer) {
         $(handle).click(function () {

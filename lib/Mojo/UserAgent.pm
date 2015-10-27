@@ -622,7 +622,7 @@ L<Mojo::UserAgent::Server> object.
 
   # Mock web service
   $ua->server->app(Mojolicious->new);
-  $ua->server->app->get('/time' => sub {
+  $ua->server->app->routes->get('/time' => sub {
     my $c = shift;
     $c->render(json => {now => time});
   });

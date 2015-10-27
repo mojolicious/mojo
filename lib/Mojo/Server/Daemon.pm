@@ -454,13 +454,13 @@ implements the following new ones.
 
   $daemon->run;
 
-Run server.
+Run server and wait for L</"SIGNALS">.
 
 =head2 start
 
   $daemon = $daemon->start;
 
-Start accepting connections.
+Start accepting connections through L</"ioloop">.
 
   # Listen on random port
   my $id   = $daemon->listen(['http://127.0.0.1'])->start->acceptors->[0];
@@ -470,7 +470,7 @@ Start accepting connections.
 
   $daemon = $daemon->stop;
 
-Stop accepting connections.
+Stop accepting connections through L</"ioloop">.
 
 =head1 DEBUGGING
 

@@ -621,14 +621,12 @@ Application server relative URLs will be processed with, defaults to a
 L<Mojo::UserAgent::Server> object.
 
   # Mock web service
+  $ua->server->app(Mojolicious->new);
   $ua->server->app->get('/time' => sub {
     my $c = shift;
     $c->render(json => {now => time});
   });
   my $time = $ua->get('/time')->res->json->{now};
-
-  # Introspect
-  say for @{$ua->server->app->secrets};
 
   # Change log level
   $ua->server->app->log->level('fatal');

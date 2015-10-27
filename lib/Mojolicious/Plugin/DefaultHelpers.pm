@@ -105,7 +105,7 @@ sub _development {
     status   => $page eq 'exception' ? 500 : 404,
     template => "$page.$mode"
   };
-  my $bundled = 'mojo/' . ($mode eq 'development' ? $mode : $page);
+  my $bundled = 'mojo/' . ($mode eq 'development' ? 'debug' : $page);
   return $c if _fallbacks($c, $options, $page, $bundled);
   _fallbacks($c, {%$options, format => 'html'}, $page, $bundled);
   return $c;

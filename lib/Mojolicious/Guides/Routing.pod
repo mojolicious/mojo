@@ -550,7 +550,7 @@ authentication.
   $auth->get('/blackjack')->to('hideout#blackjack');
 
 Broken dispatch chains can be continued by calling the method
-L<Mojolicious::Controller/"continue">, this allows for example non-blocking
+L<Mojolicious::Controller/"continue">, this allows for example, non-blocking
 operations to finish before reaching the next dispatch cycle.
 
   my $maybe = $r->under('/maybe' => sub {
@@ -588,7 +588,7 @@ automatically detected and stored in the stash value C<format>.
   # /foo.txt  -> {controller => 'foo', action => 'bar', format => 'txt'}
   $r->get('/foo')->to('foo#bar');
 
-This for example allows multiple templates in different formats to share the
+This for example, allows multiple templates in different formats to share the
 same action code. Restrictive placeholders can also be used to limit the
 allowed formats.
 
@@ -950,7 +950,7 @@ applications under a domain and/or prefix.
 =head2 Embed applications
 
 For a litte more power you can also embed applications by using them instead of
-a controller. This allows for example the use of the L<Mojolicious::Lite>
+a controller. This allows for example, the use of the L<Mojolicious::Lite>
 domain specific language in normal L<Mojolicious> controllers.
 
   # Controller

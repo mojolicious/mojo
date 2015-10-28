@@ -453,7 +453,7 @@ nested closures that often result from continuation-passing style.
 =head2 Timers
 
 Timers, another primary feature of the event loop, are created with
-L<Mojo::IOLoop/"timer"> and can for example be used to delay rendering of a
+L<Mojo::IOLoop/"timer"> and can, for example, be used to delay rendering of a
 response, and unlike C<sleep>, won't block any other requests that might be
 processed concurrently.
 
@@ -789,7 +789,7 @@ can be combined to solve some of hardest problems in web development.
 =head2 Event loops
 
 Internally the L<Mojo::IOLoop> event loop can use multiple reactor backends,
-L<EV> for example will be automatically used if possible. Which in turn allows
+L<EV> for example, will be automatically used if possible. Which in turn allows
 other event loops like L<AnyEvent> to just work.
 
   use Mojolicious::Lite;
@@ -823,7 +823,7 @@ Who actually controls the event loop backend is not important.
   });
   say $cv->recv;
 
-You could for example just embed the built-in web server into an L<AnyEvent>
+You could, for example, just embed the built-in web server into an L<AnyEvent>
 application.
 
   use Mojolicious::Lite;

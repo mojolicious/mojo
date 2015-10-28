@@ -178,7 +178,7 @@ sub template_name {
   return undef unless my $format   = $options->{format};
   $template .= ".$format";
 
-  $self->_warmup unless $self->{templates};
+  $self->warmup unless $self->{templates};
 
   # Variants
   my $handler = $options->{handler};
@@ -207,6 +207,23 @@ sub template_path {
   return undef;
 }
 
+sub warmup {
+  my $self = shift;
+
+  my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
+
+  # Handlers for templates
+  s/\.(\w+)$// and push @{$templates->{$_}}, $1
+    for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths},
+    $TEMPLATES;
+
+  # Handlers and classes for DATA templates
+  for my $class (reverse @{$self->classes}) {
+    $index->{$_} = $class for my @keys = sort keys %{data_section $class};
+    s/\.(\w+)$// and unshift @{$templates->{$_}}, $1 for reverse @keys;
+  }
+}
+
 sub _extends {
   my ($self, $stash) = @_;
   my $layout = delete $stash->{layout};
@@ -227,23 +244,6 @@ sub _render_template {
   # No handler
   else { $c->app->log->error(qq{No handler for "$handler" available}) }
   return undef;
-}
-
-sub _warmup {
-  my $self = shift;
-
-  my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
-
-  # Handlers for templates
-  s/\.(\w+)$// and push @{$templates->{$_}}, $1
-    for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths},
-    $TEMPLATES;
-
-  # Handlers and classes for DATA templates
-  for my $class (reverse @{$self->classes}) {
-    $index->{$_} = $class for my @keys = sort keys %{data_section $class};
-    s/\.(\w+)$// and unshift @{$templates->{$_}}, $1 for reverse @keys;
-  }
 }
 
 1;
@@ -286,9 +286,10 @@ Renderer cache, defaults to a L<Mojo::Cache> object.
 
 Classes to use for finding templates in C<DATA> sections with L<Mojo::Loader>,
 first one has the highest precedence, defaults to C<main>. Only files with
-exactly two extensions will be used, like C<index.html.ep>. Note that these
-classes need to have already been loaded and added during application startup
-for templates to be detected.
+exactly two extensions will be used, like C<index.html.ep>. Note that for
+templates to be detected, these classes need to have already been loaded and
+added before L</"warmup"> is called, which usually happens during application
+startup.
 
   # Add another class with templates in DATA section
   push @{$renderer->classes}, 'Mojolicious::Plugin::Fun';
@@ -447,6 +448,12 @@ C<variant> and C<handler> values, usually used by handlers.
 
 Build a full template path for an options hash reference with C<template>,
 C<format>, C<variant> and C<handler> values, usually used by handlers.
+
+=head2 warmup
+
+  $renderer->warmup;
+
+Prepare templates from L</"classes"> for future use.
 
 =head1 SEE ALSO
 

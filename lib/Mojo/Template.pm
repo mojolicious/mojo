@@ -350,7 +350,7 @@ automatically enabled.
   %% Replaced with "%", useful for generating templates
 
 Escaping behavior can be reversed with the L</"auto_escape"> attribute, this is
-the default in L<Mojolicious> C<.ep> templates for example.
+the default in L<Mojolicious> C<.ep> templates, for example.
 
   <%= Perl expression, replaced with XML escaped result %>
   <%== Perl expression, replaced with result %>

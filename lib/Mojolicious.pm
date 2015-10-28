@@ -183,7 +183,7 @@ sub plugin {
 
 sub start {
   my $self = shift;
-  $_->_warmup for $self->static, $self->renderer;
+  $_->warmup for $self->static, $self->renderer;
   return $self->commands->run(@_ ? @_ : @ARGV);
 }
 
@@ -264,8 +264,8 @@ in the chain and a call to L</"dispatch"> the last, yours will be in between.
     ...
   });
 
-This is a very powerful hook and should not be used lightly, it allows you for
-example to customize application-wide exception handling, consider it the
+This is a very powerful hook and should not be used lightly, it allows you to,
+for example, customize application-wide exception handling, consider it the
 sledgehammer in your toolbox. (Passed a callback leading to the next hook and
 the default controller object)
 

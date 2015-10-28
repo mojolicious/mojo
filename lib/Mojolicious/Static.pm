@@ -113,6 +113,14 @@ sub serve_asset {
   return $res->content->asset($asset->start_range($start)->end_range($end));
 }
 
+sub warmup {
+  my $self = shift;
+  my $index = $self->{index} = {};
+  for my $class (reverse @{$self->classes}) {
+    $index->{$_} = $class for keys %{data_section $class};
+  }
+}
+
 sub _epoch { Mojo::Date->new(shift)->epoch }
 
 sub _get_data_file {
@@ -121,7 +129,7 @@ sub _get_data_file {
   # Protect files without extensions and templates with two extensions
   return undef if $rel !~ /\.\w+$/ || $rel =~ /\.\w+\.\w+$/;
 
-  $self->_warmup unless $self->{index};
+  $self->warmup unless $self->{index};
 
   # Find file
   return undef
@@ -133,14 +141,6 @@ sub _get_file {
   my ($self, $path) = @_;
   no warnings 'newline';
   return -f $path && -r _ ? Mojo::Asset::File->new(path => $path) : undef;
-}
-
-sub _warmup {
-  my $self = shift;
-  my $index = $self->{index} = {};
-  for my $class (reverse @{$self->classes}) {
-    $index->{$_} = $class for keys %{data_section $class};
-  }
 }
 
 1;
@@ -177,9 +177,9 @@ L<Mojolicious::Static> implements the following attributes.
 
 Classes to use for finding files in C<DATA> sections with L<Mojo::Loader>,
 first one has the highest precedence, defaults to C<main>. Only files with
-exactly one extension will be used, like C<index.html>. Note that these classes
-need to have already been loaded and added during application startup for files
-to be detected.
+exactly one extension will be used, like C<index.html>. Note that for files to
+be detected, these classes need to have already been loaded and added before
+L</"warmup"> is called, which usually happens during application startup.
 
   # Add another class with static files in DATA section
   push @{$static->classes}, 'Mojolicious::Plugin::Fun';
@@ -263,6 +263,12 @@ this method does not protect from traversing to parent directories.
 
 Serve a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object with C<Range>,
 C<If-Modified-Since> and C<If-None-Match> support.
+
+=head2 warmup
+
+  $static->warmup;
+
+Prepare static files from L</"classes"> for future use.
 
 =head1 SEE ALSO
 

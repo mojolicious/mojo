@@ -214,7 +214,7 @@ alternatives.
 =head2 Rendering to strings
 
 Sometimes you might want to use the rendered result directly instead of
-generating a response, for example to send emails, this can be done with
+generating a response, for example, to send emails, this can be done with
 L<Mojolicious::Controller/"render_to_string">.
 
   my $html = $c->render_to_string('mail');
@@ -679,7 +679,7 @@ action could do.
   @@ index.html.ep
   % debug 'Hello from a template!';
 
-Helpers can also accept template blocks as last argument, this for example
+Helpers can also accept template blocks as last argument, this for example,
 allows very pleasant to use tag helpers and filters. Wrapping the helper result
 into a L<Mojo::ByteStream> object can prevent accidental double escaping.
 

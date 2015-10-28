@@ -390,7 +390,7 @@ C<MOJO_MAX_LINE_SIZE> environment variable or C<8192> (8KB).
 Maximum message size in bytes, defaults to the value of the
 C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<16777216> (16MB). Setting
 the value to C<0> will allow messages of indefinite size. Note that increasing
-this value can also drastically increase memory usage, should you for example
+this value can also drastically increase memory usage, should you for example,
 attempt to parse an excessively large message body with the L</"body_params">,
 L</"dom"> or L</"json"> methods.
 

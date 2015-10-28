@@ -288,7 +288,7 @@ Classes to use for finding templates in C<DATA> sections with L<Mojo::Loader>,
 first one has the highest precedence, defaults to C<main>. Only files with
 exactly two extensions will be used, like C<index.html.ep>. Note that for
 templates to be detected, these classes need to have already been loaded and
-added before L</"warmup"> is called, which usually happens automatically  during
+added before L</"warmup"> is called, which usually happens automatically during
 application startup.
 
   # Add another class with templates in DATA section

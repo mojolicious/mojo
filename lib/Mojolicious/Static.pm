@@ -179,7 +179,8 @@ Classes to use for finding files in C<DATA> sections with L<Mojo::Loader>,
 first one has the highest precedence, defaults to C<main>. Only files with
 exactly one extension will be used, like C<index.html>. Note that for files to
 be detected, these classes need to have already been loaded and added before
-L</"warmup"> is called, which usually happens during application startup.
+L</"warmup"> is called, which usually happens automatically during application
+startup.
 
   # Add another class with static files in DATA section
   push @{$static->classes}, 'Mojolicious::Plugin::Fun';

@@ -31,6 +31,7 @@ ok !-e $file, 'file has been cleaned up';
 # Bad PID file
 my $bad = catfile dirname(__FILE__), 'does_not_exist', 'test.pid';
 $prefork = Mojo::Server::Prefork->new(pid_file => $bad);
+$prefork->app->log->level('fatal');
 my $log = '';
 my $cb = $prefork->app->log->on(message => sub { $log .= pop });
 eval { $prefork->ensure_pid_file };

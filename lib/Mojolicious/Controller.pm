@@ -995,10 +995,10 @@ defaults to C<15> seconds.
   $c = $c->write_chunk(sub {...});
   $c = $c->write_chunk($bytes => sub {...});
 
-Write dynamic content non-blocking with C<chunked> transfer encoding, the
-optional drain callback will be invoked once all data has been written. Calling
-this method without a chunk of data will finalize the response headers and
-allow for dynamic content to be written later.
+Write dynamic content non-blocking with chunked transfer encoding, the optional
+drain callback will be invoked once all data has been written. Calling this
+method without a chunk of data will finalize the response headers and allow for
+dynamic content to be written later.
 
   # Make sure previous chunk has been written before continuing
   $c->write_chunk('H' => sub {

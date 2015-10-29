@@ -577,11 +577,11 @@ later. You can write an empty chunk of data at any time to end the stream.
   $content = $content->write_chunk($bytes);
   $content = $content->write_chunk($bytes => sub {...});
 
-Write dynamic content non-blocking with C<chunked> transfer encoding, the
-optional drain callback will be invoked once all data has been written. Calling
-this method without a chunk of data will finalize the L</"headers"> and allow
-for dynamic content to be written later. You can write an empty chunk of data
-at any time to end the stream.
+Write dynamic content non-blocking with chunked transfer encoding, the optional
+drain callback will be invoked once all data has been written. Calling this
+method without a chunk of data will finalize the L</"headers"> and allow for
+dynamic content to be written later. You can write an empty chunk of data at any
+time to end the stream.
 
   # Make sure previous chunk of data has been written before continuing
   $content->write_chunk('He' => sub {

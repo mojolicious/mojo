@@ -1258,7 +1258,7 @@ lot more efficient to use L<Mojolicious/"after_render">.
 =head2 Chunked transfer encoding
 
 For very dynamic content you might not know the response content length in
-advance, that's where the C<chunked> transfer encoding and
+advance, that's where the chunked transfer encoding and
 L<Mojolicious::Controller/"write_chunk"> come in handy. A common use would be
 to send the C<head> section of an HTML document to the browser in advance and
 speed up preloading of referenced images and stylesheets.

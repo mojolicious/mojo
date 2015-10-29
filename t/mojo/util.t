@@ -191,7 +191,7 @@ is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'),
 
 # html_unescape (special entities)
 is html_unescape('foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
-  "foo ☃ \x{2233} bar \x{00b9}baz", 'right HTML unescaped result';
+  "foo ☃ \x{2233} bar &sup1baz", 'right HTML unescaped result';
 
 # html_unescape (multi-character entity)
 is html_unescape(decode 'UTF-8', '&acE;'), "\x{223e}\x{0333}",
@@ -203,10 +203,6 @@ is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
 
 # html_unescape (nothing to unescape)
 is html_unescape('foobar'), 'foobar', 'right HTML unescaped result';
-
-# html_unescape (relaxed)
-is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r",
-  'right HTML unescaped result';
 
 # html_unescape (UTF-8)
 is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),

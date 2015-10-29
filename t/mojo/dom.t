@@ -2280,10 +2280,10 @@ is $dom->find('head > [http-equiv$="-type"]')->[0]{content}, 'text/html',
   'right attribute';
 is $dom->find('head > [http-equiv$="-type"]')->[1], undef, 'no result';
 
-# Find "0" attribute value and unescape relaxed entity
+# Find "0" attribute value
 $dom = Mojo::DOM->new(<<EOF);
 <a accesskey="0">Zero</a>
-<a accesskey="1">O&gTn&gte</a>
+<a accesskey="1">O&gTn&gt;e</a>
 EOF
 is $dom->find('a[accesskey]')->[0]->text, 'Zero',    'right text';
 is $dom->find('a[accesskey]')->[1]->text, 'O&gTn>e', 'right text';

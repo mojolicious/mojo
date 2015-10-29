@@ -45,7 +45,7 @@ sub ensure_pid_file {
   return if -e (my $file = $self->pid_file);
 
   # Create PID file
-  $self->app->log->info(qq{Can't create process id file "$file": $!})
+  $self->app->log->error(qq{Can't create process id file "$file": $!})
     and die qq{Can't create process id file "$file": $!}
     unless open my $handle, '>', $file;
   $self->app->log->info(qq{Creating process id file "$file"});

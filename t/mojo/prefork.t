@@ -7,6 +7,8 @@ use Test::More;
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK};
 
+use File::Basename 'dirname';
+use File::Spec::Functions 'catfile';
 use Mojo::IOLoop::Server;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
@@ -25,6 +27,17 @@ ok -e $file, 'file exists';
 is $prefork->check_pid, $$, 'right process id';
 undef $prefork;
 ok !-e $file, 'file has been cleaned up';
+
+# Bad PID file
+my $bad = catfile dirname(__FILE__), 'does_not_exist', 'test.pid';
+$prefork = Mojo::Server::Prefork->new(pid_file => $bad);
+my $log = '';
+my $cb = $prefork->app->log->on(message => sub { $log .= pop });
+eval { $prefork->ensure_pid_file };
+like $@,     qr/Can't create process id file/, 'right error';
+unlike $log, qr/Creating process id file/,     'right message';
+like $log,   qr/Can't create process id file/, 'right message';
+$prefork->app->log->unsubscribe(message => $cb);
 
 # Multiple workers and graceful shutdown
 my $port = Mojo::IOLoop::Server::->generate_port;
@@ -54,8 +67,8 @@ $prefork->once(
 );
 $prefork->on(reap => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
-my $log = '';
-my $cb = $prefork->app->log->on(message => sub { $log .= pop });
+$log = '';
+$cb = $prefork->app->log->on(message => sub { $log .= pop });
 is $prefork->healthy, 0, 'no healthy workers';
 $prefork->run;
 ok $healthy >= 1, 'healthy workers';

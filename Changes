@@ -1,6 +1,8 @@
 
 6.27  2015-10-29
   - Updated HTML5 entities in Mojo::Util.
+  - Improved Mojo::Server::Prefork to log if the process id file could not be
+    created.
 
 6.26  2015-10-28
   - Renamed built-in templates with more descriptive names.

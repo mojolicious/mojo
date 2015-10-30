@@ -141,7 +141,7 @@ is $headers->cache_control, 'public', 'right value';
 is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
 is $headers->header('o'), 'x', 'right value';
 
-# Parse multiline headers
+# Parse multi-line headers
 $headers = Mojo::Headers->new;
 $headers->parse(<<'EOF');
 Foo: first

@@ -8,7 +8,7 @@ has tree => sub { ['root'] };
 has 'xml';
 
 my $ATTR_RE = qr/
-  ([^<>=\s\/]+|\/)                    # Key
+  ([^<>=\s\/]+|\/)                     # Key
   (?:
     \s*=\s*
     (?s:(["'])(.*?)\g{-2}|([^>\s]*))   # Value

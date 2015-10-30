@@ -101,7 +101,7 @@ sub parse {
     # New header
     if ($line =~ /^(\S[^:]*)\s*:\s*(.*)$/) { push @$headers, [$1, $2] }
 
-    # Multiline
+    # Multi-line
     elsif ($line =~ s/^\s+// && @$headers) { $headers->[-1][1] .= " $line" }
 
     # Empty line
@@ -135,7 +135,7 @@ sub to_hash {
 sub to_string {
   my $self = shift;
 
-  # Make sure multiline values are formatted correctly
+  # Make sure multi-line values are formatted correctly
   my @headers;
   for my $name (@{$self->names}) {
     push @headers, "$name: $_" for @{$self->{headers}{lc $name}};

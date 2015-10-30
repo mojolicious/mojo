@@ -752,7 +752,7 @@ Trim whitespace characters from both ends of string.
 
   my $unindented = unindent $str;
 
-Unindent multiline string.
+Unindent multi-line string.
 
   # "foo\nbar\nbaz\n"
   unindent "  foo\n  bar\n  baz\n";

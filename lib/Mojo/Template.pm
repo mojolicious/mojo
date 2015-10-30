@@ -43,7 +43,7 @@ sub build {
       $blocks[-1] .= "\$_O .= \"" . $value . "\";" if $value ne '';
     }
 
-    # Code or multiline expression
+    # Code or multi-line expression
     elsif ($op eq 'code' || $multi) { $blocks[-1] .= $value }
 
     # Capture end
@@ -65,7 +65,7 @@ sub build {
       # Raw
       elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar + $value" }
 
-      # Multiline
+      # Multi-line
       $multi = !$next || $next->[0] ne 'text';
 
       # Append semicolon

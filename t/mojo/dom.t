@@ -773,9 +773,9 @@ is $dom->at('[test=""]')->tag,  'div', 'right tag';
 is $dom->at('[test2=""]')->tag, 'div', 'right tag';
 is $dom->at('[test3=""]'), undef, 'no result';
 
-# Multi line in attribute
+# Multi-line attribute
 $dom = Mojo::DOM->new(qq{<div test="line1\nline2" />});
-is $dom->at('div')->attr->{test}, "line1\nline2", 'multi line attribute';
+is $dom->at('div')->attr->{test}, "line1\nline2", 'multi-line attribute';
 
 # Whitespaces before closing bracket
 $dom = Mojo::DOM->new('<div >content</div>');

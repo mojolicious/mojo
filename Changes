@@ -1,5 +1,6 @@
 
 6.28  2015-10-30
+  - Fixed multi-line attribute bug in Mojo::DOM::HTML. (jamadam)
 
 6.27  2015-10-29
   - Updated HTML5 entities in Mojo::Util.
@@ -1453,9 +1454,9 @@
   - Added direct array access for parsed parameters to Mojo::Parameters.
   - Added direct array access for path parts to Mojo::Path.
   - Improved dumper helper to sort hash keys.
-  - Fixed bug in Mojo::Headers that prevented multiline headers from being
+  - Fixed bug in Mojo::Headers that prevented multi-line headers from being
     parsed correctly.
-  - Fixed multiline header support in hash representation of Mojo::Headers.
+  - Fixed multi-line header support in hash representation of Mojo::Headers.
   - Fixed cloning bug in Mojo::Headers.
 
 3.89  2013-03-04
@@ -3395,7 +3396,7 @@
   - Improved nested exception handling. (spleenjack)
   - Fixed relative path handling.
   - Fixed application generator. (yko)
-  - Fixed support for multiline expressions in Mojo::Template.
+  - Fixed support for multi-line expressions in Mojo::Template.
   - Fixed multiple --reload related leaks and reduced overall memory usage.
   - Fixed exception handling for included templates.
   - Fixed a small Mojo::Server::PSGI header bug.
@@ -3625,7 +3626,7 @@
   - Fixed Mojo::DOM to support escaped selectors.
   - Fixed Mojo::DOM parser bugs.
   - Fixed Mojo::DOM child listing bug. (evt)
-  - Fixed Mojo::DOM multiline attribute bug. (tempire)
+  - Fixed Mojo::DOM multi-line attribute bug. (tempire)
   - Fixed charset detection of the dom builder in Mojo::Message. (und3f)
   - Fixed json/data rendering with layouts in MojoX::Renderer.
   - Fixed Mojo::IOLoop to not stop unexpectedly.
@@ -4225,7 +4226,7 @@
 
 0.991234  2009-07-03
   - Added name and value filters to Mojo::Headers. (acajou)
-  - Added clean multiline value handling to Mojo::Headers.
+  - Added clean multi-line value handling to Mojo::Headers.
   - Added prepare/finalize methods to Mojolicious.
   - Added some additional MIME types to MojoX::Types.
   - Renamed method add_line to add in Mojo::Headers.

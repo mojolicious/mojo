@@ -383,7 +383,7 @@ Configure server from application settings.
 
   $hypnotoad->run('script/my_app');
 
-Run server for application.
+Run server for application and wait for L</"MANAGER SIGNALS">.
 
 =head1 SEE ALSO
 

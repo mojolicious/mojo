@@ -466,6 +466,11 @@ Start accepting connections through L</"ioloop">.
   my $id   = $daemon->listen(['http://127.0.0.1'])->start->acceptors->[0];
   my $port = $daemon->ioloop->acceptor($id)->port;
 
+  # Run multiple web servers concurrently
+  my $daemon1 = Mojo::Server::Daemon->new(listen => ['http://*:3000'])->start;
+  my $daemon2 = Mojo::Server::Daemon->new(listen => ['http://*:4000'])->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
 =head2 stop
 
   $daemon = $daemon->stop;

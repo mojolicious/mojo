@@ -282,8 +282,8 @@ sub _parent { $_[0]->tree->[$_[0]->type eq 'tag' ? 3 : 2] }
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 
 sub _replace {
-  my ($self, $parent, $tree, @nodes) = @_;
-  splice @$parent, _offset($parent, $tree), 1, _link($parent, @nodes);
+  my ($self, $parent, $child, @nodes) = @_;
+  splice @$parent, _offset($parent, $child), 1, _link($parent, @nodes);
   return $self->parent;
 }
 

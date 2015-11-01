@@ -1,5 +1,5 @@
 
-6.28  2015-10-30
+6.28  2015-11-01
   - Improved build_app method in Mojo::Server to work more like the load_app
     method.
   - Fixed multi-line attribute bug in Mojo::DOM::HTML. (jamadam)

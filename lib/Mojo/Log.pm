@@ -114,8 +114,7 @@ following new ones.
 
 Emitted when a new message gets logged.
 
-  $log->unsubscribe('message');
-  $log->on(message => sub {
+  $log->unsubscribe('message')->on(message => sub {
     my ($log, $level, @lines) = @_;
     say "$level: ", @lines;
   });

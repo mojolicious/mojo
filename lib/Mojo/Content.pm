@@ -342,8 +342,7 @@ Emitted once all data has been written.
 
 Emitted when a new chunk of content arrives.
 
-  $content->unsubscribe('read');
-  $content->on(read => sub {
+  $content->unsubscribe('read')->on(read => sub {
     my ($content, $bytes) = @_;
     say "Streaming: $bytes";
   });

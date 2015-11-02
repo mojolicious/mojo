@@ -404,8 +404,7 @@ Emitted when the WebSocket connection has been closed.
 
 Emitted when a WebSocket frame has been received.
 
-  $ws->unsubscribe('frame');
-  $ws->on(frame => sub {
+  $ws->unsubscribe('frame')->on(frame => sub {
     my ($ws, $frame) = @_;
     say "FIN: $frame->[0]";
     say "RSV1: $frame->[1]";

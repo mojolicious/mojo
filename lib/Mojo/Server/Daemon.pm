@@ -311,7 +311,10 @@ implements the following new ones.
   my $acceptors = $daemon->acceptors;
   $daemon       = $daemon->acceptors([]);
 
-Active acceptors.
+Active acceptor ids.
+
+  # Check port
+  mu $port = $daemon->ioloop->acceptor($daemon->acceptors->[0])->port;
 
 =head2 backlog
 

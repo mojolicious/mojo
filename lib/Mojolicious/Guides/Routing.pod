@@ -949,7 +949,7 @@ applications under a domain and/or prefix.
 
 =head2 Embed applications
 
-For a litte more power you can also embed applications by using them instead of
+For a little more power you can also embed applications by using them instead of
 a controller. This allows for example, the use of the L<Mojolicious::Lite>
 domain specific language in normal L<Mojolicious> controllers.
 

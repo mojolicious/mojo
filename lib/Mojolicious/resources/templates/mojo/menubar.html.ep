@@ -82,8 +82,11 @@
 <script>
   var mojobar = $('#mojobar');
   var mojobarHeight = mojobar.outerHeight();
+  function getElementByHash(hash){
+    return $(hash.replace(/(:|\.|\[|\]|,)/g, '\\$1'));
+  }
   function fixOffset() {
-    var offset = $(window.location.hash).offset();
+    var offset = getElementByHash(window.location.hash).offset();
     if (offset) {
       $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
     }
@@ -128,11 +131,11 @@
     $('.mojoscroll').click(function (e) {
       e.preventDefault();
       e.stopPropagation();
-      var anchor = this.href.split('#')[1];
-      var target = $(document.getElementById(anchor));
+      var anchor = '#' + this.href.split('#')[1];
+      var target = getElementByHash(anchor);
       var old    = target.attr('id');
       target.attr('id', '');
-      location.hash = '#' + anchor.replace(/(:|\.|\[|\]|,)/g, "\\$1");
+      location.hash = anchor;
       target.attr('id', old);
       fixOffset();
     });

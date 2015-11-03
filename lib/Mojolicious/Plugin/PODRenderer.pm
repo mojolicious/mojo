@@ -64,8 +64,7 @@ sub _html {
   for my $e ($dom->find('h1, h2, h3')->each) {
 
     push @parts, [] if $e->tag eq 'h1' || !@parts;
-    my $anchor = $e->{id};
-    my $link   = Mojo::URL->new->fragment($anchor);
+    my $link   = Mojo::URL->new->fragment($e->{id});
     push @{$parts[-1]}, my $text = $e->all_text, $link;
     my $permalink = $c->link_to('#' => $link, class => 'permalink');
     $e->content($permalink . $c->link_to($text => $toc));

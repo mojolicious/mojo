@@ -68,7 +68,7 @@ sub _html {
     my $link   = Mojo::URL->new->fragment($anchor);
     push @{$parts[-1]}, my $text = $e->all_text, $link;
     my $permalink = $c->link_to('#' => $link, class => 'permalink');
-    $e->content($permalink . $c->link_to($text => $toc, id => $anchor));
+    $e->content($permalink . $c->link_to($text => $toc));
   }
 
   # Try to find a title

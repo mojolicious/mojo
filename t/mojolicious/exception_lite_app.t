@@ -137,11 +137,11 @@ $t->get_ok('/logger?level=fatal&message=five')->status_is(200)
   ->content_is('fatal: five');
 like $log, qr/fatal:five/, 'right result';
 
-# "not_found.development.html.ep" route suggestion
-$t->get_ok('/does_not_exist')->status_is(404)
+# "debug.html.ep" route suggestion
+$t->get_ok('/does_not_exist')->status_is(404)->element_exists('#mojobar')
   ->content_like(qr!/does_not_exist!);
 
-# "not_found.development.html.ep" route suggestion
+# "debug.html.ep" route suggestion
 $t->post_ok('/does_not_exist')->status_is(404)
   ->content_like(qr!/does_not_exist!);
 

@@ -52,7 +52,7 @@ $t->get_ok('/art')->status_is(200)->text_like('h2[id="art"]' => qr/art/)
 $t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Perldoc browser (Welcome)
-$t->get_ok('/perldoc')->status_is(200)
+$t->get_ok('/perldoc')->status_is(200)->element_exists('#mojobar')
   ->text_is('#TUTORIAL a:nth-of-type(2)', 'TUTORIAL')
   ->text_is('#GUIDES a:nth-of-type(2)',   'GUIDES')
   ->content_like(qr/Mojolicious guide to the galaxy/);

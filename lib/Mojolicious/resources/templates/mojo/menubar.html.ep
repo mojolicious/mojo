@@ -128,12 +128,11 @@
     $('.mojoscroll').click(function (e) {
       e.preventDefault();
       e.stopPropagation();
-      var anchor = this.href.split('#')[1].replace(/(:|\.|\[|\]|,)/g, "\\$1");
-      var hash   = '#' + anchor;
-      var target = $(hash);
+      var anchor = this.href.split('#')[1];
+      var target = $(document.getElementById(anchor));
       var old    = target.attr('id');
       target.attr('id', '');
-      location.hash = hash;
+      location.hash = '#' + anchor.replace(/(:|\.|\[|\]|,)/g, "\\$1");
       target.attr('id', old);
       fixOffset();
     });

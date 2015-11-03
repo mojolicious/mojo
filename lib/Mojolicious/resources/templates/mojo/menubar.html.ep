@@ -82,7 +82,7 @@
 <script>
   var mojobar = $('#mojobar');
   var mojobarHeight = mojobar.outerHeight();
-  function getElementByHash(hash){
+  function getElementByHash(hash) {
     return $(hash.replace(/(:|\.|\[|\]|,)/g, '\\$1'));
   }
   function fixOffset() {
@@ -131,11 +131,11 @@
     $('.mojoscroll').click(function (e) {
       e.preventDefault();
       e.stopPropagation();
-      var anchor = '#' + this.href.split('#')[1];
-      var target = getElementByHash(anchor);
+      var hash   = '#' + this.href.split('#')[1];
+      var target = getElementByHash(hash);
       var old    = target.attr('id');
       target.attr('id', '');
-      location.hash = anchor;
+      location.hash = hash;
       target.attr('id', old);
       fixOffset();
     });

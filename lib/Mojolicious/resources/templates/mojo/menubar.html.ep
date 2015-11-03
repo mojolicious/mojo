@@ -125,10 +125,11 @@
   });
   $(document).ready(function () {
     $('a[href^="#"]').addClass('mojoscroll');
-    $(".mojoscroll").click(function (e) {
+    $('.mojoscroll').click(function (e) {
       e.preventDefault();
       e.stopPropagation();
-      var hash   = "#" + this.href.split("#")[1];
+      var anchor = this.href.split('#')[1].replace(/(:|\.|\[|\]|,)/g, "\\$1");
+      var hash   = '#' + anchor;
       var target = $(hash);
       var old    = target.attr('id');
       target.attr('id', '');

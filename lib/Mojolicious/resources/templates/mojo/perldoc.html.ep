@@ -90,7 +90,7 @@
     </style>
   </head>
   <body>
-    %= include 'mojo/mojobar'
+    %= include 'mojo/menubar'
     <div id="wrapperlicious">
       <div id="perldoc">
         <div id="source">

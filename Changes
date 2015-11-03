@@ -1,5 +1,6 @@
 
 6.29  2015-11-03
+  - Fixed a few bugs in built-in templates. (Zoffix, sri)
 
 6.28  2015-11-02
   - Improved build_app method in Mojo::Server to work more like the load_app

@@ -189,52 +189,52 @@ Append message to L</"handle">.
   $log = $log->debug('You screwed up, but that is ok');
   $log = $log->debug('All', 'cool');
 
-Emit L</"message"> event and log debug message.
+Emit L</"message"> event and log C<debug> message.
 
 =head2 error
 
   $log = $log->error('You really screwed up this time');
   $log = $log->error('Wow', 'seriously');
 
-Emit L</"message"> event and log error message.
+Emit L</"message"> event and log C<error> message.
 
 =head2 fatal
 
   $log = $log->fatal('Its over...');
   $log = $log->fatal('Bye', 'bye');
 
-Emit L</"message"> event and log fatal message.
+Emit L</"message"> event and log C<fatal> message.
 
 =head2 info
 
   $log = $log->info('You are bad, but you prolly know already');
   $log = $log->info('Ok', 'then');
 
-Emit L</"message"> event and log info message.
+Emit L</"message"> event and log C<info> message.
 
 =head2 is_debug
 
   my $bool = $log->is_debug;
 
-Check for debug log level.
+Check if C<debug> log level is active.
 
 =head2 is_error
 
   my $bool = $log->is_error;
 
-Check for error log level.
+Check if C<error> log level is active.
 
 =head2 is_info
 
   my $bool = $log->is_info;
 
-Check for info log level.
+Check if C<info> log level is active.
 
 =head2 is_warn
 
   my $bool = $log->is_warn;
 
-Check for warn log level.
+Check if C<warn> log level is active.
 
 =head2 new
 
@@ -248,7 +248,7 @@ default logger.
   $log = $log->warn('Dont do that Dave...');
   $log = $log->warn('No', 'really');
 
-Emit L</"message"> event and log warn message.
+Emit L</"message"> event and log C<warn> message.
 
 =head1 SEE ALSO
 

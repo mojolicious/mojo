@@ -271,4 +271,12 @@ $result  = $pattern->match('/i♥mojolicious');
 is_deeply $result, {one => 'i', two => 'mojolicious'}, 'right structure';
 is $pattern->render($result, 1), '/i♥mojolicious', 'right result';
 
+# Pattern reuse
+$pattern = Mojolicious::Routes::Pattern->new->parse('/first')->parse('/second')
+  ->defaults({test => 'works'});
+ok !$pattern->match('/first'), 'no result';
+$result = $pattern->match('/second');
+is_deeply $result, {test => 'works'}, 'right structure';
+is $pattern->render($result, 1), '/second', 'right result';
+
 done_testing();

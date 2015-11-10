@@ -769,49 +769,6 @@ also be used to pass whole sections of the template to the layout.
     <body><%= content %></body>
   </html>
 
-=head2 Template inheritance
-
-Inheritance is an alternative to the layout concept above, and takes it one step
-further. The helpers L<Mojolicious::Plugin::DefaultHelpers/"content"> and
-L<Mojolicious::Plugin::DefaultHelpers/"extends"> allow you to build a skeleton
-template with named blocks that child templates can override.
-
-  use Mojolicious::Lite;
-
-  get '/' => 'third';
-
-  app->start;
-  __DATA__
-
-  @@ first.html.ep
-  <!DOCTYPE html>
-  <html>
-    <head><title>Hello</title></head>
-    <body>
-      %= content header => begin
-        Default header
-      % end
-      <div>Hello World!</div>
-      %= content footer => begin
-        Default footer
-      % end
-    </body>
-  </html>
-
-  @@ second.html.ep
-  % extends 'first';
-  % content header => begin
-    New header
-  % end
-
-  @@ third.html.ep
-  % extends 'second';
-  % content footer => begin
-    New footer
-  % end
-
-This chain could go on and on to allow a very high level of template reuse.
-
 =head2 Forms
 
 To build HTML forms more efficiently you can use tag helpers like
@@ -1033,6 +990,54 @@ The token can also be submitted with the C<X-CSRF-Token> request header.
 =head1 ADVANCED
 
 Less commonly used and more powerful features.
+
+=head2 Template inheritance
+
+Inheritance takes the layout concept above one step further, the helpers
+L<Mojolicious::Plugin::DefaultHelpers/"content"> and
+L<Mojolicious::Plugin::DefaultHelpers/"extends"> allow you to build skeleton
+templates with named blocks that child templates can override.
+
+  use Mojolicious::Lite;
+
+  # first > mylayout
+  get '/first' => {template => 'first', layout => 'mylayout'};
+
+  # third > second > first > mylayout
+  get '/third' => {template => 'third', layout => 'mylayout'};
+
+  app->start;
+  __DATA__
+
+  @@ layouts/mylayout.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head><title>Hello</title></head>
+    <body><%= content %></body>
+  </html>
+
+  @@ first.html.ep
+  %= content header => begin
+    Default header
+  % end
+  <div>Hello World!</div>
+  %= content footer => begin
+    Default footer
+  % end
+
+  @@ second.html.ep
+  % extends 'first';
+  % content header => begin
+    New header
+  % end
+
+  @@ third.html.ep
+  % extends 'second';
+  % content footer => begin
+    New footer
+  % end
+
+This chain could go on and on to allow a very high level of template reuse.
 
 =head2 Serving static files
 

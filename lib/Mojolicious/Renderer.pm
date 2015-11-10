@@ -226,8 +226,8 @@ sub warmup {
 
 sub _extends {
   my ($self, $stash) = @_;
-  my $layout = delete $stash->{layout};
-  $stash->{extends} ||= join('/', 'layouts', $layout) if $layout;
+  $stash->{extends} ||= join('/', 'layouts', delete $stash->{layout})
+    if $stash->{layout};
   return delete $stash->{extends};
 }
 

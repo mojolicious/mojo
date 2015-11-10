@@ -1,5 +1,7 @@
 
 6.30  2015-11-10
+  - Fixed bug in Mojolicious::Renderer where layouts could not be used with
+    template inheritance. (nic, sri)
 
 6.29  2015-11-03
   - Fixed a few bugs in built-in templates. (Zoffix, sri)

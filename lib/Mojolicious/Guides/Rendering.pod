@@ -771,8 +771,8 @@ also be used to pass whole sections of the template to the layout.
 
 =head2 Template inheritance
 
-Inheritance takes the layout concept above one step further, the helpers
-L<Mojolicious::Plugin::DefaultHelpers/"content"> and
+Inheritance is an alternative to the layout concept above, and takes it one step
+further, the helpers L<Mojolicious::Plugin::DefaultHelpers/"content"> and
 L<Mojolicious::Plugin::DefaultHelpers/"extends"> allow you to build a skeleton
 template with named blocks that child templates can override.
 

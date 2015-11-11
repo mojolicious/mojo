@@ -36,7 +36,7 @@ sub run {
     $self->{finished} = 1;
     kill 'TERM', $self->{worker} if $self->{worker};
   };
-  unshift @{$self->watch}, $app;
+  unshift @{$self->watch}, $0 = $app;
   $self->{modified} = 1;
 
   # Prepare and cache listen sockets for smooth restarting

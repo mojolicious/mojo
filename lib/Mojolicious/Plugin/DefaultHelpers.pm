@@ -52,8 +52,10 @@ sub _asset {
 sub _block { ref $_[0] eq 'CODE' ? $_[0]() : $_[0] }
 
 sub _content {
-  my ($append, $replace, $c, $name, $content) = @_;
+  my ($append, $replace, $c, $name, @args ) = @_;
   $name ||= 'content';
+
+  my $content =  pop @args   if scalar @args == 1;
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {

@@ -72,7 +72,7 @@ $t->get_ok('/named_content_with_args')->status_is(200)
 # Pass args to content's block
 $t->get_ok('/pass_args_to_block')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
-  ->content_is("Default\na b c");
+  ->content_is("Default a b c\n\n");
 
 
 __DATA__

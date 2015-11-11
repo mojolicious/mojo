@@ -58,7 +58,8 @@ sub _content {
   my ($append, $replace, $c, $name, @args ) = @_;
   $name ||= 'content';
 
-  my $content =  pop @args   if scalar @args == 1;
+  my $content =  pop @args
+     if @args == 1  ||  @args && ref $args[-1] eq 'CODE';
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {

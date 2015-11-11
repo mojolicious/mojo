@@ -67,15 +67,14 @@ sub _content {
     else          { $hash->{$name} //= $content }
   }
 
+  return '' if !defined wantarray;
+
   my $output =  ref $hash->{$name} eq 'CODE'
      ? _block( $hash->{$name}, @args )
      : $hash->{$name}
      ;
 
-  return defined wantarray
-     ? Mojo::ByteStream->new( $output // '')
-     : ''
-     ;
+  return Mojo::ByteStream->new($output // '');
 }
 
 sub _csrf_token {

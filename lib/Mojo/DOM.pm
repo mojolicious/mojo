@@ -449,8 +449,8 @@ names are lowercased and selectors need to be lowercase as well.
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
   say $dom->at('p[id]')->text;
 
-If XML processing instructions are found, the parser will automatically switch
-into XML mode and everything becomes case-sensitive.
+If an XML declaration is found, the parser will automatically switch into XML
+mode and everything becomes case-sensitive.
 
   # XML semantics
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
@@ -745,7 +745,7 @@ no parent.
 Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   # Parse XML
-  my $dom = Mojo::DOM->new->xml(1)->parse($xml);
+  my $dom = Mojo::DOM->new->xml(1)->parse('<foo>I ♥ Mojolicious!<foo/>');
 
 =head2 preceding
 

@@ -49,7 +49,10 @@ sub _asset {
   $c->rendered;
 }
 
-sub _block { ref $_[0] eq 'CODE' ? $_[0]( @_ ) : $_[0] }
+sub _block {
+  my $content =  shift;
+  ref $content eq 'CODE' ? &$content( @_ ) : $content;
+}
 
 sub _content {
   my ($append, $replace, $c, $name, @args ) = @_;

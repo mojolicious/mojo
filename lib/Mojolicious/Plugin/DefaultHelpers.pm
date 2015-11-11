@@ -62,7 +62,10 @@ sub _content {
     else          { $hash->{$name} //= _block($content) }
   }
 
-  return Mojo::ByteStream->new($hash->{$name} // '');
+  return defined wantarray
+     ? Mojo::ByteStream->new($hash->{$name} // '')
+     : ''
+     ;
 }
 
 sub _csrf_token {

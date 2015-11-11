@@ -49,7 +49,7 @@ sub _asset {
   $c->rendered;
 }
 
-sub _block { ref $_[0] eq 'CODE' ? $_[0]() : $_[0] }
+sub _block { ref $_[0] eq 'CODE' ? $_[0]( @_ ) : $_[0] }
 
 sub _content {
   my ($append, $replace, $c, $name, @args ) = @_;
@@ -59,9 +59,9 @@ sub _content {
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {
-    if ($append) { $hash->{$name} .= _block($content) }
-    if ($replace) { $hash->{$name} = _block($content) }
-    else          { $hash->{$name} //= _block($content) }
+    if ($append) { $hash->{$name} .= _block($content, @args) }
+    if ($replace) { $hash->{$name} = _block($content, @args) }
+    else          { $hash->{$name} //= _block($content, @args) }
   }
 
   return defined wantarray

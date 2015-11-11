@@ -700,7 +700,7 @@ L<http://creativecommons.org/licenses/by-sa/4.0>.
 
 =head2 jQuery
 
-  Copyright (C) 2005, 2014 jQuery Foundation, Inc.
+  Copyright (C) 2005, 2015 jQuery Foundation, Inc.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 

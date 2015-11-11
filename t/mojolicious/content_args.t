@@ -36,6 +36,8 @@ get '/named_content_with_args';
 
 get '/pass_args_to_block';
 
+get '/define_block_and_pass_args';
+
 
 my $t = Test::Mojo->new;
 
@@ -74,6 +76,13 @@ $t->get_ok('/pass_args_to_block')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is("Default a b c\n\n");
 
+#TODO: Report about wrong result for same templates
+# Define block and pass args to it
+$t->get_ok('/define_block_and_pass_args')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("Default \na b c\n");
+
+
 
 __DATA__
 
@@ -102,3 +111,8 @@ Default<%= content 'foo', foo => 'bar' %>
 <%= "@_" %>
 % end
 Default <%= content foo => qw/ a b c / %>
+
+@@ define_block_and_pass_args.html.ep
+Default <%= content foo => qw/ a b c /, begin %>
+<%= "@_" %>
+% end

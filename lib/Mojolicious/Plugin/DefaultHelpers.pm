@@ -66,12 +66,14 @@ sub _content {
     if ($replace) { $hash->{$name} = _block($content, @args) }
     else          { $hash->{$name} //= $content }
   }
-  elsif( ref $hash->{$name} eq 'CODE' ) {
-    $hash->{$name} =  _block( $hash->{$name}, @args );
-  }
+
+  my $output =  ref $hash->{$name} eq 'CODE'
+     ? _block( $hash->{$name}, @args )
+     : $hash->{$name}
+     ;
 
   return defined wantarray
-     ? Mojo::ByteStream->new($hash->{$name} // '')
+     ? Mojo::ByteStream->new( $output // '')
      : ''
      ;
 }

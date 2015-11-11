@@ -34,6 +34,9 @@ get '/named_content_old_interface_block';
 
 get '/named_content_with_args';
 
+get '/pass_args_to_block';
+
+
 my $t = Test::Mojo->new;
 
 # Simple content
@@ -66,6 +69,11 @@ $t->get_ok('/named_content_with_args')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is("Default\n");
 
+# Pass args to content's block
+$t->get_ok('/pass_args_to_block')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("Default\na b c");
+
 
 __DATA__
 
@@ -88,3 +96,9 @@ Text
 
 @@ named_content_with_args.html.ep
 Default<%= content 'foo', foo => 'bar' %>
+
+@@ pass_args_to_block.html.ep
+% content foo => begin
+<%= "@_" %>
+% end
+Default <%= content foo => qw/ a b c / %>

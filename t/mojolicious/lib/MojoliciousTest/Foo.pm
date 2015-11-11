@@ -90,6 +90,11 @@ sub url_for_missing {
   $self->render(text => $self->url_for('does_not_exist', something => '42'));
 }
 
+sub url_for_namespace {
+  my $self = shift;
+  $self->render(text => $self->url_for('Package::Namespace'));
+}
+
 sub willdie { die 'for some reason' }
 
 sub withBlock { shift->render(template => 'withblock') }

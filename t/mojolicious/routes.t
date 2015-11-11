@@ -129,6 +129,9 @@ $inline->route('/delete')
   ->to(controller => 'articles', action => 'delete', format => undef)
   ->name('articles_delete');
 
+# Two consecutive colons in route name
+$r->route('/package/namespace')->name("Package::Namespace");
+
 # GET /method/get
 $r->route('/method/get')->via('GET')
   ->to(controller => 'method', action => 'get');
@@ -258,6 +261,10 @@ is $r->find('articles_delete')->to_string, '/articles/:id/delete',
   'right pattern';
 is $r->find('nodetect')->pattern->constraints->{format}, 0, 'right value';
 is $r->find('nodetect')->to->{controller}, 'foo', 'right controller';
+
+# Package namespaces (with consecutive colons) as route name
+is $r->find("Package::Namespace")->to_string, '/package/namespace';
+is $r->lookup("Package::Namespace")->to_string, '/package/namespace';
 
 # Null route
 $m = Mojolicious::Routes::Match->new(root => $r);

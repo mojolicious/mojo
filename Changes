@@ -1,5 +1,6 @@
 
 6.30  2015-11-04
+  - Fixed url_for to handle route named against package namespaces.
 
 6.29  2015-11-03
   - Fixed a few bugs in built-in templates. (Zoffix, sri)

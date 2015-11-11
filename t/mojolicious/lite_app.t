@@ -300,6 +300,11 @@ any '/something' => sub {
   $c->render(text => 'Just works!');
 };
 
+any '/package/namespace' => sub {
+  my $c = shift;
+  $c->render(text => $c->url_for("Package::Namespace"));
+} => "Package::Namespace";
+
 any [qw(get post whatever)] => '/something/else' => sub {
   my $c = shift;
   $c->render(text => 'Yay!');
@@ -823,6 +828,12 @@ $t->request_ok($t->ua->build_tx(WHATEVER => '/something/else'))->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
 $t->delete_ok('/something/else')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
+
+# Route named against package namespaces
+$t->get_ok('/package/namespace')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('/package/namespace');
+is $t->app->url_for("Package::Namespace"), "/package/namespace";
 
 # Regex constraint
 $t->get_ok('/regex/23')->status_is(200)

@@ -91,6 +91,9 @@ sub startup {
   # /something_missing (refer to a non-existing route with url_for)
   $r->route('/something_missing')->to('foo#url_for_missing');
 
+  # /package/namespace (use package namespace with url_for)
+  $r->route('/package/namespace')->to('foo#url_for_namespace')->name("Package::Namespace");
+
   # /test3 (no class, just a namespace)
   $r->route('/test3')
     ->to(namespace => 'MojoliciousTestController', action => 'index');

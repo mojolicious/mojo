@@ -68,6 +68,8 @@ is $t->app->build_controller->render_to_string('does_not_exist'), undef,
   'no result';
 is $t->app->build_controller->render_to_string(inline => '%= $c', c => 'foo'),
   "foo\n", 'right result';
+is ref $t->app->routes->find('Package::Namespace'), 'Mojolicious::Routes::Route',
+  'right class';
 
 # Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };
@@ -322,6 +324,10 @@ $t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})
 # Foo::url_for_missing
 $t->get_ok('/something_missing' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('does_not_exist');
+
+# Foo::url_for_namespace
+$t->get_ok('/package/namespace' => {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('/package/namespace');
 
 # Foo::templateless
 $t->get_ok('/foo/templateless' => {'X-Test' => 'Hi there!'})->status_is(200)

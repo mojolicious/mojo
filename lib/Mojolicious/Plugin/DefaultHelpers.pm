@@ -64,7 +64,10 @@ sub _content {
   if (defined $content) {
     if ($append) { $hash->{$name} .= _block($content, @args) }
     if ($replace) { $hash->{$name} = _block($content, @args) }
-    else          { $hash->{$name} //= _block($content, @args) }
+    else          { $hash->{$name} //= $content }
+  }
+  elsif( ref $hash->{$name} eq 'CODE' ) {
+    $hash->{$name} =  _block( $hash->{$name}, @args );
   }
 
   return defined wantarray

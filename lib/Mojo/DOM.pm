@@ -738,6 +738,9 @@ more siblings.
 Return L<Mojo::DOM> object for parent of this node or C<undef> if this node has
 no parent.
 
+  # "<b><i>Test</i></b>"
+  $dom->parse('<p><b><i>Test</i></b></p>')->at('i')->parent;
+
 =head2 parse
 
   $dom = $dom->parse('<foo bar="baz">I ♥ Mojolicious!</foo>');

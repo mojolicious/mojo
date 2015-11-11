@@ -28,6 +28,10 @@ get '/default_content';
 
 get '/default_content_with_args';
 
+get '/named_content_old_interface_text';
+
+get '/named_content_old_interface_block';
+
 get '/named_content_with_args';
 
 my $t = Test::Mojo->new;
@@ -47,6 +51,16 @@ $t->get_ok('/default_content_with_args')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is("Default\n");
 
+# Named content with old interface. One text argument
+$t->get_ok('/named_content_old_interface_text')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("DefaultText\n");
+
+# Named content with old interface. One block argument
+$t->get_ok('/named_content_old_interface_block')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("Default\nText\n");
+
 # Named content with arguments
 $t->get_ok('/named_content_with_args')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
@@ -63,6 +77,14 @@ Default<%= content undef %>
 
 @@ default_content_with_args.html.ep
 Default<%= content undef, foo => 'bar' %>
+
+@@ named_content_old_interface_text.html.ep
+Default<%= content foo => 'Text' %>
+
+@@ named_content_old_interface_block.html.ep
+Default<%= content foo => begin %>
+Text
+% end
 
 @@ named_content_with_args.html.ep
 Default<%= content 'foo', foo => 'bar' %>

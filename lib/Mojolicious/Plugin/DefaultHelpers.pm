@@ -73,21 +73,13 @@ sub _content {
 
   return '' if !defined wantarray;
 
-  my $output =  ref $hash->{$name} eq 'CODE'
-     ? _block( $hash->{$name}, @args )
-     : $hash->{$name}
-     ;
-
-
-  if( ref $output eq 'ARRAY' ) {
-    my $result =  '';
-    for my $chunk ( @$output ) {
-      $result .=  ref $chunk eq 'CODE'
-         ? _block( $chunk, @args )
-         : $chunk
-      ;
-    }
-    $output =  $result;
+  my $output;
+  my $t =  $hash->{$name};
+  for my $chunk ( ref $t eq 'ARRAY' ? @$t : $t ) {
+    $output .=  ref $chunk eq 'CODE'
+       ? _block( $chunk, @args )
+       : $chunk
+    ;
   }
 
   return Mojo::ByteStream->new($output // '');

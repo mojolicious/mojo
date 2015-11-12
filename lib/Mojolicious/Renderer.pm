@@ -132,11 +132,11 @@ sub render {
     return unless $self->_render_template($c, \$output, $options);
   }
 
-  # Extends
+  # Inheritance
   my $content = $stash->{'mojo.content'} ||= {};
   local $content->{content} = $output if $stash->{extends} || $stash->{layout};
-  while ((my $extends = $self->_extends($stash)) && !defined $inline) {
-    @$options{qw(handler template)} = ($stash->{handler}, $extends);
+  while ((my $next = _next($stash)) && !defined $inline) {
+    @$options{qw(handler template)} = ($stash->{handler}, $next);
     $options->{format} = $stash->{format} || $self->default_format;
     $self->_render_template($c, \$output, $options);
     $content->{content} = $output
@@ -224,11 +224,11 @@ sub warmup {
   }
 }
 
-sub _extends {
-  my ($self, $stash) = @_;
-  my $layout = delete $stash->{layout};
-  $stash->{extends} ||= join('/', 'layouts', $layout) if $layout;
-  return delete $stash->{extends};
+sub _next {
+  my $stash = shift;
+  return delete $stash->{extends} if $stash->{extends};
+  return undef unless my $layout = delete $stash->{layout};
+  return join '/', 'layouts', $layout;
 }
 
 sub _render_template {

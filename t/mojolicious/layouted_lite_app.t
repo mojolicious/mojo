@@ -48,6 +48,12 @@ get '/double_inheritance' =>
 
 get '/triple_inheritance';
 
+get '/mixed_inheritance/first' => {template => 'first'};
+
+get '/mixed_inheritance/second' => {template => 'second', layout => 'green'};
+
+get '/mixed_inheritance/third' => {template => 'third'};
+
 get '/nested-includes' => sub {
   my $c = shift;
   $c->render(
@@ -71,7 +77,11 @@ get '/outerlayout' => sub {
 
 get '/outerextends' => sub {
   my $c = shift;
-  $c->render(template => 'outerlayout', extends => 'layouts/layout');
+  $c->render(
+    template => 'outerlayout',
+    extends  => 'layouts/layout',
+    layout   => undef
+  );
 };
 
 get '/outerlayouttwo' => {layout => 'layout'} => sub {
@@ -188,6 +198,17 @@ $t->get_ok('/triple_inheritance')->status_is(200)
   ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
     . "New <content>.\n\nDefault footer!\n");
 
+# Mixed inheritance (with layout)
+$t->get_ok('/mixed_inheritance/first')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("Default\n  Default header\nStuff\n\n  Default footer\n\n");
+$t->get_ok('/mixed_inheritance/second')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("Green  New header\nStuff\n\n  Default footer\n\n");
+$t->get_ok('/mixed_inheritance/third')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("Default  New header\nStuff\n  New footer\n\n");
+
 # Template from plugin
 $t->get_ok('/plugin_with_template')->status_is(200)
   ->content_is("layout_with_template\nwith template\n\n");
@@ -285,6 +306,7 @@ Green<%= title %><%= content %>
 Mixed <%= content %>
 
 @@ blue.html.ep
+% layout undef;
 Blue<%= title %><%= content %>
 
 @@ works.html.ep
@@ -308,6 +330,27 @@ Exception happened!
 % layout 'green' if param 'green';
 % extends 'blue' if param 'blue';
 Not found happened!
+
+@@ first.html.ep
+%= content header => begin
+  Default header
+% end
+Stuff
+%= content footer => begin
+  Default footer
+% end
+
+@@ second.html.ep
+% extends 'first';
+% content header => begin
+  New header
+% end
+
+@@ third.html.ep
+% extends 'second';
+% content footer => begin
+  New footer
+% end
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';
@@ -353,6 +396,7 @@ Nested <%= include 'outerlayout' %>
 
 @@ localized.html.ep
 % extends 'localized1';
+% layout undef;
 <%= $test %>
 <%= include 'localized_include', test => 321, extends => 'localized2' %>
 <%= $test %>

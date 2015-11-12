@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Clinking Beer Mugs';
-our $VERSION  = '6.28';
+our $VERSION  = '6.31';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -700,7 +700,7 @@ L<http://creativecommons.org/licenses/by-sa/4.0>.
 
 =head2 jQuery
 
-  Copyright (C) 2005, 2014 jQuery Foundation, Inc.
+  Copyright (C) 2005, 2015 jQuery Foundation, Inc.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
@@ -756,8 +756,6 @@ Current members of the core team in alphabetical order:
 =over 2
 
 Abhijit Menon-Sen, C<ams@cpan.org>
-
-Dan Book, C<dbook@cpan.org>
 
 Glen Hinkle, C<tempire@cpan.org>
 
@@ -838,6 +836,8 @@ Christian Hansen
 chromatic
 
 Curt Tilmes
+
+Dan Book
 
 Daniel Kimsey
 

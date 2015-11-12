@@ -282,8 +282,8 @@ sub _parent { $_[0]->tree->[$_[0]->type eq 'tag' ? 3 : 2] }
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 
 sub _replace {
-  my ($self, $parent, $tree, @nodes) = @_;
-  splice @$parent, _offset($parent, $tree), 1, _link($parent, @nodes);
+  my ($self, $parent, $child, @nodes) = @_;
+  splice @$parent, _offset($parent, $child), 1, _link($parent, @nodes);
   return $self->parent;
 }
 
@@ -449,8 +449,8 @@ names are lowercased and selectors need to be lowercase as well.
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
   say $dom->at('p[id]')->text;
 
-If XML processing instructions are found, the parser will automatically switch
-into XML mode and everything becomes case-sensitive.
+If an XML declaration is found, the parser will automatically switch into XML
+mode and everything becomes case-sensitive.
 
   # XML semantics
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
@@ -738,6 +738,9 @@ more siblings.
 Return L<Mojo::DOM> object for parent of this node or C<undef> if this node has
 no parent.
 
+  # "<b><i>Test</i></b>"
+  $dom->parse('<p><b><i>Test</i></b></p>')->at('i')->parent;
+
 =head2 parse
 
   $dom = $dom->parse('<foo bar="baz">I ♥ Mojolicious!</foo>');
@@ -745,7 +748,7 @@ no parent.
 Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   # Parse XML
-  my $dom = Mojo::DOM->new->xml(1)->parse($xml);
+  my $dom = Mojo::DOM->new->xml(1)->parse('<foo>I ♥ Mojolicious!<foo/>');
 
 =head2 preceding
 

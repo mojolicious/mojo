@@ -255,8 +255,7 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server
   use Mojo::Server::Daemon;
 
   my $daemon = Mojo::Server::Daemon->new(listen => ['http://*:8080']);
-  $daemon->unsubscribe('request');
-  $daemon->on(request => sub {
+  $daemon->unsubscribe('request')->on(request => sub {
     my ($daemon, $tx) = @_;
 
     # Request
@@ -311,7 +310,10 @@ implements the following new ones.
   my $acceptors = $daemon->acceptors;
   $daemon       = $daemon->acceptors([]);
 
-Active acceptors.
+Active acceptor ids.
+
+  # Check port
+  mu $port = $daemon->ioloop->acceptor($daemon->acceptors->[0])->port;
 
 =head2 backlog
 
@@ -465,6 +467,11 @@ Start accepting connections through L</"ioloop">.
   # Listen on random port
   my $id   = $daemon->listen(['http://127.0.0.1'])->start->acceptors->[0];
   my $port = $daemon->ioloop->acceptor($id)->port;
+
+  # Run multiple web servers concurrently
+  my $daemon1 = Mojo::Server::Daemon->new(listen => ['http://*:3000'])->start;
+  my $daemon2 = Mojo::Server::Daemon->new(listen => ['http://*:4000'])->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 stop
 

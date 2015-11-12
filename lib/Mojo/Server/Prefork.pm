@@ -211,8 +211,7 @@ Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
   use Mojo::Server::Prefork;
 
   my $prefork = Mojo::Server::Prefork->new(listen => ['http://*:8080']);
-  $prefork->unsubscribe('request');
-  $prefork->on(request => sub {
+  $prefork->unsubscribe('request')->on(request => sub {
     my ($prefork, $tx) = @_;
 
     # Request

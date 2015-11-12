@@ -79,10 +79,13 @@ is $app->config({test => 23})->config->{test}, 23, 'right value';
 is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
   'right value';
 
-# Script name
-my $path = "$FindBin::Bin/lib/../lib/myapp.pl";
-is(Mojo::Server::Daemon->new->load_app($path)->config('script'),
-  abs_path($path), 'right script name');
+# Loading
+my $daemon = Mojo::Server::Daemon->new;
+my $path   = "$FindBin::Bin/lib/../lib/myapp.pl";
+is ref $daemon->load_app($path), 'Mojolicious::Lite', 'right reference';
+is $daemon->app->config('script'), abs_path($path), 'right script name';
+is ref $daemon->build_app('TestApp'), 'TestApp', 'right reference';
+is ref $daemon->app, 'TestApp', 'right reference';
 
 # Load broken app
 my $bin = $FindBin::Bin;
@@ -229,7 +232,7 @@ ok $remote_address, 'has remote address';
 ok $remote_port > 0, 'has remote port';
 
 # Pipelined
-my $daemon
+$daemon
   = Mojo::Server::Daemon->new({listen => ['http://127.0.0.1'], silent => 1});
 $daemon->start;
 my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;

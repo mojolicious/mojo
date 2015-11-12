@@ -10,7 +10,7 @@ use Mojo::Server::Prefork;
 use Mojo::Util qw(steady_time);
 use Scalar::Util 'weaken';
 
-has prefork => sub { Mojo::Server::Prefork->new };
+has prefork => sub { Mojo::Server::Prefork->new(listen => ['http://*:8080']) };
 has upgrade_timeout => 60;
 
 sub configure {
@@ -19,7 +19,6 @@ sub configure {
   # Hypnotoad settings
   my $prefork = $self->prefork;
   my $c = $prefork->app->config($name) || {};
-  $c->{listen} ||= ['http://*:8080'];
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
   # Prefork settings
@@ -384,7 +383,7 @@ Configure server from application settings.
 
   $hypnotoad->run('script/my_app');
 
-Run server for application.
+Run server for application and wait for L</"MANAGER SIGNALS">.
 
 =head1 SEE ALSO
 

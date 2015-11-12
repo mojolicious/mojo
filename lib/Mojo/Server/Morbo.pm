@@ -36,7 +36,7 @@ sub run {
     $self->{finished} = 1;
     kill 'TERM', $self->{worker} if $self->{worker};
   };
-  unshift @{$self->watch}, $app;
+  unshift @{$self->watch}, $0 = $app;
   $self->{modified} = 1;
 
   # Prepare and cache listen sockets for smooth restarting
@@ -173,7 +173,7 @@ its name or C<undef> if there have been no changes.
 
   $morbo->run('script/my_app');
 
-Run server for application.
+Run server for application and wait for L</"SIGNALS">.
 
 =head1 SEE ALSO
 

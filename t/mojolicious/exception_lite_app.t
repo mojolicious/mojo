@@ -137,11 +137,11 @@ $t->get_ok('/logger?level=fatal&message=five')->status_is(200)
   ->content_is('fatal: five');
 like $log, qr/fatal:five/, 'right result';
 
-# "not_found.development.html.ep" route suggestion
-$t->get_ok('/does_not_exist')->status_is(404)
+# "debug.html.ep" route suggestion
+$t->get_ok('/does_not_exist')->status_is(404)->element_exists('#mojobar')
   ->content_like(qr!/does_not_exist!);
 
-# "not_found.development.html.ep" route suggestion
+# "debug.html.ep" route suggestion
 $t->post_ok('/does_not_exist')->status_is(404)
   ->content_like(qr!/does_not_exist!);
 
@@ -156,7 +156,8 @@ $t->get_ok('/dead_included_template')->status_is(500)
 
 # Dead template with layout
 $t->get_ok('/dead_template_with_layout')->status_is(500)
-  ->content_like(qr/dead template with layout!/)->content_like(qr/line 2/);
+  ->content_like(qr/dead template with layout!/)->content_like(qr/line 2/)
+  ->content_unlike(qr/Green/);
 like $log, qr/dead template with layout!/, 'right result';
 
 # Dead action
@@ -264,7 +265,7 @@ done_testing();
 
 __DATA__
 @@ layouts/green.html.ep
-%= content
+Green<%= content %>
 
 @@ dead_template.html.ep
 % die 'dead template!';

@@ -14,7 +14,7 @@ has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };
 sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};
-  return $app->new unless my $e = load_class $app;
+  return $self->app($app->new)->app unless my $e = load_class $app;
   die ref $e ? $e : qq{Can't find application class "$app" in \@INC. (@INC)\n};
 }
 
@@ -115,8 +115,7 @@ following new ones.
 
 Emitted when a request is ready and needs to be handled.
 
-  $server->unsubscribe('request');
-  $server->on(request => sub {
+  $server->unsubscribe('request')->on(request => sub {
     my ($server, $tx) = @_;
     $tx->res->code(200);
     $tx->res->headers->content_type('text/plain');
@@ -152,7 +151,7 @@ the following new ones.
 
   my $app = $server->build_app('MyApp');
 
-Build application from class.
+Build application from class and assign it to L</"app">.
 
 =head2 build_tx
 
@@ -170,7 +169,7 @@ Daemonize server process.
 
   my $app = $server->load_app('/home/sri/myapp.pl');
 
-Load application from script.
+Load application from script and assign it to L</"app">.
 
   say Mojo::Server->new->load_app('./myapp.pl')->home;
 

@@ -858,6 +858,16 @@ L<Mojolicious::Routes::Route/"remove">.
 Especially for rearranging routes created by plugins this can be very useful,
 to find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
+  # GET /example/test -> {controller => 'example', action => 'test'}
+  $r->get('/something/else')->to('something#else')->name('test');
+  my $test = $r->find('test');
+  $test->pattern->parse('/example/test');
+  $test->pattern->defaults({controller => 'example', action => 'test'});
+
+Even the route pattern and destination can still be changed with
+L<Mojolicious::Routes::Pattern/"parse"> and
+L<Mojolicious::Routes::Pattern/"defaults">.
+
 =head2 Adding conditions
 
 You can also add your own conditions with the method
@@ -949,7 +959,7 @@ applications under a domain and/or prefix.
 
 =head2 Embed applications
 
-For a litte more power you can also embed applications by using them instead of
+For a little more power you can also embed applications by using them instead of
 a controller. This allows for example, the use of the L<Mojolicious::Lite>
 domain specific language in normal L<Mojolicious> controllers.
 

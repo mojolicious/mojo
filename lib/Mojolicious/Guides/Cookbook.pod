@@ -345,6 +345,8 @@ to combine multiple applications into one and deploy them together.
 
   use Mojolicious::Lite;
 
+  app->config(hypnotoad => {listen => ['http://*:80']});
+
   plugin Mount => {'test1.example.com' => '/home/sri/myapp1.pl'};
   plugin Mount => {'test2.example.com' => '/home/sri/myapp2.pl'};
 

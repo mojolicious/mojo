@@ -63,7 +63,10 @@ sub _content {
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {
-    if ($append) { $hash->{$name} .= _block($content, @args) }
+    if ($append) {
+      $hash->{$name} =  [ $hash->{$name} ]  if $hash->{$name} && ref $hash->{$name} ne 'ARRAY';
+      push @{ $hash->{$name } }, $content;
+    }
     if ($replace) { $hash->{$name} = _block($content, @args) }
     else          { $hash->{$name} //= $content }
   }
@@ -74,6 +77,18 @@ sub _content {
      ? _block( $hash->{$name}, @args )
      : $hash->{$name}
      ;
+
+
+  if( ref $output eq 'ARRAY' ) {
+    my $result =  '';
+    for my $chunk ( @$output ) {
+      $result .=  ref $chunk eq 'CODE'
+         ? _block( $chunk, @args )
+         : $chunk
+      ;
+    }
+    $output =  $result;
+  }
 
   return Mojo::ByteStream->new($output // '');
 }

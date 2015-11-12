@@ -34,6 +34,14 @@ sub register {
 
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
+  $app->helper(
+    items_in => sub {
+      my ($c, $what) = @_;
+      return unless defined $what;
+      $what = $c->stash($what) // [] unless ref $what;
+      return @$what;
+    }
+  );
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset static);
 
@@ -374,6 +382,15 @@ response headers with L<Mojolicious::Static/"is_fresh">.
   $c->is_fresh(etag => 'abc', last_modified => 1424985708)
     ? $c->rendered(304)
     : $c->render(text => 'I ♥ Mojolicious!');
+
+=head2 items_in
+
+  % if  ( items_in 'stash_variable' ) { ... }
+  % for ( items_in $array_ref ) { ... }
+
+Dereference an array reference. If the passed argument is not a reference,
+it is given to L<Mojolicious::Controller/"stash"> and the return value
+is dereferenced instead.
 
 =head2 layout
 

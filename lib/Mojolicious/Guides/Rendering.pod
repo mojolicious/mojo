@@ -769,6 +769,23 @@ also be used to pass whole sections of the template to the layout.
     <body><%= content %></body>
   </html>
 
+If you use 'content' helper with template block as last argument you can
+pass arguments to it.
+
+  @@ foo.html.ep
+  % content block => begin
+  % my( $x, $y ) =  @_;
+  <%= "$y $x" %>
+  % end
+  <!DOCTYPE html>
+  <html>
+    <body><%= content 'block', qw/ wold! Hello / %></body>
+  </html>
+
+In this context 'content' helper behaves as L<"/Reusable template blocks"> and
+have no any advantages over it, but you get more power when do
+<"/Template inheritance">
+
 =head2 Forms
 
 To build HTML forms more efficiently you can use tag helpers like
@@ -1038,6 +1055,41 @@ templates with named blocks that child templates can override.
   % end
 
 This chain could go on and on to allow a very high level of template reuse.
+You can even pass arguments to content helper you extends. Here we pass $row
+value from extended template to its child.
+
+  use Mojolicious::Lite;
+
+  get '/' => 'index';
+
+  app->start;
+  __DATA__
+
+  @@table.html.ep
+  % content 'rows' => begin
+  % my $rows =  shift;
+  % for my $row ( @$rows ) {
+  <tr><%= content 'row', $row %></tr>
+  % }
+  % end
+  <table>
+  %= content rows => [ [ a => 1 ], [ b => 2 ] ];
+  </table>
+
+  @@index.html.ep
+  % extends 'table';
+  % content row => begin
+  % my $row =  shift;
+  <td><%= "@{ $row }" %></td>
+  % end
+
+This example will generate next output.
+
+  <table>
+  <tr><td>a 1</td></tr>
+  <tr><td>b 2</td></tr>
+  </table>
+
 
 =head2 Serving static files
 

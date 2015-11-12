@@ -59,7 +59,7 @@ sub _content {
   $name ||= 'content';
 
   my $content =  pop @args
-     if @args == 1  ||  @args && ref $args[-1] eq 'CODE';
+     if @args && ref $args[-1] eq 'CODE' || @args==1 && ref $args[-1] eq '';
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {

@@ -72,7 +72,7 @@ sub _content {
     else          { $hash->{$name} //= $content }
   }
 
-  return '' if !defined wantarray;
+  return ''   if !defined $hash->{$name}  ||  !defined wantarray;
 
   my $output;
   my $t =  $hash->{$name};

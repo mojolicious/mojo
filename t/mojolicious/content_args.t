@@ -42,6 +42,8 @@ get '/inherited_content';
 
 get '/inherited_content_2';
 
+get '/allow_arrayref_hashref_as_only_argument';
+
 
 my $t = Test::Mojo->new;
 
@@ -101,6 +103,7 @@ $t->get_ok('/inherited_content')->status_is(200)
 </table>
 TABLE
 
+
 #TODO: Report about extra newline after '<table>'
 # Call inherited content when it were defined
 $t->get_ok('/inherited_content_2')->status_is(200)
@@ -124,6 +127,13 @@ $t->get_ok('/inherited_content_2')->status_is(200)
 
 </table>
 TABLE
+
+
+# Pass args to content's block
+$t->get_ok('/allow_arrayref_hashref_as_only_argument')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("1 2 3 4 5\n\n");
+
 
 
 done_testing();
@@ -196,3 +206,11 @@ Default <%= content foo => qw/ a b c /, begin %>
 % my( $row, @other_args ) =  @_;
 <%= "$row @other_args" %>: text
 % end
+
+
+@@allow_arrayref_hashref_as_only_argument.html.ep
+% content block => begin
+% my( $arrayref ) =  @_;
+<%= "@{ $arrayref }" %>
+% end
+%= content block => [ 1..5 ];

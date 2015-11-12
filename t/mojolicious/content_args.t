@@ -38,6 +38,10 @@ get '/pass_args_to_block';
 
 get '/define_block_and_pass_args';
 
+get '/inherited_content';
+
+get '/inherited_content_2';
+
 
 my $t = Test::Mojo->new;
 
@@ -82,6 +86,45 @@ $t->get_ok('/define_block_and_pass_args')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is("Default \na b c\n");
 
+# Pass args to inherited content
+$t->get_ok('/inherited_content')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is(<<TABLE);
+<table>
+<tr>
+1 foo bar: text
+
+<tr>
+2 foo bar: text
+
+
+</table>
+TABLE
+
+#TODO: Report about extra newline after '<table>'
+# Call inherited content when it were defined
+$t->get_ok('/inherited_content_2')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is(<<TABLE);
+
+<tr>
+1 foo bar: text
+
+<tr>
+2 foo bar: text
+
+<table>
+
+<tr>
+1 foo bar: text
+
+<tr>
+2 foo bar: text
+
+
+</table>
+TABLE
+
 
 
 __DATA__
@@ -115,4 +158,40 @@ Default <%= content foo => qw/ a b c / %>
 @@ define_block_and_pass_args.html.ep
 Default <%= content foo => qw/ a b c /, begin %>
 <%= "@_" %>
+% end
+
+@@form.html.ep
+% content 'rows' => begin
+% for my $n ( 1 .. 2 ) {
+<tr>
+%= content 'row', $n, foo => 'bar';
+% }
+% end
+<table>
+%= content 'rows';
+</table>
+
+@@inherited_content.html.ep
+% extends 'form';
+% content row => begin
+% my( $row, @other_args ) =  @_;
+<%= "$row @other_args" %>: text
+% end
+
+@@form_with_call_when_define.html.ep
+%= content 'rows' => begin
+% for my $n ( 1 .. 2 ) {
+<tr>
+%= content 'row', $n, foo => 'bar';
+% }
+% end
+<table>
+%= content 'rows';
+</table>
+
+@@inherited_content_2.html.ep
+% extends 'form_with_call_when_define';
+% content row => begin
+% my( $row, @other_args ) =  @_;
+<%= "$row @other_args" %>: text
 % end

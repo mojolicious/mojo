@@ -18,6 +18,8 @@ package Mojolicious::Command::my_fake_test_command;
 package Mojolicious::Command::my_test_command;
 use Mojo::Base 'Mojolicious::Command';
 
+has description => 'See, it works';
+
 package main;
 
 # Make sure @ARGV is not changed
@@ -107,6 +109,7 @@ my $buffer = '';
 like $buffer,
   qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*my_test_command.*version/s,
   'right output';
+like $buffer,   qr/See, it works/,        'description has been picked up';
 unlike $buffer, qr/my_fake_test_command/, 'fake command has been ignored';
 
 # help

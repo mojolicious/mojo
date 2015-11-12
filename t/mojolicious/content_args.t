@@ -126,6 +126,7 @@ $t->get_ok('/inherited_content_2')->status_is(200)
 TABLE
 
 
+done_testing();
 
 __DATA__
 

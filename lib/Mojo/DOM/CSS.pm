@@ -125,10 +125,10 @@ sub _equation {
   # "odd"
   return [2, 1] if $equation =~ /^\s*odd\s*$/i;
 
-  # "4", "+4" and "-4"
+  # "4", "+4" or "-4"
   return [0, $1] if $equation =~ /^\s*((?:\+|-)?\d+)\s*$/;
 
-  # "4n", "+4n", "-4n", "4n+1" and "4n-1"
+  # "4n", "+4n", "-4n", "4n+1" or "4n-1"
   return [1, 1]
     unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
   return [$1 eq '-' ? -1 : $1 eq '' ? 1 : $1, join('', split(' ', $2 // 0))];

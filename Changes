@@ -1,5 +1,6 @@
 
-6.31  2015-11-12
+6.31  2015-11-13
+  - Fixed a few small selector bugs in Mojo::DOM::CSS.
 
 6.30  2015-11-11
   - Fixed bug in Mojolicious::Renderer where layouts could not be used with

@@ -125,14 +125,13 @@ sub _equation {
   # "odd"
   return [2, 1] if $equation =~ /^\s*odd\s*$/i;
 
-  # Equation
-  my $num = [1, 1];
-  return $num if $equation !~ /(?:(-?(?:\d+)?)?(n))?\s*\+?\s*(-?\s*\d+)?\s*$/i;
-  $num->[0] = defined($1) && $1 ne '' ? $1 : $2 ? 1 : 0;
-  $num->[0] = -1 if $num->[0] eq '-';
-  $num->[1] = $3 // 0;
-  $num->[1] =~ s/\s+//g;
-  return $num;
+  # "4", "+4" and "-4"
+  return [0, $1] if $equation =~ /^\s*((?:\+|-)?\d+)\s*$/;
+
+  # "4n", "+4n", "-4n", "4n+1" and "4n-1"
+  return [1, 1]
+    unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
+  return [$1 eq '-' ? -1 : $1 eq '' ? 1 : $1, join('', split(' ', $2 // 0))];
 }
 
 sub _match {

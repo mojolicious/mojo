@@ -64,7 +64,8 @@ sub _content {
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {
     if ($append) {
-      $hash->{$name} =  [ $hash->{$name} ]  if $hash->{$name} && ref $hash->{$name} ne 'ARRAY';
+      $hash->{$name} =  [ $hash->{$name} ]
+         if defined $hash->{$name}  &&  ref $hash->{$name} ne 'ARRAY';
       push @{ $hash->{$name } }, $content;
     }
     if ($replace) { $hash->{$name} = _block($content, @args) }

@@ -256,7 +256,7 @@ $tx->req->url->parse('http://mojolicio.us/whatever');
 $jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 $tx = Mojo::Transaction::HTTP->new;
-$tx->req->url->parse('http://manydots...');
+$tx->req->url->parse('http://...many...dots...');
 $jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 

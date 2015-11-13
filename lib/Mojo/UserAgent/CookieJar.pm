@@ -100,7 +100,7 @@ sub find {
   }
 
   # Remove another part
-  continue { $domain =~ s/^[^.]+\.*// }
+  continue { $domain =~ s/^[^.]*\.*// }
 
   return \@found;
 }

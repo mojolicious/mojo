@@ -73,12 +73,12 @@ Mojolicious::Plugin::EPRenderer - Embedded Perl renderer plugin
   # Mojolicious
   $app->plugin('EPRenderer');
   $app->plugin(EPRenderer => {name => 'foo'});
-  $app->plugin(EPRenderer => {template => {line_start => '.'}});
+  $app->plugin(EPRenderer => {name => 'bar', template => {line_start => '.'}});
 
   # Mojolicious::Lite
   plugin 'EPRenderer';
   plugin EPRenderer => {name => 'foo'};
-  plugin EPRenderer => {template => {line_start => '.'}};
+  plugin EPRenderer => {name => 'bar', template => {line_start => '.'}};
 
 =head1 DESCRIPTION
 

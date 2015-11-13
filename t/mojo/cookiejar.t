@@ -255,6 +255,10 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicio.us/whatever');
 $jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://manydots...');
+$jar->prepare($tx);
+is $tx->req->cookie('foo'), undef, 'no cookie';
 
 # Gather and prepare cookies with same name (with and without domain)
 $jar = Mojo::UserAgent::CookieJar->new;

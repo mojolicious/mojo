@@ -129,7 +129,7 @@ sub _equation {
   return [0, $1] if $equation =~ /^\s*((?:\+|-)?\d+)\s*$/;
 
   # "4n", "+4n", "-4n", "4n+1" or "4n-1"
-  return [1, 1]
+  return []
     unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
   return [$1 eq '-' ? -1 : $1 eq '' ? 1 : $1, join('', split(' ', $2 // 0))];
 }

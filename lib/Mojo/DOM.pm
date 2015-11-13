@@ -748,7 +748,7 @@ no parent.
 Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   # Parse XML
-  my $dom = Mojo::DOM->new->xml(1)->parse('<foo>I ♥ Mojolicious!<foo/>');
+  my $dom = Mojo::DOM->new->xml(1)->parse('<foo>I ♥ Mojolicious!</foo>');
 
 =head2 preceding
 

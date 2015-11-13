@@ -31,13 +31,13 @@
         font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
         padding: 0.3em;
       }
-      h1, h2, h3 {
+      h1, h2, h3, h4 {
         color: #2a2a2a;
         font-size: 1.5em;
         margin: 0;
         position: relative;
       }
-      h1 a, h2 a, h3 a { text-decoration: none }
+      h1 a, h2 a, h3 a, h4 a { text-decoration: none }
       li > p {
         margin-bottom: 0;
         margin-top: 0;
@@ -84,7 +84,8 @@
         position: absolute;
         padding-right: 0.25em;
       }
-      h1:hover .permalink, h2:hover .permalink, h3:hover .permalink {
+      h1:hover .permalink, h2:hover .permalink, h3:hover .permalink,
+      h4:hover .permalink {
         display: block;
       }
     </style>

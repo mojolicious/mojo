@@ -2,6 +2,7 @@
 6.31  2015-11-13
   - Fixed handling of invalid URLs in Mojo::UserAgent::CookieJar.
   - Fixed a few small selector bugs in Mojo::DOM::CSS.
+  - Fixed a few small formatting bugs in Mojolicious::Plugin::PODRenderer.
 
 6.30  2015-11-11
   - Fixed bug in Mojolicious::Renderer where layouts could not be used with

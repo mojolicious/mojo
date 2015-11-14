@@ -1,4 +1,6 @@
 
+6.32  2015-11-15
+
 6.31  2015-11-13
   - Improved documentation browser CSS.
   - Fixed handling of invalid URLs in Mojo::UserAgent::CookieJar.

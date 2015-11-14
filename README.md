@@ -29,7 +29,7 @@
     highly scalable web services.
   * JSON and HTML/XML parser with CSS selector support.
   * Fresh code based upon years of experience developing
-    [Catalyst](http://www.catalystframework.org).
+    [Catalyst](http://www.catalystframework.org), free and open source.
 
 ## Installation
 

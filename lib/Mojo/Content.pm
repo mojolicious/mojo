@@ -484,13 +484,13 @@ content.
 
   my $bool = $content->is_chunked;
 
-Check if content is chunked.
+Check if C<Transfer-Encoding> header indicates chunked tranfer encoding.
 
 =head2 is_compressed
 
   my $bool = $content->is_compressed;
 
-Check if content is gzip compressed.
+Check C<Content-Encoding> header for C<gzip> value.
 
 =head2 is_dynamic
 

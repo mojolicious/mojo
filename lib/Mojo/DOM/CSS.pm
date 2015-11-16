@@ -104,6 +104,12 @@ sub _compile {
       if ($name eq 'not') {
         push @$last, ['pc', $name, _compile($args)];
       }
+
+      # ":first-*" or ":last-*" (rewrite with equation)
+      elsif ($name =~ s/^(?:(first)|last)-//) {
+        push @$last,
+          ['pc', 'nth-' . ($1 ? '' : 'last-') . $name, $1 ? [0, 1] : [-1, 1]];
+      }
       elsif ($name =~ /^nth-/) {
         push @$last, ['pc', $name, _equation($args)];
       }
@@ -167,12 +173,8 @@ sub _pc {
   return exists $current->[2]{checked} || exists $current->[2]{selected}
     if $class eq 'checked';
 
-  # ":first-*" or ":last-*" (rewrite with equation)
-  ($class, $args) = $1 ? ("nth-$class", [0, 1]) : ("nth-last-$class", [-1, 1])
-    if $class =~ s/^(?:(first)|last)-//;
-
   # ":nth-*"
-  if ($class =~ /^nth-/) {
+  if ($args) {
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
     my @siblings = @{_siblings($current, $type)};
 

@@ -1140,6 +1140,9 @@ is_deeply \@e, ['I'], 'found last child';
 $dom->find('ul :nth-child(-n+3):not(li)')->each(sub { push @e, shift->text });
 is_deeply \@e, ['B'], 'found first p element';
 @e = ();
+$dom->find('ul :nth-child(-n+3):NOT(li)')->each(sub { push @e, shift->text });
+is_deeply \@e, ['B'], 'found first p element';
+@e = ();
 $dom->find('ul :nth-child(-n+3):not(:first-child)')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(B C)], 'found second and third element';

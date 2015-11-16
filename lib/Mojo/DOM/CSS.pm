@@ -100,7 +100,16 @@ sub _compile {
 
     # Pseudo-class (":not" contains more selectors)
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
-      push @$last, ['pc', lc $1, $1 eq 'not' ? _compile($2) : _equation($2)];
+      my ($name, $args) = (lc $1, $2);
+      if ($name eq 'not') {
+        push @$last, ['pc', $name, _compile($args)];
+      }
+      elsif ($name =~ /^nth-/) {
+        push @$last, ['pc', $name, _equation($args)];
+      }
+      else {
+        push @$last, ['pc', $name];
+      }
     }
 
     # Tag
@@ -117,7 +126,7 @@ sub _compile {
 sub _empty { $_[0][0] eq 'comment' || $_[0][0] eq 'pi' }
 
 sub _equation {
-  return [] unless my $equation = shift;
+  return [0, 0] unless my $equation = shift;
 
   # "even"
   return [2, 2] if $equation =~ /^\s*even\s*$/i;
@@ -129,7 +138,7 @@ sub _equation {
   return [0, $1] if $equation =~ /^\s*((?:\+|-)?\d+)\s*$/;
 
   # "n", "4n", "+4n", "-4n", "n+1" or "4n-1"
-  return []
+  return
     unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
   return [$1 eq '-' ? -1 : $1 eq '' ? 1 : $1, join('', split(' ', $2 // 0))];
 }

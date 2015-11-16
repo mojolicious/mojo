@@ -1056,6 +1056,12 @@ is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
 @li = ();
 $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+@li = ();
+$dom->find('li:nth-child(0n+1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw(A)], 'found first li element';
+is $dom->find('li:nth-child(0n+0)')->size, 0, 'no results';
+is $dom->find('li:nth-child(0)')->size, 0, 'no results';
+is $dom->find('li:nth-child()')->size, 0, 'no results';
 
 # Even more pseudo-classes
 $dom = Mojo::DOM->new(<<EOF);

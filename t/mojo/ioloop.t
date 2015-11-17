@@ -85,8 +85,8 @@ $loop->timer(0.5 => sub { shift->stop });
 $loop->start;
 $loop->one_tick;
 $loop->remove($id);
-ok $count > 1, 'more than one recurring event';
-ok $count < 10, 'less than ten recurring events';
+ok($count > 1,  'more than one recurring event');
+ok($count < 10, 'less than ten recurring events');
 
 # Handle and reset
 my ($handle, $handle2);

@@ -101,20 +101,17 @@ sub _compile {
     # Pseudo-class
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
+      push @$last, my $pc = ['pc', $name];
 
       # ":not" (contains more selectors)
-      if ($name eq 'not') { push @$last, ['pc', $name, _compile($args)] }
+      $pc->[2] = _compile($args) if $name eq 'not';
 
       # ":first-*" or ":last-*" (rewrite to ":nth-*")
-      elsif ($name =~ s/^(?:(first)|last)-//) {
-        push @$last,
-          ['pc', $1 ? ("nth-$name", [0, 1]) : ("nth-last-$name", [-1, 1])];
-      }
+      @$pc[1, 2] = $1 ? ("nth-$2", [0, 1]) : ("nth-last-$2", [-1, 1])
+        if $name =~ /^(?:(first)|last)-(.+)$/;
 
-      # "nth-*"
-      elsif ($name =~ /^nth-/) { push @$last, ['pc', $name, _equation($args)] }
-
-      else { push @$last, ['pc', $name] }
+      # "nth-*" (with An+B notation)
+      $pc->[2] = _equation($args) if $name =~ /^nth-/;
     }
 
     # Tag

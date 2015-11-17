@@ -159,18 +159,18 @@ sub _name {qr/(?:^|:)\Q@{[_unescape(shift)]}\E$/}
 sub _pc {
   my ($class, $args, $current) = @_;
 
+  # ":checked"
+  return exists $current->[2]{checked} || exists $current->[2]{selected}
+    if $class eq 'checked';
+
+  # ":not"
+  return !_match($args, $current, $current) if $class eq 'not';
+
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
 
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
-
-  # ":not"
-  return !_match($args, $current, $current) if $class eq 'not';
-
-  # ":checked"
-  return exists $current->[2]{checked} || exists $current->[2]{selected}
-    if $class eq 'checked';
 
   # ":nth-*"
   if (ref $args) {

@@ -101,19 +101,20 @@ sub _compile {
     # Pseudo-class
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
-      push @$last, my $pc = ['pc', $name];
 
       # ":not" (contains more selectors)
-      $pc->[2] = _compile($args) if $name eq 'not';
-
-      # ":first-*" (rewrite to ":nth-*")
-      @$pc[1, 2] = ("nth-$1", [0, 1]) if $name =~ /^first-(.+)$/;
-
-      # ":last-*" (rewrite to ":nth-*")
-      @$pc[1, 2] = ("nth-$name", [-1, 1]) if $name =~ /^last-/;
+      $args = _compile($args) if $name eq 'not';
 
       # "nth-*" (with An+B notation)
-      $pc->[2] = _equation($args) if $name =~ /^nth-/;
+      $args = _equation($args) if $name =~ /^nth-/;
+
+      # ":first-*" (rewrite to ":nth-*")
+      ($name, $args) = ("nth-$1", [0, 1]) if $name =~ /^first-(.+)$/;
+
+      # ":last-*" (rewrite to ":nth-*")
+      ($name, $args) = ("nth-$name", [-1, 1]) if $name =~ /^last-/;
+
+      push @$last, ['pc', $name, $args];
     }
 
     # Tag
@@ -172,7 +173,7 @@ sub _pc {
     if $class eq 'checked';
 
   # ":nth-*"
-  if ($args) {
+  if (ref $args) {
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
     my @siblings = @{_siblings($current, $type)};
 

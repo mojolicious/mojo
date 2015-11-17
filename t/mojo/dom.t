@@ -1063,6 +1063,7 @@ is $dom->find('li:nth-child(0n+0)')->size,     0, 'no results';
 is $dom->find('li:nth-child(0)')->size,        0, 'no results';
 is $dom->find('li:nth-child()')->size,         0, 'no results';
 is $dom->find('li:nth-child(whatever)')->size, 0, 'no results';
+is $dom->find('li:whatever(whatever)')->size,  0, 'no results';
 
 # Even more pseudo-classes
 $dom = Mojo::DOM->new(<<EOF);

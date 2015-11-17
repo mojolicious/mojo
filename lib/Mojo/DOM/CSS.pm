@@ -172,12 +172,10 @@ sub _pc {
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
-  # ":nth-*"
+  # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
   if (ref $args) {
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
     my @siblings = @{_siblings($current, $type)};
-
-    # ":nth-last-*"
     @siblings = reverse @siblings if $class =~ /^nth-last/;
 
     for my $i (0 .. $#siblings) {
@@ -187,7 +185,7 @@ sub _pc {
     }
   }
 
-  # ":only-*"
+  # ":only-child" or ":only-of-type"
   elsif ($class eq 'only-child' || $class eq 'only-of-type') {
     my $type = $class eq 'only-of-type' ? $current->[1] : undef;
     $_ ne $current and return undef for @{_siblings($current, $type)};

@@ -188,9 +188,9 @@ sub _pc {
   }
 
   # ":only-*"
-  elsif ($class =~ /^only-(?:child|(of-type))$/) {
-    $_ ne $current and return undef
-      for @{_siblings($current, $1 ? $current->[1] : undef)};
+  elsif ($class eq 'only-child' || $class eq 'only-of-type') {
+    my $type = $class eq 'only-of-type' ? $current->[1] : undef;
+    $_ ne $current and return undef for @{_siblings($current, $type)};
     return 1;
   }
 

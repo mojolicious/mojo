@@ -106,9 +106,11 @@ sub _compile {
       # ":not" (contains more selectors)
       $pc->[2] = _compile($args) if $name eq 'not';
 
-      # ":first-*" or ":last-*" (rewrite to ":nth-*")
-      @$pc[1, 2] = $1 ? ("nth-$2", [0, 1]) : ("nth-last-$2", [-1, 1])
-        if $name =~ /^(?:(first)|last)-(.+)$/;
+      # ":first-*" (rewrite to ":nth-*")
+      @$pc[1, 2] = ("nth-$1", [0, 1]) if $name =~ /^first-(.+)$/;
+
+      # ":last-*" (rewrite to ":nth-*")
+      @$pc[1, 2] = ("nth-$name", [-1, 1]) if $name =~ /^last-/;
 
       # "nth-*" (with An+B notation)
       $pc->[2] = _equation($args) if $name =~ /^nth-/;

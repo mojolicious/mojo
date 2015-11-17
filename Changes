@@ -1,5 +1,8 @@
 
-6.32  2015-11-16
+6.32  2015-11-17
+  - Improved Mojo::DOM::CSS performance slightly. (jamadam)
+  - Fixed a few case-sensitivity and An+B notation issues in Mojo::DOM::CSS.
+    (jamadam)
 
 6.31  2015-11-13
   - Improved documentation browser CSS.

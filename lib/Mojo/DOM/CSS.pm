@@ -98,24 +98,23 @@ sub _compile {
       push @$last, ['attr', _name($1), _value($2 // '', $3 // $4 // $5, $6)];
     }
 
-    # Pseudo-class (":not" contains more selectors)
+    # Pseudo-class
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
-      if ($name eq 'not') {
-        push @$last, ['pc', $name, _compile($args)];
-      }
 
-      # ":first-*" or ":last-*" (rewrite with equation)
+      # ":not" (contains more selectors)
+      if ($name eq 'not') { push @$last, ['pc', $name, _compile($args)] }
+
+      # ":first-*" or ":last-*" (rewrite to ":nth-*")
       elsif ($name =~ s/^(?:(first)|last)-//) {
         push @$last,
-          ['pc', 'nth-' . ($1 ? '' : 'last-') . $name, $1 ? [0, 1] : [-1, 1]];
+          ['pc', $1 ? ("nth-$name", [0, 1]) : ("nth-last-$name", [-1, 1])];
       }
-      elsif ($name =~ /^nth-/) {
-        push @$last, ['pc', $name, _equation($args)];
-      }
-      else {
-        push @$last, ['pc', $name];
-      }
+
+      # "nth-*"
+      elsif ($name =~ /^nth-/) { push @$last, ['pc', $name, _equation($args)] }
+
+      else { push @$last, ['pc', $name] }
     }
 
     # Tag
@@ -143,8 +142,8 @@ sub _equation {
   # "4", "+4" or "-4"
   return [0, $1] if $equation =~ /^\s*((?:\+|-)?\d+)\s*$/;
 
-  # "n", "4n", "+4n", "-4n", "n+1" or "4n-1"
-  return
+  # "n", "4n", "+4n", "-4n", "n+1", "4n-1", "+4n-1" (and other variations)
+  return [0, 0]
     unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
   return [$1 eq '-' ? -1 : $1 eq '' ? 1 : $1, join('', split(' ', $2 // 0))];
 }

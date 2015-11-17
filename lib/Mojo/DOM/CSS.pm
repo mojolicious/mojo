@@ -105,7 +105,7 @@ sub _compile {
       # ":not" (contains more selectors)
       $args = _compile($args) if $name eq 'not';
 
-      # "nth-*" (with An+B notation)
+      # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
 
       # ":first-*" (rewrite to ":nth-*")

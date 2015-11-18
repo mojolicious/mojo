@@ -33,7 +33,7 @@ sub match_partial {
   # Path
   return undef unless my @captures = $$pathref =~ $self->regex;
   $$pathref = ${^POSTMATCH};
-  shift @captures;
+  @captures = () if $#+ == 0;
   my $captures = {%{$self->defaults}};
   for my $placeholder (@{$self->placeholders}, 'format') {
     last unless @captures;
@@ -142,7 +142,7 @@ sub _compile {
   $regex .= _compile_format($constraints->{format}, $defaults->{format})
     if $detect;
 
-  $self->regex(qr/(^$regex)/ps);
+  $self->regex(qr/^$regex/ps);
 }
 
 sub _compile_format {

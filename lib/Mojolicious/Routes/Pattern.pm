@@ -4,11 +4,11 @@ use Mojo::Base -base;
 use Mojo::Util 'deprecated';
 
 has [qw(constraints defaults)] => sub { {} };
-has [qw(regex unparsed)];
 has placeholder_start => ':';
 has [qw(placeholders tree)] => sub { [] };
-has quote_end      => ')';
-has quote_start    => '(';
+has quote_end   => ')';
+has quote_start => '(';
+has [qw(regex unparsed)];
 has relaxed_start  => '#';
 has wildcard_start => '*';
 
@@ -30,7 +30,6 @@ sub match_partial {
   # Compile on demand
   $self->_compile($detect) unless $self->{regex};
 
-  # Path
   return undef unless my @captures = $$pathref =~ $self->regex;
   $$pathref = ${^POSTMATCH};
   @captures = () if $#+ == 0;

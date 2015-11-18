@@ -1,4 +1,6 @@
 
+6.33  2015-11-19
+
 6.32  2015-11-18
   - Deprecated Mojolicious::Routes::Pattern::format_regex.
   - Added support for new HTTP status code.

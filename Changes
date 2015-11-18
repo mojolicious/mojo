@@ -1,5 +1,6 @@
 
 6.33  2015-11-19
+  - Updated IO::Socket::IP requirement to 0.37 for certain bug fixes.
 
 6.32  2015-11-18
   - Deprecated Mojolicious::Routes::Pattern::format_regex.

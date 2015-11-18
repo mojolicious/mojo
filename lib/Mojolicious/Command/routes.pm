@@ -64,6 +64,9 @@ Mojolicious::Command::routes - Routes command
 
   Usage: APPLICATION routes [OPTIONS]
 
+    ./myapp.pl routes
+    ./myapp.pl routes -v
+
   Options:
     -h, --help          Show this summary of available options
         --home <path>   Path to home directory of your application, defaults to

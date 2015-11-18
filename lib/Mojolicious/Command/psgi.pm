@@ -20,6 +20,8 @@ Mojolicious::Command::psgi - PSGI command
 
   Usage: APPLICATION psgi [OPTIONS]
 
+    ./myapp.pl psgi
+
   Options:
     -h, --help          Show this summary of available options
         --home <path>   Path to home directory of your application, defaults to

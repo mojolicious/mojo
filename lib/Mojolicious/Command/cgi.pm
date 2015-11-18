@@ -25,6 +25,8 @@ Mojolicious::Command::cgi - CGI command
 
   Usage: APPLICATION cgi [OPTIONS]
 
+    ./myapp.pl cgi
+
   Options:
     -h, --help          Show this summary of available options
         --home <path>   Path to home directory of your application, defaults to

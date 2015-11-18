@@ -40,6 +40,8 @@ Mojolicious::Command::inflate - Inflate command
 
   Usage: APPLICATION inflate [OPTIONS]
 
+    ./myapp.pl inflate
+
   Options:
     -h, --help          Show this summary of available options
         --home <path>   Path to home directory of your application, defaults to

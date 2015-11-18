@@ -55,6 +55,8 @@ Mojolicious::Command::version - Version command
 
   Usage: APPLICATION version [OPTIONS]
 
+    mojo version
+
   Options:
     -h, --help   Show this summary of available options
 

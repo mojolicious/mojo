@@ -20,6 +20,8 @@ Mojolicious::Command::generate::makefile - Makefile generator command
 
   Usage: APPLICATION generate makefile [OPTIONS]
 
+    mojo generate makefile
+
   Options:
     -h, --help   Show this summary of available options
 

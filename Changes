@@ -4,7 +4,7 @@
   - Added support for new HTTP status code.
   - Improved router performance.
   - Improved Mojo::DOM::CSS performance slightly. (jamadam)
-  - Fixed a few case-sensitivity and An+B notation issues in Mojo::DOM::CSS.
+  - Fixed a few case-sensitivity and An+B notation bugs in Mojo::DOM::CSS.
     (jamadam)
 
 6.31  2015-11-13

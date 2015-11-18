@@ -23,6 +23,9 @@ Mojolicious::Command::generate::lite_app - Lite app generator command
 
   Usage: APPLICATION generate lite_app [OPTIONS] [NAME]
 
+    mojo generate lite_app
+    mojo generate lite_app foo.pl
+
   Options:
     -h, --help   Show this summary of available options
 

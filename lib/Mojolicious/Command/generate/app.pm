@@ -55,6 +55,9 @@ Mojolicious::Command::generate::app - App generator command
 
   Usage: APPLICATION generate app [OPTIONS] [NAME]
 
+    mojo generate app
+    mojo generate app TestApp
+
   Options:
     -h, --help   Show this summary of available options
 

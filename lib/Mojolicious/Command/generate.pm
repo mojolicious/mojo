@@ -24,6 +24,9 @@ Mojolicious::Command::generate - Generator command
 
   Usage: APPLICATION generate GENERATOR [OPTIONS]
 
+    mojo generate app
+    mojo generate lite_app
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Command::generate> lists available generators.

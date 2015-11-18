@@ -52,8 +52,8 @@ sub parse {
   my $pattern = @_ % 2 ? (shift // '/') : '/';
   $pattern =~ s!^/*|/+!/!g;
   return $self->constraints({@_}) if $pattern eq '/';
-  $pattern =~ s!/$!!;
 
+  $pattern =~ s!/$!!;
   return $self->constraints({@_})->_tokenize($pattern);
 }
 

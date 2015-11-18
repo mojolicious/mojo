@@ -37,6 +37,9 @@ Mojolicious::Command::generate::plugin - Plugin generator command
 
   Usage: APPLICATION generate plugin [OPTIONS] [NAME]
 
+    mojo generate plugin
+    mojo generate plugin TestPlugin
+
   Options:
     -h, --help   Show this summary of available options
 

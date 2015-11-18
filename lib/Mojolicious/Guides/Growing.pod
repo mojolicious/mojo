@@ -202,7 +202,7 @@ fun thanks to automatic reloading.
 Just save your changes and they will be automatically in effect the next time
 you refresh your browser.
 
-=head2 A birds-eye view
+=head2 A bird's-eye view
 
 It all starts with an HTTP request like this, sent by your browser.
 

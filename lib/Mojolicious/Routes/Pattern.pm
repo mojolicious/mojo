@@ -1,14 +1,22 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
+use Mojo::Util 'deprecated';
+
 has [qw(constraints defaults)] => sub { {} };
-has [qw(format_regex regex unparsed)];
+has [qw(regex unparsed)];
 has placeholder_start => ':';
 has [qw(placeholders tree)] => sub { [] };
 has quote_end      => ')';
 has quote_start    => '(';
 has relaxed_start  => '#';
 has wildcard_start => '*';
+
+# DEPRECATED in Clinking Beer Mugs!
+sub format_regex {
+  deprecated 'Mojolicious::Routes::Pattern::format_regex is DEPRECATED';
+  return @_ > 1 ? $_[0] : undef;
+}
 
 sub match {
   my ($self, $path, $detect) = @_;
@@ -20,24 +28,19 @@ sub match_partial {
   my ($self, $pathref, $detect) = @_;
 
   # Compile on demand
-  $self->_compile unless $self->{regex};
-  $self->_compile_format if $detect && !$self->{format_regex};
+  $self->_compile($detect) unless $self->{regex};
 
   # Path
   return undef unless my @captures = $$pathref =~ $self->regex;
   $$pathref = ${^POSTMATCH};
+  shift @captures;
   my $captures = {%{$self->defaults}};
-  for my $placeholder (@{$self->placeholders}) {
+  for my $placeholder (@{$self->placeholders}, 'format') {
     last unless @captures;
     my $capture = shift @captures;
     $captures->{$placeholder} = $capture if defined $capture;
   }
 
-  # Format
-  return $captures unless $detect && (my $regex = $self->format_regex);
-  return undef unless $$pathref =~ $regex;
-  $captures->{format} = $1 if defined $1;
-  $$pathref = '';
   return $captures;
 }
 
@@ -87,7 +90,7 @@ sub render {
 }
 
 sub _compile {
-  my $self = shift;
+  my ($self, $detect) = @_;
 
   my $placeholders = $self->placeholders;
   my $constraints  = $self->constraints;
@@ -135,23 +138,25 @@ sub _compile {
   # Not rooted with a slash
   $regex = "$block$regex" if $block;
 
-  $self->regex(qr/^$regex/ps);
+  # Format
+  $regex .= _compile_format($constraints->{format}, $defaults->{format})
+    if $detect;
+
+  $self->regex(qr/(^$regex)/ps);
 }
 
 sub _compile_format {
-  my $self = shift;
+  my ($format, $default) = @_;
 
   # Default regex
-  my $format = $self->constraints->{format};
-  return $self->format_regex(qr!^/?(?:\.([^/]+))?$!) unless defined $format;
+  return '/?(?:\.([^/]+))?$' unless defined $format;
 
   # No regex
-  return undef unless $format;
+  return '' unless $format;
 
   # Compile custom regex
   my $regex = '\.' . _compile_req($format);
-  $regex = "(?:$regex)?" if $self->defaults->{format};
-  $self->format_regex(qr!^/?$regex$!);
+  return $default ? "/?(?:$regex)?\$" : "/?$regex\$";
 }
 
 sub _compile_req {
@@ -256,13 +261,6 @@ Regular expression constraints.
   $pattern     = $pattern->defaults({foo => 'bar'});
 
 Default parameters.
-
-=head2 format_regex
-
-  my $regex = $pattern->format_regex;
-  $pattern  = $pattern->format_regex($regex);
-
-Compiled regular expression for format matching.
 
 =head2 placeholder_start
 

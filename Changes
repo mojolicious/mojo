@@ -1,6 +1,8 @@
 
 6.32  2015-11-18
+  - Deprecated Mojolicious::Routes::Pattern::format_regex.
   - Added support for new HTTP status code.
+  - Improved router performance.
   - Improved Mojo::DOM::CSS performance slightly. (jamadam)
   - Fixed a few case-sensitivity and An+B notation issues in Mojo::DOM::CSS.
     (jamadam)

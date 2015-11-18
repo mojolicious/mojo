@@ -75,7 +75,7 @@ $test2->route('/baz')->to('just#works');
 $r->route('/')->to(controller => 'hello', action => 'world');
 
 # /wildcards/1/*
-$r->route('/wildcards/1/(*wildcard)', wildcard => qr/(.*)/)
+$r->route('/wildcards/1/(*wildcard)', wildcard => qr/(?:.*)/)
   ->to(controller => 'wild', action => 'card');
 
 # /wildcards/2/*

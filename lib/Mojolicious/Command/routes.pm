@@ -45,9 +45,7 @@ sub _walk {
   # Regex (verbose)
   my $pattern = $route->pattern;
   $pattern->match('/', $route->is_endpoint && !$partial);
-  my $regex  = (regexp_pattern $pattern->regex)[0];
-  my $format = (regexp_pattern($pattern->format_regex))[0];
-  push @$row, $regex, $format ? $format : '' if $verbose;
+  push @$row, (regexp_pattern $pattern->regex)[0] if $verbose;
 
   $depth++;
   _walk($_, $depth, $rows, $verbose) for @{$route->children};

@@ -148,19 +148,15 @@ is $pattern->render({test => $value}), "/$value", 'right result';
 # Format detection
 $pattern = Mojolicious::Routes::Pattern->new('/test');
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex,        'no regex';
-ok !$pattern->format_regex, 'no format regex';
+ok !$pattern->regex, 'no regex';
 is_deeply $pattern->match('/test.xml', 1),
   {action => 'index', format => 'xml'}, 'right structure';
-ok $pattern->regex,        'regex has been compiled on demand';
-ok $pattern->format_regex, 'format regex has been compiled on demand';
+ok $pattern->regex, 'regex has been compiled on demand';
 $pattern = Mojolicious::Routes::Pattern->new('/test.json');
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex,        'no regex';
-ok !$pattern->format_regex, 'no format regex';
+ok !$pattern->regex, 'no regex';
 is_deeply $pattern->match('/test.json'), {action => 'index'}, 'right structure';
 ok $pattern->regex, 'regex has been compiled on demand';
-ok !$pattern->format_regex, 'no format regex';
 is_deeply $pattern->match('/test.json', 1), {action => 'index'},
   'right structure';
 ok !$pattern->match('/test.xml'), 'no result';
@@ -169,21 +165,17 @@ ok !$pattern->match('/test'),     'no result';
 # Formats without detection
 $pattern = Mojolicious::Routes::Pattern->new('/test');
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex,        'no regex';
-ok !$pattern->format_regex, 'no format regex';
+ok !$pattern->regex, 'no regex';
 ok !$pattern->match('/test.xml'), 'no result';
 ok $pattern->regex, 'regex has been compiled on demand';
-ok !$pattern->format_regex, 'no format regex';
 is_deeply $pattern->match('/test'), {action => 'index'}, 'right structure';
 
 # Format detection disabled
 $pattern = Mojolicious::Routes::Pattern->new('/test', format => 0);
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex,        'no regex';
-ok !$pattern->format_regex, 'no format regex';
+ok !$pattern->regex, 'no regex';
 is_deeply $pattern->match('/test', 1), {action => 'index'}, 'right structure';
 ok $pattern->regex, 'regex has been compiled on demand';
-ok !$pattern->format_regex, 'no format regex';
 ok !$pattern->match('/test.xml', 1), 'no result';
 
 # Special pattern for disabling format detection

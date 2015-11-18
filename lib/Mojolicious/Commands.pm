@@ -106,9 +106,11 @@ Mojolicious::Commands - Command line interface
 
   Usage: APPLICATION COMMAND [OPTIONS]
 
+    mojo version
     mojo generate lite_app
     ./myapp.pl daemon -m production -l http://*:8080
-    ./myapp.pl get -v /foo
+    ./myapp.pl get /foo
+    ./myapp.pl routes -v
 
   Tip: CGI and PSGI environments can be automatically detected very often and
        work without commands.

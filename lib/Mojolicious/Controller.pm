@@ -168,7 +168,7 @@ sub render {
   my $plugins = $app->plugins->emit_hook(before_render => $self, $args);
   my $maybe   = delete $args->{'mojo.maybe'};
 
-  my $ts = $args->{'mojo.to_string'};
+  my $ts = $args->{'mojo.string'};
   my ($output, $format) = $app->renderer->render($self, $args);
 
   # Maybe no 404
@@ -187,7 +187,7 @@ sub render_later { shift->stash('mojo.rendered' => 1) }
 
 sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
-sub render_to_string { shift->render(@_, 'mojo.to_string' => 1) }
+sub render_to_string { shift->render(@_, 'mojo.string' => 1) }
 
 sub rendered {
   my ($self, $status) = @_;

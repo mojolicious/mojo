@@ -91,8 +91,8 @@ sub render {
   local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
 
   # Rendering to string
-  local @{$stash}{keys %$args} if my $ts = delete $args->{'mojo.to_string'};
-  delete @{$stash}{qw(layout extends)} if $ts;
+  local @{$stash}{keys %$args} if my $string = delete $args->{'mojo.string'};
+  delete @{$stash}{qw(layout extends)} if $string;
 
   # All other arguments just become part of the stash
   @$stash{keys %$args} = values %$args;
@@ -145,7 +145,7 @@ sub render {
 
   # Encoding
   $output = encode $options->{encoding}, $output
-    if !$ts && $options->{encoding} && $output;
+    if !$string && $options->{encoding} && $output;
 
   return $output, $options->{format};
 }

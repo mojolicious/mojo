@@ -130,13 +130,7 @@ sub handler {
     unless $c->tx->is_writing;
 }
 
-sub helper {
-  my ($self, $name, $cb) = @_;
-  my $r = $self->renderer;
-  $self->log->debug(qq{Helper "$name" already exists, replacing})
-    if exists $r->helpers->{$name};
-  $r->add_helper($name => $cb);
-}
+sub helper { shift->renderer->add_helper(@_) }
 
 sub hook { shift->plugins->on(@_) }
 

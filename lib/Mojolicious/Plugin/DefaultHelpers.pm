@@ -77,7 +77,7 @@ sub _content {
   my $output;
   my $t = $hash->{$name};
   for my $chunk (ref $t eq 'ARRAY' ? @$t : $t) {
-    $output .= ref $chunk eq 'CODE' ? _block($chunk, @args) : $chunk;
+    $output .= _block($chunk, @args);
   }
 
   return Mojo::ByteStream->new($output // '');

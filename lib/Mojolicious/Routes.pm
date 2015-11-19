@@ -288,13 +288,13 @@ and implements the following new ones.
 
   $r = $r->add_condition(foo => sub {...});
 
-Add a new condition.
+Register a new condition.
 
 =head2 add_shortcut
 
   $r = $r->add_shortcut(foo => sub {...});
 
-Add a new shortcut.
+Register a new shortcut.
 
 =head2 continue
 

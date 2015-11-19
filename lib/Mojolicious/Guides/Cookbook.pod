@@ -1388,6 +1388,7 @@ itself can be accessed via C<app>.
 
   $ mojo generate lite_app myapp.pl
   $ ./myapp.pl eval 'say for @{app->static->paths}'
+  $ ./myapp.pl eval 'say for sort keys %{app->renderer->helpers}'
 
 The C<verbose> options will automatically print the return value or returned
 data structure to C<STDOUT>.

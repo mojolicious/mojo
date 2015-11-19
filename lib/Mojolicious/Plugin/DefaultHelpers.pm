@@ -50,37 +50,34 @@ sub _asset {
 }
 
 sub _block {
-  my $content =  shift;
-  ref $content eq 'CODE' ? &$content( @_ ) : $content;
+  my $content = shift;
+  ref $content eq 'CODE' ? $content->(@_) : $content;
 }
 
 sub _content {
-  my ($append, $replace, $c, $name, @args ) = @_;
+  my ($append, $replace, $c, $name, @args) = @_;
   $name ||= 'content';
 
-  my $content =  pop @args
-     if @args && ref $args[-1] eq 'CODE' || @args==1 && ref $args[-1] eq '';
+  my $content = pop @args
+    if @args && ref $args[-1] eq 'CODE' || @args == 1 && ref $args[-1] eq '';
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {
     if ($append) {
-      $hash->{$name} =  [ $hash->{$name} ]
-         if defined $hash->{$name}  &&  ref $hash->{$name} ne 'ARRAY';
-      push @{ $hash->{$name } }, $content;
+      $hash->{$name} = [$hash->{$name}]
+        if defined $hash->{$name} && ref $hash->{$name} ne 'ARRAY';
+      push @{$hash->{$name}}, $content;
     }
     if ($replace) { $hash->{$name} = _block($content, @args) }
     else          { $hash->{$name} //= $content }
   }
 
-  return ''   if !defined $hash->{$name}  ||  !defined wantarray;
+  return '' if !defined $hash->{$name} || !defined wantarray;
 
   my $output;
-  my $t =  $hash->{$name};
-  for my $chunk ( ref $t eq 'ARRAY' ? @$t : $t ) {
-    $output .=  ref $chunk eq 'CODE'
-       ? _block( $chunk, @args )
-       : $chunk
-    ;
+  my $t = $hash->{$name};
+  for my $chunk (ref $t eq 'ARRAY' ? @$t : $t) {
+    $output .= ref $chunk eq 'CODE' ? _block($chunk, @args) : $chunk;
   }
 
   return Mojo::ByteStream->new($output // '');

@@ -1,5 +1,5 @@
 
-6.33  2015-11-19
+6.33  2015-11-20
   - Updated IO::Socket::IP requirement to 0.37 for certain bug fixes.
   - Improved helper method in Mojolicious to replace already existing helpers
     silently.

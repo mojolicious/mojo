@@ -326,7 +326,7 @@ implements the following new ones.
 
   $t = $t->add_generator(foo => sub {...});
 
-Register a new content generator.
+Register a content generator.
 
 =head2 endpoint
 

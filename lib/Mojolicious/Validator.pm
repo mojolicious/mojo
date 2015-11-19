@@ -115,7 +115,7 @@ implements the following new ones.
 
   $validator = $validator->add_check(size => sub {...});
 
-Register a new validation check.
+Register a validation check.
 
 =head2 validation
 

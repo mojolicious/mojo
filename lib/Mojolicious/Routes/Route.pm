@@ -290,8 +290,8 @@ implements the following new ones.
 
   $r = $r->add_child(Mojolicious::Routes::Route->new);
 
-Add a new child to this route, it will be automatically removed from its
-current parent if necessary.
+Add a child to this route, it will be automatically removed from its current
+parent if necessary.
 
   # Reattach route
   $r->add_child($r->find('foo'));

@@ -372,13 +372,13 @@ C<XMLHttpRequest>.
 
   $renderer = $renderer->add_handler(epl => sub {...});
 
-Register a new handler.
+Register a handler.
 
 =head2 add_helper
 
   $renderer = $renderer->add_helper(url_for => sub {...});
 
-Register a new helper.
+Register a helper.
 
 =head2 get_data_template
 

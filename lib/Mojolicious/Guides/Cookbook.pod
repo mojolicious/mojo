@@ -986,7 +986,7 @@ file with L<Mojo::Asset::File/"move_to">.
 
   use Mojo::UserAgent;
 
-  # Lets fetch the latest Mojolicious tarball
+  # Fetch the latest Mojolicious tarball
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
   my $tx = $ua->get('https://www.github.com/kraih/mojo/tarball/master');
   $tx->res->content->asset->move_to('mojo.tar.gz');

@@ -228,10 +228,10 @@ sub _write {
   my $stream = $self->ioloop->stream($id)->write($chunk);
 
   # Finish or continue writing
-  weaken $self;
   my $next = '_write';
   $tx->has_subscribers('finish') ? ($next = '_finish') : $self->_finish($id)
     if $tx->is_finished;
+  weaken $self;
   $stream->write('' => sub { $self->$next($id) });
 }
 

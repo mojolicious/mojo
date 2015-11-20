@@ -582,7 +582,9 @@ every request.
   $app->helper(foo => sub {...});
 
 Add or replace a helper that will be available as a method of the controller
-object and the application object, as well as a function in C<ep> templates.
+object and the application object, as well as a function in C<ep> templates. For
+a full list of helpers that are available by default see
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
   # Helper
   $app->helper(cache => sub { state $cache = {} });
@@ -645,9 +647,9 @@ L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
   $app->start;
   $app->start(@ARGV);
 
-Start the command line interface for your application, for a full list of
-commands available by default see L<Mojolicious::Commands/"COMMANDS">. Note
-that the options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode>, which are
+Start the command line interface for your application. For a full list of
+commands that are available by default see L<Mojolicious::Commands/"COMMANDS">.
+Note that the options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode>, which are
 shared by all commands, will be parsed from C<@ARGV> during compile time.
 
   # Always start daemon

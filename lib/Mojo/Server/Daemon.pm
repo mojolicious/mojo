@@ -229,17 +229,10 @@ sub _write {
 
   # Finish or continue writing
   weaken $self;
-  my $cb = sub { $self->_write($id) };
-  if ($tx->is_finished) {
-    if ($tx->has_subscribers('finish')) {
-      $cb = sub { $self->_finish($id) }
-    }
-    else {
-      $self->_finish($id);
-      return unless $c->{tx};
-    }
-  }
-  $stream->write('' => $cb);
+  my $next = '_write';
+  $tx->has_subscribers('finish') ? ($next = '_finish') : $self->_finish($id)
+    if $tx->is_finished;
+  $stream->write('' => sub { $self->$next($id) });
 }
 
 1;

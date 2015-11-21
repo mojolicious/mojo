@@ -1388,13 +1388,13 @@ called.
       my ($renderer, $c, $output, $options) = @_;
 
       # Check for one-time use inline template
-      my $inline = $options->{inline};
+      my $inline_template = $options->{inline};
 
-      # Check for absolute template path
-      my $path = $renderer->template_path($options);
+      # Check for appropriate template in "templates" directories
+      my $template_path = $renderer->template_path($options);
 
-      # Check for appropriate template in DATA section
-      my $data = $renderer->get_data_template($options);
+      # Check for appropriate template in DATA sections
+      my $data_template = $renderer->get_data_template($options);
 
       # This part is up to you and your template system :)
       ...

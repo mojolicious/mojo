@@ -386,9 +386,9 @@ Register a helper.
     handler        => 'epl'
   });
 
-Get a C<DATA> section template from L</"classes"> for an options hash reference
-with C<template>, C<format>, C<variant> and C<handler> values, usually used by
-handlers.
+Return a C<DATA> section template from L</"classes"> for an options hash
+reference with C<template>, C<format>, C<variant> and C<handler> values, or
+C<undef> if no template could be found, usually used by handlers.
 
 =head2 get_helper
 
@@ -413,7 +413,8 @@ L<Mojolicious::Controller/"render"> for a more user-friendly interface.
 
   my $name = $renderer->template_for(Mojolicious::Controller->new);
 
-Generate default template name for L<Mojolicious::Controller> object.
+Return default template name for L<Mojolicious::Controller> object, or C<undef>
+if no name could be generated.
 
 =head2 template_handler
 
@@ -422,8 +423,8 @@ Generate default template name for L<Mojolicious::Controller> object.
     format   => 'html'
   });
 
-Detect handler for an options hash reference with C<template>, C<format> and
-C<variant> values.
+Return handler for an options hash reference with C<template>, C<format> and
+C<variant> values, or C<undef> if no handler could be found.
 
 =head2 template_name
 
@@ -433,8 +434,9 @@ C<variant> values.
     handler  => 'epl'
   });
 
-Build a template name for an options hash reference with C<template>, C<format>,
-C<variant> and C<handler> values, usually used by handlers.
+Return a template name for an options hash reference with C<template>,
+C<format>, C<variant> and C<handler> values, or C<undef> if no template could be
+found, usually used by handlers.
 
 =head2 template_path
 
@@ -444,8 +446,9 @@ C<variant> and C<handler> values, usually used by handlers.
     handler  => 'epl'
   });
 
-Build a full template path for an options hash reference with C<template>,
-C<format>, C<variant> and C<handler> values, usually used by handlers.
+Return the full template path for an options hash reference with C<template>,
+C<format>, C<variant> and C<handler> values, or C<undef> if the file does not
+exist in L</"paths">, usually used by handlers.
 
 =head2 warmup
 

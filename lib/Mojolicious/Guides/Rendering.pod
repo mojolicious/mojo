@@ -1409,8 +1409,10 @@ called.
 
   1;
 
-Since most template systems don't support templates in the C<DATA> section, the
-renderer provides methods to help you with that.
+An C<inline> template, if provided by the user, will be passed along with the
+options. The C<templates> directories of the application can be searched with
+L<Mojolicious::Renderer/"template_path">, and the C<DATA> sections with
+L<Mojolicious::Renderer/"get_data_template">.
 
   use Mojolicious::Lite;
 

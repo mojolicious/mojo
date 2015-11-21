@@ -1399,14 +1399,11 @@ called.
       # This part is up to you and your template system :)
       ...
 
-      # Just die if an error occurs
-      die 'Something went wrong with the template';
-
-      # Or pass the rendered result back to the renderer
+      # Pass the rendered result back to the renderer
       $$output = 'Hello World!';
 
-      # And return true if something has been rendered or false otherwise
-      return 1;
+      # Or just die if an error occurs
+      die 'Something went wrong with the template';
     });
   }
 
@@ -1445,8 +1442,6 @@ generating bytes instead.
 
     # Encode data from stash value
     $$output = nfreeze delete $c->stash->{storable};
-
-    return 1;
   });
 
   # Set "handler" value automatically if "storable" value is set already

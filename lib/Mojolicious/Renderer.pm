@@ -138,7 +138,8 @@ sub render {
   while ((my $next = _next($stash)) && !defined $inline) {
     @$options{qw(handler template)} = ($stash->{handler}, $next);
     $options->{format} = $stash->{format} || $self->default_format;
-    $self->_render_template($c, \$output, $options);
+    my $layout;
+    $output = $layout if $self->_render_template($c, \$layout, $options);
     $content->{content} = $output
       if $content->{content} !~ /\S/ && $output =~ /\S/;
   }
@@ -234,16 +235,13 @@ sub _next {
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
-  # Find handler and render
   my $handler = $options->{handler} ||= $self->template_handler($options);
   return undef unless $handler;
-  if (my $renderer = $self->handlers->{$handler}) {
-    return 1 if $renderer->($self, $c, $output, $options);
-  }
+  $c->app->log->error(qq{No handler for "$handler" available}) and return undef
+    unless my $renderer = $self->handlers->{$handler};
 
-  # No handler
-  else { $c->app->log->error(qq{No handler for "$handler" available}) }
-  return undef;
+  $renderer->($self, $c, $output, $options);
+  return 1 if defined $$output;
 }
 
 1;

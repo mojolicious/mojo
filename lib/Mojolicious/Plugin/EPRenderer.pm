@@ -20,7 +20,7 @@ sub register {
       my ($renderer, $c, $output, $options) = @_;
 
       my $name = $options->{inline} // $renderer->template_name($options);
-      return undef unless defined $name;
+      return unless defined $name;
       my @keys = sort grep {/^\w+$/} keys %{$c->stash};
       my $key = md5_sum encode 'UTF-8', join(',', $name, @keys);
 
@@ -47,7 +47,7 @@ sub register {
       local *{"${ns}::_C"} = sub {$c};
 
       # Render with "epl" handler
-      return $renderer->handlers->{epl}($renderer, $c, $output, $options);
+      $renderer->handlers->{epl}($renderer, $c, $output, $options);
     }
   );
 }

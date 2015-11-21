@@ -16,12 +16,8 @@ sub register {
   $app->renderer->add_handler(
     $conf->{name} || 'pod' => sub {
       my ($renderer, $c, $output, $options) = @_;
-
-      # Preprocess and render
-      my $handler = $renderer->handlers->{$preprocess};
-      return undef unless $handler->($renderer, $c, $output, $options);
-      $$output = _pod_to_html($$output);
-      return 1;
+      $renderer->handlers->{$preprocess}($renderer, $c, $output, $options);
+      $$output = _pod_to_html($$output) if defined $$output;
     }
   );
 

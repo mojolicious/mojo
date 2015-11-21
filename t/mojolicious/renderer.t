@@ -15,7 +15,8 @@ my $renderer = $c->app->renderer->default_format('test');
 $renderer->add_handler(
   debug => sub {
     my ($renderer, $c, $output) = @_;
-    $$output .= 'Hello Mojo!';
+    my $content = $c->content // '';
+    $$output = "Hello Mojo!$content";
   }
 );
 $c->stash->{template} = 'something';

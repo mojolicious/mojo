@@ -21,7 +21,7 @@ sub _epl {
   else {
     my $inline = $options->{inline};
     my $name = defined $inline ? md5_sum encode('UTF-8', $inline) : undef;
-    return undef unless defined($name //= $renderer->template_name($options));
+    return unless defined($name //= $renderer->template_name($options));
 
     # Inline
     if (defined $inline) {
@@ -47,12 +47,12 @@ sub _epl {
       }
 
       # No template
-      else { $log->debug(qq{Template "$name" not found}) and return undef }
+      else { $log->debug(qq{Template "$name" not found}) }
     }
   }
 
-  # Exception or success
-  return ref $$output ? die $$output : 1;
+  # Exception
+  die $$output if ref $$output;
 }
 
 1;

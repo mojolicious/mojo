@@ -302,7 +302,7 @@ implements the following new ones.
 
   my $env = $commands->detect;
 
-Try to detect environment or return C<undef> if none could be detected.
+Try to detect environment, or return C<undef> if none could be detected.
 
 =head2 run
 

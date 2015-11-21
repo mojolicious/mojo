@@ -533,8 +533,8 @@ node's content.
   my $result = $dom->at('div ~ p');
 
 Find first descendant element of this element matching the CSS selector and
-return it as a L<Mojo::DOM> object or return C<undef> if none could be found.
-All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+return it as a L<Mojo::DOM> object, or C<undef> if none could be found. All
+selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
@@ -690,7 +690,7 @@ L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   my $namespace = $dom->namespace;
 
-Find this element's namespace or return C<undef> if none could be found.
+Find this element's namespace, or return C<undef> if none could be found.
 
   # Find namespace for an element with namespace prefix
   my $namespace = $dom->at('svg > svg\:circle')->namespace;
@@ -710,7 +710,7 @@ fragment if necessary.
 
   my $sibling = $dom->next;
 
-Return L<Mojo::DOM> object for next sibling element or C<undef> if there are no
+Return L<Mojo::DOM> object for next sibling element, or C<undef> if there are no
 more siblings.
 
   # "<h2>123</h2>"
@@ -720,7 +720,7 @@ more siblings.
 
   my $sibling = $dom->next_node;
 
-Return L<Mojo::DOM> object for next sibling node or C<undef> if there are no
+Return L<Mojo::DOM> object for next sibling node, or C<undef> if there are no
 more siblings.
 
   # "456"
@@ -735,7 +735,7 @@ more siblings.
 
   my $parent = $dom->parent;
 
-Return L<Mojo::DOM> object for parent of this node or C<undef> if this node has
+Return L<Mojo::DOM> object for parent of this node, or C<undef> if this node has
 no parent.
 
   # "<b><i>Test</i></b>"
@@ -808,7 +808,7 @@ node's content.
 
   my $sibling = $dom->previous;
 
-Return L<Mojo::DOM> object for previous sibling element or C<undef> if there
+Return L<Mojo::DOM> object for previous sibling element, or C<undef> if there
 are no more siblings.
 
   # "<h1>Test</h1>"
@@ -818,7 +818,7 @@ are no more siblings.
 
   my $sibling = $dom->previous_node;
 
-Return L<Mojo::DOM> object for previous sibling node or C<undef> if there are
+Return L<Mojo::DOM> object for previous sibling node, or C<undef> if there are
 no more siblings.
 
   # "123"
@@ -954,9 +954,9 @@ C<root>, C<tag> or C<text>.
   my $value = $dom->val;
 
 Extract value from form element (such as C<button>, C<input>, C<option>,
-C<select> and C<textarea>) or return C<undef> if this element has no value. In
+C<select> and C<textarea>), or return C<undef> if this element has no value. In
 the case of C<select> with C<multiple> attribute, find C<option> elements with
-C<selected> attribute and return an array reference with all values or C<undef>
+C<selected> attribute and return an array reference with all values, or C<undef>
 if none could be found.
 
   # "a"

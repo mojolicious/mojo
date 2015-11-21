@@ -621,14 +621,15 @@ Build Perl L</"code"> from L</"tree">.
 
   my $exception = $mt->compile;
 
-Compile Perl L</"code"> for template.
+Compile Perl L</"code"> for template and return a L<Mojo::Exception> object, or
+C<undef> if there was no exception.
 
 =head2 interpret
 
   my $output = $mt->interpret;
   my $output = $mt->interpret(@args);
 
-Interpret L</"compiled"> template code.
+Interpret L</"compiled"> template code and return the result.
 
   # Reuse template
   say $mt->render('Hello <%= $_[0] %>!', 'Bender');
@@ -646,7 +647,7 @@ Parse template into L</"tree">.
   my $output = $mt->render('<%= 1 + 1 %>');
   my $output = $mt->render('<%= shift() + shift() %>', @args);
 
-Render template.
+Render template and return the result.
 
   say $mt->render('Hello <%= $_[0] %>!', 'Bender');
 
@@ -655,7 +656,7 @@ Render template.
   my $output = $mt->render_file('/tmp/foo.mt');
   my $output = $mt->render_file('/tmp/foo.mt', @args);
 
-Render template file.
+Render template file and return the result.
 
 =head1 DEBUGGING
 

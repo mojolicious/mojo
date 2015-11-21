@@ -167,7 +167,7 @@ the following new ones.
   my $file = $morbo->check;
 
 Check if file from L</"watch"> has been modified since last check and return
-its name or C<undef> if there have been no changes.
+its name, or C<undef> if there have been no changes.
 
 =head2 run
 

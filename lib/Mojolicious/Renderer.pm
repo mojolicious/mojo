@@ -396,7 +396,7 @@ handlers.
 
   my $helper = $renderer->get_helper('url_for');
 
-Get a helper by full name, generate a helper dynamically for a prefix or return
+Get a helper by full name, generate a helper dynamically for a prefix, or return
 C<undef> if no helper or prefix could be found. Generated helpers return a
 proxy object containing the current controller object and on which nested
 helpers can be called.

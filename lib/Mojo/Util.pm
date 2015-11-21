@@ -549,7 +549,7 @@ Convert C<CamelCase> string to C<snake_case> and replace C<::> with C<->.
 
   my $chars = decode 'UTF-8', $bytes;
 
-Decode bytes to characters and return C<undef> if decoding failed.
+Decode bytes to characters, or return C<undef> if decoding failed.
 
 =head2 deprecated
 

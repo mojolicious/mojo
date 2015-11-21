@@ -209,7 +209,7 @@ sub _all_text {
 sub _ancestors {
   my ($self, $root) = @_;
 
-  return unless my $tree = $self->_parent;
+  return () unless my $tree = $self->_parent;
   my @ancestors;
   do { push @ancestors, $tree }
     while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
@@ -265,7 +265,7 @@ sub _link {
 sub _maybe { $_[1] ? $_[0]->_build($_[1], $_[0]->xml) : undef }
 
 sub _nodes {
-  return unless my $tree = shift;
+  return () unless my $tree = shift;
   my @nodes = @$tree[_start($tree) .. $#$tree];
   return shift() ? grep { $_->[0] eq 'tag' } @nodes : @nodes;
 }

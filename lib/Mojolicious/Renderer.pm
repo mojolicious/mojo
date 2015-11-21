@@ -129,7 +129,7 @@ sub render {
   # Template or templateless handler
   else {
     $options->{template} ||= $self->template_for($c);
-    return unless $self->_render_template($c, \$output, $options);
+    return () unless $self->_render_template($c, \$output, $options);
   }
 
   # Inheritance

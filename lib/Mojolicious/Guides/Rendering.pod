@@ -1410,8 +1410,8 @@ called.
   1;
 
 An C<inline> template, if provided by the user, will be passed along with the
-options. To search the C<templates> directories of the application, you can use
-L<Mojolicious::Renderer/"template_path">, and
+options. You can use L<Mojolicious::Renderer/"template_path"> to search the
+C<templates> directories of the application, and
 L<Mojolicious::Renderer/"get_data_template"> to search the C<DATA> sections.
 
   use Mojolicious::Lite;

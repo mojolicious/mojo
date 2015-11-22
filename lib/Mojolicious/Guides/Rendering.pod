@@ -947,9 +947,9 @@ L<Mojolicious::Validator::Validation/"error">.
 =head2 Cross-site request forgery
 
 CSRF is a very common attack on web applications that trick your logged in
-users to submit forms they did not intend to send. All you have to do to
+users to submit forms they did not intend to send. All you have to do, to
 protect your users from this, is to add an additional hidden field to your
-forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field"> and validate it with
+forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field">, and validate it with
 L<Mojolicious::Validator::Validation/"csrf_protect">.
 
   use Mojolicious::Lite;
@@ -1373,8 +1373,8 @@ L<Mojo::Template> contains the whole list of available options.
 =head2 Adding your favorite template system
 
 Maybe you would prefer a different template system than C<ep>, and there is not
-already a plugin on CPAN for your favorite one, all you have to do is add a new
-C<handler> with L<Mojolicious::Renderer/"add_handler"> when C<register> is
+already a plugin on CPAN for your favorite one. All you have to do, is to add a
+new C<handler> with L<Mojolicious::Renderer/"add_handler"> when C<register> is
 called.
 
   package Mojolicious::Plugin::MyRenderer;
@@ -1410,20 +1410,24 @@ called.
   1;
 
 An C<inline> template, if provided by the user, will be passed along with the
-options. The C<templates> directories of the application can be searched with
-L<Mojolicious::Renderer/"template_path">, and the C<DATA> sections with
-L<Mojolicious::Renderer/"get_data_template">.
+options. To search the C<templates> directories of the application, you can use
+L<Mojolicious::Renderer/"template_path">, and
+L<Mojolicious::Renderer/"get_data_template"> to search the C<DATA> sections.
 
   use Mojolicious::Lite;
 
   plugin 'MyRenderer';
 
-  get '/' => 'index';
+  # Render an inline template
+  get '/inline' => {inline => '...', handler => 'mine'};
+
+  # Render a template from the DATA section
+  get '/data' => {template => 'test'};
 
   app->start;
   __DATA__
 
-  @@ index.html.mine
+  @@ test.html.mine
   ...
 
 =head2 Adding a handler to generate binary data

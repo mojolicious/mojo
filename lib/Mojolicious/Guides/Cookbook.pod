@@ -158,8 +158,8 @@ works with all built-in web servers.
   $ ./script/my_app prefork -P /tmp/first.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080
 
-All you have to do is start a second web server listening to the same port and
-stop the first web server gracefully afterwards.
+All you have to do, is to start a second web server listening to the same port,
+and stop the first web server gracefully afterwards.
 
   $ ./script/my_app prefork -P /tmp/second.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080

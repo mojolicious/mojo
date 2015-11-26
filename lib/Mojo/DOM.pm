@@ -352,7 +352,7 @@ sub _wrap {
   my ($self, $content, $new) = @_;
 
   return $self if (my $tree = $self->tree)->[0] eq 'root' && !$content;
-  $content = 0 if $tree->[0] ne 'root' && $tree->[0] ne 'tag';
+  return $self if $tree->[0] ne 'root' && $tree->[0] ne 'tag' && $content;
 
   # Find innermost tag
   my $current;
@@ -999,8 +999,8 @@ placing it as the last child of the first innermost element.
 
   $dom = $dom->wrap_content('<div></div>');
 
-Wrap HTML/XML fragment around this node's content, placing it as the last
-children of the first innermost element.
+Wrap HTML/XML fragment around this node's content (for C<root> and C<tag>
+nodes), placing it as the last children of the first innermost element.
 
   # "<p><b>123Test</b></p>"
   $dom->parse('<p>Test<p>')->at('p')->wrap_content('<b>123</b>')->root;

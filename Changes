@@ -1,5 +1,7 @@
 
-6.34  2015-11-23
+6.34  2015-11-26
+  - Fixed bug in Mojo::DOM where the wrap method would attempt to wrap an
+    HTML/XML fragment around the content of root nodes.
 
 6.33  2015-11-22
   - Updated IO::Socket::IP requirement to 0.37 for certain bug fixes.

@@ -351,7 +351,7 @@ sub _text {
 sub _wrap {
   my ($self, $content, $new) = @_;
 
-  $content = 1 if (my $tree = $self->tree)->[0] eq 'root';
+  return $self if (my $tree = $self->tree)->[0] eq 'root' && !$content;
   $content = 0 if $tree->[0] ne 'root' && $tree->[0] ne 'tag';
 
   # Find innermost tag
@@ -500,7 +500,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   $dom = $dom->append('<p>I ♥ Mojolicious!</p>');
 
-Append HTML/XML fragment to this node.
+Append HTML/XML fragment to this node (for all node types other than C<root>).
 
   # "<div><h1>Test</h1><h2>123</h2></div>"
   $dom->parse('<div><h1>Test</h1></div>')
@@ -776,7 +776,7 @@ node as L<Mojo::DOM> objects.
 
   $dom = $dom->prepend('<p>I ♥ Mojolicious!</p>');
 
-Prepend HTML/XML fragment to this node.
+Prepend HTML/XML fragment to this node (for all node types other than C<root>).
 
   # "<div><h1>Test</h1><h2>123</h2></div>"
   $dom->parse('<div><h2>123</h2></div>')
@@ -980,8 +980,8 @@ if none could be found.
 
   $dom = $dom->wrap('<div></div>');
 
-Wrap HTML/XML fragment around this node, placing it as the last child of the
-first innermost element.
+Wrap HTML/XML fragment around this node (for all node types other than C<root>),
+placing it as the last child of the first innermost element.
 
   # "<p>123<b>Test</b></p>"
   $dom->parse('<b>Test</b>')->at('b')->wrap('<p>123</p>')->root;

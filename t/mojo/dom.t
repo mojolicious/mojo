@@ -2123,7 +2123,10 @@ is $dom->all_text, 'Mojo Test', 'right text';
 
 # Wrap elements
 $dom = Mojo::DOM->new('<a>Test</a>');
-is $dom->wrap('<b></b>')->type, 'root', 'right type';
+is "$dom", '<a>Test</a>', 'right result';
+$dom->wrap('<b></b>');
+is "$dom", '<a>Test</a>', 'no changes';
+is $dom->at('a')->wrap('<b></b>')->type, 'tag', 'right type';
 is "$dom", '<b><a>Test</a></b>', 'right result';
 is $dom->at('b')->strip->at('a')->wrap('A')->tag, 'a', 'right tag';
 is "$dom", '<a>Test</a>', 'right result';

@@ -3,6 +3,10 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -51,48 +55,38 @@ $t->get_ok('/art')->status_is(200)->text_like('h2[id="art"]' => qr/art/)
 # Empty
 $t->get_ok('/empty')->status_is(200)->content_is('');
 
-# Perldoc browser (Welcome)
+# Welcome
 $t->get_ok('/perldoc')->status_is(200)->element_exists('#mojobar')
-  ->text_is('#TUTORIAL a:nth-of-type(2)', 'TUTORIAL')
-  ->text_is('#GUIDES a:nth-of-type(2)',   'GUIDES')
-  ->content_like(qr/Mojolicious guide to the galaxy/);
+  ->text_like('title', qr/Mojolicious guide to the galaxy/);
 
-# Perldoc browser (Welcome with slash)
-$t->get_ok('/perldoc/')->status_is(200)
-  ->text_is('#TUTORIAL a:nth-of-type(2)', 'TUTORIAL')
-  ->text_is('#GUIDES a:nth-of-type(2)',   'GUIDES')
-  ->content_like(qr/Mojolicious guide to the galaxy/)
-  ->content_unlike(qr/Pirates/);
+# Headings
+$t->get_ok('/perldoc/MojoliciousPODTest')->status_is(200)
+  ->element_exists('h1#One')->element_exists('h2#Two')
+  ->element_exists('h3#Three')->element_exists('h4#Four')
+  ->element_exists('a[href=#One]')->element_exists('a[href=#Two]')
+  ->element_exists('a[href=#Three]')->element_exists('a[href=#Four]')
+  ->text_like('pre code', qr/\$foo/);
 
-# Perldoc browser (Mojo documentation)
-$t->get_ok('/perldoc/Mojo')->status_is(200)
-  ->text_is('h1#SYNOPSIS a:nth-of-type(2)', 'SYNOPSIS')
-  ->text_is('#handler a:nth-of-type(2)',    'handler')
-  ->text_like('p', qr/Duct tape for the HTML5 web!/);
+# Trailing slash
+$t->get_ok('/perldoc/MojoliciousPODTest/')->element_exists('#mojobar')
+  ->text_like('title', qr/PODTest/);
 
-# Perldoc browser (Mojo documentation with format)
-$t->get_ok('/perldoc/Mojo.html')->status_is(200)
-  ->text_is('h1#SYNOPSIS a:nth-of-type(2)', 'SYNOPSIS')
-  ->text_is('#handler a:nth-of-type(2)',    'handler')
-  ->text_like('p', qr/Duct tape for the HTML5 web!/);
+# Format
+$t->get_ok('/perldoc/MojoliciousPODTest.html')->element_exists('#mojobar')
+  ->text_like('title', qr/PODTest/);
 
-# Perldoc browser (negotiated Mojo documentation)
-$t->get_ok('/perldoc/Mojo' => {Accept => 'text/html'})->status_is(200)
-  ->text_is('h1#SYNOPSIS a:nth-of-type(2)', 'SYNOPSIS')
-  ->text_is('#handler a:nth-of-type(2)',    'handler')
-  ->text_like('p', qr/Duct tape for the HTML5 web!/);
+# Format (source)
+$t->get_ok('/perldoc/MojoliciousPODTest' => {Accept => 'text/plain'})
+  ->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+  ->content_like(qr/package MojoliciousPODTest/);
 
-# Perldoc browser (Mojo source with format)
-$t->get_ok('/perldoc/Mojo.txt')->status_is(200)
-  ->content_type_is('text/plain;charset=UTF-8')
-  ->content_like(qr/package Mojo;/);
-
-# Perldoc browser (negotiated Mojolicious source again)
-$t->get_ok('/perldoc/Mojolicious' => {Accept => 'text/plain'})->status_is(200)
-  ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
+# Negotiated source
+$t->get_ok('/perldoc/MojoliciousPODTest' => {Accept => 'text/plain'})
+  ->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+  ->content_like(qr/package MojoliciousPODTest/);
 
 # Perldoc browser (unsupported format)
-$t->get_ok('/perldoc/Mojolicious.json')->status_is(204);
+$t->get_ok('/perldoc/MojoliciousPODTest.json')->status_is(204);
 
 done_testing();
 

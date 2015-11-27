@@ -1,5 +1,5 @@
 
-6.34  2015-11-26
+6.34  2015-11-27
   - Fixed bug in Mojo::DOM where the wrap method would attempt to wrap an
     HTML/XML fragment around the content of root nodes.
   - Fixed bug in Mojo::DOM where the wrap_content method would attempt to wrap

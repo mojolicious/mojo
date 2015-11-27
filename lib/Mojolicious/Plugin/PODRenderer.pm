@@ -57,7 +57,7 @@ sub _html {
   # Rewrite headers
   my $toc = Mojo::URL->new->fragment('toc');
   my @parts;
-  for my $e ($dom->find('h1, h2, h3')->each) {
+  for my $e ($dom->find('h1, h2, h3, h4')->each) {
 
     push @parts, [] if $e->tag eq 'h1' || !@parts;
     my $link = Mojo::URL->new->fragment($e->{id});

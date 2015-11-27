@@ -4,6 +4,7 @@
     HTML/XML fragment around the content of root nodes.
   - Fixed bug in Mojo::DOM where the wrap_content method would attempt to wrap
     an HTML/XML fragment around nodes that do not have children.
+  - Fixed a few small formatting bugs in Mojolicious::Plugin::PODRenderer.
 
 6.33  2015-11-22
   - Updated IO::Socket::IP requirement to 0.37 for certain bug fixes.

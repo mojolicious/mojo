@@ -267,7 +267,7 @@ $daemon = Mojo::Server::Daemon->new(
   silent      => 1
 );
 is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
-is scalar @{$daemon->start->acceptors}, 1, 'one active acceptor';
+is scalar @{$daemon->start->start->acceptors}, 1, 'one active acceptor';
 is $daemon->ioloop->max_connections, 23, 'right value';
 $id = $daemon->acceptors->[0];
 ok !!Mojo::IOLoop->acceptor($id), 'acceptor has been added';

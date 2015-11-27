@@ -47,7 +47,7 @@ sub start {
   }
 
   # Start listening
-  else { $self->_listen($_) for @{$self->listen} }
+  elsif (!@{$self->acceptors}) { $self->_listen($_) for @{$self->listen} }
 
   return $self;
 }

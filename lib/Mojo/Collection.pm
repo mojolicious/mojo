@@ -177,7 +177,7 @@ string.
   my @elements = $collection->each;
   $collection  = $collection->each(sub {...});
 
-Evaluate callback for each element in collection or return all elements as a
+Evaluate callback for each element in collection, or return all elements as a
 list if none has been provided. The element will be the first argument passed
 to the callback and is also available as C<$_>.
 

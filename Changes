@@ -1,5 +1,5 @@
 
-6.34  2015-11-27
+6.34  2015-11-28
   - Improved Hypnotoad to report problems that have occured during the creation
     of listen sockets.
   - Fixed bug in Mojo::DOM where the wrap method would attempt to wrap an

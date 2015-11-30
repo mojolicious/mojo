@@ -270,13 +270,14 @@ implements the following new ones.
 
   $tx->client_read($bytes);
 
-Read data client-side, used to implement user agents.
+Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
 
 =head2 client_write
 
   my $bytes = $tx->client_write;
 
-Write data client-side, used to implement user agents.
+Write data client-side, used to implement user agents such as
+L<Mojo::UserAgent>.
 
 =head2 is_empty
 
@@ -304,13 +305,15 @@ transaction.
 
   $tx->server_read($bytes);
 
-Read data server-side, used to implement web servers.
+Read data server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
 
 =head2 server_write
 
   my $bytes = $tx->server_write;
 
-Write data server-side, used to implement web servers.
+Write data server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
 
 =head1 SEE ALSO
 

@@ -537,25 +537,28 @@ Build WebSocket message.
 
   my $bool = $ws->client_challenge;
 
-Check WebSocket handshake challenge client-side, used to implement user agents.
+Check WebSocket handshake challenge client-side, used to implement user agents
+such as L<Mojo::UserAgent>.
 
 =head2 client_handshake
 
   $ws->client_handshake;
 
-Perform WebSocket handshake client-side, used to implement user agents.
+Perform WebSocket handshake client-side, used to implement user agents such as
+L<Mojo::UserAgent>.
 
 =head2 client_read
 
   $ws->client_read($data);
 
-Read data client-side, used to implement user agents.
+Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
 
 =head2 client_write
 
   my $bytes = $ws->client_write;
 
-Write data client-side, used to implement user agents.
+Write data client-side, used to implement user agents such as
+L<Mojo::UserAgent>.
 
 =head2 connection
 
@@ -675,31 +678,36 @@ will be invoked once all data has been written.
 
   $ws->server_close;
 
-Transaction closed server-side, used to implement web servers.
+Transaction closed server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
 
 =head2 server_handshake
 
   $ws->server_handshake;
 
-Perform WebSocket handshake server-side, used to implement web servers.
+Perform WebSocket handshake server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
 
 =head2 server_open
 
   $ws->server_open;
 
-WebSocket connection established server-side, used to implement web servers.
+WebSocket connection established server-side, used to implement web servers such
+as L<Mojo::Server::Daemon>.
 
 =head2 server_read
 
   $ws->server_read($data);
 
-Read data server-side, used to implement web servers.
+Read data server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
 
 =head2 server_write
 
   my $bytes = $ws->server_write;
 
-Write data server-side, used to implement web servers.
+Write data server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
 
 =head2 with_compression
 

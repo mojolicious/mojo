@@ -189,21 +189,21 @@ implements the following new ones.
   $tx->client_close(1);
 
 Transaction closed client-side, no actual connection close is assumed by
-default, used to implement user agents.
+default, used to implement user agents such as L<Mojo::UserAgent>.
 
 =head2 client_read
 
   $tx->client_read($bytes);
 
-Read data client-side, used to implement user agents. Meant to be overloaded in
-a subclass.
+Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
+Meant to be overloaded in a subclass.
 
 =head2 client_write
 
   my $bytes = $tx->client_write;
 
-Write data client-side, used to implement user agents. Meant to be overloaded
-in a subclass.
+Write data client-side, used to implement user agents such as
+L<Mojo::UserAgent>. Meant to be overloaded in a subclass.
 
 =head2 connection
 
@@ -265,21 +265,22 @@ proxy.
 
   $tx->server_close;
 
-Transaction closed server-side, used to implement web servers.
+Transaction closed server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
 
 =head2 server_read
 
   $tx->server_read($bytes);
 
-Read data server-side, used to implement web servers. Meant to be overloaded in
-a subclass.
+Read data server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
 
 =head2 server_write
 
   my $bytes = $tx->server_write;
 
-Write data server-side, used to implement web servers. Meant to be overloaded
-in a subclass.
+Write data server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
 
 =head2 success
 

@@ -24,7 +24,7 @@ sub client_close {
     $res->error({message => $res->message, code => $res->code});
   }
 
-  return $self->server_close;
+  $self->server_close;
 }
 
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }

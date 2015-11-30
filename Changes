@@ -1,4 +1,6 @@
 
+6.35  2015-12-02
+
 6.34  2015-12-01
   - Improved Hypnotoad to report problems that have occured during the creation
     of listen sockets.

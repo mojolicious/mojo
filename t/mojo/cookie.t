@@ -372,21 +372,26 @@ is $cookies->[0]->to_string,
   . ' path=/test; secure; Max-Age=60', 'right result';
 is $cookies->[1], undef, 'no more cookies';
 
-# Parse response cookie with broken Expires value
+# Parse response cookie with broken Expires and Domain values
 $cookies = Mojo::Cookie::Response->parse('foo="ba r"; Expires=Th');
 is $cookies->[0]->name,    'foo',  'right name';
 is $cookies->[0]->value,   'ba r', 'right value';
 is $cookies->[0]->expires, undef,  'no expires value';
+is $cookies->[0]->domain,  undef,  'no domain value';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = Mojo::Cookie::Response->parse('foo="ba r"; Expires=Th; Path=/test');
+$cookies = Mojo::Cookie::Response->parse(
+  'foo="ba r"; Expires=Th; Domain=; Path=/test');
 is $cookies->[0]->name,    'foo',  'right name';
 is $cookies->[0]->value,   'ba r', 'right value';
 is $cookies->[0]->expires, undef,  'no expires value';
+is $cookies->[0]->domain,  '',     'no domain value';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = Mojo::Cookie::Response->parse('foo="ba r"; Expires; Path=/test');
+$cookies
+  = Mojo::Cookie::Response->parse('foo="ba r"; Expires; Domain; Path=/test');
 is $cookies->[0]->name,    'foo',  'right name';
 is $cookies->[0]->value,   'ba r', 'right value';
 is $cookies->[0]->expires, undef,  'no expires value';
+is $cookies->[0]->domain,  undef,  'no domain value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Response cookie with Max-Age 0 and Expires 0

@@ -194,7 +194,7 @@ sub parse_frame {
   }
 
   # Check message size
-  $self->finish(1009) and return undef if $len > $self->max_websocket_size;
+  return 1 if $len > $self->max_websocket_size;
 
   # Check if whole packet has arrived
   $len += 4 if my $masked = $second & 0b10000000;
@@ -248,6 +248,7 @@ sub server_read {
 
   $self->{read} .= $chunk // '';
   while (my $frame = $self->parse_frame(\$self->{read})) {
+    $self->finish(1009) and last unless ref $frame;
     $self->emit(frame => $frame);
   }
 

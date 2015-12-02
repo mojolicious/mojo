@@ -1,5 +1,5 @@
 
-6.35  2015-12-02
+6.35  2015-12-03
   - Removed deprecated collecting method from Mojo::UserAgent::CookieJar.
   - Fixed warnings in Mojo::Cookie::Response.
 

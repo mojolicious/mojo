@@ -406,8 +406,8 @@ L<Mojolicious/"secrets">.
 
   $app->secrets(['Mojolicious rocks']);
 
-This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies
-secure and can be changed at any time to invalidate all existing sessions.
+This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies tamper
+resistant and can be changed at any time to invalidate all existing sessions.
 
   $c->session(user => 'sebastian');
   my $user = $c->session('user');
@@ -445,7 +445,7 @@ this.
   use lib 'lib';
   use MyApp::Model::Users;
 
-  # Make signed cookies secure
+  # Make signed cookies tamper resistant
   app->secrets(['Mojolicious rocks']);
 
   helper users => sub { state $users = MyApp::Model::Users->new };

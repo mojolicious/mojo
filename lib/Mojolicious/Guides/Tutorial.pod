@@ -734,7 +734,7 @@ client-side, with a cryptographic signature to prevent tampering.
   Counter: <%= session 'counter' %>
 
 Note that you should use custom L<Mojolicious/"secrets"> to make signed cookies
-really secure.
+really tamper resistant.
 
   app->secrets(['My secret passphrase here']);
 

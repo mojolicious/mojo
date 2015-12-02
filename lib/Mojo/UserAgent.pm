@@ -98,9 +98,7 @@ sub _connect {
   if ($proto eq 'socks') {
     @options{qw(socks_address socks_port)} = @options{qw(address port)};
     ($proto, @options{qw(address port)}) = $t->endpoint($tx);
-    my $req      = $tx->req;
-    my $userinfo = $req->proxy->userinfo;
-    $req->via_proxy(0);
+    my $userinfo = $tx->req->via_proxy(0)->proxy->userinfo;
     @options{qw(socks_user socks_pass)} = split ':', $userinfo if $userinfo;
   }
 

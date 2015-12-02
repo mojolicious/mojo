@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
 use Mojo::Path;
-use Mojo::Util 'deprecated';
 
 has 'ignore';
 has max_cookie_size => 4096;
@@ -40,9 +39,6 @@ sub all {
 sub collect {
   my ($self, $tx) = @_;
 
-  # DEPRECATED in Clinking Beer Mugs!
-  return unless $self->{collecting} // 1;
-
   my $url = $tx->req->url;
   for my $cookie (@{$tx->res->cookies}) {
 
@@ -58,16 +54,6 @@ sub collect {
     next unless _path($path, $url->path->to_abs_string);
     $self->add($cookie->path($path));
   }
-}
-
-# DEPRECATED in Clinking Beer Mugs!
-sub collecting {
-  deprecated 'Mojo::UserAgent::CookieJar::collecting is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::CookieJar::ignore';
-  my $self = shift;
-  return $self->{collecting} //= 1 unless @_;
-  $self->{collecting} = shift;
-  return $self;
 }
 
 sub empty { delete shift->{jar} }

@@ -56,7 +56,7 @@ $t->get_ok('/art')->status_is(200)->text_like('h2[id="art"]' => qr/art/)
 $t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Headings
-$t->get_ok('/perldoc/MojoliciousPODTest')->status_is(200)
+$t->get_ok('/perldoc/MojoliciousTest/PODTest')->status_is(200)
   ->element_exists('h1#One')->element_exists('h2#Two')
   ->element_exists('h3#Three')->element_exists('h4#Four')
   ->element_exists('a[href=#One]')->element_exists('a[href=#Two]')
@@ -64,25 +64,25 @@ $t->get_ok('/perldoc/MojoliciousPODTest')->status_is(200)
   ->text_like('pre code', qr/\$foo/);
 
 # Trailing slash
-$t->get_ok('/perldoc/MojoliciousPODTest/')->element_exists('#mojobar')
+$t->get_ok('/perldoc/MojoliciousTest/PODTest/')->element_exists('#mojobar')
   ->text_like('title', qr/PODTest/);
 
 # Format
-$t->get_ok('/perldoc/MojoliciousPODTest.html')->element_exists('#mojobar')
+$t->get_ok('/perldoc/MojoliciousTest/PODTest.html')->element_exists('#mojobar')
   ->text_like('title', qr/PODTest/);
 
 # Format (source)
-$t->get_ok('/perldoc/MojoliciousPODTest' => {Accept => 'text/plain'})
+$t->get_ok('/perldoc/MojoliciousTest/PODTest' => {Accept => 'text/plain'})
   ->status_is(200)->content_type_is('text/plain;charset=UTF-8')
-  ->content_like(qr/package MojoliciousPODTest/);
+  ->content_like(qr/package MojoliciousTest::PODTest/);
 
 # Negotiated source
-$t->get_ok('/perldoc/MojoliciousPODTest' => {Accept => 'text/plain'})
+$t->get_ok('/perldoc/MojoliciousTest/PODTest' => {Accept => 'text/plain'})
   ->status_is(200)->content_type_is('text/plain;charset=UTF-8')
-  ->content_like(qr/package MojoliciousPODTest/);
+  ->content_like(qr/package MojoliciousTest::PODTest/);
 
 # Perldoc browser (unsupported format)
-$t->get_ok('/perldoc/MojoliciousPODTest.json')->status_is(204);
+$t->get_ok('/perldoc/MojoliciousTest/PODTest.json')->status_is(204);
 
 # Welcome
 $t->get_ok('/perldoc')->status_is(200)->element_exists('#mojobar')

@@ -1,4 +1,4 @@
-package MojoliciousPODTest;
+package MojoliciousTest::PODTest;
 
 1;
 

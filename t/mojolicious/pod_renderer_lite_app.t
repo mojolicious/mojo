@@ -55,10 +55,6 @@ $t->get_ok('/art')->status_is(200)->text_like('h2[id="art"]' => qr/art/)
 # Empty
 $t->get_ok('/empty')->status_is(200)->content_is('');
 
-# Welcome
-$t->get_ok('/perldoc')->status_is(200)->element_exists('#mojobar')
-  ->text_like('title', qr/Mojolicious guide to the galaxy/);
-
 # Headings
 $t->get_ok('/perldoc/MojoliciousPODTest')->status_is(200)
   ->element_exists('h1#One')->element_exists('h2#Two')
@@ -87,6 +83,10 @@ $t->get_ok('/perldoc/MojoliciousPODTest' => {Accept => 'text/plain'})
 
 # Perldoc browser (unsupported format)
 $t->get_ok('/perldoc/MojoliciousPODTest.json')->status_is(204);
+
+# Welcome
+$t->get_ok('/perldoc')->status_is(200)->element_exists('#mojobar')
+  ->text_like('title', qr/Mojolicious guide to the galaxy/);
 
 done_testing();
 

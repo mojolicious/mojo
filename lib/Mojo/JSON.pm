@@ -1,6 +1,7 @@
 package Mojo::JSON;
 use Mojo::Base -strict;
 
+use B;
 use Carp 'croak';
 use Exporter 'import';
 use JSON::PP ();
@@ -248,11 +249,9 @@ sub _encode_value {
   # Null
   return 'null' unless defined $value;
 
-  # Number (bitwise operators change behavior based on the internal value type)
-  my $check = "0" & $value;
+  # Number
   return $value
-    if !($check ^ $check)
-    && length $check
+    if B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK)
     && 0 + $value eq $value
     && $value * 0 == 0;
 

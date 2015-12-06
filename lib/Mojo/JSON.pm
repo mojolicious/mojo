@@ -251,8 +251,7 @@ sub _encode_value {
   # Number (bitwise operators change behavior based on the internal value type)
   my $check = (my $dummy = "0") & $value;
   return $value
-    if !($check ^ $check)
-    && length $check
+    if (!($check ^ $check) && length $check)
     && 0 + $value eq $value
     && $value * 0 == 0;
 

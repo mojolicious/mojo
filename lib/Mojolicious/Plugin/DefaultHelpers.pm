@@ -128,8 +128,10 @@ sub _fallbacks {
 }
 
 sub _inactivity_timeout {
-  return unless my $stream = Mojo::IOLoop->stream(shift->tx->connection // '');
-  $stream->timeout(shift);
+  my ($c, $timeout) = @_;
+  my $stream = Mojo::IOLoop->stream($c->tx->connection // '');
+  $stream->timeout($timeout) if $stream;
+  return $c;
 }
 
 sub _is_fresh {
@@ -345,7 +347,7 @@ Alias for L<Mojolicious::Controller/"flash">.
 
 =head2 inactivity_timeout
 
-  $c->inactivity_timeout(3600);
+  $c = $c->inactivity_timeout(3600);
 
 Use L<Mojo::IOLoop/"stream"> to find the current connection and increase
 timeout if possible.

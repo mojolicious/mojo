@@ -111,9 +111,8 @@ websocket '/close' => sub {
 };
 
 websocket '/timeout' => sub {
-  my $c = shift;
-  $c->inactivity_timeout(0.25);
-  $c->on(finish => sub { shift->stash->{finished}++ });
+  shift->inactivity_timeout(0.25)
+    ->on(finish => sub { shift->stash->{finished}++ });
 };
 
 # URL for WebSocket

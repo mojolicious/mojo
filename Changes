@@ -1,6 +1,7 @@
 
-6.36  2015-12-06
+6.36  2015-12-07
   - Improved Mojo::JSON performance slightly. (haarg)
+  - Improved inactivity_timeout helper to return the current controller object.
 
 6.35  2015-12-04
   - Removed deprecated collecting method from Mojo::UserAgent::CookieJar.

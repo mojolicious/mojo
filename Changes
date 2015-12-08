@@ -1,5 +1,5 @@
 
-6.36  2015-12-07
+6.36  2015-12-08
   - Improved Mojo::JSON performance slightly. (haarg)
   - Improved inactivity_timeout helper to return the current controller object.
 

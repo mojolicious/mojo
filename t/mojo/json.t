@@ -5,6 +5,10 @@ has 'something' => sub { {} };
 
 sub TO_JSON { shift->something }
 
+package JSONTest2;
+use Mojo::Base -base;
+use overload '&' => sub {die}, '""' => sub {'works!'};
+
 package main;
 use Mojo::Base -strict;
 
@@ -13,7 +17,6 @@ use Mojo::ByteStream 'b';
 use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
 use Mojo::Util 'encode';
 use Scalar::Util 'dualvar';
-use version;
 
 # Decode array
 my $array = decode_json '[]';
@@ -314,8 +317,8 @@ is encode_json([$dual]), '["twenty three"]', 'dualvar stringified';
 
 # Other reference types
 my $sub = sub { };
-is encode_json([$sub]), "[\"$sub\"]", 'encoded code reference';
-is encode_json([version->new('1.0')]), "[\"1.0\"]", 'encoded version object';
+is encode_json([$sub]), "[\"$sub\"]", 'code reference stringified';
+is encode_json([JSONTest2->new]), "[\"works!\"]", 'object stringified';
 
 # Ensure numbers and strings are not upgraded
 my $mixed = [3, 'three', '3', 0, "0"];

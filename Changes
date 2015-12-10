@@ -1,5 +1,6 @@
 
-6.37  2015-12-09
+6.37  2015-12-10
+  - Fixed a few reference encoding bugs in Mojo::JSON.
 
 6.36  2015-12-08
   - Improved Mojo::JSON performance slightly. (haarg)

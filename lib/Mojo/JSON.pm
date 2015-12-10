@@ -239,10 +239,10 @@ sub _encode_value {
     return $$value ? 'true' : 'false' if $ref eq 'SCALAR';
     return $value  ? 'true' : 'false' if $ref eq 'JSON::PP::Boolean';
 
-    # Blessed reference with TO_JSON method
-    if (blessed $value && (my $sub = $value->can('TO_JSON'))) {
-      return _encode_value($value->$sub);
-    }
+    # Everything else
+    return _encode_string($value)
+      unless blessed $value && (my $sub = $value->can('TO_JSON'));
+    return _encode_value($value->$sub);
   }
 
   # Null

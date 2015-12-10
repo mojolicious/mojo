@@ -13,6 +13,7 @@ use Mojo::ByteStream 'b';
 use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
 use Mojo::Util 'encode';
 use Scalar::Util 'dualvar';
+use version;
 
 # Decode array
 my $array = decode_json '[]';
@@ -310,6 +311,11 @@ is encode_json({test => [$num, $str]}), '{"test":[23,"bar"]}',
 # dualvar
 my $dual = dualvar 23, 'twenty three';
 is encode_json([$dual]), '["twenty three"]', 'dualvar stringified';
+
+# Other reference types
+my $sub = sub { };
+is encode_json([$sub]), "[\"$sub\"]", 'encoded code reference';
+is encode_json([version->new('1.0')]), "[\"1.0\"]", 'encoded version object';
 
 # Ensure numbers and strings are not upgraded
 my $mixed = [3, 'three', '3', 0, "0"];

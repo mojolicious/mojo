@@ -130,33 +130,45 @@ is $tx->req->body, 'a=1&a=2&a=3&b=4', 'right content';
 
 # Existing query string (lowercase HEAD)
 $tx = $t->tx(head => 'http://example.com?foo=bar' => form => {baz => [1, 2]});
-is $tx->req->url->to_abs, 'http://example.com?baz=1&baz=2', 'right URL';
+is $tx->req->url->to_abs, 'http://example.com?foo=bar&baz=1&baz=2', 'right URL';
 is $tx->req->method, 'head', 'right method';
 is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
 ok $tx->is_empty, 'transaction is empty';
 is $tx->req->body, '', 'no content';
 
+# UTF-8 query
+$tx
+  = $t->tx(
+  GET => 'http://example.com/foo' => form => {a => '☃', b => '♥'} =>
+    charset => 'UTF-8');
+is $tx->req->url->to_abs, 'http://example.com/foo?a=%E2%98%83&b=%E2%99%A5',
+  'right URL';
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
+is $tx->req->body, '', 'no content';
+
 # UTF-8 form
 $tx
-  = $t->tx(POST => 'http://example.com/foo' => form => {test => 12345678912} =>
-    charset => 'UTF-8');
+  = $t->tx(
+  POST => 'http://example.com/foo' => form => {'♥' => '☃'} => charset =>
+    'UTF-8');
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
-is $tx->req->body, 'test=12345678912', 'right content';
+is $tx->req->body, '%E2%99%A5=%E2%98%83', 'right content';
 
 # UTF-8 form with header and custom content type
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {Accept => '*/*', 'Content-Type' => 'application/mojo-form'} => form =>
-    {test => 123, nothing => undef} => charset => 'UTF-8');
+    {'♥' => '☃', nothing => undef} => charset => 'UTF-8');
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/mojo-form',
   'right "Content-Type" value';
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';
-is $tx->req->body, 'test=123', 'right content';
+is $tx->req->body, '%E2%99%A5=%E2%98%83', 'right content';
 
 # Multipart form
 $tx

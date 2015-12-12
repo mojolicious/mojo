@@ -170,12 +170,12 @@ sub _form {
   }
 
   # Query parameters or urlencoded
-  my $p = Mojo::Parameters->new(map { $_ => $form->{$_} } sort keys %$form);
-  $p->charset($options{charset}) if defined $options{charset};
   my $method = uc $req->method;
-  if ($method eq 'GET' || $method eq 'HEAD') { $req->url->query($p) }
+  my @form = map { $_ => $form->{$_} } sort keys %$form;
+  if ($method eq 'GET' || $method eq 'HEAD') { $req->url->query->merge(@form) }
   else {
-    $req->body($p->to_string);
+    $req->body(
+      Mojo::Parameters->new(@form)->charset($options{charset})->to_string);
     _type($headers, 'application/x-www-form-urlencoded');
   }
   return $tx;

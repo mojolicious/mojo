@@ -289,16 +289,15 @@ sub _reuse {
   my ($self, $id, $close) = @_;
 
   # Connection close
-  my $c  = $self->{connections}{$id};
-  my $tx = delete $c->{tx};
-  return $self->_remove($id)
-    if $close || !$tx || !$tx->keep_alive || $tx->error;
-
-  # Keep connection alive and enforce connection limit
-  my $queue = $self->{$c->{nb} ? 'nb_queue' : 'queue'} ||= [];
+  my $c   = $self->{connections}{$id};
+  my $tx  = delete $c->{tx};
   my $max = $self->max_connections;
+  return $self->_remove($id)
+    if $close || !$tx || !$max || !$tx->keep_alive || $tx->error;
+
+  # Keep connection alive
+  my $queue = $self->{$c->{nb} ? 'nb_queue' : 'queue'} ||= [];
   $self->_remove(shift(@$queue)->[1]) while @$queue && @$queue >= $max;
-  return $self->_loop($c->{nb})->stream($id)->close unless $max;
   push @$queue, [join(':', $self->transactor->endpoint($tx)), $id];
 }
 

@@ -245,11 +245,11 @@ sub _finish {
   my $loop = $self->_loop($c->{nb});
   $loop->remove($c->{timeout}) if $c->{timeout};
 
-  return $self->_remove($id, $close) unless my $old = $c->{tx};
+  return $self->_reuse($id, $close) unless my $old = $c->{tx};
   $old->client_close($close);
 
   # Finish WebSocket
-  return $self->_remove($id, 1) if $old->is_websocket;
+  return $self->_remove($id) if $old->is_websocket;
 
   $self->cookie_jar->collect($old);
 
@@ -262,7 +262,7 @@ sub _finish {
   }
 
   # Finish normal connection and handle redirects
-  $self->_remove($id, $close);
+  $self->_reuse($id, $close);
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
 }
 
@@ -290,16 +290,20 @@ sub _redirect {
 }
 
 sub _remove {
+  my ($self, $id) = @_;
+  my $c = delete $self->{connections}{$id};
+  $self->_dequeue($c->{nb}, $id);
+  $self->_loop($c->{nb})->remove($id);
+}
+
+sub _reuse {
   my ($self, $id, $close) = @_;
 
-  # Close connection
-  my $c = $self->{connections}{$id} || {};
+  # Connection close
+  my $c  = $self->{connections}{$id};
   my $tx = delete $c->{tx};
-  if ($close || !$tx || !$tx->keep_alive || $tx->error) {
-    delete $self->{connections}{$id};
-    $self->_dequeue($c->{nb}, $id);
-    return $self->_loop($c->{nb})->remove($id);
-  }
+  return $self->_remove($id)
+    if $close || !$tx || !$tx->keep_alive || $tx->error;
 
   # Keep connection alive (CONNECT requests get upgraded)
   $self->_enqueue($c->{nb}, join(':', $self->transactor->endpoint($tx)), $id)

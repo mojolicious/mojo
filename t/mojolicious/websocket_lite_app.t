@@ -27,6 +27,12 @@ websocket '/no_compression' => sub {
   $c->on(binary => sub { shift->send({binary => shift}) });
 };
 
+websocket '/protocols' => sub {
+  my $c = shift;
+  $c->send($c->tx->with_protocols('foo', 'bar', 'baz') // 'none');
+  $c->send($c->tx->protocol // 'none');
+};
+
 websocket '/json' => sub {
   my $c = shift;
   $c->on(
@@ -207,6 +213,24 @@ $t->websocket_ok(
   '/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
   ->send_ok({binary => $huge})->message_ok->message_is({binary => $huge})
   ->finish_ok;
+
+# Protocol negotiation
+$t->websocket_ok('/protocols' => ['bar'])->message_ok->message_is('bar')
+  ->message_ok->message_is('bar')->finish_ok;
+is $t->tx->protocol, 'bar', 'right protocol';
+is $t->tx->res->headers->sec_websocket_protocol, 'bar',
+  'right "Sec-WebSocket-Protocol" value';
+$t->websocket_ok('/protocols' => ['baz', 'bar', 'foo'])
+  ->message_ok->message_is('foo')->message_ok->message_is('foo')->finish_ok;
+is $t->tx->protocol, 'foo', 'right protocol';
+is $t->tx->res->headers->sec_websocket_protocol, 'foo',
+  'right "Sec-WebSocket-Protocol" value';
+$t->websocket_ok('/protocols' => [''])->message_ok->message_is('none')
+  ->message_ok->message_is('none')->finish_ok;
+is $t->tx->protocol, undef, 'no protocol';
+$t->websocket_ok('/protocols' => ['', '', ''])->message_ok->message_is('none')
+  ->message_ok->message_is('none')->finish_ok;
+is $t->tx->protocol, undef, 'no protocol';
 
 # JSON roundtrips (with a lot of different tests)
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})

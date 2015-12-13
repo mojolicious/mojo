@@ -3,9 +3,10 @@ use Mojo::Base 'Mojo::Transaction';
 
 use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
 use Config;
+use List::Util 'first';
 use Mojo::JSON qw(encode_json j);
 use Mojo::Transaction::HTTP;
-use Mojo::Util qw(b64_encode decode dumper encode sha1_bytes xor_encode);
+use Mojo::Util qw(b64_encode decode dumper encode sha1_bytes trim xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
@@ -209,6 +210,8 @@ sub parse_frame {
   return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];
 }
 
+sub protocol { shift->res->headers->sec_websocket_protocol }
+
 sub remote_address { shift->handshake->remote_address }
 sub remote_port    { shift->handshake->remote_port }
 sub req            { shift->handshake->req }
@@ -274,6 +277,17 @@ sub with_compression {
     and $self->res->headers->sec_websocket_extensions('permessage-deflate')
     if ($self->req->headers->sec_websocket_extensions // '')
     =~ /permessage-deflate/;
+}
+
+sub with_protocols {
+  my $self = shift;
+
+  my %protos = map { trim($_) => 1 } split ',',
+    $self->req->headers->sec_websocket_protocol;
+  return undef unless my $proto = first { $protos{$_} } @_;
+
+  $self->res->headers->sec_websocket_protocol($proto);
+  return $proto;
 }
 
 sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
@@ -631,6 +645,12 @@ Parse WebSocket frame.
   say "Opcode: $frame->[4]";
   say "Payload: $frame->[5]";
 
+=head2 protocol
+
+  my $proto = $ws->protocol;
+
+Return negotiated subprotocol or C<undef>.
+
 =head2 remote_address
 
   my $address = $ws->remote_address;
@@ -716,6 +736,12 @@ L<Mojo::Server::Daemon>.
   $ws->with_compression;
 
 Negotiate C<permessage-deflate> extension for this WebSocket connection.
+
+=head2 with_protocols
+
+  my $proto = $ws->with_protocols('v2.proto', 'v1.proto');
+
+Negotiate subprotocol for this WebSocket connection.
 
 =head1 DEBUGGING
 

@@ -147,9 +147,8 @@ sub _connect_proxy {
         unless $tx->req->url->protocol eq 'https';
 
       # TLS upgrade
-      my $loop   = $self->_loop($nb);
-      my $handle = $loop->stream($id)->steal_handle;
-      $loop->remove($id);
+      my $handle = $self->_loop($nb)->stream($id)->steal_handle;
+      $self->_remove($id);
       $id = $self->_connect($nb, 0, $old, $handle,
         sub { shift->_start($nb, $old->connection($id), $cb) });
       $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $old};
@@ -218,16 +217,6 @@ sub _dequeue {
   @$old = @new;
 
   return $found;
-}
-
-sub _enqueue {
-  my ($self, $nb, $name, $id) = @_;
-
-  # Enforce connection limit
-  my $queue = $self->{$nb ? 'nb_queue' : 'queue'} ||= [];
-  my $max = $self->max_connections;
-  $self->_remove(shift(@$queue)->[1]) while @$queue && @$queue >= $max;
-  $max ? push @$queue, [$name, $id] : $self->_loop($nb)->stream($id)->close;
 }
 
 sub _error {
@@ -305,9 +294,12 @@ sub _reuse {
   return $self->_remove($id)
     if $close || !$tx || !$tx->keep_alive || $tx->error;
 
-  # Keep connection alive (CONNECT requests get upgraded)
-  $self->_enqueue($c->{nb}, join(':', $self->transactor->endpoint($tx)), $id)
-    unless uc $tx->req->method eq 'CONNECT';
+  # Keep connection alive and enforce connection limit
+  my $queue = $self->{$c->{nb} ? 'nb_queue' : 'queue'} ||= [];
+  my $max = $self->max_connections;
+  $self->_remove(shift(@$queue)->[1]) while @$queue && @$queue >= $max;
+  return $self->_loop($c->{nb})->stream($id)->close unless $max;
+  push @$queue, [join(':', $self->transactor->endpoint($tx)), $id];
 }
 
 sub _start {

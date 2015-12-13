@@ -185,7 +185,7 @@ sub _connection {
   my $id = $tx->connection || $self->_dequeue($nb, "$proto:$host:$port", 1);
   if ($id) {
     warn "-- Reusing connection $id ($proto://$host:$port)\n" if DEBUG;
-    $self->{connections}{$id} = {cb => $cb, nb => $nb, tx => $tx};
+    @{$self->{connections}{$id}}{qw(cb tx)} = ($cb, $tx);
     $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
     return $id;
@@ -293,10 +293,13 @@ sub _remove {
   my ($self, $id, $close) = @_;
 
   # Close connection
-  my $c = delete $self->{connections}{$id} || {};
-  my $tx = $c->{tx};
-  return map { $self->_dequeue($_, $id); $self->_loop($_)->remove($id) } 1, 0
-    if $close || !$tx || !$tx->keep_alive || $tx->error;
+  my $c = $self->{connections}{$id} || {};
+  my $tx = delete $c->{tx};
+  if ($close || !$tx || !$tx->keep_alive || $tx->error) {
+    delete $self->{connections}{$id};
+    $self->_dequeue($c->{nb}, $id);
+    return $self->_loop($c->{nb})->remove($id);
+  }
 
   # Keep connection alive (CONNECT requests get upgraded)
   $self->_enqueue($c->{nb}, join(':', $self->transactor->endpoint($tx)), $id)

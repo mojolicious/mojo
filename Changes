@@ -1,5 +1,5 @@
 
-6.37  2015-12-12
+6.37  2015-12-13
   - Fixed a few reference encoding bugs in Mojo::JSON.
   - Fixed a few form generation bugs in Mojo::UserAgent::Transactor.
 

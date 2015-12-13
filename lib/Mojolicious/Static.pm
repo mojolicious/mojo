@@ -57,7 +57,7 @@ sub is_fresh {
 
   my $res_headers = $c->res->headers;
   my ($last, $etag) = @$options{qw(last_modified etag)};
-  $res_headers->last_modified(Mojo::Date->new($last)) if $last;
+  $res_headers->last_modified(Mojo::Date->new($last)->to_string) if $last;
   $res_headers->etag($etag = qq{"$etag"}) if $etag;
 
   # Unconditional

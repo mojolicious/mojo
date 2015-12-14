@@ -383,6 +383,7 @@ isnt $tx->res->body, 'Hello GZip!', 'different content';
 
 # Fork-safety
 $tx = $ua->get('/');
+ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->body, 'works!', 'right content';
 my $last = $tx->connection;
 my $port = $ua->server->url->port;
@@ -393,12 +394,16 @@ is $ua->server->url->port, $port, 'same port';
 {
   local $$ = -23;
   $tx = $ua->get('/');
+  ok !$tx->kept_alive, 'kept connection not alive';
+  ok $tx->keep_alive, 'keep connection alive';
   is $tx->res->body, 'works!', 'right content';
   isnt $tx->connection, $last, 'new connection';
   isnt $ua->server->url->port, $port, 'new port';
   $port = $ua->server->url->port;
   $last = $tx->connection;
   $tx   = $ua->get('/');
+  ok $tx->kept_alive, 'kept connection alive';
+  ok $tx->keep_alive, 'keep connection alive';
   is $tx->res->body, 'works!', 'right content';
   is $tx->connection, $last, 'same connection';
   is $ua->server->url->port, $port, 'same port';

@@ -183,23 +183,11 @@ is $tx->res->code,   200,                         'right status';
 ok $tx->keep_alive, 'connection will be kept alive';
 ok $tx->kept_alive, 'connection was kept alive';
 
-# Request that requires IPv6
-$tx = $ua->get('http://ipv6.google.com');
-is $tx->req->method, 'GET',                    'right method';
-is $tx->req->url,    'http://ipv6.google.com', 'right url';
-is $tx->res->code,   200,                      'right status';
-
 # Simple HTTPS request
 $tx = $ua->get('https://metacpan.org');
 is $tx->req->method, 'GET',                  'right method';
 is $tx->req->url,    'https://metacpan.org', 'right url';
 is $tx->res->code,   200,                    'right status';
-
-# HTTPS request that requires IPv6
-$tx = $ua->get('https://ipv6.google.com');
-is $tx->req->method, 'GET',                     'right method';
-is $tx->req->url,    'https://ipv6.google.com', 'right url';
-is $tx->res->code,   200,                       'right status';
 
 # HTTPS request that requires SNI
 SKIP: {

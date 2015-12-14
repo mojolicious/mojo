@@ -135,11 +135,10 @@ sub _finish {
   }
 
   # Close connection if necessary
-  my $req = $tx->req;
-  return $self->_remove($id) if $req->error || !$tx->keep_alive;
+  return $self->_remove($id) if $tx->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return if (my $leftovers = $req->content->leftovers) eq '';
+  return if (my $leftovers = $tx->req->content->leftovers) eq '';
   $tx = $c->{tx} = $self->_build_tx($id, $c);
   $tx->server_read($leftovers);
 }
@@ -193,7 +192,7 @@ sub _read {
   my ($self, $id, $chunk) = @_;
 
   # Make sure we have a transaction and parse chunk
-  return unless my $c = $self->{connections}{$id};
+  my $c = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
   warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
@@ -219,7 +218,7 @@ sub _write {
   my ($self, $id) = @_;
 
   # Get chunk and write
-  return unless my $c  = $self->{connections}{$id};
+  my $c = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
   return if !$tx->is_writing || $c->{writing}++;
   my $chunk = $tx->server_write;

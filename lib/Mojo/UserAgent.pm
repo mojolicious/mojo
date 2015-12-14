@@ -74,13 +74,6 @@ sub _cleanup {
   # Clean up active connections (by closing them)
   delete $self->{pid};
   $self->_finish($_, 1) for keys %{$self->{connections} || {}};
-
-  # Clean up keep-alive connections
-  my $loop = $self->_loop(0);
-  $loop->remove($_->[1]) for @{delete $self->{queue} || []};
-  $loop = $self->_loop(1);
-  $loop->remove($_->[1]) for @{delete $self->{nb_queue} || []};
-
   return $self;
 }
 

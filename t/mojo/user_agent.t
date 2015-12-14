@@ -131,14 +131,14 @@ is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
 # SOCKS proxy request without SOCKS support
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+$ua = Mojo::UserAgent->new;
 my $tx = $ua->build_tx(GET => '/');
 $tx->req->proxy($ua->server->url->scheme('socks'));
 $tx = $ua->start($tx);
 like $tx->error->{message}, qr/IO::Socket::Socks/, 'right error';
 
 # HTTPS request without TLS support
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+$ua = Mojo::UserAgent->new;
 $tx = $ua->get($ua->server->url->scheme('https'));
 like $tx->error->{message}, qr/IO::Socket::SSL/, 'right error';
 
@@ -308,6 +308,7 @@ is $code,    200, 'right status';
 is $body,    '{"hello":"world"}', 'right content';
 
 # Built-in web server times out
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $log = '';
 my $msg = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');

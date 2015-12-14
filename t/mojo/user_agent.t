@@ -131,14 +131,14 @@ is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
 # SOCKS proxy request without SOCKS support
-$ua = Mojo::UserAgent->new;
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $tx = $ua->build_tx(GET => '/');
 $tx->req->proxy($ua->server->url->scheme('socks'));
 $tx = $ua->start($tx);
 like $tx->error->{message}, qr/IO::Socket::Socks/, 'right error';
 
 # HTTPS request without TLS support
-$ua = Mojo::UserAgent->new;
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 $tx = $ua->get($ua->server->url->scheme('https'));
 like $tx->error->{message}, qr/IO::Socket::SSL/, 'right error';
 
@@ -308,7 +308,6 @@ is $code,    200, 'right status';
 is $body,    '{"hello":"world"}', 'right content';
 
 # Built-in web server times out
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $log = '';
 my $msg = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');
@@ -482,7 +481,14 @@ is $tx->res->code, 200,          'right status';
 is $tx->res->body, '0123456789', 'right content';
 is $stream, 1, 'no leaking subscribers';
 
-# Nested non-blocking requests after blocking one, with custom URL
+# Mixed blocking and non-blocking requests, with custom URL
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+$tx = $ua->get($ua->server->url);
+ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok $tx->keep_alive, 'keep connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 my @kept_alive;
 $ua->get(
   $ua->server->nb_url => sub {
@@ -505,6 +511,12 @@ $ua->get(
 );
 Mojo::IOLoop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
+$tx = $ua->get($ua->server->url);
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
+ok $tx->keep_alive, 'keep connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 
 # Simple nested non-blocking requests with timers
 @kept_alive = ();
@@ -525,13 +537,6 @@ $ua->get(
 );
 Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';
-
-# Blocking request after non-blocking one, with custom URL
-$tx = $ua->get($ua->server->url);
-ok $tx->success,    'successful';
-ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
 
 # Unexpected 1xx responses
 $req = Mojo::Message::Request->new;

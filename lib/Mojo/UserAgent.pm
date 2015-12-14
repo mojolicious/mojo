@@ -70,8 +70,6 @@ sub websocket {
 
 sub _cleanup {
   my $self = shift;
-
-  # Clean up active connections (by closing them)
   delete $self->{pid};
   $self->_finish($_, 1) for keys %{$self->{connections} || {}};
   return $self;

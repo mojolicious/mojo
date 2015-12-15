@@ -859,6 +859,7 @@ object, depending on if the handshake was successful.
   $ua->websocket('wss://example.com/echo' => ['v1.proto'] => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
+    say 'Subprotocol negotiation failed!' and return unless $tx->protocol;
     $tx->on(finish => sub {
       my ($tx, $code, $reason) = @_;
       say "WebSocket closed with status $code.";

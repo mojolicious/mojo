@@ -639,8 +639,8 @@ connection.
 
   my $proto = $c->tx->with_protocols('v2.proto', 'v1.proto');
 
-Or negotiate a subprotocol with
-L<Mojo::Transaction::WebSocket/"with_protocols">.
+You can also use L<Mojo::Transaction::WebSocket/"with_protocols"> to negotiate a
+subprotocol.
 
 =head2 Testing WebSocket web services
 

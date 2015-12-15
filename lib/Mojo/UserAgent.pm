@@ -877,8 +877,9 @@ You can activate C<permessage-deflate> compression by setting the
 C<Sec-WebSocket-Extensions> header, this can result in much better performance,
 but also increases memory usage by up to 300KB per connection.
 
-  my $headers = {'Sec-WebSocket-Extensions' => 'permessage-deflate'};
-  $ua->websocket('ws://example.com/foo' => $headers => sub {...});
+  $ua->websocket('ws://example.com/foo' => {
+    'Sec-WebSocket-Extensions' => 'permessage-deflate'
+  } => sub {...});
 
 =head1 DEBUGGING
 

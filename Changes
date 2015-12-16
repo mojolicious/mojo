@@ -1,5 +1,6 @@
 
 6.38  2015-12-15
+  - Updated prettify.js to version 8-Dec-2015.
 
 6.37  2015-12-14
   - Added protocol and with_protocols methods to Mojo::Transaction::WebSocket.

@@ -151,6 +151,7 @@ sub websocket {
 
 sub _form {
   my ($self, $tx, $form, %options) = @_;
+  $options{charset} //= 'UTF-8';
 
   # Check for uploads and force multipart if necessary
   my $req       = $tx->req;

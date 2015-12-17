@@ -852,15 +852,15 @@ $t->get_ok('/url_for_foxy')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/firefox/%23test');
 
 # UTF-8 form
-$t->post_ok('/utf8' => form => {name => 'табак'} => charset => 'UTF-8')
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->post_ok('/utf8' => form => {name => 'табак'})->status_is(200)
+  ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 22)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is("табак ангел\n");
 
 # UTF-8 "multipart/form-data" form
 $t->post_ok('/utf8' => {'Content-Type' => 'multipart/form-data'} => form =>
-    {name => 'табак'} => charset => 'UTF-8')->status_is(200)
+    {name => 'табак'})->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 22)
   ->content_type_is('text/html;charset=UTF-8')

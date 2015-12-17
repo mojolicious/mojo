@@ -138,9 +138,7 @@ is $tx->req->body, '', 'no content';
 
 # UTF-8 query
 $tx
-  = $t->tx(
-  GET => 'http://example.com/foo' => form => {a => '☃', b => '♥'} =>
-    charset => 'UTF-8');
+  = $t->tx(GET => 'http://example.com/foo' => form => {a => '☃', b => '♥'});
 is $tx->req->url->to_abs, 'http://example.com/foo?a=%E2%98%83&b=%E2%99%A5',
   'right URL';
 is $tx->req->method, 'GET', 'right method';
@@ -148,21 +146,19 @@ is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
 is $tx->req->body, '', 'no content';
 
 # UTF-8 form
-$tx
-  = $t->tx(
-  POST => 'http://example.com/foo' => form => {'♥' => '☃'} => charset =>
-    'UTF-8');
+$tx = $t->tx(POST => 'http://example.com/foo' => form => {'♥' => '☃'});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $tx->req->body, '%E2%99%A5=%E2%98%83', 'right content';
+is $tx->req->param('♥'), '☃', 'right value';
 
 # UTF-8 form with header and custom content type
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {Accept => '*/*', 'Content-Type' => 'application/mojo-form'} => form =>
-    {'♥' => '☃', nothing => undef} => charset => 'UTF-8');
+    {'♥' => '☃', nothing => undef});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/mojo-form',
@@ -170,21 +166,56 @@ is $tx->req->headers->content_type, 'application/mojo-form',
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, '%E2%99%A5=%E2%98%83', 'right content';
 
-# Multipart form
+# Form (shift_jis)
+$tx
+  = $t->tx(
+  POST => 'http://example.com/foo' => form => {'やった' => 'やった'} =>
+    charset => 'shift_jis');
+is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
+  'right "Content-Type" value';
+is $tx->req->body, '%82%E2%82%C1%82%BD=%82%E2%82%C1%82%BD', 'right content';
+is $tx->req->default_charset('shift_jis')->param('やった'), 'やった',
+  'right value';
+
+# UTF-8 multipart form
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/form-data'} => form =>
-    {test => 123, nothing => undef});
+    {'♥' => '☃', nothing => undef});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition, qr/"test"/,
-  'right "Content-Disposition" value';
-is $tx->req->content->parts->[0]->asset->slurp, 123, 'right part';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/"@{[encode 'UTF-8', '♥']}"/, 'right "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp, encode('UTF-8', '☃'),
+  'right part';
 ok !$tx->req->content->parts->[0]->asset->is_file,      'stored in memory';
 ok !$tx->req->content->parts->[0]->asset->auto_upgrade, 'no upgrade';
 is $tx->req->content->parts->[1], undef, 'no more parts';
+is $tx->req->param('♥'), '☃', 'right value';
+
+# Multipart form (shift_jis)
+$tx
+  = $t->tx(POST => 'http://example.com/foo' =>
+    {'Content-Type' => 'multipart/form-data'} => form =>
+    {'やった' => 'やった'} => charset => 'shift_jis');
+is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'multipart/form-data',
+  'right "Content-Type" value';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/"@{[encode 'shift_jis', 'やった']}"/,
+  'right "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp,
+  encode('shift_jis', 'やった'), 'right part';
+ok !$tx->req->content->parts->[0]->asset->is_file,      'stored in memory';
+ok !$tx->req->content->parts->[0]->asset->auto_upgrade, 'no upgrade';
+is $tx->req->content->parts->[1], undef, 'no more parts';
+is $tx->req->default_charset('shift_jis')->param('やった'), 'やった',
+  'right value';
 
 # Multipart form with multiple values
 $tx
@@ -209,7 +240,7 @@ like $tx->req->content->parts->[3]->headers->content_disposition, qr/"b"/,
 is $tx->req->content->parts->[3]->asset->slurp, 4, 'right part';
 is $tx->req->content->parts->[4], undef, 'no more parts';
 is_deeply $tx->req->every_param('a'), [1, 2, 3], 'right values';
-is_deeply [$tx->req->param('b')], [4], 'right values';
+is $tx->req->param('b'), 4, 'right value';
 
 # Multipart form with real file and custom header
 $tx = $t->tx(POST => 'http://example.com/foo' => form =>
@@ -288,7 +319,7 @@ $tx = $t->tx(
       file     => Mojo::Asset::Memory->new->add_chunk('snowman'),
       filename => '"☃".jpg'
     }
-  } => charset => 'UTF-8'
+  }
 );
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';

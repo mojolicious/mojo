@@ -296,8 +296,9 @@ But you could even use middleware right in your application.
 
 Sometimes you might have to deploy your application in a blackbox environment
 where you can't just change the server configuration or behind a reverse proxy
-that passes along additional information with C<X-*> headers. In such cases you
-can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming requests.
+that passes along additional information with C<X-Forwarded-*> headers. In such
+cases you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming
+requests.
 
   # Change scheme if "X-Forwarded-HTTPS" header is set
   $app->hook(before_dispatch => sub {
@@ -308,7 +309,9 @@ can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming requests.
 
 Since reverse proxies generally don't pass along information about path
 prefixes your application might be deployed under, rewriting the base path of
-incoming requests is also quite common.
+incoming requests is also quite common. This allows
+L<Mojolicious::Controller/"url_for"> for example, to generate portable URLs
+based on the current environment.
 
   # Move first part and slash from path to base path in production mode
   $app->hook(before_dispatch => sub {

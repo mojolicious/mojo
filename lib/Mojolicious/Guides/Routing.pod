@@ -491,7 +491,7 @@ L<Mojolicious::Routes/"hide"> to add additional ones.
 This has already been done for all attributes and methods from
 L<Mojolicious::Controller>.
 
-=head2 More restrictive placeholders
+=head2 Restrictive placeholders
 
 A very easy way to make placeholders more restrictive are alternatives, you
 just make a list of possible values, which then work similar to the regular

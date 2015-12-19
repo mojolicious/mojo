@@ -504,8 +504,8 @@ expression C<(bender|leela)>.
 
 You can also adjust the regular expressions behind placeholders directly, just
 make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally, C<(?:...)>
-is fine though.
+placeholders become part of a larger regular expression internally,
+non-capturing groups C<(?:...)> are fine though.
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef

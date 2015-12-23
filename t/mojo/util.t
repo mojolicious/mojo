@@ -188,14 +188,15 @@ is decode('UTF-8', url_unescape 'foo%C3%9F%C4%80bar%E2%98%BA'),
 # html_unescape
 is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'),
   "<foo>bar<baz>&\"", 'right HTML unescaped result';
+is html_unescape('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
+  "foo<baz>&\"\x{152}&Foo;", 'right HTML unescaped result';
 
 # html_unescape (special entities)
 is html_unescape('foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
   "foo ☃ \x{2233} bar &sup1baz", 'right HTML unescaped result';
 
 # html_unescape (multi-character entity)
-is html_unescape(decode 'UTF-8', '&acE;'), "\x{223e}\x{0333}",
-  'right HTML unescaped result';
+is html_unescape('&acE;'), "\x{223e}\x{0333}", 'right HTML unescaped result';
 
 # html_unescape (apos)
 is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
@@ -208,21 +209,15 @@ is html_unescape('foobar'), 'foobar', 'no changes';
 is html_unescape('&#০৩৯;&#x০৩৯;'), '&#০৩৯;&#x০৩৯;',
   'no changes';
 
-# html_unescape (UTF-8)
-is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
-  "foo<baz>&\"\x{152}&Foo;", 'right HTML unescaped result';
-
 # xml_escape
 is xml_escape(qq{la<f>\nbar"baz"'yada\n'&lt;la}),
   "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
   'right XML escaped result';
-
-# xml_escape (UTF-8 with nothing to escape)
-is xml_escape('привет'), 'привет', 'no changes';
-
-# xml_escape (UTF-8)
 is xml_escape('привет<foo>'), 'привет&lt;foo&gt;',
   'right XML escaped result';
+
+# xml_escape (nothing to escape)
+is xml_escape('привет'), 'привет', 'no changes';
 
 # xss_escape
 is xss_escape('<p>'), '&lt;p&gt;', 'right XSS escaped result';

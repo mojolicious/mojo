@@ -114,7 +114,8 @@ sub hmac_sha1_sum { hmac_sha1_hex @_ }
 
 sub html_unescape {
   my $str = shift;
-  $str =~ s/&(?:\#((?:\d{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;))/_decode($1, $2)/ge;
+  $str
+    =~ s/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;))/_decode($1, $2)/ge;
   return $str;
 }
 

@@ -172,7 +172,7 @@ is url_escape('&business;23', 's&'), '%26bu%73ine%73%73;23',
   'right URL escaped result';
 
 # url_escape (nothing to escape)
-is url_escape('foobar123-._~'), 'foobar123-._~', 'right URL escaped result';
+is url_escape('foobar123-._~'), 'foobar123-._~', 'no changes';
 
 # url_unescape
 is url_unescape('business%3B23'), 'business;23', 'right URL unescaped result';
@@ -202,7 +202,11 @@ is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
   'right HTML unescaped result';
 
 # html_unescape (nothing to unescape)
-is html_unescape('foobar'), 'foobar', 'right HTML unescaped result';
+is html_unescape('foobar'), 'foobar', 'no changes';
+
+# url_unescape (bengal numbers with nothing to unescape)
+is html_unescape('&#০৩৯;&#x০৩৯;'), '&#০৩৯;&#x০৩৯;',
+  'no changes';
 
 # html_unescape (UTF-8)
 is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
@@ -214,7 +218,7 @@ is xml_escape(qq{la<f>\nbar"baz"'yada\n'&lt;la}),
   'right XML escaped result';
 
 # xml_escape (UTF-8 with nothing to escape)
-is xml_escape('привет'), 'привет', 'right XML escaped result';
+is xml_escape('привет'), 'привет', 'no changes';
 
 # xml_escape (UTF-8)
 is xml_escape('привет<foo>'), 'привет&lt;foo&gt;',

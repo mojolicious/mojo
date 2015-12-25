@@ -1,5 +1,5 @@
 
-6.39  2015-12-24
+6.39  2015-12-25
   - Fixed small html_unescape bug in Mojo::Util.
 
 6.38  2015-12-19

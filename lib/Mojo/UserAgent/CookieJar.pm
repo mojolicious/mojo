@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
 use Mojo::Path;
+use Scalar::Util 'looks_like_number';
 
 has 'ignore';
 has max_cookie_size => 4096;
@@ -14,7 +15,8 @@ sub add {
   for my $cookie (@cookies) {
 
     # Convert max age to expires
-    if (my $age = $cookie->max_age) { $cookie->expires($age + time) }
+    my $age = $cookie->max_age;
+    $cookie->expires($age + time) if looks_like_number $age;
 
     # Check cookie size
     next if length($cookie->value // '') > $size;

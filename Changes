@@ -1,6 +1,7 @@
 
-6.39  2015-12-25
+6.39  2015-12-26
   - Fixed small html_unescape bug in Mojo::Util.
+  - Fixed handling of invalid max age in Mojo::UserAgent::CookieJar.
 
 6.38  2015-12-19
   - Updated prettify.js to version 8-Dec-2015.

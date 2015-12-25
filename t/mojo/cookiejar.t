@@ -437,6 +437,26 @@ is $tx->req->cookie('foo')->value, 'valid', 'right value';
 is $tx->req->cookie('bar')->name,  'bar',   'right name';
 is $tx->req->cookie('bar')->value, 'too',   'right value';
 
+# Gather cookies with invalid expiration
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://example.com');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    name    => 'foo',
+    value   => 'bar',
+    max_age => 'invalid'
+  ),
+  Mojo::Cookie::Response->new(name => 'bar', value => 'baz', max_age => 86400)
+);
+$jar->collect($tx);
+is $jar->all->[0]->name,  'foo', 'right name';
+is $jar->all->[0]->value, 'bar', 'right value';
+ok !$jar->all->[0]->expires, 'does not expire';
+is $jar->all->[1]->name,  'bar', 'right name';
+is $jar->all->[1]->value, 'baz', 'right value';
+ok $jar->all->[1]->expires, 'expires';
+
 # Gather cookies with invalid domain
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;

@@ -689,7 +689,7 @@ that have been bundled for internal use.
 
 =head2 Mojolicious Artwork
 
-  Copyright (C) 2010-2015, Sebastian Riedel.
+  Copyright (C) 2010-2016, Sebastian Riedel.
 
 Licensed under the CC-SA License, Version 4.0
 L<http://creativecommons.org/licenses/by-sa/4.0>.
@@ -1037,7 +1037,7 @@ Zoffix Znet
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2015, Sebastian Riedel.
+Copyright (C) 2008-2016, Sebastian Riedel.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

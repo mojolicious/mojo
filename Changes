@@ -1,5 +1,5 @@
 
-6.39  2015-12-26
+6.39  2016-01-01
   - Fixed small html_unescape bug in Mojo::Util.
   - Fixed handling of invalid max age in Mojo::UserAgent::CookieJar.
 

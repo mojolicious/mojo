@@ -316,7 +316,7 @@ of the steps, breaking the chain.
   $c->delay(
     sub {
       my $delay = shift;
-      $c->ua->get('http://mojolicio.us' => $delay->begin);
+      $c->ua->get('http://mojolicious.org' => $delay->begin);
     },
     sub {
       my ($delay, $tx) = @_;
@@ -469,7 +469,7 @@ the L</"stash">.
 
 =head2 ua
 
-  %= ua->get('mojolicio.us')->res->dom->at('title')->text
+  %= ua->get('mojolicious.org')->res->dom->at('title')->text
 
 Alias for L<Mojo/"ua">.
 
@@ -509,6 +509,6 @@ Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

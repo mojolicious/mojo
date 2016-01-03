@@ -163,7 +163,7 @@ $t->post_ok('/text')->status_is(200)->content_is(<<'EOF');
   <input class="foo" name="search" type="search" value="perl">
   <input class="foo" name="tel" type="tel" value="123456789">
   <input class="foo" name="time" type="time" value="23:59:59">
-  <input class="foo" name="url" type="url" value="http://mojolicio.us">
+  <input class="foo" name="url" type="url" value="http://mojolicious.org">
   <input class="foo" name="week" type="week" value="2012-W16">
   <input type="submit" value="Ok">
 </form>
@@ -573,7 +573,7 @@ __DATA__
   %= search_field search => 'perl', class => 'foo'
   %= tel_field tel => '123456789', class => 'foo'
   %= time_field time => '23:59:59', class => 'foo'
-  %= url_field url => 'http://mojolicio.us', class => 'foo'
+  %= url_field url => 'http://mojolicious.org', class => 'foo'
   %= week_field week => '2012-W16', class => 'foo'
   %= submit_button
 %= end

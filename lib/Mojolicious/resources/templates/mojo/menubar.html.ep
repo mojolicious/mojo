@@ -59,12 +59,12 @@
   </style>
   <div id="mojobar-content">
     <div id="mojobar-logo">
-      %= link_to 'http://mojolicio.us' => begin
+      %= link_to 'http://mojolicious.org' => begin
         %= image '/mojo/logo-white.png', alt => 'Mojolicious logo'
       % end
     </div>
     <div id="mojobar-links">
-      %= link_to Documentation => 'http://mojolicio.us/perldoc'
+      %= link_to Documentation => 'http://mojolicious.org/perldoc'
       %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
       %= link_to GitHub => 'https://github.com/kraih/mojo'
       %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'

@@ -1045,6 +1045,6 @@ the terms of the Artistic License version 2.0.
 =head1 SEE ALSO
 
 L<https://github.com/kraih/mojo>, L<Mojolicious::Guides>,
-L<http://mojolicio.us>.
+L<http://mojolicious.org>.
 
 =cut

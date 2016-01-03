@@ -118,7 +118,7 @@ Max age for cookie.
 =head2 origin
 
   my $origin = $cookie->origin;
-  $cookie    = $cookie->origin('mojolicio.us');
+  $cookie    = $cookie->origin('mojolicious.org');
 
 Origin of the cookie.
 
@@ -156,6 +156,6 @@ Render cookie.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

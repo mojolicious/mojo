@@ -265,7 +265,7 @@ by the C<begin> and C<end> keywords, they are the foundation for many helpers.
   <html>
     <head><title>Sebastians frameworks</title></head>
     <body>
-      %= $link->('http://mojolicio.us', 'Mojolicious')
+      %= $link->('http://mojolicious.org', 'Mojolicious')
       %= $link->('http://catalystframework.org', 'Catalyst')
     </body>
   </html>
@@ -704,8 +704,8 @@ constructs.
     $c->render(text => 'Dude, you really need to upgrade to Firefox.');
   };
 
-  # http://mojolicio.us/bar
-  get '/bar' => (host => 'mojolicio.us') => sub {
+  # http://mojolicious.org/bar
+  get '/bar' => (host => 'mojolicious.org') => sub {
     my $c = shift;
     $c->render(text => 'Hello Mojolicious.');
   };
@@ -801,7 +801,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
   # Blocking
   get '/headers' => sub {
     my $c   = shift;
-    my $url = $c->param('url') || 'http://mojolicio.us';
+    my $url = $c->param('url') || 'http://mojolicious.org';
     my $dom = $c->ua->get($url)->res->dom;
     $c->render(json => $dom->find('h1, h2, h3')->map('text')->to_array);
   };
@@ -809,7 +809,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
   # Non-blocking
   get '/title' => sub {
     my $c = shift;
-    $c->ua->get('mojolicio.us' => sub {
+    $c->ua->get('mojolicious.org' => sub {
       my ($ua, $tx) = @_;
       $c->render(data => $tx->res->dom->at('title')->text);
     });
@@ -821,8 +821,8 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     $c->delay(
       sub {
         my $delay = shift;
-        $c->ua->get('http://mojolicio.us'  => $delay->begin);
-        $c->ua->get('https://metacpan.org' => $delay->begin);
+        $c->ua->get('http://mojolicious.org' => $delay->begin);
+        $c->ua->get('https://metacpan.org'   => $delay->begin);
       },
       sub {
         my ($delay, $mojo, $cpan) = @_;

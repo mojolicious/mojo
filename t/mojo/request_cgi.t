@@ -46,7 +46,7 @@ $req->parse(
   QUERY_STRING         => 'lalala=23&bar=baz',
   REQUEST_METHOD       => 'POST',
   SCRIPT_NAME          => '/test/index.cgi',
-  HTTP_HOST            => 'mojolicio.us',
+  HTTP_HOST            => 'mojolicious.org',
   SERVER_PROTOCOL      => 'HTTP/1.0'
 );
 $req->parse('Hello World');
@@ -54,14 +54,14 @@ ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
 is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->url->base->host, 'mojolicio.us',     'right base host';
+is $req->url->base->host, 'mojolicious.org',  'right base host';
 is $req->url->base->port, '',                 'no base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
 is $req->version, '1.0', 'right version';
 is $req->headers->dnt, 1, 'right "DNT" value';
 is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
-  'http://mojolicio.us/test/index.cgi/foo/bar?lalala=23&bar=baz',
+  'http://mojolicious.org/test/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
 
 # Parse Apache CGI environment variables and body

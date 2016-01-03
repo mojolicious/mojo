@@ -49,7 +49,7 @@ $ua = Mojo::UserAgent->new;
 
 # Local address
 $ua->server->app(app);
-my $sock = IO::Socket::INET->new(PeerAddr => 'mojolicio.us', PeerPort => 80);
+my $sock = IO::Socket::INET->new(PeerAddr => 'mojolicious.org', PeerPort => 80);
 my $address = $sock->sockhost;
 isnt $address, '127.0.0.1', 'different address';
 $ua->local_address('127.0.0.1')->max_connections(0);
@@ -91,11 +91,11 @@ ok $tx->error,       'has error';
 $ua = Mojo::UserAgent->new;
 
 # Keep-alive
-$ua->get('http://mojolicio.us' => sub { Mojo::IOLoop->singleton->stop });
+$ua->get('http://mojolicious.org' => sub { Mojo::IOLoop->singleton->stop });
 Mojo::IOLoop->singleton->start;
 my $kept_alive;
 $ua->get(
-  'http://mojolicio.us' => sub {
+  'http://mojolicious.org' => sub {
     my ($ua, $tx) = @_;
     Mojo::IOLoop->singleton->stop;
     $kept_alive = $tx->kept_alive;
@@ -107,15 +107,15 @@ ok $kept_alive, 'connection was kept alive';
 # Nested keep-alive
 my @kept_alive;
 $ua->get(
-  'http://mojolicio.us' => sub {
+  'http://mojolicious.org' => sub {
     my ($ua, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
     $ua->get(
-      'http://mojolicio.us' => sub {
+      'http://mojolicious.org' => sub {
         my ($ua, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $ua->get(
-          'http://mojolicio.us' => sub {
+          'http://mojolicious.org' => sub {
             my ($ua, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->singleton->stop;
@@ -142,12 +142,12 @@ is $tx->res->code, 301, 'right status';
 like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
 
 # One-liner
-is g('mojolicio.us')->code,          200, 'right status';
-is h('mojolicio.us')->code,          200, 'right status';
-is h('mojolicio.us')->body,          '',  'no content';
-is p('mojolicio.us/lalalala')->code, 404, 'right status';
-is g('http://mojolicio.us')->code,   200, 'right status';
-is p('http://mojolicio.us')->code,   404, 'right status';
+is g('mojolicious.org')->code,          200, 'right status';
+is h('mojolicious.org')->code,          200, 'right status';
+is h('mojolicious.org')->body,          '',  'no content';
+is p('mojolicious.org/lalalala')->code, 404, 'right status';
+is g('http://mojolicious.org')->code,   200, 'right status';
+is p('http://mojolicious.org')->code,   404, 'right status';
 my $res = p('https://metacpan.org/search' => form => {q => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';

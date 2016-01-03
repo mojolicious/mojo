@@ -508,7 +508,7 @@ created at startup time.
   # Check title in the background every 10 seconds
   my $title = 'Got no title yet.';
   Mojo::IOLoop->recurring(10 => sub {
-    app->ua->get('http://mojolicio.us' => sub {
+    app->ua->get('http://mojolicious.org' => sub {
       my ($ua, $tx) = @_;
       $title = $tx->res->dom->at('title')->text;
     });
@@ -860,7 +860,7 @@ right in.
 
 =head2 Web scraping
 
-Scraping information from web sites has never been this much fun before. The
+Scraping information from websites has never been this much fun before. The
 built-in HTML/XML parser L<Mojo::DOM> is accessible through
 L<Mojo::Message/"dom"> and supports all CSS selectors that make sense for a
 standalone parser, it can be a very powerful tool especially for testing web
@@ -868,9 +868,9 @@ application.
 
   use Mojo::UserAgent;
 
-  # Fetch web site
+  # Fetch website
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->get('mojolicio.us/perldoc');
+  my $tx = $ua->get('mojolicious.org/perldoc');
 
   # Extract title
   say 'Title: ', $tx->res->dom->at('head > title')->text;
@@ -1174,27 +1174,27 @@ command L<Mojolicious::Command::get> that is about to change. You can just pick
 the parts that actually matter with the CSS selectors from L<Mojo::DOM> and
 JSON Pointers from L<Mojo::JSON::Pointer>.
 
-  $ mojo get http://mojolicio.us 'head > title'
+  $ mojo get http://mojolicious.org 'head > title'
 
 How about a list of all id attributes?
 
-  $ mojo get http://mojolicio.us '*' attr id
+  $ mojo get http://mojolicious.org '*' attr id
 
 Or the text content of all heading tags?
 
-  $ mojo get http://mojolicio.us 'h1, h2, h3' text
+  $ mojo get http://mojolicious.org 'h1, h2, h3' text
 
 Maybe just the text of the third heading?
 
-  $ mojo get http://mojolicio.us 'h1, h2, h3' 3 text
+  $ mojo get http://mojolicious.org 'h1, h2, h3' 3 text
 
 You can also extract all text from nested child elements.
 
-  $ mojo get http://mojolicio.us '#mojobar' all
+  $ mojo get http://mojolicious.org '#mojobar' all
 
 The request can be customized as well.
 
-  $ mojo get -M POST -c 'Hello!' http://mojolicio.us
+  $ mojo get -M POST -c 'Hello!' http://mojolicious.org
   $ mojo get -H 'X-Bender: Bite my shiny metal ass!' http://google.com
 
 You can follow redirects and view the headers for all messages.
@@ -1214,7 +1214,7 @@ This can be an invaluable tool for testing your applications.
 For quick hacks and especially testing, L<ojo> one-liners are also a great
 choice.
 
-  $ perl -Mojo -E 'say g("mojolicio.us")->dom->at("title")->text'
+  $ perl -Mojo -E 'say g("mojolicious.org")->dom->at("title")->text'
 
 =head1 APPLICATIONS
 

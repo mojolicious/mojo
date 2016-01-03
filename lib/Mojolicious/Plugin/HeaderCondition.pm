@@ -58,7 +58,7 @@ Mojolicious::Plugin::HeaderCondition - Header condition plugin
   get '/' => (agent => qr/Firefox/) => sub {...};
 
   # The "host" condition is a shortcut for the detected host
-  get '/' => (host => qr/mojolicio\.us/) => sub {...};
+  get '/' => (host => qr/mojolicious\.org/) => sub {...};
 
 =head1 DESCRIPTION
 
@@ -84,6 +84,6 @@ Register conditions in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

@@ -233,26 +233,26 @@ is $cookies->[1], undef, 'no second cookie';
 # Gather and prepare cookies without domain and path
 $jar = Mojo::UserAgent::CookieJar->new;
 my $tx = Mojo::Transaction::HTTP->new;
-$tx->req->url->parse('http://mojolicio.us/perldoc/Mojolicious');
+$tx->req->url->parse('http://mojolicious.org/perldoc/Mojolicious');
 $tx->res->cookies(
   Mojo::Cookie::Response->new(name => 'foo', value => 'without'));
 $jar->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
-$tx->req->url->parse('http://mojolicio.us/perldoc');
+$tx->req->url->parse('http://mojolicious.org/perldoc');
 $jar->prepare($tx);
 is $tx->req->cookie('foo')->name,  'foo',     'right name';
 is $tx->req->cookie('foo')->value, 'without', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
-$tx->req->url->parse('http://mojolicio.us/perldoc');
+$tx->req->url->parse('http://mojolicious.org/perldoc');
 $jar->prepare($tx);
 is $tx->req->cookie('foo')->name,  'foo',     'right name';
 is $tx->req->cookie('foo')->value, 'without', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
-$tx->req->url->parse('http://www.mojolicio.us/perldoc');
+$tx->req->url->parse('http://www.mojolicious.org/perldoc');
 $jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 $tx = Mojo::Transaction::HTTP->new;
-$tx->req->url->parse('http://mojolicio.us/whatever');
+$tx->req->url->parse('http://mojolicious.org/whatever');
 $jar->prepare($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 $tx = Mojo::Transaction::HTTP->new;
@@ -470,7 +470,7 @@ $tx->res->cookies(
   Mojo::Cookie::Response->new(
     name   => 'foo',
     value  => 'invalid',
-    domain => 'mojolicio.us'
+    domain => 'mojolicious.org'
   )
 );
 $jar->collect($tx);

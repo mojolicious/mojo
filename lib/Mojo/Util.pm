@@ -809,7 +809,7 @@ Same as L</"xml_escape">, but does not escape L<Mojo::ByteStream> objects.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut
 

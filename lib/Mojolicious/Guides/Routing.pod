@@ -42,7 +42,7 @@ disposal and can use many more variables than just the request path, such as
 request method and headers like C<Host>, C<User-Agent> and C<Accept>.
 
   GET /user/show/23 HTTP/1.1
-  Host: mojolicio.us
+  Host: mojolicious.org
   User-Agent: Mojolicious (Perl)
   Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 
@@ -653,7 +653,7 @@ subscribe to an event with L<Mojolicious::Controller/"on"> or send a message
 with L<Mojolicious::Controller/"send"> right away.
 
   GET /echo HTTP/1.1
-  Host: mojolicio.us
+  Host: mojolicious.org
   User-Agent: Mojolicious (Perl)
   Connection: Upgrade
   Upgrade: websocket
@@ -687,8 +687,8 @@ L<Mojolicious::Plugin::HeaderCondition> can be applied to any route with the
 method L<Mojolicious::Routes::Route/"over">, and allow even more powerful route
 constructs.
 
-  # / (Origin: http://mojolicio.us)
-  $r->get('/')->over(headers => {Origin => qr/mojolicio\.us/})->to('foo#bar');
+  # / (Origin: http://perl.org)
+  $r->get('/')->over(headers => {Origin => qr/perl\.org/})->to('foo#bar');
 
   # / (Firefox)
   $r->get('/')->over(agent => qr/Firefox/)->to('browser-test#firefox');
@@ -696,8 +696,8 @@ constructs.
   # / (Internet Explorer)
   $r->get('/')->over(agent => qr/Internet Explorer/)->to('browser-test#ie');
 
-  # http://mojolicio.us/perldoc
-  $r->get('/perldoc')->over(host => 'mojolicio.us')->to('perldoc#index');
+  # http://mojolicious.org/perldoc
+  $r->get('/perldoc')->over(host => 'mojolicious.org')->to('perldoc#index');
 
 Just be aware that conditions are too complex for the routing cache, which
 normally speeds up recurring requests, and can therefore reduce performance.

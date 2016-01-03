@@ -196,9 +196,9 @@ is $url->to_abs(Mojo::URL->new('http://')), 'http://localhost/23/',
   'right absolute version';
 is $url->to_abs(Mojo::URL->new('https://')), 'https://localhost/23/',
   'right absolute version';
-is $url->to_abs(Mojo::URL->new('http://mojolicio.us')), 'http://localhost/23/',
-  'right absolute version';
-is $url->to_abs(Mojo::URL->new('http://mojolicio.us:8080')),
+is $url->to_abs(Mojo::URL->new('http://mojolicious.org')),
+  'http://localhost/23/', 'right absolute version';
+is $url->to_abs(Mojo::URL->new('http://mojolicious.org:8080')),
   'http://localhost/23/', 'right absolute version';
 $url = Mojo::URL->new('///bar/23/');
 ok !$url->is_abs, 'is not absolute';
@@ -601,8 +601,8 @@ is $url->fragment, undef,                                      'no fragment';
 is "$url", 'http://foo.bar/baz/zzz', 'right absolute URL';
 
 # Hosts
-$url = Mojo::URL->new('http://mojolicio.us');
-is $url->host, 'mojolicio.us', 'right host';
+$url = Mojo::URL->new('http://mojolicious.org');
+is $url->host, 'mojolicious.org', 'right host';
 $url = Mojo::URL->new('http://[::1]');
 is $url->host, '[::1]', 'right host';
 $url = Mojo::URL->new('http://127.0.0.1');
@@ -611,8 +611,8 @@ $url = Mojo::URL->new('http://0::127.0.0.1');
 is $url->host, '0::127.0.0.1', 'right host';
 $url = Mojo::URL->new('http://[0::127.0.0.1]');
 is $url->host, '[0::127.0.0.1]', 'right host';
-$url = Mojo::URL->new('http://mojolicio.us:3000');
-is $url->host, 'mojolicio.us', 'right host';
+$url = Mojo::URL->new('http://mojolicious.org:3000');
+is $url->host, 'mojolicious.org', 'right host';
 $url = Mojo::URL->new('http://[::1]:3000');
 is $url->host, '[::1]', 'right host';
 $url = Mojo::URL->new('http://127.0.0.1:3000');
@@ -646,18 +646,18 @@ is "$url", 'http://example.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb#',
   'right format';
 
 # "%" in path
-$url = Mojo::URL->new('http://mojolicio.us/100%_fun');
+$url = Mojo::URL->new('http://mojolicious.org/100%_fun');
 is $url->path->parts->[0], '100%_fun', 'right part';
 is $url->path, '/100%25_fun', 'right path';
-is "$url", 'http://mojolicio.us/100%25_fun', 'right format';
-$url = Mojo::URL->new('http://mojolicio.us/100%fun');
+is "$url", 'http://mojolicious.org/100%25_fun', 'right format';
+$url = Mojo::URL->new('http://mojolicious.org/100%fun');
 is $url->path->parts->[0], '100%fun', 'right part';
 is $url->path, '/100%25fun', 'right path';
-is "$url", 'http://mojolicio.us/100%25fun', 'right format';
-$url = Mojo::URL->new('http://mojolicio.us/100%25_fun');
+is "$url", 'http://mojolicious.org/100%25fun', 'right format';
+$url = Mojo::URL->new('http://mojolicious.org/100%25_fun');
 is $url->path->parts->[0], '100%_fun', 'right part';
 is $url->path, '/100%25_fun', 'right path';
-is "$url", 'http://mojolicio.us/100%25_fun', 'right format';
+is "$url", 'http://mojolicious.org/100%25_fun', 'right format';
 
 # Trailing dot
 $url = Mojo::URL->new('http://☃.net./♥');

@@ -1,1 +1,1 @@
-Please read the guide for [contributing to Mojolicious](http://mojolicio.us/perldoc/Mojolicious/Guides/Contributing).
+Please read the guide for [contributing to Mojolicious](http://mojolicious.org/perldoc/Mojolicious/Guides/Contributing).

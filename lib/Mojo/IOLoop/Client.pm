@@ -279,7 +279,7 @@ These options are currently available:
 
 =item address
 
-  address => 'mojolicio.us'
+  address => 'mojolicious.org'
 
 Address or host name of the peer to connect to, defaults to C<127.0.0.1>.
 
@@ -360,6 +360,6 @@ Path to the TLS key file.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

@@ -569,9 +569,9 @@ $t->get_ok('/auto_name')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/custom_name');
 
 # Query string roundtrip
-$t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=%62ar')
+$t->get_ok('/query_string?http://mojolicious.org/perldoc?foo=%62ar')
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('http://mojolicio.us/perldoc?foo=%62ar');
+  ->content_is('http://mojolicious.org/perldoc?foo=%62ar');
 
 # Reserved stash values
 $t->get_ok('/reserved?data=just-works')->status_is(200)
@@ -1015,7 +1015,7 @@ $t->get_ok('/favicon.ico')->status_is(200)->content_is("Not a favicon!\n\n");
 # Generate URL with query parameters
 $t->get_ok('/url_with?foo=23&bar=24&baz=25')->status_is(200)->content_is(<<EOF);
 /url_with?bar=24&baz=25&foo=bar
-http://mojolicio.us/test?foo=23&bar=24&baz=25
+http://mojolicious.org/test?foo=23&bar=24&baz=25
 /test?bar=24&baz=25
 /bar/23?bar=24&baz=25&foo=yada
 EOF
@@ -1116,7 +1116,7 @@ Not a favicon!
 
 @@ url_with.html.ep
 %== url_with->query([foo => 'bar'])
-%== url_with('http://mojolicio.us/test')
+%== url_with('http://mojolicious.org/test')
 %== url_with('/test')->query([foo => undef])
 %== url_with('bartest', test => 23)->query([foo => 'yada'])
 

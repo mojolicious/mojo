@@ -47,15 +47,15 @@ should be followed at all costs.
 REST is a software architectural style for distributed hypermedia systems such
 as the web. While it can be applied to many protocols it is most commonly used
 with HTTP these days. In REST terms, when you are opening a URL like
-C<http://mojolicio.us/foo> with your browser, you are basically asking the web
-server for the HTML I<representation> of the C<http://mojolicio.us/foo>
+C<http://mojolicious.org/foo> with your browser, you are basically asking the
+web server for the HTML I<representation> of the C<http://mojolicious.org/foo>
 I<resource>.
 
-  +--------+                                +--------+
-  |        | -> http://mojolicio.us/foo  -> |        |
-  | Client |                                | Server |
-  |        | <- <html>Mojo rocks!</html> <- |        |
-  +--------+                                +--------+
+  +--------+                                  +--------+
+  |        | -> http://mojolicious.org/foo -> |        |
+  | Client |                                  | Server |
+  |        | <-  <html>Mojo rocks!</html>  <- |        |
+  +--------+                                  +--------+
 
 The fundamental idea here is that all resources are uniquely addressable with
 URLs and every resource can have different representations such as HTML, RSS or
@@ -90,7 +90,7 @@ Sessions solve this problem by allowing web applications to keep stateful
 information across several HTTP requests.
 
   GET /login?user=sebastian&pass=s3cret HTTP/1.1
-  Host: mojolicio.us
+  Host: mojolicious.org
 
   HTTP/1.1 200 OK
   Set-Cookie: sessionid=987654321
@@ -98,7 +98,7 @@ information across several HTTP requests.
   Hello sebastian.
 
   GET /protected HTTP/1.1
-  Host: mojolicio.us
+  Host: mojolicious.org
   Cookie: sessionid=987654321
 
   HTTP/1.1 200 OK

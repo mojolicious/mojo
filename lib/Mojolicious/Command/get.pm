@@ -130,15 +130,15 @@ Mojolicious::Command::get - Get command
     ./myapp.pl get /
     ./myapp.pl get -H 'Accept: text/html' /hello.html 'head > title' text
     ./myapp.pl get //sri:secr3t@/secrets.json /1/content
-    mojo get mojolicio.us
+    mojo get mojolicious.org
     mojo get -v -r google.com
-    mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicio.us
-    mojo get -M POST -H 'Content-Type: text/trololo' -c 'trololo' mojolicio.us
-    mojo get mojolicio.us 'head > title' text
-    mojo get mojolicio.us .footer all
-    mojo get mojolicio.us a attr href
-    mojo get mojolicio.us '*' attr id
-    mojo get mojolicio.us 'h1, h2, h3' 3 text
+    mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicious.org
+    mojo get -M POST -H 'Content-Type: text/trololo' -c 'trololo' perl.org
+    mojo get mojolicious.org 'head > title' text
+    mojo get mojolicious.org .footer all
+    mojo get mojolicious.org a attr href
+    mojo get mojolicious.org '*' attr id
+    mojo get mojolicious.org 'h1, h2, h3' 3 text
     mojo get https://api.metacpan.org/v0/author/SRI /name
 
   Options:
@@ -200,6 +200,6 @@ Run this command.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

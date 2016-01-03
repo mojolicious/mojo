@@ -84,8 +84,8 @@ plugin Mount => {'/y/1'            => "$FindBin::Bin/external/myapp2.pl"};
 plugin Mount => {'mojolicious.org' => $external};
 plugin(Mount => ('/y/♥' => "$FindBin::Bin/external/myapp2.pl"))
   ->to(message => 'works 3!');
-plugin Mount => {'MOJOLICIO.US/' => $external};
-plugin Mount => {'*.example.com' => $external};
+plugin Mount => {'MOJOLICIOUS.ORG/' => $external};
+plugin Mount => {'*.example.com'    => $external};
 plugin(Mount => ('*.foo-bar.de/♥/123' => $external))
   ->to(message => 'works 3!');
 
@@ -309,7 +309,7 @@ $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
   ->header_is('X-Message' => 'it works!')->content_is('mojolicious.org');
 
 # Template from myapp.pl with domain again
-$t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
+$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
@@ -322,8 +322,8 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
 EOF
 
 # Host from myapp.pl with domain again
-$t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
-  ->header_is('X-Message' => 'it works!')->content_is('mojolicio.us');
+$t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
+  ->header_is('X-Message' => 'it works!')->content_is('mojolicious.org');
 
 # Template from myapp.pl with wildcard domain
 $t->get_ok('/' => {Host => 'example.com'})->status_is(200)->content_is(<<'EOF');

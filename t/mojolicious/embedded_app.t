@@ -17,7 +17,7 @@ use FindBin;
 my $external = "$FindBin::Bin/external/script/my_app";
 plugin Mount => {'/x/1' => $external};
 plugin(Mount => ('/x/♥' => $external));
-plugin Mount => {'MOJOLICIO.US/' => $external};
+plugin Mount => {'MOJOLICIOUS.ORG/' => $external};
 plugin(Mount => ('*.foo-bar.de/♥/123' => $external));
 
 # Make sure session can be modified from both apps
@@ -73,15 +73,15 @@ $t->get_ok('/x/♥/index.html')->status_is(200)
 $t->get_ok('/x/♥/test')->status_is(200)->content_is('works%21');
 
 # External app with domain
-$t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
+$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is('too%21');
 
 # Static file from external app with domain
-$t->get_ok('/index.html' => {Host => 'mojolicio.us'})->status_is(200)
+$t->get_ok('/index.html' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is("External static file!\n");
 
 # External app with domain again
-$t->get_ok('/test' => {Host => 'mojolicio.us'})->status_is(200)
+$t->get_ok('/test' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is('works%21');
 
 # External app with a bit of everything

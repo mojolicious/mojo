@@ -430,7 +430,7 @@ Activate conditions for this route. Note that this automatically disables the
 routing cache, since conditions are too complex for caching.
 
   # Route with condition and destination
-  $r->get('/foo')->over(host => qr/mojolicio\.us/)->to('foo#bar');
+  $r->get('/foo')->over(host => qr/mojolicious\.org/)->to('foo#bar');
 
 =head2 parse
 
@@ -604,6 +604,6 @@ shortcuts provided by L</"root"> on L<Mojolicious::Routes::Route> objects.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

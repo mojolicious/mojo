@@ -74,7 +74,7 @@ use experimental 'signatures';
 # Render template "index.html.ep" from the DATA section
 get '/' => {template => 'index'};
 
-# WebSocket service used by the template to extract the title from a web site
+# WebSocket service used by the template to extract the title from a website
 websocket '/title' => sub ($c) {
   $c->on(message => sub ($c, $msg) {
     my $title = $c->ua->get($msg)->res->dom->at('title')->text;
@@ -90,10 +90,10 @@ __DATA__
 <script>
   var ws = new WebSocket('<%= $url->to_abs %>');
   ws.onmessage = function (event) { document.body.innerHTML += event.data };
-  ws.onopen    = function (event) { ws.send('http://mojolicio.us') };
+  ws.onopen    = function (event) { ws.send('http://mojolicious.org') };
 </script>
 ```
 
 ## Want to know more?
 
-  Take a look at our excellent [documentation](http://mojolicio.us/perldoc>)!
+  Take a look at our excellent [documentation](http://mojolicious.org/perldoc>)!

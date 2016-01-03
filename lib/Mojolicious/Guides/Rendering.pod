@@ -349,7 +349,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"dumper">, and tag helpers like
 L<Mojolicious::Plugin::TagHelpers/"link_to">, which are template specific and
 mostly used to generate HTML tags.
 
-  %= link_to Mojolicious => 'http://mojolicio.us'
+  %= link_to Mojolicious => 'http://mojolicious.org'
 
 In controllers you can also use the method L<Mojolicious::Controller/"helpers">
 to fully qualify helper calls and ensure that they don't conflict with existing

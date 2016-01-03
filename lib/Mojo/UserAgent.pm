@@ -387,8 +387,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   Mojo::IOLoop->delay(
     sub {
       my $delay = shift;
-      $ua->get('mojolicio.us' => $delay->begin);
-      $ua->get('cpan.org'     => $delay->begin);
+      $ua->get('mojolicious.org' => $delay->begin);
+      $ua->get('cpan.org'        => $delay->begin);
     },
     sub {
       my ($delay, $mojo, $cpan) = @_;
@@ -508,7 +508,7 @@ L<Mojo::UserAgent::CookieJar> object.
     Mojo::Cookie::Response->new(
       name   => 'foo',
       value  => 'bar',
-      domain => 'mojolicio.us',
+      domain => 'mojolicious.org',
       path   => '/perldoc'
     )
   );
@@ -890,6 +890,6 @@ advanced diagnostics information printed to C<STDERR>.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

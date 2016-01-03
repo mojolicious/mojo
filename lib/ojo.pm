@@ -61,7 +61,7 @@ ojo - Fun one-liners with Mojo!
 
 =head1 SYNOPSIS
 
-  $ perl -Mojo -E 'say g("mojolicio.us")->dom->at("title")->text'
+  $ perl -Mojo -E 'say g("mojolicious.org")->dom->at("title")->text'
 
 =head1 DESCRIPTION
 
@@ -104,7 +104,7 @@ variations.
 
 Turn string into a L<Mojo::ByteStream> object.
 
-  $ perl -Mojo -E 'b(g("mojolicio.us")->body)->html_unescape->say'
+  $ perl -Mojo -E 'b(g("mojolicious.org")->body)->html_unescape->say'
 
 =head2 c
 
@@ -132,7 +132,7 @@ L<Mojo::Message::Response> object.
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
 L<Mojo::Message::Response> object.
 
-  $ perl -Mojo -E 'say g("mojolicio.us")->dom("h1")->map("text")->join("\n")'
+  $ perl -Mojo -E 'say g("mojolicious.org")->dom("h1")->map("text")->join("\n")'
 
 =head2 h
 
@@ -162,7 +162,7 @@ Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 Benchmark block and print the results to C<STDERR>, with an optional number of
 iterations, which defaults to C<1>.
 
-  $ perl -Mojo -E 'n { say g("mojolicio.us")->code }'
+  $ perl -Mojo -E 'n { say g("mojolicious.org")->code }'
 
 =head2 o
 
@@ -222,6 +222,6 @@ Turn HTML/XML input into L<Mojo::DOM> object.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

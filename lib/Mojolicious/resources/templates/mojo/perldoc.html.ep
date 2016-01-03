@@ -125,7 +125,7 @@
       </div>
     </div>
     <div id="footer">
-      %= link_to 'http://mojolicio.us' => begin
+      %= link_to 'http://mojolicious.org' => begin
         %= image '/mojo/logo-black.png', alt => 'Mojolicious logo'
       % end
     </div>

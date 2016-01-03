@@ -75,7 +75,7 @@ Proxy server to use for HTTPS and WebSocket requests.
 =head2 not
 
   my $not = $proxy->not;
-  $proxy  = $proxy->not([qw(localhost intranet.mojolicio.us)]);
+  $proxy  = $proxy->not([qw(localhost intranet.mojolicious.org)]);
 
 Domains that don't require a proxy server to be used.
 
@@ -106,6 +106,6 @@ Prepare proxy server information for transaction.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

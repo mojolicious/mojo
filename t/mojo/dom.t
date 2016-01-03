@@ -1084,9 +1084,9 @@ $dom = Mojo::DOM->new(<<EOF);
     <div class="☃">J</div>
 </div>
 <div>
-    <a href="http://mojolicio.us">Mojo!</a>
+    <a href="http://mojolicious.org">Mojo!</a>
     <div class="☃">K</div>
-    <a href="http://mojolicio.us">Mojolicious!</a>
+    <a href="http://mojolicious.org">Mojolicious!</a>
 </div>
 EOF
 my @e;

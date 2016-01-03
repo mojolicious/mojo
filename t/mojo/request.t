@@ -465,14 +465,14 @@ $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a");
-$req->parse("Host: mojolicio.us\x0d\x0a");
+$req->parse("Host: mojolicious.org\x0d\x0a");
 $req->parse("X-Forwarded-For: 192.168.2.1, 127.0.0.1\x0d\x0a\x0d\x0a");
 $req->parse("Hello World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
 is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->url->to_abs, 'http://mojolicio.us/foo/bar/baz.html?foo=13#23',
+is $req->url->to_abs, 'http://mojolicious.org/foo/bar/baz.html?foo=13#23',
   'right absolute URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';

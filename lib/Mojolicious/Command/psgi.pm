@@ -31,7 +31,7 @@ Mojolicious::Command::psgi - PSGI command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::psgi> starts applications with L<Mojo::Server::PSGI>
+L<Mojolicious::Command::psgi> starts applications with the L<Mojo::Server::PSGI>
 backend.
 
 This is a core command, that means it is always enabled and its code a good

@@ -37,7 +37,7 @@ Mojolicious::Command::cgi - CGI command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::cgi> starts applications with L<Mojo::Server::CGI>
+L<Mojolicious::Command::cgi> starts applications with the L<Mojo::Server::CGI>
 backend.
 
 This is a core command, that means it is always enabled and its code a good

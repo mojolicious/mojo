@@ -83,7 +83,7 @@ Mojolicious::Command::prefork - Prefork command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::prefork> starts applications with
+L<Mojolicious::Command::prefork> starts applications with the
 L<Mojo::Server::Prefork> backend.
 
 This is a core command, that means it is always enabled and its code a good

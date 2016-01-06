@@ -152,7 +152,7 @@ allow matching of the C<.> character.
 No, you can't, Hypnotoad is a bit special in this regard. Because when you
 initiate a zero downtime software upgrade (hot deployment), you are only really
 sending a C<USR2> signal to the already running server, and no other information
-can be passed along. But what you can do instead, is to use a
+can be passed along. What you can do instead, is to use a
 L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
 configuration file.
 
@@ -164,8 +164,8 @@ configuration file.
     }
   };
 
-Or if you don't actually need zero downtime software upgrades, you can also just
-use L<Mojolicious::Command::prefork> instead, which is almost identical to
+Or if you don't actually need zero downtime software upgrades, just use
+L<Mojolicious::Command::prefork> instead, which is otherwise almost identical to
 Hypnotoad.
 
   $ ./myapp.pl prefork -m production -l http://*:8080 -w 10

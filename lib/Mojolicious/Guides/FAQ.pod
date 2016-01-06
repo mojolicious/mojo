@@ -147,6 +147,29 @@ detection, or consider using
 L<relaxed placeholders|Mojolicious::Guides::Routing/"Relaxed placeholders"> to
 allow matching of the C<.> character.
 
+=head2 Can i configure Hypnotoad from the comand line?
+
+No, you can't, Hypnotoad is a bit special in this regard. Because when you
+initiate a zero downtime software upgrade (hot deployment), you are only really
+sending a C<USR2> signal to the already running server, and no other information
+can be passed along. But what you can do instead, is to use a
+L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
+configuration file.
+
+  # myapp.conf
+  {
+    hypnotoad => {
+      listen  => ['http://*:8080'],
+      workers => 10
+    }
+  };
+
+Or if you don't actually need zero downtime software upgrades, you can also just
+use L<Mojolicious::Command::prefork> instead, which is almost identical to
+Hypnotoad.
+
+  $ ./myapp.pl prefork -m production -l http://*:8080 -w 10
+
 =head2 What does the error "Maximum message size exceeded" mean?
 
 To protect your applications from excessively large requests and responses, our

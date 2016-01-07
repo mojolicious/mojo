@@ -726,17 +726,18 @@ Get L<Mojo::Message::Request> object from L</"tx">.
   my $req = $c->tx->req;
 
   # Extract request information
-  my $url   = $c->req->url->to_abs;
-  my $info  = $c->req->url->to_abs->userinfo;
-  my $host  = $c->req->url->to_abs->host;
-  my $agent = $c->req->headers->user_agent;
-  my $bytes = $c->req->body;
-  my $str   = $c->req->text;
-  my $hash  = $c->req->params->to_hash;
-  my $value = $c->req->json;
-  my $foo   = $c->req->json('/23/foo');
-  my $dom   = $c->req->dom;
-  my $bar   = $c->req->dom('div.bar')->first->text;
+  my $url    = $c->req->url->to_abs;
+  my $info   = $c->req->url->to_abs->userinfo;
+  my $host   = $c->req->url->to_abs->host;
+  my $agent  = $c->req->headers->user_agent;
+  my $custom = $c->req->headers->header('Custom-Header');
+  my $bytes  = $c->req->body;
+  my $str    = $c->req->text;
+  my $hash   = $c->req->params->to_hash;
+  my $value  = $c->req->json;
+  my $foo    = $c->req->json('/23/foo');
+  my $dom    = $c->req->dom;
+  my $bar    = $c->req->dom('div.bar')->first->text;
 
 =head2 res
 
@@ -747,8 +748,11 @@ Get L<Mojo::Message::Response> object from L</"tx">.
   # Longer version
   my $res = $c->tx->res;
 
-  # Force file download by setting a custom response header
+  # Force file download by setting a response header
   $c->res->headers->content_disposition('attachment; filename=foo.png;');
+
+  # Use a custom response header
+  $c->res->headers->header('Custom-Header' => 'whatever');
 
   # Make sure response is cached correctly
   $c->res->headers->cache_control('public, max-age=300');

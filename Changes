@@ -1,5 +1,6 @@
 
 6.40  2016-01-07
+  - Added SNI support to all built-in web servers. (bpmedley, sri)
 
 6.39  2016-01-03
   - Updated links to Mojolicious website.

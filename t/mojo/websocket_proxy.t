@@ -52,7 +52,7 @@ my $id = Mojo::IOLoop->server(
 
         # Write chunk from client to server
         my $server = $buffer{$client}{connection};
-        return Mojo::IOLoop->stream($server)->write($chunk) if $server;
+        return Mojo::IOLoop->stream($server)->write($chunk) if length $server;
 
         # Read connect request from client
         my $buffer = $buffer{$client}{client} .= $chunk;
@@ -94,10 +94,10 @@ my $id = Mojo::IOLoop->server(
               }
             );
           }
-        }
 
-        # Invalid request from client
-        else { Mojo::IOLoop->remove($client) }
+          # Invalid request from client
+          else { Mojo::IOLoop->remove($client) }
+        }
       }
     );
 

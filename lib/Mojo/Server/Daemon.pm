@@ -157,7 +157,11 @@ sub _listen {
     reuse   => $query->param('reuse')
   };
   if (my $port = $url->port) { $options->{port} = $port }
-  $options->{"tls_$_"} = $query->param($_) for qw(ca cert ciphers key version);
+  $options->{"tls_$_"} = $query->param($_) for qw(ca ciphers version);
+  /^(.*)_(cert|key)$/ and $options->{"tls_$2"}{$1} = $query->param($_)
+    for @{$query->names};
+  if (my $cert = $query->param('cert')) { $options->{'tls_cert'}{''} = $cert }
+  if (my $key  = $query->param('key'))  { $options->{'tls_key'}{''}  = $key }
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
   delete $options->{address} if $options->{address} eq '*';
@@ -267,8 +271,8 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured, highly portable non-blocking I/O
-HTTP and WebSocket server, with IPv6, TLS, Comet (long polling), keep-alive and
-multiple event loop support.
+HTTP and WebSocket server, with IPv6, TLS, SNI, Comet (long polling), keep-alive
+and multiple event loop support.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
 resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
@@ -361,6 +365,10 @@ C<http://0.0.0.0:3000>).
 
   # Use a custom certificate and key
   $daemon->listen(['https://*:3000?cert=/x/server.crt&key=/y/server.key']);
+
+  # Domain specific certificates and keys (SNI)
+  $daemon->listen(
+    ['https://*:3000?example.com_cert=/x/my.crt&example.com_key=/y/my.key']);
 
   # Or even a custom certificate authority
   $daemon->listen(

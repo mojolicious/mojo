@@ -387,6 +387,7 @@ Path to TLS certificate authority file used to verify the peer certificate.
 =item cert
 
   cert=/etc/tls/server.crt
+  mojolicious.org_cert=/etc/tls/mojo.crt
 
 Path to the TLS cert file, defaults to a built-in test certificate.
 
@@ -400,6 +401,7 @@ L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
 =item key
 
   key=/etc/tls/server.key
+  mojolicious.org_key=/etc/tls/mojo.key
 
 Path to the TLS key file, defaults to a built-in test key.
 

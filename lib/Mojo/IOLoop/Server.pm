@@ -281,6 +281,7 @@ Path to TLS certificate authority file.
 =item tls_cert
 
   tls_cert => '/etc/tls/server.crt'
+  tls_cert => {'mojolicious.org' => '/etc/tls/mojo.crt'}
 
 Path to the TLS cert file, defaults to a built-in test certificate.
 
@@ -294,6 +295,7 @@ L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
 =item tls_key
 
   tls_key => '/etc/tls/server.key'
+  tls_key => {'mojolicious.org' => '/etc/tls/mojo.key'}
 
 Path to the TLS key file, defaults to a built-in test key.
 

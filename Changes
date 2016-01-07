@@ -1,5 +1,5 @@
 
-6.40  2016-01-07
+6.40  2016-01-08
   - Replaced deprecated proxy method in Mojo::Message::Request with an
     attribute.
   - Added SNI support to all built-in web servers. (bpmedley, sri)

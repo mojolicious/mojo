@@ -2,12 +2,12 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode deprecated);
+use Mojo::Util qw(b64_encode b64_decode);
 use Mojo::URL;
 
 has env => sub { {} };
 has method => 'GET';
-has 'reverse_proxy';
+has [qw(proxy reverse_proxy)];
 has url => sub { Mojo::URL->new };
 has via_proxy => 1;
 
@@ -141,24 +141,6 @@ sub parse {
     if $self->reverse_proxy
     && ($headers->header('X-Forwarded-Proto') // '') eq 'https';
 
-  return $self;
-}
-
-# DEPRECATED in Clinking Beer Mugs!
-sub proxy {
-  my $self = shift;
-
-  return $self->{proxy} unless @_;
-
-  deprecated 'Calling Mojo::Message::Request::proxy with a boolean argument is'
-    . ' DEPRECATED in favor of Mojo::Message::Request::via_proxy'
-    and return $self->via_proxy(0)
-    unless $_[0];
-  deprecated
-    'Calling Mojo::Message::Request::proxy with a string argument is DEPRECATED'
-    unless ref $_[0];
-
-  $self->{proxy} = ref $_[0] ? shift : Mojo::URL->new(shift);
   return $self;
 }
 

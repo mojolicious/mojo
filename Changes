@@ -1,5 +1,7 @@
 
 6.40  2016-01-07
+  - Replaced deprecated proxy method in Mojo::Message::Request with an
+    attribute.
   - Added SNI support to all built-in web servers. (bpmedley, sri)
 
 6.39  2016-01-03
@@ -78,7 +80,6 @@
 6.25  2015-10-21
   - Deprecated Mojo::Message::Request::proxy with boolean and string arguments
     in favor of Mojo::Message::Request::via_proxy.
-  - Replaced proxy method in Mojo::Message::Request with an attribute.
   - Moved all bundled files into "resources" directories.
   - Added via_proxy attribute to Mojo::Message::Request.
   - Improved Mojo::DOM::CSS to support selectors with leading and trailing

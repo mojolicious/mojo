@@ -1,8 +1,9 @@
 
-6.40  2016-01-08
+6.40  2016-01-09
   - Replaced deprecated proxy method in Mojo::Message::Request with an
     attribute.
   - Added SNI support to all built-in web servers. (bpmedley, sri)
+  - Updated jQuery to version 2.2.0.
 
 6.39  2016-01-03
   - Updated links to Mojolicious website.

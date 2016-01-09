@@ -3,6 +3,8 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
+use Mojo::Channel::HTTP::Client;
+use Mojo::Channel::WebSocket::Client;
 use Mojo::IOLoop;
 use Mojo::Util qw(monkey_patch term_escape);
 use Mojo::UserAgent::CookieJar;
@@ -142,7 +144,11 @@ sub _connect_proxy {
       $self->_remove($id);
       $id = $self->_connect($loop, 0, $old, $handle,
         sub { shift->_start($loop, $old->connection($id), $cb) });
-      $self->{connections}{$id} = {cb => $cb, ioloop => $loop, tx => $old};
+      $self->{connections}{$id} = Mojo::Channel::HTTP::Client->new(
+        cb     => $cb,
+        ioloop => $loop,
+        tx     => $old
+      );
     }
   );
 }
@@ -186,7 +192,8 @@ sub _connection {
   # Connect
   $id = $self->_connect($loop, 1, $tx, undef, \&_connected);
   warn "-- Connect $id ($proto://$host:$port)\n" if DEBUG;
-  $self->{connections}{$id} = {cb => $cb, ioloop => $loop, tx => $tx};
+  $self->{connections}{$id}
+    = Mojo::Channel::HTTP::Client->new(cb => $cb, ioloop => $loop, tx => $tx);
 
   return $id;
 }
@@ -234,6 +241,9 @@ sub _finish {
   if (my $new = $self->transactor->upgrade($old)) {
     weaken $self;
     $new->on(resume => sub { $self->_write($id) });
+    $self->{connections}{$id}
+      = Mojo::Channel::WebSocket::Client->new(ioloop => $c->{ioloop},
+      tx => $new);
     $c->{cb}($self, $c->{tx} = $new);
     return $new->client_read($old->res->content->leftovers);
   }

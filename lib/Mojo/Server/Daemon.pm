@@ -2,6 +2,8 @@ package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';
+use Mojo::Channel::HTTP::Server;
+use Mojo::Channel::WebSocket::Server;
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
@@ -126,7 +128,8 @@ sub _finish {
 
     # Successful upgrade
     if ($ws->handshake($tx->next(undef))->res->code == 101) {
-      $c->{tx} = $ws;
+      $c = $self->{connections}{$id}
+        = Mojo::Channel::WebSocket::Server->new(tls => $c->{tls}, tx => $ws);
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
       $ws->server_open;
@@ -174,7 +177,7 @@ sub _listen {
     $options => sub {
       my ($loop, $stream, $id) = @_;
 
-      $self->{connections}{$id} = {tls => $tls};
+      $self->{connections}{$id} = Mojo::Channel::HTTP::Server->new(tls => $tls);
       warn "-- Accept $id (@{[$stream->handle->peerhost]})\n" if DEBUG;
       $stream->timeout($self->inactivity_timeout);
 

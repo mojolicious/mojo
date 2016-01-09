@@ -8,6 +8,7 @@ use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util 'term_escape';
+use Mojo::WebSocket 'server_handshake';
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
@@ -87,8 +88,7 @@ sub _build_tx {
       # WebSocket
       if ($tx->req->is_handshake) {
         my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx);
-        $ws->server_handshake;
-        $self->emit(request => $ws);
+        $self->emit(request => server_handshake $ws);
         $tx->next($ws->handshake(undef));
       }
 

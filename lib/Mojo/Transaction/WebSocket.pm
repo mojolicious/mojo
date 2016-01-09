@@ -6,16 +6,13 @@ use Config;
 use List::Util 'first';
 use Mojo::JSON qw(encode_json j);
 use Mojo::Transaction::HTTP;
-use Mojo::Util qw(b64_encode decode dumper encode sha1_bytes trim xor_encode);
+use Mojo::Util qw(decode dumper encode trim xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
 # Perl with support for quads
 use constant MODERN =>
   (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
-
-# Unique value from RFC 6455
-use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 # Opcodes
 use constant {
@@ -98,31 +95,6 @@ sub build_message {
   return $self->build_frame(@$frame);
 }
 
-sub client_challenge {
-  my $self = shift;
-
-  # "permessage-deflate" extension
-  my $headers = $self->res->headers;
-  $self->compressed(1)
-    if ($headers->sec_websocket_extensions // '') =~ /permessage-deflate/;
-
-  return _challenge($self->req->headers->sec_websocket_key) eq
-    $headers->sec_websocket_accept && ++$self->{open};
-}
-
-sub client_handshake {
-  my $self = shift;
-
-  my $headers = $self->req->headers;
-  $headers->upgrade('websocket')      unless $headers->upgrade;
-  $headers->connection('Upgrade')     unless $headers->connection;
-  $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
-
-  # Generate 16 byte WebSocket challenge
-  my $challenge = b64_encode sprintf('%16u', int(rand 9 x 16)), '';
-  $headers->sec_websocket_key($challenge) unless $headers->sec_websocket_key;
-}
-
 sub client_write { shift->server_write(@_) }
 
 sub connection { shift->handshake->connection }
@@ -139,7 +111,7 @@ sub finish {
   return $self;
 }
 
-sub is_established { !!shift->{open} }
+sub is_established { !!$_[0]{open} || !!$_[0]{masked} }
 
 sub is_websocket {1}
 
@@ -235,14 +207,6 @@ sub server_close {
   return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
 }
 
-sub server_handshake {
-  my $self        = shift;
-  my $res_headers = $self->res->headers;
-  $res_headers->upgrade('websocket')->connection('Upgrade');
-  $res_headers->sec_websocket_accept(
-    _challenge($self->req->headers->sec_websocket_key));
-}
-
 sub server_open { shift->{open}++ }
 
 sub server_write {
@@ -276,8 +240,6 @@ sub with_protocols {
   $self->res->headers->sec_websocket_protocol($proto);
   return $proto;
 }
-
-sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
 
 sub _message {
   my ($self, $frame) = @_;
@@ -536,20 +498,6 @@ Build WebSocket frame.
 
 Build WebSocket message.
 
-=head2 client_challenge
-
-  my $bool = $ws->client_challenge;
-
-Check WebSocket handshake challenge client-side, used to implement user agents
-such as L<Mojo::UserAgent>.
-
-=head2 client_handshake
-
-  $ws->client_handshake;
-
-Perform WebSocket handshake client-side, used to implement user agents such as
-L<Mojo::UserAgent>.
-
 =head2 client_write
 
   my $bytes = $ws->client_write;
@@ -682,13 +630,6 @@ will be invoked once all data has been written.
   $ws->server_close;
 
 Transaction closed server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
-
-=head2 server_handshake
-
-  $ws->server_handshake;
-
-Perform WebSocket handshake server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>.
 
 =head2 server_open

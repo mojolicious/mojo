@@ -3,10 +3,10 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
-use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::Transactor;
 use Mojo::Util qw(b64_decode encode);
+use Mojo::WebSocket 'server_handshake';
 
 # Custom content generator
 my $t = Mojo::UserAgent::Transactor->new;
@@ -502,8 +502,7 @@ ok $tx->req->headers->sec_websocket_version,
   'has "Sec-WebSocket-Version" value';
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 is $t->upgrade($tx), undef, 'not upgraded';
-Mojo::Transaction::WebSocket->new(handshake => $tx)->server_handshake;
-$tx->res->code(101);
+server_handshake($tx)->res->code(101);
 $tx = $t->upgrade($tx);
 ok $tx->is_websocket, 'is a WebSocket';
 

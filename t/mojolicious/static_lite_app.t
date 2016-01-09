@@ -182,7 +182,7 @@ $t->get_ok('/hello4.txt' => {Range => 'bytes=0-0'})->status_is(416)
 $t->get_ok('/hidden')->status_is(404)->content_unlike(qr/Unreachable file/);
 
 # Base64 static inline file, If-Modified-Since
-my $modified = Mojo::Date->new->epoch(time - 3600);
+my $modified = Mojo::Date->new->epoch($^T - 1);
 $t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})->status_is(200)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
@@ -196,7 +196,7 @@ $t->get_ok('/static.txt')->status_is(200)
   ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
 
 # Base64 static inline file, If-Modified-Since
-$modified = Mojo::Date->new->epoch(time - 3600);
+$modified = Mojo::Date->new->epoch($^T - 1);
 $t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})->status_is(200)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");

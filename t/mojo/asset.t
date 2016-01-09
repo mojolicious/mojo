@@ -32,7 +32,7 @@ is $mem->contains('abc'), 0,  '"abc" at position 0';
 is $mem->contains('bc'),  1,  '"bc" at position 1';
 is $mem->contains('db'),  -1, 'does not contain "db"';
 is $mem->size, 3, 'right size';
-ok $mem->mtime > (time - 100), 'right mtime';
+is $mem->mtime, $^T, 'right mtime';
 is $mem->mtime, Mojo::Asset::Memory->new->mtime, 'same mtime';
 my $mtime = $mem->mtime;
 is $mem->mtime($mtime + 23)->mtime, $mtime + 23, 'right mtime';

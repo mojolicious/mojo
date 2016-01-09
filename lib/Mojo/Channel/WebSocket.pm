@@ -1,12 +1,14 @@
 package Mojo::Channel::WebSocket;
 use Mojo::Base 'Mojo::Channel';
 
+use Mojo::WebSocket 'parse_frame';
+
 sub read {
   my ($self, $chunk) = @_;
 
   my $tx = $self->{tx};
   $self->{read} .= $chunk // '';
-  while (my $frame = $tx->parse_frame(\$self->{read})) {
+  while (my $frame = parse_frame \$self->{read}, $tx->max_websocket_size) {
     $tx->finish(1009) and last unless ref $frame;
     $tx->emit(frame => $frame);
   }

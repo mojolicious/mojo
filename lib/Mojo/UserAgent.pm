@@ -330,7 +330,7 @@ sub _write {
   my $c = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
   return if !$tx->is_writing || $c->{writing}++;
-  my $chunk = $tx->client_write;
+  my $chunk = $c->write;
   delete $c->{writing};
   warn term_escape "-- Client >>> Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   my $stream = $c->{ioloop}->stream($id)->write($chunk);

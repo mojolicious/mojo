@@ -95,8 +95,6 @@ sub build_message {
   return $self->build_frame(@$frame);
 }
 
-sub client_write { shift->server_write(@_) }
-
 sub connection { shift->handshake->connection }
 
 sub finish {
@@ -208,17 +206,6 @@ sub server_close {
 }
 
 sub server_open { shift->{open}++ }
-
-sub server_write {
-  my $self = shift;
-
-  unless (length($self->{write} // '')) {
-    $self->{state} = $self->{finished} ? 'finished' : 'read';
-    $self->emit('drain');
-  }
-
-  return delete $self->{write} // '';
-}
 
 sub with_compression {
   my $self = shift;

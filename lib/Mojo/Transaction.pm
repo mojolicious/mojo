@@ -27,8 +27,6 @@ sub client_close {
   $self->server_close;
 }
 
-sub client_write { croak 'Method "client_write" not implemented by subclass' }
-
 sub connection {
   my $self = shift;
   return $self->emit(connection => $self->{connection} = shift) if @_;
@@ -58,8 +56,6 @@ sub remote_address {
 sub resume       { shift->_state(qw(write resume)) }
 sub server_close { shift->_state(qw(finished finish)) }
 
-sub server_write { croak 'Method "server_write" not implemented by subclass' }
-
 sub success { $_[0]->error ? undef : $_[0]->res }
 
 sub _state {
@@ -80,9 +76,6 @@ Mojo::Transaction - Transaction base class
 
   package Mojo::Transaction::MyTransaction;
   use Mojo::Base 'Mojo::Transaction';
-
-  sub client_write {...}
-  sub server_write {...}
 
 =head1 DESCRIPTION
 
@@ -187,13 +180,6 @@ implements the following new ones.
 Transaction closed client-side, no actual connection close is assumed by
 default, used to implement user agents such as L<Mojo::UserAgent>.
 
-=head2 client_write
-
-  my $bytes = $tx->client_write;
-
-Write data client-side, used to implement user agents such as
-L<Mojo::UserAgent>. Meant to be overloaded in a subclass.
-
 =head2 connection
 
   my $id = $tx->connection;
@@ -256,13 +242,6 @@ proxy.
 
 Transaction closed server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>.
-
-=head2 server_write
-
-  my $bytes = $tx->server_write;
-
-Write data server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
 
 =head2 success
 

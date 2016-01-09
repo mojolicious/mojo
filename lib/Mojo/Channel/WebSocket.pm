@@ -14,4 +14,18 @@ sub read {
   $tx->emit('resume');
 }
 
+
+sub write {
+  my $self = shift;
+  my $tx = $self->{tx};
+
+  unless (length($tx->{write} // '')) {
+    $tx->{state} = $tx->{finished} ? 'finished' : 'read';
+    $tx->emit('drain');
+  }
+
+  return delete $tx->{write} // '';
+}
+
+
 1;

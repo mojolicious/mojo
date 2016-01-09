@@ -123,10 +123,9 @@ sub _finish {
 
   # Upgrade connection to WebSocket
   if (my $ws = $c->{tx} = $tx->next) {
-    $c->{tx} = $ws->handshake($tx->next(undef));
 
     # Successful upgrade
-    if ($ws->res->code == 101) {
+    if ($ws->handshake($tx->next(undef))->res->code == 101) {
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
       $ws->server_open;

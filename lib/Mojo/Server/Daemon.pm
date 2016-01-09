@@ -119,23 +119,21 @@ sub _finish {
   return $self->_remove($id) if $tx->is_websocket;
 
   # Finish transaction
-  $tx->server_close;
+  delete($c->{tx})->server_close;
 
   # Upgrade connection to WebSocket
-  if (my $ws = $c->{tx} = $tx->next) {
+  if (my $ws = $tx->next) {
 
     # Successful upgrade
     if ($ws->handshake($tx->next(undef))->res->code == 101) {
+      $c->{tx} = $ws;
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
       $ws->server_open;
     }
 
     # Failed upgrade
-    else {
-      delete $c->{tx};
-      $ws->server_close;
-    }
+    else { $ws->server_close }
   }
 
   # Close connection if necessary

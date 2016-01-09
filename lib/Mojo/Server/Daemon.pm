@@ -2,6 +2,8 @@ package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';
+use Mojo::Channel::HTTP::Server;
+use Mojo::Channel::WebSocket::Server;
 use Mojo::IOLoop;
 use Mojo::URL;
 use Mojo::Util 'term_escape';

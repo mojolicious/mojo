@@ -1,7 +1,7 @@
 package Mojo::Transaction::HTTP;
 use Mojo::Base 'Mojo::Transaction';
 
-has [qw(previous next)];
+has [qw(next previous)];
 
 sub client_read {
   my ($self, $chunk) = @_;
@@ -73,10 +73,8 @@ sub _body {
   if (defined $buffer) { delete $self->{delay} }
 
   # Delayed
-  else {
-    if   (delete $self->{delay}) { $self->{state} = 'paused' }
-    else                         { $self->{delay} = 1 }
-  }
+  elsif (delete $self->{delay}) { $self->{state} = 'paused' }
+  else                          { $self->{delay} = 1 }
 
   # Finished
   $self->{state} = $finish ? 'finished' : 'read'
@@ -229,6 +227,14 @@ Emitted for unexpected C<1xx> responses that will be ignored.
 L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
 and implements the following new ones.
 
+=head2 next
+
+  my $next = $tx->next;
+  $tx      = $tx->next(Mojo::Transaction::WebSocket->new);
+
+Follow-up transaction for connections that get upgraded to a different protocol,
+usually a L<Mojo::Transaction::WebSocket> object.
+
 =head2 previous
 
   my $previous = $tx->previous;
@@ -240,14 +246,6 @@ L<Mojo::Transaction::HTTP> object.
   # Paths of previous requests
   say $tx->previous->previous->req->url->path;
   say $tx->previous->req->url->path;
-
-=head2 next
-
-  my $next = $tx->next;
-  $tx      = $tx->next(Mojo::Transaction::WebSocket->new);
-
-Follow-up transaction for connections that will get upgraded, usually a
-L<Mojo::Transaction::WebSocket> object.
 
 =head1 METHODS
 

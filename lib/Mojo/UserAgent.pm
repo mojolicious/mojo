@@ -241,11 +241,11 @@ sub _finish {
   if (my $new = $self->transactor->upgrade($old)) {
     weaken $self;
     $new->on(resume => sub { $self->_write($id) });
-    $self->{connections}{$id}
+    my $ws = $self->{connections}{$id}
       = Mojo::Channel::WebSocket::Client->new(ioloop => $c->{ioloop},
       tx => $new);
     $c->{cb}($self, $c->{tx} = $new);
-    return $new->client_read($old->res->content->leftovers);
+    return $ws->read($old->res->content->leftovers);
   }
 
   # Finish normal connection and handle redirects
@@ -257,11 +257,12 @@ sub _read {
   my ($self, $id, $chunk) = @_;
 
   # Corrupted connection
-  return $self->_remove($id) unless my $tx = $self->{connections}{$id}{tx};
+  my $c = $self->{connections}{$id};
+  return $self->_remove($id) unless my $tx = $c->{tx};
 
   # Process incoming data
   warn term_escape "-- Client <<< Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
-  $tx->client_read($chunk);
+  $c->read($chunk);
   if    ($tx->is_finished) { $self->_finish($id) }
   elsif ($tx->is_writing)  { $self->_write($id) }
 }

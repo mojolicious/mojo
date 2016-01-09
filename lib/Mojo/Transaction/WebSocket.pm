@@ -123,7 +123,6 @@ sub client_handshake {
   $headers->sec_websocket_key($challenge) unless $headers->sec_websocket_key;
 }
 
-sub client_read  { shift->server_read(@_) }
 sub client_write { shift->server_write(@_) }
 
 sub connection { shift->handshake->connection }

@@ -1,21 +1,21 @@
 package Mojo::WebSocket;
 use Mojo::Base -strict;
 
-use Exporter 'import';
 use Config;
+use Exporter 'import';
 use Mojo::Util qw(b64_encode sha1_bytes xor_encode);
 
-our @EXPORT_OK
-  = qw(build_frame challenge client_handshake parse_frame server_handshake);
+use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
 # Unique value from RFC 6455
 use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
-use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
-
 # Perl with support for quads
 use constant MODERN =>
   (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
+
+our @EXPORT_OK
+  = qw(build_frame challenge client_handshake parse_frame server_handshake);
 
 sub build_frame {
   my ($masked, $fin, $rsv1, $rsv2, $rsv3, $op, $payload) = @_;
@@ -86,7 +86,7 @@ sub client_handshake {
 }
 
 sub parse_frame {
-  my ($buffer, $max_websocket_size) = @_;
+  my ($buffer, $max) = @_;
 
   # Head
   return undef unless length $$buffer >= 2;
@@ -126,7 +126,7 @@ sub parse_frame {
   }
 
   # Check message size
-  return 1 if $len > $max_websocket_size;
+  return 1 if $len > $max;
 
   # Check if whole packet has arrived
   $len += 4 if my $masked = $second & 0b10000000;

@@ -2,18 +2,11 @@ package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
 use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
-use Config;
 use List::Util 'first';
 use Mojo::JSON qw(encode_json j);
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw(decode encode trim);
-use Mojo::WebSocket qw(build_frame);
-
-use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
-
-# Perl with support for quads
-use constant MODERN =>
-  (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
+use Mojo::WebSocket 'build_frame';
 
 # Opcodes
 use constant {
@@ -497,13 +490,6 @@ Negotiate C<permessage-deflate> extension for this WebSocket connection.
   my $proto = $ws->with_protocols('v2.proto', 'v1.proto');
 
 Negotiate subprotocol for this WebSocket connection.
-
-=head1 DEBUGGING
-
-You can set the C<MOJO_WEBSOCKET_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
-
-  MOJO_WEBSOCKET_DEBUG=1
 
 =head1 SEE ALSO
 

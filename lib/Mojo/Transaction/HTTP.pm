@@ -131,13 +131,6 @@ L<Mojo::Transaction::HTTP> object.
 L<Mojo::Transaction::HTTP> inherits all methods from L<Mojo::Transaction> and
 implements the following new ones.
 
-=head2 client_write
-
-  my $bytes = $tx->client_write;
-
-Write data client-side, used to implement user agents such as
-L<Mojo::UserAgent>.
-
 =head2 is_empty
 
   my $bool = $tx->is_empty;
@@ -159,13 +152,6 @@ transaction.
 
   # Paths of all previous requests
   say $_->req->url->path for @{$tx->redirects};
-
-=head2 server_write
-
-  my $bytes = $tx->server_write;
-
-Write data server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
 
 =head1 SEE ALSO
 

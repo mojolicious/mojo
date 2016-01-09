@@ -485,13 +485,6 @@ Build WebSocket frame.
 
 Build WebSocket message.
 
-=head2 client_write
-
-  my $bytes = $ws->client_write;
-
-Write data client-side, used to implement user agents such as
-L<Mojo::UserAgent>.
-
 =head2 connection
 
   my $id = $ws->connection;
@@ -625,13 +618,6 @@ L<Mojo::Server::Daemon>.
 
 WebSocket connection established server-side, used to implement web servers such
 as L<Mojo::Server::Daemon>.
-
-=head2 server_write
-
-  my $bytes = $ws->server_write;
-
-Write data server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
 
 =head2 with_compression
 

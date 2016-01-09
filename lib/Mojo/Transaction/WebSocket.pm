@@ -48,6 +48,12 @@ sub build_message {
   return build_frame $self->masked, @$frame;
 }
 
+sub closed {
+  my $self = shift;
+  $self->{state} = 'finished';
+  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
+}
+
 sub connection { shift->handshake->connection }
 
 sub finish {
@@ -76,6 +82,9 @@ sub new {
   return $self;
 }
 
+
+sub opened { shift->{open}++ }
+
 sub protocol { shift->res->headers->sec_websocket_protocol }
 
 sub remote_address { shift->handshake->remote_address }
@@ -97,14 +106,6 @@ sub send {
 
   return $self->emit('resume');
 }
-
-sub server_close {
-  my $self = shift;
-  $self->{state} = 'finished';
-  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
-}
-
-sub server_open { shift->{open}++ }
 
 sub with_compression {
   my $self = shift;
@@ -360,6 +361,13 @@ and implements the following new ones.
 
 Build WebSocket message.
 
+=head2 closed
+
+  $ws->closed;
+
+Transaction closed server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
+
 =head2 connection
 
   my $id = $ws->connection;
@@ -414,6 +422,13 @@ Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
 L</"frame"> event with default message parser, which also handles C<PING> and
 C<CLOSE> frames automatically.
 
+=head2 opened
+
+  $ws->opened;
+
+WebSocket connection established server-side, used to implement web servers such
+as L<Mojo::Server::Daemon>.
+
 =head2 protocol
 
   my $proto = $ws->protocol;
@@ -464,20 +479,6 @@ will be invoked once all data has been written.
 
   # Send "Ping" frame
   $ws->send([1, 0, 0, 0, 9, 'Hello World!']);
-
-=head2 server_close
-
-  $ws->server_close;
-
-Transaction closed server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
-
-=head2 server_open
-
-  $ws->server_open;
-
-WebSocket connection established server-side, used to implement web servers such
-as L<Mojo::Server::Daemon>.
 
 =head2 with_compression
 

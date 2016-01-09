@@ -44,7 +44,7 @@ package Mojo::Server::PSGI::_IO;
 use Mojo::Base -base;
 
 # Finish transaction
-sub close { shift->{tx}->server_close }
+sub close { shift->{tx}->closed }
 
 sub getline {
   my $self = shift;

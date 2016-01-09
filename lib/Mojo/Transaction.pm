@@ -10,6 +10,8 @@ has [
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
+sub closed { shift->_state(qw(finished finish)) }
+
 sub connection {
   my $self = shift;
   return $self->emit(connection => $self->{connection} = shift) if @_;
@@ -36,8 +38,7 @@ sub remote_address {
     : $self->original_remote_address;
 }
 
-sub resume       { shift->_state(qw(write resume)) }
-sub server_close { shift->_state(qw(finished finish)) }
+sub resume { shift->_state(qw(write resume)) }
 
 sub success { $_[0]->error ? undef : $_[0]->res }
 
@@ -155,6 +156,13 @@ HTTP response, defaults to a L<Mojo::Message::Response> object.
 L<Mojo::Transaction> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 closed
+
+  $tx->closed;
+
+Transaction closed server-side, used to implement web servers such as
+L<Mojo::Server::Daemon>.
+
 =head2 connection
 
   my $id = $tx->connection;
@@ -210,13 +218,6 @@ Resume transaction.
 Same as L</"original_remote_address"> or the last value of the
 C<X-Forwarded-For> header if L</"req"> has been performed through a reverse
 proxy.
-
-=head2 server_close
-
-  $tx->server_close;
-
-Transaction closed server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
 
 =head2 success
 

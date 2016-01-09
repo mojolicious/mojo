@@ -38,7 +38,7 @@ sub run {
   return undef unless $tx->is_empty || _write($res, 'get_body_chunk');
 
   # Finish transaction
-  $tx->server_close;
+  $tx->closed;
 
   return $res->code;
 }

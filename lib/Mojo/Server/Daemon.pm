@@ -107,7 +107,7 @@ sub _close {
   my ($self, $id) = @_;
 
   # Finish gracefully
-  if (my $tx = $self->{connections}{$id}{tx}) { $tx->server_close }
+  if (my $tx = $self->{connections}{$id}{tx}) { $tx->closed }
 
   delete $self->{connections}{$id};
 }
@@ -121,7 +121,7 @@ sub _finish {
   return $self->_remove($id) if $tx->is_websocket;
 
   # Finish transaction
-  delete($c->{tx})->server_close;
+  delete($c->{tx})->closed;
 
   # Upgrade connection to WebSocket
   if (my $ws = $tx->next) {
@@ -132,11 +132,11 @@ sub _finish {
         = Mojo::Channel::WebSocket->new(tls => $c->{tls}, tx => $ws);
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
-      $ws->server_open;
+      $ws->opened;
     }
 
     # Failed upgrade
-    else { $ws->server_close }
+    else { $ws->closed }
   }
 
   # Close connection if necessary

@@ -3,22 +3,6 @@ use Mojo::Base 'Mojo::Transaction';
 
 has [qw(next previous)];
 
-sub client_read {
-  my ($self, $chunk) = @_;
-
-  # Skip body for HEAD request
-  my $res = $self->res;
-  $res->content->skip_body(1) if uc $self->req->method eq 'HEAD';
-  return unless $res->parse($chunk)->is_finished;
-
-  # Unexpected 1xx response
-  return $self->{state} = 'finished'
-    if !$res->is_status_class(100) || $res->headers->upgrade;
-  $self->res($res->new)->emit(unexpected => $res);
-  return if (my $leftovers = $res->content->leftovers) eq '';
-  $self->client_read($leftovers);
-}
-
 sub client_write { shift->_write(0) }
 
 sub is_empty { !!(uc $_[0]->req->method eq 'HEAD' || $_[0]->res->is_empty) }

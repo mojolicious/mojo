@@ -3,6 +3,8 @@ use Mojo::Base 'Mojo::Channel';
 
 use Mojo::WebSocket 'parse_frame';
 
+sub close { shift->{tx}->server_close }
+
 sub read {
   my ($self, $chunk) = @_;
 

@@ -10,23 +10,6 @@ has [
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
-sub client_close {
-  my ($self, $close) = @_;
-
-  # Premature connection close
-  my $res = $self->res->finish;
-  if ($close && !$res->code && !$res->error) {
-    $res->error({message => 'Premature connection close'});
-  }
-
-  # 4xx/5xx
-  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-    $res->error({message => $res->message, code => $res->code});
-  }
-
-  $self->server_close;
-}
-
 sub connection {
   my $self = shift;
   return $self->emit(connection => $self->{connection} = shift) if @_;
@@ -171,14 +154,6 @@ HTTP response, defaults to a L<Mojo::Message::Response> object.
 
 L<Mojo::Transaction> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
-
-=head2 client_close
-
-  $tx->client_close;
-  $tx->client_close(1);
-
-Transaction closed client-side, no actual connection close is assumed by
-default, used to implement user agents such as L<Mojo::UserAgent>.
 
 =head2 connection
 

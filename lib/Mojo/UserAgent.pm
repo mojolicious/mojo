@@ -230,7 +230,7 @@ sub _finish {
   $c->{ioloop}->remove($c->{timeout}) if $c->{timeout};
 
   return $self->_reuse($id, $close) unless my $old = $c->{tx};
-  $old->client_close($close);
+  $c->close($close);
 
   # Finish WebSocket
   return $self->_remove($id) if $old->is_websocket;

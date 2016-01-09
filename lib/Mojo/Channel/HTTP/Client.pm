@@ -1,6 +1,24 @@
 package Mojo::Channel::HTTP::Client;
 use Mojo::Base 'Mojo::Channel::HTTP';
 
+sub close {
+  my ($self, $close) = @_;
+  my $tx = $self->{tx};
+
+  # Premature connection close
+  my $res = $tx->res->finish;
+  if ($close && !$res->code && !$res->error) {
+    $res->error({message => 'Premature connection close'});
+  }
+
+  # 4xx/5xx
+  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+    $res->error({message => $res->message, code => $res->code});
+  }
+
+  $self->SUPER::close;
+}
+
 sub read {
   my ($self, $chunk) = @_;
 

@@ -3,6 +3,8 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
+use Mojo::Channel::HTTP::Client;
+use Mojo::Channel::WebSocket::Client;
 use Mojo::IOLoop;
 use Mojo::Util qw(monkey_patch term_escape);
 use Mojo::UserAgent::CookieJar;

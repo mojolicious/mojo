@@ -923,8 +923,6 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 # Abstract methods
 eval { Mojo::Transaction->client_write };
 like $@, qr/Method "client_write" not implemented by subclass/, 'right error';
-eval { Mojo::Transaction->server_read };
-like $@, qr/Method "server_read" not implemented by subclass/, 'right error';
 eval { Mojo::Transaction->server_write };
 like $@, qr/Method "server_write" not implemented by subclass/, 'right error';
 

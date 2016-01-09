@@ -58,7 +58,6 @@ sub remote_address {
 sub resume       { shift->_state(qw(write resume)) }
 sub server_close { shift->_state(qw(finished finish)) }
 
-sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
 sub success { $_[0]->error ? undef : $_[0]->res }
@@ -83,7 +82,6 @@ Mojo::Transaction - Transaction base class
   use Mojo::Base 'Mojo::Transaction';
 
   sub client_write {...}
-  sub server_read  {...}
   sub server_write {...}
 
 =head1 DESCRIPTION
@@ -258,13 +256,6 @@ proxy.
 
 Transaction closed server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>.
-
-=head2 server_read
-
-  $tx->server_read($bytes);
-
-Read data server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
 
 =head2 server_write
 

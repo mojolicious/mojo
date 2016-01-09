@@ -245,18 +245,6 @@ sub server_handshake {
 
 sub server_open { shift->{open}++ }
 
-sub server_read {
-  my ($self, $chunk) = @_;
-
-  $self->{read} .= $chunk // '';
-  while (my $frame = $self->parse_frame(\$self->{read})) {
-    $self->finish(1009) and last unless ref $frame;
-    $self->emit(frame => $frame);
-  }
-
-  $self->emit('resume');
-}
-
 sub server_write {
   my $self = shift;
 
@@ -709,13 +697,6 @@ L<Mojo::Server::Daemon>.
 
 WebSocket connection established server-side, used to implement web servers such
 as L<Mojo::Server::Daemon>.
-
-=head2 server_read
-
-  $ws->server_read($data);
-
-Read data server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
 
 =head2 server_write
 

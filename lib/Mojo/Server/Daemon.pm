@@ -144,8 +144,8 @@ sub _finish {
 
   # Build new transaction for leftovers
   return if (my $leftovers = $tx->req->content->leftovers) eq '';
-  $tx = $c->{tx} = $self->_build_tx($id, $c);
-  $tx->server_read($leftovers);
+  $c->{tx} = $self->_build_tx($id, $c);
+  $c->read($leftovers);
 }
 
 sub _listen {
@@ -208,7 +208,7 @@ sub _read {
   my $c = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
   warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
-  $tx->server_read($chunk);
+  $c->read($chunk);
 
   # Last keep-alive request or corrupted connection
   $tx->res->headers->connection('close')

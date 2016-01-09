@@ -32,18 +32,6 @@ sub redirects {
   return \@redirects;
 }
 
-sub server_read {
-  my ($self, $chunk) = @_;
-
-  # Parse request
-  my $req = $self->req;
-  $req->parse($chunk) unless $req->error;
-  $self->{state} ||= 'read';
-
-  # Generate response
-  $self->emit('request') if $req->is_finished && !$self->{handled}++;
-}
-
 sub server_write { shift->_write(1) }
 
 sub _body {
@@ -264,13 +252,6 @@ transaction.
 
   # Paths of all previous requests
   say $_->req->url->path for @{$tx->redirects};
-
-=head2 server_read
-
-  $tx->server_read($bytes);
-
-Read data server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
 
 =head2 server_write
 

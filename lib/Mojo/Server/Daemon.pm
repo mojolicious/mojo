@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';
 use Mojo::Channel::HTTP::Server;
-use Mojo::Channel::WebSocket::Server;
+use Mojo::Channel::WebSocket;
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
@@ -129,7 +129,7 @@ sub _finish {
     # Successful upgrade
     if ($ws->handshake($tx->next(undef))->res->code == 101) {
       $c = $self->{connections}{$id}
-        = Mojo::Channel::WebSocket::Server->new(tls => $c->{tls}, tx => $ws);
+        = Mojo::Channel::WebSocket->new(tls => $c->{tls}, tx => $ws);
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
       $ws->server_open;

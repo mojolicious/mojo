@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
 use Mojo::Channel::HTTP::Client;
-use Mojo::Channel::WebSocket::Client;
+use Mojo::Channel::WebSocket;
 use Mojo::IOLoop;
 use Mojo::Util qw(monkey_patch term_escape);
 use Mojo::UserAgent::CookieJar;
@@ -241,8 +241,7 @@ sub _finish {
   if (my $new = $self->transactor->upgrade($old)) {
     weaken $self;
     $new->on(resume => sub { $self->_write($id) });
-    my $ws = Mojo::Channel::WebSocket::Client->new(ioloop => $c->{ioloop},
-      tx => $new);
+    my $ws = Mojo::Channel::WebSocket->new(ioloop => $c->{ioloop}, tx => $new);
     $self->{connections}{$id} = $ws;
     $c->{cb}($self, $c->{tx} = $new);
     return $ws->read($old->res->content->leftovers);

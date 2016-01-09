@@ -1,9 +1,7 @@
 package Mojo::Transaction::HTTP;
 use Mojo::Base 'Mojo::Transaction';
 
-use Mojo::Transaction::WebSocket;
-
-has 'previous';
+has [qw(previous next)];
 
 sub client_read {
   my ($self, $chunk) = @_;
@@ -59,10 +57,7 @@ sub server_read {
   $self->{state} ||= 'read';
 
   # Generate response
-  return unless $req->is_finished && !$self->{handled}++;
-  $self->emit(upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))
-    if $req->is_handshake;
-  $self->emit('request');
+  $self->emit('request') if $req->is_finished && !$self->{handled}++;
 }
 
 sub server_write { shift->_write(1) }
@@ -229,21 +224,6 @@ Emitted for unexpected C<1xx> responses that will be ignored.
     $tx->res->on(finish => sub { say 'Follow-up response is finished.' });
   });
 
-=head2 upgrade
-
-  $tx->on(upgrade => sub {
-    my ($tx, $ws) = @_;
-    ...
-  });
-
-Emitted when transaction gets upgraded to a L<Mojo::Transaction::WebSocket>
-object.
-
-  $tx->on(upgrade => sub {
-    my ($tx, $ws) = @_;
-    $ws->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-  });
-
 =head1 ATTRIBUTES
 
 L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
@@ -260,6 +240,14 @@ L<Mojo::Transaction::HTTP> object.
   # Paths of previous requests
   say $tx->previous->previous->req->url->path;
   say $tx->previous->req->url->path;
+
+=head2 next
+
+  my $next = $tx->next;
+  $tx      = $tx->next(Mojo::Transaction::WebSocket->new);
+
+Follow-up transaction for connections that will get upgraded, usually a
+L<Mojo::Transaction::WebSocket> object.
 
 =head1 METHODS
 

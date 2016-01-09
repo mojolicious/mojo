@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';
 use Mojo::IOLoop;
+use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util 'term_escape';
 use Scalar::Util 'weaken';
@@ -76,19 +77,22 @@ sub _build_tx {
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
   $tx->req->url->base->scheme('https') if $c->{tls};
 
-  # Handle upgrades and requests
   weaken $self;
-  $tx->on(
-    upgrade => sub {
-      my ($tx, $ws) = @_;
-      $ws->server_handshake;
-      $self->{connections}{$id}{ws} = $ws;
-    }
-  );
   $tx->on(
     request => sub {
       my $tx = shift;
-      $self->emit(request => $self->{connections}{$id}{ws} || $tx);
+
+      # WebSocket
+      if ($tx->req->is_handshake) {
+        my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx);
+        $ws->server_handshake;
+        $self->emit(request => $ws);
+        $tx->next($ws->handshake(undef));
+      }
+
+      # HTTP
+      else { $self->emit(request => $tx) }
+
       $tx->on(resume => sub { $self->_write($id) });
     }
   );
@@ -118,7 +122,8 @@ sub _finish {
   $tx->server_close;
 
   # Upgrade connection to WebSocket
-  if (my $ws = $c->{tx} = delete $c->{ws}) {
+  if (my $ws = $c->{tx} = $tx->next) {
+    $c->{tx} = $ws->handshake($tx->next(undef));
 
     # Successful upgrade
     if ($ws->res->code == 101) {

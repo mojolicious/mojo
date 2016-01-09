@@ -241,9 +241,9 @@ sub _finish {
   if (my $new = $self->transactor->upgrade($old)) {
     weaken $self;
     $new->on(resume => sub { $self->_write($id) });
-    my $ws = $self->{connections}{$id}
-      = Mojo::Channel::WebSocket::Client->new(ioloop => $c->{ioloop},
+    my $ws = Mojo::Channel::WebSocket::Client->new(ioloop => $c->{ioloop},
       tx => $new);
+    $self->{connections}{$id} = $ws;
     $c->{cb}($self, $c->{tx} = $new);
     return $ws->read($old->res->content->leftovers);
   }

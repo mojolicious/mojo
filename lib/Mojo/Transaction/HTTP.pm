@@ -236,12 +236,6 @@ L<Mojo::Transaction::HTTP> object.
 L<Mojo::Transaction::HTTP> inherits all methods from L<Mojo::Transaction> and
 implements the following new ones.
 
-=head2 client_read
-
-  $tx->client_read($bytes);
-
-Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
-
 =head2 client_write
 
   my $bytes = $tx->client_write;

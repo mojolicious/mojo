@@ -562,12 +562,6 @@ such as L<Mojo::UserAgent>.
 Perform WebSocket handshake client-side, used to implement user agents such as
 L<Mojo::UserAgent>.
 
-=head2 client_read
-
-  $ws->client_read($data);
-
-Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
-
 =head2 client_write
 
   my $bytes = $ws->client_write;

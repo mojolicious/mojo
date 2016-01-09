@@ -3,9 +3,9 @@ use Mojo::Base 'Mojo::Channel::HTTP';
 
 sub read {
   my ($self, $chunk) = @_;
-  my $tx = $self->{tx};
 
   # Skip body for HEAD request
+  my $tx  = $self->{tx};
   my $res = $tx->res;
   $res->content->skip_body(1) if uc $tx->req->method eq 'HEAD';
   return unless $res->parse($chunk)->is_finished;

@@ -27,7 +27,6 @@ sub client_close {
   $self->server_close;
 }
 
-sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
 sub connection {
@@ -83,7 +82,6 @@ Mojo::Transaction - Transaction base class
   package Mojo::Transaction::MyTransaction;
   use Mojo::Base 'Mojo::Transaction';
 
-  sub client_read  {...}
   sub client_write {...}
   sub server_read  {...}
   sub server_write {...}
@@ -190,13 +188,6 @@ implements the following new ones.
 
 Transaction closed client-side, no actual connection close is assumed by
 default, used to implement user agents such as L<Mojo::UserAgent>.
-
-=head2 client_read
-
-  $tx->client_read($bytes);
-
-Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
-Meant to be overloaded in a subclass.
 
 =head2 client_write
 

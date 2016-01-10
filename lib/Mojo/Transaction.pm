@@ -10,13 +10,13 @@ has [
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
-sub closed { shift->_state(qw(finished finish)) }
-
 sub connection {
   my $self = shift;
   return $self->emit(connection => $self->{connection} = shift) if @_;
   return $self->{connection};
 }
+
+sub delivered { shift->_state(qw(finished finish)) }
 
 sub error { $_[0]->req->error || $_[0]->res->error }
 
@@ -156,19 +156,19 @@ HTTP response, defaults to a L<Mojo::Message::Response> object.
 L<Mojo::Transaction> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 closed
-
-  $tx->closed;
-
-Low-level signal that the underlying connection is finished with this
-transaction.
-
 =head2 connection
 
   my $id = $tx->connection;
   $tx    = $tx->connection($id);
 
 Connection identifier.
+
+=head2 delivered
+
+  $tx->delivered;
+
+Low-level signal that the underlying connection is finished with this
+transaction.
 
 =head2 error
 

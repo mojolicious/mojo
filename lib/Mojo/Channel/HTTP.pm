@@ -1,7 +1,7 @@
 package Mojo::Channel::HTTP;
 use Mojo::Base 'Mojo::Channel';
 
-sub close { shift->{tx}->closed }
+sub close { shift->{tx}->delivered }
 
 sub is_server {undef}
 

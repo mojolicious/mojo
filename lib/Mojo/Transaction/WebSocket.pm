@@ -48,13 +48,15 @@ sub build_message {
   return build_frame $self->masked, @$frame;
 }
 
-sub closed {
+sub connection { shift->handshake->connection }
+
+sub delivered {
   my $self = shift;
   $self->{state} = 'finished';
   return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
 }
 
-sub connection { shift->handshake->connection }
+sub established { shift->{open}++ }
 
 sub finish {
   my $self = shift;
@@ -85,8 +87,6 @@ sub new {
   $self->on(frame => sub { shift->_message(@_) });
   return $self;
 }
-
-sub opened { shift->{open}++ }
 
 sub protocol { shift->res->headers->sec_websocket_protocol }
 
@@ -363,18 +363,24 @@ and implements the following new ones.
 
 Build WebSocket message.
 
-=head2 closed
-
-  $ws->closed;
-
-Low-level signal that the underlying connection is finished with this
-transaction.
-
 =head2 connection
 
   my $id = $ws->connection;
 
 Connection identifier.
+
+=head2 delivered
+
+  $ws->delivered;
+
+Low-level signal that the underlying connection is finished with this
+transaction.
+
+=head2 established
+
+  $ws->established;
+
+Low-level signal that the underlying connection has been established.
 
 =head2 finish
 
@@ -435,12 +441,6 @@ Local interface port.
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
 L</"frame"> event with default message parser, which also handles C<PING> and
 C<CLOSE> frames automatically.
-
-=head2 opened
-
-  $ws->opened;
-
-Low-level signal that the underlying connection has been established.
 
 =head2 protocol
 

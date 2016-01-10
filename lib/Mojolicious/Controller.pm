@@ -895,8 +895,8 @@ C<mojo.*> prefix are reserved for internal use.
   my $url = $c->url_for('/index.html');
   my $url = $c->url_for('//example.com/index.html');
   my $url = $c->url_for('http://example.com/index.html');
-  my $url = $c->url_for('#whatever');
   my $url = $c->url_for('mailto:sri@example.com');
+  my $url = $c->url_for('#whatever');
 
 Generate a portable L<Mojo::URL> object with base for a path, URL or route.
 

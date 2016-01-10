@@ -14,8 +14,20 @@ use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 use constant MODERN =>
   (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
 
-our @EXPORT_OK
-  = qw(build_frame challenge client_handshake parse_frame server_handshake);
+# Opcodes
+use constant {
+  WS_CONTINUATION => 0x0,
+  WS_TEXT         => 0x1,
+  WS_BINARY       => 0x2,
+  WS_CLOSE        => 0x8,
+  WS_PING         => 0x9,
+  WS_PONG         => 0xa
+};
+
+our @EXPORT_OK = (
+  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT),
+  qw(build_frame challenge client_handshake parse_frame server_handshake)
+);
 
 sub build_frame {
   my ($masked, $fin, $rsv1, $rsv2, $rsv3, $op, $payload) = @_;
@@ -163,9 +175,9 @@ Mojo::WebSocket - The WebSocket Protocol
 
 =head1 SYNOPSIS
 
-  use Mojo::WebSocket qw(build_frame parse_frame);
+  use Mojo::WebSocket qw(WS_TEXT build_frame parse_frame);
 
-  my $bytes = build_frame 0, 1, 0, 0, 0, 2, 'Hello World!';
+  my $bytes = build_frame 0, 1, 0, 0, 0, WS_TEXT, 'Hello World!';
   my $frame = parse_frame \$bytes, 262144;
 
 =head1 DESCRIPTION
@@ -184,23 +196,23 @@ individually.
 
 Build WebSocket frame.
 
-  # Binary frame with FIN bit and payload
-  say build_frame 0, 1, 0, 0, 0, 2, 'Hello World!';
+  # Maked binary frame with FIN bit and payload
+  say build_frame 1, 1, 0, 0, 0, WS_BINARY, 'Hello World!';
 
   # Text frame with payload but without FIN bit
-  say build_frame 0, 0, 0, 0, 0, 1, 'Hello ';
+  say build_frame 0, 0, 0, 0, 0, WS_TEXT, 'Hello ';
 
   # Continuation frame with FIN bit and payload
-  say build_frame 0, 1, 0, 0, 0, 0, 'World!';
+  say build_frame 0, 1, 0, 0, 0, WS_CONTINUATION, 'World!';
 
   # Close frame with FIN bit and without payload
-  say build_frame 0, 1, 0, 0, 0, 8, '';
+  say build_frame 0, 1, 0, 0, 0, WS_CLOSE, '';
 
   # Ping frame with FIN bit and payload
-  say build_frame 0, 1, 0, 0, 0, 9, 'Test 123';
+  say build_frame 0, 1, 0, 0, 0, WS_PING, 'Test 123';
 
   # Pong frame with FIN bit and payload
-  say build_frame 0, 1, 0, 0, 0, 10, 'Test 123';
+  say build_frame 0, 1, 0, 0, 0, WS_PONG, 'Test 123';
 
 =head2 challenge
 
@@ -234,6 +246,35 @@ Parse WebSocket frame.
   my $tx = server_handshake Mojo::Transaction::HTTP->new;
 
 Perform WebSocket handshake server-side.
+
+=head1 CONSTANTS
+
+L<Mojo::WebSocket> implements the following constants, which can be imported
+individually.
+
+=head2 WS_BINARY
+
+Opcode for C<Binary> frames.
+
+=head2 WS_CLOSE
+
+Opcode for C<Close> frames.
+
+=head2 WS_CONTINUATION
+
+Opcode for C<Continuation> frames.
+
+=head2 WS_PING
+
+Opcode for C<Ping> frames.
+
+=head2 WS_PONG
+
+Opcode for C<Pong> frames.
+
+=head2 WS_TEXT
+
+Opcode for C<Text> frames.
 
 =head1 SEE ALSO
 

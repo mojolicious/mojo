@@ -810,7 +810,8 @@ establish the WebSocket connection.
   $c->send({binary => encode_json({test => 'I ♥ Mojolicious!'})});
 
   # Send "Ping" frame
-  $c->send([1, 0, 0, 0, 9, 'Hello World!']);
+  use Mojo::WebSocket 'WS_PING';
+  $c->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
 
   # Make sure previous message has been written before continuing
   $c->send('First message!' => sub {

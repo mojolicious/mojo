@@ -7,19 +7,8 @@ use List::Util 'first';
 use Mojo::JSON qw(encode_json j);
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw(decode deprecated encode trim);
-use Mojo::WebSocket;
-
-use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
-
-# Opcodes
-use constant {
-  CONTINUATION => 0x0,
-  TEXT         => 0x1,
-  BINARY       => 0x2,
-  CLOSE        => 0x8,
-  PING         => 0x9,
-  PONG         => 0xa
-};
+use Mojo::WebSocket
+  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT);
 
 has [qw(compressed masked)];
 has handshake => sub { Mojo::Transaction::HTTP->new };
@@ -41,8 +30,8 @@ sub build_message {
   $frame->{text} = encode_json($frame->{json}) if exists $frame->{json};
 
   # Raw text or binary
-  if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }
-  else                       { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
+  if (exists $frame->{text}) { $frame = [1, 0, 0, 0, WS_TEXT, $frame->{text}] }
+  else { $frame = [1, 0, 0, 0, WS_BINARY, $frame->{binary}] }
 
   # "permessage-deflate" extension
   return Mojo::WebSocket::build_frame($self->masked, @$frame)
@@ -70,7 +59,7 @@ sub finish {
   my $payload = $close->[0] ? pack('n', $close->[0]) : '';
   $payload .= encode 'UTF-8', $close->[1] if defined $close->[1];
   $close->[0] //= 1005;
-  $self->send([1, 0, 0, 0, CLOSE, $payload])->{finished} = 1;
+  $self->send([1, 0, 0, 0, WS_CLOSE, $payload])->{finished} = 1;
 
   return $self;
 }
@@ -173,14 +162,14 @@ sub _message {
   my ($self, $frame) = @_;
 
   # Assume continuation
-  my $op = $frame->[4] || CONTINUATION;
+  my $op = $frame->[4] || WS_CONTINUATION;
 
   # Ping/Pong
-  return $self->send([1, 0, 0, 0, PONG, $frame->[5]]) if $op == PING;
-  return if $op == PONG;
+  return $self->send([1, 0, 0, 0, WS_PONG, $frame->[5]]) if $op == WS_PING;
+  return if $op == WS_PONG;
 
   # Close
-  if ($op == CLOSE) {
+  if ($op == WS_CLOSE) {
     return $self->finish unless length $frame->[5] >= 2;
     return $self->finish(unpack('n', substr($frame->[5], 0, 2, '')),
       decode('UTF-8', $frame->[5]));
@@ -210,8 +199,8 @@ sub _message {
 
   $self->emit(json => j($msg)) if $self->has_subscribers('json');
   $op = delete $self->{op};
-  $self->emit($op == TEXT ? 'text' : 'binary' => $msg);
-  $self->emit(message => $op == TEXT ? decode 'UTF-8', $msg : $msg)
+  $self->emit($op == WS_TEXT ? 'text' : 'binary' => $msg);
+  $self->emit(message => $op == WS_TEXT ? decode 'UTF-8', $msg : $msg)
     if $self->has_subscribers('message');
 }
 
@@ -466,8 +455,8 @@ Local interface port.
   my $ws = Mojo::Transaction::WebSocket->new({compressed => 1});
 
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
-L</"frame"> event with default message parser, which also handles C<PING> and
-C<CLOSE> frames automatically.
+L</"frame"> event with default message parser, which also handles C<Ping> and
+C<Close> frames automatically.
 
 =head2 protocol
 
@@ -518,7 +507,8 @@ Send message or frame non-blocking via WebSocket, the optional drain callback
 will be invoked once all data has been written.
 
   # Send "Ping" frame
-  $ws->send([1, 0, 0, 0, 9, 'Hello World!']);
+  use Mojo::WebSocket 'WS_PING';
+  $ws->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
 
 =head2 server_close
 
@@ -559,13 +549,6 @@ Negotiate C<permessage-deflate> extension for this WebSocket connection.
   my $proto = $ws->with_protocols('v2.proto', 'v1.proto');
 
 Negotiate subprotocol for this WebSocket connection.
-
-=head1 DEBUGGING
-
-You can set the C<MOJO_WEBSOCKET_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
-
-  MOJO_WEBSOCKET_DEBUG=1
 
 =head1 SEE ALSO
 

@@ -2,10 +2,12 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Transaction::WebSocket;
-use Mojo::WebSocket qw(build_frame parse_frame);
+use Mojo::WebSocket
+  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT),
+  qw(build_frame parse_frame);
 
 # Simple text frame roundtrip
-my $bytes = build_frame 0, 1, 0, 0, 0, 1, 'whatever';
+my $bytes = build_frame 0, 1, 0, 0, 0, WS_TEXT, 'whatever';
 is $bytes, "\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72", 'right frame';
 my $frame = parse_frame \(my $dummy = $bytes), 262144;
 is $frame->[0], 1,          'fin flag is set';
@@ -15,6 +17,30 @@ is $frame->[3], 0,          'rsv3 flag is not set';
 is $frame->[4], 1,          'text frame';
 is $frame->[5], 'whatever', 'right payload';
 is build_frame(0, 1, 0, 0, 0, 1, 'whatever'), $bytes, 'frames are equal';
+
+# Simple ping frame roundtrip
+$bytes = build_frame 0, 1, 0, 0, 0, WS_PING, 'whatever';
+is $bytes, "\x89\x08\x77\x68\x61\x74\x65\x76\x65\x72", 'right frame';
+$frame = parse_frame \($dummy = $bytes), 262144;
+is $frame->[0], 1,          'fin flag is set';
+is $frame->[1], 0,          'rsv1 flag is not set';
+is $frame->[2], 0,          'rsv2 flag is not set';
+is $frame->[3], 0,          'rsv3 flag is not set';
+is $frame->[4], 9,          'ping frame';
+is $frame->[5], 'whatever', 'right payload';
+is build_frame(0, 1, 0, 0, 0, 9, 'whatever'), $bytes, 'frames are equal';
+
+# Simple pong frame roundtrip
+$bytes = build_frame 0, 1, 0, 0, 0, WS_PONG, 'whatever';
+is $bytes, "\x8a\x08\x77\x68\x61\x74\x65\x76\x65\x72", 'right frame';
+$frame = parse_frame \($dummy = $bytes), 262144;
+is $frame->[0], 1,          'fin flag is set';
+is $frame->[1], 0,          'rsv1 flag is not set';
+is $frame->[2], 0,          'rsv2 flag is not set';
+is $frame->[3], 0,          'rsv3 flag is not set';
+is $frame->[4], 10,         'pong frame';
+is $frame->[5], 'whatever', 'right payload';
+is build_frame(0, 1, 0, 0, 0, 10, 'whatever'), $bytes, 'frames are equal';
 
 # Simple text frame roundtrip with all flags set
 $bytes = build_frame 0, 1, 1, 1, 1, 1, 'whatever';
@@ -52,17 +78,17 @@ is $frame->[4], 1,          'text frame';
 is $frame->[5], 'whatever', 'right payload';
 is build_frame(0, 1, 1, 0, 0, 1, 'whatever'), $bytes, 'frames are equal';
 
-# Simple text frame roundtrip with RSV2 flags set
-$bytes = build_frame(0, 1, 0, 1, 0, 1, 'whatever');
-is $bytes, "\xa1\x08\x77\x68\x61\x74\x65\x76\x65\x72", 'right frame';
+# Simple continuation frame roundtrip with RSV2 flags set
+$bytes = build_frame(0, 1, 0, 1, 0, WS_CONTINUATION, 'whatever');
+is $bytes, "\xa0\x08\x77\x68\x61\x74\x65\x76\x65\x72", 'right frame';
 $frame = parse_frame \($dummy = $bytes), 262144;
 is $frame->[0], 1,          'fin flag is set';
 is $frame->[1], 0,          'rsv1 flag is not set';
 is $frame->[2], 1,          'rsv2 flag is set';
 is $frame->[3], 0,          'rsv3 flag is not set';
-is $frame->[4], 1,          'text frame';
+is $frame->[4], 0,          'continuation frame';
 is $frame->[5], 'whatever', 'right payload';
-is build_frame(0, 1, 0, 1, 0, 1, 'whatever'), $bytes, 'frames are equal';
+is build_frame(0, 1, 0, 1, 0, 0, 'whatever'), $bytes, 'frames are equal';
 
 # Simple text frame roundtrip with RSV3 flags set
 $bytes = build_frame(0, 1, 0, 0, 1, 1, 'whatever');
@@ -77,7 +103,7 @@ is $frame->[5], 'whatever', 'right payload';
 is build_frame(0, 1, 0, 0, 1, 1, 'whatever'), $bytes, 'frames are equal';
 
 # Simple binary frame roundtrip
-$bytes = build_frame(0, 1, 0, 0, 0, 2, 'works');
+$bytes = build_frame(0, 1, 0, 0, 0, WS_BINARY, 'works');
 is $bytes, "\x82\x05\x77\x6f\x72\x6b\x73", 'right frame';
 $frame = parse_frame \($dummy = $bytes), 262144;
 is $frame->[0], 1,       'fin flag is set';
@@ -174,7 +200,7 @@ is $frame->[5], '', 'no payload';
 is build_frame(0, 1, 0, 0, 0, 1, ''), $bytes, 'frames are equal';
 
 # Empty close frame roundtrip
-$bytes = build_frame(0, 1, 0, 0, 0, 8, '');
+$bytes = build_frame(0, 1, 0, 0, 0, WS_CLOSE, '');
 is $bytes, "\x88\x00", 'right frame';
 $frame = parse_frame \($dummy = $bytes), 262144;
 is $frame->[0], 1,  'fin flag is set';

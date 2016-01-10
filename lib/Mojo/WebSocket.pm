@@ -144,9 +144,9 @@ sub parse_frame {
 sub server_handshake {
   my $tx = shift;
 
-  my $res_headers = $tx->res->headers;
-  $res_headers->upgrade('websocket')->connection('Upgrade');
-  $res_headers->sec_websocket_accept(
+  my $headers = $tx->res->headers;
+  $headers->upgrade('websocket')->connection('Upgrade');
+  $headers->sec_websocket_accept(
     _challenge($tx->req->headers->sec_websocket_key));
 
   return $tx;

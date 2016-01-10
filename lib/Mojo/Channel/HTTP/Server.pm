@@ -16,4 +16,10 @@ sub read {
   $tx->handle if $req->is_finished && !$self->{handled}++;
 }
 
+sub start {
+  my $self = shift;
+  delete $self->{handled};
+  return $self->SUPER::start(@_);
+}
+
 1;

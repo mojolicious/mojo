@@ -206,9 +206,7 @@ sub _read {
 
   # Make sure we have a transaction and parse chunk
   my $c = $self->{connections}{$id};
-  unless ($c->{tx}) {
-    $c->start($self->_build_tx($id, $c));
-  }
+  $c->start($self->_build_tx($id, $c)) unless $c->{tx};
   my $tx = $c->{tx};
   warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $c->read($chunk);

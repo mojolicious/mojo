@@ -8,7 +8,7 @@ sub is_server {undef}
 sub start {
   my $self = shift;
   @$self{qw(tx cb)} = @_;
-  delete @$self{qw(delay handled http_state offset write)};
+  delete @$self{qw(delay http_state offset write)};
   return $self;
 }
 

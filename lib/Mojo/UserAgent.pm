@@ -144,11 +144,8 @@ sub _connect_proxy {
       $self->_remove($id);
       $id = $self->_connect($loop, 0, $old, $handle,
         sub { shift->_start($loop, $old->connection($id), $cb) });
-      $self->{connections}{$id} = Mojo::Channel::HTTP::Client->new(
-        cb     => $cb,
-        ioloop => $loop,
-        tx     => $old
-      );
+      $self->{connections}{$id}
+        = Mojo::Channel::HTTP::Client->new(ioloop => $loop)->start($old => $cb);
     }
   );
 }
@@ -180,7 +177,7 @@ sub _connection {
   my $id = $tx->connection || $self->_dequeue($loop, "$proto:$host:$port", 1);
   if ($id) {
     warn "-- Reusing connection $id ($proto://$host:$port)\n" if DEBUG;
-    @{$self->{connections}{$id}}{qw(cb tx)} = ($cb, $tx);
+    $self->{connections}{$id}->start($tx => $cb);
     $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
     return $id;
@@ -193,7 +190,7 @@ sub _connection {
   $id = $self->_connect($loop, 1, $tx, undef, \&_connected);
   warn "-- Connect $id ($proto://$host:$port)\n" if DEBUG;
   $self->{connections}{$id}
-    = Mojo::Channel::HTTP::Client->new(cb => $cb, ioloop => $loop, tx => $tx);
+    = Mojo::Channel::HTTP::Client->new(ioloop => $loop)->start($tx => $cb);
 
   return $id;
 }

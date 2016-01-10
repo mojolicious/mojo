@@ -144,7 +144,7 @@ sub _finish {
 
   # Build new transaction for leftovers
   return if (my $leftovers = $tx->req->content->leftovers) eq '';
-  $c->{tx} = $self->_build_tx($id, $c);
+  $c->start($self->_build_tx($id, $c));
   $c->read($leftovers);
 }
 
@@ -206,7 +206,10 @@ sub _read {
 
   # Make sure we have a transaction and parse chunk
   my $c = $self->{connections}{$id};
-  my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
+  unless ($c->{tx}) {
+    $c->start($self->_build_tx($id, $c));
+  }
+  my $tx = $c->{tx};
   warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $c->read($chunk);
 

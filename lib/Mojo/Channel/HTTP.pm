@@ -5,6 +5,13 @@ sub close { shift->{tx}->delivered }
 
 sub is_server {undef}
 
+sub start {
+  my $self = shift;
+  @$self{qw(tx cb)} = @_;
+  delete @$self{qw(delay http_state offset write)};
+  return $self;
+}
+
 sub write {
   my $self = shift;
 
@@ -13,20 +20,20 @@ sub write {
   $tx->{state} ||= 'write' unless my $server = $self->is_server;
 
   # Nothing written yet
-  $tx->{$_} ||= 0 for qw(offset write);
+  $self->{$_} ||= 0 for qw(offset write);
   my $msg = $server ? $tx->res : $tx->req;
-  @$tx{qw(http_state write)} = ('start_line', $msg->start_line_size)
-    unless $tx->{http_state};
+  @$self{qw(http_state write)} = ('start_line', $msg->start_line_size)
+    unless $self->{http_state};
 
   # Start-line
   my $chunk = '';
-  $chunk .= $self->_start_line($msg) if $tx->{http_state} eq 'start_line';
+  $chunk .= $self->_start_line($msg) if $self->{http_state} eq 'start_line';
 
   # Headers
-  $chunk .= $self->_headers($msg, $server) if $tx->{http_state} eq 'headers';
+  $chunk .= $self->_headers($msg, $server) if $self->{http_state} eq 'headers';
 
   # Body
-  $chunk .= $self->_body($msg, $server) if $tx->{http_state} eq 'body';
+  $chunk .= $self->_body($msg, $server) if $self->{http_state} eq 'body';
 
   return $chunk;
 }
@@ -36,19 +43,19 @@ sub _body {
 
   # Prepare body chunk
   my $tx      = $self->{tx};
-  my $buffer  = $msg->get_body_chunk($tx->{offset});
+  my $buffer  = $msg->get_body_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $tx->{write} = $msg->content->is_dynamic ? 1 : ($tx->{write} - $written);
-  $tx->{offset} += $written;
+  $self->{write} = $msg->content->is_dynamic ? 1 : ($self->{write} - $written);
+  $self->{offset} += $written;
   if (defined $buffer) { delete $self->{delay} }
 
   # Delayed
-  elsif (delete $tx->{delay}) { $tx->{state} = 'read' }
-  else                        { $tx->{delay} = 1 }
+  elsif (delete $self->{delay}) { $tx->{state} = 'read' }
+  else                          { $self->{delay} = 1 }
 
   # Finished
   $tx->{state} = $finish ? 'finished' : 'read'
-    if $tx->{write} <= 0 || defined $buffer && $buffer eq '';
+    if $self->{write} <= 0 || defined $buffer && $buffer eq '';
 
   return defined $buffer ? $buffer : '';
 }
@@ -58,22 +65,22 @@ sub _headers {
 
   # Prepare header chunk
   my $tx      = $self->{tx};
-  my $buffer  = $msg->get_header_chunk($tx->{offset});
+  my $buffer  = $msg->get_header_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $tx->{write} -= $written;
-  $tx->{offset} += $written;
+  $self->{write} -= $written;
+  $self->{offset} += $written;
 
   # Switch to body
-  if ($tx->{write} <= 0) {
-    $tx->{offset} = 0;
+  if ($self->{write} <= 0) {
+    $self->{offset} = 0;
 
     # Response without body
     if ($head && $tx->is_empty) { $tx->{state} = 'finished' }
 
     # Body
     else {
-      $tx->{http_state} = 'body';
-      $tx->{write} = $msg->content->is_dynamic ? 1 : $msg->body_size;
+      $self->{http_state} = 'body';
+      $self->{write} = $msg->content->is_dynamic ? 1 : $msg->body_size;
     }
   }
 
@@ -84,15 +91,14 @@ sub _start_line {
   my ($self, $msg) = @_;
 
   # Prepare start-line chunk
-  my $tx      = $self->{tx};
-  my $buffer  = $msg->get_start_line_chunk($tx->{offset});
+  my $buffer  = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $tx->{write} -= $written;
-  $tx->{offset} += $written;
+  $self->{write} -= $written;
+  $self->{offset} += $written;
 
   # Switch to headers
-  @$tx{qw(http_state write offset)} = ('headers', $msg->header_size, 0)
-    if $tx->{write} <= 0;
+  @$self{qw(http_state write offset)} = ('headers', $msg->header_size, 0)
+    if $self->{write} <= 0;
 
   return $buffer;
 }

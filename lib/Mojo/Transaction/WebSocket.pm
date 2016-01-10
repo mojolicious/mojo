@@ -86,7 +86,6 @@ sub new {
   return $self;
 }
 
-
 sub opened { shift->{open}++ }
 
 sub protocol { shift->res->headers->sec_websocket_protocol }

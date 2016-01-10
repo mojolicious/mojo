@@ -1,5 +1,5 @@
 
-6.40  2016-01-10
+6.40  2016-01-11
   - Removed client_challenge, client_handshake and server_handshake methods from
     Mojo::Transaction::WebSocket. (batman)
   - Removed upgrade event from Mojo::Transaction::HTTP.
@@ -14,6 +14,7 @@
   - Updated jQuery to version 2.2.0.
   - Improve mtime attribute in Mojo::Asset::Memory to default to the value of
     $^T.
+  - Fixed url_for to handle fragments correctly.
 
 6.39  2016-01-03
   - Updated links to Mojolicious website.

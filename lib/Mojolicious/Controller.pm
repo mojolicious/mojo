@@ -295,7 +295,7 @@ sub url_for {
 
   # Absolute URL
   return $target if Scalar::Util::blessed $target && $target->isa('Mojo::URL');
-  return Mojo::URL->new($target) if $target =~ m!^(?:[^:/?#]+:|//)!;
+  return Mojo::URL->new($target) if $target =~ m!^(?:[^:/?#]+:|//|#)!;
 
   # Base
   my $url  = Mojo::URL->new;
@@ -895,6 +895,7 @@ C<mojo.*> prefix are reserved for internal use.
   my $url = $c->url_for('/index.html');
   my $url = $c->url_for('//example.com/index.html');
   my $url = $c->url_for('http://example.com/index.html');
+  my $url = $c->url_for('#whatever');
   my $url = $c->url_for('mailto:sri@example.com');
 
 Generate a portable L<Mojo::URL> object with base for a path, URL or route.

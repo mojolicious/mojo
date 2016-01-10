@@ -12,10 +12,10 @@ sub read {
   $self->{read} .= $chunk // '';
   while (my $frame = parse_frame \$self->{read}, $tx->max_websocket_size) {
     $tx->finish(1009) and last unless ref $frame;
-    $tx->emit(frame => $frame);
+    $tx->frame($frame);
   }
 
-  $tx->emit('resume');
+  $tx->resume;
 }
 
 

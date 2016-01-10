@@ -68,6 +68,8 @@ sub finish {
   return $self;
 }
 
+sub frame { shift->emit(frame => shift) }
+
 sub is_closing { !!shift->{closing} }
 
 sub is_established { !!$_[0]{open} || !!$_[0]{masked} }
@@ -382,6 +384,12 @@ Connection identifier.
   $ws = $ws->finish(1003 => 'Cannot accept data!');
 
 Close WebSocket connection gracefully.
+
+=head2 frame
+
+  $ws->frame($frame);
+
+Low-level signal that a WebSocket frame has been received.
 
 =head2 is_closing
 

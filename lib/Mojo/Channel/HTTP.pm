@@ -8,7 +8,7 @@ sub is_server {undef}
 sub start {
   my $self = shift;
   @$self{qw(tx cb)} = @_;
-  delete @$self{qw(delay http_state offset write)};
+  delete @$self{qw(delay handled http_state offset write)};
   return $self;
 }
 
@@ -50,7 +50,7 @@ sub _body {
   if (defined $buffer) { delete $self->{delay} }
 
   # Delayed
-  elsif (delete $self->{delay}) { $tx->{state} = 'read' }
+  elsif (delete $self->{delay}) { $tx->{state}   = 'read' }
   else                          { $self->{delay} = 1 }
 
   # Finished
@@ -91,7 +91,7 @@ sub _start_line {
   my ($self, $msg) = @_;
 
   # Prepare start-line chunk
-  my $buffer  = $msg->get_start_line_chunk($self->{offset});
+  my $buffer = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} -= $written;
   $self->{offset} += $written;

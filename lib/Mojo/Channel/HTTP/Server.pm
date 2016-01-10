@@ -13,7 +13,7 @@ sub read {
   $tx->{state} ||= 'read';
 
   # Generate response
-  $tx->emit('request') if $req->is_finished && !$tx->{handled}++;
+  $tx->handle if $req->is_finished && !$self->{handled}++;
 }
 
 1;

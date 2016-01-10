@@ -3,6 +3,8 @@ use Mojo::Base 'Mojo::Transaction';
 
 has [qw(next previous)];
 
+sub handle { shift->emit('request') }
+
 sub is_empty { !!(uc $_[0]->req->method eq 'HEAD' || $_[0]->res->is_empty) }
 
 sub keep_alive {
@@ -130,6 +132,12 @@ L<Mojo::Transaction::HTTP> object.
 
 L<Mojo::Transaction::HTTP> inherits all methods from L<Mojo::Transaction> and
 implements the following new ones.
+
+=head2 handle
+
+  $tx->handle;
+
+Low-level signal that a request needs to be handled.
 
 =head2 is_empty
 

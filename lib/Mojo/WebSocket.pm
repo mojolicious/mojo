@@ -1,7 +1,6 @@
 package Mojo::WebSocket;
 use Mojo::Base -strict;
 
-use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
 use Config;
 use Exporter 'import';
 use Mojo::Util qw(b64_encode sha1_bytes xor_encode);
@@ -160,7 +159,7 @@ sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
 
 =head1 NAME
 
-Mojo::WebSocket - WebSocket utility functions
+Mojo::WebSocket - The WebSocket Protocol
 
 =head1 SYNOPSIS
 
@@ -171,14 +170,17 @@ Mojo::WebSocket - WebSocket utility functions
 
 =head1 DESCRIPTION
 
-L<Mojo::WebSocket> provides utility functions for dealing with data over
-a WebSocket.
+L<Mojo::WebSocket> implements the WebSocket protocol as described in
+L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
 
 =head1 FUNCTIONS
 
+L<Mojo::WebSocket> implements the following functions, which can be imported
+individually.
+
 =head2 build_frame
 
-  my $bytes = build_frame($masked, $fin, $rsv1, $rsv2, $rsv3, $op, $payload);
+  my $bytes = build_frame $masked, $fin, $rsv1, $rsv2, $rsv3, $op, $payload;
 
 Build WebSocket frame.
 
@@ -202,17 +204,15 @@ Build WebSocket frame.
 
 =head2 challenge
 
-  my $bool = challenge(Mojo::Transaction::WebSocket->new);
+  my $bool = challenge Mojo::Transaction::WebSocket->new;
 
-Check WebSocket handshake challenge client-side, used to implement user agents
-such as L<Mojo::UserAgent>.
+Check WebSocket handshake challenge.
 
 =head2 client_handshake
 
-  my $tx = client_handshake(Mojo::Transaction::WebSocket->new);
+  my $tx = client_handshake Mojo::Transaction::HTTP->new;
 
-Perform WebSocket handshake client-side, used to implement user agents such as
-L<Mojo::UserAgent>.
+Perform WebSocket handshake client-side.
 
 =head2 parse_frame
 
@@ -231,10 +231,9 @@ Parse WebSocket frame.
 
 =head2 server_handshake
 
-  my $tx = server_handshake(Mojo::Transaction::WebSocket->new);
+  my $tx = server_handshake Mojo::Transaction::HTTP->new;
 
-Perform WebSocket handshake server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
+Perform WebSocket handshake server-side.
 
 =head1 SEE ALSO
 

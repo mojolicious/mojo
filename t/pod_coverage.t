@@ -12,6 +12,6 @@ my %RULES = (
   'Mojo::Transaction::WebSocket' =>
     {also_private => [qw(build_frame parse_frame)]},
 );
-
 pod_coverage_ok($_, $RULES{$_} || {}) for all_modules();
-done_testing;
+
+done_testing();

@@ -1,9 +1,15 @@
 
 6.40  2016-01-10
+  - Removed client_challenge, client_handshake and server_handshake methods from
+    Mojo::Transaction::WebSocket. (batman)
   - Removed upgrade event from Mojo::Transaction::HTTP.
+  - Deprecated Mojo::Transaction::WebSocket::build_frame and
+    Mojo::Transaction::WebSocket::parse_frame in favor of
+    Mojo::WebSocket::build_frame and Mojo::WebSocket::parse_frame. (batman)
   - Replaced deprecated proxy method in Mojo::Message::Request with an
     attribute.
   - Added SNI support to all built-in web servers. (bpmedley, sri)
+  - Added module Mojo::WebSocket. (batman)
   - Added next attribute to Mojo::Transaction::HTTP.
   - Updated jQuery to version 2.2.0.
   - Improve mtime attribute in Mojo::Asset::Memory to default to the value of

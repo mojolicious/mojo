@@ -25,6 +25,7 @@ has [qw(compressed masked)];
 has handshake => sub { Mojo::Transaction::HTTP->new };
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
+# DEPRECATED in Clinking Beer Mugs!
 sub build_frame {
   deprecated 'Mojo::Transaction::WebSocket::build_frame is DEPRECATED';
   Mojo::WebSocket::build_frame(shift->masked, @_);
@@ -88,6 +89,7 @@ sub new {
   return $self;
 }
 
+# DEPRECATED in Clinking Beer Mugs!
 sub parse_frame {
   deprecated 'Mojo::Transaction::WebSocket::parse_frame is DEPRECATED';
   Mojo::WebSocket::parse_frame($_[1], $_[0]->max_websocket_size);
@@ -104,11 +106,13 @@ sub resume { $_[0]->handshake->resume and return $_[0] }
 
 sub send {
   my ($self, $msg, $cb) = @_;
+
   $self->once(drain => $cb) if $cb;
   if (ref $msg eq 'ARRAY') {
     $self->{write} .= Mojo::WebSocket::build_frame($self->masked, @$msg);
   }
   else { $self->{write} .= $self->build_message($msg) }
+
   return $self->SUPER::resume;
 }
 

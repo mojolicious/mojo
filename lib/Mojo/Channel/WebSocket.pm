@@ -21,8 +21,8 @@ sub read {
 
 sub write {
   my $self = shift;
-  my $tx = $self->{tx};
 
+  my $tx = $self->{tx};
   unless (length($tx->{write} // '')) {
     $tx->{state} = $tx->{finished} ? 'finished' : 'read';
     $tx->emit('drain');

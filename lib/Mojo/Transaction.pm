@@ -160,8 +160,8 @@ implements the following new ones.
 
   $tx->closed;
 
-Transaction closed server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
+Low-level signal that the underlying connection is finished with this
+transaction.
 
 =head2 connection
 

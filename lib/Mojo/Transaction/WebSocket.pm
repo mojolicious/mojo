@@ -365,8 +365,8 @@ Build WebSocket message.
 
   $ws->closed;
 
-Transaction closed server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
+Low-level signal that the underlying connection is finished with this
+transaction.
 
 =head2 connection
 
@@ -426,8 +426,7 @@ C<CLOSE> frames automatically.
 
   $ws->opened;
 
-WebSocket connection established server-side, used to implement web servers such
-as L<Mojo::Server::Daemon>.
+Low-level signal that the underlying connection has been established.
 
 =head2 protocol
 

@@ -3,14 +3,14 @@ use Mojo::Base 'Mojo::Channel';
 
 sub close { shift->{tx}->closed }
 
-sub is_server { 0 }
+sub is_server {undef}
 
 sub write {
   my $self = shift;
-  my $server = $self->is_server;
-  my $tx = $self->{tx};
 
   # Client starts writing right away
+  my $server = $self->is_server;
+  my $tx     = $self->{tx};
   $tx->{state} ||= 'write' unless $server;
   return '' unless $tx->{state} eq 'write';
 
@@ -35,10 +35,10 @@ sub write {
 
 sub _body {
   my ($self, $msg, $finish) = @_;
-  my $tx = $self->{tx};
 
   # Prepare body chunk
-  my $buffer = $msg->get_body_chunk($tx->{offset});
+  my $tx      = $self->{tx};
+  my $buffer  = $msg->get_body_chunk($tx->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $tx->{write} = $msg->content->is_dynamic ? 1 : ($tx->{write} - $written);
   $tx->{offset} += $written;
@@ -57,10 +57,10 @@ sub _body {
 
 sub _headers {
   my ($self, $msg, $head) = @_;
-  my $tx = $self->{tx};
 
   # Prepare header chunk
-  my $buffer = $msg->get_header_chunk($tx->{offset});
+  my $tx      = $self->{tx};
+  my $buffer  = $msg->get_header_chunk($tx->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $tx->{write} -= $written;
   $tx->{offset} += $written;
@@ -84,10 +84,10 @@ sub _headers {
 
 sub _start_line {
   my ($self, $msg) = @_;
-  my $tx = $self->{tx};
 
   # Prepare start-line chunk
-  my $buffer = $msg->get_start_line_chunk($tx->{offset});
+  my $tx      = $self->{tx};
+  my $buffer  = $msg->get_start_line_chunk($tx->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $tx->{write} -= $written;
   $tx->{offset} += $written;

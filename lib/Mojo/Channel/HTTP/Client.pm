@@ -3,9 +3,9 @@ use Mojo::Base 'Mojo::Channel::HTTP';
 
 sub close {
   my ($self, $close) = @_;
-  my $tx = $self->{tx};
 
   # Premature connection close
+  my $tx  = $self->{tx};
   my $res = $tx->res->finish;
   if ($close && !$res->code && !$res->error) {
     $res->error({message => 'Premature connection close'});

@@ -45,7 +45,7 @@ sub _body {
   if (defined $buffer) { delete $self->{delay} }
 
   # Delayed
-  elsif (delete $tx->{delay}) { $tx->{state} = 'paused' }
+  elsif (delete $tx->{delay}) { $tx->{state} = 'read' }
   else                        { $tx->{delay} = 1 }
 
   # Finished

@@ -1,5 +1,5 @@
 
-6.40  2016-01-09
+6.40  2016-01-10
   - Removed upgrade event from Mojo::Transaction::HTTP.
   - Replaced deprecated proxy method in Mojo::Message::Request with an
     attribute.

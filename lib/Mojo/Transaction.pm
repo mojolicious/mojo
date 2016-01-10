@@ -56,19 +56,15 @@ sub remote_address {
     : $self->original_remote_address;
 }
 
-sub resume       { shift->_state(qw(write resume)) }
-sub server_close { shift->_state(qw(finished finish)) }
+sub resume       { shift->_state('write')->emit('resume') }
+sub server_close { shift->_state('finished')->emit('finish') }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
 sub success { $_[0]->error ? undef : $_[0]->res }
 
-sub _state {
-  my ($self, $state, $event) = @_;
-  $self->{state} = $state;
-  return $self->emit($event);
-}
+sub _state { $_[0]{state} = $_[1] and return $_[0] }
 
 1;
 

@@ -221,13 +221,10 @@ sub resume { $_[0]->handshake->resume and return $_[0] }
 
 sub send {
   my ($self, $msg, $cb) = @_;
-
   $self->once(drain => $cb) if $cb;
   if   (ref $msg eq 'ARRAY') { $self->{write} .= $self->build_frame(@$msg) }
   else                       { $self->{write} .= $self->build_message($msg) }
-  $self->{state} = 'write';
-
-  return $self->emit('resume');
+  return $self->SUPER::resume;
 }
 
 sub server_close {

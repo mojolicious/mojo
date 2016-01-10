@@ -24,7 +24,7 @@ sub write {
 
   my $tx = $self->{tx};
   unless (length($tx->{write} // '')) {
-    $tx->{state} = $tx->{finished} ? 'finished' : 'read';
+    $tx->{state} = $tx->is_closing ? 'finished' : 'read';
     $tx->emit('drain');
   }
 

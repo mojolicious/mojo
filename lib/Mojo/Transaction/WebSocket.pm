@@ -63,10 +63,12 @@ sub finish {
   my $payload = $close->[0] ? pack('n', $close->[0]) : '';
   $payload .= encode 'UTF-8', $close->[1] if defined $close->[1];
   $close->[0] //= 1005;
-  $self->send([1, 0, 0, 0, CLOSE, $payload])->{finished} = 1;
+  $self->send([1, 0, 0, 0, CLOSE, $payload])->{closing} = 1;
 
   return $self;
 }
+
+sub is_closing { !!shift->{closing} }
 
 sub is_established { !!$_[0]{open} || !!$_[0]{masked} }
 
@@ -381,6 +383,12 @@ Connection identifier.
   $ws = $ws->finish(1003 => 'Cannot accept data!');
 
 Close WebSocket connection gracefully.
+
+=head2 is_closing
+
+  my $bool = $ws->is_closing;
+
+Check if WebSocket connection is currently being closed.
 
 =head2 is_established
 

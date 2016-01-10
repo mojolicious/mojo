@@ -222,6 +222,17 @@ is $frame->[4], 2,  'binary frame';
 is $frame->[5], '', 'no payload';
 isnt(build_frame(0, 1, 0, 0, 0, 2, ''), $bytes, 'frames are not equal');
 
+# Size limit
+$bytes = build_frame(0, 1, 0, 0, 0, WS_BINARY, 'works');
+is $bytes, "\x82\x05\x77\x6f\x72\x6b\x73", 'right frame';
+$frame = parse_frame \($dummy = $bytes), 4;
+ok $frame, 'true';
+ok !ref $frame, 'not a reference';
+
+# Incomplete frame
+is parse_frame(\($dummy = "\x82\x05\x77\x6f\x72\x6b"), 262144), undef,
+  'incomplete frame';
+
 # Compressed binary message roundtrip
 my $ws = Mojo::Transaction::WebSocket->new({compressed => 1});
 $bytes = $ws->build_message({binary => 'just works'});

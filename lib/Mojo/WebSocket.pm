@@ -228,7 +228,7 @@ Perform WebSocket handshake client-side.
 
 =head2 parse_frame
 
-  my $frame = parse_frame \$bytes, $max_websocket_size;
+  my $frame = parse_frame \$bytes, $limit;
 
 Parse WebSocket frame.
 

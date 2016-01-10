@@ -443,6 +443,8 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::Util>
 
+=item * L<Mojo::WebSocket>
+
 =item * L<ojo>
 
 =back

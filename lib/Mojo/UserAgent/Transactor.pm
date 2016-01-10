@@ -12,6 +12,7 @@ use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util qw(encode url_escape);
+use Mojo::WebSocket qw(challenge client_handshake);
 
 has generators => sub { {form => \&_form, json => \&_json} };
 has name => 'Mojolicious (Perl)';
@@ -128,7 +129,7 @@ sub upgrade {
   my $code = $tx->res->code // 0;
   return undef unless $tx->req->is_handshake && $code == 101;
   my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1);
-  return $ws->client_challenge ? $ws : undef;
+  return challenge($ws) ? $ws : undef;
 }
 
 sub websocket {
@@ -144,9 +145,7 @@ sub websocket {
   $url->scheme($proto eq 'wss' ? 'https' : 'http') if $proto;
 
   # Handshake
-  Mojo::Transaction::WebSocket->new(handshake => $tx)->client_handshake;
-
-  return $tx;
+  return client_handshake $tx;
 }
 
 sub _form {

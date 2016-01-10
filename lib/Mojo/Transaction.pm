@@ -16,7 +16,7 @@ sub connection {
   return $self->{connection};
 }
 
-sub delivered { shift->_state(qw(finished finish)) }
+sub delivered { shift->_state('finished')->emit('finish') }
 
 sub error { $_[0]->req->error || $_[0]->res->error }
 
@@ -38,15 +38,11 @@ sub remote_address {
     : $self->original_remote_address;
 }
 
-sub resume { shift->_state(qw(write resume)) }
+sub resume { shift->_state('write')->emit('resume') }
 
 sub success { $_[0]->error ? undef : $_[0]->res }
 
-sub _state {
-  my ($self, $state, $event) = @_;
-  $self->{state} = $state;
-  return $self->emit($event);
-}
+sub _state { $_[0]{state} = $_[1] and return $_[0] }
 
 1;
 

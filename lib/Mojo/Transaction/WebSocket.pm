@@ -104,9 +104,8 @@ sub send {
     $self->{write} .= build_frame $self->masked, @$msg;
   }
   else { $self->{write} .= $self->build_message($msg) }
-  $self->{state} = 'write';
 
-  return $self->emit('resume');
+  return $self->SUPER::resume;
 }
 
 sub with_compression {

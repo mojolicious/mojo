@@ -9,10 +9,8 @@ sub write {
   my $self = shift;
 
   # Client starts writing right away
-  my $server = $self->is_server;
-  my $tx     = $self->{tx};
-  $tx->{state} ||= 'write' unless $server;
-  return '' unless $tx->{state} eq 'write';
+  my $tx = $self->{tx};
+  $tx->{state} ||= 'write' unless my $server = $self->is_server;
 
   # Nothing written yet
   $tx->{$_} ||= 0 for qw(offset write);

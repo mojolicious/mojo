@@ -15,6 +15,8 @@ sub client_close { shift->server_close }
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
+sub completed { ++$_[0]{completed} and return $_[0] }
+
 sub connection {
   my $self = shift;
   return $self->emit(connection => $self->{connection} = shift) if @_;
@@ -23,7 +25,7 @@ sub connection {
 
 sub error { $_[0]->req->error || $_[0]->res->error }
 
-sub is_finished { (shift->{state} // '') eq 'finished' }
+sub is_finished { !!shift->{completed} }
 
 sub is_websocket {undef}
 
@@ -39,15 +41,14 @@ sub remote_address {
     : $self->original_remote_address;
 }
 
-sub resume       { shift->_state('write')->emit('resume') }
-sub server_close { shift->_state('finished')->emit('finish') }
+sub resume { ++$_[0]{writing} and return $_[0]->emit('resume') }
+
+sub server_close { shift->completed->emit('finish') }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
 sub success { $_[0]->error ? undef : $_[0]->res }
-
-sub _state { $_[0]{state} = $_[1] and return $_[0] }
 
 1;
 
@@ -182,6 +183,12 @@ Meant to be overloaded in a subclass.
 
 Write data client-side, used to implement user agents such as
 L<Mojo::UserAgent>. Meant to be overloaded in a subclass.
+
+=head2 completed
+
+  $tx = $tx->completed;
+
+Finalize transaction.
 
 =head2 connection
 

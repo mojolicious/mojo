@@ -29,7 +29,7 @@ sub client_read {
   return unless $res->parse($chunk)->is_finished;
 
   # Unexpected 1xx response
-  return $self->{state} = 'finished'
+  return $self->completed
     if !$res->is_status_class(100) || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);
   return if (my $leftovers = $res->content->leftovers) eq '';
@@ -71,7 +71,6 @@ sub server_read {
   # Parse request
   my $req = $self->req;
   $req->parse($chunk) unless $req->error;
-  $self->{state} ||= 'read';
 
   # Generate response
   $self->emit('request') if $req->is_finished && !$self->{handled}++;
@@ -89,10 +88,10 @@ sub _body {
   $self->{offset} += $written;
 
   # Delayed
-  $self->{state} = 'read' unless defined $buffer;
+  $self->{writing} = 0 unless defined $buffer;
 
   # Finished
-  $self->{state} = $finish ? 'finished' : 'read'
+  $finish ? $self->completed : ($self->{writing} = 0)
     if $self->{write} <= 0 || defined $buffer && $buffer eq '';
 
   return $buffer // '';
@@ -112,7 +111,7 @@ sub _headers {
     $self->{offset} = 0;
 
     # Response without body
-    if ($head && $self->is_empty) { $self->{state} = 'finished' }
+    if ($head && $self->is_empty) { $self->completed }
 
     # Body
     else {
@@ -144,8 +143,7 @@ sub _write {
   my ($self, $server) = @_;
 
   # Client starts writing right away
-  $self->{state} ||= 'write' unless $server;
-  return '' unless $self->{state} eq 'write';
+  return '' unless $server ? $self->{writing} : ($self->{writing} //= 1);
 
   # Nothing written yet
   $self->{$_} ||= 0 for qw(offset write);

@@ -106,8 +106,7 @@ sub send {
 }
 
 sub server_close {
-  my $self = shift;
-  $self->{state} = 'finished';
+  my $self = shift->completed;
   return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
 }
 
@@ -128,13 +127,9 @@ sub server_read {
 
 sub server_write {
   my $self = shift;
-
-  unless (length($self->{write} // '')) {
-    $self->{state} = $self->{finished} ? 'finished' : 'read';
-    $self->emit('drain');
-  }
-
-  return delete $self->{write} // '';
+  $self->emit('drain') if ($self->{write} //= '') eq '';
+  $self->completed if $self->{write} eq '' && $self->{finished};
+  return delete $self->{write};
 }
 
 sub with_compression {

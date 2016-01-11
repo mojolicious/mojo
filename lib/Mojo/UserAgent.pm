@@ -150,17 +150,13 @@ sub _connect_proxy {
 sub _connected {
   my ($self, $id) = @_;
 
-  # Inactivity timeout
   my $c      = $self->{connections}{$id};
   my $stream = $c->{ioloop}->stream($id)->timeout($self->inactivity_timeout);
-
-  # Store connection information in transaction
   my $tx     = $c->{tx}->connection($id);
   my $handle = $stream->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
 
-  # Start writing
   weaken $self;
   $tx->on(resume => sub { $self->_write($id) });
   $self->_write($id);
@@ -183,7 +179,7 @@ sub _connection {
   # CONNECT request to proxy required
   if (my $id = $self->_connect_proxy($loop, $tx, $cb)) { return $id }
 
-  # Connect
+  # New connection
   $id = $self->_connect($loop, 1, $tx, undef, \&_connected);
   warn "-- Connect $id ($proto://$host:$port)\n" if DEBUG;
   $self->{connections}{$id} = {cb => $cb, ioloop => $loop, tx => $tx};
@@ -218,14 +214,13 @@ sub _error {
 sub _finish {
   my ($self, $id, $close) = @_;
 
-  # Remove request timeout
+  # Remove request timeout and finish transaction
   return unless my $c = $self->{connections}{$id};
   $c->{ioloop}->remove($c->{timeout}) if $c->{timeout};
-
   return $self->_reuse($id, $close) unless my $old = $c->{tx};
   $old->client_close($close);
 
-  # Finish WebSocket
+  # Always remove connection for WebSockets
   return $self->_remove($id) if $old->is_websocket;
 
   $self->cookie_jar->collect($old);
@@ -238,7 +233,7 @@ sub _finish {
     return $new->client_read($old->res->content->leftovers);
   }
 
-  # Finish normal connection and handle redirects
+  # Finish connection and handle redirects
   $self->_reuse($id, $close);
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
 }
@@ -249,7 +244,6 @@ sub _read {
   # Corrupted connection
   return $self->_remove($id) unless my $tx = $self->{connections}{$id}{tx};
 
-  # Process incoming data
   warn term_escape "-- Client <<< Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $tx->client_read($chunk);
   $self->_finish($id) if $tx->is_finished;
@@ -314,7 +308,7 @@ sub _url { shift->req->url->to_abs }
 sub _write {
   my ($self, $id) = @_;
 
-  # Get and write chunk
+  # Protect from resume event recursion
   my $c = $self->{connections}{$id};
   return if !(my $tx = $c->{tx}) || $c->{writing}++;
   my $chunk = $tx->client_write;

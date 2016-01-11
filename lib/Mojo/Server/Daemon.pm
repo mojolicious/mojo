@@ -207,7 +207,7 @@ sub _listen {
 sub _read {
   my ($self, $id, $chunk) = @_;
 
-  # Make sure we have a transaction and parse chunk
+  # Make sure we have a transaction
   my $c = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
   warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
@@ -225,7 +225,7 @@ sub _url { shift->req->url->to_abs }
 sub _write {
   my ($self, $id) = @_;
 
-  # Get chunk and write
+  # Protect from resume event recursion
   my $c = $self->{connections}{$id};
   return if !(my $tx = $c->{tx}) || $c->{writing}++;
   my $chunk = $tx->server_write;

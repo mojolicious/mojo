@@ -10,7 +10,6 @@
     attribute.
   - Added SNI support to all built-in web servers. (bpmedley, sri)
   - Added module Mojo::WebSocket. (batman)
-  - Added next attribute to Mojo::Transaction::HTTP.
   - Updated jQuery to version 2.2.0.
   - Improve mtime attribute in Mojo::Asset::Memory to default to the value of
     $^T.

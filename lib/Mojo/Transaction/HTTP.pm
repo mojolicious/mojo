@@ -1,7 +1,7 @@
 package Mojo::Transaction::HTTP;
 use Mojo::Base 'Mojo::Transaction';
 
-has [qw(next previous)];
+has 'previous';
 
 sub client_close {
   my ($self, $close) = @_;
@@ -243,14 +243,6 @@ Emitted for unexpected C<1xx> responses that will be ignored.
 
 L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
 and implements the following new ones.
-
-=head2 next
-
-  my $next = $tx->next;
-  $tx      = $tx->next(Mojo::Transaction::WebSocket->new);
-
-Follow-up transaction for connections that get upgraded to a different protocol,
-usually a L<Mojo::Transaction::WebSocket> object.
 
 =head2 previous
 

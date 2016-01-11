@@ -85,9 +85,9 @@ sub _build_tx {
 
       # WebSocket
       if ($tx->req->is_handshake) {
-        my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx);
+        my $ws = $self->{connections}{$id}{next}
+          = Mojo::Transaction::WebSocket->new(handshake => $tx);
         $self->emit(request => server_handshake $ws);
-        $tx->next($ws->handshake(undef));
       }
 
       # HTTP
@@ -122,10 +122,10 @@ sub _finish {
   delete($c->{tx})->server_close;
 
   # Upgrade connection to WebSocket
-  if (my $ws = $tx->next) {
+  if (my $ws = delete $c->{next}) {
 
     # Successful upgrade
-    if ($ws->handshake($tx->next(undef))->res->code == 101) {
+    if ($ws->handshake->res->code == 101) {
       $c->{tx} = $ws;
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });

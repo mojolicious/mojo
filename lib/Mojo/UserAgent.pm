@@ -252,8 +252,7 @@ sub _read {
   # Process incoming data
   warn term_escape "-- Client <<< Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $tx->client_read($chunk);
-  if    ($tx->is_finished) { $self->_finish($id) }
-  elsif ($tx->is_writing)  { $self->_write($id) }
+  $self->_finish($id) if $tx->is_finished;
 }
 
 sub _redirect {
@@ -317,8 +316,7 @@ sub _write {
 
   # Get and write chunk
   my $c = $self->{connections}{$id};
-  return unless my $tx = $c->{tx};
-  return if !$tx->is_writing || $c->{writing}++;
+  return if $c->{writing}++ || !(my $tx = $c->{tx});
   my $chunk = $tx->client_write;
   delete $c->{writing};
   warn term_escape "-- Client >>> Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;

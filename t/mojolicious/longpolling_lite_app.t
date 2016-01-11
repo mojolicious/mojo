@@ -93,6 +93,18 @@ get '/longpoll/nolength' => sub {
   );
 };
 
+get '/longpoll/order' => sub {
+  my $c = shift;
+  $c->write_chunk(
+    'First, ' => sub {
+      my $c = shift;
+      $c->stash->{order} -= 1;
+      $c->write_chunk('second, ' => sub { shift->finish('third!') });
+    }
+  );
+  $c->stash->{order} = 2;
+};
+
 get '/longpoll/static' => sub {
   my $c = shift;
   $c->cookie(bar => 'baz');
@@ -245,6 +257,14 @@ $t->get_ok('/longpoll/nolength')->status_is(200)
   ->content_is('hi there, what length?');
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 
+# The drain event should be emitted on the next reactor tick
+$stash = undef;
+$t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
+$t->get_ok('/longpoll/order')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('First, second, third!');
+is $stash->{order}, 1, 'the drain event was emitted on the next reactor tick';
+
 # Static file with cookies and session
 $log = '';
 $cb = $t->app->log->on(message => sub { $log .= pop });
@@ -268,7 +288,6 @@ $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/stream')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('0123456789');
-Mojo::IOLoop->one_tick until $stash->{destroyed};
 is $stash->{subscribers}, 0, 'no leaking subscribers';
 ok $stash->{destroyed}, 'controller has been destroyed';
 

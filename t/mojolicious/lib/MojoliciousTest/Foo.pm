@@ -20,8 +20,8 @@ sub longpoll {
   my $self = shift;
   $self->on(finish => sub { shift->stash->{finished} = 1 });
   $self->write_chunk(
-    sub {
-      shift->write_chunk('Poll!' => sub { shift->write_chunk('') });
+    'P' => sub {
+      shift->write_chunk('oll!' => sub { shift->write_chunk('') });
     }
   );
 }

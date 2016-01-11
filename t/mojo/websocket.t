@@ -138,7 +138,7 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-Mojo::IOLoop->one_tick until exists $stash->{finished};
+Mojo::IOLoop->one_tick until $stash->{finished};
 is $stash->{finished}, 1, 'finish event has been emitted once';
 like $result, qr!test1test2ws://127\.0\.0\.1:\d+/!, 'right result';
 
@@ -199,6 +199,7 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
+Mojo::IOLoop->one_tick until $stash->{finished};
 is $stash->{handshake}, 1, 'finish event has been emitted once for handshake';
 is $stash->{finished},  1, 'finish event has been emitted once';
 ok !$ws, 'not a WebSocket';
@@ -216,6 +217,7 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
+Mojo::IOLoop->one_tick until $stash->{finished};
 is $stash->{finished}, 1, 'finish event has been emitted once';
 is $code,   101,          'right status';
 is $result, 'test0test1', 'right result';
@@ -385,6 +387,7 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
+Mojo::IOLoop->one_tick until $stash->{finished};
 is $stash->{finished}, 1, 'finish event has been emitted once';
 like $log, qr/Inactivity timeout/, 'right log message';
 app->log->unsubscribe(message => $msg);

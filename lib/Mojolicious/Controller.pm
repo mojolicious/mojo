@@ -347,14 +347,12 @@ sub validation {
 
 sub write {
   my ($self, $chunk, $cb) = @_;
-  ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
   $self->res->content->write($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
 }
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
-  ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
   my $content = $self->res->content;
   $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
@@ -944,7 +942,6 @@ excessively large, there's a 16MB limit by default.
   $c = $c->write;
   $c = $c->write('');
   $c = $c->write($bytes);
-  $c = $c->write(sub {...});
   $c = $c->write($bytes => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be invoked
@@ -998,7 +995,6 @@ defaults to C<15> seconds.
   $c = $c->write_chunk;
   $c = $c->write_chunk('');
   $c = $c->write_chunk($bytes);
-  $c = $c->write_chunk(sub {...});
   $c = $c->write_chunk($bytes => sub {...});
 
 Write dynamic content non-blocking with chunked transfer encoding, the optional

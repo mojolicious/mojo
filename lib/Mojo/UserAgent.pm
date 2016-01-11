@@ -316,12 +316,11 @@ sub _write {
 
   # Get and write chunk
   my $c = $self->{connections}{$id};
-  return if $c->{writing}++ || !(my $tx = $c->{tx});
+  return if !(my $tx = $c->{tx}) || $c->{writing}++;
   my $chunk = $tx->client_write;
   delete $c->{writing};
   warn term_escape "-- Client >>> Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   my $stream = $c->{ioloop}->stream($id)->write($chunk);
-  $self->_finish($id) if $tx->is_finished;
 
   # Continue writing
   return if $chunk eq '';

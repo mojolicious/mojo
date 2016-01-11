@@ -93,7 +93,13 @@ sub _build_tx {
       # HTTP
       else { $self->emit(request => $tx) }
 
+      # Last keep-alive request or corrupted connection
+      my $c = $self->{connections}{$id};
+      $tx->res->headers->connection('close')
+        if $c->{requests} >= $self->max_requests || $tx->req->error;
+
       $tx->on(resume => sub { $self->_write($id) });
+      $self->_write($id);
     }
   );
 
@@ -206,14 +212,6 @@ sub _read {
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
   warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
-
-  # Last keep-alive request or corrupted connection
-  $tx->res->headers->connection('close')
-    if $c->{requests} >= $self->max_requests || $tx->req->error;
-
-  # Finish or start writing
-  if    ($tx->is_finished) { $self->_finish($id) }
-  elsif ($tx->is_writing)  { $self->_write($id) }
 }
 
 sub _remove {
@@ -229,17 +227,17 @@ sub _write {
 
   # Get chunk and write
   my $c = $self->{connections}{$id};
-  return unless my $tx = $c->{tx};
-  return if !$tx->is_writing || $c->{writing}++;
+  return if !(my $tx = $c->{tx}) || $c->{writing}++;
   my $chunk = $tx->server_write;
   delete $c->{writing};
   warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   my $stream = $self->ioloop->stream($id)->write($chunk);
 
   # Finish or continue writing
-  my $next = '_write';
+  my $next = $chunk eq '' ? undef : '_write';
   $tx->has_subscribers('finish') ? ($next = '_finish') : $self->_finish($id)
     if $tx->is_finished;
+  return unless $next;
   weaken $self;
   $stream->write('' => sub { $self->$next($id) });
 }

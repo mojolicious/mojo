@@ -38,8 +38,7 @@ sub clone {
 sub generate_body_chunk {
   my ($self, $offset) = @_;
 
-  $self->emit(drain => $offset)
-    if !delete $self->{delay} && ($self->{body_buffer} // '') eq '';
+  $self->emit(drain => $offset) if ($self->{body_buffer} // '') eq '';
   my $chunk = delete $self->{body_buffer} // '';
   return $self->{eof} ? '' : undef if $chunk eq '';
 
@@ -148,8 +147,7 @@ sub write {
   my ($self, $chunk, $cb) = @_;
 
   $self->{dynamic} = 1;
-  if (defined $chunk) { $self->{body_buffer} .= $chunk }
-  else                { $self->{delay} = 1 }
+  $self->{body_buffer} .= $chunk if defined $chunk;
   $self->once(drain => $cb) if $cb;
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
 

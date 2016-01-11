@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/lib";
 use File::Spec::Functions 'catdir';
 use Mojo::Asset::File;
 use Mojo::Date;
+use Mojo::IOLoop;
 use Mojolicious;
 use Test::Mojo;
 
@@ -572,7 +573,8 @@ my $stash;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/longpoll')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Poll!');
-ok $stash->{finished},  'finish event has been emitted';
+Mojo::IOLoop->one_tick until $stash->{finished};
+is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
 
 # MojoliciousTest::Foo::config

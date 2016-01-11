@@ -181,8 +181,8 @@ get '/stream' => sub {
 
 get '/finished' => sub {
   my $c = shift;
-  $c->on(finish => sub { shift->stash->{finished} *= 2 });
-  $c->stash->{finished} = 1;
+  $c->on(finish => sub { shift->stash->{finished} -= 1 });
+  $c->stash->{finished} = 2;
   $c->render(text => 'so far so good!');
 };
 
@@ -667,7 +667,8 @@ my $stash;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/finished')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('so far so good!');
-is $stash->{finished}, 2, 'finish event has been emitted once';
+Mojo::IOLoop->one_tick until $stash->{finished};
+is $stash->{finished}, 1, 'finish event has been emitted once';
 
 # IRI
 $t->get_ok('/привет/мир')->status_is(200)

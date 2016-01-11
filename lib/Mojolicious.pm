@@ -127,7 +127,7 @@ sub handler {
 
   # Delayed response
   $self->log->debug('Nothing has been rendered, expecting delayed response')
-    unless $c->tx->is_writing;
+    unless $c->stash->{'mojo.rendered'};
 }
 
 sub helper { shift->renderer->add_helper(@_) }

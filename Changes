@@ -2,6 +2,7 @@
 6.40  2016-01-11
   - Removed client_challenge, client_handshake and server_handshake methods from
     Mojo::Transaction::WebSocket. (batman)
+  - Removed is_writing method from Mojo::Transaction.
   - Removed upgrade event from Mojo::Transaction::HTTP.
   - Deprecated Mojo::Transaction::WebSocket::build_frame and
     Mojo::Transaction::WebSocket::parse_frame in favor of
@@ -11,8 +12,10 @@
   - Added SNI support to all built-in web servers. (bpmedley, sri)
   - Added module Mojo::WebSocket. (batman)
   - Updated jQuery to version 2.2.0.
-  - Improve mtime attribute in Mojo::Asset::Memory to default to the value of
+  - Improved performance of Mojo::Server::Daemon and Mojo::UserAgent slightly.
+  - Improved mtime attribute in Mojo::Asset::Memory to default to the value of
     $^T.
+  - Fixed a few timing bugs.
   - Fixed url_for to handle fragments correctly.
 
 6.39  2016-01-03

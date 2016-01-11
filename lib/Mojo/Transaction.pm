@@ -27,8 +27,6 @@ sub is_finished { (shift->{state} // '') eq 'finished' }
 
 sub is_websocket {undef}
 
-sub is_writing { (shift->{state} // 'write') eq 'write' }
-
 sub remote_address {
   my $self = shift;
 
@@ -219,12 +217,6 @@ Check if transaction is finished.
   my $bool = $tx->is_websocket;
 
 False, this is not a L<Mojo::Transaction::WebSocket> object.
-
-=head2 is_writing
-
-  my $bool = $tx->is_writing;
-
-Check if transaction is writing.
 
 =head2 resume
 

@@ -87,17 +87,15 @@ sub _body {
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} = $msg->content->is_dynamic ? 1 : ($self->{write} - $written);
   $self->{offset} += $written;
-  if (defined $buffer) { delete $self->{delay} }
 
   # Delayed
-  elsif (delete $self->{delay}) { $self->{state} = 'read' }
-  else                          { $self->{delay} = 1 }
+  $self->{state} = 'read' unless defined $buffer;
 
   # Finished
   $self->{state} = $finish ? 'finished' : 'read'
     if $self->{write} <= 0 || defined $buffer && $buffer eq '';
 
-  return defined $buffer ? $buffer : '';
+  return $buffer // '';
 }
 
 sub _headers {

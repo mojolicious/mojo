@@ -209,7 +209,7 @@ sub _read {
 
   # Last keep-alive request or corrupted connection
   $tx->res->headers->connection('close')
-    if (($c->{requests} || 0) >= $self->max_requests) || $tx->req->error;
+    if $c->{requests} >= $self->max_requests || $tx->req->error;
 
   # Finish or start writing
   if    ($tx->is_finished) { $self->_finish($id) }

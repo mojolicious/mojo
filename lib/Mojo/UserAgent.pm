@@ -324,7 +324,7 @@ sub _write {
   $self->_finish($id) if $tx->is_finished;
 
   # Continue writing
-  return unless $tx->is_writing;
+  return if $chunk eq '';
   weaken $self;
   $stream->write('' => sub { $self->_write($id) });
 }

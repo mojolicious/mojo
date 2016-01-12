@@ -745,7 +745,7 @@ C<my_app> to follow the CPAN standard.
   $ mv myapp.pl script/my_app
 
 Just a few small details change, instead of L<lib> we now use L<FindBin> and
-C<@ISA>, allowing us to start the application from outside its home directory.
+C<@INC>, allowing us to start the application from outside its home directory.
 
   #!/usr/bin/env perl
 

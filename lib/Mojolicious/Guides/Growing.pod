@@ -744,6 +744,21 @@ C<my_app> to follow the CPAN standard.
   $ mkdir script
   $ mv myapp.pl script/my_app
 
+Just a few small details change, instead of L<lib> we now use L<FindBin> and
+C<@ISA>, allowing us to start the application from outside its home directory.
+
+  #!/usr/bin/env perl
+
+  use strict;
+  use warnings;
+
+  use FindBin;
+  BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+
+  # Start command line interface for application
+  require Mojolicious::Commands;
+  Mojolicious::Commands->start_app('MyApp');
+
 =head2 Simplified tests
 
 Full L<Mojolicious> applications are a little easier to test, so C<t/login.t>

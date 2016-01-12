@@ -1,5 +1,5 @@
 
-6.40  2016-01-11
+6.40  2016-01-12
   - Removed client_challenge, client_handshake and server_handshake methods from
     Mojo::Transaction::WebSocket. (batman)
   - Removed is_writing method from Mojo::Transaction.
@@ -16,6 +16,7 @@
   - Improved performance of Mojo::Server::Daemon and Mojo::UserAgent slightly.
   - Improved mtime attribute in Mojo::Asset::Memory to default to the value of
     $^T.
+  - Improved app generator command to generate more portable scripts.
   - Fixed a few timing bugs.
   - Fixed url_for to handle fragments correctly.
 

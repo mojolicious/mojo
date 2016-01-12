@@ -1,12 +1,7 @@
 package Mojo::Upload;
 use Mojo::Base -base;
 
-use Mojo::Asset::File;
-use Mojo::Headers;
-
-has asset => sub { Mojo::Asset::File->new };
-has [qw(filename name)];
-has headers => sub { Mojo::Headers->new };
+has [qw(asset filename headers name)];
 
 sub move_to { $_[0]->asset->move_to($_[1]) and return $_[0] }
 
@@ -57,7 +52,7 @@ Name of the uploaded file.
   my $headers = $upload->headers;
   $upload     = $upload->headers(Mojo::Headers->new);
 
-Headers for upload, defaults to a L<Mojo::Headers> object.
+Headers for upload, usually a L<Mojo::Headers> object.
 
 =head2 name
 

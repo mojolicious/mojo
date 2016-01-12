@@ -1,5 +1,5 @@
 
-6.40  2016-01-12
+6.40  2016-01-13
   - Removed client_challenge, client_handshake, server_handshake and server_open
     methods from Mojo::Transaction::WebSocket. (batman, sri)
   - Removed is_writing method from Mojo::Transaction.

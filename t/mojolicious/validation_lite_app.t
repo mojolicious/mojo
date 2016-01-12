@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+use Mojo::Asset::Memory;
 use Mojo::Upload;
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -143,8 +144,14 @@ is_deeply $validation->failed, ['baz'], 'right names';
 # Upload size
 $validation = $t->app->validation->input(
   {
-    foo => [Mojo::Upload->new->tap(sub { $_->asset->add_chunk('valid') })],
-    bar => [Mojo::Upload->new->tap(sub { $_->asset->add_chunk('not valid') })]
+    foo => [
+      Mojo::Upload->new(asset => Mojo::Asset::Memory->new->add_chunk('valid'))
+    ],
+    bar => [
+      Mojo::Upload->new(
+        asset => Mojo::Asset::Memory->new->add_chunk('not valid')
+      )
+    ]
   }
 );
 ok $validation->required('foo')->upload->size(1, 6)->is_valid, 'valid';

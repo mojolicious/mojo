@@ -5,13 +5,11 @@ use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
 use Config;
 use List::Util 'first';
 use Mojo::JSON qw(encode_json j);
-use Mojo::Transaction::HTTP;
 use Mojo::Util qw(decode deprecated encode trim);
 use Mojo::WebSocket
   qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT);
 
-has [qw(compressed established masked)];
-has handshake => sub { Mojo::Transaction::HTTP->new };
+has [qw(compressed established handshake masked)];
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
 # DEPRECATED in Clinking Beer Mugs!
@@ -362,8 +360,7 @@ WebSocket connection established.
   my $handshake = $ws->handshake;
   $ws           = $ws->handshake(Mojo::Transaction::HTTP->new);
 
-The original handshake transaction, defaults to a L<Mojo::Transaction::HTTP>
-object.
+The original handshake transaction, usually a L<Mojo::Transaction::HTTP> object.
 
 =head2 masked
 

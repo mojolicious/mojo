@@ -63,8 +63,7 @@ sub start {
 }
 
 sub websocket {
-  my $self = shift;
-  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my ($self, $cb) = (shift, pop);
   $self->start($self->build_websocket_tx(@_), $cb);
 }
 

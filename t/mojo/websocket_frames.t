@@ -242,6 +242,8 @@ is $frame->[2], 0, 'rsv2 flag is not set';
 is $frame->[3], 0, 'rsv3 flag is not set';
 is $frame->[4], 2, 'binary frame';
 ok $frame->[5], 'has payload';
+isnt $frame->[5], $compressed->build_message({binary => 'just works'})->[5],
+  'different payload';
 my $uncompressed = Mojo::Transaction::WebSocket->new;
 my $frame2 = $uncompressed->build_message({binary => 'just works'});
 is $frame2->[0], 1, 'fin flag is set';

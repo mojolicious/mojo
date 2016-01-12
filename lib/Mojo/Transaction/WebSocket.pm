@@ -64,8 +64,6 @@ sub finish {
   return $self;
 }
 
-sub is_established { !!shift->established }
-
 sub is_websocket {1}
 
 sub kept_alive    { shift->handshake->kept_alive }
@@ -98,7 +96,7 @@ sub send {
   $self->once(drain => $cb) if $cb;
   $msg = $self->build_message($msg) unless ref $msg eq 'ARRAY';
   $self->{write} .= Mojo::WebSocket::build_frame($self->masked, @$msg);
-  return $self->SUPER::resume;
+  return $self->emit('resume');
 }
 
 sub server_close {
@@ -317,6 +315,15 @@ least one subscriber.
     say "Message: $msg";
   });
 
+=head2 resume
+
+  $tx->on(resume => sub {
+    my $tx = shift;
+    ...
+  });
+
+Emitted when transaction is resumed.
+
 =head2 text
 
   $ws->on(text => sub {
@@ -413,12 +420,6 @@ Connection identifier.
   $ws = $ws->finish(1003 => 'Cannot accept data!');
 
 Close WebSocket connection gracefully.
-
-=head2 is_established
-
- my $bool = $ws->is_established;
-
-Check if WebSocket connection has been established yet.
 
 =head2 is_websocket
 

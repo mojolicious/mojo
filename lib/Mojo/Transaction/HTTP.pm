@@ -65,6 +65,8 @@ sub redirects {
   return \@redirects;
 }
 
+sub resume { ++$_[0]{writing} and return $_[0]->emit('resume') }
+
 sub server_read {
   my ($self, $chunk) = @_;
 
@@ -221,6 +223,15 @@ Emitted when a request is ready and needs to be handled.
     $tx->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
   });
 
+=head2 resume
+
+  $tx->on(resume => sub {
+    my $tx = shift;
+    ...
+  });
+
+Emitted when transaction is resumed.
+
 =head2 unexpected
 
   $tx->on(unexpected => sub {
@@ -299,6 +310,12 @@ transaction.
 
   # Paths of all previous requests
   say $_->req->url->path for @{$tx->redirects};
+
+=head2 resume
+
+  $tx = $tx->resume;
+
+Resume transaction.
 
 =head2 server_read
 

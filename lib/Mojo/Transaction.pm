@@ -41,8 +41,6 @@ sub remote_address {
     : $self->original_remote_address;
 }
 
-sub resume { ++$_[0]{writing} and return $_[0]->emit('resume') }
-
 sub server_close { shift->completed->emit('finish') }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
@@ -95,15 +93,6 @@ Emitted when a connection has been assigned to transaction.
   });
 
 Emitted when transaction is finished.
-
-=head2 resume
-
-  $tx->on(resume => sub {
-    my $tx = shift;
-    ...
-  });
-
-Emitted when transaction is resumed.
 
 =head1 ATTRIBUTES
 
@@ -224,12 +213,6 @@ Check if transaction is finished.
   my $bool = $tx->is_websocket;
 
 False, this is not a L<Mojo::Transaction::WebSocket> object.
-
-=head2 resume
-
-  $tx = $tx->resume;
-
-Resume transaction.
 
 =head2 remote_address
 

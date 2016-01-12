@@ -233,7 +233,7 @@ ok !ref $frame, 'not a reference';
 is parse_frame(\($dummy = "\x82\x05\x77\x6f\x72\x6b"), 262144), undef,
   'incomplete frame';
 
-# Compressed binary message roundtrip
+# Compressed binary message
 my $compressed = Mojo::Transaction::WebSocket->new({compressed => 1});
 $frame = $compressed->build_message({binary => 'just works'});
 is $frame->[0], 1, 'fin flag is set';
@@ -242,8 +242,9 @@ is $frame->[2], 0, 'rsv2 flag is not set';
 is $frame->[3], 0, 'rsv3 flag is not set';
 is $frame->[4], 2, 'binary frame';
 ok $frame->[5], 'has payload';
-isnt $frame->[5], $compressed->build_message({binary => 'just works'})->[5],
-  'different payload';
+my $payload = $compressed->build_message({binary => 'just works'})->[5];
+isnt $frame->[5], $payload, 'different payload';
+ok length $frame->[5] > length $payload, 'payload is smaller';
 my $uncompressed = Mojo::Transaction::WebSocket->new;
 my $frame2 = $uncompressed->build_message({binary => 'just works'});
 is $frame2->[0], 1, 'fin flag is set';

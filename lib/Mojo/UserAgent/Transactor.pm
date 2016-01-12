@@ -129,7 +129,7 @@ sub upgrade {
   my $code = $tx->res->code // 0;
   return undef unless $tx->req->is_handshake && $code == 101;
   my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1);
-  return challenge($ws) ? $ws : undef;
+  return challenge($ws) ? $ws->established(1) : undef;
 }
 
 sub websocket {

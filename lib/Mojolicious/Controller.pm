@@ -107,7 +107,7 @@ sub finish {
 
   # WebSocket
   my $tx = $self->tx;
-  $tx->finish(@_) and return $tx->is_established ? $self : $self->rendered(101)
+  $tx->finish(@_) and return $tx->established ? $self : $self->rendered(101)
     if $tx->is_websocket;
 
   # Chunked stream
@@ -138,7 +138,7 @@ sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 sub on {
   my ($self, $name, $cb) = @_;
   my $tx = $self->tx;
-  $self->rendered(101) if $tx->is_websocket && !$tx->is_established;
+  $self->rendered(101) if $tx->is_websocket && !$tx->established;
   return $tx->on($name => sub { shift; $self->$cb(@_) });
 }
 
@@ -252,7 +252,7 @@ sub send {
   Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
   $tx->send($msg, $cb ? sub { shift; $self->$cb(@_) } : ());
-  return $tx->is_established ? $self : $self->rendered(101);
+  return $tx->established ? $self : $self->rendered(101);
 }
 
 sub session {

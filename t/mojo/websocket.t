@@ -47,11 +47,11 @@ get '/something/else' => sub {
 
 websocket '/early_start' => sub {
   my $c = shift;
-  $c->send('test' . ($c->tx->is_established ? 1 : 0));
+  $c->send('test' . ($c->tx->established ? 1 : 0));
   $c->on(
     message => sub {
       my ($c, $msg) = @_;
-      $c->send("${msg}test" . ($c->tx->is_established ? 1 : 0));
+      $c->send("${msg}test" . ($c->tx->established ? 1 : 0));
       $c->finish(1000 => 'I ♥ Mojolicious!');
     }
   );
@@ -164,7 +164,7 @@ my ($established, $status, $msg);
 $ua->websocket(
   '/early_start' => sub {
     my ($ua, $tx) = @_;
-    $established = $tx->is_established;
+    $established = $tx->established;
     $tx->on(
       finish => sub {
         my ($tx, $code, $reason) = @_;

@@ -132,10 +132,9 @@ sub _finish {
 
     # Successful upgrade
     if ($ws->handshake->res->code == 101) {
-      $c->{tx} = $ws;
+      $c->{tx} = $ws->established(1);
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
-      $ws->server_open;
     }
 
     # Failed upgrade

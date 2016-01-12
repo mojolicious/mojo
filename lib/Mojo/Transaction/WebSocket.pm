@@ -10,7 +10,7 @@ use Mojo::Util qw(decode deprecated encode trim);
 use Mojo::WebSocket
   qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT);
 
-has [qw(compressed masked)];
+has [qw(compressed established masked)];
 has handshake => sub { Mojo::Transaction::HTTP->new };
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
@@ -64,7 +64,7 @@ sub finish {
   return $self;
 }
 
-sub is_established { !!shift->{open} }
+sub is_established { !!shift->established }
 
 sub is_websocket {1}
 
@@ -105,8 +105,6 @@ sub server_close {
   my $self = shift->completed;
   return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
 }
-
-sub server_open { shift->{open}++ }
 
 sub server_read {
   my ($self, $chunk) = @_;
@@ -345,6 +343,13 @@ L<Mojo::Transaction> and implements the following new ones.
 
 Compress messages with C<permessage-deflate> extension.
 
+=head2 established
+
+  my $bool = $ws->established;
+  $ws      = $ws->established($bool);
+
+WebSocket connection established.
+
 =head2 handshake
 
   my $handshake = $ws->handshake;
@@ -507,13 +512,6 @@ will be invoked once all data has been written.
 
 Transaction closed server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>.
-
-=head2 server_open
-
-  $ws->server_open;
-
-WebSocket connection established server-side, used to implement web servers such
-as L<Mojo::Server::Daemon>.
 
 =head2 server_read
 

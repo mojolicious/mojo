@@ -11,6 +11,7 @@
     attribute.
   - Added SNI support to all built-in web servers. (bpmedley, sri)
   - Added module Mojo::WebSocket. (batman)
+  - Added established attribute to Mojo::Transaction::WebSocket.
   - Added completed method to Mojo::Transaction.
   - Updated jQuery to version 2.2.0.
   - Improved performance of Mojo::Server::Daemon and Mojo::UserAgent slightly.

@@ -59,7 +59,7 @@ sub finish {
   my $payload = $close->[0] ? pack('n', $close->[0]) : '';
   $payload .= encode 'UTF-8', $close->[1] if defined $close->[1];
   $close->[0] //= 1005;
-  $self->send([1, 0, 0, 0, WS_CLOSE, $payload])->{finished} = 1;
+  $self->send([1, 0, 0, 0, WS_CLOSE, $payload])->{closing} = 1;
 
   return $self;
 }
@@ -124,7 +124,7 @@ sub server_read {
 sub server_write {
   my $self = shift;
   $self->emit('drain') if ($self->{write} //= '') eq '';
-  $self->completed if $self->{write} eq '' && $self->{finished};
+  $self->completed if $self->{write} eq '' && $self->{closing};
   return delete $self->{write};
 }
 

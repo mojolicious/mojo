@@ -34,8 +34,7 @@ sub build_message {
   else { $frame = [1, 0, 0, 0, WS_BINARY, $frame->{binary}] }
 
   # "permessage-deflate" extension
-  return Mojo::WebSocket::build_frame($self->masked, @$frame)
-    unless $self->compressed;
+  return $frame unless $self->compressed;
   my $deflate = $self->{deflate} ||= Compress::Raw::Zlib::Deflate->new(
     AppendOutput => 1,
     MemLevel     => 8,
@@ -44,7 +43,8 @@ sub build_message {
   $deflate->deflate($frame->[5], my $out);
   $deflate->flush($out, Z_SYNC_FLUSH);
   @$frame[1, 5] = (1, substr($out, 0, length($out) - 4));
-  return Mojo::WebSocket::build_frame($self->masked, @$frame);
+
+  return $frame;
 }
 
 sub client_read  { shift->server_read(@_) }
@@ -95,13 +95,9 @@ sub resume { $_[0]->handshake->resume and return $_[0] }
 
 sub send {
   my ($self, $msg, $cb) = @_;
-
   $self->once(drain => $cb) if $cb;
-  if (ref $msg eq 'ARRAY') {
-    $self->{write} .= Mojo::WebSocket::build_frame($self->masked, @$msg);
-  }
-  else { $self->{write} .= $self->build_message($msg) }
-
+  $msg = $self->build_message($msg) unless ref $msg eq 'ARRAY';
+  $self->{write} .= Mojo::WebSocket::build_frame($self->masked, @$msg);
   return $self->SUPER::resume;
 }
 
@@ -379,10 +375,10 @@ and implements the following new ones.
 
 =head2 build_message
 
-  my $bytes = $ws->build_message({binary => $bytes});
-  my $bytes = $ws->build_message({text   => $bytes});
-  my $bytes = $ws->build_message({json   => {test => [1, 2, 3]}});
-  my $bytes = $ws->build_message($chars);
+  my $frame = $ws->build_message({binary => $bytes});
+  my $frame = $ws->build_message({text   => $bytes});
+  my $frame = $ws->build_message({json   => {test => [1, 2, 3]}});
+  my $frame = $ws->build_message($chars);
 
 Build WebSocket message.
 

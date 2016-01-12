@@ -234,16 +234,24 @@ is parse_frame(\($dummy = "\x82\x05\x77\x6f\x72\x6b"), 262144), undef,
   'incomplete frame';
 
 # Compressed binary message roundtrip
-my $ws = Mojo::Transaction::WebSocket->new({compressed => 1});
-$bytes = $ws->build_message({binary => 'just works'});
-$frame = parse_frame \($dummy = $bytes), 262144;
+my $compressed = Mojo::Transaction::WebSocket->new({compressed => 1});
+$frame = $compressed->build_message({binary => 'just works'});
 is $frame->[0], 1, 'fin flag is set';
 is $frame->[1], 1, 'rsv1 flag is set';
 is $frame->[2], 0, 'rsv2 flag is not set';
 is $frame->[3], 0, 'rsv3 flag is not set';
 is $frame->[4], 2, 'binary frame';
 ok $frame->[5], 'has payload';
-isnt(Mojo::Transaction::WebSocket->new->build_message({binary => 'just works'}),
-  $bytes, 'messages are not equal');
+my $uncompressed = Mojo::Transaction::WebSocket->new;
+my $frame2 = $uncompressed->build_message({binary => 'just works'});
+is $frame2->[0], 1, 'fin flag is set';
+is $frame2->[1], 0, 'rsv1 flag is set';
+is $frame2->[2], 0, 'rsv2 flag is not set';
+is $frame2->[3], 0, 'rsv3 flag is not set';
+is $frame2->[4], 2, 'binary frame';
+ok $frame2->[5], 'has payload';
+isnt $frame->[5], $frame2->[5], 'different payload';
+is $frame2->[5], $uncompressed->build_message({binary => 'just works'})->[5],
+  'same payload';
 
 done_testing();

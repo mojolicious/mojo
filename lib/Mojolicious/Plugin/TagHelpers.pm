@@ -224,7 +224,7 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::TagHelpers> is a collection of HTML tag helpers for
-L<Mojolicious> based on the
+L<Mojolicious>, based on the
 L<HTML Living Standard|https://html.spec.whatwg.org>.
 
 Most form helpers can automatically pick up previous input values and will show

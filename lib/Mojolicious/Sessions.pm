@@ -66,7 +66,7 @@ sub store {
 
 =head1 NAME
 
-Mojolicious::Sessions - Signed cookie based session manager
+Mojolicious::Sessions - Session manager based on signed cookies
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ Mojolicious::Sessions - Signed cookie based session manager
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Sessions> manages simple signed cookie based sessions for
+L<Mojolicious::Sessions> manages sessions based on signed cookies for
 L<Mojolicious>. All data gets serialized with L<Mojo::JSON> and stored Base64
 encoded on the client-side, but is protected from unwanted changes with a
 HMAC-SHA1 signature.

@@ -312,8 +312,8 @@ Mojo::DOM::CSS - CSS selector engine
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::CSS> is the CSS selector engine used by L<Mojo::DOM> and based on
-the L<HTML Living Standard|https://html.spec.whatwg.org> as well as
+L<Mojo::DOM::CSS> is the CSS selector engine used by L<Mojo::DOM>, based on the
+L<HTML Living Standard|https://html.spec.whatwg.org> and
 L<Selectors Level 3|http://www.w3.org/TR/css3-selectors/>.
 
 =head1 SELECTORS

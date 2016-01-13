@@ -91,7 +91,7 @@ Mojo::Date - HTTP date
 
 =head1 DESCRIPTION
 
-L<Mojo::Date> implements HTTP date and time functions based on
+L<Mojo::Date> implements HTTP date and time functions, based on
 L<RFC 7230|http://tools.ietf.org/html/rfc7230>,
 L<RFC 7231|http://tools.ietf.org/html/rfc7231> and
 L<RFC 3339|http://tools.ietf.org/html/rfc3339>.

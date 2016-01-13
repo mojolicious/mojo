@@ -208,8 +208,8 @@ variable to change this value.
 The L<Mojolicious> user agent and web servers are based on an event loop that
 supports multiple reactor backends. One of these backends is L<EV>, it is very
 fast and will be automatically used if possible. On Windows however, the
-C<ithreads> based C<fork()> emulation can interfere with it, and you may have
-to use the C<MOJO_REACTOR> environment variable to enforce a more portable one.
+C<ithreads>-based C<fork()> emulation can interfere with it, and you may have to
+use the C<MOJO_REACTOR> environment variable to enforce a more portable one.
 
   MOJO_REACTOR=Mojo::Reactor::Poll
 

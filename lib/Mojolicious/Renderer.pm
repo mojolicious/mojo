@@ -308,7 +308,7 @@ C<html>.
   my $default = $renderer->default_handler;
   $renderer   = $renderer->default_handler('ep');
 
-The default template handler to use for rendering in cases where auto detection
+The default template handler to use for rendering in cases where auto-detection
 doesn't work, like for C<inline> templates.
 
 =head2 encoding

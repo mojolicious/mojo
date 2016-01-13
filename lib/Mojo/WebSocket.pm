@@ -183,7 +183,8 @@ Mojo::WebSocket - The WebSocket Protocol
 =head1 DESCRIPTION
 
 L<Mojo::WebSocket> implements the WebSocket protocol as described in
-L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
+L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64-bit frames require
+a Perl with support for quads or they are limited to 32-bit.
 
 =head1 FUNCTIONS
 

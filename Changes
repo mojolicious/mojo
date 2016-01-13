@@ -2703,7 +2703,7 @@
   - Removed profile helper.
   - Removed CSS4 selector subject support from Mojo::DOM::CSS until we actually
     know the exact semantics.
-  - Improved Mojo::ByteStream to generate most Mojo::Util based methods
+  - Improved Mojo::ByteStream to generate most Mojo::Util-based methods
     automatically.
   - Fixed route pattern bug.
   - Fixed bug in "user_agent.t".
@@ -3810,7 +3810,7 @@
     arguments are now localized.
   - Relaxed Mojo::Server::CGI read timeout.
   - Fixed ioloop timers to actually work.
-  - Fixed PSGI environment auto detection and removed .psgi file generator
+  - Fixed PSGI environment auto-detection and removed .psgi file generator
     since it has become obsolete.
   - Fixed Mojolicious sessions to remove the session cookie immediately if it's
     not needed anymore. (ask)
@@ -3829,7 +3829,7 @@
       my $tx = $client->post_form('http://kraih.com', {q => 'mojo'});
   - Made plugins much more configurable.
   - Improved PSGI support and added psgi command.
-  - Added automatic environment detection for Plack based servers, there is no
+  - Added automatic environment detection for Plack-based servers, there is no
     technical way to detect all PSGI compliant servers yet though. That means
     "plackup myapp.pl" and "plackup script/my_app" should just work.
   - Added session and flash helpers.
@@ -3856,7 +3856,7 @@
   - Added template detection again, you can now just mix multiple template
     engines and the renderer will automatically pick the right template. So you
     don't have to use the handler argument anymore, even though it's still
-    available and overrides auto detection.
+    available and overrides auto-detection.
   - Added Flash Policy Server example. (xantus)
   - Added more reference docs.
   - Added ".gitignore" generator command. (marcus)

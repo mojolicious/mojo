@@ -1013,8 +1013,8 @@ nodes), placing it as the last children of the first innermost element.
   my $bool = $dom->xml;
   $dom     = $dom->xml($bool);
 
-Disable HTML semantics in parser and activate case-sensitivity, defaults to auto
-detection based on XML declarations.
+Disable HTML semantics in parser and activate case-sensitivity, defaults to
+auto-detection based on XML declarations.
 
 =head1 OPERATORS
 

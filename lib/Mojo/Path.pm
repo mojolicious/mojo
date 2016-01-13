@@ -145,7 +145,7 @@ Mojo::Path - Path
 
 =head1 DESCRIPTION
 
-L<Mojo::Path> is a container for paths used by L<Mojo::URL> and based on
+L<Mojo::Path> is a container for paths used by L<Mojo::URL>, based on
 L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
 
 =head1 ATTRIBUTES

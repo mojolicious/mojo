@@ -61,7 +61,7 @@ Mojolicious::Command::prefork - Prefork command
     -h, --help                           Show this summary of available options
         --home <path>                    Path to home directory of your
                                          application, defaults to the value of
-                                         MOJO_HOME or auto detection
+                                         MOJO_HOME or auto-detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or 15
     -l, --listen <location>              One or more locations you want to

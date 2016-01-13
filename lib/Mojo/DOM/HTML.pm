@@ -283,8 +283,8 @@ Mojo::DOM::HTML - HTML/XML engine
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM> and based on the
-L<HTML Living Standard|https://html.spec.whatwg.org> as well as the
+L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM>, based on the
+L<HTML Living Standard|https://html.spec.whatwg.org> and the
 L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/xml/>.
 
 =head1 ATTRIBUTES
@@ -304,8 +304,8 @@ carefully since it is very dynamic.
   my $bool = $html->xml;
   $html    = $html->xml($bool);
 
-Disable HTML semantics in parser and activate case-sensitivity, defaults to auto
-detection based on XML declarations.
+Disable HTML semantics in parser and activate case-sensitivity, defaults to
+auto-detection based on XML declarations.
 
 =head1 METHODS
 

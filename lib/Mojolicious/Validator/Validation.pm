@@ -280,7 +280,7 @@ L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
   $validation->optional('baz')->in(qw(test 123));
 
   # Longer version
-  $validation->required('foo')->check('size', 2,5)->check('like', qr/^[A-Z]/);
+  $validation->required('foo')->check('size', 2, 5)->check('like', qr/^[A-Z]/);
 
 =head1 SEE ALSO
 

@@ -107,7 +107,8 @@ These filters are available by default.
 
   $validation = $validation->filter('trim');
 
-Trim whitespace characters from both ends of string value.
+Trim whitespace characters from both ends of string value with
+L<Mojo::Util/"trim">.
 
 =head1 ATTRIBUTES
 

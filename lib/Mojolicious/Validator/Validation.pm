@@ -57,6 +57,22 @@ sub every_param {
 
 sub failed { [sort keys %{shift->{error}}] }
 
+sub filter {
+  my ($self, $filter) = (shift, shift);
+
+  return $self unless my $cb = $self->validator->filters->{$filter};
+  return $self unless defined(my $name = $self->topic);
+  my $output = $self->output;
+  return $self unless defined(my $value = $output->{$name});
+
+  $output->{$name}
+    = ref $value eq 'ARRAY'
+    ? [map { $self->$cb($name, $_, @_) } @$value]
+    : $self->$cb($name, $value, @_);
+
+  return $self;
+}
+
 sub has_data { !!keys %{shift->input} }
 
 sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
@@ -195,6 +211,12 @@ Return a list of all names for values that failed validation.
 
   # Names of all values that failed
   say for @{$validation->failed};
+
+=head2 filter
+
+  $validation = $validation->filter('trim');
+
+Filter all values of the current L</"topic">.
 
 =head2 has_data
 

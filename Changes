@@ -1,5 +1,9 @@
 
 6.41  2016-01-14
+  - Added support for validation filters.
+  - Added filters attribute to Mojolicious::Validator.
+  - Added add_filter method to Mojolicious::Validator.
+  - Added filter method to Mojolicious::Validator::Validation.
 
 6.40  2016-01-13
   - Removed client_challenge, client_handshake, server_handshake and server_open

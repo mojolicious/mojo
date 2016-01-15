@@ -375,6 +375,7 @@ Register a handler.
   $renderer->add_handler(foo => sub {
     my ($renderer, $c, $output, $options) = @_;
     ...
+    $$output = 'Hello World!';
   });
 
 =head2 add_helper

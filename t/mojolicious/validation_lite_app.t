@@ -238,6 +238,22 @@ like $@, qr/^Can't locate object method "missing" via package "$package"/,
 eval { Mojolicious::Validator::Validation::missing() };
 like $@, qr/^Undefined subroutine &${package}::missing called/, 'right error';
 
+# Missing check and filter
+eval {
+  $t->app->validation->input({foo => 1})->optional('foo')->check('missing');
+};
+like $@, qr/^Unknown check "missing"/, 'right error';
+
+# Missing check and filter
+eval {
+  $t->app->validation->input({foo => 1})->optional('foo')->check('missing');
+};
+like $@, qr/^Unknown check "missing"/, 'right error';
+eval {
+  $t->app->validation->input({foo => 1})->optional('foo')->filter('missing');
+};
+like $@, qr/^Unknown filter "missing"/, 'right error';
+
 # No validation
 $t->get_ok('/')->status_is(200)->element_exists_not('div:root')
   ->text_is('label[for="foo"]' => '<Foo>')

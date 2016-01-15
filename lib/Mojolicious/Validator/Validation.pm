@@ -23,7 +23,8 @@ sub check {
 
   return $self unless $self->is_valid;
 
-  my $cb     = $self->validator->checks->{$check};
+  Carp::croak qq{Unknown check "$check"}
+    unless my $cb = $self->validator->checks->{$check};
   my $name   = $self->topic;
   my $values = $self->output->{$name};
   for my $value (ref $values eq 'ARRAY' ? @$values : $values) {
@@ -60,9 +61,9 @@ sub failed { [sort keys %{shift->{error}}] }
 sub filter {
   my ($self, $filter) = (shift, shift);
 
-  return $self unless my $cb = $self->validator->filters->{$filter};
-  return $self unless defined(my $name = $self->topic);
-  my $output = $self->output;
+  Carp::croak qq{Unknown filter "$filter"}
+    unless my $cb = $self->validator->filters->{$filter};
+  my ($name, $output) = ($self->topic, $self->output);
   return $self unless defined(my $value = $output->{$name});
 
   $output->{$name}

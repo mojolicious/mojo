@@ -133,11 +133,23 @@ implements the following new ones.
 
 Register a validation check.
 
+  $validator->add_check(foo => sub {
+    my ($validation, $name, $value, @args) = @_;
+    ...
+    return undef;
+  });
+
 =head2 add_filter
 
   $validator = $validator->add_filter(trim => sub {...});
 
 Register a new filter.
+
+  $validator->add_filter(foo => sub {
+    my ($validation, $name, $value, @args) = @_;
+    ...
+    return $value;
+  });
 
 =head2 validation
 

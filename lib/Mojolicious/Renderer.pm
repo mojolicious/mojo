@@ -372,11 +372,21 @@ C<XMLHttpRequest>.
 
 Register a handler.
 
+  $renderer->add_handler(foo => sub {
+    my ($renderer, $c, $output, $options) = @_;
+    ...
+  });
+
 =head2 add_helper
 
   $renderer = $renderer->add_helper(url_for => sub {...});
 
 Register a helper.
+
+  $renderer->add_helper(foo => sub {
+    my ($c, @args) = @_;
+    ...
+  });
 
 =head2 get_data_template
 

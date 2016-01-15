@@ -328,6 +328,11 @@ implements the following new ones.
 
 Register a content generator.
 
+  $t->add_generator(foo => sub {
+    my ($t, $tx, @args) = @_;
+    ...
+  });
+
 =head2 endpoint
 
   my ($proto, $host, $port) = $t->endpoint(Mojo::Transaction::HTTP->new);

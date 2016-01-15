@@ -290,11 +290,22 @@ and implements the following new ones.
 
 Register a condition.
 
+  $r->add_condition(foo => sub {
+    my ($route, $c, $captures, $arg) = @_;
+    ...
+    return 1;
+  });
+
 =head2 add_shortcut
 
   $r = $r->add_shortcut(foo => sub {...});
 
 Register a shortcut.
+
+  $r->add_shortcut(foo => sub {
+    my ($route, @args) = @_;
+    ...
+  });
 
 =head2 continue
 

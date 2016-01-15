@@ -114,8 +114,8 @@ sub tx {
 
   # Generator
   if (@_ > 1) {
-    return $tx unless my $generator = $self->generators->{shift()};
-    $self->$generator($tx, @_);
+    my $cb = $self->generators->{shift()};
+    $self->$cb($tx, @_);
   }
 
   # Body

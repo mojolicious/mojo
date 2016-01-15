@@ -4,8 +4,6 @@
   - Added filters attribute to Mojolicious::Validator.
   - Added add_filter method to Mojolicious::Validator.
   - Added filter method to Mojolicious::Validator::Validation.
-  - Improved check method in Mojolicious::Validator::Validation to die more
-    gracefully if a check is missing.
 
 6.40  2016-01-13
   - Removed client_challenge, client_handshake, server_handshake and server_open

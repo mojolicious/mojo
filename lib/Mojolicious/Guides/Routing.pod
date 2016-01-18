@@ -302,6 +302,10 @@ ones.
   $cats->get('/nyan')->to(action => 'nyan');
   $cats->get('/lol');
 
+With a few common prefixes you can also greatly improve the routing performance
+of applications with many routes, because children are only tried if the prefix
+matched first.
+
 =head2 Special stash values
 
 When the dispatcher sees C<controller> and C<action> values in the stash it

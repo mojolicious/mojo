@@ -156,7 +156,7 @@ Most commonly used features every L<Mojolicious> developer should know about.
 =head2 Minimal route
 
 The attribute L<Mojolicious/"routes"> contains a router you can use to generate
-route structures, they match in the same order in which they were defined.
+route structures.
 
   # Application
   package MyApp;
@@ -175,7 +175,9 @@ route structures, they match in the same order in which they were defined.
   1;
 
 The minimal route above will load and instantiate the class
-C<MyApp::Controller::Foo> and call its C<welcome> method.
+C<MyApp::Controller::Foo> and call its C<welcome> method. Routes are usually
+configured in the C<startup> method of the application class, but the router can
+be accessed from everywhere (even at runtime).
 
   # Controller
   package MyApp::Controller::Foo;
@@ -191,8 +193,11 @@ C<MyApp::Controller::Foo> and call its C<welcome> method.
 
   1;
 
-Routes are usually configured in the C<startup> method of the application
-class, but the router can be accessed from everywhere (even at runtime).
+All routes match in the same order in which they were defined, and matching
+stops as soon as a suitable route has been found. So you can improve the routing
+performance by declaring your most frequently accessed routes first. A routing
+cache will also be used automatically to handle sudden traffic spikes more
+gracefully.
 
 =head2 Routing destination
 

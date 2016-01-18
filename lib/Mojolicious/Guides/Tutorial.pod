@@ -7,7 +7,7 @@ Mojolicious::Guides::Tutorial - Tutorial
 
 =head1 TUTORIAL
 
-A quick example driven introduction to the wonders of L<Mojolicious::Lite>.
+A quick example-driven introduction to the wonders of L<Mojolicious::Lite>.
 Almost everything you'll learn here also applies to full L<Mojolicious>
 applications.
 

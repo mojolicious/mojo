@@ -29,7 +29,7 @@ websocket '/no_compression' => sub {
 
 websocket '/protocols' => sub {
   my $c = shift;
-  $c->send($c->tx->with_protocols('foo', 'bar', 'baz') // 'none');
+  $c->send($c->tx->with_protocols('foo', 'bar', 'baz', '0') // 'none');
   $c->send($c->tx->protocol // 'none');
 };
 
@@ -224,6 +224,11 @@ $t->websocket_ok('/protocols' => ['baz', 'bar', 'foo'])
   ->message_ok->message_is('foo')->message_ok->message_is('foo')->finish_ok;
 is $t->tx->protocol, 'foo', 'right protocol';
 is $t->tx->res->headers->sec_websocket_protocol, 'foo',
+  'right "Sec-WebSocket-Protocol" value';
+$t->websocket_ok('/protocols' => ['0'])->message_ok->message_is('0')
+  ->message_ok->message_is('0')->finish_ok;
+is $t->tx->protocol, '0', 'right protocol';
+is $t->tx->res->headers->sec_websocket_protocol, '0',
   'right "Sec-WebSocket-Protocol" value';
 $t->websocket_ok('/protocols' => [''])->message_ok->message_is('none')
   ->message_ok->message_is('none')->finish_ok;

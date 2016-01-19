@@ -224,8 +224,8 @@ to the next step or L</"finish"> event.
 
   my $hash = $delay->data;
   my $foo  = $delay->data('foo');
-  $delay   = $delay->data({foo => 'bar'});
-  $delay   = $delay->data(foo => 'bar');
+  $delay   = $delay->data({foo => 'bar', baz => 23});
+  $delay   = $delay->data(foo => 'bar', baz => 23);
 
 Data shared between all L</"steps">.
 

@@ -115,8 +115,8 @@ Transaction builder, defaults to building a L<Mojo::Transaction::HTTP> object.
 
   my $hash = $app->config;
   my $foo  = $app->config('foo');
-  $app     = $app->config({foo => 'bar'});
-  $app     = $app->config(foo => 'bar');
+  $app     = $app->config({foo => 'bar', baz => 23});
+  $app     = $app->config(foo => 'bar', baz => 23);
 
 Application configuration.
 

@@ -555,8 +555,8 @@ Build L<Mojo::Transaction::HTTP> object and emit L</"after_build_tx"> hook.
 
   my $hash = $app->defaults;
   my $foo  = $app->defaults('foo');
-  $app     = $app->defaults({foo => 'bar'});
-  $app     = $app->defaults(foo => 'bar');
+  $app     = $app->defaults({foo => 'bar', baz => 23});
+  $app     = $app->defaults(foo => 'bar', baz => 23);
 
 Default values for L<Mojolicious::Controller/"stash">, assigned for every new
 request.

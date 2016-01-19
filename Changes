@@ -1,9 +1,10 @@
 
-6.41  2016-01-18
+6.41  2016-01-19
   - Added support for validation filters.
   - Added filters attribute to Mojolicious::Validator.
   - Added add_filter method to Mojolicious::Validator.
   - Added filter method to Mojolicious::Validator::Validation.
+  - Fixed MOJO_WEBSOCKET_DEBUG environment variable. (jberger)
 
 6.40  2016-01-13
   - Removed client_challenge, client_handshake, server_handshake and server_open

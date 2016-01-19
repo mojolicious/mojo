@@ -136,7 +136,7 @@ sub with_protocols {
   my $self = shift;
 
   my %protos = map { trim($_) => 1 } split ',',
-    $self->req->headers->sec_websocket_protocol;
+    $self->req->headers->sec_websocket_protocol || '';
   return undef unless my $proto = first { $protos{$_} } @_;
 
   $self->res->headers->sec_websocket_protocol($proto);

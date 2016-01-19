@@ -231,6 +231,9 @@ is $t->tx->protocol, undef, 'no protocol';
 $t->websocket_ok('/protocols' => ['', '', ''])->message_ok->message_is('none')
   ->message_ok->message_is('none')->finish_ok;
 is $t->tx->protocol, undef, 'no protocol';
+$t->websocket_ok('/protocols')->message_ok->message_is('none')
+  ->message_ok->message_is('none')->finish_ok;
+is $t->tx->protocol, undef, 'no protocol';
 
 # JSON roundtrips (with a lot of different tests)
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})

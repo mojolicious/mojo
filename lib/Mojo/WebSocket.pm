@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use Config;
 use Exporter 'import';
-use Mojo::Util qw(b64_encode sha1_bytes xor_encode);
+use Mojo::Util qw(b64_encode dumper sha1_bytes xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 

@@ -75,7 +75,7 @@ Proxy server to use for HTTPS and WebSocket requests.
 =head2 not
 
   my $not = $proxy->not;
-  $proxy  = $proxy->not([qw(localhost intranet.mojolicious.org)]);
+  $proxy  = $proxy->not(['localhost', 'intranet.mojolicious.org']);
 
 Domains that don't require a proxy server to be used.
 

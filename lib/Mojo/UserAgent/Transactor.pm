@@ -416,7 +416,8 @@ Parameters may be encoded with the C<charset> option.
 An array reference can be used for multiple form values sharing the same name.
 
   # POST request with form values sharing the same name
-  my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});
+  my $tx = $t->tx(
+    POST => 'http://example.com' => form => {a => ['b', 'c', 'd']});
 
 A hash reference with a C<content> or C<file> value can be used to switch to
 the C<multipart/form-data> content type for file uploads.

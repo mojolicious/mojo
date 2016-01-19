@@ -575,7 +575,7 @@ establish the WebSocket connection.
 
   my $value = $c->param('foo');
   $c        = $c->param(foo => 'ba;r');
-  $c        = $c->param(foo => qw(ba;r baz));
+  $c        = $c->param(foo => 'ba;r', 'baz');
   $c        = $c->param(foo => ['ba;r', 'baz']);
 
 Access route placeholder values that are not reserved stash values, file

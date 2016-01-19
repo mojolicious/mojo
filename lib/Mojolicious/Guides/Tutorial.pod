@@ -383,7 +383,7 @@ Routes can be restricted to specific request methods with different keywords.
   };
 
   # GET|POST|PATCH /bye
-  any [qw(GET POST PATCH)] => '/bye' => sub {
+  any ['GET', 'POST', 'PATCH'] => '/bye' => sub {
     my $c = shift;
     $c->render(text => 'Bye World!');
   };
@@ -429,7 +429,7 @@ just make a list of possible values.
 
   # /test
   # /123
-  any '/:foo' => [foo => [qw(test 123)]] => sub {
+  any '/:foo' => [foo => ['test', '123']] => sub {
     my $c   = shift;
     my $foo = $c->param('foo');
     $c->render(text => "Our :foo placeholder matched $foo");
@@ -581,7 +581,7 @@ limit possible values.
 
   # /hello.json
   # /hello.txt
-  get '/hello' => [format => [qw(json txt)]] => sub {
+  get '/hello' => [format => ['json', 'txt']] => sub {
     my $c = shift;
     return $c->render(json => {hello => 'world'})
       if $c->stash('format') eq 'json';

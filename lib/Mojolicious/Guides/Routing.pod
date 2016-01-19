@@ -229,7 +229,7 @@ arbitrary request methods as first argument.
   $r->post('/hello')->to(controller => 'foo', action => 'hello');
 
   # GET|POST /bye  -> {controller => 'foo', action => 'bye'}
-  $r->any([qw(GET POST)] => '/bye')->to(controller => 'foo', action => 'bye');
+  $r->any(['GET', 'POST'] => '/bye')->to(controller => 'foo', action => 'bye');
 
   # * /whatever -> {controller => 'foo', action => 'whatever'}
   $r->any('/whatever')->to(controller => 'foo', action => 'whatever');
@@ -509,7 +509,7 @@ expression C<(bender|leela)>.
   # /fry    -> undef
   # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
   # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
-  $r->get('/:name' => [name => [qw(bender leela)]])->to('foo#bar');
+  $r->get('/:name' => [name => ['bender', 'leela']])->to('foo#bar');
 
 You can also adjust the regular expressions behind placeholders directly, just
 make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
@@ -604,7 +604,7 @@ allowed formats.
   # /foo.txt -> undef
   # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
-  $r->get('/foo' => [format => [qw(rss xml)]])->to('foo#bar');
+  $r->get('/foo' => [format => ['rss', 'xml']])->to('foo#bar');
 
 A C<format> value can also be passed to L<Mojolicious::Controller/"url_for">.
 
@@ -630,7 +630,7 @@ demand.
   # /baz.xml  -> undef
   my $inactive = $r->under([format => 0]);
   $inactive->get('/foo')->to('foo#bar');
-  $inactive->get('/baz' => [format => [qw(txt html)]])->to('baz#yada');
+  $inactive->get('/baz' => [format => ['txt', 'html']])->to('baz#yada');
 
 =head2 WebSockets
 

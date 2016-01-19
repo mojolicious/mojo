@@ -115,7 +115,7 @@ Mojo::Base - Minimal base class for Mojo projects
   use Mojo::Base -base;
 
   has name => 'Nyan';
-  has [qw(age weight)] => 4;
+  has ['age', 'weight'] => 4;
 
   package Tiger;
   use Mojo::Base 'Cat';
@@ -181,11 +181,11 @@ the C<-base> flag or by setting a base class.
 =head2 has
 
   has 'name';
-  has [qw(name1 name2 name3)];
+  has ['name1', 'name2', 'name3'];
   has name => 'foo';
   has name => sub {...};
-  has [qw(name1 name2 name3)] => 'foo';
-  has [qw(name1 name2 name3)] => sub {...};
+  has ['name1', 'name2', 'name3'] => 'foo';
+  has ['name1', 'name2', 'name3'] => sub {...};
 
 Create attributes for hash-based objects, just like the L</"attr"> method.
 
@@ -197,11 +197,11 @@ L<Mojo::Base> implements the following methods.
 
   $object->attr('name');
   SubClass->attr('name');
-  SubClass->attr([qw(name1 name2 name3)]);
+  SubClass->attr(['name1', 'name2', 'name3']);
   SubClass->attr(name => 'foo');
   SubClass->attr(name => sub {...});
-  SubClass->attr([qw(name1 name2 name3)] => 'foo');
-  SubClass->attr([qw(name1 name2 name3)] => sub {...});
+  SubClass->attr(['name1', 'name2', 'name3'] => 'foo');
+  SubClass->attr(['name1', 'name2', 'name3'] => sub {...});
 
 Create attribute accessor for hash-based objects, an array reference can be
 used to create more than one at a time. Pass an optional second argument to set

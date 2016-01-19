@@ -301,7 +301,7 @@ Any of the native Perl data types can be passed to templates as references
 through the L<Mojolicious::Controller/"stash">.
 
   $c->stash(description => 'web framework');
-  $c->stash(frameworks  => [qw(Catalyst Mojolicious)]);
+  $c->stash(frameworks  => ['Catalyst', 'Mojolicious']);
   $c->stash(spinoffs    => {minion => 'job queue'});
 
   %= $description

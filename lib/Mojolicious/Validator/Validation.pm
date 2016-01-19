@@ -116,7 +116,7 @@ Mojolicious::Validator::Validation - Perform validations
   my $validation
     = Mojolicious::Validator::Validation->new(validator => $validator);
   $validation->input({foo => 'bar'});
-  $validation->required('foo')->in(qw(bar baz));
+  $validation->required('foo')->in('bar', 'baz');
   say $validation->param('foo');
 
 =head1 DESCRIPTION
@@ -276,7 +276,7 @@ L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
   # Call validation checks
   $validation->required('foo')->size(2, 5)->like(qr/^[A-Z]/);
   $validation->optional('bar')->equal_to('foo');
-  $validation->optional('baz')->in(qw(test 123));
+  $validation->optional('baz')->in('test', '123');
 
   # Longer version
   $validation->required('foo')->check('size', 2, 5)->check('like', qr/^[A-Z]/);

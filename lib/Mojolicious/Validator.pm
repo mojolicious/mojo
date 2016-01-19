@@ -76,7 +76,7 @@ String value needs to be equal to the value of another field.
 
 =head2 in
 
-  $validation = $validation->in(qw(foo bar baz));
+  $validation = $validation->in('foo', 'bar', 'baz');
 
 String value needs to match one of the values in the list.
 

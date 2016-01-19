@@ -219,7 +219,7 @@ Turn string into a L<Mojo::ByteStream> object.
 
 =head2 c
 
-  %= c(qw(a b c))->shuffle->join
+  %= c('a', 'b', 'c')->shuffle->join
 
 Turn list into a L<Mojo::Collection> object.
 

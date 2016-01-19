@@ -257,7 +257,7 @@ Contains all available conditions.
 =head2 hidden
 
   my $hidden = $r->hidden;
-  $r         = $r->hidden([qw(attr has new)]);
+  $r         = $r->hidden(['attr', 'has', 'new']);
 
 Controller attributes and methods that are hidden from router, defaults to
 C<attr>, C<has>, C<new> and C<tap>.
@@ -322,7 +322,7 @@ Match routes with L</"match"> and dispatch with L</"continue">.
 
 =head2 hide
 
-  $r = $r->hide(qw(foo bar));
+  $r = $r->hide('foo', 'bar');
 
 Hide controller attributes and methods from router.
 

@@ -302,8 +302,8 @@ parent if necessary.
   my $route = $r->any('/:foo' => sub {...});
   my $route = $r->any('/:foo' => {foo => 'bar'} => sub {...});
   my $route = $r->any('/:foo' => [foo => qr/\w+/] => sub {...});
-  my $route = $r->any([qw(GET POST)] => '/:foo' => sub {...});
-  my $route = $r->any([qw(GET POST)] => '/:foo' => [foo => qr/\w+/]);
+  my $route = $r->any(['GET', 'POST'] => '/:foo' => sub {...});
+  my $route = $r->any(['GET', 'POST'] => '/:foo' => [foo => qr/\w+/]);
 
 Generate L<Mojolicious::Routes::Route> object matching any of the listed HTTP
 request methods or all. See also L<Mojolicious::Guides::Tutorial> for many more
@@ -564,14 +564,14 @@ more argument variations.
 
   my $methods = $r->via;
   $r          = $r->via('GET');
-  $r          = $r->via(qw(GET POST));
-  $r          = $r->via([qw(GET POST)]);
+  $r          = $r->via('GET', 'POST');
+  $r          = $r->via(['GET', 'POST']);
 
 Restrict HTTP methods this route is allowed to handle, defaults to no
 restrictions.
 
   # Route with two methods and destination
-  $r->route('/foo')->via(qw(GET POST))->to('foo#bar');
+  $r->route('/foo')->via('GET', 'POST')->to('foo#bar');
 
 =head2 websocket
 

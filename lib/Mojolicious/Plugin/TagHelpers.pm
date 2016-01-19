@@ -553,11 +553,11 @@ automatically get picked up and shown as default.
 
 =head2 select_field
 
-  %= select_field country => [qw(de en)]
+  %= select_field country => ['de', 'en']
   %= select_field country => [[Germany => 'de'], 'en'], id => 'eu'
   %= select_field country => [[Germany => 'de', selected => 'selected'], 'en']
   %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
-  %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
+  %= select_field country => [c(EU => ['de', 'en']), c(Asia => ['cn', 'jp'])]
 
 Generate C<select> and C<option> tags from array references and C<optgroup>
 tags from L<Mojo::Collection> objects. Previous input values will automatically

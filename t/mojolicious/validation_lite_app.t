@@ -161,16 +161,6 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('bar'), [qw(size 1 1 6)], 'right error';
 is_deeply $validation->failed, ['bar'], 'right names';
 
-# Trim
-$validation = $t->app->validation->input({foo => ' bar', baz => ['  0 ', 1]});
-ok $validation->required('foo')->filter('trim')->in('bar')->is_valid, 'valid';
-is_deeply $validation->output, {foo => 'bar'}, 'right result';
-ok $validation->optional('baz')->filter('trim')->like(qr/\d/)->is_valid,
-  'valid';
-is_deeply $validation->output, {foo => 'bar', baz => [0, 1]}, 'right result';
-ok !$validation->in(23)->filter('trim')->is_valid, 'not valid';
-is_deeply $validation->output, {foo => 'bar'}, 'right result';
-
 # Multiple empty values
 $validation = $t->app->validation;
 ok !$validation->has_data, 'no data';
@@ -187,19 +177,6 @@ ok $validation->has_data, 'has data';
 ok $validation->required(0)->size(1, 1)->is_valid, 'valid';
 is_deeply $validation->output, {0 => 0}, 'right result';
 is $validation->param(0), 0, 'right value';
-
-# Custom filter
-$t->app->validator->add_filter(wrap => sub { join '', @_[3, 2, 4] });
-$validation = $t->app->validation->input({foo => [' bar', 'baz'], yada => 3});
-ok $validation->required('foo')->filter('wrap', 'a', 'b')->like(qr/^a.+b$/)
-  ->is_valid, 'valid';
-is_deeply $validation->output, {foo => ['a barb', 'abazb']}, 'right result';
-ok $validation->optional('yada')->filter('wrap', '3', '4')->in('334')->is_valid,
-  'valid';
-is_deeply $validation->output, {foo => ['a barb', 'abazb'], yada => 334},
-  'right result';
-ok !$validation->optional('nothing')->filter('trim')->is_valid, 'not valid';
-ok !$validation->has_error, 'no error';
 
 # Custom error
 $validation = $t->app->validation->input({foo => 'bar'});

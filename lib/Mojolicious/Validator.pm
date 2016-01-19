@@ -1,7 +1,6 @@
 package Mojolicious::Validator;
 use Mojo::Base -base;
 
-use Mojo::Util 'trim';
 use Mojolicious::Validator::Validation;
 
 has checks => sub {
@@ -13,10 +12,8 @@ has checks => sub {
     upload   => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') }
   };
 };
-has filters => sub { {trim => \&_trim} };
 
-sub add_check  { $_[0]->checks->{$_[1]}  = $_[2] and return $_[0] }
-sub add_filter { $_[0]->filters->{$_[1]} = $_[2] and return $_[0] }
+sub add_check { $_[0]->checks->{$_[1]} = $_[2] and return $_[0] }
 
 sub validation {
   Mojolicious::Validator::Validation->new(validator => shift);
@@ -39,8 +36,6 @@ sub _size {
   my $len = ref $value ? $value->size : length $value;
   return $len < $min || $len > $max;
 }
-
-sub _trim { trim $_[2] }
 
 1;
 
@@ -99,17 +94,6 @@ between these two values.
 
 Value needs to be a L<Mojo::Upload> object, representing a file upload.
 
-=head1 FILTERS
-
-These filters are available by default.
-
-=head2 trim
-
-  $validation = $validation->filter('trim');
-
-Trim whitespace characters from both ends of string value with
-L<Mojo::Util/"trim">.
-
 =head1 ATTRIBUTES
 
 L<Mojolicious::Validator> implements the following attributes.
@@ -137,18 +121,6 @@ Register a validation check.
     my ($validation, $name, $value, @args) = @_;
     ...
     return undef;
-  });
-
-=head2 add_filter
-
-  $validator = $validator->add_filter(trim => sub {...});
-
-Register a new filter.
-
-  $validator->add_filter(foo => sub {
-    my ($validation, $name, $value, @args) = @_;
-    ...
-    return $value;
   });
 
 =head2 validation

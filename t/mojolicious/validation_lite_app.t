@@ -9,7 +9,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # Custom check
-app->validator->add_check(two => sub { length $_[2] == 2 ? undef : 'ohoh' });
+app->validator->add_check(two => sub { length $_[2] == 2 ? undef : "e:$_[1]" });
 
 any '/' => sub {
   my $c = shift;
@@ -174,11 +174,12 @@ ok $validation->required('nothing')->is_valid, 'valid';
 is_deeply $validation->output, {nothing => '  '}, 'right result';
 
 # Custom filter
-$t->app->validator->add_filter(quote => sub {qq{"$_[2]"}});
+$t->app->validator->add_filter(quote => sub {qq{$_[1]="$_[2]"}});
 $validation = $t->app->validation->input({foo => [' bar', 'baz']});
 ok $validation->required('foo', 'trim', 'quote')->like(qr/"/)->is_valid,
   'valid';
-is_deeply $validation->output, {foo => ['"bar"', '"baz"']}, 'right result';
+is_deeply $validation->output, {foo => ['foo="bar"', 'foo="baz"']},
+  'right result';
 
 # Multiple empty values
 $validation = $t->app->validation;
@@ -325,7 +326,7 @@ $t->app->helper(
   }
 );
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
-  ->status_is(200)->text_is('div:root' => 'two ohoh')
+  ->status_is(200)->text_is('div:root' => 'two e:foo')
   ->text_is('label.custom.my-field-with-error[for="foo"]' => '<Foo>')
   ->element_exists('input.custom.my-field-with-error[type="text"]')
   ->element_exists('textarea.my-field-with-error')

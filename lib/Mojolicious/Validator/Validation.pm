@@ -68,8 +68,7 @@ sub optional {
 
   my $input = $self->input->{$name};
   my @input = ref $input eq 'ARRAY' ? @$input : $input;
-  for my $filter (@filters) {
-    my $cb = $self->validator->filters->{$filter};
+  for my $cb (map { $self->validator->filters->{$_} } @filters) {
     @input = map { $self->$cb($name, $_) } @input;
   }
   $self->output->{$name} = @input > 1 ? \@input : $input[0]
@@ -228,7 +227,7 @@ the current L</"topic">.
 
 Change validation L</"topic"> and apply filters.
 
-  # Trim value
+  # Trim value and check size
   $validation->optional('user', 'trim')->size(1, 15);
 
 =head2 param
@@ -255,7 +254,7 @@ Return a list of all names for values that passed validation.
 Change validation L</"topic">, apply filters, and make sure a value is present
 and not an empty string.
 
-  # Trim value
+  # Trim value and check size
   $validation->required('user', 'trim')->size(1, 15);
 
 =head1 AUTOLOAD

@@ -167,6 +167,11 @@ ok $validation->required('foo', 'trim')->in('bar')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->optional('baz', 'trim')->like(qr/^\d$/)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar', baz => [0, 1]}, 'right result';
+$validation = $t->app->validation->input({nothing => '  '});
+ok !$validation->required('nothing', 'trim')->is_valid, 'not valid';
+is_deeply $validation->output, {}, 'right result';
+ok $validation->required('nothing')->is_valid, 'valid';
+is_deeply $validation->output, {nothing => '  '}, 'right result';
 
 # Custom filter
 $t->app->validator->add_filter(quote => sub {qq{"$_[2]"}});

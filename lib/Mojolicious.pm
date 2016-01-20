@@ -523,6 +523,12 @@ Validate values, defaults to a L<Mojolicious::Validator> object.
     return $value ne 'foo';
   });
 
+  # Add validation filter
+  $app->validator->add_filter(quotemeta => sub {
+    my ($validation, $name, $value) = @_;
+    return quotemeta $value;
+  });
+
 =head1 METHODS
 
 L<Mojolicious> inherits all methods from L<Mojo> and implements the following

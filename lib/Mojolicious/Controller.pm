@@ -929,7 +929,7 @@ excessively large, there's a 16MB limit by default.
 
   # Validate GET/POST parameter
   my $validation = $c->validation;
-  $validation->required('title')->size(3, 50);
+  $validation->required('title', 'trim')->size(3, 50);
   my $title = $validation->param('title');
 
   # Validate file upload

@@ -64,11 +64,15 @@ sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
 sub optional {
-  my ($self, $name) = @_;
+  my ($self, $name, @filters) = @_;
 
   my $input = $self->input->{$name};
   my @input = ref $input eq 'ARRAY' ? @$input : $input;
-  $self->output->{$name} = $input
+  for my $filter (@filters) {
+    my $cb = $self->validator->filters->{$filter};
+    @input = map { $self->$cb($name, $_) } @input;
+  }
+  $self->output->{$name} = @input > 1 ? \@input : $input[0]
     unless grep { !defined($_) || $_ eq '' } @input;
 
   return $self->topic($name);
@@ -79,8 +83,8 @@ sub param { shift->every_param(shift)->[-1] }
 sub passed { [sort keys %{shift->output}] }
 
 sub required {
-  my ($self, $name) = @_;
-  return $self if $self->optional($name)->is_valid;
+  my ($self, $name) = (shift, shift);
+  return $self if $self->optional($name, @_)->is_valid;
   return $self->error($name => ['required']);
 }
 
@@ -220,8 +224,12 @@ the current L</"topic">.
 =head2 optional
 
   $validation = $validation->optional('foo');
+  $validation = $validation->optional('foo', 'filter1', 'filter2');
 
-Change validation L</"topic">.
+Change validation L</"topic"> and apply filters.
+
+  # Trim value
+  $validation->optional('user', 'trim')->size(1, 15);
 
 =head2 param
 
@@ -242,9 +250,13 @@ Return a list of all names for values that passed validation.
 =head2 required
 
   $validation = $validation->required('foo');
+  $validation = $validation->required('foo', 'filter1', 'filter2');
 
-Change validation L</"topic"> and make sure a value is present and not an empty
-string.
+Change validation L</"topic">, apply filters, and make sure a value is present
+and not an empty string.
+
+  # Trim value
+  $validation->required('user', 'trim')->size(1, 15);
 
 =head1 AUTOLOAD
 

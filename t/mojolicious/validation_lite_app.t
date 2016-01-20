@@ -161,6 +161,19 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('bar'), [qw(size 1 1 6)], 'right error';
 is_deeply $validation->failed, ['bar'], 'right names';
 
+# Trim
+$validation = $t->app->validation->input({foo => ' bar', baz => ['  0 ', 1]});
+ok $validation->required('foo', 'trim')->in('bar')->is_valid, 'valid';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
+ok $validation->optional('baz', 'trim')->like(qr/^\d$/)->is_valid, 'valid';
+is_deeply $validation->output, {foo => 'bar', baz => [0, 1]}, 'right result';
+
+# Custom filter
+$t->app->validator->add_filter(quote => sub {qq{"$_[2]"}});
+$validation = $t->app->validation->input({foo => [' bar', 'baz']});
+ok $validation->required('foo', 'quote')->like(qr/"/)->is_valid, 'valid';
+is_deeply $validation->output, {foo => ['" bar"', '"baz"']}, 'right result';
+
 # Multiple empty values
 $validation = $t->app->validation;
 ok !$validation->has_data, 'no data';

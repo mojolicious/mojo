@@ -171,8 +171,9 @@ is_deeply $validation->output, {foo => 'bar', baz => [0, 1]}, 'right result';
 # Custom filter
 $t->app->validator->add_filter(quote => sub {qq{"$_[2]"}});
 $validation = $t->app->validation->input({foo => [' bar', 'baz']});
-ok $validation->required('foo', 'quote')->like(qr/"/)->is_valid, 'valid';
-is_deeply $validation->output, {foo => ['" bar"', '"baz"']}, 'right result';
+ok $validation->required('foo', 'trim', 'quote')->like(qr/"/)->is_valid,
+  'valid';
+is_deeply $validation->output, {foo => ['"bar"', '"baz"']}, 'right result';
 
 # Multiple empty values
 $validation = $t->app->validation;

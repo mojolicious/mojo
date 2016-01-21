@@ -199,8 +199,8 @@ sub _listen {
   return if $self->silent;
   $self->app->log->info(qq{Listening at "$url"});
   $query->pairs([]);
-  $url->host('127.0.0.1') if $url->host eq '*';
-  say "Server available at $url";
+  $url->host('0.0.0.0') if $url->host eq '*';
+  $self->app->log->info("Server available at $url");
 }
 
 sub _read {

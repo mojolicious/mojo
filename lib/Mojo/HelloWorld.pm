@@ -1,7 +1,7 @@
 package Mojo::HelloWorld;
 use Mojolicious::Lite;
 
-app->log->level('error')->path(undef);
+app->log->level('info')->path(undef);
 
 any '/*whatever' => {whatever => '', text => 'Your Mojo is working!'};
 

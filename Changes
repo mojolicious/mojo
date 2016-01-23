@@ -1,5 +1,6 @@
 
-6.42  2016-01-23
+6.42  2016-01-24
+  - Fixed validation filter bugs in Mojolicious::Validator::Validation.
 
 6.41  2016-01-20
   - Added support for validation filters.

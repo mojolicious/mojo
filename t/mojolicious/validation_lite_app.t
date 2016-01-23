@@ -165,6 +165,7 @@ is_deeply $validation->failed, ['bar'], 'right names';
 $validation = $t->app->validation->input({foo => ' bar', baz => ['  0 ', 1]});
 ok $validation->required('foo', 'trim')->in('bar')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
+ok !$validation->optional('missing', 'trim')->is_valid, 'not valid';
 ok $validation->optional('baz', 'trim')->like(qr/^\d$/)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar', baz => [0, 1]}, 'right result';
 $validation = $t->app->validation->input({nothing => '  '});

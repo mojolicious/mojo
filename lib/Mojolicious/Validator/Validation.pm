@@ -66,13 +66,14 @@ sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 sub optional {
   my ($self, $name, @filters) = @_;
 
-  my $input = $self->input->{$name};
-  my @input = ref $input eq 'ARRAY' ? @$input : $input;
+  return $self->topic($name) unless defined(my $input = $self->input->{$name});
+
+  my @input = ref $input eq 'ARRAY' ? @$input : ($input);
   for my $cb (map { $self->validator->filters->{$_} } @filters) {
     @input = map { $self->$cb($name, $_) } @input;
   }
   $self->output->{$name} = @input > 1 ? \@input : $input[0]
-    unless grep { !defined($_) || $_ eq '' } @input;
+    unless grep { $_ eq '' } @input;
 
   return $self->topic($name);
 }

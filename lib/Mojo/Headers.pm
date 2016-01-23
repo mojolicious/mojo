@@ -482,7 +482,7 @@ Shortcut for the C<Location> header.
 
   my $names = $headers->names;
 
-Return a list of all currently defined headers.
+Return an array reference with all currently defined headers.
 
   # Names of all headers
   say for @{$headers->names};

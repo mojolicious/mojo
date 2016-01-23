@@ -194,7 +194,7 @@ array reference.
 
   my $names = $validation->failed;
 
-Return a list of all names for values that failed validation.
+Return an array reference with all names for values that failed validation.
 
   # Names of all values that failed
   say for @{$validation->failed};
@@ -241,7 +241,7 @@ you want to access more than just the last one, you can use L</"every_param">.
 
   my $names = $validation->passed;
 
-Return a list of all names for values that passed validation.
+Return an array reference with all names for values that passed validation.
 
   # Names of all values that passed
   say for @{$validation->passed};

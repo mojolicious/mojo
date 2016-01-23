@@ -305,8 +305,8 @@ Check if connection can be kept alive.
 
   my $redirects = $tx->redirects;
 
-Return a list of all previous transactions that preceded this follow-up
-transaction.
+Return an array reference with all previous transactions that preceded this
+follow-up transaction.
 
   # Paths of all previous requests
   say $_->req->url->path for @{$tx->redirects};

@@ -283,7 +283,7 @@ Merge parameters. Note that this method will normalize the parameters.
 
   my $names = $params->names;
 
-Return a list of all parameter names.
+Return an array reference with all parameter names.
 
   # Names of all parameters
   say for @{$params->names};

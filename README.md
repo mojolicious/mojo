@@ -11,14 +11,14 @@
 
 ## Features
 
-  * An amazing real-time web framework, allowing you to easily grow single
+  * An amazing **real-time web framework**, allowing you to easily grow single
     file prototypes into well-structured web applications.
     * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish
       templates, content negotiation, session management, form validation,
       testing framework, static file server, CGI/[PSGI](http://plackperl.org)
       detection, first class Unicode support and much more for you to
       discover.
-  * A powerful web development toolkit, that you can use for all kinds of
+  * A powerful **web development toolkit**, that you can use for all kinds of
     applications, independently of the web framework.
     * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
       SNI, IDNA, HTTP/SOCKS5 proxy, Comet (long polling), keep-alive, connection

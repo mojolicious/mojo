@@ -31,7 +31,7 @@ sub handler { Carp::croak 'Method "handler" not implemented in subclass' }
 
 =head1 NAME
 
-Mojo - Web Development Toolkit
+Mojo - Web development toolkit
 
 =head1 SYNOPSIS
 

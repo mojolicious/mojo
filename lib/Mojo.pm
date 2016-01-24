@@ -31,7 +31,7 @@ sub handler { Carp::croak 'Method "handler" not implemented in subclass' }
 
 =head1 NAME
 
-Mojo - Duct tape for the HTML5 web!
+Mojo - Web Development Toolkit
 
 =head1 SYNOPSIS
 
@@ -58,9 +58,9 @@ Mojo - Duct tape for the HTML5 web!
 
 =head1 DESCRIPTION
 
-A flexible runtime environment for Perl real-time web frameworks, with all the
-basic tools and helpers needed to write simple web applications and higher
-level web frameworks, such as L<Mojolicious>.
+A powerful web development toolkit, with all the basic tools and helpers needed
+to write simple web applications and higher level web frameworks, such as
+L<Mojolicious>.
 
 See L<Mojolicious::Guides> for more!
 

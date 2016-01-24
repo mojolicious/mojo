@@ -84,9 +84,9 @@ Answers to the most frequently asked questions.
 
 =head1 HIGHLIGHTS
 
-L<Mojolicious> and L<Mojolicious::Lite> are the sum of many parts, small
-building blocks that can be used independently, these are the most prominent
-ones.
+L<Mojolicious> and L<Mojolicious::Lite> are the sum of many parts, built on top
+of the L<Mojo> web development toolkit. Small building blocks that can be used
+independently for all kinds of applications, these are the most prominent ones.
 
 =over 2
 

@@ -88,9 +88,9 @@ with them before sending a pull request.
 
 =head2 Mission statement
 
-L<Mojo> is a runtime environment for Perl real-time web frameworks. It provides
-all the basic tools and helpers needed to write simple web applications and
-higher level web frameworks, such as L<Mojolicious>.
+L<Mojo> is a web development toolkit, with all the basic tools and helpers
+needed to write simple web applications and higher level web frameworks, such as
+L<Mojolicious>.
 
 All components should be reusable in other projects, and in a UNIXish way only
 loosely coupled.

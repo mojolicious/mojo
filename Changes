@@ -1,4 +1,6 @@
 
+6.43  2016-01-25
+
 6.42  2016-01-24
   - Fixed use of deprecated Perl feature in Mojo::JSON.
   - Fixed validation filter bugs in Mojolicious::Validator::Validation.

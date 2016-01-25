@@ -1226,13 +1226,14 @@ Basic authentication data will be automatically extracted from the
 C<Authorization> header.
 
   use Mojolicious::Lite;
+  use Mojo::Util 'secure_compare';
 
   get '/' => sub {
     my $c = shift;
 
     # Check for username "Bender" and password "rocks"
     return $c->render(text => 'Hello Bender!')
-      if $c->req->url->to_abs->userinfo eq 'Bender:rocks';
+      if secure_compare $c->req->url->to_abs->userinfo, 'Bender:rocks';
 
     # Require authentication
     $c->res->headers->www_authenticate('Basic');

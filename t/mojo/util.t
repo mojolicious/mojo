@@ -388,6 +388,8 @@ ok secure_compare('♥1', '♥1'), 'values are equal';
 ok !secure_compare('♥',   '♥0'),  'values are not equal';
 ok !secure_compare('0♥',  '♥'),   'values are not equal';
 ok !secure_compare('0♥1', '1♥0'), 'values are not equal';
+ok !secure_compare('',      '♥'),   'values are not equal';
+ok !secure_compare('♥',   ''),      'values are not equal';
 
 # xor_encode
 is xor_encode('hello', 'foo'), "\x0e\x0a\x03\x0a\x00", 'right result';

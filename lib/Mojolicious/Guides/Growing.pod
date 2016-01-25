@@ -266,6 +266,8 @@ separation of concerns more visible.
   use strict;
   use warnings;
 
+  use Mojo::Util 'secure_compare';
+
   my $USERS = {
     joel      => 'las3rs',
     marcus    => 'lulz',
@@ -278,7 +280,7 @@ separation of concerns more visible.
     my ($self, $user, $pass) = @_;
 
     # Success
-    return 1 if $USERS->{$user} && $USERS->{$user} eq $pass;
+    return 1 if $USERS->{$user} && secure_compare $USERS->{$user}, $pass;
 
     # Fail
     return undef;

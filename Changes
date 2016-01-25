@@ -1,5 +1,6 @@
 
 6.43  2016-01-25
+  - Improved a few examples to avoid timing attacks.
 
 6.42  2016-01-24
   - Fixed use of deprecated Perl feature in Mojo::JSON.

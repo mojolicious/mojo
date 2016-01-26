@@ -792,7 +792,7 @@ For a full list of available hooks see L<Mojolicious/"HOOKS">.
 =head2 Introspection
 
 The command L<Mojolicious::Command::routes> can be used from the command line
-to list all available routes together with name and underlying regular
+to list all available routes together with names and underlying regular
 expressions.
 
   $ ./myapp.pl routes -v

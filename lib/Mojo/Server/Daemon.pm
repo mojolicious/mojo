@@ -307,7 +307,7 @@ implements the following new ones.
 =head2 acceptors
 
   my $acceptors = $daemon->acceptors;
-  $daemon       = $daemon->acceptors([]);
+  $daemon       = $daemon->acceptors(['6be0c140ef00a389c5d039536b56d139']);
 
 Active acceptor ids.
 

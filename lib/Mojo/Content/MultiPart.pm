@@ -240,7 +240,7 @@ implements the following new ones.
 =head2 parts
 
   my $parts = $multi->parts;
-  $multi    = $multi->parts([]);
+  $multi    = $multi->parts([Mojo::Content::Single->new]);
 
 Content parts embedded in this multipart content, usually
 L<Mojo::Content::Single> objects.

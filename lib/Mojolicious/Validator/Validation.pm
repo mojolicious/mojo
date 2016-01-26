@@ -134,7 +134,7 @@ Data to be validated.
 =head2 output
 
   my $output  = $validation->output;
-  $validation = $validation->output({});
+  $validation = $validation->output({foo => 'bar', baz => [123, 'yada']});
 
 Validated data.
 

@@ -162,7 +162,7 @@ Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
 =head2 remaining
 
   my $remaining = $delay->remaining;
-  $delay        = $delay->remaining([]);
+  $delay        = $delay->remaining([sub {...}]);
 
 Remaining L</"steps"> in chain.
 

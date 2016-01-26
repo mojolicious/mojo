@@ -289,7 +289,7 @@ implements the following new ones.
 =head2 env
 
   my $env = $req->env;
-  $req    = $req->env({});
+  $req    = $req->env({PATH_INFO => '/'});
 
 Direct access to the C<CGI> or C<PSGI> environment hash if available.
 

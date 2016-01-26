@@ -96,7 +96,7 @@ L<Mojo::Home> implements the following attributes.
 =head2 parts
 
   my $parts = $home->parts;
-  $home     = $home->parts([]);
+  $home     = $home->parts(['home', 'sri', 'myapp']);
 
 Home directory parts.
 

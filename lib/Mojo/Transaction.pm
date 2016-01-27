@@ -10,10 +10,10 @@ has [
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
-sub client_close { shift->server_close }
-
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
+
+sub closed { shift->completed->emit('finish') }
 
 sub completed { ++$_[0]{completed} and return $_[0] }
 
@@ -40,8 +40,6 @@ sub remote_address {
     ? $1
     : $self->original_remote_address;
 }
-
-sub server_close { shift->completed->emit('finish') }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
@@ -152,13 +150,6 @@ HTTP response, defaults to a L<Mojo::Message::Response> object.
 L<Mojo::Transaction> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 client_close
-
-  $tx->client_close;
-
-Transaction closed client-side, used to implement user agents such as
-L<Mojo::UserAgent>.
-
 =head2 client_read
 
   $tx->client_read($bytes);
@@ -172,6 +163,12 @@ Meant to be overloaded in a subclass.
 
 Write data client-side, used to implement user agents such as
 L<Mojo::UserAgent>. Meant to be overloaded in a subclass.
+
+=head2 closed
+
+  $tx = $tx->closed;
+
+All transaction data has been sent.
 
 =head2 completed
 
@@ -222,13 +219,6 @@ False, this is not a L<Mojo::Transaction::WebSocket> object.
 Same as L</"original_remote_address"> or the last value of the
 C<X-Forwarded-For> header if L</"req"> has been performed through a reverse
 proxy.
-
-=head2 server_close
-
-  $tx->server_close;
-
-Transaction closed server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
 
 =head2 server_read
 

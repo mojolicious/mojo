@@ -1,5 +1,7 @@
 
 6.43  2016-01-27
+  - Removed client_close and server_close methods from Mojo::Transaction.
+  - Added closed method to Mojo::Transaction.
   - Added parse_message method to Mojo::Transaction::WebSocket.
   - Improved a few examples to avoid timing attacks.
 

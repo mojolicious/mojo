@@ -217,7 +217,15 @@ sub _finish {
   return unless my $c = $self->{connections}{$id};
   $c->{ioloop}->remove($c->{timeout}) if $c->{timeout};
   return $self->_reuse($id, $close) unless my $old = $c->{tx};
-  $old->client_close($close);
+
+  # Premature connection close or 4xx/5xx
+  my $res = $old->closed->res->finish;
+  if ($close && !$res->code && !$res->error) {
+    $res->error({message => 'Premature connection close'});
+  }
+  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+    $res->error({message => $res->message, code => $res->code});
+  }
 
   # Always remove connection for WebSockets
   return $self->_remove($id) if $old->is_websocket;

@@ -48,6 +48,11 @@ sub build_message {
 sub client_read  { shift->server_read(@_) }
 sub client_write { shift->server_write(@_) }
 
+sub closed {
+  my $self = shift->completed;
+  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
+}
+
 sub connection { shift->handshake->connection }
 
 sub finish {
@@ -135,11 +140,6 @@ sub send {
   $msg = $self->build_message($msg) unless ref $msg eq 'ARRAY';
   $self->{write} .= Mojo::WebSocket::build_frame($self->masked, @$msg);
   return $self->emit('resume');
-}
-
-sub server_close {
-  my $self = shift->completed;
-  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
 }
 
 sub server_read {
@@ -397,6 +397,12 @@ Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
 Write data client-side, used to implement user agents such as
 L<Mojo::UserAgent>.
 
+=head2 closed
+
+  $tx = $tx->closed;
+
+All transaction data has been sent.
+
 =head2 connection
 
   my $id = $ws->connection;
@@ -492,13 +498,6 @@ will be invoked once all data has been written.
   # Send "Ping" frame
   use Mojo::WebSocket 'WS_PING';
   $ws->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
-
-=head2 server_close
-
-  $ws->server_close;
-
-Transaction closed server-side, used to implement web servers such as
-L<Mojo::Server::Daemon>.
 
 =head2 server_read
 

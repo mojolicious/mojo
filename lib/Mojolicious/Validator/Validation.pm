@@ -162,7 +162,8 @@ and implements the following new ones.
   $validation = $validation->check('size', 2, 7);
 
 Perform validation check on all values of the current L</"topic">, no more
-checks will be performed on them after the first one failed.
+checks will be performed on them after the first one failed. All checks from
+L<Mojolicious::Validator/"CHECKS"> are supported.
 
 =head2 csrf_protect
 
@@ -226,7 +227,8 @@ the current L</"topic">.
   $validation = $validation->optional('foo');
   $validation = $validation->optional('foo', 'filter1', 'filter2');
 
-Change validation L</"topic"> and apply filters.
+Change validation L</"topic"> and apply filters. All filters from
+L<Mojolicious::Validator/"FILTERS"> are supported.
 
   # Trim value and check size
   $validation->optional('user', 'trim')->size(1, 15);
@@ -253,7 +255,9 @@ Return an array reference with all names for values that passed validation.
   $validation = $validation->required('foo', 'filter1', 'filter2');
 
 Change validation L</"topic">, apply filters, and make sure a value is present
-and not an empty string.
+and not an empty string. All filters from L<Mojolicious::Validator/"FILTERS">
+are supported.All filters from L<Mojolicious::Validator/"FILTERS">
+are supported.
 
   # Trim value and check size
   $validation->required('user', 'trim')->size(1, 15);

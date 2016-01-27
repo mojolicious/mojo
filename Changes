@@ -1,5 +1,6 @@
 
 6.43  2016-01-27
+  - Added parse_message method to Mojo::Transaction::WebSocket.
   - Improved a few examples to avoid timing attacks.
 
 6.42  2016-01-24

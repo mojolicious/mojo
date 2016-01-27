@@ -68,88 +68,19 @@ sub kept_alive    { shift->handshake->kept_alive }
 sub local_address { shift->handshake->local_address }
 sub local_port    { shift->handshake->local_port }
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(frame => sub { shift->_message(@_) });
-  return $self;
-}
-
 # DEPRECATED in Clinking Beer Mugs!
 sub parse_frame {
   deprecated 'Mojo::Transaction::WebSocket::parse_frame is DEPRECATED';
   Mojo::WebSocket::parse_frame($_[1], $_[0]->max_websocket_size);
 }
 
-sub protocol { shift->res->headers->sec_websocket_protocol }
-
-sub remote_address { shift->handshake->remote_address }
-sub remote_port    { shift->handshake->remote_port }
-sub req            { shift->handshake->req }
-sub res            { shift->handshake->res }
-
-sub resume { $_[0]->handshake->resume and return $_[0] }
-
-sub send {
-  my ($self, $msg, $cb) = @_;
-  $self->once(drain => $cb) if $cb;
-  $msg = $self->build_message($msg) unless ref $msg eq 'ARRAY';
-  $self->{write} .= Mojo::WebSocket::build_frame($self->masked, @$msg);
-  return $self->emit('resume');
-}
-
-sub server_close {
-  my $self = shift->completed;
-  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
-}
-
-sub server_read {
-  my ($self, $chunk) = @_;
-
-  $self->{read} .= $chunk // '';
-  my $max = $self->max_websocket_size;
-  while (my $frame = Mojo::WebSocket::parse_frame(\$self->{read}, $max)) {
-    $self->finish(1009) and last unless ref $frame;
-    $self->emit(frame => $frame);
-  }
-
-  $self->emit('resume');
-}
-
-sub server_write {
-  my $self = shift;
-  $self->emit('drain') if ($self->{write} //= '') eq '';
-  $self->completed if $self->{write} eq '' && $self->{closing};
-  return delete $self->{write};
-}
-
-sub with_compression {
-  my $self = shift;
-
-  # "permessage-deflate" extension
-  $self->compressed(1)
-    and $self->res->headers->sec_websocket_extensions('permessage-deflate')
-    if ($self->req->headers->sec_websocket_extensions // '')
-    =~ /permessage-deflate/;
-}
-
-sub with_protocols {
-  my $self = shift;
-
-  my %protos = map { trim($_) => 1 } split ',',
-    $self->req->headers->sec_websocket_protocol // '';
-  return undef unless defined(my $proto = first { $protos{$_} } @_);
-
-  $self->res->headers->sec_websocket_protocol($proto);
-  return $proto;
-}
-
-sub _message {
+sub parse_message {
   my ($self, $frame) = @_;
 
-  # Assume continuation
-  my $op = $frame->[4] || WS_CONTINUATION;
+  $self->emit(frame => $frame);
 
   # Ping/Pong
+  my $op = $frame->[4];
   return $self->send([1, 0, 0, 0, WS_PONG, $frame->[5]]) if $op == WS_PING;
   return if $op == WS_PONG;
 
@@ -187,6 +118,69 @@ sub _message {
   $self->emit($op == WS_TEXT ? 'text' : 'binary' => $msg);
   $self->emit(message => $op == WS_TEXT ? decode 'UTF-8', $msg : $msg)
     if $self->has_subscribers('message');
+}
+
+sub protocol { shift->res->headers->sec_websocket_protocol }
+
+sub remote_address { shift->handshake->remote_address }
+sub remote_port    { shift->handshake->remote_port }
+sub req            { shift->handshake->req }
+sub res            { shift->handshake->res }
+
+sub resume { $_[0]->handshake->resume and return $_[0] }
+
+sub send {
+  my ($self, $msg, $cb) = @_;
+  $self->once(drain => $cb) if $cb;
+  $msg = $self->build_message($msg) unless ref $msg eq 'ARRAY';
+  $self->{write} .= Mojo::WebSocket::build_frame($self->masked, @$msg);
+  return $self->emit('resume');
+}
+
+sub server_close {
+  my $self = shift->completed;
+  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
+}
+
+sub server_read {
+  my ($self, $chunk) = @_;
+
+  $self->{read} .= $chunk // '';
+  my $max = $self->max_websocket_size;
+  while (my $frame = Mojo::WebSocket::parse_frame(\$self->{read}, $max)) {
+    $self->finish(1009) and last unless ref $frame;
+    $self->parse_message($frame);
+  }
+
+  $self->emit('resume');
+}
+
+sub server_write {
+  my $self = shift;
+  $self->emit('drain') if ($self->{write} //= '') eq '';
+  $self->completed if $self->{write} eq '' && $self->{closing};
+  return delete $self->{write};
+}
+
+sub with_compression {
+  my $self = shift;
+
+  # "permessage-deflate" extension
+  $self->compressed(1)
+    and $self->res->headers->sec_websocket_extensions('permessage-deflate')
+    if ($self->req->headers->sec_websocket_extensions // '')
+    =~ /permessage-deflate/;
+}
+
+sub with_protocols {
+  my $self = shift;
+
+  my %protos = map { trim($_) => 1 } split ',',
+    $self->req->headers->sec_websocket_protocol // '';
+  return undef unless defined(my $proto = first { $protos{$_} } @_);
+
+  $self->res->headers->sec_websocket_protocol($proto);
+  return $proto;
 }
 
 1;
@@ -270,7 +264,7 @@ Emitted when the WebSocket connection has been closed.
 
 Emitted when a WebSocket frame has been received.
 
-  $ws->unsubscribe('frame')->on(frame => sub {
+  $ws->on(frame => sub {
     my ($ws, $frame) = @_;
     say "FIN: $frame->[0]";
     say "RSV1: $frame->[1]";
@@ -441,15 +435,11 @@ Local interface address.
 
 Local interface port.
 
-=head2 new
+=head2 parse_message
 
-  my $ws = Mojo::Transaction::WebSocket->new;
-  my $ws = Mojo::Transaction::WebSocket->new(compressed => 1);
-  my $ws = Mojo::Transaction::WebSocket->new({compressed => 1});
+  $ws->parse_message([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
 
-Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
-L</"frame"> event with default message parser, which also handles C<Ping> and
-C<Close> frames automatically.
+Parse WebSocket message.
 
 =head2 protocol
 

@@ -233,6 +233,17 @@ ok !ref $frame, 'not a reference';
 is parse_frame(\($dummy = "\x82\x05\x77\x6f\x72\x6b"), 262144), undef,
   'incomplete frame';
 
+# Fragmented message
+my $fragmented = Mojo::Transaction::WebSocket->new;
+my $text;
+$fragmented->on(text => sub { $text = pop });
+$fragmented->parse_message([0, 0, 0, 0, WS_TEXT, 'wo']);
+ok !$text, 'text event has not been emitted yet';
+$fragmented->parse_message([0, 0, 0, 0, WS_CONTINUATION, 'r']);
+ok !$text, 'text event has not been emitted yet';
+$fragmented->parse_message([1, 0, 0, 0, WS_CONTINUATION, 'ks!']);
+is $text, 'works!', 'right payload';
+
 # Compressed binary message
 my $compressed = Mojo::Transaction::WebSocket->new({compressed => 1});
 $frame = $compressed->build_message({binary => 'just works'});

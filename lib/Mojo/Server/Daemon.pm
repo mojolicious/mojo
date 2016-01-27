@@ -235,9 +235,8 @@ sub _write {
 
   # Finish or continue writing
   my $next = $tx->is_finished ? '_finish' : $chunk eq '' ? undef : '_write';
-  return unless $next;
   weaken $self;
-  $stream->write('' => sub { $self->$next($id) });
+  $stream->write('' => sub { $self->$next($id) }) if $next;
 }
 
 1;

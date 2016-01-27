@@ -401,7 +401,8 @@ L<Mojo::UserAgent>.
 
   $tx = $tx->closed;
 
-All transaction data has been sent.
+Same as L<Mojo::Transaction/"completed">, but also indicates that all
+transaction data has been sent.
 
 =head2 connection
 

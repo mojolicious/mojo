@@ -168,13 +168,14 @@ L<Mojo::UserAgent>. Meant to be overloaded in a subclass.
 
   $tx = $tx->closed;
 
-All transaction data has been sent.
+Same as L</"completed">, but also indicates that all transaction data has been
+sent.
 
 =head2 completed
 
   $tx = $tx->completed;
 
-Finalize transaction.
+Low-level method to finalize transaction.
 
 =head2 connection
 

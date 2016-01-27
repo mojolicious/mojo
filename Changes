@@ -4,6 +4,7 @@
   - Added closed method to Mojo::Transaction.
   - Added parse_message method to Mojo::Transaction::WebSocket.
   - Improved a few examples to avoid timing attacks.
+  - Fixed timing bug in Mojo::Server::Daemon.
 
 6.42  2016-01-24
   - Fixed use of deprecated Perl feature in Mojo::JSON.

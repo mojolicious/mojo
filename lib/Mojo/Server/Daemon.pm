@@ -135,6 +135,7 @@ sub _finish {
       $c->{tx} = $ws->established(1);
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
+      $self->_write($id);
     }
 
     # Failed upgrade
@@ -233,9 +234,7 @@ sub _write {
   my $stream = $self->ioloop->stream($id)->write($chunk);
 
   # Finish or continue writing
-  my $next = $chunk eq '' ? undef : '_write';
-  $tx->has_subscribers('finish') ? ($next = '_finish') : $self->_finish($id)
-    if $tx->is_finished;
+  my $next = $tx->is_finished ? '_finish' : $chunk eq '' ? undef : '_write';
   return unless $next;
   weaken $self;
   $stream->write('' => sub { $self->$next($id) });

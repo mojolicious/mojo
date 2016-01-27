@@ -231,12 +231,10 @@ sub _write {
   my $chunk = $tx->server_write;
   delete $c->{writing};
   warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
-  my $stream = $self->ioloop->stream($id)->write($chunk);
-
-  # Finish or continue writing
   my $next = $tx->is_finished ? '_finish' : $chunk eq '' ? undef : '_write';
+  return $self->ioloop->stream($id)->write($chunk) unless $next;
   weaken $self;
-  $stream->write('' => sub { $self->$next($id) }) if $next;
+  $self->ioloop->stream($id)->write($chunk => sub { $self->$next($id) });
 }
 
 1;

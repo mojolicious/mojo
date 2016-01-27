@@ -467,6 +467,9 @@ provided base URL.
 
 Turn URL into a string.
 
+  # "http://mojolicious.org"
+  Mojo::URL->new->scheme('http')->host('mojolicious.org')->to_string;
+
 =head1 OPERATORS
 
 L<Mojo::URL> overloads the following operators.

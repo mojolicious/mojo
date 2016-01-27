@@ -351,6 +351,9 @@ parameters.
 
 Turn parameters into a string.
 
+  # "foo=bar&baz=23"
+  Mojo::Parameters->new->pairs([foo => 'bar', baz => 23])->to_string;
+
 =head1 OPERATORS
 
 L<Mojo::Parameters> overloads the following operators.

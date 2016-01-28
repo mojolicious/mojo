@@ -227,9 +227,9 @@ sub _write {
 
   # Protect from resume event recursion
   my $c = $self->{connections}{$id};
-  return if !(my $tx = $c->{tx}) || $c->{writing}++;
+  return if !(my $tx = $c->{tx}) || $c->{writing};
+  local $c->{writing} = 1;
   my $chunk = $tx->server_write;
-  delete $c->{writing};
   warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   my $next = $tx->is_finished ? '_finish' : $chunk eq '' ? undef : '_write';
   return $self->ioloop->stream($id)->write($chunk) unless $next;

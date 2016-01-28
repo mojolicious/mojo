@@ -317,9 +317,9 @@ sub _write {
 
   # Protect from resume event recursion
   my $c = $self->{connections}{$id};
-  return if !(my $tx = $c->{tx}) || $c->{writing}++;
+  return if !(my $tx = $c->{tx}) || $c->{writing};
+  local $c->{writing} = 1;
   my $chunk = $tx->client_write;
-  delete $c->{writing};
   warn term_escape "-- Client >>> Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   return if $chunk eq '';
   weaken $self;

@@ -22,6 +22,9 @@ hook after_render => sub {
   $$output = reverse $$output . $format;
 };
 
+# Shared content
+hook before_dispatch => sub { shift->content_for(stuff => 'Shared content!') };
+
 # Default layout for whole application
 app->defaults(layout => 'default');
 
@@ -196,7 +199,7 @@ $t->get_ok('/double_inheritance')->status_is(200)
 $t->get_ok('/triple_inheritance')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
-    . "New <content>.\n\nDefault footer!\n");
+    . "New <content>.\nShared content!\n\nDefault footer!\n");
 
 # Mixed inheritance (with layout)
 $t->get_ok('/mixed_inheritance/first')->status_is(200)
@@ -257,7 +260,8 @@ $t->get_ok('/withblocklayout')->status_is(200)
 # Content blocks
 $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\n\n");
+  ->content_is(
+  "DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\nShared content!\n\n");
 $t->get_ok('/content_with')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("Default\n\nSomething <b>else</b>!\n\n\n<br>Hello world!\n\n");
@@ -386,6 +390,7 @@ Sidebar too!
 @@ triple_inheritance.html.ep
 % extends 'double_inheritance';
 New <content>.
+%= content_for 'stuff'
 
 @@ layouts/plugin_with_template.html.ep
 layout_with_template
@@ -446,6 +451,7 @@ seems
 to
 <%= content_for 'message' %>
 work!
+%= content_for 'stuff'
 
 @@ content_with.html.ep
 <% content first => begin %>Something<% end %>

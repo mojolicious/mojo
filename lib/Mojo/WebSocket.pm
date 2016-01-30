@@ -197,7 +197,7 @@ individually.
 
 Build WebSocket frame.
 
-  # Maked binary frame with FIN bit and payload
+  # Masked binary frame with FIN bit and payload
   say build_frame 1, 1, 0, 0, 0, WS_BINARY, 'Hello World!';
 
   # Text frame with payload but without FIN bit

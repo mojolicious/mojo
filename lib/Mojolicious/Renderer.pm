@@ -89,6 +89,8 @@ sub render {
   my $stash = $c->stash;
   local $stash->{layout}  = $stash->{layout}  if exists $stash->{layout};
   local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
+  local $stash->{ 'mojo.content' } ||=  {};
+
 
   # Rendering to string
   local @{$stash}{keys %$args} if my $string = delete $args->{'mojo.string'};

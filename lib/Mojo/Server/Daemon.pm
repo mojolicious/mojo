@@ -116,6 +116,8 @@ sub _close {
   delete $self->{connections}{$id};
 }
 
+sub _debug { $_[0]->app->log->debug($_[2]) if $_[0]->{connections}{$_[1]}{tx} }
+
 sub _finish {
   my ($self, $id) = @_;
 
@@ -185,15 +187,11 @@ sub _listen {
       $stream->timeout($self->inactivity_timeout);
 
       $stream->on(close => sub { $self && $self->_close($id) });
+      $stream->on(congestion => sub { $self->_debug($id, 'Write congestion') });
       $stream->on(error =>
           sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read => sub { $self->_read($id => pop) });
-      $stream->on(
-        timeout => sub {
-          $self->app->log->debug('Inactivity timeout')
-            if $self->{connections}{$id}{tx};
-        }
-      );
+      $stream->on(timeout => sub { $self->_debug($id, 'Inactivity timeout') });
     }
   );
 

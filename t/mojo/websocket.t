@@ -115,6 +115,12 @@ websocket '/timeout' => sub {
     ->on(finish => sub { shift->stash->{finished}++ });
 };
 
+websocket '/congestion' => sub {
+  my $c = shift;
+  Mojo::IOLoop->stream($c->tx->connection)->high_water_mark(5);
+  $c->send('works!')->finish;
+};
+
 # URL for WebSocket
 my $ua  = app->ua;
 my $res = $ua->get('/link')->success;
@@ -390,6 +396,18 @@ Mojo::IOLoop->start;
 Mojo::IOLoop->one_tick until $stash->{finished};
 is $stash->{finished}, 1, 'finish event has been emitted once';
 like $log, qr/Inactivity timeout/, 'right log message';
+app->log->unsubscribe(message => $msg);
+
+# Congestion
+$log = '';
+$msg = app->log->on(message => sub { $log .= pop });
+$ua->websocket(
+  '/congestion' => sub {
+    pop->on(finish => sub { Mojo::IOLoop->stop });
+  }
+);
+Mojo::IOLoop->start;
+like $log, qr/Write congestion/, 'right log message';
 app->log->unsubscribe(message => $msg);
 
 # Ping/pong

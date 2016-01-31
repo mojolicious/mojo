@@ -1,8 +1,10 @@
 
-6.43  2016-01-31
+6.43  2016-02-01
   - Removed client_close and server_close methods from Mojo::Transaction.
+  - Added high_water_mark attribute to Mojo::IOLoop::Stream.
   - Added closed method to Mojo::Transaction.
   - Added parse_message method to Mojo::Transaction::WebSocket.
+  - Added congestion event to Mojo::IOLoop::Stream.
   - Improved a few examples to avoid timing attacks.
   - Fixed timing bug in Mojo::Server::Daemon.
 

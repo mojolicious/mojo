@@ -811,7 +811,7 @@ establish the WebSocket connection.
   use Mojo::WebSocket 'WS_PING';
   $c->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
 
-  # Make sure previous message has been written before continuing
+  # Make sure the first message has been written before continuing
   $c->send('First message!' => sub {
     my $c = shift;
     $c->send('Second message!');

@@ -256,6 +256,36 @@ ok length($server) > length($server_after), 'stream has been resumed';
 is $client, $client_after, 'stream was writable while paused';
 is $client, 'works!', 'full message has been written';
 
+# Congestion
+my $congestion;
+$client = '';
+$id     = Mojo::IOLoop->server(
+  {address => '127.0.0.1'} => sub {
+    my ($loop, $stream) = @_;
+    $stream->write('a');
+    $stream->high_water_mark(3);
+    $stream->on(congestion => sub { $congestion++ });
+    $stream->write('b');
+    $stream->write('c');
+    $stream->write(
+      'd' => sub {
+        shift->write('e' => sub { shift->close });
+      }
+    );
+  }
+);
+$port = Mojo::IOLoop->acceptor($id)->port;
+Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->on(read => sub { $client .= pop });
+    $stream->on(close => sub { Mojo::IOLoop->stop });
+  }
+);
+Mojo::IOLoop->start;
+is $client,     'abcde', 'full message has been written';
+is $congestion, 2,       'congestion event has been emitted twice';
+
 # Graceful shutdown
 $err  = '';
 $loop = Mojo::IOLoop->new;

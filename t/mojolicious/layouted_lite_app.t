@@ -261,7 +261,7 @@ $t->get_ok('/withblocklayout')->status_is(200)
 $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is(
-  "DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\nShared content!\n\n");
+  "Content!This\n\nseems\nto\nHello    world!\n\nwork!\n\nShared content!\n\n");
 $t->get_ok('/content_with')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("Default\n\nSomething <b>else</b>!\n\n\n<br>Hello world!\n\n");
@@ -441,7 +441,11 @@ Two: <%= $two %>
 <% end %>
 with_block <%= $block->('one', 'two') %>
 
+@@ layouts/content_for.html.ep
+Content<%= title %><%= content_for 'more' %><%= content %>
+
 @@ content_for.html.ep
+% layout 'content_for';
 This
 <% content_for message => begin =%>Hello<% end %>
 seems
@@ -450,8 +454,11 @@ seems
 % end
 to
 <%= content_for 'message' %>
-work!
+%= include 'content_for_partial'
 %= content_for 'stuff'
+
+@@ content_for_partial.html.ep
+<% content_for more => begin %>!<% end %>work!
 
 @@ content_with.html.ep
 <% content first => begin %>Something<% end %>

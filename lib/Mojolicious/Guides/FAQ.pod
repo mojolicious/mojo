@@ -251,6 +251,22 @@ server closed the connection before the user agent could receive the whole
 response or that the user agent got destroyed, which forces all connections to
 be closed immediately.
 
+=head2 What does "Write congestion" mean?
+
+All built-in web servers are based on an event-loop, and can therefore only
+write data when the event-loop is in control. So if you are writing a lot of
+data at once to your WebSocket, it all has to be buffered, which can be very
+inefficient, and even be used for denial-of-service attacks. So you will be
+notified once the data waiting to be written reaches a certain size, which
+defaults to 16MB, and can be changed for each connection individually with
+L<Mojo::IOLoop::Stream/"high_water_mark">. To avoid this, you can simply wait
+for all data to be written, before sending more.
+
+  $c->send('First message!' => sub {
+    my $c = shift;
+    $c->send('Second message!');
+  });
+
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in
@@ -260,21 +276,6 @@ operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
-
-=head2 What does "Write congestion" mean?
-
-All built-in web servers are based on an event-loop, and can therefore only
-write data when the event-loop is in control. So if you are writing a lot of
-data at once to your WebSocket, it all has to be buffered, which can be very
-inefficient. So you will be notified once the data waiting to be written reaches
-a certain size, which defaults to 16MB, and can be changed for each connection
-individually with L<Mojo::IOLoop::Stream/"high_water_mark">. To avoid this, all
-you have to do, is to wait for all data to be written, before sending more.
-
-  $c->send('First message!' => sub {
-    my $c = shift;
-    $c->send('Second message!');
-  });
 
 =head1 MORE
 

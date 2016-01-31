@@ -187,7 +187,6 @@ sub _listen {
       $stream->timeout($self->inactivity_timeout);
 
       $stream->on(close => sub { $self && $self->_close($id) });
-      $stream->on(congestion => sub { $self->_debug($id, 'Write congestion') });
       $stream->on(error =>
           sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read => sub { $self->_read($id => pop) });

@@ -6,7 +6,6 @@ use Mojo::IOLoop;
 use Mojo::Util;
 use Scalar::Util 'weaken';
 
-has high_water_mark => 16777216;
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
@@ -81,10 +80,10 @@ sub write {
   my ($self, $chunk, $cb) = @_;
 
   $self->{buffer} .= $chunk;
-  $self->once(drain => $cb) if $cb;
-  $self->emit('congestion') if length $self->{buffer} >= $self->high_water_mark;
+  if ($cb) { $self->once(drain => $cb) }
+  elsif ($self->{buffer} eq '') { return $self }
   $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
-    if $self->{handle} && ($cb || $self->{buffer} ne '');
+    if $self->{handle};
 
   return $self;
 }
@@ -173,15 +172,6 @@ emit the following new ones.
 
 Emitted if the stream gets closed.
 
-=head2 congestion
-
-  $stream->on(congestion => sub {
-    my $stream = shift;
-    ...
-  });
-
-Emitted if the data waiting to be written reaches L</"high_water_mark">.
-
 =head2 drain
 
   $stream->on(drain => sub {
@@ -231,14 +221,6 @@ Emitted if new data has been written to the stream.
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Stream> implements the following attributes.
-
-=head2 high_water_mark
-
-  my $size = $stream->high_water_mark;
-  $stream  = $stream->high_water_mark(1024);
-
-Maximum size in bytes of data waiting to be written before the L</"congestion">
-event will be emitted, defaults to C<16777216> (16MB).
 
 =head2 reactor
 

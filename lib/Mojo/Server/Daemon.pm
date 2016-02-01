@@ -116,7 +116,7 @@ sub _close {
   delete $self->{connections}{$id};
 }
 
-sub _debug { $_[0]->app->log->debug($_[2]) if $_[0]->{connections}{$_[1]}{tx} }
+sub _debug { $_[0]->app->log->debug($_[2]) if $_[0]{connections}{$_[1]}{tx} }
 
 sub _finish {
   my ($self, $id) = @_;

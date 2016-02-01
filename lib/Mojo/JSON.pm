@@ -1,7 +1,6 @@
 package Mojo::JSON;
 use Mojo::Base -strict;
 
-use B;
 use Carp 'croak';
 use Exporter 'import';
 use JSON::PP ();
@@ -250,8 +249,9 @@ sub _encode_value {
   return 'null' unless defined $value;
 
   # Number
+  no warnings 'numeric';
   return $value
-    if B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK)
+    if length((my $dummy = '') & $value)
     && 0 + $value eq $value
     && $value * 0 == 0;
 

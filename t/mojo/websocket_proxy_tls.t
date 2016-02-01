@@ -74,10 +74,10 @@ my $id = Mojo::IOLoop->server(
         return Mojo::IOLoop->stream($server)->write($chunk) if length $server;
 
         # Read connect request from client
-        my $client = $buffer{$id}{client} .= $chunk;
-        if ($client =~ /\x0d?\x0a\x0d?\x0a$/) {
+        my $buffer = $buffer{$id}{client} .= $chunk;
+        if ($buffer =~ /\x0d?\x0a\x0d?\x0a$/) {
           $buffer{$id}{client} = '';
-          if ($client =~ /CONNECT (\S+):(\d+)?/) {
+          if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             $connected = "$1:$2";
             my $fail = $2 == $port + 1;
 

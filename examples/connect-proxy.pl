@@ -17,12 +17,11 @@ Mojo::IOLoop->server(
         return Mojo::IOLoop->stream($server)->write($chunk) if length $server;
 
         # Read connect request from client
-        my $client = $buffer{$id}{client} .= $chunk;
-        if ($client =~ /\x0d?\x0a\x0d?\x0a$/) {
+        my $buffer = $buffer{$id}{client} .= $chunk;
+        if ($buffer =~ /\x0d?\x0a\x0d?\x0a$/) {
           $buffer{$id}{client} = '';
-          if ($client =~ /CONNECT (\S+):(\d+)?/) {
-            my $address = $1;
-            my $port = $2 || 80;
+          if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
+            my ($address, $port) = ($1, $2 || 80);
 
             # Connection to server
             $buffer{$id}{connection} = Mojo::IOLoop->client(

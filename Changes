@@ -1,4 +1,6 @@
 
+6.44  2016-02-02
+
 6.43  2016-02-01
   - Removed client_close and server_close methods from Mojo::Transaction.
   - Added closed method to Mojo::Transaction.

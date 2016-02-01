@@ -276,7 +276,7 @@ Construct a new L<Mojo::IOLoop::Stream> object.
 
   $stream->start;
 
-Start watching for new data on the stream.
+Start or resume watching for new data on the stream.
 
 =head2 steal_handle
 

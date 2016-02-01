@@ -460,7 +460,7 @@ Run server and wait for L</"SIGNALS">.
 
   $daemon = $daemon->start;
 
-Start accepting connections through L</"ioloop">.
+Start or resume accepting connections through L</"ioloop">.
 
   # Listen on random port
   my $id   = $daemon->listen(['http://127.0.0.1'])->start->acceptors->[0];

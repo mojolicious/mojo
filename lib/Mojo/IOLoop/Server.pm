@@ -323,7 +323,7 @@ Get port this server is listening on.
 
   $server->start;
 
-Start accepting connections.
+Start or resume accepting connections.
 
 =head2 stop
 

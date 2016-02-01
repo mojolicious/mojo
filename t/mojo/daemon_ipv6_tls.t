@@ -31,7 +31,7 @@ get '/' => {text => 'works!'};
 my (%buffer, $forward);
 my $id = Mojo::IOLoop->server(
   {address => '[::1]'} => sub {
-    my ($loop, $stream, $client) = @_;
+    my ($loop, $stream, $id) = @_;
 
     # Connection to client
     $stream->on(
@@ -39,42 +39,42 @@ my $id = Mojo::IOLoop->server(
         my ($stream, $chunk) = @_;
 
         # Write chunk from client to server
-        my $server = $buffer{$client}{connection};
+        my $server = $buffer{$id}{connection};
         return Mojo::IOLoop->stream($server)->write($chunk) if length $server;
 
         # Read connect request from client
-        my $buffer = $buffer{$client}{client} .= $chunk;
-        if ($buffer =~ /\x0d?\x0a\x0d?\x0a$/) {
-          $buffer{$client}{client} = '';
-          if ($buffer =~ /CONNECT \S+:\d+/) {
+        my $client = $buffer{$id}{client} .= $chunk;
+        if ($client =~ /\x0d?\x0a\x0d?\x0a$/) {
+          $buffer{$id}{client} = '';
+          if ($client =~ /CONNECT \S+:\d+/) {
 
             # Connection to server
-            $buffer{$client}{connection} = Mojo::IOLoop->client(
+            $buffer{$id}{connection} = Mojo::IOLoop->client(
               {address => '[::1]', port => $forward} => sub {
                 my ($loop, $err, $stream) = @_;
 
                 # Connection to server failed
                 if ($err) {
-                  Mojo::IOLoop->remove($client);
-                  return delete $buffer{$client};
+                  Mojo::IOLoop->remove($id);
+                  return delete $buffer{$id};
                 }
 
                 # Start forwarding data in both directions
-                Mojo::IOLoop->stream($client)
+                Mojo::IOLoop->stream($id)
                   ->write("HTTP/1.1 200 OK\x0d\x0a"
                     . "Connection: keep-alive\x0d\x0a\x0d\x0a");
                 $stream->on(
                   read => sub {
                     my ($stream, $chunk) = @_;
-                    Mojo::IOLoop->stream($client)->write($chunk);
+                    Mojo::IOLoop->stream($id)->write($chunk);
                   }
                 );
 
                 # Server closed connection
                 $stream->on(
                   close => sub {
-                    Mojo::IOLoop->remove($client);
-                    delete $buffer{$client};
+                    Mojo::IOLoop->remove($id);
+                    delete $buffer{$id};
                   }
                 );
               }
@@ -82,7 +82,7 @@ my $id = Mojo::IOLoop->server(
           }
 
           # Invalid request from client
-          else { Mojo::IOLoop->remove($client) }
+          else { Mojo::IOLoop->remove($id) }
         }
       }
     );
@@ -90,7 +90,7 @@ my $id = Mojo::IOLoop->server(
     # Client closed connection
     $stream->on(
       close => sub {
-        my $buffer = delete $buffer{$client};
+        my $buffer = delete $buffer{$id};
         Mojo::IOLoop->remove($buffer->{connection}) if $buffer->{connection};
       }
     );

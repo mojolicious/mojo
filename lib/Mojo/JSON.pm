@@ -54,7 +54,7 @@ sub _decode {
   eval {
 
     # Missing input
-    die "Missing or empty input\n" if (local $_ = shift) eq '';
+    die "Missing or empty input\n" unless length(local $_ = shift);
 
     # UTF-8
     $_ = Mojo::Util::decode 'UTF-8', $_ unless shift;
@@ -251,7 +251,7 @@ sub _encode_value {
   # Number
   no warnings 'numeric';
   return $value
-    if ((my $dummy = '') & $value) ne ''
+    if length((my $dummy = '') & $value)
     && 0 + $value eq $value
     && $value * 0 == 0;
 

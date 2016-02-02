@@ -114,7 +114,7 @@ sub parse_message {
       WindowBits  => -15
     );
     $inflate->inflate(($msg .= "\x00\x00\xff\xff"), my $out);
-    return $self->finish(1009) if $msg ne '';
+    return $self->finish(1009) if length $msg;
     $msg = $out;
   }
 
@@ -157,8 +157,8 @@ sub server_read {
 
 sub server_write {
   my $self = shift;
-  $self->emit('drain') if ($self->{write} //= '') eq '';
-  $self->completed if $self->{write} eq '' && $self->{closing};
+  $self->emit('drain') unless length($self->{write} //= '');
+  $self->completed if !length $self->{write} && $self->{closing};
   return delete $self->{write};
 }
 

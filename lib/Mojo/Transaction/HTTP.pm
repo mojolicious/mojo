@@ -15,7 +15,7 @@ sub client_read {
   return $self->completed
     if !$res->is_status_class(100) || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);
-  return if (my $leftovers = $res->content->leftovers) eq '';
+  return unless length(my $leftovers = $res->content->leftovers);
   $self->client_read($leftovers);
 }
 
@@ -77,7 +77,7 @@ sub _body {
 
   # Finished
   $finish ? $self->completed : ($self->{writing} = 0)
-    if $self->{write} <= 0 || defined $buffer && $buffer eq '';
+    if $self->{write} <= 0 || defined $buffer && !length $buffer;
 
   return $buffer // '';
 }

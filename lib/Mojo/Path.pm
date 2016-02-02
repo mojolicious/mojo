@@ -15,7 +15,7 @@ sub canonicalize {
 
   my $parts = $self->parts;
   for (my $i = 0; $i <= $#$parts;) {
-    if ($parts->[$i] eq '' || $parts->[$i] eq '.' || $parts->[$i] eq '...') {
+    if (!length $parts->[$i] || $parts->[$i] eq '.' || $parts->[$i] eq '...') {
       splice @$parts, $i, 1;
     }
     elsif ($i < 1 || $parts->[$i] ne '..' || $parts->[$i - 1] eq '..') { $i++ }

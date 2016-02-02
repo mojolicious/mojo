@@ -23,7 +23,7 @@ sub detect {
     my @home = splitdir $path;
 
     # Remove "lib" and "blib"
-    pop @home while @home && ($home[-1] =~ /^b?lib$/ || $home[-1] eq '');
+    pop @home while @home && ($home[-1] =~ /^b?lib$/ || !length $home[-1]);
 
     # Turn into absolute path
     return $self->parts([splitdir abs_path catdir(@home) || '.']);

@@ -38,9 +38,9 @@ sub clone {
 sub generate_body_chunk {
   my ($self, $offset) = @_;
 
-  $self->emit(drain => $offset) if ($self->{body_buffer} // '') eq '';
+  $self->emit(drain => $offset) unless length($self->{body_buffer} // '');
   my $chunk = delete $self->{body_buffer} // '';
-  return $self->{eof} ? '' : undef if $chunk eq '';
+  return $self->{eof} ? '' : undef unless length $chunk;
 
   return $chunk;
 }
@@ -103,7 +103,7 @@ sub parse {
   # Relaxed parsing
   my $headers = $self->headers;
   my $len = $headers->content_length // '';
-  if ($self->auto_relax && $len eq '') {
+  if ($self->auto_relax && !length $len) {
     my $connection = lc($headers->connection // '');
     $self->relaxed(1)
       if $connection eq 'close' || (!$connection && $self->expect_close);
@@ -149,7 +149,7 @@ sub write {
   $self->{dynamic} = 1;
   $self->{body_buffer} .= $chunk if defined $chunk;
   $self->once(drain => $cb) if $cb;
-  $self->{eof} = 1 if defined $chunk && $chunk eq '';
+  $self->{eof} = 1 if defined $chunk && !length $chunk;
 
   return $self;
 }
@@ -158,7 +158,7 @@ sub write_chunk {
   my ($self, $chunk, $cb) = @_;
   $self->headers->transfer_encoding('chunked') unless $self->is_chunked;
   $self->write(defined $chunk ? $self->_build_chunk($chunk) : $chunk, $cb);
-  $self->{eof} = 1 if defined $chunk && $chunk eq '';
+  $self->{eof} = 1 if defined $chunk && !length $chunk;
   return $self;
 }
 
@@ -166,7 +166,7 @@ sub _build_chunk {
   my ($self, $chunk) = @_;
 
   # End
-  return "\x0d\x0a0\x0d\x0a\x0d\x0a" if $chunk eq '';
+  return "\x0d\x0a0\x0d\x0a\x0d\x0a" unless length $chunk;
 
   # First chunk has no leading CRLF
   my $crlf = $self->{chunks}++ ? "\x0d\x0a" : '';

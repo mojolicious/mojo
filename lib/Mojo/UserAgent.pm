@@ -321,7 +321,7 @@ sub _write {
   local $c->{writing} = 1;
   my $chunk = $tx->client_write;
   warn term_escape "-- Client >>> Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
-  return if $chunk eq '';
+  return unless length $chunk;
   weaken $self;
   $c->{ioloop}->stream($id)->write($chunk => sub { $self->_write($id) });
 }

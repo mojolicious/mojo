@@ -101,7 +101,7 @@ sub path {
 sub path_query {
   my $self  = shift;
   my $query = $self->query->to_string;
-  return $self->path->to_string . ($query eq '' ? '' : "?$query");
+  return $self->path->to_string . (length $query ? "?$query" : '');
 }
 
 sub protocol { lc(shift->scheme // '') }
@@ -153,7 +153,7 @@ sub to_abs {
       = $abs->path($base_path->clone)->path->trailing_slash(0)->canonicalize;
 
     # Query
-    return $abs if $abs->query->to_string ne '';
+    return $abs if length $abs->query->to_string;
     $abs->query($base->query->clone);
   }
 
@@ -176,7 +176,7 @@ sub to_string {
 
   # Path and query
   my $path = $self->path_query;
-  $url .= !$authority || $path eq '' || $path =~ m!^[/?]! ? $path : "/$path";
+  $url .= !$authority || !length $path || $path =~ m!^[/?]! ? $path : "/$path";
 
   # Fragment
   return $url unless defined(my $fragment = $self->fragment);

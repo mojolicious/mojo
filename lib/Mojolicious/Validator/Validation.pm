@@ -73,7 +73,7 @@ sub optional {
     @input = map { $self->$cb($name, $_) } @input;
   }
   $self->output->{$name} = @input > 1 ? \@input : $input[0]
-    unless grep { $_ eq '' } @input;
+    unless grep { !length } @input;
 
   return $self->topic($name);
 }

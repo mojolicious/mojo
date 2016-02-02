@@ -138,7 +138,7 @@ sub punycode_decode {
   # Consume all code points before the last delimiter
   push @output, split('', $1) if $input =~ s/(.*)\x2d//s;
 
-  while ($input ne '') {
+  while (length $input) {
     my $oldi = $i;
     my $w    = 1;
 

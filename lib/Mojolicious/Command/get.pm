@@ -67,7 +67,7 @@ sub run {
 
   # JSON Pointer
   return unless defined $selector;
-  return _json($buffer, $selector) if $selector eq '' || $selector =~ m!^/!;
+  return _json($buffer, $selector) if !length $selector || $selector =~ m!^/!;
 
   # Selector
   $charset //= $tx->res->content->charset || $tx->res->default_charset;
@@ -83,7 +83,7 @@ sub _json {
   say encode_json($data);
 }
 
-sub _say { $_ ne '' && say encode('UTF-8', $_) for @_ }
+sub _say { length && say encode('UTF-8', $_) for @_ }
 
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;

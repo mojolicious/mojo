@@ -71,7 +71,7 @@ sub get_helper {
 
   my $found;
   my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum "$name:$self";
-  my $re = $name eq '' ? qr/^(([^.]+))/ : qr/^(\Q$name\E\.([^.]+))/;
+  my $re = length $name ? qr/^(\Q$name\E\.([^.]+))/ : qr/^(([^.]+))/;
   for my $key (keys %{$self->helpers}) {
     $key =~ $re ? ($found, my $method) = (1, $2) : next;
     my $sub = $self->get_helper($1);

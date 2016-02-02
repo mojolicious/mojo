@@ -40,7 +40,7 @@ sub build {
     if ($op eq 'text') {
       $value = join "\n", map { quotemeta $_ } split("\n", $value, -1);
       $value .= '\n' if $newline;
-      $blocks[-1] .= "\$_O .= \"" . $value . "\";" if $value ne '';
+      $blocks[-1] .= "\$_O .= \"" . $value . "\";" if length $value;
     }
 
     # Code or multi-line expression

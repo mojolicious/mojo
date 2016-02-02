@@ -145,7 +145,7 @@ sub _equation {
   # "n", "4n", "+4n", "-4n", "n+1", "4n-1", "+4n-1" (and other variations)
   return [0, 0]
     unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
-  return [$1 eq '-' ? -1 : $1 eq '' ? 1 : $1, join('', split(' ', $2 // 0))];
+  return [$1 eq '-' ? -1 : !length $1 ? 1 : $1, join('', split(' ', $2 // 0))];
 }
 
 sub _match {

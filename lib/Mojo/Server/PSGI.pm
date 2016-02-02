@@ -57,7 +57,7 @@ sub getline {
   return '' unless defined $chunk;
 
   # End of content
-  return undef if $chunk eq '';
+  return undef unless length $chunk;
 
   $self->{offset} += length $chunk;
   return $chunk;

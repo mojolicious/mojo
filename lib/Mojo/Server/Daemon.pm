@@ -148,7 +148,7 @@ sub _finish {
   return $self->_remove($id) if $tx->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return if (my $leftovers = $tx->req->content->leftovers) eq '';
+  return unless length(my $leftovers = $tx->req->content->leftovers);
   $tx = $c->{tx} = $self->_build_tx($id, $c);
   $tx->server_read($leftovers);
 }
@@ -228,7 +228,7 @@ sub _write {
   local $c->{writing} = 1;
   my $chunk = $tx->server_write;
   warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
-  my $next = $tx->is_finished ? '_finish' : $chunk eq '' ? undef : '_write';
+  my $next = $tx->is_finished ? '_finish' : length $chunk ? '_write' : undef;
   return $self->ioloop->stream($id)->write($chunk) unless $next;
   weaken $self;
   $self->ioloop->stream($id)->write($chunk => sub { $self->$next($id) });

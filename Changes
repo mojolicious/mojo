@@ -1,5 +1,6 @@
 
 6.44  2016-02-02
+  - Removed deprecated format_regex attribute from Mojolicious::Routes::Pattern.
   - Improved Mojo::JSON performance slightly.
 
 6.43  2016-02-01

@@ -1,8 +1,6 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
-use Mojo::Util 'deprecated';
-
 has [qw(constraints defaults)] => sub { {} };
 has placeholder_start => ':';
 has [qw(placeholders tree)] => sub { [] };
@@ -11,12 +9,6 @@ has quote_start => '(';
 has [qw(regex unparsed)];
 has relaxed_start  => '#';
 has wildcard_start => '*';
-
-# DEPRECATED in Clinking Beer Mugs!
-sub format_regex {
-  deprecated 'Mojolicious::Routes::Pattern::format_regex is DEPRECATED';
-  return @_ > 1 ? $_[0] : undef;
-}
 
 sub match {
   my ($self, $path, $detect) = @_;

@@ -251,7 +251,7 @@ sub _encode_value {
   # Number
   no warnings 'numeric';
   return $value
-    if length((my $dummy = '') & $value)
+    if ((my $dummy = '') & $value) ne ''
     && 0 + $value eq $value
     && $value * 0 == 0;
 

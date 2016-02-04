@@ -94,6 +94,7 @@ automatically exported.
 =head2 any
 
   my $route = any '/:foo' => sub {...};
+  my $route = any '/:foo' => sub {...} => 'name';
   my $route = any '/:foo' => {foo => 'bar'} => sub {...};
   my $route = any '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = any ['GET', 'POST'] => '/:foo' => sub {...};
@@ -117,6 +118,7 @@ L<Mojolicious>.
 =head2 del
 
   my $route = del '/:foo' => sub {...};
+  my $route = del '/:foo' => sub {...} => 'name';
   my $route = del '/:foo' => {foo => 'bar'} => sub {...};
   my $route = del '/:foo' => [foo => qr/\w+/] => sub {...};
 
@@ -127,6 +129,7 @@ argument variations.
 =head2 get
 
   my $route = get '/:foo' => sub {...};
+  my $route = get '/:foo' => sub {...} => 'name';
   my $route = get '/:foo' => {foo => 'bar'} => sub {...};
   my $route = get '/:foo' => [foo => qr/\w+/] => sub {...};
 
@@ -155,6 +158,7 @@ Share code with L<Mojolicious/"hook">.
 =head2 options
 
   my $route = options '/:foo' => sub {...};
+  my $route = options '/:foo' => sub {...} => 'name';
   my $route = options '/:foo' => {foo => 'bar'} => sub {...};
   my $route = options '/:foo' => [foo => qr/\w+/] => sub {...};
 
@@ -165,6 +169,7 @@ argument variations.
 =head2 patch
 
   my $route = patch '/:foo' => sub {...};
+  my $route = patch '/:foo' => sub {...} => 'name';
   my $route = patch '/:foo' => {foo => 'bar'} => sub {...};
   my $route = patch '/:foo' => [foo => qr/\w+/] => sub {...};
 
@@ -181,6 +186,7 @@ Load a plugin with L<Mojolicious/"plugin">.
 =head2 post
 
   my $route = post '/:foo' => sub {...};
+  my $route = post '/:foo' => sub {...} => 'name';
   my $route = post '/:foo' => {foo => 'bar'} => sub {...};
   my $route = post '/:foo' => [foo => qr/\w+/] => sub {...};
 
@@ -191,6 +197,7 @@ variations.
 =head2 put
 
   my $route = put '/:foo' => sub {...};
+  my $route = put '/:foo' => sub {...} => 'name';
   my $route = put '/:foo' => {foo => 'bar'} => sub {...};
   my $route = put '/:foo' => [foo => qr/\w+/] => sub {...};
 
@@ -213,6 +220,7 @@ L<Mojolicious::Guides::Tutorial> for more argument variations.
 =head2 websocket
 
   my $route = websocket '/:foo' => sub {...};
+  my $route = websocket '/:foo' => sub {...} => 'name';
   my $route = websocket '/:foo' => {foo => 'bar'} => sub {...};
   my $route = websocket '/:foo' => [foo => qr/\w+/] => sub {...};
 

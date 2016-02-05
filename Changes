@@ -1,4 +1,6 @@
 
+6.45  2016-02-06
+
 6.44  2016-02-04
   - Removed deprecated format_regex attribute from Mojolicious::Routes::Pattern.
   - Improved get command not to use the user agent of the application.

@@ -421,11 +421,12 @@ The callback passed to L<Mojo::UserAgent/"get"> will be executed once the
 request to the backend web service has been finished, this is called
 continuation-passing style.
 
-=head2 Synchronizing events
+=head2 Synchronizing non-blocking operations
 
-Multiple events such as concurrent requests can be easily synchronized with
-L<Mojolicious::Plugin::DefaultHelpers/"delay">, which can help you avoid deep
-nested closures that often result from continuation-passing style.
+Multiple non-blocking operations, such as concurrent requests, can be easily
+synchronized with L<Mojolicious::Plugin::DefaultHelpers/"delay">, which can help
+you avoid deep nested closures that often result from continuation-passing
+style.
 
   use Mojolicious::Lite;
   use Mojo::URL;
@@ -530,10 +531,10 @@ created at startup time.
 
   app->start;
 
-Just remember that all events are processed cooperatively, so your callbacks
-shouldn't block for too long.
+Just remember that all these non-blocking operations are processed
+cooperatively, so your callbacks shouldn't block for too long.
 
-=head2 Exceptions in events
+=head2 Exceptions in non-blocking operations
 
 Since timers and other non-blocking operations are running solely in the event
 loop, outside of the application, exceptions that get thrown in callbacks can't

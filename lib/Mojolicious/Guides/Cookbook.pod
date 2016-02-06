@@ -461,8 +461,9 @@ style.
   app->start;
 
 You simply use L<Mojo::IOLoop::Delay/"begin"> to generate callbacks that can be
-passed to L<Mojo::UserAgent/"get">, and which lead to the next step in the chain
-once they all have been executed.
+passed to L<Mojo::UserAgent/"get">. These callbacks then capture arguments
+passed to them, and pass them on to the next step in the chain, once all
+generated callbacks have been executed.
 
 =head2 Timers
 

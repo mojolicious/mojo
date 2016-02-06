@@ -417,6 +417,10 @@ latency backend web services.
     </body>
   </html>
 
+The callback passed to L<Mojo::UserAgent/"get"> will be executed once the
+request to the backend web service has been finished, this is called
+continuation-passing style.
+
 =head2 Synchronizing events
 
 Multiple events such as concurrent requests can be easily synchronized with
@@ -454,6 +458,10 @@ nested closures that often result from continuation-passing style.
   };
 
   app->start;
+
+You simply use L<Mojo::IOLoop::Delay/"begin"> to generate callbacks that can be
+passed to L<Mojo::UserAgent/"get">, and which lead to the next step in the chain
+once they all have been executed.
 
 =head2 Timers
 

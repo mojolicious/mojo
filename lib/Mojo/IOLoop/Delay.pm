@@ -146,7 +146,7 @@ fatal if unhandled.
     ...
   });
 
-Emitted once the active event counter reaches zero and there are no more steps.
+Emitted once the event counter reaches zero and there are no more steps.
 
 =head1 ATTRIBUTES
 
@@ -177,10 +177,10 @@ implements the following new ones.
   my $cb = $delay->begin($offset);
   my $cb = $delay->begin($offset, $len);
 
-Indicate an active event by incrementing the active event counter, the returned
-callback needs to be called when the event has completed, to decrement the
-active event counter again. When all callbacks have been called and the active
-event counter reached zero, L</"steps"> will continue.
+Indicate an active event by incrementing the event counter, the returned
+callback needs to be called when the event has completed, to decrement the event
+counter again. When all callbacks have been called and the event counter reached
+zero, L</"steps"> will continue.
 
   # Capture all arguments except for the first one (invocant)
   my $delay = Mojo::IOLoop->delay(sub {
@@ -240,8 +240,8 @@ Data shared between all L</"steps">.
   $delay = $delay->pass;
   $delay = $delay->pass(@args);
 
-Increment active event counter and decrement it again right away to pass values
-to the next step.
+Increment event counter and decrement it again right away to pass values to the
+next step.
 
   # Longer version
   $delay->begin(0)->(@args);
@@ -250,11 +250,11 @@ to the next step.
 
   $delay = $delay->steps(sub {...}, sub {...});
 
-Sequentialize multiple events, every time the active event counter reaches zero
-a callback will run, the first one automatically runs during the next reactor
-tick unless it is delayed by incrementing the active event counter. This chain
-will continue until there are no L</"remaining"> callbacks, a callback does not
-increment the active event counter or an exception gets thrown in a callback.
+Sequentialize multiple events, every time the event counter reaches zero a
+callback will run, the first one automatically runs during the next reactor tick
+unless it is delayed by incrementing the event counter. This chain will continue
+until there are no L</"remaining"> callbacks, a callback does not increment the
+event counter or an exception gets thrown in a callback.
 
 =head2 wait
 

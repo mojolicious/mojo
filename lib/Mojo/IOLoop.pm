@@ -414,7 +414,7 @@ events for this event loop, which can help you avoid deep nested closures that
 often result from continuation-passing style. Callbacks will be passed along to
 L<Mojo::IOLoop::Delay/"steps">.
 
-  # Synchronize multiple events
+  # Synchronize multiple non-blocking operations
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
   for my $i (1 .. 10) {
     my $end = $delay->begin;
@@ -425,7 +425,7 @@ L<Mojo::IOLoop::Delay/"steps">.
   }
   $delay->wait;
 
-  # Sequentialize multiple events
+  # Sequentialize multiple non-blocking operations
   Mojo::IOLoop->delay(
 
     # First step (simple timer)

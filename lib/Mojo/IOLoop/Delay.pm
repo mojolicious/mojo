@@ -66,7 +66,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
 
   use Mojo::IOLoop::Delay;
 
-  # Synchronize multiple events
+  # Synchronize multiple non-blocking operations
   my $delay = Mojo::IOLoop::Delay->new;
   $delay->steps(sub { say 'BOOM!' });
   for my $i (1 .. 10) {
@@ -78,7 +78,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
   }
   $delay->wait;
 
-  # Sequentialize multiple events
+  # Sequentialize multiple non-blocking operations
   Mojo::IOLoop::Delay->new->steps(
 
     # First step (simple timer)
@@ -178,9 +178,9 @@ implements the following new ones.
   my $cb = $delay->begin($offset, $len);
 
 Indicate an active event by incrementing the event counter, the returned
-callback needs to be called when the event has completed, to decrement the event
-counter again. When all callbacks have been called and the event counter reached
-zero, L</"steps"> will continue.
+callback needs to be executed when the event has completed, to decrement the
+event counter again. When all callbacks have been executed and the event counter
+reached zero, L</"steps"> will continue.
 
   # Capture all arguments except for the first one (invocant)
   my $delay = Mojo::IOLoop->delay(sub {

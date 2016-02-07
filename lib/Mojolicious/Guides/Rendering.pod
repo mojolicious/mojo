@@ -947,9 +947,10 @@ L<Mojolicious::Validator::Validation/"error">.
 =head2 Cross-site request forgery
 
 CSRF is a very common attack on web applications that trick your logged in
-users to submit forms they did not intend to send. All you have to do, to
-protect your users from this, is to add an additional hidden field to your
-forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field">, and validate it with
+users to submit forms they did not intend to send, with something as mundane as
+a link. All you have to do, to protect your users from this, is to add an
+additional hidden field to your forms with
+L<Mojolicious::Plugin::TagHelpers/"csrf_field">, and validate it with
 L<Mojolicious::Validator::Validation/"csrf_protect">.
 
   use Mojolicious::Lite;
@@ -985,7 +986,9 @@ L<Mojolicious::Validator::Validation/"csrf_protect">.
     </body>
   </html>
 
-The token can also be submitted with the C<X-CSRF-Token> request header.
+For Ajax requests and the like, you can also generate a token directly with the
+helper L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">, and then pass it
+along with the C<X-CSRF-Token> request header.
 
 =head1 ADVANCED
 

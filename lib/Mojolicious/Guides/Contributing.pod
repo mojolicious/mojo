@@ -176,11 +176,12 @@ No names outside of C<Mojolicious.pm>.
 Please consider sponsoring the ongoing development of L<Mojolicious>, especially
 if your company benefits from this project. We welcome your patronage on
 L<Gratipay|https://gratipay.com/mojolicious> and
-L<Bountysource|https://www.bountysource.com/teams/mojolicious>. One-time grants
-for contiguous full-time development, over the period of a few days, can also
-have a huge impact. They allow us to tackle complex issues that are otherwise
-left to linger until somebody can't afford to not fix them. To arrange such a
-grant for a core developer please email C<sri@cpan.org>.
+L<Bountysource|https://www.bountysource.com/teams/mojolicious>.
+
+One-time grants for contiguous full-time development, over the period of a few
+days, can also have a huge impact. They allow us to tackle complex issues that
+are otherwise left to linger until somebody can't afford to not fix them. To
+arrange such a grant for a core developer please email C<sri@cpan.org>.
 
 =head1 CODE OF CONDUCT
 

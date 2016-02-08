@@ -1,5 +1,5 @@
 
-6.45  2016-02-07
+6.45  2016-02-08
 
 6.44  2016-02-04
   - Removed deprecated format_regex attribute from Mojolicious::Routes::Pattern.

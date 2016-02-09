@@ -67,6 +67,7 @@ EOF
 # Shortcut
 $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
 <div id="&amp;lt;">test &amp; 123</div>
+<div data-foo="&gt;" id="&lt;">test&nbsp;321</div>
 <div>
   <p id="0">just</p>
   <p>0</p>
@@ -511,6 +512,7 @@ __DATA__
 
 @@ small_tags.html.ep
 %=t div => (id => '&lt;') => 'test & 123'
+%=t div => (id => b('&lt;'), data => {foo => b('&gt;')}) => b('test&nbsp;321')
 %=t div => begin
   %=t p => (id => 0) => 'just'
   %=t p => 0

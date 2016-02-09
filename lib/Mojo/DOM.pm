@@ -230,7 +230,7 @@ sub _content {
   my $tree = $self->tree;
   unless ($tree->[0] eq 'root' || $tree->[0] eq 'tag') {
     my $old = $self->content;
-    return $self->content($start ? "$old$new" : "$new$old");
+    return $self->content($start ? $old . $new : $new . $old);
   }
 
   $start  = $start  ? ($#$tree + 1) : _start($tree);

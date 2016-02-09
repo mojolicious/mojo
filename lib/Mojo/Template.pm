@@ -14,7 +14,7 @@ has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
-has escape        => sub { \&Mojo::Util::xss_escape };
+has escape        => sub { \&Mojo::Util::xml_escape };
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
@@ -495,7 +495,7 @@ Encoding used for template files.
   $mt    = $mt->escape(sub {...});
 
 A callback used to escape the results of escaped expressions, defaults to
-L<Mojo::Util/"xss_escape">.
+L<Mojo::Util/"xml_escape">.
 
   $mt->escape(sub {
     my $str = shift;

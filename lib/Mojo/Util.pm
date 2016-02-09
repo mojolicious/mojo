@@ -57,8 +57,11 @@ our @EXPORT_OK = (
   qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
   qw(split_header spurt squish steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode xss_escape)
+  qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
+
+# DEPRECATED in Clinking Beer Mugs!
+push @EXPORT_OK, 'xss_escape';
 
 sub b64_decode { decode_base64 $_[0] }
 sub b64_encode { encode_base64 $_[0], $_[1] }
@@ -324,7 +327,8 @@ sub url_unescape {
 }
 
 sub xml_escape {
-  my $str = shift;
+  return $_[0] if ref $_[0] && ref $_[0] eq 'Mojo::ByteStream';
+  my $str = shift // '';
   $str =~ s/([&<>"'])/$XML{$1}/ge;
   return $str;
 }
@@ -340,9 +344,11 @@ sub xor_encode {
   return $output .= $buffer ^ substr($key, 0, length $buffer, '');
 }
 
+# DEPRECATED in Clinking Beer Mugs!
 sub xss_escape {
-  no warnings 'uninitialized';
-  ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : xml_escape("$_[0]");
+  deprecated
+    'Mojo::Util::xss_escape is DEPRECATED in favor of Mojo::Util::xml_escape';
+  xml_escape(@_);
 }
 
 sub _adapt {
@@ -790,22 +796,21 @@ L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
 
   my $escaped = xml_escape $str;
 
-Escape unsafe characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string.
+Escape unsafe characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string, but
+do not escape L<Mojo::ByteStream> objects.
 
   # "&lt;div&gt;"
   xml_escape '<div>';
+
+  # "<div>"
+  use Mojo::ByteStream 'b';
+  xml_escape b('<div>');
 
 =head2 xor_encode
 
   my $encoded = xor_encode $str, $key;
 
 XOR encode string with variable length key.
-
-=head2 xss_escape
-
-  my $escaped = xss_escape $str;
-
-Same as L</"xml_escape">, but does not escape L<Mojo::ByteStream> objects.
 
 =head1 SEE ALSO
 

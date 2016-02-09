@@ -16,7 +16,7 @@ use Mojo::Util
   qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
   qw(split_header spurt squish steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode xss_escape);
+  qw(unquote url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -219,9 +219,9 @@ is xml_escape('привет<foo>'), 'привет&lt;foo&gt;',
 # xml_escape (nothing to escape)
 is xml_escape('привет'), 'привет', 'no changes';
 
-# xss_escape
-is xss_escape('<p>'), '&lt;p&gt;', 'right XSS escaped result';
-is xss_escape(b('<p>')), '<p>', 'right XSS escaped result';
+# xml_escape (XSS)
+is xml_escape('<p>'), '&lt;p&gt;', 'right XSS escaped result';
+is xml_escape(b('<p>')), '<p>', 'right XSS escaped result';
 
 # punycode_encode
 is punycode_encode('bücher'), 'bcher-kva', 'right punycode encoded result';

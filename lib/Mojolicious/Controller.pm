@@ -203,8 +203,8 @@ sub rendered {
     # Disable auto rendering and stop timer
     my $app = $self->render_later->app;
     if (my $started = delete $stash->{'mojo.started'}) {
-      my $elapsed = sprintf '%f',
-        Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
+      my $elapsed
+        = Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
       my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
       my $code = $res->code;
       my $msg  = $res->message || $res->default_message($code);

@@ -227,6 +227,10 @@ $validation = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})
 ok !$validation->has_error, 'no error';
 ok $validation->required('foo')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
+$validation = $t->app->validation->input({csrf_token => ['abc', 'def']})
+  ->csrf_token('abc')->csrf_protect;
+ok $validation->has_error, 'has error';
+is_deeply $validation->error('csrf_token'), ['csrf_protect'], 'right error';
 
 # Missing method and function (AUTOLOAD)
 eval { $t->app->validation->missing };

@@ -378,7 +378,14 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     ->get('https://www.github.com/kraih/mojo/tarball/master')
     ->res->content->asset->move_to('/home/sri/mojo.tar.gz');
 
-  # Non-blocking concurrent requests
+  # Non-blocking request
+  $ua->get('mojolicious.org' => sub {
+    my ($ua, $tx) = @_;
+    say $tx->res->dom->at('title')->text;
+  });
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+  # Non-blocking concurrent requests (synchronized with a delay)
   Mojo::IOLoop->delay(
     sub {
       my $delay = shift;

@@ -1,5 +1,6 @@
 package Mojo::JSON::Pointer;
 use Mojo::Base -base;
+use Mojo::Exception;
 
 has 'data';
 
@@ -10,6 +11,8 @@ sub new { @_ > 1 ? shift->SUPER::new(data => shift) : shift->SUPER::new }
 
 sub _pointer {
   my ($self, $contains, $pointer) = @_;
+
+  Mojo::Exception->throw(__PACKAGE__.": Invalid JSON Pointer '$pointer'. Pointer must start with '/' or be undefined") if ($pointer && $pointer =~ /^[^\/].+/);
 
   my $data = $self->data;
   return $contains ? 1 : $data unless $pointer =~ s!^/!!;

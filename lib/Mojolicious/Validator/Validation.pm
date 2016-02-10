@@ -37,6 +37,7 @@ sub check {
 sub csrf_protect {
   my $self  = shift;
   my $token = $self->input->{csrf_token};
+  $token = ref $token eq 'ARRAY' ? $token->[-1] : $token;
   $self->error(csrf_token => ['csrf_protect'])
     unless $token && $token eq ($self->csrf_token // '');
   return $self;

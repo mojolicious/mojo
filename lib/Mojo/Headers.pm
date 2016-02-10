@@ -20,9 +20,9 @@ my %NORMALCASE = map { lc() => $_ } (
   qw(Upgrade User-Agent Vary WWW-Authenticate)
 );
 for my $header (keys %NORMALCASE) {
-  my $method = $header;
-  $method =~ y/-/_/;
-  monkey_patch __PACKAGE__, $method, sub {
+  my $name = $header;
+  $name =~ y/-/_/;
+  monkey_patch __PACKAGE__, $name, sub {
     my $self = shift;
     $self->{headers}{$header} = [@_] and return $self if @_;
     return undef unless my $headers = $self->{headers}{$header};

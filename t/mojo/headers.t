@@ -10,8 +10,8 @@ $headers->add(Connection => 'keep-alive');
 is $headers->header('Connection'), 'close, keep-alive', 'right value';
 $headers->remove('Connection');
 is $headers->header('Connection'), undef, 'no value';
-$headers->content_type('text/html');
-$headers->content_type('text/html');
+is $headers->connection, undef, 'no value';
+$headers->content_type('text/text')->content_type('text/html');
 $headers->expect('continue-100');
 $headers->connection('close');
 is $headers->content_type, 'text/html', 'right value';
@@ -202,16 +202,23 @@ is_deeply $headers->to_hash(1),
 
 # Multiple headers with the same name
 $headers = Mojo::Headers->new;
-$headers->from_hash({'X-Test' => [23, 24], 'X-Test2' => 'foo'});
+$headers->from_hash(
+  {'X-Test' => [23, 24], 'X-Test2' => 'foo', Connection => ['a', 'b']});
 $hash = $headers->to_hash;
 is $hash->{'X-Test'},  '23, 24', 'right value';
 is $hash->{'X-Test2'}, 'foo',    'right value';
+is $hash->{Connection}, 'a, b', 'right value';
 $hash = $headers->to_hash(1);
 is_deeply $hash->{'X-Test'}, [23, 24], 'right structure';
 is_deeply $hash->{'X-Test2'}, ['foo'], 'right structure';
+is_deeply $hash->{Connection}, ['a', 'b'], 'right structure';
 $headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
-is_deeply $headers->to_hash(1), {'X-Test' => [23, 24], 'X-Test2' => ['foo']},
+is_deeply $headers->to_hash(1),
+  {'X-Test' => [23, 24], 'X-Test2' => ['foo'], Connection => ['a', 'b']},
   'right structure';
+is $headers->header('X-Test'), '23, 24', 'right value';
+is $headers->connection, 'a, b', 'right value';
+is $headers->connection('c', 'd', 'e')->connection, 'c, d, e', 'right value';
 
 # Headers in chunks
 $headers = Mojo::Headers->new;

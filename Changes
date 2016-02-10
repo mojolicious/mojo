@@ -1,5 +1,6 @@
 
-6.46  2016-02-10
+6.46  2016-02-11
+  - Improved Mojo::Headers performance. (batman)
 
 6.45  2016-02-09
   - Deprecated Mojo::Util::xss_escape in favor of Mojo::Util::xml_escape.

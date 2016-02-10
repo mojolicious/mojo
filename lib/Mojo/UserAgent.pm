@@ -385,7 +385,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-  # Non-blocking concurrent requests (synchronized with a delay)
+  # Concurrent non-blocking requests (synchronized with a delay)
   Mojo::IOLoop->delay(
     sub {
       my $delay = shift;
@@ -399,7 +399,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     }
   )->wait;
 
-  # Non-blocking WebSocket connection sending and receiving JSON messages
+  # WebSocket connection sending and receiving JSON messages
   $ua->websocket('ws://example.com/echo.json' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;

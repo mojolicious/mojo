@@ -431,15 +431,14 @@ sub _stash {
   my ($name, $object) = (shift, shift);
 
   # Hash
-  my $dict = $object->{$name} ||= {};
-  return $dict unless @_;
+  return $object->{$name} ||= {} unless @_;
 
   # Get
-  return $dict->{$_[0]} unless @_ > 1 || ref $_[0];
+  return $object->{$name}{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};
-  @$dict{keys %$values} = values %$values;
+  @{$object->{$name}}{keys %$values} = values %$values;
 
   return $object;
 }

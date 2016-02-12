@@ -434,6 +434,13 @@ is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
 
+# Simple peer with deactivated proxy
+$tx = $t->tx(GET => 'http://mojolicious.org');
+$tx->req->via_proxy(0)->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
+is(($t->peer($tx))[0], 'http',            'right scheme');
+is(($t->peer($tx))[1], 'mojolicious.org', 'right host');
+is(($t->peer($tx))[2], 80,                'right port');
+
 # Simple peer with SOCKS proxy
 $tx = $t->tx(GET => 'http://mojolicious.org');
 $tx->req->proxy(Mojo::URL->new('socks://127.0.0.1:3000'));

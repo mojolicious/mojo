@@ -33,7 +33,7 @@ sub endpoint {
   my $socks;
   if (my $proxy = $req->proxy) { $socks = $proxy->protocol eq 'socks' }
   return $self->_proxy($tx, $proto, $host, $port)
-    if $proto eq 'http' && $req->via_proxy && !$req->is_handshake && !$socks;
+    if $proto eq 'http' && !$req->is_handshake && !$socks;
 
   return $proto, $host, $port;
 }
@@ -241,11 +241,10 @@ sub _multipart {
 sub _proxy {
   my ($self, $tx, $proto, $host, $port) = @_;
 
-  # Update with proxy information
-  if (my $proxy = $tx->req->proxy) {
-    $proto = $proxy->protocol;
-    $host  = $proxy->ihost;
-    $port  = $proxy->port || ($proto eq 'https' ? 443 : 80);
+  my $req = $tx->req;
+  if ($req->via_proxy && (my $proxy = $req->proxy)) {
+    return $proxy->protocol, $proxy->ihost,
+      $proxy->port || ($proto eq 'https' ? 443 : 80);
   }
 
   return $proto, $host, $port;

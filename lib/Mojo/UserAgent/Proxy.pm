@@ -22,7 +22,7 @@ sub prepare {
   $self->detect if $ENV{MOJO_PROXY};
   my $req = $tx->req;
   my $url = $req->url;
-  return unless $req->via_proxy && $self->is_needed($url->host);
+  return unless $self->is_needed($url->host);
 
   # HTTP proxy
   my $proto = $url->protocol;

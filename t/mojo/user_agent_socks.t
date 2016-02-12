@@ -161,4 +161,14 @@ is $tx->res->body, "https:$last", 'right content';
 isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
   $last, 'different ports');
 
+# Disabled SOCKS proxy
+$ua->server->url('http');
+$ua->proxy->http("socks://foo:baz\@127.0.0.1:$port");
+$tx = $ua->build_tx(GET => '/');
+$tx->req->via_proxy(0);
+$tx = $ua->start($tx);
+ok $tx->success, 'successful';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $tx->local_port, 'right content';
+
 done_testing();

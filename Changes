@@ -1,6 +1,7 @@
 
-6.46  2016-02-11
+6.46  2016-02-12
   - Improved Mojo::Headers performance. (batman)
+  - Fixed small proxy bug in Mojo::UserAgent::Transactor.
 
 6.45  2016-02-09
   - Deprecated Mojo::Util::xss_escape in favor of Mojo::Util::xml_escape.

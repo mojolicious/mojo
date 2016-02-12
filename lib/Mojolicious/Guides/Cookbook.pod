@@ -1076,8 +1076,8 @@ Sending a streaming request is almost just as easy.
   my $drain;
   $drain = sub {
     my $content = shift;
-    my $chunk   = substr $body, 0, 1, '';
-    $drain      = undef unless length $body;
+    my $chunk = substr $body, 0, 1, '';
+    $drain = undef unless length $body;
     $content->write($chunk, $drain);
   };
   $tx->req->content->$drain;

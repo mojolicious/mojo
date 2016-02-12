@@ -1282,8 +1282,8 @@ smaller chunks.
     my $drain;
     $drain = sub {
       my $c = shift;
-      my $chunk   = substr $body, 0, 1, '';
-      $drain      = undef unless length $body;
+      my $chunk = substr $body, 0, 1, '';
+      $drain = undef unless length $body;
       $c->write($chunk, $drain);
     };
     $c->$drain;

@@ -261,10 +261,10 @@ $t->get_ok('/withblocklayout')->status_is(200)
 $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is(
-  "Content!This\n\nseems\nto\nHello    world!\n\nwork!\n\nShared content!\n\n");
+  "Content!This\n\nseems\nto\nHello    World!\n\nwork!\n\nShared content!\n\n");
 $t->get_ok('/content_with')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("Default\n\nSomething <b>else</b>!\n\n\n<br>Hello world!\n\n");
+  ->content_is("Default\n\nSomething <b>else</b>!\n\n\n<br>Hello World!\n\n");
 
 # Inline template
 $t->get_ok('/inline')->status_is(200)
@@ -450,7 +450,7 @@ This
 <% content_for message => begin =%>Hello<% end %>
 seems
 % content_for message => begin
-    world!
+    World!
 % end
 to
 <%= content_for 'message' %>
@@ -467,7 +467,7 @@ to
 %= content_with 'first'
 % content_with first => '';
 %= content_with 'first'
-<% content second => begin %>world<% end %>
+<% content second => begin %>World<% end %>
 <%= content_with second => begin %><br>Hello <%= content 'second' %>!<% end %>
 % content_with 'second'
 

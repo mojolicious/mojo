@@ -64,14 +64,14 @@ session state is kept client-side.
 
   +---------+                        +------------+
   |         | ->    PUT /foo      -> |            |
-  |         | ->    Hello world!  -> |            |
+  |         | ->    Hello World!  -> |            |
   |         |                        |            |
   |         | <-    201 CREATED   <- |            |
   |         |                        |            |
   |         | ->    GET /foo      -> |            |
   | Browser |                        | Web Server |
   |         | <-    200 OK        <- |            |
-  |         | <-    Hello world!  <- |            |
+  |         | <-    Hello World!  <- |            |
   |         |                        |            |
   |         | ->    DELETE /foo   -> |            |
   |         |                        |            |
@@ -188,7 +188,7 @@ This will be the foundation for our login manager example application.
 
   get '/' => sub {
     my $c = shift;
-    $c->render(text => 'Hello world!');
+    $c->render(text => 'Hello World!');
   };
 
   app->start;
@@ -244,7 +244,7 @@ sent back to the browser.
 
   HTTP/1.1 200 OK
   Content-Length: 12
-  Hello world!
+  Hello World!
 
 =head2 Model
 

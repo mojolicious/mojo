@@ -1275,7 +1275,7 @@ smaller chunks.
     my $c = shift;
 
     # Prepare body
-    my $body = 'Hello world!';
+    my $body = 'Hello World!';
     $c->res->headers->content_length(length $body);
 
     # Start writing directly with a drain callback
@@ -1299,7 +1299,7 @@ has actually been written.
   Content-Length: 12
   Server: Mojolicious (Perl)
 
-  Hello world!
+  Hello World!
 
 =head2 Chunked transfer encoding
 

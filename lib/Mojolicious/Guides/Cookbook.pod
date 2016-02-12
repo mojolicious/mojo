@@ -1069,7 +1069,7 @@ Sending a streaming request is almost just as easy.
   my $tx = $ua->build_tx(GET => 'http://example.com');
 
   # Prepare body
-  my $body = 'Hello world!';
+  my $body = 'Hello World!';
   $tx->req->headers->content_length(length $body);
 
   # Start writing directly with a drain callback

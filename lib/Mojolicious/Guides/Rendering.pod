@@ -1263,6 +1263,44 @@ lot more efficient to use L<Mojolicious/"after_render">.
     <body>Compressed content.</body>
   </html>
 
+=head2 Streaming
+
+You don't have to render all content at once, the method
+L<Mojolicious::Controller/"write"> can also be used to stream a series of
+smaller chunks.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub {
+    my $c = shift;
+
+    # Prepare body
+    my $body = 'Hello world!';
+    $c->res->headers->content_length(length $body);
+
+    # Start writing directly with a drain callback
+    my $drain;
+    $drain = sub {
+      my $c = shift;
+      my $chunk   = substr $body, 0, 1, '';
+      $drain      = undef unless length $body;
+      $c->write($chunk, $drain);
+    };
+    $c->$drain;
+  };
+
+  app->start;
+
+The drain callback will be executed whenever the entire previous chunk of data
+has actually been written.
+
+  HTTP/1.1 200 OK
+  Date: Sat, 13 Sep 2014 16:48:29 GMT
+  Content-Length: 12
+  Server: Mojolicious (Perl)
+
+  Hello world!
+
 =head2 Chunked transfer encoding
 
 For very dynamic content you might not know the response content length in
@@ -1288,7 +1326,6 @@ before processing continues. To end the stream you can call
 L<Mojolicious::Controller/"finish"> or write an empty chunk of data.
 
   HTTP/1.1 200 OK
-  Connection: keep-alive
   Date: Sat, 13 Sep 2014 16:48:29 GMT
   Transfer-Encoding: chunked
   Server: Mojolicious (Perl)

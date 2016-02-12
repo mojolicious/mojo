@@ -304,7 +304,7 @@ stream to be inactive indefinitely.
   $stream = $stream->write($bytes);
   $stream = $stream->write($bytes => sub {...});
 
-Write data to stream, the optional drain callback will be invoked once all data
+Write data to stream, the optional drain callback will be executed once all data
 has been written.
 
 =head1 SEE ALSO

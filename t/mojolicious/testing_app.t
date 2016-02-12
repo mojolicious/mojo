@@ -16,7 +16,7 @@ my $t       = Test::Mojo->new('MojoliciousTest');
 my $success = '';
 $t->or(sub { $success .= 'one' })->success(1)->or(sub { $success .= 'two' })
   ->success(!1)->or(sub { $success .= shift->app->mode });
-is $success, 'onetesting', 'two callbacks have been invoked';
+is $success, 'onetesting', 'two callbacks have been executed';
 ok $t->get_ok('/')->success, 'test was successful';
 
 # SyntaxError::foo in testing mode (syntax error in controller)

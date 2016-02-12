@@ -54,10 +54,10 @@ is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
   local *STDERR = $handle;
   my $i = 0;
   n { ++$i };
-  is $i,        1,             'block has been invoked once';
+  is $i,        1,             'block has been executed once';
   like $buffer, qr/wallclock/, 'right output';
   n { $i++ } 10;
-  is $i, 11, 'block has been invoked ten times';
+  is $i, 11, 'block has been executed ten times';
   like $buffer, qr/wallclock.*wallclock/s, 'right output';
 }
 

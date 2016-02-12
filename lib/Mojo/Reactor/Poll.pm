@@ -209,7 +209,7 @@ Restart timer. Note that this method requires an active timer.
 Watch handle for I/O events, invoking the callback whenever handle becomes
 readable or writable.
 
-  # Callback will be invoked twice if handle becomes readable and writable
+  # Callback will be executed twice if handle becomes readable and writable
   $reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
@@ -225,7 +225,7 @@ Check if reactor is running.
 
   my $undef = $reactor->next_tick(sub {...});
 
-Invoke callback as soon as possible, but not before returning or other
+Execute callback as soon as possible, but not before returning or other
 callbacks that have been registered with this method, always returns C<undef>.
 
 =head2 one_tick

@@ -303,7 +303,7 @@ controller object)
 
 =head2 around_action
 
-Emitted right before an action gets invoked and wraps around it, so you have to
+Emitted right before an action gets executed and wraps around it, so you have to
 manually forward to the next hook if you want to continue the chain. Default
 action dispatching is the last hook in the chain, yours will run before it.
 

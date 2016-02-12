@@ -105,7 +105,7 @@ L<Mojo::Reactor::Poll>.
 Watch handle for I/O events, invoking the callback whenever handle becomes
 readable or writable. Meant to be overloaded in a subclass.
 
-  # Callback will be invoked twice if handle becomes readable and writable
+  # Callback will be executed twice if handle becomes readable and writable
   $reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
@@ -121,7 +121,7 @@ Check if reactor is running. Meant to be overloaded in a subclass.
 
   my $undef = $reactor->next_tick(sub {...});
 
-Invoke callback as soon as possible, but not before returning or other
+Execute callback as soon as possible, but not before returning or other
 callbacks that have been registered with this method, always returns C<undef>.
 Meant to be overloaded in a subclass.
 

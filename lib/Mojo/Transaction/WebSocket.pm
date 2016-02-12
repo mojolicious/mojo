@@ -494,7 +494,7 @@ Resume L</"handshake"> transaction.
   $ws = $ws->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
-will be invoked once all data has been written.
+will be executed once all data has been written.
 
   # Send "Ping" frame
   use Mojo::WebSocket 'WS_PING';

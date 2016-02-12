@@ -892,7 +892,7 @@ arguments as L<Mojo::UserAgent/"options">, except for the callback.
 
   $t = $t->or(sub {...});
 
-Invoke callback if the value of L</"success"> is false.
+Execute callback if the value of L</"success"> is false.
 
   # Diagnostics
   $t->get_ok('/bad')->or(sub { diag 'Must have been Glen!' })

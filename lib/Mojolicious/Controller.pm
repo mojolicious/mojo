@@ -793,7 +793,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
   $c = $c->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
-will be invoked once all data has been written. This method will automatically
+will be executed once all data has been written. This method will automatically
 respond to WebSocket handshake requests with a C<101> response status, to
 establish the WebSocket connection.
 
@@ -944,7 +944,7 @@ excessively large, there's a 16MB limit by default.
   $c = $c->write($bytes);
   $c = $c->write($bytes => sub {...});
 
-Write dynamic content non-blocking, the optional drain callback will be invoked
+Write dynamic content non-blocking, the optional drain callback will be executed
 once all data has been written. Calling this method without a chunk of data
 will finalize the response headers and allow for dynamic content to be written
 later.
@@ -969,7 +969,6 @@ You can call L</"finish"> or write an empty chunk of data at any time to end
 the stream.
 
   HTTP/1.1 200 OK
-  Connection: keep-alive
   Date: Sat, 13 Sep 2014 16:48:29 GMT
   Content-Length: 6
   Server: Mojolicious (Perl)
@@ -998,7 +997,7 @@ defaults to C<15> seconds.
   $c = $c->write_chunk($bytes => sub {...});
 
 Write dynamic content non-blocking with chunked transfer encoding, the optional
-drain callback will be invoked once all data has been written. Calling this
+drain callback will be executed once all data has been written. Calling this
 method without a chunk of data will finalize the response headers and allow for
 dynamic content to be written later.
 
@@ -1015,7 +1014,6 @@ You can call L</"finish"> or write an empty chunk of data at any time to end
 the stream.
 
   HTTP/1.1 200 OK
-  Connection: keep-alive
   Date: Sat, 13 Sep 2014 16:48:29 GMT
   Transfer-Encoding: chunked
   Server: Mojolicious (Perl)

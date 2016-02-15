@@ -2250,7 +2250,7 @@ is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('button')->val,   'O', 'right value';
 is $dom->find('form input')->last->val, 'P', 'right value';
 
-# PoCo example with whitespace sensitive text
+# PoCo example with whitespace-sensitive text
 $dom = Mojo::DOM->new(<<EOF);
 <?xml version="1.0" encoding="UTF-8"?>
 <response>

@@ -36,7 +36,7 @@ sub attr {
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
-    # Very performance sensitive code with lots of micro-optimizations
+    # Very performance-sensitive code with lots of micro-optimizations
     if (ref $value) {
       _monkey_patch $class, $attr, sub {
         return

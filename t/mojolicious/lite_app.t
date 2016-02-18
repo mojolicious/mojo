@@ -235,7 +235,7 @@ get '/source' => sub {
     or $c->res->headers->header('X-Missing' => 1);
 };
 
-get '/foo_relaxed/#test' => sub {
+get '/foo_relaxed/(test:relaxed)' => sub {
   my $c = shift;
   $c->render(text => $c->stash('test') . ($c->req->headers->dnt ? 1 : 0));
 };
@@ -245,7 +245,7 @@ get '/foo_wildcard/(*test)' => sub {
   $c->render(text => $c->stash('test'));
 };
 
-get '/foo_wildcard_too/*test' => sub {
+get '/foo_wildcard_too/(test:wildcard)' => sub {
   my $c = shift;
   $c->render(text => $c->stash('test'));
 };

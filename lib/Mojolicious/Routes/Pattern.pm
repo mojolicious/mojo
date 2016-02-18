@@ -7,7 +7,8 @@ has [qw(placeholders tree)] => sub { [] };
 has quote_end   => ')';
 has quote_start => '(';
 has [qw(regex unparsed)];
-has relaxed_start  => '#';
+has relaxed_start => '#';
+has types => sub { {int => '\d+', relaxed => '[^/]+', wildcard => '.+'} };
 has wildcard_start => '*';
 
 sub match {
@@ -86,11 +87,12 @@ sub _compile {
   my $placeholders = $self->placeholders;
   my $constraints  = $self->constraints;
   my $defaults     = $self->defaults;
+  my $types        = $self->types;
 
   my $block = my $regex = '';
   my $optional = 1;
   for my $token (reverse @{$self->tree}) {
-    my ($op, $value) = @$token;
+    my ($op, $value, $type) = @$token;
     my $fragment = '';
 
     # Text
@@ -108,13 +110,8 @@ sub _compile {
       unshift @$placeholders, $value;
 
       # Placeholder
-      if ($op eq 'placeholder') { $fragment = '([^/.]+)' }
-
-      # Relaxed
-      elsif ($op eq 'relaxed') { $fragment = '([^/]+)' }
-
-      # Wildcard
-      else { $fragment = '(.+)' }
+      $fragment = _compile_req($types->{$type // ''} // '[^/.]+')
+        if $op eq 'placeholder';
 
       # Custom regex
       if (my $c = $constraints->{$value}) { $fragment = _compile_req($c) }
@@ -161,42 +158,41 @@ sub _tokenize {
 
   my $quote_end   = $self->quote_end;
   my $quote_start = $self->quote_start;
-  my $placeholder = $self->placeholder_start;
+  my $start       = $self->placeholder_start;
   my $relaxed     = $self->relaxed_start;
   my $wildcard    = $self->wildcard_start;
 
-  my (@tree, $inside, $quoted);
+  my (@tree, $spec, $type);
   for my $char (split '', $pattern) {
 
-    # Quote start
+    # Quoted
     if ($char eq $quote_start) {
       push @tree, ['placeholder', ''];
-      ($inside, $quoted) = (1, 1);
+      $spec = 1;
     }
+    elsif ($char eq $quote_end) { ($spec, $type) = (0, 0) }
+
+    # Type
+    elsif ($spec && $tree[-1][1] && $char eq ':') { $type = 1 }
+    elsif ($type) { $tree[-1][2] .= $char }
 
     # Placeholder start
-    elsif ($char eq $placeholder) {
-      push @tree, ['placeholder', ''] unless $inside++;
-    }
+    elsif ($char eq $start) { push @tree, ['placeholder', ''] unless $spec++ }
 
     # Relaxed or wildcard start (upgrade when quoted)
     elsif ($char eq $relaxed || $char eq $wildcard) {
-      push @tree, ['placeholder', ''] unless $quoted;
-      $tree[-1][0] = $char eq $relaxed ? 'relaxed' : 'wildcard';
-      $inside = 1;
+      push @tree, ['placeholder', ''] unless $spec++;
+      $tree[-1][2] = $char eq '#' ? 'relaxed' : 'wildcard';
     }
-
-    # Quote end
-    elsif ($char eq $quote_end) { ($inside, $quoted) = (0, 0) }
 
     # Slash
     elsif ($char eq '/') {
       push @tree, ['slash'];
-      $inside = 0;
+      $spec = 0;
     }
 
-    # Placeholder, relaxed or wildcard
-    elsif ($inside) { $tree[-1][-1] .= $char }
+    # Placeholder
+    elsif ($spec) { $tree[-1][1] .= $char }
 
     # Text (optimize slash+text and *+text+slash+text)
     elsif ($tree[-1][0] eq 'text') { $tree[-1][-1] .= $char }
@@ -234,6 +230,29 @@ Mojolicious::Routes::Pattern - Routes pattern engine
 =head1 DESCRIPTION
 
 L<Mojolicious::Routes::Pattern> is the core of L<Mojolicious::Routes>.
+
+=head2 TYPES
+
+These placeholder types are available by default.
+
+=head2 int
+
+  "/(foo:int)"
+
+Match only decimal digit characters, similar to the regular expression C<(\d+)>.
+
+=head2 relaxed
+
+  "/(foo:relaxed)"
+
+Match all characters except C</>, similar to the regular expression C<([^/]+)>.
+
+=head2 wildcard
+
+  "/(foo:wildcard)"
+
+Match absolutely everything, including C</> and C<.>, similar to the regular
+expression C<(.+)>.
 
 =head1 ATTRIBUTES
 
@@ -302,6 +321,13 @@ Character indicating a relaxed placeholder, defaults to C<#>.
 
 Pattern in parsed form. Note that this structure should only be used very
 carefully since it is very dynamic.
+
+=head2 types
+
+  my $types = $pattern->types;
+  $pattern  = $pattern->types({foo => qr/\w+/});
+
+Placeholder types.
 
 =head2 unparsed
 

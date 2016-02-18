@@ -1,5 +1,9 @@
 
 6.47  2016-02-18
+  - Added support for typed placeholders.
+  - Added types attribute to Mojolicious::Routes and
+    Mojolicious::Routes::Pattern.
+  - Added add_type method to Mojolicious::Routes.
   - Fixed datetime_field helper to use the correct type attribute value.
 
 6.46  2016-02-13

@@ -118,36 +118,37 @@ parentheses.
 
   /i♥mojolicious -> /(one)♥(two) -> {one => 'i', two => 'mojolicious'}
 
-=head2 Relaxed placeholders
+=head2 Typed placeholders
 
-Relaxed placeholders are just like standard placeholders, but use a hash prefix
-and match all characters except C</>, similar to the regular expression
-C<([^/]+)>.
+You can also assign your placeholders a type, such as
+L<Mojolicious::Routes::Pattern/"relaxed">, which allows them to match all
+characters except C</>, similar to the regular expression C<([^/]+)>.
 
-  /hello              -> /#name/hello -> undef
-  /sebastian/23/hello -> /#name/hello -> undef
-  /sebastian.23/hello -> /#name/hello -> {name => 'sebastian.23'}
-  /sebastian/hello    -> /#name/hello -> {name => 'sebastian'}
-  /sebastian23/hello  -> /#name/hello -> {name => 'sebastian23'}
-  /sebastian 23/hello -> /#name/hello -> {name => 'sebastian 23'}
+  /hello              -> /(name:relaxed)/hello -> undef
+  /sebastian/23/hello -> /(name:relaxed)/hello -> undef
+  /sebastian.23/hello -> /(name:relaxed)/hello -> {name => 'sebastian.23'}
+  /sebastian/hello    -> /(name:relaxed)/hello -> {name => 'sebastian'}
+  /sebastian23/hello  -> /(name:relaxed)/hello -> {name => 'sebastian23'}
+  /sebastian 23/hello -> /(name:relaxed)/hello -> {name => 'sebastian 23'}
 
-They can be especially useful for manually matching file names with extensions,
+This can be especially useful for manually matching file names with extensions,
 rather than using L<format detection|/"Formats">.
 
   /music/song.mp3 -> /music/#filename -> {filename => 'song.mp3'}
 
-=head2 Wildcard placeholders
-
-Wildcard placeholders are just like the two types of placeholders above, but
-use an asterisk prefix and match absolutely everything, including C</> and
+The type L<Mojolicious::Routes::Pattern/"wildcard"> is very similar, but it
+allows your placeholders to match absolutely everything, including C</> and
 C<.>, similar to the regular expression C<(.+)>.
 
-  /hello              -> /*name/hello -> undef
-  /sebastian/23/hello -> /*name/hello -> {name => 'sebastian/23'}
-  /sebastian.23/hello -> /*name/hello -> {name => 'sebastian.23'}
-  /sebastian/hello    -> /*name/hello -> {name => 'sebastian'}
-  /sebastian23/hello  -> /*name/hello -> {name => 'sebastian23'}
-  /sebastian 23/hello -> /*name/hello -> {name => 'sebastian 23'}
+  /hello              -> /(name:wildcard)/hello -> undef
+  /sebastian/23/hello -> /(name:wildcard)/hello -> {name => 'sebastian/23'}
+  /sebastian.23/hello -> /(name:wildcard)/hello -> {name => 'sebastian.23'}
+  /sebastian/hello    -> /(name:wildcard)/hello -> {name => 'sebastian'}
+  /sebastian23/hello  -> /(name:wildcard)/hello -> {name => 'sebastian23'}
+  /sebastian 23/hello -> /(name:wildcard)/hello -> {name => 'sebastian 23'}
+
+For a full list of placeholder types see
+L<Mojolicious::Routes::Pattern/"TYPES">.
 
 =head1 BASICS
 
@@ -695,7 +696,7 @@ requests that did not match in your last route with an optional wildcard
 placeholder.
 
   # * /*
-  $r->any('/*whatever' => {whatever => ''} => sub {
+  $r->any('/(whatever:wildcard)' => {whatever => ''} => sub {
     my $c        = shift;
     my $whatever = $c->param('whatever');
     $c->render(text => "/$whatever did not match.", status => 404);

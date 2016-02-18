@@ -73,8 +73,6 @@ sub name {
   return $self;
 }
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub options { shift->_generate_route(OPTIONS => @_) }
 
 sub over {
@@ -119,10 +117,15 @@ sub render {
 sub root { shift->_chain->[0] }
 
 sub route {
-  my $self   = shift;
-  my $route  = $self->add_child(__PACKAGE__->new(@_))->children->[-1];
+  my $self = shift;
+
+  my $route   = __PACKAGE__->new;
+  my $pattern = $route->pattern;
+  $pattern->types({%{$pattern->types}, %{$self->root->types}});
+  $self->add_child($route->parse(@_));
   my $format = $self->pattern->constraints->{format};
-  $route->pattern->constraints->{format} //= 0 if defined $format && !$format;
+  $pattern->constraints->{format} //= 0 if defined $format && !$format;
+
   return $route;
 }
 
@@ -394,16 +397,6 @@ the current route.
 
   # Route with destination and custom name
   $r->get('/user')->to('user#show')->name('show_user');
-
-=head2 new
-
-  my $r = Mojolicious::Routes::Route->new;
-  my $r = Mojolicious::Routes::Route->new('/:action');
-  my $r = Mojolicious::Routes::Route->new('/:action', action => qr/\w+/);
-  my $r = Mojolicious::Routes::Route->new(format => 0);
-
-Construct a new L<Mojolicious::Routes::Route> object and L</"parse"> pattern if
-necessary.
 
 =head2 options
 

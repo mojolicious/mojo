@@ -134,7 +134,7 @@ characters except C</>, similar to the regular expression C<([^/]+)>.
 This can be especially useful for manually matching file names with extensions,
 rather than using L<format detection|/"Formats">.
 
-  /music/song.mp3 -> /music/#filename -> {filename => 'song.mp3'}
+  /music/song.mp3 -> /music/(filename:relaxed) -> {filename => 'song.mp3'}
 
 The type L<Mojolicious::Routes::Pattern/"wildcard"> is very similar, but it
 allows your placeholders to match absolutely everything, including C</> and

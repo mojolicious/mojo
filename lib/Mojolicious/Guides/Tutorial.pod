@@ -320,7 +320,7 @@ L<Mojolicious::Controller/"param">.
 
   # /testsomething/foo
   # /test123something/foo
-  get '/(:bar)something/foo' => sub {
+  get '/(bar)something/foo' => sub {
     my $c   = shift;
     my $bar = $c->param('bar');
     $c->render(text => "Our :bar placeholder matched $bar");
@@ -328,11 +328,14 @@ L<Mojolicious::Controller/"param">.
 
   app->start;
 
+To separate them from the surrounding text, you can surround your placeholders
+with parentheses, which also makes the colon prefix optional.
+
 =head2 Typed placeholders
 
 To change how much of the request path your placeholder should capture, you can
-also assign it a type like L<Mojolicious::Routes::Pattern/"wildcard">, which
-matches absolutely everything, including C</> and C<.>, similar to the regular
+assign it a type like L<Mojolicious::Routes::Pattern/"wildcard">, which matches
+absolutely everything, including C</> and C<.>, similar to the regular
 expression C<(.+)>.
 
   use Mojolicious::Lite;
@@ -340,7 +343,7 @@ expression C<(.+)>.
   # /hello/test
   # /hello/test123
   # /hello/test.123/test/123
-  get '/hello/(:you:wildcard)' => 'groovy';
+  get '/hello/(you:wildcard)' => 'groovy';
 
   app->start;
   __DATA__

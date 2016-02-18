@@ -120,7 +120,7 @@ parentheses.
 
 =head2 Typed placeholders
 
-You can also assign your placeholders a type, such as
+You can also assign your placeholders a type to change their behavior, such as
 L<Mojolicious::Routes::Pattern/"relaxed">, which allows them to match all
 characters except C</>, similar to the regular expression C<([^/]+)>.
 
@@ -131,14 +131,14 @@ characters except C</>, similar to the regular expression C<([^/]+)>.
   /sebastian23/hello  -> /(name:relaxed)/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /(name:relaxed)/hello -> {name => 'sebastian 23'}
 
-This can be especially useful for manually matching file names with extensions,
-rather than using L<format detection|/"Formats">.
+This can be very useful for manually matching file names with extensions, rather
+than relying on L<format detection|/"Formats">.
 
   /music/song.mp3 -> /music/(filename:relaxed) -> {filename => 'song.mp3'}
 
-The type L<Mojolicious::Routes::Pattern/"wildcard"> is very similar, but it
-allows your placeholders to match absolutely everything, including C</> and
-C<.>, similar to the regular expression C<(.+)>.
+The type L<Mojolicious::Routes::Pattern/"wildcard"> is very similar, but allows
+your placeholders to match absolutely everything, including C</> and C<.>,
+similar to the regular expression C<(.+)>.
 
   /hello              -> /(name:wildcard)/hello -> undef
   /sebastian/23/hello -> /(name:wildcard)/hello -> {name => 'sebastian/23'}
@@ -146,6 +146,12 @@ C<.>, similar to the regular expression C<(.+)>.
   /sebastian/hello    -> /(name:wildcard)/hello -> {name => 'sebastian'}
   /sebastian23/hello  -> /(name:wildcard)/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /(name:wildcard)/hello -> {name => 'sebastian 23'}
+
+Because the C<relaxed> and C<wildcard> pleaceholder types are so common, they
+also have a shortcut form.
+
+  /hello/♥.mojolicious -> /hello/#name -> {name => '♥.mojolicious'}
+  /hello/♥/mojolicious -> /hello/*name -> {name => '♥/mojolicious'}
 
 For a full list of placeholder types see
 L<Mojolicious::Routes::Pattern/"TYPES">.

@@ -182,7 +182,7 @@ sub _tokenize {
     # Relaxed or wildcard start (upgrade when quoted)
     elsif ($char eq $relaxed || $char eq $wildcard) {
       push @tree, ['placeholder', ''] unless $spec++;
-      $tree[-1][2] = $char eq '#' ? 'relaxed' : 'wildcard';
+      $tree[-1][2] = $char eq $relaxed ? 'relaxed' : 'wildcard';
     }
 
     # Slash

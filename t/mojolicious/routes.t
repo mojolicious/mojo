@@ -220,9 +220,10 @@ $similar->route('/too')->via('PATCH')->to('similar#post');
 $r->add_type(test => qr/test/)->route('/')->get('/custom_type/(whatever:test)');
 
 # /custom_pattern/test_*_test
-my $custom = $r->get->to('custom#pattern');
-$custom->pattern->quote_start('{')->quote_end('}')->placeholder_start('.');
-$custom->parse('/custom_pattern/test_{.custom}_test');
+my $custom = $r->get->to(four => 4);
+$custom->pattern->quote_start('{')->quote_end('}')->placeholder_start('.')
+  ->relaxed_start('$')->wildcard_start('@');
+$custom->parse('/custom_pattern/a_{.one}_b/{$two}/{@three}');
 
 # Cached lookup
 my $fast = $r->route('/fast');
@@ -957,10 +958,11 @@ is_deeply $m->stack, [], 'empty stack';
 
 # Custom pattern
 $m = Mojolicious::Routes::Match->new(root => $r);
-$m->find($c => {method => 'GET', path => '/custom_pattern/test_123_test'});
+$m->find(
+  $c => {method => 'GET', path => '/custom_pattern/a_123_b/c.123/d/123'});
 is_deeply $m->stack,
-  [{controller => 'custom', action => 'pattern', 'custom' => 123}],
+  [{one => 123, two => 'c.123', three => 'd/123', four => 4}],
   'right structure';
-is $m->path_for->{path}, '/custom_pattern/test_123_test', 'right path';
+is $m->path_for->{path}, '/custom_pattern/a_123_b/c.123/d/123', 'right path';
 
 done_testing();

@@ -216,6 +216,11 @@ my $similar = $r->route('/similar')->via(qw(DELETE GET PATCH))->inline(1);
 $similar->route('/:something')->via('GET')->to('similar#get');
 $similar->route('/too')->via('PATCH')->to('similar#post');
 
+# /custom_pattern/test_*_test
+my $custom = $r->get->to('custom#pattern');
+$custom->pattern->quote_start('{')->quote_end('}')->placeholder_start('.');
+$custom->parse('/custom_pattern/test_{.custom}_test');
+
 # Cached lookup
 my $fast = $r->route('/fast');
 is $r->find('fast'),   $fast, 'fast route found';
@@ -937,5 +942,13 @@ is $m->endpoint->suggested_method, 'PATCH', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'DELETE', path => '/similar/too'});
 is_deeply $m->stack, [], 'empty stack';
+
+# Custom pattern
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'GET', path => '/custom_pattern/test_123_test'});
+is_deeply $m->stack,
+  [{controller => 'custom', action => 'pattern', 'custom' => 123}],
+  'right structure';
+is $m->path_for->{path}, '/custom_pattern/test_123_test', 'right path';
 
 done_testing();

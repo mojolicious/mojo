@@ -117,15 +117,10 @@ sub render {
 sub root { shift->_chain->[0] }
 
 sub route {
-  my $self = shift;
-
-  my $route   = __PACKAGE__->new;
-  my $pattern = $route->pattern;
-  $pattern->types({%{$pattern->types}, %{$self->root->types}});
-  $self->add_child($route->parse(@_));
+  my $self   = shift;
+  my $route  = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
   my $format = $self->pattern->constraints->{format};
-  $pattern->constraints->{format} //= 0 if defined $format && !$format;
-
+  $route->pattern->constraints->{format} //= 0 if defined $format && !$format;
   return $route;
 }
 

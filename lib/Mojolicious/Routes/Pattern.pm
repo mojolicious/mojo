@@ -7,8 +7,7 @@ has [qw(placeholders tree)] => sub { [] };
 has quote_end   => ')';
 has quote_start => '(';
 has [qw(regex unparsed)];
-has relaxed_start => '#';
-has types => sub { {int => '\d+', relaxed => '[^/]+', wildcard => '.+'} };
+has relaxed_start  => '#';
 has wildcard_start => '*';
 
 sub match {
@@ -87,7 +86,6 @@ sub _compile {
   my $placeholders = $self->placeholders;
   my $constraints  = $self->constraints;
   my $defaults     = $self->defaults;
-  my $types        = $self->types;
 
   my $block = my $regex = '';
   my $optional = 1;
@@ -110,7 +108,7 @@ sub _compile {
       unshift @$placeholders, $value;
 
       # Placeholder
-      $fragment = _compile_req($types->{$type // ''} // '[^/.]+')
+      $fragment = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)'
         if $op eq 'placeholder';
 
       # Custom regex
@@ -162,7 +160,7 @@ sub _tokenize {
   my $relaxed     = $self->relaxed_start;
   my $wildcard    = $self->wildcard_start;
 
-  my (@tree, $spec, $type);
+  my (@tree, $spec);
   for my $char (split '', $pattern) {
 
     # Quoted
@@ -170,11 +168,7 @@ sub _tokenize {
       push @tree, ['placeholder', ''];
       $spec = 1;
     }
-    elsif ($char eq $quote_end) { ($spec, $type) = (0, 0) }
-
-    # Type
-    elsif ($spec && $tree[-1][1] && $char eq ':') { $type = 1 }
-    elsif ($type) { $tree[-1][2] .= $char }
+    elsif ($char eq $quote_end) { $spec = 0 }
 
     # Placeholder start
     elsif ($char eq $start) { push @tree, ['placeholder', ''] unless $spec++ }
@@ -230,29 +224,6 @@ Mojolicious::Routes::Pattern - Routes pattern engine
 =head1 DESCRIPTION
 
 L<Mojolicious::Routes::Pattern> is the core of L<Mojolicious::Routes>.
-
-=head2 TYPES
-
-These placeholder types are available by default.
-
-=head2 int
-
-  "/(foo:int)"
-
-Match only decimal digit characters, similar to the regular expression C<(\d+)>.
-
-=head2 relaxed
-
-  "/(foo:relaxed)"
-
-Match all characters except C</>, similar to the regular expression C<([^/]+)>.
-
-=head2 wildcard
-
-  "/(foo:wildcard)"
-
-Match absolutely everything, including C</> and C<.>, similar to the regular
-expression C<(.+)>.
 
 =head1 ATTRIBUTES
 
@@ -321,13 +292,6 @@ Character indicating a relaxed placeholder, defaults to C<#>.
 
 Pattern in parsed form. Note that this structure should only be used very
 carefully since it is very dynamic.
-
-=head2 types
-
-  my $types = $pattern->types;
-  $pattern  = $pattern->types({foo => qr/\w+/});
-
-Placeholder types.
 
 =head2 unparsed
 

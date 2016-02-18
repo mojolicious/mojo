@@ -79,8 +79,7 @@ $r->route('/wildcards/1/(*wildcard)', wildcard => qr/(?:.*)/)
   ->to(controller => 'wild', action => 'card');
 
 # /wildcards/2/*
-$r->route('/wildcards/2/(wildcard:wildcard)')
-  ->to(controller => 'card', action => 'wild');
+$r->route('/wildcards/2/*wildcard')->to(controller => 'card', action => 'wild');
 
 # /wildcards/3/*/foo
 $r->route('/wildcards/3/(*wildcard)/foo')
@@ -215,9 +214,6 @@ $r->route('/partial')->detour('foo#bar');
 my $similar = $r->route('/similar')->via(qw(DELETE GET PATCH))->inline(1);
 $similar->route('/:something')->via('GET')->to('similar#get');
 $similar->route('/too')->via('PATCH')->to('similar#post');
-
-# /custom_type/test
-$r->add_type(test => qr/test/)->route('/')->get('/custom_type/(whatever:test)');
 
 # /custom_pattern/test_*_test
 my $custom = $r->get->to(four => 4);
@@ -945,15 +941,6 @@ is_deeply $m->stack, [{}, {controller => 'similar', action => 'post'}],
 is $m->endpoint->suggested_method, 'PATCH', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'DELETE', path => '/similar/too'});
-is_deeply $m->stack, [], 'empty stack';
-
-# Custom type
-$m = Mojolicious::Routes::Match->new(root => $r);
-$m->find($c => {method => 'GET', path => '/custom_type/test'});
-is_deeply $m->stack, [{whatever => 'test'}], 'right structure';
-is $m->path_for->{path}, '/custom_type/test', 'right path';
-$m = Mojolicious::Routes::Match->new(root => $r);
-$m->find($c => {method => 'GET', path => '/custom_type/test2'});
 is_deeply $m->stack, [], 'empty stack';
 
 # Custom pattern

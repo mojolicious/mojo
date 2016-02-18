@@ -88,14 +88,6 @@ is $pattern->render({controller => 'zzz', action => 'lala'}), '/zzztest/lala',
   'right result';
 ok !$pattern->match('/test/lala'), 'no result';
 
-# Integer
-$pattern = Mojolicious::Routes::Pattern->new('/test/(num:int)');
-is_deeply $pattern->match('/test/23'), {num => 23}, 'right structure';
-is $pattern->render({num => 24}), '/test/24', 'right result';
-is_deeply $pattern->match('/test/0'), {num => 0}, 'right structure';
-is $pattern->render({num => 0}), '/test/0', 'right result';
-ok !$pattern->match('/test/lala'), 'no result';
-
 # Relaxed
 $pattern = Mojolicious::Routes::Pattern->new('/test/#controller/:action');
 is_deeply $pattern->match('/test/foo.bar/baz'),
@@ -107,16 +99,6 @@ is_deeply $pattern->match('/test/foo.bar'), {groovy => 'foo.bar'},
   'right structure';
 is $pattern->defaults->{format}, undef, 'no value';
 is $pattern->render({groovy => 'foo.bar'}), '/test/foo.bar', 'right result';
-$pattern = Mojolicious::Routes::Pattern->new('/test/(groovy:relaxed)');
-is_deeply $pattern->match('/test/foo.bar'), {groovy => 'foo.bar'},
-  'right structure';
-is $pattern->defaults->{format}, undef, 'no value';
-is $pattern->render({groovy => 'foo.bar'}), '/test/foo.bar', 'right result';
-$pattern = Mojolicious::Routes::Pattern->new('/test/:groovy:relaxed');
-is_deeply $pattern->match('/test/foo.bar'), {groovy => 'foo.bar'},
-  'right structure';
-is $pattern->defaults->{format}, undef, 'no value';
-is $pattern->render({groovy => 'foo.bar'}), '/test/foo.bar', 'right result';
 
 # Wildcard
 $pattern = Mojolicious::Routes::Pattern->new('/test/(:controller)/(*action)');
@@ -124,14 +106,7 @@ is_deeply $pattern->match('/test/foo/bar.baz/yada'),
   {controller => 'foo', action => 'bar.baz/yada'}, 'right structure';
 is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
   '/test/foo/bar.baz/yada', 'right result';
-$pattern
-  = Mojolicious::Routes::Pattern->new('/tset/:controller/(:action:wildcard)');
-is_deeply $pattern->match('/tset/foo/bar.baz/yada'),
-  {controller => 'foo', action => 'bar.baz/yada'}, 'right structure';
-is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
-  '/tset/foo/bar.baz/yada', 'right result';
-$pattern
-  = Mojolicious::Routes::Pattern->new('/tset/:controller/:action:wildcard');
+$pattern = Mojolicious::Routes::Pattern->new('/tset/:controller/*action');
 is_deeply $pattern->match('/tset/foo/bar.baz/yada'),
   {controller => 'foo', action => 'bar.baz/yada'}, 'right structure';
 is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),

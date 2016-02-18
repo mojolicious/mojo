@@ -320,7 +320,7 @@ L<Mojolicious::Controller/"param">.
 
   # /testsomething/foo
   # /test123something/foo
-  get '/(bar)something/foo' => sub {
+  get '/(:bar)something/foo' => sub {
     my $c   = shift;
     my $bar = $c->param('bar');
     $c->render(text => "Our :bar placeholder matched $bar");
@@ -331,19 +331,34 @@ L<Mojolicious::Controller/"param">.
 To separate them from the surrounding text, you can surround your placeholders
 with parentheses, which also makes the colon prefix optional.
 
-=head2 Typed placeholders
+=head2 Relaxed Placeholders
 
-To change how much of the request path your placeholder should capture, you can
-assign it a type like L<Mojolicious::Routes::Pattern/"wildcard">, which matches
-absolutely everything, including C</> and C<.>, similar to the regular
-expression C<(.+)>.
+Relaxed placeholders allow matching of everything until a C</> occurs, similar
+to the regular expression C<([^/]+)>.
+
+  use Mojolicious::Lite;
+
+  # /hello/test
+  # /hello/test.html
+  get '/hello/#you' => 'groovy';
+
+  app->start;
+  __DATA__
+
+  @@ groovy.html.ep
+  Your name is <%= $you %>.
+
+=head2 Wildcard placeholders
+
+Wildcard placeholders allow matching absolutely everything, including C</> and
+C<.>, similar to the regular expression C<(.+)>.
 
   use Mojolicious::Lite;
 
   # /hello/test
   # /hello/test123
   # /hello/test.123/test/123
-  get '/hello/(you:wildcard)' => 'groovy';
+  get '/hello/*you' => 'groovy';
 
   app->start;
   __DATA__

@@ -118,43 +118,36 @@ parentheses.
 
   /i♥mojolicious -> /(one)♥(two) -> {one => 'i', two => 'mojolicious'}
 
-=head2 Typed placeholders
+=head2 Relaxed placeholders
 
-You can also assign your placeholders a type to change their behavior, such as
-L<Mojolicious::Routes::Pattern/"relaxed">, which makes them match all characters
-except C</>, similar to the regular expression C<([^/]+)>.
+Relaxed placeholders are just like standard placeholders, but use a hash prefix
+and match all characters except C</>, similar to the regular expression
+C<([^/]+)>.
 
-  /hello              -> /(name:relaxed)/hello -> undef
-  /sebastian/23/hello -> /(name:relaxed)/hello -> undef
-  /sebastian.23/hello -> /(name:relaxed)/hello -> {name => 'sebastian.23'}
-  /sebastian/hello    -> /(name:relaxed)/hello -> {name => 'sebastian'}
-  /sebastian23/hello  -> /(name:relaxed)/hello -> {name => 'sebastian23'}
-  /sebastian 23/hello -> /(name:relaxed)/hello -> {name => 'sebastian 23'}
+  /hello              -> /#name/hello -> undef
+  /sebastian/23/hello -> /#name/hello -> undef
+  /sebastian.23/hello -> /#name/hello -> {name => 'sebastian.23'}
+  /sebastian/hello    -> /#name/hello -> {name => 'sebastian'}
+  /sebastian23/hello  -> /#name/hello -> {name => 'sebastian23'}
+  /sebastian 23/hello -> /#name/hello -> {name => 'sebastian 23'}
 
-This can be very useful for manually matching file names with extensions, rather
-than relying on L<format detection|/"Formats">.
+They can be especially useful for manually matching file names with extensions,
+rather than using L<format detection|/"Formats">.
 
-  /music/song.mp3 -> /music/(filename:relaxed) -> {filename => 'song.mp3'}
+  /music/song.mp3 -> /music/#filename -> {filename => 'song.mp3'}
 
-The type L<Mojolicious::Routes::Pattern/"wildcard"> is very similar, but makes
-your placeholders match absolutely everything, including C</> and C<.>, similar
-to the regular expression C<(.+)>.
+=head2 Wildcard placeholders
 
-  /hello              -> /(name:wildcard)/hello -> undef
-  /sebastian/23/hello -> /(name:wildcard)/hello -> {name => 'sebastian/23'}
-  /sebastian.23/hello -> /(name:wildcard)/hello -> {name => 'sebastian.23'}
-  /sebastian/hello    -> /(name:wildcard)/hello -> {name => 'sebastian'}
-  /sebastian23/hello  -> /(name:wildcard)/hello -> {name => 'sebastian23'}
-  /sebastian 23/hello -> /(name:wildcard)/hello -> {name => 'sebastian 23'}
+Wildcard placeholders are just like the two types of placeholders above, but use
+an asterisk prefix and match absolutely everything, including C</> and C<.>,
+similar to the regular expression C<(.+)>.
 
-The C<relaxed> and C<wildcard> pleaceholder types are so common, they also have
-a shortcut form.
-
-  /hello/♥.mojolicious -> /hello/#name -> {name => '♥.mojolicious'}
-  /hello/♥/mojolicious -> /hello/*name -> {name => '♥/mojolicious'}
-
-For a full list of placeholder types see
-L<Mojolicious::Routes::Pattern/"TYPES">.
+  /hello              -> /*name/hello -> undef
+  /sebastian/23/hello -> /*name/hello -> {name => 'sebastian/23'}
+  /sebastian.23/hello -> /*name/hello -> {name => 'sebastian.23'}
+  /sebastian/hello    -> /*name/hello -> {name => 'sebastian'}
+  /sebastian23/hello  -> /*name/hello -> {name => 'sebastian23'}
+  /sebastian 23/hello -> /*name/hello -> {name => 'sebastian 23'}
 
 =head1 BASICS
 
@@ -702,7 +695,7 @@ requests that did not match in your last route with an optional wildcard
 placeholder.
 
   # * /*
-  $r->any('/(whatever:wildcard)' => {whatever => ''} => sub {
+  $r->any('/*whatever' => {whatever => ''} => sub {
     my $c        = shift;
     my $whatever = $c->param('whatever');
     $c->render(text => "/$whatever did not match.", status => 404);
@@ -811,19 +804,6 @@ For a full list of available hooks see L<Mojolicious/"HOOKS">.
 =head1 ADVANCED
 
 Less commonly used and more powerful features.
-
-=head2 Adding placeholder types
-
-L<Restrictive placeholders|/"Restrictive placeholders"> can get repetitive, use
-L<Mojolicious::Routes/"add_type"> to create your own placeholder types instead.
-
-  $r->add_type(isbn10 => qr/\d{9}(?:\d|X)/);
-
-  # GET /library/0596001738
-  $r->get('/library/(book:isbn10)')->to('library#info');
-
-Just remember not to use C<^> and C<$> or capturing groups C<(...)> in your
-regular expressions.
 
 =head2 Shortcuts
 

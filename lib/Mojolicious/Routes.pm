@@ -10,13 +10,12 @@ use Scalar::Util 'weaken';
 
 has base_classes => sub { [qw(Mojolicious::Controller Mojo)] };
 has cache        => sub { Mojo::Cache->new };
-has [qw(conditions shortcuts types)] => sub { {} };
+has [qw(conditions shortcuts)] => sub { {} };
 has hidden     => sub { [qw(attr has new tap)] };
 has namespaces => sub { [] };
 
 sub add_condition { $_[0]->conditions->{$_[1]} = $_[2] and return $_[0] }
 sub add_shortcut  { $_[0]->shortcuts->{$_[1]}  = $_[2] and return $_[0] }
-sub add_type      { $_[0]->types->{$_[1]}      = $_[2] and return $_[0] }
 
 sub continue {
   my ($self, $c) = @_;
@@ -280,13 +279,6 @@ Namespaces to load controllers from.
 
 Contains all available shortcuts.
 
-=head2 types
-
-  my $types = $r->types;
-  $r        = $r->types({int => qr/\d+/});
-
-Contains all available placeholder types.
-
 =head1 METHODS
 
 L<Mojolicious::Routes> inherits all methods from L<Mojolicious::Routes::Route>
@@ -314,14 +306,6 @@ Register a shortcut.
     my ($route, @args) = @_;
     ...
   });
-
-=head2 add_type
-
-  $r = $r->add_type(foo => qr/.../);
-
-Register a placeholder type.
-
-  $r->add_type(hex => qr/[a-f0-9]+/);
 
 =head2 continue
 

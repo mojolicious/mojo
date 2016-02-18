@@ -160,7 +160,7 @@ $t->post_ok('/text')->status_is(200)->content_is(<<'EOF');
 <form action="/text" method="POST">
   <input class="foo" name="color" type="color" value="#ffffff">
   <input class="foo" name="date" type="date" value="2012-12-12">
-  <input class="foo" name="dt" type="datetime" value="2012-12-12T23:59:59Z">
+  <input class="foo" name="d" type="datetime-local" value="2012-12-12T23:59:59">
   <input class="foo" name="email" type="email" value="nospam@example.com">
   <input class="foo" name="month" type="month" value="2012-12">
   <input class="foo" name="number" type="number" value="23">
@@ -179,7 +179,7 @@ $t->post_ok(
   '/text' => form => {
     color  => '#000000',
     date   => '2012-12-13',
-    dt     => '2012-12-13T23:59:59Z',
+    d      => '2012-12-13T23:59:59',
     email  => 'spam@example.com',
     month  => '2012-11',
     number => 25,
@@ -194,7 +194,7 @@ $t->post_ok(
 <form action="/text" method="POST">
   <input class="foo" name="color" type="color" value="#000000">
   <input class="foo" name="date" type="date" value="2012-12-13">
-  <input class="foo" name="dt" type="datetime" value="2012-12-13T23:59:59Z">
+  <input class="foo" name="d" type="datetime-local" value="2012-12-13T23:59:59">
   <input class="foo" name="email" type="email" value="spam@example.com">
   <input class="foo" name="month" type="month" value="2012-11">
   <input class="foo" name="number" type="number" value="25">
@@ -573,7 +573,7 @@ __DATA__
 %= form_for text => begin
   %= color_field color => '#ffffff', class => 'foo'
   %= date_field date => '2012-12-12', class => 'foo'
-  %= datetime_field dt => '2012-12-12T23:59:59Z', class => 'foo'
+  %= datetime_field d => '2012-12-12T23:59:59', class => 'foo'
   %= email_field email => 'nospam@example.com', class => 'foo'
   %= month_field month => '2012-12', class => 'foo'
   %= number_field number => 23, class => 'foo'

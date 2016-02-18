@@ -9,10 +9,11 @@ sub register {
   my ($self, $app) = @_;
 
   # Text field variations
-  my @time = qw(date datetime month time week);
+  my @time = qw(date month time week);
   for my $name (@time, qw(color email number range search tel text url)) {
     $app->helper("${name}_field" => sub { _input(@_, type => $name) });
   }
+  $app->helper(datetime_field => sub { _input(@_, type => 'datetime-local') });
 
   my @helpers = (
     qw(csrf_field form_for hidden_field javascript label_for link_to),
@@ -302,15 +303,15 @@ get picked up and shown as default.
 =head2 datetime_field
 
   %= datetime_field 'end'
-  %= datetime_field end => '2012-12-21T23:59:59Z'
-  %= datetime_field end => '2012-12-21T23:59:59Z', id => 'foo'
+  %= datetime_field end => '2012-12-21T23:59:59'
+  %= datetime_field end => '2012-12-21T23:59:59', id => 'foo'
 
-Generate C<input> tag of type C<datetime>. Previous input values will
+Generate C<input> tag of type C<datetime-local>. Previous input values will
 automatically get picked up and shown as default.
 
-  <input name="end" type="datetime">
-  <input name="end" type="datetime" value="2012-12-21T23:59:59Z">
-  <input id="foo" name="end" type="datetime" value="2012-12-21T23:59:59Z">
+  <input name="end" type="datetime-local">
+  <input name="end" type="datetime-local" value="2012-12-21T23:59:59">
+  <input id="foo" name="end" type="datetime-local" value="2012-12-21T23:59:59">
 
 =head2 email_field
 

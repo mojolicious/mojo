@@ -1,5 +1,6 @@
 
-6.47  2016-02-15
+6.47  2016-02-18
+  - Fixed datetime_field helper to use the correct type attribute value.
 
 6.46  2016-02-13
   - Improved Mojo::Headers performance. (batman)

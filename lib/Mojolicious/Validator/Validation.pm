@@ -175,6 +175,7 @@ Validate C<csrf_token> and protect from cross-site request forgery.
 
   my $err     = $validation->error('foo');
   $validation = $validation->error(foo => ['custom_check']);
+  $validation = $validation->error(foo => [$check, $result, @args]);
 
 Get or set details for failed validation check, at any given time there can
 only be one per field.

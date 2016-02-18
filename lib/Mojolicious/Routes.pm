@@ -321,6 +321,8 @@ Register a shortcut.
 
 Register a placeholder type.
 
+  $r->add_type(hex => qr/[a-f0-9]/);
+
 =head2 continue
 
   $r->continue(Mojolicious::Controller->new);

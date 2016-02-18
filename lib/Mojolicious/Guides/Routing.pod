@@ -814,7 +814,7 @@ Less commonly used and more powerful features.
 
 =head2 Adding placeholder types
 
-L<Restrictive placeholders/"Restrictive placeholders"> can get repetitive, use
+L<Restrictive placeholders|/"Restrictive placeholders"> can get repetitive, use
 L<Mojolicious::Routes/"add_type"> to create your own placeholder types instead.
 
   $r->add_type(isbn10 => qr/\d{9}(?:\d|X)/);

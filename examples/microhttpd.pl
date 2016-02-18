@@ -6,7 +6,6 @@ my %buffer;
 Mojo::IOLoop->server(
   {port => 8080} => sub {
     my ($loop, $stream, $id) = @_;
-    $buffer{$id} = '';
     $stream->on(
       read => sub {
         my ($stream, $chunk) = @_;
@@ -23,7 +22,6 @@ Mojo::IOLoop->server(
         }
       }
     );
-    $stream->on(close => sub { delete $buffer{$id} });
   }
 );
 

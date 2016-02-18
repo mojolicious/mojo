@@ -121,8 +121,8 @@ parentheses.
 =head2 Typed placeholders
 
 You can also assign your placeholders a type to change their behavior, such as
-L<Mojolicious::Routes::Pattern/"relaxed">, which allows them to match all
-characters except C</>, similar to the regular expression C<([^/]+)>.
+L<Mojolicious::Routes::Pattern/"relaxed">, which makes them match all characters
+except C</>, similar to the regular expression C<([^/]+)>.
 
   /hello              -> /(name:relaxed)/hello -> undef
   /sebastian/23/hello -> /(name:relaxed)/hello -> undef
@@ -136,9 +136,9 @@ than relying on L<format detection|/"Formats">.
 
   /music/song.mp3 -> /music/(filename:relaxed) -> {filename => 'song.mp3'}
 
-The type L<Mojolicious::Routes::Pattern/"wildcard"> is very similar, but allows
-your placeholders to match absolutely everything, including C</> and C<.>,
-similar to the regular expression C<(.+)>.
+The type L<Mojolicious::Routes::Pattern/"wildcard"> is very similar, but makes
+your placeholders match absolutely everything, including C</> and C<.>, similar
+to the regular expression C<(.+)>.
 
   /hello              -> /(name:wildcard)/hello -> undef
   /sebastian/23/hello -> /(name:wildcard)/hello -> {name => 'sebastian/23'}
@@ -147,8 +147,8 @@ similar to the regular expression C<(.+)>.
   /sebastian23/hello  -> /(name:wildcard)/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /(name:wildcard)/hello -> {name => 'sebastian 23'}
 
-Because the C<relaxed> and C<wildcard> pleaceholder types are so common, they
-also have a shortcut form.
+The C<relaxed> and C<wildcard> pleaceholder types are so common, they also have
+a shortcut form.
 
   /hello/♥.mojolicious -> /hello/#name -> {name => '♥.mojolicious'}
   /hello/♥/mojolicious -> /hello/*name -> {name => '♥/mojolicious'}
@@ -812,10 +812,21 @@ For a full list of available hooks see L<Mojolicious/"HOOKS">.
 
 Less commonly used and more powerful features.
 
+=head2 Adding placeholders types
+
+Restrictive placeholders can get repetitive, use
+L<Mojolicious::Routes/"add_type"> to create your own placeholder types.
+
+  # Simple "isbn10" type
+  $r->add_type(isbn10 => qr/\d{9}(?:\d|X)/);
+
+  # GET /library/0596001738
+  $r->get('/library/(book:isbn10)')->to('library#info');
+
 =head2 Shortcuts
 
-You can also add your own shortcuts with L<Mojolicious::Routes/"add_shortcut">
-to make route generation more expressive.
+To make route generation more expressive, you can also add your own shortcuts
+with L<Mojolicious::Routes/"add_shortcut">.
 
   # Simple "resource" shortcut
   $r->add_shortcut(resource => sub {

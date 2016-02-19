@@ -73,7 +73,7 @@ sub render {
       elsif ($optional) { $fragment = '' }
     }
 
-    $str = "$fragment$str";
+    $str = $fragment . $str;
   }
 
   # Format can be optional
@@ -106,10 +106,7 @@ sub _compile {
     # Placeholder
     else {
       unshift @$placeholders, $value;
-
-      # Placeholder
-      $fragment = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)'
-        if $op eq 'placeholder';
+      $fragment = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)';
 
       # Custom regex
       if (my $c = $constraints->{$value}) { $fragment = _compile_req($c) }
@@ -118,11 +115,11 @@ sub _compile {
       exists $defaults->{$value} ? ($fragment .= '?') : ($optional = 0);
     }
 
-    $block = "$fragment$block";
+    $block = $fragment . $block;
   }
 
   # Not rooted with a slash
-  $regex = "$block$regex" if $block;
+  $regex = $block . $regex if $block;
 
   # Format
   $regex .= _compile_format($constraints->{format}, $defaults->{format})
@@ -164,16 +161,13 @@ sub _tokenize {
   for my $char (split '', $pattern) {
 
     # Quoted
-    if ($char eq $quote_start) {
-      push @tree, ['placeholder', ''];
-      $spec = 1;
-    }
+    if ($char eq $quote_start) { push @tree, ['placeholder', ''] if ++$spec }
     elsif ($char eq $quote_end) { $spec = 0 }
 
-    # Placeholder start
+    # Placeholder
     elsif ($char eq $start) { push @tree, ['placeholder', ''] unless $spec++ }
 
-    # Relaxed or wildcard start (upgrade when quoted)
+    # Relaxed or wildcard (upgrade when quoted)
     elsif ($char eq $relaxed || $char eq $wildcard) {
       push @tree, ['placeholder', ''] unless $spec++;
       $tree[-1][2] = $char eq $relaxed ? 'relaxed' : 'wildcard';

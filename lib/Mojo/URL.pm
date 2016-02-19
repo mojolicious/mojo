@@ -239,12 +239,18 @@ L<Mojo::URL> implements the following attributes.
 
 Base of this URL, defaults to a L<Mojo::URL> object.
 
+  "http://example.com/a/b?c"
+  Mojo::URL->new("/a/b?c")->base(Mojo::URL->new("http://example.com"))->to_abs;
+
 =head2 fragment
 
   my $fragment = $url->fragment;
   $url         = $url->fragment('♥mojolicious♥');
 
 Fragment part of this URL.
+
+  # "yada"
+  Mojo::URL->new('http://example.com/foo?bar=baz#yada')->fragment;
 
 =head2 host
 
@@ -253,12 +259,18 @@ Fragment part of this URL.
 
 Host part of this URL.
 
+  # "example.com"
+  Mojo::URL->new('http://sri:t3st@example.com:8080/foo')->host;
+
 =head2 port
 
   my $port = $url->port;
   $url     = $url->port(8080);
 
 Port part of this URL.
+
+  # "8080"
+  Mojo::URL->new('http://sri:t3st@example.com:8080/foo')->port;
 
 =head2 scheme
 
@@ -267,12 +279,18 @@ Port part of this URL.
 
 Scheme part of this URL.
 
+  # "http"
+  Mojo::URL->new('http://example.com/foo')->scheme;
+
 =head2 userinfo
 
   my $info = $url->userinfo;
   $url     = $url->userinfo('root:♥');
 
 Userinfo part of this URL.
+
+  # "sri:t3st"
+  Mojo::URL->new('https://sri:t3st@example.com/foo')->userinfo;
 
 =head1 METHODS
 

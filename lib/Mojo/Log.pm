@@ -219,7 +219,15 @@ Emit L</"message"> event and log C<info> message.
 
   my $bool = $log->is_level('debug');
 
-Check log L</"level">.
+Check active log L</"level">.
+
+  # True
+  $log->level('debug')->is_level('debug');
+  $log->level('debug')->is_level('info');
+
+  # False
+  $log->level('info')->is_level('debug');
+  $log->level('fatal')->is_level('warn');
 
 =head2 new
 

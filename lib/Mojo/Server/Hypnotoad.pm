@@ -298,8 +298,8 @@ Setting the value to C<0> will allow connections to be inactive indefinitely.
 
   listen => ['http://*:80']
 
-List of one or more locations to listen on, defaults to C<http://*:8080>. See
-also L<Mojo::Server::Daemon/"listen"> for more examples.
+Array reference with one or more locations to listen on, defaults to
+C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
 
 =head2 multi_accept
 

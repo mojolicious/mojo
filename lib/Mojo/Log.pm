@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
-use Mojo::Util 'encode';
+use Mojo::Util qw(deprecated encode monkey_patch);
 
 has format => sub { \&_format };
 has handle => sub {
@@ -21,7 +21,15 @@ has max_history_size => 10;
 has 'path';
 
 # Supported log levels
-my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
+my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
+
+# DEPRECATED in Clinking Beer Mugs!
+for my $name (qw(debug error info warn)) {
+  monkey_patch __PACKAGE__, "is_$name", sub {
+    deprecated "Mojo::Log::$name is DEPRECATED in favor of Mojo::Log::is_level";
+    shift->is_level($name);
+  };
+}
 
 sub append {
   my ($self, $msg) = @_;
@@ -37,10 +45,7 @@ sub error { shift->_log(error => @_) }
 sub fatal { shift->_log(fatal => @_) }
 sub info  { shift->_log(info  => @_) }
 
-sub is_debug { shift->_now('debug') }
-sub is_error { shift->_now('error') }
-sub is_info  { shift->_now('info') }
-sub is_warn  { shift->_now('warn') }
+sub is_level { $LEVEL{pop()} >= $LEVEL{$ENV{MOJO_LOG_LEVEL} || shift->level} }
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -59,7 +64,7 @@ sub _log { shift->emit('message', shift, @_) }
 sub _message {
   my ($self, $level) = (shift, shift);
 
-  return unless $self->_now($level);
+  return unless $self->is_level($level);
 
   my $max     = $self->max_history_size;
   my $history = $self->history;
@@ -68,8 +73,6 @@ sub _message {
 
   $self->append($self->format->(@$msg));
 }
-
-sub _now { $LEVEL->{pop()} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || shift->level} }
 
 1;
 
@@ -212,29 +215,11 @@ Emit L</"message"> event and log C<fatal> message.
 
 Emit L</"message"> event and log C<info> message.
 
-=head2 is_debug
+=head2 is_level
 
-  my $bool = $log->is_debug;
+  my $bool = $log->is_level('debug');
 
-Check if C<debug> log level is active.
-
-=head2 is_error
-
-  my $bool = $log->is_error;
-
-Check if C<error> log level is active.
-
-=head2 is_info
-
-  my $bool = $log->is_info;
-
-Check if C<info> log level is active.
-
-=head2 is_warn
-
-  my $bool = $log->is_warn;
-
-Check if C<warn> log level is active.
+Check log L</"level">.
 
 =head2 new
 

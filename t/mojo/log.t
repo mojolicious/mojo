@@ -102,37 +102,37 @@ ok !$history->[2], 'no more messages';
 
 # "debug"
 is $log->level('debug')->level, 'debug', 'right level';
-ok $log->is_debug, '"debug" log level is active';
-ok $log->is_info,  '"info" log level is active';
-ok $log->is_warn,  '"warn" log level is active';
-ok $log->is_error, '"error" log level is active';
+ok $log->is_level('debug'), '"debug" log level is active';
+ok $log->is_level('info'),  '"info" log level is active';
+ok $log->is_level('warn'),, '"warn" log level is active';
+ok $log->is_level('error'), '"error" log level is active';
 
 # "info"
 is $log->level('info')->level, 'info', 'right level';
-ok !$log->is_debug, '"debug" log level is inactive';
-ok $log->is_info,  '"info" log level is active';
-ok $log->is_warn,  '"warn" log level is active';
-ok $log->is_error, '"error" log level is active';
+ok !$log->is_level('debug'), '"debug" log level is inactive';
+ok $log->is_level('info'), '"info" log level is active';
+ok $log->is_level('warn'),, '"warn" log level is active';
+ok $log->is_level('error'), '"error" log level is active';
 
 # "warn"
 is $log->level('warn')->level, 'warn', 'right level';
-ok !$log->is_debug, '"debug" log level is inactive';
-ok !$log->is_info,  '"info" log level is inactive';
-ok $log->is_warn,  '"warn" log level is active';
-ok $log->is_error, '"error" log level is active';
+ok !$log->is_level('debug'), '"debug" log level is inactive';
+ok !$log->is_level('info'),  '"info" log level is inactive';
+ok $log->is_level('warn'),, '"warn" log level is active';
+ok $log->is_level('error'), '"error" log level is active';
 
 # "error"
 is $log->level('error')->level, 'error', 'right level';
-ok !$log->is_debug, '"debug" log level is inactive';
-ok !$log->is_info,  '"info" log level is inactive';
-ok !$log->is_warn,  '"warn" log level is inactive';
-ok $log->is_error, '"error" log level is active';
+ok !$log->is_level('debug'), '"debug" log level is inactive';
+ok !$log->is_level('info'),  '"info" log level is inactive';
+ok !$log->is_level('warn'),  '"warn" log level is inactive';
+ok $log->is_level('error'), '"error" log level is active';
 
 # "fatal"
 is $log->level('fatal')->level, 'fatal', 'right level';
-ok !$log->is_debug, '"debug" log level is inactive';
-ok !$log->is_info,  '"info" log level is inactive';
-ok !$log->is_warn,  '"warn" log level is inactive';
-ok !$log->is_error, '"error" log level is inactive';
+ok !$log->is_level('debug'), '"debug" log level is inactive';
+ok !$log->is_level('info'),  '"info" log level is inactive';
+ok !$log->is_level('warn'),, '"warn" log level is inactive';
+ok !$log->is_level('error'), '"error" log level is inactive';
 
 done_testing();

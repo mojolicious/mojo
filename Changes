@@ -1,5 +1,6 @@
 
 6.48  2016-02-22
+  - Updated jQuery to version 2.2.1.
   - Fixed bug where the results of the list_files method in Mojo::Home would
     include directories.
 

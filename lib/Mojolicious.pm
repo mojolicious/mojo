@@ -736,12 +736,6 @@ have been used in the past.
 
 1.0, C<Snowflake> (U+2744)
 
-0.999930, C<Hot Beverage> (U+2615)
-
-0.999927, C<Comet> (U+2604)
-
-0.999920, C<Snowman> (U+2603)
-
 =head1 SPONSORS
 
 Some of the work on this distribution has been sponsored by

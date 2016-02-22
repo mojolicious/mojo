@@ -195,7 +195,6 @@ newer versions.
 
 Another good reverse proxy is L<Apache|http://httpd.apache.org> with
 C<mod_proxy>, the configuration looks quite similar to the Nginx one above.
-If you want WebSocket support, newer versions come with C<mod_proxy_wstunnel>.
 
   <VirtualHost *:80>
     ServerName localhost
@@ -205,12 +204,15 @@ If you want WebSocket support, newer versions come with C<mod_proxy_wstunnel>.
     </Proxy>
     ProxyRequests Off
     ProxyPreserveHost On
-    # If you need multiple ProxyPass definitions, list longest path first
-    ProxyPass /ws ws://localhost:8080/ws
     ProxyPass / http://localhost:8080/ keepalive=On
     ProxyPassReverse / http://localhost:8080/
     RequestHeader set X-Forwarded-Proto "http"
   </VirtualHost>
+
+And if you need WebSocket support, newer versions come with
+C<mod_proxy_wstunnel>.
+
+  ProxyPass /echo ws://localhost:8080/echo
 
 =head2 Apache/CGI
 

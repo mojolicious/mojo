@@ -7,7 +7,7 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
 has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 100 };
 
 # Common headers
-my %NORMALCASE = map { lc() => $_ } (
+my %NAMES = map { lc() => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Access-Control-Allow-Origin Allow Authorization Cache-Control Connection),
   qw(Content-Disposition Content-Encoding Content-Language Content-Length),
@@ -19,7 +19,7 @@ my %NORMALCASE = map { lc() => $_ } (
   qw(Set-Cookie Status Strict-Transport-Security TE Trailer Transfer-Encoding),
   qw(Upgrade User-Agent Vary WWW-Authenticate)
 );
-for my $header (keys %NORMALCASE) {
+for my $header (keys %NAMES) {
   my $name = $header;
   $name =~ y/-/_/;
   monkey_patch __PACKAGE__, $name, sub {
@@ -35,7 +35,7 @@ sub add {
 
   # Make sure we have a normal case entry for name
   my $key = lc $name;
-  $self->{normalcase}{$key} //= $name unless $NORMALCASE{$key};
+  $self->{names}{$key} //= $name unless $NAMES{$key};
   push @{$self->{headers}{$key}}, @_;
 
   return $self;
@@ -82,8 +82,7 @@ sub leftovers { delete shift->{buffer} }
 
 sub names {
   my $self = shift;
-  return [map { $NORMALCASE{$_} || $self->{normalcase}{$_} || $_ }
-      keys %{$self->{headers}}];
+  return [map { $NAMES{$_} || $self->{names}{$_} } keys %{$self->{headers}}];
 }
 
 sub parse {
@@ -133,8 +132,8 @@ sub remove {
 
 sub to_hash {
   my ($self, $multi) = @_;
-  return {map { $_ => $multi ? $self->{headers}{lc $_} : $self->header($_) }
-      @{$self->names}};
+  return {map { $_ => $self->{headers}{lc $_} } @{$self->names}} if $multi;
+  return {map { $_ => $self->header($_) } @{$self->names}};
 }
 
 sub to_string {
@@ -254,11 +253,11 @@ L<Cross-Origin Resource Sharing|http://www.w3.org/TR/cors/>.
   $headers = $headers->add(Foo => 'one value');
   $headers = $headers->add(Foo => 'first value', 'second value');
 
-Add one or more header values with one or more lines.
+Add header with one or more lines.
 
-  # "Vary: Accept"
-  # "Vary: Accept-Encoding"
-  $headers->vary('Accept')->add(Vary => 'Accept-Encoding')->to_string;
+  # "Vary: Accept
+  #  Vary: Accept-Encoding"
+  $headers->add(Vary => 'Accept')->add(Vary => 'Accept-Encoding')->to_string;
 
 =head2 allow
 

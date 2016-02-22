@@ -58,7 +58,7 @@ sub to_datetime {
   my ($s, $m, $h, $day, $month, $year) = gmtime(my $epoch = shift->epoch);
   my $str = sprintf '%04d-%02d-%02dT%02d:%02d:%02d', $year + 1900, $month + 1,
     $day, $h, $m, $s;
-  return $str . ($epoch =~ /(\.\d+)$/ ? "$1Z" : 'Z');
+  return $str . ($epoch =~ /(\.\d+)$/ ? $1 : '') . 'Z';
 }
 
 sub to_string {

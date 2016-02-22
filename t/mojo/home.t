@@ -48,11 +48,15 @@ is $home->rel_dir('foo/bar'), catdir(splitdir($FindBin::Bin), 'foo', 'bar'),
   'right path';
 
 # List files
-is first(sub {/Base1\.pm$/}, @{$home->list_files('lib')}),
-  'Mojo/BaseTest/Base1.pm', 'right result';
-is first(sub {/Base2\.pm$/}, @{$home->list_files('lib')}),
-  'Mojo/BaseTest/Base2.pm', 'right result';
-is first(sub {/Base3\.pm$/}, @{$home->list_files('lib')}),
-  'Mojo/BaseTest/Base3.pm', 'right result';
+is_deeply $home->list_files('lib/does_not_exist'), [], 'no files';
+is_deeply $home->list_files('lib/myapp.pl'),       [], 'no files';
+my $files = [
+  'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
+  'BaseTest/Base3.pm',  'DeprecationTest.pm',
+  'LoaderException.pm', 'LoaderException2.pm',
+  'LoaderTest/A.pm',    'LoaderTest/B.pm',
+  'LoaderTest/C.pm'
+];
+is_deeply $home->list_files('lib/Mojo'), $files, 'right files';
 
 done_testing();

@@ -39,15 +39,14 @@ sub lib_dir {
 }
 
 sub list_files {
-  my ($self, $dir) = @_;
+  my ($self, $dir) = (shift, shift // '');
 
-  $dir = catdir @{$self->parts}, split('/', $dir // '');
-  return [] unless -d $dir;
   my @files;
+  return \@files unless -d ($dir = catdir @{$self->parts}, split('/', $dir));
   find {
     wanted => sub {
-      my @parts = splitdir abs2rel($File::Find::name, $dir);
-      push @files, join '/', @parts unless grep {/^\./} @parts;
+      push @files, join '/', splitdir abs2rel($File::Find::name, $dir)
+        unless -d $File::Find::name;
     },
     no_chdir => 1
   }, $dir;
@@ -124,10 +123,10 @@ Path to C<lib> directory of application.
   my $files = $home->list_files;
   my $files = $home->list_files('foo/bar');
 
-Portably list all files recursively in directory relative to the home
-directory.
+Portably list all files recursively in directory relative to the home directory.
 
-  say $home->rel_file($home->list_files('templates/layouts')->[1]);
+  # List layouts
+  say for @{$home->rel_file($home->list_files('templates/layouts')};
 
 =head2 mojo_lib_dir
 

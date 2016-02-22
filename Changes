@@ -1,5 +1,5 @@
 
-6.48  2016-02-20
+6.48  2016-02-22
 
 6.47  2016-02-19
   - Deprecated Mojo::Log::is_debug, Mojo::Log::is_error, Mojo::Log::is_info and

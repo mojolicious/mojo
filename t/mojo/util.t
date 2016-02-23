@@ -412,8 +412,8 @@ spurt "just\nworks!", $file;
 is slurp($file), "just\nworks!", 'successful roundtrip';
 
 # files
-is_deeply [files('does_not_exist')], [], 'no files';
-is_deeply [files('util.t')],         [], 'no files';
+is_deeply [files 'does_not_exist'], [], 'no files';
+is_deeply [files __FILE__],         [], 'no files';
 my $lib = catdir dirname(__FILE__), 'lib', 'Mojo';
 my @files = map { catfile $lib, split '/' } (
   'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
@@ -422,7 +422,7 @@ my @files = map { catfile $lib, split '/' } (
   'LoaderTest/A.pm',    'LoaderTest/B.pm',
   'LoaderTest/C.pm'
 );
-is_deeply [files($lib)], \@files, 'right files';
+is_deeply [files $lib], \@files, 'right files';
 
 # steady_time
 like steady_time, qr/^[\d.]+$/, 'high resolution time';

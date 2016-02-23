@@ -23,9 +23,7 @@ sub run {
   my $res  = $tx->res->fix_headers;
   my $hash = $res->headers->to_hash(1);
   my @headers;
-  for my $name (keys %$hash) {
-    push @headers, map { $name => $_ } @{$hash->{$name}};
-  }
+  for my $name (keys %$hash) { push @headers, $name, $_ for @{$hash->{$name}} }
 
   # PSGI response
   my $io = Mojo::Server::PSGI::_IO->new(tx => $tx, empty => $tx->is_empty);

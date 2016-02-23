@@ -116,12 +116,9 @@ sub encode { _encoding($_[0])->encode("$_[1]") }
 
 sub files {
   my $dir = shift;
-
   my @files;
-  return @files unless -d $dir;
   my $wanted = sub { -d $File::Find::name or push @files, $File::Find::name };
-  find {wanted => $wanted, no_chdir => 1}, $dir;
-
+  find {wanted => $wanted, no_chdir => 1}, $dir if -d $dir;
   return sort @files;
 }
 

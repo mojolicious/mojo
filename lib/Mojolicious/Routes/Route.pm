@@ -36,21 +36,7 @@ sub delete { shift->_generate_route(DELETE => @_) }
 
 sub detour { shift->partial(1)->to(@_) }
 
-sub find {
-  my ($self, $name) = @_;
-
-  my @children = (@{$self->children});
-  my $candidate;
-  while (my $child = shift @children) {
-
-    # Custom names have priority
-    $candidate = $child->has_custom_name ? return $child : $child
-      if $child->name eq $name;
-    push @children, @{$child->children};
-  }
-
-  return $candidate;
-}
+sub find { shift->_index->{shift()} }
 
 sub get { shift->_generate_route(GET => @_) }
 
@@ -219,6 +205,20 @@ sub _generate_route {
   $methods eq 'under' ? $route->inline(1) : $route->via($methods);
 
   return defined $name ? $route->name($name) : $route;
+}
+
+sub _index {
+  my $self = shift;
+
+  my %index;
+  my @children = (@{$self->children});
+  while (my $child = shift @children) {
+    if ($child->has_custom_name) { $index{$child->name} = $child }
+    else                         { $index{$child->name} ||= $child }
+    push @children, @{$child->children};
+  }
+
+  return \%index;
 }
 
 1;

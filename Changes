@@ -2,6 +2,7 @@
 6.48  2016-02-23
   - Added files function to Mojo::Util.
   - Updated jQuery to version 2.2.1.
+  - Improved url_for performance significantly.
   - Fixed bug where the results of the list_files method in Mojo::Home would
     include directories.
 

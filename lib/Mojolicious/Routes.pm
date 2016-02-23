@@ -53,13 +53,7 @@ sub is_hidden {
   return !!($h->{$method} || index($method, '_') == 0 || $method !~ /[a-z]/);
 }
 
-sub lookup {
-  my ($self, $name) = @_;
-  my $reverse = $self->{reverse} ||= {};
-  return $reverse->{$name} if exists $reverse->{$name};
-  return undef unless my $route = $self->find($name);
-  return $reverse->{$name} = $route;
-}
+sub lookup { ($_[0]{reverse} //= $_[0]->_index)->{$_[1]} }
 
 sub match {
   my ($self, $c) = @_;

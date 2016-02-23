@@ -7,7 +7,7 @@ use Test::More;
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
 
-use File::Spec::Functions 'catdir';
+use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
@@ -57,8 +57,8 @@ use Mojo::Util qw(slurp spurt);
 
 # Prepare script
 my $dir = tempdir CLEANUP => 1;
-my $script = catdir $dir, 'myapp.pl';
-my $log    = catdir $dir, 'mojo.log';
+my $script = catfile $dir, 'myapp.pl';
+my $log    = catfile $dir, 'mojo.log';
 my $port1  = Mojo::IOLoop::Server->generate_port;
 my $port2  = Mojo::IOLoop::Server->generate_port;
 spurt <<EOF, $script;
@@ -216,7 +216,7 @@ like $log, qr/Starting zero downtime software upgrade/, 'right message';
 like $log, qr/Upgrade successful, stopping $old/,       'right message';
 
 sub _pid {
-  return undef unless open my $file, '<', catdir($dir, 'hypnotoad.pid');
+  return undef unless open my $file, '<', catfile($dir, 'hypnotoad.pid');
   my $pid = <$file>;
   chomp $pid;
   return $pid;

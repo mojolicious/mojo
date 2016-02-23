@@ -5,14 +5,14 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
+use File::Spec::Functions qw(catdir catfile);
 use File::Temp 'tempdir';
 use Mojo::ByteStream 'b';
 use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode dumper encode hmac_sha1_sum html_unescape md5_bytes md5_sum),
+  qw(decode dumper encode files hmac_sha1_sum html_unescape md5_bytes md5_sum),
   qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
   qw(split_header spurt squish steady_time tablify term_escape trim unindent),
@@ -410,6 +410,19 @@ my $dir = tempdir CLEANUP => 1;
 my $file = catfile $dir, 'test.txt';
 spurt "just\nworks!", $file;
 is slurp($file), "just\nworks!", 'successful roundtrip';
+
+# files
+is_deeply [files('does_not_exist')], [], 'no files';
+is_deeply [files('util.t')],         [], 'no files';
+my $lib = catdir dirname(__FILE__), 'lib', 'Mojo';
+my @files = map { catfile $lib, split '/' } (
+  'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
+  'BaseTest/Base3.pm',  'DeprecationTest.pm',
+  'LoaderException.pm', 'LoaderException2.pm',
+  'LoaderTest/A.pm',    'LoaderTest/B.pm',
+  'LoaderTest/C.pm'
+);
+is_deeply [files($lib)], \@files, 'right files';
 
 # steady_time
 like steady_time, qr/^[\d.]+$/, 'high resolution time';

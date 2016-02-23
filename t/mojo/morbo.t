@@ -7,7 +7,8 @@ use Test::More;
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
 
-use File::Spec::Functions 'catdir';
+use File::Path 'mkpath';
+use File::Spec::Functions qw(catdir catfile);
 use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
@@ -20,8 +21,10 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
 
 # Prepare script
 my $dir = tempdir CLEANUP => 1;
-my $script = catdir $dir, 'myapp.pl';
-my $morbo = Mojo::Server::Morbo->new(watch => [$script]);
+my $script = catfile $dir, 'myapp.pl';
+my $subdir = catdir $dir, 'test', 'stuff';
+mkpath $subdir;
+my $morbo = Mojo::Server::Morbo->new(watch => [$subdir, $script]);
 is $morbo->check, undef, 'file has not changed';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
@@ -110,6 +113,13 @@ $tx = $ua->get("http://127.0.0.1:$port/hello");
 ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'Hello!', 'right content';
+
+# New file
+is $morbo->check, undef, 'directory has not changed';
+my $new = catfile $subdir, 'test.txt';
+spurt 'whatever', $new;
+is $morbo->check, $new, 'directory has changed';
+is $morbo->check, undef, 'directory has not changed again';
 
 # Stop
 kill 'INT', $pid;

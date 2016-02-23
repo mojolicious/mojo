@@ -1,14 +1,14 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Spec::Functions 'catdir';
+use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use Mojo::Log;
 use Mojo::Util qw(decode slurp);
 
 # Logging to file
 my $dir = tempdir CLEANUP => 1;
-my $path = catdir $dir, 'test.log';
+my $path = catfile $dir, 'test.log';
 my $log = Mojo::Log->new(level => 'error', path => $path);
 $log->error('Just works');
 $log->fatal('I ♥ Mojolicious');

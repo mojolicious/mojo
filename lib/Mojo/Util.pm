@@ -7,6 +7,7 @@ use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use Exporter 'import';
+use File::Find 'find';
 use IO::Poll qw(POLLIN POLLPRI);
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
@@ -53,8 +54,8 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated dumper encode hmac_sha1_sum html_unescape md5_bytes),
-  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(decode deprecated dumper encode files hmac_sha1_sum html_unescape),
+  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
   qw(split_header spurt squish steady_time tablify term_escape trim unindent),
   qw(unquote url_escape url_unescape xml_escape xor_encode)
@@ -112,6 +113,17 @@ sub dumper {
 }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
+
+sub files {
+  my $dir = shift;
+
+  my @files;
+  return @files unless -d $dir;
+  my $wanted = sub { -d $File::Find::name or push @files, $File::Find::name };
+  find {wanted => $wanted, no_chdir => 1}, $dir;
+
+  return sort @files;
+}
 
 sub hmac_sha1_sum { hmac_sha1_hex @_ }
 
@@ -575,6 +587,15 @@ Dump a Perl data structure with L<Data::Dumper>.
   my $bytes = encode 'UTF-8', $chars;
 
 Encode characters to bytes.
+
+=head2 files
+
+  my @files = files '/tmp/uploads';
+
+List all files recursively in a directory.
+
+  # List all templates
+  say for files '/home/sri/myapp/templates';
 
 =head2 hmac_sha1_sum
 

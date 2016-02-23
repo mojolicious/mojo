@@ -4,10 +4,9 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Cwd 'abs_path';
 use File::Basename 'dirname';
-use File::Find 'find';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
-use Mojo::Util 'class_to_path';
+use Mojo::Util qw(class_to_path files);
 
 has parts => sub { [] };
 
@@ -40,18 +39,8 @@ sub lib_dir {
 
 sub list_files {
   my ($self, $dir) = (shift, shift // '');
-
-  my @files;
-  return \@files unless -d ($dir = catdir @{$self->parts}, split('/', $dir));
-  find {
-    wanted => sub {
-      push @files, join '/', splitdir abs2rel($File::Find::name, $dir)
-        unless -d $File::Find::name;
-    },
-    no_chdir => 1
-  }, $dir;
-
-  return [sort @files];
+  $dir = catdir @{$self->parts}, split('/', $dir);
+  return [map { join '/', splitdir abs2rel($_, $dir) } files $dir];
 }
 
 sub mojo_lib_dir { catdir dirname(__FILE__), '..' }

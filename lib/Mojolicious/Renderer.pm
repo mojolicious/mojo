@@ -215,8 +215,7 @@ sub warmup {
 
   # Handlers for templates
   s/\.(\w+)$// and push @{$templates->{$_}}, $1
-    for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths},
-    $TEMPLATES;
+    for map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}, $TEMPLATES;
 
   # Handlers and classes for DATA templates
   for my $class (reverse @{$self->classes}) {

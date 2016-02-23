@@ -4,8 +4,8 @@ use Mojo::Base -base;
 # "Linda: With Haley's Comet out of ice, Earth is experiencing the devastating
 #         effects of sudden, intense global warming.
 #  Morbo: Morbo is pleased but sticky."
-use Mojo::Home;
 use Mojo::Server::Daemon;
+use Mojo::Util 'files';
 use POSIX 'WNOHANG';
 
 has daemon => sub { Mojo::Server::Daemon->new };
@@ -13,18 +13,8 @@ has watch  => sub { [qw(lib templates)] };
 
 sub check {
   my $self = shift;
-
-  # Discover files
-  my @files;
-  for my $watch (@{$self->watch}) {
-    if (-d $watch) {
-      my $home = Mojo::Home->new->parse($watch);
-      push @files, $home->rel_file($_) for @{$home->list_files};
-    }
-    elsif (-r $watch) { push @files, $watch }
-  }
-
-  $self->_check($_) and return $_ for @files;
+  $self->_check($_) and return $_
+    for map { -f $_ && -r $_ ? $_ : files $_ } @{$self->watch};
   return undef;
 }
 

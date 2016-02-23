@@ -4,7 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Cwd qw(cwd realpath);
-use File::Spec::Functions qw(canonpath catdir splitdir);
+use File::Spec::Functions qw(canonpath catdir catfile splitdir);
 use FindBin;
 use List::Util 'first';
 use Mojo::HelloWorld;
@@ -39,10 +39,10 @@ is_deeply [split /\\|\//, catdir(splitdir($FindBin::Bin))],
 # Path generation
 $home = Mojo::Home->new($FindBin::Bin);
 is $home->lib_dir, catdir(splitdir($FindBin::Bin), 'lib'), 'right path';
-is $home->rel_file('foo.txt'), catdir(splitdir($FindBin::Bin), 'foo.txt'),
+is $home->rel_file('foo.txt'), catfile(splitdir($FindBin::Bin), 'foo.txt'),
   'right path';
 is $home->rel_file('foo/bar.txt'),
-  catdir(splitdir($FindBin::Bin), 'foo', 'bar.txt'), 'right path';
+  catfile(splitdir($FindBin::Bin), 'foo', 'bar.txt'), 'right path';
 is $home->rel_dir('foo'), catdir(splitdir($FindBin::Bin), 'foo'), 'right path';
 is $home->rel_dir('foo/bar'), catdir(splitdir($FindBin::Bin), 'foo', 'bar'),
   'right path';

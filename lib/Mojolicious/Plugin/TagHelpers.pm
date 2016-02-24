@@ -21,14 +21,12 @@ sub register {
   );
   $app->helper($_ => __PACKAGE__->can("_$_")) for @helpers;
 
-  $app->helper(check_box =>
-      sub { _input(shift, shift, value => shift, @_, type => 'checkbox') });
+  $app->helper(check_box => sub { _input(@_, type => 'checkbox') });
   $app->helper(file_field => sub { _empty_field('file', @_) });
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
   $app->helper(input_tag => sub { _input(@_) });
   $app->helper(password_field => sub { _empty_field('password', @_) });
-  $app->helper(radio_button =>
-      sub { _input(shift, shift, value => shift, @_, type => 'radio') });
+  $app->helper(radio_button => sub { _input(@_, type => 'radio') });
 
   # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);

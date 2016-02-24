@@ -290,8 +290,7 @@ sub signed_cookie {
 sub stash { Mojo::Util::_stash(stash => @_) }
 
 sub url_for {
-  my $self = shift;
-  my $target = shift // '';
+  my ($self, $target) = (shift, shift // '');
 
   # Absolute URL
   return $target if Scalar::Util::blessed $target && $target->isa('Mojo::URL');

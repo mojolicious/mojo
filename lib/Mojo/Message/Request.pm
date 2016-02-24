@@ -107,17 +107,16 @@ sub params {
 
 sub parse {
   my $self = shift;
+  my ($env, $chunk) = ref $_[0] ? (shift, '') : (undef, shift);
 
   # Parse CGI environment
-  my $env = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
   $self->env($env)->_parse_env($env) if $env;
 
   # Parse normal message
-  my @args = $env ? () : @_;
-  if (($self->{state} // '') ne 'cgi') { $self->SUPER::parse(@args) }
+  if (($self->{state} // '') ne 'cgi') { $self->SUPER::parse($chunk) }
 
   # Parse CGI content
-  else { $self->content($self->content->parse_body(@args))->SUPER::parse }
+  else { $self->content($self->content->parse_body($chunk))->SUPER::parse('') }
 
   # Check if we can fix things that require all headers
   return $self unless $self->is_finished;
@@ -129,12 +128,11 @@ sub parse {
   if (!$base->host && (my $host = $headers->host)) { $base->authority($host) }
 
   # Basic authentication
-  my $auth = _parse_basic_auth($headers->authorization);
-  $base->userinfo($auth) if $auth;
+  if (my $basic = _basic($headers->authorization)) { $base->userinfo($basic) }
 
   # Basic proxy authentication
-  my $proxy_auth = _parse_basic_auth($headers->proxy_authorization);
-  $self->proxy(Mojo::URL->new->userinfo($proxy_auth)) if $proxy_auth;
+  my $basic = _basic($headers->proxy_authorization);
+  $self->proxy(Mojo::URL->new->userinfo($basic)) if $basic;
 
   # "X-Forwarded-Proto"
   $base->scheme('https')
@@ -148,13 +146,13 @@ sub query_params { shift->url->query }
 
 sub start_line_size { length shift->_start_line->{start_buffer} }
 
-sub _parse_basic_auth {
-  return undef unless my $header = shift;
-  return $header =~ /Basic (.+)$/ ? b64_decode $1 : undef;
-}
+sub _basic { $_[0] && $_[0] =~ /Basic (.+)$/ ? b64_decode $1 : undef }
 
 sub _parse_env {
   my ($self, $env) = @_;
+
+  # Bypass normal message parser
+  $self->{state} = 'cgi';
 
   # Extract headers
   my $headers = $self->headers;
@@ -167,11 +165,8 @@ sub _parse_env {
     $headers->header($name => $value);
 
     # Host/Port
-    if ($name eq 'HOST') {
-      my ($host, $port) = ($value, undef);
-      ($host, $port) = ($1, $2) if $host =~ /^([^:]*):?(.*)$/;
-      $base->host($host)->port($port);
-    }
+    $value =~ s/:(\d+)$// ? $base->host($value)->port($1) : $base->host($value)
+      if $name eq 'HOST';
   }
 
   # Content-Type is a special case on some servers
@@ -209,9 +204,6 @@ sub _parse_env {
     $buffer =~ s!^/!!;
     $path->parse($buffer);
   }
-
-  # Bypass normal message parser
-  $self->{state} = 'cgi';
 }
 
 sub _start_line {
@@ -439,8 +431,7 @@ default.
 =head2 parse
 
   $req = $req->parse('GET /foo/bar HTTP/1.1');
-  $req = $req->parse(REQUEST_METHOD => 'GET');
-  $req = $req->parse({REQUEST_METHOD => 'GET'});
+  $req = $req->parse({PATH_INFO => '/'});
 
 Parse HTTP request chunks or environment hash.
 

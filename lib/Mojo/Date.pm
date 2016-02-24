@@ -46,7 +46,6 @@ sub parse {
   # Invalid
   else { return $self->epoch(undef) }
 
-  # Prevent crash
   my $epoch = eval { timegm $s, $m, $h, $day, $month, $year };
   return $self->epoch(
     (defined $epoch && ($epoch += $offset) >= 0) ? $epoch : undef);

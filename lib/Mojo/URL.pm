@@ -21,7 +21,7 @@ sub authority {
     $self->userinfo(_decode(url_unescape $1)) if $authority =~ s/^([^\@]+)\@//;
 
     # Port
-    $authority =~ s/:(\d+)$// and $self->port($1);
+    $self->port($1) if $authority =~ s/:(\d+)$//;
 
     # Host
     my $host = url_unescape $authority;

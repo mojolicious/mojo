@@ -12,7 +12,7 @@ sub add_chunk {
   my ($self, $chunk) = @_;
 
   # Upgrade if necessary
-  $self->{content} .= $chunk // '';
+  $self->{content} .= $chunk;
   return $self if !$self->auto_upgrade || $self->size <= $self->max_memory_size;
   my $file = Mojo::Asset::File->new;
   return $file->add_chunk($self->emit(upgrade => $file)->slurp);

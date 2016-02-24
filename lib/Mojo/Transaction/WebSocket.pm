@@ -145,7 +145,7 @@ sub send {
 sub server_read {
   my ($self, $chunk) = @_;
 
-  $self->{read} .= $chunk // '';
+  $self->{read} .= $chunk;
   my $max = $self->max_websocket_size;
   while (my $frame = Mojo::WebSocket::parse_frame(\$self->{read}, $max)) {
     $self->finish(1009) and last unless ref $frame;

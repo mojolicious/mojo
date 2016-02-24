@@ -86,10 +86,10 @@ sub names {
 }
 
 sub parse {
-  my $self = shift;
+  my ($self, $chunk) = @_;
 
   $self->{state} = 'headers';
-  $self->{buffer} .= shift // '';
+  $self->{buffer} .= $chunk;
   my $headers = $self->{cache} ||= [];
   my $size    = $self->max_line_size;
   my $lines   = $self->max_lines;

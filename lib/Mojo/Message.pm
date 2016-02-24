@@ -142,10 +142,10 @@ sub json {
 }
 
 sub parse {
-  my $self = shift;
+  my ($self, $chunk) = @_;
 
   return $self if $self->{error};
-  $self->{raw_size} += length(my $chunk = shift // '');
+  $self->{raw_size} += length $chunk;
   $self->{buffer} .= $chunk;
 
   # Start-line

@@ -119,11 +119,9 @@ sub parse {
 
 sub remove {
   my ($self, $name) = @_;
-
   my $pairs = $self->pairs;
   my $i     = 0;
   $pairs->[$i] eq $name ? splice @$pairs, $i, 2 : ($i += 2) while $i < @$pairs;
-
   return $self;
 }
 

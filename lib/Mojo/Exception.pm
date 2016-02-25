@@ -110,7 +110,7 @@ Mojo::Exception - Exceptions with context
 
   # Throw exception and show stack trace
   eval { Mojo::Exception->throw('Died at test.pl line 3.') };
-  say $_->[1], ':', $_->[2]  for @{$@->frames};
+  say "$_->[1]: $_->[2]"  for @{$@->frames};
 
   # Customize exception
   eval { die Mojo::Exception->new('Died at test.pl line 3.')->trace(2) };

@@ -145,14 +145,14 @@ The line where the exception occurred if available.
 =head2 lines_after
 
   my $lines = $e->lines_after;
-  $e        = $e->lines_after([[1 => 'my $foo = 23;'], [2 => 'my $bar = 24;']]);
+  $e        = $e->lines_after([[4 => 'say $foo;'], [5 => 'say $bar;']]);
 
 Lines after the line where the exception occurred if available.
 
 =head2 lines_before
 
   my $lines = $e->lines_before;
-  $e        = $e->lines_before([[4 => 'say $foo;'], [5 => 'say $bar;']]);
+  $e        = $e->lines_before([[1 => 'my $foo = 8;'], [2 => 'my $bar = 9;']]);
 
 Lines before the line where the exception occurred if available.
 

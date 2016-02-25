@@ -211,6 +211,7 @@ EOF
 # Checkboxes
 $t->get_ok('/multibox')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
+  <input name="foo" type="checkbox">
   <input name="foo" type="checkbox" value="one">
   <input name="foo" type="checkbox" value="two">
   <input checked name="foo" type="checkbox" value="three">
@@ -221,6 +222,7 @@ EOF
 # Checkboxes with one value
 $t->get_ok('/multibox?foo=two')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
+  <input name="foo" type="checkbox">
   <input name="foo" type="checkbox" value="one">
   <input checked name="foo" type="checkbox" value="two">
   <input name="foo" type="checkbox" value="three">
@@ -231,6 +233,7 @@ EOF
 # Checkboxes with one right and one wrong value
 $t->get_ok('/multibox?foo=one&foo=four')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
+  <input name="foo" type="checkbox">
   <input checked name="foo" type="checkbox" value="one">
   <input name="foo" type="checkbox" value="two">
   <input name="foo" type="checkbox" value="three">
@@ -241,6 +244,7 @@ EOF
 # Checkboxes with wrong value
 $t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
+  <input name="foo" type="checkbox">
   <input name="foo" type="checkbox" value="one">
   <input name="foo" type="checkbox" value="two">
   <input name="foo" type="checkbox" value="three">
@@ -248,9 +252,11 @@ $t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
-# Checkboxes with two values
-$t->get_ok('/multibox?foo=two&foo=one')->status_is(200)->content_is(<<EOF);
+# Checkboxes with multiple values
+$t->get_ok('/multibox?foo=two&foo=one&foo=on')->status_is(200)
+  ->content_is(<<EOF);
 <form action="/multibox">
+  <input checked name="foo" type="checkbox">
   <input checked name="foo" type="checkbox" value="one">
   <input checked name="foo" type="checkbox" value="two">
   <input name="foo" type="checkbox" value="three">
@@ -270,6 +276,7 @@ $t->get_ok('/form/lala?a=3&a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   <input data="ok" name="foo" type="text" value="1">
   <input name="foo" type="checkbox" value="1">
   <input checked name="a" type="checkbox" value="2">
+  <input name="b" type="radio">
   <input name="b" type="radio" value="1">
   <input checked name="b" type="radio" value="0">
   <input name="c" type="hidden" value="foo">
@@ -292,7 +299,8 @@ $t->get_ok('/form/lala?a=3&a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 EOF
 
 # Advanced form with different values
-$t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/form/lala?c=b&d=3&e=4&f=<5&b=on')->status_is(200)
+  ->content_is(<<EOF);
 <form action="/links" method="post">
   <input name="foo">
 </form>
@@ -302,6 +310,7 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
   <input data="ok" name="foo" type="text" value="1">
   <input name="foo" type="checkbox" value="1">
   <input name="a" type="checkbox" value="2">
+  <input checked name="b" type="radio">
   <input name="b" type="radio" value="1">
   <input name="b" type="radio" value="0">
   <input name="c" type="hidden" value="foo">
@@ -588,6 +597,7 @@ __DATA__
 
 @@ multibox.html.ep
 %= form_for multibox => begin
+  %= check_box 'foo'
   %= check_box foo => 'one'
   %= check_box foo => 'two'
   %= check_box foo => 'three', checked => undef
@@ -604,6 +614,7 @@ __DATA__
   %= text_field foo => 1, data => 'ok'
   %= check_box foo => 1
   %= check_box a => 2
+  %= radio_button 'b'
   %= radio_button b => '1'
   %= radio_button b => '0'
   %= hidden_field c => 'foo'

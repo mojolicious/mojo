@@ -79,7 +79,7 @@ sub _detect {
   my @trace;
   while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
 
-  # Extract file and line from stacktrace
+  # Extract file and line from stack trace
   my $first = $self->frames->[0];
   push @trace, [$first->[1], $first->[2]] if $first;
 
@@ -108,7 +108,7 @@ Mojo::Exception - Exceptions with context
 
   use Mojo::Exception;
 
-  # Throw exception and show stacktrace
+  # Throw exception and show stack trace
   eval { Mojo::Exception->throw('Died at test.pl line 3.') };
   say $_->[1], ':', $_->[2]  for @{$@->frames};
 
@@ -129,7 +129,7 @@ L<Mojo::Exception> implements the following attributes.
   my $frames = $e->frames;
   $e         = $e->frames([$frame1, $frame2]);
 
-Stacktrace.
+Stack trace.
 
   # Extract information from the last frame
   my ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext,
@@ -189,7 +189,7 @@ additional files if necessary.
   Mojo::Exception->throw('Died at test.pl line 3.');
   Mojo::Exception->throw('Died at test.pl line 3.', [$file1, $file2]);
 
-Throw exception with stacktrace and extract context information from additional
+Throw exception with stack trace and extract context information from additional
 files if necessary.
 
 =head2 to_string
@@ -206,9 +206,9 @@ Render exception.
   $e = $e->trace;
   $e = $e->trace($skip);
 
-Store L</"frames">.
+Generate stack trace and store all L</"frames">.
 
-  # Skip 3 call frames in stacktrace
+  # Skip 3 call frames in stack trace
   $e->trace(3);
 
 =head1 OPERATORS

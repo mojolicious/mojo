@@ -91,14 +91,14 @@ sub compile {
   my $compiled = eval $self->_wrap($code);
   $self->compiled($compiled) and return undef unless $@;
 
-  # Use local stacktrace for compile exceptions
+  # Use local stack trace for compile exceptions
   return Mojo::Exception->new($@, [$self->unparsed, $code])->trace->verbose(1);
 }
 
 sub interpret {
   my $self = shift;
 
-  # Stacktrace
+  # Stack trace
   local $SIG{__DIE__} = sub {
     CORE::die($_[0]) if ref $_[0];
     Mojo::Exception->throw(shift, [$self->unparsed, $self->code]);

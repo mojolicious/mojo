@@ -595,7 +595,7 @@ $output = $mt->render(<<'EOF');
 EOF
 is $output, "Mojo::Template::SandBox\nworks!\n", 'right result';
 
-# Unusable error message (stacktrace required)
+# Unusable error message (stack trace required)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 test

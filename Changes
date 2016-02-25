@@ -2687,7 +2687,7 @@
     from 0 to 0.025 seconds.
 
 2.31  2011-11-21
-  - Improved stacktraces by making them a lot simpler.
+  - Improved stack traces by making them a lot simpler.
 
 2.30  2011-11-20
   - Deprecated Mojo::IOLoop::on_lock in favor of Mojo::IOLoop::lock.

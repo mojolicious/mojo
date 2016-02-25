@@ -41,9 +41,7 @@ sub accepts {
   return \@exts unless @_;
 
   # Find best representation
-  for my $ext (@exts) {
-    return $ext if grep { $ext eq $_ } @_;
-  }
+  for my $ext (@exts) { $ext eq $_ and return $ext for @_ }
   return @exts ? undef : shift;
 }
 

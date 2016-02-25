@@ -170,7 +170,7 @@ sub _tag {
   # Attributes
   my $attrs = $tree->[2] = {@_};
   if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
-    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = @$data{keys %$data};
+    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
   }
 
   return Mojo::ByteStream->new(Mojo::DOM::HTML::_render($tree));

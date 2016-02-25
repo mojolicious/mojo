@@ -14,7 +14,7 @@ has watch  => sub { [qw(lib templates)] };
 sub check {
   my $self = shift;
   $self->_check($_) and return $_
-    for map { -f $_ && -r $_ ? $_ : files $_ } @{$self->watch};
+    for map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch};
   return undef;
 }
 

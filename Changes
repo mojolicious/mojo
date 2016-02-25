@@ -1,5 +1,6 @@
 
 6.49  2016-02-25
+  - Fixed Windows bug in "util.t".
 
 6.48  2016-02-24
   - Added files function to Mojo::Util.

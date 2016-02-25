@@ -5,7 +5,7 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 use File::Basename 'dirname';
-use File::Spec::Functions qw(catdir catfile);
+use File::Spec::Functions qw(catdir catfile splitdir);
 use File::Temp 'tempdir';
 use Mojo::ByteStream 'b';
 use Mojo::DeprecationTest;
@@ -422,7 +422,7 @@ my @files = map { catfile $lib, split '/' } (
   'LoaderTest/A.pm',    'LoaderTest/B.pm',
   'LoaderTest/C.pm'
 );
-is_deeply [files $lib], \@files, 'right files';
+is_deeply [map { catfile splitdir $_ } files $lib], \@files, 'right files';
 
 # steady_time
 like steady_time, qr/^[\d.]+$/, 'high resolution time';

@@ -108,11 +108,13 @@ Mojo::Exception - Exceptions with context
 
   use Mojo::Exception;
 
-  # Throw exception
-  Mojo::Exception->throw('Not again!');
+  # Throw exception and show stacktrace
+  eval { Mojo::Exception->throw('Died at test.pl line 3.') };
+  say $_->[1], ':', $_->[2]  for @{$@->frames};
 
   # Customize exception
-  die Mojo::Exception->new('Not again!')->trace(2)->verbose(1);
+  eval { die Mojo::Exception->new('Died at test.pl line 3.')->trace(2) };
+  say $@->verbose(1);
 
 =head1 DESCRIPTION
 
@@ -125,35 +127,39 @@ L<Mojo::Exception> implements the following attributes.
 =head2 frames
 
   my $frames = $e->frames;
-  $e         = $e->frames($frames);
+  $e         = $e->frames([$frame1, $frame2]);
 
 Stacktrace.
+
+  # Extract information from the last frame
+  my ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext,
+      $is_require, $hints, $bitmask, $hinthash) = @{$e->frames->[-1]};
 
 =head2 line
 
   my $line = $e->line;
-  $e       = $e->line([3 => 'foo']);
+  $e       = $e->line([3 => 'die;']);
 
-The line where the exception occurred.
+The line where the exception occurred if available.
 
 =head2 lines_after
 
   my $lines = $e->lines_after;
-  $e        = $e->lines_after([[1 => 'bar'], [2 => 'baz']]);
+  $e        = $e->lines_after([[1 => 'my $foo = 23;'], [2 => 'my $bar = 24;']]);
 
-Lines after the line where the exception occurred.
+Lines after the line where the exception occurred if available.
 
 =head2 lines_before
 
   my $lines = $e->lines_before;
-  $e        = $e->lines_before([[4 => 'bar'], [5 => 'baz']]);
+  $e        = $e->lines_before([[4 => 'say $foo;'], [5 => 'say $bar;']]);
 
-Lines before the line where the exception occurred.
+Lines before the line where the exception occurred if available.
 
 =head2 message
 
   my $msg = $e->message;
-  $e      = $e->message('Oops!');
+  $e      = $e->message('Died at test.pl line 3.');
 
 Exception message.
 
@@ -172,17 +178,19 @@ following new ones.
 =head2 new
 
   my $e = Mojo::Exception->new;
-  my $e = Mojo::Exception->new('Oops!');
-  my $e = Mojo::Exception->new('Oops!', $files);
+  my $e = Mojo::Exception->new('Died at test.pl line 3.');
+  my $e = Mojo::Exception->new('Died at test.pl line 3.', [$file1, $file2]);
 
-Construct a new L<Mojo::Exception> object.
+Construct a new L<Mojo::Exception> object and extract context information from
+additional files if necessary.
 
 =head2 throw
 
-  Mojo::Exception->throw('Oops!');
-  Mojo::Exception->throw('Oops!', $files);
+  Mojo::Exception->throw('Died at test.pl line 3.');
+  Mojo::Exception->throw('Died at test.pl line 3.', [$file1, $file2]);
 
-Throw exception with stacktrace.
+Throw exception with stacktrace and extract context information from additional
+files if necessary.
 
 =head2 to_string
 
@@ -190,12 +198,18 @@ Throw exception with stacktrace.
 
 Render exception.
 
+  # Render exception with context
+  say $e->verbose(1)->to_string;
+
 =head2 trace
 
   $e = $e->trace;
-  $e = $e->trace(2);
+  $e = $e->trace($skip);
 
-Store stacktrace.
+Store L</"frames">.
+
+  # Skip 3 call frames in stacktrace
+  $e->trace(3);
 
 =head1 OPERATORS
 

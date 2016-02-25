@@ -2212,8 +2212,12 @@ $dom = Mojo::DOM->new(<<EOF);
 <form action="/foo">
   <p>Test</p>
   <input type="text" name="a" value="A" />
+  <input type="checkbox" name="q">
   <input type="checkbox" checked name="b" value="B">
+  <input type="radio" name="r">
   <input type="radio" checked name="c" value="C">
+  <input name="s">
+  <input type="checkbox" name="t" value="">
   <select multiple name="f">
     <option value="F">G</option>
     <optgroup>
@@ -2249,6 +2253,10 @@ is_deeply $dom->find('select')->last->at('option')->val, 'R', 'right value';
 is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('button')->val,   'O', 'right value';
 is $dom->find('form input')->last->val, 'P', 'right value';
+is $dom->at('input[name=q]')->val, 'on',  'right value';
+is $dom->at('input[name=r]')->val, 'on',  'right value';
+is $dom->at('input[name=s]')->val, undef, 'no value';
+is $dom->at('input[name=t]')->val, '',    'right value';
 
 # PoCo example with whitespace-sensitive text
 $dom = Mojo::DOM->new(<<EOF);

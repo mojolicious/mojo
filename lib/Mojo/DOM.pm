@@ -165,6 +165,11 @@ sub val {
   # "option"
   return $self->{value} // $self->text if (my $tag = $self->tag) eq 'option';
 
+  # "input" ("type=checkbox" and "type=radio")
+  my $type = $self->{type} // '';
+  return $self->{value} // 'on'
+    if $tag eq 'input' && ($type eq 'checkbox' || $type eq 'radio');
+
   # "textarea", "input" or "button"
   return $tag eq 'textarea' ? $self->text : $self->{value} if $tag ne 'select';
 
@@ -960,7 +965,7 @@ C<selected> attribute and return an array reference with all values, or C<undef>
 if none could be found.
 
   # "a"
-  $dom->parse('<input name="test" value="a">')->at('input')->val;
+  $dom->parse('<input name=test value=a>')->at('input')->val;
 
   # "b"
   $dom->parse('<textarea>b</textarea>')->at('textarea')->val;
@@ -975,6 +980,9 @@ if none could be found.
   # "e"
   $dom->parse('<select multiple><option selected>e</option></select>')
     ->at('select')->val->[0];
+
+  # "on"
+  $dom->parse('<input name=test type=checkbox>')->at('input')->val;
 
 =head2 wrap
 

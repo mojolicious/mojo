@@ -2,6 +2,7 @@
 6.49  2016-02-25
   - Improved check_box and radio_button helpers with support for "on" default
     values.
+  - Improved val method in Mojo::DOM with support for "on" default values.
   - Fixed Windows bug in "util.t".
 
 6.48  2016-02-24

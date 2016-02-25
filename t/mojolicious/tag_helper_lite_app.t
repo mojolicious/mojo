@@ -24,6 +24,8 @@ get '/basicform';
 
 post '/text';
 
+post '/check_box_no_value';
+
 get '/multibox';
 
 get 'form/:test' => 'form';
@@ -209,6 +211,13 @@ $t->post_ok(
 EOF
 
 # Checkboxes
+$t->post_ok('/check_box_no_value' => form => { foo => 'on' }
+)->status_is(200)->content_is(<<EOF);
+<form action="/check_box_no_value" method="POST">
+  <input checked name="foo" type="checkbox" value="on">
+</form>
+EOF
+
 $t->get_ok('/multibox')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input name="foo" type="checkbox" value="one">
@@ -584,6 +593,11 @@ __DATA__
   %= url_field url => 'http://mojolicious.org', class => 'foo'
   %= week_field week => '2012-W16', class => 'foo'
   %= submit_button
+%= end
+
+@@ check_box_no_value.html.ep
+%= form_for check_box_no_value => begin
+  %= check_box 'foo'
 %= end
 
 @@ multibox.html.ep

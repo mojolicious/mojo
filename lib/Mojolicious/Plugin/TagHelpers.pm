@@ -71,7 +71,7 @@ sub _input {
   if (@values && $type ne 'submit') {
 
     # Checkbox or radiobutton
-    my $value = $attrs{value} // '';
+    my $value = $attrs{value} // 'on';
     if ($type eq 'checkbox' || $type eq 'radio') {
       $attrs{value} = $value;
       delete $attrs{checked} if @values;

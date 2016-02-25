@@ -350,9 +350,9 @@ current controller object, a reference to the content and the format)
 
 =head2 after_dispatch
 
-Emitted in reverse order after a response has been rendered. Note that this
+Emitted in reverse order after a response has been generated. Note that this
 hook can trigger out of order due to its dynamic nature, and with embedded
-applications will only work for the application that is rendering.
+applications will only work for the application that is generating the response.
 
   $app->hook(after_dispatch => sub {
     my $c = shift;

@@ -253,12 +253,14 @@ L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
 
 =head2 check_box
 
+  %= check_box 'employed'
   %= check_box employed => 1
   %= check_box employed => 1, checked => undef, id => 'foo'
 
 Generate C<input> tag of type C<checkbox>. Previous input values will
 automatically get picked up and shown as default.
 
+  <input name="employed" type="checkbox">
   <input name="employed" type="checkbox" value="1">
   <input checked id="foo" name="employed" type="checkbox" value="1">
 
@@ -514,12 +516,14 @@ Generate C<input> tag of type C<password>.
 
 =head2 radio_button
 
+  %= radio_button 'test'
   %= radio_button country => 'germany'
   %= radio_button country => 'germany', checked => undef, id => 'foo'
 
 Generate C<input> tag of type C<radio>. Previous input values will
 automatically get picked up and shown as default.
 
+  <input name="test" type="radio">
   <input name="country" type="radio" value="germany">
   <input checked id="foo" name="country" type="radio" value="germany">
 

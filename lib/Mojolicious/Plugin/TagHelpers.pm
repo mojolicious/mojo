@@ -169,12 +169,8 @@ sub _tag {
 
   # Attributes
   my $attrs = $tree->[2] = {@_};
-  if ($attrs->{data} && ref $attrs->{data} eq 'HASH') {
-    while (my ($key, $value) = each %{$attrs->{data}}) {
-      $key =~ y/_/-/;
-      $attrs->{lc "data-$key"} = $value;
-    }
-    delete $attrs->{data};
+  if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
+    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = @$data{keys %$data};
   }
 
   return Mojo::ByteStream->new(Mojo::DOM::HTML::_render($tree));

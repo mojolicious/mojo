@@ -2,8 +2,6 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-use Scalar::Util 'blessed';
-
 has [qw(frames line lines_before lines_after)] => sub { [] };
 has message => 'Exception!';
 has 'verbose';

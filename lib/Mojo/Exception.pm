@@ -96,7 +96,7 @@ Mojo::Exception - Exceptions with context
   use Mojo::Exception;
 
   # Throw exception and show stack trace
-  eval { die Mojo::Exception->new('Something went wrong!') };
+  eval { die Mojo::Exception->new('Something went wrong!')->trace };
   say "$_->[1]:$_->[2]"  for @{$@->frames};
 
   # Customize exception

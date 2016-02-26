@@ -73,13 +73,19 @@ is_deeply $e->line,               [4, 'use Mojo::Exception;'], 'right line';
 is_deeply $e->lines_after->[0],   [5, ''],                     'right line';
 
 # Verbose
-$e = Mojo::Exception->new('Test!')->lines_before([[3, 'foo();']])
-  ->line([4, 'die;'])->lines_after([[5, 'bar();']])->verbose(1);
+$e = Mojo::Exception->new('Test!')->verbose(1);
+$e->lines_before([[3, 'foo();']])->line([4, 'die;'])
+  ->lines_after([[5, 'bar();']]);
 is $e, <<EOF, 'right result';
 Test!
 3: foo();
 4: die;
 5: bar();
+EOF
+$e->message("Works!\n")->lines_before([])->lines_after([]);
+is $e, <<EOF, 'right result';
+Works!
+4: die;
 EOF
 
 done_testing();

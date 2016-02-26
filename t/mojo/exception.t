@@ -11,7 +11,7 @@ $e = Mojo::Exception->new('Test!');
 is $e->message, 'Test!', 'right message';
 is "$e", 'Test!', 'right message';
 
-# Throwing
+# Context information
 eval {
 
   # test

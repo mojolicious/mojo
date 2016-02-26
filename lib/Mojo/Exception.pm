@@ -97,7 +97,7 @@ Mojo::Exception - Exceptions with context
 
   # Throw exception and show stack trace
   eval { die Mojo::Exception->new('Something went wrong!')->trace };
-  say "$_->[1]:$_->[2]"  for @{$@->frames};
+  say "$_->[1]:$_->[2]" for @{$@->frames};
 
   # Customize exception
   eval {
@@ -151,14 +151,14 @@ Lines before the line where the exception occurred if available.
   my $msg = $e->message;
   $e      = $e->message('Died at test.pl line 3.');
 
-Exception message, defaults to "C<Exception!>".
+Exception message, defaults to C<Exception!>.
 
 =head2 verbose
 
   my $bool = $e->verbose;
   $e       = $e->verbose($bool);
 
-Render exception with context.
+Enable context information for L</"to_string">.
 
 =head1 METHODS
 

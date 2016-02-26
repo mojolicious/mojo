@@ -171,8 +171,8 @@ following new ones.
   $e = $e->inspect;
   $e = $e->inspect($source1, $source2);
 
-Inspect L</"message"> and L</"frames"> to fill L</"lines_before">, L</"line">
-and L</"lines_after"> with context information.
+Inspect L</"message">, L</"frames"> and optional additional sources to fill
+L</"lines_before">, L</"line"> and L</"lines_after"> with context information.
 
 =head2 new
 

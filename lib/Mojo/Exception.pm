@@ -53,8 +53,7 @@ sub to_string {
 }
 
 sub trace {
-  my ($self, $start) = @_;
-  $start //= 1;
+  my ($self, $start) = (shift, shift // 1);
   my @frames;
   while (my @trace = caller($start++)) { push @frames, \@trace }
   return $self->frames(\@frames);
@@ -158,7 +157,7 @@ Lines before the line where the exception occurred if available.
   my $msg = $e->message;
   $e      = $e->message('Died at test.pl line 3.');
 
-Exception message.
+Exception message, defaults to "C<Exception!>".
 
 =head2 verbose
 

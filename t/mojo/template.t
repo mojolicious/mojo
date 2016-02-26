@@ -609,8 +609,10 @@ is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->lines_before->[1][0], 2,      'right number';
 is $output->lines_before->[1][1], '123',  'right line';
-is $output->line->[0], 3, 'right number';
+ok $output->lines_before->[1][2], 'contains code';
+is $output->line->[0], 3,              'right number';
 is $output->line->[1], '% die "x\n";', 'right line';
+ok $output->line->[2], 'contains code';
 like "$output", qr/^x/, 'right result';
 
 # Compile time exception
@@ -1089,7 +1091,8 @@ $mt     = Mojo::Template->new;
 $file   = catfile dirname(__FILE__), 'templates', 'exception.mt';
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/exception\.mt line 2/, 'message contains filename';
+like $output->message,  qr/exception\.mt line 2/, 'message contains filename';
+like $output->filename, qr/exception\.mt/,        'right name';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
@@ -1104,6 +1107,7 @@ $output = $mt->name('"foo.mt" from DATA section')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/foo\.mt from DATA section line 2/,
   'message contains filename';
+is $output->filename, undef, 'no name';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';

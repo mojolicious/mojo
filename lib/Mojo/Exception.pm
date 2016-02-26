@@ -2,12 +2,12 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
+has [qw(filename verbose)];
 has [qw(frames line lines_before lines_after)] => sub { [] };
 has message => 'Exception!';
-has 'verbose';
 
 sub inspect {
-  my ($self, @files) = @_;
+  my ($self, @source) = @_;
 
   # Extract file and line from message
   my @trace;
@@ -15,16 +15,17 @@ sub inspect {
   while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
 
   # Extract file and line from stack trace
-  my $first = $self->frames->[0];
-  push @trace, [$first->[1], $first->[2]] if $first;
+  if (my $zero = $self->frames->[0]) { push @trace, [$zero->[1], $zero->[2]] }
 
   # Search for context in files
   for my $frame (@trace) {
     next unless -r $frame->[0] && open my $handle, '<:utf8', $frame->[0];
-    $self->_context($frame->[1], [[<$handle>]]);
+    $self->filename($frame->[0])->_context($frame->[1], [[<$handle>]]);
     return $self;
   }
-  $self->_context($trace[-1][1], [map { [split "\n"] } @files]) if @files;
+
+  # Search for context in source
+  $self->_context($trace[-1][1], [map { [split "\n"] } @source]) if @source;
 
   return $self;
 }
@@ -114,6 +115,13 @@ L<Mojo::Exception> is a container for exceptions with context information.
 
 L<Mojo::Exception> implements the following attributes.
 
+=head2 filename
+
+  my $name = $e->filename;
+  $e       = $e->filename('test.pl');
+
+The file where the exception occurred if available.
+
 =head2 frames
 
   my $frames = $e->frames;
@@ -128,21 +136,21 @@ Stack trace if available.
 =head2 line
 
   my $line = $e->line;
-  $e       = $e->line([3 => 'die;']);
+  $e       = $e->line([3, 'die;']);
 
 The line where the exception occurred if available.
 
 =head2 lines_after
 
   my $lines = $e->lines_after;
-  $e        = $e->lines_after([[4 => 'say $foo;'], [5 => 'say $bar;']]);
+  $e        = $e->lines_after([[4, 'say $foo;'], [5, 'say $bar;']]);
 
 Lines after the line where the exception occurred if available.
 
 =head2 lines_before
 
   my $lines = $e->lines_before;
-  $e        = $e->lines_before([[1 => 'my $foo = 8;'], [2 => 'my $bar = 9;']]);
+  $e        = $e->lines_before([[1, 'my $foo = 23;'], [2, 'my $bar = 24;']]);
 
 Lines before the line where the exception occurred if available.
 
@@ -168,10 +176,10 @@ following new ones.
 =head2 inspect
 
   $e = $e->inspect;
-  $e = $e->inspect($file1, $file2);
+  $e = $e->inspect($source1, $source2);
 
-Inspect L</"message"> and L</"frames"> to fill L</"lines_before">, L</"line">
-and L</"lines_after"> with context information.
+Inspect L</"message"> and L</"frames"> to fill L</"filename">,
+L</"lines_before">, L</"line"> and L</"lines_after"> with context information.
 
 =head2 new
 
@@ -183,7 +191,7 @@ Construct a new L<Mojo::Exception> object and assign L</"message"> if necessary.
 =head2 throw
 
   Mojo::Exception->throw('Something went wrong!');
-  Mojo::Exception->throw('Something went wrong!', $file1, $file2);
+  Mojo::Exception->throw('Something went wrong!', $source1, $source2);
 
 Throw exception from the current execution context.
 

@@ -58,4 +58,19 @@ like wrapper1(0)->frames->[0][3], qr/trace/,    'right subroutine';
 like wrapper1(1)->frames->[0][3], qr/wrapper2/, 'right subroutine';
 like wrapper1(2)->frames->[0][3], qr/wrapper1/, 'right subroutine';
 
+# Inspect
+$e = Mojo::Exception->new("Whatever at @{[__FILE__]} line 3.");
+is_deeply $e->lines_before, [], 'no lines';
+is_deeply $e->line,         [], 'no line';
+is_deeply $e->lines_after,  [], 'no lines';
+$e->inspect;
+is_deeply $e->inspect->lines_before->[-1], [2, ''], 'right line';
+is_deeply $e->inspect->line, [3, 'use Test::More;'], 'right line';
+is_deeply $e->inspect->lines_after->[0], [4, 'use Mojo::Exception;'],
+  'right line';
+$e->message("Died at @{[__FILE__]} line 4.")->inspect;
+is_deeply $e->inspect->lines_before->[-1], [3, 'use Test::More;'], 'right line';
+is_deeply $e->inspect->line, [4, 'use Mojo::Exception;'], 'right line';
+is_deeply $e->inspect->lines_after->[0], [5, ''], 'right line';
+
 done_testing();

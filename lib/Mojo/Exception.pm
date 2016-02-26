@@ -2,7 +2,7 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-has [qw(frames line lines_before lines_after)] => sub { [] };
+has [qw(frames line lines_after lines_before)] => sub { [] };
 has message => 'Exception!';
 has 'verbose';
 
@@ -11,7 +11,7 @@ sub inspect {
 
   # Extract file and line from message
   my @trace;
-  my $msg = $self->line([])->lines_before([])->lines_after([])->message;
+  my $msg = $self->lines_before([])->line([])->lines_after([])->message;
   while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
 
   # Extract file and line from stack trace

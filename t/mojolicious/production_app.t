@@ -52,27 +52,27 @@ $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
 # SyntaxError::foo in production mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Internal Server Error/);
+  ->content_like(qr/Not development mode error!/);
 
 # Foo::syntaxerror in production mode (syntax error in template)
 $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Internal Server Error/);
+  ->content_like(qr/Not development mode error!/);
 
 # Exceptional::this_one_dies (action dies)
 $t->get_ok('/exceptional/this_one_dies')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Internal Server Error/);
+  ->content_like(qr/Not development mode error!/);
 
 # Exceptional::this_one_might_die (bridge dies)
 $t->get_ok('/exceptional_too/this_one_dies')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Internal Server Error/);
+  ->content_like(qr/Not development mode error!/);
 
 # Exceptional::this_one_might_die (action dies)
 $t->get_ok('/exceptional_too/this_one_dies' => {'X-DoNotDie' => 1})
   ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Internal Server Error/);
+  ->content_like(qr/Not development mode error!/);
 
 # Exceptional::this_one_does_not_exist (action does not exist)
 $t->get_ok('/exceptional/this_one_does_not_exist')->status_is(404)

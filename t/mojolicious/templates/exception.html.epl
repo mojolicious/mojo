@@ -3,5 +3,5 @@
 %= $self->stash('exception')->message
 % }
 % else {
-Internal Server Error
+Not development mode error!
 % }

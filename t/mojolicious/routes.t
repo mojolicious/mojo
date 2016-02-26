@@ -10,7 +10,7 @@ my $r = Mojolicious::Routes->new;
 $r->route('/clean')->to(clean => 1)->name('very_clean');
 
 # /clean/too
-$r->route('/clean/too')->to(something => 1);
+$r->route('/clean/too')->to(something => 1)->name('very_clean');
 
 # /0
 $r->route('0')->to(null => 1);

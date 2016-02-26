@@ -210,15 +210,15 @@ sub _generate_route {
 sub _index {
   my $self = shift;
 
-  my %index;
+  my (%auto, %custom);
   my @children = (@{$self->children});
   while (my $child = shift @children) {
-    if ($child->has_custom_name) { $index{$child->name} = $child }
-    else                         { $index{$child->name} ||= $child }
+    if   ($child->has_custom_name) { $custom{$child->name} ||= $child }
+    else                           { $auto{$child->name}   ||= $child }
     push @children, @{$child->children};
   }
 
-  return \%index;
+  return {%auto, %custom};
 }
 
 1;

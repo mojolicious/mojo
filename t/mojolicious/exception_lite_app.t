@@ -43,6 +43,8 @@ get '/logger' => sub {
   $c->render(text => "$level: $msg");
 };
 
+get '/custom_exception' => sub { die Mojo::Base->new };
+
 get '/dead_template';
 
 get '/dead_included_template';
@@ -144,6 +146,9 @@ $t->get_ok('/does_not_exist')->status_is(404)->element_exists('#mojobar')
 # "debug.html.ep" route suggestion
 $t->post_ok('/does_not_exist')->status_is(404)
   ->content_like(qr!/does_not_exist!);
+
+# Custom exception
+$t->get_ok('/custom_exception')->status_is(500)->content_like(qr/Mojo::Base/);
 
 # Dead template
 $t->get_ok('/dead_template')->status_is(500)->content_like(qr/dead template!/)

@@ -6,6 +6,7 @@ use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
 use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
+use Scalar::Util 'blessed';
 
 sub register {
   my ($self, $app) = @_;
@@ -87,7 +88,7 @@ sub _development {
   my ($page, $c, $e) = @_;
 
   my $app = $c->app;
-  $app->log->error($e = ref $e ? $e : Mojo::Exception->new($e)->inspect)
+  $app->log->error($e = _exception($e) ? $e : Mojo::Exception->new($e)->inspect)
     if $page eq 'exception';
 
   # Filtered stash snapshot
@@ -111,6 +112,8 @@ sub _development {
   _fallbacks($c, {%$options, format => 'html'}, $page, $bundled);
   return $c;
 }
+
+sub _exception { blessed $_[0] && $_[0]->isa('Mojo::Exception') }
 
 sub _fallbacks {
   my ($c, $options, $template, $bundled) = @_;

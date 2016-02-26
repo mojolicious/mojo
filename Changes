@@ -1,6 +1,5 @@
 
 6.49  2016-02-26
-  - Added filename attribute to Mojo::Exception.
   - Added inspect method to Mojo::Exception.
   - Improved check_box and radio_button helpers with support for "on" default
     values.

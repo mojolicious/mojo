@@ -2,9 +2,9 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-has [qw(filename verbose)];
 has [qw(frames line lines_before lines_after)] => sub { [] };
 has message => 'Exception!';
+has 'verbose';
 
 sub inspect {
   my ($self, @source) = @_;
@@ -20,7 +20,7 @@ sub inspect {
   # Search for context in files
   for my $frame (@trace) {
     next unless -r $frame->[0] && open my $handle, '<:utf8', $frame->[0];
-    $self->filename($frame->[0])->_context($frame->[1], [[<$handle>]]);
+    $self->_context($frame->[1], [[<$handle>]]);
     return $self;
   }
 
@@ -61,26 +61,26 @@ sub _append {
 }
 
 sub _context {
-  my ($self, $num, $lines) = @_;
+  my ($self, $num, $sources) = @_;
 
   # Line
-  return unless defined $lines->[0][$num - 1];
+  return unless defined $sources->[0][$num - 1];
   $self->line([$num]);
-  _append($self->line, $_->[$num - 1]) for @$lines;
+  _append($self->line, $_->[$num - 1]) for @$sources;
 
   # Before
   for my $i (2 .. 6) {
     last if ((my $previous = $num - $i) < 0);
     unshift @{$self->lines_before}, [$previous + 1];
-    _append($self->lines_before->[0], $_->[$previous]) for @$lines;
+    _append($self->lines_before->[0], $_->[$previous]) for @$sources;
   }
 
   # After
   for my $i (0 .. 4) {
     next if ((my $next = $num + $i) < 0);
-    next unless defined $lines->[0][$next];
+    next unless defined $sources->[0][$next];
     push @{$self->lines_after}, [$next + 1];
-    _append($self->lines_after->[-1], $_->[$next]) for @$lines;
+    _append($self->lines_after->[-1], $_->[$next]) for @$sources;
   }
 }
 
@@ -114,13 +114,6 @@ L<Mojo::Exception> is a container for exceptions with context information.
 =head1 ATTRIBUTES
 
 L<Mojo::Exception> implements the following attributes.
-
-=head2 filename
-
-  my $name = $e->filename;
-  $e       = $e->filename('test.pl');
-
-The file where the exception occurred if available.
 
 =head2 frames
 
@@ -178,8 +171,8 @@ following new ones.
   $e = $e->inspect;
   $e = $e->inspect($source1, $source2);
 
-Inspect L</"message"> and L</"frames"> to fill L</"filename">,
-L</"lines_before">, L</"line"> and L</"lines_after"> with context information.
+Inspect L</"message"> and L</"frames"> to fill L</"lines_before">, L</"line">
+and L</"lines_after"> with context information.
 
 =head2 new
 

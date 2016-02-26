@@ -1091,8 +1091,7 @@ $mt     = Mojo::Template->new;
 $file   = catfile dirname(__FILE__), 'templates', 'exception.mt';
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message,  qr/exception\.mt line 2/, 'message contains filename';
-like $output->filename, qr/exception\.mt/,        'right name';
+like $output->message, qr/exception\.mt line 2/, 'message contains filename';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
@@ -1107,7 +1106,6 @@ $output = $mt->name('"foo.mt" from DATA section')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/foo\.mt from DATA section line 2/,
   'message contains filename';
-is $output->filename, undef, 'no name';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';

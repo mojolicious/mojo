@@ -25,7 +25,6 @@ eval {
 $e = $@;
 isa_ok $e, 'Mojo::Exception', 'right class';
 is $e,     'Works!',          'right result';
-like $e->filename, qr/exception\.t/, 'right name';
 like $e->frames->[0][1],     qr/exception\.t/, 'right file';
 is $e->lines_before->[0][0], 15,               'right number';
 is $e->lines_before->[0][1], 'eval {',         'right line';

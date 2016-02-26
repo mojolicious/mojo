@@ -40,6 +40,7 @@ sub to_string {
   my $str = $self->message;
   return $str unless $self->verbose;
 
+  $str .= "\n" unless $str =~ /\n$/;
   $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
   $str .= $self->line->[0] . ': ' . $self->line->[1] . "\n" if $self->line->[0];
   $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};

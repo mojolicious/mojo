@@ -136,8 +136,7 @@ sub render {
   while ((my $next = _next($stash)) && !defined $inline) {
     @$options{qw(handler template)} = ($stash->{handler}, $next);
     $options->{format} = $stash->{format} || $self->default_format;
-    my $layout;
-    $output = $layout if $self->_render_template($c, \$layout, $options);
+    if ($self->_render_template($c, \my $tmp, $options)) { $output = $tmp }
     $content->{content} = $output
       if $content->{content} !~ /\S/ && $output =~ /\S/;
   }

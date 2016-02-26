@@ -699,7 +699,16 @@ is $output->lines_after->[0][0], 6,          'right number';
 is $output->lines_after->[0][1], '%= 1 + 1', 'right line';
 is $output->lines_after->[1][0], 7,          'right number';
 is $output->lines_after->[1][1], 'test',     'right line';
-like "$output", qr/oops! at template line 5/, 'right result';
+is $output, <<EOF, 'right result';
+oops! at template line 5.
+1: test
+2: 123\\
+3: 456
+4:  %# This dies
+5: % die 'oops!';
+6: %= 1 + 1
+7: test
+EOF
 
 # Exception in template (empty perl lines)
 $mt     = Mojo::Template->new;

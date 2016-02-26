@@ -46,6 +46,8 @@ sub to_string {
   return $str;
 }
 
+sub throw { CORE::die shift->new(shift)->trace(2)->inspect }
+
 sub trace {
   my ($self, $start) = (shift, shift // 1);
   my @frames;
@@ -96,7 +98,7 @@ Mojo::Exception - Exceptions with context
   use Mojo::Exception;
 
   # Throw exception and show stack trace
-  eval { die Mojo::Exception->new('Something went wrong!')->trace };
+  eval { Mojo::Exception->throw('Something went wrong!') };
   say "$_->[1]:$_->[2]" for @{$@->frames};
 
   # Customize exception
@@ -188,6 +190,15 @@ Render exception.
 
   # Render exception with context
   say $e->verbose(1)->to_string;
+
+=head2 throw
+
+  Mojo::Exception->throw('Something went wrong!');
+
+Throw exception from the current execution context.
+
+  # Longer version
+  die Mojo::Exception->new('Something went wrong!')->trace->inspect;
 
 =head2 trace
 

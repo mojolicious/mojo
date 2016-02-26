@@ -1,5 +1,6 @@
 
 6.50  2016-02-27
+  - Added throw method to Mojo::Exception.
 
 6.49  2016-02-26
   - Removed throw method from Mojo::Exception.

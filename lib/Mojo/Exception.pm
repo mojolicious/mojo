@@ -178,7 +178,7 @@ and L</"lines_after"> with context information.
   my $e = Mojo::Exception->new;
   my $e = Mojo::Exception->new('Died at test.pl line 3.');
 
-Construct a new L<Mojo::Exception> object.
+Construct a new L<Mojo::Exception> object and assign L</"message"> if necessary.
 
 =head2 throw
 

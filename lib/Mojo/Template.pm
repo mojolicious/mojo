@@ -92,7 +92,8 @@ sub compile {
   $self->compiled($compiled) and return undef unless $@;
 
   # Use local stack trace for compile exceptions
-  return Mojo::Exception->new($@, [$self->unparsed, $code])->trace->verbose(1);
+  return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
+    ->trace->verbose(1);
 }
 
 sub interpret {
@@ -101,15 +102,12 @@ sub interpret {
   # Stack trace
   local $SIG{__DIE__} = sub {
     CORE::die($_[0]) if ref $_[0];
-    Mojo::Exception->throw(shift, [$self->unparsed, $self->code]);
+    Mojo::Exception->throw(shift, $self->unparsed, $self->code);
   };
 
   return undef unless my $compiled = $self->compiled;
   my $output;
-  return $output if eval { $output = $compiled->(@_); 1 };
-
-  # Exception with template context
-  return Mojo::Exception->new($@, [$self->unparsed])->verbose(1);
+  return eval { $output = $compiled->(@_); 1 } ? $output : $@;
 }
 
 sub parse {

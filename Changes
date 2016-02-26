@@ -1,5 +1,6 @@
 
-6.49  2016-02-25
+6.49  2016-02-26
+  - Added inspect method to Mojo::Exception.
   - Improved check_box and radio_button helpers with support for "on" default
     values.
   - Improved val method in Mojo::DOM with support for "on" default values.

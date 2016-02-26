@@ -87,7 +87,8 @@ sub _development {
   my ($page, $c, $e) = @_;
 
   my $app = $c->app;
-  $app->log->error($e = Mojo::Exception->new($e)) if $page eq 'exception';
+  $app->log->error($e = ref $e ? $e : Mojo::Exception->new($e)->inspect)
+    if $page eq 'exception';
 
   # Filtered stash snapshot
   my $stash = $c->stash;
@@ -414,7 +415,7 @@ C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
 =head2 reply->exception
 
   $c = $c->reply->exception('Oops!');
-  $c = $c->reply->exception(Mojo::Exception->new('Oops!'));
+  $c = $c->reply->exception(Mojo::Exception->new);
 
 Render the exception template C<exception.$mode.$format.*> or
 C<exception.$format.*> and set the response status code to C<500>. Also sets

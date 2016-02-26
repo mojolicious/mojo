@@ -8,9 +8,32 @@ has [qw(frames line lines_before lines_after)] => sub { [] };
 has message => 'Exception!';
 has 'verbose';
 
-sub new { @_ > 1 ? shift->SUPER::new->_detect(@_) : shift->SUPER::new }
+sub inspect {
+  my ($self, @files) = @_;
 
-sub throw { die shift->new->trace(2)->_detect(@_) }
+  # Extract file and line from message
+  my @trace;
+  my $msg = $self->message;
+  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
+
+  # Extract file and line from stack trace
+  my $first = $self->frames->[0];
+  push @trace, [$first->[1], $first->[2]] if $first;
+
+  # Search for context in files
+  for my $frame (@trace) {
+    next unless -r $frame->[0] && open my $handle, '<:utf8', $frame->[0];
+    $self->_context($frame->[1], [[<$handle>]]);
+    return $self;
+  }
+  $self->_context($trace[-1][1], [map { [split "\n"] } @files]) if @files;
+
+  return $self;
+}
+
+sub new { @_ > 1 ? shift->SUPER::new(message => shift) : shift->SUPER::new }
+
+sub throw { die shift->new(shift)->trace(2)->inspect(@_) }
 
 sub to_string {
   my $self = shift;
@@ -69,33 +92,6 @@ sub _context {
   }
 }
 
-sub _detect {
-  my ($self, $msg, $files) = @_;
-
-  return $msg if blessed $msg && $msg->isa('Mojo::Exception');
-  $self->message($msg);
-
-  # Extract file and line from message
-  my @trace;
-  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
-
-  # Extract file and line from stack trace
-  my $first = $self->frames->[0];
-  push @trace, [$first->[1], $first->[2]] if $first;
-
-  # Search for context in files
-  for my $frame (@trace) {
-    next unless -r $frame->[0] && open my $handle, '<:utf8', $frame->[0];
-    $self->_context($frame->[1], [[<$handle>]]);
-    return $self;
-  }
-
-  # More context
-  $self->_context($trace[-1][1], [map { [split "\n"] } @$files]) if $files;
-
-  return $self;
-}
-
 1;
 
 =encoding utf8
@@ -109,12 +105,15 @@ Mojo::Exception - Exceptions with context
   use Mojo::Exception;
 
   # Throw exception and show stack trace
-  eval { Mojo::Exception->throw('Died at test.pl line 3.') };
-  say "$_->[1]: $_->[2]"  for @{$@->frames};
+  eval { Mojo::Exception->throw('Something went wrong!') };
+  say "$_->[1]:$_->[2]"  for @{$@->frames};
 
   # Customize exception
-  eval { die Mojo::Exception->new('Died at test.pl line 3.')->trace(2) };
-  say $@->verbose(1);
+  eval {
+    my $e = Mojo::Exception->new('Died at test.pl line 3.');
+    die $e->trace(2)->inspect->verbose(1);
+  };
+  say $@;
 
 =head1 DESCRIPTION
 
@@ -129,7 +128,7 @@ L<Mojo::Exception> implements the following attributes.
   my $frames = $e->frames;
   $e         = $e->frames([$frame1, $frame2]);
 
-Stack trace.
+Stack trace if available.
 
   # Extract information from the last frame
   my ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext,
@@ -175,22 +174,30 @@ Render exception with context.
 L<Mojo::Exception> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 inspect
+
+  $e = $e->inspect;
+  $e = $e->inspect($file1, $file2);
+
+Inspect L</"message"> and L</"frames"> to fill L</"lines_before">, L</"line">
+and L</"lines_after"> with context information.
+
 =head2 new
 
   my $e = Mojo::Exception->new;
   my $e = Mojo::Exception->new('Died at test.pl line 3.');
-  my $e = Mojo::Exception->new('Died at test.pl line 3.', [$file1, $file2]);
 
-Construct a new L<Mojo::Exception> object and extract context information from
-additional files if necessary.
+Construct a new L<Mojo::Exception> object.
 
 =head2 throw
 
-  Mojo::Exception->throw('Died at test.pl line 3.');
-  Mojo::Exception->throw('Died at test.pl line 3.', [$file1, $file2]);
+  Mojo::Exception->throw('Something went wrong!');
+  Mojo::Exception->throw('Something went wrong!', $file1, $file2);
 
-Throw exception with stack trace and extract context information from additional
-files if necessary.
+Throw exception from the current execution context.
+
+  # Longer version
+  die Mojo::Exception->new('Something went wrong!')->trace->inspect;
 
 =head2 to_string
 

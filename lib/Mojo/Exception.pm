@@ -7,7 +7,7 @@ has message => 'Exception!';
 has 'verbose';
 
 sub inspect {
-  my ($self, @source) = @_;
+  my ($self, @sources) = @_;
 
   # Extract file and line from message
   my @trace;
@@ -24,8 +24,8 @@ sub inspect {
     return $self;
   }
 
-  # Search for context in source
-  $self->_context($trace[-1][1], [map { [split "\n"] } @source]) if @source;
+  # Search for context in sources
+  $self->_context($trace[-1][1], [map { [split "\n"] } @sources]) if @sources;
 
   return $self;
 }

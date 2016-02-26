@@ -605,6 +605,7 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->message, "x\n", 'right message';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->lines_before->[1][0], 2,      'right number';
@@ -626,6 +627,7 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/Missing right curly/, 'right message';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,          'right number';
 is $output->lines_before->[0][1], 'test',     'right line';
 is $output->lines_before->[1][0], 2,          'right number';
@@ -650,6 +652,7 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 15,  'right number';
 is $output->lines_before->[0][1], '}', 'right line';
 is $output->lines_before->[1][0], 16,  'right number';
@@ -681,6 +684,7 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/oops!/, 'right message';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,               'right number';
 is $output->lines_before->[0][1], 'test',          'right line';
 is $output->lines_before->[1][0], 2,               'right number';
@@ -712,6 +716,7 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/oops!/, 'right message';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,          'right number';
 is $output->lines_before->[0][1], 'test\\\\', 'right line';
 ok $output->lines_before->[0][2], 'contains code';
@@ -1092,6 +1097,7 @@ $file   = catfile dirname(__FILE__), 'templates', 'exception.mt';
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt line 2/, 'message contains filename';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
@@ -1106,6 +1112,7 @@ $output = $mt->name('"foo.mt" from DATA section')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/foo\.mt from DATA section line 2/,
   'message contains filename';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
@@ -1119,6 +1126,7 @@ $mt     = Mojo::Template->new;
 $file   = catfile dirname(__FILE__), 'templates', 'utf8_exception.mt';
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0][1], '☃', 'right line';
 is $output->line->[1], '% die;♥', 'right line';
 is $output->lines_after->[0][1], '☃', 'right line';
@@ -1128,6 +1136,7 @@ $mt     = Mojo::Template->new;
 $output = $mt->render('<% die "Test at template line 99\n"; %>');
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->message, "Test at template line 99\n", 'right message';
+ok $output->verbose, 'verbose exception';
 is $output->lines_before->[0], undef, 'no lines before';
 is $output->line->[0],         1,     'right number';
 is $output->line->[1], '<% die "Test at template line 99\n"; %>', 'right line';

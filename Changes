@@ -6,6 +6,7 @@
   - Improved val method in Mojo::DOM with support for "on" default values.
   - Fixed url_for bug where routes with custom names would not match in the same
     order as routes with automatically generated names.
+  - Fixed bug in Mojo::Template where not all exceptions were verbose.
   - Fixed Windows bug in "util.t".
 
 6.48  2016-02-24

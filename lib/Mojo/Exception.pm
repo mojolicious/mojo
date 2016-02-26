@@ -32,7 +32,7 @@ sub inspect {
 
 sub new { @_ > 1 ? shift->SUPER::new(message => shift) : shift->SUPER::new }
 
-sub throw { die shift->new(shift)->trace(2)->inspect(@_) }
+sub throw { die shift->new(shift)->trace(2)->inspect }
 
 sub to_string {
   my $self = shift;
@@ -185,7 +185,6 @@ Construct a new L<Mojo::Exception> object and assign L</"message"> if necessary.
 =head2 throw
 
   Mojo::Exception->throw('Something went wrong!');
-  Mojo::Exception->throw('Something went wrong!', $source1, $source2);
 
 Throw exception from the current execution context.
 

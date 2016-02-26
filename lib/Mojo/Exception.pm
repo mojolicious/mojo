@@ -32,8 +32,6 @@ sub inspect {
 
 sub new { @_ > 1 ? shift->SUPER::new(message => shift) : shift->SUPER::new }
 
-sub throw { die shift->new(shift)->trace(2)->inspect }
-
 sub to_string {
   my $self = shift;
 
@@ -98,7 +96,7 @@ Mojo::Exception - Exceptions with context
   use Mojo::Exception;
 
   # Throw exception and show stack trace
-  eval { Mojo::Exception->throw('Something went wrong!') };
+  eval { die Mojo::Exception->new('Something went wrong!') };
   say "$_->[1]:$_->[2]"  for @{$@->frames};
 
   # Customize exception
@@ -181,15 +179,6 @@ L</"lines_before">, L</"line"> and L</"lines_after"> with context information.
   my $e = Mojo::Exception->new('Died at test.pl line 3.');
 
 Construct a new L<Mojo::Exception> object and assign L</"message"> if necessary.
-
-=head2 throw
-
-  Mojo::Exception->throw('Something went wrong!');
-
-Throw exception from the current execution context.
-
-  # Longer version
-  die Mojo::Exception->new('Something went wrong!')->trace->inspect;
 
 =head2 to_string
 

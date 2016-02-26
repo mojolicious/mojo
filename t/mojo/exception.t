@@ -16,7 +16,7 @@ eval {
 
   # test
 
-  my $wrapper = sub { Mojo::Exception->throw('Works!') };
+  my $wrapper = sub { die Mojo::Exception->new('Works!')->trace->inspect };
   $wrapper->();
 
   # test
@@ -36,7 +36,8 @@ is $e->lines_before->[3][0], 18,         'right number';
 ok !$e->lines_before->[3][1], 'empty line';
 is $e->lines_before->[4][0], 19, 'right number';
 is $e->lines_before->[4][1],
-  "  my \$wrapper = sub { Mojo::Exception->throw('Works!') };", 'right line';
+  "  my \$wrapper = sub { die Mojo::Exception->new('Works!')->trace->inspect };",
+  'right line';
 is $e->line->[0], 20, 'right number';
 is $e->line->[1], "  \$wrapper->();", 'right line';
 is $e->lines_after->[0][0], 21, 'right number';

@@ -64,13 +64,12 @@ is_deeply $e->lines_before, [], 'no lines';
 is_deeply $e->line,         [], 'no line';
 is_deeply $e->lines_after,  [], 'no lines';
 $e->inspect;
-is_deeply $e->inspect->lines_before->[-1], [2, ''], 'right line';
-is_deeply $e->inspect->line, [3, 'use Test::More;'], 'right line';
-is_deeply $e->inspect->lines_after->[0], [4, 'use Mojo::Exception;'],
-  'right line';
+is_deeply $e->lines_before->[-1], [2, ''],                     'right line';
+is_deeply $e->line,               [3, 'use Test::More;'],      'right line';
+is_deeply $e->lines_after->[0],   [4, 'use Mojo::Exception;'], 'right line';
 $e->message("Died at @{[__FILE__]} line 4.")->inspect;
-is_deeply $e->inspect->lines_before->[-1], [3, 'use Test::More;'], 'right line';
-is_deeply $e->inspect->line, [4, 'use Mojo::Exception;'], 'right line';
-is_deeply $e->inspect->lines_after->[0], [5, ''], 'right line';
+is_deeply $e->lines_before->[-1], [3, 'use Test::More;'],      'right line';
+is_deeply $e->line,               [4, 'use Mojo::Exception;'], 'right line';
+is_deeply $e->lines_after->[0],   [5, ''],                     'right line';
 
 done_testing();

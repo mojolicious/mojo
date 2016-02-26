@@ -101,8 +101,8 @@ sub interpret {
 
   # Stack trace
   local $SIG{__DIE__} = sub {
-    CORE::die($_[0]) if ref $_[0];
-    die Mojo::Exception->new(shift)
+    CORE::die $_[0] if ref $_[0];
+    CORE::die Mojo::Exception->new(shift)
       ->trace->inspect($self->unparsed, $self->code)->verbose(1);
   };
 

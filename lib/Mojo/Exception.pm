@@ -11,7 +11,7 @@ sub inspect {
 
   # Extract file and line from message
   my @trace;
-  my $msg = $self->message;
+  my $msg = $self->line([])->lines_before([])->lines_after([])->message;
   while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
 
   # Extract file and line from stack trace
@@ -36,17 +36,11 @@ sub throw { die shift->new(shift)->trace(2)->inspect(@_) }
 sub to_string {
   my $self = shift;
 
-  return $self->message unless $self->verbose;
-  my $str = $self->message ? $self->message : '';
+  my $str = $self->message;
+  return $str unless $self->verbose;
 
-  # Before
   $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
-
-  # Line
-  $str .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
-    if $self->line->[0];
-
-  # After
+  $str .= $self->line->[0] . ': ' . $self->line->[1] . "\n" if $self->line->[0];
   $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
 
   return $str;

@@ -50,4 +50,12 @@ is $e->lines_after->[3][1], '};',       'right line';
 is $e->lines_after->[4][0], 25,         'right number';
 is $e->lines_after->[4][1], '$e = $@;', 'right line';
 
+# Trace
+sub wrapper2 { Mojo::Exception->new->trace(@_) }
+sub wrapper1 { wrapper2(@_) }
+like wrapper1()->frames->[0][3], qr/wrapper2/, 'right subroutine';
+like wrapper1(0)->frames->[0][3], qr/trace/,    'right subroutine';
+like wrapper1(1)->frames->[0][3], qr/wrapper2/, 'right subroutine';
+like wrapper1(2)->frames->[0][3], qr/wrapper1/, 'right subroutine';
+
 done_testing();

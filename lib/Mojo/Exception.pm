@@ -205,10 +205,14 @@ Render exception.
   $e = $e->trace;
   $e = $e->trace($skip);
 
-Generate stack trace and store all L</"frames">.
+Generate stack trace and store all L</"frames">, defaults to skipping C<1> call
+frame.
 
-  # Skip 3 call frames in stack trace
+  # Skip 3 call frames
   $e->trace(3);
+
+  # Skip no call frames
+  $e->trace(0);
 
 =head1 OPERATORS
 

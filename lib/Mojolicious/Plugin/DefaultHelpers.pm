@@ -244,9 +244,9 @@ Alias for L<Mojo/"config">.
   %= content
 
 Store partial rendered content in a named buffer and retrieve it later,
-defaults to retrieving the named buffer C<content>, which is commonly used for
-the renderers C<layout> and C<extends> features. New content will be ignored if
-the named buffer is already in use.
+defaults to retrieving the named buffer C<content>, which is used by the
+renderer for the C<layout> and C<extends> features. New content will be ignored
+if the named buffer is already in use.
 
 =head2 content_for
 

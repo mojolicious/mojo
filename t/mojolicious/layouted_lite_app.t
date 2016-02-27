@@ -51,6 +51,8 @@ get '/double_inheritance' =>
 
 get '/triple_inheritance';
 
+get '/triple_inheritance_explicit_content';
+
 get '/mixed_inheritance/first' => {template => 'first'};
 
 get '/mixed_inheritance/second' => {template => 'second', layout => 'green'};
@@ -197,6 +199,12 @@ $t->get_ok('/double_inheritance')->status_is(200)
 
 # Triple inheritance
 $t->get_ok('/triple_inheritance')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
+    . "New <content>.\nShared content!\n\nDefault footer!\n");
+
+# Triple inheritance with explicit content
+$t->get_ok('/triple_inheritance_explicit_content')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
     . "New <content>.\nShared content!\n\nDefault footer!\n");
@@ -391,6 +399,13 @@ Sidebar too!
 % extends 'double_inheritance';
 New <content>.
 %= content_for 'stuff'
+
+@@ triple_inheritance_explicit_content.html.ep
+% extends 'double_inheritance';
+% content content => begin
+New <content>.
+%= content_for 'stuff'
+% end
 
 @@ layouts/plugin_with_template.html.ep
 layout_with_template

@@ -132,7 +132,8 @@ sub render {
 
   # Inheritance
   my $content = $stash->{'mojo.content'} ||= {};
-  local $content->{content} = $output if $stash->{extends} || $stash->{layout};
+  local $content->{content} = $content->{content} // $output
+    if $stash->{extends} || $stash->{layout};
   while ((my $next = _next($stash)) && !defined $inline) {
     @$options{qw(handler template)} = ($stash->{handler}, $next);
     $options->{format} = $stash->{format} || $self->default_format;

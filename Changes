@@ -1,5 +1,7 @@
 
 6.51  2016-02-28
+  - Fixed bug in Mojolicious::Plugin::EPLRenderer where empty templates from the
+    DATA section would be ignored.
 
 6.50  2016-02-27
   - Added throw method to Mojo::Exception.

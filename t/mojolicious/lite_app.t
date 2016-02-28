@@ -55,6 +55,8 @@ hook before_render => sub {
   $args->{test} = 'after' if $c->stash->{to_string};
 };
 
+get '/empty';
+
 get '/☃' => sub {
   my $c = shift;
   $c->render(text => $c->url_for . $c->url_for({}) . $c->url_for('current'));
@@ -465,6 +467,9 @@ is $t->app->build_controller->render_to_string('index', handler => 'epl'),
   'Just works!', 'right result';
 is $t->app->build_controller->render_to_string(inline => '0'), "0\n",
   'right result';
+
+# Empty template
+$t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Unicode snowman
 $t->get_ok('/☃')->status_is(200)
@@ -1030,6 +1035,8 @@ $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
 done_testing();
 
 __DATA__
+@@ empty.html.ep
+
 @@ with-format.html.ep
 <%= url_for 'without-format' %>
 

@@ -40,7 +40,7 @@ sub _epl {
       }
 
       # Try DATA section
-      elsif (my $d = $renderer->get_data_template($options)) {
+      elsif (defined(my $d = $renderer->get_data_template($options))) {
         $log->debug(qq{Rendering template "$name" from DATA section});
         $$output
           = $mt->name(qq{template "$name" from DATA section})->render($d, $c);

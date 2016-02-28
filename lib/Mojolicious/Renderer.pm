@@ -97,7 +97,7 @@ sub render {
   };
   my $inline = $options->{inline} = delete $stash->{inline};
   $options->{handler} //= $self->default_handler if defined $inline;
-  $options->{format} = $stash->{format} // $self->default_format;
+  $options->{format} = $stash->{format} || $self->default_format;
 
   # Data
   my $output;
@@ -167,7 +167,7 @@ sub template_name {
   my ($self, $options) = @_;
 
   return undef unless defined(my $template = $options->{template});
-  return undef unless defined(my $format   = $options->{format});
+  return undef unless my $format = $options->{format};
   $template .= ".$format";
 
   $self->warmup unless $self->{templates};

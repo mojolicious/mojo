@@ -126,13 +126,13 @@ sub render {
 
   # Inheritance
   my $content = $stash->{'mojo.content'} ||= {};
-  local $content->{content} = $output if $stash->{extends} || $stash->{layout};
+  local $content->{content} = $output =~ /\S/ ? $output : undef
+    if $stash->{extends} || $stash->{layout};
   while ((my $next = _next($stash)) && !defined $inline) {
     @$options{qw(handler template)} = ($stash->{handler}, $next);
     $options->{format} = $stash->{format} || $self->default_format;
     if ($self->_render_template($c, \my $tmp, $options)) { $output = $tmp }
-    $content->{content} = $output
-      if $content->{content} !~ /\S/ && $output =~ /\S/;
+    $content->{content} //= $output if $output =~ /\S/;
   }
 
   # Encoding

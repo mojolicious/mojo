@@ -55,6 +55,14 @@ hook before_render => sub {
   $args->{test} = 'after' if $c->stash->{to_string};
 };
 
+get '/empty_with_comment_and_line';
+
+get '/empty_with_comment';
+
+get '/empty_with_line';
+
+get '/empty';
+
 get '/☃' => sub {
   my $c = shift;
   $c->render(text => $c->url_for . $c->url_for({}) . $c->url_for('current'));
@@ -465,6 +473,15 @@ is $t->app->build_controller->render_to_string('index', handler => 'epl'),
   'Just works!', 'right result';
 is $t->app->build_controller->render_to_string(inline => '0'), "0\n",
   'right result';
+
+# empty template variations
+$t->get_ok('/empty_with_comment_and_line')->status_is(200)->content_is("\n");
+
+$t->get_ok('/empty_with_comment')->status_is(200)->content_is('');
+
+$t->get_ok('/empty_with_line')->status_is(200)->content_is("\n");
+
+$t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Unicode snowman
 $t->get_ok('/☃')->status_is(200)
@@ -1030,6 +1047,14 @@ $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
 done_testing();
 
 __DATA__
+@@ empty_with_comment_and_line.html.ep
+%# comment
+
+@@ empty_with_comment.html.ep
+%# comment
+@@ empty_with_line.html.ep
+
+@@ empty.html.ep
 @@ with-format.html.ep
 <%= url_for 'without-format' %>
 

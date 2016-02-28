@@ -46,8 +46,8 @@ is app->build_controller->test->helper, 'Mojolicious::Controller',
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
-# UTF-8 text
-app->types->type(txt => 'text/plain;charset=UTF-8');
+# Custom format
+app->types->type(0 => 'text/zero');
 
 # Rewrite when rendering to string
 hook before_render => sub {
@@ -439,7 +439,7 @@ get '/redirect/condition/0' => (redirect => 0) => sub {
 get '/redirect/condition/1' => (redirect => 1) =>
   {text => 'condition works too!'};
 
-get '/url_with';
+get '/url_with' => {template => '0', format => '0'};
 
 get '/url_with/:foo' => sub {
   my $c = shift;
@@ -1019,7 +1019,8 @@ is b($t->tx->res->body)->url_unescape->decode('UTF-8'), '/captures/♥/☃',
 $t->get_ok('/favicon.ico')->status_is(200)->content_is("Not a favicon!\n\n");
 
 # Generate URL with query parameters
-$t->get_ok('/url_with?foo=23&bar=24&baz=25')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/url_with?foo=23&bar=24&baz=25')->status_is(200)
+  ->content_type_is('text/zero')->content_is(<<EOF);
 /url_with?bar=24&baz=25&foo=bar
 http://mojolicious.org/test?foo=23&bar=24&baz=25
 /test?bar=24&baz=25
@@ -1122,7 +1123,7 @@ app layout <%= content %><%= app->mode %>
 @@ favicon.ico
 Not a favicon!
 
-@@ url_with.html.ep
+@@ 0.0.ep
 %== url_with->query([foo => 'bar'])
 %== url_with('http://mojolicious.org/test')
 %== url_with('/test')->query([foo => undef])

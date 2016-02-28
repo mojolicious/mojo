@@ -13,13 +13,7 @@ has classes => sub { ['main'] };
 has default_format => 'html';
 has 'default_handler';
 has encoding => 'UTF-8';
-has handlers => sub {
-  {
-    data => sub { ${$_[2]} = $_[3]{data} },
-    text => sub { ${$_[2]} = $_[3]{text} },
-    json => sub { ${$_[2]} = encode_json($_[3]{json}) }
-  };
-};
+has handlers => sub { {data => \&_data, json => \&_json, text => \&_text} };
 has helpers => sub { {} };
 has paths   => sub { [] };
 
@@ -221,6 +215,10 @@ sub warmup {
   }
 }
 
+sub _data { ${$_[2]} = $_[3]{data} }
+
+sub _json { ${$_[2]} = encode_json($_[3]{json}) }
+
 sub _next {
   my $stash = shift;
   return delete $stash->{extends} if $stash->{extends};
@@ -239,6 +237,8 @@ sub _render_template {
   $renderer->($self, $c, $output, $options);
   return 1 if defined $$output;
 }
+
+sub _text { ${$_[2]} = $_[3]{text} }
 
 1;
 

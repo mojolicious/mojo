@@ -75,8 +75,8 @@ L<Mojolicious::Guides::Cookbook/"DEPLOYMENT">.
 
 Routes are basically just fancy paths that can contain different kinds of
 placeholders and usually lead to an action, if they match the path part of the
-request URL. The first argument passed to all actions (C<$c>), is a
-L<Mojolicious::Controller> object, containing both, the HTTP request and
+request URL. The first argument passed to all actions (C<$c>) is a
+L<Mojolicious::Controller> object, containing both the HTTP request and
 response.
 
   use Mojolicious::Lite;

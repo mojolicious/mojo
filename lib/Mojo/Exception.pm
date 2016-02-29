@@ -10,22 +10,22 @@ sub inspect {
   my ($self, @sources) = @_;
 
   # Extract file and line from message
-  my @trace;
+  my @files;
   my $msg = $self->lines_before([])->line([])->lines_after([])->message;
-  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
+  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @files, [$1, $2] }
 
   # Extract file and line from stack trace
-  if (my $zero = $self->frames->[0]) { push @trace, [$zero->[1], $zero->[2]] }
+  if (my $zero = $self->frames->[0]) { push @files, [$zero->[1], $zero->[2]] }
 
   # Search for context in files
-  for my $frame (@trace) {
-    next unless -r $frame->[0] && open my $handle, '<:utf8', $frame->[0];
-    $self->_context($frame->[1], [[<$handle>]]);
+  for my $file (@files) {
+    next unless -r $file->[0] && open my $handle, '<:utf8', $file->[0];
+    $self->_context($file->[1], [[<$handle>]]);
     return $self;
   }
 
   # Search for context in sources
-  $self->_context($trace[-1][1], [map { [split "\n"] } @sources]) if @sources;
+  $self->_context($files[-1][1], [map { [split "\n"] } @sources]) if @sources;
 
   return $self;
 }

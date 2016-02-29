@@ -38,6 +38,10 @@ L<HTTP|https://developer.mozilla.org/en-US/docs/Web/HTTP>.
 
 =head1 CONVENTIONS
 
+=over 2
+
+=item Modern Perl
+
 L<Mojolicious> uses a modern subset of Perl exclusively, and therefore all
 documentation assumes that L<strict>, L<warnings>, L<utf8> and Perl 5.10
 features are enabled, even if examples don't specifically mention it.
@@ -49,6 +53,8 @@ features are enabled, even if examples don't specifically mention it.
 
 Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for
 you automatically, whenever they are used.
+
+=back
 
 =head1 TUTORIAL
 

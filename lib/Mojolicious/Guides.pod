@@ -47,8 +47,8 @@ features are enabled, even if examples don't specifically mention it.
   use utf8;
   use feature ':5.10';
 
-Some modules like L<Mojo::Base> and L<Mojolicious::Lite> will enable them for
-you automatically whenever they are used.
+Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for
+you automatically, whenever they are used.
 
 =head1 TUTORIAL
 

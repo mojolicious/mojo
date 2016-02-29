@@ -334,8 +334,8 @@ content with the L<Mojolicious> renderer.
 
 =head1 SYNTAX
 
-For all templates L<strict>, L<warnings>, L<utf8> and Perl 5.10 features are
-automatically enabled.
+For all templates L<strict>, L<warnings>, L<utf8> and Perl 5.10
+L<features|feature> are automatically enabled.
 
   <% Perl code %>
   <%= Perl expression, replaced with result %>

@@ -658,7 +658,7 @@ commonly used to pass parts of a template to helpers.
 
 You should always try to keep your actions small and reuse as much code as
 possible. Helpers make this very easy, they get passed the current controller
-object as first argument and you can use them to do pretty much anything an
+object as first argument, and you can use them to do pretty much anything an
 action could do.
 
   use Mojolicious::Lite;

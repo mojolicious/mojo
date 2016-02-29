@@ -179,7 +179,7 @@ string.
 
 Evaluate callback for each element in collection, or return all elements as a
 list if none has been provided. The element will be the first argument passed
-to the callback and is also available as C<$_>.
+to the callback, and is also available as C<$_>.
 
   # Make a numbered list
   $collection->each(sub {
@@ -198,7 +198,7 @@ to the callback and is also available as C<$_>.
 Evaluate regular expression/callback for, or call method on, each element in
 collection and return the first one that matched the regular expression, or for
 which the callback/method returned true. The element will be the first argument
-passed to the callback and is also available as C<$_>.
+passed to the callback, and is also available as C<$_>.
 
   # Longer version
   my $first = $collection->first(sub { $_->$method(@args) });
@@ -229,7 +229,7 @@ all elements.
 Evaluate regular expression/callback for, or call method on, each element in
 collection and create a new collection with all elements that matched the
 regular expression, or for which the callback/method returned true. The element
-will be the first argument passed to the callback and is also available as
+will be the first argument passed to the callback, and is also available as
 C<$_>.
 
   # Longer version
@@ -265,7 +265,7 @@ Return the last element in collection.
 
 Evaluate callback for, or call method on, each element in collection and create
 a new collection from the results. The element will be the first argument
-passed to the callback and is also available as C<$_>.
+passed to the callback, and is also available as C<$_>.
 
   # Longer version
   my $new = $collection->map(sub { $_->$method(@args) });

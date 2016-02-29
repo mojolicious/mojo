@@ -203,7 +203,7 @@ L<Mojo::Base> implements the following methods.
   SubClass->attr(['name1', 'name2', 'name3'] => 'foo');
   SubClass->attr(['name1', 'name2', 'name3'] => sub {...});
 
-Create attribute accessor for hash-based objects, an array reference can be
+Create attribute accessors for hash-based objects, an array reference can be
 used to create more than one at a time. Pass an optional second argument to set
 a default value, it should be a constant or a callback. The callback will be
 executed at accessor read time if there's no set value. Accessors can be
@@ -226,7 +226,7 @@ pass it either a hash or a hash reference with attribute values.
   $object = $object->tap($method, @args);
 
 K combinator, tap into a method chain to perform operations on an object within
-the chain. The object will be the first argument passed to the callback and is
+the chain. The object will be the first argument passed to the callback, and is
 also available as C<$_>.
 
   # Longer version

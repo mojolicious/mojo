@@ -50,8 +50,6 @@ sub add_helper {
 
 sub get_data_template {
   my ($self, $options) = @_;
-
-  # Find template
   return undef unless my $template = $self->template_name($options);
   return data_section $self->{index}{$template}, $template;
 }
@@ -185,17 +183,10 @@ sub template_name {
 }
 
 sub template_path {
-  my $self = shift;
-
-  # Nameless
-  return undef unless my $name = $self->template_name(shift);
-
-  # Search all paths
-  for my $path (@{$self->paths}, $TEMPLATES) {
-    my $file = catfile $path, split('/', $name);
-    return $file if -r $file;
-  }
-
+  my ($self, $options) = @_;
+  return undef unless my $name = $self->template_name($options);
+  my @parts = split '/', $name;
+  -r and return $_ for map { catfile $_, @parts } @{$self->paths}, $TEMPLATES;
   return undef;
 }
 

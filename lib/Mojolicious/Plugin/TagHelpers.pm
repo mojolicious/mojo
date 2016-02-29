@@ -57,8 +57,8 @@ sub _form_for {
 }
 
 sub _hidden_field {
-  my $c = shift;
-  return _tag('input', name => shift, value => shift, @_, type => 'hidden');
+  my ($c, $name, $value) = (shift, shift, shift);
+  return _tag('input', name => $name, value => $value, @_, type => 'hidden');
 }
 
 sub _input {
@@ -156,8 +156,8 @@ sub _stylesheet {
 }
 
 sub _submit_button {
-  my $c = shift;
-  return _tag('input', value => shift // 'Ok', @_, type => 'submit');
+  my ($c, $value) = (shift, shift // 'Ok');
+  return _tag('input', value => $value, @_, type => 'submit');
 }
 
 sub _tag {

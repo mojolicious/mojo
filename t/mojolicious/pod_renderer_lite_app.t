@@ -86,7 +86,7 @@ $t->get_ok('/perldoc/MojoliciousTest/PODTest.json')->status_is(204);
 
 # Welcome
 $t->get_ok('/perldoc')->status_is(200)->element_exists('#mojobar')
-  ->text_like('title', qr/Mojolicious guide to the galaxy/);
+  ->text_like('title', qr/The Mojolicious Guide to the Galaxy/);
 
 done_testing();
 

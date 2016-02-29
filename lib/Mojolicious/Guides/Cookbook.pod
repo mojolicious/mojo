@@ -217,7 +217,8 @@ C<CGI> is supported out of the box and your L<Mojolicious> application will
 automatically detect that it is executed as a C<CGI> script. Its use in
 production environments is discouraged though, because as a result of how
 C<CGI> works, it is very slow and many web servers are making it exceptionally
-hard to configure properly.
+hard to configure properly. Additionally, many real-time web features, such as
+WebSockets, are not avilable.
 
   ScriptAlias / /home/sri/my_app/script/my_app/
 
@@ -227,7 +228,8 @@ L<PSGI> is an interface between Perl web frameworks and web servers, and
 L<Plack> is a Perl module and toolkit that contains L<PSGI> middleware, helpers
 and adapters to web servers. L<PSGI> and L<Plack> are inspired by Python's WSGI
 and Ruby's Rack. L<Mojolicious> applications are ridiculously simple to deploy
-with L<Plack>.
+with L<Plack>, but be aware that many real-time web features, such as
+WebSockets, are not available.
 
   $ plackup ./script/my_app
 

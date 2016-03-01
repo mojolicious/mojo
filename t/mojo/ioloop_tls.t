@@ -359,4 +359,32 @@ is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
 
+# ALPN
+SKIP: {
+  skip 'ALPN support required!', 1 unless IO::Socket::SSL->can_alpn;
+
+  my ($server_proto, $client_proto);
+  $id = Mojo::IOLoop->server(
+    address       => '127.0.0.1',
+    tls           => 1,
+    tls_protocols => ['foo', 'bar', 'baz'],
+    sub {
+      my ($loop, $stream) = @_;
+      $server_proto = $stream->protocol;
+      $stream->close;
+    }
+  );
+  $port = Mojo::IOLoop->acceptor($id)->port;
+  Mojo::IOLoop->client(
+    {port => $port, tls => 1, tls_protocols => ['baz', 'bar']} => sub {
+      my ($loop, $err, $stream) = @_;
+      $client_proto = $stream->protocol;
+      $stream->on(close => sub { Mojo::IOLoop->stop });
+    }
+  );
+  Mojo::IOLoop->start;
+  is $server_proto, 'baz', 'right protocol';
+  is $client_proto, 'baz', 'right protocol';
+}
+
 done_testing();

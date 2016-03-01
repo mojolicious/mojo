@@ -16,7 +16,7 @@ my $NDN = NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.94 (); 1';
+  : eval 'use IO::Socket::SSL 2.009 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -163,7 +163,7 @@ sub _try_tls {
 
   my $handle = $self->{handle};
   return $self->_cleanup->emit(connect => $handle) unless $args->{tls};
-  return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
+  return $self->emit(error => 'IO::Socket::SSL 2.009+ required for TLS support')
     unless TLS;
 
   # Upgrade
@@ -180,6 +180,8 @@ sub _try_tls {
     SSL_verifycn_name   => $args->{address},
     SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
   );
+  $options{SSL_alpn_protocols} = $args->{tls_protocols}
+    if IO::Socket::SSL->can_alpn;
   my $reactor = $self->reactor;
   $reactor->remove($handle);
   return $self->emit(error => 'TLS upgrade failed')
@@ -271,7 +273,7 @@ implements the following new ones.
 
 Open a socket connection to a remote host. Note that non-blocking name
 resolution depends on L<Net::DNS::Native> (0.15+), SOCKS5 support on
-L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (1.94+).
+L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (2.009+).
 
 These options are currently available:
 
@@ -355,6 +357,12 @@ Path to the TLS certificate file.
   tls_key => '/etc/tls/client.key'
 
 Path to the TLS key file.
+
+=item tls_protocols
+
+  tls_protocols => ['foo', 'bar']
+
+ALPN protocols to negotiate.
 
 =back
 

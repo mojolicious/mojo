@@ -36,6 +36,11 @@ sub is_writing {
 
 sub new { shift->SUPER::new(handle => shift, buffer => '', timeout => 15) }
 
+sub protocol {
+  return undef unless my $handle = shift->{handle};
+  return $handle->can('alpn_selected') ? $handle->alpn_selected : undef;
+}
+
 sub start {
   my $self = shift;
 
@@ -271,6 +276,12 @@ Check if stream is writing.
   my $stream = Mojo::IOLoop::Stream->new($handle);
 
 Construct a new L<Mojo::IOLoop::Stream> object.
+
+=head2 protocol
+
+  my $proto = $stream->protocol;
+
+Selected ALPN protocol.
 
 =head2 start
 

@@ -12,7 +12,7 @@ use Socket qw(IPPROTO_TCP TCP_NODELAY);
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.94 (); 1';
+  : eval 'use IO::Socket::SSL 2.009 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -79,7 +79,7 @@ sub listen {
   $self->{handle} = $handle;
 
   return unless $args->{tls};
-  croak "IO::Socket::SSL 1.94+ required for TLS support" unless TLS;
+  croak "IO::Socket::SSL 2.009+ required for TLS support" unless TLS;
 
   weaken $self;
   my $tls = $self->{tls} = {
@@ -94,6 +94,8 @@ sub listen {
     SSL_startHandshake     => 0,
     SSL_verify_mode => $args->{tls_verify} // ($args->{tls_ca} ? 0x03 : 0x00)
   };
+  $tls->{SSL_alpn_protocols} = $args->{tls_protocols}
+    if IO::Socket::SSL->can_alpn;
   $tls->{SSL_ca_file} = $args->{tls_ca}
     if $args->{tls_ca} && -T $args->{tls_ca};
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
@@ -235,7 +237,7 @@ Get handle for server.
   $server->listen(port => 3000);
 
 Create a new listen socket. Note that TLS support depends on L<IO::Socket::SSL>
-(1.94+).
+(2.009+).
 
 These options are currently available:
 
@@ -298,6 +300,12 @@ L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
   tls_key => {'mojolicious.org' => '/etc/tls/mojo.key'}
 
 Path to the TLS key file, defaults to a built-in test key.
+
+=item tls_protocols
+
+  tls_protocols => ['foo', 'bar']
+
+ALPN protocols to negotiate.
 
 =item tls_verify
 

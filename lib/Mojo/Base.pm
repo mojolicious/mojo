@@ -226,11 +226,11 @@ pass it either a hash or a hash reference with attribute values.
   $object = $object->tap($method, @args);
 
 Tap into a method chain to perform operations on an object within the chain
-(also known as a K combinator or Kestrel). The object will be the first
-argument passed to the callback and is also available as C<$_>. The callback's
-return value will be ignored; instead, the object (the callback's first
-argument) will be the return value. In this way, arbitrary code can be used
-within (i.e., spliced or tapped into) a chained set of object method calls.
+(also known as a K combinator or Kestrel). The object will be the first argument
+passed to the callback, and is also available as C<$_>. The callback's return
+value will be ignored; instead, the object (the callback's first argument) will
+be the return value. In this way, arbitrary code can be used within (i.e.,
+spliced or tapped into) a chained set of object method calls.
 
   # Longer version
   $object = $object->tap(sub { $_->$method(@args) });

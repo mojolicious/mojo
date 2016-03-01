@@ -1,5 +1,5 @@
 
-6.52  2016-03-01
+6.52  2016-03-02
 
 6.51  2016-02-29
   - Fixed bug in Mojolicious::Plugin::EPLRenderer where empty templates from the

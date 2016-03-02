@@ -50,13 +50,13 @@ sub client {
   my ($self, $cb) = (_instance(shift), pop);
 
   my $id = $self->_id;
-  my $client = $self->{connections}{$id}{client} = Mojo::IOLoop::Client->new;
+  my $client = $self->{out}{$id}{client} = Mojo::IOLoop::Client->new;
   weaken $client->reactor($self->reactor)->{reactor};
 
   weaken $self;
   $client->on(
     connect => sub {
-      delete $self->{connections}{$id}{client};
+      delete $self->{out}{$id}{client};
       my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->_stream($stream => $id);
       $self->$cb(undef, $stream);
@@ -88,14 +88,14 @@ sub recurring { shift->_timer(recurring => @_) }
 
 sub remove {
   my ($self, $id) = (_instance(shift), @_);
-  my $c = $self->{connections}{$id};
+  my $c = $self->{in}{$id} || $self->{out}{$id};
   if ($c && (my $stream = $c->{stream})) { return $stream->close_gracefully }
   $self->_remove($id);
 }
 
 sub reset {
   my $self = _instance(shift);
-  delete @$self{qw(accepting acceptors connections stop)};
+  delete @$self{qw(accepting acceptors in out stop)};
   $self->reactor->reset;
   $self->stop;
 }
@@ -115,7 +115,7 @@ sub server {
       }
 
       my $stream = Mojo::IOLoop::Stream->new(pop);
-      $self->$cb($stream, $self->stream($stream));
+      $self->$cb($stream, $self->_stream($stream, $self->_id, 1));
 
       # Stop accepting if connection limit has been reached
       $self->_not_accepting if $self->_limit;
@@ -143,8 +143,9 @@ sub stop_gracefully {
 
 sub stream {
   my ($self, $stream) = (_instance(shift), @_);
-  return ($self->{connections}{$stream} || {})->{stream} unless ref $stream;
-  return $self->_stream($stream => $self->_id);
+  return $self->_stream($stream => $self->_id) if ref $stream;
+  my $c = $self->{in}{$stream} || $self->{out}{$stream} || {};
+  return $c->{stream};
 }
 
 sub timer { shift->_timer(timer => @_) }
@@ -153,17 +154,15 @@ sub _id {
   my $self = shift;
   my $id;
   do { $id = md5_sum 'c' . steady_time . rand 999 }
-    while $self->{connections}{$id} || $self->{acceptors}{$id};
+    while $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
   return $id;
 }
 
+sub _in { scalar keys %{shift->{in} || {}} }
+
 sub _instance { ref $_[0] ? $_[0] : $_[0]->singleton }
 
-sub _limit {
-  my $self = shift;
-  return 1 if $self->{stop};
-  return keys %{$self->{connections}} >= $self->max_connections;
-}
+sub _limit { $_[0]{stop} ? 1 : $_[0]->_in >= $_[0]->max_connections }
 
 sub _maybe_accepting {
   my $self = shift;
@@ -179,6 +178,8 @@ sub _not_accepting {
   return $self;
 }
 
+sub _out { scalar keys %{shift->{out} || {}} }
+
 sub _remove {
   my ($self, $id) = @_;
 
@@ -191,24 +192,24 @@ sub _remove {
     if delete $self->{acceptors}{$id};
 
   # Connection
-  return unless delete $self->{connections}{$id};
+  return unless delete $self->{in}{$id} || delete $self->{out}{$id};
   $self->_maybe_accepting;
-  warn "-- $id <<< $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
+  warn "-- $id <<< $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
 }
 
 sub _stop {
   my $self = shift;
-  return if keys %{$self->{connections}};
+  return if $self->_out || $self->_in;
   $self->_remove(delete $self->{stop});
   $self->stop;
 }
 
 sub _stream {
-  my ($self, $stream, $id) = @_;
+  my ($self, $stream, $id, $server) = @_;
 
   # Connect stream with reactor
-  $self->{connections}{$id}{stream} = $stream;
-  warn "-- $id >>> $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
+  $self->{$server ? 'in' : 'out'}{$id}{stream} = $stream;
+  warn "-- $id >>> $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
   weaken $stream->reactor($self->reactor)->{reactor};
   weaken $self;
   $stream->on(close => sub { $self && $self->_remove($id) });
@@ -341,8 +342,9 @@ randomly to improve load balancing between multiple server processes.
   my $max = $loop->max_connections;
   $loop   = $loop->max_connections(1000);
 
-The maximum number of concurrent connections this event loop is allowed to
-handle before stopping to accept new incoming connections, defaults to C<1000>.
+The maximum number of accepted connections this event loop is allowed to handle
+concurrently, before stopping to accept new incoming connections, defaults to
+C<1000>.
 
 =head2 multi_accept
 

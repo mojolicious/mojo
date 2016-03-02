@@ -1,5 +1,6 @@
 
 6.52  2016-03-02
+  - Fixed a few concurrency bugs in Mojo::IOLoop.
 
 6.51  2016-02-29
   - Fixed bug in Mojolicious::Plugin::EPLRenderer where empty templates from the

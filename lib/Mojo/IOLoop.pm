@@ -138,7 +138,7 @@ sub stop { _instance(shift)->reactor->stop }
 
 sub stop_gracefully {
   my $self = _instance(shift)->_not_accepting;
-  ++$self->{stop} and $self->emit('finish')->_stop;
+  ++$self->{stop} and !$self->emit('finish')->_in and $self->stop;
 }
 
 sub stream {
@@ -193,12 +193,10 @@ sub _remove {
 
   # Connection
   return unless delete $self->{in}{$id} || delete $self->{out}{$id};
-  $self->_stop if $self->{stop};
+  return $self->stop if $self->{stop} && !$self->_in;
   $self->_maybe_accepting;
   warn "-- $id <<< $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
 }
-
-sub _stop { !$_[0]->_out && !$_[0]->_in && $_[0]->stop }
 
 sub _stream {
   my ($self, $stream, $id, $server) = @_;
@@ -594,7 +592,7 @@ event loop can be restarted by running L</"start"> again.
   Mojo::IOLoop->stop_gracefully;
   $loop->stop_gracefully;
 
-Stop accepting new connections and wait for all existing connections to be
+Stop accepting new connections and wait for already accepted connections to be
 closed before stopping the event loop.
 
 =head2 stream

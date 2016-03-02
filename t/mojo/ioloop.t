@@ -259,11 +259,22 @@ is $client, 'works!', 'full message has been written';
 # Graceful shutdown
 $err  = '';
 $loop = Mojo::IOLoop->new;
+$port
+  = $loop->acceptor($loop->server({address => '127.0.0.1'} => sub { }))->port;
+$id = $loop->client({port => $port} => sub { shift->stop_gracefully });
 my $finish;
+$loop->on(finish => sub { ++$finish and shift->stream($id)->close });
+$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->start;
+ok !$loop->stream($id), 'stopped gracefully';
+ok !$err, 'no error';
+is $finish, 1, 'finish event has been emitted once';
+
+# Graceful shutdown (without connection)
+$err = $finish = '';
+$loop = Mojo::IOLoop->new;
 $loop->on(finish => sub { $finish++ });
 $loop->next_tick(sub { shift->stop_gracefully });
-$loop->remove(
-  $loop->client({port => Mojo::IOLoop::Server->generate_port} => sub { }));
 $loop->timer(30 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';

@@ -305,8 +305,7 @@ C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
 
   multi_accept => 100
 
-Number of connections to accept at once, defaults to the value of
-L<Mojo::IOLoop/"multi_accept">.
+Number of connections to accept at once, defaults to the value of L</"clients">.
 
 =head2 pid_file
 

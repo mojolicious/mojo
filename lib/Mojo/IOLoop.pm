@@ -138,7 +138,7 @@ sub stop { _instance(shift)->reactor->stop }
 
 sub stop_gracefully {
   my $self = _instance(shift)->_not_accepting;
-  $self->{stop} ||= $self->emit('finish')->recurring(1 => \&_stop);
+  ++$self->{stop} and $self->emit('finish')->_stop;
 }
 
 sub stream {
@@ -193,16 +193,12 @@ sub _remove {
 
   # Connection
   return unless delete $self->{in}{$id} || delete $self->{out}{$id};
+  $self->_stop if $self->{stop};
   $self->_maybe_accepting;
   warn "-- $id <<< $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
 }
 
-sub _stop {
-  my $self = shift;
-  return if $self->_out || $self->_in;
-  $self->_remove(delete $self->{stop});
-  $self->stop;
-}
+sub _stop { !$_[0]->_out && !$_[0]->_in && $_[0]->stop }
 
 sub _stream {
   my ($self, $stream, $id, $server) = @_;

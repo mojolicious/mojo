@@ -261,7 +261,7 @@ $err  = '';
 $loop = Mojo::IOLoop->new;
 my $finish;
 $loop->on(finish => sub { $finish++ });
-$loop->stop_gracefully;
+$loop->next_tick(sub { shift->stop_gracefully });
 $loop->remove(
   $loop->client({port => Mojo::IOLoop::Server->generate_port} => sub { }));
 $loop->timer(30 => sub { shift->stop; $err = 'failed' });

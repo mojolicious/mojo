@@ -1,5 +1,6 @@
 
 6.52  2016-03-02
+  - Added is_listening method to Mojo::IOLoop::Server.
   - Improved responsiveness of stop_gracefully method in Mojo::IOLoop.
   - Fixed a few concurrency bugs in Mojo::IOLoop.
 

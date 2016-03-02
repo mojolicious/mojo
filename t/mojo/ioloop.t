@@ -291,6 +291,31 @@ $loop->start;
 ok !$err, 'no error';
 is $loop->max_accepts, 1, 'right value';
 
+# Connection limit
+$err  = '';
+$loop = Mojo::IOLoop->new->max_connections(2);
+my @listening;
+$id = $loop->server(
+  {address => '127.0.0.1'} => sub {
+    my ($loop, $stream) = @_;
+
+    $loop->next_tick(
+      sub {
+        my $loop = shift;
+        push @listening, $loop->acceptor($id)->is_listening;
+        $loop->stop if @listening >= 2;
+      }
+    );
+  }
+);
+$port = $loop->acceptor($id)->port;
+$loop->client({port => $port} => sub { }) for 1 .. 2;
+$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->start;
+ok !$err, 'no error';
+ok $listening[0], 'still accepting connections';
+ok !$listening[1], 'connection limit reached';
+
 # Exception in timer
 {
   local *STDERR;

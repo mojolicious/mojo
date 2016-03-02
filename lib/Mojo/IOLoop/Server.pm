@@ -38,6 +38,8 @@ sub generate_port {
 
 sub handle { shift->{handle} }
 
+sub is_listening { !!shift->{active} }
+
 sub listen {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
@@ -105,10 +107,11 @@ sub port { shift->{handle}->sockport }
 sub start {
   my $self = shift;
   weaken $self;
-  $self->reactor->io($self->{handle} => sub { $self->_accept });
+  ++$self->{active}
+    and $self->reactor->io($self->{handle} => sub { $self->_accept });
 }
 
-sub stop { $_[0]->reactor->remove($_[0]{handle}) }
+sub stop { delete($_[0]{active}) and $_[0]->reactor->remove($_[0]{handle}) }
 
 sub _accept {
   my $self = shift;
@@ -229,6 +232,12 @@ Find a free TCP port, primarily used for tests.
   my $handle = $server->handle;
 
 Get handle for server.
+
+=head2 is_listening
+
+  my $bool = $server->is_listening;
+
+Check if connections are currently being accepted.
 
 =head2 listen
 

@@ -429,8 +429,8 @@ TLS protocol version.
   $daemon = $daemon->max_clients(100);
 
 Maximum number of accepted connections this server is allowed to handle
-concurrently before stopping to accept new incoming connections, passed along to
-L<Mojo::IOLoop/"max_connections">.
+concurrently, before stopping to accept new incoming connections, passed along
+to L<Mojo::IOLoop/"max_connections">.
 
 =head2 max_requests
 

@@ -325,7 +325,7 @@ L<Mojo::IOLoop> implements the following attributes.
   my $max = $loop->max_accepts;
   $loop   = $loop->max_accepts(1000);
 
-The maximum number of connections this event loop is allowed to accept before
+The maximum number of connections this event loop is allowed to accept, before
 shutting down gracefully without interrupting existing connections, defaults to
 C<0>. Setting the value to C<0> will allow this event loop to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
@@ -596,7 +596,7 @@ event loop can be restarted by running L</"start"> again.
   $loop->stop_gracefully;
 
 Stop accepting new connections and wait for already accepted connections to be
-closed before stopping the event loop.
+closed, before stopping the event loop.
 
 =head2 stream
 

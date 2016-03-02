@@ -360,7 +360,7 @@ and implements the following new ones.
   my $accepts = $prefork->accepts;
   $prefork    = $prefork->accepts(100);
 
-Maximum number of connections a worker is allowed to accept before stopping
+Maximum number of connections a worker is allowed to accept, before stopping
 gracefully and then getting replaced with a newly started worker, passed along
 to L<Mojo::IOLoop/"max_accepts">, defaults to C<1000>. Setting the value to
 C<0> will allow workers to accept new connections indefinitely. Note that up to

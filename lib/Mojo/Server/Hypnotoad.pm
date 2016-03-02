@@ -239,7 +239,7 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
   accepts => 100
 
-Maximum number of connections a worker is allowed to accept before stopping
+Maximum number of connections a worker is allowed to accept, before stopping
 gracefully and then getting replaced with a newly started worker, defaults to
 the value of L<Mojo::Server::Prefork/"accepts">. Setting the value to C<0> will
 allow workers to accept new connections indefinitely. Note that up to half of
@@ -257,8 +257,8 @@ L<Mojo::Server::Daemon/"backlog">.
   clients => 100
 
 Maximum number of accepted connections each worker process is allowed to handle
-concurrently before stopping to accept new incoming connections, defaults to the
-value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency works
+concurrently, before stopping to accept new incoming connections, defaults to
+the value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency works
 best with applications that perform mostly non-blocking operations, to optimize
 for blocking operations you can decrease this value and increase L</"workers">
 instead for better performance.

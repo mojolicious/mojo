@@ -26,13 +26,10 @@ is ref $loop->reactor, 'MyReactor', 'right class';
 # Defaults
 $loop = Mojo::IOLoop->new;
 is $loop->max_connections, 1000, 'right default';
-is $loop->multi_accept,    50,   'right default';
-$loop = Mojo::IOLoop->new(max_connections => 51);
-is $loop->max_connections, 51, 'right value';
-is $loop->multi_accept,    50, 'right value';
+is $loop->multi_accept,    1000, 'right default';
 $loop = Mojo::IOLoop->new(max_connections => 10);
 is $loop->max_connections, 10, 'right value';
-is $loop->multi_accept,    1,  'right value';
+is $loop->multi_accept,    10, 'right value';
 $loop = Mojo::IOLoop->new(multi_accept => 10);
 is $loop->max_connections, 1000, 'right value';
 is $loop->multi_accept,    10,   'right value';
@@ -293,7 +290,7 @@ is $loop->max_accepts, 1, 'right value';
 
 # Connection limit
 $err  = '';
-$loop = Mojo::IOLoop->new->max_connections(2);
+$loop = Mojo::IOLoop->new->max_connections(2)->multi_accept(1);
 my @accepting;
 $id = $loop->server(
   {address => '127.0.0.1'} => sub {

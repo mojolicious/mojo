@@ -10,9 +10,8 @@ has accepts => 1000;
 has cleanup => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
-has 'multi_accept';
-has pid_file => sub { catfile tmpdir, 'prefork.pid' };
-has workers => 4;
+has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
+has workers            => 4;
 
 sub DESTROY {
   my $self = shift;
@@ -65,7 +64,6 @@ sub run {
 
   # Prepare event loop
   my $loop = $self->ioloop->max_accepts($self->accepts);
-  if (defined(my $multi = $self->multi_accept)) { $loop->multi_accept($multi) }
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
@@ -398,14 +396,6 @@ Heartbeat interval in seconds, defaults to C<5>.
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
 stopped gracefully, defaults to C<20>.
-
-=head2 multi_accept
-
-  my $multi = $prefork->multi_accept;
-  $prefork  = $prefork->multi_accept(100);
-
-Number of connections to accept at once, passed along to
-L<Mojo::IOLoop/"multi_accept">.
 
 =head2 pid_file
 

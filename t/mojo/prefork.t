@@ -100,7 +100,6 @@ $prefork = Mojo::Server::Prefork->new(
   accepts            => 500,
   heartbeat_interval => 0.5,
   listen             => ["http://*:$port"],
-  multi_accept       => 3,
   workers            => 1
 );
 $prefork->unsubscribe('request');
@@ -123,8 +122,7 @@ $prefork->once(
 $prefork->on(reap => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
 $prefork->run;
-is $prefork->ioloop->max_accepts,  500, 'right value';
-is $prefork->ioloop->multi_accept, 3,   'right value';
+is $prefork->ioloop->max_accepts, 500, 'right value';
 is scalar @spawn, 1, 'one worker spawned';
 is scalar @reap,  1, 'one worker reaped';
 ok !$graceful, 'server has been stopped immediately';

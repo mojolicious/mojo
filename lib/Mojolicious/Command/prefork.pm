@@ -68,7 +68,8 @@ Mojolicious::Command::prefork - Prefork command
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"
     -M, --multi-accept <number>          Number of connections to accept at
-                                         once, defaults to 50
+                                         once, defaults to the value of
+                                         --clients
     -m, --mode <name>                    Operating mode for your application,
                                          defaults to the value of
                                          MOJO_MODE/PLACK_ENV or "development"

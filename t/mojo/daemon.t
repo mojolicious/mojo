@@ -261,14 +261,16 @@ like $buffer, qr/Mojo$/, 'transactions were pipelined';
 
 # Throttling
 $daemon = Mojo::Server::Daemon->new(
-  app         => $app,
-  listen      => ['http://127.0.0.1'],
-  max_clients => 23,
-  silent      => 1
+  app          => $app,
+  listen       => ['http://127.0.0.1'],
+  max_clients  => 23,
+  multi_accept => 3,
+  silent       => 1
 );
 is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
 is scalar @{$daemon->start->start->acceptors}, 1, 'one active acceptor';
 is $daemon->ioloop->max_connections, 23, 'right value';
+is $daemon->ioloop->multi_accept,    3,  'right value';
 $id = $daemon->acceptors->[0];
 ok !!Mojo::IOLoop->acceptor($id), 'acceptor has been added';
 is scalar @{$daemon->stop->acceptors}, 0, 'no active acceptors';

@@ -15,9 +15,10 @@ sub run {
     'b|backlog=i'            => sub { $daemon->backlog($_[1]) },
     'c|clients=i'            => sub { $daemon->max_clients($_[1]) },
     'i|inactivity-timeout=i' => sub { $daemon->inactivity_timeout($_[1]) },
-    'l|listen=s'   => \my @listen,
-    'p|proxy'      => sub { $daemon->reverse_proxy(1) },
-    'r|requests=i' => sub { $daemon->max_requests($_[1]) };
+    'l|listen=s'       => \my @listen,
+    'M|multi-accept=i' => sub { $daemon->multi_accept($_[1]) },
+    'p|proxy'          => sub { $daemon->reverse_proxy(1) },
+    'r|requests=i'     => sub { $daemon->max_requests($_[1]) };
 
   $daemon->listen(\@listen) if @listen;
   $daemon->run;
@@ -54,6 +55,9 @@ Mojolicious::Command::daemon - Daemon command
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"
+    -M, --multi-accept <number>          Number of connections to accept at
+                                         once, defaults to the value of
+                                         --clients
     -m, --mode <name>                    Operating mode for your application,
                                          defaults to the value of
                                          MOJO_MODE/PLACK_ENV or "development"

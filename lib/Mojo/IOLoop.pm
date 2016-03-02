@@ -16,7 +16,7 @@ use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
 has max_accepts     => 0;
 has max_connections => 1000;
-has multi_accept    => sub { shift->max_connections > 50 ? 50 : 1 };
+has multi_accept    => sub { shift->max_connections };
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
@@ -345,8 +345,8 @@ C<1000>.
   my $multi = $loop->multi_accept;
   $loop     = $loop->multi_accept(100);
 
-Number of connections to accept at once, defaults to C<50> or C<1>, depending
-on if the value of L</"max_connections"> is smaller than C<50>.
+Number of connections to accept at once, defaults to the value of
+L</"max_connections">.
 
 =head2 reactor
 

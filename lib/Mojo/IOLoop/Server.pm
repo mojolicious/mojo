@@ -118,7 +118,7 @@ sub _accept {
 
   # Greedy accept
   for (1 .. $self->multi_accept) {
-    return unless my $handle = $self->{handle}->accept;
+    return unless $self->{active} && (my $handle = $self->{handle}->accept);
     $handle->blocking(0);
 
     # Disable Nagle's algorithm

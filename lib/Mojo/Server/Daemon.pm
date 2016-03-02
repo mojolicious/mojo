@@ -12,7 +12,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has acceptors => sub { [] };
-has [qw(backlog max_clients silent)];
+has [qw(backlog max_clients multi_accept silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
@@ -43,6 +43,7 @@ sub start {
   # Resume accepting connections
   my $loop = $self->ioloop;
   if (my $max = $self->max_clients) { $loop->max_connections($max) }
+  if (defined(my $multi = $self->multi_accept)) { $loop->multi_accept($multi) }
   if (my $servers = $self->{servers}) {
     push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_})
       for keys %$servers;
@@ -437,6 +438,14 @@ L<Mojo::IOLoop/"max_connections">.
   $daemon = $daemon->max_requests(100);
 
 Maximum number of keep-alive requests per connection, defaults to C<25>.
+
+=head2 multi_accept
+
+  my $multi = $daemon->multi_accept;
+  $daemon   = $daemon->multi_accept(100);
+
+Number of connections to accept at once, passed along to
+L<Mojo::IOLoop/"multi_accept">.
 
 =head2 silent
 

@@ -1,7 +1,9 @@
 
 6.52  2016-03-02
   - Added is_accepting method to Mojo::IOLoop::Server.
+  - Added -M option to daemon command.
   - Improved responsiveness of stop_gracefully method in Mojo::IOLoop.
+  - Fixed bug in Mojo::IOLoop where too many connections could be accepted.
   - Fixed a few concurrency bugs in Mojo::IOLoop.
 
 6.51  2016-02-29

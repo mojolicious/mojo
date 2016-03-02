@@ -303,7 +303,7 @@ C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
 
 =head2 multi_accept
 
-  multi_accept => 100
+  multi_accept => 5
 
 Number of connections to accept at once, defaults to the value of L</"clients">.
 

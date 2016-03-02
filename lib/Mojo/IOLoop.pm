@@ -343,10 +343,13 @@ C<1000>.
 =head2 multi_accept
 
   my $multi = $loop->multi_accept;
-  $loop     = $loop->multi_accept(100);
+  $loop     = $loop->multi_accept(5);
 
 Number of connections to accept at once, defaults to the value of
 L</"max_connections">.
+
+  # Accept one connection at a time
+  $loop->multi_accept(1);
 
 =head2 reactor
 

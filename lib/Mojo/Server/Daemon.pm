@@ -442,7 +442,7 @@ Maximum number of keep-alive requests per connection, defaults to C<25>.
 =head2 multi_accept
 
   my $multi = $daemon->multi_accept;
-  $daemon   = $daemon->multi_accept(100);
+  $daemon   = $daemon->multi_accept(5);
 
 Number of connections to accept at once, passed along to
 L<Mojo::IOLoop/"multi_accept">.

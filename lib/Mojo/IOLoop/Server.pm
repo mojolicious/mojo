@@ -38,7 +38,7 @@ sub generate_port {
 
 sub handle { shift->{handle} }
 
-sub is_listening { !!shift->{active} }
+sub is_accepting { !!shift->{active} }
 
 sub listen {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
@@ -233,9 +233,9 @@ Find a free TCP port, primarily used for tests.
 
 Get handle for server.
 
-=head2 is_listening
+=head2 is_accepting
 
-  my $bool = $server->is_listening;
+  my $bool = $server->is_accepting;
 
 Check if connections are currently being accepted.
 

@@ -426,7 +426,7 @@ TLS protocol version.
 =head2 max_clients
 
   my $max = $daemon->max_clients;
-  $daemon = $daemon->max_clients(1000);
+  $daemon = $daemon->max_clients(100);
 
 Maximum number of accepted connections this server is allowed to handle
 concurrently before stopping to accept new incoming connections, passed along to

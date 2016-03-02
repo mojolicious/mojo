@@ -334,7 +334,7 @@ randomly to improve load balancing between multiple server processes.
 =head2 max_connections
 
   my $max = $loop->max_connections;
-  $loop   = $loop->max_connections(1000);
+  $loop   = $loop->max_connections(100);
 
 The maximum number of accepted connections this event loop is allowed to handle
 concurrently, before stopping to accept new incoming connections, defaults to

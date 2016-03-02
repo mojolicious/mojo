@@ -57,12 +57,12 @@ $prefork->on(
 is $prefork->workers, 4, 'start with four workers';
 my (@spawn, @reap, $worker, $tx, $graceful, $healthy);
 $prefork->on(spawn => sub { push @spawn, pop });
-$prefork->once(
+$prefork->on(
   heartbeat => sub {
     my ($prefork, $pid) = @_;
-    $worker  = $pid;
-    $healthy = $prefork->healthy;
-    $tx      = Mojo::UserAgent->new->get("http://127.0.0.1:$port");
+    $worker = $pid;
+    return if ($healthy = $prefork->healthy) < 4;
+    $tx = Mojo::UserAgent->new->get("http://127.0.0.1:$port");
     kill 'QUIT', $$;
   }
 );
@@ -72,7 +72,7 @@ $log = '';
 $cb = $prefork->app->log->on(message => sub { $log .= pop });
 is $prefork->healthy, 0, 'no healthy workers';
 $prefork->run;
-ok $healthy >= 1, 'healthy workers';
+is $healthy, 4, 'healthy workers';
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
 ok !!grep { $worker eq $_ } @spawn, 'worker has a heartbeat';

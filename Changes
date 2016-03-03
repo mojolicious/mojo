@@ -1,7 +1,7 @@
 
 6.53  2016-03-03
   - Removed multi_accept setting from Hypnotoad.
-  - Removed -M option from daemon and prefork commands.
+  - Removed -M options from daemon and prefork commands.
   - Deprecated Mojo::IOLoop::multi_accept.
   - Deprecated Mojo::IOLoop::Server::multi_accept.
   - Deprecated Mojo::Server::Daemon::multi_accept.

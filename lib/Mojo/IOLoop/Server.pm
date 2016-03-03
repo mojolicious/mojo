@@ -124,8 +124,7 @@ sub _accept {
 
   # Greedy accept
   my $accepted = 0;
-  while (1) {
-    return if !$self->{active} || ($accepted++ && $self->{single_accept});
+  while ($self->{active} && !($self->{single_accept} && $accepted++)) {
     return unless my $handle = $self->{handle}->accept;
     $handle->blocking(0);
 

@@ -152,10 +152,10 @@ sub timer { shift->_timer(timer => @_) }
 
 sub _id {
   my $self = shift;
-  while (my $id = md5_sum 'c' . steady_time . rand) {
-    next if $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
-    return $id;
-  }
+  my $id;
+  do { $id = md5_sum 'c' . steady_time . rand }
+    while $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
+  return $id;
 }
 
 sub _in { scalar keys %{shift->{in} || {}} }

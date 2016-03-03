@@ -129,9 +129,9 @@ sub server {
 sub singleton { state $loop = shift->SUPER::new }
 
 sub start {
-  my $self = shift;
+  my $self = _instance(shift);
   croak 'Mojo::IOLoop already running' if $self->is_running;
-  _instance($self)->reactor->start;
+  $self->reactor->start;
 }
 
 sub stop { _instance(shift)->reactor->stop }
@@ -152,10 +152,10 @@ sub timer { shift->_timer(timer => @_) }
 
 sub _id {
   my $self = shift;
-  my $id;
-  do { $id = md5_sum 'c' . steady_time . rand 999 }
-    while $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
-  return $id;
+  while (my $id = md5_sum 'c' . steady_time . rand) {
+    next if $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
+    return $id;
+  }
 }
 
 sub _in { scalar keys %{shift->{in} || {}} }

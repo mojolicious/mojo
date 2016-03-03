@@ -64,8 +64,20 @@ our @EXPORT_OK = (
 # DEPRECATED in Clinking Beer Mugs!
 push @EXPORT_OK, 'xss_escape';
 
-sub b64_decode { decode_base64 $_[0] }
-sub b64_encode { encode_base64 $_[0], $_[1] }
+# Aliases
+monkey_patch(__PACKAGE__, 'b64_decode',    \&decode_base64);
+monkey_patch(__PACKAGE__, 'b64_encode',    \&encode_base64);
+monkey_patch(__PACKAGE__, 'hmac_sha1_sum', \&hmac_sha1_hex);
+monkey_patch(__PACKAGE__, 'md5_bytes',     \&md5);
+monkey_patch(__PACKAGE__, 'md5_sum',       \&md5_hex);
+monkey_patch(__PACKAGE__, 'sha1_bytes',    \&sha1);
+monkey_patch(__PACKAGE__, 'sha1_sum',      \&sha1_hex);
+
+# Use a monotonic clock if possible
+monkey_patch(__PACKAGE__, 'steady_time',
+  MONOTONIC
+  ? sub () { Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) }
+  : \&Time::HiRes::time);
 
 sub camelize {
   my $str = shift;
@@ -122,17 +134,12 @@ sub files {
   return sort @files;
 }
 
-sub hmac_sha1_sum { hmac_sha1_hex @_ }
-
 sub html_unescape {
   my $str = shift;
   $str
     =~ s/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;))/_decode($1, $2)/ge;
   return $str;
 }
-
-sub md5_bytes { md5 @_ }
-sub md5_sum   { md5_hex @_ }
 
 # Declared in Mojo::Base to avoid circular require problems
 sub monkey_patch { Mojo::Base::_monkey_patch(@_) }
@@ -241,9 +248,6 @@ sub secure_compare {
   return $r == 0;
 }
 
-sub sha1_bytes { sha1 @_ }
-sub sha1_sum   { sha1_hex @_ }
-
 sub slurp {
   my $path = shift;
 
@@ -270,12 +274,6 @@ sub squish {
   my $str = trim(@_);
   $str =~ s/\s+/ /g;
   return $str;
-}
-
-sub steady_time () {
-  MONOTONIC
-    ? Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC())
-    : Time::HiRes::time;
 }
 
 sub tablify {

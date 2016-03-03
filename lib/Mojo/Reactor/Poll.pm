@@ -116,9 +116,9 @@ sub watch {
 
 sub _id {
   my $self = shift;
-  my $id;
-  do { $id = md5_sum 't' . steady_time . rand 999 } while $self->{timers}{$id};
-  return $id;
+  while (my $id = md5_sum 't' . steady_time . rand) {
+    return $id unless $self->{timers}{$id};
+  }
 }
 
 sub _next {

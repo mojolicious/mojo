@@ -306,6 +306,24 @@ $loop->start;
 ok $accepting[0], 'accepting connections';
 ok !$accepting[1], 'connection limit reached';
 
+# Request limit
+$daemon = Mojo::Server::Daemon->new(
+  app    => $app,
+  listen => ['http://127.0.0.1'],
+  silent => 1
+)->start;
+$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
+is $daemon->max_requests, 100, 'right value';
+is $daemon->max_requests(2)->max_requests, 2, 'right value';
+$tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
+ok $tx->keep_alive, 'will be kept alive';
+is $tx->res->code, 200,         'right status';
+is $tx->res->body, 'Whatever!', 'right content';
+$tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
+ok !$tx->keep_alive, 'will not be kept alive';
+is $tx->res->code, 200,         'right status';
+is $tx->res->body, 'Whatever!', 'right content';
+
 # Abstract methods
 eval { Mojo::Server->run };
 like $@, qr/Method "run" not implemented by subclass/, 'right error';

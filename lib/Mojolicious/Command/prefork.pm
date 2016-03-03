@@ -75,7 +75,7 @@ Mojolicious::Command::prefork - Prefork command
                                          defaults to the value of
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
-                                         keep-alive connection, defaults to 25
+                                         keep-alive connection, defaults to 100
     -w, --workers <number>               Number of workers, defaults to 4
 
 =head1 DESCRIPTION

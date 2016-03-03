@@ -16,7 +16,7 @@ has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
-has max_requests => 25;
+has max_requests => 100;
 
 sub DESTROY {
   return if Mojo::Util::_global_destruction();
@@ -447,9 +447,9 @@ to L<Mojo::IOLoop/"max_connections">.
 =head2 max_requests
 
   my $max = $daemon->max_requests;
-  $daemon = $daemon->max_requests(100);
+  $daemon = $daemon->max_requests(250);
 
-Maximum number of keep-alive requests per connection, defaults to C<25>.
+Maximum number of keep-alive requests per connection, defaults to C<100>.
 
 =head2 silent
 

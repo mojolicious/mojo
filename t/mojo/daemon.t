@@ -306,33 +306,6 @@ $loop->start;
 ok $accepting[0], 'accepting connections';
 ok !$accepting[1], 'connection limit reached';
 
-# Multi-accept and connection limit
-$loop   = Mojo::IOLoop->new;
-$daemon = Mojo::Server::Daemon->new(
-  app         => $app,
-  ioloop      => $loop,
-  listen      => ['http://127.0.0.1'],
-  max_clients => 2,
-  silent      => 1
-)->start;
-$acceptor  = $loop->acceptor($daemon->acceptors->[0]);
-@accepting = ();
-$acceptor->on(
-  accept => sub {
-    my $acceptor = shift;
-    $loop->next_tick(
-      sub {
-        push @accepting, $acceptor->is_accepting;
-        shift->stop if @accepting == 2;
-      }
-    );
-  }
-);
-$loop->client({port => $acceptor->port} => sub { }) for 1 .. 2;
-$loop->start;
-ok !$accepting[0], 'connection limit reached';
-ok !$accepting[1], 'connection limit reached';
-
 # Abstract methods
 eval { Mojo::Server->run };
 like $@, qr/Method "run" not implemented by subclass/, 'right error';

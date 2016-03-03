@@ -261,16 +261,14 @@ like $buffer, qr/Mojo$/, 'transactions were pipelined';
 
 # Throttling
 $daemon = Mojo::Server::Daemon->new(
-  app          => $app,
-  listen       => ['http://127.0.0.1'],
-  max_clients  => 23,
-  multi_accept => 3,
-  silent       => 1
+  app         => $app,
+  listen      => ['http://127.0.0.1'],
+  max_clients => 23,
+  silent      => 1
 );
 is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
 is scalar @{$daemon->start->start->acceptors}, 1, 'one active acceptor';
 is $daemon->ioloop->max_connections, 23, 'right value';
-is $daemon->ioloop->multi_accept,    3,  'right value';
 $id = $daemon->acceptors->[0];
 ok !!Mojo::IOLoop->acceptor($id), 'acceptor has been added';
 is scalar @{$daemon->stop->acceptors}, 0, 'no active acceptors';
@@ -280,6 +278,60 @@ $id = $daemon->acceptors->[0];
 ok !!Mojo::IOLoop->acceptor($id), 'acceptor has been added';
 undef $daemon;
 ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
+
+# Single-accept and connection limit
+my $loop = Mojo::IOLoop->new;
+$daemon = Mojo::Server::Daemon->new(
+  app         => $app,
+  ioloop      => $loop,
+  listen      => ['http://127.0.0.1?single_accept=1'],
+  max_clients => 2,
+  silent      => 1
+)->start;
+my $acceptor = $loop->acceptor($daemon->acceptors->[0]);
+my @accepting;
+$acceptor->on(
+  accept => sub {
+    my $acceptor = shift;
+    $loop->next_tick(
+      sub {
+        push @accepting, $acceptor->is_accepting;
+        shift->stop if @accepting == 2;
+      }
+    );
+  }
+);
+$loop->client({port => $acceptor->port} => sub { }) for 1 .. 2;
+$loop->start;
+ok $accepting[0], 'accepting connections';
+ok !$accepting[1], 'connection limit reached';
+
+# Multi-accept
+$loop   = Mojo::IOLoop->new;
+$daemon = Mojo::Server::Daemon->new(
+  app         => $app,
+  ioloop      => $loop,
+  listen      => ['http://127.0.0.1'],
+  max_clients => 2,
+  silent      => 1
+)->start;
+$acceptor  = $loop->acceptor($daemon->acceptors->[0]);
+@accepting = ();
+$acceptor->on(
+  accept => sub {
+    my $acceptor = shift;
+    $loop->next_tick(
+      sub {
+        push @accepting, $acceptor->is_accepting;
+        shift->stop if @accepting == 2;
+      }
+    );
+  }
+);
+$loop->client({port => $acceptor->port} => sub { }) for 1 .. 2;
+$loop->start;
+ok !$accepting[0], 'connection limit reached';
+ok !$accepting[1], 'connection limit reached';
 
 # Abstract methods
 eval { Mojo::Server->run };

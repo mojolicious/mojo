@@ -27,8 +27,7 @@ sub configure {
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout listen multi_accept pid_file),
-    qw(workers);
+    qw(heartbeat_timeout inactivity_timeout listen pid_file workers);
 }
 
 sub run {
@@ -300,12 +299,6 @@ Setting the value to C<0> will allow connections to be inactive indefinitely.
 
 Array reference with one or more locations to listen on, defaults to
 C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
-
-=head2 multi_accept
-
-  multi_accept => 5
-
-Number of connections to accept at once, defaults to the value of L</"clients">.
 
 =head2 pid_file
 

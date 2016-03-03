@@ -9,14 +9,13 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
-use Mojo::Util qw(md5_sum steady_time);
+use Mojo::Util qw(deprecated md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
 has max_accepts     => 0;
 has max_connections => 1000;
-has multi_accept    => sub { shift->max_connections };
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
@@ -36,8 +35,7 @@ sub acceptor {
   return $self->{acceptors}{$acceptor} unless ref $acceptor;
 
   # Connect acceptor with reactor
-  my $id = $self->_id;
-  $self->{acceptors}{$id} = $acceptor->multi_accept($self->multi_accept);
+  $self->{acceptors}{my $id = $self->_id} = $acceptor;
   weaken $acceptor->reactor($self->reactor)->{reactor};
 
   # Allow new acceptor to get picked up
@@ -75,6 +73,12 @@ sub delay {
 }
 
 sub is_running { _instance(shift)->reactor->is_running }
+
+# DEPRECATED in Clinking Beer Mugs!
+sub multi_accept {
+  deprecated 'Mojo::IOLoop::multi_accept is DEPRECATED';
+  @_ > 1 ? $_[0] : undef;
+}
 
 sub next_tick {
   my ($self, $cb) = (_instance(shift), @_);
@@ -339,17 +343,6 @@ randomly to improve load balancing between multiple server processes.
 The maximum number of accepted connections this event loop is allowed to handle
 concurrently, before stopping to accept new incoming connections, defaults to
 C<1000>.
-
-=head2 multi_accept
-
-  my $multi = $loop->multi_accept;
-  $loop     = $loop->multi_accept(5);
-
-Number of connections to accept at once, defaults to the value of
-L</"max_connections">.
-
-  # Accept one connection at a time
-  $loop->multi_accept(1);
 
 =head2 reactor
 

@@ -26,13 +26,8 @@ is ref $loop->reactor, 'MyReactor', 'right class';
 # Defaults
 $loop = Mojo::IOLoop->new;
 is $loop->max_connections, 1000, 'right default';
-is $loop->multi_accept,    1000, 'right default';
 $loop = Mojo::IOLoop->new(max_connections => 10);
 is $loop->max_connections, 10, 'right value';
-is $loop->multi_accept,    10, 'right value';
-$loop = Mojo::IOLoop->new(multi_accept => 10);
-is $loop->max_connections, 1000, 'right value';
-is $loop->multi_accept,    10,   'right value';
 
 # Double start
 my $err;
@@ -290,10 +285,10 @@ is $loop->max_accepts, 1, 'right value';
 
 # Connection limit
 $err  = '';
-$loop = Mojo::IOLoop->new->max_connections(2)->multi_accept(1);
+$loop = Mojo::IOLoop->new->max_connections(2);
 my @accepting;
 $id = $loop->server(
-  {address => '127.0.0.1'} => sub {
+  {address => '127.0.0.1', single_accept => 1} => sub {
     shift->next_tick(
       sub {
         my $loop = shift;

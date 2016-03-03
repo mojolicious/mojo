@@ -6,6 +6,7 @@ use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use IO::Socket::IP;
 use Mojo::IOLoop;
+use Mojo::Util 'deprecated';
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
@@ -21,7 +22,6 @@ use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 my $CERT = catfile dirname(__FILE__), 'resources', 'server.crt';
 my $KEY  = catfile dirname(__FILE__), 'resources', 'server.key';
 
-has multi_accept => 50;
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY {
@@ -78,7 +78,7 @@ sub listen {
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
   }
   $handle->blocking(0);
-  $self->{handle} = $handle;
+  @$self{qw(handle single_accept)} = ($handle, $args->{single_accept});
 
   return unless $args->{tls};
   croak "IO::Socket::SSL 1.94+ required for TLS support" unless TLS;
@@ -102,6 +102,12 @@ sub listen {
   $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
 }
 
+# DEPRECATED in Clinking Beer Mugs!
+sub multi_accept {
+  deprecated 'Mojo::IOLoop::Server::multi_accept is DEPRECATED';
+  @_ > 1 ? $_[0] : undef;
+}
+
 sub port { shift->{handle}->sockport }
 
 sub start {
@@ -117,8 +123,10 @@ sub _accept {
   my $self = shift;
 
   # Greedy accept
-  for (1 .. $self->multi_accept) {
-    return unless $self->{active} && (my $handle = $self->{handle}->accept);
+  my $accepted = 0;
+  while (1) {
+    return if !$self->{active} || ($accepted++ && $self->{single_accept});
+    return unless my $handle = $self->{handle}->accept;
     $handle->blocking(0);
 
     # Disable Nagle's algorithm
@@ -201,13 +209,6 @@ Emitted for each accepted connection.
 
 L<Mojo::IOLoop::Server> implements the following attributes.
 
-=head2 multi_accept
-
-  my $multi = $server->multi_accept;
-  $server   = $server->multi_accept(100);
-
-Number of connections to accept at once, defaults to C<50>.
-
 =head2 reactor
 
   my $reactor = $server->reactor;
@@ -274,6 +275,12 @@ Port to listen on, defaults to a random port.
 
 Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
 option.
+
+=item single_accept
+
+  single_accept => 1
+
+Only accept one connection at a time.
 
 =item tls
 

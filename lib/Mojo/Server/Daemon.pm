@@ -5,14 +5,14 @@ use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util 'term_escape';
+use Mojo::Util qw(deprecated term_escape);
 use Mojo::WebSocket 'server_handshake';
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has acceptors => sub { [] };
-has [qw(backlog max_clients multi_accept silent)];
+has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
@@ -24,6 +24,12 @@ sub DESTROY {
   $self->_remove($_) for keys %{$self->{connections} || {}};
   my $loop = $self->ioloop;
   $loop->remove($_) for @{$self->acceptors};
+}
+
+# DEPRECATED in Clinking Beer Mugs!
+sub multi_accept {
+  deprecated 'Mojo::Server::Daemon::multi_accept is DEPRECATED';
+  @_ > 1 ? $_[0] : undef;
 }
 
 sub run {
@@ -43,7 +49,6 @@ sub start {
   # Resume accepting connections
   my $loop = $self->ioloop;
   if (my $max = $self->max_clients) { $loop->max_connections($max) }
-  if (defined(my $multi = $self->multi_accept)) { $loop->multi_accept($multi) }
   if (my $servers = $self->{servers}) {
     push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_})
       for keys %$servers;
@@ -163,9 +168,10 @@ sub _listen {
 
   my $query   = $url->query;
   my $options = {
-    address => $url->host,
-    backlog => $self->backlog,
-    reuse   => $query->param('reuse')
+    address       => $url->host,
+    backlog       => $self->backlog,
+    single_accept => $query->param('single_accept'),
+    reuse         => $query->param('reuse')
   };
   if (my $port = $url->port) { $options->{port} = $port }
   $options->{"tls_$_"} = $query->param($_) for qw(ca ciphers version);
@@ -409,6 +415,12 @@ Path to the TLS key file, defaults to a built-in test key.
 Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
 option.
 
+=item single_accept
+
+  single_accept=1
+
+Only accept one connection at a time.
+
 =item verify
 
   verify=0x00
@@ -438,14 +450,6 @@ to L<Mojo::IOLoop/"max_connections">.
   $daemon = $daemon->max_requests(100);
 
 Maximum number of keep-alive requests per connection, defaults to C<25>.
-
-=head2 multi_accept
-
-  my $multi = $daemon->multi_accept;
-  $daemon   = $daemon->multi_accept(5);
-
-Number of connections to accept at once, passed along to
-L<Mojo::IOLoop/"multi_accept">.
 
 =head2 silent
 

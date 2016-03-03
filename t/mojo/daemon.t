@@ -306,7 +306,7 @@ $loop->start;
 ok $accepting[0], 'accepting connections';
 ok !$accepting[1], 'connection limit reached';
 
-# Multi-accept
+# Multi-accept and connection limit
 $loop   = Mojo::IOLoop->new;
 $daemon = Mojo::Server::Daemon->new(
   app         => $app,

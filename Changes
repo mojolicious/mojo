@@ -1,6 +1,7 @@
 
 6.53  2016-03-03
   - Improved Mojo::IOLoop performance slightly.
+  - Fixed default value bug in val method of Mojo::DOM.
 
 6.52  2016-03-02
   - Added is_accepting method to Mojo::IOLoop::Server.

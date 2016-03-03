@@ -166,8 +166,9 @@ sub val {
   return $self->{value} // $self->text if (my $tag = $self->tag) eq 'option';
 
   # "input" ("type=checkbox" and "type=radio")
+  my $type = $self->{type} // '';
   return $self->{value} // 'on'
-    if $tag eq 'input' && grep { $self->{type} // '' eq $_ } qw(checkbox radio);
+    if $tag eq 'input' && ($type eq 'radio' || $type eq 'checkbox');
 
   # "textarea", "input" or "button"
   return $tag eq 'textarea' ? $self->text : $self->{value} if $tag ne 'select';

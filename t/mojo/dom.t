@@ -2218,6 +2218,7 @@ $dom = Mojo::DOM->new(<<EOF);
   <input type="radio" checked name="c" value="C">
   <input name="s">
   <input type="checkbox" name="t" value="">
+  <input type=text name="u">
   <select multiple name="f">
     <option value="F">G</option>
     <optgroup>
@@ -2257,6 +2258,7 @@ is $dom->at('input[name=q]')->val, 'on',  'right value';
 is $dom->at('input[name=r]')->val, 'on',  'right value';
 is $dom->at('input[name=s]')->val, undef, 'no value';
 is $dom->at('input[name=t]')->val, '',    'right value';
+is $dom->at('input[name=u]')->val, undef, 'no value';
 
 # PoCo example with whitespace-sensitive text
 $dom = Mojo::DOM->new(<<EOF);

@@ -6,7 +6,7 @@ use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 
-has accepts => 1000;
+has accepts => 10000;
 has cleanup => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
@@ -360,7 +360,7 @@ and implements the following new ones.
 
 Maximum number of connections a worker is allowed to accept, before stopping
 gracefully and then getting replaced with a newly started worker, passed along
-to L<Mojo::IOLoop/"max_accepts">, defaults to C<1000>. Setting the value to
+to L<Mojo::IOLoop/"max_accepts">, defaults to C<10000>. Setting the value to
 C<0> will allow workers to accept new connections indefinitely. Note that up to
 half of this value can be subtracted randomly to improve load balancing.
 

@@ -8,6 +8,7 @@
   - Added single_accept option to Mojo::IOLoop::Server::listen.
   - Added single_accept parameter to Mojo::Server::Daemon::listen.
   - Increased default max_requests from 25 to 100 in Mojo::Server::Daemon.
+  - Increased default accepts from 1000 to 10000 in Mojo::Server::Prefork.
   - Improved performance of many Mojo::Util functions slightly.
   - Fixed default value bug in val method of Mojo::DOM.
 

@@ -62,9 +62,6 @@ sub run {
   # No Windows support
   say 'Preforking is not available for Windows.' and exit 0 if $^O eq 'MSWin32';
 
-  # Prepare event loop
-  my $loop = $self->ioloop->max_accepts($self->accepts);
-
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
 
@@ -86,6 +83,7 @@ sub run {
 
   # Preload application before starting workers
   $self->start->app->log->info("Manager $$ started");
+  $self->ioloop->max_accepts($self->accepts);
   $self->{running} = 1;
   $self->_manage while $self->{running};
 }

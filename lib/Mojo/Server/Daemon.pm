@@ -46,9 +46,10 @@ sub run {
 sub start {
   my $self = shift;
 
-  # Resume accepting connections
   my $loop = $self->ioloop;
   if (my $max = $self->max_clients) { $loop->max_connections($max) }
+
+  # Resume accepting connections
   if (my $servers = $self->{servers}) {
     push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_})
       for keys %$servers;

@@ -75,7 +75,7 @@ sub build {
     # Capture start
     if ($op eq 'cpst') { $capture = 1 }
     elsif ($capture) {
-      $blocks[-1] .= " sub { my \$_O = ''; ";
+      $blocks[-1] .= "sub { my \$_O = ''; ";
       $capture = 0;
     }
   }
@@ -271,7 +271,7 @@ sub _wrap {
   # Wrap lines
   my $num = () = $code =~ /\n/g;
   my $head = $self->_line(1) . "\npackage @{[$self->namespace]};";
-  $head .= " use Mojo::Base -strict; no warnings 'ambiguous';";
+  $head .= "use Mojo::Base -strict; no warnings 'ambiguous';";
   $code = "$head sub { my \$_O = ''; @{[$self->prepend]}; { $code\n";
   $code .= $self->_line($num + 1) . "\n@{[$self->append]}; } \$_O };";
 

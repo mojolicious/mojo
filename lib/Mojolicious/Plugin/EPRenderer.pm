@@ -34,8 +34,8 @@ sub register {
 
         # Stash values (every time)
         my $prepend = 'my $self = my $c = shift; my $_S = $c->stash; {';
-        $prepend .= join '',
-          map {" my \$$_ = \$_S->{'$_'};"} grep {/^\w+$/} keys %{$c->stash};
+        $prepend .= "my \$$_ = \$_S->{'$_'};"
+          for grep {/^\w+$/} keys %{$c->stash};
         $mt->prepend($prepend . $mt->prepend)->append(';}' . $mt->append);
 
         $cache->set($key => $mt);

@@ -21,8 +21,7 @@ sub register {
 
       my $name = $options->{inline} // $renderer->template_name($options);
       return unless defined $name;
-      my @keys = sort grep {/^\w+$/} keys %{$c->stash};
-      my $key = md5_sum encode 'UTF-8', join(',', $name, @keys);
+      my $key = md5_sum encode 'UTF-8', $name;
 
       # Prepare template for "epl" handler
       my $cache = $renderer->cache;
@@ -35,7 +34,8 @@ sub register {
 
         # Stash values (every time)
         my $prepend = 'my $self = my $c = shift; my $_S = $c->stash; {';
-        $prepend .= join '', map {" my \$$_ = \$_S->{'$_'};"} @keys;
+        $prepend .= join '',
+          map {" my \$$_ = \$_S->{'$_'};"} grep {/^\w+$/} keys %{$c->stash};
         $mt->prepend($prepend . $mt->prepend)->append(';}' . $mt->append);
 
         $cache->set($key => $mt);

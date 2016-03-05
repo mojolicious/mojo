@@ -1,5 +1,6 @@
 
-6.54  2016-03-04
+6.54  2016-03-05
+  - Improved performance of .ep templates slightly.
 
 6.53  2016-03-03
   - Removed multi_accept setting from Hypnotoad.

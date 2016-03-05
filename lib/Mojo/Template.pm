@@ -97,7 +97,7 @@ sub compile {
 }
 
 sub interpret {
-  my $self = shift;
+  my $self = $_[0];
 
   # Stack trace
   local $SIG{__DIE__} = sub {
@@ -112,7 +112,9 @@ sub interpret {
 }
 
 sub parse {
-  my ($self, $template) = @_;
+  my ($self, $template) = (shift, shift);
+
+  $self = $self->create_named_variables(@_);
 
   # Clean start
   $self->unparsed($template)->tree(\my @tree);
@@ -228,7 +230,20 @@ sub parse {
 
 sub render {
   my $self = shift;
-  return $self->parse(shift)->build->compile || $self->interpret(@_);
+  return $self->parse(shift, @_)->build->compile || $self->interpret(@_);
+}
+sub stash { Mojo::Util::_stash(stash => @_) }
+sub create_named_variables {
+  my $self = shift;
+  return $self if $self->prepend =~ /\$self->stash/;
+  my $stash = $self->stash;
+  my (undef, $args) = (@_ % 2 ? shift : undef, {@_});
+  @$stash{keys %$args} = values %$args;
+  my @keys = sort grep {/^\w+$/} keys %{$self->stash};
+  my $prepend = ' my $self = shift and my $_S = $self->stash if ref $_[0]; {';
+  $prepend .= join '', map {" my \$$_ = \$_S->{'$_'};"} @keys;
+  $self->prepend($prepend . $self->prepend)->append($self->append =~ /^;}/ ? $self->append : ';}' . $self->append);
+  $self;
 }
 
 sub render_file {

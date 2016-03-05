@@ -26,6 +26,11 @@ my $mt     = Mojo::Template->new;
 my $output = $mt->render('');
 is $output, '', 'empty string';
 
+# Create named variabled template
+$mt     = Mojo::Template->new;
+$output = $mt->render('<%= $test %>', test => 'TEST');
+is $output, "TEST\n", 'empty string';
+
 # Named template
 $mt     = Mojo::Template->new;
 $output = $mt->name('foo/bar.mt')->render('<%= __FILE__ %>');

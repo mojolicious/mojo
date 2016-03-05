@@ -69,7 +69,7 @@ placeholder values are turned into a hash.
   /user/show/23 -> /user/:action/:id -> {action => 'show', id => 23}
 
 This hash is basically the center of every L<Mojolicious> application, you will
-learn more about this later on. Internally routes get compiled to regular
+learn more about this later on. Internally, routes get compiled to regular
 expressions, so you can get the best of both worlds with a little bit of
 experience.
 

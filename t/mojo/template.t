@@ -821,6 +821,16 @@ $output = $mt->vars(1)
   ->render('<%= $foo %><%= $bar %>', {foo => 'works', bar => '!'});
 is $output, "works!\n", 'variables';
 
+# No variables
+$mt     = Mojo::Template->new;
+$output = $mt->vars(1)->render('works too!');
+is $output, "works too!\n", 'no variables';
+
+# Bad variables
+$mt = Mojo::Template->new;
+$output = $mt->vars(1)->render('bad variables!', {'not good' => 23});
+is $output, "bad variables!\n", 'bad variables';
+
 # Ugly multiline loop
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');

@@ -677,10 +677,10 @@ rendering failed.
   my $output = $mt->parse('<%= 1 + 1 %>')->run;
 
   # Render with arguments
-  say Mojo::Template->new->render('<%= $_[0] %>', 'sri');
+  say Mojo::Template->new->render('<%= $_[0] %>', 'bar');
 
   # Render with named variables
-  say Mojo::Template->new(vars => 1)->render('<%= $name %>', {name => 'sri'});
+  say Mojo::Template->new(vars => 1)->render('<%= $foo %>', {foo => 'bar'});
 
 =head2 render_file
 

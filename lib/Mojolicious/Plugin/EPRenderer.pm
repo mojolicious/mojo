@@ -28,23 +28,19 @@ sub register {
       my $cache = $renderer->cache;
       unless ($options->{'mojo.template'} = $cache->get($key)) {
         my $mt = $options->{'mojo.template'} = Mojo::Template->new($template);
+        $mt->prepend('my $self = my $c = shift;' . $mt->prepend);
+        $cache->set($key => $mt);
 
         # Helpers (only once)
         ++$self->{helpers} and _helpers($ns, $renderer->helpers)
           unless $self->{helpers};
-
-        # Stash values (every time)
-        my $prepend = 'my $self = my $c = shift; my $_S = $c->stash; {';
-        $prepend .= join '', map {" my \$$_ = \$_S->{'$_'};"} @keys;
-        $mt->prepend($prepend . $mt->prepend)->append(';}' . $mt->append);
-
-        $cache->set($key => $mt);
       }
 
-      # Make current controller available
+      # Make current controller and stash available
       no strict 'refs';
       no warnings 'redefine';
       local *{"${ns}::_C"} = sub {$c};
+      $options->{'mojo.template'}->context($c->stash);
 
       # Render with "epl" handler
       $renderer->handlers->{epl}($renderer, $c, $output, $options);

@@ -26,6 +26,11 @@ my $mt     = Mojo::Template->new;
 my $output = $mt->render('');
 is $output, '', 'empty string';
 
+# Provide context
+$mt     = Mojo::Template->new;
+$output = $mt->context({test => 'TEST'})->render('<%= $test %>');
+is $output, "TEST\n", 'empty string';
+
 # Named template
 $mt     = Mojo::Template->new;
 $output = $mt->name('foo/bar.mt')->render('<%= __FILE__ %>');

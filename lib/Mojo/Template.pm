@@ -13,6 +13,7 @@ has [qw(auto_escape compiled)];
 has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
+has context       => sub { {} };
 has encoding      => 'UTF-8';
 has escape        => sub { \&Mojo::Util::xml_escape };
 has [qw(escape_mark expression_mark trim_mark)] => '=';
@@ -108,7 +109,8 @@ sub interpret {
 
   return undef unless my $compiled = $self->compiled;
   my $output;
-  return eval { $output = $compiled->(@_); 1 } ? $output : $@;
+  my $context = delete $self->{context} || {};
+  return eval { $output = $compiled->($context, @_); 1 } ? $output : $@;
 }
 
 sub parse {
@@ -263,17 +265,22 @@ sub _trim {
 }
 
 sub _wrap {
-  my ($self, $code) = @_;
+  my ($self, $body) = @_;
 
   # Escape function
   monkey_patch $self->namespace, '_escape', $self->escape;
 
+  # Context
+  my $vars = join '',
+    map {"my \$$_ = \$_V->{'$_'};"} grep {/^\w+$/} keys %{$self->context};
+
   # Wrap lines
-  my $num = () = $code =~ /\n/g;
-  my $head = $self->_line(1) . "\npackage @{[$self->namespace]};";
-  $head .= " use Mojo::Base -strict; no warnings 'ambiguous';";
-  $code = "$head sub { my \$_O = ''; @{[$self->prepend]}; { $code\n";
-  $code .= $self->_line($num + 1) . "\n@{[$self->append]}; } \$_O };";
+  my $num = () = $body =~ /\n/g;
+  my $code = $self->_line(1) . "\npackage @{[$self->namespace]};";
+  $code .= "use Mojo::Base -strict; no warnings 'ambiguous';";
+  $code .= "sub { my \$_O = ''; my \$_V = shift;";
+  $code .= "@{[$self->prepend]};{ $vars { $body\n";
+  $code .= $self->_line($num + 1) . "\n;}@{[$self->append]}; } \$_O };";
 
   warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $code;
@@ -480,6 +487,13 @@ Character indicating the start of a comment, defaults to C<#>.
   $mt          = $mt->compiled($compiled);
 
 Compiled template code.
+
+=head2 context
+
+  my $context = $mt->context;
+  $mt         = $mt->context({foo => 'bar'});
+
+Values to be turned into variables the next time this template gets rendered.
 
 =head2 encoding
 

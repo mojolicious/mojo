@@ -32,8 +32,7 @@ $output = $mt->name('foo/bar.mt')->render('<%= __FILE__ %>');
 is $output, "foo/bar.mt\n", 'template name';
 
 # Consistent scalar context
-$mt->prepend('my @foo = (3, 4);')->parse('<%= @foo %>:<%== @foo %>');
-$output = $mt->build->compile || $mt->interpret;
+$output = $mt->prepend('my @foo = (3, 4);')->render('<%= @foo %>:<%== @foo %>');
 is $output, "2:2\n", 'same context';
 
 # Parentheses
@@ -575,8 +574,7 @@ EOF
 is $output, " \n    2\n\n    3\n\n    4\n", 'block loop';
 
 # Strict
-$mt = Mojo::Template->new;
-$output = $mt->parse('% $foo = 1;')->build->compile || $mt->interpret;
+$output = Mojo::Template->new->render('% $foo = 1;');
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/^Global symbol "\$foo" requires/, 'right message';
 
@@ -790,7 +788,7 @@ is $output, "foo\nbar\n", 'control structure';
 
 # Mixed tags
 $mt = Mojo::Template->new;
-$mt->parse(<<'EOF');
+$output = $mt->render(<<'EOF', 2);
 <html foo="bar">
 <%= $_[0] + 1 %> test <%= 2 + 2 %> lala <%# comment lalala %>
 %# This is a comment!
@@ -798,14 +796,10 @@ $mt->parse(<<'EOF');
 %= $i * 2
 </html>
 EOF
-$mt->build;
-like $mt->code,   qr/lala/,             'right code';
-unlike $mt->code, qr/ comment lalala /, 'right code';
-ok !defined($mt->compiled), 'nothing compiled';
-$mt->compile;
-isa_ok $mt->compiled, 'CODE', 'code compiled';
-$output = $mt->interpret(2);
 is $output, "<html foo=\"bar\">\n3 test 4 lala \n4\n\</html>\n", 'all tags';
+like $mt->code,       qr/lala/,             'right code';
+unlike $mt->code,     qr/ comment lalala /, 'right code';
+isa_ok $mt->compiled, 'CODE',               'code compiled';
 
 # Arguments
 $mt = Mojo::Template->new;
@@ -816,10 +810,16 @@ $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 </html>
 EOF
 is $output, "<html>\ntest bar\n</html>\n", 'arguments';
-is $mt->interpret('tset', {foo => 'baz'}), "<html>\ntset baz\n</html>\n",
+is $mt->run('tset', {foo => 'baz'}), "<html>\ntset baz\n</html>\n",
   'arguments again';
-is $mt->interpret('tset', {foo => 'yada'}), "<html>\ntset yada\n</html>\n",
+is $mt->run('tset', {foo => 'yada'}), "<html>\ntset yada\n</html>\n",
   'arguments again';
+
+# Variables
+$mt     = Mojo::Template->new;
+$output = $mt->vars(1)
+  ->render('<%= $foo %><%= $bar %>', {foo => 'works', bar => '!'});
+is $output, "works!\n", 'variables';
 
 # Ugly multiline loop
 $mt     = Mojo::Template->new;
@@ -1053,7 +1053,7 @@ test
 321
 EOF
 is $mt->tree->[0][1], "test\n123\n456", 'optimized text lines';
-$output = $mt->build->compile || $mt->interpret;
+$output = $mt->run;
 is_deeply $mt->tree, [], 'has been consumed';
 is $output, "test\n123\n456789\\\n987\n654\n321\n", 'just text';
 

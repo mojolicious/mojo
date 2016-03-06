@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::EPRenderer;
-use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin::EPLRenderer';
 
 use Mojo::Template;
 use Mojo::Util qw(encode md5_sum monkey_patch);
@@ -10,7 +10,7 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Auto escape by default to prevent XSS attacks
-  my $template = {auto_escape => 1, %{$conf->{template} || {}}};
+  my $template = {auto_escape => 1, %{$conf->{template} || {}}, vars => 1};
   my $ns = $self->{namespace} = $template->{namespace}
     //= 'Mojo::Template::Sandbox::' . md5_sum "$self";
 
@@ -25,20 +25,14 @@ sub register {
 
       # Prepare template for "epl" handler
       my $cache = $renderer->cache;
-      unless ($options->{'mojo.template'} = $cache->get($key)) {
-        my $mt = $options->{'mojo.template'} = Mojo::Template->new($template);
+      my $mt    = $cache->get($key);
+      unless ($mt) {
+        $cache->set($key => $mt = Mojo::Template->new($template));
+        $mt->prepend('my $self = my $c = _C;' . $mt->prepend);
 
         # Helpers (only once)
         ++$self->{helpers} and _helpers($ns, $renderer->helpers)
           unless $self->{helpers};
-
-        # Stash values (every time)
-        my $prepend = 'my $self = my $c = shift; my $_S = $c->stash; {';
-        $prepend .= "my \$$_ = \$_S->{'$_'};"
-          for grep {/^\w+$/} keys %{$c->stash};
-        $mt->prepend($prepend . $mt->prepend)->append(';}' . $mt->append);
-
-        $cache->set($key => $mt);
       }
 
       # Make current controller available
@@ -47,7 +41,8 @@ sub register {
       local *{"${ns}::_C"} = sub {$c};
 
       # Render with "epl" handler
-      $renderer->handlers->{epl}($renderer, $c, $output, $options);
+      Mojolicious::Plugin::EPLRenderer::_render($renderer, $c, $output,
+        $options, $mt, $c->stash);
     }
   );
 }
@@ -118,7 +113,7 @@ Attribute values passed to L<Mojo::Template> object used to render templates.
 =head1 METHODS
 
 L<Mojolicious::Plugin::EPRenderer> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin::EPLRenderer> and implements the following new ones.
 
 =head2 register
 

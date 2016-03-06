@@ -11,6 +11,7 @@ my %RULES = (
   'Mojo::IOLoop'         => {also_private => ['multi_accept']},
   'Mojo::IOLoop::Server' => {also_private => ['multi_accept']},
   'Mojo::Server::Daemon' => {also_private => ['multi_accept']},
+  'Mojo::Template'       => {also_private => ['build', 'compile', 'interpret']},
   'Mojo::Transaction::WebSocket' =>
     {also_private => [qw(build_frame parse_frame)]},
   'Mojo::Util' => {also_private => ['xss_escape']}

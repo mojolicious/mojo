@@ -411,7 +411,11 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Plugin::EPLRenderer>
 
+=over 2
+
 =item * L<Mojolicious::Plugin::EPRenderer>
+
+=back
 
 =item * L<Mojolicious::Plugin::HeaderCondition>
 

@@ -1,6 +1,12 @@
 
-6.54  2016-03-05
-  - Improved performance of .ep templates slightly.
+6.54  2016-03-06
+  - Deprecated Mojo::Template::interpret in favor of Mojo::Template::run.
+  - Deprecated Mojo::Template::build.
+  - Deprecated Mojo::Template::compile.
+  - Added support for named variables to Mojo::Template.
+  - Added vars attribute to Mojo::Template.
+  - Added run method to Mojo::Template.
+  - Improved Mojo::Template performance slightly.
 
 6.53  2016-03-03
   - Removed multi_accept setting from Hypnotoad.

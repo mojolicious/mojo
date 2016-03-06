@@ -26,7 +26,7 @@ sub DESTROY {
   $loop->remove($_) for @{$self->acceptors};
 }
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 sub multi_accept {
   deprecated 'Mojo::Server::Daemon::multi_accept is DEPRECATED';
   @_ > 1 ? $_[0] : undef;

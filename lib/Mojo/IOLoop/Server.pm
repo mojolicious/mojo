@@ -102,7 +102,7 @@ sub listen {
   $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
 }
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 sub multi_accept {
   deprecated 'Mojo::IOLoop::Server::multi_accept is DEPRECATED';
   @_ > 1 ? $_[0] : undef;

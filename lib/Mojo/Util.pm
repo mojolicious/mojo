@@ -61,7 +61,7 @@ our @EXPORT_OK = (
   qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 push @EXPORT_OK, 'xss_escape';
 
 # Aliases
@@ -351,7 +351,7 @@ sub xor_encode {
   return $output .= $buffer ^ substr($key, 0, length $buffer, '');
 }
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 sub xss_escape {
   deprecated
     'Mojo::Util::xss_escape is DEPRECATED in favor of Mojo::Util::xml_escape';

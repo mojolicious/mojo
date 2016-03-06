@@ -23,19 +23,19 @@ has tag_start => '<%';
 has tag_end   => '%>';
 has tree      => sub { [] };
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 sub build {
   deprecated 'Mojo::Template::build is DEPRECATED';
   shift->_build(@_);
 }
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 sub compile {
   deprecated 'Mojo::Template::compile is DEPRECATED';
   shift->_compile(@_);
 }
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 sub interpret {
   deprecated 'Mojo::Template::compile is DEPRECATED'
     . ' in favor of Mojo::Template::run';

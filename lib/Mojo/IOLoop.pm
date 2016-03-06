@@ -74,7 +74,7 @@ sub delay {
 
 sub is_running { _instance(shift)->reactor->is_running }
 
-# DEPRECATED in Clinking Beer Mugs!
+# DEPRECATED!
 sub multi_accept {
   deprecated 'Mojo::IOLoop::multi_accept is DEPRECATED';
   @_ > 1 ? $_[0] : undef;

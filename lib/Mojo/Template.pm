@@ -317,7 +317,7 @@ Mojo::Template - Perl-ish templates!
 
   # Use Perl modules
   my $mt = Mojo::Template->new;
-  my $output = $mt->render(<<'EOF');
+  say $mt->render(<<'EOF');
   % use Time::Piece;
   <!DOCTYPE html>
   <html>
@@ -326,26 +326,23 @@ Mojo::Template - Perl-ish templates!
     <body>Time: <%= $now->hms %></body>
   </html>
   EOF
-  say $output;
 
   # Render with arguments
-  my $output = $mt->render(<<'EOF', 23, 'Arguments');
+  say $mt->render(<<'EOF', 23, 'Arguments');
   % my ($num, $title) = @_;
   <!DOCTYPE html>
   <html>
     <head><title><%= $title %></title></head>
     <body>
-      foo <% my $i = $num + 2; %>
-      % for (1 .. 23) {
-      * some text <%= $i++ %>
+      % for my $i (1 .. $num) {
+        * some text <%= $i %>
       % }
     </body>
   </html>
   EOF
-  say $output;
 
   # Render with named variables
-  my $output = $mt->vars(1)->render(<<'EOF', {title => 'Variables'});
+  say $mt->vars(1)->render(<<'EOF', {title => 'Variables'});
   <!DOCTYPE html>
   <html>
     <head><title><%= $title %></title></head>
@@ -354,7 +351,6 @@ Mojo::Template - Perl-ish templates!
     </body>
   </html>
   EOF
-  say $output;
 
 =head1 DESCRIPTION
 

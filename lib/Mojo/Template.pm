@@ -38,8 +38,8 @@ sub compile {
 # DEPRECATED!
 sub interpret {
   deprecated 'Mojo::Template::compile is DEPRECATED'
-    . ' in favor of Mojo::Template::run';
-  shift->run(@_);
+    . ' in favor of Mojo::Template::process';
+  shift->process(@_);
 }
 
 sub parse {
@@ -157,21 +157,7 @@ sub parse {
   return $self;
 }
 
-sub render { shift->parse(shift)->run(@_) }
-
-sub render_file {
-  my ($self, $path) = (shift, shift);
-
-  $self->name($path) unless defined $self->{name};
-  my $template = slurp $path;
-  my $encoding = $self->encoding;
-  croak qq{Template "$path" has invalid encoding}
-    if $encoding && !defined($template = decode $encoding, $template);
-
-  return $self->render($template, @_);
-}
-
-sub run {
+sub process {
   my $self = shift;
 
   if (!$self->{compiled} && (my $e = $self->_build->_compile(@_))) { return $e }
@@ -185,6 +171,20 @@ sub run {
 
   my $output;
   return eval { $output = $self->compiled->(@_); 1 } ? $output : $@;
+}
+
+sub render { shift->parse(shift)->process(@_) }
+
+sub render_file {
+  my ($self, $path) = (shift, shift);
+
+  $self->name($path) unless defined $self->{name};
+  my $template = slurp $path;
+  my $encoding = $self->encoding;
+  croak qq{Template "$path" has invalid encoding}
+    if $encoding && !defined($template = decode $encoding, $template);
+
+  return $self->render($template, @_);
 }
 
 sub _build {
@@ -660,6 +660,20 @@ following new ones.
 
 Parse template into L</"tree">.
 
+=head2 process
+
+  my $output = $mt->process;
+  my $output = $mt->process(@args);
+  my $output = $mt->process({foo => 'bar'});
+
+Process template code and return the result, or a L<Mojo::Exception> object if
+rendering failed.
+
+  # Reuse template
+  say $mt->render('Hello <%= $_[0] %>!', 'Bender');
+  say $mt->process('Fry');
+  say $mt->process('Leela');
+
 =head2 render
 
   my $output = $mt->render('<%= 1 + 1 %>');
@@ -670,7 +684,7 @@ Render template and return the result, or a L<Mojo::Exception> object if
 rendering failed.
 
   # Longer version
-  my $output = $mt->parse('<%= 1 + 1 %>')->run;
+  my $output = $mt->parse('<%= 1 + 1 %>')->process;
 
   # Render with arguments
   say Mojo::Template->new->render('<%= $_[0] %>', 'bar');
@@ -685,20 +699,6 @@ rendering failed.
   my $output = $mt->render_file('/tmp/bar.mt', {foo => 'bar'});
 
 Same as L</"render">, but renders a template file.
-
-=head2 run
-
-  my $output = $mt->run;
-  my $output = $mt->run(@args);
-  my $output = $mt->run({foo => 'bar'});
-
-Run template code and return the result, or a L<Mojo::Exception> object if
-rendering failed.
-
-  # Reuse template
-  say $mt->render('Hello <%= $_[0] %>!', 'Bender');
-  say $mt->run('Fry');
-  say $mt->run('Leela');
 
 =head1 DEBUGGING
 

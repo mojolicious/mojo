@@ -16,7 +16,7 @@ sub _render {
   # Cached
   if ($mt->compiled) {
     $c->app->log->debug("Rendering cached @{[$mt->name]}");
-    $$output = $mt->run(@args);
+    $$output = $mt->process(@args);
   }
 
   # Not cached

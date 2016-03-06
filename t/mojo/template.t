@@ -810,9 +810,9 @@ $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 </html>
 EOF
 is $output, "<html>\ntest bar\n</html>\n", 'arguments';
-is $mt->run('tset', {foo => 'baz'}), "<html>\ntset baz\n</html>\n",
+is $mt->process('tset', {foo => 'baz'}), "<html>\ntset baz\n</html>\n",
   'arguments again';
-is $mt->run('tset', {foo => 'yada'}), "<html>\ntset yada\n</html>\n",
+is $mt->process('tset', {foo => 'yada'}), "<html>\ntset yada\n</html>\n",
   'arguments again';
 
 # Variables
@@ -1063,7 +1063,7 @@ test
 321
 EOF
 is $mt->tree->[0][1], "test\n123\n456", 'optimized text lines';
-$output = $mt->run;
+$output = $mt->process;
 is_deeply $mt->tree, [], 'has been consumed';
 is $output, "test\n123\n456789\\\n987\n654\n321\n", 'just text';
 

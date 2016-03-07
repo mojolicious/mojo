@@ -13,8 +13,13 @@ has watch  => sub { [qw(lib templates)] };
 
 sub check {
   my $self = shift;
-  $self->_check($_) and return $_
-    for map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch};
+  # pack all changed files names in one pass in array
+  # to prevent constant mojo "one-by-one" restart:
+  my @files_changed;
+  for (map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch}) {
+    push @files_changed, $_ if $self->_check($_);
+  }
+  return \@files_changed if @files_changed;
   return undef;
 }
 
@@ -51,8 +56,15 @@ sub _check {
 sub _manage {
   my $self = shift;
 
-  if (defined(my $file = $self->check)) {
-    say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
+  if (defined(my $files = $self->check)) {
+    if($ENV{MORBO_VERBOSE}) {
+      if(@{$files} == 1) {
+        say qq{File "$files->[0]" changed, restarting.};
+      }
+      else {
+        say scalar(@{$files}).qq{ files changed, restarting.};
+      }
+    }
     kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;
   }

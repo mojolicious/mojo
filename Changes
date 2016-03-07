@@ -2,9 +2,8 @@
 6.55  2016-03-07
 
 6.54  2016-03-06
+  - Deprecated Mojo::Template::build and Mojo::Template::compile.
   - Deprecated Mojo::Template::interpret in favor of Mojo::Template::process.
-  - Deprecated Mojo::Template::build.
-  - Deprecated Mojo::Template::compile.
   - Added support for named variables to Mojo::Template.
   - Added vars attribute to Mojo::Template.
   - Added process method to Mojo::Template.

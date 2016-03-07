@@ -797,9 +797,9 @@ $output = $mt->render(<<'EOF', 2);
 </html>
 EOF
 is $output, "<html foo=\"bar\">\n3 test 4 lala \n4\n\</html>\n", 'all tags';
-like $mt->code,       qr/lala/,             'right code';
-unlike $mt->code,     qr/ comment lalala /, 'right code';
-isa_ok $mt->compiled, 'CODE',               'code compiled';
+like $mt->code,   qr/lala/,             'right code';
+unlike $mt->code, qr/ comment lalala /, 'right code';
+is ref $mt->compiled, 'CODE', 'code compiled';
 
 # Arguments
 $mt = Mojo::Template->new;

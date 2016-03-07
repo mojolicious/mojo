@@ -26,13 +26,13 @@ has tree      => sub { [] };
 # DEPRECATED!
 sub build {
   deprecated 'Mojo::Template::build is DEPRECATED';
-  shift->_build(@_);
+  return shift;
 }
 
 # DEPRECATED!
 sub compile {
   deprecated 'Mojo::Template::compile is DEPRECATED';
-  shift->_compile(@_);
+  return shift;
 }
 
 # DEPRECATED!
@@ -159,9 +159,17 @@ sub parse {
 sub process {
   my $self = shift;
 
-  if (!$self->{compiled} && (my $e = $self->_build->_compile(@_))) { return $e }
+  # Use local stack trace for compile exceptions
+  my $compiled = $self->compiled;
+  unless ($compiled) {
+    my $code = $self->_build->code;
+    return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
+      ->trace->verbose(1)
+      unless $compiled = eval $self->_wrap($code, @_);
+    $self->compiled($compiled);
+  }
 
-  # Stack trace
+  # Use a real stack trace for normal exceptions
   local $SIG{__DIE__} = sub {
     CORE::die $_[0] if ref $_[0];
     CORE::die Mojo::Exception->new(shift)
@@ -169,7 +177,7 @@ sub process {
   };
 
   my $output;
-  return eval { $output = $self->compiled->(@_); 1 } ? $output : $@;
+  return eval { $output = $compiled->(@_); 1 } ? $output : $@;
 }
 
 sub render { shift->parse(shift)->process(@_) }
@@ -244,19 +252,6 @@ sub _build {
   }
 
   return $self->code(join "\n", @blocks)->tree([]);
-}
-
-sub _compile {
-  my ($self, $vars) = @_;
-
-  # Compile with line directive
-  return undef unless defined(my $code = $self->code);
-  my $compiled = eval $self->_wrap($code, $vars);
-  $self->compiled($compiled) and return undef unless $@;
-
-  # Use local stack trace for compile exceptions
-  return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
-    ->trace->verbose(1);
 }
 
 sub _line {

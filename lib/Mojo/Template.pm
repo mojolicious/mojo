@@ -663,7 +663,7 @@ L<Mojo::Exception> object if rendering failed.
   # Parse and process
   say Mojo::Template->new->parse('Hello <%= $_[0] %>')->process('Bender');
 
-  # Reuse template
+  # Reuse template (for much better performance)
   my $mt = Mojo::Template->new;
   say $mt->render('Hello <%= $_[0] %>!', 'Bender');
   say $mt->process('Fry');

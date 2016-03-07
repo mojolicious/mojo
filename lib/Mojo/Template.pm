@@ -159,10 +159,11 @@ sub parse {
 sub process {
   my $self = shift;
 
-  # Use local stack trace for compile exceptions
+  # Use a local stack trace for compile exceptions
   my $compiled = $self->compiled;
   unless ($compiled) {
-    my $code = $self->_build->code;
+    my $code = $self->_compile->code;
+    monkey_patch $self->namespace, '_escape', $self->escape;
     return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
       ->trace->verbose(1)
       unless $compiled = eval $self->_wrap($code, @_);
@@ -194,7 +195,7 @@ sub render_file {
   return $self->render($template, @_);
 }
 
-sub _build {
+sub _compile {
   my $self = shift;
 
   my $tree   = $self->tree;
@@ -275,9 +276,6 @@ sub _trim {
 
 sub _wrap {
   my ($self, $body, $vars) = @_;
-
-  # Escape function
-  monkey_patch $self->namespace, '_escape', $self->escape;
 
   # Variables
   my $args = '';

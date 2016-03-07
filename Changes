@@ -1,4 +1,6 @@
 
+6.55  2016-03-07
+
 6.54  2016-03-06
   - Deprecated Mojo::Template::interpret in favor of Mojo::Template::process.
   - Deprecated Mojo::Template::build.

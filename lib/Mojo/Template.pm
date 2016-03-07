@@ -32,7 +32,7 @@ sub build {
 # DEPRECATED!
 sub compile {
   deprecated 'Mojo::Template::compile is DEPRECATED';
-  return shift;
+  return undef;
 }
 
 # DEPRECATED!

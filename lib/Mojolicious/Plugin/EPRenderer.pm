@@ -10,12 +10,12 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Auto escape by default to prevent XSS attacks
-  my $dialect = {auto_escape => 1, %{$conf->{template} || {}}, vars => 1};
-  my $ns = $self->{namespace} = $dialect->{namespace}
+  my $ep = {auto_escape => 1, %{$conf->{template} || {}}, vars => 1};
+  my $ns = $self->{namespace} = $ep->{namespace}
     //= 'Mojo::Template::Sandbox::' . md5_sum "$self";
 
   # Make "$self" and "$c" available in templates
-  $dialect->{prepend} = 'my $self = my $c = _C;' . ($dialect->{prepend} // '');
+  $ep->{prepend} = 'my $self = my $c = _C;' . ($ep->{prepend} // '');
 
   # Add "ep" handler and make it the default
   $app->renderer->default_handler('ep')->add_handler(
@@ -28,7 +28,7 @@ sub register {
 
       my $cache = $renderer->cache;
       my $mt    = $cache->get($key);
-      $cache->set($key => $mt = Mojo::Template->new($dialect)) unless $mt;
+      $cache->set($key => $mt = Mojo::Template->new($ep)) unless $mt;
 
       # Export helpers only once
       ++$self->{helpers} and _helpers($ns, $renderer->helpers)
@@ -74,9 +74,8 @@ Mojolicious::Plugin::EPRenderer - Embedded Perl renderer plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::EPRenderer> is a renderer for C<ep> or C<Embedded Perl>
-templates. For more information see
-L<Mojolicious::Guides::Rendering/"Embedded Perl">.
+L<Mojolicious::Plugin::EPRenderer> is a renderer for Embedded Perl templates.
+For more information see L<Mojolicious::Guides::Rendering/"Embedded Perl">.
 
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins, you're welcome to fork it.

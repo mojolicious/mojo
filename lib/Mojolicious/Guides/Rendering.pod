@@ -62,10 +62,11 @@ plugins, but more about that later.
 =head2 Embedded Perl
 
 L<Mojolicious> includes a minimalistic but very powerful template system out of
-the box called Embedded Perl or C<ep> for short. It allows the embedding of
-Perl code right into actual content using a small set of special tags and line
-start characters. For all templates L<strict>, L<warnings>, L<utf8> and Perl
-5.10 L<features|feature> are automatically enabled.
+the box called Embedded Perl or C<ep> for short. It is based on
+L<Mojo::Template> and allows the embedding of Perl code right into actual
+content using a small set of special tags and line start characters. For all
+templates L<strict>, L<warnings>, L<utf8> and Perl 5.10 L<features|feature> are
+automatically enabled.
 
   <% Perl code %>
   <%= Perl expression, replaced with XML escaped result %>

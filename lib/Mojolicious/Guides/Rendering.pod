@@ -570,30 +570,11 @@ value).
 
   my $html = $c->render_to_string('reminder', layout => 'mail');
 
-=head2 Include templates
+=head2 Partial templates
 
-Like most helpers L<Mojolicious::Plugin::DefaultHelpers/"include"> is just a
-shortcut to make your life a little easier.
-
-  use Mojolicious::Lite;
-
-  get '/' => 'foo';
-
-  app->start;
-  __DATA__
-
-  @@ foo.html.ep
-  <!DOCTYPE html>
-  <html>
-    %= include 'header', title => 'Howdy'
-    <body>Bar</body>
-  </html>
-
-  @@ header.html.ep
-  <head><title><%= $title %></title></head>
-
-Instead of C<include> you could also just call
-L<Mojolicious::Controller/"render_to_string"> to include one template into
+You can break up bigger templates into smaller, more manageable chunks, which
+can also be shared with other templates. Just use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"include"> to include one template into
 another.
 
   use Mojolicious::Lite;
@@ -606,7 +587,7 @@ another.
   @@ foo.html.ep
   <!DOCTYPE html>
   <html>
-    %= $c->render_to_string('header', title => 'Howdy')
+    %= include 'header', title => 'Howdy'
     <body>Bar</body>
   </html>
 

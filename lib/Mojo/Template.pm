@@ -326,18 +326,18 @@ Mojo::Template - Perl-ish templates
   EOF
 
   # Render with arguments
-  say $mt->render(<<'EOF', 23, 'Arguments');
-  % my ($num, $title) = @_;
+  say $mt->render(<<'EOF', [1 .. 13], 'Hello World!');
+  % my ($numbers, $title) = @_;
   <div>
     <h1><%= $title %></h1>
-    % for my $i (1 .. $num) {
+    % for my $i (@$numbers) {
       * some text <%= $i %>
     % }
   </div>
   EOF
 
   # Render with named variables
-  say $mt->vars(1)->render(<<'EOF', {title => 'Variables'});
+  say $mt->vars(1)->render(<<'EOF', {title => 'Hello World!'});
   <div>
     <h1><%= $title %></h1>
     %= 5 + 5

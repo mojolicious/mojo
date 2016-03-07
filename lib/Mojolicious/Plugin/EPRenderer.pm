@@ -10,9 +10,12 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Auto escape by default to prevent XSS attacks
-  my $template = {auto_escape => 1, %{$conf->{template} || {}}, vars => 1};
-  my $ns = $self->{namespace} = $template->{namespace}
+  my $dialect = {auto_escape => 1, %{$conf->{template} || {}}, vars => 1};
+  my $ns = $self->{namespace} = $dialect->{namespace}
     //= 'Mojo::Template::Sandbox::' . md5_sum "$self";
+
+  # Make "$self" and "$c" available in templates
+  $dialect->{prepend} = 'my $self = my $c = _C;' . ($dialect->{prepend} // '');
 
   # Add "ep" handler and make it the default
   $app->renderer->default_handler('ep')->add_handler(
@@ -23,24 +26,18 @@ sub register {
       return unless defined $name;
       my $key = md5_sum encode 'UTF-8', $name;
 
-      # Prepare template for "epl" handler
       my $cache = $renderer->cache;
       my $mt    = $cache->get($key);
-      unless ($mt) {
-        $cache->set($key => $mt = Mojo::Template->new($template));
-        $mt->prepend('my $self = my $c = _C;' . $mt->prepend);
+      $cache->set($key => $mt = Mojo::Template->new($dialect)) unless $mt;
 
-        # Helpers (only once)
-        ++$self->{helpers} and _helpers($ns, $renderer->helpers)
-          unless $self->{helpers};
-      }
+      # Export helpers only once
+      ++$self->{helpers} and _helpers($ns, $renderer->helpers)
+        unless $self->{helpers};
 
-      # Make current controller available
+      # Make current controller available and render with "epl" handler
       no strict 'refs';
       no warnings 'redefine';
       local *{"${ns}::_C"} = sub {$c};
-
-      # Render with "epl" handler
       Mojolicious::Plugin::EPLRenderer::_render($renderer, $c, $output,
         $options, $mt, $c->stash);
     }

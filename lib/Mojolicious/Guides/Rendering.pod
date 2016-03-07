@@ -572,19 +572,19 @@ value).
 
 =head2 Partial templates
 
-You can break up bigger templates into smaller, more manageable chunks, which
-can also be shared with other templates. Just use the helper
+You can break up bigger templates into smaller, more manageable chunks. These
+partial templates can also be shared with other templates. Just use the helper
 L<Mojolicious::Plugin::DefaultHelpers/"include"> to include one template into
 another.
 
   use Mojolicious::Lite;
 
-  get '/' => 'foo';
+  get '/' => {template => 'foo/bar'};
 
   app->start;
   __DATA__
 
-  @@ foo.html.ep
+  @@ foo/bar.html.ep
   <!DOCTYPE html>
   <html>
     %= include 'header', title => 'Howdy'

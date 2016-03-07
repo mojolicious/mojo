@@ -657,10 +657,14 @@ Parse template into L</"tree">.
   my $output = $mt->process(@args);
   my $output = $mt->process({foo => 'bar'});
 
-Process template code and return the result, or a L<Mojo::Exception> object if
-rendering failed.
+Process previously parsed template and return the result, or a
+L<Mojo::Exception> object if rendering failed.
+
+  # Parse and process
+  say Mojo::Template->new->parse('Hello <%= $_[0] %>')->process('Bender');
 
   # Reuse template
+  my $mt = Mojo::Template->new;
   say $mt->render('Hello <%= $_[0] %>!', 'Bender');
   say $mt->process('Fry');
   say $mt->process('Leela');

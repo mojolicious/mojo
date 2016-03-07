@@ -104,7 +104,6 @@ sub parse {
 
       # End
       if ($op ne 'text' && $token =~ $end_re) {
-        $op = 'text';
 
         # Capture start
         splice @tree, -1, 0, ['cpst'] if $1;
@@ -113,7 +112,7 @@ sub parse {
         _trim(\@tree) if ($trimming = $2) && @tree > 1;
 
         # Hint at end
-        push @tree, ['text', ''];
+        push @tree, [$op = 'text', ''];
       }
 
       # Code
@@ -321,7 +320,7 @@ Mojo::Template - Perl-ish templates
   % use Time::Piece;
   <div>
     % my $now = localtime;
-    <p>Time: <%= $now->hms %></p>
+    Time: <%= $now->hms %>
   </div>
   EOF
 
@@ -331,7 +330,7 @@ Mojo::Template - Perl-ish templates
   <div>
     <h1><%= $title %></h1>
     % for my $i (@$numbers) {
-      * some text <%= $i %>
+      Test <%= $i %>
     % }
   </div>
   EOF

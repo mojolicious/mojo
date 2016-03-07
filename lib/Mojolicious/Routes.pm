@@ -199,7 +199,7 @@ sub _render {
 
 =head1 NAME
 
-Mojolicious::Routes - Always find your destination with routes!
+Mojolicious::Routes - Always find your destination with routes
 
 =head1 SYNOPSIS
 

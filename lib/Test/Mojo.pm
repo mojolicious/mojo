@@ -400,7 +400,7 @@ sub _wait {
 
 =head1 NAME
 
-Test::Mojo - Testing Mojo!
+Test::Mojo - Testing Mojo
 
 =head1 SYNOPSIS
 

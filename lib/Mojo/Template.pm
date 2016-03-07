@@ -319,37 +319,29 @@ Mojo::Template - Perl-ish templates!
   my $mt = Mojo::Template->new;
   say $mt->render(<<'EOF');
   % use Time::Piece;
-  <!DOCTYPE html>
-  <html>
-    <head><title>Modules</title></head>
+  <div>
     % my $now = localtime;
-    <body>Time: <%= $now->hms %></body>
-  </html>
+    <p>Time: <%= $now->hms %></p>
+  </div>
   EOF
 
   # Render with arguments
   say $mt->render(<<'EOF', 23, 'Arguments');
   % my ($num, $title) = @_;
-  <!DOCTYPE html>
-  <html>
-    <head><title><%= $title %></title></head>
-    <body>
-      % for my $i (1 .. $num) {
-        * some text <%= $i %>
-      % }
-    </body>
-  </html>
+  <div>
+    <h1><%= $title %></h1>
+    % for my $i (1 .. $num) {
+      * some text <%= $i %>
+    % }
+  </div>
   EOF
 
   # Render with named variables
   say $mt->vars(1)->render(<<'EOF', {title => 'Variables'});
-  <!DOCTYPE html>
-  <html>
-    <head><title><%= $title %></title></head>
-    <body>
-      %= 5 + 5
-    </body>
-  </html>
+  <div>
+    <h1><%= $title %></h1>
+    %= 5 + 5
+  </div>
   EOF
 
 =head1 DESCRIPTION

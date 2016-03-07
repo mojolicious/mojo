@@ -723,8 +723,10 @@ avoid conflicts.
 
 =head2 Content blocks
 
-Blocks and the helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> can
-also be used to pass whole sections of the template to the layout.
+The helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> allows you to
+pass whole blocks of content from one template to another. This can be very
+useful when your layout has distinct sections, such as sidebars, where content
+should be inserted by the template.
 
   use Mojolicious::Lite;
 

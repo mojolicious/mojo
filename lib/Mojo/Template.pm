@@ -631,7 +631,7 @@ Instead of a list of values, use a hash reference with named variables to pass
 data to templates.
 
   # "works!"
-  Mojo::Template->new(vars => 1)->render('<%= $test %>', {test => 'works!'});
+  Mojo::Template->new(vars => 1)->render('<%= $test %>!', {test => 'works'});
 
 =head1 METHODS
 

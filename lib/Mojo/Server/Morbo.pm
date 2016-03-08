@@ -5,25 +5,24 @@ use Mojo::Base -base;
 #         effects of sudden, intense global warming.
 #  Morbo: Morbo is pleased but sticky."
 use Mojo::Server::Daemon;
-use Mojo::Util qw(files deprecated);
+use Mojo::Util qw(deprecated files);
 use POSIX 'WNOHANG';
 
 has daemon => sub { Mojo::Server::Daemon->new };
 has watch  => sub { [qw(lib templates)] };
 
-sub modified_files {
-  my $self = shift;
-  my @files;
-  for (map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch}) {
-    push @files, $_ if $self->_check($_);
-  }
-  return [@files];
-}
-
 # DEPRECATED!
 sub check {
-  deprecated 'Mojo::Server::Morbo::check is DEPRECATED';
-  return (@{$_[0]->modified_files // []})[0];
+  deprecated 'Mojo::Server::Morbo::check is DEPRECATED'
+    . ' in favor of Mojo::Server::Morbo::modified_files';
+  return shift->modified_files->[0];
+}
+
+sub modified_files {
+  my $self = shift;
+  my @files = grep { $self->_check($_) }
+    map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch};
+  return \@files;
 }
 
 sub run {
@@ -59,15 +58,11 @@ sub _check {
 sub _manage {
   my $self = shift;
 
-  if (my @files = @{$self->modified_files//[]}) {
-    if($ENV{MORBO_VERBOSE}) {
-      if(@files == 1) {
-        say "File @{[$files[0]]} changed, restarting.";
-      }
-      else {
-        say scalar(@files).qq{ files changed, restarting.};
-      }
-    }
+  if (my @files = @{$self->modified_files}) {
+    say @files == 1
+      ? "File @{[$files[0]]} changed, restarting."
+      : "@{[scalar @files]} files changed, restarting."
+      if $ENV{MORBO_DEBUG};
     kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;
   }
@@ -171,8 +166,11 @@ the following new ones.
 
   my $files = $morbo->modified_files;
 
-Check if files from L</"watch"> have been modified since last check and return
-an array ref of file names, or C<undef> if there have been no changes.
+Check if files from L</"watch"> have been modified since the last check and
+return an array reference with the results.
+
+  # All files that have been modified
+  say for @{$morbo->modified_files};
 
 =head2 run
 

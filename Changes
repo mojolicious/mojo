@@ -1,7 +1,10 @@
 
-6.55  2016-03-07
-  - Added modified_files method to Mojo::Server::Morbo.
-  - Deprecated Mojo::Server::Morbo::check.
+6.55  2016-03-08
+  - Deprecated Mojo::Server::Morbo::check in favor of
+    Mojo::Server::Morbo::modified_files. (leejo, nugged)
+  - Added modified_files method to Mojo::Server::Morbo. (leejo, nugged)
+  - Fixed a bug where Morbo would restart more than once if multiple files
+    changed at the same time. (leejo, nugged)
 
 6.54  2016-03-06
   - Deprecated Mojo::Template::build and Mojo::Template::compile.

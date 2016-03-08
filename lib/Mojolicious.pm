@@ -791,6 +791,8 @@ Andreas Koenig
 
 Andrew Fresh
 
+Andrew Nugged
+
 Andrey Khozov
 
 Andrey Kuzmin
@@ -904,6 +906,8 @@ Kitamura Akatsuki
 Klaus S. Madsen
 
 Lars Balker Rasmussen
+
+Lee Johnson
 
 Leon Brocard
 

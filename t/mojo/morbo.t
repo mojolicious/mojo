@@ -25,7 +25,7 @@ my $script = catfile $dir, 'myapp.pl';
 my $subdir = catdir $dir, 'test', 'stuff';
 mkpath $subdir;
 my $morbo = Mojo::Server::Morbo->new(watch => [$subdir, $script]);
-ok !@{$morbo->modified_files}, 'file has not changed';
+is_deeply $morbo->modified_files, [], 'no files have changed';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
 
@@ -67,7 +67,7 @@ get '/hello' => {text => 'Hello World!'};
 
 app->start;
 EOF
-is $morbo->modified_files->[0], $script, 'file has changed';
+is_deeply $morbo->modified_files, [$script], 'file has changed';
 ok((stat $script)[9] > $mtime, 'modify time has changed');
 is((stat $script)[7], $size, 'still equal size');
 sleep 3;
@@ -86,7 +86,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 
 # Update script without changing mtime
 ($size, $mtime) = (stat $script)[7, 9];
-ok !@{$morbo->modified_files}, 'file has not changed';
+is_deeply $morbo->modified_files, [], 'no files have changed';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
 
@@ -97,7 +97,7 @@ get '/hello' => {text => 'Hello!'};
 app->start;
 EOF
 utime $mtime, $mtime, $script;
-is $morbo->modified_files->[0], $script, 'file has changed';
+is_deeply $morbo->modified_files, [$script], 'file has changed';
 ok((stat $script)[9] == $mtime, 'modify time has not changed');
 isnt((stat $script)[7], $size, 'size has changed');
 sleep 3;
@@ -115,12 +115,11 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'Hello!', 'right content';
 
 # New file(s)
-ok !@{$morbo->modified_files}, 'directory has not changed';
+is_deeply $morbo->modified_files, [], 'directory has not changed';
 my @new = map { catfile $subdir, "$_.txt" } qw/test testing/;
 spurt 'whatever', $_ for @new;
-my %modified_files = map { $_ => 1 } @{$morbo->modified_files};
-ok $modified_files{$_}, 'directory has changed' for @new;
-ok !@{$morbo->modified_files}, 'directory has not changed again';
+is_deeply $morbo->modified_files, \@new, 'two files have changed';
+is_deeply $morbo->modified_files, [], 'directory has not changed again';
 
 # Stop
 kill 'INT', $pid;

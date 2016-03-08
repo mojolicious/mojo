@@ -202,7 +202,7 @@ sub _tokenize {
 
 =head1 NAME
 
-Mojolicious::Routes::Pattern - Routes pattern engine
+Mojolicious::Routes::Pattern - Route pattern
 
 =head1 SYNOPSIS
 

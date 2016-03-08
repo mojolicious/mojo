@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::Rendering - Rendering
+Mojolicious::Guides::Rendering - Rendering content
 
 =head1 OVERVIEW
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::Routing - Routing
+Mojolicious::Guides::Routing - Routing requests
 
 =head1 OVERVIEW
 

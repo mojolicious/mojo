@@ -91,7 +91,7 @@ sub _all {
 
 =head1 NAME
 
-Mojo::Loader - Loader
+Mojo::Loader - Load all kinds of things
 
 =head1 SYNOPSIS
 

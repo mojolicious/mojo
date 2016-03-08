@@ -43,7 +43,7 @@ sub run {
 
 =head1 NAME
 
-Mojolicious::Command::cpanify - Cpanify command
+Mojolicious::Command::cpanify - CPAN-ify command
 
 =head1 SYNOPSIS
 

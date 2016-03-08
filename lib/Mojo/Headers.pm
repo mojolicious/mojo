@@ -154,7 +154,7 @@ sub to_string {
 
 =head1 NAME
 
-Mojo::Headers - Headers
+Mojo::Headers - HTTP headers
 
 =head1 SYNOPSIS
 

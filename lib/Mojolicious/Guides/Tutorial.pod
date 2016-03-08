@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::Tutorial - Tutorial
+Mojolicious::Guides::Tutorial - Get started with Mojolicious
 
 =head1 TUTORIAL
 

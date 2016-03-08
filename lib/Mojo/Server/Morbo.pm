@@ -5,17 +5,25 @@ use Mojo::Base -base;
 #         effects of sudden, intense global warming.
 #  Morbo: Morbo is pleased but sticky."
 use Mojo::Server::Daemon;
-use Mojo::Util 'files';
+use Mojo::Util qw(files deprecated);
 use POSIX 'WNOHANG';
 
 has daemon => sub { Mojo::Server::Daemon->new };
 has watch  => sub { [qw(lib templates)] };
 
-sub check {
+sub modified_files {
   my $self = shift;
-  $self->_check($_) and return $_
-    for map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch};
-  return undef;
+  my @files;
+  for (map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch}) {
+    push @files, $_ if $self->_check($_);
+  }
+  return [@files];
+}
+
+# DEPRECATED!
+sub check {
+  deprecated 'Mojo::Server::Morbo::check is DEPRECATED';
+  return (@{$_[0]->modified_files // []})[0];
 }
 
 sub run {
@@ -51,8 +59,15 @@ sub _check {
 sub _manage {
   my $self = shift;
 
-  if (defined(my $file = $self->check)) {
-    say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
+  if (my @files = @{$self->modified_files//[]}) {
+    if($ENV{MORBO_VERBOSE}) {
+      if(@files == 1) {
+        say "File @{[$files[0]]} changed, restarting.";
+      }
+      else {
+        say scalar(@files).qq{ files changed, restarting.};
+      }
+    }
     kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;
   }
@@ -152,12 +167,12 @@ directory.
 L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 check
+=head2 modified_files
 
-  my $file = $morbo->check;
+  my $files = $morbo->modified_files;
 
-Check if file from L</"watch"> has been modified since last check and return
-its name, or C<undef> if there have been no changes.
+Check if files from L</"watch"> have been modified since last check and return
+an array ref of file names, or C<undef> if there have been no changes.
 
 =head2 run
 

@@ -19,8 +19,9 @@ sub check {
 }
 
 sub modified_files {
-  my $self = shift;
-  my @files = grep { $self->_check($_) }
+  my $self  = shift;
+  my $cache = $self->{cache} ||= {};
+  my @files = grep { _check($cache, $_) }
     map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch};
   return \@files;
 }
@@ -44,12 +45,10 @@ sub run {
 }
 
 sub _check {
-  my ($self, $file) = @_;
+  my ($cache, $file) = @_;
 
   # Check if modify time and/or size have changed
   my ($size, $mtime) = (stat $file)[7, 9];
-  return undef unless defined $mtime;
-  my $cache = $self->{cache} ||= {};
   my $stats = $cache->{$file} ||= [$^T, $size];
   return undef if $mtime <= $stats->[0] && $size == $stats->[1];
   return !!($cache->{$file} = [$mtime, $size]);

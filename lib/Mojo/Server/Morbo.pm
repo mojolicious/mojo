@@ -60,8 +60,8 @@ sub _manage {
 
   if (my @files = @{$self->modified_files}) {
     say @files == 1
-      ? "File @{[$files[0]]} changed, restarting."
-      : "@{[scalar @files]} files changed, restarting."
+      ? qq{File "@{[$files[0]]}" changed, restarting.}
+      : qq{@{[scalar @files]} files changed, restarting.}
       if $ENV{MORBO_DEBUG};
     kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;

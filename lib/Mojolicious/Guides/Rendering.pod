@@ -842,16 +842,16 @@ logic with methods like L<Mojolicious::Validator::Validation/"is_valid">.
       %= form_for index => begin
         %= label_for user => 'Username (required, 1-20 characters, only e-t)'
         <br>
-        %= text_field 'user'
+        %= text_field 'user', id => 'user'
         %= submit_button
         <br>
         %= label_for pass => 'Password (optional, 7-500 characters)'
         <br>
-        %= password_field 'pass'
+        %= password_field 'pass', id => 'pass'
         <br>
         %= label_for pass_again => 'Password again (equal to the value above)'
         <br>
-        %= password_field 'pass_again'
+        %= password_field 'pass_again', id => 'pass_again'
       % end
     </body>
   </html>
@@ -964,7 +964,7 @@ L<Mojolicious::Validator::Validation/"csrf_protect">.
       %= form_for target => begin
         %= csrf_field
         %= label_for city => 'Which city to point low orbit ion cannon at?'
-        %= text_field 'city'
+        %= text_field 'city', id => 'city'
         %= submit_button
       %= end
     </body>

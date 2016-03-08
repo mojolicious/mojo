@@ -352,12 +352,12 @@ __DATA__
 % }
 %= form_for index => begin
   %= label_for foo => '<Foo>', class => 'custom'
-  %= text_field 'foo', class => 'custom'
+  %= text_field 'foo', class => 'custom', id => 'foo'
   %= text_area 'bar'
   %= label_for baz => (class => 'custom') => begin
     Baz
   % end
-  %= select_field baz => [qw(yada yada)]
+  %= select_field baz => [qw(yada yada)], id => 'baz'
   %= password_field 'yada'
 % end
 

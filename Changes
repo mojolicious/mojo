@@ -1,5 +1,7 @@
 
 6.55  2016-03-07
+  - Added modified_files method to Mojo::Server::Morbo.
+  - Deprecated Mojo::Server::Morbo::check.
 
 6.54  2016-03-06
   - Deprecated Mojo::Template::build and Mojo::Template::compile.

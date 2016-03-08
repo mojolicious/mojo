@@ -19,10 +19,18 @@ sub check {
 }
 
 sub modified_files {
-  my $self  = shift;
+  my $self = shift;
+
   my $cache = $self->{cache} ||= {};
-  my @files = grep { _check($cache, $_) }
-    map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch};
+  my @files;
+  for my $file (map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch}) {
+    my ($size, $mtime) = (stat $file)[7, 9];
+    my $stats = $cache->{$file} ||= [$^T, $size];
+    next if $mtime <= $stats->[0] && $size == $stats->[1];
+    @$stats = ($mtime, $size);
+    push @files, $file;
+  }
+
   return \@files;
 }
 
@@ -42,16 +50,6 @@ sub run {
 
   $self->_manage until $self->{finished} && !$self->{worker};
   exit 0;
-}
-
-sub _check {
-  my ($cache, $file) = @_;
-
-  # Check if modify time and/or size have changed
-  my ($size, $mtime) = (stat $file)[7, 9];
-  my $stats = $cache->{$file} ||= [$^T, $size];
-  return undef if $mtime <= $stats->[0] && $size == $stats->[1];
-  return !!($cache->{$file} = [$mtime, $size]);
 }
 
 sub _manage {

@@ -138,7 +138,7 @@ sub _stop {
 
 =head1 NAME
 
-Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
+Mojo::Server::Hypnotoad - A production web serv...ALL GLORY TO THE HYPNOTOAD!
 
 =head1 SYNOPSIS
 

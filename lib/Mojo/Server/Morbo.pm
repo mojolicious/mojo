@@ -94,7 +94,7 @@ sub _spawn {
 
 =head1 NAME
 
-Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
+Mojo::Server::Morbo - Tonight at 11...DOOOOOOOOOOOOOOOM!
 
 =head1 SYNOPSIS
 

@@ -60,7 +60,7 @@ sub to_string { catdir @{shift->parts} }
 
 =head1 NAME
 
-Mojo::Home - Home sweet home!
+Mojo::Home - Home sweet home
 
 =head1 SYNOPSIS
 

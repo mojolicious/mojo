@@ -3,6 +3,7 @@
   - Deprecated Mojo::Server::Morbo::check in favor of
     Mojo::Server::Morbo::modified_files. (leejo, nugged)
   - Added modified_files method to Mojo::Server::Morbo. (leejo, nugged)
+  - Improved renderer performance slightly.
   - Fixed a bug where Morbo would restart more than once if multiple files
     changed at the same time. (leejo, nugged)
 

@@ -565,7 +565,7 @@ authentication.
     return 1 if $c->req->headers->header('X-Bender');
 
     # Not authenticated
-    $c->render(text => "You're not Bender.");
+    $c->render(text => "You're not Bender.", status => 401);
     return undef;
   });
   $auth->get('/blackjack')->to('hideout#blackjack');

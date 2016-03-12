@@ -362,7 +362,15 @@ ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 
 # 404 response
 $tx = $ua->get('/does_not_exist');
+ok !$tx->success,    'not successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok $tx->keep_alive, 'keep connection alive';
+is $tx->error->{message}, 'Not Found', 'right error';
+is $tx->error->{code},    404,         'right status';
+$tx = $ua->get('/does_not_exist');
 ok !$tx->success, 'not successful';
+ok $tx->kept_alive, 'kept connection alive';
+ok $tx->keep_alive, 'keep connection alive';
 is $tx->error->{message}, 'Not Found', 'right error';
 is $tx->error->{code},    404,         'right status';
 

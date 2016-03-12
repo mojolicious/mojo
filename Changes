@@ -1,5 +1,6 @@
 
-6.56  2016-03-09
+6.56  2016-03-12
+  - Fix keep-alive bug (jberger)
 
 6.55  2016-03-08
   - Deprecated Mojo::Server::Morbo::check in favor of

@@ -237,9 +237,7 @@ sub _finish {
     return $new->client_read($old->res->content->leftovers);
   }
 
-  # Finish connection
   $self->_reuse($id, $close);
-
   if ($res->is_status_class(400) || $res->is_status_class(500)) {
     $res->error({message => $res->message, code => $res->code});
   }

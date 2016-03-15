@@ -127,10 +127,15 @@ sub dumper {
 sub encode { _encoding($_[0])->encode("$_[1]") }
 
 sub files {
-  my $dir = shift;
+  my ($dir, $options) = (shift, shift // {});
+
+  # This may break in the future, but is worth it for performance
+  local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
+
   my @files;
   my $wanted = sub { -d $File::Find::name or push @files, $File::Find::name };
   find {wanted => $wanted, no_chdir => 1}, $dir if -d $dir;
+
   return sort @files;
 }
 
@@ -586,11 +591,24 @@ Encode characters to bytes.
 =head2 files
 
   my @files = files '/tmp/uploads';
+  my @files = files '/tmp/uploads', {hidden => 1};
 
 List all files recursively in a directory.
 
   # List all templates
   say for files '/home/sri/myapp/templates';
+
+These options are currently available:
+
+=over 2
+
+=item hidden
+
+  hidden => 1
+
+Include hidden files and directories.
+
+=back
 
 =head2 hmac_sha1_sum
 

@@ -423,6 +423,9 @@ my @files = map { catfile $lib, split '/' } (
   'LoaderTest/C.pm'
 );
 is_deeply [map { catfile splitdir $_ } files $lib], \@files, 'right files';
+my @hidden = map { catfile $lib, split '/' } '.hidden.txt', '.test/hidden.txt';
+is_deeply [map { catfile splitdir $_ } files $lib, {hidden => 1}],
+  [@hidden, @files], 'right files';
 
 # steady_time
 like steady_time, qr/^[\d.]+$/, 'high resolution time';

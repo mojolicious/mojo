@@ -119,6 +119,7 @@ is_deeply $morbo->modified_files, [], 'directory has not changed';
 my @new = map { catfile $subdir, "$_.txt" } qw/test testing/;
 spurt 'whatever', $_ for @new;
 is_deeply $morbo->modified_files, \@new, 'two files have changed';
+spurt 'whatever', catfile($subdir, '.hidden.txt');
 is_deeply $morbo->modified_files, [], 'directory has not changed again';
 
 # Stop

@@ -1360,10 +1360,10 @@ that they will be picked up automatically by the command line interface?
     my ($self, @args) = @_;
 
     # Leak secret passphrases
-    say for @{$self->app->secrets} if $args[0] eq 'secrets';
+    if ($args[0] eq 'secrets') { say for @{$self->app->secrets} }
 
     # Leak mode
-    say $self->app->mode if $args[0] eq 'mode';
+    elsif ($args[0] eq 'mode') { say $self->app->mode }
   }
 
   1;

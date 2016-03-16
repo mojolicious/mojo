@@ -1,4 +1,6 @@
 
+6.57  2016-03-17
+
 6.56  2016-03-16
   - Added hidden option to list_files method in Mojo::Home. (batman, sri)
   - Added hidden option to files function in Mojo::Util. (batman, sri)

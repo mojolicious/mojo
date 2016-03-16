@@ -132,11 +132,12 @@ sub files {
   # This may break in the future, but is worth it for performance
   local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
 
-  my @files;
-  my $wanted = sub { -d $File::Find::name or push @files, $File::Find::name };
-  find {wanted => $wanted, no_chdir => 1}, $dir if -d $dir;
+  my %files;
+  my $want = sub { $files{$_}++ };
+  my $post = sub { delete $files{$File::Find::dir} };
+  find {wanted => $want, postprocess => $post, no_chdir => 1}, $dir if -d $dir;
 
-  return sort @files;
+  return sort keys %files;
 }
 
 sub html_unescape {

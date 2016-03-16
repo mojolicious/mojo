@@ -133,7 +133,7 @@ sub files {
   local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
 
   my %files;
-  my $want = sub { $files{$_}++ };
+  my $want = sub { $files{$File::Find::name}++ };
   my $post = sub { delete $files{$File::Find::dir} };
   find {wanted => $want, postprocess => $post, no_chdir => 1}, $dir if -d $dir;
 

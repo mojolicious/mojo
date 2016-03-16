@@ -59,7 +59,7 @@ sub _manage {
     say @files == 1
       ? qq{File "@{[$files[0]]}" changed, restarting.}
       : qq{@{[scalar @files]} files changed, restarting.}
-      if $ENV{MORBO_DEBUG};
+      if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;
   }

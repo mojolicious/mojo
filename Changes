@@ -3,6 +3,7 @@
   - Added hidden option to list_files method in Mojo::Home. (batman, sri)
   - Added hidden option to files function in Mojo::Util. (batman, sri)
   - Fixed bug where Morbo would not ignore hidden files. (batman, sri)
+  - Fixed bug where Morbo would ignore the --verbose option.
   - Fixed keep-alive bug in Mojo::UserAgent. (jberger)
 
 6.55  2016-03-08

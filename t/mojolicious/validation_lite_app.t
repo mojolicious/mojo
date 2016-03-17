@@ -63,8 +63,15 @@ ok !$validation->required('does_not_exist')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('does_not_exist'), ['required'], 'right error';
-$validation = $t->app->validation->input({foo => [], bar => ['a']});
+$validation = $t->app->validation->input(
+  {foo => [], bar => ['a'], baz => undef, yada => [undef]});
 ok !$validation->optional('foo')->is_valid, 'not valid';
+is_deeply $validation->output, {}, 'right result';
+ok !$validation->has_error, 'no error';
+ok !$validation->optional('baz')->is_valid, 'not valid';
+is_deeply $validation->output, {}, 'right result';
+ok !$validation->has_error, 'no error';
+ok !$validation->optional('yada')->is_valid, 'not valid';
 is_deeply $validation->output, {}, 'right result';
 ok !$validation->has_error, 'no error';
 ok $validation->optional('bar')->is_valid, 'valid';

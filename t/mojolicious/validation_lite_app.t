@@ -184,10 +184,12 @@ is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok !$validation->optional('missing', 'trim')->is_valid, 'not valid';
 ok $validation->optional('baz', 'trim')->like(qr/^\d$/)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar', baz => [0, 1]}, 'right result';
-$validation = $t->app->validation->input({nothing => '  '});
+$validation = $t->app->validation->input({nothing => '  ', more => [undef]});
 ok !$validation->required('nothing', 'trim')->is_valid, 'not valid';
 is_deeply $validation->output, {}, 'right result';
 ok $validation->required('nothing')->is_valid, 'valid';
+is_deeply $validation->output, {nothing => '  '}, 'right result';
+ok !$validation->optional('more', 'trim')->is_valid, 'not valid';
 is_deeply $validation->output, {nothing => '  '}, 'right result';
 
 # Custom filter

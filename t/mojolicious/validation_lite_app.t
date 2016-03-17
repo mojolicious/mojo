@@ -40,7 +40,7 @@ any '/forgery' => sub {
 my $t = Test::Mojo->new;
 
 # Required and optional values
-my $validation = $t->app->validation->input({foo => 'bar', baz => 'yada'});
+my $validation = $t->app->validation->input({foo => 'bar', baz => 'yada', moo => ['test']});
 is_deeply $validation->passed, [], 'no names';
 is_deeply $validation->failed, [], 'no names';
 is $validation->param('foo'), undef, 'no value';
@@ -63,6 +63,8 @@ ok !$validation->required('does_not_exist')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('does_not_exist'), ['required'], 'right error';
+ok $validation->required('moo')->is_valid, 'valid';
+is_deeply $validation->output->{moo}, ['test'], 'not disarrayed';
 
 # Equal to
 $validation

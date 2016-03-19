@@ -251,7 +251,8 @@ Close stream gracefully.
 
   my $handle = $stream->handle;
 
-Get handle for stream.
+Get handle for stream, usually an L<IO::Socket::IP> or L<IO::Socket::SSL>
+object.
 
 =head2 is_readable
 

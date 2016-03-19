@@ -231,7 +231,7 @@ Find a free TCP port, primarily used for tests.
 
   my $handle = $server->handle;
 
-Get handle for server.
+Get handle for server, usually an L<IO::Socket::IP> object.
 
 =head2 is_accepting
 

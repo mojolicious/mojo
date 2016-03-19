@@ -36,8 +36,8 @@ to generate a small example application.
 =head2 Commands
 
 Many different L<commands|Mojolicious::Commands/"COMMANDS"> are automatically
-available from the command line. CGI and L<PSGI> environments can usually be
-auto-detected and will just work without commands.
+available from the command line. CGI and L<PSGI> environments can even be
+detected and will usually just work without commands.
 
   $ ./myapp.pl daemon
   Server available at http://127.0.0.1:3000
@@ -55,8 +55,8 @@ auto-detected and will just work without commands.
   ...List of available commands (or automatically detected environment)...
 
 A call to L<Mojolicious/"start"> (C<app-E<gt>start>), which starts the command
-system, should usually be the last expression in your application, because its
-return value can be significant.
+system, should be the last expression in your application, because its return
+value can be significant.
 
   # Use @ARGV to pick a command
   app->start;

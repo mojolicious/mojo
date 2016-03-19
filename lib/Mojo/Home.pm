@@ -116,7 +116,7 @@ Path to C<lib> directory of application.
 Portably list all files recursively in directory relative to the home directory.
 
   # List layouts
-  say for @{$home->list_files('templates/layouts')};
+  say $home->rel_file($_) for @{$home->list_files('templates/layouts')};
 
 These options are currently available:
 

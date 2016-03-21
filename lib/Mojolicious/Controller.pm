@@ -619,7 +619,7 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 =head2 render
 
   my $bool = $c->render;
-  my $bool = $c->render(controller => 'foo', action => 'bar');
+  my $bool = $c->render(foo => 'bar', baz => 23);
   my $bool = $c->render(template => 'foo/index');
   my $bool = $c->render(template => 'index', format => 'html');
   my $bool = $c->render(data => $bytes);
@@ -678,7 +678,7 @@ automatic rendering would result in a response.
 =head2 render_maybe
 
   my $bool = $c->render_maybe;
-  my $bool = $c->render_maybe(controller => 'foo', action => 'bar');
+  my $bool = $c->render_maybe(foo => 'bar', baz => 23);
   my $bool = $c->render_maybe('foo/index', format => 'html');
 
 Try to render content, but do not call

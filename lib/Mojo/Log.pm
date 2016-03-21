@@ -26,7 +26,8 @@ my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
 # DEPRECATED!
 for my $name (qw(debug error info warn)) {
   monkey_patch __PACKAGE__, "is_$name", sub {
-    deprecated "Mojo::Log::$name is DEPRECATED in favor of Mojo::Log::is_level";
+    deprecated
+      "Mojo::Log::is_$name is DEPRECATED in favor of Mojo::Log::is_level";
     shift->is_level($name);
   };
 }

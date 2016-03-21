@@ -685,7 +685,7 @@ if it exists.
   $ mkdir -p templates/foo
   $ echo 'Hello World!' > templates/foo/bar.html.ep
 
- They have a higher precedence than templates in the C<DATA> section.
+They have a higher precedence than templates in the C<DATA> section.
 
   use Mojolicious::Lite;
 

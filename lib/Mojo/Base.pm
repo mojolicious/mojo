@@ -222,8 +222,8 @@ pass it either a hash or a hash reference with attribute values.
 =head2 tap
 
   $object = $object->tap(sub {...});
-  $object = $object->tap($method);
-  $object = $object->tap($method, @args);
+  $object = $object->tap('some_method');
+  $object = $object->tap('some_method', @args);
 
 Tap into a method chain to perform operations on an object within the chain
 (also known as a K combinator or Kestrel). The object will be the first argument
@@ -233,7 +233,7 @@ be the return value. In this way, arbitrary code can be used within (i.e.,
 spliced or tapped into) a chained set of object method calls.
 
   # Longer version
-  $object = $object->tap(sub { $_->$method(@args) });
+  $object = $object->tap(sub { $_->some_method(@args) });
 
   # Inject side effects into a method chain
   $object->foo('A')->tap(sub { say $_->foo })->foo('B');

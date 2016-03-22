@@ -287,7 +287,7 @@ Address or host name of the peer to connect to, defaults to C<127.0.0.1>.
 
   handle => $handle
 
-Use an already prepared handle.
+Use an already prepared L<IO::Socket::IP> object.
 
 =item local_address
 

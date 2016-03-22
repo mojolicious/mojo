@@ -1,5 +1,5 @@
 
-6.57  2016-03-21
+6.57  2016-03-22
   - Fixed a few validation bugs in Mojolicious::Validator::Validation.
     (Mikey, sri)
 

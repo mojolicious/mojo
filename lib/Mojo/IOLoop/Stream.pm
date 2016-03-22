@@ -283,7 +283,7 @@ Start or resume watching for new data on the stream.
 
   my $handle = $stream->steal_handle;
 
-Steal handle from stream and prevent it from getting closed automatically.
+Steal L</"handle"> and prevent it from getting closed automatically.
 
 =head2 stop
 

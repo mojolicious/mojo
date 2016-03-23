@@ -2,6 +2,7 @@
 6.57  2016-03-23
   - Fixed a few validation bugs in Mojolicious::Validator::Validation.
     (Mikey, sri)
+  - Fixed copyright notice.
 
 6.56  2016-03-16
   - Added hidden option to list_files method in Mojo::Home. (batman, sri)

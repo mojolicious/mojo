@@ -276,6 +276,16 @@ resolve issues and learning from mistakes.
 
 Original text courtesy of the L<Speak Up! project|http://speakup.io/coc.html>.
 
+=head1 FORKS
+
+The Mojolicious Core Team believes that there is a lot of value in the entire
+toolkit being a unified project. Forks drain resources from the original
+project, not just the mindshare but also very valuable bug reports and patches.
+Therefore we ask that you to please not publically fork pieces of the
+Mojolicious distribution without our consent. As doing so is against our express
+wishes, people who engage in unauthorized forking will not be allowed to
+participate in community sponsored spaces.
+
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the

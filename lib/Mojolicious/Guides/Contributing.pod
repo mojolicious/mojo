@@ -278,7 +278,7 @@ Original text courtesy of the L<Speak Up! project|http://speakup.io/coc.html>.
 
 =head1 FORKS
 
-The Mojolicious Core Team believes that there is a lot of value in the entire
+The Mojolicious core team believes that there is a lot of value in the entire
 toolkit being a unified project. Forks drain resources from the original
 project, not just the mindshare but also very valuable bug reports and patches.
 Therefore we ask that you to please not publically fork pieces of the

@@ -155,17 +155,13 @@ sub punycode_decode {
   my $input = shift;
   use integer;
 
-  my $n    = PC_INITIAL_N;
-  my $i    = 0;
-  my $bias = PC_INITIAL_BIAS;
-  my @output;
+  my ($n, $i, $bias, @output) = (PC_INITIAL_N, 0, PC_INITIAL_BIAS);
 
   # Consume all code points before the last delimiter
   push @output, split('', $1) if $input =~ s/(.*)\x2d//s;
 
   while (length $input) {
-    my $oldi = $i;
-    my $w    = 1;
+    my ($oldi, $w) = ($i, 1);
 
     # Base to infinity in steps of base
     for (my $k = PC_BASE; 1; $k += PC_BASE) {
@@ -192,25 +188,20 @@ sub punycode_encode {
   my $output = shift;
   use integer;
 
-  my $n     = PC_INITIAL_N;
-  my $delta = 0;
-  my $bias  = PC_INITIAL_BIAS;
+  my ($n, $delta, $bias) = (PC_INITIAL_N, 0, PC_INITIAL_BIAS);
 
   # Extract basic code points
-  my $len   = length $output;
   my @input = map {ord} split '', $output;
-  my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
   $output =~ s/[^\x00-\x7f]+//gs;
   my $h = my $basic = length $output;
   $output .= "\x2d" if $basic > 0;
 
-  for my $m (@chars) {
+  for my $m (sort grep { $_ >= PC_INITIAL_N } @input) {
     next if $m < $n;
     $delta += ($m - $n) * ($h + 1);
     $n = $m;
 
-    for (my $i = 0; $i < $len; $i++) {
-      my $c = $input[$i];
+    for my $c (@input) {
 
       if ($c < $n) { $delta++ }
       elsif ($c == $n) {

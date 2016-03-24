@@ -186,8 +186,8 @@ such a grant for a core developer please email C<sri@cpan.org>.
 
 =head1 CODE OF CONDUCT
 
-Like the technical community as a whole, the Mojolicious team and community is
-made up of a mixture of professionals and volunteers from all over the world,
+Like the technical community as a whole, the L<Mojolicious> team and community
+is made up of a mixture of professionals and volunteers from all over the world,
 working on every aspect of the mission - including mentorship, teaching, and
 connecting people.
 
@@ -200,10 +200,10 @@ This isn’t an exhaustive list of things that you can’t do. Rather, take it i
 the spirit in which it’s intended - a guide to make it easier to enrich all of
 us and the technical communities in which we participate.
 
-This code of conduct applies to all spaces managed by the Mojolicious project.
-This includes IRC, the mailing lists, the issue tracker, and any other forums
-created by the project team which the community uses for communication. In
-addition, violations of this code outside these spaces may affect a person's
+This code of conduct applies to all spaces managed by the L<Mojolicious>
+project. This includes IRC, the mailing lists, the issue tracker, and any other
+forums created by the project team which the community uses for communication.
+In addition, violations of this code outside these spaces may affect a person's
 ability to participate within them.
 
 If you believe someone is violating the code of conduct, we ask that you report
@@ -232,8 +232,8 @@ disagreement is no excuse for poor behavior and poor manners. We might all
 experience some frustration now and then, but we cannot allow that frustration
 to turn into a personal attack. It’s important to remember that a community
 where people feel uncomfortable or threatened is not a productive one. Members
-of the Mojolicious community should be respectful when dealing with other
-members as well as with people outside the Mojolicious community.
+of the L<Mojolicious> community should be respectful when dealing with other
+members as well as with people outside the L<Mojolicious> community.
 
 =item * B<Be careful in the words that you choose.> We are a community of
 professionals, and we conduct ourselves professionally. Be kind to others. Do
@@ -263,10 +263,10 @@ then stop.
 =back
 
 =item * B<When we disagree, try to understand why.> Disagreements, both social
-and technical, happen all the time and Mojolicious is no exception. It is
+and technical, happen all the time and L<Mojolicious> is no exception. It is
 important that we resolve disagreements and differing views constructively.
-Remember that we’re different. The strength of Mojolicious comes from its varied
-community, people from a wide range of backgrounds. Different people have
+Remember that we’re different. The strength of L<Mojolicious> comes from its
+varied community, people from a wide range of backgrounds. Different people have
 different perspectives on issues. Being unable to understand why someone holds a
 viewpoint doesn’t mean that they’re wrong. Don’t forget that it is human to err
 and blaming each other doesn’t get us anywhere. Instead, focus on helping to
@@ -278,12 +278,12 @@ Original text courtesy of the L<Speak Up! project|http://speakup.io/coc.html>.
 
 =head1 FORKS
 
-The Mojolicious core team believes that there is a lot of value in the entire
+The L<Mojolicious> core team believes that there is a lot of value in the entire
 toolkit being a unified project. Forks drain resources from the original
 project, not just the mindshare but also very valuable bug reports and patches.
-Therefore we ask that you to please not publically fork pieces of the
-Mojolicious distribution without our consent. As doing so is against our express
-wishes, people who engage in unauthorized forking will not be allowed to
+Therefore we ask that you please not publically fork pieces of the
+L<Mojolicious> distribution without our consent. As doing so is against our
+express wishes, people who engage in unauthorized forking will not be allowed to
 participate in community sponsored spaces.
 
 =head1 MORE

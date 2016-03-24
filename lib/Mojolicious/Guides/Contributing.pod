@@ -279,12 +279,12 @@ Original text courtesy of the L<Speak Up! project|http://speakup.io/coc.html>.
 =head1 FORKS
 
 The L<Mojolicious> core team believes that there is a lot of value in the entire
-toolkit being a unified project. Forks drain resources from the original
-project, not just the mindshare but also very valuable bug reports and patches.
-Therefore we ask that you please not publically fork pieces of the
-L<Mojolicious> distribution without our consent. As doing so is against our
-express wishes, people who engage in unauthorized forking will not be allowed to
-participate in community sponsored spaces.
+toolkit being a unified project. Forks drain resources from a project, not just
+mindshare but also very valuable bug reports and patches, which can have very
+serious security implications. Therefore we ask that you please not publically
+fork pieces of the L<Mojolicious> distribution without our consent. As doing so
+is against our express wishes, individuals who engage in unauthorized forking
+may be denied from participating in community sponsored spaces.
 
 =head1 MORE
 

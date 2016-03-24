@@ -109,7 +109,7 @@ is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was not kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
@@ -117,7 +117,7 @@ is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was not kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 

@@ -218,7 +218,9 @@ use the C<MOJO_REACTOR> environment variable to enforce a more portable one.
 L<Mojolicious> uses secret passphrases for security features such as signed
 cookies. It defaults to using L<Mojolicious/"moniker">, which is not very
 secure, so we added this log message as a reminder. You can change the
-passphrase with the attribute L<Mojolicious/"secrets">.
+passphrase with the attribute L<Mojolicious/"secrets">. Since some plugins also
+depend on it, you should try changing it as early as possible in your
+application.
 
   $app->secrets(['My very secret passphrase.']);
 

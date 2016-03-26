@@ -1348,7 +1348,8 @@ L<Mojolicious::Plugins/"PLUGINS"> for a few ideas.
 
 By now you've probably used many of the built-in commands described in
 L<Mojolicious::Commands>, but did you know that you can just add new ones and
-that they will be picked up automatically by the command line interface?
+that they will be picked up automatically by the command line interface if they
+are placed in a directory from C<@INC>?
 
   package Mojolicious::Command::spy;
   use Mojo::Base 'Mojolicious::Command';
@@ -1374,7 +1375,7 @@ attributes and methods in L<Mojolicious::Command> that you can use or overload.
   $ mojo spy secrets
   HelloWorld
 
-  $ ./myapp.pl spy secrets
+  $ ./script/myapp spy secrets
   secr3t
 
 And to make your commands application specific, just add a custom namespace to
@@ -1397,7 +1398,7 @@ C<MyApp::Command::spy> instead of C<Mojolicious::Command::spy>.
 The options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode> are handled
 automatically by L<Mojolicious::Commands> and are shared by all commands.
 
-  $ ./myapp.pl spy -m production mode
+  $ ./script/myapp spy -m production mode
   production
 
 For a full list of shared options see L<Mojolicious::Commands/"SYNOPSIS">.

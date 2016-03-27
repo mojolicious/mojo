@@ -287,12 +287,12 @@ fork pieces of the L<Mojolicious> distribution without our consent. As doing so
 is against our express wishes, individuals who engage in unauthorized forking
 may be denied from participating in community sponsored spaces.
 
-For users considering the use of a forked module, we strongly recommend that you
-inform yourself about the history of said fork and the maintainers behind it.
-While many parts of L<Mojolicious> have been forked in the past, sometimes for
-good reasons such as compatibility with older versions of Perl, very few have
-been able to keep up with L<Mojolicious>, and are often missing critical bug
-fixes.
+For deveopers considering the use of a forked module, we strongly recommend that
+you inform yourself about the history of said fork and the maintainers behind
+it. While many parts of L<Mojolicious> have been forked in the past, sometimes
+for good reasons such as compatibility with older versions of Perl, very few
+forks have been able to keep up with L<Mojolicious> development, and are often
+missing critical bug fixes.
 
 =head1 MORE
 

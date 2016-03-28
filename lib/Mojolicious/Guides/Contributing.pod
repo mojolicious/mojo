@@ -290,7 +290,7 @@ may be denied from participating in community sponsored spaces.
 For developers considering the use of a forked module, we strongly recommend
 that you make yourself familiar with its history and track record. While many
 parts of L<Mojolicious> have been forked in the past, very few forks have been
-able to keep up with L<Mojolicious> development, and are often missing critical
+able to keep up with L<Mojolicious> development, and most are missing critical
 bug fixes.
 
 =head1 MORE

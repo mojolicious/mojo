@@ -284,8 +284,11 @@ Construct a new array-based L<Mojo::Collection> object.
   my $result = $collection->reduce(sub {...});
   my $result = $collection->reduce(sub {...}, $initial);
 
-Reduce elements in collection with callback, the first element will be used as
-initial value if none has been provided.
+Reduce elements in collection with a callback and return its final result,
+setting C<$a> and C<$b> each time the callback is executed. The first time C<$a>
+will be set to an optional initial value or the first element in the collection.
+And from then on C<$a> will be set to the return value of the callback, while
+C<$b> will always be set to the next element in the collection.
 
   # Calculate the sum of all values
   my $sum = $collection->reduce(sub { $a + $b });
@@ -325,8 +328,9 @@ Number of elements in collection.
   my $new = $collection->sort;
   my $new = $collection->sort(sub {...});
 
-Sort elements based on return value of callback and create a new collection
-from the results.
+Sort elements based on return value of a callback and create a new collection
+from the results, setting C<$a> and C<$b> to the elements being compared, each
+time the callback is executed.
 
   # Sort values case-insensitive
   my $case_insensitive = $collection->sort(sub { uc($a) cmp uc($b) });

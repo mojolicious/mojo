@@ -63,7 +63,7 @@ changes and add new information to the
 L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
 
 Pull requests with additions or changes to the documentation included in the
-L<Mojolicious> distribution, follow the same rules as code contributions. Please
+L<Mojolicious> distribution follow the same rules as code contributions. Please
 don't send pull requests for overly simplistic changes, such as the addition of
 a comma or semicolon.
 

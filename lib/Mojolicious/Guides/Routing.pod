@@ -241,8 +241,8 @@ but content will not be sent with the response even if it is present.
   # HEAD /test -> {controller => 'bar', action => 'test'}
   $r->get('/test')->to(controller => 'bar', action => 'test');
 
-You can also use the C<_method> query parameter to override the request method,
-this can be very useful when submitting forms with browsers that only support
+You can also use the C<_method> query parameter to override the request method.
+This can be very useful when submitting forms with browsers that only support
 C<GET> and C<POST>.
 
   # PUT  /stuff             -> {controller => 'baz', action => 'stuff'}
@@ -418,7 +418,7 @@ which usually looks much better.
 =head2 Named routes
 
 Naming your routes will allow backreferencing in many methods and helpers
-throughout the whole framework, most of them internally rely on
+throughout the whole framework, most of which internally rely on
 L<Mojolicious::Controller/"url_for"> for this.
 
   # /foo/marcus -> {controller => 'foo', action => 'bar', user => 'marcus'}

@@ -234,14 +234,14 @@ arbitrary request methods as first argument.
   # * /whatever -> {controller => 'foo', action => 'whatever'}
   $r->any('/whatever')->to(controller => 'foo', action => 'whatever');
 
-There is one small exception, C<HEAD> requests are considered equal to C<GET>,
+There is one small exception: C<HEAD> requests are considered equal to C<GET>,
 but content will not be sent with the response even if it is present.
 
   # GET /test  -> {controller => 'bar', action => 'test'}
   # HEAD /test -> {controller => 'bar', action => 'test'}
   $r->get('/test')->to(controller => 'bar', action => 'test');
 
-You can also use the C<_method> query parameter to override the request method,
+You can also use the C<_method> query parameter to override the request method;
 this can be very useful when submitting forms with browsers that only support
 C<GET> and C<POST>.
 
@@ -418,7 +418,7 @@ which usually looks much better.
 =head2 Named routes
 
 Naming your routes will allow backreferencing in many methods and helpers
-throughout the whole framework, most of them internally rely on
+throughout the whole framework, most of which internally rely on
 L<Mojolicious::Controller/"url_for"> for this.
 
   # /foo/marcus -> {controller => 'foo', action => 'bar', user => 'marcus'}
@@ -435,7 +435,7 @@ L<Mojolicious::Controller/"url_for"> for this.
 
 You can assign a name with L<Mojolicious::Routes::Route/"name">, or let the
 router generate one automatically, which would be equal to the route itself
-without non-word characters, custom names have a higher precedence though.
+without non-word characters. Custom names have a higher precedence.
 
   # /foo/bar ("foobar")
   $r->get('/foo/bar')->to('test#stuff');

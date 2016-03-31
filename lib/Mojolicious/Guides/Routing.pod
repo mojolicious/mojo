@@ -852,8 +852,9 @@ with L<Mojolicious::Routes/"add_shortcut">.
 
 =head2 Rearranging routes
 
-Until the first request has been handled, all routes can still be moved around
-or even removed with methods like L<Mojolicious::Routes::Route/"add_child"> and
+From application startup until the first request has arrived, all routes can
+still be moved around or even removed with methods like
+L<Mojolicious::Routes::Route/"add_child"> and
 L<Mojolicious::Routes::Route/"remove">.
 
   # GET /example/show -> {controller => 'example', action => 'show'}

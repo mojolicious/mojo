@@ -1,6 +1,7 @@
 
-6.58  2016-03-31
+6.58  2016-04-02
   - Added fork policy to Mojolicious::Guides::Contributing.
+  - Improved Mojo::JSON to generate canonical JSON objects.
 
 6.57  2016-03-23
   - Fixed a few validation bugs in Mojolicious::Validator::Validation.

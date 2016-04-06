@@ -1,5 +1,5 @@
 
-6.58  2016-04-02
+6.58  2016-04-06
   - Added fork policy to Mojolicious::Guides::Contributing.
   - Improved Mojo::JSON to generate canonical JSON objects.
 

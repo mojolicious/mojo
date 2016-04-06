@@ -610,10 +610,15 @@ For more control you can also access request information directly.
   $c = $c->redirect_to('/index.html');
   $c = $c->redirect_to('http://example.com/index.html');
 
-Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
+Prepare a C<302> (if the status code is not already C<3xx>) redirect response
+with C<Location> header, takes the same arguments as L</"url_for">.
 
-  # Moved permanently
+  # Moved Permanently
   $c->res->code(301);
+  $c->redirect_to('some_route');
+
+  # Temporary Redirect
+  $c->res->code(307);
   $c->redirect_to('some_route');
 
 =head2 render

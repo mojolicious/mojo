@@ -1474,9 +1474,9 @@ to the proper shebang during installation.
 
   use FindBin;
   BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+  use Mojolicious::Commands;
 
   # Start command line interface for application
-  require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
 That's really everything, now you can package your application like any other

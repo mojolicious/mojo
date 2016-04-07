@@ -629,9 +629,9 @@ allow running tests again.
   use warnings;
 
   use lib 'lib';
+  use Mojolicious::Commands;
 
   # Start command line interface for application
-  require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
 And the directory structure of our hybrid application should be looking like
@@ -754,9 +754,9 @@ C<@INC>, allowing us to start the application from outside its home directory.
 
   use FindBin;
   BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+  use Mojolicious::Commands;
 
   # Start command line interface for application
-  require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
 =head2 Simplified tests

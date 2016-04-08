@@ -56,6 +56,7 @@ is $e->lines_after->[1][0], 6,    'right number';
 is $e->lines_after->[1][1], '1;', 'right line';
 like "$e", qr/Exception/, 'right message';
 
+## issue/944
 $e = load_class 'Mojo::LoaderException3';
 isa_ok $e, 'Mojo::Exception', 'still an exception';
 $e = load_class 'Mojo::LoaderException3';

@@ -416,11 +416,11 @@ is_deeply [files 'does_not_exist'], [], 'no files';
 is_deeply [files __FILE__],         [], 'no files';
 my $lib = catdir dirname(__FILE__), 'lib', 'Mojo';
 my @files = map { catfile $lib, split '/' } (
-  'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
-  'BaseTest/Base3.pm',  'DeprecationTest.pm',
-  'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest/A.pm',    'LoaderTest/B.pm',
-  'LoaderTest/C.pm'
+  'BaseTest/Base1.pm',   'BaseTest/Base2.pm',
+  'BaseTest/Base3.pm',   'DeprecationTest.pm',
+  'LoaderException.pm',  'LoaderException2.pm',
+  'LoaderException3.pm', 'LoaderTest/A.pm',
+  'LoaderTest/B.pm',     'LoaderTest/C.pm'
 );
 is_deeply [map { catfile splitdir $_ } files $lib], \@files, 'right files';
 my @hidden = map { catfile $lib, split '/' } '.hidden.txt', '.test/hidden.txt';

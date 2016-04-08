@@ -51,11 +51,11 @@ is $home->rel_dir('foo/bar'), catdir(splitdir($FindBin::Bin), 'foo', 'bar'),
 is_deeply $home->list_files('lib/does_not_exist'), [], 'no files';
 is_deeply $home->list_files('lib/myapp.pl'),       [], 'no files';
 my @files = (
-  'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
-  'BaseTest/Base3.pm',  'DeprecationTest.pm',
-  'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest/A.pm',    'LoaderTest/B.pm',
-  'LoaderTest/C.pm'
+  'BaseTest/Base1.pm',   'BaseTest/Base2.pm',
+  'BaseTest/Base3.pm',   'DeprecationTest.pm',
+  'LoaderException.pm',  'LoaderException2.pm',
+  'LoaderException3.pm', 'LoaderTest/A.pm',
+  'LoaderTest/B.pm',     'LoaderTest/C.pm'
 );
 is_deeply $home->list_files('lib/Mojo'), \@files, 'right files';
 my @hidden = ('.hidden.txt', '.test/hidden.txt');

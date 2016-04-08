@@ -6,6 +6,7 @@ use File::Basename 'fileparse';
 use File::Spec::Functions qw(catdir catfile splitdir);
 use Mojo::Exception;
 use Mojo::Util qw(b64_decode class_to_path);
+use Symbol 'delete_package';
 
 our @EXPORT_OK
   = qw(data_section file_is_binary find_modules find_packages load_class);
@@ -47,13 +48,27 @@ sub load_class {
   return 1 if ($class || '') !~ /^\w(?:[\w:']*\w)?$/;
 
   # Load if not already loaded
-  return undef if $class->can('new') || eval "require $class; 1";
+  return undef if $class->can('new') || eval { _load_class($class) };
 
   # Does not exist
   return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $class]}\E in \@INC/;
 
   # Real error
   return Mojo::Exception->new($@)->inspect;
+}
+
+sub _load_class {
+    my $class  = shift;
+    my $result = eval "require $class; 1";
+
+    if ($@) {
+	if ($class->can('new')) {
+	    delete_package $class;
+	}
+	die $@;
+    }
+
+    return $result;
 }
 
 sub _all {

@@ -1,7 +1,9 @@
 
-6.58  2016-04-07
+6.58  2016-04-08
   - Added fork policy to Mojolicious::Guides::Contributing.
   - Improved Mojo::JSON to generate canonical JSON objects.
+  - Fixed bug in Mojo::Loader where classes with exceptions could not be loaded
+    twice. (kiwiroy, sri)
 
 6.57  2016-03-23
   - Fixed a few validation bugs in Mojolicious::Validator::Validation.

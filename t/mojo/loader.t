@@ -38,6 +38,11 @@ is $e->line->[0], 7,    'right number';
 is $e->line->[1], "1;", 'right line';
 like "$e", qr/Missing right curly/, 'right message';
 
+# Exception again
+$e = load_class 'Mojo::LoaderException';
+isa_ok $e, 'Mojo::Exception', 'right exception';
+like $e->message, qr/Attempt to reload/, 'right message';
+
 # Complicated exception
 $e = load_class 'Mojo::LoaderException2';
 isa_ok $e, 'Mojo::Exception', 'right exception';
@@ -80,6 +85,7 @@ ok !!Mojo::LoaderTest::B->can('new'), 'loaded successfully';
 ok !!Mojo::LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
+is load_class('Mojo::LoaderTest'), 1, 'nothing to load';
 is load_class('Mojo::LoaderTest'), 1, 'nothing to load';
 
 # Invalid class

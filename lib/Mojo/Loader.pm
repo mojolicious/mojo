@@ -43,11 +43,14 @@ sub find_packages {
 sub load_class {
   my $class = shift;
 
-  # Check for a valid class name
+  # Invalid class name
   return 1 if ($class || '') !~ /^\w(?:[\w:']*\w)?$/;
 
-  # Load if not already loaded
-  return undef if $class->can('new') || eval "require $class; 1";
+  # Already loaded
+  return undef if $class->can('new');
+
+  # Success
+  eval "require $class; 1" ? return undef : Mojo::Util::_teardown($class);
 
   # Does not exist
   return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $class]}\E in \@INC/;

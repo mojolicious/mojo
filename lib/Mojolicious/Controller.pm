@@ -548,7 +548,7 @@ establish the WebSocket connection.
   # Do something after the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
-    $c->app->log->debug('We are done');
+    $c->app->log->debug('All data has been sent');
   });
 
   # Receive WebSocket message

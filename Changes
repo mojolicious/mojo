@@ -1,4 +1,6 @@
 
+6.59  2016-04-11
+
 6.58  2016-04-09
   - Removed deprecated build_frame and parse_frame methods from
     Mojo::Transaction::WebSocket.

@@ -1,5 +1,7 @@
 
 6.58  2016-04-09
+  - Removed deprecated build_frame and parse_frame methods from
+    Mojo::Transaction::WebSocket.
   - Added fork policy to Mojolicious::Guides::Contributing.
   - Improved Mojo::JSON to generate canonical JSON objects.
   - Fixed bug in Mojo::Loader where classes with exceptions could not be loaded

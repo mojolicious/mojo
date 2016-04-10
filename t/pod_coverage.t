@@ -13,9 +13,7 @@ my %RULES = (
   'Mojo::Server::Daemon' => {also_private => ['multi_accept']},
   'Mojo::Server::Morbo'  => {also_private => ['check']},
   'Mojo::Template'       => {also_private => ['build', 'compile', 'interpret']},
-  'Mojo::Transaction::WebSocket' =>
-    {also_private => [qw(build_frame parse_frame)]},
-  'Mojo::Util' => {also_private => ['xss_escape']}
+  'Mojo::Util'           => {also_private => ['xss_escape']}
 );
 pod_coverage_ok($_, $RULES{$_} || {}) for all_modules();
 

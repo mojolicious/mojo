@@ -1,5 +1,6 @@
 
 6.59  2016-04-20
+  - Improved HTML Living Standard compliance of Mojo::DOM::HTML.
   - Improved Mojo::Server::Prefork to log when the manager process has been
     stopped.
 

@@ -86,6 +86,7 @@ sub run {
   $self->ioloop->max_accepts($self->accepts);
   $self->{running} = 1;
   $self->_manage while $self->{running};
+  $self->app->log->info("Manager $$ stopped");
 }
 
 sub _heartbeat { shift->{writer}->syswrite("$$:$_[0]\n") or exit 0 }

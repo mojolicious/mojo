@@ -85,6 +85,7 @@ like $log, qr/Manager $$ started/,                   'right message';
 like $log, qr/Creating process id file/,             'right message';
 like $log, qr/Stopping worker $spawn[0] gracefully/, 'right message';
 like $log, qr/Worker $spawn[0] stopped/,             'right message';
+like $log, qr/Manager $$ stopped/,                   'right message';
 $prefork->app->log->unsubscribe(message => $cb);
 
 # Process id file

@@ -3,6 +3,7 @@
   - Improved HTML Living Standard compliance of Mojo::DOM::HTML.
   - Improved Mojo::Server::Prefork to log when the manager process has been
     stopped.
+  - Fixed a few tests to keep up with breaking changes in IO::Socket::SSL.
 
 6.58  2016-04-09
   - Removed deprecated build_frame and parse_frame methods from

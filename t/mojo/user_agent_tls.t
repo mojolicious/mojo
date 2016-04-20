@@ -84,7 +84,7 @@ $listen
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt'
-  . '&ciphers=RC4-SHA:ALL'
+  . '&ciphers=AES256-SHA:ALL'
   . '&verify=0x00'
   . '&version=SSLv3';
 $daemon->listen([$listen])->start;
@@ -97,8 +97,8 @@ IO::Socket::SSL::set_defaults(SSL_version => 'SSLv3');
 $tx = $ua->get("https://127.0.0.1:$port");
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';
-is $ua->ioloop->stream($tx->connection)->handle->get_cipher, 'RC4-SHA',
-  'RC4-SHA has been negotiatied';
+is $ua->ioloop->stream($tx->connection)->handle->get_cipher, 'AES256-SHA',
+  'AES256-SHA has been negotiatied';
 is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'SSLv3',
   'SSLv3 has been negotiatied';
 

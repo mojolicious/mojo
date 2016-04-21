@@ -176,12 +176,20 @@ No names outside of C<Mojolicious.pm>.
 
 =head1 SPONSORSHIP
 
-Please consider sponsoring the ongoing development of L<Mojolicious>, especially
-if your company benefits from this project. We welcome your patronage on
+L<Mojolicious> is open source and free to use. However, the amount of effort
+needed to maintain the project and develop new features for it is not
+sustainable without proper financial backing. You can support the ongoing
+development of L<Mojolicious> through
 L<Gratipay|https://gratipay.com/mojolicious>,
 L<Bountysource|https://www.bountysource.com/teams/mojolicious>,
-L<PayPal|https://www.paypal.me/kraih> or through Bitcoin
+L<PayPal|https://www.paypal.me/kraih> or Bitcoin
 (C<1Cid78CmK4hvf78Ry8K2XeDx8pQHNh4hbz>).
+
+If you run a business and use L<Mojolicious> in a revenue generating product, it
+makes business sense to sponsor L<Mojolicious> development. Because it ensures
+that the project your product relies on stays healthy and actively maintained.
+It can also help your exposure within the community and will make it easier to
+attract L<Mojolicious> developers.
 
 Grants for contiguous full-time development, over the period of a few days, can
 also have a huge impact. They allow us to tackle complex issues that are

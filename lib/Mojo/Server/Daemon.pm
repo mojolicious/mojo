@@ -119,9 +119,9 @@ sub _close {
 
   # Finish gracefully
   if (my $tx = $self->{connections}{$id}{tx}) {
-    $tx->closed;
-    $self->_debug($id, 'Premature connection close')
+    $self->app->log->debug('Premature connection close')
       unless $tx->is_websocket || $tx->res->is_finished;
+    $tx->closed;
   }
 
   delete $self->{connections}{$id};

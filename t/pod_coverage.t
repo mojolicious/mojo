@@ -12,8 +12,7 @@ my %RULES = (
   'Mojo::IOLoop::Server' => {also_private => ['multi_accept']},
   'Mojo::Server::Daemon' => {also_private => ['multi_accept']},
   'Mojo::Server::Morbo'  => {also_private => ['check']},
-  'Mojo::Template'       => {also_private => ['build', 'compile', 'interpret']},
-  'Mojo::Util'           => {also_private => ['xss_escape']}
+  'Mojo::Template'       => {also_private => ['build', 'compile', 'interpret']}
 );
 pod_coverage_ok($_, $RULES{$_} || {}) for all_modules();
 

@@ -61,9 +61,6 @@ our @EXPORT_OK = (
   qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
 
-# DEPRECATED!
-push @EXPORT_OK, 'xss_escape';
-
 # Aliases
 monkey_patch(__PACKAGE__, 'b64_decode',    \&decode_base64);
 monkey_patch(__PACKAGE__, 'b64_encode',    \&encode_base64);
@@ -346,13 +343,6 @@ sub xor_encode {
   $output .= $buffer ^ $key
     while length($buffer = substr($input, 0, $len, '')) == $len;
   return $output .= $buffer ^ substr($key, 0, length $buffer, '');
-}
-
-# DEPRECATED!
-sub xss_escape {
-  deprecated
-    'Mojo::Util::xss_escape is DEPRECATED in favor of Mojo::Util::xml_escape';
-  xml_escape(@_);
 }
 
 sub _adapt {

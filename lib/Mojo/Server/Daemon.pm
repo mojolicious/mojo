@@ -118,7 +118,11 @@ sub _close {
   my ($self, $id) = @_;
 
   # Finish gracefully
-  if (my $tx = $self->{connections}{$id}{tx}) { $tx->closed }
+  if (my $tx = $self->{connections}{$id}{tx}) {
+    $tx->closed;
+    $self->_debug($id, 'Premature connection close')
+      unless $tx->is_websocket || $tx->res->is_finished;
+  }
 
   delete $self->{connections}{$id};
 }

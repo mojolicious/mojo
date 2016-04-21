@@ -1,6 +1,8 @@
 
 6.59  2016-04-21
   - Improved HTML Living Standard compliance of Mojo::DOM::HTML.
+  - Improved Mojo::Server::Daemon to log when a connection has been closed
+    prematurely.
   - Improved Mojo::Server::Prefork to log when the manager process has been
     stopped.
   - Fixed a few tests to keep up with breaking changes in IO::Socket::SSL.

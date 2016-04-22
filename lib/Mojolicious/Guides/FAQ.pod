@@ -259,7 +259,8 @@ response. While this is generally harmless in itself, special care must be taken
 for non-blocking operations that might still be active, because once the
 connection has been closed L<Mojolicious::Controller/"tx"> will no longer be
 available. In such cases you can use events like L<Mojo::Transaction/"finish">
-for cleaning up, or keep an extra reference to the transaction object.
+for cleaning up, or keep an extra reference to the transaction object, so it
+doesn't get destroyed too early.
 
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 

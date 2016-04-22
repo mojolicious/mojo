@@ -1,5 +1,5 @@
 
-6.59  2016-04-21
+6.59  2016-04-22
   - Removed deprecated xss_escape function from Mojo::Util.
   - Improved HTML Living Standard compliance of Mojo::DOM::HTML.
   - Improved Mojo::Server::Daemon to log when a connection has been closed

@@ -111,7 +111,6 @@ sub server {
   weaken $self;
   $server->on(
     accept => sub {
-
       my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->$cb($stream, $self->_stream($stream, $self->_id, 1));
 

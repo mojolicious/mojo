@@ -112,14 +112,14 @@ sub server {
   $server->on(
     accept => sub {
 
+      my $stream = Mojo::IOLoop::Stream->new(pop);
+      $self->$cb($stream, $self->_stream($stream, $self->_id, 1));
+
       # Enforce connection limit (randomize to improve load balancing)
       if (my $max = $self->max_accepts) {
         $self->{accepts} //= $max - int rand $max / 2;
         $self->stop_gracefully if ($self->{accepts} -= 1) <= 0;
       }
-
-      my $stream = Mojo::IOLoop::Stream->new(pop);
-      $self->$cb($stream, $self->_stream($stream, $self->_id, 1));
 
       # Stop accepting if connection limit has been reached
       $self->_not_accepting if $self->_limit;

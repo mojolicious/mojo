@@ -1,5 +1,7 @@
 
-6.60  2016-04-23
+6.60  2016-04-25
+  - Fixed bug in Mojo::IOLoop where stopping gracefully would sometimes result
+    in connections getting closed too early. (anparker, sri)
 
 6.59  2016-04-22
   - Removed deprecated xss_escape function from Mojo::Util.

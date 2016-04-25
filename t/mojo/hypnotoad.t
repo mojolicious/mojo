@@ -130,8 +130,10 @@ app->log->path('$log');
 plugin Config => {
   default => {
     hypnotoad => {
+      accepts => 2,
       inactivity_timeout => 3,
       listen => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
+      requests => 1,
       workers => 1
     }
   }
@@ -174,7 +176,7 @@ while (1) {
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
@@ -182,7 +184,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Application has been reloaded (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
@@ -190,16 +192,16 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
+ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Same result (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
+ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 

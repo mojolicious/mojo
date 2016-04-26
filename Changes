@@ -1,4 +1,6 @@
 
+6.61  2016-04-26
+
 6.60  2016-04-25
   - Fixed bug in Mojo::IOLoop where stopping gracefully would sometimes result
     in connections getting closed too early. (anparker, sri)

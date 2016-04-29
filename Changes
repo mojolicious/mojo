@@ -1,5 +1,7 @@
 
-6.61  2016-04-26
+6.61  2016-04-30
+  - Improved Mojo::Server::Daemon to no longer log when a connection has been
+    closed prematurely.
 
 6.60  2016-04-25
   - Fixed bug in Mojo::IOLoop where stopping gracefully would sometimes result

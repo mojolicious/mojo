@@ -300,17 +300,15 @@ Mojo::IOLoop->one_tick until $stash->{destroyed};
 ok !$stash->{writing}, 'finish event timing is right';
 ok $stash->{destroyed}, 'controller has been destroyed';
 
-# Request and inactivity timeouts
-$log = '';
-$cb  = $t->app->log->on(message => sub { $log .= pop });
-$tx  = $t->ua->request_timeout(0.5)->get('/too_long');
+# Request timeout
+$tx = $t->ua->request_timeout(0.5)->get('/too_long');
 is $tx->error->{message}, 'Request timeout', 'right error';
 $t->ua->request_timeout(0);
+
+# Inactivity timeout
 $tx = $t->ua->inactivity_timeout(0.5)->get('/too_long');
 is $tx->error->{message}, 'Inactivity timeout', 'right error';
 $t->ua->inactivity_timeout(20);
-like $log, qr/Premature connection close/, 'right message';
-$t->app->log->unsubscribe(message => $cb);
 
 # Transaction is available after rendering early in steps
 $t->get_ok('/steps')->status_is(200)->content_is('second');

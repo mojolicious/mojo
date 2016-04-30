@@ -2,6 +2,8 @@
 6.61  2016-04-30
   - Improved Mojo::Server::Daemon to no longer log when a connection has been
     closed prematurely.
+  - Fixed bug in Mojo::Content where the drain event would not always be emitted
+    for dynamically generated content with a Content-Length header.
 
 6.60  2016-04-25
   - Fixed bug in Mojo::IOLoop where stopping gracefully would sometimes result

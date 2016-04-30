@@ -72,7 +72,11 @@ get '/longpoll/length' => sub {
   Mojo::IOLoop->timer(
     0.25 => sub {
       $c->on(finish => sub { shift->stash->{finished}++ });
-      $c->write('there plain,' => sub { shift->write(' whats up?') });
+      $c->write(
+        'there plain,' => sub {
+          shift->write(' whats up?' => sub { shift->stash->{drain}++ });
+        }
+      );
     }
   );
 };
@@ -246,9 +250,12 @@ is $tx->res->error->{message}, 'Interrupted', 'right error';
 is $buffer, 'hi ', 'right content';
 
 # Stream with delay and content length
+$stash = undef;
+$t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/longpoll/length')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
   ->content_is('hi there plain, whats up?');
+is $stash->{drain}, 1, 'drain event has been emitted once';
 
 # Stream with delay and finish
 $t->get_ok('/longpoll/nolength')->status_is(200)

@@ -966,7 +966,7 @@ while (1) {
 }
 $res->fix_headers;
 is $res->headers->connection, undef, 'no "Connection" value';
-ok !$res->content->is_dynamic, 'no dynamic content';
+ok $res->content->is_dynamic, 'dynamic content';
 is $count, length($body), 'right length';
 is $full, $body, 'right content';
 

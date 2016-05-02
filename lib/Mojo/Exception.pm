@@ -12,7 +12,9 @@ sub inspect {
   # Extract file and line from message
   my @files;
   my $msg = $self->lines_before([])->line([])->lines_after([])->message;
-  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @files, [$1, $2] }
+  while (defined $msg && $msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) {
+    unshift @files, [$1, $2];
+  }
 
   # Extract file and line from stack trace
   if (my $zero = $self->frames->[0]) { push @files, [$zero->[1], $zero->[2]] }

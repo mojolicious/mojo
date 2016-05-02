@@ -88,4 +88,13 @@ Works!
 4: die;
 EOF
 
+{
+  my $warn;
+  local $SIG{__WARN__} = sub { $warn = shift };
+  $e = Mojo::Exception->new(undef);
+  my $thrown = eval { $e->throw };
+  is $warn, undef,
+    'calling ->throw on an exception with an undefined message does not warn';
+}
+
 done_testing();

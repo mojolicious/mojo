@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 # "Bender: I was God once.
 #  God: Yes, I saw. You were doing well, until everyone died."
+use Config;
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
@@ -33,8 +34,8 @@ sub configure {
 sub run {
   my ($self, $app) = @_;
 
-  # No Windows support
-  _exit('Hypnotoad is not available for Windows.') if $^O eq 'MSWin32';
+  # No fork emulation support
+  _exit('Hypnotoad does not support fork emulation.') if $Config{d_pseudofork};
 
   # Remember executable and application for later
   $ENV{HYPNOTOAD_EXE} ||= $0;

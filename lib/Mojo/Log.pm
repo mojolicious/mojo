@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
-use Mojo::Util qw(deprecated encode monkey_patch);
+use Mojo::Util qw(encode monkey_patch);
 
 has format => sub { \&_format };
 has handle => sub {
@@ -22,15 +22,6 @@ has 'path';
 
 # Supported log levels
 my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
-
-# DEPRECATED!
-for my $name (qw(debug error info warn)) {
-  monkey_patch __PACKAGE__, "is_$name", sub {
-    deprecated
-      "Mojo::Log::is_$name is DEPRECATED in favor of Mojo::Log::is_level";
-    shift->is_level($name);
-  };
-}
 
 sub append {
   my ($self, $msg) = @_;

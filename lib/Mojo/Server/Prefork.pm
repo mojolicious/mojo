@@ -1,6 +1,7 @@
 package Mojo::Server::Prefork;
 use Mojo::Base 'Mojo::Server::Daemon';
 
+use Config;
 use File::Spec::Functions qw(catfile tmpdir);
 use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
@@ -59,8 +60,9 @@ sub healthy {
 sub run {
   my $self = shift;
 
-  # No Windows support
-  say 'Preforking is not available for Windows.' and exit 0 if $^O eq 'MSWin32';
+  # No fork emulation support
+  say 'Preforking does not support fork emulation.' and exit 0
+    if $Config{d_pseudofork};
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";

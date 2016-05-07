@@ -1,5 +1,8 @@
 
-6.62  2016-05-02
+6.62  2016-05-07
+  - Removed deprecated is_debug, is_error, is_info and is_warn methods from
+    Mojo::Log.
+  - Improved support for Ubuntu on Windows.
 
 6.61  2016-04-30
   - Improved Mojo::Server::Daemon to no longer log when a connection has been

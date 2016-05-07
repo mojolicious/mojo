@@ -2,7 +2,6 @@ package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
 use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
-use Config;
 use List::Util 'first';
 use Mojo::JSON qw(encode_json j);
 use Mojo::Util qw(decode encode trim);

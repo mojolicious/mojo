@@ -5,7 +5,6 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
-use FindBin;
 use Mojo::Util qw(class_to_path files);
 
 has parts => sub { [] };
@@ -27,6 +26,12 @@ sub detect {
     # Turn into absolute path
     return $self->parts([splitdir abs_path catdir(@home) || '.']);
   }
+
+  # We don't want to load this unconditionally. When FindBin is loaded it will
+  # die if $0 does not point to an actual file. Since we may not need FindBin
+  # at all, we can make using Mojo::Home safer by not loading it unless it's
+  # absolutely necessary.
+  require FindBin;
 
   # FindBin fallback
   return $self->parts([split '/', $FindBin::Bin]);

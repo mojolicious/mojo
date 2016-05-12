@@ -132,8 +132,13 @@ sub to {
 
   if ($shortcut) {
 
+    # callback
+    if (ref($shortcut) && ref($shortcut) eq 'CODE') {
+      $defaults{cb} = $shortcut;
+    }
+ 
     # Application
-    if (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
+    elsif (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
       $defaults{app} = $shortcut;
     }
 

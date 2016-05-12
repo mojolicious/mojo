@@ -527,6 +527,7 @@ preferred.
   $r           = $r->to('MyApp');
   $r           = $r->to('MyApp', foo => 'bar');
   $r           = $r->to('MyApp', {foo => 'bar'});
+  $r           = $r->to(sub {shift->render(text=>'Callback shortcut');});
 
 Set default parameters for this route.
 

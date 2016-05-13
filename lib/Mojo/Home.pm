@@ -2,10 +2,9 @@ package Mojo::Home;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-use Cwd 'abs_path';
+use Cwd qw(abs_path getcwd);
 use File::Basename 'dirname';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
-use FindBin;
 use Mojo::Util qw(class_to_path files);
 
 has parts => sub { [] };
@@ -16,7 +15,7 @@ sub detect {
   # Environment variable
   return $self->parts([splitdir abs_path $ENV{MOJO_HOME}]) if $ENV{MOJO_HOME};
 
-  # Try to find home from lib directory
+  # Location of the application class
   if ($class && (my $path = $INC{my $file = class_to_path $class})) {
     $path =~ s/\Q$file\E$//;
     my @home = splitdir $path;
@@ -28,8 +27,8 @@ sub detect {
     return $self->parts([splitdir abs_path catdir(@home) || '.']);
   }
 
-  # FindBin fallback
-  return $self->parts([split '/', $FindBin::Bin]);
+  # Current working directory
+  return $self->parts([splitdir getcwd]);
 }
 
 sub lib_dir {
@@ -98,8 +97,8 @@ following new ones.
   $home = $home->detect;
   $home = $home->detect('My::App');
 
-Detect home directory from the value of the C<MOJO_HOME> environment variable
-or application class.
+Detect home directory from the value of the C<MOJO_HOME> environment variable,
+location of the application class, or the current working directory.
 
 =head2 lib_dir
 

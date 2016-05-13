@@ -15,26 +15,20 @@ my $target = canonpath realpath getcwd;
 {
   local $ENV{MOJO_HOME} = '.';
   my $home = Mojo::Home->new->detect;
-  is_deeply [split /\\|\//, canonpath($home->to_string)],
-    [split /\\|\//, $target], 'right path detected';
+  is_deeply [splitdir canonpath($home->to_string)], [splitdir $target],
+    'right path detected';
 }
 
-# Class detection
-my $original = catdir splitdir $FindBin::Bin;
+# Current working directory
+my $original = catdir splitdir getcwd;
 my $home     = Mojo::Home->new->detect;
-is_deeply [split /\\|\//, realpath $original], [split /\\|\//, $home],
-  'right path detected';
+is_deeply [splitdir realpath getcwd], [splitdir $home], 'right path detected';
 
 # Specific class detection
 $INC{'MyClass.pm'} = 'MyClass.pm';
 $home = Mojo::Home->new->detect('MyClass');
-is_deeply [split /\\|\//, canonpath($home->to_string)],
-  [split /\\|\//, $target], 'right path detected';
-
-# FindBin detection
-$home = Mojo::Home->new->detect(undef);
-is_deeply [split /\\|\//, catdir(splitdir($FindBin::Bin))],
-  [split /\\|\//, $home], 'right path detected';
+is_deeply [splitdir canonpath($home->to_string)], [splitdir $target],
+  'right path detected';
 
 # Path generation
 $home = Mojo::Home->new($FindBin::Bin);

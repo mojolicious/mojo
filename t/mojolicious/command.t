@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use Cwd 'cwd';
+use Cwd 'getcwd';
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use Mojolicious::Command;
@@ -14,7 +14,7 @@ isa_ok $command->app, 'Mojo',        'right application';
 isa_ok $command->app, 'Mojolicious', 'right application';
 
 # Generating files
-my $cwd = cwd;
+my $cwd = getcwd;
 my $dir = tempdir CLEANUP => 1;
 chdir $dir;
 $command->create_rel_dir('foo/bar');

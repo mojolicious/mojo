@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use Cwd qw(cwd realpath);
+use Cwd qw(getcwd realpath);
 use File::Spec::Functions qw(canonpath catdir catfile splitdir);
 use FindBin;
 use List::Util 'first';
@@ -11,7 +11,7 @@ use Mojo::HelloWorld;
 use Mojo::Home;
 
 # ENV detection
-my $target = canonpath realpath cwd;
+my $target = canonpath realpath getcwd;
 {
   local $ENV{MOJO_HOME} = '.';
   my $home = Mojo::Home->new->detect;

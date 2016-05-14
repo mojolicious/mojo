@@ -1,12 +1,13 @@
+* Mojolicious version: VERSION HERE
+* Perl version: VERSION HERE
+* Operating system: NAME AND VERSION HERE
+
 ### Steps to reproduce the behavior
-Tell us how to reproduce the problem
+EXPLAIN WHAT HAPPENED HERE, PREFERABLY WITH CODE EXAMPLES
 
 ### Expected behavior
-Tell us what should happen
+EXPLAIN WHAT SHOULD HAPPEN HERE
 
 ### Actual behavior
-Tell us what happens instead
+EXPLAIN WHAT HAPPENED INSTEAD HERE
 
-### System configuration
-**Mojolicious version**:
-**Perl version**:

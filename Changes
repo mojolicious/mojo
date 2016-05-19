@@ -1,5 +1,5 @@
 
-6.63  2016-05-15
+6.63  2016-05-20
 
 6.62  2016-05-14
   - Removed deprecated is_debug, is_error, is_info and is_warn methods from
@@ -240,7 +240,7 @@
 
 6.26  2015-10-28
   - Renamed built-in templates with more descriptive names.
-  - Added warmup method to Mojolicious::Renderer and Mojolicious::Static.
+  - Added warmup methods to Mojolicious::Renderer and Mojolicious::Static.
 
 6.25  2015-10-21
   - Deprecated Mojo::Message::Request::proxy with boolean and string arguments
@@ -432,7 +432,7 @@
     node, preceding_siblings, previous_sibling and type methods in Mojo::DOM to
     descendant_nodes, child_nodes, following_nodes, matches, next_node, type,
     preceding_nodes, previous_node and tag.
-  - Renamed match method in Mojo::DOM and Mojo::DOM::CSS to matches.
+  - Renamed match methods in Mojo::DOM and Mojo::DOM::CSS to matches.
   - Renamed extract and inject methods in Mojo::UserAgent::CookieJar to collect
     and prepare.
   - Renamed inject method in Mojo::UserAgent::Proxy to prepare.
@@ -1079,7 +1079,7 @@
   - Improved WebSocket and long poll performance.
 
 4.85  2014-02-26
-  - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.
+  - Added next_tick methods to Mojo::IOLoop and Mojo::Reactor.
   - Added host_port and path_query methods to Mojo::URL.
   - Added is_handshake method to Mojo::Message::Request.
   - Improved Mojo::Reactor::EV responsiveness.
@@ -1555,7 +1555,7 @@
     Mojo::Transaction::WebSocket.
   - Added json event to Mojo::Transaction::WebSocket.
   - Added render_maybe method to Mojolicious::Controller.
-  - Added again method to Mojo::Reactor, Mojo::Reactor::Poll and
+  - Added again methods to Mojo::Reactor, Mojo::Reactor::Poll and
     Mojo::Reactor::EV.
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
@@ -2071,9 +2071,9 @@
   - Fixed small AUTOLOAD bug in Mojolicious::Lite.
 
 3.20  2012-08-04
-  - Added extract_start_line method to Mojo::Message, Mojo::Message::Request
+  - Added extract_start_line methods to Mojo::Message, Mojo::Message::Request
     and Mojo::Message::Response.
-  - Added get_start_line_chunk method to Mojo::Message::Request and
+  - Added get_start_line_chunk methods to Mojo::Message::Request and
     Mojo::Message::Request.
   - Improved end method in Mojo::IOLoop::Delay to return the number of
     remaining events.
@@ -2408,7 +2408,7 @@
   - Deprecated Mojo::IOLoop::drop in favor of Mojo::IOLoop::remove.
   - Renamed Mojo::Reactor::drop to Mojo::Reactor::remove.
   - Added module Mojo::Reactor::Poll.
-  - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
+  - Added one_tick methods to Mojo::Reactor and Mojo::Reactor::EV.
   - Removed experimental status from Mojo::IOLoop::Client.
   - Removed experimental status from Mojo::IOLoop::Server.
   - Removed experimental status from Mojo::IOLoop::Stream.
@@ -2584,7 +2584,7 @@
     Mojo::IOLoop.
 
 2.50  2012-02-18
-  - Added EXPERIMENTAL is_running method to Mojo::IOWatcher and
+  - Added EXPERIMENTAL is_running methods to Mojo::IOWatcher and
     Mojo::IOWatcher::EV.
   - Added file upload support to param method in Mojolicious::Controller.
   - Removed gitignore command.
@@ -2935,7 +2935,7 @@
 
 2.05  2011-10-22
   - Added EXPERIMENTAL max_memory_size attribute to Mojo::Asset::Memory.
-  - Added EXPERIMENTAL is_file method to Mojo::Asset and Mojo::Asset::File.
+  - Added EXPERIMENTAL is_file methods to Mojo::Asset and Mojo::Asset::File.
   - Improved start_tls method in Mojo::IOLoop by allowing it to accept more
     options.
   - Improved MOJO_MAX_MEMORY_SIZE handling by moving it from

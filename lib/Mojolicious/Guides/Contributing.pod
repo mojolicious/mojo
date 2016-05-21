@@ -191,10 +191,7 @@ that the project your product relies on stays healthy and actively maintained.
 It can also help your exposure within the community and will make it easier to
 attract L<Mojolicious> developers.
 
-Grants for contiguous full-time development, over the period of a few days, can
-also have a huge impact. They allow us to tackle complex issues that are
-otherwise left to linger until somebody can't afford to not fix them. To arrange
-such a grant for a core developer please email C<sri@cpan.org>.
+Please email C<sri@cpan.org> if you have any questions regarding sponsorships.
 
 =head1 CODE OF CONDUCT
 

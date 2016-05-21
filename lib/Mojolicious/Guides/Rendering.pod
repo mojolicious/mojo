@@ -615,8 +615,8 @@ C<begin> and before C<end>.
     % my $name = shift;
     Hello <%= $name %>.
   <% end %>
-  <%= $block->('Sebastian') %>
-  <%= $block->('Sara') %>
+  <%= $block->('Wolfgang') %>
+  <%= $block->('Baerbel') %>
 
 A naive translation of the template to Perl code could look like this.
 
@@ -629,8 +629,8 @@ A naive translation of the template to Perl code could look like this.
     $output .= '.';
     return Mojo::ByteStream->new($output);
   };
-  $output .= xml_escape scalar + $block->('Sebastian');
-  $output .= xml_escape scalar + $block->('Sara');
+  $output .= xml_escape scalar + $block->('Wolfgang');
+  $output .= xml_escape scalar + $block->('Baerbel');
   return $output;
 
 While template blocks cannot be shared between templates, they are most

@@ -71,7 +71,6 @@ $buffer = '';
 like $buffer, qr/\[exist\]/, 'right output';
 open my $xml, '<', $command->rel_file('123.xml');
 is join('', <$xml>), "seems\nto\nwork", 'right result';
-chdir $cwd;
 
 # Quiet
 $buffer = '';
@@ -81,6 +80,7 @@ $buffer = '';
   $command->quiet(1)->write_rel_file('123.xml', 'fail');
 }
 is $buffer, '', 'no output';
+chdir $cwd;
 
 # Abstract methods
 eval { Mojolicious::Command->run };

@@ -6,7 +6,6 @@ use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use IO::Socket::IP;
 use Mojo::IOLoop;
-use Mojo::Util 'deprecated';
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
@@ -100,12 +99,6 @@ sub listen {
     if $args->{tls_ca} && -T $args->{tls_ca};
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
   $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
-}
-
-# DEPRECATED!
-sub multi_accept {
-  deprecated 'Mojo::IOLoop::Server::multi_accept is DEPRECATED';
-  @_ > 1 ? $_[0] : undef;
 }
 
 sub port { shift->{handle}->sockport }

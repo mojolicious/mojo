@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util qw(deprecated term_escape);
+use Mojo::Util 'term_escape';
 use Mojo::WebSocket 'server_handshake';
 use Scalar::Util 'weaken';
 
@@ -24,12 +24,6 @@ sub DESTROY {
   $self->_remove($_) for keys %{$self->{connections} || {}};
   my $loop = $self->ioloop;
   $loop->remove($_) for @{$self->acceptors};
-}
-
-# DEPRECATED!
-sub multi_accept {
-  deprecated 'Mojo::Server::Daemon::multi_accept is DEPRECATED';
-  @_ > 1 ? $_[0] : undef;
 }
 
 sub run {

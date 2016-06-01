@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Mojo::ByteStream;
 use Mojo::Exception;
-use Mojo::Util qw(decode deprecated encode monkey_patch slurp);
+use Mojo::Util qw(decode encode monkey_patch slurp);
 
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
@@ -22,25 +22,6 @@ has namespace => 'Mojo::Template::SandBox';
 has tag_start => '<%';
 has tag_end   => '%>';
 has tree      => sub { [] };
-
-# DEPRECATED!
-sub build {
-  deprecated 'Mojo::Template::build is DEPRECATED';
-  return shift;
-}
-
-# DEPRECATED!
-sub compile {
-  deprecated 'Mojo::Template::compile is DEPRECATED';
-  return undef;
-}
-
-# DEPRECATED!
-sub interpret {
-  deprecated 'Mojo::Template::compile is DEPRECATED'
-    . ' in favor of Mojo::Template::process';
-  shift->process(@_);
-}
 
 sub parse {
   my ($self, $template) = @_;

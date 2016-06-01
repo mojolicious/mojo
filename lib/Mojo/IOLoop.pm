@@ -9,7 +9,7 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
-use Mojo::Util qw(deprecated md5_sum steady_time);
+use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
@@ -73,12 +73,6 @@ sub delay {
 }
 
 sub is_running { _instance(shift)->reactor->is_running }
-
-# DEPRECATED!
-sub multi_accept {
-  deprecated 'Mojo::IOLoop::multi_accept is DEPRECATED';
-  @_ > 1 ? $_[0] : undef;
-}
 
 sub next_tick {
   my ($self, $cb) = (_instance(shift), @_);

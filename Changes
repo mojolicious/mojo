@@ -1,5 +1,9 @@
 
-6.63  2016-06-01
+6.63  2016-06-02
+  - Removed deprecated check method from Mojo::Server::Morbo.
+  - Removed deprecated build, compile and interpret methods from Mojo::Template.
+  - Removed deprecated multi_accept methods from Mojo::IOLoop,
+    Mojo::IOLoop::Server and Mojo::Server::Daemon.
   - Updated jQuery to version 2.2.4.
   - Improved generator commands not to overwrite existing files.
 

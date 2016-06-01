@@ -5,18 +5,11 @@ use Mojo::Base -base;
 #         effects of sudden, intense global warming.
 #  Morbo: Morbo is pleased but sticky."
 use Mojo::Server::Daemon;
-use Mojo::Util qw(deprecated files);
+use Mojo::Util 'files';
 use POSIX 'WNOHANG';
 
 has daemon => sub { Mojo::Server::Daemon->new };
 has watch  => sub { [qw(lib templates)] };
-
-# DEPRECATED!
-sub check {
-  deprecated 'Mojo::Server::Morbo::check is DEPRECATED'
-    . ' in favor of Mojo::Server::Morbo::modified_files';
-  return shift->modified_files->[0];
-}
 
 sub modified_files {
   my $self = shift;

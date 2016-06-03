@@ -1,5 +1,5 @@
 
-6.63  2016-06-02
+6.63  2016-06-03
   - Removed deprecated check method from Mojo::Server::Morbo.
   - Removed deprecated build, compile and interpret methods from Mojo::Template.
   - Removed deprecated multi_accept methods from Mojo::IOLoop,

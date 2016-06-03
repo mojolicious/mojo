@@ -891,7 +891,7 @@ true value for the route to match.
       my ($route, $c, $captures, $num) = @_;
 
       # Loser
-      return undef unless int rand $num;
+      return undef if int rand $num;
 
       # Winner
       return 1;

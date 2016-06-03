@@ -32,12 +32,14 @@ $buffer = '';
   $command->create_rel_dir('foo/bar');
 }
 like $buffer, qr/\[exist\]/, 'right output';
+chdir $cwd;
 
 # Generating files
 my $template = "@@ foo_bar\njust <%= 'works' %>!\n";
 open my $data, '<', \$template;
 no strict 'refs';
 *{"Mojolicious::Command::DATA"} = $data;
+chdir $dir;
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
@@ -71,8 +73,10 @@ $buffer = '';
 like $buffer, qr/\[exist\]/, 'right output';
 open my $xml, '<', $command->rel_file('123.xml');
 is join('', <$xml>), "seems\nto\nwork", 'right result';
+chdir $cwd;
 
 # Quiet
+chdir $dir;
 $buffer = '';
 {
   open my $handle, '>', \$buffer;

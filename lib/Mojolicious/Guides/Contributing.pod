@@ -191,7 +191,7 @@ that the project your product relies on stays healthy and actively maintained.
 It can also help your exposure within the community and will make it easier to
 attract L<Mojolicious> developers.
 
-Please email C<sri@cpan.org> if you have any questions regarding sponsorships.
+Please email C<sri@cpan.org> if you have any questions regarding sponsorship.
 
 =head1 CODE OF CONDUCT
 

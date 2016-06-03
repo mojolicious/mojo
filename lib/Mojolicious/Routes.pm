@@ -50,7 +50,7 @@ sub hide { push @{shift->hidden}, @_ }
 sub is_hidden {
   my ($self, $method) = @_;
   my $h = $self->{hiding} ||= {map { $_ => 1 } @{$self->hidden}};
-  return !!($h->{$method} || index($method, '_') == 0 || $method !~ /[a-z]/);
+  return !!($h->{$method} || $method =~ /^_/ || $method =~ /^[A-Z_]+$/);
 }
 
 sub lookup { ($_[0]{reverse} //= $_[0]->_index)->{$_[1]} }

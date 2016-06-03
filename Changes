@@ -1,4 +1,6 @@
 
+6.64  2016-06-04
+
 6.63  2016-06-03
   - Removed deprecated check method from Mojo::Server::Morbo.
   - Removed deprecated build, compile and interpret methods from Mojo::Template.

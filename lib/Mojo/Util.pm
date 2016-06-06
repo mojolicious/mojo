@@ -140,7 +140,7 @@ sub files {
 sub html_unescape {
   my $str = shift;
   $str
-    =~ s/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;))/_decode($1, $2)/ge;
+    =~ s/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
   return $str;
 }
 
@@ -367,7 +367,12 @@ sub _decode {
   return chr($point !~ /^x/ ? $point : hex $point) unless defined $name;
 
   # Named character reference
-  return exists $ENTITIES{$name} ? $ENTITIES{$name} : "&$name";
+  my $rest = '';
+  while (length $name) {
+    return "$ENTITIES{$name}$rest" if exists $ENTITIES{$name};
+    $rest = chop($name) . $rest;
+  }
+  return "&$rest";
 }
 
 sub _encoding {
@@ -835,24 +840,33 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 __DATA__
 Aacute; U+000C1
+Aacute U+000C1
 aacute; U+000E1
+aacute U+000E1
 Abreve; U+00102
 abreve; U+00103
 ac; U+0223E
 acd; U+0223F
 acE; U+0223E U+00333
 Acirc; U+000C2
+Acirc U+000C2
 acirc; U+000E2
+acirc U+000E2
 acute; U+000B4
+acute U+000B4
 Acy; U+00410
 acy; U+00430
 AElig; U+000C6
+AElig U+000C6
 aelig; U+000E6
+aelig U+000E6
 af; U+02061
 Afr; U+1D504
 afr; U+1D51E
 Agrave; U+000C0
+Agrave U+000C0
 agrave; U+000E0
+agrave U+000E0
 alefsym; U+02135
 aleph; U+02135
 Alpha; U+00391
@@ -861,7 +875,9 @@ Amacr; U+00100
 amacr; U+00101
 amalg; U+02A3F
 AMP; U+00026
+AMP U+00026
 amp; U+00026
+amp U+00026
 And; U+02A53
 and; U+02227
 andand; U+02A55
@@ -900,7 +916,9 @@ ApplyFunction; U+02061
 approx; U+02248
 approxeq; U+0224A
 Aring; U+000C5
+Aring U+000C5
 aring; U+000E5
+aring U+000E5
 Ascr; U+1D49C
 ascr; U+1D4B6
 Assign; U+02254
@@ -908,9 +926,13 @@ ast; U+0002A
 asymp; U+02248
 asympeq; U+0224D
 Atilde; U+000C3
+Atilde U+000C3
 atilde; U+000E3
+atilde U+000E3
 Auml; U+000C4
+Auml U+000C4
 auml; U+000E4
+auml U+000E4
 awconint; U+02233
 awint; U+02A11
 backcong; U+0224C
@@ -1025,6 +1047,7 @@ bprime; U+02035
 Breve; U+002D8
 breve; U+002D8
 brvbar; U+000A6
+brvbar U+000A6
 Bscr; U+0212C
 bscr; U+1D4B7
 bsemi; U+0204F
@@ -1058,7 +1081,9 @@ ccaps; U+02A4D
 Ccaron; U+0010C
 ccaron; U+0010D
 Ccedil; U+000C7
+Ccedil U+000C7
 ccedil; U+000E7
+ccedil U+000E7
 Ccirc; U+00108
 ccirc; U+00109
 Cconint; U+02230
@@ -1067,9 +1092,11 @@ ccupssm; U+02A50
 Cdot; U+0010A
 cdot; U+0010B
 cedil; U+000B8
+cedil U+000B8
 Cedilla; U+000B8
 cemptyv; U+029B2
 cent; U+000A2
+cent U+000A2
 CenterDot; U+000B7
 centerdot; U+000B7
 Cfr; U+0212D
@@ -1126,7 +1153,9 @@ copf; U+1D554
 coprod; U+02210
 Coproduct; U+02210
 COPY; U+000A9
+COPY U+000A9
 copy; U+000A9
+copy U+000A9
 copysr; U+02117
 CounterClockwiseContourIntegral; U+02233
 crarr; U+021B5
@@ -1161,6 +1190,7 @@ curlyeqsucc; U+022DF
 curlyvee; U+022CE
 curlywedge; U+022CF
 curren; U+000A4
+curren U+000A4
 curvearrowleft; U+021B6
 curvearrowright; U+021B7
 cuvee; U+022CE
@@ -1190,6 +1220,7 @@ ddarr; U+021CA
 DDotrahd; U+02911
 ddotseq; U+02A77
 deg; U+000B0
+deg U+000B0
 Del; U+02207
 Delta; U+00394
 delta; U+003B4
@@ -1216,6 +1247,7 @@ digamma; U+003DD
 disin; U+022F2
 div; U+000F7
 divide; U+000F7
+divide U+000F7
 divideontimes; U+022C7
 divonx; U+022C7
 DJcy; U+00402
@@ -1287,13 +1319,17 @@ DZcy; U+0040F
 dzcy; U+0045F
 dzigrarr; U+027FF
 Eacute; U+000C9
+Eacute U+000C9
 eacute; U+000E9
+eacute U+000E9
 easter; U+02A6E
 Ecaron; U+0011A
 ecaron; U+0011B
 ecir; U+02256
 Ecirc; U+000CA
+Ecirc U+000CA
 ecirc; U+000EA
+ecirc U+000EA
 ecolon; U+02255
 Ecy; U+0042D
 ecy; U+0044D
@@ -1307,7 +1343,9 @@ Efr; U+1D508
 efr; U+1D522
 eg; U+02A9A
 Egrave; U+000C8
+Egrave U+000C8
 egrave; U+000E8
+egrave U+000E8
 egs; U+02A96
 egsdot; U+02A98
 el; U+02A99
@@ -1363,9 +1401,13 @@ esim; U+02242
 Eta; U+00397
 eta; U+003B7
 ETH; U+000D0
+ETH U+000D0
 eth; U+000F0
+eth U+000F0
 Euml; U+000CB
+Euml U+000CB
 euml; U+000EB
+euml U+000EB
 euro; U+020AC
 excl; U+00021
 exist; U+02203
@@ -1399,14 +1441,17 @@ forkv; U+02AD9
 Fouriertrf; U+02131
 fpartint; U+02A0D
 frac12; U+000BD
+frac12 U+000BD
 frac13; U+02153
 frac14; U+000BC
+frac14 U+000BC
 frac15; U+02155
 frac16; U+02159
 frac18; U+0215B
 frac23; U+02154
 frac25; U+02156
 frac34; U+000BE
+frac34 U+000BE
 frac35; U+02157
 frac38; U+0215C
 frac45; U+02158
@@ -1481,8 +1526,10 @@ gsim; U+02273
 gsime; U+02A8E
 gsiml; U+02A90
 GT; U+0003E
+GT U+0003E
 Gt; U+0226B
 gt; U+0003E
+gt U+0003E
 gtcc; U+02AA7
 gtcir; U+02A7A
 gtdot; U+022D7
@@ -1538,21 +1585,28 @@ HumpEqual; U+0224F
 hybull; U+02043
 hyphen; U+02010
 Iacute; U+000CD
+Iacute U+000CD
 iacute; U+000ED
+iacute U+000ED
 ic; U+02063
 Icirc; U+000CE
+Icirc U+000CE
 icirc; U+000EE
+icirc U+000EE
 Icy; U+00418
 icy; U+00438
 Idot; U+00130
 IEcy; U+00415
 iecy; U+00435
 iexcl; U+000A1
+iexcl U+000A1
 iff; U+021D4
 Ifr; U+02111
 ifr; U+1D526
 Igrave; U+000CC
+Igrave U+000CC
 igrave; U+000EC
+igrave U+000EC
 ii; U+02148
 iiiint; U+02A0C
 iiint; U+0222D
@@ -1597,6 +1651,7 @@ Iota; U+00399
 iota; U+003B9
 iprod; U+02A3C
 iquest; U+000BF
+iquest U+000BF
 Iscr; U+02110
 iscr; U+1D4BE
 isin; U+02208
@@ -1611,7 +1666,9 @@ itilde; U+00129
 Iukcy; U+00406
 iukcy; U+00456
 Iuml; U+000CF
+Iuml U+000CF
 iuml; U+000EF
+iuml U+000EF
 Jcirc; U+00134
 jcirc; U+00135
 Jcy; U+00419
@@ -1659,6 +1716,7 @@ langle; U+027E8
 lap; U+02A85
 Laplacetrf; U+02112
 laquo; U+000AB
+laquo U+000AB
 Larr; U+0219E
 lArr; U+021D0
 larr; U+02190
@@ -1839,8 +1897,10 @@ lsquor; U+0201A
 Lstrok; U+00141
 lstrok; U+00142
 LT; U+0003C
+LT U+0003C
 Lt; U+0226A
 lt; U+0003C
+lt U+0003C
 ltcc; U+02AA6
 ltcir; U+02A79
 ltdot; U+022D6
@@ -1857,6 +1917,7 @@ luruhar; U+02966
 lvertneqq; U+02268 U+0FE00
 lvnE; U+02268 U+0FE00
 macr; U+000AF
+macr U+000AF
 male; U+02642
 malt; U+02720
 maltese; U+02720
@@ -1879,10 +1940,12 @@ Mfr; U+1D510
 mfr; U+1D52A
 mho; U+02127
 micro; U+000B5
+micro U+000B5
 mid; U+02223
 midast; U+0002A
 midcir; U+02AF0
 middot; U+000B7
+middot U+000B7
 minus; U+02212
 minusb; U+0229F
 minusd; U+02238
@@ -1915,6 +1978,7 @@ natur; U+0266E
 natural; U+0266E
 naturals; U+02115
 nbsp; U+000A0
+nbsp U+000A0
 nbump; U+0224E U+00338
 nbumpe; U+0224F U+00338
 ncap; U+02A43
@@ -1997,6 +2061,7 @@ Nopf; U+02115
 nopf; U+1D55F
 Not; U+02AEC
 not; U+000AC
+not U+000AC
 NotCongruent; U+02262
 NotCupCap; U+0226D
 NotDoubleVerticalBar; U+02226
@@ -2106,7 +2171,9 @@ nsupseteq; U+02289
 nsupseteqq; U+02AC6 U+00338
 ntgl; U+02279
 Ntilde; U+000D1
+Ntilde U+000D1
 ntilde; U+000F1
+ntilde U+000F1
 ntlg; U+02278
 ntriangleleft; U+022EA
 ntrianglelefteq; U+022EC
@@ -2139,11 +2206,15 @@ nwarr; U+02196
 nwarrow; U+02196
 nwnear; U+02927
 Oacute; U+000D3
+Oacute U+000D3
 oacute; U+000F3
+oacute U+000F3
 oast; U+0229B
 ocir; U+0229A
 Ocirc; U+000D4
+Ocirc U+000D4
 ocirc; U+000F4
+ocirc U+000F4
 Ocy; U+0041E
 ocy; U+0043E
 odash; U+0229D
@@ -2159,7 +2230,9 @@ Ofr; U+1D512
 ofr; U+1D52C
 ogon; U+002DB
 Ograve; U+000D2
+Ograve U+000D2
 ograve; U+000F2
+ograve U+000F2
 ogt; U+029C1
 ohbar; U+029B5
 ohm; U+003A9
@@ -2191,7 +2264,9 @@ ord; U+02A5D
 order; U+02134
 orderof; U+02134
 ordf; U+000AA
+ordf U+000AA
 ordm; U+000BA
+ordm U+000BA
 origof; U+022B6
 oror; U+02A56
 orslope; U+02A57
@@ -2200,15 +2275,21 @@ oS; U+024C8
 Oscr; U+1D4AA
 oscr; U+02134
 Oslash; U+000D8
+Oslash U+000D8
 oslash; U+000F8
+oslash U+000F8
 osol; U+02298
 Otilde; U+000D5
+Otilde U+000D5
 otilde; U+000F5
+otilde U+000F5
 Otimes; U+02A37
 otimes; U+02297
 otimesas; U+02A36
 Ouml; U+000D6
+Ouml U+000D6
 ouml; U+000F6
+ouml U+000F6
 ovbar; U+0233D
 OverBar; U+0203E
 OverBrace; U+023DE
@@ -2216,6 +2297,7 @@ OverBracket; U+023B4
 OverParenthesis; U+023DC
 par; U+02225
 para; U+000B6
+para U+000B6
 parallel; U+02225
 parsim; U+02AF3
 parsl; U+02AFD
@@ -2251,6 +2333,7 @@ plusdu; U+02A25
 pluse; U+02A72
 PlusMinus; U+000B1
 plusmn; U+000B1
+plusmn U+000B1
 plussim; U+02A26
 plustwo; U+02A27
 pm; U+000B1
@@ -2259,6 +2342,7 @@ pointint; U+02A15
 Popf; U+02119
 popf; U+1D561
 pound; U+000A3
+pound U+000A3
 Pr; U+02ABB
 pr; U+0227A
 prap; U+02AB7
@@ -2312,7 +2396,9 @@ quatint; U+02A16
 quest; U+0003F
 questeq; U+0225F
 QUOT; U+00022
+QUOT U+00022
 quot; U+00022
+quot U+00022
 rAarr; U+021DB
 race; U+0223D U+00331
 Racute; U+00154
@@ -2325,6 +2411,7 @@ rangd; U+02992
 range; U+029A5
 rangle; U+027E9
 raquo; U+000BB
+raquo U+000BB
 Rarr; U+021A0
 rArr; U+021D2
 rarr; U+02192
@@ -2373,7 +2460,9 @@ realpart; U+0211C
 reals; U+0211D
 rect; U+025AD
 REG; U+000AE
+REG U+000AE
 reg; U+000AE
+reg U+000AE
 ReverseElement; U+0220B
 ReverseEquilibrium; U+021CB
 ReverseUpEquilibrium; U+0296F
@@ -2489,6 +2578,7 @@ seArr; U+021D8
 searr; U+02198
 searrow; U+02198
 sect; U+000A7
+sect U+000A7
 semi; U+0003B
 seswar; U+02929
 setminus; U+02216
@@ -2509,6 +2599,7 @@ shortparallel; U+02225
 ShortRightArrow; U+02192
 ShortUpArrow; U+02191
 shy; U+000AD
+shy U+000AD
 Sigma; U+003A3
 sigma; U+003C3
 sigmaf; U+003C2
@@ -2620,8 +2711,11 @@ sung; U+0266A
 Sup; U+022D1
 sup; U+02283
 sup1; U+000B9
+sup1 U+000B9
 sup2; U+000B2
+sup2 U+000B2
 sup3; U+000B3
+sup3 U+000B3
 supdot; U+02ABE
 supdsub; U+02AD8
 supE; U+02AC6
@@ -2651,6 +2745,7 @@ swarr; U+02199
 swarrow; U+02199
 swnwar; U+0292A
 szlig; U+000DF
+szlig U+000DF
 Tab; U+00009
 target; U+02316
 Tau; U+003A4
@@ -2681,13 +2776,16 @@ ThinSpace; U+02009
 thkap; U+02248
 thksim; U+0223C
 THORN; U+000DE
+THORN U+000DE
 thorn; U+000FE
+thorn U+000FE
 Tilde; U+0223C
 tilde; U+002DC
 TildeEqual; U+02243
 TildeFullEqual; U+02245
 TildeTilde; U+02248
 times; U+000D7
+times U+000D7
 timesb; U+022A0
 timesbar; U+02A31
 timesd; U+02A30
@@ -2730,7 +2828,9 @@ twixt; U+0226C
 twoheadleftarrow; U+0219E
 twoheadrightarrow; U+021A0
 Uacute; U+000DA
+Uacute U+000DA
 uacute; U+000FA
+uacute U+000FA
 Uarr; U+0219F
 uArr; U+021D1
 uarr; U+02191
@@ -2740,7 +2840,9 @@ ubrcy; U+0045E
 Ubreve; U+0016C
 ubreve; U+0016D
 Ucirc; U+000DB
+Ucirc U+000DB
 ucirc; U+000FB
+ucirc U+000FB
 Ucy; U+00423
 ucy; U+00443
 udarr; U+021C5
@@ -2751,7 +2853,9 @@ ufisht; U+0297E
 Ufr; U+1D518
 ufr; U+1D532
 Ugrave; U+000D9
+Ugrave U+000D9
 ugrave; U+000F9
+ugrave U+000F9
 uHar; U+02963
 uharl; U+021BF
 uharr; U+021BE
@@ -2763,6 +2867,7 @@ ultri; U+025F8
 Umacr; U+0016A
 umacr; U+0016B
 uml; U+000A8
+uml U+000A8
 UnderBar; U+0005F
 UnderBrace; U+023DF
 UnderBracket; U+023B5
@@ -2810,7 +2915,9 @@ utri; U+025B5
 utrif; U+025B4
 uuarr; U+021C8
 Uuml; U+000DC
+Uuml U+000DC
 uuml; U+000FC
+uuml U+000FC
 uwangle; U+029A7
 vangrt; U+0299C
 varepsilon; U+003F5
@@ -2916,7 +3023,9 @@ xutri; U+025B3
 xvee; U+022C1
 xwedge; U+022C0
 Yacute; U+000DD
+Yacute U+000DD
 yacute; U+000FD
+yacute U+000FD
 YAcy; U+0042F
 yacy; U+0044F
 Ycirc; U+00176
@@ -2924,6 +3033,7 @@ ycirc; U+00177
 Ycy; U+0042B
 ycy; U+0044B
 yen; U+000A5
+yen U+000A5
 Yfr; U+1D51C
 yfr; U+1D536
 YIcy; U+00407
@@ -2936,6 +3046,7 @@ YUcy; U+0042E
 yucy; U+0044E
 Yuml; U+00178
 yuml; U+000FF
+yuml U+000FF
 Zacute; U+00179
 zacute; U+0017A
 Zcaron; U+0017D

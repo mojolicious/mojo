@@ -193,7 +193,7 @@ is html_unescape('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
 
 # html_unescape (special entities)
 is html_unescape('foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
-  "foo ☃ \x{2233} bar &sup1baz", 'right HTML unescaped result';
+  "foo ☃ \x{2233} bar ¹baz", 'right HTML unescaped result';
 
 # html_unescape (multi-character entity)
 is html_unescape('&acE;'), "\x{223e}\x{0333}", 'right HTML unescaped result';
@@ -204,6 +204,10 @@ is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
 
 # html_unescape (nothing to unescape)
 is html_unescape('foobar'), 'foobar', 'no changes';
+
+# html_unescape (relaxed)
+is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r",
+  'right HTML unescaped result';
 
 # url_unescape (bengal numbers with nothing to unescape)
 is html_unescape('&#০৩৯;&#x০৩৯;'), '&#০৩৯;&#x০৩৯;',

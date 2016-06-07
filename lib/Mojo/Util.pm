@@ -369,10 +369,10 @@ sub _decode {
   # Named character reference
   my $rest = '';
   while (length $name) {
-    return "$ENTITIES{$name}$rest" if exists $ENTITIES{$name};
-    $rest = chop($name) . $rest;
+    return $ENTITIES{$name} . reverse $rest if exists $ENTITIES{$name};
+    $rest .= chop $name;
   }
-  return "&$rest";
+  return '&' . reverse $rest;
 }
 
 sub _encoding {

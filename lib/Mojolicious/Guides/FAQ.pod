@@ -203,16 +203,6 @@ around 256KB by default, you can use the attribute
 L<Mojo::Content/"max_buffer_size"> or C<MOJO_MAX_BUFFER_SIZE> environment
 variable to change this value.
 
-=head2 What does the error "EV does not work with ithreads" mean?
-
-The L<Mojolicious> user agent and web servers are based on an event loop that
-supports multiple reactor backends. One of these backends is L<EV>, it is very
-fast and will be automatically used if possible. On Windows however, the
-C<ithreads>-based C<fork()> emulation can interfere with it, and you may have to
-use the C<MOJO_REACTOR> environment variable to enforce a more portable one.
-
-  MOJO_REACTOR=Mojo::Reactor::Poll
-
 =head2 What does "Your secret passphrase needs to be changed" mean?
 
 L<Mojolicious> uses secret passphrases for security features such as signed

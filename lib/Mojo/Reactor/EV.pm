@@ -6,8 +6,6 @@ use EV 4.0;
 
 my $EV;
 
-sub CLONE { die "EV does not work with ithreads.\n" }
-
 sub DESTROY { undef $EV }
 
 sub again {

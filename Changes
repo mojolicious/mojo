@@ -1,6 +1,8 @@
 
-6.64  2016-06-07
+6.64  2016-06-09
   - Updated HTML5 entities in Mojo::Util.
+  - Improved Mojo::IOLoop to fall back to Mojo::Reactor::Poll if Perl has been
+    compiled with fork emulation.
 
 6.63  2016-06-03
   - Removed deprecated check method from Mojo::Server::Morbo.

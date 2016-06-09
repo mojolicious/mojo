@@ -2,12 +2,14 @@ package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
+use Config;
 use Mojo::Loader 'load_class';
 
 sub again { croak 'Method "again" not implemented by subclass' }
 
 sub detect {
-  my $try = $ENV{MOJO_REACTOR} || 'Mojo::Reactor::EV';
+  my $default = 'Mojo::Reactor::' . ($Config{d_pseudofork} ? 'Poll' : 'EV');
+  my $try = $ENV{MOJO_REACTOR} || $default;
   return load_class($try) ? 'Mojo::Reactor::Poll' : $try;
 }
 

@@ -144,6 +144,13 @@ $jar->add(
     name    => 'baz',
     value   => '24',
     max_age => -1
+  ),
+  Mojo::Cookie::Response->new(
+    domain  => 'labs.example.com',
+    path    => '/',
+    name    => 'qux',
+    value   => 'qux',
+    max_age => 0
   )
 );
 my $expired = Mojo::Cookie::Response->new(

@@ -16,7 +16,7 @@ sub add {
 
     # Convert max age to expires
     my $age = $cookie->max_age;
-    $cookie->expires($age ? $age + time : 0) if looks_like_number $age;
+    $cookie->expires($age <= 0 ? 0 : $age + time) if looks_like_number $age;
 
     # Check cookie size
     next if length($cookie->value // '') > $size;

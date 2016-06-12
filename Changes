@@ -1,6 +1,7 @@
 
-6.65  2016-06-10
+6.65  2016-06-12
   - Updated jQuery to version 3.0.0.
+  - Fixed "0" value bug in Mojo::UserAgent::CookieJar. (jamadam)
 
 6.64  2016-06-09
   - Updated HTML5 entities in Mojo::Util.

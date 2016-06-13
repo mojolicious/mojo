@@ -174,7 +174,7 @@ No names outside of C<Mojolicious.pm>.
 
 =back
 
-=head1 SPONSORSHIP
+=head1 DONATIONS
 
 L<Mojolicious> is open source and free to use. However, the amount of effort
 needed to maintain the project and develop new features for it is not
@@ -186,12 +186,12 @@ L<PayPal|https://www.paypal.me/kraih> or Bitcoin
 (C<1Cid78CmK4hvf78Ry8K2XeDx8pQHNh4hbz>).
 
 If you run a business and use L<Mojolicious> in a revenue generating product, it
-makes business sense to sponsor L<Mojolicious> development. Because it ensures
+makes business sense to support L<Mojolicious> development. Because it ensures
 that the project your product relies on stays healthy and actively maintained.
 It can also help your exposure within the community and will make it easier to
 attract L<Mojolicious> developers.
 
-Please email C<sri@cpan.org> if you have any questions regarding sponsorship.
+Please email C<sri@cpan.org> if you have any questions about becoming a sponsor.
 
 =head1 CODE OF CONDUCT
 

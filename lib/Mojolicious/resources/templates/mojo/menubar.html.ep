@@ -123,6 +123,7 @@
       else if (st > start) {
         fixed = true;
         mojobar.css({'position': 'fixed', 'top': 0});
+        lastScrollTop = $(window).scrollTop();
       }
     });
   });

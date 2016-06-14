@@ -19,6 +19,8 @@ ok $url->is_abs,     'is absolute';
 is $url->scheme,     'https', 'right scheme';
 is $url->protocol,   'https', 'right protocol';
 is $url->userinfo,   'sri:foobar', 'right userinfo';
+is $url->username,   'sri', 'right username';
+is $url->password,   'foobar', 'right username';
 is $url->host,       'example.com', 'right host';
 is $url->port,       '8080', 'right port';
 is $url->authority,  'sri:foobar@example.com:8080', 'right authority';
@@ -39,6 +41,8 @@ $url = Mojo::URL->new(
   'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
 is $url->scheme,   'ws',                          'right scheme';
 is $url->userinfo, 'AZaz09-._~!$&\'()*+,;=:',     'right userinfo';
+is $url->username, 'AZaz09-._~!$&\'()*+,;=',      'right username';
+is $url->password, '',                            'right password';
 is $url->host,     'localhost',                   'right host';
 is $url->fragment, 'AZaz09-._~!$&\'()*+,;=%:@/?', 'right fragment';
 is "$url", 'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?',
@@ -87,10 +91,12 @@ is "$url", 'http://sri:foobar@example.com:8080?%E5=%E4#23', 'right format';
 
 # Query string
 $url = Mojo::URL->new(
-  'wss://sri:foobar@example.com:8080?_monkeybiz%3B&_monkey;23#23');
+  'wss://sri:foo:bar@example.com:8080?_monkeybiz%3B&_monkey;23#23');
 ok $url->is_abs,   'is absolute';
 is $url->scheme,   'wss', 'right scheme';
-is $url->userinfo, 'sri:foobar', 'right userinfo';
+is $url->userinfo, 'sri:foo:bar', 'right userinfo';
+is $url->username, 'sri', 'right username';
+is $url->password, 'foo:bar', 'right password';
 is $url->host,     'example.com', 'right host';
 is $url->port,     '8080', 'right port';
 is $url->path,     '', 'no path';
@@ -99,12 +105,14 @@ is_deeply $url->query->pairs, ['_monkeybiz;', '', '_monkey;23', ''],
   'right structure';
 is $url->query, '_monkeybiz%3B=&_monkey%3B23=', 'right query';
 is $url->fragment, '23', 'right fragment';
-is "$url", 'wss://sri:foobar@example.com:8080?_monkeybiz%3B=&_monkey%3B23=#23',
+is "$url", 'wss://sri:foo:bar@example.com:8080?_monkeybiz%3B=&_monkey%3B23=#23',
   'right format';
 $url = Mojo::URL->new('https://example.com/0?0#0');
 ok $url->is_abs,    'is absolute';
 is $url->scheme,    'https', 'right scheme';
 is $url->userinfo,  undef, 'no userinfo';
+is $url->username,  undef, 'no username';
+is $url->password,  undef, 'no password';
 is $url->host,      'example.com', 'right host';
 is $url->port,      undef, 'no port';
 is $url->host_port, 'example.com', 'right host and port';
@@ -351,6 +359,8 @@ is "$url", 'http://xn--n3h.xn--n3h.net', 'right format';
 # IDNA (escaped userinfo and host)
 $url = Mojo::URL->new('https://%E2%99%A5:%E2%99%A5@kr%E4ih.com:3000');
 is $url->userinfo, '♥:♥',          'right userinfo';
+is $url->username, '♥',              'right username';
+is $url->password, '♥',              'right password';
 is $url->host,     "kr\xe4ih.com",     'right host';
 is $url->ihost,    'xn--krih-moa.com', 'right internationalized host';
 is $url->port,     3000,               'right port';
@@ -406,6 +416,8 @@ is $url->to_abs, 'http://foo.com/', 'right absolute version';
 $url = Mojo::URL->new('http://0@foo.com#0');
 is $url->scheme,   'http',    'right scheme';
 is $url->userinfo, '0',       'right userinfo';
+is $url->username, '0',       'right username';
+is $url->password, undef,     'no password';
 is $url->host,     'foo.com', 'right host';
 is $url->fragment, '0',       'right fragment';
 is "$url", 'http://0@foo.com#0', 'right format';

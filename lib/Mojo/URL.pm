@@ -85,6 +85,8 @@ sub parse {
   return $self;
 }
 
+sub password { (shift->userinfo // '') =~ /:(.*)$/ ? $1 : undef }
+
 sub path {
   my $self = shift;
 
@@ -182,6 +184,8 @@ sub to_string {
   return $url unless defined(my $fragment = $self->fragment);
   return $url . '#' . _encode($fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?');
 }
+
+sub username { (shift->userinfo // '') =~ /^([^:]+)/ ? $1 : undef }
 
 sub _decode { decode('UTF-8', $_[0]) // $_[0] }
 
@@ -378,6 +382,18 @@ Parse relative or absolute URL.
   # "sri@example.com"
   $url->parse('mailto:sri@example.com')->path;
 
+=head2 password
+
+  my $password = $url->password;
+
+Password part of L</"userinfo">.
+
+  # "s3cret"
+  Mojo::URL->new('http://isabel:s3cret@mojolicious.org')->password;
+
+  # "s:3:c:r:e:t"
+  Mojo::URL->new('http://isabel:s:3:c:r:e:t@mojolicious.org')->password;
+
 =head2 path
 
   my $path = $url->path;
@@ -487,6 +503,15 @@ Turn URL into a string.
 
   # "http://mojolicious.org"
   Mojo::URL->new->scheme('http')->host('mojolicious.org')->to_string;
+
+=head2 username
+
+  my $username = $url->username;
+
+Username part of L</"userinfo">.
+
+  # "isabel"
+  Mojo::URL->new('http://isabel:s3cret@mojolicious.org')->username;
 
 =head1 OPERATORS
 

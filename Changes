@@ -1,5 +1,6 @@
 
 6.65  2016-06-14
+  - Added password and username methods to Mojo::URL.
   - Updated jQuery to version 3.0.0.
   - Fixed "0" value bug in Mojo::UserAgent::CookieJar. (jamadam)
 

@@ -20,7 +20,7 @@ is $url->scheme,     'https', 'right scheme';
 is $url->protocol,   'https', 'right protocol';
 is $url->userinfo,   'sri:foobar', 'right userinfo';
 is $url->username,   'sri', 'right username';
-is $url->password,   'foobar', 'right username';
+is $url->password,   'foobar', 'right password';
 is $url->host,       'example.com', 'right host';
 is $url->port,       '8080', 'right port';
 is $url->authority,  'sri:foobar@example.com:8080', 'right authority';

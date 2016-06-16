@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Clinking Beer Mugs';
-our $VERSION  = '6.66';
+our $VERSION  = '6.67';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -190,7 +190,7 @@ sub _exception {
   $c->helpers->reply->exception($@) unless eval { $next->(); 1 };
 }
 
-"Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn";
+1;
 
 =encoding utf8
 

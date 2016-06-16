@@ -252,12 +252,16 @@ ok $sent > 25, 'sent enough';
 # Blocking proxy requests
 $ua->proxy->https("http://sri:secr3t\@127.0.0.1:$proxy");
 my $tx = $ua->max_connections(0)->get("https://127.0.0.1:$port/proxy");
-is $tx->res->code, 200, 'right status';
-is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
+is $tx->res->code,   200,                             'right status';
+is $tx->res->body,   "https://127.0.0.1:$port/proxy", 'right content';
+is $tx->req->method, 'GET',                           'right method';
+is $tx->previous->req->method, 'CONNECT', 'right method';
 $tx = $ua->max_connections(5)->get("https://127.0.0.1:$port/proxy");
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
-is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
+is $tx->res->code,   200,                             'right status';
+is $tx->res->body,   "https://127.0.0.1:$port/proxy", 'right content';
+is $tx->req->method, 'GET',                           'right method';
+is $tx->previous->req->method, 'CONNECT', 'right method';
 
 # Proxy WebSocket with bad target
 $ua->proxy->https("http://127.0.0.1:$proxy");

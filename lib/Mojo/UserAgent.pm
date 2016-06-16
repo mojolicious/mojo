@@ -239,7 +239,7 @@ sub _finish {
     return $new->client_read($old->res->content->leftovers);
   }
 
-  # CONNECT requests always have a followup request
+  # CONNECT requests always have a follow-up request
   $self->_reuse($id, $close) unless uc $old->req->method eq 'CONNECT';
   if ($res->is_status_class(400) || $res->is_status_class(500)) {
     $res->error({message => $res->message, code => $res->code});

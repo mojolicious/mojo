@@ -190,7 +190,7 @@ sub _exception {
   $c->helpers->reply->exception($@) unless eval { $next->(); 1 };
 }
 
-1;
+"Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn";
 
 =encoding utf8
 

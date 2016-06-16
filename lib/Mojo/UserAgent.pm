@@ -239,7 +239,8 @@ sub _finish {
     return $new->client_read($old->res->content->leftovers);
   }
 
-  $self->_reuse($id, $close);
+  # CONNECT requests always have a followup request
+  $self->_reuse($id, $close) unless uc $old->req->method eq 'CONNECT';
   if ($res->is_status_class(400) || $res->is_status_class(500)) {
     $res->error({message => $res->message, code => $res->code});
   }
@@ -275,9 +276,8 @@ sub _reuse {
   my ($self, $id, $close) = @_;
 
   # Connection close
-  my $c  = $self->{connections}{$id};
-  my $tx = delete $c->{tx};
-  return if $tx && uc $tx->req->method eq 'CONNECT';
+  my $c   = $self->{connections}{$id};
+  my $tx  = delete $c->{tx};
   my $max = $self->max_connections;
   return $self->_remove($id)
     if $close || !$tx || !$max || !$tx->keep_alive || $tx->error;

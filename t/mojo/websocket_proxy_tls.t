@@ -271,7 +271,7 @@ $ua->websocket(
     my ($ua, $tx) = @_;
     $success = $tx->success;
     $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
-    $err     = $tx->res->error;
+    $err     = $tx->error;
     Mojo::IOLoop->stop;
   }
 );

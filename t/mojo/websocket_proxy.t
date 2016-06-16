@@ -195,17 +195,19 @@ ok $sent > 25, 'sent enough';
 
 # Proxy WebSocket with bad target
 $ua->proxy->http("http://127.0.0.1:$proxy");
-my ($success, $err);
+my ($success, $leak, $err);
 $ua->websocket(
   "ws://127.0.0.1:$dummy/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
+    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
     $err     = $tx->error;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
 ok !$success, 'no success';
+ok !$leak,    'connection has been removed';
 is $err->{message}, 'Proxy connection failed', 'right message';
 
 done_testing();

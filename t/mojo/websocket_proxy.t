@@ -36,14 +36,14 @@ $daemon->listen(['http://127.0.0.1'])->start;
 my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # CONNECT proxy server for testing
-my $dummy = Mojo::IOLoop::Server->generate_port;
 my (%buffer, $connected, $read, $sent);
 my $nf
   = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok = "HTTP/1.0 201 BAR\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
-my $id = Mojo::IOLoop->server(
+my $ok    = "HTTP/1.0 201 BAR\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
+my $dummy = Mojo::IOLoop::Server->generate_port;
+my $id    = Mojo::IOLoop->server(
   {address => '127.0.0.1'} => sub {
     my ($loop, $stream, $id) = @_;
 

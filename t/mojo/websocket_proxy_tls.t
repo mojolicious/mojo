@@ -54,14 +54,14 @@ $daemon->listen([$listen])->start;
 my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # Connect proxy server for testing
-my $dummy = Mojo::IOLoop::Server->generate_port;
 my (%buffer, $connected, $read, $sent);
 my $nf
   = "HTTP/1.1 501 FOO\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
-my $id = Mojo::IOLoop->server(
+my $ok    = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
+my $dummy = Mojo::IOLoop::Server->generate_port;
+my $id    = Mojo::IOLoop->server(
   {address => '127.0.0.1'} => sub {
     my ($loop, $stream, $id) = @_;
 
@@ -261,7 +261,7 @@ is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
 
 # Proxy WebSocket with bad target
 $ua->proxy->https("http://127.0.0.1:$proxy");
-my ($success, $err, $leak);
+my ($success, $leak, $err);
 $ua->websocket(
   "wss://127.0.0.1:$dummy/test" => sub {
     my ($ua, $tx) = @_;

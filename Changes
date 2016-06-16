@@ -1,5 +1,7 @@
 
-6.66  2016-06-15
+6.66  2016-06-16
+  - Fixed support for CONNECT requests without keep alive connections in
+    Mojo::UserAgent. (anparker, sri)
 
 6.65  2016-06-14
   - Added password and username methods to Mojo::URL.

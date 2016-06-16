@@ -125,18 +125,20 @@ sub _connect_proxy {
     ($loop, $new) => sub {
       my ($self, $tx) = @_;
 
-      # CONNECT failed (connection needs to be kept alive)
-      $old->res->error({message => 'Proxy connection failed'})
-        and return $self->$cb($old)
-        if $tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive;
-
-      # Start real transaction
-      $old->req->via_proxy(0);
+      # CONNECT failed
       my $id = $tx->connection;
+      if ($tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive) {
+        $old->res->error({message => 'Proxy connection failed'});
+        $self->_remove($id);
+        return $self->$cb($old);
+      }
+
+      # Start real transaction without TLS upgrade
+      $old->req->via_proxy(0);
       return $self->_start($loop, $old->connection($id), $cb)
         unless $tx->req->url->protocol eq 'https';
 
-      # TLS upgrade
+      # TLS upgrade before starting the real transaction
       my $handle = $loop->stream($id)->steal_handle;
       $self->_remove($id);
       $id = $self->_connect($loop, 0, $old, $handle,
@@ -273,8 +275,9 @@ sub _reuse {
   my ($self, $id, $close) = @_;
 
   # Connection close
-  my $c   = $self->{connections}{$id};
-  my $tx  = delete $c->{tx};
+  my $c  = $self->{connections}{$id};
+  my $tx = delete $c->{tx};
+  return if $tx && uc $tx->req->method eq 'CONNECT';
   my $max = $self->max_connections;
   return $self->_remove($id)
     if $close || !$tx || !$max || !$tx->keep_alive || $tx->error;

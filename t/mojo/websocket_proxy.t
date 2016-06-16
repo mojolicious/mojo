@@ -4,6 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
@@ -35,6 +36,7 @@ $daemon->listen(['http://127.0.0.1'])->start;
 my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # CONNECT proxy server for testing
+my $dummy = Mojo::IOLoop::Server->generate_port;
 my (%buffer, $connected, $read, $sent);
 my $nf
   = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
@@ -60,7 +62,7 @@ my $id = Mojo::IOLoop->server(
           $buffer{$id}{client} = '';
           if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             $connected = "$1:$2";
-            my $fail = $2 == $port + 1;
+            my $fail = $2 == $dummy;
 
             # Connection to server
             $buffer{$id}{connection} = Mojo::IOLoop->client(
@@ -193,10 +195,9 @@ ok $sent > 25, 'sent enough';
 
 # Proxy WebSocket with bad target
 $ua->proxy->http("http://127.0.0.1:$proxy");
-my $port2 = $port + 1;
 my ($success, $err);
 $ua->websocket(
-  "ws://127.0.0.1:$port2/test" => sub {
+  "ws://127.0.0.1:$dummy/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
     $err     = $tx->error;

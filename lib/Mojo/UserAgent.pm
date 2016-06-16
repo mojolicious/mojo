@@ -126,6 +126,7 @@ sub _connect_proxy {
       my ($self, $tx) = @_;
 
       # CONNECT failed
+      $old->previous($tx)->req->via_proxy(0);
       my $id = $tx->connection;
       if ($tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive) {
         $old->res->error({message => 'Proxy connection failed'});
@@ -134,7 +135,6 @@ sub _connect_proxy {
       }
 
       # Start real transaction without TLS upgrade
-      $old->req->via_proxy(0);
       return $self->_start($loop, $old->connection($id), $cb)
         unless $tx->req->url->protocol eq 'https';
 

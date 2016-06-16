@@ -54,6 +54,7 @@ $daemon->listen([$listen])->start;
 my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 
 # Connect proxy server for testing
+my $dummy = Mojo::IOLoop::Server->generate_port;
 my (%buffer, $connected, $read, $sent);
 my $nf
   = "HTTP/1.1 501 FOO\x0d\x0a"
@@ -79,7 +80,7 @@ my $id = Mojo::IOLoop->server(
           $buffer{$id}{client} = '';
           if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             $connected = "$1:$2";
-            my $fail = $2 == $port + 1;
+            my $fail = $2 == $dummy;
 
             # Connection to server
             $buffer{$id}{connection} = Mojo::IOLoop->client(
@@ -260,30 +261,31 @@ is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
 
 # Proxy WebSocket with bad target
 $ua->proxy->https("http://127.0.0.1:$proxy");
-my $port2 = $port + 1;
-my ($success, $err);
+my ($success, $err, $leak);
 $ua->websocket(
-  "wss://127.0.0.1:$port2/test" => sub {
+  "wss://127.0.0.1:$dummy/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
+    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
     $err     = $tx->res->error;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
 ok !$success, 'no success';
+ok !$leak,    'connection has been removed';
 is $err->{message}, 'Proxy connection failed', 'right error';
 
 # Failed TLS handshake through proxy
 $tx = $ua->get("https://127.0.0.1:$close");
-is $err->{message}, 'Proxy connection failed', 'right error';
+like $tx->error->{message}, qr/handshake problems/, 'right error';
 
 # Idle connection through proxy
 $ua->on(
   start => sub { shift->connect_timeout(0.25) if pop->req->method eq 'CONNECT' }
 );
 $tx = $ua->get("https://127.0.0.1:$idle");
-is $err->{message}, 'Proxy connection failed', 'right error';
+is $tx->error->{message}, 'Connect timeout', 'right error';
 $ua->connect_timeout(10);
 
 # Blocking proxy request again

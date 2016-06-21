@@ -15,8 +15,8 @@ use Mojo::Util
   qw(decode dumper encode files hmac_sha1_sum html_unescape md5_bytes md5_sum),
   qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
-  qw(split_header spurt squish steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode);
+  qw(split_header spurt steady_time tablify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -348,11 +348,6 @@ is trim(' la la  la '),             'la la  la',         'right trimmed result';
 is trim(" \n la la la \n "),        'la la la',          'right trimmed result';
 is trim("\n la\nla la \n"),         "la\nla la",         'right trimmed result';
 is trim(" \nla \n  \t\nla\nla\n "), "la \n  \t\nla\nla", 'right trimmed result';
-
-# squish
-is squish(' la la  la '),             'la la la', 'right squished result';
-is squish("\n la\nla la \n"),         'la la la', 'right squished result';
-is squish(" \nla \n  \t\nla\nla\n "), 'la la la', 'right squished result';
 
 # md5_bytes
 is unpack('H*', md5_bytes(encode 'UTF-8', 'foo bar baz ♥')),

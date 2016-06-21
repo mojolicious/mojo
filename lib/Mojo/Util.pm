@@ -57,8 +57,8 @@ our @EXPORT_OK = (
   qw(decode deprecated dumper encode files hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
-  qw(split_header spurt squish steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode)
+  qw(split_header spurt steady_time tablify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -262,12 +262,6 @@ sub spurt {
   defined $file->syswrite($content)
     or croak qq{Can't write to file "$path": $!};
   return $content;
-}
-
-sub squish {
-  my $str = trim(@_);
-  $str =~ s/\s+/ /g;
-  return $str;
 }
 
 sub tablify {
@@ -729,16 +723,6 @@ its own array reference, and keys without a value get C<undef> assigned.
   $bytes = spurt $bytes, '/etc/passwd';
 
 Write all data at once to file.
-
-=head2 squish
-
-  my $squished = squish $str;
-
-Trim whitespace characters from both ends of string and then change all
-consecutive groups of whitespace into one space each.
-
-  # "foo bar"
-  squish '  foo  bar  ';
 
 =head2 steady_time
 

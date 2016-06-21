@@ -262,19 +262,19 @@ like $@, qr/^Undefined subroutine &${package}::missing called/, 'right error';
 $t->get_ok('/')->status_is(200)->element_exists_not('div:root')
   ->text_is('label[for="foo"]' => '<Foo>')
   ->element_exists('input[type="text"]')->element_exists('textarea')
-  ->text_is('label[for="baz"]' => 'Baz')->element_exists('select')
+  ->text_like('label[for="baz"]' => qr/Baz/)->element_exists('select')
   ->element_exists('input[type="password"]');
 
 # Successful validation
 $t->get_ok('/' => form => {foo => '☃☃'})->status_is(200)
   ->element_exists_not('div:root')->text_is('label[for="foo"]' => '<Foo>')
   ->element_exists('input[type="text"]')->element_exists('textarea')
-  ->text_is('label[for="baz"]' => 'Baz')->element_exists('select')
+  ->text_like('label[for="baz"]' => qr/Baz/)->element_exists('select')
   ->element_exists('input[type="password"]');
 
 # Validation failed for required fields
 $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
-  ->text_is('div:root'                                 => 'in 1')
+  ->text_like('div:root' => qr/in.+1/s)
   ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
   ->element_exists('input.custom.field-with-error[type="text"][value="no"]')
   ->element_exists_not('textarea.field-with-error')
@@ -349,11 +349,11 @@ $t->app->helper(
   }
 );
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
-  ->status_is(200)->text_is('div:root' => 'two e:foo')
+  ->status_is(200)->text_like('div:root' => qr/two.+e:foo/s)
   ->text_is('label.custom.my-field-with-error[for="foo"]' => '<Foo>')
   ->element_exists('input.custom.my-field-with-error[type="text"]')
   ->element_exists('textarea.my-field-with-error')
-  ->text_is('label.custom.my-field-with-error[for="baz"]' => 'Baz')
+  ->text_like('label.custom.my-field-with-error[for="baz"]' => qr/Baz/)
   ->element_exists('select.my-field-with-error')
   ->element_exists('input.my-field-with-error[type="password"]');
 

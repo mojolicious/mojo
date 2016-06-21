@@ -42,8 +42,8 @@ has static    => sub { Mojolicious::Static->new };
 has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Clinking Beer Mugs';
-our $VERSION  = '6.67';
+our $CODENAME = 'Nerd Face';
+our $VERSION  = '7.0';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -717,6 +717,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 Every major release of L<Mojolicious> has a code name, these are the ones that
 have been used in the past.
+
+7.0, C<Nerd Face> (U+1F913)
 
 6.0, C<Clinking Beer Mugs> (U+1F37B)
 

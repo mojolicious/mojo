@@ -1,5 +1,10 @@
 
-6.67  2016-06-21
+7.0  2016-06-21
+  - Code name "Nerd Face", this is a major release.
+  - Removed squish method from Mojo::ByteStream.
+  - Removed squish function from Mojo::Util.
+  - Removed support for smart whitespace trimming from all_text and text methods
+    in Mojo::DOM.
   - Fix a few whitespace bugs in Mojo::DOM.
 
 6.66  2016-06-16

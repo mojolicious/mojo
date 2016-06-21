@@ -97,8 +97,8 @@ websocket '/double_echo' => sub {
   );
 };
 
-websocket '/squish' => sub {
-  shift->on(message => sub { shift->send(b(shift)->squish) });
+websocket '/trim' => sub {
+  shift->on(message => sub { shift->send(b(shift)->trim) });
 };
 
 websocket '/dead' => sub { die 'i see dead processes' };
@@ -306,7 +306,7 @@ is $result, 'hi!hi!', 'right result';
 # Sending objects
 $result = undef;
 $ua->websocket(
-  '/squish' => sub {
+  '/trim' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });

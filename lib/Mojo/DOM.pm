@@ -304,10 +304,10 @@ sub _siblings {
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
 
 sub _text {
-  my ($nodes, $recurse) = @_;
+  my ($nodes, $all) = @_;
 
   my $text = '';
-  for my $node (@$nodes) {
+  while (my $node = shift @$nodes) {
     my $type = $node->[0];
 
     # Text
@@ -316,10 +316,7 @@ sub _text {
     }
 
     # Nested tag
-    elsif ($type eq 'tag' && $recurse) {
-      no warnings 'recursion';
-      $text .= _text([_nodes($node)], 1);
-    }
+    elsif ($type eq 'tag' && $all) { unshift @$nodes, _nodes($node) }
   }
 
   return $text;

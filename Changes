@@ -5,7 +5,7 @@
   - Removed squish function from Mojo::Util.
   - Removed support for smart whitespace trimming from all_text and text methods
     in Mojo::DOM.
-  - Fix a few whitespace bugs in Mojo::DOM.
+  - Fixed a few whitespace bugs in Mojo::DOM.
 
 6.66  2016-06-16
   - Fixed support for CONNECT requests without keep alive connections in

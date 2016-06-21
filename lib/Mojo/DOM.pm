@@ -862,6 +862,9 @@ Alias for L<Mojo::Base/"tap">.
 
 Extract text content from this element only (not including child elements).
 
+  # "bar"
+  $dom->parse("<div>foo<p>bar</p>baz</div>")->at('p')->text;
+
   # "foo\nbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->text;
 

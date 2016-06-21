@@ -1,5 +1,5 @@
 
-7.0  2016-06-21
+7.0  2016-06-22
   - Code name "Nerd Face", this is a major release.
   - Removed squish method from Mojo::ByteStream.
   - Removed squish function from Mojo::Util.

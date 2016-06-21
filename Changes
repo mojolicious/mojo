@@ -1,5 +1,6 @@
 
-6.67  2016-06-18
+6.67  2016-06-21
+  - Fix a few whitespace bugs in Mojo::DOM.
 
 6.66  2016-06-16
   - Fixed support for CONNECT requests without keep alive connections in

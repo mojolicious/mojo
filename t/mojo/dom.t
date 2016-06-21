@@ -130,7 +130,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
 is $simple->parent->all_text,
-  'test easy works well yada yada < very broken more text', 'right text';
+  'testeasyworks well yada yada<very brokenmore text', 'right text';
 is $simple->tag, 'simple', 'right tag';
 is $simple->attr('class'), 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
@@ -1299,7 +1299,7 @@ is "$dom", <<EOF, 'right result';
 <div>D</div>works
 EOF
 $dom->at('li')->prepend_content('A3<p>A2</p>')->prepend_content('A4');
-is $dom->at('li')->text, 'A4A3 A', 'right text';
+is $dom->at('li')->text, 'A4A3A', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
@@ -1310,7 +1310,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 $dom->find('li')->[1]->append_content('<p>C2</p>C3')->append_content(' C4')
   ->append_content('C5');
-is $dom->find('li')->[1]->text, 'C C3 C4C5', 'right text';
+is $dom->find('li')->[1]->text, 'CC3C4C5', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
@@ -1365,13 +1365,13 @@ $dom = Mojo::DOM->new(<<EOF);
   <p>H
 </div>
 EOF
-is $dom->find('div > p')->[0]->text, 'A',   'right text';
-is $dom->find('div > p')->[1]->text, 'B',   'right text';
-is $dom->find('div > p')->[2]->text, 'C',   'right text';
-is $dom->find('div > p')->[3]->text, 'D',   'right text';
-is $dom->find('div > p')->[4]->text, 'E',   'right text';
-is $dom->find('div > p')->[5]->text, 'F G', 'right text';
-is $dom->find('div > p')->[6]->text, 'H',   'right text';
+is $dom->find('div > p')->[0]->text, 'A',  'right text';
+is $dom->find('div > p')->[1]->text, 'B',  'right text';
+is $dom->find('div > p')->[2]->text, 'C',  'right text';
+is $dom->find('div > p')->[3]->text, 'D',  'right text';
+is $dom->find('div > p')->[4]->text, 'E',  'right text';
+is $dom->find('div > p')->[5]->text, 'FG', 'right text';
+is $dom->find('div > p')->[6]->text, 'H',  'right text';
 is $dom->find('div > p > p')->[0], undef, 'no results';
 is $dom->at('div > p > img')->attr->{src}, 'foo.png', 'right attribute';
 is $dom->at('div > div')->text, 'X', 'right text';
@@ -1622,11 +1622,11 @@ $dom = Mojo::DOM->new(<<EOF);
     </ul>
 EOF
 is $dom->find('html > head > title')->[0]->text,    'Real World!', 'right text';
-is $dom->find('body > ul > li')->[0]->text,         'Test 123',    'right text';
+is $dom->find('body > ul > li')->[0]->text,         'Test123',     'right text';
 is $dom->find('body > ul > li > p')->[0]->text,     '',            'no text';
-is $dom->find('body > ul > li')->[1]->text,         'Test 321',    'right text';
+is $dom->find('body > ul > li')->[1]->text,         'Test321',     'right text';
 is $dom->find('body > ul > li > p')->[1]->text,     '',            'no text';
-is $dom->find('body > ul > li')->[1]->all_text,     'Test 321',    'right text';
+is $dom->find('body > ul > li')->[1]->all_text,     'Test321',     'right text';
 is $dom->find('body > ul > li > p')->[1]->all_text, '',            'no text';
 is $dom->find('body > ul > li')->[2]->text,         'Test 3 2 1',  'right text';
 is $dom->find('body > ul > li > p')->[2]->text,     '',            'no text';
@@ -1644,11 +1644,11 @@ $dom = Mojo::DOM->new(<<EOF);
     <div>foo<strong>: bar</strong>baz<strong>? yada</strong>!</div>
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
-is $dom->find('body > div')->[0]->all_text,      'foo bar.',    'right text';
-is $dom->find('body > div')->[1]->all_text, 'foo, bar baz; yada.', 'right text';
-is $dom->find('body > div')->[1]->text,     'foo baz.',            'right text';
-is $dom->find('body > div')->[2]->all_text, 'foo: bar baz? yada!', 'right text';
-is $dom->find('body > div')->[2]->text,     'foo baz!',            'right text';
+is $dom->find('body > div')->[0]->all_text,      'foobar.',     'right text';
+is $dom->find('body > div')->[1]->all_text, 'foo, barbaz; yada.', 'right text';
+is $dom->find('body > div')->[1]->text,     'foobaz.',            'right text';
+is $dom->find('body > div')->[2]->all_text, 'foo: barbaz? yada!', 'right text';
+is $dom->find('body > div')->[2]->text,     'foobaz!',            'right text';
 
 # Real world JavaScript and CSS
 $dom = Mojo::DOM->new(<<EOF);
@@ -1875,14 +1875,14 @@ $dom = Mojo::DOM->new(<<EOF);
 </html>
 EOF
 is $dom->at('html > head > title')->text, 'Test', 'right text';
-is $dom->find('html body table tr > td > font')->[0]->text, 'te st 1',
+is $dom->find('html body table tr > td > font')->[0]->text, 'test1',
   'right text';
-is $dom->find('html body table tr > td')->[1]->text, 'x1',     'right text';
-is $dom->find('html body table tr > td')->[2]->text, 'tes t2', 'right text';
-is $dom->find('html body table tr > td')->[3]->text, 'x2',     'right text';
+is $dom->find('html body table tr > td')->[1]->text, 'x1',    'right text';
+is $dom->find('html body table tr > td')->[2]->text, 'test2', 'right text';
+is $dom->find('html body table tr > td')->[3]->text, 'x2',    'right text';
 is $dom->find('html body table tr > td')->[5], undef, 'no result';
 is $dom->find('html body table tr > td')->size, 5, 'right number of elements';
-is $dom->find('html body table tr > td > font')->[1]->text, 't est3',
+is $dom->find('html body table tr > td > font')->[1]->text, 'test3',
   'right text';
 is $dom->find('html body table tr > td > font')->[2], undef, 'no result';
 is $dom->find('html body table tr > td > font')->size, 2,
@@ -2122,7 +2122,7 @@ is $dom->at('c')->parent->tag, 'b', 'right tag';
 is $dom->at('d')->parent->tag, 'b', 'right tag';
 $dom->at('b')->prepend_content('<e>Mojo</e>');
 is $dom->at('e')->parent->tag, 'b', 'right tag';
-is $dom->all_text, 'Mojo Test', 'right text';
+is $dom->all_text, 'MojoTest', 'right text';
 
 # Wrap elements
 $dom = Mojo::DOM->new('<a>Test</a>');
@@ -2188,12 +2188,12 @@ $dom = Mojo::DOM->new(<<EOF);
 EOF
 is $dom->text, '', 'no text';
 is $dom->text(0), "\n", 'right text';
-is $dom->all_text, "looks like\n  it\n    really\n  works", 'right text';
+is $dom->all_text, "lookslike\n  it\n    really\n  works", 'right text';
 is $dom->all_text(0), "\n  looks\n  like\n  it\n    really\n  \n  works\n\n",
   'right text';
-is $dom->at('div')->text, 'looks works', 'right text';
+is $dom->at('div')->text, 'looksworks', 'right text';
 is $dom->at('div')->text(0), "\n  looks\n  \n  works\n", 'right text';
-is $dom->at('div')->all_text, "looks like\n  it\n    really\n  works",
+is $dom->at('div')->all_text, "lookslike\n  it\n    really\n  works",
   'right text';
 is $dom->at('div')->all_text(0),
   "\n  looks\n  like\n  it\n    really\n  \n  works\n", 'right text';

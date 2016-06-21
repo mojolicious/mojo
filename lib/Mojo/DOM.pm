@@ -318,13 +318,6 @@ sub _start { $_[0][0] eq 'root' ? 1 : 4 }
 sub _text {
   my ($nodes, $recurse, $trim) = @_;
 
-  # Merge successive text nodes
-  my $i = 0;
-  while (my $next = $nodes->[$i + 1]) {
-    ++$i and next unless $nodes->[$i][0] eq 'text' && $next->[0] eq 'text';
-    splice @$nodes, $i, 2, ['text', $nodes->[$i][1] . $next->[1]];
-  }
-
   my $text = '';
   for my $node (@$nodes) {
     my $type = $node->[0];
@@ -342,11 +335,7 @@ sub _text {
       $chunk = _text([_nodes($node)], 1, $node->[1] eq 'pre' ? 0 : $trim);
     }
 
-    # Add leading whitespace if punctuation allows it
-    $chunk = " $chunk" if $text =~ /\S\z/ && $chunk =~ /^[^.!?,;:\s]+/;
-
-    # Trim whitespace blocks
-    $text .= $chunk if $chunk =~ /\S+/ || !$trim;
+    $text .= $chunk;
   }
 
   return $text;

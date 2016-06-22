@@ -150,7 +150,7 @@ sub to_abs {
 
   # Inherit path
   if (!@{$path->parts}) {
-    $path = $abs->path($base->path->clone)->path->canonicalize;
+    $abs->path($base->path->clone->canonicalize);
 
     # Query
     $abs->query($base->query->clone) unless length $abs->query->to_string;

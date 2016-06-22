@@ -397,8 +397,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =over 2
 
-=item * L<Mojolicious::Plugin::Charset>
-
 =item * L<Mojolicious::Plugin::Config>
 
 =over 2

@@ -1,6 +1,7 @@
 
 7.0  2016-06-22
   - Code name "Nerd Face", this is a major release.
+  - Removed Mojolicious::Plugin::Charset.
   - Removed squish method from Mojo::ByteStream.
   - Removed squish function from Mojo::Util.
   - Removed support for smart whitespace trimming from all_text and text methods

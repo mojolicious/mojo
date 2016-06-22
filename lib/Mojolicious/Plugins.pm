@@ -78,10 +78,6 @@ examples.
 
 =over 2
 
-=item L<Mojolicious::Plugin::Charset>
-
-Change the application charset.
-
 =item L<Mojolicious::Plugin::Config>
 
 Perl-ish configuration files.

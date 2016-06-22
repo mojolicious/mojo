@@ -149,18 +149,15 @@ sub to_abs {
   return $abs if $path->leading_slash;
 
   # Inherit path
-  my $base_path = $base->path;
   if (!@{$path->parts}) {
-    $path
-      = $abs->path($base_path->clone)->path->trailing_slash(0)->canonicalize;
+    $path = $abs->path($base->path->clone)->path->canonicalize;
 
     # Query
-    return $abs if length $abs->query->to_string;
-    $abs->query($base->query->clone);
+    $abs->query($base->query->clone) unless length $abs->query->to_string;
   }
 
   # Merge paths
-  else { $abs->path($base_path->clone->merge($path)->canonicalize) }
+  else { $abs->path($base->path->clone->merge($path)->canonicalize) }
 
   return $abs;
 }

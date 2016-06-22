@@ -262,6 +262,12 @@ is $url->to_abs, 'http://example.com/bar/foo?foo=bar#23',
   'right absolute version';
 is $url->to_abs->base, 'http://example.com/bar/baz/', 'right base';
 
+# Absolute with query
+$url = Mojo::URL->new('?foo=bar#23');
+$url->base->parse('http://example.com/bar/baz/');
+is $url->to_abs, 'http://example.com/bar/baz/?foo=bar#23',
+  'right absolute version';
+
 # Clone (advanced)
 $url = Mojo::URL->new(
   'ws://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23');

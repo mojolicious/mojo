@@ -74,10 +74,11 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
 L<Mojolicious::Plugin::JSONConfig> is a JSON configuration plugin that
 preprocesses its input with L<Mojo::Template>.
 
-The application object can be accessed via C<$app> or the C<app> function. You
-can extend the normal configuration file C<$moniker.json> with C<mode> specific
-ones like C<$moniker.$mode.json>. A default configuration filename will be
-generated from the value of L<Mojolicious/"moniker">.
+The application object can be accessed via C<$app> or the C<app> function. A
+default configuration filename in the application home directory will be
+generated from the value of L<Mojolicious/"moniker"> (C<$moniker.json>). You can
+extend the normal configuration file C<$moniker.json> with C<mode> specific ones
+like C<$moniker.$mode.json>, which will be detected automatically.
 
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.

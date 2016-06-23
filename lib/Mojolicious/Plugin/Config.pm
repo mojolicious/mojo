@@ -4,11 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use File::Spec::Functions 'file_name_is_absolute';
 use Mojo::Util qw(decode slurp);
 
-sub load {
-  my ($self, $file, $conf, $app) = @_;
-  $app->log->debug(qq{Reading configuration file "$file"});
-  return $self->parse(decode('UTF-8', slurp $file), $file, $conf, $app);
-}
+sub load { $_[0]->parse(decode('UTF-8', slurp $_[1]), @_[1, 2, 3]) }
 
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
@@ -99,10 +95,11 @@ L<Mojolicious::Plugin::Config> is a Perl-ish configuration plugin.
 
 The application object can be accessed via C<$app> or the C<app> function,
 L<strict>, L<warnings>, L<utf8> and Perl 5.10 L<features|feature> are
-automatically enabled. You can extend the normal configuration file
-C<$moniker.conf> with C<mode> specific ones like C<$moniker.$mode.conf>. A
-default configuration filename will be generated from the value of
-L<Mojolicious/"moniker">.
+automatically enabled. A default configuration filename in the application home
+directory will be generated from the value of L<Mojolicious/"moniker">
+(C<$moniker.conf>). You can extend the normal configuration file
+C<$moniker.conf> with C<mode> specific ones like C<$moniker.$mode.conf>, which
+will be detected automatically.
 
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.

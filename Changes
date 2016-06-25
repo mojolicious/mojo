@@ -10,6 +10,8 @@
     loaded.
   - Fixed trailing slash bug in Mojo::URL.
   - Fixed a few whitespace bugs in Mojo::DOM.
+  - Fixed a bug causing headers with zero length values to be ignored by the get
+    command. (jberger)
 
 6.66  2016-06-16
   - Fixed support for CONNECT requests without keep alive connections in

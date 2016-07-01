@@ -171,8 +171,8 @@ L<Mojolicious::Command::get>.
 =head2 JSON Services
 
 JSON is a very common interchange format for web services. Mojolicious loves
-JSON and makes it very easy to use everywhere. In this example you can fetch
-module data from L<MetaCPAN|http://metacpan.org>.
+JSON and makes it very easy to both build and use JSON services. In this example
+you can fetch module data from L<MetaCPAN|http://metacpan.org>.
 
   use Mojolicious::Lite;
 

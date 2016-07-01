@@ -168,6 +168,33 @@ L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get -v -M POST -c 'test' /echo
 
+=head2 JSON Services
+
+JSON is a very common interchange format for web services. Mojolicious loves
+JSON and makes it very easy to use everywhere. In this example you can fetch
+module data from L<MetaCPAN|http://metacpan.org>.
+
+  use Mojolicious::Lite;
+
+  post '/module_info' => sub {
+    my $c = shift;
+    my $module = $c->req->json->{module};
+    my $info = $c->ua->get("http://api.metacpan.org/module/$module")->res->json;
+    $c->render(json => $info);
+  };
+
+  app->start;
+
+Now let's see the current distribution that contains L<Mojo>.
+
+  $ ./myapp.pl get -M POST -c '{"module":"Mojo"}' /module_info /release
+
+That trailing path is a L<"JSON pointer"|Mojo::JSON::Pointer> which helps dive
+into JSON documents quickly. The example above might have used one to get the
+module from the request.
+
+  my $module = $c->req->json('/module');
+
 =head2 Built-in C<exception> and C<not_found> pages
 
 During development you will encounter these pages whenever you make a mistake,

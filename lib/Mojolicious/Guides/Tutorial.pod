@@ -172,8 +172,8 @@ L<Mojolicious::Command::get>.
 
 JSON is the most commonly used data-interchange format for web services.
 L<Mojolicious> loves JSON and comes with the possibly fastest pure-Perl
-implementation L<Mojo::JSON> built right in, it is accessible through
-L<Mojo::Message/"json"> and the reserved C<json> stash value.
+implementation L<Mojo::JSON> built right in, which is accessible through
+L<Mojo::Message/"json"> as well as the reserved stash value C<json>.
 
   use Mojolicious::Lite;
 
@@ -187,7 +187,8 @@ L<Mojo::Message/"json"> and the reserved C<json> stash value.
 
   app->start;
 
-Send JSON documents from the command line with L<Mojolicious::Command::get>.
+You can send JSON documents from the command line with
+L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get -M PUT -c '{"message":"Hello Mojo!"}' /reverse
 

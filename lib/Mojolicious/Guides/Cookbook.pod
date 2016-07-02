@@ -908,7 +908,7 @@ For a full list of available CSS selectors see L<Mojo::DOM::CSS/"SELECTORS">.
 
 Most web services these days are based on the JSON data-interchange format.
 That's why L<Mojolicious> comes with the possibly fastest pure-Perl
-implementation L<Mojo::JSON> built right in, it is accessible through
+implementation L<Mojo::JSON> built right in, which is accessible through
 L<Mojo::Message/"json">.
 
   use Mojo::UserAgent;

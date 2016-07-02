@@ -168,6 +168,29 @@ L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get -v -M POST -c 'test' /echo
 
+=head2 JSON
+
+JSON is the most commonly used data-interchange format for web services.
+L<Mojolicious> loves JSON and comes with the possibly fastest pure-Perl
+implementation L<Mojo::JSON> built right in, it is accessible through
+L<Mojo::Message/"json"> and the reserved C<json> stash value.
+
+  use Mojolicious::Lite;
+
+  # Modify the received JSON document and return it
+  put '/reverse' => sub {
+    my $c    = shift;
+    my $hash = $c->req->json;
+    $hash->{message} = reverse $hash->{message};
+    $c->render(json => $hash);
+  };
+
+  app->start;
+
+Send JSON documents from the command line with L<Mojolicious::Command::get>.
+
+  $ ./myapp.pl get -M PUT -c '{"message":"Hello Mojo!"}' /reverse
+
 =head2 Built-in C<exception> and C<not_found> pages
 
 During development you will encounter these pages whenever you make a mistake,

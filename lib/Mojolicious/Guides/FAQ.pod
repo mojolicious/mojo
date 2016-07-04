@@ -135,6 +135,12 @@ connections concurrently.
 
 In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
+=head2 Where can i discuss my patches for Mojolicious?
+
+We'd love to discuss your contributions to L<Mojolicious> on our official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
+
 =head2 Where did my file extension go?
 
 Standard route placeholders will not match the C<.> character, however

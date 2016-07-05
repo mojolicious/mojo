@@ -28,25 +28,23 @@ is $url->path,       '/x/index.html', 'right path';
 is $url->query,      'monkey=biz&foo=1', 'right query';
 is $url->path_query, '/x/index.html?monkey=biz&foo=1', 'right path and query';
 is $url->fragment,   '/!%?@3', 'right fragment';
-is "$url",
-  'https://sri:foobar@example.com:8080/x/index.html?monkey=biz&foo=1#/!%?@3',
+is "$url", 'https://example.com:8080/x/index.html?monkey=biz&foo=1#/!%?@3',
   'right format';
 $url->path('/index.xml');
-is "$url",
-  'https://sri:foobar@example.com:8080/index.xml?monkey=biz&foo=1#/!%?@3',
+is "$url", 'https://example.com:8080/index.xml?monkey=biz&foo=1#/!%?@3',
   'right format';
 
 # Advanced userinfo and fragment roundtrip
 $url = Mojo::URL->new(
   'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
-is $url->scheme,   'ws',                          'right scheme';
-is $url->userinfo, 'AZaz09-._~!$&\'()*+,;=:',     'right userinfo';
-is $url->username, 'AZaz09-._~!$&\'()*+,;=',      'right username';
-is $url->password, '',                            'right password';
-is $url->host,     'localhost',                   'right host';
-is $url->fragment, 'AZaz09-._~!$&\'()*+,;=%:@/?', 'right fragment';
-is "$url", 'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?',
-  'right format';
+is $url->scheme,    'ws',                                'right scheme';
+is $url->userinfo,  'AZaz09-._~!$&\'()*+,;=:',           'right userinfo';
+is $url->username,  'AZaz09-._~!$&\'()*+,;=',            'right username';
+is $url->password,  '',                                  'right password';
+is $url->host,      'localhost',                         'right host';
+is $url->authority, 'AZaz09-._~!$&\'()*+,;=:@localhost', 'right authority';
+is $url->fragment,  'AZaz09-._~!$&\'()*+,;=%:@/?',       'right fragment';
+is "$url", 'ws://localhost#AZaz09-._~!$&\'()*+,;=%:@/?', 'right format';
 
 # Parameters
 $url = Mojo::URL->new(
@@ -60,34 +58,32 @@ is $url->path,     '', 'no path';
 is $url->query,    '_monkey=biz%3B&_monkey=23', 'right query';
 is_deeply $url->query->to_hash, {_monkey => ['biz;', 23]}, 'right structure';
 is $url->fragment, '23', 'right fragment';
-is "$url", 'http://sri:foobar@example.com:8080?_monkey=biz%3B&_monkey=23#23',
+is "$url", 'http://example.com:8080?_monkey=biz%3B&_monkey=23#23',
   'right format';
 $url->query(monkey => 'foo');
-is "$url", 'http://sri:foobar@example.com:8080?monkey=foo#23', 'right format';
+is "$url", 'http://example.com:8080?monkey=foo#23', 'right format';
 $url->query([monkey => 'bar']);
-is "$url", 'http://sri:foobar@example.com:8080?monkey=bar#23', 'right format';
+is "$url", 'http://example.com:8080?monkey=bar#23', 'right format';
 $url->query({foo => 'bar'});
-is "$url", 'http://sri:foobar@example.com:8080?monkey=bar&foo=bar#23',
-  'right format';
+is "$url", 'http://example.com:8080?monkey=bar&foo=bar#23', 'right format';
 $url->query('foo');
-is "$url", 'http://sri:foobar@example.com:8080?foo#23', 'right format';
+is "$url", 'http://example.com:8080?foo#23', 'right format';
 $url->query('foo=bar');
-is "$url", 'http://sri:foobar@example.com:8080?foo=bar#23', 'right format';
+is "$url", 'http://example.com:8080?foo=bar#23', 'right format';
 $url->query([foo => undef]);
-is "$url", 'http://sri:foobar@example.com:8080#23', 'right format';
+is "$url", 'http://example.com:8080#23', 'right format';
 $url->query([foo => 23, bar => 24, baz => 25]);
-is "$url", 'http://sri:foobar@example.com:8080?foo=23&bar=24&baz=25#23',
-  'right format';
+is "$url", 'http://example.com:8080?foo=23&bar=24&baz=25#23', 'right format';
 $url->query([foo => 26, bar => undef, baz => undef]);
-is "$url", 'http://sri:foobar@example.com:8080?foo=26#23', 'right format';
+is "$url", 'http://example.com:8080?foo=26#23', 'right format';
 $url->query(c => 3);
-is "$url", 'http://sri:foobar@example.com:8080?c=3#23', 'right format';
+is "$url", 'http://example.com:8080?c=3#23', 'right format';
 $url->query(Mojo::Parameters->new('a=1&b=2'));
 is_deeply $url->query->to_hash, {a => 1, b => 2}, 'right structure';
-is "$url", 'http://sri:foobar@example.com:8080?a=1&b=2#23', 'right format';
+is "$url", 'http://example.com:8080?a=1&b=2#23', 'right format';
 $url->query(Mojo::Parameters->new('%E5=%E4')->charset(undef));
 is_deeply $url->query->to_hash, {"\xe5" => "\xe4"}, 'right structure';
-is "$url", 'http://sri:foobar@example.com:8080?%E5=%E4#23', 'right format';
+is "$url", 'http://example.com:8080?%E5=%E4#23', 'right format';
 
 # Query string
 $url = Mojo::URL->new(
@@ -105,7 +101,7 @@ is_deeply $url->query->pairs, ['_monkeybiz;', '', '_monkey;23', ''],
   'right structure';
 is $url->query, '_monkeybiz%3B=&_monkey%3B23=', 'right query';
 is $url->fragment, '23', 'right fragment';
-is "$url", 'wss://sri:foo:bar@example.com:8080?_monkeybiz%3B=&_monkey%3B23=#23',
+is "$url", 'wss://example.com:8080?_monkeybiz%3B=&_monkey%3B23=#23',
   'right format';
 $url = Mojo::URL->new('https://example.com/0?0#0');
 ok $url->is_abs,    'is absolute';
@@ -280,11 +276,10 @@ is $clone->port,     '8080', 'right port';
 is $clone->path,     '/test/index.html', 'right path';
 is $clone->query,    'monkey=biz&foo=1', 'right query';
 is $clone->fragment, '23', 'right fragment';
-is "$clone",
-  'ws://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23',
+is "$clone", 'ws://example.com:8080/test/index.html?monkey=biz&foo=1#23',
   'right format';
 $clone->path('/index.xml');
-is "$clone", 'ws://sri:foobar@example.com:8080/index.xml?monkey=biz&foo=1#23',
+is "$clone", 'ws://example.com:8080/index.xml?monkey=biz&foo=1#23',
   'right format';
 
 # Clone (with base)
@@ -370,20 +365,22 @@ is $url->password, '♥',              'right password';
 is $url->host,     "kr\xe4ih.com",     'right host';
 is $url->ihost,    'xn--krih-moa.com', 'right internationalized host';
 is $url->port,     3000,               'right port';
-is "$url", 'https://%E2%99%A5:%E2%99%A5@xn--krih-moa.com:3000', 'right format';
+is $url->authority, '%E2%99%A5:%E2%99%A5@xn--krih-moa.com:3000',
+  'right authority';
+is "$url", 'https://xn--krih-moa.com:3000', 'right format';
 
 # IDNA (snowman)
 $url = Mojo::URL->new('http://☃:☃@☃.☃.de/☃?☃#☃');
-ok $url->is_abs,   'is absolute';
-is $url->scheme,   'http', 'right scheme';
-is $url->userinfo, '☃:☃', 'right userinfo';
-is $url->host,     '☃.☃.de', 'right host';
-is $url->ihost,    'xn--n3h.xn--n3h.de', 'right internationalized host';
-is $url->path,     '/%E2%98%83', 'right path';
-is $url->query,    '%E2%98%83', 'right query';
-is $url->fragment, '☃', 'right fragment';
-is "$url",
-  'http://%E2%98%83:%E2%98%83@xn--n3h.xn--n3h.de/%E2%98%83?%E2%98%83#%E2%98%83',
+ok $url->is_abs,    'is absolute';
+is $url->scheme,    'http', 'right scheme';
+is $url->userinfo,  '☃:☃', 'right userinfo';
+is $url->host,      '☃.☃.de', 'right host';
+is $url->ihost,     'xn--n3h.xn--n3h.de', 'right internationalized host';
+is $url->authority, '%E2%98%83:%E2%98%83@xn--n3h.xn--n3h.de', 'right authority';
+is $url->path,      '/%E2%98%83', 'right path';
+is $url->query,     '%E2%98%83', 'right query';
+is $url->fragment,  '☃', 'right fragment';
+is "$url", 'http://xn--n3h.xn--n3h.de/%E2%98%83?%E2%98%83#%E2%98%83',
   'right format';
 
 # IRI/IDNA
@@ -420,13 +417,14 @@ is $url->to_abs, 'http://foo.com/', 'right absolute version';
 
 # "0"
 $url = Mojo::URL->new('http://0@foo.com#0');
-is $url->scheme,   'http',    'right scheme';
-is $url->userinfo, '0',       'right userinfo';
-is $url->username, '0',       'right username';
-is $url->password, undef,     'no password';
-is $url->host,     'foo.com', 'right host';
-is $url->fragment, '0',       'right fragment';
-is "$url", 'http://0@foo.com#0', 'right format';
+is $url->scheme,    'http',      'right scheme';
+is $url->userinfo,  '0',         'right userinfo';
+is $url->username,  '0',         'right username';
+is $url->password,  undef,       'no password';
+is $url->host,      'foo.com',   'right host';
+is $url->authority, '0@foo.com', 'right authority';
+is $url->fragment,  '0',         'right fragment';
+is "$url", 'http://foo.com#0', 'right format';
 
 # Empty path elements
 $url = Mojo::URL->new('http://example.com/foo//bar/23/');

@@ -175,11 +175,10 @@ is $req->version, '1.0', 'right version';
 is $req->headers->dnt, 1, 'right "DNT" value';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
-is $req->url->to_abs->to_string, 'http://Aladdin:open%20sesame@localhost:8080'
-  . '/test/index.cgi/foo/bar?lalala=23&bar=baz', 'right absolute URL';
-is $req->url->base,
-  'http://Aladdin:open%20sesame@localhost:8080/test/index.cgi/',
-  'right base URL';
+is $req->url->to_abs->to_string,
+  'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
+  'right absolute URL';
+is $req->url->base, 'http://localhost:8080/test/index.cgi/', 'right base URL';
 is $req->url->base->userinfo, 'Aladdin:open sesame', 'right userinfo';
 is $req->url, 'foo/bar?lalala=23&bar=baz', 'right URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';

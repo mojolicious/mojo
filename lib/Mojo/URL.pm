@@ -169,8 +169,8 @@ sub to_string {
   my $url = '';
   if (my $proto = $self->protocol) { $url .= "$proto:" }
 
-  # Authority
-  my $authority = $self->authority;
+  # Authority (without userinfo)
+  my $authority = $self->host_port;
   $url .= "//$authority" if defined $authority;
 
   # Path and query
@@ -213,7 +213,6 @@ Mojo::URL - Uniform Resource Locator
   # Build
   my $url = Mojo::URL->new;
   $url->scheme('http');
-  $url->userinfo('sri:foobar');
   $url->host('example.com');
   $url->port(3000);
   $url->path('/foo/bar');
@@ -496,10 +495,14 @@ provided base URL.
 
   my $str = $url->to_string;
 
-Turn URL into a string.
+Turn URL into a string. Note that L</"userinfo"> will not be included for
+security reasons.
 
   # "http://mojolicious.org"
   Mojo::URL->new->scheme('http')->host('mojolicious.org')->to_string;
+
+  # "http://mojolicious.org"
+  Mojo::URL->new('http://daniel:s3cret@mojolicious.org')->to_string;
 
 =head2 username
 

@@ -296,7 +296,7 @@ sub _start {
   unless ($url->is_abs) {
     my $base
       = $loop == $self->ioloop ? $self->server->url : $self->server->nb_url;
-    $url->scheme($base->scheme)->authority($base->authority);
+    $url->scheme($base->scheme)->host($base->host)->port($base->port);
   }
 
   $_->prepare($tx) for $self->proxy, $self->cookie_jar;

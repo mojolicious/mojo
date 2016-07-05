@@ -1396,10 +1396,10 @@ L<Mojo::Template> contains the whole list of available options.
 
 =head2 Adding your favorite template system
 
-Maybe you would prefer a different template system than C<ep>, and there is not
-already a plugin on CPAN for your favorite one. All you have to do, is to add a
-new C<handler> with L<Mojolicious::Renderer/"add_handler"> when C<register> is
-called.
+Maybe you would prefer a different template system than C<ep>, which is provided
+by L<Mojolicious::Plugin::EPRenderer>, and there is not already a plugin on CPAN
+for your favorite one. All you have to do, is to add a new C<handler> with
+L<Mojolicious::Renderer/"add_handler"> when C<register> is called.
 
   package Mojolicious::Plugin::MyRenderer;
   use Mojo::Base 'Mojolicious::Plugin';

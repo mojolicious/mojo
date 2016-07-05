@@ -1,5 +1,5 @@
 
-7.0  2016-07-04
+7.0  2016-07-05
   - Code name "Thinking Face", this is a major release.
   - Removed Mojolicious::Plugin::Charset.
   - Removed squish method from Mojo::ByteStream.

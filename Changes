@@ -10,6 +10,7 @@
     loaded.
   - Fixed trailing slash bug in Mojo::URL.
   - Fixed a few whitespace bugs in Mojo::DOM.
+  - Fixed attribute selector bug in Mojo::DOM::CSS. (Akron)
   - Fixed a bug causing headers with zero length values to be ignored by the get
     command. (jberger)
 

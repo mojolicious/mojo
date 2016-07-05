@@ -43,6 +43,7 @@ sub _attr {
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
     next unless $name =~ $name_re;
+    next if !defined $attrs->{$name} && defined $value_re;
     return 1 unless defined $attrs->{$name} && defined $value_re;
     return 1 if $attrs->{$name} =~ $value_re;
   }

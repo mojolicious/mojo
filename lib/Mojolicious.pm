@@ -228,7 +228,7 @@ Perl-ish templates, content negotiation, session management, form validation,
 testing framework, static file server, C<CGI>/C<PSGI> detection, first class
 Unicode support and much more for you to discover.
 
-Take a look at our excellent documentation in L<Mojolicious::Guides> for more!
+Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
 =head1 HOOKS
 

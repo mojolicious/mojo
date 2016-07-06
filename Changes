@@ -2,6 +2,7 @@
 7.0  2016-07-06
   - Code name "Thinking Face", this is a major release.
   - Removed Mojolicious::Plugin::Charset.
+  - Removed authority method from Mojo::URL.
   - Removed squish method from Mojo::ByteStream.
   - Removed squish function from Mojo::Util.
   - Removed support for smart whitespace trimming from all_text and text methods

@@ -222,7 +222,13 @@ Mojolicious - Real-time web framework
 
 =head1 DESCRIPTION
 
-Take a look at our excellent documentation in L<Mojolicious::Guides>!
+An amazing real-time web framework built on top of the powerful L<Mojo> web
+development toolkit. With support for RESTful routes, plugins, commands,
+Perl-ish templates, content negotiation, session management, form validation,
+testing framework, static file server, C<CGI>/C<PSGI> detection, first class
+Unicode support and much more for you to discover.
+
+Take a look at our excellent documentation in L<Mojolicious::Guides> for more!
 
 =head1 HOOKS
 

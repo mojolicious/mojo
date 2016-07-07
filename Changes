@@ -7,6 +7,7 @@
   - Removed squish function from Mojo::Util.
   - Removed support for smart whitespace trimming from all_text and text methods
     in Mojo::DOM.
+  - Updated jQuery to version 3.1.0.
   - Improved Mojo::URL not to include the userinfo part when generating URLs, as
     recommended by the URL Living Standard.
   - Improved Mojolicious::Plugin::Config to no longer log which files have been

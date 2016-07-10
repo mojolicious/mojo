@@ -208,10 +208,14 @@ in debugging your application.
 
   app->start;
 
-You can even use CSS selectors with L<Mojolicious::Command::get> to extract
-only the information you're actually interested in.
+You can even use CSS selectors with L<Mojolicious::Command::get> to extract only
+the information you're actually interested in.
 
   $ ./myapp.pl get /dies '#error'
+
+And don't worry about revealing too much information on these pages, they are
+only available during development, and will be replaced automatically with pages
+that don't reveal any sensitive information in a production environment.
 
 =head2 Route names
 
@@ -952,8 +956,10 @@ C<log> directory exists.
 
   $ mkdir log
 
-Mode changes also affect a few other aspects of the framework, such as mode
-specific C<exception> and C<not_found> templates.
+Mode changes also affect a few other aspects of the framework, such as the
+built-in C<exception> and C<not_found> pages. Once you switch modes from
+C<development> to C<production>, no sensitive information will be revealed on
+those pages anymore.
 
 =head2 Testing
 

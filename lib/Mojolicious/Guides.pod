@@ -480,7 +480,7 @@ the L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
+L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
 channel C<#mojo> on C<irc.perl.org>
 (L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
 

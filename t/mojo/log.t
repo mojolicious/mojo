@@ -6,6 +6,8 @@ use File::Temp 'tempdir';
 use Mojo::Log;
 use Mojo::Util qw(decode slurp);
 
+delete $ENV{MOJO_LOG_LEVEL};
+
 # Logging to file
 my $dir = tempdir CLEANUP => 1;
 my $path = catfile $dir, 'test.log';

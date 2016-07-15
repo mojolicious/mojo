@@ -1,6 +1,6 @@
 
-7.0  2016-07-10
-  - Code name "Thinking Face", this is a major release.
+7.0  2016-07-15
+  - Code name "Doughnut", this is a major release.
   - Removed Mojolicious::Plugin::Charset.
   - Removed authority method from Mojo::URL.
   - Removed squish method from Mojo::ByteStream.

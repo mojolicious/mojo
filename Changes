@@ -1,5 +1,5 @@
 
-7.0  2016-07-15
+7.0  2016-07-19
   - Code name "Doughnut", this is a major release.
   - Removed Mojolicious::Plugin::Charset.
   - Removed authority method from Mojo::URL.

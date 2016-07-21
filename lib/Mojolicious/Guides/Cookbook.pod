@@ -218,7 +218,7 @@ automatically detect that it is executed as a C<CGI> script. Its use in
 production environments is discouraged though, because as a result of how
 C<CGI> works, it is very slow and many web servers are making it exceptionally
 hard to configure properly. Additionally, many real-time web features, such as
-WebSockets, are not avilable.
+WebSockets, are not available.
 
   ScriptAlias / /home/sri/my_app/script/my_app/
 
@@ -762,7 +762,7 @@ can be combined to solve some of hardest problems in web development.
   hook after_build_tx => sub {
     my $tx = shift;
 
-    # Subscribe to "upgrade" event to indentify multipart uploads
+    # Subscribe to "upgrade" event to identify multipart uploads
     weaken $tx;
     $tx->req->content->on(upgrade => sub {
       my ($single, $multi) = @_;

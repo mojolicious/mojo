@@ -484,7 +484,7 @@ content.
 
   my $bool = $content->is_chunked;
 
-Check if C<Transfer-Encoding> header indicates chunked tranfer encoding.
+Check if C<Transfer-Encoding> header indicates chunked transfer encoding.
 
 =head2 is_compressed
 

@@ -97,14 +97,13 @@ sub redirect {
 }
 
 sub tx {
-  my $self = shift;
+  my ($self, $method, $url) = (shift, shift, shift);
 
   # Method and URL
   my $tx  = Mojo::Transaction::HTTP->new;
-  my $req = $tx->req->method(shift);
-  my $url = shift;
-  $url = "http://$url" unless $url =~ m!^/|://!;
-  ref $url ? $req->url($url) : $req->url->parse($url);
+  my $req = $tx->req->method($method);
+  if   (ref $url) { $req->url($url) }
+  else            { $req->url->parse($url =~ m!^/|://! ? $url : "http://$url") }
 
   # Headers (we identify ourselves and accept gzip compression)
   my $headers = $req->headers;

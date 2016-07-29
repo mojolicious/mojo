@@ -56,7 +56,7 @@ sub run {
   weaken $self;
   $prefork->on(wait   => sub { $self->_manage });
   $prefork->on(reap   => sub { $self->_cleanup(pop) });
-  $prefork->on(finish => sub { $self->{finished} = 1 });
+  $prefork->on(finish => sub { $self->_finish });
 
   # Testing
   _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
@@ -86,6 +86,17 @@ sub _cleanup {
 }
 
 sub _exit { say shift and exit 0 }
+
+sub _finish {
+  my $self = shift;
+
+  $self->{finish} = 1;
+  return unless my $new = $self->{new};
+
+  my $prefork = $self->prefork->cleanup(0);
+  unlink $prefork->pid_file;
+  $prefork->ensure_pid_file($new);
+}
 
 sub _hot_deploy {
 

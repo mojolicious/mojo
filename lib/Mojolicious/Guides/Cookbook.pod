@@ -148,6 +148,23 @@ C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
   # myapp.conf
   {hypnotoad => {proxy => 1}};
 
+To manage Hypnotoad with systemd, you can use a unit configuration file like
+this.
+
+  [Unit]
+  Description=My Mojolicious application
+  After=default.target
+
+  [Service]
+  Type=forking
+  PIDFile=/home/sri/myapp/script/hypnotoad.pid
+  ExecStart=/path/to/hypnotoad /home/sri/myapp/script/my_app
+  ExecReload=/path/to/hypnotoad /home/sri/myapp/script/my_app
+  KillMode=process
+
+  [Install]
+  WantedBy=default.target
+
 =head2 Zero downtime software upgrades
 
 Hypnotoad makes zero downtime software upgrades (hot deployment) very simple,

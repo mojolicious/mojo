@@ -14,15 +14,7 @@ has heartbeat_interval => 5;
 has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
 has workers            => 4;
 
-sub DESTROY {
-  my $self = shift;
-
-  # Worker
-  return unless $self->cleanup;
-
-  # Manager
-  if (my $file = $self->pid_file) { unlink $file if -w $file }
-}
+sub DESTROY { unlink $_[0]->pid_file if $_[0]->cleanup }
 
 sub check_pid {
   my $file = shift->pid_file;
@@ -34,12 +26,12 @@ sub check_pid {
   return $pid if $pid && kill 0, $pid;
 
   # Not running
-  unlink $file if -w $file;
+  unlink $file;
   return undef;
 }
 
 sub ensure_pid_file {
-  my $self = shift;
+  my ($self, $pid) = @_;
 
   # Check if PID file already exists
   return if -e (my $file = $self->pid_file);
@@ -50,7 +42,7 @@ sub ensure_pid_file {
     unless open my $handle, '>', $file;
   $self->app->log->info(qq{Creating process id file "$file"});
   chmod 0644, $handle;
-  print $handle $$;
+  print $handle "$pid\n";
 }
 
 sub healthy {
@@ -99,7 +91,7 @@ sub _manage {
   # Spawn more workers if necessary and check PID file
   if (!$self->{finished}) {
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
-    $self->ensure_pid_file;
+    $self->ensure_pid_file($$);
   }
 
   # Shutdown
@@ -432,7 +424,7 @@ not running.
 
 =head2 ensure_pid_file
 
-  $prefork->ensure_pid_file;
+  $prefork->ensure_pid_file($pid);
 
 Ensure L</"pid_file"> exists.
 

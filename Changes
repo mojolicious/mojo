@@ -1,5 +1,8 @@
 
-7.01  2016-07-26
+7.01  2016-07-30
+  - Improved support for systemd.
+  - Fixed a bug in Mojo::Server::Prefork where PID files would not contain a
+    newline character.
 
 7.0  2016-07-19
   - Code name "Doughnut", this is a major release.

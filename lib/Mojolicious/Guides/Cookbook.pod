@@ -153,7 +153,7 @@ this.
 
   [Unit]
   Description=My Mojolicious application
-  After=default.target
+  After=network.target
 
   [Service]
   Type=forking
@@ -163,7 +163,7 @@ this.
   KillMode=process
 
   [Install]
-  WantedBy=default.target
+  WantedBy=multi-user.target
 
 =head2 Zero downtime software upgrades
 

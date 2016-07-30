@@ -42,6 +42,20 @@ L<Mojo::Server::Daemon/"listen">.
   $ ./script/my_app daemon -l https://[::]:3000
   Server available at https://[::]:3000
 
+To manage the web server with systemd, you can use a unit configuration file
+like this.
+
+  [Unit]
+  Description=My Mojolicious application
+  After=network.target
+
+  [Service]
+  Type=simple
+  ExecStart=/home/sri/myapp/script/my_app daemon -m production -l http://*:8080
+
+  [Install]
+  WantedBy=multi-user.target
+
 On UNIX platforms you can also add preforking and switch to a multi-process
 architecture with L<Mojolicious::Command::prefork>, to take advantage of
 multiple CPU cores and copy-on-write memory management.

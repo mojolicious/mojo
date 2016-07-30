@@ -121,6 +121,38 @@ ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
+# Update script (broken)
+spurt <<'EOF', $script;
+use Mojolicious::Lite;
+
+die if $ENV{HYPNOTOAD_PID};
+
+app->start;
+EOF
+open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
+
+# Connection did not get lost
+$tx = $ua->get("http://127.0.0.1:$port1/hello");
+ok $tx->is_finished, 'transaction is finished';
+ok $tx->keep_alive,  'connection will be kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Hello Hypnotoad!', 'right content';
+
+# Connection did not get lost (second port)
+$tx = $ua->get("http://127.0.0.1:$port2/hello");
+ok $tx->is_finished, 'transaction is finished';
+ok $tx->keep_alive,  'connection will be kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Hello Hypnotoad!', 'right content';
+
+# Wait for hot deployment to fail
+while (1) {
+  last if slurp($log) =~ qr/Zero downtime software upgrade failed/;
+  sleep 1;
+}
+
 # Update script
 spurt <<EOF, $script;
 use Mojolicious::Lite;
@@ -145,7 +177,7 @@ get '/hello' => {text => 'Hello World!'};
 
 app->start;
 EOF
-open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
+open $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
 
 # Connection did not get lost
 $tx = $ua->get("http://127.0.0.1:$port1/hello");

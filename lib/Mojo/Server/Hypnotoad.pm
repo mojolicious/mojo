@@ -22,7 +22,7 @@ sub configure {
   my $c = $prefork->app->config($name) || {};
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
-  # Prefork settings
+  # Pre-fork settings
   $prefork->reverse_proxy($c->{proxy})   if defined $c->{proxy};
   $prefork->max_clients($c->{clients})   if $c->{clients};
   $prefork->max_requests($c->{requests}) if $c->{requests};
@@ -161,7 +161,7 @@ Mojo::Server::Hypnotoad - A production web serv...ALL GLORY TO THE HYPNOTOAD!
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Hypnotoad> is a full featured, UNIX optimized, preforking
+L<Mojo::Server::Hypnotoad> is a full featured, UNIX optimized, pre-forking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Prefork>, with IPv6, TLS, SNI, Comet (long
 polling), keep-alive, multiple event loop and hot deployment support that just

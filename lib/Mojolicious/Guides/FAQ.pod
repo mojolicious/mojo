@@ -252,7 +252,7 @@ be closed immediately.
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in
-preforking web servers send heartbeat messages to the manager process at
+pre-forking web servers send heartbeat messages to the manager process at
 regular intervals, to signal that they are still responsive. A blocking
 operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout

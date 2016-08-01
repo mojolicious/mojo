@@ -53,7 +53,7 @@ sub run {
   my $self = shift;
 
   # No fork emulation support
-  say 'Preforking does not support fork emulation.' and exit 0
+  say 'Pre-forking does not support fork emulation.' and exit 0
     if $Config{d_pseudofork};
 
   # Pipe for worker communication
@@ -195,7 +195,7 @@ sub _wait {
 
 =head1 NAME
 
-Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
+Mojo::Server::Prefork - Pre-forking non-blocking I/O HTTP and WebSocket server
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Prefork> is a full featured, UNIX optimized, preforking
+L<Mojo::Server::Prefork> is a full featured, UNIX optimized, pre-forking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Daemon>, with IPv6, TLS, SNI, Comet (long polling),
 keep-alive and multiple event loop support. Note that the server uses signals

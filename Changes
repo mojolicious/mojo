@@ -1,5 +1,5 @@
 
-7.01  2016-07-31
+7.01  2016-08-01
   - Improved support for systemd.
   - Fixed a bug in Mojo::Server::Prefork where PID files would not contain a
     newline character.

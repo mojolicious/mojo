@@ -24,7 +24,7 @@
       SNI, IDNA, HTTP/SOCKS5 proxy, Comet (long polling), keep-alive, connection
       pooling, timeout, cookie, multipart, and gzip compression support.
     * Built-in non-blocking I/O web server, supporting multiple event loops as
-      well as optional preforking and hot deployment, perfect for building
+      well as optional pre-forking and hot deployment, perfect for building
       highly scalable web services.
     * JSON and HTML/XML parser with CSS selector support.
   * Very clean, portable and object-oriented pure-Perl API with no hidden

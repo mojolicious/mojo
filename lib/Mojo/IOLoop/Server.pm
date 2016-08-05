@@ -311,7 +311,8 @@ Path to the TLS key file, defaults to a built-in test key.
 
   tls_verify => 0x00
 
-TLS verification mode, defaults to C<0x03>.
+TLS verification mode, defaults to C<0x03> if a certificate authority file has
+been provided, or C<0x00>.
 
 =item tls_version
 

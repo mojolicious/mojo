@@ -14,7 +14,7 @@ Mojo::IOLoop->server(
 
         # Write chunk from client to server
         my $server = $buffer{$id}{connection};
-        return Mojo::IOLoop->stream($server)->write($chunk) if defined $server;
+        return Mojo::IOLoop->stream($server)->write($chunk) if $server;
 
         # Read connect request from client
         my $buffer = $buffer{$id}{client} .= $chunk;

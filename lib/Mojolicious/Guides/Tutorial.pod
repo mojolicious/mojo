@@ -11,6 +11,13 @@ A quick example-driven introduction to the wonders of L<Mojolicious::Lite>.
 Almost everything you'll learn here also applies to full L<Mojolicious>
 applications.
 
+This is only the first of the L<Mojolicious::Guides>. Those guides delve deeper
+into topics like L<growing|Mojolicious::Guides::Growing> a Lite app into a
+full one, L<routing|Mojolicious::Guides::Routing> and
+L<rendering|Mojolicious::Guides::Rendering> and more.
+It is highly encouraged that readers continue on to the remaining guides after
+reading this one.
+
 =head2 Hello World
 
 A simple Hello World application can look like this, L<strict>, L<warnings>,

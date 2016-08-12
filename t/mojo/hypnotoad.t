@@ -67,7 +67,6 @@ app->log->path('$log');
 plugin Config => {
   default => {
     hypnotoad => {
-      inactivity_timeout => 3,
       listen => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
       workers => 1
     }

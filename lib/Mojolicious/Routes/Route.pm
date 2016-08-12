@@ -304,8 +304,8 @@ parent if necessary.
   my $route = $r->any(['GET', 'POST'] => '/:foo' => [foo => qr/\w+/]);
 
 Generate L<Mojolicious::Routes::Route> object matching any of the listed HTTP
-request methods or all. See also L<Mojolicious::Guides::Tutorial> for many more
-argument variations.
+request methods or all. See also L<Mojolicious::Guides::Tutorial>
+and L<Mojolicious::Guides::Routing> for many more argument variations.
 
   # Route with destination
   $r->any('/user')->to('user#whatever');
@@ -318,7 +318,8 @@ argument variations.
   my $route = $r->delete('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<DELETE> requests.
-See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing>
+for many more argument variations.
 
   # Route with destination
   $r->delete('/user')->to('user#remove');
@@ -351,7 +352,8 @@ generated ones.
   my $route = $r->get('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<GET> requests.
-See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing>
+for many more argument variations.
 
   # Route with destination
   $r->get('/user')->to('user#show');
@@ -401,8 +403,8 @@ the current route.
   my $route = $r->options('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<OPTIONS>
-requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
-variations.
+requests. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
   # Route with destination
   $r->options('/user')->to('user#overview');
@@ -436,7 +438,8 @@ Parse pattern.
   my $route = $r->patch('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<PATCH> requests.
-See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing>
+for many more argument variations.
 
   # Route with destination
   $r->patch('/user')->to('user#update');
@@ -449,7 +452,8 @@ See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
   my $route = $r->post('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<POST> requests.
-See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing>
+for many more argument variations.
 
   # Route with destination
   $r->post('/user')->to('user#create');
@@ -462,7 +466,8 @@ See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
   my $route = $r->put('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only C<PUT> requests.
-See also L<Mojolicious::Guides::Tutorial> for many more argument variations.
+See also L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing>
+for many more argument variations.
 
   # Route with destination
   $r->put('/user')->to('user#replace');
@@ -540,8 +545,8 @@ Stringify the whole route.
   my $route = $r->under([format => 0]);
 
 Generate L<Mojolicious::Routes::Route> object for a nested route with its own
-intermediate destination. See also L<Mojolicious::Guides::Tutorial> for many
-more argument variations.
+intermediate destination. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
   # Intermediate destination and prefix shared between two routes
   my $auth = $r->under('/user')->to('user#auth');
@@ -569,8 +574,8 @@ restrictions.
   my $route = $r->websocket('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate L<Mojolicious::Routes::Route> object matching only WebSocket
-handshakes. See also L<Mojolicious::Guides::Tutorial> for many more argument
-variations.
+handshakes. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
   # Route with destination
   $r->websocket('/echo')->to('example#echo');

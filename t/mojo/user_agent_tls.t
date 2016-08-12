@@ -93,7 +93,6 @@ $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
 # Invalid certificate
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
 $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
-IO::Socket::SSL::set_defaults(SSL_version => 'TLSv1');
 $tx = $ua->get("https://127.0.0.1:$port");
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';

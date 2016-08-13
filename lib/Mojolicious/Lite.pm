@@ -102,7 +102,7 @@ automatically exported.
 
 Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the
 listed HTTP request methods or all. See also L<Mojolicious::Guides::Tutorial>
-for many more argument variations.
+and L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head2 app
 
@@ -123,8 +123,8 @@ L<Mojolicious>.
   my $route = del '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"delete">, matching only
-C<DELETE> requests. See also L<Mojolicious::Guides::Tutorial> for many more
-argument variations.
+C<DELETE> requests. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head2 get
 
@@ -134,8 +134,8 @@ argument variations.
   my $route = get '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET>
-requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
-variations.
+requests. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head2 group
 
@@ -163,8 +163,8 @@ Share code with L<Mojolicious/"hook">.
   my $route = options '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"options">, matching only
-C<OPTIONS> requests. See also L<Mojolicious::Guides::Tutorial> for many more
-argument variations.
+C<OPTIONS> requests. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head2 patch
 
@@ -174,8 +174,8 @@ argument variations.
   my $route = patch '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"patch">, matching only
-C<PATCH> requests. See also L<Mojolicious::Guides::Tutorial> for many more
-argument variations.
+C<PATCH> requests. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head2 plugin
 
@@ -191,8 +191,8 @@ Load a plugin with L<Mojolicious/"plugin">.
   my $route = post '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"post">, matching only C<POST>
-requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
-variations.
+requests. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head2 put
 
@@ -202,8 +202,8 @@ variations.
   my $route = put '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT>
-requests. See also L<Mojolicious::Guides::Tutorial> for many more argument
-variations.
+requests. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head2 under
 
@@ -215,7 +215,8 @@ variations.
 
 Generate nested route with L<Mojolicious::Routes::Route/"under">, to which all
 following routes are automatically appended. See also
-L<Mojolicious::Guides::Tutorial> for more argument variations.
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for many
+more argument variations.
 
 =head2 websocket
 
@@ -225,8 +226,8 @@ L<Mojolicious::Guides::Tutorial> for more argument variations.
   my $route = websocket '/:foo' => [foo => qr/\w+/] => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"websocket">, matching only
-WebSocket handshakes. See also L<Mojolicious::Guides::Tutorial> for many more
-argument variations.
+WebSocket handshakes. See also L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for many more argument variations.
 
 =head1 ATTRIBUTES
 

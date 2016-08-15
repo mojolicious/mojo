@@ -36,6 +36,7 @@ for my $line (split "\n", join('', <DATA>)) {
   next unless $line =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
   $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
 }
+close DATA;
 
 # Characters that should be escaped in XML
 my %XML = (

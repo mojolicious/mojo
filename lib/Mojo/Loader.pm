@@ -84,7 +84,7 @@ sub _all {
     $all->{$name} = $name =~ s/\s*\(\s*base64\s*\)$//
       && ++$BIN{$class}{$name} ? b64_decode $data : $data;
   }
-
+  $. = 0;
   return $all;
 }
 

@@ -32,9 +32,12 @@ use constant {
 # To generate a new HTML entity table run this command
 # perl examples/entities.pl
 my %ENTITIES;
-for my $line (split "\n", join('', <DATA>)) {
-  next unless $line =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
-  $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
+{
+  local $.;
+  for my $line (split "\n", join('', <DATA>)) {
+    next unless $line =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
+    $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
+  }
 }
 
 # Characters that should be escaped in XML

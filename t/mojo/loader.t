@@ -160,4 +160,8 @@ is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
     ['test.bin'], 'right DATA files';
 }
 
+# Hide DATA usage from error messages
+eval "die 'whatever'";
+unlike $@, qr/DATA/, 'DATA has been hidden';
+
 done_testing();

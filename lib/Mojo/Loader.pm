@@ -63,6 +63,7 @@ sub _all {
   my $class = shift;
 
   return $CACHE{$class} if $CACHE{$class};
+  local $.;
   my $handle = do { no strict 'refs'; \*{"${class}::DATA"} };
   return {} unless fileno $handle;
   seek $handle, 0, 0;

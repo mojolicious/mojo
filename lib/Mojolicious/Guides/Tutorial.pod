@@ -312,8 +312,9 @@ by the C<begin> and C<end> keywords, they are the foundation for many helpers.
 
 =head2 Helpers
 
-Helpers are little functions you can reuse throughout your whole application,
-from actions to templates.
+Helpers are little functions you can create with the keyword
+L<Mojolicious::Lite/"helper"> and reuse throughout your whole application, from
+actions to templates.
 
   use Mojolicious::Lite;
 
@@ -408,7 +409,8 @@ C<.>, similar to the regular expression C<(.+)>.
 
 =head2 HTTP methods
 
-Routes can be restricted to specific request methods with different keywords.
+Routes can be restricted to specific request methods with different keywords
+like L<Mojolicious::Lite/"get"> and L<Mojolicious::Lite/"any">.
 
   use Mojolicious::Lite;
 

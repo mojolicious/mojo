@@ -1,7 +1,7 @@
 
 7.02  2016-08-16
   - Fixed bugs in Mojo::Loader and Mojo::Util where the DATA handle would be
-    mentioned in error messages.
+    mentioned in error messages. (jberger, kiwiroy, sri)
 
 7.01  2016-08-01
   - Improved support for systemd.

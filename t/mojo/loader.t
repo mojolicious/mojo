@@ -161,7 +161,7 @@ is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
 }
 
 # Hide DATA usage from error messages
-eval "die 'whatever'";
+eval { die 'whatever' };
 unlike $@, qr/DATA/, 'DATA has been hidden';
 
 done_testing();

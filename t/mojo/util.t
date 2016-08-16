@@ -501,7 +501,7 @@ is term_escape("\x00\x09\x0b\x1f\x7f\x80\x9f"), '\x00\x09\x0b\x1f\x7f\x80\x9f',
   'right result';
 
 # Hide DATA usage from error messages
-eval "die 'whatever'";
+eval { die 'whatever' };
 unlike $@, qr/DATA/, 'DATA has been hidden';
 
 done_testing();

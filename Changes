@@ -1,5 +1,6 @@
 
 7.03  2016-08-17
+  - Fixed packaging errors.
 
 7.02  2016-08-17
   - Fixed bugs in Mojo::Loader and Mojo::Util where the DATA handle would be

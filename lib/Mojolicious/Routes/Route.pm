@@ -328,7 +328,7 @@ route name, defaulting to the pattern C</> and a name based on the pattern.
 An arbitrary number of key/value pairs in between the route pattern and name can
 be used to specify route conditions.
 
-  # Route with pattern, conditions and destination
+  # Route with pattern, condition and destination
   $r->any('/' => (agent => qr/Firefox/))->to('foo#bar');
 
 A hash reference is used to specifiy optional placeholders and default values

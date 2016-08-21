@@ -1,5 +1,7 @@
 
-7.04  2016-08-18
+7.04  2016-08-21
+  - Fixed bug where Mojo::UserAgent would try to follow redirects for CONNECT
+    requests.
 
 7.03  2016-08-17
   - Fixed packaging errors.

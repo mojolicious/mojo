@@ -927,6 +927,12 @@ is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
+# 302 redirect for CONNECT request
+$tx = $t->tx(CONNECT => 'http://mojolicious.org');
+$tx->res->code(302);
+$tx->res->headers->location('http://example.com/bar');
+is $t->redirect($tx), undef, 'unsupported redirect';
+
 # Abstract methods
 eval { Mojo::Transaction->client_read };
 like $@, qr/Method "client_read" not implemented by subclass/, 'right error';

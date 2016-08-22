@@ -257,7 +257,6 @@ Return an array reference with all names for values that passed validation.
 
 Change validation L</"topic">, apply filters, and make sure a value is present
 and not an empty string. All filters from L<Mojolicious::Validator/"FILTERS">
-are supported.All filters from L<Mojolicious::Validator/"FILTERS">
 are supported.
 
   # Trim value and check size

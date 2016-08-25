@@ -145,7 +145,7 @@ sub process {
   unless ($compiled) {
     my $code = $self->_compile->code;
     monkey_patch $self->namespace, '_escape', $self->escape;
-    return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
+    return Mojo::Exception->new(my $e = $@)->inspect($self->unparsed, $code)
       ->trace->verbose(1)
       unless $compiled = eval $self->_wrap($code, @_);
     $self->compiled($compiled);

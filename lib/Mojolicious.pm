@@ -187,7 +187,7 @@ sub _exception {
   my ($next, $c) = @_;
   local $SIG{__DIE__}
     = sub { ref $_[0] ? CORE::die $_[0] : Mojo::Exception->throw(shift) };
-  $c->helpers->reply->exception($@) unless eval { $next->(); 1 };
+  $c->helpers->reply->exception(my $tmp = $@) unless eval { $next->(); 1 };
 }
 
 1;

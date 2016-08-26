@@ -607,9 +607,10 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
   my $sp = Mojo::IOLoop->subprocess(sub {...}, sub {...});
   my $sp = $loop->subprocess(sub {...}, sub {...});
 
-Create a new subprocess and return a L<Mojo::IOLoop::Subprocess> object for it.
-Callbacks will be passed along to L<Mojo::IOLoop::Subprocess/"run">. Note that
-this method is EXPERIMENTAL and might change without warning!
+Build L<Mojo::IOLoop::Subprocess> object to perform expensive operations in
+subprocesses, without blocking the event loop. Callbacks will be passed along to
+L<Mojo::IOLoop::Subprocess/"run">. Note that this method is EXPERIMENTAL and
+might change without warning!
 
   # Perform an expensive blocking operation in a subprocess
   Mojo::IOLoop->subprocess(

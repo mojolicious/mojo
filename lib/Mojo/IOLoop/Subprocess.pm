@@ -77,7 +77,7 @@ Mojo::IOLoop::Subprocess - Subprocesses
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Subprocess> allows L<Mojo::IOLoop> to process expensive blocking
+L<Mojo::IOLoop::Subprocess> allows L<Mojo::IOLoop> to perform expensive blocking
 operations in subprocesses. Note that this module is EXPERIMENTAL and might
 change without warning!
 

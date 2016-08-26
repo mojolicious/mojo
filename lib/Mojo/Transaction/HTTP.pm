@@ -93,16 +93,13 @@ sub _headers {
 
   # Switch to body
   if ($self->{write} <= 0) {
-    $self->{offset} = 0;
+    @$self{qw(http_state offset)} = ('body', 0);
 
     # Response without body
     if ($head && $self->is_empty) { $self->completed }
 
     # Body
-    else {
-      $self->{http_state} = 'body';
-      $self->{write} = $msg->content->is_dynamic ? 1 : $msg->body_size;
-    }
+    else { $self->{write} = $msg->content->is_dynamic ? 1 : $msg->body_size }
   }
 
   return $buffer;

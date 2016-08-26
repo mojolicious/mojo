@@ -95,7 +95,7 @@ L<Storable>.
 
   $sessions->deserialize(sub {
     my $bytes = shift;
-    return {};
+    return [];
   });
 
 =head2 ioloop

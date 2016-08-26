@@ -8,6 +8,7 @@ use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
+use Mojo::IOLoop::Subprocess;
 use Mojo::Reactor::Poll;
 use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
@@ -143,6 +144,12 @@ sub stream {
   return $self->_stream($stream => $self->_id) if ref $stream;
   my $c = $self->{in}{$stream} || $self->{out}{$stream} || {};
   return $c->{stream};
+}
+
+sub subprocess {
+  my $sp = Mojo::IOLoop::Subprocess->new;
+  weaken $sp->ioloop(_instance(shift))->{ioloop};
+  return $sp->run(@_);
 }
 
 sub timer { shift->_timer(timer => @_) }
@@ -594,6 +601,28 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
   # Increase inactivity timeout for connection to 300 seconds
   Mojo::IOLoop->stream($id)->timeout(300);
+
+=head2 subprocess
+
+  my $sp = Mojo::IOLoop->subprocess(sub {...}, sub {...});
+  my $sp = $loop->subprocess(sub {...}, sub {...});
+
+Create a new subprocess and return a L<Mojo::IOLoop::Subprocess> object for it.
+Callbacks will be passed along to L<Mojo::IOLoop::Subprocess/"run">. Note that
+this method is EXPERIMENTAL and might change without warning!
+
+  # Perform an expensive blocking operation in a subprocess
+  Mojo::IOLoop->subprocess(
+    sub {
+      my $sp = shift;
+      sleep 5;
+      return 1 + 1, 2 + 2;
+    },
+    sub {
+      my ($sp, $err, @results) = @_;
+      say "The results are $results[0] and $results[1]";
+    }
+  );
 
 =head2 timer
 

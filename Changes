@@ -1,5 +1,9 @@
 
-7.04  2016-08-21
+7.04  2016-08-26
+  - Added EXPERIMENTAL support for performing expensive blocking operations in
+    subprocesses. (jberger, sri)
+  - Added EXPERIMENTAL module Mojo::IOLoop::Subprocess. (jberger, sri)
+  - Added EXPERIMENTAL subprocess method to Mojo::IOLoop. (jberger, sri)
   - Fixed bug where Mojo::UserAgent would try to follow redirects for CONNECT
     requests.
 

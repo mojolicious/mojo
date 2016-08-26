@@ -1,6 +1,7 @@
 package Mojo::IOLoop::Subprocess;
 use Mojo::Base -base;
 
+use Carp 'croak';
 use Config;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
@@ -16,14 +17,13 @@ sub run {
   my ($self, $first, $second) = @_;
 
   # No fork emulation support
-  say 'Subprocesses do not support fork emulation.' and exit 0
-    if $Config{d_pseudofork};
+  croak 'Subprocesses do not support fork emulation' if $Config{d_pseudofork};
 
   # Pipe for subprocess communication
-  pipe(my $reader, my $writer) or die "Can't create pipe: $!";
+  pipe(my $reader, my $writer) or croak "Can't create pipe: $!";
 
   # Child
-  die "Can't fork: $!" unless defined($self->{pid} = fork);
+  croak "Can't fork: $!" unless defined($self->{pid} = fork);
   unless ($self->{pid}) {
     $self->ioloop->reset;
     print $writer $self->serialize->([$self->$first]);
@@ -134,8 +134,10 @@ Process id of the spawned subprocess if available.
   $sp = $sp->run(sub {...}, sub {...});
 
 Execute the first callback in a child process and wait for it to return one or
-more values, before executing the second callback in the parent process with the
-results.
+more values, without blocking L</"ioloop"> in the parent process. Then execute
+the second callback in the parent process with the results. The return values of
+the first callback will be serialized with L<Storable>, so they can be shared
+between processes.
 
 =head1 SEE ALSO
 

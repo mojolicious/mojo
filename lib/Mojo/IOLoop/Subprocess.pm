@@ -137,8 +137,8 @@ Process id of the spawned subprocess if available.
 Execute the first callback in a child process and wait for it to return one or
 more values, without blocking L</"ioloop"> in the parent process. Then execute
 the second callback in the parent process with the results. The return values of
-the first callback will be serialized with L<Storable>, so they can be shared
-between processes.
+the first callback and exceptions thrown by it, will be serialized with
+L<Storable>, so they can be shared between processes.
 
 =head1 SEE ALSO
 

@@ -35,10 +35,8 @@ sub run {
   $self->ioloop->stream($stream);
   my $buffer;
   $stream->on(read => sub { $buffer .= pop });
-  my $parent = $$;
   $stream->on(
     close => sub {
-      return unless $$ == $parent;
       waitpid $self->{pid}, 0;
       return $self->$second("Non-zero exit status (@{[$? >> 8]})") if $?;
       my $result = eval { $self->deserialize->($buffer) } || [];

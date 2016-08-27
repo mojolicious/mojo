@@ -25,6 +25,21 @@ Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is $result, 0 . $subprocess->pid . ('x' x 100000), 'right result';
 
+# Custom event loop
+($fail, $result) = ();
+my $loop = Mojo::IOLoop->new;
+$loop->subprocess(
+  sub {'♥'},
+  sub {
+    my ($subprocess, $err, @results) = @_;
+    $fail   = $err;
+    $result = \@results;
+  }
+);
+$loop->start;
+ok !$fail, 'no error';
+is_deeply $result, ['♥'], 'right structure';
+
 # Multiple return values
 ($fail, $result) = ();
 $subprocess = Mojo::IOLoop::Subprocess->new;
@@ -76,6 +91,20 @@ Mojo::IOLoop->delay(
 )->wait;
 ok !$fail, 'no error';
 is_deeply $result, [1, 2], 'right structure';
+
+# No result
+($fail, $result) = ();
+Mojo::IOLoop::Subprocess->new->run(
+  sub { exit 0 },
+  sub {
+    my ($subprocess, $err, @results) = @_;
+    $fail   = $err;
+    $result = \@results;
+  }
+);
+Mojo::IOLoop->start;
+ok !$fail, 'no error';
+is_deeply $result, [], 'right structure';
 
 # Non-zero exit status
 $fail = undef;

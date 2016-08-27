@@ -29,7 +29,7 @@ is $result, 0 . $sp->pid . ('x' x 100000), 'right result';
 ($fail, $result) = ();
 $sp = Mojo::IOLoop::Subprocess->new;
 $sp->run(
-  sub { return 1, [{two => 2}], 3 },
+  sub { return '♥', [{two => 2}], 3 },
   sub {
     my ($sp, $err, @results) = @_;
     $fail   = $err;
@@ -38,7 +38,7 @@ $sp->run(
 );
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
-is_deeply $result, [1, [{two => 2}], 3], 'right structure';
+is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 
 # Event loop in subprocess
 ($fail, $result) = ();

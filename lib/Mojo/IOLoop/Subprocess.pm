@@ -64,11 +64,11 @@ Mojo::IOLoop::Subprocess - Subprocesses
     sub {
       my $sp = shift;
       sleep 5;
-      return 1 + 1, 2 + 2;
+      return '♥', 'Mojolicious';
     },
     sub {
       my ($sp, $err, @results) = @_;
-      say "The results are $results[0] and $results[1]";
+      say "I $results[0] $results[1]!";
     }
   );
 

@@ -1,5 +1,5 @@
 
-7.04  2016-08-27
+7.04  2016-08-28
   - Added EXPERIMENTAL support for performing computationally expensive
     operations in subprocesses, without blocking the event loop. (jberger, sri)
   - Added EXPERIMENTAL module Mojo::IOLoop::Subprocess. (jberger, sri)

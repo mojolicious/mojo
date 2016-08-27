@@ -5,6 +5,7 @@ use Carp 'croak';
 use Config;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
+use POSIX ();
 use Storable;
 
 has deserialize => sub { \&Storable::thaw };
@@ -21,6 +22,7 @@ sub run {
 
   # Pipe for subprocess communication
   pipe(my $reader, my $writer) or croak "Can't create pipe: $!";
+  $writer->autoflush(1);
 
   # Child
   croak "Can't fork: $!" unless defined($self->{pid} = fork);
@@ -28,7 +30,7 @@ sub run {
     $self->ioloop->reset;
     my $results = eval { [$self->$first] } || [];
     print $writer $self->serialize->([$@, @$results]);
-    exit 0;
+    POSIX::_exit(0);
   }
 
   # Parent

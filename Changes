@@ -4,6 +4,8 @@
     operations in subprocesses, without blocking the event loop. (jberger, sri)
   - Added EXPERIMENTAL module Mojo::IOLoop::Subprocess. (jberger, sri)
   - Added EXPERIMENTAL subprocess method to Mojo::IOLoop. (jberger, sri)
+  - Improved req and res methods in Mojolicious::Controller to die more
+    gracefully if the connection has already been closed.
   - Fixed bug where Mojo::UserAgent would try to follow redirects for CONNECT
     requests.
 

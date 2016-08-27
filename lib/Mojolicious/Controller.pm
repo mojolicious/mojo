@@ -218,8 +218,8 @@ sub rendered {
   return $self;
 }
 
-sub req { shift->tx->req }
-sub res { shift->tx->res }
+sub req { (shift->tx || Carp::croak 'Connection already closed')->req }
+sub res { (shift->tx || Carp::croak 'Connection already closed')->res }
 
 sub respond_to {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});

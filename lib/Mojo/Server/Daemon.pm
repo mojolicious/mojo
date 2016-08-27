@@ -21,9 +21,8 @@ has max_requests => 100;
 sub DESTROY {
   return if Mojo::Util::_global_destruction();
   my $self = shift;
-  $self->_remove($_) for keys %{$self->{connections} || {}};
   my $loop = $self->ioloop;
-  $loop->remove($_) for @{$self->acceptors};
+  $loop->remove($_) for keys %{$self->{connections} || {}}, @{$self->acceptors};
 }
 
 sub run {

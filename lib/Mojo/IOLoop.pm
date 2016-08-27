@@ -147,9 +147,9 @@ sub stream {
 }
 
 sub subprocess {
-  my $sp = Mojo::IOLoop::Subprocess->new;
-  weaken $sp->ioloop(_instance(shift))->{ioloop};
-  return $sp->run(@_);
+  my $subprocess = Mojo::IOLoop::Subprocess->new;
+  weaken $subprocess->ioloop(_instance(shift))->{ioloop};
+  return $subprocess->run(@_);
 }
 
 sub timer { shift->_timer(timer => @_) }
@@ -604,8 +604,8 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 =head2 subprocess
 
-  my $sp = Mojo::IOLoop->subprocess(sub {...}, sub {...});
-  my $sp = $loop->subprocess(sub {...}, sub {...});
+  my $subprocess = Mojo::IOLoop->subprocess(sub {...}, sub {...});
+  my $subprocess = $loop->subprocess(sub {...}, sub {...});
 
 Build L<Mojo::IOLoop::Subprocess> object to perform computationally expensive
 operations in subprocesses, without blocking the event loop. Callbacks will be
@@ -615,12 +615,12 @@ EXPERIMENTAL and might change without warning!
   # Operation that would block the event loop for 5 seconds
   Mojo::IOLoop->subprocess(
     sub {
-      my $sp = shift;
+      my $subprocess = shift;
       sleep 5;
       return '♥', 'Mojolicious';
     },
     sub {
-      my ($sp, $err, @results) = @_;
+      my ($subprocess, $err, @results) = @_;
       say "I $results[0] $results[1]!";
     }
   );

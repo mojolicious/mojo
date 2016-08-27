@@ -59,21 +59,21 @@ Mojo::IOLoop::Subprocess - Subprocesses
   use Mojo::IOLoop::Subprocess;
 
   # Operation that would block the event loop for 5 seconds
-  my $sp = Mojo::IOLoop::Subprocess->new;
-  $sp->run(
+  my $subprocess = Mojo::IOLoop::Subprocess->new;
+  $subprocess->run(
     sub {
-      my $sp = shift;
+      my $subprocess = shift;
       sleep 5;
       return '♥', 'Mojolicious';
     },
     sub {
-      my ($sp, $err, @results) = @_;
+      my ($subprocess, $err, @results) = @_;
       say "I $results[0] $results[1]!";
     }
   );
 
   # Start event loop if necessary
-  $sp->ioloop->start unless $sp->ioloop->is_running;
+  $subprocess->ioloop->start unless $subprocess->ioloop->is_running;
 
 =head1 DESCRIPTION
 
@@ -87,33 +87,33 @@ L<Mojo::IOLoop::Subprocess> implements the following attributes.
 
 =head2 deserialize
 
-  my $cb = $sp->deserialize;
-  $sp    = $sp->deserialize(sub {...});
+  my $cb      = $subprocess->deserialize;
+  $subprocess = $subprocess->deserialize(sub {...});
 
 A callback used to deserialize subprocess return values, defaults to using
 L<Storable>.
 
-  $sessions->deserialize(sub {
+  $subprocess->deserialize(sub {
     my $bytes = shift;
     return [];
   });
 
 =head2 ioloop
 
-  my $loop = $sp->ioloop;
-  $sp      = $sp->ioloop(Mojo::IOLoop->new);
+  my $loop    = $subprocess->ioloop;
+  $subprocess = $subprocess->ioloop(Mojo::IOLoop->new);
 
 Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
 
 =head2 serialize
 
-  my $cb = $sp->serialize;
-  $sp    = $sp->serialize(sub {...});
+  my $cb      = $subprocess->serialize;
+  $subprocess = $subprocess->serialize(sub {...});
 
 A callback used to serialize subprocess return values, defaults to using
 L<Storable>.
 
-  $sessions->serialize(sub {
+  $subprocess->serialize(sub {
     my $array = shift;
     return '';
   });
@@ -125,13 +125,13 @@ implements the following new ones.
 
 =head2 pid
 
-  my $pid = $sp->pid;
+  my $pid = $subprocess->pid;
 
 Process id of the spawned subprocess if available.
 
 =head2 run
 
-  $sp = $sp->run(sub {...}, sub {...});
+  $subprocess = $subprocess->run(sub {...}, sub {...});
 
 Execute the first callback in a child process and wait for it to return one or
 more values, without blocking L</"ioloop"> in the parent process. Then execute

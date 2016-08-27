@@ -12,26 +12,26 @@ use Mojo::IOLoop::Subprocess;
 
 # Huge result
 my ($fail, $result);
-my $sp = Mojo::IOLoop::Subprocess->new;
-$sp->run(
+my $subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run(
   sub { shift->pid . $$ . ('x' x 100000) },
   sub {
-    my ($sp, $err, $two) = @_;
+    my ($subprocess, $err, $two) = @_;
     $fail   = $err;
     $result = $two;
   }
 );
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
-is $result, 0 . $sp->pid . ('x' x 100000), 'right result';
+is $result, 0 . $subprocess->pid . ('x' x 100000), 'right result';
 
 # Multiple return values
 ($fail, $result) = ();
-$sp = Mojo::IOLoop::Subprocess->new;
-$sp->run(
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run(
   sub { return '♥', [{two => 2}], 3 },
   sub {
-    my ($sp, $err, @results) = @_;
+    my ($subprocess, $err, @results) = @_;
     $fail   = $err;
     $result = \@results;
   }
@@ -42,8 +42,8 @@ is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 
 # Event loop in subprocess
 ($fail, $result) = ();
-$sp = Mojo::IOLoop::Subprocess->new;
-$sp->run(
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run(
   sub {
     my $result;
     Mojo::IOLoop->next_tick(sub { $result = 23 });
@@ -51,7 +51,7 @@ $sp->run(
     return $result;
   },
   sub {
-    my ($sp, $err, $twenty_three) = @_;
+    my ($subprocess, $err, $twenty_three) = @_;
     $fail   = $err;
     $result = $twenty_three;
   }
@@ -82,7 +82,7 @@ $fail = undef;
 Mojo::IOLoop::Subprocess->new->run(
   sub { exit 3 },
   sub {
-    my ($sp, $err) = @_;
+    my ($subprocess, $err) = @_;
     $fail = $err;
   }
 );
@@ -90,13 +90,13 @@ Mojo::IOLoop->start;
 is $fail, 'Non-zero exit status (3)', 'right error';
 
 # Serialization error
-$fail = undef;
-$sp   = Mojo::IOLoop::Subprocess->new;
-$sp->deserialize(sub { die 'Whatever' });
-$sp->run(
+$fail       = undef;
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->deserialize(sub { die 'Whatever' });
+$subprocess->run(
   sub { 1 + 1 },
   sub {
-    my ($sp, $err) = @_;
+    my ($subprocess, $err) = @_;
     $fail = $err;
   }
 );

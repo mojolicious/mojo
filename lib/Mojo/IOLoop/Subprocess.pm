@@ -58,7 +58,7 @@ Mojo::IOLoop::Subprocess - Subprocesses
 
   use Mojo::IOLoop::Subprocess;
 
-  # Perform an expensive blocking operation in a subprocess
+  # Operation that would block the event loop for 5 seconds
   my $sp = Mojo::IOLoop::Subprocess->new;
   $sp->run(
     sub {
@@ -77,9 +77,9 @@ Mojo::IOLoop::Subprocess - Subprocesses
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Subprocess> allows L<Mojo::IOLoop> to perform expensive blocking
-operations in subprocesses. Note that this module is EXPERIMENTAL and might
-change without warning!
+L<Mojo::IOLoop::Subprocess> allows L<Mojo::IOLoop> to perform computationally
+expensive operations in subprocesses, without blocking the event loop. Note that
+this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 

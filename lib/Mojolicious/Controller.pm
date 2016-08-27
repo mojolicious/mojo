@@ -106,7 +106,7 @@ sub finish {
   my $self = shift;
 
   # WebSocket
-  my $tx = $self->tx;
+  my $tx = $self->tx || Carp::croak 'Connection already closed';
   $tx->finish(@_) and return $tx->established ? $self : $self->rendered(101)
     if $tx->is_websocket;
 
@@ -137,7 +137,7 @@ sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 
 sub on {
   my ($self, $name, $cb) = @_;
-  my $tx = $self->tx;
+  my $tx = $self->tx || Carp::croak 'Connection already closed';
   $self->rendered(101) if $tx->is_websocket && !$tx->established;
   return $tx->on($name => sub { shift; $self->$cb(@_) });
 }
@@ -248,7 +248,7 @@ sub respond_to {
 
 sub send {
   my ($self, $msg, $cb) = @_;
-  my $tx = $self->tx;
+  my $tx = $self->tx || Carp::croak 'Connection already closed';
   Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
   $tx->send($msg, $cb ? sub { shift; $self->$cb(@_) } : ());

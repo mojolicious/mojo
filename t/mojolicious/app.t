@@ -600,9 +600,17 @@ $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
   ->content_like(qr!<\?xml version="1.0" encoding="UTF-8"\?><rss />!);
 
 # Connection already closed
+eval { Mojolicious::Controller->new->finish };
+like $@, qr/Connection already closed/, 'right error';
+eval {
+  Mojolicious::Controller->new->on(finish => sub { });
+};
+like $@, qr/Connection already closed/, 'right error';
 eval { Mojolicious::Controller->new->req };
 like $@, qr/Connection already closed/, 'right error';
 eval { Mojolicious::Controller->new->res };
+like $@, qr/Connection already closed/, 'right error';
+eval { Mojolicious::Controller->new->send('whatever') };
 like $@, qr/Connection already closed/, 'right error';
 
 # Abstract methods

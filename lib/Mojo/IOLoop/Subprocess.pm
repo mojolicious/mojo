@@ -26,7 +26,8 @@ sub run {
   croak "Can't fork: $!" unless defined($self->{pid} = fork);
   unless ($self->{pid}) {
     $self->ioloop->reset;
-    print $writer $self->serialize->([$self->$first]);
+    my $results = eval { [$self->$first] } || [];
+    print $writer $self->serialize->([$@, @$results]);
     exit 0;
   }
 
@@ -40,7 +41,7 @@ sub run {
       waitpid $self->{pid}, 0;
       return $self->$second("Non-zero exit status (@{[$? >> 8]})") if $?;
       my $result = eval { $self->deserialize->($buffer) } || [];
-      $self->$second($@, @$result);
+      $self->$second(shift(@$result) // $@, @$result);
     }
   );
   return $self;

@@ -106,6 +106,18 @@ Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, [], 'right structure';
 
+# Exception
+$fail = undef;
+Mojo::IOLoop::Subprocess->new->run(
+  sub { die 'Whatever' },
+  sub {
+    my ($subprocess, $err) = @_;
+    $fail = $err;
+  }
+);
+Mojo::IOLoop->start;
+like $fail, qr/Whatever/, 'right error';
+
 # Non-zero exit status
 $fail = undef;
 Mojo::IOLoop::Subprocess->new->run(

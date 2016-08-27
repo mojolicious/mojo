@@ -267,7 +267,8 @@ connection has been closed in the meantime and the value of the attribute
 L<Mojolicious::Controller/"tx"> is no longer available. While there might not be
 a way to prevent the connection from getting closed, you can also avoid this
 error message by keeping a reference to the transaction object that is not
-weakened.
+weakened. The helper L<Mojolicious::Plugin::DefaultHelpers/"delay"> will do this
+automatically for you.
 
 =head1 MORE
 

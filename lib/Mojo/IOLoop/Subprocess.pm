@@ -42,8 +42,8 @@ sub run {
     close => sub {
       waitpid $self->{pid}, 0;
       return $self->$parent("Non-zero exit status (@{[$? >> 8]})") if $?;
-      my $result = eval { $self->deserialize->($buffer) } || [];
-      $self->$parent(shift(@$result) // $@, @$result);
+      my $results = eval { $self->deserialize->($buffer) } || [];
+      $self->$parent(shift(@$results) // $@, @$results);
     }
   );
   return $self;

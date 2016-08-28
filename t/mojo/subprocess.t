@@ -17,13 +17,14 @@ $subprocess->run(
   sub { shift->pid . $$ . ('x' x 100000) },
   sub {
     my ($subprocess, $err, $two) = @_;
-    $fail   = $err;
-    $result = $two;
+    $fail = $err;
+    $result .= $two;
   }
 );
+$result = $$;
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
-is $result, 0 . $subprocess->pid . ('x' x 100000), 'right result';
+is $result, $$ . 0 . $subprocess->pid . ('x' x 100000), 'right result';
 
 # Custom event loop
 ($fail, $result) = ();

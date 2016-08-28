@@ -15,7 +15,7 @@ has serialize   => sub { \&Storable::freeze };
 sub pid { shift->{pid} }
 
 sub run {
-  my ($self, $first, $second) = @_;
+  my ($self, $child, $parent) = @_;
 
   # No fork emulation support
   croak 'Subprocesses do not support fork emulation' if $Config{d_pseudofork};
@@ -28,7 +28,7 @@ sub run {
   croak "Can't fork: $!" unless defined($self->{pid} = fork);
   unless ($self->{pid}) {
     $self->ioloop->reset;
-    my $results = eval { [$self->$first] } || [];
+    my $results = eval { [$self->$child] } || [];
     print $writer $self->serialize->([$@, @$results]);
     POSIX::_exit(0);
   }
@@ -41,9 +41,9 @@ sub run {
   $stream->on(
     close => sub {
       waitpid $self->{pid}, 0;
-      return $self->$second("Non-zero exit status (@{[$? >> 8]})") if $?;
+      return $self->$parent("Non-zero exit status (@{[$? >> 8]})") if $?;
       my $result = eval { $self->deserialize->($buffer) } || [];
-      $self->$second(shift(@$result) // $@, @$result);
+      $self->$parent(shift(@$result) // $@, @$result);
     }
   );
   return $self;

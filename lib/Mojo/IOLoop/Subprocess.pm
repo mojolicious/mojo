@@ -40,8 +40,8 @@ sub run {
   $stream->on(read => sub { $buffer .= pop });
   $stream->on(
     close => sub {
-      waitpid $self->{pid}, 0;
-      return $self->$parent("Non-zero exit status (@{[$? >> 8]})") if $?;
+      return $self->$parent("Non-zero exit status (@{[$? >> 8]})")
+        if waitpid($self->{pid}, 0) > 0 && $?;
       my $results = eval { $self->deserialize->($buffer) } || [];
       $self->$parent(shift(@$results) // $@, @$results);
     }

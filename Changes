@@ -1,5 +1,7 @@
 
 7.05  2016-08-29
+  - Fixed bug in Mojo::IOLoop::Subprocess where EV would steal the subprocess
+    exit status.
 
 7.04  2016-08-28
   - Added EXPERIMENTAL support for performing computationally expensive

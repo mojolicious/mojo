@@ -96,7 +96,7 @@ is_deeply $result, [1, 2], 'right structure';
 # No result
 ($fail, $result) = ();
 Mojo::IOLoop::Subprocess->new->run(
-  sub { exit 0 },
+  sub {return},
   sub {
     my ($subprocess, $err, @results) = @_;
     $fail   = $err;
@@ -129,7 +129,7 @@ Mojo::IOLoop::Subprocess->new->run(
   }
 );
 Mojo::IOLoop->start;
-is $fail, 'Non-zero exit status (3)', 'right error';
+like $fail, qr/Storable/, 'right error';
 
 # Serialization error
 $fail       = undef;

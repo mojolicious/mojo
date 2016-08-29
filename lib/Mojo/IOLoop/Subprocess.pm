@@ -36,14 +36,12 @@ sub run {
   # Parent
   my $stream = Mojo::IOLoop::Stream->new($reader);
   $self->ioloop->stream($stream);
-  my $buffer;
+  my $buffer = '';
   $stream->on(read => sub { $buffer .= pop });
   $stream->on(
     close => sub {
-      my $results
-        = waitpid($pid, 0) == $pid && $?
-        ? ["Non-zero exit status (@{[$? >> 8]})"]
-        : eval { $self->deserialize->($buffer) } || [];
+      waitpid $pid, 0;
+      my $results = eval { $self->deserialize->($buffer) } || [];
       $self->$parent(shift(@$results) // $@, @$results);
     }
   );

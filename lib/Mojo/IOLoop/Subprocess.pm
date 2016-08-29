@@ -41,7 +41,7 @@ sub run {
   $stream->on(
     close => sub {
       return $self->$parent("Non-zero exit status (@{[$? >> 8]})")
-        if waitpid($self->{pid}, 0) > 0 && $?;
+        if waitpid($self->{pid}, 0) == $self->{pid} && $?;
       my $results = eval { $self->deserialize->($buffer) } || [];
       $self->$parent(shift(@$results) // $@, @$results);
     }

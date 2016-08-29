@@ -25,8 +25,8 @@ sub run {
   $writer->autoflush(1);
 
   # Child
-  croak "Can't fork: $!" unless defined($self->{pid} = fork);
-  unless ($self->{pid}) {
+  croak "Can't fork: $!" unless defined(my $pid = $self->{pid} = fork);
+  unless ($pid) {
     $self->ioloop->reset;
     my $results = eval { [$self->$child] } || [];
     print $writer $self->serialize->([$@, @$results]);
@@ -40,9 +40,10 @@ sub run {
   $stream->on(read => sub { $buffer .= pop });
   $stream->on(
     close => sub {
-      return $self->$parent("Non-zero exit status (@{[$? >> 8]})")
-        if waitpid($self->{pid}, 0) == $self->{pid} && $?;
-      my $results = eval { $self->deserialize->($buffer) } || [];
+      my $results
+        = waitpid($pid, 0) == $pid && $?
+        ? ["Non-zero exit status (@{[$? >> 8]})"]
+        : eval { $self->deserialize->($buffer) } || [];
       $self->$parent(shift(@$results) // $@, @$results);
     }
   );

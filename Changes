@@ -1,4 +1,6 @@
 
+7.05  2016-08-29
+
 7.04  2016-08-28
   - Added EXPERIMENTAL support for performing computationally expensive
     operations in subprocesses, without blocking the event loop. (jberger, sri)

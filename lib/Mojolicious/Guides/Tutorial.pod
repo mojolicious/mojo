@@ -791,10 +791,11 @@ really tamper resistant.
 =head2 File uploads
 
 All files uploaded via C<multipart/form-data> request are automatically
-available as L<Mojo::Upload> objects. And you don't have to worry about memory
-usage, because all files above 250KB will be automatically streamed into a
-temporary file. To build HTML forms more efficiently, you can also use tag
-helpers like L<Mojolicious::Plugin::TagHelpers/"form_for">.
+available as L<Mojo::Upload> objects from L<Mojolicious::Controller/"param">.
+And you don't have to worry about memory usage, because all files above 250KB
+will be automatically streamed into a temporary file. To build HTML forms more
+efficiently, you can also use tag helpers like
+L<Mojolicious::Plugin::TagHelpers/"form_for">.
 
   use Mojolicious::Lite;
 

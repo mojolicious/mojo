@@ -736,6 +736,7 @@ Get L<Mojo::Message::Request> object from L</"tx">.
   my $bytes  = $c->req->body;
   my $str    = $c->req->text;
   my $hash   = $c->req->params->to_hash;
+  my $all    = $c->req->uploads;
   my $value  = $c->req->json;
   my $foo    = $c->req->json('/23/foo');
   my $dom    = $c->req->dom;

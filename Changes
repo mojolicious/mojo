@@ -1,5 +1,6 @@
 
 7.06  2016-09-08
+  - Fixed a few test description encoding bugs in Test::Mojo.
 
 7.05  2016-08-29
   - Fixed bug in Mojo::IOLoop::Subprocess where EV would steal the subprocess

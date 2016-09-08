@@ -31,74 +31,74 @@ sub app {
 
 sub content_is {
   my ($self, $value, $desc) = @_;
-  $desc ||= 'exact match for content';
-  return $self->_test('is', $self->tx->res->text, $value, $desc);
+  return $self->_test('is', $self->tx->res->text,
+    $value, _desc($desc, 'exact match for content'));
 }
 
 sub content_isnt {
   my ($self, $value, $desc) = @_;
-  $desc ||= 'no match for content';
-  return $self->_test('isnt', $self->tx->res->text, $value, $desc);
+  return $self->_test('isnt', $self->tx->res->text,
+    $value, _desc($desc, 'no match for content'));
 }
 
 sub content_like {
   my ($self, $regex, $desc) = @_;
-  $desc ||= 'content is similar';
-  return $self->_test('like', $self->tx->res->text, $regex, $desc);
+  return $self->_test('like', $self->tx->res->text,
+    $regex, _desc($desc, 'content is similar'));
 }
 
 sub content_type_is {
   my ($self, $type, $desc) = @_;
-  $desc ||= "Content-Type: $type";
+  $desc = _desc($desc, "Content-Type: $type");
   return $self->_test('is', $self->tx->res->headers->content_type, $type,
     $desc);
 }
 
 sub content_type_isnt {
   my ($self, $type, $desc) = @_;
-  $desc ||= "not Content-Type: $type";
+  $desc = _desc($desc, "not Content-Type: $type");
   return $self->_test('isnt', $self->tx->res->headers->content_type, $type,
     $desc);
 }
 
 sub content_type_like {
   my ($self, $regex, $desc) = @_;
-  $desc ||= 'Content-Type is similar';
+  $desc = _desc($desc, 'Content-Type is similar');
   return $self->_test('like', $self->tx->res->headers->content_type, $regex,
     $desc);
 }
 
 sub content_type_unlike {
   my ($self, $regex, $desc) = @_;
-  $desc ||= 'Content-Type is not similar';
+  $desc = _desc($desc, 'Content-Type is not similar');
   return $self->_test('unlike', $self->tx->res->headers->content_type, $regex,
     $desc);
 }
 
 sub content_unlike {
   my ($self, $regex, $desc) = @_;
-  $desc ||= 'content is not similar';
-  return $self->_test('unlike', $self->tx->res->text, $regex, $desc);
+  return $self->_test('unlike', $self->tx->res->text,
+    $regex, _desc($desc, 'content is not similar'));
 }
 
 sub delete_ok { shift->_build_ok(DELETE => @_) }
 
 sub element_count_is {
   my ($self, $selector, $count, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{element count for selector "$selector"};
   my $size = $self->tx->res->dom->find($selector)->size;
-  return $self->_test('is', $size, $count, $desc);
+  return $self->_test('is', $size, $count,
+    _desc($desc, qq{element count for selector "$selector"}));
 }
 
 sub element_exists {
   my ($self, $selector, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{element for selector "$selector" exists};
+  $desc = _desc($desc, qq{element for selector "$selector" exists});
   return $self->_test('ok', $self->tx->res->dom->at($selector), $desc);
 }
 
 sub element_exists_not {
   my ($self, $selector, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{no element for selector "$selector"};
+  $desc = _desc($desc, qq{no element for selector "$selector"});
   return $self->_test('ok', !$self->tx->res->dom->at($selector), $desc);
 }
 
@@ -122,42 +122,42 @@ sub head_ok { shift->_build_ok(HEAD => @_) }
 
 sub header_is {
   my ($self, $name, $value, $desc) = @_;
-  $desc ||= "$name: " . ($value // '');
+  $desc = _desc($desc, "$name: " . ($value // ''));
   return $self->_test('is', $self->tx->res->headers->header($name), $value,
     $desc);
 }
 
 sub header_isnt {
   my ($self, $name, $value, $desc) = @_;
-  $desc ||= "not $name: " . ($value // '');
+  $desc = _desc($desc, "not $name: " . ($value // ''));
   return $self->_test('isnt', $self->tx->res->headers->header($name), $value,
     $desc);
 }
 
 sub header_like {
   my ($self, $name, $regex, $desc) = @_;
-  $desc ||= "$name is similar";
+  $desc = _desc($desc, "$name is similar");
   return $self->_test('like', $self->tx->res->headers->header($name), $regex,
     $desc);
 }
 
 sub header_unlike {
   my ($self, $name, $regex, $desc) = @_;
-  $desc ||= "$name is not similar";
+  $desc = _desc($desc, "$name is not similar");
   return $self->_test('unlike', $self->tx->res->headers->header($name),
     $regex, $desc);
 }
 
 sub json_has {
   my ($self, $p, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{has value for JSON Pointer "$p"};
+  $desc = _desc($desc, qq{has value for JSON Pointer "$p"});
   return $self->_test('ok',
     !!Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
 
 sub json_hasnt {
   my ($self, $p, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{has no value for JSON Pointer "$p"};
+  $desc = _desc($desc, qq{has no value for JSON Pointer "$p"});
   return $self->_test('ok',
     !Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
@@ -165,76 +165,77 @@ sub json_hasnt {
 sub json_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
-  my $desc = encode 'UTF-8', shift || qq{exact match for JSON Pointer "$p"};
+  my $desc = _desc(shift, qq{exact match for JSON Pointer "$p"});
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
 sub json_like {
   my ($self, $p, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{similar match for JSON Pointer "$p"};
-  return $self->_test('like', $self->tx->res->json($p), $regex, $desc);
+  return $self->_test('like', $self->tx->res->json($p),
+    $regex, _desc($desc, qq{similar match for JSON Pointer "$p"}));
 }
 
 sub json_message_has {
   my ($self, $p, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{has value for JSON Pointer "$p"};
+  $desc = _desc($desc, qq{has value for JSON Pointer "$p"});
   return $self->_test('ok', $self->_json(contains => $p), $desc);
 }
 
 sub json_message_hasnt {
   my ($self, $p, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{has no value for JSON Pointer "$p"};
+  $desc = _desc($desc, qq{has no value for JSON Pointer "$p"});
   return $self->_test('ok', !$self->_json(contains => $p), $desc);
 }
 
 sub json_message_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
-  my $desc = encode 'UTF-8', shift || qq{exact match for JSON Pointer "$p"};
+  my $desc = _desc(shift, qq{exact match for JSON Pointer "$p"});
   return $self->_test('is_deeply', $self->_json(get => $p), $data, $desc);
 }
 
 sub json_message_like {
   my ($self, $p, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{similar match for JSON Pointer "$p"};
-  return $self->_test('like', $self->_json(get => $p), $regex, $desc);
+  return $self->_test('like', $self->_json(get => $p),
+    $regex, _desc($desc, qq{similar match for JSON Pointer "$p"}));
 }
 
 sub json_message_unlike {
   my ($self, $p, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{no similar match for JSON Pointer "$p"};
-  return $self->_test('unlike', $self->_json(get => $p), $regex, $desc);
+  return $self->_test('unlike', $self->_json(get => $p),
+    $regex, _desc($desc, qq{no similar match for JSON Pointer "$p"}));
 }
 
 sub json_unlike {
   my ($self, $p, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{no similar match for JSON Pointer "$p"};
-  return $self->_test('unlike', $self->tx->res->json($p), $regex, $desc);
+  return $self->_test('unlike', $self->tx->res->json($p),
+    $regex, _desc($desc, qq{no similar match for JSON Pointer "$p"}));
 }
 
 sub message_is {
   my ($self, $value, $desc) = @_;
-  return $self->_message('is', $value, $desc || 'exact match for message');
+  return $self->_message('is', $value, _desc($desc, 'exact match for message'));
 }
 
 sub message_isnt {
   my ($self, $value, $desc) = @_;
-  return $self->_message('isnt', $value, $desc || 'no match for message');
+  return $self->_message('isnt', $value, _desc($desc, 'no match for message'));
 }
 
 sub message_like {
   my ($self, $regex, $desc) = @_;
-  return $self->_message('like', $regex, $desc || 'message is similar');
+  return $self->_message('like', $regex, _desc($desc, 'message is similar'));
 }
 
 sub message_ok {
   my ($self, $desc) = @_;
-  return $self->_test('ok', !!$self->_wait, $desc || 'message received');
+  return $self->_test('ok', !!$self->_wait, _desc($desc, 'message received'));
 }
 
 sub message_unlike {
   my ($self, $regex, $desc) = @_;
-  return $self->_message('unlike', $regex, $desc || 'message is not similar');
+  return $self->_message('unlike', $regex,
+    _desc($desc, 'message is not similar'));
 }
 
 sub new {
@@ -266,7 +267,7 @@ sub reset_session {
 sub send_ok {
   my ($self, $msg, $desc) = @_;
 
-  $desc ||= 'send message';
+  $desc = _desc($desc, 'send message');
   return $self->_test('ok', 0, $desc) unless $self->tx->is_websocket;
 
   $self->tx->send($msg => sub { Mojo::IOLoop->stop });
@@ -276,38 +277,39 @@ sub send_ok {
 
 sub status_is {
   my ($self, $status, $desc) = @_;
-  $desc ||= "$status " . $self->tx->res->default_message($status);
+  $desc = _desc($desc, "$status " . $self->tx->res->default_message($status));
   return $self->_test('is', $self->tx->res->code, $status, $desc);
 }
 
 sub status_isnt {
   my ($self, $status, $desc) = @_;
-  $desc ||= "not $status " . $self->tx->res->default_message($status);
-  return $self->_test('isnt', $self->tx->res->code, $status, $desc);
+  return $self->_test('isnt', $self->tx->res->code,
+    $status,
+    _desc($desc, "not $status " . $self->tx->res->default_message($status)));
 }
 
 sub text_is {
   my ($self, $selector, $value, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{exact match for selector "$selector"};
-  return $self->_test('is', $self->_text($selector), $value, $desc);
+  return $self->_test('is', $self->_text($selector),
+    $value, _desc($desc, qq{exact match for selector "$selector"}));
 }
 
 sub text_isnt {
   my ($self, $selector, $value, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{no match for selector "$selector"};
-  return $self->_test('isnt', $self->_text($selector), $value, $desc);
+  return $self->_test('isnt', $self->_text($selector),
+    $value, _desc($desc, qq{no match for selector "$selector"}));
 }
 
 sub text_like {
   my ($self, $selector, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{similar match for selector "$selector"};
-  return $self->_test('like', $self->_text($selector), $regex, $desc);
+  return $self->_test('like', $self->_text($selector),
+    $regex, _desc($desc, qq{similar match for selector "$selector"}));
 }
 
 sub text_unlike {
   my ($self, $selector, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{no similar match for selector "$selector"};
-  return $self->_test('unlike', $self->_text($selector), $regex, $desc);
+  return $self->_test('unlike', $self->_text($selector),
+    $regex, _desc($desc, qq{no similar match for selector "$selector"}));
 }
 
 sub websocket_ok {
@@ -320,6 +322,8 @@ sub _build_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   return $self->_request_ok($self->ua->build_tx($method, $url, @_), $url);
 }
+
+sub _desc { encode 'UTF-8', shift || shift }
 
 sub _json {
   my ($self, $method, $p) = @_;
@@ -364,7 +368,7 @@ sub _request_ok {
     );
     Mojo::IOLoop->start;
 
-    my $desc = encode 'UTF-8', "WebSocket handshake with $url";
+    my $desc = _desc("WebSocket handshake with $url");
     return $self->_test('ok', $self->tx->is_websocket, $desc);
   }
 
@@ -373,8 +377,7 @@ sub _request_ok {
   my $err = $self->tx->error;
   Test::More::diag $err->{message}
     if !(my $ok = !$err->{message} || $err->{code}) && $err;
-  my $desc = encode 'UTF-8', "@{[uc $tx->req->method]} $url";
-  return $self->_test('ok', $ok, $desc);
+  return $self->_test('ok', $ok, _desc("@{[uc $tx->req->method]} $url"));
 }
 
 sub _test {

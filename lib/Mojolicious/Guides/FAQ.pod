@@ -78,9 +78,16 @@ In addition we will also keep the distribution installable up to a certain
 legacy version that we deem worthy of supporting, but not specifically optimize
 for it, this is currently 5.10.1.
 
+=head2 How well is Windows supported?
+
+Windows is fully supported by L<Mojolicious>, some features such as
+L<subprocesses|Mojo::IOLoop/"subprocess"> and
+L<Hypnotoad|Mojo::Server::Hypnotoad> will however require the use of the
+L<Linux Subsystem for Windows|https://msdn.microsoft.com/commandline/wsl/>.
+
 =head2 Do I need to clean my environment before testing Mojolicious?
 
-Mojolicious uses many environment variables both internally and externally,
+L<Mojolicious> uses many environment variables both internally and externally,
 notably (but not exclusively) those starting with the prefix C<MOJO_*> and
 C<PLACK_ENV>. The test suite expects a clean environment; testing with a
 non-standard environment is unsupported and is unlikely to succeed. Therefore
@@ -157,11 +164,11 @@ allow matching of the C<.> character.
 
 =head2 Can I configure Hypnotoad from the command line?
 
-No, you can't, Hypnotoad is a bit special in this regard. Because when you
-initiate a zero downtime software upgrade (hot deployment), you are only really
-sending a C<USR2> signal to the already running server, and no other information
-can be passed along. What you can do instead, is to use a
-L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
+No, you can't, L<Hypnotoad|Mojo::Server::Hypnotoad> is a bit special in this
+regard. Because when you initiate a zero downtime software upgrade (hot
+deployment), you are only really sending a C<USR2> signal to the already running
+server, and no other information can be passed along. What you can do instead,
+is to use a L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
 configuration file.
 
   # myapp.conf

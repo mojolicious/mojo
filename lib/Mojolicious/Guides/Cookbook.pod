@@ -122,9 +122,9 @@ script.
 =head2 Hypnotoad
 
 For bigger applications L<Mojolicious> contains the UNIX optimized pre-forking
-web server L<Mojo::Server::Hypnotoad>, which can take advantage of multiple CPU
-cores and copy-on-write memory management to scale up to thousands of
-concurrent client connections.
+web server L<Hypnotoad|Mojo::Server::Hypnotoad>, which can take advantage of
+multiple CPU cores and copy-on-write memory management to scale up to thousands
+of concurrent client connections.
 
   Mojo::Server::Hypnotoad
   |- Mojo::Server::Daemon [1]
@@ -172,15 +172,16 @@ losing a single incoming connection, just by running the command above again.
   $ hypnotoad ./script/my_app
   Starting hot deployment for Hypnotoad server 31841.
 
-You might also want to enable proxy support if you're using Hypnotoad behind a
-reverse proxy. This allows L<Mojolicious> to automatically pick up the
-C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
+You might also want to enable proxy support if you're using
+L<Hypnotoad|Mojo::Server::Hypnotoad> behind a reverse proxy. This allows
+L<Mojolicious> to automatically pick up the C<X-Forwarded-For> and
+C<X-Forwarded-Proto> headers.
 
   # myapp.conf
   {hypnotoad => {proxy => 1}};
 
-To manage Hypnotoad with systemd, you can use a unit configuration file like
-this.
+To manage L<Hypnotoad|Mojo::Server::Hypnotoad> with systemd, you can use a unit
+configuration file like this.
 
   [Unit]
   Description=My Mojolicious application
@@ -198,10 +199,10 @@ this.
 
 =head2 Zero downtime software upgrades
 
-Hypnotoad makes zero downtime software upgrades (hot deployment) very simple,
-as you can see above, but on modern operating systems that support the
-C<SO_REUSEPORT> socket option, there is also another method available that
-works with all built-in web servers.
+L<Hypnotoad|Mojo::Server::Hypnotoad> makes zero downtime software upgrades (hot
+deployment) very simple, as you can see above, but on modern operating systems
+that support the C<SO_REUSEPORT> socket option, there is also another method
+available that works with all built-in web servers.
 
   $ ./script/my_app prefork -P /tmp/first.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080
@@ -218,9 +219,9 @@ parameter.
 
 =head2 Nginx
 
-One of the most popular setups these days is Hypnotoad behind an
-L<Nginx|http://nginx.org> reverse proxy, which even supports WebSockets in
-newer versions.
+One of the most popular setups these days is
+L<Hypnotoad|Mojo::Server::Hypnotoad> behind an L<Nginx|http://nginx.org> reverse
+proxy, which even supports WebSockets in newer versions.
 
   upstream myapp {
     server 127.0.0.1:8080;

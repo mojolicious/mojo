@@ -1,5 +1,5 @@
 
-7.06  2016-09-01
+7.06  2016-09-08
 
 7.05  2016-08-29
   - Fixed bug in Mojo::IOLoop::Subprocess where EV would steal the subprocess

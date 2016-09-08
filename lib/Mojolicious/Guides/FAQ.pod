@@ -115,7 +115,7 @@ subroutine is finished, this is called continuation-passing style.
 No, it is not possible to magically make Perl code non-blocking. While
 L<Mojolicious> has been designed from the ground up for non-blocking I/O and
 event loops, taking advantage of this requires blocking code to be wrapped in
-L<subprocesses|Mojo::IOLoop/"subprocess">, or the use of specialized
+L<subprocesses|Mojo::IOLoop/"subprocess">, and the use of specialized
 non-blocking code available through modules like L<Mojo::IOLoop> and
 L<Mojo::UserAgent>, or third-party event loops. In the documentation we often
 refer to this as real-time web, for more information see also

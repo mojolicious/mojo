@@ -80,10 +80,10 @@ for it, this is currently 5.10.1.
 
 =head2 How well is Windows supported by Mojolicious?
 
-Windows is fully supported by L<Mojolicious>, some more advanced features, such
-as L<subprocesses|Mojo::IOLoop/"subprocess"> and the
+Windows is fully supported by L<Mojolicious>, some of the more advanced
+features, such as L<subprocesses|Mojo::IOLoop/"subprocess"> and the
 L<Hypnotoad|Mojo::Server::Hypnotoad> web server, will however require the use of
-the L<Linux Subsystem for Windows|https://msdn.microsoft.com/commandline/wsl/>.
+the L<Windows Subsystem for Linux|https://msdn.microsoft.com/commandline/wsl/>.
 
 =head2 Do I need to clean my environment before testing Mojolicious?
 

@@ -323,7 +323,7 @@ sub _build_ok {
   return $self->_request_ok($self->ua->build_tx($method, $url, @_), $url);
 }
 
-sub _desc { encode 'UTF-8', shift || shift }
+sub _desc { shift || encode 'UTF-8', shift }
 
 sub _json {
   my ($self, $method, $p) = @_;

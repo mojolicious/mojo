@@ -1,4 +1,6 @@
 
+7.07  2016-09-18
+
 7.06  2016-09-17
   - Fixed bug where Mojolicious::Renderer would wrap text in layouts.
   - Fixed a few test description encoding bugs in Test::Mojo.

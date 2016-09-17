@@ -99,17 +99,16 @@ sub render {
   # Data
   return delete $stash->{data}, $options->{format} if defined $stash->{data};
 
+  # Text
+  return _maybe($options->{encoding}, delete $stash->{text}), $options->{format}
+    if defined $stash->{text};
+
   # JSON
   return encode_json(delete $stash->{json}), 'json' if exists $stash->{json};
 
-  # Text
-  my $output = delete $stash->{text};
-
   # Template or templateless handler
-  unless (defined $output) {
-    $options->{template} //= $self->template_for($c);
-    return () unless $self->_render_template($c, \$output, $options);
-  }
+  $options->{template} //= $self->template_for($c);
+  return () unless $self->_render_template($c, \my $output, $options);
 
   # Inheritance
   my $content = $stash->{'mojo.content'} ||= {};
@@ -122,11 +121,8 @@ sub render {
     $content->{content} //= $output if $output =~ /\S/;
   }
 
-  # Encoding
-  $output = encode $options->{encoding}, $output
-    if !$string && $options->{encoding} && $output;
-
-  return $output, $options->{format};
+  return $string ? $output : _maybe($options->{encoding}, $output),
+    $options->{format};
 }
 
 sub template_for {
@@ -194,6 +190,8 @@ sub warmup {
     s/\.(\w+)$// and unshift @{$templates->{$_}}, $1 for reverse @keys;
   }
 }
+
+sub _maybe { $_[0] ? encode @_ : $_[1] }
 
 sub _next {
   my $stash = shift;

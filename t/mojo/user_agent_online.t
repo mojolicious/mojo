@@ -189,14 +189,6 @@ is $tx->req->method, 'GET',                  'right method';
 is $tx->req->url,    'https://metacpan.org', 'right url';
 is $tx->res->code,   200,                    'right status';
 
-# HTTPS request that requires SNI
-SKIP: {
-  skip 'SNI support required!', 1 unless IO::Socket::SSL->can_client_sni;
-  $tx = $ua->get('https://cpanmin.us');
-  is $tx->res->code, 302, 'right status';
-  like $tx->res->headers->location, qr/github/, 'right "Location" header';
-}
-
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;
 

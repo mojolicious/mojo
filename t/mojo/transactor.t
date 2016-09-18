@@ -720,7 +720,7 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # 303 redirect (dynamic)
-$tx = $t->tx(POST => 'http://mojolicious.org/foo');
+$tx = $t->tx(PUT => 'http://mojolicious.org/foo');
 $tx->res->code(303);
 $tx->res->headers->location('http://example.com/bar');
 $tx->req->content->write_chunk('whatever' => sub { shift->finish });

@@ -89,10 +89,8 @@ sub redirect {
     $new->req($clone);
   }
   else {
-    my $method = uc $req->method;
-    my $headers
-      = $new->req->method(
-      $code == 303 ? 'GET' : $method eq 'POST' ? 'GET' : $method)
+    my $m = uc $req->method;
+    my $headers = $new->req->method($code == 303 || $m eq 'POST' ? 'GET' : $m)
       ->content->headers($req->headers->clone)->headers;
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
   }

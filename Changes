@@ -1,5 +1,7 @@
 
 7.07  2016-09-18
+  - Fixed bug in Mojo::UserAgent::Transactor where 303 redirects would not be
+    followed correctly with GET requests. (jberger)
 
 7.06  2016-09-17
   - Fixed bug where Mojolicious::Renderer would wrap text in layouts.

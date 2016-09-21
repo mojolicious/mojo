@@ -138,7 +138,7 @@ sub _controller {
 
   # Load and instantiate controller/application
   my $new;
-  unless ($new = $self->_class($old, $field)) { return !!defined $new }
+  unless ($new = $self->_class($old, $field)) { return defined $new }
 
   # Application
   my $class = ref $new;

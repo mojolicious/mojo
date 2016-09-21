@@ -331,7 +331,7 @@ be used to specify route conditions.
   # Route with pattern, condition and destination
   $r->any('/' => (agent => qr/Firefox/))->to('foo#bar');
 
-A hash reference is used to specifiy optional placeholders and default values
+A hash reference is used to specify optional placeholders and default values
 for the stash.
 
   # Route with pattern, optional placeholder and destination

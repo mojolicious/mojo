@@ -1,5 +1,7 @@
 
-7.08  2016-09-21
+7.08  2016-09-22
+  - Improved accuracy of finished_ok test in Test::Mojo.
+  - Fixed state transition bugs in Mojo::Transaction::HTTP.
 
 7.07  2016-09-20
   - Fixed bug in Mojo::UserAgent::Transactor where 303 redirects would not be

@@ -25,6 +25,7 @@ get '/echo' => {text => 'plain echo!'};
 websocket '/no_compression' => sub {
   my $c = shift;
   $c->on(binary => sub { shift->send({binary => shift}) });
+  $c->render(text => 'this should be ignored', status => 101);
 };
 
 websocket '/protocols' => sub {

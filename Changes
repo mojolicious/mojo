@@ -1,5 +1,6 @@
 
 7.08  2016-09-23
+  - Added -i option to get command.
   - Improved accuracy of finished_ok test in Test::Mojo.
   - Fixed state transition bug in Mojo::Transaction::HTTP that caused message
     bodies to be included in responses to HEAD requests.

@@ -621,6 +621,7 @@ EXPERIMENTAL and might change without warning!
     },
     sub {
       my ($subprocess, $err, @results) = @_;
+      say "Subprocess error: $err" and return if $err;
       say "I $results[0] $results[1]!";
     }
   );

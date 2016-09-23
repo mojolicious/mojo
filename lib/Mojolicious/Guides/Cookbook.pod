@@ -588,6 +588,38 @@ created at startup time.
 Just remember that all these non-blocking operations are processed
 cooperatively, so your callbacks shouldn't block for too long.
 
+=head2 Subprocesses
+
+You can also use subprocesses, created with L<Mojo::IOLoop/"subprocess">, to
+perform computationally expensive operations without blocking the event loop.
+
+  use Mojolicious::Lite;
+  use Mojo::IOLoop;
+
+  # Operation that would block the event loop for 5 seconds
+  get '/' => sub {
+    my $c = shift;
+    Mojo::IOLoop->subprocess(
+      sub {
+        my $subprocess = shift;
+        sleep 5;
+        return '♥', 'Mojolicious';
+      },
+      sub {
+        my ($subprocess, $err, @results) = @_;
+        return $c->reply->exception($err) if $err;
+        $c->render(text => "I $results[0] $results[1]!");
+      }
+    );
+  };
+
+  app->start;
+
+The first callback will be executed in a child process, without blocking the
+event loop of the parent process. The results of the first callback will then be
+shared between both processes, and the second callback executed in the parent
+process.
+
 =head2 Exceptions in non-blocking operations
 
 Since timers and other non-blocking operations are running solely in the event

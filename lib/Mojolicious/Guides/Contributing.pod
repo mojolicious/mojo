@@ -182,7 +182,6 @@ needed to maintain the project and develop new features for it is not
 sustainable without proper financial backing. You can support the ongoing
 development of L<Mojolicious> through
 L<Gratipay|https://gratipay.com/mojolicious>,
-L<Bountysource|https://www.bountysource.com/teams/mojolicious>,
 L<PayPal|https://www.paypal.me/kraih> or Bitcoin
 (C<1Cid78CmK4hvf78Ry8K2XeDx8pQHNh4hbz>).
 

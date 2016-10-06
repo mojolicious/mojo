@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
-use Mojo::Util qw(encode monkey_patch);
+use Mojo::Util 'encode';
 
 has format => sub { \&_format };
 has handle => sub {

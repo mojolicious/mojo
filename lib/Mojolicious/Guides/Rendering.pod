@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::Rendering - Rendering
+Mojolicious::Guides::Rendering - Rendering content
 
 =head1 OVERVIEW
 
@@ -62,10 +62,11 @@ plugins, but more about that later.
 =head2 Embedded Perl
 
 L<Mojolicious> includes a minimalistic but very powerful template system out of
-the box called Embedded Perl or C<ep> for short. It allows the embedding of
-Perl code right into actual content using a small set of special tags and line
-start characters. For all templates L<strict>, L<warnings>, L<utf8> and Perl
-5.10 L<features|feature> are automatically enabled.
+the box called Embedded Perl or C<ep> for short. It is based on
+L<Mojo::Template> and allows the embedding of Perl code right into actual
+content using a small set of special tags and line start characters. For all
+templates L<strict>, L<warnings>, L<utf8> and Perl 5.10 L<features|feature> are
+automatically enabled.
 
   <% Perl code %>
   <%= Perl expression, replaced with XML escaped result %>
@@ -570,43 +571,24 @@ value).
 
   my $html = $c->render_to_string('reminder', layout => 'mail');
 
-=head2 Include templates
+=head2 Partial templates
 
-Like most helpers L<Mojolicious::Plugin::DefaultHelpers/"include"> is just a
-shortcut to make your life a little easier.
-
-  use Mojolicious::Lite;
-
-  get '/' => 'foo';
-
-  app->start;
-  __DATA__
-
-  @@ foo.html.ep
-  <!DOCTYPE html>
-  <html>
-    %= include 'header', title => 'Howdy'
-    <body>Bar</body>
-  </html>
-
-  @@ header.html.ep
-  <head><title><%= $title %></title></head>
-
-Instead of C<include> you could also just call
-L<Mojolicious::Controller/"render_to_string"> to include one template into
+You can break up bigger templates into smaller, more manageable chunks. These
+partial templates can also be shared with other templates. Just use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"include"> to include one template into
 another.
 
   use Mojolicious::Lite;
 
-  get '/' => 'foo';
+  get '/' => {template => 'foo/bar'};
 
   app->start;
   __DATA__
 
-  @@ foo.html.ep
+  @@ foo/bar.html.ep
   <!DOCTYPE html>
   <html>
-    %= $c->render_to_string('header', title => 'Howdy')
+    %= include 'header', title => 'Howdy'
     <body>Bar</body>
   </html>
 
@@ -633,8 +615,8 @@ C<begin> and before C<end>.
     % my $name = shift;
     Hello <%= $name %>.
   <% end %>
-  <%= $block->('Sebastian') %>
-  <%= $block->('Sara') %>
+  <%= $block->('Wolfgang') %>
+  <%= $block->('Baerbel') %>
 
 A naive translation of the template to Perl code could look like this.
 
@@ -647,8 +629,8 @@ A naive translation of the template to Perl code could look like this.
     $output .= '.';
     return Mojo::ByteStream->new($output);
   };
-  $output .= xml_escape scalar + $block->('Sebastian');
-  $output .= xml_escape scalar + $block->('Sara');
+  $output .= xml_escape scalar + $block->('Wolfgang');
+  $output .= xml_escape scalar + $block->('Baerbel');
   return $output;
 
 While template blocks cannot be shared between templates, they are most
@@ -742,8 +724,10 @@ avoid conflicts.
 
 =head2 Content blocks
 
-Blocks and the helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> can
-also be used to pass whole sections of the template to the layout.
+The helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> allows you to
+pass whole blocks of content from one template to another. This can be very
+useful when your layout has distinct sections, such as sidebars, where content
+should be inserted by the template.
 
   use Mojolicious::Lite;
 
@@ -858,16 +842,16 @@ logic with methods like L<Mojolicious::Validator::Validation/"is_valid">.
       %= form_for index => begin
         %= label_for user => 'Username (required, 1-20 characters, only e-t)'
         <br>
-        %= text_field 'user'
+        %= text_field 'user', id => 'user'
         %= submit_button
         <br>
         %= label_for pass => 'Password (optional, 7-500 characters)'
         <br>
-        %= password_field 'pass'
+        %= password_field 'pass', id => 'pass'
         <br>
         %= label_for pass_again => 'Password again (equal to the value above)'
         <br>
-        %= password_field 'pass_again'
+        %= password_field 'pass_again', id => 'pass_again'
       % end
     </body>
   </html>
@@ -980,7 +964,7 @@ L<Mojolicious::Validator::Validation/"csrf_protect">.
       %= form_for target => begin
         %= csrf_field
         %= label_for city => 'Which city to point low orbit ion cannon at?'
-        %= text_field 'city'
+        %= text_field 'city', id => 'city'
         %= submit_button
       %= end
     </body>
@@ -1412,10 +1396,10 @@ L<Mojo::Template> contains the whole list of available options.
 
 =head2 Adding your favorite template system
 
-Maybe you would prefer a different template system than C<ep>, and there is not
-already a plugin on CPAN for your favorite one. All you have to do, is to add a
-new C<handler> with L<Mojolicious::Renderer/"add_handler"> when C<register> is
-called.
+Maybe you would prefer a different template system than C<ep>, which is provided
+by L<Mojolicious::Plugin::EPRenderer>, and there is not already a plugin on CPAN
+for your favorite one. All you have to do, is to add a new C<handler> with
+L<Mojolicious::Renderer/"add_handler"> when C<register> is called.
 
   package Mojolicious::Plugin::MyRenderer;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -1521,7 +1505,8 @@ more documentation and examples by many different authors.
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>.
+L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
 
 =cut

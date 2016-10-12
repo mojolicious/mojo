@@ -10,8 +10,13 @@ use Test::Mojo;
 my $yatta      = 'やった';
 my $yatta_sjis = b($yatta)->encode('shift_jis')->to_string;
 
-# Charset plugin
-plugin Charset => {charset => 'Shift_JIS'};
+app->types->type(html => 'text/html;charset=Shift_JIS');
+app->renderer->encoding('Shift_JIS');
+app->hook(
+  before_dispatch => sub {
+    shift->req->default_charset('Shift_JIS')->url->query->charset('Shift_JIS');
+  }
+);
 
 # UTF-8 text renderer
 app->renderer->add_handler(

@@ -11,11 +11,20 @@ use POSIX 'WNOHANG';
 has daemon => sub { Mojo::Server::Daemon->new };
 has watch  => sub { [qw(lib templates)] };
 
-sub check {
+sub modified_files {
   my $self = shift;
-  $self->_check($_) and return $_
-    for map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch};
-  return undef;
+
+  my $cache = $self->{cache} ||= {};
+  my @files;
+  for my $file (map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch}) {
+    my ($size, $mtime) = (stat $file)[7, 9];
+    my $stats = $cache->{$file} ||= [$^T, $size];
+    next if $mtime <= $stats->[0] && $size == $stats->[1];
+    @$stats = ($mtime, $size);
+    push @files, $file;
+  }
+
+  return \@files;
 }
 
 sub run {
@@ -36,23 +45,14 @@ sub run {
   exit 0;
 }
 
-sub _check {
-  my ($self, $file) = @_;
-
-  # Check if modify time and/or size have changed
-  my ($size, $mtime) = (stat $file)[7, 9];
-  return undef unless defined $mtime;
-  my $cache = $self->{cache} ||= {};
-  my $stats = $cache->{$file} ||= [$^T, $size];
-  return undef if $mtime <= $stats->[0] && $size == $stats->[1];
-  return !!($cache->{$file} = [$mtime, $size]);
-}
-
 sub _manage {
   my $self = shift;
 
-  if (defined(my $file = $self->check)) {
-    say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
+  if (my @files = @{$self->modified_files}) {
+    say @files == 1
+      ? qq{File "@{[$files[0]]}" changed, restarting.}
+      : qq{@{[scalar @files]} files changed, restarting.}
+      if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;
   }
@@ -87,7 +87,7 @@ sub _spawn {
 
 =head1 NAME
 
-Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
+Mojo::Server::Morbo - Tonight at 11...DOOOOOOOOOOOOOOOM!
 
 =head1 SYNOPSIS
 
@@ -152,12 +152,15 @@ directory.
 L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 check
+=head2 modified_files
 
-  my $file = $morbo->check;
+  my $files = $morbo->modified_files;
 
-Check if file from L</"watch"> has been modified since last check and return
-its name, or C<undef> if there have been no changes.
+Check if files from L</"watch"> have been modified since the last check and
+return an array reference with the results.
+
+  # All files that have been modified
+  say for @{$morbo->modified_files};
 
 =head2 run
 

@@ -43,11 +43,14 @@ sub find_packages {
 sub load_class {
   my $class = shift;
 
-  # Check for a valid class name
+  # Invalid class name
   return 1 if ($class || '') !~ /^\w(?:[\w:']*\w)?$/;
 
-  # Load if not already loaded
-  return undef if $class->can('new') || eval "require $class; 1";
+  # Already loaded
+  return undef if $class->can('new');
+
+  # Success
+  eval "require $class; 1" ? return undef : Mojo::Util::_teardown($class);
 
   # Does not exist
   return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $class]}\E in \@INC/;
@@ -60,6 +63,7 @@ sub _all {
   my $class = shift;
 
   return $CACHE{$class} if $CACHE{$class};
+  local $.;
   my $handle = do { no strict 'refs'; \*{"${class}::DATA"} };
   return {} unless fileno $handle;
   seek $handle, 0, 0;
@@ -91,7 +95,7 @@ sub _all {
 
 =head1 NAME
 
-Mojo::Loader - Loader
+Mojo::Loader - Load all kinds of things
 
 =head1 SYNOPSIS
 

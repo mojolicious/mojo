@@ -12,18 +12,20 @@ use File::Spec::Functions 'catfile';
 use Mojo::IOLoop::Server;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
-use Mojo::Util 'spurt';
+use Mojo::Util 'slurp';
 
 # Manage and clean up PID file
 my $prefork = Mojo::Server::Prefork->new;
 my $file    = $prefork->pid_file;
 ok !$prefork->check_pid, 'no process id';
-spurt "\n", $file;
+$prefork->ensure_pid_file(-23);
 ok -e $file, 'file exists';
+is slurp($file), "-23\n", 'right process id';
 ok !$prefork->check_pid, 'no process id';
 ok !-e $file, 'file has been cleaned up';
-$prefork->ensure_pid_file;
+$prefork->ensure_pid_file($$);
 ok -e $file, 'file exists';
+is slurp($file), "$$\n", 'right process id';
 is $prefork->check_pid, $$, 'right process id';
 undef $prefork;
 ok !-e $file, 'file has been cleaned up';
@@ -34,7 +36,7 @@ $prefork = Mojo::Server::Prefork->new(pid_file => $bad);
 $prefork->app->log->level('fatal');
 my $log = '';
 my $cb = $prefork->app->log->on(message => sub { $log .= pop });
-eval { $prefork->ensure_pid_file };
+eval { $prefork->ensure_pid_file($$) };
 like $@,     qr/Can't create process id file/, 'right error';
 unlike $log, qr/Creating process id file/,     'right message';
 like $log,   qr/Can't create process id file/, 'right message';
@@ -55,14 +57,14 @@ $prefork->on(
   }
 );
 is $prefork->workers, 4, 'start with four workers';
-my (@spawn, @reap, $worker, $tx, $graceful, $healthy);
+my (@spawn, @reap, $worker, $tx, $graceful);
 $prefork->on(spawn => sub { push @spawn, pop });
-$prefork->once(
+$prefork->on(
   heartbeat => sub {
     my ($prefork, $pid) = @_;
-    $worker  = $pid;
-    $healthy = $prefork->healthy;
-    $tx      = Mojo::UserAgent->new->get("http://127.0.0.1:$port");
+    $worker = $pid;
+    return if $prefork->healthy < 4;
+    $tx = Mojo::UserAgent->new->get("http://127.0.0.1:$port");
     kill 'QUIT', $$;
   }
 );
@@ -72,7 +74,6 @@ $log = '';
 $cb = $prefork->app->log->on(message => sub { $log .= pop });
 is $prefork->healthy, 0, 'no healthy workers';
 $prefork->run;
-ok $healthy >= 1, 'healthy workers';
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
 ok !!grep { $worker eq $_ } @spawn, 'worker has a heartbeat';
@@ -85,6 +86,7 @@ like $log, qr/Manager $$ started/,                   'right message';
 like $log, qr/Creating process id file/,             'right message';
 like $log, qr/Stopping worker $spawn[0] gracefully/, 'right message';
 like $log, qr/Worker $spawn[0] stopped/,             'right message';
+like $log, qr/Manager $$ stopped/,                   'right message';
 $prefork->app->log->unsubscribe(message => $cb);
 
 # Process id file
@@ -100,7 +102,6 @@ $prefork = Mojo::Server::Prefork->new(
   accepts            => 500,
   heartbeat_interval => 0.5,
   listen             => ["http://*:$port"],
-  multi_accept       => 3,
   workers            => 1
 );
 $prefork->unsubscribe('request');
@@ -123,8 +124,7 @@ $prefork->once(
 $prefork->on(reap => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
 $prefork->run;
-is $prefork->ioloop->max_accepts,  500, 'right value';
-is $prefork->ioloop->multi_accept, 3,   'right value';
+is $prefork->ioloop->max_accepts, 500, 'right value';
 is scalar @spawn, 1, 'one worker spawned';
 is scalar @reap,  1, 'one worker reaped';
 ok !$graceful, 'server has been stopped immediately';

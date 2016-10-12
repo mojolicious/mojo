@@ -132,7 +132,7 @@
     %= include 'mojo/menubar'
     <script>
       function mojoDrawer (handle, drawer) {
-        $(handle).click(function () {
+        $(handle).on('click', function () {
           $(drawer).slideToggle('slow');
           var text = $(handle + ' div.tap').text();
           text = text == "tap for more" ? "tap for less" : "tap for more";
@@ -140,7 +140,7 @@
         });
         $(drawer).toggle();
       }
-      $(document).ready(function () {
+      $(function () {
         mojoDrawer('#trace', '#frames');
         mojoDrawer('#more', '#infos');
       });
@@ -195,7 +195,7 @@
             <script>
               var current = '#context';
               function mojoShowcase () {
-                $('#showcase').click(function () {
+                $('#showcase').on('click', function () {
                   $(this).unbind('click');
                   $(current).slideToggle('slow', function () {
                     current = current == '#context' ? '#insight' : '#context';

@@ -125,18 +125,20 @@ sub _connect_proxy {
     ($loop, $new) => sub {
       my ($self, $tx) = @_;
 
-      # CONNECT failed (connection needs to be kept alive)
-      $old->res->error({message => 'Proxy connection failed'})
-        and return $self->$cb($old)
-        if $tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive;
-
-      # Start real transaction
-      $old->req->via_proxy(0);
+      # CONNECT failed
+      $old->previous($tx)->req->via_proxy(0);
       my $id = $tx->connection;
+      if ($tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive) {
+        $old->res->error({message => 'Proxy connection failed'});
+        $self->_remove($id);
+        return $self->$cb($old);
+      }
+
+      # Start real transaction without TLS upgrade
       return $self->_start($loop, $old->connection($id), $cb)
         unless $tx->req->url->protocol eq 'https';
 
-      # TLS upgrade
+      # TLS upgrade before starting the real transaction
       my $handle = $loop->stream($id)->steal_handle;
       $self->_remove($id);
       $id = $self->_connect($loop, 0, $old, $handle,
@@ -218,13 +220,10 @@ sub _finish {
   $c->{ioloop}->remove($c->{timeout}) if $c->{timeout};
   return $self->_reuse($id, $close) unless my $old = $c->{tx};
 
-  # Premature connection close or 4xx/5xx
+  # Premature connection close
   my $res = $old->closed->res->finish;
   if ($close && !$res->code && !$res->error) {
     $res->error({message => 'Premature connection close'});
-  }
-  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-    $res->error({message => $res->message, code => $res->code});
   }
 
   # Always remove connection for WebSockets
@@ -240,8 +239,11 @@ sub _finish {
     return $new->client_read($old->res->content->leftovers);
   }
 
-  # Finish connection and handle redirects
-  $self->_reuse($id, $close);
+  # CONNECT requests always have a follow-up request
+  $self->_reuse($id, $close) unless uc $old->req->method eq 'CONNECT';
+  if ($res->is_status_class(400) || $res->is_status_class(500)) {
+    $res->error({message => $res->message, code => $res->code});
+  }
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
 }
 
@@ -294,7 +296,7 @@ sub _start {
   unless ($url->is_abs) {
     my $base
       = $loop == $self->ioloop ? $self->server->url : $self->server->nb_url;
-    $url->scheme($base->scheme)->authority($base->authority);
+    $url->scheme($base->scheme)->host($base->host)->port($base->port);
   }
 
   $_->prepare($tx) for $self->proxy, $self->cookie_jar;

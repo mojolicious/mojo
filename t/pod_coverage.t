@@ -7,11 +7,4 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 plan skip_all => 'Test::Pod::Coverage 1.04+ required for this test!'
   unless eval 'use Test::Pod::Coverage 1.04; 1';
 
-my %RULES = (
-  'Mojo::Transaction::WebSocket' =>
-    {also_private => [qw(build_frame parse_frame)]},
-  'Mojo::Util' => {also_private => ['xss_escape']}
-);
-pod_coverage_ok($_, $RULES{$_} || {}) for all_modules();
-
-done_testing();
+all_pod_coverage_ok();

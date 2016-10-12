@@ -42,8 +42,8 @@ has static    => sub { Mojolicious::Static->new };
 has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Clinking Beer Mugs';
-our $VERSION  = '6.52';
+our $CODENAME = 'Doughnut';
+our $VERSION  = '7.09';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -221,6 +221,12 @@ Mojolicious - Real-time web framework
   }
 
 =head1 DESCRIPTION
+
+An amazing real-time web framework built on top of the powerful L<Mojo> web
+development toolkit. With support for RESTful routes, plugins, commands,
+Perl-ish templates, content negotiation, session management, form validation,
+testing framework, static file server, C<CGI>/C<PSGI> detection, first class
+Unicode support and much more for you to discover.
 
 Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
@@ -718,6 +724,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 Every major release of L<Mojolicious> has a code name, these are the ones that
 have been used in the past.
 
+7.0, C<Doughnut> (U+1F369)
+
 6.0, C<Clinking Beer Mugs> (U+1F37B)
 
 5.0, C<Tiger Face> (U+1F42F)
@@ -783,6 +791,8 @@ Alexey Likhatskiy
 
 Anatoly Sharifulin
 
+Andre Parker
+
 Andre Vieth
 
 Andreas Jaekel
@@ -790,6 +800,8 @@ Andreas Jaekel
 Andreas Koenig
 
 Andrew Fresh
+
+Andrew Nugged
 
 Andrey Khozov
 
@@ -905,6 +917,8 @@ Klaus S. Madsen
 
 Lars Balker Rasmussen
 
+Lee Johnson
+
 Leon Brocard
 
 Magnus Holm
@@ -981,6 +995,8 @@ Robin Lee
 
 Roland Lammel
 
+Roy Storey
+
 Ryan Jendoubi
 
 Sascha Kiefer
@@ -1039,7 +1055,7 @@ Zoffix Znet
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2016, Sebastian Riedel.
+Copyright (C) 2008-2016, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

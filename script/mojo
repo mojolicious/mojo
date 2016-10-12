@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-require Mojolicious::Commands;
+use Mojolicious::Commands;
+
 Mojolicious::Commands->start_app('Mojo::HelloWorld');
 
 =encoding utf8

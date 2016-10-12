@@ -1,5 +1,168 @@
 
-6.52  2016-03-01
+7.09  2016-10-06
+
+7.08  2016-09-23
+  - Added -i and -o options to get command.
+  - Updated jQuery to version 3.1.1.
+  - Improved accuracy of finished_ok test in Test::Mojo.
+  - Fixed state transition bug in Mojo::Transaction::HTTP that caused message
+    bodies to be included in responses to HEAD requests.
+
+7.07  2016-09-20
+  - Fixed bug in Mojo::UserAgent::Transactor where 303 redirects would not be
+    followed correctly with GET requests. (jberger)
+
+7.06  2016-09-17
+  - Fixed bug where Mojolicious::Renderer would wrap text in layouts.
+  - Fixed a few test description encoding bugs in Test::Mojo.
+
+7.05  2016-08-29
+  - Fixed bug in Mojo::IOLoop::Subprocess where EV would steal the subprocess
+    exit status.
+
+7.04  2016-08-28
+  - Added EXPERIMENTAL support for performing computationally expensive
+    operations in subprocesses, without blocking the event loop. (jberger, sri)
+  - Added EXPERIMENTAL module Mojo::IOLoop::Subprocess. (jberger, sri)
+  - Added EXPERIMENTAL subprocess method to Mojo::IOLoop. (jberger, sri)
+  - Improved many methods in Mojolicious::Controller to die more gracefully if
+    the connection has already been closed.
+  - Fixed bug where Mojo::UserAgent would try to follow redirects for CONNECT
+    requests.
+
+7.03  2016-08-17
+  - Fixed packaging errors.
+
+7.02  2016-08-17
+  - Fixed bugs in Mojo::Loader and Mojo::Util where the DATA handle would be
+    mentioned in error messages. (jberger, kiwiroy, sri)
+
+7.01  2016-08-01
+  - Improved support for systemd.
+  - Fixed a bug in Mojo::Server::Prefork where PID files would not contain a
+    newline character.
+
+7.0  2016-07-19
+  - Code name "Doughnut", this is a major release.
+  - Removed Mojolicious::Plugin::Charset.
+  - Removed authority method from Mojo::URL.
+  - Removed squish method from Mojo::ByteStream.
+  - Removed squish function from Mojo::Util.
+  - Removed support for smart whitespace trimming from all_text and text methods
+    in Mojo::DOM.
+  - Updated jQuery to version 3.1.0.
+  - Improved Mojo::URL not to include the userinfo part when generating URLs, as
+    recommended by the URL Living Standard.
+  - Improved Mojolicious::Plugin::Config to no longer log which files have been
+    loaded.
+  - Fixed trailing slash bug in Mojo::URL.
+  - Fixed a few whitespace bugs in Mojo::DOM.
+  - Fixed attribute selector bug in Mojo::DOM::CSS. (Akron)
+  - Fixed a bug causing headers with zero length values to be ignored by the get
+    command. (jberger)
+
+6.66  2016-06-16
+  - Fixed support for CONNECT requests without keep alive connections in
+    Mojo::UserAgent. (anparker, sri)
+
+6.65  2016-06-14
+  - Added password and username methods to Mojo::URL.
+  - Updated jQuery to version 3.0.0.
+  - Fixed "0" value bug in Mojo::UserAgent::CookieJar. (jamadam)
+
+6.64  2016-06-09
+  - Updated HTML5 entities in Mojo::Util.
+  - Improved Mojo::IOLoop to fall back to Mojo::Reactor::Poll if Perl has been
+    compiled with fork emulation.
+
+6.63  2016-06-03
+  - Removed deprecated check method from Mojo::Server::Morbo.
+  - Removed deprecated build, compile and interpret methods from Mojo::Template.
+  - Removed deprecated multi_accept methods from Mojo::IOLoop,
+    Mojo::IOLoop::Server and Mojo::Server::Daemon.
+  - Updated jQuery to version 2.2.4.
+  - Improved generator commands not to overwrite existing files.
+
+6.62  2016-05-14
+  - Removed deprecated is_debug, is_error, is_info and is_warn methods from
+    Mojo::Log.
+  - Improved support for Ubuntu on Windows.
+
+6.61  2016-04-30
+  - Improved Mojo::Server::Daemon to no longer log when a connection has been
+    closed prematurely.
+  - Fixed bug in Mojo::Content where the drain event would not always be emitted
+    for dynamically generated content with a Content-Length header.
+
+6.60  2016-04-25
+  - Fixed bug in Mojo::IOLoop where stopping gracefully would sometimes result
+    in connections getting closed too early. (anparker, sri)
+
+6.59  2016-04-22
+  - Removed deprecated xss_escape function from Mojo::Util.
+  - Improved HTML Living Standard compliance of Mojo::DOM::HTML.
+  - Improved Mojo::Server::Daemon to log when a connection has been closed
+    prematurely.
+  - Improved Mojo::Server::Prefork to log when the manager process has been
+    stopped.
+  - Fixed a few tests to keep up with breaking changes in IO::Socket::SSL.
+  - Fixed a few timing bugs in tests.
+
+6.58  2016-04-09
+  - Removed deprecated build_frame and parse_frame methods from
+    Mojo::Transaction::WebSocket.
+  - Added fork policy to Mojolicious::Guides::Contributing.
+  - Improved Mojo::JSON to generate canonical JSON objects.
+  - Fixed bug in Mojo::Loader where classes with exceptions could not be loaded
+    twice. (kiwiroy, sri)
+
+6.57  2016-03-23
+  - Fixed a few validation bugs in Mojolicious::Validator::Validation.
+    (Mikey, sri)
+  - Fixed copyright notice.
+
+6.56  2016-03-16
+  - Added hidden option to list_files method in Mojo::Home. (batman, sri)
+  - Added hidden option to files function in Mojo::Util. (batman, sri)
+  - Fixed bug where Morbo would not ignore hidden files. (batman, sri)
+  - Fixed bug where Morbo would ignore the --verbose option.
+  - Fixed keep-alive bug in Mojo::UserAgent. (jberger)
+
+6.55  2016-03-08
+  - Deprecated Mojo::Server::Morbo::check in favor of
+    Mojo::Server::Morbo::modified_files. (leejo, nugged)
+  - Added modified_files method to Mojo::Server::Morbo. (leejo, nugged)
+  - Improved renderer performance slightly.
+  - Fixed a bug where Morbo would restart more than once if multiple files
+    changed at the same time. (leejo, nugged)
+
+6.54  2016-03-06
+  - Deprecated Mojo::Template::build and Mojo::Template::compile.
+  - Deprecated Mojo::Template::interpret in favor of Mojo::Template::process.
+  - Added support for named variables to Mojo::Template.
+  - Added vars attribute to Mojo::Template.
+  - Added process method to Mojo::Template.
+  - Improved Mojo::Template performance slightly.
+
+6.53  2016-03-03
+  - Removed multi_accept setting from Hypnotoad.
+  - Removed -M options from daemon and prefork commands.
+  - Deprecated Mojo::IOLoop::multi_accept.
+  - Deprecated Mojo::IOLoop::Server::multi_accept.
+  - Deprecated Mojo::Server::Daemon::multi_accept.
+  - Added single_accept option to Mojo::IOLoop::Server::listen.
+  - Added single_accept parameter to Mojo::Server::Daemon::listen.
+  - Increased default max_requests from 25 to 100 in Mojo::Server::Daemon.
+  - Increased default accepts from 1000 to 10000 in Mojo::Server::Prefork.
+  - Improved performance of many Mojo::Util functions slightly.
+  - Fixed default value bug in val method of Mojo::DOM.
+
+6.52  2016-03-02
+  - Added is_accepting method to Mojo::IOLoop::Server.
+  - Added -M option to daemon command.
+  - Improved responsiveness of stop_gracefully method in Mojo::IOLoop.
+  - Fixed bug in Mojo::IOLoop where too many connections could be accepted.
+  - Fixed a few concurrency bugs in Mojo::IOLoop.
 
 6.51  2016-02-29
   - Fixed bug in Mojolicious::Plugin::EPLRenderer where empty templates from the
@@ -159,7 +322,7 @@
 
 6.26  2015-10-28
   - Renamed built-in templates with more descriptive names.
-  - Added warmup method to Mojolicious::Renderer and Mojolicious::Static.
+  - Added warmup methods to Mojolicious::Renderer and Mojolicious::Static.
 
 6.25  2015-10-21
   - Deprecated Mojo::Message::Request::proxy with boolean and string arguments
@@ -351,7 +514,7 @@
     node, preceding_siblings, previous_sibling and type methods in Mojo::DOM to
     descendant_nodes, child_nodes, following_nodes, matches, next_node, type,
     preceding_nodes, previous_node and tag.
-  - Renamed match method in Mojo::DOM and Mojo::DOM::CSS to matches.
+  - Renamed match methods in Mojo::DOM and Mojo::DOM::CSS to matches.
   - Renamed extract and inject methods in Mojo::UserAgent::CookieJar to collect
     and prepare.
   - Renamed inject method in Mojo::UserAgent::Proxy to prepare.
@@ -998,7 +1161,7 @@
   - Improved WebSocket and long poll performance.
 
 4.85  2014-02-26
-  - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.
+  - Added next_tick methods to Mojo::IOLoop and Mojo::Reactor.
   - Added host_port and path_query methods to Mojo::URL.
   - Added is_handshake method to Mojo::Message::Request.
   - Improved Mojo::Reactor::EV responsiveness.
@@ -1474,7 +1637,7 @@
     Mojo::Transaction::WebSocket.
   - Added json event to Mojo::Transaction::WebSocket.
   - Added render_maybe method to Mojolicious::Controller.
-  - Added again method to Mojo::Reactor, Mojo::Reactor::Poll and
+  - Added again methods to Mojo::Reactor, Mojo::Reactor::Poll and
     Mojo::Reactor::EV.
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
@@ -1990,9 +2153,9 @@
   - Fixed small AUTOLOAD bug in Mojolicious::Lite.
 
 3.20  2012-08-04
-  - Added extract_start_line method to Mojo::Message, Mojo::Message::Request
+  - Added extract_start_line methods to Mojo::Message, Mojo::Message::Request
     and Mojo::Message::Response.
-  - Added get_start_line_chunk method to Mojo::Message::Request and
+  - Added get_start_line_chunk methods to Mojo::Message::Request and
     Mojo::Message::Request.
   - Improved end method in Mojo::IOLoop::Delay to return the number of
     remaining events.
@@ -2327,7 +2490,7 @@
   - Deprecated Mojo::IOLoop::drop in favor of Mojo::IOLoop::remove.
   - Renamed Mojo::Reactor::drop to Mojo::Reactor::remove.
   - Added module Mojo::Reactor::Poll.
-  - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
+  - Added one_tick methods to Mojo::Reactor and Mojo::Reactor::EV.
   - Removed experimental status from Mojo::IOLoop::Client.
   - Removed experimental status from Mojo::IOLoop::Server.
   - Removed experimental status from Mojo::IOLoop::Stream.
@@ -2503,7 +2666,7 @@
     Mojo::IOLoop.
 
 2.50  2012-02-18
-  - Added EXPERIMENTAL is_running method to Mojo::IOWatcher and
+  - Added EXPERIMENTAL is_running methods to Mojo::IOWatcher and
     Mojo::IOWatcher::EV.
   - Added file upload support to param method in Mojolicious::Controller.
   - Removed gitignore command.
@@ -2854,7 +3017,7 @@
 
 2.05  2011-10-22
   - Added EXPERIMENTAL max_memory_size attribute to Mojo::Asset::Memory.
-  - Added EXPERIMENTAL is_file method to Mojo::Asset and Mojo::Asset::File.
+  - Added EXPERIMENTAL is_file methods to Mojo::Asset and Mojo::Asset::File.
   - Improved start_tls method in Mojo::IOLoop by allowing it to accept more
     options.
   - Improved MOJO_MAX_MEMORY_SIZE handling by moving it from

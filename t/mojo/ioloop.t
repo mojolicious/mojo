@@ -26,16 +26,8 @@ is ref $loop->reactor, 'MyReactor', 'right class';
 # Defaults
 $loop = Mojo::IOLoop->new;
 is $loop->max_connections, 1000, 'right default';
-is $loop->multi_accept,    50,   'right default';
-$loop = Mojo::IOLoop->new(max_connections => 51);
-is $loop->max_connections, 51, 'right value';
-is $loop->multi_accept,    50, 'right value';
 $loop = Mojo::IOLoop->new(max_connections => 10);
 is $loop->max_connections, 10, 'right value';
-is $loop->multi_accept,    1,  'right value';
-$loop = Mojo::IOLoop->new(multi_accept => 10);
-is $loop->max_connections, 1000, 'right value';
-is $loop->multi_accept,    10,   'right value';
 
 # Double start
 my $err;
@@ -259,11 +251,22 @@ is $client, 'works!', 'full message has been written';
 # Graceful shutdown
 $err  = '';
 $loop = Mojo::IOLoop->new;
+$port
+  = $loop->acceptor($loop->server({address => '127.0.0.1'} => sub { }))->port;
+$id = $loop->client({port => $port} => sub { shift->stop_gracefully });
 my $finish;
+$loop->on(finish => sub { ++$finish and shift->stream($id)->close });
+$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->start;
+ok !$loop->stream($id), 'stopped gracefully';
+ok !$err, 'no error';
+is $finish, 1, 'finish event has been emitted once';
+
+# Graceful shutdown (without connection)
+$err = $finish = '';
+$loop = Mojo::IOLoop->new;
 $loop->on(finish => sub { $finish++ });
-$loop->stop_gracefully;
-$loop->remove(
-  $loop->client({port => Mojo::IOLoop::Server->generate_port} => sub { }));
+$loop->next_tick(sub { shift->stop_gracefully });
 $loop->timer(30 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
@@ -279,6 +282,29 @@ $loop->timer(30 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $loop->max_accepts, 1, 'right value';
+
+# Connection limit
+$err  = '';
+$loop = Mojo::IOLoop->new->max_connections(2);
+my @accepting;
+$id = $loop->server(
+  {address => '127.0.0.1', single_accept => 1} => sub {
+    shift->next_tick(
+      sub {
+        my $loop = shift;
+        push @accepting, $loop->acceptor($id)->is_accepting;
+        $loop->stop if @accepting == 2;
+      }
+    );
+  }
+);
+$port = $loop->acceptor($id)->port;
+$loop->client({port => $port} => sub { }) for 1 .. 2;
+$loop->timer(30 => sub { shift->stop; $err = 'failed' });
+$loop->start;
+ok !$err, 'no error';
+ok $accepting[0], 'accepting connections';
+ok !$accepting[1], 'connection limit reached';
 
 # Exception in timer
 {

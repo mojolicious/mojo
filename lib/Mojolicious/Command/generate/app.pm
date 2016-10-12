@@ -119,9 +119,9 @@ use warnings;
 
 use FindBin;
 BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+use Mojolicious::Commands;
 
 # Start command line interface for application
-require Mojolicious::Commands;
 Mojolicious::Commands->start_app('<%= $class %>');
 
 @@ appclass

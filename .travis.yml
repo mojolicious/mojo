@@ -13,6 +13,7 @@ env:
     - TEST_EV=1
     - TEST_POD=1
     - TEST_SOCKS=1
+    - TEST_SUBPROCESS=1
     - TEST_TLS=1
 install:
   - cpanm -n EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Pod Test::Pod::Coverage

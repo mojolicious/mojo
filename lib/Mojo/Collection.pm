@@ -192,8 +192,8 @@ to the callback, and is also available as C<$_>.
   my $first = $collection->first;
   my $first = $collection->first(qr/foo/);
   my $first = $collection->first(sub {...});
-  my $first = $collection->first($method);
-  my $first = $collection->first($method, @args);
+  my $first = $collection->first('some_method');
+  my $first = $collection->first('some_method', @args);
 
 Evaluate regular expression/callback for, or call method on, each element in
 collection and return the first one that matched the regular expression, or for
@@ -201,7 +201,7 @@ which the callback/method returned true. The element will be the first argument
 passed to the callback, and is also available as C<$_>.
 
   # Longer version
-  my $first = $collection->first(sub { $_->$method(@args) });
+  my $first = $collection->first(sub { $_->some_method(@args) });
 
   # Find first value that contains the word "mojo"
   my $interesting = $collection->first(qr/mojo/i);
@@ -223,8 +223,8 @@ all elements.
 
   my $new = $collection->grep(qr/foo/);
   my $new = $collection->grep(sub {...});
-  my $new = $collection->grep($method);
-  my $new = $collection->grep($method, @args);
+  my $new = $collection->grep('some_method');
+  my $new = $collection->grep('some_method', @args);
 
 Evaluate regular expression/callback for, or call method on, each element in
 collection and create a new collection with all elements that matched the
@@ -233,7 +233,7 @@ will be the first argument passed to the callback, and is also available as
 C<$_>.
 
   # Longer version
-  my $new = $collection->grep(sub { $_->$method(@args) });
+  my $new = $collection->grep(sub { $_->some_method(@args) });
 
   # Find all values that contain the word "mojo"
   my $interesting = $collection->grep(qr/mojo/i);
@@ -260,15 +260,15 @@ Return the last element in collection.
 =head2 map
 
   my $new = $collection->map(sub {...});
-  my $new = $collection->map($method);
-  my $new = $collection->map($method, @args);
+  my $new = $collection->map('some_method');
+  my $new = $collection->map('some_method', @args);
 
 Evaluate callback for, or call method on, each element in collection and create
 a new collection from the results. The element will be the first argument
 passed to the callback, and is also available as C<$_>.
 
   # Longer version
-  my $new = $collection->map(sub { $_->$method(@args) });
+  my $new = $collection->map(sub { $_->some_method(@args) });
 
   # Append the word "mojo" to all values
   my $mojoified = $collection->map(sub { $_ . 'mojo' });
@@ -284,8 +284,11 @@ Construct a new array-based L<Mojo::Collection> object.
   my $result = $collection->reduce(sub {...});
   my $result = $collection->reduce(sub {...}, $initial);
 
-Reduce elements in collection with callback, the first element will be used as
-initial value if none has been provided.
+Reduce elements in collection with a callback and return its final result,
+setting C<$a> and C<$b> each time the callback is executed. The first time C<$a>
+will be set to an optional initial value or the first element in the collection.
+And from then on C<$a> will be set to the return value of the callback, while
+C<$b> will always be set to the next element in the collection.
 
   # Calculate the sum of all values
   my $sum = $collection->reduce(sub { $a + $b });
@@ -325,8 +328,9 @@ Number of elements in collection.
   my $new = $collection->sort;
   my $new = $collection->sort(sub {...});
 
-Sort elements based on return value of callback and create a new collection
-from the results.
+Sort elements based on return value of a callback and create a new collection
+from the results, setting C<$a> and C<$b> to the elements being compared, each
+time the callback is executed.
 
   # Sort values case-insensitive
   my $case_insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
@@ -347,15 +351,15 @@ Turn collection into array reference.
 
   my $new = $collection->uniq;
   my $new = $collection->uniq(sub {...});
-  my $new = $collection->uniq($method);
-  my $new = $collection->uniq($method, @args);
+  my $new = $collection->uniq('some_method');
+  my $new = $collection->uniq('some_method', @args);
 
 Create a new collection without duplicate elements, using the string
 representation of either the elements or the return value of the
 callback/method.
 
   # Longer version
-  my $new = $collection->uniq(sub { $_->$method(@args) });
+  my $new = $collection->uniq(sub { $_->some_method(@args) });
 
   # "foo bar baz"
   Mojo::Collection->new('foo', 'bar', 'bar', 'baz')->uniq->join(' ');

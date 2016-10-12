@@ -9,7 +9,7 @@ use Mojo::Util qw(decode encode monkey_patch slurp);
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
 has [qw(append code prepend unparsed)] => '';
-has [qw(auto_escape compiled)];
+has [qw(auto_escape compiled vars)];
 has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
@@ -23,99 +23,11 @@ has tag_start => '<%';
 has tag_end   => '%>';
 has tree      => sub { [] };
 
-sub build {
-  my $self = shift;
-
-  my $tree   = $self->tree;
-  my $escape = $self->auto_escape;
-
-  my @blocks = ('');
-  my ($i, $capture, $multi);
-  while (++$i <= @$tree && (my $next = $tree->[$i])) {
-    my ($op, $value) = @{$tree->[$i - 1]};
-    push @blocks, '' and next if $op eq 'line';
-    my $newline = chomp($value //= '');
-
-    # Text (quote and fix line ending)
-    if ($op eq 'text') {
-      $value = join "\n", map { quotemeta $_ } split("\n", $value, -1);
-      $value .= '\n' if $newline;
-      $blocks[-1] .= "\$_O .= \"" . $value . "\";" if length $value;
-    }
-
-    # Code or multi-line expression
-    elsif ($op eq 'code' || $multi) { $blocks[-1] .= $value }
-
-    # Capture end
-    elsif ($op eq 'cpen') {
-      $blocks[-1] .= 'return Mojo::ByteStream->new($_O) }';
-
-      # No following code
-      $blocks[-1] .= ';' if ($next->[1] // '') =~ /^\s*$/;
-    }
-
-    # Expression
-    if ($op eq 'expr' || $op eq 'escp') {
-
-      # Escaped
-      if (!$multi && ($op eq 'escp' && !$escape || $op eq 'expr' && $escape)) {
-        $blocks[-1] .= "\$_O .= _escape scalar + $value";
-      }
-
-      # Raw
-      elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar + $value" }
-
-      # Multi-line
-      $multi = !$next || $next->[0] ne 'text';
-
-      # Append semicolon
-      $blocks[-1] .= ';' unless $multi || $capture;
-    }
-
-    # Capture start
-    if ($op eq 'cpst') { $capture = 1 }
-    elsif ($capture) {
-      $blocks[-1] .= " sub { my \$_O = ''; ";
-      $capture = 0;
-    }
-  }
-
-  return $self->code(join "\n", @blocks)->tree([]);
-}
-
-sub compile {
-  my $self = shift;
-
-  # Compile with line directive
-  return undef unless defined(my $code = $self->code);
-  my $compiled = eval $self->_wrap($code);
-  $self->compiled($compiled) and return undef unless $@;
-
-  # Use local stack trace for compile exceptions
-  return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
-    ->trace->verbose(1);
-}
-
-sub interpret {
-  my $self = shift;
-
-  # Stack trace
-  local $SIG{__DIE__} = sub {
-    CORE::die $_[0] if ref $_[0];
-    CORE::die Mojo::Exception->new(shift)
-      ->trace->inspect($self->unparsed, $self->code)->verbose(1);
-  };
-
-  return undef unless my $compiled = $self->compiled;
-  my $output;
-  return eval { $output = $compiled->(@_); 1 } ? $output : $@;
-}
-
 sub parse {
   my ($self, $template) = @_;
 
   # Clean start
-  $self->unparsed($template)->tree(\my @tree);
+  $self->unparsed($template)->tree(\my @tree)->compiled(undef);
 
   my $tag     = $self->tag_start;
   my $replace = $self->replace_mark;
@@ -173,7 +85,6 @@ sub parse {
 
       # End
       if ($op ne 'text' && $token =~ $end_re) {
-        $op = 'text';
 
         # Capture start
         splice @tree, -1, 0, ['cpst'] if $1;
@@ -182,7 +93,7 @@ sub parse {
         _trim(\@tree) if ($trimming = $2) && @tree > 1;
 
         # Hint at end
-        push @tree, ['text', ''];
+        push @tree, [$op = 'text', ''];
       }
 
       # Code
@@ -226,10 +137,32 @@ sub parse {
   return $self;
 }
 
-sub render {
+sub process {
   my $self = shift;
-  return $self->parse(shift)->build->compile || $self->interpret(@_);
+
+  # Use a local stack trace for compile exceptions
+  my $compiled = $self->compiled;
+  unless ($compiled) {
+    my $code = $self->_compile->code;
+    monkey_patch $self->namespace, '_escape', $self->escape;
+    return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
+      ->trace->verbose(1)
+      unless $compiled = eval $self->_wrap($code, @_);
+    $self->compiled($compiled);
+  }
+
+  # Use a real stack trace for normal exceptions
+  local $SIG{__DIE__} = sub {
+    CORE::die $_[0] if ref $_[0];
+    CORE::die Mojo::Exception->new(shift)
+      ->trace->inspect($self->unparsed, $self->code)->verbose(1);
+  };
+
+  my $output;
+  return eval { $output = $compiled->(@_); 1 } ? $output : $@;
 }
+
+sub render { shift->parse(shift)->process(@_) }
 
 sub render_file {
   my ($self, $path) = (shift, shift);
@@ -241,6 +174,66 @@ sub render_file {
     if $encoding && !defined($template = decode $encoding, $template);
 
   return $self->render($template, @_);
+}
+
+sub _compile {
+  my $self = shift;
+
+  my $tree   = $self->tree;
+  my $escape = $self->auto_escape;
+
+  my @blocks = ('');
+  my ($i, $capture, $multi);
+  while (++$i <= @$tree && (my $next = $tree->[$i])) {
+    my ($op, $value) = @{$tree->[$i - 1]};
+    push @blocks, '' and next if $op eq 'line';
+    my $newline = chomp($value //= '');
+
+    # Text (quote and fix line ending)
+    if ($op eq 'text') {
+      $value = join "\n", map { quotemeta $_ } split("\n", $value, -1);
+      $value .= '\n' if $newline;
+      $blocks[-1] .= "\$_O .= \"" . $value . "\";" if length $value;
+    }
+
+    # Code or multi-line expression
+    elsif ($op eq 'code' || $multi) { $blocks[-1] .= $value }
+
+    # Capture end
+    elsif ($op eq 'cpen') {
+      $blocks[-1] .= 'return Mojo::ByteStream->new($_O) }';
+
+      # No following code
+      $blocks[-1] .= ';' if ($next->[1] // '') =~ /^\s*$/;
+    }
+
+    # Expression
+    if ($op eq 'expr' || $op eq 'escp') {
+
+      # Escaped
+      if (!$multi && ($op eq 'escp' && !$escape || $op eq 'expr' && $escape)) {
+        $blocks[-1] .= "\$_O .= _escape scalar + $value";
+      }
+
+      # Raw
+      elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar + $value" }
+
+      # Multi-line
+      $multi = !$next || $next->[0] ne 'text';
+
+      # Append semicolon
+      $blocks[-1] .= ';' unless $multi || $capture;
+    }
+
+    # Capture start
+    if ($op eq 'cpst') { $capture = 1 }
+    elsif ($capture) {
+      $blocks[-1] .= "sub { my \$_O = ''; ";
+      $capture = 0;
+    }
+  }
+
+  return $self->code(join "\n", @blocks)->tree([]);
 }
 
 sub _line {
@@ -263,17 +256,21 @@ sub _trim {
 }
 
 sub _wrap {
-  my ($self, $code) = @_;
+  my ($self, $body, $vars) = @_;
 
-  # Escape function
-  monkey_patch $self->namespace, '_escape', $self->escape;
+  # Variables
+  my $args = '';
+  if ($self->vars && (my @vars = grep {/^\w+$/} keys %$vars)) {
+    $args = 'my (' . join(',', map {"\$$_"} @vars) . ')';
+    $args .= '= @{shift()}{qw(' . join(' ', @vars) . ')};';
+  }
 
   # Wrap lines
-  my $num = () = $code =~ /\n/g;
-  my $head = $self->_line(1) . "\npackage @{[$self->namespace]};";
-  $head .= " use Mojo::Base -strict; no warnings 'ambiguous';";
-  $code = "$head sub { my \$_O = ''; @{[$self->prepend]}; { $code\n";
-  $code .= $self->_line($num + 1) . "\n@{[$self->append]}; } \$_O };";
+  my $num = () = $body =~ /\n/g;
+  my $code = $self->_line(1) . "\npackage @{[$self->namespace]};";
+  $code .= "use Mojo::Base -strict; no warnings 'ambiguous';";
+  $code .= "sub { my \$_O = ''; @{[$self->prepend]};{ $args { $body\n";
+  $code .= $self->_line($num + 1) . "\n;}@{[$self->append]}; } \$_O };";
 
   warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $code;
@@ -285,49 +282,47 @@ sub _wrap {
 
 =head1 NAME
 
-Mojo::Template - Perl-ish templates!
+Mojo::Template - Perl-ish templates
 
 =head1 SYNOPSIS
 
   use Mojo::Template;
 
-  # Simple
+  # Use Perl modules
   my $mt = Mojo::Template->new;
-  my $output = $mt->render(<<'EOF');
+  say $mt->render(<<'EOF');
   % use Time::Piece;
-  <!DOCTYPE html>
-  <html>
-    <head><title>Simple</title></head>
+  <div>
     % my $now = localtime;
-    <body>Time: <%= $now->hms %></body>
-  </html>
+    Time: <%= $now->hms %>
+  </div>
   EOF
-  say $output;
 
-  # More advanced
-  my $output = $mt->render(<<'EOF', 23, 'More advanced');
-  % my ($num, $title) = @_;
-  %= 5 * 5
-  <!DOCTYPE html>
-  <html>
-    <head><title><%= $title %></title></head>
-    <body>
-      test 123
-      foo <% my $i = $num + 2; %>
-      % for (1 .. 23) {
-      * some text <%= $i++ %>
-      % }
-    </body>
-  </html>
+  # Render with arguments
+  say $mt->render(<<'EOF', [1 .. 13], 'Hello World!');
+  % my ($numbers, $title) = @_;
+  <div>
+    <h1><%= $title %></h1>
+    % for my $i (@$numbers) {
+      Test <%= $i %>
+    % }
+  </div>
   EOF
-  say $output;
+
+  # Render with named variables
+  say $mt->vars(1)->render(<<'EOF', {title => 'Hello World!'});
+  <div>
+    <h1><%= $title %></h1>
+    %= 5 + 5
+  </div>
+  EOF
 
 =head1 DESCRIPTION
 
-L<Mojo::Template> is a minimalistic and very Perl-ish template engine, designed
-specifically for all those small tasks that come up during big projects. Like
-preprocessing a configuration file, generating text from heredocs and stuff
-like that.
+L<Mojo::Template> is a minimalistic, fast, and very Perl-ish template engine,
+designed specifically for all those small tasks that come up during big
+projects. Like preprocessing a configuration file, generating text from heredocs
+and stuff like that.
 
 See L<Mojolicious::Guides::Rendering> for information on how to generate
 content with the L<Mojolicious> renderer.
@@ -428,6 +423,9 @@ L<Mojo::Template> implements the following attributes.
 
 Activate automatic escaping.
 
+  # "&lt;html&gt;"
+  Mojo::Template->new(auto_escape => 1)->render("<%= '<html>' %>");
+
 =head2 append
 
   my $code = $mt->append;
@@ -463,7 +461,7 @@ Keyword indicating the start of a capture block, defaults to C<begin>.
   my $code = $mt->code;
   $mt      = $mt->code($code);
 
-Perl code for template.
+Perl code for template if available.
 
 =head2 comment_mark
 
@@ -479,14 +477,14 @@ Character indicating the start of a comment, defaults to C<#>.
   my $compiled = $mt->compiled;
   $mt          = $mt->compiled($compiled);
 
-Compiled template code.
+Compiled template code if available.
 
 =head2 encoding
 
   my $encoding = $mt->encoding;
   $mt          = $mt->encoding('UTF-8');
 
-Encoding used for template files.
+Encoding used for template files, defaults to C<UTF-8>.
 
 =head2 escape
 
@@ -586,8 +584,8 @@ Characters indicating the end of a tag, defaults to C<%E<gt>>.
   my $tree = $mt->tree;
   $mt      = $mt->tree([['text', 'foo'], ['line']]);
 
-Template in parsed form. Note that this structure should only be used very
-carefully since it is very dynamic.
+Template in parsed form if available. Note that this structure should only be
+used very carefully since it is very dynamic.
 
 =head2 trim_mark
 
@@ -603,38 +601,23 @@ Character activating automatic whitespace trimming, defaults to C<=>.
   my $unparsed = $mt->unparsed;
   $mt          = $mt->unparsed('<%= 1 + 1 %>');
 
-Raw unparsed template.
+Raw unparsed template if available.
+
+=head2 vars
+
+  my $bool = $mt->vars;
+  $mt      = $mt->vars($bool);
+
+Instead of a list of values, use a hash reference with named variables to pass
+data to templates.
+
+  # "works!"
+  Mojo::Template->new(vars => 1)->render('<%= $test %>!', {test => 'works'});
 
 =head1 METHODS
 
 L<Mojo::Template> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 build
-
-  $mt = $mt->build;
-
-Build Perl L</"code"> from L</"tree">.
-
-=head2 compile
-
-  my $e = $mt->compile;
-
-Compile Perl L</"code"> for template and return a L<Mojo::Exception> object, or
-C<undef> if there was no exception.
-
-=head2 interpret
-
-  my $output = $mt->interpret;
-  my $output = $mt->interpret(@args);
-
-Interpret L</"compiled"> template code and return the result, or a
-L<Mojo::Exception> object if rendering failed.
-
-  # Reuse template
-  say $mt->render('Hello <%= $_[0] %>!', 'Bender');
-  say $mt->interpret('Fry');
-  say $mt->interpret('Leela');
 
 =head2 parse
 
@@ -642,23 +625,49 @@ L<Mojo::Exception> object if rendering failed.
 
 Parse template into L</"tree">.
 
+=head2 process
+
+  my $output = $mt->process;
+  my $output = $mt->process(@args);
+  my $output = $mt->process({foo => 'bar'});
+
+Process previously parsed template and return the result, or a
+L<Mojo::Exception> object if rendering failed.
+
+  # Parse and process
+  say Mojo::Template->new->parse('Hello <%= $_[0] %>')->process('Bender');
+
+  # Reuse template (for much better performance)
+  my $mt = Mojo::Template->new;
+  say $mt->render('Hello <%= $_[0] %>!', 'Bender');
+  say $mt->process('Fry');
+  say $mt->process('Leela');
+
 =head2 render
 
   my $output = $mt->render('<%= 1 + 1 %>');
   my $output = $mt->render('<%= shift() + shift() %>', @args);
+  my $output = $mt->render('<%= $foo %>', {foo => 'bar'});
 
 Render template and return the result, or a L<Mojo::Exception> object if
 rendering failed.
 
-  say $mt->render('Hello <%= $_[0] %>!', 'Bender');
+  # Longer version
+  my $output = $mt->parse('<%= 1 + 1 %>')->process;
+
+  # Render with arguments
+  say Mojo::Template->new->render('<%= $_[0] %>', 'bar');
+
+  # Render with named variables
+  say Mojo::Template->new(vars => 1)->render('<%= $foo %>', {foo => 'bar'});
 
 =head2 render_file
 
   my $output = $mt->render_file('/tmp/foo.mt');
   my $output = $mt->render_file('/tmp/foo.mt', @args);
+  my $output = $mt->render_file('/tmp/bar.mt', {foo => 'bar'});
 
-Render template file and return the result, or a L<Mojo::Exception> object if
-rendering failed.
+Same as L</"render">, but renders a template file.
 
 =head1 DEBUGGING
 

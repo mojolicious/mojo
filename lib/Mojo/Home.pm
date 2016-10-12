@@ -2,10 +2,9 @@ package Mojo::Home;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-use Cwd 'abs_path';
+use Cwd qw(abs_path getcwd);
 use File::Basename 'dirname';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
-use FindBin;
 use Mojo::Util qw(class_to_path files);
 
 has parts => sub { [] };
@@ -16,7 +15,7 @@ sub detect {
   # Environment variable
   return $self->parts([splitdir abs_path $ENV{MOJO_HOME}]) if $ENV{MOJO_HOME};
 
-  # Try to find home from lib directory
+  # Location of the application class
   if ($class && (my $path = $INC{my $file = class_to_path $class})) {
     $path =~ s/\Q$file\E$//;
     my @home = splitdir $path;
@@ -28,8 +27,8 @@ sub detect {
     return $self->parts([splitdir abs_path catdir(@home) || '.']);
   }
 
-  # FindBin fallback
-  return $self->parts([split '/', $FindBin::Bin]);
+  # Current working directory
+  return $self->parts([splitdir getcwd]);
 }
 
 sub lib_dir {
@@ -38,9 +37,9 @@ sub lib_dir {
 }
 
 sub list_files {
-  my ($self, $dir) = (shift, shift // '');
+  my ($self, $dir, $options) = (shift, shift // '', shift);
   $dir = catdir @{$self->parts}, split('/', $dir);
-  return [map { join '/', splitdir abs2rel($_, $dir) } files $dir];
+  return [map { join '/', splitdir abs2rel($_, $dir) } files $dir, $options];
 }
 
 sub mojo_lib_dir { catdir dirname(__FILE__), '..' }
@@ -60,7 +59,7 @@ sub to_string { catdir @{shift->parts} }
 
 =head1 NAME
 
-Mojo::Home - Home sweet home!
+Mojo::Home - Home sweet home
 
 =head1 SYNOPSIS
 
@@ -98,8 +97,8 @@ following new ones.
   $home = $home->detect;
   $home = $home->detect('My::App');
 
-Detect home directory from the value of the C<MOJO_HOME> environment variable
-or application class.
+Detect home directory from the value of the C<MOJO_HOME> environment variable,
+location of the application class, or the current working directory.
 
 =head2 lib_dir
 
@@ -111,11 +110,24 @@ Path to C<lib> directory of application.
 
   my $files = $home->list_files;
   my $files = $home->list_files('foo/bar');
+  my $files = $home->list_files('foo/bar', {hidden => 1});
 
 Portably list all files recursively in directory relative to the home directory.
 
   # List layouts
-  say for @{$home->rel_file($home->list_files('templates/layouts')};
+  say $home->rel_file($_) for @{$home->list_files('templates/layouts')};
+
+These options are currently available:
+
+=over 2
+
+=item hidden
+
+  hidden => 1
+
+Include hidden files and directories.
+
+=back
 
 =head2 mojo_lib_dir
 

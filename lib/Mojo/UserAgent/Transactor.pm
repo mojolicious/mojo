@@ -71,23 +71,26 @@ sub redirect {
   my $code = $res->code // 0;
   return undef unless grep { $_ == $code } 301, 302, 303, 307, 308;
 
+  # CONNECT requests cannot be redirected
+  my $req = $old->req;
+  return undef if uc $req->method eq 'CONNECT';
+
   # Fix location without authority and/or scheme
   return undef unless my $location = $res->headers->location;
   $location = Mojo::URL->new($location);
-  $location = $location->base($old->req->url)->to_abs unless $location->is_abs;
+  $location = $location->base($req->url)->to_abs unless $location->is_abs;
   my $proto = $location->protocol;
   return undef if ($proto ne 'http' && $proto ne 'https') || !$location->host;
 
   # Clone request if necessary
   my $new = Mojo::Transaction::HTTP->new;
-  my $req = $old->req;
   if ($code == 307 || $code == 308) {
     return undef unless my $clone = $req->clone;
     $new->req($clone);
   }
   else {
-    my $method = uc $req->method;
-    my $headers = $new->req->method($method eq 'POST' ? 'GET' : $method)
+    my $m = uc $req->method;
+    my $headers = $new->req->method($code == 303 || $m eq 'POST' ? 'GET' : $m)
       ->content->headers($req->headers->clone)->headers;
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
   }
@@ -97,14 +100,13 @@ sub redirect {
 }
 
 sub tx {
-  my $self = shift;
+  my ($self, $method, $url) = (shift, shift, shift);
 
   # Method and URL
   my $tx  = Mojo::Transaction::HTTP->new;
-  my $req = $tx->req->method(shift);
-  my $url = shift;
-  $url = "http://$url" unless $url =~ m!^/|://!;
-  ref $url ? $req->url($url) : $req->url->parse($url);
+  my $req = $tx->req->method($method);
+  if   (ref $url) { $req->url($url) }
+  else            { $req->url->parse($url =~ m!^/|://! ? $url : "http://$url") }
 
   # Headers (we identify ourselves and accept gzip compression)
   my $headers = $req->headers;

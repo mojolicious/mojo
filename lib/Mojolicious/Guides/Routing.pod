@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::Routing - Routing
+Mojolicious::Guides::Routing - Routing requests
 
 =head1 OVERVIEW
 
@@ -19,17 +19,17 @@ Essentials every L<Mojolicious> developer should know.
 The foundation of every web framework is a tiny black box connecting incoming
 requests with code generating the appropriate response.
 
-  GET /user/show/1 -> $c->render(text => 'Sebastian');
+  GET /user/show/1 -> $c->render(text => 'Daniel');
 
 This black box is usually called a dispatcher. There are many implementations
 using different strategies to establish these connections, but pretty much all
 are based around mapping the path part of the request URL to some kind of
 response generator.
 
-  /user/show/2 -> $c->render(text => 'Daniel');
+  /user/show/2 -> $c->render(text => 'Isabell');
   /user/show/3 -> $c->render(text => 'Sara');
-  /user/show/4 -> $c->render(text => 'Baerbel');
-  /user/show/5 -> $c->render(text => 'Wolfgang');
+  /user/show/4 -> $c->render(text => 'Stefan');
+  /user/show/5 -> $c->render(text => 'Fynn');
 
 While it is very well possible to make all these connections static, it is also
 rather inefficient. That's why regular expressions are commonly used to make
@@ -69,7 +69,7 @@ placeholder values are turned into a hash.
   /user/show/23 -> /user/:action/:id -> {action => 'show', id => 23}
 
 This hash is basically the center of every L<Mojolicious> application, you will
-learn more about this later on. Internally routes get compiled to regular
+learn more about this later on. Internally, routes get compiled to regular
 expressions, so you can get the best of both worlds with a little bit of
 experience.
 
@@ -241,8 +241,8 @@ but content will not be sent with the response even if it is present.
   # HEAD /test -> {controller => 'bar', action => 'test'}
   $r->get('/test')->to(controller => 'bar', action => 'test');
 
-You can also use the C<_method> query parameter to override the request method,
-this can be very useful when submitting forms with browsers that only support
+You can also use the C<_method> query parameter to override the request method.
+This can be very useful when submitting forms with browsers that only support
 C<GET> and C<POST>.
 
   # PUT  /stuff             -> {controller => 'baz', action => 'stuff'}
@@ -418,7 +418,7 @@ which usually looks much better.
 =head2 Named routes
 
 Naming your routes will allow backreferencing in many methods and helpers
-throughout the whole framework, most of them internally rely on
+throughout the whole framework, most of which internally rely on
 L<Mojolicious::Controller/"url_for"> for this.
 
   # /foo/marcus -> {controller => 'foo', action => 'bar', user => 'marcus'}
@@ -565,7 +565,7 @@ authentication.
     return 1 if $c->req->headers->header('X-Bender');
 
     # Not authenticated
-    $c->render(text => "You're not Bender.");
+    $c->render(text => "You're not Bender.", status => 401);
     return undef;
   });
   $auth->get('/blackjack')->to('hideout#blackjack');
@@ -852,8 +852,9 @@ with L<Mojolicious::Routes/"add_shortcut">.
 
 =head2 Rearranging routes
 
-Until the first request has been handled, all routes can still be moved around
-or even removed with methods like L<Mojolicious::Routes::Route/"add_child"> and
+From application startup until the first request has arrived, all routes can
+still be moved around or even removed with methods like
+L<Mojolicious::Routes::Route/"add_child"> and
 L<Mojolicious::Routes::Route/"remove">.
 
   # GET /example/show -> {controller => 'example', action => 'show'}
@@ -890,7 +891,7 @@ true value for the route to match.
       my ($route, $c, $captures, $num) = @_;
 
       # Loser
-      return undef unless int rand $num;
+      return undef if int rand $num;
 
       # Winner
       return 1;
@@ -1060,7 +1061,8 @@ more documentation and examples by many different authors.
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>.
+L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
 
 =cut

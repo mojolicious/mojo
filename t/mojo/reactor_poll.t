@@ -126,13 +126,16 @@ ok $writable, 'handle is writable again';
 ok !$timer,     'timer was not triggered';
 ok !$recurring, 'recurring was not triggered again';
 ($readable, $writable, $timer, $recurring) = ();
+my $next_tick;
+is $reactor->next_tick(sub { $next_tick++ }), undef, 'returned undef';
 $id = $reactor->recurring(0 => sub { $recurring++ });
-is $reactor->next_tick(sub { shift->stop }), undef, 'returned undef';
+$reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok $readable, 'handle is readable again';
 ok $writable, 'handle is writable again';
 ok !$timer, 'timer was not triggered';
 ok $recurring, 'recurring was triggered again';
+ok $next_tick, 'next tick was triggered';
 
 # Reset
 $reactor->next_tick(sub { die 'Reset failed' });

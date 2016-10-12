@@ -18,6 +18,8 @@ app->log->level('fatal');
 
 get '/' => {text => 'works!'};
 
+get '/huge' => {text => 'x' x 262144};
+
 my $timeout = undef;
 get '/timeout' => sub {
   my $c = shift;
@@ -268,12 +270,20 @@ ok $tx->is_empty, 'transaction is empty';
 is $tx->res->body, '', 'no content';
 
 # Connection was kept alive
-$tx = $ua->get('/');
+$tx = $ua->head('/huge');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200, 'right status';
+is $tx->res->headers->content_length, 262144, 'right "Content-Length" value';
+ok $tx->is_empty, 'transaction is empty';
+is $tx->res->body, '', 'no content';
+$tx = $ua->get('/huge');
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->headers->content_length, 262144, 'right "Content-Length" value';
 ok !$tx->is_empty, 'transaction is not empty';
-is $tx->res->body, 'works!', 'right content';
+is $tx->res->body, 'x' x 262144, 'right content';
 
 # Non-blocking form
 ($success, $code, $body) = ();
@@ -362,7 +372,15 @@ ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 
 # 404 response
 $tx = $ua->get('/does_not_exist');
+ok !$tx->success,    'not successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok $tx->keep_alive, 'keep connection alive';
+is $tx->error->{message}, 'Not Found', 'right error';
+is $tx->error->{code},    404,         'right status';
+$tx = $ua->get('/does_not_exist');
 ok !$tx->success, 'not successful';
+ok $tx->kept_alive, 'kept connection alive';
+ok $tx->keep_alive, 'keep connection alive';
 is $tx->error->{message}, 'Not Found', 'right error';
 is $tx->error->{code},    404,         'right status';
 

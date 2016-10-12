@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::EPRenderer;
-use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin::EPLRenderer';
 
 use Mojo::Template;
 use Mojo::Util qw(encode md5_sum monkey_patch);
@@ -10,9 +10,12 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Auto escape by default to prevent XSS attacks
-  my $template = {auto_escape => 1, %{$conf->{template} || {}}};
-  my $ns = $self->{namespace} = $template->{namespace}
+  my $ep = {auto_escape => 1, %{$conf->{template} || {}}, vars => 1};
+  my $ns = $self->{namespace} = $ep->{namespace}
     //= 'Mojo::Template::Sandbox::' . md5_sum "$self";
+
+  # Make "$self" and "$c" available in templates
+  $ep->{prepend} = 'my $self = my $c = _C;' . ($ep->{prepend} // '');
 
   # Add "ep" handler and make it the default
   $app->renderer->default_handler('ep')->add_handler(
@@ -21,33 +24,22 @@ sub register {
 
       my $name = $options->{inline} // $renderer->template_name($options);
       return unless defined $name;
-      my @keys = sort grep {/^\w+$/} keys %{$c->stash};
-      my $key = md5_sum encode 'UTF-8', join(',', $name, @keys);
+      my $key = md5_sum encode 'UTF-8', $name;
 
-      # Prepare template for "epl" handler
       my $cache = $renderer->cache;
-      unless ($options->{'mojo.template'} = $cache->get($key)) {
-        my $mt = $options->{'mojo.template'} = Mojo::Template->new($template);
+      my $mt    = $cache->get($key);
+      $cache->set($key => $mt = Mojo::Template->new($ep)) unless $mt;
 
-        # Helpers (only once)
-        ++$self->{helpers} and _helpers($ns, $renderer->helpers)
-          unless $self->{helpers};
+      # Export helpers only once
+      ++$self->{helpers} and _helpers($ns, $renderer->helpers)
+        unless $self->{helpers};
 
-        # Stash values (every time)
-        my $prepend = 'my $self = my $c = shift; my $_S = $c->stash; {';
-        $prepend .= join '', map {" my \$$_ = \$_S->{'$_'};"} @keys;
-        $mt->prepend($prepend . $mt->prepend)->append(';}' . $mt->append);
-
-        $cache->set($key => $mt);
-      }
-
-      # Make current controller available
+      # Make current controller available and render with "epl" handler
       no strict 'refs';
       no warnings 'redefine';
       local *{"${ns}::_C"} = sub {$c};
-
-      # Render with "epl" handler
-      $renderer->handlers->{epl}($renderer, $c, $output, $options);
+      Mojolicious::Plugin::EPLRenderer::_render($renderer, $c, $output,
+        $options, $mt, $c->stash);
     }
   );
 }
@@ -82,14 +74,8 @@ Mojolicious::Plugin::EPRenderer - Embedded Perl renderer plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::EPRenderer> is a renderer for C<ep> or C<Embedded Perl>
-templates.
-
-C<Embedded Perl> is a simple template format where you embed perl code into
-documents. It is based on L<Mojo::Template>, but extends it with some
-convenient syntax sugar designed specifically for L<Mojolicious>. It supports
-L<Mojolicious> template helpers and exposes the stash directly as Perl
-variables.
+L<Mojolicious::Plugin::EPRenderer> is a renderer for Embedded Perl templates.
+For more information see L<Mojolicious::Guides::Rendering/"Embedded Perl">.
 
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins, you're welcome to fork it.
@@ -118,7 +104,7 @@ Attribute values passed to L<Mojo::Template> object used to render templates.
 =head1 METHODS
 
 L<Mojolicious::Plugin::EPRenderer> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin::EPLRenderer> and implements the following new ones.
 
 =head2 register
 

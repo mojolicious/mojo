@@ -133,7 +133,7 @@ any '/json_too' => {json => {hello => 'world'}};
 
 get '/null/:null' => sub {
   my $c = shift;
-  $c->render(text => $c->param('null'), layout => 'layout');
+  $c->render(text => $c->param('null'));
 };
 
 get '/action_template' => {controller => 'foo'} => sub {
@@ -284,12 +284,7 @@ get '/foo' => sub {
 };
 
 get '/layout' => sub {
-  shift->render(
-    text    => 'Yea baby!',
-    layout  => 'layout',
-    handler => 'epl',
-    title   => 'Layout'
-  );
+  shift->render(layout => 'layout', handler => 'epl', title => 'Layout');
 };
 
 post '/template' => 'index';
@@ -622,7 +617,7 @@ $t->get_ok('/template.txt.epl')->status_is(404)
 
 # Captured "0"
 $t->get_ok('/null/0')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/layouted 0/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('0');
 
 # Render action
 $t->get_ok('/action_template')->status_is(200)
@@ -1102,6 +1097,9 @@ layouted <%== content %>
 
 @@ layouts/app23.html.ep
 app layout <%= content %><%= app->mode %>
+
+@@ layout.html.epl
+Yea baby!\
 
 @@ app.html.ep
 <% layout layout . 23; %><%= layout %>

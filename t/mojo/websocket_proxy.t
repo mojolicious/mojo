@@ -4,6 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
@@ -40,8 +41,9 @@ my $nf
   = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok = "HTTP/1.0 201 BAR\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
-my $id = Mojo::IOLoop->server(
+my $ok    = "HTTP/1.0 201 BAR\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
+my $dummy = Mojo::IOLoop::Server->generate_port;
+my $id    = Mojo::IOLoop->server(
   {address => '127.0.0.1'} => sub {
     my ($loop, $stream, $id) = @_;
 
@@ -52,7 +54,7 @@ my $id = Mojo::IOLoop->server(
 
         # Write chunk from client to server
         my $server = $buffer{$id}{connection};
-        return Mojo::IOLoop->stream($server)->write($chunk) if length $server;
+        return Mojo::IOLoop->stream($server)->write($chunk) if $server;
 
         # Read connect request from client
         my $buffer = $buffer{$id}{client} .= $chunk;
@@ -60,7 +62,7 @@ my $id = Mojo::IOLoop->server(
           $buffer{$id}{client} = '';
           if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             $connected = "$1:$2";
-            my $fail = $2 == $port + 1;
+            my $fail = $2 == $dummy;
 
             # Connection to server
             $buffer{$id}{connection} = Mojo::IOLoop->client(
@@ -193,18 +195,19 @@ ok $sent > 25, 'sent enough';
 
 # Proxy WebSocket with bad target
 $ua->proxy->http("http://127.0.0.1:$proxy");
-my $port2 = $port + 1;
-my ($success, $err);
+my ($success, $leak, $err);
 $ua->websocket(
-  "ws://127.0.0.1:$port2/test" => sub {
+  "ws://127.0.0.1:$dummy/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
+    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
     $err     = $tx->error;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
 ok !$success, 'no success';
+ok !$leak,    'connection has been removed';
 is $err->{message}, 'Proxy connection failed', 'right message';
 
 done_testing();

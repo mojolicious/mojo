@@ -999,7 +999,7 @@ $req->parse("Hello World!\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url->base, 'http://Aladdin:open%20sesame@127.0.0.1', 'right base URL';
+is $req->url->base, 'http://127.0.0.1', 'right base URL';
 is $req->url->base->userinfo, 'Aladdin:open sesame', 'right base userinfo';
 is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';

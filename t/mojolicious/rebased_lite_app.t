@@ -46,7 +46,7 @@ http://example.com/rebased/
 <img src="/rebased/images/test.png">
 <link href="//example.com/base.css" rel="stylesheet">
 <a href="mailto:sri@example.com">Contact</a>
-http://example.com/rebased
+http://example.com/rebased/
 http://example.com/rebased/foo
 /rebased/foo
 http://example.com/

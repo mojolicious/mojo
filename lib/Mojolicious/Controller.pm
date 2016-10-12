@@ -106,7 +106,7 @@ sub finish {
   my $self = shift;
 
   # WebSocket
-  my $tx = $self->tx;
+  my $tx = $self->tx || Carp::croak 'Connection already closed';
   $tx->finish(@_) and return $tx->established ? $self : $self->rendered(101)
     if $tx->is_websocket;
 
@@ -137,7 +137,7 @@ sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 
 sub on {
   my ($self, $name, $cb) = @_;
-  my $tx = $self->tx;
+  my $tx = $self->tx || Carp::croak 'Connection already closed';
   $self->rendered(101) if $tx->is_websocket && !$tx->established;
   return $tx->on($name => sub { shift; $self->$cb(@_) });
 }
@@ -218,8 +218,8 @@ sub rendered {
   return $self;
 }
 
-sub req { shift->tx->req }
-sub res { shift->tx->res }
+sub req { (shift->tx || Carp::croak 'Connection already closed')->req }
+sub res { (shift->tx || Carp::croak 'Connection already closed')->res }
 
 sub respond_to {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
@@ -248,7 +248,7 @@ sub respond_to {
 
 sub send {
   my ($self, $msg, $cb) = @_;
-  my $tx = $self->tx;
+  my $tx = $self->tx || Carp::croak 'Connection already closed';
   Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
   $tx->send($msg, $cb ? sub { shift; $self->$cb(@_) } : ());
@@ -548,7 +548,7 @@ establish the WebSocket connection.
   # Do something after the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
-    $c->app->log->debug('We are done');
+    $c->app->log->debug('All data has been sent');
   });
 
   # Receive WebSocket message
@@ -610,16 +610,21 @@ For more control you can also access request information directly.
   $c = $c->redirect_to('/index.html');
   $c = $c->redirect_to('http://example.com/index.html');
 
-Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
+Prepare a C<302> (if the status code is not already C<3xx>) redirect response
+with C<Location> header, takes the same arguments as L</"url_for">.
 
-  # Moved permanently
+  # Moved Permanently
   $c->res->code(301);
+  $c->redirect_to('some_route');
+
+  # Temporary Redirect
+  $c->res->code(307);
   $c->redirect_to('some_route');
 
 =head2 render
 
   my $bool = $c->render;
-  my $bool = $c->render(controller => 'foo', action => 'bar');
+  my $bool = $c->render(foo => 'bar', baz => 23);
   my $bool = $c->render(template => 'foo/index');
   my $bool = $c->render(template => 'index', format => 'html');
   my $bool = $c->render(data => $bytes);
@@ -678,7 +683,7 @@ automatic rendering would result in a response.
 =head2 render_maybe
 
   my $bool = $c->render_maybe;
-  my $bool = $c->render_maybe(controller => 'foo', action => 'bar');
+  my $bool = $c->render_maybe(foo => 'bar', baz => 23);
   my $bool = $c->render_maybe('foo/index', format => 'html');
 
 Try to render content, but do not call
@@ -731,6 +736,7 @@ Get L<Mojo::Message::Request> object from L</"tx">.
   my $bytes  = $c->req->body;
   my $str    = $c->req->text;
   my $hash   = $c->req->params->to_hash;
+  my $all    = $c->req->uploads;
   my $value  = $c->req->json;
   my $foo    = $c->req->json('/23/foo');
   my $dom    = $c->req->dom;

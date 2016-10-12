@@ -61,9 +61,6 @@ is b('"foo 23 \"bar"')->unquote, 'foo 23 "bar', 'right unquoted result';
 # trim
 is b(' la la la ')->trim, 'la la la', 'right trimmed result';
 
-# squish
-is b("\n la\nla la \n")->squish, 'la la la', 'right squished result';
-
 # md5_bytes
 is unpack('H*', b('foo bar baz ♥')->encode->md5_bytes),
   'a740aeb6e066f158cbf19fd92e890d2d', 'right binary md5 checksum';

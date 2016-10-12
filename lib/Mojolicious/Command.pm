@@ -20,22 +20,16 @@ has usage => "Usage: APPLICATION\n";
 sub chmod_file {
   my ($self, $path, $mod) = @_;
   chmod $mod, $path or croak qq{Can't chmod file "$path": $!};
-  say "  [chmod] $path " . sprintf('%lo', $mod) unless $self->quiet;
-  return $self;
+  return $self->_loud("  [chmod] $path " . sprintf('%lo', $mod));
 }
 
 sub chmod_rel_file { $_[0]->chmod_file($_[0]->rel_file($_[1]), $_[2]) }
 
 sub create_dir {
   my ($self, $path) = @_;
-
-  if (-d $path) { say "  [exist] $path" unless $self->quiet }
-  else {
-    mkpath $path or croak qq{Can't make directory "$path": $!};
-    say "  [mkdir] $path" unless $self->quiet;
-  }
-
-  return $self;
+  return $self->_loud("  [exist] $path") if -d $path;
+  mkpath $path or croak qq{Can't make directory "$path": $!};
+  return $self->_loud("  [mkdir] $path");
 }
 
 sub create_rel_dir { $_[0]->create_dir($_[0]->rel_dir($_[1])) }
@@ -76,13 +70,19 @@ sub run { croak 'Method "run" not implemented by subclass' }
 
 sub write_file {
   my ($self, $path, $data) = @_;
+  return $self->_loud("  [exist] $path") if -f $path;
   $self->create_dir(dirname $path);
   spurt $data, $path;
-  say "  [write] $path" unless $self->quiet;
-  return $self;
+  return $self->_loud("  [write] $path");
 }
 
 sub write_rel_file { $_[0]->write_file($_[0]->rel_file($_[1]), $_[2]) }
+
+sub _loud {
+  my ($self, $msg) = @_;
+  say $msg unless $self->quiet;
+  return $self;
+}
 
 1;
 

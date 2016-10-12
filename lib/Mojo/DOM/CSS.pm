@@ -42,9 +42,9 @@ sub _attr {
 
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
-    next unless $name =~ $name_re;
-    return 1 unless defined $attrs->{$name} && defined $value_re;
-    return 1 if $attrs->{$name} =~ $value_re;
+    my $value = $attrs->{$name};
+    next if $name !~ $name_re || (!defined $value && defined $value_re);
+    return 1 if !(defined $value && defined $value_re) || $value =~ $value_re;
   }
 
   return undef;

@@ -66,7 +66,7 @@ sub connect {
 sub _cleanup {
   my $self = shift;
   $NDN->timedout($self->{dns}) if $self->{dns};
-  my $reactor = $self->reactor;
+  return unless my $reactor = $self->reactor;
   $self->{$_} && $reactor->remove(delete $self->{$_}) for qw(dns timer handle);
   return $self;
 }
@@ -289,7 +289,7 @@ Address or host name of the peer to connect to, defaults to C<127.0.0.1>.
 
   handle => $handle
 
-Use an already prepared handle.
+Use an already prepared L<IO::Socket::IP> object.
 
 =item local_address
 

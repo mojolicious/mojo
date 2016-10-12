@@ -72,8 +72,8 @@ sub optional {
   for my $cb (map { $self->validator->filters->{$_} } @filters) {
     @input = map { $self->$cb($name, $_) } @input;
   }
-  $self->output->{$name} = @input > 1 ? \@input : $input[0]
-    unless grep { !length } @input;
+  $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0]
+    if @input && !grep { !length } @input;
 
   return $self->topic($name);
 }
@@ -257,7 +257,6 @@ Return an array reference with all names for values that passed validation.
 
 Change validation L</"topic">, apply filters, and make sure a value is present
 and not an empty string. All filters from L<Mojolicious::Validator/"FILTERS">
-are supported.All filters from L<Mojolicious::Validator/"FILTERS">
 are supported.
 
   # Trim value and check size

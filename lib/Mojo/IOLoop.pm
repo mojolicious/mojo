@@ -8,6 +8,7 @@ use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
+use Mojo::IOLoop::Subprocess;
 use Mojo::Reactor::Poll;
 use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
@@ -16,7 +17,6 @@ use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
 has max_accepts     => 0;
 has max_connections => 1000;
-has multi_accept    => sub { shift->max_connections > 50 ? 50 : 1 };
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
@@ -36,8 +36,7 @@ sub acceptor {
   return $self->{acceptors}{$acceptor} unless ref $acceptor;
 
   # Connect acceptor with reactor
-  my $id = $self->_id;
-  $self->{acceptors}{$id} = $acceptor->multi_accept($self->multi_accept);
+  $self->{acceptors}{my $id = $self->_id} = $acceptor;
   weaken $acceptor->reactor($self->reactor)->{reactor};
 
   # Allow new acceptor to get picked up
@@ -50,13 +49,13 @@ sub client {
   my ($self, $cb) = (_instance(shift), pop);
 
   my $id = $self->_id;
-  my $client = $self->{connections}{$id}{client} = Mojo::IOLoop::Client->new;
+  my $client = $self->{out}{$id}{client} = Mojo::IOLoop::Client->new;
   weaken $client->reactor($self->reactor)->{reactor};
 
   weaken $self;
   $client->on(
     connect => sub {
-      delete $self->{connections}{$id}{client};
+      delete $self->{out}{$id}{client};
       my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->_stream($stream => $id);
       $self->$cb(undef, $stream);
@@ -88,14 +87,14 @@ sub recurring { shift->_timer(recurring => @_) }
 
 sub remove {
   my ($self, $id) = (_instance(shift), @_);
-  my $c = $self->{connections}{$id};
+  my $c = $self->{in}{$id} || $self->{out}{$id};
   if ($c && (my $stream = $c->{stream})) { return $stream->close_gracefully }
   $self->_remove($id);
 }
 
 sub reset {
   my $self = _instance(shift);
-  delete @$self{qw(accepting acceptors connections stop)};
+  delete @$self{qw(accepting acceptors in out stop)};
   $self->reactor->reset;
   $self->stop;
 }
@@ -107,15 +106,14 @@ sub server {
   weaken $self;
   $server->on(
     accept => sub {
+      my $stream = Mojo::IOLoop::Stream->new(pop);
+      $self->$cb($stream, $self->_stream($stream, $self->_id, 1));
 
       # Enforce connection limit (randomize to improve load balancing)
       if (my $max = $self->max_accepts) {
         $self->{accepts} //= $max - int rand $max / 2;
         $self->stop_gracefully if ($self->{accepts} -= 1) <= 0;
       }
-
-      my $stream = Mojo::IOLoop::Stream->new(pop);
-      $self->$cb($stream, $self->stream($stream));
 
       # Stop accepting if connection limit has been reached
       $self->_not_accepting if $self->_limit;
@@ -129,22 +127,29 @@ sub server {
 sub singleton { state $loop = shift->SUPER::new }
 
 sub start {
-  my $self = shift;
+  my $self = _instance(shift);
   croak 'Mojo::IOLoop already running' if $self->is_running;
-  _instance($self)->reactor->start;
+  $self->reactor->start;
 }
 
 sub stop { _instance(shift)->reactor->stop }
 
 sub stop_gracefully {
   my $self = _instance(shift)->_not_accepting;
-  $self->{stop} ||= $self->emit('finish')->recurring(1 => \&_stop);
+  ++$self->{stop} and !$self->emit('finish')->_in and $self->stop;
 }
 
 sub stream {
   my ($self, $stream) = (_instance(shift), @_);
-  return ($self->{connections}{$stream} || {})->{stream} unless ref $stream;
-  return $self->_stream($stream => $self->_id);
+  return $self->_stream($stream => $self->_id) if ref $stream;
+  my $c = $self->{in}{$stream} || $self->{out}{$stream} || {};
+  return $c->{stream};
+}
+
+sub subprocess {
+  my $subprocess = Mojo::IOLoop::Subprocess->new;
+  weaken $subprocess->ioloop(_instance(shift))->{ioloop};
+  return $subprocess->run(@_);
 }
 
 sub timer { shift->_timer(timer => @_) }
@@ -152,18 +157,16 @@ sub timer { shift->_timer(timer => @_) }
 sub _id {
   my $self = shift;
   my $id;
-  do { $id = md5_sum 'c' . steady_time . rand 999 }
-    while $self->{connections}{$id} || $self->{acceptors}{$id};
+  do { $id = md5_sum 'c' . steady_time . rand }
+    while $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
   return $id;
 }
 
+sub _in { scalar keys %{shift->{in} || {}} }
+
 sub _instance { ref $_[0] ? $_[0] : $_[0]->singleton }
 
-sub _limit {
-  my $self = shift;
-  return 1 if $self->{stop};
-  return keys %{$self->{connections}} >= $self->max_connections;
-}
+sub _limit { $_[0]{stop} ? 1 : $_[0]->_in >= $_[0]->max_connections }
 
 sub _maybe_accepting {
   my $self = shift;
@@ -179,6 +182,8 @@ sub _not_accepting {
   return $self;
 }
 
+sub _out { scalar keys %{shift->{out} || {}} }
+
 sub _remove {
   my ($self, $id) = @_;
 
@@ -191,24 +196,18 @@ sub _remove {
     if delete $self->{acceptors}{$id};
 
   # Connection
-  return unless delete $self->{connections}{$id};
+  return unless delete $self->{in}{$id} || delete $self->{out}{$id};
+  return $self->stop if $self->{stop} && !$self->_in;
   $self->_maybe_accepting;
-  warn "-- $id <<< $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
-}
-
-sub _stop {
-  my $self = shift;
-  return if keys %{$self->{connections}};
-  $self->_remove(delete $self->{stop});
-  $self->stop;
+  warn "-- $id <<< $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
 }
 
 sub _stream {
-  my ($self, $stream, $id) = @_;
+  my ($self, $stream, $id, $server) = @_;
 
   # Connect stream with reactor
-  $self->{connections}{$id}{stream} = $stream;
-  warn "-- $id >>> $$ (@{[scalar keys %{$self->{connections}}]})\n" if DEBUG;
+  $self->{$server ? 'in' : 'out'}{$id}{stream} = $stream;
+  warn "-- $id >>> $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
   weaken $stream->reactor($self->reactor)->{reactor};
   weaken $self;
   $stream->on(close => sub { $self && $self->_remove($id) });
@@ -330,7 +329,7 @@ L<Mojo::IOLoop> implements the following attributes.
   my $max = $loop->max_accepts;
   $loop   = $loop->max_accepts(1000);
 
-The maximum number of connections this event loop is allowed to accept before
+The maximum number of connections this event loop is allowed to accept, before
 shutting down gracefully without interrupting existing connections, defaults to
 C<0>. Setting the value to C<0> will allow this event loop to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
@@ -339,18 +338,11 @@ randomly to improve load balancing between multiple server processes.
 =head2 max_connections
 
   my $max = $loop->max_connections;
-  $loop   = $loop->max_connections(1000);
+  $loop   = $loop->max_connections(100);
 
-The maximum number of concurrent connections this event loop is allowed to
-handle before stopping to accept new incoming connections, defaults to C<1000>.
-
-=head2 multi_accept
-
-  my $multi = $loop->multi_accept;
-  $loop     = $loop->multi_accept(100);
-
-Number of connections to accept at once, defaults to C<50> or C<1>, depending
-on if the value of L</"max_connections"> is smaller than C<50>.
+The maximum number of accepted connections this event loop is allowed to handle
+concurrently, before stopping to accept new incoming connections, defaults to
+C<1000>.
 
 =head2 reactor
 
@@ -596,8 +588,8 @@ event loop can be restarted by running L</"start"> again.
   Mojo::IOLoop->stop_gracefully;
   $loop->stop_gracefully;
 
-Stop accepting new connections and wait for all existing connections to be
-closed before stopping the event loop.
+Stop accepting new connections and wait for already accepted connections to be
+closed, before stopping the event loop.
 
 =head2 stream
 
@@ -609,6 +601,30 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
   # Increase inactivity timeout for connection to 300 seconds
   Mojo::IOLoop->stream($id)->timeout(300);
+
+=head2 subprocess
+
+  my $subprocess = Mojo::IOLoop->subprocess(sub {...}, sub {...});
+  my $subprocess = $loop->subprocess(sub {...}, sub {...});
+
+Build L<Mojo::IOLoop::Subprocess> object to perform computationally expensive
+operations in subprocesses, without blocking the event loop. Callbacks will be
+passed along to L<Mojo::IOLoop::Subprocess/"run">. Note that this method is
+EXPERIMENTAL and might change without warning!
+
+  # Operation that would block the event loop for 5 seconds
+  Mojo::IOLoop->subprocess(
+    sub {
+      my $subprocess = shift;
+      sleep 5;
+      return '♥', 'Mojolicious';
+    },
+    sub {
+      my ($subprocess, $err, @results) = @_;
+      say "Subprocess error: $err" and return if $err;
+      say "I $results[0] $results[1]!";
+    }
+  );
 
 =head2 timer
 

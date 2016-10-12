@@ -40,7 +40,7 @@ sub _size {
   return $len < $min || $len > $max;
 }
 
-sub _trim { trim $_[2] }
+sub _trim { trim $_[2] // '' }
 
 1;
 

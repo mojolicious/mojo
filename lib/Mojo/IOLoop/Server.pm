@@ -21,7 +21,6 @@ use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 my $CERT = catfile dirname(__FILE__), 'resources', 'server.crt';
 my $KEY  = catfile dirname(__FILE__), 'resources', 'server.key';
 
-has multi_accept => 50;
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY {
@@ -37,6 +36,8 @@ sub generate_port {
 }
 
 sub handle { shift->{handle} }
+
+sub is_accepting { !!shift->{active} }
 
 sub listen {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
@@ -76,7 +77,7 @@ sub listen {
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
   }
   $handle->blocking(0);
-  $self->{handle} = $handle;
+  @$self{qw(handle single_accept)} = ($handle, $args->{single_accept});
 
   return unless $args->{tls};
   croak "IO::Socket::SSL 2.009+ required for TLS support" unless TLS;
@@ -107,16 +108,18 @@ sub port { shift->{handle}->sockport }
 sub start {
   my $self = shift;
   weaken $self;
-  $self->reactor->io($self->{handle} => sub { $self->_accept });
+  ++$self->{active}
+    and $self->reactor->io($self->{handle} => sub { $self->_accept });
 }
 
-sub stop { $_[0]->reactor->remove($_[0]{handle}) }
+sub stop { delete($_[0]{active}) and $_[0]->reactor->remove($_[0]{handle}) }
 
 sub _accept {
   my $self = shift;
 
   # Greedy accept
-  for (1 .. $self->multi_accept) {
+  my $accepted = 0;
+  while ($self->{active} && !($self->{single_accept} && $accepted++)) {
     return unless my $handle = $self->{handle}->accept;
     $handle->blocking(0);
 
@@ -200,13 +203,6 @@ Emitted for each accepted connection.
 
 L<Mojo::IOLoop::Server> implements the following attributes.
 
-=head2 multi_accept
-
-  my $multi = $server->multi_accept;
-  $server   = $server->multi_accept(100);
-
-Number of connections to accept at once, defaults to C<50>.
-
 =head2 reactor
 
   my $reactor = $server->reactor;
@@ -230,7 +226,13 @@ Find a free TCP port, primarily used for tests.
 
   my $handle = $server->handle;
 
-Get handle for server.
+Get handle for server, usually an L<IO::Socket::IP> object.
+
+=head2 is_accepting
+
+  my $bool = $server->is_accepting;
+
+Check if connections are currently being accepted.
 
 =head2 listen
 
@@ -267,6 +269,12 @@ Port to listen on, defaults to a random port.
 
 Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
 option.
+
+=item single_accept
+
+  single_accept => 1
+
+Only accept one connection at a time.
 
 =item tls
 
@@ -311,7 +319,8 @@ ALPN protocols to negotiate.
 
   tls_verify => 0x00
 
-TLS verification mode, defaults to C<0x03>.
+TLS verification mode, defaults to C<0x03> if a certificate authority file has
+been provided, or C<0x00>.
 
 =item tls_version
 

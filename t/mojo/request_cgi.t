@@ -175,11 +175,10 @@ is $req->version, '1.0', 'right version';
 is $req->headers->dnt, 1, 'right "DNT" value';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
-is $req->url->to_abs->to_string, 'http://Aladdin:open%20sesame@localhost:8080'
-  . '/test/index.cgi/foo/bar?lalala=23&bar=baz', 'right absolute URL';
-is $req->url->base,
-  'http://Aladdin:open%20sesame@localhost:8080/test/index.cgi/',
-  'right base URL';
+is $req->url->to_abs->to_string,
+  'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
+  'right absolute URL';
+is $req->url->base, 'http://localhost:8080/test/index.cgi/', 'right base URL';
 is $req->url->base->userinfo, 'Aladdin:open sesame', 'right userinfo';
 is $req->url, 'foo/bar?lalala=23&bar=baz', 'right URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
@@ -232,7 +231,7 @@ is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
 is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
   'right value';
-is $req->url->to_abs->to_string, 'http://test1/index.pl', 'right absolute URL';
+is $req->url->to_abs->to_string, 'http://test1/index.pl/', 'right absolute URL';
 
 # Parse Apache 2.2 (win32) CGI environment variables and body
 $req = Mojo::Message::Request->new;
@@ -265,7 +264,7 @@ is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
 is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
   'right value';
-is $req->url->to_abs->to_string, 'http://test1/index.pl', 'right absolute URL';
+is $req->url->to_abs->to_string, 'http://test1/index.pl/', 'right absolute URL';
 
 # Parse Apache 2.2.14 CGI environment variables and body (root)
 $req = Mojo::Message::Request->new;
@@ -307,7 +306,7 @@ is $req->version, '1.1', 'right version';
 ok !$req->is_secure, 'not secure';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
-is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload',
+is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload/',
   'right absolute URL';
 
 # Parse Apache 2.2.11 CGI environment variables and body (HTTPS=ON)
@@ -411,7 +410,7 @@ is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->version, '1.0',         'right version';
 is $req->body,    'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
-is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi',
+is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/',
   'right absolute URL';
 
 # Parse Apache 2.2.9 CGI environment variables (root without PATH_INFO)
@@ -433,7 +432,7 @@ is $req->url->base->host, 'getmyapp.org', 'right base host';
 is $req->url->path, '', 'no path';
 is $req->url->base->path, '/cgi-bin/myapp/myapp.pl/', 'right base path';
 is $req->version, '1.1', 'right version';
-is $req->url->to_abs->to_string, 'http://getmyapp.org/cgi-bin/myapp/myapp.pl',
+is $req->url->to_abs->to_string, 'http://getmyapp.org/cgi-bin/myapp/myapp.pl/',
   'right absolute URL';
 
 # Parse Apache mod_fastcgi CGI environment variables (multipart file upload)

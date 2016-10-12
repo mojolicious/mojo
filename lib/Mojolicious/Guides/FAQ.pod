@@ -62,19 +62,32 @@ installation times without giving us anything in return. It would only make
 sense if we wanted to pass ownership of a module to a new maintainer, which we
 already have done in the past.
 
+=head2 Where can i discuss my patches for Mojolicious?
+
+We'd love to discuss your contributions to L<Mojolicious> on our official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
+
 =head2 Which versions of Perl are supported by Mojolicious?
 
 First of all, you need to be aware that according to the L<perlpolicy>, only
 the two most recent stable release series of Perl are supported by the
-community and receive bug fixes, which are currently 5.22.x and 5.20.x.
+community and receive bug fixes, which are currently 5.24.x and 5.22.x.
 L<Mojolicious> follows this model and fully supports these two release series.
 In addition we will also keep the distribution installable up to a certain
 legacy version that we deem worthy of supporting, but not specifically optimize
 for it, this is currently 5.10.1.
 
+=head2 How well is Windows supported by Mojolicious?
+
+Windows is fully supported by L<Mojolicious>, some of the more advanced
+features, such as L<subprocesses|Mojo::IOLoop/"subprocess"> and the
+L<Hypnotoad|Mojo::Server::Hypnotoad> web server, will however require the use of
+the L<Windows Subsystem for Linux|https://msdn.microsoft.com/commandline/wsl/>.
+
 =head2 Do I need to clean my environment before testing Mojolicious?
 
-Mojolicious uses many environment variables both internally and externally,
+L<Mojolicious> uses many environment variables both internally and externally,
 notably (but not exclusively) those starting with the prefix C<MOJO_*> and
 C<PLACK_ENV>. The test suite expects a clean environment; testing with a
 non-standard environment is unsupported and is unlikely to succeed. Therefore
@@ -108,10 +121,12 @@ subroutine is finished, this is called continuation-passing style.
 
 No, it is not possible to magically make Perl code non-blocking. While
 L<Mojolicious> has been designed from the ground up for non-blocking I/O and
-event loops, taking advantage of this requires specialized code available
-through modules like L<Mojo::IOLoop> and L<Mojo::UserAgent>, or third-party
-event loops. In the documentation we often refer to this as real-time web, for
-more information see also L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
+event loops, taking advantage of this requires blocking code to be wrapped in
+L<subprocesses|Mojo::IOLoop/"subprocess">, and the use of specialized
+non-blocking code available through modules like L<Mojo::IOLoop> and
+L<Mojo::UserAgent>, or third-party event loops. In the documentation we often
+refer to this as real-time web, for more information see also
+L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
 
 =head2 What is an event loop?
 
@@ -149,11 +164,11 @@ allow matching of the C<.> character.
 
 =head2 Can I configure Hypnotoad from the command line?
 
-No, you can't, Hypnotoad is a bit special in this regard. Because when you
-initiate a zero downtime software upgrade (hot deployment), you are only really
-sending a C<USR2> signal to the already running server, and no other information
-can be passed along. What you can do instead, is to use a
-L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
+No, you can't, L<Hypnotoad|Mojo::Server::Hypnotoad> is a bit special in this
+regard. Because when you initiate a zero downtime software upgrade (hot
+deployment), you are only really sending a C<USR2> signal to the already running
+server, and no other information can be passed along. What you can do instead,
+is to use a L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
 configuration file.
 
   # myapp.conf
@@ -203,22 +218,14 @@ around 256KB by default, you can use the attribute
 L<Mojo::Content/"max_buffer_size"> or C<MOJO_MAX_BUFFER_SIZE> environment
 variable to change this value.
 
-=head2 What does the error "EV does not work with ithreads" mean?
-
-The L<Mojolicious> user agent and web servers are based on an event loop that
-supports multiple reactor backends. One of these backends is L<EV>, it is very
-fast and will be automatically used if possible. On Windows however, the
-C<ithreads>-based C<fork()> emulation can interfere with it, and you may have to
-use the C<MOJO_REACTOR> environment variable to enforce a more portable one.
-
-  MOJO_REACTOR=Mojo::Reactor::Poll
-
 =head2 What does "Your secret passphrase needs to be changed" mean?
 
 L<Mojolicious> uses secret passphrases for security features such as signed
 cookies. It defaults to using L<Mojolicious/"moniker">, which is not very
 secure, so we added this log message as a reminder. You can change the
-passphrase with the attribute L<Mojolicious/"secrets">.
+passphrase with the attribute L<Mojolicious/"secrets">. Since some plugins also
+depend on it, you should try changing it as early as possible in your
+application.
 
   $app->secrets(['My very secret passphrase.']);
 
@@ -254,12 +261,23 @@ be closed immediately.
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in
-preforking web servers send heartbeat messages to the manager process at
+pre-forking web servers send heartbeat messages to the manager process at
 regular intervals, to signal that they are still responsive. A blocking
 operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<20> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
+
+=head2 What does "Connection already closed" mean?
+
+This error message usually appears after waiting for the results of a
+non-blocking operation for longer periods of time, because the underlying
+connection has been closed in the meantime and the value of the attribute
+L<Mojolicious::Controller/"tx"> is no longer available. While there might not be
+a way to prevent the connection from getting closed, you can also avoid this
+error message by keeping a reference to the transaction object that is not
+weakened. The helper L<Mojolicious::Plugin::DefaultHelpers/"delay"> will do this
+automatically for you.
 
 =head1 MORE
 
@@ -271,7 +289,8 @@ more documentation and examples by many different authors.
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>.
+L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
 
 =cut

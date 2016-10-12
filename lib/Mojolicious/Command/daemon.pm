@@ -61,7 +61,7 @@ Mojolicious::Command::daemon - Daemon command
                                          defaults to the value of
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
-                                         keep-alive connection, defaults to 25
+                                         keep-alive connection, defaults to 100
 
 =head1 DESCRIPTION
 

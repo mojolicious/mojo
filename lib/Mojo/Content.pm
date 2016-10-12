@@ -38,8 +38,10 @@ sub clone {
 sub generate_body_chunk {
   my ($self, $offset) = @_;
 
-  $self->emit(drain => $offset) unless length($self->{body_buffer} // '');
-  my $chunk = delete $self->{body_buffer} // '';
+  $self->emit(drain => $offset) unless length($self->{body_buffer} //= '');
+  my $len = $self->headers->content_length;
+  return '' if looks_like_number $len && $len == $offset;
+  my $chunk = delete $self->{body_buffer};
   return $self->{eof} ? '' : undef unless length $chunk;
 
   return $chunk;
@@ -59,7 +61,7 @@ sub is_chunked { !!shift->headers->transfer_encoding }
 
 sub is_compressed { lc(shift->headers->content_encoding // '') eq 'gzip' }
 
-sub is_dynamic { $_[0]{dynamic} && !defined $_[0]->headers->content_length }
+sub is_dynamic { !!$_[0]{dynamic} }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
 
@@ -482,7 +484,7 @@ content.
 
   my $bool = $content->is_chunked;
 
-Check if C<Transfer-Encoding> header indicates chunked tranfer encoding.
+Check if C<Transfer-Encoding> header indicates chunked transfer encoding.
 
 =head2 is_compressed
 

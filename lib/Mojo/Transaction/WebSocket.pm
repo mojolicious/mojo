@@ -2,21 +2,14 @@ package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
 use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
-use Config;
 use List::Util 'first';
 use Mojo::JSON qw(encode_json j);
-use Mojo::Util qw(decode deprecated encode trim);
+use Mojo::Util qw(decode encode trim);
 use Mojo::WebSocket
   qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT);
 
 has [qw(compressed established handshake masked)];
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
-
-# DEPRECATED in Clinking Beer Mugs!
-sub build_frame {
-  deprecated 'Mojo::Transaction::WebSocket::build_frame is DEPRECATED';
-  Mojo::WebSocket::build_frame(shift->masked, @_);
-}
 
 sub build_message {
   my ($self, $frame) = @_;
@@ -72,12 +65,6 @@ sub is_websocket {1}
 sub kept_alive    { shift->handshake->kept_alive }
 sub local_address { shift->handshake->local_address }
 sub local_port    { shift->handshake->local_port }
-
-# DEPRECATED in Clinking Beer Mugs!
-sub parse_frame {
-  deprecated 'Mojo::Transaction::WebSocket::parse_frame is DEPRECATED';
-  Mojo::WebSocket::parse_frame($_[1], $_[0]->max_websocket_size);
-}
 
 sub parse_message {
   my ($self, $frame) = @_;

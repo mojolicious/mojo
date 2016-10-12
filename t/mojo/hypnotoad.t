@@ -28,7 +28,6 @@ use Mojo::Util qw(slurp spurt);
     heartbeat_timeout  => 9,
     inactivity_timeout => 5,
     listen             => ['http://*:8081'],
-    multi_accept       => 16,
     pid_file           => '/foo/bar.pid',
     proxy              => 1,
     requests           => 3,
@@ -48,7 +47,6 @@ use Mojo::Util qw(slurp spurt);
   is_deeply $hypnotoad->prefork->listen, ['http://*:8081'], 'right value';
   is $hypnotoad->prefork->max_clients,  1,              'right value';
   is $hypnotoad->prefork->max_requests, 3,              'right value';
-  is $hypnotoad->prefork->multi_accept, 16,             'right value';
   is $hypnotoad->prefork->pid_file,     '/foo/bar.pid', 'right value';
   ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
   is $hypnotoad->prefork->workers, 7, 'right value';
@@ -69,7 +67,6 @@ app->log->path('$log');
 plugin Config => {
   default => {
     hypnotoad => {
-      inactivity_timeout => 3,
       listen => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
       workers => 1
     }
@@ -111,7 +108,7 @@ is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was not kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
@@ -119,9 +116,41 @@ is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was not kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
+
+# Update script (broken)
+spurt <<'EOF', $script;
+use Mojolicious::Lite;
+
+die if $ENV{HYPNOTOAD_PID};
+
+app->start;
+EOF
+open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
+
+# Connection did not get lost
+$tx = $ua->get("http://127.0.0.1:$port1/hello");
+ok $tx->is_finished, 'transaction is finished';
+ok $tx->keep_alive,  'connection will be kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Hello Hypnotoad!', 'right content';
+
+# Connection did not get lost (second port)
+$tx = $ua->get("http://127.0.0.1:$port2/hello");
+ok $tx->is_finished, 'transaction is finished';
+ok $tx->keep_alive,  'connection will be kept alive';
+ok $tx->kept_alive,  'connection was kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Hello Hypnotoad!', 'right content';
+
+# Wait for hot deployment to fail
+while (1) {
+  last if slurp($log) =~ qr/Zero downtime software upgrade failed/;
+  sleep 1;
+}
 
 # Update script
 spurt <<EOF, $script;
@@ -132,8 +161,10 @@ app->log->path('$log');
 plugin Config => {
   default => {
     hypnotoad => {
+      accepts => 2,
       inactivity_timeout => 3,
       listen => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
+      requests => 1,
       workers => 1
     }
   }
@@ -145,7 +176,7 @@ get '/hello' => {text => 'Hello World!'};
 
 app->start;
 EOF
-open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
+open $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
 
 # Connection did not get lost
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
@@ -176,7 +207,7 @@ while (1) {
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
@@ -184,7 +215,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Application has been reloaded (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
@@ -192,16 +223,16 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
+ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Same result (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
+ok !$tx->keep_alive, 'connection will not be kept alive';
+ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 

@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 # "Bender: I was God once.
 #  God: Yes, I saw. You were doing well, until everyone died."
+use Config;
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
@@ -21,21 +22,20 @@ sub configure {
   my $c = $prefork->app->config($name) || {};
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
-  # Prefork settings
+  # Pre-fork settings
   $prefork->reverse_proxy($c->{proxy})   if defined $c->{proxy};
   $prefork->max_clients($c->{clients})   if $c->{clients};
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout listen multi_accept pid_file),
-    qw(workers);
+    qw(heartbeat_timeout inactivity_timeout listen pid_file workers);
 }
 
 sub run {
   my ($self, $app) = @_;
 
-  # No Windows support
-  _exit('Hypnotoad is not available for Windows.') if $^O eq 'MSWin32';
+  # No fork emulation support
+  _exit('Hypnotoad does not support fork emulation.') if $Config{d_pseudofork};
 
   # Remember executable and application for later
   $ENV{HYPNOTOAD_EXE} ||= $0;
@@ -56,7 +56,7 @@ sub run {
   weaken $self;
   $prefork->on(wait   => sub { $self->_manage });
   $prefork->on(reap   => sub { $self->_cleanup(pop) });
-  $prefork->on(finish => sub { $self->{finished} = 1 });
+  $prefork->on(finish => sub { $self->_finish });
 
   # Testing
   _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
@@ -86,6 +86,17 @@ sub _cleanup {
 }
 
 sub _exit { say shift and exit 0 }
+
+sub _finish {
+  my $self = shift;
+
+  $self->{finish} = 1;
+  return unless my $new = $self->{new};
+
+  my $prefork = $self->prefork->cleanup(0);
+  unlink $prefork->pid_file;
+  $prefork->ensure_pid_file($new);
+}
 
 sub _hot_deploy {
 
@@ -139,7 +150,7 @@ sub _stop {
 
 =head1 NAME
 
-Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
+Mojo::Server::Hypnotoad - A production web serv...ALL GLORY TO THE HYPNOTOAD!
 
 =head1 SYNOPSIS
 
@@ -150,7 +161,7 @@ Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Hypnotoad> is a full featured, UNIX optimized, preforking
+L<Mojo::Server::Hypnotoad> is a full featured, UNIX optimized, pre-forking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Prefork>, with IPv6, TLS, SNI, Comet (long
 polling), keep-alive, multiple event loop and hot deployment support that just
@@ -239,7 +250,7 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
   accepts => 100
 
-Maximum number of connections a worker is allowed to accept before stopping
+Maximum number of connections a worker is allowed to accept, before stopping
 gracefully and then getting replaced with a newly started worker, defaults to
 the value of L<Mojo::Server::Prefork/"accepts">. Setting the value to C<0> will
 allow workers to accept new connections indefinitely. Note that up to half of
@@ -256,9 +267,9 @@ L<Mojo::Server::Daemon/"backlog">.
 
   clients => 100
 
-Maximum number of concurrent connections each worker process is allowed to
-handle before stopping to accept new incoming connections, defaults to the
-value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency works
+Maximum number of accepted connections each worker process is allowed to handle
+concurrently, before stopping to accept new incoming connections, defaults to
+the value of L<Mojo::IOLoop/"max_connections">. Note that high concurrency works
 best with applications that perform mostly non-blocking operations, to optimize
 for blocking operations you can decrease this value and increase L</"workers">
 instead for better performance.
@@ -300,13 +311,6 @@ Setting the value to C<0> will allow connections to be inactive indefinitely.
 
 Array reference with one or more locations to listen on, defaults to
 C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
-
-=head2 multi_accept
-
-  multi_accept => 100
-
-Number of connections to accept at once, defaults to the value of
-L<Mojo::IOLoop/"multi_accept">.
 
 =head2 pid_file
 

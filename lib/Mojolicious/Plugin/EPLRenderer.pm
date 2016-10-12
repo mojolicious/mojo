@@ -4,17 +4,19 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Template;
 use Mojo::Util qw(encode md5_sum);
 
-sub register { $_[1]->renderer->add_handler(epl => \&_epl) }
+sub register {
+  my ($self, $app) = @_;
+  $app->renderer->add_handler(
+    epl => sub { _render(@_, Mojo::Template->new, $_[1]) });
+}
 
-sub _epl {
-  my ($renderer, $c, $output, $options) = @_;
+sub _render {
+  my ($renderer, $c, $output, $options, $mt, @args) = @_;
 
   # Cached
-  my $mt = delete $options->{'mojo.template'} || Mojo::Template->new;
-  my $log = $c->app->log;
   if ($mt->compiled) {
-    $log->debug("Rendering cached @{[$mt->name]}");
-    $$output = $mt->interpret($c);
+    $c->app->log->debug("Rendering cached @{[$mt->name]}");
+    $$output = $mt->process(@args);
   }
 
   # Not cached
@@ -25,8 +27,8 @@ sub _epl {
 
     # Inline
     if (defined $inline) {
-      $log->debug(qq{Rendering inline template "$name"});
-      $$output = $mt->name(qq{inline template "$name"})->render($inline, $c);
+      $c->app->log->debug(qq{Rendering inline template "$name"});
+      $$output = $mt->name(qq{inline template "$name"})->render($inline, @args);
     }
 
     # File
@@ -35,19 +37,19 @@ sub _epl {
 
       # Try template
       if (defined(my $path = $renderer->template_path($options))) {
-        $log->debug(qq{Rendering template "$name"});
-        $$output = $mt->name(qq{template "$name"})->render_file($path, $c);
+        $c->app->log->debug(qq{Rendering template "$name"});
+        $$output = $mt->name(qq{template "$name"})->render_file($path, @args);
       }
 
       # Try DATA section
       elsif (defined(my $d = $renderer->get_data_template($options))) {
-        $log->debug(qq{Rendering template "$name" from DATA section});
-        $$output
-          = $mt->name(qq{template "$name" from DATA section})->render($d, $c);
+        $c->app->log->debug(qq{Rendering template "$name" from DATA section});
+        $$output = $mt->name(qq{template "$name" from DATA section})
+          ->render($d, @args);
       }
 
       # No template
-      else { $log->debug(qq{Template "$name" not found}) }
+      else { $c->app->log->debug(qq{Template "$name" not found}) }
     }
   }
 

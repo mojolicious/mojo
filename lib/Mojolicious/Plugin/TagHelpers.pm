@@ -65,12 +65,10 @@ sub _input {
   my ($c, $name) = (shift, shift);
   my %attrs = @_ % 2 ? (value => shift, @_) : @_;
 
-  # Special selection value
-  my @values = @{$c->every_param($name)};
-  my $type = $attrs{type} || '';
-  if (@values && $type ne 'submit') {
+  if (my @values = @{$c->every_param($name)}) {
 
     # Checkbox or radiobutton
+    my $type = $attrs{type} || '';
     if ($type eq 'checkbox' || $type eq 'radio') {
       delete $attrs{checked} if @values;
       my $value = $attrs{value} // 'on';

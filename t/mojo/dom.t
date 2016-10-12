@@ -130,7 +130,8 @@ is "$dom", <<EOF, 'right result';
 EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
 is $simple->parent->all_text,
-  'test easy works well yada yada < very broken more text', 'right text';
+  "\n  test\n  easy\n  \n  \n  works well\n   yada yada\n"
+  . "  \n  \n  < very broken\n  \n  more text\n", 'right text';
 is $simple->tag, 'simple', 'right tag';
 is $simple->attr('class'), 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
@@ -347,7 +348,7 @@ is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
 # HTML5 (unquoted values)
 $dom = Mojo::DOM->new(
-  '<div id = test foo ="bar" class=tset bar=/baz/ baz=//>works</div>');
+  '<div id = test foo ="bar" class=tset bar=/baz/ value baz=//>works</div>');
 is $dom->at('#test')->text,                'works', 'right text';
 is $dom->at('div')->text,                  'works', 'right text';
 is $dom->at('[foo=bar][foo="bar"]')->text, 'works', 'right text';
@@ -357,6 +358,8 @@ is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text,       'works', 'right text';
 is $dom->at('[bar=/baz/]')->text, 'works', 'right text';
 is $dom->at('[baz=//]')->text,    'works', 'right text';
+is $dom->at('[value]')->text,     'works', 'right text';
+is $dom->at('[value=baz]'), undef, 'no result';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
 $dom = Mojo::DOM->new(q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
@@ -589,7 +592,8 @@ is_deeply [$dom->at('title')->ancestors->map('tag')->each], [qw(channel rss)],
 is $dom->at('extension')->attr('foo:id'), 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
-is $dom->find('description')->[1]->text, '<p>trololololo>', 'right text';
+is $dom->find('description')->[1]->text, "\n        <p>trololololo>\n      ",
+  'right text';
 is $dom->at('pubDate')->text,        'Mon, 12 Jul 2010 20:42:00', 'right text';
 like $dom->at('[id*="ork"]')->text,  qr/\[awesome\]\]/,           'right text';
 like $dom->at('[id*="orks"]')->text, qr/\[awesome\]\]/,           'right text';
@@ -656,11 +660,11 @@ $dom = Mojo::DOM->new(<<EOF);
   </bar>
 </foo>
 EOF
-is $dom->at('foo bar baz')->text,    'First',      'right text';
-is $dom->at('baz')->namespace,       'uri:first',  'right namespace';
-is $dom->at('foo bar ya\.da')->text, 'Second',     'right text';
-is $dom->at('ya\.da')->namespace,    'uri:second', 'right namespace';
-is $dom->at('foo')->namespace,       undef,        'no namespace';
+is $dom->at('foo bar baz')->text,    "First\n    ", 'right text';
+is $dom->at('baz')->namespace,       'uri:first',   'right namespace';
+is $dom->at('foo bar ya\.da')->text, "Second\n  ",  'right text';
+is $dom->at('ya\.da')->namespace,    'uri:second',  'right namespace';
+is $dom->at('foo')->namespace,       undef,         'no namespace';
 is $dom->at('[xml\.s]'), undef, 'no result';
 is $dom->at('b\.z'),     undef, 'no result';
 
@@ -1299,7 +1303,7 @@ is "$dom", <<EOF, 'right result';
 <div>D</div>works
 EOF
 $dom->at('li')->prepend_content('A3<p>A2</p>')->prepend_content('A4');
-is $dom->at('li')->text, 'A4A3 A', 'right text';
+is $dom->at('li')->text, 'A4A3A', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
@@ -1310,7 +1314,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 $dom->find('li')->[1]->append_content('<p>C2</p>C3')->append_content(' C4')
   ->append_content('C5');
-is $dom->find('li')->[1]->text, 'C C3 C4C5', 'right text';
+is $dom->find('li')->[1]->text, 'CC3 C4C5', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
@@ -1327,8 +1331,8 @@ $dom = Mojo::DOM->new(<<EOF);
     <title>foo</title>
   <body>bar
 EOF
-is $dom->at('html > head > title')->text, 'foo', 'right text';
-is $dom->at('html > body')->text,         'bar', 'right text';
+is $dom->at('html > head > title')->text, 'foo',   'right text';
+is $dom->at('html > body')->text,         "bar\n", 'right text';
 
 # Optional "li" tag
 $dom = Mojo::DOM->new(<<EOF);
@@ -1345,13 +1349,13 @@ $dom = Mojo::DOM->new(<<EOF);
   <li>E
 </ul>
 EOF
-is $dom->find('ul > li > ol > li')->[0]->text, 'F', 'right text';
-is $dom->find('ul > li > ol > li')->[1]->text, 'G', 'right text';
-is $dom->find('ul > li')->[1]->text,           'A', 'right text';
-is $dom->find('ul > li')->[2]->text,           'B', 'right text';
-is $dom->find('ul > li')->[3]->text,           'C', 'right text';
-is $dom->find('ul > li')->[4]->text,           'D', 'right text';
-is $dom->find('ul > li')->[5]->text,           'E', 'right text';
+is $dom->find('ul > li > ol > li')->[0]->text, "F\n      ", 'right text';
+is $dom->find('ul > li > ol > li')->[1]->text, "G\n    ",   'right text';
+is $dom->find('ul > li')->[1]->text,           'A',         'right text';
+is $dom->find('ul > li')->[2]->text,           "B\n  ",     'right text';
+is $dom->find('ul > li')->[3]->text,           'C',         'right text';
+is $dom->find('ul > li')->[4]->text,           "D\n  ",     'right text';
+is $dom->find('ul > li')->[5]->text,           "E\n",       'right text';
 
 # Optional "p" tag
 $dom = Mojo::DOM->new(<<EOF);
@@ -1365,13 +1369,13 @@ $dom = Mojo::DOM->new(<<EOF);
   <p>H
 </div>
 EOF
-is $dom->find('div > p')->[0]->text, 'A',   'right text';
-is $dom->find('div > p')->[1]->text, 'B',   'right text';
-is $dom->find('div > p')->[2]->text, 'C',   'right text';
-is $dom->find('div > p')->[3]->text, 'D',   'right text';
-is $dom->find('div > p')->[4]->text, 'E',   'right text';
-is $dom->find('div > p')->[5]->text, 'F G', 'right text';
-is $dom->find('div > p')->[6]->text, 'H',   'right text';
+is $dom->find('div > p')->[0]->text, 'A',      'right text';
+is $dom->find('div > p')->[1]->text, "B\n  ",  'right text';
+is $dom->find('div > p')->[2]->text, 'C',      'right text';
+is $dom->find('div > p')->[3]->text, 'D',      'right text';
+is $dom->find('div > p')->[4]->text, "E\n  ",  'right text';
+is $dom->find('div > p')->[5]->text, "FG\n  ", 'right text';
+is $dom->find('div > p')->[6]->text, "H\n",    'right text';
 is $dom->find('div > p > p')->[0], undef, 'no results';
 is $dom->at('div > p > img')->attr->{src}, 'foo.png', 'right attribute';
 is $dom->at('div > div')->text, 'X', 'right text';
@@ -1387,12 +1391,12 @@ $dom = Mojo::DOM->new(<<EOF);
   <dd>F
 </dl>
 EOF
-is $dom->find('dl > dt')->[0]->text, 'A', 'right text';
-is $dom->find('dl > dd')->[0]->text, 'B', 'right text';
-is $dom->find('dl > dt')->[1]->text, 'C', 'right text';
-is $dom->find('dl > dd')->[1]->text, 'D', 'right text';
-is $dom->find('dl > dt')->[2]->text, 'E', 'right text';
-is $dom->find('dl > dd')->[2]->text, 'F', 'right text';
+is $dom->find('dl > dt')->[0]->text, 'A',     'right text';
+is $dom->find('dl > dd')->[0]->text, "B\n  ", 'right text';
+is $dom->find('dl > dt')->[1]->text, 'C',     'right text';
+is $dom->find('dl > dd')->[1]->text, "D\n  ", 'right text';
+is $dom->find('dl > dt')->[2]->text, "E\n  ", 'right text';
+is $dom->find('dl > dd')->[2]->text, "F\n",   'right text';
 
 # Optional "rp" and "rt" tags
 $dom = Mojo::DOM->new(<<EOF);
@@ -1405,12 +1409,12 @@ $dom = Mojo::DOM->new(<<EOF);
   <rt>F
 </ruby>
 EOF
-is $dom->find('ruby > rp')->[0]->text, 'A', 'right text';
-is $dom->find('ruby > rt')->[0]->text, 'B', 'right text';
-is $dom->find('ruby > rp')->[1]->text, 'C', 'right text';
-is $dom->find('ruby > rt')->[1]->text, 'D', 'right text';
-is $dom->find('ruby > rp')->[2]->text, 'E', 'right text';
-is $dom->find('ruby > rt')->[2]->text, 'F', 'right text';
+is $dom->find('ruby > rp')->[0]->text, 'A',     'right text';
+is $dom->find('ruby > rt')->[0]->text, "B\n  ", 'right text';
+is $dom->find('ruby > rp')->[1]->text, 'C',     'right text';
+is $dom->find('ruby > rt')->[1]->text, "D\n  ", 'right text';
+is $dom->find('ruby > rp')->[2]->text, "E\n  ", 'right text';
+is $dom->find('ruby > rt')->[2]->text, "F\n\n", 'right text';
 
 # Optional "optgroup" and "option" tags
 $dom = Mojo::DOM->new(<<EOF);
@@ -1425,14 +1429,14 @@ $dom = Mojo::DOM->new(<<EOF);
     <option>H
 </div>
 EOF
-is $dom->find('div > optgroup')->[0]->text,          'A', 'right text';
-is $dom->find('div > optgroup > #foo')->[0]->text,   'B', 'right text';
-is $dom->find('div > optgroup > option')->[1]->text, 'C', 'right text';
-is $dom->find('div > optgroup > option')->[2]->text, 'D', 'right text';
-is $dom->find('div > optgroup')->[1]->text,          'E', 'right text';
-is $dom->find('div > optgroup > option')->[3]->text, 'F', 'right text';
-is $dom->find('div > optgroup')->[2]->text,          'G', 'right text';
-is $dom->find('div > optgroup > option')->[4]->text, 'H', 'right text';
+is $dom->find('div > optgroup')->[0]->text, "A\n    \n    ", 'right text';
+is $dom->find('div > optgroup > #foo')->[0]->text,   "B\n    ", 'right text';
+is $dom->find('div > optgroup > option')->[1]->text, 'C',       'right text';
+is $dom->find('div > optgroup > option')->[2]->text, "D\n  ",   'right text';
+is $dom->find('div > optgroup')->[1]->text,          "E\n    ", 'right text';
+is $dom->find('div > optgroup > option')->[3]->text, "F\n  ",   'right text';
+is $dom->find('div > optgroup')->[2]->text,          "G\n    ", 'right text';
+is $dom->find('div > optgroup > option')->[4]->text, "H\n",     'right text';
 
 # Optional "colgroup" tag
 $dom = Mojo::DOM->new(<<EOF);
@@ -1471,9 +1475,9 @@ $dom = Mojo::DOM->new(<<EOF);
 </table>
 EOF
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
-is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
-is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
-is $dom->at('table > tfoot > tr > td')->text, 'C', 'right text';
+is $dom->find('table > thead > tr > th')->[1]->text, "D\n  ", 'right text';
+is $dom->at('table > tbody > tr > td')->text, "B\n",   'right text';
+is $dom->at('table > tfoot > tr > td')->text, "C\n  ", 'right text';
 
 # Optional "colgroup", "thead", "tbody", "tr", "th" and "td" tags
 $dom = Mojo::DOM->new(<<EOF);
@@ -1507,10 +1511,10 @@ is $dom->find('table > colgroup > col')->[1]->attr->{class}, 'foo',
 is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
-is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
-is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
-is $dom->find('table > tbody > tr > td')->map('text')->join("\n"), "B\nE",
-  'right text';
+is $dom->find('table > thead > tr > th')->[1]->text, "D\n  ", 'right text';
+is $dom->at('table > tbody > tr > td')->text, "B\n  ", 'right text';
+is $dom->find('table > tbody > tr > td')->map('text')->join("\n"),
+  "B\n  \nE\n", 'right text';
 
 # Optional "colgroup", "tbody", "tr", "th" and "td" tags
 $dom = Mojo::DOM->new(<<EOF);
@@ -1532,7 +1536,7 @@ is $dom->find('table > colgroup > col')->[1]->attr->{class}, 'foo',
   'right attribute';
 is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
-is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
+is $dom->at('table > tbody > tr > td')->text, "B\n", 'right text';
 
 # Optional "tr" and "td" tags
 $dom = Mojo::DOM->new(<<EOF);
@@ -1547,10 +1551,10 @@ $dom = Mojo::DOM->new(<<EOF);
       <td>D
 </table>
 EOF
-is $dom->find('table > tr > td')->[0]->text, 'A', 'right text';
-is $dom->find('table > tr > td')->[1]->text, 'B', 'right text';
-is $dom->find('table > tr > td')->[2]->text, 'C', 'right text';
-is $dom->find('table > tr > td')->[3]->text, 'D', 'right text';
+is $dom->find('table > tr > td')->[0]->text, "A\n      ", 'right text';
+is $dom->find('table > tr > td')->[1]->text, 'B',         'right text';
+is $dom->find('table > tr > td')->[2]->text, "C\n    ",   'right text';
+is $dom->find('table > tr > td')->[3]->text, "D\n",       'right text';
 
 # Real world table
 $dom = Mojo::DOM->new(<<EOF);
@@ -1580,20 +1584,28 @@ $dom = Mojo::DOM->new(<<EOF);
     </table>
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
-is $dom->find('html > body > p')->[0]->text,     'Just a test', 'right text';
-is $dom->find('p')->[0]->text,                   'Just a test', 'right text';
-is $dom->find('thead > tr > .three')->[0]->text, 'Three',       'right text';
-is $dom->find('thead > tr > .four')->[0]->text,  'Four',        'right text';
-is $dom->find('tbody > tr > .beta')->[0]->text,  'Beta',        'right text';
-is $dom->find('tbody > tr > .gamma')->[0]->text, '',            'no text';
-is $dom->find('tbody > tr > .gamma > a')->[0]->text, 'Gamma',     'right text';
-is $dom->find('tbody > tr > .alpha')->[1]->text,     'Alpha Two', 'right text';
+is $dom->find('html > body > p')->[0]->text, "Just a test\n    ", 'right text';
+is $dom->find('p')->[0]->text,               "Just a test\n    ", 'right text';
+is $dom->find('thead > tr > .three')->[0]->text, "Three\n          ",
+  'right text';
+is $dom->find('thead > tr > .four')->[0]->text, "Four\n      ", 'right text';
+is $dom->find('tbody > tr > .beta')->[0]->text, "Beta\n          ",
+  'right text';
+is $dom->find('tbody > tr > .gamma')->[0]->text, "\n          ", 'no text';
+is $dom->find('tbody > tr > .gamma > a')->[0]->text, 'Gamma', 'right text';
+is $dom->find('tbody > tr > .alpha')->[1]->text, "Alpha Two\n          ",
+  'right text';
 is $dom->find('tbody > tr > .gamma > a')->[1]->text, 'Gamma Two', 'right text';
 my @following
   = $dom->find('tr > td:nth-child(1)')->map(following => ':nth-child(even)')
   ->flatten->map('all_text')->each;
-is_deeply \@following, ['Beta', 'Delta', 'Beta Two', 'Delta Two'],
-  'right results';
+my $elements = [
+  "Beta\n          ",
+  "Delta\n        ",
+  "Beta Two\n          ",
+  "Delta Two\n    "
+];
+is_deeply \@following, $elements, 'right results';
 
 # Real world list
 $dom = Mojo::DOM->new(<<EOF);
@@ -1621,17 +1633,22 @@ $dom = Mojo::DOM->new(<<EOF);
         <p>
     </ul>
 EOF
-is $dom->find('html > head > title')->[0]->text,    'Real World!', 'right text';
-is $dom->find('body > ul > li')->[0]->text,         'Test 123',    'right text';
-is $dom->find('body > ul > li > p')->[0]->text,     '',            'no text';
-is $dom->find('body > ul > li')->[1]->text,         'Test 321',    'right text';
-is $dom->find('body > ul > li > p')->[1]->text,     '',            'no text';
-is $dom->find('body > ul > li')->[1]->all_text,     'Test 321',    'right text';
-is $dom->find('body > ul > li > p')->[1]->all_text, '',            'no text';
-is $dom->find('body > ul > li')->[2]->text,         'Test 3 2 1',  'right text';
-is $dom->find('body > ul > li > p')->[2]->text,     '',            'no text';
-is $dom->find('body > ul > li')->[2]->all_text,     'Test 3 2 1',  'right text';
-is $dom->find('body > ul > li > p')->[2]->all_text, '',            'no text';
+is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
+is $dom->find('body > ul > li')->[0]->text,
+  "\n        Test\n        \n        123\n        ", 'right text';
+is $dom->find('body > ul > li > p')->[0]->text, "\n\n      ", 'no text';
+is $dom->find('body > ul > li')->[1]->text,
+  "\n        Test\n        \n        321\n        ", 'right text';
+is $dom->find('body > ul > li > p')->[1]->text, "\n      ", 'no text';
+is $dom->find('body > ul > li')->[1]->all_text,
+  "\n        Test\n        \n        321\n        \n      ", 'right text';
+is $dom->find('body > ul > li > p')->[1]->all_text, "\n      ", 'no text';
+is $dom->find('body > ul > li')->[2]->text,
+  "\n        Test\n        3\n        2\n        1\n        ", 'right text';
+is $dom->find('body > ul > li > p')->[2]->text, "\n    ", 'no text';
+is $dom->find('body > ul > li')->[2]->all_text,
+  "\n        Test\n        3\n        2\n        1\n        \n    ";
+is $dom->find('body > ul > li > p')->[2]->all_text, "\n    ", 'no text';
 
 # Advanced whitespace trimming (punctuation)
 $dom = Mojo::DOM->new(<<EOF);
@@ -1645,10 +1662,10 @@ $dom = Mojo::DOM->new(<<EOF);
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
 is $dom->find('body > div')->[0]->all_text,      'foo bar.',    'right text';
-is $dom->find('body > div')->[1]->all_text, 'foo, bar baz; yada.', 'right text';
-is $dom->find('body > div')->[1]->text,     'foo baz.',            'right text';
-is $dom->find('body > div')->[2]->all_text, 'foo: bar baz? yada!', 'right text';
-is $dom->find('body > div')->[2]->text,     'foo baz!',            'right text';
+is $dom->find('body > div')->[1]->all_text, 'foo, barbaz; yada.', 'right text';
+is $dom->find('body > div')->[1]->text,     'foobaz.',            'right text';
+is $dom->find('body > div')->[2]->all_text, 'foo: barbaz? yada!', 'right text';
+is $dom->find('body > div')->[2]->text,     'foobaz!',            'right text';
 
 # Real world JavaScript and CSS
 $dom = Mojo::DOM->new(<<EOF);
@@ -1714,7 +1731,7 @@ is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',
   'right attribute';
 is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js',
   'right attribute';
-is $dom->find('html > head > script')->[2]->text, '', 'no text';
+is $dom->find('html > head > script')->[2]->text, "\n  ", 'no text';
 is $dom->at('html > body')->text, 'Bar', 'right text';
 
 # Inline DTD
@@ -1735,7 +1752,7 @@ is $dom->tree->[5][1], ' root [
   <!ELEMENT root (#PCDATA)>
   <!ATTLIST root att CDATA #REQUIRED>
 ]', 'right doctype';
-is $dom->at('root')->text, '<hello>world</hello>', 'right text';
+is $dom->at('root')->text, "\n  <hello>world</hello>\n", 'right text';
 $dom = Mojo::DOM->new(<<EOF);
 <!doctype book
 SYSTEM "usr.dtd"
@@ -1769,7 +1786,7 @@ is $dom->tree->[3][1], ' foo [
   %myentities;
 ]  ', 'right doctype';
 is $dom->at('foo')->attr->{'xml:lang'}, 'de', 'right attribute';
-is $dom->at('foo')->text, 'Check!', 'right text';
+is $dom->at('foo')->text, "Check!\n", 'right text';
 $dom = Mojo::DOM->new(<<EOF);
 <!DOCTYPE TESTSUITE PUBLIC "my.dtd" 'mhhh' [
   <!ELEMENT foo ANY>
@@ -1824,8 +1841,8 @@ EOF
 is $dom->at('html > head > title')->text, 'Test', 'right text';
 is $dom->find('html > body > font > table > tr > td')->[0]->text, 'test1',
   'right text';
-is $dom->find('html > body > font > table > tr > td')->[1]->text, 'test2',
-  'right text';
+is $dom->find('html > body > font > table > tr > td')->[1]->text,
+  "test2\n    ", 'right text';
 
 # Broken "font" and "div" blocks
 $dom = Mojo::DOM->new(<<EOF);
@@ -1839,9 +1856,9 @@ $dom = Mojo::DOM->new(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html head title')->text,            'Test',  'right text';
-is $dom->at('html body font > div')->text,       'test1', 'right text';
-is $dom->at('html body font > div > div')->text, 'test2', 'right text';
+is $dom->at('html head title')->text, 'Test', 'right text';
+is $dom->at('html body font > div')->text, "test1\n      \n  ", 'right text';
+is $dom->at('html body font > div > div')->text, "test2\n    ", 'right text';
 
 # Broken "div" blocks
 $dom = Mojo::DOM->new(<<EOF);
@@ -1875,14 +1892,14 @@ $dom = Mojo::DOM->new(<<EOF);
 </html>
 EOF
 is $dom->at('html > head > title')->text, 'Test', 'right text';
-is $dom->find('html body table tr > td > font')->[0]->text, 'te st 1',
+is $dom->find('html body table tr > td > font')->[0]->text, 'test1',
   'right text';
-is $dom->find('html body table tr > td')->[1]->text, 'x1',     'right text';
-is $dom->find('html body table tr > td')->[2]->text, 'tes t2', 'right text';
-is $dom->find('html body table tr > td')->[3]->text, 'x2',     'right text';
+is $dom->find('html body table tr > td')->[1]->text, 'x1',    'right text';
+is $dom->find('html body table tr > td')->[2]->text, 'test2', 'right text';
+is $dom->find('html body table tr > td')->[3]->text, 'x2',    'right text';
 is $dom->find('html body table tr > td')->[5], undef, 'no result';
 is $dom->find('html body table tr > td')->size, 5, 'right number of elements';
-is $dom->find('html body table tr > td > font')->[1]->text, 't est3',
+is $dom->find('html body table tr > td > font')->[1]->text, 'test3',
   'right text';
 is $dom->find('html body table tr > td > font')->[2], undef, 'no result';
 is $dom->find('html body table tr > td > font')->size, 2,
@@ -2062,7 +2079,7 @@ EOF
 ok $dom->xml, 'XML mode active';
 is $dom->at('a')->{id}, 'one', 'right attribute';
 is_deeply [sort keys %{$dom->at('a')}], ['id'], 'right attributes';
-is $dom->at('a')->at('B')->text, 'foo', 'right text';
+is $dom->at('a')->at('B')->text, "\n    foo\n    \n    \n  ", 'right text';
 is $dom->at('B')->{class}, 'two', 'right attribute';
 is_deeply [sort keys %{$dom->at('a B')}], [qw(class test)], 'right attributes';
 is $dom->find('a B c')->[0]->text, 'bar', 'right text';
@@ -2094,7 +2111,7 @@ EOF
 ok !$dom->xml, 'XML mode not active';
 is $dom->at('a')->{id}, 'one', 'right attribute';
 is_deeply [sort keys %{$dom->at('a')}], ['id'], 'right attributes';
-is $dom->at('a')->at('b')->text, 'foo', 'right text';
+is $dom->at('a')->at('b')->text, "\n    foo\n    \n    \n  ", 'right text';
 is $dom->at('b')->{class}, 'two', 'right attribute';
 is_deeply [sort keys %{$dom->at('a b')}], [qw(class test)], 'right attributes';
 is $dom->find('a b c')->[0]->text, 'bar', 'right text';
@@ -2122,7 +2139,7 @@ is $dom->at('c')->parent->tag, 'b', 'right tag';
 is $dom->at('d')->parent->tag, 'b', 'right tag';
 $dom->at('b')->prepend_content('<e>Mojo</e>');
 is $dom->at('e')->parent->tag, 'b', 'right tag';
-is $dom->all_text, 'Mojo Test', 'right text';
+is $dom->all_text, 'MojoTest', 'right text';
 
 # Wrap elements
 $dom = Mojo::DOM->new('<a>Test</a>');
@@ -2175,38 +2192,6 @@ is "$dom", <<EOF, 'right result';
 </table>
 EOF
 
-# Preformatted text
-$dom = Mojo::DOM->new(<<EOF);
-<div>
-  looks
-  <pre><code>like
-  it
-    really</code>
-  </pre>
-  works
-</div>
-EOF
-is $dom->text, '', 'no text';
-is $dom->text(0), "\n", 'right text';
-is $dom->all_text, "looks like\n  it\n    really\n  works", 'right text';
-is $dom->all_text(0), "\n  looks\n  like\n  it\n    really\n  \n  works\n\n",
-  'right text';
-is $dom->at('div')->text, 'looks works', 'right text';
-is $dom->at('div')->text(0), "\n  looks\n  \n  works\n", 'right text';
-is $dom->at('div')->all_text, "looks like\n  it\n    really\n  works",
-  'right text';
-is $dom->at('div')->all_text(0),
-  "\n  looks\n  like\n  it\n    really\n  \n  works\n", 'right text';
-is $dom->at('div pre')->text, "\n  ", 'right text';
-is $dom->at('div pre')->text(0), "\n  ", 'right text';
-is $dom->at('div pre')->all_text, "like\n  it\n    really\n  ", 'right text';
-is $dom->at('div pre')->all_text(0), "like\n  it\n    really\n  ", 'right text';
-is $dom->at('div pre code')->text, "like\n  it\n    really", 'right text';
-is $dom->at('div pre code')->text(0), "like\n  it\n    really", 'right text';
-is $dom->at('div pre code')->all_text, "like\n  it\n    really", 'right text';
-is $dom->at('div pre code')->all_text(0), "like\n  it\n    really",
-  'right text';
-
 # Form values
 $dom = Mojo::DOM->new(<<EOF);
 <form action="/foo">
@@ -2218,6 +2203,7 @@ $dom = Mojo::DOM->new(<<EOF);
   <input type="radio" checked name="c" value="C">
   <input name="s">
   <input type="checkbox" name="t" value="">
+  <input type=text name="u">
   <select multiple name="f">
     <option value="F">G</option>
     <optgroup>
@@ -2257,6 +2243,7 @@ is $dom->at('input[name=q]')->val, 'on',  'right value';
 is $dom->at('input[name=r]')->val, 'on',  'right value';
 is $dom->at('input[name=s]')->val, undef, 'no value';
 is $dom->at('input[name=t]')->val, '',    'right value';
+is $dom->at('input[name=u]')->val, undef, 'no value';
 
 # PoCo example with whitespace-sensitive text
 $dom = Mojo::DOM->new(<<EOF);
@@ -2289,16 +2276,12 @@ is $dom->find('entry')->[0]->at('addresses')->children('type')->[0]->text,
   'home', 'right text';
 is $dom->find('entry')->[0]->at('addresses formatted')->text,
   "742 Evergreen Terrace\nSpringfield, VT 12345 USA", 'right text';
-is $dom->find('entry')->[0]->at('addresses formatted')->text(0),
-  "742 Evergreen Terrace\nSpringfield, VT 12345 USA", 'right text';
 is $dom->find('entry')->[1]->at('displayName')->text, 'Marge Simpson',
   'right text';
 is $dom->find('entry')->[1]->at('id')->text, '1286822', 'right text';
 is $dom->find('entry')->[1]->at('addresses')->children('type')->[0]->text,
   'home', 'right text';
 is $dom->find('entry')->[1]->at('addresses formatted')->text,
-  '742 Evergreen Terrace Springfield, VT 12345 USA', 'right text';
-is $dom->find('entry')->[1]->at('addresses formatted')->text(0),
   "742 Evergreen Terrace\nSpringfield, VT 12345 USA", 'right text';
 is $dom->find('entry')->[2], undef, 'no result';
 is $dom->find('entry')->size, 2, 'right number of elements';
@@ -2324,7 +2307,7 @@ is $dom->find('head > [http-equiv$="-type"]')->[1], undef, 'no result';
 # Find "0" attribute value
 $dom = Mojo::DOM->new(<<EOF);
 <a accesskey="0">Zero</a>
-<a accesskey="1">O&gTn&gt;e</a>
+<a accesskey="1">O&gTn&gte</a>
 EOF
 is $dom->find('a[accesskey]')->[0]->text, 'Zero',    'right text';
 is $dom->find('a[accesskey]')->[1]->text, 'O&gTn>e', 'right text';
@@ -2411,9 +2394,9 @@ $dom = Mojo::DOM->new(<<EOF);
   </dd>
 </dl>
 EOF
-is $dom->find('dl > dd > dl > dt')->[0]->text, 'B', 'right text';
-is $dom->find('dl > dd > dl > dd')->[0]->text, 'C', 'right text';
-is $dom->find('dl > dt')->[0]->text,           'A', 'right text';
+is $dom->find('dl > dd > dl > dt')->[0]->text, "B\n      ", 'right text';
+is $dom->find('dl > dd > dl > dd')->[0]->text, "C\n    ",   'right text';
+is $dom->find('dl > dt')->[0]->text,           'A',         'right text';
 
 # Nested lists
 $dom = Mojo::DOM->new(<<EOF);
@@ -2429,12 +2412,15 @@ $dom = Mojo::DOM->new(<<EOF);
   </ul>
 </div>
 EOF
-is $dom->find('div > ul > li')->[0]->text, 'A', 'right text';
+is $dom->find('div > ul > li')->[0]->text, "\n      A\n      \n    ",
+  'right text';
 is $dom->find('div > ul > li')->[1], undef, 'no result';
-is $dom->find('div > ul li')->[0]->text, 'A', 'right text';
+is $dom->find('div > ul li')->[0]->text, "\n      A\n      \n    ",
+  'right text';
 is $dom->find('div > ul li')->[1]->text, 'B', 'right text';
 is $dom->find('div > ul li')->[2], undef, 'no result';
-is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
+is $dom->find('div > ul ul')->[0]->text, "\n        \n        C\n      ",
+  'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
 # Unusual order

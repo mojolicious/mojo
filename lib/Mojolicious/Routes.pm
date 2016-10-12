@@ -50,7 +50,7 @@ sub hide { push @{shift->hidden}, @_ }
 sub is_hidden {
   my ($self, $method) = @_;
   my $h = $self->{hiding} ||= {map { $_ => 1 } @{$self->hidden}};
-  return !!($h->{$method} || index($method, '_') == 0 || $method !~ /[a-z]/);
+  return !!($h->{$method} || $method =~ /^_/ || $method =~ /^[A-Z_]+$/);
 }
 
 sub lookup { ($_[0]{reverse} //= $_[0]->_index)->{$_[1]} }
@@ -138,7 +138,7 @@ sub _controller {
 
   # Load and instantiate controller/application
   my $new;
-  unless ($new = $self->_class($old, $field)) { return !!defined $new }
+  unless ($new = $self->_class($old, $field)) { return defined $new }
 
   # Application
   my $class = ref $new;
@@ -199,7 +199,7 @@ sub _render {
 
 =head1 NAME
 
-Mojolicious::Routes - Always find your destination with routes!
+Mojolicious::Routes - Always find your destination with routes
 
 =head1 SYNOPSIS
 

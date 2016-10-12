@@ -279,6 +279,51 @@ ok !!Mojo::IOLoop->acceptor($id), 'acceptor has been added';
 undef $daemon;
 ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
 
+# Single-accept and connection limit
+my $loop = Mojo::IOLoop->new;
+$daemon = Mojo::Server::Daemon->new(
+  app         => $app,
+  ioloop      => $loop,
+  listen      => ['http://127.0.0.1?single_accept=1'],
+  max_clients => 2,
+  silent      => 1
+)->start;
+my $acceptor = $loop->acceptor($daemon->acceptors->[0]);
+my @accepting;
+$acceptor->on(
+  accept => sub {
+    my $acceptor = shift;
+    $loop->next_tick(
+      sub {
+        push @accepting, $acceptor->is_accepting;
+        shift->stop if @accepting == 2;
+      }
+    );
+  }
+);
+$loop->client({port => $acceptor->port} => sub { }) for 1 .. 2;
+$loop->start;
+ok $accepting[0], 'accepting connections';
+ok !$accepting[1], 'connection limit reached';
+
+# Request limit
+$daemon = Mojo::Server::Daemon->new(
+  app    => $app,
+  listen => ['http://127.0.0.1'],
+  silent => 1
+)->start;
+$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
+is $daemon->max_requests, 100, 'right value';
+is $daemon->max_requests(2)->max_requests, 2, 'right value';
+$tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
+ok $tx->keep_alive, 'will be kept alive';
+is $tx->res->code, 200,         'right status';
+is $tx->res->body, 'Whatever!', 'right content';
+$tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
+ok !$tx->keep_alive, 'will not be kept alive';
+is $tx->res->code, 200,         'right status';
+is $tx->res->body, 'Whatever!', 'right content';
+
 # Abstract methods
 eval { Mojo::Server->run };
 like $@, qr/Method "run" not implemented by subclass/, 'right error';

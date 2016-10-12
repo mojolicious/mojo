@@ -91,15 +91,15 @@
       $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
     }
   }
-  $(window).load(function () {
+  $(window).on('load', function () {
     if (window.location.hash) {
       fixOffset();
     }
     var start = mojobar.offset().top;
     var fixed;
-    var lastScrollTop = start;
+    var lastScrollTop = $(window).scrollTop();
     var hidden = mojobarHeight + 1;
-    $(window).scroll(function () {
+    $(window).on('scroll', function () {
       var st = $(window).scrollTop();
       if (fixed) {
         if (st <= start) {
@@ -123,11 +123,12 @@
       else if (st > start) {
         fixed = true;
         mojobar.css({'position': 'fixed', 'top': 0});
+        lastScrollTop = $(window).scrollTop();
       }
     });
   });
-  $(document).ready(function () {
-    $('a[href^="#"]').addClass('​mojoscroll').click(function (e) {
+  $(function () {
+    $('a[href^="#"]').addClass('​mojoscroll').on('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
       var hash   = '#' + this.href.split('#')[1];

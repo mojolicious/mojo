@@ -13,9 +13,8 @@ has classes => sub { ['main'] };
 has default_format => 'html';
 has 'default_handler';
 has encoding => 'UTF-8';
-has handlers => sub { {data => \&_data, json => \&_json, text => \&_text} };
-has helpers => sub { {} };
-has paths   => sub { [] };
+has [qw(handlers helpers)] => sub { {} };
+has paths => sub { [] };
 
 # Bundled templates
 my $TEMPLATES = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
@@ -98,29 +97,18 @@ sub render {
   $options->{format} = $stash->{format} || $self->default_format;
 
   # Data
-  my $output;
-  if (defined(my $data = delete $stash->{data})) {
-    $self->handlers->{data}($self, $c, \$output, {data => $data});
-    return $output, $options->{format};
-  }
-
-  # JSON
-  elsif (exists $stash->{json}) {
-    my $json = delete $stash->{json};
-    $self->handlers->{json}($self, $c, \$output, {json => $json});
-    return $output, 'json';
-  }
+  return delete $stash->{data}, $options->{format} if defined $stash->{data};
 
   # Text
-  elsif (defined(my $text = delete $stash->{text})) {
-    $self->handlers->{text}($self, $c, \$output, {text => $text});
-  }
+  return _maybe($options->{encoding}, delete $stash->{text}), $options->{format}
+    if defined $stash->{text};
+
+  # JSON
+  return encode_json(delete $stash->{json}), 'json' if exists $stash->{json};
 
   # Template or templateless handler
-  else {
-    $options->{template} //= $self->template_for($c);
-    return () unless $self->_render_template($c, \$output, $options);
-  }
+  $options->{template} //= $self->template_for($c);
+  return () unless $self->_render_template($c, \my $output, $options);
 
   # Inheritance
   my $content = $stash->{'mojo.content'} ||= {};
@@ -133,11 +121,8 @@ sub render {
     $content->{content} //= $output if $output =~ /\S/;
   }
 
-  # Encoding
-  $output = encode $options->{encoding}, $output
-    if !$string && $options->{encoding} && $output;
-
-  return $output, $options->{format};
+  return $string ? $output : _maybe($options->{encoding}, $output),
+    $options->{format};
 }
 
 sub template_for {
@@ -206,9 +191,7 @@ sub warmup {
   }
 }
 
-sub _data { ${$_[2]} = $_[3]{data} }
-
-sub _json { ${$_[2]} = encode_json($_[3]{json}) }
+sub _maybe { $_[0] ? encode @_ : $_[1] }
 
 sub _next {
   my $stash = shift;
@@ -228,8 +211,6 @@ sub _render_template {
   $renderer->($self, $c, $output, $options);
   return 1 if defined $$output;
 }
-
-sub _text { ${$_[2]} = $_[3]{text} }
 
 1;
 
@@ -312,8 +293,7 @@ determine if template files should be decoded before processing.
   my $handlers = $renderer->handlers;
   $renderer    = $renderer->handlers({epl => sub {...}});
 
-Registered handlers, by default only C<data>, C<text> and C<json> are already
-defined.
+Registered handlers.
 
 =head2 helpers
 

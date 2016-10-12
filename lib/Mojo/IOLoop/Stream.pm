@@ -8,8 +8,6 @@ use Scalar::Util 'weaken';
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
-sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
-
 sub close {
   my $self = shift;
   return unless my $reactor = $self->reactor;
@@ -256,7 +254,8 @@ Close stream gracefully.
 
   my $handle = $stream->handle;
 
-Get handle for stream.
+Get handle for stream, usually an L<IO::Socket::IP> or L<IO::Socket::SSL>
+object.
 
 =head2 is_readable
 
@@ -293,7 +292,7 @@ Start or resume watching for new data on the stream.
 
   my $handle = $stream->steal_handle;
 
-Steal handle from stream and prevent it from getting closed automatically.
+Steal L</"handle"> and prevent it from getting closed automatically.
 
 =head2 stop
 

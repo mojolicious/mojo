@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::Tutorial - Tutorial
+Mojolicious::Guides::Tutorial - Get started with Mojolicious
 
 =head1 TUTORIAL
 
@@ -11,12 +11,19 @@ A quick example-driven introduction to the wonders of L<Mojolicious::Lite>.
 Almost everything you'll learn here also applies to full L<Mojolicious>
 applications.
 
+This is only the first of the L<Mojolicious::Guides>. Other guides delve deeper
+into topics like L<growing|Mojolicious::Guides::Growing> a L<Mojolicious::Lite>
+prototype into a well-structured L<Mojolicious> application,
+L<routing|Mojolicious::Guides::Routing>,
+L<rendering|Mojolicious::Guides::Rendering> and more. It is highly encouraged
+that readers continue on to the remaining guides after reading this one.
+
 =head2 Hello World
 
 A simple Hello World application can look like this, L<strict>, L<warnings>,
 L<utf8> and Perl 5.10 L<features|feature> are automatically enabled and a few
-functions imported when you use L<Mojolicious::Lite>, turning your script into a
-full featured web application.
+L<functions|Mojolicious::Lite/"FUNCTIONS"> imported, when you use
+L<Mojolicious::Lite>, turning your script into a full featured web application.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
@@ -28,15 +35,16 @@ full featured web application.
 
   app->start;
 
-There is also a helper command to generate a small example application.
+With L<Mojolicious::Command::generate::lite_app> there is also a helper command
+to generate a small example application.
 
   $ mojo generate lite_app myapp.pl
 
 =head2 Commands
 
-All the normal L<Mojolicious::Commands> are available from the command line.
-Note that CGI and L<PSGI> environments can usually be auto detected and will
-just work without commands.
+Many different L<commands|Mojolicious::Commands/"COMMANDS"> are automatically
+available from the command line. CGI and L<PSGI> environments can even be
+detected and will usually just work without commands.
 
   $ ./myapp.pl daemon
   Server available at http://127.0.0.1:3000
@@ -53,11 +61,15 @@ just work without commands.
   $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...
 
-The C<app-E<gt>start> call that starts the L<Mojolicious> command system should
-usually be the last expression in your application and can be customized to
-override normal C<@ARGV> use.
+A call to L<Mojolicious/"start"> (C<app-E<gt>start>), which starts the command
+system, should be the last expression in your application, because its return
+value can be significant.
 
-  app->start('daemon');
+  # Use @ARGV to pick a command
+  app->start;
+
+  # Start the "daemon" command
+  app->start('daemon', '-l', 'http://*:8080');
 
 =head2 Reloading
 
@@ -163,6 +175,30 @@ L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get -v -M POST -c 'test' /echo
 
+=head2 JSON
+
+JSON is the most commonly used data-interchange format for web services.
+L<Mojolicious> loves JSON and comes with the possibly fastest pure-Perl
+implementation L<Mojo::JSON> built right in, which is accessible through
+L<Mojo::Message/"json"> as well as the reserved stash value C<json>.
+
+  use Mojolicious::Lite;
+
+  # Modify the received JSON document and return it
+  put '/reverse' => sub {
+    my $c    = shift;
+    my $hash = $c->req->json;
+    $hash->{message} = reverse $hash->{message};
+    $c->render(json => $hash);
+  };
+
+  app->start;
+
+You can send JSON documents from the command line with
+L<Mojolicious::Command::get>.
+
+  $ ./myapp.pl get -M PUT -c '{"message":"Hello Mojo!"}' /reverse
+
 =head2 Built-in C<exception> and C<not_found> pages
 
 During development you will encounter these pages whenever you make a mistake,
@@ -179,10 +215,14 @@ in debugging your application.
 
   app->start;
 
-You can even use CSS selectors with L<Mojolicious::Command::get> to extract
-only the information you're actually interested in.
+You can even use CSS selectors with L<Mojolicious::Command::get> to extract only
+the information you're actually interested in.
 
   $ ./myapp.pl get /dies '#error'
+
+And don't worry about revealing too much information on these pages, they are
+only available during development, and will be replaced automatically with pages
+that don't reveal any sensitive information in a production environment.
 
 =head2 Route names
 
@@ -272,8 +312,9 @@ by the C<begin> and C<end> keywords, they are the foundation for many helpers.
 
 =head2 Helpers
 
-Helpers are little functions you can reuse throughout your whole application,
-from actions to templates.
+Helpers are little functions you can create with the keyword
+L<Mojolicious::Lite/"helper"> and reuse throughout your whole application, from
+actions to templates.
 
   use Mojolicious::Lite;
 
@@ -368,7 +409,8 @@ C<.>, similar to the regular expression C<(.+)>.
 
 =head2 HTTP methods
 
-Routes can be restricted to specific request methods with different keywords.
+Routes can be restricted to specific request methods with different keywords
+like L<Mojolicious::Lite/"get"> and L<Mojolicious::Lite/"any">.
 
   use Mojolicious::Lite;
 
@@ -675,7 +717,12 @@ L<Mojolicious::Command::get>.
 =head2 External templates
 
 External templates will be searched by the renderer in a C<templates> directory
-if it exists and have a higher precedence than those in the C<DATA> section.
+if it exists.
+
+  $ mkdir -p templates/foo
+  $ echo 'Hello World!' > templates/foo/bar.html.ep
+
+They have a higher precedence than templates in the C<DATA> section.
 
   use Mojolicious::Lite;
 
@@ -744,10 +791,11 @@ really tamper resistant.
 =head2 File uploads
 
 All files uploaded via C<multipart/form-data> request are automatically
-available as L<Mojo::Upload> objects. And you don't have to worry about memory
-usage, because all files above 250KB will be automatically streamed into a
-temporary file. To build HTML forms more efficiently, you can also use tag
-helpers like L<Mojolicious::Plugin::TagHelpers/"form_for">.
+available as L<Mojo::Upload> objects from L<Mojolicious::Controller/"param">.
+And you don't have to worry about memory usage, because all files above 250KB
+will be automatically streamed into a temporary file. To build HTML forms more
+efficiently, you can also use tag helpers like
+L<Mojolicious::Plugin::TagHelpers/"form_for">.
 
   use Mojolicious::Lite;
 
@@ -918,8 +966,10 @@ C<log> directory exists.
 
   $ mkdir log
 
-Mode changes also affect a few other aspects of the framework, such as mode
-specific C<exception> and C<not_found> templates.
+Mode changes also affect a few other aspects of the framework, such as the
+built-in C<exception> and C<not_found> pages. Once you switch modes from
+C<development> to C<production>, no sensitive information will be revealed on
+those pages anymore.
 
 =head2 Testing
 
@@ -954,7 +1004,8 @@ more documentation and examples by many different authors.
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>.
+L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
 
 =cut

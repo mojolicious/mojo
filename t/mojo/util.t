@@ -15,8 +15,8 @@ use Mojo::Util
   qw(decode dumper encode files hmac_sha1_sum html_unescape md5_bytes md5_sum),
   qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
-  qw(split_header spurt squish steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode);
+  qw(split_header spurt steady_time tablify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -193,7 +193,7 @@ is html_unescape('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
 
 # html_unescape (special entities)
 is html_unescape('foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
-  "foo ☃ \x{2233} bar &sup1baz", 'right HTML unescaped result';
+  "foo ☃ \x{2233} bar ¹baz", 'right HTML unescaped result';
 
 # html_unescape (multi-character entity)
 is html_unescape('&acE;'), "\x{223e}\x{0333}", 'right HTML unescaped result';
@@ -204,6 +204,10 @@ is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
 
 # html_unescape (nothing to unescape)
 is html_unescape('foobar'), 'foobar', 'no changes';
+
+# html_unescape (relaxed)
+is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r",
+  'right HTML unescaped result';
 
 # url_unescape (bengal numbers with nothing to unescape)
 is html_unescape('&#০৩৯;&#x০৩৯;'), '&#০৩৯;&#x০৩৯;',
@@ -345,11 +349,6 @@ is trim(" \n la la la \n "),        'la la la',          'right trimmed result';
 is trim("\n la\nla la \n"),         "la\nla la",         'right trimmed result';
 is trim(" \nla \n  \t\nla\nla\n "), "la \n  \t\nla\nla", 'right trimmed result';
 
-# squish
-is squish(' la la  la '),             'la la la', 'right squished result';
-is squish("\n la\nla la \n"),         'la la la', 'right squished result';
-is squish(" \nla \n  \t\nla\nla\n "), 'la la la', 'right squished result';
-
 # md5_bytes
 is unpack('H*', md5_bytes(encode 'UTF-8', 'foo bar baz ♥')),
   'a740aeb6e066f158cbf19fd92e890d2d', 'right binary md5 checksum';
@@ -423,6 +422,9 @@ my @files = map { catfile $lib, split '/' } (
   'LoaderTest/C.pm'
 );
 is_deeply [map { catfile splitdir $_ } files $lib], \@files, 'right files';
+my @hidden = map { catfile $lib, split '/' } '.hidden.txt', '.test/hidden.txt';
+is_deeply [map { catfile splitdir $_ } files $lib, {hidden => 1}],
+  [@hidden, @files], 'right files';
 
 # steady_time
 like steady_time, qr/^[\d.]+$/, 'high resolution time';
@@ -497,5 +499,9 @@ is term_escape("Accept: */*\x0d\x0a"), "Accept: */*\\x0d\x0a",   'right result';
 is term_escape("\t\b\r\n\f"),          "\\x09\\x08\\x0d\n\\x0c", 'right result';
 is term_escape("\x00\x09\x0b\x1f\x7f\x80\x9f"), '\x00\x09\x0b\x1f\x7f\x80\x9f',
   'right result';
+
+# Hide DATA usage from error messages
+eval { die 'whatever' };
+unlike $@, qr/DATA/, 'DATA has been hidden';
 
 done_testing();

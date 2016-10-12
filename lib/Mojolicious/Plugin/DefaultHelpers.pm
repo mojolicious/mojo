@@ -69,7 +69,7 @@ sub _content {
 sub _csrf_token {
   my $c = shift;
   return $c->session->{csrf_token}
-    ||= hmac_sha1_sum($$ . steady_time . rand 999, $c->app->secrets->[0]);
+    ||= hmac_sha1_sum($$ . steady_time . rand, $c->app->secrets->[0]);
 }
 
 sub _current_route {
@@ -441,7 +441,8 @@ templates.
 
 Reply with a static file using L<Mojolicious/"static">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
-helper does not protect from traversing to parent directories.
+helper uses a relative path, but does not protect from traversing to parent
+directories.
 
   # Serve file with a custom content type
   $c->res->headers->content_type('application/myapp');

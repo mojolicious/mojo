@@ -233,7 +233,7 @@ embedded in the C<DATA> sections of your application into real files.
   $ ./myapp.pl prefork
 
 Use L<Mojolicious::Command::prefork> to start application with standalone
-preforking HTTP and WebSocket server.
+pre-forking HTTP and WebSocket server.
 
 =head2 psgi
 

@@ -57,6 +57,11 @@ websocket '/early_start' => sub {
   );
 };
 
+websocket '/early_finish' => sub {
+  my $c = shift;
+  Mojo::IOLoop->next_tick(sub { $c->rendered(101)->finish(4000, 'kaboom') });
+};
+
 websocket '/denied' => sub {
   my $c = shift;
   $c->tx->handshake->on(finish => sub { $c->stash->{handshake}++ });
@@ -97,8 +102,8 @@ websocket '/double_echo' => sub {
   );
 };
 
-websocket '/squish' => sub {
-  shift->on(message => sub { shift->send(b(shift)->squish) });
+websocket '/trim' => sub {
+  shift->on(message => sub { shift->send(b(shift)->trim) });
 };
 
 websocket '/dead' => sub { die 'i see dead processes' };
@@ -186,6 +191,18 @@ ok $established, 'connection established';
 is $status,      1000, 'right status';
 is $msg,         'I ♥ Mojolicious!', 'right message';
 is $result,      'test0test2test1', 'right result';
+
+# WebSocket connection gets closed very fast
+$status = undef;
+$ua->websocket(
+  '/early_finish' => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(finish => sub { $status = [@_[1, 2]]; Mojo::IOLoop->stop });
+  }
+);
+Mojo::IOLoop->start;
+is $status->[0], 4000,     'right status';
+is $status->[1], 'kaboom', 'right message';
 
 # Connection denied
 ($stash, $code, $ws) = ();
@@ -306,7 +323,7 @@ is $result, 'hi!hi!', 'right result';
 # Sending objects
 $result = undef;
 $ua->websocket(
-  '/squish' => sub {
+  '/trim' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });

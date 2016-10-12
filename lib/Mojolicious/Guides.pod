@@ -323,6 +323,8 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::Home>
 
+=item * L<Mojo::IOLoop::Subprocess>
+
 =item * L<Mojo::JSON::Pointer>
 
 =item * L<Mojo::Parameters>
@@ -397,8 +399,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =over 2
 
-=item * L<Mojolicious::Plugin::Charset>
-
 =item * L<Mojolicious::Plugin::Config>
 
 =over 2
@@ -411,7 +411,11 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Plugin::EPLRenderer>
 
+=over 2
+
 =item * L<Mojolicious::Plugin::EPRenderer>
+
+=back
 
 =item * L<Mojolicious::Plugin::HeaderCondition>
 
@@ -478,7 +482,8 @@ the L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>.
+L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
 
 =cut

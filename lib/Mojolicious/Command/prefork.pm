@@ -5,7 +5,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Prefork;
 
 has description =>
-  'Start application with preforking HTTP and WebSocket server';
+  'Start application with pre-forking HTTP and WebSocket server';
 has usage => sub { shift->extract_usage };
 
 sub run {
@@ -20,12 +20,11 @@ sub run {
     'I|heartbeat-interval=i' => sub { $prefork->heartbeat_interval($_[1]) },
     'H|heartbeat-timeout=i'  => sub { $prefork->heartbeat_timeout($_[1]) },
     'i|inactivity-timeout=i' => sub { $prefork->inactivity_timeout($_[1]) },
-    'l|listen=s'       => \my @listen,
-    'M|multi-accept=i' => sub { $prefork->multi_accept($_[1]) },
-    'P|pid-file=s'     => sub { $prefork->pid_file($_[1]) },
-    'p|proxy'          => sub { $prefork->reverse_proxy(1) },
-    'r|requests=i'     => sub { $prefork->max_requests($_[1]) },
-    'w|workers=i'      => sub { $prefork->workers($_[1]) };
+    'l|listen=s'   => \my @listen,
+    'P|pid-file=s' => sub { $prefork->pid_file($_[1]) },
+    'p|proxy'      => sub { $prefork->reverse_proxy(1) },
+    'r|requests=i' => sub { $prefork->max_requests($_[1]) },
+    'w|workers=i'  => sub { $prefork->workers($_[1]) };
 
   $prefork->listen(\@listen) if @listen;
   $prefork->run;
@@ -37,7 +36,7 @@ sub run {
 
 =head1 NAME
 
-Mojolicious::Command::prefork - Prefork command
+Mojolicious::Command::prefork - Pre-fork command
 
 =head1 SYNOPSIS
 
@@ -50,7 +49,7 @@ Mojolicious::Command::prefork - Prefork command
 
   Options:
     -a, --accepts <number>               Number of connections for workers to
-                                         accept, defaults to 1000
+                                         accept, defaults to 10000
     -b, --backlog <size>                 Listen backlog size, defaults to
                                          SOMAXCONN
     -c, --clients <number>               Maximum number of concurrent
@@ -67,8 +66,6 @@ Mojolicious::Command::prefork - Prefork command
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"
-    -M, --multi-accept <number>          Number of connections to accept at
-                                         once, defaults to 50
     -m, --mode <name>                    Operating mode for your application,
                                          defaults to the value of
                                          MOJO_MODE/PLACK_ENV or "development"
@@ -78,7 +75,7 @@ Mojolicious::Command::prefork - Prefork command
                                          defaults to the value of
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
-                                         keep-alive connection, defaults to 25
+                                         keep-alive connection, defaults to 100
     -w, --workers <number>               Number of workers, defaults to 4
 
 =head1 DESCRIPTION

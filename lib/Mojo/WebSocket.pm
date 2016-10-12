@@ -171,7 +171,7 @@ sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
 
 =head1 NAME
 
-Mojo::WebSocket - The WebSocket Protocol
+Mojo::WebSocket - The WebSocket protocol
 
 =head1 SYNOPSIS
 

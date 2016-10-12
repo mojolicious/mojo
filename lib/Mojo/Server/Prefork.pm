@@ -1,28 +1,20 @@
 package Mojo::Server::Prefork;
 use Mojo::Base 'Mojo::Server::Daemon';
 
+use Config;
 use File::Spec::Functions qw(catfile tmpdir);
 use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 
-has accepts => 1000;
+has accepts => 10000;
 has cleanup => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
-has 'multi_accept';
-has pid_file => sub { catfile tmpdir, 'prefork.pid' };
-has workers => 4;
+has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
+has workers            => 4;
 
-sub DESTROY {
-  my $self = shift;
-
-  # Worker
-  return unless $self->cleanup;
-
-  # Manager
-  if (my $file = $self->pid_file) { unlink $file if -w $file }
-}
+sub DESTROY { unlink $_[0]->pid_file if $_[0]->cleanup }
 
 sub check_pid {
   my $file = shift->pid_file;
@@ -34,12 +26,12 @@ sub check_pid {
   return $pid if $pid && kill 0, $pid;
 
   # Not running
-  unlink $file if -w $file;
+  unlink $file;
   return undef;
 }
 
 sub ensure_pid_file {
-  my $self = shift;
+  my ($self, $pid) = @_;
 
   # Check if PID file already exists
   return if -e (my $file = $self->pid_file);
@@ -50,7 +42,7 @@ sub ensure_pid_file {
     unless open my $handle, '>', $file;
   $self->app->log->info(qq{Creating process id file "$file"});
   chmod 0644, $handle;
-  print $handle $$;
+  print $handle "$pid\n";
 }
 
 sub healthy {
@@ -60,12 +52,9 @@ sub healthy {
 sub run {
   my $self = shift;
 
-  # No Windows support
-  say 'Preforking is not available for Windows.' and exit 0 if $^O eq 'MSWin32';
-
-  # Prepare event loop
-  my $loop = $self->ioloop->max_accepts($self->accepts);
-  if (defined(my $multi = $self->multi_accept)) { $loop->multi_accept($multi) }
+  # No fork emulation support
+  say 'Pre-forking does not support fork emulation.' and exit 0
+    if $Config{d_pseudofork};
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
@@ -88,8 +77,10 @@ sub run {
 
   # Preload application before starting workers
   $self->start->app->log->info("Manager $$ started");
+  $self->ioloop->max_accepts($self->accepts);
   $self->{running} = 1;
   $self->_manage while $self->{running};
+  $self->app->log->info("Manager $$ stopped");
 }
 
 sub _heartbeat { shift->{writer}->syswrite("$$:$_[0]\n") or exit 0 }
@@ -100,7 +91,7 @@ sub _manage {
   # Spawn more workers if necessary and check PID file
   if (!$self->{finished}) {
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
-    $self->ensure_pid_file;
+    $self->ensure_pid_file($$);
   }
 
   # Shutdown
@@ -204,7 +195,7 @@ sub _wait {
 
 =head1 NAME
 
-Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
+Mojo::Server::Prefork - Pre-forking non-blocking I/O HTTP and WebSocket server
 
 =head1 SYNOPSIS
 
@@ -230,7 +221,7 @@ Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Prefork> is a full featured, UNIX optimized, preforking
+L<Mojo::Server::Prefork> is a full featured, UNIX optimized, pre-forking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Daemon>, with IPv6, TLS, SNI, Comet (long polling),
 keep-alive and multiple event loop support. Note that the server uses signals
@@ -362,9 +353,9 @@ and implements the following new ones.
   my $accepts = $prefork->accepts;
   $prefork    = $prefork->accepts(100);
 
-Maximum number of connections a worker is allowed to accept before stopping
+Maximum number of connections a worker is allowed to accept, before stopping
 gracefully and then getting replaced with a newly started worker, passed along
-to L<Mojo::IOLoop/"max_accepts">, defaults to C<1000>. Setting the value to
+to L<Mojo::IOLoop/"max_accepts">, defaults to C<10000>. Setting the value to
 C<0> will allow workers to accept new connections indefinitely. Note that up to
 half of this value can be subtracted randomly to improve load balancing.
 
@@ -398,14 +389,6 @@ Heartbeat interval in seconds, defaults to C<5>.
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
 stopped gracefully, defaults to C<20>.
-
-=head2 multi_accept
-
-  my $multi = $prefork->multi_accept;
-  $prefork  = $prefork->multi_accept(100);
-
-Number of connections to accept at once, passed along to
-L<Mojo::IOLoop/"multi_accept">.
 
 =head2 pid_file
 
@@ -441,7 +424,7 @@ not running.
 
 =head2 ensure_pid_file
 
-  $prefork->ensure_pid_file;
+  $prefork->ensure_pid_file($pid);
 
 Ensure L</"pid_file"> exists.
 

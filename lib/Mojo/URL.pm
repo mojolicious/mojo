@@ -10,30 +10,6 @@ use Mojo::Util
 has base => sub { Mojo::URL->new };
 has [qw(fragment host port scheme userinfo)];
 
-sub authority {
-  my $self = shift;
-
-  # New authority
-  if (@_) {
-    return $self unless defined(my $authority = shift);
-
-    # Userinfo
-    $self->userinfo(_decode(url_unescape $1)) if $authority =~ s/^([^\@]+)\@//;
-
-    # Port
-    $self->port($1) if $authority =~ s/:(\d+)$//;
-
-    # Host
-    my $host = url_unescape $authority;
-    return $host =~ /[^\x00-\x7f]/ ? $self->ihost($host) : $self->host($host);
-  }
-
-  # Build authority
-  return undef      unless defined(my $authority = $self->host_port);
-  return $authority unless defined(my $info      = $self->userinfo);
-  return _encode($info, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $authority;
-}
-
 sub clone {
   my $self  = shift;
   my $clone = $self->new;
@@ -43,7 +19,14 @@ sub clone {
 }
 
 sub host_port {
-  my $self = shift;
+  my ($self, $host_port) = @_;
+
+  if (defined $host_port) {
+    $self->port($1) if $host_port =~ s/:(\d+)$//;
+    my $host = url_unescape $host_port;
+    return $host =~ /[^\x00-\x7f]/ ? $self->ihost($host) : $self->host($host);
+  }
+
   return undef unless defined(my $host = $self->ihost);
   return $host unless my $port = $self->port;
   return "$host:$port";
@@ -77,13 +60,18 @@ sub parse {
   # Official regex from RFC 3986
   $url =~ m!^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?!;
   $self->scheme($2)                         if defined $2;
-  $self->authority($4)                      if defined $4;
   $self->path($5)                           if defined $5;
   $self->query($7)                          if defined $7;
   $self->fragment(_decode(url_unescape $9)) if defined $9;
+  if (defined(my $authority = $4)) {
+    $self->userinfo(_decode(url_unescape $1)) if $authority =~ s/^([^\@]+)\@//;
+    $self->host_port($authority);
+  }
 
   return $self;
 }
+
+sub password { (shift->userinfo // '') =~ /:(.*)$/ ? $1 : undef }
 
 sub path {
   my $self = shift;
@@ -139,26 +127,23 @@ sub to_abs {
   $abs->base($base)->scheme($base->scheme);
 
   # Authority
-  return $abs if $abs->authority;
-  $abs->authority($base->authority);
+  return $abs if $abs->host;
+  $abs->userinfo($base->userinfo)->host($base->host)->port($base->port);
 
   # Absolute path
   my $path = $abs->path;
   return $abs if $path->leading_slash;
 
   # Inherit path
-  my $base_path = $base->path;
   if (!@{$path->parts}) {
-    $path
-      = $abs->path($base_path->clone)->path->trailing_slash(0)->canonicalize;
+    $abs->path($base->path->clone->canonicalize);
 
     # Query
-    return $abs if length $abs->query->to_string;
-    $abs->query($base->query->clone);
+    $abs->query($base->query->clone) unless length $abs->query->to_string;
   }
 
   # Merge paths
-  else { $abs->path($base_path->clone->merge($path)->canonicalize) }
+  else { $abs->path($base->path->clone->merge($path)->canonicalize) }
 
   return $abs;
 }
@@ -170,8 +155,8 @@ sub to_string {
   my $url = '';
   if (my $proto = $self->protocol) { $url .= "$proto:" }
 
-  # Authority
-  my $authority = $self->authority;
+  # Authority (without userinfo)
+  my $authority = $self->host_port;
   $url .= "//$authority" if defined $authority;
 
   # Path and query
@@ -180,12 +165,13 @@ sub to_string {
 
   # Fragment
   return $url unless defined(my $fragment = $self->fragment);
-  return $url . '#' . _encode($fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?');
+  return $url . '#' . url_escape encode('UTF-8', $fragment),
+    '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
 }
 
-sub _decode { decode('UTF-8', $_[0]) // $_[0] }
+sub username { (shift->userinfo // '') =~ /^([^:]+)/ ? $1 : undef }
 
-sub _encode { url_escape encode('UTF-8', $_[0]), $_[1] }
+sub _decode { decode('UTF-8', $_[0]) // $_[0] }
 
 1;
 
@@ -212,7 +198,6 @@ Mojo::URL - Uniform Resource Locator
   # Build
   my $url = Mojo::URL->new;
   $url->scheme('http');
-  $url->userinfo('sri:foobar');
   $url->host('example.com');
   $url->port(3000);
   $url->path('/foo/bar');
@@ -297,19 +282,6 @@ Userinfo part of this URL.
 L<Mojo::URL> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 authority
-
-  my $authority = $url->authority;
-  $url          = $url->authority('root:%E2%99%A5@localhost:8080');
-
-Authority part of this URL.
-
-  # "root:%E2%99%A5@xn--n3h.net:8080"
-  Mojo::URL->new('http://root:♥@☃.net:8080/test')->authority;
-
-  # "root@example.com"
-  Mojo::URL->new('http://root@example.com/test')->authority;
-
 =head2 clone
 
   my $url2 = $url->clone;
@@ -319,6 +291,7 @@ Clone this URL.
 =head2 host_port
 
   my $host_port = $url->host_port;
+  $url          = $url->host_port('example.com:8080');
 
 Normalized version of L</"host"> and L</"port">.
 
@@ -377,6 +350,18 @@ Parse relative or absolute URL.
 
   # "sri@example.com"
   $url->parse('mailto:sri@example.com')->path;
+
+=head2 password
+
+  my $password = $url->password;
+
+Password part of L</"userinfo">.
+
+  # "s3cret"
+  Mojo::URL->new('http://isabel:s3cret@mojolicious.org')->password;
+
+  # "s:3:c:r:e:t"
+  Mojo::URL->new('http://isabel:s:3:c:r:e:t@mojolicious.org')->password;
 
 =head2 path
 
@@ -483,10 +468,23 @@ provided base URL.
 
   my $str = $url->to_string;
 
-Turn URL into a string.
+Turn URL into a string. Note that L</"userinfo"> will not be included for
+security reasons.
 
   # "http://mojolicious.org"
   Mojo::URL->new->scheme('http')->host('mojolicious.org')->to_string;
+
+  # "http://mojolicious.org"
+  Mojo::URL->new('http://daniel:s3cret@mojolicious.org')->to_string;
+
+=head2 username
+
+  my $username = $url->username;
+
+Username part of L</"userinfo">.
+
+  # "isabel"
+  Mojo::URL->new('http://isabel:s3cret@mojolicious.org')->username;
 
 =head1 OPERATORS
 

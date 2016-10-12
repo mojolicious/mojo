@@ -55,7 +55,7 @@ sub extract_start_line {
   return !$self->error({message => 'Bad request start-line'})
     unless $1 =~ /^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$/;
   my $url = $self->method($1)->version($3)->url;
-  return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
+  return !!($1 eq 'CONNECT' ? $url->host_port($2) : $url->parse($2));
 }
 
 sub fix_headers {
@@ -125,7 +125,7 @@ sub parse {
   my $base = $self->url->base;
   $base->scheme('http') unless $base->scheme;
   my $headers = $self->headers;
-  if (!$base->host && (my $host = $headers->host)) { $base->authority($host) }
+  if (!$base->host && (my $host = $headers->host)) { $base->host_port($host) }
 
   # Basic authentication
   if (my $basic = _basic($headers->authorization)) { $base->userinfo($basic) }

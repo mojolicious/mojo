@@ -12,8 +12,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
-  qw(sha1_sum slurp spurt squish term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode)
+  qw(sha1_sum slurp spurt term_escape trim unindent unquote url_escape),
+  qw(url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);
@@ -266,7 +266,7 @@ Read all data at once from file into bytestream with L<Mojo::Util/"slurp">.
 Write all data from bytestream at once to file with L<Mojo::Util/"spurt">.
 
   # Remove unnecessary whitespace from file
-  b('/home/sri/foo.txt')->slurp->squish->spurt('/home/sri/bar.txt');
+  b('/home/sri/foo.txt')->slurp->trim->spurt('/home/sri/bar.txt');
 
 =head2 split
 
@@ -277,14 +277,6 @@ objects.
 
   # "One,Two,Three"
   b("one,two,three")->split(',')->map('camelize')->join(',');
-
-=head2 squish
-
-  $stream = $stream->squish;
-
-Trim whitespace characters from both ends of bytestream and then change all
-consecutive groups of whitespace into one space each with
-L<Mojo::Util/"squish">.
 
 =head2 tap
 

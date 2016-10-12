@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::Growing - Growing
+Mojolicious::Guides::Growing - Growing Mojolicious applications
 
 =head1 OVERVIEW
 
@@ -629,9 +629,9 @@ allow running tests again.
   use warnings;
 
   use lib 'lib';
+  use Mojolicious::Commands;
 
   # Start command line interface for application
-  require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
 And the directory structure of our hybrid application should be looking like
@@ -754,9 +754,9 @@ C<@INC>, allowing us to start the application from outside its home directory.
 
   use FindBin;
   BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+  use Mojolicious::Commands;
 
   # Start command line interface for application
-  require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 
 =head2 Simplified tests
@@ -823,7 +823,8 @@ more documentation and examples by many different authors.
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>.
+L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
 
 =cut

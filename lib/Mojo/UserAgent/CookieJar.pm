@@ -16,7 +16,7 @@ sub add {
 
     # Convert max age to expires
     my $age = $cookie->max_age;
-    $cookie->expires($age + time) if looks_like_number $age;
+    $cookie->expires($age <= 0 ? 0 : $age + time) if looks_like_number $age;
 
     # Check cookie size
     next if length($cookie->value // '') > $size;
@@ -75,7 +75,7 @@ sub find {
       next unless $cookie->domain || $host eq $cookie->origin;
 
       # Check if cookie has expired
-      if (my $expires = $cookie->expires) { next if time > ($expires || 0) }
+      if (defined(my $expires = $cookie->expires)) { next if time > $expires }
       push @$new, $cookie;
 
       # Taste cookie

@@ -16,14 +16,13 @@ has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
-has max_requests => 25;
+has max_requests => 100;
 
 sub DESTROY {
   return if Mojo::Util::_global_destruction();
   my $self = shift;
-  $self->_remove($_) for keys %{$self->{connections} || {}};
   my $loop = $self->ioloop;
-  $loop->remove($_) for @{$self->acceptors};
+  $loop->remove($_) for keys %{$self->{connections} || {}}, @{$self->acceptors};
 }
 
 sub run {
@@ -40,9 +39,10 @@ sub run {
 sub start {
   my $self = shift;
 
-  # Resume accepting connections
   my $loop = $self->ioloop;
   if (my $max = $self->max_clients) { $loop->max_connections($max) }
+
+  # Resume accepting connections
   if (my $servers = $self->{servers}) {
     push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_})
       for keys %$servers;
@@ -109,10 +109,7 @@ sub _build_tx {
 
 sub _close {
   my ($self, $id) = @_;
-
-  # Finish gracefully
   if (my $tx = $self->{connections}{$id}{tx}) { $tx->closed }
-
   delete $self->{connections}{$id};
 }
 
@@ -162,9 +159,10 @@ sub _listen {
 
   my $query   = $url->query;
   my $options = {
-    address => $url->host,
-    backlog => $self->backlog,
-    reuse   => $query->param('reuse')
+    address       => $url->host,
+    backlog       => $self->backlog,
+    single_accept => $query->param('single_accept'),
+    reuse         => $query->param('reuse')
   };
   if (my $port = $url->port) { $options->{port} = $port }
   $options->{"tls_$_"} = $query->param($_) for qw(ca ciphers version);
@@ -408,11 +406,18 @@ Path to the TLS key file, defaults to a built-in test key.
 Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
 option.
 
+=item single_accept
+
+  single_accept=1
+
+Only accept one connection at a time.
+
 =item verify
 
   verify=0x00
 
-TLS verification mode, defaults to C<0x03>.
+TLS verification mode, defaults to C<0x03> if a certificate authority file has
+been provided, or C<0x00>.
 
 =item version
 
@@ -425,18 +430,18 @@ TLS protocol version.
 =head2 max_clients
 
   my $max = $daemon->max_clients;
-  $daemon = $daemon->max_clients(1000);
+  $daemon = $daemon->max_clients(100);
 
-Maximum number of concurrent connections this server is allowed to handle
-before stopping to accept new incoming connections, passed along to
-L<Mojo::IOLoop/"max_connections">.
+Maximum number of accepted connections this server is allowed to handle
+concurrently, before stopping to accept new incoming connections, passed along
+to L<Mojo::IOLoop/"max_connections">.
 
 =head2 max_requests
 
   my $max = $daemon->max_requests;
-  $daemon = $daemon->max_requests(100);
+  $daemon = $daemon->max_requests(250);
 
-Maximum number of keep-alive requests per connection, defaults to C<25>.
+Maximum number of keep-alive requests per connection, defaults to C<100>.
 
 =head2 silent
 

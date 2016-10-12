@@ -56,7 +56,7 @@ my %MESSAGES = (
   428 => 'Precondition Required',              # RFC 6585
   429 => 'Too Many Requests',                  # RFC 6585
   431 => 'Request Header Fields Too Large',    # RFC 6585
-  451 => 'Unavailable For Legal Reasons',      # Draft
+  451 => 'Unavailable For Legal Reasons',      # RFC 7725
   500 => 'Internal Server Error',
   501 => 'Not Implemented',
   502 => 'Bad Gateway',
@@ -250,13 +250,21 @@ this method finalizes the response.
 
   my $bool = $res->is_empty;
 
-Check if this is a C<1xx>, C<204> or C<304> response.
+Check if this response has a C<1xx>, C<204> or C<304> status code.
 
 =head2 is_status_class
 
   my $bool = $res->is_status_class(200);
 
 Check response status class.
+
+  # True
+  Mojo::Message::Response->new->code(304)->is_status_class(300);
+  Mojo::Message::Response->new->code(404)->is_status_class(400);
+
+  # False
+  Mojo::Message::Response->new->code(404)->is_status_class(300);
+  Mojo::Message::Response->new->code(404)->is_status_class(200);
 
 =head2 start_line_size
 

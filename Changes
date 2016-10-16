@@ -1,5 +1,6 @@
 
-7.09  2016-10-06
+7.09  2016-10-16
+  - Fixed a few proxy bugs in Mojo::UserAgent.
 
 7.08  2016-09-23
   - Added -i and -o options to get command.

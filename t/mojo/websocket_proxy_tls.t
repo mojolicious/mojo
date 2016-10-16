@@ -297,4 +297,26 @@ $tx = $ua->get("https://127.0.0.1:$port/proxy");
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
 
+# Blocking request to bad proxy
+$ua    = Mojo::UserAgent->new;
+$proxy = Mojo::IOLoop::Server->generate_port;
+$ua->proxy->https("http://127.0.0.1:$proxy");
+$tx = $ua->get("https://127.0.0.1:$port/proxy");
+ok !$tx->success, 'no success';
+is $tx->error->{message}, 'Proxy connection failed', 'right error';
+
+# Non-blocking request to bad proxy
+($success, $err) = ();
+$ua->get(
+  "https://127.0.0.1:$port/proxy" => sub {
+    my ($ua, $tx) = @_;
+    $success = $tx->success;
+    $err     = $tx->error;
+    Mojo::IOLoop->stop;
+  }
+);
+Mojo::IOLoop->start;
+ok !$success, 'no success';
+is $err->{message}, 'Proxy connection failed', 'right error';
+
 done_testing();

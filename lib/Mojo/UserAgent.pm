@@ -130,7 +130,7 @@ sub _connect_proxy {
       my $id = $tx->connection;
       if ($tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive) {
         $old->res->error({message => 'Proxy connection failed'});
-        $self->_remove($id);
+        $self->_remove($id) if $id;
         return $self->$cb($old);
       }
 

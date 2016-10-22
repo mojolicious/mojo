@@ -49,6 +49,8 @@ sub append {
 
 sub clone { $_[0]->new->from_hash($_[0]->to_hash(1)) }
 
+sub every_header { shift->{headers}{lc shift} || [] }
+
 sub from_hash {
   my ($self, $hash) = @_;
 
@@ -395,6 +397,16 @@ header, which has no specification yet, but is very commonly used.
   $headers = $headers->etag('"abc321"');
 
 Get or replace current header value, shortcut for the C<ETag> header.
+
+=head2 every_header
+
+  my $all = $headers->every_header('Location');
+
+Similar to L</"header">, but returns all headers sharing the same name as an
+array reference.
+
+  # Get first header value
+  say $headers->every_header('Location')->[0];
 
 =head2 expect
 

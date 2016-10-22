@@ -7,6 +7,8 @@ use Mojo::Headers;
 my $headers = Mojo::Headers->new;
 $headers->add(Connection => 'close');
 $headers->add(Connection => 'keep-alive');
+is_deeply $headers->every_header('Connection'), ['close', 'keep-alive'],
+  'right structure';
 is $headers->header('Connection'), 'close, keep-alive', 'right value';
 $headers->remove('Connection');
 is $headers->header('Connection'), undef, 'no value';

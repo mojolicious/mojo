@@ -892,6 +892,19 @@ $tx->res->code(302);
 $tx->res->headers->location('http:');
 is $t->redirect($tx), undef, 'unsupported redirect';
 
+# 302 redirect with multiple locations
+$tx = $t->tx(GET => 'http://mojolicious.org/foo');
+$tx->res->code(302);
+$tx->res->headers->add(Location => 'http://example.com/1.html');
+$tx->res->headers->add(Location => 'http://example.com/2.html');
+$tx = $t->redirect($tx);
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->url->to_abs, 'http://example.com/1.html', 'right URL';
+is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->body, '',    'no content';
+is $tx->res->code, undef, 'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
+
 # 302 redirect (relative path and query)
 $tx = $t->tx(POST => 'http://mojolicious.org/foo/bar?a=b' =>
     {Accept => 'application/json'});

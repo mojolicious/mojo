@@ -76,7 +76,8 @@ sub redirect {
   return undef if uc $req->method eq 'CONNECT';
 
   # Fix location without authority and/or scheme
-  return undef unless my $location = $res->headers->location;
+  return undef
+    unless my $location = $res->headers->every_header('Location')->[0];
   $location = Mojo::URL->new($location);
   $location = $location->base($req->url)->to_abs unless $location->is_abs;
   my $proto = $location->protocol;

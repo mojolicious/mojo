@@ -76,8 +76,7 @@ sub cookies {
 
   # Parse cookies
   my $headers = $self->headers;
-  return [map { @{Mojo::Cookie::Response->parse($_)} } $headers->set_cookie]
-    unless @_;
+  return [@{Mojo::Cookie::Response->parse($headers->set_cookie)}] unless @_;
 
   # Add cookies
   $headers->add('Set-Cookie' => "$_")

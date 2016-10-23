@@ -1,4 +1,6 @@
 
+7.10  2016-10-23
+
 7.09  2016-10-22
   - Added every_header method to Mojo::Headers.
   - Fixed redirect bug in Mojo::UserAgent::Transactor.

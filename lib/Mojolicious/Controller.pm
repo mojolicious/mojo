@@ -19,7 +19,6 @@ my %RESERVED = map { $_ => 1 } (
   qw(action app cb controller data extends format handler inline json layout),
   qw(namespace path status template text variant)
 );
-
 sub AUTOLOAD {
   my $self = shift;
 
@@ -180,7 +179,11 @@ sub render {
   my $headers = $self->res->body($output)->headers;
   $headers->content_type($app->types->type($format) || 'text/plain')
     unless $headers->content_type;
-  return !!$self->rendered($self->stash->{status});
+
+  my $status = $self->stash->{status};
+  $status = undef unless $status && $self->stash->{status} =~ /^\d{3}$/;
+
+  return !!$self->rendered($status);
 }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }
@@ -192,9 +195,9 @@ sub render_to_string { shift->render(@_, 'mojo.string' => 1) }
 sub rendered {
   my ($self, $status) = @_;
 
-  # Make sure we have a status
+  # Make sure we have a valid status
   my $res = $self->res;
-  $res->code($status || 200) if $status || !$res->code;
+  $res->code($status || 200) if ($status && $status =~ /^\d{3}$/) || !$res->code;
 
   # Finish transaction
   my $stash = $self->stash;

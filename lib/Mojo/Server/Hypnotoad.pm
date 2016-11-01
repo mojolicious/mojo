@@ -8,7 +8,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
-use Mojo::Util qw(steady_time);
+use Mojo::Util 'steady_time';
 use Scalar::Util 'weaken';
 
 has prefork => sub { Mojo::Server::Prefork->new(listen => ['http://*:8080']) };

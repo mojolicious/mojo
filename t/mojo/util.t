@@ -116,6 +116,8 @@ $tree   = [
 is_deeply split_cookie_header($header), $tree, 'right result';
 
 # getopt
+getopt ['--charset', 'UTF-8'], 'c|charset=s' => \my $charset;
+is $charset, 'UTF-8', 'right string';
 my $array = ['-t', 'test', '-h', '--whatever', 'Whatever!', 'stuff'];
 getopt $array, ['pass_through'], 't|test=s' => \my $test;
 is $test, 'test', 'right string';

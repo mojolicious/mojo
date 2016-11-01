@@ -616,6 +616,10 @@ Extract options from an array reference with L<Getopt::Long>, but without
 changing its global configuration. The configuration options C<no_auto_abbrev>
 and C<no_ignore_case> are enabled by default.
 
+  # Extract "charset" option
+  getopt ['--charset', 'UTF-8'], 'charset=s' => \my $charset;
+  say $charset;
+
 =head2 hmac_sha1_sum
 
   my $checksum = hmac_sha1_sum $bytes, 'passw0rd';

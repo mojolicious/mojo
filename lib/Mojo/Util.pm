@@ -141,8 +141,9 @@ sub files {
 
 sub getopt {
   my $opts = ref $_[1] eq 'ARRAY' ? splice @_, 1, 1 : [];
-  my $save = Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case), @$opts);
-  GetOptionsFromArray shift, @_;
+  my $save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case),
+    @$opts);
+  GetOptionsFromArray @_;
   Getopt::Long::Configure($save);
 }
 

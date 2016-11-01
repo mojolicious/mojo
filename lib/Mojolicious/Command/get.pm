@@ -6,7 +6,7 @@ use Mojo::IOLoop;
 use Mojo::JSON qw(encode_json j);
 use Mojo::JSON::Pointer;
 use Mojo::UserAgent;
-use Mojo::Util qw(getopt decode encode);
+use Mojo::Util qw(decode encode getopt);
 use Scalar::Util 'weaken';
 
 has description => 'Perform HTTP request';

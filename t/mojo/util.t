@@ -12,8 +12,8 @@ use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode dumper encode files hmac_sha1_sum html_unescape md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
+  qw(decode dumper encode files getopt hmac_sha1_sum html_unescape md5_bytes),
+  qw(md5_sum monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
   qw(split_header spurt steady_time tablify term_escape trim unindent unquote),
   qw(url_escape url_unescape xml_escape xor_encode);
@@ -114,6 +114,16 @@ $tree   = [
   ['a',  'b']
 ];
 is_deeply split_cookie_header($header), $tree, 'right result';
+
+# getopt
+my $array = ['-t', 'test', '-h', '--whatever', 'Whatever!', 'stuff'];
+getopt $array, ['pass_through'], 't|test=s' => \my $test;
+is $test, 'test', 'right string';
+is_deeply $array, ['-h', '--whatever', 'Whatever!', 'stuff'], 'right structure';
+getopt $array, 'h' => \my $flag, 'w|whatever=s' => \my $whatever;
+ok $flag, 'flag has been set';
+is $whatever, 'Whatever!', 'right string';
+is_deeply $array, ['stuff'], 'right structure';
 
 # unindent
 is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",

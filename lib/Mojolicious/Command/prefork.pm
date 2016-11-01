@@ -1,8 +1,8 @@
 package Mojolicious::Command::prefork;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Prefork;
+use Mojo::Util 'getopt';
 
 has description =>
   'Start application with pre-forking HTTP and WebSocket server';
@@ -12,7 +12,7 @@ sub run {
   my ($self, @args) = @_;
 
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
-  GetOptionsFromArray \@args,
+  getopt \@args,
     'a|accepts=i'            => sub { $prefork->accepts($_[1]) },
     'b|backlog=i'            => sub { $prefork->backlog($_[1]) },
     'c|clients=i'            => sub { $prefork->max_clients($_[1]) },

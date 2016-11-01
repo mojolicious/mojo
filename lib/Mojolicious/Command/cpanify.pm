@@ -2,7 +2,7 @@ package Mojolicious::Command::cpanify;
 use Mojo::Base 'Mojolicious::Command';
 
 use File::Basename 'basename';
-use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
+use Mojo::Util 'getopt';
 
 has description => 'Upload distribution to CPAN';
 has usage => sub { shift->extract_usage };
@@ -10,7 +10,7 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  GetOptionsFromArray \@args,
+  getopt \@args,
     'p|password=s' => \(my $password = ''),
     'u|user=s'     => \(my $user     = '');
   die $self->usage unless my $file = shift @args;

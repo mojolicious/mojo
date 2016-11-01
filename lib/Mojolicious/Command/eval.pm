@@ -1,7 +1,7 @@
 package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
+use Mojo::Util 'getopt';
 
 has description => 'Run code against application';
 has usage => sub { shift->extract_usage };
@@ -9,7 +9,7 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  GetOptionsFromArray \@args, 'v|verbose' => \my $v1, 'V' => \my $v2;
+  getopt \@args, 'v|verbose' => \my $v1, 'V' => \my $v2;
   my $code = shift @args || '';
 
   # Run code against application

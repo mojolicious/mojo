@@ -8,6 +8,7 @@ use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use Exporter 'import';
 use File::Find 'find';
+use Getopt::Long 'GetOptionsFromArray';
 use IO::Poll qw(POLLIN POLLPRI);
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
@@ -55,7 +56,7 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated dumper encode files hmac_sha1_sum html_unescape),
+  qw(decode deprecated dumper encode files getopt hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_cookie_header),
   qw(split_header spurt steady_time tablify term_escape trim unindent unquote),
@@ -136,6 +137,13 @@ sub files {
   find {wanted => $want, postprocess => $post, no_chdir => 1}, $dir if -d $dir;
 
   return sort keys %files;
+}
+
+sub getopt {
+  my $opts = ref $_[1] eq 'ARRAY' ? splice @_, 1, 1 : [];
+  my $save = Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case), @$opts);
+  GetOptionsFromArray shift, @_;
+  Getopt::Long::Configure($save);
 }
 
 sub html_unescape {
@@ -591,6 +599,21 @@ These options are currently available:
 Include hidden files and directories.
 
 =back
+
+=head2 getopt
+
+  getopt $array,
+    'H|headers=s' => \my @headers,
+    't|timeout=i' => \my $timeout,
+    'v|verbose'   => \my $verbose;
+  getopt $array, ['pass_through'],
+    'H|headers=s' => \my @headers,
+    't|timeout=i' => \my $timeout,
+    'v|verbose'   => \my $verbose;
+
+Extract options from an array reference with L<Getopt::Long>, but without
+changing its global configuration. The configuration options C<no_auto_abbrev>
+and C<no_ignore_case> are enabled by default.
 
 =head2 hmac_sha1_sum
 

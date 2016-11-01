@@ -1,10 +1,9 @@
 package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long 'GetOptionsFromArray';
 use Mojo::Loader qw(find_modules find_packages load_class);
 use Mojo::Server;
-use Mojo::Util 'tablify';
+use Mojo::Util qw(getopt tablify);
 
 has hint => <<EOF;
 
@@ -73,15 +72,11 @@ sub start_app { shift; Mojo::Server->new->build_app(shift)->start(@_) }
 
 # Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
 sub _args {
-  return if __PACKAGE__->detect;
-
-  my $save
-    = Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
-  GetOptionsFromArray shift,
+  getopt shift, ['pass_through'],
     'h|help'   => \$ENV{MOJO_HELP},
     'home=s'   => \$ENV{MOJO_HOME},
-    'm|mode=s' => \$ENV{MOJO_MODE};
-  Getopt::Long::Configure($save);
+    'm|mode=s' => \$ENV{MOJO_MODE}
+    unless __PACKAGE__->detect;
 }
 
 # Do not remove options from @ARGV

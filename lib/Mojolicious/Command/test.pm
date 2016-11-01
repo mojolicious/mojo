@@ -1,7 +1,7 @@
 package Mojolicious::Command::test;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
+use Mojo::Util 'getopt';
 
 has description => 'Run tests';
 has usage => sub { shift->extract_usage };
@@ -9,7 +9,7 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  GetOptionsFromArray \@args, 'v|verbose' => \$ENV{HARNESS_VERBOSE};
+  getopt \@args, 'v|verbose' => \$ENV{HARNESS_VERBOSE};
 
   if (!@args && (my $home = $self->app->home)) {
     die "Can't find test directory.\n" unless -d $home->rel_dir('t');

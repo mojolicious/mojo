@@ -3,21 +3,18 @@
 use strict;
 use warnings;
 
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
+use Mojo::Server::Hypnotoad;
+use Mojo::Util 'getopt';
+use Mojolicious::Command;
 
-GetOptions
+getopt \@ARGV,
   'f|foreground' => \$ENV{HYPNOTOAD_FOREGROUND},
   'h|help'       => \my $help,
   's|stop'       => \$ENV{HYPNOTOAD_STOP},
   't|test'       => \$ENV{HYPNOTOAD_TEST};
 
 my $app = shift || $ENV{HYPNOTOAD_APP};
-if ($help || !$app) {
-  require Mojolicious::Command;
-  die Mojolicious::Command->new->extract_usage;
-}
-
-require Mojo::Server::Hypnotoad;
+die Mojolicious::Command->new->extract_usage if $help || !$app;
 Mojo::Server::Hypnotoad->new->run($app);
 
 =encoding utf8

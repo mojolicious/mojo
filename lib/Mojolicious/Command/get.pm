@@ -1,13 +1,12 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON qw(encode_json j);
 use Mojo::JSON::Pointer;
 use Mojo::UserAgent;
-use Mojo::Util qw(decode encode);
+use Mojo::Util qw(getopt decode encode);
 use Scalar::Util 'weaken';
 
 has description => 'Perform HTTP request';
@@ -16,7 +15,7 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  GetOptionsFromArray \@args,
+  getopt \@args,
     'C|charset=s'            => \my $charset,
     'c|content=s'            => \(my $content = ''),
     'H|header=s'             => \my @headers,

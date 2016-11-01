@@ -2,8 +2,7 @@ package Mojolicious::Command::routes;
 use Mojo::Base 'Mojolicious::Command';
 
 use re 'regexp_pattern';
-use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
-use Mojo::Util qw(encode tablify);
+use Mojo::Util qw(encode getopt tablify);
 
 has description => 'Show available routes';
 has usage => sub { shift->extract_usage };
@@ -11,7 +10,7 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
+  getopt \@args, 'v|verbose' => \my $verbose;
 
   my $rows = [];
   _walk($_, 0, $rows, $verbose) for @{$self->app->routes->children};

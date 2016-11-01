@@ -1,8 +1,8 @@
 package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
+use Mojo::Util 'getopt';
 
 has description => 'Start application with HTTP and WebSocket server';
 has usage => sub { shift->extract_usage };
@@ -11,7 +11,7 @@ sub run {
   my ($self, @args) = @_;
 
   my $daemon = Mojo::Server::Daemon->new(app => $self->app);
-  GetOptionsFromArray \@args,
+  getopt \@args,
     'b|backlog=i'            => sub { $daemon->backlog($_[1]) },
     'c|clients=i'            => sub { $daemon->max_clients($_[1]) },
     'i|inactivity-timeout=i' => sub { $daemon->inactivity_timeout($_[1]) },

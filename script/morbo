@@ -14,8 +14,7 @@ getopt \@ARGV,
   'v|verbose'  => \$ENV{MORBO_VERBOSE},
   'w|watch=s'  => \my @watch;
 
-my $app = shift;
-die Mojolicious::Command->new->extract_usage if $help || !$app;
+die Mojolicious::Command->new->extract_usage if $help || !(my $app = shift);
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->daemon->listen(\@listen) if @listen;
 $morbo->watch(\@watch) if @watch;

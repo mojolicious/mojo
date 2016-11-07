@@ -1,5 +1,7 @@
 
-7.11  2016-11-02
+7.11  2016-11-07
+  - Improved one_tick method in Mojo::IOLoop to protect from recursion, similar
+    to the start method.
 
 7.10  2016-11-01
   - Added getopt function to Mojo::Util.

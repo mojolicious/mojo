@@ -42,6 +42,18 @@ Mojo::IOLoop->next_tick(
 Mojo::IOLoop->start;
 like $err, qr/^Mojo::IOLoop already running/, 'right error';
 
+# Double one_tick
+$err = undef;
+Mojo::IOLoop->next_tick(
+  sub {
+    my $loop = shift;
+    eval { $loop->one_tick };
+    $err = $@;
+  }
+);
+Mojo::IOLoop->one_tick;
+like $err, qr/^Mojo::IOLoop already running/, 'right error';
+
 # Basic functionality
 my ($ticks, $timer, $hirestimer);
 my $id = $loop->recurring(0 => sub { $ticks++ });

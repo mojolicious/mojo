@@ -81,7 +81,11 @@ sub next_tick {
   return $self->reactor->next_tick(sub { $self->$cb });
 }
 
-sub one_tick { _instance(shift)->reactor->one_tick }
+sub one_tick {
+  my $self = _instance(shift);
+  croak 'Mojo::IOLoop already running' if $self->is_running;
+  $self->reactor->one_tick;
+}
 
 sub recurring { shift->_timer(recurring => @_) }
 
@@ -482,8 +486,7 @@ callbacks that have been registered with this method, always returns C<undef>.
   Mojo::IOLoop->one_tick;
   $loop->one_tick;
 
-Run event loop until an event occurs. Note that this method can recurse back
-into the reactor, so you need to be careful.
+Run event loop until an event occurs.
 
   # Don't block longer than 0.5 seconds
   my $id = Mojo::IOLoop->timer(0.5 => sub {});

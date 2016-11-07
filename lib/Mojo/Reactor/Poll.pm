@@ -232,8 +232,7 @@ callbacks that have been registered with this method, always returns C<undef>.
 
   $reactor->one_tick;
 
-Run reactor until an event occurs or no events are being watched anymore. Note
-that this method can recurse back into the reactor, so you need to be careful.
+Run reactor until an event occurs or no events are being watched anymore.
 
   # Don't block longer than 0.5 seconds
   my $id = $reactor->timer(0.5 => sub {});

@@ -42,6 +42,10 @@ All templates should be in the C<templates> directories of the application,
 which can be customized with L<Mojolicious::Renderer/"paths">, or one of the
 the C<DATA> sections from L<Mojolicious::Renderer/"classes">.
 
+Any layouts should be directly under one of the C<templates> directories of the
+application (for example C<templates/layouts/example.layout.html.ep>) or one of
+the C<DATA> sections from L<Mojolicious::Rendered/"classes">.
+
   __DATA__
 
   @@ time.html.ep
@@ -570,6 +574,10 @@ but the C<layout> value needs to be passed as a render argument (not a stash
 value).
 
   my $html = $c->render_to_string('reminder', layout => 'mail');
+
+Note that when searching for a file based layout, the C<layout> helper will
+search for a C<layout> in a directory named C<layouts> in one of the
+C<templates> directories.
 
 =head2 Partial templates
 

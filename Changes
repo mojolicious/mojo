@@ -1,5 +1,5 @@
 
-7.11  2016-11-07
+7.11  2016-11-25
   - Improved one_tick method in Mojo::IOLoop to protect from recursion, similar
     to the start method.
 

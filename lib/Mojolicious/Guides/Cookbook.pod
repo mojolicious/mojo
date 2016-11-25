@@ -249,8 +249,7 @@ if you need WebSocket support, newer versions come with C<mod_proxy_wstunnel>.
   <VirtualHost *:80>
     ServerName localhost
     <Proxy *>
-      Order deny,allow
-      Allow from all
+      Require all granted
     </Proxy>
     ProxyRequests Off
     ProxyPreserveHost On

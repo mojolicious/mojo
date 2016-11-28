@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp ();
 use Mojo::Exception;
+use Mojo::Log;
 use Mojo::Util;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
@@ -23,23 +24,19 @@ has commands => sub {
   return $commands;
 };
 has controller_class => 'Mojolicious::Controller';
-
-has log => sub {
+has log              => sub {
   my $self = shift;
+
+  # Check if we have a log directory that is writable
   my $log  = Mojo::Log->new;
   my $home = $self->home;
   my $mode = $self->mode;
-
-  # Check if we have a log directory that is writable
   $log->path($home->rel_file("log/$mode.log"))
     if -d $home->rel_file('log') && -w _;
 
   # Reduced log output outside of development mode
-  $log->level('info') unless $mode eq 'development';
-
-  return $log;
+  return $mode eq 'development' ? $log : $log->level('info');
 };
-
 has mode => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
 has moniker  => sub { Mojo::Util::decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
@@ -408,8 +405,8 @@ loaded before the first request arrives.
   $app    = $app->log(Mojo::Log->new);
 
 The logging layer of your application, defaults to a L<Mojo::Log> object. The
-level will default to C<debug> if the L</mode> is C<development> or C<info>
-otherwise. All messages will be written to C<STDERR> or a C<log/$mode.log> file
+level will default to C<debug> if the L</mode> is C<development>, or C<info>
+otherwise. All messages will be written to C<STDERR>, or a C<log/$mode.log> file
 if a C<log> directory exists.
 
   # Log debug message

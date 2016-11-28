@@ -450,22 +450,17 @@ $t->get_ok('/just/some/template')->status_is(200)
   ->content_is("Development template with high precedence.\n");
 
 # Check default development mode log level
-my $app = Mojolicious->new;
-is $app->log->level, 'debug', 'right log level';
+is(Mojolicious->new->log->level, 'debug', 'right log level');
 
 # Check non-development mode log level
-$app = Mojolicious->new;
-$app->mode('test');
-is $app->log->level, 'info', 'right log level';
+is(Mojolicious->new->mode('test')->log->level, 'info', 'right log level');
 
 # Make sure we can override attributes with constructor arguments
-$app = MojoliciousTest->new(mode => 'test');
-is $app->mode, 'test', 'right mode';
-$app = MojoliciousTest->new({mode => 'test'});
-is $app->mode, 'test', 'right mode';
+is(MojoliciousTest->new(mode => 'test')->mode, 'test', 'right mode');
+is(MojoliciousTest->new({mode => 'test'})->mode, 'test', 'right mode');
 
 # Persistent error
-$app = MojoliciousTest->new;
+my $app = MojoliciousTest->new;
 my $tx = $t->ua->build_tx(GET => '/foo');
 $app->handler($tx);
 is $tx->res->code, 200, 'right status';

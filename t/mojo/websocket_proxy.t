@@ -160,7 +160,7 @@ is $result, 'http://example.com/proxy', 'right content';
 $ua->websocket(
   "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
-    Mojo::IOLoop->stop and return unless $tx->is_websocket;
+    return Mojo::IOLoop->stop unless $tx->is_websocket;
     $kept_alive = $tx->kept_alive;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
@@ -183,7 +183,7 @@ $result = undef;
 $ua->websocket(
   "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
-    Mojo::IOLoop->stop and return unless $tx->is_websocket;
+    return Mojo::IOLoop->stop unless $tx->is_websocket;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
@@ -201,10 +201,9 @@ my ($success, $leak, $err);
 $ua->websocket(
   "ws://127.0.0.1:$dummy/test" => sub {
     my ($ua, $tx) = @_;
-    Mojo::IOLoop->stop and return unless $tx->is_websocket;
     $success = $tx->success;
-    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
     $err     = $tx->error;
+    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection) if $tx->is_websocket;
     Mojo::IOLoop->stop;
   }
 );

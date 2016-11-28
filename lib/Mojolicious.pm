@@ -23,6 +23,23 @@ has commands => sub {
   return $commands;
 };
 has controller_class => 'Mojolicious::Controller';
+
+has log => sub {
+  my $self = shift;
+  my $log  = Mojo::Log->new;
+  my $home = $self->home;
+  my $mode = $self->mode;
+
+  # Check if we have a log directory that is writable
+  $log->path($home->rel_file("log/$mode.log"))
+    if -d $home->rel_file('log') && -w _;
+
+  # Reduced log output outside of development mode
+  $log->level('info') unless $mode eq 'development';
+
+  return $log;
+};
+
 has mode => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
 has moniker  => sub { Mojo::Util::decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
@@ -151,19 +168,11 @@ sub new {
   $r->hide(qw(rendered req res respond_to send session signed_cookie stash));
   $r->hide(qw(tx url_for validation write write_chunk));
 
-  # Check if we have a log directory that is writable
-  my $mode = $self->mode;
-  $self->log->path($home->rel_file("log/$mode.log"))
-    if -d $home->rel_file('log') && -w _;
-
   $self->plugin($_)
     for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
 
   # Exception handling should be first in chain
   $self->hook(around_dispatch => \&_exception);
-
-  # Reduced log output outside of development mode
-  $self->log->level('info') unless $mode eq 'development';
 
   $self->startup;
 
@@ -393,16 +402,26 @@ Class to be used for the default controller, defaults to
 L<Mojolicious::Controller>. Note that this class needs to have already been
 loaded before the first request arrives.
 
+=head2 log
+
+  my $log = $app->log;
+  $app    = $app->log(Mojo::Log->new);
+
+The logging layer of your application, defaults to a L<Mojo::Log> object. The
+level will default to C<debug> if the L</mode> is C<development> or C<info>
+otherwise. All messages will be written to C<STDERR> or a C<log/$mode.log> file
+if a C<log> directory exists.
+
+  # Log debug message
+  $app->log->debug('It works');
+
 =head2 mode
 
   my $mode = $app->mode;
   $app     = $app->mode('production');
 
 The operating mode for your application, defaults to a value from the
-C<MOJO_MODE> and C<PLACK_ENV> environment variables or C<development>. Right
-before calling L</"startup">, L<Mojolicious> will pick up the current mode,
-name the log file after it and raise the log level from C<debug> to C<info> if
-it has a value other than C<development>.
+C<MOJO_MODE> and C<PLACK_ENV> environment variables or C<development>.
 
 =head2 moniker
 
@@ -634,10 +653,9 @@ requests indiscriminately, for a full list of available hooks see L</"HOOKS">.
   my $app = Mojolicious->new({moniker => 'foo_bar'});
 
 Construct a new L<Mojolicious> application and call L</"startup">. Will
-automatically detect your home directory and set up logging based on your
-current operating mode. Also sets up the renderer, static file server, a
-default set of plugins and an L</"around_dispatch"> hook with the default
-exception handling.
+automatically detect your home directory. Also sets up the renderer, static file
+server, a default set of plugins and an L</"around_dispatch"> hook with the
+default exception handling.
 
 =head2 plugin
 

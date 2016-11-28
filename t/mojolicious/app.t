@@ -449,9 +449,14 @@ $t->get_ok('/just/some/template')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("Development template with high precedence.\n");
 
-# Check develpment mode log level
+# Check default development mode log level
 my $app = Mojolicious->new;
 is $app->log->level, 'debug', 'right log level';
+
+# Check non-development mode log level
+$app = Mojolicious->new;
+$app->mode('test');
+is $app->log->level, 'info', 'right log level';
 
 # Make sure we can override attributes with constructor arguments
 $app = MojoliciousTest->new(mode => 'test');

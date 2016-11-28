@@ -199,10 +199,9 @@ my ($success, $leak, $err);
 $ua->websocket(
   "ws://127.0.0.1:$dummy/test" => sub {
     my ($ua, $tx) = @_;
-    Mojo::IOLoop->stop and return unless $tx->is_websocket;
     $success = $tx->success;
-    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
     $err     = $tx->error;
+    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection) if $tx->is_websocket;
     Mojo::IOLoop->stop;
   }
 );

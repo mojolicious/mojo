@@ -1,7 +1,9 @@
 
-7.11  2016-11-25
+7.11  2016-11-28
   - Improved one_tick method in Mojo::IOLoop to protect from recursion, similar
     to the start method.
+  - Improved Mojolicious log attribute making it easier to override default
+    settings. (jberger)
 
 7.10  2016-11-01
   - Added getopt function to Mojo::Util.

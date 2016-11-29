@@ -9,7 +9,8 @@ use Scalar::Util 'weaken';
 
 has accepts => 10000;
 has cleanup => 1;
-has [qw(graceful_timeout heartbeat_timeout)] => 20;
+has graceful_timeout => 20;
+has heartbeat_timeout => sub { $ENV{MOJO_HEARTBEAT_TIMEOUT} // 20 };
 has heartbeat_interval => 5;
 has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
 has workers            => 4;
@@ -388,7 +389,8 @@ Heartbeat interval in seconds, defaults to C<5>.
   $prefork    = $prefork->heartbeat_timeout(2);
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped gracefully, defaults to C<20>.
+stopped gracefully, defaults to the value of the C<MOJO_HEARTBEAT_TIMEOUT>
+environment variable or C<20>.
 
 =head2 pid_file
 

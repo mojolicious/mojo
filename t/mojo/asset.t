@@ -238,6 +238,14 @@ ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';
 
+# Incomplete write
+{
+  no warnings 'redefine';
+  local *IO::Handle::syswrite = sub { $! = 0; 2 };
+  eval { Mojo::Asset::File->new->add_chunk('test') };
+  like $@, qr/Can't write to asset: .*/, 'right error';
+}
+
 # Abstract methods
 eval { Mojo::Asset->add_chunk };
 like $@, qr/Method "add_chunk" not implemented by subclass/, 'right error';

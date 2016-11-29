@@ -46,7 +46,8 @@ sub DESTROY {
 
 sub add_chunk {
   my ($self, $chunk) = @_;
-  defined $self->handle->syswrite($chunk) or croak "Can't write to asset: $!";
+  ($self->handle->syswrite($chunk) // -1) == length $chunk
+    or croak "Can't write to asset: $!";
   return $self;
 }
 

@@ -269,7 +269,7 @@ sub split_header        { _header(shift, 0) }
 sub spurt {
   my ($content, $path) = @_;
   open my $file, '>', $path or croak qq{Can't open file "$path": $!};
-  defined $file->syswrite($content)
+  ($file->syswrite($content) // -1) == length $content
     or croak qq{Can't write to file "$path": $!};
   return $content;
 }

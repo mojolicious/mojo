@@ -5,8 +5,10 @@
     to the start method.
   - Improved log attribute in Mojolicious making it easier to override default
     settings. (jberger)
-  - Fixed a bug in Mojo::Server::Prefork where workers would accept keep-alive
+  - Fixed bug in Mojo::Server::Prefork where workers would accept keep-alive
     requests after a graceful shutdown had already been initiated.
+  - Fixed bugs in Mojo::Util and Mojo::Asset::File where incomplete writes would
+    not be recognized as errors. (bobkare, sri)
 
 7.10  2016-11-01
   - Added getopt function to Mojo::Util.

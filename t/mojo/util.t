@@ -422,6 +422,14 @@ my $file = catfile $dir, 'test.txt';
 spurt "just\nworks!", $file;
 is slurp($file), "just\nworks!", 'successful roundtrip';
 
+# spurt (incomplete write)
+{
+  no warnings 'redefine';
+  local *IO::Handle::syswrite = sub { $! = 0; 5 };
+  eval { spurt "just\nworks!", $file };
+  like $@, qr/Can't write to file ".*/, 'right error';
+}
+
 # files
 is_deeply [files 'does_not_exist'], [], 'no files';
 is_deeply [files __FILE__],         [], 'no files';

@@ -38,26 +38,11 @@ has log              => sub {
   return $mode eq 'development' ? $log : $log->level('info');
 };
 has mode => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
-has moniker => sub { Mojo::Util::decamelize ref shift };
-has plugins => sub { Mojolicious::Plugins->new };
-has renderer => sub {
-  Mojolicious::Renderer->new(paths => [shift->home->rel_dir('templates')]);
-};
-has routes => sub {
-  my $self = shift;
-
-  # Hide controller attributes/methods
-  my $r = Mojolicious::Routes->new;
-  $r->hide(qw(app continue cookie every_cookie every_param));
-  $r->hide(qw(every_signed_cookie finish flash helpers match on param));
-  $r->hide(qw(redirect_to render render_later render_maybe render_to_string));
-  $r->hide(qw(rendered req res respond_to send session signed_cookie stash));
-  $r->hide(qw(tx url_for validation write write_chunk));
-
-  # Default to controller and application namespace
-  return $r->namespaces(["@{[ref $self]}::Controller", ref $self]);
-};
-has secrets => sub {
+has moniker  => sub { Mojo::Util::decamelize ref shift };
+has plugins  => sub { Mojolicious::Plugins->new };
+has renderer => sub { Mojolicious::Renderer->new };
+has routes   => sub { Mojolicious::Routes->new };
+has secrets  => sub {
   my $self = shift;
 
   # Warn developers about insecure default
@@ -66,9 +51,8 @@ has secrets => sub {
   # Default to moniker
   return [$self->moniker];
 };
-has sessions => sub { Mojolicious::Sessions->new };
-has static =>
-  sub { Mojolicious::Static->new(paths => [shift->home->rel_dir('public')]) };
+has sessions  => sub { Mojolicious::Sessions->new };
+has static    => sub { Mojolicious::Static->new };
 has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
@@ -166,6 +150,20 @@ sub hook { shift->plugins->on(@_) }
 
 sub new {
   my $self = shift->SUPER::new(@_);
+
+  my $home = $self->home;
+  push @{$self->renderer->paths}, $home->rel_dir('templates');
+  push @{$self->static->paths},   $home->rel_dir('public');
+
+  # Default to controller and application namespace
+  my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
+
+  # Hide controller attributes/methods
+  $r->hide(qw(app continue cookie every_cookie every_param));
+  $r->hide(qw(every_signed_cookie finish flash helpers match on param));
+  $r->hide(qw(redirect_to render render_later render_maybe render_to_string));
+  $r->hide(qw(rendered req res respond_to send session signed_cookie stash));
+  $r->hide(qw(tx url_for validation write write_chunk));
 
   $self->plugin($_)
     for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
@@ -651,9 +649,10 @@ requests indiscriminately, for a full list of available hooks see L</"HOOKS">.
   my $app = Mojolicious->new(moniker => 'foo_bar');
   my $app = Mojolicious->new({moniker => 'foo_bar'});
 
-Construct a new L<Mojolicious> application and call L</"startup">. Also sets up
-a default set of plugins and an L</"around_dispatch"> hook with the default
-exception handling.
+Construct a new L<Mojolicious> application and call L</"startup">. Will
+automatically detect your home directory. Also sets up the renderer, static file
+server, a default set of plugins and an L</"around_dispatch"> hook with the
+default exception handling.
 
 =head2 plugin
 

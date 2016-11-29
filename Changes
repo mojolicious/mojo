@@ -3,8 +3,8 @@
   - Added EXPERIMENTAL close_idle_connections method to Mojo::Server::Daemon.
   - Improved one_tick method in Mojo::IOLoop to protect from recursion, similar
     to the start method.
-  - Improved log, renderer, routes and static attributes in Mojolicious, making
-    it easier to override default settings. (jberger, sri)
+  - Improved log attribute in Mojolicious to make it easier to override default
+    settings. (jberger)
   - Fixed bug in Mojo::Server::Prefork where workers would accept keep-alive
     requests after a graceful shutdown had already been initiated.
   - Fixed bugs in Mojo::Util and Mojo::Asset::File where incomplete writes would

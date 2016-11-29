@@ -61,6 +61,7 @@ my $port1  = Mojo::IOLoop::Server->generate_port;
 my $port2  = Mojo::IOLoop::Server->generate_port;
 spurt <<EOF, $script;
 use Mojolicious::Lite;
+use Mojo::IOLoop;
 
 app->log->path('$log');
 
@@ -76,6 +77,19 @@ plugin Config => {
 app->log->level('debug');
 
 get '/hello' => {text => 'Hello Hypnotoad!'};
+
+my \$graceful;
+Mojo::IOLoop->singleton->on(finish => sub { \$graceful++ });
+
+get '/graceful' => sub {
+  my \$c = shift;
+  my \$id;
+  \$id = Mojo::IOLoop->recurring(0 => sub {
+    return unless \$graceful;
+    \$c->render(text => 'Graceful shutdown!');
+    Mojo::IOLoop->remove(\$id);
+  });
+};
 
 app->start;
 EOF
@@ -130,6 +144,12 @@ app->start;
 EOF
 open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
 
+# Wait for hot deployment to fail
+while (1) {
+  last if slurp($log) =~ qr/Zero downtime software upgrade failed/;
+  sleep 1;
+}
+
 # Connection did not get lost
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
@@ -146,11 +166,10 @@ ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
-# Wait for hot deployment to fail
-while (1) {
-  last if slurp($log) =~ qr/Zero downtime software upgrade failed/;
-  sleep 1;
-}
+# Request that will be served after graceful shutdown has been initiated
+$tx = $ua->build_tx(GET => "http://127.0.0.1:$port1/graceful");
+$ua->start($tx => sub { });
+Mojo::IOLoop->one_tick until $tx->req->is_finished;
 
 # Update script
 spurt <<EOF, $script;
@@ -172,30 +191,11 @@ plugin Config => {
 
 app->log->level('debug');
 
-get '/hello' => {text => 'Hello World!'};
+get '/hello' => sub { shift->render(text => "Hello World \$\$!") };
 
 app->start;
 EOF
 open $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
-
-# Connection did not get lost
-$tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
-is $tx->res->body, 'Hello Hypnotoad!', 'right content';
-
-# Connection did not get lost (second port)
-$tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_finished, 'transaction is finished';
-ok $tx->keep_alive,  'connection will be kept alive';
-ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
-is $tx->res->body, 'Hello Hypnotoad!', 'right content';
-
-# Remove keep-alive connections
-$ua = Mojo::UserAgent->new;
 
 # Wait for hot deployment to finish
 while (1) {
@@ -204,37 +204,47 @@ while (1) {
   last if $new ne $old;
 }
 
+# Request that will be served by an old worker that is still running
+Mojo::IOLoop->one_tick until $tx->is_finished;
+ok !$tx->keep_alive, 'connection will not be kept alive';
+ok !$tx->kept_alive, 'connection was not kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Graceful shutdown!', 'right content';
+
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200,            'right status';
-is $tx->res->body, 'Hello World!', 'right content';
+is $tx->res->code, 200, 'right status';
+my $first = $tx->res->body;
+like $first, qr/Hello World \d+!/, 'right content';
 
 # Application has been reloaded (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200,            'right status';
-is $tx->res->body, 'Hello World!', 'right content';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $first, 'same content';
 
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200,            'right status';
-is $tx->res->body, 'Hello World!', 'right content';
+is $tx->res->code, 200, 'right status';
+my $second = $tx->res->body;
+isnt $first, $second, 'different content';
+like $second, qr/Hello World \d+!/, 'right content';
 
 # Same result (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200,            'right status';
-is $tx->res->body, 'Hello World!', 'right content';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $second, 'same content';
 
 # Stop
 open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '-s';

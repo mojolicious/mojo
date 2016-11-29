@@ -148,6 +148,7 @@ sub _spawn {
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(CHLD INT TERM TTIN TTOU);
   $SIG{QUIT} = sub { $loop->stop_gracefully };
+  $loop->on(finish => sub { $self->max_requests(1)->close_idle_connections });
   delete $self->{reader};
   srand;
 
@@ -373,7 +374,8 @@ a true value.
   $prefork    = $prefork->graceful_timeout(15);
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
-being forced, defaults to C<20>.
+being forced, defaults to C<20>. Note that this value should usually be a little
+larger than the maximum amount of time you expect any one request to take.
 
 =head2 heartbeat_interval
 
@@ -388,7 +390,9 @@ Heartbeat interval in seconds, defaults to C<5>.
   $prefork    = $prefork->heartbeat_timeout(2);
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped gracefully, defaults to C<20>.
+stopped gracefully, defaults to C<20>. Note that this value should usually be a
+little larger than the maximum amount of time you expect any one operation to
+block the event loop.
 
 =head2 pid_file
 

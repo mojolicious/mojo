@@ -280,7 +280,9 @@ instead for better performance.
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
 being forced, defaults to the value of
-L<Mojo::Server::Prefork/"graceful_timeout">.
+L<Mojo::Server::Prefork/"graceful_timeout">. Note that this value should usually
+be a little larger than the maximum amount of time you expect any one request to
+take.
 
 =head2 heartbeat_interval
 
@@ -295,7 +297,9 @@ L<Mojo::Server::Prefork/"heartbeat_interval">.
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
 stopped gracefully, defaults to the value of
-L<Mojo::Server::Prefork/"heartbeat_timeout">.
+L<Mojo::Server::Prefork/"heartbeat_timeout">. Note that this value should
+usually be a little larger than the maximum amount of time you expect any one
+operation to block the event loop.
 
 =head2 inactivity_timeout
 

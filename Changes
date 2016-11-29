@@ -1,9 +1,12 @@
 
-7.11  2016-11-28
+7.11  2016-11-29
+  - Added EXPERIMENTAL close_idle_connections method to Mojo::Server::Daemon.
   - Improved one_tick method in Mojo::IOLoop to protect from recursion, similar
     to the start method.
   - Improved log attribute in Mojolicious making it easier to override default
     settings. (jberger)
+  - Fixed a bug in Mojo::Server::Prefork where workers would accept keep-alive
+    requests after a graceful shutdown had already been initiated.
 
 7.10  2016-11-01
   - Added getopt function to Mojo::Util.

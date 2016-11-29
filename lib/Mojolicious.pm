@@ -41,9 +41,7 @@ has mode => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
 has moniker => sub { Mojo::Util::decamelize ref shift };
 has plugins => sub { Mojolicious::Plugins->new };
 has renderer => sub {
-  my $renderer = Mojolicious::Renderer->new;
-  push @{$renderer->paths}, shift->home->rel_dir('templates');
-  return $renderer;
+  Mojolicious::Renderer->new(paths => [shift->home->rel_dir('templates')]);
 };
 has routes => sub {
   my $self = shift;
@@ -69,11 +67,8 @@ has secrets => sub {
   return [$self->moniker];
 };
 has sessions => sub { Mojolicious::Sessions->new };
-has static => sub {
-  my $static = Mojolicious::Static->new;
-  push @{$static->paths}, shift->home->rel_dir('public');
-  return $static;
-};
+has static =>
+  sub { Mojolicious::Static->new(paths => [shift->home->rel_dir('public')]) };
 has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 

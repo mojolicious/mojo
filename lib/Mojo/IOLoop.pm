@@ -337,7 +337,8 @@ The maximum number of connections this event loop is allowed to accept, before
 shutting down gracefully without interrupting existing connections, defaults to
 C<0>. Setting the value to C<0> will allow this event loop to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
-randomly to improve load balancing between multiple server processes.
+randomly to improve load balancing between multiple server processes, and to
+make sure that not all of them restart at the same time.
 
 =head2 max_connections
 

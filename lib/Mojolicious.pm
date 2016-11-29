@@ -930,6 +930,8 @@ Kitamura Akatsuki
 
 Klaus S. Madsen
 
+Knut Arne Bjorndal
+
 Lars Balker Rasmussen
 
 Lee Johnson

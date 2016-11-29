@@ -358,7 +358,8 @@ Maximum number of connections a worker is allowed to accept, before stopping
 gracefully and then getting replaced with a newly started worker, passed along
 to L<Mojo::IOLoop/"max_accepts">, defaults to C<10000>. Setting the value to
 C<0> will allow workers to accept new connections indefinitely. Note that up to
-half of this value can be subtracted randomly to improve load balancing.
+half of this value can be subtracted randomly to improve load balancing, and to
+make sure that not all workers restart at the same time.
 
 =head2 cleanup
 

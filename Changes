@@ -1,4 +1,6 @@
 
+7.12  2016-12-01
+
 7.11  2016-11-30
   - Added EXPERIMENTAL close_idle_connections method to Mojo::Server::Daemon.
   - Improved one_tick method in Mojo::IOLoop to protect from recursion, similar

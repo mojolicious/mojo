@@ -728,6 +728,7 @@ Get L<Mojo::Message::Request> object from L</"tx">.
   my $req = $c->tx->req;
 
   # Extract request information
+  my $method = $c->req->method;
   my $url    = $c->req->url->to_abs;
   my $info   = $c->req->url->to_abs->userinfo;
   my $host   = $c->req->url->to_abs->host;

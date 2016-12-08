@@ -629,7 +629,7 @@ Opposite of L</"content_like">.
 
   $t = $t->delete_ok('http://example.com/foo');
   $t = $t->delete_ok('/foo');
-  $t = $t->delete_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->delete_ok('/foo' => {Accept => '*/*'} => 'Content!');
   $t = $t->delete_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->delete_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
@@ -685,7 +685,7 @@ Wait for WebSocket connection to be closed gracefully and check status.
 
   $t = $t->get_ok('http://example.com/foo');
   $t = $t->get_ok('/foo');
-  $t = $t->get_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->get_ok('/foo' => {Accept => '*/*'} => 'Content!');
   $t = $t->get_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->get_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
@@ -708,7 +708,7 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
 
   $t = $t->head_ok('http://example.com/foo');
   $t = $t->head_ok('/foo');
-  $t = $t->head_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->head_ok('/foo' => {Accept => '*/*'} => 'Content!');
   $t = $t->head_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->head_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
@@ -884,7 +884,7 @@ Construct a new L<Test::Mojo> object.
 
   $t = $t->options_ok('http://example.com/foo');
   $t = $t->options_ok('/foo');
-  $t = $t->options_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->options_ok('/foo' => {Accept => '*/*'} => 'Content!');
   $t = $t->options_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->options_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
@@ -905,7 +905,7 @@ Execute callback if the value of L</"success"> is false.
 
   $t = $t->patch_ok('http://example.com/foo');
   $t = $t->patch_ok('/foo');
-  $t = $t->patch_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->patch_ok('/foo' => {Accept => '*/*'} => 'Content!');
   $t = $t->patch_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->patch_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
@@ -916,7 +916,7 @@ arguments as L<Mojo::UserAgent/"patch">, except for the callback.
 
   $t = $t->post_ok('http://example.com/foo');
   $t = $t->post_ok('/foo');
-  $t = $t->post_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->post_ok('/foo' => {Accept => '*/*'} => 'Content!');
   $t = $t->post_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->post_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
@@ -936,7 +936,7 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
 
   $t = $t->put_ok('http://example.com/foo');
   $t = $t->put_ok('/foo');
-  $t = $t->put_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->put_ok('/foo' => {Accept => '*/*'} => 'Content!');
   $t = $t->put_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->put_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 

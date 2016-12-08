@@ -642,7 +642,7 @@ implements the following new ones.
 
   my $tx = $ua->build_tx(GET => 'example.com');
   my $tx = $ua->build_tx(
-    PUT => 'http://example.com' => {Accept => '*/*'} => 'Hi!');
+    PUT => 'http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->build_tx(
     PUT => 'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->build_tx(
@@ -697,7 +697,7 @@ L<Mojo::UserAgent::Transactor/"websocket">.
 =head2 delete
 
   my $tx = $ua->delete('example.com');
-  my $tx = $ua->delete('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $ua->delete('http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->delete(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->delete(
@@ -717,7 +717,7 @@ implied). You can also append a callback to perform requests non-blocking.
 =head2 get
 
   my $tx = $ua->get('example.com');
-  my $tx = $ua->get('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $ua->get('http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->get(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->get(
@@ -737,7 +737,7 @@ perform requests non-blocking.
 =head2 head
 
   my $tx = $ua->head('example.com');
-  my $tx = $ua->head('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $ua->head('http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->head(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->head(
@@ -757,7 +757,7 @@ implied). You can also append a callback to perform requests non-blocking.
 =head2 options
 
   my $tx = $ua->options('example.com');
-  my $tx = $ua->options('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $ua->options('http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->options(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->options(
@@ -777,7 +777,7 @@ implied). You can also append a callback to perform requests non-blocking.
 =head2 patch
 
   my $tx = $ua->patch('example.com');
-  my $tx = $ua->patch('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $ua->patch('http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->patch(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->patch(
@@ -797,7 +797,7 @@ implied). You can also append a callback to perform requests non-blocking.
 =head2 post
 
   my $tx = $ua->post('example.com');
-  my $tx = $ua->post('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $ua->post('http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->post(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->post(
@@ -817,7 +817,7 @@ implied). You can also append a callback to perform requests non-blocking.
 =head2 put
 
   my $tx = $ua->put('example.com');
-  my $tx = $ua->put('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $ua->put('http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->put(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->put(

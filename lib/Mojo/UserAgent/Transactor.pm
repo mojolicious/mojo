@@ -366,10 +366,11 @@ C<307> or C<308> redirect response if possible.
   my $tx = $t->tx(GET  => 'example.com');
   my $tx = $t->tx(POST => 'http://example.com');
   my $tx = $t->tx(GET  => 'http://example.com' => {Accept => '*/*'});
-  my $tx = $t->tx(PUT  => 'http://example.com' => 'Hi!');
+  my $tx = $t->tx(PUT  => 'http://example.com' => 'Content!');
   my $tx = $t->tx(PUT  => 'http://example.com' => form => {a => 'b'});
   my $tx = $t->tx(PUT  => 'http://example.com' => json => {a => 'b'});
-  my $tx = $t->tx(POST => 'http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $t->tx(
+    POST => 'http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $t->tx(
     PUT => 'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $t->tx(

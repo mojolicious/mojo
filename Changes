@@ -1,5 +1,5 @@
 
-7.12  2016-12-03
+7.12  2016-12-09
 
 7.11  2016-11-30
   - Added EXPERIMENTAL close_idle_connections method to Mojo::Server::Daemon.

@@ -14,6 +14,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 has ca              => sub { $ENV{MOJO_CA_FILE} };
+has ca_path         => sub { $ENV{MOJO_CA_PATH} };
 has cert            => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
 has cookie_jar      => sub { Mojo::UserAgent::CookieJar->new };
@@ -93,7 +94,7 @@ sub _connect {
   }
 
   # TLS
-  map { $options{"tls_$_"} = $self->$_ } qw(ca cert key)
+  map { $options{"tls_$_"} = $self->$_ } qw(ca ca_path cert key)
     if ($options{tls} = $proto eq 'https');
 
   weaken $self;
@@ -470,6 +471,15 @@ activates hostname verification.
   # Show certificate authorities for debugging
   IO::Socket::SSL::set_defaults(
     SSL_verify_callback => sub { say "Authority: $_[2]" and return $_[0] });
+
+=head2 ca_path
+
+  my $ca_path = $ua->ca_path;
+  $ua         = $ua->ca_path('/etc/ssl/certs');
+
+Path to TLS certificate authority directory used to verify the peer certificate,
+defaults to the value of the C<MOJO_CA_PATH> environment variable. Also
+activates hostname verification.
 
 =head2 cert
 

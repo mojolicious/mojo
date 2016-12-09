@@ -171,14 +171,16 @@ sub _try_tls {
   my %options = (
     SSL_ca_file => $args->{tls_ca}
       && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+    SSL_ca_path => $args->{tls_ca_path}
+      && -d $args->{tls_ca_path} ? $args->{tls_ca_path} : undef,
     SSL_cert_file  => $args->{tls_cert},
     SSL_error_trap => sub { $self->emit(error => $_[1]) },
     SSL_hostname   => IO::Socket::SSL->can_client_sni ? $args->{address} : '',
     SSL_key_file   => $args->{tls_key},
     SSL_startHandshake  => 0,
-    SSL_verify_mode     => $args->{tls_ca} ? 0x01 : 0x00,
+    SSL_verify_mode     => ($args->{tls_ca} || $args->{tls_ca_path}) ? 0x01 : 0x00,
     SSL_verifycn_name   => $args->{address},
-    SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
+    SSL_verifycn_scheme => ($args->{tls_ca} || $args->{tls_ca_path}) ? 'http' : undef
   );
   my $reactor = $self->reactor;
   $reactor->remove($handle);
@@ -343,6 +345,12 @@ Enable TLS.
   tls_ca => '/etc/tls/ca.crt'
 
 Path to TLS certificate authority file. Also activates hostname verification.
+
+=item tls_ca_path
+
+  tls_ca_path => '/etc/ssl/certs'
+
+Path to TLS certificate authority directory. Also activates hostname verification.
 
 =item tls_cert
 

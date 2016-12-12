@@ -37,11 +37,16 @@ sub dispatch {
 }
 
 sub file {
-  my ($self, $rel) = @_;
+  my ($self, $rel, $c) = @_;
 
   # Search all paths
   for my $path (@{$self->paths}) {
-    next unless my $asset = $self->_get_file(catfile $path, split('/', $rel));
+    my $asset;
+    unless( $asset = $self->_get_file(catfile $path, split('/', $rel)) ) {
+      $c->app->log->debug("Did not find $rel in $path") if $c;
+      next;
+    }
+    $c->app->log->debug("Found $rel in $path") if $c;
     return $asset;
   }
 
@@ -76,7 +81,7 @@ sub is_fresh {
 sub serve {
   my ($self, $c, $rel) = @_;
 
-  return undef unless my $asset = $self->file($rel);
+  return undef unless my $asset = $self->file($rel, $c);
   my $headers = $c->res->headers;
   return !!$self->serve_asset($c, $asset) if $headers->content_type;
 
@@ -223,6 +228,11 @@ exist. Note that this method uses a relative path, but does not protect from
 traversing to parent directories.
 
   my $content = $static->file('foo/bar.html')->slurp;
+
+With a controller as the second argument, C<file> can log debugging 
+information.
+
+  my $asset = $static->file('images/logo.png', $c);
 
 =head2 is_fresh
 

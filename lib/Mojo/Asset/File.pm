@@ -10,6 +10,7 @@ use IO::File;
 use Mojo::Util 'md5_sum';
 
 has [qw(cleanup path)];
+has mode => sub { return 'ro' };
 has handle => sub {
   my $self = shift;
 
@@ -17,7 +18,8 @@ has handle => sub {
   my $handle = IO::File->new;
   my $path   = $self->path;
   if (defined $path && -f $path) {
-    $handle->open($path, O_RDONLY) or croak qq{Can't open file "$path": $!};
+    my $mode = $self->mode  eq 'rw' ? O_APPEND | O_RDWR : O_RDONLY;
+    $handle->open($path, $mode) or croak qq{Can't open file "$path": $!};
     return $handle;
   }
 
@@ -165,6 +167,12 @@ L<Mojo::Asset::File> inherits all events from L<Mojo::Asset>.
 
 L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and implements
 the following new ones.
+
+=head2 mode
+
+  $file->mode($bool);
+
+If true, operation of the existing file support writing.
 
 =head2 cleanup
 

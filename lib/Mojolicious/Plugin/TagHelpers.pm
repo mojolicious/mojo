@@ -303,10 +303,9 @@ automatically get picked up and shown as default.
 
 =head2 csrf_button_to
 
-  %= csrf_button_to 'Remove' => 'some_delete_route'
+  %= csrf_button_to Remove => 'some_delete_route'
 
-Same as L</"button_to">, but also includes a field generated with
-L</"csrf_field">.
+Same as L</"button_to">, but also includes a L</"csrf_field">.
 
   <form action="/path/to/delete/route?_method=DELETE" method="POST">
     <input name="csrf_token" type="hidden" value="fa6a08...">

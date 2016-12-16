@@ -316,7 +316,11 @@ $t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
 my $token = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->val;
 $t->post_ok('/forgery' => form => {csrf_token => $token, foo => 'bar'})
   ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
+  ->element_exists('[value=bar]')->element_exists_not('.field-with-error')
+  ->element_count_is('[name=csrf_token]', 2)->element_count_is('form', 2)
+  ->element_exists('form > input[name=csrf_token] + input[type=submit]');
+is $t->tx->res->dom->find('[name=csrf_token]')->[0]->val,
+  $t->tx->res->dom->find('[name=csrf_token]')->[1]->val, 'same token';
 
 # Correct CSRF token (header)
 $t->post_ok('/forgery' => {'X-CSRF-Token' => $token} => form => {foo => 'bar'})
@@ -391,3 +395,4 @@ __DATA__
   %= csrf_field
   %= text_field 'foo'
 %= end
+%= csrf_button_to Root => '/'

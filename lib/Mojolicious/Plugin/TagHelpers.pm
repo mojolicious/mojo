@@ -21,7 +21,9 @@ sub register {
   );
   $app->helper($_ => __PACKAGE__->can("_$_")) for @helpers;
 
+  $app->helper(button_to => sub { _button_to(0, @_) });
   $app->helper(check_box => sub { _input(@_, type => 'checkbox') });
+  $app->helper(csrf_button_to => sub { _button_to(1, @_) });
   $app->helper(file_field => sub { _empty_field('file', @_) });
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
   $app->helper(input_tag      => sub { _input(@_) });
@@ -30,6 +32,12 @@ sub register {
 
   # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
+}
+
+sub _button_to {
+  my ($csrf, $c, $text) = (shift, shift, shift);
+  my $prefix = $csrf ? _csrf_field($c) : '';
+  return _form_for($c, @_, sub { $prefix . _submit_button($c, $text) });
 }
 
 sub _csrf_field {
@@ -245,6 +253,28 @@ by default.
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
 
+=head2 button_to
+
+  %= button_to Test => 'some_get_route'
+  %= button_to Test => some_get_route => {id => 23} => (class => 'menu')
+  %= button_to Test => 'http://example.com/test' => (class => 'menu')
+  %= button_to Remove => 'some_delete_route'
+
+Generate portable C<form> tag with L</"form_for">, containing a single button.
+
+  <form action="/path/to/get/route">
+    <input type="submit" value="Test">
+  </form>
+  <form action="/path/to/get/route/23" class="menu">
+    <input type="submit" value="Test">
+  </form>
+  <form action="http://example.com/test" class="menu">
+    <input type="submit" value="Test">
+  </form>
+  <form action="/path/to/delete/route?_method=DELETE" method="POST">
+    <input type="submit" value="Remove">
+  </form>
+
 =head2 check_box
 
   %= check_box 'employed'
@@ -270,6 +300,18 @@ automatically get picked up and shown as default.
   <input name="background" type="color">
   <input name="background" type="color" value="#ffffff">
   <input id="foo" name="background" type="color" value="#ffffff">
+
+=head2 csrf_button_to
+
+  %= csrf_button_to 'Remove' => 'some_delete_route'
+
+Same as L</"button_to">, but also includes a field generated with
+L</"csrf_field">.
+
+  <form action="/path/to/delete/route?_method=DELETE" method="POST">
+    <input name="csrf_token" type="hidden" value="fa6a08...">
+    <input type="submit" value="Remove">
+  </form>
 
 =head2 csrf_field
 

@@ -1,5 +1,7 @@
 
-7.12  2016-12-09
+7.12  2016-12-17
+  - Added button_to and csrf_button_to helpers to
+    Mojolicious::Plugin::TagHelpers.
 
 7.11  2016-11-30
   - Added EXPERIMENTAL close_idle_connections method to Mojo::Server::Daemon.

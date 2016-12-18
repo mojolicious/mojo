@@ -81,8 +81,7 @@ Mojo::IOLoop::Subprocess - Subprocesses
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Subprocess> allows L<Mojo::IOLoop> to perform computationally
-expensive operations in subprocesses, without blocking the event loop. Note that
-this module is EXPERIMENTAL and might change without warning!
+expensive operations in subprocesses, without blocking the event loop.
 
 =head1 ATTRIBUTES
 

@@ -613,8 +613,7 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 Build L<Mojo::IOLoop::Subprocess> object to perform computationally expensive
 operations in subprocesses, without blocking the event loop. Callbacks will be
-passed along to L<Mojo::IOLoop::Subprocess/"run">. Note that this method is
-EXPERIMENTAL and might change without warning!
+passed along to L<Mojo::IOLoop::Subprocess/"run">.
 
   # Operation that would block the event loop for 5 seconds
   Mojo::IOLoop->subprocess(

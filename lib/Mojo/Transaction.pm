@@ -234,7 +234,7 @@ proxy.
 Returns the L<Mojo::Message::Response> object from L</"res"> or dies if a
 connection error has occured.
 
-  # Fine grained response handling
+  # Fine grained response handling (dies on connection errors)
   my $res = $tx->result;
   if    ($res->is_success)  { say $res->body }
   elsif ($res->is_error)    { say $res->message }
@@ -263,7 +263,7 @@ Returns the L<Mojo::Message::Response> object from L</"res"> if transaction was
 successful or C<undef> otherwise. Connection and parser errors have only a
 message in L</"error">, C<400> and C<500> responses also a code.
 
-  # Sensible exception handling
+  # Manual exception handling
   if (my $res = $tx->success) { say $res->body }
   else {
     my $err = $tx->error;

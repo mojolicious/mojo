@@ -376,7 +376,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     ->get('https://www.github.com/kraih/mojo/tarball/master')
     ->res->content->asset->move_to('/home/sri/mojo.tar.gz');
 
-  # Form POST (application/x-www-form-urlencoded) with exception handling
+  # Form POST (application/x-www-form-urlencoded) with manual exception handling
   my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {

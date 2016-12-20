@@ -194,7 +194,7 @@ commonly used together with L</"success">.
   # Longer version
   my $err = $tx->req->error || $tx->res->error;
 
-  # Check for different kinds of errors
+  # Check for 4xx/5xx response and connection errors
   if (my $err = $tx->error) {
     die "$err->{code} response: $err->{message}" if $err->{code};
     die "Connection error: $err->{message}";

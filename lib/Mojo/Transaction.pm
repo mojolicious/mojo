@@ -41,6 +41,12 @@ sub remote_address {
     : $self->original_remote_address;
 }
 
+sub result {
+  my $self = shift;
+  my $err  = $self->error;
+  return !$err || $err->{code} ? $self->res : croak $err->{message};
+}
+
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
@@ -220,6 +226,20 @@ False, this is not a L<Mojo::Transaction::WebSocket> object.
 Same as L</"original_remote_address"> or the last value of the
 C<X-Forwarded-For> header if L</"req"> has been performed through a reverse
 proxy.
+
+=head2 result
+
+  my $res = $tx->result;
+
+Returns the L<Mojo::Message::Response> object from L</"res"> or dies if a
+connection error has occured.
+
+  # Fine grained response handling
+  my $res = $tx->result;
+  if    ($res->is_success)  { say $res->body }
+  elsif ($res->is_error)    { say $res->message }
+  elsif ($res->code == 301) { say $res->headers->location }
+  else                      { say 'Whatever...' }
 
 =head2 server_read
 

@@ -327,6 +327,8 @@ ok !$tx->success, 'not successful';
 is $tx->error->{message}, 'Premature connection close', 'right error';
 is $timeout, 1, 'finish event has been emitted';
 like $log, qr/Inactivity timeout/, 'right log message';
+eval { $tx->result };
+like $@, qr/Premature connection close/, 'right error';
 
 # Client times out
 $ua->once(
@@ -343,6 +345,8 @@ $ua->once(
 $tx = $ua->get('/timeout?timeout=5');
 ok !$tx->success, 'not successful';
 is $tx->error->{message}, 'Inactivity timeout', 'right error';
+eval { $tx->result };
+like $@, qr/Inactivity timeout/, 'right error';
 
 # Keep alive connection times out
 my $id;
@@ -372,7 +376,9 @@ ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 
 # 404 response
 $tx = $ua->get('/does_not_exist');
-ok !$tx->success,    'not successful';
+ok !$tx->success, 'not successful';
+ok $tx->result, 'has a result';
+is $tx->result->code, 404, 'right status';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->error->{message}, 'Not Found', 'right error';
@@ -388,7 +394,9 @@ is $tx->error->{code},    404,         'right status';
 $tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');
 $tx = $ua->start($ua->build_tx(GET => '/echo' => 'Hello GZip!'));
 ok $tx->success, 'successful';
-is $tx->res->code, 200, 'right status';
+ok $tx->result,  'has a result';
+is $tx->result->code, 200, 'right status';
+is $tx->res->code,    200, 'right status';
 is $tx->res->headers->content_encoding, undef, 'no "Content-Encoding" value';
 is $tx->res->body, 'Hello GZip!', 'right content';
 $tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');

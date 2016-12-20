@@ -342,14 +342,12 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $ua = Mojo::UserAgent->new;
   say $ua->get('www.☃.net?hello=there' => {Accept => '*/*'})->res->body;
 
-  # Form POST (application/x-www-form-urlencoded) with exception handling
-  my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
-  if (my $res = $tx->success) { say $res->body }
-  else {
-    my $err = $tx->error;
-    die "$err->{code} response: $err->{message}" if $err->{code};
-    die "Connection error: $err->{message}";
-  }
+  # Fine grained response handling (dies on connection errors)
+  my $res = $ua->get('mojolicious.org/perldoc')->result;
+  if    ($res->is_success)  { say $res->body }
+  elsif ($res->is_error)    { say $res->message }
+  elsif ($res->code == 301) { say $res->headers->location }
+  else                      { say 'Whatever...' }
 
   # Extract data from HTML and XML resources with CSS selectors
   say $ua->get('www.perl.org')->res->dom->at('title')->text;
@@ -377,6 +375,15 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   $ua->max_redirects(5)
     ->get('https://www.github.com/kraih/mojo/tarball/master')
     ->res->content->asset->move_to('/home/sri/mojo.tar.gz');
+
+  # Form POST (application/x-www-form-urlencoded) with exception handling
+  my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
+  if (my $res = $tx->success) { say $res->body }
+  else {
+    my $err = $tx->error;
+    die "$err->{code} response: $err->{message}" if $err->{code};
+    die "Connection error: $err->{message}";
+  }
 
   # Non-blocking request
   $ua->get('mojolicious.org' => sub {

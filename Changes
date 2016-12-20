@@ -1,6 +1,7 @@
 
 7.13  2016-12-21
   - Deprecated Mojo::Message::Response in favor of new is_* methods.
+  - Added result method to Mojo::Transaction.
   - Added is_client_error, is_error, is_info, is_redirect, is_server_error and
     is_success methods to Mojo::Message::Response.
 

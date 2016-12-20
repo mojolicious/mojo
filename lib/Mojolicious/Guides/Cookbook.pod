@@ -606,7 +606,7 @@ perform computationally expensive operations without blocking the event loop.
       },
       sub {
         my ($subprocess, $err, @results) = @_;
-        return $c->reply->exception($err) if $err;
+        $c->reply->exception($err) and return if $err;
         $c->render(text => "I $results[0] $results[1]!");
       }
     );

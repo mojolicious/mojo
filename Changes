@@ -1,5 +1,7 @@
 
-7.13  2016-12-20
+7.13  2016-12-21
+  - Improved is_status_class method in Mojo::Message::Response to be able to
+    check for multiple classes at once.
 
 7.12  2016-12-18
   - Added button_to and csrf_button_to helpers to

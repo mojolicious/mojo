@@ -88,10 +88,13 @@ ok $res->code(200)->is_status_class(200), 'is in range';
 ok $res->code(201)->is_status_class(200), 'is in range';
 ok $res->code(299)->is_status_class(200), 'is in range';
 ok $res->code(302)->is_status_class(300), 'is in range';
-ok !$res->code(199)->is_status_class(200),   'not in range';
-ok !$res->code(300)->is_status_class(200),   'not in range';
-ok !$res->code(200)->is_status_class(100),   'not in range';
-ok !$res->code(200)->is_status_class(300),   'not in range';
+ok $res->code(302)->is_status_class(200, 300), 'is in range';
+ok $res->code(302)->is_status_class(300, 400), 'is in range';
+ok !$res->code(199)->is_status_class(200), 'not in range';
+ok !$res->code(300)->is_status_class(200), 'not in range';
+ok !$res->code(200)->is_status_class(100), 'not in range';
+ok !$res->code(200)->is_status_class(300), 'not in range';
+ok !$res->code(200)->is_status_class(300, 400), 'not in range';
 ok !$res->code(undef)->is_status_class(200), 'no range';
 
 # Status code and message

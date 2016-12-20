@@ -126,9 +126,9 @@ sub is_empty {
 }
 
 sub is_status_class {
-  my ($self, $class) = @_;
+  my ($self, @classes) = @_;
   return undef unless my $code = $self->code;
-  return $code >= $class && $code < ($class + 100);
+  return !!grep { $code >= $_ && $code < ($_ + 100) } @classes;
 }
 
 sub start_line_size { length shift->_start_line->{start_buffer} }
@@ -254,16 +254,20 @@ Check if this response has a C<1xx>, C<204> or C<304> status code.
 =head2 is_status_class
 
   my $bool = $res->is_status_class(200);
+  my $bool = $res->is_status_class(400, 500);
 
 Check response status class.
 
   # True
   Mojo::Message::Response->new->code(304)->is_status_class(300);
   Mojo::Message::Response->new->code(404)->is_status_class(400);
+  Mojo::Message::Response->new->code(404)->is_status_class(400, 500);
+  Mojo::Message::Response->new->code(502)->is_status_class(400, 500);
 
   # False
   Mojo::Message::Response->new->code(404)->is_status_class(300);
   Mojo::Message::Response->new->code(404)->is_status_class(200);
+  Mojo::Message::Response->new->code(200)->is_status_class(400, 500);
 
 =head2 start_line_size
 

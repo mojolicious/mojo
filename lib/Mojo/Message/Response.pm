@@ -119,17 +119,26 @@ sub get_start_line_chunk {
   return substr $self->{start_buffer}, $offset, 131072;
 }
 
+sub is_client_error { shift->is_status_class(400) }
+
 sub is_empty {
   my $self = shift;
   return undef unless my $code = $self->code;
   return $self->is_status_class(100) || $code == 204 || $code == 304;
 }
 
+sub is_error { shift->is_status_class(400, 500) }
+sub is_info { shift->is_status_class(100) }
+sub is_redirect     { shift->is_status_class(300) }
+sub is_server_error { shift->is_status_class(500) }
+
 sub is_status_class {
   my ($self, @classes) = @_;
   return undef unless my $code = $self->code;
   return !!grep { $code >= $_ && $code < ($_ + 100) } @classes;
 }
+
+sub is_success { shift->is_status_class(200) }
 
 sub start_line_size { length shift->_start_line->{start_buffer} }
 
@@ -245,11 +254,42 @@ Make sure response has all required headers.
 Get a chunk of status-line data starting from a specific position. Note that
 this method finalizes the response.
 
+=head2 is_client_error
+
+  my $bool = $res->is_client_error;
+
+Shortcut for an L</"is_status_class"> check with the C<4xx> status class.
+
 =head2 is_empty
 
   my $bool = $res->is_empty;
 
 Check if this response has a C<1xx>, C<204> or C<304> status code.
+
+=head2 is_error
+
+  my $bool = $res->is_error;
+
+Shortcut for an L</"is_status_class"> check with the C<4xx> and C<5xx> status
+classes.
+
+=head2 is_info
+
+  my $bool = $res->is_info;
+
+Shortcut for an L</"is_status_class"> check with the C<1xx> status class.
+
+=head2 is_redirect
+
+  my $bool = $res->is_redirect;
+
+Shortcut for an L</"is_status_class"> check with the C<3xx> status class.
+
+=head2 is_server_error
+
+  my $bool = $res->is_server_error;
+
+Shortcut for an L</"is_status_class"> check with the C<5xx> status class.
 
 =head2 is_status_class
 
@@ -268,6 +308,12 @@ Check response status class.
   Mojo::Message::Response->new->code(404)->is_status_class(300);
   Mojo::Message::Response->new->code(404)->is_status_class(200);
   Mojo::Message::Response->new->code(200)->is_status_class(400, 500);
+
+=head2 is_success
+
+  my $bool = $res->is_success;
+
+Shortcut for an L</"is_status_class"> check with the C<2xx> status class.
 
 =head2 start_line_size
 

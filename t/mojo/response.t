@@ -84,18 +84,37 @@ is $res->code(511)->default_message, 'Network Authentication Required',
 is $res->default_message(100), 'Continue', 'right message';
 
 # Status code ranges
+ok $res->code(101)->is_info, 'is in range';
+ok $res->code(199)->is_info, 'is in range';
 ok $res->code(200)->is_status_class(200), 'is in range';
 ok $res->code(201)->is_status_class(200), 'is in range';
 ok $res->code(299)->is_status_class(200), 'is in range';
+ok $res->code(200)->is_success, 'is in range';
+ok $res->code(299)->is_success, 'is in range';
 ok $res->code(302)->is_status_class(300), 'is in range';
 ok $res->code(302)->is_status_class(200, 300), 'is in range';
 ok $res->code(302)->is_status_class(300, 400), 'is in range';
+ok $res->code(301)->is_redirect,     'is in range';
+ok $res->code(399)->is_redirect,     'is in range';
+ok $res->code(401)->is_client_error, 'is in range';
+ok $res->code(499)->is_client_error, 'is in range';
+ok $res->code(400)->is_error,        'is in range';
+ok $res->code(599)->is_error,        'is in range';
+ok $res->code(501)->is_server_error, 'is in range';
+ok $res->code(599)->is_server_error, 'is in range';
 ok !$res->code(199)->is_status_class(200), 'not in range';
 ok !$res->code(300)->is_status_class(200), 'not in range';
 ok !$res->code(200)->is_status_class(100), 'not in range';
 ok !$res->code(200)->is_status_class(300), 'not in range';
 ok !$res->code(200)->is_status_class(300, 400), 'not in range';
+ok !$res->code(200)->is_info,         'not in range';
+ok !$res->code(100)->is_success,      'not in range';
+ok !$res->code(200)->is_redirect,     'not in range';
+ok !$res->code(200)->is_error,        'not in range';
+ok !$res->code(200)->is_client_error, 'not in range';
+ok !$res->code(200)->is_server_error, 'not in range';
 ok !$res->code(undef)->is_status_class(200), 'no range';
+ok !$res->code(undef)->is_success, 'no range';
 
 # Status code and message
 $res = Mojo::Message::Response->new;

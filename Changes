@@ -1,9 +1,8 @@
 
 7.13  2016-12-21
+  - Deprecated Mojo::Message::Response in favor of new is_* methods.
   - Added is_client_error, is_error, is_info, is_redirect, is_server_error and
     is_success methods to Mojo::Message::Response.
-  - Improved is_status_class method in Mojo::Message::Response to be able to
-    check for multiple classes at once.
 
 7.12  2016-12-18
   - Added button_to and csrf_button_to helpers to

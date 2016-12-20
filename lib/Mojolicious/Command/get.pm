@@ -54,7 +54,7 @@ sub run {
       # Stream content (ignore redirects)
       $tx->res->content->unsubscribe('read')->on(
         read => sub {
-          return if $redirect && $tx->res->is_status_class(300);
+          return if $redirect && $tx->res->is_redirect;
           defined $selector ? ($buffer .= pop) : print pop;
         }
       );

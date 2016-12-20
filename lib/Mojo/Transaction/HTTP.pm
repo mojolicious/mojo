@@ -12,8 +12,7 @@ sub client_read {
   return unless $res->parse($chunk)->is_finished;
 
   # Unexpected 1xx response
-  return $self->completed
-    if !$res->is_status_class(100) || $res->headers->upgrade;
+  return $self->completed if !$res->is_info || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);
   return unless length(my $leftovers = $res->content->leftovers);
   $self->client_read($leftovers);

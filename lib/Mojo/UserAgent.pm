@@ -128,7 +128,7 @@ sub _connect_proxy {
       # CONNECT failed
       $old->previous($tx)->req->via_proxy(0);
       my $id = $tx->connection;
-      if ($tx->error || !$tx->res->is_status_class(200) || !$tx->keep_alive) {
+      if ($tx->error || !$tx->res->is_success || !$tx->keep_alive) {
         $old->res->error({message => 'Proxy connection failed'});
         $self->_remove($id) if $id;
         return $self->$cb($old);
@@ -241,9 +241,7 @@ sub _finish {
 
   # CONNECT requests always have a follow-up request
   $self->_reuse($id, $close) unless uc $old->req->method eq 'CONNECT';
-  if ($res->is_status_class(400) || $res->is_status_class(500)) {
-    $res->error({message => $res->message, code => $res->code});
-  }
+  $res->error({message => $res->message, code => $res->code}) if $res->is_error;
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
 }
 

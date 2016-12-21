@@ -952,6 +952,32 @@ When we say L<Mojolicious> is a web framework we actually mean it, with
 L<Mojo::UserAgent> there's a full featured HTTP and WebSocket user agent built
 right in.
 
+=head2 REST web services
+
+Requests can be performed very comfortably with methods like
+L<Mojo::UserAgent/"get">, and always result in a L<Mojo::Transaction::HTTP>
+object, which has many wonderful attributes and methods. You can check for
+connection errors with L<Mojo::Transaction/"result">, or access HTTP request and
+response information directly through L<Mojo::Transaction/"req"> and
+L<Mojo::Transaction/"res">.
+
+  use Mojo::UserAgent;
+
+  # Request a resource and make sure there were no connection errors
+  my $ua = Mojo::UserAgent->new;
+  my $res = $ua->get(
+    'mojolicious.org/perldoc/Mojolicious' => {Accept => 'text/plain'})->result;
+
+  # Decide what to do with its representation
+  if    ($res->is_success)  { say $res->body }
+  elsif ($res->is_error)    { say $res->message }
+  elsif ($res->code == 301) { say $res->headers->location }
+  else                      { say 'Whatever...' }
+
+While methods like L<Mojo::Message::Response/"is_success"> and
+L<Mojo::Message::Response/"is_error"> serve as building blocks for more
+sophisticated REST clients.
+
 =head2 Web scraping
 
 Scraping information from websites has never been this much fun before. The

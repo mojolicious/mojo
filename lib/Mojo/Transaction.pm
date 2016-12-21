@@ -144,12 +144,40 @@ Remote interface port.
 
 HTTP request, defaults to a L<Mojo::Message::Request> object.
 
+  # Access request information
+  my $method = $tx->req->method;
+  my $url    = $tx->req->url->to_abs;
+  my $info   = $tx->req->url->to_abs->userinfo;
+  my $host   = $tx->req->url->to_abs->host;
+  my $agent  = $tx->req->headers->user_agent;
+  my $custom = $tx->req->headers->header('Custom-Header');
+  my $bytes  = $tx->req->body;
+  my $str    = $tx->req->text;
+  my $hash   = $tx->req->params->to_hash;
+  my $all    = $tx->req->uploads;
+  my $value  = $tx->req->json;
+  my $foo    = $tx->req->json('/23/foo');
+  my $dom    = $tx->req->dom;
+  my $bar    = $tx->req->dom('div.bar')->first->text;
+
 =head2 res
 
   my $res = $tx->res;
   $tx     = $tx->res(Mojo::Message::Response->new);
 
 HTTP response, defaults to a L<Mojo::Message::Response> object.
+
+  # Access response information
+  my $code    = $tx->res->code;
+  my $message = $tx->res->message;
+  my $server  = $tx->res->headers->server;
+  my $custom  = $tx->res->headers->header('Custom-Header');
+  my $bytes   = $tx->res->body;
+  my $str     = $tx->res->text;
+  my $value   = $tx->res->json;
+  my $foo     = $tx->res->json('/23/foo');
+  my $dom     = $tx->res->dom;
+  my $bar     = $tx->res->dom('div.bar')->first->text;
 
 =head1 METHODS
 

@@ -266,43 +266,43 @@ this method finalizes the response.
 
   my $bool = $res->is_client_error;
 
-Check for C<4xx> status L</"code">.
+Check if this response has a C<4xx> status L</"code">.
 
 =head2 is_empty
 
   my $bool = $res->is_empty;
 
-Check if this response has a C<1xx>, C<204> or C<304> status code.
+Check if this response has a C<1xx>, C<204> or C<304> status L</"code">.
 
 =head2 is_error
 
   my $bool = $res->is_error;
 
-Check for C<4xx> and C<5xx> status L</"code">.
+Check if this response has a C<4xx> or C<5xx> status L</"code">.
 
 =head2 is_info
 
   my $bool = $res->is_info;
 
-Check for C<1xx> status L</"code">.
+Check if this response has a C<1xx> status L</"code">.
 
 =head2 is_redirect
 
   my $bool = $res->is_redirect;
 
-Check for C<3xx> status L</"code">.
+Check if this response has a C<3xx> status L</"code">.
 
 =head2 is_server_error
 
   my $bool = $res->is_server_error;
 
-Check for C<5xx> status L</"code">.
+Check if this response has a C<5xx> status L</"code">.
 
 =head2 is_success
 
   my $bool = $res->is_success;
 
-Check for C<2xx> status L</"code">.
+Check if this response has a C<2xx> status L</"code">.
 
 =head2 start_line_size
 

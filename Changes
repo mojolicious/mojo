@@ -1,5 +1,5 @@
 
-7.13  2016-12-21
+7.13  2016-12-23
   - Deprecated Mojo::Message::Response::is_status_class in favor of new is_*
     methods.
   - Added result method to Mojo::Transaction.

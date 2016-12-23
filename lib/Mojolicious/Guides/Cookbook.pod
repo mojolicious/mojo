@@ -956,7 +956,7 @@ right in.
 
 Requests can be performed very comfortably with methods like
 L<Mojo::UserAgent/"get">, and always result in a L<Mojo::Transaction::HTTP>
-object, which has many wonderful attributes and methods. You can check for
+object, which has many useful attributes and methods. You can check for
 connection errors with L<Mojo::Transaction/"result">, or access HTTP request and
 response information directly through L<Mojo::Transaction/"req"> and
 L<Mojo::Transaction/"res">.

@@ -150,7 +150,14 @@ sub tag {
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
-sub text { _text([_nodes(shift->tree)], 0) }
+sub text {
+  my $tree = shift->tree;
+  my $type = $tree->[0];
+  if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
+    return $tree->[1];
+  }
+  _text([_nodes($tree)], 0);
+}
 
 sub to_string { shift->_delegate('render') }
 
@@ -860,13 +867,17 @@ Alias for L<Mojo::Base/"tap">.
 
   my $text = $dom->text;
 
-Extract text content from this element only (not including child elements).
+Extract text content from this element only (not including child elements),
+or from nodes of type text, raw or cdata.
 
   # "bar"
   $dom->parse("<div>foo<p>bar</p>baz</div>")->at('p')->text;
 
   # "foo\nbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->text;
+
+  # "&"
+  $dom->parse("<p>&amp;</p>")->at('p')->child_nodes->[0]->text;
 
 =head2 to_string
 

@@ -122,6 +122,20 @@ is_deeply $morbo->modified_files, \@new, 'two files have changed';
 spurt 'whatever', catfile($subdir, '.hidden.txt');
 is_deeply $morbo->modified_files, [], 'directory has not changed again';
 
+# Broken symlink
+SKIP: {
+  skip 'Symlink support required!', 4 unless eval { symlink '', ''; 1 };
+  my $missing = catfile $subdir, 'missing.txt';
+  my $broken = catfile $subdir, 'broken.txt';
+  symlink $missing, $broken;
+  ok -l $broken, 'symlink created';
+  ok !-f $broken, 'symlink target does not exist';
+  my $warned;
+  local $SIG{__WARN__} = sub { $warned++ };
+  is_deeply $morbo->modified_files, [], 'directory has not changed';
+  ok !$warned, 'no warnings';
+}
+
 # Stop
 kill 'INT', $pid;
 sleep 1 while _port($port);

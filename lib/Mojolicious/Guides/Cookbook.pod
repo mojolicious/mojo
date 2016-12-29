@@ -965,8 +965,7 @@ L<Mojo::Transaction/"res">.
 
   # Request a resource and make sure there were no connection errors
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->get(
-    'http://mojolicious.org/perldoc/Mojolicious' => {Accept => 'text/plain'});
+  my $tx = $ua->get('mojolicious.org/perldoc/Mojo' => {Accept => 'text/plain'});
   my $res = $tx->result;
 
   # Decide what to do with its representation

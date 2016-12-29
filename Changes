@@ -5,6 +5,7 @@
   - Added result method to Mojo::Transaction.
   - Added is_client_error, is_error, is_info, is_redirect, is_server_error and
     is_success methods to Mojo::Message::Response.
+  - Fixed bug where Morbo could not handle broken symlinks. (Grinnz)
 
 7.12  2016-12-18
   - Added button_to and csrf_button_to helpers to

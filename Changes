@@ -1,4 +1,6 @@
 
+7.14  2016-12-30
+
 7.13  2016-12-23
   - Deprecated Mojo::Message::Response::is_status_class in favor of new is_*
     methods.

@@ -2,7 +2,7 @@ package Mojo::Loader;
 use Mojo::Base -strict;
 
 use Exporter 'import';
-use File::Basename 'fileparse';
+use File::Basename 'basename';
 use File::Spec::Functions qw(catdir catfile splitdir);
 use Mojo::Exception;
 use Mojo::Util qw(b64_decode class_to_path);
@@ -27,7 +27,7 @@ sub find_modules {
     opendir(my $dir, $path);
     for my $file (grep /\.pm$/, readdir $dir) {
       next if -d catfile splitdir($path), $file;
-      $modules{"${ns}::" . fileparse $file, qr/\.pm/}++;
+      $modules{"${ns}::" . basename $file, '.pm'}++;
     }
   }
 

@@ -7,7 +7,7 @@ use Test::More;
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
 
-use File::Path 'mkpath';
+use File::Path 'make_path';
 use File::Spec::Functions qw(catdir catfile);
 use File::Temp 'tempdir';
 use FindBin;
@@ -23,7 +23,7 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
 my $dir = tempdir CLEANUP => 1;
 my $script = catfile $dir, 'myapp.pl';
 my $subdir = catdir $dir, 'test', 'stuff';
-mkpath $subdir;
+make_path $subdir;
 my $morbo = Mojo::Server::Morbo->new(watch => [$subdir, $script]);
 is_deeply $morbo->modified_files, [], 'no files have changed';
 spurt <<EOF, $script;

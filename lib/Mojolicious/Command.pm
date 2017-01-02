@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Cwd 'getcwd';
 use File::Basename 'dirname';
-use File::Path 'mkpath';
+use File::Path 'make_path';
 use File::Spec::Functions qw(catdir catfile);
 use Mojo::Loader 'data_section';
 use Mojo::Server;
@@ -28,7 +28,7 @@ sub chmod_rel_file { $_[0]->chmod_file($_[0]->rel_file($_[1]), $_[2]) }
 sub create_dir {
   my ($self, $path) = @_;
   return $self->_loud("  [exist] $path") if -d $path;
-  mkpath $path or croak qq{Can't make directory "$path": $!};
+  make_path $path or croak qq{Can't make directory "$path": $!};
   return $self->_loud("  [mkdir] $path");
 }
 

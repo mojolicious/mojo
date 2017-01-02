@@ -48,7 +48,7 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
     "baz": ["♥"],
 
     %# You have full access to the application
-    "music_dir": "<%= app->home->rel_file('music') %>"
+    "music_dir": "<%= app->home->child('music') %>"
   }
 
   # Mojolicious

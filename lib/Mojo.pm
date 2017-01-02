@@ -78,8 +78,8 @@ L<Mojo> implements the following attributes.
 The home directory of your application, defaults to a L<Mojo::Home> object
 which stringifies to the actual path.
 
-  # Generate portable path relative to home directory
-  my $path = $app->home->rel_file('data/important.txt');
+  # Portably generate path relative to home directory
+  my $path = $app->home->child('data', 'important.txt');
 
 =head2 log
 

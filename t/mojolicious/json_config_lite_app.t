@@ -6,9 +6,7 @@ BEGIN {
 }
 
 use Test::More;
-use Cwd 'abs_path';
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
+use Mojo::File 'path';
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -23,7 +21,8 @@ like $@, qr/Malformed JSON/, 'right error';
 # Load plugins
 my $config
   = plugin j_s_o_n_config => {default => {foo => 'baz', hello => 'there'}};
-my $path = abs_path catfile(dirname(__FILE__), 'json_config_lite_app_abs.json');
+my $path
+  = path(__FILE__)->to_abs->dirname->child('json_config_lite_app_abs.json');
 plugin JSONConfig => {file => $path};
 is $config->{foo},          'bar',            'right value';
 is $config->{hello},        'there',          'right value';

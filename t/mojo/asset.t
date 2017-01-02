@@ -1,11 +1,9 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Basename 'dirname';
-use File::Spec::Functions qw(catdir catfile);
-use File::Temp 'tempdir';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
+use Mojo::File qw(path tempdir);
 
 # File asset
 my $file = Mojo::Asset::File->new;
@@ -201,19 +199,18 @@ ok !$asset->is_file, 'stored in memory';
 
 # Temporary directory
 {
-  my $tmpdir = tempdir CLEANUP => 1;
-  local $ENV{MOJO_TMPDIR} = $tmpdir;
+  local $ENV{MOJO_TMPDIR} = my $tmpdir = tempdir;
   $file = Mojo::Asset::File->new;
   is($file->tmpdir, $tmpdir, 'same directory');
   $file->add_chunk('works!');
   is $file->slurp, 'works!', 'right content';
-  is dirname($file->path), $tmpdir, 'same directory';
+  is path($file->path)->dirname, $tmpdir, 'same directory';
 }
 
 # Custom temporary file
 {
-  my $tmpdir = tempdir CLEANUP => 1;
-  my $path = catfile $tmpdir, 'test.file';
+  my $tmpdir = tempdir;
+  my $path   = $tmpdir->child('test.file');
   ok !-e $path, 'file does not exist';
   $file = Mojo::Asset::File->new(path => $path);
   is $file->path, $path, 'right path';

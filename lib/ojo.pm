@@ -5,6 +5,7 @@ use Benchmark qw(timeit timestr :hireswallclock);
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
+use Mojo::File 'path';
 use Mojo::JSON 'j';
 use Mojo::Util qw(dumper monkey_patch);
 
@@ -28,6 +29,7 @@ sub import {
     b => \&b,
     c => \&c,
     d => sub { _request($ua, 'DELETE', @_) },
+    f => \&path,
     g => sub { _request($ua, 'GET',    @_) },
     h => sub { _request($ua, 'HEAD',   @_) },
     j => \&j,
@@ -121,6 +123,12 @@ Turn list into a L<Mojo::Collection> object.
 
 Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return resulting
 L<Mojo::Message::Response> object.
+
+=head2 f
+
+  my $path = f('/home/sri/foo.txt');
+
+Turn string into a L<Mojo::File> object.
 
 =head2 g
 

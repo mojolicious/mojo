@@ -7,12 +7,10 @@ use Test::More;
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK};
 
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
+use Mojo::File 'path';
 use Mojo::IOLoop::Server;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
-use Mojo::Util 'slurp';
 
 # Manage and clean up PID file
 my $prefork = Mojo::Server::Prefork->new;
@@ -20,18 +18,18 @@ my $file    = $prefork->pid_file;
 ok !$prefork->check_pid, 'no process id';
 $prefork->ensure_pid_file(-23);
 ok -e $file, 'file exists';
-is slurp($file), "-23\n", 'right process id';
+is path($file)->slurp, "-23\n", 'right process id';
 ok !$prefork->check_pid, 'no process id';
 ok !-e $file, 'file has been cleaned up';
 $prefork->ensure_pid_file($$);
 ok -e $file, 'file exists';
-is slurp($file), "$$\n", 'right process id';
+is path($file)->slurp, "$$\n", 'right process id';
 is $prefork->check_pid, $$, 'right process id';
 undef $prefork;
 ok !-e $file, 'file has been cleaned up';
 
 # Bad PID file
-my $bad = catfile dirname(__FILE__), 'does_not_exist', 'test.pid';
+my $bad = path(__FILE__)->dirname->child('does_not_exist', 'test.pid');
 $prefork = Mojo::Server::Prefork->new(pid_file => $bad);
 $prefork->app->log->level('fatal');
 my $log = '';

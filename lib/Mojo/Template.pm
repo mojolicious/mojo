@@ -4,7 +4,8 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Mojo::ByteStream;
 use Mojo::Exception;
-use Mojo::Util qw(decode encode monkey_patch slurp);
+use Mojo::File 'path';
+use Mojo::Util qw(decode encode monkey_patch);
 
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
@@ -168,7 +169,7 @@ sub render_file {
   my ($self, $path) = (shift, shift);
 
   $self->name($path) unless defined $self->{name};
-  my $template = slurp $path;
+  my $template = path($path)->slurp;
   my $encoding = $self->encoding;
   croak qq{Template "$path" has invalid encoding}
     if $encoding && !defined($template = decode $encoding, $template);

@@ -1,7 +1,7 @@
 package Mojolicious::Command::test;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Util qw(files getopt);
+use Mojo::Util 'getopt';
 
 has description => 'Run tests';
 has usage => sub { shift->extract_usage };
@@ -11,10 +11,10 @@ sub run {
 
   getopt \@args, 'v|verbose' => \$ENV{HARNESS_VERBOSE};
 
-  if (!@args && (my $home = $self->app->home)) {
-    die "Can't find test directory.\n" unless -d $home->rel_file('t');
-    /\.t$/ and push @args, $_ for files $home->rel_file('t');
-    say qq{Running tests from "}, $home->rel_file('t') . '".';
+  if (!@args && (my $tests = $self->app->home->child('t'))) {
+    die "Can't find test directory.\n" unless -d $tests;
+    @args = $tests->list_tree->grep(qr/\.t$/)->map('to_string')->each;
+    say qq{Running tests from "$tests".};
   }
 
   $ENV{HARNESS_OPTIONS} //= 'c';

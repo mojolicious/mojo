@@ -1151,16 +1151,15 @@ when C<register> is called.
   package Mojolicious::Plugin::AlertAssets;
   use Mojo::Base 'Mojolicious::Plugin';
 
-  use File::Basename 'dirname';
-  use File::Spec::Functions 'catdir';
+  use Mojo::File 'path';
 
   sub register {
     my ($self, $app) = @_;
 
     # Append "templates" and "public" directories
-    my $base = catdir dirname(__FILE__), 'AlertAssets';
-    push @{$app->renderer->paths}, catdir($base, 'templates');
-    push @{$app->static->paths},   catdir($base, 'public');
+    my $base = path(__FILE__)->dirname->child('AlertAssets');
+    push @{$app->renderer->paths}, $base->child('templates')->to_string;
+    push @{$app->static->paths},   $base->child('public')->to_string;
   }
 
   1;

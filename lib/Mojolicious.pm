@@ -31,8 +31,8 @@ has log              => sub {
   my $log  = Mojo::Log->new;
   my $home = $self->home;
   my $mode = $self->mode;
-  $log->path($home->rel_file("log/$mode.log"))
-    if -d $home->rel_file('log') && -w _;
+  $log->path($home->child('log', "$mode.log"))
+    if -d $home->child('log') && -w _;
 
   # Reduced log output outside of development mode
   return $mode eq 'development' ? $log : $log->level('info');
@@ -152,8 +152,8 @@ sub new {
   my $self = shift->SUPER::new(@_);
 
   my $home = $self->home;
-  push @{$self->renderer->paths}, $home->rel_file('templates');
-  push @{$self->static->paths},   $home->rel_file('public');
+  push @{$self->renderer->paths}, $home->child('templates');
+  push @{$self->static->paths},   $home->child('public');
 
   # Default to controller and application namespace
   my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);

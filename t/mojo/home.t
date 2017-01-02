@@ -3,39 +3,52 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use Cwd qw(getcwd realpath);
-use File::Spec::Functions qw(canonpath catdir catfile splitdir);
 use FindBin;
-use List::Util 'first';
+use Mojo::File 'path';
 use Mojo::HelloWorld;
 use Mojo::Home;
 
 # ENV detection
-my $target = canonpath realpath getcwd;
 {
-  local $ENV{MOJO_HOME} = '.';
+  my $fake = path->to_abs->child('does_not_exist');
+  local $ENV{MOJO_HOME} = $fake->to_string;
   my $home = Mojo::Home->new->detect;
-  is_deeply [splitdir canonpath($home->to_string)], [splitdir $target],
-    'right path detected';
+  is_deeply $home->to_array, $fake->to_array, 'right path detected';
+}
+
+# Specific class detection
+{
+  my $fake = path->to_abs->child('does_not_exist_2');
+  local $INC{'My/Class.pm'} = $fake->child('My', 'Class.pm');
+  my $home = Mojo::Home->new->detect('My::Class');
+  is_deeply $home->to_array, $fake->to_array, 'right path detected';
+}
+
+# Specific class detection (with "lib")
+{
+  my $fake = path->to_abs->child('does_not_exist_3');
+  local $INC{'My/Class.pm'} = $fake->child('lib', 'My', 'Class.pm');
+  my $home = Mojo::Home->new->detect('My::Class');
+  is_deeply $home->to_array, $fake->to_array, 'right path detected';
+}
+
+# Specific class detection (with "blib")
+{
+  my $fake = path->to_abs->child('does_not_exist_3');
+  local $INC{'My/Class.pm'} = $fake->child('blib', 'My', 'Class.pm');
+  my $home = Mojo::Home->new->detect('My::Class');
+  is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }
 
 # Current working directory
-my $original = catdir splitdir getcwd;
-my $home     = Mojo::Home->new->detect;
-is_deeply [splitdir realpath getcwd], [splitdir $home], 'right path detected';
-
-# Specific class detection
-$INC{'MyClass.pm'} = 'MyClass.pm';
-$home = Mojo::Home->new->detect('MyClass');
-is_deeply [splitdir canonpath($home->to_string)], [splitdir $target],
-  'right path detected';
+my $home = Mojo::Home->new->detect;
+is_deeply $home->to_array, path->to_abs->to_array, 'right path detected';
 
 # Path generation
 $home = Mojo::Home->new($FindBin::Bin);
-is $home->lib_dir, catdir(splitdir($FindBin::Bin), 'lib'), 'right path';
-is $home->rel_file('foo.txt'), catfile(splitdir($FindBin::Bin), 'foo.txt'),
-  'right path';
-is $home->rel_file('foo/bar.txt'),
-  catfile(splitdir($FindBin::Bin), 'foo', 'bar.txt'), 'right path';
+my $path = path($FindBin::Bin);
+is $home->rel_file('foo.txt'), $path->child('foo.txt'), 'right path';
+is $home->rel_file('foo/bar.txt'), $path->child('foo', 'bar.txt'), 'right path';
+is $home->rel_file('foo/bar.txt')->basename, 'bar.txt', 'right result';
 
 done_testing();

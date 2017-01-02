@@ -4,9 +4,7 @@ use Mojo::Base -base;
 # "Bender: I was God once.
 #  God: Yes, I saw. You were doing well, until everyone died."
 use Config;
-use Cwd 'abs_path';
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
+use Mojo::File 'path';
 use Mojo::Server::Prefork;
 use Mojo::Util 'steady_time';
 use Scalar::Util 'weaken';
@@ -39,7 +37,7 @@ sub run {
 
   # Remember executable and application for later
   $ENV{HYPNOTOAD_EXE} ||= $0;
-  $0 = $ENV{HYPNOTOAD_APP} ||= abs_path $app;
+  $0 = $ENV{HYPNOTOAD_APP} ||= path($app)->to_abs->to_string;
 
   # This is a production server
   $ENV{MOJO_MODE} ||= 'production';
@@ -51,7 +49,7 @@ sub run {
   # Preload application and configure server
   my $prefork = $self->prefork->cleanup(0);
   $prefork->load_app($app)->config->{hypnotoad}{pid_file}
-    //= catfile dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid';
+    //= path($ENV{HYPNOTOAD_APP})->dirname->child('hypnotoad.pid')->to_string;
   $self->configure('hypnotoad');
   weaken $self;
   $prefork->on(wait   => sub { $self->_manage });

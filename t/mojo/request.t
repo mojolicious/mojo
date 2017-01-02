@@ -1,12 +1,11 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Spec::Functions 'catfile';
-use File::Temp 'tempdir';
 use IO::Compress::Gzip 'gzip';
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Request;
+use Mojo::File 'tempdir';
 use Mojo::Message::Request;
 use Mojo::URL;
 use Mojo::Util 'encode';
@@ -760,7 +759,8 @@ is $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename, 'hello.pl', 'right filename';
 ok !$req->upload('upload')->asset->is_file, 'stored in memory';
 is $req->upload('upload')->asset->size, 69, 'right size';
-my $file = catfile(tempdir(CLEANUP => 1), ("MOJO_TMP." . time . ".txt"));
+my $tempdir = tempdir;
+my $file    = $tempdir->child('MOJO_TMP.' . time . '.txt');
 is $req->upload('upload')->move_to($file)->filename, 'hello.pl',
   'right filename';
 ok unlink($file), 'unlinked file';

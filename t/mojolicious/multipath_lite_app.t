@@ -7,8 +7,8 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # More paths with higher precedence
-unshift @{app->renderer->paths}, app->home->rel_file('templates2');
-unshift @{app->static->paths},   app->home->rel_file('public2');
+unshift @{app->renderer->paths}, app->home->child('templates2');
+unshift @{app->static->paths},   app->home->child('public2');
 
 get '/twenty_three' => '23';
 

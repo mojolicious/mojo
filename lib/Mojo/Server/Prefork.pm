@@ -2,7 +2,8 @@ package Mojo::Server::Prefork;
 use Mojo::Base 'Mojo::Server::Daemon';
 
 use Config;
-use File::Spec::Functions qw(catfile tmpdir);
+use File::Spec;
+use Mojo::File 'path';
 use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
@@ -11,8 +12,8 @@ has accepts => 10000;
 has cleanup => 1;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
-has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
-has workers            => 4;
+has pid_file => sub { path(File::Spec->tmpdir, 'prefork.pid')->to_string };
+has workers  => 4;
 
 sub DESTROY { unlink $_[0]->pid_file if $_[0]->cleanup }
 

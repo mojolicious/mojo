@@ -2,9 +2,8 @@ package Mojo::IOLoop::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
 use IO::Socket::IP;
+use Mojo::File 'path';
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
@@ -18,8 +17,8 @@ use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 # To regenerate the certificate run this command (18.04.2012)
 # openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
-my $CERT = catfile dirname(__FILE__), 'resources', 'server.crt';
-my $KEY  = catfile dirname(__FILE__), 'resources', 'server.key';
+my $CERT = path(__FILE__)->dirname->child('resources', 'server.crt')->to_string;
+my $KEY  = path(__FILE__)->dirname->child('resources', 'server.key')->to_string;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 

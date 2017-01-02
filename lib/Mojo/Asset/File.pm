@@ -4,9 +4,9 @@ use Mojo::Base 'Mojo::Asset';
 use Carp 'croak';
 use Errno 'EEXIST';
 use Fcntl qw(O_APPEND O_CREAT O_EXCL O_RDONLY O_RDWR);
-use File::Copy 'move';
-use File::Spec::Functions 'catfile';
+use File::Spec;
 use IO::File;
+use Mojo::File;
 use Mojo::Util 'md5_sum';
 
 has [qw(cleanup path)];
@@ -22,7 +22,7 @@ has handle => sub {
   }
 
   # Open new or temporary file
-  my $base = catfile $self->tmpdir, 'mojo.tmp';
+  my $base = Mojo::File->new($self->tmpdir, 'mojo.tmp')->to_string;
   my $name = $path // $base;
   until ($handle->open($name, O_APPEND | O_CREAT | O_EXCL | O_RDWR)) {
     croak qq{Can't open file "$name": $!} if defined $path || $! != $!{EEXIST};
@@ -35,7 +35,7 @@ has handle => sub {
 
   return $handle;
 };
-has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec::Functions::tmpdir };
+has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
 
 sub DESTROY {
   my $self = shift;
@@ -113,8 +113,7 @@ sub move_to {
   delete $self->{handle};
 
   # Move file and prevent clean up
-  my $from = $self->path;
-  move($from, $to) or croak qq{Can't move file "$from" to "$to": $!};
+  Mojo::File->new($self->path)->move_to($to);
   return $self->path($to)->cleanup(0);
 }
 

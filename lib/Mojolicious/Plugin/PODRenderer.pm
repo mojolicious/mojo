@@ -4,8 +4,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Asset::File;
 use Mojo::ByteStream;
 use Mojo::DOM;
+use Mojo::File 'path';
 use Mojo::URL;
-use Mojo::Util 'slurp';
 use Pod::Simple::XHTML;
 use Pod::Simple::Search;
 
@@ -85,7 +85,7 @@ sub _perldoc {
   return $c->redirect_to("https://metacpan.org/pod/$module")
     unless $path && -r $path;
 
-  my $src = slurp $path;
+  my $src = path($path)->slurp;
   $c->respond_to(txt => {data => $src}, html => sub { _html($c, $src) });
 }
 

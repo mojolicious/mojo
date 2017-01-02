@@ -4,8 +4,8 @@ use Mojo::Base -base;
 # "Linda: With Haley's Comet out of ice, Earth is experiencing the devastating
 #         effects of sudden, intense global warming.
 #  Morbo: Morbo is pleased but sticky."
+use Mojo::File 'path';
 use Mojo::Server::Daemon;
-use Mojo::Util 'files';
 use POSIX 'WNOHANG';
 
 has daemon => sub { Mojo::Server::Daemon->new };
@@ -15,8 +15,10 @@ sub modified_files {
   my $self = shift;
 
   my $cache = $self->{cache} ||= {};
+  my @check
+    = map { -f $_ && -r _ ? $_ : path($_)->list_tree->each } @{$self->watch};
   my @files;
-  for my $file (map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch}) {
+  for my $file (@check) {
     my ($size, $mtime) = (stat $file)[7, 9];
     next unless defined $size and defined $mtime;
     my $stats = $cache->{$file} ||= [$^T, $size];

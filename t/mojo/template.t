@@ -1,8 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
+use Mojo::File 'path';
 use Mojo::Template;
 
 package MyTemplateExporter;
@@ -651,21 +650,21 @@ EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
 ok $output->verbose, 'verbose exception';
-is $output->lines_before->[0][0], 15,  'right number';
+is $output->lines_before->[0][0], 14,  'right number';
 is $output->lines_before->[0][1], '}', 'right line';
-is $output->lines_before->[1][0], 16,  'right number';
+is $output->lines_before->[1][0], 15,  'right number';
 is $output->lines_before->[1][1], '',  'right line';
-is $output->lines_before->[2][0], 17,  'right number';
+is $output->lines_before->[2][0], 16,  'right number';
 is $output->lines_before->[2][1], 'package MyTemplateException;', 'right line';
-is $output->lines_before->[3][0], 18,                        'right number';
+is $output->lines_before->[3][0], 17,                        'right number';
 is $output->lines_before->[3][1], 'use Mojo::Base -strict;', 'right line';
-is $output->lines_before->[4][0], 19,                        'right number';
+is $output->lines_before->[4][0], 18,                        'right number';
 is $output->lines_before->[4][1], '',                        'right line';
-is $output->line->[0], 20, 'right number';
+is $output->line->[0], 19, 'right number';
 is $output->line->[1], "sub exception { die 'ohoh' }", 'right line';
-is $output->lines_after->[0][0], 21,              'right number';
+is $output->lines_after->[0][0], 20,              'right number';
 is $output->lines_after->[0][1], '',              'right line';
-is $output->lines_after->[1][0], 22,              'right number';
+is $output->lines_after->[1][0], 21,              'right number';
 is $output->lines_after->[1][1], 'package main;', 'right line';
 like "$output", qr/ohoh/, 'right result';
 
@@ -1106,13 +1105,13 @@ EOF
 
 # File
 $mt = Mojo::Template->new;
-my $file = catfile dirname(__FILE__), 'templates', 'test.mt';
+my $file = path(__FILE__)->dirname->child('templates', 'test.mt');
 $output = $mt->render_file($file, 3);
 like $output, qr/23\nHello World!/, 'file';
 
 # Exception in file
 $mt     = Mojo::Template->new;
-$file   = catfile dirname(__FILE__), 'templates', 'exception.mt';
+$file   = path(__FILE__)->dirname->child('templates', 'exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt line 2/, 'message contains filename';
@@ -1142,7 +1141,7 @@ like "$output", qr/foo\.mt from DATA section line 2/, 'right result';
 
 # Exception with UTF-8 context
 $mt     = Mojo::Template->new;
-$file   = catfile dirname(__FILE__), 'templates', 'utf8_exception.mt';
+$file   = path(__FILE__)->dirname->child('templates', 'utf8_exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 ok $output->verbose, 'verbose exception';
@@ -1163,7 +1162,7 @@ is $output->lines_after->[0], undef, 'no lines after';
 
 # Different encodings
 $mt = Mojo::Template->new(encoding => 'shift_jis');
-$file = catfile dirname(__FILE__), 'templates', 'utf8_exception.mt';
+$file = path(__FILE__)->dirname->child('templates', 'utf8_exception.mt');
 ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';
 

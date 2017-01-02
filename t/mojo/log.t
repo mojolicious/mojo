@@ -1,20 +1,19 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Spec::Functions 'catfile';
-use File::Temp 'tempdir';
+use Mojo::File qw(path tempdir);
 use Mojo::Log;
-use Mojo::Util qw(decode slurp);
+use Mojo::Util 'decode';
 
 # Logging to file
-my $dir = tempdir CLEANUP => 1;
-my $path = catfile $dir, 'test.log';
-my $log = Mojo::Log->new(level => 'error', path => $path);
+my $dir  = tempdir;
+my $path = $dir->child('test.log');
+my $log  = Mojo::Log->new(level => 'error', path => $path);
 $log->error('Just works');
 $log->fatal('I ♥ Mojolicious');
 $log->debug('Does not work');
 undef $log;
-my $content = decode 'UTF-8', slurp($path);
+my $content = decode 'UTF-8', path($path)->slurp;
 like $content,   qr/\[.*\] \[error\] Just works/,        'right error message';
 like $content,   qr/\[.*\] \[fatal\] I ♥ Mojolicious/, 'right fatal message';
 unlike $content, qr/\[.*\] \[debug\] Does not work/,     'no debug message';

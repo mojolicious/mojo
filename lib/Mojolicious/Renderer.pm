@@ -1,12 +1,12 @@
 package Mojolicious::Renderer;
 use Mojo::Base -base;
 
-use File::Spec::Functions qw(abs2rel catfile splitdir);
 use Mojo::Cache;
+use Mojo::File 'path';
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader 'data_section';
-use Mojo::Util qw(decamelize encode files md5_sum monkey_patch slurp);
+use Mojo::Util qw(decamelize encode md5_sum monkey_patch);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -18,7 +18,7 @@ has paths => sub { [] };
 
 # Bundled templates
 my $TEMPLATES = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
-  ->rel_file('Mojolicious/resources/templates');
+  ->child('Mojolicious', 'resources', 'templates');
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 
@@ -171,7 +171,8 @@ sub template_path {
   my ($self, $options) = @_;
   return undef unless my $name = $self->template_name($options);
   my @parts = split '/', $name;
-  -r and return $_ for map { catfile $_, @parts } @{$self->paths}, $TEMPLATES;
+  -r and return $_
+    for map { path($_, @parts)->to_string } @{$self->paths}, $TEMPLATES;
   return undef;
 }
 
@@ -183,7 +184,8 @@ sub warmup {
   # Handlers for templates
   for my $path (@{$self->paths}, $TEMPLATES) {
     s/\.(\w+)$// and push @{$templates->{$_}}, $1
-      for map { join '/', splitdir(abs2rel $_, $path) } files $path;
+      for path($path)->list_tree->map(sub { join '/', @{$_->to_rel($path)} })
+      ->each;
   }
 
   # Handlers and classes for DATA templates

@@ -1543,8 +1543,8 @@ automatically installed with the modules.
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
-  use File::Basename 'dirname';
-  use File::Spec::Functions 'catdir';
+  use Mojo::File 'path';
+  use Mojo::Home;
 
   # Every CPAN module needs a version
   our $VERSION = '1.0';
@@ -1553,13 +1553,13 @@ automatically installed with the modules.
     my $self = shift;
 
     # Switch to installable home directory
-    $self->home->parse(catdir(dirname(__FILE__), 'MyApp'));
+    $self->home(Mojo::Home->new(path(__FILE__)->dirname->child('MyApp')));
 
     # Switch to installable "public" directory
-    $self->static->paths->[0] = $self->home->rel_file('public');
+    $self->static->paths->[0] = $self->home->child('public');
 
     # Switch to installable "templates" directory
-    $self->renderer->paths->[0] = $self->home->rel_file('templates');
+    $self->renderer->paths->[0] = $self->home->child('templates');
 
     $self->plugin('PODRenderer');
 

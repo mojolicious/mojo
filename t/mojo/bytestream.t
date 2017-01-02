@@ -1,9 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use File::Basename 'dirname';
-use File::Spec::Functions 'catfile';
-use File::Temp 'tempdir';
 use FindBin;
 use Mojo::ByteStream 'b';
 
@@ -134,19 +131,6 @@ b('te', 'st')->say($handle);
   b(1, 2, 3)->say->quote->say;
 }
 is $buffer, "test\n123\n\"123\"\n", 'right output';
-
-# slurp
-my $file = catfile dirname(__FILE__), 'templates', 'exception.mt';
-$stream = b($file)->slurp;
-is $stream, "test\n% die;\n123\n", 'right content';
-$stream = b($file)->slurp->split("\n")->grep(qr/die/)->join;
-is $stream, '% die;', 'right content';
-
-# spurt
-my $dir = tempdir CLEANUP => 1;
-$file = catfile $dir, 'test.txt';
-is b("just\nworks!")->spurt($file)->quote, qq{"just\nworks!"}, 'right result';
-is b($file)->slurp, "just\nworks!", 'successful roundtrip';
 
 # term_escape
 is b("\t\b\r\n\f")->term_escape, "\\x09\\x08\\x0d\n\\x0c", 'right result';

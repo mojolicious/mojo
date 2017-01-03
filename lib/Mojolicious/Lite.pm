@@ -3,7 +3,6 @@ use Mojo::Base 'Mojolicious';
 
 # "Bender: Bite my shiny metal ass!"
 use File::Basename qw(basename dirname);
-use File::Spec::Functions 'catdir';
 use Mojo::UserAgent::Server;
 use Mojo::Util 'monkey_patch';
 
@@ -13,8 +12,7 @@ sub import {
   $ENV{MOJO_EXE} ||= (caller)[1];
 
   # Reuse home directory if possible
-  local $ENV{MOJO_HOME} = catdir split('/', dirname $ENV{MOJO_EXE})
-    unless $ENV{MOJO_HOME};
+  local $ENV{MOJO_HOME} = dirname $ENV{MOJO_EXE} unless $ENV{MOJO_HOME};
 
   # Initialize application class
   my $caller = caller;

@@ -34,7 +34,7 @@ sub run {
   }
 
   # Parent
-  my $stream = Mojo::IOLoop::Stream->new($reader);
+  my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
   $self->ioloop->stream($stream);
   my $buffer = '';
   $stream->on(read => sub { $buffer .= pop });

@@ -260,7 +260,7 @@ proxy.
   my $res = $tx->result;
 
 Returns the L<Mojo::Message::Response> object from L</"res"> or dies if a
-connection error has occured.
+connection error has occurred.
 
   # Fine grained response handling (dies on connection errors)
   my $res = $tx->result;

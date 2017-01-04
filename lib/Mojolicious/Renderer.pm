@@ -1,12 +1,12 @@
 package Mojolicious::Renderer;
 use Mojo::Base -base;
 
-use File::Spec::Functions 'catfile';
+use File::Spec::Functions qw(abs2rel catfile splitdir);
 use Mojo::Cache;
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader 'data_section';
-use Mojo::Util qw(decamelize encode md5_sum monkey_patch slurp);
+use Mojo::Util qw(decamelize encode files md5_sum monkey_patch slurp);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -181,8 +181,10 @@ sub warmup {
   my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
 
   # Handlers for templates
-  s/\.(\w+)$// and push @{$templates->{$_}}, $1
-    for map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}, $TEMPLATES;
+  for my $path (@{$self->paths}, $TEMPLATES) {
+    s/\.(\w+)$// and push @{$templates->{$_}}, $1
+      for map { join '/', splitdir(abs2rel $_, $path) } files $path;
+  }
 
   # Handlers and classes for DATA templates
   for my $class (reverse @{$self->classes}) {

@@ -1,7 +1,7 @@
 package Mojolicious::Command::test;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Util 'getopt';
+use Mojo::Util qw(files getopt);
 
 has description => 'Run tests';
 has usage => sub { shift->extract_usage };
@@ -13,8 +13,7 @@ sub run {
 
   if (!@args && (my $home = $self->app->home)) {
     die "Can't find test directory.\n" unless -d $home->rel_file('t');
-    my $files = $home->list_files('t');
-    /\.t$/ and push @args, $home->rel_file("t/$_") for @$files;
+    /\.t$/ and push @args, $_ for files $home->rel_file('t');
     say qq{Running tests from "}, $home->rel_file('t') . '".';
   }
 

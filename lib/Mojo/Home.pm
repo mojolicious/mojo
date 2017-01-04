@@ -36,7 +36,10 @@ sub lib_dir {
   return -d $path ? $path : undef;
 }
 
+# DEPRECATED!
 sub list_files {
+  deprecated
+    'Mojo::Home::list_files is DEPRECATED in favor of Mojo::Util::files';
   my ($self, $dir, $options) = (shift, shift // '', shift);
   $dir = catdir @{$self->parts}, split('/', $dir);
   return [map { join '/', splitdir abs2rel($_, $dir) } files $dir, $options];
@@ -111,29 +114,6 @@ location of the application class, or the current working directory.
   my $path = $home->lib_dir;
 
 Path to C<lib> directory of application.
-
-=head2 list_files
-
-  my $files = $home->list_files;
-  my $files = $home->list_files('foo/bar');
-  my $files = $home->list_files('foo/bar', {hidden => 1});
-
-Portably list all files recursively in directory relative to the home directory.
-
-  # List layouts
-  say $home->rel_file($_) for @{$home->list_files('templates/layouts')};
-
-These options are currently available:
-
-=over 2
-
-=item hidden
-
-  hidden => 1
-
-Include hidden files and directories.
-
-=back
 
 =head2 mojo_lib_dir
 

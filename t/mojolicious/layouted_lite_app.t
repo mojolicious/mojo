@@ -13,7 +13,7 @@ use Test::Mojo;
 # Plugin with a template
 plugin 'PluginWithTemplate';
 
-app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
+app->renderer->paths->[0] = app->home->rel_file('does_not_exist');
 
 # Reverse filter
 hook after_render => sub {

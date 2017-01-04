@@ -12,10 +12,10 @@ sub run {
   getopt \@args, 'v|verbose' => \$ENV{HARNESS_VERBOSE};
 
   if (!@args && (my $home = $self->app->home)) {
-    die "Can't find test directory.\n" unless -d $home->rel_dir('t');
+    die "Can't find test directory.\n" unless -d $home->rel_file('t');
     my $files = $home->list_files('t');
     /\.t$/ and push @args, $home->rel_file("t/$_") for @$files;
-    say qq{Running tests from "}, $home->rel_dir('t') . '".';
+    say qq{Running tests from "}, $home->rel_file('t') . '".';
   }
 
   $ENV{HARNESS_OPTIONS} //= 'c';

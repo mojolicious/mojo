@@ -5,7 +5,7 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 use Cwd qw(abs_path getcwd);
 use File::Basename 'dirname';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
-use Mojo::Util qw(class_to_path files);
+use Mojo::Util qw(class_to_path deprecated files);
 
 has parts => sub { [] };
 
@@ -48,7 +48,13 @@ sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub parse { shift->parts([splitdir shift]) }
 
-sub rel_dir  { catdir @{shift->parts},  split('/', shift) }
+# DEPRECATED!
+sub rel_dir {
+  deprecated
+    'Mojo::Home::rel_dir is DEPRECATED in favor of Mojo::Hom::rel_file';
+  catdir @{shift->parts}, split('/', shift);
+}
+
 sub rel_file { catfile @{shift->parts}, split('/', shift) }
 
 sub to_string { catdir @{shift->parts} }
@@ -149,18 +155,11 @@ necessary.
 
 Parse home directory.
 
-=head2 rel_dir
-
-  my $path = $home->rel_dir('foo/bar');
-
-Portably generate an absolute path for a directory relative to the home
-directory.
-
 =head2 rel_file
 
   my $path = $home->rel_file('foo/bar.html');
 
-Portably generate an absolute path for a file relative to the home directory.
+Portably generate an absolute path relative to the home directory.
 
 =head2 to_string
 

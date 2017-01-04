@@ -1,5 +1,8 @@
 
-7.14  2017-01-03
+7.14  2017-01-04
+  - Deprecated Mojo::Home::rel_dir in favor of Mojo::Home::rel_file.
+  - Deprecated Mojolicious::Command::rel_dir in favor of
+    Mojolicious::Command::rel_file.
   - Fixed a bug in Mojo::IOLoop::Subprocess where the pipe used for IPC could
     disappear because of a timeout.
 

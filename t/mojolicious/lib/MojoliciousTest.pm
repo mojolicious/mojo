@@ -13,7 +13,7 @@ sub startup {
     unshift @{$self->renderer->classes}, 'MojoliciousTest::Foo';
 
     # Static root for development
-    unshift @{$self->static->paths}, $self->home->rel_dir('public_dev');
+    unshift @{$self->static->paths}, $self->home->rel_file('public_dev');
 
     # Development namespace
     unshift @{$self->routes->namespaces}, 'MojoliciousTest3';

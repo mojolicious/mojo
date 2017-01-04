@@ -18,7 +18,7 @@ has paths => sub { [] };
 
 # Bundled templates
 my $TEMPLATES = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
-  ->rel_dir('Mojolicious/resources/templates');
+  ->rel_file('Mojolicious/resources/templates');
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 

@@ -1556,10 +1556,10 @@ automatically installed with the modules.
     $self->home->parse(catdir(dirname(__FILE__), 'MyApp'));
 
     # Switch to installable "public" directory
-    $self->static->paths->[0] = $self->home->rel_dir('public');
+    $self->static->paths->[0] = $self->home->rel_file('public');
 
     # Switch to installable "templates" directory
-    $self->renderer->paths->[0] = $self->home->rel_dir('templates');
+    $self->renderer->paths->[0] = $self->home->rel_file('templates');
 
     $self->plugin('PODRenderer');
 

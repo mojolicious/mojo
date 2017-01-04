@@ -68,7 +68,7 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
     baz => ['♥'],
 
     # You have full access to the application
-    music_dir => app->home->rel_dir('music')
+    music_dir => app->home->rel_file('music')
   };
 
   # Mojolicious

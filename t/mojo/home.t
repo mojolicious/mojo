@@ -37,9 +37,6 @@ is $home->rel_file('foo.txt'), catfile(splitdir($FindBin::Bin), 'foo.txt'),
   'right path';
 is $home->rel_file('foo/bar.txt'),
   catfile(splitdir($FindBin::Bin), 'foo', 'bar.txt'), 'right path';
-is $home->rel_dir('foo'), catdir(splitdir($FindBin::Bin), 'foo'), 'right path';
-is $home->rel_dir('foo/bar'), catdir(splitdir($FindBin::Bin), 'foo', 'bar'),
-  'right path';
 
 # List files
 is_deeply $home->list_files('lib/does_not_exist'), [], 'no files';

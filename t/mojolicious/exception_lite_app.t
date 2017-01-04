@@ -10,7 +10,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # No real templates
-app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
+app->renderer->paths->[0] = app->home->rel_file('does_not_exist');
 
 # Logger
 app->log->handle(undef);

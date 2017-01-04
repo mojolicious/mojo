@@ -14,7 +14,7 @@ has paths   => sub { [] };
 
 # Bundled files
 my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
-  ->rel_dir('Mojolicious/resources/public');
+  ->rel_file('Mojolicious/resources/public');
 
 sub dispatch {
   my ($self, $c) = @_;

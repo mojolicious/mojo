@@ -152,8 +152,8 @@ sub new {
   my $self = shift->SUPER::new(@_);
 
   my $home = $self->home;
-  push @{$self->renderer->paths}, $home->rel_dir('templates');
-  push @{$self->static->paths},   $home->rel_dir('public');
+  push @{$self->renderer->paths}, $home->rel_file('templates');
+  push @{$self->static->paths},   $home->rel_file('public');
 
   # Default to controller and application namespace
   my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);

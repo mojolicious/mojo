@@ -54,7 +54,7 @@ sub parse { shift->parts([splitdir shift]) }
 # DEPRECATED!
 sub rel_dir {
   deprecated
-    'Mojo::Home::rel_dir is DEPRECATED in favor of Mojo::Hom::rel_file';
+    'Mojo::Home::rel_dir is DEPRECATED in favor of Mojo::Home::rel_file';
   catdir @{shift->parts}, split('/', shift);
 }
 

@@ -1,5 +1,5 @@
 
-7.15  2017-01-05
+7.15  2017-01-06
 
 7.14  2017-01-04
   - Deprecated Mojo::Home::list_files in favor of Mojo::Util::files.

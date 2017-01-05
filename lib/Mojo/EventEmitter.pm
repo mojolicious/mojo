@@ -103,7 +103,8 @@ L<Mojo::EventEmitter> can emit the following events.
   });
 
 This is a special event for errors, it will not be emitted directly by this
-class but is fatal if unhandled.
+class, but is fatal if unhandled. Subclasses may choose to emit it, but are not
+required to do so.
 
   $e->on(error => sub {
     my ($e, $err) = @_;

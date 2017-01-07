@@ -16,7 +16,7 @@ sub modified_files {
 
   my $cache = $self->{cache} ||= {};
   my @files;
-  for my $file (map { -f $_ && -r _ ? $_ : files $_ } @{$self->watch}) {
+  for my $file (map { -f $_ && -r $_ ? $_ : files $_ } @{$self->watch}) {
     my ($size, $mtime) = (stat $file)[7, 9];
     next unless defined $size and defined $mtime;
     my $stats = $cache->{$file} ||= [$^T, $size];

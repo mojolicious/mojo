@@ -7,14 +7,12 @@ use Test::More;
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
 
-use File::Spec::Functions 'catfile';
-use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
+use Mojo::File 'tempdir';
 use Mojo::IOLoop::Server;
 use Mojo::Server::Hypnotoad;
 use Mojo::UserAgent;
-use Mojo::Util qw(slurp spurt);
 
 # Configure
 {
@@ -54,12 +52,12 @@ use Mojo::Util qw(slurp spurt);
 }
 
 # Prepare script
-my $dir = tempdir CLEANUP => 1;
-my $script = catfile $dir, 'myapp.pl';
-my $log    = catfile $dir, 'mojo.log';
+my $dir    = tempdir;
+my $script = $dir->child('myapp.pl');
+my $log    = $dir->child('mojo.log');
 my $port1  = Mojo::IOLoop::Server->generate_port;
 my $port2  = Mojo::IOLoop::Server->generate_port;
-spurt <<EOF, $script;
+$script->spurt(<<EOF);
 use Mojolicious::Lite;
 use Mojo::IOLoop;
 
@@ -135,7 +133,7 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Update script (broken)
-spurt <<'EOF', $script;
+$script->spurt(<<'EOF');
 use Mojolicious::Lite;
 
 die if $ENV{HYPNOTOAD_PID};
@@ -146,7 +144,7 @@ open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
 
 # Wait for hot deployment to fail
 while (1) {
-  last if slurp($log) =~ qr/Zero downtime software upgrade failed/;
+  last if $log->slurp =~ qr/Zero downtime software upgrade failed/;
   sleep 1;
 }
 
@@ -172,7 +170,7 @@ $ua->start($tx => sub { });
 Mojo::IOLoop->one_tick until $tx->req->is_finished;
 
 # Update script
-spurt <<EOF, $script;
+$script->spurt(<<EOF);
 use Mojolicious::Lite;
 
 app->log->path('$log');
@@ -251,13 +249,13 @@ open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '-s';
 sleep 1 while _port($port2);
 
 # Check log
-$log = slurp $log;
+$log = $log->slurp;
 like $log, qr/Worker \d+ started/,                      'right message';
 like $log, qr/Starting zero downtime software upgrade/, 'right message';
 like $log, qr/Upgrade successful, stopping $old/,       'right message';
 
 sub _pid {
-  return undef unless open my $file, '<', catfile($dir, 'hypnotoad.pid');
+  return undef unless open my $file, '<', $dir->child('hypnotoad.pid');
   my $pid = <$file>;
   chomp $pid;
   return $pid;

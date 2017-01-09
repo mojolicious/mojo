@@ -8,6 +8,7 @@ BEGIN {
 
 use Test::More;
 use ojo;
+use File::Basename 'basename';
 
 # Application
 a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })
@@ -43,6 +44,9 @@ is b('<foo>')->url_escape, '%3Cfoo%3E', 'right result';
 
 # Collection
 is c(1, 2, 3)->join('-'), '1-2-3', 'right result';
+
+# File
+is f(__FILE__)->basename, basename(__FILE__), 'right result';
 
 # Dumper
 is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';

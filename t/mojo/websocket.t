@@ -20,7 +20,7 @@ use Mojolicious::Lite;
 app->log->level('fatal');
 
 # Avoid exception template
-app->renderer->paths->[0] = app->home->rel_file('public');
+app->renderer->paths->[0] = app->home->child('public');
 
 get '/link' => sub {
   my $c = shift;

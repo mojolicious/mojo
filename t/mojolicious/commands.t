@@ -10,8 +10,7 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Cwd 'getcwd';
-use File::Temp 'tempdir';
+use Mojo::File qw(path tempdir);
 
 package Mojolicious::Command::my_fake_test_command;
 
@@ -239,8 +238,8 @@ require Mojolicious::Command::generate::app;
 $app = Mojolicious::Command::generate::app->new;
 ok $app->description, 'has a description';
 like $app->usage, qr/app/, 'has usage information';
-my $cwd = getcwd;
-my $dir = tempdir CLEANUP => 1;
+my $cwd = path;
+my $dir = tempdir;
 chdir $dir;
 $buffer = '';
 {

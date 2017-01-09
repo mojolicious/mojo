@@ -2,7 +2,7 @@ package Mojo::Asset::Memory;
 use Mojo::Base 'Mojo::Asset';
 
 use Mojo::Asset::File;
-use Mojo::Util 'spurt';
+use Mojo::File 'path';
 
 has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
@@ -41,11 +41,7 @@ sub get_chunk {
   return substr shift->{content} // '', $offset, $max;
 }
 
-sub move_to {
-  my ($self, $to) = @_;
-  spurt $self->{content} // '', $to;
-  return $self;
-}
+sub move_to { path($_[1])->spurt($_[0]{content} // '') and return $_[0] }
 
 sub size { length(shift->{content} // '') }
 

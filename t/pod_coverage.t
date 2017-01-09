@@ -8,4 +8,6 @@ plan skip_all => 'Test::Pod::Coverage 1.04+ required for this test!'
   unless eval 'use Test::Pod::Coverage 1.04; 1';
 
 # DEPRECATED!
-all_pod_coverage_ok({also_private => [qw(list_files rel_dir is_status_class)]});
+my @deprecated
+  = qw(files is_status_class lib_dir parse parts rel_dir slurp spurt);
+all_pod_coverage_ok({also_private => \@deprecated});

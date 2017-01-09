@@ -7,26 +7,22 @@ use Test::More;
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
 
-use File::Path 'make_path';
-use File::Spec::Functions qw(catdir catfile);
-use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
+use Mojo::File 'tempdir';
 use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::Server::Morbo;
 use Mojo::UserAgent;
-use Mojo::Util 'spurt';
 use Socket qw(SO_REUSEPORT SOL_SOCKET);
 
 # Prepare script
-my $dir = tempdir CLEANUP => 1;
-my $script = catfile $dir, 'myapp.pl';
-my $subdir = catdir $dir, 'test', 'stuff';
-make_path $subdir;
-my $morbo = Mojo::Server::Morbo->new(watch => [$subdir, $script]);
+my $dir    = tempdir;
+my $script = $dir->child('myapp.pl');
+my $subdir = $dir->child('test', 'stuff')->make_path;
+my $morbo  = Mojo::Server::Morbo->new(watch => [$subdir, $script]);
 is_deeply $morbo->modified_files, [], 'no files have changed';
-spurt <<EOF, $script;
+$script->spurt(<<EOF);
 use Mojolicious::Lite;
 
 app->log->level('fatal');
@@ -58,7 +54,7 @@ is $tx->res->body, 'Hello Morbo!', 'right content';
 
 # Update script without changing size
 my ($size, $mtime) = (stat $script)[7, 9];
-spurt <<EOF, $script;
+$script->spurt(<<EOF);
 use Mojolicious::Lite;
 
 app->log->level('fatal');
@@ -87,7 +83,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Update script without changing mtime
 ($size, $mtime) = (stat $script)[7, 9];
 is_deeply $morbo->modified_files, [], 'no files have changed';
-spurt <<EOF, $script;
+$script->spurt(<<EOF);
 use Mojolicious::Lite;
 
 app->log->level('fatal');
@@ -116,17 +112,17 @@ is $tx->res->body, 'Hello!', 'right content';
 
 # New file(s)
 is_deeply $morbo->modified_files, [], 'directory has not changed';
-my @new = map { catfile $subdir, "$_.txt" } qw/test testing/;
-spurt 'whatever', $_ for @new;
+my @new = map { $subdir->child("$_.txt") } qw/test testing/;
+$_->spurt('whatever') for @new;
 is_deeply $morbo->modified_files, \@new, 'two files have changed';
-spurt 'whatever', catfile($subdir, '.hidden.txt');
+$subdir->child('.hidden.txt')->spurt('whatever');
 is_deeply $morbo->modified_files, [], 'directory has not changed again';
 
 # Broken symlink
 SKIP: {
   skip 'Symlink support required!', 4 unless eval { symlink '', ''; 1 };
-  my $missing = catfile $subdir, 'missing.txt';
-  my $broken  = catfile $subdir, 'broken.txt';
+  my $missing = $subdir->child('missing.txt');
+  my $broken  = $subdir->child('broken.txt');
   symlink $missing, $broken;
   ok -l $broken,  'symlink created';
   ok !-f $broken, 'symlink target does not exist';

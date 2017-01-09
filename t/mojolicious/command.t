@@ -3,9 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use Cwd 'getcwd';
-use File::Spec::Functions 'catdir';
-use File::Temp 'tempdir';
+use Mojo::File qw(path tempdir);
 use Mojolicious::Command;
 
 # Application
@@ -14,8 +12,8 @@ isa_ok $command->app, 'Mojo',        'right application';
 isa_ok $command->app, 'Mojolicious', 'right application';
 
 # Creating directories
-my $cwd = getcwd;
-my $dir = tempdir CLEANUP => 1;
+my $cwd = path;
+my $dir = tempdir;
 chdir $dir;
 my $buffer = '';
 {
@@ -24,7 +22,7 @@ my $buffer = '';
   $command->create_rel_dir('foo/bar');
 }
 like $buffer, qr/[mkdir]/, 'right output';
-ok -d catdir(qw(foo bar)), 'directory exists';
+ok -d path('foo', 'bar'), 'directory exists';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
@@ -35,6 +33,7 @@ like $buffer, qr/\[exist\]/, 'right output';
 chdir $cwd;
 
 # Generating files
+is $command->rel_file('foo/bar.txt')->basename, 'bar.txt', 'right result';
 my $template = "@@ foo_bar\njust <%= 'works' %>!\n";
 open my $data, '<', \$template;
 no strict 'refs';

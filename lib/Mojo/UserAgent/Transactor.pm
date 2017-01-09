@@ -1,11 +1,11 @@
 package Mojo::UserAgent::Transactor;
 use Mojo::Base -base;
 
-use File::Basename 'basename';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
+use Mojo::File 'path';
 use Mojo::JSON 'encode_json';
 use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
@@ -208,7 +208,7 @@ sub _multipart {
         if (my $file = delete $value->{file}) {
           $file = Mojo::Asset::File->new(path => $file) unless ref $file;
           $part->asset($file);
-          $value->{filename} //= basename $file->path
+          $value->{filename} //= path($file->path)->basename
             if $file->isa('Mojo::Asset::File');
         }
 

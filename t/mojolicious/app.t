@@ -11,9 +11,9 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use File::Spec::Functions 'catfile';
 use Mojo::Asset::File;
 use Mojo::Date;
+use Mojo::File 'path';
 use Mojo::IOLoop;
 use Mojolicious;
 use Mojolicious::Controller;
@@ -390,7 +390,7 @@ like $log, qr/Controller "MojoliciousTest::Another" does not exist/,
 $t->app->log->unsubscribe(message => $cb);
 
 # Check Last-Modified header for static files
-my $path = catfile($FindBin::Bin, 'public_dev', 'hello.txt');
+my $path = path($FindBin::Bin, 'public_dev', 'hello.txt');
 my $size = Mojo::Asset::File->new(path => $path)->size;
 my $mtime
   = Mojo::Date->new(Mojo::Asset::File->new(path => $path)->mtime)->to_string;

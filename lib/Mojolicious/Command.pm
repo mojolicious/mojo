@@ -2,14 +2,11 @@ package Mojolicious::Command;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use Cwd 'getcwd';
-use File::Basename 'dirname';
-use File::Path 'make_path';
-use File::Spec::Functions qw(catdir catfile);
+use Mojo::File 'path';
 use Mojo::Loader 'data_section';
 use Mojo::Server;
 use Mojo::Template;
-use Mojo::Util qw(deprecated spurt unindent);
+use Mojo::Util qw(deprecated unindent);
 use Pod::Usage 'pod2usage';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
@@ -28,7 +25,7 @@ sub chmod_rel_file { $_[0]->chmod_file($_[0]->rel_file($_[1]), $_[2]) }
 sub create_dir {
   my ($self, $path) = @_;
   return $self->_loud("  [exist] $path") if -d $path;
-  make_path $path or croak qq{Can't make directory "$path": $!};
+  path($path)->make_path;
   return $self->_loud("  [mkdir] $path");
 }
 
@@ -51,10 +48,10 @@ sub help { print shift->usage }
 sub rel_dir {
   deprecated 'Mojolicious::Command::rel_dir is DEPRECATED'
     . ' in favor of Mojolicious::Command::rel_file';
-  catdir getcwd(), split('/', pop);
+  path->child(split('/', pop))->to_string;
 }
 
-sub rel_file { catfile getcwd(), split('/', pop) }
+sub rel_file { path->child(split('/', pop)) }
 
 sub render_data {
   my ($self, $name) = (shift, shift);
@@ -77,8 +74,8 @@ sub run { croak 'Method "run" not implemented by subclass' }
 sub write_file {
   my ($self, $path, $data) = @_;
   return $self->_loud("  [exist] $path") if -f $path;
-  $self->create_dir(dirname $path);
-  spurt $data, $path;
+  $self->create_dir(path($path)->dirname);
+  path($path)->spurt($data);
   return $self->_loud("  [write] $path");
 }
 
@@ -209,7 +206,7 @@ Print usage information for command.
 
   my $path = $command->rel_file('foo/bar.txt');
 
-Portably generate an absolute path relative to the current working directory.
+Return a L<Mojo::File> object relative to the current working directory.
 
 =head2 render_data
 

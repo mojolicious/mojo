@@ -1,10 +1,10 @@
 package Mojolicious::Plugin::Config;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use File::Spec::Functions 'file_name_is_absolute';
-use Mojo::Util qw(decode slurp);
+use Mojo::File 'path';
+use Mojo::Util 'decode';
 
-sub load { $_[0]->parse(decode('UTF-8', slurp $_[1]), @_[1, 2, 3]) }
+sub load { $_[0]->parse(decode('UTF-8', path($_[1])->slurp), @_[1, 2, 3]) }
 
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
@@ -30,8 +30,8 @@ sub register {
   my $mode = $file =~ /^(.*)\.([^.]+)$/ ? join('.', $1, $app->mode, $2) : '';
 
   my $home = $app->home;
-  $file = $home->rel_file($file) unless file_name_is_absolute $file;
-  $mode = $home->rel_file($mode) if $mode && !file_name_is_absolute $mode;
+  $file = $home->child($file) unless path($file)->is_abs;
+  $mode = $home->child($mode) if $mode && !path($mode)->is_abs;
   $mode = undef unless $mode && -e $mode;
 
   # Read config file
@@ -68,7 +68,7 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
     baz => ['♥'],
 
     # You have full access to the application
-    music_dir => app->home->rel_file('music')
+    music_dir => app->home->child('music')
   };
 
   # Mojolicious

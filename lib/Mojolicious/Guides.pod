@@ -321,8 +321,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::Headers>
 
-=item * L<Mojo::Home>
-
 =item * L<Mojo::IOLoop::Subprocess>
 
 =item * L<Mojo::JSON::Pointer>
@@ -460,6 +458,14 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 =item * L<Mojo::Collection>
 
 =item * L<Mojo::DOM>
+
+=item * L<Mojo::File>
+
+=over 2
+
+=item * L<Mojo::Home>
+
+=back
 
 =item * L<Mojo::JSON>
 

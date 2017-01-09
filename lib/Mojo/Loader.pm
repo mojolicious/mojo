@@ -2,9 +2,8 @@ package Mojo::Loader;
 use Mojo::Base -strict;
 
 use Exporter 'import';
-use File::Basename 'basename';
-use File::Spec::Functions qw(catdir catfile splitdir);
 use Mojo::Exception;
+use Mojo::File 'path';
 use Mojo::Util qw(b64_decode class_to_path);
 
 our @EXPORT_OK
@@ -21,14 +20,9 @@ sub find_modules {
 
   my %modules;
   for my $directory (@INC) {
-    next unless -d (my $path = catdir $directory, split(/::|'/, $ns));
-
-    # List "*.pm" files in directory
-    opendir(my $dir, $path);
-    for my $file (grep /\.pm$/, readdir $dir) {
-      next if -d catfile splitdir($path), $file;
-      $modules{"${ns}::" . basename $file, '.pm'}++;
-    }
+    next unless -d (my $path = path($directory, split(/::|'/, $ns)));
+    $modules{"${ns}::$_"}++
+      for $path->list->grep(qr/\.pm$/)->map('basename', '.pm')->each;
   }
 
   return sort keys %modules;

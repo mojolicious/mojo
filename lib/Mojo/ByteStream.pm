@@ -12,8 +12,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
-  qw(sha1_sum slurp spurt term_escape trim unindent unquote url_escape),
-  qw(url_unescape xml_escape xor_encode)
+  qw(sha1_sum term_escape trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode)
 );
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);
@@ -47,9 +47,29 @@ sub secure_compare { Mojo::Util::secure_compare ${shift()}, shift }
 
 sub size { length ${$_[0]} }
 
+# DEPRECATED!
+sub slurp {
+  Mojo::Util::deprecated 'Mojo::ByteStream::slurp is DEPRECATED'
+    . ' in favor of Mojo::File::slurp';
+  require Mojo::File;
+  my $self = shift;
+  $$self = Mojo::File->new($$self)->slurp;
+  return $self;
+}
+
 sub split {
   my ($self, $pattern) = @_;
   return Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
+}
+
+# DEPRECATED!
+sub spurt {
+  Mojo::Util::deprecated 'Mojo::ByteStream::spurt is DEPRECATED'
+    . ' in favor of Mojo::File::spurt';
+  require Mojo::File;
+  my $self = shift;
+  Mojo::File->new(shift)->spurt($$self);
+  return $self;
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }
@@ -249,24 +269,6 @@ Generate SHA1 checksum for bytestream with L<Mojo::Util/"sha1_sum">.
   my $size = $stream->size;
 
 Size of bytestream.
-
-=head2 slurp
-
-  $stream = $stream->slurp;
-
-Read all data at once from file into bytestream with L<Mojo::Util/"slurp">.
-
-  # Read file and print lines in random order
-  b('/home/sri/myapp.pl')->slurp->split("\n")->shuffle->join("\n")->say;
-
-=head2 spurt
-
-  $stream = $stream->spurt('/home/sri/myapp.pl');
-
-Write all data from bytestream at once to file with L<Mojo::Util/"spurt">.
-
-  # Remove unnecessary whitespace from file
-  b('/home/sri/foo.txt')->slurp->trim->spurt('/home/sri/bar.txt');
 
 =head2 split
 

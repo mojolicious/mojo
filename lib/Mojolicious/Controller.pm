@@ -402,7 +402,7 @@ a L<Mojolicious> object.
   $c->app->log->debug('Hello Mojo');
 
   # Generate path
-  my $path = $c->app->home->rel_file('templates/foo/bar.html.ep');
+  my $path = $c->app->home->child('templates', 'foo', 'bar.html.ep');
 
 =head2 match
 

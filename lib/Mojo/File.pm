@@ -16,7 +16,6 @@ use File::Path     ();
 use File::Spec::Functions qw(abs2rel catfile file_name_is_absolute splitdir);
 use File::Temp ();
 use Mojo::Collection;
-use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('path', 'tempdir');
 

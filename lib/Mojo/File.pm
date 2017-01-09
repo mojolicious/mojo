@@ -169,6 +169,9 @@ individually.
 Construct a new scalar-based L<Mojo::File> object, defaults to using the current
 working directory.
 
+  # "foo/bar/baz.txt" (on UNIX)
+  path('foo', 'bar', 'baz.txt');
+
 =head2 tempdir
 
   my $path = tempdir;
@@ -301,6 +304,9 @@ Move the file.
 
 Construct a new L<Mojo::File> object, defaults to using the current working
 directory.
+
+  # "foo/bar/baz.txt" (on UNIX)
+  Mojo::File->new('foo', 'bar', 'baz.txt');
 
 =head2 slurp
 

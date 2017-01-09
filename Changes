@@ -9,8 +9,10 @@
     favor of new features inherited from the Mojo::File base class.
   - Added module Mojo::File.
   - Improved Mojo::Home to be a subclass of Mojo::File.
-  - Improved rel_file methods in Mojo::Home and Mojolicious::Command to return
-    Mojo::File objects.
+  - Improved mojo_lib_dir and rel_file methods in Mojo::Home to return
+    Mojo::Home objects.
+  - Improved rel_file methods in Mojolicious::Command to return Mojo::File
+    objects.
 
 7.14  2017-01-04
   - Deprecated Mojo::Home::list_files in favor of Mojo::Util::files.

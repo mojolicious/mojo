@@ -22,10 +22,7 @@ our @EXPORT_OK = ('path', 'tempdir');
 
 sub basename { scalar File::Basename::basename ${$_[0]}, @_ }
 
-sub child {
-  my $self = shift;
-  return $self->new($self, @_);
-}
+sub child { $_[0]->new(@_) }
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
@@ -76,16 +73,7 @@ sub move_to {
 
 sub new {
   my $class = shift;
-
-  my $value;
-  unless (@_) { $value = getcwd }
-
-  elsif (@_ > 1) { $value = catfile @_ }
-
-  elsif (blessed $_[0] && $_[0]->isa('File::Temp::Dir')) { $value = $_[0] }
-
-  else { $value = shift }
-
+  my $value = @_ == 1 ? $_[0] : @_ > 1 ? catfile @_ : getcwd;
   return bless \$value, ref $class || $class;
 }
 

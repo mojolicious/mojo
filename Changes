@@ -1,5 +1,16 @@
 
-7.15  2017-01-06
+7.15  2017-01-09
+  - Deprecated Mojo::ByteStream::slurp and Mojo::Util::slurp in favor of
+    Mojo::File::slurp.
+  - Deprecated Mojo::ByteStream::spurt and Mojo::Util::spurt in favor of
+    Mojo::File::spurt.
+  - Deprecated Mojo::Util::files in favor of Mojo::File::list_tree.
+  - Deprecated Mojo::Home::lib_dir, Mojo::Home::parse, Mojo::Home::parts in
+    favor of new features inherited from the Mojo::File base class.
+  - Added module Mojo::File.
+  - Improved Mojo::Home to be a subclass of Mojo::File.
+  - Improved rel_file methods in Mojo::Home and Mojolicious::Command to return
+    Mojo::File objects.
 
 7.14  2017-01-04
   - Deprecated Mojo::Home::list_files in favor of Mojo::Util::files.

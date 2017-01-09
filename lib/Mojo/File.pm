@@ -13,7 +13,7 @@ use File::Basename ();
 use File::Copy     ();
 use File::Find     ();
 use File::Path     ();
-use File::Spec;
+use File::Spec::Functions qw(abs2rel catfile file_name_is_absolute splitdir);
 use File::Temp ();
 use Mojo::Collection;
 use Scalar::Util 'blessed';
@@ -29,7 +29,7 @@ sub child {
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
-sub is_abs { File::Spec->file_name_is_absolute(${shift()}) }
+sub is_abs { file_name_is_absolute ${shift()} }
 
 sub list {
   my ($self, $options) = (shift, shift // {});
@@ -38,7 +38,7 @@ sub list {
   opendir(my $dir, $$self) or croak qq{Can't open directory "$$self": $!};
   my @files = grep { $_ ne '.' && $_ ne '..' } readdir $dir;
   @files = grep { !/^\./ } @files unless $options->{hidden};
-  @files = map { File::Spec->catfile($$self, $_) } @files;
+  @files = map { catfile $$self, $_ } @files;
   @files = grep { !-d } @files unless $options->{dir};
 
   return Mojo::Collection->new(map { $self->new($_) } sort @files);
@@ -76,17 +76,17 @@ sub move_to {
 
 sub new {
   my $class = shift;
-  my $self = bless \my $dummy, ref $class || $class;
 
-  unless (@_) { $$self = getcwd }
+  my $value;
+  unless (@_) { $value = getcwd }
 
-  elsif (@_ > 1) { $$self = File::Spec->catfile(@_) }
+  elsif (@_ > 1) { $value = catfile @_ }
 
-  elsif (blessed $_[0] && $_[0]->isa('File::Temp::Dir')) { $$self = $_[0] }
+  elsif (blessed $_[0] && $_[0]->isa('File::Temp::Dir')) { $value = $_[0] }
 
-  else { $$self = shift }
+  else { $value = shift }
 
-  return $self;
+  return bless \$value, ref $class || $class;
 }
 
 sub path { __PACKAGE__->new(@_) }
@@ -116,9 +116,9 @@ sub tempdir { __PACKAGE__->new(File::Temp->newdir(@_)) }
 
 sub to_abs { $_[0]->new(abs_path ${$_[0]}) }
 
-sub to_array { [File::Spec->splitdir(${shift()})] }
+sub to_array { [splitdir ${shift()}] }
 
-sub to_rel { $_[0]->new(File::Spec->abs2rel(${$_[0]}, $_[1])) }
+sub to_rel { $_[0]->new(abs2rel(${$_[0]}, $_[1])) }
 
 sub to_string {"${$_[0]}"}
 

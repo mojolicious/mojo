@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Asset';
 use Carp 'croak';
 use Errno 'EEXIST';
 use Fcntl qw(O_APPEND O_CREAT O_EXCL O_RDONLY O_RDWR);
-use File::Spec;
+use File::Spec::Functions ();
 use IO::File;
 use Mojo::File;
 use Mojo::Util 'md5_sum';
@@ -35,7 +35,7 @@ has handle => sub {
 
   return $handle;
 };
-has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
+has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec::Functions::tmpdir };
 
 sub DESTROY {
   my $self = shift;

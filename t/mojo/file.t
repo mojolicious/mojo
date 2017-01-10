@@ -1,9 +1,9 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Cwd qw(abs_path getcwd);
+use Cwd 'getcwd';
 use File::Basename qw(basename dirname);
-use File::Spec::Functions qw(abs2rel catfile splitdir);
+use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use File::Temp;
 use Mojo::File qw(path tempdir);
 
@@ -29,19 +29,19 @@ is_deeply [@{path('foo', 'bar')}], [splitdir catfile('foo', 'bar')],
   'same structure';
 
 # Absolute
-is path('file.t')->to_abs, abs_path('file.t'), 'same path';
+is path('file.t')->to_abs, rel2abs('file.t'), 'same path';
 
 # Relative
 is path('test.txt')->to_abs->to_rel(getcwd),
-  abs2rel(abs_path('test.txt'), getcwd), 'same path';
+  abs2rel(rel2abs('test.txt'), getcwd), 'same path';
 
 # Basename
-is path('file.t')->to_abs->basename, basename(abs_path 'file.t'), 'same path';
-is path('file.t')->to_abs->basename('.t'), basename(abs_path('file.t'), '.t'),
+is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';
+is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'),
   'same path';
 
 # Dirname
-is path('file.t')->to_abs->dirname, dirname(abs_path 'file.t'), 'same path';
+is path('file.t')->to_abs->dirname, dirname(rel2abs 'file.t'), 'same path';
 
 # Checks
 ok path(__FILE__)->to_abs->is_abs, 'path is absolute';

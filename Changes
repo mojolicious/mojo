@@ -1,5 +1,6 @@
 
 7.16  2017-01-10
+  - Fixed Windows bugs in Mojo::File. (kmx)
 
 7.15  2017-01-09
   - Deprecated Mojo::ByteStream::slurp and Mojo::Util::slurp in favor of

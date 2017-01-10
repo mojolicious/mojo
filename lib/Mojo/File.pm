@@ -7,13 +7,14 @@ use overload
   fallback => 1;
 
 use Carp 'croak';
-use Cwd qw(abs_path getcwd);
+use Cwd 'getcwd';
 use Exporter 'import';
 use File::Basename ();
 use File::Copy     ();
 use File::Find     ();
 use File::Path     ();
-use File::Spec::Functions qw(abs2rel catfile file_name_is_absolute splitdir);
+use File::Spec::Functions
+  qw(abs2rel catfile file_name_is_absolute rel2abs splitdir);
 use File::Temp ();
 use Mojo::Collection;
 
@@ -100,7 +101,7 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub tempdir { __PACKAGE__->new(File::Temp->newdir(@_)) }
 
-sub to_abs { $_[0]->new(abs_path ${$_[0]}) }
+sub to_abs { $_[0]->new(rel2abs ${$_[0]}) }
 
 sub to_array { [splitdir ${shift()}] }
 

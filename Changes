@@ -1,4 +1,6 @@
 
+7.16  2017-01-10
+
 7.15  2017-01-09
   - Deprecated Mojo::ByteStream::slurp and Mojo::Util::slurp in favor of
     Mojo::File::slurp.

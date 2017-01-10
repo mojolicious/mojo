@@ -47,10 +47,9 @@ sub list_tree {
   local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
 
   my %files;
-  my $want = sub { $files{$File::Find::name}++ };
-  my $post = sub { delete $files{$File::Find::dir} };
-  File::Find::find {wanted => $want, postprocess => $post, no_chdir => 1},
-    $$self
+  my $w = sub { $files{$File::Find::name}++ };
+  my $p = sub { delete $files{$File::Find::dir} };
+  File::Find::find {wanted => $w, postprocess => $p, no_chdir => 1}, $$self
     if -d $$self;
 
   return Mojo::Collection->new(map { $self->new($_) } sort keys %files);

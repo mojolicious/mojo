@@ -13,6 +13,8 @@
     Mojo::Home objects.
   - Improved rel_file methods in Mojolicious::Command to return Mojo::File
     objects.
+  - Improved every_param and param methods in Mojolicious::Validator::Validation
+    to use the current topic.
 
 7.14  2017-01-04
   - Deprecated Mojo::Home::list_files in favor of Mojo::Util::files.

@@ -51,7 +51,7 @@ sub error {
 }
 
 sub every_param {
-  return [] unless defined(my $value = shift->output->{shift()});
+  return [] unless defined(my $value = $_[0]->output->{$_[1] // $_[0]->topic});
   return [ref $value eq 'ARRAY' ? @$value : $value];
 }
 
@@ -185,6 +185,7 @@ only be one per field.
 
 =head2 every_param
 
+  my $values = $validation->every_param;
   my $values = $validation->every_param('foo');
 
 Similar to L</"param">, but returns all values sharing the same name as an
@@ -236,10 +237,15 @@ L<Mojolicious::Validator/"FILTERS"> are supported.
 
 =head2 param
 
+  my $value = $validation->param;
   my $value = $validation->param('foo');
 
-Access validated values. If there are multiple values sharing the same name, and
-you want to access more than just the last one, you can use L</"every_param">.
+Access validated values, defaults to the current L</"topic">. If there are
+multiple values sharing the same name, and you want to access more than just the
+last one, you can use L</"every_param">.
+
+  # Get value right away
+  my $user = $validation->optional('user')->size(1, 15)->param;
 
 =head2 passed
 

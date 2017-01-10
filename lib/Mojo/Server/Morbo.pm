@@ -15,10 +15,8 @@ sub modified_files {
   my $self = shift;
 
   my $cache = $self->{cache} ||= {};
-  my @check
-    = map { -f $_ && -r _ ? $_ : path($_)->list_tree->each } @{$self->watch};
   my @files;
-  for my $file (@check) {
+  for my $file (map { -f $_ && -r _ ? $_ : _list($_) } @{$self->watch}) {
     my ($size, $mtime) = (stat $file)[7, 9];
     next unless defined $size and defined $mtime;
     my $stats = $cache->{$file} ||= [$^T, $size];
@@ -47,6 +45,8 @@ sub run {
   $self->_manage until $self->{finished} && !$self->{worker};
   exit 0;
 }
+
+sub _list { path(shift)->list_tree->map('to_string')->each }
 
 sub _manage {
   my $self = shift;

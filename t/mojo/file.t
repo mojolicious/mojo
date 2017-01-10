@@ -3,14 +3,14 @@ use Mojo::Base -strict;
 use Test::More;
 use Cwd 'getcwd';
 use File::Basename qw(basename dirname);
-use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
+use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
 use File::Temp;
 use Mojo::File qw(path tempdir);
 
 # Constructor
-is(Mojo::File->new, getcwd(), 'same path');
-is path(), getcwd(), 'same path';
-is path()->to_string, getcwd(), 'same path';
+is(Mojo::File->new, canonpath(getcwd), 'same path');
+is path(), canonpath(getcwd), 'same path';
+is path()->to_string, canonpath(getcwd), 'same path';
 is path('/foo/bar'), '/foo/bar', 'same path';
 is path('foo', 'bar', 'baz'), catfile('foo', 'bar', 'baz'), 'same path';
 

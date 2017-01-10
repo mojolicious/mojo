@@ -14,7 +14,7 @@ use File::Copy     ();
 use File::Find     ();
 use File::Path     ();
 use File::Spec::Functions
-  qw(abs2rel catfile file_name_is_absolute rel2abs splitdir);
+  qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
 use File::Temp ();
 use Mojo::Collection;
 
@@ -38,7 +38,7 @@ sub list {
   @files = map { catfile $$self, $_ } @files;
   @files = grep { !-d } @files unless $options->{dir};
 
-  return Mojo::Collection->new(map { $self->new($_) } sort @files);
+  return Mojo::Collection->new(map { $self->new(canonpath($_)) } sort @files);
 }
 
 sub list_tree {
@@ -72,7 +72,7 @@ sub move_to {
 
 sub new {
   my $class = shift;
-  my $value = @_ == 1 ? $_[0] : @_ > 1 ? catfile @_ : getcwd;
+  my $value = @_ == 1 ? $_[0] : @_ > 1 ? catfile @_ : canonpath getcwd;
   return bless \$value, ref $class || $class;
 }
 

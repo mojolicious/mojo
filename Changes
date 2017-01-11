@@ -1,4 +1,6 @@
 
+7.19  2017-01-12
+
 7.18  2017-01-11
   - Fixed support for relative %INC paths in Mojo::Home.
   - Fixed a bug in Mojo::URL where invalid fragment strings could be generated.

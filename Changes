@@ -1,4 +1,6 @@
 
+7.18  2017-01-12
+
 7.17  2017-01-11
   - Fixed Windows bugs in Mojo::File. (kmx)
 

@@ -38,7 +38,7 @@ sub list {
   @files = map { catfile $$self, $_ } @files;
   @files = grep { !-d } @files unless $options->{dir};
 
-  return Mojo::Collection->new(map { $self->new(canonpath($_)) } sort @files);
+  return Mojo::Collection->new(map { $self->new($_) } sort @files);
 }
 
 sub list_tree {
@@ -53,7 +53,8 @@ sub list_tree {
   File::Find::find {wanted => $w, postprocess => $p, no_chdir => 1}, $$self
     if -d $$self;
 
-  return Mojo::Collection->new(map { $self->new($_) } sort keys %files);
+  return Mojo::Collection->new(map { $self->new(canonpath($_)) }
+      sort keys %files);
 }
 
 sub make_path {

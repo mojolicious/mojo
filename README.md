@@ -1,5 +1,5 @@
 
-# Mojolicious [![Build Status](https://travis-ci.org/kraih/mojo.svg?branch=master)](https://travis-ci.org/kraih/mojo)
+# Mojolicious [![Build Status](https://travis-ci.org/kraih/mojo.svg?branch=master)](https://travis-ci.org/kraih/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/rf4661uxfjolra2y?svg=true)](https://ci.appveyor.com/project/kraih/mojo)
 
   Back in the early days of the web, many people learned Perl because of a
   wonderful Perl library called [CGI](https://metacpan.org/module/CGI). It was

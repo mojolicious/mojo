@@ -40,6 +40,13 @@ use Mojo::Home;
   is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }
 
+# Specific class detection (relative)
+{
+  local $INC{'My/Class.pm'} = path('My', 'Class.pm')->to_string;
+  my $home = Mojo::Home->new->detect('My::Class');
+  is_deeply $home->to_array, path->to_array, 'right path detected';
+}
+
 # Specific class detection (relative "blib")
 {
   local $INC{'My/Class.pm'} = path('blib', 'My', 'Class.pm')->to_string;

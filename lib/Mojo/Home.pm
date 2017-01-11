@@ -7,17 +7,17 @@ sub detect {
   my ($self, $class) = @_;
 
   # Environment variable
-  my $detected;
-  if ($ENV{MOJO_HOME}) { $detected = Mojo::File->new($ENV{MOJO_HOME})->to_abs }
+  my $home;
+  if ($ENV{MOJO_HOME}) { $home = Mojo::File->new($ENV{MOJO_HOME})->to_array }
 
   # Location of the application class (Windows mixes backslash and slash)
   elsif ($class && (my $path = $INC{my $file = class_to_path $class})) {
-    $path =~ s!\\!/!g;
-    $path =~ s!(?:(?:^|/)b?lib)?/\Q$file\E$!!;
-    $detected = Mojo::File->new($path)->to_abs;
+    $home = Mojo::File->new($path)->to_array;
+    splice @$home, split('/', $file) * -1;
+    pop @$home if @$home && ($home->[-1] eq 'blib' || $home->[-1] eq 'lib');
   }
 
-  $$self = $detected->to_string if $detected;
+  $$self = Mojo::File->new(@$home)->to_abs->to_string if $home;
   return $self;
 }
 

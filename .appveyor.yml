@@ -21,4 +21,4 @@ install:
 build: off
 
 test_script:
-  - 'prove -lv t'
+  - 'prove -lv t t/mojo t/mojolicious'

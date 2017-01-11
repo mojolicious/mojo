@@ -4,13 +4,6 @@ shallow_clone: true
 environment:
   matrix:
     - perl_type: system
-    - perl_type: strawberry
-    - perl_type: strawberry
-      perl_version: 5.12.3.1
-    - perl_type: strawberry
-      perl_version: 5.16.3.3
-    - perl_type: strawberry
-      perl_version: 5.20.1.1
     - perl_type: cygwin
 
 install:
@@ -21,4 +14,4 @@ install:
 build: off
 
 test_script:
-  - 'prove -lv t t/mojo t/mojolicious'
+  - 'prove -l t t/mojo t/mojolicious'

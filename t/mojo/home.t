@@ -7,7 +7,6 @@ use FindBin;
 use Mojo::File 'path';
 use Mojo::HelloWorld;
 use Mojo::Home;
-use Mojo::Util 'class_to_path';
 
 # ENV detection
 {
@@ -20,8 +19,7 @@ use Mojo::Util 'class_to_path';
 # Specific class detection
 {
   my $fake = path->to_abs->child('does_not_exist_2');
-  local $INC{'My/Class.pm'}
-    = $fake->child(class_to_path 'My::Class')->to_string;
+  local $INC{'My/Class.pm'} = $fake->child('My', 'Class.pm')->to_string;
   my $home = Mojo::Home->new->detect('My::Class');
   is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }
@@ -29,8 +27,7 @@ use Mojo::Util 'class_to_path';
 # Specific class detection (with "lib")
 {
   my $fake = path->to_abs->child('does_not_exist_3');
-  local $INC{'My/Class.pm'}
-    = $fake->child('lib', class_to_path 'My::Class')->to_string;
+  local $INC{'My/Class.pm'} = $fake->child('lib', 'My', 'Class.pm')->to_string;
   my $home = Mojo::Home->new->detect('My::Class');
   is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }
@@ -38,8 +35,7 @@ use Mojo::Util 'class_to_path';
 # Specific class detection (with "blib")
 {
   my $fake = path->to_abs->child('does_not_exist_3');
-  local $INC{'My/Class.pm'}
-    = $fake->child('blib', class_to_path 'My::Class')->to_string;
+  local $INC{'My/Class.pm'} = $fake->child('blib', 'My', 'Class.pm')->to_string;
   my $home = Mojo::Home->new->detect('My::Class');
   is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }

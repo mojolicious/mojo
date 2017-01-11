@@ -12,7 +12,8 @@ sub detect {
 
   # Location of the application class (Windows mixes backslash and slash)
   elsif ($class && (my $path = $INC{my $file = class_to_path $class})) {
-    $path =~ s!(?:[\\/]b?lib)?[\\/]\Q$file\E$!!;
+    $path =~ s!\\!/!g;
+    $path =~ s!(?:/b?lib)?/\Q$file\E$!!;
     $detected = Mojo::File->new($path)->to_abs;
   }
 

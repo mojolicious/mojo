@@ -26,22 +26,22 @@ is $url->path,       '/x/index.html', 'right path';
 is $url->query,      'monkey=biz&foo=1', 'right query';
 is $url->path_query, '/x/index.html?monkey=biz&foo=1', 'right path and query';
 is $url->fragment,   '/!%?@3', 'right fragment';
-is "$url", 'https://example.com:8080/x/index.html?monkey=biz&foo=1#/!%?@3',
+is "$url", 'https://example.com:8080/x/index.html?monkey=biz&foo=1#/!%25?@3',
   'right format';
 $url->path('/index.xml');
-is "$url", 'https://example.com:8080/index.xml?monkey=biz&foo=1#/!%?@3',
+is "$url", 'https://example.com:8080/index.xml?monkey=biz&foo=1#/!%25?@3',
   'right format';
 
 # Advanced userinfo and fragment roundtrip
 $url = Mojo::URL->new(
-  'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
-is $url->scheme,   'ws',                          'right scheme';
-is $url->userinfo, 'AZaz09-._~!$&\'()*+,;=:',     'right userinfo';
-is $url->username, 'AZaz09-._~!$&\'()*+,;=',      'right username';
-is $url->password, '',                            'right password';
-is $url->host,     'localhost',                   'right host';
-is $url->fragment, 'AZaz09-._~!$&\'()*+,;=%:@/?', 'right fragment';
-is "$url", 'ws://localhost#AZaz09-._~!$&\'()*+,;=%:@/?', 'right format';
+  'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=:@/?');
+is $url->scheme,   'ws',                         'right scheme';
+is $url->userinfo, 'AZaz09-._~!$&\'()*+,;=:',    'right userinfo';
+is $url->username, 'AZaz09-._~!$&\'()*+,;=',     'right username';
+is $url->password, '',                           'right password';
+is $url->host,     'localhost',                  'right host';
+is $url->fragment, 'AZaz09-._~!$&\'()*+,;=:@/?', 'right fragment';
+is "$url", 'ws://localhost#AZaz09-._~!$&\'()*+,;=:@/?', 'right format';
 
 # Parameters
 $url = Mojo::URL->new(

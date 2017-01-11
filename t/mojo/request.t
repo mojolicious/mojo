@@ -2098,7 +2098,7 @@ $req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url, "/#09azAZ!\$%&\'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~%C3%9F",
+is $req->url, "/#09azAZ!\$%25&\'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~%C3%9F",
   'right URL';
 
 # Abstract methods

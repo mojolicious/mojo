@@ -166,7 +166,7 @@ sub to_string {
   # Fragment
   return $url unless defined(my $fragment = $self->fragment);
   return $url . '#' . url_escape encode('UTF-8', $fragment),
-    '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
+    '^A-Za-z0-9\-._~!$&\'()*+,;=:@/?';
 }
 
 sub username { (shift->userinfo // '') =~ /^([^:]+)/ ? $1 : undef }

@@ -100,14 +100,14 @@ sub _accept {
       = Mojo::IOLoop::TLS->new(reactor => $self->reactor);
     weaken $tls->{reactor};
     $tls->on(
-      negotiated => sub {
+      finish => sub {
         my $handle = pop;
         delete $self->{handles}{$id};
         $self->emit(accept => $handle);
       }
     );
     $tls->on(error => sub { delete $self->{handles}{$id} });
-    $tls->negotiate(%$args, handle => $handle);
+    $tls->negotiate(%$args, handle => $handle, server => 1);
   }
 }
 

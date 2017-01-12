@@ -49,15 +49,17 @@ sub negotiate {
 
   my $handle = $args->{handle};
   return $self->emit(error => "TLS upgrade failed: $IO::Socket::SSL::SSL_ERROR")
-    unless IO::Socket::SSL->start_SSL($handle, %$tls, SSL_server => 1);
-  $self->reactor->io($self->{handle} = $handle => sub { $self->_tls($handle) });
+    unless IO::Socket::SSL->start_SSL($handle, %$tls,
+    SSL_server => $args->{server});
+  $self->reactor->io($self->{handle}
+      = $handle => sub { $self->_tls($handle, $args->{server}) });
 }
 
 sub _tls {
-  my ($self, $handle) = @_;
+  my ($self, $handle, $server) = @_;
 
-  return $self->emit(negotiated => delete $self->{handle})
-    if $handle->accept_SSL;
+  return $self->emit(finish => delete $self->{handle})
+    if $server ? $handle->accept_SSL : $handle->connect_SSL;
 
   # Switch between reading and writing
   my $err = $IO::Socket::SSL::SSL_ERROR;

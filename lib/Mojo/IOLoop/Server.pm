@@ -79,7 +79,7 @@ sub listen {
   @$self{qw(handle single_accept)} = ($handle, $args->{single_accept});
 
   return unless $args->{tls};
-  croak "IO::Socket::SSL 1.94+ required for TLS support" unless TLS;
+  croak 'IO::Socket::SSL 1.94+ required for TLS support' unless TLS;
 
   weaken $self;
   my $tls = $self->{tls} = {

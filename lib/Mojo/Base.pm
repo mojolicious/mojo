@@ -206,9 +206,9 @@ L<Mojo::Base> implements the following methods.
 Create attribute accessors for hash-based objects, an array reference can be
 used to create more than one at a time. Pass an optional second argument to set
 a default value, it should be a constant or a callback. The callback will be
-executed at accessor read time if there's no set value. Accessors can be
-chained, that means they return their invocant when they are called with an
-argument.
+executed at accessor read time if there's no set value, and gets passed the
+current instance of the object as first argument. Accessors can be chained, that
+means they return their invocant when they are called with an argument.
 
 =head2 new
 

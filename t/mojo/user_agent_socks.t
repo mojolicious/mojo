@@ -10,7 +10,7 @@ plan skip_all => 'set TEST_SOCKS to enable this test (developer only!)'
 plan skip_all => 'IO::Socket::Socks 0.64+ required for this test!'
   unless Mojo::IOLoop::Client::SOCKS;
 plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
-  unless Mojo::IOLoop::Server::TLS;
+  unless Mojo::IOLoop::TLS->has_tls;
 
 use Mojo::IOLoop;
 use Mojo::IOLoop::Server;

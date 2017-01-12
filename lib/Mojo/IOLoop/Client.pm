@@ -268,6 +268,7 @@ implements the following new ones.
 =head2 connect
 
   $client->connect(address => '127.0.0.1', port => 3000);
+  $client->connect({address => '127.0.0.1', port => 3000});
 
 Open a socket connection to a remote host. Note that non-blocking name
 resolution depends on L<Net::DNS::Native> (0.15+), SOCKS5 support on

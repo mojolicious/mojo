@@ -234,6 +234,7 @@ Check if connections are currently being accepted.
 =head2 listen
 
   $server->listen(port => 3000);
+  $server->listen({port => 3000});
 
 Create a new listen socket. Note that TLS support depends on L<IO::Socket::SSL>
 (1.94+).

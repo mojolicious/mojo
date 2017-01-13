@@ -96,7 +96,7 @@ sub _accept {
 
     # Start TLS handshake
     my $tls = Mojo::IOLoop::TLS->new(reactor => $self->reactor);
-    $tls->on(finish => sub { $self->emit(accept => pop) });
+    $tls->on(upgrade => sub { $self->emit(accept => pop) });
     $tls->on(error => sub { });
     $tls->negotiate(%$args, handle => $handle, server => 1);
   }

@@ -1,5 +1,5 @@
 
-7.19  2017-01-12
+7.19  2017-01-13
 
 7.18  2017-01-11
   - Fixed support for relative %INC paths in Mojo::Home.

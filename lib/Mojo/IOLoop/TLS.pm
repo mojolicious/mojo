@@ -129,7 +129,7 @@ emit the following new ones.
 
 =head2 upgrade
 
-  $tls->on(connect => sub {
+  $tls->on(upgrade => sub {
     my ($tls, $handle) = @_;
     ...
   });

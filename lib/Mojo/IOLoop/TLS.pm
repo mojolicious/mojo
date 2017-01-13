@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Exporter 'import';
 use Mojo::File 'path';
-use Scalar::Util 'weaken';
 
 # TLS support requires IO::Socket::SSL
 use constant HAS_TLS => $ENV{MOJO_NO_TLS}
@@ -33,7 +32,6 @@ sub negotiate {
   return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
     unless HAS_TLS;
 
-  weaken $self;
   my $tls = {
     SSL_ca_file => $args->{tls_ca}
       && -T $args->{tls_ca} ? $args->{tls_ca} : undef,

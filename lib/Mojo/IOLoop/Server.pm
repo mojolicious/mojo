@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use IO::Socket::IP;
 use Mojo::IOLoop;
-use Mojo::IOLoop::TLS;
+use Mojo::IOLoop::TLS 'HAS_TLS';
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
@@ -65,8 +65,7 @@ sub listen {
   @$self{qw(handle single_accept)} = ($handle, $args->{single_accept});
 
   return unless $args->{tls};
-  croak 'IO::Socket::SSL 1.94+ required for TLS support'
-    unless Mojo::IOLoop::TLS->has_tls;
+  croak 'IO::Socket::SSL 1.94+ required for TLS support' unless HAS_TLS;
   $self->{args} = $args;
 }
 
@@ -93,10 +92,10 @@ sub _accept {
     # Disable Nagle's algorithm
     setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
-    # Start TLS handshake
     $self->emit(accept => $handle) and next unless my $args = $self->{args};
-    my $id  = "$handle";
-    my $tls = $self->{handles}{$id}
+
+    # Start TLS handshake
+    my $tls = $self->{handles}{my $id = "$handle"}
       = Mojo::IOLoop::TLS->new(reactor => $self->reactor);
     weaken $tls->{reactor};
     $tls->on(

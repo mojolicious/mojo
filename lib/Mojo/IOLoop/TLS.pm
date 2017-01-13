@@ -8,8 +8,8 @@ use Mojo::File 'path';
 use constant HAS_TLS => $ENV{MOJO_NO_TLS}
   ? 0
   : eval 'use IO::Socket::SSL 1.94 (); 1';
-use constant TLS_READ  => HAS_TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
-use constant TLS_WRITE => HAS_TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
+use constant READ  => HAS_TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
+use constant WRITE => HAS_TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
@@ -74,8 +74,8 @@ sub _tls {
 
   # Switch between reading and writing
   my $err = $IO::Socket::SSL::SSL_ERROR;
-  if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
-  elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
+  if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
+  elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
 }
 
 1;

@@ -19,10 +19,8 @@ my $NDN = HAS_NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 use constant HAS_SOCKS => $ENV{MOJO_NO_SOCKS}
   ? 0
   : eval 'use IO::Socket::Socks 0.64 (); 1';
-use constant SOCKS_READ => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ() : 0;
-use constant SOCKS_WRITE => HAS_SOCKS
-  ? IO::Socket::Socks::SOCKS_WANT_WRITE()
-  : 0;
+use constant READ  => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
+use constant WRITE => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
@@ -85,7 +83,7 @@ sub _connect {
   }
   $handle->blocking(0);
 
-  $self->_wait($handle, $args);
+  $self->_wait('_ready', $handle, $args);
 }
 
 sub _port { $_[0]{socks_port} || $_[0]{port} || ($_[0]{tls} ? 443 : 80) }
@@ -98,7 +96,7 @@ sub _ready {
   unless ($handle->connect) {
     return $self->emit(error => $!) unless $! == EINPROGRESS;
     $self->reactor->remove($handle);
-    return $self->_wait($handle, $args);
+    return $self->_wait('_ready', $handle, $args);
   }
 
   return $self->emit(error => $! || 'Not connected') unless $handle->connected;
@@ -118,9 +116,9 @@ sub _socks {
 
   # Switch between reading and writing
   my $err = $IO::Socket::Socks::SOCKS_ERROR;
-  if    ($err == SOCKS_READ)  { $self->reactor->watch($handle, 1, 0) }
-  elsif ($err == SOCKS_WRITE) { $self->reactor->watch($handle, 1, 1) }
-  else                        { $self->emit(error => $err) }
+  if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
+  elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
+  else                  { $self->emit(error => $err) }
 }
 
 sub _try_socks {
@@ -140,8 +138,8 @@ sub _try_socks {
   $reactor->remove($handle);
   return $self->emit(error => 'SOCKS upgrade failed')
     unless IO::Socket::Socks->start_SOCKS($handle, %options);
-  weaken $self;
-  $reactor->io($handle => sub { $self->_socks($args) })->watch($handle, 0, 1);
+
+  $self->_wait('_socks', $handle, $args);
 }
 
 sub _try_tls {
@@ -161,9 +159,9 @@ sub _try_tls {
 }
 
 sub _wait {
-  my ($self, $handle, $args) = @_;
+  my ($self, $next, $handle, $args) = @_;
   weaken $self;
-  $self->reactor->io($handle => sub { $self->_ready($args) })
+  $self->reactor->io($handle => sub { $self->$next($args) })
     ->watch($handle, 0, 1);
 }
 

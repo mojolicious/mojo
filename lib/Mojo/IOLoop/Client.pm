@@ -152,10 +152,10 @@ sub _try_tls {
 
   # Start TLS handshake
   weaken $self;
-  my $tls = Mojo::IOLoop::TLS->new(reactor => $reactor);
+  my $tls = Mojo::IOLoop::TLS->new($handle)->reactor($self->reactor);
   $tls->on(upgrade => sub { $self->_cleanup->emit(connect => pop) });
   $tls->on(error => sub { $self->emit(error => pop) });
-  $tls->negotiate(%$args, handle => $handle);
+  $tls->negotiate(%$args);
 }
 
 sub _wait {

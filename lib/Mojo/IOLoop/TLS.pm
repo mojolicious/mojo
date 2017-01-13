@@ -59,12 +59,14 @@ sub negotiate {
     $tls->{SSL_verifycn_name} = $args->{address};
   }
 
-  my $handle = $args->{handle};
+  my $handle = $self->{handle};
   return $self->emit(error => $IO::Socket::SSL::SSL_ERROR)
     unless IO::Socket::SSL->start_SSL($handle, %$tls);
-  $self->reactor->io($self->{handle}
+  $self->reactor->io($handle
       = $handle => sub { $self->_tls($handle, $args->{server}) });
 }
+
+sub new { shift->SUPER::new(handle => shift) }
 
 sub _tls {
   my ($self, $handle, $server) = @_;
@@ -91,7 +93,7 @@ Mojo::IOLoop::TLS - Non-blocking TLS handshake
   use Mojo::IOLoop::TLS;
 
   # Negotiate TLS
-  my $tls = Mojo::IOLoop::TLS->new;
+  my $tls = Mojo::IOLoop::TLS->new($old_handle);
   $tls->on(upgrade => sub {
     my ($tls, $new_handle) = @_;
     ...
@@ -100,7 +102,7 @@ Mojo::IOLoop::TLS - Non-blocking TLS handshake
     my ($tls, $err) = @_;
     ...
   });
-  $tls->negotiate(handle => $old_handle, server => 1);
+  $tls->negotiate(server => 1, tls_version => 'TLSv1_2');
 
   # Start reactor if necessary
   $tls->reactor->start unless $tls->reactor->is_running;
@@ -151,20 +153,14 @@ implements the following new ones.
 
 =head2 negotiate
 
-  $tls->negotiate(handle => $handle, server => 1);
-  $tls->negotiate({handle => $handle, server => 1});
+  $tls->negotiate(server => 1, tls_version => 'TLSv1_2');
+  $tls->negotiate({server => 1, tls_version => 'TLSv1_2'});
 
 Negotiate TLS.
 
 These options are currently available:
 
 =over 2
-
-=item handle
-
-  handle => $handle
-
-L<IO::Socket::IP> object to negotiate TLS with.
 
 =item server
 
@@ -215,6 +211,12 @@ client-side if a certificate authority file has been provided, or C<0x00>.
 TLS protocol version.
 
 =back
+
+=head2 new
+
+  my $tls = Mojo::IOLoop::TLS->new($handle);
+
+Construct a new L<Mojo::IOLoop::Stream> object.
 
 =head1 CONSTANTS
 

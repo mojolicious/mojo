@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Exporter 'import';
 use Mojo::File 'path';
+use Scalar::Util 'weaken';
 
 # TLS support requires IO::Socket::SSL
 use constant HAS_TLS => $ENV{MOJO_NO_TLS}
@@ -20,11 +21,7 @@ our @EXPORT_OK = ('HAS_TLS');
 my $CERT = path(__FILE__)->dirname->child('resources', 'server.crt')->to_string;
 my $KEY  = path(__FILE__)->dirname->child('resources', 'server.key')->to_string;
 
-sub DESTROY {
-  my $self = shift;
-  return unless my $reactor = $self->reactor;
-  $reactor->remove($self->{handle}) if $self->{handle};
-}
+sub DESTROY { shift->_cleanup }
 
 sub negotiate {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
@@ -32,13 +29,33 @@ sub negotiate {
   return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
     unless HAS_TLS;
 
+  my $handle = $self->{handle};
+  return $self->emit(error => $IO::Socket::SSL::SSL_ERROR)
+    unless IO::Socket::SSL->start_SSL($handle, %{$self->_expand($args)});
+  $self->reactor->io($handle
+      = $handle => sub { $self->_tls($handle, $args->{server}) });
+}
+
+sub new { shift->SUPER::new(handle => shift) }
+
+sub _cleanup {
+  my $self = shift;
+  return unless my $reactor = $self->reactor;
+  $reactor->remove($self->{handle}) if $self->{handle};
+  return $self;
+}
+
+sub _expand {
+  my ($self, $args) = @_;
+
+  weaken $self;
   my $tls = {
     SSL_ca_file => $args->{tls_ca}
       && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_error_trap         => sub { $self->emit(error => $_[1]) },
+    SSL_error_trap         => sub { $self->_cleanup->emit(error => $_[1]) },
     SSL_honor_cipher_order => 1,
-    SSL_server             => $args->{server},
-    SSL_startHandshake     => 0
+    SSL_server         => $args->{server},
+    SSL_startHandshake => 0
   };
   $tls->{SSL_cert_file}   = $args->{tls_cert}    if $args->{tls_cert};
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
@@ -59,14 +76,8 @@ sub negotiate {
     $tls->{SSL_verifycn_name} = $args->{address};
   }
 
-  my $handle = $self->{handle};
-  return $self->emit(error => $IO::Socket::SSL::SSL_ERROR)
-    unless IO::Socket::SSL->start_SSL($handle, %$tls);
-  $self->reactor->io($handle
-      = $handle => sub { $self->_tls($handle, $args->{server}) });
+  return $tls;
 }
-
-sub new { shift->SUPER::new(handle => shift) }
 
 sub _tls {
   my ($self, $handle, $server) = @_;

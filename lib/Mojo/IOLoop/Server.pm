@@ -62,11 +62,10 @@ sub listen {
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
   }
   $handle->blocking(0);
-  @$self{qw(handle single_accept)} = ($handle, $args->{single_accept});
+  @$self{qw(args handle)} = ($args, $handle);
 
-  return unless $args->{tls};
-  croak 'IO::Socket::SSL 1.94+ required for TLS support' unless HAS_TLS;
-  $self->{args} = $args;
+  croak 'IO::Socket::SSL 1.94+ required for TLS support'
+    if !HAS_TLS && $args->{tls};
 }
 
 sub port { shift->{handle}->sockport }
@@ -84,15 +83,16 @@ sub _accept {
   my $self = shift;
 
   # Greedy accept
+  my $args     = $self->{args};
   my $accepted = 0;
-  while ($self->{active} && !($self->{single_accept} && $accepted++)) {
+  while ($self->{active} && !($args->{single_accept} && $accepted++)) {
     return unless my $handle = $self->{handle}->accept;
     $handle->blocking(0);
 
     # Disable Nagle's algorithm
     setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
-    $self->emit(accept => $handle) and next unless my $args = $self->{args};
+    $self->emit(accept => $handle) and next unless $args->{tls};
 
     # Start TLS handshake
     my $tls = Mojo::IOLoop::TLS->new($handle)->reactor($self->reactor);

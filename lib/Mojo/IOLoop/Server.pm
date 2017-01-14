@@ -3,31 +3,17 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use IO::Socket::IP;
-use Mojo::File 'path';
 use Mojo::IOLoop;
+use Mojo::IOLoop::TLS 'HAS_TLS';
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
-
-# TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval 'use IO::Socket::SSL 1.94 (); 1';
-use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
-use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
-
-# To regenerate the certificate run this command (18.04.2012)
-# openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
-my $CERT = path(__FILE__)->dirname->child('resources', 'server.crt')->to_string;
-my $KEY  = path(__FILE__)->dirname->child('resources', 'server.key')->to_string;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY {
   my $self = shift;
   $ENV{MOJO_REUSE} =~ s/(?:^|\,)\Q$self->{reuse}\E// if $self->{reuse};
-  return unless my $reactor = $self->reactor;
-  $self->stop if $self->{handle};
-  $reactor->remove($_) for values %{$self->{handles}};
+  $self->stop if $self->{handle} && $self->reactor;
 }
 
 sub generate_port {
@@ -76,28 +62,10 @@ sub listen {
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
   }
   $handle->blocking(0);
-  @$self{qw(handle single_accept)} = ($handle, $args->{single_accept});
+  @$self{qw(args handle)} = ($args, $handle);
 
-  return unless $args->{tls};
-  croak 'IO::Socket::SSL 1.94+ required for TLS support' unless TLS;
-
-  weaken $self;
-  my $tls = $self->{tls} = {
-    SSL_cert_file => $args->{tls_cert} || $CERT,
-    SSL_error_trap => sub {
-      return unless my $handle = delete $self->{handles}{shift()};
-      $self->reactor->remove($handle);
-      close $handle;
-    },
-    SSL_honor_cipher_order => 1,
-    SSL_key_file           => $args->{tls_key} || $KEY,
-    SSL_startHandshake     => 0,
-    SSL_verify_mode => $args->{tls_verify} // ($args->{tls_ca} ? 0x03 : 0x00)
-  };
-  $tls->{SSL_ca_file} = $args->{tls_ca}
-    if $args->{tls_ca} && -T $args->{tls_ca};
-  $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
-  $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
+  croak 'IO::Socket::SSL 1.94+ required for TLS support'
+    if !HAS_TLS && $args->{tls};
 }
 
 sub port { shift->{handle}->sockport }
@@ -115,40 +83,23 @@ sub _accept {
   my $self = shift;
 
   # Greedy accept
+  my $args     = $self->{args};
   my $accepted = 0;
-  while ($self->{active} && !($self->{single_accept} && $accepted++)) {
+  while ($self->{active} && !($args->{single_accept} && $accepted++)) {
     return unless my $handle = $self->{handle}->accept;
     $handle->blocking(0);
 
     # Disable Nagle's algorithm
     setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
+    $self->emit(accept => $handle) and next unless $args->{tls};
+
     # Start TLS handshake
-    $self->emit(accept => $handle) and next unless my $tls = $self->{tls};
-    $self->_handshake($self->{handles}{$handle} = $handle)
-      if $handle = IO::Socket::SSL->start_SSL($handle, %$tls, SSL_server => 1);
+    my $tls = Mojo::IOLoop::TLS->new($handle)->reactor($self->reactor);
+    $tls->on(upgrade => sub { $self->emit(accept => pop) });
+    $tls->on(error => sub { });
+    $tls->negotiate(%$args, server => 1);
   }
-}
-
-sub _handshake {
-  my ($self, $handle) = @_;
-  weaken $self;
-  $self->reactor->io($handle => sub { $self->_tls($handle) });
-}
-
-sub _tls {
-  my ($self, $handle) = @_;
-
-  # Accepted
-  if ($handle->accept_SSL) {
-    $self->reactor->remove($handle);
-    return $self->emit(accept => delete $self->{handles}{$handle});
-  }
-
-  # Switch between reading and writing
-  my $err = $IO::Socket::SSL::SSL_ERROR;
-  if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
-  elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
 }
 
 1;

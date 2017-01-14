@@ -2,32 +2,29 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno 'EINPROGRESS';
+use Exporter 'import';
 use IO::Socket::IP;
 use Mojo::IOLoop;
+use Mojo::IOLoop::TLS;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native
-use constant NDN => $ENV{MOJO_NO_NDN}
+use constant HAS_NNR => $ENV{MOJO_NO_NNR}
   ? 0
   : eval 'use Net::DNS::Native 0.15 (); 1';
-my $NDN = NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
-
-# TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval 'use IO::Socket::SSL 1.94 (); 1';
-use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
-use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
+my $NDN = HAS_NNR ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 
 # SOCKS support requires IO::Socket::Socks
-use constant SOCKS => $ENV{MOJO_NO_SOCKS}
+use constant HAS_SOCKS => $ENV{MOJO_NO_SOCKS}
   ? 0
   : eval 'use IO::Socket::Socks 0.64 (); 1';
-use constant SOCKS_READ  => SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
-use constant SOCKS_WRITE => SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
+use constant READ  => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
+use constant WRITE => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
+
+our @EXPORT_OK = qw(HAS_NNR HAS_SOCKS);
 
 sub DESTROY { shift->_cleanup }
 
@@ -44,7 +41,7 @@ sub connect {
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
   return $reactor->next_tick(sub { $self && $self->_connect($args) })
-    if !NDN || $args->{handle};
+    if !HAS_NNR || $args->{handle};
 
   # Non-blocking name resolution
   my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
@@ -86,7 +83,7 @@ sub _connect {
   }
   $handle->blocking(0);
 
-  $self->_wait($handle, $args);
+  $self->_wait('_ready', $handle, $args);
 }
 
 sub _port { $_[0]{socks_port} || $_[0]{port} || ($_[0]{tls} ? 443 : 80) }
@@ -99,7 +96,7 @@ sub _ready {
   unless ($handle->connect) {
     return $self->emit(error => $!) unless $! == EINPROGRESS;
     $self->reactor->remove($handle);
-    return $self->_wait($handle, $args);
+    return $self->_wait('_ready', $handle, $args);
   }
 
   return $self->emit(error => $! || 'Not connected') unless $handle->connected;
@@ -119,22 +116,9 @@ sub _socks {
 
   # Switch between reading and writing
   my $err = $IO::Socket::Socks::SOCKS_ERROR;
-  if    ($err == SOCKS_READ)  { $self->reactor->watch($handle, 1, 0) }
-  elsif ($err == SOCKS_WRITE) { $self->reactor->watch($handle, 1, 1) }
-  else                        { $self->emit(error => $err) }
-}
-
-sub _tls {
-  my $self = shift;
-
-  # Connected
-  my $handle = $self->{handle};
-  return $self->_cleanup->emit(connect => $handle) if $handle->connect_SSL;
-
-  # Switch between reading and writing
-  my $err = $IO::Socket::SSL::SSL_ERROR;
-  if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
-  elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
+  if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
+  elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
+  else                  { $self->emit(error => $err) }
 }
 
 sub _try_socks {
@@ -144,7 +128,7 @@ sub _try_socks {
   return $self->_try_tls($args) unless $args->{socks_address};
   return $self->emit(
     error => 'IO::Socket::Socks 0.64+ required for SOCKS support')
-    unless SOCKS;
+    unless HAS_SOCKS;
 
   my %options = (ConnectAddr => $args->{address}, ConnectPort => $args->{port});
   @options{qw(AuthType Username Password)}
@@ -154,8 +138,8 @@ sub _try_socks {
   $reactor->remove($handle);
   return $self->emit(error => 'SOCKS upgrade failed')
     unless IO::Socket::Socks->start_SOCKS($handle, %options);
-  weaken $self;
-  $reactor->io($handle => sub { $self->_socks($args) })->watch($handle, 0, 1);
+
+  $self->_wait('_socks', $handle, $args);
 }
 
 sub _try_tls {
@@ -163,34 +147,20 @@ sub _try_tls {
 
   my $handle = $self->{handle};
   return $self->_cleanup->emit(connect => $handle) unless $args->{tls};
-  return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
-    unless TLS;
-
-  # Upgrade
-  weaken $self;
-  my %options = (
-    SSL_ca_file => $args->{tls_ca}
-      && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_cert_file  => $args->{tls_cert},
-    SSL_error_trap => sub { $self->emit(error => $_[1]) },
-    SSL_hostname   => IO::Socket::SSL->can_client_sni ? $args->{address} : '',
-    SSL_key_file   => $args->{tls_key},
-    SSL_startHandshake  => 0,
-    SSL_verify_mode     => $args->{tls_ca} ? 0x01 : 0x00,
-    SSL_verifycn_name   => $args->{address},
-    SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
-  );
   my $reactor = $self->reactor;
   $reactor->remove($handle);
-  return $self->emit(error => 'TLS upgrade failed')
-    unless IO::Socket::SSL->start_SSL($handle, %options);
-  $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
+
+  # Start TLS handshake
+  my $tls = Mojo::IOLoop::TLS->new($handle)->reactor($self->reactor);
+  $tls->on(upgrade => sub { $self->_cleanup->emit(connect => pop) });
+  $tls->on(error => sub { $self->emit(error => pop) });
+  $tls->negotiate(%$args);
 }
 
 sub _wait {
-  my ($self, $handle, $args) = @_;
+  my ($self, $next, $handle, $args) = @_;
   weaken $self;
-  $self->reactor->io($handle => sub { $self->_ready($args) })
+  $self->reactor->io($handle => sub { $self->$next($args) })
     ->watch($handle, 0, 1);
 }
 
@@ -358,6 +328,19 @@ Path to the TLS certificate file.
 Path to the TLS key file.
 
 =back
+
+=head1 CONSTANTS
+
+L<Mojo::IOLoop::Client> implements the following constants, which can be
+imported individually.
+
+=head2 HAS_NNR
+
+Non-blocking name resolution is supported with L<Net::DNS::Native>.
+
+=head2 HAS_SOCKS
+
+SOCKS5 is supported with L<IO::Socket::SOCKS>.
 
 =head1 SEE ALSO
 

@@ -1,7 +1,8 @@
 package Mojolicious::Command::version;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::IOLoop::Client;
+use Mojo::IOLoop::Client qw(HAS_NNR HAS_SOCKS);
+use Mojo::IOLoop::TLS 'HAS_TLS';
 use Mojolicious;
 
 has description => 'Show versions of available modules';
@@ -10,11 +11,10 @@ has usage => sub { shift->extract_usage };
 sub run {
   my $self = shift;
 
-  my $ev    = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'n/a';
-  my $class = 'Mojo::IOLoop::Client';
-  my $socks = $class->SOCKS ? $IO::Socket::Socks::VERSION : 'n/a';
-  my $tls   = $class->TLS ? $IO::Socket::SSL::VERSION : 'n/a';
-  my $ndn   = $class->NDN ? $Net::DNS::Native::VERSION : 'n/a';
+  my $ev = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'n/a';
+  my $socks = HAS_SOCKS ? $IO::Socket::Socks::VERSION : 'n/a';
+  my $tls   = HAS_TLS   ? $IO::Socket::SSL::VERSION   : 'n/a';
+  my $ndn   = HAS_NNR   ? $Net::DNS::Native::VERSION  : 'n/a';
 
   print <<EOF;
 CORE

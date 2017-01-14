@@ -257,6 +257,8 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::IOLoop::Stream>
 
+=item * L<Mojo::IOLoop::TLS>
+
 =item * L<Mojo::Log>
 
 =item * L<Mojo::Message>

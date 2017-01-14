@@ -1,7 +1,7 @@
 package Mojolicious::Command::version;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::IOLoop::Client qw(HAS_NDN HAS_SOCKS);
+use Mojo::IOLoop::Client qw(HAS_NNR HAS_SOCKS);
 use Mojo::IOLoop::TLS 'HAS_TLS';
 use Mojolicious;
 
@@ -14,7 +14,7 @@ sub run {
   my $ev = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'n/a';
   my $socks = HAS_SOCKS ? $IO::Socket::Socks::VERSION : 'n/a';
   my $tls   = HAS_TLS   ? $IO::Socket::SSL::VERSION   : 'n/a';
-  my $ndn   = HAS_NDN   ? $Net::DNS::Native::VERSION  : 'n/a';
+  my $ndn   = HAS_NNR   ? $Net::DNS::Native::VERSION  : 'n/a';
 
   print <<EOF;
 CORE

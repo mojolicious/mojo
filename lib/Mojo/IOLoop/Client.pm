@@ -10,10 +10,10 @@ use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native
-use constant HAS_NDN => $ENV{MOJO_NO_NDN}
+use constant HAS_NNR => $ENV{MOJO_NO_NNR}
   ? 0
   : eval 'use Net::DNS::Native 0.15 (); 1';
-my $NDN = HAS_NDN ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
+my $NDN = HAS_NNR ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 
 # SOCKS support requires IO::Socket::Socks
 use constant HAS_SOCKS => $ENV{MOJO_NO_SOCKS}
@@ -24,7 +24,7 @@ use constant WRITE => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
-our @EXPORT_OK = qw(HAS_NDN HAS_SOCKS);
+our @EXPORT_OK = qw(HAS_NNR HAS_SOCKS);
 
 sub DESTROY { shift->_cleanup }
 
@@ -41,7 +41,7 @@ sub connect {
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
   return $reactor->next_tick(sub { $self && $self->_connect($args) })
-    if !HAS_NDN || $args->{handle};
+    if !HAS_NNR || $args->{handle};
 
   # Non-blocking name resolution
   my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
@@ -334,7 +334,7 @@ Path to the TLS key file.
 L<Mojo::IOLoop::Client> implements the following constants, which can be
 imported individually.
 
-=head2 HAS_NDN
+=head2 HAS_NNR
 
 Non-blocking name resolution is supported with L<Net::DNS::Native>.
 

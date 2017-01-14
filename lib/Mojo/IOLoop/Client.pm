@@ -336,11 +336,12 @@ imported individually.
 
 =head2 HAS_NNR
 
-Non-blocking name resolution is supported with L<Net::DNS::Native>.
+True if L<Net::DNS::Native> 0.15+ is installed and non-blocking name resolution
+support enabled.
 
 =head2 HAS_SOCKS
 
-SOCKS5 is supported with L<IO::Socket::SOCKS>.
+True if L<IO::Socket::SOCKS> 0.64+ is installed and SOCKS5 support enabled.
 
 =head1 SEE ALSO
 

@@ -236,7 +236,7 @@ imported individually.
 
 =head2 HAS_TLS
 
-TLS is supported with L<IO::Socket::SSL>.
+True if L<IO::Socket::SSL> 1.94+ is installed and TLS support enabled.
 
 =head1 SEE ALSO
 

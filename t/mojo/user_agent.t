@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 BEGIN {
-  $ENV{MOJO_NO_SOCKS} = $ENV{MOJO_NO_TLS} = 1;
+  $ENV{MOJO_NO_NNR} = $ENV{MOJO_NO_SOCKS} = $ENV{MOJO_NO_TLS} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
@@ -138,11 +138,16 @@ my $tx = $ua->build_tx(GET => '/');
 $tx->req->proxy($ua->server->url->scheme('socks'));
 $tx = $ua->start($tx);
 like $tx->error->{message}, qr/IO::Socket::Socks/, 'right error';
+ok !Mojo::IOLoop::Client->can_socks, 'no SOCKS5 support';
 
 # HTTPS request without TLS support
 $ua = Mojo::UserAgent->new;
 $tx = $ua->get($ua->server->url->scheme('https'));
 like $tx->error->{message}, qr/IO::Socket::SSL/, 'right error';
+ok !Mojo::IOLoop::TLS->can_tls, 'no TLS support';
+
+# No non-blocking name resolution
+ok !Mojo::IOLoop::Client->can_nnr, 'no non-blocking name resolution support';
 
 # Blocking
 $tx = $ua->get('/');

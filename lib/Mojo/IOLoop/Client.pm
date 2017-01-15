@@ -2,7 +2,6 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno 'EINPROGRESS';
-use Exporter 'import';
 use IO::Socket::IP;
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
@@ -10,23 +9,24 @@ use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native
-use constant HAS_NNR => $ENV{MOJO_NO_NNR}
+use constant NNR => $ENV{MOJO_NO_NNR}
   ? 0
   : eval 'use Net::DNS::Native 0.15 (); 1';
-my $NDN = HAS_NNR ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
+my $NDN = NNR ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 
 # SOCKS support requires IO::Socket::Socks
-use constant HAS_SOCKS => $ENV{MOJO_NO_SOCKS}
+use constant SOCKS => $ENV{MOJO_NO_SOCKS}
   ? 0
   : eval 'use IO::Socket::Socks 0.64 (); 1';
-use constant READ  => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
-use constant WRITE => HAS_SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
+use constant READ  => SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
+use constant WRITE => SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
-our @EXPORT_OK = qw(HAS_NNR HAS_SOCKS);
-
 sub DESTROY { shift->_cleanup }
+
+sub can_nnr   {NNR}
+sub can_socks {SOCKS}
 
 sub connect {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
@@ -41,7 +41,7 @@ sub connect {
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
   return $reactor->next_tick(sub { $self && $self->_connect($args) })
-    if !HAS_NNR || $args->{handle};
+    if !NNR || $args->{handle};
 
   # Non-blocking name resolution
   my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
@@ -128,7 +128,7 @@ sub _try_socks {
   return $self->_try_tls($args) unless $args->{socks_address};
   return $self->emit(
     error => 'IO::Socket::Socks 0.64+ required for SOCKS support')
-    unless HAS_SOCKS;
+    unless SOCKS;
 
   my %options = (ConnectAddr => $args->{address}, ConnectPort => $args->{port});
   @options{qw(AuthType Username Password)}
@@ -235,6 +235,19 @@ global L<Mojo::IOLoop> singleton.
 L<Mojo::IOLoop::Client> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 can_nnr
+
+  my $bool = Mojo::IOLoop::Client->can_nnr;
+
+True if L<Net::DNS::Native> 0.15+ is installed and non-blocking name resolution
+support enabled.
+
+=head2 can_socks
+
+  my $bool = Mojo::IOLoop::Client->can_socks;
+
+True if L<IO::Socket::SOCKS> 0.64+ is installed and SOCKS5 support enabled.
+
 =head2 connect
 
   $client->connect(address => '127.0.0.1', port => 3000);
@@ -328,20 +341,6 @@ Path to the TLS certificate file.
 Path to the TLS key file.
 
 =back
-
-=head1 CONSTANTS
-
-L<Mojo::IOLoop::Client> implements the following constants, which can be
-imported individually.
-
-=head2 HAS_NNR
-
-True if L<Net::DNS::Native> 0.15+ is installed and non-blocking name resolution
-support enabled.
-
-=head2 HAS_SOCKS
-
-True if L<IO::Socket::SOCKS> 0.64+ is installed and SOCKS5 support enabled.
 
 =head1 SEE ALSO
 

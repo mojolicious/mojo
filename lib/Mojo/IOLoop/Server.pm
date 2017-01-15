@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use IO::Socket::IP;
 use Mojo::IOLoop;
-use Mojo::IOLoop::TLS 'HAS_TLS';
+use Mojo::IOLoop::TLS;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
@@ -65,7 +65,7 @@ sub listen {
   @$self{qw(args handle)} = ($args, $handle);
 
   croak 'IO::Socket::SSL 1.94+ required for TLS support'
-    if !HAS_TLS && $args->{tls};
+    if !Mojo::IOLoop::TLS->can_tls && $args->{tls};
 }
 
 sub port { shift->{handle}->sockport }
@@ -166,7 +166,7 @@ implements the following new ones.
 
 =head2 generate_port
 
-  my $port = $server->generate_port;
+  my $port = Mojo::IOLoop::Server->generate_port;
 
 Find a free TCP port, primarily used for tests.
 

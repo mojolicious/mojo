@@ -1,7 +1,7 @@
 
 7.19  2017-01-14
   - Added module Mojo::IOLoop::TLS.
-  - Added HAS_NNR and HAS_SOCKS constants to Mojo::IOLoop::Client.
+  - Added can_nnr and can_socks methods to Mojo::IOLoop::Client.
 
 7.18  2017-01-11
   - Fixed support for relative %INC paths in Mojo::Home.

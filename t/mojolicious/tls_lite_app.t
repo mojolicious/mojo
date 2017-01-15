@@ -3,11 +3,12 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use Mojo::IOLoop::TLS 'HAS_TLS';
+use Mojo::IOLoop::TLS;
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
-plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!' unless HAS_TLS;
+plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
+  unless Mojo::IOLoop::TLS->can_tls;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;

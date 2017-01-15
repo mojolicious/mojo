@@ -6,11 +6,12 @@ BEGIN {
 }
 
 use Test::More;
-use Mojo::IOLoop::TLS 'HAS_TLS';
+use Mojo::IOLoop::TLS;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!' unless HAS_TLS;
+plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
+  unless Mojo::IOLoop::TLS->can_tls;
 
 use IO::Socket::INET;
 use Mojo::IOLoop;

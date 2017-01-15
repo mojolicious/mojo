@@ -1,6 +1,9 @@
 use Mojo::Base -strict;
 
-BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
+BEGIN {
+  $ENV{MOJO_NO_SOCKS} = $ENV{MOJO_NO_TLS} = 1;
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
+}
 
 use Test::More;
 use FindBin;
@@ -322,6 +325,13 @@ $tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
 ok !$tx->keep_alive, 'will not be kept alive';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
+
+# No TLS support
+eval {
+  Mojo::Server::Daemon->new(listen => ['https://127.0.0.1'], silent => 1)
+    ->start;
+};
+like $@, qr/IO::Socket::SSL/, 'right error';
 
 # Abstract methods
 eval { Mojo::Server->run };

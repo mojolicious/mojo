@@ -1,20 +1,18 @@
 package Mojo::IOLoop::TLS;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Exporter 'import';
 use Mojo::File 'path';
+use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 
 # TLS support requires IO::Socket::SSL
-use constant HAS_TLS => $ENV{MOJO_NO_TLS}
+use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
   : eval 'use IO::Socket::SSL 1.94 (); 1';
-use constant READ  => HAS_TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
-use constant WRITE => HAS_TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
+use constant READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
+use constant WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor };
-
-our @EXPORT_OK = ('HAS_TLS');
 
 # To regenerate the certificate run this command (18.04.2012)
 # openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
@@ -23,11 +21,13 @@ my $KEY  = path(__FILE__)->dirname->child('resources', 'server.key')->to_string;
 
 sub DESTROY { shift->_cleanup }
 
+sub can_tls {TLS}
+
 sub negotiate {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
   return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
-    unless HAS_TLS;
+    unless TLS;
 
   my $handle = $self->{handle};
   return $self->emit(error => $IO::Socket::SSL::SSL_ERROR)
@@ -162,6 +162,12 @@ global L<Mojo::IOLoop> singleton.
 L<Mojo::IOLoop::TLS> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 can_tls
+
+  my $bool = Mojo::IOLoop::TLS->can_tls;
+
+True if L<IO::Socket::SSL> 1.94+ is installed and TLS support enabled.
+
 =head2 negotiate
 
   $tls->negotiate(server => 1, tls_version => 'TLSv1_2');
@@ -228,15 +234,6 @@ TLS protocol version.
   my $tls = Mojo::IOLoop::TLS->new($handle);
 
 Construct a new L<Mojo::IOLoop::Stream> object.
-
-=head1 CONSTANTS
-
-L<Mojo::IOLoop::TLS> implements the following constants, which can be
-imported individually.
-
-=head2 HAS_TLS
-
-True if L<IO::Socket::SSL> 1.94+ is installed and TLS support enabled.
 
 =head1 SEE ALSO
 

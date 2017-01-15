@@ -1,4 +1,6 @@
 
+7.20  2017-01-15
+
 7.19  2017-01-14
   - Added module Mojo::IOLoop::TLS.
   - Added can_nnr and can_socks methods to Mojo::IOLoop::Client.

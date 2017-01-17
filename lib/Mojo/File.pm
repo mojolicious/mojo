@@ -59,8 +59,7 @@ sub list_tree {
 
 sub make_path {
   my $self = shift;
-  File::Path::make_path $$self, @_
-    or croak qq{Can't make directory "$$self": $!};
+  File::Path::make_path $$self, @_;
   return $self;
 }
 

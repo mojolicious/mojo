@@ -52,16 +52,16 @@ sub _expand {
   my $tls = {
     SSL_ca_file => $args->{tls_ca}
       && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_cert_file          => $args->{tls_cert},
-    SSL_cipher_list        => $args->{tls_ciphers},
     SSL_error_trap         => sub { $self->_cleanup->emit(error => $_[1]) },
     SSL_honor_cipher_order => 1,
-    SSL_key_file           => $args->{tls_key},
-    SSL_server             => $args->{server},
-    SSL_startHandshake     => 0,
-    SSL_verify_mode        => $args->{tls_verify},
-    SSL_version            => $args->{tls_version}
+    SSL_startHandshake     => 0
   };
+  $tls->{SSL_cert_file}   = $args->{tls_cert}    if $args->{tls_cert};
+  $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
+  $tls->{SSL_key_file}    = $args->{tls_key}     if $args->{tls_key};
+  $tls->{SSL_server}      = $args->{server}      if $args->{server};
+  $tls->{SSL_verify_mode} = $args->{tls_verify}  if exists $args->{tls_verify};
+  $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
 
   if ($args->{server}) {
     $tls->{SSL_cert_file} ||= $CERT;

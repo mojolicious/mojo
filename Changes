@@ -1,7 +1,8 @@
 
-7.20  2017-01-17
+7.20  2017-01-18
   - Fixed a bug in Mojo::File where the make_path method would die even if no
     error occurred.
+  - Fixed warnings in Mojo::IOLoop::TLS.
 
 7.19  2017-01-14
   - Added module Mojo::IOLoop::TLS.

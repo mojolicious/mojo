@@ -592,6 +592,7 @@ documentation, defaults to using the file this function was called from.
 
   # "Usage: APPLICATION test [OPTIONS]\n"
   extract_usage;
+
   =head1 SYNOPSIS
 
     Usage: APPLICATION test [OPTIONS]

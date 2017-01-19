@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 use Mojo::Server::Morbo;
 use Mojo::Util qw(extract_usage getopt);
 
-getopt \@ARGV,
+getopt
   'h|help'     => \my $help,
   'l|listen=s' => \my @listen,
   'm|mode=s'   => \$ENV{MOJO_MODE},

@@ -151,7 +151,7 @@ sub getopt {
   my $opts = ref $_[1] eq 'ARRAY' ? splice @_, 1, 1 : [];
   my $save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case),
     @$opts);
-  GetOptionsFromArray @_;
+  GetOptionsFromArray ref $_[0] eq 'ARRAY' ? @_ : (\@ARGV, @_);
   Getopt::Long::Configure($save);
 }
 
@@ -601,6 +601,10 @@ documentation, defaults to using the file this function was called from.
 
 =head2 getopt
 
+  getopt
+    'H|headers=s' => \my @headers,
+    't|timeout=i' => \my $timeout,
+    'v|verbose'   => \my $verbose;
   getopt $array,
     'H|headers=s' => \my @headers,
     't|timeout=i' => \my $timeout,
@@ -611,8 +615,8 @@ documentation, defaults to using the file this function was called from.
     'v|verbose'   => \my $verbose;
 
 Extract options from an array reference with L<Getopt::Long>, but without
-changing its global configuration. The configuration options C<no_auto_abbrev>
-and C<no_ignore_case> are enabled by default.
+changing its global configuration, defaults to using C<@ARGV>. The configuration
+options C<no_auto_abbrev> and C<no_ignore_case> are enabled by default.
 
   # Extract "charset" option
   getopt ['--charset', 'UTF-8'], 'charset=s' => \my $charset;

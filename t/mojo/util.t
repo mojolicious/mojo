@@ -135,6 +135,12 @@ getopt $array, 'h' => \my $flag, 'w|whatever=s' => \my $whatever;
 ok $flag, 'flag has been set';
 is $whatever, 'Whatever!', 'right string';
 is_deeply $array, ['stuff'], 'right structure';
+{
+  local @ARGV = ('--charset', 'UTF-16', 'test');
+  getopt 'c|charset=s' => \my $charset;
+  is $charset, 'UTF-16', 'right string';
+  is_deeply \@ARGV, ['test'], 'right structure';
+}
 
 # unindent
 is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",

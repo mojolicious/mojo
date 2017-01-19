@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 use Mojo::Server::Hypnotoad;
 use Mojo::Util qw(extract_usage getopt);
 
-getopt \@ARGV,
+getopt
   'f|foreground' => \$ENV{HYPNOTOAD_FOREGROUND},
   'h|help'       => \my $help,
   's|stop'       => \$ENV{HYPNOTOAD_STOP},

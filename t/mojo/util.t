@@ -137,9 +137,9 @@ is $whatever, 'Whatever!', 'right string';
 is_deeply $array, ['stuff'], 'right structure';
 {
   local @ARGV = ('--charset', 'UTF-16', 'test');
-  getopt 'c|charset=s' => \my $charset;
-  is $charset, 'UTF-16', 'right string';
-  is_deeply \@ARGV, ['test'], 'right structure';
+  getopt 'c|charset=s' => \my @charset;
+  is_deeply \@charset, ['UTF-16'], 'right structure';
+  is_deeply \@ARGV,    ['test'],   'right structure';
 }
 
 # unindent

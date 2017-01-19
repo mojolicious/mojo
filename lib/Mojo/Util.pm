@@ -148,10 +148,10 @@ sub files {
 }
 
 sub getopt {
-  my $opts = ref $_[1] eq 'ARRAY' ? splice @_, 1, 1 : [];
+  my ($array, $opts) = map { ref $_[0] eq 'ARRAY' ? shift : $_ } \@ARGV, [];
   my $save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case),
     @$opts);
-  GetOptionsFromArray ref $_[0] eq 'ARRAY' ? @_ : (\@ARGV, @_);
+  GetOptionsFromArray $array, @_;
   Getopt::Long::Configure($save);
 }
 

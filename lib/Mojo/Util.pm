@@ -11,6 +11,7 @@ use Getopt::Long 'GetOptionsFromArray';
 use IO::Poll qw(POLLIN POLLPRI);
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
+use Pod::Usage 'pod2usage';
 use Symbol 'delete_package';
 use Time::HiRes ();
 
@@ -55,11 +56,11 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated dumper encode getopt hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum split_cookie_header split_header),
-  qw(steady_time tablify term_escape trim unindent unquote url_escape),
-  qw(url_unescape xml_escape xor_encode)
+  qw(decode deprecated dumper encode extract_usage getopt hmac_sha1_sum),
+  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
+  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum),
+  qw(split_cookie_header split_header steady_time tablify term_escape trim),
+  qw(unindent unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 # DEPRECATED!
@@ -126,6 +127,17 @@ sub dumper {
 }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
+
+sub extract_usage {
+  my $file = @_ ? "$_[0]" : (caller)[1];
+
+  open my $handle, '>', \my $output;
+  pod2usage -exitval => 'noexit', -input => $file, -output => $handle;
+  $output =~ s/^.*\n|\n$//;
+  $output =~ s/\n$//;
+
+  return unindent($output);
+}
 
 # DEPRECATED!
 sub files {
@@ -569,6 +581,22 @@ Dump a Perl data structure with L<Data::Dumper>.
   my $bytes = encode 'UTF-8', $chars;
 
 Encode characters to bytes.
+
+=head2 extract_usage
+
+  my $usage = extract_usage;
+  my $usage = extract_usage '/home/sri/foo.pod';
+
+Extract usage message from the SYNOPSIS section of a file containing POD
+documentation, defaults to using the file this function was called from.
+
+  # "Usage: APPLICATION test [OPTIONS]\n"
+  extract_usage;
+  =head1 SYNOPSIS
+
+    Usage: APPLICATION test [OPTIONS]
+
+  =cut
 
 =head2 getopt
 

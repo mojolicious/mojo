@@ -1,11 +1,8 @@
 #!perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use Mojo::Server::Morbo;
-use Mojo::Util 'getopt';
-use Mojolicious::Command;
+use Mojo::Util qw(extract_usage getopt);
 
 getopt \@ARGV,
   'h|help'     => \my $help,
@@ -14,7 +11,7 @@ getopt \@ARGV,
   'v|verbose'  => \$ENV{MORBO_VERBOSE},
   'w|watch=s'  => \my @watch;
 
-die Mojolicious::Command->new->extract_usage if $help || !(my $app = shift);
+die extract_usage if $help || !(my $app = shift);
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->daemon->listen(\@listen) if @listen;
 $morbo->watch(\@watch) if @watch;

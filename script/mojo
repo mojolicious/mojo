@@ -1,7 +1,5 @@
 #!perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use Mojolicious::Commands;
 

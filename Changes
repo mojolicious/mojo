@@ -1,5 +1,6 @@
 
 7.21  2017-01-19
+  - Added extract_usage function to Mojo::Util.
 
 7.20  2017-01-18
   - Fixed a bug in Mojo::File where the make_path method would die even if no

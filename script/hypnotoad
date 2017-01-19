@@ -1,11 +1,8 @@
 #!perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use Mojo::Server::Hypnotoad;
-use Mojo::Util 'getopt';
-use Mojolicious::Command;
+use Mojo::Util qw(extract_usage getopt);
 
 getopt \@ARGV,
   'f|foreground' => \$ENV{HYPNOTOAD_FOREGROUND},
@@ -14,7 +11,7 @@ getopt \@ARGV,
   't|test'       => \$ENV{HYPNOTOAD_TEST};
 
 my $app = shift || $ENV{HYPNOTOAD_APP};
-die Mojolicious::Command->new->extract_usage if $help || !$app;
+die extract_usage if $help || !$app;
 Mojo::Server::Hypnotoad->new->run($app);
 
 =encoding utf8

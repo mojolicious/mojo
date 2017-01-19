@@ -6,8 +6,7 @@ use Mojo::File 'path';
 use Mojo::Loader 'data_section';
 use Mojo::Server;
 use Mojo::Template;
-use Mojo::Util qw(deprecated unindent);
-use Pod::Usage 'pod2usage';
+use Mojo::Util 'deprecated';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
 has description => 'No description';
@@ -31,16 +30,7 @@ sub create_dir {
 
 sub create_rel_dir { $_[0]->create_dir($_[0]->rel_file($_[1])) }
 
-sub extract_usage {
-  my $self = shift;
-
-  open my $handle, '>', \my $output;
-  pod2usage -exitval => 'noexit', -input => (caller)[1], -output => $handle;
-  $output =~ s/^.*\n//;
-  $output =~ s/\n$//;
-
-  return unindent $output;
-}
+sub extract_usage { Mojo::Util::extract_usage((caller)[1]) }
 
 sub help { print shift->usage }
 
@@ -104,19 +94,25 @@ Mojolicious::Command - Command base class
   # Short description
   has description => 'My first Mojo command';
 
-  # Short usage message
-  has usage => <<EOF;
-  Usage: APPLICATION mycommand [OPTIONS]
-
-  Options:
-    -s, --something   Does something
-  EOF
+  # Usage message from SYNOPSIS
+  has usage => sub { shift->extract_usage };
 
   sub run {
     my ($self, @args) = @_;
 
     # Magic here! :)
   }
+
+  1;
+
+  =head1 SYNOPSIS
+
+    Usage: APPLICATION mycommand [OPTIONS]
+
+    Options:
+      -s, --something   Does something
+
+  =cut
 
 =head1 DESCRIPTION
 
@@ -194,7 +190,7 @@ Portably create a directory relative to the current working directory.
   my $usage = $command->extract_usage;
 
 Extract usage message from the SYNOPSIS section of the file this method was
-called from.
+called from with L<Mojo::Util/"extract_usage">.
 
 =head2 help
 

@@ -5,15 +5,16 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 use Mojo::ByteStream 'b';
+use Mojo::File 'path';
 use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode dumper encode getopt hmac_sha1_sum html_unescape md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
-  qw(sha1_bytes sha1_sum split_cookie_header split_header steady_time tablify),
-  qw(term_escape trim unindent unquote url_escape url_unescape xml_escape),
-  qw(xor_encode);
+  qw(decode dumper encode extract_usage getopt hmac_sha1_sum html_unescape),
+  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum split_cookie_header split_header),
+  qw(steady_time tablify term_escape trim unindent unquote url_escape),
+  qw(url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -111,6 +112,17 @@ $tree   = [
   ['a',  'b']
 ];
 is_deeply split_cookie_header($header), $tree, 'right result';
+
+# extract_usage
+is extract_usage, "extract_usage test!\n", 'right result';
+is extract_usage(path($FindBin::Bin, 'lib', 'myapp.pl')),
+  "USAGE: myapp.pl daemon\n\n test\n123\n", 'right result';
+
+=head1 SYNOPSIS
+
+  extract_usage test!
+
+=cut
 
 # getopt
 getopt ['--charset', 'UTF-8'], 'c|charset=s' => \my $charset;

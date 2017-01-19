@@ -10,8 +10,7 @@ getopt
   's|stop'       => \$ENV{HYPNOTOAD_STOP},
   't|test'       => \$ENV{HYPNOTOAD_TEST};
 
-my $app = shift || $ENV{HYPNOTOAD_APP};
-die extract_usage if $help || !$app;
+die extract_usage if $help || !(my $app = shift || $ENV{HYPNOTOAD_APP});
 Mojo::Server::Hypnotoad->new->run($app);
 
 =encoding utf8

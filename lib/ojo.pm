@@ -28,29 +28,18 @@ sub import {
     a => sub { $caller->can('any')->(@_) and return $ua->server->app },
     b => \&b,
     c => \&c,
-    d => sub { _request($ua, 'DELETE', @_) },
+    d => sub { $ua->delete(@_)->result },
     f => \&path,
-    g => sub { _request($ua, 'GET',    @_) },
-    h => sub { _request($ua, 'HEAD',   @_) },
+    g => sub { $ua->get(@_)->result },
+    h => sub { $ua->head(@_)->result },
     j => \&j,
     n => sub (&@) { say STDERR timestr timeit($_[1] // 1, $_[0]) },
-    o => sub { _request($ua, 'OPTIONS', @_) },
-    p => sub { _request($ua, 'POST',    @_) },
+    o => sub      { $ua->options(@_)->result },
+    p => sub      { $ua->post(@_)->result },
     r => \&dumper,
-    t => sub { _request($ua, 'PATCH',   @_) },
-    u => sub { _request($ua, 'PUT',     @_) },
+    t => sub { $ua->patch(@_)->result },
+    u => sub { $ua->put(@_)->result },
     x => sub { Mojo::DOM->new(@_) };
-}
-
-sub _request {
-  my $ua = shift;
-
-  my $tx  = $ua->start($ua->build_tx(@_));
-  my $err = $tx->error;
-  warn qq/Problem loading URL "@{[$tx->req->url]}": $err->{message}\n/
-    if $err && !$err->{code};
-
-  return $tx->res;
 }
 
 1;

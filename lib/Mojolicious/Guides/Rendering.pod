@@ -145,6 +145,12 @@ backslash.
   in multiple\\
   lines
 
+A newline character gets appended automatically to every template, unless the
+last character is a backslash. And empty lines at the end of a template are
+ignored.
+
+  There is <%= 1 + 1 %> no newline at the end here\
+
 At the beginning of the template, stash values that don't have invalid
 characters in their name get automatically initialized as normal variables, and
 the controller object as both C<$self> and C<$c>.

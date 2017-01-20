@@ -374,6 +374,12 @@ backslash.
   in multiple\\
   lines
 
+A newline character gets appended automatically to every template, unless the
+last character is a backslash. And empty lines at the end of a template are
+ignored.
+
+  There is <%= 1 + 1 %> no newline at the end here\
+
 You can capture whole template blocks for reuse later with the C<begin> and
 C<end> keywords. Just be aware that both keywords are part of the surrounding
 tag and not actual Perl code, so there can only be whitespace after C<begin>

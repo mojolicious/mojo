@@ -1050,6 +1050,11 @@ $mt     = Mojo::Template->new;
 $output = $mt->render("test\n\n123\n\n<% %>456\n789");
 is $output, "test\n\n123\n\n456\n789\n", 'empty statement';
 
+# Multiple newlines
+$mt     = Mojo::Template->new;
+$output = $mt->render("test\n\n\n\n");
+is $output, "test\n", 'just one newline remaining';
+
 # Optimize successive text lines ending with newlines
 $mt = Mojo::Template->new;
 $mt->parse(<<'EOF');

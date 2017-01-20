@@ -1,5 +1,5 @@
 
-7.21  2017-01-19
+7.21  2017-01-20
   - Added extract_usage function to Mojo::Util.
   - Improve getopt function in Mojo::Util to use @ARGV by default.
 

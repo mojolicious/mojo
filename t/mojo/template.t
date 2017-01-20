@@ -1055,10 +1055,20 @@ $mt     = Mojo::Template->new;
 $output = $mt->render('test');
 is $output, "test\n", 'just one newline';
 
-# Multiple newlines
+# Multiple newlines at the end
 $mt     = Mojo::Template->new;
 $output = $mt->render("test\n\n\n\n");
 is $output, "test\n", 'just one newline';
+
+# Escaped newline at the end
+$mt     = Mojo::Template->new;
+$output = $mt->render("test\\\n");
+is $output, 'test', 'no newline';
+
+# Multiple escaped newlines at the end
+$mt     = Mojo::Template->new;
+$output = $mt->render("test\\\n\n\n\n");
+is $output, 'test', 'no newline';
 
 # Optimize successive text lines ending with newlines
 $mt = Mojo::Template->new;

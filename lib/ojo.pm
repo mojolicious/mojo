@@ -119,6 +119,8 @@ L<Mojo::Message::Response> object.
 
 Turn string into a L<Mojo::File> object.
 
+  $ perl -Mojo -E 'say r j f("hello.json")->slurp'
+
 =head2 g
 
   my $res = g('example.com');
@@ -149,7 +151,7 @@ L<Mojo::Message::Response> object.
 
 Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 
-  $ perl -Mojo -E 'b(j({hello => "world!"}))->spurt("hello.json")'
+  $ perl -Mojo -E 'f("hello.json")->spurt(j {hello => "world!"})'
 
 =head2 n
 
@@ -187,7 +189,7 @@ L<Mojo::Message::Response> object.
 
 Dump a Perl data structure with L<Mojo::Util/"dumper">.
 
-  perl -Mojo -E 'say r(g("example.com")->headers->to_hash)'
+  perl -Mojo -E 'say r g("example.com")->headers->to_hash'
 
 =head2 t
 
@@ -215,7 +217,7 @@ L<Mojo::Message::Response> object.
 
 Turn HTML/XML input into L<Mojo::DOM> object.
 
-  $ perl -Mojo -E 'say x(b("test.html")->slurp)->at("title")->text'
+  $ perl -Mojo -E 'say x(f("test.html")->slurp)->at("title")->text'
 
 =head1 SEE ALSO
 

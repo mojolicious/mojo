@@ -167,7 +167,9 @@ designed to be used with it and are being developed under the same umbrella.
 
 A tiny wrapper around L<DBD::Pg> that makes
 L<PostgreSQL|http://www.postgresql.org> a lot of fun to use with
-L<Mojolicious>.
+L<Mojolicious>. And it contains an excellent
+L<blog|https://github.com/kraih/mojo-pg/tree/master/examples/blog> example
+application to show you the MVC design pattern in action.
 
 =item L<Minion>
 

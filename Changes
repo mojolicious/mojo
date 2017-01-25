@@ -1,6 +1,9 @@
 
 7.22  2017-01-25
   - Added ports method to Mojo::Server::Daemon.
+  - Added remove_tree method to Mojo::File.
+  - Improved spurt method in Mojo::File with support for writing multiple chunks
+    at once.
 
 7.21  2017-01-21
   - Added extract_usage function to Mojo::Util.

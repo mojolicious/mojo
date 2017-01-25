@@ -71,6 +71,12 @@ ok !-d $subdir, 'directory does not exist anymore';
 $subdir->make_path;
 ok -d $subdir, 'directory exists';
 
+# Remove tree
+$dir = tempdir;
+$dir->child('foo', 'bar')->make_path->child('test.txt')->spurt('test!');
+is $dir->child('foo', 'bar', 'test.txt')->slurp, 'test!', 'right content';
+ok !-e $dir->child('foo')->remove_tree->to_string, 'tree has been removed';
+
 # Move to
 $dir = tempdir;
 my $destination = $dir->child('dest.txt');
@@ -123,6 +129,7 @@ is_deeply path($lib)->list_tree({hidden => 1})->map('to_string')->to_array,
 $dir = tempdir;
 my $file = $dir->child('test.txt')->spurt('just works!');
 is $file->slurp, 'just works!', 'right content';
+is $file->spurt('w', 'orks', ' too!')->slurp, 'works too!', 'right content';
 {
   no warnings 'redefine';
   local *IO::Handle::syswrite = sub { $! = 0; 5 };

@@ -78,6 +78,12 @@ sub new {
 
 sub path { __PACKAGE__->new(@_) }
 
+sub remove_tree {
+  my $self = shift;
+  File::Path::remove_tree $$self, @_;
+  return $self;
+}
+
 sub slurp {
   my $self = shift;
 
@@ -90,7 +96,7 @@ sub slurp {
 }
 
 sub spurt {
-  my ($self, $content) = @_;
+  my ($self, $content) = (shift, join '', @_);
   open my $file, '>', $$self or croak qq{Can't open file "$$self": $!};
   ($file->syswrite($content) // -1) == length $content
     or croak qq{Can't write to file "$$self": $!};
@@ -224,7 +230,8 @@ Check if the path is absolute.
   my $collection = $path->list({hidden => 1});
 
 List all files in the directory and return a L<Mojo::Collection> object
-containing the results as L<Mojo::File> objects.
+containing the results as L<Mojo::File> objects. The list does not include C<.>
+and C<..>.
 
   # List files
   say for Mojo::File->new('/home/sri/myapp')->list->each;
@@ -253,7 +260,8 @@ Include hidden files.
   my $collection = $path->list_tree({hidden => 1});
 
 List all files recursively in the directory and return a L<Mojo::Collection>
-object containing the results as L<Mojo::File> objects.
+object containing the results as L<Mojo::File> objects. The list does not
+include C<.> and C<..>.
 
   # List all templates
   say for Mojo::File->new('/home/sri/myapp/templates')->list_tree->each;
@@ -280,7 +288,7 @@ Create the directories if they don't already exist with L<File::Path>.
 
   $path = $path->move_to('/home/sri/.vimrc.backup');
 
-Move the file.
+Move the file with L<File::Copy>.
 
 =head2 new
 
@@ -295,6 +303,13 @@ directory.
   # "foo/bar/baz.txt" (on UNIX)
   Mojo::File->new('foo', 'bar', 'baz.txt');
 
+=head2 remove_tree
+
+  $path = $path->remove_tree;
+
+Delete this directory and any files and subdirectories it may contain with
+L<File::Path>.
+
 =head2 slurp
 
   my $bytes = $path->slurp;
@@ -304,6 +319,7 @@ Read all data at once from the file.
 =head2 spurt
 
   $path = $path->spurt($bytes);
+  $path = $path->spurt(@chunks_of_bytes);
 
 Write all data at once to the file.
 

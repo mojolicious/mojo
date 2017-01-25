@@ -149,11 +149,11 @@ undef $tmp;
 ok !-e $path, 'file has been cleaned up';
 is $mem->move_to($path)->slurp, 'abc', 'right content';
 ok -e $path, 'file exists';
-unlink $path;
+ok unlink($path), 'unlinked file';
 ok !-e $path, 'file has been cleaned up';
 is(Mojo::Asset::Memory->new->move_to($path)->slurp, '', 'no content');
 ok -e $path, 'file exists';
-unlink $path;
+ok unlink($path), 'unlinked file';
 ok !-e $path, 'file has been cleaned up';
 
 # Move file asset to file
@@ -169,11 +169,11 @@ ok !-e $path, 'file has been cleaned up';
 is $file->move_to($path)->slurp, 'bcd', 'right content';
 undef $file;
 ok -e $path, 'file exists';
-unlink $path;
+ok unlink($path), 'unlinked file';
 ok !-e $path, 'file has been cleaned up';
 is(Mojo::Asset::File->new->move_to($path)->slurp, '', 'no content');
 ok -e $path, 'file exists';
-unlink $path;
+ok unlink($path), 'unlinked file';
 ok !-e $path, 'file has been cleaned up';
 
 # Upgrade
@@ -232,7 +232,7 @@ is $file->contains('es'), 1, '"es" at position 1';
 $path = $file->path;
 undef $file;
 ok -e $path, 'file exists';
-unlink $path;
+ok unlink($path), 'unlinked file';
 ok !-e $path, 'file has been cleaned up';
 
 # Incomplete write

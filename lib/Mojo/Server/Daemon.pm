@@ -32,6 +32,10 @@ sub close_idle_connections {
   !$c->{$_}{tx} and $c->{$_}{requests} and $loop->remove($_) for keys %$c;
 }
 
+sub ports {
+  [map { $_[0]->ioloop->acceptor($_)->port } @{$_[0]->acceptors}];
+}
+
 sub run {
   my $self = shift;
 
@@ -469,6 +473,15 @@ implements the following new ones.
 Close all connections without active requests. Note that this method is
 EXPERIMENTAL and might change without warning!
 
+=head2 ports
+
+  my $ports = $daemon->ports;
+
+Get all ports this server is currently listening on.
+
+  # All ports
+  say for @{$daemon->ports};
+
 =head2 run
 
   $daemon->run;
@@ -482,8 +495,7 @@ Run server and wait for L</"SIGNALS">.
 Start or resume accepting connections through L</"ioloop">.
 
   # Listen on random port
-  my $id   = $daemon->listen(['http://127.0.0.1'])->start->acceptors->[0];
-  my $port = $daemon->ioloop->acceptor($id)->port;
+  my $port = $daemon->listen(['http://127.0.0.1'])->start->ports->[0];
 
   # Run multiple web servers concurrently
   my $daemon1 = Mojo::Server::Daemon->new(listen => ['http://*:3000'])->start;

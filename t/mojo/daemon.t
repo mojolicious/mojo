@@ -236,8 +236,7 @@ ok $remote_port > 0, 'has remote port';
 # Pipelined
 $daemon
   = Mojo::Server::Daemon->new({listen => ['http://127.0.0.1'], silent => 1});
-$daemon->start;
-my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
+my $port = $daemon->start->ports->[0];
 is $daemon->app->moniker, 'HelloWorld', 'right moniker';
 my $buffer = '';
 my $id;
@@ -314,7 +313,7 @@ $daemon = Mojo::Server::Daemon->new(
   listen => ['http://127.0.0.1'],
   silent => 1
 )->start;
-$port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
+$port = $daemon->ports->[0];
 is $daemon->max_requests, 100, 'right value';
 is $daemon->max_requests(2)->max_requests, 2, 'right value';
 $tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");

@@ -104,8 +104,7 @@ my $daemon = Mojo::Server::Daemon->new(
   listen => ['https://[::1]'],
   silent => 1
 );
-$daemon->start;
-my $port = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
+my $port = $daemon->start->ports->[0];
 my $ua   = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $tx   = $ua->get("https://[::1]:$port/");
 is $tx->res->code, 200,      'right status';
@@ -122,8 +121,7 @@ SKIP: {
     . '&127.0.0.1_key=t/mojo/certs/server.key'
     . '&example.com_cert=t/mojo/certs/domain.crt'
     . '&example.com_key=t/mojo/certs/domain.key';
-  $daemon->listen([$listen])->start;
-  $forward = Mojo::IOLoop->acceptor($daemon->acceptors->[0])->port;
+  $forward = $daemon->listen([$listen])->start->ports->[0];
   $ua      = Mojo::UserAgent->new(
     ioloop => Mojo::IOLoop->singleton,
     ca     => 't/mojo/certs/ca.crt'

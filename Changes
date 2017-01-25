@@ -1,5 +1,6 @@
 
-7.22  2017-01-22
+7.22  2017-01-25
+  - Added ports method to Mojo::Server::Daemon.
 
 7.21  2017-01-21
   - Added extract_usage function to Mojo::Util.

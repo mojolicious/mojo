@@ -1,4 +1,6 @@
 
+7.23  2017-01-26
+
 7.22  2017-01-25
   - Added ports method to Mojo::Server::Daemon.
   - Added remove_tree method to Mojo::File.

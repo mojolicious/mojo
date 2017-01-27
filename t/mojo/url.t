@@ -42,6 +42,9 @@ is $url->password, '',                           'right password';
 is $url->host,     'localhost',                  'right host';
 is $url->fragment, 'AZaz09-._~!$&\'()*+,;=:@/?', 'right fragment';
 is "$url", 'ws://localhost#AZaz09-._~!$&\'()*+,;=:@/?', 'right format';
+is $url->to_unsafe_string,
+  'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=:@/?',
+  'right format';
 
 # Parameters
 $url = Mojo::URL->new(
@@ -373,6 +376,9 @@ is $url->query,    '%E2%98%83', 'right query';
 is $url->fragment, '☃', 'right fragment';
 is "$url", 'http://xn--n3h.xn--n3h.de/%E2%98%83?%E2%98%83#%E2%98%83',
   'right format';
+is $url->to_unsafe_string,
+  'http://%E2%98%83:%E2%98%83@xn--n3h.xn--n3h.de/%E2%98%83?%E2%98%83#%E2%98%83',
+  'right format';
 
 # IRI/IDNA
 $url = Mojo::URL->new('http://☃.net/♥/?q=♥☃');
@@ -415,6 +421,7 @@ is $url->password, undef,     'no password';
 is $url->host,     'foo.com', 'right host';
 is $url->fragment, '0',       'right fragment';
 is "$url", 'http://foo.com#0', 'right format';
+is $url->to_unsafe_string, 'http://0@foo.com#0', 'right format';
 
 # Empty path elements
 $url = Mojo::URL->new('http://example.com/foo//bar/23/');

@@ -63,9 +63,9 @@ sub parse {
   $self->path($5)                           if defined $5;
   $self->query($7)                          if defined $7;
   $self->fragment(_decode(url_unescape $9)) if defined $9;
-  if (defined(my $authority = $4)) {
-    $self->userinfo(_decode(url_unescape $1)) if $authority =~ s/^([^\@]+)\@//;
-    $self->host_port($authority);
+  if (defined(my $auth = $4)) {
+    $self->userinfo(_decode(url_unescape $1)) if $auth =~ s/^([^\@]+)\@//;
+    $self->host_port($auth);
   }
 
   return $self;
@@ -148,30 +148,37 @@ sub to_abs {
   return $abs;
 }
 
-sub to_string {
-  my $self = shift;
+sub to_string        { shift->_string(0) }
+sub to_unsafe_string { shift->_string(1) }
+
+sub username { (shift->userinfo // '') =~ /^([^:]+)/ ? $1 : undef }
+
+sub _decode { decode('UTF-8', $_[0]) // $_[0] }
+
+sub _encode { url_escape encode('UTF-8', $_[0]), $_[1] }
+
+sub _string {
+  my ($self, $unsafe) = @_;
 
   # Scheme
   my $url = '';
   if (my $proto = $self->protocol) { $url .= "$proto:" }
 
-  # Authority (without userinfo)
-  my $authority = $self->host_port;
-  $url .= "//$authority" if defined $authority;
+  # Authority
+  my $auth = $self->host_port;
+  if ($unsafe && defined(my $info = $self->userinfo)) {
+    $auth = _encode($info, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $auth;
+  }
+  $url .= "//$auth" if defined $auth;
 
   # Path and query
   my $path = $self->path_query;
-  $url .= !$authority || !length $path || $path =~ m!^[/?]! ? $path : "/$path";
+  $url .= !$auth || !length $path || $path =~ m!^[/?]! ? $path : "/$path";
 
   # Fragment
   return $url unless defined(my $fragment = $self->fragment);
-  return $url . '#' . url_escape encode('UTF-8', $fragment),
-    '^A-Za-z0-9\-._~!$&\'()*+,;=:@/?';
+  return $url . '#' . _encode($fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=:@/?');
 }
-
-sub username { (shift->userinfo // '') =~ /^([^:]+)/ ? $1 : undef }
-
-sub _decode { decode('UTF-8', $_[0]) // $_[0] }
 
 1;
 
@@ -476,6 +483,15 @@ security reasons.
 
   # "http://mojolicious.org"
   Mojo::URL->new('http://daniel:s3cret@mojolicious.org')->to_string;
+
+=head2 to_unsafe_string
+
+  my $str = $url->to_unsafe_string;
+
+Same as L</"to_string">, but includes L</"userinfo">.
+
+  # "ttp://daniel:s3cret@mojolicious.org"
+  Mojo::URL->new('http://daniel:s3cret@mojolicious.org')->to_unsafe_string;
 
 =head2 username
 

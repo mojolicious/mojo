@@ -1,5 +1,6 @@
 
 7.23  2017-01-27
+  - Added to_unsafe_string method to Mojo::URL.
   - Fixed a data corruption problem in Mojo::IOLoop::Stream, caused by a
     dependency of IO::Socket::SSL on the internal representation of strings,
     which differs from IO::Socket::IP. (coolo, sri)

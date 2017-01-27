@@ -77,6 +77,8 @@ sub timeout {
 sub write {
   my ($self, $chunk, $cb) = @_;
 
+  # IO::Socket::SSL will corrupt data with the wrong internal representation
+  utf8::downgrade $chunk;
   $self->{buffer} .= $chunk;
   if ($cb) { $self->once(drain => $cb) }
   elsif (!length $self->{buffer}) { return $self }

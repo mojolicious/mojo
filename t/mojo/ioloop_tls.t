@@ -30,15 +30,18 @@ plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
 # openssl req -x509 -days 7300 -key bad.key -in bad.csr -out bad.crt
 use Mojo::IOLoop;
 
-# Built-in certificate
+# Built-in certificate (and upgraded string)
 my $loop  = Mojo::IOLoop->new;
 my $delay = $loop->delay;
+my $upgraded
+  = "\x01\x00\x00\x00\x00\x00\xD0\x00\x0A\x00\x0B\x00\x00\x00\x84\x0B";
+utf8::upgrade $upgraded;
 my ($server, $client);
 my $end = $delay->begin;
 my $id  = $loop->server(
   {address => '127.0.0.1', tls => 1} => sub {
     my ($loop, $stream) = @_;
-    $stream->write('test' => sub { shift->write('321') });
+    $stream->write($upgraded => sub { shift->write('321') });
     $stream->on(close => $end);
     $stream->on(read => sub { $server .= pop });
   }
@@ -55,8 +58,8 @@ $loop->client(
   }
 );
 $delay->wait;
-is $server, 'tset123', 'right content';
-is $client, 'test321', 'right content';
+is $server, 'tset123',        'right content';
+is $client, "${upgraded}321", 'right content';
 
 # Valid client certificate
 $delay = Mojo::IOLoop->delay;

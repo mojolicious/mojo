@@ -2,7 +2,7 @@
 7.23  2017-01-27
   - Fixed a data corruption problem in Mojo::IOLoop::Stream, caused by a
     dependency of IO::Socket::SSL on the internal representation of strings,
-    which differs from IO::Socket::IP.
+    which differs from IO::Socket::IP. (coolo, sri)
 
 7.22  2017-01-25
   - Added ports method to Mojo::Server::Daemon.

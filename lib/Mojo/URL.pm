@@ -490,7 +490,7 @@ security reasons.
 
 Same as L</"to_string">, but includes L</"userinfo">.
 
-  # "ttp://daniel:s3cret@mojolicious.org"
+  # "http://daniel:s3cret@mojolicious.org"
   Mojo::URL->new('http://daniel:s3cret@mojolicious.org')->to_unsafe_string;
 
 =head2 username

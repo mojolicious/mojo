@@ -68,6 +68,15 @@ get '/one' => sub {
   is(Mojo::UserAgent->new->max_redirects, 0, 'right value');
 }
 
+# Max response size
+{
+  is(Mojo::UserAgent->new->max_response_size, 2147483648, 'right value');
+  local $ENV{MOJO_MAX_RESPONSE_SIZE} = 25;
+  is(Mojo::UserAgent->new->max_response_size, 25, 'right value');
+  local $ENV{MOJO_MAX_RESPONSE_SIZE} = 0;
+  is(Mojo::UserAgent->new->max_response_size, 0, 'right value');
+}
+
 # Timeouts
 {
   is(Mojo::UserAgent->new->connect_timeout, 10, 'right value');
@@ -156,7 +165,8 @@ ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->version, '1.1', 'right version';
 is $tx->res->code,    200,   'right status';
 ok !$tx->res->headers->connection, 'no "Connection" value';
-is $tx->res->body, 'works!', 'right content';
+is $tx->res->max_message_size, 2147483648, 'right value';
+is $tx->res->body,             'works!',   'right content';
 
 # Again
 $tx = $ua->get('/');
@@ -166,12 +176,13 @@ is $tx->res->version, '1.1', 'right version';
 is $tx->res->code,    200,   'right status';
 ok !$tx->res->headers->connection, 'no "Connection" value';
 is $tx->res->body, 'works!', 'right content';
-$tx = $ua->get('/');
+$tx = $ua->max_response_size(33554432)->get('/');
 ok $tx->success, 'successful';
 is $tx->res->version, '1.1', 'right version';
 is $tx->res->code,    200,   'right status';
 ok !$tx->res->headers->connection, 'no "Connection" value';
-is $tx->res->body, 'works!', 'right content';
+is $tx->res->max_message_size, 33554432, 'right value';
+is $tx->res->body,             'works!', 'right content';
 
 # Shortcuts for common request methods
 is $ua->delete('/method')->res->body,  'DELETE',  'right content';

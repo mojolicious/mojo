@@ -15,14 +15,16 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
+  my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   getopt \@args,
     'C|charset=s'            => \my $charset,
     'c|content=s'            => \(my $content = ''),
     'H|header=s'             => \my @headers,
-    'i|inactivity-timeout=i' => \my $inactivity,
+    'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
     'M|method=s'             => \(my $method = 'GET'),
-    'o|connect-timeout=i'    => \my $connect,
+    'o|connect-timeout=i'    => sub { $ua->connect_timeout($_[1]) },
     'r|redirect'             => \my $redirect,
+    'S|response-size=i'      => sub { $ua->max_response_size($_[1]) },
     'v|verbose'              => \my $verbose;
 
   @args = map { decode 'UTF-8', $_ } @args;
@@ -33,12 +35,8 @@ sub run {
   my %headers = map { /^\s*([^:]+)\s*:\s*(.*+)$/ ? ($1, $2) : () } @headers;
 
   # Detect proxy for absolute URLs
-  my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   $url !~ m!^/! ? $ua->proxy->detect : $ua->server->app($self->app);
   $ua->max_redirects(10) if $redirect;
-
-  $ua->inactivity_timeout($inactivity) if defined $inactivity;
-  $ua->connect_timeout($connect) if $connect;
 
   my $buffer = '';
   $ua->on(
@@ -163,6 +161,10 @@ Mojolicious::Command::get - Get command
     -o, --connect-timeout <seconds>      Connect timeout, defaults to the value
                                          of MOJO_CONNECT_TIMEOUT or 10
     -r, --redirect                       Follow up to 10 redirects
+    -S, --response-size <size>           Maximum response size in bytes,
+                                         defaults to the value of
+                                         MOJO_MAX_RESPONSE_SIZE or
+                                         2147483648 (2GB)
     -v, --verbose                        Print request and response headers to
                                          STDERR
 

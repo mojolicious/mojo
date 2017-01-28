@@ -23,8 +23,9 @@ has ioloop             => sub { Mojo::IOLoop->new };
 has key                => sub { $ENV{MOJO_KEY_FILE} };
 has max_connections    => 5;
 has max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
-has proxy => sub { Mojo::UserAgent::Proxy->new };
-has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
+has max_response_size => sub { $ENV{MOJO_MAX_RESPONSE_SIZE} // 2147483648 };
+has proxy             => sub { Mojo::UserAgent::Proxy->new };
+has request_timeout   => sub { $ENV{MOJO_REQUEST_TIMEOUT}   // 0 };
 has server => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 
@@ -298,6 +299,7 @@ sub _start {
   }
 
   $_->prepare($tx) for $self->proxy, $self->cookie_jar;
+  $tx->res->max_message_size($self->max_response_size);
 
   # Connect and add request timeout if necessary
   my $id = $self->emit(start => $tx)->_connection($loop, $tx, $cb);
@@ -572,6 +574,18 @@ will prevent any connections from being kept alive.
 Maximum number of redirects the user agent will follow before it fails,
 defaults to the value of the C<MOJO_MAX_REDIRECTS> environment variable or
 C<0>.
+
+=head2 max_response_size
+
+  my $max = $ua->max_response_size;
+  $ua     = $ua->max_response_size(16777216);
+
+Maximum response size in bytes, defaults to the value of the
+C<MOJO_MAX_RESPONSE_SIZE> environment variable or C<2147483648> (2GB). Setting
+the value to C<0> will allow responses of indefinite size. Note that increasing
+this value can also drastically increase memory usage, should you for example,
+attempt to parse an excessively large response body with the methods
+L<Mojo::Message/"dom"> or L<Mojo::Message/"json">.
 
 =head2 proxy
 

@@ -423,7 +423,7 @@ C<multipart/form-data> message body, usually a L<Mojo::Parameters> object. Note
 that this method caches all data, so it should not be called before the entire
 message body has been received. Parts of the message body need to be loaded
 into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large, there's a 16MB limit by default.
+excessively large.
 
   # Get POST parameter names and values
   my $hash = $msg->body_params->to_hash;
@@ -481,8 +481,7 @@ an optional selector can be used to call the method L<Mojo::DOM/"find"> on it
 right away, which then returns a L<Mojo::Collection> object. Note that this
 method caches all data, so it should not be called before the entire message
 body has been received. The whole message body needs to be loaded into memory
-to parse it, so you have to make sure it is not excessively large, there's a
-16MB limit by default.
+to parse it, so you have to make sure it is not excessively large.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->map('text')->join("\n");
@@ -604,7 +603,7 @@ Pointer can be used to extract a specific value with L<Mojo::JSON::Pointer>.
 Note that this method caches all data, so it should not be called before the
 entire message body has been received. The whole message body needs to be
 loaded into memory to parse it, so you have to make sure it is not excessively
-large, there's a 16MB limit by default.
+large.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];

@@ -190,7 +190,7 @@ Hypnotoad.
 To protect your applications from excessively large requests and responses, our
 HTTP parser has a cap after which it will automatically stop accepting new
 data, and in most cases force the connection to be closed. The limit is 16MB on
-the server-side and 2GB on the client-side by default, you can use the
+the server-side, and 2GB on the client-side by default. You can use the
 attributes L<Mojo::Message/"max_message_size"> and
 L<Mojo::UserAgent/"max_response_size"> or C<MOJO_MAX_MESSAGE_SIZE> and
 C<MOJO_MAX_RESPONSE_SIZE> environment variables to change these values.

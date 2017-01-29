@@ -1,4 +1,6 @@
 
+7.24  2017-01-30
+
 7.23  2017-01-29
   - Added max_request_size attribute to Mojolicious.
   - Added max_response_size attribute to Mojo::UserAgent.

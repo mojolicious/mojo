@@ -923,7 +923,7 @@ Who actually controls the event loop backend is not important.
   my $ua = Mojo::UserAgent->new;
   $ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
     my ($ua, $tx) = @_;
-    $cv->send($tx->res->json('/hits/hits/0/_source/release'));
+    $cv->send($tx->result->json('/hits/hits/0/_source/release'));
   });
   say $cv->recv;
 
@@ -990,16 +990,16 @@ application.
 
   # Fetch website
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->get('mojolicious.org/perldoc');
+  my $res = $ua->get('mojolicious.org/perldoc')->result;
 
   # Extract title
-  say 'Title: ', $tx->res->dom->at('head > title')->text;
+  say 'Title: ', $res->dom->at('head > title')->text;
 
   # Extract headings
-  $tx->res->dom('h1, h2, h3')->each(sub { say 'Heading: ', shift->all_text });
+  $res->dom('h1, h2, h3')->each(sub { say 'Heading: ', shift->all_text });
 
   # Visit all nodes recursively to extract more than just text
-  for my $n ($tx->res->dom->descendant_nodes->each) {
+  for my $n ($res->dom->descendant_nodes->each) {
 
     # Text or CDATA node
     print $n->content if $n->type eq 'text' || $n->type eq 'cdata';
@@ -1026,7 +1026,7 @@ L<Mojo::Message/"json">.
   # Search MetaCPAN for "mojolicious" and list latest releases
   my $url = Mojo::URL->new('http://api.metacpan.org/v0/release/_search');
   $url->query({q => 'mojolicious', sort => 'date:desc'});
-  for my $hit (@{$ua->get($url)->res->json->{hits}{hits}}) {
+  for my $hit (@{$ua->get($url)->result->json->{hits}{hits}}) {
     say "$hit->{_source}{name} ($hit->{_source}{author})";
   }
 
@@ -1038,7 +1038,7 @@ will be automatically generated.
   use Mojo::UserAgent;
 
   my $ua = Mojo::UserAgent->new;
-  say $ua->get('https://sri:secret@example.com/hideout')->res->body;
+  say $ua->get('https://sri:secret@example.com/hideout')->result->body;
 
 =head2 Decorating follow-up requests
 
@@ -1060,7 +1060,7 @@ them.
   });
 
   # Request that will most likely get redirected
-  say 'Title: ', $ua->get('google.com')->res->dom->at('head > title')->text;
+  say 'Title: ', $ua->get('google.com')->result->dom->at('head > title')->text;
 
 This even works for proxy C<CONNECT> requests.
 
@@ -1117,7 +1117,7 @@ file with L<Mojo::Asset::File/"move_to">.
   # Fetch the latest Mojolicious tarball
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
   my $tx = $ua->get('https://www.github.com/kraih/mojo/tarball/master');
-  $tx->res->content->asset->move_to('mojo.tar.gz');
+  $tx->result->content->asset->move_to('mojo.tar.gz');
 
 To protect you from excessively large files there is also a limit of 2GB by
 default, which you can tweak with the attribute
@@ -1210,11 +1210,11 @@ keep many concurrent connections active at the same time.
   my $ua = Mojo::UserAgent->new;
   $ua->get('http://metacpan.org/search?q=mojo' => sub {
     my ($ua, $mojo) = @_;
-    say $mojo->res->dom->at('title')->text;
+    say $mojo->result->dom->at('title')->text;
   });
   $ua->get('http://metacpan.org/search?q=minion' => sub {
     my ($ua, $minion) = @_;
-    say $minion->res->dom->at('title')->text;
+    say $minion->result->dom->at('title')->text;
   });
 
   # Start event loop if necessary
@@ -1234,8 +1234,8 @@ synchronize multiple non-blocking requests.
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, $mojo, $minion) = @_;
-    say $mojo->res->dom->at('title')->text;
-    say $minion->res->dom->at('title')->text;
+    say $mojo->result->dom->at('title')->text;
+    say $minion->result->dom->at('title')->text;
   });
   $ua->get('http://metacpan.org/search?q=mojo'   => $delay->begin);
   $ua->get('http://metacpan.org/search?q=minion' => $delay->begin);

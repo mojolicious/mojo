@@ -63,16 +63,14 @@ sub run {
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
-  my $err = $tx->error;
-  warn qq{Problem loading URL "@{[$tx->req->url]}": $err->{message}\n}
-    if $err && !$err->{code};
+  my $res = $tx->result;
 
   # JSON Pointer
   return unless defined $selector;
   return _json($buffer, $selector) if !length $selector || $selector =~ m!^/!;
 
   # Selector
-  $charset //= $tx->res->content->charset || $tx->res->default_charset;
+  $charset //= $res->content->charset || $res->default_charset;
   _select($buffer, $selector, $charset, @args);
 }
 

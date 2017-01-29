@@ -426,7 +426,7 @@ Maximum request size in bytes, defaults to the value of
 L<Mojo::Message/"max_message_size">. Setting the value to C<0> will allow
 requests of indefinite size. Note that increasing this value can also
 drastically increase memory usage, should you for example attempt to parse an
-excessively large response body with the methods L<Mojo::Message/"dom"> or
+excessively large request body with the methods L<Mojo::Message/"dom"> or
 L<Mojo::Message/"json">.
 
 =head2 mode

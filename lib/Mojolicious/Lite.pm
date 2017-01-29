@@ -21,8 +21,7 @@ sub import {
   push @{"${caller}::ISA"}, 'Mojo';
 
   # Generate moniker based on filename
-  my $moniker = path($ENV{MOJO_EXE})->basename;
-  $moniker =~ s/\.(?:pl|pm|t)$//i;
+  my $moniker = path($ENV{MOJO_EXE})->basename('.pl', '.pm', '.t');
   my $app = shift->new(moniker => $moniker);
 
   # Initialize routes without namespaces

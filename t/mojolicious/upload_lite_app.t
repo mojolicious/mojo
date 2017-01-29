@@ -35,8 +35,8 @@ my $t = Test::Mojo->new;
 
 # Request size limit
 $t->get_ok('/request_size')->status_is(200)->content_is(16777216);
-$t->app->max_request_size(33554432);
-$t->get_ok('/request_size')->status_is(200)->content_is(33554432);
+$t->app->max_request_size(0);
+$t->get_ok('/request_size')->status_is(200)->content_is(0);
 
 # Asset and filename
 my $file = Mojo::Asset::File->new->add_chunk('lalala');

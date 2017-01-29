@@ -167,12 +167,12 @@ is $tx->res->version, '1.1', 'right version';
 is $tx->res->code,    200,   'right status';
 ok !$tx->res->headers->connection, 'no "Connection" value';
 is $tx->res->body, 'works!', 'right content';
-$tx = $ua->max_response_size(33554432)->get('/');
+$tx = $ua->max_response_size(0)->get('/');
 ok $tx->success, 'successful';
 is $tx->res->version, '1.1', 'right version';
 is $tx->res->code,    200,   'right status';
 ok !$tx->res->headers->connection, 'no "Connection" value';
-is $tx->res->max_message_size, 33554432, 'right value';
+is $tx->res->max_message_size, 0,        'right value';
 is $tx->res->body,             'works!', 'right content';
 
 # Shortcuts for common request methods

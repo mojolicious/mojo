@@ -79,7 +79,7 @@ get '/' => {template => 'index'};
 # WebSocket service used by the template to extract the title from a website
 websocket '/title' => sub ($c) {
   $c->on(message => sub ($c, $msg) {
-    my $title = $c->ua->get($msg)->res->dom->at('title')->text;
+    my $title = $c->ua->get($msg)->result->dom->at('title')->text;
     $c->send($title);
   });
 };

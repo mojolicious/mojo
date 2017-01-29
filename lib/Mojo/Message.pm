@@ -389,10 +389,7 @@ C<MOJO_MAX_LINE_SIZE> environment variable or C<8192> (8KB).
 
 Maximum message size in bytes, defaults to the value of the
 C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<16777216> (16MB). Setting
-the value to C<0> will allow messages of indefinite size. Note that increasing
-this value can also drastically increase memory usage, should you for example,
-attempt to parse an excessively large message body with the L</"body_params">,
-L</"dom"> or L</"json"> methods.
+the value to C<0> will allow messages of indefinite size.
 
 =head2 version
 
@@ -423,7 +420,8 @@ C<multipart/form-data> message body, usually a L<Mojo::Parameters> object. Note
 that this method caches all data, so it should not be called before the entire
 message body has been received. Parts of the message body need to be loaded
 into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large.
+excessively large. There's a 16MB limit for requests and a 2GB limit for
+responses by default.
 
   # Get POST parameter names and values
   my $hash = $msg->body_params->to_hash;
@@ -481,7 +479,8 @@ an optional selector can be used to call the method L<Mojo::DOM/"find"> on it
 right away, which then returns a L<Mojo::Collection> object. Note that this
 method caches all data, so it should not be called before the entire message
 body has been received. The whole message body needs to be loaded into memory
-to parse it, so you have to make sure it is not excessively large.
+to parse it, so you have to make sure it is not excessively large. There's a
+16MB limit for requests and a 2GB limit for responses by default.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->map('text')->join("\n");
@@ -603,7 +602,8 @@ Pointer can be used to extract a specific value with L<Mojo::JSON::Pointer>.
 Note that this method caches all data, so it should not be called before the
 entire message body has been received. The whole message body needs to be
 loaded into memory to parse it, so you have to make sure it is not excessively
-large.
+large. There's a 16MB limit for requests and a 2GB limit for responses by
+default.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];

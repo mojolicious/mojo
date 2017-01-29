@@ -37,6 +37,7 @@ has log              => sub {
   # Reduced log output outside of development mode
   return $mode eq 'development' ? $log : $log->level('info');
 };
+has 'max_request_size';
 has mode => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
 has moniker  => sub { Mojo::Util::decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
@@ -92,8 +93,12 @@ sub build_controller {
 
 sub build_tx {
   my $self = shift;
-  my $tx   = Mojo::Transaction::HTTP->new;
+
+  my $tx  = Mojo::Transaction::HTTP->new;
+  my $max = $self->max_request_size;
+  $tx->req->max_message_size($max) if defined $max;
   $self->plugins->emit_hook(after_build_tx => $tx, $self);
+
   return $tx;
 }
 
@@ -411,6 +416,18 @@ if a C<log> directory exists.
 
   # Log debug message
   $app->log->debug('It works');
+
+=head2 max_request_size
+
+  my $max = $app->max_request_size;
+  $app    = $app->max_request_size(16777216);
+
+Maximum request size in bytes, defaults to the value of
+L<Mojo::Message/"max_message_size">. Setting the value to C<0> will allow
+requests of indefinite size. Note that increasing this value can also
+drastically increase memory usage, should you for example attempt to parse an
+excessively large response body with the methods L<Mojo::Message/"dom"> or
+L<Mojo::Message/"json">.
 
 =head2 mode
 

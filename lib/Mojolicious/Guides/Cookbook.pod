@@ -1123,6 +1123,9 @@ To protect you from excessively large files there is also a limit of 2GB by
 default, which you can tweak with the attribute
 L<Mojo::UserAgent/"max_response_size">.
 
+  # Increase limit to 10GB
+  $ua->max_response_size(10737418240);
+
 =head2 Large file upload
 
 Uploading a large file is even easier.

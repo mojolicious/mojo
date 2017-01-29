@@ -9,8 +9,12 @@ use Mojo::JSON 'encode_json';
 use Mojo::Message::Response;
 use Mojo::Util 'encode';
 
-# Common status codes
+# Defaults
 my $res = Mojo::Message::Response->new;
+is $res->max_message_size, 2147483648, 'right default';
+
+# Common status codes
+$res = Mojo::Message::Response->new;
 is $res->code(100)->default_message, 'Continue',            'right message';
 is $res->code(101)->default_message, 'Switching Protocols', 'right message';
 is $res->code(102)->default_message, 'Processing',          'right message';

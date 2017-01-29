@@ -584,6 +584,7 @@ message body, in that order. If there are multiple values sharing the same
 name, and you want to access more than just the last one, you can use
 L</"every_param">. Parts of the request body need to be loaded into memory to
 parse C<POST> parameters, so you have to make sure it is not excessively large.
+There's a 16MB limit for requests by default.
 
   # Get first value
   my $first = $c->every_param('foo')->[0];
@@ -930,7 +931,7 @@ validate file uploads as well as C<GET> and C<POST> parameters extracted from
 the query string and C<application/x-www-form-urlencoded> or
 C<multipart/form-data> message body. Parts of the request body need to be loaded
 into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large.
+excessively large. There's a 16MB limit for requests by default.
 
   # Validate GET/POST parameter
   my $validation = $c->validation;

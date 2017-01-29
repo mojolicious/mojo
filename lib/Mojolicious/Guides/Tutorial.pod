@@ -834,11 +834,10 @@ L<Mojolicious::Plugin::TagHelpers/"form_for">.
 
 To protect you from excessively large files there is also a limit of 16MB by
 default, which you can tweak with the attribute
-L<Mojo::Message/"max_message_size"> or C<MOJO_MAX_MESSAGE_SIZE> environment
-variable.
+L<Mojolicious/"max_request_size">.
 
   # Increase limit to 1GB
-  $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
+  app->max_request_size(1073741824);
 
 =head2 User agent
 

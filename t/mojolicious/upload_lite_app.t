@@ -9,6 +9,11 @@ use Mojo::Content::Single;
 use Mojolicious::Lite;
 use Test::Mojo;
 
+get '/request_size' => sub {
+  my $c = shift;
+  $c->render(text => $c->req->max_message_size);
+};
+
 post '/upload' => sub {
   my $c       = shift;
   my $file    = $c->param('file');
@@ -27,6 +32,11 @@ post '/multi' => sub {
 };
 
 my $t = Test::Mojo->new;
+
+# Request size limit
+$t->get_ok('/request_size')->status_is(200)->content_is(16777216);
+$t->app->max_request_size(33554432);
+$t->get_ok('/request_size')->status_is(200)->content_is(33554432);
 
 # Asset and filename
 my $file = Mojo::Asset::File->new->add_chunk('lalala');

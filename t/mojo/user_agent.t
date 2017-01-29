@@ -68,15 +68,6 @@ get '/one' => sub {
   is(Mojo::UserAgent->new->max_redirects, 0, 'right value');
 }
 
-# Max response size
-{
-  is(Mojo::UserAgent->new->max_response_size, 2147483648, 'right value');
-  local $ENV{MOJO_MAX_RESPONSE_SIZE} = 25;
-  is(Mojo::UserAgent->new->max_response_size, 25, 'right value');
-  local $ENV{MOJO_MAX_RESPONSE_SIZE} = 0;
-  is(Mojo::UserAgent->new->max_response_size, 0, 'right value');
-}
-
 # Timeouts
 {
   is(Mojo::UserAgent->new->connect_timeout, 10, 'right value');

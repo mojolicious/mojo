@@ -6,6 +6,7 @@ use Mojo::Date;
 use Mojo::Util 'deprecated';
 
 has [qw(code message)];
+has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} // 2147483648 };
 
 # Umarked codes are from RFC 7231
 my %MESSAGES = (
@@ -211,6 +212,15 @@ implements the following new ones.
   $res     = $res->code(200);
 
 HTTP response status code.
+
+=head2 max_message_size
+
+  my $size = $res->max_message_size;
+  $res     = $res->max_message_size(1024);
+
+Maximum message size in bytes, defaults to the value of the
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<2147483648> (2GB). Setting
+the value to C<0> will allow messages of indefinite size.
 
 =head2 message
 

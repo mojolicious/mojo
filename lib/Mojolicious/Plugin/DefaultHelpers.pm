@@ -324,7 +324,7 @@ of the steps, breaking the chain.
     },
     sub {
       my ($delay, $tx) = @_;
-      $c->render(json => {title => $tx->res->dom->at('title')->text});
+      $c->render(json => {title => $tx->result->dom->at('title')->text});
     }
   );
 
@@ -474,7 +474,7 @@ the L</"stash">.
 
 =head2 ua
 
-  %= ua->get('mojolicious.org')->res->dom->at('title')->text
+  %= ua->get('mojolicious.org')->result->dom->at('title')->text
 
 Alias for L<Mojo/"ua">.
 

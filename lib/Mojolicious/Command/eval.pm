@@ -32,7 +32,7 @@ Mojolicious::Command::eval - Eval command
 
   Usage: APPLICATION eval [OPTIONS] CODE
 
-    ./myapp.pl eval 'say app->ua->get("/")->res->body'
+    ./myapp.pl eval 'say app->ua->get("/")->result->body'
     ./myapp.pl eval 'say for sort keys %{app->renderer->helpers}'
     ./myapp.pl eval -v 'app->home'
     ./myapp.pl eval -V 'app->renderer->paths'

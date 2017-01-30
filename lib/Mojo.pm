@@ -100,7 +100,7 @@ A full featured HTTP user agent for use in your applications, defaults to a
 L<Mojo::UserAgent> object.
 
   # Perform blocking request
-  say $app->ua->get('example.com')->res->body;
+  say $app->ua->get('example.com')->result->body;
 
 =head1 METHODS
 

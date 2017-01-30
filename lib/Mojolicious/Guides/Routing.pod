@@ -720,11 +720,6 @@ constructs.
   # http://mojolicious.org/perldoc
   $r->get('/perldoc')->over(host => 'mojolicious.org')->to('perldoc#index');
 
-Or append your conditions as key/value pairs to the route.
-
-  # / (Origin: http://perl.org)
-  $r->get('/' => agent => qr/Firefox/)->to('foo#bar');
-
 Just be aware that conditions are too complex for the routing cache, which
 normally speeds up recurring requests, and can therefore reduce performance.
 
@@ -919,7 +914,7 @@ Use whatever request information you need.
   });
 
   # /hello?to=world&test=1
-  $r->get('/hello' => query => {test => 1, to => 'world'})->to('foo#bar');
+  $r->get('/hello')->over(query => {test => 1, to => 'world'})->to('foo#bar');
 
 =head2 Condition plugins
 

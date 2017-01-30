@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use Test::Mojo;
 use Mojo::DOM;
 
 # Empty
@@ -297,8 +298,9 @@ is $dom->child_nodes->first->text,      '',    'no text';
 is $dom->child_nodes->first->all_text,  '',    'no text';
 
 # Class and ID
-$dom = Mojo::DOM->new('<div id="id" class="class">a</div>');
-is $dom->at('div#id.class')->text, 'a', 'right text';
+my $t = Test::Mojo->new();
+$t->dom(Mojo::DOM->new('<div id="id" class="class">a</div>'));
+$t->text_is('div#id.class', 'a', 'right text');
 
 # Deep nesting (parent combinator)
 $dom = Mojo::DOM->new(<<EOF);
@@ -341,126 +343,131 @@ is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
 is_deeply [$dom->ancestors->each],             [], 'no results';
 
 # Script tag
-$dom = Mojo::DOM->new(<<EOF);
+$t->dom(Mojo::DOM->new(<<EOF));
 <script charset="utf-8">alert('lalala');</script>
 EOF
-is $dom->at('script')->text, "alert('lalala');", 'right script content';
+$t->text_is('script', "alert('lalala');", 'right script content');
 
 # HTML5 (unquoted values)
-$dom = Mojo::DOM->new(
-  '<div id = test foo ="bar" class=tset bar=/baz/ value baz=//>works</div>');
-is $dom->at('#test')->text,                'works', 'right text';
-is $dom->at('div')->text,                  'works', 'right text';
-is $dom->at('[foo=bar][foo="bar"]')->text, 'works', 'right text';
-is $dom->at('[foo="ba"]'), undef, 'no result';
-is $dom->at('[foo=bar]')->text, 'works', 'right text';
-is $dom->at('[foo=ba]'), undef, 'no result';
-is $dom->at('.tset')->text,       'works', 'right text';
-is $dom->at('[bar=/baz/]')->text, 'works', 'right text';
-is $dom->at('[baz=//]')->text,    'works', 'right text';
-is $dom->at('[value]')->text,     'works', 'right text';
-is $dom->at('[value=baz]'), undef, 'no result';
+$t->dom(
+  Mojo::DOM->new(
+    '<div id = test foo ="bar" class=tset bar=/baz/ value baz=//>works</div>')
+);
+$t->text_is('#test',                'works', 'right text');
+$t->text_is('div',                  'works', 'right text');
+$t->text_is('[foo=bar][foo="bar"]', 'works', 'right text');
+$t->text_is('[foo=bar]',            'works', 'right text');
+$t->text_is('.tset',                'works', 'right text');
+$t->text_is('[bar=/baz/]',          'works', 'right text');
+$t->text_is('[baz=//]',             'works', 'right text');
+$t->text_is('[value]',              'works', 'right text');
+$t->element_exists_not('[foo="ba"]',  'no result');
+$t->element_exists_not('[foo=ba]',    'no result');
+$t->element_exists_not('[value=baz]', 'no result');
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
-$dom = Mojo::DOM->new(q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
-is $dom->at('#test')->text,       'works', 'right text';
-is $dom->at('div')->text,         'works', 'right text';
-is $dom->at('[foo="bar"]')->text, 'works', 'right text';
-is $dom->at('[foo="ba"]'), undef, 'no result';
-is $dom->at('[foo=bar]')->text, 'works', 'right text';
-is $dom->at('[foo=ba]'), undef, 'no result';
-is $dom->at('.tset')->text, 'works', 'right text';
+$t->dom(
+  Mojo::DOM->new(q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>}));
+$t->text_is('#test',       'works', 'right text');
+$t->text_is('div',         'works', 'right text');
+$t->text_is('[foo="bar"]', 'works', 'right text');
+$t->text_is('[foo=bar]',   'works', 'right text');
+$t->text_is('.tset',       'works', 'right text');
+$t->element_exists_not('[foo=ba]',   'no result');
+$t->element_exists_not('[foo="ba"]', 'no result');
 
 # Already decoded Unicode snowman and quotes in selector
-$dom = Mojo::DOM->new('<div id="snow&apos;m&quot;an">☃</div>');
-is $dom->at('[id="snow\'m\"an"]')->text,      '☃', 'right text';
-is $dom->at('[id="snow\'m\22 an"]')->text,    '☃', 'right text';
-is $dom->at('[id="snow\'m\000022an"]')->text, '☃', 'right text';
-is $dom->at('[id="snow\'m\22an"]'),      undef, 'no result';
-is $dom->at('[id="snow\'m\21 an"]'),     undef, 'no result';
-is $dom->at('[id="snow\'m\000021an"]'),  undef, 'no result';
-is $dom->at('[id="snow\'m\000021 an"]'), undef, 'no result';
-is $dom->at("[id='snow\\'m\"an']")->text,  '☃', 'right text';
-is $dom->at("[id='snow\\27m\"an']")->text, '☃', 'right text';
+$t->dom(Mojo::DOM->new('<div id="snow&apos;m&quot;an">☃</div>'));
+$t->text_is('[id="snow\'m\"an"]',      '☃', 'right text');
+$t->text_is('[id="snow\'m\22 an"]',    '☃', 'right text');
+$t->text_is('[id="snow\'m\000022an"]', '☃', 'right text');
+$t->element_exists_not('[id="snow\'m\22an"]',      'no result');
+$t->element_exists_not('[id="snow\'m\21 an"]',     'no result');
+$t->element_exists_not('[id="snow\'m\000021an"]',  'no result');
+$t->element_exists_not('[id="snow\'m\000021 an"]', 'no result');
+$t->text_is("[id='snow\\'m\"an']",  '☃', 'right text');
+$t->text_is("[id='snow\\27m\"an']", '☃', 'right text');
 
 # Unicode and escaped selectors
 my $html
   = '<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>';
-$dom = Mojo::DOM->new($html);
-is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
-is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
-is $dom->at("#\\\n\\2603 x")->text,                   'Snowman', 'right text';
-is $dom->at(qq{[id="\\\n\\2603 x"]})->text,           'Snowman', 'right text';
-is $dom->at(qq{[id="\\\n\\002603x"]})->text,          'Snowman', 'right text';
-is $dom->at(qq{[id="\\\\2603 x"]})->text,             'Snowman', 'right text';
-is $dom->at("html #\\\n\\002603x")->text,             'Snowman', 'right text';
-is $dom->at('html #\\2603 x')->text,                  'Snowman', 'right text';
-is $dom->at("html #\\\n\\2603 x")->text,              'Snowman', 'right text';
-is $dom->at(qq{html [id="\\\n\\2603 x"]})->text,      'Snowman', 'right text';
-is $dom->at(qq{html [id="\\\n\\002603x"]})->text,     'Snowman', 'right text';
-is $dom->at(qq{html [id="\\\\2603 x"]})->text,        'Snowman', 'right text';
-is $dom->at('#☃x')->text,                           'Snowman', 'right text';
-is $dom->at('div#☃x')->text,                        'Snowman', 'right text';
-is $dom->at('html div#☃x')->text,                   'Snowman', 'right text';
-is $dom->at('[id^="☃"]')->text,                     'Snowman', 'right text';
-is $dom->at('div[id^="☃"]')->text,                  'Snowman', 'right text';
-is $dom->at('html div[id^="☃"]')->text,             'Snowman', 'right text';
-is $dom->at('html > div[id^="☃"]')->text,           'Snowman', 'right text';
-is $dom->at('[id^=☃]')->text,                       'Snowman', 'right text';
-is $dom->at('div[id^=☃]')->text,                    'Snowman', 'right text';
-is $dom->at('html div[id^=☃]')->text,               'Snowman', 'right text';
-is $dom->at('html > div[id^=☃]')->text,             'Snowman', 'right text';
-is $dom->at(".\\\n\\002665")->text,                   'Heart',   'right text';
-is $dom->at('.\\2665')->text,                         'Heart',   'right text';
-is $dom->at("html .\\\n\\002665")->text,              'Heart',   'right text';
-is $dom->at('html .\\2665')->text,                    'Heart',   'right text';
-is $dom->at(qq{html [class\$="\\\n\\002665"]})->text, 'Heart',   'right text';
-is $dom->at(qq{html [class\$="\\2665"]})->text,       'Heart',   'right text';
-is $dom->at(qq{[class\$="\\\n\\002665"]})->text,      'Heart',   'right text';
-is $dom->at(qq{[class\$="\\2665"]})->text,            'Heart',   'right text';
-is $dom->at('.x')->text,                              'Heart',   'right text';
-is $dom->at('html .x')->text,                         'Heart',   'right text';
-is $dom->at('.♥')->text,                            'Heart',   'right text';
-is $dom->at('html .♥')->text,                       'Heart',   'right text';
-is $dom->at('div.♥')->text,                         'Heart',   'right text';
-is $dom->at('html div.♥')->text,                    'Heart',   'right text';
-is $dom->at('[class$="♥"]')->text,                  'Heart',   'right text';
-is $dom->at('div[class$="♥"]')->text,               'Heart',   'right text';
-is $dom->at('html div[class$="♥"]')->text,          'Heart',   'right text';
-is $dom->at('html > div[class$="♥"]')->text,        'Heart',   'right text';
-is $dom->at('[class$=♥]')->text,                    'Heart',   'right text';
-is $dom->at('div[class$=♥]')->text,                 'Heart',   'right text';
-is $dom->at('html div[class$=♥]')->text,            'Heart',   'right text';
-is $dom->at('html > div[class$=♥]')->text,          'Heart',   'right text';
-is $dom->at('[class~="♥"]')->text,                  'Heart',   'right text';
-is $dom->at('div[class~="♥"]')->text,               'Heart',   'right text';
-is $dom->at('html div[class~="♥"]')->text,          'Heart',   'right text';
-is $dom->at('html > div[class~="♥"]')->text,        'Heart',   'right text';
-is $dom->at('[class~=♥]')->text,                    'Heart',   'right text';
-is $dom->at('div[class~=♥]')->text,                 'Heart',   'right text';
-is $dom->at('html div[class~=♥]')->text,            'Heart',   'right text';
-is $dom->at('html > div[class~=♥]')->text,          'Heart',   'right text';
-is $dom->at('[class~="x"]')->text,                    'Heart',   'right text';
-is $dom->at('div[class~="x"]')->text,                 'Heart',   'right text';
-is $dom->at('html div[class~="x"]')->text,            'Heart',   'right text';
-is $dom->at('html > div[class~="x"]')->text,          'Heart',   'right text';
-is $dom->at('[class~=x]')->text,                      'Heart',   'right text';
-is $dom->at('div[class~=x]')->text,                   'Heart',   'right text';
-is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
-is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
-is $dom->at('html'), $html, 'right result';
-is $dom->at('#☃x')->parent,     $html, 'right result';
-is $dom->at('#☃x')->root,       $html, 'right result';
-is $dom->children('html')->first, $html, 'right result';
-is $dom->to_string, $html, 'right result';
-is $dom->content,   $html, 'right result';
+$t->dom(Mojo::DOM->new($html));
+$t->text_is("#\\\n\\002603x",                  'Snowman', 'right text');
+$t->text_is('#\\2603 x',                       'Snowman', 'right text');
+$t->text_is("#\\\n\\2603 x",                   'Snowman', 'right text');
+$t->text_is(qq{[id="\\\n\\2603 x"]},           'Snowman', 'right text');
+$t->text_is(qq{[id="\\\n\\002603x"]},          'Snowman', 'right text');
+$t->text_is(qq{[id="\\\\2603 x"]},             'Snowman', 'right text');
+$t->text_is("html #\\\n\\002603x",             'Snowman', 'right text');
+$t->text_is('html #\\2603 x',                  'Snowman', 'right text');
+$t->text_is("html #\\\n\\2603 x",              'Snowman', 'right text');
+$t->text_is(qq{html [id="\\\n\\2603 x"]},      'Snowman', 'right text');
+$t->text_is(qq{html [id="\\\n\\002603x"]},     'Snowman', 'right text');
+$t->text_is(qq{html [id="\\\\2603 x"]},        'Snowman', 'right text');
+$t->text_is('#☃x',                           'Snowman', 'right text');
+$t->text_is('div#☃x',                        'Snowman', 'right text');
+$t->text_is('html div#☃x',                   'Snowman', 'right text');
+$t->text_is('[id^="☃"]',                     'Snowman', 'right text');
+$t->text_is('div[id^="☃"]',                  'Snowman', 'right text');
+$t->text_is('html div[id^="☃"]',             'Snowman', 'right text');
+$t->text_is('html > div[id^="☃"]',           'Snowman', 'right text');
+$t->text_is('[id^=☃]',                       'Snowman', 'right text');
+$t->text_is('div[id^=☃]',                    'Snowman', 'right text');
+$t->text_is('html div[id^=☃]',               'Snowman', 'right text');
+$t->text_is('html > div[id^=☃]',             'Snowman', 'right text');
+$t->text_is(".\\\n\\002665",                   'Heart',   'right text');
+$t->text_is('.\\2665',                         'Heart',   'right text');
+$t->text_is("html .\\\n\\002665",              'Heart',   'right text');
+$t->text_is('html .\\2665',                    'Heart',   'right text');
+$t->text_is(qq{html [class\$="\\\n\\002665"]}, 'Heart',   'right text');
+$t->text_is(qq{html [class\$="\\2665"]},       'Heart',   'right text');
+$t->text_is(qq{[class\$="\\\n\\002665"]},      'Heart',   'right text');
+$t->text_is(qq{[class\$="\\2665"]},            'Heart',   'right text');
+$t->text_is('.x',                              'Heart',   'right text');
+$t->text_is('html .x',                         'Heart',   'right text');
+$t->text_is('.♥',                            'Heart',   'right text');
+$t->text_is('html .♥',                       'Heart',   'right text');
+$t->text_is('div.♥',                         'Heart',   'right text');
+$t->text_is('html div.♥',                    'Heart',   'right text');
+$t->text_is('[class$="♥"]',                  'Heart',   'right text');
+$t->text_is('div[class$="♥"]',               'Heart',   'right text');
+$t->text_is('html div[class$="♥"]',          'Heart',   'right text');
+$t->text_is('html > div[class$="♥"]',        'Heart',   'right text');
+$t->text_is('[class$=♥]',                    'Heart',   'right text');
+$t->text_is('div[class$=♥]',                 'Heart',   'right text');
+$t->text_is('html div[class$=♥]',            'Heart',   'right text');
+$t->text_is('html > div[class$=♥]',          'Heart',   'right text');
+$t->text_is('[class~="♥"]',                  'Heart',   'right text');
+$t->text_is('div[class~="♥"]',               'Heart',   'right text');
+$t->text_is('html div[class~="♥"]',          'Heart',   'right text');
+$t->text_is('html > div[class~="♥"]',        'Heart',   'right text');
+$t->text_is('[class~=♥]',                    'Heart',   'right text');
+$t->text_is('div[class~=♥]',                 'Heart',   'right text');
+$t->text_is('html div[class~=♥]',            'Heart',   'right text');
+$t->text_is('html > div[class~=♥]',          'Heart',   'right text');
+$t->text_is('[class~="x"]',                    'Heart',   'right text');
+$t->text_is('div[class~="x"]',                 'Heart',   'right text');
+$t->text_is('html div[class~="x"]',            'Heart',   'right text');
+$t->text_is('html > div[class~="x"]',          'Heart',   'right text');
+$t->text_is('[class~=x]',                      'Heart',   'right text');
+$t->text_is('div[class~=x]',                   'Heart',   'right text');
+$t->text_is('html div[class~=x]',              'Heart',   'right text');
+$t->text_is('html > div[class~=x]',            'Heart',   'right text');
+is $t->dom->at('html'), $html, 'right result';
+is $t->dom->at('#☃x')->parent,     $html, 'right result';
+is $t->dom->at('#☃x')->root,       $html, 'right result';
+is $t->dom->children('html')->first, $html, 'right result';
+is $t->dom->to_string, $html, 'right result';
+is $t->dom->content,   $html, 'right result';
 
 # Looks remotely like HTML
-$dom = Mojo::DOM->new(
-  '<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');
-is $dom->at('title')->text, '♥', 'right text';
-is $dom->at('*')->text,     '♥', 'right text';
-is $dom->at('.test')->text, '♥', 'right text';
+$t->dom(
+  Mojo::DOM->new(
+    '<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃')
+);
+$t->text_is('title', '♥', 'right text');
+$t->text_is('*',     '♥', 'right text');
+$t->text_is('.test', '♥', 'right text');
 
 # Replace elements
 $dom = Mojo::DOM->new('<div>foo<p>lalala</p>bar</div>');
@@ -1195,7 +1202,7 @@ $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(J K)], 'found only child';
 
 # Sibling combinator
-$dom = Mojo::DOM->new(<<EOF);
+$t->dom(Mojo::DOM->new(<<EOF));
 <ul>
     <li>A</li>
     <p>B</p>
@@ -1206,44 +1213,44 @@ $dom = Mojo::DOM->new(<<EOF);
 <p id="☃">F<b>H</b></p>
 <div>G</div>
 EOF
-is $dom->at('li ~ p')->text,       'B', 'right text';
-is $dom->at('li + p')->text,       'B', 'right text';
-is $dom->at('h1 ~ p ~ p')->text,   'F', 'right text';
-is $dom->at('h1 + p ~ p')->text,   'F', 'right text';
-is $dom->at('h1 ~ p + p')->text,   'F', 'right text';
-is $dom->at('h1 + p + p')->text,   'F', 'right text';
-is $dom->at('h1  +  p+p')->text,   'F', 'right text';
-is $dom->at('ul > li ~ li')->text, 'C', 'right text';
-is $dom->at('ul li ~ li')->text,   'C', 'right text';
-is $dom->at('ul>li~li')->text,     'C', 'right text';
-is $dom->at('ul li li'),     undef, 'no result';
-is $dom->at('ul ~ li ~ li'), undef, 'no result';
-is $dom->at('ul + li ~ li'), undef, 'no result';
-is $dom->at('ul > li + li'), undef, 'no result';
-is $dom->at('h1 ~ div')->text, 'G', 'right text';
-is $dom->at('h1 + div'), undef, 'no result';
-is $dom->at('p + div')->text,               'G', 'right text';
-is $dom->at('ul + h1 + p + p + div')->text, 'G', 'right text';
-is $dom->at('ul + h1 ~ p + div')->text,     'G', 'right text';
-is $dom->at('h1 ~ #♥')->text,             'E', 'right text';
-is $dom->at('h1 + #♥')->text,             'E', 'right text';
-is $dom->at('#♥~#☃')->text,             'F', 'right text';
-is $dom->at('#♥+#☃')->text,             'F', 'right text';
-is $dom->at('#♥+#☃>b')->text,           'H', 'right text';
-is $dom->at('#♥ > #☃'), undef, 'no result';
-is $dom->at('#♥ #☃'),   undef, 'no result';
-is $dom->at('#♥ + #☃ + :nth-last-child(1)')->text,  'G', 'right text';
-is $dom->at('#♥ ~ #☃ + :nth-last-child(1)')->text,  'G', 'right text';
-is $dom->at('#♥ + #☃ ~ :nth-last-child(1)')->text,  'G', 'right text';
-is $dom->at('#♥ ~ #☃ ~ :nth-last-child(1)')->text,  'G', 'right text';
-is $dom->at('#♥ + :nth-last-child(2)')->text,         'F', 'right text';
-is $dom->at('#♥ ~ :nth-last-child(2)')->text,         'F', 'right text';
-is $dom->at('#♥ + #☃ + *:nth-last-child(1)')->text, 'G', 'right text';
-is $dom->at('#♥ ~ #☃ + *:nth-last-child(1)')->text, 'G', 'right text';
-is $dom->at('#♥ + #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
-is $dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
-is $dom->at('#♥ + *:nth-last-child(2)')->text,        'F', 'right text';
-is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
+$t->text_is('li ~ p',       'B', 'right text');
+$t->text_is('li + p',       'B', 'right text');
+$t->text_is('h1 ~ p ~ p',   'F', 'right text');
+$t->text_is('h1 + p ~ p',   'F', 'right text');
+$t->text_is('h1 ~ p + p',   'F', 'right text');
+$t->text_is('h1 + p + p',   'F', 'right text');
+$t->text_is('h1  +  p+p',   'F', 'right text');
+$t->text_is('ul > li ~ li', 'C', 'right text');
+$t->text_is('ul li ~ li',   'C', 'right text');
+$t->text_is('ul>li~li',     'C', 'right text');
+$t->element_exists_not('ul li li',     'no result');
+$t->element_exists_not('ul ~ li ~ li', 'no result');
+$t->element_exists_not('ul + li ~ li', 'no result');
+$t->element_exists_not('ul > li + li', 'no result');
+$t->text_is('h1 ~ div', 'G', 'right text');
+$t->element_exists_not('h1 + div', 'no result');
+$t->text_is('p + div',               'G', 'right text');
+$t->text_is('ul + h1 + p + p + div', 'G', 'right text');
+$t->text_is('ul + h1 ~ p + div',     'G', 'right text');
+$t->text_is('h1 ~ #♥',             'E', 'right text');
+$t->text_is('h1 + #♥',             'E', 'right text');
+$t->text_is('#♥~#☃',             'F', 'right text');
+$t->text_is('#♥+#☃',             'F', 'right text');
+$t->text_is('#♥+#☃>b',           'H', 'right text');
+$t->element_exists_not('#♥ > #☃', 'no result');
+$t->element_exists_not('#♥ #☃',   'no result');
+$t->text_is('#♥ + #☃ + :nth-last-child(1)',  'G', 'right text');
+$t->text_is('#♥ ~ #☃ + :nth-last-child(1)',  'G', 'right text');
+$t->text_is('#♥ + #☃ ~ :nth-last-child(1)',  'G', 'right text');
+$t->text_is('#♥ ~ #☃ ~ :nth-last-child(1)',  'G', 'right text');
+$t->text_is('#♥ + :nth-last-child(2)',         'F', 'right text');
+$t->text_is('#♥ ~ :nth-last-child(2)',         'F', 'right text');
+$t->text_is('#♥ + #☃ + *:nth-last-child(1)', 'G', 'right text');
+$t->text_is('#♥ ~ #☃ + *:nth-last-child(1)', 'G', 'right text');
+$t->text_is('#♥ + #☃ ~ *:nth-last-child(1)', 'G', 'right text');
+$t->text_is('#♥ ~ #☃ ~ *:nth-last-child(1)', 'G', 'right text');
+$t->text_is('#♥ + *:nth-last-child(2)',        'F', 'right text');
+$t->text_is('#♥ ~ *:nth-last-child(2)',        'F', 'right text');
 
 # Adding nodes
 $dom = Mojo::DOM->new(<<EOF);
@@ -1325,14 +1332,14 @@ is "$dom", <<EOF, 'right result';
 EOF
 
 # Optional "head" and "body" tags
-$dom = Mojo::DOM->new(<<EOF);
+$t->dom(Mojo::DOM->new(<<EOF));
 <html>
   <head>
     <title>foo</title>
   <body>bar
 EOF
-is $dom->at('html > head > title')->text, 'foo',   'right text';
-is $dom->at('html > body')->text,         "bar\n", 'right text';
+$t->text_is('html > head > title', 'foo',   'right text');
+$t->text_is('html > body',         "bar\n", 'right text');
 
 # Optional "li" tag
 $dom = Mojo::DOM->new(<<EOF);
@@ -1810,7 +1817,7 @@ is $dom->tree->[1][1], ' TESTSUITE PUBLIC "my.dtd" \'mhhh\' [
 is $dom->at('foo')->attr('bar'), 'false', 'right attribute';
 
 # Broken "font" block and useless end tags
-$dom = Mojo::DOM->new(<<EOF);
+$t->dom(Mojo::DOM->new(<<EOF));
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1821,8 +1828,8 @@ $dom = Mojo::DOM->new(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text,          'Test', 'right text';
-is $dom->at('html body table tr td > font')->text, 'test', 'right text';
+$t->text_is('html > head > title',          'Test', 'right text');
+$t->text_is('html body table tr td > font', 'test', 'right text');
 
 # Different broken "font" block
 $dom = Mojo::DOM->new(<<EOF);
@@ -1845,7 +1852,7 @@ is $dom->find('html > body > font > table > tr > td')->[1]->text,
   "test2\n    ", 'right text';
 
 # Broken "font" and "div" blocks
-$dom = Mojo::DOM->new(<<EOF);
+$t->dom(Mojo::DOM->new(<<EOF));
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1856,12 +1863,12 @@ $dom = Mojo::DOM->new(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html head title')->text, 'Test', 'right text';
-is $dom->at('html body font > div')->text, "test1\n      \n  ", 'right text';
-is $dom->at('html body font > div > div')->text, "test2\n    ", 'right text';
+$t->text_is('html head title',            'Test',              'right text');
+$t->text_is('html body font > div',       "test1\n      \n  ", 'right text');
+$t->text_is('html body font > div > div', "test2\n    ",       'right text');
 
 # Broken "div" blocks
-$dom = Mojo::DOM->new(<<EOF);
+$t->dom(Mojo::DOM->new(<<EOF));
 <html>
   <head><title>Test</title></head>
   <body>
@@ -1873,8 +1880,8 @@ $dom = Mojo::DOM->new(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html head title')->text,                 'Test', 'right text';
-is $dom->at('html body div table tr td > div')->text, 'test', 'right text';
+$t->text_is('html head title',                 'Test', 'right text');
+$t->text_is('html body div table tr td > div', 'test', 'right text');
 
 # And another broken "font" block
 $dom = Mojo::DOM->new(<<EOF);
@@ -1946,8 +1953,8 @@ is $dom->find('#screw-up .ewww > a > img')->[2], undef, 'no result';
 is $dom->find('#screw-up .ewww > a > img')->size, 2, 'right number of elements';
 
 # Broken "br" tag
-$dom = Mojo::DOM->new('<br< abc abc abc abc abc abc abc abc<p>Test</p>');
-is $dom->at('p')->text, 'Test', 'right text';
+$t->dom(Mojo::DOM->new('<br< abc abc abc abc abc abc abc abc<p>Test</p>'));
+$t->text_is('p', 'Test', 'right text');
 
 # Modifying an XML document
 $dom = Mojo::DOM->new(<<'EOF');
@@ -2424,20 +2431,20 @@ is $dom->find('div > ul ul')->[0]->text, "\n        \n        C\n      ",
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
 # Unusual order
-$dom
-  = Mojo::DOM->new('<a href="http://example.com" id="foo" class="bar">Ok!</a>');
-is $dom->at('a:not([href$=foo])[href^=h]')->text, 'Ok!', 'right text';
-is $dom->at('a:not([href$=example.com])[href^=h]'), undef, 'no result';
-is $dom->at('a[href^=h]#foo.bar')->text, 'Ok!', 'right text';
-is $dom->at('a[href^=h]#foo.baz'), undef, 'no result';
-is $dom->at('a[href^=h]#foo:not(b)')->text, 'Ok!', 'right text';
-is $dom->at('a[href^=h]#foo:not(a)'), undef, 'no result';
-is $dom->at('[href^=h].bar:not(b)[href$=m]#foo')->text, 'Ok!', 'right text';
-is $dom->at('[href^=h].bar:not(b)[href$=m]#bar'), undef, 'no result';
-is $dom->at(':not(b)#foo#foo')->text, 'Ok!', 'right text';
-is $dom->at(':not(b)#foo#bar'), undef, 'no result';
-is $dom->at(':not([href^=h]#foo#bar)')->text, 'Ok!', 'right text';
-is $dom->at(':not([href^=h]#foo#foo)'), undef, 'no result';
+$t->dom(
+  Mojo::DOM->new('<a href="http://example.com" id="foo" class="bar">Ok!</a>'));
+$t->text_is('a:not([href$=foo])[href^=h]', 'Ok!', 'right text');
+$t->element_exists_not('a:not([href$=example.com])[href^=h]', 'no result');
+$t->text_is('a[href^=h]#foo.bar', 'Ok!', 'right text');
+$t->element_exists_not('a[href^=h]#foo.baz', 'no result');
+$t->text_is('a[href^=h]#foo:not(b)', 'Ok!', 'right text');
+$t->element_exists_not('a[href^=h]#foo:not(a)', 'no result');
+$t->text_is('[href^=h].bar:not(b)[href$=m]#foo', 'Ok!', 'right text');
+$t->element_exists_not('[href^=h].bar:not(b)[href$=m]#bar', 'no result');
+$t->text_is(':not(b)#foo#foo', 'Ok!', 'right text');
+$t->element_exists_not(':not(b)#foo#bar', 'no result');
+$t->text_is(':not([href^=h]#foo#bar)', 'Ok!', 'right text');
+$t->element_exists_not(':not([href^=h]#foo#foo)', 'no result');
 
 # Slash between attributes
 $dom = Mojo::DOM->new('<input /type=checkbox / value="/a/" checked/><br/>');
@@ -2446,11 +2453,11 @@ is_deeply $dom->at('input')->attr,
 is "$dom", '<input checked type="checkbox" value="/a/"><br>', 'right result';
 
 # Dot and hash in class and id attributes
-$dom = Mojo::DOM->new('<p class="a#b.c">A</p><p id="a#b.c">B</p>');
-is $dom->at('p.a\#b\.c')->text,       'A', 'right text';
-is $dom->at(':not(p.a\#b\.c)')->text, 'B', 'right text';
-is $dom->at('p#a\#b\.c')->text,       'B', 'right text';
-is $dom->at(':not(p#a\#b\.c)')->text, 'A', 'right text';
+$t->dom(Mojo::DOM->new('<p class="a#b.c">A</p><p id="a#b.c">B</p>'));
+$t->text_is('p.a\#b\.c',       'A', 'right text');
+$t->text_is(':not(p.a\#b\.c)', 'B', 'right text');
+$t->text_is('p#a\#b\.c',       'B', 'right text');
+$t->text_is(':not(p#a\#b\.c)', 'A', 'right text');
 
 # Extra whitespace
 $dom = Mojo::DOM->new('< span>a< /span><b >b</b><span >c</ span>');
@@ -2460,9 +2467,9 @@ is $dom->at('b + span')->text, 'c', 'right text';
 is "$dom", '<span>a</span><b>b</b><span>c</span>', 'right result';
 
 # Selectors with leading and trailing whitespace
-$dom = Mojo::DOM->new('<div id=foo><b>works</b></div>');
-is $dom->at(' div   b ')->text,          'works', 'right text';
-is $dom->at('  :not(  #foo  )  ')->text, 'works', 'right text';
+$t->dom(Mojo::DOM->new('<div id=foo><b>works</b></div>'));
+$t->text_is(' div   b ',          'works', 'right text');
+$t->text_is('  :not(  #foo  )  ', 'works', 'right text');
 
 # "0"
 $dom = Mojo::DOM->new('0');
@@ -2489,14 +2496,14 @@ is $dom->at('img')->{src}, 'foo.png', 'right attribute';
 is "$dom", '<img src="foo.png">test', 'right result';
 
 # "title"
-$dom = Mojo::DOM->new('<title> <p>test&lt;</title>');
-is $dom->at('title')->text, ' <p>test<', 'right text';
-is "$dom", '<title> <p>test<</title>', 'right result';
+$t->dom(Mojo::DOM->new('<title> <p>test&lt;</title>'));
+$t->text_is('title', ' <p>test<', 'right text');
+is $t->dom . '', '<title> <p>test<</title>', 'right result';
 
 # "textarea"
-$dom = Mojo::DOM->new('<textarea id="a"> <p>test&lt;</textarea>');
-is $dom->at('textarea#a')->text, ' <p>test<', 'right text';
-is "$dom", '<textarea id="a"> <p>test<</textarea>', 'right result';
+$t->dom(Mojo::DOM->new('<textarea id="a"> <p>test&lt;</textarea>'));
+$t->text_is('textarea#a', ' <p>test<', 'right text');
+is $t->dom . '', '<textarea id="a"> <p>test<</textarea>', 'right result';
 
 # Comments
 $dom = Mojo::DOM->new(<<EOF);
@@ -2511,8 +2518,8 @@ is $dom->tree->[5][1], ' HTML4 ',             'right comment';
 is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
 
 # Huge number of attributes
-$dom = Mojo::DOM->new('<div ' . ('a=b ' x 32768) . '>Test</div>');
-is $dom->at('div[a=b]')->text, 'Test', 'right text';
+$t->dom(Mojo::DOM->new('<div ' . ('a=b ' x 32768) . '>Test</div>'));
+$t->text_is('div[a=b]', 'Test', 'right text');
 
 # Huge number of nested tags
 my $huge = ('<a>' x 100) . 'works' . ('</a>' x 100);

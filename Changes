@@ -1,5 +1,6 @@
 
 7.24  2017-01-30
+  - Expose dom as an attribute on Test::Mojo.
 
 7.23  2017-01-29
   - Added max_request_size attribute to Mojolicious.

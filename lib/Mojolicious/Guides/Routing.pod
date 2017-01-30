@@ -720,6 +720,11 @@ constructs.
   # http://mojolicious.org/perldoc
   $r->get('/perldoc')->over(host => 'mojolicious.org')->to('perldoc#index');
 
+Or append your conditions as key/value pairs to the route.
+
+  # / (Origin: http://perl.org)
+  $r->get('/' => agent => qr/Firefox/)->to('foo#bar');
+
 Just be aware that conditions are too complex for the routing cache, which
 normally speeds up recurring requests, and can therefore reduce performance.
 
@@ -886,20 +891,35 @@ plugins that run every time a new request arrives, and which need to return a
 true value for the route to match.
 
   # A condition that randomly allows a route to match
-  $r->add_condition(
-    random => sub {
-      my ($route, $c, $captures, $num) = @_;
+  $r->add_condition(random => sub {
+    my ($route, $c, $captures, $num) = @_;
 
-      # Loser
-      return undef if int rand $num;
+    # Loser
+    return undef if int rand $num;
 
-      # Winner
-      return 1;
-    }
-  );
+    # Winner
+    return 1;
+  });
 
   # /maybe (25% chance)
   $r->get('/maybe')->over(random => 4)->to('foo#bar');
+
+Use whatever request information you need.
+
+  # A condition to check query parameters (useful for mock web services)
+  $r->add_condition(query => sub {
+    my ($route, $c, $captures, $hash) = @_;
+
+    for my $key (keys %$hash) {
+      my $param = $c->req->url->query->param($key);
+      return undef unless defined $param && $param eq $hash->{$key};
+    }
+
+    return 1;
+  });
+
+  # /hello?to=world&test=1
+  $r->get('/hello' => query => {test => 1, to => 'world'})->to('foo#bar');
 
 =head2 Condition plugins
 

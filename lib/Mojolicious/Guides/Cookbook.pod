@@ -833,7 +833,7 @@ finished.
 
 L<Mojolicious> contains a very sophisticated event system based on
 L<Mojo::EventEmitter>, with ready-to-use events on almost all layers, and which
-can be combined to solve some of hardest problems in web development.
+can be combined to solve some of the hardest problems in web development.
 
   use Mojolicious::Lite;
   use Scalar::Util 'weaken';

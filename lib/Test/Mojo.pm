@@ -17,7 +17,8 @@ use Mojo::Util qw(decode encode);
 use Test::More ();
 
 has [qw(message success tx)];
-has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
+has ua  => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
+has dom => sub { shift->tx->res->dom };
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
@@ -85,7 +86,7 @@ sub delete_ok { shift->_build_ok(DELETE => @_) }
 
 sub element_count_is {
   my ($self, $selector, $count, $desc) = @_;
-  my $size = $self->tx->res->dom->find($selector)->size;
+  my $size = $self->dom->find($selector)->size;
   return $self->_test('is', $size, $count,
     _desc($desc, qq{element count for selector "$selector"}));
 }
@@ -93,13 +94,13 @@ sub element_count_is {
 sub element_exists {
   my ($self, $selector, $desc) = @_;
   $desc = _desc($desc, qq{element for selector "$selector" exists});
-  return $self->_test('ok', $self->tx->res->dom->at($selector), $desc);
+  return $self->_test('ok', $self->dom->at($selector), $desc);
 }
 
 sub element_exists_not {
   my ($self, $selector, $desc) = @_;
   $desc = _desc($desc, qq{no element for selector "$selector"});
-  return $self->_test('ok', !$self->tx->res->dom->at($selector), $desc);
+  return $self->_test('ok', !$self->dom->at($selector), $desc);
 }
 
 sub finish_ok {
@@ -371,6 +372,7 @@ sub _request_ok {
     my $desc = _desc("WebSocket handshake with $url");
     return $self->_test('ok', $self->tx->is_websocket, $desc);
   }
+  delete $self->{dom};
 
   # Perform request
   $self->tx($self->ua->start($tx));
@@ -387,7 +389,7 @@ sub _test {
 }
 
 sub _text {
-  return '' unless my $e = shift->tx->res->dom->at(shift);
+  return '' unless my $e = shift->dom->at(shift);
   return $e->text;
 }
 
@@ -449,6 +451,13 @@ C<HARNESS_IS_VERBOSE> environment variable.
 =head1 ATTRIBUTES
 
 L<Test::Mojo> implements the following attributes.
+
+=head2 dom
+
+  my $dom = $t->dom;
+  $t     = $t->dom(Mojo::DOM->new);
+
+Current L<Mojo::DOM> object. Defaults to DOM from the current transaction.
 
 =head2 message
 

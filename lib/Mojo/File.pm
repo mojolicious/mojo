@@ -281,8 +281,10 @@ Include hidden files and directories.
 =head2 make_path
 
   $path = $path->make_path;
+  $path = $path->make_path({mode => 0711});
 
-Create the directories if they don't already exist with L<File::Path>.
+Create the directories if they don't already exist with L<File::Path>. Any
+additional arguments are passed through unmodified to L<File::Path::make_path>.
 
 =head2 move_to
 
@@ -306,9 +308,11 @@ directory.
 =head2 remove_tree
 
   $path = $path->remove_tree;
+  $path = $path->remove_tree({keep_root => 1});
 
 Delete this directory and any files and subdirectories it may contain with
-L<File::Path>.
+L<File::Path>.  Any additional arguments are passed through unmodified to
+L<File::Path::remove_tree>.
 
 =head2 slurp
 

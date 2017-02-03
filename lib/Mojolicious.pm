@@ -791,15 +791,21 @@ Current members of the core team in alphabetical order:
 
 =over 2
 
-Abhijit Menon-Sen, C<ams@cpan.org>
-
-Glen Hinkle, C<tempire@cpan.org>
-
 Jan Henning Thorsen, C<jhthorsen@cpan.org>
 
 Joel Berger, C<jberger@cpan.org>
 
 Marcus Ramberg, C<mramberg@cpan.org>
+
+=back
+
+The following members of the core team are currently on hiatus:
+
+=over 2
+
+Abhijit Menon-Sen, C<ams@cpan.org>
+
+Glen Hinkle, C<tempire@cpan.org>
 
 =back
 

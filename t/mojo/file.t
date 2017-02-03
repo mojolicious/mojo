@@ -70,11 +70,18 @@ my $subdir = $dir->child('foo', 'bar');
 ok !-d $subdir, 'directory does not exist anymore';
 $subdir->make_path;
 ok -d $subdir, 'directory exists';
+my $nextdir = $dir->child('foo', 'foobar')->make_path({error => \my $error});
+ok -d $nextdir, 'directory exists';
+isa_ok $error, 'ARRAY', 'make_path modified variable';
 
 # Remove tree
 $dir = tempdir;
 $dir->child('foo', 'bar')->make_path->child('test.txt')->spurt('test!');
 is $dir->child('foo', 'bar', 'test.txt')->slurp, 'test!', 'right content';
+$subdir = $dir->child('foo', 'foobar')->make_path;
+ok -e $subdir->child('bar')->make_path->child('a.out')->spurt('ELF'), 'created';
+ok -d $subdir->remove_tree({keep_root => 1}), 'arg passed through and dir kept';
+ok !-e $subdir->child('bar'), 'sub tree has been removed';
 ok !-e $dir->child('foo')->remove_tree->to_string, 'tree has been removed';
 
 # Move to

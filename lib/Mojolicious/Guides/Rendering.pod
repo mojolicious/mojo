@@ -333,10 +333,6 @@ L<Mojolicious::Plugin::DefaultHelpers/"stash">.
     Minion is a <%= $spinoffs->{minion} %>.
   % }
 
-Just be aware that too many optional stash values will make templates less
-cacheable, which can reduce performance. So passing an C<undef> value to the
-stash, instead of making it optional, is always preferable.
-
 =head2 Helpers
 
 Helpers are little functions you can use in templates as well as application

@@ -170,7 +170,7 @@ Create a new collection with all elements that are defined and not an empty
 string.
 
   # "0, 1, 2, 3"
-  Mojo::Collection->new(0, 1, undef, 2, '', 3)->compact->join(', ');
+  c(0, 1, undef, 2, '', 3)->compact->join(', ');
 
 =head2 each
 
@@ -217,7 +217,7 @@ Flatten nested collections/arrays recursively and create a new collection with
 all elements.
 
   # "1, 2, 3, 4, 5, 6, 7"
-  Mojo::Collection->new(1, [2, [3, 4], 5, [6]], 7)->flatten->join(', ');
+  c(1, [2, [3, 4], 5, [6]], 7)->flatten->join(', ');
 
 =head2 grep
 
@@ -309,7 +309,7 @@ Create a new collection with all elements in reverse order.
 Create a new collection with all selected elements.
 
   # "B C E"
-  Mojo::Collection->new('A', 'B', 'C', 'D', 'E')->slice(1, 2, 4)->join(' ');
+  c('A', 'B', 'C', 'D', 'E')->slice(1, 2, 4)->join(' ');
 
 =head2 shuffle
 
@@ -362,10 +362,10 @@ callback/method.
   my $new = $collection->uniq(sub { $_->some_method(@args) });
 
   # "foo bar baz"
-  Mojo::Collection->new('foo', 'bar', 'bar', 'baz')->uniq->join(' ');
+  c('foo', 'bar', 'bar', 'baz')->uniq->join(' ');
 
   # "[[1, 2], [2, 1]]"
-  Mojo::Collection->new([1, 2], [2, 1], [3, 2])->uniq(sub{ $_->[1] })->to_array;
+  c([1, 2], [2, 1], [3, 2])->uniq(sub{ $_->[1] })->to_array;
 
 =head1 SEE ALSO
 

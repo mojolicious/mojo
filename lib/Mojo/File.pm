@@ -209,10 +209,10 @@ L<Mojo::File> implements the following methods.
 Return the last level of the path with L<File::Basename>.
 
   # ".vimrc" (on UNIX)
-  Mojo::File->new('/home/sri/.vimrc')->basename;
+  path('/home/sri/.vimrc')->basename;
 
   # "test" (on UNIX)
-  Mojo::File->new('/home/sri/test.txt')->basename('.txt');
+  path('/home/sri/test.txt')->basename('.txt');
 
 =head2 child
 
@@ -221,7 +221,7 @@ Return the last level of the path with L<File::Basename>.
 Return a new L<Mojo::File> object relative to the path.
 
   # "/home/sri/.vimrc" (on UNIX)
-  Mojo::File->new('/home')->child('sri', '.vimrc');
+  path('/home')->child('sri', '.vimrc');
 
 =head2 dirname
 
@@ -231,7 +231,7 @@ Return all but the last level of the path with L<File::Basename> as a
 L<Mojo::File> object.
 
   # "/home/sri" (on UNIX)
-  Mojo::File->new('/home/sri/.vimrc')->dirname;
+  path('/home/sri/.vimrc')->dirname;
 
 =head2 is_abs
 
@@ -240,10 +240,10 @@ L<Mojo::File> object.
 Check if the path is absolute.
 
   # True (on UNIX)
-  Mojo::File->new('/home/sri/.vimrc')->is_abs;
+  path('/home/sri/.vimrc')->is_abs;
 
   # False (on UNIX)
-  Mojo::File->new('.vimrc')->is_abs;
+  path('.vimrc')->is_abs;
 
 =head2 list
 
@@ -255,7 +255,7 @@ containing the results as L<Mojo::File> objects. The list does not include C<.>
 and C<..>.
 
   # List files
-  say for Mojo::File->new('/home/sri/myapp')->list->each;
+  say for path('/home/sri/myapp')->list->each;
 
 These options are currently available:
 
@@ -285,7 +285,7 @@ object containing the results as L<Mojo::File> objects. The list does not
 include C<.> and C<..>.
 
   # List all templates
-  say for Mojo::File->new('/home/sri/myapp/templates')->list_tree->each;
+  say for path('/home/sri/myapp/templates')->list_tree->each;
 
 These options are currently available:
 
@@ -318,6 +318,7 @@ Move the file with L<File::Copy>.
   my $path = Mojo::File->new;
   my $path = Mojo::File->new('/home/sri/.vimrc');
   my $path = Mojo::File->new('/home', 'sri', '.vimrc');
+  my $path = Mojo::File->new(File::Temp->new);
   my $path = Mojo::File->new(File::Temp->newdir);
 
 Construct a new L<Mojo::File> object, defaults to using the current working
@@ -337,7 +338,7 @@ Open file with L<IO::File>.
 
   # Combine "fcntl.h" constants
   use Fcntl qw(O_CREAT O_EXCL O_RDWR);
-  my $handle = Mojo::File->new('/tmp/test.pl')->open(O_RDWR | O_CREAT | O_EXCL);
+  my $handle = path('/home/sri/test.pl')->open(O_RDWR | O_CREAT | O_EXCL);
 
 =head2 remove_tree
 
@@ -379,7 +380,7 @@ Return the canonical path as a L<Mojo::File> object.
 Split the path on directory separators.
 
   # "home:sri:.vimrc" (on UNIX)
-  join ':', @{Mojo::File->new('/home/sri/.vimrc')->to_array};
+  join ':', @{path('/home/sri/.vimrc')->to_array};
 
 =head2 to_rel
 
@@ -389,7 +390,7 @@ Return a relative path from the original path to the destination path as a
 L<Mojo::File> object.
 
   # "sri/.vimrc" (on UNIX)
-  Mojo::File->new('/home/sri/.vimrc')->to_rel('/home');
+  path('/home/sri/.vimrc')->to_rel('/home');
 
 =head2 to_string
 

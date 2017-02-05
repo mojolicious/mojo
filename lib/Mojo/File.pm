@@ -184,7 +184,7 @@ Construct a new scalar-based L<Mojo::File> object for a temporary directory with
 L<File::Temp>.
 
   # Longer version
-  my $path = Mojo::File->new(File::Temp->newdir('tempXXXXX'));
+  my $path = path(File::Temp->newdir('tempXXXXX'));
 
 =head2 tempfile
 
@@ -195,7 +195,7 @@ Construct a new scalar-based L<Mojo::File> object for a temporary file with
 L<File::Temp>.
 
   # Longer version
-  my $path = Mojo::File->new(File::Temp->new(DIR => '/tmp'));
+  my $path = path(File::Temp->new(DIR => '/tmp'));
 
 =head1 METHODS
 

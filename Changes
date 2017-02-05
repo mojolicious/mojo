@@ -1,5 +1,7 @@
 
-7.24  2017-02-04
+7.24  2017-02-05
+  - Added open method to Mojo::File.
+  - Added tempfile function to Mojo::File.
 
 7.23  2017-01-29
   - Added max_request_size attribute to Mojolicious.

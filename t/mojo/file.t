@@ -5,7 +5,7 @@ use Cwd 'getcwd';
 use File::Basename qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
 use File::Temp;
-use Mojo::File qw(path tempdir);
+use Mojo::File qw(path tempdir tempfile);
 
 # Constructor
 is(Mojo::File->new, canonpath(getcwd), 'same path');
@@ -63,6 +63,22 @@ $path = "$dir";
 ok -d $path, 'directory exists';
 undef $dir;
 ok !-d $path, 'directory does not exist anymore';
+
+# Temporary file
+$dir = tempdir;
+my $file = tempfile(DIR => $dir);
+$path = "$file";
+ok -f $path, 'file exists';
+is $file->dirname, $dir, 'same directory';
+is $file->spurt('test')->slurp, 'test', 'right result';
+undef $file;
+ok !-f $path, 'file does not exist anymore';
+
+# Open
+$file = tempfile;
+$file->spurt("test\n123\n");
+my $handle = $file->open('<');
+is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
 
 # Make path
 $dir = tempdir;
@@ -134,8 +150,8 @@ is_deeply path($lib)->list_tree({hidden => 1})->map('to_string')->to_array,
   [@hidden, @files], 'right files';
 
 # I/O
-$dir = tempdir;
-my $file = $dir->child('test.txt')->spurt('just works!');
+$dir  = tempdir;
+$file = $dir->child('test.txt')->spurt('just works!');
 is $file->slurp, 'just works!', 'right content';
 is $file->spurt('w', 'orks', ' too!')->slurp, 'works too!', 'right content';
 {

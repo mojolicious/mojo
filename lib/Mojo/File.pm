@@ -16,9 +16,10 @@ use File::Path     ();
 use File::Spec::Functions
   qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
 use File::Temp ();
+use IO::File;
 use Mojo::Collection;
 
-our @EXPORT_OK = ('path', 'tempdir');
+our @EXPORT_OK = ('path', 'tempdir', 'tempfile');
 
 sub basename { scalar File::Basename::basename ${$_[0]}, @_ }
 
@@ -76,6 +77,13 @@ sub new {
   return bless \$value, ref $class || $class;
 }
 
+sub open {
+  my $self   = shift;
+  my $handle = IO::File->new;
+  $handle->open($$self, @_) or croak qq{Can't open file "$$self": $!};
+  return $handle;
+}
+
 sub path { __PACKAGE__->new(@_) }
 
 sub remove_tree {
@@ -87,7 +95,7 @@ sub remove_tree {
 sub slurp {
   my $self = shift;
 
-  open my $file, '<', $$self or croak qq{Can't open file "$$self": $!};
+  CORE::open my $file, '<', $$self or croak qq{Can't open file "$$self": $!};
   my $ret = my $content = '';
   while ($ret = $file->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
   croak qq{Can't read from file "$$self": $!} unless defined $ret;
@@ -97,7 +105,7 @@ sub slurp {
 
 sub spurt {
   my ($self, $content) = (shift, join '', @_);
-  open my $file, '>', $$self or croak qq{Can't open file "$$self": $!};
+  CORE::open my $file, '>', $$self or croak qq{Can't open file "$$self": $!};
   ($file->syswrite($content) // -1) == length $content
     or croak qq{Can't write to file "$$self": $!};
   return $self;
@@ -106,6 +114,8 @@ sub spurt {
 sub tap { shift->Mojo::Base::tap(@_) }
 
 sub tempdir { __PACKAGE__->new(File::Temp->newdir(@_)) }
+
+sub tempfile { __PACKAGE__->new(File::Temp->new(@_)) }
 
 sub to_abs { $_[0]->new(rel2abs ${$_[0]}) }
 
@@ -175,6 +185,17 @@ L<File::Temp>.
 
   # Longer version
   my $path = Mojo::File->new(File::Temp->newdir('tempXXXXX'));
+
+=head2 tempfile
+
+  my $path = tempfile;
+  my $path = tempfile(DIR => '/tmp');
+
+Construct a new scalar-based L<Mojo::File> object for a temporary file with
+L<File::Temp>.
+
+  # Longer version
+  my $path = Mojo::File->new(File::Temp->new(DIR => '/tmp'));
 
 =head1 METHODS
 
@@ -304,6 +325,12 @@ directory.
 
   # "foo/bar/baz.txt" (on UNIX)
   Mojo::File->new('foo', 'bar', 'baz.txt');
+
+=head2 open
+
+  my $handle = $path->open('<');
+
+Open the file with L<IO::File>.
 
 =head2 remove_tree
 

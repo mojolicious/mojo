@@ -2,38 +2,26 @@ package Mojo::Asset::File;
 use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';
-use Errno 'EEXIST';
-use Fcntl qw(O_APPEND O_CREAT O_EXCL O_RDONLY O_RDWR);
+use Fcntl qw(SEEK_SET);
 use File::Spec::Functions ();
-use IO::File;
-use Mojo::File;
-use Mojo::Util 'md5_sum';
+use Mojo::File 'tempfile';
 
 has [qw(cleanup path)];
 has handle => sub {
   my $self = shift;
 
+  # Enable automatic cleanup if the file has to be created
+  my $path = $self->path;
+  $self->cleanup(1) if !defined $self->cleanup && (!defined $path || !-e $path);
+
   # Open existing file
-  my $handle = IO::File->new;
-  my $path   = $self->path;
-  if (defined $path && -f $path) {
-    $handle->open($path, O_RDONLY) or croak qq{Can't open file "$path": $!};
-    return $handle;
-  }
+  return Mojo::File->new($path)->open(-e $path ? '<' : '+>>') if defined $path;
 
   # Open new or temporary file
-  my $base = Mojo::File->new($self->tmpdir, 'mojo.tmp')->to_string;
-  my $name = $path // $base;
-  until ($handle->open($name, O_APPEND | O_CREAT | O_EXCL | O_RDWR)) {
-    croak qq{Can't open file "$name": $!} if defined $path || $! != $!{EEXIST};
-    $name = "$base." . md5_sum(time . $$ . rand);
-  }
-  $self->path($name);
-
-  # Enable automatic cleanup
-  $self->cleanup(1) unless defined $self->cleanup;
-
-  return $handle;
+  my $template = 'mojo.tmp.XXXXXXXXXXXXXXXX';
+  my $file = tempfile DIR => $self->tmpdir, TEMPLATE => $template, UNLINK => 0;
+  $self->path($file->to_string);
+  return $file->open('+>>');
 };
 has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec::Functions::tmpdir };
 

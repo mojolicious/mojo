@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
+use Mojo::File;
 use Mojo::Util 'encode';
 
 has format => sub { \&_format };
@@ -12,8 +13,7 @@ has handle => sub {
   return \*STDERR unless my $path = shift->path;
 
   # File
-  croak qq{Can't open log file "$path": $!} unless open my $file, '>>', $path;
-  return $file;
+  return Mojo::File->new($path)->open('>>');
 };
 has history => sub { [] };
 has level => 'debug';

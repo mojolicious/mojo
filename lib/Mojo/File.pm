@@ -328,9 +328,9 @@ directory.
 
 =head2 open
 
-  my $handle = $path->open('<');
+  my $handle = $path->open('+<');
 
-Open the file with L<IO::File>.
+Open file with L<IO::File>.
 
 =head2 remove_tree
 

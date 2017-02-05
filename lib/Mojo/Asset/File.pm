@@ -10,14 +10,16 @@ has [qw(cleanup path)];
 has handle => sub {
   my $self = shift;
 
-  # Enable automatic cleanup if the file has to be created
-  my $path = $self->path;
-  $self->cleanup(1) if !defined $self->cleanup && (!defined $path || !-e $path);
-
   # Open existing file
-  return Mojo::File->new($path)->open(-e $path ? '<' : '+>>') if defined $path;
+  my $path = $self->path;
+  return Mojo::File->new($path)->open('<') if defined $path && -e $path;
 
-  # Open new or temporary file
+  $self->cleanup(1) unless defined $self->cleanup;
+
+  # Create a specific file
+  return Mojo::File->new($path)->open('+>>') if defined $path;
+
+  # Create a temporary file
   my $template = 'mojo.tmp.XXXXXXXXXXXXXXXX';
   my $file = tempfile DIR => $self->tmpdir, TEMPLATE => $template, UNLINK => 0;
   $self->path($file->to_string);

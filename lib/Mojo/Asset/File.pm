@@ -2,7 +2,7 @@ package Mojo::Asset::File;
 use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';
-use Fcntl qw(SEEK_SET);
+use Fcntl 'SEEK_SET';
 use File::Spec::Functions ();
 use Mojo::File 'tempfile';
 

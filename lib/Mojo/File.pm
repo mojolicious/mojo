@@ -335,6 +335,10 @@ directory.
 
 Open file with L<IO::File>.
 
+  # Combine "fcntl.h" constants
+  use Fcntl qw(O_CREAT O_EXCL O_RDWR);
+  my $handle = Mojo::File->new('/tmp/test.pl')->open(O_RDWR | O_CREAT | O_EXCL);
+
 =head2 remove_tree
 
   $path = $path->remove_tree;

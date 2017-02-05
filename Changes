@@ -1,4 +1,6 @@
 
+7.25  2017-02-06
+
 7.24  2017-02-05
   - Added open method to Mojo::File.
   - Added tempfile function to Mojo::File.

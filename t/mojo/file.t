@@ -2,10 +2,12 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Cwd 'getcwd';
+use Fcntl 'O_RDONLY';
 use File::Basename qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
 use File::Temp;
 use Mojo::File qw(path tempdir tempfile);
+use Mojo::Util 'encode';
 
 # Constructor
 is(Mojo::File->new, canonpath(getcwd), 'same path');
@@ -79,6 +81,13 @@ $file = tempfile;
 $file->spurt("test\n123\n");
 my $handle = $file->open('<');
 is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
+$handle = $file->open('r');
+is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
+$handle = $file->open(O_RDONLY);
+is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
+$file->spurt(encode('UTF-8', '♥'));
+$handle = $file->open('<:encoding(UTF-8)');
+is_deeply [<$handle>], ['♥'], 'right structure';
 
 # Make path
 $dir = tempdir;

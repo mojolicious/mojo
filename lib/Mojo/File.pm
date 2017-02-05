@@ -16,7 +16,7 @@ use File::Path     ();
 use File::Spec::Functions
   qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
 use File::Temp ();
-use IO::File;
+use IO::File   ();
 use Mojo::Collection;
 
 our @EXPORT_OK = ('path', 'tempdir', 'tempfile');
@@ -329,6 +329,9 @@ directory.
 =head2 open
 
   my $handle = $path->open('+<');
+  my $handle = $path->open('r+');
+  my $handle = $path->open(O_RDWR);
+  my $handle = $path->open('<:encoding(UTF-8)');
 
 Open file with L<IO::File>.
 

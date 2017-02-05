@@ -116,7 +116,7 @@ sub slurp {
   $handle->sysseek(0, SEEK_SET);
   my $ret = my $content = '';
   while ($ret = $handle->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
-  return defined $ret ? $content : croak qq{Can't read from asset: $!};
+  return defined $ret ? $content : croak "Can't read from asset: $!";
 }
 
 1;

@@ -20,7 +20,15 @@ sub inspect {
   # Search for context in files
   for my $file (@files) {
     next unless -r $file->[0] && open my $handle, '<:utf8', $file->[0];
-    $self->_context($file->[1], [[<$handle>]]);
+    # If there are UTF-8 problems in the source file, don't store any context
+    my @lines = eval {
+      use warnings 'FATAL' => 'utf8';
+      <$handle>;
+    };
+    if ($@) {
+      next;
+    }
+    $self->_context($file->[1], [\@lines]);
     return $self;
   }
 

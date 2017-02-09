@@ -340,29 +340,29 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   use Mojo::UserAgent;
 
-  # Say hello to the Unicode snowman and include an Accept header
-  my $ua = Mojo::UserAgent->new;
-  say $ua->get('www.☃.net?hello=there' => {Accept => '*/*'})->res->body;
-
   # Fine grained response handling (dies on connection errors)
+  my $ua  = Mojo::UserAgent->new;
   my $res = $ua->get('mojolicious.org/perldoc')->result;
   if    ($res->is_success)  { say $res->body }
   elsif ($res->is_error)    { say $res->message }
   elsif ($res->code == 301) { say $res->headers->location }
   else                      { say 'Whatever...' }
 
+  # Say hello to the Unicode snowman and include an Accept header
+  say $ua->get('www.☃.net?hello=there' => {Accept => '*/*'})->result->body;
+
   # Extract data from HTML and XML resources with CSS selectors
-  say $ua->get('www.perl.org')->res->dom->at('title')->text;
+  say $ua->get('www.perl.org')->result->dom->at('title')->text;
 
   # Scrape the latest headlines from a news site
   say $ua->get('blogs.perl.org')
-    ->res->dom->find('h2 > a')->map('text')->join("\n");
+    ->result->dom->find('h2 > a')->map('text')->join("\n");
 
   # IPv6 PUT request with Content-Type header and content
   my $tx = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hi!');
 
   # Quick JSON API request with Basic authentication
-  my $value = $ua->get('https://sri:s3cret@example.com/test.json')->res->json;
+  my $value = $ua->get('https://sri:t3st@example.com/test.json')->result->json;
 
   # JSON POST (application/json) with TLS certificate authentication
   my $tx = $ua->cert('tls.crt')->key('tls.key')
@@ -371,12 +371,12 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Search DuckDuckGo anonymously through Tor
   $ua->proxy->http('socks://127.0.0.1:9050');
   say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')
-    ->res->json('/Abstract');
+    ->result->json('/Abstract');
 
   # Follow redirects to download Mojolicious from GitHub
   $ua->max_redirects(5)
     ->get('https://www.github.com/kraih/mojo/tarball/master')
-    ->res->content->asset->move_to('/home/sri/mojo.tar.gz');
+    ->result->content->asset->move_to('/home/sri/mojo.tar.gz');
 
   # Form POST (application/x-www-form-urlencoded) with manual exception handling
   my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
@@ -390,7 +390,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Non-blocking request
   $ua->get('mojolicious.org' => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->dom->at('title')->text;
+    say $tx->result->dom->at('title')->text;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -403,8 +403,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     },
     sub {
       my ($delay, $mojo, $cpan) = @_;
-      say $mojo->res->dom->at('title')->text;
-      say $cpan->res->dom->at('title')->text;
+      say $mojo->result->dom->at('title')->text;
+      say $cpan->result->dom->at('title')->text;
     }
   )->wait;
 
@@ -631,7 +631,7 @@ L<Mojo::UserAgent::Server> object.
     my $c = shift;
     $c->render(json => {now => time});
   });
-  my $time = $ua->get('/time')->res->json->{now};
+  my $time = $ua->get('/time')->result->json->{now};
 
   # Change log level
   $ua->server->app->log->level('fatal');
@@ -729,7 +729,7 @@ implied). You can also append a callback to perform requests non-blocking.
 
   $ua->delete('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -749,7 +749,7 @@ perform requests non-blocking.
 
   $ua->get('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -769,7 +769,7 @@ implied). You can also append a callback to perform requests non-blocking.
 
   $ua->head('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -789,7 +789,7 @@ implied). You can also append a callback to perform requests non-blocking.
 
   $ua->options('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -809,7 +809,7 @@ implied). You can also append a callback to perform requests non-blocking.
 
   $ua->patch('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -829,7 +829,7 @@ implied). You can also append a callback to perform requests non-blocking.
 
   $ua->post('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -849,7 +849,7 @@ perform requests non-blocking.
 
   $ua->put('http://example.com' => json => {a => 'b'} => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
@@ -864,7 +864,7 @@ to perform requests non-blocking.
   my $tx = $ua->build_tx(GET => 'http://example.com');
   $ua->start($tx => sub {
     my ($ua, $tx) = @_;
-    say $tx->res->body;
+    say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 

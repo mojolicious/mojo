@@ -451,7 +451,7 @@ latency backend web services.
     my $c = shift;
     $c->ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
       my ($ua, $tx) = @_;
-      $c->render('metacpan', hits => $tx->res->json->{hits}{hits});
+      $c->render('metacpan', hits => $tx->result->json->{hits}{hits});
     });
   };
 
@@ -503,8 +503,8 @@ style.
       sub {
         my ($delay, $mojo, $minion) = @_;
         $c->render(json => {
-          mojo   => $mojo->res->json('/hits/hits/0/_source/release'),
-          minion => $minion->res->json('/hits/hits/0/_source/release')
+          mojo   => $mojo->result->json('/hits/hits/0/_source/release'),
+          minion => $minion->result->json('/hits/hits/0/_source/release')
         });
       }
     );
@@ -572,7 +572,7 @@ created at startup time.
   Mojo::IOLoop->recurring(10 => sub {
     app->ua->get('http://mojolicious.org' => sub {
       my ($ua, $tx) = @_;
-      $title = $tx->res->dom->at('title')->text;
+      $title = $tx->result->dom->at('title')->text;
     });
   });
 

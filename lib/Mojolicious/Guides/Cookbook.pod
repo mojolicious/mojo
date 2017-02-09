@@ -1228,7 +1228,7 @@ batches.
   use Mojo::IOLoop;
 
   my @urls = (
-    'mojolicious.org/perldoc/Mojo/DOM,   'mojolicious.org/perldoc/Mojo',
+    'mojolicious.org/perldoc/Mojo/DOM',  'mojolicious.org/perldoc/Mojo',
     'mojolicious.org/perldoc/Mojo/File', 'mojolicious.org/perldoc/Mojo/URL'
   );
 
@@ -1260,9 +1260,9 @@ batches.
   $fetch->() for 1 .. 2;
   $delay->wait;
 
-It is also strongly recommended to respect C<robots.txt> files and to wait a
-little before reopening connections to the same host, or the operators might
-be forced to block your access.
+It is also strongly recommended to respect every sites C<robots.txt> file as
+well as terms of service, and to wait a little before reopening connections to
+the same host, or the operators might be forced to block your access.
 
 =head2 Concurrent blocking requests
 

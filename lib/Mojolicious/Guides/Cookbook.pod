@@ -1220,7 +1220,46 @@ keep many concurrent connections active at the same time.
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-You can take full control of the L<Mojo::IOLoop> event loop.
+But don't try to open too many connections to the same server at the same time,
+it might get overwhelmed. Better use a queue to process requests in smaller
+batches.
+
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
+
+  my @urls = qw(mojolicious.org mojolicious.org/perldoc google.com perl.org);
+
+  # User agent with a custom name, following up to 5 redirects
+  my $ua = Mojo::UserAgent->new(max_redirects => 5);
+  $ua->transactor->name('MyParallelCrawler 1.0');
+
+  # Use a delay to keep the event loop running until we are done
+  my $delay = Mojo::IOLoop->delay;
+  my $fetch;
+  $fetch = sub {
+
+    # Stop if there are no more URLs
+    return unless my $url = shift @urls;
+
+    # Fetch the next title
+    my $end = $delay->begin;
+    $ua->get($url => sub {
+      my ($ua, $tx) = @_;
+      say "$url: ", $tx->result->dom->at('title')->text;
+      $end->();
+
+      # Next request
+      $fetch->();
+    });
+  };
+
+  # Process two requests at a time
+  $fetch->() for 1 .. 2;
+  $delay->wait;
+
+It is also strongly recommended to respect C<robots.txt> files and to wait a
+little before reopening connections to the same host, or the operators might
+be forced to block your access.
 
 =head2 Concurrent blocking requests
 

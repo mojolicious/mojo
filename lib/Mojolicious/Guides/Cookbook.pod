@@ -1220,14 +1220,17 @@ keep many concurrent connections active at the same time.
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-But don't try to open too many connections to the same server at the same time,
-it might get overwhelmed. Better use a queue to process requests in smaller
+But don't try to open too many connections to one server at the same time, it
+might get overwhelmed. Better use a queue to process requests in smaller
 batches.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  my @urls = qw(mojolicious.org mojolicious.org/perldoc google.com perl.org);
+  my @urls = (
+    'mojolicious.org/perldoc/Mojo/DOM,   'mojolicious.org/perldoc/Mojo',
+    'mojolicious.org/perldoc/Mojo/File', 'mojolicious.org/perldoc/Mojo/URL'
+  );
 
   # User agent with a custom name, following up to 5 redirects
   my $ua = Mojo::UserAgent->new(max_redirects => 5);

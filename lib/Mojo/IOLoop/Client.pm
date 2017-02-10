@@ -37,6 +37,10 @@ sub connect {
   $self->{timer} = $reactor->timer($args->{timeout} || 10,
     sub { $self->emit(error => 'Connect timeout') });
 
+  # No name resolution required for UNIX sockets
+  return $reactor->next_tick(sub { $self && $self->_connect($args) })
+    if defined $args->{path};
+
   # Blocking name resolution
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
@@ -72,18 +76,37 @@ sub _connect {
   my ($self, $args) = @_;
 
   my $handle;
-  my $address = $args->{socks_address} || $args->{address};
+  my $class;
   unless ($handle = $self->{handle} = $args->{handle}) {
-    my %options = (PeerAddr => $address, PeerPort => _port($args));
-    %options = (PeerAddrInfo => $args->{addr_info}) if $args->{addr_info};
-    $options{Blocking} = 0;
-    $options{LocalAddr} = $args->{local_address} if $args->{local_address};
+    my %options = (Blocking => 0);
+    if (defined $args->{path}) {
+      $options{Peer} = $args->{path};
+      require IO::Socket::UNIX; # load it on demand
+      $class = 'IO::Socket::UNIX';
+    }
+    else {
+      if ($args->{addr_info}) {
+        $options{PeerAddrInfo} = $args->{addr_info};
+      }
+      else {
+        $options{PeerAddr} = $args->{socks_address} || $args->{address};
+        $options{PeerPort} = _port($args);
+      }
+      $options{LocalAddr} = $args->{local_address} if $args->{local_address};
+      $class = 'IO::Socket::IP';
+    }
     return $self->emit(error => "Can't connect: $@")
-      unless $self->{handle} = $handle = IO::Socket::IP->new(%options);
+      unless $self->{handle} = $handle = $class->new(%options);
   }
   $handle->blocking(0);
 
-  $self->_wait('_ready', $handle, $args);
+  if (defined $args->{path}) {
+    # UNIX sockets are inmediately ready!
+    $self->_try_socks($args);
+  }
+  else {
+    $self->_wait('_ready', $handle, $args);
+  }
 }
 
 sub _port { $_[0]{socks_port} || $_[0]{port} || ($_[0]{tls} ? 443 : 80) }

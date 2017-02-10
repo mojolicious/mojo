@@ -359,16 +359,16 @@ L<Mojo::Reactor::EV> object with a default subscriber to the event
 L<Mojo::Reactor/"error">.
 
   # Watch if handle becomes readable or writable
-  $loop->reactor->io($handle => sub {
+  Mojo::IOLoop->singleton->reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
 
   # Change to watching only if handle becomes writable
-  $loop->reactor->watch($handle, 0, 1);
+  Mojo::IOLoop->singleton->reactor->watch($handle, 0, 1);
 
   # Remove handle again
-  $loop->reactor->remove($handle);
+  Mojo::IOLoop->singleton->reactor->remove($handle);
 
 =head1 METHODS
 

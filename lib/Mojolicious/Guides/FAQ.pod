@@ -94,62 +94,6 @@ non-standard environment is unsupported and is unlikely to succeed. Therefore
 when installing or upgrading L<Mojolicious> and when running its tests, we
 highly recommend using an environment which does not set these variables.
 
-=head2 What is the difference between blocking and non-blocking operations?
-
-A I<blocking> operation is a subroutine that blocks the execution of the
-calling subroutine until the subroutine is finished.
-
-  sub foo {
-    my $result = blocking_subroutine();
-    ...
-  }
-
-A I<non-blocking> operation on the other hand lets the calling subroutine
-continue execution even though the subroutine is not yet finished. Instead of
-waiting, the calling subroutine passes along a callback to be executed once the
-subroutine is finished, this is called continuation-passing style.
-
-  sub foo {
-    non_blocking_subroutine(sub {
-      my $result = shift;
-      ...
-    });
-    ...
-  }
-
-=head2 Will my code magically become non-blocking with Mojolicious?
-
-No, it is not possible to magically make Perl code non-blocking. While
-L<Mojolicious> has been designed from the ground up for non-blocking I/O and
-event loops, taking advantage of this requires blocking code to be wrapped in
-L<subprocesses|Mojo::IOLoop/"subprocess">, and the use of specialized
-non-blocking code available through modules like L<Mojo::IOLoop> and
-L<Mojo::UserAgent>, or third-party event loops. In the documentation we often
-refer to this as real-time web, for more information see also
-L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
-
-=head2 What is an event loop?
-
-An event loop is basically a loop that continually tests for external events
-and executes the appropriate callbacks to handle them, it is often the main
-loop in a program. Non-blocking tests for readability/writability of file
-descriptors and timers are commonly used events for highly scalable network
-servers, because they allow a single process to handle thousands of client
-connections concurrently.
-
-  while (1) {
-    my @readable = test_fds_for_readability();
-    handle_readable_fds(@readable);
-
-    my @writable = test_fds_for_writability();
-    handle_writable_fds(@writable);
-
-    my @expired = test_timers();
-    handle_timers(@expired);
-  }
-
-In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
-
 =head2 Where did my file extension go?
 
 Standard route placeholders will not match the C<.> character, however

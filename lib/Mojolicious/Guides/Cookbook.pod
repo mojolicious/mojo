@@ -9,6 +9,62 @@ Mojolicious::Guides::Cookbook - Cooking with Mojolicious
 
 This document contains many fun recipes for cooking with L<Mojolicious>.
 
+=head1 CONCEPTS
+
+Essentials every L<Mojolicious> developer should know.
+
+=head2 Blocking and non-blocking operations
+
+A I<blocking> operation is a subroutine that blocks the execution of the
+calling subroutine until the subroutine is finished.
+
+  sub foo {
+    my $result = blocking_subroutine();
+    ...
+  }
+
+A I<non-blocking> operation on the other hand lets the calling subroutine
+continue execution even though the subroutine is not yet finished. Instead of
+waiting, the calling subroutine passes along a callback to be executed once the
+subroutine is finished, this is called continuation-passing style.
+
+  sub foo {
+    non_blocking_subroutine(sub {
+      my $result = shift;
+      ...
+    });
+    ...
+  }
+
+While L<Mojolicious> has been designed from the ground up for non-blocking I/O
+and event loops, it is not possible to magically make Perl code non-blocking.
+You have to use specialized non-blocking code available through modules like
+L<Mojo::IOLoop> and L<Mojo::UserAgent>, or third-party event loops. You can wrap
+your blocking code in L<subprocesses|Mojo::IOLoop/"subprocess"> though to
+prevent it from interfering with your non-blocking code.
+
+=head2 Event loops
+
+An event loop is basically a loop that continually tests for external events
+and executes the appropriate callbacks to handle them, it is often the main
+loop in a program. Non-blocking tests for readability/writability of file
+descriptors and timers are commonly used events for highly scalable network
+servers, because they allow a single process to handle thousands of client
+connections concurrently.
+
+  while (1) {
+    my @readable = test_fds_for_readability();
+    handle_readable_fds(@readable);
+
+    my @writable = test_fds_for_writability();
+    handle_writable_fds(@writable);
+
+    my @expired = test_timers();
+    handle_timers(@expired);
+  }
+
+In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
+
 =head1 DEPLOYMENT
 
 Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
@@ -890,7 +946,7 @@ can be combined to solve some of the hardest problems in web development.
     </body>
   </html>
 
-=head2 Event loops
+=head2 More event loops
 
 Internally, the L<Mojo::IOLoop> event loop can use multiple reactor backends,
 L<EV> for example, will be automatically used if possible. Which in turn allows

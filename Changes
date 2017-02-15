@@ -1,5 +1,7 @@
 
 7.26  2017-02-15
+  - Fixed bug in Mojo::IOLoop::Subprocess where starting multiple subprocesses
+    at once could cause expcetions. (jberger)
 
 7.25  2017-02-09
   - Fixed cleanup bugs in Mojo::IOLoop::Stream.

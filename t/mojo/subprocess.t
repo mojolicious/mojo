@@ -107,6 +107,28 @@ Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, [], 'right structure';
 
+# Stream inherited from previous subprocesses
+($fail, $result) = ();
+my $delay = Mojo::IOLoop->delay;
+my $me    = $$;
+for (0 .. 2) {
+  my $end        = $delay->begin;
+  my $subprocess = Mojo::IOLoop::Subprocess->new;
+  $subprocess->run(
+    sub { 1 + 1 },
+    sub {
+      my ($subprocess, $err, $two) = @_;
+      $fail ||= $err;
+      push @$result, $two;
+      is $me, $$, 'we are the parent';
+      $end->();
+    }
+  );
+}
+$delay->wait;
+ok !$fail, 'no error';
+is_deeply $result, [2, 2, 2], 'right structure';
+
 # Exception
 $fail = undef;
 Mojo::IOLoop::Subprocess->new->run(
@@ -144,18 +166,5 @@ $subprocess->run(
 );
 Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
-
-# Stream inherited by previous subprocesses, #1054
-my $me = $$;
-for (0 .. 2) {
-  my $subprocess = Mojo::IOLoop::Subprocess->new;
-  $subprocess->run(
-    sub { 1 + 1 },
-    sub {
-      my ($subprocess, $err) = @_;
-      is $me, $$, 'correct parent';
-    }
-  );
-}
 
 done_testing();

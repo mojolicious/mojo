@@ -145,4 +145,17 @@ $subprocess->run(
 Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
 
+# Stream inherited by previous subprocesses, #1054
+my $me = $$;
+for (0 .. 2) {
+  my $subprocess = Mojo::IOLoop::Subprocess->new;
+  $subprocess->run(
+    sub { 1 + 1 },
+    sub {
+      my ($subprocess, $err) = @_;
+      is $me, $$, 'correct parent';
+    }
+  );
+}
+
 done_testing();

@@ -124,6 +124,63 @@ L<Mojo::IOLoop::Delay> manages callbacks and controls the flow of events for
 L<Mojo::IOLoop>, which can help you avoid deep nested closures that often
 result from continuation-passing style.
 
+  use Mojo::IOLoop;
+
+  # These deep nested closures are often referred to as "Callback Hell"
+  Mojo::IOLoop->timer(3 => sub {
+    my loop = shift;
+
+    say '3 seconds';
+    Mojo::IOLoop->timer(3 => sub {
+      my $loop = shift;
+
+      say '6 seconds';
+      Mojo::IOLoop->timer(3 => sub {
+        my $loop = shift;
+
+        say '9 seconds';
+        Mojo::IOLoop->stop;
+      });
+    });
+  });
+
+  Mojo::IOLoop->start;
+
+The idea behind L<Mojo::IOLoop::Delay> is to turn the nested closures above into
+a flat series of closures. In the example below, the call to L</"begin"> creates
+a callback that we can pass to L<Mojo::IOLoop/"timer"> and that leads to the
+next closure in the series when called.
+
+  use Mojo::IOLoop;
+
+  # Instead of nested closures we now have a simple chain
+  my $delay = Mojo::IOloop->delay(
+    sub {
+      my $delay = shift;
+      Mojo::IOLoop->timer(3 => $delay->begin);
+    },
+    sub {
+      my $delay = shift;
+      say '3 seconds';
+      Mojo::IOLoop->timer(3 => $delay->begin);
+    },
+    sub {
+      my $delay = shift;
+      say '6 seconds';
+      Mojo::IOLoop->timer(3 => $delay->begin);
+    },
+    sub {
+      my $delay = shift;
+      say '9 seconds';
+    }
+  );
+  $delay->wait;
+
+Another positive side effect of this pattern is that we do not need to call
+L<Mojo::IOLoop/"start"> and L<Mojo::IOLoop/"stop"> manually, because we know
+exactly when our series of closures has reached the end. So L</"wait"> can stop
+the event loop automatically if it had to be started at all in the first place.
+
 =head1 EVENTS
 
 L<Mojo::IOLoop::Delay> inherits all events from L<Mojo::EventEmitter> and can

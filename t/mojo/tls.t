@@ -35,16 +35,16 @@ is ref $server_result, 'IO::Socket::SSL', 'right class';
 
 # Built-in certificate (custom event loop and cipher)
 my $loop = Mojo::IOLoop->new;
-socketpair($client_sock, $server_sock, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+socketpair(my $client_sock2, my $server_sock2, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
   or die "Couldn't create socket pair: $!";
-$client_sock->blocking(0);
-$server_sock->blocking(0);
+$client_sock2->blocking(0);
+$server_sock2->blocking(0);
 $delay  = $loop->delay;
-$server = Mojo::IOLoop::TLS->new($server_sock)->reactor($loop->reactor);
+$server = Mojo::IOLoop::TLS->new($server_sock2)->reactor($loop->reactor);
 $server->once(upgrade => $delay->begin);
 $server->once(error => sub { warn pop });
 $server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL');
-$client = Mojo::IOLoop::TLS->new($client_sock)->reactor($loop->reactor);
+$client = Mojo::IOLoop::TLS->new($client_sock2)->reactor($loop->reactor);
 $client->once(upgrade => $delay->begin);
 $client->once(error => sub { warn pop });
 $client->negotiate;

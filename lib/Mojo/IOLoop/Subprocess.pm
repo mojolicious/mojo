@@ -34,12 +34,14 @@ sub run {
   }
 
   # Parent
+  my $me     = $$;
   my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
   $self->ioloop->stream($stream);
   my $buffer = '';
   $stream->on(read => sub { $buffer .= pop });
   $stream->on(
     close => sub {
+      return unless $$ == $me;
       waitpid $pid, 0;
       my $results = eval { $self->deserialize->($buffer) } || [];
       $self->$parent(shift(@$results) // $@, @$results);

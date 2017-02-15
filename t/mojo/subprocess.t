@@ -111,7 +111,7 @@ is_deeply $result, [], 'right structure';
 ($fail, $result) = ();
 my $delay = Mojo::IOLoop->delay;
 my $me    = $$;
-for (0 .. 2) {
+for (0 .. 1) {
   my $end        = $delay->begin;
   my $subprocess = Mojo::IOLoop::Subprocess->new;
   $subprocess->run(
@@ -127,7 +127,7 @@ for (0 .. 2) {
 }
 $delay->wait;
 ok !$fail, 'no error';
-is_deeply $result, [2, 2, 2], 'right structure';
+is_deeply $result, [2, 2], 'right structure';
 
 # Exception
 $fail = undef;

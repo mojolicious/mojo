@@ -69,7 +69,7 @@
       %= link_to GitHub => 'https://github.com/kraih/mojo'
       %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'
       %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
-      %= link_to Blog => 'http://blog.kraih.com'
+      %= link_to Blog => 'http://blog.mojolicious.org'
       %= link_to Twitter => 'https://twitter.com/kraih'
       %= form_for 'https://www.google.com/cse' => (target => '_blank') => begin
         %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'

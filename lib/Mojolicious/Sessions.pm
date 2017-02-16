@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 
-has [qw(cookie_domain secure)];
+has [qw(cookie_domain secure samesite)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
@@ -55,6 +55,7 @@ sub store {
     expires  => $session->{expires},
     httponly => 1,
     path     => $self->cookie_path,
+    samesite => $self->samesite,
     secure   => $self->secure
   };
   $c->signed_cookie($self->cookie_name, $value, $options);
@@ -139,6 +140,15 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
     my $bytes = shift;
     return {};
   });
+
+=head2 samesite
+
+  my $same_site = $sessions->same_site;
+  $sessions = $sessions->same_site('Lax');
+
+Sets the "SameSite" cookie attribute as defined in
+L<https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00>.
+Acceptable values are C<lax> and C<strict>.
 
 =head2 secure
 

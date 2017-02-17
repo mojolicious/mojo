@@ -1,5 +1,5 @@
 
-7.27  2017-02-16
+7.27  2017-02-17
 
 7.26  2017-02-15
   - Fixed bug in Mojo::IOLoop::Subprocess where starting multiple subprocesses

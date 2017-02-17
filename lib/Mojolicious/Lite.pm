@@ -78,10 +78,104 @@ Mojolicious::Lite - Micro real-time web framework
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Lite> is a micro real-time web framework built around
-L<Mojolicious>.
+L<Mojolicious::Lite> is a tiny domain specific language built around
+L<Mojolicious>, made up of only about a dozen Perl functions.
 
 See L<Mojolicious::Guides::Tutorial> for more!
+
+=head1 GROWING
+
+While L<Mojolicious::Guides::Growing> will give you a detailed introduction to
+growing a L<Mojolicious::Lite> prototype into a well-structured L<Mojolicious>
+application, here we have collected a few snippets that illustrate very well
+just how similar both of them are.
+
+=head2 Routes
+
+The functions L</"get">, L</"post"> and friends all have equivalent methods.
+
+  # Mojolicious::Lite
+  get '/foo' => sub {
+    my $c = shift;
+    $c->render(text => 'Hello World!');
+  };
+
+  # Mojolicious
+  sub startup {
+    my $self = shift;
+
+    my $routes = $self->routes;
+    $routes->get('/foo' => sub {
+      my $c = shift;
+      $c->render(text => 'Hello World!');
+    });
+  }
+
+=head2 Application
+
+The application object you can access with the function L</"app"> is the first
+argument passed to the C<startup> method.
+
+  # Mojolicious::Lite
+  app->max_request_size(16777216);
+
+  # Mojolicious
+  sub startup {
+    my $self = shift;
+    $self->max_request_size(16777216);
+  }
+
+=head2 Plugins
+
+Instead of the L</"plugin"> function you just use the method
+L<Mojolicious/"plugin">.
+
+  # Mojolicious::Lite
+  plugin 'Config';
+
+  # Mojolicious
+  sub startup {
+    my $self = shift;
+    $self->plugin('Config');
+  }
+
+=head2 Helpers
+
+Similar to plugins, instead of the L</"helper"> function you just use the method
+L<Mojolicious/"helper">.
+
+  # Mojolicious::Lite
+  helper two => sub {
+    my $c = shift;
+    return 1 + 1;
+  };
+
+  # Mojolicious
+  sub startup {
+    my $self = shift;
+    $self->helper(two => sub {
+      my $c = shift;
+      return 1 + 1;
+    });
+  }
+
+=head2 Under
+
+Instead of sequential function calls, we can use methods to build a tree with
+nested routes, that much better illustrates how routes work internally.
+
+  # Mojolicious::Lite
+  under '/foo';
+  get '/bar' => sub {...};
+
+  # Mojolicious
+  sub startup {
+    my $self = shift;
+
+    my $routes = $self->routes;
+    my $foo = $routes->under('/foo');
+    $foo->get('/bar' => sub {...});
+  }
 
 =head1 FUNCTIONS
 

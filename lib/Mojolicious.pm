@@ -332,10 +332,10 @@ action dispatching is the last hook in the chain, yours will run before it.
 
 This is a very powerful hook and should not be used lightly, it allows you for
 example to pass additional arguments to actions or handle return values
-differently. Note that this hook can be run more than once for the current
-request, for example when using nested routes. (Passed a callback leading
-to the next hook, the current controller object, the action callback and a
-flag indicating if this action is an endpoint)
+differently. Note that this hook can trigger more than once for the same
+request if there are nested routes. (Passed a callback leading to the next hook,
+the current controller object, the action callback and a flag indicating if this
+action is an endpoint)
 
 =head2 before_render
 

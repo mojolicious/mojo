@@ -78,8 +78,13 @@ sub _connect {
 
   my $t = $self->transactor;
   my ($proto, $host, $port) = $peer ? $t->peer($tx) : $t->endpoint($tx);
-  my %options
-    = (address => $host, port => $port, timeout => $self->connect_timeout);
+  my %options = (timeout => $self->connect_timeout);
+  if ($proto eq 'http+unix') {
+    $options{path} = $host;
+  }
+  else {
+    @options{qw(address port)} = ($host, $port);
+  }
   if (my $local = $self->local_address) { $options{local_address} = $local }
   $options{handle} = $handle if $handle;
 
@@ -154,9 +159,14 @@ sub _connected {
   my $stream = $c->{ioloop}->stream($id)->timeout($self->inactivity_timeout);
   my $tx     = $c->{tx}->connection($id);
   my $handle = $stream->handle;
-  $tx->local_address($handle->sockhost)->local_port($handle->sockport);
-  $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
-
+  if ($handle->isa('IO::Socket::UNIX')) {
+    $tx->local_address($handle->hostpath)->local_port(-1);
+    $tx->remote_address($handle->peerpath)->remote_port(-1);
+  }
+  else {
+    $tx->local_address($handle->sockhost)->local_port($handle->sockport);
+    $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  }
   weaken $self;
   $tx->on(resume => sub { $self->_write($id) });
   $self->_write($id);

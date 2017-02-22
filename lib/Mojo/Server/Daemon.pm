@@ -85,8 +85,14 @@ sub _build_tx {
   my $tx = $self->build_tx->connection($id);
   $tx->res->headers->server('Mojolicious (Perl)');
   my $handle = $self->ioloop->stream($id)->handle;
-  $tx->local_address($handle->sockhost)->local_port($handle->sockport);
-  $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  if ($handle->isa('IO::Socket::UNIX')) {
+    $tx->local_address($handle->hostpath)->local_port(-1);
+    $tx->remote_address($handle->peerpath)->remote_port(-1);
+  }
+  else {
+    $tx->local_address($handle->sockhost)->local_port($handle->sockport);
+    $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  }
   $tx->req->url->base->scheme('https') if $c->{tls};
 
   weaken $self;
@@ -166,16 +172,22 @@ sub _listen {
 
   my $url   = Mojo::URL->new($listen);
   my $proto = $url->protocol;
-  croak qq{Invalid listen location "$listen"} unless $proto =~ /^https?$/;
+  croak qq{Invalid listen location "$listen"} unless $proto =~ /^https?(?:\+unix)?$/;
 
   my $query   = $url->query;
   my $options = {
-    address       => $url->host,
     backlog       => $self->backlog,
     single_accept => $query->param('single_accept'),
     reuse         => $query->param('reuse')
   };
-  if (my $port = $url->port) { $options->{port} = $port }
+
+  if ($proto eq 'http+unix') {
+    $options->{path} = $url->host;
+  }
+  else { # proto is http or https
+    if ((my $host = $url->host) ne '*') { $options->{address} = $host }
+    if (my $port = $url->port) { $options->{port} = $port }
+  }
   $options->{"tls_$_"} = $query->param($_) for qw(ca ciphers version);
   /^(.*)_(cert|key)$/ and $options->{"tls_$2"}{$1} = $query->param($_)
     for @{$query->names};
@@ -183,8 +195,7 @@ sub _listen {
   if (my $key  = $query->param('key'))  { $options->{'tls_key'}{''}  = $key }
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
-  delete $options->{address} if $options->{address} eq '*';
-  my $tls = $options->{tls} = $proto eq 'https';
+  my $tls = $options->{tls} = $proto =~ /^https/;
 
   weaken $self;
   push @{$self->acceptors}, $self->ioloop->server(
@@ -206,8 +217,14 @@ sub _listen {
   return if $self->silent;
   $self->app->log->info(qq{Listening at "$url"});
   $query->pairs([]);
-  $url->host('127.0.0.1') if $url->host eq '*';
-  say "Server available at $url";
+
+  if (defined $options->{path}) {
+    say "Server available at ".$url->host;
+  }
+  else {
+    $url->host('127.0.0.1') if $url->host eq '*';
+    say "Server available at $url";
+  }
 }
 
 sub _read {

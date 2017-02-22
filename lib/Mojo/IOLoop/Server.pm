@@ -27,12 +27,19 @@ sub is_accepting { !!shift->{active} }
 sub listen {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
-  # Look for reusable file descriptor
+  my $path = $args->{path};
   my $address = $args->{address} || '0.0.0.0';
   my $port = $args->{port};
+
+  # Look for reusable file descriptor
   $ENV{MOJO_REUSE} ||= '';
   my $fd;
-  $fd = $1 if $port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/;
+  if (defined $path) {
+    $fd = $1 if $ENV{MOJO_REUSE} =~ /(?:^|\,)unix:\Q$path\E:(\d+)/;
+  }
+  else {
+    $fd = $1 if $port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/;
+  }
 
   # Allow file descriptor inheritance
   local $^F = 1023;
@@ -46,19 +53,31 @@ sub listen {
 
   # New socket
   else {
+    my $reuse;
     my %options = (
       Listen => $args->{backlog} // SOMAXCONN,
-      LocalAddr => $address,
-      ReuseAddr => 1,
-      ReusePort => $args->{reuse},
-      Type      => SOCK_STREAM
+      Type   => SOCK_STREAM
     );
-    $options{LocalPort} = $port if $port;
-    $options{LocalAddr} =~ s/[\[\]]//g;
-    $handle = IO::Socket::IP->new(%options)
-      or croak "Can't create listen socket: $@";
-    $fd = fileno $handle;
-    my $reuse = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
+    if (defined $path) {
+      require IO::Socket::UNIX;
+      $options{Local} = $path;
+      unlink $path if -S $path;
+      $handle = IO::Socket::UNIX->new(%options)
+        or croak "Can't create listen socket: $!";
+      $fd = fileno $handle;
+      $reuse = $self->{reuse} = join ':', 'unix', $path, $fd;
+    }
+    else {
+      $options{LocalAddr} = $address;
+      $options{ReuseAddr} = 1;
+      $options{ReusePort} = $args->{reuse};
+      $options{LocalPort} = $port if $port;
+      $options{LocalAddr} =~ s/[\[\]]//g;
+      $handle = IO::Socket::IP->new(%options)
+        or croak "Can't create listen socket: $@";
+      $fd = fileno $handle;
+      $reuse = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
+    }
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
   }
   $handle->blocking(0);

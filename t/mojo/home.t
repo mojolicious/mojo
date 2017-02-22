@@ -32,10 +32,11 @@ use Mojo::Home;
   is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }
 
-# Specific class detection (with "blib")
+# Specific class detection (with "blib/lib")
 {
   my $fake = path->to_abs->child('does_not_exist_3');
-  local $INC{'My/Class.pm'} = $fake->child('blib', 'My', 'Class.pm')->to_string;
+  local $INC{'My/Class.pm'}
+    = $fake->child('blib', 'lib', 'My', 'Class.pm')->to_string;
   my $home = Mojo::Home->new->detect('My::Class');
   is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }
@@ -47,9 +48,9 @@ use Mojo::Home;
   is_deeply $home->to_array, path->to_array, 'right path detected';
 }
 
-# Specific class detection (relative "blib")
+# Specific class detection (relative "blib/lib")
 {
-  local $INC{'My/Class.pm'} = path('blib', 'My', 'Class.pm')->to_string;
+  local $INC{'My/Class.pm'} = path('blib', 'lib', 'My', 'Class.pm')->to_string;
   my $home = Mojo::Home->new->detect('My::Class');
   is_deeply $home->to_array, path->to_array, 'right path detected';
 }

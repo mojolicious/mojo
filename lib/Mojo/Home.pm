@@ -14,7 +14,8 @@ sub detect {
   elsif ($class && (my $path = $INC{my $file = class_to_path $class})) {
     $home = Mojo::File->new($path)->to_array;
     splice @$home, (my @dummy = split('/', $file)) * -1;
-    pop @$home if @$home && ($home->[-1] eq 'blib' || $home->[-1] eq 'lib');
+    pop @$home if @$home && $home->[-1] eq 'lib';
+    pop @$home if @$home && $home->[-1] eq 'blib';
   }
 
   $$self = Mojo::File->new(@$home)->to_abs->to_string if $home;

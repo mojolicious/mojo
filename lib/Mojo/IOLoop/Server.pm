@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use IO::Socket::IP;
+use IO::Socket::UNIX;
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
 use Scalar::Util 'weaken';
@@ -28,37 +29,52 @@ sub listen {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
   # Look for reusable file descriptor
+  my $path = $self->{path} = $args->{path};
   my $address = $args->{address} || '0.0.0.0';
   my $port = $args->{port};
   $ENV{MOJO_REUSE} ||= '';
-  my $fd;
-  $fd = $1 if $port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/;
+  my $fd
+    = ($path && $ENV{MOJO_REUSE} =~ /(?:^|\,)unix:\Q$path\E:(\d+)/)
+    || ($port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/)
+    ? $1
+    : undef;
 
   # Allow file descriptor inheritance
   local $^F = 1023;
 
   # Reuse file descriptor
   my $handle;
+  my $class = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
   if (defined $fd) {
-    $handle = IO::Socket::IP->new_from_fd($fd, 'r')
+    $handle = $class->new_from_fd($fd, 'r')
       or croak "Can't open file descriptor $fd: $!";
   }
 
-  # New socket
   else {
-    my %options = (
-      Listen => $args->{backlog} // SOMAXCONN,
-      LocalAddr => $address,
-      ReuseAddr => 1,
-      ReusePort => $args->{reuse},
-      Type      => SOCK_STREAM
-    );
-    $options{LocalPort} = $port if $port;
-    $options{LocalAddr} =~ s/[\[\]]//g;
-    $handle = IO::Socket::IP->new(%options)
-      or croak "Can't create listen socket: $@";
-    $fd = fileno $handle;
-    my $reuse = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
+    my %options
+      = (Listen => $args->{backlog} // SOMAXCONN, Type => SOCK_STREAM);
+
+    # UNIX domain socket
+    my $reuse;
+    if ($path) {
+      unlink $path if -S $self->{path};
+      $options{Local} = $path;
+      $handle = $class->new(%options) or croak "Can't create listen socket: $!";
+      $reuse = $self->{reuse} = join ':', 'unix', $path, fileno $handle;
+    }
+
+    # IP socket
+    else {
+      $options{LocalAddr} = $address;
+      $options{LocalAddr} =~ s/[\[\]]//g;
+      $options{LocalPort} = $port if $port;
+      $options{ReuseAddr} = 1;
+      $options{ReusePort} = $args->{reuse};
+      $handle = $class->new(%options) or croak "Can't create listen socket: $@";
+      $fd     = fileno $handle;
+      $reuse  = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
+    }
+
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
   }
   $handle->blocking(0);
@@ -108,7 +124,7 @@ sub _accept {
 
 =head1 NAME
 
-Mojo::IOLoop::Server - Non-blocking TCP server
+Mojo::IOLoop::Server - Non-blocking TCP and UNIX domain socket server
 
 =head1 SYNOPSIS
 
@@ -131,7 +147,8 @@ Mojo::IOLoop::Server - Non-blocking TCP server
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Server> accepts TCP connections for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Server> accepts TCP/IP and UNIX domain socket connections for
+L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
@@ -205,6 +222,12 @@ Local address to listen on, defaults to C<0.0.0.0>.
   backlog => 128
 
 Maximum backlog size, defaults to C<SOMAXCONN>.
+
+=item path
+
+  path => '/tmp/myapp.sock'
+
+Path for UNIX domain socket to listen on.
 
 =item port
 

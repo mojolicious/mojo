@@ -42,10 +42,10 @@ sub ihost {
 
   # Check if host needs to be encoded
   return undef unless defined(my $host = $self->host);
-  return lc $host unless $host =~ /[^\x00-\x7f]/;
+  return $host unless $host =~ /[^\x00-\x7f]/;
 
   # Encode
-  return lc join '.',
+  return join '.',
     map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ }
     split(/\./, $host, -1);
 }
@@ -166,6 +166,7 @@ sub _string {
 
   # Authority
   my $auth = $self->host_port;
+  $auth = _encode($auth, '^A-Za-z0-9\-._~!$&\'()*+,;=:\[\]') if defined $auth;
   if ($unsafe && defined(my $info = $self->userinfo)) {
     $auth = _encode($info, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $auth;
   }

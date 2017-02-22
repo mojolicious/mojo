@@ -1,5 +1,7 @@
 
 7.27  2017-02-22
+  - Added support for UNIX domain sockets. (sri, salva)
+  - Fixed a bug in Mojo::URL where invalid host strings could be generated.
   - Fixed blib handling in Mojo::Home.
 
 7.26  2017-02-15

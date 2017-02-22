@@ -186,10 +186,11 @@ $loop->client(
     $connected = 1;
   }
 );
-like $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:${port}:/,
+my $fd = fileno $loop->acceptor($id)->handle;
+like $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/,
   'file descriptor can be reused';
 $loop->start;
-unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:${port}:/,
+unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/,
   'environment is clean';
 ok $connected, 'connected';
 ok !$loop->acceptor($id), 'acceptor has been removed';

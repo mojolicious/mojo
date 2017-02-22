@@ -78,8 +78,9 @@ sub _connect {
 
   my $t = $self->transactor;
   my ($proto, $host, $port) = $peer ? $t->peer($tx) : $t->endpoint($tx);
-  my %options
-    = (address => $host, port => $port, timeout => $self->connect_timeout);
+  my %options = (timeout => $self->connect_timeout);
+  if ($proto eq 'http+unix') { $options{path} = $host }
+  else                       { @options{qw(address port)} = ($host, $port) }
   if (my $local = $self->local_address) { $options{local_address} = $local }
   $options{handle} = $handle if $handle;
 
@@ -154,8 +155,10 @@ sub _connected {
   my $stream = $c->{ioloop}->stream($id)->timeout($self->inactivity_timeout);
   my $tx     = $c->{tx}->connection($id);
   my $handle = $stream->handle;
-  $tx->local_address($handle->sockhost)->local_port($handle->sockport);
-  $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  unless ($handle->isa('IO::Socket::UNIX')) {
+    $tx->local_address($handle->sockhost)->local_port($handle->sockport);
+    $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  }
 
   weaken $self;
   $tx->on(resume => sub { $self->_write($id) });
@@ -372,6 +375,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')
     ->result->json('/Abstract');
 
+  # GET request via UNIX domain socket "/tmp/myapp.sock" (percent encoded slash)
+  say $ua->get('http+unix://%2Ftmp%2Fmyapp.sock/perldoc')->result->body;
+
   # Follow redirects to download Mojolicious from GitHub
   $ua->max_redirects(5)
     ->get('https://www.github.com/kraih/mojo/tarball/master')
@@ -423,9 +429,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 =head1 DESCRIPTION
 
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
-agent, with IPv6, TLS, SNI, IDNA, HTTP/SOCKS5 proxy, Comet (long polling),
-keep-alive, connection pooling, timeout, cookie, multipart, gzip compression
-and multiple event loop support.
+agent, with IPv6, TLS, SNI, IDNA, HTTP/SOCKS5 proxy, UNIX domain socket, Comet
+(long polling), keep-alive, connection pooling, timeout, cookie, multipart, gzip
+compression and multiple event loop support.
 
 All connections will be reset automatically if a new process has been forked,
 this allows multiple processes to share the same L<Mojo::UserAgent> object

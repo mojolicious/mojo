@@ -45,7 +45,7 @@ sub collect {
   for my $cookie (@{$tx->res->cookies}) {
 
     # Validate domain
-    my $host = $url->ihost;
+    my $host = lc $url->ihost;
     my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
     if (my $cb = $self->ignore) { next if $cb->($cookie) }
     next if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
@@ -64,7 +64,7 @@ sub find {
   my ($self, $url) = @_;
 
   my @found;
-  return \@found unless my $domain = my $host = $url->ihost;
+  my $domain = my $host = lc $url->ihost;
   my $path = $url->path->to_abs_string;
   while ($domain) {
     next unless my $old = $self->{jar}{$domain};

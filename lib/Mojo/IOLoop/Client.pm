@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno 'EINPROGRESS';
 use IO::Socket::IP;
+use IO::Socket::UNIX;
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
 use Scalar::Util 'weaken';
@@ -41,7 +42,7 @@ sub connect {
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
   return $reactor->next_tick(sub { $self && $self->_connect($args) })
-    if !NNR || $args->{handle};
+    if !NNR || $args->{handle} || $args->{path};
 
   # Non-blocking name resolution
   my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
@@ -71,19 +72,32 @@ sub _cleanup {
 sub _connect {
   my ($self, $args) = @_;
 
-  my $handle;
-  my $address = $args->{socks_address} || $args->{address};
-  unless ($handle = $self->{handle} = $args->{handle}) {
-    my %options = (PeerAddr => $address, PeerPort => _port($args));
-    %options = (PeerAddrInfo => $args->{addr_info}) if $args->{addr_info};
-    $options{Blocking} = 0;
-    $options{LocalAddr} = $args->{local_address} if $args->{local_address};
+  my $path = $args->{path};
+  my $handle = $self->{handle} = $args->{handle};
+
+  unless ($handle) {
+    my $class = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
+    my %options = (Blocking => 0);
+
+    # UNIX domain socket
+    if ($path) { $options{Peer} = $path }
+
+    # IP socket
+    else {
+      if (my $info = $args->{addr_info}) { $options{PeerAddrInfo} = $info }
+      else {
+        $options{PeerAddr} = $args->{socks_address} || $args->{address};
+        $options{PeerPort} = _port($args);
+      }
+      $options{LocalAddr} = $args->{local_address} if $args->{local_address};
+    }
+
     return $self->emit(error => "Can't connect: $@")
-      unless $self->{handle} = $handle = IO::Socket::IP->new(%options);
+      unless $self->{handle} = $handle = $class->new(%options);
   }
   $handle->blocking(0);
 
-  $self->_wait('_ready', $handle, $args);
+  $path ? $self->_try_socks($args) : $self->_wait('_ready', $handle, $args);
 }
 
 sub _port { $_[0]{socks_port} || $_[0]{port} || ($_[0]{tls} ? 443 : 80) }
@@ -170,7 +184,7 @@ sub _wait {
 
 =head1 NAME
 
-Mojo::IOLoop::Client - Non-blocking TCP client
+Mojo::IOLoop::Client - Non-blocking TCP/IP and UNIX domain socket client
 
 =head1 SYNOPSIS
 
@@ -193,7 +207,8 @@ Mojo::IOLoop::Client - Non-blocking TCP client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Client> opens TCP/IP and UNIX domain socket connections for
+L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
@@ -278,6 +293,12 @@ Use an already prepared L<IO::Socket::IP> object.
   local_address => '127.0.0.1'
 
 Local address to bind to.
+
+=item path
+
+  path => '/tmp/myapp.sock'
+
+Path of UNIX domain socket to connect to.
 
 =item port
 

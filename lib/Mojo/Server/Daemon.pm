@@ -85,8 +85,10 @@ sub _build_tx {
   my $tx = $self->build_tx->connection($id);
   $tx->res->headers->server('Mojolicious (Perl)');
   my $handle = $self->ioloop->stream($id)->handle;
-  $tx->local_address($handle->sockhost)->local_port($handle->sockport);
-  $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  unless ($handle->isa('IO::Socket::UNIX')) {
+    $tx->local_address($handle->sockhost)->local_port($handle->sockport);
+    $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  }
   $tx->req->url->base->scheme('https') if $c->{tls};
 
   weaken $self;
@@ -166,16 +168,20 @@ sub _listen {
 
   my $url   = Mojo::URL->new($listen);
   my $proto = $url->protocol;
-  croak qq{Invalid listen location "$listen"} unless $proto =~ /^https?$/;
+  croak qq{Invalid listen location "$listen"}
+    unless $proto eq 'http' || $proto eq 'https' || $proto eq 'http+unix';
 
   my $query   = $url->query;
   my $options = {
-    address       => $url->host,
     backlog       => $self->backlog,
     single_accept => $query->param('single_accept'),
     reuse         => $query->param('reuse')
   };
-  if (my $port = $url->port) { $options->{port} = $port }
+  if ($proto eq 'http+unix') { $options->{path} = $url->host }
+  else {
+    if ((my $host = $url->host) ne '*') { $options->{address} = $host }
+    if (my $port = $url->port) { $options->{port} = $port }
+  }
   $options->{"tls_$_"} = $query->param($_) for qw(ca ciphers version);
   /^(.*)_(cert|key)$/ and $options->{"tls_$2"}{$1} = $query->param($_)
     for @{$query->names};
@@ -183,7 +189,6 @@ sub _listen {
   if (my $key  = $query->param('key'))  { $options->{'tls_key'}{''}  = $key }
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
-  delete $options->{address} if $options->{address} eq '*';
   my $tls = $options->{tls} = $proto eq 'https';
 
   weaken $self;
@@ -207,7 +212,7 @@ sub _listen {
   $self->app->log->info(qq{Listening at "$url"});
   $query->pairs([]);
   $url->host('127.0.0.1') if $url->host eq '*';
-  say "Server available at $url";
+  say 'Server available at ', $options->{path} // $url;
 }
 
 sub _read {
@@ -361,6 +366,9 @@ C<http://0.0.0.0:3000>).
 
   # Listen on IPv4 and IPv6 interfaces
   $daemon->listen(['http://127.0.0.1:3000', 'http://[::1]:3000']);
+
+  # Listen on UNIX domain socket "/tmp/myapp.sock" (percent encoded slash)
+  $daemon->listen(['http+unix://%2Ftmp%2Fmyapp.sock']);
 
   # Allow multiple servers to use the same port (SO_REUSEPORT)
   $daemon->listen(['http://*:8080?reuse=1']);

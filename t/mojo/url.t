@@ -8,8 +8,8 @@ my $url = Mojo::URL->new('HtTp://Example.Com');
 is $url->scheme,   'HtTp',        'right scheme';
 is $url->protocol, 'http',        'right protocol';
 is $url->host,     'Example.Com', 'right host';
-is $url->ihost,    'example.com', 'right internationalized host';
-is "$url", 'http://example.com', 'right format';
+is $url->ihost,    'Example.Com', 'right internationalized host';
+is "$url", 'http://Example.Com', 'right format';
 
 # Advanced
 $url = Mojo::URL->new(
@@ -318,6 +318,15 @@ is $url->port,   3000, 'right port';
 is $url->path,   '/', 'right path';
 is "$url", 'wss://[::1]:3000/', 'right format';
 
+# Escaped host
+$url = Mojo::URL->new('http+unix://%2FUsers%2Fsri%2Ftest.sock/index.html');
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http+unix', 'right scheme';
+is $url->host,   '/Users/sri/test.sock', 'right host';
+is $url->port,   undef, 'no port';
+is $url->path,   '/index.html', 'right path';
+is "$url", 'http+unix://%2FUsers%2Fsri%2Ftest.sock/index.html', 'right format';
+
 # IDNA
 $url = Mojo::URL->new('http://bücher.ch:3000/foo');
 ok $url->is_abs,     'is absolute';
@@ -390,11 +399,11 @@ $url = Mojo::URL->new('http://☃.Net/♥/♥/?♥=☃');
 ok $url->is_abs, 'is absolute';
 is $url->scheme, 'http', 'right scheme';
 is $url->host,   '☃.Net', 'right host';
-is $url->ihost,  'xn--n3h.net', 'right internationalized host';
+is $url->ihost,  'xn--n3h.Net', 'right internationalized host';
 is $url->path,   '/%E2%99%A5/%E2%99%A5/', 'right path';
 is_deeply $url->path->parts, ['♥', '♥'], 'right structure';
 is $url->query->param('♥'), '☃', 'right query value';
-is "$url", 'http://xn--n3h.net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83',
+is "$url", 'http://xn--n3h.Net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83',
   'right format';
 $url = Mojo::URL->new(
   'http://xn--n3h.net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83');
@@ -686,14 +695,14 @@ $url->parse('HTTP://FOO.BAR/%E4/?%E5=%E4');
 is $url->scheme,   'HTTP',    'right scheme';
 is $url->protocol, 'http',    'right protocol';
 is $url->host,     'FOO.BAR', 'right host';
-is $url->ihost,    'foo.bar', 'right internationalized host';
+is $url->ihost,    'FOO.BAR', 'right internationalized host';
 is $url->path,     '/%E4/',   'right path';
 is_deeply $url->path->parts, ["\xe4"], 'right structure';
 ok $url->path->leading_slash,  'has leading slash';
 ok $url->path->trailing_slash, 'has trailing slash';
 is $url->query, '%E5=%E4', 'right query';
 is $url->query->param("\xe5"), "\xe4", 'right value';
-is "$url", 'http://foo.bar/%E4/?%E5=%E4', 'right format';
+is "$url", 'http://FOO.BAR/%E4/?%E5=%E4', 'right format';
 
 # Resolve RFC 1808 examples
 my $base = Mojo::URL->new('http://a/b/c/d?q#f');

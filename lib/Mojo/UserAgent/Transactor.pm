@@ -143,13 +143,14 @@ sub websocket {
   my $tx = $self->tx(GET => @_);
   my $req = $tx->req;
   $req->headers->sec_websocket_protocol(join ', ', @$sub) if @$sub;
-  my $url   = $req->url;
-  my $proto = $url->protocol;
-  $url->scheme(
-    $proto eq 'ws+unix' ? 'http+unix' : $proto eq 'wss' ? 'https' : 'http')
-    if $proto;
 
-  # Handshake
+  # Handshake protocol
+  my $url = $req->url;
+  my $proto = $url->protocol // '';
+  if    ($proto eq 'ws')      { $url->scheme('http') }
+  elsif ($proto eq 'wss')     { $url->scheme('https') }
+  elsif ($proto eq 'ws+unix') { $url->scheme('http+unix') }
+
   return client_handshake $tx;
 }
 

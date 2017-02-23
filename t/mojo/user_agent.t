@@ -175,6 +175,13 @@ ok !$tx->res->headers->connection, 'no "Connection" value';
 is $tx->res->max_message_size, 0,        'right value';
 is $tx->res->body,             'works!', 'right content';
 
+# Unsupported protocol
+$tx = $ua->get('htttp://example.com');
+ok !$tx->success, 'not successful';
+is $tx->error->{message}, 'Unsupported protocol: htttp', 'right error';
+eval { $tx->result };
+like $@, qr/Unsupported protocol: htttp/, 'right error';
+
 # Shortcuts for common request methods
 is $ua->delete('/method')->res->body,  'DELETE',  'right content';
 is $ua->get('/method')->res->body,     'GET',     'right content';

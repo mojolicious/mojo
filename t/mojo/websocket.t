@@ -380,6 +380,18 @@ $ua->websocket(
 Mojo::IOLoop->start;
 is $status, 1006, 'right status';
 
+# Unsupported protocol
+my $error;
+$ua->websocket(
+  'wsss://example.com' => sub {
+    my ($ua, $tx) = @_;
+    $error = $tx->error;
+    Mojo::IOLoop->stop;
+  }
+);
+Mojo::IOLoop->start;
+is $error->{message}, 'Unsupported protocol: wsss', 'right error';
+
 # 16-bit length
 $result = undef;
 $ua->websocket(

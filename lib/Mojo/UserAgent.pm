@@ -291,9 +291,16 @@ sub _reuse {
 sub _start {
   my ($self, $loop, $tx, $cb) = @_;
 
-  # Application server
+  # Check protocol (WebSocket handshakes are HTTP)
   my $url = $tx->req->url;
-  unless ($url->is_abs) {
+  if (my $proto = $url->protocol) {
+    $tx->res->error({message => "Unsupported protocol: $proto"})
+      and return $loop->next_tick(sub { $self->$cb($tx) })
+      unless grep { $proto eq $_ } qw(http http+unix https);
+  }
+
+  # Application server
+  else {
     my $base
       = $loop == $self->ioloop ? $self->server->url : $self->server->nb_url;
     $url->scheme($base->scheme)->host($base->host)->port($base->port);

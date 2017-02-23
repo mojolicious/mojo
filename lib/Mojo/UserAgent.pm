@@ -78,6 +78,7 @@ sub _connect {
 
   my $t = $self->transactor;
   my ($proto, $host, $port) = $peer ? $t->peer($tx) : $t->endpoint($tx);
+
   my %options = (timeout => $self->connect_timeout);
   if ($proto eq 'http+unix') { $options{path} = $host }
   else                       { @options{qw(address port)} = ($host, $port) }
@@ -183,6 +184,9 @@ sub _connection {
   if (my $id = $self->_connect_proxy($loop, $tx, $cb)) { return $id }
 
   # New connection
+  $tx->res->error({message => "Unsupported protocol: $proto"})
+    and return $loop->next_tick(sub { $self->$cb($tx) })
+    unless $proto eq 'http' || $proto eq 'https' || $proto eq 'http+unix';
   $id = $self->_connect($loop, 1, $tx, undef, \&_connected);
   warn "-- Connect $id ($proto://$host:$port)\n" if DEBUG;
   $self->{connections}{$id} = {cb => $cb, ioloop => $loop, tx => $tx};
@@ -291,16 +295,9 @@ sub _reuse {
 sub _start {
   my ($self, $loop, $tx, $cb) = @_;
 
-  # Check protocol (WebSocket handshakes are HTTP)
+  # Application serve
   my $url = $tx->req->url;
-  if (my $proto = $url->protocol) {
-    $tx->res->error({message => "Unsupported protocol: $proto"})
-      and return $loop->next_tick(sub { $self->$cb($tx) })
-      unless grep { $proto eq $_ } qw(http http+unix https);
-  }
-
-  # Application server
-  else {
+  unless ($url->is_abs) {
     my $base
       = $loop == $self->ioloop ? $self->server->url : $self->server->nb_url;
     $url->scheme($base->scheme)->host($base->host)->port($base->port);

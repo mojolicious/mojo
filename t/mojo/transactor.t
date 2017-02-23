@@ -558,6 +558,20 @@ ok $tx->req->headers->sec_websocket_version,
   'has "Sec-WebSocket-Version" value';
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 
+# WebSocket handshake with UNIX domain socket
+$tx = $t->websocket('ws+unix://%2Ftmp%2Fmyapp.sock/echo' => {DNT => 1});
+is $tx->req->url->to_abs, 'http+unix://%2Ftmp%2Fmyapp.sock/echo', 'right URL';
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->dnt,        1,         'right "DNT" value';
+is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
+ok !$tx->req->headers->sec_websocket_protocol,
+  'no "Sec-WebSocket-Protocol" header';
+ok $tx->req->headers->sec_websocket_version,
+  'has "Sec-WebSocket-Version" value';
+is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
+
 # Proxy CONNECT
 $tx = $t->tx(GET => 'HTTPS://sri:secr3t@mojolicious.org');
 $tx->req->proxy(Mojo::URL->new('http://sri:secr3t@127.0.0.1:3000'));

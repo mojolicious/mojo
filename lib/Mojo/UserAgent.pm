@@ -413,8 +413,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     }
   )->wait;
 
-  # WebSocket connection sending and receiving JSON messages
-  $ua->websocket('ws://example.com/echo.json' => sub {
+  # WebSocket connection sending and receiving JSON via UNIX domain socket
+  $ua->websocket('ws+unix://%2Ftmp%2Fmyapp.sock/echo.json' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(json => sub {

@@ -21,7 +21,10 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('fatal');
 
-get '/' => {text => 'works!'};
+get '/' => sub {
+  my $c = shift;
+  $c->render(text => $c->req->url);
+};
 
 get '/info' => sub {
   my $c              = shift;
@@ -30,6 +33,11 @@ get '/info' => sub {
   my $remote_address = $c->tx->remote_address // 'None';
   my $remote_port    = $c->tx->remote_port // 'None';
   $c->render(text => "$local_address:$local_port:$remote_address:$remote_port");
+};
+
+websocket '/echo' => sub {
+  my $c = shift;
+  $c->on(message => sub { shift->send(shift)->finish });
 };
 
 # UNIX domain socket server
@@ -49,13 +57,44 @@ like $ENV{MOJO_REUSE}, qr/^unix:\Q$test\E:\Q$fd\E/,
 # Root
 my $ua = Mojo::UserAgent->new(ioloop => $daemon->ioloop);
 my $tx = $ua->get("http+unix://$encoded/");
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
+ok !$tx->kept_alive, 'connection was not kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, '/', 'right content';
+$tx = $ua->get("http+unix://$encoded/");
+ok $tx->kept_alive, 'connection was kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, '/', 'right content';
 
 # Connection information
 $tx = $ua->get("http+unix://$encoded/info");
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'None:None:None:None', 'right content';
+
+# WebSocket
+my $result;
+$ua->websocket(
+  "ws+unix://$encoded/echo" => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(message => sub { shift->finish; $result = shift });
+    $tx->send('roundtrip works!');
+  }
+);
+Mojo::IOLoop->start;
+is $result, 'roundtrip works!', 'right result';
+
+# WebSocket again
+$result = undef;
+$ua->websocket(
+  "ws+unix://$encoded/echo" => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(message => sub { shift->finish; $result = shift });
+    $tx->send('roundtrip works!');
+  }
+);
+Mojo::IOLoop->start;
+is $result, 'roundtrip works!', 'right result';
 
 # Cleanup
 undef $daemon;

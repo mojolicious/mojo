@@ -320,11 +320,12 @@ is "$url", 'wss://[::1]:3000/', 'right format';
 
 # Escaped host
 $url = Mojo::URL->new('http+unix://%2FUsers%2Fsri%2Ftest.sock/index.html');
-ok $url->is_abs, 'is absolute';
-is $url->scheme, 'http+unix', 'right scheme';
-is $url->host,   '/Users/sri/test.sock', 'right host';
-is $url->port,   undef, 'no port';
-is $url->path,   '/index.html', 'right path';
+ok $url->is_abs,    'is absolute';
+is $url->scheme,    'http+unix', 'right scheme';
+is $url->host,      '/Users/sri/test.sock', 'right host';
+is $url->port,      undef, 'no port';
+is $url->host_port, '/Users/sri/test.sock', 'right host and port';
+is $url->path,      '/index.html', 'right path';
 is "$url", 'http+unix://%2FUsers%2Fsri%2Ftest.sock/index.html', 'right format';
 
 # IDNA

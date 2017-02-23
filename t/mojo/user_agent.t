@@ -176,7 +176,7 @@ is $tx->res->max_message_size, 0,        'right value';
 is $tx->res->body,             'works!', 'right content';
 
 # Unsupported protocol
-$tx = $ua->get('htttp://example.com');
+$tx = $ua->request_timeout(3600)->get('htttp://example.com');
 ok !$tx->success, 'not successful';
 is $tx->error->{message}, 'Unsupported protocol: htttp', 'right error';
 eval { $tx->result };

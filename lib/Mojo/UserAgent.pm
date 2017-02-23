@@ -307,8 +307,8 @@ sub _start {
   my $max = $self->max_response_size;
   $tx->res->max_message_size($max) if defined $max;
 
-  # Connect and add request timeout if necessary
-  my $id = $self->emit(start => $tx)->_connection($loop, $tx, $cb);
+  $self->emit(start => $tx);
+  return undef unless my $id = $self->_connection($loop, $tx, $cb);
   if (my $timeout = $self->request_timeout) {
     weaken $self;
     $self->{connections}{$id}{timeout}

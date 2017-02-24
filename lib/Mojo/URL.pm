@@ -28,7 +28,7 @@ sub host_port {
   }
 
   return undef unless defined(my $host = $self->ihost);
-  return $host unless my $port = $self->port;
+  return $host unless defined(my $port = $self->port);
   return "$host:$port";
 }
 

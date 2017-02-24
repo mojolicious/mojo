@@ -219,7 +219,7 @@ sub _start_line {
   # CONNECT
   my $method = uc $self->method;
   if ($method eq 'CONNECT') {
-    my $port = $url->port || ($url->protocol eq 'https' ? '443' : '80');
+    my $port = $url->port // ($url->protocol eq 'https' ? '443' : '80');
     $path = $url->ihost . ":$port";
   }
 

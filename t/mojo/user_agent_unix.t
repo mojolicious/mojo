@@ -6,6 +6,9 @@ use Test::More;
 use Mojo::File 'tempdir';
 use IO::Socket::UNIX;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 plan skip_all => 'set TEST_UNIX to enable this test (developer only!)'
   unless $ENV{TEST_UNIX};
 my $dir   = tempdir;
@@ -14,6 +17,7 @@ plan skip_all => 'UNIX domain socket support required for this test!'
   unless IO::Socket::UNIX->new(Listen => 1, Local => $dummy);
 
 use Mojo::Server::Daemon;
+use Mojo::TestConnectProxy;
 use Mojo::UserAgent;
 use Mojo::Util 'url_escape';
 use Mojolicious::Lite;
@@ -37,7 +41,8 @@ get '/info' => sub {
 
 websocket '/echo' => sub {
   my $c = shift;
-  $c->on(message => sub { shift->send(shift)->finish });
+  $c->on(message =>
+      sub { shift->send($c->req->url->to_abs->host . ': ' . shift)->finish });
 };
 
 # UNIX domain socket server
@@ -81,7 +86,7 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $result, 'roundtrip works!', 'right result';
+is $result, "$test: roundtrip works!", 'right result';
 
 # WebSocket again
 $result = undef;
@@ -94,7 +99,36 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $result, 'roundtrip works!', 'right result';
+is $result, "$test: roundtrip works!", 'right result';
+
+# WebSocket with proxy
+my $proxy         = $dir->child('proxy.sock');
+my $encoded_proxy = url_escape $proxy;
+my $id = Mojo::TestConnectProxy::proxy({path => "$proxy"}, {path => "$test"});
+$result = undef;
+$ua->proxy->http("http+unix://$encoded_proxy");
+$ua->websocket(
+  'ws://example.com/echo' => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(message => sub { shift->finish; $result = shift });
+    $tx->send('roundtrip works!');
+  }
+);
+Mojo::IOLoop->start;
+is $result, 'example.com: roundtrip works!', 'right result';
+Mojo::IOLoop->remove($id);
+
+# Proxy
+$ua->proxy->http("http+unix://$encoded");
+$tx = $ua->get('http://example.com');
+ok !$tx->kept_alive, 'connection was not kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'http://example.com', 'right content';
+$tx = $ua->get('http://example.com');
+ok $tx->kept_alive, 'connection was kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'http://example.com', 'right content';
 
 # Cleanup
 undef $daemon;

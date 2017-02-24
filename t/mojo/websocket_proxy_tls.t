@@ -5,6 +5,9 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::TLS;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
@@ -12,6 +15,7 @@ plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Mojo::TestConnectProxy;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 
@@ -53,96 +57,16 @@ my $listen
 my $port = $daemon->listen([$listen])->start->ports->[0];
 
 # Connect proxy server for testing
-my (%buffer, $connected, $read, $sent);
-my $nf
+my $zero
   = "HTTP/1.1 501 FOO\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok    = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
-my $dummy = Mojo::IOLoop::Server->generate_port;
-my $id    = Mojo::IOLoop->server(
-  {address => '127.0.0.1'} => sub {
-    my ($loop, $stream, $id) = @_;
-
-    # Connection to client
-    $stream->on(
-      read => sub {
-        my ($stream, $chunk) = @_;
-
-        # Write chunk from client to server
-        my $server = $buffer{$id}{connection};
-        return Mojo::IOLoop->stream($server)->write($chunk) if $server;
-
-        # Read connect request from client
-        my $buffer = $buffer{$id}{client} .= $chunk;
-        if ($buffer =~ /\x0d?\x0a\x0d?\x0a$/) {
-          $buffer{$id}{client} = '';
-          if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
-            $connected = "$1:$2";
-            my $fail = $2 == $dummy;
-
-            # Connection to server
-            $buffer{$id}{connection} = Mojo::IOLoop->client(
-              {address => $1, port => $fail ? $port : $2} => sub {
-                my ($loop, $err, $stream) = @_;
-
-                # Connection to server failed
-                if ($err) {
-                  Mojo::IOLoop->remove($id);
-                  return delete $buffer{$id};
-                }
-
-                # Start forwarding data in both directions
-                Mojo::IOLoop->stream($id)->write($fail ? $nf : $ok);
-                $stream->on(
-                  read => sub {
-                    my ($stream, $chunk) = @_;
-                    $read += length $chunk;
-                    $sent += length $chunk;
-                    Mojo::IOLoop->stream($id)->write($chunk);
-                  }
-                );
-
-                # Server closed connection
-                $stream->on(
-                  close => sub {
-                    Mojo::IOLoop->remove($id);
-                    delete $buffer{$id};
-                  }
-                );
-              }
-            );
-          }
-
-          # Invalid request from client
-          else { Mojo::IOLoop->remove($id) }
-        }
-      }
-    );
-
-    # Client closed connection
-    $stream->on(
-      close => sub {
-        my $buffer = delete $buffer{$id};
-        Mojo::IOLoop->remove($buffer->{connection}) if $buffer->{connection};
-      }
-    );
-  }
+my $id = Mojo::TestConnectProxy::proxy(
+  {address => '127.0.0.1'},
+  {address => '127.0.0.1', port => $port},
+  undef, $zero
 );
 my $proxy = Mojo::IOLoop->acceptor($id)->port;
-
-# Fake server to test failed TLS handshake
-$id = Mojo::IOLoop->server(
-  sub {
-    my ($loop, $stream) = @_;
-    $stream->on(read => sub { shift->close });
-  }
-);
-my $close = Mojo::IOLoop->acceptor($id)->port;
-
-# Fake server to test idle connection
-$id = Mojo::IOLoop->server(sub { });
-my $idle = Mojo::IOLoop->acceptor($id)->port;
 
 # User agent with valid certificates
 my $ua = Mojo::UserAgent->new(
@@ -243,10 +167,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok $kept_alive, 'connection was kept alive';
-is $connected,  "127.0.0.1:$port", 'connected';
-is $result,     'test1test2', 'right result';
-ok $read > 25, 'read enough';
-ok $sent > 25, 'sent enough';
+is $result, 'test1test2', 'right result';
 
 # Blocking proxy requests
 $ua->proxy->https("http://sri:secr3t\@127.0.0.1:$proxy");
@@ -266,7 +187,7 @@ is $tx->previous->req->method, 'CONNECT', 'right method';
 $ua->proxy->https("http://127.0.0.1:$proxy");
 my ($success, $leak, $err);
 $ua->websocket(
-  "wss://127.0.0.1:$dummy/test" => sub {
+  "wss://127.0.0.1:0/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
     $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
@@ -279,22 +200,39 @@ ok !$success, 'no success';
 ok !$leak,    'connection has been removed';
 is $err->{message}, 'Proxy connection failed', 'right error';
 
-# Failed TLS handshake through proxy
-$tx = $ua->get("https://127.0.0.1:$close");
-like $tx->error->{message}, qr/handshake problems/, 'right error';
-
-# Idle connection through proxy
-$ua->on(
-  start => sub { shift->connect_timeout(0.25) if pop->req->method eq 'CONNECT' }
-);
-$tx = $ua->get("https://127.0.0.1:$idle");
-is $tx->error->{message}, 'Connect timeout', 'right error';
-$ua->connect_timeout(10);
-
 # Blocking proxy request again
 $tx = $ua->get("https://127.0.0.1:$port/proxy");
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
+
+# Failed TLS handshake through proxy
+my $close = Mojo::IOLoop->acceptor(
+  Mojo::IOLoop->server(
+    sub {
+      my ($loop, $stream) = @_;
+      $stream->on(read => sub { shift->close });
+    }
+  )
+)->port;
+$id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
+  {address => '127.0.0.1', port => $close});
+my $proxy2 = Mojo::IOLoop->acceptor($id)->port;
+$ua->proxy->https("http://127.0.0.1:$proxy2");
+$tx = $ua->get('https://example.com');
+like $tx->error->{message}, qr/handshake problems/, 'right error';
+
+# Idle connection through proxy
+my $idle = Mojo::IOLoop->acceptor(Mojo::IOLoop->server(sub { }))->port;
+$id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
+  {address => '127.0.0.1', port => $idle});
+my $proxy3 = Mojo::IOLoop->acceptor($id)->port;
+$ua->on(
+  start => sub { shift->connect_timeout(0.25) if pop->req->method eq 'CONNECT' }
+);
+$ua->proxy->https("http://127.0.0.1:$proxy3");
+$tx = $ua->get('https://example.com');
+is $tx->error->{message}, 'Connect timeout', 'right error';
+$ua->connect_timeout(10);
 
 # Blocking request to bad proxy
 $ua    = Mojo::UserAgent->new;

@@ -5,6 +5,9 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::TLS;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)'
   unless $ENV{TEST_IPV6};
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
@@ -19,6 +22,7 @@ plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
 #   -CAkey ca.key -CAcreateserial
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Mojo::TestConnectProxy;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 
@@ -26,77 +30,6 @@ use Mojolicious::Lite;
 app->log->level('fatal');
 
 get '/' => {text => 'works!'};
-
-# CONNECT proxy server for testing
-my (%buffer, $forward);
-my $id = Mojo::IOLoop->server(
-  {address => '[::1]'} => sub {
-    my ($loop, $stream, $id) = @_;
-
-    # Connection to client
-    $stream->on(
-      read => sub {
-        my ($stream, $chunk) = @_;
-
-        # Write chunk from client to server
-        my $server = $buffer{$id}{connection};
-        return Mojo::IOLoop->stream($server)->write($chunk) if $server;
-
-        # Read connect request from client
-        my $buffer = $buffer{$id}{client} .= $chunk;
-        if ($buffer =~ /\x0d?\x0a\x0d?\x0a$/) {
-          $buffer{$id}{client} = '';
-          if ($buffer =~ /CONNECT \S+:\d+/) {
-
-            # Connection to server
-            $buffer{$id}{connection} = Mojo::IOLoop->client(
-              {address => '[::1]', port => $forward} => sub {
-                my ($loop, $err, $stream) = @_;
-
-                # Connection to server failed
-                if ($err) {
-                  Mojo::IOLoop->remove($id);
-                  return delete $buffer{$id};
-                }
-
-                # Start forwarding data in both directions
-                Mojo::IOLoop->stream($id)
-                  ->write("HTTP/1.1 200 OK\x0d\x0a"
-                    . "Connection: keep-alive\x0d\x0a\x0d\x0a");
-                $stream->on(
-                  read => sub {
-                    my ($stream, $chunk) = @_;
-                    Mojo::IOLoop->stream($id)->write($chunk);
-                  }
-                );
-
-                # Server closed connection
-                $stream->on(
-                  close => sub {
-                    Mojo::IOLoop->remove($id);
-                    delete $buffer{$id};
-                  }
-                );
-              }
-            );
-          }
-
-          # Invalid request from client
-          else { Mojo::IOLoop->remove($id) }
-        }
-      }
-    );
-
-    # Client closed connection
-    $stream->on(
-      close => sub {
-        my $buffer = delete $buffer{$id};
-        Mojo::IOLoop->remove($buffer->{connection}) if $buffer->{connection};
-      }
-    );
-  }
-);
-my $proxy = Mojo::IOLoop->acceptor($id)->port;
 
 # IPv6 and TLS
 my $daemon = Mojo::Server::Daemon->new(
@@ -121,8 +54,11 @@ SKIP: {
     . '&127.0.0.1_key=t/mojo/certs/server.key'
     . '&example.com_cert=t/mojo/certs/domain.crt'
     . '&example.com_key=t/mojo/certs/domain.key';
-  $forward = $daemon->listen([$listen])->start->ports->[0];
-  $ua      = Mojo::UserAgent->new(
+  my $forward = $daemon->listen([$listen])->start->ports->[0];
+  my $id = Mojo::TestConnectProxy::proxy({address => '[::1]'},
+    {address => '[::1]', port => $forward});
+  my $proxy = Mojo::IOLoop->acceptor($id)->port;
+  $ua = Mojo::UserAgent->new(
     ioloop => Mojo::IOLoop->singleton,
     ca     => 't/mojo/certs/ca.crt'
   );

@@ -606,11 +606,15 @@ Proxy manager, defaults to a L<Mojo::UserAgent::Proxy> object.
   # Detect proxy servers from environment
   $ua->proxy->detect;
 
-  # Manually configure HTTP proxy (using CONNECT for HTTPS)
+  # Manually configure HTTP proxy (using CONNECT for HTTPS/WebSockets)
   $ua->proxy->http('http://127.0.0.1:8080')->https('http://127.0.0.1:8080');
 
   # Manually configure Tor (SOCKS5)
   $ua->proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
+
+  # Manually configure UNIX domain socket (using CONNECT for HTTPS/WebSockets)
+  $ua->proxy->http('http+unix://%2Ftmp%2Fproxy.sock')
+    ->https('http+unix://%2Ftmp%2Fproxy.sock');
 
 =head2 request_timeout
 

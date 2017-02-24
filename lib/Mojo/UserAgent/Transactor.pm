@@ -27,7 +27,7 @@ sub endpoint {
   my $url   = $req->url;
   my $proto = $url->protocol || 'http';
   my $host  = $url->ihost;
-  my $port  = $url->port || ($proto eq 'https' ? 443 : 80);
+  my $port  = $url->port // ($proto eq 'https' ? 443 : 80);
 
   # Proxy for normal HTTP requests
   my $socks;
@@ -250,7 +250,7 @@ sub _proxy {
   my $req = $tx->req;
   if ($req->via_proxy && (my $proxy = $req->proxy)) {
     return $proxy->protocol, $proxy->ihost,
-      $proxy->port || ($proto eq 'https' ? 443 : 80);
+      $proxy->port // ($proto eq 'https' ? 443 : 80);
   }
 
   return $proto, $host, $port;

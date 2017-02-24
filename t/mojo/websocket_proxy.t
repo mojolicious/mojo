@@ -3,9 +3,14 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use Mojo::IOLoop;
 use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
+use Mojo::TestConnectProxy;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 
@@ -35,82 +40,8 @@ my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 my $port = $daemon->listen(['http://127.0.0.1'])->start->ports->[0];
 
 # CONNECT proxy server for testing
-my (%buffer, $connected, $read, $sent);
-my $nf
-  = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
-  . "Content-Length: 0\x0d\x0a"
-  . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok    = "HTTP/1.0 201 BAR\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
-my $dummy = Mojo::IOLoop::Server->generate_port;
-my $id    = Mojo::IOLoop->server(
-  {address => '127.0.0.1'} => sub {
-    my ($loop, $stream, $id) = @_;
-
-    # Connection to client
-    $stream->on(
-      read => sub {
-        my ($stream, $chunk) = @_;
-
-        # Write chunk from client to server
-        my $server = $buffer{$id}{connection};
-        return Mojo::IOLoop->stream($server)->write($chunk) if $server;
-
-        # Read connect request from client
-        my $buffer = $buffer{$id}{client} .= $chunk;
-        if ($buffer =~ /\x0d?\x0a\x0d?\x0a$/) {
-          $buffer{$id}{client} = '';
-          if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
-            $connected = "$1:$2";
-            my $fail = $2 == $dummy;
-
-            # Connection to server
-            $buffer{$id}{connection} = Mojo::IOLoop->client(
-              {address => $1, port => $fail ? $port : $2} => sub {
-                my ($loop, $err, $stream) = @_;
-
-                # Connection to server failed
-                if ($err) {
-                  Mojo::IOLoop->remove($id);
-                  return delete $buffer{$id};
-                }
-
-                # Start forwarding data in both directions
-                Mojo::IOLoop->stream($id)->write($fail ? $nf : $ok);
-                $stream->on(
-                  read => sub {
-                    my ($stream, $chunk) = @_;
-                    $read += length $chunk;
-                    $sent += length $chunk;
-                    Mojo::IOLoop->stream($id)->write($chunk);
-                  }
-                );
-
-                # Server closed connection
-                $stream->on(
-                  close => sub {
-                    Mojo::IOLoop->remove($id);
-                    delete $buffer{$id};
-                  }
-                );
-              }
-            );
-          }
-
-          # Invalid request from client
-          else { Mojo::IOLoop->remove($id) }
-        }
-      }
-    );
-
-    # Client closed connection
-    $stream->on(
-      close => sub {
-        my $buffer = delete $buffer{$id};
-        Mojo::IOLoop->remove($buffer->{connection}) if $buffer->{connection};
-      }
-    );
-  }
-);
+my $id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
+  {address => '127.0.0.1', port => $port});
 my $proxy = Mojo::IOLoop->acceptor($id)->port;
 
 # Normal non-blocking request
@@ -187,16 +118,13 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $connected, "127.0.0.1:$port", 'connected';
-is $result,    'test1test2',      'right result';
-ok $read > 25, 'read enough';
-ok $sent > 25, 'sent enough';
+is $result, 'test1test2', 'right result';
 
 # Proxy WebSocket with bad target
 $ua->proxy->http("http://127.0.0.1:$proxy");
 my ($success, $leak, $err);
 $ua->websocket(
-  "ws://127.0.0.1:$dummy/test" => sub {
+  "ws://127.0.0.1:0/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
     $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);

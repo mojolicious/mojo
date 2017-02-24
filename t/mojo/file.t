@@ -124,8 +124,10 @@ is $destination->slurp, 'works!', 'right content';
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
 is_deeply path(__FILE__)->list->to_array,         [], 'no files';
 my $lib = path(__FILE__)->dirname->child('lib', 'Mojo');
-my @files = map { path($lib)->child(split '/') }
-  ('DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm');
+my @files = map { path($lib)->child(split '/') } (
+  'DeprecationTest.pm',  'LoaderException.pm',
+  'LoaderException2.pm', 'TestConnectProxy.pm'
+);
 is_deeply path($lib)->list->map('to_string')->to_array, \@files, 'right files';
 unshift @files, $lib->child('.hidden.txt')->to_string;
 is_deeply path($lib)->list({hidden => 1})->map('to_string')->to_array, \@files,
@@ -133,7 +135,7 @@ is_deeply path($lib)->list({hidden => 1})->map('to_string')->to_array, \@files,
 @files = map { path($lib)->child(split '/') } (
   'BaseTest',           'DeprecationTest.pm',
   'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest'
+  'LoaderTest',         'TestConnectProxy.pm'
 );
 is_deeply path($lib)->list({dir => 1})->map('to_string')->to_array, \@files,
   'right files';
@@ -149,7 +151,7 @@ is_deeply path(__FILE__)->list_tree->to_array,         [], 'no files';
   'BaseTest/Base3.pm',  'DeprecationTest.pm',
   'LoaderException.pm', 'LoaderException2.pm',
   'LoaderTest/A.pm',    'LoaderTest/B.pm',
-  'LoaderTest/C.pm'
+  'LoaderTest/C.pm',    'TestConnectProxy.pm'
 );
 is_deeply path($lib)->list_tree->map('to_string')->to_array, \@files,
   'right files';

@@ -1394,12 +1394,16 @@ C<http+unix://> and C<ws+unix://> schemes, and pass along a percent encoded path
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # GET request via UNIX domain socket "/tmp/myapp.sock"
+  # GET request via UNIX domain socket "/tmp/foo.sock"
   my $ua = Mojo::UserAgent->new;
-  say $ua->get('http+unix://%2Ftmp%2Fmyapp.sock/index.html')->result->body;
+  say $ua->get('http+unix://%2Ftmp%2Ffoo.sock/index.html')->result->body;
 
-  # WebSocket connection via UNIX domain socket "/tmp/myapp.sock"
-  $ua->websocket('ws+unix://%2Ftmp%2Fmyapp.sock/echo' => sub {
+  # GET request with HOST header via UNIX domain socket "/tmp/bar.sock"
+  my $tx = $ua->get('http+unix://%2Ftmp%2Fbar.sock' => {Host => 'example.com'});
+  say $tx->result->body;
+
+  # WebSocket connection via UNIX domain socket "/tmp/baz.sock"
+  $ua->websocket('ws+unix://%2Ftmp%2Fbaz.sock/echo' => sub {
     my ($ua, $tx) = @_;
 
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
@@ -1413,6 +1417,8 @@ C<http+unix://> and C<ws+unix://> schemes, and pass along a percent encoded path
     $tx->send('Hi!');
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+You can set the C<Host> header manually to pass along a hostname.
 
 =head2 Command line
 

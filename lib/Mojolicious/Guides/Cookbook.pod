@@ -1383,6 +1383,36 @@ protocol.
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+=head2 UNIX domain sockets
+
+Not just TCP/IP sockets are supported, but also UNIX domain sockets, which can
+have significant security and performance benefits when used for inter-process
+communication. Instead of C<http://> and C<ws://> you can use the
+C<http+unix://> and C<ws+unix://> schemes, and pass along a percent encoded path
+(C</> becomes C<%2F>) instead of a hostname.
+
+  use Mojo::UserAgent;
+
+  # GET request via UNIX domain socket
+  my $ua = Mojo::UserAgent->new;
+  say $ua->get('http+unix://%2Ftmp%2Fmyapp.sock/index.html')->result->body;
+
+  # WebSocket connection via UNIX domain socket
+  $ua->websocket('ws+unix://%2Ftmp%2Fmyapp.sock/echo' => sub {
+    my ($ua, $tx) = @_;
+
+    say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
+
+    $tx->on(message => sub {
+      my ($tx, $msg) = @_;
+      say "WebSocket message: $msg";
+      $tx->finish;
+    });
+
+    $tx->send('Hi!');
+  });
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
 =head2 Command line
 
 Don't you hate checking huge HTML files from the command line? Thanks to the

@@ -1394,11 +1394,11 @@ C<http+unix://> and C<ws+unix://> schemes, and pass along a percent encoded path
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # GET request via UNIX domain socket
+  # GET request via UNIX domain socket "/tmp/myapp.sock"
   my $ua = Mojo::UserAgent->new;
   say $ua->get('http+unix://%2Ftmp%2Fmyapp.sock/index.html')->result->body;
 
-  # WebSocket connection via UNIX domain socket
+  # WebSocket connection via UNIX domain socket "/tmp/myapp.sock"
   $ua->websocket('ws+unix://%2Ftmp%2Fmyapp.sock/echo' => sub {
     my ($ua, $tx) = @_;
 

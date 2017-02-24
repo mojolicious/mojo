@@ -1392,6 +1392,7 @@ C<http+unix://> and C<ws+unix://> schemes, and pass along a percent encoded path
 (C</> becomes C<%2F>) instead of a hostname.
 
   use Mojo::UserAgent;
+  use Mojo::IOLoop;
 
   # GET request via UNIX domain socket
   my $ua = Mojo::UserAgent->new;

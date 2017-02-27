@@ -25,6 +25,9 @@ EOF
   my $app = class_to_path $class;
   $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
+  # Config file
+  $self->render_to_rel_file('config', "$name/$name.conf");
+
   # Controller
   my $controller = "${class}::Controller::Example";
   my $path       = class_to_path $controller;
@@ -136,6 +139,13 @@ sub startup {
   # Documentation browser under "/perldoc"
   $self->plugin('PODRenderer');
 
+  #Config mechanism
+  $self->plugin('Config');
+
+  #Read some config data
+  my $config = $self->app->config;
+  $self->app->secrets( $config->{secrets} );
+
   # Router
   my $r = $self->routes;
 
@@ -202,3 +212,8 @@ and the layout "templates/layouts/default.html.ep",
 <%%= link_to 'here' => '/index.html' %> to move forward to a static page. To
 learn more, you can also browse through the documentation
 <%%= link_to 'here' => '/perldoc' %>.
+
+@@ config
+{
+  secrets => ['changeme1', 'ChangeMe2', 'cHanGemEtoO0'],
+};

@@ -29,9 +29,9 @@ sub listen {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
   # Look for reusable file descriptor
-  my $path = $self->{path} = $args->{path};
+  my $path    = $args->{path};
   my $address = $args->{address} || '0.0.0.0';
-  my $port = $args->{port};
+  my $port    = $args->{port};
   $ENV{MOJO_REUSE} ||= '';
   my $fd
     = ($path && $ENV{MOJO_REUSE} =~ /(?:^|\,)unix:\Q$path\E:(\d+)/)
@@ -57,7 +57,7 @@ sub listen {
     # UNIX domain socket
     my $reuse;
     if ($path) {
-      unlink $path if -S $self->{path};
+      unlink $path if -S $path;
       $options{Local} = $path;
       $handle = $class->new(%options) or croak "Can't create listen socket: $!";
       $reuse = $self->{reuse} = join ':', 'unix', $path, fileno $handle;

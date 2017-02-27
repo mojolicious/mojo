@@ -1,4 +1,6 @@
 
+7.28  2017-02-28
+
 7.27  2017-02-27
   - Added support for UNIX domain sockets. (sri, salva)
   - Improved Mojo::UserAgent to complain about unsupported protocols.

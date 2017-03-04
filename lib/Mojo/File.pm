@@ -25,6 +25,13 @@ sub basename { scalar File::Basename::basename ${$_[0]}, @_ }
 
 sub child { $_[0]->new(@_) }
 
+sub copy_to {
+  my ($self, $to) = @_;
+  File::Copy::copy($$self, $to)
+    or croak qq{Can't copy file "$$self" to "$to": $!};
+  return $self;
+}
+
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
 sub is_abs { file_name_is_absolute ${shift()} }
@@ -222,6 +229,12 @@ Return a new L<Mojo::File> object relative to the path.
 
   # "/home/sri/.vimrc" (on UNIX)
   path('/home')->child('sri', '.vimrc');
+
+=head2 copy_to
+
+  $path = $path->copy_to('/home/sri/.vimrc.backup');
+
+Copy the file with L<File::Copy>.
 
 =head2 dirname
 

@@ -120,6 +120,17 @@ ok !-f $source->move_to($destination), 'file no longer exists';
 ok -f $destination, 'file exists';
 is $destination->slurp, 'works!', 'right content';
 
+# Copy to
+$dir         = tempdir;
+$destination = $dir->child('dest.txt');
+$source      = $dir->child('src.txt')->spurt('works!');
+ok -f $source,       'file exists';
+ok !-f $destination, 'file does not exists';
+ok -f $source->copy_to($destination), 'file still exists';
+ok -f $destination, 'file also exists now';
+is $source->slurp,      'works!', 'right content';
+is $destination->slurp, 'works!', 'right content';
+
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
 is_deeply path(__FILE__)->list->to_array,         [], 'no files';

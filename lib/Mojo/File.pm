@@ -10,9 +10,9 @@ use Carp 'croak';
 use Cwd 'getcwd';
 use Exporter 'import';
 use File::Basename ();
-use File::Copy     ();
-use File::Find     ();
-use File::Path     ();
+use File::Copy qw(copy move);
+use File::Find 'find';
+use File::Path ();
 use File::Spec::Functions
   qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
 use File::Temp ();
@@ -27,8 +27,7 @@ sub child { $_[0]->new(@_) }
 
 sub copy_to {
   my ($self, $to) = @_;
-  File::Copy::copy($$self, $to)
-    or croak qq{Can't copy file "$$self" to "$to": $!};
+  copy($$self, $to) or croak qq{Can't copy file "$$self" to "$to": $!};
   return $self;
 }
 
@@ -55,14 +54,14 @@ sub list_tree {
   # This may break in the future, but is worth it for performance
   local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
 
-  my %files;
-  my $w = sub { $files{$File::Find::name}++ };
-  my $p = sub { delete $files{$File::Find::dir} };
-  File::Find::find {wanted => $w, postprocess => $p, no_chdir => 1}, $$self
-    if -d $$self;
+  my %all;
+  my $wanted = {wanted => sub { $all{$File::Find::name}++ }, no_chdir => 1};
+  $wanted->{postprocess} = sub { delete $all{$File::Find::dir} }
+    unless $options->{dir};
+  find $wanted, $$self if -d $$self;
+  delete $all{$$self};
 
-  return Mojo::Collection->new(map { $self->new(canonpath($_)) }
-      sort keys %files);
+  return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
 }
 
 sub make_path {
@@ -73,8 +72,7 @@ sub make_path {
 
 sub move_to {
   my ($self, $to) = @_;
-  File::Copy::move($$self, $to)
-    or croak qq{Can't move file "$$self" to "$to": $!};
+  move($$self, $to) or croak qq{Can't move file "$$self" to "$to": $!};
   return $self;
 }
 
@@ -303,6 +301,12 @@ include C<.> and C<..>.
 These options are currently available:
 
 =over 2
+
+=item dir
+
+  dir => 1
+
+Include directories.
 
 =item hidden
 

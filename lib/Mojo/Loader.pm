@@ -172,8 +172,8 @@ Search for modules in a namespace non-recursively.
 
 Load a class and catch exceptions, returns a false value if loading was
 successful, a true value if the class was not found, or a L<Mojo::Exception>
-object if loading failed. Note that classes are checked for a C<new> method
-to see if they are already loaded.
+object if loading failed. Note that classes are checked for a C<new> method to
+see if they are already loaded.
 
   # Handle exceptions
   if (my $e = load_class 'Foo::Bar') {

@@ -29,7 +29,7 @@ undef $prefork;
 ok !-e $file, 'file has been cleaned up';
 
 # Bad PID file
-my $bad = path(__FILE__)->dirname->child('does_not_exist', 'test.pid');
+my $bad = path(__FILE__)->sibling('does_not_exist', 'test.pid');
 $prefork = Mojo::Server::Prefork->new(pid_file => $bad);
 $prefork->app->log->level('fatal');
 my $log = '';

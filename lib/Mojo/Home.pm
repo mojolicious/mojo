@@ -38,7 +38,7 @@ sub list_files {
     ->to_array;
 }
 
-sub mojo_lib_dir { shift->new(__FILE__)->dirname->child('..') }
+sub mojo_lib_dir { shift->new(__FILE__)->sibling('..') }
 
 # DEPRECATED!
 sub parse {

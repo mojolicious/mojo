@@ -97,6 +97,8 @@ sub remove_tree {
   return $self;
 }
 
+sub sibling { shift->dirname->child(@_) }
+
 sub slurp {
   my $self = shift;
 
@@ -364,6 +366,18 @@ Open file with L<IO::File>.
 
 Delete this directory and any files and subdirectories it may contain, any
 additional arguments are passed through to L<File::Path>.
+
+=head2 sibling
+
+  my $sibling = $path->sibling('.vimrc');
+
+Return a new L<Mojo::File> object relative to the directory part of the path.
+
+  # "/home/sri/.vimrc" (on UNIX)
+  path('/home/sri/.bashrc')->sibling('.vimrc');
+
+  # "/home/sri/.ssh/known_hosts" (on UNIX)
+  path('/home/sri/.bashrc')->sibling('.ssh', 'known_hosts');
 
 =head2 slurp
 

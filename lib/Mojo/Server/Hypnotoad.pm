@@ -49,7 +49,7 @@ sub run {
   # Preload application and configure server
   my $prefork = $self->prefork->cleanup(0);
   $prefork->load_app($app)->config->{hypnotoad}{pid_file}
-    //= path($ENV{HYPNOTOAD_APP})->dirname->child('hypnotoad.pid')->to_string;
+    //= path($ENV{HYPNOTOAD_APP})->sibling('hypnotoad.pid')->to_string;
   $self->configure('hypnotoad');
   weaken $self;
   $prefork->on(wait   => sub { $self->_manage });

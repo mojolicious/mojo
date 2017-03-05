@@ -24,6 +24,10 @@ is path('/home')->tap(sub { $$_ .= '/sri' })->to_string, '/home/sri',
 is path('foo', 'bar')->child('baz', 'yada'),
   catfile(catfile('foo', 'bar'), 'baz', 'yada'), 'same path';
 
+# Siblings
+is path('foo', 'bar')->sibling('baz', 'yada'),
+  catfile(dirname(catfile('foo', 'bar')), 'baz', 'yada'), 'same path';
+
 # Array
 is_deeply path('foo', 'bar')->to_array, [splitdir catfile('foo', 'bar')],
   'same structure';
@@ -134,7 +138,7 @@ is $destination->slurp, 'works!', 'right content';
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
 is_deeply path(__FILE__)->list->to_array,         [], 'no files';
-my $lib = path(__FILE__)->dirname->child('lib', 'Mojo');
+my $lib = path(__FILE__)->sibling('lib', 'Mojo');
 my @files = map { path($lib)->child(split '/') } (
   'DeprecationTest.pm',  'LoaderException.pm',
   'LoaderException2.pm', 'TestConnectProxy.pm'

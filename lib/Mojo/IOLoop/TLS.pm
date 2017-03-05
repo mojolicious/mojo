@@ -16,8 +16,8 @@ has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 # To regenerate the certificate run this command (18.04.2012)
 # openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
-my $CERT = path(__FILE__)->dirname->child('resources', 'server.crt')->to_string;
-my $KEY  = path(__FILE__)->dirname->child('resources', 'server.key')->to_string;
+my $CERT = path(__FILE__)->sibling('resources', 'server.crt')->to_string;
+my $KEY  = path(__FILE__)->sibling('resources', 'server.key')->to_string;
 
 sub DESTROY { shift->_cleanup }
 

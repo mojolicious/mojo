@@ -1686,7 +1686,7 @@ automatically installed with the modules.
     my $self = shift;
 
     # Switch to installable home directory
-    $self->home(Mojo::Home->new(path(__FILE__)->dirname->child('MyApp')));
+    $self->home(Mojo::Home->new(path(__FILE__)->sibling('MyApp')));
 
     # Switch to installable "public" directory
     $self->static->paths->[0] = $self->home->child('public');

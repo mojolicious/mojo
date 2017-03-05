@@ -136,11 +136,11 @@ use Mojo::Base 'Mojolicious';
 sub startup {
   my $self = shift;
 
-  # Documentation browser under "/perldoc"
-  $self->plugin('PODRenderer');
-
   # Load configuration from hash returned by "my_app.conf"
   my $config = $self->plugin('Config');
+
+  # Documentation browser under "/perldoc"
+  $self->plugin('PODRenderer') if $config->{perldoc};
 
   # Router
   my $r = $self->routes;
@@ -202,15 +202,19 @@ done_testing();
 %% layout 'default';
 %% title 'Welcome';
 <h2><%%= $msg %></h2>
-This page was generated from the template "templates/example/welcome.html.ep"
-and the layout "templates/layouts/default.html.ep",
-<%%= link_to 'click here' => url_for %> to reload the page or
-<%%= link_to 'here' => '/index.html' %> to move forward to a static page. To
-learn more, you can also browse through the documentation
-<%%= link_to 'here' => '/perldoc' %>.
+<p>
+  This page was generated from the template "templates/example/welcome.html.ep"
+  and the layout "templates/layouts/default.html.ep",
+  <%%= link_to 'click here' => url_for %> to reload the page or
+  <%%= link_to 'here' => '/index.html' %> to move forward to a static page.
+  %% if (config 'perldoc') {
+    To learn more, you can also browse through the documentation
+    <%%= link_to 'here' => '/perldoc' %>.
+  %% }
+</p>
 
 @@ config
 {
-  pg      => 'postgresql://tester:testing@/test',
+  perldoc => 1,
   secrets => ['s3cret']
 }

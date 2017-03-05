@@ -210,7 +210,6 @@ learn more, you can also browse through the documentation
 <%%= link_to 'here' => '/perldoc' %>.
 
 @@ config
-
 {
   pg      => 'postgresql://tester:testing@/test',
   secrets => ['s3cret']

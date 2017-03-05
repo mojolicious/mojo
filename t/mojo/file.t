@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Cwd qw(getcwd realpath);
+use Cwd 'getcwd';
 use Fcntl 'O_RDONLY';
 use File::Basename qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
@@ -40,10 +40,6 @@ is path('file.t')->to_abs, rel2abs('file.t'), 'same path';
 # Relative
 is path('test.txt')->to_abs->to_rel(getcwd),
   abs2rel(rel2abs('test.txt'), getcwd), 'same path';
-
-# Resolved
-is path(__FILE__)->sibling('..', 'lib')->realpath,
-  realpath(catfile(scalar dirname(__FILE__), '..', 'lib')), 'same path';
 
 # Basename
 is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';

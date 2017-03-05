@@ -21,14 +21,14 @@ use Mojo::Collection;
 
 our @EXPORT_OK = ('path', 'tempdir', 'tempfile');
 
-sub basename { scalar File::Basename::basename ${$_[0]}, @_ }
+sub basename { File::Basename::basename ${$_[0]}, @_ }
 
 sub child { $_[0]->new(@_) }
 
 sub copy_to {
   my ($self, $to) = @_;
   copy($$self, $to) or croak qq{Can't copy file "$$self" to "$to": $!};
-  return $self;
+  return $self->new(-d $to ? ($to, File::Basename::basename $self) : $to);
 }
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
@@ -73,7 +73,7 @@ sub make_path {
 sub move_to {
   my ($self, $to) = @_;
   move($$self, $to) or croak qq{Can't move file "$$self" to "$to": $!};
-  return $self;
+  return $self->new(-d $to ? ($to, File::Basename::basename $self) : $to);
 }
 
 sub new {
@@ -237,9 +237,11 @@ Return a new L<Mojo::File> object relative to the path.
 
 =head2 copy_to
 
-  $path = $path->copy_to('/home/sri/.vimrc.backup');
+  my $destination = $path->copy_to('/home/sri');
+  my $destination = $path->copy_to('/home/sri/.vimrc.backup');
 
-Copy the file with L<File::Copy>.
+Copy file with L<File::Copy> and return the destination as a L<Mojo::File>
+object.
 
 =head2 dirname
 
@@ -333,9 +335,11 @@ passed through to L<File::Path>.
 
 =head2 move_to
 
-  $path = $path->move_to('/home/sri/.vimrc.backup');
+  my $destination = $path->move_to('/home/sri');
+  my $destination = $path->move_to('/home/sri/.vimrc.backup');
 
-Move the file with L<File::Copy>.
+Move file with L<File::Copy> and return the destination as a L<Mojo::File>
+object.
 
 =head2 new
 
@@ -413,7 +417,8 @@ Alias for L<Mojo::Base/"tap">.
 
   my $absolute = $path->to_abs;
 
-Return the absolute path as a L<Mojo::File> object.
+Return absolute path as a L<Mojo::File> object, the path does not need to exist
+on the file system.
 
 =head2 to_array
 

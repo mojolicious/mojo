@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Cwd 'getcwd';
+use Cwd qw(getcwd realpath);
 use Fcntl 'O_RDONLY';
 use File::Basename qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
@@ -26,7 +26,7 @@ is path('foo', 'bar')->child('baz', 'yada'),
 
 # Siblings
 is path('foo', 'bar')->sibling('baz', 'yada'),
-  catfile(dirname(catfile('foo', 'bar')), 'baz', 'yada'), 'same path';
+  catfile(scalar dirname(catfile('foo', 'bar')), 'baz', 'yada'), 'same path';
 
 # Array
 is_deeply path('foo', 'bar')->to_array, [splitdir catfile('foo', 'bar')],
@@ -41,13 +41,18 @@ is path('file.t')->to_abs, rel2abs('file.t'), 'same path';
 is path('test.txt')->to_abs->to_rel(getcwd),
   abs2rel(rel2abs('test.txt'), getcwd), 'same path';
 
+# Resolved
+is path(__FILE__)->sibling('..', 'lib')->realpath,
+  realpath(catfile(scalar dirname(__FILE__), '..', 'lib')), 'same path';
+
 # Basename
 is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';
 is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'),
   'same path';
 
 # Dirname
-is path('file.t')->to_abs->dirname, dirname(rel2abs 'file.t'), 'same path';
+is path('file.t')->to_abs->dirname, scalar dirname(rel2abs 'file.t'),
+  'same path';
 
 # Checks
 ok path(__FILE__)->to_abs->is_abs, 'path is absolute';

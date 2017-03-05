@@ -152,8 +152,9 @@ Mojo::File - File system paths
   # Portably deal with file system paths
   my $path = Mojo::File->new('/home/sri/.vimrc');
   say $path->slurp;
+  say $path->dirname;
   say $path->basename;
-  say $path->dirname->child('.bashrc');
+  say $path->sibling('.bashrc');
 
   # Use the alternative constructor
   use Mojo::File 'path';

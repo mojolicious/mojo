@@ -214,8 +214,8 @@ done_testing();
 </p>
 
 @@ config
-% use Mojo::Util qw(md5_sum steady_time);
+% use Mojo::Util qw(sha1_sum steady_time);
 {
   perldoc => 1,
-  secrets => ['<%= md5_sum $$ . steady_time . rand  %>']
+  secrets => ['<%= sha1_sum $$ . steady_time . rand  %>']
 }

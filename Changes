@@ -1,4 +1,6 @@
 
+7.29  2017-03-08
+
 7.28  2017-03-07
   - Added copy_to, realpath and sibling methods to Mojo::File.
   - Added dir option to list_tree method in Mojo::File.

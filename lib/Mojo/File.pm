@@ -91,6 +91,8 @@ sub open {
 
 sub path { __PACKAGE__->new(@_) }
 
+sub realpath { $_[0]->new(Cwd::realpath ${$_[0]}) }
+
 sub remove_tree {
   my $self = shift;
   File::Path::remove_tree $$self, @_;
@@ -366,6 +368,12 @@ Open file with L<IO::File>.
   # Combine "fcntl.h" constants
   use Fcntl qw(O_CREAT O_EXCL O_RDWR);
   my $handle = path('/home/sri/test.pl')->open(O_RDWR | O_CREAT | O_EXCL);
+
+=head2 realpath
+
+  my $realpath = $path->realpath;
+
+Resolve the path with L<Cwd> and return the result as a L<Mojo::File> object.
 
 =head2 remove_tree
 

@@ -51,14 +51,17 @@ my %XML = (
 # "Sun, 06 Nov 1994 08:49:37 GMT" and "Sunday, 06-Nov-94 08:49:37 GMT"
 my $EXPIRES_RE = qr/(\w+\W+\d+\W+\w+\W+\d+\W+\d+:\d+:\d+\W*\w+)/;
 
+# HTML entities
+my $ENTITY_RE = qr/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+[;=]?))/;
+
 # Encoding cache
 my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode deprecated dumper encode extract_usage getopt hmac_sha1_sum),
-  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
-  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum),
+  qw(html_attr_unescape html_unescape md5_bytes md5_sum monkey_patch),
+  qw(punycode_decode punycode_encode quote secure_compare sha1_bytes sha1_sum),
   qw(split_cookie_header split_header steady_time tablify term_escape trim),
   qw(unindent unquote url_escape url_unescape xml_escape xor_encode)
 );
@@ -155,12 +158,8 @@ sub getopt {
   Getopt::Long::Configure($save);
 }
 
-sub html_unescape {
-  my $str = shift;
-  $str
-    =~ s/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
-  return $str;
-}
+sub html_attr_unescape { _html(shift, 1) }
+sub html_unescape      { _html(shift, 0) }
 
 # Declared in Mojo::Base to avoid circular require problems
 sub monkey_patch { Mojo::Base::_monkey_patch(@_) }
@@ -367,23 +366,25 @@ sub _adapt {
   return $k + (((PC_BASE - PC_TMIN + 1) * $delta) / ($delta + PC_SKEW));
 }
 
-sub _decode {
-  my ($point, $name) = @_;
+sub _encoding {
+  $CACHE{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
+}
+
+sub _entity {
+  my ($point, $name, $attr) = @_;
 
   # Code point
   return chr($point !~ /^x/ ? $point : hex $point) unless defined $name;
 
   # Named character reference
-  my $rest = '';
+  my $rest = my $last = '';
   while (length $name) {
-    return $ENTITIES{$name} . reverse $rest if exists $ENTITIES{$name};
-    $rest .= chop $name;
+    return $ENTITIES{$name} . reverse $rest
+      if exists $ENTITIES{$name}
+      && (!$attr || $name =~ /;$/ || $last !~ /[A-Za-z0-9=]/);
+    $rest .= $last = chop $name;
   }
   return '&' . reverse $rest;
-}
-
-sub _encoding {
-  $CACHE{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
 }
 
 # Supported on Perl 5.14+
@@ -416,6 +417,12 @@ sub _header {
 
   # Take care of final part
   return [@part ? (@tree, \@part) : @tree];
+}
+
+sub _html {
+  my ($str, $attr) = @_;
+  $str =~ s/$ENTITY_RE/_entity($1, $2, $attr)/geo;
+  return $str;
 }
 
 sub _options {
@@ -630,6 +637,19 @@ Generate HMAC-SHA1 checksum for bytes.
 
   # "11cedfd5ec11adc0ec234466d8a0f2a83736aa68"
   hmac_sha1_sum 'foo', 'passw0rd';
+
+=head2 html_attr_unescape
+
+  my $str = html_attr_unescape $escaped;
+
+Same as L</"html_unescape">, but handles special rules from the
+L<HTML Living Standard|https://html.spec.whatwg.org> for HTML attributes.
+
+  # "foo=bar&ltest=baz"
+  html_attr_unescape 'foo=bar&ltest=baz';
+
+  # "foo=bar<est=baz"
+  html_attr_unescape 'foo=bar&lt;est=baz';
 
 =head2 html_unescape
 

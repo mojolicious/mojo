@@ -786,6 +786,18 @@ is $dom->at('.line1')->tag, 'div', 'right tag';
 is $dom->at('.line2')->tag, 'div', 'right tag';
 is $dom->at('.line3'), undef, 'no result';
 
+# Entities in attributes
+$dom = Mojo::DOM->new(qq{<a href="/?foo&lt=bar"></a>});
+is $dom->at('a')->{href}, '/?foo&lt=bar', 'right attribute value';
+$dom = Mojo::DOM->new(qq{<a href="/?f&ltoo=bar"></a>});
+is $dom->at('a')->{href}, '/?f&ltoo=bar', 'right attribute value';
+$dom = Mojo::DOM->new(qq{<a href="/?f&lt-oo=bar"></a>});
+is $dom->at('a')->{href}, '/?f<-oo=bar', 'right attribute value';
+$dom = Mojo::DOM->new(qq{<a href="/?foo=&lt"></a>});
+is $dom->at('a')->{href}, '/?foo=<', 'right attribute value';
+$dom = Mojo::DOM->new(qq{<a href="/?f&lt;oo=bar"></a>});
+is $dom->at('a')->{href}, '/?f<oo=bar', 'right attribute value';
+
 # Whitespaces before closing bracket
 $dom = Mojo::DOM->new('<div >content</div>');
 ok $dom->at('div'), 'tag found';

@@ -11,10 +11,10 @@ use Mojo::DeprecationTest;
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode dumper encode extract_usage getopt hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum split_cookie_header split_header),
-  qw(steady_time tablify term_escape trim unindent unquote url_escape),
-  qw(url_unescape xml_escape xor_encode);
+  qw(html_attr_unescape md5_bytes md5_sum monkey_patch punycode_decode),
+  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum),
+  qw(split_cookie_header split_header steady_time tablify term_escape trim),
+  qw(unindent unquote url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -234,6 +234,17 @@ is html_unescape('foobar'), 'foobar', 'no changes';
 
 # html_unescape (relaxed)
 is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r",
+  'right HTML unescaped result';
+
+# html_attr_unescape
+is html_attr_unescape('/?foo&lt=bar'), '/?foo&lt=bar',
+  'right HTML unescaped result';
+is html_attr_unescape('/?f&ltoo=bar'), '/?f&ltoo=bar',
+  'right HTML unescaped result';
+is html_attr_unescape('/?f&lt-oo=bar'), '/?f<-oo=bar',
+  'right HTML unescaped result';
+is html_attr_unescape('/?foo=&lt'), '/?foo=<', 'right HTML unescaped result';
+is html_attr_unescape('/?f&lt;oo=bar'), '/?f<oo=bar',
   'right HTML unescaped result';
 
 # url_unescape (bengal numbers with nothing to unescape)

@@ -240,8 +240,12 @@ sub message_unlike {
 
 sub new {
   my $self = shift->SUPER::new;
+
   return $self unless my $app = shift;
-  return $self->app(ref $app ? $app : Mojo::Server->new->build_app($app));
+
+  my @args = @_ ? {config => {config_override => 1, %{shift()}}} : ();
+  return $self->app(
+    ref $app ? $app : Mojo::Server->new->build_app($app, @args));
 }
 
 sub options_ok { shift->_build_ok(OPTIONS => @_) }
@@ -876,9 +880,15 @@ Opposite of L</"message_like">.
 
   my $t = Test::Mojo->new;
   my $t = Test::Mojo->new('MyApp');
+  my $t = Test::Mojo->new(MyApp => {test => 'configuration', hello => 'Mojo!'});
   my $t = Test::Mojo->new(MyApp->new);
 
-Construct a new L<Test::Mojo> object.
+Construct a new L<Test::Mojo> object. In addition to a class name, you can pass
+along a hash reference with configuration values that will be used to
+instantiate the application. The special configuration value C<config_override>
+will be set in L<Mojo/"config"> as well, which is used to disable configuration
+plugins like L<Mojolicious::Plugin::Config> and
+L<Mojolicious::Plugin::JSONConfig> for tests.
 
 =head2 options_ok
 

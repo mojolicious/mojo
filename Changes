@@ -1,5 +1,7 @@
 
-7.29  2017-03-09
+7.29  2017-03-12
+  - Added support for overriding configuration files in applications tested with
+    Test::Mojo.
   - Added html_attr_unescape function to Mojo::Util.
   - Fixed unescaping of HTML5 attribute values in Mojo::DOM::HTML.
 

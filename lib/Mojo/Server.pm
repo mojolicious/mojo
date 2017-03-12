@@ -12,9 +12,9 @@ has app           => sub { shift->build_app('Mojo::HelloWorld') };
 has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };
 
 sub build_app {
-  my ($self, $app) = @_;
+  my ($self, $app) = (shift, shift);
   local $ENV{MOJO_EXE};
-  return $self->app($app->new)->app unless my $e = load_class $app;
+  return $self->app($app->new(@_))->app unless my $e = load_class $app;
   die ref $e ? $e : qq{Can't find application class "$app" in \@INC. (@INC)\n};
 }
 
@@ -150,6 +150,8 @@ the following new ones.
 =head2 build_app
 
   my $app = $server->build_app('MyApp');
+  my $app = $server->build_app('MyApp', log => Mojo::Log->new);
+  my $app = $server->build_app('MyApp', {log => Mojo::Log->new});
 
 Build application from class and assign it to L</"app">.
 

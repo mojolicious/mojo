@@ -880,7 +880,7 @@ Opposite of L</"message_like">.
 
   my $t = Test::Mojo->new;
   my $t = Test::Mojo->new('MyApp');
-  my $t = Test::Mojo->new(MyApp => {test => 'configuration', hello => 'Mojo!'});
+  my $t = Test::Mojo->new(MyApp => {foo => 'bar', baz => 23});
   my $t = Test::Mojo->new(MyApp->new);
 
 Construct a new L<Test::Mojo> object. In addition to a class name, you can pass

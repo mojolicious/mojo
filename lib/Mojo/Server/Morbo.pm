@@ -10,6 +10,7 @@ use POSIX 'WNOHANG';
 
 has daemon => sub { Mojo::Server::Daemon->new };
 has watch  => sub { [qw(lib templates)] };
+has sleep  => sub { 1 };
 
 sub modified_files {
   my $self = shift;
@@ -65,7 +66,7 @@ sub _manage {
   }
 
   $self->_spawn if !$self->{worker} && delete $self->{modified};
-  sleep 1;
+  sleep $self->sleep;
 }
 
 sub _spawn {

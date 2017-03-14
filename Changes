@@ -1,4 +1,6 @@
 
+7.30  2017-03-15
+
 7.29  2017-03-12
   - Added support for overriding configuration files in applications tested with
     Test::Mojo.

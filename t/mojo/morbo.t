@@ -8,6 +8,8 @@ plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
 
 use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use IO::Socket::INET;
 use Mojo::File 'tempdir';
 use Mojo::IOLoop::Server;
@@ -20,8 +22,9 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
 my $dir    = tempdir;
 my $script = $dir->child('myapp.pl');
 my $subdir = $dir->child('test', 'stuff')->make_path;
-my $morbo  = Mojo::Server::Morbo->new(watch => [$subdir, $script]);
-is_deeply $morbo->modified_files, [], 'no files have changed';
+my $morbo  = Mojo::Server::Morbo->new();
+$morbo->backend->watch([$subdir, $script]);
+is_deeply $morbo->backend->modified_files, [], 'no files have changed';
 $script->spurt(<<EOF);
 use Mojolicious::Lite;
 
@@ -63,7 +66,7 @@ get '/hello' => {text => 'Hello World!'};
 
 app->start;
 EOF
-is_deeply $morbo->modified_files, [$script], 'file has changed';
+is_deeply $morbo->backend->modified_files, [$script], 'file has changed';
 ok((stat $script)[9] > $mtime, 'modify time has changed');
 is((stat $script)[7], $size, 'still equal size');
 sleep 3;
@@ -82,7 +85,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 
 # Update script without changing mtime
 ($size, $mtime) = (stat $script)[7, 9];
-is_deeply $morbo->modified_files, [], 'no files have changed';
+is_deeply $morbo->backend->modified_files, [], 'no files have changed';
 $script->spurt(<<EOF);
 use Mojolicious::Lite;
 
@@ -93,7 +96,7 @@ get '/hello' => {text => 'Hello!'};
 app->start;
 EOF
 utime $mtime, $mtime, $script;
-is_deeply $morbo->modified_files, [$script], 'file has changed';
+is_deeply $morbo->backend->modified_files, [$script], 'file has changed';
 ok((stat $script)[9] == $mtime, 'modify time has not changed');
 isnt((stat $script)[7], $size, 'size has changed');
 sleep 3;
@@ -111,12 +114,13 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'Hello!', 'right content';
 
 # New file(s)
-is_deeply $morbo->modified_files, [], 'directory has not changed';
+is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
 my @new = map { $subdir->child("$_.txt") } qw/test testing/;
 $_->spurt('whatever') for @new;
-is_deeply $morbo->modified_files, \@new, 'two files have changed';
+is_deeply $morbo->backend->modified_files, \@new, 'two files have changed';
 $subdir->child('.hidden.txt')->spurt('whatever');
-is_deeply $morbo->modified_files, [], 'directory has not changed again';
+is_deeply $morbo->backend->modified_files, [],
+  'directory has not changed again';
 
 # Broken symlink
 SKIP: {
@@ -128,7 +132,7 @@ SKIP: {
   ok !-f $broken, 'symlink target does not exist';
   my $warned;
   local $SIG{__WARN__} = sub { $warned++ };
-  is_deeply $morbo->modified_files, [], 'directory has not changed';
+  is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
   ok !$warned, 'no warnings';
 }
 
@@ -166,6 +170,19 @@ sub _reuse_port {
     LocalPort => Mojo::IOLoop::Server->generate_port,
     ReusePort => 1
   );
+}
+
+
+{
+  local $ENV{MOJO_MORBO_BACKEND} = 'TestBackend';
+  my $test_morbo = Mojo::Server::Morbo->new;
+  isa_ok(
+    $test_morbo->backend,
+    'Mojo::Server::Morbo::Backend::TestBackend',
+    'right backend'
+  );
+  is_deeply($test_morbo->backend->modified_files,
+    ['always_changed'], 'Correct response');
 }
 
 done_testing();

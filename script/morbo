@@ -5,16 +5,17 @@ use Mojo::Server::Morbo;
 use Mojo::Util qw(extract_usage getopt);
 
 getopt
-  'h|help'     => \my $help,
-  'l|listen=s' => \my @listen,
-  'm|mode=s'   => \$ENV{MOJO_MODE},
-  'v|verbose'  => \$ENV{MORBO_VERBOSE},
-  'w|watch=s'  => \my @watch;
+  'b|backend=s' => \$ENV{MOJO_MORBO_BACKEND},
+  'h|help'      => \my $help,
+  'l|listen=s'  => \my @listen,
+  'm|mode=s'    => \$ENV{MOJO_MODE},
+  'v|verbose'   => \$ENV{MORBO_VERBOSE},
+  'w|watch=s'   => \my @watch;
 
 die extract_usage if $help || !(my $app = shift);
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->daemon->listen(\@listen) if @listen;
-$morbo->watch(\@watch) if @watch;
+$morbo->backend->watch(\@watch)  if @watch;
 $morbo->run($app);
 
 =encoding utf8
@@ -34,6 +35,9 @@ morbo - Morbo HTTP and WebSocket development server
     morbo -w /usr/local/lib -w public -w myapp.conf ./myapp.pl
 
   Options:
+    -b, --backend <name>           Morbo backend to use for the reloader
+                                   defaults to 'Poll'
+                                   (Mojo::Server::Morbo::Backend::Poll)
     -h, --help                     Show this message
     -l, --listen <location>        One or more locations you want to listen on,
                                    defaults to the value of MOJO_LISTEN or

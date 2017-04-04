@@ -79,10 +79,6 @@ $date = Mojo::Date->new(1305280824);
 is $date->to_string, 'Fri, 13 May 2011 10:00:24 GMT', 'right format';
 $date = Mojo::Date->new('1305280824.23');
 is $date->to_string, 'Fri, 13 May 2011 10:00:24 GMT', 'right format';
-$date = Mojo::Date->new(-127180500);
-is $date->to_string, 'Tue, 21 Dec 1965 00:05:00 GMT', 'right format';
-$date = Mojo::Date->new('-127180500.23');
-is $date->to_string, 'Tue, 21 Dec 1965 00:04:59 GMT', 'right format';
 
 # Current time roundtrips
 my $before = time;

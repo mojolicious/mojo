@@ -22,7 +22,7 @@ sub parse {
   my ($self, $date) = @_;
 
   # epoch (784111777)
-  return $self->epoch($date) if $date =~ /^-?\d+$|^-?\d+\.\d+$/;
+  return $self->epoch($date) if $date =~ /^\d+$|^\d+\.\d+$/;
 
   # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
   # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)

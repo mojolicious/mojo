@@ -54,10 +54,20 @@ sub parse {
 sub to_datetime {
 
   # RFC 3339 (1994-11-06T08:49:37Z)
-  my ($s, $m, $h, $day, $month, $year) = gmtime(my $epoch = shift->epoch);
+  my ($s, $m, $h, $day, $month, $year) = _gmftime(shift->epoch);
   my $str = sprintf '%04d-%02d-%02dT%02d:%02d:%02d', $year + 1900, $month + 1,
     $day, $h, $m, $s;
-  return $str . ($epoch =~ /(\.\d+)$/ ? $1 : '') . 'Z';
+  return $str . ($s =~ /(\.\d+)$/ ? $1 : '') . 'Z';
+}
+
+# gmtime with (possibly) fractional seconds
+sub _gmftime {
+  return gmtime $_[0] unless $_[0] =~ /^((-?)\d+)(\.\d+)$/;
+
+  # decompose $epoch into $t + $f, where 0 ≤ $f < 1
+  my ($t, $f) = $2 ? ($1 - 1, $_[0] - $1 + 1) : ($1, $3);
+  my @t = gmtime $t;
+  return shift(@t) + $f, @t;
 }
 
 sub to_string {

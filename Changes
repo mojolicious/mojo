@@ -1,5 +1,12 @@
 
-7.30  2017-03-15
+7.30  2017-04-04
+  - Deprecated Mojo::Server::Morbo::watch in favor of
+    Mojo::Server::Morbo::Backend::Poll::watch. (marcus)
+  - Added support for pluggable Morbo backends. (marcus)
+  - Added Mojo::Server::Morbo::Backend and Mojo::Server::Morbo::Backend::Poll
+    modules. (marcus)
+  - Added backend attribute to Mojo::Server::Morbo. (marcus)
+  - Added -b option to Morbo. (marcus)
 
 7.29  2017-03-12
   - Added support for overriding configuration files in applications tested with

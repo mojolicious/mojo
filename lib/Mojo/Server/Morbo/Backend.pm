@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp 'croak';
 
 has watch => sub { [qw(lib templates)] };
-has watch_timeout => sub { $ENV{MORBO_BACKEND_TIMEOUT} || 1 };
+has watch_timeout => sub { $ENV{MOJO_MORBO_TIMEOUT} || 1 };
 
 sub modified_files {
   croak 'Method "modified_files" not implemented by subclass';
@@ -27,9 +27,8 @@ Mojo::Server::Morbo::Backend - Morbo backend base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Morbo::Backend> is an abstract base class for the morbo
-auto-reloader backend. The default included with Mojo is
-L<Mojo::Server::Morbo::Backend::Poll>.
+L<Mojo::Server::Morbo::Backend> is an abstract base class for Morbo backends,
+like L<Mojo::Server::Morbo::Backend::Poll>.
 
 =head1 ATTRIBUTES
 
@@ -46,11 +45,12 @@ directory.
 
 =head2 watch_timeout
 
-  my $watch_timeout = $backend->watch_timeout;
-  $backend          = $backend->watch_timeout(10);
+  my $timeout = $backend->watch_timeout;
+  $backend    = $backend->watch_timeout(10);
 
-Backends should not block longer than this many seconds to wait for events. Defaults
-to 1 or the MORBO_BACKEND_TIMEOUT environment variable.
+Maximum amount of time in seconds a backend may block when waiting for files to
+change, defaults to the value of the C<MOJO_MORBO_TIMEOUT> environment variable
+or C<1>.
 
 =head1 METHODS
 
@@ -62,13 +62,11 @@ implements the following new ones.
   my $files = $backend->modified_files;
 
 Check if files from L</"watch"> have been modified since the last check and
-return an array reference with the results.
+return an array reference with the results. Meant to be overloaded in a
+subclass.
 
   # All files that have been modified
   say for @{$backend->modified_files};
-
-Meant to be implemented in a subclass. Make sure your implementation uses
-the L</"watch_timeout"> attribute to return for signal handling.
 
 =head1 SEE ALSO
 

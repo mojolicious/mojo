@@ -29,27 +29,41 @@ sub _list { path(shift)->list_tree->map('to_string')->each }
 
 =head1 NAME
 
-Mojo::Server::Morbo::Backend::Poll - Morbo default backend class
+Mojo::Server::Morbo::Backend::Poll - Morbo default backend
 
 =head1 SYNOPSIS
 
+  use Mojo::Server::Morbo::Backend::Poll;
+
   my $backend = Mojo::Server::Morbo::Backend::Poll->new;
-  if ($backend->modified_files) {...}
+  if (my $files = $backend->modified_files) {
+    ...
+  }
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Morbo::Backend:Poll> is the default reloader backend for
+L<Mojo::Server::Morbo::Backend:Poll> is the default backend for
 L<Mojo::Server::Morbo>.
+
+=head1 ATTRIBUTES
+
+L<Mojo::Server::Morbo::Backend::Poll> inherits all attributes from
+L<Mojo::Server::Morbo::Backend>.
 
 =head1 METHODS
 
 L<Mojo::Server::Morbo::Backend::Poll> inherits all methods from
-L<Mojo::Server::Morbo::Backend>.
+L<Mojo::Server::Morbo::Backend> and implements the following new ones.
 
 =head2 modified_files
 
-Checks the mtime timestamp for all the watched files and returns
-an array reference with any modified files.
+  my $files = $backend->modified_files;
+
+Check file size and mtime to determine which files have changed, this is not
+particularly efficient, but very portable.
+
+  # All files that have been modified
+  say for @{$backend->modified_files};
 
 =head1 SEE ALSO
 

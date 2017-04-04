@@ -140,6 +140,16 @@ SKIP: {
 kill 'INT', $pid;
 sleep 1 while _port($port);
 
+# Custom backend
+{
+  local $ENV{MOJO_MORBO_BACKEND} = 'TestBackend';
+  my $test_morbo = Mojo::Server::Morbo->new;
+  isa_ok $test_morbo->backend, 'Mojo::Server::Morbo::Backend::TestBackend',
+    'right backend';
+  is_deeply $test_morbo->backend->modified_files, ['always_changed'],
+    'always changes';
+}
+
 # SO_REUSEPORT
 SKIP: {
   skip 'SO_REUSEPORT support required!', 2 unless eval { _reuse_port() };
@@ -170,19 +180,6 @@ sub _reuse_port {
     LocalPort => Mojo::IOLoop::Server->generate_port,
     ReusePort => 1
   );
-}
-
-
-{
-  local $ENV{MOJO_MORBO_BACKEND} = 'TestBackend';
-  my $test_morbo = Mojo::Server::Morbo->new;
-  isa_ok(
-    $test_morbo->backend,
-    'Mojo::Server::Morbo::Backend::TestBackend',
-    'right backend'
-  );
-  is_deeply($test_morbo->backend->modified_files,
-    ['always_changed'], 'Correct response');
 }
 
 done_testing();

@@ -35,9 +35,8 @@ morbo - Morbo HTTP and WebSocket development server
     morbo -w /usr/local/lib -w public -w myapp.conf ./myapp.pl
 
   Options:
-    -b, --backend <name>           Morbo backend to use for the reloader
-                                   defaults to 'Poll'
-                                   (Mojo::Server::Morbo::Backend::Poll)
+    -b, --backend <name>           Morbo backend to use for reloading, defaults
+                                   to "Poll"
     -h, --help                     Show this message
     -l, --listen <location>        One or more locations you want to listen on,
                                    defaults to the value of MOJO_LISTEN or

@@ -347,6 +347,14 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::Server::Morbo>
 
+=item * L<Mojo::Server::Morbo::Backend>
+
+=over 2
+
+=item * L<Mojo::Server::Morbo::Backend::Poll>
+
+=back
+
 =item * L<Mojo::Template>
 
 =item * L<Mojo::URL>

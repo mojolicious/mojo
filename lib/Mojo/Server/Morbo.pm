@@ -10,12 +10,11 @@ use Mojo::Util 'deprecated';
 use POSIX 'WNOHANG';
 
 has backend => sub {
-  my $backend
-    = 'Mojo::Server::Morbo::Backend::' . ($ENV{MOJO_MORBO_BACKEND} || 'Poll');
-  return $backend->new unless my $e = load_class($backend);
-  die ref $e
-    ? $e
-    : qq{Can't find Morbo backend class "$backend" in \@INC. (@INC)\n};
+  my $backend = $ENV{MOJO_MORBO_BACKEND} || 'Poll';
+  $backend = "Mojo::Server::Morbo::Backend::$backend";
+  return $backend->new unless my $e = load_class $backend;
+  die $e if ref $e;
+  die qq{Can't find Morbo backend class "$backend" in \@INC. (@INC)\n};
 };
 has daemon => sub { Mojo::Server::Daemon->new };
 
@@ -39,7 +38,8 @@ sub run {
 
 # DEPRECATED!
 sub watch {
-  deprecated 'watch is deprecated in favor of backend->watch';
+  deprecated 'Mojo::Server::Morbo::watch is DEPRECATED'
+    . ' in favor of Mojo::Server::Morbo::Backend::Poll::watch';
   shift->backend->watch(@_);
 }
 
@@ -132,10 +132,9 @@ L<Mojo::Server::Morbo> implements the following attributes.
 =head2 backend
 
   my $backend = $morbo->backend;
-  $backend    = $morbo->backend(Mojo::Server::Morbo::Backend::Poll->new);
+  $morbo      = $morbo->backend(Mojo::Server::Morbo::Backend::Poll->new);
 
-L<Mojo::Server::Morbo::Backend> object responsible for watching the source for
-changes.
+Backend, usually a L<Mojo::Server::Morbo::Backend::Poll> object.
 
 =head2 daemon
 

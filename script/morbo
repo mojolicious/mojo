@@ -9,12 +9,14 @@ getopt
   'l|listen=s' => \my @listen,
   'm|mode=s'   => \$ENV{MOJO_MODE},
   'v|verbose'  => \$ENV{MORBO_VERBOSE},
+  's|sleep=i'  => \my $sleep,
   'w|watch=s'  => \my @watch;
 
 die extract_usage if $help || !(my $app = shift);
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->daemon->listen(\@listen) if @listen;
 $morbo->watch(\@watch) if @watch;
+$morbo->sleep($sleep) if $sleep;
 $morbo->run($app);
 
 =encoding utf8
@@ -31,7 +33,7 @@ morbo - Morbo HTTP and WebSocket development server
     morbo ./myapp.pl
     morbo -m production -l https://*:443 -l http://[::]:3000 ./myapp.pl
     morbo -l 'https://*:443?cert=./server.crt&key=./server.key' ./myapp.pl
-    morbo -w /usr/local/lib -w public -w myapp.conf ./myapp.pl
+    morbo -w /usr/local/lib -w public -w myapp.conf -s 5 ./myapp.pl
 
   Options:
     -h, --help                     Show this message
@@ -43,6 +45,8 @@ morbo - Morbo HTTP and WebSocket development server
                                    MOJO_MODE/PLACK_ENV or "development"
     -v, --verbose                  Print details about what files changed to
                                    STDOUT
+    -s, --sleep <seconds>          Try not to spend more time than this without
+                                   looking for file changes
     -w, --watch <directory/file>   One or more directories and files to watch
                                    for changes, defaults to the application
                                    script as well as the "lib" and "templates"

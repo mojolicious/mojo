@@ -169,7 +169,8 @@ is_deeply path($lib)->list({hidden => 1})->map('to_string')->to_array, \@files,
 @files = map { path($lib)->child(split '/') } (
   'BaseTest',           'DeprecationTest.pm',
   'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest',         'TestConnectProxy.pm'
+  'LoaderTest',         'Server',
+  'TestConnectProxy.pm'
 );
 is_deeply path($lib)->list({dir => 1})->map('to_string')->to_array, \@files,
   'right files';
@@ -185,7 +186,8 @@ is_deeply path(__FILE__)->list_tree->to_array,         [], 'no files';
   'BaseTest/Base3.pm',  'DeprecationTest.pm',
   'LoaderException.pm', 'LoaderException2.pm',
   'LoaderTest/A.pm',    'LoaderTest/B.pm',
-  'LoaderTest/C.pm',    'TestConnectProxy.pm'
+  'LoaderTest/C.pm',    'Server/Morbo/Backend/TestBackend.pm',
+  'TestConnectProxy.pm'
 );
 is_deeply path($lib)->list_tree->map('to_string')->to_array, \@files,
   'right files';
@@ -194,13 +196,15 @@ is_deeply path($lib)->list_tree->map('to_string')->to_array, \@files,
 is_deeply path($lib)->list_tree({hidden => 1})->map('to_string')->to_array,
   [@hidden, @files], 'right files';
 my @all = map { path($lib)->child(split '/') } (
-  '.hidden.txt',        '.test',
-  '.test/hidden.txt',   'BaseTest',
-  'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
-  'BaseTest/Base3.pm',  'DeprecationTest.pm',
-  'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest',         'LoaderTest/A.pm',
-  'LoaderTest/B.pm',    'LoaderTest/C.pm',
+  '.hidden.txt',          '.test',
+  '.test/hidden.txt',     'BaseTest',
+  'BaseTest/Base1.pm',    'BaseTest/Base2.pm',
+  'BaseTest/Base3.pm',    'DeprecationTest.pm',
+  'LoaderException.pm',   'LoaderException2.pm',
+  'LoaderTest',           'LoaderTest/A.pm',
+  'LoaderTest/B.pm',      'LoaderTest/C.pm',
+  'Server',               'Server/Morbo',
+  'Server/Morbo/Backend', 'Server/Morbo/Backend/TestBackend.pm',
   'TestConnectProxy.pm'
 );
 is_deeply path($lib)->list_tree({dir => 1, hidden => 1})->map('to_string')

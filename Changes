@@ -1,4 +1,6 @@
 
+7.31  2017-04-06
+
 7.30  2017-04-04
   - Deprecated Mojo::Server::Morbo::watch in favor of
     Mojo::Server::Morbo::Backend::Poll::watch. (marcus)

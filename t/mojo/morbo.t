@@ -13,6 +13,7 @@ use lib "$FindBin::Bin/lib";
 use IO::Socket::INET;
 use Mojo::File 'tempdir';
 use Mojo::IOLoop::Server;
+use Mojo::Server::Morbo::Backend;
 use Mojo::Server::Daemon;
 use Mojo::Server::Morbo;
 use Mojo::UserAgent;
@@ -143,11 +144,13 @@ sleep 1 while _port($port);
 # Custom backend
 {
   local $ENV{MOJO_MORBO_BACKEND} = 'TestBackend';
+  local $ENV{MOJO_MORBO_TIMEOUT} = 2;
   my $test_morbo = Mojo::Server::Morbo->new;
   isa_ok $test_morbo->backend, 'Mojo::Server::Morbo::Backend::TestBackend',
     'right backend';
   is_deeply $test_morbo->backend->modified_files, ['always_changed'],
     'always changes';
+  is $test_morbo->backend->watch_timeout, 2, 'right timeout';
 }
 
 # SO_REUSEPORT
@@ -171,6 +174,10 @@ SKIP: {
     ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
     'SO_REUSEPORT socket option';
 }
+
+# Abstract methods
+eval { Mojo::Server::Morbo::Backend->modified_files };
+like $@, qr/Method "modified_files" not implemented by subclass/, 'right error';
 
 sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
 

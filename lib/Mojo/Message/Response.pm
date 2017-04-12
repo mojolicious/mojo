@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Response;
 use Mojo::Date;
-use Mojo::Util 'deprecated';
 
 has [qw(code message)];
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} // 2147483648 };
@@ -133,13 +132,6 @@ sub is_error { shift->_status_class(400, 500) }
 sub is_info { shift->_status_class(100) }
 sub is_redirect     { shift->_status_class(300) }
 sub is_server_error { shift->_status_class(500) }
-
-# DEPRECATED!
-sub is_status_class {
-  deprecated 'Mojo::Message::Response::is_status_class is DEPRECATED'
-    . ' in favor of new is_* methods';
-  shift->_status_class(@_);
-}
 
 sub is_success { shift->_status_class(200) }
 

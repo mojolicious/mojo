@@ -6,7 +6,6 @@ use Mojo::File 'path';
 use Mojo::Loader 'data_section';
 use Mojo::Server;
 use Mojo::Template;
-use Mojo::Util 'deprecated';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
 has description => 'No description';
@@ -33,13 +32,6 @@ sub create_rel_dir { $_[0]->create_dir($_[0]->rel_file($_[1])) }
 sub extract_usage { Mojo::Util::extract_usage((caller)[1]) }
 
 sub help { print shift->usage }
-
-# DEPRECATED!
-sub rel_dir {
-  deprecated 'Mojolicious::Command::rel_dir is DEPRECATED'
-    . ' in favor of Mojolicious::Command::rel_file';
-  path->child(split('/', pop))->to_string;
-}
 
 sub rel_file { path->child(split('/', pop)) }
 

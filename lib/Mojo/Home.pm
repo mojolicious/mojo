@@ -1,7 +1,7 @@
 package Mojo::Home;
 use Mojo::Base 'Mojo::File';
 
-use Mojo::Util qw(class_to_path deprecated);
+use Mojo::Util 'class_to_path';
 
 sub detect {
   my ($self, $class) = @_;
@@ -22,47 +22,7 @@ sub detect {
   return $self;
 }
 
-# DEPRECATED!
-sub lib_dir {
-  deprecated 'Mojo::Home::lib_dir is DEPRECATED';
-  shift->child('lib')->to_string;
-}
-
-# DEPRECATED!
-sub list_files {
-  deprecated
-    'Mojo::Home::list_files is DEPRECATED in favor of Mojo::Files::list_tree';
-  my ($self, $dir, $options) = (shift, shift // '', shift);
-  my $base = $self->child(split('/', $dir));
-  $base->list_tree($options)->map(sub { join '/', @{$_->to_rel($base)} })
-    ->to_array;
-}
-
 sub mojo_lib_dir { shift->new(__FILE__)->sibling('..') }
-
-# DEPRECATED!
-sub parse {
-  deprecated 'Mojo::Home::parse is DEPRECATED';
-  my $self = shift;
-  $$self = shift;
-  return $self;
-}
-
-# DEPRECATED!
-sub parts {
-  deprecated 'Mojo::Home::parts is DEPRECATED';
-  my $self = shift;
-  return $self->to_array unless @_;
-  $$self = Mojo::File->new(@{shift()})->to_string;
-  return $self;
-}
-
-# DEPRECATED!
-sub rel_dir {
-  deprecated
-    'Mojo::Home::rel_dir is DEPRECATED in favor of Mojo::Home::rel_file';
-  Mojo::File->new(@{shift->parts}, split('/', shift))->to_string;
-}
 
 sub rel_file { shift->child(split('/', shift)) }
 

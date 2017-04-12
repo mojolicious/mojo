@@ -1,5 +1,12 @@
 
-7.31  2017-04-06
+7.31  2017-04-12
+  - Removed deprecated filed, slurp and spurt functions from Mojo::Util.
+  - Removed deprecated parts attribute from Mojo::Home.
+  - Removed deprecated slurp and spurt methods from Mojo::ByteStream.
+  - Removed deprecated lib_dir, list_files, parse and rel_dir methods
+    from Mojo::Home.
+  - Removed deprecated rel_dir method from Mojolicious::Command.
+  - Removed deprecated is_status_class method from Mojo::Message::Response.
 
 7.30  2017-04-04
   - Deprecated Mojo::Server::Morbo::watch in favor of

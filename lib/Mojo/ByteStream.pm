@@ -47,29 +47,9 @@ sub secure_compare { Mojo::Util::secure_compare ${shift()}, shift }
 
 sub size { length ${$_[0]} }
 
-# DEPRECATED!
-sub slurp {
-  Mojo::Util::deprecated 'Mojo::ByteStream::slurp is DEPRECATED'
-    . ' in favor of Mojo::File::slurp';
-  require Mojo::File;
-  my $self = shift;
-  $$self = Mojo::File->new($$self)->slurp;
-  return $self;
-}
-
 sub split {
   my ($self, $pattern) = @_;
   return Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
-}
-
-# DEPRECATED!
-sub spurt {
-  Mojo::Util::deprecated 'Mojo::ByteStream::spurt is DEPRECATED'
-    . ' in favor of Mojo::File::spurt';
-  require Mojo::File;
-  my $self = shift;
-  Mojo::File->new(shift)->spurt($$self);
-  return $self;
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }

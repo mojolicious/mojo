@@ -66,9 +66,6 @@ our @EXPORT_OK = (
   qw(unindent unquote url_escape url_unescape xml_escape xor_encode)
 );
 
-# DEPRECATED!
-push @EXPORT_OK, qw(files slurp spurt);
-
 # Aliases
 monkey_patch(__PACKAGE__, 'b64_decode',    \&decode_base64);
 monkey_patch(__PACKAGE__, 'b64_encode',    \&encode_base64);
@@ -140,14 +137,6 @@ sub extract_usage {
   $output =~ s/\n$//;
 
   return unindent($output);
-}
-
-# DEPRECATED!
-sub files {
-  deprecated
-    'Mojo::Util::files is DEPRECATED in favor of Mojo::File::list_tree';
-  require Mojo::File;
-  Mojo::File->new(shift)->list_tree(@_)->map('to_string')->each;
 }
 
 sub getopt {
@@ -259,22 +248,8 @@ sub secure_compare {
   return $r == 0;
 }
 
-# DEPRECATED!
-sub slurp {
-  deprecated 'Mojo::Util::slurp is DEPRECATED in favor of Mojo::File::slurp';
-  require Mojo::File;
-  Mojo::File->new(shift)->slurp;
-}
-
 sub split_cookie_header { _header(shift, 1) }
 sub split_header        { _header(shift, 0) }
-
-# DEPRECATED!
-sub spurt {
-  deprecated 'Mojo::Util::spurt is DEPRECATED in favor of Mojo::File::spurt';
-  require Mojo::File;
-  Mojo::File->new($_[1])->spurt($_[0]) and return $_[0];
-}
 
 sub tablify {
   my $rows = shift;

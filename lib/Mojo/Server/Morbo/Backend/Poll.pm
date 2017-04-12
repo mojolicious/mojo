@@ -6,7 +6,6 @@ use Mojo::File 'path';
 sub modified_files {
   my $self = shift;
 
-  sleep $self->watch_timeout;
   my $cache = $self->{cache} ||= {};
   my @files;
   for my $file (map { -f $_ && -r _ ? $_ : _list($_) } @{$self->watch}) {
@@ -17,6 +16,7 @@ sub modified_files {
     @$stats = ($mtime, $size);
     push @files, $file;
   }
+  sleep $self->watch_timeout unless @files;
 
   return \@files;
 }

@@ -937,6 +937,13 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
   my $upload = {foo => {content => 'bar', filename => 'baz.txt'}};
   $t->post_ok('/upload' => form => $upload)->status_is(200);
 
+  # Test file upload with predefined filename and content type header
+  $t->post_ok('/upload' => form => {foo => {
+      content => 'bar',
+      filename => "foo.txt",
+      'Content-Type' => 'text/plain'}})
+    ->status_is(200);
+
   # Test JSON API
   $t->post_ok('/hello.json' => json => {hello => 'world'})
     ->status_is(200)

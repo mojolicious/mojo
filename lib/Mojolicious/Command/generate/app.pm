@@ -127,6 +127,10 @@ use Mojolicious::Commands;
 # Start command line interface for application
 Mojolicious::Commands->start_app('<%= $class %>');
 
+# or so even then you define app constructor 
+# use <%= $class %>;
+# <%= $class %>->new(%foo_args)->start(@ARGV);
+
 @@ appclass
 % my $class = shift;
 package <%= $class %>;

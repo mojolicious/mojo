@@ -40,7 +40,7 @@ sub attr {
     if (ref $value) {
       _monkey_patch $class, $attr, sub {
         return
-          exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
+          exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0], $attr))
           if @_ == 1;
         $_[0]{$attr} = $_[1];
         $_[0];

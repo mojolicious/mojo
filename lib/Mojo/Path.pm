@@ -10,6 +10,9 @@ use Mojo::Util qw(decode encode url_escape url_unescape);
 
 has charset => 'UTF-8';
 
+# Allow developers to override which characters AREN'T url_escape()-ed
+our $url_escape_chars = '^A-Za-z0-9\-._~!$&\'*+,;=:@()';
+
 sub canonicalize {
   my $self = shift;
 
@@ -90,14 +93,14 @@ sub to_string {
   my $charset = $self->charset;
   if (defined(my $path = $self->{path})) {
     $path = encode $charset, $path if $charset;
-    return url_escape $path, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/';
+    return url_escape $path, $url_escape_chars . '%/';
   }
 
   # Build path
   my @parts = @{$self->parts};
   @parts = map { encode $charset, $_ } @parts if $charset;
   my $path = join '/',
-    map { url_escape $_, '^A-Za-z0-9\-._~!$&\'()*+,;=:@' } @parts;
+    map { url_escape $_, $url_escape_chars } @parts;
   $path = "/$path" if $self->leading_slash;
   $path = "$path/" if $self->trailing_slash;
   return $path;

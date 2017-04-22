@@ -1,7 +1,7 @@
 package Mojolicious::Command::generate::app;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Util qw(class_to_file class_to_path);
+use Mojo::Util qw(class_to_file class_to_path decamelize);
 
 has description => 'Generate Mojolicious application directory structure';
 has usage => sub { shift->extract_usage };
@@ -25,8 +25,8 @@ EOF
   my $app = class_to_path $class;
   $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
-  # Config file
-  $self->render_to_rel_file('config', "$name/$name.conf");
+  # Config file (using the default moniker)
+  $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.conf");
 
   # Controller
   my $controller = "${class}::Controller::Example";

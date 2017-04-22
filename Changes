@@ -7,6 +7,8 @@
     Mojo::Home.
   - Removed deprecated rel_dir method from Mojolicious::Command.
   - Removed deprecated is_status_class method from Mojo::Message::Response.
+  - Fixed a bug in the app generator command where the config file name was not
+    based on the application moniker.
 
 7.30  2017-04-04
   - Deprecated Mojo::Server::Morbo::watch in favor of

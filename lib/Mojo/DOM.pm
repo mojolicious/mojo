@@ -430,15 +430,15 @@ mode and everything becomes case-sensitive.
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
   say $dom->at('P[ID]')->text;
 
-XML detection can also be disabled with the L</"xml"> method.
-
-  # Force XML semantics
-  my $dom = Mojo::DOM->new->xml(1)->parse('<P ID="greeting">Hi!</P>');
-  say $dom->at('P[ID]')->text;
+HTML or XML semantics can also be forced with the L</"xml"> method.
 
   # Force HTML semantics
   my $dom = Mojo::DOM->new->xml(0)->parse('<P ID="greeting">Hi!</P>');
   say $dom->at('p[id]')->text;
+
+  # Force XML semantics
+  my $dom = Mojo::DOM->new->xml(1)->parse('<P ID="greeting">Hi!</P>');
+  say $dom->at('P[ID]')->text;
 
 =head1 METHODS
 

@@ -1,6 +1,8 @@
 .*
 *~
 !.gitignore
+!.appveyor.cmd
+!.appveyor.yml
 !.perltidyrc
 !.travis.yml
 /blib

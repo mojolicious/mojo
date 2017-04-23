@@ -78,8 +78,8 @@ sub _input {
     # Checkbox or radiobutton
     my $type = $attrs{type} || '';
     if ($type eq 'checkbox' || $type eq 'radio') {
-      delete $attrs{checked} if @values;
       my $value = $attrs{value} // 'on';
+      delete $attrs{checked};
       $attrs{checked} = undef if grep { $_ eq $value } @values;
     }
 

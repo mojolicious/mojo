@@ -26,6 +26,7 @@ sub register {
   $app->helper(csrf_button_to => sub { _button_to(1, @_) });
   $app->helper(file_field => sub { _empty_field('file', @_) });
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
+  $app->helper(meta_tag       => sub { _meta(@_) });
   $app->helper(input_tag      => sub { _input(@_) });
   $app->helper(password_field => sub { _empty_field('password', @_) });
   $app->helper(radio_button   => sub { _input(@_, type => 'radio') });
@@ -62,6 +63,25 @@ sub _form_for {
   my $url = $c->url_for(@url);
   $url->query({_method => $method}) if @post && $method ne 'POST';
   return _tag('form', action => $url, @post, @_);
+}
+
+sub _meta {
+  my ($c, $name, $value) = (shift, shift, shift);
+
+  return _tag('meta', $name => $value, @_)
+    if $name eq 'charset';
+
+  my @pragma = (
+    qw(content-language	content-type default-style refresh set-cookie),
+    qw(PICS-Label x-dns-prefetch-control) # extentions and proposeda from
+  );
+  # https://wiki.whatwg.org/wiki/PragmaExtensions
+  return _tag('meta', 'http-equiv' => $name, content => $value, @_)
+    if grep { /$_/i =~ $name } @pragma;
+
+  # Long list of metadata names at:
+  #   https://wiki.whatwg.org/wiki/MetaExtensions
+  return _tag('meta', name => $name, content => $value, @_);
 }
 
 sub _hidden_field {
@@ -437,6 +457,23 @@ Generate portable C<img> tag.
   <img src="/path/to/images/foo.png">
   <img alt="Foo" src="/path/to/images/foo.png">
 
+=head2 meta_tag
+
+  %= meta_tag charset => 'UTF-8'
+  %= meta_tag 'Content-Type' => 'text/html; charset=iso-8859-1'
+  %= meta_tag refresh => 2
+  %= meta_tag 'application-name' => 'Lovely Blog'
+  %= meta_tag author => 'John Doe'
+
+Generate C<meta> tag. A list of Pragma Directives is used to create
+http-equiv(s) all others except charset are treated as metadata names.
+
+  <meta charset="UTF-8">
+  <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+  <meta content="2" http-equiv="refresh">
+  <meta content="Lovely Blog" name="application-name">
+  <meta content="John Doe" name="author">
+
 =head2 input_tag
 
   %= input_tag 'first_name'
@@ -690,8 +727,6 @@ key/value pairs to generate attributes from.
 
 Very useful for reuse in more specific tag helpers.
 
-  my $output = $c->tag('meta');
-  my $output = $c->tag('meta', charset => 'UTF-8');
   my $output = $c->tag(div => '<p>This will be escaped</p>');
   my $output = $c->tag(div => sub { '<p>This will not be escaped</p>' });
 

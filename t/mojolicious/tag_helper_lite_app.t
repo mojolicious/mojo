@@ -28,6 +28,8 @@ post '/text';
 
 get '/multibox';
 
+get '/multibutton';
+
 get 'form/:test' => 'form';
 
 put 'selection';
@@ -280,6 +282,86 @@ $t->get_ok('/multibox?foo=two&foo=one&foo=on')->status_is(200)
   <input checked name="foo" type="checkbox" value="one">
   <input checked name="foo" type="checkbox" value="two">
   <input name="foo" type="checkbox" value="three">
+  <input type="submit" value="Ok">
+</form>
+EOF
+
+# Checkboxes with second multiple values
+$t->get_ok('/multibox?foo=two&foo=one')->status_is(200)
+  ->content_is(<<EOF);
+<form action="/multibox">
+  <input name="foo" type="checkbox">
+  <input checked name="foo" type="checkbox" value="one">
+  <input checked name="foo" type="checkbox" value="two">
+  <input name="foo" type="checkbox" value="three">
+  <input type="submit" value="Ok">
+</form>
+EOF
+
+# Radiobuttons
+$t->get_ok('/multibutton')->status_is(200)->content_is(<<EOF);
+<form action="/multibutton">
+  <input name="foo" type="radio">
+  <input name="foo" type="radio" value="one">
+  <input name="foo" type="radio" value="two">
+  <input checked name="foo" type="radio" value="three">
+  <input type="submit" value="Ok">
+</form>
+EOF
+
+# Radiobuttons with one value
+$t->get_ok('/multibutton?foo=two')->status_is(200)->content_is(<<EOF);
+<form action="/multibutton">
+  <input name="foo" type="radio">
+  <input name="foo" type="radio" value="one">
+  <input checked name="foo" type="radio" value="two">
+  <input name="foo" type="radio" value="three">
+  <input type="submit" value="Ok">
+</form>
+EOF
+
+# Radiobuttons with one right and one wrong value
+$t->get_ok('/multibutton?foo=one&foo=four')->status_is(200)->content_is(<<EOF);
+<form action="/multibutton">
+  <input name="foo" type="radio">
+  <input checked name="foo" type="radio" value="one">
+  <input name="foo" type="radio" value="two">
+  <input name="foo" type="radio" value="three">
+  <input type="submit" value="Ok">
+</form>
+EOF
+
+# Radiobuttons with wrong value
+$t->get_ok('/multibutton?foo=bar')->status_is(200)->content_is(<<EOF);
+<form action="/multibutton">
+  <input name="foo" type="radio">
+  <input name="foo" type="radio" value="one">
+  <input name="foo" type="radio" value="two">
+  <input name="foo" type="radio" value="three">
+  <input type="submit" value="Ok">
+</form>
+EOF
+
+# Radiobuttons with multiple values
+$t->get_ok('/multibutton?foo=two&foo=one&foo=on')->status_is(200)
+  ->content_is(<<EOF);
+<form action="/multibutton">
+  <input checked name="foo" type="radio">
+  <input name="foo" type="radio" value="one">
+  <input name="foo" type="radio" value="two">
+  <input name="foo" type="radio" value="three">
+  <input type="submit" value="Ok">
+</form>
+EOF
+
+# Radiobuttons with second multiple values
+$t->get_ok('/multibutton?foo=two&foo=one')->status_is(200)
+  ->content_is(<<EOF);
+<form action="/multibutton">
+  <input name="foo" type="radio">
+  <input checked name="foo" type="radio" value="one">
+  <input name="foo" type="radio" value="two">
+  <input name="foo" type="radio" value="three">
   <input type="submit" value="Ok">
 </form>
 EOF
@@ -628,6 +710,15 @@ __DATA__
   %= check_box foo => 'one'
   %= check_box foo => 'two'
   %= check_box foo => 'three', checked => undef
+  %= submit_button
+%= end
+
+@@ multibutton.html.ep
+%= form_for multibutton => begin
+  %= radio_button 'foo'
+  %= radio_button foo => 'one'
+  %= radio_button foo => 'two'
+  %= radio_button foo => 'three', checked => undef
   %= submit_button
 %= end
 

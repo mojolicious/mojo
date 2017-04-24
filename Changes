@@ -1,4 +1,6 @@
 
+7.32  2017-04-24
+
 7.31  2017-04-23
   - Removed deprecated files, slurp and spurt functions from Mojo::Util.
   - Removed deprecated parts attribute from Mojo::Home.

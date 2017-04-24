@@ -229,7 +229,7 @@ sub _render {
 
   # No children
   return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
-    unless $tree->[4];
+    if !$tree->[4] || $tree->[4]->[0] eq 'text' && !defined $tree->[4]->[1];
 
   # Children
   no warnings 'recursion';

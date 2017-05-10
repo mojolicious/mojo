@@ -96,6 +96,19 @@ is $collection->map('reverse')->map(join => "\n")->join("\n"),
 is $collection->map(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
   'right result';
 
+# push
+$collection = c(1, 2, 3);
+is_deeply $collection->push(4, 5, 6), [1, 2, 3, 4, 5, 6], 'right result';
+$collection = c(1);
+is_deeply $collection->push([2])->flatten->to_array, [1, 2], 'right result';
+is_deeply $collection->push(3)->push(4), [1, [2], 3, 4], 'right result';
+$collection = c();
+is_deeply $collection->push(1)->push(2), [1, 2], 'right result';
+my $c2 = c(3, 4);
+my $c3 = c(5, 6);
+is_deeply $collection->push($c2)->push($c3)->flatten, [1, 2, 3, 4, 5, 6],
+  'right result';
+
 # reverse
 $collection = c(3, 2, 1);
 is_deeply $collection->reverse->to_array, [1, 2, 3], 'right order';
@@ -168,5 +181,23 @@ is_deeply $collection->uniq(join => ',')->flatten->to_array, [1, 2, 2, 1],
 
 # TO_JSON
 is encode_json(c(1, 2, 3)), '[1,2,3]', 'right result';
+
+# unshift
+$collection = c(1, 2, 3);
+is_deeply $collection->unshift(4, 5, 6), [4, 5, 6, 1, 2, 3], 'right result';
+$collection = c(1);
+is_deeply $collection->unshift([2])->flatten->to_array, [2, 1], 'right result';
+is_deeply $collection->unshift(3)->unshift(4), [4, 3, [2], 1], 'right result';
+$collection = c();
+is_deeply $collection->unshift(1)->unshift(2), [2, 1], 'right result';
+$c2 = c(3, 4);
+$c3 = c(5, 6);
+is_deeply $collection->unshift($c2)->unshift($c3)->flatten, [5, 6, 3, 4, 2, 1],
+  'right result';
+$collection = c(2, 1);
+is_deeply $collection
+  ->unshift($c2->reverse->to_array)
+  ->unshift($c3->reverse->to_array)->flatten, [6, 5, 4, 3, 2, 1],
+  'right result';
 
 done_testing();

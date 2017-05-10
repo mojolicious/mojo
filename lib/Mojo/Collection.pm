@@ -57,6 +57,12 @@ sub new {
   return bless [@_], ref $class || $class;
 }
 
+sub push {
+  my $self = shift;
+  push @$self, @_;
+  return $self;
+}
+
 sub reduce {
   my $self = shift;
   @_ = (@_, @$self);
@@ -97,6 +103,12 @@ sub uniq {
   my %seen;
   return $self->new(grep { !$seen{$_->$cb(@_)}++ } @$self) if $cb;
   return $self->new(grep { !$seen{$_}++ } @$self);
+}
+
+sub unshift {
+  my $self = shift;
+  unshift @$self, @_;
+  return $self;
 }
 
 sub _flatten {
@@ -279,6 +291,12 @@ passed to the callback, and is also available as C<$_>.
 
 Construct a new array-based L<Mojo::Collection> object.
 
+=head2 push
+
+  my $collection = $collection->push(6, 7, 8);
+
+Add elements to the existing L<Mojo::Collection> object.
+
 =head2 reduce
 
   my $result = $collection->reduce(sub {...});
@@ -366,6 +384,16 @@ callback/method.
 
   # "[[1, 2], [2, 1]]"
   c([1, 2], [2, 1], [3, 2])->uniq(sub{ $_->[1] })->to_array;
+
+=head2 unshift
+
+  my $collection = $collection->unshift(1, 2, 3);
+
+Prepends an array to the collection in the specified order.
+
+  my $coundown = Mojo::Collection->new('BAM!');
+  my $count = Mojo::Collection->new(1, 2, 3);
+  $countdown->unshift( $count->reverse );
 
 =head1 SEE ALSO
 

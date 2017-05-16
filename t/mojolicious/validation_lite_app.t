@@ -219,6 +219,21 @@ ok $validation->required(0)->size(1, 1)->is_valid, 'valid';
 is_deeply $validation->output, {0 => 0}, 'right result';
 is $validation->param(0), 0, 'right value';
 
+# Value type coercion
+$validation = $t->app->validation->input({one => ['1'], love => '♥', two => ['zwei', '二'], foo => ['', 'bar']});
+ok $validation->required(one => 'last')->is_valid, 'valid';
+is $validation->output->{one}, '1', 'right result';
+ok $validation->required(two => ('last', 'list', 'first'))->is_valid, 'valid';
+ok !$validation->optional(foo => 'first')->is_valid, 'not valid';
+is_deeply $validation->output, { one => '1', two => 'zwei' }, 'right result';
+is_deeply $validation->optional(love => 'list')->output->{love}, ['♥'], 'right result';
+
+# Required lists
+$validation = $t->app->validation->input({with_gaps => ['first', '', 'third'], empty => []});
+ok $validation->required(with_gaps => 'list')->is_valid, 'valid';
+ok !$validation->required(empty => 'list')->is_valid, 'not valid';
+is_deeply $validation->output, {with_gaps => ['first', 'third']}, 'right result';
+
 # Custom error
 $validation = $t->app->validation->input({foo => 'bar'});
 ok !$validation->required('foo')->has_error, 'no error';

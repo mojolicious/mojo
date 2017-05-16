@@ -6,6 +6,13 @@ use Scalar::Util ();
 
 has [qw(csrf_token topic validator)];
 has [qw(input output)] => sub { {} };
+has output_formatters => sub {
+  {
+    first => sub { $_[0] },
+    last  => sub { $_[-1] },
+    list  => sub { [grep length, @_] },
+  };
+};
 
 sub AUTOLOAD {
   my $self = shift;
@@ -61,19 +68,37 @@ sub has_data { !!keys %{shift->input} }
 
 sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
 
-sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
+sub is_valid {
+  my ($self, $topic) = ($_[0], $_[1] // $_[0]->topic);
+  return unless exists $self->output->{$topic};
+  my $val = $self->output->{$topic};
+  return ref $val ne 'ARRAY' || exists $val->[0];
+}
 
 sub optional {
   my ($self, $name, @filters) = @_;
 
   return $self->topic($name) unless defined(my $input = $self->input->{$name});
 
+  my ($output_formatters, $output_formatter) = $self->output_formatters;
+  if (my $output_format = (grep { $output_formatters->{$_} } @filters)[-1]) {
+    @filters = grep { not defined $output_formatters->{$_} } @filters;
+    $output_formatter = $output_formatters->{$output_format};
+  }
+
   my @input = ref $input eq 'ARRAY' ? @$input : ($input);
   for my $cb (map { $self->validator->filters->{$_} } @filters) {
     @input = map { $self->$cb($name, $_) } @input;
   }
-  $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0]
-    if @input && !grep { !length } @input;
+
+  if ($output_formatter) {
+    my $output = $output_formatter->(@input);
+    $self->output->{$name} = $output if $output;
+  }
+  else {
+    $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0]
+      if @input && !grep { !length } @input;
+  }
 
   return $self->topic($name);
 }
@@ -85,6 +110,7 @@ sub passed { [sort keys %{shift->output}] }
 sub required {
   my ($self, $name) = (shift, shift);
   return $self if $self->optional($name, @_)->is_valid;
+  delete $self->output->{$name};
   return $self->error($name => ['required']);
 }
 
@@ -137,6 +163,16 @@ Data to be validated.
   $validation = $validation->output({foo => 'bar', baz => [123, 'yada']});
 
 Validated data.
+
+=head2 output_formatters
+
+  my $output_formatters = $validation->output_formatters;
+  $validation = $validation->output_formatters({list => sub { [ grep length, @_ ]}});
+
+Values given as L</input> can be coerced into different output formats. Current output
+formatters are "list", which will result in an arrayref of non blank values regardless of
+input type, and first and last which do nothing if input scalar but return the first and
+last values respectively when the input is an arrayref.
 
 =head2 topic
 
@@ -228,12 +264,16 @@ the current L</"topic">.
 
   $validation = $validation->optional('foo');
   $validation = $validation->optional('foo', 'filter1', 'filter2');
+  $validation = $validation->optional(foo => 'list');
 
 Change validation L</"topic"> and apply filters. All filters from
 L<Mojolicious::Validator/"FILTERS"> are supported.
 
   # Trim value and check size
   $validation->optional('user', 'trim')->size(1, 15);
+
+If the list output formatter is specified, returns a list of zero or more
+non-blank elements.
 
 =head2 param
 
@@ -260,6 +300,7 @@ Return an array reference with all names for values that passed validation.
 
   $validation = $validation->required('foo');
   $validation = $validation->required('foo', 'filter1', 'filter2');
+  $validation = $validation->required(foo => 'list');
 
 Change validation L</"topic">, apply filters, and make sure a value is present
 and not an empty string. All filters from L<Mojolicious::Validator/"FILTERS">
@@ -267,6 +308,10 @@ are supported.
 
   # Trim value and check size
   $validation->required('user', 'trim')->size(1, 15);
+
+If the output formatter "list" is specified, the input is valid if at least one value is
+supplied. If not output formatter is specified, any blank values will result in validation
+failure.
 
 =head1 AUTOLOAD
 

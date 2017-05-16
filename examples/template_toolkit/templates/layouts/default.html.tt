@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TT Example</title>
+  </head>
+  <body>
+    [% content %]
+  </body>
+</html>

@@ -1,0 +1,3 @@
+[% title = c.l('Welcome') %]
+<h2>[% title %]</h2>
+<p>[% c.l('This page was generated from the template "[_1]" and the layout "[_2]".', 'templates/example/welcome.html.ep', 'templates/layouts/default.html.ep') %]</p>

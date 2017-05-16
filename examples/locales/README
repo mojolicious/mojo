@@ -1,0 +1,4 @@
+To generate messages.po, run:
+xgettext.pl -P tt2=tt --output-dir=locales --directory=templates
+
+Start the web server then hit /ms to see Bahasa Malaysia translation.

@@ -50,20 +50,31 @@ sub _asset {
   $c->rendered;
 }
 
-sub _block { ref $_[0] eq 'CODE' ? $_[0]() : $_[0] }
+sub _block { ref $_[0] eq 'CODE' ? $_[0](@_[1..$#_]) : $_[0] }
 
 sub _content {
-  my ($append, $replace, $c, $name, $content) = @_;
+  my ($append, $replace, $c, $name, @args) = @_;
   $name ||= 'content';
+
+  my $content = pop @args
+    if @args && ref $args[-1] eq 'CODE' || @args == 1 && ref $args[-1] eq '';
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {
-    if ($append) { $hash->{$name} .= _block($content) }
-    if ($replace) { $hash->{$name} = _block($content) }
-    else          { $hash->{$name} //= _block($content) }
+    if ($append) { push @{$hash->{$name}}, $content }
+    if ($replace) { $hash->{$name} = [_block($content, @args)] }
+    else          { $hash->{$name} //= [$content] }
   }
 
-  return Mojo::ByteStream->new($hash->{$name} // '');
+  return '' if !defined $hash->{$name} || !defined wantarray;
+
+  my $output;
+  my $t = $hash->{$name};
+  for my $chunk (ref $t eq 'ARRAY' ? @$t : $t) {
+    $output .= _block($chunk, @args);
+  }
+
+  return Mojo::ByteStream->new($output // '');
 }
 
 sub _csrf_token {

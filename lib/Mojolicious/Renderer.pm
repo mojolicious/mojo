@@ -17,8 +17,8 @@ has [qw(handlers helpers)] => sub { {} };
 has paths => sub { [] };
 
 # Bundled templates
-my $TEMPLATES = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
-  ->child('Mojolicious', 'resources', 'templates');
+my $TEMPLATES = Mojo::Home->new->mojo_lib_dir->child('Mojolicious', 'resources',
+  'templates');
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 

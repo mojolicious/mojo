@@ -1,5 +1,7 @@
 
-7.32  2017-05-18
+7.32  2017-05-21
+  - Fixed memory leak in Mojo::IOLoop::Client that sometimes prevented the
+    connect timeout from working correctly for TLS handshakes.
 
 7.31  2017-04-23
   - Removed deprecated files, slurp and spurt functions from Mojo::Util.

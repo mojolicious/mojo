@@ -383,6 +383,8 @@ $buffer = '';
   $version->run;
 }
 like $buffer, qr/Perl/, 'right output';
+like $buffer, qr/Mojolicious/, 'right mojolicious output';
+like $buffer, qr/Minion/, 'right minion output';
 like $buffer, qr/You might want to update your Mojolicious to 1000!/,
   'right output';
 

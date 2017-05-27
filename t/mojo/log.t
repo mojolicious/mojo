@@ -5,6 +5,8 @@ use Mojo::File qw(path tempdir);
 use Mojo::Log;
 use Mojo::Util 'decode';
 
+delete $ENV{MOJO_LOG_LEVEL};
+
 # Logging to file
 my $dir  = tempdir;
 my $path = $dir->child('test.log');

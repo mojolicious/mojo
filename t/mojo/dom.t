@@ -293,7 +293,7 @@ ok !$dom->child_nodes->first->matches('*'), 'no match';
 is_deeply $dom->child_nodes->first->attr, {}, 'no attributes';
 is $dom->child_nodes->first->namespace, undef, 'no namespace';
 is $dom->child_nodes->first->tag,       undef, 'no tag';
-is $dom->child_nodes->first->text,      '',    'no text';
+is $dom->child_nodes->first->text,      'foo',    'text';
 is $dom->child_nodes->first->all_text,  '',    'no text';
 
 # Class and ID
@@ -2531,5 +2531,25 @@ my $huge = ('<a>' x 100) . 'works' . ('</a>' x 100);
 $dom = Mojo::DOM->new($huge);
 is $dom->all_text, 'works', 'right text';
 is "$dom", $huge, 'right result';
+
+# text
+$dom = Mojo::DOM->new(<<EOF);
+<title>&amp;</title>
+<p>&amp;</p>
+<b><!-- &amp; --><b>
+<a><![CDATA[&amp;]]></a>
+EOF
+is $dom->at('title')->child_nodes->[0]->type, 'raw', 'right type';
+is $dom->at('title')->child_nodes->[0]->text, '&', 'right text';
+is $dom->at('title')->text,                   '&', 'right text';
+is $dom->at('p')->child_nodes->[0]->type,     'text', 'right type';
+is $dom->at('p')->child_nodes->[0]->text,     '&', 'right text';
+is $dom->at('p')->text,                       '&', 'right text';
+is $dom->at('a')->child_nodes->[0]->type,     'cdata', 'right type';
+is $dom->at('a')->child_nodes->[0]->text,     '&amp;', 'right text';
+is $dom->at('a')->text,                       '&amp;', 'right text';
+is $dom->at('b')->child_nodes->[0]->type,     'comment', 'right type';
+is $dom->at('b')->child_nodes->[0]->text,     '', 'no text';
+is $dom->at('b')->text,                       '', 'no text';
 
 done_testing();

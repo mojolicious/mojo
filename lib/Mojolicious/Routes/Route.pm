@@ -132,8 +132,13 @@ sub to {
 
   if ($shortcut) {
 
+    # callback
+    if (ref($shortcut) && ref($shortcut) eq 'CODE') {
+      $defaults{cb} = $shortcut;
+    }
+ 
     # Application
-    if (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
+    elsif (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
       $defaults{app} = $shortcut;
     }
 
@@ -590,6 +595,7 @@ preferred.
   $r           = $r->to('MyApp');
   $r           = $r->to('MyApp', foo => 'bar');
   $r           = $r->to('MyApp', {foo => 'bar'});
+  $r           = $r->to(sub {shift->render(text=>'Callback shortcut');});
 
 Set default parameters for this route.
 

@@ -50,7 +50,7 @@ sub load_class {
   return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $class]}\E in \@INC/;
 
   # Real error
-  return Mojo::Exception->new($@)->inspect;
+  return Mojo::Exception->new(my $e = $@)->inspect;
 }
 
 sub _all {

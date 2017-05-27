@@ -46,7 +46,8 @@ sub _step {
   $self->{counter} = 0;
   if (my $cb = shift @{$self->remaining}) {
     eval { $self->$cb(@args); 1 }
-      or (++$self->{fail} and return $self->remaining([])->emit(error => $@));
+      or (++$self->{fail} and return $self->remaining([])
+                                ->emit(error => my $e = $@));
   }
 
   return $self->remaining([])->emit(finish => @args) unless $self->{counter};

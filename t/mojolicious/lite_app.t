@@ -590,7 +590,7 @@ $t->get_ok('/data/exception')->status_is(500)
 # Exception in template
 $t->get_ok('/template/exception')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("Died at template dies_too.html.ep line 2.\n\n");
+  ->content_like(qr{^Died at .*t/mojolicious/templates/dies_too\.html\.ep line 2\.\n\n$});
 
 # Generate URL without format
 $t->get_ok('/with-format')->content_is("/without-format\n");

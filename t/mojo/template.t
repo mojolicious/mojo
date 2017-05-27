@@ -1144,9 +1144,9 @@ is $output->lines_after->[0][0], 3,     'right number';
 is $output->lines_after->[0][1], '123', 'right line';
 like "$output", qr/exception\.mt line 2/, 'right result';
 
-# Exception in file (different name)
+# Exception in file (different path)
 $mt     = Mojo::Template->new;
-$output = $mt->name('"foo.mt" from DATA section')->render_file($file);
+$output = $mt->path('"foo.mt" from DATA section')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/foo\.mt from DATA section line 2/,
   'message contains filename';

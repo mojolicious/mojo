@@ -19,6 +19,7 @@ has escape        => sub { \&Mojo::Util::xml_escape };
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
+has path      => '';
 has namespace => 'Mojo::Template::SandBox';
 has tag_start => '<%';
 has tag_end   => '%>';
@@ -149,6 +150,7 @@ sub process {
     return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
       ->trace->verbose(1)
       unless $compiled = eval $self->_wrap($code, @_);
+    monkey_patch $self->namespace, '_compiled', $compiled;
     $self->compiled($compiled);
   }
 
@@ -168,6 +170,7 @@ sub render { shift->parse(shift)->process(@_) }
 sub render_file {
   my ($self, $path) = (shift, shift);
 
+  $self->path($path) unless defined $self->{path};
   $self->name($path) unless defined $self->{name};
   my $template = path($path)->slurp;
   my $encoding = $self->encoding;
@@ -238,9 +241,10 @@ sub _compile {
 }
 
 sub _line {
-  my $name = shift->name;
-  $name =~ y/"//d;
-  return qq{#line @{[shift]} "$name"};
+  my $self = shift;
+  my $path = $self->path || $self->name;
+  $path =~ y/"//d;
+  return qq{#line @{[shift]} "$path"};
 }
 
 sub _trim {

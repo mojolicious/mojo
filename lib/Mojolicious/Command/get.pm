@@ -36,7 +36,9 @@ sub run {
   my %headers = map { /^\s*([^:]+)\s*:\s*(.*+)$/ ? ($1, $2) : () } @headers;
 
   # Build form
-  my %form = map { $_->[0] => $_->[1] =~ /^\@(.+)$/ ? {file => $1} : $_->[1] }
+  my %form;
+  push @{$form{$_->[0]}}, $_->[1]
+    for map { [$_->[0], $_->[1] =~ /^\@(.+)$/ ? {file => $1} : $_->[1]] }
     map { [split('=', $_, 2)] } @form;
 
   # Detect proxy for absolute URLs

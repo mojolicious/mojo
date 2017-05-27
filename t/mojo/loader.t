@@ -85,8 +85,13 @@ ok !!Mojo::LoaderTest::B->can('new'), 'loaded successfully';
 ok !!Mojo::LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
-is load_class('Mojo::LoaderTest'), 1, 'nothing to load';
-is load_class('Mojo::LoaderTest'), 1, 'nothing to load';
+# Symbol::delete_package is indeed too powerful - https://metacpan.org/pod/Symbol#BUGS
+# Using Mojo::LoaderTest wipes out Mojo::LoaderTest::{A,B,C} too!
+is load_class('Mojo::LoaderTest::Z'), 1, 'nothing to load';
+is load_class('Mojo::LoaderTest::Z'), 1, 'nothing to load';
+
+is load_class('Mojo::LoaderTest::C'), undef, 'loaded';
+ok !!Mojo::LoaderTest::C->can('new'), 'loaded successfully';
 
 # Invalid class
 is load_class('Mojolicious/Lite'),      1,     'nothing to load';
@@ -97,6 +102,11 @@ is load_class('::Mojolicious::Lite'),   1,     'nothing to load';
 is load_class('Mojolicious::Lite::'),   1,     'nothing to load';
 is load_class('::Mojolicious::Lite::'), 1,     'nothing to load';
 is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
+
+# DATA filehandle
+my $section = data_section('Mojo::LoaderTest::C', 'basic.html');
+eval "die 'not yet'";
+unlike $@, qr/<DATA> line/, 'no addendum thanks';
 
 # UNIX DATA templates
 {

@@ -93,7 +93,7 @@ $ua->websocket(
     $kept_alive = $tx->kept_alive;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
-    $tx->send('test1');
+    ($tx->is_websocket) ? $tx->send('test1') : Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
@@ -114,7 +114,7 @@ $ua->websocket(
     my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
-    $tx->send('test1');
+    ($tx->is_websocket) ? $tx->send('test1') : Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
@@ -127,8 +127,8 @@ $ua->websocket(
   "ws://127.0.0.1:0/test" => sub {
     my ($ua, $tx) = @_;
     $success = $tx->success;
-    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
     $err     = $tx->error;
+    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection) if $tx->is_websocket;
     Mojo::IOLoop->stop;
   }
 );

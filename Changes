@@ -1,6 +1,7 @@
 
-7.32  2017-05-27
+7.32  2017-05-28
   - Added -f option to get command.
+  - Improved get command with support for piping data to STDIN.
   - Fixed memory leak in Mojo::IOLoop::Client that sometimes prevented the
     connect timeout from working correctly for TLS handshakes.
 

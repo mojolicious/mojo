@@ -15,11 +15,15 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
+  # Content from STDIN
+  vec(my $readbits, fileno(STDIN), 1) = 1;
+  my $content = select($readbits, undef, undef, 0) ? join '', <STDIN> : undef;
+
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   my %form;
   getopt \@args,
     'C|charset=s' => \my $charset,
-    'c|content=s' => \my $content,
+    'c|content=s' => \$content,
     'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
     'H|header=s'  => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
@@ -141,6 +145,7 @@ Mojolicious::Command::get - Get command
     mojo get -M POST -H 'Content-Type: text/trololo' -c 'trololo' perl.org
     mojo get -f 'q=Mojolicious' -f 'size=5' https://metacpan.org/search
     mojo get -M POST -f 'upload=@some_file.txt' mojolicious.org
+    mojo get -M PUT mojolicious.org < some_file.txt
     mojo get mojolicious.org 'head > title' text
     mojo get mojolicious.org .footer all
     mojo get mojolicious.org a attr href

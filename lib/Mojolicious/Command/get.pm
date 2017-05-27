@@ -155,8 +155,9 @@ Mojolicious::Command::get - Get command
     -C, --charset <charset>              Charset of HTML/XML content, defaults
                                          to auto-detection
     -c, --content <content>              Content to send with request
-    -f, --form <name=value>              Form value or file upload
-    -H, --header <name:value>            Additional HTTP header
+    -f, --form <name=value>              One or more form values and file
+                                         uploads
+    -H, --header <name:value>            One or more additional HTTP headers
     -h, --help                           Show this summary of available options
         --home <path>                    Path to home directory of your
                                          application, defaults to the value of

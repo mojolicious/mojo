@@ -1,5 +1,6 @@
 
-7.32  2017-05-21
+7.32  2017-05-27
+  - Added -f option to get command.
   - Fixed memory leak in Mojo::IOLoop::Client that sometimes prevented the
     connect timeout from working correctly for TLS handshakes.
 

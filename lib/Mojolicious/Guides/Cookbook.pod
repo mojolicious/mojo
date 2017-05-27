@@ -1450,6 +1450,14 @@ The request can be customized as well.
   $ mojo get -M POST -c 'Hello!' http://mojolicious.org
   $ mojo get -H 'X-Bender: Bite my shiny metal ass!' http://google.com
 
+Submit forms as C<application/x-www-form-urlencoded> content.
+
+  $ mojo get -M POST -f 'q=Mojo' -f 'size=5' https://metacpan.org/search
+
+Or upload files as C<multipart/form-data> content.
+
+  $ mojo get -M POST -f 'upload=@some_file.txt' mojolicious.org
+
 You can follow redirects and view the headers for all messages.
 
   $ mojo get -r -v http://google.com 'head > title'

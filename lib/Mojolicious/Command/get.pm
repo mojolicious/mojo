@@ -16,16 +16,18 @@ sub run {
   my ($self, @args) = @_;
 
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+  my @content;
   getopt \@args,
-    'C|charset=s'            => \my $charset,
-    'c|content=s'            => \(my $content = ''),
-    'H|header=s'             => \my @headers,
+    'C|charset=s' => \my $charset,
+    'c|content=s' => sub { @content = ($_[1]) },
+    'f|form=s'    => \my @form,
+    'H|header=s'  => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
-    'M|method=s'             => \(my $method = 'GET'),
-    'o|connect-timeout=i'    => sub { $ua->connect_timeout($_[1]) },
-    'r|redirect'             => \my $redirect,
-    'S|response-size=i'      => sub { $ua->max_response_size($_[1]) },
-    'v|verbose'              => \my $verbose;
+    'M|method=s' => \(my $method = 'GET'),
+    'o|connect-timeout=i' => sub { $ua->connect_timeout($_[1]) },
+    'r|redirect'          => \my $redirect,
+    'S|response-size=i'   => sub { $ua->max_response_size($_[1]) },
+    'v|verbose'           => \my $verbose;
 
   @args = map { decode 'UTF-8', $_ } @args;
   die $self->usage unless my $url = shift @args;
@@ -33,6 +35,11 @@ sub run {
 
   # Parse header pairs
   my %headers = map { /^\s*([^:]+)\s*:\s*(.*+)$/ ? ($1, $2) : () } @headers;
+
+  # Build form
+  @content = (form => {}) if @form;
+  $content[1]{$_->[0]} = $_->[1] =~ /^\@(.+)$/ ? {file => $1} : $_->[1]
+    for map { [split('=', $_, 2)] } @form;
 
   # Detect proxy for absolute URLs
   $url !~ m!^/! ? $ua->proxy->detect : $ua->server->app($self->app);
@@ -62,7 +69,7 @@ sub run {
   # Switch to verbose for HEAD requests
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
-  my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
+  my $tx = $ua->start($ua->build_tx($method, $url, \%headers, @content));
   my $res = $tx->result;
 
   # JSON Pointer
@@ -134,6 +141,8 @@ Mojolicious::Command::get - Get command
     mojo get -v -r -o 25 -i 50 google.com
     mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicious.org
     mojo get -M POST -H 'Content-Type: text/trololo' -c 'trololo' perl.org
+    mojo get -f 'q=Mojolicious' -f 'size=5' https://metacpan.org/search
+    mojo get -M POST -f 'upload=@some_file.txt' mojolicious.org
     mojo get mojolicious.org 'head > title' text
     mojo get mojolicious.org .footer all
     mojo get mojolicious.org a attr href
@@ -146,6 +155,7 @@ Mojolicious::Command::get - Get command
     -C, --charset <charset>              Charset of HTML/XML content, defaults
                                          to auto-detection
     -c, --content <content>              Content to send with request
+    -f, --form <name=value>              Form value or file upload
     -H, --header <name:value>            Additional HTTP header
     -h, --help                           Show this summary of available options
         --home <path>                    Path to home directory of your

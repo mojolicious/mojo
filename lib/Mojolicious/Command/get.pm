@@ -16,18 +16,17 @@ sub run {
   my ($self, @args) = @_;
 
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-  my @content;
   getopt \@args,
-    'C|charset=s' => \my $charset,
-    'c|content=s' => sub { @content = ($_[1]) },
-    'f|form=s'    => \my @form,
-    'H|header=s'  => \my @headers,
+    'C|charset=s'            => \my $charset,
+    'c|content=s'            => \my $content,
+    'f|form=s'               => \my @form,
+    'H|header=s'             => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
-    'M|method=s' => \(my $method = 'GET'),
-    'o|connect-timeout=i' => sub { $ua->connect_timeout($_[1]) },
-    'r|redirect'          => \my $redirect,
-    'S|response-size=i'   => sub { $ua->max_response_size($_[1]) },
-    'v|verbose'           => \my $verbose;
+    'M|method=s'             => \(my $method = 'GET'),
+    'o|connect-timeout=i'    => sub { $ua->connect_timeout($_[1]) },
+    'r|redirect'             => \my $redirect,
+    'S|response-size=i'      => sub { $ua->max_response_size($_[1]) },
+    'v|verbose'              => \my $verbose;
 
   @args = map { decode 'UTF-8', $_ } @args;
   die $self->usage unless my $url = shift @args;
@@ -37,9 +36,8 @@ sub run {
   my %headers = map { /^\s*([^:]+)\s*:\s*(.*+)$/ ? ($1, $2) : () } @headers;
 
   # Build form
-  @content = (form => {}) if @form;
-  $content[1]{$_->[0]} = $_->[1] =~ /^\@(.+)$/ ? {file => $1} : $_->[1]
-    for map { [split('=', $_, 2)] } @form;
+  my %form = map { $_->[0] => $_->[1] =~ /^\@(.+)$/ ? {file => $1} : $_->[1] }
+    map { [split('=', $_, 2)] } @form;
 
   # Detect proxy for absolute URLs
   $url !~ m!^/! ? $ua->proxy->detect : $ua->server->app($self->app);
@@ -69,6 +67,7 @@ sub run {
   # Switch to verbose for HEAD requests
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
+  my @content = %form ? (form => \%form) : defined $content ? ($content) : ();
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, @content));
   my $res = $tx->result;
 

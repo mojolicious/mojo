@@ -16,17 +16,18 @@ sub run {
   my ($self, @args) = @_;
 
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+  my %form;
   getopt \@args,
-    'C|charset=s'            => \my $charset,
-    'c|content=s'            => \my $content,
-    'f|form=s'               => \my @form,
-    'H|header=s'             => \my @headers,
+    'C|charset=s' => \my $charset,
+    'c|content=s' => \my $content,
+    'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
+    'H|header=s'  => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
-    'M|method=s'             => \(my $method = 'GET'),
-    'o|connect-timeout=i'    => sub { $ua->connect_timeout($_[1]) },
-    'r|redirect'             => \my $redirect,
-    'S|response-size=i'      => sub { $ua->max_response_size($_[1]) },
-    'v|verbose'              => \my $verbose;
+    'M|method=s' => \(my $method = 'GET'),
+    'o|connect-timeout=i' => sub { $ua->connect_timeout($_[1]) },
+    'r|redirect'          => \my $redirect,
+    'S|response-size=i'   => sub { $ua->max_response_size($_[1]) },
+    'v|verbose'           => \my $verbose;
 
   @args = map { decode 'UTF-8', $_ } @args;
   die $self->usage unless my $url = shift @args;
@@ -34,12 +35,6 @@ sub run {
 
   # Parse header pairs
   my %headers = map { /^\s*([^:]+)\s*:\s*(.*+)$/ ? ($1, $2) : () } @headers;
-
-  # Build form
-  my %form;
-  push @{$form{$_->[0]}}, $_->[1]
-    for map { [$_->[0], $_->[1] =~ /^\@(.+)$/ ? {file => $1} : $_->[1]] }
-    map { [split('=', $_, 2)] } @form;
 
   # Detect proxy for absolute URLs
   $url !~ m!^/! ? $ua->proxy->detect : $ua->server->app($self->app);
@@ -81,6 +76,8 @@ sub run {
   $charset //= $res->content->charset || $res->default_charset;
   _select($buffer, $selector, $charset, @args);
 }
+
+sub _form { push @{$_[0]{$1}}, $2 ? {file => $3} : $3 }
 
 sub _header { $_[0]->build_start_line, $_[0]->headers->to_string, "\n\n" }
 

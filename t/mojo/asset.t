@@ -46,6 +46,7 @@ is $file->contains('a'), -1, 'does not contain "a"';
 $mem = Mojo::Asset::Memory->new;
 is $mem->size, 0, 'asset is empty';
 is $mem->get_chunk(0), '', 'no content';
+is $mem->get_chunk(1), '', 'no content (offset outside of string)';
 is $mem->slurp, '', 'no content';
 ok !$mem->is_range, 'no range';
 is $mem->contains('a'), -1, 'does not contain "a"';

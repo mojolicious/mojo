@@ -38,7 +38,8 @@ sub get_chunk {
     $max = $end + 1 - $offset if ($offset + $max) > $end;
   }
 
-  return substr shift->{content} // '', $offset, $max;
+  my $len = length($self->{content} //= '');
+  return substr $self->{content}, $offset > $len ? $len : $offset, $max;
 }
 
 sub move_to { path($_[1])->spurt($_[0]{content} // '') and return $_[0] }

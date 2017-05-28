@@ -149,15 +149,17 @@ $buffer = '';
   $get->run('/');
 }
 like $buffer, qr/Your Mojo is working!/, 'right output';
+my $template
+  = '<p><%= param "just" %> <%= $c->req->headers->header("X-Test") %></p>';
 $get->app->plugins->once(
-  before_dispatch => sub { shift->render(text => '<p>works</p>') });
+  before_dispatch => sub { shift->render(inline => $template) });
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $get->run('/html', 'p', 'text');
+  $get->run('-f', 'just=works', '-H', 'X-Test: fine', '/html', 'p', 'text');
 }
-like $buffer, qr/works/, 'right output';
+like $buffer, qr/works fine/, 'right output';
 $get->app->plugins->once(
   before_dispatch => sub { shift->render(json => {works => 'too'}) });
 $buffer = '';
@@ -252,7 +254,7 @@ ok -e $app->rel_file('my_app/script/my_app'), 'script exists';
 ok -e $app->rel_file('my_app/lib/MyApp.pm'),  'application class exists';
 ok -e $app->rel_file('my_app/lib/MyApp/Controller/Example.pm'),
   'controller exists';
-ok -e $app->rel_file('my_app/my_app.conf'),  'config file exists';
+ok -e $app->rel_file('my_app/my_app.conf'),       'config file exists';
 ok -e $app->rel_file('my_app/t/basic.t'),         'test exists';
 ok -e $app->rel_file('my_app/public/index.html'), 'static file exists';
 ok -e $app->rel_file('my_app/templates/layouts/default.html.ep'),

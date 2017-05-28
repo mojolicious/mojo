@@ -16,14 +16,14 @@ sub run {
   my ($self, @args) = @_;
 
   # Content from STDIN
-  vec(my $readbits, fileno(STDIN), 1) = 1;
-  my $content = select($readbits, undef, undef, 0) ? join '', <STDIN> : undef;
+  vec(my $r, fileno(STDIN), 1) = 1;
+  my $body = -p STDIN && select($r, undef, undef, 0) ? join '', <STDIN> : undef;
 
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   my %form;
   getopt \@args,
     'C|charset=s' => \my $charset,
-    'c|content=s' => \$content,
+    'c|content=s' => \$body,
     'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
     'H|header=s'  => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
@@ -68,7 +68,7 @@ sub run {
   # Switch to verbose for HEAD requests
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
-  my @content = %form ? (form => \%form) : defined $content ? ($content) : ();
+  my @content = %form ? (form => \%form) : defined $body ? ($body) : ();
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, @content));
   my $res = $tx->result;
 

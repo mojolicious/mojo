@@ -1447,10 +1447,17 @@ You can also extract all text from nested child elements.
 
 The request can be customized as well.
 
-  $ mojo get -M POST -c 'Hello!' http://mojolicious.org
-  $ mojo get -H 'X-Bender: Bite my shiny metal ass!' http://google.com
+  $ mojo get -M POST -H 'X-Bender: Bite my shiny metal ass!' http://google.com
 
-Pipe data to be sent with the request to C<STDIN>.
+Store response data by redirecting C<STDOUT>.
+
+  $ mojo get mojolicious.org > example.html
+
+Pass request data by redirecting C<STDIN>.
+
+  $ mojo get -M PUT mojolicious.org < example.html
+
+Or use the output of another program.
 
   $ echo 'Hello World' | mojo get -M PUT http://mojolicious.org
 
@@ -1458,9 +1465,9 @@ Submit forms as C<application/x-www-form-urlencoded> content.
 
   $ mojo get -M POST -f 'q=Mojo' -f 'size=5' https://metacpan.org/search
 
-Or upload files as C<multipart/form-data> content.
+And upload files as C<multipart/form-data> content.
 
-  $ mojo get -M POST -f 'upload=@some_file.txt' mojolicious.org
+  $ mojo get -M POST -f 'upload=@example.html' mojolicious.org
 
 You can follow redirects and view the headers for all messages.
 

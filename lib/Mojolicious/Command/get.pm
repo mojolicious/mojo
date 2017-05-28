@@ -142,10 +142,10 @@ Mojolicious::Command::get - Get command
     mojo get mojolicious.org
     mojo get -v -r -o 25 -i 50 google.com
     mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicious.org
-    mojo get -M POST -H 'Content-Type: text/trololo' -c 'trololo' perl.org
+    mojo get mojolicious.org > example.html
+    mojo get -M PUT mojolicious.org < example.html
     mojo get -f 'q=Mojolicious' -f 'size=5' https://metacpan.org/search
-    mojo get -M POST -f 'upload=@some_file.txt' mojolicious.org
-    mojo get -M PUT mojolicious.org < some_file.txt
+    mojo get -M POST -f 'upload=@example.html' mojolicious.org
     mojo get mojolicious.org 'head > title' text
     mojo get mojolicious.org .footer all
     mojo get mojolicious.org a attr href

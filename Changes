@@ -1,4 +1,6 @@
 
+7.33  2017-05-30
+
 7.32  2017-05-28
   - Added -f option to get command.
   - Improved get command with support for passing request data by redirecting

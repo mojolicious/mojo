@@ -29,7 +29,7 @@
       highly scalable web services.
     * JSON and HTML/XML parser with CSS selector support.
   * Very clean, portable and object-oriented pure-Perl API with no hidden
-    magic and no requirements besides Perl 5.22.0 (versions as old as 5.10.1
+    magic and no requirements besides Perl 5.24.0 (versions as old as 5.10.1
     can be used too, but may require additional CPAN modules to be installed)
   * Fresh code based upon years of experience developing
     [Catalyst](http://www.catalystframework.org), free and open source.

@@ -72,7 +72,7 @@ channel C<#mojo> on C<irc.perl.org>
 
 First of all, you need to be aware that according to the L<perlpolicy>, only
 the two most recent stable release series of Perl are supported by the
-community and receive bug fixes, which are currently 5.24.x and 5.22.x.
+community and receive bug fixes, which are currently 5.26.x and 5.24.x.
 L<Mojolicious> follows this model and fully supports these two release series.
 In addition we will also keep the distribution installable up to a certain
 legacy version that we deem worthy of supporting, but not specifically optimize

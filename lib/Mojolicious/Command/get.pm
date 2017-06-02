@@ -151,7 +151,7 @@ Mojolicious::Command::get - Get command
     mojo get mojolicious.org a attr href
     mojo get mojolicious.org '*' attr id
     mojo get mojolicious.org 'h1, h2, h3' 3 text
-    mojo get https://api.metacpan.org/v0/author/SRI /name
+    mojo get https://fastapi.metacpan.org/v1/author/SRI /name
     mojo get -H 'Host: example.com' http+unix://%2Ftmp%2Fmyapp.sock/index.html
 
   Options:

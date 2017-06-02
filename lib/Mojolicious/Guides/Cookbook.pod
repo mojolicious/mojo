@@ -505,7 +505,7 @@ latency backend web services.
   # Search MetaCPAN for "mojolicious"
   get '/' => sub {
     my $c = shift;
-    $c->ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
+    $c->ua->get('fastapi.metacpan.org/v1/module/_search?q=mojolicious' => sub {
       my ($ua, $tx) = @_;
       $c->render('metacpan', hits => $tx->result->json->{hits}{hits});
     });
@@ -549,7 +549,7 @@ style.
       # Concurrent requests
       sub {
         my $delay = shift;
-        my $url   = Mojo::URL->new('api.metacpan.org/v0/module/_search');
+        my $url   = Mojo::URL->new('fastapi.metacpan.org/v1/module/_search');
         $url->query({sort => 'date:desc'});
         $c->ua->get($url->clone->query({q => 'mojo'})   => $delay->begin);
         $c->ua->get($url->clone->query({q => 'minion'}) => $delay->begin);
@@ -977,7 +977,7 @@ Who actually controls the event loop backend is not important.
   # Search MetaCPAN for "mojolicious"
   my $cv = AE::cv;
   my $ua = Mojo::UserAgent->new;
-  $ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
+  $ua->get('fastapi.metacpan.org/v1/module/_search?q=mojolicious' => sub {
     my ($ua, $tx) = @_;
     $cv->send($tx->result->json('/hits/hits/0/_source/release'));
   });
@@ -1080,7 +1080,7 @@ L<Mojo::Message/"json">.
   my $ua = Mojo::UserAgent->new;
 
   # Search MetaCPAN for "mojolicious" and list latest releases
-  my $url = Mojo::URL->new('http://api.metacpan.org/v0/release/_search');
+  my $url = Mojo::URL->new('http://fastapi.metacpan.org/v1/release/_search');
   $url->query({q => 'mojolicious', sort => 'date:desc'});
   for my $hit (@{$ua->get($url)->result->json->{hits}{hits}}) {
     say "$hit->{_source}{name} ($hit->{_source}{author})";
@@ -1475,7 +1475,7 @@ You can follow redirects and view the headers for all messages.
 
 Extract just the information you really need from JSON data structures.
 
-  $ mojo get https://api.metacpan.org/v0/author/SRI /name
+  $ mojo get https://fastapi.metacpan.org/v1/author/SRI /name
 
 This can be an invaluable tool for testing your applications.
 

@@ -33,7 +33,8 @@ EOF
   # Check latest version on CPAN
   my $latest = eval {
     $self->app->ua->max_redirects(10)->tap(sub { $_->proxy->detect })
-      ->get('api.metacpan.org/v0/release/Mojolicious')->result->json->{version};
+      ->get('fastapi.metacpan.org/v1/release/Mojolicious')
+      ->result->json->{version};
   } or return;
 
   my $msg = 'This version is up to date, have fun!';

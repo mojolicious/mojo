@@ -1,5 +1,7 @@
 
-7.33  2017-06-01
+7.33  2017-06-03
+  - Fixed version command to use the new MetaCPAN API, since the old one got
+    shut down.
 
 7.32  2017-05-28
   - Added -f option to get command.

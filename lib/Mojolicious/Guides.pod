@@ -185,6 +185,11 @@ outside of the request/response lifecycle. Among those tasks you'll commonly
 find image resizing, spam filtering, HTTP downloads, building tarballs, warming
 caches and basically everything else you can imagine that's not super fast.
 
+And it comes with a great example application you can use for inspiration. The
+L<link checker|https://github.com/kraih/mojo-pg/tree/master/examples/linkcheck>
+will show you how to integrate background jobs into well-structured
+L<Mojolicious> applications.
+
 =back
 
 =head1 REFERENCE

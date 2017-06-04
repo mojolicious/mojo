@@ -167,7 +167,8 @@ designed to be used with it and are being developed under the same umbrella.
 
 A tiny wrapper around L<DBD::Pg> that makes
 L<PostgreSQL|http://www.postgresql.org> a lot of fun to use with
-L<Mojolicious>. Perform queries blocking and non-blocking, use all SQL features
+L<Mojolicious>. Perform queries blocking and non-blocking, use all
+L<SQL features|https://www.postgresql.org/docs/current/static/sql.html>
 PostgreSQL has to offer, generate CRUD queries from data structures, manage your
 database schema with migrations and build scalable real-time web applications
 with the publish/subscribe pattern.

@@ -1,4 +1,6 @@
 
+7.34  2017-06-06
+
 7.33  2017-06-05
   - Added EXPERIMENTAL support for :matches pseudo-class and :not pseudo-class
     with compount selectors to Mojo::DOM::CSS.

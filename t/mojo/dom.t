@@ -1112,6 +1112,14 @@ is_deeply \@e, [qw(A C E G I)], 'found all odd elements';
 $dom->find('li:nth-of-type(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(A E H)], 'found all odd li elements';
 @e = ();
+$dom->find('ul li:not(:first-child, :last-child)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw(C E F H)], 'found all odd li elements';
+@e = ();
+$dom->find('ul li:matches(:first-child, :last-child)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw(A I)], 'found all odd li elements';
+@e = ();
 $dom->find('li:nth-last-of-type( odd )')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(C F I)], 'found all odd li elements';
 @e = ();
@@ -2209,8 +2217,10 @@ $dom = Mojo::DOM->new(<<EOF);
 <form action="/foo">
   <p>Test</p>
   <input type="text" name="a" value="A" />
+  <input type=text name="a" value="A2">
   <input type="checkbox" name="q">
   <input type="checkbox" checked name="b" value="B">
+  <input type="checkbox" checked name="b">
   <input type="radio" name="r">
   <input type="radio" checked name="c" value="C">
   <input name="s">
@@ -2221,19 +2231,40 @@ $dom = Mojo::DOM->new(<<EOF);
     <optgroup>
       <option>H</option>
       <option selected>I</option>
+      <option selected disabled>V</option>
     </optgroup>
     <option value="J" selected>K</option>
+    <optgroup disabled>
+      <option selected>I2</option>
+    </optgroup>
   </select>
   <select name="n"><option>N</option></select>
   <select multiple name="q"><option>Q</option></select>
+  <select name="y" disabled>
+    <option selected>Y</option>
+  </select>
   <select name="d">
     <option selected>R</option>
     <option selected>D</option>
   </select>
   <textarea name="m">M</textarea>
+  <textarea name="m">M3</textarea>
+  <textarea name="m2" disabled>M2</textarea>
   <button name="o" value="O">No!</button>
+  <input type=text name="x" value="X" disabled>
   <input type="submit" name="p" value="P" />
 </form>
+<form><input type="submit" name="a" value="A"></form>
+<form>
+  <input type="button" name="b" value="B" disabled>
+  <input type="button" name="c" value="C">
+</form>
+<form><input type="image" name="c" value="C"></form>
+<form>
+  <button name="e" value="E" disabled>
+  <button name="d" value="D">
+</form>
+<form></form>
 EOF
 is $dom->at('p')->val,                         undef, 'no value';
 is $dom->at('input')->val,                     'A',   'right value';
@@ -2243,19 +2274,46 @@ is_deeply $dom->at('select')->val, ['I', 'J'], 'right values';
 is $dom->at('select option')->val,                          'F', 'right value';
 is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
 is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
-is $dom->find('select')->[1]->val,        undef, 'no value';
-is_deeply $dom->find('select')->[2]->val, undef, 'no value';
+is $dom->find('select')->[1]->val, undef, 'no value';
+is $dom->find('select')->[2]->val, undef, 'no value';
 is $dom->find('select')->[2]->at('option')->val, 'Q', 'right value';
-is_deeply $dom->find('select')->last->val, 'D', 'right value';
-is_deeply $dom->find('select')->last->at('option')->val, 'R', 'right value';
+is $dom->at('select[disabled]')->val, 'Y', 'right value';
+is $dom->find('select')->last->val, 'D', 'right value';
+is $dom->find('select')->last->at('option')->val, 'R', 'right value';
 is $dom->at('textarea')->val, 'M', 'right value';
-is $dom->at('button')->val,   'O', 'right value';
-is $dom->find('form input')->last->val, 'P', 'right value';
+is $dom->find('textarea')->last->val, 'M2', 'right value';
+is $dom->at('button')->val, 'O', 'right value';
+is $dom->at('form')->find('input')->last->val, 'P', 'right value';
 is $dom->at('input[name=q]')->val, 'on',  'right value';
 is $dom->at('input[name=r]')->val, 'on',  'right value';
 is $dom->at('input[name=s]')->val, undef, 'no value';
 is $dom->at('input[name=t]')->val, '',    'right value';
 is $dom->at('input[name=u]')->val, undef, 'no value';
+my $form = {
+  a => ['A', 'A2'],
+  b => ['B', 'on'],
+  c => 'C',
+  d => 'D',
+  f => ['I', 'J'],
+  m => ['M', 'M3'],
+  o => 'O'
+};
+is_deeply $dom->at('form')->val, $form, 'right structure';
+$form = {
+  a => ['A', 'A2'],
+  b => ['B', 'on'],
+  c => 'C',
+  d => 'D',
+  f => ['I', 'J'],
+  m => ['M', 'M3'],
+  p => 'P'
+};
+is_deeply $dom->at('form')->val('input[type=submit]'), $form, 'right structure';
+is_deeply $dom->find('form')->[1]->val, {a => 'A'}, 'right structure';
+is_deeply $dom->find('form')->[2]->val, {c => 'C'}, 'right structure';
+is_deeply $dom->find('form')->[3]->val, {c => 'C'}, 'right structure';
+is_deeply $dom->find('form')->[4]->val, {d => 'D'}, 'right structure';
+is_deeply $dom->find('form')->[5]->val, {}, 'right structure';
 
 # PoCo example with whitespace-sensitive text
 $dom = Mojo::DOM->new(<<EOF);

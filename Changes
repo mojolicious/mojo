@@ -1,5 +1,8 @@
 
-7.33  2017-06-03
+7.33  2017-06-05
+  - Added EXPERIMENTAL support for :matches pseudo-class and :not pseudo-class
+    with compount selectors to Mojo::DOM::CSS.
+  - Improved val method in Mojo::DOM with support for <form> elements.
   - Fixed version command to use the new MetaCPAN API, since the old one got
     shut down.
 

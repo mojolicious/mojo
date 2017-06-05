@@ -161,11 +161,8 @@ sub type { shift->tree->[0] }
 sub val {
   my $self = shift;
 
-  # "form"
-  return $self->_form(@_) if (my $tag = $self->tag) eq 'form';
-
   # "option"
-  return $self->{value} // $self->text if $tag eq 'option';
+  return $self->{value} // $self->text if (my $tag = $self->tag) eq 'option';
 
   # "input" ("type=checkbox" and "type=radio")
   my $type = $self->{type} // '';
@@ -243,40 +240,6 @@ sub _delegate {
   return $$self->$method unless @_;
   $$self->$method(@_);
   return $self;
-}
-
-sub _form {
-  my ($self, $selector) = @_;
-  $selector //= 'button:not([disabled]), input:matches([type=button],'
-    . ' [type=submit], [type=image]):not([disabled])';
-
-  # The submit button
-  my $form = {};
-  if (my $e = $self->at($selector)) { _input($form, $e->{name}, $e->val) }
-
-  # "select" and "textarea"
-  _input($form, $_->{name}, $_->val)
-    for $self->find('select:not([disabled]), textarea:not([disabled])')->each;
-
-  # "input"
-  my $input = $self->find(
-    'input:not([type=button], [type=image], [type=submit], [disabled])');
-  for my $e ($input->each) {
-    my $type = $e->{type} // '';
-    _input($form, $e->{name}, $e->val)
-      if ($type ne 'radio' && $type ne 'checkbox') || exists $e->{checked};
-  }
-
-  return $form;
-}
-
-sub _input {
-  my ($form, $name, $value) = @_;
-  $form->{$name}
-    = exists $form->{$name}
-    ? [ref $form->{$name} ? @{$form->{$name}} : $form->{$name}, $value]
-    : $value
-    if defined $name && defined $value;
 }
 
 sub _link {
@@ -957,16 +920,12 @@ C<root>, C<tag> or C<text>.
 =head2 val
 
   my $value = $dom->val;
-  my $value = $dom->val('input[type=submit]');
 
-Extract values from C<button>, C<form>, C<input>, C<option>, C<select> and
-C<textarea> elements, or return C<undef> if this element has no value. In the
-case of C<select> with C<multiple> attribute, find C<option> elements with
+Extract value from form element (such as C<button>, C<input>, C<option>,
+C<select> and C<textarea>), or return C<undef> if this element has no value. In
+the case of C<select> with C<multiple> attribute, find C<option> elements with
 C<selected> attribute and return an array reference with all values, or C<undef>
-if none could be found. In the case of C<form>, find all elements mentioned
-before that would be submitted by pressing the first button or the button
-matching the CSS selector, and return a hash reference with their names and
-values. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
+if none could be found.
 
   # "a"
   $dom->parse('<input name=test value=a>')->at('input')->val;
@@ -984,10 +943,6 @@ values. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # "e"
   $dom->parse('<select multiple><option selected>e</option></select>')
     ->at('select')->val->[0];
-
-  # "f"
-  $dom->parse('<form action="/"><input name="a" value="f"></form>')
-    ->at('form')->val->{a};
 
   # "on"
   $dom->parse('<input name=test type=checkbox>')->at('input')->val;

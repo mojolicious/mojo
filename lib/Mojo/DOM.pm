@@ -985,7 +985,7 @@ values. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   $dom->parse('<select multiple><option selected>e</option></select>')
     ->at('select')->val->[0];
 
-  # "b"
+  # "f"
   $dom->parse('<form action="/"><input name="a" value="f"></form>')
     ->at('form')->val->{a};
 

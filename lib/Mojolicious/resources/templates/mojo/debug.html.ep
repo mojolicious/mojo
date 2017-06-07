@@ -59,7 +59,11 @@
         color: #eee;
         text-shadow: #333 0 1px 0;
       }
-      .important { background-color: rgba(47, 48, 50, .75) }
+      .important {
+        background-color: rgba(47, 48, 50, .75);
+        border: 1px solid red;
+      }
+      .important > td.key { color: red;}
       .infobox { color: #333 }
       .infobox tr:nth-child(odd) .value { background-color: #ddeeff }
       .infobox tr:nth-child(even) .value { background-color: #eef9ff }

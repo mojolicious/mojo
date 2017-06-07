@@ -394,10 +394,13 @@ Open a TCP/IP or UNIX domain socket connection with L<Mojo::IOLoop::Client>,
 takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
 
   # Connect to 127.0.0.1 on port 3000
-  Mojo::IOLoop->client({port => 3000} => sub {
+  my $id = Mojo::IOLoop->client({port => 3000} => sub {
     my ($loop, $err, $stream) = @_;
     ...
   });
+
+Don't forget to remove new connection from the loop by it C<$id> if you don't
+need the stream anymore. Otherwise you will get memory leak.
 
 =head2 delay
 

@@ -141,8 +141,8 @@ sub _start_line {
   my $self = shift;
 
   return $self if defined $self->{start_buffer};
-  my $code = $self->code    || 404;
-  my $msg  = $self->message || $self->default_message;
+  my $code = int($self->code) || 404;
+  my $msg  = $self->message   || $self->default_message;
   $self->{start_buffer} = "HTTP/@{[$self->version]} $code $msg\x0d\x0a";
 
   return $self;

@@ -102,4 +102,10 @@ is $pointer->get('/k"l'),   6,     '"/k\\"l" is 6';
 is $pointer->get('/ '),     7,     '"/ " is 7';
 is $pointer->get('/m~0n'),  8,     '"/m~0n" is 8';
 
+# catch invalid pointer reference-tokens
+eval {
+  $pointer->get('no_slash');
+};
+ok $@ =~ /Invalid JSON Pointer 'no_slash'/, 'reference-token must start with "/"';
+
 done_testing();

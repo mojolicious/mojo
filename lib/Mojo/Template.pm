@@ -45,17 +45,17 @@ sub parse {
     = qr/^(\s*)\Q$start\E(?:(\Q$replace\E)|(\Q$cmnt\E)|(\Q$expr\E))?(.*)$/;
   my $token_re = qr/
     (
-      \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                   # Replace
+      \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                         # Replace
     |
-      \Q$tag$expr\E(?:\Q$escp\E)?(?:\s*\Q$cpen\E(?!\w))?   # Expression
+      \Q$tag$expr\E(?:\Q$escp\E)?(?:\s*\Q$cpen\E(?!\w))?         # Expression
     |
-      \Q$tag\E(?:\s*\Q$cpen\E(?!\w))?                      # Code
+      \Q$tag\E(?:\s*\Q$cpen\E(?!\w))?                            # Code
     |
-      (?:(?<!\w)\Q$cpst\E\s*)?(?:\Q$trim\E)?\Q$end\E       # End
+      (?:(?<!\w)\Q$cpst\E\s*)?(?:\#.*?)?(?:\Q$trim\E)?\Q$end\E   # End
     )
   /x;
-  my $cpen_re = qr/^\Q$tag\E(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E(.*)$/;
-  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
+  my $cpen_re = qr/^\Q$tag\E(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E(.*)(?:\#.*?)?$/;
+  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(?:\#.*?)?(\Q$trim\E)?\Q$end\E$/;
 
   # Split lines
   my $op = 'text';

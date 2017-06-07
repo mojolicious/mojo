@@ -125,6 +125,13 @@ sub remove {
   return $self;
 }
 
+sub remove_all {
+  my ($self) = @_;
+  my $pairs = $self->pairs;
+  @$pairs=();
+  return $self;
+}
+
 sub to_hash {
   my $self = shift;
 
@@ -332,6 +339,12 @@ Remove parameters. Note that this method will normalize the parameters.
 
   # "bar=yada"
   Mojo::Parameters->new('foo=bar&foo=baz&bar=yada')->remove('foo');
+
+=head2 remove_all
+
+  $params = $params->remove_all;
+
+Remove all parameters. This is the equivalent of delete_all in CGI module.
 
 =head2 to_hash
 

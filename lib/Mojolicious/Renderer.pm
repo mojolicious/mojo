@@ -94,7 +94,7 @@ sub render {
   };
   my $inline = $options->{inline} = delete $stash->{inline};
   $options->{handler} //= $self->default_handler if defined $inline;
-  $options->{format} = $stash->{format} || $self->default_format;
+  $options->{format} = delete $stash->{format} || $self->default_format;
 
   # Data
   return delete $stash->{data}, $options->{format} if defined $stash->{data};

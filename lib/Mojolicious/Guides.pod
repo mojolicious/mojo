@@ -54,6 +54,9 @@ L<features|feature> are enabled, even if examples don't specifically mention it.
 Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for
 you automatically, whenever they are used.
 
+=item Learning Hypertext Transfer Protocol
+http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+
 =back
 
 =head1 TUTORIAL

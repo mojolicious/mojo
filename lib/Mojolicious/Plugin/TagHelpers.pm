@@ -691,7 +691,7 @@ key/value pairs to generate attributes from.
 Very useful for reuse in more specific tag helpers.
 
   my $output = $c->tag('meta');
-  my $output = $c->tag('meta', charset => 'UTF-8');
+  my $output = $c->tag('meta', name => 'charset', content => 'UTF-8');
   my $output = $c->tag(div => '<p>This will be escaped</p>');
   my $output = $c->tag(div => sub { '<p>This will not be escaped</p>' });
 

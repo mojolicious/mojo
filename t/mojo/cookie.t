@@ -143,6 +143,14 @@ $cookie->value('ba r');
 $cookie->path('/test');
 is $cookie->to_string, 'foo="ba r"; path=/test', 'right format';
 
+# Response cookie with SameSite attribute as string
+$cookie = Mojo::Cookie::Response->new;
+$cookie->name('foo');
+$cookie->value('ba r');
+$cookie->path('/test');
+$cookie->samesite('lax');
+is $cookie->to_string, 'foo="ba r"; path=/test; SameSite=Lax', 'SameSite attribute';
+
 # Response cookie without value as string
 $cookie = Mojo::Cookie::Response->new;
 $cookie->name('foo');
@@ -196,28 +204,30 @@ is $cookies->[2], undef, 'no more cookies';
 $cookies
   = Mojo::Cookie::Response->parse(
       'foo="ba r"; Domain=example.com; Path=/test; Max-Age=60;'
-    . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure;');
-is $cookies->[0]->name,    'foo',         'right name';
-is $cookies->[0]->value,   'ba r',        'right value';
-is $cookies->[0]->domain,  'example.com', 'right domain';
-is $cookies->[0]->path,    '/test',       'right path';
-is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 1218092879,    'right expires value';
-is $cookies->[0]->secure,  1,             'right secure flag';
+    . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure; SameSite=Strict');
+is $cookies->[0]->name,     'foo',         'right name';
+is $cookies->[0]->value,    'ba r',        'right value';
+is $cookies->[0]->domain,   'example.com', 'right domain';
+is $cookies->[0]->path,     '/test',       'right path';
+is $cookies->[0]->max_age,  60,            'right max age value';
+is $cookies->[0]->expires,  1218092879,    'right expires value';
+is $cookies->[0]->secure,   1,             'right secure flag';
+is $cookies->[0]->samesite, 'strict',      'right samesite attribute';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie with invalid flag (RFC 6265)
 $cookies
   = Mojo::Cookie::Response->parse(
       'foo="ba r"; Domain=.example.com; Path=/test; Max-Age=60;'
-    . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; InSecure;');
-is $cookies->[0]->name,    'foo',         'right name';
-is $cookies->[0]->value,   'ba r',        'right value';
-is $cookies->[0]->domain,  'example.com', 'right domain';
-is $cookies->[0]->path,    '/test',       'right path';
-is $cookies->[0]->max_age, 60,            'right max age value';
-is $cookies->[0]->expires, 1218092879,    'right expires value';
-is $cookies->[0]->secure,  undef,         'no secure flag';
+    . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; InSecure; SameSite=Whatever');
+is $cookies->[0]->name,     'foo',         'right name';
+is $cookies->[0]->value,    'ba r',        'right value';
+is $cookies->[0]->domain,   'example.com', 'right domain';
+is $cookies->[0]->path,     '/test',       'right path';
+is $cookies->[0]->max_age,  60,            'right max age value';
+is $cookies->[0]->expires,  1218092879,    'right expires value';
+is $cookies->[0]->secure,   undef,         'no secure flag';
+is $cookies->[0]->samesite, undef,         'no invalid samesite value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie (RFC 6265)

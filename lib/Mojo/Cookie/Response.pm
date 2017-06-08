@@ -4,9 +4,9 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires httponly max_age origin path secure)];
+has [qw(domain expires httponly max_age origin path secure samesite)];
 
-my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure samesite);
 
 sub parse {
   my ($self, $str) = @_;
@@ -22,6 +22,10 @@ sub parse {
       $value =~ s/^\.// if $attr eq 'domain' && defined $value;
       $value = Mojo::Date->new($value // '')->epoch if $attr eq 'expires';
       $value = 1 if $attr eq 'secure' || $attr eq 'httponly';
+	  if ($attr eq 'samesite') {
+        next unless $value =~ /\A(?:lax|strict)\Z/i;
+        $value = lc($value);
+      }
       $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr} = $value;
     }
   }
@@ -55,6 +59,15 @@ sub to_string {
 
   # "Max-Age"
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
+
+  if (defined (my $samesite = $self->samesite)) {
+    if ($samesite ne '') {
+      $samesite = ucfirst lc $samesite;
+      if ( $samesite eq 'Lax' or $samesite eq 'Strict' ) {
+        $cookie .= "; SameSite=$samesite";
+      }
+    }
+  }
 
   return $cookie;
 }
@@ -128,6 +141,15 @@ Origin of the cookie.
   $cookie  = $cookie->path('/test');
 
 Cookie path.
+
+=head2 samesite
+
+  my $samesite = $cookie->samesite; 
+  $cookie      = $cookie->samesite('lax'); 
+
+SameSite attribute as defined in 
+L<https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00>.
+Acceptable values are C<lax> and C<strict>.
 
 =head2 secure
 

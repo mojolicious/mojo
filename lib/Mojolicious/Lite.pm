@@ -338,6 +338,80 @@ L<Mojolicious::Lite> inherits all attributes from L<Mojolicious>.
 
 L<Mojolicious::Lite> inherits all methods from L<Mojolicious>.
 
+=head1 GROWING
+
+The process of expanding from L<Mojolicious::Lite> into a full
+L<Mojolicious> application is described in the L<Growing
+Guide|Mojolicious::Guides::Growing>.
+
+Here is a cheatsheet with hints for reference.
+
+=head2 Starting the application.
+
+Full Mojolicious requires namespaces, placed under the C<lib> directory.
+
+  # Mojolicious::Lite, in myapp.pl:
+  app->start;
+
+  # Mojolicious, in myapp.pl or script/myapp:
+  Mojolicious::Commands->start_app('MyApp');
+
+=head2 Plugins
+
+Plugins, C<hook>s and C<helper>s are loaded in startup:
+
+  # Mojolicious::Lite
+  plugin 'Config';
+
+  # Mojolicious
+  sub startup {
+    my $self = shift;
+    $self->plugin('Config');
+  }
+
+=head2 Routes
+
+This applies to: C<any>, C<get>, C<options>, C<patch>, C<post>, C<put>, and
+C<websocket>:
+
+  # Mojolicious::Lite
+  get '/foo' => sub { ... };
+
+  # Mojolicious
+  sub startup {
+    my $self   = shift;
+    my $routes = $self->routes;
+    $routes->get('/foo' => sub { ... });
+  }
+
+Lite's C<del> abbreviation is expanded in the startup:
+
+  # Mojolicious::Lite
+  del '/foo' => sub { ... };
+
+  # Mojolicious
+  sub startup {
+    my $self   = shift;
+    my $routes = $self->routes;
+    $routes->delete('/foo' => sub { ... });
+  }
+
+=head2 Under and Groups
+
+  # Mojolicious::Lite
+  under '/foo';
+  get '/bar' => sub {...};
+
+  # Mojolicious
+  sub startup {
+    my $self   = shift;
+    my $routes = $self->routes;
+    my $under  = $routes->under('/foo');
+    $under->get('/bar' => sub {...});
+  }
+
+Nested routes in full Mojolicious replace C<group> blocks.
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.

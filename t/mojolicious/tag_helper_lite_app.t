@@ -14,6 +14,8 @@ get 'small_tags';
 
 get 'tags_with_error';
 
+get 'meta';
+
 any [qw(GET POST)] => 'links';
 
 get '/buttons';
@@ -84,6 +86,15 @@ $t->get_ok('/tags_with_error')->status_is(200)->content_is(<<EOF);
 <bar class="test field-with-error">
   0
 </bar>
+EOF
+
+# Meta tags
+$t->get_ok('/meta')->status_is(200)->content_is(<<EOF);
+<meta charset="UTF-8">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta content="2" http-equiv="refresh">
+<meta content="Lovely Blog" name="application-name">
+<meta content="John Doe" name="author">
 EOF
 
 # Links
@@ -554,6 +565,13 @@ __DATA__
 %= tag_with_error 'bar', (class => 'test') => begin
   0
 %= end
+
+@@ meta.html.ep
+%= meta_tag charset => 'UTF-8'
+%= meta_tag 'Content-Type' => 'text/html; charset=iso-8859-1'
+%= meta_tag refresh => 2
+%= meta_tag 'application-name' => 'Lovely Blog'
+%= meta_tag author => 'John Doe'
 
 @@ links.html.ep
 <%= link_to 'Pa<th' => '/path' %>

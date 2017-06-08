@@ -133,11 +133,27 @@ implements the following new ones.
 
 Register a validation check.
 
-  $validator->add_check(foo => sub {
-    my ($validation, $name, $value, @args) = @_;
-    ...
-    return undef;
+  $validator->add_check( exclude_insensitve => sub {
+    my ($validation_obj, $name, $value, @args) = @_;
+      for (@args) {
+        # return false if validation passes
+        return undef if fc $_ eq fc $value;
+      }
+
+      # return true if validation fails
+      return 1;
   });
+
+The anonymous subroutine's return value indicates if the check fails (i.e.
+it should return true if the value fails to validate, or false if it is okay.)
+
+Once C<add_check> has been called, a new method will be usable on the
+validator class.
+
+  # any color name that isn't primary
+  $c->validator
+    ->required('color')
+    ->exclude_insensitve('red','green','blue');
 
 =head2 add_filter
 

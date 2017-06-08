@@ -169,6 +169,12 @@ sub json_is {
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
+sub json_isa {
+  my ($self, $p, $reftype, $desc) = @_;
+  return $self->_test('isa_ok', 
+    $self->tx->res->json($p), $reftype, _desc($desc, qq{has value of $reftype type for JSON Pointer "$p"}));
+}
+
 sub json_like {
   my ($self, $p, $regex, $desc) = @_;
   return $self->_test('like', $self->tx->res->json($p),
@@ -770,6 +776,14 @@ Opposite of L</"json_has">.
 
 Check the value extracted from JSON response using the given JSON Pointer with
 L<Mojo::JSON::Pointer>, which defaults to the root value if it is omitted.
+
+=head2 json_isa
+
+  $t = $t->json_isa('/foo/1' => 'ARRAY');
+  $t = $t->json_isa('/foo/1' => 'HASH', 'right type');
+
+Check Perl type of the value extracted from JSON response using the given JSON Pointer with
+L<Mojo::JSON::Pointer>.
 
 =head2 json_like
 

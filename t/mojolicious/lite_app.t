@@ -598,7 +598,7 @@ $t->get_ok('/without-format')->content_is("/without-format\n");
 $t->get_ok('/without-format.html')->content_is("/without-format\n");
 
 # JSON response
-$t->get_ok('/json_too')->status_is(200)->json_is({hello => 'world'});
+$t->get_ok('/json_too')->status_is(200)->json_isa('', 'HASH')->json_is({hello => 'world'});
 
 # Static inline file
 $t->get_ok('/static.txt')->status_is(200)
@@ -874,6 +874,7 @@ $t->post_ok('/malformed_utf8' =>
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_type_is('application/json;charset=UTF-8')
   ->json_is({foo => [1, -2, 3, 'b☃r']})
+  ->json_isa('/foo' => 'ARRAY')
   ->json_is('/foo' => [1, -2, 3, 'b☃r'])
   ->json_is('/foo/3', 'b☃r', 'with description')->json_has('/foo')
   ->json_has('/foo', 'with description')->json_hasnt('/bar')

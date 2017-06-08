@@ -63,7 +63,8 @@ sub to_datetime {
 sub to_string {
 
   # RFC 7231 (Sun, 06 Nov 1994 08:49:37 GMT)
-  my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime shift->epoch;
+  my ($s, $m, $h, $mday, $month, $year, $wday)
+    = gmtime sprintf("%.0f", shift->epoch);
   return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT', $DAYS[$wday], $mday,
     $MONTHS[$month], $year + 1900, $h, $m, $s;
 }

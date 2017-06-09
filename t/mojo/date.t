@@ -108,7 +108,7 @@ is(Mojo::Date->new('Thu, 01 Jan 1970 00:00:00 GMT')->epoch,
 
 # No epoch value
 $date = Mojo::Date->new;
-ok $date->parse('Mon, 01 Jan 1900 00:00:00'), 'right format';
+ok $date->parse('Mon, 29 Feb 1900 00:00:00'), 'right format';
 is $date->epoch, undef, 'no epoch value';
 
 done_testing();

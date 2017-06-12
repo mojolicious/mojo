@@ -82,7 +82,7 @@ sub _expand {
 sub _tls {
   my ($self, $handle, $server) = @_;
 
-  return $self->emit(upgrade => delete $self->{handle})
+  return $self->_cleanup->emit(upgrade => delete $self->{handle})
     if $server ? $handle->accept_SSL : $handle->connect_SSL;
 
   # Switch between reading and writing

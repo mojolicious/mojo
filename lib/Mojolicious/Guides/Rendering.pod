@@ -1061,6 +1061,7 @@ serve them while allowing content negotiation to be performed with C<Range>,
 C<If-Modified-Since> and C<If-None-Match> headers.
 
   use Mojolicious::Lite;
+  use Mojo::Asset::File;
 
   get '/leak' => sub {
     my $c = shift;
@@ -1075,6 +1076,7 @@ L<Mojolicious::Controller/"rendered"> to tell the renderer when you're done
 generating a response.
 
   use Mojolicious::Lite;
+  use Mojo::Asset::File;
 
   get '/leak' => sub {
     my $c = shift;

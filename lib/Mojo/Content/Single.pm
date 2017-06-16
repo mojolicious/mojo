@@ -135,7 +135,8 @@ Content size in bytes.
 
   my $clone = $single->clone;
 
-Clone content if possible, otherwise return C<undef>.
+Return a new L<Mojo::Content::Single> object cloned from this content if
+possible, otherwise return C<undef>.
 
 =head2 get_body_chunk
 

@@ -294,7 +294,7 @@ following new ones.
 
   my $url2 = $url->clone;
 
-Clone this URL.
+Return a new L<Mojo::URL> object cloned from this URL.
 
 =head2 host_port
 
@@ -457,8 +457,8 @@ object.
   my $abs = $url->to_abs;
   my $abs = $url->to_abs(Mojo::URL->new('http://example.com/foo'));
 
-Clone relative URL and turn it into an absolute one using L</"base"> or
-provided base URL.
+Return a new L<Mojo::URL> object cloned from this relative URL and turn it into
+an absolute one using L</"base"> or provided base URL.
 
   # "http://example.com/foo/baz.xml?test=123"
   Mojo::URL->new('baz.xml?test=123')

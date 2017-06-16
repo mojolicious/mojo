@@ -272,7 +272,8 @@ Generate a suitable boundary for content and add it to C<Content-Type> header.
 
   my $clone = $multi->clone;
 
-Clone content if possible, otherwise return C<undef>.
+Return a new L<Mojo::Content::MultiPart> object cloned form this content if
+possible, otherwise return C<undef>.
 
 =head2 get_body_chunk
 

@@ -298,7 +298,7 @@ Get or replace current header value, shortcut for the C<Cache-Control> header.
 
   my $clone = $headers->clone;
 
-Clone headers.
+Return a new L<Mojo::Headers> object cloned from these headers.
 
 =head2 connection
 

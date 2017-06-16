@@ -340,7 +340,8 @@ implements the following new ones.
 
   my $clone = $req->clone;
 
-Clone request if possible, otherwise return C<undef>.
+Return a new L<Mojo::Message::Request> object cloned from this request if
+possible, otherwise return C<undef>.
 
 =head2 cookies
 

@@ -445,7 +445,8 @@ Extract charset from C<Content-Type> header.
 
   my $clone = $content->clone;
 
-Clone content if possible, otherwise return C<undef>.
+Return a new L<Mojo::Content> object cloned from this content if possible,
+otherwise return C<undef>.
 
 =head2 generate_body_chunk
 

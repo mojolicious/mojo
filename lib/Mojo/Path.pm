@@ -187,7 +187,7 @@ treated as C<.> to protect from path traversal attacks.
 
   my $clone = $path->clone;
 
-Clone path.
+Return a new L<Mojo::Path> object cloned from this path.
 
 =head2 contains
 

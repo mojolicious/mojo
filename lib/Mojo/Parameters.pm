@@ -247,7 +247,7 @@ Append parameters. Note that this method will normalize the parameters.
 
   my $params2 = $params->clone;
 
-Clone parameters.
+Return a new L<Mojo::Parameters> object cloned from these parameters.
 
 =head2 every_param
 

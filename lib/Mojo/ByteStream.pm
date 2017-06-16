@@ -137,7 +137,7 @@ Camelize bytestream with L<Mojo::Util/"camelize">.
 
   my $stream2 = $stream->clone;
 
-Clone bytestream.
+Return a new L<Mojo::ByteStream> object cloned from this bytestream.
 
 =head2 decamelize
 

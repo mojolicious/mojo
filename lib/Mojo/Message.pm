@@ -408,8 +408,7 @@ the following new ones.
   my $bytes = $msg->body;
   $msg      = $msg->body('Hello!');
 
-Slurp or replace L</"content">, L<Mojo::Content::MultiPart> will be
-automatically downgraded to L<Mojo::Content::Single>.
+Slurp or replace L</"content">.
 
 =head2 body_params
 

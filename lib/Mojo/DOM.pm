@@ -15,9 +15,9 @@ use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
 use Scalar::Util qw(blessed weaken);
 
-sub all_text { _text([_nodes(shift->tree)], 1) }
+sub all_text { _text(_nodes(shift->tree), 1) }
 
-sub ancestors { _select($_[0]->_collect($_[0]->_ancestors), $_[1]) }
+sub ancestors { _select($_[0]->_collect([$_[0]->_ancestors]), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 sub append_content { shift->_content(1, 0, @_) }
@@ -57,7 +57,7 @@ sub content {
   if ($type eq 'root' || $type eq 'tag') {
     return $self->_content(0, 1, @_) if @_;
     my $html = Mojo::DOM::HTML->new(xml => $self->xml);
-    return join '', map { $html->tree($_)->render } _nodes($self->tree);
+    return join '', map { $html->tree($_)->render } @{_nodes($self->tree)};
   }
 
   return $self->tree->[1] unless @_;
@@ -67,10 +67,10 @@ sub content {
 
 sub descendant_nodes { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
-sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
+sub find { $_[0]->_collect($_[0]->_css->select($_[1])) }
 
-sub following { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[1]}), $_[1]) }
-sub following_nodes { $_[0]->_collect(@{$_[0]->_siblings->[1]}) }
+sub following { _select($_[0]->_collect($_[0]->_siblings(1)->[1]), $_[1]) }
+sub following_nodes { $_[0]->_collect($_[0]->_siblings->[1]) }
 
 sub matches { shift->_css->matches(@_) }
 
@@ -105,14 +105,14 @@ sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 0)->[1]) }
 
 sub parent {
   my $self = shift;
-  return undef if $self->tree->[0] eq 'root';
-  return $self->_build($self->_parent, $self->xml);
+  return undef if (my $tree = $self->tree)->[0] eq 'root';
+  return $self->_build(_parent($tree), $self->xml);
 }
 
 sub parse { shift->_delegate(parse => @_) }
 
-sub preceding { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[0]}), $_[1]) }
-sub preceding_nodes { $_[0]->_collect(@{$_[0]->_siblings->[0]}) }
+sub preceding { _select($_[0]->_collect($_[0]->_siblings(1)->[0]), $_[1]) }
+sub preceding_nodes { $_[0]->_collect($_[0]->_siblings->[0]) }
 
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
@@ -125,7 +125,7 @@ sub remove { shift->replace('') }
 sub replace {
   my ($self, $new) = @_;
   return $self->parse($new) if (my $tree = $self->tree)->[0] eq 'root';
-  return $self->_replace($self->_parent, $tree, _nodes($self->_parse($new)));
+  return $self->_replace(_parent($tree), $tree, _nodes($self->_parse($new)));
 }
 
 sub root {
@@ -150,7 +150,7 @@ sub tag {
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
-sub text { _text([_nodes(shift->tree)], 0) }
+sub text { _text(_nodes(shift->tree), 0) }
 
 sub to_string { shift->_delegate('render') }
 
@@ -188,21 +188,23 @@ sub _add {
 
   return $self if (my $tree = $self->tree)->[0] eq 'root';
 
-  my $parent = $self->_parent;
+  my $parent = _parent($tree);
   splice @$parent, _offset($parent, $tree) + $offset, 0,
-    _link($parent, _nodes($self->_parse($new)));
+    @{_link($parent, _nodes($self->_parse($new)))};
 
   return $self;
 }
 
 sub _all {
-  map { $_->[0] eq 'tag' ? ($_, _all(_nodes($_))) : ($_) } @_;
+  my $nodes = shift;
+  @$nodes = map { $_->[0] eq 'tag' ? ($_, @{_all(_nodes($_))}) : ($_) } @$nodes;
+  return $nodes;
 }
 
 sub _ancestors {
   my ($self, $root) = @_;
 
-  return () unless my $tree = $self->_parent;
+  return () unless my $tree = _parent($self->tree);
   my @ancestors;
   do { push @ancestors, $tree }
     while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
@@ -212,9 +214,9 @@ sub _ancestors {
 sub _build { shift->new->tree(shift)->xml(shift) }
 
 sub _collect {
-  my $self = shift;
-  my $xml  = $self->xml;
-  return Mojo::Collection->new(map { $self->_build($_, $xml) } @_);
+  my ($self, $nodes) = (shift, shift // []);
+  my $xml = $self->xml;
+  return Mojo::Collection->new(map { $self->_build($_, $xml) } @$nodes);
 }
 
 sub _content {
@@ -228,7 +230,7 @@ sub _content {
 
   $start  = $start  ? ($#$tree + 1) : _start($tree);
   $offset = $offset ? $#$tree       : 0;
-  splice @$tree, $start, $offset, _link($tree, _nodes($self->_parse($new)));
+  splice @$tree, $start, $offset, @{_link($tree, _nodes($self->_parse($new)))};
 
   return $self;
 }
@@ -243,16 +245,16 @@ sub _delegate {
 }
 
 sub _link {
-  my ($parent, @children) = @_;
+  my ($parent, $children) = @_;
 
   # Link parent to children
-  for my $node (@children) {
+  for my $node (@$children) {
     my $offset = $node->[0] eq 'tag' ? 3 : 2;
     $node->[$offset] = $parent;
     weaken $node->[$offset];
   }
 
-  return @children;
+  return $children;
 }
 
 sub _maybe { $_[1] ? $_[0]->_build($_[1], $_[0]->xml) : undef }
@@ -260,7 +262,7 @@ sub _maybe { $_[1] ? $_[0]->_build($_[1], $_[0]->xml) : undef }
 sub _nodes {
   return () unless my $tree = shift;
   my @nodes = @$tree[_start($tree) .. $#$tree];
-  return shift() ? grep { $_->[0] eq 'tag' } @nodes : @nodes;
+  return shift() ? [grep { $_->[0] eq 'tag' } @nodes] : \@nodes;
 }
 
 sub _offset {
@@ -270,13 +272,13 @@ sub _offset {
   return $i;
 }
 
-sub _parent { $_[0]->tree->[$_[0]->type eq 'tag' ? 3 : 2] }
+sub _parent { $_[0]->[$_[0][0] eq 'tag' ? 3 : 2] }
 
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 
 sub _replace {
-  my ($self, $parent, $child, @nodes) = @_;
-  splice @$parent, _offset($parent, $child), 1, _link($parent, @nodes);
+  my ($self, $parent, $child, $nodes) = @_;
+  splice @$parent, _offset($parent, $child), 1, @{_link($parent, $nodes)};
   return $self->parent;
 }
 
@@ -289,11 +291,11 @@ sub _select {
 sub _siblings {
   my ($self, $tags, $i) = @_;
 
-  return [] unless my $parent = $self->parent;
-
   my $tree = $self->tree;
+  return [] unless my $parent = $tree->[0] eq 'root' ? undef : _parent($tree);
+
   my (@before, @after, $match);
-  for my $node (_nodes($parent->tree)) {
+  for my $node (@{_nodes($parent)}) {
     ++$match and next if !$match && $node eq $tree;
     next if $tags && $node->[0] ne 'tag';
     $match ? push @after, $node : push @before, $node;
@@ -317,7 +319,7 @@ sub _text {
     }
 
     # Nested tag
-    elsif ($type eq 'tag' && $all) { unshift @$nodes, _nodes($node) }
+    elsif ($type eq 'tag' && $all) { unshift @$nodes, @{_nodes($node)} }
   }
 
   return $text;
@@ -332,19 +334,19 @@ sub _wrap {
   # Find innermost tag
   my $current;
   my $first = $new = $self->_parse($new);
-  $current = $first while $first = (_nodes($first, 1))[0];
+  $current = $first while $first = _nodes($first, 1)->[0];
   return $self unless $current;
 
   # Wrap content
   if ($content) {
-    push @$current, _link($current, _nodes($tree));
-    splice @$tree, _start($tree), $#$tree, _link($tree, _nodes($new));
+    push @$current, @{_link($current, _nodes($tree))};
+    splice @$tree, _start($tree), $#$tree, @{_link($tree, _nodes($new))};
     return $self;
   }
 
   # Wrap element
-  $self->_replace($self->_parent, $tree, _nodes($new));
-  push @$current, _link($current, $tree);
+  $self->_replace(_parent($tree), $tree, _nodes($new));
+  push @$current, @{_link($current, [$tree])};
   return $self;
 }
 

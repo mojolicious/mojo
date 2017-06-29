@@ -100,8 +100,8 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next      { $_[0]->_maybe($_[0]->_siblings(1, 0)->[1]) }
-sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 0)->[1]) }
+sub next      { $_[0]->_maybe($_[0]->_siblings(1)->[1][0]) }
+sub next_node { $_[0]->_maybe($_[0]->_siblings(0)->[1][0]) }
 
 sub parent {
   my $self = shift;
@@ -117,8 +117,8 @@ sub preceding_nodes { $_[0]->_collect($_[0]->_siblings->[0]) }
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous      { $_[0]->_maybe($_[0]->_siblings(1, -1)->[0]) }
-sub previous_node { $_[0]->_maybe($_[0]->_siblings(0, -1)->[0]) }
+sub previous      { $_[0]->_maybe($_[0]->_siblings(1)->[0][-1]) }
+sub previous_node { $_[0]->_maybe($_[0]->_siblings(0)->[0][-1]) }
 
 sub remove { shift->replace('') }
 
@@ -289,19 +289,21 @@ sub _select {
 }
 
 sub _siblings {
-  my ($self, $tags, $i) = @_;
+  my ($self, $tags) = @_;
 
   my $tree = $self->tree;
   return [] unless my $parent = $tree->[0] eq 'root' ? undef : _parent($tree);
 
-  my (@before, @after, $match);
-  for my $node (@{_nodes($parent)}) {
-    ++$match and next if !$match && $node eq $tree;
-    next if $tags && $node->[0] ne 'tag';
-    $match ? push @after, $node : push @before, $node;
-  }
+  my $nodes = _nodes($parent);
+  my $num   = -1;
+  defined($num++) and $_ eq $tree and last for @$nodes;
+  my @before = $num > 0 ? @$nodes[0 .. ($num - 1)] : ();
+  my @after = $#$nodes > $num ? @$nodes[($num + 1) .. $#$nodes] : ();
 
-  return defined $i ? [$before[$i], $after[$i]] : [\@before, \@after];
+  return [\@before, \@after] unless $tags;
+
+  return [[grep { $_->[0] eq 'tag' } @before],
+    [grep { $_->[0] eq 'tag' } @after]];
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }

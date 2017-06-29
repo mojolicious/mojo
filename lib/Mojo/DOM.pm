@@ -282,11 +282,7 @@ sub _replace {
   return $self->parent;
 }
 
-sub _select {
-  my ($collection, $selector) = @_;
-  return $collection unless $selector;
-  return $collection->new(grep { $_->matches($selector) } @$collection);
-}
+sub _select { $_[1] ? $_[0]->grep(matches => $_[1]) : $_[0] }
 
 sub _siblings {
   my ($self, $tags) = @_;

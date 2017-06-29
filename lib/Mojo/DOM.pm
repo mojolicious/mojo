@@ -294,16 +294,16 @@ sub _siblings {
   my $tree = $self->tree;
   return [] unless my $parent = $tree->[0] eq 'root' ? undef : _parent($tree);
 
-  my $nodes = _nodes($parent);
-  my $num   = -1;
-  defined($num++) and $_ eq $tree and last for @$nodes;
-  my @before = $num > 0 ? @$nodes[0 .. ($num - 1)] : ();
-  my @after = $#$nodes > $num ? @$nodes[($num + 1) .. $#$nodes] : ();
+  my $after = _nodes($parent);
+  my $match = -1;
+  defined($match++) and $_ eq $tree and last for @$after;
+  my @before = $match > 0 ? splice(@$after, 0, $match) : ();
+  shift @$after;
 
-  return [\@before, \@after] unless $tags;
+  return [\@before, $after] unless $tags;
 
   return [[grep { $_->[0] eq 'tag' } @before],
-    [grep { $_->[0] eq 'tag' } @after]];
+    [grep { $_->[0] eq 'tag' } @$after]];
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }

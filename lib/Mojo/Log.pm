@@ -6,7 +6,7 @@ use Fcntl ':flock';
 use Mojo::File;
 use Mojo::Util 'encode';
 
-has format => sub { \&_format };
+has format => sub { shift->short ? \&_short : \&_default };
 has handle => sub {
 
   # STDERR
@@ -19,6 +19,7 @@ has history => sub { [] };
 has level => 'debug';
 has max_history_size => 10;
 has 'path';
+has short => sub { !!$ENV{JOURNAL_STREAM} && !shift->path };
 
 # Supported log levels
 my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
@@ -47,7 +48,7 @@ sub new {
 
 sub warn { shift->_log(warn => @_) }
 
-sub _format {
+sub _default {
   '[' . localtime(shift) . '] [' . shift() . '] ' . join "\n", @_, '';
 }
 
@@ -65,6 +66,8 @@ sub _message {
 
   $self->append($self->format->(@$msg));
 }
+
+sub _short { shift; '[' . shift() . '] ' . join "\n", @_, '' }
 
 1;
 
@@ -167,6 +170,15 @@ Maximum number of logged messages to store in L</"history">, defaults to C<10>.
   $log     = $log->path('/var/log/mojo.log');
 
 Log file path used by L</"handle">.
+
+=head2 short
+
+  my $bool = $log->short;
+  $log     = $log->short($bool);
+
+Generate short log messages without a timestamp, suitable for systemd, defaults
+to auto-detection based on the presence of a L</"path"> and the
+C<JOURNAL_STREAM> environment variable.
 
 =head1 METHODS
 

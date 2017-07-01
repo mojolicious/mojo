@@ -69,8 +69,8 @@ sub descendant_nodes { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
 sub find { $_[0]->_collect($_[0]->_css->select($_[1])) }
 
-sub following { _select($_[0]->_collect($_[0]->_siblings(1)->[1]), $_[1]) }
-sub following_nodes { $_[0]->_collect($_[0]->_siblings->[1]) }
+sub following { _select($_[0]->_collect($_[0]->_siblings(1, 1)), $_[1]) }
+sub following_nodes { $_[0]->_collect($_[0]->_siblings(0, 1)) }
 
 sub matches { shift->_css->matches(@_) }
 
@@ -100,8 +100,8 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next      { $_[0]->_maybe($_[0]->_siblings(1)->[1][0]) }
-sub next_node { $_[0]->_maybe($_[0]->_siblings(0)->[1][0]) }
+sub next      { $_[0]->_maybe($_[0]->_siblings(1, 1)->[0]) }
+sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 1)->[0]) }
 
 sub parent {
   my $self = shift;
@@ -111,14 +111,14 @@ sub parent {
 
 sub parse { shift->_delegate(parse => @_) }
 
-sub preceding { _select($_[0]->_collect($_[0]->_siblings(1)->[0]), $_[1]) }
-sub preceding_nodes { $_[0]->_collect($_[0]->_siblings->[0]) }
+sub preceding { _select($_[0]->_collect($_[0]->_siblings(1, 0)), $_[1]) }
+sub preceding_nodes { $_[0]->_collect($_[0]->_siblings(0)) }
 
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous      { $_[0]->_maybe($_[0]->_siblings(1)->[0][-1]) }
-sub previous_node { $_[0]->_maybe($_[0]->_siblings(0)->[0][-1]) }
+sub previous      { $_[0]->_maybe($_[0]->_siblings(1, 0)->[-1]) }
+sub previous_node { $_[0]->_maybe($_[0]->_siblings(0, 0)->[-1]) }
 
 sub remove { shift->replace('') }
 
@@ -285,21 +285,19 @@ sub _replace {
 sub _select { $_[1] ? $_[0]->grep(matches => $_[1]) : $_[0] }
 
 sub _siblings {
-  my ($self, $tags) = @_;
+  my ($self, $tags, $tail) = @_;
 
   my $tree = $self->tree;
   return [] unless my $parent = $tree->[0] eq 'root' ? undef : _parent($tree);
 
-  my $after = _nodes($parent);
+  my $nodes = _nodes($parent);
   my $match = -1;
-  defined($match++) and $_ eq $tree and last for @$after;
-  my @before = $match > 0 ? splice(@$after, 0, $match) : ();
-  shift @$after;
+  defined($match++) and $_ eq $tree and last for @$nodes;
 
-  return [\@before, $after] unless $tags;
+  if ($tail) { splice @$nodes, 0, $match + 1 }
+  else       { splice @$nodes, $match, ($#$nodes + 1) - $match }
 
-  return [[grep { $_->[0] eq 'tag' } @before],
-    [grep { $_->[0] eq 'tag' } @$after]];
+  return $tags ? [grep { $_->[0] eq 'tag' } @$nodes] : $nodes;
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }

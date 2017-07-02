@@ -1,5 +1,6 @@
 
-7.34  2017-06-30
+7.34  2017-07-02
+  - Added short attribute to Mojo::Log.
   - Improved Mojo::Log to print log messages without timestamps to STDERR when
     deployed with systemd.
   - Improved Mojo::DOM performance slightly.

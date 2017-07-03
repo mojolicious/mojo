@@ -6,7 +6,6 @@ use Mojo::Base -base;
 #  Morbo: Morbo is pleased but sticky."
 use Mojo::Loader 'load_class';
 use Mojo::Server::Daemon;
-use Mojo::Util 'deprecated';
 use POSIX 'WNOHANG';
 
 has backend => sub {
@@ -34,13 +33,6 @@ sub run {
 
   $self->_manage until $self->{finished} && !$self->{worker};
   exit 0;
-}
-
-# DEPRECATED!
-sub watch {
-  deprecated 'Mojo::Server::Morbo::watch is DEPRECATED'
-    . ' in favor of Mojo::Server::Morbo::Backend::Poll::watch';
-  shift->backend->watch(@_);
 }
 
 sub _manage {

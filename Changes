@@ -1,5 +1,6 @@
 
-7.35  2017-07-03
+7.35  2017-07-04
+  - Removed deprecated watch attribute from Mojo::Server::Morbo.
 
 7.34  2017-07-02
   - Added short attribute to Mojo::Log.

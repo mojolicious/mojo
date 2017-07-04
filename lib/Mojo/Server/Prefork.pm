@@ -118,7 +118,7 @@ sub _manage {
 
     # Graceful stop with timeout
     my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
-    $log->debug("Stopping worker $pid gracefully ($gt seconds)")
+    $log->info("Stopping worker $pid gracefully ($gt seconds)")
       and (kill 'QUIT', $pid or $self->_stopped($pid))
       if $graceful && !$w->{quit}++;
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
@@ -154,7 +154,7 @@ sub _spawn {
   delete $self->{reader};
   srand;
 
-  $self->app->log->debug("Worker $$ started");
+  $self->app->log->info("Worker $$ started");
   $loop->start;
   exit 0;
 }
@@ -165,7 +165,7 @@ sub _stopped {
   return unless my $w = delete $self->{pool}{$pid};
 
   my $log = $self->app->log;
-  $log->debug("Worker $pid stopped");
+  $log->info("Worker $pid stopped");
   $log->error("Worker $pid stopped too early, shutting down") and $self->_term
     unless $w->{healthy};
 }

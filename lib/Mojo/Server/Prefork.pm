@@ -410,7 +410,7 @@ block the event loop.
 Temporarily spawn up to this number of additional workers if there is a need,
 defaults to C<2>. This allows for new workers to be started while old ones are
 still shutting down gracefully, drastically reducing the performance cost of
-restarts.
+worker restarts.
 
 =head2 pid_file
 

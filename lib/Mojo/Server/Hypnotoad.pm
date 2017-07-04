@@ -322,7 +322,7 @@ C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
 Temporarily spawn up to this number of additional workers if there is a need,
 defaults to the value of L<Mojo::Server::Prefork/"overload">. This allows for
 new workers to be started while old ones are still shutting down gracefully,
-drastically reducing the performance cost of restarts.
+drastically reducing the performance cost of worker restarts.
 
 =head2 pid_file
 

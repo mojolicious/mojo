@@ -13,6 +13,7 @@ has cleanup            => 1;
 has graceful_timeout   => 60;
 has heartbeat_timeout  => 20;
 has heartbeat_interval => 5;
+has overload           => 2;
 has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
 has workers            => 4;
 
@@ -92,7 +93,11 @@ sub _manage {
 
   # Spawn more workers if necessary and check PID file
   if (!$self->{finished}) {
-    $self->_spawn while keys %{$self->{pool}} < $self->workers;
+    my $graceful = grep { $_->{graceful} } values %{$self->{pool}};
+    my $overload = $self->overload;
+    $overload = $graceful ? $graceful > $overload ? $overload : $graceful : 0;
+    my $need = ($self->workers - keys %{$self->{pool}}) + $overload;
+    $self->_spawn while $need-- > 0;
     $self->ensure_pid_file($$);
   }
 
@@ -396,6 +401,15 @@ Maximum amount of time in seconds before a worker without a heartbeat will be
 stopped gracefully, defaults to C<20>. Note that this value should usually be a
 little larger than the maximum amount of time you expect any one operation to
 block the event loop.
+
+=head2 overload
+
+  my $overload = $prefork->overload;
+  $prefork     = $prefork->overload(4);
+
+Temporarily spawn up to this number of additional workers if there is a need,
+for example if too many workers are shutting down gracefully at the same time,
+defaults to C<2>.
 
 =head2 pid_file
 

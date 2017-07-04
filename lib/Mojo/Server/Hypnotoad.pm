@@ -26,7 +26,7 @@ sub configure {
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout listen pid_file workers);
+    qw(heartbeat_timeout inactivity_timeout listen overload pid_file workers);
 }
 
 sub run {
@@ -314,6 +314,14 @@ Setting the value to C<0> will allow connections to be inactive indefinitely.
 
 Array reference with one or more locations to listen on, defaults to
 C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
+
+=head2 overload
+
+  overload => 4
+
+Temporarily spawn up to this number of additional workers if there is a need,
+for example if too many workers are shutting down gracefully at the same time,
+defaults to the value of L<Mojo::Server::Prefork/"overload">.
 
 =head2 pid_file
 

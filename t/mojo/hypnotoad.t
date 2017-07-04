@@ -26,6 +26,7 @@ use Mojo::UserAgent;
     heartbeat_timeout  => 9,
     inactivity_timeout => 5,
     listen             => ['http://*:8081'],
+    overload           => 4,
     pid_file           => '/foo/bar.pid',
     proxy              => 1,
     requests           => 3,
@@ -45,6 +46,7 @@ use Mojo::UserAgent;
   is_deeply $hypnotoad->prefork->listen, ['http://*:8081'], 'right value';
   is $hypnotoad->prefork->max_clients,  1,              'right value';
   is $hypnotoad->prefork->max_requests, 3,              'right value';
+  is $hypnotoad->prefork->overload,     4,              'right value';
   is $hypnotoad->prefork->pid_file,     '/foo/bar.pid', 'right value';
   ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
   is $hypnotoad->prefork->workers, 7, 'right value';

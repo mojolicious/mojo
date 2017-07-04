@@ -1,6 +1,9 @@
 
 7.35  2017-07-04
   - Removed deprecated watch attribute from Mojo::Server::Morbo.
+  - Added overload attribute to Mojo::Server::Prefork.
+  - Added -o option to prefork command.
+  - Added overload setting to Hypnotoad.
   - Increased default graceful_timeout from 20 to 60 seconds in
     Mojo::Server::Prefork.
 

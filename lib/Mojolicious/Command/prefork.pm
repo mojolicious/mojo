@@ -21,10 +21,10 @@ sub run {
     'H|heartbeat-timeout=i'  => sub { $prefork->heartbeat_timeout($_[1]) },
     'i|inactivity-timeout=i' => sub { $prefork->inactivity_timeout($_[1]) },
     'l|listen=s'   => \my @listen,
-    'o|overload=i' => sub { $prefork->overload($_[1]) },
     'P|pid-file=s' => sub { $prefork->pid_file($_[1]) },
     'p|proxy'      => sub { $prefork->reverse_proxy(1) },
     'r|requests=i' => sub { $prefork->max_requests($_[1]) },
+    's|spare=i'    => sub { $prefork->spare($_[1]) },
     'w|workers=i'  => sub { $prefork->workers($_[1]) };
 
   $prefork->listen(\@listen) if @listen;
@@ -71,8 +71,6 @@ Mojolicious::Command::prefork - Pre-fork command
     -m, --mode <name>                    Operating mode for your application,
                                          defaults to the value of
                                          MOJO_MODE/PLACK_ENV or "development"
-    -o, --overload <number>              Temporarily spawn up to this number of
-                                         additional workers, defaults to 2
     -P, --pid-file <path>                Path to process id file, defaults to
                                          "prefork.pid" in a temporary diretory
     -p, --proxy                          Activate reverse proxy support,
@@ -80,6 +78,8 @@ Mojolicious::Command::prefork - Pre-fork command
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
                                          keep-alive connection, defaults to 100
+    -s, --spare <number>                 Temporarily spawn up to this number of
+                                         additional workers, defaults to 2
     -w, --workers <number>               Number of workers, defaults to 4
 
 =head1 DESCRIPTION

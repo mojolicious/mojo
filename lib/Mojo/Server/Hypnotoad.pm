@@ -26,7 +26,7 @@ sub configure {
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout listen overload pid_file workers);
+    qw(heartbeat_timeout inactivity_timeout listen pid_file spare workers);
 }
 
 sub run {
@@ -315,15 +315,6 @@ Setting the value to C<0> will allow connections to be inactive indefinitely.
 Array reference with one or more locations to listen on, defaults to
 C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
 
-=head2 overload
-
-  overload => 4
-
-Temporarily spawn up to this number of additional workers if there is a need,
-defaults to the value of L<Mojo::Server::Prefork/"overload">. This allows for
-new workers to be started while old ones are still shutting down gracefully,
-drastically reducing the performance cost of worker restarts.
-
 =head2 pid_file
 
   pid_file => '/var/run/hypnotoad.pid'
@@ -346,6 +337,15 @@ value of L<Mojo::Server/"reverse_proxy">.
 
 Number of keep-alive requests per connection, defaults to the value of
 L<Mojo::Server::Daemon/"max_requests">.
+
+=head2 spare
+
+  spare => 4
+
+Temporarily spawn up to this number of additional workers if there is a need,
+defaults to the value of L<Mojo::Server::Prefork/"spare">. This allows for new
+workers to be started while old ones are still shutting down gracefully,
+drastically reducing the performance cost of worker restarts.
 
 =head2 upgrade_timeout
 

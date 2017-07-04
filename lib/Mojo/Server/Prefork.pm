@@ -13,8 +13,8 @@ has cleanup            => 1;
 has graceful_timeout   => 60;
 has heartbeat_timeout  => 20;
 has heartbeat_interval => 5;
-has overload           => 2;
 has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
+has spare              => 2;
 has workers            => 4;
 
 sub DESTROY { unlink $_[0]->pid_file if $_[0]->cleanup }
@@ -94,9 +94,9 @@ sub _manage {
   # Spawn more workers if necessary and check PID file
   if (!$self->{finished}) {
     my $graceful = grep { $_->{graceful} } values %{$self->{pool}};
-    my $overload = $self->overload;
-    $overload = $graceful ? $graceful > $overload ? $overload : $graceful : 0;
-    my $need = ($self->workers - keys %{$self->{pool}}) + $overload;
+    my $spare = $self->spare;
+    $spare = $graceful ? $graceful > $spare ? $spare : $graceful : 0;
+    my $need = ($self->workers - keys %{$self->{pool}}) + $spare;
     $self->_spawn while $need-- > 0;
     $self->ensure_pid_file($$);
   }
@@ -402,16 +402,6 @@ stopped gracefully, defaults to C<20>. Note that this value should usually be a
 little larger than the maximum amount of time you expect any one operation to
 block the event loop.
 
-=head2 overload
-
-  my $overload = $prefork->overload;
-  $prefork     = $prefork->overload(4);
-
-Temporarily spawn up to this number of additional workers if there is a need,
-defaults to C<2>. This allows for new workers to be started while old ones are
-still shutting down gracefully, drastically reducing the performance cost of
-worker restarts.
-
 =head2 pid_file
 
   my $file = $prefork->pid_file;
@@ -419,6 +409,16 @@ worker restarts.
 
 Full path of process id file, defaults to C<prefork.pid> in a temporary
 directory.
+
+=head2 spare
+
+  my $spare = $prefork->spare;
+  $prefork  = $prefork->spare(4);
+
+Temporarily spawn up to this number of additional workers if there is a need,
+defaults to C<2>. This allows for new workers to be started while old ones are
+still shutting down gracefully, drastically reducing the performance cost of
+worker restarts.
 
 =head2 workers
 

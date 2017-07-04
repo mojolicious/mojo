@@ -123,15 +123,15 @@ sub _manage {
   if ($self->{upgrade} && !$self->{finished}) {
 
     # Fresh start
+    my $ut = $self->upgrade_timeout;
     unless ($self->{new}) {
-      $log->info('Starting zero downtime software upgrade');
+      $log->info("Starting zero downtime software upgrade ($ut seconds)");
       die "Can't fork: $!" unless defined(my $pid = $self->{new} = fork);
       exec $^X, $ENV{HYPNOTOAD_EXE} or die "Can't exec: $!" unless $pid;
     }
 
     # Timeout
-    kill 'KILL', $self->{new}
-      if $self->{upgrade} + $self->upgrade_timeout <= steady_time;
+    kill 'KILL', $self->{new} if $self->{upgrade} + $ut <= steady_time;
   }
 }
 

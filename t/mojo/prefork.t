@@ -79,12 +79,13 @@ ok $graceful, 'server has been stopped gracefully';
 is_deeply [sort @spawn], [sort @reap], 'same process ids';
 is $tx->res->code, 200,           'right status';
 is $tx->res->body, 'just works!', 'right content';
-like $log, qr/Listening at/,                         'right message';
-like $log, qr/Manager $$ started/,                   'right message';
-like $log, qr/Creating process id file/,             'right message';
-like $log, qr/Stopping worker $spawn[0] gracefully/, 'right message';
-like $log, qr/Worker $spawn[0] stopped/,             'right message';
-like $log, qr/Manager $$ stopped/,                   'right message';
+like $log, qr/Listening at/,             'right message';
+like $log, qr/Manager $$ started/,       'right message';
+like $log, qr/Creating process id file/, 'right message';
+like $log, qr/Stopping worker $spawn[0] gracefully \(60 seconds\)/,
+  'right message';
+like $log, qr/Worker $spawn[0] stopped/, 'right message';
+like $log, qr/Manager $$ stopped/,       'right message';
 $prefork->app->log->unsubscribe(message => $cb);
 
 # Process id file

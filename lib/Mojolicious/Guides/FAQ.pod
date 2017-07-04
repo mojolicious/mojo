@@ -203,7 +203,7 @@ server closed the connection before the user agent could receive the whole
 response or that the user agent got destroyed, which forces all connections to
 be closed immediately.
 
-=head2 What does "Worker 31842 has no heartbeat, restarting" mean?
+=head2 What does "Worker 31842 has no heartbeat (20 seconds), restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in
 pre-forking web servers send heartbeat messages to the manager process at

@@ -47,7 +47,7 @@ Mojolicious::Command::prefork - Pre-fork command
     ./myapp.pl prefork -m production -l http://*:8080
     ./myapp.pl prefork -l http://127.0.0.1:8080 -l https://[::]:8081
     ./myapp.pl prefork -l 'https://*:443?cert=./server.crt&key=./server.key'
-    ./myapp.pl prefork -l http+unix://%2Ftmp%2Fmyapp.sock
+    ./myapp.pl prefork -l http+unix://%2Ftmp%2Fmyapp.sock -w 12
 
   Options:
     -a, --accepts <number>               Number of connections for workers to
@@ -58,7 +58,7 @@ Mojolicious::Command::prefork - Pre-fork command
                                          connections, defaults to 1000
     -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 60.
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
-    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
+    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 30
     -h, --help                           Show this summary of available options
         --home <path>                    Path to home directory of your
                                          application, defaults to the value of

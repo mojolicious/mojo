@@ -171,12 +171,9 @@ sub _listen {
   croak qq{Invalid listen location "$listen"}
     unless $proto eq 'http' || $proto eq 'https' || $proto eq 'http+unix';
 
-  my $query   = $url->query;
-  my $options = {
-    backlog       => $self->backlog,
-    single_accept => $query->param('single_accept'),
-    reuse         => $query->param('reuse')
-  };
+  my $query = $url->query;
+  my $options = {backlog => $self->backlog};
+  $options->{$_} = $query->param($_) for qw(fd single_accept reuse);
   if ($proto eq 'http+unix') { $options->{path} = $url->host }
   else {
     if ((my $host = $url->host) ne '*') { $options->{address} = $host }
@@ -370,6 +367,9 @@ C<http://0.0.0.0:3000>).
   # Listen on UNIX domain socket "/tmp/myapp.sock" (percent encoded slash)
   $daemon->listen(['http+unix://%2Ftmp%2Fmyapp.sock']);
 
+  # File descriptor, as used by systemd
+  $daemon->listen(['http://127.0.0.1?fd=3']);
+
   # Allow multiple servers to use the same port (SO_REUSEPORT)
   $daemon->listen(['http://*:8080?reuse=1']);
 
@@ -410,6 +410,12 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
 TLS cipher specification string. For more information about the format see
 L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
+
+=item fd
+
+  fd=3
+
+File descriptor with an already prepared listen socket.
 
 =item key
 

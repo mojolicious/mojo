@@ -45,7 +45,7 @@ sub listen {
   # Reuse file descriptor
   my $handle;
   my $class = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
-  if (defined $fd) {
+  if (defined($fd //= $args->{fd})) {
     $handle = $class->new_from_fd($fd, 'r')
       or croak "Can't open file descriptor $fd: $!";
   }
@@ -222,6 +222,12 @@ Local address to listen on, defaults to C<0.0.0.0>.
   backlog => 128
 
 Maximum backlog size, defaults to C<SOMAXCONN>.
+
+=item fd
+
+  fd => 3
+
+File descriptor with an already prepared listen socket.
 
 =item path
 

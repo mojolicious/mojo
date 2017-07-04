@@ -1,8 +1,10 @@
 
-7.35  2017-07-04
+7.35  2017-07-05
   - Removed deprecated watch attribute from Mojo::Server::Morbo.
   - Added spare attribute to Mojo::Server::Prefork.
   - Added -s option to prefork command.
+  - Added fd option to Mojo::IOLoop::Server::listen.
+  - Added fd parameter to Mojo::Server::Daemon::listen.
   - Added spare setting to Hypnotoad.
   - Increased default graceful_timeout from 20 to 60 seconds and
     heartbeat_timeout from 20 to 30 seconds in Mojo::Server::Prefork.

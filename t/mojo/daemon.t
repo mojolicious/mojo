@@ -7,6 +7,7 @@ BEGIN {
 
 use Test::More;
 use FindBin;
+use IO::Socket::INET;
 use Mojo;
 use Mojo::File 'path';
 use Mojo::IOLoop;
@@ -120,31 +121,38 @@ $app->log->level('fatal');
 
 $app->routes->post(
   '/chunked' => sub {
-    my $self = shift;
+    my $c = shift;
 
-    my $params = $self->req->params->to_hash;
+    my $params = $c->req->params->to_hash;
     my @chunks;
     for my $key (sort keys %$params) { push @chunks, $params->{$key} }
 
     my $cb;
     $cb = sub {
-      my $self = shift;
+      my $c = shift;
       $cb = undef unless my $chunk = shift @chunks || '';
-      $self->write_chunk($chunk, $cb);
+      $c->write_chunk($chunk, $cb);
     };
-    $self->$cb;
+    $c->$cb;
   }
 );
 
 my ($local_address, $local_port, $remote_address, $remote_port);
 $app->routes->post(
   '/upload' => sub {
-    my $self = shift;
-    $local_address  = $self->tx->local_address;
-    $local_port     = $self->tx->local_port;
-    $remote_address = $self->tx->remote_address;
-    $remote_port    = $self->tx->remote_port;
-    $self->render(data => $self->req->upload('file')->slurp);
+    my $c = shift;
+    $local_address  = $c->tx->local_address;
+    $local_port     = $c->tx->local_port;
+    $remote_address = $c->tx->remote_address;
+    $remote_port    = $c->tx->remote_port;
+    $c->render(data => $c->req->upload('file')->slurp);
+  }
+);
+
+$app->routes->any(
+  '/port' => sub {
+    my $c = shift;
+    $c->render(text => $c->req->url->to_abs->port);
   }
 );
 
@@ -324,6 +332,20 @@ $tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
 ok !$tx->keep_alive, 'will not be kept alive';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
+
+# File descriptor
+my $listen = IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1');
+my $fd = fileno $listen;
+$daemon = Mojo::Server::Daemon->new(
+  app    => $app,
+  listen => ["http://127.0.0.1?fd=$fd"],
+  silent => 1
+)->start;
+$port = $listen->sockport;
+is $daemon->ports->[0], $port, 'same port';
+$tx = $ua->get("http://127.0.0.1:$port/port");
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $port, 'right content';
 
 # No TLS support
 eval {

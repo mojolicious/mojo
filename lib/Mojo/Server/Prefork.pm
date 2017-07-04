@@ -408,8 +408,9 @@ block the event loop.
   $prefork     = $prefork->overload(4);
 
 Temporarily spawn up to this number of additional workers if there is a need,
-for example if too many workers are shutting down gracefully at the same time,
-defaults to C<2>.
+defaults to C<2>. This allows for new workers to be started while old ones are
+still shutting down gracefully, drastically reducing the performance cost of
+restarts.
 
 =head2 pid_file
 

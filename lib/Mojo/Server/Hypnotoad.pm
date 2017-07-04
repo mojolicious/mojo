@@ -320,8 +320,9 @@ C<http://*:8080>. See also L<Mojo::Server::Daemon/"listen"> for more examples.
   overload => 4
 
 Temporarily spawn up to this number of additional workers if there is a need,
-for example if too many workers are shutting down gracefully at the same time,
-defaults to the value of L<Mojo::Server::Prefork/"overload">.
+defaults to the value of L<Mojo::Server::Prefork/"overload">. This allows for
+new workers to be started while old ones are still shutting down gracefully,
+drastically reducing the performance cost of restarts.
 
 =head2 pid_file
 

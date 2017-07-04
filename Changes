@@ -4,8 +4,8 @@
   - Added spare attribute to Mojo::Server::Prefork.
   - Added -s option to prefork command.
   - Added spare setting to Hypnotoad.
-  - Increased default graceful_timeout from 20 to 60 seconds in
-    Mojo::Server::Prefork.
+  - Increased default graceful_timeout from 20 to 60 seconds and
+    heartbeat_timeout from 20 to 30 seconds in Mojo::Server::Prefork.
 
 7.34  2017-07-02
   - Added short attribute to Mojo::Log.

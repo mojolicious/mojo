@@ -203,14 +203,14 @@ server closed the connection before the user agent could receive the whole
 response or that the user agent got destroyed, which forces all connections to
 be closed immediately.
 
-=head2 What does "Worker 31842 has no heartbeat (20 seconds), restarting" mean?
+=head2 What does "Worker 31842 has no heartbeat (30 seconds), restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in
 pre-forking web servers send heartbeat messages to the manager process at
 regular intervals, to signal that they are still responsive. A blocking
 operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
-defaults to C<20> seconds and can be extended with the attribute
+defaults to C<30> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
 
 =head2 What does "Connection already closed" mean?

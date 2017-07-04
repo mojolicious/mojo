@@ -11,7 +11,7 @@ use Scalar::Util 'weaken';
 has accepts            => 10000;
 has cleanup            => 1;
 has graceful_timeout   => 60;
-has heartbeat_timeout  => 20;
+has heartbeat_timeout  => 30;
 has heartbeat_interval => 5;
 has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
 has spare              => 2;
@@ -398,7 +398,7 @@ Heartbeat interval in seconds, defaults to C<5>.
   $prefork    = $prefork->heartbeat_timeout(2);
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped gracefully, defaults to C<20>. Note that this value should usually be a
+stopped gracefully, defaults to C<30>. Note that this value should usually be a
 little larger than the maximum amount of time you expect any one operation to
 block the event loop.
 

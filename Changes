@@ -1,6 +1,8 @@
 
 7.35  2017-07-04
   - Removed deprecated watch attribute from Mojo::Server::Morbo.
+  - Increased default graceful_timeout from 20 to 60 seconds in
+    Mojo::Server::Prefork.
 
 7.34  2017-07-02
   - Added short attribute to Mojo::Log.

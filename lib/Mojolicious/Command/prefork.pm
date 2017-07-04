@@ -55,7 +55,7 @@ Mojolicious::Command::prefork - Pre-fork command
                                          SOMAXCONN
     -c, --clients <number>               Maximum number of concurrent
                                          connections, defaults to 1000
-    -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 20.
+    -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 60.
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
     -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
     -h, --help                           Show this summary of available options

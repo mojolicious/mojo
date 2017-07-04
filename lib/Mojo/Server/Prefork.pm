@@ -8,9 +8,10 @@ use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 
-has accepts => 10000;
-has cleanup => 1;
-has [qw(graceful_timeout heartbeat_timeout)] => 20;
+has accepts            => 10000;
+has cleanup            => 1;
+has graceful_timeout   => 60;
+has heartbeat_timeout  => 20;
 has heartbeat_interval => 5;
 has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
 has workers            => 4;
@@ -123,7 +124,7 @@ sub _manage {
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
-    $log->debug("Stopping worker $pid")
+    $log->debug("Stopping worker $pid immediately")
       and (kill 'KILL', $pid or $self->_stopped($pid))
       if $w->{force} || ($self->{finished} && !$graceful);
   }
@@ -376,7 +377,7 @@ a true value.
   $prefork    = $prefork->graceful_timeout(15);
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
-being forced, defaults to C<20>. Note that this value should usually be a little
+being forced, defaults to C<60>. Note that this value should usually be a little
 larger than the maximum amount of time you expect any one request to take.
 
 =head2 heartbeat_interval

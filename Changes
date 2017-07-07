@@ -1,5 +1,6 @@
 
-7.36  2017-07-06
+7.36  2017-07-07
+  - Fixed basename method in Mojo::File to work with relative paths. (jberger)
 
 7.35  2017-07-05
   - Removed deprecated watch attribute from Mojo::Server::Morbo.

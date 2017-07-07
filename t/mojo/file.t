@@ -48,6 +48,7 @@ is path('.')->realpath, realpath('.'), 'same path';
 is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';
 is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'),
   'same path';
+is path('file.t')->basename('.t'), basename('file.t', '.t'), 'same path';
 
 # Dirname
 is path('file.t')->to_abs->dirname, scalar dirname(rel2abs 'file.t'),

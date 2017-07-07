@@ -21,7 +21,7 @@ use Mojo::Collection;
 
 our @EXPORT_OK = ('path', 'tempdir', 'tempfile');
 
-sub basename { File::Basename::basename ${$_[0]}, @_ }
+sub basename { File::Basename::basename ${shift()}, @_ }
 
 sub child { $_[0]->new(@_) }
 

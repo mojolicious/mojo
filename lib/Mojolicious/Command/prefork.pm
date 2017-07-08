@@ -72,7 +72,7 @@ Mojolicious::Command::prefork - Pre-fork command
                                          defaults to the value of
                                          MOJO_MODE/PLACK_ENV or "development"
     -P, --pid-file <path>                Path to process id file, defaults to
-                                         "prefork.pid" in a temporary diretory
+                                         "prefork.pid" in a temporary directory
     -p, --proxy                          Activate reverse proxy support,
                                          defaults to the value of
                                          MOJO_REVERSE_PROXY

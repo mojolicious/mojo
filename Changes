@@ -1,6 +1,7 @@
 
-7.36  2017-07-07
+7.36  2017-07-08
   - Fixed basename method in Mojo::File to work with relative paths. (jberger)
+  - Fixed Mojo::HelloWorld to actually be a Mojolicious subclass.
 
 7.35  2017-07-05
   - Removed deprecated watch attribute from Mojo::Server::Morbo.

@@ -216,13 +216,9 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =over 2
 
-=item * L<Mojolicious::Lite>
-
-=over 2
-
 =item * L<Mojo::HelloWorld>
 
-=back
+=item * L<Mojolicious::Lite>
 
 =back
 

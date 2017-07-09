@@ -19,7 +19,8 @@ has history => sub { [] };
 has level => 'debug';
 has max_history_size => 10;
 has 'path';
-has short => sub { $ENV{JOURNAL_STREAM} && !shift->path };
+has short =>
+  sub { $ENV{INVOCATION_ID} && $ENV{JOURNAL_STREAM} && !shift->path };
 
 # Supported log levels
 my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
@@ -178,7 +179,7 @@ Log file path used by L</"handle">.
 
 Generate short log messages without a timestamp, suitable for systemd, defaults
 to auto-detection based on the presence of a L</"path"> and the
-C<JOURNAL_STREAM> environment variable.
+C<INVOCATION_ID> and C<JOURNAL_STREAM> environment variables.
 
 =head1 METHODS
 

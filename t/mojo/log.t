@@ -57,6 +57,7 @@ like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^debug:\d+:Test:1:2:3$/,
   like $log->format->(time, 'debug', 'Test 123'),
     qr/^\[.*\] \[debug\] Test 123\n$/, 'right format';
   local $ENV{JOURNAL_STREAM} = '1:23456';
+  local $ENV{INVOCATION_ID}  = 1;
   $log = Mojo::Log->new;
   ok $log->short, 'systemd has been detected';
   like $log->format->(time, 'debug', 'Test 123'), qr/^\[debug\] Test 123\n$/,

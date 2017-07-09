@@ -1,6 +1,8 @@
 
-7.36  2017-07-08
+7.36  2017-07-09
   - Fixed basename method in Mojo::File to work with relative paths. (jberger)
+  - Fixed a bug where Mojo::Log could not correctly identify if it was deployed
+    with systemd.
   - Fixed Mojo::HelloWorld to actually be a Mojolicious subclass.
 
 7.35  2017-07-05

@@ -65,6 +65,7 @@
     </div>
     <div id="mojobar-links">
       %= link_to Documentation => 'http://mojolicious.org/perldoc'
+      %= link_to Chat => 'https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org'
       %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
       %= link_to GitHub => 'https://github.com/kraih/mojo'
       %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'

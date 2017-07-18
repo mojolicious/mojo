@@ -284,8 +284,6 @@ resolve issues and learning from mistakes.
 
 =back
 
-Original text courtesy of the L<Speak Up! project|http://speakup.io/coc.html>.
-
 =head1 FORK POLICY
 
 The L<Mojolicious> core team believes that there is a lot of value in the entire

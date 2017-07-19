@@ -2,7 +2,6 @@ package Mojolicious::Command::generate::app;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
-use Mojo::Path;
 use Mojo::File;
 
 has description => 'Generate Mojolicious application directory structure';

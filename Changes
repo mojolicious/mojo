@@ -1,5 +1,7 @@
 
-7.37  2017-07-18
+7.37  2017-07-19
+  - Fixed bugs in Mojo::IOLoop and Mojo::Reactor::Poll that would prevent a
+    reset from clearing events.
 
 7.36  2017-07-09
   - Fixed basename method in Mojo::File to work with relative paths. (jberger)

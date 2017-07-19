@@ -234,6 +234,12 @@ $reactor->timer(0 => sub { die "works!\n" });
 $reactor->start;
 like $err, qr/works!/, 'right error';
 
+# Reset events
+$reactor->on(error => sub { });
+ok $reactor->has_subscribers('error'), 'has subscribers';
+$reactor->reset;
+ok !$reactor->has_subscribers('error'), 'no subscribers';
+
 # Recursion
 $timer   = undef;
 $reactor = $reactor->new;

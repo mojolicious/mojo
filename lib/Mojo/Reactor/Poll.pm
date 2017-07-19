@@ -91,11 +91,11 @@ sub remove {
   return !!delete $self->{io}{fileno $remove};
 }
 
-sub reset { delete @{shift()}{qw(io next_tick next_timer timers)} }
+sub reset { delete @{shift()}{qw(events io next_tick next_timer timers)} }
 
 sub start {
   my $self = shift;
-  $self->{running}++;
+  local $self->{running} = ($self->{running} || 0) + 1;
   $self->one_tick while $self->{running};
 }
 

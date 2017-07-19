@@ -129,6 +129,12 @@ Mojo::IOLoop->one_tick;
 Mojo::IOLoop->reset;
 ok time < ($time + 10), 'stopped automatically';
 
+# Reset events
+Mojo::IOLoop->singleton->on(finish => sub { });
+ok !!Mojo::IOLoop->singleton->has_subscribers('finish'), 'has subscribers';
+Mojo::IOLoop->reset;
+ok !Mojo::IOLoop->singleton->has_subscribers('finish'), 'no subscribers';
+
 # Stream
 my $buffer = '';
 $id = Mojo::IOLoop->server(

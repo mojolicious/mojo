@@ -98,7 +98,7 @@ sub remove {
 
 sub reset {
   my $self = _instance(shift);
-  delete @$self{qw(accepting acceptors in out stop)};
+  delete @$self{qw(accepting acceptors events in out stop)};
   $self->reactor->reset;
   $self->stop;
 }

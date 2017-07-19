@@ -2,9 +2,18 @@ package Mojolicious::Command::generate::app;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
+use Mojo::File;
 
 has description => 'Generate Mojolicious application directory structure';
 has usage => sub { shift->extract_usage };
+
+has locations => sub { { script => 'script',
+                         class  => 'lib',
+                         test   => 't',
+                         static => 'public',
+                         controller => 'Example',
+                         action => 'welcome',
+                     } };
 
 sub run {
   my ($self, $class) = @_;
@@ -18,32 +27,48 @@ EOF
 
   # Script
   my $name = class_to_file $class;
-  $self->render_to_rel_file('mojo', "$name/script/$name", $class);
-  $self->chmod_rel_file("$name/script/$name", 0744);
-
-  # Application class
-  my $app = class_to_path $class;
-  $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
+  my $script_name = Mojo::File->new($name, $self->locations->{script})->child($name);
+  $self->render_to_rel_file('mojo',
+                            $script_name,
+                            $class, $self->locations->{class});
+  $self->chmod_rel_file($script_name, 0744);
 
   # Config file (using the default moniker)
-  $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.conf");
+  my $config_base = decamelize $class . '.conf';
+  $self->render_to_rel_file('config',
+                            Mojo::File->new($name)->child(${config_base}),
+                            $config_base);
+
+  # Application class
+  my $controller = $self->locations->{controller};
+  my $action     = $self->locations->{action};
+  $self->render_to_rel_file('appclass',
+                            Mojo::File->new($name, $self->locations->{class}, class_to_path $class),
+                            # NOTE: Mojo::Home currently requires
+                            # application class in 'lib' or 'blib'
+                            $class, $config_base, decamelize($controller), $action);
 
   # Controller
-  my $controller = "${class}::Controller::Example";
-  my $path       = class_to_path $controller;
-  $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
+  my $controller_class = "${class}::Controller::${controller}";
+  $self->render_to_rel_file('controller',
+                            Mojo::File->new($name,  $self->locations->{class}, class_to_path $controller_class),
+                            $controller_class, decamelize($controller), $action);
 
   # Test
-  $self->render_to_rel_file('test', "$name/t/basic.t", $class);
+  $self->render_to_rel_file('test',
+                            Mojo::File->new($name, $self->locations->{test})->child('basic.t'),
+                            $class);
 
   # Static file
-  $self->render_to_rel_file('static', "$name/public/index.html");
+  $self->render_to_rel_file('static',
+                            Mojo::File->new($name, $self->locations->{static})->child('index.html'));
 
   # Templates
   $self->render_to_rel_file('layout',
-    "$name/templates/layouts/default.html.ep");
+                            Mojo::File->new($name, 'templates', 'layouts')->child('default.html.ep'));
   $self->render_to_rel_file('welcome',
-    "$name/templates/example/welcome.html.ep");
+                            Mojo::File->new($name, 'templates', decamelize $controller)->child("${action}.html.ep"),
+                            decamelize($controller), $action);
 }
 
 1;
@@ -114,21 +139,21 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 __DATA__
 
 @@ mojo
-% my $class = shift;
+% my ($class, $lib) = @_;
 #!/usr/bin/env perl
 
 use strict;
 use warnings;
 
 use FindBin;
-BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+BEGIN { unshift @INC, "$FindBin::Bin/../<%= $lib %>" }
 use Mojolicious::Commands;
 
 # Start command line interface for application
 Mojolicious::Commands->start_app('<%= $class %>');
 
 @@ appclass
-% my $class = shift;
+% my ($class, $config, $controller, $action) = @_;
 package <%= $class %>;
 use Mojo::Base 'Mojolicious';
 
@@ -136,8 +161,8 @@ use Mojo::Base 'Mojolicious';
 sub startup {
   my $self = shift;
 
-  # Load configuration from hash returned by "my_app.conf"
-  my $config = $self->plugin('Config');
+  # Load configuration from hash returned by .conf file
+  my $config = $self->plugin('Config' => {file => "<%= $config %>"});
 
   # Documentation browser under "/perldoc"
   $self->plugin('PODRenderer') if $config->{perldoc};
@@ -146,21 +171,21 @@ sub startup {
   my $r = $self->routes;
 
   # Normal route to controller
-  $r->get('/')->to('example#welcome');
+  $r->get('/')->to('<%= $controller %>#<%= $action %>');
 }
 
 1;
 
 @@ controller
-% my $class = shift;
+% my ($class, $controller, $action) = @_;
 package <%= $class %>;
 use Mojo::Base 'Mojolicious::Controller';
 
 # This action will render a template
-sub welcome {
+sub <%= $action %> {
   my $self = shift;
 
-  # Render template "example/welcome.html.ep" with message
+  # Render template "<%= $controller %>/<%= $action %>.html.ep" with message
   $self->render(msg => 'Welcome to the Mojolicious real-time web framework!');
 }
 
@@ -187,7 +212,10 @@ use Test::More;
 use Test::Mojo;
 
 my $t = Test::Mojo->new('<%= $class %>');
+# Test controller
 $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
+# ...and static file
+$t->get_ok('/index.html')->status_is(200)->content_like(qr/Welcome to the/i);
 
 done_testing();
 
@@ -201,9 +229,10 @@ done_testing();
 @@ welcome
 %% layout 'default';
 %% title 'Welcome';
+% my ($controller, $action) = @_;
 <h2><%%= $msg %></h2>
 <p>
-  This page was generated from the template "templates/example/welcome.html.ep"
+  This page was generated from the template "templates/<%= $controller %>/<%= $action %>.html.ep"
   and the layout "templates/layouts/default.html.ep",
   <%%= link_to 'click here' => url_for %> to reload the page or
   <%%= link_to 'here' => '/index.html' %> to move forward to a static page.

@@ -251,17 +251,19 @@ sub secure_compare {
 
 sub slugify {
   my ($value, $allow_unicode) = @_;
+
   if ($allow_unicode) {
 
-    # force unicode semantics by upgrading string
+    # Force unicode semantics by upgrading string
     utf8::upgrade($value = Unicode::Normalize::NFKC($value));
     $value =~ s/[^\w\s-]+//g;
   }
   else {
     $value = Unicode::Normalize::NFKD($value);
-    $value =~ s/[^a-zA-Z0-9_\p{PosixSpace}-]+//g;  # ascii word/space/dash chars
+    $value =~ s/[^a-zA-Z0-9_\p{PosixSpace}-]+//g;
   }
   (my $new = lc trim($value)) =~ s/[-\s]+/-/g;
+
   return $new;
 }
 

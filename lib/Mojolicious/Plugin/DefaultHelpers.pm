@@ -217,7 +217,7 @@ Alias for L<Mojolicious::Controller/"app">.
 
 =head2 b
 
-  %= b('test 123')->b64_encode
+  %= b('Joel is a slug')->slugify
 
 Turn string into a L<Mojo::ByteStream> object.
 

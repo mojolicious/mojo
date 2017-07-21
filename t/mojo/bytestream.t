@@ -136,9 +136,9 @@ is $buffer, "test\n123\n\"123\"\n", 'right output';
 is b("\t\b\r\n\f")->term_escape, "\\x09\\x08\\x0d\n\\x0c", 'right result';
 
 # slugify
-is b("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois")->slugify,
+is b("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois")->slugify->to_string,
   'un-elephant-a-loree-du-bois', 'right result';
-is b("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois")->slugify(1),
+is b("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois")->slugify(1)->to_string,
   "un-\x{e9}l\x{e9}phant-\x{e0}-lor\x{e9}e-du-bois", 'right result';
 
 done_testing();

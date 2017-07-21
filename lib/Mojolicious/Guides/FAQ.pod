@@ -203,6 +203,15 @@ server closed the connection before the user agent could receive the whole
 response or that the user agent got destroyed, which forces all connections to
 be closed immediately.
 
+  # The variable $ua goes out of scope and gets destroyed too early
+  Mojo::IOLoop->timer(5 => sub {
+    my $ua = Mojo::UserAgent->new;
+    $ua->get('http://mojolicious.org' => sub {
+      my ($ua, $tx) = @_;
+      say $tx->result->dom->at('title')->text;
+    });
+  });
+
 =head2 What does "Worker 31842 has no heartbeat (30 seconds), restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in

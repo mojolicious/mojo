@@ -13,7 +13,8 @@ use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Pod::Usage 'pod2usage';
 use Symbol 'delete_package';
-use Time::HiRes ();
+use Time::HiRes        ();
+use Unicode::Normalize ();
 
 # Check for monotonic clock support
 use constant MONOTONIC =>
@@ -62,8 +63,8 @@ our @EXPORT_OK = (
   qw(decode deprecated dumper encode extract_usage getopt hmac_sha1_sum),
   qw(html_attr_unescape html_unescape md5_bytes md5_sum monkey_patch),
   qw(punycode_decode punycode_encode quote secure_compare sha1_bytes sha1_sum),
-  qw(split_cookie_header split_header steady_time tablify term_escape trim),
-  qw(unindent unquote url_escape url_unescape xml_escape xor_encode)
+  qw(slugify split_cookie_header split_header steady_time tablify term_escape),
+  qw(trim unindent unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -246,6 +247,22 @@ sub secure_compare {
   my $r = 0;
   $r |= ord(substr $one, $_) ^ ord(substr $two, $_) for 0 .. length($one) - 1;
   return $r == 0;
+}
+
+sub slugify {
+  my ($value, $allow_unicode) = @_;
+  if ($allow_unicode) {
+
+    # force unicode semantics by upgrading string
+    utf8::upgrade($value = Unicode::Normalize::NFKC($value));
+    $value =~ s/[^\w\s-]+//g;
+  }
+  else {
+    $value = Unicode::Normalize::NFKD($value);
+    $value =~ s/[^a-zA-Z0-9_\p{PosixSpace}-]+//g;  # ascii word/space/dash chars
+  }
+  (my $new = lc trim($value)) =~ s/[-\s]+/-/g;
+  return $new;
 }
 
 sub split_cookie_header { _header(shift, 1) }
@@ -708,6 +725,27 @@ Generate SHA1 checksum for bytes.
 
   # "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
   sha1_sum 'foo';
+
+=head2 slugify
+
+  my $slug = slugify $string;
+  my $slug = slugify $string, $bool;
+
+Returns a URL slug generated from the input string. Non-word characters are
+removed, the string is trimmed and lowercased, and whitespace characters are
+replaced by a dash. By default, non-ASCII characters are normalized to ASCII
+word characters or removed, but if a true value is passed as the second
+parameter, all word characters will be allowed in the result according to
+unicode semantics.
+
+  # "joel-is-a-slug"
+  slugify 'Joel is a slug';
+
+  # "this-is-my-resume"
+  slugify 'This is: my - résumé! ☃ ';
+
+  # "this-is-my-résumé"
+  slugify 'This is: my - résumé! ☃ ', 1;
 
 =head2 split_cookie_header
 

@@ -12,8 +12,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
-  qw(sha1_sum term_escape trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode)
+  qw(sha1_sum slugify term_escape trim unindent unquote url_escape),
+  qw(url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);
@@ -249,6 +249,13 @@ Generate SHA1 checksum for bytestream with L<Mojo::Util/"sha1_sum">.
   my $size = $stream->size;
 
 Size of bytestream.
+
+=head2 slugify
+
+  $stream = $stream->slugify;
+  $stream = $stream->slugify($bool);
+
+Generate URL slug for bytestream with L<Mojo::Util/"slugify">.
 
 =head2 split
 

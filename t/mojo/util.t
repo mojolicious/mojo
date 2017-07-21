@@ -12,7 +12,7 @@ use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode dumper encode extract_usage getopt hmac_sha1_sum html_unescape),
   qw(html_attr_unescape md5_bytes md5_sum monkey_patch punycode_decode),
-  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum),
+  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum slugify),
   qw(split_cookie_header split_header steady_time tablify term_escape trim),
   qw(unindent unquote url_escape url_unescape xml_escape xor_encode);
 
@@ -511,6 +511,23 @@ is term_escape("Accept: */*\x0d\x0a"), "Accept: */*\\x0d\x0a",   'right result';
 is term_escape("\t\b\r\n\f"),          "\\x09\\x08\\x0d\n\\x0c", 'right result';
 is term_escape("\x00\x09\x0b\x1f\x7f\x80\x9f"), '\x00\x09\x0b\x1f\x7f\x80\x9f',
   'right result';
+
+# slugify
+is slugify('a & b'),     'a-b',     'right result';
+is slugify('a &amp; b'), 'a-amp-b', 'right result';
+is slugify(123),         '123',     'right result';
+is slugify(' Jack & Jill like numbers 1,2,3 and 4 and silly characters ?%.$!/'),
+  'jack-jill-like-numbers-123-and-4-and-silly-characters', 'right result';
+is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois"),
+  'un-elephant-a-loree-du-bois', 'right result';
+is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois", 1),
+  "un-\x{e9}l\x{e9}phant-\x{e0}-lor\x{e9}e-du-bois", 'right result';
+is slugify('Hello, World!'), 'hello-world', 'right result';
+is slugify('spam & eggs'),   'spam-eggs',   'right result';
+is slugify('spam & ıçüş',  1), 'spam-ıçüş', 'right result';
+is slugify('foo ıç bar',     1), 'foo-ıç-bar',  'right result';
+is slugify('    foo ıç bar', 1), 'foo-ıç-bar',  'right result';
+is slugify('你好',           1), '你好',        'right result';
 
 # Hide DATA usage from error messages
 eval { die 'whatever' };

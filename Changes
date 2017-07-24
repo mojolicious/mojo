@@ -1,4 +1,6 @@
 
+7.38  2017-07-24
+
 7.37  2017-07-21
   - Added slugify method to Mojo::ByteStream. (Grinnz)
   - Added slugify function to Mojo::Util. (Grinnz)

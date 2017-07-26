@@ -198,7 +198,9 @@ startup.
   $static   = $static->extra({'foo/bar.txt' => '/home/sri/myapp/bar.txt'};
 
 Paths for extra files to be served from locations other than L</"paths">, such
-as images used by the built-in exception and not found pages.
+as the images used by the built-in exception and not found pages. Note that
+extra files are only served if no better alternative could be found in
+L</"paths"> and L</"classes">.
 
   # Remove built-in favicon
   delete $static->extra->{'favicon.ico'};

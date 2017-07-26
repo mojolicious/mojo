@@ -539,6 +539,9 @@ L<Mojolicious::Static> object.
   # Add another class with static files in DATA section
   push @{$app->static->classes}, 'Mojolicious::Plugin::Fun';
 
+  # Remove built-in favicon
+  delete $app->static->extra->{'favicon.ico'};
+
 =head2 types
 
   my $types = $app->types;
@@ -1089,6 +1092,8 @@ Victor Engmark
 Viliam Pucik
 
 Wes Cravens
+
+William Lindley
 
 Yaroslav Korshak
 

@@ -9,21 +9,15 @@ use Mojo::Home;
 use Mojo::Loader 'data_section';
 use Mojo::Util 'md5_sum';
 
-has classes => sub { ['main'] };
-has paths   => sub { [] };
-has special => sub {
+# Bundled files
+my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
+  ->child('Mojolicious', 'resources', 'public');
+my %EXTRA = $PUBLIC->list_tree->map(
+  sub { join('/', @{$_->to_rel($PUBLIC)}), $_->realpath->to_string })->each;
 
-  # Bundled files are handled specially
-  my $public = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
-    ->child('Mojolicious', 'resources', 'public');
-  return {
-    @{
-      $public->list_tree->map(
-        sub { join('/', @{$_->to_rel($public)}), $_->realpath; }
-      )
-    }
-  };
-};
+has classes => sub { ['main'] };
+has extra   => sub { +{%EXTRA} };
+has paths   => sub { [] };
 
 sub dispatch {
   my ($self, $c) = @_;
@@ -57,9 +51,9 @@ sub file {
   # Search DATA
   if (my $asset = $self->_get_data_file($rel)) { return $asset }
 
-  # Search special files
-  my $special = $self->special;
-  return exists $special->{$rel} ? $self->_get_file($special->{$rel}) : undef;
+  # Search extra files
+  my $extra = $self->extra;
+  return exists $extra->{$rel} ? $self->_get_file($extra->{$rel}) : undef;
 }
 
 sub is_fresh {
@@ -168,7 +162,6 @@ Mojolicious::Static - Serve static files
   my $static = Mojolicious::Static->new;
   push @{$static->classes}, 'MyApp::Controller::Foo';
   push @{$static->paths}, '/home/sri/public';
-  delete $static->special->{'mojo/jquery/jquery.js'};
 
 =head1 DESCRIPTION
 
@@ -199,6 +192,17 @@ startup.
   # Add another class with static files in DATA section and higher precedence
   unshift @{$static->classes}, 'Mojolicious::Plugin::MoreFun';
 
+=head2 extra
+
+  my $extra = $static->extra;
+  $static   = $static->extra({'foo/bar.txt' => '/home/sri/myapp/bar.txt'};
+
+Paths for extra files to be served from locations other than L</"paths">, such
+as images used by the built-in exception and not found pages.
+
+  # Remove built-in favicon
+  delete $static->extra->{'favicon.ico'};
+
 =head2 paths
 
   my $paths = $static->paths;
@@ -211,17 +215,6 @@ Directories to serve static files from, first one has the highest precedence.
 
   # Add another "public" directory with higher precedence
   unshift @{$static->paths}, '/home/sri/themes/blue/public';
-
-=head2 special
-
-  my $special_files = $static->special;
-  my $icon_abs_path = $static->special->{'favicon.ico'};
-
-Paths for which special files will be served: a hash mapping HTTP request paths
-to filenames. This is populated by default with the favicon, jQuery, and other
-files used by the built-in exception and not_found pages. Deleting an entry
-will suppress the serving of its special file; that path will then be handled
-as a normal route.
 
 =head1 METHODS
 

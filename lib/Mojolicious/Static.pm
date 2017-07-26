@@ -195,7 +195,7 @@ startup.
 =head2 extra
 
   my $extra = $static->extra;
-  $static   = $static->extra({'foo/bar.txt' => '/home/sri/myapp/bar.txt'};
+  $static   = $static->extra({'foo/bar.txt' => '/home/sri/myapp/bar.txt'});
 
 Paths for extra files to be served from locations other than L</"paths">, such
 as the images used by the built-in exception and not found pages. Note that

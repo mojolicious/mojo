@@ -33,6 +33,9 @@ is $t->app, $t->app->commands->app, 'applications are equal';
 is $t->app->static->file('hello.txt')->slurp,
   "Hello Mojo from a static file!\n", 'right content';
 is $t->app->static->file('does_not_exist.html'), undef, 'no file';
+isnt $t->app->static->file('mojo/jquery/jquery.js'), undef, 'find built-in jQuery';
+delete $t->app->static->special->{'mojo/jquery/jquery.js'};
+is $t->app->static->file('mojo/jquery/jquery.js'), undef, 'suppress built-in jQuery';
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 
 # Default namespaces

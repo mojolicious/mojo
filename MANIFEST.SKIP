@@ -5,3 +5,4 @@
 ^MYMETA\.
 ^blib
 ^pm_to_blib
+\B\.DS_Store

@@ -3,6 +3,7 @@ use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Time::Local 'timegm';
+use POSIX ();
 
 has epoch => sub {time};
 
@@ -22,7 +23,7 @@ sub parse {
   my ($self, $date) = @_;
 
   # epoch (784111777)
-  return $self->epoch($date) if $date =~ /^\d+$|^\d+\.\d+$/;
+  return $self->epoch($date) if $date =~ /^-?\d+$|^-?\d+\.\d+$/;
 
   # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
   # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
@@ -47,26 +48,32 @@ sub parse {
   else { return $self->epoch(undef) }
 
   my $epoch = eval { timegm $s, $m, $h, $day, $month, $year };
-  return $self->epoch(
-    (defined $epoch && ($epoch += $offset) >= 0) ? $epoch : undef);
+  $epoch += $offset if defined $epoch;
+  return $self->epoch($epoch);
 }
 
 sub to_datetime {
 
   # RFC 3339 (1994-11-06T08:49:37Z)
-  my ($s, $m, $h, $day, $month, $year) = gmtime(my $epoch = shift->epoch);
-  my $str = sprintf '%04d-%02d-%02dT%02d:%02d:%02d', $year + 1900, $month + 1,
-    $day, $h, $m, $s;
-  return $str . ($epoch =~ /(\.\d+)$/ ? $1 : '') . 'Z';
+  my ($f, $t) = _modf(shift->epoch);
+  my ($s, $m, $h, $day, $month, $year) = gmtime($t);
+  my $fmt = '%04d-%02d-%02dT%02d:%02d:' . ($f ? '%09.6f' : '%02d');
+  my $str = sprintf $fmt, $year + 1900, $month + 1, $day, $h, $m, $s + $f;
+  $str =~ s/0+$// if $f;
+  return $str . 'Z';
 }
 
 sub to_string {
 
   # RFC 7231 (Sun, 06 Nov 1994 08:49:37 GMT)
-  my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime shift->epoch;
+  my ($s, $m, $h, $mday, $month, $year, $wday)
+    = gmtime sprintf("%.0f", shift->epoch);
   return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT', $DAYS[$wday], $mday,
     $MONTHS[$month], $year + 1900, $h, $m, $s;
 }
+
+# Decompose $x into $f + $t where 0 ≤ $f < 1 and $t is integer
+sub _modf { my $t = POSIX::floor($_[0]); ($_[0] - $t, $t) }
 
 1;
 

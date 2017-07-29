@@ -38,6 +38,10 @@ is(Mojo::Date->new('1994-11-06t08:49:37.33z')->epoch,
   784111777.33, 'right epoch value');
 is(Mojo::Date->new(784111777.33)->to_datetime,
   '1994-11-06T08:49:37.33Z', 'right format');
+is(Mojo::Date->new(0.33)->to_datetime,
+  '1970-01-01T00:00:00.33Z', 'right format');
+is(Mojo::Date->new('-0.33')->to_datetime,
+  '1969-12-31T23:59:59.67Z', 'right format');
 
 # Special cases
 is(Mojo::Date->new('Sun ,  06-Nov-1994  08:49:37  UTC')->epoch,
@@ -79,6 +83,14 @@ $date = Mojo::Date->new(1305280824);
 is $date->to_string, 'Fri, 13 May 2011 10:00:24 GMT', 'right format';
 $date = Mojo::Date->new('1305280824.23');
 is $date->to_string, 'Fri, 13 May 2011 10:00:24 GMT', 'right format';
+$date = Mojo::Date->new('1305280824.73');
+is $date->to_string, 'Fri, 13 May 2011 10:00:25 GMT', 'right format';
+$date = Mojo::Date->new(-127180500);
+is $date->to_string, 'Tue, 21 Dec 1965 00:05:00 GMT', 'right format';
+$date = Mojo::Date->new('-127180500.23');
+is $date->to_string, 'Tue, 21 Dec 1965 00:05:00 GMT', 'right format';
+$date = Mojo::Date->new('-127180500.60');
+is $date->to_string, 'Tue, 21 Dec 1965 00:04:59 GMT', 'right format';
 
 # Current time roundtrips
 my $before = time;
@@ -96,7 +108,7 @@ is(Mojo::Date->new('Thu, 01 Jan 1970 00:00:00 GMT')->epoch,
 
 # No epoch value
 $date = Mojo::Date->new;
-ok $date->parse('Mon, 01 Jan 1900 00:00:00'), 'right format';
+ok $date->parse('Mon, 29 Feb 1900 00:00:00'), 'right format';
 is $date->epoch, undef, 'no epoch value';
 
 done_testing();

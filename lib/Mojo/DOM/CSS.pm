@@ -19,18 +19,29 @@ my $ATTR_RE   = qr/
 
 sub matches {
   my $tree = shift->tree;
-  return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, $tree);
+  return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, undef, $tree);
 }
 
-sub select     { _select(0, shift->tree, _compile(@_)) }
-sub select_one { _select(1, shift->tree, _compile(@_)) }
+sub _ptree {
+  my $tree = $_[0];
+
+  return $tree->[3] if ($tree->[0] eq 'tag');
+  return $tree;
+}
+
+sub select     { my $tree = shift->tree; _select(0, _ptree($tree), $tree, _scopize(_compile(@_))) }
+sub select_one { my $tree = shift->tree; _select(1, _ptree($tree), $tree, _scopize(_compile(@_))) }
 
 sub _ancestor {
-  my ($selectors, $current, $tree, $one, $pos) = @_;
+  my ($selectors, $current, $tree, $scope, $one, $pos) = @_;
 
+  if (defined($tree) && $current eq $tree || $current->[0] eq 'root') {
+    return undef;
+  }
   while ($current = $current->[3]) {
-    return undef if $current->[0] eq 'root' || $current eq $tree;
-    return 1 if _combinator($selectors, $current, $tree, $pos);
+    return 1 if _combinator($selectors, $current, $tree, $scope, $pos);
+    return undef if $current->[0] eq 'root';
+    return undef if defined($tree) && $current eq $tree;
     last if $one;
   }
 
@@ -39,6 +50,8 @@ sub _ancestor {
 
 sub _attr {
   my ($name_re, $value_re, $current) = @_;
+
+  return undef if $current->[0] eq 'root';
 
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
@@ -51,26 +64,59 @@ sub _attr {
 }
 
 sub _combinator {
-  my ($selectors, $current, $tree, $pos) = @_;
+  my ($selectors, $current, $tree, $scope, $pos) = @_;
 
   # Selector
   return undef unless my $c = $selectors->[$pos];
   if (ref $c) {
-    return undef unless _selector($c, $current);
+    return undef unless _selector($c, $current, $tree, $scope);
     return 1 unless $c = $selectors->[++$pos];
   }
 
   # ">" (parent only)
-  return _ancestor($selectors, $current, $tree, 1, ++$pos) if $c eq '>';
+  return _ancestor($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '>';
 
   # "~" (preceding siblings)
-  return _sibling($selectors, $current, $tree, 0, ++$pos) if $c eq '~';
+  return _sibling($selectors, $current, $tree, $scope, 0, ++$pos) if $c eq '~';
 
   # "+" (immediately preceding siblings)
-  return _sibling($selectors, $current, $tree, 1, ++$pos) if $c eq '+';
+  return _sibling($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '+';
 
   # " " (ancestor)
-  return _ancestor($selectors, $current, $tree, 0, ++$pos);
+  return _ancestor($selectors, $current, $tree, $scope, 0, ++$pos);
+}
+
+sub _has_scope {
+  my $selectors = $_[0];
+
+  for my $selector (@$selectors) {
+    next unless ref $selector && defined($selector->[0][0]) &&
+        $selector->[0][0] eq 'pc';
+    return 1 if $selector->[0][1] eq 'scope';
+    next unless $selector->[0][1] eq 'has' || $selector->[0][1] eq 'matches' || $selector->[0][1] eq 'not';
+    for (@{$selector->[0][2]}) {
+      return 1 if _has_scope($_);
+    }
+  }
+
+  return undef;
+}
+
+sub _scopize {
+  my $group = $_[0];
+
+  for my $selectors (@$group) {
+    shift @$selectors if ($selectors->[0] && !defined($selectors->[0][0][0]));
+    if (@$selectors == 0) {
+      unshift @$selectors, [['pc', 'scope']], ' ', [];
+    } elsif (!ref $selectors->[0]) {
+      unshift @$selectors, [['pc', 'scope']];
+    } elsif (!_has_scope($selectors)) {
+      unshift @$selectors, [['pc', 'scope']], ' ';
+    }
+  }
+
+  return $group;
 }
 
 sub _compile {
@@ -102,8 +148,9 @@ sub _compile {
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
 
-      # ":matches" and ":not" (contains more selectors)
+      # ":matches", ":not", and ":has" (contains more selectors)
       $args = _compile($args) if $name eq 'matches' || $name eq 'not';
+      $args = _scopize(_compile($args)) if $name eq 'has';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
@@ -149,31 +196,39 @@ sub _equation {
 }
 
 sub _match {
-  my ($group, $current, $tree) = @_;
-  _combinator([reverse @$_], $current, $tree, 0) and return 1 for @$group;
+  my ($group, $current, $tree, $scope) = @_;
+  _combinator([reverse @$_], $current, $tree, $scope, 0) and return 1 for @$group;
   return undef;
 }
 
 sub _name {qr/(?:^|:)\Q@{[_unescape(shift)]}\E$/}
 
 sub _pc {
-  my ($class, $args, $current) = @_;
+  my ($class, $args, $current, $tree, $scope) = @_;
+
+  # ":scope"
+  return ($current eq $scope) if $class eq 'scope';
+
+  # ":not"
+  return !_match($args, $current, $current, $scope) if $class eq 'not';
+
+  # ":matches"
+  return !!_match($args, $current, $current, $scope) if $class eq 'matches';
+
+  return undef if $current->[0] eq 'root';
+
+  # ":root"
+  return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
   # ":checked"
   return exists $current->[2]{checked} || exists $current->[2]{selected}
     if $class eq 'checked';
 
-  # ":not"
-  return !_match($args, $current, $current) if $class eq 'not';
-
-  # ":matches"
-  return !!_match($args, $current, $current) if $class eq 'matches';
-
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
 
-  # ":root"
-  return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
+  # ":has"
+  return !!_has(1, $current, $args) if $class eq 'has';
 
   # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
   if (ref $args) {
@@ -199,7 +254,7 @@ sub _pc {
 }
 
 sub _select {
-  my ($one, $tree, $group) = @_;
+  my ($one, $tree, $scope, $group) = @_;
 
   my @results;
   my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
@@ -207,15 +262,21 @@ sub _select {
     next unless $current->[0] eq 'tag';
 
     unshift @queue, @$current[4 .. $#$current];
-    next unless _match($group, $current, $tree);
+    next unless _match($group, $current, $tree, $scope);
     $one ? return $current : push @results, $current;
   }
 
   return $one ? undef : \@results;
 }
 
+sub _has {
+  my ($one, $tree, $group) = @_;
+
+  return _select($one, _ptree($tree), $tree, $group);
+}
+
 sub _selector {
-  my ($selector, $current) = @_;
+  my ($selector, $current, $tree, $scope) = @_;
 
   for my $s (@$selector) {
     my $type = $s->[0];
@@ -227,24 +288,24 @@ sub _selector {
     elsif ($type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
 
     # Pseudo-class
-    elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current) }
+    elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current, $tree, $scope) }
   }
 
   return 1;
 }
 
 sub _sibling {
-  my ($selectors, $current, $tree, $immediate, $pos) = @_;
+  my ($selectors, $current, $tree, $scope, $immediate, $pos) = @_;
 
   my $found;
   for my $sibling (@{_siblings($current)}) {
     return $found if $sibling eq $current;
 
     # "+" (immediately preceding sibling)
-    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $pos) }
+    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $scope, $pos) }
 
     # "~" (preceding sibling)
-    else { return 1 if _combinator($selectors, $sibling, $tree, $pos) }
+    else { return 1 if _combinator($selectors, $sibling, $tree, $scope, $pos) }
   }
 
   return undef;
@@ -514,6 +575,28 @@ An C<E> element that matches compound selector C<s1> and/or compound selector
 C<s2>. Note that this selector is EXPERIMENTAL and might change without warning!
 
   my $headers = $css->select(':matches(section, article, aside, nav) h1');
+
+This selector is part of
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
+
+=head2 E:has(s1,s2)
+
+An C<E> element that has a child that matches selector C<s1> or selector
+C<s2>. Note that support for compound selectors is EXPERIMENTAL and might
+change without warning!
+
+  my $paras = $css->select('p:has(h1,h2,h3)');
+
+This selector is part of
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
+
+=head2 E:scope
+
+An C<E> element that is the scope element of the current search. Note
+that support for compound selectors is EXPERIMENTAL and might change
+without warning!
 
 This selector is part of
 L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work

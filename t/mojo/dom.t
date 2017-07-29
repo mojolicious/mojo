@@ -927,6 +927,39 @@ is $dom->at(':empty[type^="ch"]')->attr->{name}, 'groovy',  'right name';
 is $dom->at('p')->attr->{id},                    'content', 'right attribute';
 is $dom->at('p:empty')->attr->{id}, 'no_content', 'right attribute';
 
+is $dom->find(':has(input)')->[0]->tag, 'form', 'right tag';
+
+$dom = Mojo::DOM->new(<<EOF);
+<ul>
+    <li>A</li>
+    <li>B</li>
+    <li>C</li>
+    <li>D</li>
+    <li>E</li>
+    <li>F</li>
+    <li>G</li>
+    <li>H</li>
+    <a><b></b></a>
+    <a><b><c></c></b></a>
+    <a><c></c></a>
+    <a><c><d></d></c></a>
+    <a><c></c></a>
+</ul>
+EOF
+
+is $dom->find('li:has(+li)')->[-1], '<li>G</li>', 'right content';
+is $dom->find('a:has(b,c)')->[0], '<a><b></b></a>', 'right content';
+is $dom->find('a:has(b,c)')->[-1], '<a><c></c></a>', 'right content';
+is $dom->find('a:has(>b)')->[0], '<a><b></b></a>', 'right content';
+is $dom->find('a:has(>b)')->[1], '<a><b><c></c></b></a>', 'right content';
+is $dom->find('a:has(>c)')->[0], '<a><c></c></a>', 'right content';
+is $dom->find('a:has(d)')->[0], '<a><c><d></d></c></a>', 'right content';
+is $dom->find('a:has(>d)')->[0], undef, 'right content';
+is $dom->find('d:has(c)')->[0], undef, 'right content';
+is $dom->find('c:has(c)')->[0], undef, 'right content';
+is $dom->find('d:has(*)')->[0], undef, 'right content';
+is $dom->find('c:has(*)')->[0], '<c><d></d></c>', 'right content';
+
 # More pseudo-classes
 $dom = Mojo::DOM->new(<<EOF);
 <ul>
@@ -1264,6 +1297,33 @@ is $dom->at('#♥ + #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
 is $dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
 is $dom->at('#♥ + *:nth-last-child(2)')->text,        'F', 'right text';
 is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
+
+# Scoped selectors
+$dom = Mojo::DOM::->new(<<EOF);
+<div>
+  <p>One</p>
+  <p>Two</p>
+  <p><a href="#">Link</a></p>
+</div>
+<div>
+  <p>Three</p>
+  <p>Four</p>
+</div>
+EOF
+is $dom->at('div')->at(':scope p')->text, 'One', 'right text';
+is $dom->at('div')->at(':scope > p')->text, 'One', 'right text';
+is $dom->at('div')->at('> p')->text, 'One', 'right text';
+is $dom->at('div')->at(':scope a')->text, 'Link', 'right text';
+ok !$dom->at('div')->at(':scope > a'), 'not a child';
+is $dom->at('div')->at(':scope > p > a')->text, 'Link','right text';
+is $dom->find('div')->last->at(':scope p')->text, 'Three', 'right text';
+is $dom->find('div')->last->at(':scope > p')->text, 'Three', 'right text';
+is $dom->find('div')->last->at('> p')->text, 'Three', 'right text';
+is $dom->at('p')->at(':scope + p')->text, 'Two', 'right text';
+ok $dom->at('p')->at(':scope + p'), 'right text';
+
+ok $dom->at('div')->at(':matches(:scope)'), 'right element';
+ok $dom->at('div')->at(':matches(:matches(:scope))'), 'right element';
 
 # Adding nodes
 $dom = Mojo::DOM->new(<<EOF);

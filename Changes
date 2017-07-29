@@ -1,7 +1,8 @@
 
-7.38  2017-07-29
+7.38  2017-07-30
   - Added extra attribute to Mojolicious::Static. (jabberwok)
   - Improve Mojo::URL performance significantly.
+  - Fixed memory leak in Mojo::URL that was caused by a Perl 5.24 bug.
 
 7.37  2017-07-21
   - Added slugify method to Mojo::ByteStream. (Grinnz)

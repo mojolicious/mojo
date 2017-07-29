@@ -55,8 +55,8 @@ my $EXPIRES_RE = qr/(\w+\W+\d+\W+\w+\W+\d+\W+\d+:\d+:\d+\W*\w+)/;
 # HTML entities
 my $ENTITY_RE = qr/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+[;=]?))/;
 
-# Encoding cache
-my %CACHE;
+# Encoding and pattern cache
+my (%ENCODING, %PATTERN);
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
@@ -316,8 +316,18 @@ sub unquote {
 
 sub url_escape {
   my ($str, $pattern) = @_;
-  if   ($pattern) { $str =~ s/([$pattern])/sprintf '%%%02X', ord $1/ge }
-  else            { $str =~ s/([^A-Za-z0-9\-._~])/sprintf '%%%02X', ord $1/ge }
+
+  if ($pattern) {
+    unless (exists $PATTERN{$pattern}) {
+      (my $quoted = $pattern) =~ s!([/\$\[])!\\$1!g;
+      $PATTERN{$pattern}
+        = eval "sub { \$_[0] =~ s/([$quoted])/sprintf '%%%02X', ord \$1/ge }"
+        or croak $@;
+    }
+    $PATTERN{$pattern}->($str);
+  }
+  else { $str =~ s/([^A-Za-z0-9\-._~])/sprintf '%%%02X', ord $1/ge }
+
   return $str;
 }
 
@@ -361,7 +371,7 @@ sub _adapt {
 }
 
 sub _encoding {
-  $CACHE{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
+  $ENCODING{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
 }
 
 sub _entity {

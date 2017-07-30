@@ -1214,6 +1214,31 @@ is_deeply \@e, ['J'], 'found only child';
 $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(J K)], 'found only child';
 
+# Scoped selectors
+$dom = Mojo::DOM->new(<<EOF);
+<foo>
+  <foo>
+    <bar></bar>
+  </foo>
+  <bar></bar>
+</foo>
+EOF
+is $dom->at('foo')->find('foo > bar')->size,        2, 'two elements found';
+is $dom->at('foo')->find(':scope foo > bar')->size, 1, 'one element found';
+
+# Relational pseudo-class
+$dom = Mojo::DOM->new(<<EOF);
+<foo>
+  <foo id=One>
+    <bar>A</bar>
+  </foo>
+  <foo id=Two></foo>
+  <baz>B</baz>
+</foo>
+EOF
+ok $dom->find('foo:has(> bar)')->[0]->matches('#One'), 'element found';
+ok $dom->find('foo:has(+ baz)')->first->matches('#Two'), 'element found';
+
 # Sibling combinator
 $dom = Mojo::DOM->new(<<EOF);
 <ul>
@@ -2081,10 +2106,10 @@ $dom->find('b')->each(
     $_->find('c a')->each(sub { push @results, $_->text });
   }
 );
-is_deeply \@results, [qw(baz yada)], 'right results';
+is_deeply \@results, [qw(bar baz yada)], 'right results';
 is $dom->at('b')->at('a')->text, 'bar', 'right text';
 is $dom->at('c > b > a')->text, 'bar', 'right text';
-is $dom->at('b')->at('c > b > a'), undef, 'no result';
+is $dom->at('b')->at('c > b > a')->text, 'bar', 'right text';
 
 # Direct hash access to attributes in XML mode
 $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);

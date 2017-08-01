@@ -1,4 +1,6 @@
 
+7.39  2017-08-02
+
 7.38  2017-07-30
   - Added extra attribute to Mojolicious::Static. (jabberwok)
   - Improve Mojo::URL performance significantly.

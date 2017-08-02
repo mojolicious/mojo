@@ -309,8 +309,8 @@ sub unindent {
 sub unquote {
   my $str = shift;
   return $str unless $str =~ s/^"(.*)"$/$1/g;
-  $str =~ s/\\\\/\\/g;
   $str =~ s/\\"/"/g;
+  $str =~ s/\\\\/\\/g;
   return $str;
 }
 

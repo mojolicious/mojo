@@ -211,6 +211,12 @@ ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Graceful shutdown!', 'right content';
 
+# One uncertain request that may or may not be served by the old worker
+$tx = $ua->get("http://127.0.0.1:$port1/hello");
+is $tx->res->code, 200, 'right status';
+$tx = $ua->get("http://127.0.0.1:$port2/hello");
+is $tx->res->code, 200, 'right status';
+
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';

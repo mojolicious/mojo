@@ -25,13 +25,6 @@ sub DESTROY {
   $loop->remove($_) for keys %{$self->{connections} || {}}, @{$self->acceptors};
 }
 
-sub close_idle_connections {
-  my $self = shift;
-  my $c    = $self->{connections};
-  my $loop = $self->ioloop;
-  !$c->{$_}{tx} and $c->{$_}{requests} and $loop->remove($_) for keys %$c;
-}
-
 sub ports {
   [map { $_[0]->ioloop->acceptor($_)->port } @{$_[0]->acceptors}];
 }
@@ -96,8 +89,11 @@ sub _build_tx {
     request => sub {
       my $tx = shift;
 
+      my $req = $tx->req;
+      if (my $error = $req->error) { $self->_debug($id, $error->{message}) }
+
       # WebSocket
-      if ($tx->req->is_handshake) {
+      if ($req->is_handshake) {
         my $ws = $self->{connections}{$id}{next}
           = Mojo::Transaction::WebSocket->new(handshake => $tx);
         $self->emit(request => server_handshake $ws);
@@ -109,7 +105,8 @@ sub _build_tx {
       # Last keep-alive request or corrupted connection
       my $c = $self->{connections}{$id};
       $tx->res->headers->connection('close')
-        if $c->{requests} >= $self->max_requests || $tx->req->error;
+        and ++Mojo::IOLoop->stream($id)->{closed}
+        if $c->{requests} >= $self->max_requests || $req->error;
 
       $tx->on(resume => sub { $self->_write($id) });
       $self->_write($id);
@@ -479,13 +476,6 @@ Disable console messages.
 
 L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
 implements the following new ones.
-
-=head2 close_idle_connections
-
-  $daemon->close_idle_connections;
-
-Close all connections without active requests. Note that this method is
-EXPERIMENTAL and might change without warning!
 
 =head2 ports
 

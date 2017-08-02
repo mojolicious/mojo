@@ -747,10 +747,14 @@ $t->app->log->unsubscribe(message => $cb);
 # With body and max message size
 {
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
+  $log = '';
+  $cb = $t->app->log->on(message => sub { $log .= pop });
   $t->get_ok('/', '1234' x 1024)->status_is(200)
     ->header_is(Connection => 'close')
     ->content_is("Maximum message size exceeded\n"
       . "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+  like $log, qr/Maximum message size exceeded/, 'right message';
+  $t->app->log->unsubscribe(message => $cb);
 }
 
 # Relaxed placeholder

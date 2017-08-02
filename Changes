@@ -1,5 +1,10 @@
 
 7.39  2017-08-02
+  - Removed experimental close_idle_connections method from
+    Mojo::Server::Daemon.
+  - Improve Mojo::Server::Daemon to log request errors.
+  - Fixed a bug where Mojo::Server::Daemon would close connections too quickly
+    and interrupt requests.
 
 7.38  2017-07-30
   - Added extra attribute to Mojolicious::Static. (jabberwok)

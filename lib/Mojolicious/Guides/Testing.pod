@@ -95,7 +95,7 @@ concise because we are not repeating the invocant for each test, and coherent
 because assertions that belong to the same request are syntactically bound in
 the same method chain.
 
-Occsionally it makes sense to break up a test to perform more complex
+Occasionally it makes sense to break up a test to perform more complex
 assertions on a response. L<Test::Mojo> exposes the entire transaction object
 so you can get all the data you need from a response:
 

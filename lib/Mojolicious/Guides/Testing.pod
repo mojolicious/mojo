@@ -29,11 +29,11 @@ A test file for a simple web application might look like:
 
   # Post a JSON document
   $t->post_ok('/notifications',
-              json => { event   => "full moon",
-                        via     => "sms",
+              json => { event   => 'full moon',
+                        via     => 'sms',
                         channel => '+15555555555' })
     ->status_is(201)
-    ->json_is('/message' => "notification created");
+    ->json_is('/message' => 'notification created');
 
   # Perform GET requests and look at the responses
   $t->get_ok('/sunrise')
@@ -52,7 +52,7 @@ A test file for a simple web application might look like:
     ->status_is(200);
 
   # Use Test::More's like() to check the response
-  like $t->tx->res->dom->at('div#thanks')->text, qr(thank you), "thanks";
+  like $t->tx->res->dom->at('div#thanks')->text, qr(thank you), 'thanks';
 
   done_testing();
 
@@ -291,7 +291,7 @@ Auth header value:
 
   app->helper(basic_auth => sub {
     shift;
-    return "Basic " . b64_encode join(':' => @_), '';
+    return 'Basic ' . b64_encode join(':' => @_), '';
   });
 
 How do we test application helpers like this? L<Test::Mojo> has access to the
@@ -300,8 +300,8 @@ application object, which allows us to invoke helpers from our test file:
   my $t = Test::Mojo->new('MyApp');
 
   is( $t->app->basic_auth(bif => "Bif's Passwerdd"),
-      "Basic YmlmOkJpZidzIFBhc3N3ZXJkZA==",
-      "correct header value" );
+      'Basic YmlmOkJpZidzIFBhc3N3ZXJkZA==',
+      'correct header value' );
 
 Any aspect of the application (helpers, plugins, routes, session data, etc.)
 can be introspected from L<Test::Mojo> through the application object. This
@@ -340,8 +340,8 @@ argument). This allows us to set headers and build query strings for authentic
 test situations:
 
   $t->get_ok('/internal/personnel',
-             { Authorization => "Internal secret-password" },
-             form => { q => "Professor Plum" });
+             { Authorization => 'Internal secret-password' },
+             form => { q => 'Professor Plum' });
 
 which generates the following request:
 
@@ -374,15 +374,15 @@ returning.
 Testing the status code is as simple as adding the C<status_is> assertion:
 
   $t->post_ok('/doorbell',
-              form => { action => "ring once" })
+              form => { action => 'ring once' })
     ->status_is(200);
 
 Along with C<status_isnt>, this will cover most needs. For more elaborate
 status code testing, you can access the status code directly:
 
   $t->post_ok('/doorbell',
-              form => { action => "ring once" });
-  is($t->tx->res->message, "Moved Permanently", "try next door");
+              form => { action => 'ring once' });
+  is($t->tx->res->message, 'Moved Permanently', 'try next door');
 
 =head2 HTTP response headers
 
@@ -519,7 +519,7 @@ user agent should follow with each test:
 
   $t->ua->max_redirects(4);
   $t->get_ok('/1')
-    ->json_is('/message' => "this is five");
+    ->json_is('/message' => 'this is five');
 
 When we set C<max_redirects>, it stays set for the life of the test object
 until we change it.
@@ -569,7 +569,7 @@ transaction's response (L<Mojo::Message::Response>) object:
   $t->get_ok('/');
 
   my ($cookie) = grep { $_->name eq 'smarty' } @{$t->tx->res->cookies};
-  like($cookie && $cookie->to_string, qr(smarty=pants), "cookie found");
+  like($cookie && $cookie->to_string, qr(smarty=pants), 'cookie found');
 
 =head2 Custom transactions
 
@@ -694,14 +694,14 @@ every test:
 
   $t->post_ok('http://myapp.example.com/thermostat/heat',
               {Authorization => 'Basic bWU6c2VjcmV0bHkK='},
-              json => {temperature => "23°F"})
+              json => {temperature => '23°F'})
     ->status_is(200);
 
 But what we'd like to do is to make the tests as simple as regular
 L<Mojolicious> tests:
 
   $t->post_ok('/thermostat/heat',
-              json => {temperature => "23°F"});
+              json => {temperature => '23°F'});
 
 To do this we're going to override L<Test::Mojo>'s constructor and L<post_ok>
 methods. The constructur will accept a C<base_url>, C<username>, and
@@ -741,7 +741,7 @@ C<SUPER::new> without removing our custom arguments first:
     my $self    = shift;
     my $url     = $self->base_url . shift;
     my $headers = (ref $_[0] eq 'HASH' ? shift : {});
-    $headers->{Authorization} //= "Basic " .
+    $headers->{Authorization} //= 'Basic ' .
       b64_encode join(':' => $self->username, $self->password), '';
 
     $self->SUPER::post_ok($url, $headers, @_);

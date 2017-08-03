@@ -186,7 +186,8 @@ out of scope, the application is stopped.
 Relative URLs in the test object method assertions (C<get_ok>, C<post_ok>,
 etc.) will be sent to the Mojolicious application started by L<Test::Mojo>:
 
-  $t->get_ok('/frogs');  ## http://localhost:32114/frogs
+  # Rewritten to http://localhost:32114/frogs
+  $t->get_ok('/frogs');
 
 L<Test::Mojo> has a lot of handy shortcuts built into it to make testing
 L<Mojolicious> or L<Mojolicious::Lite> applications enjoyable.

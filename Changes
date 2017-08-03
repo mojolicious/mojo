@@ -1,7 +1,9 @@
 
-7.39  2017-08-02
+7.39  2017-08-03
   - Removed experimental close_idle_connections method from
     Mojo::Server::Daemon.
+  - Increased default graceful_timeout from 60 to 120 seconds in
+    Mojo::Server::Prefork.
   - Improve Mojo::Server::Daemon to log request errors.
   - Fixed a bug where Mojo::Server::Daemon would close connections too quickly
     and interrupt requests.

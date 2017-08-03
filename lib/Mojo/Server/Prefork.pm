@@ -10,7 +10,7 @@ use Scalar::Util 'weaken';
 
 has accepts            => 10000;
 has cleanup            => 1;
-has graceful_timeout   => 60;
+has graceful_timeout   => 120;
 has heartbeat_timeout  => 30;
 has heartbeat_interval => 5;
 has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
@@ -382,8 +382,9 @@ a true value.
   $prefork    = $prefork->graceful_timeout(15);
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
-being forced, defaults to C<60>. Note that this value should usually be a little
-larger than the maximum amount of time you expect any one request to take.
+being forced, defaults to C<120>. Note that this value should usually be a
+little larger than the maximum amount of time you expect any one request to
+take.
 
 =head2 heartbeat_interval
 

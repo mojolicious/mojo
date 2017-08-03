@@ -795,36 +795,6 @@ connection.
 You can also use L<Mojo::Transaction::WebSocket/"with_protocols"> to negotiate a
 subprotocol.
 
-=head2 Testing WebSocket web services
-
-While the message flow on WebSocket connections can be rather dynamic, it more
-often than not is quite predictable, which allows this rather pleasant
-L<Test::Mojo> API to be used.
-
-  use Test::More;
-  use Test::Mojo;
-
-  # Include application
-  use FindBin;
-  require "$FindBin::Bin/../echo.pl";
-
-  # Test echo web service
-  my $t = Test::Mojo->new;
-  $t->websocket_ok('/echo')
-    ->send_ok('Hello Mojo!')
-    ->message_ok
-    ->message_is('echo: Hello Mojo!')
-    ->finish_ok;
-
-  # Test JSON web service
-  $t->websocket_ok('/echo.json')
-    ->send_ok({json => {test => [1, 2, 3]}})
-    ->message_ok
-    ->json_message_is('/test', [1, 2, 3])
-    ->finish_ok;
-
-  done_testing();
-
 =head2 EventSource web service
 
 EventSource is a special form of long polling where you can use

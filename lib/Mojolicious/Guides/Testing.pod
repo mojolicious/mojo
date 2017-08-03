@@ -247,8 +247,8 @@ as C<MOJO_MODE>) and through configuration values. One nice feature of
 L<Test::Mojo> is its ability to pass configuration values directly from its
 constructor.
 
-Let's modify our application to enable a new feature when the C<enable_test>
-configuration value is set (this is called a "feature flag"):
+Let's modify our application and add a "feature flag" to enable a new feature
+when the C<enable_weather> configuration value is set:
 
   # Load configuration from hash returned by "my_app.conf"
   my $config = $self->plugin('Config');
@@ -256,23 +256,26 @@ configuration value is set (this is called a "feature flag"):
   # Normal route to controller
   $r->get('/')->to('example#welcome');
 
-  # NEW: this route only exists when 'enable_test' is set in the configuration
-  if ($config->{enable_test}) {
-      $r->get('/testing')->to(cb => sub { shift->render(text => "It's hot! 🔥") })
+  # NEW: this route only exists when 'enable_weather' is set in the configuration
+  if ($config->{enable_weather}) {
+      $r->get('/weather')->to(cb => sub { shift->render(text => "It's hot! 🔥") }
   }
 
 To test this new feature, we don't even need to create a configuration file—we
 can simply pass the configuration data to the application directly via
 L<Test::Mojo>'s constructor:
 
-  my $t = Test::Mojo->new('MyApp', { enable_test => 1 });
+  my $t = Test::Mojo->new('MyApp', { enable_weather => 1 });
   $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
-  $t->get_ok('/testing')->status_is(200)->content_like(qr/🔥/);
+  $t->get_ok('/weather')->status_is(200)->content_like(qr/🔥/);
 
 When we run these tests, L<Test::Mojo> will pass this configuration data to
-the application, which will cause it to create a special C</testing> route
-that we can access in our tests. Unless C<enable_test> is set in a
-configuration file, this route will not exist when the application runs.
+the application, which will cause it to create a special C</weather> route
+that we can access in our tests. Unless C<enable_weather> is set in a
+configuration file, this route will not exist when the application
+runs. Feature flags like this allow us to do soft rollouts of features,
+targeting a small audience for a period of time. Once the feature has been
+proven, we can refactor the conditional and make it a full release.
 
 This example shows how easy it is to start testing a Mojolicious application
 and how to set specific application configuration directives from a test file.

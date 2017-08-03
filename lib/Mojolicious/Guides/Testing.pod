@@ -281,6 +281,31 @@ proven, we can refactor the conditional and make it a full release.
 This example shows how easy it is to start testing a Mojolicious application
 and how to set specific application configuration directives from a test file.
 
+=head3 Testing Application Helpers
+
+Let's say we register a helper in our application to generate an HTTP Basic
+Auth header value:
+
+  use Mojo::Util 'b64_encode';
+
+  app->helper(basic_auth => sub {
+    shift;
+    return "Basic " . b64_encode join(':' => @_), '';
+  });
+
+How do we test application helpers like this? L<Test::Mojo> has access to the
+application object, which allows us to invoke helpers from our test file:
+
+  my $t = Test::Mojo->new('MyApp');
+
+  is( $t->app->basic_auth(bif => "Bif's Passwerdd"),
+      "Basic YmlmOkJpZidzIFBhc3N3ZXJkZA==",
+      "correct header value" );
+
+Any aspect of the application (helpers, plugins, routes, session data, etc.)
+can be introspected from L<Test::Mojo> through the application object. This
+enables us to get deep test coverage of L<Mojolicious>-based applications.
+
 =head2 HTTP Request Assertions
 
 L<Test::Mojo> has a L<Mojo::UserAgent> object that allows it to make HTTP

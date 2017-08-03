@@ -1,4 +1,6 @@
 
+7.40  2017-08-04
+
 7.39  2017-08-03
   - Removed experimental close_idle_connections method from
     Mojo::Server::Daemon.

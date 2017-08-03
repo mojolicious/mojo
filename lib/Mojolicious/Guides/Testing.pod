@@ -22,6 +22,7 @@ A test file for a simple web application might look like:
 
   use Test::Mojo;
   use Test::More;
+  use Mojo::Base -strict;
 
   # Start a Mojolicious app named "Celestial"
   my $t = Test::Mojo->new('Celestial');
@@ -247,7 +248,7 @@ L<Test::Mojo> is its ability to pass configuration values directly from its
 constructor.
 
 Let's modify our application to enable a new feature when the C<enable_test>
-configuration value is set:
+configuration value is set (this is called a "feature flag"):
 
   # Load configuration from hash returned by "my_app.conf"
   my $config = $self->plugin('Config');

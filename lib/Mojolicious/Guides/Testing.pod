@@ -125,12 +125,12 @@ object:
   # Still first transaction
   $t->content_type_is('application/json');
 
-  # Second transaction; Test::Mojo tx object is reset
+  # Second transaction
   $t->get_ok('/frogs?q=banjo', { 'Content-Type' => 'text/html' })
     ->status_is(200)
     ->content_like(qr/interioris/i);
 
-  # Second transaction again
+  # Still second transaction
   $t->content_type_is('text/html');
 
 This statefulness also enables L<Test::Mojo> to handle sessions, follow

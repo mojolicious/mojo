@@ -743,8 +743,6 @@ See also L<Test::Mojo>, L<Mojo::UserAgent>, L<Mojo::DOM>, L<Mojo::JSON>,
 L<Mojo::JSON::Pointer>, and L<Mojo::Transaction> for additional API
 information referenced in this tutorial.
 
-FIXME: https://github.com/kraih/mojo/issues/1111
-
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't

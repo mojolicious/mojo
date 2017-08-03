@@ -381,7 +381,7 @@ status code testing, you can access the status code directly:
 
   $t->post_ok('/doorbell',
               form => { action => "ring once" });
-  cmp_ok($t->tx->res->code, "<", 400, "status is good");
+  is($t->tx->res->message, "Moved Permanently", "try next door");
 
 =head2 HTTP Response Headers
 

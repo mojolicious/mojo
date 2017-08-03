@@ -20,9 +20,10 @@ many of the ideas and syntax introduced in this document.
 
 A test file for a simple web application might look like:
 
+  use Mojo::Base -strict;
+
   use Test::Mojo;
   use Test::More;
-  use Mojo::Base -strict;
 
   # Start a Mojolicious app named "Celestial"
   my $t = Test::Mojo->new('Celestial');
@@ -535,6 +536,8 @@ cookies. By default, the L<Mojo::UserAgent> object in L<Test::Mojo> will
 manage session for us by saving and sending cookies automatically, just like
 common web browsers:
 
+  use Mojo::Base -strict;
+
   use Test::Mojo;
   use Test::More;
 
@@ -595,6 +598,8 @@ C<request_ok>:
 While the message flow on WebSocket connections can be rather dynamic, it more
 often than not is quite predictable, which allows this rather pleasant
 L<Test::Mojo> API to be used.
+
+  use Mojo::Base -strict;
 
   use Test::More;
   use Test::Mojo;

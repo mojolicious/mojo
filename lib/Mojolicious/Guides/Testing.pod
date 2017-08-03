@@ -646,7 +646,7 @@ Or:
 
   {"temperature":"23°C"}
 
-To test kind of web application, this we could do something like this for
+To test this kind of web application, this we could do something like this for
 every test:
 
   $t->post_ok('http://myapp.example.com/thermostat/heat',

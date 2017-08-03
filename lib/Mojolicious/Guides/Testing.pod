@@ -63,7 +63,7 @@ to L<Test::Mojo>.
 
 Essentials every L<Mojolicious> developer should know.
 
-=head2 L<Test::Mojo> At a Glance
+=head2 L<Test::Mojo> at a glance
 
 The L<Test::More> module bundled with Perl includes several primitive test
 assertions, such as C<ok>, C<is>, C<isnt>, C<like>, C<unlike>, C<cmp_ok>,
@@ -136,7 +136,7 @@ object:
 This statefulness also enables L<Test::Mojo> to handle sessions, follow
 redirects, and inspect past responses during a redirect.
 
-=head2 The L<Test::Mojo> Object
+=head2 The L<Test::Mojo> object
 
 The L<Test::Mojo> object manages the Mojolicious application lifecycle (if a
 Mojolicious application class is supplied) as well as exposes the built-in
@@ -163,7 +163,7 @@ without triggering test assertions:
 
 See L<Mojo::UserAgent> for the complete API and return values.
 
-=head2 Testing Mojolicious Applications
+=head2 Testing Mojolicious applications
 
 If you pass the name of a L<Mojolicious> application class (e.g., 'MyApp') to
 the L<Test::Mojo> constructor, L<Test::Mojo> will instantiate the class and
@@ -191,7 +191,7 @@ etc.) will be sent to the Mojolicious application started by L<Test::Mojo>:
 L<Test::Mojo> has a lot of handy shortcuts built into it to make testing
 L<Mojolicious> or L<Mojolicious::Lite> applications enjoyable.
 
-=head3 An Example
+=head3 An example
 
 Let's spin up a Mojolicious application using C<mojo generate app MyApp>. The
 C<mojo> utility will create a working application and a C<t> directory with a
@@ -241,7 +241,7 @@ application. We write our tests with relative URLs because L<Test::Mojo> takes
 care of getting the request to the running test application (since its port
 may change between runs).
 
-=head3 Testing with Configuration Data
+=head3 Testing with configuration data
 
 We can alter the behavior of our application using environment variables (such
 as C<MOJO_MODE>) and through configuration values. One nice feature of
@@ -281,7 +281,7 @@ proven, we can refactor the conditional and make it a full release.
 This example shows how easy it is to start testing a Mojolicious application
 and how to set specific application configuration directives from a test file.
 
-=head3 Testing Application Helpers
+=head3 Testing application helpers
 
 Let's say we register a helper in our application to generate an HTTP Basic
 Auth header value:
@@ -306,7 +306,7 @@ Any aspect of the application (helpers, plugins, routes, session data, etc.)
 can be introspected from L<Test::Mojo> through the application object. This
 enables us to get deep test coverage of L<Mojolicious>-based applications.
 
-=head2 HTTP Request Assertions
+=head2 HTTP request assertions
 
 L<Test::Mojo> has a L<Mojo::UserAgent> object that allows it to make HTTP
 requests and check for HTTP transport errors. HTTP request assertions include
@@ -318,7 +318,7 @@ You may also make HTTP requests using custom verbs (beyond C<GET>, C<POST>,
 C<PUT>, etc.) by building your own transaction object. See L</"Custom
 Transactions"> below.
 
-=head3 Using HTTP Request Assertions
+=head3 Using HTTP request assertions
 
 To post a URL-encoded form to the C</calls> endpoint of an application, we
 simply use the C<form> content type shortcut:
@@ -362,7 +362,7 @@ L<Test::Mojo> provides assertions to test almost every aspect of the HTTP
 response, including the HTTP response status code, the value of the
 C<Content-Type> header, and other arbitrary HTTP header information.
 
-=head2 HTTP Response Status Code
+=head2 HTTP response status code
 
 While not technically an HTTP header, the status line is the first line in an
 HTTP response and is followed by the response headers. Testing the response
@@ -383,7 +383,7 @@ status code testing, you can access the status code directly:
               form => { action => "ring once" });
   is($t->tx->res->message, "Moved Permanently", "try next door");
 
-=head2 HTTP Response Headers
+=head2 HTTP response headers
 
 L<Test::Mojo> allows us to inspect and make assertions about HTTP response
 headers. The C<Content-Type> header is commonly tested and has its own
@@ -404,7 +404,7 @@ We can test for multiple headers in a single response using method chains:
     ->header_isnt('Compression' => 'gzip')
     ->header_unlike('Server' => qr/IIS/i);
 
-=head2 HTTP Response Content Assertions
+=head2 HTTP response content assertions
 
 L<Test::Mojo> also exposes a rich set of assertions for testing the body of a
 response, whether that body be HTML, plain-text, or JSON. The C<content_*>
@@ -427,7 +427,7 @@ does, we can introspect JSON documents as well as DOM-based documents (HTML,
 XML) with assertions that allow us to check for the existence of elements as
 well as inspect the content of text nodes.
 
-=head2 JSON Response Assertions
+=head2 JSON response assertions
 
 L<Test::Mojo>'s L<Mojo::UserAgent> has access to a JSON parser, which allows
 us to test to see if a JSON response contains a value at a location in the
@@ -447,7 +447,7 @@ value at JSON pointer locations:
 
 JSON pointer syntax make testing JSON responses simple and readable.
 
-=head2 DOM Response Assertions
+=head2 DOM response assertions
 
 We can also inspect HTML and XML responses using the L<Mojo::DOM> parser in
 the user agent. Here are a few examples from the L<Test::Mojo> documentation:
@@ -527,7 +527,7 @@ L<Test::Mojo>'s handling of HTTP redirects eliminates the need for making
 many, sometimes an unknown number, of redirections to keep testing precise and
 easy to follow (ahem).
 
-=head2 Cookies and Session Management
+=head2 Cookies and session management
 
 We can use L<Test::Mojo> to test applications that keep session state in
 cookies. By default, the L<Mojo::UserAgent> object in L<Test::Mojo> will
@@ -570,7 +570,7 @@ transaction's response (L<Mojo::Message::Response>) object:
   my ($cookie) = grep { $_->name eq 'smarty' } @{$t->tx->res->cookies};
   like($cookie && $cookie->to_string, qr(smarty=pants), "cookie found");
 
-=head2 Custom Transactions
+=head2 Custom transactions
 
 Let's say we have an application that responds to a new HTTP verb C<RING> and
 to use it we must also pass in a secret cookie value. This is not a
@@ -589,23 +589,35 @@ C<request_ok>:
     ->status_is(200)
     ->json_is('/status' => 'ding dong');
 
-=head2 WebSockets
+=head2 Testing WebSocket web services
 
-L<Test::Mojo> can also test your WebSocket application. Here are some examples
-from L<Test::Mojo>'s documentation:
+While the message flow on WebSocket connections can be rather dynamic, it more
+often than not is quite predictable, which allows this rather pleasant
+L<Test::Mojo> API to be used.
 
-  $t->websocket_ok('/time')
+  use Test::More;
+  use Test::Mojo;
+
+  # Include application
+  use FindBin;
+  require "$FindBin::Bin/../echo.pl";
+
+  # Test echo web service
+  my $t = Test::Mojo->new;
+  $t->websocket_ok('/echo')
+    ->send_ok('Hello Mojo!')
     ->message_ok
-    ->message_like(qr/\d+/)
-    ->message_unlike(qr/\w+/)
+    ->message_is('echo: Hello Mojo!')
     ->finish_ok;
 
-If our WebSocket sends us JSON messages, L<Test::Mojo> has the ability to
-parse those for us:
-
-  $t->websocket_ok('/hello')
+  # Test JSON web service
+  $t->websocket_ok('/echo.json')
+    ->send_ok({json => {test => [1, 2, 3]}})
     ->message_ok
-    ->json_message_like('/howdy' => qr/pard/i);
+    ->json_message_is('/test', [1, 2, 3])
+    ->finish_ok;
+
+  done_testing();
 
 =head2 Extending L<Test::Mojo>
 

@@ -380,6 +380,7 @@ is quote('"foo; 23 "bar"'), '"\"foo; 23 \"bar\""', 'right quoted result';
 # unquote
 is unquote('"foo 23 \"bar"'),     'foo 23 "bar',   'right unquoted result';
 is unquote('"\"foo 23 \"bar\""'), '"foo 23 "bar"', 'right unquoted result';
+is unquote('"\\\""'), '\"', 'right unquoted result';
 
 # trim
 is trim(' la la  la '),             'la la  la',         'right trimmed result';

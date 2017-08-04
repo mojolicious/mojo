@@ -699,14 +699,14 @@ every test:
 
   $t->post_ok('http://myapp.example.com/thermostat/heat',
               {Authorization => 'Basic bWU6c2VjcmV0bHkK='},
-              json => {temperature => '23°F'})
+              json => {temperature => '23°C'})
     ->status_is(200);
 
 But what we'd like to do is to make the tests as simple as regular
 L<Mojolicious> tests:
 
   $t->post_ok('/thermostat/heat',
-              json => {temperature => '23°F'});
+              json => {temperature => '23°C'});
 
 To do this we're going to override L<Test::Mojo>'s constructor and L<post_ok>
 methods. The constructur will accept a C<base_url>, C<username>, and

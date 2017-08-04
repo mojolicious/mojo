@@ -379,7 +379,7 @@ Testing the status code is as simple as adding the C<status_is> assertion:
     ->status_is(200);
 
 Along with C<status_isnt>, this will cover most needs. For more elaborate
-status code testing, you can access the status code directly:
+status code testing, you can access the response internals directly:
 
   $t->post_ok('/doorbell',
               form => { action => 'ring once' });

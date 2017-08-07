@@ -303,6 +303,24 @@ us to get deep test coverage of L<Mojolicious>-based applications.
 
 =head1 ASSERTIONS
 
+This section describes the basic test assertions supplied by
+L<Test::Mojo>. There are four broad categories of assertions for HTTP
+requests:
+
+=over 2
+
+=item * HTTP requests
+
+=item * HTTP response status
+
+=item * HTTP response headers
+
+=item * HTTP response content/body
+
+=back
+
+WebSocket test assertions are covered in L</Testing WebSocket web services>.
+
 =head2 HTTP request assertions
 
 L<Test::Mojo> has a L<Mojo::UserAgent> object that allows it to make HTTP
@@ -422,7 +440,7 @@ does, we can introspect JSON documents as well as DOM-based documents (HTML,
 XML) with assertions that allow us to check for the existence of elements as
 well as inspect the content of text nodes.
 
-=head2 JSON response assertions
+=head3 JSON response assertions
 
 L<Test::Mojo>'s L<Mojo::UserAgent> has access to a JSON parser, which allows
 us to test to see if a JSON response contains a value at a location in the
@@ -442,7 +460,7 @@ value at JSON pointer locations:
 
 JSON pointer syntax make testing JSON responses simple and readable.
 
-=head2 DOM response assertions
+=head3 DOM response assertions
 
 We can also inspect HTML and XML responses using the L<Mojo::DOM> parser in
 the user agent. Here are a few examples from the L<Test::Mojo> documentation:
@@ -454,7 +472,10 @@ The L<Mojo::DOM> parser uses the CSS selector syntax described in
 L<Mojo::DOM::CSS>, allowing us to test for values in HTML and XML documents
 without resorting to typically verbose and inflexible DOM traversal methods.
 
-=head1 ADVANCED CONCEPTS
+=head1 ADVANCED TOPICS
+
+This section describes some complex (but common) testing situations that
+L<Test::Mojo> excels in making simple.
 
 =head2 Redirects
 

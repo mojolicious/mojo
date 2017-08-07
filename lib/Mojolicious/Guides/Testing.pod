@@ -573,14 +573,14 @@ transaction's response (L<Mojo::Message::Response>) object:
 Let's say we have an application that responds to a new HTTP verb C<RING> and
 to use it we must also pass in a secret cookie value. This is not a
 problem. We can test the application by creating a L<Mojo::Transaction>
-object, setting the cookie, then passing the transaction object to
-C<request_ok>:
+object, setting the cookie (see L<Mojo::Message::Request>), then passing the
+transaction object to C<request_ok>:
 
   # Use custom "RING" verb
   my $tx = $t->ua->build_tx(RING => '/doorbell');
 
   # Set a special cookie
-  $tx->req->cookies("Secret=don't tell anybody");
+  $tx->req->cookies({name => 'Secret', value => "don't tell anybody"});
 
   # Make the request
   $t->request_ok($tx)

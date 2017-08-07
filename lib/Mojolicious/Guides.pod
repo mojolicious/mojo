@@ -100,6 +100,11 @@ Become a part of the ongoing L<Mojolicious> development.
 
 Answers to the most frequently asked questions.
 
+=item L<Mojolicious::Guides::Testing>
+
+Powerful yet elegant testing techniques and tools for L<Mojolicious> and other
+web applications.
+
 =back
 
 =head1 HIGHLIGHTS

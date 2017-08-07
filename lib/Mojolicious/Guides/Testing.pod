@@ -10,7 +10,7 @@ Mojolicious::Guides::Testing - Web Application Testing Made Easy
 This document is an introduction to testing web applications with
 L<Test::Mojo>. L<Test::Mojo> can be thought of as a module that provides all
 of the tools and testing assertions needed to test web applications in a
-Perlish way.
+Perl-ish way.
 
 While L<Test::Mojo> can be used to test any web application, it has shortcuts
 designed to make testing L<Mojolicious> web applications easy and pain-free.
@@ -29,10 +29,7 @@ A test file for a simple web application might look like:
   my $t = Test::Mojo->new('Celestial');
 
   # Post a JSON document
-  $t->post_ok('/notifications',
-              json => { event   => 'full moon',
-                        via     => 'sms',
-                        channel => '+15555555555' })
+  $t->post_ok('/notifications', json => {event => 'full moon', via => 'sms', channel => '+15555555555'})
     ->status_is(201)
     ->json_is('/message' => 'notification created');
 
@@ -40,20 +37,16 @@ A test file for a simple web application might look like:
   $t->get_ok('/sunrise')
     ->status_is(200)
     ->content_like(qr/ am$/);
-
   $t->get_ok('/sunset')
     ->status_is(200)
     ->content_like(qr/ pm$/);
 
   # Post a URL-encoded form
-  $t->post_ok('/insurance',
-              form => { name   => 'Jimmy',
-                        amount => '3.000.000',
-                        currency => '€' })
+  $t->post_ok('/insurance', form => {name => 'Jimmy', amount => '3.000.000', currency => '€'})
     ->status_is(200);
 
   # Use Test::More's like() to check the response
-  like $t->tx->res->dom->at('div#thanks')->text, qr(thank you), 'thanks';
+  like $t->tx->res->dom->at('div#thanks')->text, qr/thank you/, 'thanks';
 
   done_testing();
 
@@ -101,7 +94,7 @@ Occasionally it makes sense to break up a test to perform more complex
 assertions on a response. L<Test::Mojo> exposes the entire transaction object
 so you can get all the data you need from a response:
 
-  $t->put_ok('/bees', json => { type => 'worker', name => 'Karl' })
+  $t->put_ok('/bees', json => {type => 'worker', name => 'Karl'})
     ->status_is(202)
     ->json_has('/id');
 
@@ -119,7 +112,7 @@ objects from the previous transaction are available in the L<Test::Mojo>
 object:
 
   # First transaction
-  $t->get_ok('/frogs?q=bullfrog', { 'Content-Type' => 'application/json' })
+  $t->get_ok('/frogs?q=bullfrog', {'Content-Type' => 'application/json'})
     ->status_is(200)
     ->json_like('/0/species' => qr/catesbeianus/i);
 
@@ -127,7 +120,7 @@ object:
   $t->content_type_is('application/json');
 
   # Second transaction
-  $t->get_ok('/frogs?q=banjo', { 'Content-Type' => 'text/html' })
+  $t->get_ok('/frogs?q=banjo', {'Content-Type' => 'text/html'})
     ->status_is(200)
     ->content_like(qr/interioris/i);
 
@@ -268,7 +261,7 @@ To test this new feature, we don't even need to create a configuration file—we
 can simply pass the configuration data to the application directly via
 L<Test::Mojo>'s constructor:
 
-  my $t = Test::Mojo->new('MyApp', { enable_weather => 1 });
+  my $t = Test::Mojo->new('MyApp', {enable_weather => 1});
   $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
   $t->get_ok('/weather')->status_is(200)->content_like(qr/🔥/);
 
@@ -291,8 +284,8 @@ Auth header value:
   use Mojo::Util 'b64_encode';
 
   app->helper(basic_auth => sub {
-    shift;
-    return 'Basic ' . b64_encode join(':' => @_), '';
+    my $c = shift;
+    return {Authorization => 'Basic ' . b64_encode join(':' => @_), ''};
   });
 
 How do we test application helpers like this? L<Test::Mojo> has access to the
@@ -300,13 +293,13 @@ application object, which allows us to invoke helpers from our test file:
 
   my $t = Test::Mojo->new('MyApp');
 
-  is( $t->app->basic_auth(bif => "Bif's Passwerdd"),
-      'Basic YmlmOkJpZidzIFBhc3N3ZXJkZA==',
-      'correct header value' );
+  is_deeply $t->app->basic_auth(bif => "Bif's Passwerdd"),
+    {Authorization => 'Basic YmlmOkJpZidzIFBhc3N3ZXJkZA=='},
+    'correct header value';
 
-Any aspect of the application (helpers, plugins, routes, session data, etc.)
-can be introspected from L<Test::Mojo> through the application object. This
-enables us to get deep test coverage of L<Mojolicious>-based applications.
+Any aspect of the application (helpers, plugins, routes, etc.) can be
+introspected from L<Test::Mojo> through the application object. This enables
+us to get deep test coverage of L<Mojolicious>-based applications.
 
 =head2 HTTP request assertions
 
@@ -325,7 +318,7 @@ Transactions"> below.
 To post a URL-encoded form to the C</calls> endpoint of an application, we
 simply use the C<form> content type shortcut:
 
-  $t->post_ok('/calls', form => { to => '+43.55.555.5555' });
+  $t->post_ok('/calls', form => {to => '+43.55.555.5555'});
 
 which will create the following HTTP request:
 
@@ -341,14 +334,14 @@ argument). This allows us to set headers and build query strings for authentic
 test situations:
 
   $t->get_ok('/internal/personnel',
-             { Authorization => 'Internal secret-password' },
-             form => { q => 'Professor Plum' });
+             {Authorization => 'Token secret-password'},
+             form => {q => 'Professor Plum'});
 
 which generates the following request:
 
   GET /internal/personnel?q=Professor+Plum HTTP/1.1
   Content-Length: 0
-  Authorization: Internal secret-password
+  Authorization: Token secret-password
 
 The C<form> content generator (see L<Mojo::UserAgent::Transactor>) will
 generate a query string for C<GET> requests and
@@ -374,16 +367,14 @@ returning.
 
 Testing the status code is as simple as adding the C<status_is> assertion:
 
-  $t->post_ok('/doorbell',
-              form => { action => 'ring once' })
+  $t->post_ok('/doorbell', form => {action => 'ring once'})
     ->status_is(200);
 
 Along with C<status_isnt>, this will cover most needs. For more elaborate
 status code testing, you can access the response internals directly:
 
-  $t->post_ok('/doorbell',
-              form => { action => 'ring once' });
-  is($t->tx->res->message, 'Moved Permanently', 'try next door');
+  $t->post_ok('/doorbell', form => {action => 'ring once'});
+  is $t->tx->res->message, 'Moved Permanently', 'try next door';
 
 =head2 HTTP response headers
 
@@ -457,9 +448,9 @@ the user agent. Here are a few examples from the L<Test::Mojo> documentation:
   $t->text_is('div.foo[x=y]' => 'Hello!');
   $t->text_is('html head title' => 'Hello!', 'right title');
 
-The L<Mojo::DOM> parser uses CSS selector syntax, allowing us to test for
-values in HTML and XML documents without resorting to typically verbose and
-inflexible DOM traversal methods.
+The L<Mojo::DOM> parser uses the CSS selector syntax described in
+L<Mojo::DOM::CSS>, allowing us to test for values in HTML and XML documents
+without resorting to typically verbose and inflexible DOM traversal methods.
 
 =head2 Redirects
 
@@ -511,7 +502,7 @@ user agent should follow with each test:
   $t->get_ok('/1')
     ->header_is(location => '/4');
 
-  # look at the previous hop
+  # Look at the previous hop
   is $t->tx->previous->res->headers->location, '/3', 'previous redirect';
 
   $t->ua->max_redirects(3);
@@ -549,7 +540,7 @@ common web browsers:
     ->content_is('Please log in');
 
   # Application sets an authorization cookie
-  $t->post_ok('/login', { password => 'let me in' })
+  $t->post_ok('/login', {password => 'let me in'})
     ->status_is(200)
     ->content_is('You are logged in');
 
@@ -571,8 +562,7 @@ transaction's response (L<Mojo::Message::Response>) object:
 
   $t->get_ok('/');
 
-  my ($cookie) = grep { $_->name eq 'smarty' } @{$t->tx->res->cookies};
-  like($cookie && $cookie->to_string, qr(smarty=pants), 'cookie found');
+  like $t->tx->res->cookie('smarty'), qr/smarty=pants/, 'cookie found';
 
 =head2 Custom transactions
 
@@ -586,7 +576,7 @@ C<request_ok>:
   my $tx = $t->ua->build_tx(RING => '/doorbell');
 
   # Set a special cookie
-  $tx->req->cookies({Secret => "don't tell anybody"});
+  $tx->req->cookies("Secret=don't tell anybody");
 
   # Make the request
   $t->request_ok($tx)
@@ -604,12 +594,8 @@ L<Test::Mojo> API to be used.
   use Test::More;
   use Test::Mojo;
 
-  # Include application
-  use FindBin;
-  require "$FindBin::Bin/../echo.pl";
-
   # Test echo web service
-  my $t = Test::Mojo->new;
+  my $t = Test::Mojo->new('EchoService');
   $t->websocket_ok('/echo')
     ->send_ok('Hello Mojo!')
     ->message_ok
@@ -649,137 +635,6 @@ level higher (which tells L<Test::Builder> how far up the call stack to look
 when something fails). Finally we use L<Test::More>'s C<is> method to compare
 the location header with the expected header value. We wrap that in the
 C<success> method, which propagates the object for method chaining.
-
-=head3 Subclassing
-
-In some situations you may find your tests have a lot of boilerplate setup
-(authentication, etc.) and may want to subclass L<Test::Mojo> to handle
-that. Because of some of the expectations of L<Test::Mojo> and how it handles
-configuration data, subclassing takes a little extra work.
-
-For an example let's say we have an RPC-based web application I<that is
-already deployed>, where the HTTP method is always C<POST> and the remote
-procedure name is in the URL, and we have a C<Basic> authorization header with
-username C<me> and password C<secretly>.
-
-All of our requests follow this basic pattern:
-
-  POST /<service>/<method>
-  Host: myapp.example.com
-  Authorization: Basic bWU6c2VjcmV0bHkK=
-
-  {"json":"payload"}
-
-For example:
-
-  POST /bedroom-light/power-on
-  Host: myapp.example.com
-  Authorization: Basic bWU6c2VjcmV0bHkK=
-
-  {"level":"50%"}
-
-Or:
-
-  POST /blender/spin-blades
-  Host: myapp.example.com
-  Authorization: Basic bWU6c2VjcmV0bHkK=
-
-  {"speed":"whip"}
-
-Or:
-
-  POST /thermostat/heat
-  Host: myapp.example.com
-  Authorization: Basic bWU6c2VjcmV0bHkK=
-
-  {"temperature":"23°C"}
-
-To test this kind of web application, we could do something like this for
-every test:
-
-  $t->post_ok('http://myapp.example.com/thermostat/heat',
-              {Authorization => 'Basic bWU6c2VjcmV0bHkK='},
-              json => {temperature => '23°C'})
-    ->status_is(200);
-
-But what we'd like to do is to make the tests as simple as regular
-L<Mojolicious> tests:
-
-  $t->post_ok('/thermostat/heat',
-              json => {temperature => '23°C'});
-
-To do this we're going to override L<Test::Mojo>'s constructor and L<post_ok>
-methods. The constructur will accept a C<base_url>, C<username>, and
-C<password> parameters. The C<post_ok> method will add the C<Authorization>
-header for us.
-
-Because L<Test::Mojo>'s constructor has some shortcuts built into it for
-passing configuration data to Mojolicious applications, we can't invoke
-C<SUPER::new> without removing our custom arguments first:
-
-  package Test::MyApp;
-  use Mojo::Base 'Test::Mojo';
-  use Mojo::Util 'b64_encode';
-
-  has [my @attr = qw/base_url username password/];
-
-  sub new {
-    my $class = shift;
-    my %args  = @_;
-    my %app   = ();
-
-    # Remove custom attributes
-    @app{@attr} = delete @args{@attr};
-
-    my $self = $class->SUPER::new(%args);
-
-    # Set custom attributes
-    $self
-      ->base_url($app{base_url})
-      ->username($app{username})
-      ->password($app{password});
-
-    return $self;
-  }
-
-  sub post_ok {
-    my $self    = shift;
-    my $url     = $self->base_url . shift;
-    my $headers = (ref $_[0] eq 'HASH' ? shift : {});
-    $headers->{Authorization} //= 'Basic ' .
-      b64_encode join(':' => $self->username, $self->password), '';
-
-    $self->SUPER::post_ok($url, $headers, @_);
-  }
-
-  1;
-
-Our version of C<post_ok> works just like L<Test::Mojo>'s, but it adds the
-C<Authorization> header our web application needs for every call. To use our
-new L<Test::Mojo> subclass:
-
-  use Test::MyApp;
-  use Test::More;
-
-  my $t = Test::MyApp->new(base_url => 'http://myapp.example.com',
-                           username => 'me',
-                           password => 'secretly');
-
-  $t->post_ok('/blender/faster',
-              json => {speed => 'frappé'})
-    ->status_is(200);
-
-  # Use invalid password
-  $t->password('sorry!');
-  $t->post_ok('/blender/faster',
-              json => {speed => 'frappé'})
-    ->status_is(401);
-
-  done_testing();
-
-Great! Our little L<Test::Mojo>-based class allows us to make authorized
-requests to our deployed web application, and the test assertion (C<post_ok>)
-preserves compatibility with L<Test::Mojo>.
 
 =head1 MORE
 

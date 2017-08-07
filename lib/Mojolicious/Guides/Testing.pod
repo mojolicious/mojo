@@ -611,6 +611,35 @@ L<Test::Mojo> API to be used.
 
   done_testing();
 
+Because of their inherent asynchronous nature, testing WebSocket
+communications can be tricky. The L<Test::Mojo> WebSocket assertions serialize
+messages via event loop primitives. This enables us to treat WebSocket
+messages as if they were using the same request-response communication pattern
+we're accustomed to with HTTP.
+
+To illustrate, let's walk through these tests. In the first test, we use the
+C<websocket_ok> assertion to ensure that we can connect to our application's
+WebSocket route at C</echo> and that it's "speaking" WebSocket protocol to
+us. The next C<send_ok> assertion tests the connection again (in case it
+closed, for example) and attempts to send the message C<Hello Mojo!>. The next
+assertion, C<message_ok>, blocks (using the L<Mojo::IOLoop> singleton in the
+application) and waits for a response from the server. The response is then
+compared with C<'echo: Hello Mojo!'> in the C<message_is> assertion, and
+finally we close and test our connection status again with C<finish_ok>.
+
+The second test is like the first, but now we're sending and expecting JSON
+documents at C</echo.json>. In the C<send_ok> assertion we take advantage of
+L<Mojo::UserAgent>'s JSON content generator (see
+L<Mojo::UserAgent::Transactor>) to marshal hash and array references into JSON
+documents, and then send them as a WebSocket message. We wait (block) for a
+response from the server with C<message_ok>. Then because we're expecting a
+JSON document back, we can leverage C<json_message_ok> which parses the
+WebSocket response body and returns an object we can access through
+L<Mojo::JSON::Pointer> syntax. Then we close (and test) our WebSocket
+connection.
+
+Testing WebSocket servers does not get any simpler than with L<Test::Mojo>.
+
 =head2 Extending L<Test::Mojo>
 
 If you see that you're writing a lot of test assertions that aren't chainable,

@@ -88,6 +88,11 @@ Simple and fun introduction to the L<Mojolicious> router.
 
 Generating content with the L<Mojolicious> renderer.
 
+=item L<Mojolicious::Guides::Testing>
+
+Powerful yet elegant testing techniques and tools for L<Mojolicious> and other
+web applications.
+
 =item L<Mojolicious::Guides::Cookbook>
 
 Cooking with L<Mojolicious>, recipes for every taste.
@@ -99,11 +104,6 @@ Become a part of the ongoing L<Mojolicious> development.
 =item L<Mojolicious::Guides::FAQ>
 
 Answers to the most frequently asked questions.
-
-=item L<Mojolicious::Guides::Testing>
-
-Powerful yet elegant testing techniques and tools for L<Mojolicious> and other
-web applications.
 
 =back
 

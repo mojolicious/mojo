@@ -301,6 +301,8 @@ Any aspect of the application (helpers, plugins, routes, etc.) can be
 introspected from L<Test::Mojo> through the application object. This enables
 us to get deep test coverage of L<Mojolicious>-based applications.
 
+=head1 ASSERTIONS
+
 =head2 HTTP request assertions
 
 L<Test::Mojo> has a L<Mojo::UserAgent> object that allows it to make HTTP
@@ -451,6 +453,8 @@ the user agent. Here are a few examples from the L<Test::Mojo> documentation:
 The L<Mojo::DOM> parser uses the CSS selector syntax described in
 L<Mojo::DOM::CSS>, allowing us to test for values in HTML and XML documents
 without resorting to typically verbose and inflexible DOM traversal methods.
+
+=head1 ADVANCED CONCEPTS
 
 =head2 Redirects
 

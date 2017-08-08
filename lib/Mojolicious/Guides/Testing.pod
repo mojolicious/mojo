@@ -279,7 +279,7 @@ and how to set specific application configuration directives from a test file.
 =head3 Testing application helpers
 
 Let's say we register a helper in our application to generate an HTTP Basic
-Auth header value:
+Authorization header:
 
   use Mojo::Util 'b64_encode';
 

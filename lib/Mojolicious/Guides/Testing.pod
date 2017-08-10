@@ -709,6 +709,94 @@ uses the role:
     ->location_is('http://mojolicious.org')
     ->or(sub { diag 'I miss tempire.' });
 
+=head3 Role composition with attributes
+
+One limitation of L<Role::Tiny> is that it only composes behaviors, not
+attributes. Fortunately, L<Mojo::Base> provides lightweight attributes,
+allowing us to create more sophisticated roles.
+
+Let's say we have an application that requires the client to include a special
+header with an HMAC signature of the HTTP method and URI to ensure that the
+request hasn't been tampered with. A client might calculate the signature like
+this:
+
+  use Digest::SHA 'hmac_sha256';
+  use Mojo::Util 'b64_encode';
+
+  sub calculate_signature {
+    my $secret = pop;
+    return b64_encode hmac_sha256(join(',' => @_), $secret), '';
+  }
+
+and then add the special header to the request:
+
+  GET /thermostat/temperature
+  X-Signature: 7xxyePz43qyTHjq5Xg41K0HRSV/hW6hNyki7upt0rFY=
+
+Without roles, we might use this function in our test file like this:
+
+  my $t = Test::Mojo->new('MyApp');
+
+  # Bad signature (no secret)
+  my $signature = calculate_signature('GET', '/blender/blade-speed', '');
+  $t->get_with_signature_ok('/blender/blade-speed', {'X-Signature' => $signature})
+    ->status_is(401)
+    ->json_is('/error' => 'sorry');
+
+  # Good signature
+  $signature = calculate_signature('GET', '/thermostat/temperature', 'spaceship overhead');
+  $t->get_with_signature_ok('/thermostat/temperature', {'X-Signature' => $signature})
+    ->status_is(200)
+    ->json_is('/temperature' => '23°F');
+
+But rather than cluttering each test with this calculation and header—not to
+mention the fact that we have to duplicate the method, URI, and secret for
+each test we run—we can create a role to do the work for us:
+
+  package Test::Mojo::Role::Signature;
+
+  use Role::Tiny;
+  use Mojo::Base 'Test::Mojo';
+  use Digest::SHA 'hmac_sha256';
+  use Mojo::Util 'b64_encode';
+
+  has 'secret';
+
+  sub get_with_signature_ok {
+      my ($t, $url) = (shift, shift);
+      my $headers = (ref $_[0] eq 'HASH' ? shift : {});
+
+      my $sig = b64_encode hmac_sha256("GET,$url", $t->secret // ''), '';
+      $headers->{'X-Signature'} = $sig;
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
+      $t->SUPER::get_ok($url, $headers, @_);
+  }
+
+With this role, adding a signature to each test requests is as easy as setting
+the secret and using the new role:
+
+  my $t = Test::Mojo->with_roles('Test::Mojo::Role::Signature')->new('MyApp');
+
+  # Bad signature (no secret)
+  $t->get_with_signature_ok('/blender/blade-speed')
+    ->status_is(401)
+    ->json_is('/error' => 'sorry');
+
+  # Good signature
+  $t->secret('spaceship overhead');
+  $t->get_with_signature_ok('/thermostat/temperature')
+    ->status_is(200)
+    ->json_is('/temperature' => '23°F');
+
+  # Also good signature (secret attribute is stateful)
+  $t->get_with_signature_ok('/front-door/status')
+    ->status_is(200)
+    ->json_is('/state' => 'locked');
+
+Now our tests are uncluttered and free of duplicated data. Further, any of our
+other test files can import this role using the same C<with_roles> method we
+used here.
+
 In this section we've covered how to add custom test assertions to
 L<Test::Mojo> with roles and how to use those roles to simplify testing.
 

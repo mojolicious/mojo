@@ -15,7 +15,7 @@ sub yell {'HEY!'}
 requires 'name';
 
 sub hello {
-  my ($self) = @_;
+  my $self = shift;
   return $self->yell . ' ' . uc($self->name) . '!!!';
 }
 
@@ -25,7 +25,7 @@ use Role::Tiny;
 requires 'name';
 
 sub whisper {
-  my ($self) = @_;
+  my $self = shift;
   return 'psst, ' . lc($self->name);
 }
 
@@ -41,19 +41,22 @@ sub hello {
 
 package main;
 
+# Plain class
 my $obj = Mojo::RoleTest::Base->new(name => 'Ted');
-is($obj->name,  'Ted',       'attr works');
-is($obj->hello, 'hello Ted', 'class method');
+is $obj->name,  'Ted',       'attribute';
+is $obj->hello, 'hello Ted', 'method';
 
+# Single role
 my $obj2 = Mojo::RoleTest::Base->with_roles('Mojo::RoleTest::LOUD')->new;
-is($obj2->hello, 'HEY! BOB!!!', 'method from role overrides base method');
-is($obj2->yell,  'HEY!',        'new method from role');
+is $obj2->hello, 'HEY! BOB!!!', 'role method';
+is $obj2->yell,  'HEY!',        'another role method';
 
+# Multiple roles
 my $obj3 = Mojo::RoleTest::Base->with_roles('Mojo::RoleTest::quiet',
   'Mojo::RoleTest::LOUD')->new(name => 'Joel');
-is($obj3->name,    'Joel',         'attr from base class');
-is($obj3->whisper, 'psst, joel',   'method from role1');
-is($obj3->hello,   'HEY! JOEL!!!', 'method override from role2');
+is $obj3->name,    'Joel',         'base attribute';
+is $obj3->whisper, 'psst, joel',   'method from first role';
+is $obj3->hello,   'HEY! JOEL!!!', 'method from second role';
 
 done_testing();
 

@@ -11,13 +11,13 @@ use Carp ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
-# Supported on Perl 5.22+
-my $NAME
-  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
-
 # Role support requires Role::Tiny 2.000001+
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
+
+# Supported on Perl 5.22+
+my $NAME
+  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
 
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
@@ -108,8 +108,8 @@ sub tap {
 }
 
 sub with_roles {
-  return Role::Tiny->create_class_with_roles(@_) if (ROLES);
-  Carp::croak "Role::Tiny 2.000001+ is required for with_roles method";
+  return Role::Tiny->create_class_with_roles(@_) if ROLES;
+  Carp::croak 'Role::Tiny 2.000001+ is required for roles';
 }
 
 1;
@@ -223,10 +223,10 @@ means they return their invocant when they are called with an argument.
 
 =head2 can_roles
 
-  my $bool = Mojo::Base->can_roles();
+  my $bool = Mojo::Base->can_roles;
 
-True if L<Role::Tiny> 2.000001+ is installed, indicates that roles are supported in L<Mojo::Base>
-derived classes.
+True if L<Role::Tiny> 2.000001+ is installed and roles are supported in
+L<Mojo::Base> derived classes.
 
 =head2 new
 
@@ -258,12 +258,14 @@ spliced or tapped into) a chained set of object method calls.
 
 =head2 with_roles
 
-  my $new_class = Class->with_roles('Foo::Role1', 'Bar::Role2');
-  my $object = $new_class->new();
+  my $new_class = SubClass->with_roles('Foo::Role1', 'Bar::Role2');
 
-Create and return a new class that extends the given class with the
-list of roles composed in order, using L<Role::Tiny>'s method
-C<create_class_with_roles>.
+Create and return a new class that extends the given class with the list of
+roles using L<Role::Tiny>.
+
+  # Create a new class and instantiate it
+  my $new_class = SubClass->with_roles('Foo::Role1', 'Foo::Role2');
+  my $object    = $new_class->new;
 
 =head1 SEE ALSO
 

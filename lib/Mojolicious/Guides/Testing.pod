@@ -693,9 +693,9 @@ object, the value to compare, and an optional description.
 We assign a default description value (C<$desc>), set the L<Test::Builder>
 C<Level> global variable one level higher (which tells L<Test::Builder> how
 far up the call stack to look when something fails), then we use
-L<Test::More>'s C<is> method to compare the location header with the expected
-header value. We wrap that in the C<success> attribute, which records the
-boolean test result and propagates the L<Test::Mojo> object for method
+L<Test::More>'s C<is> function to compare the location header with the
+expected header value. We wrap that in the C<success> attribute, which records
+the boolean test result and propagates the L<Test::Mojo> object for method
 chaining.
 
 With this new package, we're ready to compose a new test object that

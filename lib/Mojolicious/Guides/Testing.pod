@@ -667,28 +667,131 @@ Testing WebSocket servers does not get any simpler than with L<Test::Mojo>.
 
 =head2 Extending L<Test::Mojo>
 
-If you see that you're writing a lot of test assertions that aren't chainable,
-you may benefit from writing your own test assertion. This example comes from
-the L<Test::Mojo> documentation, but is worth examining closer:
+In some situations you may find your tests have a lot of boilerplate, making
+tests cluttered and hard to follow. For example let's say we have an RPC-based
+web application where the HTTP method is always C<POST> and the remote
+procedure name is in the URL, and we use HTTP Basic authentication with
+username C<me> and password C<secretly>.
 
-  my $location_is = sub {
-    my ($t, $value, $desc) = @_;
-    $desc ||= "Location: $value";
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    return $t->success(is($t->tx->res->headers->location, $value, $desc));
-  };
-  $t->get_ok('/')
+All of our requests follow this basic pattern:
+
+  POST /<service>/<command>
+  Authorization: Basic xxxxx
+
+  {"json":"payload"}
+
+For example:
+
+  POST /bedroom-light/power-on
+  Authorization: Basic bWU6c2VjcmV0bHkK=
+
+  {"level":"50%"}
+
+Or:
+
+  POST /blender/spin-blades
+  Authorization: Basic bWU6c2VjcmV0bHkK=
+
+  {"speed":"whip"}
+
+Or:
+
+  POST /thermostat/heat
+  Authorization: Basic bWU6c2VjcmV0bHkK=
+
+  {"temperature":"23°C"}
+
+To test this kind of web application, we'd need to do something like this for
+every test:
+
+  $t->post_ok('/thermostat/heat',
+              {Authorization => 'Basic ' . b64_encode 'me:secretly', ''},
+              json => {temperature => '23°C'})
+    ->status_is(200);
+
+But adding the C<Authorization> header for every request is tedious and likely
+to result in copy/paste errors given enough tests. We'd like to extend
+C<post_ok>'s behavior to build the header for us. With Mojolicious 7.41 (or
+later) and L<Role::Tiny> installed, we can compose this behavior with roles.
+
+First, we create a new package that will implement the role we want:
+
+  package Test::Mojo::Role::BasicAuth;
+  use Role::Tiny;
+  use Mojo::Util 'b64_encode';
+  use Mojo::Base 'Test::Mojo';
+
+  sub post_with_auth_ok {
+      my $t = shift;
+      my $url = shift;
+      my $creds = shift; # username:password
+      my $headers = (ref $_[0] eq 'HASH' ? shift : {});
+      $headers->{Authorization} = "Basic " . b64_encode $creds, '';
+      $t->SUPER::post_ok($url, $headers, @_);
+  }
+
+  1;
+
+This role accepts an extra credentials parameter, then uses that to create an
+C<Authorization> header, then we pass everything along to C<post_ok> to do the
+heavy lifting.
+
+In our test file, we apply the role using C<with_roles> (available in
+Mojolicious 7:41 and later), which creates a new class whose objects have the
+C<post_with_auth_ok> capability:
+
+  my $t = Test::Mojo->with_roles('Test::Mojo::Role::BasicAuth')->new('MyApp');
+
+  $t->post_with_auth_ok('/thermostat/heat', 'me:secretly',
+                        json => {temperature => '23°C'})
+    ->status_is(200);
+
+=head3 Extending with multiple roles
+
+We can compose multiple roles into L<Test::Mojo> objects, too. Let's say we
+want to test the C<Location> header after a redirect, in addition to the
+C<Authorization> header role we've just added. Let's create a new class that
+implements a test assertion named C<location_is>:
+
+  package Test::Mojo::Role::Location;
+  use Role::Tiny;
+  use Test::More;
+
+  sub location_is {
+      my ($t, $value, $desc) = @_;
+      $desc ||= "Location: $value";
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
+      return $t->success(is($t->tx->res->headers->location, $value, $desc));
+  }
+
+  1;
+
+When we make new test assertions using roles, we want to use method signatures
+that match other C<*_is> methods in L<Test::Mojo>, so we accept the test
+object, the value to compare, and an optional description.
+
+In this method we assign a default description value (C<$desc>), set the
+L<Test::Builder> C<Level> global variable one level higher (which tells
+L<Test::Builder> how far up the call stack to look when something fails), then
+we use L<Test::More>'s C<is> method to compare the location header with the
+expected header value. We wrap that in the C<success> attribute, which records
+the boolean test result and propagates the L<Test::Mojo> object for method
+chaining.
+
+With this new package, we're ready to compose a new test object that
+implements both roles:
+
+  my $t = Test::Mojo->with_roles('Test::Mojo::Role::Authorization',
+                                 'Test::Mojo::Role::Location')->new('MyApp');
+
+  $t->post_with_auth_ok('/redirect/mojo', 'me:secretly',
+                        json => {message => 'Mojo, here I come!'})
     ->status_is(302)
-    ->$location_is('http://mojolicious.org')
-    ->or(sub { diag 'Must have been Joel!' });
+    ->location_is('http://mojolicious.org')
+    ->or(sub { diag 'I miss tempire.' });
 
-We create an anonymous subroutine (C<$location_is>) whose method signature
-matches other C<*_is> methods in L<Test::Mojo>. We create a default test
-description (C<$desc>), set the L<Test::Builder> C<Level> global variable one
-level higher (which tells L<Test::Builder> how far up the call stack to look
-when something fails). Finally we use L<Test::More>'s C<is> method to compare
-the location header with the expected header value. We wrap that in the
-C<success> method, which propagates the object for method chaining.
+In this section we've covered how to add custom test assertions to
+L<Test::Mojo> with roles and how to use those roles to simplify testing.
 
 =head1 MORE
 

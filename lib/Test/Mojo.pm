@@ -450,8 +450,7 @@ If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
 be set to C<debug> or C<fatal>, depending on the value of the
 C<HARNESS_IS_VERBOSE> environment variable.
 
-For an introductory guide to testing L<Mojolicious> (and other) web
-applications, see L<Mojolicious::Guides::Testing>.
+See L<Mojolicious::Guides::Testing> for more.
 
 =head1 ATTRIBUTES
 
@@ -1062,6 +1061,6 @@ arguments as L<Mojo::UserAgent/"websocket">, except for the callback.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<Mojolicious::Guides::Testing>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

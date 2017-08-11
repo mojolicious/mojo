@@ -1,8 +1,8 @@
 
-7.40  2017-08-10
+7.40  2017-08-11
   - Added support for Role::Tiny extensions to all classes based on Mojo::Base.
     (dotan)
-  - Added can_roles and with_roles methods to Mojo::Base. (dotan)
+  - Added with_roles method to Mojo::Base. (dotan)
 
 7.39  2017-08-03
   - Removed experimental close_idle_connections method from

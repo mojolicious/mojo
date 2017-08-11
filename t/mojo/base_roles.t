@@ -4,7 +4,7 @@ use Test::More;
 
 BEGIN {
   plan skip_all => 'Role::Tiny 2.000001+ required for this test!'
-    unless Mojo::Base->can_roles;
+    unless Mojo::Base->ROLES;
 }
 
 package Mojo::RoleTest::LOUD;

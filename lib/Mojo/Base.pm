@@ -65,8 +65,6 @@ sub attr {
   }
 }
 
-sub can_roles {ROLES}
-
 sub import {
   my $class = shift;
   return unless my $flag = shift;
@@ -221,13 +219,6 @@ executed at accessor read time if there's no set value, and gets passed the
 current instance of the object as first argument. Accessors can be chained, that
 means they return their invocant when they are called with an argument.
 
-=head2 can_roles
-
-  my $bool = Mojo::Base->can_roles;
-
-True if L<Role::Tiny> 2.000001+ is installed and roles are supported in
-L<Mojo::Base> derived classes.
-
 =head2 new
 
   my $object = SubClass->new;
@@ -260,10 +251,11 @@ spliced or tapped into) a chained set of object method calls.
 
   my $new_class = SubClass->with_roles('Foo::Role1', 'Bar::Role2');
 
-Create and return a new class that extends the given class with the list of
-roles using L<Role::Tiny>.
+Create and return a new class that extends the given class with one or more
+L<Role::Tiny> roles. Note that role support depends on L<Role::Tiny>
+(2.000001+).
 
-  # Create a new class and instantiate it
+  # Create a new class with roles and instantiate it
   my $new_class = SubClass->with_roles('Foo::Role1', 'Foo::Role2');
   my $object    = $new_class->new;
 

@@ -602,7 +602,7 @@ C<request_ok>:
 
 While the message flow on WebSocket connections can be rather dynamic, it more
 often than not is quite predictable, which allows this rather pleasant
-L<Test::Mojo> WebSockt API to be used:
+L<Test::Mojo> WebSocket API to be used:
 
   use Mojo::Base -strict;
 

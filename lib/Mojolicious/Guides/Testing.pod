@@ -660,8 +660,8 @@ Testing WebSocket servers does not get any simpler than with L<Test::Mojo>.
 
 If you see that you're writing a lot of test assertions that aren't chainable,
 you may benefit from writing your own test assertions. Let's say we want to test
-the C<Location> header after a redirect. We'll create a new class that
-implements a test assertion named C<location_is>:
+the C<Location> header after a redirect. We'll create a new class with
+L<Role::Tiny> that implements a test assertion named C<location_is>:
 
   package Test::Mojo::Role::Location;
 

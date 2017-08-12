@@ -451,7 +451,7 @@ at JSON pointer locations:
     ->json_is('/beings/jeremiah/age' => 42)
     ->json_like('/beings/jeremiah/species' => qr/bullfrog/i);
 
-JSON pointer syntax make testing JSON responses simple and readable.
+JSON pointer syntax makes testing JSON responses simple and readable.
 
 =head3 DOM response assertions
 
@@ -604,7 +604,7 @@ C<request_ok>:
 
 While the message flow on WebSocket connections can be rather dynamic, it more
 often than not is quite predictable, which allows this rather pleasant
-L<Test::Mojo> API to be used.
+L<Test::Mojo> WebSocket API to be used:
 
   use Mojo::Base -strict;
 

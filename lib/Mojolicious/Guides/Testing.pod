@@ -249,7 +249,7 @@ when the C<enable_weather> configuration value is set:
   # Normal route to controller
   $r->get('/')->to('example#welcome');
 
-  # NEW: this route only exists if 'enable_weather' is set in the configuration
+  # NEW: this route only exists if "enable_weather" is set in the configuration
   if ($config->{enable_weather}) {
     $r->get('/weather' => sub { shift->render(text => "It's hot! 🔥") }
   }
@@ -623,7 +623,7 @@ L<Test::Mojo> WebSocket API to be used:
   $t->websocket_ok('/echo.json')
     ->send_ok({json => {test => [1, 2, 3]}})
     ->message_ok
-    ->json_message_is('/test', [1, 2, 3])
+    ->json_message_is('/test' => [1, 2, 3])
     ->finish_ok;
 
   done_testing();

@@ -167,7 +167,6 @@ All three forms save a lot of typing.
   use utf8;
   use feature ':5.10';
   use IO::Handle ();
-  use Mojo::Base;
   push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
@@ -179,7 +178,6 @@ All three forms save a lot of typing.
   use IO::Handle ();
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
-  use Mojo::Base;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
 =head1 FUNCTIONS

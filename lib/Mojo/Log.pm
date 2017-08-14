@@ -19,8 +19,7 @@ has history => sub { [] };
 has level => 'debug';
 has max_history_size => 10;
 has 'path';
-has short =>
-  sub { $ENV{INVOCATION_ID} && $ENV{JOURNAL_STREAM} && !shift->path };
+has short => sub { $ENV{MOJO_LOG_SHORT} };
 
 # Supported log levels
 my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
@@ -178,8 +177,7 @@ Log file path used by L</"handle">.
   $log     = $log->short($bool);
 
 Generate short log messages without a timestamp, suitable for systemd, defaults
-to auto-detection based on the presence of a L</"path"> and the
-C<INVOCATION_ID> and C<JOURNAL_STREAM> environment variables.
+to the value of the C<MOJO_LOG_SHORT> environment variables.
 
 =head1 METHODS
 

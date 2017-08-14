@@ -50,22 +50,19 @@ $log->format(
 like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^debug:\d+:Test:1:2:3$/,
   'right format';
 
-# systemd
+# Short log messages
 {
   $log = Mojo::Log->new;
-  ok !$log->short, 'systemd has not been detected';
+  ok !$log->short, 'long messages';
   like $log->format->(time, 'debug', 'Test 123'),
     qr/^\[.*\] \[debug\] Test 123\n$/, 'right format';
-  local $ENV{JOURNAL_STREAM} = '1:23456';
-  local $ENV{INVOCATION_ID}  = 1;
+  local $ENV{MOJO_LOG_SHORT} = 1;
   $log = Mojo::Log->new;
-  ok $log->short, 'systemd has been detected';
+  ok $log->short, 'short messages';
+  $log = Mojo::Log->new(short => 1);
+  ok $log->short, 'short messages';
   like $log->format->(time, 'debug', 'Test 123'), qr/^\[debug\] Test 123\n$/,
     'right format';
-  $log = Mojo::Log->new(path => $path);
-  ok !$log->short, 'a path will be used';
-  like $log->format->(time, 'debug', 'Test 123'),
-    qr/^\[.*\] \[debug\] Test 123\n$/, 'right format';
 }
 
 # Events

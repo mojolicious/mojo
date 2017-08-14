@@ -1,9 +1,11 @@
 
-7.40  2017-08-12
+7.40  2017-08-14
   - Added support for Role::Tiny extensions to all classes based on Mojo::Base.
     (dotan)
   - Added with_roles method to Mojo::Base. (dotan)
   - Added the guide Mojolicious::Guides::Testing. (scottw)
+  - Replaced systemd detection in Mojo::Log with the MOJO_LOG_SHORT environment
+    variable, since there is no reliable way to detect systemd.
 
 7.39  2017-08-03
   - Removed experimental close_idle_connections method from

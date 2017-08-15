@@ -1,5 +1,7 @@
 
 7.41  2017-08-15
+  - Added with_roles method to Mojo::ByteStream, Mojo::Collection, Mojo::DOM and
+    Mojo::File.
 
 7.40  2017-08-14
   - Added support for Role::Tiny extensions to all classes based on Mojo::Base.

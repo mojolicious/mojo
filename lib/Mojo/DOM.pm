@@ -178,6 +178,8 @@ sub val {
   return exists $self->{multiple} ? $v->size ? $v->to_array : undef : $v->last;
 }
 
+sub with_roles { shift->Mojo::Base::with_roles(@_) }
+
 sub wrap         { shift->_wrap(0, @_) }
 sub wrap_content { shift->_wrap(1, @_) }
 
@@ -945,6 +947,12 @@ if none could be found.
 
   # "on"
   $dom->parse('<input name=test type=checkbox>')->at('input')->val;
+
+=head2 with_roles
+
+  my $new_class = Mojo::DOM->with_roles('Foo::Role1', 'Bar::Role2');
+
+Alias for L<Mojo::Base/"with_roles">.
 
 =head2 wrap
 

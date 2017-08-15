@@ -56,6 +56,8 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub to_string { ${$_[0]} }
 
+sub with_roles { shift->Mojo::Base::with_roles(@_) }
+
 sub _delegate {
   my ($self, $sub) = (shift, shift);
   $$self = $sub->(shift || 'UTF-8', $$self);
@@ -327,6 +329,12 @@ L<Mojo::Util/"url_unescape">.
 
   # "&lt;html&gt;"
   b('%3Chtml%3E')->url_unescape->xml_escape;
+
+=head2 with_roles
+
+  my $new_class = Mojo::ByteStream->with_roles('Foo::Role1', 'Bar::Role2');
+
+Alias for L<Mojo::Base/"with_roles">.
 
 =head2 xml_escape
 

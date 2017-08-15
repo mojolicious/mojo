@@ -137,6 +137,8 @@ sub to_rel { $_[0]->new(abs2rel(${$_[0]}, $_[1])) }
 
 sub to_string {"${$_[0]}"}
 
+sub with_roles { shift->Mojo::Base::with_roles(@_) }
+
 1;
 
 =encoding utf8
@@ -445,6 +447,12 @@ L<Mojo::File> object.
   my $str = $path->to_string;
 
 Stringify the path.
+
+=head2 with_roles
+
+  my $new_class = Mojo::File->with_roles('Foo::Role1', 'Bar::Role2');
+
+Alias for L<Mojo::Base/"with_roles">.
 
 =head1 OPERATORS
 

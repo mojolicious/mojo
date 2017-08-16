@@ -669,10 +669,10 @@ L<Role::Tiny> that implements a test assertion named C<location_is>:
   use Test::More;
 
   sub location_is {
-      my ($t, $value, $desc) = @_;
-      $desc ||= "Location: $value";
-      local $Test::Builder::Level = $Test::Builder::Level + 1;
-      return $t->success(is($t->tx->res->headers->location, $value, $desc));
+    my ($t, $value, $desc) = @_;
+    $desc ||= "Location: $value";
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return $t->success(is($t->tx->res->headers->location, $value, $desc));
   }
 
   1;
@@ -691,7 +691,7 @@ propagates the L<Test::Mojo> object for method chaining.
 With this new package, we're ready to compose a new test object that uses the
 role:
 
-  my $t = Test::Mojo->with_roles('Test::Mojo::Role::Location')->new('MyApp');
+  my $t = Test::Mojo->with_roles('+Location')->new('MyApp');
 
   $t->post_ok('/redirect/mojo' => json => {message => 'Mojo, here I come!'})
     ->status_is(302)

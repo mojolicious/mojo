@@ -1,4 +1,6 @@
 
+7.42  2017-08-16
+
 7.41  2017-08-15
   - Added with_roles method to Mojo::ByteStream, Mojo::Collection, Mojo::DOM and
     Mojo::File.

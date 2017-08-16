@@ -7,7 +7,7 @@ BEGIN {
     unless Mojo::Base->ROLES;
 }
 
-package Mojo::RoleTest::LOUD;
+package Mojo::RoleTest::Role::LOUD;
 use Role::Tiny;
 
 sub yell {'HEY!'}
@@ -19,7 +19,7 @@ sub hello {
   return $self->yell . ' ' . uc($self->name) . '!!!';
 }
 
-package Mojo::RoleTest::quiet;
+package Mojo::RoleTest::Role::quiet;
 use Role::Tiny;
 
 requires 'name';
@@ -29,7 +29,7 @@ sub whisper {
   return 'psst, ' . lc($self->name);
 }
 
-package Mojo::RoleTest::Base;
+package Mojo::RoleTest;
 use Mojo::Base -base;
 
 has name => 'bob';
@@ -52,21 +52,39 @@ use Mojo::DOM;
 use Mojo::File;
 
 # Plain class
-my $obj = Mojo::RoleTest::Base->new(name => 'Ted');
+my $obj = Mojo::RoleTest->new(name => 'Ted');
 is $obj->name,  'Ted',       'attribute';
 is $obj->hello, 'hello Ted', 'method';
 
 # Single role
-my $obj2 = Mojo::RoleTest::Base->with_roles('Mojo::RoleTest::LOUD')->new;
+my $obj2 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::LOUD')->new;
 is $obj2->hello, 'HEY! BOB!!!', 'role method';
 is $obj2->yell,  'HEY!',        'another role method';
 
+# Single role (shorthand)
+my $obj4 = Mojo::RoleTest->with_roles('+LOUD')->new;
+is $obj4->hello, 'HEY! BOB!!!', 'role method';
+is $obj4->yell,  'HEY!',        'another role method';
+
 # Multiple roles
-my $obj3 = Mojo::RoleTest::Base->with_roles('Mojo::RoleTest::quiet',
-  'Mojo::RoleTest::LOUD')->new(name => 'Joel');
+my $obj3 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet',
+  'Mojo::RoleTest::Role::LOUD')->new(name => 'Joel');
 is $obj3->name,    'Joel',         'base attribute';
 is $obj3->whisper, 'psst, joel',   'method from first role';
 is $obj3->hello,   'HEY! JOEL!!!', 'method from second role';
+
+# Multiple roles (shorthand)
+my $obj5 = Mojo::RoleTest->with_roles('+quiet', '+LOUD')->new(name => 'Joel');
+is $obj5->name,    'Joel',         'base attribute';
+is $obj5->whisper, 'psst, joel',   'method from first role';
+is $obj5->hello,   'HEY! JOEL!!!', 'method from second role';
+
+# Multiple roles (mixed)
+my $obj6 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet', '+LOUD')
+  ->new(name => 'Joel');
+is $obj6->name,    'Joel',         'base attribute';
+is $obj6->whisper, 'psst, joel',   'method from first role';
+is $obj6->hello,   'HEY! JOEL!!!', 'method from second role';
 
 # Classes that are not subclasses of Mojo::Base
 my $stream = Mojo::ByteStream->with_roles('Mojo::RoleTest::Hello')->new;

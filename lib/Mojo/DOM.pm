@@ -13,7 +13,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util 'weaken';
 
 sub all_text { _text(_nodes(shift->tree), 1) }
 
@@ -950,7 +950,8 @@ if none could be found.
 
 =head2 with_roles
 
-  my $new_class = Mojo::DOM->with_roles('Foo::Role1', 'Bar::Role2');
+  my $new_class = Mojo::DOM->with_roles('Mojo::DOM::Role::One');
+  my $new_class = Mojo::DOM->with_roles('+One', '+Two');
 
 Alias for L<Mojo::Base/"with_roles">.
 

@@ -332,7 +332,8 @@ L<Mojo::Util/"url_unescape">.
 
 =head2 with_roles
 
-  my $new_class = Mojo::ByteStream->with_roles('Foo::Role1', 'Bar::Role2');
+  my $new_class = Mojo::ByteStream->with_roles('Mojo::ByteStream::Role::One');
+  my $new_class = Mojo::ByteStream->with_roles('+One', '+Two');
 
 Alias for L<Mojo::Base/"with_roles">.
 

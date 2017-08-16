@@ -450,7 +450,8 @@ Stringify the path.
 
 =head2 with_roles
 
-  my $new_class = Mojo::File->with_roles('Foo::Role1', 'Bar::Role2');
+  my $new_class = Mojo::File->with_roles('Mojo::File::Role::One');
+  my $new_class = Mojo::File->with_roles('+One', '+Two');
 
 Alias for L<Mojo::Base/"with_roles">.
 

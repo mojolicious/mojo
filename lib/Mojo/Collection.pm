@@ -373,6 +373,7 @@ callback/method.
 
   my $new_class = Mojo::Collection->with_roles('Mojo::Collection::Role::One');
   my $new_class = Mojo::Collection->with_roles('+One', '+Two');
+  $collection   = $collection->with_roles('+One', '+Two');
 
 Alias for L<Mojo::Base/"with_roles">.
 

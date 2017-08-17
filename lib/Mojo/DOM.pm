@@ -952,6 +952,7 @@ if none could be found.
 
   my $new_class = Mojo::DOM->with_roles('Mojo::DOM::Role::One');
   my $new_class = Mojo::DOM->with_roles('+One', '+Two');
+  $dom          = $dom->with_roles('+One', '+Two');
 
 Alias for L<Mojo::Base/"with_roles">.
 

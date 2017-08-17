@@ -1,6 +1,6 @@
 
 7.43  2017-08-18
-  - Improve Mojo::Base role support with the ability to rebless objects.
+  - Improved Mojo::Base role support with the ability to rebless objects.
 
 7.42  2017-08-17
   - Improved Mojo::Base role support with shorthands.

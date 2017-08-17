@@ -1,8 +1,9 @@
 
-7.42  2017-08-16
-  - Improved Mojo::Base role support with shorthands, so
-    "MyClass->with_roles('MyClass::Role::Foo')" becomes
-    "MyClass->with_roles('+Foo')".
+7.42  2017-08-17
+  - Improved Mojo::Base role support with shorthands.
+      MyClass->with_roles('MyClass::Role::Foo')
+    becomes
+      MyClass->with_roles('+Foo')
 
 7.41  2017-08-15
   - Added with_roles method to Mojo::ByteStream, Mojo::Collection, Mojo::DOM and

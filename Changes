@@ -1,4 +1,6 @@
 
+7.43  2017-08-18
+
 7.42  2017-08-17
   - Improved Mojo::Base role support with shorthands.
       MyClass->with_roles('MyClass::Role::Foo')

@@ -1,5 +1,6 @@
 language: perl
 perl:
+  - "5.26"
   - "5.24"
   - "5.22"
   - "5.20"
@@ -18,7 +19,7 @@ env:
     - TEST_UNIX=1
     - TEST_TLS=1
 install:
-  - cpanm -n EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Pod Test::Pod::Coverage
+  - cpanm -n EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Role::Tiny Test::Pod Test::Pod::Coverage
   - cpanm -n --installdeps .
 sudo: false
 notifications:

@@ -259,10 +259,11 @@ spliced or tapped into) a chained set of object method calls.
   my $new_class = SubClass->with_roles('+One', '+Two');
   $object       = $object->with_roles('+One', '+Two');
 
-Create a new class with one or more L<Role::Tiny> roles and return it, or
-rebless the given object into it. For roles following the naming scheme
-C<MyClass::Role::RoleName> you can use the shorthand C<+RoleName>. Note that
-role support depends on L<Role::Tiny> (2.000001+).
+Create a new class with one or more L<Role::Tiny> roles. If called on a class
+returns the new class, or if called on an object reblesses the object into the
+new class. For roles following the naming scheme C<MyClass::Role::RoleName> you
+can use the shorthand C<+RoleName>. Note that role support depends on
+L<Role::Tiny> (2.000001+).
 
   # Create a new class with the role "SubClass::Role::Foo" and instantiate it
   my $new_class = SubClass->with_roles('+Foo');

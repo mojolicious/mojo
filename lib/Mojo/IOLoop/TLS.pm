@@ -51,7 +51,7 @@ sub _expand {
   weaken $self;
   my $tls = {
     SSL_ca_file => $args->{tls_ca}
-      && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+      && -T $args->{tls_ca} ? $args->{tls_ca} : \undef,
     SSL_error_trap         => sub { $self->_cleanup->emit(error => $_[1]) },
     SSL_honor_cipher_order => 1,
     SSL_startHandshake     => 0
@@ -71,7 +71,6 @@ sub _expand {
   else {
     $tls->{SSL_hostname}
       = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
-    $tls->{SSL_verifycn_scheme} = $args->{tls_ca} ? 'http' : undef;
     $tls->{SSL_verify_mode} //= $args->{tls_ca} ? 0x01 : 0x00;
     $tls->{SSL_verifycn_name} = $args->{address};
   }

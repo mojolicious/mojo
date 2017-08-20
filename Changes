@@ -1,5 +1,6 @@
 
-7.44  2017-08-19
+7.44  2017-08-20
+  - Improved Mojo::IOLoop::TLS to use a little less memory.
 
 7.43  2017-08-18
   - Improved Mojo::Base role support with the ability to rebless objects.

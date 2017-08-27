@@ -1,0 +1,7 @@
+% my $self = shift;
+% if ($self->app->mode eq 'development') {
+%= $self->stash('exception')->message
+% }
+% else {
+Not development mode error!
+% }

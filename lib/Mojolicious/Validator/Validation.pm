@@ -69,7 +69,9 @@ sub optional {
   return $self->topic($name) unless defined(my $input = $self->input->{$name});
 
   my @input = ref $input eq 'ARRAY' ? @$input : ($input);
-  for my $cb (map { $self->validator->filters->{$_} } @filters) {
+  my $filters_cb =  $self->validator->filters;
+  for my $cb ( @filters) {
+    $cb =  $filters_cb->{$cb};
     @input = map { $self->$cb($name, $_) } @input;
   }
   $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0]

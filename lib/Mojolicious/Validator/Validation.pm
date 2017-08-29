@@ -70,9 +70,10 @@ sub optional {
 
   my @input = ref $input eq 'ARRAY' ? @$input : ($input);
   my $filters_cb =  $self->validator->filters;
-  for my $cb ( @filters) {
-    $cb =  $filters_cb->{$cb};
-    @input = map { $self->$cb($name, $_) } @input;
+  for my $cb (@filters) {
+    ($cb, my @args) =  ref $cb ? @$cb : $cb;
+    $cb = $filters_cb->{$cb};
+    @input = map { $self->$cb($name, $_, @args) } @input;
   }
   $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0]
     if @input && !grep { !length } @input;

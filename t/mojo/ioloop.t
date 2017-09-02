@@ -9,22 +9,8 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 
-# Custom reactor
-package MyReactor;
-use Mojo::Base 'Mojo::Reactor::Poll';
-
-package main;
-
-# Reactor detection
-$ENV{MOJO_REACTOR} = 'MyReactorDoesNotExist';
-my $loop = Mojo::IOLoop->new;
-is ref $loop->reactor, 'Mojo::Reactor::Poll', 'right class';
-$ENV{MOJO_REACTOR} = 'MyReactor';
-$loop = Mojo::IOLoop->new;
-is ref $loop->reactor, 'MyReactor', 'right class';
-
 # Defaults
-$loop = Mojo::IOLoop->new;
+my $loop = Mojo::IOLoop->new;
 is $loop->max_connections, 1000, 'right default';
 $loop = Mojo::IOLoop->new(max_connections => 10);
 is $loop->max_connections, 10, 'right value';
@@ -332,7 +318,7 @@ ok !$accepting[1], 'connection limit reached';
   my $loop = Mojo::IOLoop->new;
   $loop->timer(0 => sub { die 'Bye!' });
   $loop->start;
-  like $err, qr/^MyReactor:.*Bye!/, 'right error';
+  like $err, qr/^Mojo::Reactor::Poll:.*Bye!/, 'right error';
 }
 
 # Defaults

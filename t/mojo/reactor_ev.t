@@ -253,18 +253,6 @@ is $timer, 1, 'timer was triggered once';
 # Detection
 is(Mojo::Reactor->detect, 'Mojo::Reactor::EV', 'right class');
 
-# Dummy reactor
-package Mojo::Reactor::Test;
-use Mojo::Base 'Mojo::Reactor::Poll';
-
-package main;
-
-# Detection (env)
-{
-  local $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Test';
-  is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
-}
-
 # EV in control
 is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::EV', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';

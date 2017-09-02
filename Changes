@@ -1,6 +1,11 @@
 
-7.44  2017-08-20
+7.44  2017-09-02
+  - Reverted a previous change to Mojo::Loader that allowed for load_class to be
+    called on the same class multiple times, since it had very bad side effects.
   - Improved Mojo::IOLoop::TLS to use a little less memory.
+  - Fixed a bug where Mojolicious controllers like "MyApp::Controller::Foo::Bar"
+    would disappear if loading the controller "MyApp::Controller::Foo" was
+    attempted but failed.
 
 7.43  2017-08-18
   - Improved Mojo::Base role support with the ability to rebless objects.

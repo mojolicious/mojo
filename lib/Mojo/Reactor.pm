@@ -5,12 +5,15 @@ use Carp 'croak';
 use Config;
 use Mojo::Loader 'load_class';
 
+my $DETECTED;
+
 sub again { croak 'Method "again" not implemented by subclass' }
 
 sub detect {
   my $default = 'Mojo::Reactor::' . ($Config{d_pseudofork} ? 'Poll' : 'EV');
   my $try = $ENV{MOJO_REACTOR} || $default;
-  return load_class($try) ? 'Mojo::Reactor::Poll' : $try;
+  return $DETECTED if $DETECTED;
+  return $DETECTED = load_class($try) ? 'Mojo::Reactor::Poll' : $try;
 }
 
 sub io         { croak 'Method "io" not implemented by subclass' }

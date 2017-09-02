@@ -599,6 +599,16 @@ $t->get_ok('/foo/session')->status_is(200)
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
   ->content_like(qr!<\?xml version="1.0" encoding="UTF-8"\?><rss />!);
 
+# Missing controller has no side effects
+$t->get_ok('/side_effects-test/index')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('pass');
+$t->get_ok('/side_effects/index')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)');
+$t->get_ok('/side_effects/index')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)');
+$t->get_ok('/side_effects-test/index')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('pass');
+
 # Connection already closed
 eval { Mojolicious::Controller->new->finish };
 like $@, qr/Connection already closed/, 'right error';

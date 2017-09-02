@@ -24,24 +24,19 @@ ok !!UNIVERSAL::can(B => 'svref_2object'), 'method found';
 my $e = load_class 'Mojo::LoaderException';
 isa_ok $e, 'Mojo::Exception', 'right exception';
 like $e->message, qr/Missing right curly/, 'right message';
-is $e->lines_before->[0][0], 2,                       'right number';
-is $e->lines_before->[0][1], '',                      'right line';
-is $e->lines_before->[1][0], 3,                       'right number';
-is $e->lines_before->[1][1], 'use Mojo::Base -base;', 'right line';
-is $e->lines_before->[2][0], 4,                       'right number';
-is $e->lines_before->[2][1], '',                      'right line';
-is $e->lines_before->[3][0], 5,                       'right number';
-is $e->lines_before->[3][1], 'foo {',                 'right line';
-is $e->lines_before->[4][0], 6,                       'right number';
-is $e->lines_before->[4][1], '',                      'right line';
-is $e->line->[0], 7,    'right number';
+is $e->lines_before->[0][0], 4,            'right number';
+is $e->lines_before->[0][1], '',           'right line';
+is $e->lines_before->[1][0], 5,            'right number';
+is $e->lines_before->[1][1], 'sub new {}', 'right line';
+is $e->lines_before->[2][0], 6,            'right number';
+is $e->lines_before->[2][1], '',           'right line';
+is $e->lines_before->[3][0], 7,            'right number';
+is $e->lines_before->[3][1], 'foo {',      'right line';
+is $e->lines_before->[4][0], 8,            'right number';
+is $e->lines_before->[4][1], '',           'right line';
+is $e->line->[0], 9,    'right number';
 is $e->line->[1], "1;", 'right line';
 like "$e", qr/Missing right curly/, 'right message';
-
-# Exception again
-$e = load_class 'Mojo::LoaderException';
-isa_ok $e, 'Mojo::Exception', 'right exception';
-like $e->message, qr/Attempt to reload/, 'right message';
 
 # Complicated exception
 $e = load_class 'Mojo::LoaderException2';

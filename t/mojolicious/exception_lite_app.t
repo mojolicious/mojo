@@ -264,7 +264,6 @@ $t->get_ok('/mojo/pinstripe-dark.png')->status_is(200)
   ->content_type_is('image/png');
 $t->get_ok('/mojo/pinstripe-light.png')->status_is(200)
   ->content_type_is('image/png');
-$t->get_ok('/mojo/stripes.png')->status_is(200)->content_type_is('image/png');
 
 done_testing();
 

@@ -9,6 +9,9 @@ use Scalar::Util 'weaken';
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
   : eval 'use IO::Socket::SSL 1.94 (); 1';
+use constant DEFAULT => eval { IO::Socket::SSL->VERSION('1.965') }
+  ? ''
+  : \undef;
 use constant READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -51,7 +54,7 @@ sub _expand {
   weaken $self;
   my $tls = {
     SSL_ca_file => $args->{tls_ca}
-      && -T $args->{tls_ca} ? $args->{tls_ca} : \undef,
+      && -T $args->{tls_ca} ? $args->{tls_ca} : DEFAULT,
     SSL_error_trap         => sub { $self->_cleanup->emit(error => $_[1]) },
     SSL_honor_cipher_order => 1,
     SSL_startHandshake     => 0

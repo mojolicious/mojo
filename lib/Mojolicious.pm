@@ -881,6 +881,8 @@ Charlie Brady
 
 Chas. J. Owens IV
 
+Chase Whitener
+
 Christian Hansen
 
 chromatic
@@ -912,6 +914,8 @@ Dominique Dumont
 Dotan Dimet
 
 Douglas Christopher Wilson
+
+Ettore Di Giacinto
 
 Eugen Konkov
 
@@ -1046,6 +1050,8 @@ Roy Storey
 Ryan Jendoubi
 
 Salvador Fandino
+
+Santiago Zarate
 
 Sascha Kiefer
 

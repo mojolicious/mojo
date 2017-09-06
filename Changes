@@ -1,5 +1,7 @@
 
-7.45  2017-09-03
+7.45  2017-09-06
+  - Fixed support for versions of IO::Socket::SSL older than 1.965. (mudler,
+    foursixnine, genio, sri)
 
 7.44  2017-09-02
   - Reverted a previous change to Mojo::Loader that allowed for load_class to be

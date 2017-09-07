@@ -1,4 +1,6 @@
 
+7.46  2017-09-07
+
 7.45  2017-09-06
   - Fixed support for versions of IO::Socket::SSL older than 1.965. (mudler,
     foursixnine, genio, sri)

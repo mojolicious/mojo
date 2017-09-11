@@ -792,7 +792,7 @@ really tamper resistant.
 
 All files uploaded via C<multipart/form-data> request are automatically
 available as L<Mojo::Upload> objects from L<Mojolicious::Controller/"param">.
-And you don't have to worry about memory usage, because all files above 250KB
+And you don't have to worry about memory usage, because all files above 250KiB
 will be automatically streamed into a temporary file. To build HTML forms more
 efficiently, you can also use tag helpers like
 L<Mojolicious::Plugin::TagHelpers/"form_for">.
@@ -832,11 +832,11 @@ L<Mojolicious::Plugin::TagHelpers/"form_for">.
     </body>
   </html>
 
-To protect you from excessively large files there is also a limit of 16MB by
+To protect you from excessively large files there is also a limit of 16MiB by
 default, which you can tweak with the attribute
 L<Mojolicious/"max_request_size">.
 
-  # Increase limit to 1GB
+  # Increase limit to 1GiB
   app->max_request_size(1073741824);
 
 =head2 User agent

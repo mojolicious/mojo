@@ -211,7 +211,7 @@ HTTP response status code.
   $res     = $res->max_message_size(1024);
 
 Maximum message size in bytes, defaults to the value of the
-C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<2147483648> (2GB). Setting
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<2147483648> (2GiB). Setting
 the value to C<0> will allow messages of indefinite size.
 
 =head2 message

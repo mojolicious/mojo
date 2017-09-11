@@ -412,7 +412,7 @@ than just the last one, you can use L</"every_param">. Note that this method
 caches all data, so it should not be called before the entire request body has
 been received. Parts of the request body need to be loaded into memory to parse
 C<POST> parameters, so you have to make sure it is not excessively large.
-There's a 16MB limit for requests by default.
+There's a 16MiB limit for requests by default.
 
 =head2 params
 
@@ -423,7 +423,7 @@ C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
 usually a L<Mojo::Parameters> object. Note that this method caches all data, so
 it should not be called before the entire request body has been received. Parts
 of the request body need to be loaded into memory to parse C<POST> parameters,
-so you have to make sure it is not excessively large. There's a 16MB limit for
+so you have to make sure it is not excessively large. There's a 16MiB limit for
 requests by default.
 
   # Get parameter names and values

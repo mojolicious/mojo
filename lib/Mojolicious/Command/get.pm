@@ -175,7 +175,7 @@ Mojolicious::Command::get - Get command
                                          of MOJO_CONNECT_TIMEOUT or 10
     -r, --redirect                       Follow up to 10 redirects
     -S, --response-size <size>           Maximum response size in bytes,
-                                         defaults to 2147483648 (2GB)
+                                         defaults to 2147483648 (2GiB)
     -v, --verbose                        Print request and response headers to
                                          STDERR
 

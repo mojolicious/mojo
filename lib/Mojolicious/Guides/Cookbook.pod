@@ -787,7 +787,7 @@ the WebSocket connection has been closed.
 
 You can activate C<permessage-deflate> compression with
 L<Mojo::Transaction::WebSocket/"with_compression">, this can result in much
-better performance, but also increases memory usage by up to 300KB per
+better performance, but also increases memory usage by up to 300KiB per
 connection.
 
   my $proto = $c->tx->with_protocols('v2.proto', 'v1.proto');
@@ -1135,7 +1135,7 @@ L<Mojo::UserAgent::Transactor/"tx">.
 
 When downloading large files with L<Mojo::UserAgent> you don't have to worry
 about memory usage at all, because it will automatically stream everything
-above 250KB into a temporary file, which can then be moved into a permanent
+above 250KiB into a temporary file, which can then be moved into a permanent
 file with L<Mojo::Asset::File/"move_to">.
 
   use Mojo::UserAgent;
@@ -1145,11 +1145,11 @@ file with L<Mojo::Asset::File/"move_to">.
   my $tx = $ua->get('https://www.github.com/kraih/mojo/tarball/master');
   $tx->result->content->asset->move_to('mojo.tar.gz');
 
-To protect you from excessively large files there is also a limit of 2GB by
+To protect you from excessively large files there is also a limit of 2GiB by
 default, which you can tweak with the attribute
 L<Mojo::UserAgent/"max_response_size">.
 
-  # Increase limit to 10GB
+  # Increase limit to 10GiB
   $ua->max_response_size(10737418240);
 
 =head2 Large file upload

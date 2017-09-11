@@ -432,7 +432,7 @@ underlying connection might get closed early.
   my $address = $c->tx->remote_address;
   my $port    = $c->tx->remote_port;
 
-  # Increase size limit for WebSocket messages to 16MB
+  # Increase size limit for WebSocket messages to 16MiB
   $c->tx->max_websocket_size(16777216) if $c->tx->is_websocket;
 
   # Perform non-blocking operation without knowing the connection status
@@ -584,7 +584,7 @@ message body, in that order. If there are multiple values sharing the same
 name, and you want to access more than just the last one, you can use
 L</"every_param">. Parts of the request body need to be loaded into memory to
 parse C<POST> parameters, so you have to make sure it is not excessively large.
-There's a 16MB limit for requests by default.
+There's a 16MiB limit for requests by default.
 
   # Get first value
   my $first = $c->every_param('foo')->[0];
@@ -840,7 +840,7 @@ usually defaults to C<15> seconds.
 Persistent data storage for the next few requests, all session data gets
 serialized with L<Mojo::JSON> and stored Base64 encoded in HMAC-SHA1 signed
 cookies, to prevent tampering. Note that cookies usually have a C<4096> byte
-(4KB) limit, depending on browser.
+(4KiB) limit, depending on browser.
 
   # Manipulate session
   $c->session->{foo} = 'bar';
@@ -931,7 +931,7 @@ validate file uploads as well as C<GET> and C<POST> parameters extracted from
 the query string and C<application/x-www-form-urlencoded> or
 C<multipart/form-data> message body. Parts of the request body need to be loaded
 into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large. There's a 16MB limit for requests by default.
+excessively large. There's a 16MiB limit for requests by default.
 
   # Validate GET/POST parameter
   my $validation = $c->validation;

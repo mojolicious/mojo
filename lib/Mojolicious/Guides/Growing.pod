@@ -431,7 +431,7 @@ through the method L<Mojolicious::Controller/"flash">.
   $c->redirect_to('goodbye');
 
 Just remember that all session data gets serialized with L<Mojo::JSON> and
-stored in HMAC-SHA1 signed cookies, which usually have a C<4096> byte (4KB)
+stored in HMAC-SHA1 signed cookies, which usually have a C<4096> byte (4KiB)
 limit, depending on browser.
 
 =head2 Final prototype

@@ -191,7 +191,7 @@ L<Mojo::Headers> implements the following attributes.
   $headers = $headers->max_line_size(1024);
 
 Maximum header line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<8192> (8KB).
+C<MOJO_MAX_LINE_SIZE> environment variable or C<8192> (8KiB).
 
 =head2 max_lines
 

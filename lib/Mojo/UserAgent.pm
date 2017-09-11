@@ -911,7 +911,7 @@ object, depending on if the handshake was successful.
 
 You can activate C<permessage-deflate> compression by setting the
 C<Sec-WebSocket-Extensions> header, this can result in much better performance,
-but also increases memory usage by up to 300KB per connection.
+but also increases memory usage by up to 300KiB per connection.
 
   $ua->websocket('ws://example.com/foo' => {
     'Sec-WebSocket-Extensions' => 'permessage-deflate'

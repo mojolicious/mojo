@@ -208,7 +208,7 @@ Check if asset contains a specific string.
   my $bytes = $file->get_chunk($offset, $max);
 
 Get chunk of data starting from a specific position, defaults to a maximum
-chunk size of C<131072> bytes (128KB).
+chunk size of C<131072> bytes (128KiB).
 
 =head2 is_file
 

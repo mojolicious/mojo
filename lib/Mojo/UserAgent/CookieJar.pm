@@ -168,7 +168,7 @@ A callback used to decide if a cookie should be ignored by L</"collect">.
   my $size = $jar->max_cookie_size;
   $jar     = $jar->max_cookie_size(4096);
 
-Maximum cookie size in bytes, defaults to C<4096> (4KB).
+Maximum cookie size in bytes, defaults to C<4096> (4KiB).
 
 =head1 METHODS
 

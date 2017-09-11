@@ -355,7 +355,7 @@ Mask outgoing frames with XOR cipher and a random 32-bit key.
   $ws      = $ws->max_websocket_size(1024);
 
 Maximum WebSocket message size in bytes, defaults to the value of the
-C<MOJO_MAX_WEBSOCKET_SIZE> environment variable or C<262144> (256KB).
+C<MOJO_MAX_WEBSOCKET_SIZE> environment variable or C<262144> (256KiB).
 
 =head1 METHODS
 

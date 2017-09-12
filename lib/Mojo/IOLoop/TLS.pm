@@ -10,8 +10,8 @@ use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
   : eval 'use IO::Socket::SSL 1.94 (); 1';
 use constant DEFAULT => eval { IO::Socket::SSL->VERSION('1.965') }
-  ? ''
-  : \undef;
+  ? \undef
+  : '';
 use constant READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 

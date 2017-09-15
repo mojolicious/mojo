@@ -282,8 +282,8 @@ sub tablify {
     }
   }
 
-  my @formats = (map({"\%-${_}s"} @spec[0 .. $#spec - 1]),'%s');
-  return join '', map { sprintf join(' ', @formats[0..scalar @$_ - 1]) . "\n", @$_ } @$rows;
+  my @formats = map({"\%-${_}s"} @spec[0 .. $#spec - 1]), '%s';
+  return join '', map { sprintf join('  ', @formats[0 .. scalar @$_ - 1]) . "\n", @$_ } @$rows;
 }
 
 sub term_escape {

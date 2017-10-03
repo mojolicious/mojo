@@ -14,7 +14,8 @@ use Mojo::URL;
 use Mojo::Util qw(encode url_escape);
 use Mojo::WebSocket qw(challenge client_handshake);
 
-has generators => sub { {form => \&_form, json => \&_json} };
+has generators =>
+  sub { {form => \&_form, json => \&_json, multipart => \&_multipart} };
 has name => 'Mojolicious (Perl)';
 
 sub add_generator { $_[0]->generators->{$_[1]} = $_[2] and return $_[0] }
@@ -168,7 +169,7 @@ sub _form {
 
   # Multipart
   if ($multipart) {
-    my $parts = $self->_multipart($options{charset}, $form);
+    my $parts = $self->_multipart_form($options{charset}, $form);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
     _type($headers, 'multipart/form-data');
@@ -194,54 +195,79 @@ sub _json {
 }
 
 sub _multipart {
+  my ($self, $tx, $parts) = @_;
+
+  my $req     = $tx->req;
+  my $headers = $req->headers;
+  my @parts   = $self->_parts(undef, undef, $parts);
+  $req->content(
+    Mojo::Content::MultiPart->new(headers => $headers, parts => \@parts));
+
+  return $tx;
+}
+
+sub _multipart_form {
   my ($self, $charset, $form) = @_;
 
   my @parts;
   for my $name (sort keys %$form) {
     next unless defined(my $values = $form->{$name});
-    for my $value (ref $values eq 'ARRAY' ? @$values : ($values)) {
-      push @parts, my $part = Mojo::Content::Single->new;
-
-      # Upload
-      my $filename;
-      my $headers = $part->headers;
-      if (ref $value eq 'HASH') {
-
-        # File
-        if (my $file = delete $value->{file}) {
-          $file = Mojo::Asset::File->new(path => $file) unless ref $file;
-          $part->asset($file);
-          $value->{filename} //= path($file->path)->basename
-            if $file->isa('Mojo::Asset::File');
-        }
-
-        # Memory
-        elsif (defined(my $content = delete $value->{content})) {
-          $part->asset(Mojo::Asset::Memory->new->add_chunk($content));
-        }
-
-        # Filename and headers
-        $filename = url_escape delete $value->{filename} // $name, '"';
-        $filename = encode $charset, $filename if $charset;
-        $headers->from_hash($value);
-      }
-
-      # Field
-      else {
-        $value = encode $charset, $value if $charset;
-        $part->asset(Mojo::Asset::Memory->new->add_chunk($value));
-      }
-
-      # Content-Disposition
-      $name = url_escape $name, '"';
-      $name = encode $charset, $name if $charset;
-      my $disposition = qq{form-data; name="$name"};
-      $disposition .= qq{; filename="$filename"} if defined $filename;
-      $headers->content_disposition($disposition);
-    }
+    push @parts,
+      $self->_parts($charset, $name,
+      ref $values eq 'ARRAY' ? $values : [$values]);
   }
 
   return \@parts;
+}
+
+sub _parts {
+  my ($self, $charset, $name, $parts) = @_;
+
+  my @parts;
+  for my $value (@$parts) {
+    push @parts, my $part = Mojo::Content::Single->new;
+
+    my $filename;
+    my $headers = $part->headers;
+    if (ref $value eq 'HASH') {
+
+      # File
+      if (my $file = delete $value->{file}) {
+        $file = Mojo::Asset::File->new(path => $file) unless ref $file;
+        $part->asset($file);
+        $value->{filename} //= path($file->path)->basename
+          if $file->isa('Mojo::Asset::File');
+      }
+
+      # Memory
+      elsif (defined(my $content = delete $value->{content})) {
+        $part->asset(Mojo::Asset::Memory->new->add_chunk($content));
+      }
+
+      # Filename and headers
+      $filename = delete $value->{filename};
+      $headers->from_hash($value);
+      next unless defined $name;
+      $filename = url_escape $filename // $name, '"';
+      $filename = encode $charset, $filename if $charset;
+    }
+
+    # Field
+    else {
+      $value = encode $charset, $value if $charset;
+      $part->asset(Mojo::Asset::Memory->new->add_chunk($value));
+    }
+
+    # Content-Disposition
+    next unless defined $name;
+    $name = url_escape $name, '"';
+    $name = encode $charset, $name if $charset;
+    my $disposition = qq{form-data; name="$name"};
+    $disposition .= qq{; filename="$filename"} if defined $filename;
+    $headers->content_disposition($disposition);
+  }
+
+  return @parts;
 }
 
 sub _proxy {
@@ -469,6 +495,37 @@ C<Content-Type> header manually.
   # Force "multipart/form-data"
   my $headers = {'Content-Type' => 'multipart/form-data'};
   my $tx = $t->tx(POST => 'example.com' => $headers => form => {a => 'b'});
+
+The C<multipart> content generator can be used to build custom multipart
+requests and does not set a content type.
+
+  # POST request with multipart content ("foo" and "bar")
+  my $tx = $t->tx(POST => 'http://example.com' => multipart => ['foo', 'bar']);
+
+Similar to the C<form> content generator you can also pass a hash reference with
+a C<content> or C<file> value, as well as headers.
+
+  # POST request with multipart content streamed from file
+  my $tx = $t->tx(
+    POST => 'http://example.com' => multipart => [{file => '/foo.txt'}]);
+
+  # PUT request with multipart content streamed from asset
+  my $headers = {'Content-Type' => 'multipart/custom'};
+  my $asset   = Mojo::Asset::Memory->new->add_chunk('lalala');
+  my $tx      = $t->tx(
+    PUT => 'http://example.com' => $headers => multipart => [{file => $asset}]);
+
+  # POST request with multipart content and custom headers
+  my $tx = $t->tx(POST => 'http://example.com' => multipart => [
+    {
+      content        => 'foo',
+      'Content-Type' => 'text/plain'
+    },
+    {
+      content        => 'bar',
+      'Content-Type' => 'text/plain'
+    }
+  ]);
 
 =head2 upgrade
 

@@ -360,6 +360,57 @@ like $tx->req->content->parts->[1]->headers->content_disposition, qr/two\.txt/,
 is $tx->req->content->parts->[1]->asset->slurp, 'works', 'right part';
 is $tx->req->content->parts->[2], undef, 'no more parts';
 
+# Multipart request (long)
+$tx = $t->tx(POST => 'http://example.com/foo' => multipart =>
+    [{content => 'just'}, {content => 'works'}]);
+is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
+is $tx->req->content->parts->[0]->headers->content_disposition, undef,
+  'no "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp, 'just', 'right part';
+is $tx->req->content->parts->[1]->headers->content_disposition, undef,
+  'no "Content-Disposition" value';
+is $tx->req->content->parts->[1]->asset->slurp, 'works', 'right part';
+is $tx->req->content->parts->[2], undef, 'no more parts';
+
+# Multipart request (short)
+$tx
+  = $t->tx(POST => 'http://example.com/foo' => multipart => ['just', 'works']);
+is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
+is $tx->req->content->parts->[0]->headers->content_disposition, undef,
+  'no "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp, 'just', 'right part';
+is $tx->req->content->parts->[1]->headers->content_disposition, undef,
+  'no "Content-Disposition" value';
+is $tx->req->content->parts->[1]->asset->slurp, 'works', 'right part';
+is $tx->req->content->parts->[2], undef, 'no more parts';
+
+# Multipart request with asset
+$tx = $t->tx(POST => 'http://example.com/foo' => multipart =>
+    [{file => Mojo::Asset::Memory->new->add_chunk('snowman')}]);
+is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
+is $tx->req->content->parts->[0]->headers->content_disposition, undef,
+  'no "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp, 'snowman', 'right part';
+is $tx->req->content->parts->[1], undef, 'no more parts';
+
+# Multipart request with real file and custom header
+$tx = $t->tx(POST => 'http://example.com/foo' => multipart =>
+    [{file => __FILE__, DNT => 1}]);
+is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
+like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
+ok $tx->req->content->parts->[0]->asset->is_file, 'stored in file';
+ok !$tx->req->content->parts->[0]->headers->header('file'), 'no "file" header';
+is $tx->req->content->parts->[0]->headers->dnt, 1, 'right "DNT" header';
+is $tx->req->content->parts->[1], undef, 'no more parts';
+
 # Simple endpoint
 $tx = $t->tx(GET => 'mojolicious.org');
 is(($t->endpoint($tx))[0], 'http',            'right scheme');

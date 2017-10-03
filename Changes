@@ -1,5 +1,5 @@
 
-7.47  2017-09-13
+7.47  2017-10-03
 
 7.46  2017-09-12
   - Fixed support for versions of IO::Socket::SSL older than 1.965 again.

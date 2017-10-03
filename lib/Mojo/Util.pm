@@ -127,7 +127,7 @@ sub dumper {
   Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
 }
 
-sub encode { _encoding($_[0])->encode("$_[1]") }
+sub encode { _encoding($_[0])->encode("$_[1]", 0) }
 
 sub extract_usage {
   my $file = @_ ? "$_[0]" : (caller)[1];
@@ -499,14 +499,14 @@ individually.
 
   my $bytes = b64_decode $b64;
 
-Base64 decode bytes.
+Base64 decode bytes with L<MIME::Base64>.
 
 =head2 b64_encode
 
   my $b64 = b64_encode $bytes;
   my $b64 = b64_encode $bytes, "\n";
 
-Base64 encode bytes, the line ending defaults to a newline.
+Base64 encode bytes with L<MIME::Base64>, the line ending defaults to a newline.
 
 =head2 camelize
 
@@ -572,7 +572,8 @@ Convert C<CamelCase> string to C<snake_case> and replace C<::> with C<->.
 
   my $chars = decode 'UTF-8', $bytes;
 
-Decode bytes to characters, or return C<undef> if decoding failed.
+Decode bytes to characters with L<Encode>, or return C<undef> if decoding
+failed.
 
 =head2 deprecated
 
@@ -591,7 +592,7 @@ Dump a Perl data structure with L<Data::Dumper>.
 
   my $bytes = encode 'UTF-8', $chars;
 
-Encode characters to bytes.
+Encode characters to bytes with L<Encode>.
 
 =head2 extract_usage
 
@@ -637,7 +638,7 @@ options C<no_auto_abbrev> and C<no_ignore_case> are enabled by default.
 
   my $checksum = hmac_sha1_sum $bytes, 'passw0rd';
 
-Generate HMAC-SHA1 checksum for bytes.
+Generate HMAC-SHA1 checksum for bytes with L<Digest::SHA>.
 
   # "11cedfd5ec11adc0ec234466d8a0f2a83736aa68"
   hmac_sha1_sum 'foo', 'passw0rd';
@@ -668,13 +669,13 @@ Unescape all HTML entities in string.
 
   my $checksum = md5_bytes $bytes;
 
-Generate binary MD5 checksum for bytes.
+Generate binary MD5 checksum for bytes with L<Digest::MD5>.
 
 =head2 md5_sum
 
   my $checksum = md5_sum $bytes;
 
-Generate MD5 checksum for bytes.
+Generate MD5 checksum for bytes with L<Digest::MD5>.
 
   # "acbd18db4cc2f85cedef654fccc4a4d8"
   md5_sum 'foo';
@@ -727,13 +728,13 @@ Constant time comparison algorithm to prevent timing attacks.
 
   my $checksum = sha1_bytes $bytes;
 
-Generate binary SHA1 checksum for bytes.
+Generate binary SHA1 checksum for bytes with L<Digest::SHA>.
 
 =head2 sha1_sum
 
   my $checksum = sha1_sum $bytes;
 
-Generate SHA1 checksum for bytes.
+Generate SHA1 checksum for bytes with L<Digest::SHA>.
 
   # "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
   sha1_sum 'foo';

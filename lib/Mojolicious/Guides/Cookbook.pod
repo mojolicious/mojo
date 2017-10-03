@@ -1110,7 +1110,7 @@ content repeatedly for multiple requests.
   $ua->put('http://example.com/upload'  => stream => '/home/sri/mojo.png');
   $ua->post('http://example.com/upload' => stream => '/home/sri/minion.png');
 
-The C<json> and C<form> content generators are always available.
+The C<json>, C<form> and C<multipart> content generators are always available.
 
   use Mojo::UserAgent;
 
@@ -1127,6 +1127,9 @@ The C<json> and C<form> content generators are always available.
   # Send "multipart/form-data" content via PUT
   my $tx4 = $ua->put('http://upload.example.com' =>
     form => {test => {content => 'Hello World!'}});
+
+  # Send custom multipart content via PUT
+  my $tx5 = $ua->put('http://api.example.com' => multipart => ['Hello World!']);
 
 For more information about available content generators see also
 L<Mojo::UserAgent::Transactor/"tx">.

@@ -221,10 +221,10 @@ sub _multipart_form {
 }
 
 sub _parts {
-  my ($self, $charset, $name, $parts) = @_;
+  my ($self, $charset, $name, $values) = @_;
 
   my @parts;
-  for my $value (@$parts) {
+  for my $value (@$values) {
     push @parts, my $part = Mojo::Content::Single->new;
 
     my $filename;
@@ -337,8 +337,8 @@ L<Mojo::UserAgent::Transactor> implements the following attributes.
   my $generators = $t->generators;
   $t             = $t->generators({foo => sub {...}});
 
-Registered content generators, by default only C<form> and C<json> are already
-defined.
+Registered content generators, by default only C<form>, C<json> and C<multipart>
+are already defined.
 
 =head2 name
 

@@ -127,7 +127,7 @@ sub dumper {
   Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
 }
 
-sub encode { _encoding($_[0])->encode("$_[1]") }
+sub encode { _encoding($_[0])->encode("$_[1]", 0) }
 
 sub extract_usage {
   my $file = @_ ? "$_[0]" : (caller)[1];

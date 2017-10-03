@@ -191,6 +191,17 @@ is decode('does_not_exist', ''), undef, 'decoding with invalid encoding worked';
 eval { encode('does_not_exist', '') };
 like $@, qr/Unknown encoding 'does_not_exist'/, 'right error';
 
+# encode (using external encoding)
+{
+  my @warnings;
+  local $SIG{__WARN__} = sub {
+    push @warnings, @_;
+  };
+  encode('MIME-Header', "foo\x{df}\x{0100}bar\x{263a}");
+
+  is scalar(@warnings), 0, 'no warnings';
+}
+
 # url_escape
 is url_escape('business;23'), 'business%3B23', 'right URL escaped result';
 

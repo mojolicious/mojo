@@ -33,13 +33,13 @@ sub endpoint {
   # Proxy for normal HTTP requests
   my $socks;
   if (my $proxy = $req->proxy) { $socks = $proxy->protocol eq 'socks' }
-  return $self->_proxy($tx, $proto, $host, $port)
+  return _proxy($tx, $proto, $host, $port)
     if $proto eq 'http' && !$req->is_handshake && !$socks;
 
   return $proto, $host, $port;
 }
 
-sub peer { $_[0]->_proxy($_[1], $_[0]->endpoint($_[1])) }
+sub peer { _proxy($_[1], $_[0]->endpoint($_[1])) }
 
 sub proxy_connect {
   my ($self, $old) = @_;
@@ -155,6 +155,8 @@ sub websocket {
   return client_handshake $tx;
 }
 
+sub _content { Mojo::Content::MultiPart->new(headers => $_[0], parts => $_[1]) }
+
 sub _form {
   my ($self, $tx, $form, %options) = @_;
   $options{charset} = 'UTF-8' unless exists $options{charset};
@@ -169,9 +171,7 @@ sub _form {
 
   # Multipart
   if ($multipart) {
-    my $parts = $self->_multipart_form($options{charset}, $form);
-    $req->content(
-      Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
+    $req->content(_content($headers, _form_parts($options{charset}, $form)));
     _type($headers, 'multipart/form-data');
     return $tx;
   }
@@ -188,6 +188,19 @@ sub _form {
   return $tx;
 }
 
+sub _form_parts {
+  my ($charset, $form) = @_;
+
+  my @parts;
+  for my $name (sort keys %$form) {
+    next unless defined(my $values = $form->{$name});
+    $values = [$values] unless ref $values eq 'ARRAY';
+    push @parts, @{_parts($charset, $name, $values)};
+  }
+
+  return \@parts;
+}
+
 sub _json {
   my ($self, $tx, $data) = @_;
   _type($tx->req->body(encode_json $data)->headers, 'application/json');
@@ -196,32 +209,13 @@ sub _json {
 
 sub _multipart {
   my ($self, $tx, $parts) = @_;
-
-  my $req     = $tx->req;
-  my $headers = $req->headers;
-  my @parts   = $self->_parts(undef, undef, $parts);
-  $req->content(
-    Mojo::Content::MultiPart->new(headers => $headers, parts => \@parts));
-
+  my $req = $tx->req;
+  $req->content(_content($req->headers, _parts(undef, undef, $parts)));
   return $tx;
 }
 
-sub _multipart_form {
-  my ($self, $charset, $form) = @_;
-
-  my @parts;
-  for my $name (sort keys %$form) {
-    next unless defined(my $values = $form->{$name});
-    push @parts,
-      $self->_parts($charset, $name,
-      ref $values eq 'ARRAY' ? $values : [$values]);
-  }
-
-  return \@parts;
-}
-
 sub _parts {
-  my ($self, $charset, $name, $values) = @_;
+  my ($charset, $name, $values) = @_;
 
   my @parts;
   for my $value (@$values) {
@@ -267,11 +261,11 @@ sub _parts {
     $headers->content_disposition($disposition);
   }
 
-  return @parts;
+  return \@parts;
 }
 
 sub _proxy {
-  my ($self, $tx, $proto, $host, $port) = @_;
+  my ($tx, $proto, $host, $port) = @_;
 
   my $req = $tx->req;
   if ($req->via_proxy && (my $proxy = $req->proxy)) {
@@ -502,8 +496,8 @@ requests and does not set a content type.
   # POST request with multipart content ("foo" and "bar")
   my $tx = $t->tx(POST => 'http://example.com' => multipart => ['foo', 'bar']);
 
-Similar to the C<form> content generator you can also pass a hash reference with
-a C<content> or C<file> value, as well as headers.
+Similar to the C<form> content generator you can also pass hash references with
+C<content> or C<file> values, as well as headers.
 
   # POST request with multipart content streamed from file
   my $tx = $t->tx(
@@ -518,12 +512,14 @@ a C<content> or C<file> value, as well as headers.
   # POST request with multipart content and custom headers
   my $tx = $t->tx(POST => 'http://example.com' => multipart => [
     {
-      content        => 'foo',
-      'Content-Type' => 'text/plain'
+      content            => 'Hello',
+      'Content-Type'     => 'text/plain',
+      'Content-Language' => 'en-US'
     },
     {
-      content        => 'bar',
-      'Content-Type' => 'text/plain'
+      content            => 'World!',
+      'Content-Type'     => 'text/plain',
+      'Content-Language' => 'en-US'
     }
   ]);
 

@@ -314,13 +314,19 @@ These content generators are available by default.
   $t->tx(POST => 'http://example.com' => form => {a => 'b'});
 
 Generate query string, C<application/x-www-form-urlencoded> or
-C<multipart/form-data> content.
+C<multipart/form-data> content. See L</"tx"> for more.
 
 =head2 json
 
   $t->tx(PATCH => 'http://example.com' => json => {a => 'b'});
 
-Generate JSON content with L<Mojo::JSON>.
+Generate JSON content with L<Mojo::JSON>. See L</"tx"> for more.
+
+=head2 multipart
+
+  $t->tx(PUT => 'http://example.com' => multipart => ['Hello', 'World!']);
+
+Generate multipart content. See L</"tx"> for more.
 
 =head1 ATTRIBUTES
 

@@ -398,12 +398,14 @@ C<307> or C<308> redirect response if possible.
   my $tx = $t->tx(PUT  => 'http://example.com' => 'Content!');
   my $tx = $t->tx(PUT  => 'http://example.com' => form => {a => 'b'});
   my $tx = $t->tx(PUT  => 'http://example.com' => json => {a => 'b'});
+  my $tx = $t->tx(PUT  => 'https://example.com' => multipart => ['a', 'b']);
+  my $tx = $t->tx(POST => 'example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $t->tx(
-    POST => 'http://example.com' => {Accept => '*/*'} => 'Content!');
+    PUT => 'example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $t->tx(
-    PUT => 'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+    PUT => 'example.com' => {Accept => '*/*'} => json => {a => 'b'});
   my $tx = $t->tx(
-    PUT => 'http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
+    PUT => 'example.com' => {Accept => '*/*'} => multipart => ['a', 'b']);
 
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
 requests, with support for L</"GENERATORS">.

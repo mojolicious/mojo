@@ -7,7 +7,7 @@ use Mojo::Date;
 use Mojo::File 'path';
 use Mojo::Home;
 use Mojo::Loader 'data_section';
-use Mojo::Util 'md5_sum';
+use Mojo::Util qw(encode md5_sum);
 
 # Bundled files
 my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
@@ -43,9 +43,10 @@ sub file {
   my ($self, $rel) = @_;
 
   # Search all paths
+  my @parts = map { encode 'UTF-8', $_ } split '/', $rel;
   for my $path (@{$self->paths}) {
-    my $asset = $self->_get_file(path($path, split('/', $rel))->to_string);
-    return $asset if $asset;
+    next unless my $asset = $self->_get_file(path($path, @parts)->to_string);
+    return $asset;
   }
 
   # Search DATA

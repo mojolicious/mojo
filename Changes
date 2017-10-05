@@ -1,6 +1,7 @@
 
 7.47  2017-10-05
   - Added multipart content generator to Mojo::UserAgent::Transactor.
+  - Improved Mojolicious::Static with support for UTF-8 file names.
   - Fixed a bug in Mojo::File where parts of a path could get accidentally
     upgraded from bytes to characters.
 

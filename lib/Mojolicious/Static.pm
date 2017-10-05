@@ -43,7 +43,7 @@ sub file {
   my ($self, $rel) = @_;
 
   # Search all paths
-  my @parts = map { encode 'UTF-8', $_ } split '/', $rel;
+  my @parts = split '/', $rel;
   for my $path (@{$self->paths}) {
     next unless my $asset = _get_file(path($path, @parts)->to_string);
     return $asset;

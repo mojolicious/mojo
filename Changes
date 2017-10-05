@@ -1,6 +1,6 @@
 
 7.47  2017-10-03
-  - Added "multipart" content generator to Mojo::UserAgent::Transactor.
+  - Added multipart content generator to Mojo::UserAgent::Transactor.
 
 7.46  2017-09-12
   - Fixed support for versions of IO::Socket::SSL older than 1.965 again.

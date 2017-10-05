@@ -78,6 +78,10 @@ sub move_to {
 
 sub new {
   my $class = shift;
+
+  # File systems require bytes, make sure we don't accidentally upgrade
+  utf8::downgrade $_, 1 for @_;
+
   my $value = @_ == 1 ? $_[0] : @_ > 1 ? catfile @_ : canonpath getcwd;
   return bless \$value, ref $class || $class;
 }

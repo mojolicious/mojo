@@ -1,6 +1,8 @@
 
-7.47  2017-10-03
+7.47  2017-10-05
   - Added multipart content generator to Mojo::UserAgent::Transactor.
+  - Fixed a bug in Mojo::File where parts of a path could get accidentally
+    upgraded from bytes to characters.
 
 7.46  2017-09-12
   - Fixed support for versions of IO::Socket::SSL older than 1.965 again.

@@ -7,7 +7,7 @@ use Mojo::Date;
 use Mojo::File 'path';
 use Mojo::Home;
 use Mojo::Loader 'data_section';
-use Mojo::Util qw(encode md5_sum);
+use Mojo::Util 'md5_sum';
 
 # Bundled files
 my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)

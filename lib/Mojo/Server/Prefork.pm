@@ -315,7 +315,7 @@ Emitted when a heartbeat message has been received from a worker.
     ...
   });
 
-Emitted when a child process dies.
+Emitted when a child process exited.
 
   $prefork->on(reap => sub {
     my ($prefork, $pid) = @_;

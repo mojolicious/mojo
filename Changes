@@ -1,4 +1,6 @@
 
+7.48  2017-10-12
+
 7.47  2017-10-05
   - Added multipart content generator to Mojo::UserAgent::Transactor.
   - Fixed a bug in Mojo::File where parts of a path could get accidentally

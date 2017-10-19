@@ -1,5 +1,7 @@
 
-7.48  2017-10-14
+7.48  2017-10-19
+  - Reverted previous Mojo::File change since there were too many unintended
+    side effects.
 
 7.47  2017-10-05
   - Added multipart content generator to Mojo::UserAgent::Transactor.

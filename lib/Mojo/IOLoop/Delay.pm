@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::IOLoop;
 use Mojo::Util;
+use Scalar::Util 'weaken';
 
 has ioloop    => sub { Mojo::IOLoop->singleton };
 has remaining => sub { [] };
@@ -18,10 +19,37 @@ sub data { Mojo::Util::_stash(data => @_) }
 
 sub pass { $_[0]->begin->(@_) }
 
+sub race {
+  my $self = shift;
+  my $next = $self->_clone;
+  $_->then(sub { $next->resolve(@_) }, sub { $next->reject(@_) }) for $self, @_;
+  return $next;
+}
+
+sub reject  { shift->_finish(error  => @_) }
+sub resolve { shift->_finish(finish => @_) }
+
 sub steps {
   my $self = shift->remaining([@_]);
   $self->ioloop->next_tick($self->begin);
   return $self;
+}
+
+sub then {
+  my ($self, $finish, $error) = @_;
+
+  my $next = $self->_clone;
+  $self->once(finish => sub { shift; $next->resolve(@_) });
+  $self->once(error  => sub { shift; $next->reject(@_) });
+  $next->once(finish => sub { shift; $finish->(@_) }) if $finish;
+  $next->once(error  => sub { shift; $error->(@_) }) if $error;
+
+  return $next unless $self->{settled};
+
+  my $method = $self->{error} ? 'reject' : 'resolve';
+  my $args = $self->{error} || $self->{finish};
+  $next->ioloop->next_tick(sub { $next->$method(@$args) });
+  return $next;
 }
 
 sub wait {
@@ -32,24 +60,37 @@ sub wait {
   $self->ioloop->start;
 }
 
+sub _clone {
+  my $self  = shift;
+  my $clone = $self->new;
+  weaken $clone->ioloop($self->ioloop)->{ioloop};
+  return $clone;
+}
+
 sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
+
+sub _finish {
+  my ($self, $event) = (shift, shift);
+  $self->{settled} ? return $self : $self->{settled}++;
+  $self->{$event} = [@_];
+  return $self->remaining([])->emit($event => @_);
+}
 
 sub _step {
   my ($self, $id, $offset, $len) = (shift, shift, shift, shift);
 
   $self->{args}[$id]
     = [@_ ? defined $len ? splice @_, $offset, $len : splice @_, $offset : ()];
-  return $self if $self->{fail} || --$self->{pending} || $self->{lock};
+  return $self if $self->{settled} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->remaining}) {
-    eval { $self->$cb(@args); 1 }
-      or (++$self->{fail} and return $self->remaining([])->emit(error => $@));
+    eval { $self->$cb(@args); 1 } or $self->reject($@);
   }
 
-  return $self->remaining([])->emit(finish => @args) unless $self->{counter};
+  return $self->resolve(@args) unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
   return $self;
 }
@@ -60,7 +101,7 @@ sub _step {
 
 =head1 NAME
 
-Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
+Mojo::IOLoop::Delay - Promises/A+ and flow-control helpers
 
 =head1 SYNOPSIS
 
@@ -120,9 +161,10 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Delay> manages callbacks and controls the flow of events for
-L<Mojo::IOLoop>, which can help you avoid deep nested closures that often
-result from continuation-passing style.
+L<Mojo::IOLoop::Delay> is a Perl-ish implementation of
+L<Promises/A+|https://promisesaplus.com> and provides flow-control helpers for
+L<Mojo::IOLoop>, which can help you avoid deep nested closures that often result
+from continuation-passing style.
 
   use Mojo::IOLoop;
 
@@ -304,6 +346,18 @@ next step.
   # Longer version
   $delay->begin(0)->(@args);
 
+=head2 race
+
+  my $thenable = $delay->race(@thenables);
+
+=head2 reject
+
+  $delay = $delay->reject(@args);
+
+=head2 resolve
+
+  $delay = $delay->resolve(@args);
+
 =head2 steps
 
   $delay = $delay->steps(sub {...}, sub {...});
@@ -313,6 +367,10 @@ callback will run, the first one automatically runs during the next reactor tick
 unless it is delayed by incrementing the event counter. This chain will continue
 until there are no L</"remaining"> callbacks, a callback does not increment the
 event counter or an exception gets thrown in a callback.
+
+=head2 then
+
+  my $thenable = $delay->then(sub {...}, sub {...});
 
 =head2 wait
 

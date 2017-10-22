@@ -20,6 +20,61 @@ $end2->();
 $delay->wait;
 is_deeply \@results, [1, 1], 'right results';
 
+# Thenable
+my ($resolve, $reject, $resolve2, $reject2);
+$delay = Mojo::IOLoop::Delay->new;
+my $delay2 = $delay->then(sub { $resolve = shift }, sub { $reject = shift });
+$delay2->then(sub { $resolve2 = shift }, sub { $reject2 = shift });
+$delay->resolve('works');
+is $resolve,  'works', 'promise was resolved';
+is $resolve2, 'works', 'promise was resolved';
+is $reject,   undef,   'promise was not rejected';
+is $reject2,  undef,   'promise was not rejected';
+
+# Thenable (race)
+($resolve, $reject) = ();
+my $promise  = Mojo::IOLoop::Delay->new;
+my $promise2 = Mojo::IOLoop::Delay->new;
+my $promise3 = Mojo::IOLoop::Delay->new;
+$promise->race($promise2, $promise3)
+  ->then(sub { $resolve = shift }, sub { $reject = shift });
+$promise->resolve('first');
+$promise2->resolve('second');
+$promise3->resolve('third');
+is $resolve, 'first', 'promise was resolved';
+is $reject,  undef,   'promise was not rejected';
+($resolve, $reject) = ();
+$promise  = Mojo::IOLoop::Delay->new;
+$promise2 = Mojo::IOLoop::Delay->new;
+$promise3 = Mojo::IOLoop::Delay->new;
+$promise->race($promise2, $promise3)
+  ->then(sub { $resolve = shift }, sub { $reject = shift });
+$promise3->reject('third');
+$promise->reject('first');
+$promise2->reject('second');
+is $resolve, undef,   'promise was not resolved';
+is $reject,  'third', 'promise was rejected';
+
+# Thenable (already settled)
+($resolve, $reject) = ();
+$delay = Mojo::IOLoop::Delay->new;
+$delay->resolve('works');
+$delay->then(sub { $resolve = shift }, sub { $reject = shift });
+is $resolve, undef, 'no value';
+is $reject,  undef, 'no value';
+$delay->ioloop->one_tick;
+is $resolve, 'works', 'right value';
+is $reject,  undef,   'no value';
+($resolve, $reject) = ();
+$delay = Mojo::IOLoop::Delay->new->catch(sub { });
+$delay->reject('works too');
+$delay->then(sub { $resolve = shift }, sub { $reject = shift });
+is $resolve, undef, 'no value';
+is $reject,  undef, 'no value';
+$delay->ioloop->one_tick;
+is $resolve, undef,       'no value';
+is $reject,  'works too', 'right value';
+
 # Argument splicing
 $delay = Mojo::IOLoop::Delay->new;
 Mojo::IOLoop->next_tick($delay->begin);

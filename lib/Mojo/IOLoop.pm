@@ -406,10 +406,8 @@ takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay(sub {...});
   my $delay = $loop->delay(sub {...}, sub {...});
 
-Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow of
-events for this event loop, which can help you avoid deep nested closures that
-often result from continuation-passing style. Callbacks will be passed along to
-L<Mojo::IOLoop::Delay/"steps">.
+Build L<Mojo::IOLoop::Delay> object to use as a promise or for flow-control.
+Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
   # Synchronize multiple non-blocking operations
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

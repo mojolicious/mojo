@@ -60,20 +60,20 @@ is $reject,  'third', 'promise was rejected';
 $delay = Mojo::IOLoop::Delay->new;
 $delay->resolve('works');
 $delay->then(sub { $resolve = shift }, sub { $reject = shift });
-is $resolve, undef, 'no value';
-is $reject,  undef, 'no value';
+is $resolve, undef, 'promise was not resolved';
+is $reject,  undef, 'promise was not rejected';
 $delay->ioloop->one_tick;
-is $resolve, 'works', 'right value';
-is $reject,  undef,   'no value';
+is $resolve, 'works', 'promise was resolved';
+is $reject,  undef,   'promise was not rejected';
 ($resolve, $reject) = ();
 $delay = Mojo::IOLoop::Delay->new->catch(sub { });
 $delay->reject('works too');
 $delay->then(sub { $resolve = shift }, sub { $reject = shift });
-is $resolve, undef, 'no value';
-is $reject,  undef, 'no value';
+is $resolve, undef, 'promise was not resolved';
+is $reject,  undef, 'promise was not rejected';
 $delay->ioloop->one_tick;
-is $resolve, undef,       'no value';
-is $reject,  'works too', 'right value';
+is $resolve, undef,       'promise was not resolved';
+is $reject,  'works too', 'promise was rejected';
 
 # Argument splicing
 $delay = Mojo::IOLoop::Delay->new;

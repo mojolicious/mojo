@@ -9,9 +9,10 @@ plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)'
   unless $ENV{TEST_IPV6};
 
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay 'delay';
 
 # IPv6 roundtrip
-my $delay = Mojo::IOLoop->delay;
+my $delay = delay;
 my ($server, $client);
 my $end = $delay->begin;
 my $id  = Mojo::IOLoop->server(

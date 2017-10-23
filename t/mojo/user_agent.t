@@ -8,6 +8,7 @@ BEGIN {
 use Test::More;
 use IO::Compress::Gzip 'gzip';
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay 'delay';
 use Mojo::Message::Request;
 use Mojo::UserAgent;
 use Mojo::UserAgent::Server;
@@ -612,7 +613,7 @@ is $tx->res->body, 'Hi!', 'right content';
 # Connection limit
 $ua = Mojo::UserAgent->new(max_connections => 2);
 my $result;
-Mojo::IOLoop->delay(
+delay(
   sub {
     my $delay = shift;
     $ua->get('/' => $delay->begin) for 1 .. 5;

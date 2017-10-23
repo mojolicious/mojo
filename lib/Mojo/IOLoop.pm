@@ -10,7 +10,7 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::IOLoop::Subprocess;
 use Mojo::Reactor::Poll;
-use Mojo::Util qw(md5_sum steady_time);
+use Mojo::Util qw(deprecated md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
@@ -67,7 +67,10 @@ sub client {
   return $id;
 }
 
+# DEPRECATED!
 sub delay {
+  deprecated 'Mojo::IOLoop::delay is DEPRECATED'
+    . ' in favor of Mojo::IOLoop::Delay::delay';
   my $delay = Mojo::IOLoop::Delay->new;
   weaken $delay->ioloop(_instance(shift))->{ioloop};
   return @_ ? $delay->steps(@_) : $delay;
@@ -398,66 +401,6 @@ takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
     my ($loop, $err, $stream) = @_;
     ...
   });
-
-=head2 delay
-
-  my $delay = Mojo::IOLoop->delay;
-  my $delay = $loop->delay;
-  my $delay = $loop->delay(sub {...});
-  my $delay = $loop->delay(sub {...}, sub {...});
-
-Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow of
-events for this event loop, which can help you avoid deep nested closures that
-often result from continuation-passing style. Callbacks will be passed along to
-L<Mojo::IOLoop::Delay/"steps">.
-
-  # Synchronize multiple non-blocking operations
-  my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
-  for my $i (1 .. 10) {
-    my $end = $delay->begin;
-    Mojo::IOLoop->timer($i => sub {
-      say 10 - $i;
-      $end->();
-    });
-  }
-  $delay->wait;
-
-  # Sequentialize multiple non-blocking operations
-  Mojo::IOLoop->delay(
-
-    # First step (simple timer)
-    sub {
-      my $delay = shift;
-      Mojo::IOLoop->timer(2 => $delay->begin);
-      say 'Second step in 2 seconds.';
-    },
-
-    # Second step (concurrent timers)
-    sub {
-      my $delay = shift;
-      Mojo::IOLoop->timer(1 => $delay->begin);
-      Mojo::IOLoop->timer(3 => $delay->begin);
-      say 'Third step in 3 seconds.';
-    },
-
-    # Third step (the end)
-    sub { say 'And done after 5 seconds total.' }
-  )->wait;
-
-  # Handle exceptions in all steps
-  Mojo::IOLoop->delay(
-    sub {
-      my $delay = shift;
-      die 'Intentional error';
-    },
-    sub {
-      my ($delay, @args) = @_;
-      say 'Never actually reached.';
-    }
-  )->catch(sub {
-    my ($delay, $err) = @_;
-    say "Something went wrong: $err";
-  })->wait;
 
 =head2 is_running
 

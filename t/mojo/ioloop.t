@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Client;
-use Mojo::IOLoop::Delay;
+use Mojo::IOLoop::Delay 'delay';
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 
@@ -138,7 +138,7 @@ $id = Mojo::IOLoop->server(
   }
 );
 $port = Mojo::IOLoop->acceptor($id)->port;
-my $delay = Mojo::IOLoop->delay;
+my $delay = delay;
 my $end   = $delay->begin;
 $handle = undef;
 Mojo::IOLoop->client(
@@ -189,7 +189,7 @@ ok !$loop->acceptor($id), 'acceptor has been removed';
 
 # Removed connection (with delay)
 my $removed;
-$delay = Mojo::IOLoop->delay(sub { $removed++ });
+$delay = delay(sub { $removed++ });
 $end   = $delay->begin;
 $id    = Mojo::IOLoop->server(
   (address => '127.0.0.1') => sub {

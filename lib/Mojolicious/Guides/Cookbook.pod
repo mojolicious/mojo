@@ -1255,6 +1255,7 @@ batches.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
+  use Mojo::IOLoop::Delay 'delay';
 
   my @urls = (
     'mojolicious.org/perldoc/Mojo/DOM',  'mojolicious.org/perldoc/Mojo',
@@ -1266,7 +1267,7 @@ batches.
   $ua->transactor->name('MyParallelCrawler 1.0');
 
   # Use a delay to keep the event loop running until we are done
-  my $delay = Mojo::IOLoop->delay;
+  my $delay = delay;
   my $fetch;
   $fetch = sub {
 
@@ -1295,15 +1296,16 @@ the same host, or the operators might be forced to block your access.
 
 =head2 Concurrent blocking requests
 
-You can emulate blocking behavior by using L<Mojo::IOLoop/"delay"> to
-synchronize multiple non-blocking requests.
+You can emulate blocking behavior by using L<Mojo::IOLoop::Delay> to synchronize
+multiple non-blocking requests.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
+  use Mojo::IOLoop::Delay 'delay';
 
   # Synchronize non-blocking requests
   my $ua    = Mojo::UserAgent->new;
-  my $delay = Mojo::IOLoop->delay(sub {
+  my $delay = delay(sub {
     my ($delay, $mojo, $minion) = @_;
     say $mojo->result->dom->at('title')->text;
     say $minion->result->dom->at('title')->text;

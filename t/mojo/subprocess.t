@@ -8,6 +8,7 @@ plan skip_all => 'set TEST_SUBPROCESS to enable this test (developer only!)'
   unless $ENV{TEST_SUBPROCESS};
 
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay 'delay';
 use Mojo::IOLoop::Subprocess;
 
 # Huge result
@@ -78,7 +79,7 @@ is $result, 23, 'right result';
 
 # Concurrent subprocesses
 ($fail, $result) = ();
-Mojo::IOLoop->delay(
+delay(
   sub {
     my $delay = shift;
     Mojo::IOLoop->subprocess(sub {1}, $delay->begin);
@@ -109,7 +110,7 @@ is_deeply $result, [], 'right structure';
 
 # Stream inherited from previous subprocesses
 ($fail, $result) = ();
-my $delay = Mojo::IOLoop->delay;
+my $delay = delay;
 my $me    = $$;
 for (0 .. 1) {
   my $end        = $delay->begin;

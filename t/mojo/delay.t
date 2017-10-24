@@ -15,6 +15,14 @@ Mojo::IOLoop->one_tick;
 is_deeply \@results, ['hello', 'world'], 'promise resolved';
 is_deeply \@errors, [], 'promise not rejected';
 
+# Promise (already resolved)
+$delay = Mojo::IOLoop::Delay->new->resolve('early');
+(@results, @errors) = ();
+$delay->then(sub { @results = @_ }, sub { @errors = @_ });
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['early'], 'promise resolved';
+is_deeply \@errors, [], 'promise not rejected';
+
 # Promise (resolved with finally)
 $delay   = Mojo::IOLoop::Delay->new;
 @results = ();
@@ -31,6 +39,14 @@ $delay->reject('bye', 'world');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promise not resolved';
 is_deeply \@errors, ['bye', 'world'], 'promise rejected';
+
+# Promise (rejected early)
+$delay = Mojo::IOLoop::Delay->new->reject('early');
+(@results, @errors) = ();
+$delay->then(sub { @results = @_ }, sub { @errors = @_ });
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [], 'promise not resolved';
+is_deeply \@errors, ['early'], 'promise rejected';
 
 # Promise (rejected with finally)
 $delay  = Mojo::IOLoop::Delay->new;

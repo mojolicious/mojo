@@ -11,7 +11,6 @@ use IO::Socket::INET;
 use Mojo;
 use Mojo::File 'path';
 use Mojo::IOLoop;
-use Mojo::IOLoop::Delay 'delay';
 use Mojo::Log;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
@@ -203,7 +202,7 @@ is $tx->res->body, 'Whatever!', 'right content';
 
 # Concurrent requests
 my ($tx2, $tx3);
-my $delay = delay(sub { (undef, $tx, $tx2, $tx3) = @_ });
+my $delay = Mojo::IOLoop->delay(sub { (undef, $tx, $tx2, $tx3) = @_ });
 $ua->get('/concurrent1/' => $delay->begin);
 $ua->post(
   '/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);

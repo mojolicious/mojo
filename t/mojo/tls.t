@@ -11,7 +11,6 @@ plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
   unless Mojo::IOLoop::TLS->can_tls;
 
 use Mojo::IOLoop;
-use Mojo::IOLoop::Delay 'delay';
 use Socket;
 
 # Built-in certificate
@@ -19,7 +18,7 @@ socketpair(my $client_sock, my $server_sock, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
   or die "Couldn't create socket pair: $!";
 $client_sock->blocking(0);
 $server_sock->blocking(0);
-my $delay  = delay;
+my $delay  = Mojo::IOLoop->delay;
 my $server = Mojo::IOLoop::TLS->new($server_sock);
 $server->once(upgrade => $delay->begin);
 $server->once(error => sub { warn pop });
@@ -40,7 +39,7 @@ socketpair(my $client_sock2, my $server_sock2, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
   or die "Couldn't create socket pair: $!";
 $client_sock2->blocking(0);
 $server_sock2->blocking(0);
-$delay = Mojo::IOLoop::Delay->new(ioloop => $loop);
+$delay  = $loop->delay;
 $server = Mojo::IOLoop::TLS->new($server_sock2)->reactor($loop->reactor);
 $server->once(upgrade => $delay->begin);
 $server->once(error => sub { warn pop });

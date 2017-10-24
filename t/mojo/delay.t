@@ -4,7 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Mojo::IOLoop;
-use Mojo::IOLoop::Delay 'delay';
+use Mojo::IOLoop::Delay;
 
 # Basic functionality
 my $delay = Mojo::IOLoop::Delay->new;
@@ -157,11 +157,11 @@ is_deeply $result, [2, 3, 4], 'right results';
 
 # Nested delays
 ($finished, $result) = ();
-$delay = delay(
+$delay = Mojo::IOLoop->delay(
   sub {
     my $first = shift;
     $first->on(finish => sub { $finished++ });
-    my $second = delay($first->begin);
+    my $second = Mojo::IOLoop->delay($first->begin);
     Mojo::IOLoop->next_tick($second->begin);
     Mojo::IOLoop->next_tick($first->begin);
     my $end = $second->begin(0);

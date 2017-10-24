@@ -404,8 +404,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
   # Concurrent non-blocking requests (synchronized with a delay)
-  use Mojo::IOLoop::Delay 'delay';
-  delay(
+  Mojo::IOLoop->delay(
     sub {
       my $delay = shift;
       $ua->get('mojolicious.org' => $delay->begin);

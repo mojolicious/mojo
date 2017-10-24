@@ -5,7 +5,6 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::IOLoop;
-use Mojo::IOLoop::Delay 'delay';
 use Mojo::Transaction::WebSocket;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
@@ -241,7 +240,7 @@ is $code,   101,          'right status';
 is $result, 'test0test1', 'right result';
 
 # Concurrent subrequests
-my $delay = delay;
+my $delay = Mojo::IOLoop->delay;
 ($code, $result) = ();
 my ($code2, $result2);
 my $end = $delay->begin;

@@ -409,6 +409,18 @@ takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
 Build L<Mojo::IOLoop::Delay> object to use as a promise or for flow-control.
 Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
+  # Wrap continuation-passing style API with promises
+  my $ua = Mojo::UserAgent->new;
+  sub aget {
+    my $promise = Mojo::IOLoop->delay;
+    $ua->get(@_ => sub {
+      my ($ua, $tx) = @_;
+      $promise->resolve($tx);
+    });
+    return $promise;
+  }
+  aget('http://mojolicious.org')->then(sub { say shift->res->code })->wait;
+
   # Synchronize multiple non-blocking operations
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
   for my $i (1 .. 10) {

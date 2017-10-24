@@ -121,6 +121,7 @@ sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
 
 sub _settle {
   my ($self, $status) = (shift, shift);
+  return $self if $self->{result};
   @{$self}{qw(result status)} = ([@_], $status);
   $self->_defer;
   return $self;

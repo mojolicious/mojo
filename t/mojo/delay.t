@@ -57,6 +57,15 @@ $delay->reject('bye', 'world');
 Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['bye', 'world', 'bye', 'world'], 'promise settled';
 
+# Promise (no state change)
+$delay = Mojo::IOLoop::Delay->new;
+(@results, @errors) = ();
+$delay->then(sub { @results = @_ }, sub { @errors = @_ });
+$delay->resolve('pass')->reject('fail')->resolve('fail');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['pass'], 'promise resolved';
+is_deeply \@errors, [], 'promise not rejected';
+
 # Promise (chained)
 $delay   = Mojo::IOLoop::Delay->new;
 @results = ();

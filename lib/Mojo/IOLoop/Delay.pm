@@ -489,7 +489,9 @@ Sequentialize multiple events, every time the event counter reaches zero a
 callback will run, the first one automatically runs during the next reactor tick
 unless it is delayed by incrementing the event counter. This chain will continue
 until there are no L</"remaining"> callbacks, a callback does not increment the
-event counter or an exception gets thrown in a callback.
+event counter or an exception gets thrown in a callback. Finishing the chain
+will also result in the promise being fulfilled, or if an exception got thrown
+it will be rejected.
 
 =head2 then
 
@@ -503,8 +505,8 @@ handler.
 
   $delay->wait;
 
-Start L</"ioloop"> and stop it again once an L</"error"> or L</"finish"> event
-gets emitted, does nothing when L</"ioloop"> is already running.
+Start L</"ioloop"> and stop it again once the promise has been fulfilled or
+rejected, does nothing when L</"ioloop"> is already running.
 
 =head1 SEE ALSO
 

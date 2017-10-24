@@ -6,9 +6,82 @@ use Test::More;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Delay;
 
-# Basic functionality
+# Promise (resolved)
 my $delay = Mojo::IOLoop::Delay->new;
-my @results;
+my (@results, @errors);
+$delay->then(sub { @results = @_ }, sub { @errors = @_ });
+$delay->resolve('hello', 'world');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['hello', 'world'], 'promise resolved';
+is_deeply \@errors, [], 'promise not rejected';
+
+# Promise (rejected)
+$delay = Mojo::IOLoop::Delay->new;
+(@results, @errors) = ();
+$delay->then(sub { @results = @_ }, sub { @errors = @_ });
+$delay->reject('bye', 'world');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [], 'promise not resolved';
+is_deeply \@errors, ['bye', 'world'], 'promise rejected';
+
+# Promise (chained)
+$delay   = Mojo::IOLoop::Delay->new;
+@results = ();
+$delay->then(sub {"$_[0]:1"})->then(sub {"$_[0]:2"})->then(sub {"$_[0]:3"})
+  ->then(sub { push @results, "$_[0]:4" });
+$delay->resolve('test');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['test:1:2:3:4'], 'promises resolved';
+
+# Promise (resolved nested)
+$delay = Mojo::IOLoop::Delay->new;
+my $delay2 = Mojo::IOLoop::Delay->new;
+@results = ();
+$delay->then(sub {$delay2})->then(sub { @results = @_ });
+$delay->resolve;
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [], 'promise not resolved';
+$delay2->resolve('works too');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['works too'], 'promise resolved';
+
+# Promise (exception in chain)
+$delay = Mojo::IOLoop::Delay->new;
+(@results, @errors) = ();
+$delay->then(sub {@_})->then(sub {@_})->then(sub { die "test: $_[0]\n" })
+  ->then(sub { push @results, 'fail' })->catch(sub { @errors = @_ });
+$delay->resolve('works');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [], 'promises not resolved';
+is_deeply \@errors, ["test: works\n"], 'promises rejected';
+
+# Promise (race)
+$delay  = Mojo::IOLoop::Delay->new->then(sub {@_});
+$delay2 = Mojo::IOLoop::Delay->new->then(sub {@_});
+my $delay3 = Mojo::IOLoop::Delay->new->then(sub {@_});
+@results = ();
+$delay->race($delay2, $delay3)->then(sub { @results = @_ });
+$delay2->resolve('second');
+$delay3->resolve('third');
+$delay->resolve('first');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['second'], 'promises resolved';
+
+# Promise (all)
+$delay  = Mojo::IOLoop::Delay->new->then(sub {@_});
+$delay2 = Mojo::IOLoop::Delay->new->then(sub {@_});
+$delay3 = Mojo::IOLoop::Delay->new->then(sub {@_});
+@results = ();
+$delay->all($delay2, $delay3)->then(sub { @results = @_ });
+$delay2->resolve('second');
+$delay3->resolve('third');
+$delay->resolve('first');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [['first'], ['second'], ['third']], 'promises resolved';
+
+# Basic functionality
+$delay   = Mojo::IOLoop::Delay->new;
+@results = ();
 for my $i (1, 1) {
   my $end = $delay->begin;
   Mojo::IOLoop->next_tick(sub { push @results, $i; $end->() });
@@ -19,61 +92,6 @@ $end->();
 $end2->();
 $delay->wait;
 is_deeply \@results, [1, 1], 'right results';
-
-# Thenable
-my ($resolve, $reject, $resolve2, $reject2);
-$delay = Mojo::IOLoop::Delay->new;
-my $delay2 = $delay->then(sub { $resolve = shift }, sub { $reject = shift });
-$delay2->then(sub { $resolve2 = shift }, sub { $reject2 = shift });
-$delay->resolve('works');
-is $resolve,  'works', 'promise was resolved';
-is $resolve2, 'works', 'promise was resolved';
-is $reject,   undef,   'promise was not rejected';
-is $reject2,  undef,   'promise was not rejected';
-
-# Thenable (race)
-($resolve, $reject) = ();
-my $promise  = Mojo::IOLoop::Delay->new;
-my $promise2 = Mojo::IOLoop::Delay->new;
-my $promise3 = Mojo::IOLoop::Delay->new;
-$promise->race($promise2, $promise3)
-  ->then(sub { $resolve = shift }, sub { $reject = shift });
-$promise->resolve('first');
-$promise2->resolve('second');
-$promise3->resolve('third');
-is $resolve, 'first', 'promise was resolved';
-is $reject,  undef,   'promise was not rejected';
-($resolve, $reject) = ();
-$promise  = Mojo::IOLoop::Delay->new;
-$promise2 = Mojo::IOLoop::Delay->new;
-$promise3 = Mojo::IOLoop::Delay->new;
-$promise->race($promise2, $promise3)
-  ->then(sub { $resolve = shift }, sub { $reject = shift });
-$promise3->reject('third');
-$promise->reject('first');
-$promise2->reject('second');
-is $resolve, undef,   'promise was not resolved';
-is $reject,  'third', 'promise was rejected';
-
-# Thenable (already settled)
-($resolve, $reject) = ();
-$delay = Mojo::IOLoop::Delay->new;
-$delay->resolve('works');
-$delay->then(sub { $resolve = shift }, sub { $reject = shift });
-is $resolve, undef, 'promise was not resolved';
-is $reject,  undef, 'promise was not rejected';
-$delay->ioloop->one_tick;
-is $resolve, 'works', 'promise was resolved';
-is $reject,  undef,   'promise was not rejected';
-($resolve, $reject) = ();
-$delay = Mojo::IOLoop::Delay->new->catch(sub { });
-$delay->reject('works too');
-$delay->then(sub { $resolve = shift }, sub { $reject = shift });
-is $resolve, undef, 'promise was not resolved';
-is $reject,  undef, 'promise was not rejected';
-$delay->ioloop->one_tick;
-is $resolve, undef,       'promise was not resolved';
-is $reject,  'works too', 'promise was rejected';
 
 # Argument splicing
 $delay = Mojo::IOLoop::Delay->new;
@@ -301,7 +319,9 @@ $delay->steps(
   },
   sub { die 'Second step!' },
   sub { $result = 'failed' }
-)->catch(sub { $failed = shift })->wait;
+);
+$delay->on(error => sub { $failed = pop });
+$delay->wait;
 is_deeply $delay->remaining, [], 'no remaining steps';
 like $failed, qr/^Second step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';

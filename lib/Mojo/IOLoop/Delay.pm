@@ -3,10 +3,30 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::IOLoop;
 use Mojo::Util;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(blessed weaken);
 
 has ioloop    => sub { Mojo::IOLoop->singleton };
 has remaining => sub { [] };
+
+sub all {
+  my @promises = @_;
+
+  my $all = $promises[0]->_clone;
+
+  my $results   = [];
+  my $remaining = scalar @promises;
+  for my $i (0 .. $#promises) {
+    $promises[$i]->then(
+      sub {
+        $results->[$i] = [@_];
+        $all->resolve(@$results) if --$remaining <= 0;
+      },
+      sub { $all->reject(@_) },
+    );
+  }
+
+  return $all;
+}
 
 sub begin {
   my ($self, $offset, $len) = @_;
@@ -22,14 +42,14 @@ sub data { Mojo::Util::_stash(data => @_) }
 sub pass { $_[0]->begin->(@_) }
 
 sub race {
-  my $self = shift;
-  my $next = $self->_clone;
-  $_->then(sub { $next->resolve(@_) }, sub { $next->reject(@_) }) for $self, @_;
-  return $next;
+  my @promises = @_;
+  my $race     = $promises[0]->_clone;
+  $_->then(sub { $race->resolve(@_) }, sub { $race->reject(@_) }) for @promises;
+  return $race;
 }
 
-sub reject  { shift->_finish(error  => @_) }
-sub resolve { shift->_finish(finish => @_) }
+sub reject  { shift->_settle('reject',  @_) }
+sub resolve { shift->_settle('resolve', @_) }
 
 sub steps {
   my $self = shift->remaining([@_]);
@@ -38,20 +58,15 @@ sub steps {
 }
 
 sub then {
-  my ($self, $finish, $error) = @_;
+  my ($self, $resolve, $reject) = @_;
 
-  my $next = $self->_clone;
-  $self->on(finish => sub { shift; $next->resolve(@_) });
-  $self->on(error  => sub { shift; $next->reject(@_) });
-  $next->on(finish => sub { shift; $finish->(@_) }) if $finish;
-  $next->on(error  => sub { shift; $error->(@_) }) if $error;
+  my $new = $self->_clone;
+  push @{$self->{resolve}}, $self->_wrap('resolve', $new, $resolve);
+  push @{$self->{reject}},  $self->_wrap('reject',  $new, $reject);
 
-  return $next unless $self->{settled};
+  $self->_defer if $self->{result};
 
-  my $method = $self->{error} ? 'reject' : 'resolve';
-  my $args = $self->{error} || $self->{finish};
-  $next->ioloop->next_tick(sub { $next->$method(@$args) });
-  return $next;
+  return $new;
 }
 
 sub wait {
@@ -69,13 +84,23 @@ sub _clone {
   return $clone;
 }
 
+sub _defer {
+  my $self = shift;
+
+  my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
+  @$self{qw(resolve reject)} = ([], []);
+  my $results = $self->{result};
+
+  $self->ioloop->next_tick(sub { $_->(@$results) for @$cbs });
+}
+
 sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
 
-sub _finish {
-  my ($self, $event) = (shift, shift);
-  $self->{settled} ? return $self : $self->{settled}++;
-  $self->{$event} = [@_];
-  return $self->remaining([])->emit($event => @_);
+sub _settle {
+  my ($self, $status) = (shift, shift);
+  @{$self}{qw(result status)} = ([@_], $status);
+  $self->_defer;
+  return $self;
 }
 
 sub _step {
@@ -83,18 +108,40 @@ sub _step {
 
   $self->{args}[$id]
     = [@_ ? defined $len ? splice @_, $offset, $len : splice @_, $offset : ()];
-  return $self if $self->{settled} || --$self->{pending} || $self->{lock};
+  return $self if $self->{fail} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->remaining}) {
-    eval { $self->$cb(@args); 1 } or $self->reject($@);
+    eval { $self->$cb(@args); 1 }
+      or (++$self->{fail} and return $self->remaining([])->emit(error => $@));
   }
 
-  return $self->resolve(@args) unless $self->{counter};
+  return $self->remaining([])->emit(finish => @args) unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
   return $self;
+}
+
+sub _wrap {
+  my ($self, $method, $new, $cb) = @_;
+
+  return sub { $new->$method(@{$self->{result}}) }
+    unless defined $cb;
+
+  return sub {
+    my @result;
+    unless (eval { @result = $cb->(@_); 1 }) {
+      $new->reject($@);
+    }
+
+    elsif (@result == 1 and blessed $result[0] and $result[0]->can('then')) {
+      $result[0]
+        ->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
+    }
+
+    else { $new->resolve(@result) }
+  };
 }
 
 1;
@@ -272,6 +319,10 @@ Remaining L</"steps"> in chain.
 L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 all
+
+  my $new = $delay->all(@delays);
+
 =head2 begin
 
   my $cb = $delay->begin;
@@ -324,7 +375,7 @@ together to the next step or L</"finish"> event.
 
 =head2 catch
 
-  my $thenable = $delay->catch(sub {...});
+  my $new = $delay->catch(sub {...});
 
 =head2 data
 
@@ -354,7 +405,7 @@ next step.
 
 =head2 race
 
-  my $thenable = $delay->race(@thenables);
+  my $new = $delay->race(@delays);
 
 =head2 reject
 
@@ -376,7 +427,7 @@ event counter or an exception gets thrown in a callback.
 
 =head2 then
 
-  my $thenable = $delay->then(sub {...}, sub {...});
+  my $new = $delay->then(sub {...}, sub {...});
 
 =head2 wait
 

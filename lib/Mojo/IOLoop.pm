@@ -411,7 +411,7 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
   # Wrap continuation-passing style APIs with promises
   my $ua = Mojo::UserAgent->new;
-  sub aget {
+  sub get {
     my $promise = Mojo::IOLoop->delay;
     $ua->get(@_ => sub {
       my ($ua, $tx) = @_;
@@ -419,7 +419,9 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
     });
     return $promise;
   }
-  aget('http://mojolicious.org')->then(sub { say shift->res->code })->wait;
+  my $mojo = get('http://mojolicious.org');
+  my $cpan = get('http://metacpan.org');
+  $mojo->race($cpan)->then(sub { say shift->req->url })->wait;
 
   # Synchronize multiple non-blocking operations
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

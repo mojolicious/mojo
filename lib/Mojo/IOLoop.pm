@@ -453,7 +453,7 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
       say 'Never actually reached.';
     }
   )->catch(sub {
-    my ($delay, $err) = @_;
+    my $err = shift;
     say "Something went wrong: $err";
   })->wait;
 

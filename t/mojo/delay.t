@@ -301,7 +301,7 @@ $delay->steps(
   },
   sub { die 'Second step!' },
   sub { $result = 'failed' }
-)->catch(sub { $failed = pop })->wait;
+)->catch(sub { $failed = shift })->wait;
 is_deeply $delay->remaining, [], 'no remaining steps';
 like $failed, qr/^Second step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';

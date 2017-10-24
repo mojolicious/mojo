@@ -15,6 +15,8 @@ sub begin {
   return sub { $self->_step($id, $offset // 1, $len, @_) };
 }
 
+sub catch { shift->then(undef, shift) }
+
 sub data { Mojo::Util::_stash(data => @_) }
 
 sub pass { $_[0]->begin->(@_) }
@@ -39,10 +41,10 @@ sub then {
   my ($self, $finish, $error) = @_;
 
   my $next = $self->_clone;
-  $self->once(finish => sub { shift; $next->resolve(@_) });
-  $self->once(error  => sub { shift; $next->reject(@_) });
-  $next->once(finish => sub { shift; $finish->(@_) }) if $finish;
-  $next->once(error  => sub { shift; $error->(@_) }) if $error;
+  $self->on(finish => sub { shift; $next->resolve(@_) });
+  $self->on(error  => sub { shift; $next->reject(@_) });
+  $next->on(finish => sub { shift; $finish->(@_) }) if $finish;
+  $next->on(error  => sub { shift; $error->(@_) }) if $error;
 
   return $next unless $self->{settled};
 
@@ -155,7 +157,7 @@ Mojo::IOLoop::Delay - Promises/A+ and flow-control helpers
       say 'Never actually reached.';
     }
   )->catch(sub {
-    my ($delay, $err) = @_;
+    my $err = shift;
     say "Something went wrong: $err";
   })->wait;
 
@@ -319,6 +321,10 @@ together to the next step or L</"finish"> event.
   Mojo::IOLoop->client({port => 3000} => $delay->begin);
   Mojo::IOLoop->client({port => 4000} => $delay->begin);
   $delay->wait;
+
+=head2 catch
+
+  my $thenable = $delay->catch(sub {...});
 
 =head2 data
 

@@ -183,7 +183,7 @@ Mojo::IOLoop::Delay - Promises/A+ and flow-control helpers
 
   use Mojo::IOLoop::Delay;
 
-  # Wrap continuation-passing style API with promises
+  # Wrap continuation-passing style APIs with promises
   my $ua = Mojo::UserAgent->new;
   sub aget {
     my $promise = Mojo::IOLoop->delay;

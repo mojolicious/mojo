@@ -409,7 +409,7 @@ takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
 Build L<Mojo::IOLoop::Delay> object to use as a promise or for flow-control.
 Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
-  # Wrap continuation-passing style API with promises
+  # Wrap continuation-passing style APIs with promises
   my $ua = Mojo::UserAgent->new;
   sub aget {
     my $promise = Mojo::IOLoop->delay;

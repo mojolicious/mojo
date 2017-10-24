@@ -15,6 +15,14 @@ Mojo::IOLoop->one_tick;
 is_deeply \@results, ['hello', 'world'], 'promise resolved';
 is_deeply \@errors, [], 'promise not rejected';
 
+# Promise (resolved with finally)
+$delay   = Mojo::IOLoop::Delay->new;
+@results = ();
+$delay->finally(sub { @results = @_; 'fail' })->then(sub { push @results, @_ });
+$delay->resolve('hello', 'world');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['hello', 'world', 'hello', 'world'], 'promise settled';
+
 # Promise (rejected)
 $delay = Mojo::IOLoop::Delay->new;
 (@results, @errors) = ();
@@ -23,6 +31,15 @@ $delay->reject('bye', 'world');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promise not resolved';
 is_deeply \@errors, ['bye', 'world'], 'promise rejected';
+
+# Promise (rejected with finally)
+$delay  = Mojo::IOLoop::Delay->new;
+@errors = ();
+$delay->finally(sub { @errors = @_; 'fail' })
+  ->then(undef, sub { push @errors, @_ });
+$delay->reject('bye', 'world');
+Mojo::IOLoop->one_tick;
+is_deeply \@errors, ['bye', 'world', 'bye', 'world'], 'promise settled';
 
 # Promise (chained)
 $delay   = Mojo::IOLoop::Delay->new;
@@ -44,6 +61,18 @@ is_deeply \@results, [], 'promise not resolved';
 $delay2->resolve('works too');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['works too'], 'promise resolved';
+
+# Promise (resolved nested with finally)
+$delay   = Mojo::IOLoop::Delay->new;
+$delay2  = Mojo::IOLoop::Delay->new;
+@results = ();
+$delay->finally(sub {$delay2})->finally(sub { @results = @_ });
+$delay->resolve('pass');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [], 'promise not resolved';
+$delay2->resolve('fail');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['pass'], 'promise resolved';
 
 # Promise (exception in chain)
 $delay = Mojo::IOLoop::Delay->new;

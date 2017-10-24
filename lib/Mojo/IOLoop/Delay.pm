@@ -39,6 +39,29 @@ sub catch { shift->then(undef, shift) }
 
 sub data { Mojo::Util::_stash(data => @_) }
 
+sub finally {
+  my ($self, $finally) = @_;
+
+  my $new = $self->_clone;
+  my $cb  = sub {
+    my ($method, @result) = @_;
+    my ($promise) = eval { $finally->(@result) };
+    if ($promise && blessed $promise && $promise->can('then')) {
+      return $promise->then(sub { $new->$method(@result) },
+        sub { $new->$method(@result) });
+    }
+    $new->$method(@result);
+    ();
+  };
+
+  push @{$self->{resolve}}, sub { $cb->('resolve', @_) };
+  push @{$self->{reject}},  sub { $cb->('reject',  @_) };
+
+  $self->_defer if $self->{result};
+
+  return $new;
+}
+
 sub pass { $_[0]->begin->(@_) }
 
 sub race {
@@ -72,9 +95,9 @@ sub then {
 sub wait {
   my $self = shift;
   return if $self->ioloop->is_running;
-  $self->once(error => \&_die);
-  $self->once(finish => sub { shift->ioloop->stop });
-  $self->ioloop->start;
+  my $loop = $self->ioloop;
+  $self->finally(sub { $loop->stop });
+  $loop->start;
 }
 
 sub _clone {
@@ -114,11 +137,15 @@ sub _step {
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->remaining}) {
-    eval { $self->$cb(@args); 1 }
-      or (++$self->{fail} and return $self->remaining([])->emit(error => $@));
+    unless (eval { $self->$cb(@args); 1 }) {
+      my $err = $@;
+      $self->{fail}++;
+      return $self->remaining([])->reject($err)->emit(error => $err);
+    }
   }
 
-  return $self->remaining([])->emit(finish => @args) unless $self->{counter};
+  return $self->remaining([])->resolve(@args)->emit(finish => @args)
+    unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
   return $self;
 }
@@ -391,6 +418,10 @@ Data shared between all L</"steps">.
 
   # Assign multiple values at once
   $delay->data(foo => 'test', bar => 23);
+
+=head2 finally
+
+  my $new = $delay->finally(sub {...});
 
 =head2 pass
 

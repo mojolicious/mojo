@@ -350,6 +350,12 @@ implements the following new ones.
 
   my $new = $delay->all(@delays);
 
+Returns a new L<Mojo::IOLoop::Delay> object that either fulfills when all of the
+passed L<Mojo::IOLoop::Delay> objects have fulfilled or rejects as soon as one
+of them rejects. If the returned promise fulfills, it is fulfilled with the
+values from the fulfilled promises in the same order as the passed promises.
+This method can be useful for aggregating results of multiple promises.
+
 =head2 begin
 
   my $cb = $delay->begin;
@@ -404,6 +410,11 @@ together to the next step or L</"finish"> event.
 
   my $new = $delay->catch(sub {...});
 
+Appends a rejection handler callback to the promise, and returns a new
+L<Mojo::IOLoop::Delay> object resolving to the return value of the callback if
+it is called, or to its original fulfillment value if the promise is instead
+fulfilled.
+
 =head2 data
 
   my $hash = $delay->data;
@@ -423,6 +434,10 @@ Data shared between all L</"steps">.
 
   my $new = $delay->finally(sub {...});
 
+Appends a fulfillment and rejection handler to the promise, and returns a new
+L<Mojo::IOLoop::Delay> object resolving to the original fulfillment value or
+rejection reason.
+
 =head2 pass
 
   $delay = $delay->pass;
@@ -438,13 +453,21 @@ next step.
 
   my $new = $delay->race(@delays);
 
+Returns a new L<Mojo::IOLoop::Delay> object that fulfills or rejects as soon as
+one of the passed L<Mojo::IOLoop::Delay> objects fulfills or rejects, with the
+value or reason from that promise.
+
 =head2 reject
 
-  $delay = $delay->reject(@args);
+  $delay = $delay->reject(@results);
+
+Reject the promise.
 
 =head2 resolve
 
-  $delay = $delay->resolve(@args);
+  $delay = $delay->resolve(@results);
+
+Resolve the promise.
 
 =head2 steps
 
@@ -459,6 +482,10 @@ event counter or an exception gets thrown in a callback.
 =head2 then
 
   my $new = $delay->then(sub {...}, sub {...});
+
+Appends fulfillment and rejection handlers to the promise, and returns a new
+L<Mojo::IOLoop::Delay> object resolving to the return value of the called
+handler.
 
 =head2 wait
 

@@ -81,7 +81,8 @@ sub _delay {
   my $c     = shift;
   my $tx    = $c->render_later->tx;
   my $delay = Mojo::IOLoop->delay(@_);
-  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
+  $delay->on(error => sub { $c->helpers->reply->exception(pop) and undef $tx });
+  $delay->wait;
 }
 
 sub _development {
@@ -314,7 +315,8 @@ of the steps, breaking the chain.
   $c->render_later;
   my $tx    = $c->tx;
   my $delay = Mojo::IOLoop->delay(sub {...}, sub {...});
-  $delay->catch(sub { $c->reply->exception(pop) and undef $tx })->wait;
+  $delay->on(error => sub { $c->helpers->reply->exception(pop) and undef $tx });
+  $delay->wait;
 
   # Non-blocking request
   $c->delay(

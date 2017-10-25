@@ -110,11 +110,11 @@ sub _clone {
 sub _defer {
   my $self = shift;
 
+  return unless my $result = $self->{result};
   my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
-  @$self{qw(resolve reject)} = ([], []);
-  my $results = $self->{result};
+  @{$self}{qw(resolve reject)} = ([], []);
 
-  $self->ioloop->next_tick(sub { $_->(@$results) for @$cbs });
+  $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
 }
 
 sub _settle {
@@ -166,7 +166,7 @@ sub _wrap {
         ->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
     }
 
-    else { $new->resolve(@result) }
+    else { $new->$method(@result) }
   };
 }
 

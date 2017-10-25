@@ -66,7 +66,7 @@ Mojo::IOLoop->one_tick;
 is_deeply \@results, ['pass'], 'promise resolved';
 is_deeply \@errors, [], 'promise not rejected';
 
-# Promise (chained)
+# Promise (resolved chained)
 $delay   = Mojo::IOLoop::Delay->new;
 @results = ();
 $delay->then(sub {"$_[0]:1"})->then(sub {"$_[0]:2"})->then(sub {"$_[0]:3"})
@@ -74,6 +74,15 @@ $delay->then(sub {"$_[0]:1"})->then(sub {"$_[0]:2"})->then(sub {"$_[0]:3"})
 $delay->resolve('test');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['test:1:2:3:4'], 'promises resolved';
+
+# Promise (rejected chained)
+$delay  = Mojo::IOLoop::Delay->new;
+@errors = ();
+$delay->then(undef, sub {"$_[0]:1"})->then(undef, sub {"$_[0]:2"})
+  ->then(undef, sub {"$_[0]:3"})->then(undef, sub { push @errors, "$_[0]:4" });
+$delay->reject('tset');
+Mojo::IOLoop->one_tick;
+is_deeply \@errors, ['tset:1:2:3:4'], 'promises rejected';
 
 # Promise (resolved nested)
 $delay = Mojo::IOLoop::Delay->new;

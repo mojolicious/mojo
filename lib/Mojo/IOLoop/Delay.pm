@@ -117,8 +117,6 @@ sub _defer {
   $self->ioloop->next_tick(sub { $_->(@$results) for @$cbs });
 }
 
-sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
-
 sub _settle {
   my ($self, $status) = (shift, shift);
   return $self if $self->{result};

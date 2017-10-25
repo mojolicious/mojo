@@ -1,5 +1,12 @@
 
-7.49  2017-10-21
+7.49  2017-10-25
+  - Added Promises/A+ support. Note that Mojo::IOLoop::Delay previously
+    inherited a catch method from Mojo::EventEmitter that was passed the error
+    message as second argument instead of the first, so you might have to change
+      $delay->catch(sub { my ($delay, $error) = @_; ... });
+    to
+      $delay->catch(sub { my ($error) = @_; ... });
+  - Added all, catch, finally, race and then methods to Mojo::IOLoop::Delay.
   - Updated jQuery to version 3.2.1.
 
 7.48  2017-10-19

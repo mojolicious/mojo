@@ -1237,11 +1237,11 @@ keep many concurrent connections active at the same time.
 
   # Concurrent non-blocking requests
   my $ua = Mojo::UserAgent->new;
-  $ua->get('http://metacpan.org/search?q=mojo' => sub {
+  $ua->get('https://metacpan.org/search?q=mojo' => sub {
     my ($ua, $mojo) = @_;
     say $mojo->result->dom->at('title')->text;
   });
-  $ua->get('http://metacpan.org/search?q=minion' => sub {
+  $ua->get('https://metacpan.org/search?q=minion' => sub {
     my ($ua, $minion) = @_;
     say $minion->result->dom->at('title')->text;
   });

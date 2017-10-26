@@ -1308,8 +1308,8 @@ synchronize multiple non-blocking requests.
     say $mojo->result->dom->at('title')->text;
     say $minion->result->dom->at('title')->text;
   });
-  $ua->get('http://metacpan.org/search?q=mojo'   => $delay->begin);
-  $ua->get('http://metacpan.org/search?q=minion' => $delay->begin);
+  $ua->get('https://metacpan.org/search?q=mojo'   => $delay->begin);
+  $ua->get('https://metacpan.org/search?q=minion' => $delay->begin);
   $delay->wait;
 
 If you plan on doing this a lot it might be worth wrapping your
@@ -1328,12 +1328,12 @@ continuation-passing style APIs into promises, to make them easily composable.
     });
     return $promise;
   }
-  my $mojo   = get('http://metacpan.org/search?q=mojo');
-  my $minion = get('http://metacpan.org/search?q=minion');
+  my $mojo   = get('https://metacpan.org/search?q=mojo');
+  my $minion = get('https://metacpan.org/search?q=minion');
   $mojo->all($minion)->then(sub {
     my ($mojo, $minion) = @_;
-    say $mojo->result->dom->at('title')->text;
-    say $minion->result->dom->at('title')->text;
+    say $mojo->[0]->result->dom->at('title')->text;
+    say $minion->[0]->result->dom->at('title')->text;
   })->wait;
 
 The call to L<Mojo::IOLoop::Delay/"wait"> makes this code portable, it can now

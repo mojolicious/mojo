@@ -489,15 +489,15 @@ value or reason from that promise.
 
 =head2 reject
 
-  $delay = $delay->reject(@results);
+  $delay = $delay->reject(@reason);
 
-Reject the promise.
+Reject the promise with one or more rejection reasons.
 
 =head2 resolve
 
-  $delay = $delay->resolve(@results);
+  $delay = $delay->resolve(@value);
 
-Resolve the promise.
+Resolve the promise with one or more fulfillment values.
 
 =head2 steps
 

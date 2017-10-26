@@ -94,8 +94,7 @@ sub then {
 
 sub wait {
   my $self = shift;
-  return if $self->ioloop->is_running;
-  my $loop = $self->ioloop;
+  return if (my $loop = $self->ioloop)->is_running;
   $self->finally(sub { $loop->stop });
   $loop->start;
 }
@@ -157,11 +156,10 @@ sub _wrap {
 
   return sub {
     my @result;
-    unless (eval { @result = $cb->(@_); 1 }) {
-      $new->reject($@);
-    }
+    my $success = eval { @result = $cb->(@_); 1 };
+    if (!$success) { $new->reject($@) }
 
-    elsif (@result == 1 and blessed $result[0] and $result[0]->can('then')) {
+    elsif (@result == 1 && blessed $result[0] && $result[0]->can('then')) {
       $result[0]
         ->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
     }

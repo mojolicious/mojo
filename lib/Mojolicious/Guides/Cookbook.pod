@@ -1301,7 +1301,7 @@ synchronize multiple non-blocking requests.
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # Synchronize non-blocking requests
+  # Synchronize non-blocking requests with flow-control helpers
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, $mojo, $minion) = @_;
@@ -1311,6 +1311,30 @@ synchronize multiple non-blocking requests.
   $ua->get('http://metacpan.org/search?q=mojo'   => $delay->begin);
   $ua->get('http://metacpan.org/search?q=minion' => $delay->begin);
   $delay->wait;
+
+If you plan on doing this a lot it might be worth wrapping your
+continuation-passing style APIs into promises, to make them easily composable.
+
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
+
+  # Synchronize non-blocking requests with promises
+  my $ua = Mojo::UserAgent->new;
+  sub get {
+    my $promise = Mojo::IOLoop->delay;
+    $ua->get(@_ => sub {
+      my ($ua, $tx) = @_;
+      $promise->resolve($tx);
+    });
+    return $promise;
+  }
+  my $mojo   = get('http://metacpan.org/search?q=mojo');
+  my $minion = get('http://metacpan.org/search?q=minion');
+  $mojo->all($minion)->then(sub {
+    my ($mojo, $minion) = @_;
+    say $mojo->result->dom->at('title')->text;
+    say $minion->result->dom->at('title')->text;
+  })->wait;
 
 The call to L<Mojo::IOLoop::Delay/"wait"> makes this code portable, it can now
 work inside an already running event loop or start one on demand.

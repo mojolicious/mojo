@@ -406,7 +406,7 @@ takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay(sub {...});
   my $delay = $loop->delay(sub {...}, sub {...});
 
-Build L<Mojo::IOLoop::Delay> object to use as a promise or for flow-control.
+Build L<Mojo::IOLoop::Delay> object to use as a promise and/or for flow-control.
 Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
   # Wrap continuation-passing style APIs with promises

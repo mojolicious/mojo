@@ -536,11 +536,11 @@ handler.
   # Change the fulfillment value or rejection reason
   $delay->then(sub {
     my @value = @_;
-    return "The result is $value[0]";
+    return "This is good: $value[0]";
   },
   sub {
     my @reason = @_;
-    return "Something went wrong: $reason[0]";
+    return "This is bad: $reason[0]";
   });
 
 =head2 wait

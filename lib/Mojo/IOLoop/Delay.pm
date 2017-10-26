@@ -426,6 +426,12 @@ L<Mojo::IOLoop::Delay> object resolving to the return value of the callback if
 it is called, or to its original fulfillment value if the promise is instead
 fulfilled.
 
+  $delay->catch(sub {
+    my @reason = @_;
+    warn "Something went wrong: $reason[0]";
+    return @reason;
+  });
+
 =head2 data
 
   my $hash = $delay->data;
@@ -448,6 +454,11 @@ Data shared between all L</"steps">.
 Appends a fulfillment and rejection handler to the promise, and returns a new
 L<Mojo::IOLoop::Delay> object resolving to the original fulfillment value or
 rejection reason.
+
+  $delay->finally(sub {
+    my @value_or_reason = @_;
+    say "We are done!";
+  });
 
 =head2 pass
 
@@ -499,6 +510,17 @@ it will be rejected.
 Appends fulfillment and rejection handlers to the promise, and returns a new
 L<Mojo::IOLoop::Delay> object resolving to the return value of the called
 handler.
+
+  $delay->then(sub {
+    my @value = @_;
+    say "The result is $value[0]";
+    return @value;
+  },
+  sub {
+    my @reason = @_;
+    warn "Something went wrong: $reason[0]";
+    return @reason;
+  });
 
 =head2 wait
 

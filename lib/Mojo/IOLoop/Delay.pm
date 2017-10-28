@@ -2,7 +2,7 @@ package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::IOLoop;
-use Mojo::Util qw(deprecated);
+use Mojo::Util 'deprecated';
 use Scalar::Util qw(blessed weaken);
 
 has ioloop    => sub { Mojo::IOLoop->singleton };

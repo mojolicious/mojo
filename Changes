@@ -1,5 +1,6 @@
 
-7.49  2017-10-25
+7.49  2017-10-28
+  - Deprecated Mojo::IOLoop::Delay::data.
   - Added Promises/A+ support. Note that Mojo::IOLoop::Delay previously
     inherited a catch method from Mojo::EventEmitter that was passed the error
     message as second argument instead of the first, so you might have to change

@@ -210,17 +210,6 @@ my @numbers;
 $delay->steps(sub { (undef, @numbers) = @_ })->wait;
 is_deeply \@numbers, [2, 3, 5, 7, 11, 14, 15, 19, 20], 'right values';
 
-# Data
-is $delay->data('foo'), undef, 'no value';
-is_deeply $delay->data(foo => 'bar')->data, {foo => 'bar'}, 'right value';
-is $delay->data('foo'), 'bar', 'right value';
-delete $delay->data->{foo};
-is $delay->data('foo'), undef, 'no value';
-$delay->data(foo => 'bar', baz => 'yada');
-is $delay->data({test => 23})->data->{test}, 23, 'right value';
-is_deeply $delay->data, {foo => 'bar', baz => 'yada', test => 23},
-  'right value';
-
 # Steps
 my ($finished, $result);
 $delay = Mojo::IOLoop::Delay->new;
@@ -235,8 +224,7 @@ $delay->steps(
   sub {
     my ($delay, @numbers) = @_;
     my $end = $delay->begin;
-    Mojo::IOLoop->next_tick(
-      sub { $end->(undef, @numbers, 4)->data(foo => 'bar') });
+    Mojo::IOLoop->next_tick(sub { $end->(undef, @numbers, 4) });
   },
   sub {
     my ($delay, @numbers) = @_;
@@ -245,7 +233,6 @@ $delay->steps(
 )->wait;
 is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [2, 3, 2, 1, 4, 5], 'right results';
-is $delay->data('foo'), 'bar', 'right value';
 
 # One step
 $result = undef;
@@ -370,11 +357,11 @@ my $double = sub {
   Mojo::IOLoop->next_tick(sub { $end->($num * 2) });
 };
 $result = undef;
-$delay = Mojo::IOLoop::Delay->new->data(num => 9)->steps(
+$delay  = Mojo::IOLoop::Delay->new->steps(
   sub {
     my $delay = shift;
     my $end   = $delay->begin(0);
-    Mojo::IOLoop->next_tick(sub { $end->($delay->data('num')) });
+    Mojo::IOLoop->next_tick(sub { $end->(9) });
     unshift @{$delay->remaining}, $double;
   },
   sub {
@@ -385,7 +372,6 @@ $delay = Mojo::IOLoop::Delay->new->data(num => 9)->steps(
 is scalar @{$delay->remaining}, 2, 'two steps remaining';
 $delay->wait;
 is scalar @{$delay->remaining}, 0, 'no steps remaining';
-is $delay->data('num'), 9, 'right value';
 is $result, 18, 'right result';
 
 # Exception in first step
@@ -418,7 +404,12 @@ $delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub {
     my $end = shift->begin;
-    Mojo::IOLoop->next_tick(sub { $end->()->data(foo => 'bar') });
+    Mojo::IOLoop->next_tick(
+      sub {
+        $result = 'pass';
+        $end->();
+      }
+    );
   },
   sub { die 'Second step!' },
   sub { $result = 'failed' }
@@ -428,8 +419,7 @@ $delay->wait;
 is_deeply $delay->remaining, [], 'no remaining steps';
 like $failed, qr/^Second step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';
-ok !$result,   'no result';
-is $delay->data('foo'), 'bar', 'right value';
+is $result, 'pass', 'right result';
 
 # Exception in second step (with active event)
 ($failed, $finished, $result) = ();

@@ -2,7 +2,7 @@ package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::IOLoop;
-use Mojo::Util;
+use Mojo::Util qw(deprecated);
 use Scalar::Util qw(blessed weaken);
 
 has ioloop    => sub { Mojo::IOLoop->singleton };
@@ -37,7 +37,11 @@ sub begin {
 
 sub catch { shift->then(undef, shift) }
 
-sub data { Mojo::Util::_stash(data => @_) }
+# DEPRECATED!
+sub data {
+  deprecated 'Mojo::IOLoop::Delay::data is DEPRECATED';
+  Mojo::Util::_stash(data => @_);
+}
 
 sub finally {
   my ($self, $finally) = @_;
@@ -423,21 +427,6 @@ fulfilled.
     my @reason = @_;
     return "This is bad: $reason[0]";
   });
-
-=head2 data
-
-  my $hash = $delay->data;
-  my $foo  = $delay->data('foo');
-  $delay   = $delay->data({foo => 'bar', baz => 23});
-  $delay   = $delay->data(foo => 'bar', baz => 23);
-
-Data shared between all L</"steps">.
-
-  # Remove value
-  my $foo = delete $delay->data->{foo};
-
-  # Assign multiple values at once
-  $delay->data(foo => 'test', bar => 23);
 
 =head2 finally
 

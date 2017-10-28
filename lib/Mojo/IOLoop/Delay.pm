@@ -110,16 +110,16 @@ sub _defer {
   my $self = shift;
 
   return unless my $result = $self->{result};
-  my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
+  my $cbs = $self->{state} eq 'resolve' ? $self->{resolve} : $self->{reject};
   @{$self}{qw(resolve reject)} = ([], []);
 
   $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
 }
 
 sub _settle {
-  my ($self, $status) = (shift, shift);
+  my ($self, $state) = (shift, shift);
   return $self if $self->{result};
-  @{$self}{qw(result status)} = ([@_], $status);
+  @{$self}{qw(result state)} = ([@_], $state);
   $self->_defer;
   return $self;
 }
@@ -230,21 +230,6 @@ Mojo::IOLoop::Delay - Promises/A+ and flow-control helpers
       say 'And done after 5 seconds total.';
     }
   )->wait;
-
-  # Handle exceptions in all steps
-  Mojo::IOLoop::Delay->new->steps(
-    sub {
-      my $delay = shift;
-      die 'Intentional error';
-    },
-    sub {
-      my ($delay, @args) = @_;
-      say 'Never actually reached.';
-    }
-  )->catch(sub {
-    my $err = shift;
-    say "Something went wrong: $err";
-  })->wait;
 
 =head1 DESCRIPTION
 

@@ -456,21 +456,6 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
     sub { say 'And done after 5 seconds total.' }
   )->wait;
 
-  # Handle exceptions in all steps
-  Mojo::IOLoop->delay(
-    sub {
-      my $delay = shift;
-      die 'Intentional error';
-    },
-    sub {
-      my ($delay, @args) = @_;
-      say 'Never actually reached.';
-    }
-  )->catch(sub {
-    my $err = shift;
-    say "Something went wrong: $err";
-  })->wait;
-
 =head2 is_running
 
   my $bool = Mojo::IOLoop->is_running;

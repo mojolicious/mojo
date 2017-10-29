@@ -67,7 +67,7 @@ sub reject { shift->_settle('reject', @_) }
 
 # DEPRECATED!
 sub remaining {
-  deprecated 'Mojo::IOLoop::Delay::remaining is deprecated';
+  deprecated 'Mojo::IOLoop::Delay::remaining is DEPRECATED';
   my $self = shift;
   return $self->{steps} ||= [] unless @_;
   $self->{steps} = shift;

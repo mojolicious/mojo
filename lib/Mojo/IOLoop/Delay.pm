@@ -5,8 +5,7 @@ use Mojo::IOLoop;
 use Mojo::Util 'deprecated';
 use Scalar::Util qw(blessed weaken);
 
-has ioloop    => sub { Mojo::IOLoop->singleton };
-has remaining => sub { [] };
+has ioloop => sub { Mojo::IOLoop->singleton };
 
 sub all {
   my @promises = @_;
@@ -64,11 +63,22 @@ sub race {
   return $race;
 }
 
-sub reject  { shift->_settle('reject',  @_) }
+sub reject { shift->_settle('reject', @_) }
+
+# DEPRECATED!
+sub remaining {
+  deprecated 'Mojo::IOLoop::Delay::remaining is deprecated';
+  my $self = shift;
+  return $self->{steps} ||= [] unless @_;
+  $self->{steps} = shift;
+  return $self;
+}
+
 sub resolve { shift->_settle('resolve', @_) }
 
 sub steps {
-  my $self = shift->remaining([@_]);
+  my ($self, @steps) = @_;
+  $self->{steps} = \@steps;
   $self->ioloop->next_tick($self->begin);
   return $self;
 }
@@ -135,15 +145,15 @@ sub _step {
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
-  if (my $cb = shift @{$self->remaining}) {
+  if (my $cb = shift @{$self->{steps}}) {
     unless (eval { $self->$cb(@args); 1 }) {
       my $err = $@;
-      $self->{fail}++;
-      return $self->remaining([])->reject($err)->emit(error => $err);
+      @{$self}{qw(fail steps)} = (1, []);
+      return $self->reject($err)->emit(error => $err);
     }
   }
 
-  return $self->remaining([])->resolve(@args)->emit(finish => @args)
+  ($self->{steps} = []) and return $self->resolve(@args)->emit(finish => @args)
     unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
   return $self;
@@ -325,13 +335,6 @@ L<Mojo::IOLoop::Delay> implements the following attributes.
 
 Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
 
-=head2 remaining
-
-  my $remaining = $delay->remaining;
-  $delay        = $delay->remaining([sub {...}]);
-
-Remaining L</"steps"> in chain.
-
 =head1 METHODS
 
 L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::EventEmitter> and
@@ -473,10 +476,10 @@ Resolve the promise with one or more fulfillment values.
 Sequentialize multiple events, every time the event counter reaches zero a
 callback will run, the first one automatically runs during the next reactor tick
 unless it is delayed by incrementing the event counter. This chain will continue
-until there are no L</"remaining"> callbacks, a callback does not increment the
-event counter or an exception gets thrown in a callback. Finishing the chain
-will also result in the promise being fulfilled, or if an exception got thrown
-it will be rejected.
+until there are no remaining callbacks, a callback does not increment the event
+counter or an exception gets thrown in a callback. Finishing the chain will also
+result in the promise being fulfilled, or if an exception got thrown it will be
+rejected.
 
 =head2 then
 

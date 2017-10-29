@@ -302,8 +302,8 @@ emit the following new ones.
     ...
   });
 
-Emitted if an exception gets thrown in one of the steps, breaking the chain,
-fatal if unhandled.
+Emitted if an exception gets thrown in one of the L</"steps">, breaking the
+chain, fatal if unhandled.
 
 =head2 finish
 
@@ -312,7 +312,7 @@ fatal if unhandled.
     ...
   });
 
-Emitted once the event counter reaches zero and there are no more steps.
+Emitted once the event counter reaches zero and there are no more L</"steps">.
 
 =head1 ATTRIBUTES
 
@@ -406,6 +406,9 @@ L<Mojo::IOLoop::Delay> object resolving to the return value of the callback if
 it is called, or to its original fulfillment value if the promise is instead
 fulfilled.
 
+  # Longer version
+  $delay->then(undef, sub {...});
+
   # Pass along the rejection reason
   $delay->catch(sub {
     my @reason = @_;
@@ -438,8 +441,7 @@ rejection reason.
   $delay = $delay->pass;
   $delay = $delay->pass(@args);
 
-Increment event counter and decrement it again right away to pass values to the
-next step.
+Shortcut for passing values between L</"steps">.
 
   # Longer version
   $delay->begin(0)->(@args);

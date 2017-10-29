@@ -304,12 +304,10 @@ Check or get name of current route.
 
   $c->delay(sub {...}, sub {...});
 
-Disable automatic rendering and use L<Mojo::IOLoop/"delay"> to manage callbacks
-and control the flow of events, which can help you avoid deep nested closures
-that often result from continuation-passing style. Also keeps a reference to
-L<Mojolicious::Controller/"tx"> in case the underlying connection gets closed
-early, and calls L</"reply-E<gt>exception"> if an exception gets thrown in one
-of the steps, breaking the chain.
+Disable automatic rendering and use L<Mojo::IOLoop/"delay"> for flow-control.
+Also keeps a reference to L<Mojolicious::Controller/"tx"> in case the underlying
+connection gets closed early, and calls L</"reply-E<gt>exception"> if an
+exception gets thrown in one of the steps, breaking the chain.
 
   # Longer version
   $c->render_later;

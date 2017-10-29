@@ -49,13 +49,10 @@ sub finally {
   my $new = $self->_clone;
   my $cb  = sub {
     my ($method, @result) = @_;
-    my ($promise) = eval { $finally->(@result) };
-    if ($promise && blessed $promise && $promise->can('then')) {
-      return $promise->then(sub { $new->$method(@result) },
-        sub { $new->$method(@result) });
-    }
-    $new->$method(@result);
-    ();
+    my ($res) = eval { $finally->(@result) };
+    return $new->$method(@result)
+      unless $res && blessed $res && $res->can('then');
+    $res->then(sub { $new->$method(@result) }, sub { $new->$method(@result) });
   };
 
   push @{$self->{resolve}}, sub { $cb->('resolve', @_) };
@@ -114,16 +111,16 @@ sub _defer {
   my $self = shift;
 
   return unless my $result = $self->{result};
-  my $cbs = $self->{state} eq 'resolve' ? $self->{resolve} : $self->{reject};
+  my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
   @{$self}{qw(resolve reject)} = ([], []);
 
   $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
 }
 
 sub _settle {
-  my ($self, $state) = (shift, shift);
+  my ($self, $status) = (shift, shift);
   return $self if $self->{result};
-  @{$self}{qw(result state)} = ([@_], $state);
+  @{$self}{qw(result status)} = ([@_], $status);
   $self->_defer;
   return $self;
 }
@@ -159,16 +156,13 @@ sub _wrap {
     unless defined $cb;
 
   return sub {
-    my @result;
-    my $success = eval { @result = $cb->(@_); 1 };
-    if (!$success) { $new->reject($@) }
+    my @res;
+    return $new->reject($@) unless eval { @res = $cb->(@_); 1 };
 
-    elsif (@result == 1 && blessed $result[0] && $result[0]->can('then')) {
-      $result[0]
-        ->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
-    }
+    return $new->$method(@res)
+      unless @res == 1 && blessed $res[0] && $res[0]->can('then');
 
-    else { $new->$method(@result) }
+    $res[0]->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
   };
 }
 

@@ -47,16 +47,8 @@ sub finally {
   my ($self, $finally) = @_;
 
   my $new = $self->_clone;
-  my $cb  = sub {
-    my ($method, @result) = @_;
-    my ($res) = eval { $finally->(@result) };
-    return $new->$method(@result)
-      unless $res && blessed $res && $res->can('then');
-    $res->then(sub { $new->$method(@result) }, sub { $new->$method(@result) });
-  };
-
-  push @{$self->{resolve}}, sub { $cb->('resolve', @_) };
-  push @{$self->{reject}},  sub { $cb->('reject',  @_) };
+  push @{$self->{resolve}}, sub { _finally($new, $finally, 'resolve', @_) };
+  push @{$self->{reject}},  sub { _finally($new, $finally, 'reject',  @_) };
 
   $self->_defer if $self->{result};
 
@@ -85,8 +77,8 @@ sub then {
   my ($self, $resolve, $reject) = @_;
 
   my $new = $self->_clone;
-  push @{$self->{resolve}}, $self->_wrap('resolve', $new, $resolve);
-  push @{$self->{reject}},  $self->_wrap('reject',  $new, $reject);
+  push @{$self->{resolve}}, sub { _then($new, $resolve, 'resolve', @_) };
+  push @{$self->{reject}},  sub { _then($new, $reject,  'reject',  @_) };
 
   $self->_defer if $self->{result};
 
@@ -115,6 +107,14 @@ sub _defer {
   @{$self}{qw(resolve reject)} = ([], []);
 
   $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
+}
+
+sub _finally {
+  my ($new, $finally, $method, @result) = @_;
+  my ($res) = eval { $finally->(@result) };
+  return $new->$method(@result)
+    unless $res && blessed $res && $res->can('then');
+  $res->then(sub { $new->$method(@result) }, sub { $new->$method(@result) });
 }
 
 sub _settle {
@@ -149,21 +149,18 @@ sub _step {
   return $self;
 }
 
-sub _wrap {
-  my ($self, $method, $new, $cb) = @_;
+sub _then {
+  my ($new, $cb, $method, @result) = @_;
 
-  return sub { $new->$method(@{$self->{result}}) }
-    unless defined $cb;
+  return $new->$method(@result) unless defined $cb;
 
-  return sub {
-    my @res;
-    return $new->reject($@) unless eval { @res = $cb->(@_); 1 };
+  my @res;
+  return $new->reject($@) unless eval { @res = $cb->(@result); 1 };
 
-    return $new->$method(@res)
-      unless @res == 1 && blessed $res[0] && $res[0]->can('then');
+  return $new->$method(@res)
+    unless @res == 1 && blessed $res[0] && $res[0]->can('then');
 
-    $res[0]->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
-  };
+  $res[0]->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
 }
 
 1;

@@ -65,6 +65,10 @@
         padding-top: 1em;
         text-align: center;
       }
+      #more {
+        display: inline;
+        font-size: 0.8em;
+      }
       #perldoc {
         background-color: #fff;
         border: 1px solid #c1c1c1;
@@ -76,7 +80,7 @@
         padding-top: 70px;
       }
       #perldoc > ul:first-of-type a { text-decoration: none }
-      #source { padding-bottom: 1em }
+      #links { padding-bottom: 1em }
       #wrapperlicious {
         max-width: 1000px;
         margin: 0 auto;
@@ -97,15 +101,17 @@
     %= include 'mojo/menubar'
     <div id="wrapperlicious">
       <div id="perldoc">
-        <div id="source">
+        <div id="links">
           % my $path;
           % for my $part (split '/', $module) {
             %= '::' if $path
             % $path .= "/$part";
             %= link_to $part => url_for("/perldoc$path")
           % }
-          (<%= link_to 'source' => url_for("/perldoc$path.txt") %>,
-          <%= link_to 'CPAN' => $cpan %>)
+          <div id="more">
+            (<%= link_to 'source' => url_for("/perldoc$path.txt") %>,
+            <%= link_to 'CPAN' => $cpan %>)
+          </div>
         </div>
         <h1><a id="toc">CONTENTS</a></h1>
         <ul>

@@ -80,10 +80,10 @@ sub _perldoc {
 
   # Find module or redirect to CPAN
   my $module = join '::', split('/', $c->param('module'));
+  $c->stash(cpan => "https://metacpan.org/pod/$module");
   my $path
     = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
-  return $c->redirect_to("https://metacpan.org/pod/$module")
-    unless $path && -r $path;
+  return $c->redirect_to($c->stash('cpan')) unless $path && -r $path;
 
   my $src = path($path)->slurp;
   $c->respond_to(txt => {data => $src}, html => sub { _html($c, $src) });

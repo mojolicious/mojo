@@ -297,9 +297,9 @@ that leads to the next closure in the series when executed.
 
 Another positive side effect of this pattern is that we do not need to call
 L<Mojo::IOLoop/"start"> and L<Mojo::IOLoop/"stop"> manually, because we know
-exactly when our series of L</"steps"> and/or chain of promises has reached the
-end. So L</"wait"> can stop the event loop automatically if it had to be started
-at all in the first place.
+exactly when our chain of L</"steps"> and/or promises has reached the end. So
+L</"wait"> can stop the event loop automatically if it had to be started at all
+in the first place.
 
 =head1 EVENTS
 

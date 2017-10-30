@@ -1,4 +1,6 @@
 
+7.51  2017-11-01
+
 7.50  2017-10-30
   - Deprecated error and finish events in Mojo::IOLoop::Delay. Since there is no
     good way to warn our users about this deprecation, it will be in effect

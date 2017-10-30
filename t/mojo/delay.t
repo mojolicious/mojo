@@ -211,9 +211,8 @@ $delay->steps(sub { (undef, @numbers) = @_ })->wait;
 is_deeply \@numbers, [2, 3, 5, 7, 11, 14, 15, 19, 20], 'right values';
 
 # Steps
-my ($finished, $result);
+my $result;
 $delay = Mojo::IOLoop::Delay->new;
-$delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub {
     my $delay = shift;
@@ -231,7 +230,6 @@ $delay->steps(
     $result = \@numbers;
   }
 )->wait;
-is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [2, 3, 2, 1, 4, 5], 'right results';
 
 # One step
@@ -259,18 +257,15 @@ $delay->wait;
 is $result, 23, 'right result';
 
 # End chain after first step
-($finished, $result) = ();
-$delay = Mojo::IOLoop::Delay->new;
-$delay->on(finish => sub { $finished++ });
+$result = undef;
+$delay  = Mojo::IOLoop::Delay->new;
 $delay->steps(sub { $result = 'success' }, sub { $result = 'fail' });
 $delay->wait;
-is $finished, 1,         'finish event has been emitted once';
-is $result,   'success', 'right result';
+is $result, 'success', 'right result';
 
 # End chain after third step
-($finished, $result) = ();
-$delay = Mojo::IOLoop::Delay->new;
-$delay->on(finish => sub { $finished++ });
+$result = undef;
+$delay  = Mojo::IOLoop::Delay->new;
 $delay->steps(
   sub { Mojo::IOLoop->next_tick(shift->begin) },
   sub {
@@ -280,8 +275,7 @@ $delay->steps(
   sub { $result = 'success' },
   sub { $result = 'fail' }
 )->wait;
-is $finished, 1,         'finish event has been emitted once';
-is $result,   'success', 'right result';
+is $result, 'success', 'right result';
 
 # End chain after second step
 @results = ();
@@ -318,11 +312,10 @@ $delay->steps(
 is_deeply $result, [2, 3, 4], 'right results';
 
 # Nested delays
-($finished, $result) = ();
-$delay = Mojo::IOLoop->delay(
+$result = undef;
+$delay  = Mojo::IOLoop->delay(
   sub {
-    my $first = shift;
-    $first->on(finish => sub { $finished++ });
+    my $first  = shift;
     my $second = Mojo::IOLoop->delay($first->begin);
     Mojo::IOLoop->next_tick($second->begin);
     Mojo::IOLoop->next_tick($first->begin);
@@ -346,34 +339,27 @@ $delay = Mojo::IOLoop->delay(
     push @$result, @numbers;
   }
 )->wait;
-is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23, 24], 'right results';
 
 # Exception in first step
 my $failed;
-($finished, $result) = ();
-$delay = Mojo::IOLoop::Delay->new;
-$delay->on(error => sub { $failed = pop });
-$delay->on(finish => sub { $finished++ });
-$delay->steps(sub { die 'First step!' }, sub { $result = 'failed' })->wait;
+$result = undef;
+$delay  = Mojo::IOLoop::Delay->new;
+$delay->steps(sub { die 'First step!' }, sub { $result = 'failed' })
+  ->catch(sub { $failed = shift })->wait;
 like $failed, qr/^First step!/, 'right error';
-ok !$finished, 'finish event has not been emitted';
-ok !$result,   'no result';
+ok !$result, 'no result';
 
 # Exception in last step
-($failed, $finished) = ();
-$delay = Mojo::IOLoop::Delay->new;
-$delay->on(error => sub { $failed = pop });
-$delay->on(finish => sub { $finished++ });
+$failed = undef;
+$delay  = Mojo::IOLoop::Delay->new;
 $delay->steps(sub { Mojo::IOLoop->next_tick(shift->begin) },
-  sub { die 'Last step!' })->wait;
+  sub { die 'Last step!' })->catch(sub { $failed = pop })->wait;
 like $failed, qr/^Last step!/, 'right error';
-ok !$finished, 'finish event has not been emitted';
 
 # Exception in second step
-($failed, $finished, $result) = ();
+($failed, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
-$delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub {
     my $end = shift->begin;
@@ -387,17 +373,13 @@ $delay->steps(
   sub { die 'Second step!' },
   sub { $result = 'failed' }
 );
-$delay->on(error => sub { $failed = pop });
-$delay->wait;
+$delay->catch(sub { $failed = shift })->wait;
 like $failed, qr/^Second step!/, 'right error';
-ok !$finished, 'finish event has not been emitted';
-is $result, 'pass', 'right result';
+is $result,   'pass',            'right result';
 
 # Exception in second step (with active event)
-($failed, $finished, $result) = ();
+($failed, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
-$delay->on(error => sub { $failed = pop });
-$delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub { Mojo::IOLoop->next_tick(shift->begin) },
   sub {
@@ -406,19 +388,9 @@ $delay->steps(
     die 'Second step!';
   },
   sub { $result = 'failed' }
-);
+)->catch(sub { $failed = shift });
 Mojo::IOLoop->start;
 like $failed, qr/^Second step!/, 'right error';
-ok !$finished, 'finish event has not been emitted';
-ok !$result,   'no result';
-
-# Fatal exception in second step
-Mojo::IOLoop->singleton->reactor->unsubscribe('error');
-$delay = Mojo::IOLoop::Delay->new;
-ok !$delay->has_subscribers('error'), 'no subscribers';
-$delay->steps(sub { Mojo::IOLoop->next_tick(shift->begin) },
-  sub { die 'Oops!' });
-eval { $delay->wait };
-like $@, qr/Oops!/, 'right error';
+ok !$result, 'no result';
 
 done_testing();

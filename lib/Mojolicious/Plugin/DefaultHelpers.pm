@@ -78,11 +78,10 @@ sub _current_route {
 }
 
 sub _delay {
-  my $c     = shift;
-  my $tx    = $c->render_later->tx;
-  my $delay = Mojo::IOLoop->delay(@_);
-  $delay->on(error => sub { $c->helpers->reply->exception(pop) and undef $tx });
-  $delay->wait;
+  my $c  = shift;
+  my $tx = $c->render_later->tx;
+  Mojo::IOLoop->delay(@_)
+    ->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
 }
 
 sub _development {
@@ -312,9 +311,8 @@ exception gets thrown in one of the steps, breaking the chain.
   # Longer version
   $c->render_later;
   my $tx    = $c->tx;
-  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...});
-  $delay->on(error => sub { $c->helpers->reply->exception(pop) and undef $tx });
-  $delay->wait;
+  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...})
+  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
 
   # Non-blocking request
   $c->delay(

@@ -80,6 +80,10 @@ sub steps {
   my ($self, @steps) = @_;
   $self->{steps} = \@steps;
   $self->ioloop->next_tick($self->begin);
+
+  # DEPRECATED!
+  $self->on(error => sub { });
+
   return $self;
 }
 
@@ -301,30 +305,6 @@ exactly when our chain of L</"steps"> and/or promises has reached the end. So
 L</"wait"> can stop the event loop automatically if it had to be started at all
 in the first place.
 
-=head1 EVENTS
-
-L<Mojo::IOLoop::Delay> inherits all events from L<Mojo::EventEmitter> and can
-emit the following new ones.
-
-=head2 error
-
-  $delay->on(error => sub {
-    my ($delay, $err) = @_;
-    ...
-  });
-
-Emitted if an exception gets thrown in one of the L</"steps">, breaking the
-chain, fatal if unhandled.
-
-=head2 finish
-
-  $delay->on(finish => sub {
-    my ($delay, @args) = @_;
-    ...
-  });
-
-Emitted once the event counter reaches zero and there are no more L</"steps">.
-
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Delay> implements the following attributes.
@@ -338,8 +318,8 @@ Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::Base> and implements
+the following new ones.
 
 =head2 all
 

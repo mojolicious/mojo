@@ -82,7 +82,7 @@ sub steps {
   $self->ioloop->next_tick($self->begin);
 
   # DEPRECATED!
-  $self->on(error => sub { });
+  $self->{deprecated} ||= $self->on(error => sub { });
 
   return $self;
 }

@@ -411,7 +411,7 @@ it is called, or to its original fulfillment value if the promise is instead
 fulfilled.
 
   # Longer version
-  $delay->then(undef, sub {...});
+  my $new = $delay->then(undef, sub {...});
 
   # Pass along the rejection reason
   $delay->catch(sub {

@@ -18,6 +18,7 @@ $res = Mojo::Message::Response->new;
 is $res->code(100)->default_message, 'Continue',            'right message';
 is $res->code(101)->default_message, 'Switching Protocols', 'right message';
 is $res->code(102)->default_message, 'Processing',          'right message';
+is $res->code(103)->default_message, 'Early Hints',         'right message';
 is $res->code(200)->default_message, 'OK',                  'right message';
 is $res->code(201)->default_message, 'Created',             'right message';
 is $res->code(202)->default_message, 'Accepted',            'right message';

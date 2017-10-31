@@ -1,5 +1,6 @@
 
-7.51  2017-11-01
+7.51  2017-10-31
+  - Added -signatures flag to Mojo::Base and Mojolicious::Lite.
   - Added support for new HTTP status code.
 
 7.50  2017-10-30

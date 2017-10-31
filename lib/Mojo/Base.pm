@@ -68,31 +68,39 @@ sub attr {
 
 sub import {
   my $class = shift;
-  return unless my $flag = shift;
+  return unless my @flags = @_;
 
   # Base
-  if ($flag eq '-base') { $flag = $class }
+  if ($flags[0] eq '-base') { $flags[0] = $class }
 
   # Strict
-  elsif ($flag eq '-strict') { $flag = undef }
+  elsif ($flags[0] eq '-strict') { $flags[0] = undef }
 
   # Module
-  elsif ((my $file = $flag) && !$flag->can('new')) {
+  elsif ((my $file = $flags[0]) && !$flags[0]->can('new')) {
     $file =~ s!::|'!/!g;
     require "$file.pm";
   }
 
   # ISA
-  if ($flag) {
+  if ($flags[0]) {
     my $caller = caller;
     no strict 'refs';
-    push @{"${caller}::ISA"}, $flag;
+    push @{"${caller}::ISA"}, $flags[0];
     _monkey_patch $caller, 'has', sub { attr($caller, @_) };
   }
 
   # Mojo modules are strict!
   $_->import for qw(strict warnings utf8);
   feature->import(':5.10');
+
+  # Signatures (Perl 5.20+)
+  if (($flags[1] || '') eq '-signatures') {
+    Carp::croak 'Subroutine signatures require Perl 5.20+' if $] < 5.020;
+    require experimental;
+    @_ = ('warnings', 'signatures');
+    goto &experimental::import;
+  }
 }
 
 sub new {
@@ -187,6 +195,17 @@ All three forms save a lot of typing.
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+
+On Perl 5.20+ you can also append a C<-signatures> flag to all three forms and
+enable support for L<subroutine signatures|perlsub/"Signatures">.
+
+  # Also enable signatures
+  use Mojo::Base -strict, -signatures;
+  use Mojo::Base -base, -signatures;
+  use Mojo::Base 'SomeBaseClass', -signatures;
+
+This will also disable experimental warnings on versions of Perl where this
+feature was still experimental.
 
 =head1 FUNCTIONS
 

@@ -17,6 +17,7 @@ sub import {
   # Mojolicious::Lite
   my $caller = caller;
   eval "package $caller; use Mojolicious::Lite; 1" or die $@;
+  Mojo::Base->import(-strict, $] < 5.020 ? () : (-signatures));
   my $ua = $caller->app->ua;
   $ua->server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]() });
 
@@ -70,6 +71,11 @@ C<MOJO_PROXY> environment variable.
 Every L<ojo> one-liner is also a L<Mojolicious::Lite> application.
 
   $ perl -Mojo -E 'get "/" => {inline => "%= time"}; app->start' get /
+
+On Perl 5.20+ L<subroutine signatures|perlsub/"Signatures"> will be enabled
+automatically.
+
+  $ perl -Mojo -E 'a(sub ($c) { $c->render(text => 'Hello!') })->start' get /
 
 If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
 be set to C<fatal>.

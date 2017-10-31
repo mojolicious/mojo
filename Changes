@@ -2,6 +2,7 @@
 7.51  2017-10-31
   - Added -signatures flag to Mojo::Base and Mojolicious::Lite.
   - Added support for new HTTP status code.
+  - Improved ojo to enable subroutine signatures automatically on Perl 5.20+.
 
 7.50  2017-10-30
   - Deprecated error and finish events in Mojo::IOLoop::Delay. Since there is no

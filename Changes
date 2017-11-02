@@ -1,5 +1,7 @@
 
-7.52  2017-11-01
+7.52  2017-11-02
+  - Added delete_p, get_p, head_p, options_p, patch_p, post_p, put_p and start_p
+    methods to Mojo::UserAgent.
 
 7.51  2017-10-31
   - Added -signatures flag to Mojo::Base and Mojolicious::Lite.

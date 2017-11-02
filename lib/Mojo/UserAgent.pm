@@ -34,6 +34,10 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
     my ($self, $cb) = (shift, ref $_[-1] eq 'CODE' ? pop : undef);
     return $self->start($self->build_tx($name, @_), $cb);
   };
+  monkey_patch __PACKAGE__, lc($name) . '_p', sub {
+    my $self = shift;
+    return $self->start_p($self->build_tx($name, @_));
+  };
 }
 
 sub DESTROY { Mojo::Util::_global_destruction() or shift->_cleanup }
@@ -59,6 +63,22 @@ sub start {
   $self->ioloop->start;
 
   return $tx;
+}
+
+sub start_p {
+  my ($self, $tx) = @_;
+
+  my $promise = Mojo::IOLoop->delay;
+  $self->start(
+    $tx => sub {
+      my ($self, $tx) = @_;
+      my $err = $tx->error;
+      $promise->resolve($tx) if !$err || $err->{code};
+      $promise->reject($err->{message});
+    }
+  );
+
+  return $promise;
 }
 
 sub websocket {
@@ -403,19 +423,14 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-  # Concurrent non-blocking requests (synchronized with a delay)
-  Mojo::IOLoop->delay(
-    sub {
-      my $delay = shift;
-      $ua->get('mojolicious.org' => $delay->begin);
-      $ua->get('cpan.org'        => $delay->begin);
-    },
-    sub {
-      my ($delay, $mojo, $cpan) = @_;
-      say $mojo->result->dom->at('title')->text;
-      say $cpan->result->dom->at('title')->text;
-    }
-  )->wait;
+  # Concurrent non-blocking requests (synchronized with promises)
+  my $mojo = $ua->get_p('mojolicious.org');
+  my $cpan = $ua->get_p('cpan.org');
+  $mojo->all($cpan)->then(sub {
+    my ($mojo, $cpan) = @_;
+    say $mojo->[0]->result->dom->at('title')->text;
+    say $cpan->[0]->result->dom->at('title')->text;
+  })->wait;
 
   # WebSocket connection sending and receiving JSON via UNIX domain socket
   $ua->websocket('ws+unix://%2Ftmp%2Fmyapp.sock/echo.json' => sub {
@@ -746,6 +761,22 @@ implied). You can also append a callback to perform requests non-blocking.
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+=head2 delete_p
+
+  my $promise = $ua->delete_p('http://example.com');
+
+Same as L</"delete">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  $ua->delete_p('http://example.com' => json => {a => 'b'})->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
+
 =head2 get
 
   my $tx = $ua->get('example.com');
@@ -765,6 +796,22 @@ perform requests non-blocking.
     say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+=head2 get_p
+
+  my $promise = $ua->get_p('http://example.com');
+
+Same as L</"get">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  $ua->get_p('http://example.com' => json => {a => 'b'})->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
 
 =head2 head
 
@@ -786,6 +833,22 @@ implied). You can also append a callback to perform requests non-blocking.
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+=head2 head_p
+
+  my $promise = $ua->head_p('http://example.com');
+
+Same as L</"head">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  $ua->head_p('http://example.com' => json => {a => 'b'})->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
+
 =head2 options
 
   my $tx = $ua->options('example.com');
@@ -805,6 +868,22 @@ implied). You can also append a callback to perform requests non-blocking.
     say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+=head2 options_p
+
+  my $promise = $ua->options_p('http://example.com');
+
+Same as L</"options">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  $ua->options_p('http://example.com' => json => {a => 'b'})->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
 
 =head2 patch
 
@@ -826,6 +905,22 @@ implied). You can also append a callback to perform requests non-blocking.
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+=head2 patch_p
+
+  my $promise = $ua->patch_p('http://example.com');
+
+Same as L</"patch">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  $ua->patch_p('http://example.com' => json => {a => 'b'})->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
+
 =head2 post
 
   my $tx = $ua->post('example.com');
@@ -845,6 +940,22 @@ implied). You can also append a callback to perform requests non-blocking.
     say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+=head2 post_p
+
+  my $promise = $ua->post_p('http://example.com');
+
+Same as L</"post">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  $ua->post_p('http://example.com' => json => {a => 'b'})->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
 
 =head2 put
 
@@ -866,6 +977,22 @@ perform requests non-blocking.
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+=head2 put_p
+
+  my $promise = $ua->put_p('http://example.com');
+
+Same as L</"put">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  $ua->put_p('http://example.com' => json => {a => 'b'})->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
+
 =head2 start
 
   my $tx = $ua->start(Mojo::Transaction::HTTP->new);
@@ -880,6 +1007,23 @@ to perform requests non-blocking.
     say $tx->result->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+=head2 start_p
+
+  my $promise = $ua->start_p(Mojo::Transaction::HTTP->new);
+
+Same as L</"start">, but performs all requests non-blocking and returns a
+L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
+callback.
+
+  my $tx = $ua->build_tx(GET => 'http://example.com');
+  $ua->start_p($tx)->then(sub {
+    my $tx = shift;
+    say $tx->result->body;
+  })->catch(sub {
+    my $err = shift;
+    warn "Connection error: $err";
+  })->wait;
 
 =head2 websocket
 

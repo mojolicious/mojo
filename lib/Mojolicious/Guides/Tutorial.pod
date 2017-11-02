@@ -868,20 +868,15 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
   # Concurrent non-blocking
   get '/titles' => sub {
     my $c = shift;
-    $c->delay(
-      sub {
-        my $delay = shift;
-        $c->ua->get('http://mojolicious.org' => $delay->begin);
-        $c->ua->get('https://metacpan.org'   => $delay->begin);
-      },
-      sub {
-        my ($delay, $mojo, $cpan) = @_;
-        $c->render(json => {
-          mojo => $mojo->result->dom->at('title')->text,
-          cpan => $cpan->result->dom->at('title')->text
-        });
-      }
-    );
+    my $mojo = $ua->get_p('http://mojolicious.org');
+    my $cpan = $ua->get_p('https://metacpan.org');
+    $mojo->all($cpan)->then(sub {
+      my ($mojo, $cpan) = @_;
+      $c->render(json => {
+        mojo => $mojo->[0]->result->dom->at('title')->text,
+        cpan => $cpan->[0]->result->dom->at('title')->text
+      });
+    })->wait;
   };
 
   app->start;

@@ -132,6 +132,43 @@ ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
+# Promises
+my @results;
+my $p1 = $ua->get_p('/');
+my $p2 = $ua->get_p('/');
+$p1->all($p2)->then(
+  sub {
+    my ($first, $second) = @_;
+    push @results, $first, $second;
+  }
+)->wait;
+ok $results[0][0]->success, 'successful';
+is $results[0][0]->res->code, 200,      'right status';
+is $results[0][0]->res->body, 'works!', 'right content';
+ok $results[1][0]->success, 'successful';
+is $results[1][0]->res->code, 200,      'right status';
+is $results[1][0]->res->body, 'works!', 'right content';
+
+# Promises (shortcut methods)
+my $result;
+$ua->delete_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, 'DELETE', 'right result';
+$ua->get_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, 'GET', 'right result';
+$ua->head_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, '', 'no result';
+$ua->options_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, 'OPTIONS', 'right result';
+$ua->patch_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, 'PATCH', 'right result';
+$ua->post_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, 'POST', 'right result';
+$ua->put_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, 'PUT', 'right result';
+$ua->start_p($ua->build_tx(TEST => '/method'))
+  ->then(sub { $result = shift->res->body })->wait;
+is $result, 'TEST', 'right result';
+
 # SOCKS proxy request without SOCKS support
 $ua = Mojo::UserAgent->new;
 my $tx = $ua->build_tx(GET => '/');
@@ -145,6 +182,12 @@ $ua = Mojo::UserAgent->new;
 $tx = $ua->get($ua->server->url->scheme('https'));
 like $tx->error->{message}, qr/IO::Socket::SSL/, 'right error';
 ok !Mojo::IOLoop::TLS->can_tls, 'no TLS support';
+
+# Promises (rejected)
+my $error;
+$ua->get_p($ua->server->url->scheme('https'))->catch(sub { $error = shift })
+  ->wait;
+like $error, qr/IO::Socket::SSL/, 'right error';
 
 # No non-blocking name resolution
 ok !Mojo::IOLoop::Client->can_nnr, 'no non-blocking name resolution support';
@@ -611,7 +654,7 @@ is $tx->res->body, 'Hi!', 'right content';
 
 # Connection limit
 $ua = Mojo::UserAgent->new(max_connections => 2);
-my $result;
+$result = undef;
 Mojo::IOLoop->delay(
   sub {
     my $delay = shift;

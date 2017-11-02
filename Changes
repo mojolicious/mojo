@@ -1,4 +1,6 @@
 
+7.53  2017-11-03
+
 7.52  2017-11-02
   - Added delete_p, get_p, head_p, options_p, patch_p, post_p, put_p and start_p
     methods to Mojo::UserAgent.

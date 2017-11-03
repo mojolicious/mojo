@@ -532,9 +532,9 @@ continuation-passing style.
 =head2 Synchronizing non-blocking operations
 
 Multiple non-blocking operations, such as concurrent requests, can be easily
-synchronized with L<Mojolicious::Plugin::DefaultHelpers/"delay">, which can help
-you avoid deep nested closures that often result from continuation-passing
-style.
+synchronized with L<Mojo::IOLoop::Delay> promises and
+L<Mojo::IOLoop::Delay/"all">. You create promises manually or use methods like
+L<Mojo::UserAgent/"get_p"> that create them for you.
 
   use Mojolicious::Lite;
   use Mojo::URL;
@@ -543,35 +543,55 @@ style.
   get '/' => sub {
     my $c = shift;
 
-    # Prepare response in two steps
-    $c->delay(
+    # Create two promises
+    my $url   = Mojo::URL->new('fastapi.metacpan.org/v1/module/_search');
+    my $mojo   = $c->ua->get_p($url->clone->query({q => 'mojo'}));
+    my $minion = $c->ua->get_p($url->clone->query({q => 'minion'}));
 
-      # Concurrent requests
-      sub {
-        my $delay = shift;
-        my $url   = Mojo::URL->new('fastapi.metacpan.org/v1/module/_search');
-        $url->query({sort => 'date:desc'});
-        $c->ua->get($url->clone->query({q => 'mojo'})   => $delay->begin);
-        $c->ua->get($url->clone->query({q => 'minion'}) => $delay->begin);
-      },
-
-      # Delayed rendering
-      sub {
-        my ($delay, $mojo, $minion) = @_;
-        $c->render(json => {
-          mojo   => $mojo->result->json('/hits/hits/0/_source/release'),
-          minion => $minion->result->json('/hits/hits/0/_source/release')
-        });
-      }
-    );
+    # Render a response once both promises have been resolved
+    $mojo->all($minion)->then(sub {
+      my ($mojo, $minion) = @_;
+      $c->render(json => {
+        mojo   => $mojo->[0]->result->json('/hits/hits/0/_source/release'),
+        minion => $minion->[0]->result->json('/hits/hits/0/_source/release')
+      });
+    })->catch(sub {
+      my $err = shift;
+      $c->reply->exception($err);
+    })->wait;
   };
 
   app->start;
 
-You simply use L<Mojo::IOLoop::Delay/"begin"> to generate code references that
-can be passed to L<Mojo::UserAgent/"get"> as callbacks. These code references
-then capture arguments passed to them, and pass them on to the next step in the
-chain, once all generated code references have been executed.
+To create promises maually you just wrap your continuation-passing style APIs in
+functions that return promises. Here's an example for how
+L<Mojo::UserAgent/"get_p"> works internally.
+
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
+
+  # Wrap a user agent method with a promise
+  my $ua = Mojo::UserAgent->new;
+  sub get_p {
+    my $promise = Mojo::IOLoop->delay;
+    $ua->get(@_ => sub {
+      my ($ua, $tx) = @_;
+      my $err = $tx->error;
+      $promise->resolve($tx) if !$err || $err->{code};
+      $promise->reject($err->{message});
+    });
+    return $promise;
+  }
+
+  # Use our new promise generating function
+  get_p('http://mojolicious.org')->then(sub {
+    my $tx = shift;
+    say $tx->result->dom->at('title')->text;
+  })->wait;
+
+Promises have three states, they start out as C<pending> and you call
+L<Mojo::IOLoop::Delay/"resolve"> to transition them to C<fulfilled>, or
+L<Mojo::IOLoop::Delay/"reject"> to transition them to C<rejected>.
 
 =head2 Timers
 
@@ -1278,10 +1298,10 @@ batches.
     $ua->get($url => sub {
       my ($ua, $tx) = @_;
       say "$url: ", $tx->result->dom->at('title')->text;
-      $end->();
 
       # Next request
       $fetch->();
+      $end->();
     });
   };
 
@@ -1295,49 +1315,22 @@ the same host, or the operators might be forced to block your access.
 
 =head2 Concurrent blocking requests
 
-You can emulate blocking behavior by using L<Mojo::IOLoop/"delay"> to
-synchronize multiple non-blocking requests.
-
-  use Mojo::UserAgent;
-  use Mojo::IOLoop;
-
-  # Synchronize non-blocking requests with flow-control helpers
-  my $ua    = Mojo::UserAgent->new;
-  my $delay = Mojo::IOLoop->delay(sub {
-    my ($delay, $mojo, $minion) = @_;
-    say $mojo->result->dom->at('title')->text;
-    say $minion->result->dom->at('title')->text;
-  });
-  $ua->get('https://metacpan.org/search?q=mojo'   => $delay->begin);
-  $ua->get('https://metacpan.org/search?q=minion' => $delay->begin);
-  $delay->wait;
-
-If you plan on doing this a lot it might be worth wrapping your
-continuation-passing style APIs into promises, to make them easily composable.
+You might have seen L<Mojo::IOLoop::Delay/"wait"> already in some examples
+above. It is used to make non-blocking operations portable, allowing them to
+work inside an already running event loop or start one on demand.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
   # Synchronize non-blocking requests with promises
   my $ua = Mojo::UserAgent->new;
-  sub get {
-    my $promise = Mojo::IOLoop->delay;
-    $ua->get(@_ => sub {
-      my ($ua, $tx) = @_;
-      $promise->resolve($tx);
-    });
-    return $promise;
-  }
-  my $mojo   = get('https://metacpan.org/search?q=mojo');
-  my $minion = get('https://metacpan.org/search?q=minion');
+  my $mojo   = $ua->get_p('https://metacpan.org/search?q=mojo');
+  my $minion = $ua->get_p('https://metacpan.org/search?q=minion');
   $mojo->all($minion)->then(sub {
     my ($mojo, $minion) = @_;
     say $mojo->[0]->result->dom->at('title')->text;
     say $minion->[0]->result->dom->at('title')->text;
   })->wait;
-
-The call to L<Mojo::IOLoop::Delay/"wait"> makes this code portable, it can now
-work inside an already running event loop or start one on demand.
 
 =head2 WebSockets
 

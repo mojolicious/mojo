@@ -326,10 +326,11 @@ the following new ones.
   my $new = $delay->all(@delays);
 
 Returns a new L<Mojo::IOLoop::Delay> object that either fulfills when all of the
-passed L<Mojo::IOLoop::Delay> objects have fulfilled or rejects as soon as one
-of them rejects. If the returned promise fulfills, it is fulfilled with the
-values from the fulfilled promises in the same order as the passed promises.
-This method can be useful for aggregating results of multiple promises.
+passed L<Mojo::IOLoop::Delay> objects (including the invocant) have fulfilled or
+rejects as soon as one of them rejects. If the returned promise fulfills, it is
+fulfilled with the values from the fulfilled promises in the same order as the
+passed promises. This method can be useful for aggregating results of multiple
+promises.
 
 =head2 begin
 
@@ -435,8 +436,8 @@ Shortcut for passing values between L</"steps">.
   my $new = $delay->race(@delays);
 
 Returns a new L<Mojo::IOLoop::Delay> object that fulfills or rejects as soon as
-one of the passed L<Mojo::IOLoop::Delay> objects fulfills or rejects, with the
-value or reason from that promise.
+one of the passed L<Mojo::IOLoop::Delay> objects (including the invocant)
+fulfills or rejects, with the value or reason from that promise.
 
 =head2 reject
 

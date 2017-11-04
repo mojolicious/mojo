@@ -415,7 +415,9 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
     my $promise = Mojo::IOLoop->delay;
     $ua->get(@_ => sub {
       my ($ua, $tx) = @_;
-      $promise->resolve($tx);
+      my $err = $tx->error;
+      $promise->resolve($tx) if !$err || $err->{code};
+      $promise->reject($err->{message});
     });
     return $promise;
   }

@@ -128,6 +128,7 @@ Mojo::Promise - Promises/A+
 =head1 SYNOPSIS
 
   use Mojo::Promise;
+  use Mojo::UserAgent;
 
   # Wrap continuation-passing style APIs with promises
   my $ua = Mojo::UserAgent->new;
@@ -135,7 +136,9 @@ Mojo::Promise - Promises/A+
     my $promise = Mojo::Promise->new;
     $ua->get(@_ => sub {
       my ($ua, $tx) = @_;
-      $promise->resolve($tx);
+      my $err = $tx->error;
+      $promise->resolve($tx) if !$err || $err->{code};
+      $promise->reject($err->{message});
     });
     return $promise;
   }
@@ -155,7 +158,7 @@ L<Mojo::Promise> implements the following attributes.
 =head2 ioloop
 
   my $loop = $promise->ioloop;
-  $promise   = $promise->ioloop(Mojo::IOLoop->new);
+  $promise = $promise->ioloop(Mojo::IOLoop->new);
 
 Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
 

@@ -142,9 +142,17 @@ Mojo::Promise - Promises/A+
     });
     return $promise;
   }
+
+  # Synchronize multiple non-blocking operations
   my $mojo = get('http://mojolicious.org');
   my $cpan = get('http://metacpan.org');
-  Mojo::Promise->race($mojo, $cpan)->then(sub { say shift->req->url })->wait;
+  Mojo::Promise->race($mojo, $cpan)->then(sub {
+    my $tx = shift;
+    say $tx->req->url, ' won!';
+  })->catch(sub {
+    my $err = shift;
+    warn "Something went wrong: $err";
+  })->wait;
 
 =head1 DESCRIPTION
 

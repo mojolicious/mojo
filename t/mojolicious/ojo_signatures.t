@@ -1,6 +1,9 @@
 use Mojo::Base -strict;
 
-BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
+BEGIN {
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
+  $ENV{MOJO_PROXY}   =  0;
+}
 
 use Test::More;
 

@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
 use Mojo::IOLoop;
+use Mojo::Promise;
 use Mojo::Util qw(monkey_patch term_escape);
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Proxy;
@@ -68,7 +69,7 @@ sub start {
 sub start_p {
   my ($self, $tx) = @_;
 
-  my $promise = Mojo::IOLoop->delay;
+  my $promise = Mojo::Promise->new;
   $self->start(
     $tx => sub {
       my ($self, $tx) = @_;
@@ -426,7 +427,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Concurrent non-blocking requests (synchronized with promises)
   my $mojo = $ua->get_p('mojolicious.org');
   my $cpan = $ua->get_p('cpan.org');
-  $mojo->all($cpan)->then(sub {
+  Mojo::Promise->all($mojo, $cpan)->then(sub {
     my ($mojo, $cpan) = @_;
     say $mojo->[0]->result->dom->at('title')->text;
     say $cpan->[0]->result->dom->at('title')->text;
@@ -766,8 +767,7 @@ implied). You can also append a callback to perform requests non-blocking.
   my $promise = $ua->delete_p('http://example.com');
 
 Same as L</"delete">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   $ua->delete_p('http://example.com' => json => {a => 'b'})->then(sub {
     my $tx = shift;
@@ -802,8 +802,7 @@ perform requests non-blocking.
   my $promise = $ua->get_p('http://example.com');
 
 Same as L</"get">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   $ua->get_p('http://example.com' => json => {a => 'b'})->then(sub {
     my $tx = shift;
@@ -838,8 +837,7 @@ implied). You can also append a callback to perform requests non-blocking.
   my $promise = $ua->head_p('http://example.com');
 
 Same as L</"head">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   $ua->head_p('http://example.com' => json => {a => 'b'})->then(sub {
     my $tx = shift;
@@ -874,8 +872,7 @@ implied). You can also append a callback to perform requests non-blocking.
   my $promise = $ua->options_p('http://example.com');
 
 Same as L</"options">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   $ua->options_p('http://example.com' => json => {a => 'b'})->then(sub {
     my $tx = shift;
@@ -910,8 +907,7 @@ implied). You can also append a callback to perform requests non-blocking.
   my $promise = $ua->patch_p('http://example.com');
 
 Same as L</"patch">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   $ua->patch_p('http://example.com' => json => {a => 'b'})->then(sub {
     my $tx = shift;
@@ -946,8 +942,7 @@ implied). You can also append a callback to perform requests non-blocking.
   my $promise = $ua->post_p('http://example.com');
 
 Same as L</"post">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   $ua->post_p('http://example.com' => json => {a => 'b'})->then(sub {
     my $tx = shift;
@@ -982,8 +977,7 @@ perform requests non-blocking.
   my $promise = $ua->put_p('http://example.com');
 
 Same as L</"put">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   $ua->put_p('http://example.com' => json => {a => 'b'})->then(sub {
     my $tx = shift;
@@ -1013,8 +1007,7 @@ to perform requests non-blocking.
   my $promise = $ua->start_p(Mojo::Transaction::HTTP->new);
 
 Same as L</"start">, but performs all requests non-blocking and returns a
-L<Mojo::IOLoop::Delay> object to be used as a promise instead of accepting a
-callback.
+L<Mojo::Promise> object to be used as a promise instead of accepting a callback.
 
   my $tx = $ua->build_tx(GET => 'http://example.com');
   $ua->start_p($tx)->then(sub {

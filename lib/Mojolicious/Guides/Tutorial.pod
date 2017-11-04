@@ -870,7 +870,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     my $c = shift;
     my $mojo = $ua->get_p('http://mojolicious.org');
     my $cpan = $ua->get_p('https://metacpan.org');
-    $mojo->all($cpan)->then(sub {
+    Mojo::Promise->all($mojo, $cpan)->then(sub {
       my ($mojo, $cpan) = @_;
       $c->render(json => {
         mojo => $mojo->[0]->result->dom->at('title')->text,

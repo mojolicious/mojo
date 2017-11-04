@@ -343,8 +343,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::Exception>
 
-=item * L<Mojo::IOLoop::Delay>
-
 =item * L<Mojo::Headers>
 
 =item * L<Mojo::IOLoop::Subprocess>
@@ -354,6 +352,14 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 =item * L<Mojo::Parameters>
 
 =item * L<Mojo::Path>
+
+=item * L<Mojo::Promise>
+
+=over 2
+
+=item * L<Mojo::IOLoop::Delay>
+
+=back
 
 =item * L<Mojo::Server::Hypnotoad>
 

@@ -1,5 +1,7 @@
 
-7.53  2017-11-03
+7.53  2017-11-04
+  - Added module Mojo::Promise.
+  - Improved Mojo::IOLoop::Delay to be a subclass of Mojo::Promise.
 
 7.52  2017-11-02
   - Added delete_p, get_p, head_p, options_p, patch_p, post_p, put_p and start_p

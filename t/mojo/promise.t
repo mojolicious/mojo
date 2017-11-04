@@ -79,8 +79,9 @@ is_deeply \@results, ['test:1:2:3:4'], 'promises resolved';
 # Rejected chained
 $promise = Mojo::Promise->new;
 @errors  = ();
-$promise->then(undef, sub {"$_[0]:1"})->then(undef, sub {"$_[0]:2"})
-  ->then(undef, sub {"$_[0]:3"})->then(undef, sub { push @errors, "$_[0]:4" });
+$promise->then(undef, sub {"$_[0]:1"})
+  ->then(sub {"$_[0]:2"}, sub {"$_[0]:fail"})->then(sub {"$_[0]:3"})
+  ->then(sub { push @errors, "$_[0]:4" });
 $promise->reject('tset');
 Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['tset:1:2:3:4'], 'promises rejected';

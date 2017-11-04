@@ -1,5 +1,7 @@
 
 7.54  2017-11-05
+  - Fixed a bug in Mojo::Promise where promise chains could not recover from
+    rejections.
 
 7.53  2017-11-04
   - Added module Mojo::Promise.

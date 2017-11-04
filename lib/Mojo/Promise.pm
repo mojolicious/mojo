@@ -111,7 +111,7 @@ sub _then {
   my @res;
   return $new->reject($@) unless eval { @res = $cb->(@result); 1 };
 
-  return $new->$method(@res)
+  return $new->resolve(@res)
     unless @res == 1 && blessed $res[0] && $res[0]->can('then');
 
   $res[0]->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });

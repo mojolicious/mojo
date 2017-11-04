@@ -421,7 +421,7 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
   }
   my $mojo = get('http://mojolicious.org');
   my $cpan = get('http://metacpan.org');
-  $mojo->race($cpan)->then(sub { say shift->req->url })->wait;
+  Mojo::Promise->race($mojo, $cpan)->then(sub { say shift->req->url })->wait;
 
   # Synchronize multiple non-blocking operations
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

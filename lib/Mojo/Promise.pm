@@ -141,7 +141,7 @@ Mojo::Promise - Promises/A+
   }
   my $mojo = get('http://mojolicious.org');
   my $cpan = get('http://metacpan.org');
-  $mojo->race($cpan)->then(sub { say shift->req->url })->wait;
+  Mojo::Promise->race($mojo, $cpan)->then(sub { say shift->req->url })->wait;
 
 =head1 DESCRIPTION
 

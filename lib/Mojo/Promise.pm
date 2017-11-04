@@ -169,7 +169,7 @@ the following new ones.
 
 =head2 all
 
-  my $new = Mojo::Promise->all(@promises)
+  my $new = Mojo::Promise->all(@promises);
   my $new = $promise->all(@promises);
 
 Returns a new L<Mojo::Promise> object that either fulfills when all of the

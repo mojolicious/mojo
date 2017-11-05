@@ -47,8 +47,7 @@ sub race {
   return $race;
 }
 
-sub reject { shift->_settle('reject', @_) }
-
+sub reject  { shift->_settle('reject',  @_) }
 sub resolve { shift->_settle('resolve', @_) }
 
 sub then {
@@ -143,7 +142,19 @@ Mojo::Promise - Promises/A+
     return $promise;
   }
 
-  # Synchronize multiple non-blocking operations
+  # Synchronize non-blocking operations (all)
+  my $mojo = get('http://mojolicious.org');
+  my $cpan = get('http://metacpan.org');
+  Mojo::Promise->all($mojo, $cpan)->then(sub {
+    my ($mojo, $cpan) = @_;
+    say $mojo->[0]->res->code;
+    say $cpan->[0]->res->code;
+  })->catch(sub {
+    my $err = shift;
+    warn "Something went wrong: $err";
+  })->wait;
+
+  # Synchronize non-blocking operations (race)
   my $mojo = get('http://mojolicious.org');
   my $cpan = get('http://metacpan.org');
   Mojo::Promise->race($mojo, $cpan)->then(sub {

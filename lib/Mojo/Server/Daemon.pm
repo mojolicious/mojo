@@ -106,7 +106,7 @@ sub _build_tx {
       my $c = $self->{connections}{$id};
       $tx->res->headers->connection('close')
         and ++Mojo::IOLoop->stream($id)->{closed}
-        if $c->{requests} >= $self->max_requests || $req->error;
+        if ($c->{requests} || 1) >= $self->max_requests || $req->error;
 
       $tx->on(resume => sub { $self->_write($id) });
       $self->_write($id);

@@ -19,7 +19,7 @@ sub all {
         $results->[$i] = [@_];
         $all->resolve(@$results) if --$remaining <= 0;
       },
-      sub { $all->reject(@_) },
+      sub { $all->reject(@_) }
     );
   }
 

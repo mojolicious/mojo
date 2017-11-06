@@ -8,6 +8,7 @@ use feature ();
 # No imports because we get subclassed, a lot!
 use Carp         ();
 use Scalar::Util ();
+use Mojo::Util;
 
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
@@ -16,20 +17,8 @@ use IO::Handle ();
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
-# Supported on Perl 5.22+
-my $NAME
-  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
-
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
-
-# Declared here to avoid circular require problems in Mojo::Util
-sub _monkey_patch {
-  my ($class, %patch) = @_;
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
-}
 
 sub attr {
   my ($self, $attrs, $value) = @_;
@@ -43,7 +32,7 @@ sub attr {
 
     # Very performance-sensitive code with lots of micro-optimizations
     if (ref $value) {
-      _monkey_patch $class, $attr, sub {
+      Mojo::Util::monkey_patch $class, $attr, sub {
         return
           exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
           if @_ == 1;
@@ -52,7 +41,7 @@ sub attr {
       };
     }
     elsif (defined $value) {
-      _monkey_patch $class, $attr, sub {
+      Mojo::Util::monkey_patch $class, $attr, sub {
         return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
           if @_ == 1;
         $_[0]{$attr} = $_[1];
@@ -60,7 +49,7 @@ sub attr {
       };
     }
     else {
-      _monkey_patch $class, $attr,
+      Mojo::Util::monkey_patch $class, $attr,
         sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
     }
   }
@@ -87,7 +76,7 @@ sub import {
     my $caller = caller;
     no strict 'refs';
     push @{"${caller}::ISA"}, $flags[0];
-    _monkey_patch $caller, 'has', sub { attr($caller, @_) };
+    Mojo::Util::monkey_patch $caller, 'has', sub { attr($caller, @_) };
   }
 
   # Mojo modules are strict!

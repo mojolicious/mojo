@@ -31,10 +31,6 @@ use constant {
   PC_INITIAL_N    => 128
 };
 
-# Supported on Perl 5.22+
-my $NAME
-  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
-
 # To generate a new HTML entity table run this command
 # perl examples/entities.pl
 my %ENTITIES;
@@ -155,12 +151,8 @@ sub getopt {
 sub html_attr_unescape { _html(shift, 1) }
 sub html_unescape      { _html(shift, 0) }
 
-sub monkey_patch {
-  my ($class, %patch) = @_;
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
-}
+# Declared in Mojo::Base to avoid circular require problems
+sub monkey_patch { Mojo::Base::_monkey_patch(@_) }
 
 # Direct translation of RFC 3492
 sub punycode_decode {

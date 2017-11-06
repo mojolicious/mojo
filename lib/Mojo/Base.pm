@@ -60,9 +60,8 @@ sub attr {
 }
 
 sub import {
-  my $class = shift;
+  my ($class, $caller) = (shift, caller);
   return unless my @flags = @_;
-  my $caller = caller;
 
   # Base
   if ($flags[0] eq '-base') { $flags[0] = $class }
@@ -82,7 +81,7 @@ sub import {
     require "$file.pm";
   }
 
-  # has and possibly ISA
+  # "has" and possibly ISA
   if ($flags[0]) {
     no strict 'refs';
     push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
@@ -167,7 +166,8 @@ interfaces.
   use Mojo::Base 'SomeBaseClass';
   use Mojo::Base -role;
 
-All four forms save a lot of typing.
+All four forms save a lot of typing. Note that role support depends on
+L<Role::Tiny> (2.000001+).
 
   # use Mojo::Base -strict;
   use strict;

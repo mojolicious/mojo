@@ -1,7 +1,7 @@
 
 7.55  2017-11-06
+  - Added -role flag to Mojo::Base. (jberger)
   - Improved Windows compatibility of Mojo::Server::Daemon.
-  - Added -role flag to Mojo::Base (jberger).
 
 7.54  2017-11-05
   - Fixed a bug in Mojo::Promise where promise chains could not recover from

@@ -487,9 +487,9 @@ is tablify([[undef, 'yada'], ['yada', undef]]), "      yada\nyada  \n",
 is tablify([['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]),
   "foo   bar   baz\nyada  yada  yada\n", 'right result';
 is tablify([['a', '', 0], [0, '', 'b']]), "a    0\n0    b\n", 'right result';
-is tablify([[1, 2], [3   ]        ]), "1  2\n3\n",   'right result';
-is tablify([[1   ], [2, 3]        ]), "1\n2  3\n",   'right result';
-is tablify([[1   ], [    ], [2, 3]]), "1\n\n2  3\n", 'right result';
+is tablify([[1, 2], [3]]), "1  2\n3\n", 'right result';
+is tablify([[1], [2, 3]]), "1\n2  3\n", 'right result';
+is tablify([[1], [], [2, 3]]), "1\n\n2  3\n", 'right result';
 
 # deprecated
 {

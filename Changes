@@ -1,6 +1,8 @@
 
 7.55  2017-11-06
   - Added -role flag to Mojo::Base. (jberger)
+  - Improved tablify function in Mojo::Util to work with non-rectangular arrays.
+    (CandyAngel, jabberwok)
   - Improved Windows compatibility of Mojo::Server::Daemon.
 
 7.54  2017-11-05

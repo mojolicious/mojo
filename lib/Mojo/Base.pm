@@ -9,6 +9,7 @@ use feature ();
 use Carp         ();
 use Scalar::Util ();
 
+# Defer to runtime so Mojo::Util can use "-strict"
 require Mojo::Util;
 
 # Only Perl 5.14+ requires it on demand

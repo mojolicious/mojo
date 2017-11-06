@@ -290,8 +290,8 @@ sub tablify {
     }
   }
 
-  my $format = join '  ', map({"\%-${_}s"} @spec[0 .. $#spec - 1]), '%s';
-  return join '', map { sprintf "$format\n", @$_ } @$rows;
+  my @fs = (map({"\%-${_}s"} @spec[0 .. $#spec - 1]), '%s');
+  return join '', map { sprintf join('  ', @fs[0 .. $#$_]) . "\n", @$_ } @$rows;
 }
 
 sub term_escape {

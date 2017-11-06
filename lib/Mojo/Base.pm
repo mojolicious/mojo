@@ -62,6 +62,7 @@ sub attr {
 sub import {
   my $class = shift;
   return unless my @flags = @_;
+  my $caller = caller;
 
   # Base
   if ($flags[0] eq '-base') { $flags[0] = $class }
@@ -69,17 +70,22 @@ sub import {
   # Strict
   elsif ($flags[0] eq '-strict') { $flags[0] = undef }
 
+  # Role
+  elsif ($flags[0] eq '-role') {
+    Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+    eval "package $caller; use Role::Tiny; 1" or die $@;
+  }
+
   # Module
   elsif ((my $file = $flags[0]) && !$flags[0]->can('new')) {
     $file =~ s!::|'!/!g;
     require "$file.pm";
   }
 
-  # ISA
+  # has and possibly ISA
   if ($flags[0]) {
-    my $caller = caller;
     no strict 'refs';
-    push @{"${caller}::ISA"}, $flags[0];
+    push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
     Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
   }
 
@@ -159,8 +165,9 @@ interfaces.
   use Mojo::Base -strict;
   use Mojo::Base -base;
   use Mojo::Base 'SomeBaseClass';
+  use Mojo::Base -role;
 
-All three forms save a lot of typing.
+All four forms save a lot of typing.
 
   # use Mojo::Base -strict;
   use strict;
@@ -188,6 +195,15 @@ All three forms save a lot of typing.
   push @ISA, 'SomeBaseClass';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
+  # use Mojo::Base -role;
+  use strict;
+  use warnings;
+  use utf8;
+  use feature ':5.10';
+  use IO::Handle ();
+  use Role::Tiny;
+  sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+
 On Perl 5.20+ you can also append a C<-signatures> flag to all three forms and
 enable support for L<subroutine signatures|perlsub/"Signatures">.
 
@@ -195,6 +211,7 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
   use Mojo::Base -strict, -signatures;
   use Mojo::Base -base, -signatures;
   use Mojo::Base 'SomeBaseClass', -signatures;
+  use Mojo::Base -role, -signatures;
 
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.

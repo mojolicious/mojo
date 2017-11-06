@@ -664,8 +664,8 @@ the C<Location> header after a redirect. We'll create a new class with
 L<Role::Tiny> that implements a test assertion named C<location_is>:
 
   package Test::Mojo::Role::Location;
+  use Mojo::Base -role;
 
-  use Role::Tiny;
   use Test::More;
 
   sub location_is {

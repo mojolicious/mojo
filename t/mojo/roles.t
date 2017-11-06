@@ -20,13 +20,15 @@ sub hello {
 }
 
 package Mojo::RoleTest::Role::quiet;
-use Role::Tiny;
+use Mojo::Base -role;
 
 requires 'name';
 
+has prefix => 'psst, ';
+
 sub whisper {
   my $self = shift;
-  return 'psst, ' . lc($self->name);
+  return $self->prefix . lc($self->name);
 }
 
 package Mojo::RoleTest;
@@ -40,7 +42,7 @@ sub hello {
 }
 
 package Mojo::RoleTest::Hello;
-use Role::Tiny;
+use Mojo::Base -role;
 
 sub hello {'hello mojo!'}
 
@@ -69,8 +71,10 @@ is $obj4->yell,  'HEY!',        'another role method';
 # Multiple roles
 my $obj3 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet',
   'Mojo::RoleTest::Role::LOUD')->new(name => 'Joel');
-is $obj3->name,    'Joel',         'base attribute';
-is $obj3->whisper, 'psst, joel',   'method from first role';
+is $obj3->name,    'Joel',       'base attribute';
+is $obj3->whisper, 'psst, joel', 'method from first role';
+$obj3->prefix('psssst, ');
+is $obj3->whisper, 'psssst, joel', 'method from first role';
 is $obj3->hello,   'HEY! JOEL!!!', 'method from second role';
 
 # Multiple roles (shorthand)

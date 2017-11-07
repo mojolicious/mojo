@@ -12,13 +12,13 @@ use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 # Non-blocking name resolution requires Net::DNS::Native
 use constant NNR => $ENV{MOJO_NO_NNR}
   ? 0
-  : eval 'use Net::DNS::Native 0.15 (); 1';
+  : eval { require Net::DNS::Native; Net::DNS::Native->VERSION('0.15'); 1 };
 my $NDN = NNR ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
 
 # SOCKS support requires IO::Socket::Socks
 use constant SOCKS => $ENV{MOJO_NO_SOCKS}
   ? 0
-  : eval 'use IO::Socket::Socks 0.64 (); 1';
+  : eval { require IO::Socket::Socks; IO::Socket::Socks->VERSION('0.64'); 1 };
 use constant READ  => SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
 use constant WRITE => SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
 

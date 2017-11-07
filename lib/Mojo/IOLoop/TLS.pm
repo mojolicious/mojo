@@ -8,7 +8,7 @@ use Scalar::Util 'weaken';
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.94 (); 1';
+  : eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('1.94'); 1 };
 use constant DEFAULT => eval { IO::Socket::SSL->VERSION('1.965') }
   ? \undef
   : '';

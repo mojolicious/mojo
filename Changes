@@ -1,4 +1,6 @@
 
+7.56  2017-11-07
+
 7.55  2017-11-06
   - Added -role flag to Mojo::Base. (jberger)
   - Improved tablify function in Mojo::Util to work with non-rectangular arrays.

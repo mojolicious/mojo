@@ -81,11 +81,14 @@ sub import {
     require "$file.pm";
   }
 
-  # "has" and possibly ISA
+  # Exports and possibly ISA
   if ($flags[0]) {
     no strict 'refs';
     push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
-    Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
+    my %subs = (has => sub { attr($caller, @_) });
+    $subs{with} = sub { Role::Tiny->apply_roles_to_package($caller, @_) }
+      unless !ROLES || $flags[0] eq '-role';
+    Mojo::Util::monkey_patch($caller, %subs);
   }
 
   # Mojo modules are strict!
@@ -184,6 +187,7 @@ L<Role::Tiny> (2.000001+).
   use IO::Handle ();
   push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+  sub with { Role::Tiny->apply_roles_to_package(__PACKAGE__, @_) }
 
   # use Mojo::Base 'SomeBaseClass';
   use strict;
@@ -194,6 +198,7 @@ L<Role::Tiny> (2.000001+).
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+  sub with { Role::Tiny->apply_roles_to_package(__PACKAGE__, @_) }
 
   # use Mojo::Base -role;
   use strict;

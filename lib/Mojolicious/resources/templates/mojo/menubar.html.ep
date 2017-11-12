@@ -10,26 +10,20 @@
       height: 46px;
       overflow: hidden;
       position: absolute;
-      text-align: right;
-      vertical-align: middle;
       width: 100%;
       z-index: 1000;
     }
-    #mojobar-content {
-      margin: 0 auto;
-      max-width: 1000px;
-    }
-    #mojobar-logo {
-      float: left;
-      margin-left: 5em;
+    #mojobar-brand {
+      display: inline-block;
+      padding-left: 50px;
       padding-top: 4px;
     }
     #mojobar-links {
-      display:table-cell;
+      display: inline;
       float: right;
       height: 60px;
-      margin-right: 5em;
       margin-top: 0.8em;
+      padding-right: 50px;
     }
     #mojobar-links a {
       color: #bbb;
@@ -57,30 +51,26 @@
     #mojobar-links form { display: inline }
     .animated { transition: all 0.25s ease }
   </style>
-  <div id="mojobar-content">
-    <div id="mojobar-logo">
-      %= link_to 'http://mojolicious.org' => begin
-        <picture>
-          <img src="<%= url_for '/mojo/logo-white.png' %>"
-            srcset="<%= url_for '/mojo/logo-white@2x.png' %> 2x">
-        </picture>
-      % end
-    </div>
-    <div id="mojobar-links">
-      %= link_to Documentation => 'http://mojolicious.org/perldoc'
-      %= link_to Chat => 'https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org'
-      %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
-      %= link_to GitHub => 'https://github.com/kraih/mojo'
-      %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'
-      %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
-      %= link_to Blog => 'http://blog.mojolicious.org'
-      %= link_to Twitter => 'https://twitter.com/kraih'
-      %= form_for 'https://www.google.com/cse' => (target => '_blank') => begin
-        %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
-        %= hidden_field ie => 'UTF-8'
-        %= search_field 'q', placeholder => 'Search'
-      %= end
-    </div>
+  %= link_to 'http://mojolicious.org' => (id => 'mojobar-brand') => begin
+    <picture>
+      <img src="<%= url_for '/mojo/logo-white.png' %>"
+        srcset="<%= url_for '/mojo/logo-white@2x.png' %> 2x">
+    </picture>
+  % end
+  <div id="mojobar-links">
+    %= link_to Documentation => 'http://mojolicious.org/perldoc'
+    %= link_to Chat => 'https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org'
+    %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
+    %= link_to GitHub => 'https://github.com/kraih/mojo'
+    %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'
+    %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
+    %= link_to Blog => 'http://blog.mojolicious.org'
+    %= link_to Twitter => 'https://twitter.com/kraih'
+    %= form_for 'https://www.google.com/cse' => (target => '_blank') => begin
+      %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
+      %= hidden_field ie => 'UTF-8'
+      %= search_field 'q', placeholder => 'Search'
+    %= end
   </div>
 </div>
 <script>

@@ -1,5 +1,6 @@
 
-7.56  2017-11-07
+7.56  2017-11-12
+  - Improved built-in templates with high resolution logos.
 
 7.55  2017-11-06
   - Added -role flag to Mojo::Base. (jberger)

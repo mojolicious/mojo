@@ -324,7 +324,11 @@
     </div>
     <div id="footer">
       %= link_to 'http://mojolicious.org' => begin
-        %= image '/mojo/logo-black.png', alt => 'Mojolicious logo'
+        <picture>
+          <img src="<%= url_for '/mojo/logo-black.png' %>"
+            srcset="<%= url_for '/mojo/logo-black@2x.png' %> 2x"
+            alt="Mojolicious logo">
+        </picture>
       % end
     </div>
   </body>

@@ -52,6 +52,14 @@ sub map {
   return $self->new(map { $_->$cb(@_) } @$self);
 }
 
+sub n_map {
+  my ($self, $n, $cb) = (shift, shift, shift);
+  return
+    $self->new(map  { $_->$cb(@_) }
+               map  { $self->new(@$self[$_..List::Util::min($_+$n-1, $#$self)]) }
+               grep { 0 == $_ % $n } 0 .. $#$self);
+}
+
 sub new {
   my $class = shift;
   return bless [@_], ref $class || $class;
@@ -274,6 +282,16 @@ passed to the callback, and is also available as C<$_>.
 
   # Append the word "mojo" to all values
   my $mojoified = $collection->map(sub { $_ . 'mojo' });
+
+=head2 n_map
+
+  my $new = $collection->n_map(3, 'reverse');
+  my $new = $collection->n_map(3, sub { $_->join(' ') });
+  my $new = $collection->n_map(3, sub { $_->join(' ') }, @args);
+
+Evaluate callback for, or call method on, each C<$n> elements in collection and
+create a new collection from the results. The elements will be the first argument
+passed to the callback as a new collection, and is also available as C<$_>.
 
 =head2 new
 

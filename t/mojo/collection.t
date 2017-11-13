@@ -96,6 +96,29 @@ is $collection->map('reverse')->map(join => "\n")->join("\n"),
 is $collection->map(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
   'right result';
 
+# n_map
+$collection = $collection->flatten;
+is $collection->n_map(3, join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
+    'right result';
+$collection->n_map(3, sub { is $_[0]->size, $_[1], 'size' }, 3);
+is_deeply $collection->n_map(3, sub { $_ })->flatten, $collection,
+    'round trip';
+$collection = c(1 .. 20);
+is_deeply $collection->n_map(10, 'flatten'), [[1 .. 10], [11 .. 20]],
+    'flatten 10 together';
+is_deeply $collection->n_map(10, sub { $_ }), [[1 .. 10], [11 .. 20]],
+    '10 per row slightly quicker';
+is_deeply $collection->n_map(10, sub { $_->reduce(sub { $a + $b }) }),
+    [55, 155], 'reduce 10 together';
+$collection = c(1 .. 5);
+is_deeply $collection->n_map(2, 'flatten'), [[1,2],[3,4],[5]], 'partial last';
+is_deeply $collection->n_map(7, 'flatten'), [[1,2,3,4,5]], 'partial first';
+is_deeply $collection->n_map(1, 'flatten'), [[1],[2],[3],[4],[5]], 'single';
+is_deeply $collection->n_map(2, 'reverse'), [[2, 1],[4, 3],[5]], 'reverse';
+$collection = c(1, 2, 3, 4, c(5,6,7,8), 9, 10);
+is_deeply $collection->n_map(3, 'flatten'), [[1,2,3], [4,5,6,7,8,9], [10]],
+    'non-flat collection';
+
 # reverse
 $collection = c(3, 2, 1);
 is_deeply $collection->reverse->to_array, [1, 2, 3], 'right order';

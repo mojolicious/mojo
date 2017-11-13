@@ -46,6 +46,10 @@ use Mojo::Base -role;
 
 sub hello {'hello mojo!'}
 
+package Mojo::RoleTest::WithHello;
+use Mojo::Base -base;
+with 'Mojo::RoleTest::Hello';
+
 package main;
 
 use Mojo::ByteStream;
@@ -67,6 +71,10 @@ is $obj2->yell,  'HEY!',        'another role method';
 my $obj4 = Mojo::RoleTest->with_roles('+LOUD')->new;
 is $obj4->hello, 'HEY! BOB!!!', 'role method';
 is $obj4->yell,  'HEY!',        'another role method';
+
+# Single role (using with)
+my $obj8 = Mojo::RoleTest::WithHello->new;
+is $obj8->hello, 'hello mojo!', 'role method';
 
 # Multiple roles
 my $obj3 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet',

@@ -150,7 +150,7 @@ that leads to the next closure in the series when executed.
   use Mojo::IOLoop;
 
   # Instead of nested closures we now have a simple chain of steps
-  my $delay = Mojo::IOloop->delay(
+  my $delay = Mojo::IOLoop->delay(
     sub {
       my $delay = shift;
       Mojo::IOLoop->timer(3 => $delay->begin);

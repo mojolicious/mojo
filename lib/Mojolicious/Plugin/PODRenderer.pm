@@ -47,8 +47,8 @@ sub _html {
 
   # Rewrite code blocks for syntax highlighting and correct indentation
   for my $e ($dom->find('pre > code')->each) {
-    my $str = $e->content;
-    next if $str =~ /^\s*(?:\$|Usage:)\s+/m || $str !~ /[\$\@\%]\w|-&gt;\w/m;
+    next if (my $str = $e->content) =~ /^\s*(?:\$|Usage:)\s+/m;
+    next unless $str =~ /[\$\@\%]\w|-&gt;\w|^use\s+\w/m;
     my $attrs = $e->attr;
     my $class = $attrs->{class};
     $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';

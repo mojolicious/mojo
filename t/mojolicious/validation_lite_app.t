@@ -125,6 +125,27 @@ is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('baz'), ['like', 1, $re], 'right error';
 
+# Num
+$validation = $t->app->validation->input({foo => 23, bar => 0, baz => 'fail'});
+ok $validation->required('foo')->num->is_valid, 'valid';
+is_deeply $validation->output, {foo => 23}, 'right result';
+ok $validation->required('bar')->num->is_valid, 'valid';
+is_deeply $validation->output, {foo => 23, bar => 0}, 'right result';
+ok !$validation->has_error, 'no error';
+ok !$validation->required('baz')->num->is_valid, 'not valid';
+is_deeply $validation->error('baz'), [qw(num 1)], 'right error';
+is_deeply $validation->failed, ['baz'], 'right names';
+$validation = $t->app->validation->input({foo => 23});
+ok $validation->required('foo')->num(22, 24)->is_valid, 'valid';
+$validation = $t->app->validation->input({foo => 23});
+ok $validation->required('foo')->num(23, 24)->is_valid, 'valid';
+$validation = $t->app->validation->input({foo => 23});
+ok $validation->required('foo')->num(22, 23)->is_valid, 'valid';
+$validation = $t->app->validation->input({foo => 23});
+ok !$validation->required('foo')->num(24, 25)->is_valid, 'not valid';
+ok $validation->has_error, 'has error';
+is_deeply $validation->error('foo'), [qw(num 1 24 25)], 'right error';
+
 # Size
 $validation
   = $t->app->validation->input({foo => 'bar', baz => 'yada', yada => 'yada'});

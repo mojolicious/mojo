@@ -37,7 +37,7 @@ sub _in {
 
 sub _num {
   my ($validation, $name, $value, $min, $max) = @_;
-  return 1 if $value !~ /^\d+$/;
+  return 1 if $value !~ /^[0-9]+$/;
   return defined $min && $max ? $min > $value || $max < $value : undef;
 }
 

@@ -14,7 +14,7 @@ sub again {
 
 sub io {
   my ($self, $handle, $cb) = @_;
-  $self->{io}{fileno $handle} = {cb => $cb};
+  $self->{io}{fileno($handle) // croak 'Handle is closed'} = {cb => $cb};
   return $self->watch($handle, 1, 1);
 }
 
@@ -88,7 +88,7 @@ sub recurring { shift->_timer(1, @_) }
 sub remove {
   my ($self, $remove) = @_;
   return !!delete $self->{timers}{$remove} unless ref $remove;
-  return !!delete $self->{io}{fileno $remove};
+  return !!delete $self->{io}{fileno($remove) // croak 'Handle is closed'};
 }
 
 sub reset { delete @{shift()}{qw(events io next_tick next_timer timers)} }

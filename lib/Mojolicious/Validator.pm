@@ -98,7 +98,8 @@ String value needs to match the regular expression.
   $validation = $validation->num;
   $validation = $validation->num(2, 5);
 
-String value needs to be numeric and if provided in the given range.
+String value needs to be a non-fractional number and if provided in the given
+range.
 
 =head2 size
 

@@ -131,7 +131,7 @@
   <body>
     %= include 'mojo/menubar'
     <script>
-      function mojoDrawer (handle, drawer) {
+      function mojoDrawer(handle, drawer) {
         $(handle).on('click', function () {
           $(drawer).slideToggle('slow');
           var text = $(handle + ' div.tap').text();
@@ -194,7 +194,7 @@
             <div class="tap">tap for more</div>
             <script>
               var current = '#context';
-              function mojoShowcase () {
+              function mojoShowcase() {
                 $('#showcase').on('click', function () {
                   $(this).unbind('click');
                   $(current).slideToggle('slow', function () {

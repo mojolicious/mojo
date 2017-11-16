@@ -135,7 +135,7 @@ L<Mojolicious::Validator> implements the following attributes.
   $validator = $validator->checks({size => sub {...}});
 
 Registered validation checks, by default only L</"equal_to">, L</"in">,
-L</"like">, L</"size"> and L</"upload"> are already defined.
+L</"like">, L</"num">, L</"size"> and L</"upload"> are already defined.
 
 =head1 METHODS
 

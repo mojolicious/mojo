@@ -391,7 +391,7 @@ Get L<Mojo::IOLoop::Server> object for id or turn object into an acceptor.
   my $id = $loop->client({address => '127.0.0.1', port => 3000} => sub {...});
 
 Open a TCP/IP or UNIX domain socket connection with L<Mojo::IOLoop::Client>,
-takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
+takes the same arguments as L<Mojo::IOLoop::Client/"connect1">.
 
   # Connect to 127.0.0.1 on port 3000
   Mojo::IOLoop->client({port => 3000} => sub {

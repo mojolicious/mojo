@@ -1,4 +1,6 @@
 
+7.57  2017-11-16
+
 7.56  2017-11-14
   - Added num check to Mojolicious::Validator.
   - Improved built-in templates with high resolution logos.

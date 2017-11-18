@@ -1,5 +1,6 @@
 
-7.57  2017-11-16
+7.57  2017-11-18
+  - Fixed installation problems with some versions of Perl on Windows.
 
 7.56  2017-11-14
   - Added num check to Mojolicious::Validator.

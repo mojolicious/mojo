@@ -54,7 +54,7 @@
   %= link_to 'http://mojolicious.org' => (id => 'mojobar-brand') => begin
     <picture>
       <img src="<%= url_for '/mojo/logo-white.png' %>"
-        srcset="<%= url_for '/mojo/logo-white@2x.png' %> 2x">
+        srcset="<%= url_for '/mojo/logo-white-2x.png' %> 2x">
     </picture>
   % end
   <div id="mojobar-links">

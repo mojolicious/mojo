@@ -135,7 +135,7 @@
       %= link_to 'http://mojolicious.org' => begin
         <picture>
           <img src="<%= url_for '/mojo/logo-black.png' %>"
-            srcset="<%= url_for '/mojo/logo-black@2x.png' %> 2x"
+            srcset="<%= url_for '/mojo/logo-black-2x.png' %> 2x"
             alt="Mojolicious logo">
         </picture>
       % end

@@ -7,6 +7,10 @@ BEGIN {
 
 use Test::More;
 
+my $test_no_warnings = eval {
+    require Test::NoWarnings;
+};
+
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
@@ -387,5 +391,10 @@ $buffer = '';
 like $buffer, qr/Perl/, 'right output';
 like $buffer, qr/You might want to update your Mojolicious to 1000!/,
   'right output';
+
+SKIP: {
+    skip('Test::NoWarnings required!', 1) unless $test_no_warnings;
+    Test::NoWarnings::had_no_warnings();
+}
 
 done_testing();

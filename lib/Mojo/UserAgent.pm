@@ -450,8 +450,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
 agent, with IPv6, TLS, SNI, IDNA, HTTP/SOCKS5 proxy, UNIX domain socket, Comet
-(long polling), keep-alive, connection pooling, timeout, cookie, multipart, gzip
-compression and multiple event loop support.
+(long polling), Promises/A+, keep-alive, connection pooling, timeout, cookie,
+multipart, gzip compression and multiple event loop support.
 
 All connections will be reset automatically if a new process has been forked,
 this allows multiple processes to share the same L<Mojo::UserAgent> object

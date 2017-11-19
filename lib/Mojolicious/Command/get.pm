@@ -16,7 +16,7 @@ sub run {
   my ($self, @args) = @_;
 
   # Data from STDIN
-  vec(my $r, fileno(STDIN), 1) = 1;
+  vec(my $r = '', fileno(STDIN), 1) = 1;
   my $in = !-t STDIN && select($r, undef, undef, 0) ? join '', <STDIN> : undef;
 
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);

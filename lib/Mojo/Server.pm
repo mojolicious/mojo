@@ -115,7 +115,7 @@ following new ones.
 
 Emitted when a request is ready and needs to be handled.
 
-  $server->unsubscribe('request')->on(request => sub {
+  $server->on(request => sub {
     my ($server, $tx) = @_;
     $tx->res->code(200);
     $tx->res->headers->content_type('text/plain');

@@ -142,6 +142,19 @@ Mojo::Promise - Promises/A+
     return $promise;
   }
 
+  # Perform non-blocking operations sequentially
+  get('http://mojolicious.org')->then(sub {
+    my $mojo = shift;
+    say $mojo->res->code;
+    return get('http://metacpan.org');
+  })->then(sub {
+    my $cpan = shift;
+    say $cpan->res->code;
+  })->catch(sub {
+    my $err = shift;
+    warn "Something went wrong: $err";
+  })->wait;
+
   # Synchronize non-blocking operations (all)
   my $mojo = get('http://mojolicious.org');
   my $cpan = get('http://metacpan.org');

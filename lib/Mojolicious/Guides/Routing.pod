@@ -1024,6 +1024,11 @@ containing a C<handler> method accepting L<Mojolicious::Controller> objects.
 
   1;
 
+The host application will only share very little information with the embedded
+application through the stash. So you cannot currently use route placeholders in
+routes leading to embedded applications, since that would cause problems with
+L<Mojolicious::Controller/"url_for">.
+
 =head2 Application plugins
 
 You can even package applications as self-contained reusable plugins.

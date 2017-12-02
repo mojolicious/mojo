@@ -1336,7 +1336,7 @@ work inside an already running event loop or start one on demand.
 =head2 WebSockets
 
 WebSockets are not just for the server-side, you can use
-L<Mojo::UserAgent/"websocket"> to open new connections, which are always
+L<Mojo::UserAgent/"websocket_p"> to open new connections, which are always
 non-blocking. The WebSocket handshake uses HTTP, and is a normal C<GET> request
 with a few additional headers. It can even contain cookies, and is followed by
 a C<101> response from the server, notifying our user agent that the connection
@@ -1344,20 +1344,21 @@ has been established and it can start using the bi-directional WebSocket
 protocol.
 
   use Mojo::UserAgent;
-  use Mojo::IOLoop;
+  use Mojo::Promise;
 
   # Open WebSocket to echo service
   my $ua = Mojo::UserAgent->new;
-  $ua->websocket('ws://echo.websocket.org' => sub {
-    my ($ua, $tx) = @_;
+  $ua->websocket_p('ws://echo.websocket.org')->then(sub {
+    my $tx = shift;
 
-    # Check if WebSocket handshake was successful
-    say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
+    # Prepare a followup promise so we can wait for messages
+    my $promise = Mojo::Promise->new;
 
     # Wait for WebSocket to be closed
     $tx->on(finish => sub {
       my ($tx, $code, $reason) = @_;
       say "WebSocket closed with status $code.";
+      $promise->resolve;
     });
 
     # Close WebSocket after receiving one message
@@ -1369,10 +1370,13 @@ protocol.
 
     # Send a message to the server
     $tx->send('Hi!');
-  });
 
-  # Start event loop if necessary
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+    # Insert a new promise into the promise chain
+    return $promise;
+  })->catch(sub {
+    my $err = shift;
+    warn "WebSocket error: $err";
+  })->wait;
 
 =head2 UNIX domain sockets
 

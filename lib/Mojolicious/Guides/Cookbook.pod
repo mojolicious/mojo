@@ -1375,6 +1375,8 @@ protocol.
     return $promise;
   })->catch(sub {
     my $err = shift;
+
+    # Handle failed WebSocket handshakes and other exceptions
     warn "WebSocket error: $err";
   })->wait;
 

@@ -73,7 +73,9 @@ app->start;
 use Mojolicious::Lite -signatures;
 
 # Render template "index.html.ep" from the DATA section
-get '/' => {template => 'index'};
+get '/' => sub ($c) {
+  $c->render(template => 'index');
+};
 
 # WebSocket service used by the template to extract the title from a website
 websocket '/title' => sub ($c) {

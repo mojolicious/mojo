@@ -1,5 +1,6 @@
 
-7.58  2017-11-24
+7.58  2017-12-02
+  - Added websocket_p method to Mojo::UserAgent.
 
 7.57  2017-11-18
   - Fixed installation problems with some versions of Perl on Windows.

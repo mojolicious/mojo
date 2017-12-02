@@ -66,25 +66,16 @@ sub start {
   return $tx;
 }
 
-sub start_p {
-  my ($self, $tx) = @_;
-
-  my $promise = Mojo::Promise->new;
-  $self->start(
-    $tx => sub {
-      my ($self, $tx) = @_;
-      my $err = $tx->error;
-      $promise->resolve($tx) if !$err || $err->{code};
-      $promise->reject($err->{message});
-    }
-  );
-
-  return $promise;
-}
+sub start_p { shift->_promise(0, @_) }
 
 sub websocket {
   my ($self, $cb) = (shift, pop);
   $self->start($self->build_websocket_tx(@_), $cb);
+}
+
+sub websocket_p {
+  my $self = shift;
+  return $self->_promise(1, $self->build_websocket_tx(@_));
 }
 
 sub _cleanup {
@@ -270,6 +261,24 @@ sub _finish {
   $self->_reuse($id, $close) unless uc $old->req->method eq 'CONNECT';
   $res->error({message => $res->message, code => $res->code}) if $res->is_error;
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
+}
+
+sub _promise {
+  my ($self, $ws, $tx) = @_;
+
+  my $promise = Mojo::Promise->new;
+  $self->start(
+    $tx => sub {
+      my ($self, $tx) = @_;
+      $promise->reject('WebSocket handshake failed')
+        if $ws && !$tx->is_websocket;
+      my $err = $tx->error;
+      $promise->resolve($tx) if !$err || $err->{code};
+      $promise->reject($err->{message});
+    }
+  );
+
+  return $promise;
 }
 
 sub _read {
@@ -1053,6 +1062,29 @@ but also increases memory usage by up to 300KiB per connection.
   $ua->websocket('ws://example.com/foo' => {
     'Sec-WebSocket-Extensions' => 'permessage-deflate'
   } => sub {...});
+
+=head2 websocket_p
+
+  my $promise = $ua->websocket_p('ws://example.com');
+
+Same as L</"websocket">, but returns a L<Mojo::Promise> object instead of
+accepting a callback.
+
+  $ua->websocket_p('wss://example.com/echo')->then(sub {
+    my $tx = shift;
+    my $promise = Mojo::Promise->new;
+    $tx->on(finish => sub { $promise->resolve });
+    $tx->on(message => sub {
+      my ($tx, $msg) = @_;
+      say "WebSocket message: $msg";
+      $tx->finish;
+    });
+    $tx->send('Hi!');
+    return $promise;
+  })->catch(sub {
+    my $err = shift;
+    warn "WebSocket error: $err";
+  })->wait;
 
 =head1 DEBUGGING
 

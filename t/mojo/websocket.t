@@ -5,6 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::IOLoop;
+use Mojo::Promise;
 use Mojo::Transaction::WebSocket;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
@@ -332,6 +333,24 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 is $result, 'foo bar', 'right result';
+
+# Promises
+$result = undef;
+$ua->websocket_p('/trim')->then(
+  sub {
+    my $tx      = shift;
+    my $promise = Mojo::Promise->new;
+    $tx->on(finish => sub { $promise->resolve });
+    $tx->on(message => sub { shift->finish; $result = pop });
+    $tx->send(' also works! ');
+    return $promise;
+  }
+)->wait;
+is $result, 'also works!', 'right result';
+$result = undef;
+$ua->websocket_p('/foo')->then(sub { $result = 'test failed' })
+  ->catch(sub                      { $result = shift })->wait;
+is $result, 'WebSocket handshake failed', 'right result';
 
 # Dies
 ($ws, $code, $msg) = ();

@@ -66,7 +66,7 @@ app->start;
 ## Duct tape for the HTML5 web
 
   Use all the latest Perl and HTML features in beautiful single file
-  prototypes like this one, and grow them easily into well-structured
+  prototypes like this one, and grow them easily into well-structured MVC web
   applications.
 
 ```perl

@@ -356,13 +356,15 @@ L<Mojo::DOM>.
 
   # Test login with valid credentials
   $t->post_ok('/' => form => {user => 'sebastian', pass => 'secr3t'})
-    ->status_is(200)->text_like('html body' => qr/Welcome sebastian/);
+    ->status_is(200)
+    ->text_like('html body' => qr/Welcome sebastian/);
 
   # Test accessing a protected page
   $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
 
   # Test if HTML login form shows up again after logout
-  $t->get_ok('/logout')->status_is(200)
+  $t->get_ok('/logout')
+    ->status_is(200)
     ->element_exists('form input[name="user"]')
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');
@@ -778,11 +780,13 @@ can be simplified.
     ->element_exists('form input[type="submit"]');
 
   $t->post_ok('/' => form => {user => 'sebastian', pass => 'secr3t'})
-    ->status_is(200)->text_like('html body' => qr/Welcome sebastian/);
+    ->status_is(200)
+    ->text_like('html body' => qr/Welcome sebastian/);
 
   $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
 
-  $t->get_ok('/logout')->status_is(200)
+  $t->get_ok('/logout')
+    ->status_is(200)
     ->element_exists('form input[name="user"]')
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');

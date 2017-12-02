@@ -904,6 +904,18 @@ C<mojo.*> prefix are reserved for internal use.
 
 Generate a portable L<Mojo::URL> object with base for a path, URL or route.
 
+  # Rebuild URL for the current route
+  $c->url_for;
+
+  # Rebuild URL for the current route, but replace the "name" placeholder value
+  $c->url_for(name => 'sebastian');
+
+  # Absolute URL for the current route
+  $c->url_for->to_abs;
+
+  # Build URL for route "test" with two placeholder values
+  $c->url_for('test', name => 'sebastian', foo => 'bar');
+
   # "http://127.0.0.1:3000/index.html" if application was started with Morbo
   $c->url_for('/index.html')->to_abs;
 

@@ -66,7 +66,23 @@ sub start {
   return $tx;
 }
 
-sub start_p { shift->_promise(0, @_) }
+sub start_p {
+  my ($self, $tx) = @_;
+
+  my $promise = Mojo::Promise->new;
+  $self->start(
+    $tx => sub {
+      my ($self, $tx) = @_;
+      my $err = $tx->error;
+      return $promise->reject($err->{message}) if $err && !$err->{code};
+      return $promise->reject('WebSocket handshake failed')
+        if $tx->req->is_handshake && !$tx->is_websocket;
+      $promise->resolve($tx);
+    }
+  );
+
+  return $promise;
+}
 
 sub websocket {
   my ($self, $cb) = (shift, pop);
@@ -75,7 +91,7 @@ sub websocket {
 
 sub websocket_p {
   my $self = shift;
-  return $self->_promise(1, $self->build_websocket_tx(@_));
+  return $self->start_p($self->build_websocket_tx(@_));
 }
 
 sub _cleanup {
@@ -261,24 +277,6 @@ sub _finish {
   $self->_reuse($id, $close) unless uc $old->req->method eq 'CONNECT';
   $res->error({message => $res->message, code => $res->code}) if $res->is_error;
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
-}
-
-sub _promise {
-  my ($self, $ws, $tx) = @_;
-
-  my $promise = Mojo::Promise->new;
-  $self->start(
-    $tx => sub {
-      my ($self, $tx) = @_;
-      $promise->reject('WebSocket handshake failed')
-        if $ws && !$tx->is_websocket;
-      my $err = $tx->error;
-      $promise->resolve($tx) if !$err || $err->{code};
-      $promise->reject($err->{message});
-    }
-  );
-
-  return $promise;
 }
 
 sub _read {

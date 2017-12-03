@@ -34,8 +34,8 @@
   * Fresh code based upon years of experience developing
     [Catalyst](http://www.catalystframework.org), free and open source.
   * Hundreds of 3rd party
-    [extensions](https://metacpan.org/requires/module/Mojolicious) and high
-    quality spin-off projects like the
+    [extensions](https://metacpan.org/requires/distribution/Mojolicious) and
+    high quality spin-off projects like the
     [Minion](http://mojolicious.org/perldoc/Minion) job queue.
 
 ## Installation

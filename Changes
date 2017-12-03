@@ -1,4 +1,6 @@
 
+7.59  2017-12-03
+
 7.58  2017-12-02
   - Added websocket_p method to Mojo::UserAgent.
 

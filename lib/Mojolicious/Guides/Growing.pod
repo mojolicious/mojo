@@ -150,6 +150,7 @@ organized CPAN distribution to maximize maintainability.
   |  +- MyApp                # Application namespace
   |     +- Controller        # Controller namespace
   |        +- Example.pm     # Controller class
+  |- my_app.conf             # Configuration file
   |- t                       # Test directory
   |  +- basic.t              # Random test
   |- log                     # Log directory

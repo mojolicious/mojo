@@ -13,7 +13,7 @@ use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 use constant NNR => $ENV{MOJO_NO_NNR}
   ? 0
   : eval { require Net::DNS::Native; Net::DNS::Native->VERSION('0.15'); 1 };
-my $NDN = NNR ? Net::DNS::Native->new(pool => 5, extra_thread => 1) : undef;
+my $NDN;
 
 # SOCKS support requires IO::Socket::Socks
 use constant SOCKS => $ENV{MOJO_NO_SOCKS}
@@ -45,6 +45,7 @@ sub connect {
     if !NNR || $args->{handle} || $args->{path};
 
   # Non-blocking name resolution
+  $NDN //= Net::DNS::Native->new(pool => 5, extra_thread => 1);
   my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
     {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
   $reactor->io(
@@ -63,7 +64,7 @@ sub connect {
 
 sub _cleanup {
   my $self = shift;
-  $NDN->timedout($self->{dns}) if $self->{dns};
+  $NDN->timedout($self->{dns}) if $NDN && $self->{dns};
   return unless my $reactor = $self->reactor;
   $self->{$_} && $reactor->remove(delete $self->{$_}) for qw(dns timer handle);
   return $self;

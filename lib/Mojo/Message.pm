@@ -103,7 +103,7 @@ sub fix_headers {
   if ($content->is_multipart) { $headers->remove('Content-Length') }
   elsif ($content->is_chunked || $headers->content_length) { return $self }
   if   ($content->is_dynamic) { $headers->connection('close') }
-  elsif (!$is_websocket || $size > 0) { $headers->content_length($self->body_size) }
+  elsif (!$is_websocket || $size > 0) { $headers->content_length($size) }
   else { $headers->remove('Content-Length') }
 
   return $self;

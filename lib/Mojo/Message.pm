@@ -106,8 +106,12 @@ sub fix_headers {
   }
   else {
     my $size = $self->body_size
-    if (!$is_websocket || $size > 0) { $headers->content_length($size) }
-    else { $headers->remove('Content-Length') }
+    if (!$is_websocket || $size > 0) { 
+      $headers->content_length($size) 
+    }
+    else { 
+      $headers->remove('Content-Length')
+    }
   }
   return $self;  
 }

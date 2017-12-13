@@ -101,7 +101,9 @@ sub fix_headers {
   my $is_websocket = defined $websocket;
   if ($content->is_multipart) { $headers->remove('Content-Length') }
   elsif ($content->is_chunked || $headers->content_length) { return $self }
-  if   ($content->is_dynamic) { $headers->connection('close') }
+  if ($content->is_dynamic) { 
+    $headers->connection('close') 
+  }
   else {
     my $size = $self->body_size
     if (!$is_websocket || $size > 0) { $headers->content_length($size) }

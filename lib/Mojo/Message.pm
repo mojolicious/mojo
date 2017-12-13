@@ -98,12 +98,12 @@ sub fix_headers {
   my $content = $self->content;
   my $headers = $content->headers;
   my $websocket = $headers->sec_websocket_accept;
-  my $isWebsocket = defined $websocket;
+  my $is_websocket = defined $websocket;
   my $size = $self->body_size;  
   if ($content->is_multipart) { $headers->remove('Content-Length') }
   elsif ($content->is_chunked || $headers->content_length) { return $self }
   if   ($content->is_dynamic) { $headers->connection('close') }
-  elsif (!$isWebsocket || $size > 0) { $headers->content_length($self->body_size) }
+  elsif (!$is_websocket || $size > 0) { $headers->content_length($self->body_size) }
   else { $headers->remove('Content-Length') }
 
   return $self;

@@ -104,7 +104,7 @@ sub fix_headers {
   }
   else {
     my $size = $self->body_size;
-    my $is_websocket = defined $headers->sec_websocket_version; 
+    my $is_websocket = defined $headers->sec_websocket_version || defined $headers->sec_websocket_accept; 
     if (!$is_websocket || $size > 0) {
       $headers->content_length($size) 
     }

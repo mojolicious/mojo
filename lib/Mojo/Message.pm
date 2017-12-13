@@ -99,14 +99,16 @@ sub fix_headers {
   my $headers = $content->headers;
   my $websocket = $headers->sec_websocket_accept;
   my $is_websocket = defined $websocket;
-  
   if ($content->is_multipart) { $headers->remove('Content-Length') }
   elsif ($content->is_chunked || $headers->content_length) { return $self }
   if   ($content->is_dynamic) { $headers->connection('close') }
-  elsif (!$is_websocket || (my $size = $self->body_size)) { $headers->content_length($size) }
-  else { $headers->remove('Content-Length') }
+  else {
+    my $size = $self->body_size
+    if (!$is_websocket || $size > 0) { $headers->content_length($size) }
+    else { $headers->remove('Content-Length') }
 
-  return $self;
+    return $self;
+  }
 }
 
 sub get_body_chunk {

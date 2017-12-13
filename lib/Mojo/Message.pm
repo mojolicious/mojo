@@ -97,15 +97,15 @@ sub fix_headers {
   # Content-Length or Connection (unless chunked transfer encoding is used)
   my $content = $self->content;
   my $headers = $content->headers;
-  my $websocket = $headers->sec_websocket_accept;
-  my $is_websocket = defined $websocket;
   if ($content->is_multipart) { $headers->remove('Content-Length') }
   elsif ($content->is_chunked || $headers->content_length) { return $self }
   if ($content->is_dynamic) { 
     $headers->connection('close') 
   }
   else {
-    my $size = $self->body_size
+    my $size = $self->body_size;
+    my $websocket = $headers->sec_websocket_accept;
+    my $is_websocket = defined $websocket;
     if (!$is_websocket || $size > 0) { 
       $headers->content_length($size) 
     }

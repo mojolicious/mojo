@@ -895,7 +895,7 @@ is $res->message,     'Switching Protocols', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->connection, 'Upgrade', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
-is $res->headers->content_length, 0,           'right "Content-Length" value';
+ok !defined $res->headers->content_length, '"Content-Length" value not set for websocket';
 is $res->headers->upgrade,        'websocket', 'right "Upgrade" value';
 is $res->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Accept" value';

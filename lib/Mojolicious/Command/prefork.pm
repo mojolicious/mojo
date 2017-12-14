@@ -20,12 +20,12 @@ sub run {
     'I|heartbeat-interval=i' => sub { $prefork->heartbeat_interval($_[1]) },
     'H|heartbeat-timeout=i'  => sub { $prefork->heartbeat_timeout($_[1]) },
     'i|inactivity-timeout=i' => sub { $prefork->inactivity_timeout($_[1]) },
-    'l|listen=s'   => \my @listen,
-    'P|pid-file=s' => sub { $prefork->pid_file($_[1]) },
-    'p|proxy'      => sub { $prefork->reverse_proxy(1) },
-    'r|requests=i' => sub { $prefork->max_requests($_[1]) },
-    's|spare=i'    => sub { $prefork->spare($_[1]) },
-    'w|workers=i'  => sub { $prefork->workers($_[1]) };
+    'l|listen=s'             => \my @listen,
+    'P|pid-file=s'           => sub { $prefork->pid_file($_[1]) },
+    'p|proxy'                => sub { $prefork->reverse_proxy(1) },
+    'r|requests=i'           => sub { $prefork->max_requests($_[1]) },
+    's|spare=i'              => sub { $prefork->spare($_[1]) },
+    'w|workers=i'            => sub { $prefork->workers($_[1]) };
 
   $prefork->listen(\@listen) if @listen;
   $prefork->run;

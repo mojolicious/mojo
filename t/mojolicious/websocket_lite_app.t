@@ -100,7 +100,7 @@ websocket '/one_sided' => sub {
 under '/nested';
 
 websocket sub {
-  my $c = shift;
+  my $c    = shift;
   my $echo = $c->cookie('echo') // '';
   $c->cookie(echo => 'again');
   $c->on(

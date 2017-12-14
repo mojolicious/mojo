@@ -109,7 +109,7 @@ sub _parse {
   my ($self, $name) = (shift, shift);
 
   unless ($self->{parts}) {
-    my $path = url_unescape delete($self->{path}) // '';
+    my $path    = url_unescape delete($self->{path}) // '';
     my $charset = $self->charset;
     $path = decode($charset, $path) // $path if $charset;
     $self->{leading_slash}  = $path =~ s!^/!!;

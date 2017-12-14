@@ -24,7 +24,7 @@ sub add {
     # Replace cookie
     my $origin = $cookie->origin // '';
     next unless my $domain = lc($cookie->domain // $origin);
-    next unless my $path = $cookie->path;
+    next unless my $path   = $cookie->path;
     next unless length(my $name = $cookie->name // '');
     my $jar = $self->{jar}{$domain} ||= [];
     @$jar = (grep({ _compare($_, $path, $name, $origin) } @$jar), $cookie);
@@ -45,7 +45,7 @@ sub collect {
   for my $cookie (@{$tx->res->cookies}) {
 
     # Validate domain
-    my $host = lc $url->ihost;
+    my $host   = lc $url->ihost;
     my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
     if (my $cb = $self->ignore) { next if $cb->($cookie) }
     next if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);

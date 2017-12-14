@@ -104,7 +104,7 @@ sub parse {
 
   # Relaxed parsing
   my $headers = $self->headers;
-  my $len = $headers->content_length // '';
+  my $len     = $headers->content_length // '';
   if ($self->auto_relax && !length $len) {
     my $connection = lc($headers->connection // '');
     $self->relaxed(1)

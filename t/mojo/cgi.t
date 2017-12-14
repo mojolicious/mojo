@@ -65,7 +65,7 @@ my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
 is $res->headers->status,         '200 OK', 'right "Status" value';
 is $res->headers->content_length, 21,       'right "Content-Length" value';
-is $res->headers->content_type, 'text/html;charset=UTF-8',
+is $res->headers->content_type,   'text/html;charset=UTF-8',
   'right "Content-Type" value';
 is $res->body, 'Your Mojo is working!', 'right content';
 
@@ -87,7 +87,7 @@ $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
 is $res->headers->status,         '200 OK', 'right "Status" value';
 is $res->headers->content_length, 21,       'right "Content-Length" value';
-is $res->headers->content_type, 'text/html;charset=UTF-8',
+is $res->headers->content_type,   'text/html;charset=UTF-8',
   'right "Content-Type" value';
 is $res->body, '', 'no content';
 
@@ -110,7 +110,7 @@ $res = Mojo::Message::Response->new->parse($msg);
 is $res->code, 200, 'right status';
 is $res->headers->status,         undef, 'no "Status" value';
 is $res->headers->content_length, 21,    'right "Content-Length" value';
-is $res->headers->content_type, 'text/html;charset=UTF-8',
+is $res->headers->content_type,   'text/html;charset=UTF-8',
   'right "Content-Type" value';
 is $res->body, 'Your Mojo is working!', 'right content';
 
@@ -184,7 +184,7 @@ $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
 is $res->headers->status,         '200 OK', 'right "Status" value';
 is $res->headers->content_length, 15,       'right "Content-Length" value';
-is $res->headers->content_type, 'text/html;charset=UTF-8',
+is $res->headers->content_type,   'text/html;charset=UTF-8',
   'right "Content-Type" value';
 is $res->body, '192.0.2.1:https', 'right content';
 

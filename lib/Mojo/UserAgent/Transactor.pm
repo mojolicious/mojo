@@ -68,7 +68,7 @@ sub redirect {
   my ($self, $old) = @_;
 
   # Commonly used codes
-  my $res = $old->res;
+  my $res  = $old->res;
   my $code = $res->code // 0;
   return undef unless grep { $_ == $code } 301, 302, 303, 307, 308;
 
@@ -146,7 +146,7 @@ sub websocket {
   $req->headers->sec_websocket_protocol(join ', ', @$sub) if @$sub;
 
   # Handshake protocol
-  my $url = $req->url;
+  my $url   = $req->url;
   my $proto = $url->protocol // '';
   if    ($proto eq 'ws')      { $url->scheme('http') }
   elsif ($proto eq 'wss')     { $url->scheme('https') }

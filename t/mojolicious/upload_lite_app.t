@@ -21,7 +21,7 @@ post '/upload' => sub {
   $c->render(text => $file->filename
       . $file->asset->slurp
       . $c->param('test')
-      . ($headers->content_type  // '')
+      . ($headers->content_type // '')
       . ($headers->header('X-X') // ''));
 };
 

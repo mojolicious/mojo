@@ -229,7 +229,7 @@ is $req->body, 'request=&ajax=true&login=test&password=111&'
 is $req->param('ajax'),     'true', 'right value';
 is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
-is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
+is $req->param('edition'),  'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
   'right value';
 is $req->url->to_abs->to_string, 'http://test1/index.pl/', 'right absolute URL';
 
@@ -262,7 +262,7 @@ is $req->body, 'request=&ajax=true&login=test&password=111&'
 is $req->param('ajax'),     'true', 'right value';
 is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
-is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
+is $req->param('edition'),  'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
   'right value';
 is $req->url->to_abs->to_string, 'http://test1/index.pl/', 'right absolute URL';
 

@@ -14,7 +14,7 @@ use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 has acceptors => sub { [] };
 has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
-has ioloop => sub { Mojo::IOLoop->singleton };
+has ioloop             => sub { Mojo::IOLoop->singleton };
 has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_requests => 100;
 

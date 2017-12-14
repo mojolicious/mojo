@@ -239,7 +239,7 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Missing right curly/);
 like $log, qr/Rendering template "syntaxerror.html.epl"/, 'right message';
-like $log, qr/Missing right curly/, 'right message';
+like $log, qr/Missing right curly/,                       'right message';
 like $log, qr/Template "exception.development.html.ep" not found/,
   'right message';
 like $log, qr/Rendering template "exception.html.epl"/, 'right message';

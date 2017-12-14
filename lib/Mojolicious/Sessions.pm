@@ -44,7 +44,7 @@ sub store {
 
   # Generate "expires" value from "expiration" if necessary
   my $expiration = $session->{expiration} // $self->default_expiration;
-  my $default = delete $session->{expires};
+  my $default    = delete $session->{expires};
   $session->{expires} = $default || time + $expiration
     if $expiration || $default;
 

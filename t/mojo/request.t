@@ -49,6 +49,7 @@ is $req->version,           '1.1', 'right version';
 is $req->url,               '/', 'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding line limit
 # (alternative)
@@ -64,6 +65,7 @@ is $req->version,           '1.1', 'right version';
 is $req->url,               '/', 'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 
 # Parse HTTP 1.1 message with content exceeding line limit
 $req = Mojo::Message::Request->new;
@@ -98,6 +100,7 @@ is $req->version,           '1.1', 'right version';
 is $req->url,               '/', 'right URL';
 is $req->headers->header('Foo'), undef, 'no "Foo" value';
 is $req->body, '', 'no content';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 
 # Parse broken HTTP 1.1 message with start-line exceeding line limit
 $req = Mojo::Message::Request->new;
@@ -111,6 +114,7 @@ is $req->version, '1.1', 'right version';
 is $req->url,     '',    'no URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 
 # Parse broken HTTP 1.1 message with start-line exceeding line limit
 # (alternative)
@@ -124,6 +128,7 @@ is $req->version, '1.1', 'right version';
 is $req->url,     '',    'no URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 
 # Parse pipelined HTTP 1.1 messages exceeding leftover limit
 $req = Mojo::Message::Request->new;
@@ -265,6 +270,7 @@ is $req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 is $req->headers->sec_websocket_key, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->body, '', 'no content';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 
 # Parse HTTP 1.0 start-line and headers, no body
 $req = Mojo::Message::Request->new;
@@ -1248,10 +1254,10 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
 is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection,     'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
-is $req->headers->host,           'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
+is $req->headers->connection, 'Upgrade',     'right "Connection" value';
+is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
+is $req->headers->host,       'example.com', 'right "Host" value';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
@@ -1276,10 +1282,10 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
 is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection,     'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
-is $req->headers->host,           'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
+is $req->headers->connection, 'Upgrade',     'right "Connection" value';
+is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
+is $req->headers->host,       'example.com', 'right "Host" value';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
@@ -1292,10 +1298,10 @@ is $clone->method,      'GET', 'right method';
 is $clone->version,     '1.1', 'right version';
 is $clone->url,         '/demo', 'right URL';
 is $clone->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $clone->headers->connection,   'Upgrade',     'right "Connection" value';
-is $clone->headers->upgrade,      'websocket',   'right "Upgrade" value';
-is $clone->headers->host,         'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
+is $clone->headers->connection, 'Upgrade',     'right "Connection" value';
+is $clone->headers->upgrade,    'websocket',   'right "Upgrade" value';
+is $clone->headers->host,       'example.com', 'right "Host" value';
+ok !defined $clone->headers->content_length, '"Content-Length" does not exist';
 is $clone->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $clone->headers->sec_websocket_protocol, 'sample',
@@ -1319,10 +1325,10 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
 is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection,     'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
-is $req->headers->host,           'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
+is $req->headers->connection, 'Upgrade',     'right "Connection" value';
+is $req->headers->upgrade,    'websocket',   'right "Upgrade" value';
+is $req->headers->host,       'example.com', 'right "Host" value';
+ok !defined $req->headers->content_length, '"Content-Length" does not exist';
 is $req->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',

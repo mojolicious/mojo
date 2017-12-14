@@ -112,6 +112,9 @@ sub fix_headers {
   my $headers = $self->headers;
   $headers->date(Mojo::Date->new->to_string) unless $headers->date;
 
+  # RFC 7230 3.3.2
+  $headers->remove('Content-Length') if $self->is_empty;
+
   return $self;
 }
 

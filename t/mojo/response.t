@@ -855,6 +855,7 @@ is $res->headers->sec_websocket_accept, 'abcdef=',
 is $res->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $res->body, '', 'no content';
+ok !defined $res->headers->content_length, '"Content-Length" does not exist';
 
 # Parse WebSocket handshake response (with frame)
 $res = Mojo::Message::Response->new;
@@ -879,6 +880,7 @@ is $res->headers->sec_websocket_protocol, 'sample',
 is $res->body, '', 'no content';
 is $res->content->leftovers, "\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72",
   'frame in leftovers';
+ok !defined $res->headers->content_length, '"Content-Length" does not exist';
 
 # Build WebSocket handshake response
 $res = Mojo::Message::Response->new;
@@ -895,13 +897,14 @@ is $res->message,     'Switching Protocols', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->connection, 'Upgrade', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
-is $res->headers->content_length, 0,           'right "Content-Length" value';
-is $res->headers->upgrade,        'websocket', 'right "Upgrade" value';
+ok !defined $res->headers->content_length, '"Content-Length" does not exist';
+is $res->headers->upgrade, 'websocket', 'right "Upgrade" value';
 is $res->headers->sec_websocket_accept, 'abcdef=',
   'right "Sec-WebSocket-Accept" value';
 is $res->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $res->body, '', 'no content';
+ok !defined $res->headers->content_length, '"Content-Length" does not exist';
 
 # Build and parse HTTP 1.1 response with 3 cookies
 $res = Mojo::Message::Response->new;

@@ -82,7 +82,7 @@ Mojo::IOLoop->delay(
   sub {
     my $delay = shift;
     Mojo::IOLoop->subprocess(sub {1}, $delay->begin);
-    Mojo::IOLoop->subprocess(sub {2}, $delay->begin);
+    Mojo::IOLoop->subprocess->run(sub {2}, $delay->begin);
   },
   sub {
     my ($delay, $err1, $result1, $err2, $result2) = @_;

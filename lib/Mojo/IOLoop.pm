@@ -153,7 +153,7 @@ sub stream {
 sub subprocess {
   my $subprocess = Mojo::IOLoop::Subprocess->new;
   weaken $subprocess->ioloop(_instance(shift))->{ioloop};
-  return $subprocess->run(@_);
+  return @_ ? $subprocess->run(@_) : $subprocess;
 }
 
 sub timer { shift->_timer(timer => @_) }
@@ -608,6 +608,7 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 =head2 subprocess
 
   my $subprocess = Mojo::IOLoop->subprocess(sub {...}, sub {...});
+  my $subprocess = $loop->subprocess;
   my $subprocess = $loop->subprocess(sub {...}, sub {...});
 
 Build L<Mojo::IOLoop::Subprocess> object to perform computationally expensive

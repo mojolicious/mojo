@@ -1,7 +1,9 @@
 
-7.59  2017-12-10
+7.59  2017-12-14
   - Changed Mojo::IOLoop::Client to only start a thread pool with
     Net::DNS::Native on demand. (Grinnz)
+  - Improved subprocess method in Mojo::IOLoop to allow for easier role
+    composition.
   - Fixed RFC 7230 compliance bug in Mojo::Message::Response. (jberger)
 
 7.58  2017-12-02

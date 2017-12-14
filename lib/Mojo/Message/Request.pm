@@ -77,6 +77,12 @@ sub fix_headers {
   return $self unless my $info = $proxy->userinfo;
   $headers->proxy_authorization('Basic ' . b64_encode($info, ''))
     unless $headers->proxy_authorization;
+
+  # RFC 7230 3.3.2. suggests not to send Content-Length
+  if (self->method == 'GET') {
+    $headers->remove('Content-Length')
+  }
+    
   return $self;
 }
 

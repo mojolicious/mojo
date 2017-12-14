@@ -180,10 +180,8 @@ No names outside of C<Mojolicious.pm>.
 L<Mojolicious> is open source and free to use. However, the amount of effort
 needed to maintain the project and develop new features for it is not
 sustainable without proper financial backing. You can support the ongoing
-development of L<Mojolicious> through
-L<Gratipay|https://gratipay.com/mojolicious>,
-L<PayPal|https://www.paypal.me/kraih> or Bitcoin
-(C<1Cid78CmK4hvf78Ry8K2XeDx8pQHNh4hbz>).
+development of L<Mojolicious> through L<PayPal|https://www.paypal.me/kraih> and
+Bitcoin (C<1Cid78CmK4hvf78Ry8K2XeDx8pQHNh4hbz>).
 
 If you run a business and use L<Mojolicious> in a revenue generating product, it
 makes business sense to support L<Mojolicious> development. Because it ensures

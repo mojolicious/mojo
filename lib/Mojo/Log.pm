@@ -235,6 +235,8 @@ Check active log L</"level">.
 =head2 new
 
   my $log = Mojo::Log->new;
+  my $log = Mojo::Log->new(level => 'warn');
+  my $log = Mojo::Log->new({level => 'warn'});
 
 Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with
 default logger.

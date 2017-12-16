@@ -1,5 +1,6 @@
 
-7.59  2017-12-14
+7.59  2017-12-15
+  - Moved home and ua attributes from Mojo to Mojolicious.
   - Changed Mojo::IOLoop::Client to only start a thread pool with
     Net::DNS::Native on demand. (Grinnz)
   - Improved subprocess method in Mojo::IOLoop to allow for easier role

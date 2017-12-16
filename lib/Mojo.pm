@@ -4,20 +4,11 @@ use Mojo::Base -base;
 # "Professor: These old Doomsday devices are dangerously unstable. I'll rest
 #             easier not knowing where they are."
 use Carp ();
-use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
-use Mojo::UserAgent;
 use Mojo::Util;
-use Scalar::Util ();
 
-has home => sub { Mojo::Home->new->detect(ref shift) };
-has log  => sub { Mojo::Log->new };
-has ua   => sub {
-  my $ua = Mojo::UserAgent->new;
-  Scalar::Util::weaken $ua->server->app(shift)->{app};
-  return $ua;
-};
+has log => sub { Mojo::Log->new };
 
 sub build_tx { Mojo::Transaction::HTTP->new }
 
@@ -70,17 +61,6 @@ See L<Mojolicious::Guides> for more!
 
 L<Mojo> implements the following attributes.
 
-=head2 home
-
-  my $home = $app->home;
-  $app     = $app->home(Mojo::Home->new);
-
-The home directory of your application, defaults to a L<Mojo::Home> object
-which stringifies to the actual path.
-
-  # Portably generate path relative to home directory
-  my $path = $app->home->child('data', 'important.txt');
-
 =head2 log
 
   my $log = $app->log;
@@ -90,17 +70,6 @@ The logging layer of your application, defaults to a L<Mojo::Log> object.
 
   # Log debug message
   $app->log->debug('It works');
-
-=head2 ua
-
-  my $ua = $app->ua;
-  $app   = $app->ua(Mojo::UserAgent->new);
-
-A full featured HTTP user agent for use in your applications, defaults to a
-L<Mojo::UserAgent> object.
-
-  # Perform blocking request
-  say $app->ua->get('example.com')->result->body;
 
 =head1 METHODS
 

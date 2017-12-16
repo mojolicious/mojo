@@ -66,12 +66,8 @@ is $tx->res->body, 'Hello TestApp!', 'right content';
   ok !!Mojo::Server::Daemon->new->reverse_proxy, 'reverse proxy';
 }
 
-# Optional home detection
-my @path = qw(th is mojo dir wil l never-ever exist);
-my $app = Mojo->new(home => Mojo::Home->new(@path));
-is $app->home, path(@path), 'right home directory';
-
 # Config
+my $app = Mojo->new;
 is $app->config('foo'), undef, 'no value';
 is_deeply $app->config(foo => 'bar')->config, {foo => 'bar'}, 'right value';
 is $app->config('foo'), 'bar', 'right value';

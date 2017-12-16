@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/lib";
 use Mojo::Asset::File;
 use Mojo::Date;
 use Mojo::File 'path';
+use Mojo::Home;
 use Mojo::IOLoop;
 use Mojolicious;
 use Mojolicious::Controller;
@@ -39,6 +40,11 @@ use Test::Mojo;
   local $ENV{PLACK_ENV} = 'something';
   is(Test::Mojo->new('MojoliciousTest')->app->mode, 'else', 'right mode');
 }
+
+# Optional home detection
+my @path = qw(th is mojo dir wil l never-ever exist);
+my $app = Mojolicious->new(home => Mojo::Home->new(@path));
+is $app->home, path(@path), 'right home directory';
 
 my $t = Test::Mojo->new('MojoliciousTest');
 
@@ -460,7 +466,7 @@ is(MojoliciousTest->new(mode => 'test')->mode, 'test', 'right mode');
 is(MojoliciousTest->new({mode => 'test'})->mode, 'test', 'right mode');
 
 # Persistent error
-my $app = MojoliciousTest->new;
+$app = MojoliciousTest->new;
 my $tx = $t->ua->build_tx(GET => '/foo');
 $app->handler($tx);
 is $tx->res->code, 200, 'right status';

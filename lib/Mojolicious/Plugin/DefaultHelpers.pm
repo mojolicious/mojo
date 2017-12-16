@@ -474,7 +474,7 @@ the L</"stash">.
 
   %= ua->get('mojolicious.org')->result->dom->at('title')->text
 
-Alias for L<Mojo/"ua">.
+Alias for L<Mojolicious/"ua">.
 
 =head2 url_for
 

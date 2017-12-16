@@ -4,8 +4,10 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp ();
 use Mojo::Exception;
+use Mojo::Home;
 use Mojo::Log;
 use Mojo::Util;
+use Mojo::UserAgent;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -24,6 +26,7 @@ has commands => sub {
   return $commands;
 };
 has controller_class => 'Mojolicious::Controller';
+has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {
   my $self = shift;
 
@@ -52,9 +55,14 @@ has secrets  => sub {
   # Default to moniker
   return [$self->moniker];
 };
-has sessions  => sub { Mojolicious::Sessions->new };
-has static    => sub { Mojolicious::Static->new };
-has types     => sub { Mojolicious::Types->new };
+has sessions => sub { Mojolicious::Sessions->new };
+has static   => sub { Mojolicious::Static->new };
+has types    => sub { Mojolicious::Types->new };
+has ua       => sub {
+  my $ua = Mojo::UserAgent->new;
+  Scalar::Util::weaken $ua->server->app(shift)->{app};
+  return $ua;
+};
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
@@ -405,6 +413,17 @@ Class to be used for the default controller, defaults to
 L<Mojolicious::Controller>. Note that this class needs to have already been
 loaded before the first request arrives.
 
+=head2 home
+
+  my $home = $app->home;
+  $app     = $app->home(Mojo::Home->new);
+
+The home directory of your application, defaults to a L<Mojo::Home> object
+which stringifies to the actual path.
+
+  # Portably generate path relative to home directory
+  my $path = $app->home->child('data', 'important.txt');
+
 =head2 log
 
   my $log = $app->log;
@@ -552,6 +571,17 @@ L<Mojolicious::Types> object.
 
   # Add custom MIME type
   $app->types->type(twt => 'text/tweet');
+
+=head2 ua
+
+  my $ua = $app->ua;
+  $app   = $app->ua(Mojo::UserAgent->new);
+
+A full featured HTTP user agent for use in your applications, defaults to a
+L<Mojo::UserAgent> object.
+
+  # Perform blocking request
+  say $app->ua->get('example.com')->result->body;
 
 =head2 validator
 

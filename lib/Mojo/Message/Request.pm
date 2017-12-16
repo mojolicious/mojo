@@ -72,6 +72,9 @@ sub fix_headers {
     $headers->authorization('Basic ' . b64_encode($info, ''));
   }
 
+  # RFC 7230 3.3.2
+  $headers->remove('Content-Length') if ($headers->content_length // '') eq '0';
+
   # Basic proxy authentication
   return $self unless (my $proxy = $self->proxy) && $self->via_proxy;
   return $self unless my $info = $proxy->userinfo;

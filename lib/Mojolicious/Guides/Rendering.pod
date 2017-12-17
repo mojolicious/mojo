@@ -590,12 +590,15 @@ another.
   @@ foo/bar.html.ep
   <!DOCTYPE html>
   <html>
-    %= include 'header', title => 'Howdy'
+    %= include '_header', title => 'Howdy'
     <body>Bar</body>
   </html>
 
-  @@ header.html.ep
+  @@ _header.html.ep
   <head><title><%= $title %></title></head>
+
+You can name partial templates however you like, but a leading underscore is a
+commonly used naming convention.
 
 =head2 Reusable template blocks
 

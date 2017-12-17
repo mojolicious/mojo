@@ -1,4 +1,6 @@
 
+7.60  2017-12-17
+
 7.59  2017-12-15
   - Moved home and ua attributes from Mojo to Mojolicious.
   - Changed Mojo::IOLoop::Client to only start a thread pool with

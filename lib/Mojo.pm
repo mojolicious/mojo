@@ -55,6 +55,10 @@ L<Mojolicious>. Some of the most commonly used tools are L<Mojo::UserAgent>,
 L<Mojo::DOM>, L<Mojo::JSON>, L<Mojo::Server::Daemon>, L<Mojo::Server::Prefork>,
 L<Mojo::IOLoop> and L<Mojo::Template>.
 
+The class L<Mojo> serves as an abstract base class for web frameworks like
+L<Mojolicious> and L<Mojolicious::Lite>. It provides essentials like the
+L</"log"> attribute, which web servers like L<Mojo::Server::Daemon> depend on.
+
 See L<Mojolicious::Guides> for more!
 
 =head1 ATTRIBUTES

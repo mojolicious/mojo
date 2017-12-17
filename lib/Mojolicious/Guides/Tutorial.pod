@@ -734,6 +734,36 @@ They have a higher precedence than templates in the C<DATA> section.
 
   app->start;
 
+=head2 Home
+
+You can use L<Mojolicious/"home"> to interact with the directory your
+application considers its home. This is the directory it will search for
+C<public> and C<templates> directories, but you can use it to store all sorts of
+application specific data.
+
+  $ mkdir cache
+  $ echo 'Hello World!' > cache/hello.txt
+
+There are many useful methods L<Mojo::Home> inherits from L<Mojo::File>, like
+L<Mojo::File/"child"> and L<Mojo::File/"slurp">, that will help you keep your
+application portable across many different operating systems.
+
+  use Mojolicious::Lite;
+
+  # Load message into memory
+  my $hello = app->home->child('cache', 'hello.txt')->slurp;
+
+  # Display message
+  get '/' => sub {
+    my $c = shift;
+    $c->render(text => $hello);
+  };
+
+You can also introspect your application from the command line with
+L<Mojolicious::Command::eval>.
+
+  $ ./myapp.pl eval -v 'app->home'
+
 =head2 Conditions
 
 Conditions such as C<agent> and C<host> from

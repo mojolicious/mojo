@@ -97,6 +97,13 @@ is $obj7->name,    'Joel',         'base attribute';
 is $obj7->whisper, 'psst, joel',   'method from first role';
 is $obj7->hello,   'HEY! JOEL!!!', 'method from second role';
 
+# Multiple Mojo::Base roles
+my $obj8 = Mojo::RoleTest->with_roles('+quiet', 'Mojo::RoleTest::Hello')
+  ->new(name => 'Joel');
+is $obj8->name,    'Joel',        'base attribute';
+is $obj8->whisper, 'psst, joel',  'method from first role';
+is $obj8->hello,   'hello mojo!', 'method from second role';
+
 # Classes that are not subclasses of Mojo::Base
 my $stream = Mojo::ByteStream->with_roles('Mojo::RoleTest::Hello')->new;
 is $stream->hello, 'hello mojo!', 'right result';

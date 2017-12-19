@@ -72,7 +72,6 @@ sub import {
   # Role
   elsif ($flags[0] eq '-role') {
     Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
-    eval "package $caller; use Role::Tiny; 1" or die $@;
   }
 
   # Module
@@ -82,9 +81,16 @@ sub import {
 
   # "has" and possibly ISA
   if ($flags[0]) {
-    no strict 'refs';
-    push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
     Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
+    if ($flags[0] eq '-role') {
+
+      # import of Role::Tiny must come after injecting has
+      eval "package $caller; use Role::Tiny; 1" or die $@;
+    }
+    else {
+      no strict 'refs';
+      push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
+    }
   }
 
   # Mojo modules are strict!

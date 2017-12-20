@@ -66,24 +66,18 @@ sub import {
   # Base
   if ($flags[0] eq '-base') { $flags[0] = $class }
 
-  # Strict
-  elsif ($flags[0] eq '-strict') { $flags[0] = undef }
-
   # Role
-  elsif ($flags[0] eq '-role') {
+  if ($flags[0] eq '-role') {
     Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+    Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
     eval "package $caller; use Role::Tiny; 1" or die $@;
   }
 
-  # Module
-  elsif ($flags[0] && !$flags[0]->can('new')) {
-    require(Mojo::Util::class_to_path($flags[0]));
-  }
-
-  # "has" and possibly ISA
-  if ($flags[0]) {
+  # Module and not -strict
+  elsif ($flags[0] !~ /^-/) {
     no strict 'refs';
-    push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
+    require(Mojo::Util::class_to_path($flags[0])) unless $flags[0]->can('new');
+    push @{"${caller}::ISA"}, $flags[0];
     Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
   }
 

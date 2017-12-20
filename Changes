@@ -1,5 +1,7 @@
 
-7.60  2017-12-17
+7.60  2017-12-20
+  - Fixed a bug in Mojo::Base that prevented composition of multiple roles.
+    (aferreira, batman)
 
 7.59  2017-12-15
   - Moved home and ua attributes from Mojo to Mojolicious.

@@ -39,6 +39,36 @@ is(Mojo::Date->new('1994-11-06t08:49:37.33z')->epoch,
 is(Mojo::Date->new(784111777.33)->to_datetime,
   '1994-11-06T08:49:37.33Z', 'right format');
 
+# ISO 8601
+is(Mojo::Date->new('20140820T204500')->epoch,
+  1408567500, 'right epoch value');
+is(Mojo::Date->new('20140820T204500+00')->epoch,
+  1408567500, 'right epoch value');
+is(Mojo::Date->new('20140820T214500+01')->epoch,
+  1408567500, 'right epoch value');
+is(Mojo::Date->new('20140820T221500+130')->epoch,
+  1408567500, 'right epoch value');
+is(Mojo::Date->new('2014-08-20 22:15:00.05+0130')->epoch,
+  1408567500.05, 'right epoch value');
+is(Mojo::Date->new('2014-08-20T19:15:00,06-0130')->epoch,
+  1408567500.06, 'right epoch value');
+is(Mojo::Date->new('2014-232T20:45:00')->epoch,
+  1408567500, 'right epoch value');
+is(Mojo::Date->new('2014-W34-3T20:45:00')->epoch,
+  1408567500, 'right epoch value');
+is(Mojo::Date->new('2014W343T20:45:00')->epoch,
+  1408567500, 'right epoch value');
+is(Mojo::Date->new('2014-01')->epoch,
+  1388534400, 'right epoch value');
+is(Mojo::Date->new('2014-01-01')->epoch,
+  1388534400, 'right epoch value');
+is(Mojo::Date->new('2014-01-01T00')->epoch,
+  1388534400, 'right epoch value');
+is(Mojo::Date->new('2014-01-01T00:00')->epoch,
+  1388534400, 'right epoch value');
+is(Mojo::Date->new('2014-01-01T00:00+00')->epoch,
+  1388534400, 'right epoch value');
+
 # Special cases
 is(Mojo::Date->new('Sun ,  06-Nov-1994  08:49:37  UTC')->epoch,
   784111777, 'right epoch value');

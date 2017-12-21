@@ -251,7 +251,8 @@ sub _encode_value {
   # Number
   no warnings 'numeric';
   return $value
-    if length((my $dummy = '') & $value)
+    if !utf8::is_utf8($value)
+    && length((my $dummy = '') & $value)
     && 0 + $value eq $value
     && $value * 0 == 0;
 

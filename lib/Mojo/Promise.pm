@@ -265,11 +265,17 @@ rejects, with the value or reason from that promise.
 
 Reject the promise with one or more rejection reasons.
 
+  # Generate rejected promise
+  my $promise = Mojo::Promise->new->reject('Something went wrong: Oops');
+
 =head2 resolve
 
   $promise = $promise->resolve(@value);
 
 Resolve the promise with one or more fulfillment values.
+
+  # Generate fulfilled promise
+  my $promise = Mojo::Promise->new->resolve('The result is: 24');
 
 =head2 then
 

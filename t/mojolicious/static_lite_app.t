@@ -216,6 +216,10 @@ $t->get_ok('/static.txt' => {Range => 'bytes=45-50'})->status_is(416)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->content_is('');
 
+# UTF-8 encoded inline file
+$t->get_ok('/static_utf8.txt')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("I ♥ Unicode\n");
+
 done_testing();
 
 __DATA__
@@ -224,3 +228,6 @@ Unreachable file.
 
 @@ static.txt (base64)
 dGVzdCAxMjMKbGFsYWxh
+
+@@ static_utf8.txt
+I ♥ Unicode

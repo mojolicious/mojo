@@ -121,7 +121,7 @@
     });
   });
   $(function () {
-    $('a[href^="#"]').addClass('​mojoscroll').on('click', function (e) {
+    $('a[href^="#"]').addClass('mojoscroll').on('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
       var hash   = '#' + this.href.split('#')[1];

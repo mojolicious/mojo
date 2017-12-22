@@ -6,8 +6,8 @@ use Mojo::Asset::Memory;
 use Mojo::Date;
 use Mojo::File 'path';
 use Mojo::Home;
-use Mojo::Loader 'data_section';
-use Mojo::Util 'md5_sum';
+use Mojo::Loader qw(data_section file_is_binary);
+use Mojo::Util qw(encode md5_sum);
 
 # Bundled files
 my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
@@ -137,9 +137,10 @@ sub _get_data_file {
   $self->warmup unless $self->{index};
 
   # Find file
-  return undef
-    unless defined(my $data = data_section($self->{index}{$rel}, $rel));
-  return Mojo::Asset::Memory->new->add_chunk($data);
+  my @args = ($self->{index}{$rel}, $rel);
+  return undef unless defined(my $data = data_section(@args));
+  return Mojo::Asset::Memory->new->add_chunk(
+    file_is_binary(@args) ? $data : encode 'UTF-8', $data);
 }
 
 sub _get_file {

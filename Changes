@@ -1,5 +1,7 @@
 
 7.60  2017-12-22
+  - Improved number detection in Mojo::JSON with a workaround for an upcoming
+    breaking change in Perl 5.28. (haarg)
   - Fixed a bug in Mojo::Base that prevented composition of multiple roles.
     (aferreira, batman)
   - Fixed a bug in Mojolicious::Static where text files from DATA sections would

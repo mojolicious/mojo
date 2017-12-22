@@ -1,7 +1,9 @@
 
-7.60  2017-12-20
+7.60  2017-12-22
   - Fixed a bug in Mojo::Base that prevented composition of multiple roles.
     (aferreira, batman)
+  - Fixed a bug in Mojolicious::Static where text files from DATA sections would
+    not be UTF-8 encoded. (Grinnz)
 
 7.59  2017-12-15
   - Moved home and ua attributes from Mojo to Mojolicious.

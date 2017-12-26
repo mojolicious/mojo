@@ -127,6 +127,10 @@ L<Mojo::Server::Morbo> implements the following attributes.
   $morbo      = $morbo->backend(Mojo::Server::Morbo::Backend::Poll->new);
 
 Backend, usually a L<Mojo::Server::Morbo::Backend::Poll> object.
+Control this by setting the environment variable
+C<MOJO_MORBO_BACKEND>. Its value will be appended to
+C<Mojo::Server::Morbo::Backend::>, and the class of that name needs to
+implement the L<Mojo::Server::Morbo::Backend> interface.
 
 =head2 daemon
 

@@ -1,7 +1,8 @@
 
-7.60  2017-12-22
+7.60  2017-12-27
   - Improved number detection in Mojo::JSON with a workaround for an upcoming
     breaking change in Perl 5.28. (haarg)
+  - Improved HTML Living Standard compliance of Mojo::DOM::HTML.
   - Fixed a bug in Mojo::Base that prevented composition of multiple roles.
     (aferreira, batman)
   - Fixed a bug in Mojolicious::Static where text files from DATA sections would

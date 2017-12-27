@@ -51,8 +51,9 @@ my %END = (body => 'head', optgroup => 'optgroup', option => 'option');
 
 # HTML elements that break paragraphs
 map { $END{$_} = 'p' } (
-  qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
-  qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
+  qw(address article aside blockquote details div dl fieldset figcaption),
+  qw(figure footer form h1 h2 h3 h4 h5 h6 header hgroup hr main menu nav ol p),
+  qw(pre section table ul)
 );
 
 # HTML table elements with optional end tags

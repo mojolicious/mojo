@@ -39,7 +39,9 @@ EOF
 # Start
 my $port   = Mojo::IOLoop::Server->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
-my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
+# |- means output streams untouched.  Can use `perl -Mblib t/mojo/morbo.t`
+# to watch debugging output, eg with MORBO_VERBOSE.
+my $pid    = open my $server, '|-', $^X, "-Mblib", "$prefix/morbo", '-l',
   "http://127.0.0.1:$port", $script;
 sleep 1 while !_port($port);
 

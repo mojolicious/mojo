@@ -36,7 +36,8 @@ morbo - Morbo HTTP and WebSocket development server
 
   Options:
     -b, --backend <name>           Morbo backend to use for reloading, defaults
-                                   to "Poll"
+                                   to "Poll" (you can also set environment
+                                   variable MOJO_MORBO_BACKEND for same effect)
     -h, --help                     Show this message
     -l, --listen <location>        One or more locations you want to listen on,
                                    defaults to the value of MOJO_LISTEN or

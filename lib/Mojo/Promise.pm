@@ -20,14 +20,20 @@ sub all {
   my $results   = [];
   my $remaining = scalar @promises;
   for my $i (0 .. $#promises) {
-    $promises[$i]->then(
-      sub {
-        $results->[$i] = [@_];
-        $all->resolve(@$results) if --$remaining <= 0;
-      },
-      sub { $all->reject(@_) }
-    );
+    if ($promises[$i] && blessed $promises[$i] && $promises[$i]->can('then')) {
+      $promises[$i]->then(
+        sub {
+          $results->[$i] = [@_];
+          $all->resolve(@$results) if --$remaining <= 0;
+        },
+        sub { $all->reject(@_) }
+      );
+    } else {
+      $results->[$i] = [$promises[$i]];
+      --$remaining;
+    }
   }
+  $all->resolve(@$results) if $remaining <= 0; # all non-promises
 
   return $all;
 }
@@ -214,13 +220,25 @@ the following new ones.
 
 =head2 all
 
-  my $new = Mojo::Promise->all(@promises);
+  my $new = Mojo::Promise->all(@promises_or_other);
+
+  my $new = Mojo::Promise->all('hello', Mojo::Promise->new->resolve('there'));
+  my @data;
+  $new->then(sub { @data = @_ }); # @data will be (['hello'], ['there'])
 
 Returns a new L<Mojo::Promise> object that either fulfills when all of the
-passed L<Mojo::Promise> objects have fulfilled or rejects as soon as one of them
-rejects. If the returned promise fulfills, it is fulfilled with the values from
-the fulfilled promises in the same order as the passed promises. This method can
-be useful for aggregating results of multiple promises.
+passed arguments have fulfilled, or rejects as soon as one of them rejects.
+Any of the arguments that are not "then-able" (do not have a C<then>
+method) will be treated as though they are promises that have fulfilled
+immediately with that value.
+
+If the returned promise fulfills, it is fulfilled with the values from
+the fulfilled promises in the same order as the passed promises.
+The values from each fulfilled promise are within an array-ref, so that
+there are the same number of arguments to the returned promise's C<then>
+as there were arguments to C<all>.
+
+This method can be useful for aggregating results of multiple promises.
 
 =head2 catch
 

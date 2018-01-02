@@ -15,7 +15,7 @@ sub all {
     and deprecated 'Use of Mojo::Promise::all as instance method is DEPRECATED'
     if ref $class;
 
-  my $all = $promises[0]->_clone;
+  my $all = $class->new;
 
   my $results   = [];
   my $remaining = scalar @promises;
@@ -54,7 +54,7 @@ sub race {
     and deprecated 'Use of Mojo::Promise::race as instance method is DEPRECATED'
     if ref $class;
 
-  my $new = $promises[0]->_clone;
+  my $new = $class->new;
   $_->then(sub { $new->resolve(@_) }, sub { $new->reject(@_) }) for @promises;
 
   return $new;

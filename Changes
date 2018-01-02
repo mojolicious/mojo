@@ -2,6 +2,8 @@
 7.60  2018-01-02
   - Deprecated use of Mojo::Promise::all and Mojo::Promise::race as instance
     methods.
+  - Improved all and race methods in Mojo::Promise to be able to handle
+    arbitrary then-ables.
   - Improved number detection in Mojo::JSON with a workaround for an upcoming
     breaking change in Perl 5.28. (haarg)
   - Improved HTML Living Standard compliance of Mojo::DOM::HTML.

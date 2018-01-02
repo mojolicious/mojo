@@ -150,7 +150,7 @@ $promise  = Mojo::Promise->new->then(sub {@_});
 $promise2 = Mojo::Promise->new->then(sub {@_});
 $promise3 = Mojo::Promise->new->then(sub {@_});
 (@results, @errors) = ();
-$promise->race($promise2, $promise3)
+Mojo::Promise->race($promise, $promise2, $promise3)
   ->then(sub { @results = @_ }, sub { @errors = @_ });
 $promise2->reject('second');
 $promise3->resolve('third');
@@ -176,7 +176,7 @@ $promise  = Mojo::Promise->new->then(sub {@_});
 $promise2 = Mojo::Promise->new->then(sub {@_});
 $promise3 = Mojo::Promise->new->then(sub {@_});
 (@results, @errors) = ();
-$promise->all($promise2, $promise3)
+Mojo::Promise->all($promise, $promise2, $promise3)
   ->then(sub { @results = @_ }, sub { @errors = @_ });
 $promise2->resolve('second');
 $promise3->reject('third');

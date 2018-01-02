@@ -136,7 +136,7 @@ is $body,    'works!', 'right content';
 my @results;
 my $p1 = $ua->get_p('/');
 my $p2 = $ua->get_p('/');
-$p1->all($p2)->then(
+Mojo::Promise->all($p1, $p2)->then(
   sub {
     my ($first, $second) = @_;
     push @results, $first, $second;

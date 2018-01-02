@@ -11,7 +11,7 @@ my $delay  = Mojo::IOLoop::Delay->new->then(sub {@_});
 my $delay2 = Mojo::IOLoop::Delay->new->then(sub {@_});
 my $delay3 = Mojo::IOLoop::Delay->new->then(sub {@_});
 my @results;
-$delay->all($delay2, $delay3)->then(sub { @results = @_ });
+Mojo::Promise->all($delay, $delay2, $delay3)->then(sub { @results = @_ });
 $delay2->resolve('second');
 $delay3->resolve('third');
 $delay->resolve('first');

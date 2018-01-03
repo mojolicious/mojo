@@ -1,5 +1,7 @@
 
 7.61  2018-01-03
+  - Un-deprecated use of Mojo::Promise::all and Mojo::Promise::race as instance
+    methods.
 
 7.60  2018-01-02
   - Deprecated use of Mojo::Promise::all and Mojo::Promise::race as instance

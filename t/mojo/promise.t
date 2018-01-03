@@ -145,7 +145,7 @@ $promise->resolve('first');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['second'], 'promises resolved';
 
-# Rejected race
+# Rejected race, class method
 $promise  = Mojo::Promise->new->then(sub {@_});
 $promise2 = Mojo::Promise->new->then(sub {@_});
 $promise3 = Mojo::Promise->new->then(sub {@_});
@@ -159,12 +159,38 @@ Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promises not resolved';
 is_deeply \@errors, ['second'], 'promise rejected';
 
-# All
+# Rejected race, instance method
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+(@results, @errors) = ();
+$promise->race($promise2, $promise3)
+  ->then(sub { @results = @_ }, sub { @errors = @_ });
+$promise2->reject('second');
+$promise3->resolve('third');
+$promise->resolve('first');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [], 'promises not resolved';
+is_deeply \@errors, ['second'], 'promise rejected';
+
+# All, class method
 $promise  = Mojo::Promise->new->then(sub {@_});
 $promise2 = Mojo::Promise->new->then(sub {@_});
 $promise3 = Mojo::Promise->new->then(sub {@_});
 @results  = ();
 Mojo::Promise->all($promise, $promise2, $promise3)->then(sub { @results = @_ });
+$promise2->resolve('second');
+$promise3->resolve('third');
+$promise->resolve('first');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [['first'], ['second'], ['third']], 'promises resolved';
+
+# All, instance method
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+@results  = ();
+$promise->all($promise2, $promise3)->then(sub { @results = @_ });
 $promise2->resolve('second');
 $promise3->resolve('third');
 $promise->resolve('first');

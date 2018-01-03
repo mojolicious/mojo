@@ -207,12 +207,10 @@ is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
 
 # Failed TLS handshake through proxy
 my $close = Mojo::IOLoop->acceptor(
-  Mojo::IOLoop->server(
-    sub {
-      my ($loop, $stream) = @_;
-      $stream->on(read => sub { shift->close });
-    }
-  )
+  Mojo::IOLoop->server(sub {
+    my ($loop, $stream) = @_;
+    $stream->on(read => sub { shift->close });
+  })
 )->port;
 $id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
   {address => '127.0.0.1', port => $close});

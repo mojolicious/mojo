@@ -65,12 +65,10 @@ sub suspended {
   my $self = shift;
 
   $self->res->headers->append('X-Suspended' => $self->match->position);
-  Mojo::IOLoop->next_tick(
-    sub {
-      $self->res->headers->append('X-Suspended' => $self->match->position);
-      $self->continue;
-    }
-  );
+  Mojo::IOLoop->next_tick(sub {
+    $self->res->headers->append('X-Suspended' => $self->match->position);
+    $self->continue;
+  });
 
   return 0;
 }

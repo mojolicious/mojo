@@ -17,7 +17,7 @@ $content = Mojo::Content::Single->new(
 ok !$content->body_contains('foo'), 'content does not contain "foo"';
 ok $content->body_contains('bar'), 'content contains "bar"';
 $content = Mojo::Content::Single->new(
-  {asset => Mojo::Asset::Memory->new->add_chunk('foo')});
+{asset => Mojo::Asset::Memory->new->add_chunk('foo')});
 ok !$content->body_contains('bar'), 'content does not contain "bar"';
 ok $content->body_contains('foo'), 'content contains "foo"';
 

@@ -522,8 +522,9 @@ is $m->path_for->{path}, '/wildcards/3/hello/there/foo', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/wildcards/4/hello/there/foo'});
 is_deeply $m->stack,
-  [{controller => 'somewhat', action => 'dangerous', wildcard => 'hello/there'}
-  ], 'right structure';
+  [
+{controller => 'somewhat', action => 'dangerous', wildcard => 'hello/there'}],
+  'right structure';
 is $m->path_for->{path}, '/wildcards/4/hello/there/foo', 'right path';
 
 # Special characters
@@ -535,10 +536,8 @@ is_deeply $m->stack,
 is $m->path_for->{path}, '/wildcards/1/♥', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/wildcards/1/http://www.google.com'});
-@stack
-  = (
-  {controller => 'wild', action => 'card', wildcard => 'http://www.google.com'}
-  );
+@stack = (
+{controller => 'wild', action => 'card', wildcard => 'http://www.google.com'});
 is_deeply $m->stack, \@stack, 'right structure';
 is $m->path_for->{path}, '/wildcards/1/http://www.google.com', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);

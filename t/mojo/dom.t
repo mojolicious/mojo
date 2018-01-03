@@ -2066,21 +2066,17 @@ $dom->parse(<<EOF);
 </c>
 EOF
 my @results;
-$dom->find('b')->each(
-  sub {
-    $_->find('a')->each(sub { push @results, $_->text });
-  }
-);
+$dom->find('b')->each(sub {
+  $_->find('a')->each(sub { push @results, $_->text });
+});
 is_deeply \@results, [qw(bar baz yada)], 'right results';
 @results = ();
 $dom->find('a')->each(sub { push @results, $_->text });
 is_deeply \@results, [qw(foo bar baz yada)], 'right results';
 @results = ();
-$dom->find('b')->each(
-  sub {
-    $_->find('c a')->each(sub { push @results, $_->text });
-  }
-);
+$dom->find('b')->each(sub {
+  $_->find('c a')->each(sub { push @results, $_->text });
+});
 is_deeply \@results, [qw(baz yada)], 'right results';
 is $dom->at('b')->at('a')->text, 'bar', 'right text';
 is $dom->at('c > b > a')->text, 'bar', 'right text';

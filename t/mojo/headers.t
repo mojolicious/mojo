@@ -205,7 +205,7 @@ is_deeply $headers->to_hash(1),
 # Multiple headers with the same name
 $headers = Mojo::Headers->new;
 $headers->from_hash(
-  {'X-Test' => [23, 24], 'X-Test2' => 'foo', Connection => ['a', 'b']});
+{'X-Test' => [23, 24], 'X-Test2' => 'foo', Connection => ['a', 'b']});
 $hash = $headers->to_hash;
 is $hash->{'X-Test'},  '23, 24', 'right value';
 is $hash->{'X-Test2'}, 'foo',    'right value';

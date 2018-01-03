@@ -145,6 +145,23 @@ $promise->resolve('first');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['second'], 'promises resolved';
 
+# Race with a non-Promise
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+@results  = ();
+Mojo::Promise->race($promise2, 'first', $promise3)
+  ->then(sub { @results = @_ });
+$promise2->resolve('second');
+$promise3->resolve('third');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['first'], 'promises resolved';
+
+# Race with all non-Promises
+@results  = ();
+Mojo::Promise->race('first', 'second', 'third')->then(sub { @results = @_ });
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['first'], 'promises resolved';
+
 # Rejected race
 $promise  = Mojo::Promise->new->then(sub {@_});
 $promise2 = Mojo::Promise->new->then(sub {@_});

@@ -61,6 +61,10 @@ sub race {
     if ref $class;
 
   my $new = $class->new;
+  # make Promise of non-Promise so don't unfairly beat already-settled Promise
+  @promises = map {
+    ($_ && blessed $_ && $_->can('then')) ? $_ : $class->new->resolve($_)
+  } @promises;
   $_->then(sub { $new->resolve(@_) }, sub { $new->reject(@_) }) for @promises;
 
   return $new;
@@ -284,8 +288,10 @@ reason.
   my $new = Mojo::Promise->race(@promises);
 
 Returns a new L<Mojo::Promise> object that fulfills or rejects as soon as one of
-the passed L<Mojo::Promise> objects fulfills or rejects, with the value or
-reason from that promise.
+the passed arguments fulfills or rejects, with the value or reason from that
+promise. Any of the arguments that are not "then-able" (do not have a C<then>
+method) will be treated as though they are promises that have fulfilled
+immediately with that value.
 
 =head2 reject
 

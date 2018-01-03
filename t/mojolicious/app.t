@@ -70,7 +70,7 @@ is $t->app->static->file('does_not_exist.html'), undef, 'no file';
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 is $t->app->secrets->[0], $t->app->moniker, 'secret defaults to moniker';
 is $t->app->renderer->template_handler(
-{template => 'foo/bar/index', format => 'html'}), 'epl', 'right handler';
+  {template => 'foo/bar/index', format => 'html'}), 'epl', 'right handler';
 is $t->app->build_controller->req->url, '', 'no URL';
 is $t->app->build_controller->render_to_string('does_not_exist'), undef,
   'no result';

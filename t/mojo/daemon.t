@@ -298,10 +298,12 @@ my @accepting;
 $acceptor->on(
   accept => sub {
     my $acceptor = shift;
-    $loop->next_tick(sub {
-      push @accepting, $acceptor->is_accepting;
-      shift->stop if @accepting == 2;
-    });
+    $loop->next_tick(
+      sub {
+        push @accepting, $acceptor->is_accepting;
+        shift->stop if @accepting == 2;
+      }
+    );
   }
 );
 $loop->client({port => $acceptor->port} => sub { }) for 1 .. 2;

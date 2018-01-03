@@ -34,11 +34,13 @@ under('/missing' => sub {1})->route->to('does_not_exist#not_at_all');
 under '/suspended' => sub {
   my $c = shift;
 
-  Mojo::IOLoop->next_tick(sub {
-    return $c->render(text => 'stopped!') unless $c->param('ok');
-    $c->stash(suspended => 'suspended!');
-    $c->continue;
-  });
+  Mojo::IOLoop->next_tick(
+    sub {
+      return $c->render(text => 'stopped!') unless $c->param('ok');
+      $c->stash(suspended => 'suspended!');
+      $c->continue;
+    }
+  );
 
   return 0;
 };

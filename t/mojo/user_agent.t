@@ -136,10 +136,12 @@ is $body,    'works!', 'right content';
 my @results;
 my $p1 = $ua->get_p('/');
 my $p2 = $ua->get_p('/');
-Mojo::Promise->all($p1, $p2)->then(sub {
-  my ($first, $second) = @_;
-  push @results, $first, $second;
-})->wait;
+Mojo::Promise->all($p1, $p2)->then(
+  sub {
+    my ($first, $second) = @_;
+    push @results, $first, $second;
+  }
+)->wait;
 ok $results[0][0]->success, 'successful';
 is $results[0][0]->res->code, 200,      'right status';
 is $results[0][0]->res->body, 'works!', 'right content';
@@ -605,14 +607,16 @@ is $tx->res->body, 'works!', 'right content';
 $ua->get(
   '/' => sub {
     push @kept_alive, pop->kept_alive;
-    Mojo::IOLoop->next_tick(sub {
-      $ua->get(
-        '/' => sub {
-          push @kept_alive, pop->kept_alive;
-          Mojo::IOLoop->next_tick(sub { Mojo::IOLoop->stop });
-        }
-      );
-    });
+    Mojo::IOLoop->next_tick(
+      sub {
+        $ua->get(
+          '/' => sub {
+            push @kept_alive, pop->kept_alive;
+            Mojo::IOLoop->next_tick(sub { Mojo::IOLoop->stop });
+          }
+        );
+      }
+    );
   }
 );
 Mojo::IOLoop->start;

@@ -336,14 +336,16 @@ is $result, 'foo bar', 'right result';
 
 # Promises
 $result = undef;
-$ua->websocket_p('/trim')->then(sub {
-  my $tx      = shift;
-  my $promise = Mojo::Promise->new;
-  $tx->on(finish => sub { $promise->resolve });
-  $tx->on(message => sub { shift->finish; $result = pop });
-  $tx->send(' also works! ');
-  return $promise;
-})->wait;
+$ua->websocket_p('/trim')->then(
+  sub {
+    my $tx      = shift;
+    my $promise = Mojo::Promise->new;
+    $tx->on(finish => sub { $promise->resolve });
+    $tx->on(message => sub { shift->finish; $result = pop });
+    $tx->send(' also works! ');
+    return $promise;
+  }
+)->wait;
 is $result, 'also works!', 'right result';
 $result = undef;
 $ua->websocket_p('/foo')->then(sub { $result = 'test failed' })

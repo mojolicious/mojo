@@ -1,5 +1,7 @@
 
-7.61  2018-01-03
+7.61  2018-01-08
+  - Increased default upgrade_timeout from 60 to 180 seconds in
+    Mojo::Server::Hypnotoad.
 
 7.60  2018-01-02
   - Deprecated use of Mojo::Promise::all and Mojo::Promise::race as instance

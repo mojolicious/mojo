@@ -10,7 +10,7 @@ use Mojo::Util 'steady_time';
 use Scalar::Util 'weaken';
 
 has prefork => sub { Mojo::Server::Prefork->new(listen => ['http://*:8080']) };
-has upgrade_timeout => 60;
+has upgrade_timeout => 180;
 
 sub configure {
   my ($self, $name) = @_;
@@ -352,7 +352,7 @@ drastically reducing the performance cost of worker restarts.
   upgrade_timeout => 45
 
 Maximum amount of time in seconds a zero downtime software upgrade may take
-before getting canceled, defaults to C<60>.
+before getting canceled, defaults to C<180>.
 
 =head2 workers
 

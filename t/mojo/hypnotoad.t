@@ -33,7 +33,7 @@ use Mojo::UserAgent;
     upgrade_timeout    => 45,
     workers            => 7
   };
-  is $hypnotoad->upgrade_timeout, 60, 'right default';
+  is $hypnotoad->upgrade_timeout, 180, 'right default';
   $hypnotoad->configure('test');
   is_deeply $hypnotoad->prefork->listen, ['http://*:8080'], 'right value';
   $hypnotoad->configure('myserver');
@@ -259,7 +259,7 @@ sleep 1 while _port($port2);
 # Check log
 $log = $log->slurp;
 like $log, qr/Worker \d+ started/, 'right message';
-like $log, qr/Starting zero downtime software upgrade \(60 seconds\)/,
+like $log, qr/Starting zero downtime software upgrade \(180 seconds\)/,
   'right message';
 like $log, qr/Upgrade successful, stopping $old/, 'right message';
 

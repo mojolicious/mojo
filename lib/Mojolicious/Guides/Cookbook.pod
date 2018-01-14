@@ -154,7 +154,7 @@ configuration file like this.
   [Service]
   Type=simple
   ExecStart=/home/sri/myapp/script/my_app prefork -m production -l http://*:8080
-  KillMode=process
+  KillMode=control-group
 
   [Install]
   WantedBy=multi-user.target

@@ -383,7 +383,7 @@ L<Mojo::Server::Prefork> object this server manages.
   $hypnotoad  = $hypnotoad->upgrade_timeout(15);
 
 Maximum amount of time in seconds a zero downtime software upgrade may take
-before getting canceled, defaults to C<60>.
+before getting canceled, defaults to C<180>.
 
 =head1 METHODS
 

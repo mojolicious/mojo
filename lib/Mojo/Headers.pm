@@ -144,7 +144,9 @@ sub to_string {
   # Make sure multi-line values are formatted correctly
   my @headers;
   for my $name (@{$self->names}) {
-    push @headers, "$name: $_" for @{$self->{headers}{lc $name}};
+    for my $head (@{$self->{headers}{lc $name}}) {
+      push @headers, "$name: $head" if $head;
+    }
   }
 
   return join "\x0d\x0a", @headers;

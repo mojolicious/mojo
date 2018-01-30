@@ -65,6 +65,74 @@ connections concurrently.
 
 In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
+=head2 Reverse Proxy
+
+A I<reverse proxy> is a server that is put in front of your application and acts
+as the frontend facing clients. It can provide a lot of benefits, like
+protecting your application in the backend, balancing load across multiple
+instances, or supporting several backend applications from the same IP/port.
+
+   .               ..........................................
+                   :                                        :                        
+                   :                       +-------------+  :                        
+                   :  +------------+      +-------------+|  :
+   +--------+      :  |            |      |             ||  :
+   |        |-------->|  reverse   |----->| Mojolicious ||  :
+   | client |      :  |   proxy    |      | application ||  :
+   |        |<--------|            |<-----|             ||  :
+   +--------+      :  | (frontend) |      |  (backend)  ||  :
+                   :  |            |      |             |+  :
+                   :  +------------+      +-------------+   :                       
+                   :                                        :
+                   .. system boundary (e.g. same host) ......
+
+In this setup, your application will receive requests from the reverse proxy
+instead of the original client; additionally, the address/hostname where your
+application lives internally will be usually different from the one accessed
+externally. Last, it might even be the case that the reverse proxy exposes
+services via HTTPS, while contacting the Mojolicious application via plaintext
+HTTP.
+
+As an example, compare a sample request from the client against what arrives to
+the Mojolicious application:
+
+   client                 reverse proxy (frontend)           Mojolicious app
+    __|__              _______________|______________             ____|____
+   /     \            /                              \           /         \
+   1.2.3.4 --HTTPS--> api.example.com      10.20.30.39 --HTTP--> 10.20.30.40
+
+   GET /foo/1 HTTP/1.1                |    GET /foo/1 HTTP/1.1
+   Host: api.example.com              |    Host: 10.20.30.40
+   User-Agent: Mojolicious (Perl)     |    User-Agent: ShinyProxy/1.2
+   ...                                |    ...
+
+You're losing the client's address (e.g. useful for analytics, or Geo-IP) and if
+the application generates URLs via L<Mojolicious::Controller/"url_for">, the
+result will be like this:
+
+   http://10.20.30.40/bar/2
+
+instead of something I<meaningful for the client>, like this:
+
+   https://api.example.com/bar/2
+
+To solve these problems you can:
+
+=over
+
+=item *
+
+configure your reverse proxy to send the missing data (see L</Nginx> and
+L</"Apache/mod_proxy">) and tell your application about it, usually setting the
+environment variable C<MOJO_REVERSE_PROXY=1>; OR
+
+=item *
+
+do-it-yourself like suggested in L</Rewriting>.
+
+=back
+
+
 =head1 DEPLOYMENT
 
 Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on

@@ -1,5 +1,6 @@
 
-7.62  2018-01-15
+7.62  2018-02-01
+  - Fixed a promise resolution bug in Mojo::Promise.
 
 7.61  2018-01-08
   - Increased default upgrade_timeout from 60 to 180 seconds in

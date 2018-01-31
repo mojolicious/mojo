@@ -185,4 +185,21 @@ Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promises not resolved';
 is_deeply \@errors, ['third'], 'promise rejected';
 
+# Settle with promise
+$promise  = Mojo::Promise->new->resolve('works');
+@results  = ();
+$promise2 = Mojo::Promise->new->resolve($promise)
+  ->then(sub { push @results, 'first', @_; @_ });
+$promise2->then(sub { push @results, 'second', @_ });
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['first', 'works', 'second', 'works'], 'promises resolved';
+$promise  = Mojo::Promise->new->reject('works too');
+@errors   = ();
+$promise2 = Mojo::Promise->new->reject($promise)
+  ->catch(sub { push @errors, 'first', @_; @_ });
+$promise2->then(sub { push @errors, 'second', @_ });
+Mojo::IOLoop->one_tick;
+is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
+  'promises rejected';
+
 done_testing();

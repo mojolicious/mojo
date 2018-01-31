@@ -2,9 +2,9 @@ package Mojo::Cookie::Response;
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;
-use Mojo::Util qw(quote split_cookie_header);
+use Mojo::Util qw(quote split_cookie_header deprecated);
 
-has [qw(domain expires httponly max_age origin path secure)];
+has [qw(domain expires httponly max_age host_only path secure)];
 
 my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
 
@@ -24,6 +24,7 @@ sub parse {
       $value = 1 if $attr eq 'secure' || $attr eq 'httponly';
       $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr} = $value;
     }
+    $cookies[-1]->host_only(1) unless $cookies[-1]{domain};
   }
 
   return \@cookies;
@@ -57,6 +58,12 @@ sub to_string {
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
 
   return $cookie;
+}
+
+sub origin {
+  deprecated 'Mojo::Cookie::Response::origin is DEPRECATED'
+    . ' in favor of Mojo::Cookie::Response::domain';
+  shift->attr('origin', @_);
 }
 
 1;
@@ -121,6 +128,14 @@ Max age for cookie.
   $cookie    = $cookie->origin('mojolicious.org');
 
 Origin of the cookie.
+
+=head2 host_only
+
+  my $hostonly = $cookie->host_only;
+  $hostonly    = $cookie->host_only($bool);
+
+Host-only flag, which is set if the cookie's domain should be inferred
+from the request-host
 
 =head2 path
 

@@ -144,6 +144,7 @@ Mojolicious::Command::get - Get command
     mojo get mojolicious.org
     mojo get -v -r -o 25 -i 50 google.com
     mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicious.org
+    mojo get -u 'sri:s3cret' https://mojolicious.org
     mojo get mojolicious.org > example.html
     mojo get -M PUT mojolicious.org < example.html
     mojo get -f 'q=Mojolicious' -f 'size=5' https://metacpan.org/search

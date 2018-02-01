@@ -1,5 +1,6 @@
 
 7.62  2018-02-01
+  - Added dont_use_nlink option to list_tree method in Mojo::File.
   - Fixed a promise resolution bug in Mojo::Promise.
 
 7.61  2018-01-08

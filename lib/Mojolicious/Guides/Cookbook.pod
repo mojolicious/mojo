@@ -92,8 +92,8 @@ instances, or supporting several applications through the same IP/port.
 This setup introduces some problems, though: the application will receive
 requests from the reverse proxy instead of the original client; the
 address/hostname where your application lives internally will be different from
-the one visible from the outside; if terminating SSL, the reverse proxy exposes
-services via HTTPS, while using HTTP towards the Mojolicious application.
+the one visible from the outside; and if terminating SSL, the reverse proxy exposes
+services via HTTPS while using HTTP towards the Mojolicious application.
 
 As an example, compare a sample request from the client and what the Mojolicious
 application receives:
@@ -108,8 +108,8 @@ application receives:
    User-Agent: Mojolicious (Perl)     |    User-Agent: ShinyProxy/1.2
    ...                                |    ...
 
-The client address is no longer available (it might be useful for analytics, or
-Geo-IP) and URLs generated via L<Mojolicious::Controller/"url_for"> will be like
+However, now the client address is no longer available (which might be useful for analytics or
+Geo-IP), and URLs generated via L<Mojolicious::Controller/"url_for"> will look like
 this:
 
    http://10.20.30.40/bar/2
@@ -130,7 +130,7 @@ environment variable C<MOJO_REVERSE_PROXY=1>; OR
 
 =item *
 
-do it yourself like suggested in L</Rewriting>.
+do it yourself as suggested in L</Rewriting>.
 
 =back
 

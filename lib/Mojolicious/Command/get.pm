@@ -3,8 +3,9 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::DOM;
 use Mojo::IOLoop;
-use Mojo::JSON qw(encode_json j);
+use Mojo::JSON qw(to_json j);
 use Mojo::JSON::Pointer;
+use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode getopt);
 use Scalar::Util 'weaken';
@@ -31,6 +32,7 @@ sub run {
     'o|connect-timeout=i' => sub { $ua->connect_timeout($_[1]) },
     'r|redirect'          => \my $redirect,
     'S|response-size=i'   => sub { $ua->max_response_size($_[1]) },
+    'u|user=s'            => \my $user,
     'v|verbose'           => \my $verbose;
 
   @args = map { decode 'UTF-8', $_ } @args;
@@ -42,6 +44,7 @@ sub run {
 
   # Detect proxy for absolute URLs
   $url !~ m!^/! ? $ua->proxy->detect : $ua->server->app($self->app);
+  $url = Mojo::URL->new($url)->userinfo($user) if $user;
   $ua->max_redirects(10) if $redirect;
 
   my $buffer = '';
@@ -88,8 +91,7 @@ sub _header { $_[0]->build_start_line, $_[0]->headers->to_string, "\n\n" }
 sub _json {
   return unless my $data = j(shift);
   return unless defined($data = Mojo::JSON::Pointer->new($data)->get(shift));
-  return _say($data) unless ref $data eq 'HASH' || ref $data eq 'ARRAY';
-  say encode_json($data);
+  _say(ref $data eq 'HASH' || ref $data eq 'ARRAY' ? to_json($data) : $data);
 }
 
 sub _say { length && say encode('UTF-8', $_) for @_ }
@@ -176,6 +178,8 @@ Mojolicious::Command::get - Get command
     -r, --redirect                       Follow up to 10 redirects
     -S, --response-size <size>           Maximum response size in bytes,
                                          defaults to 2147483648 (2GiB)
+    -u, --user <userinfo>                Alternate mechanism for specifying
+                                         colon-separated username and password
     -v, --verbose                        Print request and response headers to
                                          STDERR
 

@@ -92,8 +92,8 @@ instances, or supporting several applications through the same IP/port.
 This setup introduces some problems, though: the application will receive
 requests from the reverse proxy instead of the original client; the
 address/hostname where your application lives internally will be different from
-the one visible from the outside; if terminating SSL, the reverse proxy exposes
-services via HTTPS, while using HTTP towards the Mojolicious application.
+the one visible from the outside; and if terminating SSL, the reverse proxy
+exposes services via HTTPS while using HTTP towards the Mojolicious application.
 
 As an example, compare a sample request from the client and what the Mojolicious
 application receives:
@@ -105,12 +105,12 @@ application receives:
 
    GET /foo/1 HTTP/1.1                |    GET /foo/1 HTTP/1.1
    Host: api.example.com              |    Host: 10.20.30.40
-   User-Agent: Mojolicious (Perl)     |    User-Agent: ShinyProxy/1.2
+   User-Agent: Firefox                |    User-Agent: ShinyProxy/1.2
    ...                                |    ...
 
-The client address is no longer available (it might be useful for analytics, or
-Geo-IP) and URLs generated via L<Mojolicious::Controller/"url_for"> will be like
-this:
+However, now the client address is no longer available (which might be useful
+for analytics, or Geo-IP) and URLs generated via
+L<Mojolicious::Controller/"url_for"> will look like this:
 
    http://10.20.30.40/bar/2
 
@@ -118,22 +118,11 @@ instead of something meaningful for the client, like this:
 
    https://api.example.com/bar/2
 
-To solve these problems you can:
-
-=over
-
-=item *
-
-configure your reverse proxy to send the missing data (see L</Nginx> and
-L</"Apache/mod_proxy">) and tell your application about it, usually setting the
-environment variable C<MOJO_REVERSE_PROXY=1>; OR
-
-=item *
-
-do it yourself like suggested in L</Rewriting>.
-
-=back
-
+To solve these problems, you can configure your reverse proxy to send the
+missing data (see L</Nginx> and L</"Apache/mod_proxy">) and tell your
+application about it setting the environment variable C<MOJO_REVERSE_PROXY>. For
+finer control, L</Rewriting> includes examples of how the changes could be
+implemented manually.
 
 =head1 DEPLOYMENT
 

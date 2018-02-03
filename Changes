@@ -2,6 +2,7 @@
 7.62  2018-02-01
   - Added -u option to get command. (jberger)
   - Added dont_use_nlink option to list_tree method in Mojo::File.
+  - Added reverse proxy section to Mojolicious::Guides::Cookbook. (polettix)
   - Fixed a promise resolution bug in Mojo::Promise.
 
 7.61  2018-01-08

@@ -75,17 +75,16 @@ limiting the number of concurrent open sockets towards the Mojolicious
 application (or even using Unix sockets), balancing load across multiple
 instances, or supporting several applications through the same IP/port.
 
-   .               ...........................................
-                   :                                         :
-                   :                      +---------------+  :
-   +--------+      :  +-----------+      +---------------+|  :
-   |        |-------->|           |      |               ||  :
-   | client |      :  |  reverse  |----->|  Mojolicious  ||  :
-   |        |<--------|   proxy   |      |  application  ||  :
-   +--------+      :  |           |<-----|               ||  :
-                   :  +-----------+      +---------------+   :
-                   :                                         :
-                   .. system boundary (e.g. same host) .......
+                   ..........................................
+                   :                                        :
+   +--------+      :  +-----------+      +---------------+  :
+   |        |-------->|           |      |               |  :
+   | client |      :  |  reverse  |----->|  Mojolicious  |  :
+   |        |<--------|   proxy   |      |  application  |  :
+   +--------+      :  |           |<-----|               |  :
+                   :  +-----------+      +---------------+  :
+                   :                                        :
+                   .. system boundary (e.g. same host) ......
 
 This setup introduces some problems, though: the application will receive
 requests from the reverse proxy instead of the original client; the

@@ -65,7 +65,7 @@ connections concurrently.
 
 In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
-=head2 Reverse Proxy
+=head2 Reverse proxy
 
 A reverse proxy architecture is a deployment technique used in many production
 environments, where a I<reverse proxy> server is put in front of your

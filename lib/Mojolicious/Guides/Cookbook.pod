@@ -117,8 +117,8 @@ instead of something meaningful for the client, like this:
 
 To solve these problems, you can configure your reverse proxy to send the
 missing data (see L</Nginx> and L</"Apache/mod_proxy">) and tell your
-application about it setting the environment variable C<MOJO_REVERSE_PROXY>. For
-finer control, L</Rewriting> includes examples of how the changes could be
+application about it by setting the environment variable C<MOJO_REVERSE_PROXY>.
+For finer control, L</Rewriting> includes examples of how the changes could be
 implemented manually.
 
 =head1 DEPLOYMENT

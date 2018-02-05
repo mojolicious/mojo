@@ -39,6 +39,36 @@ is(Mojo::Date->new('1994-11-06t08:49:37.33z')->epoch,
 is(Mojo::Date->new(784111777.33)->to_datetime,
   '1994-11-06T08:49:37.33Z', 'right format');
 
+# ISO 8601
+is(Mojo::Date->new('20140820T204500')->epoch,
+  1408567500, 'date time format yyyymmddTHHMMSS');
+is(Mojo::Date->new('20140820T204500+00')->epoch,
+  1408567500, 'date time format yyyymmddTHHMMSS+00');
+is(Mojo::Date->new('20140820T214500+01')->epoch,
+  1408567500, 'date time format yyyymmddTHHMMSS+HH');
+is(Mojo::Date->new('20140820T221500+130')->epoch,
+  1408567500, 'date time format yyyymmddTHHMMSS+HMM');
+is(Mojo::Date->new('2014-08-20 22:15:00.05+0130')->epoch,
+  1408567500.05, 'date time format yyyy-mm-ddTHH:MM:SS.NN+HHMM');
+is(Mojo::Date->new('2014-08-20T19:15:00,06-0130')->epoch,
+  1408567500.06, 'date time format yyyy-mm-ddTHH:MM:SS,NN-HHMM');
+is(Mojo::Date->new('2014-232T20:45:00')->epoch,
+  1408567500, 'date time format yyyy-DDDTHH:MM:SS');
+is(Mojo::Date->new('2014-W34-3T20:45:00')->epoch,
+  1408567500, 'date time format yyyy-Www-DTHH:MM:SS');
+is(Mojo::Date->new('2014W343T20:45:00')->epoch,
+  1408567500, 'date time format yyyyWwwDTHH:MM:SS');
+is(Mojo::Date->new('2014-01')->epoch,
+  1388534400, 'date format yyyy-mm');
+is(Mojo::Date->new('2014-01-01')->epoch,
+  1388534400, 'date format yyyy-mm-dd');
+is(Mojo::Date->new('2014-01-01T00')->epoch,
+  1388534400, 'date time format yyyy-mm-ddTHH');
+is(Mojo::Date->new('2014-01-01T00:00')->epoch,
+  1388534400, 'date time format yyyy-mm-ddTHH:MM');
+is(Mojo::Date->new('2014-01-01T00:00+00')->epoch,
+  1388534400, 'date time format yyyy-mm-ddTHH:MM+HH');
+
 # Special cases
 is(Mojo::Date->new('Sun ,  06-Nov-1994  08:49:37  UTC')->epoch,
   784111777, 'right epoch value');

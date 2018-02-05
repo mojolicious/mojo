@@ -6,9 +6,13 @@ use Time::Local 'timegm';
 
 has epoch => sub {time};
 
-my $RFC3339_RE = qr/
-  ^(\d+)-(\d+)-(\d+)\D+(\d+):(\d+):(\d+(?:\.\d+)?)   # Date and time
-  (?:Z|([+-])(\d+):(\d+))?$                          # Offset
+my $ISO8601_RE = qr/
+  ^(\d{4}(?!\d{2}\b))                                             # Years
+  (?:(-?)(?:(\d\d)(?:\2(\d\d))?                                   # Calendar dates
+    |W(\d\d)-?([1-7])?                                            # Week dates
+    |(\d{3}))                                                     # Ordinal dates
+    (?:(?:T|\s+)(\d\d)(?:(:?)(\d\d))?(?:\9(\d\d(?:[\.,]\d+)?)?)?  # Time
+      (?:Z|([\+-])(\d{1,2}):?(\d{2})?)?)?)?$                      # Offset
 /xi;
 
 my @DAYS   = qw(Sun Mon Tue Wed Thu Fri Sat);
@@ -32,10 +36,27 @@ sub parse {
     ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
 
-  # RFC 3339 (1994-11-06T08:49:37Z)
-  elsif ($date =~ $RFC3339_RE) {
-    ($year, $month, $day, $h, $m, $s) = ($1, $2 - 1, $3, $4, $5, $6);
-    $offset = (($8 * 3600) + ($9 * 60)) * ($7 eq '+' ? -1 : 1) if $7;
+  # ISO 8601 (2000-01-02 03:04:05.678+0900)
+  # Groups: 2000,-,01,02,undef,undef,undef,03,:,04,05.678,+,09,00
+  elsif ($date =~ $ISO8601_RE) {
+    ($year, $h, $m, $s) = ($1, $8//0, $10//0, $11//0);
+    if ( $day = $7 or my $week = $5 ) {
+      $month = 0;
+      unless($day) {
+        my $days = 0;
+        $days += _is_leap_year($_)?366:365 for (1970..($year - 1));
+        my $wday_offset = ($days + 3) % 7; # first day of 1970 is 4(Thu)
+        $day = ($week - 1) * 7 + ($6 // 1) - $wday_offset;
+      }
+      my $n = _is_leap_year($year)? 29 : 28;
+      my @m = (31,$n,31,30,31,30,31,31,30,31,30,31);
+      for (@m) { last if $day <= $_; $day -= $_; $month++ }
+    }
+    else {
+      ($month, $day) = (($3 // 1) - 1, $4 // 1);
+    }
+    $offset = (($13 * 3600) + (($14 // 0) * 60)) * ($12 eq '+' ? -1 : 1) if $12;
+    $s =~ s/,/./g; # must be at last else $n will be replaced
   }
 
   # ANSI C asctime() (Sun Nov  6 08:49:37 1994)
@@ -66,6 +87,14 @@ sub to_string {
   my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime shift->epoch;
   return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT', $DAYS[$wday], $mday,
     $MONTHS[$month], $year + 1900, $h, $m, $s;
+}
+
+sub _is_leap_year {
+    return 0 if $_[0] % 4;
+    return 1 if $_[0] % 100;
+    return 0 if $_[0] % 400;
+
+    return 1;
 }
 
 1;
@@ -143,6 +172,16 @@ Parse date.
   say Mojo::Date->new('1994-11-06T08:49:37.21Z')->epoch;
   say Mojo::Date->new('1994-11-06T08:49:37+01:00')->epoch;
   say Mojo::Date->new('1994-11-06T08:49:37-01:00')->epoch;
+
+  # ISO 8601
+  # Support almost all format described in ISO 8601
+  # For partial date time like '1994-11 01:01' will fallback to
+  # '1994-11-01 01::01::00'. However, for digital only date
+  # like '2014' or '20141102' will be treated as epoch instead
+  # of ISO 8601 date, e.g. '2014' => 1970-01-01T00:33:34
+  say Mojo::Date->new('19941106T084937+0100')->epoch;
+  say Mojo::Date->new('1994-1106T08:49:37+0630')->epoch;
+  say Mojo::Date->new('2017-355T08:49:37+0630')->epoch;
 
 =head2 to_datetime
 

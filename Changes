@@ -1,4 +1,6 @@
 
+7.64  2018-02-07
+
 7.63  2018-02-06
   - Improved Mojo::Log to use native systemd log levels.
 

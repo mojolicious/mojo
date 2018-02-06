@@ -80,8 +80,8 @@ without them, and update relevant documentation.
 
 While the L<Mojolicious> distribution covers a wide range of features, we are
 rather conservative when it comes to adding new ones. So if your contribution
-is not a bug fix, it is B<strongly recommended> that you discuss it in advance
-on the L<mailing list|http://groups.google.com/group/mojolicious> or the
+is not a simple bug fix, it is B<strongly recommended> that you discuss it in
+advance on the L<mailing list|http://groups.google.com/group/mojolicious> or the
 official IRC channel C<#mojo> on C<irc.perl.org>
 (L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>), to
 avoid unnecessary work and to increase its chances of getting accepted.

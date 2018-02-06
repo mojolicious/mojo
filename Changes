@@ -1,5 +1,6 @@
 
 7.63  2018-02-06
+  - Improved Mojo::Log to use native systemd log levels.
 
 7.62  2018-02-01
   - Added -u option to get command. (jberger)

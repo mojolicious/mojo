@@ -24,6 +24,9 @@ has short => sub { $ENV{MOJO_LOG_SHORT} };
 # Supported log levels
 my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
 
+# Systemd magic numbers
+my %MAGIC = (debug => 7, info => 6, warn => 4, error => 3, fatal => 2);
+
 sub append {
   my ($self, $msg) = @_;
 
@@ -67,7 +70,10 @@ sub _message {
   $self->append($self->format->(@$msg));
 }
 
-sub _short { shift; '[' . shift() . '] ' . join "\n", @_, '' }
+sub _short {
+  my ($time, $level) = (shift, shift);
+  return "<$MAGIC{$level}>[$level] " . join "\n", @_, '';
+}
 
 1;
 

@@ -1,5 +1,6 @@
 
 7.65  2018-02-08
+  - Added support for new HTTP status code.
 
 7.64  2018-02-07
   - Fixed a bug in Mojo::Log where short log messages spanning multiple lines

@@ -60,6 +60,7 @@ is $res->code(416)->default_message, 'Request Range Not Satisfiable',
   'right message';
 is $res->code(417)->default_message, 'Expectation Failed',    'right message';
 is $res->code(418)->default_message, "I'm a teapot",          'right message';
+is $res->code(421)->default_message, 'Misdirected Request',   'right message';
 is $res->code(422)->default_message, 'Unprocessable Entity',  'right message';
 is $res->code(423)->default_message, 'Locked',                'right message';
 is $res->code(424)->default_message, 'Failed Dependency',     'right message';

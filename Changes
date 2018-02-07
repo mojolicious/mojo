@@ -1,4 +1,6 @@
 
+7.65  2018-02-08
+
 7.64  2018-02-07
   - Fixed a bug in Mojo::Log where short log messages spanning multiple lines
     would not be formatted properly for systemd.

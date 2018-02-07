@@ -72,7 +72,8 @@ sub _message {
 
 sub _short {
   my ($time, $level) = (shift, shift);
-  return "<$MAGIC{$level}>[" . substr($level, 0, 1) . '] ' . join "\n", @_, '';
+  my ($magic, $short) = ("<$MAGIC{$level}>", substr($level, 0, 1));
+  return "${magic}[$short] " . join("\n$magic", @_) . "\n";
 }
 
 1;

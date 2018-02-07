@@ -1,5 +1,7 @@
 
 7.64  2018-02-07
+  - Fixed a bug in Mojo::Log where short log messages spanning multiple lines
+    would not be formatted properly for systemd.
 
 7.63  2018-02-06
   - Improved Mojo::Log to use native systemd log levels.

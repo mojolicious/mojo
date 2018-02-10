@@ -42,9 +42,9 @@ sub register {
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
 
-  $app->helper('profile.elapsed'       => \&_profile_elapsed);
-  $app->helper('profile.server_timing' => \&_profile_server_timing);
-  $app->helper('profile.start'         => \&_profile_start);
+  $app->helper('timing.elapsed'       => \&_timing_elapsed);
+  $app->helper('timing.server_timing' => \&_timing_server_timing);
+  $app->helper('timing.start'         => \&_timing_start);
 
   $app->helper(ua => sub { shift->app->ua });
 }
@@ -148,30 +148,30 @@ sub _is_fresh {
   return $c->app->static->is_fresh($c, \%options);
 }
 
-sub _profile_elapsed {
-  my ($c, $name) = @_;
-  return undef unless my $started = $c->stash->{'mojo.profile'}{$name};
-  return tv_interval($started, [gettimeofday()]);
-}
-
-sub _profile_server_timing {
-  my ($c, $metric, $desc, $name) = @_;
-  my $value = $metric;
-  $value .= qq{;desc="$desc"} if $desc;
-  if ($name && (my $d = _profile_elapsed($c, $name))) { $value .= ";dur=$d" }
-  $c->res->headers->append('Server-Timing' => $value);
-}
-
-sub _profile_start {
-  my ($c, $name) = @_;
-  $c->stash->{'mojo.profile'}{$name} = [gettimeofday];
-}
-
 sub _static {
   my ($c, $file) = @_;
   return !!$c->rendered if $c->app->static->serve($c, $file);
   $c->app->log->debug(qq{Static file "$file" not found});
   return !$c->helpers->reply->not_found;
+}
+
+sub _timing_elapsed {
+  my ($c, $name) = @_;
+  return undef unless my $started = $c->stash->{'mojo.timing'}{$name};
+  return tv_interval($started, [gettimeofday()]);
+}
+
+sub _timing_server_timing {
+  my ($c, $metric, $desc, $name) = @_;
+  my $value = $metric;
+  $value .= qq{;desc="$desc"} if $desc;
+  if ($name && (my $d = _timing_elapsed($c, $name))) { $value .= ";dur=$d" }
+  $c->res->headers->append('Server-Timing' => $value);
+}
+
+sub _timing_start {
+  my ($c, $name) = @_;
+  $c->stash->{'mojo.timing'}{$name} = [gettimeofday];
 }
 
 sub _url_with {
@@ -485,38 +485,38 @@ Alias for L<Mojolicious::Controller/"stash">.
 
   %= stash('name') // 'Somebody'
 
-=head2 profile->elapsed
+=head2 timing->elapsed
 
-  my $elapsed = $c->profile->elapsed('foo');
+  my $elapsed = $c->timing->elapsed('foo');
 
 Return fractional number of seconds since named timstamp has been created with
-L</"profile-E<gt>start"> or C<undef> if no such timestamp exists. Note that this
+L</"timing-E<gt>start"> or C<undef> if no such timestamp exists. Note that this
 helper is EXPERIMENTAL and might change without warning!
 
   # Log profiling information
-  $c->profile->start('database_stuff');
+  $c->timing->start('database_stuff');
   ...
-  my $elapsed = $c->profile->elapsed('database_stuff');
+  my $elapsed = $c->timing->elapsed('database_stuff');
   $c->app->log->debug("Database stuff took $elapsed seconds");
 
-=head2 profile->server_timing
+=head2 timing->server_timing
 
-  $c->profile->server_timing('metric');
-  $c->profile->server_timing('metric', 'Some Description');
-  $c->profile->server_timing('metric', 'Some Description', 'foo');
+  $c->timing->server_timing('metric');
+  $c->timing->server_timing('metric', 'Some Description');
+  $c->timing->server_timing('metric', 'Some Description', 'foo');
 
 Create C<Server-Timing> header with or without named timestamp created with
-L</"profile-E<gt>start">. Note that this helper is EXPERIMENTAL and might change
+L</"timing-E<gt>start">. Note that this helper is EXPERIMENTAL and might change
 without warning!
 
   # Forward profiling information to browser
-  $c->profile->start('database_stuff');
+  $c->timing->start('database_stuff');
   ...
-  $c->profile->server_timing('db', 'Database Stuff', 'database_stuff');
+  $c->timing->server_timing('db', 'Database Stuff', 'database_stuff');
 
-=head2 profile->start
+=head2 timing->start
 
-  $c->profile->start('foo');
+  $c->timing->start('foo');
 
 Create named timestamp. Note that this helper is EXPERIMENTAL and might change
 without warning!

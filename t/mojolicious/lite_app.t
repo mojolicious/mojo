@@ -445,17 +445,17 @@ get '/dynamic/inline' => sub {
   $c->render(inline => 'dynamic inline ' . $dynamic_inline++);
 };
 
-get '/profile' => sub {
+get '/timing' => sub {
   my $c = shift;
-  $c->profile->start('foo');
-  $c->profile->start('bar');
+  $c->timing->start('foo');
+  $c->timing->start('bar');
   usleep 1000;
-  my $foo = $c->profile->elapsed('foo');
-  my $bar = $c->profile->elapsed('bar');
-  $c->profile->server_timing('miss');
-  $c->profile->server_timing('dc',   'atl');
-  $c->profile->server_timing('test', 'Some Test', 'foo');
-  $c->profile->server_timing('app',  undef, 'foo');
+  my $foo = $c->timing->elapsed('foo');
+  my $bar = $c->timing->elapsed('bar');
+  $c->timing->server_timing('miss');
+  $c->timing->server_timing('dc',   'atl');
+  $c->timing->server_timing('test', 'Some Test', 'foo');
+  $c->timing->server_timing('app',  undef, 'foo');
   $c->render(text => "Foo: $foo, Bar: $bar");
 };
 
@@ -1044,7 +1044,7 @@ $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 1\n");
 $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
 
 # Profiling
-$t->get_ok('/profile')->status_is(200)
+$t->get_ok('/timing')->status_is(200)
   ->header_like('Server-Timing' =>
     qr/miss, dc;desc="atl", test;desc="Some Test";dur=[0-9.]+, app;dur=[0-9.]+/)
   ->content_like(qr/Foo: [0-9.]+, Bar: [0-9.]+/);

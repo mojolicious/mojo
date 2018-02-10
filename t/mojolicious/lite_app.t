@@ -11,6 +11,7 @@ use Mojo::Cookie::Response;
 use Mojo::IOLoop;
 use Mojolicious::Lite;
 use Test::Mojo;
+use Time::HiRes 'usleep';
 
 # Missing plugin
 eval { plugin 'does_not_exist' };
@@ -442,6 +443,20 @@ my $dynamic_inline = 1;
 get '/dynamic/inline' => sub {
   my $c = shift;
   $c->render(inline => 'dynamic inline ' . $dynamic_inline++);
+};
+
+get '/profile' => sub {
+  my $c = shift;
+  $c->profile->start('foo');
+  $c->profile->start('bar');
+  usleep 1000;
+  my $foo = $c->profile->elapsed('foo');
+  my $bar = $c->profile->elapsed('bar');
+  $c->profile->server_timing('miss');
+  $c->profile->server_timing('dc',   'atl');
+  $c->profile->server_timing('test', 'Some Test', 'foo');
+  $c->profile->server_timing('app',  undef, 'foo');
+  $c->render(text => "Foo: $foo, Bar: $bar");
 };
 
 my $t = Test::Mojo->new;
@@ -1027,6 +1042,12 @@ $t->get_ok('/url_with/foo?foo=bar')->status_is(200)
 # Dynamic inline template
 $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 1\n");
 $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
+
+# Profiling
+$t->get_ok('/profile')->status_is(200)
+  ->header_like('Server-Timing' =>
+    qr/miss, dc;desc="atl", test;desc="Some Test";dur=[0-9.]+, app;dur=[0-9.]+/)
+  ->content_like(qr/Foo: [0-9.]+, Bar: [0-9.]+/);
 
 done_testing();
 

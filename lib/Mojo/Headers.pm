@@ -16,8 +16,8 @@ my %NAMES = map { lc() => $_ } (
   qw(Last-Modified Link Location Origin Proxy-Authenticate),
   qw(Proxy-Authorization Range Sec-WebSocket-Accept Sec-WebSocket-Extensions),
   qw(Sec-WebSocket-Key Sec-WebSocket-Protocol Sec-WebSocket-Version Server),
-  qw(Set-Cookie Status Strict-Transport-Security TE Trailer Transfer-Encoding),
-  qw(Upgrade User-Agent Vary WWW-Authenticate)
+  qw(Server-Timing Set-Cookie Status Strict-Transport-Security TE Trailer),
+  qw(Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
 );
 for my $header (keys %NAMES) {
   my $name = $header;
@@ -608,6 +608,14 @@ header from L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
   $headers   = $headers->server('Mojo');
 
 Get or replace current header value, shortcut for the C<Server> header.
+
+=head2 server_timing
+
+  my $timing = $headers->server_timing;
+  $headers   = $headers->server_timing('app;desc=Mojolicious;dur=0.0001');
+
+Get or replace current header value, shortcut for the C<Server-Timing> header.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 set_cookie
 

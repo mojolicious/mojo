@@ -6,6 +6,7 @@ use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
 use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
+use Time::HiRes qw(gettimeofday tv_interval);
 use Scalar::Util 'blessed';
 
 sub register {
@@ -40,6 +41,10 @@ sub register {
 
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
+
+  $app->helper('profile.elapsed'       => \&_profile_elapsed);
+  $app->helper('profile.server_timing' => \&_profile_server_timing);
+  $app->helper('profile.start'         => \&_profile_start);
 
   $app->helper(ua => sub { shift->app->ua });
 }
@@ -141,6 +146,25 @@ sub _inactivity_timeout {
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
+}
+
+sub _profile_elapsed {
+  my ($c, $name) = @_;
+  return undef unless my $started = $c->stash->{'mojo.profile'}{$name};
+  return tv_interval($started, [gettimeofday()]);
+}
+
+sub _profile_server_timing {
+  my ($c, $metric, $desc, $name) = @_;
+  my $value = $metric;
+  $value .= qq{;desc="$desc"} if $desc;
+  if ($name && (my $d = _profile_elapsed($c, $name))) { $value .= ";dur=$d" }
+  $c->res->headers->append('Server-Timing' => $value);
+}
+
+sub _profile_start {
+  my ($c, $name) = @_;
+  $c->stash->{'mojo.profile'}{$name} = [gettimeofday];
 }
 
 sub _static {
@@ -460,6 +484,31 @@ Alias for L<Mojolicious::Controller/"session">.
 Alias for L<Mojolicious::Controller/"stash">.
 
   %= stash('name') // 'Somebody'
+
+=head2 profile->elapsed
+
+  my $elapsed = $c->timer->elapsed('foo');
+
+Return fractional number of seconds since named timstamp has been created with
+L</"profile-E<gt>start"> or C<undef> if no such timestamp exists. Note that this
+helper is EXPERIMENTAL and might change without warning!
+
+=head2 profile->server_timing
+
+  $c->profile->server_timing('app');
+  $c->profile->server_timing('app', 'Some Description');
+  $c->profile->server_timing('app', 'Some Description', 'foo');
+
+Create C<Server-Timing> header with or without named timestamp created with
+L</"profile-E<gt>start">. Note that this helper is EXPERIMENTAL and might change
+without warning! 
+
+=head2 profile->start
+
+  $c->profile->start('foo');
+
+Create named timestamp. Note that this helper is EXPERIMENTAL and might change
+without warning!
 
 =head2 title
 

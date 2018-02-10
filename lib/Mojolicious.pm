@@ -18,7 +18,6 @@ use Mojolicious::Static;
 use Mojolicious::Types;
 use Mojolicious::Validator;
 use Scalar::Util ();
-use Time::HiRes  ();
 
 has commands => sub {
   my $commands = Mojolicious::Commands->new(app => shift);
@@ -129,7 +128,7 @@ sub dispatch {
     my $method = $req->method;
     my $path   = $req->url->path->to_abs_string;
     $self->log->debug(qq{$method "$path"});
-    $stash->{'mojo.started'} = [Time::HiRes::gettimeofday];
+    $c->helpers->profile->start('mojo.timer');
   }
 
   # Routes

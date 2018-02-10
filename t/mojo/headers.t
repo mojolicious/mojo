@@ -94,9 +94,10 @@ is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
   'right value';
 is $headers->sec_websocket_version('foo')->sec_websocket_version, 'foo',
   'right value';
-is $headers->server('foo')->server,         'foo', 'right value';
-is $headers->set_cookie('foo')->set_cookie, 'foo', 'right value';
-is $headers->status('foo')->status,         'foo', 'right value';
+is $headers->server('foo')->server,               'foo', 'right value';
+is $headers->server_timing('foo')->server_timing, 'foo', 'right value';
+is $headers->set_cookie('foo')->set_cookie,       'foo', 'right value';
+is $headers->status('foo')->status,               'foo', 'right value';
 is $headers->strict_transport_security('foo')->strict_transport_security,
   'foo', 'right value';
 is $headers->te('foo')->te,                               'foo', 'right value';

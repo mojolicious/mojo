@@ -501,9 +501,9 @@ helper is EXPERIMENTAL and might change without warning!
 
 =head2 profile->server_timing
 
-  $c->profile->server_timing('app');
-  $c->profile->server_timing('app', 'Some Description');
-  $c->profile->server_timing('app', 'Some Description', 'foo');
+  $c->profile->server_timing('metric');
+  $c->profile->server_timing('metric', 'Some Description');
+  $c->profile->server_timing('metric', 'Some Description', 'foo');
 
 Create C<Server-Timing> header with or without named timestamp created with
 L</"profile-E<gt>start">. Note that this helper is EXPERIMENTAL and might change

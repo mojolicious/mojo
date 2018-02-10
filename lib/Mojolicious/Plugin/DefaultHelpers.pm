@@ -493,7 +493,7 @@ Return fractional number of seconds since named timstamp has been created with
 L</"timing-E<gt>start"> or C<undef> if no such timestamp exists. Note that this
 helper is EXPERIMENTAL and might change without warning!
 
-  # Log profiling information
+  # Log timing information
   $c->timing->start('database_stuff');
   ...
   my $elapsed = $c->timing->elapsed('database_stuff');
@@ -509,7 +509,7 @@ Create C<Server-Timing> header with or without named timestamp created with
 L</"timing-E<gt>start">. Note that this helper is EXPERIMENTAL and might change
 without warning!
 
-  # Forward profiling information to browser
+  # Forward timing information to browser
   $c->timing->start('database_stuff');
   ...
   $c->timing->server_timing('db', 'Database Stuff', 'database_stuff');

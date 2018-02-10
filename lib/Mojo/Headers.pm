@@ -614,7 +614,8 @@ Get or replace current header value, shortcut for the C<Server> header.
   my $timing = $headers->server_timing;
   $headers   = $headers->server_timing('app;desc=Mojolicious;dur=0.0001');
 
-Get or replace current header value, shortcut for the C<Server-Timing> header.
+Get or replace current header value, shortcut for the C<Server-Timing> header
+from L<Server Timing|https://www.w3.org/TR/server-timing/>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 set_cookie

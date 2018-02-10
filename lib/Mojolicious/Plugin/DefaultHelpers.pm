@@ -487,11 +487,17 @@ Alias for L<Mojolicious::Controller/"stash">.
 
 =head2 profile->elapsed
 
-  my $elapsed = $c->timer->elapsed('foo');
+  my $elapsed = $c->profile->elapsed('foo');
 
 Return fractional number of seconds since named timstamp has been created with
 L</"profile-E<gt>start"> or C<undef> if no such timestamp exists. Note that this
 helper is EXPERIMENTAL and might change without warning!
+
+  # Log profiling information
+  $c->profile->start('database_stuff');
+  ...
+  my $elapsed = $c->profile->elapsed('database_stuff');
+  $c->app->log->debug("Database stuff took $elapsed seconds");
 
 =head2 profile->server_timing
 
@@ -501,7 +507,12 @@ helper is EXPERIMENTAL and might change without warning!
 
 Create C<Server-Timing> header with or without named timestamp created with
 L</"profile-E<gt>start">. Note that this helper is EXPERIMENTAL and might change
-without warning! 
+without warning!
+
+  # Forward profiling information to browser
+  $c->profile->start('database_stuff');
+  ...
+  $c->profile->server_timing('db', 'Database Stuff', 'database_stuff');
 
 =head2 profile->start
 

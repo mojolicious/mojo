@@ -1049,6 +1049,10 @@ $t->get_ok('/timing')->status_is(200)
   ->header_like('Server-Timing' =>
     qr/miss, dc;desc="atl", test;desc="Some Test";dur=0.002, app;dur=0.001/)
   ->content_like(qr/Foo: [0-9.]+, Bar: [0-9.]+ \([0-9.?]+\)/);
+is $t->app->timing->elapsed('does_not_exist'), undef,    'no timing data';
+is $t->app->timing->rps('0.1'),                '10.000', 'right number';
+is $t->app->timing->rps(1),                    '1.000',  'right number';
+is $t->app->timing->rps(0),                    undef,    'number too small';
 
 done_testing();
 

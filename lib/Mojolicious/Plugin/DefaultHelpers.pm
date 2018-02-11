@@ -167,10 +167,10 @@ sub _timing_elapsed {
 sub _timing_rps { $_[1] == 0 ? undef : sprintf '%.3f', 1 / $_[1] }
 
 sub _timing_server_timing {
-  my ($c, $metric, $desc, $name) = @_;
+  my ($c, $metric, $desc, $dur) = @_;
   my $value = $metric;
-  $value .= qq{;desc="$desc"} if $desc;
-  if ($name && (my $d = _timing_elapsed($c, $name))) { $value .= ";dur=$d" }
+  $value .= qq{;desc="$desc"} if defined $desc;
+  $value .= ";dur=$dur"       if defined $dur;
   $c->res->headers->append('Server-Timing' => $value);
 }
 
@@ -526,11 +526,10 @@ without warning!
 
   $c->timing->server_timing('metric');
   $c->timing->server_timing('metric', 'Some Description');
-  $c->timing->server_timing('metric', 'Some Description', 'foo');
+  $c->timing->server_timing('metric', 'Some Description', '0.001');
 
-Create C<Server-Timing> header with optional description and time from
-L</"timing-E<gt>elapsed">. Note that this helper is EXPERIMENTAL and might
-change without warning!
+Create C<Server-Timing> header with optional description and duration. Note that
+this helper is EXPERIMENTAL and might change without warning!
 
   # "Server-Timing: miss"
   $c->timing->server_timing('miss');
@@ -541,7 +540,12 @@ change without warning!
   # "Server-Timing: db;desc=Database;dur=0.0001"
   $c->timing->begin('database_stuff');
   ...
-  $c->timing->server_timing('db', 'Database', 'database_stuff');
+  my $elapsed = $c->timing->elapsed('database_stuff');
+  $c->timing->server_timing('db', 'Database', $elapsed);
+
+  # "Server-Timing: miss, dc;desc=atl"
+  $c->timing->server_timing('miss');
+  $c->timing->server_timing('dc', 'atl');
 
 =head2 title
 

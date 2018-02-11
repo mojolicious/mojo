@@ -454,8 +454,8 @@ get '/timing' => sub {
   my $bar = $c->timing->elapsed('bar');
   $c->timing->server_timing('miss');
   $c->timing->server_timing('dc',   'atl');
-  $c->timing->server_timing('test', 'Some Test', 'foo');
-  $c->timing->server_timing('app',  undef, 'foo');
+  $c->timing->server_timing('test', 'Some Test', '0.002');
+  $c->timing->server_timing('app',  undef, '0.001');
   my $rps = $c->timing->rps($bar);
   $c->render(text => "Foo: $foo, Bar: $bar ($rps)");
 };
@@ -1047,7 +1047,7 @@ $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
 # Profiling
 $t->get_ok('/timing')->status_is(200)
   ->header_like('Server-Timing' =>
-    qr/miss, dc;desc="atl", test;desc="Some Test";dur=[0-9.]+, app;dur=[0-9.]+/)
+    qr/miss, dc;desc="atl", test;desc="Some Test";dur=0.002, app;dur=0.001/)
   ->content_like(qr/Foo: [0-9.]+, Bar: [0-9.]+ \([0-9.?]+\)/);
 
 done_testing();

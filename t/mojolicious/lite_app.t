@@ -1044,7 +1044,7 @@ $t->get_ok('/url_with/foo?foo=bar')->status_is(200)
 $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 1\n");
 $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
 
-# Profiling
+# Timing
 $t->get_ok('/timing')->status_is(200)
   ->header_like('Server-Timing' =>
     qr/miss, dc;desc="atl", test;desc="Some Test";dur=0.002, app;dur=0.001/)

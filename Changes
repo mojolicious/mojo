@@ -1,6 +1,6 @@
 
 7.65  2018-02-10
-  - Added EXPERIMENTAL timing->elapsed, timing->server_timing and timing->start
+  - Added EXPERIMENTAL timing->begin, timing->elapsed and timing->server_timing
     helpers to Mojolicious::Plugin::DefaultHelpers.
   - Added EXPERIMENTAL server_timing method to Mojo::Headers.
   - Added support for new HTTP status code.

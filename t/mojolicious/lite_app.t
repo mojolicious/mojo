@@ -447,8 +447,8 @@ get '/dynamic/inline' => sub {
 
 get '/timing' => sub {
   my $c = shift;
-  $c->timing->start('foo');
-  $c->timing->start('bar');
+  $c->timing->begin('foo');
+  $c->timing->begin('bar');
   usleep 1000;
   my $foo = $c->timing->elapsed('foo');
   my $bar = $c->timing->elapsed('bar');

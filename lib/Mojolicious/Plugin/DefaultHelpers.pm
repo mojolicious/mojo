@@ -42,9 +42,9 @@ sub register {
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
 
+  $app->helper('timing.begin'         => \&_timing_begin);
   $app->helper('timing.elapsed'       => \&_timing_elapsed);
   $app->helper('timing.server_timing' => \&_timing_server_timing);
-  $app->helper('timing.start'         => \&_timing_start);
 
   $app->helper(ua => sub { shift->app->ua });
 }
@@ -155,6 +155,8 @@ sub _static {
   return !$c->helpers->reply->not_found;
 }
 
+sub _timing_begin { shift->stash->{'mojo.timing'}{shift()} = [gettimeofday] }
+
 sub _timing_elapsed {
   my ($c, $name) = @_;
   return undef unless my $started = $c->stash->{'mojo.timing'}{$name};
@@ -167,11 +169,6 @@ sub _timing_server_timing {
   $value .= qq{;desc="$desc"} if $desc;
   if ($name && (my $d = _timing_elapsed($c, $name))) { $value .= ";dur=$d" }
   $c->res->headers->append('Server-Timing' => $value);
-}
-
-sub _timing_start {
-  my ($c, $name) = @_;
-  $c->stash->{'mojo.timing'}{$name} = [gettimeofday];
 }
 
 sub _url_with {
@@ -485,16 +482,23 @@ Alias for L<Mojolicious::Controller/"stash">.
 
   %= stash('name') // 'Somebody'
 
+=head2 timing->begin
+
+  $c->timing->begin('foo');
+
+Create named timestamp. Note that this helper is EXPERIMENTAL and might change
+without warning!
+
 =head2 timing->elapsed
 
   my $elapsed = $c->timing->elapsed('foo');
 
-Return fractional number of seconds since named timstamp has been created with
-L</"timing-E<gt>start"> or C<undef> if no such timestamp exists. Note that this
-helper is EXPERIMENTAL and might change without warning!
+Return fractional amount of time in seconds since named timstamp has been
+created with L</"timing-E<gt>begin"> or C<undef> if no such timestamp exists.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
   # Log timing information
-  $c->timing->start('database_stuff');
+  $c->timing->begin('database_stuff');
   ...
   my $elapsed = $c->timing->elapsed('database_stuff');
   $c->app->log->debug("Database stuff took $elapsed seconds");
@@ -505,21 +509,20 @@ helper is EXPERIMENTAL and might change without warning!
   $c->timing->server_timing('metric', 'Some Description');
   $c->timing->server_timing('metric', 'Some Description', 'foo');
 
-Create C<Server-Timing> header with or without named timestamp created with
-L</"timing-E<gt>start">. Note that this helper is EXPERIMENTAL and might change
+Create C<Server-Timing> header with optional description and time from
+</"timing-E<gt>elapsed">. Note that this helper is EXPERIMENTAL and might change
 without warning!
 
-  # Forward timing information to browser
-  $c->timing->start('database_stuff');
+  # "Server-Timing: miss"
+  $c->timing->server_timing('miss');
+
+  # "Server-Timing: dc;desc=atl"
+  $c->timing->server_timing('dc', 'atl');
+
+  # "Server-Timing: db;desc=Database;dur=0.0001"
+  $c->timing->begin('database_stuff');
   ...
-  $c->timing->server_timing('db', 'Database Stuff', 'database_stuff');
-
-=head2 timing->start
-
-  $c->timing->start('foo');
-
-Create named timestamp. Note that this helper is EXPERIMENTAL and might change
-without warning!
+  $c->timing->server_timing('db', 'Database', 'database_stuff');
 
 =head2 title
 

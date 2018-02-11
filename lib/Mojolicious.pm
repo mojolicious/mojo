@@ -128,7 +128,7 @@ sub dispatch {
     my $method = $req->method;
     my $path   = $req->url->path->to_abs_string;
     $self->log->debug(qq{$method "$path"});
-    $c->helpers->timing->start('mojo.timer');
+    $c->helpers->timing->begin('mojo.timer');
   }
 
   # Routes

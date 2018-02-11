@@ -44,6 +44,7 @@ sub register {
 
   $app->helper('timing.begin'         => \&_timing_begin);
   $app->helper('timing.elapsed'       => \&_timing_elapsed);
+  $app->helper('timing.rps'           => \&_timing_rps);
   $app->helper('timing.server_timing' => \&_timing_server_timing);
 
   $app->helper(ua => sub { shift->app->ua });
@@ -162,6 +163,8 @@ sub _timing_elapsed {
   return undef unless my $started = $c->stash->{'mojo.timing'}{$name};
   return tv_interval($started, [gettimeofday()]);
 }
+
+sub _timing_rps { $_[1] == 0 ? undef : sprintf '%.3f', 1 / $_[1] }
 
 sub _timing_server_timing {
   my ($c, $metric, $desc, $name) = @_;
@@ -486,8 +489,8 @@ Alias for L<Mojolicious::Controller/"stash">.
 
   $c->timing->begin('foo');
 
-Create named timestamp. Note that this helper is EXPERIMENTAL and might change
-without warning!
+Create named timestamp for L<"timing-E<gt>elapsed">. Note that this helper is
+EXPERIMENTAL and might change without warning!
 
 =head2 timing->elapsed
 
@@ -502,6 +505,22 @@ Note that this helper is EXPERIMENTAL and might change without warning!
   ...
   my $elapsed = $c->timing->elapsed('database_stuff');
   $c->app->log->debug("Database stuff took $elapsed seconds");
+
+=head2 timing->rps
+
+  my $rps = $c->timing->rps('0.001');
+
+Return fractional number of requests that could be performed in one second if
+every singe one took the given amount of time in seconds or C<undef> if the
+number is too low. Note that this helper is EXPERIMENTAL and might change
+without warning!
+
+  # Log more timing information
+  $c->timing->begin('web_stuff');
+  ...
+  my $elapsed = $c->timing->elapsed('web_stuff');
+  my $rps     = $c->timing->rps($elapsed);
+  $c->app->log->debug("Web stuff took $elapsed seconds ($rps per second)");
 
 =head2 timing->server_timing
 

@@ -456,7 +456,8 @@ get '/timing' => sub {
   $c->timing->server_timing('dc',   'atl');
   $c->timing->server_timing('test', 'Some Test', 'foo');
   $c->timing->server_timing('app',  undef, 'foo');
-  $c->render(text => "Foo: $foo, Bar: $bar");
+  my $rps = $c->timing->rps($bar);
+  $c->render(text => "Foo: $foo, Bar: $bar ($rps)");
 };
 
 my $t = Test::Mojo->new;
@@ -1047,7 +1048,7 @@ $t->get_ok('/dynamic/inline')->status_is(200)->content_is("dynamic inline 2\n");
 $t->get_ok('/timing')->status_is(200)
   ->header_like('Server-Timing' =>
     qr/miss, dc;desc="atl", test;desc="Some Test";dur=[0-9.]+, app;dur=[0-9.]+/)
-  ->content_like(qr/Foo: [0-9.]+, Bar: [0-9.]+/);
+  ->content_like(qr/Foo: [0-9.]+, Bar: [0-9.]+ \([0-9.?]+\)/);
 
 done_testing();
 

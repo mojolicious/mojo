@@ -200,9 +200,10 @@ sub rendered {
   if (!$stash->{'mojo.finished'} && ++$stash->{'mojo.finished'}) {
 
     # Disable auto rendering and stop timer
-    my $app = $self->render_later->app;
-    if (defined(my $elapsed = $self->helpers->timing->elapsed('mojo.timer'))) {
-      my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+    my $app    = $self->render_later->app;
+    my $timing = $self->helpers->timing;
+    if (defined(my $elapsed = $timing->elapsed('mojo.timer'))) {
+      my $rps  = $timing->rps($elapsed) // '??';
       my $code = $res->code;
       my $msg  = $res->message || $res->default_message($code);
       $app->log->debug("$code $msg (${elapsed}s, $rps/s)");

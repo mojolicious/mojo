@@ -1,4 +1,6 @@
 
+7.66  2018-02-12
+
 7.65  2018-02-11
   - Added EXPERIMENTAL timing->begin, timing->elapsed, timing->rps and
     timing->server_timing helpers to Mojolicious::Plugin::DefaultHelpers.

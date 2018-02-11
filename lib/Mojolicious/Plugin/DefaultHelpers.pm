@@ -529,8 +529,8 @@ without warning!
   $c->timing->server_timing('metric', 'Some Description', 'foo');
 
 Create C<Server-Timing> header with optional description and time from
-</"timing-E<gt>elapsed">. Note that this helper is EXPERIMENTAL and might change
-without warning!
+L</"timing-E<gt>elapsed">. Note that this helper is EXPERIMENTAL and might
+change without warning!
 
   # "Server-Timing: miss"
   $c->timing->server_timing('miss');

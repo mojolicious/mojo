@@ -27,7 +27,7 @@ sub add {
     next unless my $path   = $cookie->path;
     next unless length(my $name = $cookie->name // '');
     my $jar = $self->{jar}{$domain} ||= [];
-    @$jar = (grep({ _compare($_, $path, $name, $origin) } @$jar), $cookie);
+    @$jar = (grep({ _compare($_, $path, $name, $domain) } @$jar), $cookie);
   }
 
   return $self;
@@ -46,7 +46,9 @@ sub collect {
 
     # Validate domain
     my $host   = lc $url->ihost;
-    my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
+    my $domain = lc($cookie->domain // $cookie->origin
+        // $cookie->origin($host)->origin);
+    $cookie->domain($domain);
     if (my $cb = $self->ignore) { next if $cb->($cookie) }
     next if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
 
@@ -72,7 +74,7 @@ sub find {
     # Grab cookies
     my $new = $self->{jar}{$domain} = [];
     for my $cookie (@$old) {
-      next unless $cookie->domain || $host eq $cookie->origin;
+      next if $cookie->host_only && $host ne $cookie->domain;
 
       # Check if cookie has expired
       if (defined(my $expires = $cookie->expires)) { next if time > $expires }
@@ -101,9 +103,11 @@ sub prepare {
 }
 
 sub _compare {
-  my ($cookie, $path, $name, $origin) = @_;
-  return 1 if $cookie->path ne $path || $cookie->name ne $name;
-  return ($cookie->origin // '') ne $origin;
+  my ($cookie, $path, $name, $domain) = @_;
+  return 1
+    if $cookie->path ne $path
+    || $cookie->name ne $name
+    || $cookie->domain ne $domain;
 }
 
 sub _path { $_[0] eq '/' || $_[0] eq $_[1] || index($_[1], "$_[0]/") == 0 }

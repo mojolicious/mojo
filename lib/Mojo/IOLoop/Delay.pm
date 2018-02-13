@@ -4,8 +4,6 @@ use Mojo::Base 'Mojo::Promise';
 # DEPRECATED!
 use base 'Mojo::EventEmitter';
 
-use Mojo::Util 'deprecated';
-
 sub begin {
   my ($self, $offset, $len) = @_;
   $self->{pending}++;
@@ -13,22 +11,7 @@ sub begin {
   return sub { $self->_step($id, $offset // 1, $len, @_) };
 }
 
-# DEPRECATED!
-sub data {
-  deprecated 'Mojo::IOLoop::Delay::data is DEPRECATED';
-  Mojo::Util::_stash(data => @_);
-}
-
 sub pass { $_[0]->begin->(@_) }
-
-# DEPRECATED!
-sub remaining {
-  deprecated 'Mojo::IOLoop::Delay::remaining is DEPRECATED';
-  my $self = shift;
-  return $self->{steps} ||= [] unless @_;
-  $self->{steps} = shift;
-  return $self;
-}
 
 sub steps {
   my ($self, @steps) = @_;

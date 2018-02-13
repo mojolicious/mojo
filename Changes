@@ -2,7 +2,11 @@
 7.66  2018-02-13
   - This release contains fixes for security issues, everybody should upgrade!
   - Removed origin attribute of Mojo::Cookie::Response.
+  - Removed deprecated data and remaining methods from Mojo::IOLoop::Delay.
   - Added host_only attribute to Mojo::Cookie::Response.
+  - Improved all method in Mojo::Promise to resolve with no results if no
+    promises have been passed.
+  - Fixed a bug in Mojo::UserAgent::CookieJar where old cookies could be leaked.
 
 7.65  2018-02-11
   - Added EXPERIMENTAL timing->begin, timing->elapsed, timing->rps and

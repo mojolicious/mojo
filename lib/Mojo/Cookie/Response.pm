@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires httponly max_age origin path secure)];
+has [qw(domain expires host_only httponly max_age path secure)];
 
 my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
 
@@ -100,6 +100,14 @@ Cookie domain.
 
 Expiration for cookie.
 
+=head2 host_only
+
+  my $bool = $cookie->host_only;
+  $cookie  = $cookie->host_only($bool);
+
+Host-only flag, indicating that the canonicalized request-host is identical to
+the cookie's L</"domain">.
+
 =head2 httponly
 
   my $bool = $cookie->httponly;
@@ -114,13 +122,6 @@ cookie.
   $cookie     = $cookie->max_age(60);
 
 Max age for cookie.
-
-=head2 origin
-
-  my $origin = $cookie->origin;
-  $cookie    = $cookie->origin('mojolicious.org');
-
-Origin of the cookie.
 
 =head2 path
 

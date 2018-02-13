@@ -1,5 +1,8 @@
 
-7.66  2018-02-12
+7.66  2018-02-13
+  - This release contains fixes for security issues, everybody should upgrade!
+  - Removed origin attribute of Mojo::Cookie::Response.
+  - Added host_only attribute to Mojo::Cookie::Response.
 
 7.65  2018-02-11
   - Added EXPERIMENTAL timing->begin, timing->elapsed, timing->rps and

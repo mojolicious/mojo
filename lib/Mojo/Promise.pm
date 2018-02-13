@@ -28,7 +28,7 @@ sub all {
     );
   }
 
-  return @promises ? $all : $all->resolve([]);
+  return @promises ? $all : $all->resolve;
 }
 
 sub catch { shift->then(undef, shift) }

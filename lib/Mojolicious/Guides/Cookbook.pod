@@ -605,7 +605,7 @@ that create them for you.
     my $minion = $c->ua->get_p($url->clone->query({q => 'minion'}));
 
     # Render a response once both promises have been resolved
-    Mojo::Promise->all(mojo, $minion)->then(sub {
+    Mojo::Promise->all($mojo, $minion)->then(sub {
       my ($mojo, $minion) = @_;
       $c->render(json => {
         mojo   => $mojo->[0]->result->json('/hits/hits/0/_source/release'),

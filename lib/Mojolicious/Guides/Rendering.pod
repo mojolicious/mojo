@@ -1291,6 +1291,40 @@ has actually been written.
 
   Hello World!
 
+Instead of providing a C<Content-Length> header you can also call
+L<Mojolicious::Controller/"finish"> and close the connection manually once you
+are done.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub {
+    my $c = shift;
+
+    # Prepare body
+    my $body = 'Hello World!';
+
+    # Start writing directly with a drain callback
+    my $drain;
+    $drain = sub {
+      my $c = shift;
+      my $chunk = substr $body, 0, 1, '';
+      length $chunk ? $c->write($chunk, $drain) : $c->finish;
+    };
+    $c->$drain;
+  };
+
+  app->start;
+
+While this is rather inefficient, as it prevents keep-alive, it is sometimes
+necessary for EventSource and similar applications.
+
+  HTTP/1.1 200 OK
+  Date: Sat, 13 Sep 2014 16:48:29 GMT
+  Connection: close
+  Server: Mojolicious (Perl)
+
+  Hello World!
+
 =head2 Chunked transfer encoding
 
 For very dynamic content you might not know the response content length in

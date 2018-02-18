@@ -107,11 +107,11 @@ sub _development {
   my $renderer = $app->renderer;
   my $options  = {
     exception => $page eq 'exception' ? $e : undef,
-    format => $stash->{format} || $renderer->default_format,
-    handler  => undef,
-    snapshot => \%snapshot,
-    status   => $page eq 'exception' ? 500 : 404,
-    template => "$page.$mode"
+    format    => $stash->{format} || $renderer->default_format,
+    handler   => undef,
+    snapshot  => \%snapshot,
+    status    => $page eq 'exception' ? 500 : 404,
+    template  => "$page.$mode"
   };
   my $bundled = 'mojo/' . ($mode eq 'development' ? 'debug' : $page);
   return $c if _fallbacks($c, $options, $page, $bundled);

@@ -188,28 +188,24 @@ is $cookies->[1], undef, 'no second cookie';
 
 # Switch between secure and normal cookies
 $jar = Mojo::UserAgent::CookieJar->new;
-$jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'foo',
-    secure => 1
-  )
-);
+$jar->add(Mojo::Cookie::Response->new(
+  domain => 'example.com',
+  path   => '/foo',
+  name   => 'foo',
+  value  => 'foo',
+  secure => 1
+));
 $cookies = $jar->find(Mojo::URL->new('https://example.com/foo'));
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'foo', 'right value';
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
 is scalar @$cookies, 0, 'no insecure cookie';
-$jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar'
-  )
-);
+$jar->add(Mojo::Cookie::Response->new(
+  domain => 'example.com',
+  path   => '/foo',
+  name   => 'foo',
+  value  => 'bar'
+));
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';
@@ -220,14 +216,12 @@ is $cookies->[1], undef, 'no second cookie';
 
 # "(" in path
 $jar = Mojo::UserAgent::CookieJar->new;
-$jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo(bar',
-    name   => 'foo',
-    value  => 'bar'
-  )
-);
+$jar->add(Mojo::Cookie::Response->new(
+  domain => 'example.com',
+  path   => '/foo(bar',
+  name   => 'foo',
+  value  => 'bar'
+));
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo(bar'));
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';

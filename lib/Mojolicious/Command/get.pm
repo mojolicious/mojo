@@ -28,12 +28,12 @@ sub run {
     'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
     'H|header=s'  => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
-    'M|method=s' => \(my $method = 'GET'),
-    'o|connect-timeout=i' => sub { $ua->connect_timeout($_[1]) },
-    'r|redirect'          => \my $redirect,
-    'S|response-size=i'   => sub { $ua->max_response_size($_[1]) },
-    'u|user=s'            => \my $user,
-    'v|verbose'           => \my $verbose;
+    'M|method=s'             => \(my $method = 'GET'),
+    'o|connect-timeout=i'    => sub { $ua->connect_timeout($_[1]) },
+    'r|redirect'             => \my $redirect,
+    'S|response-size=i'      => sub { $ua->max_response_size($_[1]) },
+    'u|user=s'               => \my $user,
+    'v|verbose'              => \my $verbose;
 
   @args = map { decode 'UTF-8', $_ } @args;
   die $self->usage unless my $url = shift @args;

@@ -1,5 +1,6 @@
 
-7.67  2018-02-14
+7.67  2018-02-19
+  - Modernized ".perltidyrc".
 
 7.66  2018-02-13
   - This release contains fixes for security issues, everybody should upgrade!

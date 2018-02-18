@@ -11,11 +11,11 @@ use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::Util 'decode';
 
-has content => sub { Mojo::Content::Single->new };
-has default_charset => 'UTF-8';
-has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
+has content          => sub { Mojo::Content::Single->new };
+has default_charset  => 'UTF-8';
+has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} // 16777216 };
-has version => '1.1';
+has version          => '1.1';
 
 sub body {
   my $self = shift;

@@ -164,13 +164,11 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('yada'), [qw(size 1 5 10)], 'right error';
 
 # Upload
-$validation = $t->app->validation->input(
-  {
-    foo => Mojo::Upload->new,
-    bar => [Mojo::Upload->new, Mojo::Upload->new],
-    baz => [Mojo::Upload->new, 'test']
-  }
-);
+$validation = $t->app->validation->input({
+  foo => Mojo::Upload->new,
+  bar => [Mojo::Upload->new, Mojo::Upload->new],
+  baz => [Mojo::Upload->new, 'test']
+});
 ok $validation->required('foo')->upload->is_valid, 'valid';
 ok $validation->required('bar')->upload->is_valid, 'valid';
 ok $validation->required('baz')->is_valid, 'valid';
@@ -181,18 +179,15 @@ is_deeply $validation->error('baz'), [qw(upload 1)], 'right error';
 is_deeply $validation->failed, ['baz'], 'right names';
 
 # Upload size
-$validation = $t->app->validation->input(
-  {
-    foo => [
-      Mojo::Upload->new(asset => Mojo::Asset::Memory->new->add_chunk('valid'))
-    ],
-    bar => [
-      Mojo::Upload->new(
-        asset => Mojo::Asset::Memory->new->add_chunk('not valid')
-      )
-    ]
-  }
-);
+$validation = $t->app->validation->input({
+  foo =>
+    [Mojo::Upload->new(asset => Mojo::Asset::Memory->new->add_chunk('valid'))],
+  bar => [
+    Mojo::Upload->new(
+      asset => Mojo::Asset::Memory->new->add_chunk('not valid')
+    )
+  ]
+});
 ok $validation->required('foo')->upload->size(1, 6)->is_valid, 'valid';
 ok !$validation->has_error, 'no error';
 ok !$validation->required('bar')->upload->size(1, 6)->is_valid, 'not valid';

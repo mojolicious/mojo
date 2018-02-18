@@ -23,9 +23,9 @@ has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
 has ioloop             => sub { Mojo::IOLoop->new };
 has key                => sub { $ENV{MOJO_KEY_FILE} };
 has max_connections    => 5;
-has max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
-has proxy => sub { Mojo::UserAgent::Proxy->new };
-has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
+has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
+has proxy              => sub { Mojo::UserAgent::Proxy->new };
+has request_timeout    => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
 has server     => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 

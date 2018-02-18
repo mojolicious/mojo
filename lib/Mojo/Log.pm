@@ -15,8 +15,8 @@ has handle => sub {
   # File
   return Mojo::File->new($path)->open('>>');
 };
-has history => sub { [] };
-has level => 'debug';
+has history          => sub { [] };
+has level            => 'debug';
 has max_history_size => 10;
 has 'path';
 has short => sub { $ENV{MOJO_LOG_SHORT} };

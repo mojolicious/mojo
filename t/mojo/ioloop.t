@@ -17,26 +17,22 @@ is $loop->max_connections, 10, 'right value';
 
 # Double start
 my $err;
-Mojo::IOLoop->next_tick(
-  sub {
-    my $loop = shift;
-    eval { $loop->start };
-    $err = $@;
-    $loop->stop;
-  }
-);
+Mojo::IOLoop->next_tick(sub {
+  my $loop = shift;
+  eval { $loop->start };
+  $err = $@;
+  $loop->stop;
+});
 Mojo::IOLoop->start;
 like $err, qr/^Mojo::IOLoop already running/, 'right error';
 
 # Double one_tick
 $err = undef;
-Mojo::IOLoop->next_tick(
-  sub {
-    my $loop = shift;
-    eval { $loop->one_tick };
-    $err = $@;
-  }
-);
+Mojo::IOLoop->next_tick(sub {
+  my $loop = shift;
+  eval { $loop->one_tick };
+  $err = $@;
+});
 Mojo::IOLoop->one_tick;
 like $err, qr/^Mojo::IOLoop already running/, 'right error';
 
@@ -94,12 +90,10 @@ Mojo::IOLoop->start;
 $count = 0;
 Mojo::IOLoop->recurring(10 => sub { $timer++ });
 my $running;
-Mojo::IOLoop->next_tick(
-  sub {
-    Mojo::IOLoop->reset;
-    $running = Mojo::IOLoop->is_running;
-  }
-);
+Mojo::IOLoop->next_tick(sub {
+  Mojo::IOLoop->reset;
+  $running = Mojo::IOLoop->is_running;
+});
 Mojo::IOLoop->start;
 ok !$running, 'not running';
 is $count, 0, 'no recurring events';
@@ -294,13 +288,11 @@ $loop = Mojo::IOLoop->new->max_connections(2);
 my @accepting;
 $id = $loop->server(
   {address => '127.0.0.1', single_accept => 1} => sub {
-    shift->next_tick(
-      sub {
-        my $loop = shift;
-        push @accepting, $loop->acceptor($id)->is_accepting;
-        $loop->stop if @accepting == 2;
-      }
-    );
+    shift->next_tick(sub {
+      my $loop = shift;
+      push @accepting, $loop->acceptor($id)->is_accepting;
+      $loop->stop if @accepting == 2;
+    });
   }
 );
 $port = $loop->acceptor($id)->port;

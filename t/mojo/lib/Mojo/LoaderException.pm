@@ -2,7 +2,7 @@ package Mojo::LoaderException;
 
 use Mojo::Base -base;
 
-sub new {}
+sub new { }
 
 foo {
 

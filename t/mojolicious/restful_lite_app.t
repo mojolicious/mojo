@@ -39,7 +39,7 @@ post sub {
     json => {json => {just => 'works too'}},
     html => {text => '<html><body>works too'},
     xml  => {data => '<just>works too</just>'},
-    any => {text => 'works too', status => 201}
+    any  => {text => 'works too', status => 201}
   );
 };
 

@@ -268,8 +268,8 @@ is_deeply decode_json($bytes), ['test'], 'successful roundtrip';
 # Blessed reference with TO_JSON method
 $bytes = encode_json(JSONTest->new);
 is_deeply decode_json($bytes), {}, 'successful roundtrip';
-$bytes = encode_json(
-  JSONTest->new(something => {just => 'works'}, else => {not => 'working'}));
+$bytes = encode_json(JSONTest->new(
+  something => {just => 'works'}, else => {not => 'working'}));
 is_deeply decode_json($bytes), {just => 'works'}, 'successful roundtrip';
 
 # Boolean shortcut

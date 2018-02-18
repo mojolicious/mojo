@@ -263,13 +263,11 @@ post '/with/header/condition' => sub {
 get '/session_cookie' => sub {
   my $c = shift;
   $c->render(text => 'Cookie set!');
-  $c->res->cookies(
-    Mojo::Cookie::Response->new(
-      path  => '/session_cookie',
-      name  => 'session',
-      value => '23'
-    )
-  );
+  $c->res->cookies(Mojo::Cookie::Response->new(
+    path  => '/session_cookie',
+    name  => 'session',
+    value => '23'
+  ));
 };
 
 get '/session_cookie/2' => sub {
@@ -374,13 +372,11 @@ get '/redirect_twice' => sub { shift->redirect_to('/redirect_named') };
 
 get '/redirect_callback' => sub {
   my $c = shift;
-  Mojo::IOLoop->next_tick(
-    sub {
-      $c->res->code(301);
-      $c->res->body('Whatever!');
-      $c->redirect_to('http://127.0.0.1/foo');
-    }
-  );
+  Mojo::IOLoop->next_tick(sub {
+    $c->res->code(301);
+    $c->res->body('Whatever!');
+    $c->redirect_to('http://127.0.0.1/foo');
+  });
 };
 
 get '/static' => sub { shift->reply->static('hello.txt') };

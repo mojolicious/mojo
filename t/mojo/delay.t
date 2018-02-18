@@ -199,12 +199,10 @@ $delay = Mojo::IOLoop::Delay->new;
 $delay->steps(
   sub {
     my $end = shift->begin;
-    Mojo::IOLoop->next_tick(
-      sub {
-        $result = 'pass';
-        $end->();
-      }
-    );
+    Mojo::IOLoop->next_tick(sub {
+      $result = 'pass';
+      $end->();
+    });
   },
   sub { die 'Second step!' },
   sub { $result = 'failed' }

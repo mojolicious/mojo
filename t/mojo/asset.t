@@ -1,6 +1,8 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use Carp 'croak';
+use Config;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::File qw(path tempdir);
@@ -241,6 +243,22 @@ ok !-e $path, 'file has been cleaned up';
   local *IO::Handle::syswrite = sub { $! = 0; 2 };
   eval { Mojo::Asset::File->new->add_chunk('test') };
   like $@, qr/Can't write to asset: .*/, 'right error';
+}
+
+# Forked process
+SKIP: {
+  skip 'Real fork is required!', 2 if $Config{d_pseudofork};
+  $file = Mojo::Asset::File->new->add_chunk('Fork test!');
+  $path = $file->path;
+  ok -e $path, 'file exists';
+  is $file->slurp, 'Fork test!', 'right content';
+  croak "Can't fork: $!" unless defined(my $pid = fork);
+  exit 0 unless $pid;
+  waitpid $pid, 0 if $pid;
+  ok -e $path, 'file still exists';
+  is $file->slurp, 'Fork test!', 'right content';
+  undef $file;
+  ok !-e $path, 'file has been cleaned up';
 }
 
 # Abstract methods

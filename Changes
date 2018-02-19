@@ -1,6 +1,8 @@
 
 7.67  2018-02-19
   - Modernized ".perltidyrc".
+  - Fixed a bug in Mojo::Asset::File where forked processes could delete
+    temporary files prematurely.
 
 7.66  2018-02-13
   - This release contains fixes for security issues, everybody should upgrade!

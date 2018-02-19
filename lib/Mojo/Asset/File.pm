@@ -29,9 +29,12 @@ has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec::Functions::tmpdir };
 
 sub DESTROY {
   my $self = shift;
+
   return unless $self->cleanup && defined(my $path = $self->path);
   if (my $handle = $self->handle) { close $handle }
-  unlink $path if -w $path;
+
+  # Only the process that created the file is allowed to remove it
+  unlink $path if -w $path && ($self->{pid} // $$) == $$;
 }
 
 sub add_chunk {
@@ -108,6 +111,12 @@ sub move_to {
 }
 
 sub mtime { (stat shift->handle)[9] }
+
+sub new {
+  my $file = shift->SUPER::new(@_);
+  $file->{pid} = $$;
+  return $file;
+}
 
 sub size { -s shift->handle }
 
@@ -227,6 +236,14 @@ Move asset data into a specific file and disable L</"cleanup">.
   my $mtime = $file->mtime;
 
 Modification time of asset.
+
+=head2 new
+
+  my $file = Mojo::Asset::File->new;
+  my $file = Mojo::Asset::File->new(path => '/home/sri/test.txt');
+  my $file = Mojo::Asset::File->new({path => '/home/sri/test.txt'});
+
+Construct a new L<Mojo::Asset::File> object.
 
 =head2 size
 

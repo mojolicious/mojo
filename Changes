@@ -1,4 +1,6 @@
 
+7.68  2018-02-20
+
 7.67  2018-02-19
   - Modernized ".perltidyrc".
   - Fixed a bug in Mojo::Asset::File where forked processes could delete

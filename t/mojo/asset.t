@@ -247,7 +247,7 @@ ok !-e $path, 'file has been cleaned up';
 
 # Forked process
 SKIP: {
-  skip 'Real fork is required!', 2 if $Config{d_pseudofork};
+  skip 'Real fork is required!', 5 if $Config{d_pseudofork};
   $file = Mojo::Asset::File->new->add_chunk('Fork test!');
   $path = $file->path;
   ok -e $path, 'file exists';

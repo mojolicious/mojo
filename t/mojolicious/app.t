@@ -61,6 +61,7 @@ is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
   'right class';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
+is $t->app->sessions->same_site,     'lax',          'right samesite';
 is_deeply $t->app->commands->namespaces,
   [qw(Mojolicious::Command MojoliciousTest::Command)], 'right namespaces';
 is $t->app, $t->app->commands->app, 'applications are equal';

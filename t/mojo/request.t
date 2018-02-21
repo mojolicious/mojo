@@ -456,7 +456,7 @@ $req->parse("o World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url->host, 'foo',            'no host';
+is $req->url->host, 'foo',            'right host';
 is $req->url->path, '/bar//baz.html', 'right path';
 is $req->url, '//foo/bar//baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';

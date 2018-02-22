@@ -308,7 +308,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is $req->content->progress, 0, 'right progress';
   $req->parse('GET /foo/bar/baz.html?fo');
   is $req->content->progress, 0, 'right progress';
-  $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+  $req->parse("o=13 HTTP/1.0\x0d\x0aContent");
   $req->parse('-Type: text/');
   is $req->content->progress, 0, 'right progress';
   $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
@@ -326,7 +326,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   ok $req->is_finished, 'request is finished';
   is $req->method,      'GET', 'right method';
   is $req->version,     '1.0', 'right version';
-  is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+  is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
   is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
   is $req->headers->content_length, 27, 'right "Content-Length" value';
 }
@@ -433,14 +433,14 @@ $req = Mojo::Message::Request->new;
 my $body = '';
 $req->content->on(read => sub { $body .= pop });
 $req->parse('GET /foo/bar/baz.html?fo');
-$req->parse("o=13#23 HTTP/1.0\x0aContent");
+$req->parse("o=13 HTTP/1.0\x0aContent");
 $req->parse('-Type: text/');
 $req->parse("plain\x0aContent-Length: 27\x0a\x0aH");
 $req->parse("ello World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';
 is $req->body, "Hello World!\n1234\nlalalala\n", 'right content';
@@ -449,23 +449,23 @@ is $body, "Hello World!\n1234\nlalalala\n", 'right content';
 # Parse full HTTP 1.0 request (no scheme and empty elements in path)
 $req = Mojo::Message::Request->new;
 $req->parse('GET //foo/bar//baz.html?fo');
-$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse("o=13 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url->host, 'foo',            'right host';
-is $req->url->path, '/bar//baz.html', 'right path';
-is $req->url, '//foo/bar//baz.html?foo=13#23', 'right URL';
+is $req->url->host, undef, 'no host';
+is $req->url->path, '//foo/bar//baz.html', 'right path';
+is $req->url, '//foo/bar//baz.html?foo=13', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';
 
 # Parse full HTTP 1.0 request (behind reverse proxy)
 $req = Mojo::Message::Request->new;
 $req->parse('GET /foo/bar/baz.html?fo');
-$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse("o=13 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a");
 $req->parse("Host: mojolicious.org\x0d\x0a");
@@ -474,8 +474,8 @@ $req->parse("Hello World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->url->to_abs, 'http://mojolicious.org/foo/bar/baz.html?foo=13#23',
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
+is $req->url->to_abs, 'http://mojolicious.org/foo/bar/baz.html?foo=13',
   'right absolute URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';
@@ -485,7 +485,7 @@ $req      = Mojo::Message::Request->new;
 $finished = undef;
 $req->on(finish => sub { $finished = shift->is_finished });
 $req->parse('GET /foo/bar/baz.html?fo');
-$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse("o=13 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n123");
@@ -495,14 +495,14 @@ ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';
 
 # Parse full HTTP 1.0 request with UTF-8 form input
 $req = Mojo::Message::Request->new;
 $req->parse('GET /foo/bar/baz.html?fo');
-$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse("o=13 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: application/');
 $req->parse("x-www-form-urlencoded\x0d\x0aContent-Length: 14");
 $req->parse("\x0d\x0a\x0d\x0a");
@@ -510,7 +510,7 @@ $req->parse('name=%E2%98%83');
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $req->headers->content_length, 14, 'right "Content-Length" value';
@@ -538,7 +538,7 @@ is $req->body, $compressed, 'right content';
 # Parse HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
 is $req->content->progress, 0, 'right progress';
-$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->parse("POST /foo/bar/baz.html?foo=13 HTTP/1.1\x0d\x0a");
 is $req->content->progress, 0, 'right progress';
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
@@ -556,7 +556,7 @@ is $req->content->progress, 28, 'right progress';
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_length, 13,           'right "Content-Length" value';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->content->asset->size, 13, 'right size';
@@ -572,8 +572,8 @@ $req->on(
   }
 );
 $req->content->unsubscribe('read')->on(read => sub { $buffer .= pop });
-$req->on(finish => sub { $finish .= shift->url->fragment });
-$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->on(finish => sub { $finish .= shift->url->query });
+$req->parse("POST /foo/bar/baz.html?foo=13 HTTP/1.1\x0d\x0a");
 is $progress, '', 'no progress';
 $req->parse("Content-Type: text/plain\x0d\x0a");
 is $progress, '', 'no progress';
@@ -585,26 +585,26 @@ $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 is $finish, '', 'not finished yet';
 $req->parse("0\x0d\x0a\x0d\x0a");
-is $finish, '23', 'finished';
+is $finish,   'foo=13',            'finished';
 is $progress, '/foo/bar/baz.html', 'made progress';
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_length, 13,           'right "Content-Length" value';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $buffer, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 "application/x-www-form-urlencoded"
 $req = Mojo::Message::Request->new;
-$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->parse("POST /foo/bar/baz.html?foo=13 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 25\x0d\x0a");
 $req->parse("Content-Type: application/x-www-form-urlencoded\x0d\x0a");
 $req->parse("\x0d\x0afoo=bar&+tset=23+&foo=bar");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $req->content->asset->size, 25, 'right size';
@@ -624,7 +624,7 @@ is $req->param('test23'), undef, 'no value';
 
 # Parse HTTP 1.1 chunked request with trailing headers
 $req = Mojo::Message::Request->new;
-$req->parse("POST /foo/bar/baz.html?foo=13&bar=23#23 HTTP/1.1\x0d\x0a");
+$req->parse("POST /foo/bar/baz.html?foo=13&bar=23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: whatever\x0d\x0a");
 $req->parse("Trailer: X-Trailer1; X-Trailer2\x0d\x0a\x0d\x0a");
@@ -638,7 +638,7 @@ $req->parse("X-Trailer2: 123\x0d\x0a\x0d\x0a");
 ok $req->is_finished,  'request is finished';
 is $req->method,       'POST', 'right method';
 is $req->version,      '1.1', 'right version';
-is $req->url,          '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->url,          '/foo/bar/baz.html?foo=13&bar=23', 'right URL';
 is $req->query_params, 'foo=13&bar=23', 'right parameters';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
@@ -649,7 +649,7 @@ is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 chunked request with trailing headers (different variation)
 $req = Mojo::Message::Request->new;
-$req->parse("POST /foo/bar/baz.html?foo=13&bar=23#23 HTTP/1.1\x0d\x0a");
+$req->parse("POST /foo/bar/baz.html?foo=13&bar=23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0aTransfer-Enc");
 $req->parse("oding: chunked\x0d\x0a");
 $req->parse("Trailer: X-Trailer\x0d\x0a\x0d\x0a");
@@ -661,7 +661,7 @@ $req->parse("0\x0d\x0aX-Trailer: 777\x0d\x0a\x0d\x0aLEFTOVER");
 ok $req->is_finished,  'request is finished';
 is $req->method,       'POST', 'right method';
 is $req->version,      '1.1', 'right version';
-is $req->url,          '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->url,          '/foo/bar/baz.html?foo=13&bar=23', 'right URL';
 is $req->query_params, 'foo=13&bar=23', 'right parameters';
 ok !defined $req->headers->transfer_encoding, 'no "Transfer-Encoding" value';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
@@ -672,7 +672,7 @@ is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 chunked request with trailing headers (different variation)
 $req = Mojo::Message::Request->new;
-$req->parse("POST /foo/bar/baz.html?foo=13&bar=23#23 HTTP/1.1\x0d\x0a");
+$req->parse("POST /foo/bar/baz.html?foo=13&bar=23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: chunked\x0d\x0a");
 $req->parse("Trailer: X-Trailer1; X-Trailer2\x0d\x0a\x0d\x0a");
@@ -684,7 +684,7 @@ $req->parse("0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
 ok $req->is_finished,  'request is finished';
 is $req->method,       'POST', 'right method';
 is $req->version,      '1.1', 'right version';
-is $req->url,          '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->url,          '/foo/bar/baz.html?foo=13&bar=23', 'right URL';
 is $req->query_params, 'foo=13&bar=23', 'right parameters';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
@@ -695,7 +695,7 @@ is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 chunked request with trailing headers (no Trailer header)
 $req = Mojo::Message::Request->new;
-$req->parse("POST /foo/bar/baz.html?foo=13&bar=23#23 HTTP/1.1\x0d\x0a");
+$req->parse("POST /foo/bar/baz.html?foo=13&bar=23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
 $req->parse("4\x0d\x0a");
@@ -706,7 +706,7 @@ $req->parse("0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
 ok $req->is_finished,  'request is finished';
 is $req->method,       'POST', 'right method';
 is $req->version,      '1.1', 'right version';
-is $req->url,          '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->url,          '/foo/bar/baz.html?foo=13&bar=23', 'right URL';
 is $req->query_params, 'foo=13&bar=23', 'right parameters';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
@@ -718,7 +718,7 @@ is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 # Parse HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;
 is $req->content->progress, 0, 'right progress';
-$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+$req->parse("GET /foo/bar/baz.html?foo13 HTTP/1.1\x0d\x0a");
 is $req->content->progress, 0, 'right progress';
 $req->parse("Content-Length: 416\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
@@ -743,11 +743,11 @@ $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
 is $req->content->progress, 416, 'right progress';
 ok $req->is_finished, 'request is finished';
 ok $req->content->is_multipart, 'multipart content';
-is $req->body,         '',                           'no content';
-is $req->method,       'GET',                        'right method';
-is $req->version,      '1.1',                        'right version';
-is $req->url,          '/foo/bar/baz.html?foo13#23', 'right URL';
-is $req->query_params, 'foo13',                      'right parameters';
+is $req->body,         '',                        'no content';
+is $req->method,       'GET',                     'right method';
+is $req->version,      '1.1',                     'right version';
+is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
+is $req->query_params, 'foo13',                   'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
@@ -788,7 +788,7 @@ $req->content->on(
     );
   }
 );
-$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+$req->parse("GET /foo/bar/baz.html?foo13 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 562\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
@@ -812,11 +812,11 @@ $req->parse("Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
 $req->parse("Bye!\x0d\x0a------------0xKhTmLbOuNdArY--");
 ok $req->is_finished, 'request is finished';
 ok $req->content->is_multipart, 'multipart content';
-is $req->body,         '',                           'no content';
-is $req->method,       'GET',                        'right method';
-is $req->version,      '1.1',                        'right version';
-is $req->url,          '/foo/bar/baz.html?foo13#23', 'right URL';
-is $req->query_params, 'foo13',                      'right parameters';
+is $req->body,         '',                        'no content';
+is $req->method,       'GET',                     'right method';
+is $req->version,      '1.1',                     'right version';
+is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
+is $req->query_params, 'foo13',                   'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
@@ -869,7 +869,7 @@ $req->content->on(
     );
   }
 );
-$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+$req->parse("GET /foo/bar/baz.html?foo13 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 418\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
@@ -894,10 +894,10 @@ is $stream, "#!/usr/bin/perl\n\nuse strict;\nuse war", 'right content';
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
 ok $req->is_finished, 'request is finished';
 ok $req->content->is_multipart, 'multipart content';
-is $req->method,       'GET',                        'right method';
-is $req->version,      '1.1',                        'right version';
-is $req->url,          '/foo/bar/baz.html?foo13#23', 'right URL';
-is $req->query_params, 'foo13',                      'right parameters';
+is $req->method,       'GET',                     'right method';
+is $req->version,      '1.1',                     'right version';
+is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
+is $req->query_params, 'foo13',                   'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
@@ -918,7 +918,7 @@ is $stream,
 # Parse HTTP 1.1 multipart request (without upgrade)
 $req = Mojo::Message::Request->new;
 $req->content->auto_upgrade(0);
-$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+$req->parse("GET /foo/bar/baz.html?foo13 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 418\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
@@ -938,10 +938,10 @@ $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
 ok $req->is_finished, 'request is finished';
 ok !$req->content->is_multipart, 'no multipart content';
-is $req->method,       'GET',                        'right method';
-is $req->version,      '1.1',                        'right version';
-is $req->url,          '/foo/bar/baz.html?foo13#23', 'right URL';
-is $req->query_params, 'foo13',                      'right parameters';
+is $req->method,       'GET',                     'right method';
+is $req->version,      '1.1',                     'right version';
+is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
+is $req->query_params, 'foo13',                   'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
@@ -952,7 +952,7 @@ like $req->content->asset->slurp, qr/------------0xKhTmLbOuNdArY--$/,
 
 # Parse HTTP 1.1 multipart request with "0" filename
 $req = Mojo::Message::Request->new;
-$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+$req->parse("GET /foo/bar/baz.html?foo13 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 410\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
@@ -972,10 +972,10 @@ $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
 ok $req->is_finished, 'request is finished';
 ok $req->content->is_multipart, 'no multipart content';
-is $req->method,       'GET',                        'right method';
-is $req->version,      '1.1',                        'right version';
-is $req->url,          '/foo/bar/baz.html?foo13#23', 'right URL';
-is $req->query_params, 'foo13',                      'right parameters';
+is $req->method,       'GET',                     'right method';
+is $req->version,      '1.1',                     'right version';
+is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
+is $req->query_params, 'foo13',                   'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
@@ -994,7 +994,7 @@ is $req->upload('upload')->asset->size, 69, 'right size';
 
 # Parse full HTTP 1.1 proxy request with basic authentication
 $req = Mojo::Message::Request->new;
-$req->parse("GET http://127.0.0.1/foo/bar HTTP/1.1\x0d\x0a");
+$req->parse("GET http://127.0.0.1/foo/bar#baz HTTP/1.1\x0d\x0a");
 $req->parse("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Host: 127.0.0.1\x0d\x0a");
 $req->parse("Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
@@ -1652,7 +1652,7 @@ $req->parse('GET /foo/bar/baz.html?fo');
 is $counter, 1, 'right count';
 ok !$req->content->is_parsing_body, 'is not parsing body';
 ok !$req->is_finished, 'request is not finished';
-$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse("o=13 HTTP/1.0\x0d\x0aContent");
 is $counter, 2, 'right count';
 ok !$req->content->is_parsing_body, 'is not parsing body';
 ok !$req->is_finished, 'request is not finished';
@@ -1683,7 +1683,7 @@ ok $req->is_finished, 'request is finished';
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';
 my $cookies = $req->cookies;
@@ -2097,12 +2097,13 @@ is $req->url->query->pairs->[0], 'Mojo::Message::Request', 'right value';
 
 # Parse lots of special characters in URL
 $req = Mojo::Message::Request->new;
-$req->parse("GET /#09azAZ!\$%&'()*+,-./:;=?@[\\]^_`{|}~\xC3\x9F ");
+$req->parse("GET /09azAZ!\$%&'()*+,-./:;=?@[\\]^_`{|}~\xC3\x9F#abc ");
 $req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url, "/#09azAZ!\$%25&\'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~%C3%9F",
+is $req->url,
+  "/09azAZ!\$%&'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~%C3%83%C2%9F",
   'right URL';
 
 # Abstract methods

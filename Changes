@@ -1,5 +1,8 @@
 
-7.68  2018-02-20
+7.68  2018-02-22
+  - Fixed RFC 7230 compliance bugs in Mojo::Message::Request that prevented
+    "GET //foo/bar HTTP/1.1" to be interpreted as a request target in origin
+    form.
 
 7.67  2018-02-19
   - Modernized ".perltidyrc".

@@ -54,8 +54,11 @@ sub extract_start_line {
   # We have a (hopefully) full request-line
   return !$self->error({message => 'Bad request start-line'})
     unless $1 =~ /^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$/;
-  my $url = $self->method($1)->version($3)->url;
-  return !!($1 eq 'CONNECT' ? $url->host_port($2) : $url->parse($2));
+  my $url    = $self->method($1)->version($3)->url;
+  my $target = $2;
+  return !!$url->host_port($target) if $1 eq 'CONNECT';
+  return !!$url->parse($target)->fragment(undef) if $target =~ /^[^:\/?#]+:/;
+  return !!$url->path_query($target);
 }
 
 sub fix_headers {

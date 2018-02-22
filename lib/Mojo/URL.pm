@@ -89,8 +89,10 @@ sub path {
 sub path_query {
   my ($self, $pq) = @_;
 
-  return $pq =~ /^([^?#]*)(?:\?([^#]*))?/ ? $self->path($1)->query($2) : $self
-    if defined $pq;
+  if (defined $pq) {
+    return $self unless $pq =~ /^([^?#]*)(?:\?([^#]*))?/;
+    return defined $2 ? $self->path($1)->query($2) : $self->path($1);
+  }
 
   my $query = $self->query->to_string;
   return $self->path->to_string . (length $query ? "?$query" : '');

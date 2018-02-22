@@ -405,7 +405,7 @@ L<Mojo::Path/"merge">, defaults to a L<Mojo::Path> object.
 =head2 path_query
 
   my $path_query = $url->path_query;
-  $url           = $url->path_query('/foo/bar?a=1b=2');
+  $url           = $url->path_query('/foo/bar?a=1&b=2');
 
 Normalized version of L</"path"> and L</"query">.
 

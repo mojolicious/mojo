@@ -1,4 +1,6 @@
 
+7.69  2018-02-23
+
 7.68  2018-02-22
   - Fixed RFC 7230 compliance bugs in Mojo::Message::Request that prevented
     "GET //foo/bar HTTP/1.1" to be interpreted as a request target in origin

@@ -1,5 +1,9 @@
 
 7.69  2018-02-24
+  - Added EXPERIMENTAL samesite attributes to Mojo::Cookie::Response and
+    Mojolicious::Sessions.
+  - Improved session security by setting "SameSite=Strict" for all session
+    cookies, which can very effectively prevent CSRF attacks.
   - Improved respond_to method in Mojolicious::Controller and accepts helper in
     Mojolicious::Plugin::DefaultHelpers to no longer limit support for multiple
     MIME types to requests containing an X-Requested-With header, since browsers

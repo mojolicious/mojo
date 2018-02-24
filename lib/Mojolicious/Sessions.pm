@@ -9,6 +9,7 @@ has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 has deserialize        => sub { \&Mojo::JSON::j };
+has samesite           => 'Strict';
 has serialize          => sub { \&Mojo::JSON::encode_json };
 
 sub load {
@@ -55,6 +56,7 @@ sub store {
     expires  => $session->{expires},
     httponly => 1,
     path     => $self->cookie_path,
+    samesite => $self->samesite,
     secure   => $self->secure
   };
   $c->signed_cookie($self->cookie_name, $value, $options);
@@ -139,6 +141,15 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
     my $bytes = shift;
     return {};
   });
+
+=head2 samesite
+
+  my $same  = $sessions->samesite;
+  $sessions = $sessions->samesite('Lax');
+
+Set the C<SameSite> attribute on all sessions cookies to this value, which can
+very effectively prevent CSRF attacks, defaults to C<Strict>. Note that this
+attribute is EXPERIMENTAL and might change without warning!
 
 =head2 secure
 

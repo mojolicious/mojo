@@ -477,21 +477,9 @@ $t->get_ok('/rest' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
   ->status_is(200)->content_type_is('application/xml')
   ->text_is(just => 'works');
 
-# Internet Explorer 8
-my $ie
-  = 'image/jpeg, application/x-ms-application, image/gif, application/xaml+xml'
-  . ', image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash'
-  . ', application/msword, */*';
-$t->get_ok('/rest.html' => {Accept => $ie})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
-
-# Internet Explorer 8 with query
-$t->get_ok('/rest?format=html' => {Accept => $ie})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
-
-# Chrome 11
-my $chrome = 'application/xml,application/xhtml+xml,text/html;q=0.9'
-  . ',text/plain;q=0.8,image/png,*/*;q=0.5';
+# Chrome 64
+my $chrome = 'text/html,application/xhtml+xml,application/xml;q=0.9'
+  . ',image/webp,image/apng,*/*;q=0.8';
 $t->get_ok('/rest.html' => {Accept => $chrome})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 

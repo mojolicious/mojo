@@ -33,7 +33,7 @@ has mapping => sub {
 };
 
 sub detect {
-  my ($self, $accept, $prioritize) = @_;
+  my ($self, $accept) = @_;
 
   # Extract and prioritize MIME types
   my %types;
@@ -41,7 +41,6 @@ sub detect {
     and $types{lc $1} = $2 // 1
     for split ',', $accept // '';
   my @detected = sort { $types{$b} <=> $types{$a} } sort keys %types;
-  return [] if !$prioritize && @detected > 1;
 
   # Detect extensions from MIME types
   my %reverse;
@@ -50,6 +49,7 @@ sub detect {
     my @types = @{$mapping->{$ext}};
     push @{$reverse{$_}}, $ext for map { s/\;.*$//; lc $_ } @types;
   }
+
   return [map { @{$reverse{$_} // []} } @detected];
 }
 
@@ -127,11 +127,9 @@ the following new ones.
 
 =head2 detect
 
-  my $exts = $types->detect('application/json;q=9');
-  my $exts = $types->detect('text/html, application/json;q=9', 1);
+  my $exts = $types->detect('text/html, application/json;q=9');
 
-Detect file extensions from C<Accept> header value, prioritization of
-unspecific values that contain more than one MIME type is disabled by default.
+Detect file extensions from C<Accept> header value.
 
   # List detected extensions prioritized
   say for @{$types->detect('application/json, text/xml;q=0.1', 1)};

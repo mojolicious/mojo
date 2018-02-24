@@ -1,5 +1,9 @@
 
-7.69  2018-02-23
+7.69  2018-02-24
+  - Improved respond_to method in Mojolicious::Controller and accepts helper in
+    Mojolicious::Plugin::DefaultHelpers to no longer limit support for multiple
+    MIME types to requests containing an X-Requested-With header, since browsers
+    have become smarter about requesting what they actually want.
 
 7.68  2018-02-22
   - Fixed RFC 7230 compliance bugs in Mojo::Message::Request that prevented

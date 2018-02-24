@@ -772,10 +772,7 @@ Automatically select best possible representation for resource from C<Accept>
 request header, C<format> stash value or C<format> C<GET>/C<POST> parameter,
 defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty
 C<204> response. Each representation can be handled with a callback or a hash
-reference containing arguments to be passed to L</"render">. Since browsers
-often don't really know what they actually want, unspecific C<Accept> request
-headers with more than one MIME type will be ignored, unless the
-C<X-Requested-With> header is set to the value C<XMLHttpRequest>.
+reference containing arguments to be passed to L</"render">.
 
   # Everything else than "json" and "xml" gets a 204 response
   $c->respond_to(

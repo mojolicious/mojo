@@ -46,11 +46,6 @@ is_deeply $t->detect('APPLICATION/XML'), ['xml'], 'right formats';
 is_deeply $t->detect('TEXT/XML'),        ['xml'], 'right formats';
 is_deeply $t->detect('text/html;q=0.9'), ['htm', 'html'], 'right formats';
 is_deeply $t->detect('TEXT/HTML;Q=0.9'), ['htm', 'html'], 'right formats';
-is_deeply $t->detect('text/html,*/*'),             [], 'no formats';
-is_deeply $t->detect('text/html;q=0.9,*/*'),       [], 'no formats';
-is_deeply $t->detect('text/html,*/*;q=0.9'),       [], 'no formats';
-is_deeply $t->detect('text/html;q=0.8,*/*;q=0.9'), [], 'no formats';
-is_deeply $t->detect('TEXT/HTML;Q=0.8,*/*;Q=0.9'), [], 'no formats';
 
 # Alternatives
 $t->type(json => ['application/json', 'text/x-json']);
@@ -69,19 +64,19 @@ is $t->type('htm'),  'text/html',               'right type';
 is $t->type('html'), 'text/html;charset=UTF-8', 'right type';
 
 # Prioritize
-is_deeply $t->detect('text/plain', 1), ['txt'], 'right formats';
-is_deeply $t->detect('text/plain,text/html', 1), ['htm', 'html', 'txt'],
+is_deeply $t->detect('text/plain'), ['txt'], 'right formats';
+is_deeply $t->detect('text/plain,text/html'), ['htm', 'html', 'txt'],
   'right formats';
-is_deeply $t->detect('TEXT/HTML; q=0.8 ', 1), ['htm', 'html'], 'right formats';
-is_deeply $t->detect('TEXT/HTML  ;  q  =  0.8 ', 1), ['htm', 'html'],
+is_deeply $t->detect('TEXT/HTML; q=0.8 '), ['htm', 'html'], 'right formats';
+is_deeply $t->detect('TEXT/HTML  ;  q  =  0.8 '), ['htm', 'html'],
   'right formats';
-is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9', 1),
+is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9'),
   ['txt', 'htm', 'html'], 'right formats';
-is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9', 1),
-  ['htm', 'html', 'txt'], 'right formats';
-is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1', 1),
+is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9'), ['htm', 'html', 'txt'],
+  'right formats';
+is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1'),
   ['xml', 'txt', 'xml'], 'right formats';
-is_deeply $t->detect('application/json, text/javascript, */*; q=0.01', 1),
+is_deeply $t->detect('application/json, text/javascript, */*; q=0.01'),
   ['json'], 'right formats';
 
 done_testing();

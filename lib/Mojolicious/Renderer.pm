@@ -26,8 +26,8 @@ sub accepts {
   my ($self, $c) = (shift, shift);
 
   # List representations
-  my $req = $c->req;
-  my @exts = @{$c->app->types->detect($req->headers->accept, $req->is_xhr)};
+  my $req  = $c->req;
+  my @exts = @{$c->app->types->detect($req->headers->accept)};
   if (!@exts && (my $format = $c->stash->{format} || $req->param('format'))) {
     push @exts, $format;
   }
@@ -332,10 +332,7 @@ the following new ones.
 Select best possible representation for L<Mojolicious::Controller> object from
 C<Accept> request header, C<format> stash value or C<format> C<GET>/C<POST>
 parameter, defaults to returning the first extension if no preference could be
-detected. Since browsers often don't really know what they actually want,
-unspecific C<Accept> request headers with more than one MIME type will be
-ignored, unless the C<X-Requested-With> header is set to the value
-C<XMLHttpRequest>.
+detected.
 
 =head2 add_handler
 

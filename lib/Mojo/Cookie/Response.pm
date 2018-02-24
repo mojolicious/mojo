@@ -4,9 +4,9 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires host_only httponly max_age path secure)];
+has [qw(domain expires host_only httponly max_age path secure samesite)];
 
-my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure samesite);
 
 sub parse {
   my ($self, $str) = @_;
@@ -31,7 +31,6 @@ sub parse {
 
 sub to_string {
   my $self = shift;
-
   # Name and value
   return '' unless length(my $name = $self->name // '');
   my $value = $self->value // '';
@@ -55,6 +54,9 @@ sub to_string {
 
   # "Max-Age"
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
+
+  # "SameSite"
+  if (defined(my $samesite = $self->samesite)) { $cookie .= '; SameSite'.ucfirst($samesite) }
 
   return $cookie;
 }
@@ -115,6 +117,17 @@ the cookie's L</"domain">.
 
 HttpOnly flag, which can prevent client-side scripts from accessing this
 cookie.
+
+=head2 samesite
+
+  my $same_site_policy = $cookie->samesite;
+  $cookie  = $cookie->samesite('strict');
+
+SameSite attribute, currently supported by firefox and chrome.
+If its value is 'strict', browsers send cookie only  to same-site requests.
+If its value is 'lax', browsers send them with cross-site requests too.
+All other values are ignored.
+
 
 =head2 max_age
 

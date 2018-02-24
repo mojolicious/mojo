@@ -1,4 +1,6 @@
 
+7.70  2018-02-25
+
 7.69  2018-02-24
   - Improved respond_to method in Mojolicious::Controller and accepts helper in
     Mojolicious::Plugin::DefaultHelpers to no longer limit support for multiple

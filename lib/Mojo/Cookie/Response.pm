@@ -4,10 +4,9 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires host_only httponly max_age path samesite secure)];
+has [qw(domain expires host_only httponly max_age path secure)];
 
-my %ATTRS
-  = map { $_ => 1 } qw(domain expires httponly max-age path samesite secure);
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
 
 sub parse {
   my ($self, $str) = @_;
@@ -53,9 +52,6 @@ sub to_string {
 
   # "HttpOnly"
   $cookie .= "; HttpOnly" if $self->httponly;
-
-  # "SameSite"
-  if (my $same = $self->samesite) { $cookie .= "; SameSite=$same" }
 
   # "Max-Age"
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
@@ -133,14 +129,6 @@ Max age for cookie.
   $cookie  = $cookie->path('/test');
 
 Cookie path.
-
-=head2 samesite
-
-  my $same = $cookie->samesite;
-  $cookie  = $cookie->samesite('Strict');
-
-SameSite attribute, which can very effectively prevent CSRF attacks. Note that
-this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 secure
 

@@ -164,10 +164,9 @@ $cookie->max_age(60);
 $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->httponly(1);
-$cookie->samesite('Lax');
 is $cookie->to_string,
   '0="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
-  . ' path=/test; secure; HttpOnly; SameSite=Lax; Max-Age=60', 'right format';
+  . ' path=/test; secure; HttpOnly; Max-Age=60', 'right format';
 
 # Empty response cookie
 is_deeply(Mojo::Cookie::Response->parse, [], 'no cookies');
@@ -192,22 +191,6 @@ is $cookies->[1]->name,    'SHIPPING',      'right name';
 is $cookies->[1]->value,   'FEDEX',         'right value';
 is $cookies->[1]->expires, 942189161,       'right expires value';
 is $cookies->[2], undef, 'no more cookies';
-
-# Parse full response cookie
-$cookies
-  = Mojo::Cookie::Response->parse(
-      '0="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
-    . ' path=/test; secure; HttpOnly; SameSite=Lax; Max-Age=60');
-is $cookies->[0]->name,    '0',           'right name';
-is $cookies->[0]->value,   'ba r',        'right value';
-is $cookies->[0]->expires, 1218092879,    'right expires value';
-is $cookies->[0]->domain,  'example.com', 'right domain value';
-is $cookies->[0]->path,    '/test',       'right path value';
-ok $cookies->[0]->secure,  'right secure value';
-ok $cookies->[0]->httponly, 'right HttpOnly value';
-is $cookies->[0]->samesite, 'Lax', 'right SameSite value';
-is $cookies->[0]->max_age,  60, 'right Max-Age value';
-is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie (RFC 6265)
 $cookies

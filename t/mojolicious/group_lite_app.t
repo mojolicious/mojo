@@ -270,8 +270,6 @@ like $log, qr/Cookie "foo" is not signed/,       'right message';
 like $log, qr/Cookie "bad" has a bad signature/, 'right message';
 ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
-is $t->tx->res->cookie('mojolicious')->samesite, 'Strict',
-  'session cookie has the right SameSite value';
 $t->app->log->unsubscribe(message => $cb);
 
 # Broken session cookie

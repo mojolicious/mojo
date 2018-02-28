@@ -1,4 +1,6 @@
 
+7.71  2018-03-02
+
 7.70  2018-03-01
   - Fixed ordering of sources for content negotiation in Mojolicious::Renderer.
   - Fixed a content negotiation bug in Mojolicious::Renderer that prevented all

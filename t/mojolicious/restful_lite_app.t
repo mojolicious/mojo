@@ -85,7 +85,7 @@ $t->get_ok('/accepts' => {Accept => 'text/plain'})->status_is(200)
   ->json_is({best => 'txt'});
 
 # Accept "txt" with everything
-$t->get_ok('/accepts.html?format=json' => {Accept => 'text/plain'})
+$t->get_ok('/accepts.txt?format=json' => {Accept => 'text/html'})
   ->status_is(200)->json_is({best => 'txt'});
 
 # Nothing
@@ -122,10 +122,6 @@ $t->get_ok('/rest' => {Accept => 'Text/Html'})->status_is(200)
 
 # Accept "html" with format
 $t->get_ok('/rest.html' => {Accept => 'text/html'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
-
-# Accept "html" with wrong format
-$t->get_ok('/rest.json' => {Accept => 'text/html'})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
 
 # Accept "html" with quality
@@ -168,11 +164,6 @@ $t->get_ok('/rest.json' => {Accept => 'application/json'})->status_is(200)
   ->content_type_is('application/json;charset=UTF-8')
   ->json_is({just => 'works'});
 
-# Accept "json" with wrong format
-$t->get_ok('/rest.png' => {Accept => 'application/json'})->status_is(200)
-  ->content_type_is('application/json;charset=UTF-8')
-  ->json_is({just => 'works'});
-
 # Accept "json" with quality
 $t->get_ok('/rest' => {Accept => 'application/json;q=9'})->status_is(200)
   ->content_type_is('application/json;charset=UTF-8')
@@ -212,10 +203,6 @@ $t->get_ok('/rest' => {Accept => 'APPLICATION/XML'})->status_is(200)
 
 # Accept "xml" with format
 $t->get_ok('/rest.xml' => {Accept => 'application/xml'})->status_is(200)
-  ->content_type_is('application/xml')->text_is(just => 'works');
-
-# Accept "xml" with wrong format
-$t->get_ok('/rest.txt' => {Accept => 'application/xml'})->status_is(200)
   ->content_type_is('application/xml')->text_is(just => 'works');
 
 # Accept "xml" with quality
@@ -264,11 +251,6 @@ $t->post_ok('/rest' => {Accept => 'Text/Html'})->status_is(200)
 
 # Accept "html" with format
 $t->post_ok('/rest.html' => {Accept => 'text/html'})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->text_is('html > body', 'works too');
-
-# Accept "html" with wrong format
-$t->post_ok('/rest.json' => {Accept => 'text/html'})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works too');
 
@@ -338,11 +320,6 @@ $t->post_ok('/rest.json' => {Accept => 'application/json'})->status_is(200)
   ->content_type_is('application/json;charset=UTF-8')
   ->json_is({just => 'works too'});
 
-# Accept "json" with wrong format
-$t->post_ok('/rest.png' => {Accept => 'application/json'})->status_is(200)
-  ->content_type_is('application/json;charset=UTF-8')
-  ->json_is({just => 'works too'});
-
 # Accept "json" with quality
 $t->post_ok('/rest' => {Accept => 'application/json;q=9'})->status_is(200)
   ->content_type_is('application/json;charset=UTF-8')
@@ -406,10 +383,6 @@ $t->post_ok('/rest' => {Accept => 'APPLICATION/XML'})->status_is(200)
 $t->post_ok('/rest.xml' => {Accept => 'application/xml'})->status_is(200)
   ->content_type_is('application/xml')->text_is(just => 'works too');
 
-# Accept "xml" with wrong format
-$t->post_ok('/rest.txt' => {Accept => 'application/xml'})->status_is(200)
-  ->content_type_is('application/xml')->text_is(just => 'works too');
-
 # Accept "xml" with quality
 $t->post_ok('/rest' => {Accept => 'application/xml;q=9'})->status_is(200)
   ->content_type_is('application/xml')->text_is(just => 'works too');
@@ -456,9 +429,10 @@ $t->post_ok(
 $t->post_ok('/rest' => {Accept => 'image/png'})->status_is(201)
   ->content_type_is('text/html;charset=UTF-8')->content_is('works too');
 
-# Unsupported accept with supported query
-$t->post_ok('/rest?format=json' => {Accept => 'image/png'})->status_is(201)
-  ->content_type_is('text/html;charset=UTF-8')->content_is('works too');
+# Unsupported everything
+$t->post_ok('/rest.png?format=jpg' => {Accept => 'image/whatever'})
+  ->status_is(201)->content_type_is('text/html;charset=UTF-8')
+  ->content_is('works too');
 
 # Unsupported format
 $t->post_ok('/rest.png')->status_is(201)

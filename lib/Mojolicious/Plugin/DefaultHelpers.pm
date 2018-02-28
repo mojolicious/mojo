@@ -215,10 +215,10 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
   my $formats = $c->accepts;
   my $format  = $c->accepts('html', 'json', 'txt');
 
-Select best possible representation for resource from C<Accept> request header,
-C<format> stash value or C<format> C<GET>/C<POST> parameter with
-L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension
-if no preference could be detected.
+Select best possible representation for resource from C<format> stash value,
+C<format> C<GET>/C<POST> parameter or C<Accept> request header with
+L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension if
+no preference could be detected.
 
   # Check if JSON is acceptable
   $c->render(json => {hello => 'world'}) if $c->accepts('json');

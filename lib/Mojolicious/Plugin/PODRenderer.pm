@@ -26,7 +26,7 @@ sub register {
 
   # Perldoc browser
   return undef if $conf->{no_perldoc};
-  my $defaults = {module => 'Mojolicious/Guides', format => 'html'};
+  my $defaults = {module => 'Mojolicious/Guides'};
   return $app->routes->any(
     '/perldoc/:module' => $defaults => [module => qr/[^.]+/] => \&_perldoc);
 }

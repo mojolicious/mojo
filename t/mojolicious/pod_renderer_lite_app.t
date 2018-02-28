@@ -76,6 +76,12 @@ $t->get_ok('/perldoc/MojoliciousTest/PODTest' => {Accept => 'text/plain'})
   ->status_is(200)->content_type_is('text/plain;charset=UTF-8')
   ->content_like(qr/package MojoliciousTest::PODTest/);
 
+# Format (source with extension)
+$t->get_ok('/perldoc/MojoliciousTest/PODTest.txt' =>
+    {Accept => 'text/html,application/xhtml+xml,application/xml'})
+  ->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+  ->content_like(qr/package MojoliciousTest::PODTest/);
+
 # Negotiated source
 $t->get_ok('/perldoc/MojoliciousTest/PODTest' => {Accept => 'text/plain'})
   ->status_is(200)->content_type_is('text/plain;charset=UTF-8')

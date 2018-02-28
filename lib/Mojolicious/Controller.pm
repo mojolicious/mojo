@@ -768,8 +768,8 @@ Get L<Mojo::Message::Response> object from L</"tx">.
     any  => sub {...}
   );
 
-Automatically select best possible representation for resource from C<Accept>
-request header, C<format> stash value or C<format> C<GET>/C<POST> parameter,
+Automatically select best possible representation for resource from C<format>
+stash value, C<format> C<GET>/C<POST> parameter or C<Accept> request header,
 defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty
 C<204> response. Each representation can be handled with a callback or a hash
 reference containing arguments to be passed to L</"render">.

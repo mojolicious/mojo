@@ -820,7 +820,7 @@ Current members of the core team in alphabetical order:
 
 Jan Henning Thorsen, C<batman@mojolicious.org>
 
-Joel Berger, C<jberger@cpan.org>
+Joel Berger, C<jberger@mojolicious.org>
 
 Marcus Ramberg, C<marcus@mojolicious.org>
 

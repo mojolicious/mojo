@@ -214,7 +214,7 @@ In addition, violations of this code outside these spaces may affect a person's
 ability to participate within them.
 
 If you believe someone is violating the code of conduct, we ask that you report
-it by emailing Joel Berger (C<jberger@cpan.org>) or other members of
+it by emailing Joel Berger (C<jberger@mojolicious.org>) or other members of
 L<the team|Mojolicious/"CORE DEVELOPERS">.
 
 =over 2

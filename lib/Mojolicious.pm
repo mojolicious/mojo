@@ -810,7 +810,7 @@ L<The Perl Foundation|http://www.perlfoundation.org>, thank you!
 
 =head1 PROJECT FOUNDER
 
-Sebastian Riedel, C<sri@cpan.org>
+Sebastian Riedel, C<kraih@mojolicious.org>
 
 =head1 CORE DEVELOPERS
 
@@ -818,11 +818,11 @@ Current members of the core team in alphabetical order:
 
 =over 2
 
-Jan Henning Thorsen, C<jhthorsen@cpan.org>
+Jan Henning Thorsen, C<batman@mojolicious.org>
 
 Joel Berger, C<jberger@cpan.org>
 
-Marcus Ramberg, C<mramberg@cpan.org>
+Marcus Ramberg, C<marcus@mojolicious.org>
 
 =back
 

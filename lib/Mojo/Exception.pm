@@ -22,8 +22,7 @@ sub inspect {
   # Search for context in files
   for my $file (@files) {
     next unless -r $file->[0] && open my $handle, '<', $file->[0];
-    my @lines = map { decode('UTF-8', $_) // $_ } <$handle>;
-    $self->_context($file->[1], [\@lines]);
+    $self->_context($file->[1], [[<$handle>]]);
     return $self;
   }
 
@@ -60,6 +59,7 @@ sub trace {
 
 sub _append {
   my ($stack, $line) = @_;
+  $line = decode('UTF-8', $line) // $line;
   chomp $line;
   push @$stack, $line;
 }

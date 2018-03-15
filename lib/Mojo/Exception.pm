@@ -1,5 +1,6 @@
 package Mojo::Exception;
 use Mojo::Base -base;
+use Mojo::Util 'decode';
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
@@ -19,8 +20,9 @@ sub inspect {
 
   # Search for context in files
   for my $file (@files) {
-    next unless -r $file->[0] && open my $handle, '<:utf8', $file->[0];
-    $self->_context($file->[1], [[<$handle>]]);
+    next unless -r $file->[0] && open my $handle, '<', $file->[0];
+    my @lines = map { decode('UTF-8', $_) // $_ } <$handle>;
+    $self->_context($file->[1], [\@lines]);
     return $self;
   }
 

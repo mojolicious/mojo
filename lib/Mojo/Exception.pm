@@ -1,7 +1,8 @@
 package Mojo::Exception;
 use Mojo::Base -base;
-use Mojo::Util 'decode';
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
+
+use Mojo::Util 'decode';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message => 'Exception!';

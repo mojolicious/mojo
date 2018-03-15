@@ -55,7 +55,7 @@ sub load_app {
       "package Mojo::Server::Sandbox::@{[md5_sum $path]}; require \$path";
     die qq{Can't load application from file "$path": $@} if $@;
     die qq{File "$path" did not return an application object.\n}
-      unless blessed $app && $app->isa('Mojolicious');
+      unless blessed $app && $app->can('handler');
     $self->app($app);
   };
   FindBin->again;

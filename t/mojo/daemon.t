@@ -8,7 +8,6 @@ BEGIN {
 use Test::More;
 use FindBin;
 use IO::Socket::INET;
-use Mojo;
 use Mojo::File 'path';
 use Mojo::IOLoop;
 use Mojo::Log;
@@ -17,7 +16,7 @@ use Mojo::UserAgent;
 use Mojolicious;
 
 package TestApp;
-use Mojo::Base 'Mojo';
+use Mojo::Base 'Mojolicious';
 
 sub handler {
   my ($self, $tx) = @_;
@@ -67,7 +66,7 @@ is $tx->res->body, 'Hello TestApp!', 'right content';
 }
 
 # Config
-my $app = Mojo->new;
+my $app = Mojolicious->new;
 is $app->config('foo'), undef, 'no value';
 is_deeply $app->config(foo => 'bar')->config, {foo => 'bar'}, 'right value';
 is $app->config('foo'), 'bar', 'right value';

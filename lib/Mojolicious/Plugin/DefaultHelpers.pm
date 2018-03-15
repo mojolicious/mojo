@@ -255,7 +255,7 @@ Turn list into a L<Mojo::Collection> object.
 
   %= config 'something'
 
-Alias for L<Mojo/"config">.
+Alias for L<Mojolicious/"config">.
 
 =head2 content
 

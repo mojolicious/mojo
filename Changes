@@ -1,5 +1,7 @@
 
-7.71  2018-03-02
+7.71  2018-03-15
+  - Deprecated Mojo::build_tx, Mojo::Config, Mojo::handler and Mojo::log.
+  - Added config method to Mojolicious.
 
 7.70  2018-03-01
   - Fixed ordering of sources for content negotiation in Mojolicious::Renderer.

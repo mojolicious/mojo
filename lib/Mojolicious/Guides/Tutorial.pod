@@ -959,10 +959,10 @@ L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
 
 =head2 Mode
 
-You can use the L<Mojo::Log> object from L<Mojo/"log"> to portably collect
-debug messages and automatically disable them later in a production setup by
-changing the L<Mojolicious> operating mode, which can also be retrieved from
-the attribute L<Mojolicious/"mode">.
+You can use the L<Mojo::Log> object from L<Mojolicious/"log"> to portably
+collect debug messages and automatically disable them later in a production
+setup by changing the L<Mojolicious> operating mode, which can also be retrieved
+from the attribute L<Mojolicious/"mode">.
 
   use Mojolicious::Lite;
 

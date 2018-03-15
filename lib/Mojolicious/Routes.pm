@@ -8,7 +8,7 @@ use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
 use Scalar::Util 'weaken';
 
-has base_classes => sub { [qw(Mojolicious::Controller Mojo)] };
+has base_classes => sub { [qw(Mojolicious::Controller Mojolicious)] };
 has cache        => sub { Mojo::Cache->new };
 has [qw(conditions shortcuts)] => sub { {} };
 has hidden     => sub { [qw(attr has new tap)] };
@@ -144,7 +144,7 @@ sub _controller {
   my $class = ref $new;
   my $app   = $old->app;
   my $log   = $app->log;
-  if ($new->isa('Mojo')) {
+  if ($new->isa('Mojolicious')) {
     $log->debug(qq{Routing to application "$class"});
 
     # Try to connect routes
@@ -232,7 +232,7 @@ L<Mojolicious::Routes::Route> and implements the following new ones.
   $r          = $r->base_classes(['MyApp::Controller']);
 
 Base classes used to identify controllers, defaults to
-L<Mojolicious::Controller> and L<Mojo>.
+L<Mojolicious::Controller> and L<Mojolicious>.
 
 =head2 cache
 

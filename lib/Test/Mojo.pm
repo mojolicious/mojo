@@ -888,8 +888,8 @@ Opposite of L</"message_like">.
 Construct a new L<Test::Mojo> object. In addition to a class name, you can pass
 along a hash reference with configuration values that will be used to
 instantiate the application. The special configuration value C<config_override>
-will be set in L<Mojo/"config"> as well, which is used to disable configuration
-plugins like L<Mojolicious::Plugin::Config> and
+will be set in L<Mojolicious/"config"> as well, which is used to disable
+configuration plugins like L<Mojolicious::Plugin::Config> and
 L<Mojolicious::Plugin::JSONConfig> for tests.
 
 =head2 options_ok

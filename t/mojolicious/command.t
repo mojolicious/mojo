@@ -8,7 +8,6 @@ use Mojolicious::Command;
 
 # Application
 my $command = Mojolicious::Command->new;
-isa_ok $command->app, 'Mojo',        'right application';
 isa_ok $command->app, 'Mojolicious', 'right application';
 
 # Creating directories

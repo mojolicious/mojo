@@ -18,7 +18,7 @@ sub import {
   # Initialize application class
   my $caller = caller;
   no strict 'refs';
-  push @{"${caller}::ISA"}, 'Mojo';
+  push @{"${caller}::ISA"}, 'Mojolicious';
 
   # Generate moniker based on filename
   my $moniker = path($ENV{MOJO_EXE})->basename('.pl', '.pm', '.t');

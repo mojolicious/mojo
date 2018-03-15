@@ -57,7 +57,7 @@ get '/' => sub {
 };
 
 package MyTestApp::Basic;
-use Mojo::Base 'Mojo';
+use Mojo::Base 'Mojolicious';
 
 sub handler {
   my ($self, $c) = @_;

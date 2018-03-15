@@ -1009,11 +1009,12 @@ be passed along in the C<path> stash value.
   # /foo/*
   $r->any('/foo')->detour('bar#', name => 'Mojo');
 
-A minimal embeddable application is nothing more than a subclass of L<Mojo>,
-containing a C<handler> method accepting L<Mojolicious::Controller> objects.
+A minimal embeddable application is nothing more than a subclass of
+L<Mojolicious>, containing a C<handler> method accepting
+L<Mojolicious::Controller> objects.
 
   package MyApp::Controller::Bar;
-  use Mojo::Base 'Mojo';
+  use Mojo::Base 'Mojolicious';
 
   sub handler {
     my ($self, $c) = @_;

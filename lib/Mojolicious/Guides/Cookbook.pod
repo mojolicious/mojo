@@ -253,7 +253,7 @@ L<Mojolicious::Lite> applications.
   $ hypnotoad ./script/my_app
 
 Many configuration settings can be tweaked right from within your application
-with L<Mojo/"config">, for a full list see
+with L<Mojolicious/"config">, for a full list see
 L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   use Mojolicious::Lite;
@@ -1589,7 +1589,7 @@ appended with a C<.conf> extension (C<myapp.conf>).
 
 Configuration files themselves are just Perl scripts that return a hash
 reference with configuration settings of your choice. All those settings are
-then available through the method L<Mojo/"config"> and the helper
+then available through the method L<Mojolicious/"config"> and the helper
 L<Mojolicious::Plugin::DefaultHelpers/"config">.
 
   use Mojolicious::Lite;

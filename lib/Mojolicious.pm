@@ -1,5 +1,5 @@
 package Mojolicious;
-use Mojo::Base 'Mojo';
+use Mojo::Base -base;
 
 # "Fry: Shut up and take my money!"
 use Carp ();
@@ -109,6 +109,7 @@ sub build_tx {
   return $tx;
 }
 
+sub config   { Mojo::Util::_stash(config   => @_); }
 sub defaults { Mojo::Util::_stash(defaults => @_) }
 
 sub dispatch {
@@ -389,8 +390,7 @@ Useful for rewriting outgoing responses and other post-processing tasks.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious> inherits all attributes from L<Mojo> and implements the
-following new ones.
+L<Mojolicious> implements the following attributes.
 
 =head2 commands
 
@@ -603,8 +603,8 @@ Validate values, defaults to a L<Mojolicious::Validator> object.
 
 =head1 METHODS
 
-L<Mojolicious> inherits all methods from L<Mojo> and implements the following
-new ones.
+L<Mojolicious> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
 
 =head2 build_controller
 
@@ -622,6 +622,21 @@ Build default controller object with L</"controller_class">.
   my $tx = $app->build_tx;
 
 Build L<Mojo::Transaction::HTTP> object and emit L</"after_build_tx"> hook.
+
+=head2 config
+
+  my $hash = $app->config;
+  my $foo  = $app->config('foo');
+  $app     = $app->config({foo => 'bar', baz => 23});
+  $app     = $app->config(foo => 'bar', baz => 23);
+
+Application configuration.
+
+  # Remove value
+  my $foo = delete $app->config->{foo};
+
+  # Assign multiple values at once
+  $app->config(foo => 'test', bar => 23);
 
 =head2 defaults
 

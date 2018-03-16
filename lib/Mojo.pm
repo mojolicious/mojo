@@ -43,7 +43,37 @@ Mojo - Web development toolkit
 
 =head1 SYNOPSIS
 
-  use Mojo;
+  # HTTP/WebSocket user agent
+  use Mojo::UserAgent;
+  my $ua = Mojo::UserAgent->new;
+  say $ua->get('www.mojolicious.org')->result->headers->server;
+
+  # HTML/XML DOM parser with CSS selectors
+  use Mojo::DOM;
+  my $dom = Mojo::DOM->new('<div><b>Hello Mojo!</b></div>');
+  say $dom->at('div > b')->text;
+
+  # Perl-ish templates
+  my $mt = Mojo::Template->new;
+  say $mt->render('Hello <%= $what %>!', {what => 'Mojo'});
+
+  # HTTP/WebSocket server
+  use Mojo::Server::Daemon;
+  my $daemon = Mojo::Server::Daemon->new(listen => ['http://*:8080']);
+  $daemon->unsubscribe('request')->on(request => sub {
+    my ($daemon, $tx) = @_;
+    $tx->res->code(200);
+    $tx->res->body('Hello Mojo!');
+    $tx->resume;
+  });
+  $daemon->run;
+
+  # Event loop
+  use Mojo::IOLoop;
+  for my $seconds (1 .. 5) {
+    Mojo::IOLoop->timer($seconds => sub { say $seconds });
+  }
+  Mojo::IOLoop->start;
 
 =head1 DESCRIPTION
 

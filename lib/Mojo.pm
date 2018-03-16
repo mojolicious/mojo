@@ -54,6 +54,7 @@ Mojo - Web development toolkit
   say $dom->at('div > b')->text;
 
   # Perl-ish templates
+  use Mojo::Template;
   my $mt = Mojo::Template->new;
   say $mt->render('Hello <%= $what %>!', {what => 'Mojo'});
 

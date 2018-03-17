@@ -55,7 +55,7 @@ Mojo - Web development toolkit
 
   # Perl-ish templates
   use Mojo::Template;
-  my $mt = Mojo::Template->new;
+  my $mt = Mojo::Template->new(vars => 1);
   say $mt->render('Hello <%= $what %>!', {what => 'Mojo'});
 
   # HTTP/WebSocket server

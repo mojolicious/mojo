@@ -84,10 +84,10 @@ sub _match {
   }
 
   # Match children
-  my @snapshot = $r->parent ? ([@{$self->stack}], $captures) : ([], {});
+  my $snapshot = $r->parent ? [@{$self->stack}] : [];
   for my $child (@{$r->children}) {
     return 1 if $self->_match($child, $c, $options);
-    $self->stack([@{$snapshot[0]}])->{captures} = $snapshot[1];
+    $self->stack([@$snapshot]);
   }
 }
 

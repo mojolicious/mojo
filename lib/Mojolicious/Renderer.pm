@@ -272,7 +272,8 @@ application startup.
   $renderer   = $renderer->default_format('html');
 
 The default format to render if C<format> is not set in the stash, defaults to
-C<html>.
+C<html>. Note that changing the default away from C<html> is not recommended, as
+it has the potential to break, for example, plugins with bundled templates.
 
 =head2 default_handler
 

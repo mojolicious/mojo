@@ -1,5 +1,5 @@
 
-7.72  2018-03-16
+7.72  2018-03-24
 
 7.71  2018-03-15
   - Deprecated Mojo::build_tx, Mojo::Config, Mojo::handler and Mojo::log.

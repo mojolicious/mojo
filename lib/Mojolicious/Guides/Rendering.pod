@@ -381,7 +381,7 @@ instead of L<Mojolicious::Controller/"render">.
   );
 
 The best possible representation will be automatically selected from the
-C<format> stash value, C<format> C<GET>/C<POST> parameter or C<Accept> request
+C<format> C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request
 header and stored in the C<format> stash value. To change MIME type mappings for
 the C<Accept> request header or the C<Content-Type> response header you can use
 L<Mojolicious/"types">.

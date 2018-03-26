@@ -145,6 +145,14 @@ $validation = $t->app->validation->input({foo => 23});
 ok !$validation->required('foo')->num(24, 25)->is_valid, 'not valid';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('foo'), [qw(num 1 24 25)], 'right error';
+$validation = $t->app->validation->input({foo => 23});
+ok $validation->required('foo')->num(22)->is_valid, 'valid';
+$validation = $t->app->validation->input({foo => 23});
+ok $validation->required('foo')->num(23)->is_valid, 'valid';
+$validation = $t->app->validation->input({foo => 23});
+ok !$validation->required('foo')->num(24)->is_valid, 'not valid';
+ok $validation->has_error, 'has error';
+is_deeply $validation->error('foo'), ['num', 1, 24], 'right error';
 
 # Size
 $validation

@@ -38,7 +38,7 @@ sub _in {
 sub _num {
   my ($validation, $name, $value, $min, $max) = @_;
   return 1 if $value !~ /^[0-9]+$/;
-  return defined $min && $max ? $min > $value || $max < $value : undef;
+  return defined $min && $min > $value || defined $max && $max < $value;
 }
 
 sub _size {
@@ -96,6 +96,7 @@ String value needs to match the regular expression.
 =head2 num
 
   $validation = $validation->num;
+  $validation = $validation->num(2);
   $validation = $validation->num(2, 5);
 
 String value needs to be a non-fractional number and if provided in the given

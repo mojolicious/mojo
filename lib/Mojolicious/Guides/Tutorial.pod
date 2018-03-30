@@ -897,9 +897,9 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 
   # Concurrent non-blocking
   get '/titles' => sub {
-    my $c = shift;
-    my $mojo = $ua->get_p('http://mojolicious.org');
-    my $cpan = $ua->get_p('https://metacpan.org');
+    my $c  = shift;
+    my $mojo = $c->ua->get_p('http://mojolicious.org');
+    my $cpan = $c->ua->get_p('https://metacpan.org');
     Mojo::Promise->all($mojo, $cpan)->then(sub {
       my ($mojo, $cpan) = @_;
       $c->render(json => {

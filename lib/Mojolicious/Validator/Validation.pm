@@ -183,6 +183,9 @@ only be one per field.
   # Details about failed validation
   my ($check, $result, @args) = @{$validation->error('foo')};
 
+  # Force validation to fail for a field without performing a check
+  $validation->error(foo => ['some_made_up_check_name']);
+
 =head2 every_param
 
   my $values = $validation->every_param;

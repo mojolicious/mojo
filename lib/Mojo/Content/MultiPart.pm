@@ -62,7 +62,7 @@ sub get_body_chunk {
   return $self->generate_body_chunk($offset) if $self->{dynamic};
 
   # First boundary
-  my $boundary     = $self->build_boundary;
+  my $boundary     = $self->{boundary} //= $self->build_boundary;
   my $boundary_len = length($boundary) + 6;
   my $len          = $boundary_len - 2;
   return substr "--$boundary\x0d\x0a", $offset if $len > $offset;

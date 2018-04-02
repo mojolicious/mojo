@@ -1,4 +1,6 @@
 
+7.73  2018-04-03
+
 7.72  2018-04-02
   - Improved Mojo::Content::MultiPart performance for large numbers of parts.
     (philipspencer)

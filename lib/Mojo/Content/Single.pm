@@ -12,7 +12,7 @@ sub body_contains { shift->asset->contains(shift) >= 0 }
 sub body_size {
   my $self = shift;
   return ($self->headers->content_length || 0) if $self->{dynamic};
-  return $self->asset->size;
+  return $self->{body_size} //= $self->asset->size;
 }
 
 sub clone {

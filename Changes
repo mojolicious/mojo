@@ -1,6 +1,7 @@
 
 7.72  2018-04-02
   - Improved Mojo::Content::MultiPart performance for large numbers of parts.
+    (philipspencer)
   - Fixed another problem with ordering of sources for content negotiation in
     Mojolicious::Renderer.
 

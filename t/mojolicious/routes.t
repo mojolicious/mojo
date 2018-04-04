@@ -119,6 +119,11 @@ $r->route('/format6', format => 0)
 # /format7.foobar
 $r->route('/format7', format => [qw(foo foobar)])->to('perl#rocks');
 
+# /type/23
+# /type/24
+$r->add_type(my_num => [23, 24]);
+$r->route('/type/(id:my_num)')->to('foo#bar');
+
 # /articles/1/edit
 # /articles/1/delete
 my $inline = $r->route('/articles/:id')->inline(1)
@@ -661,6 +666,21 @@ is_deeply $m->stack,
 is $m->path_for->{path}, '/format7.foobar', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/format7.foobarbaz'});
+is_deeply $m->stack, [], 'empty stack';
+
+# Placeholder types
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'GET', path => '/type/23'});
+is_deeply $m->stack, [{controller => 'foo', action => 'bar', id => 23}],
+  'right structure';
+is $m->path_for->{path}, '/type/23', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'GET', path => '/type/24'});
+is_deeply $m->stack, [{controller => 'foo', action => 'bar', id => 24}],
+  'right structure';
+is $m->path_for->{path}, '/type/24', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'GET', path => '/type/25'});
 is_deeply $m->stack, [], 'empty stack';
 
 # Request methods

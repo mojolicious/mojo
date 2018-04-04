@@ -527,6 +527,29 @@ non-capturing groups C<(?:...)> are fine though.
 This way you get easily readable routes and the raw power of regular
 expressions.
 
+=head2 Placeholder types
+
+And if you have multiple routes using restrictive placeholders you can also turn
+them into placeholder types.
+
+  # A type with alternatives
+  $r->add_type(futurama_name => ['bender', 'leela']);
+
+  # /fry    -> undef
+  # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
+  # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
+  $r->get('/(name:futurama_name)')->to('foo#bar');
+
+Placeholder types work just like restrictive placeholders, they are just
+reusable with the C<(placeholder:type)> notation.
+
+  # A type adjusting the regular expression
+  $r->add_type(num => qr/\d+/);
+
+  # /23   -> {controller => 'foo', action => 'bar', number => 23}
+  # /test -> undef
+  $r->get('/(number:num)')->to('foo#bar');
+
 =head2 Introspection
 
 The command L<Mojolicious::Command::routes> can be used from the command line

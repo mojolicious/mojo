@@ -1,5 +1,9 @@
 
-7.73  2018-04-03
+7.73  2018-04-04
+  - Added support for placeholder types.
+  - Added types attribute to Mojolicious::Routes and
+    Mojolicious::Routes::Pattern.
+  - Added add_type method to Mojolicious::Routes.
   - Removed deprecated use of Mojo::Promise::all and Mojo::Promise::race as
     instance methods.
 

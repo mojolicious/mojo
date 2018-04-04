@@ -271,4 +271,12 @@ $result = $pattern->match('/second');
 is_deeply $result, {test => 'works'}, 'right structure';
 is $pattern->render($result, 1), '/second', 'right result';
 
+# Placeholder types
+$pattern = Mojolicious::Routes::Pattern->new->types({num => qr/\d+/})
+  ->parse('/foo/(bar:num)/baz');
+$result = $pattern->match('/foo/23/baz', 1);
+is_deeply $result, {'bar' => 23}, 'right structure';
+is $pattern->render($result, 1), '/foo/23/baz', 'right result';
+ok !$pattern->match('/foo/bar/baz', 1), 'no result';
+
 done_testing();

@@ -338,8 +338,8 @@ sub validation {
   my $hash   = $req->params->to_hash;
   $hash->{csrf_token} //= $header if $token && $header;
   $hash->{$_} = $req->every_upload($_) for map { $_->name } @{$req->uploads};
-  my $validation = $self->app->validator->validation->input($hash);
-  return $stash->{'mojo.validation'} = $validation->csrf_token($token);
+  my $v = $self->app->validator->validation->input($hash);
+  return $stash->{'mojo.validation'} = $v->csrf_token($token);
 }
 
 sub write {
@@ -931,7 +931,7 @@ to inherit query parameters from the current request.
 
 =head2 validation
 
-  my $validation = $c->validation;
+  my $v = $c->validation;
 
 Get L<Mojolicious::Validator::Validation> object for current request to
 validate file uploads as well as C<GET> and C<POST> parameters extracted from
@@ -941,14 +941,14 @@ into memory to parse C<POST> parameters, so you have to make sure it is not
 excessively large. There's a 16MiB limit for requests by default.
 
   # Validate GET/POST parameter
-  my $validation = $c->validation;
-  $validation->required('title', 'trim')->size(3, 50);
-  my $title = $validation->param('title');
+  my $v = $c->validation;
+  $v->required('title', 'trim')->size(3, 50);
+  my $title = $v->param('title');
 
   # Validate file upload
-  my $validation = $c->validation;
-  $validation->required('tarball')->upload->size(1, 1048576);
-  my $tarball = $validation->param('tarball');
+  my $v = $c->validation;
+  $v->required('tarball')->upload->size(1, 1048576);
+  my $tarball = $v->param('tarball');
 
 =head2 write
 

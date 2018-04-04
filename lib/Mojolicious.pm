@@ -591,13 +591,13 @@ Validate values, defaults to a L<Mojolicious::Validator> object.
 
   # Add validation check
   $app->validator->add_check(foo => sub {
-    my ($validation, $name, $value) = @_;
+    my ($v, $name, $value) = @_;
     return $value ne 'foo';
   });
 
   # Add validation filter
   $app->validator->add_filter(quotemeta => sub {
-    my ($validation, $name, $value) = @_;
+    my ($v, $name, $value) = @_;
     return quotemeta $value;
   });
 

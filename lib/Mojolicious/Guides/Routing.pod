@@ -544,7 +544,7 @@ Placeholder types work just like restrictive placeholders, they are just
 reusable with the C<(placeholder:type)> notation.
 
   # A type adjusting the regular expression
-  $r->add_type(num => qr/\d+/);
+  $r->add_type(num => qr/[0-9]+/);
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef

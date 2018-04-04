@@ -546,9 +546,9 @@ reusable with the C<(placeholder:type)> notation.
   # A type adjusting the regular expression
   $r->add_type(num => qr/[0-9]+/);
 
-  # /23   -> {controller => 'foo', action => 'bar', number => 23}
+  # /article/23   -> {controller => 'articles', action => 'show', id => 23}
   # /test -> undef
-  $r->get('/(number:num)')->to('foo#bar');
+  $r->get('/article/(id:num)')->to('articles#show');
 
 =head2 Introspection
 

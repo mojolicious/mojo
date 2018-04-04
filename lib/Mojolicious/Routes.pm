@@ -231,7 +231,8 @@ These placeholder types are available by default.
 
   $r->get('/article/(id:num)');
 
-Placeholder value needs to be a non-fractional number.
+Placeholder value needs to be a non-fractional number, similar to the regular
+expression C<([0-9]+)>.
 
 =head1 ATTRIBUTES
 

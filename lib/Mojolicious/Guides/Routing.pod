@@ -547,7 +547,7 @@ reusable with the C<(placeholder:type)> notation.
   $r->add_type(num => qr/[0-9]+/);
 
   # /article/23   -> {controller => 'articles', action => 'show', id => 23}
-  # /test -> undef
+  # /article/test -> undef
   $r->get('/article/(id:num)')->to('articles#show');
 
 =head2 Introspection

@@ -4,6 +4,7 @@
   - Added types attribute to Mojolicious::Routes and
     Mojolicious::Routes::Pattern.
   - Added add_type method to Mojolicious::Routes.
+  - Added num placeholder type to Mojolicious::Routes.
   - Removed deprecated use of Mojo::Promise::all and Mojo::Promise::race as
     instance methods.
 

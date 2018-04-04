@@ -10,7 +10,8 @@ use Scalar::Util 'weaken';
 
 has base_classes => sub { [qw(Mojolicious::Controller Mojolicious)] };
 has cache        => sub { Mojo::Cache->new };
-has [qw(conditions shortcuts types)] => sub { {} };
+has [qw(conditions shortcuts)] => sub { {} };
+has types      => sub { {num => qr/[0-9]+/} };
 has hidden     => sub { [qw(attr has new tap)] };
 has namespaces => sub { [] };
 
@@ -222,6 +223,16 @@ L<Mojolicious::Routes> is the core of the L<Mojolicious> web framework.
 
 See L<Mojolicious::Guides::Routing> for more.
 
+=head1 TYPES
+
+These placeholder types are available by default.
+
+=head2 num
+
+  $r->get('/article/(id:num)');
+
+Placeholder value needs to be a non-fractional number.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Routes> inherits all attributes from
@@ -279,7 +290,7 @@ Contains all available shortcuts.
   my $types = $r->types;
   $r        = $r->types({int => qr/[0-9]+/});
 
-Placeholder types.
+Registered placeholder types, by default only L</"num"> is already defined.
 
 =head1 METHODS
 

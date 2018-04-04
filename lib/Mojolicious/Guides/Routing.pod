@@ -544,11 +544,21 @@ Placeholder types work just like restrictive placeholders, they are just
 reusable with the C<(placeholder:type)> notation.
 
   # A type adjusting the regular expression
-  $r->add_type(num => qr/[0-9]+/);
+  $r->add_type(upper => qr/[A-Z]+/);
 
-  # /article/23   -> {controller => 'articles', action => 'show', id => 23}
+  # /user/ROOT -> {controller => 'users', action => 'show', name => 'ROOT'}
+  # /user/root -> undef
+  # /user/23   -> undef
+  $r->get('/user/(name:upper)')->to('users#show');
+
+Some types like C<num> are used so commonly that they are available by default.
+
+  # /article/12   -> {controller => 'article', action => 'show', id => 12}
   # /article/test -> undef
   $r->get('/article/(id:num)')->to('articles#show');
+
+For a full list of available placeholder types see also
+L<Mojolicious::Routes/"TYPES">.
 
 =head2 Introspection
 

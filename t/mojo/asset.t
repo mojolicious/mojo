@@ -37,6 +37,10 @@ is $mem->mtime, $^T, 'right mtime';
 is $mem->mtime, Mojo::Asset::Memory->new->mtime, 'same mtime';
 my $mtime = $mem->mtime;
 is $mem->mtime($mtime + 23)->mtime, $mtime + 23, 'right mtime';
+
+# Asset upgrade from memory to file
+$mem = Mojo::Asset::Memory->new;
+$mem->add_chunk('abcdef');
 isa_ok $mem->to_file, 'Mojo::Asset::File', 'right class';
 is $mem->to_file->slurp, $mem->slurp, 'same content';
 $file = $mem->to_file;

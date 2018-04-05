@@ -317,7 +317,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   ok !$upgrade, 'upgrade event has not been emitted';
   $req->parse("o World!\n");
   ok $upgrade, 'upgrade event has been emitted';
-  is $size, 0, 'file was empty when upgrade event got emitted';
+  is $size, 13, 'file has content';
   is $req->content->progress, 13, 'right progress';
   ok $req->content->asset->is_file, 'stored in file';
   $req->parse("1234\nlalalala\n");

@@ -1,6 +1,6 @@
 
 7.73  2018-04-05
-  - Added support for placeholder types.
+  - Added support for routes with placeholder types.
   - Added types attribute to Mojolicious::Routes and
     Mojolicious::Routes::Pattern.
   - Added add_type method to Mojolicious::Routes.

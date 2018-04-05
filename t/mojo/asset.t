@@ -39,6 +39,11 @@ my $mtime = $mem->mtime;
 is $mem->mtime($mtime + 23)->mtime, $mtime + 23, 'right mtime';
 isa_ok $mem->to_file, 'Mojo::Asset::File', 'right class';
 is $mem->to_file->slurp, $mem->slurp, 'same content';
+$file = $mem->to_file;
+$path = $file->path;
+ok -e $path, 'file exists';
+undef $file;
+ok !-e $path, 'file has been cleaned up';
 
 # Empty file asset
 $file = Mojo::Asset::File->new;

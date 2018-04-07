@@ -113,8 +113,7 @@ sub _compile {
     # Placeholder
     else {
       if ($value =~ /^(.+)\Q$start\E(.+)$/) {
-        my $r = $types->{$2};
-        ($value, $part) = ($1, $r ? _compile_req($r) : '(?!)');
+        ($value, $part) = ($1, _compile_req($types->{$2} // '?!'));
       }
       else {
         $part = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)';

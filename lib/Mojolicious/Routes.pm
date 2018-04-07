@@ -327,7 +327,7 @@ Register a shortcut.
 
 Register a placeholder type.
 
-  $r->add_type(int => qr/[0-9]+/);
+  $r->add_type(lower => qr/[a-z]+/);
 
 =head2 continue
 

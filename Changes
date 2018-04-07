@@ -1,4 +1,6 @@
 
+7.75  2018-04-08
+
 7.74  2018-04-06
   - Improved unknown placeholder types to match nothing in
     Mojolicious::Routes::Pattern.

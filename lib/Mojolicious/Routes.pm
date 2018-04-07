@@ -289,7 +289,7 @@ Contains all available shortcuts.
 =head2 types
 
   my $types = $r->types;
-  $r        = $r->types({int => qr/[0-9]+/});
+  $r        = $r->types({lower => qr/[a-z]+/});
 
 Registered placeholder types, by default only L</"num"> is already defined.
 
@@ -323,7 +323,8 @@ Register a shortcut.
 
 =head2 add_type
 
-  $r = $r->add_type(foo => sub {...});
+  $r = $r->add_type(foo => qr/\w+/);
+  $r = $r->add_type(foo => ['bar', 'baz']);
 
 Register a placeholder type.
 

@@ -967,4 +967,17 @@ is_deeply $m->stack,
   'right structure';
 is $m->path_for->{path}, '/custom_pattern/a_123_b/c.123/d/123', 'right path';
 
+# Unknown placeholder type (matches nothing)
+$r = Mojolicious::Routes->new;
+$r->get('/(foo:does_not_exist)');
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'GET', path => '/'});
+is_deeply $m->stack, [], 'empty stack';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'GET', path => '/test'});
+is_deeply $m->stack, [], 'empty stack';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->find($c => {method => 'GET', path => '/23'});
+is_deeply $m->stack, [], 'empty stack';
+
 done_testing();

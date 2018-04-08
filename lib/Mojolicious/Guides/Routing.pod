@@ -530,7 +530,7 @@ expressions.
 =head2 Placeholder types
 
 And if you have multiple routes using restrictive placeholders you can also turn
-them into placeholder types.
+them into placeholder types with L<Mojolicious::Routes/"add_type">.
 
   # A type with alternatives
   $r->add_type(futurama_name => ['bender', 'leela']);

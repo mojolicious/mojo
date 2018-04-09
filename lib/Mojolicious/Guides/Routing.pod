@@ -149,6 +149,10 @@ similar to the regular expression C<(.+)>.
   /sebastian23/hello  -> /*name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /*name/hello -> {name => 'sebastian 23'}
 
+They can be useful for manually matching entire file paths.
+
+  /music/rock/song.mp3 -> /music/*filepath -> {filepath => 'rock/song.mp3'}
+
 =head1 BASICS
 
 Most commonly used features every L<Mojolicious> developer should know about.

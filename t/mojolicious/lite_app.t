@@ -240,7 +240,7 @@ get '/foo_relaxed/#test' => sub {
   $c->render(text => $c->stash('test') . ($c->req->headers->dnt ? 1 : 0));
 };
 
-get '/foo_wildcard/(*test)' => sub {
+get '/foo_wildcard/<*test>' => sub {
   my $c = shift;
   $c->render(text => $c->stash('test'));
 };
@@ -410,7 +410,7 @@ get '/default/:text' => (default => 23) => sub {
   $c->render(text => "works $default $test");
 };
 
-get '/foo/(bar:num)/baz' => sub {
+get '/foo/<bar:num>/baz' => sub {
   my $c = shift;
   $c->render(text => $c->param('bar'));
 };
@@ -418,7 +418,7 @@ get '/foo/(bar:num)/baz' => sub {
 # Custom placeholder type
 app->routes->add_type(my_num => qr/[5-9]+/);
 
-get '/type/(test:my_num)' => {inline => '%= $test'};
+get '/type/<test:my_num>' => {inline => '%= $test'};
 
 # Redirect condition
 app->routes->add_condition(

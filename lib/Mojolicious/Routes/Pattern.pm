@@ -2,12 +2,13 @@ package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
 use Carp 'croak';
+use Mojo::Util 'deprecated';
 
 has [qw(constraints defaults types)] => sub { {} };
 has [qw(placeholder_start type_start)] => ':';
 has [qw(placeholders tree)] => sub { [] };
-has quote_end   => ')';
-has quote_start => '(';
+has quote_end   => '>';
+has quote_start => '<';
 has [qw(regex unparsed)];
 has relaxed_start  => '#';
 has wildcard_start => '*';
@@ -163,6 +164,11 @@ sub _compile_req {
 sub _tokenize {
   my ($self, $pattern) = @_;
 
+  # DEPRECATED!
+  deprecated 'Placeholder quoting with "(placeholder)" is DEPRECATED'
+    . ' in favor of "<placeholder>"'
+    if $pattern =~ tr/()/<>/;
+
   my $quote_end   = $self->quote_end;
   my $quote_start = $self->quote_start;
   my $start       = $self->placeholder_start;
@@ -268,16 +274,16 @@ Placeholder names.
 =head2 quote_end
 
   my $end  = $pattern->quote_end;
-  $pattern = $pattern->quote_end(']');
+  $pattern = $pattern->quote_end('}');
 
-Character indicating the end of a quoted placeholder, defaults to C<)>.
+Character indicating the end of a quoted placeholder, defaults to C<E<gt>>.
 
 =head2 quote_start
 
   my $start = $pattern->quote_start;
-  $pattern  = $pattern->quote_start('[');
+  $pattern  = $pattern->quote_start('{');
 
-Character indicating the start of a quoted placeholder, defaults to C<(>.
+Character indicating the start of a quoted placeholder, defaults to C<E<lt>>.
 
 =head2 regex
 
@@ -318,7 +324,7 @@ Placeholder types.
 =head2 unparsed
 
   my $unparsed = $pattern->unparsed;
-  $pattern     = $pattern->unparsed('/(foo)/(bar)');
+  $pattern     = $pattern->unparsed('/:foo/:bar');
 
 Raw unparsed pattern.
 

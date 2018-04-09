@@ -54,7 +54,7 @@ $test->route('/edit')->to(action => 'edit')->name('test_edit');
 $r->route('/:controller/testedit')->to(action => 'testedit');
 
 # /*/test/delete/*
-$test->route('/delete/(id)', id => qr/\d+/)->to(action => 'delete', id => 23);
+$test->route('/delete/<id>', id => qr/\d+/)->to(action => 'delete', id => 23);
 
 # /test2
 my $test2 = $r->route('/test2/')->inline(1)->to(controller => 'test2');
@@ -75,14 +75,14 @@ $test2->route('/baz')->to('just#works');
 $r->route('/')->to(controller => 'hello', action => 'world');
 
 # /wildcards/1/*
-$r->route('/wildcards/1/(*wildcard)', wildcard => qr/(?:.*)/)
+$r->route('/wildcards/1/<*wildcard>', wildcard => qr/(?:.*)/)
   ->to(controller => 'wild', action => 'card');
 
 # /wildcards/2/*
 $r->route('/wildcards/2/*wildcard')->to(controller => 'card', action => 'wild');
 
 # /wildcards/3/*/foo
-$r->route('/wildcards/3/(*wildcard)/foo')
+$r->route('/wildcards/3/<*wildcard>/foo')
   ->to(controller => 'very', action => 'dangerous');
 
 # /wildcards/4/*/foo
@@ -122,7 +122,7 @@ $r->route('/format7', format => [qw(foo foobar)])->to('perl#rocks');
 # /type/23
 # /type/24
 $r->add_type(my_num => [23, 24]);
-$r->route('/type/(id:my_num)')->to('foo#bar');
+$r->route('/type/<id:my_num>')->to('foo#bar');
 
 # /articles/1/edit
 # /articles/1/delete
@@ -969,7 +969,7 @@ is $m->path_for->{path}, '/custom_pattern/a_123_b/c.123/d/123', 'right path';
 
 # Unknown placeholder type (matches nothing)
 $r = Mojolicious::Routes->new;
-$r->get('/(foo:does_not_exist)');
+$r->get('/<foo:does_not_exist>');
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/'});
 is_deeply $m->stack, [], 'empty stack';

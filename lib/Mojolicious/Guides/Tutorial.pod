@@ -361,7 +361,7 @@ L<Mojolicious::Controller/"param">.
 
   # /testsomething/foo
   # /test123something/foo
-  get '/(:bar)something/foo' => sub {
+  get '/<:bar>something/foo' => sub {
     my $c   = shift;
     my $bar = $c->param('bar');
     $c->render(text => "Our :bar placeholder matched $bar");
@@ -370,7 +370,7 @@ L<Mojolicious::Controller/"param">.
   app->start;
 
 To separate them from the surrounding text, you can surround your placeholders
-with parentheses, which also makes the colon prefix optional.
+with C<E<lt>> and C<E<gt>>, which also makes the colon prefix optional.
 
 =head2 Relaxed Placeholders
 

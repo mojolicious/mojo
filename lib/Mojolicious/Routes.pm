@@ -229,7 +229,7 @@ These placeholder types are available by default.
 
 =head2 num
 
-  $r->get('/article/(id:num)');
+  $r->get('/article/<id:num>');
 
 Placeholder value needs to be a non-fractional number, similar to the regular
 expression C<([0-9]+)>.

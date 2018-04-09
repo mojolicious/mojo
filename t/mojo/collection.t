@@ -165,6 +165,11 @@ is_deeply $collection->uniq(sub { $_->[1] }), [[1, 2, 3], [3, 1, 2]],
 $collection = c(c(1, 2), c(1, 2), c(2, 1));
 is_deeply $collection->uniq(join => ',')->flatten->to_array, [1, 2, 2, 1],
   'right result';
+$collection = c(undef, '', 3, 2, 1, 0);
+is_deeply $collection->uniq->to_array, [undef, 3, 2, 1, 0], 'right result';
+$collection = c(undef, '', 3, 2, 1, 0);
+is_deeply $collection->uniq(sub {$_})->to_array, [undef, 3, 2, 1, 0],
+  'right result';
 
 # TO_JSON
 is encode_json(c(1, 2, 3)), '[1,2,3]', 'right result';

@@ -23,7 +23,7 @@ sub _render {
   else {
     my $inline = $options->{inline};
     my $name = defined $inline ? md5_sum encode('UTF-8', $inline) : undef;
-    return unless defined($name //= $renderer->template_name($options));
+    return unless defined($name //= $renderer->template_path($options) || $renderer->template_name($options));
 
     # Inline
     if (defined $inline) {

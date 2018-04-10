@@ -22,7 +22,7 @@ sub register {
     $conf->{name} || 'ep' => sub {
       my ($renderer, $c, $output, $options) = @_;
 
-      my $name = $options->{inline} // $renderer->template_name($options);
+      my $name = $options->{inline} // $renderer->template_path($options) || $renderer->template_name($options);
       return unless defined $name;
       my $key = md5_sum encode 'UTF-8', $name;
 

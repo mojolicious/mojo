@@ -1,4 +1,6 @@
 
+7.76  2018-04-10
+
 7.75  2018-04-09
   - Deprecated placeholder quoting with "(placeholder)" in favor of
     "<placeholder>".

@@ -182,7 +182,63 @@ Mojo::Promise - Promises/A+
 =head1 DESCRIPTION
 
 L<Mojo::Promise> is a Perl-ish implementation of
-L<Promises/A+|https://promisesaplus.com>.
+L<Promises/A+|https://promisesaplus.com>. Promises allow asynchronous 
+operations to be handled in a controlled and composable way.
+
+A promise wraps a single asynchronous operation that will either be 
+fulfilled or rejected with an error in the future. A fulfilled promise 
+will have a stable value that is guaranteed to not change anymore.
+Also in case the promise fails, the resuting error will not change.
+
+Promises have three states, they start out as C<pending> and you call
+L<Mojo::Promise/"resolve"> to transition them to C<fulfilled>, or
+L<Mojo::Promise/"reject"> to transition them to C<rejected>.
+
+The example below runs an asynchronous HTTP GET request wrapped in a promise.
+Upon receiving a successful response the promise will be resolved with the 
+transaction as resulting value. In case of errors the promise is rejected 
+with the error message taken from the received response.
+
+  sub get {
+    my $promise = Mojo::Promise->new;
+    $ua->get(@_ => sub {
+      my ($ua, $tx) = @_;
+      my $err = $tx->error;
+      $promise->resolve($tx) if !$err || $err->{code};
+      $promise->reject($err->{message});
+    });
+    return $promise;
+  }
+
+The C<get> function will return a promise object immediatly and perform 
+no further operations until a response is received.
+
+The most common way of dealing with promises is using the method 
+L<Mojo::Promise/"then">. The will allow to call the provided callback 
+upon fulfillment of the promise.
+
+  my $promise = get("http://mojo.licio.us"); # returns a promise
+  $promise->then(sub {
+    my ($self, $tx) = @_;
+    print "Mojolicous website is " . $tx->code;
+  });
+
+Through the composable nature of promises you are now allowed to chain 
+operation by using the various mechanisms the promise object provides.
+
+For example a new promise can be created to resolve only after both 
+GET operations have completed using the method L<Mojo::Promise/"all">.
+
+  my $promise1 = get("http://mojolicious.org");
+  my $promise2 = get("https://perlbrew.pl/");
+  my $both = Mojo::Promise->all($promise1, $promise2)->then(sub {
+    my ($value1, $value2) = @_;
+    println "Mojolicous website returns " . $value1;
+    println "Perlbrew website returns " . $valuu2;
+  });
+
+To handle errors the catch method can be used. The provided callback
+will be passed the error resulting from the failed/rejected operation.
 
 =head1 ATTRIBUTES
 

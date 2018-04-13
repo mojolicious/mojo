@@ -619,7 +619,7 @@ that create them for you.
 
   app->start;
 
-To create promises maually you just wrap your continuation-passing style APIs in
+To create promises manually you just wrap your continuation-passing style APIs in
 functions that return promises. Here's an example for how
 L<Mojo::UserAgent/"get_p"> works internally.
 
@@ -645,9 +645,7 @@ L<Mojo::UserAgent/"get_p"> works internally.
     say $tx->result->dom->at('title')->text;
   })->wait;
 
-Promises have three states, they start out as C<pending> and you call
-L<Mojo::Promise/"resolve"> to transition them to C<fulfilled>, or
-L<Mojo::Promise/"reject"> to transition them to C<rejected>.
+See L<Mojo::Promise> for more examples on working with promises.
 
 =head2 Timers
 

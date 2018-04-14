@@ -217,10 +217,10 @@ The most common way of dealing with promises is using the method
 L<Mojo::Promise/"then">. The will allow to call the provided callback 
 upon fulfillment of the promise.
 
-  my $promise = get("http://mojo.licio.us"); # returns a promise
+  my $promise = get("http://mojolicious.org"); # returns a promise
   $promise->then(sub {
     my ($self, $tx) = @_;
-    print "Mojolicous website is " . $tx->code;
+    say "Mojolicous website returns " . $tx->res->code;
   });
 
 Through the composable nature of promises you are now allowed to chain 
@@ -232,9 +232,9 @@ GET operations have completed using the method L<Mojo::Promise/"all">.
   my $promise1 = get("http://mojolicious.org");
   my $promise2 = get("https://perlbrew.pl/");
   my $both = Mojo::Promise->all($promise1, $promise2)->then(sub {
-    my ($value1, $value2) = @_;
-    println "Mojolicous website returns " . $value1;
-    println "Perlbrew website returns " . $valuu2;
+    my ($tx1, $tx2) = @_;
+    say "Mojolicous website returns " . $tx1->res->code;
+    say "Perlbrew website returns " . $tx2->res->code;
   });
 
 To handle errors the catch method can be used. The provided callback

@@ -62,14 +62,19 @@ sub get_body_chunk {
   return $self->generate_body_chunk($offset) if $self->{dynamic};
 
   # First boundary
-  my $boundary     = $self->build_boundary;
+  my $boundary     = $self->{boundary} //= $self->build_boundary;
   my $boundary_len = length($boundary) + 6;
   my $len          = $boundary_len - 2;
   return substr "--$boundary\x0d\x0a", $offset if $len > $offset;
 
+  # Skip parts that have already been processed
+  my $start = 0;
+  ($len, $start) = ($self->{last_len}, $self->{last_part} + 1)
+    if $self->{offset} && $offset > $self->{offset};
+
   # Prepare content part by part
   my $parts = $self->parts;
-  for (my $i = 0; $i < @$parts; $i++) {
+  for (my $i = $start; $i < @$parts; $i++) {
     my $part = $parts->[$i];
 
     # Headers
@@ -92,6 +97,8 @@ sub get_body_chunk {
     return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $len
       if ($len + $boundary_len) > $offset;
     $len += $boundary_len;
+
+    @{$self}{qw(last_len last_part offset)} = ($len, $i, $offset);
   }
 }
 

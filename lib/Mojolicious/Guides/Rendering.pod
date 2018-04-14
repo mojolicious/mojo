@@ -381,7 +381,7 @@ instead of L<Mojolicious::Controller/"render">.
   );
 
 The best possible representation will be automatically selected from the
-C<format> stash value, C<format> C<GET>/C<POST> parameter or C<Accept> request
+C<format> C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request
 header and stored in the C<format> stash value. To change MIME type mappings for
 the C<Accept> request header or the C<Content-Type> response header you can use
 L<Mojolicious/"types">.
@@ -819,16 +819,16 @@ logic with methods like L<Mojolicious::Validator::Validation/"is_valid">.
     my $c = shift;
 
     # Check if parameters have been submitted
-    my $validation = $c->validation;
-    return $c->render unless $validation->has_data;
+    my $v = $c->validation;
+    return $c->render unless $v->has_data;
 
     # Validate parameters ("pass_again" depends on "pass")
-    $validation->required('user')->size(1, 20)->like(qr/^[a-z0-9]+$/);
-    $validation->required('pass_again')->equal_to('pass')
-      if $validation->optional('pass')->size(7, 500)->is_valid;
+    $v->required('user')->size(1, 20)->like(qr/^[a-z0-9]+$/);
+    $v->required('pass_again')->equal_to('pass')
+      if $v->optional('pass')->size(7, 500)->is_valid;
 
     # Render confirmation if validation was successful
-    $c->render('thanks') unless $validation->has_error;
+    $c->render('thanks') unless $v->has_error;
   } => 'index';
 
   app->start;
@@ -889,7 +889,7 @@ L<Mojolicious::Validator::Validation/"error">.
 
   # Add "range" check
   app->validator->add_check(range => sub {
-    my ($validation, $name, $value, $min, $max) = @_;
+    my ($v, $name, $value, $min, $max) = @_;
     return $value < $min || $value > $max;
   });
 
@@ -899,14 +899,14 @@ L<Mojolicious::Validator::Validation/"error">.
     my $c = shift;
 
     # Validate parameters with custom check
-    my $validation = $c->validation;
-    $validation->required('number')->range(3, 23);
+    my $v = $c->validation;
+    $v->required('number')->range(3, 23);
 
     # Render form again if validation failed
-    return $c->render('form') if $validation->has_error;
+    return $c->render('form') if $v->has_error;
 
     # Prevent double form submission with redirect
-    $c->flash(number => $validation->param('number'));
+    $c->flash(number => $v->param('number'));
     $c->redirect_to('form');
   };
 
@@ -950,13 +950,13 @@ L<Mojolicious::Validator::Validation/"csrf_protect">.
     my $c = shift;
 
     # Check CSRF token
-    my $validation = $c->validation;
+    my $v = $c->validation;
     return $c->render(text => 'Bad CSRF token!', status => 403)
-      if $validation->csrf_protect->has_error('csrf_token');
+      if $v->csrf_protect->has_error('csrf_token');
 
-    my $city = $validation->required('city')->param('city');
+    my $city = $v->required('city')->param('city');
     $c->render(text => "Low orbit ion cannon pointed at $city!")
-      unless $validation->has_error;
+      unless $v->has_error;
   } => 'target';
 
   app->start;

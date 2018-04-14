@@ -95,8 +95,8 @@ sub to_array { [@{shift()}] }
 sub uniq {
   my ($self, $cb) = (shift, shift);
   my %seen;
-  return $self->new(grep { !$seen{$_->$cb(@_)}++ } @$self) if $cb;
-  return $self->new(grep { !$seen{$_}++ } @$self);
+  return $self->new(grep { !$seen{$_->$cb(@_) // ''}++ } @$self) if $cb;
+  return $self->new(grep { !$seen{$_ // ''}++ } @$self);
 }
 
 sub with_roles { shift->Mojo::Base::with_roles(@_) }
@@ -358,7 +358,8 @@ Turn collection into array reference.
 
 Create a new collection without duplicate elements, using the string
 representation of either the elements or the return value of the
-callback/method.
+callback/method to decide uniqueness. Note that C<undef> and empty string are
+treated the same.
 
   # Longer version
   my $new = $collection->uniq(sub { $_->some_method(@args) });

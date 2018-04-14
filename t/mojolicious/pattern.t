@@ -12,7 +12,7 @@ is $pattern->tree->[0][1], '/test/123', 'optimized pattern';
 
 # Normal pattern with text, placeholders and a default value
 $pattern
-  = Mojolicious::Routes::Pattern->new->parse('/test/(controller)/:action');
+  = Mojolicious::Routes::Pattern->new->parse('/test/<controller>/:action');
 $pattern->defaults({action => 'index'});
 is_deeply $pattern->match('/test/foo/bar', 1),
   {controller => 'foo', action => 'bar'}, 'right structure';
@@ -24,7 +24,7 @@ ok !$pattern->match('/test/'), 'no result';
 is $pattern->render({controller => 'foo'}), '/test/foo', 'right result';
 
 # Optional placeholder in the middle
-$pattern = Mojolicious::Routes::Pattern->new('/test(name)123');
+$pattern = Mojolicious::Routes::Pattern->new('/test<name>123');
 $pattern->defaults({name => 'foo'});
 is_deeply $pattern->match('/test123',    1), {name => 'foo'}, 'right structure';
 is_deeply $pattern->match('/testbar123', 1), {name => 'bar'}, 'right structure';
@@ -69,7 +69,7 @@ is $pattern->render, '', 'right result';
 is $pattern->render({format => 'txt'}, 1), '.txt', 'right result';
 
 # Regex in pattern
-$pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',
+$pattern = Mojolicious::Routes::Pattern->new('/test/<controller>/:action/<id>',
   id => '\d+');
 $pattern->defaults({action => 'index', id => 1});
 is_deeply $pattern->match('/test/foo/bar/203'),
@@ -80,7 +80,7 @@ is $pattern->render({controller => 'zzz', action => 'index', id => 13}),
 is $pattern->render({controller => 'zzz'}), '/test/zzz', 'right result';
 
 # Quoted placeholders
-$pattern = Mojolicious::Routes::Pattern->new('/(:controller)test/(action)');
+$pattern = Mojolicious::Routes::Pattern->new('/<:controller>test/<action>');
 $pattern->defaults({action => 'index'});
 is_deeply $pattern->match('/footest/bar'),
   {controller => 'foo', action => 'bar'}, 'right structure';
@@ -94,14 +94,14 @@ is_deeply $pattern->match('/test/foo.bar/baz'),
   {controller => 'foo.bar', action => 'baz'}, 'right structure';
 is $pattern->render({controller => 'foo.bar', action => 'baz'}),
   '/test/foo.bar/baz', 'right result';
-$pattern = Mojolicious::Routes::Pattern->new('/test/(#groovy)');
+$pattern = Mojolicious::Routes::Pattern->new('/test/<#groovy>');
 is_deeply $pattern->match('/test/foo.bar'), {groovy => 'foo.bar'},
   'right structure';
 is $pattern->defaults->{format}, undef, 'no value';
 is $pattern->render({groovy => 'foo.bar'}), '/test/foo.bar', 'right result';
 
 # Wildcard
-$pattern = Mojolicious::Routes::Pattern->new('/test/(:controller)/(*action)');
+$pattern = Mojolicious::Routes::Pattern->new('/test/<:controller>/<*action>');
 is_deeply $pattern->match('/test/foo/bar.baz/yada'),
   {controller => 'foo', action => 'bar.baz/yada'}, 'right structure';
 is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
@@ -123,7 +123,7 @@ is_deeply $pattern->match('/test(test)(\Qtest\E)('),
 is $pattern->render({test => '23'}), '/23', 'right result';
 
 # Regex in pattern
-$pattern = Mojolicious::Routes::Pattern->new('/.+(:test)');
+$pattern = Mojolicious::Routes::Pattern->new('/.+<:test>');
 is_deeply $pattern->match('/.+test'), {test => 'test'}, 'right structure';
 is $pattern->render({test => '23'}), '/.+23', 'right result';
 
@@ -223,11 +223,11 @@ $result = $pattern->match('/foo/bar', 1);
 is_deeply $result, {'' => 'foo', '0' => 'bar'}, 'right structure';
 is $pattern->render($result, 1), '/foo/bar', 'right result';
 is $pattern->render({'' => 'bar', '0' => 'baz'}, 1), '/bar/baz', 'right result';
-$pattern = Mojolicious::Routes::Pattern->new('/(:)test/(0)');
+$pattern = Mojolicious::Routes::Pattern->new('/<:>test/<0>');
 $result = $pattern->match('/footest/bar', 1);
 is_deeply $result, {'' => 'foo', '0' => 'bar'}, 'right structure';
 is $pattern->render($result, 1), '/footest/bar', 'right result';
-$pattern = Mojolicious::Routes::Pattern->new('/()test');
+$pattern = Mojolicious::Routes::Pattern->new('/<>test');
 $result = $pattern->match('/footest', 1);
 is_deeply $result, {'' => 'foo'}, 'right structure';
 is $pattern->render($result, 1), '/footest', 'right result';
@@ -258,7 +258,7 @@ $result                         = $pattern->match('/', 1);
 is_deeply $result, {format => 'txt'}, 'right structure';
 
 # Unicode
-$pattern = Mojolicious::Routes::Pattern->new('/(one)♥(two)');
+$pattern = Mojolicious::Routes::Pattern->new('/<one>♥<two>');
 $result  = $pattern->match('/i♥mojolicious');
 is_deeply $result, {one => 'i', two => 'mojolicious'}, 'right structure';
 is $pattern->render($result, 1), '/i♥mojolicious', 'right result';
@@ -270,5 +270,13 @@ ok !$pattern->match('/first'), 'no result';
 $result = $pattern->match('/second');
 is_deeply $result, {test => 'works'}, 'right structure';
 is $pattern->render($result, 1), '/second', 'right result';
+
+# Placeholder types
+$pattern = Mojolicious::Routes::Pattern->new->types({num => qr/\d+/})
+  ->parse('/foo/<bar:num>/baz');
+$result = $pattern->match('/foo/23/baz', 1);
+is_deeply $result, {'bar' => 23}, 'right structure';
+is $pattern->render($result, 1), '/foo/23/baz', 'right result';
+ok !$pattern->match('/foo/bar/baz', 1), 'no result';
 
 done_testing();

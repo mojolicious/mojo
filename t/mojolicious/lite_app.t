@@ -240,7 +240,7 @@ get '/foo_relaxed/#test' => sub {
   $c->render(text => $c->stash('test') . ($c->req->headers->dnt ? 1 : 0));
 };
 
-get '/foo_wildcard/(*test)' => sub {
+get '/foo_wildcard/<*test>' => sub {
   my $c = shift;
   $c->render(text => $c->stash('test'));
 };
@@ -409,6 +409,16 @@ get '/default/:text' => (default => 23) => sub {
   my $test    = $c->stash('test');
   $c->render(text => "works $default $test");
 };
+
+get '/foo/<bar:num>/baz' => sub {
+  my $c = shift;
+  $c->render(text => $c->param('bar'));
+};
+
+# Custom placeholder type
+app->routes->add_type(my_num => qr/[5-9]+/);
+
+get '/type/<test:my_num>' => {inline => '%= $test'};
 
 # Redirect condition
 app->routes->add_condition(
@@ -1001,6 +1011,18 @@ $t->get_ok('/koi8-r')->status_is(200)
 $t->get_ok('/default/condition')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('works 23 condition23 works!');
+
+# Placeholder type
+$t->get_ok('/foo/23/baz')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('23');
+$t->get_ok('/foo/bar/baz')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)');
+
+# Custom placeholder type
+$t->get_ok('/type/56')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("56\n");
+$t->get_ok('/type/12')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)');
 
 # Redirect from condition
 $t->get_ok('/redirect/condition/0')->status_is(200)

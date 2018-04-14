@@ -27,6 +27,7 @@ sub add_child {
   my ($self, $route) = @_;
   Scalar::Util::weaken $route->remove->parent($self)->{parent};
   push @{$self->children}, $route;
+  $route->pattern->types($self->root->types);
   return $self;
 }
 

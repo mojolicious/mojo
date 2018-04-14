@@ -3,17 +3,11 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Scalar::Util qw(blessed weaken);
-use Mojo::Util 'deprecated';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
 sub all {
   my ($class, @promises) = @_;
-
-  # DEPRECATED!
-  unshift(@promises, $class)
-    and deprecated 'Use of Mojo::Promise::all as instance method is DEPRECATED'
-    if ref $class;
 
   my $all       = $class->new;
   my $results   = [];
@@ -47,15 +41,8 @@ sub finally {
 
 sub race {
   my ($class, @promises) = @_;
-
-  # DEPRECATED!
-  unshift(@promises, $class)
-    and deprecated 'Use of Mojo::Promise::race as instance method is DEPRECATED'
-    if ref $class;
-
   my $new = $class->new;
   $_->then(sub { $new->resolve(@_) }, sub { $new->reject(@_) }) for @promises;
-
   return $new;
 }
 

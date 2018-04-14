@@ -103,20 +103,20 @@ expression C<([^/.]+)>.
   /sebastian23/hello  -> /:name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /:name/hello -> {name => 'sebastian 23'}
 
-All placeholders can be surrounded by parentheses to separate them from the
-surrounding text.
+All placeholders can be surrounded by C<E<lt>> and C<E<gt>> to separate them
+from the surrounding text.
 
-  /hello             -> /(:name)hello -> undef
-  /sebastian/23hello -> /(:name)hello -> undef
-  /sebastian.23hello -> /(:name)hello -> undef
-  /sebastianhello    -> /(:name)hello -> {name => 'sebastian'}
-  /sebastian23hello  -> /(:name)hello -> {name => 'sebastian23'}
-  /sebastian 23hello -> /(:name)hello -> {name => 'sebastian 23'}
+  /hello             -> /<:name>hello -> undef
+  /sebastian/23hello -> /<:name>hello -> undef
+  /sebastian.23hello -> /<:name>hello -> undef
+  /sebastianhello    -> /<:name>hello -> {name => 'sebastian'}
+  /sebastian23hello  -> /<:name>hello -> {name => 'sebastian23'}
+  /sebastian 23hello -> /<:name>hello -> {name => 'sebastian 23'}
 
 The colon prefix is optional for standard placeholders that are surrounded by
-parentheses.
+C<E<lt>> and C<E<gt>>.
 
-  /i♥mojolicious -> /(one)♥(two) -> {one => 'i', two => 'mojolicious'}
+  /i♥mojolicious -> /<one>♥<two> -> {one => 'i', two => 'mojolicious'}
 
 =head2 Relaxed placeholders
 
@@ -148,6 +148,10 @@ similar to the regular expression C<(.+)>.
   /sebastian/hello    -> /*name/hello -> {name => 'sebastian'}
   /sebastian23/hello  -> /*name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /*name/hello -> {name => 'sebastian 23'}
+
+They can be useful for manually matching entire file paths.
+
+  /music/rock/song.mp3 -> /music/*filepath -> {filepath => 'rock/song.mp3'}
 
 =head1 BASICS
 
@@ -526,6 +530,39 @@ non-capturing groups C<(?:...)> are fine though.
 
 This way you get easily readable routes and the raw power of regular
 expressions.
+
+=head2 Placeholder types
+
+And if you have multiple routes using restrictive placeholders you can also turn
+them into placeholder types with L<Mojolicious::Routes/"add_type">.
+
+  # A type with alternatives
+  $r->add_type(futurama_name => ['bender', 'leela']);
+
+  # /fry    -> undef
+  # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
+  # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
+  $r->get('/<name:futurama_name>')->to('foo#bar');
+
+Placeholder types work just like restrictive placeholders, they are just
+reusable with the C<E<lt>placeholder:typeE<gt>> notation.
+
+  # A type adjusting the regular expression
+  $r->add_type(upper => qr/[A-Z]+/);
+
+  # /user/ROOT -> {controller => 'users', action => 'show', name => 'ROOT'}
+  # /user/root -> undef
+  # /user/23   -> undef
+  $r->get('/user/<name:upper>')->to('users#show');
+
+Some types like C<num> are used so commonly that they are available by default.
+
+  # /article/12   -> {controller => 'article', action => 'show', id => 12}
+  # /article/test -> undef
+  $r->get('/article/<id:num>')->to('articles#show');
+
+For a full list of available placeholder types see also
+L<Mojolicious::Routes/"TYPES">.
 
 =head2 Introspection
 

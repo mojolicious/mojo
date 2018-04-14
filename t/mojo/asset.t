@@ -18,6 +18,7 @@ is $file->contains('bc'),  1,  '"bc" at position 1';
 is $file->contains('db'),  -1, 'does not contain "db"';
 is $file->size, 3, 'right size';
 is $file->mtime, (stat $file->handle)[9], 'right mtime';
+is $file->to_file, $file, 'same object';
 
 # Cleanup
 my $path = $file->path;
@@ -36,6 +37,17 @@ is $mem->mtime, $^T, 'right mtime';
 is $mem->mtime, Mojo::Asset::Memory->new->mtime, 'same mtime';
 my $mtime = $mem->mtime;
 is $mem->mtime($mtime + 23)->mtime, $mtime + 23, 'right mtime';
+
+# Asset upgrade from memory to file
+$mem = Mojo::Asset::Memory->new;
+$mem->add_chunk('abcdef');
+isa_ok $mem->to_file, 'Mojo::Asset::File', 'right class';
+is $mem->to_file->slurp, $mem->slurp, 'same content';
+$file = $mem->to_file;
+$path = $file->path;
+ok -e $path, 'file exists';
+undef $file;
+ok !-e $path, 'file has been cleaned up';
 
 # Empty file asset
 $file = Mojo::Asset::File->new;
@@ -276,5 +288,7 @@ eval { Mojo::Asset->size };
 like $@, qr/Method "size" not implemented by subclass/, 'right error';
 eval { Mojo::Asset->slurp };
 like $@, qr/Method "slurp" not implemented by subclass/, 'right error';
+eval { Mojo::Asset->to_file };
+like $@, qr/Method "to_file" not implemented by subclass/, 'right error';
 
 done_testing();

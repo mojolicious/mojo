@@ -215,8 +215,8 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
   my $formats = $c->accepts;
   my $format  = $c->accepts('html', 'json', 'txt');
 
-Select best possible representation for resource from C<format> stash value,
-C<format> C<GET>/C<POST> parameter or C<Accept> request header with
+Select best possible representation for resource from C<format> C<GET>/C<POST>
+parameter, C<format> stash value or C<Accept> request header with
 L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension if
 no preference could be detected.
 

@@ -14,8 +14,8 @@ sub add_chunk {
   # Upgrade if necessary
   $self->{content} .= $chunk;
   return $self if !$self->auto_upgrade || $self->size <= $self->max_memory_size;
-  my $file = Mojo::Asset::File->new;
-  return $file->add_chunk($self->emit(upgrade => $file)->slurp);
+  $self->emit(upgrade => my $file = $self->to_file);
+  return $file;
 }
 
 sub contains {
@@ -46,6 +46,8 @@ sub move_to { path($_[1])->spurt($_[0]{content} // '') and return $_[0] }
 sub size { length(shift->{content} // '') }
 
 sub slurp { shift->{content} // '' }
+
+sub to_file { Mojo::Asset::File->new->add_chunk(shift->slurp) }
 
 1;
 
@@ -158,6 +160,12 @@ Size of asset data in bytes.
   my $bytes = mem->slurp;
 
 Read all asset data at once.
+
+=head2 to_file
+
+  my $file = $mem->to_file;
+
+Convert asset to L<Mojo::Asset::File> object.
 
 =head1 SEE ALSO
 

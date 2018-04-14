@@ -1,5 +1,31 @@
 
-7.72  2018-03-24
+7.76  2018-04-10
+
+7.75  2018-04-09
+  - Deprecated placeholder quoting with "(placeholder)" in favor of
+    "<placeholder>".
+  - Fixed warnings in Mojo::Collection.
+
+7.74  2018-04-06
+  - Improved unknown placeholder types to match nothing in
+    Mojolicious::Routes::Pattern.
+
+7.73  2018-04-05
+  - Added support for routes with placeholder types.
+  - Added types attribute to Mojolicious::Routes and
+    Mojolicious::Routes::Pattern.
+  - Added add_type method to Mojolicious::Routes.
+  - Added to_file method to Mojo::Asset, Mojo::Asset::File and
+    Mojo::Asset::Memory.
+  - Added num placeholder type to Mojolicious::Routes.
+  - Removed deprecated use of Mojo::Promise::all and Mojo::Promise::race as
+    instance methods.
+
+7.72  2018-04-02
+  - Improved Mojo::Content::MultiPart performance for large numbers of parts.
+    (philipspencer)
+  - Fixed another problem with ordering of sources for content negotiation in
+    Mojolicious::Renderer.
 
 7.71  2018-03-15
   - Deprecated Mojo::build_tx, Mojo::Config, Mojo::handler and Mojo::log.

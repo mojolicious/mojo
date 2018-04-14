@@ -1,11 +1,14 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
-has [qw(constraints defaults)] => sub { {} };
-has placeholder_start => ':';
+use Carp 'croak';
+use Mojo::Util 'deprecated';
+
+has [qw(constraints defaults types)] => sub { {} };
+has [qw(placeholder_start type_start)] => ':';
 has [qw(placeholders tree)] => sub { [] };
-has quote_end   => ')';
-has quote_start => '(';
+has quote_end   => '>';
+has quote_start => '<';
 has [qw(regex unparsed)];
 has relaxed_start  => '#';
 has wildcard_start => '*';
@@ -51,29 +54,32 @@ sub parse {
 sub render {
   my ($self, $values, $endpoint) = @_;
 
+  my $start = $self->type_start;
+
   # Placeholders can only be optional without a format
   my $optional = !(my $format = $values->{format});
 
   my $str = '';
   for my $token (reverse @{$self->tree}) {
     my ($op, $value) = @$token;
-    my $fragment = '';
+    my $part = '';
 
     # Text
-    if ($op eq 'text') { ($fragment, $optional) = ($value, 0) }
+    if ($op eq 'text') { ($part, $optional) = ($value, 0) }
 
     # Slash
-    elsif ($op eq 'slash') { $fragment = '/' unless $optional }
+    elsif ($op eq 'slash') { $part = '/' unless $optional }
 
     # Placeholder
     else {
-      my $default = $self->defaults->{$value};
-      $fragment = $values->{$value} // $default // '';
-      if (!defined $default || ($default ne $fragment)) { $optional = 0 }
-      elsif ($optional) { $fragment = '' }
+      my $name = (split $start, $value)[0] // '';
+      my $default = $self->defaults->{$name};
+      $part = $values->{$name} // $default // '';
+      if (!defined $default || ($default ne $part)) { $optional = 0 }
+      elsif ($optional) { $part = '' }
     }
 
-    $str = $fragment . $str;
+    $str = $part . $str;
   }
 
   # Format can be optional
@@ -86,15 +92,17 @@ sub _compile {
   my $placeholders = $self->placeholders;
   my $constraints  = $self->constraints;
   my $defaults     = $self->defaults;
+  my $start        = $self->type_start;
+  my $types        = $self->types;
 
   my $block = my $regex = '';
   my $optional = 1;
   for my $token (reverse @{$self->tree}) {
     my ($op, $value, $type) = @$token;
-    my $fragment = '';
+    my $part = '';
 
     # Text
-    if ($op eq 'text') { ($fragment, $optional) = (quotemeta $value, 0) }
+    if ($op eq 'text') { ($part, $optional) = (quotemeta $value, 0) }
 
     # Slash
     elsif ($op eq 'slash') {
@@ -105,17 +113,22 @@ sub _compile {
 
     # Placeholder
     else {
+      if ($value =~ /^(.+)\Q$start\E(.+)$/) {
+        ($value, $part) = ($1, _compile_req($types->{$2} // '?!'));
+      }
+      else {
+        $part = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)';
+      }
       unshift @$placeholders, $value;
-      $fragment = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)';
 
       # Custom regex
-      if (my $c = $constraints->{$value}) { $fragment = _compile_req($c) }
+      if (my $c = $constraints->{$value}) { $part = _compile_req($c) }
 
       # Optional placeholder
-      exists $defaults->{$value} ? ($fragment .= '?') : ($optional = 0);
+      exists $defaults->{$value} ? ($part .= '?') : ($optional = 0);
     }
 
-    $block = $fragment . $block;
+    $block = $part . $block;
   }
 
   # Not rooted with a slash
@@ -151,24 +164,31 @@ sub _compile_req {
 sub _tokenize {
   my ($self, $pattern) = @_;
 
+  # DEPRECATED!
+  deprecated 'Placeholder quoting with "(placeholder)" is DEPRECATED'
+    . ' in favor of "<placeholder>"'
+    if $pattern =~ tr/()/<>/;
+
   my $quote_end   = $self->quote_end;
   my $quote_start = $self->quote_start;
   my $start       = $self->placeholder_start;
   my $relaxed     = $self->relaxed_start;
   my $wildcard    = $self->wildcard_start;
 
-  my (@tree, $spec);
+  my (@tree, $spec, $more);
   for my $char (split '', $pattern) {
 
     # Quoted
     if ($char eq $quote_start) { push @tree, ['placeholder', ''] if ++$spec }
-    elsif ($char eq $quote_end) { $spec = 0 }
+    elsif ($char eq $quote_end) { $spec = $more = 0 }
 
     # Placeholder
-    elsif ($char eq $start) { push @tree, ['placeholder', ''] unless $spec++ }
+    elsif (!$more && $char eq $start) {
+      push @tree, ['placeholder', ''] unless $spec++;
+    }
 
     # Relaxed or wildcard (upgrade when quoted)
-    elsif ($char eq $relaxed || $char eq $wildcard) {
+    elsif (!$more && ($char eq $relaxed || $char eq $wildcard)) {
       push @tree, ['placeholder', ''] unless $spec++;
       $tree[-1][2] = $char eq $relaxed ? 'relaxed' : 'wildcard';
     }
@@ -176,11 +196,11 @@ sub _tokenize {
     # Slash
     elsif ($char eq '/') {
       push @tree, ['slash'];
-      $spec = 0;
+      $spec = $more = 0;
     }
 
     # Placeholder
-    elsif ($spec) { $tree[-1][1] .= $char }
+    elsif ($spec && ++$more) { $tree[-1][1] .= $char }
 
     # Text (optimize slash+text and *+text+slash+text)
     elsif ($tree[-1][0] eq 'text') { $tree[-1][-1] .= $char }
@@ -254,16 +274,16 @@ Placeholder names.
 =head2 quote_end
 
   my $end  = $pattern->quote_end;
-  $pattern = $pattern->quote_end(']');
+  $pattern = $pattern->quote_end('}');
 
-Character indicating the end of a quoted placeholder, defaults to C<)>.
+Character indicating the end of a quoted placeholder, defaults to C<E<gt>>.
 
 =head2 quote_start
 
   my $start = $pattern->quote_start;
-  $pattern  = $pattern->quote_start('[');
+  $pattern  = $pattern->quote_start('{');
 
-Character indicating the start of a quoted placeholder, defaults to C<(>.
+Character indicating the start of a quoted placeholder, defaults to C<E<lt>>.
 
 =head2 regex
 
@@ -287,10 +307,24 @@ Character indicating a relaxed placeholder, defaults to C<#>.
 Pattern in parsed form. Note that this structure should only be used very
 carefully since it is very dynamic.
 
+=head2 type_start
+
+  my $start = $pattern->type_start;
+  $pattern  = $pattern->type_start('|');
+
+Character indicating the start of a placeholder type, defaults to C<:>.
+
+=head2 types
+
+  my $types = $pattern->types;
+  $pattern  = $pattern->types({int => qr/[0-9]+/});
+
+Placeholder types.
+
 =head2 unparsed
 
   my $unparsed = $pattern->unparsed;
-  $pattern     = $pattern->unparsed('/(foo)/(bar)');
+  $pattern     = $pattern->unparsed('/:foo/:bar');
 
 Raw unparsed pattern.
 

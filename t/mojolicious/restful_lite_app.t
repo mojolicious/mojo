@@ -85,7 +85,7 @@ $t->get_ok('/accepts' => {Accept => 'text/plain'})->status_is(200)
   ->json_is({best => 'txt'});
 
 # Accept "txt" with everything
-$t->get_ok('/accepts.txt?format=json' => {Accept => 'text/html'})
+$t->get_ok('/accepts.json?format=txt' => {Accept => 'text/html'})
   ->status_is(200)->json_is({best => 'txt'});
 
 # Nothing
@@ -438,8 +438,8 @@ $t->post_ok('/rest.png?format=jpg' => {Accept => 'image/whatever'})
 $t->post_ok('/rest.png')->status_is(201)
   ->content_type_is('text/html;charset=UTF-8')->content_is('works too');
 
-# Unsupported format with supported query
-$t->post_ok('/rest.png?format=json')->status_is(201)
+# Unsupported format and query
+$t->post_ok('/rest.png?format=png')->status_is(201)
   ->content_type_is('text/html;charset=UTF-8')->content_is('works too');
 
 # Does not exist

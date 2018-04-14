@@ -128,6 +128,8 @@ sub slurp {
   return defined $ret ? $content : croak "Can't read from asset: $!";
 }
 
+sub to_file {shift}
+
 1;
 
 =encoding utf8
@@ -256,6 +258,13 @@ Size of asset data in bytes.
   my $bytes = $file->slurp;
 
 Read all asset data at once.
+
+=head2 to_file
+
+  $file = $file->to_file;
+
+Does nothing but return the invocant, since we already have a
+L<Mojo::Asset::File> object.
 
 =head1 SEE ALSO
 

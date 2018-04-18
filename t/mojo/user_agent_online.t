@@ -152,15 +152,11 @@ my $res = p('https://metacpan.org/search' => form => {q => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';
 
-# Simple requests
+# Simple request
 $tx = $ua->get('metacpan.org');
 is $tx->req->method, 'GET',                 'right method';
 is $tx->req->url,    'http://metacpan.org', 'right url';
 is $tx->res->code,   301,                   'right status';
-$tx = $ua->get('http://google.com');
-is $tx->req->method, 'GET',               'right method';
-is $tx->req->url,    'http://google.com', 'right url';
-is $tx->res->code,   302,                 'right status';
 
 # Simple keep-alive requests
 $tx = $ua->get('https://www.wikipedia.org');

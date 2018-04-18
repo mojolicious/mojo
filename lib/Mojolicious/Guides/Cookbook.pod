@@ -619,8 +619,8 @@ that create them for you.
 
   app->start;
 
-To create promises maually you just wrap your continuation-passing style APIs in
-functions that return promises. Here's an example for how
+To create promises manually you just wrap your continuation-passing style APIs
+in functions that return promises. Here's an example for how
 L<Mojo::UserAgent/"get_p"> works internally.
 
   use Mojo::UserAgent;

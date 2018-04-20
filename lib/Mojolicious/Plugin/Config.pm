@@ -22,6 +22,8 @@ sub parse {
 sub register {
   my ($self, $app, $conf) = @_;
 
+  $app->defaults(config => $app->config);
+
   # Override
   return $app->config if $app->config->{config_override};
 
@@ -49,7 +51,7 @@ sub register {
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}} if $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
-  return $app->defaults(config => $app->config)->config($config)->config;
+  return $app->config($config)->config;
 }
 
 1;

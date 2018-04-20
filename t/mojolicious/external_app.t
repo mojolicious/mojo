@@ -38,4 +38,7 @@ $t->get_ok('/index.html')->status_is(200)
 # More text from config override
 $t->get_ok('/test')->status_is(200)->content_is('override!');
 
+# Config stash value from template
+$t->get_ok('/inline')->status_is(200)->content_is('override!');
+
 done_testing();

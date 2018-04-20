@@ -27,6 +27,13 @@ sub startup {
       $self->render(text => ++$self->session->{secondary});
     }
   );
+
+  $r->get(
+    '/inline' => sub {
+      my $self = shift;
+      $self->render(inline => '<%= $config->{whatever} =%>');
+    }
+  );
 }
 
 1;

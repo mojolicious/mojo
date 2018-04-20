@@ -22,9 +22,8 @@ sub parse {
 sub register {
   my ($self, $app, $conf) = @_;
 
-  $app->defaults(config => $app->config);
-
   # Override
+  $app->defaults(config => $app->config);
   return $app->config if $app->config->{config_override};
 
   # Config file

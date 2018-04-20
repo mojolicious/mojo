@@ -1,5 +1,7 @@
 
-7.76  2018-04-10
+7.76  2018-04-20
+  - Fixed a bug in Mojolicious::Plugin::Config where the config stash value was
+    not available when the config_override feature was used. (tim)
 
 7.75  2018-04-09
   - Deprecated placeholder quoting with "(placeholder)" in favor of

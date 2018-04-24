@@ -1,4 +1,6 @@
 
+7.77  2018-04-24
+
 7.76  2018-04-23
   - Due to lack of domain experts on the team, Windows is no longer officially
     supported. Moving foward, we will try to keep Mojolicious installable on

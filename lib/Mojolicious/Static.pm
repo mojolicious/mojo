@@ -9,6 +9,8 @@ use Mojo::Home;
 use Mojo::Loader qw(data_section file_is_binary);
 use Mojo::Util qw(encode md5_sum);
 
+use constant IS_WINDOWS => ($^O eq 'MSWin32' or $^O eq 'cygwin');
+
 # Bundled files
 my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
   ->child('Mojolicious', 'resources', 'public');
@@ -32,6 +34,9 @@ sub dispatch {
   my $path  = $req->url->path;
   $path = $stash->{path} ? $path->new($stash->{path}) : $path->clone;
   return undef unless my @parts = @{$path->canonicalize->parts};
+
+  # Don't serve when a part has embedded path separators on windows
+  if (IS_WINDOWS) { /\\/ && return undef for @parts }
 
   # Serve static file and prevent path traversal
   return undef if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));

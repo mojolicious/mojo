@@ -34,7 +34,7 @@ sub dispatch {
   return undef unless my @parts = @{$path->canonicalize->parts};
 
   # Serve static file and prevent path traversal
-  return undef if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));
+  return undef if $parts[0] =~ /^\.\./ || !$self->serve($c, join('/', @parts));
   $stash->{'mojo.static'} = 1;
   return !!$c->rendered;
 }

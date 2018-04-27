@@ -71,7 +71,7 @@ app->start;
 
   Use all the latest Perl and HTML features in beautiful single file
   prototypes like this one, and
-  [grow](http://mojolicious.org/perldoc/Mojolicious/Guides/Growing#Differences)
+  [grow](https://mojolicious.org/perldoc/Mojolicious/Guides/Growing#Differences)
   them easily into well-structured **Model-View-Controller** web applications.
 
 ```perl
@@ -104,4 +104,4 @@ __DATA__
 
 ## Want to know more?
 
-  Take a look at our excellent [documentation](http://mojolicious.org/perldoc)!
+  Take a look at our excellent [documentation](https://mojolicious.org/perldoc)!

@@ -51,14 +51,14 @@
     #mojobar-links form { display: inline }
     .animated { transition: all 0.25s ease }
   </style>
-  %= link_to 'http://mojolicious.org' => (id => 'mojobar-brand') => begin
+  %= link_to 'https://mojolicious.org' => (id => 'mojobar-brand') => begin
     <picture>
       <img src="<%= url_for '/mojo/logo-white.png' %>"
         srcset="<%= url_for '/mojo/logo-white-2x.png' %> 2x">
     </picture>
   % end
   <div id="mojobar-links">
-    %= link_to Documentation => 'http://mojolicious.org/perldoc'
+    %= link_to Documentation => 'https://mojolicious.org/perldoc'
     %= link_to Chat => 'https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org'
     %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
     %= link_to GitHub => 'https://github.com/kraih/mojo'

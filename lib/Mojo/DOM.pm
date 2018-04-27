@@ -66,7 +66,10 @@ sub content {
 
 sub descendant_nodes { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
-sub find { $_[0]->_collect($_[0]->_css->select($_[1])) }
+sub find {
+  my $self = shift;
+  return $self->_collect($self->_css->select(@_));
+}
 
 sub following { _select($_[0]->_collect($_[0]->_siblings(1, 1)), $_[1]) }
 sub following_nodes { $_[0]->_collect($_[0]->_siblings(0, 1)) }
@@ -509,6 +512,11 @@ selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
 
+Trailing pairs are optionally used to declare xml namespace aliases.
+
+  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>');
+  my $rect = $dom->at('svg|rect', svg => 'http://www.w3.org/2000/svg');
+
 =head2 attr
 
   my $hash = $dom->attr;
@@ -619,6 +627,11 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # Find elements with a class that contains dots
   my @divs = $dom->find('div.foo\.bar')->each;
 
+Trailing pairs are optionally used to declare xml namespace aliases.
+
+  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>');
+  my $rects = $dom->find('svg|rect', svg => 'http://www.w3.org/2000/svg');
+
 =head2 following
 
   my $collection = $dom->following;
@@ -655,6 +668,12 @@ L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # False
   $dom->parse('<p class="a">A</p>')->at('p')->matches('.b');
   $dom->parse('<p class="a">A</p>')->at('p')->matches('p[id]');
+
+Trailing pairs are optionally used to declare xml namespace aliases.
+
+  # True
+  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>');
+  $dom->matches('svg|rect', svg => 'http://www.w3.org/2000/svg');
 
 =head2 namespace
 

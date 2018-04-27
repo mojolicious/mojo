@@ -19,7 +19,7 @@ my $ATTR_RE   = qr/
 
 sub matches {
   my $tree = shift->tree;
-  return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, $tree);
+  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree);
 }
 
 sub select     { _select(0, shift->tree, _compile(@_)) }
@@ -74,7 +74,7 @@ sub _combinator {
 }
 
 sub _compile {
-  my $css = trim "$_[0]";
+  my ($css, %ns) = (trim(shift . ''), @_);
 
   my $group = [[]];
   while (my $selectors = $group->[-1]) {
@@ -103,7 +103,7 @@ sub _compile {
       my ($name, $args) = (lc $1, $2);
 
       # ":matches" and ":not" (contains more selectors)
-      $args = _compile($args) if $name eq 'matches' || $name eq 'not';
+      $args = _compile($args, %ns) if $name eq 'matches' || $name eq 'not';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
@@ -119,7 +119,9 @@ sub _compile {
 
     # Tag
     elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
-      push @$last, ['tag', _name($1)] unless $1 eq '*';
+      my $pre = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1 : undef;
+      my $ns  = length $pre ? $ns{$pre} // return [['invalid']] : $pre;
+      push @$last, ['tag', $name eq '*' ? undef : _name($name), _unescape($ns)];
     }
 
     else {last}
@@ -155,6 +157,25 @@ sub _match {
 }
 
 sub _name {qr/(?:^|:)\Q@{[_unescape(shift)]}\E$/}
+
+sub _namespace {
+  my ($ns, $current) = @_;
+  my $attr = $current->[1]  =~ /^([^:]+):/ ? "xmlns:$1" : 'xmlns';
+
+  # Walk up the tree, starting at this element
+  while ($current) {
+    last if $current->[0] eq 'root';
+
+    # Match against the first element with the target attribute
+    return $current->[2]{$attr} eq $ns if exists $current->[2]{$attr};
+
+    # Visit the parent
+    $current = $current->[3];
+  }
+
+  # Failing to match yields true if searching for no namespace, false otherwise
+  return !length $ns;
+}
 
 sub _pc {
   my ($class, $args, $current) = @_;
@@ -221,13 +242,19 @@ sub _selector {
     my $type = $s->[0];
 
     # Tag
-    if ($type eq 'tag') { return undef unless $current->[1] =~ $s->[1] }
+    if ($type eq 'tag') {
+      return undef if defined $s->[1] && $current->[1] !~ $s->[1];
+      return undef if defined $s->[2] && !_namespace($s->[2], $current);
+    }
 
     # Attribute
     elsif ($type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
 
     # Pseudo-class
     elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current) }
+
+    # Invalid selector
+    else { return undef }
   }
 
   return 1;
@@ -262,7 +289,7 @@ sub _siblings {
 }
 
 sub _unescape {
-  my $value = shift;
+  return undef unless defined(my $value = shift);
 
   # Remove escaped newlines
   $value =~ s/\\\n//g;
@@ -519,6 +546,20 @@ This selector is part of
 L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
 in progress.
 
+=head2 Q|E
+
+An C<E> element that belongs to the namespace alias C<Q> from
+L<CSS Namespaces Module Level 3|https://www.w3.org/TR/css-namespaces-3/>.
+Key/value pairs passed to selector methods are used to declare namespace
+aliases.
+
+  # <qml:elem xmlns:qml="http://example.com/q-markup"></qml:elem>
+  my $elem = $css->select('lq|elem', lq => 'http://example.com/q-markup');
+
+Using an empty alias searches for an element that belongs to no namespace.
+
+  my $div = $c->select('|div');
+
 =head2 E F
 
 An C<F> element descendant of an C<E> element.
@@ -575,20 +616,26 @@ following new ones.
 =head2 matches
 
   my $bool = $css->matches('head > title');
+  my $bool = $css->matches('head > ns|title', ns => 'namespace');
 
-Check if first node in L</"tree"> matches the CSS selector.
+Check if first node in L</"tree"> matches the CSS selector. Optional key/value
+pairs declare aliases for namespaces.
 
 =head2 select
 
   my $results = $css->select('head > title');
+  my $results = $css->select('head > ns|title', ns => 'namespace');
 
-Run CSS selector against L</"tree">.
+Run CSS selector against L</"tree">. Optional key/value pairs declare aliases
+for namespaces.
 
 =head2 select_one
 
   my $result = $css->select_one('head > title');
+  my $result = $css->select_one('head > ns|title', ns => 'namespace');
 
 Run CSS selector against L</"tree"> and stop as soon as the first node matched.
+Optional key/value pairs declare aliases for namespaces.
 
 =head1 SEE ALSO
 

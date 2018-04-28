@@ -504,6 +504,7 @@ node's content.
 =head2 at
 
   my $result = $dom->at('div ~ p');
+  my $result = $dom->at('svg|line', svg => 'http://www.w3.org/2000/svg');
 
 Find first descendant element of this element matching the CSS selector and
 return it as a L<Mojo::DOM> object, or C<undef> if none could be found. All
@@ -512,10 +513,11 @@ selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
 
-Trailing pairs are optionally used to declare xml namespace aliases.
+Trailing key/value pairs can be used to declare xml namespace aliases.
 
-  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>');
-  my $rect = $dom->at('svg|rect', svg => 'http://www.w3.org/2000/svg');
+  # "<rect />"
+  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>')
+    ->at('svg|rect', svg => 'http://www.w3.org/2000/svg');
 
 =head2 attr
 
@@ -610,6 +612,7 @@ element as L<Mojo::DOM> objects.
 =head2 find
 
   my $collection = $dom->find('div ~ p');
+  my $collection = $dom->find('svg|line', svg => 'http://www.w3.org/2000/svg');
 
 Find all descendant elements of this element matching the CSS selector and
 return a L<Mojo::Collection> object containing these elements as L<Mojo::DOM>
@@ -627,10 +630,11 @@ objects. All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # Find elements with a class that contains dots
   my @divs = $dom->find('div.foo\.bar')->each;
 
-Trailing pairs are optionally used to declare xml namespace aliases.
+Trailing key/value pairs can be used to declare xml namespace aliases.
 
-  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>');
-  my $rects = $dom->find('svg|rect', svg => 'http://www.w3.org/2000/svg');
+  # "<rect />"
+  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>')
+    ->find('svg|rect', svg => 'http://www.w3.org/2000/svg')->first;
 
 =head2 following
 
@@ -657,6 +661,7 @@ node as L<Mojo::DOM> objects.
 =head2 matches
 
   my $bool = $dom->matches('div ~ p');
+  my $bool = $dom->matches('svg|line', svg => 'http://www.w3.org/2000/svg');
 
 Check if this element matches the CSS selector. All selectors from
 L<Mojo::DOM::CSS/"SELECTORS"> are supported.
@@ -669,11 +674,11 @@ L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   $dom->parse('<p class="a">A</p>')->at('p')->matches('.b');
   $dom->parse('<p class="a">A</p>')->at('p')->matches('p[id]');
 
-Trailing pairs are optionally used to declare xml namespace aliases.
+Trailing key/value pairs can be used to declare xml namespace aliases.
 
   # True
-  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>');
-  $dom->matches('svg|rect', svg => 'http://www.w3.org/2000/svg');
+  $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>')
+    ->matches('svg|rect', svg => 'http://www.w3.org/2000/svg');
 
 =head2 namespace
 

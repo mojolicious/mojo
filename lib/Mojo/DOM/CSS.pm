@@ -119,8 +119,8 @@ sub _compile {
 
     # Tag
     elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
-      my $pre = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1 : undef;
-      my $ns  = length $pre ? $ns{$pre} // return [['invalid']] : $pre;
+      my $alias = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1 : undef;
+      my $ns = length $alias ? $ns{$alias} // return [['invalid']] : $alias;
       push @$last, ['tag', $name eq '*' ? undef : _name($name), _unescape($ns)];
     }
 
@@ -160,16 +160,12 @@ sub _name {qr/(?:^|:)\Q@{[_unescape(shift)]}\E$/}
 
 sub _namespace {
   my ($ns, $current) = @_;
-  my $attr = $current->[1]  =~ /^([^:]+):/ ? "xmlns:$1" : 'xmlns';
 
-  # Walk up the tree, starting at this element
+  my $attr = $current->[1] =~ /^([^:]+):/ ? "xmlns:$1" : 'xmlns';
   while ($current) {
     last if $current->[0] eq 'root';
-
-    # Match against the first element with the target attribute
     return $current->[2]{$attr} eq $ns if exists $current->[2]{$attr};
 
-    # Visit the parent
     $current = $current->[3];
   }
 
@@ -553,7 +549,6 @@ L<CSS Namespaces Module Level 3|https://www.w3.org/TR/css-namespaces-3/>.
 Key/value pairs passed to selector methods are used to declare namespace
 aliases.
 
-  # <qml:elem xmlns:qml="http://example.com/q-markup"></qml:elem>
   my $elem = $css->select('lq|elem', lq => 'http://example.com/q-markup');
 
 Using an empty alias searches for an element that belongs to no namespace.
@@ -616,26 +611,27 @@ following new ones.
 =head2 matches
 
   my $bool = $css->matches('head > title');
-  my $bool = $css->matches('head > ns|title', ns => 'namespace');
+  my $bool = $css->matches('svg|line', svg => 'http://www.w3.org/2000/svg');
 
-Check if first node in L</"tree"> matches the CSS selector. Optional key/value
-pairs declare aliases for namespaces.
+Check if first node in L</"tree"> matches the CSS selector. Trailing key/value
+pairs can be used to declare xml namespace aliases.
 
 =head2 select
 
   my $results = $css->select('head > title');
-  my $results = $css->select('head > ns|title', ns => 'namespace');
+  my $results = $css->select('svg|line', svg => 'http://www.w3.org/2000/svg');
 
-Run CSS selector against L</"tree">. Optional key/value pairs declare aliases
-for namespaces.
+Run CSS selector against L</"tree">. Trailing key/value pairs can be used to
+declare xml namespace aliases.
 
 =head2 select_one
 
   my $result = $css->select_one('head > title');
-  my $result = $css->select_one('head > ns|title', ns => 'namespace');
+  my $result =
+    $css->select_one('svg|line', svg => 'http://www.w3.org/2000/svg');
 
 Run CSS selector against L</"tree"> and stop as soon as the first node matched.
-Optional key/value pairs declare aliases for namespaces.
+Trailing key/value pairs can be used to declare xml namespace aliases.
 
 =head1 SEE ALSO
 

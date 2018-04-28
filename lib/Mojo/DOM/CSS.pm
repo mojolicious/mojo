@@ -542,9 +542,9 @@ This selector is part of
 L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
 in progress.
 
-=head2 Q|E
+=head2 A|E
 
-An C<E> element that belongs to the namespace alias C<Q> from
+An C<E> element that belongs to the namespace alias C<A> from
 L<CSS Namespaces Module Level 3|https://www.w3.org/TR/css-namespaces-3/>.
 Key/value pairs passed to selector methods are used to declare namespace
 aliases.

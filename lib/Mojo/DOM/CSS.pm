@@ -307,6 +307,9 @@ sub _value {
   # "~=" (word)
   return qr/(?:^|\s+)$value(?:\s+|$)/ if $op eq '~';
 
+  # "|=" (hyphen-separated)
+  return qr/^$value(?:-|$)/ if $op eq '|';
+
   # "*=" (contains)
   return qr/$value/ if $op eq '*';
 
@@ -415,6 +418,13 @@ An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
   my $contains = $css->select('input[name*="fo"]');
   my $contains = $css->select('input[name*=fo]');
+
+=head2 E[foo|="en"]
+
+An C<E> element whose C<foo> attribute has a hyphen-separated list of values
+beginning (from the left) with C<en>.
+
+  my $english = $css->select('link[hreflang|=en]');
 
 =head2 E:root
 

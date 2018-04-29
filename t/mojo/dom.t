@@ -2346,6 +2346,8 @@ is $dom->find('a[accesskey~=0]')->[0]->text, 'Zero', 'right text';
 is $dom->find('a[accesskey~=0]')->[1], undef, 'no result';
 is $dom->find('a[accesskey*=0]')->[0]->text, 'Zero', 'right text';
 is $dom->find('a[accesskey*=0]')->[1], undef, 'no result';
+is $dom->find('a[accesskey|=0]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey|=0]')->[1], undef, 'no result';
 is $dom->find('a[accesskey=1]')->[0]->text, 'O&gTn>e', 'right text';
 is $dom->find('a[accesskey=1]')->[1], undef, 'no result';
 is $dom->find('a[accesskey^=1]')->[0]->text, 'O&gTn>e', 'right text';
@@ -2356,6 +2358,8 @@ is $dom->find('a[accesskey~=1]')->[0]->text, 'O&gTn>e', 'right text';
 is $dom->find('a[accesskey~=1]')->[1], undef, 'no result';
 is $dom->find('a[accesskey*=1]')->[0]->text, 'O&gTn>e', 'right text';
 is $dom->find('a[accesskey*=1]')->[1], undef, 'no result';
+is $dom->find('a[accesskey|=1]')->[0]->text, 'O&gTn>e', 'right text';
+is $dom->find('a[accesskey|=1]')->[1], undef, 'no result';
 is $dom->at('a[accesskey*="."]'), undef, 'no result';
 
 # Empty attribute value
@@ -2387,6 +2391,7 @@ $dom = Mojo::DOM->new(<<EOF);
 <p class="foo">A</p>
 <p class="foo bAr">B</p>
 <p class="FOO">C</p>
+<p class="foo-bar">D</p>
 EOF
 is $dom->find('.foo')->map('text')->join(','),            'A,B', 'right result';
 is $dom->find('.FOO')->map('text')->join(','),            'C',   'right result';
@@ -2399,12 +2404,17 @@ is $dom->find('[class="foo bar" i]')->map('text')->join(','), 'B',
 is $dom->find('[class~=foo]')->map('text')->join(','), 'A,B', 'right result';
 is $dom->find('[class~=foo i]')->map('text')->join(','), 'A,B,C',
   'right result';
-is $dom->find('[class*=f]')->map('text')->join(','),   'A,B',   'right result';
-is $dom->find('[class*=f i]')->map('text')->join(','), 'A,B,C', 'right result';
-is $dom->find('[class^=F]')->map('text')->join(','),   'C',     'right result';
-is $dom->find('[class^=F i]')->map('text')->join(','), 'A,B,C', 'right result';
-is $dom->find('[class$=O]')->map('text')->join(','),   'C',     'right result';
-is $dom->find('[class$=O i]')->map('text')->join(','), 'A,C',   'right result';
+is $dom->find('[class*=f]')->map('text')->join(','), 'A,B,D', 'right result';
+is $dom->find('[class*=f i]')->map('text')->join(','), 'A,B,C,D',
+  'right result';
+is $dom->find('[class^=F]')->map('text')->join(','), 'C', 'right result';
+is $dom->find('[class^=F i]')->map('text')->join(','), 'A,B,C,D',
+  'right result';
+is $dom->find('[class$=O]')->map('text')->join(','),   'C',   'right result';
+is $dom->find('[class$=O i]')->map('text')->join(','), 'A,C', 'right result';
+is $dom->find('[class|=foo]')->map('text')->join(','), 'A,D', 'right result';
+is $dom->find('[class|=foo i]')->map('text')->join(','), 'A,C,D',
+  'right result';
 
 # Nested description lists
 $dom = Mojo::DOM->new(<<EOF);
@@ -2574,6 +2584,7 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
   <bar xmlns="ns:bar">
     <tag val="2" />
     <baz />
+    <yada hreflang="en-US">YADA</yada>
   </bar>
 </foo>
 EOF
@@ -2619,5 +2630,9 @@ ok $dom->at('foons|foo barns|bar barns|tag[val="2"] ~ barns|baz', %ns),
 ok !$dom->at('foons|bar', %ns), 'no result';
 ok !$dom->at('foons|baz', %ns), 'no result';
 ok $dom->at('baz')->matches('barns|*', %ns), 'match';
+is $dom->at('barns|bar [hreflang|=en]',    %ns)->text, 'YADA', 'right text';
+is $dom->at('barns|bar [hreflang|=en-US]', %ns)->text, 'YADA', 'right text';
+ok !$dom->at('barns|bar [hreflang|=en-US-yada]', %ns), 'no result';
+ok !$dom->at('barns|bar [hreflang|=e]',          %ns), 'no result';
 
 done_testing();

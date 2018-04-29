@@ -1214,6 +1214,27 @@ is_deeply \@e, ['J'], 'found only child';
 $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(J K)], 'found only child';
 
+# Links
+$dom = Mojo::DOM->new(<<EOF);
+<a>A</a>
+<a href=/>B</a>
+<link rel=C>
+<link href=/ rel=D>
+<area alt=E>
+<area href=/ alt=F>
+<div href=borked>very borked</div>
+EOF
+is $dom->find(':link')->map(sub { $_->tag })->join(','), 'a,link,area',
+  'right tags';
+is $dom->find(':visited')->map(sub { $_->tag })->join(','), 'a,link,area',
+  'right tags';
+is $dom->at('a:link')->text,    'B', 'right result';
+is $dom->at('a:visited')->text, 'B', 'right result';
+is $dom->at('link:link')->{rel},    'D', 'right result';
+is $dom->at('link:visited')->{rel}, 'D', 'right result';
+is $dom->at('area:link')->{alt},    'F', 'right result';
+is $dom->at('area:visited')->{alt}, 'F', 'right result';
+
 # Sibling combinator
 $dom = Mojo::DOM->new(<<EOF);
 <ul>

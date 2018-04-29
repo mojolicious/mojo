@@ -2,6 +2,7 @@
 7.77  2018-04-28
   - Added support for namespace selectors like "ns|*" to Mojo::DOM::CSS.
     (jberger)
+  - Added support for :link and :visited pseudo-classes to Mojo::DOM::CSS.
   - Added support for hyphen-separated list attribute selectors like
     "[heflang|=en]" to Mojo::DOM::CSS.
 

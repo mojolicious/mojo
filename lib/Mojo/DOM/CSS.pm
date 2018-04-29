@@ -192,6 +192,13 @@ sub _pc {
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
+  # ":link" and ":visited"
+  if ($class eq 'link' || $class eq 'visited') {
+    return undef unless $current->[0] eq 'tag' && exists $current->[2]{href};
+    my $tag = $current->[1];
+    return $tag eq 'a' || $tag eq 'area' || $tag eq 'link';
+  }
+
   # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
   if (ref $args) {
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
@@ -509,6 +516,20 @@ An C<E> element, only sibling of its type.
 An C<E> element that has no children (including text nodes).
 
   my $empty = $css->select(':empty');
+
+=head2 E:link
+
+An C<E> element being the source anchor of a hyperlink of which the target is
+not yet visited (C<:link>) or already visited (C<:visited>). Note that
+L<Mojo::DOM::CSS> is not stateful, therefore C<:link> and C<:visited> yield
+exactly the same results.
+
+  my $links = $css->select(':link');
+  my $links = $css->select(':visited');
+
+=head2 E:visited
+
+Alias for L</"E:link">.
 
 =head2 E:checked
 

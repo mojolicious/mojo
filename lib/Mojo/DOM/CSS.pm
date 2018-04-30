@@ -195,8 +195,7 @@ sub _pc {
   # ":link" and ":visited"
   if ($class eq 'link' || $class eq 'visited') {
     return undef unless $current->[0] eq 'tag' && exists $current->[2]{href};
-    my $tag = $current->[1];
-    return $tag eq 'a' || $tag eq 'area' || $tag eq 'link';
+    return !!grep { $current->[1] eq $_ } qw(a area link);
   }
 
   # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"

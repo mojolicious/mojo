@@ -6,7 +6,7 @@
     (jberger)
   - Added support for :link and :visited pseudo-classes to Mojo::DOM::CSS.
   - Added support for hyphen-separated list attribute selectors like
-    "[heflang|=en]" to Mojo::DOM::CSS.
+    "[hreflang|=en]" to Mojo::DOM::CSS.
 
 7.76  2018-04-23
   - Due to lack of domain experts on the team, Windows is no longer officially

@@ -1,4 +1,6 @@
 
+7.78  2018-05-01
+
 7.77  2018-04-28
   - Added support for namespace selectors like "ns|*" to Mojo::DOM::CSS.
     (jberger)

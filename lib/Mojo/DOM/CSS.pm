@@ -74,7 +74,7 @@ sub _combinator {
 }
 
 sub _compile {
-  my ($css, %ns) = (trim(shift . ''), @_);
+  my ($css, %ns) = (trim('' . shift), @_);
 
   my $group = [[]];
   while (my $selectors = $group->[-1]) {

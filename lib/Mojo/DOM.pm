@@ -112,7 +112,7 @@ sub parent {
   return $self->_build(_parent($tree), $self->xml);
 }
 
-sub parse { shift->_delegate(parse => @_) }
+sub parse { ${$_[0]}->parse($_[1]) and return $_[0] }
 
 sub preceding { _select($_[0]->_collect($_[0]->_siblings(1, 0)), $_[1]) }
 sub preceding_nodes { $_[0]->_collect($_[0]->_siblings(0)) }
@@ -155,9 +155,9 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { _text(_nodes(shift->tree), 0) }
 
-sub to_string { shift->_delegate('render') }
+sub to_string { ${shift()}->render }
 
-sub tree { shift->_delegate(tree => @_) }
+sub tree { @_ > 1 ? (${$_[0]}->tree($_[1]) and return $_[0]) : ${$_[0]}->tree }
 
 sub type { shift->tree->[0] }
 
@@ -186,7 +186,7 @@ sub with_roles { shift->Mojo::Base::with_roles(@_) }
 sub wrap         { shift->_wrap(0, @_) }
 sub wrap_content { shift->_wrap(1, @_) }
 
-sub xml { shift->_delegate(xml => @_) }
+sub xml { @_ > 1 ? (${$_[0]}->xml($_[1]) and return $_[0]) : ${$_[0]}->xml }
 
 sub _add {
   my ($self, $offset, $new) = @_;
@@ -241,13 +241,6 @@ sub _content {
 }
 
 sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
-
-sub _delegate {
-  my ($self, $method) = (shift, shift);
-  return $$self->$method unless @_;
-  $$self->$method(@_);
-  return $self;
-}
 
 sub _link {
   my ($parent, $children) = @_;

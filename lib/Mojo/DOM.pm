@@ -12,7 +12,8 @@ use overload
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(blessed weaken);
+use Storable 'dclone';
 
 sub all_text { _text(_nodes(shift->tree), 1) }
 
@@ -278,7 +279,11 @@ sub _offset {
 
 sub _parent { $_[0]->[$_[0][0] eq 'tag' ? 3 : 2] }
 
-sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
+sub _parse {
+  my ($self, $input) = @_;
+  return dclone $input->tree if blessed $input && $input->isa('Mojo::DOM');
+  return Mojo::DOM::HTML->new(xml => $self->xml)->parse($input)->tree;
+}
 
 sub _replace {
   my ($self, $parent, $child, $nodes) = @_;
@@ -472,6 +477,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 =head2 append
 
   $dom = $dom->append('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->append(Mojo::DOM->new);
 
 Append HTML/XML fragment to this node (for all node types other than C<root>).
 
@@ -486,6 +492,7 @@ Append HTML/XML fragment to this node (for all node types other than C<root>).
 =head2 append_content
 
   $dom = $dom->append_content('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->append_content(Mojo::DOM->new);
 
 Append HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to this
 node's content.
@@ -569,6 +576,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   my $str = $dom->content;
   $dom    = $dom->content('<p>I ♥ Mojolicious!</p>');
+  $dom    = $dom->content(Mojo::DOM->new);
 
 Return this node's content or replace it with HTML/XML fragment (for C<root>
 and C<tag> nodes) or raw content.
@@ -769,6 +777,7 @@ node as L<Mojo::DOM> objects.
 =head2 prepend
 
   $dom = $dom->prepend('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->prepend(Mojo::DOM->new);
 
 Prepend HTML/XML fragment to this node (for all node types other than C<root>).
 
@@ -783,6 +792,7 @@ Prepend HTML/XML fragment to this node (for all node types other than C<root>).
 =head2 prepend_content
 
   $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->prepend_content(Mojo::DOM->new);
 
 Prepend HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to this
 node's content.
@@ -839,6 +849,7 @@ Remove this node and return L</"root"> (for C<root> nodes) or L</"parent">.
 =head2 replace
 
   my $parent = $dom->replace('<div>I ♥ Mojolicious!</div>');
+  my $parent = $dom->replace(Mojo::DOM->new);
 
 Replace this node with HTML/XML fragment and return L</"root"> (for C<root>
 nodes) or L</"parent">.
@@ -982,6 +993,7 @@ Alias for L<Mojo::Base/"with_roles">.
 =head2 wrap
 
   $dom = $dom->wrap('<div></div>');
+  $dom = $dom->wrap(Mojo::DOM->new);
 
 Wrap HTML/XML fragment around this node (for all node types other than C<root>),
 placing it as the last child of the first innermost element.
@@ -1001,6 +1013,7 @@ placing it as the last child of the first innermost element.
 =head2 wrap_content
 
   $dom = $dom->wrap_content('<div></div>');
+  $dom = $dom->wrap_content(Mojo::DOM->new);
 
 Wrap HTML/XML fragment around this node's content (for C<root> and C<tag>
 nodes), placing it as the last children of the first innermost element.

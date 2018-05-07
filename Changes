@@ -1,5 +1,7 @@
 
-7.78  2018-05-01
+7.78  2018-05-07
+  - Improved performance of all DOM manipulation methods in Mojo::DOM
+    significantly when reusing Mojo::DOM objects.
 
 7.77  2018-04-28
   - Added support for namespace selectors like "ns|*" to Mojo::DOM::CSS.

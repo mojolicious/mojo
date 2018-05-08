@@ -46,9 +46,32 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->content_like(qr/Testing not found/);
 
 # Try to access a file which is not under the web root via path
+# traversal in testing mode (goes back and forth one directory)
+$t->get_ok('/another/../../../mojolicious/secret.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Testing not found/);
+
+# Try to access a file which is not under the web root via path
 # traversal in testing mode (triple dot)
 $t->get_ok('/.../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Testing not found/);
+
+# Try to access a file which is not under the web root via path
+# traversal in testing mode (backslashes)
+$t->get_ok('/..\\..\\mojolicious\\secret.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Testing not found/);
+
+# Try to access a file which is not under the web root via path
+# traversal in testing mode (escaped backslashes)
+$t->get_ok('/..%5C..%5Cmojolicious%5Csecret.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Testing not found/);
+
+# Check that backslashes on query or fragment parts don't block access
+# in testing mode
+$t->get_ok('/hello.txt?one=\\1#two=\\2')->status_is(200)
+  ->content_like(qr/Hello Mojo from a static file!/);
 
 done_testing();

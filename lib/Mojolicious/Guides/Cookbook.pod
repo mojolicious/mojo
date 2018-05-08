@@ -640,7 +640,7 @@ L<Mojo::UserAgent/"get_p"> works internally.
   }
 
   # Use our new promise generating function
-  get_p('http://mojolicious.org')->then(sub {
+  get_p('https://mojolicious.org')->then(sub {
     my $tx = shift;
     say $tx->result->dom->at('title')->text;
   })->wait;
@@ -702,7 +702,7 @@ created at startup time.
   # Check title in the background every 10 seconds
   my $title = 'Got no title yet.';
   Mojo::IOLoop->recurring(10 => sub {
-    app->ua->get('http://mojolicious.org' => sub {
+    app->ua->get('https://mojolicious.org' => sub {
       my ($ua, $tx) = @_;
       $title = $tx->result->dom->at('title')->text;
     });
@@ -1483,23 +1483,23 @@ command L<Mojolicious::Command::get> that is about to change. You can just pick
 the parts that actually matter with the CSS selectors from L<Mojo::DOM> and
 JSON Pointers from L<Mojo::JSON::Pointer>.
 
-  $ mojo get http://mojolicious.org 'head > title'
+  $ mojo get https://mojolicious.org 'head > title'
 
 How about a list of all id attributes?
 
-  $ mojo get http://mojolicious.org '*' attr id
+  $ mojo get https://mojolicious.org '*' attr id
 
 Or the text content of all heading tags?
 
-  $ mojo get http://mojolicious.org 'h1, h2, h3' text
+  $ mojo get https://mojolicious.org 'h1, h2, h3' text
 
 Maybe just the text of the third heading?
 
-  $ mojo get http://mojolicious.org 'h1, h2, h3' 3 text
+  $ mojo get https://mojolicious.org 'h1, h2, h3' 3 text
 
 You can also extract all text from nested child elements.
 
-  $ mojo get http://mojolicious.org '#mojobar' all
+  $ mojo get https://mojolicious.org '#mojobar' all
 
 The request can be customized as well.
 
@@ -1515,7 +1515,7 @@ Pass request data by redirecting C<STDIN>.
 
 Or use the output of another program.
 
-  $ echo 'Hello World' | mojo get -M PUT http://mojolicious.org
+  $ echo 'Hello World' | mojo get -M PUT https://mojolicious.org
 
 Submit forms as C<application/x-www-form-urlencoded> content.
 

@@ -144,10 +144,10 @@ Mojo::Promise - Promises/A+
   }
 
   # Perform non-blocking operations sequentially
-  get('http://mojolicious.org')->then(sub {
+  get('https://mojolicious.org')->then(sub {
     my $mojo = shift;
     say $mojo->res->code;
-    return get('http://metacpan.org');
+    return get('https://metacpan.org');
   })->then(sub {
     my $cpan = shift;
     say $cpan->res->code;
@@ -157,8 +157,8 @@ Mojo::Promise - Promises/A+
   })->wait;
 
   # Synchronize non-blocking operations (all)
-  my $mojo = get('http://mojolicious.org');
-  my $cpan = get('http://metacpan.org');
+  my $mojo = get('https://mojolicious.org');
+  my $cpan = get('https://metacpan.org');
   Mojo::Promise->all($mojo, $cpan)->then(sub {
     my ($mojo, $cpan) = @_;
     say $mojo->[0]->res->code;
@@ -169,8 +169,8 @@ Mojo::Promise - Promises/A+
   })->wait;
 
   # Synchronize non-blocking operations (race)
-  my $mojo = get('http://mojolicious.org');
-  my $cpan = get('http://metacpan.org');
+  my $mojo = get('https://mojolicious.org');
+  my $cpan = get('https://metacpan.org');
   Mojo::Promise->race($mojo, $cpan)->then(sub {
     my $tx = shift;
     say $tx->req->url, ' won!';
@@ -319,6 +319,6 @@ rejected, does nothing when L</"ioloop"> is already running.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

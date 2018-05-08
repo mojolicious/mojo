@@ -197,7 +197,7 @@ for a fully functional L<Mojolicious> plugin.
 
 =head2 get
 
-  $ mojo get http://mojolicious.org
+  $ mojo get https://mojolicious.org
   $ ./myapp.pl get /foo
 
 Use L<Mojolicious::Command::get> to perform requests to remote host or local
@@ -321,6 +321,6 @@ shared by all commands, will be parsed from C<@ARGV> during compile time.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

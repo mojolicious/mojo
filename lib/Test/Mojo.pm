@@ -492,7 +492,7 @@ True if the last test was successful.
   };
   $t->get_ok('/')
     ->status_is(302)
-    ->$location_is('http://mojolicious.org')
+    ->$location_is('https://mojolicious.org')
     ->or(sub { diag 'Must have been Joel!' });
 
 =head2 tx
@@ -699,7 +699,7 @@ Perform a C<GET> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"get">, except for the callback.
 
   # Run tests against remote host
-  $t->get_ok('http://mojolicious.org/perldoc')->status_is(200);
+  $t->get_ok('https://mojolicious.org/perldoc')->status_is(200);
 
   # Use relative URL for request with Basic authentication
   $t->get_ok('//sri:secr3t@/secrets.json')
@@ -1061,6 +1061,6 @@ arguments as L<Mojo::UserAgent/"websocket">, except for the callback.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

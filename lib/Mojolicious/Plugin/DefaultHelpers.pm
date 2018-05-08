@@ -342,7 +342,7 @@ exception gets thrown in one of the steps, breaking the chain.
   $c->delay(
     sub {
       my $delay = shift;
-      $c->ua->get('http://mojolicious.org' => $delay->begin);
+      $c->ua->get('https://mojolicious.org' => $delay->begin);
     },
     sub {
       my ($delay, $tx) = @_;
@@ -598,6 +598,6 @@ Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

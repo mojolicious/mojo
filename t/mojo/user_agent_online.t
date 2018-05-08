@@ -147,7 +147,6 @@ is h('mojolicious.org')->code,          200, 'right status';
 is h('mojolicious.org')->body,          '',  'no content';
 is p('mojolicious.org/lalalala')->code, 404, 'right status';
 is g('http://mojolicious.org')->code,   200, 'right status';
-is p('http://mojolicious.org')->code,   404, 'right status';
 my $res = p('https://metacpan.org/search' => form => {q => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';

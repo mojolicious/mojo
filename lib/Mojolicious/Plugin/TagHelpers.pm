@@ -496,7 +496,7 @@ Generate C<label> tag.
   %= link_to Contact => 'mailto:sri@example.com'
   <%= link_to index => begin %>Home<% end %>
   <%= link_to '/file.txt' => begin %>File<% end %>
-  <%= link_to 'http://mojolicious.org' => begin %>Mojolicious<% end %>
+  <%= link_to 'https://mojolicious.org' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
 Generate portable C<a> tag with L<Mojolicious::Controller/"url_for">, defaults
@@ -510,7 +510,7 @@ to using the capitalized link target as content.
   <a href="mailto:sri@example.com">Contact</a>
   <a href="/path/to/index">Home</a>
   <a href="/path/to/file.txt">File</a>
-  <a href="http://mojolicious.org">Mojolicious</a>
+  <a href="https://mojolicious.org">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
 
 =head2 month_field
@@ -767,15 +767,15 @@ get picked up and shown as default.
 =head2 url_field
 
   %= url_field 'address'
-  %= url_field address => 'http://mojolicious.org'
-  %= url_field address => 'http://mojolicious.org', id => 'foo'
+  %= url_field address => 'https://mojolicious.org'
+  %= url_field address => 'https://mojolicious.org', id => 'foo'
 
 Generate C<input> tag of type C<url>. Previous input values will automatically
 get picked up and shown as default.
 
   <input name="address" type="url">
-  <input name="address" type="url" value="http://mojolicious.org">
-  <input id="foo" name="address" type="url" value="http://mojolicious.org">
+  <input name="address" type="url" value="https://mojolicious.org">
+  <input id="foo" name="address" type="url" value="https://mojolicious.org">
 
 =head2 week_field
 
@@ -803,6 +803,6 @@ Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

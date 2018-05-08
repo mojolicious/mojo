@@ -422,8 +422,8 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
     });
     return $promise;
   }
-  my $mojo = get('http://mojolicious.org');
-  my $cpan = get('http://metacpan.org');
+  my $mojo = get('https://mojolicious.org');
+  my $cpan = get('https://metacpan.org');
   Mojo::Promise->race($mojo, $cpan)->then(sub { say shift->req->url })->wait;
 
   # Synchronize multiple non-blocking operations
@@ -655,6 +655,6 @@ diagnostics information printed to C<STDERR>.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

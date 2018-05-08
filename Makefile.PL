@@ -22,7 +22,7 @@ WriteMakefile(
     prereqs        => {runtime => {requires => {perl => '5.010001'}}},
     resources      => {
       bugtracker => {web => 'https://github.com/kraih/mojo/issues'},
-      homepage   => 'http://mojolicious.org',
+      homepage   => 'https://mojolicious.org',
       license    => ['http://www.opensource.org/licenses/artistic-license-2.0'],
       repository => {
         type => 'git',

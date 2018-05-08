@@ -209,7 +209,7 @@ be closed immediately.
   # The variable $ua goes out of scope and gets destroyed too early
   Mojo::IOLoop->timer(5 => sub {
     my $ua = Mojo::UserAgent->new;
-    $ua->get('http://mojolicious.org' => sub {
+    $ua->get('https://mojolicious.org' => sub {
       my ($ua, $tx) = @_;
       say $tx->result->dom->at('title')->text;
     });

@@ -132,7 +132,7 @@
       </div>
     </div>
     <div id="footer">
-      %= link_to 'http://mojolicious.org' => begin
+      %= link_to 'https://mojolicious.org' => begin
         <picture>
           <img src="<%= url_for '/mojo/logo-black.png' %>"
             srcset="<%= url_for '/mojo/logo-black-2x.png' %> 2x"

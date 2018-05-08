@@ -659,6 +659,6 @@ All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

@@ -668,6 +668,6 @@ shortcuts provided by L</"root"> on L<Mojolicious::Routes::Route> objects.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

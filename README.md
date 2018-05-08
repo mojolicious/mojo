@@ -98,7 +98,7 @@ __DATA__
 <script>
   var ws = new WebSocket('<%= $url->to_abs %>');
   ws.onmessage = function (event) { document.body.innerHTML += event.data };
-  ws.onopen    = function (event) { ws.send('http://mojolicious.org') };
+  ws.onopen    = function (event) { ws.send('https://mojolicious.org') };
 </script>
 ```
 

@@ -336,7 +336,8 @@ L<Mojo::DOM::HTML> implements the following functions.
 
   my $str = tag_to_html 'div', id => 'foo', 'safe content';
 
-Generate HTML/XML tag and render it right away.  Note that this method is
+Generate HTML/XML tag and render it right away. This is a significantly faster
+alternative to L</"tag"> for template systems. Note that this method is
 EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

@@ -166,6 +166,10 @@ sub parse {
 
 sub render { _render($_[0]->tree, $_[0]->xml) }
 
+sub tag { shift->tree(['root', _tag(@_)]) }
+
+sub tag_to_html { _render(_tag(@_), undef) }
+
 sub _end {
   my ($end, $xml, $current) = @_;
 
@@ -265,6 +269,22 @@ sub _start {
   $$current = $new;
 }
 
+sub _tag {
+  my $tree = ['tag', shift, undef, undef];
+
+  # Content
+  if (ref $_[-1] eq 'CODE') { push @$tree, ['raw', pop->()] }
+  elsif (@_ % 2) { push @$tree, ['text', pop] }
+
+  # Attributes
+  my $attrs = $tree->[2] = {@_};
+  if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
+    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
+  }
+
+  return $tree;
+}
+
 1;
 
 =encoding utf8
@@ -308,6 +328,17 @@ carefully since it is very dynamic.
 Disable HTML semantics in parser and activate case-sensitivity, defaults to
 auto-detection based on XML declarations.
 
+=head1 FUNCTIONS
+
+L<Mojo::DOM::HTML> implements the following functions.
+
+=head2 tag_to_html
+
+  my $str = tag_to_html 'div', id => 'foo', 'safe content';
+
+Generate HTML/XML tag and render it right away.  Note that this method is
+EXPERIMENTAL and might change without warning!
+
 =head1 METHODS
 
 L<Mojo::DOM::HTML> inherits all methods from L<Mojo::Base> and implements the
@@ -324,6 +355,13 @@ Parse HTML/XML fragment.
   my $str = $html->render;
 
 Render DOM to HTML/XML.
+
+=head2 tag
+
+  $html = $html->tag('div', id => 'foo', 'safe content');
+
+Generate HTML/XML tag. Note that this method is EXPERIMENTAL and might change
+without warning!
 
 =head1 SEE ALSO
 

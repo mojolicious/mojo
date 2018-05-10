@@ -1,6 +1,8 @@
 
 7.78  2018-05-11
-  - Added new_tag method to Mojo::DOM. (jberger, sri)
+  - Added EXPERIMENTAL new_tag method to Mojo::DOM. (jberger, sri)
+  - Added EXPERIMENTAL tag method to Mojo::DOM::HTML.
+  - Added EXPERIMENTAL tag_to_html function to Mojo::DOM::HTML.
   - Improved performance of all DOM manipulation methods in Mojo::DOM
     significantly when reusing Mojo::DOM objects.
 

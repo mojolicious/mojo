@@ -104,20 +104,9 @@ sub new {
 }
 
 sub new_tag {
-  my ($self, $tree) = (shift, ['tag', shift, undef, undef]);
-
-  # Content
-  if (ref $_[-1] eq 'CODE') { push @$tree, ['raw', pop->()] }
-  elsif (@_ % 2) { push @$tree, ['text', pop] }
-
-  # Attributes
-  my $attrs = $tree->[2] = {@_};
-  if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
-    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
-  }
-
-  my $new = $self->new;
-  $$new->tree(['root', $tree]);
+  my $self = shift;
+  my $new  = $self->new;
+  $$new->tag(@_);
   $$new->xml($$self->xml) if ref $self;
   return $new;
 }
@@ -732,7 +721,8 @@ fragment if necessary.
 
 Construct a new L<Mojo::DOM> object for an HTML/XML tag with or without
 attributes and content. The C<data> attribute may contain a hash reference with
-key/value pairs to generate attributes from.
+key/value pairs to generate attributes from. Note that this method is
+EXPERIMENTAL and might change without warning!
 
   # "<br>"
   Mojo::DOM->new_tag('br');

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
-use Mojo::DOM;
+use Mojo::DOM::HTML;
 use Scalar::Util 'blessed';
 
 sub register {
@@ -166,7 +166,7 @@ sub _submit_button {
   return _tag('input', value => $value, @_, type => 'submit');
 }
 
-sub _tag { Mojo::ByteStream->new(Mojo::DOM->new_tag(@_)->to_string) }
+sub _tag { Mojo::ByteStream->new(Mojo::DOM::HTML::tag_to_html(@_)) }
 
 sub _tag_with_error {
   my ($c, $tag) = (shift, shift);

@@ -103,6 +103,25 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
+sub new_tag {
+  my ($self, $tree) = (shift, ['tag', shift, undef, undef]);
+
+  # Content
+  if (ref $_[-1] eq 'CODE') { push @$tree, ['raw', pop->()] }
+  elsif (@_ % 2) { push @$tree, ['text', pop] }
+
+  # Attributes
+  my $attrs = $tree->[2] = {@_};
+  if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
+    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
+  }
+
+  my $new = $self->new;
+  $$new->tree(['root', $tree]);
+  $$new->xml($$self->xml) if ref $self;
+  return $new;
+}
+
 sub next      { $_[0]->_maybe($_[0]->_siblings(1, 1, 0)) }
 sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 1, 0)) }
 
@@ -700,6 +719,41 @@ Find this element's namespace, or return C<undef> if none could be found.
 
 Construct a new scalar-based L<Mojo::DOM> object and L</"parse"> HTML/XML
 fragment if necessary.
+
+=head2 new_tag
+
+  my $tag = Mojo::DOM->new_tag('div');
+  my $tag = $dom->new_tag('div');
+  my $tag = $dom->new_tag('div', id => 'foo', hidden => undef);
+  my $tag = $dom->new_tag('div', 'safe content');
+  my $tag = $dom->new_tag('div', id => 'foo', 'safe content');
+  my $tag = $dom->new_tag('div', data => {mojo => 'rocks'}, 'safe content');
+  my $tag = $dom->new_tag('div', id => 'foo', sub { 'unsafe content' });
+
+Construct a new L<Mojo::DOM> object for an HTML/XML tag with or without
+attributes and content. The C<data> attribute may contain a hash reference with
+key/value pairs to generate attributes from.
+
+  # "<br>"
+  Mojo::DOM->new_tag('br');
+
+  # "<div></div>"
+  Mojo::DOM->new_tag('div');
+
+  # "<div id="foo" hidden></div>"
+  Mojo::DOM->new_tag('div', id => 'foo', hidden => undef);
+
+  # "<div>test &amp; 123</div>"
+  Mojo::DOM->new_tag('div', 'test & 123');
+
+  # "<div id="foo">test &amp; 123</div>"
+  Mojo::DOM->new_tag('div', id => 'foo', 'test & 123');
+
+  # "<div data-foo="1" data-bar="test">test &amp; 123</div>""
+  Mojo::DOM->new_tag('div', data => {foo => 1, Bar => 'test'}, 'test & 123');
+
+  # "<div id="foo">test & 123</div>"
+  Mojo::DOM->new_tag('div', id => 'foo', sub { 'test & 123' });
 
 =head2 next
 

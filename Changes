@@ -1,5 +1,6 @@
 
-7.78  2018-05-07
+7.78  2018-05-11
+  - Added new_tag method to Mojo::DOM. (jberger, sri)
   - Improved performance of all DOM manipulation methods in Mojo::DOM
     significantly when reusing Mojo::DOM objects.
 

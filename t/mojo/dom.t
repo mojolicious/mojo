@@ -2700,4 +2700,57 @@ $dom->at('b')->wrap_content($fragment);
 is $dom, '<div><a><b><a><b>CC</b></a></b></a></div>', 'right result';
 is $fragment, '<a><b>C</b></a>', 'right result';
 
+# Generate tags
+is(Mojo::DOM->new_tag('br')->to_string,  '<br>',        'right result');
+is(Mojo::DOM->new_tag('div')->to_string, '<div></div>', 'right result');
+is(
+  Mojo::DOM->new_tag('div', id => 'foo', hidden => undef)->to_string,
+  '<div hidden id="foo"></div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', 'safe & content'),
+  '<div>safe &amp; content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', id => 'foo', 'safe & content'),
+  '<div id="foo">safe &amp; content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag(
+    'div',
+    id   => 'foo',
+    data => {foo => 0, Bar => 'test'},
+    'safe & content'
+  ),
+  '<div data-bar="test" data-foo="0" id="foo">safe &amp; content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', sub {'unsafe & content'}),
+  '<div>unsafe & content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', id => 'foo', sub {'unsafe & content'}),
+  '<div id="foo">unsafe & content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new->new_tag('foo', hidden => undef),
+  '<foo hidden></foo>',
+  'right result'
+);
+is(
+  Mojo::DOM->new->xml(1)->new_tag('foo', hidden => undef),
+  '<foo hidden="hidden" />',
+  'right result'
+);
+$dom = Mojo::DOM->new('<div>Test</div>');
+my $br = $dom->new_tag('br');
+$dom->at('div')->append_content($br)->append_content($br);
+is $dom, '<div>Test<br><br></div>', 'right result';
+
 done_testing();

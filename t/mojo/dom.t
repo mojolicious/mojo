@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::DOM;
+use Mojo::DOM::HTML 'tag_to_html';
 
 # Empty
 is(Mojo::DOM->new,                     '',    'right result');
@@ -2752,5 +2753,7 @@ $dom = Mojo::DOM->new('<div>Test</div>');
 my $br = $dom->new_tag('br');
 $dom->at('div')->append_content($br)->append_content($br);
 is $dom, '<div>Test<br><br></div>', 'right result';
+is tag_to_html('div', id => 'foo', 'bar'), '<div id="foo">bar</div>',
+  'right result';
 
 done_testing();

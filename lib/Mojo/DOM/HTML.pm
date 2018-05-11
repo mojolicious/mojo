@@ -1,8 +1,11 @@
 package Mojo::DOM::HTML;
 use Mojo::Base -base;
 
+use Exporter 'import';
 use Mojo::Util qw(html_attr_unescape html_unescape xml_escape);
 use Scalar::Util 'weaken';
+
+our @EXPORT_OK = ('tag_to_html');
 
 has tree => sub { ['root'] };
 has 'xml';
@@ -315,6 +318,19 @@ L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM>, based on the
 L<HTML Living Standard|https://html.spec.whatwg.org> and the
 L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/xml/>.
 
+=head1 FUNCTIONS
+
+L<Mojo::DOM::HTML> implements the following functions, which can be imported
+individually.
+
+=head2 tag_to_html
+
+  my $str = tag_to_html 'div', id => 'foo', 'safe content';
+
+Generate HTML/XML tag and render it right away. This is a significantly faster
+alternative to L</"tag"> for template systems that have to generate a lot of
+tags. Note that this method is EXPERIMENTAL and might change without warning!
+
 =head1 ATTRIBUTES
 
 L<Mojo::DOM::HTML> implements the following attributes.
@@ -334,18 +350,6 @@ carefully since it is very dynamic.
 
 Disable HTML semantics in parser and activate case-sensitivity, defaults to
 auto-detection based on XML declarations.
-
-=head1 FUNCTIONS
-
-L<Mojo::DOM::HTML> implements the following functions.
-
-=head2 tag_to_html
-
-  my $str = tag_to_html 'div', id => 'foo', 'safe content';
-
-Generate HTML/XML tag and render it right away. This is a significantly faster
-alternative to L</"tag"> for template systems. Note that this method is
-EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

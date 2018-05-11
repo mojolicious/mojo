@@ -107,6 +107,21 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
 $t->get_ok('/.../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
+# Try to access a file which is not under the web root via path
+# traversal in production mode (backslashes)
+$t->get_ok('/..\\..\\mojolicious\\secret.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
+
+# Try to access a file which is not under the web root via path
+# traversal in production mode (escaped backslashes)
+$t->get_ok('/..%5C..%5Cmojolicious%5Csecret.txt')->status_is(404)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
+
+# Check that backslashes on query or fragment parts don't block access
+# in production mode
+$t->get_ok('/hello.txt?one=\\1#two=\\2')->status_is(200)
+  ->content_like(qr/Hello Mojo from a static file!/);
+
 # Embedded production static file
 $t->get_ok('/some/static/file.txt')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')

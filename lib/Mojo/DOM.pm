@@ -746,6 +746,10 @@ EXPERIMENTAL and might change without warning!
   # "<div id="foo">test & 123</div>"
   Mojo::DOM->new_tag('div', id => 'foo', sub { 'test & 123' });
 
+  # "<div>Hello<b>Mojo!</b></div>"
+  Mojo::DOM->new('<div>Hello</div>')->at('div')
+    ->append_content(Mojo::DOM->new_tag('b', 'Mojo!'))->root;
+
 =head2 next
 
   my $sibling = $dom->next;

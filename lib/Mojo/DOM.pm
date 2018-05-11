@@ -387,6 +387,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Modify
   $dom->find('div p')->last->append('<p id="c">456</p>');
+  $dom->at('#c')->prepend($dom->new_tag('p', id => 'd', '789'));
   $dom->find(':not(p)')->map('strip');
 
   # Render

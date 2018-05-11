@@ -329,7 +329,7 @@ individually.
 
 Generate HTML/XML tag and render it right away. This is a significantly faster
 alternative to L</"tag"> for template systems that have to generate a lot of
-tags. Note that this method is EXPERIMENTAL and might change without warning!
+tags. Note that this function is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 

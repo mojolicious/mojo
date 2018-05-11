@@ -198,12 +198,43 @@ sub _node {
 sub _render {
   my ($tree, $xml) = @_;
 
-  # Text (escaped)
+  # Tag
   my $type = $tree->[0];
+  if ($type eq 'tag') {
+
+    # Start tag
+    my $tag    = $tree->[1];
+    my $result = "<$tag";
+
+    # Attributes
+    for my $key (sort keys %{$tree->[2]}) {
+      my $value = $tree->[2]{$key};
+      $result .= $xml ? qq{ $key="$key"} : " $key" and next
+        unless defined $value;
+      $result .= qq{ $key="} . xml_escape($value) . '"';
+    }
+
+    # No children
+    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
+      unless $tree->[4];
+
+    # Children
+    no warnings 'recursion';
+    $result .= '>' . join '', map { _render($_, $xml) } @$tree[4 .. $#$tree];
+
+    # End tag
+    return "$result</$tag>";
+  }
+
+  # Text (escaped)
   return xml_escape $tree->[1] if $type eq 'text';
 
   # Raw text
   return $tree->[1] if $type eq 'raw';
+
+  # Root
+  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
+    if $type eq 'root';
 
   # DOCTYPE
   return '<!DOCTYPE' . $tree->[1] . '>' if $type eq 'doctype';
@@ -217,31 +248,8 @@ sub _render {
   # Processing instruction
   return '<?' . $tree->[1] . '?>' if $type eq 'pi';
 
-  # Root
-  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
-    if $type eq 'root';
-
-  # Start tag
-  my $tag    = $tree->[1];
-  my $result = "<$tag";
-
-  # Attributes
-  for my $key (sort keys %{$tree->[2]}) {
-    my $value = $tree->[2]{$key};
-    $result .= $xml ? qq{ $key="$key"} : " $key" and next unless defined $value;
-    $result .= qq{ $key="} . xml_escape($value) . '"';
-  }
-
-  # No children
-  return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
-    unless $tree->[4];
-
-  # Children
-  no warnings 'recursion';
-  $result .= '>' . join '', map { _render($_, $xml) } @$tree[4 .. $#$tree];
-
-  # End tag
-  return "$result</$tag>";
+  # Everything else
+  return '';
 }
 
 sub _start {
@@ -273,15 +281,14 @@ sub _tag {
   my $tree = ['tag', shift, undef, undef];
 
   # Content
-  if (ref $_[-1] eq 'CODE') { push @$tree, ['raw', pop->()] }
-  elsif (@_ % 2) { push @$tree, ['text', pop] }
+  push @$tree, ref $_[-1] eq 'CODE' ? ['raw', pop->()] : ['text', pop]
+    if @_ % 2;
 
   # Attributes
   my $attrs = $tree->[2] = {@_};
-  if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
-    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
-  }
-
+  return $tree unless exists $attrs->{data} && ref $attrs->{data} eq 'HASH';
+  my $data = delete $attrs->{data};
+  @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
   return $tree;
 }
 

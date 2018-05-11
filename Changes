@@ -1,4 +1,6 @@
 
+7.79  2018-05-12
+
 7.78  2018-05-11
   - Deprecated delay helper in Mojolicious::Plugin::DefaultHelpers.
   - Added EXPERIMENTAL new_tag method to Mojo::DOM. (jberger, sri)

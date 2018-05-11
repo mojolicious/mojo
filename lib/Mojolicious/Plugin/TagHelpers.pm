@@ -652,9 +652,9 @@ Alias for L</"tag">.
   %= tag 'br'
   %= tag 'div'
   %= tag 'div', id => 'foo', hidden => undef
-  %= tag div => 'test & 123'
-  %= tag div => (id => 'foo') => 'test & 123'
-  %= tag div => (data => {my_id => 1, Name => 'test'}) => 'test & 123'
+  %= tag 'div', 'test & 123'
+  %= tag 'div', id => 'foo', 'test & 123'
+  %= tag 'div', data => {my_id => 1, Name => 'test'}, 'test & 123'
   %= tag div => begin
     test & 123
   % end
@@ -677,8 +677,8 @@ Very useful for reuse in more specific tag helpers.
 
   my $output = $c->tag('meta');
   my $output = $c->tag('meta', charset => 'UTF-8');
-  my $output = $c->tag(div => '<p>This will be escaped</p>');
-  my $output = $c->tag(div => sub { '<p>This will not be escaped</p>' });
+  my $output = $c->tag('div', '<p>This will be escaped</p>');
+  my $output = $c->tag('div', sub { '<p>This will not be escaped</p>' });
 
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
 accidental double escaping in C<ep> templates.

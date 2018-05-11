@@ -5,7 +5,7 @@ use Mojo::ByteStream;
 use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
-use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
+use Mojo::Util qw(deprecated dumper hmac_sha1_sum steady_time);
 use Time::HiRes qw(gettimeofday tv_interval);
 use Scalar::Util 'blessed';
 
@@ -31,8 +31,11 @@ sub register {
   $app->helper(content_for  => sub { _content(1, 0, @_) });
   $app->helper(content_with => sub { _content(0, 1, @_) });
 
+  # DEPRECATED!
+  $app->helper(delay => \&_delay);
+
   $app->helper($_ => $self->can("_$_"))
-    for qw(csrf_token current_route delay inactivity_timeout is_fresh url_with);
+    for qw(csrf_token current_route inactivity_timeout is_fresh url_with);
 
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
@@ -83,7 +86,9 @@ sub _current_route {
   return @_ ? $route->name eq shift : $route->name;
 }
 
+# DEPRECATED!
 sub _delay {
+  deprecated 'delay helper is DEPRECATED';
   my $c  = shift;
   my $tx = $c->render_later->tx;
   Mojo::IOLoop->delay(@_)
@@ -322,33 +327,6 @@ Get CSRF token from L</"session">, and generate one if none exists.
   %= current_route
 
 Check or get name of current route.
-
-=head2 delay
-
-  $c->delay(sub {...}, sub {...});
-
-Disable automatic rendering and use L<Mojo::IOLoop/"delay"> for flow-control.
-Also keeps a reference to L<Mojolicious::Controller/"tx"> in case the underlying
-connection gets closed early, and calls L</"reply-E<gt>exception"> if an
-exception gets thrown in one of the steps, breaking the chain.
-
-  # Longer version
-  $c->render_later;
-  my $tx    = $c->tx;
-  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...})
-  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
-
-  # Non-blocking request
-  $c->delay(
-    sub {
-      my $delay = shift;
-      $c->ua->get('https://mojolicious.org' => $delay->begin);
-    },
-    sub {
-      my ($delay, $tx) = @_;
-      $c->render(json => {title => $tx->result->dom->at('title')->text});
-    }
-  );
 
 =head2 dumper
 

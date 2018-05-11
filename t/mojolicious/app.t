@@ -409,32 +409,31 @@ $t->get_ok('/hello.txt')->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')
   ->content_like(qr/Hello Mojo from a development static file!/);
 
-# Try to access a file which is not under the web root via path
-# traversal
+# Try to access a file which is not under the web root via path traversal
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
-# Try to access a file which is not under the web root via path
-# traversal (goes back and forth one directory)
+# Try to access a file which is not under the web root via path traversal (goes
+# back and forth one directory)
 $t->get_ok('/another/../../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
-# Try to access a file which is not under the web root via path
-# traversal (triple dot)
+# Try to access a file which is not under the web root via path traversal
+# (triple dot)
 $t->get_ok('/.../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
-# Try to access a file which is not under the web root via path
-# traversal (backslashes)
+# Try to access a file which is not under the web root via path traversal
+# (backslashes)
 $t->get_ok('/..\\..\\mojolicious\\secret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
-# Try to access a file which is not under the web root via path
-# traversal (escaped backslashes)
+# Try to access a file which is not under the web root via path traversal
+# (escaped backslashes)
 $t->get_ok('/..%5C..%5Cmojolicious%5Csecret.txt')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 
-# Check that backslashes on query or fragment parts don't block access
+# Check that backslashes in query or fragment parts don't block access
 $t->get_ok('/another/file?one=\\1#two=\\2')->status_is(200)
   ->content_like(qr/Hello Mojolicious!/);
 

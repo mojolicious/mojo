@@ -17,7 +17,7 @@ use Storable 'dclone';
 
 sub all_text { _text(_nodes(shift->tree), 1) }
 
-sub ancestors { _select($_[0]->_collect([$_[0]->_ancestors]), $_[1]) }
+sub ancestors { _select($_[0]->_collect([_ancestors($_[0]->tree)]), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 sub append_content { shift->_content(1, 0, @_) }
@@ -72,8 +72,8 @@ sub find {
   return $self->_collect($self->_css->select(@_));
 }
 
-sub following { _select($_[0]->_collect($_[0]->_siblings(1, 1)), $_[1]) }
-sub following_nodes { $_[0]->_collect($_[0]->_siblings(0, 1)) }
+sub following { _select($_[0]->_collect(_siblings($_[0]->tree, 1, 1)), $_[1]) }
+sub following_nodes { $_[0]->_collect(_siblings($_[0]->tree, 0, 1)) }
 
 sub matches { shift->_css->matches(@_) }
 
@@ -84,7 +84,7 @@ sub namespace {
 
   # Extract namespace prefix and search parents
   my $ns = $tree->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
-  for my $node ($tree, $self->_ancestors) {
+  for my $node ($tree, _ancestors($tree)) {
 
     # Namespace for prefix
     my $attrs = $node->[2];
@@ -111,8 +111,8 @@ sub new_tag {
   return $new;
 }
 
-sub next      { $_[0]->_maybe($_[0]->_siblings(1, 1, 0)) }
-sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 1, 0)) }
+sub next      { $_[0]->_maybe(_siblings($_[0]->tree, 1, 1, 0)) }
+sub next_node { $_[0]->_maybe(_siblings($_[0]->tree, 0, 1, 0)) }
 
 sub parent {
   my $self = shift;
@@ -122,14 +122,14 @@ sub parent {
 
 sub parse { ${$_[0]}->parse($_[1]) and return $_[0] }
 
-sub preceding { _select($_[0]->_collect($_[0]->_siblings(1, 0)), $_[1]) }
-sub preceding_nodes { $_[0]->_collect($_[0]->_siblings(0)) }
+sub preceding { _select($_[0]->_collect(_siblings($_[0]->tree, 1, 0)), $_[1]) }
+sub preceding_nodes { $_[0]->_collect(_siblings($_[0]->tree, 0)) }
 
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous      { $_[0]->_maybe($_[0]->_siblings(1, 0, -1)) }
-sub previous_node { $_[0]->_maybe($_[0]->_siblings(0, 0, -1)) }
+sub previous      { $_[0]->_maybe(_siblings($_[0]->tree, 1, 0, -1)) }
+sub previous_node { $_[0]->_maybe(_siblings($_[0]->tree, 0, 0, -1)) }
 
 sub remove { shift->replace('') }
 
@@ -141,8 +141,15 @@ sub replace {
 
 sub root {
   my $self = shift;
-  return $self unless my $tree = $self->_ancestors(1);
+  return $self unless my $tree = _ancestors($self->tree, 1);
   return $self->_build($tree, $self->xml);
+}
+
+sub selector {
+  return undef unless (my $tree = shift->tree)->[0] eq 'tag';
+  return join ' > ',
+    reverse map { $_->[1] . ':nth-child(' . (@{_siblings($_, 1)} + 1) . ')' }
+    $tree, _ancestors($tree);
 }
 
 sub strip {
@@ -215,9 +222,9 @@ sub _all {
 }
 
 sub _ancestors {
-  my ($self, $root) = @_;
+  my ($tree, $root) = @_;
 
-  return () unless my $tree = _parent($self->tree);
+  return () unless $tree = _parent($tree);
   my @ancestors;
   do { push @ancestors, $tree }
     while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
@@ -295,9 +302,9 @@ sub _replace {
 sub _select { $_[1] ? $_[0]->grep(matches => $_[1]) : $_[0] }
 
 sub _siblings {
-  my ($self, $tags, $tail, $i) = @_;
+  my ($tree, $tags, $tail, $i) = @_;
 
-  return defined $i ? undef : [] if (my $tree = $self->tree)->[0] eq 'root';
+  return defined $i ? undef : [] if $tree->[0] eq 'root';
 
   my $nodes = _nodes(_parent($tree));
   my $match = -1;
@@ -908,6 +915,16 @@ nodes) or L</"parent">.
   my $root = $dom->root;
 
 Return L<Mojo::DOM> object for C<root> node.
+
+=head2 selector
+
+  my $selector = $dom->selector;
+
+Get a unique CSS selector for this element. Note that this method is
+EXPERIMENTAL and might change without warning!
+
+  # "p:nth-child(1) > b:nth-child(1) > i:nth-child(1)"
+  $dom->parse('<p><b><i>Test</i></b><p>')->at('i')->selector;
 
 =head2 strip
 

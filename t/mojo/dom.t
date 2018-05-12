@@ -2756,4 +2756,38 @@ is $dom, '<div>Test<br><br></div>', 'right result';
 is tag_to_html('div', id => 'foo', 'bar'), '<div id="foo">bar</div>',
   'right result';
 
+# Generate selector
+$dom = Mojo::DOM->new(<<EOF);
+<html>
+  <head>
+    <title>Test</title>
+  </head>
+  <body>
+    <p id="a">A</p>
+    <p id="b">B</p>
+    <p id="c">C</p>
+    <p id="d">D</p>
+  </body>
+<html>
+EOF
+is $dom->selector, undef, 'not a tag';
+is $dom->at('#a')->child_nodes->first->selector, undef, 'not a tag';
+is $dom->at('#a')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(1)', 'right selector';
+is $dom->at($dom->at('#a')->selector)->text, 'A', 'right text';
+is $dom->at('#b')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(2)', 'right selector';
+is $dom->at($dom->at('#b')->selector)->text, 'B', 'right text';
+is $dom->at('#c')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(3)', 'right selector';
+is $dom->at($dom->at('#c')->selector)->text, 'C', 'right text';
+is $dom->at('#d')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(4)', 'right selector';
+is $dom->at($dom->at('#d')->selector)->text, 'D', 'right text';
+is $dom->at('title')->selector,
+  'html:nth-child(1) > head:nth-child(1) > title:nth-child(1)',
+  'right selector';
+is $dom->at($dom->at('title')->selector)->text, 'Test', 'right text';
+is $dom->at('html')->selector, 'html:nth-child(1)', 'right selector';
+
 done_testing();

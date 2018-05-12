@@ -921,7 +921,7 @@ Return L<Mojo::DOM> object for C<root> node.
   my $selector = $dom->selector;
 
 Get a unique CSS selector for this element. Note that this method is
-EXPERIMENTAL and might change without warning
+EXPERIMENTAL and might change without warning!
 
   # "ul:nth-child(1) > li:nth-child(2)"
   $dom->parse('<ul><li>Test</li><li>123</li></ul>')->find('li')->last->selector;

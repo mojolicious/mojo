@@ -924,7 +924,7 @@ Get a unique CSS selector for this element. Note that this method is
 EXPERIMENTAL and might change without warning!
 
   # "p:nth-child(1) > b:nth-child(1) > i:nth-child(1)"
-  $dom->parse('<p><b><i>Test</i></b><p>')->at('i')->selector;
+  $dom->parse('<p><b><i>Test</i></b></p>')->at('i')->selector;
 
 =head2 strip
 

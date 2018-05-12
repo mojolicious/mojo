@@ -198,26 +198,29 @@ sub _pc {
     return !!grep { $current->[1] eq $_ } qw(a area link);
   }
 
-  # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
-  if (ref $args) {
-    my $type = $class =~ /of-type$/ ? $current->[1] : undef;
-    my @siblings = @{_siblings($current, $type)};
-    @siblings = reverse @siblings if $class =~ /^nth-last/;
-
-    for my $i (0 .. $#siblings) {
-      next if (my $result = $args->[0] * $i + $args->[1]) < 1;
-      last unless my $sibling = $siblings[$result - 1];
-      return 1 if $sibling eq $current;
-    }
-  }
-
   # ":only-child" or ":only-of-type"
-  elsif ($class eq 'only-child' || $class eq 'only-of-type') {
+  if ($class eq 'only-child' || $class eq 'only-of-type') {
     my $type = $class eq 'only-of-type' ? $current->[1] : undef;
     $_ ne $current and return undef for @{_siblings($current, $type)};
     return 1;
   }
 
+  # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
+  if (ref $args) {
+    my $type = $class eq 'nth-of-type'
+      || $class eq 'nth-last-of-type' ? $current->[1] : undef;
+    my @siblings = @{_siblings($current, $type)};
+    @siblings = reverse @siblings
+      if $class eq 'nth-last-child' || $class eq 'nth-last-of-type';
+
+    for my $i (0 .. $#siblings) {
+      next if (my $result = $args->[0] * $i + $args->[1]) < 1;
+      return undef unless my $sibling = $siblings[$result - 1];
+      return 1 if $sibling eq $current;
+    }
+  }
+
+  # Everything else
   return undef;
 }
 

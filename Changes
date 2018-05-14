@@ -1,4 +1,6 @@
 
+7.80  2018-05-15
+
 7.79  2018-05-14
   - Added EXPERIMENTAL selector method to Mojo::DOM.
   - Added reply->file helper to Mojolicious::Plugin::DefaultHelpers.

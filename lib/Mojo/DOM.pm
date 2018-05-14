@@ -733,29 +733,29 @@ key/value pairs to generate attributes from. Note that this method is
 EXPERIMENTAL and might change without warning!
 
   # "<br>"
-  Mojo::DOM->new_tag('br');
+  $dom->new_tag('br');
 
   # "<div></div>"
-  Mojo::DOM->new_tag('div');
+  $dom->new_tag('div');
 
   # "<div id="foo" hidden></div>"
-  Mojo::DOM->new_tag('div', id => 'foo', hidden => undef);
+  $dom->new_tag('div', id => 'foo', hidden => undef);
 
   # "<div>test &amp; 123</div>"
-  Mojo::DOM->new_tag('div', 'test & 123');
+  $dom->new_tag('div', 'test & 123');
 
   # "<div id="foo">test &amp; 123</div>"
-  Mojo::DOM->new_tag('div', id => 'foo', 'test & 123');
+  $dom->new_tag('div', id => 'foo', 'test & 123');
 
   # "<div data-foo="1" data-bar="test">test &amp; 123</div>""
-  Mojo::DOM->new_tag('div', data => {foo => 1, Bar => 'test'}, 'test & 123');
+  $dom->new_tag('div', data => {foo => 1, Bar => 'test'}, 'test & 123');
 
   # "<div id="foo">test & 123</div>"
-  Mojo::DOM->new_tag('div', id => 'foo', sub { 'test & 123' });
+  $dom->new_tag('div', id => 'foo', sub { 'test & 123' });
 
   # "<div>Hello<b>Mojo!</b></div>"
-  Mojo::DOM->new('<div>Hello</div>')->at('div')
-    ->append_content(Mojo::DOM->new_tag('b', 'Mojo!'))->root;
+  $dom->parse('<div>Hello</div>')->at('div')
+    ->append_content($dom->new_tag('b', 'Mojo!'))->root;
 
 =head2 next
 

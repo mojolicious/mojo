@@ -431,9 +431,12 @@ a copy of the L</"stash"> for use in the templates.
 
   $c->reply->file('/etc/passwd');
 
-Reply with a static file from an absolute path.
+Reply with a static file from an absolute path anywhere on the file system.
 
-  # Serve file from absolute path with a custom content type
+  # Longer version
+  $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+
+  # Serve file from an absolute path with a custom content type
   $c->res->headers->content_type('application/myapp');
   $c->reply->file('/home/sri/foo.txt');
 
@@ -456,7 +459,7 @@ C<public> directories or C<DATA> sections of your application. Note that this
 helper uses a relative path, but does not protect from traversing to parent
 directories.
 
-  # Serve file from relative path with a custom content type
+  # Serve file from a relative path with a custom content type
   $c->res->headers->content_type('application/myapp');
   $c->reply->static('foo.txt');
 

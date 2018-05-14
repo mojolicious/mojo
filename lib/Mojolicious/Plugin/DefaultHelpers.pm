@@ -440,6 +440,9 @@ Reply with a static file from an absolute path anywhere on the file system.
   $c->res->headers->content_type('application/myapp');
   $c->reply->file('/home/sri/foo.txt');
 
+  # Serve file from a secret application directory
+  $c->reply->file($c->app->home->child('secret', 'file.txt'));
+
 =head2 reply->not_found
 
   $c = $c->reply->not_found;

@@ -431,7 +431,8 @@ a copy of the L</"stash"> for use in the templates.
 
   $c->reply->file('/etc/passwd');
 
-Reply with a static file from an absolute path anywhere on the file system.
+Reply with a static file from an absolute path anywhere on the file system using
+L<Mojolicious/"static">.
 
   # Longer version
   $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));

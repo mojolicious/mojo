@@ -5,6 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::Asset::Memory;
 use Mojo::Date;
+use Mojo::File 'path';
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -29,6 +30,11 @@ get '/asset' => sub {
   my $c   = shift;
   my $mem = Mojo::Asset::Memory->new->add_chunk('I <3 Assets!');
   $c->reply->asset($mem);
+};
+
+get '/file' => sub {
+  my $c = shift;
+  $c->reply->file(path(__FILE__)->dirname->child('templates2', '42.html.ep'));
 };
 
 my $t = Test::Mojo->new;
@@ -168,6 +174,10 @@ $t->get_ok('/asset' => {'If-None-Match' => $etag})->status_is(304)
 # Partial asset
 $t->get_ok('/asset' => {'Range' => 'bytes=3-5'})->status_is(206)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('3 A');
+
+# File
+$t->get_ok('/file' => {'Range' => 'bytes=4-9'})->status_is(206)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('answer');
 
 # Empty file
 $t->get_ok('/hello4.txt')->status_is(200)

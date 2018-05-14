@@ -1,6 +1,7 @@
 
-7.79  2018-05-12
+7.79  2018-05-14
   - Added EXPERIMENTAL selector method to Mojo::DOM.
+  - Added reply->file helper to Mojolicious::Plugin::DefaultHelpers.
 
 7.78  2018-05-11
   - Deprecated delay helper in Mojolicious::Plugin::DefaultHelpers.

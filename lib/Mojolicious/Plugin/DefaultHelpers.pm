@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Mojo::Asset::File;
 use Mojo::ByteStream;
 use Mojo::Collection;
 use Mojo::Exception;
@@ -48,7 +49,7 @@ sub register {
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
 
-  $app->helper("reply.$_" => $self->can("_$_")) for qw(asset static);
+  $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
 
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
@@ -140,6 +141,8 @@ sub _fallbacks {
   delete @$stash{qw(extends layout)};
   return $c->render_maybe($bundled, %$options, handler => 'ep');
 }
+
+sub _file { _asset(shift, Mojo::Asset::File->new(path => shift)) }
 
 sub _inactivity_timeout {
   my ($c, $timeout) = @_;
@@ -424,6 +427,16 @@ C<exception.$format.*> and set the response status code to C<500>. Also sets
 the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot> to
 a copy of the L</"stash"> for use in the templates.
 
+=head2 reply->file
+
+  $c->reply->file('/etc/passwd');
+
+Reply with a static file from an absolute path.
+
+  # Serve file from absolute path with a custom content type
+  $c->res->headers->content_type('application/myapp');
+  $c->reply->file('/home/sri/foo.txt');
+
 =head2 reply->not_found
 
   $c = $c->reply->not_found;
@@ -443,7 +456,7 @@ C<public> directories or C<DATA> sections of your application. Note that this
 helper uses a relative path, but does not protect from traversing to parent
 directories.
 
-  # Serve file with a custom content type
+  # Serve file from relative path with a custom content type
   $c->res->headers->content_type('application/myapp');
   $c->reply->static('foo.txt');
 

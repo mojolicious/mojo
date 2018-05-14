@@ -1037,7 +1037,8 @@ Static files are automatically served from the C<public> directories of the
 application, which can be customized with L<Mojolicious::Static/"paths">, or one
 of the C<DATA> sections from L<Mojolicious::Static/"classes">. And if that's not
 enough you can also serve them manually with
-L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static"> and
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>file">.
 
   use Mojolicious::Lite;
 
@@ -1050,6 +1051,11 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static">.
     my $c = shift;
     $c->res->headers->content_disposition('attachment; filename=bar.png;');
     $c->reply->static('foo/bar.png');
+  };
+
+  get '/leak' => sub {
+    my $c = shift;
+    $c->reply->file('/etc/passwd');
   };
 
   app->start;

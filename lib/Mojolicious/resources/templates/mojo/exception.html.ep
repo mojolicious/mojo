@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
-  <head><title>Server error</title></head>
-  <style>
+  <head>
+    <title>Server error</title>
+    <style>
       body { background-color: #caecf6 }
       #raptor {
         background: url(<%= url_for '/mojo/failraptor.png' %>);
@@ -14,6 +15,7 @@
         width: 743px;
       }
     </style>
+  </head>
   <body><div id="raptor"></div></body>
 </html>
 <!-- a padding to disable MSIE and Chrome friendly error page -->

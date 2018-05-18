@@ -257,6 +257,8 @@ sub _content {
 
 sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
 
+sub _fragment { _link(my $r = ['root', @_], [@_]); $r }
+
 sub _link {
   my ($parent, $children) = @_;
 
@@ -291,9 +293,8 @@ sub _parse {
   my ($self, $input) = @_;
   return Mojo::DOM::HTML->new(xml => $self->xml)->parse($input)->tree
     unless blessed $input && $input->isa('Mojo::DOM');
-
   my $tree = dclone $input->tree;
-  return $tree->[0] eq 'root' ? $tree : _wrap_root($tree);
+  return $tree->[0] eq 'root' ? $tree : _fragment($tree);
 }
 
 sub _replace {
@@ -366,8 +367,6 @@ sub _wrap {
   push @$current, @{_link($current, [$tree])};
   return $self;
 }
-
-sub _wrap_root { _link(my $r = ['root', @_], [@_]); $r }
 
 1;
 

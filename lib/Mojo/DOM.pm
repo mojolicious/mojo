@@ -289,9 +289,11 @@ sub _parent { $_[0]->[$_[0][0] eq 'tag' ? 3 : 2] }
 
 sub _parse {
   my ($self, $input) = @_;
-  return dclone $input->tree
-    if blessed $input && $input->isa('Mojo::DOM') && $input->type eq 'root';
-  return Mojo::DOM::HTML->new(xml => $self->xml)->parse($input)->tree;
+  return Mojo::DOM::HTML->new(xml => $self->xml)->parse($input)->tree
+    unless blessed $input && $input->isa('Mojo::DOM');
+
+  my $tree = dclone $input->tree;
+  return $tree->[0] eq 'root' ? $tree : _wrap_root($tree);
 }
 
 sub _replace {
@@ -364,6 +366,8 @@ sub _wrap {
   push @$current, @{_link($current, [$tree])};
   return $self;
 }
+
+sub _wrap_root { _link(my $r = ['root', @_], [@_]); $r }
 
 1;
 

@@ -289,7 +289,8 @@ sub _parent { $_[0]->[$_[0][0] eq 'tag' ? 3 : 2] }
 
 sub _parse {
   my ($self, $input) = @_;
-  return dclone $input->tree if blessed $input && $input->isa('Mojo::DOM');
+  return dclone $input->tree
+    if blessed $input && $input->isa('Mojo::DOM') && $input->type eq 'root';
   return Mojo::DOM::HTML->new(xml => $self->xml)->parse($input)->tree;
 }
 

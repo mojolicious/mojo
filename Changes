@@ -1,5 +1,7 @@
 
-7.80  2018-05-15
+7.80  2018-05-18
+  - Fixed a bug where Mojo::DOM could only reuse Mojo::DOM objects containing
+    root nodes.
 
 7.79  2018-05-14
   - Added EXPERIMENTAL selector method to Mojo::DOM.

@@ -2790,4 +2790,9 @@ is $dom->at('title')->selector,
 is $dom->at($dom->at('title')->selector)->text, 'Test', 'right text';
 is $dom->at('html')->selector, 'html:nth-child(1)', 'right selector';
 
+# Reusing partial DOM trees
+$dom = $dom->parse('<div><b>Test</b></div>');
+is $dom->at('div')->prepend($dom->at('b'))->root,
+  '<b>Test</b><div><b>Test</b></div>', 'right result';
+
 done_testing();

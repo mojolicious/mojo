@@ -53,17 +53,16 @@ sub _expand {
 
   weaken $self;
   my $tls = {
-    SSL_ca_file => $args->{tls_ca}
-      && -T $args->{tls_ca} ? $args->{tls_ca} : DEFAULT,
-    SSL_error_trap         => sub { $self->_cleanup->emit(error => $_[1]) },
-    SSL_honor_cipher_order => 1,
-    SSL_startHandshake     => 0
+    SSL_error_trap     => sub { $self->_cleanup->emit(error => $_[1]) },
+    SSL_startHandshake => 0
   };
+  $tls->{SSL_ca_file} = $args->{tls_ca}
+    if $args->{tls_ca} && -T $args->{tls_ca};
   $tls->{SSL_cert_file}   = $args->{tls_cert}    if $args->{tls_cert};
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
   $tls->{SSL_key_file}    = $args->{tls_key}     if $args->{tls_key};
   $tls->{SSL_server}      = $args->{server}      if $args->{server};
-  $tls->{SSL_verify_mode} = $args->{tls_verify}  if exists $args->{tls_verify};
+  $tls->{SSL_verify_mode} = $args->{tls_verify}  if defined $args->{tls_verify};
   $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
 
   if ($args->{server}) {
@@ -74,7 +73,6 @@ sub _expand {
   else {
     $tls->{SSL_hostname}
       = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
-    $tls->{SSL_verify_mode} //= $args->{tls_ca} ? 0x01 : 0x00;
     $tls->{SSL_verifycn_name} = $args->{address};
   }
 
@@ -191,8 +189,7 @@ Negotiate TLS from the server-side, defaults to the client-side.
 
   tls_ca => '/etc/tls/ca.crt'
 
-Path to TLS certificate authority file. Also activates hostname verification on
-the client-side.
+Path to TLS certificate authority file.
 
 =item tls_cert
 
@@ -220,8 +217,7 @@ Path to the TLS key file, defaults to a built-in test key on the server-side.
 
   tls_verify => 0x00
 
-TLS verification mode, defaults to C<0x03> on the server-side and C<0x01> on the
-client-side if a certificate authority file has been provided, or C<0x00>.
+TLS verification mode.
 
 =item tls_version
 

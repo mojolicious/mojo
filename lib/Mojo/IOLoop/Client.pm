@@ -349,7 +349,7 @@ Enable TLS.
 
   tls_ca => '/etc/tls/ca.crt'
 
-Path to TLS certificate authority file. Also activates hostname verification.
+Path to TLS certificate authority file.
 
 =item tls_cert
 

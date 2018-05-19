@@ -28,6 +28,7 @@ sub run {
     'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
     'H|header=s'  => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
+    'k|insecure'             => sub { $ua->insecure(1) },
     'M|method=s'             => \(my $method = 'GET'),
     'o|connect-timeout=i'    => sub { $ua->connect_timeout($_[1]) },
     'r|redirect'             => \my $redirect,
@@ -170,6 +171,8 @@ Mojolicious::Command::get - Get command
                                          MOJO_HOME or auto-detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
                                          value of MOJO_INACTIVITY_TIMEOUT or 20
+    -k, --insecure                       Do not require a valid TLS certificate
+                                         to access HTTPS sites
     -M, --method <method>                HTTP method to use, defaults to "GET"
     -m, --mode <name>                    Operating mode for your application,
                                          defaults to the value of

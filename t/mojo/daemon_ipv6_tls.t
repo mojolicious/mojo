@@ -38,8 +38,8 @@ my $daemon = Mojo::Server::Daemon->new(
   silent => 1
 );
 my $port = $daemon->start->ports->[0];
-my $ua   = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-my $tx   = $ua->get("https://[::1]:$port/");
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, insecure => 1);
+my $tx = $ua->get("https://[::1]:$port/");
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 

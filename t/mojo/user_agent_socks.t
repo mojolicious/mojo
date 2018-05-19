@@ -105,7 +105,7 @@ Mojo::IOLoop->singleton->reactor->io(
 );
 
 # Failed authentication with SOCKS proxy
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, insecure => 1);
 $ua->proxy->http("socks://foo:baz\@127.0.0.1:$port");
 my $tx = $ua->get('/');
 ok !$tx->success, 'not successful';

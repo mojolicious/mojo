@@ -14,7 +14,8 @@ sub run {
   my $ev = eval { require Mojo::Reactor::EV; 1 } ? $EV::VERSION : 'n/a';
   my $socks
     = Mojo::IOLoop::Client->can_socks ? $IO::Socket::Socks::VERSION : 'n/a';
-  my $tls = Mojo::IOLoop::TLS->can_tls    ? $IO::Socket::SSL::VERSION  : 'n/a';
+  my $tls = Mojo::IOLoop::TLS->can_tls ? $IO::Socket::SSL::VERSION : 'n/a';
+  my $ca = eval { require Mozilla::CA; 1 } ? $Mozilla::CA::VERSION : 'n/a';
   my $nnr = Mojo::IOLoop::Client->can_nnr ? $Net::DNS::Native::VERSION : 'n/a';
   my $roles = Mojo::Base->ROLES ? $Role::Tiny::VERSION : 'n/a';
 
@@ -27,6 +28,7 @@ OPTIONAL
   EV 4.0+                 ($ev)
   IO::Socket::Socks 0.64+ ($socks)
   IO::Socket::SSL 1.94+   ($tls)
+  Mozilla::CA             ($ca)
   Net::DNS::Native 0.15+  ($nnr)
   Role::Tiny 2.000001+    ($roles)
 

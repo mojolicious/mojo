@@ -17,7 +17,8 @@ use Mojo::Util qw(decode encode);
 use Test::More ();
 
 has [qw(message success tx)];
-has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
+has ua =>
+  sub { Mojo::UserAgent->new(insecure => 1)->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
@@ -448,7 +449,9 @@ your tests with the command L<Mojolicious::Command::test> or L<prove>.
 
 If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
 be set to C<debug> or C<fatal>, depending on the value of the
-C<HARNESS_IS_VERBOSE> environment variable.
+C<HARNESS_IS_VERBOSE> environment variable. And to make it esier to test
+HTTPS/WSS web services L<Mojo::UserAgent/"insecure"> will be activated by
+default for L</"ua">.
 
 See L<Mojolicious::Guides::Testing> for more.
 

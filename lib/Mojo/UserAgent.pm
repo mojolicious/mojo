@@ -14,19 +14,20 @@ use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
-has ca              => sub { $ENV{MOJO_CA_FILE} };
-has cert            => sub { $ENV{MOJO_CERT_FILE} };
-has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
-has cookie_jar      => sub { Mojo::UserAgent::CookieJar->new };
-has [qw(local_address max_response_size)];
+has ca                 => sub { $ENV{MOJO_CA_FILE} };
+has cert               => sub { $ENV{MOJO_CERT_FILE} };
+has connect_timeout    => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
+has cookie_jar         => sub { Mojo::UserAgent::CookieJar->new };
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
-has ioloop             => sub { Mojo::IOLoop->new };
-has key                => sub { $ENV{MOJO_KEY_FILE} };
-has max_connections    => 5;
-has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
-has proxy              => sub { Mojo::UserAgent::Proxy->new };
-has request_timeout    => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
-has server     => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
+has insecure           => sub { $ENV{MOJO_INSECURE} };
+has [qw(local_address max_response_size)];
+has ioloop => sub { Mojo::IOLoop->new };
+has key    => sub { $ENV{MOJO_KEY_FILE} };
+has max_connections => 5;
+has max_redirects   => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
+has proxy           => sub { Mojo::UserAgent::Proxy->new };
+has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
+has server => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
@@ -122,8 +123,10 @@ sub _connect {
   }
 
   # TLS
-  map { $options{"tls_$_"} = $self->$_ } qw(ca cert key)
-    if ($options{tls} = $proto eq 'https');
+  if ($options{tls} = $proto eq 'https') {
+    map { $options{"tls_$_"} = $self->$_ } qw(ca cert key);
+    $options{tls_verify} = 0x00 if $self->insecure;
+  }
 
   weaken $self;
   my $id;
@@ -503,8 +506,7 @@ L<Mojo::UserAgent> implements the following attributes.
   $ua    = $ua->ca('/etc/tls/ca.crt');
 
 Path to TLS certificate authority file used to verify the peer certificate,
-defaults to the value of the C<MOJO_CA_FILE> environment variable. Also
-activates hostname verification.
+defaults to the value of the C<MOJO_CA_FILE> environment variable.
 
   # Show certificate authorities for debugging
   IO::Socket::SSL::set_defaults(
@@ -565,6 +567,16 @@ Maximum amount of time in seconds a connection can be inactive before getting
 closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
 variable or C<20>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
+
+=head2 insecure
+
+  my $bool = $ua->insecure;
+  $ua      = $ua->insecure($bool);
+
+Do not require a valid TLS certificate to access HTTPS/WSS sites.
+
+  # Disable TLS certificate validation for testing
+  say $ua->insecure(1)->get('https://127.0.0.1:3000')->result->code;
 
 =head2 ioloop
 

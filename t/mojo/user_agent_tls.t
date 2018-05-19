@@ -56,11 +56,13 @@ $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
   local $ENV{MOJO_CA_FILE}   = 't/mojo/certs/ca.crt';
   local $ENV{MOJO_CERT_FILE} = 't/mojo/certs/client.crt';
   local $ENV{MOJO_KEY_FILE}  = 't/mojo/certs/client.key';
+  local $ENV{MOJO_INSECURE}  = 0;
   $tx = $ua->get("https://127.0.0.1:$port");
-  is $ua->ca,   't/mojo/certs/ca.crt',     'right path';
-  is $ua->cert, 't/mojo/certs/client.crt', 'right path';
-  is $ua->key,  't/mojo/certs/client.key', 'right path';
-  ok $tx->success, 'successful';
+  is $ua->ca,       't/mojo/certs/ca.crt',     'right path';
+  is $ua->cert,     't/mojo/certs/client.crt', 'right path';
+  is $ua->key,      't/mojo/certs/client.key', 'right path';
+  is $ua->insecure, 0,                         'secure';
+  ok $tx->success,  'successful';
   is $tx->res->code, 200,      'right status';
   is $tx->res->body, 'works!', 'right content';
 }
@@ -89,7 +91,7 @@ $listen
 $port = $daemon->listen([$listen])->start->ports->[0];
 
 # Invalid certificate
-$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop, insecure => 1);
 $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
 $tx = $ua->get("https://127.0.0.1:$port");
 ok $tx->success, 'successful';

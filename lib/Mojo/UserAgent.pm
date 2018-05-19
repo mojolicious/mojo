@@ -16,6 +16,7 @@ use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 has ca              => sub { $ENV{MOJO_CA_FILE} };
 has cert            => sub { $ENV{MOJO_CERT_FILE} };
+has verify          => sub { $ENV{MOJO_VERIFY} };
 has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
 has cookie_jar      => sub { Mojo::UserAgent::CookieJar->new };
 has [qw(local_address max_response_size)];
@@ -122,7 +123,7 @@ sub _connect {
   }
 
   # TLS
-  map { $options{"tls_$_"} = $self->$_ } qw(ca cert key)
+  map { $options{"tls_$_"} = $self->$_ } qw(ca cert key verify)
     if ($options{tls} = $proto eq 'https');
 
   weaken $self;
@@ -503,8 +504,7 @@ L<Mojo::UserAgent> implements the following attributes.
   $ua    = $ua->ca('/etc/tls/ca.crt');
 
 Path to TLS certificate authority file used to verify the peer certificate,
-defaults to the value of the C<MOJO_CA_FILE> environment variable. Also
-activates hostname verification.
+defaults to the value of the C<MOJO_CA_FILE> environment variable.
 
   # Show certificate authorities for debugging
   IO::Socket::SSL::set_defaults(
@@ -1024,6 +1024,13 @@ L<Mojo::Promise> object instead of accepting a callback.
     my $err = shift;
     warn "Connection error: $err";
   })->wait;
+
+=head2 verify
+
+  my $verify_mode = $ua->verify;
+  $ua->verify(0); # disable TLS certificate verification
+
+Set the TLS verify_mode. See SSL_verify_mode in IO::Socket::SSL.
 
 =head2 websocket
 

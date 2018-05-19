@@ -17,7 +17,7 @@ use Mojo::Util qw(decode encode);
 use Test::More ();
 
 has [qw(message success tx)];
-has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
+has ua => sub { Mojo::UserAgent->new(verify => 0)->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';

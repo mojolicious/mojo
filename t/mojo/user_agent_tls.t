@@ -90,6 +90,7 @@ $port = $daemon->listen([$listen])->start->ports->[0];
 
 # Invalid certificate
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+$ua->ca('t/mojo/certs/ca.crt');
 $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
 $tx = $ua->get("https://127.0.0.1:$port");
 ok $tx->success, 'successful';
@@ -98,5 +99,23 @@ is $ua->ioloop->stream($tx->connection)->handle->get_cipher, 'AES256-SHA',
   'AES256-SHA has been negotiatied';
 is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',
   'TLSv1 has been negotiatied';
+
+# Web server with invalid certificate
+$daemon = Mojo::Server::Daemon->new(
+  app    => app,
+  ioloop => Mojo::IOLoop->singleton,
+  silent => 1
+);
+$listen
+  = 'https://127.0.0.1'
+  . '?cert=t/mojo/certs/selfsigned.crt'
+  . '&key=t/mojo/certs/selfsigned.key';
+$port = $daemon->listen([$listen])->start->ports->[0];
+
+# Verification left at default, certificate should be rejected
+$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+$tx = $ua->get("https://127.0.0.1:$port");
+ok !$tx->success, 'not successful';
+ok $tx->error, 'has error';
 
 done_testing();

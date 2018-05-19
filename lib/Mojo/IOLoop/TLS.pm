@@ -63,7 +63,7 @@ sub _expand {
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
   $tls->{SSL_key_file}    = $args->{tls_key}     if $args->{tls_key};
   $tls->{SSL_server}      = $args->{server}      if $args->{server};
-  $tls->{SSL_verify_mode} = $args->{tls_verify}  if exists $args->{tls_verify};
+  $tls->{SSL_verify_mode} = $args->{tls_verify}  if defined $args->{tls_verify};
   $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
 
   if ($args->{server}) {
@@ -74,7 +74,6 @@ sub _expand {
   else {
     $tls->{SSL_hostname}
       = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
-    $tls->{SSL_verify_mode} //= $args->{tls_ca} ? 0x01 : 0x00;
     $tls->{SSL_verifycn_name} = $args->{address};
   }
 

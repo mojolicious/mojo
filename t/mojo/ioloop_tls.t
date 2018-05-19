@@ -49,7 +49,7 @@ my $id  = $loop->server(
 my $port = $loop->acceptor($id)->port;
 my $end2 = $delay->begin;
 $loop->client(
-  {port => $port, tls => 1} => sub {
+  {port => $port, tls => 1, tls_verify => 0} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => $end2);
@@ -96,6 +96,7 @@ Mojo::IOLoop->client(
   tls      => 1,
   tls_cert => 't/mojo/certs/client.crt',
   tls_key  => 't/mojo/certs/client.key',
+  tls_verify => 0,
   sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
@@ -324,6 +325,7 @@ $loop->client(
   tls      => 1,
   tls_cert => 't/mojo/certs/bad.crt',
   tls_key  => 't/mojo/certs/bad.key',
+  tls_verify => 0,
   sub {
     my ($loop, $err, $stream) = @_;
     $stream->timeout(0.5);
@@ -351,7 +353,7 @@ $id = Mojo::IOLoop->server(
 );
 $port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->client(
-  {port => $port, tls => 1} => sub {
+  {port => $port, tls => 1, tls_verify => 0} => sub {
     shift->stop;
     $client     = 'connected';
     $client_err = shift;

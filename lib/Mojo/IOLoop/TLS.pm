@@ -74,7 +74,6 @@ sub _expand {
   else {
     $tls->{SSL_hostname}
       = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
-    $tls->{SSL_verify_mode} //= $args->{tls_ca} ? 0x01 : 0x00;
     $tls->{SSL_verifycn_name} = $args->{address};
   }
 

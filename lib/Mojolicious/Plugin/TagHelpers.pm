@@ -439,6 +439,7 @@ and shown as default.
 =head2 javascript
 
   %= javascript '/script.js'
+  %= javascript '/script.js', defer => undef
   %= javascript begin
     var a = 'b';
   % end
@@ -446,6 +447,7 @@ and shown as default.
 Generate portable C<script> tag for JavaScript asset.
 
   <script src="/path/to/script.js"></script>
+  <script src="/path/to/script.js" defer></script>
   <script><![CDATA[
     var a = 'b';
   ]]></script>
@@ -618,6 +620,7 @@ get picked up and shown as default.
 =head2 stylesheet
 
   %= stylesheet '/foo.css'
+  %= stylesheet '/foo.css', title => 'Foo style'
   %= stylesheet begin
     body {color: #000}
   % end
@@ -625,6 +628,7 @@ get picked up and shown as default.
 Generate portable C<style> or C<link> tag for CSS asset.
 
   <link href="/path/to/foo.css" rel="stylesheet">
+  <link href="/path/to/foo.css" rel="stylesheet" title="Foo style">
   <style><![CDATA[
     body {color: #000}
   ]]></style>

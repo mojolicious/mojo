@@ -133,6 +133,7 @@ $t->get_ok('/buttons')->status_is(200)
 # Scripts
 $t->get_ok('/script')->status_is(200)->content_is(<<EOF);
 <script src="/script.js"></script>
+<script async src="/script.js"></script>
 <script>//<![CDATA[
 
   var a = 'b';
@@ -148,6 +149,7 @@ EOF
 # Stylesheets
 $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
 <link href="/foo.css" rel="stylesheet">
+<link href="/foo.css" rel="stylesheet" title="Test">
 <style>/*<![CDATA[*/
 
   body {color: #000}
@@ -576,6 +578,7 @@ __DATA__
 
 @@ script.html.ep
 <%= javascript '/script.js' %>
+<%= javascript '/script.js', async => undef %>
 <%= javascript begin %>
   var a = 'b';
 <% end %>
@@ -585,6 +588,7 @@ __DATA__
 
 @@ style.html.ep
 <%= stylesheet '/foo.css' %>
+<%= stylesheet '/foo.css', title => 'Test' %>
 <%= stylesheet begin %>
   body {color: #000}
 <% end %>

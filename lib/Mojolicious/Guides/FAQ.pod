@@ -137,10 +137,11 @@ Hypnotoad.
 There are many variations of this error, but most of them mean that TLS
 certificate validation in L<Mojo::UserAgent> failed. This usually happens for
 two reasons. The most common one is that the peer certificate is simply invalid.
-If that's the case you can use the attribute L<Mojo::UserAgent/"insecure"> or
-C<MOJO_INSECURE> environment variable to disable certificate validation. And if
-that's not the case you might be missing the L<Mozilla::CA> module, which is
-required by L<IO::Socket::SSL> to be able to validate certificates.
+If that's the case and you are certain that no MITM attack is being attempted,
+you can use the attribute L<Mojo::UserAgent/"insecure"> or C<MOJO_INSECURE>
+environment variable to disable certificate validation. And if that's not the
+case you might be missing the L<Mozilla::CA> module, which is required by
+L<IO::Socket::SSL> to be able to validate certificates.
 
 =head2 What does the error "Maximum message size exceeded" mean?
 

@@ -107,15 +107,14 @@ $daemon = Mojo::Server::Daemon->new(
 );
 $listen
   = 'https://127.0.0.1'
-  . '?cert=t/mojo/certs/bad.crt'
-  . '&key=t/mojo/certs/bad.key'
-  . '&ca=t/mojo/certs/ca.crt';
+  . '?cert=t/mojo/certs/selfsigned.crt'
+  . '&key=t/mojo/certs/selfsigned.key';
 $port = $daemon->listen([$listen])->start->ports->[0];
 
 # Verification left at default, certificate should be rejected
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
 $tx = $ua->get("https://127.0.0.1:$port");
-ok $tx->success, 'successful';
-ok !$tx->error, 'no error';
+ok !$tx->success, 'not successful';
+ok $tx->error, 'has error';
 
 done_testing();

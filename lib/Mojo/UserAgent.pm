@@ -573,7 +573,8 @@ inactive indefinitely.
   my $bool = $ua->insecure;
   $ua      = $ua->insecure($bool);
 
-Do not require a valid TLS certificate to access HTTPS/WSS sites.
+Do not require a valid TLS certificate to access HTTPS/WSS sites, defaults to
+the value of the C<MOJO_INSECURE> environment variable.
 
   # Disable TLS certificate validation for testing
   say $ua->insecure(1)->get('https://127.0.0.1:3000')->result->code;

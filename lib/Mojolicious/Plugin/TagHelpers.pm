@@ -447,7 +447,7 @@ and shown as default.
 Generate portable C<script> tag for JavaScript asset.
 
   <script src="/path/to/script.js"></script>
-  <script src="/path/to/script.js" defer></script>
+  <script defer src="/path/to/script.js"></script>
   <script><![CDATA[
     var a = 'b';
   ]]></script>

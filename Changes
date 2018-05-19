@@ -3,9 +3,12 @@
   - Many users expected that Mojo::UserAgent would validate all TLS certificates
     by default. So far that has not been the case, but will change with this
     release in an effort to strengthen security. By default Mojo::UserAgent will
-    now reject all invalid TLS certificates. To return to the previous behavious
-    you can use the insecure attribute.
+    now reject all invalid TLS certificates. To return to the previous behavior
+    you can use the new insecure attribute.
       $ua->insecure(1);
+    To make testing easier, Test::Mojo will default to having the insecure
+    attribute activated. And with the get command you can use the new -k option.
+      mojo get -k https://127.0.0.1:3000
     That also means that Mojo::IOLoop::TLS will no longer have a default
     tls_verify value. To disable TLS certificate validation there you can use
     the value 0x00.

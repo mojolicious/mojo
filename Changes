@@ -1,4 +1,6 @@
 
+7.81  2018-05-21
+
 7.80  2018-05-20
   - Many users expected that Mojo::UserAgent would verify all TLS certificates
     by default. Unfortunately that has not been the case so far, but will change

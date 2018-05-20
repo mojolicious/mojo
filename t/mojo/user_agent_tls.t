@@ -91,6 +91,11 @@ $listen
 $port = $daemon->listen([$listen])->start->ports->[0];
 
 # Invalid certificate
+$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+$ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
+$tx = $ua->get("https://127.0.0.1:$port");
+ok !$tx->success, 'not successful';
+ok $tx->error, 'has error';
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop, insecure => 1);
 $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
 $tx = $ua->get("https://127.0.0.1:$port");

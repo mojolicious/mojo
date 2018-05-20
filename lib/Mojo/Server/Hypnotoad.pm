@@ -66,11 +66,11 @@ sub run {
   $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
 
   # Daemonize as early as possible (but not for restarts)
+  local $SIG{USR2} = sub { $self->{upgrade} ||= steady_time };
   $prefork->start;
   $prefork->daemonize if !$ENV{HYPNOTOAD_FOREGROUND} && $ENV{HYPNOTOAD_REV} < 3;
 
   # Start accepting connections
-  local $SIG{USR2} = sub { $self->{upgrade} ||= steady_time };
   $prefork->cleanup(1)->run;
 }
 

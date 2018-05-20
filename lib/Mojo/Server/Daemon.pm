@@ -53,7 +53,10 @@ sub start {
   }
 
   # Start listening
-  elsif (!@{$self->acceptors}) { $self->_listen($_) for @{$self->listen} }
+  elsif (!@{$self->acceptors}) {
+    $self->app->server($self);
+    $self->_listen($_) for @{$self->listen};
+  }
 
   return $self;
 }

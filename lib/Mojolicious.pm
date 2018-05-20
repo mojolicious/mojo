@@ -194,6 +194,11 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
+sub server {
+  my ($self, $server) = @_;
+  $self->plugins->emit_hook(before_server_start => $server, $self);
+}
+
 sub start {
   my $self = shift;
   $_->warmup for $self->static, $self->renderer;
@@ -253,6 +258,20 @@ Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
 L<Mojolicious> will emit the following hooks in the listed order.
 
+=head2 before_server_start
+
+Emitted right before the application server is started, for web servers that
+support it, like L<Mojo::Server::Daemon> and L<Mojo::Server::Prefork>. Note that
+this hook is EXPERIMENTAL and might change without warning!
+
+  $app->hook(before_server_start => sub {
+    my ($server, $app) = @_;
+    ...
+  });
+
+Useful for reconfiguring application servers dynamically or collecting server
+diagnostics information. (Passed the server and application objects)
+
 =head2 after_build_tx
 
 Emitted right after the transaction is built and before the HTTP request gets
@@ -266,7 +285,7 @@ parsed.
 This is a very powerful hook and should not be used lightly, it makes some
 rather advanced features such as upload progress bars possible. Note that this
 hook will not work for embedded applications, because only the host application
-gets to build transactions. (Passed the transaction and application object)
+gets to build transactions. (Passed the transaction and application objects)
 
 =head2 around_dispatch
 
@@ -733,6 +752,13 @@ default exception handling.
 
 Load a plugin, for a full list of example plugins included in the
 L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
+
+=head2 server
+
+  $app->server(Mojo::Server->new);
+
+Emits the L</"before_server_start"> hook. Note that this method is EXPERIMENTAL
+and might change without warning!
 
 =head2 start
 

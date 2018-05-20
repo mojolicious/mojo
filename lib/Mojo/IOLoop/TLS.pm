@@ -68,7 +68,6 @@ sub _expand {
   if ($args->{server}) {
     $tls->{SSL_cert_file} ||= $CERT;
     $tls->{SSL_key_file}  ||= $KEY;
-    $tls->{SSL_verify_mode} //= $args->{tls_ca} ? 0x03 : 0x00;
   }
   else {
     $tls->{SSL_hostname}

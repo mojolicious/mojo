@@ -363,6 +363,12 @@ Path to the TLS certificate file.
 
 Path to the TLS key file.
 
+=item tls_verify
+
+  tls_verify => 0x00
+
+TLS verification mode.
+
 =back
 
 =head1 SEE ALSO

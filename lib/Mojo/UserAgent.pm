@@ -576,7 +576,7 @@ inactive indefinitely.
 Do not require a valid TLS certificate to access HTTPS/WSS sites, defaults to
 the value of the C<MOJO_INSECURE> environment variable.
 
-  # Disable TLS certificate validation for testing
+  # Disable TLS certificate verification for testing
   say $ua->insecure(1)->get('https://127.0.0.1:3000')->result->code;
 
 =head2 ioloop

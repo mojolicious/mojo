@@ -68,8 +68,8 @@ C<MOJO_PROXY> environment variable.
 
   $ MOJO_PROXY=0 perl -Mojo -E 'say g("example.com")->body'
 
-TLS certificate validation can be disabled with the C<MOJO_INSECURE> environment
-variable.
+TLS certificate verification can be disabled with the C<MOJO_INSECURE>
+environment variable.
 
   $ MOJO_INSECURE=1 perl -Mojo -E 'say g("https://127.0.0.1:3000")->body'
 

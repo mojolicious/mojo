@@ -184,6 +184,36 @@ Mojo::Promise - Promises/A+
 L<Mojo::Promise> is a Perl-ish implementation of
 L<Promises/A+|https://promisesaplus.com>.
 
+=head1 STATES
+
+A promise is an object representing the eventual completion or failure of an
+asynchronous operation. It allows asynchronous methods to return values, like
+synchronous methods. But instead of immediately returning the final value, the
+asynchronous method returns a promise to supply the value at some point in the
+future.
+
+A promise can be in one of three states:
+
+=over 2
+
+=item pending
+
+Initial state, neither fulfilled nor rejected.
+
+=item fulfilled
+
+Meaning that the operation completed successfully.
+
+=item rejected
+
+Meaning that the operation failed.
+
+=back
+
+A pending promise can either be fulfilled with a value or rejected with a
+reason. When either happens, the associated handlers queued up by a promise's
+L</"then"> method are called.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Promise> implements the following attributes.

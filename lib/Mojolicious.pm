@@ -109,7 +109,7 @@ sub build_tx {
   return $tx;
 }
 
-sub config   { Mojo::Util::_stash(config   => @_); }
+sub config   { Mojo::Util::_stash(config   => @_) }
 sub defaults { Mojo::Util::_stash(defaults => @_) }
 
 sub dispatch {
@@ -194,10 +194,7 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-sub server {
-  my ($self, $server) = @_;
-  $self->plugins->emit_hook(before_server_start => $server, $self);
-}
+sub server { $_[0]->plugins->emit_hook(before_server_start => @_[1, 0]) }
 
 sub start {
   my $self = shift;

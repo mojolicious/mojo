@@ -2,7 +2,7 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode md5_bytes sha1_sum);
+use Mojo::Util qw(b64_encode b64_decode sha1_sum);
 use Mojo::URL;
 
 my ($SEED, $COUNTER) = (rand, int rand 0xffffff);

@@ -126,9 +126,9 @@ sub dispatch {
   my $stash = $c->stash;
   unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
     my $req    = $c->req;
-    my $id     = $req->request_id;
     my $method = $req->method;
     my $path   = $req->url->path->to_abs_string;
+    my $id     = $req->request_id;
     $self->log->debug(qq{$method "$path" ($id)});
     $c->helpers->timing->begin('mojo.timer');
   }

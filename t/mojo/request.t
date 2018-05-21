@@ -16,7 +16,10 @@ is $req->max_message_size, 16777216, 'right default';
 
 # Request ID
 my $id = Mojo::Message::Request->new->request_id;
-isnt $id, Mojo::Message::Request->new->request_id, 'different id';
+ok length $id >= 8, 'at least 8 characters';
+my $id2 = Mojo::Message::Request->new->request_id;
+ok length $id >= 8, 'at least 8 characters';
+isnt $id, $id2, 'different id';
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding all limits
 $req = Mojo::Message::Request->new;

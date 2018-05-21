@@ -14,6 +14,10 @@ use Mojo::Util 'encode';
 my $req = Mojo::Message::Request->new;
 is $req->max_message_size, 16777216, 'right default';
 
+# Request ID
+my $id = Mojo::Message::Request->new->request_id;
+isnt $id, Mojo::Message::Request->new->request_id, 'different id';
+
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding all limits
 $req = Mojo::Message::Request->new;
 my $finished;

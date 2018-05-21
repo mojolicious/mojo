@@ -1,5 +1,7 @@
 
 7.81  2018-05-21
+  - Added request_id attribute to Mojo::Message::Request.
+  - Improved all built in templates to contain a comment with their request id.
 
 7.80  2018-05-20
   - Many users expected that Mojo::UserAgent would verify all TLS certificates

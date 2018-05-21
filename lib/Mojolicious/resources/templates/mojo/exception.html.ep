@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Request ID: <%= $c->req->request_id %> -->
 <html>
   <head>
     <title>Server error</title>

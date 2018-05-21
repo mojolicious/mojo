@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Request ID: <%= $c->req->request_id %> -->
 <html>
   <head>
     % my $title = stash('exception') ? 'Server error' : 'Page not found';
@@ -271,6 +272,7 @@
       <div id="request" class="box infobox spaced">
         <table>
           % my $req = $c->req;
+          %= $kv->('Request ID' => $req->request_id)
           %= $kv->(Method => $req->method)
           % my $url = $req->url;
           %= $kv->(URL => $url->to_string)

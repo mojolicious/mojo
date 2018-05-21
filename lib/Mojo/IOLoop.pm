@@ -47,6 +47,8 @@ sub acceptor {
 
 sub client {
   my ($self, $cb) = (_instance(shift), pop);
+  my $args = ref $_[0] ? $_[0] : {@_};
+  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
 
   my $id = $self->_id;
   my $client = $self->{out}{$id}{client} = Mojo::IOLoop::Client->new;
@@ -56,13 +58,13 @@ sub client {
   $client->on(
     connect => sub {
       delete $self->{out}{$id}{client};
-      my $stream = Mojo::IOLoop::Stream->new(pop);
+      my $stream = $class->new(pop);
       $self->_stream($stream => $id);
       $self->$cb(undef, $stream);
     }
   );
   $client->on(error => sub { $self->_remove($id); $self->$cb(pop, undef) });
-  $client->connect(@_);
+  $client->connect($args);
 
   return $id;
 }
@@ -105,12 +107,14 @@ sub reset {
 
 sub server {
   my ($self, $cb) = (_instance(shift), pop);
+  my $args = ref $_[0] ? $_[0] : {@_};
+  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
 
   my $server = Mojo::IOLoop::Server->new;
   weaken $self;
   $server->on(
     accept => sub {
-      my $stream = Mojo::IOLoop::Stream->new(pop);
+      my $stream = $class->new(pop);
       $self->$cb($stream, $self->_stream($stream, $self->_id, 1));
 
       # Enforce connection limit (randomize to improve load balancing)
@@ -123,7 +127,7 @@ sub server {
       $self->_not_accepting if $self->_limit;
     }
   );
-  $server->listen(@_);
+  $server->listen($args);
 
   return $self->acceptor($server);
 }
@@ -157,6 +161,13 @@ sub subprocess {
 }
 
 sub timer { shift->_timer(timer => @_) }
+
+sub transition {
+  my ($self, $id, $class) = (_instance(shift), @_);
+  my $new = $class->new($self->stream($id)->steal_handle);
+  $self->_stream($new, $id, !!$self->{in}{$id});
+  return $new;
+}
 
 sub _id {
   my $self = shift;
@@ -645,6 +656,13 @@ seconds.
     my $loop = shift;
     ...
   });
+
+=head2 transition
+
+  my $stream = Mojo::IOLoop->transition($id, 'Mojo::IOLoop::Stream::HTTPClient');
+  my $stream = $loop->transition($id, 'Mojo::IOLoop::Stream::HTTPClient');
+
+Transition stream to a different class.
 
 =head1 DEBUGGING
 

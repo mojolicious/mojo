@@ -186,10 +186,10 @@ L<Promises/A+|https://promisesaplus.com>.
 
 =head1 STATES
 
-A promise is an object representing the eventual completion or failure of an
-asynchronous operation. It allows asynchronous methods to return values, like
-synchronous methods. But instead of immediately returning the final value, the
-asynchronous method returns a promise to supply the value at some point in the
+A promise is an object representing the eventual completion or failure of a
+non-blocking operation. It allows non-blocking functions to return values, like
+blocking functions. But instead of immediately returning the final value, the
+non-blocking function returns a promise to supply the value at some point in the
 future.
 
 A promise can be in one of three states:

@@ -1,4 +1,6 @@
 
+7.82  2018-05-22
+
 7.81  2018-05-21
   - Added request_id attribute to Mojo::Message::Request.
   - Improved all built in templates to contain a comment with their request id.

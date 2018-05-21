@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::Message';
 use Mojo::Cookie::Request;
 use Mojo::Util qw(b64_encode b64_decode md5_bytes sha1_sum);
 use Mojo::URL;
-use Sys::Hostname 'hostname';
 
 my $COUNTER = int rand 0xffffff;
 
@@ -12,9 +11,9 @@ has env => sub { {} };
 has method => 'GET';
 has [qw(proxy reverse_proxy)];
 has request_id => sub {
-  state $machine = md5_bytes hostname;
+  state $seed = rand;
   $COUNTER = ($COUNTER + 1) % 0xffffff;
-  return substr sha1_sum($machine . $$ . $COUNTER), 0, 8;
+  return substr sha1_sum($seed . $$ . $COUNTER), 0, 8;
 };
 has url => sub { Mojo::URL->new };
 has via_proxy => 1;

@@ -104,15 +104,14 @@ sub _development {
 
   # Filtered stash snapshot
   my $stash = $c->stash;
-  my %snapshot = map { $_ => $stash->{$_} }
+  %{$stash->{snapshot} = {}} = map { $_ => $stash->{$_} }
     grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
+  $stash->{exception} = $page eq 'exception' ? $e : undef;
 
   # Render with fallbacks
   my $mode     = $app->mode;
   my $renderer = $app->renderer;
-  $stash->{exception} = $page eq 'exception' ? $e : undef;
-  $stash->{snapshot} = \%snapshot;
-  my $options = {
+  my $options  = {
     format   => $stash->{format} || $renderer->default_format,
     handler  => undef,
     status   => $page eq 'exception' ? 500 : 404,

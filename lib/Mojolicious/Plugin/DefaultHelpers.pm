@@ -109,10 +109,9 @@ sub _development {
   $stash->{exception} = $page eq 'exception' ? $e : undef;
 
   # Render with fallbacks
-  my $mode     = $app->mode;
-  my $renderer = $app->renderer;
-  my $options  = {
-    format   => $stash->{format} || $renderer->default_format,
+  my $mode    = $app->mode;
+  my $options = {
+    format   => $stash->{format} || $app->renderer->default_format,
     handler  => undef,
     status   => $page eq 'exception' ? 500 : 404,
     template => "$page.$mode"

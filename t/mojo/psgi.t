@@ -42,6 +42,13 @@ get '/proxy' => sub {
 }
 
 # Binding
+my @server;
+app->hook(
+  before_server_start => sub {
+    my ($server, $app) = @_;
+    push @server, ref $server, $app->mode;
+  }
+);
 my $app = Mojo::Server::PSGI->new(app => app)->to_psgi_app;
 my $content = 'hello=world';
 open my $body, '<', \$content;
@@ -77,6 +84,8 @@ $res->[2]->close;
 is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
 is_deeply decode_json($params), {bar => 'baz', hello => 'world', lalala => 23},
   'right structure';
+is_deeply \@server, ['Mojo::Server::PSGI', 'development'],
+  'hook has been emitted once';
 
 # Command
 $content = 'world=hello';

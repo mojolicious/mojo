@@ -1,5 +1,6 @@
 
-7.82  2018-05-22
+7.82  2018-05-24
+  - Improved Mojo::Server::PSGI with support for before_server_start hook.
 
 7.81  2018-05-21
   - Added request_id attribute to Mojo::Message::Request.

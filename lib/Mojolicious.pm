@@ -259,8 +259,9 @@ L<Mojolicious> will emit the following hooks in the listed order.
 =head2 before_server_start
 
 Emitted right before the application server is started, for web servers that
-support it, like L<Mojo::Server::Daemon> and L<Mojo::Server::Prefork>. Note that
-this hook is EXPERIMENTAL and might change without warning!
+support it, like L<Mojo::Server::Daemon>, L<Mojo::Server::Prefork> and
+L<Mojo::Server::PSGI>. Note that this hook is EXPERIMENTAL and might change
+without warning!
 
   $app->hook(before_server_start => sub {
     my ($server, $app) = @_;

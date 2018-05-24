@@ -34,7 +34,7 @@ sub to_psgi_app {
   my $self = shift;
 
   # Preload application and wrap it
-  $self->app;
+  $self->app->server($self);
   return sub { $self->run(@_) }
 }
 

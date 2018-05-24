@@ -79,7 +79,8 @@ sub render {
   local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
 
   # Rendering to string
-  local @{$stash}{keys %$args} if my $string = delete $args->{'mojo.string'};
+  my ($maybe, $string) = delete @{$args}{'mojo.maybe', 'mojo.string'};
+  local @{$stash}{keys %$args} if $string || $maybe;
   delete @{$stash}{qw(layout extends)} if $string;
 
   # All other arguments just become part of the stash

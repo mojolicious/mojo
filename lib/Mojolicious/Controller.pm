@@ -163,11 +163,10 @@ sub render {
   # Template may be first argument
   my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
   $args->{template} = $template if $template;
-  my $app     = $self->app;
+  my $app = $self->app;
   my $plugins = $app->plugins->emit_hook(before_render => $self, $args);
-  my $maybe   = delete $args->{'mojo.maybe'};
 
-  my $ts = $args->{'mojo.string'};
+  my ($maybe, $ts) = @{$args}{'mojo.maybe', 'mojo.string'};
   my ($output, $format) = $app->renderer->render($self, $args);
 
   # Maybe no 404
@@ -179,7 +178,7 @@ sub render {
   my $headers = $self->res->body($output)->headers;
   $headers->content_type($app->types->type($format) || 'text/plain')
     unless $headers->content_type;
-  return !!$self->rendered($self->stash->{status});
+  return !!$self->rendered($args->{status} || $self->stash->{status});
 }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }
@@ -686,7 +685,9 @@ automatic rendering would result in a response.
 
 Try to render content, but do not call
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found"> if no response
-could be generated, takes the same arguments as L</"render">.
+could be generated, all arguments get localized automatically and are only
+available during this render operation, takes the same arguments as
+L</"render">.
 
   # Render template "index_local" only if it exists
   $c->render_maybe('index_local') or $c->render('index');

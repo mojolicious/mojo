@@ -110,13 +110,13 @@ sub _development {
   # Render with fallbacks
   my $mode     = $app->mode;
   my $renderer = $app->renderer;
-  my $options  = {
-    exception => $page eq 'exception' ? $e : undef,
-    format    => $stash->{format} || $renderer->default_format,
-    handler   => undef,
-    snapshot  => \%snapshot,
-    status    => $page eq 'exception' ? 500 : 404,
-    template  => "$page.$mode"
+  $stash->{exception} = $page eq 'exception' ? $e : undef;
+  $stash->{snapshot} = \%snapshot;
+  my $options = {
+    format   => $stash->{format} || $renderer->default_format,
+    handler  => undef,
+    status   => $page eq 'exception' ? 500 : 404,
+    template => "$page.$mode"
   };
   my $bundled = 'mojo/' . ($mode eq 'development' ? 'debug' : $page);
   return $c if _fallbacks($c, $options, $page, $bundled);
@@ -137,7 +137,7 @@ sub _fallbacks {
 
   # Inline template
   my $stash = $c->stash;
-  return undef unless $stash->{format} eq 'html';
+  return undef unless $options->{format} eq 'html';
   delete @$stash{qw(extends layout)};
   return $c->render_maybe($bundled, %$options, handler => 'ep');
 }

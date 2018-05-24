@@ -1,6 +1,8 @@
 
 7.82  2018-05-24
   - Improved Mojo::Server::PSGI with support for before_server_start hook.
+  - Fixed a bug where render_maybe in Mojolicious::Controller could not render
+    multiple alternatives properly because arguments were not localized.
 
 7.81  2018-05-21
   - Added request_id attribute to Mojo::Message::Request.

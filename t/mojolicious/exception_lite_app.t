@@ -55,8 +55,8 @@ get '/dead_template_too';
 
 get '/dead_handler' => {handler => 'dead'};
 
-get '/dead_action_dead_handler' => {handler => 'dead'} => sub {
-  die "dead action dead handler!\n";
+get '/dead_action_epl' => {handler => 'epl'} => sub {
+  die "dead action epl!\n";
 };
 
 get '/dead_included_template';
@@ -177,10 +177,10 @@ $t->get_ok('/dead_handler.xml')->status_is(500)
   ->content_is("<very>bad</very>\n");
 like $log, qr/dead handler!/, 'right result';
 
-# Dead handler
-$t->get_ok('/dead_action_dead_handler.xml')->status_is(500)
+# Dead action (with a different handler)
+$t->get_ok('/dead_action_epl.xml')->status_is(500)
   ->content_is("<very>bad</very>\n");
-like $log, qr/dead action dead handler!/, 'right result';
+like $log, qr/dead action epl!/, 'right result';
 
 # Dead included template
 $t->get_ok('/dead_included_template')->status_is(500)

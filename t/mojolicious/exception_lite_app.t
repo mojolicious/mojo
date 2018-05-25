@@ -20,6 +20,8 @@ app->log->on(message => sub { shift; $log .= join ':', @_ });
 
 helper dead_helper => sub { die "dead helper!\n" };
 
+app->renderer->add_handler(dead => sub { die "dead handler!\n" });
+
 # Custom rendering for missing "txt" template
 hook before_render => sub {
   my ($c, $args) = @_;
@@ -50,6 +52,12 @@ get '/custom_exception' => sub { die Mojo::Base->new };
 get '/dead_template';
 
 get '/dead_template_too';
+
+get '/dead_handler' => {handler => 'dead'};
+
+get '/dead_action_dead_handler' => {handler => 'dead'} => sub {
+  die "dead action dead handler!\n";
+};
 
 get '/dead_included_template';
 
@@ -163,6 +171,16 @@ like $log, qr/dead template!/, 'right result';
 $t->get_ok('/dead_template_too.xml')->status_is(500)
   ->content_is("<very>bad</very>\n");
 like $log, qr/dead template too!/, 'right result';
+
+# Dead handler
+$t->get_ok('/dead_handler.xml')->status_is(500)
+  ->content_is("<very>bad</very>\n");
+like $log, qr/dead handler!/, 'right result';
+
+# Dead handler
+$t->get_ok('/dead_action_dead_handler.xml')->status_is(500)
+  ->content_is("<very>bad</very>\n");
+like $log, qr/dead action dead handler!/, 'right result';
 
 # Dead included template
 $t->get_ok('/dead_included_template')->status_is(500)

@@ -49,6 +49,8 @@ get '/custom_exception' => sub { die Mojo::Base->new };
 
 get '/dead_template';
 
+get '/dead_template_too';
+
 get '/dead_included_template';
 
 get '/dead_template_with_layout';
@@ -156,6 +158,11 @@ $t->get_ok('/custom_exception')->status_is(500)->content_like(qr/Mojo::Base/);
 $t->get_ok('/dead_template')->status_is(500)->content_like(qr/dead template!/)
   ->content_like(qr/line 1/);
 like $log, qr/dead template!/, 'right result';
+
+# Dead template with a different handler
+$t->get_ok('/dead_template_too.xml')->status_is(500)
+  ->content_is("<very>bad</very>\n");
+like $log, qr/dead template too!/, 'right result';
 
 # Dead included template
 $t->get_ok('/dead_included_template')->status_is(500)
@@ -279,6 +286,9 @@ Green<%= content %>
 
 @@ dead_template.html.ep
 % die 'dead template!';
+
+@@ dead_template_too.xml.epl
+% die 'dead template too!';
 
 @@ dead_included_template.html.ep
 this

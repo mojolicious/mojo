@@ -733,8 +733,7 @@ fragment if necessary.
 
 Construct a new L<Mojo::DOM> object for an HTML/XML tag with or without
 attributes and content. The C<data> attribute may contain a hash reference with
-key/value pairs to generate attributes from. Note that this method is
-EXPERIMENTAL and might change without warning!
+key/value pairs to generate attributes from.
 
   # "<br>"
   $dom->new_tag('br');
@@ -924,8 +923,7 @@ Return L<Mojo::DOM> object for C<root> node.
 
   my $selector = $dom->selector;
 
-Get a unique CSS selector for this element. Note that this method is
-EXPERIMENTAL and might change without warning!
+Get a unique CSS selector for this element.
 
   # "ul:nth-child(1) > li:nth-child(2)"
   $dom->parse('<ul><li>Test</li><li>123</li></ul>')->find('li')->last->selector;

@@ -1,6 +1,7 @@
 
-7.82  2018-05-24
-  - Improved Mojo::Server::PSGI with support for before_server_start hook.
+7.82  2018-05-26
+  - Removed experimental status from new_tag and selector methods in Mojo::DOM.
+  - Improved Mojo::Server::PSGI with support for the before_server_start hook.
   - Fixed a bug where render_maybe in Mojolicious::Controller could not render
     multiple alternatives properly because arguments were not localized.
 

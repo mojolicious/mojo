@@ -1,4 +1,6 @@
 
+7.83  2018-05-28
+
 7.82  2018-05-27
   - Removed experimental status from new_tag and selector methods in Mojo::DOM.
   - Improved Mojo::Server::PSGI with support for the before_server_start hook.

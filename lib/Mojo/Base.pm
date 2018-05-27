@@ -235,8 +235,8 @@ are used to assign a new attribute value.
 In this case the C<name> attribute accessor is called on the object created by
 C<Duck-E<gt>new>. It assigns a new attribute value and then returns the C<Duck>
 object, so the C<quack> method can be called on it afterwards. These method
-chains can continue until one of the attribute accessors or methods called does
-not return the C<Duck> object.
+chains can continue until one of the methods called does not return the C<Duck>
+object.
 
 =head1 FUNCTIONS
 

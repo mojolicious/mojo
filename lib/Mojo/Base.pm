@@ -209,6 +209,35 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.
 
+=head1 FLUENT INTERFACES
+
+Fluent interfaces are a way to design object-oriented APIs around method
+chaining to create domain-specific languages, with the goal of making the
+readablity of the source code close to written prose.
+
+  package Duck;
+  use Mojo::Base -base;
+
+  has 'name';
+
+  sub quack {
+    my $self = shift;
+    my $name = $self->name;
+    say "$name: Quack!"
+  }
+
+L<Mojo::Base> will help you with this by having all attribute accessors created
+with L</"has"> (or L</"attr">) return their invocant (C<$self>) whenever they
+are used to assign a new attribute value.
+
+  Duck->new->name('Donald')->quack;
+
+In this case the C<name> attribute accessor is called on the object created by
+C<Duck-E<lt>new>. It assigns a new attribute value and then returns the C<Duck>
+object, so the C<quack> method can be called on it afterwards. These method
+chains can continue until one of the attribute accessors or methods called does
+not return the C<Duck> object.
+
 =head1 FUNCTIONS
 
 L<Mojo::Base> implements the following functions, which can be imported with

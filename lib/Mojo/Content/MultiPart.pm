@@ -59,7 +59,7 @@ sub get_body_chunk {
   my ($self, $offset) = @_;
 
   # Body generator
-  return $self->generate_body_chunk($offset) if $self->{dynamic};
+  return $self->generate_body_chunk($offset) if $self->is_dynamic;
 
   # First boundary
   my $boundary     = $self->{boundary} //= $self->build_boundary;

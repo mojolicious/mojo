@@ -251,19 +251,24 @@ is $client, 'works!', 'full message has been written';
 
 # Custom stream class
 my ($server_stream, $client_stream);
-$id
-  = Mojo::IOLoop->server(
+$delay = Mojo::IOLoop->delay;
+$end   = $delay->begin;
+$id    = Mojo::IOLoop->server(
   {address => '127.0.0.1',
-    stream_class => 'Mojo::IOLoop::Stream::HTTPServer'} =>
-    sub { $server_stream = $_[1] });
+    stream_class => 'Mojo::IOLoop::Stream::HTTPServer'} => sub {
+    $server_stream = $_[1];
+    $end->();
+  }
+);
 $port = Mojo::IOLoop->acceptor($id)->port;
+$end2 = $delay->begin;
 $id   = Mojo::IOLoop->client(
   {port => $port, stream_class => 'Mojo::IOLoop::Stream::HTTPClient'} => sub {
     $client_stream = pop;
-    Mojo::IOLoop->stop;
+    $end2->();
   }
 );
-Mojo::IOLoop->start;
+$delay->wait;
 isa_ok $server_stream, 'Mojo::IOLoop::Stream::HTTPServer',
   'right server stream';
 isa_ok $client_stream, 'Mojo::IOLoop::Stream::HTTPClient',

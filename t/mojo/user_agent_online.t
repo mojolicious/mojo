@@ -233,9 +233,4 @@ ok $tx->is_finished, 'transaction is finished';
 is $tx->error->{message}, 'Connect timeout', 'right error';
 $ua->connect_timeout(3);
 
-# Request timeout (non-routable address)
-$tx = $ua->request_timeout(0.5)->get('192.0.2.1');
-ok $tx->is_finished, 'transaction is finished';
-is $tx->error->{message}, 'Request timeout', 'right error';
-
 done_testing();

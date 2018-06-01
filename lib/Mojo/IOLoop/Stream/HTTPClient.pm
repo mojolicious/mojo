@@ -134,8 +134,6 @@ Mojo::IOLoop::Stream::HTTPClient - Non-blocking I/O HTTP client stream
       $stream->process($tx);
     }
   );
-  
-  # Establish connection
   $client->connect(address => 'mojolicious.org', port => 80);
 
   # Start reactor if necessary

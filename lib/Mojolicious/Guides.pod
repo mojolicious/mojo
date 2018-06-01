@@ -275,6 +275,18 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::IOLoop::Stream>
 
+=over 2
+
+=item * L<Mojo::IOLoop::Stream::HTTPClient>
+
+=item * L<Mojo::IOLoop::Stream::HTTPServer>
+
+=item * L<Mojo::IOLoop::Stream::WebSocketClient>
+
+=item * L<Mojo::IOLoop::Stream::WebSocketServer>
+
+=back
+
 =item * L<Mojo::IOLoop::TLS>
 
 =item * L<Mojo::Log>

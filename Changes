@@ -1,5 +1,14 @@
 
-7.83  2018-05-28
+7.83  2018-06-01
+  - Replaced MOJO_DAEMON_DEBUG and MOJO_USERAGENT_DEBUG environment variables
+    with MOJO_SERVER_DEBUG and MOJO_CLIENT_DEBUG. (anparker)
+  - Added modules Mojo::IOLoop::Stream::HTTPClient,
+    Mojo::IOLoop::Stream::HTTPServer, Mojo::IOLoop::Stream::WebSocketClient and
+    Mojo::IOLoop::Stream::WebSocketServer. (anparker)
+  - Added transition method to Mojo::IOLoop. (anparker)
+  - Added close_connections method to Mojo::Server::Daemon. (anparker)
+  - Added stream_class argument to client and server methods in Mojo::IOLoop.
+    (anparker)
 
 7.82  2018-05-27
   - Removed experimental status from new_tag and selector methods in Mojo::DOM.

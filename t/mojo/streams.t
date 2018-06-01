@@ -18,7 +18,7 @@ $app           = $server_stream->app;
 ok $app, 'has default app';
 isa_ok $app, 'Mojo::HelloWorld', 'right default app';
 
-# App
+# Silence
 $app = Mojolicious->new;
 $app->log->level('fatal');
 

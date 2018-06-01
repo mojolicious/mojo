@@ -5,10 +5,7 @@ use Scalar::Util 'weaken';
 
 sub process {
   my ($self, $tx) = @_;
-
-  return if $self->{tx};
   $self->{tx} = $tx;
-
   weaken $self;
   $tx->on(resume => sub { $self->_write_content });
   $self->_write_content;
@@ -44,6 +41,9 @@ Mojo::IOLoop::Stream::WebSocketClient - Non-blocking I/O WebSocket client stream
   # Create stream and process transaction with it
   my $stream = Mojo::IOLoop::Stream::WebSocketClient->new($handle);
   $stream->process($ws);
+
+  # Start reactor if necessary
+  $stream->reactor->start unless $stream->reactor->is_running;
 
 =head1 DESCRIPTION
 

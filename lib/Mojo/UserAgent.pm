@@ -188,6 +188,7 @@ sub _connect_proxy {
 
 sub _connected {
   my ($self, $id) = @_;
+
   my $c      = $self->{connections}{$id};
   my $stream = $c->{ioloop}->stream($id)->timeout($self->inactivity_timeout)
     ->request_timeout($self->request_timeout);
@@ -312,11 +313,11 @@ sub _start {
 
 sub _upgrade {
   my ($self, $id, $ws) = @_;
-  my $c    = delete $self->{connections}{$id};
-  my $loop = $c->{ioloop};
 
+  my $c       = delete $self->{connections}{$id};
+  my $loop    = $c->{ioloop};
   my $timeout = $loop->stream($id)->timeout;
-  my $stream = $loop->transition($id, 'Mojo::IOLoop::Stream::WebSocketClient');
+  my $stream  = $loop->transition($id, 'Mojo::IOLoop::Stream::WebSocketClient');
   $stream->timeout($timeout);
 
   weaken $self;
@@ -326,7 +327,6 @@ sub _upgrade {
   $self->cookie_jar->collect($ws);
 
   $c->{cb}($self, $c->{tx} = $ws);
-
   $self->{connections}{$id} = $c;
   $stream->process($ws);
 }
@@ -627,9 +627,9 @@ Proxy manager, defaults to a L<Mojo::UserAgent::Proxy> object.
 
 Maximum amount of time in seconds sending the request and receiving a whole
 response may take before getting canceled, defaults to the value of the
-C<MOJO_REQUEST_TIMEOUT> environment variable or C<0>. This time does not include
-amount of time spent connecting. Setting the value to C<0> will allow the user
-agent to wait indefinitely. The timeout will reset for every followed redirect.
+C<MOJO_REQUEST_TIMEOUT> environment variable or C<0>. This does not include
+L</"connect_timeout">. Setting the value to C<0> will allow the user agent to
+wait indefinitely. The timeout will reset for every followed redirect.
 
   # Allow 3 seconds to establish connection and 5 seconds to process request
   $ua->max_redirects(0)->connect_timeout(3)->request_timeout(5);
@@ -1067,8 +1067,8 @@ accepting a callback.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_CLIENT_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
+You can set the C<MOJO_CLIENT_DEBUG> environment variable to get some advanced
+diagnostics information printed to C<STDERR>.
 
   MOJO_CLIENT_DEBUG=1
 

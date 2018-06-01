@@ -11,7 +11,6 @@ use Mojo::IOLoop::Stream;
 use Mojo::IOLoop::Stream::HTTPClient;
 use Mojo::IOLoop::Stream::HTTPServer;
 
-
 # Defaults
 my $loop = Mojo::IOLoop->new;
 is $loop->max_connections, 1000, 'right default';

@@ -27,12 +27,11 @@ sub DESTROY {
 sub close_connections {
   my $self = shift;
   my $loop = $self->ioloop;
-  $loop->stream($_)->max_requests(1) for keys %{$self->{connections} || {}};
+  $_->max_requests(1)
+    for map { $loop->stream($_) || () } keys %{$self->{connections} || {}};
 }
 
-sub ports {
-  [map { $_[0]->ioloop->acceptor($_)->port } @{$_[0]->acceptors}];
-}
+sub ports { [map { $_[0]->ioloop->acceptor($_)->port } @{$_[0]->acceptors}] }
 
 sub run {
   my $self = shift;
@@ -155,11 +154,10 @@ sub _request {
 
 sub _upgrade {
   my ($self, $id, $ws) = @_;
-  my $c    = delete $self->{connections}{$id};
-  my $loop = $self->ioloop;
 
+  my $loop    = $self->ioloop;
   my $timeout = $loop->stream($id)->timeout;
-  my $stream = $loop->transition($id, 'Mojo::IOLoop::Stream::WebSocketServer');
+  my $stream  = $loop->transition($id, 'Mojo::IOLoop::Stream::WebSocketServer');
   $stream->timeout($timeout);
 
   weaken $self;
@@ -411,8 +409,8 @@ implements the following new ones.
 
   $daemon->close_connections;
 
-Make connections to stop accepting new requests and close after
-finishing processing current one.
+Stop accepting new requests and close all connections after finising those
+currently being processed.
 
 =head2 ports
 

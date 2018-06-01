@@ -20,9 +20,7 @@ sub new {
 sub process {
   my ($self, $tx) = @_;
 
-  return if $self->{tx};
   $self->{tx} = $tx;
-
   my $handle = $self->handle;
   unless ($handle->isa('IO::Socket::UNIX')) {
     $tx->local_address($handle->sockhost)->local_port($handle->sockport);
@@ -118,7 +116,8 @@ Mojo::IOLoop::Stream::HTTPClient - Non-blocking I/O HTTP client stream
   
   # Create transaction
   my $tx = Mojo::Transaction::HTTP->new;
-  $tx->req->method('GET')->url->parse('https://mojolicious.org');
+  $tx->req->method('GET')
+  $tx->url->parse('https://mojolicious.org');
   $tx->on(
     finish => sub {
       my $tx = shift;
@@ -136,9 +135,11 @@ Mojo::IOLoop::Stream::HTTPClient - Non-blocking I/O HTTP client stream
     }
   );
   
-  # Start connection
+  # Establish connection
   $client->connect(address => 'mojolicious.org', port => 80);
-  $client->reactor->start;
+
+  # Start reactor if necessary
+  $stream->reactor->start unless $stream->reactor->is_running;
 
 =head1 DESCRIPTION
 
@@ -179,22 +180,22 @@ will allow to wait indefinitely.
 L<Mojo::IOLoop::Stream::HTTPClient> inherits all methods from
 L<Mojo::IOLoop::Stream> and implements the following new ones.
 
-=head2 process
-
-  $stream->process(Mojo::Transaction::HTTP->new);
-
-Process a L<Mojo::Transaction::HTTP> object with the current connection.
-
 =head2 new
 
   my $stream = Mojo::IOLoop::Stream::HTTPClient->new($handle);
 
 Construct a new L<Mojo::IOLoop::Stream::HTTPClient> object.
 
+=head2 process
+
+  $stream->process(Mojo::Transaction::HTTP->new);
+
+Process a L<Mojo::Transaction::HTTP> object with the current connection.
+
 =head1 DEBUGGING
 
-You can set the C<MOJO_CLIENT_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
+You can set the C<MOJO_CLIENT_DEBUG> environment variable to get some advanced
+diagnostics information printed to C<STDERR>.
 
   MOJO_CLIENT_DEBUG=1
 

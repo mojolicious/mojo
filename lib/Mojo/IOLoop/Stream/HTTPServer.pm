@@ -62,9 +62,7 @@ sub _build_tx {
   return ++$self->{keep_alive} > 1 ? $tx->kept_alive(1) : $tx;
 }
 
-sub _close {
-  delete($_[0]->{tx})->closed if $_[0]->{tx};
-}
+sub _close { delete($_[0]->{tx})->closed if $_[0]->{tx} }
 
 sub _finish {
   my $self = shift;
@@ -152,14 +150,13 @@ Mojo::IOLoop::Stream::HTTPServer - Non-blocking I/O HTTP server stream
   );
   $server->listen(port => 3000);
   
-  # Start accepting connections
-  $server->start;
+  # Start reactor if necessary
+  $stream->reactor->start unless $stream->reactor->is_running;
 
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Stream::HTTPServer> is a container for I/O streams used by
 L<Mojo::IOLoop> to support the HTTP protocol server-side.
-
 
 =head1 EVENTS
 
@@ -211,8 +208,8 @@ L<Mojo::IOLoop::Stream> and implements the following ones.
   my $app = $stream->app;
   $stream = $stream->app(Mojolicious->new);
 
-Application responsible for building transactions. Defaults to
-a L<Mojo::HelloWorld> object.
+Application responsible for building transactions, defaults to a
+L<Mojo::HelloWorld> object.
 
 =head2 max_requests
 

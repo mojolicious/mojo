@@ -5,18 +5,13 @@ use Scalar::Util 'weaken';
 
 sub process {
   my ($self, $tx) = @_;
-
-  return if $self->{tx};
   $self->{tx} = $tx;
-
   weaken $self;
   $tx->on(resume => sub { $self->_write_content });
   $self->_write_content;
 }
 
-sub _close {
-  delete($_[0]->{tx})->closed if $_[0]->{tx};
-}
+sub _close { delete($_[0]->{tx})->closed if $_[0]->{tx} }
 
 sub _finish { shift->close_gracefully }
 
@@ -44,11 +39,13 @@ Mojo::IOLoop::Stream::WebSocketServer - Non-blocking I/O WebSocket server stream
   my $stream = Mojo::IOLoop::Stream::WebSocketServer->new($handle);
   $stream->process($ws);
 
+  # Start reactor if necessary
+  $stream->reactor->start unless $stream->reactor->is_running;
+
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Stream::WebSocketServer> is a container for I/O streams used by
 L<Mojo::IOLoop> to support the WebSocket protocol server-side.
-
 
 =head1 EVENTS
 

@@ -48,11 +48,11 @@ sub acceptor {
 sub client {
   my ($self, $cb) = (_instance(shift), pop);
   my $args = ref $_[0] ? $_[0] : {@_};
-  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
 
   my $id = $self->_id;
   my $client = $self->{out}{$id}{client} = Mojo::IOLoop::Client->new;
   weaken $client->reactor($self->reactor)->{reactor};
+  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
 
   weaken $self;
   $client->on(
@@ -108,9 +108,9 @@ sub reset {
 sub server {
   my ($self, $cb) = (_instance(shift), pop);
   my $args = ref $_[0] ? $_[0] : {@_};
-  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
 
   my $server = Mojo::IOLoop::Server->new;
+  my $class = delete $args->{stream_class} || 'Mojo::IOLoop::Stream';
   weaken $self;
   $server->on(
     accept => sub {
@@ -402,11 +402,12 @@ Get L<Mojo::IOLoop::Server> object for id or turn object into an acceptor.
   my $id = $loop->client({address => '127.0.0.1', port => 3000} => sub {...});
 
 Open a TCP/IP or UNIX domain socket connection with L<Mojo::IOLoop::Client> and
-create a L<Mojo::IOLoop::Stream> object, takes the same arguments as
-L<Mojo::IOLoop::Client/"connect">.
+create a stream object (usually L<Mojo::IOLoop::Stream>), takes the same
+arguments as L<Mojo::IOLoop::Client/"connect"> in addition to C<stream_class>.
 
-  # Connect to 127.0.0.1 on port 3000
-  Mojo::IOLoop->client({port => 3000} => sub {
+  # Connect to 127.0.0.1 on port 3000 with a custom stream class
+  my $class = 'Mojo::IOLoop::Stream::HTTPClient';
+  Mojo::IOLoop->client({port => 3000, stream_class => $class} => sub {
     my ($loop, $err, $stream) = @_;
     ...
   });
@@ -542,11 +543,12 @@ Remove everything and stop the event loop.
   my $id = $loop->server({port => 3000} => sub {...});
 
 Accept TCP/IP and UNIX domain socket connections with L<Mojo::IOLoop::Server>
-and create L<Mojo::IOLoop::Stream> objects, takes the same arguments as
-L<Mojo::IOLoop::Server/"listen">.
+and create stream objects (usually L<Mojo::IOLoop::Stream>, takes the same
+arguments as L<Mojo::IOLoop::Server/"listen"> in addition to C<stream_class>.
 
-  # Listen on port 3000
-  Mojo::IOLoop->server({port => 3000} => sub {
+  # Listen on port 3000 with a custom stream class
+  my $class = 'Mojo::IOLoop::Stream::HTTPServer';
+  Mojo::IOLoop->server({port => 3000, stream_class => $class} => sub {
     my ($loop, $stream, $id) = @_;
     ...
   });
@@ -659,8 +661,9 @@ seconds.
 
 =head2 transition
 
-  my $stream = Mojo::IOLoop->transition($id, 'Mojo::IOLoop::Stream::HTTPClient');
-  my $stream = $loop->transition($id, 'Mojo::IOLoop::Stream::HTTPClient');
+  my $stream =
+    Mojo::IOLoop->transition($id => 'Mojo::IOLoop::Stream::HTTPClient');
+  my $stream = $loop->transition($id => 'Mojo::IOLoop::Stream::HTTPClient');
 
 Transition stream to a different class.
 

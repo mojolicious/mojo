@@ -37,7 +37,6 @@ $c->stash->{layout}   = 'something';
 $c->stash->{handler}  = 'debug';
 is_deeply [$renderer->render($c)], ['Hello Mojo!Hello Mojo!', 'test'],
   'normal rendering with layout';
-is delete $c->stash->{layout}, 'something';
 
 # Rendering a path with dots
 $c->stash->{template} = 'some.path.with.dots/template';

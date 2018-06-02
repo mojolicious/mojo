@@ -166,7 +166,18 @@ sub render {
   my $app = $self->app;
   my $plugins = $app->plugins->emit_hook(before_render => $self, $args);
 
+  # Localize "extends" and "layout" to allow argument overrides
   my ($maybe, $ts) = @{$args}{'mojo.maybe', 'mojo.string'};
+  my $stash = $self->stash;
+  local $stash->{layout}  = $stash->{layout}  if exists $stash->{layout};
+  local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
+
+  # Rendering to string
+  local @{$stash}{keys %$args} if $ts || $maybe;
+  delete @{$stash}{qw(layout extends)} if $ts;
+
+  # All other arguments just become part of the stash
+  @$stash{keys %$args} = values %$args;
   my ($output, $format) = $app->renderer->render($self, $args);
 
   # Maybe no 404
@@ -178,7 +189,7 @@ sub render {
   my $headers = $self->res->body($output)->headers;
   $headers->content_type($app->types->type($format) || 'text/plain')
     unless $headers->content_type;
-  return !!$self->rendered($args->{status} || $self->stash->{status});
+  return !!$self->rendered($stash->{status});
 }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }

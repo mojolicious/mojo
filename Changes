@@ -1,5 +1,5 @@
 
-7.83  2018-06-01
+7.83  2018-06-02
   - Replaced MOJO_DAEMON_DEBUG and MOJO_USERAGENT_DEBUG environment variables
     with MOJO_SERVER_DEBUG and MOJO_CLIENT_DEBUG. (anparker)
   - Added modules Mojo::IOLoop::Stream::HTTPClient,
@@ -9,6 +9,7 @@
   - Added close_connections method to Mojo::Server::Daemon. (anparker)
   - Added stream_class argument to client and server methods in Mojo::IOLoop.
     (anparker)
+  - Fixed a small render_maybe argument localization bug.
 
 7.82  2018-05-27
   - Removed experimental status from new_tag and selector methods in Mojo::DOM.

@@ -73,19 +73,7 @@ sub get_helper {
 sub render {
   my ($self, $c, $args) = @_;
 
-  # Localize "extends" and "layout" to allow argument overrides
-  my $stash = $c->stash;
-  local $stash->{layout}  = $stash->{layout}  if exists $stash->{layout};
-  local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
-
-  # Rendering to string
-  my ($maybe, $string) = delete @{$args}{'mojo.maybe', 'mojo.string'};
-  local @{$stash}{keys %$args} if $string || $maybe;
-  delete @{$stash}{qw(layout extends)} if $string;
-
-  # All other arguments just become part of the stash
-  @$stash{keys %$args} = values %$args;
-
+  my $stash   = $c->stash;
   my $options = {
     encoding => $self->encoding,
     handler  => $stash->{handler},
@@ -121,8 +109,8 @@ sub render {
     $content->{content} //= $output if $output =~ /\S/;
   }
 
-  return $string ? $output : _maybe($options->{encoding}, $output),
-    $options->{format};
+  return $output if $args->{'mojo.string'};
+  return _maybe($options->{encoding}, $output), $options->{format};
 }
 
 sub template_for {

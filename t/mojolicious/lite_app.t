@@ -46,6 +46,13 @@ is app->build_controller->test->helper, 'Mojolicious::Controller',
 
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
+app->renderer->add_handler(
+  change_status => sub {
+    my ($renderer, $c, $output, $options) = @_;
+    $c->stash(status => 500);
+    $$output = "Bad\n";
+  }
+);
 
 # Rewrite when rendering to string
 hook before_render => sub {
@@ -154,6 +161,13 @@ get '/dead_template' => 'dead_template';
 get '/dead_renderer' => sub { shift->render(handler => 'dead') };
 
 get '/dead_auto_renderer' => {handler => 'dead'};
+
+get '/handler_change_status' =>
+  sub { shift->render(handler => 'change_status', status => 200) };
+
+get '/template_change_status' => sub {
+  shift->render(inline => 'Bad<% stash status => 500; %>', status => 200);
+};
 
 get '/regex/in/template' => 'test(test)(\Qtest\E)(';
 
@@ -663,6 +677,12 @@ $t->get_ok('/dead_auto_renderer')->status_is(500)
 # Dead template
 $t->get_ok('/dead_template')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/works too!/);
+
+# Handler that changes status
+$t->get_ok('/handler_change_status')->status_is(500)->content_is("Bad\n");
+
+# Template that changes status
+$t->get_ok('/template_change_status')->status_is(500)->content_is("Bad\n");
 
 # Regex in name
 $t->get_ok('/regex/in/template')->status_is(200)

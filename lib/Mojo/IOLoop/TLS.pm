@@ -53,6 +53,7 @@ sub _expand {
     SSL_error_trap     => sub { $self->_cleanup->emit(error => $_[1]) },
     SSL_startHandshake => 0
   };
+  $tls->{SSL_alpn_protocols} = $args->{tls_protocols} if $args->{tls_protocols};
   $tls->{SSL_ca_file} = $args->{tls_ca}
     if $args->{tls_ca} && -T $args->{tls_ca};
   $tls->{SSL_cert_file}   = $args->{tls_cert}    if $args->{tls_cert};
@@ -61,8 +62,6 @@ sub _expand {
   $tls->{SSL_server}      = $args->{server}      if $args->{server};
   $tls->{SSL_verify_mode} = $args->{tls_verify}  if defined $args->{tls_verify};
   $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
-  $tls->{SSL_alpn_protocols} = $args->{tls_protocols}
-    if $args->{tls_protocols} && IO::Socket::SSL->can_alpn;
 
   if ($args->{server}) {
     $tls->{SSL_cert_file} ||= $CERT;

@@ -7,7 +7,7 @@ use Mojo::IOLoop::TLS;
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
-plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
   unless Mojo::IOLoop::TLS->can_tls;
 
 # To regenerate all required certificates run these commands (12.12.2014)
@@ -363,5 +363,37 @@ Mojo::IOLoop->start;
 is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
+
+# ALPN
+SKIP: {
+  skip 'ALPN support required!', 1 unless IO::Socket::SSL->can_alpn;
+
+  my ($server_proto, $client_proto);
+  $id = Mojo::IOLoop->server(
+    address       => '127.0.0.1',
+    tls           => 1,
+    tls_protocols => ['foo', 'bar', 'baz'],
+    sub {
+      my ($loop, $stream) = @_;
+      $server_proto = $stream->handle->alpn_selected;
+      $stream->close;
+    }
+  );
+  $port = Mojo::IOLoop->acceptor($id)->port;
+  Mojo::IOLoop->client(
+    port          => $port,
+    tls           => 1,
+    tls_protocols => ['baz', 'bar'],
+    tls_verify    => 0x00,
+    sub {
+      my ($loop, $err, $stream) = @_;
+      $client_proto = $stream->handle->alpn_selected;
+      $stream->on(close => sub { Mojo::IOLoop->stop });
+    }
+  );
+  Mojo::IOLoop->start;
+  is $server_proto, 'baz', 'right protocol';
+  is $client_proto, 'baz', 'right protocol';
+}
 
 done_testing();

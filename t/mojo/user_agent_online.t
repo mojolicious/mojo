@@ -10,7 +10,7 @@ use Mojo::IOLoop::TLS;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
   unless Mojo::IOLoop::TLS->can_tls;
 plan skip_all => 'Mozilla::CA required for this test!'
   unless eval { require Mozilla::CA; 1 };

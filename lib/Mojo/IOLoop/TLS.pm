@@ -8,10 +8,7 @@ use Scalar::Util 'weaken';
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('1.94'); 1 };
-use constant DEFAULT => eval { IO::Socket::SSL->VERSION('1.965') }
-  ? \undef
-  : '';
+  : eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.009'); 1 };
 use constant READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -29,7 +26,7 @@ sub can_tls {TLS}
 sub negotiate {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
-  return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
+  return $self->emit(error => 'IO::Socket::SSL 2.009+ required for TLS support')
     unless TLS;
 
   my $handle = $self->{handle};
@@ -64,6 +61,8 @@ sub _expand {
   $tls->{SSL_server}      = $args->{server}      if $args->{server};
   $tls->{SSL_verify_mode} = $args->{tls_verify}  if defined $args->{tls_verify};
   $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
+  $tls->{SSL_alpn_protocols} = $args->{tls_protocols}
+    if $args->{tls_protocols} && IO::Socket::SSL->can_alpn;
 
   if ($args->{server}) {
     $tls->{SSL_cert_file} ||= $CERT;
@@ -165,7 +164,7 @@ implements the following new ones.
 
   my $bool = Mojo::IOLoop::TLS->can_tls;
 
-True if L<IO::Socket::SSL> 1.94+ is installed and TLS support enabled.
+True if L<IO::Socket::SSL> 2.009+ is installed and TLS support enabled.
 
 =head2 negotiate
 

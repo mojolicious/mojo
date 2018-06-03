@@ -272,7 +272,7 @@ True if L<IO::Socket::SOCKS> 0.64+ is installed and SOCKS5 support enabled.
 
 Open a socket connection to a remote host. Note that non-blocking name
 resolution depends on L<Net::DNS::Native> (0.15+), SOCKS5 support on
-L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (1.94+).
+L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (2.009+).
 
 These options are currently available:
 
@@ -362,6 +362,12 @@ Path to the TLS certificate file.
   tls_key => '/etc/tls/client.key'
 
 Path to the TLS key file.
+
+=item tls_protocols
+
+  tls_protocols => ['foo', 'bar']
+
+ALPN protocols to negotiate.
 
 =item tls_verify
 

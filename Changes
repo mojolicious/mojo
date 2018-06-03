@@ -2,11 +2,13 @@
 7.83  2018-06-02
   - Replaced MOJO_DAEMON_DEBUG and MOJO_USERAGENT_DEBUG environment variables
     with MOJO_SERVER_DEBUG and MOJO_CLIENT_DEBUG. (anparker)
+  - Updated IO::Socket::SSL requirement to 2.009 for ALPN support.
   - Added modules Mojo::IOLoop::Stream::HTTPClient,
     Mojo::IOLoop::Stream::HTTPServer, Mojo::IOLoop::Stream::WebSocketClient and
     Mojo::IOLoop::Stream::WebSocketServer. (anparker)
   - Added transition method to Mojo::IOLoop. (anparker)
   - Added close_connections method to Mojo::Server::Daemon. (anparker)
+  - Added tls_protocols argument to client and server methods in Mojo::IOLoop.
   - Added stream_class argument to client and server methods in Mojo::IOLoop.
     (anparker)
   - Fixed a small render_maybe argument localization bug.

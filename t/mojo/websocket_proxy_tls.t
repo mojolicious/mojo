@@ -10,7 +10,7 @@ use lib "$FindBin::Bin/lib";
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
-plan skip_all => 'IO::Socket::SSL 1.94+ required for this test!'
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
   unless Mojo::IOLoop::TLS->can_tls;
 
 use Mojo::IOLoop;

@@ -1,4 +1,6 @@
 
+7.84  2018-06-03
+
 7.83  2018-06-02
   - Replaced MOJO_DAEMON_DEBUG and MOJO_USERAGENT_DEBUG environment variables
     with MOJO_SERVER_DEBUG and MOJO_CLIENT_DEBUG. (anparker)

@@ -8,9 +8,8 @@
     Mojo::IOLoop::Stream::WebSocketServer. (anparker)
   - Added transition method to Mojo::IOLoop. (anparker)
   - Added close_connections method to Mojo::Server::Daemon. (anparker)
-  - Added tls_protocols argument to client and server methods in Mojo::IOLoop.
-  - Added stream_class argument to client and server methods in Mojo::IOLoop.
-    (anparker)
+  - Added stream_class and tls_protocols arguments to client and server methods
+    in Mojo::IOLoop. (anparker, sri)
   - Fixed a small render_maybe argument localization bug.
 
 7.82  2018-05-27

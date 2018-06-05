@@ -22,35 +22,32 @@ sub app {
 
 sub nb_url { shift->_url(1, @_) }
 
-sub restart { shift->_restart(1) }
+sub restart { delete @{$_[0]}{qw(nb_port nb_server port server)} }
 
 sub url { shift->_url(0, @_) }
 
-sub _restart {
-  my ($self, $full, $proto) = @_;
-  delete @{$self}{qw(nb_port port)} if $full;
-
-  $self->{proto} = $proto ||= 'http';
-
-  # Blocking
-  my $server = $self->{server}
-    = Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
-  weaken $server->app($self->app)->{app};
-  my $port = $self->{port} ? ":$self->{port}" : '';
-  $self->{port}
-    = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
-
-  # Non-blocking
-  $server = $self->{nb_server} = Mojo::Server::Daemon->new(silent => 1);
-  weaken $server->app($self->app)->{app};
-  $port = $self->{nb_port} ? ":$self->{nb_port}" : '';
-  $self->{nb_port}
-    = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
-}
-
 sub _url {
-  my ($self, $nb) = (shift, shift);
-  $self->_restart(0, @_) if !$self->{server} || @_;
+  my ($self, $nb, $proto) = @_;
+
+  if (!$self->{server} || $proto) {
+    $proto = $self->{proto} = $proto || 'http';
+
+    # Blocking
+    my $server = $self->{server}
+      = Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
+    weaken $server->app($self->app)->{app};
+    my $port = $self->{port} ? ":$self->{port}" : '';
+    $self->{port}
+      = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
+
+    # Non-blocking
+    $server = $self->{nb_server} = Mojo::Server::Daemon->new(silent => 1);
+    weaken $server->app($self->app)->{app};
+    $port = $self->{nb_port} ? ":$self->{nb_port}" : '';
+    $self->{nb_port}
+      = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
+  }
+
   my $port = $nb ? $self->{nb_port} : $self->{port};
   return Mojo::URL->new("$self->{proto}://127.0.0.1:$port/");
 }

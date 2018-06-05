@@ -1,5 +1,7 @@
 
-7.84  2018-06-03
+7.84  2018-06-05
+  - Fixed a bug where test servers would be started when reusing a
+    Mojo::UserAgent object after fork.
 
 7.83  2018-06-02
   - Replaced MOJO_DAEMON_DEBUG and MOJO_USERAGENT_DEBUG environment variables

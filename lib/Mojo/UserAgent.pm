@@ -171,11 +171,10 @@ sub _connect_proxy {
 
       # CONNECT failed
       return $self->_error($id, 'Proxy connection failed')
-        if ($tx->error || !$tx->res->is_success || !$tx->keep_alive);
+        if $tx->error || !$tx->res->is_success || !$tx->keep_alive;
 
       # Start real transaction without TLS upgrade
-      return $self->_process($id)
-        unless $tx->req->url->protocol eq 'https';
+      return $self->_process($id) unless $tx->req->url->protocol eq 'https';
 
       # TLS upgrade before starting the real transaction
       my $handle = $loop->stream($id)->steal_handle;

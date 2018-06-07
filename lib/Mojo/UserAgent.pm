@@ -106,10 +106,10 @@ sub _cleanup {
 }
 
 sub _connect {
-  my ($self, $loop, $peer, $tx, $handle, $cb) = @_;
+  my ($self, $loop, $tx, $handle) = @_;
 
   my $t = $self->transactor;
-  my ($proto, $host, $port) = $peer ? $t->peer($tx) : $t->endpoint($tx);
+  my ($proto, $host, $port) = $handle ? $t->endpoint($tx) : $t->peer($tx);
 
   my %options = (
     timeout      => $self->connect_timeout,
@@ -149,7 +149,7 @@ sub _connect {
       $stream->on(close => sub { $self && $self->_finish($id, 1) });
       $stream->on(error => sub { $self && $self->_error($id, pop) });
       $stream->on(upgrade => sub { $self->_upgrade($id, pop) });
-      $self->$cb($id);
+      $self->_process($id);
     }
   );
 }
@@ -159,44 +159,31 @@ sub _connect_proxy {
 
   # Start CONNECT request
   return undef unless my $new = $self->transactor->proxy_connect($old);
-  return $self->_start(
+  my $id;
+  return $id = $self->_start(
     ($loop, $new) => sub {
       my ($self, $tx) = @_;
 
-      # CONNECT failed
+      # Real transaction
       $old->previous($tx)->req->via_proxy(0);
-      my $id = $tx->connection;
-      if ($tx->error || !$tx->res->is_success || !$tx->keep_alive) {
-        $old->res->error({message => 'Proxy connection failed'});
-        $self->_remove($id) if $id;
-        return $self->$cb($old);
-      }
+      my $c = $self->{connections}{$id}
+        = {cb => $cb, ioloop => $loop, tx => $old};
+
+      # CONNECT failed
+      return $self->_error($id, 'Proxy connection failed')
+        if ($tx->error || !$tx->res->is_success || !$tx->keep_alive);
 
       # Start real transaction without TLS upgrade
-      return $self->_start($loop, $old->connection($id), $cb)
+      return $self->_process($id)
         unless $tx->req->url->protocol eq 'https';
 
       # TLS upgrade before starting the real transaction
       my $handle = $loop->stream($id)->steal_handle;
       $self->_remove($id);
-      $id = $self->_connect($loop, 0, $old, $handle,
-        sub { shift->_start($loop, $old->connection($id), $cb) });
-      $self->{connections}{$id} = {cb => $cb, ioloop => $loop, tx => $old};
+      $id = $self->_connect($loop, $old, $handle);
+      $self->{connections}{$id} = $c;
     }
   );
-}
-
-sub _connected {
-  my ($self, $id) = @_;
-
-  my $c      = $self->{connections}{$id};
-  my $stream = $c->{ioloop}->stream($id)->timeout($self->inactivity_timeout)
-    ->request_timeout($self->request_timeout);
-  my $tx = $c->{tx}->connection($id);
-
-  weaken $self;
-  $tx->on(finish => sub { $self->_finish($id) });
-  $stream->process($tx);
 }
 
 sub _connection {
@@ -204,12 +191,12 @@ sub _connection {
 
   # Reuse connection
   my ($proto, $host, $port) = $self->transactor->endpoint($tx);
-  my $id = $tx->connection || $self->_dequeue($loop, "$proto:$host:$port", 1);
-  if ($id) {
+  my $id;
+  if ($id = $self->_dequeue($loop, "$proto:$host:$port", 1)) {
     warn "-- Reusing connection $id ($proto://$host:$port)\n" if DEBUG;
     @{$self->{connections}{$id}}{qw(cb tx)} = ($cb, $tx);
     $tx->kept_alive(1) unless $tx->connection;
-    $self->_connected($id);
+    $self->_process($id);
     return $id;
   }
 
@@ -220,7 +207,7 @@ sub _connection {
   $tx->res->error({message => "Unsupported protocol: $proto"})
     and return $loop->next_tick(sub { $self->$cb($tx) })
     unless $proto eq 'http' || $proto eq 'https' || $proto eq 'http+unix';
-  $id = $self->_connect($loop, 1, $tx, undef, \&_connected);
+  $id = $self->_connect($loop, $tx);
   warn "-- Connect $id ($proto://$host:$port)\n" if DEBUG;
   $self->{connections}{$id} = {cb => $cb, ioloop => $loop, tx => $tx};
 
@@ -261,6 +248,19 @@ sub _finish {
 
   $self->_reuse($id, $close) unless uc $tx->req->method eq 'CONNECT';
   $c->{cb}($self, $tx) unless $self->_redirect($c, $tx);
+}
+
+sub _process {
+  my ($self, $id) = @_;
+
+  my $c      = $self->{connections}{$id};
+  my $stream = $c->{ioloop}->stream($id)->timeout($self->inactivity_timeout)
+    ->request_timeout($self->request_timeout);
+  my $tx = $c->{tx}->connection($id);
+
+  weaken $self;
+  $tx->on(finish => sub { $self->_finish($id) });
+  $stream->process($tx);
 }
 
 sub _redirect {
@@ -314,7 +314,7 @@ sub _start {
 sub _upgrade {
   my ($self, $id, $ws) = @_;
 
-  my $c       = delete $self->{connections}{$id};
+  my $c       = $self->{connections}{$id};
   my $loop    = $c->{ioloop};
   my $timeout = $loop->stream($id)->timeout;
   my $stream  = $loop->transition($id, 'Mojo::IOLoop::Stream::WebSocketClient');
@@ -327,7 +327,6 @@ sub _upgrade {
   $self->cookie_jar->collect($ws);
 
   $c->{cb}($self, $c->{tx} = $ws);
-  $self->{connections}{$id} = $c;
   $stream->process($ws);
 }
 

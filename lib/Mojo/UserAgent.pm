@@ -244,7 +244,6 @@ sub _finish {
   return $self->_reuse($id, $close) unless my $tx = $c->{tx};
 
   $self->cookie_jar->collect($tx);
-
   $self->_reuse($id, $close) unless uc $tx->req->method eq 'CONNECT';
   $c->{cb}($self, $tx) unless $self->_redirect($c, $tx);
 }
@@ -294,18 +293,16 @@ sub _reuse {
 sub _start {
   my ($self, $loop, $tx, $cb) = @_;
 
-  # Application serve
+  # Application server
   my $url = $tx->req->url;
-  unless ($url->is_abs) {
-    my $base
-      = $loop == $self->ioloop ? $self->server->url : $self->server->nb_url;
+  if (!$url->is_abs && (my $server = $self->server)) {
+    my $base = $loop == $self->ioloop ? $server->url : $server->nb_url;
     $url->scheme($base->scheme)->host($base->host)->port($base->port);
   }
 
   $_->prepare($tx) for $self->proxy, $self->cookie_jar;
   my $max = $self->max_response_size;
   $tx->res->max_message_size($max) if defined $max;
-
   $self->emit(start => $tx);
   return $self->_connection($loop, $tx, $cb);
 }
@@ -324,12 +321,9 @@ sub _upgrade {
   $stream->on(close => sub { $self && $self->_remove($id) });
 
   $self->cookie_jar->collect($ws);
-
   $c->{cb}($self, $c->{tx} = $ws);
   $stream->process($ws);
 }
-
-sub _url { shift->req->url->to_abs }
 
 1;
 

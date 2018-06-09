@@ -107,8 +107,8 @@ sub _write_content {
   my $self = shift;
 
   # Protect from resume event recursion
-  return if !(my $tx = $self->{tx}) || $self->{cont_writing};
-  local $self->{cont_writing} = 1;
+  return if !(my $tx = $self->{tx}) || $self->{write_lock};
+  local $self->{write_lock} = 1;
   my $chunk = $tx->server_write;
   warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   my $next

@@ -8,7 +8,7 @@ use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
-has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
+has request_timeout => 0;
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -92,8 +92,8 @@ sub _write_content {
   my $self = shift;
 
   # Protect from resume event recursion
-  return if !(my $tx = $self->{tx}) || $self->{cont_writing};
-  local $self->{cont_writing} = 1;
+  return if !(my $tx = $self->{tx}) || $self->{write_lock};
+  local $self->{write_lock} = 1;
   my $chunk = $tx->client_write;
   warn term_escape "-- Client >>> Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   return unless length $chunk;
@@ -169,9 +169,8 @@ L<Mojo::IOLoop::Stream> and implements the following ones.
   $stream     = $stream->request_timeout(5);
 
 Maximum amount of time in seconds sending the request and receiving a whole
-response may take before getting canceled, defaults to the value of the
-C<MOJO_REQUEST_TIMEOUT> environment variable or C<0>. Setting the value to C<0>
-will allow to wait indefinitely.
+response may take before getting canceled, defaults to C<0>. Setting the value
+to C<0> will allow to wait indefinitely.
 
 =head1 METHODS
 

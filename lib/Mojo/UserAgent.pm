@@ -325,6 +325,8 @@ sub _upgrade {
   $stream->process($ws);
 }
 
+sub _url { shift->req->url->to_abs }
+
 1;
 
 =encoding utf8

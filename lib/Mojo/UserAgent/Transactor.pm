@@ -41,6 +41,15 @@ sub endpoint {
 
 sub peer { _proxy($_[1], $_[0]->endpoint($_[1])) }
 
+sub promisify {
+  my ($self, $promise, $tx) = @_;
+  my $err = $tx->error;
+  return $promise->reject($err->{message}) if $err && !$err->{code};
+  return $promise->reject('WebSocket handshake failed')
+    if $tx->req->is_handshake && !$tx->is_websocket;
+  $promise->resolve($tx);
+}
+
 sub proxy_connect {
   my ($self, $old) = @_;
 
@@ -375,6 +384,13 @@ Actual endpoint for transaction.
   my ($proto, $host, $port) = $t->peer(Mojo::Transaction::HTTP->new);
 
 Actual peer for transaction.
+
+=head2 promisify
+
+  $t->promisify(Mojo::Promise->new, Mojo::Transaction::HTTP->new);
+
+Resolve or reject L<Mojo::Promise> object with L<Mojo::Transaction::HTTP>
+object.
 
 =head2 proxy_connect
 

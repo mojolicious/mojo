@@ -71,19 +71,8 @@ sub start {
 
 sub start_p {
   my ($self, $tx) = @_;
-
   my $promise = Mojo::Promise->new;
-  $self->start(
-    $tx => sub {
-      my ($self, $tx) = @_;
-      my $err = $tx->error;
-      return $promise->reject($err->{message}) if $err && !$err->{code};
-      return $promise->reject('WebSocket handshake failed')
-        if $tx->req->is_handshake && !$tx->is_websocket;
-      $promise->resolve($tx);
-    }
-  );
-
+  $self->start($tx => sub { shift->transactor->promisify($promise, shift) });
   return $promise;
 }
 

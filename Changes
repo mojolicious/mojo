@@ -1,5 +1,6 @@
 
-7.85  2018-06-06
+7.85  2018-06-10
+  - Added promisify method to Mojo::UserAgent::Transactor.
 
 7.84  2018-06-05
   - Fixed a bug where test servers would be started when reusing a

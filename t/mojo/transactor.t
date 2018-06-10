@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
+use Mojo::Promise;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::Transactor;
@@ -1010,6 +1011,33 @@ $tx = $t->tx(CONNECT => 'http://mojolicious.org');
 $tx->res->code(302);
 $tx->res->headers->location('http://example.com/bar');
 is $t->redirect($tx), undef, 'unsupported redirect';
+
+# Promisify
+my $promise = Mojo::Promise->new;
+my (@results, @errors);
+$promise->then(sub { push @results, @_ }, sub { push @errors, @_ });
+$tx = $t->tx(GET => '/');
+$t->promisify($promise, $tx);
+$promise->wait;
+is_deeply \@results, [$tx], 'promise resolved';
+is_deeply \@errors, [], 'promise not rejected';
+$promise = Mojo::Promise->new;
+(@results, @errors) = ();
+$promise->then(sub { push @results, @_ }, sub { push @errors, @_ });
+$tx = $t->websocket('/');
+$t->promisify($promise, $tx);
+$promise->wait;
+is_deeply \@results, [], 'promise not resolved';
+is_deeply \@errors, ['WebSocket handshake failed'], 'promise rejected';
+$promise = Mojo::Promise->new;
+(@results, @errors) = ();
+$promise->then(sub { push @results, @_ }, sub { push @errors, @_ });
+$tx = $t->tx(GET => '/');
+$tx->res->error({message => 'Premature connection close'});
+$t->promisify($promise, $tx);
+$promise->wait;
+is_deeply \@results, [], 'promise not resolved';
+is_deeply \@errors, ['Premature connection close'], 'promise rejected';
 
 # Abstract methods
 eval { Mojo::Transaction->client_read };

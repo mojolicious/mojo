@@ -1,5 +1,6 @@
 
 7.85  2018-06-10
+  - Removed deprecated build_tx, config, handler and log methods from Mojo.
   - Added promisify method to Mojo::UserAgent::Transactor.
 
 7.84  2018-06-05
@@ -105,7 +106,7 @@
     Mojolicious::Renderer.
 
 7.71  2018-03-15
-  - Deprecated Mojo::build_tx, Mojo::Config, Mojo::handler and Mojo::log.
+  - Deprecated Mojo::build_tx, Mojo::config, Mojo::handler and Mojo::log.
   - Added config method to Mojolicious.
   - Fixed exceptions caused by non-UTF-8 files in Mojo::Exception. (Grinnz)
 

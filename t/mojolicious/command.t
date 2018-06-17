@@ -33,7 +33,12 @@ chdir $cwd;
 
 # Generating files
 is $command->rel_file('foo/bar.txt')->basename, 'bar.txt', 'right result';
-my $template = "@@ foo_bar\njust <%= 'works' %>!\n";
+my $template = <<'EOF';
+@@ foo_bar
+just <%= 'works' %>!
+@@ dies
+% die 'template error';
+EOF
 open my $data, '<', \$template;
 no strict 'refs';
 *{"Mojolicious::Command::DATA"} = $data;
@@ -71,6 +76,8 @@ $buffer = '';
 like $buffer, qr/\[exist\]/, 'right output';
 open my $xml, '<', $command->rel_file('123.xml');
 is join('', <$xml>), "seems\nto\nwork", 'right result';
+eval { $command->render_data('dies') };
+like $@, qr/template error/, 'right error';
 chdir $cwd;
 
 # Quiet

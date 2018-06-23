@@ -7,8 +7,7 @@ has description => 'Generate Mojolicious application directory structure';
 has usage => sub { shift->extract_usage };
 
 sub run {
-  my ($self, $class) = @_;
-  $class ||= 'MyApp';
+  my ($self, $class) = (shift, shift || 'MyApp');
 
   # Prevent bad applications
   die <<EOF unless $class =~ /^[A-Z](?:\w|::)+$/;
@@ -18,12 +17,13 @@ EOF
 
   # Script
   my $name = class_to_file $class;
-  $self->render_to_rel_file('mojo', "$name/script/$name", $class);
+  $self->template({vars => 1});
+  $self->render_to_rel_file('mojo', "$name/script/$name", {class => $class});
   $self->chmod_rel_file("$name/script/$name", 0744);
 
   # Application class
   my $app = class_to_path $class;
-  $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
+  $self->render_to_rel_file('appclass', "$name/lib/$app", {class => $class});
 
   # Config file (using the default moniker)
   $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.conf");
@@ -31,10 +31,11 @@ EOF
   # Controller
   my $controller = "${class}::Controller::Example";
   my $path       = class_to_path $controller;
-  $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
+  $self->render_to_rel_file('controller', "$name/lib/$path",
+    {class => $controller});
 
   # Test
-  $self->render_to_rel_file('test', "$name/t/basic.t", $class);
+  $self->render_to_rel_file('test', "$name/t/basic.t", {class => $class});
 
   # Static file
   $self->render_to_rel_file('static', "$name/public/index.html");
@@ -114,7 +115,6 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 __DATA__
 
 @@ mojo
-% my $class = shift;
 #!/usr/bin/env perl
 
 use strict;
@@ -128,7 +128,6 @@ use Mojolicious::Commands;
 Mojolicious::Commands->start_app('<%= $class %>');
 
 @@ appclass
-% my $class = shift;
 package <%= $class %>;
 use Mojo::Base 'Mojolicious';
 
@@ -152,7 +151,6 @@ sub startup {
 1;
 
 @@ controller
-% my $class = shift;
 package <%= $class %>;
 use Mojo::Base 'Mojolicious::Controller';
 
@@ -180,7 +178,6 @@ sub welcome {
 </html>
 
 @@ test
-% my $class = shift;
 use Mojo::Base -strict;
 
 use Test::More;

@@ -35,9 +35,12 @@ chdir $cwd;
 is $command->rel_file('foo/bar.txt')->basename, 'bar.txt', 'right result';
 my $template = <<'EOF';
 @@ foo_bar
-just <%= 'works' %>!
+% my $word = shift;
+just <%= $word %>!
 @@ dies
 % die 'template error';
+@@ bar_baz
+just <%= $word %> too!
 EOF
 open my $data, '<', \$template;
 no strict 'refs';
@@ -47,11 +50,21 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $command->render_to_rel_file('foo_bar', 'bar/baz.txt');
+  $command->render_to_rel_file('foo_bar', 'bar/baz.txt', 'works');
 }
 like $buffer, qr/\[mkdir\].*\[write\]/s, 'right output';
 open my $txt, '<', $command->rel_file('bar/baz.txt');
 is join('', <$txt>), "just works!\n", 'right result';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $command->template({vars => 1})
+    ->render_to_rel_file('bar_baz', 'bar/two.txt', {word => 'works'});
+}
+like $buffer, qr/\[exist\].*\[write\]/s, 'right output';
+open $txt, '<', $command->rel_file('bar/two.txt');
+is join('', <$txt>), "just works too!\n", 'right result';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;

@@ -1,5 +1,6 @@
 
-7.86  2018-06-19
+7.86  2018-06-23
+  - Added template attribute to Mojolicious::Command.
 
 7.85  2018-06-17
   - Removed deprecated build_tx, config, handler and log methods from Mojo.

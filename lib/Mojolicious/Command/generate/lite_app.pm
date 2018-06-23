@@ -5,8 +5,7 @@ has description => 'Generate Mojolicious::Lite application';
 has usage => sub { shift->extract_usage };
 
 sub run {
-  my ($self, $name) = @_;
-  $name ||= 'myapp.pl';
+  my ($self, $name) = (shift, shift || 'myapp.pl');
   $self->render_to_rel_file('liteapp', $name);
   $self->chmod_rel_file($name, 0744);
 }

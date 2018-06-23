@@ -8,21 +8,23 @@ has description => 'Generate Mojolicious plugin directory structure';
 has usage => sub { shift->extract_usage };
 
 sub run {
-  my ($self, $name) = @_;
-  $name ||= 'MyPlugin';
+  my ($self, $name) = (shift, shift || 'MyPlugin');
 
   # Class
   my $class = $name =~ /^[a-z]/ ? camelize $name : $name;
   $class = "Mojolicious::Plugin::$class";
   my $app = class_to_path $class;
   my $dir = join '-', split('::', $class);
-  $self->render_to_rel_file('class', "$dir/lib/$app", $class, $name);
+  $self->template({vars => 1});
+  $self->render_to_rel_file('class', "$dir/lib/$app",
+    {class => $class, name => $name});
 
   # Test
-  $self->render_to_rel_file('test', "$dir/t/basic.t", $name);
+  $self->render_to_rel_file('test', "$dir/t/basic.t", {name => $name});
 
   # Makefile
-  $self->render_to_rel_file('makefile', "$dir/Makefile.PL", $class, $app);
+  $self->render_to_rel_file('makefile', "$dir/Makefile.PL",
+    {class => $class, path => $app});
 }
 
 1;
@@ -93,7 +95,6 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 __DATA__
 
 @@ class
-% my ($class, $name) = @_;
 package <%= $class %>;
 use Mojo::Base 'Mojolicious::Plugin';
 
@@ -142,7 +143,6 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 <% %>=cut
 
 @@ test
-% my $name = shift;
 use Mojo::Base -strict;
 
 use Test::More;
@@ -162,7 +162,6 @@ $t->get_ok('/')->status_is(200)->content_is('Hello Mojo!');
 done_testing();
 
 @@ makefile
-% my ($class, $path) = @_;
 use strict;
 use warnings;
 

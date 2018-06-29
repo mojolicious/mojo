@@ -9,6 +9,11 @@ use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode getopt);
 use Scalar::Util 'weaken';
+use Mojo::Cookie::Request;
+use Mojo::Cookie::Response;
+use Mojo::Collection 'c';
+use Mojo::ByteStream 'b';
+use Mojo::File 'path';
 
 has description => 'Perform HTTP request';
 has usage => sub { shift->extract_usage };
@@ -23,10 +28,11 @@ sub run {
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   my %form;
   getopt \@args,
-    'C|charset=s' => \my $charset,
-    'c|content=s' => \$in,
-    'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
-    'H|header=s'  => \my @headers,
+    'b|cookie-jar=s' => \my $cookie_jar,
+    'C|charset=s'    => \my $charset,
+    'c|content=s'    => \$in,
+    'f|form=s'       => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
+    'H|header=s'     => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
     'k|insecure'             => sub { $ua->insecure(1) },
     'M|method=s'             => \(my $method = 'GET'),
@@ -73,8 +79,13 @@ sub run {
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
   my @content = %form ? (form => \%form) : defined $in ? ($in) : ();
-  my $tx = $ua->start($ua->build_tx($method, $url, \%headers, @content));
+  my $tx = $ua->build_tx($method, $url, \%headers, @content);
+  b(path($cookie_jar)->slurp)->split("\n")->each(sub{
+    $tx->req->cookies(Mojo::Cookie::Request->new({map {%$_} @{Mojo::Cookie::Response->parse($_->to_string)}}));
+  }) if $cookie_jar && -f $cookie_jar;
+  $tx = $ua->start($tx);
   my $res = $tx->result;
+  path($cookie_jar)->spurt(c(@{$res->cookies})->join("\n")) if $cookie_jar;
 
   # JSON Pointer
   return unless defined $selector;
@@ -143,7 +154,7 @@ Mojolicious::Command::get - Get command
     ./myapp.pl get -H 'Accept: text/html' /hello.html 'head > title' text
     ./myapp.pl get //sri:secr3t@/secrets.json /1/content
     mojo get mojolicious.org
-    mojo get -v -r -o 25 -i 50 google.com
+    mojo get -v -r -o 25 -i 50 -b cookie-jar google.com
     mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicious.org
     mojo get -u 'sri:s3cret' https://mojolicious.org
     mojo get mojolicious.org > example.html
@@ -159,6 +170,7 @@ Mojolicious::Command::get - Get command
     mojo get -H 'Host: example.com' http+unix://%2Ftmp%2Fmyapp.sock/index.html
 
   Options:
+    -b, --cookie-jar <file name>         Cookie jar file to use
     -C, --charset <charset>              Charset of HTML/XML content, defaults
                                          to auto-detection
     -c, --content <content>              Content to send with request

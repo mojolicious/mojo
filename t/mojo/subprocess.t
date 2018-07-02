@@ -22,7 +22,9 @@ $subprocess->run(
   }
 );
 $result = $$;
+ok !$subprocess->pid, 'no process id available yet';
 Mojo::IOLoop->start;
+ok $subprocess->pid, 'process id available';
 ok !$fail, 'no error';
 is $result, $$ . 0 . $subprocess->pid . ('x' x 100000), 'right result';
 

@@ -1,6 +1,8 @@
 
-7.86  2018-06-23
+7.86  2018-07-02
   - Added template attribute to Mojolicious::Command.
+  - Improved Mojo::IOLoop::Subprocess to only fork new processes after the event
+    loop has been started.
 
 7.85  2018-06-17
   - Removed deprecated build_tx, config, handler and log methods from Mojo.

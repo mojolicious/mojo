@@ -1,7 +1,6 @@
 package Mojo::IOLoop::Subprocess;
 use Mojo::Base -base;
 
-use Carp 'croak';
 use Config;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
@@ -15,17 +14,26 @@ has serialize   => sub { \&Storable::freeze };
 sub pid { shift->{pid} }
 
 sub run {
+  my ($self, @args) = @_;
+  $self->ioloop->next_tick(sub { $self->_start(@args) });
+  return $self;
+}
+
+sub _start {
   my ($self, $child, $parent) = @_;
 
   # No fork emulation support
-  croak 'Subprocesses do not support fork emulation' if $Config{d_pseudofork};
+  return $self->$parent('Subprocesses do not support fork emulation')
+    if $Config{d_pseudofork};
 
   # Pipe for subprocess communication
-  pipe(my $reader, my $writer) or croak "Can't create pipe: $!";
+  return $self->$parent("Can't create pipe: $!")
+    unless pipe(my $reader, my $writer);
   $writer->autoflush(1);
 
   # Child
-  croak "Can't fork: $!" unless defined(my $pid = $self->{pid} = fork);
+  return $self->$parent("Can't fork: $!")
+    unless defined(my $pid = $self->{pid} = fork);
   unless ($pid) {
     $self->ioloop->reset;
     my $results = eval { [$self->$child] } || [];

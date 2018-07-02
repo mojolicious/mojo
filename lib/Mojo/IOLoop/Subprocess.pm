@@ -1,5 +1,5 @@
 package Mojo::IOLoop::Subprocess;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Config;
 use Mojo::IOLoop;
@@ -44,7 +44,7 @@ sub _start {
   # Parent
   my $me     = $$;
   my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
-  $self->ioloop->stream($stream);
+  $self->emit('start')->ioloop->stream($stream);
   my $buffer = '';
   $stream->on(read => sub { $buffer .= pop });
   $stream->on(
@@ -55,7 +55,6 @@ sub _start {
       $self->$parent(shift(@$results) // $@, @$results);
     }
   );
-  return $self;
 }
 
 1;
@@ -92,6 +91,20 @@ Mojo::IOLoop::Subprocess - Subprocesses
 
 L<Mojo::IOLoop::Subprocess> allows L<Mojo::IOLoop> to perform computationally
 expensive operations in subprocesses, without blocking the event loop.
+
+=head1 EVENTS
+
+L<Mojo::IOLoop::Subprocess> inherits all events from L<Mojo::EventEmitter> and
+can emit the following new ones.
+
+=head2 start
+
+  $subprocess->on(start => sub {
+    my $subprocess = shift;
+    ...
+  });
+
+Emitted when the subprocess has been spawned and starts its work.
 
 =head1 ATTRIBUTES
 
@@ -132,7 +145,7 @@ L<Storable>.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Subprocess> inherits all methods from L<Mojo::Base> and
+L<Mojo::IOLoop::Subprocess> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
 =head2 pid

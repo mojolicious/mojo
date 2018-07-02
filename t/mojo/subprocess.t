@@ -13,7 +13,7 @@ use Mojo::IOLoop::Subprocess;
 # Huge result
 my ($fail, $result, @start);
 my $subprocess = Mojo::IOLoop::Subprocess->new;
-$subprocess->on(start => sub { push @start, shift->pid });
+$subprocess->on(spawn => sub { push @start, shift->pid });
 $subprocess->run(
   sub { shift->pid . $$ . ('x' x 100000) },
   sub {
@@ -28,7 +28,7 @@ Mojo::IOLoop->start;
 ok $subprocess->pid, 'process id available';
 ok !$fail, 'no error';
 is $result, $$ . 0 . $subprocess->pid . ('x' x 100000), 'right result';
-is_deeply \@start, [$subprocess->pid], 'start event has been emitted once';
+is_deeply \@start, [$subprocess->pid], 'spawn event has been emitted once';
 
 # Custom event loop
 ($fail, $result) = ();

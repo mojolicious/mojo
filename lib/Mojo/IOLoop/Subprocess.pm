@@ -44,7 +44,7 @@ sub _start {
   # Parent
   my $me     = $$;
   my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
-  $self->emit('start')->ioloop->stream($stream);
+  $self->emit('spawn')->ioloop->stream($stream);
   my $buffer = '';
   $stream->on(read => sub { $buffer .= pop });
   $stream->on(
@@ -97,14 +97,20 @@ expensive operations in subprocesses, without blocking the event loop.
 L<Mojo::IOLoop::Subprocess> inherits all events from L<Mojo::EventEmitter> and
 can emit the following new ones.
 
-=head2 start
+=head2 spawn
 
-  $subprocess->on(start => sub {
+  $subprocess->on(spawn => sub {
     my $subprocess = shift;
     ...
   });
 
-Emitted when the subprocess has been spawned and starts its work.
+Emitted in the parent process when the subprocess has been spawned.
+
+  $subprocess->on(spawn => sub {
+    my $subprocess = shift;
+    my $pid = $subprocess->pid;
+    say "Performing work in process $pid";
+  });
 
 =head1 ATTRIBUTES
 

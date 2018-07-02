@@ -1,7 +1,7 @@
 
 7.86  2018-07-02
   - Added template attribute to Mojolicious::Command.
-  - Added start event to Mojo::IOLoop::Subprocess.
+  - Added spawn event to Mojo::IOLoop::Subprocess.
   - Improved Mojo::IOLoop::Subprocess to only fork new processes after the event
     loop has been started.
 

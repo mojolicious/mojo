@@ -16,7 +16,7 @@ is_deeply app->config, {it => 'works'}, 'right value';
 
 # Invalid config file
 eval { plugin JSONConfig => {file => 'public/hello.txt'} };
-like $@, qr/Malformed JSON/, 'right error';
+like $@, qr/JSON/, 'right error';
 
 # Load plugins
 my $config

@@ -1,3 +1,7 @@
+use Mojo::Base -strict;
+
+BEGIN { $ENV{MOJO_NO_JSON_XS} = 1 }
+
 package JSONTest;
 use Mojo::Base -base;
 

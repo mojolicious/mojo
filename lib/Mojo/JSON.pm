@@ -4,8 +4,13 @@ use Mojo::Base -strict;
 use Carp 'croak';
 use Exporter 'import';
 use JSON::PP ();
-use Mojo::Util;
+use Mojo::Util qw(decode encode monkey_patch);
 use Scalar::Util 'blessed';
+
+# XS support requires Cpanel::JSON::XS
+use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
+  ? 0
+  : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.04'); 1 };
 
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
@@ -25,12 +30,28 @@ my %ESCAPE = (
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
+# Try to use XS if possible
+if (JSON_XS) {
+  my $BINARY
+    = Cpanel::JSON::XS->new->utf8(1)->canonical(1)->allow_nonref(1)
+    ->allow_unknown(1)->allow_blessed(1)->convert_blessed(1)
+    ->stringify_infnan(1)->escape_slash(1);
+  my $TEXT
+    = Cpanel::JSON::XS->new->utf8(0)->canonical(1)->allow_nonref(1)
+    ->allow_unknown(1)->allow_blessed(1)->convert_blessed(1)
+    ->stringify_infnan(1)->escape_slash(1);
+  monkey_patch __PACKAGE__, 'encode_json', sub { $BINARY->encode($_[0]) };
+  monkey_patch __PACKAGE__, 'decode_json', sub { $BINARY->decode($_[0]) };
+  monkey_patch __PACKAGE__, 'to_json',     sub { $TEXT->encode($_[0]) };
+  monkey_patch __PACKAGE__, 'from_json',   sub { $TEXT->decode($_[0]) };
+}
+
 sub decode_json {
   my $err = _decode(\my $value, shift);
   return defined $err ? croak $err : $value;
 }
 
-sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
+sub encode_json { encode('UTF-8', _encode_value(shift)) }
 
 sub false () {JSON::PP::false}
 
@@ -57,7 +78,7 @@ sub _decode {
     die "Missing or empty input\n" unless length(local $_ = shift);
 
     # UTF-8
-    $_ = Mojo::Util::decode 'UTF-8', $_ unless shift;
+    $_ = decode('UTF-8', $_) unless shift;
     die "Input is not UTF-8 encoded\n" unless defined;
 
     # Value
@@ -323,6 +344,10 @@ The two Unicode whitespace characters C<u2028> and C<u2029> will always be
 escaped to make JSONP easier, and the character C</> to prevent XSS attacks.
 
   "\x{2028}\x{2029}</script>" -> "\u2028\u2029<\/script>"
+
+For better performance the optional module L<Cpanel::JSON::XS> (4.04+) will be
+used automatically if possible. This can also be disabled with the
+C<MOJO_NO_JSON_XS> environment variable.
 
 =head1 FUNCTIONS
 

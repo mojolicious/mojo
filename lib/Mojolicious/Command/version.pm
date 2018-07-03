@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::TLS;
+use Mojo::JSON;
 use Mojolicious;
 
 has description => 'Show versions of available modules';
@@ -11,6 +12,7 @@ has usage => sub { shift->extract_usage };
 sub run {
   my $self = shift;
 
+  my $json = Mojo::JSON->JSON_XS ? $Cpanel::JSON::XS::VERSION : 'n/a';
   my $ev = eval { require Mojo::Reactor::EV; 1 } ? $EV::VERSION : 'n/a';
   my $socks
     = Mojo::IOLoop::Client->can_socks ? $IO::Socket::Socks::VERSION : 'n/a';
@@ -24,6 +26,7 @@ CORE
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
+  Cpanel::JSON::XS 4.04+  ($json)
   EV 4.0+                 ($ev)
   IO::Socket::Socks 0.64+ ($socks)
   IO::Socket::SSL 2.009+  ($tls)

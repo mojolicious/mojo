@@ -16,16 +16,14 @@ our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
 # Escaped special character map (with u2028 and u2029)
 my %ESCAPE = (
-  '"'     => '"',
-  '\\'    => '\\',
-  '/'     => '/',
-  'b'     => "\x08",
-  'f'     => "\x0c",
-  'n'     => "\x0a",
-  'r'     => "\x0d",
-  't'     => "\x09",
-  'u2028' => "\x{2028}",
-  'u2029' => "\x{2029}"
+  '"'  => '"',
+  '\\' => '\\',
+  '/'  => '/',
+  'b'  => "\x08",
+  'f'  => "\x0c",
+  'n'  => "\x0a",
+  'r'  => "\x0d",
+  't'  => "\x09"
 );
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
@@ -340,10 +338,9 @@ their values are true or false.
   \1 -> true
   \0 -> false
 
-The two Unicode whitespace characters C<u2028> and C<u2029> will always be
-escaped to make JSONP easier, and the character C</> to prevent XSS attacks.
+The character C</> will always be escaped to prevent XSS attacks.
 
-  "\x{2028}\x{2029}</script>" -> "\u2028\u2029<\/script>"
+  "</script>" -> "<\/script>"
 
 For better performance the optional module L<Cpanel::JSON::XS> (4.04+) will be
 used automatically if possible. This can also be disabled with the

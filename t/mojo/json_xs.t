@@ -4,6 +4,11 @@ use Test::More;
 use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
 use Mojo::Util qw(decode encode);
 
+BEGIN {
+  plan skip_all => 'Cpanel::JSON::XS 4.04+ required for this test!'
+    unless Mojo::JSON->JSON_XS;
+}
+
 # Basics
 my $array = decode_json '[]';
 is_deeply $array, [], 'decode_jsom';

@@ -14,7 +14,6 @@ use Mojo::Base -base;
 use overload '&' => sub {die}, '""' => sub {'works!'};
 
 package main;
-use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::ByteStream 'b';

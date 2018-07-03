@@ -1,4 +1,6 @@
 
+7.87  2018-07-03
+
 7.86  2018-07-02
   - Added template attribute to Mojolicious::Command.
   - Added spawn event to Mojo::IOLoop::Subprocess.

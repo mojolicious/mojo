@@ -221,10 +221,6 @@ is_deeply $array, ["\x{10346}"], 'successful roundtrip';
 $array = decode_json '["\\ud800\\udf46"]';
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
-# Decode object with duplicate keys
-$hash = decode_json '{"foo": 1, "foo": 2}';
-is_deeply $hash, {foo => 2}, 'decode {"foo": 1, "foo": 2}';
-
 # Complicated roudtrips
 $bytes = '{"":""}';
 $hash  = decode_json $bytes;
@@ -312,8 +308,6 @@ my $dual = dualvar 23, 'twenty three';
 is encode_json([$dual]), '["twenty three"]', 'dualvar stringified';
 
 # Other reference types
-my $sub = sub { };
-is encode_json([$sub]), "[\"$sub\"]", 'code reference stringified';
 is encode_json([JSONTest2->new]), "[\"works!\"]", 'object stringified';
 
 # Ensure numbers and strings are not upgraded

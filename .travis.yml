@@ -19,7 +19,8 @@ env:
     - TEST_UNIX=1
     - TEST_TLS=1
 install:
-  - cpanm -n EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Role::Tiny Test::Pod Test::Pod::Coverage
+  - cpanm -n Cpanel::JSON::XS EV IO::Socket::Socks IO::Socket::SSL
+  - cpanm -n Net::DNS::Native Role::Tiny Test::Pod Test::Pod::Coverage
   - cpanm -n --installdeps .
 sudo: false
 notifications:

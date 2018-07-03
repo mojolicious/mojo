@@ -1,7 +1,9 @@
 
 7.87  2018-07-03
   - Added optional support for Cpanel::JSON::XS to Mojo::JSON for much better
-    JSON encoding and decoding performance.
+    JSON encoding and decoding performance. That also means Mojo::JSON can no
+    longer encode the two Unicode whitespace characters u2028 and u2029, since
+    this is unsupported by Cpanel::JSON::XS.
 
 7.86  2018-07-02
   - Added template attribute to Mojolicious::Command.

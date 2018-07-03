@@ -1,5 +1,7 @@
 
 7.87  2018-07-03
+  - Added optional support for Cpanel::JSON::XS to Mojo::JSON for much better
+    JSON encoding and decoding performance.
 
 7.86  2018-07-02
   - Added template attribute to Mojolicious::Command.

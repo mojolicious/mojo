@@ -7,7 +7,7 @@ use JSON::PP ();
 use Mojo::Util qw(decode encode monkey_patch);
 use Scalar::Util 'blessed';
 
-# XS support requires Cpanel::JSON::XS
+# For better performance Cpanel::JSON::XS is required
 use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
   ? 0
   : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.04'); 1 };
@@ -28,16 +28,13 @@ my %ESCAPE = (
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
-# Try to use XS if possible
+# Replace pure-Perl fallbacks if Cpanel::JSON::XS is available
 if (JSON_XS) {
-  my $BINARY
-    = Cpanel::JSON::XS->new->utf8(1)->canonical(1)->allow_nonref(1)
-    ->allow_unknown(1)->allow_blessed(1)->convert_blessed(1)
-    ->stringify_infnan(1)->escape_slash(1);
-  my $TEXT
-    = Cpanel::JSON::XS->new->utf8(0)->canonical(1)->allow_nonref(1)
-    ->allow_unknown(1)->allow_blessed(1)->convert_blessed(1)
-    ->stringify_infnan(1)->escape_slash(1);
+  my $BINARY = Cpanel::JSON::XS->new->utf8(1);
+  my $TEXT   = Cpanel::JSON::XS->new->utf8(0);
+  $_->canonical(1)->allow_nonref(1)->allow_unknown(1)->allow_blessed(1)
+    ->convert_blessed(1)->stringify_infnan(1)->escape_slash(1)
+    for $BINARY, $TEXT;
   monkey_patch __PACKAGE__, 'encode_json', sub { $BINARY->encode($_[0]) };
   monkey_patch __PACKAGE__, 'decode_json', sub { $BINARY->decode($_[0]) };
   monkey_patch __PACKAGE__, 'to_json',     sub { $TEXT->encode($_[0]) };

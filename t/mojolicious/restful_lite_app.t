@@ -19,7 +19,7 @@ get '/accepts' => sub {
 
 get '/wants_json' => sub {
   my $c = shift;
-  $c->render(json => {wants_json => \$c->accepts('', 'json')});
+  $c->render(json => {wants_json => $c->accepts('', 'json') ? \1 : \0});
 };
 
 under '/rest';

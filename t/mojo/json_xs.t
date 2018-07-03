@@ -57,12 +57,17 @@ is_deeply encode_json(Mojo::ByteStream->new('test')), '"test"',
   'blessed reference';
 
 # "convert_blessed"
-is_deeply encode_json(JSONTest->new), '{}',
-  'blessed reference with TO_JSON method';
+$bytes = encode_json(JSONTest->new);
+is_deeply decode_json($bytes), {}, 'successful roundtrip';
+$bytes = encode_json(JSONTest->new(
+  something => {just => 'works'}, else => {not => 'working'}));
+is_deeply decode_json($bytes), {just => 'works'}, 'successful roundtrip';
 
 # "stringify_infnan"
-is_deeply encode_json(9**9**9), '"inf"', 'inf';
-is_deeply encode_json(-sin(9**9**9)), '"nan"', 'nan';
+like encode_json({test => 9**9**9}), qr/^{"test":".*"}$/,
+  'encode "inf" as string';
+like encode_json({test => -sin(9**9**9)}), qr/^{"test":".*"}$/,
+  'encode "nan" as string';
 
 # "escape_slash"
 is_deeply encode_json('/test/123'), '"\/test\/123"', 'escaped slash';

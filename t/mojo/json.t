@@ -269,6 +269,9 @@ $bytes = encode_json(JSONTest->new(
   something => {just => 'works'}, else => {not => 'working'}));
 is_deeply decode_json($bytes), {just => 'works'}, 'successful roundtrip';
 
+# Unknown reference
+is_deeply encode_json(sub { }), 'null', 'unknown reference';
+
 # Boolean shortcut
 is encode_json({true  => \1}), '{"true":true}',   'encode {true => \1}';
 is encode_json({false => \0}), '{"false":false}', 'encode {false => \0}';

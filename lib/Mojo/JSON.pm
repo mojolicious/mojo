@@ -14,7 +14,7 @@ use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
 
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
-# Escaped special character map (with u2028 and u2029)
+# Escaped special character map
 my %ESCAPE = (
   '"'  => '"',
   '\\' => '\\',
@@ -30,10 +30,10 @@ for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
 # Replace pure-Perl fallbacks if Cpanel::JSON::XS is available
 if (JSON_XS) {
-  my $BINARY = Cpanel::JSON::XS->new->utf8(1);
-  my $TEXT   = Cpanel::JSON::XS->new->utf8(0);
-  $_->canonical(1)->allow_nonref(1)->allow_unknown(1)->allow_blessed(1)
-    ->convert_blessed(1)->stringify_infnan(1)->escape_slash(1)
+  my $BINARY = Cpanel::JSON::XS->new->utf8;
+  my $TEXT   = Cpanel::JSON::XS->new;
+  $_->canonical->allow_nonref->allow_unknown->allow_blessed->convert_blessed
+    ->stringify_infnan->escape_slash
     for $BINARY, $TEXT;
   monkey_patch __PACKAGE__, 'encode_json', sub { $BINARY->encode($_[0]) };
   monkey_patch __PACKAGE__, 'decode_json', sub { $BINARY->decode($_[0]) };
@@ -235,7 +235,7 @@ sub _encode_object {
 
 sub _encode_string {
   my $str = shift;
-  $str =~ s!([\x00-\x1f\x{2028}\x{2029}\\"/])!$REVERSE{$1}!gs;
+  $str =~ s!([\x00-\x1f\\"/])!$REVERSE{$1}!gs;
   return "\"$str\"";
 }
 
@@ -256,8 +256,8 @@ sub _encode_value {
     return $value  ? 'true' : 'false' if $ref eq 'JSON::PP::Boolean';
 
     # Everything else
-    return _encode_string($value)
-      unless blessed $value && (my $sub = $value->can('TO_JSON'));
+    return 'null' unless blessed $value;
+    return _encode_string($value) unless my $sub = $value->can('TO_JSON');
     return _encode_value($value->$sub);
   }
 

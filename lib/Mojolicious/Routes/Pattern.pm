@@ -164,11 +164,6 @@ sub _compile_req {
 sub _tokenize {
   my ($self, $pattern) = @_;
 
-  # DEPRECATED!
-  deprecated 'Placeholder quoting with "(placeholder)" is DEPRECATED'
-    . ' in favor of "<placeholder>"'
-    if $pattern =~ tr/()/<>/;
-
   my $quote_end   = $self->quote_end;
   my $quote_start = $self->quote_start;
   my $start       = $self->placeholder_start;

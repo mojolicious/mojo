@@ -5,7 +5,7 @@ use Mojo::Cookie::Request;
 use Mojo::Util qw(b64_encode b64_decode sha1_sum);
 use Mojo::URL;
 
-my ($SEED, $COUNTER) = (rand, int rand 0xffffff);
+my ($SEED, $COUNTER) = (time . rand, int rand 0xffffff);
 
 has env => sub { {} };
 has method => 'GET';

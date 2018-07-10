@@ -164,8 +164,12 @@ sub timer { shift->_timer(timer => @_) }
 
 sub transition {
   my ($self, $id, $class) = (_instance(shift), @_);
-  my $new = $class->new($self->stream($id)->steal_handle);
+
+  my $old = $self->stream($id);
+  my $new = $class->new($old->steal_handle);
   $self->_stream($new, $id, !!$self->{in}{$id});
+  $old->emit(transition => $new);
+
   return $new;
 }
 

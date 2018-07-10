@@ -211,6 +211,15 @@ Emitted if new data arrives on the stream.
 Emitted if the stream has been inactive for too long and will get closed
 automatically.
 
+=head2 transition
+
+  $stream->on(transition => sub {
+    my ($stream, $new_stream) = @_;
+    ...
+  });
+
+Emitted if the stream has transitioned to a different class.
+
 =head2 write
 
   $stream->on(write => sub {

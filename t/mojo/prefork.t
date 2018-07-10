@@ -7,14 +7,17 @@ use Test::More;
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK};
 
-use Mojo::File 'path';
+use Mojo::File qw(path tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
 
 # Manage and clean up PID file
 my $prefork = Mojo::Server::Prefork->new;
-my $file    = $prefork->pid_file;
+my $dir     = tempdir;
+ok $prefork->pid_file, 'has default path';
+my $file = $dir->child('prefork.pid');
+$prefork->pid_file($file);
 ok !$prefork->check_pid, 'no process id';
 $prefork->ensure_pid_file(-23);
 ok -e $file, 'file exists';
@@ -44,7 +47,8 @@ $prefork->app->log->unsubscribe(message => $cb);
 my $port = Mojo::IOLoop::Server::->generate_port;
 $prefork = Mojo::Server::Prefork->new(
   heartbeat_interval => 0.5,
-  listen             => ["http://*:$port"]
+  listen             => ["http://*:$port"],
+  pid_file           => $file
 );
 $prefork->unsubscribe('request');
 $prefork->on(

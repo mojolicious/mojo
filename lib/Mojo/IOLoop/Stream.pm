@@ -76,6 +76,13 @@ sub timeout {
   return $self;
 }
 
+sub transition {
+  my ($self, $class) = @_;
+  my $new = $class->new($self->steal_handle);
+  $self->emit(transition => $new);
+  return $new;
+}
+
 sub write {
   my ($self, $chunk, $cb) = @_;
 
@@ -310,6 +317,12 @@ Stop watching for new data on the stream.
 Maximum amount of time in seconds stream can be inactive before getting closed
 automatically, defaults to C<15>. Setting the value to C<0> will allow this
 stream to be inactive indefinitely.
+
+=head2 transition
+
+  my $new_stream = $stream->transition('Mojo::IOLoop::Stream::HTTPClient');
+
+Transition stream to a different class.
 
 =head2 write
 

@@ -76,12 +76,7 @@ sub timeout {
   return $self;
 }
 
-sub transition {
-  my ($self, $class) = @_;
-  my $new = $class->new($self->steal_handle);
-  $self->emit(transition => $new);
-  return $new;
-}
+sub transition { shift->emit(transition => shift) }
 
 sub write {
   my ($self, $chunk, $cb) = @_;
@@ -320,7 +315,7 @@ stream to be inactive indefinitely.
 
 =head2 transition
 
-  my $new_stream = $stream->transition('Mojo::IOLoop::Stream::HTTPClient');
+  $stream->transition($new_stream);
 
 Transition stream to a different class. Note that this method is EXPERIMENTAL
 and might change without warning!

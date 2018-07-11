@@ -322,7 +322,8 @@ stream to be inactive indefinitely.
 
   my $new_stream = $stream->transition('Mojo::IOLoop::Stream::HTTPClient');
 
-Transition stream to a different class.
+Transition stream to a different class. Note that this method is EXPERIMENTAL
+and might change without warning!
 
 =head2 write
 

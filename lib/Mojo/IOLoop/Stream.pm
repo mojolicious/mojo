@@ -79,7 +79,11 @@ sub timeout {
   return $self;
 }
 
-sub transition { shift->emit(transition => shift) }
+sub transition {
+  my ($self, $new) = @_;
+  @{$new}{qw(read written)} = @{$self}{qw(read written)};
+  $self->emit(transition => $new);
+}
 
 sub write {
   my ($self, $chunk, $cb) = @_;
@@ -257,15 +261,15 @@ implements the following new ones.
 
   my $num = $stream->bytes_read;
 
-Bytes received. Note that this method is EXPERIMENTAL and might change without
-warning!
+Number of bytes received. Note that this method is EXPERIMENTAL and might change
+without warning!
 
 =head2 bytes_written
 
   my $num = $stream->bytes_written;
 
-Bytes written. Note that this method is EXPERIMENTAL and might change without
-warning!
+Number of bytes written. Note that this method is EXPERIMENTAL and might change
+without warning!
 
 =head2 close
 

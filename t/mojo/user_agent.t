@@ -493,6 +493,7 @@ is $ua->server->url->port, $port, 'same port';
 
 # Introspect
 my $req = my $res = '';
+my @num;
 my $start = $ua->on(
   start => sub {
     my ($ua, $tx) = @_;
@@ -500,7 +501,8 @@ my $start = $ua->on(
       connection => sub {
         my ($tx, $connection) = @_;
         my $stream = Mojo::IOLoop->stream($connection);
-        my $read   = $stream->on(
+        push @num, $stream->bytes_read, $stream->bytes_written;
+        my $read = $stream->on(
           read => sub {
             my ($stream, $chunk) = @_;
             $res .= $chunk;
@@ -514,6 +516,7 @@ my $start = $ua->on(
         );
         $tx->on(
           finish => sub {
+            push @num, $stream->bytes_read, $stream->bytes_written;
             $stream->unsubscribe(read  => $read);
             $stream->unsubscribe(write => $write);
           }
@@ -532,6 +535,7 @@ is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')}, 1,
   'unsubscribed successfully';
 like $req, qr!^GET / .*whatever$!s,      'right request';
 like $res, qr|^HTTP/.*200 OK.*works!$|s, 'right response';
+is_deeply \@num, [0, 0, length $res, length $req], 'right structure';
 $ua->unsubscribe(start => $start);
 ok !$ua->has_subscribers('start'), 'unsubscribed successfully';
 

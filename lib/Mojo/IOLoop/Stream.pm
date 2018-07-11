@@ -10,6 +10,9 @@ has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
 
+sub bytes_read    { shift->{read}    || 0 }
+sub bytes_written { shift->{written} || 0 }
+
 sub close {
   my $self = shift;
   return unless my $reactor = $self->reactor;
@@ -97,9 +100,10 @@ sub _again { $_[0]->reactor->again($_[0]{timer}) if $_[0]{timer} }
 sub _read {
   my $self = shift;
 
-  my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
-  return $read == 0 ? $self->close : $self->emit(read => $buffer)->_again
-    if defined $read;
+  if (defined(my $read = $self->{handle}->sysread(my $buffer, 131072, 0))) {
+    $self->{read} += $read;
+    return $read == 0 ? $self->close : $self->emit(read => $buffer)->_again;
+  }
 
   # Retry
   return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
@@ -115,6 +119,7 @@ sub _write {
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
     return unless defined(my $written = $handle->syswrite($self->{buffer}));
+    $self->{written} += $written;
     $self->emit(write => substr($self->{buffer}, 0, $written, ''))->_again;
   }
 
@@ -247,6 +252,20 @@ global L<Mojo::IOLoop> singleton.
 
 L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
+
+=head2 bytes_read
+
+  my $num = $stream->bytes_read;
+
+Bytes received. Note that this method is EXPERIMENTAL and might change without
+warning!
+
+=head2 bytes_written
+
+  my $num = $stream->bytes_written;
+
+Bytes written. Note that this method is EXPERIMENTAL and might change without
+warning!
 
 =head2 close
 

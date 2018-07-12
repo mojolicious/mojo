@@ -57,17 +57,14 @@ you automatically, whenever they are used.
 =item Variable names
 
 Where possible, the documentation will try to use variable names in example code
-that describes whatever type of data should be passed through to or is returned
-from methods and functions. For instance C<$bytes> or C<$chars> to distinguish
-whether it is encoded bytes or decoded characters, C<$bool> to indicate whether
-a value only indicates true or false, the use of C<$c> to denote a
-L<Mojolicious::Controller> object, or C<$app> to denote the application object.
+that describes the type of data that the API will use. For instance C<$bytes> or
+C<$chars> to distinguish whether it is encoded bytes or decoded characters,
+C<$bool> if the value just indicates true or false, C<$c> to denote a
+L<Mojolicious::Controller> object, or C<$app> to denote the
+L<application|Mojolicious> object.
 
 The distinction between C<$bytes> and C<$chars> is especially important because
-Perl itself only considers them strings, so if an interface is designed to take
-bytes it can get into trouble if given characters, and if an interface is
-designed to take characters it can cause something to be double-encoded if given
-an already encoded string of bytes.
+Perl itself only considers them strings.
 
 =back
 

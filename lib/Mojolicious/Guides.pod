@@ -7,9 +7,14 @@ Mojolicious::Guides - The Mojolicious Guide to the Galaxy
 
 =head1 DON'T PANIC!
 
-We are constantly working on new documentation. Follow us on
-L<GitHub|http://github.com/kraih/mojo> or join the official IRC channel C<#mojo>
-on C<irc.perl.org> to get all the latest updates.
+The L<Mojolicious|https://mojolicious.org> documentation is structured into
+three parts. The L</"TUTORIAL"> everyone starts with, the L</"GUIDES"> that
+explain all major features in detail, and the class L</"REFERENCE"> listing
+all available APIs.
+
+Some parts of the documentation only use the L<Mojolicious::Lite> micro web
+framework for examples, but that's merely a convenience for the reader. Almost
+all features are exactly the same for full L<Mojolicious> applications.
 
 =head1 BASICS
 

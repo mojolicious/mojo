@@ -59,6 +59,18 @@ L<features|feature> are enabled, even if examples don't specifically mention it.
 Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for
 you automatically, whenever they are used.
 
+=item Variable names
+
+Where possible, the documentation will try to use variable names in example code
+that describes the type of data that the API will use. For instance C<$bytes> or
+C<$chars> to distinguish whether it is encoded bytes or decoded characters,
+C<$bool> if the value just indicates true or false, C<$c> to denote a
+L<Mojolicious::Controller> object, or C<$app> to denote the
+L<application|Mojolicious> object.
+
+The distinction between C<$bytes> and C<$chars> is especially important because
+Perl itself only considers them strings.
+
 =back
 
 =head1 TUTORIAL

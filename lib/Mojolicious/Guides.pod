@@ -63,8 +63,8 @@ you automatically, whenever they are used.
 
 For brevity and clarity, example variables will reflect the type of data the API
 uses. For instance, C<$bytes> or C<$chars> to distinguish whether it is encoded
-bytes or decoded characters in a Perl L<string|perlunifaq>, C<$bool> if the value
-just indicates true or false, C<$c> to denote a L<Mojolicious::Controller>
+bytes or decoded characters in a Perl L<string|perlunifaq>, C<$bool> if the
+value just indicates true or false, C<$c> to denote a L<Mojolicious::Controller>
 object, or C<$app> to denote the L<application|Mojolicious> object.
 
 =back

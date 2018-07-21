@@ -568,7 +568,7 @@ is $tx->res->body, '0123456789', 'right content';
 is $stream, 1, 'no leaking subscribers';
 
 # Mixed blocking and non-blocking requests, with custom URL
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+$ua = Mojo::UserAgent->new;
 $tx = $ua->get($ua->server->url);
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
@@ -624,7 +624,7 @@ is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
 # Unexpected 1xx responses
 $req = Mojo::Message::Request->new;
-$id  = Mojo::IOLoop->server(
+$id  = $ua->ioloop->server(
   {address => '127.0.0.1'} => sub {
     my ($loop, $stream) = @_;
     $stream->on(
@@ -640,7 +640,7 @@ $id  = Mojo::IOLoop->server(
     );
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->port;
+$port = $ua->ioloop->acceptor($id)->port;
 $tx = $ua->build_tx(GET => "http://127.0.0.1:$port/");
 my @unexpected;
 $tx->on(unexpected => sub { push @unexpected, pop });

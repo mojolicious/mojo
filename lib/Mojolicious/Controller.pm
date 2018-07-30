@@ -395,8 +395,7 @@ L<Mojolicious/"controller_class">.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Controller> inherits all attributes from L<Mojo::Base> and
-implements the following new ones.
+L<Mojolicious::Controller> implements the following attributes.
 
 =head2 app
 

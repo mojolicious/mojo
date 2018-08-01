@@ -45,14 +45,18 @@ sub store {
   # Generate "expires" value from "expiration" if necessary
   my $expiration = $session->{expiration} // $self->default_expiration;
   my $default    = delete $session->{expires};
-  $session->{expires} = $default || time + $expiration
+  
+  my $time = time;
+  $session->{expires} = $default || $time + $expiration
     if $expiration || $default;
+  my $max_age = $session->{expires} - $time if $session->{expires};
 
   my $value = b64_encode $self->serialize->($session), '';
   $value =~ y/=/-/;
   my $options = {
     domain   => $self->cookie_domain,
     expires  => $session->{expires},
+    max_age => $max_age,
     httponly => 1,
     path     => $self->cookie_path,
     secure   => $self->secure
@@ -113,11 +117,14 @@ Path for session cookies, defaults to C</>.
   my $time  = $sessions->default_expiration;
   $sessions = $sessions->default_expiration(3600);
 
-Default time for sessions to expire in seconds from now, defaults to C<3600>.
-The expiration timeout gets refreshed for every request. Setting the value to
-C<0> will allow sessions to persist until the browser window is closed, this
-can have security implications though. For more control you can also use the
-C<expiration> and C<expires> session values.
+Default time for sessions to expire in seconds from now, defaults to C<3600>. 
+This will affect what is set for both the C<expires> and C<max-age> directives.
+C<max-age> will always be set to C<expires> minus 
+L<time|https://perldoc.perl.org/functions/time.html> if C<expires> is set. The 
+expiration timeout gets refreshed for every request. Setting the value to C<0> 
+will allow sessions to persist until the browser window is closed, this can 
+have security implications though. For more control you can also use the 
+C<expiration> and C<expires> session values. 
 
   # Expiration date in seconds from now (persists between requests)
   $c->session(expiration => 604800);

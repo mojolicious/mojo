@@ -1,7 +1,5 @@
 
-[![Mojolicious Logo](https://raw.github.com/kraih/mojo/master/lib/Mojolicious/resources/public/mojo/logo.png?raw=true)](http://mojolicious.org)
-
-# [![Build Status](https://travis-ci.com/kraih/mojo.svg?branch=master)](https://travis-ci.com/kraih/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/rf4661uxfjolra2y?svg=true)](https://ci.appveyor.com/project/kraih/mojo)
+# Mojolicious [![Build Status](https://travis-ci.com/kraih/mojo.svg?branch=master)](https://travis-ci.com/kraih/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/rf4661uxfjolra2y?svg=true)](https://ci.appveyor.com/project/kraih/mojo)
 
   Back in the early days of the web, many people learned Perl because of a
   wonderful Perl library called [CGI](https://metacpan.org/module/CGI). It was

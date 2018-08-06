@@ -281,6 +281,7 @@ $t->get_ok('/mojo/prettify/prettify-mojo-light.css')->status_is(200)
   ->content_type_is('text/css');
 $t->get_ok('/mojo/failraptor.png')->status_is(200)
   ->content_type_is('image/png');
+$t->get_ok('/mojo/logo.png')->status_is(200)->content_type_is('image/png');
 $t->get_ok('/mojo/logo-black.png')->status_is(200)
   ->content_type_is('image/png');
 $t->get_ok('/mojo/logo-black-2x.png')->status_is(200)

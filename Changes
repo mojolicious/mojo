@@ -1,5 +1,6 @@
 
-7.89  2018-07-21
+7.89  2018-08-06
+  - Mojolicious has a new logo!
 
 7.88  2018-07-11
   - Added EXPERIMENTAL bytes_read, bytes_written and transition methods to

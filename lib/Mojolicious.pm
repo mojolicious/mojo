@@ -838,15 +838,25 @@ have been used in the past.
 4.0, C<Top Hat> (U+1F3A9)
 
 3.0, C<Rainbow> (U+1F308)
-
 2.0, C<Leaf Fluttering In Wind> (U+1F343)
 
 1.0, C<Snowflake> (U+2744)
 
 =head1 SPONSORS
 
+=over 2
+
+=item
+
+L<Stix|https://stix.no> sponsored the creation of the Mojolicious logo (designed
+by Nicolai Graesdal) and transferred its copyright to Sebastian Riedel.
+
+=item
+
 Some of the work on this distribution has been sponsored by
-L<The Perl Foundation|http://www.perlfoundation.org>, thank you!
+L<The Perl Foundation|http://www.perlfoundation.org>.
+
+=back
 
 =head1 PROJECT FOUNDER
 

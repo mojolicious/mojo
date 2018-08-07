@@ -1,5 +1,9 @@
 
-[![Mojolicious Logo](https://raw.github.com/kraih/mojo/master/lib/Mojolicious/resources/public/mojo/logo.png?raw=true)](http://mojolicious.org)
+<p align="center">
+  <a href="https://mojolicious.org">
+    <img src="https://raw.github.com/kraih/mojo/master/lib/Mojolicious/resources/public/mojo/logo.png?raw=true" style="margin: 0 auto;">
+  </a>
+</p>
 
  # [![Build Status](https://travis-ci.com/kraih/mojo.svg?branch=master)](https://travis-ci.com/kraih/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/rf4661uxfjolra2y?svg=true)](https://ci.appveyor.com/project/kraih/mojo)
 

@@ -253,7 +253,7 @@ weakened.
   })->catch(sub {
     my $err = shift;
     $tx;
-    $c->render(text => $err);
+    $c->reply->exception($err);
   });
 
 =head1 MORE

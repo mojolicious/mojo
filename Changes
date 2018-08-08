@@ -1,4 +1,6 @@
 
+7.91  2018-08-09
+
 7.90  2018-08-08
   - Deprecated expect_close attribute in Mojo::Content.
   - Removed deprecated delay helper from Mojolicious::Plugin::DefaultHelpers.

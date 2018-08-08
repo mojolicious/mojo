@@ -633,19 +633,19 @@ $t->get_ok('/side_effects/index')->status_is(404)
 $t->get_ok('/side_effects-test/index')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('pass');
 
-# Connection already closed
+# Transaction already destroyed
 eval { Mojolicious::Controller->new->finish };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval {
   Mojolicious::Controller->new->on(finish => sub { });
 };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval { Mojolicious::Controller->new->req };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval { Mojolicious::Controller->new->res };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval { Mojolicious::Controller->new->send('whatever') };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 
 # Abstract methods
 eval { Mojolicious::Plugin->register };

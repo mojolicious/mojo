@@ -1,6 +1,7 @@
 
 7.90  2018-08-08
   - Deprecated expect_close attribute in Mojo::Content.
+  - Removed deprecated delay helper from Mojolicious::Plugin::DefaultHelpers.
   - Changed error message for destroyed transactions from
     "Connection already closed" to "Transaction already destroyed".
   - Fixed a race condition in Mojo::UserAgent where closing connections could

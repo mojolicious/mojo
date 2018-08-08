@@ -6,7 +6,7 @@ use Mojo::ByteStream;
 use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
-use Mojo::Util qw(deprecated dumper hmac_sha1_sum steady_time);
+use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
 use Time::HiRes qw(gettimeofday tv_interval);
 use Scalar::Util 'blessed';
 
@@ -31,17 +31,6 @@ sub register {
   $app->helper(content      => sub { _content(0, 0, @_) });
   $app->helper(content_for  => sub { _content(1, 0, @_) });
   $app->helper(content_with => sub { _content(0, 1, @_) });
-
-  # DEPRECATED!
-  $app->helper(
-    delay => sub {
-      deprecated 'delay helper is DEPRECATED';
-      my $c  = shift;
-      my $tx = $c->render_later->tx;
-      Mojo::IOLoop->delay(@_)
-        ->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
-    }
-  );
 
   $app->helper($_ => $self->can("_$_"))
     for qw(csrf_token current_route inactivity_timeout is_fresh url_with);

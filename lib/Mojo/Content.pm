@@ -5,8 +5,9 @@ use Carp 'croak';
 use Compress::Raw::Zlib qw(WANT_GZIP Z_STREAM_END);
 use Mojo::Headers;
 use Scalar::Util 'looks_like_number';
+use Mojo::Util 'deprecated';
 
-has [qw(auto_decompress auto_relax expect_close relaxed skip_body)];
+has [qw(auto_decompress auto_relax relaxed skip_body)];
 has headers           => sub { Mojo::Headers->new };
 has max_buffer_size   => sub { $ENV{MOJO_MAX_BUFFER_SIZE} || 262144 };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
@@ -33,6 +34,12 @@ sub clone {
   my $self = shift;
   return undef if $self->is_dynamic;
   return $self->new(headers => $self->headers->clone);
+}
+
+# DEPRECATED!
+sub expect_close {
+  deprecated 'Mojo::Content::expect_close is DEPRECATED';
+  return $_[1] ? $_[0] : undef;
 }
 
 sub generate_body_chunk {
@@ -107,8 +114,7 @@ sub parse {
   my $len     = $headers->content_length // '';
   if ($self->auto_relax && !length $len) {
     my $connection = lc($headers->connection // '');
-    $self->relaxed(1)
-      if $connection eq 'close' || (!$connection && $self->expect_close);
+    $self->relaxed(1) if $connection eq 'close' || !$connection;
   }
 
   # Chunked or relaxed content
@@ -364,13 +370,6 @@ Decompress content automatically if L</"is_compressed"> is true.
   $content = $content->auto_relax($bool);
 
 Try to detect when relaxed parsing is necessary.
-
-=head2 expect_close
-
-  my $bool = $content->expect_close;
-  $content = $content->expect_close($bool);
-
-Expect a response that is terminated with a connection close.
 
 =head2 headers
 

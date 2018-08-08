@@ -101,7 +101,6 @@ sub extract_start_line {
   my $content = $self->content;
   $content->skip_body(1) if $self->code($2)->is_empty;
   defined $content->$_ or $content->$_(1) for qw(auto_decompress auto_relax);
-  $content->expect_close(1) if $1 eq '1.0';
   return !!$self->version($1)->message($3);
 }
 

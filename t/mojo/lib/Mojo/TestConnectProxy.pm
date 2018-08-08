@@ -7,9 +7,9 @@ use Mojo::IOLoop;
 sub proxy {
   my ($from, $to, $ok, $zero) = @_;
 
-  $ok   ||= "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
-  $zero ||= "HTTP/1.1 404 NOT FOUND\x0d\x0aContent-Length: 0\x0d\x0a"
-    . "Connection: close\x0d\x0a\x0d\x0a";
+  $ok   ||= "HTTP/1.1 200 OK\x0d\x0aServer: Test 1.0\x0d\x0a\x0d\x0a";
+  $zero ||= "HTTP/1.1 404 NOT FOUND\x0d\x0aContent-Length: 20\x0d\x0a"
+    . "Connection: close\x0d\x0a\x0d\x0aSomething went wrong";
 
   my %buffer;
   return Mojo::IOLoop->server(

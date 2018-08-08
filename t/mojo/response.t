@@ -131,10 +131,10 @@ is $res->code(1)->default_message, '', 'empty default message';
 # Parse HTTP 1.1 response start-line, no headers and body
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
-ok $res->is_finished, 'response is finished';
-is $res->code,        200, 'right status';
-is $res->message,     'OK', 'right message';
-is $res->version,     '1.1', 'right version';
+ok !$res->is_finished, 'response is not finished';
+is $res->code,    200,   'right status';
+is $res->message, 'OK',  'right message';
+is $res->version, '1.1', 'right version';
 
 # Parse HTTP 1.1 response start-line, no headers and body (small chunks)
 $res = Mojo::Message::Response->new;
@@ -175,18 +175,18 @@ ok !$res->is_finished, 'response is not finished';
 $res->parse("\x0d");
 ok !$res->is_finished, 'response is not finished';
 $res->parse("\x0a");
-ok $res->is_finished, 'response is finished';
-is $res->code,        200, 'right status';
-is $res->message,     'OK', 'right message';
-is $res->version,     '1.1', 'right version';
+ok !$res->is_finished, 'response is not finished';
+is $res->code,    200,   'right status';
+is $res->message, 'OK',  'right message';
+is $res->version, '1.1', 'right version';
 
 # Parse HTTP 1.1 response start-line, no headers and body (no message)
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200\x0d\x0a\x0d\x0a");
-ok $res->is_finished, 'response is finished';
-is $res->code,        200, 'right status';
-is $res->message,     undef, 'no message';
-is $res->version,     '1.1', 'right version';
+ok !$res->is_finished, 'response is not finished';
+is $res->code,    200,   'right status';
+is $res->message, undef, 'no message';
+is $res->version, '1.1', 'right version';
 
 # Parse HTTP 1.0 response start-line and headers but no body
 $res = Mojo::Message::Response->new;

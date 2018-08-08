@@ -431,9 +431,10 @@ L<Mojolicious::Routes::Match> object.
 
 The transaction that is currently being processed, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note that
-this reference is usually weakened, so the object needs to be referenced
-elsewhere as well when you're performing non-blocking operations and the
-underlying connection might get closed early.
+this reference is usually weakened to protect you from hard to detect memory
+leaks. So the object needs to be referenced elsewhere as well when you're
+performing non-blocking operations and the underlying connection might get
+closed early.
 
   # Check peer information
   my $address = $c->tx->remote_address;
@@ -737,6 +738,7 @@ Get L<Mojo::Message::Request> object from L</"tx">.
   my $req = $c->tx->req;
 
   # Extract request information
+  my $id     = $c->req->request_id;
   my $method = $c->req->method;
   my $url    = $c->req->url->to_abs;
   my $info   = $c->req->url->to_abs->userinfo;

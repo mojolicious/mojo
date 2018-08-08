@@ -60,6 +60,14 @@ get '/one' => sub {
   $c->render(text => 'One!');
 };
 
+get '/redirect_close' => sub {
+  my $c = shift;
+  $c->res->headers->connection('close');
+  $c->res->headers->location($c->url_for('/')->to_abs);
+  $c->rendered(302);
+  $c->res->fix_headers->headers->remove('Content-Length');
+};
+
 # Max redirects
 {
   local $ENV{MOJO_MAX_REDIRECTS} = 25;
@@ -444,6 +452,15 @@ ok $tx->kept_alive, 'kept connection alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->error->{message}, 'Not Found', 'right error';
 is $tx->error->{code},    404,         'right status';
+
+# Redirect with connection close
+$tx = $ua->max_redirects(3)->get('/redirect_close');
+ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+is $tx->res->version, '1.1',    'right version';
+is $tx->res->code,    200,      'right status';
+is $tx->res->body,    'works!', 'right content';
+$ua->max_redirects(0);
 
 # Compressed response
 $tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');

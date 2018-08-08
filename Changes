@@ -3,6 +3,8 @@
   - Deprecated expect_close attribute in Mojo::Content.
   - Changed error message for destroyed transactions from
     "Connection already closed" to "Transaction already destroyed".
+  - Fixed a race condition in Mojo::UserAgent where closing connections could
+    sometimes end up being reused.
   - Fixed an RFC 7230 compliance problem where HTTP/1.1 responses were sometimes
     incomplete.
 

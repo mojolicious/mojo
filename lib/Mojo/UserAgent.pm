@@ -271,7 +271,7 @@ sub _reuse {
   my $c   = $self->{connections}{$id};
   my $tx  = delete $c->{tx};
   my $max = $self->max_connections;
-  return $self->_remove($id) if $close || !$tx || !$max;
+  return $self->_remove($id) if $close || !$tx || !$max || !$tx->keep_alive;
 
   # Keep connection alive
   my $queue = $self->{queue}{$c->{ioloop}} ||= [];

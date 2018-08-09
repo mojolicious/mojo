@@ -111,6 +111,23 @@ Mojo::IOLoop->start;
 ok !defined $err->{code}, 'no code';
 is $err->{message}, 'Premature connection close', 'right message';
 
+# Timeout (and readable check)
+$id = _client(
+  $opts => sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->timeout("0.01");
+    $stream->on(
+      timeout => sub {
+        my $stream = shift;
+        Mojo::IOLoop->stop;
+        $stream->is_readable;
+      }
+    );
+  }
+);
+Mojo::IOLoop->start;
+ok !Mojo::IOLoop->stream($id), 'stream has been closed';
+
 # HTTP Error
 $tx = _tx('http://127.0.0.1/not_found');
 $tx->on(

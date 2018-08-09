@@ -1,4 +1,6 @@
 
+7.92  2018-08-10
+
 7.91  2018-08-09
   - Fixed a bug in Mojo::IOLoop::Stream where is_readable could not be called
     after a timeout event.

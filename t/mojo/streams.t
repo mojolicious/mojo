@@ -115,7 +115,7 @@ is $err->{message}, 'Premature connection close', 'right message';
 $id = _client(
   $opts => sub {
     my ($loop, $err, $stream) = @_;
-    $stream->timeout("0.01");
+    $stream->timeout('0.01');
     $stream->on(
       timeout => sub {
         my $stream = shift;
@@ -126,7 +126,7 @@ $id = _client(
   }
 );
 Mojo::IOLoop->start;
-ok !Mojo::IOLoop->stream($id), 'stream has been closed';
+ok !Mojo::IOLoop->stream($id), 'connection has been closed';
 
 # HTTP Error
 $tx = _tx('http://127.0.0.1/not_found');
@@ -154,14 +154,14 @@ _client(
 );
 Mojo::IOLoop->start;
 ok !$stash->{kept_alive}, 'connection was not kept alive';
-ok !$closed, 'connection is not closed';
+ok !$closed, 'connection has not been closed';
 $app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $tx = _tx('http://127.0.0.1/keep-alive');
 $tx->on(finish => sub { Mojo::IOLoop->stop });
 $client_stream->process($tx);
 Mojo::IOLoop->start;
 ok $stash->{kept_alive}, 'connection was kept alive';
-is $closed, 1, 'connection is closed';
+is $closed, 1, 'connection has been closed';
 
 # Timeout
 $tx = _tx('http://127.0.0.1/timeout');

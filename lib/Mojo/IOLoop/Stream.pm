@@ -79,12 +79,6 @@ sub timeout {
   return $self;
 }
 
-sub transition {
-  my ($self, $new) = @_;
-  @{$new}{qw(read written)} = @{$self}{qw(read written)};
-  $self->emit(transition => $new);
-}
-
 sub write {
   my ($self, $chunk, $cb) = @_;
 
@@ -222,15 +216,6 @@ Emitted if new data arrives on the stream.
 Emitted if the stream has been inactive for too long and will get closed
 automatically.
 
-=head2 transition
-
-  $stream->on(transition => sub {
-    my ($stream, $new_stream) = @_;
-    ...
-  });
-
-Emitted if the stream has transitioned to a different class.
-
 =head2 write
 
   $stream->on(write => sub {
@@ -335,13 +320,6 @@ Stop watching for new data on the stream.
 Maximum amount of time in seconds stream can be inactive before getting closed
 automatically, defaults to C<15>. Setting the value to C<0> will allow this
 stream to be inactive indefinitely.
-
-=head2 transition
-
-  $stream->transition($new_stream);
-
-Transition stream to a different class. Note that this method is EXPERIMENTAL
-and might change without warning!
 
 =head2 write
 

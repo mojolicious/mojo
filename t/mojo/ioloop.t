@@ -8,8 +8,6 @@ use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
-use Mojo::IOLoop::Stream::HTTPClient;
-use Mojo::IOLoop::Stream::HTTPServer;
 
 # Defaults
 my $loop = Mojo::IOLoop->new;
@@ -248,38 +246,6 @@ is $server_before, $server_after, 'stream has been paused';
 ok length($server) > length($server_after), 'stream has been resumed';
 is $client, $client_after, 'stream was writable while paused';
 is $client, 'works!', 'full message has been written';
-
-# Custom stream class
-my ($server_stream, $client_stream);
-$delay = Mojo::IOLoop->delay;
-$end   = $delay->begin;
-$id    = Mojo::IOLoop->server(
-  {address => '127.0.0.1',
-    stream_class => 'Mojo::IOLoop::Stream::HTTPServer'} => sub {
-    $server_stream = $_[1];
-    $end->();
-  }
-);
-$port = Mojo::IOLoop->acceptor($id)->port;
-$end2 = $delay->begin;
-$id   = Mojo::IOLoop->client(
-  {port => $port, stream_class => 'Mojo::IOLoop::Stream::HTTPClient'} => sub {
-    $client_stream = pop;
-    $end2->();
-  }
-);
-$delay->wait;
-isa_ok $server_stream, 'Mojo::IOLoop::Stream::HTTPServer',
-  'right server stream';
-isa_ok $client_stream, 'Mojo::IOLoop::Stream::HTTPClient',
-  'right client stream';
-
-# Transition
-$handle = $client_stream->handle;
-$stream = Mojo::IOLoop->transition($id, 'Mojo::IOLoop::Stream');
-isa_ok $stream, 'Mojo::IOLoop::Stream', 'right upgraded stream';
-is $stream->handle, $handle, 'same handle';
-ok !$client_stream->handle, 'no handle';
 
 # Graceful shutdown
 $err  = '';

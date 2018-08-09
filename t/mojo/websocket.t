@@ -443,25 +443,7 @@ like $log, qr/Inactivity timeout/, 'right log message';
 app->log->unsubscribe(message => $msg);
 
 # Ping/pong
-my ($pong, @transition, @num);
-$ua->once(
-  start => sub {
-    my ($ua, $tx) = @_;
-    $tx->on(
-      connection => sub {
-        my ($tx, $connection) = @_;
-        Mojo::IOLoop->stream($connection)->on(
-          transition => sub {
-            my ($stream, $new_stream) = @_;
-            push @num, $stream->bytes_read, $stream->bytes_written,
-              $new_stream->bytes_read, $new_stream->bytes_written;
-            push @transition, ref $stream, ref $new_stream;
-          }
-        );
-      }
-    );
-  }
-);
+my $pong;
 $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
@@ -479,10 +461,5 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 is $pong, 'test', 'received pong with payload';
-is_deeply \@transition,
-  ['Mojo::IOLoop::Stream::HTTPClient', 'Mojo::IOLoop::Stream::WebSocketClient'],
-  'right classes';
-is $num[0], $num[2], 'same number of bytes read';
-is $num[1], $num[3], 'same number of bytes written';
 
 done_testing();

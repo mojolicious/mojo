@@ -155,7 +155,7 @@ sub _spawn {
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(CHLD INT TERM TTIN TTOU);
   $SIG{QUIT} = sub { $loop->stop_gracefully };
-  $loop->on(finish => sub { $self->max_requests(1)->close_connections });
+  $loop->on(finish => sub { $self->max_requests(1) });
   delete $self->{reader};
   srand;
 

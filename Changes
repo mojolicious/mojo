@@ -1,5 +1,9 @@
 
-7.92  2018-08-10
+7.92  2018-08-09
+  - This release reverts the addition of stream classes (added in 7.83), which
+    have unfortunately resulted in many Mojolicious applications becoming
+    unstable. While there are no known exploits yet, we've chosen to err on the
+    side of cautiousness and will classify this as a security issue.
 
 7.91  2018-08-09
   - Fixed a bug in Mojo::IOLoop::Stream where is_readable could not be called

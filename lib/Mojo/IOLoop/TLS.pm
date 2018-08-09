@@ -32,8 +32,7 @@ sub negotiate {
   my $handle = $self->{handle};
   return $self->emit(error => $IO::Socket::SSL::SSL_ERROR)
     unless IO::Socket::SSL->start_SSL($handle, %{$self->_expand($args)});
-  $self->reactor->io($handle
-      = $handle => sub { $self->_tls($handle, $args->{server}) });
+  $self->reactor->io($handle => sub { $self->_tls($handle, $args->{server}) });
 }
 
 sub new { shift->SUPER::new(handle => shift) }

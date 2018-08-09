@@ -1,4 +1,6 @@
 
+7.93  2018-08-10
+
 7.92  2018-08-09
   - This release reverts the addition of stream classes (added in 7.83), which
     have unfortunately resulted in many Mojolicious applications becoming

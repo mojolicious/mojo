@@ -887,8 +887,8 @@ Opposite of L</"message_like">.
   my $t = Test::Mojo->new;
   my $t = Test::Mojo->new('MyApp');
   my $t = Test::Mojo->new('MyApp', {foo => 'bar'});
-  my $t = Test::Mojo->new(Mojo::File->new('script/myapp'));
-  my $t = Test::Mojo->new(Mojo::File->new('script/myapp'), {foo => 'bar'});
+  my $t = Test::Mojo->new(Mojo::File->new('/path/to/myapp.pl'));
+  my $t = Test::Mojo->new(Mojo::File->new('/path/to/myapp.pl'), {foo => 'bar'});
   my $t = Test::Mojo->new(MyApp->new);
   my $t = Test::Mojo->new(MyApp->new, {foo => 'bar'});
 

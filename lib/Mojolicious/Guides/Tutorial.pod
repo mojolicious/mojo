@@ -1005,7 +1005,10 @@ L<Test::Mojo>.
   use Mojo::File 'path';
   use Test::Mojo;
 
-  my $t = Test::Mojo->new(path(__FILE__)->dirname->sibling('myapp.pl'));
+  # Portably point to "../myapp.pl"
+  my $script = path(__FILE__)->dirname->sibling('myapp.pl');
+
+  my $t = Test::Mojo->new($script);
   $t->get_ok('/')->status_is(200)->content_like(qr/Funky/);
 
   done_testing();

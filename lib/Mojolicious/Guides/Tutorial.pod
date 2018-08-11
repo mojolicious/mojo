@@ -1002,12 +1002,10 @@ with normal Perl tests like C<t/basic.t>, which can be a lot of fun thanks to
 L<Test::Mojo>.
 
   use Test::More;
+  use Mojo::File 'path';
   use Test::Mojo;
 
-  use FindBin;
-  require "$FindBin::Bin/../myapp.pl";
-
-  my $t = Test::Mojo->new;
+  my $t = Test::Mojo->new(path(__FILE__)->dirname->child('..', 'myapp.pl'));
   $t->get_ok('/')->status_is(200)->content_like(qr/Funky/);
 
   done_testing();

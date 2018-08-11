@@ -245,8 +245,9 @@ sub new {
   return $self unless my $app = shift;
 
   my @args = @_ ? {config => {config_override => 1, %{shift()}}} : ();
-  return $self->app(
-    ref $app ? $app : Mojo::Server->new->build_app($app, @args));
+  return $self->app(Mojo::Server->new->build_app($app, @args)) unless ref $app;
+  $app = Mojo::Server->new->load_app($app) unless $app->isa('Mojolicious');
+  return $self->app(@args ? $app->config($args[0]{config}) : $app);
 }
 
 sub options_ok { shift->_build_ok(OPTIONS => @_) }
@@ -885,15 +886,23 @@ Opposite of L</"message_like">.
 
   my $t = Test::Mojo->new;
   my $t = Test::Mojo->new('MyApp');
-  my $t = Test::Mojo->new(MyApp => {foo => 'bar', baz => 23});
+  my $t = Test::Mojo->new('MyApp', {foo => 'bar'});
+  my $t = Test::Mojo->new(Mojo::File->new('script/myapp'));
+  my $t = Test::Mojo->new(Mojo::File->new('script/myapp'), {foo => 'bar'});
   my $t = Test::Mojo->new(MyApp->new);
+  my $t = Test::Mojo->new(MyApp->new, {foo => 'bar'});
 
-Construct a new L<Test::Mojo> object. In addition to a class name, you can pass
-along a hash reference with configuration values that will be used to
-instantiate the application. The special configuration value C<config_override>
+Construct a new L<Test::Mojo> object. In addition to a class name or
+L<Mojo::File> object pointing to the application script, you can pass along a
+hash reference with configuration values that will be used to override the
+application configuration. The special configuration value C<config_override>
 will be set in L<Mojolicious/"config"> as well, which is used to disable
 configuration plugins like L<Mojolicious::Plugin::Config> and
 L<Mojolicious::Plugin::JSONConfig> for tests.
+
+  # Load application script relative to the "t" directory
+  use Mojo::File 'path';
+  my $t = Test::Mojo->new(path(__FILE__)->dirname->child('..', 'myapp.pl'));
 
 =head2 options_ok
 

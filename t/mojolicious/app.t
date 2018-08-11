@@ -46,7 +46,18 @@ my @path = qw(th is mojo dir wil l never-ever exist);
 my $app = Mojolicious->new(home => Mojo::Home->new(@path));
 is $app->home, path(@path), 'right home directory';
 
+# Config override
 my $t = Test::Mojo->new('MojoliciousTest');
+ok !$t->app->config->{config_override}, 'no override';
+ok !$t->app->config->{foo},             'no value';
+$t = Test::Mojo->new('MojoliciousTest', {foo => 'bar'});
+ok $t->app->config->{config_override}, 'override';
+is $t->app->config->{foo}, 'bar', 'right value';
+$t = Test::Mojo->new(MojoliciousTest->new, {foo => 'baz'});
+ok $t->app->config->{config_override}, 'override';
+is $t->app->config->{foo}, 'baz', 'right value';
+
+$t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something',

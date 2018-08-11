@@ -1,5 +1,7 @@
 
-7.93  2018-08-10
+7.93  2018-08-11
+  - Improved Test::Mojo to accept Mojo::File objects pointing to application
+    scripts and to override configurations more consistently.
 
 7.92  2018-08-09
   - This release reverts the addition of stream classes (added in 7.83), which

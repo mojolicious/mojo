@@ -7,12 +7,10 @@ BEGIN {
 
 use Test::More;
 
-use FindBin;
-require "$FindBin::Bin/external/myapp.pl";
-
 use Test::Mojo;
+use Mojo::File 'path';
 
-my $t = Test::Mojo->new;
+my $t = Test::Mojo->new(path(__FILE__)->dirname->child('external', 'myapp.pl'));
 
 # Template from myapp.pl
 $t->get_ok('/')->status_is(200)->content_is(<<'EOF');

@@ -1,4 +1,6 @@
 
+7.94  2018-08-12
+
 7.93  2018-08-11
   - Improved Test::Mojo to accept Mojo::File objects pointing to application
     scripts and to override configurations more consistently.

@@ -54,7 +54,9 @@ experimental to explicitly exclude them from these rules. This gives us the
 necessary freedom to ensure a healthy future for L<Mojolicious>. So, as long as
 you are not using anything marked experimental, untested or undocumented, you
 can always count on backwards compatibility, everything else would be
-considered a bug.
+considered a bug. However, to completely avoid any risk of accidental breakage,
+we do recommend following current best practices for version pinning with
+L<Carton> for production setups.
 
 =head2 Why not split up Mojolicious into many smaller distributions?
 
@@ -73,11 +75,12 @@ channel C<#mojo> on C<irc.perl.org>
 
 First of all, you need to be aware that according to the L<perlpolicy>, only
 the two most recent stable release series of Perl are supported by the
-community and receive bug fixes, which are currently 5.26.x and 5.24.x.
+community and receive bug fixes, which are currently 5.28.x and 5.26.x.
 L<Mojolicious> follows this model and fully supports these two release series.
-In addition we will also keep the distribution installable up to a certain
-legacy version that we deem worthy of supporting, but not specifically optimize
-for it, this is currently 5.10.1.
+In addition we will also keep the distribution installable (and that means
+passing all tests) up to a certain legacy version that the core team deems
+worthy of supporting, but not specifically optimize for it, this is currently
+5.10.1.
 
 =head2 How well is Windows supported by Mojolicious?
 

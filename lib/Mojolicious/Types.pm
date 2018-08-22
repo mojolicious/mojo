@@ -141,9 +141,10 @@ the following new ones.
 
   $types->content_type(Mojolicious::Controller->new, {ext => 'json'});
 
-Detect MIME type for L<Mojolicious::Controller> unless a C<Content-Type> header
-has already been set. Note that this method is EXPERIMENTAL and might change
-without warning!
+Detect MIME type for L<Mojolicious::Controller> object unless a C<Content-Type>
+response header has already been set, defaults to using the MIME type for the
+C<txt> extension if no better alternative could be found. Note that this method
+is EXPERIMENTAL and might change without warning!
 
 These options are currently available:
 

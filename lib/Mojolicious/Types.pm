@@ -38,7 +38,7 @@ sub content_type {
   my $headers = $c->res->headers;
   return undef if $headers->content_type;
 
-  my $type = $o->{ext} ? $self->type($o->{ext}) : $self->file_type($o->{file});
+  my $type = $o->{file} ? $self->file_type($o->{file}) : $self->type($o->{ext});
   $headers->content_type($type // $self->type('txt'));
 }
 

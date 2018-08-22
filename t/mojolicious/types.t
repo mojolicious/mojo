@@ -1,8 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::Asset::File;
-use Mojo::Path;
 use Mojolicious;
 use Mojolicious::Types;
 

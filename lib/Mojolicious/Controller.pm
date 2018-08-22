@@ -186,9 +186,8 @@ sub render {
     unless defined $output;
 
   $plugins->emit_hook(after_render => $self, \$output, $format);
-  my $headers = $self->res->body($output)->headers;
-  $headers->content_type($app->types->type($format) || 'text/plain')
-    unless $headers->content_type;
+  $self->res->body($output);
+  $app->types->content_type($self, {ext => $format});
   return !!$self->rendered($stash->{status});
 }
 

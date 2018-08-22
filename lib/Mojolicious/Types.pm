@@ -32,6 +32,16 @@ has mapping => sub {
   };
 };
 
+sub content_type {
+  my ($self, $c, $o) = (shift, shift, shift // {});
+
+  my $headers = $c->res->headers;
+  return undef if $headers->content_type;
+
+  my $type = $o->{ext} ? $self->type($o->{ext}) : $self->file_type($o->{file});
+  $headers->content_type($type // $self->type('txt'));
+}
+
 sub detect {
   my ($self, $accept) = @_;
 
@@ -126,6 +136,32 @@ MIME type mapping.
 
 L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
+
+=head2 content_type
+
+  $types->content_type(Mojolicious::Controller->new, {ext => 'json'});
+
+Detect MIME type for L<Mojolicious::Controller> unless a C<Content-Type> header
+has already been set. Note that this method is EXPERIMENTAL and might change
+without warning!
+
+These options are currently available:
+
+=over 2
+
+=item ext
+
+  ext => 'json'
+
+File extension to get MIME type for.
+
+=item file
+
+  file => 'foo/bar.png'
+
+File path to get MIME type for.
+
+=back
 
 =head2 detect
 

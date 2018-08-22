@@ -81,19 +81,16 @@ sub is_fresh {
 
 sub serve {
   my ($self, $c, $rel) = @_;
-
   return undef unless my $asset = $self->file($rel);
-  my $headers = $c->res->headers;
-  return !!$self->serve_asset($c, $asset) if $headers->content_type;
-
-  # Content-Type
-  my $types = $c->app->types;
-  $headers->content_type($types->file_type($rel) || $types->type('txt'));
+  $c->app->types->content_type($c, {file => $rel});
   return !!$self->serve_asset($c, $asset);
 }
 
 sub serve_asset {
   my ($self, $c, $asset) = @_;
+
+  # Content-Type
+  $c->app->types->content_type($c, {file => $asset->path}) if $asset->is_file;
 
   # Last-Modified and ETag
   my $res = $c->res;

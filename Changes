@@ -1,6 +1,10 @@
 
 7.94  2018-08-22
-  - Added EXPERIMENTAL file_type method to Mojolicious::Types.
+  - Added EXPERIMENTAL content_type and file_type methods to Mojolicious::Types.
+  - Fixed a bug where the reply->file helper would not try to set a Content-Type
+    header.
+  - Fixed a bug where the render method in Mojolicious::Controller would not
+    always use Mojolicious::Types to find the correct Content-Type value.
 
 7.93  2018-08-11
   - Improved Test::Mojo to accept Mojo::File objects pointing to application

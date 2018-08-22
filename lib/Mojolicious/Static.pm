@@ -88,8 +88,7 @@ sub serve {
 
   # Content-Type
   my $types = $c->app->types;
-  my $type = $rel =~ /\.(\w+)$/ ? $types->type($1) : undef;
-  $headers->content_type($type || $types->type('txt'));
+  $headers->content_type($types->file_type($rel) || $types->type('txt'));
   return !!$self->serve_asset($c, $asset);
 }
 

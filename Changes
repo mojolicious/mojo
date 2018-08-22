@@ -1,5 +1,6 @@
 
-7.94  2018-08-12
+7.94  2018-08-22
+  - Added EXPERIMENTAL file_type method to Mojolicious::Types.
 
 7.93  2018-08-11
   - Improved Test::Mojo to accept Mojo::File objects pointing to application

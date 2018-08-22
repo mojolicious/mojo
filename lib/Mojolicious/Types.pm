@@ -53,6 +53,8 @@ sub detect {
   return [map { @{$reverse{$_} // []} } @detected];
 }
 
+sub file_type { $_[1] =~ /\.(\w+)$/ ? $_[0]->type($1) : undef }
+
 sub type {
   my ($self, $ext, $type) = @_;
   return $self->mapping->{lc $ext}[0] unless $type;
@@ -133,6 +135,13 @@ Detect file extensions from C<Accept> header value.
 
   # List detected extensions prioritized
   say for @{$types->detect('application/json, text/xml;q=0.1', 1)};
+
+=head2 file_type
+
+  my $type = $types->file_type('foo/bar.png');
+
+Get MIME type for file path. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 type
 

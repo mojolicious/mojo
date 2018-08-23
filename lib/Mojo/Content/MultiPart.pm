@@ -41,9 +41,9 @@ sub build_boundary {
 
   # Add boundary to Content-Type header
   my $headers = $self->headers;
-  ($headers->content_type // '') =~ m!^(.*multipart/[^;]+)(.*)$!;
-  my $before = $1 || 'multipart/mixed';
-  my $after  = $2 || '';
+  my ($before, $after) = ('multipart/mixed', '');
+  ($before, $after) = ($1, $2)
+    if ($headers->content_type // '') =~ m!^(.*multipart/[^;]+)(.*)$!;
   $headers->content_type("$before; boundary=$boundary$after");
 
   return $boundary;

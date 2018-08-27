@@ -615,6 +615,9 @@ HTTP methods to match, which are not available). See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more
 information.
 
+  # Longer version
+  $r->any('/:foo' => sub {...})->inline(1);
+
   # Intermediate destination and prefix shared between two routes
   my $auth = $r->under('/user')->to('user#auth');
   $auth->get('/show')->to('#show');

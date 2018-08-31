@@ -1,4 +1,6 @@
 
+7.95  2018-08-31
+
 7.94  2018-08-27
   - Added EXPERIMENTAL content_type and file_type methods to Mojolicious::Types.
   - Fixed a bug where the reply->file helper would not try to set a Content-Type

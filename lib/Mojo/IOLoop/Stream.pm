@@ -37,7 +37,7 @@ sub is_writing {
   return !!length($self->{buffer}) || $self->has_subscribers('drain');
 }
 
-sub new { shift->SUPER::new(handle => shift, buffer => '', timeout => 15) }
+sub new { shift->SUPER::new(handle => shift, timeout => 15) }
 
 sub start {
   my $self = shift;
@@ -121,7 +121,8 @@ sub _write {
     $self->emit(write => substr($self->{buffer}, 0, $written, ''))->_again;
   }
 
-  $self->emit('drain') unless length $self->{buffer};
+  # Clear the buffer to free the underlying SV* memory
+  undef $self->{buffer}, $self->emit('drain') unless length $self->{buffer};
   return if $self->is_writing;
   return $self->close if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0) if $self->{handle};

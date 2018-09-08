@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 
 plan skip_all => 'set TEST_SUBPROCESS to enable this test (developer only!)'
-  unless $ENV{TEST_SUBPROCESS};
+  unless $ENV{TEST_SUBPROCESS} || $ENV{TEST_ALL};
 
 use Mojo::IOLoop;
 use Mojo::IOLoop::Subprocess;

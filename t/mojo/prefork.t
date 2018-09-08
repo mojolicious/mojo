@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
-  unless $ENV{TEST_PREFORK};
+  unless $ENV{TEST_PREFORK} || $ENV{TEST_ALL};
 
 use Mojo::File qw(path tempdir);
 use Mojo::IOLoop::Server;

@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
-  unless $ENV{TEST_MORBO};
+  unless $ENV{TEST_MORBO} || $ENV{TEST_ALL};
 
 use FindBin;
 use lib "$FindBin::Bin/lib";

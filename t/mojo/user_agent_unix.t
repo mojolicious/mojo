@@ -10,7 +10,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 plan skip_all => 'set TEST_UNIX to enable this test (developer only!)'
-  unless $ENV{TEST_UNIX};
+  unless $ENV{TEST_UNIX} || $ENV{TEST_ALL};
 my $dir   = tempdir;
 my $dummy = $dir->child('dummy.sock')->to_string;
 plan skip_all => 'UNIX domain socket support required for this test!'

@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
-  unless $ENV{TEST_HYPNOTOAD};
+  unless $ENV{TEST_HYPNOTOAD} || $ENV{TEST_ALL};
 
 use FindBin;
 use IO::Socket::INET;

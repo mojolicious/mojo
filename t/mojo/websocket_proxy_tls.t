@@ -9,7 +9,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS};
+  unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
 plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
   unless Mojo::IOLoop::TLS->can_tls;
 

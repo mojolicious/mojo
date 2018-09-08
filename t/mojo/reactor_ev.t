@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
-  unless $ENV{TEST_EV};
+  unless $ENV{TEST_EV} || $ENV{TEST_ALL};
 plan skip_all => 'EV 4.0+ required for this test!'
   unless eval { require EV; EV->VERSION('4.0'); 1 };
 

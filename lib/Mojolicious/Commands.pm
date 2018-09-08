@@ -243,14 +243,6 @@ usually auto detected.
 
 Use L<Mojolicious::Command::routes> to list application routes.
 
-=head2 test
-
-  $ ./myapp.pl test
-  $ ./myapp.pl test t/fun.t
-
-Use L<Mojolicious::Command::test> to run application tests from the C<t>
-directory.
-
 =head2 version
 
   $ mojo version

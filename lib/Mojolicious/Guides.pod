@@ -426,8 +426,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Command::routes>
 
-=item * L<Mojolicious::Command::test>
-
 =item * L<Mojolicious::Command::version>
 
 =item * L<Mojolicious::Commands>

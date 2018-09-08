@@ -373,11 +373,11 @@ L<Mojo::DOM>.
   done_testing();
 
 Your application won't pass these tests, but from now on you can use them to
-check your progress with the command L<Mojolicious::Command::test>.
+check your progress.
 
-  $ ./myapp.pl test
-  $ ./myapp.pl test t/login.t
-  $ ./myapp.pl test -v t/login.t
+  $ prove -l
+  $ prove -l t/login.t
+  $ prove -l -v t/login.t
 
 Or perform quick requests right from the command line with
 L<Mojolicious::Command::get>.

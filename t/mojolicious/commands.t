@@ -359,12 +359,6 @@ $buffer = '';
 like $buffer, qr!/\*whatever!, 'right output';
 like $buffer, qr!/\(\.\+\)\?!, 'verbose';
 
-# test
-require Mojolicious::Command::test;
-my $test = Mojolicious::Command::test->new;
-ok $test->description, 'has a description';
-like $test->usage, qr/test/, 'has usage information';
-
 # version
 require Mojolicious::Command::version;
 my $version = Mojolicious::Command::version->new;

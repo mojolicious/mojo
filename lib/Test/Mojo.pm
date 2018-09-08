@@ -442,10 +442,9 @@ Test::Mojo - Testing Mojo
 
 L<Test::Mojo> is a test user agent based on L<Mojo::UserAgent>, it is usually
 used together with L<Test::More> to test L<Mojolicious> applications. Just run
-your tests with the command L<Mojolicious::Command::test> or L<prove>.
+your tests with L<prove>.
 
-  $ ./script/my_app test
-  $ ./script/my_app test -v t/foo.t
+  $ prove -l -v
   $ prove -l -v t/foo.t
 
 If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will

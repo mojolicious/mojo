@@ -3,6 +3,13 @@
   - Removed test command.
   - Removed deprecated expect_close attribute from Mojo::Content.
   - Removed deprecated error and finish events from Mojo::IOLoop::Delay.
+  - Removed experimental status from server_timing method in Mojo::Headers.
+  - Removed experimental status from tag_to_html function in Mojo::DOM::HTML.
+  - Removed experimental status from tag method in Mojo::DOM::HTML.
+  - Removed experimental status from bytes_read and bytes_written methods in
+    Mojo::IOLoop::Stream.
+  - Removed experimental status from before_server_start hook.
+  - Removed experimental status from timing->* helpers.
   - Improved Mojo::Promise to allow for reject and resolve methods to be used as
     class methods.
   - Reduced memory usage of Mojo::IOLoop::Stream.

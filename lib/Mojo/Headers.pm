@@ -616,7 +616,6 @@ Get or replace current header value, shortcut for the C<Server> header.
 
 Get or replace current header value, shortcut for the C<Server-Timing> header
 from L<Server Timing|https://www.w3.org/TR/server-timing/>.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 set_cookie
 

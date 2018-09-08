@@ -329,7 +329,7 @@ individually.
 
 Generate HTML/XML tag and render it right away. This is a significantly faster
 alternative to L</"tag"> for template systems that have to generate a lot of
-tags. Note that this function is EXPERIMENTAL and might change without warning!
+tags.
 
 =head1 ATTRIBUTES
 
@@ -372,8 +372,7 @@ Render DOM to HTML/XML.
 
   $html = $html->tag('div', id => 'foo', 'safe content');
 
-Generate HTML/XML tag. Note that this method is EXPERIMENTAL and might change
-without warning!
+Generate HTML/XML tag.
 
 =head1 SEE ALSO
 

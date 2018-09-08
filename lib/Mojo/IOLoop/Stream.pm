@@ -247,15 +247,13 @@ implements the following new ones.
 
   my $num = $stream->bytes_read;
 
-Number of bytes received. Note that this method is EXPERIMENTAL and might change
-without warning!
+Number of bytes received.
 
 =head2 bytes_written
 
   my $num = $stream->bytes_written;
 
-Number of bytes written. Note that this method is EXPERIMENTAL and might change
-without warning!
+Number of bytes written.
 
 =head2 close
 

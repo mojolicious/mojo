@@ -261,8 +261,7 @@ L<Mojolicious> will emit the following hooks in the listed order.
 
 Emitted right before the application server is started, for web servers that
 support it, which includes all the built-in ones (except for
-L<Mojo::Server::CGI>). Note that this hook is EXPERIMENTAL and might change
-without warning!
+L<Mojo::Server::CGI>).
 
   $app->hook(before_server_start => sub {
     my ($server, $app) = @_;

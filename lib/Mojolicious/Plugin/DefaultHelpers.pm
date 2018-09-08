@@ -473,8 +473,7 @@ Alias for L<Mojolicious::Controller/"stash">.
 
   $c->timing->begin('foo');
 
-Create named timestamp for L<"timing-E<gt>elapsed">. Note that this helper is
-EXPERIMENTAL and might change without warning!
+Create named timestamp for L<"timing-E<gt>elapsed">.
 
 =head2 timing->elapsed
 
@@ -482,7 +481,6 @@ EXPERIMENTAL and might change without warning!
 
 Return fractional amount of time in seconds since named timstamp has been
 created with L</"timing-E<gt>begin"> or C<undef> if no such timestamp exists.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
   # Log timing information
   $c->timing->begin('database_stuff');
@@ -496,8 +494,7 @@ Note that this helper is EXPERIMENTAL and might change without warning!
 
 Return fractional number of requests that could be performed in one second if
 every singe one took the given amount of time in seconds or C<undef> if the
-number is too low. Note that this helper is EXPERIMENTAL and might change
-without warning!
+number is too low.
 
   # Log more timing information
   $c->timing->begin('web_stuff');
@@ -512,8 +509,7 @@ without warning!
   $c->timing->server_timing('metric', 'Some Description');
   $c->timing->server_timing('metric', 'Some Description', '0.001');
 
-Create C<Server-Timing> header with optional description and duration. Note that
-this helper is EXPERIMENTAL and might change without warning!
+Create C<Server-Timing> header with optional description and duration.
 
   # "Server-Timing: miss"
   $c->timing->server_timing('miss');

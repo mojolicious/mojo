@@ -2,11 +2,11 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::Asset::Memory;
 use Mojo::Upload;
 use Mojolicious::Lite;
-use Test::Mojo;
 
 # Custom check
 app->validator->add_check(two => sub { length $_[2] == 2 ? undef : "e:$_[1]" });

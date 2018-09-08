@@ -6,6 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
+use Test::Mojo;
 use Test::More;
 
 use FindBin;
@@ -18,7 +19,6 @@ use Mojo::Home;
 use Mojo::IOLoop;
 use Mojolicious;
 use Mojolicious::Controller;
-use Test::Mojo;
 
 # Missing config file
 {
@@ -484,11 +484,14 @@ $t->get_ok('/just/some/template')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("Development template with high precedence.\n");
 
-# Check default development mode log level
-is(Mojolicious->new->log->level, 'debug', 'right log level');
+{
+  # Check default development mode log level
+  local $ENV{MOJO_LOG_LEVEL};
+  is(Mojolicious->new->log->level, 'debug', 'right log level');
 
-# Check non-development mode log level
-is(Mojolicious->new->mode('test')->log->level, 'info', 'right log level');
+  # Check non-development mode log level
+  is(Mojolicious->new->mode('test')->log->level, 'info', 'right log level');
+}
 
 # Make sure we can override attributes with constructor arguments
 is(MojoliciousTest->new(mode => 'test')->mode, 'test', 'right mode');

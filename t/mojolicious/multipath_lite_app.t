@@ -2,9 +2,9 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
-use Test::Mojo;
 
 # More paths with higher precedence
 unshift @{app->renderer->paths}, app->home->child('templates2');

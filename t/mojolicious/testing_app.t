@@ -5,12 +5,11 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
+use Test::Mojo;
 use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
-
-use Test::Mojo;
 
 my $t       = Test::Mojo->new('MojoliciousTest');
 my $success = '';

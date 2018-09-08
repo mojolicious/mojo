@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 
 use FindBin;
@@ -9,7 +10,6 @@ use lib "$FindBin::Bin/lib";
 
 use Mojo::Message::Response;
 use Mojolicious::Lite;
-use Test::Mojo;
 
 # Internal redirect
 hook around_dispatch => sub {

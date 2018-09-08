@@ -37,6 +37,7 @@ has log              => sub {
     if -d $home->child('log') && -w _;
 
   # Reduced log output outside of development mode
+  return $log->level($ENV{MOJO_LOG_LEVEL}) if $ENV{MOJO_LOG_LEVEL};
   return $mode eq 'development' ? $log : $log->level('info');
 };
 has 'max_request_size';
@@ -447,9 +448,10 @@ which stringifies to the actual path.
   $app    = $app->log(Mojo::Log->new);
 
 The logging layer of your application, defaults to a L<Mojo::Log> object. The
-level will default to C<debug> if the L</mode> is C<development>, or C<info>
-otherwise. All messages will be written to C<STDERR>, or a C<log/$mode.log> file
-if a C<log> directory exists.
+level will default to either the C<MOJO_LOG_LEVEL> environment variable,
+C<debug> if the L</mode> is C<development>, or C<info> otherwise. All messages
+will be written to C<STDERR>, or a C<log/$mode.log> file if a C<log> directory
+exists.
 
   # Log debug message
   $app->log->debug('It works');

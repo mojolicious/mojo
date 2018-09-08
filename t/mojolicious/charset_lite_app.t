@@ -2,10 +2,10 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
-use Test::Mojo;
 
 my $yatta      = 'やった';
 my $yatta_sjis = b($yatta)->encode('shift_jis')->to_string;

@@ -2,12 +2,12 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 
 BEGIN { plan skip_all => 'Perl 5.20+ required for this test!' if $] < 5.020 }
 
 use Mojolicious::Lite -signatures;
-use Test::Mojo;
 
 helper send_json => sub ($c, $hash) { $c->send({json => $hash}) };
 

@@ -2,11 +2,11 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::JSON 'encode_json';
 use Mojolicious::Lite;
-use Test::Mojo;
 
 websocket '/echo' => sub {
   my $c = shift;

@@ -5,10 +5,10 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::File 'path';
 use Mojolicious::Lite;
-use Test::Mojo;
 
 # Default
 app->config(it => 'works');

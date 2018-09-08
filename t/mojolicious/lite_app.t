@@ -5,12 +5,12 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
 use Mojo::IOLoop;
 use Mojolicious::Lite;
-use Test::Mojo;
 use Time::HiRes 'usleep';
 
 # Missing plugin

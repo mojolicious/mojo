@@ -2,12 +2,12 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::Asset::Memory;
 use Mojo::Date;
 use Mojo::File 'path';
 use Mojolicious::Lite;
-use Test::Mojo;
 
 get '/hello3.txt' => sub { shift->reply->static('hello2.txt') };
 

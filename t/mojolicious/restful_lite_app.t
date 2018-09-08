@@ -2,10 +2,10 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::JSON qw(false true);
 use Mojolicious::Lite;
-use Test::Mojo;
 
 any [qw(POST PUT)] => '/json/echo' => sub {
   my $c = shift;

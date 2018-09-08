@@ -2,10 +2,10 @@ use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
+use Test::Mojo;
 use Test::More;
 use Mojo::IOLoop;
 use Mojolicious::Lite;
-use Test::Mojo;
 
 package MyTestApp::Controller;
 use Mojo::Base 'Mojolicious::Controller';

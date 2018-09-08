@@ -41,7 +41,7 @@ sub error { shift->_log(error => @_) }
 sub fatal { shift->_log(fatal => @_) }
 sub info  { shift->_log(info  => @_) }
 
-sub is_level { $LEVEL{pop()} >= $LEVEL{$ENV{MOJO_LOG_LEVEL} || shift->level} }
+sub is_level { $LEVEL{pop()} >= $LEVEL{shift->level} }
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -161,8 +161,7 @@ The last few logged messages.
   $log      = $log->level('debug');
 
 Active log level, defaults to C<debug>. Available log levels are C<debug>,
-C<info>, C<warn>, C<error> and C<fatal>, in that order. Note that the
-C<MOJO_LOG_LEVEL> environment variable can override this value.
+C<info>, C<warn>, C<error> and C<fatal>, in that order.
 
 =head2 max_history_size
 

@@ -1,9 +1,6 @@
 package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::Promise';
 
-# DEPRECATED!
-use base 'Mojo::EventEmitter';
-
 sub begin {
   my ($self, $offset, $len) = @_;
   $self->{pending}++;
@@ -17,9 +14,6 @@ sub steps {
   my ($self, @steps) = @_;
   $self->{steps} = \@steps;
   $self->ioloop->next_tick($self->begin);
-
-  # DEPRECATED!
-  $self->{deprecated} ||= $self->on(error => sub { });
 
   return $self;
 }
@@ -38,11 +32,11 @@ sub _step {
     unless (eval { $self->$cb(@args); 1 }) {
       my $err = $@;
       @{$self}{qw(fail steps)} = (1, []);
-      return $self->reject($err)->emit(error => $err);
+      return $self->reject($err);
     }
   }
 
-  ($self->{steps} = []) and return $self->resolve(@args)->emit(finish => @args)
+  ($self->{steps} = []) and return $self->resolve(@args)
     unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
   return $self;

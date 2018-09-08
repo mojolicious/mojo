@@ -116,36 +116,13 @@ is $result, 'success', 'right result';
 # End chain after second step
 @results = ();
 $delay   = Mojo::IOLoop::Delay->new;
-$delay->on(finish => sub { shift; push @results, [@_] });
+$delay->then(sub { push @results, [@_] });
 $delay->steps(
   sub { shift->pass(23) },
   sub { shift; push @results, [@_] },
   sub { push @results, 'fail' }
 )->wait;
 is_deeply \@results, [[23], [23]], 'right results';
-
-# Finish steps with event
-$result = undef;
-$delay  = Mojo::IOLoop::Delay->new;
-$delay->on(
-  finish => sub {
-    my ($delay, @numbers) = @_;
-    $result = \@numbers;
-  }
-);
-$delay->steps(
-  sub {
-    my $delay = shift;
-    my $end   = $delay->begin;
-    Mojo::IOLoop->next_tick(sub { $end->(1, 2, 3) });
-  },
-  sub {
-    my ($delay, @numbers) = @_;
-    my $end = $delay->begin;
-    Mojo::IOLoop->next_tick(sub { $end->(undef, @numbers, 4) });
-  }
-)->wait;
-is_deeply $result, [2, 3, 4], 'right results';
 
 # Nested delays
 $result = undef;

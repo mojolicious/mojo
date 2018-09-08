@@ -855,7 +855,8 @@ L<Mojo::Promise> object instead of accepting a callback.
 =head2 options
 
   my $tx = $ua->options('example.com');
-  my $tx = $ua->options('http://example.com' => {Accept => '*/*'} => 'Content!');
+  my $tx = $ua->options(
+    'http://example.com' => {Accept => '*/*'} => 'Content!');
   my $tx = $ua->options(
     'http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
   my $tx = $ua->options(

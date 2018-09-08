@@ -95,6 +95,7 @@ sub _finally {
 
 sub _settle {
   my ($self, $status) = (shift, shift);
+  $self = $self->new unless ref $self;
 
   $_[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () })
     and return $self
@@ -289,21 +290,25 @@ reason from that promise.
 
 =head2 reject
 
-  $promise = $promise->reject(@reason);
+  my $promise = Mojo::Promise->reject(@reason);
+  $promise    = $promise->reject(@reason);
 
-Reject the promise with one or more rejection reasons.
+Build rejected L<Mojo::Promise> object or reject the promise with one or more
+rejection reasons.
 
-  # Generate rejected promise
-  my $promise = Mojo::Promise->new->reject('Something went wrong: Oops');
+  # Longer version
+  my $promise = Mojo::Promise->new->reject(@reason);
 
 =head2 resolve
 
-  $promise = $promise->resolve(@value);
+  my $promise = Mojo::Promise->resolve(@value);
+  $promise    = $promise->resolve(@value);
 
-Resolve the promise with one or more fulfillment values.
+Build resolved L<Mojo::Promise> object or resolve the promise with one or more
+fulfillment values.
 
-  # Generate fulfilled promise
-  my $promise = Mojo::Promise->new->resolve('The result is: 24');
+  # Longer version
+  my $promise = Mojo::Promise->new->resolve(@value);
 
 =head2 then
 

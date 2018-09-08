@@ -1,5 +1,8 @@
 
-7.95  2018-08-31
+8.0  2018-09-08
+  - Improved Mojo::Promise to allow for reject and resolve methods to be used as
+    class methods.
+  - Reduced memory usage of Mojo::IOLoop::Stream.
 
 7.94  2018-08-27
   - Added EXPERIMENTAL content_type and file_type methods to Mojolicious::Types.
@@ -9,7 +12,7 @@
     always use Mojolicious::Types to find the correct Content-Type value.
 
 7.93  2018-08-11
-  - Improved Test::Mojo to accept Mojo::File objects pointing to application
+  - Improved Test::Mojo to accept Mojo::File objects pointing t application
     scripts and to override configurations more consistently.
 
 7.92  2018-08-09

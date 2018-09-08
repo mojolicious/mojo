@@ -1,6 +1,7 @@
 
 8.0  2018-09-08
   - Removed test command.
+  - Removed deprecated expect_close attribute from Mojo::Content.
   - Removed deprecated error and finish events from Mojo::IOLoop::Delay.
   - Improved Mojo::Promise to allow for reject and resolve methods to be used as
     class methods.

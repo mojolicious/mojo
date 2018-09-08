@@ -5,7 +5,6 @@ use Carp 'croak';
 use Compress::Raw::Zlib qw(WANT_GZIP Z_STREAM_END);
 use Mojo::Headers;
 use Scalar::Util 'looks_like_number';
-use Mojo::Util 'deprecated';
 
 has [qw(auto_decompress auto_relax relaxed skip_body)];
 has headers           => sub { Mojo::Headers->new };
@@ -34,12 +33,6 @@ sub clone {
   my $self = shift;
   return undef if $self->is_dynamic;
   return $self->new(headers => $self->headers->clone);
-}
-
-# DEPRECATED!
-sub expect_close {
-  deprecated 'Mojo::Content::expect_close is DEPRECATED';
-  return $_[1] ? $_[0] : undef;
 }
 
 sub generate_body_chunk {

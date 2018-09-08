@@ -1745,7 +1745,9 @@ actually much easier than you might think.
   $ mv templates lib/MyApp/
 
 The trick is to move the C<public> and C<templates> directories so they can get
-automatically installed with the modules.
+automatically installed with the modules. Additionally author commands from the
+C<Mojolicious::Command::Author> namespace are not usually wanted by an
+installed application so they can be excluded.
 
   # Application
   package MyApp;
@@ -1768,6 +1770,9 @@ automatically installed with the modules.
 
     # Switch to installable "templates" directory
     $self->renderer->paths->[0] = $self->home->child('templates');
+
+    # Exclude author commands
+    $self->commands->namespaces(['Mojolicious::Commands']);
 
     $self->plugin('PODRenderer');
 

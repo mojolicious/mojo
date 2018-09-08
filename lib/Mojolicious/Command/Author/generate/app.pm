@@ -1,4 +1,4 @@
-package Mojolicious::Command::generate::app;
+package Mojolicious::Command::Author::generate::app;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
@@ -53,7 +53,7 @@ EOF
 
 =head1 NAME
 
-Mojolicious::Command::generate::app - App generator command
+Mojolicious::Command::Author::generate::app - App generator command
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ Mojolicious::Command::generate::app - App generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::app> generates application directory
+L<Mojolicious::Command::Author::generate::app> generates application directory
 structures for fully functional L<Mojolicious> applications.
 
 This is a core command, that means it is always enabled and its code a good
@@ -78,7 +78,7 @@ available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::generate::app> inherits all attributes from
+L<Mojolicious::Command::Author::generate::app> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
@@ -97,7 +97,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::generate::app> inherits all methods from
+L<Mojolicious::Command::Author::generate::app> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run

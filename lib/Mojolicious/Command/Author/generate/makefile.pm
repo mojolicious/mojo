@@ -1,4 +1,4 @@
-package Mojolicious::Command::generate::makefile;
+package Mojolicious::Command::Author::generate::makefile;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojolicious;
@@ -14,7 +14,7 @@ sub run { shift->render_to_rel_file('makefile', 'Makefile.PL') }
 
 =head1 NAME
 
-Mojolicious::Command::generate::makefile - Makefile generator command
+Mojolicious::Command::Author::generate::makefile - Makefile generator command
 
 =head1 SYNOPSIS
 
@@ -27,8 +27,8 @@ Mojolicious::Command::generate::makefile - Makefile generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::makefile> generates C<Makefile.PL> files for
-applications.
+L<Mojolicious::Command::Author::generate::makefile> generates C<Makefile.PL>
+files for applications.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
@@ -38,7 +38,7 @@ available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::generate::makefile> inherits all attributes from
+L<Mojolicious::Command::Author::generate::makefile> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
@@ -57,7 +57,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::generate::makefile> inherits all methods from
+L<Mojolicious::Command::Author::generate::makefile> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run

@@ -1,4 +1,4 @@
-package Mojolicious::Command::generate::lite_app;
+package Mojolicious::Command::Author::generate::lite_app;
 use Mojo::Base 'Mojolicious::Command';
 
 has description => 'Generate Mojolicious::Lite application';
@@ -16,7 +16,7 @@ sub run {
 
 =head1 NAME
 
-Mojolicious::Command::generate::lite_app - Lite app generator command
+Mojolicious::Command::Author::generate::lite_app - Lite app generator command
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ Mojolicious::Command::generate::lite_app - Lite app generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::lite_app> generate fully functional
+L<Mojolicious::Command::Author::generate::lite_app> generate fully functional
 L<Mojolicious::Lite> applications.
 
 This is a core command, that means it is always enabled and its code a good
@@ -41,7 +41,7 @@ available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::generate::lite_app> inherits all attributes from
+L<Mojolicious::Command::Author::generate::lite_app> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
@@ -60,7 +60,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::generate::lite_app> inherits all methods from
+L<Mojolicious::Command::Author::generate::lite_app> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run

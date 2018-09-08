@@ -404,23 +404,11 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Command::cgi>
 
-=item * L<Mojolicious::Command::cpanify>
-
 =item * L<Mojolicious::Command::daemon>
 
 =item * L<Mojolicious::Command::eval>
 
-=item * L<Mojolicious::Command::generate::app>
-
-=item * L<Mojolicious::Command::generate::lite_app>
-
-=item * L<Mojolicious::Command::generate::makefile>
-
-=item * L<Mojolicious::Command::generate::plugin>
-
 =item * L<Mojolicious::Command::get>
-
-=item * L<Mojolicious::Command::inflate>
 
 =item * L<Mojolicious::Command::prefork>
 
@@ -430,11 +418,23 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Command::version>
 
+=item * L<Mojolicious::Command::Author::cpanify>
+
+=item * L<Mojolicious::Command::Author::generate::app>
+
+=item * L<Mojolicious::Command::Author::generate::lite_app>
+
+=item * L<Mojolicious::Command::Author::generate::makefile>
+
+=item * L<Mojolicious::Command::Author::generate::plugin>
+
+=item * L<Mojolicious::Command::Author::inflate>
+
 =item * L<Mojolicious::Commands>
 
 =over 2
 
-=item * L<Mojolicious::Command::generate>
+=item * L<Mojolicious::Command::Author::generate>
 
 =back
 

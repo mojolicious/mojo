@@ -1,4 +1,4 @@
-package Mojolicious::Command::generate::plugin;
+package Mojolicious::Command::Author::generate::plugin;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(camelize class_to_path);
@@ -33,7 +33,7 @@ sub run {
 
 =head1 NAME
 
-Mojolicious::Command::generate::plugin - Plugin generator command
+Mojolicious::Command::Author::generate::plugin - Plugin generator command
 
 =head1 SYNOPSIS
 
@@ -47,8 +47,8 @@ Mojolicious::Command::generate::plugin - Plugin generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::plugin> generates directory structures for
-fully functional L<Mojolicious> plugins.
+L<Mojolicious::Command::Author::generate::plugin> generates directory structures
+for fully functional L<Mojolicious> plugins.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
@@ -58,7 +58,7 @@ available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::generate::plugin> inherits all attributes from
+L<Mojolicious::Command::Author::generate::plugin> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
@@ -77,7 +77,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::generate::plugin> inherits all methods from
+L<Mojolicious::Command::Author::generate::plugin> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run

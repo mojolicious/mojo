@@ -1409,9 +1409,10 @@ section of your application, similar to templates.
 
 Templates stored in files get preferred over files from the C<DATA> section,
 this allows you to include a default set of templates in your application that
-the user can later customize. The command L<Mojolicious::Command::inflate> will
-write all templates and static files from the C<DATA> section into actual files
-in the C<templates> and C<public> directories.
+the user can later customize. The command
+L<Mojolicious::Command::Author::inflate> will write all templates and static
+files from the C<DATA> section into actual files in the C<templates> and
+C<public> directories.
 
   $ ./myapp.pl inflate
 

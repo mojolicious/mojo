@@ -1,4 +1,4 @@
-package Mojolicious::Command::cpanify;
+package Mojolicious::Command::Author::cpanify;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::File 'path';
@@ -43,7 +43,7 @@ sub run {
 
 =head1 NAME
 
-Mojolicious::Command::cpanify - CPAN-ify command
+Mojolicious::Command::Author::cpanify - CPAN-ify command
 
 =head1 SYNOPSIS
 
@@ -58,7 +58,7 @@ Mojolicious::Command::cpanify - CPAN-ify command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::cpanify> uploads files to CPAN.
+L<Mojolicious::Command::Author::cpanify> uploads files to CPAN.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
@@ -68,7 +68,7 @@ available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::cpanify> inherits all attributes from
+L<Mojolicious::Command::Author::cpanify> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
@@ -87,7 +87,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::cpanify> inherits all methods from
+L<Mojolicious::Command::Author::cpanify> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run

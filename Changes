@@ -13,6 +13,21 @@
   - Improved Mojo::Promise to allow for reject and resolve methods to be used as
     class methods.
   - Reduced memory usage of Mojo::IOLoop::Stream.
+  - Added Mojolicious::Command::Author default namespace in
+    Mojolicious::Commands.
+  - Moved Mojolicious::Command::cpanify to
+    Mojolicious::Command::Author::cpanify.
+  - Moved Mojolicious::Command::generate to
+    Mojolicious::Command::Author::generate.
+  - Moved Mojolicious::Command::generate::app to
+    Mojolicious::Command::Author::generate::app.
+  - Moved Mojolicious::Command::generate::lite_app to
+    Mojolicious::Command::Author::generate::lite_app.
+  - Moved Mojolicious::Command::generate::makefile to
+    Mojolicious::Command::Author::generate::makefile.
+  - Moved Mojolicious::Command::generate::plugin to
+    Mojolicious::Command::Author::generate::plugin.
+  - Moved Mojolicious::Command::inflate to Mojolicious::Command::Author::inflate.
 
 7.94  2018-08-27
   - Added EXPERIMENTAL content_type and file_type methods to Mojolicious::Types.

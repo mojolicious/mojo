@@ -1,4 +1,4 @@
-package Mojolicious::Command::inflate;
+package Mojolicious::Command::Author::inflate;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Loader qw(data_section file_is_binary);
@@ -34,7 +34,7 @@ sub run {
 
 =head1 NAME
 
-Mojolicious::Command::inflate - Inflate command
+Mojolicious::Command::Author::inflate - Inflate command
 
 =head1 SYNOPSIS
 
@@ -51,8 +51,8 @@ Mojolicious::Command::inflate - Inflate command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::inflate> turns templates and static files embedded in
-the C<DATA> sections of your application into real files.
+L<Mojolicious::Command::Author::inflate> turns templates and static files
+embedded in the C<DATA> sections of your application into real files.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
@@ -62,7 +62,7 @@ available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::inflate> inherits all attributes from
+L<Mojolicious::Command::Author::inflate> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
@@ -81,7 +81,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::inflate> inherits all methods from
+L<Mojolicious::Command::Author::inflate> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run

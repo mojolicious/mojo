@@ -27,7 +27,11 @@ is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 is_deeply $t->app->commands->namespaces,
-  [qw(Mojolicious::Command MojoliciousTest::Command)], 'right namespaces';
+  [
+  'Mojolicious::Command', 'Mojolicious::Command::Author',
+  'MojoliciousTest::Command'
+  ],
+  'right namespaces';
 is $t->app, $t->app->commands->app, 'applications are equal';
 is $t->app->static->file('hello.txt')->slurp,
   "Hello Mojo from a static file!\n", 'right content';

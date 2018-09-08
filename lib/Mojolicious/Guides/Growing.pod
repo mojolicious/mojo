@@ -164,8 +164,8 @@ organized CPAN distribution to maximize maintainability.
         +- welcome.html.ep   # Template for "welcome" action
 
 Both application skeletons can be automatically generated with the commands
-L<Mojolicious::Command::generate::lite_app> and
-L<Mojolicious::Command::generate::app>.
+L<Mojolicious::Command::Author::generate::lite_app> and
+L<Mojolicious::Command::Author::generate::app>.
 
   $ mojo generate lite_app myapp.pl
   $ mojo generate app MyApp
@@ -556,7 +556,7 @@ possibilities.
 
 All templates and static files inlined in the C<DATA> section can be
 automatically turned into separate files in the C<templates> and C<public>
-directories with the command L<Mojolicious::Command::inflate>.
+directories with the command L<Mojolicious::Command::Author::inflate>.
 
   $ ./myapp.pl inflate
 

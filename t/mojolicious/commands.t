@@ -94,7 +94,8 @@ is $app->start('test_command'), 'works!', 'right result';
 }
 
 # mojo
-is_deeply $commands->namespaces, ['Mojolicious::Command'], 'right namespaces';
+is_deeply $commands->namespaces,
+  ['Mojolicious::Command', 'Mojolicious::Command::Author'], 'right namespaces';
 ok $commands->description, 'has a description';
 like $commands->message,   qr/COMMAND/, 'has a message';
 like $commands->hint,      qr/help/, 'has a hint';
@@ -177,8 +178,8 @@ ok $cgi->description, 'has a description';
 like $cgi->usage, qr/cgi/, 'has usage information';
 
 # cpanify
-require Mojolicious::Command::cpanify;
-my $cpanify = Mojolicious::Command::cpanify->new;
+require Mojolicious::Command::Author::cpanify;
+my $cpanify = Mojolicious::Command::Author::cpanify->new;
 ok $cpanify->description, 'has a description';
 like $cpanify->usage, qr/cpanify/, 'has usage information';
 $cpanify->app->ua->unsubscribe('start')->once(
@@ -217,9 +218,9 @@ $buffer = '';
 like $buffer, qr/Mojolicious::Controller/, 'right output';
 
 # generate
-require Mojolicious::Command::generate;
-my $generator = Mojolicious::Command::generate->new;
-is_deeply $generator->namespaces, ['Mojolicious::Command::generate'],
+require Mojolicious::Command::Author::generate;
+my $generator = Mojolicious::Command::Author::generate->new;
+is_deeply $generator->namespaces, ['Mojolicious::Command::Author::generate'],
   'right namespaces';
 ok $generator->description, 'has a description';
 like $generator->message,   qr/generate/, 'has a message';
@@ -236,8 +237,8 @@ like $buffer,
   'right output';
 
 # generate app
-require Mojolicious::Command::generate::app;
-$app = Mojolicious::Command::generate::app->new;
+require Mojolicious::Command::Author::generate::app;
+$app = Mojolicious::Command::Author::generate::app->new;
 ok $app->description, 'has a description';
 like $app->usage, qr/app/, 'has usage information';
 my $cwd = path;
@@ -264,8 +265,8 @@ ok -e $app->rel_file('my_app/templates/example/welcome.html.ep'),
 chdir $cwd;
 
 # generate lite_app
-require Mojolicious::Command::generate::lite_app;
-$app = Mojolicious::Command::generate::lite_app->new;
+require Mojolicious::Command::Author::generate::lite_app;
+$app = Mojolicious::Command::Author::generate::lite_app->new;
 ok $app->description, 'has a description';
 like $app->usage, qr/lite_app/, 'has usage information';
 $dir = tempdir CLEANUP => 1;
@@ -281,8 +282,8 @@ ok -e $app->rel_file('myapp.pl'), 'app exists';
 chdir $cwd;
 
 # generate makefile
-require Mojolicious::Command::generate::makefile;
-my $makefile = Mojolicious::Command::generate::makefile->new;
+require Mojolicious::Command::Author::generate::makefile;
+my $makefile = Mojolicious::Command::Author::generate::makefile->new;
 ok $makefile->description, 'has a description';
 like $makefile->usage, qr/makefile/, 'has usage information';
 $dir = tempdir CLEANUP => 1;
@@ -298,8 +299,8 @@ ok -e $app->rel_file('Makefile.PL'), 'Makefile.PL exists';
 chdir $cwd;
 
 # generate plugin
-require Mojolicious::Command::generate::plugin;
-my $plugin = Mojolicious::Command::generate::plugin->new;
+require Mojolicious::Command::Author::generate::plugin;
+my $plugin = Mojolicious::Command::Author::generate::plugin->new;
 ok $plugin->description, 'has a description';
 like $plugin->usage, qr/plugin/, 'has usage information';
 $dir = tempdir CLEANUP => 1;
@@ -320,8 +321,8 @@ ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/Makefile.PL'),
 chdir $cwd;
 
 # inflate
-require Mojolicious::Command::inflate;
-my $inflate = Mojolicious::Command::inflate->new;
+require Mojolicious::Command::Author::inflate;
+my $inflate = Mojolicious::Command::Author::inflate->new;
 ok $inflate->description, 'has a description';
 like $inflate->usage, qr/inflate/, 'has usage information';
 

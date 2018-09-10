@@ -22,7 +22,7 @@
     always use Mojolicious::Types to find the correct Content-Type value.
 
 7.93  2018-08-11
-  - Improved Test::Mojo to accept Mojo::File objects pointing t application
+  - Improved Test::Mojo to accept Mojo::File objects pointing to application
     scripts and to override configurations more consistently.
 
 7.92  2018-08-09

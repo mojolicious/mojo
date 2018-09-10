@@ -1112,8 +1112,8 @@ done.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot more
-documentation and examples by many different authors.
+L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
+lot more documentation and examples by many different authors.
 
 =head1 SUPPORT
 

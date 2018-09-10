@@ -12,8 +12,8 @@ few of them.
 
 =head1 REPORTING BUGS
 
-We use the L<GitHub issue tracker|https://github.com/kraih/mojo/issues>, so
-you'll need to create a (free) GitHub account to be able to submit issues,
+We use the L<GitHub issue tracker|https://github.com/mojolicious/mojo/issues>, 
+so you'll need to create a (free) GitHub account to be able to submit issues,
 comments and pull requests.
 
 First of all, make sure you are using the latest version of L<Mojolicious>, it
@@ -43,7 +43,7 @@ develop and release a proper fix.
 =head1 RESOLVING ISSUES
 
 There are many ways in which you can help us resolve existing issues on the
-L<GitHub issue tracker|https://github.com/kraih/mojo/issues>.
+L<GitHub issue tracker|https://github.com/mojolicious/mojo/issues>.
 
 Can you replicate the problem on your computer? Add a comment saying that
 you're seeing the same. Perhaps you can provide additional information that
@@ -60,7 +60,7 @@ One of the easiest ways to contribute to L<Mojolicious> is through
 documentation improvements. While the L<Mojolicious::Guides> are carefully
 curated by the core team, everybody with a (free) GitHub account can make
 changes and add new information to the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
+L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>.
 
 Pull requests with additions or changes to the documentation included in the
 L<Mojolicious> distribution follow the same rules as code contributions. Please
@@ -163,7 +163,7 @@ The master source code repository should always be kept in a stable state, use
 feature branches for actual development.
 
 Code has to be run through L<Perl::Tidy> with the included
-L<.perltidyrc|https://github.com/kraih/mojo/blob/master/.perltidyrc>, and
+L<.perltidyrc|https://github.com/mojolicious/mojo/blob/master/.perltidyrc>, and
 everything should look like it was written by a single person.
 
 Functions and methods should be as short as possible, no spaghetti code.
@@ -300,8 +300,8 @@ bug fixes.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot more
-documentation and examples by many different authors.
+L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
+lot more documentation and examples by many different authors.
 
 =head1 SUPPORT
 

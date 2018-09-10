@@ -192,13 +192,14 @@ database schema with migrations and build scalable real-time web applications
 with the publish/subscribe pattern.
 
 And it comes with two great
-L<example applications|https://github.com/kraih/mojo-pg/tree/master/examples/>
+L<example
+applications|https://github.com/mojolicious/mojo-pg/tree/master/examples/>
 you can use for inspiration. The minimal
-L<chat|https://github.com/kraih/mojo-pg/tree/master/examples/chat.pl>
+L<chat|https://github.com/mojolicious/mojo-pg/tree/master/examples/chat.pl>
 application will show you how to scale WebSockets to multiple servers, and the
 well-structured
-L<blog|https://github.com/kraih/mojo-pg/tree/master/examples/blog> application
-how to apply the MVC design pattern in practice.
+L<blog|https://github.com/mojolicious/mojo-pg/tree/master/examples/blog> 
+application how to apply the MVC design pattern in practice.
 
 =item L<Minion>
 
@@ -210,7 +211,8 @@ find image resizing, spam filtering, HTTP downloads, building tarballs, warming
 caches and basically everything else you can imagine that's not super fast.
 
 And it comes with a great example application you can use for inspiration. The
-L<link checker|https://github.com/kraih/minion/tree/master/examples/linkcheck>
+L<link
+checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck>
 will show you how to integrate background jobs into well-structured
 L<Mojolicious> applications.
 
@@ -529,7 +531,7 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 =head1 MORE
 
 A lot more documentation and examples by many different authors can be found in
-the L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
+the L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>.
 
 =head1 SUPPORT
 

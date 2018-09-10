@@ -39,5 +39,5 @@ WriteMakefile(
     'Time::Local'    => '1.2'
   },
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
-  test => {TESTS => 't/*.t t/*/*.t'}
+  test      => {TESTS => 't/*.t t/*/*.t'}
 );

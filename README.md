@@ -5,7 +5,7 @@
   </a>
 </p>
 
- # [![Build Status](https://travis-ci.com/mojolicious/mojo.svg?branch=master)](https://travis-ci.com/mojoliocus/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/rf4661uxfjolra2y?svg=true)](https://ci.appveyor.com/project/kraih/mojo)
+ # [![Build Status](https://travis-ci.com/mojolicious/mojo.svg?branch=master)](https://travis-ci.com/mojoliocus/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/b748ehchfsd4edac?svg=true)](https://ci.appveyor.com/project/mojolicious/mojo)
 
   Back in the early days of the web, many people learned Perl because of a
   wonderful Perl library called [CGI](https://metacpan.org/module/CGI). It was

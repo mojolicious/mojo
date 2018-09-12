@@ -29,7 +29,7 @@ WriteMakefile(
         url  => 'https://github.com/mojolicious/mojo.git',
         web  => 'https://github.com/mojolicious/mojo',
       },
-      x_IRC => 'irc://irc.perl.org/#mojo'
+      x_IRC => 'irc://irc.freenode.net/#mojo'
     },
   },
   PREREQ_PM => {

@@ -69,7 +69,7 @@ already have done in the past.
 
 We'd love to discuss your contributions to L<Mojolicious> on our official IRC
 channel C<#mojo> on C<irc.freenode.net>
-(L<chat now!|https://kiwiirc.com/client/irc.freenode.net/mojo>).
+(L<chat now!|https://kiwiirc.com/client/irc.freenode.net/mojo?nick=mojo?>).
 
 =head2 Which versions of Perl are supported by Mojolicious?
 
@@ -271,6 +271,6 @@ If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
 L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
 channel C<#mojo> on C<irc.freenode.net>
-(L<chat now!|https://kiwiirc.com/client/irc.freenode.net/mojo>).
+(L<chat now!|https://kiwiirc.com/client/irc.freenode.net/mojo?nick=mojo?>).
 
 =cut

@@ -1,5 +1,5 @@
 
-8.0  2018-09-08
+8.0  2018-09-14
   - Removed test command.
   - Removed deprecated expect_close attribute from Mojo::Content.
   - Removed deprecated error and finish events from Mojo::IOLoop::Delay.
@@ -27,7 +27,8 @@
     Mojolicious::Command::Author::generate::makefile.
   - Moved Mojolicious::Command::generate::plugin to
     Mojolicious::Command::Author::generate::plugin.
-  - Moved Mojolicious::Command::inflate to Mojolicious::Command::Author::inflate.
+  - Moved Mojolicious::Command::inflate to
+    Mojolicious::Command::Author::inflate.
 
 7.94  2018-08-27
   - Added EXPERIMENTAL content_type and file_type methods to Mojolicious::Types.

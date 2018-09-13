@@ -270,8 +270,8 @@ fulfilled.
 
   my $new = $promise->clone;
 
-Return a new L<Mojo::Promise> object cloned from this promise in C<pending>
-state.
+Return a new L<Mojo::Promise> object cloned from this promise that is still
+pending.
 
 =head2 finally
 

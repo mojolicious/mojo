@@ -9,7 +9,7 @@ has ioloop => sub { Mojo::IOLoop->singleton };
 sub all {
   my ($class, @promises) = @_;
 
-  my $all       = $class->new;
+  my $all       = $promises[0]->clone;
   my $results   = [];
   my $remaining = scalar @promises;
   for my $i (0 .. $#promises) {
@@ -22,15 +22,22 @@ sub all {
     );
   }
 
-  return @promises ? $all : $all->resolve;
+  return $all;
 }
 
 sub catch { shift->then(undef, shift) }
 
+sub clone {
+  my $self  = shift;
+  my $clone = $self->new;
+  weaken $clone->ioloop($self->ioloop)->{ioloop};
+  return $clone;
+}
+
 sub finally {
   my ($self, $finally) = @_;
 
-  my $new = $self->_clone;
+  my $new = $self->clone;
   push @{$self->{resolve}}, sub { _finally($new, $finally, 'resolve', @_) };
   push @{$self->{reject}},  sub { _finally($new, $finally, 'reject',  @_) };
 
@@ -41,7 +48,7 @@ sub finally {
 
 sub race {
   my ($class, @promises) = @_;
-  my $new = $class->new;
+  my $new = $promises[0]->clone;
   $_->then(sub { $new->resolve(@_) }, sub { $new->reject(@_) }) for @promises;
   return $new;
 }
@@ -52,7 +59,7 @@ sub resolve { shift->_settle('resolve', @_) }
 sub then {
   my ($self, $resolve, $reject) = @_;
 
-  my $new = $self->_clone;
+  my $new = $self->clone;
   push @{$self->{resolve}}, sub { _then($new, $resolve, 'resolve', @_) };
   push @{$self->{reject}},  sub { _then($new, $reject,  'reject',  @_) };
 
@@ -66,13 +73,6 @@ sub wait {
   return if (my $loop = $self->ioloop)->is_running;
   $self->finally(sub { $loop->stop });
   $loop->start;
-}
-
-sub _clone {
-  my $self  = shift;
-  my $clone = $self->new;
-  weaken $clone->ioloop($self->ioloop)->{ioloop};
-  return $clone;
 }
 
 sub _defer {
@@ -265,6 +265,13 @@ fulfilled.
     my @reason = @_;
     return "This is bad: $reason[0]";
   });
+
+=head2 clone
+
+  my $new = $promise->clone;
+
+Return a new L<Mojo::Promise> object cloned from this promise in C<pending>
+state.
 
 =head2 finally
 

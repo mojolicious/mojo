@@ -132,6 +132,18 @@ $promise2->resolve('fail');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['pass'], 'promise resolved';
 
+# Clone
+my $loop = Mojo::IOLoop->new;
+$promise = Mojo::Promise->new(ioloop => $loop)->resolve('failed');
+$promise2 = $promise->clone;
+(@results, @errors) = ();
+$promise2->then(sub { @results = @_ }, sub { @errors = @_ });
+$promise2->resolve('success');
+is $loop, $promise2->ioloop, 'same loop';
+$loop->one_tick;
+is_deeply \@results, ['success'], 'promise resolved';
+is_deeply \@errors, [], 'promise not rejected';
+
 # Exception in chain
 $promise = Mojo::Promise->new;
 (@results, @errors) = ();
@@ -194,14 +206,6 @@ $promise->resolve('first');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promises not resolved';
 is_deeply \@errors, ['third'], 'promise rejected';
-
-# Empty all
-(@results, @errors) = ();
-Mojo::Promise->all()
-  ->then(sub { @results = 'pass', @_ }, sub { @errors = 'fail', @_ });
-Mojo::IOLoop->one_tick;
-is_deeply \@results, ['pass'], 'promise resolved';
-is_deeply \@errors, [], 'promise not rejected';
 
 # Settle with promise
 $promise  = Mojo::Promise->new->resolve('works');

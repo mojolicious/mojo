@@ -1843,7 +1843,7 @@ lot more documentation and examples by many different authors.
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
 L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.freenode.net>
-(L<chat now!|https://kiwiirc.com/client/irc.freenode.net/mojo?nick=mojo?>).
+channel C<#mojo> on C<irc.freenode.net> (L<chat
+now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>).
 
 =cut

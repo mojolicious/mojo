@@ -12,6 +12,7 @@
   - Removed experimental status from timing->* helpers.
   - Added clone method to Mojo::Promise.
   - Added chmod method to Mojo::File.
+  - Added prepare event to Mojo::UserAgent.
   - Added Mojolicious::Command::Author default namespace in
     Mojolicious::Commands.
   - Moved Mojolicious::Command::cpanify to

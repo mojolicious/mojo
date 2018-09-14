@@ -313,6 +313,7 @@ sub _start {
   my ($self, $loop, $tx, $cb) = @_;
 
   # Application server
+  $self->emit(prepare => $tx);
   my $url = $tx->req->url;
   if (!$url->is_abs && (my $server = $self->server)) {
     my $base = $loop == $self->ioloop ? $server->url : $server->nb_url;
@@ -466,6 +467,23 @@ See L<Mojolicious::Guides::Cookbook/"USER AGENT"> for more.
 L<Mojo::UserAgent> inherits all events from L<Mojo::EventEmitter> and can emit
 the following new ones.
 
+=head2 prepare
+
+  $ua->on(prepare => sub {
+    my ($ua, $tx) = @_;
+    ...
+  });
+
+Emitted whenever a new transaction is being prepared, before relative URLs are
+rewritten and cookies added. This includes automatically prepared proxy
+C<CONNECT> requests and followed redirects.
+
+  $ua->on(prepare => sub {
+    my ($ua, $tx) = @_;
+    $tx->req->url(Mojo::URL->new('/mock-mojolicious'))
+      if $tx->req->url->host eq 'mojolicious.org';
+  });
+
 =head2 start
 
   $ua->on(start => sub {
@@ -473,7 +491,7 @@ the following new ones.
     ...
   });
 
-Emitted whenever a new transaction is about to start, this includes
+Emitted whenever a new transaction is about to start. This includes
 automatically prepared proxy C<CONNECT> requests and followed redirects.
 
   $ua->on(start => sub {

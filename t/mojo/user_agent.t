@@ -276,8 +276,14 @@ like $err, qr/error event works/, 'right error';
 
 # Events
 my ($finished_req, $finished_tx, $finished_res);
-$tx = $ua->build_tx(GET => '/');
+$tx = $ua->build_tx(GET => '/does_not_exist');
 ok !$tx->is_finished, 'transaction is not finished';
+$ua->once(
+  prepare => sub {
+    my ($ua, $tx) = @_;
+    $tx->req->url->path('/');
+  }
+);
 $ua->once(
   start => sub {
     my ($ua, $tx) = @_;

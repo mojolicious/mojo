@@ -83,9 +83,9 @@ sub parse_message {
       decode('UTF-8', $frame->[5]));
   }
 
+  # Append chunk and check message size
   @{$self}{qw(op pmc)} = ($op, $self->compressed && $frame->[1])
     unless exists $self->{op};
-  # Append chunk and check message size
   $self->{message} .= $frame->[5];
   my $max = $self->max_websocket_size;
   return $self->finish(1009) if length $self->{message} > $max;

@@ -268,4 +268,17 @@ isnt $frame->[5], $frame2->[5], 'different payload';
 is $frame2->[5], $uncompressed->build_message({binary => 'just works'})->[5],
   'same payload';
 
+# Compressed fragmented message
+my $fragmented_compressed = Mojo::Transaction::WebSocket->new({compressed => 1});
+undef $text;
+$fragmented_compressed->on(message => sub { $text = pop });
+my $compressed_payload = $fragmented_compressed->build_message({text => 'just works'})->[5];
+ok !$text, 'message event has not been emitted yet';
+$fragmented_compressed->parse_message([0, 1, 0, 0, WS_TEXT, substr($compressed_payload, 0, 3)]);
+ok !$text, 'message event has not been emitted yet';
+$fragmented_compressed->parse_message([0, 0, 0, 0, WS_CONTINUATION, substr($compressed_payload, 3, 3)]);
+ok !$text, 'message event has not been emitted yet';
+$fragmented_compressed->parse_message([1, 0, 0, 0, WS_CONTINUATION, substr($compressed_payload, 6)]);
+is $text, 'just works', 'decoded correctly';
+
 done_testing();

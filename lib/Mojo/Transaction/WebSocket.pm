@@ -83,8 +83,9 @@ sub parse_message {
       decode('UTF-8', $frame->[5]));
   }
 
+  @{$self}{qw(op pmc)} = ($op, $self->compressed && $frame->[1])
+    unless exists $self->{op};
   # Append chunk and check message size
-  $self->{op} = $op unless exists $self->{op};
   $self->{message} .= $frame->[5];
   my $max = $self->max_websocket_size;
   return $self->finish(1009) if length $self->{message} > $max;
@@ -94,7 +95,7 @@ sub parse_message {
 
   # "permessage-deflate" extension (handshake and RSV1)
   my $msg = delete $self->{message};
-  if ($self->compressed && $frame->[1]) {
+  if ($self->compressed && $self->{pmc}) {
     my $inflate = $self->{inflate} ||= Compress::Raw::Zlib::Inflate->new(
       Bufsize     => $max,
       LimitOutput => 1,

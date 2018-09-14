@@ -10,7 +10,7 @@ use Mojo::Template;
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
 has description => 'No description';
 has 'quiet';
-has template => sub { {} };
+has template => sub { {vars => 1} };
 has usage => "Usage: APPLICATION\n";
 
 sub chmod_file {
@@ -150,7 +150,7 @@ Limited command output.
   $command     = $command->template({vars => 1});
 
 Attribute values passed to L<Mojo::Template> objects used to render templates
-with L</"render_data">.
+with L</"render_data">, defaults to activating C<vars>.
 
 =head2 usage
 

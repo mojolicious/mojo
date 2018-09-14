@@ -15,7 +15,6 @@ sub run {
   $class = "Mojolicious::Plugin::$class";
   my $app = class_to_path $class;
   my $dir = join '-', split('::', $class);
-  $self->template({vars => 1});
   $self->render_to_rel_file('class', "$dir/lib/$app",
     {class => $class, name => $name});
 

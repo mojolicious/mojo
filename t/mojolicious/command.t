@@ -50,7 +50,7 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $command->render_to_rel_file('foo_bar', 'bar/baz.txt', 'works');
+  $command->template({})->render_to_rel_file('foo_bar', 'bar/baz.txt', 'works');
 }
 like $buffer, qr/\[mkdir\].*\[write\]/s, 'right output';
 open my $txt, '<', $command->rel_file('bar/baz.txt');

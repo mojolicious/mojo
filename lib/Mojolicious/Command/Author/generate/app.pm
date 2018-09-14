@@ -17,7 +17,6 @@ EOF
 
   # Script
   my $name = class_to_file $class;
-  $self->template({vars => 1});
   $self->render_to_rel_file('mojo', "$name/script/$name", {class => $class});
   $self->chmod_rel_file("$name/script/$name", 0744);
 

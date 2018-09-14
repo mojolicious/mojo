@@ -1,4 +1,6 @@
 
+8.01  2018-09-16
+
 8.0  2018-09-15
   - Code name "Supervillain", this is a major release.
   - Changed query method in Mojo::URL to merge with hash references and append

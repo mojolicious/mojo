@@ -1,5 +1,8 @@
 
 8.0  2018-09-14
+  - Changed query method in Mojo::URL to merge with hash references and append
+    with array references instead of the other way around. Because appended
+    pairs should be able to preserve order.
   - Removed test command.
   - Removed deprecated expect_close attribute from Mojo::Content.
   - Removed deprecated error and finish events from Mojo::IOLoop::Delay.

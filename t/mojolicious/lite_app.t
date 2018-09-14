@@ -1186,10 +1186,10 @@ Yea baby!\
 Not a favicon!
 
 @@ 0.html.ep
-%== url_with->query([foo => 'bar'])
+%== url_with->query({foo => 'bar'})
 %== url_with('http://mojolicious.org/test')
-%== url_with('/test')->query([foo => undef])
-%== url_with('bartest', test => 23)->query([foo => 'yada'])
+%== url_with('/test')->query({foo => undef})
+%== url_with('bartest', test => 23)->query({foo => 'yada'})
 
 __END__
 This is not a template!

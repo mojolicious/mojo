@@ -557,7 +557,7 @@ Alias for L<Mojolicious::Controller/"url_for">.
 Does the same as L</"url_for">, but inherits query parameters from the current
 request.
 
-  %= url_with->query([page => 2])
+  %= url_with->query({page => 2})
 
 =head2 validation
 

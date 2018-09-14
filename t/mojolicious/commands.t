@@ -251,17 +251,14 @@ $buffer = '';
   $app->run;
 }
 like $buffer, qr/my_app/, 'right output';
-ok -e $app->rel_file('my_app/script/my_app'), 'script exists';
-ok -e $app->rel_file('my_app/lib/MyApp.pm'),  'application class exists';
-ok -e $app->rel_file('my_app/lib/MyApp/Controller/Example.pm'),
-  'controller exists';
-ok -e $app->rel_file('my_app/my_app.conf'),       'config file exists';
-ok -e $app->rel_file('my_app/t/basic.t'),         'test exists';
-ok -e $app->rel_file('my_app/public/index.html'), 'static file exists';
-ok -e $app->rel_file('my_app/templates/layouts/default.html.ep'),
-  'layout exists';
-ok -e $app->rel_file('my_app/templates/example/welcome.html.ep'),
-  'template exists';
+ok -e $app->rel_file('script/my_app'), 'script exists';
+ok -e $app->rel_file('lib/MyApp.pm'),  'application class exists';
+ok -e $app->rel_file('lib/MyApp/Controller/Example.pm'), 'controller exists';
+ok -e $app->rel_file('my_app.conf'),                     'config file exists';
+ok -e $app->rel_file('t/basic.t'),                       'test exists';
+ok -e $app->rel_file('public/index.html'),               'static file exists';
+ok -e $app->rel_file('/templates/layouts/default.html.ep'), 'layout exists';
+ok -e $app->rel_file('templates/example/welcome.html.ep'),  'template exists';
 chdir $cwd;
 
 # generate lite_app
@@ -312,12 +309,9 @@ $buffer = '';
   $plugin->run;
 }
 like $buffer, qr/MyPlugin\.pm/, 'right output';
-ok -e $app->rel_file(
-  'Mojolicious-Plugin-MyPlugin/lib/Mojolicious/Plugin/MyPlugin.pm'),
-  'class exists';
-ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/t/basic.t'), 'test exists';
-ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/Makefile.PL'),
-  'Makefile.PL exists';
+ok -e $app->rel_file('lib/Mojolicious/Plugin/MyPlugin.pm'), 'class exists';
+ok -e $app->rel_file('t/basic.t'),                          'test exists';
+ok -e $app->rel_file('Makefile.PL'), 'Makefile.PL exists';
 chdir $cwd;
 
 # inflate

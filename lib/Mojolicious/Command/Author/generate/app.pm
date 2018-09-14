@@ -17,33 +17,30 @@ EOF
 
   # Script
   my $name = class_to_file $class;
-  $self->render_to_rel_file('mojo', "$name/script/$name", {class => $class});
-  $self->chmod_rel_file("$name/script/$name", 0744);
+  $self->render_to_rel_file('mojo', "script/$name", {class => $class});
+  $self->chmod_rel_file("script/$name", 0744);
 
   # Application class
   my $app = class_to_path $class;
-  $self->render_to_rel_file('appclass', "$name/lib/$app", {class => $class});
+  $self->render_to_rel_file('appclass', "lib/$app", {class => $class});
 
   # Config file (using the default moniker)
-  $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.conf");
+  $self->render_to_rel_file('config', "@{[decamelize $class]}.conf");
 
   # Controller
   my $controller = "${class}::Controller::Example";
   my $path       = class_to_path $controller;
-  $self->render_to_rel_file('controller', "$name/lib/$path",
-    {class => $controller});
+  $self->render_to_rel_file('controller', "lib/$path", {class => $controller});
 
   # Test
-  $self->render_to_rel_file('test', "$name/t/basic.t", {class => $class});
+  $self->render_to_rel_file('test', "t/basic.t", {class => $class});
 
   # Static file
-  $self->render_to_rel_file('static', "$name/public/index.html");
+  $self->render_to_rel_file('static', "public/index.html");
 
   # Templates
-  $self->render_to_rel_file('layout',
-    "$name/templates/layouts/default.html.ep");
-  $self->render_to_rel_file('welcome',
-    "$name/templates/example/welcome.html.ep");
+  $self->render_to_rel_file('layout',  "templates/layouts/default.html.ep");
+  $self->render_to_rel_file('welcome', "templates/example/welcome.html.ep");
 }
 
 1;

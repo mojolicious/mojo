@@ -5,6 +5,8 @@
     pairs should be able to preserve order.
   - Changed template attribute in Mojolicious::Command to acivate vars by
     default.
+  - Changed app and plugin generator commands to use the current working
+    directory as project root instead of creating a new directory.
   - Removed test command.
   - Removed deprecated expect_close attribute from Mojo::Content.
   - Removed deprecated error and finish events from Mojo::IOLoop::Delay.

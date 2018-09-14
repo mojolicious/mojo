@@ -188,19 +188,20 @@ Let's spin up a Mojolicious application using C<mojo generate app MyApp>. The
 C<mojo> utility will create a working application and a C<t> directory with a
 working test file:
 
+  $ mkdir my_app
+  $ cd my_app
   $ mojo generate app MyApp
-  [mkdir] /my_app/script
-  [write] /my_app/script/my_app
-  [chmod] /my_app/script/my_app 744
+  [mkdir] script
+  [write] script/my_app
+  [chmod] script/my_app 744
   ...
-  [mkdir] /my_app/t
-  [write] /my_app/t/basic.t
+  [mkdir] t
+  [write] t/basic.t
   ...
 
 Let's run the tests (we'll create the C<log> directory to quiet the application
 output):
 
-  $ cd my_app
   $ mkdir log
   $ prove -lv t
   t/basic.t ..

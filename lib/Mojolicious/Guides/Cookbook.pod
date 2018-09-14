@@ -1739,8 +1739,9 @@ data structure to C<STDOUT>.
 Ever thought about releasing your L<Mojolicious> application to CPAN? It's
 actually much easier than you might think.
 
-  $ mojo generate app MyApp
+  $ mkdir my_app
   $ cd my_app
+  $ mojo generate app MyApp
   $ mv public lib/MyApp/
   $ mv templates lib/MyApp/
 

@@ -14,9 +14,9 @@ has template => sub { {} };
 has usage => "Usage: APPLICATION\n";
 
 sub chmod_file {
-  my ($self, $path, $mod) = @_;
-  chmod $mod, $path or croak qq{Can't chmod file "$path": $!};
-  return $self->_loud("  [chmod] $path " . sprintf('%lo', $mod));
+  my ($self, $path, $mode) = @_;
+  path($path)->chmod($mode);
+  return $self->_loud("  [chmod] $path " . sprintf('%lo', $mode));
 }
 
 sub chmod_rel_file { $_[0]->chmod_file($_[0]->rel_file($_[1]), $_[2]) }

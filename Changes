@@ -11,6 +11,7 @@
   - Removed experimental status from before_server_start hook.
   - Removed experimental status from timing->* helpers.
   - Added clone method to Mojo::Promise.
+  - Added chmod method to Mojo::File.
   - Added Mojolicious::Command::Author default namespace in
     Mojolicious::Commands.
   - Moved Mojolicious::Command::cpanify to
@@ -27,6 +28,7 @@
     Mojolicious::Command::Author::generate::plugin.
   - Moved Mojolicious::Command::inflate to
     Mojolicious::Command::Author::inflate.
+  - Updated project metadata.
   - Improved Mojo::Promise to allow for reject and resolve methods to be used as
     class methods.
   - Reduced memory usage of Mojo::IOLoop::Stream.

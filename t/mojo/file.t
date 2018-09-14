@@ -155,6 +155,11 @@ ok -f $destination2, 'file also exists now';
 is $destination->slurp,  'works!', 'right content';
 is $destination2->slurp, 'works!', 'right content';
 
+# Change permissions
+$dir = tempdir;
+eval { $dir->child('does_not_exist')->chmod(644) };
+like $@, qr/^Can't chmod file/, 'right error';
+
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
 is_deeply path(__FILE__)->list->to_array,         [], 'no files';

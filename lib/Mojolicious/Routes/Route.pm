@@ -134,9 +134,7 @@ sub to {
   if ($shortcut) {
 
     # Application
-    if (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
-      $defaults{app} = $shortcut;
-    }
+    if (ref $shortcut || $shortcut =~ /^[\w:]+$/) { $defaults{app} = $shortcut }
 
     # Controller and action
     elsif ($shortcut =~ /^([\w\-:]+)?\#(\w+)?$/) {

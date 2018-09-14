@@ -14,7 +14,6 @@ sub steps {
   my ($self, @steps) = @_;
   $self->{steps} = \@steps;
   $self->ioloop->next_tick($self->begin);
-
   return $self;
 }
 

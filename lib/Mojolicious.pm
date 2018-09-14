@@ -65,7 +65,7 @@ has ua       => sub {
 };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Doughnut';
+our $CODENAME = 'Supervillain';
 our $VERSION  = '8.0';
 
 sub AUTOLOAD {

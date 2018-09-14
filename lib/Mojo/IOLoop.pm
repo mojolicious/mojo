@@ -460,8 +460,6 @@ Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
 
 Check if event loop is running.
 
-  exit unless Mojo::IOLoop->is_running;
-
 =head2 next_tick
 
   my $undef = Mojo::IOLoop->next_tick(sub {...});

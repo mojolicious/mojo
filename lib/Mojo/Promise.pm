@@ -297,8 +297,8 @@ reason from that promise.
 
 =head2 reject
 
-  my $promise = Mojo::Promise->reject(@reason);
-  $promise    = $promise->reject(@reason);
+  my $new  = Mojo::Promise->reject(@reason);
+  $promise = $promise->reject(@reason);
 
 Build rejected L<Mojo::Promise> object or reject the promise with one or more
 rejection reasons.
@@ -308,8 +308,8 @@ rejection reasons.
 
 =head2 resolve
 
-  my $promise = Mojo::Promise->resolve(@value);
-  $promise    = $promise->resolve(@value);
+  my $new  = Mojo::Promise->resolve(@value);
+  $promise = $promise->resolve(@value);
 
 Build resolved L<Mojo::Promise> object or resolve the promise with one or more
 fulfillment values.

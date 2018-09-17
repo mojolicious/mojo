@@ -6,7 +6,7 @@
   - Changed query method in Mojo::URL to merge with hash references and append
     with array references instead of the other way around. Because appended
     pairs should be able to preserve order.
-  - Changed template attribute in Mojolicious::Command to acivate vars by
+  - Changed template attribute in Mojolicious::Command to activate vars by
     default.
   - Removed test command.
   - Removed deprecated expect_close attribute from Mojo::Content.

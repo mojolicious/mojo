@@ -433,9 +433,9 @@ Normalized version of L</"scheme">.
   $url      = $url->query('a=1&b=2');
   $url      = $url->query(Mojo::Parameters->new);
 
-Query part of this URL, key/value pairs in an array reference will be merged
-with L<Mojo::Parameters/"merge">, and key/value pairs in a hash reference
-appended with L<Mojo::Parameters/"append">, defaults to a L<Mojo::Parameters>
+Query part of this URL, key/value pairs in an array reference will be appended
+with L<Mojo::Parameters/"append">, and key/value pairs in a hash reference
+merged with L<Mojo::Parameters/"merge">, defaults to a L<Mojo::Parameters>
 object.
 
   # "2"

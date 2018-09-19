@@ -215,7 +215,7 @@ $id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
 my $proxy2 = Mojo::IOLoop->acceptor($id)->port;
 $ua->proxy->https("http://127.0.0.1:$proxy2");
 $tx = $ua->get('https://example.com');
-like $tx->error->{message}, qr/handshake problems/, 'right error';
+like $tx->error->{message}, qr/SSL connect attempt/, 'right error';
 
 # Idle connection through proxy
 my $idle = Mojo::IOLoop->acceptor(Mojo::IOLoop->server(sub { }))->port;

@@ -1,4 +1,6 @@
 
+8.02  2018-09-26
+
 8.01  2018-09-25
   - Updated jQuery to version 3.3.1.
   - Fixed order of command namespaces so Mojolicious can be upgraded without

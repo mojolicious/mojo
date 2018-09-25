@@ -66,7 +66,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.01';
+our $VERSION  = '8.02';
 
 sub AUTOLOAD {
   my $self = shift;

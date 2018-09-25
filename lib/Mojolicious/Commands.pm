@@ -11,7 +11,7 @@ See 'APPLICATION help COMMAND' for more information on a specific command.
 EOF
 has message => sub { shift->extract_usage . "\nCommands:\n" };
 has namespaces =>
-  sub { ['Mojolicious::Command', 'Mojolicious::Command::Author'] };
+  sub { ['Mojolicious::Command::Author', 'Mojolicious::Command'] };
 
 sub detect {
 
@@ -276,8 +276,8 @@ Short usage message shown before listing available commands.
   my $namespaces = $commands->namespaces;
   $commands      = $commands->namespaces(['MyApp::Command']);
 
-Namespaces to load commands from, defaults to C<Mojolicious::Command> and
-C<Mojolicious::Command::Author>.
+Namespaces to load commands from, defaults to C<Mojolicious::Command::Author>
+and C<Mojolicious::Command>.
 
   # Add another namespace to load commands from
   push @{$commands->namespaces}, 'MyApp::Command';

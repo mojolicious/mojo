@@ -74,7 +74,7 @@ is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 is_deeply $t->app->commands->namespaces,
   [
-  'Mojolicious::Command', 'Mojolicious::Command::Author',
+  'Mojolicious::Command::Author', 'Mojolicious::Command',
   'MojoliciousTest::Command'
   ],
   'right namespaces';

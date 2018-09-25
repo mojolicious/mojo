@@ -95,7 +95,7 @@ is $app->start('test_command'), 'works!', 'right result';
 
 # mojo
 is_deeply $commands->namespaces,
-  ['Mojolicious::Command', 'Mojolicious::Command::Author'], 'right namespaces';
+  ['Mojolicious::Command::Author', 'Mojolicious::Command'], 'right namespaces';
 ok $commands->description, 'has a description';
 like $commands->message,   qr/COMMAND/, 'has a message';
 like $commands->hint,      qr/help/, 'has a hint';

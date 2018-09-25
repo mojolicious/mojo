@@ -1,5 +1,6 @@
 
 8.02  2018-09-26
+  - Improved HTML5.2 compliance of Mojo::DOM::HTML.
 
 8.01  2018-09-25
   - Updated jQuery to version 3.3.1.

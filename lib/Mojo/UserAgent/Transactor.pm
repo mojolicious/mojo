@@ -14,7 +14,7 @@ use Mojo::URL;
 use Mojo::Util qw(encode url_escape);
 use Mojo::WebSocket qw(challenge client_handshake);
 
-has compressed => sub { $ENV{MOJO_COMPRESSED} // 1 };
+has compressed => sub { $ENV{MOJO_GZIP} // 1 };
 has generators =>
   sub { {form => \&_form, json => \&_json, multipart => \&_multipart} };
 has name => 'Mojolicious (Perl)';
@@ -349,8 +349,8 @@ L<Mojo::UserAgent::Transactor> implements the following attributes.
   $t       = $t->compressed($bool);
 
 Try to negotiate compression for the response content and decompress it
-automatically, defaults to the value of the C<MOJO_COMPRESSED> environment
-variable or true.
+automatically, defaults to the value of the C<MOJO_GZIP> environment variable or
+true.
 
 =head2 generators
 

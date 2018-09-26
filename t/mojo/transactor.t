@@ -19,6 +19,20 @@ $t->add_generator(
   }
 );
 
+# Compression
+{
+  local $ENV{MOJO_COMPRESSED} = 1;
+  my $t = Mojo::UserAgent::Transactor->new;
+  ok $t->compressed, 'compressed';
+  is $t->tx(GET => '/')->req->headers->accept_encoding, 'gzip', 'right value';
+  is $t->tx(GET => '/')->res->content->auto_decompress, undef,  'no value';
+  $ENV{MOJO_COMPRESSED} = 0;
+  $t = Mojo::UserAgent::Transactor->new;
+  ok !$t->compressed, 'not compressed';
+  is $t->tx(GET => '/')->req->headers->accept_encoding, undef, 'no value';
+  is $t->tx(GET => '/')->res->content->auto_decompress, 0,     'right value';
+}
+
 # Simple GET
 my $tx = $t->tx(GET => 'mojolicious.org/foo.html?bar=baz');
 is $tx->req->url->to_abs, 'http://mojolicious.org/foo.html?bar=baz',

@@ -14,6 +14,7 @@ use Mojo::URL;
 use Mojo::Util qw(encode url_escape);
 use Mojo::WebSocket qw(challenge client_handshake);
 
+has compressed => sub { $ENV{MOJO_COMPRESSED} // 1 };
 has generators =>
   sub { {form => \&_form, json => \&_json, multipart => \&_multipart} };
 has name => 'Mojolicious (Perl)';
@@ -123,7 +124,8 @@ sub tx {
   my $headers = $req->headers;
   $headers->from_hash(shift) if ref $_[0] eq 'HASH';
   $headers->user_agent($self->name) unless $headers->user_agent;
-  $headers->accept_encoding('gzip') unless $headers->accept_encoding;
+  if    (!$self->compressed)         { $tx->res->content->auto_decompress(0) }
+  elsif (!$headers->accept_encoding) { $headers->accept_encoding('gzip') }
 
   # Generator
   if (@_ > 1) {
@@ -340,6 +342,15 @@ Generate multipart content. See L</"tx"> for more.
 =head1 ATTRIBUTES
 
 L<Mojo::UserAgent::Transactor> implements the following attributes.
+
+=head2 compressed
+
+  my $bool = $t->compressed;
+  $t       = $t->compressed($bool);
+
+Try to negotiate compression for the response content and decompress it
+automatically, defaults to the value of the C<MOJO_COMPRESSED> environment
+variable or true.
 
 =head2 generators
 

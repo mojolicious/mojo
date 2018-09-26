@@ -1,5 +1,6 @@
 
-8.02  2018-09-26
+8.02  2018-09-27
+  - Added compressed attribute to Mojo::UserAgent::Transactor.
   - Improved HTML5.2 compliance of Mojo::DOM::HTML.
 
 8.01  2018-09-25

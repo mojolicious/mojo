@@ -704,6 +704,9 @@ Transaction builder, defaults to a L<Mojo::UserAgent::Transactor> object.
   # Change name of user agent
   $ua->transactor->name('MyUA 1.0');
 
+  # Disable compression
+  $ua->transactor->compressed(0);
+
 =head1 METHODS
 
 L<Mojo::UserAgent> inherits all methods from L<Mojo::EventEmitter> and

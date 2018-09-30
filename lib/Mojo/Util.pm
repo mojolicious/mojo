@@ -8,7 +8,9 @@ use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use Exporter 'import';
 use Getopt::Long 'GetOptionsFromArray';
+use IO::Compress::Gzip;
 use IO::Poll qw(POLLIN POLLPRI);
+use IO::Uncompress::Gunzip;
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Pod::Usage 'pod2usage';
@@ -64,11 +66,12 @@ my (%ENCODING, %PATTERN);
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated dumper encode extract_usage getopt hmac_sha1_sum),
-  qw(html_attr_unescape html_unescape md5_bytes md5_sum monkey_patch),
-  qw(punycode_decode punycode_encode quote secure_compare sha1_bytes sha1_sum),
-  qw(slugify split_cookie_header split_header steady_time tablify term_escape),
-  qw(trim unindent unquote url_escape url_unescape xml_escape xor_encode)
+  qw(decode deprecated dumper encode extract_usage getopt gunzip gzip),
+  qw(hmac_sha1_sum html_attr_unescape html_unescape md5_bytes md5_sum),
+  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
+  qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time),
+  qw(tablify term_escape trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode)
 );
 
 # Aliases
@@ -150,6 +153,20 @@ sub getopt {
     @$opts);
   GetOptionsFromArray $array, @_;
   Getopt::Long::Configure($save);
+}
+
+sub gunzip {
+  my $compressed = shift;
+  IO::Uncompress::Gunzip::gunzip \$compressed, \my $uncompressed
+    or croak "Couldn't gunzip: $IO::Uncompress::Gunzip::GzipError";
+  return $uncompressed;
+}
+
+sub gzip {
+  my $uncompressed = shift;
+  IO::Compress::Gzip::gzip \$uncompressed, \my $compressed
+    or croak "Couldn't gzip: $IO::Compress::Gzip::GzipError";
+  return $compressed;
 }
 
 sub html_attr_unescape { _html(shift, 1) }
@@ -641,6 +658,18 @@ options C<no_auto_abbrev> and C<no_ignore_case> are enabled by default.
   # Extract "charset" option
   getopt ['--charset', 'UTF-8'], 'charset=s' => \my $charset;
   say $charset;
+
+=head2 gunzip
+
+  my $uncompressed = gunzip $compressed;
+
+Uncompress bytes with L<IO::Compress::Gunzip>.
+
+=head2 gzip
+
+  my $compressed = gzip $uncompressed;
+
+Compress bytes with L<IO::Compress::Gzip>.
 
 =head2 hmac_sha1_sum
 

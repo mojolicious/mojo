@@ -6,13 +6,13 @@ use Mojo::File 'path';
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader 'data_section';
-use Mojo::Util qw(decamelize encode md5_sum monkey_patch);
+use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
+has [qw(compress default_handler)];
 has default_format => 'html';
-has 'default_handler';
-has encoding => 'UTF-8';
+has encoding       => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
 has paths => sub { [] };
 
@@ -111,6 +111,26 @@ sub render {
 
   return $output if $args->{'mojo.string'};
   return _maybe($options->{encoding}, $output), $options->{format};
+}
+
+sub respond {
+  my ($self, $c, $output, $format, $status) = @_;
+
+  # Gzip compression
+  my $res = $c->res;
+  if ($self->compress) {
+    my $headers = $res->headers;
+    $headers->append(Vary => 'Accept-Encoding');
+    my $gzip = ($c->req->headers->accept_encoding // '') =~ /gzip/i;
+    if ($gzip && !$headers->content_encoding) {
+      $headers->content_encoding('gzip');
+      $output = gzip $output;
+    }
+  }
+
+  $res->body($output);
+  $c->app->types->content_type($c, {ext => $format});
+  return !!$c->rendered($status);
 }
 
 sub template_for {
@@ -255,6 +275,15 @@ application startup.
   # Add another class with templates in DATA section and higher precedence
   unshift @{$renderer->classes}, 'Mojolicious::Plugin::MoreFun';
 
+=head2 compress
+
+  my $bool = $t->compress;
+  $t       = $t->compress($bool);
+
+Try to negotiate compression for dynamically generated response content and
+C<gzip> compress it automatically, defaults to false. Note that this attribute
+is EXPERIMENTAL and might change without warning!
+
 =head2 default_format
 
   my $default = $renderer->default_format;
@@ -376,6 +405,16 @@ helpers can be called.
 
 Render output through one of the renderers. See
 L<Mojolicious::Controller/"render"> for a more user-friendly interface.
+
+=head2 respond
+
+  my $bool = $renderer->respond(Mojolicious::Controller->new, $output, $format);
+  my $bool = $renderer->respond(
+    Mojolicious::Controller->new, $output, $format, $status);
+
+Finalize dynamically generated response content and L</"compress"> it if
+possible. Note that this method is EXPERIMENTAL and might change without
+warning!
 
 =head2 template_for
 

@@ -6,11 +6,11 @@ BEGIN {
 }
 
 use Test::More;
-use IO::Compress::Gzip 'gzip';
 use Mojo::IOLoop;
 use Mojo::Message::Request;
 use Mojo::UserAgent;
 use Mojo::UserAgent::Server;
+use Mojo::Util 'gzip';
 use Mojolicious::Lite;
 
 # Silence
@@ -36,8 +36,8 @@ get '/no_length' => sub {
 get '/no_content' => {text => 'fail!', status => 204};
 
 get '/echo' => sub {
-  my $c = shift;
-  gzip \(my $uncompressed = $c->req->body), \my $compressed;
+  my $c          = shift;
+  my $compressed = gzip $c->req->body;
   $c->res->headers->content_encoding($c->req->headers->accept_encoding);
   $c->render(data => $compressed);
 };

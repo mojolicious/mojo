@@ -1,6 +1,11 @@
 
-8.02  2018-09-27
+8.02  2018-09-30
+  - Added support for gzip compression of dynamically generated responses.
+  - Added EXPERIMENTAL compress attribute to Mojolicious::Renderer.
   - Added compressed attribute to Mojo::UserAgent::Transactor.
+  - Added EXPERIMENTAL respond method to Mojolicious::Renderer.
+  - Added gunzip and gzip methods to Mojo::ByteStream.
+  - Added gunzip and gzip functions to Mojo::Util.
   - Improved HTML5.2 compliance of Mojo::DOM::HTML.
 
 8.01  2018-09-25

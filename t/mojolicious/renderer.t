@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::Util 'decode';
+use Mojo::Util qw(decode gunzip);
 use Mojolicious;
 
 # Partial rendering
@@ -97,6 +97,45 @@ is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
 my $helpers = $first->helpers;
 is $helpers->myapp->multi_level->test, $helpers->myapp->multi_level->test,
   'same result';
+
+# Compression
+my $output = 'a' x 1000;
+$c = $app->build_controller;
+$c->req->headers->accept_encoding('gzip');
+$renderer->respond($c, $output, 'html');
+is $c->res->headers->content_type, 'text/html;charset=UTF-8',
+  'right "Content-Type" value';
+ok !$c->res->headers->vary,             'no "Vary" value';
+ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
+is $c->res->body, $output, 'same string';
+$renderer->compress(1);
+$c = $app->build_controller;
+$c->req->headers->accept_encoding('gzip');
+$renderer->respond($c, $output, 'html');
+is $c->res->headers->content_type, 'text/html;charset=UTF-8',
+  'right "Content-Type" value';
+is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
+is $c->res->headers->content_encoding, 'gzip', 'right "Content-Encoding" value';
+isnt $c->res->body, $output, 'different string';
+is gunzip($c->res->body), $output, 'same string';
+$c = $app->build_controller;
+$renderer->respond($c, $output, 'html');
+is $c->res->code, 200, 'right status';
+is $c->res->headers->content_type, 'text/html;charset=UTF-8',
+  'right "Content-Type" value';
+is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
+ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
+is $c->res->body, $output, 'same string';
+$c = $app->build_controller;
+$c->res->headers->content_encoding('whatever');
+$renderer->respond($c, $output, 'html', 500);
+is $c->res->code, 500, 'right status';
+is $c->res->headers->content_type, 'text/html;charset=UTF-8',
+  'right "Content-Type" value';
+is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
+is $c->res->headers->content_encoding, 'whatever',
+  'right "Content-Encoding" value';
+is $c->res->body, $output, 'same string';
 
 # Missing method (AUTOLOAD)
 my $class = ref $first->myapp;

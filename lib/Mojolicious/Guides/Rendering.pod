@@ -1259,6 +1259,9 @@ lot more efficient to use L<Mojolicious/"after_render">.
     <body>Compressed content.</body>
   </html>
 
+If you want to compress all dynamically generated content you can also activate
+L<Mojolicious::Renderer/"compress">.
+
 =head2 Streaming
 
 You don't have to render all content at once, the method

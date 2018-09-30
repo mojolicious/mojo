@@ -10,11 +10,11 @@ use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode dumper encode extract_usage getopt hmac_sha1_sum html_unescape),
-  qw(html_attr_unescape md5_bytes md5_sum monkey_patch punycode_decode),
-  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum slugify),
-  qw(split_cookie_header split_header steady_time tablify term_escape trim),
-  qw(unindent unquote url_escape url_unescape xml_escape xor_encode);
+  qw(decode dumper encode extract_usage getopt gunzip gzip hmac_sha1_sum),
+  qw(html_unescape html_attr_unescape md5_bytes md5_sum monkey_patch),
+  qw(punycode_decode punycode_encode quote secure_compare sha1_bytes sha1_sum),
+  qw(slugify split_cookie_header split_header steady_time tablify term_escape),
+  qw(trim unindent unquote url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -531,6 +531,14 @@ is slugify('spam & ıçüş',  1), 'spam-ıçüş', 'right result';
 is slugify('foo ıç bar',     1), 'foo-ıç-bar',  'right result';
 is slugify('    foo ıç bar', 1), 'foo-ıç-bar',  'right result';
 is slugify('你好',           1), '你好',        'right result';
+
+# gzip/gunzip
+my $uncompressed = 'a' x 1000;
+my $compressed   = gzip $uncompressed;
+isnt $compressed, $uncompressed, 'string changed';
+ok length $compressed < length $uncompressed, 'string is shorter';
+my $result = gunzip $compressed;
+is $result, $uncompressed, 'same string';
 
 # Hide DATA usage from error messages
 eval { die 'whatever' };

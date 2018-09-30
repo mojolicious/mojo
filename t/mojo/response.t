@@ -1,13 +1,12 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use IO::Compress::Gzip 'gzip';
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::JSON 'encode_json';
 use Mojo::Message::Response;
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode gzip);
 
 # Defaults
 my $res = Mojo::Message::Response->new;
@@ -623,7 +622,7 @@ like $res->content->asset->slurp, qr/hallo welt/, 'right content';
 
 # Parse HTTP 1.1 gzip compressed response
 my $uncompressed = 'abc' x 1000;
-gzip \$uncompressed, \my $compressed;
+my $compressed   = gzip $uncompressed;
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
@@ -650,8 +649,8 @@ is $res->body, $uncompressed, 'right content';
 # Parse HTTP 1.1 chunked gzip compressed response
 $uncompressed = 'abc' x 1000;
 $compressed   = undef;
-gzip \$uncompressed, \$compressed;
-$res = Mojo::Message::Response->new;
+$compressed   = gzip $uncompressed;
+$res          = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Encoding: gzip\x0d\x0a");

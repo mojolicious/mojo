@@ -1,14 +1,13 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use IO::Compress::Gzip 'gzip';
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Request;
 use Mojo::File 'tempdir';
 use Mojo::Message::Request;
 use Mojo::URL;
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode gzip);
 
 # Defaults
 my $req = Mojo::Message::Request->new;
@@ -524,7 +523,7 @@ is $req->headers->content_length, 14, 'right "Content-Length" value';
 is $req->param('name'), '☃', 'right value';
 
 # Parse HTTP 1.1 gzip compressed request (no decompression)
-gzip \(my $uncompressed = 'abc' x 1000), \my $compressed;
+my $compressed = gzip my $uncompressed = 'abc' x 1000;
 $req = Mojo::Message::Request->new;
 $req->parse("POST /foo HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");

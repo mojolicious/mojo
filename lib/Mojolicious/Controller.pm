@@ -178,7 +178,8 @@ sub render {
 
   # All other arguments just become part of the stash
   @$stash{keys %$args} = values %$args;
-  my ($output, $format) = $app->renderer->render($self, $args);
+  my $renderer = $app->renderer;
+  my ($output, $format) = $renderer->render($self, $args);
 
   # Maybe no 404
   return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
@@ -186,9 +187,7 @@ sub render {
     unless defined $output;
 
   $plugins->emit_hook(after_render => $self, \$output, $format);
-  $self->res->body($output);
-  $app->types->content_type($self, {ext => $format});
-  return !!$self->rendered($stash->{status});
+  return $renderer->respond($self, $output, $format, $stash->{status});
 }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }

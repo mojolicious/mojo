@@ -141,4 +141,11 @@ is b("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois")->slugify->to_string,
 is b("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois")->slugify(1)->to_string,
   "un-\x{e9}l\x{e9}phant-\x{e0}-lor\x{e9}e-du-bois", 'right result';
 
+# gzip/gunzip
+my $uncompressed = b('a' x 1000);
+my $compressed   = $uncompressed->clone->gzip;
+isnt $compressed->to_string, $uncompressed->to_string, 'bytestream changed';
+ok $compressed->size < $uncompressed->size, 'bytestream is shorter';
+is $compressed->gunzip->to_string, $uncompressed->to_string, 'same bytestream';
+
 done_testing();

@@ -10,9 +10,9 @@ our @EXPORT_OK = ('b');
 
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
-  qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
-  qw(sha1_sum slugify term_escape trim unindent unquote url_escape),
+  qw(b64_decode b64_encode camelize decamelize gunzip gzip hmac_sha1_sum),
+  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
+  qw(sha1_bytes sha1_sum slugify term_escape trim unindent unquote url_escape),
   qw(url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
@@ -166,6 +166,18 @@ Encode bytestream with L<Mojo::Util/"encode">, defaults to using C<UTF-8>.
 
   # "%E2%99%A5"
   b('♥')->encode->url_escape;
+
+=head2 gunzip
+
+  $stream = $stream->gunzip;
+
+Uncompress bytestream with L<Mojo::Util/"gunzip">.
+
+=head2 gzip
+
+  stream = $stream->gzip;
+
+Compress bytestream with L<Mojo::Util/"gzip">.
 
 =head2 hmac_sha1_sum
 

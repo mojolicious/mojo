@@ -98,7 +98,7 @@ my $helpers = $first->helpers;
 is $helpers->myapp->multi_level->test, $helpers->myapp->multi_level->test,
   'same result';
 
-# Compression
+# Compression (disabled)
 my $output = 'a' x 1000;
 $c = $app->build_controller;
 $c->req->headers->accept_encoding('gzip');
@@ -108,6 +108,8 @@ is $c->res->headers->content_type, 'text/html;charset=UTF-8',
 ok !$c->res->headers->vary,             'no "Vary" value';
 ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
+
+# Compression (enabled)
 $renderer->compress(1);
 $c = $app->build_controller;
 $c->req->headers->accept_encoding('gzip');
@@ -118,6 +120,8 @@ is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
 is $c->res->headers->content_encoding, 'gzip', 'right "Content-Encoding" value';
 isnt $c->res->body, $output, 'different string';
 is gunzip($c->res->body), $output, 'same string';
+
+# Compression (not requested)
 $c = $app->build_controller;
 $renderer->respond($c, $output, 'html');
 is $c->res->code, 200, 'right status';
@@ -126,6 +130,8 @@ is $c->res->headers->content_type, 'text/html;charset=UTF-8',
 is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
 ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
+
+# Compression (other transfer encoding)
 $c = $app->build_controller;
 $c->res->headers->content_encoding('whatever');
 $renderer->respond($c, $output, 'html', 500);

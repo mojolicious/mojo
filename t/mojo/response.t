@@ -494,6 +494,10 @@ ok !$res->content->parts->[1]->is_multipart, 'no multipart content';
 ok !$res->content->parts->[2]->is_multipart, 'no multipart content';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
+my $dir  = tempdir;
+my $file = $dir->child('multipart.html');
+eval { $res->save_to($file) };
+like $@, qr/^Multipart content cannot be saved to files/, 'right error';
 
 # Parse HTTP 1.1 chunked multipart response with leftovers (at once)
 $res = Mojo::Message::Response->new;
@@ -1094,8 +1098,7 @@ is_deeply $res->dom('p > a')->map('text')->to_array, [qw(yada yada)],
 is_deeply \@text, [qw(test test)], 'right values';
 is_deeply $res->dom->find('p > a')->map('text')->to_array, [qw(test test)],
   'right values';
-my $dir  = tempdir;
-my $file = $dir->child('test.html');
+$file = $dir->child('single.html');
 is $res->save_to($file)->body,
   '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>', 'right content';
 is $file->slurp, '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>',

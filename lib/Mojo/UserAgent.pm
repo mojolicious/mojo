@@ -391,6 +391,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->cert('tls.crt')->key('tls.key')
     ->post('https://example.com' => json => {top => 'secret'});
 
+  # Form POST (application/x-www-form-urlencoded)
+  my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
+
   # Search DuckDuckGo anonymously through Tor
   $ua->proxy->http('socks://127.0.0.1:9050');
   say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')
@@ -403,15 +406,6 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   $ua->max_redirects(5)
     ->get('https://www.github.com/mojolicious/mojo/tarball/master')
     ->result->save_to('/home/sri/mojo.tar.gz');
-
-  # Form POST (application/x-www-form-urlencoded) with manual exception handling
-  my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
-  if (my $res = $tx->success) { say $res->body }
-  else {
-    my $err = $tx->error;
-    die "$err->{code} response: $err->{message}" if $err->{code};
-    die "Connection error: $err->{message}";
-  }
 
   # Non-blocking request
   $ua->get('mojolicious.org' => sub {

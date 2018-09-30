@@ -4,6 +4,7 @@ use Test::More;
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
+use Mojo::File 'tempdir';
 use Mojo::JSON 'encode_json';
 use Mojo::Message::Response;
 use Mojo::Util qw(encode gzip);
@@ -1093,6 +1094,12 @@ is_deeply $res->dom('p > a')->map('text')->to_array, [qw(yada yada)],
 is_deeply \@text, [qw(test test)], 'right values';
 is_deeply $res->dom->find('p > a')->map('text')->to_array, [qw(test test)],
   'right values';
+my $dir  = tempdir;
+my $file = $dir->child('test.html');
+is $res->save_to($file)->body,
+  '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>', 'right content';
+is $file->slurp, '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>',
+  'right content';
 
 # Build DOM from response with charset
 $res = Mojo::Message::Response->new;

@@ -181,6 +181,14 @@ sub parse {
   return $self->emit('progress')->content->is_finished ? $self->finish : $self;
 }
 
+sub save_to {
+  my ($self, $path) = @_;
+  my $content = $self->content;
+  croak 'Multipart content cannot be saved to files' if $content->is_multipart;
+  $content->asset->move_to($path);
+  return $self;
+}
+
 sub start_line_size {
   croak 'Method "start_line_size" not implemented by subclass';
 }
@@ -613,6 +621,12 @@ default.
   $msg = $msg->parse('HTTP/1.1 200 OK...');
 
 Parse message chunk.
+
+=head2 save_to
+
+  $msg = $msg->save_to('/some/path/index.html');
+
+Save message body to a file.
 
 =head2 start_line_size
 

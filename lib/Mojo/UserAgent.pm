@@ -402,7 +402,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Follow redirects to download Mojolicious from GitHub
   $ua->max_redirects(5)
     ->get('https://www.github.com/mojolicious/mojo/tarball/master')
-    ->result->content->asset->move_to('/home/sri/mojo.tar.gz');
+    ->result->save_to('/home/sri/mojo.tar.gz');
 
   # Form POST (application/x-www-form-urlencoded) with manual exception handling
   my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});

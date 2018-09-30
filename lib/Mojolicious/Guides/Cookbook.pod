@@ -1215,14 +1215,14 @@ L<Mojo::UserAgent::Transactor/"tx">.
 When downloading large files with L<Mojo::UserAgent> you don't have to worry
 about memory usage at all, because it will automatically stream everything
 above 250KiB into a temporary file, which can then be moved into a permanent
-file with L<Mojo::Asset::File/"move_to">.
+file with L<Mojo::Message/"save_to">.
 
   use Mojo::UserAgent;
 
   # Fetch the latest Mojolicious tarball
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
   my $tx = $ua->get('https://www.github.com/mojolicious/mojo/tarball/master');
-  $tx->result->content->asset->move_to('mojo.tar.gz');
+  $tx->result->save_to('mojo.tar.gz');
 
 To protect you from excessively large files there is also a limit of 2GiB by
 default, which you can tweak with the attribute

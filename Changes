@@ -8,6 +8,8 @@
   - Added gunzip and gzip methods to Mojo::ByteStream.
   - Added gunzip and gzip functions to Mojo::Util.
   - Improved HTML5.2 compliance of Mojo::DOM::HTML.
+  - Fixed a bug in Mojo::Transaction::HTTP that prevented the finish event in
+    Mojo::Message::Request from getting emitted sometimes.
 
 8.01  2018-09-25
   - Updated jQuery to version 3.3.1.

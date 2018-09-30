@@ -590,6 +590,29 @@ is $tx->res->code, 200,          'right status';
 is $tx->res->body, '0123456789', 'right content';
 is $stream, 1, 'no leaking subscribers';
 
+# Upload progress
+$ua = Mojo::UserAgent->new;
+my $progress = {};
+$ua->on(
+  start => sub {
+    my ($ua, $tx) = @_;
+    $tx->req->on(
+      progress => sub {
+        my ($req, $state, $offset) = @_;
+        $progress->{$state} = 1;
+      }
+    );
+    $tx->req->on(finish => sub { $progress->{finish} = 1 });
+  }
+);
+$tx = $ua->post('/echo' => 'Hello Mojo!');
+ok $tx->success, 'successful';
+ok !$tx->error, 'no error';
+is $tx->res->code, 200,           'right status';
+is $tx->res->body, 'Hello Mojo!', 'right content';
+is_deeply $progress, {start_line => 1, headers => 1, body => 1, finish => 1},
+  'right structure';
+
 # Mixed blocking and non-blocking requests, with custom URL
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 $tx = $ua->get($ua->server->url);

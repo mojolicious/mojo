@@ -67,16 +67,14 @@ sub _body {
 
   # Prepare body chunk
   my $buffer = $msg->get_body_chunk($self->{offset});
-  my $written = defined $buffer ? length $buffer : 0;
-  $self->{write} = $msg->content->is_dynamic ? 1 : ($self->{write} - $written);
-  $self->{offset} += $written;
+  $self->{offset} += defined $buffer ? length $buffer : 0;
 
   # Delayed
   $self->{writing} = 0 unless defined $buffer;
 
   # Finished
   $finish ? $self->completed : ($self->{writing} = 0)
-    if $self->{write} <= 0 || defined $buffer && !length $buffer;
+    if defined $buffer && !length $buffer;
 
   return $buffer // '';
 }
@@ -95,10 +93,7 @@ sub _headers {
     @$self{qw(http_state offset)} = ('body', 0);
 
     # Response without body
-    if ($head && $self->is_empty) { $self->completed->{http_state} = 'empty' }
-
-    # Body
-    else { $self->{write} = $msg->content->is_dynamic ? 1 : $msg->body_size }
+    $self->completed->{http_state} = 'empty' if $head && $self->is_empty;
   }
 
   return $buffer;

@@ -1,4 +1,6 @@
 
+8.03  2018-10-02
+
 8.02  2018-10-01
   - Deprecated Mojo::Transaction::success in favor of Mojo::Transaction::result
     and Mojo::Transaction::error. Unfortunately this method is used a lot in

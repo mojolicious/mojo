@@ -75,6 +75,9 @@ $c = $t->app->build_controller;
 $c->req->headers->if_none_match('"abc", "cba"');
 ok $c->is_fresh(etag => 'abc'), 'content is fresh';
 $c = $t->app->build_controller;
+$c->req->headers->if_none_match(' "xyz" , "abc","cba" ');
+ok $c->is_fresh(etag => 'abc'), 'content is fresh';
+$c = $t->app->build_controller;
 $c->req->headers->if_none_match('"cba", "abc"');
 ok !$c->is_fresh(etag => 'cab'), 'content is stale';
 

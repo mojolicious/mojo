@@ -46,6 +46,12 @@ sub finally {
   return $new;
 }
 
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->ioloop and weaken $self->{ioloop};
+  return $self;
+}
+
 sub race {
   my ($class, @promises) = @_;
   my $new = $promises[0]->clone;
@@ -286,6 +292,12 @@ reason.
     my @value_or_reason = @_;
     say "We are done!";
   });
+
+=head2 new
+
+  my $promise = Mojo::Promise->new;
+
+Construct a new L<Mojo::Promise> object.
 
 =head2 race
 

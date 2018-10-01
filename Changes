@@ -15,6 +15,8 @@
   - Improved HTML5.2 compliance of Mojo::DOM::HTML.
   - Fixed a bug in Mojo::Transaction::HTTP that prevented the finish event in
     Mojo::Message::Request from getting emitted sometimes.
+  - Fixed a bug in Mojo::Promise where the ioloop attribute was not a weakened
+    reference after object construction.
   - Fixed a bug where the is_fresh helper could only handle If-None-Match
     headers with a single etag value.
 

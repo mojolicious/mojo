@@ -1,5 +1,7 @@
 
 8.02  2018-10-01
+  - Deprecated Mojo::Transaction::success in favor of Mojo::Transaction::result
+    and Mojo::Transaction::error.
   - Added support for gzip compression of dynamically generated responses
     (enable with $app->renderer->compress(1)).
   - Added EXPERIMENTAL compress attribute to Mojolicious::Renderer.

@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
+use Mojo::Util 'deprecated';
 
 has [
   qw(kept_alive local_address local_port original_remote_address remote_port)];
@@ -50,7 +51,12 @@ sub result {
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
-sub success { $_[0]->error ? undef : $_[0]->res }
+# DEPRECATED!
+sub success {
+  deprecated 'Mojo::Transaction::success is DEPRECATED'
+    . ' in favor of Mojo::Transaction::result and Mojo::Transaction::error';
+  $_[0]->error ? undef : $_[0]->res;
+}
 
 1;
 
@@ -282,22 +288,6 @@ L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
 
 Write data server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
-
-=head2 success
-
-  my $res = $tx->success;
-
-Returns the L<Mojo::Message::Response> object from L</"res"> if transaction was
-successful or C<undef> otherwise. Connection and parser errors have only a
-message in L</"error">, C<400> and C<500> responses also a code.
-
-  # Manual exception handling
-  if (my $res = $tx->success) { say $res->body }
-  else {
-    my $err = $tx->error;
-    die "$err->{code} response: $err->{message}" if $err->{code};
-    die "Connection error: $err->{message}";
-  }
 
 =head1 SEE ALSO
 

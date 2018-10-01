@@ -357,7 +357,7 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 
 get '/subrequest' => sub {
   my $c = shift;
-  $c->render(text => $c->ua->post('/template')->success->body);
+  $c->render(text => $c->ua->post('/template')->result->body);
 };
 
 # Make sure hook runs non-blocking

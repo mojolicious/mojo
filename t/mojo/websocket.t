@@ -123,7 +123,7 @@ websocket '/timeout' => sub {
 
 # URL for WebSocket
 my $ua  = app->ua;
-my $res = $ua->get('/link')->success;
+my $res = $ua->get('/link')->result;
 is $res->code, 200, 'right status';
 like $res->body, qr!ws://127\.0\.0\.1:\d+/!, 'right content';
 

@@ -185,19 +185,17 @@ is $tx->previous->req->method, 'CONNECT', 'right method';
 
 # Proxy WebSocket with bad target
 $ua->proxy->https("http://127.0.0.1:$proxy");
-my ($success, $leak, $err);
+my ($leak, $err);
 $ua->websocket(
   "wss://127.0.0.1:0/test" => sub {
     my ($ua, $tx) = @_;
-    $success = $tx->success;
-    $leak    = !!Mojo::IOLoop->stream($tx->previous->connection);
-    $err     = $tx->error;
+    $leak = !!Mojo::IOLoop->stream($tx->previous->connection);
+    $err  = $tx->error;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-ok !$success, 'no success';
-ok !$leak,    'connection has been removed';
+ok !$leak, 'connection has been removed';
 is $err->{message}, 'Proxy connection failed', 'right error';
 
 # Blocking proxy request again
@@ -235,21 +233,18 @@ $ua    = Mojo::UserAgent->new;
 $proxy = Mojo::IOLoop::Server->generate_port;
 $ua->proxy->https("http://127.0.0.1:$proxy");
 $tx = $ua->get("https://127.0.0.1:$port/proxy");
-ok !$tx->success, 'no success';
 is $tx->error->{message}, 'Proxy connection failed', 'right error';
 
 # Non-blocking request to bad proxy
-($success, $err) = ();
+$err = undef;
 $ua->get(
   "https://127.0.0.1:$port/proxy" => sub {
     my ($ua, $tx) = @_;
-    $success = $tx->success;
-    $err     = $tx->error;
+    $err = $tx->error;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-ok !$success, 'no success';
 is $err->{message}, 'Proxy connection failed', 'right error';
 
 done_testing();

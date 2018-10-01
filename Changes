@@ -1,7 +1,7 @@
 
 8.02  2018-10-01
   - Deprecated Mojo::Transaction::success in favor of Mojo::Transaction::result
-    and Mojo::Transaction::error. Unfortunately this method is used very much in
+    and Mojo::Transaction::error. Unfortunately this method is used a lot in
     legacy code, so this deprecation will be in effect until the next major
     release.
   - Added support for gzip compression of dynamically generated responses

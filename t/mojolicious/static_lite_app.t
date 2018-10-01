@@ -39,17 +39,21 @@ get '/file' => sub {
 
 my $t = Test::Mojo->new;
 
-# Freshness
+# Freshness (Etag)
 my $c = $t->app->build_controller;
 ok !$c->is_fresh, 'content is stale';
 $c->res->headers->etag('"abc"');
 $c->req->headers->if_none_match('"abc"');
 ok $c->is_fresh, 'content is fresh';
+
+# Freshness (Last-Modified)
 $c = $t->app->build_controller;
 my $date = Mojo::Date->new(23);
 $c->res->headers->last_modified($date);
 $c->req->headers->if_modified_since($date);
 ok $c->is_fresh, 'content is fresh';
+
+# Freshness (Etag and Last-Modified)
 $c = $t->app->build_controller;
 $c->req->headers->if_none_match('"abc"');
 $c->req->headers->if_modified_since($date);
@@ -57,10 +61,22 @@ ok $c->is_fresh(etag => 'abc', last_modified => $date->epoch),
   'content is fresh';
 is $c->res->headers->etag,          '"abc"', 'right "ETag" value';
 is $c->res->headers->last_modified, "$date", 'right "Last-Modified" value';
+
 $c = $t->app->build_controller;
 ok !$c->is_fresh(last_modified => $date->epoch), 'content is stale';
 is $c->res->headers->etag,          undef,   'no "ETag" value';
 is $c->res->headers->last_modified, "$date", 'right "Last-Modified" value';
+
+# Freshness (multiple Etag values)
+$c = $t->app->build_controller;
+$c->req->headers->if_none_match('"cba", "abc"');
+ok $c->is_fresh(etag => 'abc'), 'content is fresh';
+$c = $t->app->build_controller;
+$c->req->headers->if_none_match('"abc", "cba"');
+ok $c->is_fresh(etag => 'abc'), 'content is fresh';
+$c = $t->app->build_controller;
+$c->req->headers->if_none_match('"cba", "abc"');
+ok !$c->is_fresh(etag => 'cab'), 'content is stale';
 
 # Static file
 $t->get_ok('/hello.txt')->status_is(200)

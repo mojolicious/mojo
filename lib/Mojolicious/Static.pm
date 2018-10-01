@@ -7,7 +7,7 @@ use Mojo::Date;
 use Mojo::File 'path';
 use Mojo::Home;
 use Mojo::Loader qw(data_section file_is_binary);
-use Mojo::Util qw(encode md5_sum);
+use Mojo::Util qw(encode md5_sum trim);
 
 # Bundled files
 my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
@@ -72,7 +72,8 @@ sub is_fresh {
   return undef unless (my $since = $req_headers->if_modified_since) || $match;
 
   # If-None-Match
-  return undef if $match && ($etag // $res_headers->etag // '') ne $match;
+  $etag //= $res_headers->etag // '';
+  return undef if $match && !grep { trim($_) eq $etag } split ',', $match;
 
   # If-Modified-Since
   return !!$match unless ($last //= $res_headers->last_modified) && $since;

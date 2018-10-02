@@ -30,12 +30,16 @@ my $listen
   = 'https://127.0.0.1'
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
-  . '&ca=t/mojo/certs/ca.crt';
+  . '&ca=t/mojo/certs/ca.crt&verify=0x03';
 my $port = $daemon->listen([$listen])->start->ports->[0];
 
 # No certificate
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $tx = $ua->get("https://127.0.0.1:$port");
+ok $tx->error, 'has error';
+$tx = $ua->get("https://127.0.0.1:$port");
+ok $tx->error, 'has error';
+$tx = $ua->ca('t/mojo/certs/ca.crt')->get("https://127.0.0.1:$port");
 ok $tx->error, 'has error';
 $tx = $ua->get("https://127.0.0.1:$port");
 ok $tx->error, 'has error';

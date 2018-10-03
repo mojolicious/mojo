@@ -228,8 +228,7 @@ Connection identifier.
 
   my $err = $tx->error;
 
-Get request or response error and return C<undef> if there is no error,
-commonly used together with L</"success">.
+Get request or response error and return C<undef> if there is no error.
 
   # Longer version
   my $err = $tx->req->error || $tx->res->error;

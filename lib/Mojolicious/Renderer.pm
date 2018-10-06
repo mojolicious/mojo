@@ -277,8 +277,8 @@ application startup.
 
 =head2 compress
 
-  my $bool = $t->compress;
-  $t       = $t->compress($bool);
+  my $bool  = $renderer->compress;
+  $renderer = $renderer->compress($bool);
 
 Try to negotiate compression for dynamically generated response content and
 C<gzip> compress it automatically, defaults to false. Note that this attribute

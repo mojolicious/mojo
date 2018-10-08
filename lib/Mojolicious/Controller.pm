@@ -403,8 +403,8 @@ L<Mojolicious::Controller> implements the following attributes.
 A reference back to the application that dispatched to this controller, usually
 a L<Mojolicious> object.
 
-  # Use application logger
-  $c->app->log->debug('Hello Mojo');
+  # Use application user agent
+  my $tx = $c->app->ua->get('mojolicious.org');
 
   # Generate path
   my $path = $c->app->home->child('templates', 'foo', 'bar.html.ep');
@@ -542,6 +542,7 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
   # Use a nested helper instead of the "reply" controller method
   $c->helpers->reply->not_found;
 
+
 =head2 on
 
   my $cb = $c->on(finish => sub {...});
@@ -554,26 +555,26 @@ establish the WebSocket connection.
   # Do something after the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
-    $c->app->log->debug('All data has been sent');
+    $c->log->debug('All data has been sent');
   });
 
   # Receive WebSocket message
   $c->on(message => sub {
     my ($c, $msg) = @_;
-    $c->app->log->debug("Message: $msg");
+    $c->log->debug("Message: $msg");
   });
 
   # Receive JSON object via WebSocket message
   $c->on(json => sub {
     my ($c, $hash) = @_;
-    $c->app->log->debug("Test: $hash->{test}");
+    $c->log->debug("Test: $hash->{test}");
   });
 
   # Receive WebSocket "Binary" message
   $c->on(binary => sub {
     my ($c, $bytes) = @_;
     my $len = length $bytes;
-    $c->app->log->debug("Received $len bytes");
+    $c->log->debug("Received $len bytes");
   });
 
 =head2 param

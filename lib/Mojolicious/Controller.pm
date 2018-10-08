@@ -405,8 +405,8 @@ L<Mojolicious::Controller> implements the following attributes.
 A reference back to the application that dispatched to this controller, usually
 a L<Mojolicious> object.
 
-  # Use application logger
-  $c->app->ua->get('mojolicious.org');
+  # Use application user agent
+  my $tx = $c->app->ua->get('mojolicious.org');
 
   # Generate path
   my $path = $c->app->home->child('templates', 'foo', 'bar.html.ep');

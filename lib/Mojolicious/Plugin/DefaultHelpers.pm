@@ -146,7 +146,7 @@ sub _is_fresh {
 sub _static {
   my ($c, $file) = @_;
   return !!$c->rendered if $c->app->static->serve($c, $file);
-  $c->app->log->debug(qq{Static file "$file" not found});
+  $c->log->debug(qq{Static file "$file" not found});
   return !$c->helpers->reply->not_found;
 }
 
@@ -486,7 +486,7 @@ created with L</"timing-E<gt>begin"> or C<undef> if no such timestamp exists.
   $c->timing->begin('database_stuff');
   ...
   my $elapsed = $c->timing->elapsed('database_stuff');
-  $c->app->log->debug("Database stuff took $elapsed seconds");
+  $c->log->debug("Database stuff took $elapsed seconds");
 
 =head2 timing->rps
 
@@ -501,7 +501,7 @@ number is too low.
   ...
   my $elapsed = $c->timing->elapsed('web_stuff');
   my $rps     = $c->timing->rps($elapsed);
-  $c->app->log->debug("Web stuff took $elapsed seconds ($rps per second)");
+  $c->log->debug("Web stuff took $elapsed seconds ($rps per second)");
 
 =head2 timing->server_timing
 

@@ -42,7 +42,7 @@ sub cookie {
 
     # Cookie too big
     my $cookie = {name => $name, value => shift, %{shift || {}}};
-    $self->app->log->error(qq{Cookie "$name" is bigger than 4096 bytes})
+    $self->log->error(qq{Cookie "$name" is bigger than 4096 bytes})
       if length $cookie->{value} > 4096;
 
     $self->res->cookies($cookie);
@@ -92,10 +92,10 @@ sub every_signed_cookie {
       }
       if ($valid) { push @results, $value }
 
-      else { $self->app->log->debug(qq{Cookie "$name" has a bad signature}) }
+      else { $self->log->debug(qq{Cookie "$name" has a bad signature}) }
     }
 
-    else { $self->app->log->debug(qq{Cookie "$name" is not signed}) }
+    else { $self->log->debug(qq{Cookie "$name" is not signed}) }
   }
 
   return \@results;
@@ -133,6 +133,8 @@ sub flash {
 }
 
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
+
+sub log { shift->app->log(@_); }
 
 sub on {
   my ($self, $name, $cb) = @_;
@@ -404,7 +406,7 @@ A reference back to the application that dispatched to this controller, usually
 a L<Mojolicious> object.
 
   # Use application logger
-  $c->app->log->debug('Hello Mojo');
+  $c->app->ua->get('mojolicious.org');
 
   # Generate path
   my $path = $c->app->home->child('templates', 'foo', 'bar.html.ep');
@@ -444,7 +446,7 @@ closed early.
   # Perform non-blocking operation without knowing the connection status
   my $tx = $c->tx;
   Mojo::IOLoop->timer(2 => sub {
-    $c->app->log->debug($tx->is_finished ? 'Finished' : 'In progress');
+    $c->log->debug($tx->is_finished ? 'Finished' : 'In progress');
   });
 
 =head1 METHODS
@@ -542,6 +544,11 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
   # Use a nested helper instead of the "reply" controller method
   $c->helpers->reply->not_found;
 
+=head2 log
+
+Shortcut for app->log. Gives you the L<Mojolicious> application log object,
+usually a L<Mojo::Log> object.
+
 =head2 on
 
   my $cb = $c->on(finish => sub {...});
@@ -554,26 +561,26 @@ establish the WebSocket connection.
   # Do something after the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
-    $c->app->log->debug('All data has been sent');
+    $c->log->debug('All data has been sent');
   });
 
   # Receive WebSocket message
   $c->on(message => sub {
     my ($c, $msg) = @_;
-    $c->app->log->debug("Message: $msg");
+    $c->log->debug("Message: $msg");
   });
 
   # Receive JSON object via WebSocket message
   $c->on(json => sub {
     my ($c, $hash) = @_;
-    $c->app->log->debug("Test: $hash->{test}");
+    $c->log->debug("Test: $hash->{test}");
   });
 
   # Receive WebSocket "Binary" message
   $c->on(binary => sub {
     my ($c, $bytes) = @_;
     my $len = length $bytes;
-    $c->app->log->debug("Received $len bytes");
+    $c->log->debug("Received $len bytes");
   });
 
 =head2 param

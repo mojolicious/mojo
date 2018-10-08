@@ -814,7 +814,7 @@ L<Mojolicious::Controller/"send">.
     my $c = shift;
 
     # Opened
-    $c->app->log->debug('WebSocket opened');
+    $c->log->debug('WebSocket opened');
 
     # Increase inactivity timeout for connection a bit
     $c->inactivity_timeout(300);
@@ -828,7 +828,7 @@ L<Mojolicious::Controller/"send">.
     # Closed
     $c->on(finish => sub {
       my ($c, $code, $reason) = @_;
-      $c->app->log->debug("WebSocket closed with status $code");
+      $c->log->debug("WebSocket closed with status $code");
     });
   };
 
@@ -896,7 +896,7 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     $c->write;
 
     # Subscribe to "message" event and forward "log" events to browser
-    my $cb = $c->app->log->on(message => sub {
+    my $cb = $c->log->on(message => sub {
       my ($log, $level, @lines) = @_;
       $c->write("event:log\ndata: [$level] @lines\n\n");
     });
@@ -904,7 +904,7 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     # Unsubscribe from "message" event again once we are done
     $c->on(finish => sub {
       my $c = shift;
-      $c->app->log->unsubscribe(message => $cb);
+      $c->log->unsubscribe(message => $cb);
     });
   };
 

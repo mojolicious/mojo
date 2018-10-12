@@ -453,7 +453,7 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b&h=i&h=j')
     . "\n</form>\n");
 
 # Selection with multiple values preselected
-$t->put_ok('/selection?preselect=1')->status_is(200)
+$t->put_ok('/selection?preselect=1&undef=1')->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option selected value="b">b</option>'
@@ -668,6 +668,7 @@ __DATA__
 
 @@ selection.html.ep
 % param a => qw(b g) if param 'preselect';
+% param foo => undef if param 'undef';
 %= form_for selection => begin
   %= select_field a => ['b', c(c => ['<d', [ E => 'e'], 'f']), 'g']
   %= select_field foo => [qw(bar baz)], multiple => 'multiple'

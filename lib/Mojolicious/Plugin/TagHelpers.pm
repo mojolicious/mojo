@@ -134,7 +134,7 @@ sub _option {
 sub _select_field {
   my ($c, $name, $options, %attrs) = (shift, shift, shift, @_);
 
-  my %values = map { $_ => 1 } grep { defined } @{$c->every_param($name)};
+  my %values = map { $_ => 1 } grep {defined} @{$c->every_param($name)};
 
   my $groups = '';
   for my $group (@$options) {

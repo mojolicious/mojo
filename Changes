@@ -1,7 +1,9 @@
 
-8.03  2018-10-10
+8.03  2018-10-12
   - Fixed a small bug in Mojo::UserAgent where request timeouts could be created
     twice.
+  - Improved Mojolicious::Types to use the correct MIME types for woff and
+    woff2 files.
 
 8.02  2018-10-01
   - Deprecated Mojo::Transaction::success in favor of Mojo::Transaction::result

@@ -37,6 +37,7 @@ sub register {
 
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
+  $app->helper(log     => sub { shift->app->log(@_) });
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
 
@@ -378,6 +379,12 @@ response headers with L<Mojolicious::Static/"is_fresh">.
 Set C<layout> stash value, all additional key/value pairs get merged into the
 L</"stash">.
 
+=head2 log
+
+  % log->debug('Hello Mojo')
+
+Alias for L<Mojolicious/"log">.
+
 =head2 param
 
   %= param 'foo'
@@ -486,7 +493,7 @@ created with L</"timing-E<gt>begin"> or C<undef> if no such timestamp exists.
   $c->timing->begin('database_stuff');
   ...
   my $elapsed = $c->timing->elapsed('database_stuff');
-  $c->app->log->debug("Database stuff took $elapsed seconds");
+  $c->log->debug("Database stuff took $elapsed seconds");
 
 =head2 timing->rps
 
@@ -501,7 +508,7 @@ number is too low.
   ...
   my $elapsed = $c->timing->elapsed('web_stuff');
   my $rps     = $c->timing->rps($elapsed);
-  $c->app->log->debug("Web stuff took $elapsed seconds ($rps per second)");
+  $c->log->debug("Web stuff took $elapsed seconds ($rps per second)");
 
 =head2 timing->server_timing
 

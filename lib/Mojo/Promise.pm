@@ -8,6 +8,7 @@ has ioloop => sub { Mojo::IOLoop->singleton };
 
 sub all {
   my ($class, @promises) = @_;
+  return $class->resolve unless @promises;
 
   my $all       = $promises[0]->clone;
   my $results   = [];
@@ -54,6 +55,7 @@ sub new {
 
 sub race {
   my ($class, @promises) = @_;
+  return $class->resolve unless @promises;
   my $new = $promises[0]->clone;
   $_->then(sub { $new->resolve(@_) }, sub { $new->reject(@_) }) for @promises;
   return $new;

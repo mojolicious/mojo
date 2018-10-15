@@ -6,7 +6,6 @@ use Mojo::Cache;
 use Mojo::Loader 'load_class';
 use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
-use Scalar::Util 'weaken';
 
 has base_classes => sub { [qw(Mojolicious::Controller Mojolicious)] };
 has cache        => sub { Mojo::Cache->new };
@@ -150,7 +149,7 @@ sub _controller {
     # Try to connect routes
     if (my $sub = $new->can('routes')) {
       my $r = $new->$sub;
-      weaken $r->parent($old->match->endpoint)->{parent} unless $r->parent;
+      $r->parent($old->match->endpoint) unless $r->parent;
     }
     $new->handler($old);
     $old->stash->{'mojo.routed'} = 1;

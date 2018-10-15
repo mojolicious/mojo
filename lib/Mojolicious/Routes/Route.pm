@@ -4,10 +4,10 @@ use Mojo::Base -base;
 use Carp ();
 use Mojo::Util;
 use Mojolicious::Routes::Pattern;
-use Scalar::Util ();
 
-has [qw(inline parent partial)];
+has [qw(inline partial)];
 has 'children' => sub { [] };
+has parent     => undef, weak => 1;
 has pattern    => sub { Mojolicious::Routes::Pattern->new };
 
 sub AUTOLOAD {
@@ -25,8 +25,7 @@ sub AUTOLOAD {
 
 sub add_child {
   my ($self, $route) = @_;
-  Scalar::Util::weaken $route->remove->parent($self)->{parent};
-  push @{$self->children}, $route;
+  push @{$self->children}, $route->remove->parent($self);
   $route->pattern->types($self->root->types);
   return $self;
 }
@@ -262,7 +261,8 @@ Allow L</"under"> semantics for this route.
   my $parent = $r->parent;
   $r         = $r->parent(Mojolicious::Routes::Route->new);
 
-The parent of this route, usually a L<Mojolicious::Routes::Route> object.
+The parent of this route, usually a L<Mojolicious::Routes::Route> object. Note
+that this attribute is weakened.
 
 =head2 partial
 

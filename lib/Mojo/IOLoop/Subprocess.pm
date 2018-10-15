@@ -8,7 +8,7 @@ use POSIX ();
 use Storable;
 
 has deserialize => sub { \&Storable::thaw };
-has ioloop      => sub { Mojo::IOLoop->singleton };
+has ioloop      => sub { Mojo::IOLoop->singleton }, weak => 1;
 has serialize   => sub { \&Storable::freeze };
 
 sub pid { shift->{pid} }
@@ -135,6 +135,7 @@ L<Storable>.
   $subprocess = $subprocess->ioloop(Mojo::IOLoop->new);
 
 Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
+Note that this attribute is weakened.
 
 =head2 serialize
 

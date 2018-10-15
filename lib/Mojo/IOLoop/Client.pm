@@ -22,7 +22,7 @@ use constant SOCKS => $ENV{MOJO_NO_SOCKS}
 use constant READ  => SOCKS ? IO::Socket::Socks::SOCKS_WANT_READ()  : 0;
 use constant WRITE => SOCKS ? IO::Socket::Socks::SOCKS_WANT_WRITE() : 0;
 
-has reactor => sub { Mojo::IOLoop->singleton->reactor };
+has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
 sub DESTROY { shift->_cleanup }
 
@@ -245,7 +245,7 @@ L<Mojo::IOLoop::Client> implements the following attributes.
   $client     = $client->reactor(Mojo::Reactor::Poll->new);
 
 Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton.
+global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
 
 =head1 METHODS
 

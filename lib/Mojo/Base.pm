@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use feature ();
+use mro;
 
 # No imports because we get subclassed, a lot!
 use Carp         ();
@@ -23,38 +24,85 @@ use constant ROLES =>
 sub DESTROY { }
 
 sub attr {
-  my ($self, $attrs, $value) = @_;
+  my ($self, $attrs, $value, %kv) = @_;
   return unless (my $class = ref $self || $self) && $attrs;
 
   Carp::croak 'Default has to be a code reference or constant value'
     if ref $value && ref $value ne 'CODE';
 
+  # Weaken
+  if ($kv{weak}) {
+    our %weak_names;
+    my $w = $weak_names{$class};
+    unless ($w) {
+      $w = $weak_names{$class} = [];
+      my $sub = sub {
+        my $class = shift;
+        my $self  = $class->next::method(@_);
+        ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$w;
+        return $self;
+      };
+      Mojo::Util::monkey_patch(my $base = $class . '::_Base', 'new', $sub);
+      no strict 'refs';
+      unshift @{"${class}::ISA"}, $base;
+    }
+    push @$w, ref($attrs) eq 'ARRAY' ? @$attrs : $attrs;
+  }
+
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
     # Very performance-sensitive code with lots of micro-optimizations
-    if (ref $value) {
-      my $sub = sub {
-        return
-          exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
-          if @_ == 1;
-        $_[0]{$attr} = $_[1];
-        $_[0];
-      };
-      Mojo::Util::monkey_patch($class, $attr, $sub);
-    }
-    elsif (defined $value) {
-      my $sub = sub {
-        return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
-          if @_ == 1;
-        $_[0]{$attr} = $_[1];
-        $_[0];
-      };
-      Mojo::Util::monkey_patch($class, $attr, $sub);
+    if ($kv{weak}) {
+      if (ref $value) {
+        my $sub = sub {
+          return exists $_[0]{$attr}
+            ? $_[0]{$attr}
+            : (
+            ref($_[0]{$attr} = $value->($_[0]))
+              && Scalar::Util::weaken($_[0]{$attr}),
+            $_[0]{$attr}
+            ) if @_ == 1;
+          ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
+      else {
+        my $sub = sub {
+          return $_[0]{$attr} if @_ == 1;
+          ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
     }
     else {
-      Mojo::Util::monkey_patch($class, $attr,
-        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
+      if (ref $value) {
+        my $sub = sub {
+          return
+            exists $_[0]{$attr}
+            ? $_[0]{$attr}
+            : ($_[0]{$attr} = $value->($_[0]))
+            if @_ == 1;
+          $_[0]{$attr} = $_[1];
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
+      elsif (defined $value) {
+        my $sub = sub {
+          return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
+            if @_ == 1;
+          $_[0]{$attr} = $_[1];
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
+      else {
+        Mojo::Util::monkey_patch($class, $attr,
+          sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
+      }
     }
   }
 }
@@ -251,6 +299,9 @@ the C<-base> flag or by setting a base class.
   has name => sub {...};
   has ['name1', 'name2', 'name3'] => 'foo';
   has ['name1', 'name2', 'name3'] => sub {...};
+  has name => sub {...}, weak => 1;
+  has name => undef, weak => 1;
+  has ['name1', 'name2', 'name3'] => sub {...}, weak => 1;
 
 Create attributes for hash-based objects, just like the L</"attr"> method.
 
@@ -267,6 +318,9 @@ L<Mojo::Base> implements the following methods.
   SubClass->attr(name => sub {...});
   SubClass->attr(['name1', 'name2', 'name3'] => 'foo');
   SubClass->attr(['name1', 'name2', 'name3'] => sub {...});
+  SubClass->attr(name => sub {...}, weak => 1);
+  SubClass->attr(name => undef, weak => 1);
+  SubClass->attr(['name1', 'name2', 'name3'] => sub {...}, weak => 1);
 
 Create attribute accessors for hash-based objects, an array reference can be
 used to create more than one at a time. Pass an optional second argument to set
@@ -274,6 +328,18 @@ a default value, it should be a constant or a callback. The callback will be
 executed at accessor read time if there's no set value, and gets passed the
 current instance of the object as first argument. Accessors can be chained, that
 means they return their invocant when they are called with an argument.
+
+These options are currently available:
+
+=over 2
+
+=item weak
+
+  weak => 1
+
+Weaken attribute reference to avoid circlular references and memory leaks.
+
+=back
 
 =head2 new
 

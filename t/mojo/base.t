@@ -21,12 +21,38 @@ use Mojo::Base 'Mojo::BaseTest';
 package Mojo::BaseTestTestTest;
 use Mojo::Base "Mojo'BaseTestTest";
 
+package Mojo::BaseTest::Weak1;
+use Mojo::Base -base;
+
+our $ONE;
+
+has one => sub {$ONE}, weak => 1;
+
+package Mojo::BaseTest::Weak2;
+use Mojo::Base 'Mojo::BaseTest::Weak1';
+
+our $TWO;
+
+has ['two'] => sub {$TWO}, weak => 1;
+has four => undef, weak => 1;
+has 'five';
+
+sub new { shift->SUPER::new(@_) }
+
+package Mojo::BaseTest::Weak3;
+use Mojo::Base 'Mojo::BaseTest::Weak2';
+
+our $THREE;
+
+has three => sub {$THREE}, weak => 1;
+
 package main;
 
 use Mojo::Base;
 use Mojo::BaseTest::Base1;
 use Mojo::BaseTest::Base2;
 use Mojo::BaseTest::Base3;
+use Scalar::Util 'isweak';
 
 # Basic functionality
 my $object = Mojo::BaseTest->new->foo(23);
@@ -85,5 +111,26 @@ like $@, qr/Default has to be a code reference or constant value/,
   'right error';
 eval { Mojo::BaseTest->attr(23) };
 like $@, qr/Attribute "23" invalid/, 'right error';
+
+# Weaken
+my ($one, $two, $three) = (
+  $Mojo::BaseTest::Weak1::ONE, $Mojo::BaseTest::Weak2::TWO,
+  $Mojo::BaseTest::Weak3::THREE
+) = ({}, {}, {});
+my $weak
+  = Mojo::BaseTest::Weak3->new(one => $one, two => $two, three => $three);
+ok isweak($weak->{$_}), "weakened $_ ok with value" for qw(one two three);
+$weak = Mojo::BaseTest::Weak3->new->tap('one')->tap('two')->tap('three');
+ok isweak($weak->{$_}), "weakened $_ ok with default" for qw(one two three);
+$weak = Mojo::BaseTest::Weak3->new->one($one)->two($two)->three($three);
+ok isweak($weak->{$_}), "weakened $_ ok with default" for qw(one two three);
+is $weak->four, undef, 'no default value';
+ok isweak($weak->four($weak)->{four}), 'weakened value';
+is $weak->four, $weak, 'circular reference';
+ok !isweak($weak->five($weak)->{five}), 'not weakened value';
+is $weak->five, $weak, 'circular reference';
+$weak->attr(six => undef, weak => 1);
+ok isweak($weak->six($weak)->{six}), 'weakened value';
+is $weak->six, $weak, 'circular reference';
 
 done_testing();

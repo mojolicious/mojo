@@ -12,7 +12,7 @@ use constant TLS => $ENV{MOJO_NO_TLS}
 use constant READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
-has reactor => sub { Mojo::IOLoop->singleton->reactor };
+has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
 # To regenerate the certificate run this command (18.04.2012)
 # openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
@@ -151,7 +151,7 @@ L<Mojo::IOLoop::TLS> implements the following attributes.
   $tls        = $tls->reactor(Mojo::Reactor::Poll->new);
 
 Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton.
+global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
 
 =head1 METHODS
 

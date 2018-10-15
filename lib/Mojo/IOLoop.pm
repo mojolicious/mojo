@@ -36,8 +36,7 @@ sub acceptor {
   return $self->{acceptors}{$acceptor} unless ref $acceptor;
 
   # Connect acceptor with reactor
-  $self->{acceptors}{my $id = $self->_id} = $acceptor;
-  weaken $acceptor->reactor($self->reactor)->{reactor};
+  $self->{acceptors}{my $id = $self->_id} = $acceptor->reactor($self->reactor);
 
   # Allow new acceptor to get picked up
   $self->_not_accepting->_maybe_accepting;
@@ -48,9 +47,9 @@ sub acceptor {
 sub client {
   my ($self, $cb) = (_instance(shift), pop);
 
-  my $id = $self->_id;
-  my $client = $self->{out}{$id}{client} = Mojo::IOLoop::Client->new;
-  weaken $client->reactor($self->reactor)->{reactor};
+  my $id     = $self->_id;
+  my $client = $self->{out}{$id}{client}
+    = Mojo::IOLoop::Client->new(reactor => $self->reactor);
 
   weaken $self;
   $client->on(
@@ -68,8 +67,7 @@ sub client {
 }
 
 sub delay {
-  my $delay = Mojo::IOLoop::Delay->new;
-  weaken $delay->ioloop(_instance(shift))->{ioloop};
+  my $delay = Mojo::IOLoop::Delay->new(ioloop => _instance(shift));
   return @_ ? $delay->steps(@_) : $delay;
 }
 
@@ -151,8 +149,7 @@ sub stream {
 }
 
 sub subprocess {
-  my $subprocess = Mojo::IOLoop::Subprocess->new;
-  weaken $subprocess->ioloop(_instance(shift))->{ioloop};
+  my $subprocess = Mojo::IOLoop::Subprocess->new(ioloop => _instance(shift));
   return @_ ? $subprocess->run(@_) : $subprocess;
 }
 
@@ -210,9 +207,9 @@ sub _stream {
   my ($self, $stream, $id, $server) = @_;
 
   # Connect stream with reactor
-  $self->{$server ? 'in' : 'out'}{$id}{stream} = $stream;
+  $self->{$server ? 'in' : 'out'}{$id}{stream}
+    = $stream->reactor($self->reactor);
   warn "-- $id >>> $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
-  weaken $stream->reactor($self->reactor)->{reactor};
   weaken $self;
   $stream->on(close => sub { $self && $self->_remove($id) });
   $stream->start;

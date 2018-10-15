@@ -9,7 +9,7 @@ use Mojo::IOLoop::TLS;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
-has reactor => sub { Mojo::IOLoop->singleton->reactor };
+has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
 sub DESTROY {
   my $self = shift;
@@ -174,7 +174,7 @@ L<Mojo::IOLoop::Server> implements the following attributes.
   $server     = $server->reactor(Mojo::Reactor::Poll->new);
 
 Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton.
+global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
 
 =head1 METHODS
 

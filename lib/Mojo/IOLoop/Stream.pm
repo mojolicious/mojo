@@ -6,7 +6,7 @@ use Mojo::IOLoop;
 use Mojo::Util;
 use Scalar::Util 'weaken';
 
-has reactor => sub { Mojo::IOLoop->singleton->reactor };
+has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
 sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
 
@@ -236,7 +236,7 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
   $stream     = $stream->reactor(Mojo::Reactor::Poll->new);
 
 Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton.
+global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
 
 =head1 METHODS
 

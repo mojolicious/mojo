@@ -2,9 +2,9 @@ package Mojo::Promise;
 use Mojo::Base -base;
 
 use Mojo::IOLoop;
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util 'blessed';
 
-has ioloop => sub { Mojo::IOLoop->singleton };
+has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
 sub all {
   my ($class, @promises) = @_;
@@ -27,12 +27,7 @@ sub all {
 
 sub catch { shift->then(undef, shift) }
 
-sub clone {
-  my $self  = shift;
-  my $clone = $self->new;
-  weaken $clone->ioloop($self->ioloop)->{ioloop};
-  return $clone;
-}
+sub clone { $_[0]->new(ioloop => $_[0]->ioloop) }
 
 sub finally {
   my ($self, $finally) = @_;
@@ -44,12 +39,6 @@ sub finally {
   $self->_defer if $self->{result};
 
   return $new;
-}
-
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->ioloop and weaken $self->{ioloop};
-  return $self;
 }
 
 sub race {
@@ -231,6 +220,7 @@ L<Mojo::Promise> implements the following attributes.
   $promise = $promise->ioloop(Mojo::IOLoop->new);
 
 Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
+Note that this attribute is weakened.
 
 =head1 METHODS
 

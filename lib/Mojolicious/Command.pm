@@ -7,7 +7,10 @@ use Mojo::Loader 'data_section';
 use Mojo::Server;
 use Mojo::Template;
 
-has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
+has
+  app =>
+  sub { $_[0]{app_ref} = Mojo::Server->new->build_app('Mojo::HelloWorld') },
+  weak          => 1;
 has description => 'No description';
 has 'quiet';
 has template => sub { {vars => 1} };
@@ -125,7 +128,8 @@ L<Mojolicious::Command> implements the following attributes.
   my $app  = $command->app;
   $command = $command->app(Mojolicious->new);
 
-Application for command, defaults to a L<Mojo::HelloWorld> object.
+Application for command, defaults to a L<Mojo::HelloWorld> object. Note that
+this attribute is weakened.
 
   # Introspect
   say "Template path: $_" for @{$command->app->renderer->paths};

@@ -19,11 +19,7 @@ use Mojolicious::Types;
 use Mojolicious::Validator;
 use Scalar::Util ();
 
-has commands => sub {
-  my $commands = Mojolicious::Commands->new(app => shift);
-  Scalar::Util::weaken $commands->{app};
-  return $commands;
-};
+has commands         => sub { Mojolicious::Commands->new(app => shift) };
 has controller_class => 'Mojolicious::Controller';
 has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {

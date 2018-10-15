@@ -125,9 +125,7 @@ sub _class {
     return !$log->debug(qq{Class "$class" is not a controller}) unless $found;
 
     # Success
-    my $new = $class->new(%$c);
-    weaken $new->{tx};
-    return $new;
+    return $class->new(%$c);
   }
 
   # Nothing found

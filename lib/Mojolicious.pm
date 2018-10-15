@@ -83,17 +83,19 @@ sub AUTOLOAD {
 
 sub build_controller {
   my ($self, $tx) = @_;
-  $tx ||= $self->build_tx;
 
   # Embedded application
   my $stash = {};
-  if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
+  if ($tx && (my $sub = $tx->can('stash'))) {
+    ($stash, $tx) = ($tx->$sub, $tx->tx);
+  }
 
   # Build default controller
   my $defaults = $self->defaults;
   @$stash{keys %$defaults} = values %$defaults;
   my $c
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+  $c->{tx} ||= $self->build_tx;
 
   return $c;
 }
@@ -150,7 +152,6 @@ sub handler {
 
   # Process with chain
   my $c = $self->build_controller(@_);
-  Scalar::Util::weaken $c->{tx};
   $self->plugins->emit_chain(around_dispatch => $c);
 
   # Delayed response

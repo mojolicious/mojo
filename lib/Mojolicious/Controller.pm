@@ -9,10 +9,9 @@ use Mojo::Util;
 use Mojolicious::Routes::Match;
 use Scalar::Util ();
 
-has app => undef, weak => 1;
+has [qw(app tx)] => undef, weak => 1;
 has match =>
   sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
-has 'tx';
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -430,10 +429,9 @@ L<Mojolicious::Routes::Match> object.
 
 The transaction that is currently being processed, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note that
-this reference is usually weakened to protect you from hard to detect memory
-leaks. So the object needs to be referenced elsewhere as well when you're
-performing non-blocking operations and the underlying connection might get
-closed early.
+this attribute is weakened. So the object needs to be referenced elsewhere as
+well when you're performing non-blocking operations and the underlying
+connection might get closed early.
 
   # Check peer information
   my $address = $c->tx->remote_address;

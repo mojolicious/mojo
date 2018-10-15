@@ -126,7 +126,7 @@ sub _class {
 
     # Success
     my $new = $class->new(%$c);
-    weaken $new->{$_} for qw(app tx);
+    weaken $new->{tx};
     return $new;
   }
 

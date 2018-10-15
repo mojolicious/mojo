@@ -9,9 +9,10 @@ use Mojo::Util;
 use Mojolicious::Routes::Match;
 use Scalar::Util ();
 
-has [qw(app tx)];
+has app => undef, weak => 1;
 has match =>
   sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
+has 'tx';
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -401,7 +402,7 @@ L<Mojolicious::Controller> implements the following attributes.
   $c      = $c->app(Mojolicious->new);
 
 A reference back to the application that dispatched to this controller, usually
-a L<Mojolicious> object.
+a L<Mojolicious> object. Note that this attribute is weakened.
 
   # Use application logger
   $c->app->log->debug('Hello Mojo');

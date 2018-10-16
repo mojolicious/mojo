@@ -763,7 +763,7 @@ EOT
 $-= $output
 EOF
 like $output,
-  qr/test\n\nBareword "bar" not allowed .+ in use at template line 1/,
+  qr/test\n\nBareword "bar".+in use at template line 1\.\n1: %= bar/,
   'exception in nested template';
 
 # Control structures

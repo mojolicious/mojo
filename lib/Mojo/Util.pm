@@ -14,6 +14,7 @@ use IO::Uncompress::Gunzip;
 use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Pod::Usage 'pod2usage';
+use Sub::Util 'set_subname';
 use Symbol 'delete_package';
 use Time::HiRes        ();
 use Unicode::Normalize ();
@@ -32,10 +33,6 @@ use constant {
   PC_INITIAL_BIAS => 72,
   PC_INITIAL_N    => 128
 };
-
-# Supported on Perl 5.22+
-my $NAME
-  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
 
 # To generate a new HTML entity table run this command
 # perl examples/entities.pl
@@ -176,7 +173,7 @@ sub monkey_patch {
   my ($class, %patch) = @_;
   no strict 'refs';
   no warnings 'redefine';
-  *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
+  *{"${class}::$_"} = set_subname("${class}::$_", $patch{$_}) for keys %patch;
 }
 
 # Direct translation of RFC 3492

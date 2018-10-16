@@ -132,5 +132,9 @@ is $weak->five, $weak, 'circular reference';
 $weak->attr(six => undef, weak => 1);
 ok isweak($weak->six($weak)->{six}), 'weakened value';
 is $weak->six, $weak, 'circular reference';
+$weak = Mojo::BaseTest::Weak3->new(one => 23);
+is $weak->one, 23, 'right value';
+is $weak->one(24)->one,   24, 'right value';
+is $weak->four(25)->four, 25, 'right value';
 
 done_testing();

@@ -1,6 +1,7 @@
 
 8.03  2018-10-15
   - Added support for weak reference accessors to Mojo::Base. (mst)
+  - Updated List::Util requirement to 1.41 for set_subname support.
   - Fixed a small bug in Mojo::UserAgent where request timeouts could be created
     twice.
   - Improved Mojolicious::Types to use the correct MIME types for woff and

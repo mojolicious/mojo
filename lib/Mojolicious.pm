@@ -51,14 +51,10 @@ has secrets  => sub {
   # Default to moniker
   return [$self->moniker];
 };
-has sessions => sub { Mojolicious::Sessions->new };
-has static   => sub { Mojolicious::Static->new };
-has types    => sub { Mojolicious::Types->new };
-has ua       => sub {
-  my $ua = Mojo::UserAgent->new;
-  Scalar::Util::weaken $ua->server->app(shift)->{app};
-  return $ua;
-};
+has sessions  => sub { Mojolicious::Sessions->new };
+has static    => sub { Mojolicious::Static->new };
+has types     => sub { Mojolicious::Types->new };
+has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';

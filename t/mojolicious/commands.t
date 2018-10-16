@@ -182,6 +182,7 @@ require Mojolicious::Command::Author::cpanify;
 my $cpanify = Mojolicious::Command::Author::cpanify->new;
 ok $cpanify->description, 'has a description';
 like $cpanify->usage, qr/cpanify/, 'has usage information';
+$cpanify->app->ua->server->app($cpanify->app);
 $cpanify->app->ua->unsubscribe('start')->once(
   start => sub {
     my ($ua, $tx) = @_;
@@ -365,6 +366,7 @@ require Mojolicious::Command::version;
 my $version = Mojolicious::Command::version->new;
 ok $version->description, 'has a description';
 like $version->usage, qr/version/, 'has usage information';
+$version->app->ua->server->app($version->app);
 $version->app->ua->once(
   start => sub {
     my ($ua, $tx) = @_;

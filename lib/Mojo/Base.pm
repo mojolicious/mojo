@@ -3,7 +3,7 @@ package Mojo::Base;
 use strict;
 use warnings;
 use utf8;
-use feature ();
+use feature ':5.10';
 use mro;
 
 # No imports because we get subclassed, a lot!
@@ -32,20 +32,19 @@ sub attr {
 
   # Weaken
   if ($kv{weak}) {
-    our %weak_names;
-    my $w = $weak_names{$class};
-    unless ($w) {
-      $w = $weak_names{$class} = [];
+    state %weak_names;
+    unless ($weak_names{$class}) {
+      my $names = $weak_names{$class} = [];
       my $sub = sub {
         my $self = shift->next::method(@_);
-        ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$w;
+        ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$names;
         return $self;
       };
       Mojo::Util::monkey_patch(my $base = $class . '::_Base', 'new', $sub);
       no strict 'refs';
       unshift @{"${class}::ISA"}, $base;
     }
-    push @$w, ref($attrs) eq 'ARRAY' ? @$attrs : $attrs;
+    push @{$weak_names{$class}}, ref $attrs eq 'ARRAY' ? @$attrs : $attrs;
   }
 
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {

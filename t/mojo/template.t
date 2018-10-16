@@ -696,6 +696,7 @@ is $output->lines_after->[0][0], 6,          'right number';
 is $output->lines_after->[0][1], '%= 1 + 1', 'right line';
 is $output->lines_after->[1][0], 7,          'right number';
 is $output->lines_after->[1][1], 'test',     'right line';
+$output->frames([['Sandbox', 'template', 5], ['main', 'template.t', 673]]);
 is $output, <<EOF, 'right result';
 oops! at template line 5.
 1: test
@@ -705,6 +706,8 @@ oops! at template line 5.
 5: % die 'oops!';
 6: %= 1 + 1
 7: test
+template:5 (Sandbox)
+template.t:673 (main)
 EOF
 
 # Exception in template (empty perl lines)
@@ -759,13 +762,9 @@ EOT
 -$]
 $-= $output
 EOF
-is $output, <<'EOF', 'exception in nested template';
-test
-
-Bareword "bar" not allowed while "strict subs" in use at template line 1.
-1: %= bar
-
-EOF
+like $output,
+  qr/test\n\nBareword "bar" not allowed .+ in use at template line 1/,
+  'exception in nested template';
 
 # Control structures
 $mt     = Mojo::Template->new;

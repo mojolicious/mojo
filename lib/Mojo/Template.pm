@@ -418,6 +418,9 @@ error messages with context.
   4: % my $i = 2; xx
   5: %= $i * 2
   6: </body>
+  template:4 (Mojo::Template::Sandbox)
+  path/to/Mojo/Template.pm:123 (Mojo::Template)
+  path/to/myapp.pl:123 (main)
 
 =head1 ATTRIBUTES
 

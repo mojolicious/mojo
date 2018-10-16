@@ -94,6 +94,11 @@ is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"],
 
 # Verbose
 $e = Mojo::Exception->new('Test!')->verbose(1);
+$e->frames([
+  ['Sandbox',     'template',      4],
+  ['MyApp::Test', 'MyApp/Test.pm', 3],
+  ['main',        'foo.pl',        4]
+]);
 $e->lines_before([[3, 'foo();']])->line([4, 'die;'])
   ->lines_after([[5, 'bar();']]);
 is $e, <<EOF, 'right result';
@@ -101,11 +106,17 @@ Test!
 3: foo();
 4: die;
 5: bar();
+template:4 (Sandbox)
+MyApp/Test.pm:3 (MyApp::Test)
+foo.pl:4 (main)
 EOF
 $e->message("Works!\n")->lines_before([])->lines_after([]);
 is $e, <<EOF, 'right result';
 Works!
 4: die;
+template:4 (Sandbox)
+MyApp/Test.pm:3 (MyApp::Test)
+foo.pl:4 (main)
 EOF
 
 done_testing();

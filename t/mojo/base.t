@@ -111,6 +111,8 @@ like $@, qr/Default has to be a code reference or constant value/,
   'right error';
 eval { Mojo::BaseTest->attr(23) };
 like $@, qr/Attribute "23" invalid/, 'right error';
+eval { Mojo::BaseTest->attr(foo => undef, fail => 1) };
+like $@, qr/Unsupported attribute option/, 'right error';
 
 # Weaken
 my ($one, $two, $three) = (

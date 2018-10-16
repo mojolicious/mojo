@@ -29,6 +29,7 @@ sub attr {
 
   Carp::croak 'Default has to be a code reference or constant value'
     if ref $value && ref $value ne 'CODE';
+  Carp::croak 'Unsupported attribute option' if grep { $_ ne 'weak' } keys %kv;
 
   # Weaken
   if ($kv{weak}) {
@@ -209,6 +210,7 @@ L<Role::Tiny> (2.000001+).
   use warnings;
   use utf8;
   use feature ':5.10';
+  use mro;
   use IO::Handle ();
 
   # use Mojo::Base -base;
@@ -216,6 +218,7 @@ L<Role::Tiny> (2.000001+).
   use warnings;
   use utf8;
   use feature ':5.10';
+  use mro;
   use IO::Handle ();
   push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
@@ -225,6 +228,7 @@ L<Role::Tiny> (2.000001+).
   use warnings;
   use utf8;
   use feature ':5.10';
+  use mro;
   use IO::Handle ();
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
@@ -235,6 +239,7 @@ L<Role::Tiny> (2.000001+).
   use warnings;
   use utf8;
   use feature ':5.10';
+  use mro;
   use IO::Handle ();
   use Role::Tiny;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }

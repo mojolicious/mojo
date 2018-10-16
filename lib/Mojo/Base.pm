@@ -76,32 +76,28 @@ sub attr {
         Mojo::Util::monkey_patch($class, $attr, $sub);
       }
     }
+    elsif (ref $value) {
+      my $sub = sub {
+        return
+          exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
+          if @_ == 1;
+        $_[0]{$attr} = $_[1];
+        $_[0];
+      };
+      Mojo::Util::monkey_patch($class, $attr, $sub);
+    }
+    elsif (defined $value) {
+      my $sub = sub {
+        return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
+          if @_ == 1;
+        $_[0]{$attr} = $_[1];
+        $_[0];
+      };
+      Mojo::Util::monkey_patch($class, $attr, $sub);
+    }
     else {
-      if (ref $value) {
-        my $sub = sub {
-          return
-            exists $_[0]{$attr}
-            ? $_[0]{$attr}
-            : ($_[0]{$attr} = $value->($_[0]))
-            if @_ == 1;
-          $_[0]{$attr} = $_[1];
-          $_[0];
-        };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
-      }
-      elsif (defined $value) {
-        my $sub = sub {
-          return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
-            if @_ == 1;
-          $_[0]{$attr} = $_[1];
-          $_[0];
-        };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
-      }
-      else {
-        Mojo::Util::monkey_patch($class, $attr,
-          sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
-      }
+      Mojo::Util::monkey_patch($class, $attr,
+        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
     }
   }
 }

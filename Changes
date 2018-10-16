@@ -1,4 +1,6 @@
 
+8.04  2018-10-17
+
 8.03  2018-10-16
   - Added support for weak reference accessors to Mojo::Base. (mst)
   - Updated List::Util requirement to 1.41 for set_subname support.

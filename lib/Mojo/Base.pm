@@ -334,9 +334,10 @@ These options are currently available:
 
 =item weak
 
-  weak => 1
+  weak => $bool
 
-Weaken attribute reference to avoid circlular references and memory leaks.
+Weaken attribute reference to avoid
+L<circular references|perlref/"Circular-References"> and memory leaks.
 
 =back
 

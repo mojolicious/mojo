@@ -30,13 +30,13 @@ sub import {
 
 sub register {
   my ($target, $object, $name, $code) = @_;
-  state %Dyn_Methods;
-  state $setup = do { fieldhash %Dyn_Methods; 1 };
+  state %dyn_methods;
+  state $setup = do { fieldhash %dyn_methods; 1 };
 
   my $dyn_pkg = "${target}::_Dynamic";
-  monkey_patch($dyn_pkg, $name, $target->BUILD_DYNAMIC($name, \%Dyn_Methods))
+  monkey_patch($dyn_pkg, $name, $target->BUILD_DYNAMIC($name, \%dyn_methods))
     unless do { no strict 'refs'; *{"${dyn_pkg}::${name}"}{CODE} };
-  $Dyn_Methods{$object}{$name} = $code;
+  $dyn_methods{$object}{$name} = $code;
 }
 
 1;

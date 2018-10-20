@@ -779,9 +779,11 @@ startup. Meant to be overloaded in a subclass.
     ...
   }
 
-=head1 BUILD_DYNAMIC
+=head2 BUILD_DYNAMIC
 
 C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
+
+=head1 HELPERS
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 helpers on L<Mojolicious> objects. This includes all helpers from

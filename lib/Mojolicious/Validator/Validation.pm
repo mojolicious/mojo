@@ -272,9 +272,11 @@ are supported.
   # Trim value and check size
   $v->required('user', 'trim')->size(1, 15);
 
-=head1 BUILD_DYNAMIC
+=head2 BUILD_DYNAMIC
 
 C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
+
+=head1 CALLING CHECKS
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
 validation checks provided by L</"validator"> on

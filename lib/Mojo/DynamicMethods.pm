@@ -10,7 +10,7 @@ sub import {
   my ($flag, $caller) = ($_[1] // '', caller);
   return unless $flag eq '-dispatch';
 
-  my $dyn_pkg = "${caller}::_DynamicMethods";
+  my $dyn_pkg = "${caller}::_Dynamic";
   monkey_patch $dyn_pkg, 'can', sub {
     my ($self, $method, @rest) = @_;
 
@@ -33,7 +33,7 @@ sub register {
   state %Dyn_Methods;
   state $setup = do { fieldhash %Dyn_Methods; 1 };
 
-  my $dyn_pkg = "${target}::_DynamicMethods";
+  my $dyn_pkg = "${target}::_Dynamic";
   monkey_patch($dyn_pkg, $name, $target->BUILD_DYNAMIC($name, \%Dyn_Methods))
     unless do { no strict 'refs'; *{"${dyn_pkg}::${name}"}{CODE} };
   $Dyn_Methods{$object}{$name} = $code;

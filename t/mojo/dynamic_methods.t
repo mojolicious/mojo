@@ -29,7 +29,7 @@ Mojo::DynamicMethods::register
   'Mojo::TestDynamic', $t1->hashref, 'foo',
   sub { };
 
-my $foo = \&Mojo::TestDynamic::_DynamicMethods::foo;
+my $foo = \&Mojo::TestDynamic::_Dynamic::foo;
 
 my $called_foo;
 
@@ -39,7 +39,7 @@ Mojo::DynamicMethods::register
   'Mojo::TestDynamic', $t1->hashref, 'foo',
   sub { $called_foo++; $dyn_methods = $_[1] };
 
-is($foo, \&Mojo::TestDynamic::_DynamicMethods::foo, 'foo not reinstalled');
+is($foo, \&Mojo::TestDynamic::_Dynamic::foo, 'foo not reinstalled');
 
 ok(!Mojo::TestDynamic->can('foo'), 'dynamic method hidden');
 

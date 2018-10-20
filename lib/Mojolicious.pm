@@ -65,7 +65,7 @@ sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
   return sub {
     my $self    = shift;
-    my $dynamic = $dyn_methods->{$self}{$method};
+    my $dynamic = $dyn_methods->{$self->renderer}{$method};
     return $self->build_controller->$dynamic(@_) if $dynamic;
     my $package = ref $self;
     Carp::croak qq{Can't locate object method "$method" via package "$package"};
@@ -150,18 +150,7 @@ sub handler {
     unless $c->stash->{'mojo.rendered'};
 }
 
-sub helper {
-  my ($self, $name, $helper) = @_;
-
-  my $ret = $self->renderer->add_helper($name => $helper);
-  $helper = $self->renderer->get_helper($name) if $name =~ s/\..*$//;
-
-  Mojo::DynamicMethods::register 'Mojolicious', $self, $name, $helper;
-  Mojo::DynamicMethods::register 'Mojolicious::Controller', $self, $name,
-    $helper;
-
-  return $ret;
-}
+sub helper { shift->renderer->add_helper(@_) }
 
 sub hook { shift->plugins->on(@_) }
 

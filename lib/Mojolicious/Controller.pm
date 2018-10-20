@@ -24,7 +24,7 @@ sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
   return sub {
     my $self    = shift;
-    my $dynamic = $dyn_methods->{$self->{app}}{$method};
+    my $dynamic = $dyn_methods->{$self->{app}{renderer}}{$method};
     return $self->$dynamic(@_) if $dynamic;
     my $package = ref $self;
     Carp::croak qq{Can't locate object method "$method" via package "$package"};

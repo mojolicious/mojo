@@ -6,6 +6,7 @@ use Mojo::File 'path';
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader 'data_section';
+use Mojo::DynamicMethods;
 use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
 
 has cache   => sub { Mojo::Cache->new };
@@ -43,6 +44,9 @@ sub add_helper {
   my ($self, $name, $cb) = @_;
   $self->helpers->{$name} = $cb;
   delete $self->{proxy};
+  $cb = $self->get_helper($name) if $name =~ s/\..*$//;
+  Mojo::DynamicMethods::register 'Mojolicious', $self, $name, $cb;
+  Mojo::DynamicMethods::register 'Mojolicious::Controller', $self, $name, $cb;
   return $self;
 }
 

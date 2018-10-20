@@ -2,7 +2,7 @@ package Mojolicious::Routes::Route;
 use Mojo::Base -base;
 
 use Carp ();
-use Mojo::DynamicMethods;
+use Mojo::DynamicMethods -dispatch;
 use Mojo::Util;
 use Mojolicious::Routes::Pattern;
 

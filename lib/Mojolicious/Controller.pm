@@ -4,7 +4,7 @@ use Mojo::Base -base;
 # No imports, for security reasons!
 use Carp ();
 use Mojo::ByteStream;
-use Mojo::DynamicMethods;
+use Mojo::DynamicMethods -dispatch;
 use Mojo::URL;
 use Mojo::Util;
 use Mojolicious::Routes::Match;

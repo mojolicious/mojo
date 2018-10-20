@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 # "Fry: Shut up and take my money!"
 use Carp ();
-use Mojo::DynamicMethods;
+use Mojo::DynamicMethods -dispatch;
 use Mojo::Exception;
 use Mojo::Home;
 use Mojo::Log;

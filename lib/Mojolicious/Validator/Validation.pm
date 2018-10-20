@@ -2,7 +2,7 @@ package Mojolicious::Validator::Validation;
 use Mojo::Base -base;
 
 use Carp ();
-use Mojo::DynamicMethods;
+use Mojo::DynamicMethods -dispatch;
 use Scalar::Util ();
 
 has [qw(csrf_token topic validator)];

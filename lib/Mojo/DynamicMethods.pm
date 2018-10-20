@@ -8,9 +8,9 @@ use Scalar::Util 'weaken';
 fieldhash my %Dyn_Methods;
 
 sub import {
-  my $target = caller;
+  my ($flag, $caller) = (shift // '', caller);
 
-  my $dyn_pkg = "${target}::_DynamicMethods";
+  my $dyn_pkg = "${caller}::_DynamicMethods";
   monkey_patch $dyn_pkg, 'can', sub {
     my ($self, $method, @rest) = @_;
 
@@ -24,7 +24,7 @@ sub import {
   $INC{class_to_path($dyn_pkg)} = __FILE__;
   {
     no strict 'refs';
-    unshift @{"${target}::ISA"}, $dyn_pkg;
+    unshift @{"${caller}::ISA"}, $dyn_pkg;
   }
 }
 

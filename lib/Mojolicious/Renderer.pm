@@ -16,6 +16,7 @@ has default_format => 'html';
 has encoding       => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
 has paths => sub { [] };
+has register_dynamic => sub { [ qw(Mojolicious Mojolicious::Controller) ] };
 
 # Bundled templates
 my $TEMPLATES = Mojo::Home->new->mojo_lib_dir->child('Mojolicious', 'resources',
@@ -45,8 +46,8 @@ sub add_helper {
   $self->helpers->{$name} = $cb;
   delete $self->{proxy};
   $cb = $self->get_helper($name) if $name =~ s/\..*$//;
-  Mojo::DynamicMethods::register 'Mojolicious', $self, $name, $cb;
-  Mojo::DynamicMethods::register 'Mojolicious::Controller', $self, $name, $cb;
+  Mojo::DynamicMethods::register $_, $self, $name, $cb
+    for @{$self->register_dynamic};
   return $self;
 }
 

@@ -124,3 +124,9 @@ Then later:
 Must return a subroutine suitable for installation under name C<$method>
 which will look up the dynamic method coderef in the supplied C<$dyn_methods>
 hashref using the same reference passed to L</register>.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+
+=cut

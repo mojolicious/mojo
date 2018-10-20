@@ -76,3 +76,51 @@ Mojo::DynamicMethods - Dynamic method dispatch for helpers and related code
   
   $obj->foo;
 
+=head1 DESCRIPTION
+
+L<Mojo::DynamicMethods> provides dynamic method dispatch for per-object
+helper methods without requiring use of C<AUTOLOAD>.
+
+To opt your class into dynamic dispatch, simply pass the -dispatch flag:
+
+  use Mojo::DynamicMethods -dispatch;
+
+and implement L</BUILD_DYNAMIC> as a method in your class.
+
+=head1 FUNCTIONS
+
+L<Mojo::DynamicMethods> provides the following function, which is not exported:
+
+=head2 register
+
+  Mojo::DynamicMethods::register $class, $ref, $name, $code;
+
+Registers the method C<$name> as eligible for dynamic dispatch for C<$class>,
+and sets C<$code> to be looked up for C<$name> by reference C<$ref> in a
+dynamic method contructed by L</BUILD_DYNAMIC>.
+
+=head1 METHODS
+
+L<Mojo::DynamicMethods> requires you to implement the following method on
+any class participating in dynamic dispatch:
+
+=head2 BUILD_DYNAMIC
+  
+  sub BUILD_DYNAMIC {
+    my ($class, $method, $dyn_methods) = @_;
+    return sub {
+      my $self    = shift;
+      my $dynamic = $dyn_methods->{$self}{$method};
+      return $self->$dynamic(@_) if $dynamic;
+      my $package = ref $self;
+      Carp::croak qq{Can't locate object method "$method" via package "$package"};
+    };
+  }
+
+Then later:
+
+  Mojo::DynamicMethods::register $class, $self, $name, $code;
+
+Must return a subroutine suitable for installation under name C<$method>
+which will look up the dynamic method coderef in the supplied C<$dyn_methods>
+hashref using the same reference passed to L</register>.

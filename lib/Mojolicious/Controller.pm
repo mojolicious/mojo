@@ -1048,7 +1048,9 @@ the stream.
   o!
   0
 
-=head1 AUTOLOAD
+=head1 BUILD_DYNAMIC
+
+C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 helpers provided by L</"app"> on L<Mojolicious::Controller> objects. This

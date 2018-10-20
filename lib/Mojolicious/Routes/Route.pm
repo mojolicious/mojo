@@ -652,7 +652,9 @@ L<Mojolicious::Guides::Routing> for more information.
   # Route with destination
   $r->websocket('/echo')->to('example#echo');
 
-=head1 AUTOLOAD
+=head1 BUILD_DYNAMIC
+
+<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 shortcuts provided by L</"root"> on L<Mojolicious::Routes::Route> objects.

@@ -1,21 +1,23 @@
 package Mojolicious::Validator::Validation;
 use Mojo::Base -base;
 
-use Carp         ();
+use Carp ();
+use Mojo::DynamicMethods -dispatch;
 use Scalar::Util ();
 
 has [qw(csrf_token topic validator)];
 has [qw(input output)] => sub { {} };
 
-sub AUTOLOAD {
-  my $self = shift;
+sub BUILD_DYNAMIC {
+  my ($class, $method, $dyn_methods) = @_;
 
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
-
-  return $self->check($method => @_) if $self->validator->checks->{$method};
-  Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  return sub {
+    my $self    = shift;
+    my $dynamic = $dyn_methods->{$self->validator}{$method};
+    return $self->check($method => @_) if $dynamic;
+    my $package = ref $self;
+    Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  };
 }
 
 sub check {
@@ -270,7 +272,11 @@ are supported.
   # Trim value and check size
   $v->required('user', 'trim')->size(1, 15);
 
-=head1 AUTOLOAD
+=head2 BUILD_DYNAMIC
+
+C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
+
+=head1 CALLING CHECKS
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
 validation checks provided by L</"validator"> on

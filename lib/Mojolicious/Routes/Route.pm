@@ -2,6 +2,7 @@ package Mojolicious::Routes::Route;
 use Mojo::Base -base;
 
 use Carp ();
+use Mojo::DynamicMethods -dispatch;
 use Mojo::Util;
 use Mojolicious::Routes::Pattern;
 
@@ -10,17 +11,16 @@ has 'children' => sub { [] };
 has parent     => undef, weak => 1;
 has pattern    => sub { Mojolicious::Routes::Pattern->new };
 
-sub AUTOLOAD {
-  my $self = shift;
+sub BUILD_DYNAMIC {
+  my ($class, $method, $dyn_methods) = @_;
 
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
-
-  # Call shortcut with current route
-  Carp::croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $shortcut = $self->root->shortcuts->{$method};
-  return $self->$shortcut(@_);
+  return sub {
+    my $self    = shift;
+    my $dynamic = $dyn_methods->{$self->root}{$method};
+    return $self->$dynamic(@_) if $dynamic;
+    my $package = ref($self);
+    Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  };
 }
 
 sub add_child {
@@ -652,7 +652,11 @@ L<Mojolicious::Guides::Routing> for more information.
   # Route with destination
   $r->websocket('/echo')->to('example#echo');
 
-=head1 AUTOLOAD
+=head2 BUILD_DYNAMIC
+
+<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
+
+=head1 SHORTCUTS
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 shortcuts provided by L</"root"> on L<Mojolicious::Routes::Route> objects.

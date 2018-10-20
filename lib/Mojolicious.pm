@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 # "Fry: Shut up and take my money!"
 use Carp ();
+use Mojo::DynamicMethods -dispatch;
 use Mojo::Exception;
 use Mojo::Home;
 use Mojo::Log;
@@ -60,17 +61,15 @@ has validator => sub { Mojolicious::Validator->new };
 our $CODENAME = 'Supervillain';
 our $VERSION  = '8.04';
 
-sub AUTOLOAD {
-  my $self = shift;
-
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
-
-  # Call helper with fresh controller
-  Carp::croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $helper = $self->renderer->get_helper($method);
-  return $self->build_controller->$helper(@_);
+sub BUILD_DYNAMIC {
+  my ($class, $method, $dyn_methods) = @_;
+  return sub {
+    my $self    = shift;
+    my $dynamic = $dyn_methods->{$self->renderer}{$method};
+    return $self->build_controller->$dynamic(@_) if $dynamic;
+    my $package = ref $self;
+    Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  };
 }
 
 sub build_controller {
@@ -780,7 +779,11 @@ startup. Meant to be overloaded in a subclass.
     ...
   }
 
-=head1 AUTOLOAD
+=head2 BUILD_DYNAMIC
+
+C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
+
+=head1 HELPERS
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 helpers on L<Mojolicious> objects. This includes all helpers from

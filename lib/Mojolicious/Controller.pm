@@ -4,6 +4,7 @@ use Mojo::Base -base;
 # No imports, for security reasons!
 use Carp ();
 use Mojo::ByteStream;
+use Mojo::DynamicMethods -dispatch;
 use Mojo::URL;
 use Mojo::Util;
 use Mojolicious::Routes::Match;
@@ -19,17 +20,15 @@ my %RESERVED = map { $_ => 1 } (
   qw(namespace path status template text variant)
 );
 
-sub AUTOLOAD {
-  my $self = shift;
-
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
-
-  # Call helper with current controller
-  Carp::croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $helper = $self->app->renderer->get_helper($method);
-  return $self->$helper(@_);
+sub BUILD_DYNAMIC {
+  my ($class, $method, $dyn_methods) = @_;
+  return sub {
+    my $self    = shift;
+    my $dynamic = $dyn_methods->{$self->{app}{renderer}}{$method};
+    return $self->$dynamic(@_) if $dynamic;
+    my $package = ref $self;
+    Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  };
 }
 
 sub continue { $_[0]->app->routes->continue($_[0]) }
@@ -1049,7 +1048,11 @@ the stream.
   o!
   0
 
-=head1 AUTOLOAD
+=head2 BUILD_DYNAMIC
+
+C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
+
+=head1 HELPERS
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 helpers provided by L</"app"> on L<Mojolicious::Controller> objects. This

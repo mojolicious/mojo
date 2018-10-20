@@ -228,11 +228,6 @@ Check if validation resulted in errors, defaults to checking all fields.
 Check if validation was successful and field has a value, defaults to checking
 the current L</"topic">.
 
-=head2 new
-
-Registers the standard checks for dynamic method dispatch then delegates
-to L<Mojo::Base/new>.
-
 =head2 optional
 
   $v = $v->optional('foo');

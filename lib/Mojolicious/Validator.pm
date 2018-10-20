@@ -180,6 +180,11 @@ Register a new filter.
     return $value;
   });
 
+=head2 new
+
+Registers the standard checks for dynamic method dispatch then delegates
+to L<Mojo::Base/new>.
+
 =head2 validation
 
   my $v = $validator->validation;

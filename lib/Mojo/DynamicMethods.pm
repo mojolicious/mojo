@@ -4,6 +4,7 @@ use Mojo::Base -strict;
 use Mojo::Util qw(class_to_path monkey_patch);
 use Hash::Util::FieldHash 'fieldhash';
 use Scalar::Util 'weaken';
+no warnings 'once'; # once warnings get confused by the stash lookups
 
 fieldhash my %Dyn_Methods;
 
@@ -34,7 +35,7 @@ sub register {
 
   my $dyn_pkg = "${target}::_DynamicMethods";
   monkey_patch($dyn_pkg, $name, $target->BUILD_DYNAMIC($name, \%Dyn_Methods))
-    unless $dyn_pkg->can($name);
+    unless do { no strict 'refs'; *{"${dyn_pkg}::${name}"}{CODE} };
   $Dyn_Methods{$object}{$name} = $code;
 }
 

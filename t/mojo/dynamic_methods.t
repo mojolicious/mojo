@@ -25,6 +25,12 @@ use Mojo::DynamicMethods;
 
 my ($t1, $t2) = map Mojo::TestDynamic->new, 1, 2;
 
+Mojo::DynamicMethods::register
+  'Mojo::TestDynamic', $t1->hashref, 'foo',
+  sub { };
+
+my $foo = \&Mojo::TestDynamic::_DynamicMethods::foo;
+
 my $called_foo;
 
 my $dyn_methods;
@@ -32,6 +38,8 @@ my $dyn_methods;
 Mojo::DynamicMethods::register
   'Mojo::TestDynamic', $t1->hashref, 'foo',
   sub { $called_foo++; $dyn_methods = $_[1] };
+
+is($foo, \&Mojo::TestDynamic::_DynamicMethods::foo, 'foo not reinstalled');
 
 ok(!Mojo::TestDynamic->can('foo'), 'dynamic method hidden');
 

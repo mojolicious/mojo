@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Routes::Route';
 
 use List::Util 'first';
 use Mojo::Cache;
-use Mojo::DynamicMethods -dispatch;
+use Mojo::DynamicMethods;
 use Mojo::Loader 'load_class';
 use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;

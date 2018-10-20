@@ -8,7 +8,8 @@ use Scalar::Util 'weaken';
 fieldhash my %Dyn_Methods;
 
 sub import {
-  my ($flag, $caller) = (shift // '', caller);
+  my ($flag, $caller) = ($_[1] // '', caller);
+  return unless $flag eq '-dispatch';
 
   my $dyn_pkg = "${caller}::_DynamicMethods";
   monkey_patch $dyn_pkg, 'can', sub {

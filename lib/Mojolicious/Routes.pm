@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Routes::Route';
 
 use List::Util 'first';
 use Mojo::Cache;
+use Mojo::DynamicMethods;
 use Mojo::Loader 'load_class';
 use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
@@ -15,8 +16,16 @@ has hidden     => sub { [qw(attr has new tap)] };
 has namespaces => sub { [] };
 
 sub add_condition { $_[0]->conditions->{$_[1]} = $_[2] and return $_[0] }
-sub add_shortcut  { $_[0]->shortcuts->{$_[1]}  = $_[2] and return $_[0] }
-sub add_type      { $_[0]->types->{$_[1]}      = $_[2] and return $_[0] }
+
+sub add_shortcut {
+  my ($self, $name, $cb) = @_;
+  $self->shortcuts->{$name} = $cb;
+  Mojo::DynamicMethods::register 'Mojolicious::Routes::Route', $self, $name,
+    $cb;
+  return $self;
+}
+
+sub add_type { $_[0]->types->{$_[1]} = $_[2] and return $_[0] }
 
 sub continue {
   my ($self, $c) = @_;

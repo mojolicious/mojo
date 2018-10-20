@@ -1,23 +1,35 @@
 package Mojolicious::Validator;
 use Mojo::Base -base;
 
+use Mojo::DynamicMethods;
 use Mojo::Util 'trim';
 use Mojolicious::Validator::Validation;
 
-has checks => sub {
-  {
-    equal_to => \&_equal_to,
-    in       => \&_in,
-    like     => sub { $_[2] !~ $_[3] },
-    num      => \&_num,
-    size     => \&_size,
-    upload   => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') }
-  };
-};
+has checks => sub { {} };
 has filters => sub { {trim => \&_trim} };
 
-sub add_check  { $_[0]->checks->{$_[1]}  = $_[2] and return $_[0] }
+sub add_check {
+  my ($self, $name, $cb) = @_;
+  $self->checks->{$name} = $cb;
+  Mojo::DynamicMethods::register 'Mojolicious::Validator::Validation', $self,
+    $name, $cb;
+  return $self;
+}
+
 sub add_filter { $_[0]->filters->{$_[1]} = $_[2] and return $_[0] }
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+
+  $self->add_check(equal_to => \&_equal_to);
+  $self->add_check(in       => \&_in);
+  $self->add_check(like     => sub { $_[2] !~ $_[3] });
+  $self->add_check(num      => \&_num);
+  $self->add_check(size     => \&_size);
+  $self->add_check(upload => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') });
+
+  return $self;
+}
 
 sub validation {
   Mojolicious::Validator::Validation->new(validator => shift);

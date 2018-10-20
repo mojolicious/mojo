@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 # "Fry: Shut up and take my money!"
 use Carp ();
+use Mojo::DynamicMethods;
 use Mojo::Exception;
 use Mojo::Home;
 use Mojo::Log;
@@ -60,17 +61,15 @@ has validator => sub { Mojolicious::Validator->new };
 our $CODENAME = 'Supervillain';
 our $VERSION  = '8.04';
 
-sub AUTOLOAD {
-  my $self = shift;
-
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
-
-  # Call helper with fresh controller
-  Carp::croak qq{Can't locate object method "$method" via package "$package"}
-    unless my $helper = $self->renderer->get_helper($method);
-  return $self->build_controller->$helper(@_);
+sub BUILD_DYNAMIC {
+  my ($class, $method, $dyn_methods) = @_;
+  return sub {
+    my $self    = shift;
+    my $dynamic = $dyn_methods->{$self}{$method};
+    return $self->build_controller->$dynamic(@_) if $dynamic;
+    my $package = ref $self;
+    Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  };
 }
 
 sub build_controller {
@@ -151,7 +150,18 @@ sub handler {
     unless $c->stash->{'mojo.rendered'};
 }
 
-sub helper { shift->renderer->add_helper(@_) }
+sub helper {
+  my ($self, $name, $helper) = @_;
+
+  my $ret = $self->renderer->add_helper($name => $helper);
+  $helper = $self->renderer->get_helper($name) if $name =~ s/\..*$//;
+
+  Mojo::DynamicMethods::register 'Mojolicious', $self, $name, $helper;
+  Mojo::DynamicMethods::register 'Mojolicious::Controller', $self, $name,
+    $helper;
+
+  return $ret;
+}
 
 sub hook { shift->plugins->on(@_) }
 

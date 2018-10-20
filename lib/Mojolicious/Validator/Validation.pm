@@ -1,21 +1,23 @@
 package Mojolicious::Validator::Validation;
 use Mojo::Base -base;
 
-use Carp         ();
+use Carp ();
+use Mojo::DynamicMethods;
 use Scalar::Util ();
 
 has [qw(csrf_token topic validator)];
 has [qw(input output)] => sub { {} };
 
-sub AUTOLOAD {
-  my $self = shift;
+sub BUILD_DYNAMIC {
+  my ($class, $method, $dyn_methods) = @_;
 
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
-
-  return $self->check($method => @_) if $self->validator->checks->{$method};
-  Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  return sub {
+    my $self    = shift;
+    my $dynamic = $dyn_methods->{$self->validator}{$method};
+    return $self->check($method => @_) if $dynamic;
+    my $package = ref $self;
+    Carp::croak qq{Can't locate object method "$method" via package "$package"};
+  };
 }
 
 sub check {

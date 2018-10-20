@@ -6,8 +6,6 @@ use Hash::Util::FieldHash 'fieldhash';
 use Scalar::Util 'weaken';
 no warnings 'once'; # once warnings get confused by the stash lookups
 
-fieldhash my %Dyn_Methods;
-
 sub import {
   my ($flag, $caller) = ($_[1] // '', caller);
   return unless $flag eq '-dispatch';
@@ -32,6 +30,8 @@ sub import {
 
 sub register {
   my ($target, $object, $name, $code) = @_;
+  state %Dyn_Methods;
+  state $setup = do { fieldhash %Dyn_Methods; 1 };
 
   my $dyn_pkg = "${target}::_DynamicMethods";
   monkey_patch($dyn_pkg, $name, $target->BUILD_DYNAMIC($name, \%Dyn_Methods))

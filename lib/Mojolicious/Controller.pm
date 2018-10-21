@@ -132,7 +132,17 @@ sub flash {
   return $self;
 }
 
-sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
+sub helpers {
+  my $self = shift;
+
+  my $helpers = $self->{helpers};
+  unless ($helpers) {
+    $helpers = $self->{helpers} ||= $self->app->renderer->get_helper('');
+    Scalar::Util::weaken $self->{helpers};
+  }
+
+  return $helpers->($self);
+}
 
 sub on {
   my ($self, $name, $cb) = @_;

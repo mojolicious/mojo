@@ -2,11 +2,11 @@ package Mojolicious::Renderer;
 use Mojo::Base -base;
 
 use Mojo::Cache;
+use Mojo::DynamicMethods;
 use Mojo::File 'path';
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader 'data_section';
-use Mojo::DynamicMethods;
 use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
 
 has cache   => sub { Mojo::Cache->new };
@@ -16,7 +16,6 @@ has default_format => 'html';
 has encoding       => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
 has paths => sub { [] };
-has register_dynamic => sub { [ qw(Mojolicious Mojolicious::Controller) ] };
 
 # Bundled templates
 my $TEMPLATES = Mojo::Home->new->mojo_lib_dir->child('Mojolicious', 'resources',
@@ -43,11 +42,13 @@ sub add_handler { $_[0]->handlers->{$_[1]} = $_[2] and return $_[0] }
 
 sub add_helper {
   my ($self, $name, $cb) = @_;
+
   $self->helpers->{$name} = $cb;
   delete $self->{proxy};
   $cb = $self->get_helper($name) if $name =~ s/\..*$//;
   Mojo::DynamicMethods::register $_, $self, $name, $cb
-    for @{$self->register_dynamic};
+    for qw(Mojolicious Mojolicious::Controller);
+
   return $self;
 }
 

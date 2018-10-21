@@ -1,4 +1,6 @@
 
+8.05  2018-10-22
+
 8.04  2018-10-21
   - Added EXPERIMENTAL module Mojo::DynamicMethods. (mst)
   - Replaced all uses of AUTOLOAD with a much faster alternative, so helpers are

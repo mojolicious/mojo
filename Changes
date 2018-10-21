@@ -1,8 +1,9 @@
 
 8.04  2018-10-21
-  - Added module Mojo::DynamicMethods. (mst)
+  - Added EXPERIMENTAL module Mojo::DynamicMethods. (mst)
   - Replaced all uses of AUTOLOAD with a much faster alternative, so helpers are
     faster by up to 400% and stack traces contain more information. (mst)
+  - Removed experimental status from server method in Mojolicious.
 
 8.03  2018-10-16
   - Added support for weak reference accessors to Mojo::Base. (mst)

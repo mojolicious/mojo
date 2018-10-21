@@ -752,8 +752,7 @@ L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
 
   $app->server(Mojo::Server->new);
 
-Emits the L</"before_server_start"> hook. Note that this method is EXPERIMENTAL
-and might change without warning!
+Emits the L</"before_server_start"> hook.
 
 =head2 start
 

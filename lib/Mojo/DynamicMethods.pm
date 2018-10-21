@@ -94,6 +94,8 @@ C<$ref> to L</"register">.
     };
   }
 
+Note that this modules is EXPERIMENTAL and might change without warning!
+
 =head1 FUNCTIONS
 
 L<Mojo::DynamicMethods> implements the following functions.

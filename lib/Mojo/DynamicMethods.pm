@@ -2,7 +2,7 @@ package Mojo::DynamicMethods;
 use Mojo::Base -strict;
 
 use Hash::Util::FieldHash 'fieldhash';
-use Mojo::Util qw(class_to_path monkey_patch);
+use Mojo::Util 'monkey_patch';
 
 sub import {
   my ($flag, $caller) = ($_[1] // '', caller);
@@ -20,7 +20,6 @@ sub import {
     return $h && $h eq $can ? undef : $can;
   };
 
-  $INC{class_to_path($dyn_pkg)} = __FILE__;
   {
     no strict 'refs';
     unshift @{"${caller}::ISA"}, $dyn_pkg;

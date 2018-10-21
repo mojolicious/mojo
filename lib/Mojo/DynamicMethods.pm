@@ -56,14 +56,7 @@ Mojo::DynamicMethods - Fast dynamic method dispatch
 
   sub BUILD_DYNAMIC {
     my ($class, $method, $dyn_methods) = @_;
-    return sub {
-      my $self    = shift;
-      my $dynamic = $dyn_methods->{$self}{$method};
-      return $self->$dynamic(@_) if $dynamic;
-      my $package = ref $self;
-      Carp::croak
-        qq{Can't locate object method "$method" via package "$package"};
-    };
+    return sub {...};
   }
 
   sub add_helper {
@@ -73,11 +66,10 @@ Mojo::DynamicMethods - Fast dynamic method dispatch
 
   package main;
 
-  # Generate methods dynamically (and hide them from "can")
+  # Generate methods dynamically (and hide them from "$obj->can(...)")
   my $obj = MyClass->new;
   $obj->add_helper(foo => sub { warn 'Hello Helper!' });
   $obj->foo;
-  warn 'Method hidden from $obj->can(...)' unless $obj->can('foo');
 
 =head1 DESCRIPTION
 
@@ -91,6 +83,17 @@ To opt your class into dynamic dispatch, simply pass the C<-dispatch> flag.
 And implement a C<BUILD_DYNAMIC> method in your class, making sure that the key
 you use to lookup methods in C<$dyn_methods> is the same thing you pass as
 C<$ref> to L</"register">.
+
+  sub BUILD_DYNAMIC {
+    my ($class, $method, $dyn_methods) = @_;
+    return sub {
+      my $self    = shift;
+      my $dynamic = $dyn_methods->{$self}{$method};
+      return $self->$dynamic(@_) if $dynamic;
+      my $package = ref $self;
+      croak qq{Can't locate object method "$method" via package "$package"};
+    };
+  }
 
 =head1 FUNCTIONS
 

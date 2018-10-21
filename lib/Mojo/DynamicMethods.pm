@@ -76,20 +76,20 @@ Mojo::DynamicMethods - Fast dynamic method dispatch
 L<Mojo::DynamicMethods> provides dynamic method dispatch for per-object helper
 methods without requiring use of C<AUTOLOAD>.
 
-To opt your class into dynamic dispatch, simply pass the C<-dispatch> flag.
+To opt your class into dynamic dispatch simply pass the C<-dispatch> flag.
 
   use Mojo::DynamicMethods -dispatch;
 
-And implement a C<BUILD_DYNAMIC> method in your class, making sure that the key
-you use to lookup methods in C<$dyn_methods> is the same thing you pass as
+And then implement a C<BUILD_DYNAMIC> method in your class, making sure that the
+key you use to lookup methods in C<$dyn_methods> is the same thing you pass as
 C<$ref> to L</"register">.
 
   sub BUILD_DYNAMIC {
     my ($class, $method, $dyn_methods) = @_;
     return sub {
-      my $self    = shift;
+      my ($self, @args) = @_;
       my $dynamic = $dyn_methods->{$self}{$method};
-      return $self->$dynamic(@_) if $dynamic;
+      return $self->$dynamic(@args) if $dynamic;
       my $package = ref $self;
       croak qq{Can't locate object method "$method" via package "$package"};
     };

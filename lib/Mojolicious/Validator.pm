@@ -182,8 +182,9 @@ Register a new filter.
 
 =head2 new
 
-Registers the standard checks for dynamic method dispatch then delegates
-to L<Mojo::Base/new>.
+  my $validator = Mojolicious::Validator->new;
+
+Construct a new L<Mojolicious::Validator> object.
 
 =head2 validation
 

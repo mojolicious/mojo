@@ -63,6 +63,7 @@ our $VERSION  = '8.04';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
+
   return sub {
     my $self    = shift;
     my $dynamic = $dyn_methods->{$self->renderer}{$method};
@@ -778,10 +779,6 @@ startup. Meant to be overloaded in a subclass.
     my $self = shift;
     ...
   }
-
-=head2 BUILD_DYNAMIC
-
-C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
 
 =head1 HELPERS
 

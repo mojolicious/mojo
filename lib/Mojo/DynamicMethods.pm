@@ -1,10 +1,8 @@
 package Mojo::DynamicMethods;
 use Mojo::Base -strict;
 
-use Mojo::Util qw(class_to_path monkey_patch);
 use Hash::Util::FieldHash 'fieldhash';
-use Scalar::Util 'weaken';
-no warnings 'once'; # once warnings get confused by the stash lookups
+use Mojo::Util qw(class_to_path monkey_patch);
 
 sub import {
   my ($flag, $caller) = ($_[1] // '', caller);
@@ -17,6 +15,7 @@ sub import {
     # Delegate to our parent's "can" if there is one, without breaking if not
     my $can = $self->${\($self->next::can || 'UNIVERSAL::can')}($method, @rest);
     return undef unless $can;
+    no warnings 'once';
     my $h = do { no strict 'refs'; *{"${dyn_pkg}::${method}"}{CODE} };
     return $h && $h eq $can ? undef : $can;
   };
@@ -30,6 +29,7 @@ sub import {
 
 sub register {
   my ($target, $object, $name, $code) = @_;
+
   state %dyn_methods;
   state $setup = do { fieldhash %dyn_methods; 1 };
 
@@ -45,16 +45,15 @@ sub register {
 
 =head1 NAME
 
-Mojo::DynamicMethods - Dynamic method dispatch for helpers and related code
+Mojo::DynamicMethods - Fast dynamic method dispatch
 
 =head1 SYNOPSIS
 
   package MyClass;
-  
   use Mojo::Base -base;
-  
+
   use Mojo::DynamicMethods -dispatch;
-  
+
   sub BUILD_DYNAMIC {
     my ($class, $method, $dyn_methods) = @_;
     return sub {
@@ -62,45 +61,48 @@ Mojo::DynamicMethods - Dynamic method dispatch for helpers and related code
       my $dynamic = $dyn_methods->{$self}{$method};
       return $self->$dynamic(@_) if $dynamic;
       my $package = ref $self;
-      Carp::croak qq{Can't locate object method "$method" via package "$package"};
+      Carp::croak
+        qq{Can't locate object method "$method" via package "$package"};
     };
   }
-  
+
   sub add_helper {
-    my ($self, $name, $code) = @_;
-    Mojo::DynamicMethods::register 'MyClass', $self, $name, $code;
+    my ($self, $name, $cb) = @_;
+    Mojo::DynamicMethods::register 'MyClass', $self, $name, $cb;
   }
-  
+
   package main;
-  
-  my $obj = MyClass->new->add_helper(foo => sub { warn "foo" });
-  
+
+  # Generate methods dynamically (and hide them from "can")
+  my $obj = MyClass->new;
+  $obj->add_helper(foo => sub { warn 'Hello Helper!' });
   $obj->foo;
+  warn 'Method hidden from $obj->can(...)' unless $obj->can('foo');
 
 =head1 DESCRIPTION
 
-L<Mojo::DynamicMethods> provides dynamic method dispatch for per-object
-helper methods without requiring use of C<AUTOLOAD>.
+L<Mojo::DynamicMethods> provides dynamic method dispatch for per-object helper
+methods without requiring use of C<AUTOLOAD>.
 
-To opt your class into dynamic dispatch, simply pass the -dispatch flag:
+To opt your class into dynamic dispatch, simply pass the C<-dispatch> flag.
 
   use Mojo::DynamicMethods -dispatch;
 
-and implement L</BUILD_DYNAMIC> as a method in your class, making sure that
-the key you use to lookup methods in C<$dyn_methods> is the same thing you
-pass as C<$ref> to register.
+And implement a C<BUILD_DYNAMIC> method in your class, making sure that the key
+you use to lookup methods in C<$dyn_methods> is the same thing you pass as
+C<$ref> to L</"register">.
 
 =head1 FUNCTIONS
 
-L<Mojo::DynamicMethods> provides the following function, which is not exported:
+L<Mojo::DynamicMethods> implements the following functions.
 
 =head2 register
 
-  Mojo::DynamicMethods::register $class, $ref, $name, $code;
+  Mojo::DynamicMethods::register $class, $ref, $name, $cb;
 
 Registers the method C<$name> as eligible for dynamic dispatch for C<$class>,
-and sets C<$code> to be looked up for C<$name> by reference C<$ref> in a
-dynamic method contructed by L</BUILD_DYNAMIC>.
+and sets C<$cb> to be looked up for C<$name> by reference C<$ref> in a dynamic
+method contructed by C<BUILD_DYNAMIC>.
 
 =head1 SEE ALSO
 

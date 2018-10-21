@@ -22,6 +22,7 @@ my %RESERVED = map { $_ => 1 } (
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
+
   return sub {
     my $self    = shift;
     my $dynamic = $dyn_methods->{$self->{app}{renderer}}{$method};
@@ -1047,10 +1048,6 @@ the stream.
   2
   o!
   0
-
-=head2 BUILD_DYNAMIC
-
-C<BUILD_DYNAMIC> fulfills the contract required by L<Mojo::DynamicMethods>.
 
 =head1 HELPERS
 

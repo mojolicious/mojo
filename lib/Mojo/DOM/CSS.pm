@@ -120,7 +120,9 @@ sub _compile {
     # Tag
     elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
       my $alias = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1 : undef;
-      my $ns = length $alias ? $ns{$alias} // return [['invalid']] : $alias;
+      my $ns = defined $alias && length $alias
+        ? $ns{$alias} // return [['invalid']]
+        : $alias;
       push @$last, ['tag', $name eq '*' ? undef : _name($name), _unescape($ns)];
     }
 

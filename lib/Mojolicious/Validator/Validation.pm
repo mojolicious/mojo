@@ -75,7 +75,7 @@ sub optional {
     @input = map { $self->$cb($name, $_) } @input;
   }
   $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0]
-    if @input && !grep { !length } @input;
+    if @input && !grep { !defined || !length } @input;
 
   return $self->topic($name);
 }

@@ -8,7 +8,7 @@ sub import {
   my ($flag, $caller) = ($_[1] // '', caller);
   return unless $flag eq '-dispatch';
 
-  my $dyn_pkg = "${caller}::_Dynamic";
+  my $dyn_pkg    = "${caller}::_Dynamic";
   my $caller_can = $caller->can('SUPER::can');
   monkey_patch $dyn_pkg, 'can', sub {
     my ($self, $method, @rest) = @_;

@@ -9,11 +9,12 @@ sub import {
   return unless $flag eq '-dispatch';
 
   my $dyn_pkg = "${caller}::_Dynamic";
+  my $caller_can = $caller->can('SUPER::can');
   monkey_patch $dyn_pkg, 'can', sub {
     my ($self, $method, @rest) = @_;
 
     # Delegate to our parent's "can" if there is one, without breaking if not
-    my $can = $self->${\($self->next::can || 'UNIVERSAL::can')}($method, @rest);
+    my $can = $self->$caller_can($method, @rest);
     return undef unless $can;
     no warnings 'once';
     my $h = do { no strict 'refs'; *{"${dyn_pkg}::${method}"}{CODE} };

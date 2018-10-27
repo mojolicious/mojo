@@ -15,7 +15,7 @@ sub body_contains {
 sub body_size {
   my $self = shift;
 
-  # Check for existing Content-Lenght header
+  # Check for existing Content-Length header
   if (my $len = $self->headers->content_length) { return $len }
 
   # Calculate length of whole body

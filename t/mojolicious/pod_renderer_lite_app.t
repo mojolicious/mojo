@@ -13,6 +13,12 @@ use Mojolicious::Lite;
 plugin('PODRenderer')->name('perldoc');
 ok app->routes->find('perldoc'), 'route found';
 
+plugin('PODRenderer', {
+    route => '/doc',
+    index => 'MojoliciousTest::PODTest',
+});
+ok app->routes->find('doc'), 'alternate route found';
+
 # Default layout
 app->defaults(layout => 'gray');
 
@@ -61,6 +67,10 @@ $t->get_ok('/perldoc/MojoliciousTest/PODTest')->status_is(200)
   ->element_exists('a[href=#One]')->element_exists('a[href=#Two]')
   ->element_exists('a[href=#Three]')->element_exists('a[href=#Four]')
   ->text_like('pre code', qr/\$foo/);
+
+# Specified index
+$t->get_ok('/doc')->element_exists('#mojobar')
+  ->text_like('title', qr/PODTest/);
 
 # Trailing slash
 $t->get_ok('/perldoc/MojoliciousTest/PODTest/')->element_exists('#mojobar')

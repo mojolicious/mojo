@@ -8,11 +8,19 @@ use Mojo::File 'path';
 use Mojo::URL;
 use Pod::Simple::XHTML;
 use Pod::Simple::Search;
+use Scalar::Util 'blessed';
 
 sub register {
   my ($self, $app, $conf) = @_;
 
   my $preprocess = $conf->{preprocess} || 'ep';
+  my $index      = $conf->{index}      || 'Mojolicious::Guides';
+  my $template   = $conf->{template}   || 'mojo/perldoc';
+  my $route      = $conf->{route}      || $app->routes->under('/perldoc');
+
+  $route = $app->routes->under($route)
+    unless blessed $route and $route->isa('Mojolicious::Routes::Route');
+
   $app->renderer->add_handler(
     $conf->{name} || 'pod' => sub {
       my ($renderer, $c, $output, $options) = @_;
@@ -26,9 +34,26 @@ sub register {
 
   # Perldoc browser
   return undef if $conf->{no_perldoc};
-  my $defaults = {module => 'Mojolicious/Guides'};
-  return $app->routes->any(
-    '/perldoc/:module' => $defaults => [module => qr/[^.]+/] => \&_perldoc);
+  my $defaults = {module => $index};
+  return $route->any(
+    '/:module' => $defaults => [module => qr/[^.]+/] => sub {
+      my $c = shift;
+
+      # Find module or redirect to CPAN
+      my $module = join '::', split('/', $c->param('module'));
+      $c->stash(cpan => "https://metacpan.org/pod/$module");
+      $c->stash(root => $route->to_string);
+      my $path
+        = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
+      return $c->redirect_to($c->stash('cpan')) unless $path && -r $path;
+
+      my $src = path($path)->slurp;
+      $c->respond_to(
+        txt  => {data => $src},
+        html => sub { _html($c, $src, $route, $template) }
+      );
+    }
+  );
 }
 
 sub _indentation {
@@ -36,12 +61,12 @@ sub _indentation {
 }
 
 sub _html {
-  my ($c, $src) = @_;
+  my ($c, $src, $route, $template) = @_;
 
   # Rewrite links
   my $dom     = Mojo::DOM->new(_pod_to_html($src));
-  my $perldoc = $c->url_for('/perldoc/');
-  $_->{href} =~ s!^https://metacpan\.org/pod/!$perldoc!
+  my $perldoc = $c->url_for($route->to_string);
+  $_->{href} =~ s!^https://metacpan\.org/pod/!$perldoc/!
     and $_->{href} =~ s!::!/!gi
     for $dom->find('a[href]')->map('attr')->each;
 
@@ -72,21 +97,7 @@ sub _html {
 
   # Combine everything to a proper response
   $c->content_for(perldoc => "$dom");
-  $c->render('mojo/perldoc', title => $title, parts => \@parts);
-}
-
-sub _perldoc {
-  my $c = shift;
-
-  # Find module or redirect to CPAN
-  my $module = join '::', split('/', $c->param('module'));
-  $c->stash(cpan => "https://metacpan.org/pod/$module");
-  my $path
-    = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
-  return $c->redirect_to($c->stash('cpan')) unless $path && -r $path;
-
-  my $src = path($path)->slurp;
-  $c->respond_to(txt => {data => $src}, html => sub { _html($c, $src) });
+  $c->render($template, title => $title, parts => \@parts);
 }
 
 sub _pod_to_html {
@@ -125,6 +136,13 @@ Mojolicious::Plugin::PODRenderer - POD renderer plugin
   # Without documentation browser
   plugin PODRenderer => {no_perldoc => 1};
 
+  # Customise the browser to fit the rest of your app!
+  plugin PODRenderer => {
+    route    => '/docs',
+    template => 'custom/doc',
+    index    => 'MyApp::GettingStarted',
+  };
+
   # foo.html.ep
   %= pod_to_html "=head1 TEST\n\nC<123>"
 
@@ -145,6 +163,14 @@ by default.
 
 L<Mojolicious::Plugin::PODRenderer> supports the following options.
 
+=head2 index
+
+  # Mojolicious::Lite
+  plugin PODRenderer => {index => 'My::Module'};
+
+Set the name of the module that will be loaded by default by the documentation
+browser. Defaults to L<Mojolicious::Guides>.
+
 =head2 name
 
   # Mojolicious::Lite
@@ -157,8 +183,8 @@ Handler name, defaults to C<pod>.
   # Mojolicious::Lite
   plugin PODRenderer => {no_perldoc => 1};
 
-Disable L<Mojolicious::Guides> documentation browser that will otherwise be
-available under C</perldoc>.
+Disable the documentation browser that will otherwise be available under
+C</perldoc> (or under the value provided using C<route>, below).
 
 =head2 preprocess
 
@@ -166,6 +192,25 @@ available under C</perldoc>.
   plugin PODRenderer => {preprocess => 'epl'};
 
 Name of handler used to preprocess POD, defaults to C<ep>.
+
+=head2 route
+
+  # Mojolicious::Lite
+  plugin PODRenderer => {route => '/foo'};
+
+  # Same as
+  plugin PODRenderer => {route => app->routes->under('/foo')};
+
+Set the route under which the document browser will be made available.
+Defaults to '/perldoc'.
+
+=head2 template
+
+  # Mojolicious::Lite
+  plugin PODRenderer => {template=> 'custom/template'};
+
+Name of the template to use for the documentation browser. Defaults to
+C<mojo/perldoc>.
 
 =head1 HELPERS
 

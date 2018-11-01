@@ -14,7 +14,7 @@ use Pod::Simple::Search;
 sub register {
   my ($self, $app, $conf) = @_;
 
-  deprecated 'The PODRenderer plugin is DEPRECATED';
+  deprecated 'Mojolicious::Plugin::PODRenderer is DEPRECATED';
 
   my $preprocess = $conf->{preprocess} || 'ep';
   $app->renderer->add_handler(

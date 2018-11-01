@@ -14,7 +14,7 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw(app flash param stash session url_for validation)) {
+  for my $name (qw(app param stash session url_for)) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -36,6 +36,7 @@ sub register {
     for qw(csrf_token current_route inactivity_timeout is_fresh url_with);
 
   $app->helper(dumper => sub { shift; dumper @_ });
+  $app->helper(flash => \&_flash);
   $app->helper(include => sub { shift->render_to_string(@_) });
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
@@ -49,6 +50,7 @@ sub register {
   $app->helper('timing.server_timing' => \&_timing_server_timing);
 
   $app->helper(ua => sub { shift->app->ua });
+  $app->helper(validation => \&_validation);
 }
 
 sub _asset {
@@ -131,6 +133,21 @@ sub _fallbacks {
 
 sub _file { _asset(shift, Mojo::Asset::File->new(path => shift)) }
 
+sub _flash {
+  my $c = shift;
+
+  # Check old flash
+  my $session = $c->session;
+  return $session->{flash} ? $session->{flash}{$_[0]} : undef
+    if @_ == 1 && !ref $_[0];
+
+  # Initialize new flash and merge values
+  my $values = ref $_[0] ? $_[0] : {@_};
+  @{$session->{new_flash} ||= {}}{keys %$values} = values %$values;
+
+  return $c;
+}
+
 sub _inactivity_timeout {
   my ($c, $timeout) = @_;
   my $stream = Mojo::IOLoop->stream($c->tx->connection // '');
@@ -171,6 +188,22 @@ sub _timing_server_timing {
 sub _url_with {
   my $c = shift;
   return $c->url_for(@_)->query($c->req->url->query->clone);
+}
+
+sub _validation {
+  my $c = shift;
+
+  my $stash = $c->stash;
+  return $stash->{'mojo.validation'} if $stash->{'mojo.validation'};
+
+  my $req    = $c->req;
+  my $token  = $c->session->{csrf_token};
+  my $header = $req->headers->header('X-CSRF-Token');
+  my $hash   = $req->params->to_hash;
+  $hash->{csrf_token} //= $header if $token && $header;
+  $hash->{$_} = $req->every_upload($_) for map { $_->name } @{$req->uploads};
+  my $v = $c->app->validator->validation->input($hash);
+  return $stash->{'mojo.validation'} = $v->csrf_token($token);
 }
 
 1;
@@ -334,9 +367,16 @@ L</"stash">.
 
 =head2 flash
 
+  my $foo = $c->flash('foo');
+  $c      = $c->flash({foo => 'bar'});
+  $c      = $c->flash(foo => 'bar');
   %= flash 'foo'
 
-Alias for L<Mojolicious::Controller/"flash">.
+Data storage persistent only for the next request, stored in the L</"session">.
+
+  # Show message after redirect
+  $c->flash(message => 'User created successfully!');
+  $c->redirect_to('show_user', id => 23);
 
 =head2 inactivity_timeout
 
@@ -561,9 +601,24 @@ request.
 
 =head2 validation
 
-  %= validation->param('foo')
+  my $v = $c->validation;
 
-Alias for L<Mojolicious::Controller/"validation">.
+Get L<Mojolicious::Validator::Validation> object for current request to
+validate file uploads as well as C<GET> and C<POST> parameters extracted from
+the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body. Parts of the request body need to be loaded
+into memory to parse C<POST> parameters, so you have to make sure it is not
+excessively large. There's a 16MiB limit for requests by default.
+
+  # Validate GET/POST parameter
+  my $v = $c->validation;
+  $v->required('title', 'trim')->size(3, 50);
+  my $title = $v->param('title');
+
+  # Validate file upload
+  my $v = $c->validation;
+  $v->required('tarball')->upload->size(1, 1048576);
+  my $tarball = $v->param('tarball');
 
 =head1 METHODS
 

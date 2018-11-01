@@ -187,7 +187,7 @@ sub _text_area {
 
 sub _validation {
   my ($c, $name) = (shift, shift);
-  return _tag(@_) unless $c->validation->has_error($name);
+  return _tag(@_) unless $c->helpers->validation->has_error($name);
   return $c->helpers->tag_with_error(@_);
 }
 
@@ -223,9 +223,10 @@ necessary attributes always be generated automatically.
   <%= radio_button country => 'france'  %> France
   <%= radio_button country => 'uk'      %> UK
 
-For fields that failed validation with L<Mojolicious::Controller/"validation">
-the C<field-with-error> class will be automatically added through
-L</"tag_with_error">, to make styling with CSS easier.
+For fields that failed validation with
+L<Mojolicious::Plugin::DefaultHelpers/"validation"> the C<field-with-error>
+class will be automatically added through L</"tag_with_error">, to make styling
+with CSS easier.
 
   <input class="field-with-error" name="age" type="text" value="250">
 

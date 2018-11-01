@@ -1,4 +1,6 @@
 
+8.06  2018-11-01
+
 8.05  2018-10-25
   - Deprecated Mojolicious::Plugin::PODRenderer in favor of alternatives from
     CPAN.

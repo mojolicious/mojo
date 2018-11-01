@@ -32,6 +32,8 @@ sub register {
   $app->helper(content_for  => sub { _content(1, 0, @_) });
   $app->helper(content_with => sub { _content(0, 1, @_) });
 
+  $app->helper(continue => sub { $_[0]->app->routes->continue($_[0]) });
+
   $app->helper($_ => $self->can("_$_"))
     for qw(csrf_token current_route inactivity_timeout is_fresh url_with);
 
@@ -334,6 +336,13 @@ already in use.
     Hello <%= content 'message' %>
   % end
   %= content 'message'
+
+=head2 continue
+
+  $c->continue;
+
+Continue dispatch chain from an intermediate destination with
+L<Mojolicious::Routes/"continue">.
 
 =head2 csrf_token
 

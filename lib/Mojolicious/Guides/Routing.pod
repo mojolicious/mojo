@@ -607,9 +607,9 @@ authentication.
   });
   $auth->get('/blackjack')->to('hideout#blackjack');
 
-Broken dispatch chains can be continued by calling the method
-L<Mojolicious::Controller/"continue">, this allows for example, non-blocking
-operations to finish before reaching the next dispatch cycle.
+Broken dispatch chains can be continued by calling
+L<Mojolicious::Plugin::DefaultHelpers/"continue">, this allows for example,
+non-blocking operations to finish before reaching the next dispatch cycle.
 
   my $maybe = $r->under('/maybe' => sub {
     my $c = shift;

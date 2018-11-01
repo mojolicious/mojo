@@ -277,8 +277,6 @@ $t->get_ok('/mojo/prettify/run_prettify.js')->status_is(200)
   ->content_type_is('application/javascript');
 $t->get_ok('/mojo/prettify/prettify-mojo-dark.css')->status_is(200)
   ->content_type_is('text/css');
-$t->get_ok('/mojo/prettify/prettify-mojo-light.css')->status_is(200)
-  ->content_type_is('text/css');
 $t->get_ok('/mojo/failraptor.png')->status_is(200)
   ->content_type_is('image/png');
 $t->get_ok('/mojo/logo.png')->status_is(200)->content_type_is('image/png');
@@ -293,8 +291,6 @@ $t->get_ok('/mojo/logo-white-2x.png')->status_is(200)
 $t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');
 $t->get_ok('/mojo/notfound.png')->status_is(200)->content_type_is('image/png');
 $t->get_ok('/mojo/pinstripe-dark.png')->status_is(200)
-  ->content_type_is('image/png');
-$t->get_ok('/mojo/pinstripe-light.png')->status_is(200)
   ->content_type_is('image/png');
 
 done_testing();

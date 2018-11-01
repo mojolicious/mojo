@@ -1,3 +1,4 @@
+# DEPRECATED!
 package Mojolicious::Plugin::PODRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
@@ -6,11 +7,14 @@ use Mojo::ByteStream;
 use Mojo::DOM;
 use Mojo::File 'path';
 use Mojo::URL;
+use Mojo::Util 'deprecated';
 use Pod::Simple::XHTML;
 use Pod::Simple::Search;
 
 sub register {
   my ($self, $app, $conf) = @_;
+
+  deprecated 'The PODRenderer plugin is DEPRECATED';
 
   my $preprocess = $conf->{preprocess} || 'ep';
   $app->renderer->add_handler(
@@ -108,75 +112,15 @@ sub _pod_to_html {
 
 =head1 NAME
 
-Mojolicious::Plugin::PODRenderer - POD renderer plugin
+Mojolicious::Plugin::PODRenderer - DEPRECATED!
 
 =head1 SYNOPSIS
 
-  # Mojolicious (with documentation browser under "/perldoc")
-  my $route = $app->plugin('PODRenderer');
-  my $route = $app->plugin(PODRenderer => {name => 'foo'});
-  my $route = $app->plugin(PODRenderer => {preprocess => 'epl'});
-
-  # Mojolicious::Lite (with documentation browser under "/perldoc")
-  my $route = plugin 'PODRenderer';
-  my $route = plugin PODRenderer => {name => 'foo'};
-  my $route = plugin PODRenderer => {preprocess => 'epl'};
-
-  # Without documentation browser
-  plugin PODRenderer => {no_perldoc => 1};
-
-  # foo.html.ep
-  %= pod_to_html "=head1 TEST\n\nC<123>"
-
-  # foo.html.pod
-  =head1 <%= uc 'test' %>
+  # DEPRECATED!
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::PODRenderer> is a renderer for true Perl hackers, rawr!
-
-The code of this plugin is a good example for learning to build new plugins,
-you're welcome to fork it.
-
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
-
-=head1 OPTIONS
-
-L<Mojolicious::Plugin::PODRenderer> supports the following options.
-
-=head2 name
-
-  # Mojolicious::Lite
-  plugin PODRenderer => {name => 'foo'};
-
-Handler name, defaults to C<pod>.
-
-=head2 no_perldoc
-
-  # Mojolicious::Lite
-  plugin PODRenderer => {no_perldoc => 1};
-
-Disable L<Mojolicious::Guides> documentation browser that will otherwise be
-available under C</perldoc>.
-
-=head2 preprocess
-
-  # Mojolicious::Lite
-  plugin PODRenderer => {preprocess => 'epl'};
-
-Name of handler used to preprocess POD, defaults to C<ep>.
-
-=head1 HELPERS
-
-L<Mojolicious::Plugin::PODRenderer> implements the following helpers.
-
-=head2 pod_to_html
-
-  %= pod_to_html '=head2 lalala'
-  <%= pod_to_html begin %>=head2 lalala<% end %>
-
-Render POD to HTML without preprocessing.
+This module is DEPRECATED!
 
 =head1 METHODS
 

@@ -468,8 +468,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Plugin::Mount>
 
-=item * L<Mojolicious::Plugin::PODRenderer>
-
 =item * L<Mojolicious::Plugin::TagHelpers>
 
 =back

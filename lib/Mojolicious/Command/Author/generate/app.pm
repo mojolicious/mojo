@@ -137,9 +137,6 @@ sub startup {
   # Load configuration from hash returned by "my_app.conf"
   my $config = $self->plugin('Config');
 
-  # Documentation browser under "/perldoc"
-  $self->plugin('PODRenderer') if $config->{perldoc};
-
   # Router
   my $r = $self->routes;
 
@@ -203,15 +200,10 @@ done_testing();
   and the layout "templates/layouts/default.html.ep",
   <%%= link_to 'click here' => url_for %> to reload the page or
   <%%= link_to 'here' => '/index.html' %> to move forward to a static page.
-  %% if (config 'perldoc') {
-    To learn more, you can also browse through the documentation
-    <%%= link_to 'here' => '/perldoc' %>.
-  %% }
 </p>
 
 @@ config
 % use Mojo::Util qw(sha1_sum steady_time);
 {
-  perldoc => 1,
   secrets => ['<%= sha1_sum $$ . steady_time . rand  %>']
 }

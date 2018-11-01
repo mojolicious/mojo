@@ -1774,8 +1774,6 @@ installed application so they can be excluded.
     # Exclude author commands
     $self->commands->namespaces(['Mojolicious::Commands']);
 
-    $self->plugin('PODRenderer');
-
     my $r = $self->routes;
     $r->get('/welcome')->to('example#welcome');
   }

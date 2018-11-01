@@ -106,11 +106,6 @@ JSON configuration files.
 
 Mount whole L<Mojolicious> applications.
 
-=item L<Mojolicious::Plugin::PODRenderer>
-
-Renderer for turning POD into HTML and documentation browser for
-L<Mojolicious::Guides>.
-
 =item L<Mojolicious::Plugin::TagHelpers>
 
 Template specific helper collection, loaded automatically.

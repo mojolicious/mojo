@@ -1,7 +1,7 @@
 package Mojo::Home;
 use Mojo::Base 'Mojo::File';
 
-use Mojo::Util 'class_to_path';
+use Mojo::Util qw(class_to_path deprecated);
 
 sub detect {
   my ($self, $class) = @_;
@@ -21,7 +21,11 @@ sub detect {
   return $self;
 }
 
-sub mojo_lib_dir { shift->new(__FILE__)->sibling('..') }
+# DEPRECATED!
+sub mojo_lib_dir {
+  deprecated 'Mojo::Home::mojo_lib_dir is DEPRECATED';
+  shift->new(__FILE__)->sibling('..');
+}
 
 sub rel_file { shift->child(split('/', shift)) }
 
@@ -59,13 +63,6 @@ following new ones.
 
 Detect home directory from the value of the C<MOJO_HOME> environment variable or
 the location of the application class.
-
-=head2 mojo_lib_dir
-
-  my $path = $home->mojo_lib_dir;
-
-Path to C<lib> directory in which L<Mojolicious> is installed as a L<Mojo::Home>
-object.
 
 =head2 rel_file
 

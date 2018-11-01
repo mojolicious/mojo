@@ -5,7 +5,6 @@ use Mojo::Cache;
 use Mojo::DynamicMethods;
 use Mojo::File 'path';
 use Mojo::JSON 'encode_json';
-use Mojo::Home;
 use Mojo::Loader 'data_section';
 use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
 
@@ -18,8 +17,7 @@ has [qw(handlers helpers)] => sub { {} };
 has paths => sub { [] };
 
 # Bundled templates
-my $TEMPLATES = Mojo::Home->new->mojo_lib_dir->child('Mojolicious', 'resources',
-  'templates');
+my $TEMPLATES = path(__FILE__)->sibling('resources', 'templates');
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 

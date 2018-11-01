@@ -2,6 +2,7 @@
 8.05  2018-10-25
   - Deprecated Mojolicious::Plugin::PODRenderer in favor of alternatives from
     CPAN.
+  - Deprecated Mojo::Home::mojo_lib_dir.
   - Updated FAQ with a warning not to use Perl 5.10.x and 5.12.x with
     Mojolicious.
 

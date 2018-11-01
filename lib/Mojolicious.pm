@@ -167,9 +167,9 @@ sub new {
 
   # Hide controller attributes/methods
   $r->hide(qw(app cookie every_cookie every_param every_signed_cookie finish));
-  $r->hide(qw(helpers match on param redirect_to render render_later));
-  $r->hide(qw(render_maybe render_to_string rendered req res respond_to send));
-  $r->hide(qw(session signed_cookie stash tx url_for write write_chunk));
+  $r->hide(qw(helpers match on param render render_later render_maybe));
+  $r->hide(qw(render_to_string rendered req res send session signed_cookie));
+  $r->hide(qw(stash tx url_for write write_chunk));
 
   $self->plugin($_)
     for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);

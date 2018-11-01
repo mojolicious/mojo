@@ -35,10 +35,10 @@ sub register {
   $app->helper(continue => sub { $_[0]->app->routes->continue($_[0]) });
 
   $app->helper($_ => $self->can("_$_"))
-    for qw(csrf_token current_route inactivity_timeout is_fresh url_with);
+    for qw(csrf_token current_route flash inactivity_timeout is_fresh),
+    qw(redirect_to respond_to url_with validation);
 
   $app->helper(dumper => sub { shift; dumper @_ });
-  $app->helper(flash => \&_flash);
   $app->helper(include => sub { shift->render_to_string(@_) });
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
@@ -52,7 +52,6 @@ sub register {
   $app->helper('timing.server_timing' => \&_timing_server_timing);
 
   $app->helper(ua => sub { shift->app->ua });
-  $app->helper(validation => \&_validation);
 }
 
 sub _asset {
@@ -160,6 +159,40 @@ sub _inactivity_timeout {
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
+}
+
+sub _redirect_to {
+  my $c = shift;
+
+  # Don't override 3xx status
+  my $res = $c->res;
+  $res->headers->location($c->url_for(@_));
+  return $c->rendered($res->is_redirect ? () : 302);
+}
+
+sub _respond_to {
+  my ($c, $args) = (shift, ref $_[0] ? $_[0] : {@_});
+
+  # Find target
+  my $target;
+  my $renderer = $c->app->renderer;
+  my @formats  = @{$renderer->accepts($c)};
+  for my $format (@formats ? @formats : ($renderer->default_format)) {
+    next unless $target = $args->{$format};
+    $c->stash->{format} = $format;
+    last;
+  }
+
+  # Fallback
+  unless ($target) {
+    return $c->rendered(204) unless $target = $args->{any};
+    delete $c->stash->{format};
+  }
+
+  # Dispatch
+  ref $target eq 'CODE' ? $target->($c) : $c->render(%$target);
+
+  return $c;
 }
 
 sub _static {
@@ -433,6 +466,24 @@ L</"stash">.
 
 Alias for L<Mojolicious::Controller/"param">.
 
+=head2 redirect_to
+
+  $c = $c->redirect_to('named', foo => 'bar');
+  $c = $c->redirect_to('named', {foo => 'bar'});
+  $c = $c->redirect_to('/index.html');
+  $c = $c->redirect_to('http://example.com/index.html');
+
+Prepare a C<302> (if the status code is not already C<3xx>) redirect response
+with C<Location> header, takes the same arguments as L</"url_for">.
+
+  # Moved Permanently
+  $c->res->code(301);
+  $c->redirect_to('some_route');
+
+  # Temporary Redirect
+  $c->res->code(307);
+  $c->redirect_to('some_route');
+
 =head2 reply->asset
 
   $c->reply->asset(Mojo::Asset::File->new);
@@ -502,6 +553,30 @@ directories.
   # Serve file from a relative path with a custom content type
   $c->res->headers->content_type('application/myapp');
   $c->reply->static('foo.txt');
+
+=head2 respond_to
+
+  $c = $c->respond_to(
+    json => {json => {message => 'Welcome!'}},
+    html => {template => 'welcome'},
+    any  => sub {...}
+  );
+
+Automatically select best possible representation for resource from C<format>
+C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request header,
+defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty
+C<204> response. Each representation can be handled with a callback or a hash
+reference containing arguments to be passed to
+L<Mojolicious::Controller/"render">.
+
+  # Everything else than "json" and "xml" gets a 204 response
+  $c->respond_to(
+    json => sub { $c->render(json => {just => 'works'}) },
+    xml  => {text => '<just>works</just>'},
+    any  => {data => '', status => 204}
+  );
+
+For more advanced negotiation logic you can also use L</"accepts">.
 
 =head2 session
 

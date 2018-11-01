@@ -366,8 +366,9 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 =head2 Content negotiation
 
 For resources with different representations and that require truly RESTful
-content negotiation you can also use L<Mojolicious::Controller/"respond_to">
-instead of L<Mojolicious::Controller/"render">.
+content negotiation you can also use
+L<Mojolicious::Plugin::DefaultHelpers/"respond_to"> instead of
+L<Mojolicious::Controller/"render">.
 
   # /hello (Accept: application/json) -> "json"
   # /hello (Accept: application/xml)  -> "xml"
@@ -799,10 +800,10 @@ parameter.
     </body>
   </html>
 
-The helper L<Mojolicious::Plugin::DefaultHelpers/"flash"> and method
-L<Mojolicious::Controller/"redirect_to"> are often used together to prevent
-double form submission, allowing users to receive a confirmation message that
-will vanish if they decide to reload the page they've been redirected to.
+The helpers L<Mojolicious::Plugin::DefaultHelpers/"flash"> and
+L<Mojolicious::Plugin::DefaultHelpers/"redirect_to"> are often used together to
+prevent double form submission, allowing users to receive a confirmation message
+that will vanish if they decide to reload the page they've been redirected to.
 
 =head2 Form validation
 

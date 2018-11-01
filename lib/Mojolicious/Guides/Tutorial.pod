@@ -657,7 +657,8 @@ placeholder.
 =head2 Content negotiation
 
 For resources with different representations and that require truly RESTful
-content negotiation you can also use L<Mojolicious::Controller/"respond_to">.
+content negotiation you can also use
+L<Mojolicious::Plugin::DefaultHelpers/"respond_to">.
 
   use Mojolicious::Lite;
 

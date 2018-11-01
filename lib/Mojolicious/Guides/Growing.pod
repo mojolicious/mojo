@@ -427,8 +427,8 @@ set an absolute expiration date in the past.
 
 For data that should only be visible on the next request, like a confirmation
 message after a C<302> redirect performed with
-L<Mojolicious::Controller/"redirect_to">, you can use the flash, accessible
-through L<Mojolicious::Plugin::DefaultHelpers/"flash">.
+L<Mojolicious::Plugin::DefaultHelpers/"redirect_to">, you can use the flash,
+accessible through L<Mojolicious::Plugin::DefaultHelpers/"flash">.
 
   $c->flash(message => 'Everything is fine.');
   $c->redirect_to('goodbye');

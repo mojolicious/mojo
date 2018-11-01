@@ -131,15 +131,6 @@ sub param {
   return $self;
 }
 
-sub redirect_to {
-  my $self = shift;
-
-  # Don't override 3xx status
-  my $res = $self->res;
-  $res->headers->location($self->url_for(@_));
-  return $self->rendered($res->is_redirect ? () : 302);
-}
-
 sub render {
   my $self = shift;
 
@@ -209,31 +200,6 @@ sub rendered {
 
 sub req { (shift->tx || Carp::croak 'Transaction already destroyed')->req }
 sub res { (shift->tx || Carp::croak 'Transaction already destroyed')->res }
-
-sub respond_to {
-  my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
-
-  # Find target
-  my $target;
-  my $renderer = $self->app->renderer;
-  my @formats  = @{$renderer->accepts($self)};
-  for my $format (@formats ? @formats : ($renderer->default_format)) {
-    next unless $target = $args->{$format};
-    $self->stash->{format} = $format;
-    last;
-  }
-
-  # Fallback
-  unless ($target) {
-    return $self->rendered(204) unless $target = $args->{any};
-    delete $self->stash->{format};
-  }
-
-  # Dispatch
-  ref $target eq 'CODE' ? $target->($self) : $self->render(%$target);
-
-  return $self;
-}
 
 sub send {
   my ($self, $msg, $cb) = @_;
@@ -556,24 +522,6 @@ For more control you can also access request information directly.
   # Only file uploads
   my $foo = $c->req->upload('foo');
 
-=head2 redirect_to
-
-  $c = $c->redirect_to('named', foo => 'bar');
-  $c = $c->redirect_to('named', {foo => 'bar'});
-  $c = $c->redirect_to('/index.html');
-  $c = $c->redirect_to('http://example.com/index.html');
-
-Prepare a C<302> (if the status code is not already C<3xx>) redirect response
-with C<Location> header, takes the same arguments as L</"url_for">.
-
-  # Moved Permanently
-  $c->res->code(301);
-  $c->redirect_to('some_route');
-
-  # Temporary Redirect
-  $c->res->code(307);
-  $c->redirect_to('some_route');
-
 =head2 render
 
   my $bool = $c->render;
@@ -717,30 +665,6 @@ Get L<Mojo::Message::Response> object from L</"tx">.
   # Make sure response is cached correctly
   $c->res->headers->cache_control('public, max-age=300');
   $c->res->headers->append(Vary => 'Accept-Encoding');
-
-=head2 respond_to
-
-  $c = $c->respond_to(
-    json => {json => {message => 'Welcome!'}},
-    html => {template => 'welcome'},
-    any  => sub {...}
-  );
-
-Automatically select best possible representation for resource from C<format>
-C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request header,
-defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty
-C<204> response. Each representation can be handled with a callback or a hash
-reference containing arguments to be passed to L</"render">.
-
-  # Everything else than "json" and "xml" gets a 204 response
-  $c->respond_to(
-    json => sub { $c->render(json => {just => 'works'}) },
-    xml  => {text => '<just>works</just>'},
-    any  => {data => '', status => 204}
-  );
-
-For more advanced negotiation logic you can also use the helper
-L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
 
 =head2 send
 

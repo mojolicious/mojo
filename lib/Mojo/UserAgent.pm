@@ -252,16 +252,6 @@ sub _finish {
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
 }
 
-sub _read {
-  my ($self, $id, $chunk) = @_;
-
-  # Corrupted connection
-  return $self->_remove($id) unless my $tx = $self->{connections}{$id}{tx};
-  warn term_escape "-- Client <<< Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
-  $tx->client_read($chunk);
-  $self->_finish($id) if $tx->is_finished;
-}
-
 sub _process {
   my ($self, $id) = @_;
 
@@ -277,6 +267,16 @@ sub _process {
   weaken $self;
   $tx->on(resume => sub { $self->_write($id) });
   $self->_write($id);
+}
+
+sub _read {
+  my ($self, $id, $chunk) = @_;
+
+  # Corrupted connection
+  return $self->_remove($id) unless my $tx = $self->{connections}{$id}{tx};
+  warn term_escape "-- Client <<< Server (@{[_url($tx)]})\n$chunk\n" if DEBUG;
+  $tx->client_read($chunk);
+  $self->_finish($id) if $tx->is_finished;
 }
 
 sub _redirect {

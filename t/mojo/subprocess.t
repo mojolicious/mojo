@@ -171,4 +171,35 @@ $subprocess->run(
 Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
 
+# Progress
+($fail, $result) = (undef, undef);
+my @progresses;
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run(
+  sub {
+    my $s = shift;
+    $s->progress(20);
+    $s->progress({percentage => 45});
+    $s->progress({percentage => 90}, {long_data => [1 .. 1e5]});
+    'yay';
+  },
+  sub {
+    my ($subprocess, $err, @res) = @_;
+    $fail   = $err;
+    $result = \@res;
+  }
+);
+$subprocess->on(
+  progress => sub {
+    my ($subprocess, @args) = @_;
+    push @progresses, \@args;
+  }
+);
+Mojo::IOLoop->start;
+ok !$fail, 'no error';
+is_deeply $result, ['yay'], 'correct result';
+is_deeply \@progresses,
+  [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]],
+  'correct progress';
+
 done_testing();

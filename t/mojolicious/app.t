@@ -178,6 +178,7 @@ $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
   ->content_unlike(qr/Something/)->content_like(qr/Page not found/);
 
 # Plugin::Test::SomePlugin2::register (security violation again)
+$t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
 my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
@@ -551,6 +552,7 @@ $t->get_ok('/foo/routes')->status_is(200)
   ->header_is(Server     => 'Mojolicious (Perl)')->content_is('/foo/routes');
 
 # SingleFileTestApp::Redispatch::handler
+$t->app->log->level('debug')->unsubscribe('message');
 $log = '';
 $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/redispatch')->status_is(200)
@@ -590,6 +592,7 @@ $t->get_ok('/staged')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Go away!');
 
 # MojoliciousTestController::Foo::suspended
+$t->app->log->level('debug')->unsubscribe('message');
 $log = '';
 $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended')->status_is(200)

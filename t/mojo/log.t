@@ -11,12 +11,16 @@ my $path = $dir->child('test.log');
 my $log  = Mojo::Log->new(level => 'error', path => $path);
 $log->error('Just works');
 $log->fatal('I ♥ Mojolicious');
+$log->error(sub {'This too'});
 $log->debug('Does not work');
+$log->debug(sub { return 'And this', 'too' });
 undef $log;
 my $content = decode 'UTF-8', path($path)->slurp;
 like $content,   qr/\[.*\] \[error\] Just works/,        'right error message';
 like $content,   qr/\[.*\] \[fatal\] I ♥ Mojolicious/, 'right fatal message';
+like $content,   qr/\[.*\] \[error\] This too/,          'right error message';
 unlike $content, qr/\[.*\] \[debug\] Does not work/,     'no debug message';
+unlike $content, qr/\[.*\] \[debug\] And this\ntoo\n/,   'right debug message';
 
 # Logging to STDERR
 my $buffer = '';
@@ -27,11 +31,13 @@ my $buffer = '';
   $log->error('Just works');
   $log->fatal('I ♥ Mojolicious');
   $log->debug('Works too');
+  $log->debug(sub { return 'And this', 'too' });
 }
 $content = decode 'UTF-8', $buffer;
 like $content, qr/\[.*\] \[error\] Just works\n/,        'right error message';
 like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\n/, 'right fatal message';
 like $content, qr/\[.*\] \[debug\] Works too\n/,         'right debug message';
+like $content, qr/\[.*\] \[debug\] And this\ntoo\n/,     'right debug message';
 
 # Formatting
 $log = Mojo::Log->new;

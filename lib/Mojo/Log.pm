@@ -55,12 +55,14 @@ sub _default {
   '[' . localtime(shift) . '] [' . shift() . '] ' . join "\n", @_, '';
 }
 
-sub _log { shift->emit('message', shift, @_) }
+sub _log {
+  my ($self, $level) = (shift, shift);
+  return $self unless $self->is_level($level);
+  return $self->emit('message', $level, ref $_[0] eq 'CODE' ? $_[0]() : @_);
+}
 
 sub _message {
   my ($self, $level) = (shift, shift);
-
-  return unless $self->is_level($level);
 
   my $max     = $self->max_history_size;
   my $history = $self->history;
@@ -200,6 +202,7 @@ Append message to L</"handle">.
 
   $log = $log->debug('You screwed up, but that is ok');
   $log = $log->debug('All', 'cool');
+  $log = $log->debug(sub {...});
 
 Emit L</"message"> event and log C<debug> message.
 
@@ -207,6 +210,7 @@ Emit L</"message"> event and log C<debug> message.
 
   $log = $log->error('You really screwed up this time');
   $log = $log->error('Wow', 'seriously');
+  $log = $log->error(sub {...});
 
 Emit L</"message"> event and log C<error> message.
 
@@ -214,6 +218,7 @@ Emit L</"message"> event and log C<error> message.
 
   $log = $log->fatal('Its over...');
   $log = $log->fatal('Bye', 'bye');
+  $log = $log->fatal(sub {...});
 
 Emit L</"message"> event and log C<fatal> message.
 
@@ -221,6 +226,7 @@ Emit L</"message"> event and log C<fatal> message.
 
   $log = $log->info('You are bad, but you prolly know already');
   $log = $log->info('Ok', 'then');
+  $log = $log->info(sub {...});
 
 Emit L</"message"> event and log C<info> message.
 
@@ -251,6 +257,7 @@ default logger.
 
   $log = $log->warn('Dont do that Dave...');
   $log = $log->warn('No', 'really');
+  $log = $log->warn(sub {...});
 
 Emit L</"message"> event and log C<warn> message.
 

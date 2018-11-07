@@ -161,6 +161,7 @@ get '/too_long' => sub {
 my $t = Test::Mojo->new;
 
 # Stream without delay and finish
+$t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
 my $cb = $t->app->log->on(message => sub { $log .= pop });
 my $stash;

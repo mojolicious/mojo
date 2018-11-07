@@ -1,5 +1,9 @@
 
-8.06  2018-11-01
+8.06  2018-11-07
+  - Improved debug, error, fatal, info and warn methods in Mojo::Log to accept
+    closures to generate log messages on demand. So expensive code for debugging
+    can be deactivated easily in production.
+  - Improved Mojolicious performance by up to 10% with more efficient logging.
 
 8.05  2018-10-25
   - Deprecated Mojolicious::Plugin::PODRenderer in favor of alternatives from

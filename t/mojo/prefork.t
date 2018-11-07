@@ -34,7 +34,7 @@ ok !-e $file, 'file has been cleaned up';
 # Bad PID file
 my $bad = path(__FILE__)->sibling('does_not_exist', 'test.pid');
 $prefork = Mojo::Server::Prefork->new(pid_file => $bad);
-$prefork->app->log->level('fatal');
+$prefork->app->log->level('debug')->unsubscribe('message');
 my $log = '';
 my $cb = $prefork->app->log->on(message => sub { $log .= pop });
 eval { $prefork->ensure_pid_file($$) };
@@ -72,6 +72,7 @@ $prefork->on(
 );
 $prefork->on(reap => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
+$prefork->app->log->level('debug')->unsubscribe('message');
 $log = '';
 $cb = $prefork->app->log->on(message => sub { $log .= pop });
 is $prefork->healthy, 0, 'no healthy workers';

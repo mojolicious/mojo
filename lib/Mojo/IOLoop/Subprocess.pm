@@ -192,7 +192,7 @@ Process id of the spawned subprocess if available.
 
 =head2 progress
 
-  $subprocess->progress(@data)
+  $subprocess->progress(@data);
 
 Send data serialized with L<Storable> to the parent process at any time during
 the subprocess's execution. Must be called by the subprocess and emits the
@@ -210,7 +210,8 @@ L</"progress"> event in the parent process with the data.
     },
     sub {
       my ($subprocess, $err, @results) = @_;
-      say "Progress is 100%";
+      say 'Progress is 100%';
+      say $results[0];
     }
   );
   $subprocess->on(progress => sub {

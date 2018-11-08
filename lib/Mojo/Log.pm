@@ -55,7 +55,7 @@ sub warn { shift->_log(warn => @_) }
 sub _default {
   my ($time, $level) = (shift, shift);
   my ($s, $m, $h, $day, $month, $year) = localtime $time;
-  $time = sprintf '%04d-%02d-%02dT%02d:%02d:%02.5f', $year + 1900, $month + 1,
+  $time = sprintf '%04d-%02d-%02dT%02d:%02d:%08.5f', $year + 1900, $month + 1,
     $day, $h, $m, "$s." . (split /\./, $time)[1];
   return "[$time] [$$] [$level] " . join "\n", @_, '';
 }

@@ -1,4 +1,6 @@
 
+8.07  2018-11-09
+
 8.06  2018-11-07
   - Added support for progress updates to Mojo::IOLoop::Subprocess. (karjala)
   - Added progress method to Mojo::IOLoop::Subprocess. (karjala)

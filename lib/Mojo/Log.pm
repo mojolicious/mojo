@@ -52,7 +52,7 @@ sub new {
 sub warn { shift->_log(warn => @_) }
 
 sub _default {
-  '[' . localtime(shift) . '] [' . shift() . '] ' . join "\n", @_, '';
+  '[' . localtime(shift) . "] [$$] [" . shift() . '] ' . join "\n", @_, '';
 }
 
 sub _log {
@@ -75,7 +75,7 @@ sub _message {
 sub _short {
   my ($time, $level) = (shift, shift);
   my ($magic, $short) = ("<$MAGIC{$level}>", substr($level, 0, 1));
-  return "${magic}[$short] " . join("\n$magic", @_) . "\n";
+  return "${magic}[$$] [$short] " . join("\n$magic", @_) . "\n";
 }
 
 1;
@@ -139,7 +139,7 @@ A callback for formatting log messages.
 
   $log->format(sub {
     my ($time, $level, @lines) = @_;
-    return "[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious\n";
+    return "[Thu May 15 17:47:04 2014] [28320] [info] I ♥ Mojolicious\n";
   });
 
 =head2 handle

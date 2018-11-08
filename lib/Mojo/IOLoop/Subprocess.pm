@@ -51,7 +51,7 @@ sub _start {
     read => sub {
       $buffer .= pop;
       while (1) {
-        my ($len) = $buffer =~ /\A([0-9]+)\-/;
+        my ($len) = $buffer =~ /^([0-9]+)\-/;
         last unless $len and length $buffer >= $len + $+[0];
         my $snippet = substr $buffer, 0, $len + $+[0], '';
         my $args = $self->deserialize->(substr $snippet, $+[0]);
@@ -72,9 +72,7 @@ sub _start {
 
 sub progress {
   my ($self, @args) = @_;
-
   my $serialized = $self->serialize->(\@args);
-
   print {$self->{writer}} length($serialized), '-', $serialized;
 }
 
@@ -125,8 +123,8 @@ can emit the following new ones.
     ...
   });
 
-Emitted in the parent process when the child calls the L<progress|/"progress1">
-method.
+Emitted in the parent process when the subprocess calls the
+L<progress|/"progress1"> method.
 
 =head2 spawn
 
@@ -196,9 +194,29 @@ Process id of the spawned subprocess if available.
 
   $subprocess->progress(@data)
 
-Have the child process send data to the parent at any time during the child's
-execution. Must be called by the child. The data is received by the parent,
-which then emits a L</progress> event with this data.
+Send data serialized with L<Storable> to the parent process at any time during
+the subprocess's execution. Must be called by the subprocess and emits the
+L</"progress"> event in the parent process with the data.
+
+  # Send progress information to the parent process
+  $subprocess->run(
+    sub {
+      my $subprocess = shift;
+      $subprocess->progress('0%');
+      sleep 5;
+      $subprocess->progress('50%');
+      sleep 5;
+      return 'Hello Mojo!';
+    },
+    sub {
+      my ($subprocess, $err, @results) = @_;
+      say "Progress is 100%";
+    }
+  );
+  $subprocess->on(progress => sub {
+    my ($subprocess, @data) = @_;
+    say "Progress is $data[0]";
+  });
 
 =head2 run
 

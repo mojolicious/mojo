@@ -173,7 +173,7 @@ like $fail, qr/Whatever/, 'right error';
 
 # Progress
 ($fail, $result) = (undef, undef);
-my @progresses;
+my @progress;
 $subprocess = Mojo::IOLoop::Subprocess->new;
 $subprocess->run(
   sub {
@@ -192,13 +192,13 @@ $subprocess->run(
 $subprocess->on(
   progress => sub {
     my ($subprocess, @args) = @_;
-    push @progresses, \@args;
+    push @progress, \@args;
   }
 );
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['yay'], 'correct result';
-is_deeply \@progresses,
+is_deeply \@progress,
   [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]],
   'correct progress';
 

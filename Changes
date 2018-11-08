@@ -1,5 +1,8 @@
 
 8.06  2018-11-07
+  - Added support for progress updates to Mojo::IOLoop::Subprocess. (karjala)
+  - Added progress method to Mojo::IOLoop::Subprocess. (karjala)
+  - Added progress event to Mojo::IOLoop::Subprocess. (karjala)
   - Improved debug, error, fatal, info and warn methods in Mojo::Log to accept
     closures to generate log messages on demand. So expensive code for debugging
     can be deactivated easily in production.

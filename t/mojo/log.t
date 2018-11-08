@@ -10,7 +10,7 @@ use Time::HiRes 'time';
 my $dir  = tempdir;
 my $path = $dir->child('test.log');
 my $log  = Mojo::Log->new(level => 'error', path => $path);
-$log->error('Just works');
+$log->error('Works');
 $log->fatal('I ♥ Mojolicious');
 $log->error(sub {'This too'});
 $log->debug('Does not work');
@@ -18,7 +18,7 @@ $log->debug(sub { return 'And this', 'too' });
 undef $log;
 my $content = decode 'UTF-8', path($path)->slurp;
 like $content,
-  qr/\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{5}] \[\d+\] \[error\] Just works/,
+  qr/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{5}] \[\d+\] \[error\] Works/,
   'right error message';
 like $content, qr/\[.*\] \[\d+\] \[fatal\] I ♥ Mojolicious/,
   'right fatal message';
@@ -123,7 +123,7 @@ my $history;
 }
 $content = decode 'UTF-8', $buffer;
 like $content,
-  qr/\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{5}\] \[$$\] \[error\] First\n/,
+  qr/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{5}\] \[$$\] \[error\] First\n/,
   'right error message';
 like $content, qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
 unlike $content, qr/debug/, 'no debug message';

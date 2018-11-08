@@ -134,7 +134,7 @@ use Mojo::Base 'Mojolicious';
 sub startup {
   my $self = shift;
 
-  # Load configuration from hash returned by "my_app.conf"
+  # Load configuration from hash returned by config file
   my $config = $self->plugin('Config');
 
   # Router

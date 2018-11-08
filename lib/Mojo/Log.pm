@@ -195,7 +195,7 @@ following new ones.
 
 =head2 append
 
-  $log->append("[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious\n");
+  $log->append("[2018-11-08 14:20:13.77168] [28320] [info] I ♥ Mojolicious\n");
 
 Append message to L</"handle">.
 

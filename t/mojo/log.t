@@ -17,7 +17,9 @@ $log->debug('Does not work');
 $log->debug(sub { return 'And this', 'too' });
 undef $log;
 my $content = decode 'UTF-8', path($path)->slurp;
-like $content, qr/\[.*\] \[\d+\] \[error\] Just works/, 'right error message';
+like $content,
+  qr/\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{5}] \[\d+\] \[error\] Just works/,
+  'right error message';
 like $content, qr/\[.*\] \[\d+\] \[fatal\] I ♥ Mojolicious/,
   'right fatal message';
 like $content, qr/\[.*\] \[\d+\] \[error\] This too/, 'right error message';
@@ -120,9 +122,11 @@ my $history;
   $history = $log->history;
 }
 $content = decode 'UTF-8', $buffer;
-like $content,   qr/\[.*\] \[error\] First\n/,        'right error message';
-like $content,   qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
-unlike $content, qr/debug/,                           'no debug message';
+like $content,
+  qr/\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{5}\] \[$$\] \[error\] First\n/,
+  'right error message';
+like $content, qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
+unlike $content, qr/debug/, 'no debug message';
 like $history->[0][0], qr/^[0-9.]+$/, 'right epoch time';
 is $history->[0][1],   'fatal',       'right level';
 is $history->[0][2],   'Second',      'right message';

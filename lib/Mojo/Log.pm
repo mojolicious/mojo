@@ -37,10 +37,10 @@ sub append {
   flock $handle, LOCK_UN;
 }
 
-sub debug { $_[0]->is_level('debug') ? _log(@_, 'debug') : $_[0] }
-sub error { $_[0]->is_level('error') ? _log(@_, 'error') : $_[0] }
-sub fatal { $_[0]->is_level('fatal') ? _log(@_, 'fatal') : $_[0] }
-sub info  { $_[0]->is_level('info')  ? _log(@_, 'info')  : $_[0] }
+sub debug { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
+sub error { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
+sub fatal { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
+sub info  { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'info')  : $_[0] }
 
 sub is_level { $LEVEL{pop()} >= $LEVEL{shift->level} }
 
@@ -50,7 +50,7 @@ sub new {
   return $self;
 }
 
-sub warn { $_[0]->is_level('warn') ? _log(@_, 'warn') : $_[0] }
+sub warn { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn') : $_[0] }
 
 sub _default {
   my ($time, $level) = (shift, shift);

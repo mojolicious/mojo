@@ -9,6 +9,7 @@
   - Improved Mojo::Log to use the time format "2018-11-08T14:25:5.76027" and to
     include the process id in log messages.
   - Improved Mojolicious performance by up to 10% with more efficient logging.
+  - Fixed a problem with the built in templates where an image was missing.
 
 8.05  2018-10-25
   - Deprecated Mojolicious::Plugin::PODRenderer in favor of alternatives from

@@ -5,6 +5,7 @@ use Carp 'croak';
 use Fcntl ':flock';
 use Mojo::File;
 use Mojo::Util 'encode';
+use Time::HiRes 'time';
 
 has format => sub { shift->short ? \&_short : \&_default };
 has handle => sub {
@@ -52,7 +53,11 @@ sub new {
 sub warn { shift->_log(warn => @_) }
 
 sub _default {
-  '[' . localtime(shift) . "] [$$] [" . shift() . '] ' . join "\n", @_, '';
+  my ($time, $level) = (shift, shift);
+  my ($s, $m, $h, $day, $month, $year) = localtime $time;
+  $time = sprintf '%04d-%02d-%02dT%02d:%02d:%02.5f', $year + 1900, $month + 1,
+    $day, $h, $m, "$s." . (split /\./, $time)[1];
+  return "[$time] [$$] [$level] " . join "\n", @_, '';
 }
 
 sub _log {
@@ -139,7 +144,7 @@ A callback for formatting log messages.
 
   $log->format(sub {
     my ($time, $level, @lines) = @_;
-    return "[Thu May 15 17:47:04 2014] [28320] [info] I ♥ Mojolicious\n";
+    return "[2018-11-08T14:20:13.77168] [28320] [info] I ♥ Mojolicious\n";
   });
 
 =head2 handle

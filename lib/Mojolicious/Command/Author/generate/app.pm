@@ -137,6 +137,9 @@ sub startup {
   # Load configuration from hash returned by config file
   my $config = $self->plugin('Config');
 
+  # Configure the application
+  $self->secrets($config->{secrets});
+
   # Router
   my $r = $self->routes;
 

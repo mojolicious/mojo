@@ -59,7 +59,9 @@ sub listen {
     if ($path) {
       unlink $path if -S $path;
       $options{Local} = $path;
+      my $prev = umask 0;
       $handle = $class->new(%options) or croak "Can't create listen socket: $!";
+      umask $prev;
       $reuse = $self->{reuse} = join ':', 'unix', $path, fileno $handle;
     }
 

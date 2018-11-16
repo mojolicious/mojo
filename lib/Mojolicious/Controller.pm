@@ -190,7 +190,7 @@ sub rendered {
       my $code    = $res->code;
       my $msg     = $res->message || $res->default_message($code);
       return "$code $msg (${elapsed}s, $rps/s)";
-    });
+    }) unless $stash->{'mojo.static'};
 
     $app->plugins->emit_hook_reverse(after_dispatch => $self);
     $app->sessions->store($self);

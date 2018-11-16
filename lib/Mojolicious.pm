@@ -118,16 +118,14 @@ sub dispatch {
 
   # Start timer (ignore static files)
   my $stash = $c->stash;
-  unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
-    $self->log->debug(sub {
-      my $req    = $c->req;
-      my $method = $req->method;
-      my $path   = $req->url->path->to_abs_string;
-      my $id     = $req->request_id;
-      $c->helpers->timing->begin('mojo.timer');
-      return qq{$method "$path" ($id)};
-    });
-  }
+  $self->log->debug(sub {
+    my $req    = $c->req;
+    my $method = $req->method;
+    my $path   = $req->url->path->to_abs_string;
+    my $id     = $req->request_id;
+    $c->helpers->timing->begin('mojo.timer');
+    return qq{$method "$path" ($id)};
+  }) unless $stash->{'mojo.static'};
 
   # Routes
   $plugins->emit_hook(before_routes => $c);

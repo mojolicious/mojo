@@ -9,6 +9,8 @@ use Mojo::Date;
 use Mojo::File 'path';
 use Mojolicious::Lite;
 
+hook after_static => sub { shift->app->log->debug('Static file served') };
+
 get '/hello3.txt' => sub { shift->reply->static('hello2.txt') };
 
 post '/hello4.txt' => sub {
@@ -82,10 +84,16 @@ $c->req->headers->if_none_match('"cba", "abc"');
 ok !$c->is_fresh(etag => 'cab'), 'content is stale';
 
 # Static file
+$t->app->log->level('debug')->unsubscribe('message');
+my $log = '';
+my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/hello.txt')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
   ->content_is("Hello Mojo from a static file!\n");
+like $log,   qr/Static file served/, 'right message';
+unlike $log, qr/200 OK/,             'no status message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Static file (HEAD)
 $t->head_ok('/hello.txt')->status_is(200)

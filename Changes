@@ -1,5 +1,7 @@
 
-8.07  2018-11-09
+8.07  2018-11-16
+  - Fixed a bug in Mojo::Server::Morbo that prevented the before_server_start
+    hook from getting emitted.
 
 8.06  2018-11-07
   - Added support for progress updates to Mojo::IOLoop::Subprocess. (karjala)

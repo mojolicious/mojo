@@ -87,12 +87,15 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Update script without changing mtime
 ($size, $mtime) = (stat $script)[7, 9];
 is_deeply $morbo->backend->modified_files, [], 'no files have changed';
-$script->spurt(<<EOF);
+$script->spurt(<<'EOF');
 use Mojolicious::Lite;
 
 app->log->level('fatal');
 
-get '/hello' => {text => 'Hello!'};
+my $message = 'Failed!';
+hook before_server_start => sub { $message = 'Hello!' };
+
+get '/hello' => sub { shift->render(text => $message) };
 
 app->start;
 EOF

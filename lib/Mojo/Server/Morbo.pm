@@ -64,7 +64,7 @@ sub _spawn {
 
   # Worker
   my $daemon = $self->daemon;
-  $daemon->load_app($self->backend->watch->[0]);
+  $daemon->load_app($self->backend->watch->[0])->server($daemon);
   $daemon->ioloop->recurring(1 => sub { shift->stop unless kill 0, $manager });
   $daemon->run;
   exit 0;

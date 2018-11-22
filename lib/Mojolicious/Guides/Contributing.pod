@@ -182,7 +182,7 @@ No names outside of C<Mojolicious.pm>.
 L<Mojolicious> is open source and free to use. However, the amount of effort
 needed to maintain the project and develop new features for it is not
 sustainable without proper financial backing. You can support the ongoing
-development of L<Mojolicious> through L<PayPal|https://www.paypal.me/kraih>.
+development of L<Mojolicious> through PayPal (C<donations@mojolicious.org>).
 
 If you run a business and use L<Mojolicious> in a revenue generating product, it
 makes business sense to support L<Mojolicious> development. Because it ensures
@@ -190,8 +190,8 @@ that the project your product relies on stays healthy and actively maintained.
 It can also help your exposure within the community and will make it easier to
 attract L<Mojolicious> developers.
 
-Please email Sebastian Riedel (C<kraih@mojolicious.org>) if you have any
-questions about becoming a sponsor.
+Please email us (C<donations@mojolicious.org>) if you have any questions about
+becoming a sponsor.
 
 =head1 CODE OF CONDUCT
 

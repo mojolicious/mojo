@@ -175,7 +175,7 @@ is $tx->req->param('♥'), '☃', 'right value';
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {Accept => '*/*', 'Content-Type' => 'application/mojo-form'} => form =>
-    {'♥' => '☃', nothing => undef});
+    {'♥'  => '☃', nothing        => undef});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/mojo-form',
@@ -218,7 +218,7 @@ is $tx->req->param('♥'), '☃', 'right value';
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/form-data'} => form =>
-    {'やった' => 'やった'} => charset => 'shift_jis');
+    {'やった'    => 'やった'}           => charset => 'shift_jis');
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',

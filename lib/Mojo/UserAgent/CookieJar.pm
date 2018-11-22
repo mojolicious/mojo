@@ -23,7 +23,7 @@ sub add {
 
     # Replace cookie
     next unless my $domain = lc($cookie->domain // '');
-    next unless my $path   = $cookie->path;
+    next unless my $path = $cookie->path;
     next unless length(my $name = $cookie->name // '');
     my $jar = $self->{jar}{$domain} ||= [];
     @$jar = (grep({ _compare($_, $path, $name, $domain) } @$jar), $cookie);
@@ -65,7 +65,7 @@ sub find {
 
   my @found;
   my $domain = my $host = lc $url->ihost;
-  my $path = $url->path->to_abs_string;
+  my $path   = $url->path->to_abs_string;
   while ($domain) {
     next unless my $old = $self->{jar}{$domain};
 

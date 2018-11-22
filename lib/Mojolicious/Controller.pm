@@ -137,7 +137,7 @@ sub render {
   # Template may be first argument
   my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
   $args->{template} = $template if $template;
-  my $app = $self->app;
+  my $app     = $self->app;
   my $plugins = $app->plugins->emit_hook(before_render => $self, $args);
 
   # Localize "extends" and "layout" to allow argument overrides

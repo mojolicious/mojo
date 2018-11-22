@@ -267,7 +267,7 @@ sub _wrap {
   }
 
   # Wrap lines
-  my $num = () = $body =~ /\n/g;
+  my $num  = () = $body =~ /\n/g;
   my $code = $self->_line(1) . "\npackage @{[$self->namespace]};";
   $code .= "use Mojo::Base -strict; no warnings 'ambiguous';";
   $code .= "sub { my \$_O = ''; @{[$self->prepend]};{ $args { $body\n";

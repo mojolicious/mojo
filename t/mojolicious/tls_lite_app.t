@@ -22,14 +22,14 @@ app->log->level('fatal');
 app->sessions->secure(1);
 
 get '/login' => sub {
-  my $c = shift;
+  my $c    = shift;
   my $name = $c->param('name') || 'anonymous';
   $c->session(name => $name);
   $c->render(text => "Welcome $name!");
 };
 
 get '/again' => sub {
-  my $c = shift;
+  my $c    = shift;
   my $name = $c->session('name') || 'anonymous';
   $c->render(text => "Welcome back $name!");
 };

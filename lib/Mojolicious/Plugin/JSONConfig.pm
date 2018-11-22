@@ -24,7 +24,7 @@ sub render {
   $prepend .= q[my $app = shift; sub app; local *app = sub { $app };];
   $prepend .= q[use Mojo::Base -strict; no warnings 'ambiguous';];
 
-  my $mt = Mojo::Template->new($conf->{template} || {})->name($file);
+  my $mt     = Mojo::Template->new($conf->{template} || {})->name($file);
   my $output = $mt->prepend($prepend . $mt->prepend)->render($content, $app);
   return ref $output ? die $output : $output;
 }

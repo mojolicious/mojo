@@ -123,7 +123,7 @@ sub parse_frame {
   elsif ($len == 126) {
     return undef unless length $$buffer > 4;
     $hlen = 4;
-    $len = unpack 'x2n', $$buffer;
+    $len  = unpack 'x2n', $$buffer;
     warn "-- Extended 16-bit payload ($len)\n" if DEBUG;
   }
 
@@ -131,7 +131,7 @@ sub parse_frame {
   elsif ($len == 127) {
     return undef unless length $$buffer > 10;
     $hlen = 10;
-    $len = MODERN ? unpack('x2Q>', $$buffer) : unpack('x2x4N', $$buffer);
+    $len  = MODERN ? unpack('x2Q>', $$buffer) : unpack('x2x4N', $$buffer);
     warn "-- Extended 64-bit payload ($len)\n" if DEBUG;
   }
 

@@ -27,7 +27,7 @@ has max_connections => 5;
 has max_redirects   => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has proxy           => sub { Mojo::UserAgent::Proxy->new };
 has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
-has server => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
+has server     => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
@@ -131,7 +131,7 @@ sub _connect {
       $stream->on(timeout => sub { $self->_error($id, 'Inactivity timeout') });
       $stream->on(close => sub { $self && $self->_finish($id, 1) });
       $stream->on(error => sub { $self && $self->_error($id, pop) });
-      $stream->on(read => sub { $self->_read($id, pop) });
+      $stream->on(read  => sub { $self->_read($id, pop) });
       $self->_process($id);
     }
   );

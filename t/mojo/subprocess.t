@@ -90,7 +90,7 @@ Mojo::IOLoop->delay(
   },
   sub {
     my ($delay, $err1, $result1, $err2, $result2) = @_;
-    $fail = $err1 || $err2;
+    $fail   = $err1 || $err2;
     $result = [$result1, $result2];
   }
 )->wait;

@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 BEGIN {
-  $ENV{MOJO_NO_NNR} = $ENV{MOJO_NO_SOCKS} = $ENV{MOJO_NO_TLS} = 1;
+  $ENV{MOJO_NO_NNR}  = $ENV{MOJO_NO_SOCKS} = $ENV{MOJO_NO_TLS} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
@@ -109,7 +109,7 @@ Mojo::UserAgent::Server->app(app);
 is(Mojo::UserAgent::Server->app, app, 'applications are equal again');
 
 # Clean up non-blocking requests
-my $ua = Mojo::UserAgent->new;
+my $ua  = Mojo::UserAgent->new;
 my $get = my $post = '';
 $ua->get('/' => sub { $get = pop->error });
 $ua->post('/' => sub { $post = pop->error });
@@ -679,7 +679,7 @@ $id  = Mojo::IOLoop->server(
   }
 );
 $port = Mojo::IOLoop->acceptor($id)->port;
-$tx = $ua->build_tx(GET => "http://127.0.0.1:$port/");
+$tx   = $ua->build_tx(GET => "http://127.0.0.1:$port/");
 my @unexpected;
 $tx->on(unexpected => sub { push @unexpected, pop });
 $tx = $ua->start($tx);
@@ -691,7 +691,7 @@ is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
 
 # Connection limit
-$ua = Mojo::UserAgent->new(max_connections => 2);
+$ua     = Mojo::UserAgent->new(max_connections => 2);
 $result = undef;
 Mojo::IOLoop->delay(
   sub {

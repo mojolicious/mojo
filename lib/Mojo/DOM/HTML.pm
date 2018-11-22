@@ -101,7 +101,7 @@ my %BLOCK = map { $_ => 1 } (
 sub parse {
   my ($self, $html) = (shift, "$_[0]");
 
-  my $xml = $self->xml;
+  my $xml     = $self->xml;
   my $current = my $tree = ['root'];
   while ($html =~ /\G$TOKEN_RE/gcso) {
     my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway)

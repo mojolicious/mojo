@@ -6,7 +6,7 @@ use Mojo::File 'path';
 
 has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
-has mtime => sub {$^T};
+has mtime           => sub {$^T};
 
 sub add_chunk {
   my ($self, $chunk) = @_;
@@ -22,7 +22,7 @@ sub contains {
   my ($self, $str) = @_;
 
   my $start = $self->start_range;
-  my $pos = index $self->{content} // '', $str, $start;
+  my $pos   = index $self->{content} // '', $str, $start;
   $pos -= $start if $start && $pos >= 0;
   my $end = $self->end_range;
 

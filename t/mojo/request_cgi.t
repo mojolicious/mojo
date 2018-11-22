@@ -176,7 +176,7 @@ is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 # Parse Apache 2.2 (win32) CGI environment variables and body
 $req = Mojo::Message::Request->new;
 my ($finished, $progress);
-$req->on(finish => sub { $finished = shift->is_finished });
+$req->on(finish   => sub { $finished = shift->is_finished });
 $req->on(progress => sub { $progress++ });
 ok !$finished, 'not finished';
 ok !$progress, 'no progress';

@@ -163,7 +163,7 @@ like $@, qr/^Can't chmod file/, 'right error';
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
 is_deeply path(__FILE__)->list->to_array,         [], 'no files';
-my $lib = path(__FILE__)->sibling('lib', 'Mojo');
+my $lib   = path(__FILE__)->sibling('lib', 'Mojo');
 my @files = map { path($lib)->child(split '/') } (
   'DeprecationTest.pm',  'LoaderException.pm',
   'LoaderException2.pm', 'TestConnectProxy.pm'

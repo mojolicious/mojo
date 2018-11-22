@@ -113,7 +113,7 @@ $result = undef;
 $ua->websocket(
   "wss://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
   }
@@ -160,7 +160,7 @@ $ua->websocket(
   "wss://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
   }

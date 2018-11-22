@@ -102,7 +102,7 @@ hook after_dispatch => sub {
 };
 
 get '/late/session' => sub {
-  my $c = shift;
+  my $c    = shift;
   my $late = $c->session('late') || 'not yet!';
   $c->render(text => $late);
 };
@@ -209,7 +209,7 @@ $t->get_ok('/missing')->status_is(404)->content_is("Oops!\n");
 # Suspended bridge
 $t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
-my $cb = $t->app->log->on(message => sub { $log .= pop });
+my $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended?ok=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('suspended!');
 like $log, qr!GET "/suspended"!,      'right message';
@@ -264,7 +264,7 @@ is $stash->{_name}, 'stash', 'right "_name" value';
 
 # Cookies, session and flash
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
   "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");

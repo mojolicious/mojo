@@ -185,7 +185,7 @@ $inactive->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
 # /source/third
 # /source/third.xml
 my $source = $r->route('/source')->to('source#');
-my $first = $source->route(format => 0)->route('/first')->to('#first');
+my $first  = $source->route(format => 0)->route('/first')->to('#first');
 $source->route('/second')->to('#second');
 my $third  = $source->route('/third')->to('#third');
 my $target = $r->remove->route('/target')->to('target#');

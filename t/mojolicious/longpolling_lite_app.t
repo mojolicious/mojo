@@ -163,7 +163,7 @@ my $t = Test::Mojo->new;
 # Stream without delay and finish
 $t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
-my $cb = $t->app->log->on(message => sub { $log .= pop });
+my $cb  = $t->app->log->on(message => sub { $log .= pop });
 my $stash;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/write')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -220,7 +220,7 @@ is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
 
 # Interrupted by raising an error
-my $tx = $t->ua->build_tx(GET => '/longpoll/chunked');
+my $tx     = $t->ua->build_tx(GET => '/longpoll/chunked');
 my $buffer = '';
 $tx->res->content->unsubscribe('read')->on(
   read => sub {
@@ -259,7 +259,7 @@ is $stash->{order}, 1, 'the drain event was emitted on the next reactor tick';
 
 # Static file with cookies and session
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/longpoll/static')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/bar=baz/)

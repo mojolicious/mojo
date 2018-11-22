@@ -58,7 +58,7 @@ sub contains {
 
   # Sliding window search
   my $offset = 0;
-  my $start = $handle->sysread(my $window, $len);
+  my $start  = $handle->sysread(my $window, $len);
   while ($offset < $end) {
 
     # Read as much as possible

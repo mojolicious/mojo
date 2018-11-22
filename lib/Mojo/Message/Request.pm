@@ -7,13 +7,13 @@ use Mojo::URL;
 
 my ($SEED, $COUNTER) = ($$ . time . rand, int rand 0xffffff);
 
-has env => sub { {} };
+has env    => sub { {} };
 has method => 'GET';
 has [qw(proxy reverse_proxy)];
 has request_id => sub {
   substr sha1_sum($SEED . ($COUNTER = ($COUNTER + 1) % 0xffffff)), 0, 8;
 };
-has url => sub { Mojo::URL->new };
+has url       => sub { Mojo::URL->new };
 has via_proxy => 1;
 
 sub clone {
@@ -207,7 +207,7 @@ sub _parse_env {
 
     # Remove SCRIPT_NAME prefix if necessary
     my $buffer = $path->to_string;
-    $value =~ s!^/|/$!!g;
+    $value  =~ s!^/|/$!!g;
     $buffer =~ s!^/?\Q$value\E/?!!;
     $buffer =~ s!^/!!;
     $path->parse($buffer);

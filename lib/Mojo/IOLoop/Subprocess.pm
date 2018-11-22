@@ -54,7 +54,7 @@ sub _start {
         my ($len) = $buffer =~ /^([0-9]+)\-/;
         last unless $len and length $buffer >= $len + $+[0];
         my $snippet = substr $buffer, 0, $len + $+[0], '';
-        my $args = $self->deserialize->(substr $snippet, $+[0]);
+        my $args    = $self->deserialize->(substr $snippet, $+[0]);
         $self->emit(progress => @$args);
       }
     }

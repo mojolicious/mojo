@@ -108,7 +108,7 @@ isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right transaction';
 
 # Fresh application
 $app = Mojolicious->new;
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+$ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 is $ua->server->app($app)->app->moniker, 'mojolicious', 'right moniker';
 
 # Silence
@@ -328,7 +328,7 @@ is $tx->res->body, 'Whatever!', 'right content';
 
 # File descriptor
 my $listen = IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1');
-my $fd = fileno $listen;
+my $fd     = fileno $listen;
 $daemon = Mojo::Server::Daemon->new(
   app    => $app,
   listen => ["http://127.0.0.1?fd=$fd"],

@@ -28,7 +28,7 @@ post '/params' => sub {
 };
 
 get '/proxy' => sub {
-  my $c = shift;
+  my $c       = shift;
   my $reverse = join ':', $c->tx->remote_address,
     $c->req->url->to_abs->protocol;
   $c->render(text => $reverse);
@@ -49,7 +49,7 @@ app->hook(
     push @server, ref $server, $app->mode;
   }
 );
-my $app = Mojo::Server::PSGI->new(app => app)->to_psgi_app;
+my $app     = Mojo::Server::PSGI->new(app => app)->to_psgi_app;
 my $content = 'hello=world';
 open my $body, '<', \$content;
 my $env = {
@@ -73,9 +73,9 @@ my $res = $app->($env);
 is $res->[0], 200, 'right status';
 my %headers = @{$res->[1]};
 ok keys(%headers) >= 3, 'enough headers';
-ok $headers{Date}, 'has "Date" value';
+ok $headers{Date},             'has "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
-is $headers{'Content-Type'}, 'application/json;charset=UTF-8',
+is $headers{'Content-Type'},   'application/json;charset=UTF-8',
   'right "Content-Type" value';
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
@@ -112,9 +112,9 @@ $res = $app->($env);
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
 ok keys(%headers) >= 3, 'enough headers';
-ok $headers{Date}, 'has "Date" value';
+ok $headers{Date},             'has "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
-is $headers{'Content-Type'}, 'application/json;charset=UTF-8',
+is $headers{'Content-Type'},   'application/json;charset=UTF-8',
   'right "Content-Type" value';
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }

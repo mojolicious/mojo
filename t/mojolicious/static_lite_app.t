@@ -86,9 +86,9 @@ ok !$c->is_fresh(etag => 'cab'), 'content is stale';
 # Static file
 $t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
-my $cb = $t->app->log->on(message => sub { $log .= pop });
+my $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/hello.txt')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
   ->content_is("Hello Mojo from a static file!\n");
 like $log,   qr/Static file served/, 'right message';
@@ -97,7 +97,7 @@ $t->app->log->unsubscribe(message => $cb);
 
 # Static file (HEAD)
 $t->head_ok('/hello.txt')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
   ->content_is('');
 
@@ -165,7 +165,7 @@ $t->get_ok('/hello.txt' => {Range => 'bytes=32-33'})->status_is(416)
 
 # Render single byte static file
 $t->get_ok('/hello3.txt')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->content_is('X');
 

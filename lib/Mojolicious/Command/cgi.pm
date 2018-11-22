@@ -5,7 +5,7 @@ use Mojo::Server::CGI;
 use Mojo::Util 'getopt';
 
 has description => 'Start application with CGI';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;

@@ -71,17 +71,17 @@ is $output, "    \ntest    \n", 'expression trimmed';
 
 # Trim expression tags
 my $capture = 'no warnings "redefine"; sub capture { shift->(@_) }';
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render('    <%= capture begin =%><html><% end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Trim expression tags (relaxed expression end)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render('    <%= capture begin =%><html><%= end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Trim expression tags (relaxed escaped expression end)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render('    <%= capture begin =%><html><%== end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
@@ -155,7 +155,7 @@ is $output, "% my \$num = 23;\nThe number is <%= \$num %>.\n",
   'mixed lines have been replaced';
 
 # Helper starting with "end"
-$mt = Mojo::Template->new(prepend => 'sub endpoint { "works!" }');
+$mt     = Mojo::Template->new(prepend => 'sub endpoint { "works!" }');
 $output = $mt->render(<<'EOF');
 % endpoint;
 %= endpoint
@@ -165,7 +165,7 @@ EOF
 is $output, "works!\nworks!\nworks!works!", 'helper worked';
 
 # Helper ending with "begin"
-$mt = Mojo::Template->new(prepend => 'sub funbegin { "works too!" }');
+$mt     = Mojo::Template->new(prepend => 'sub funbegin { "works too!" }');
 $output = $mt->render(<<'EOF');
 % funbegin;
 %= funbegin
@@ -301,7 +301,7 @@ EOF
 is $output, "<html>\n\n", 'escaped expression block';
 
 # Capture lines (passed through with extra whitespace)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = capture begin                  %>
 <html>
@@ -311,35 +311,35 @@ EOF
 is $output, "\n\n<html>\n\n", 'captured lines';
 
 # Capture tags (passed through)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = capture begin %><html><% end %><%== $result %>
 EOF
 is $output, "<html>\n", 'capture tags';
 
 # Capture tags (passed through alternative)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = capture begin %><html><% end %><%== $result %>
 EOF
 is $output, "<html>\n", 'capture tags';
 
 # Capture tags with appended code (passed through)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = +(capture begin %><html><% end); %><%== $result %>
 EOF
 is $output, "<html>\n", 'capture tags with appended code';
 
 # Capture tags with appended code (passed through alternative)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = +( capture begin %><html><% end ); %><%= $result %>
 EOF
 is $output, "<html>\n", 'capture tags with appended code';
 
 # Nested capture tags (passed through)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = capture
   begin %><%= capture begin %><html><% end
@@ -348,7 +348,7 @@ EOF
 is $output, "<html>\n", 'nested capture tags';
 
 # Nested capture tags (passed through alternative)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = capture begin =%>
     <%== capture begin =%>
@@ -535,7 +535,7 @@ is $output, <<EOF, 'advanced capturing with tags';
 EOF
 
 # Block loop
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 % my $i = 2;
 <%= capture begin %>
@@ -553,7 +553,7 @@ is $output, <<EOF, 'block loop';
 EOF
 
 # Block loop (perl lines)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 % my $i = 2;
 %= capture begin
@@ -563,7 +563,7 @@ EOF
 is $output, "\n2\n3\n4", 'block loop';
 
 # Block loop (indented perl lines)
-$mt = Mojo::Template->new(prepend => $capture);
+$mt     = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
   % my $i = 2;
  %= capture begin
@@ -785,7 +785,7 @@ EOF
 is $output, "foo\nbar\n", 'control structure';
 
 # Mixed tags
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF', 2);
 <html foo="bar">
 <%= $_[0] + 1 %> test <%= 2 + 2 %> lala <%# comment lalala %>
@@ -800,7 +800,7 @@ unlike $mt->code, qr/ comment lalala /, 'right code';
 is ref $mt->compiled, 'CODE', 'code compiled';
 
 # Arguments
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 % my $msg = shift;
 <html><% my $hash = $_[0]; %>
@@ -825,7 +825,7 @@ $output = $mt->vars(1)->render('works too!');
 is $output, "works too!\n", 'no variables';
 
 # Bad variables
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = $mt->vars(1)->render('bad variables!', {'not good' => 23});
 is $output, "bad variables!\n", 'bad variables';
 
@@ -1180,7 +1180,7 @@ is $output->line->[1], '<% die "Test at template line 99\n"; %>', 'right line';
 is $output->lines_after->[0], undef, 'no lines after';
 
 # Different encodings
-$mt = Mojo::Template->new(encoding => 'shift_jis');
+$mt   = Mojo::Template->new(encoding => 'shift_jis');
 $file = path(__FILE__)->sibling('templates', 'utf8_exception.mt');
 ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';

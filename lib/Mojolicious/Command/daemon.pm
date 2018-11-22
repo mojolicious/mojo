@@ -5,7 +5,7 @@ use Mojo::Server::Daemon;
 use Mojo::Util 'getopt';
 
 has description => 'Start application with HTTP and WebSocket server';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;

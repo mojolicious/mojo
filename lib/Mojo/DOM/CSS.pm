@@ -285,7 +285,7 @@ sub _sibling {
 sub _siblings {
   my ($current, $type) = @_;
 
-  my $parent = $current->[3];
+  my $parent   = $current->[3];
   my @siblings = grep { $_->[0] eq 'tag' }
     @$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent];
   @siblings = grep { $type eq $_->[1] } @siblings if defined $type;

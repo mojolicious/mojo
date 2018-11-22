@@ -10,7 +10,7 @@ use Mojo::Util qw(encode md5_sum trim);
 
 # Bundled files
 my $PUBLIC = path(__FILE__)->sibling('resources', 'public');
-my %EXTRA = $PUBLIC->list_tree->map(
+my %EXTRA  = $PUBLIC->list_tree->map(
   sub { join('/', @{$_->to_rel($PUBLIC)}), $_->realpath->to_string })->each;
 
 has classes => sub { ['main'] };
@@ -94,7 +94,7 @@ sub serve_asset {
   # Last-Modified and ETag
   my $res = $c->res;
   $res->code(200)->headers->accept_ranges('bytes');
-  my $mtime = $asset->mtime;
+  my $mtime   = $asset->mtime;
   my $options = {etag => md5_sum($mtime), last_modified => $mtime};
   return $res->code(304) if $self->is_fresh($c, $options);
 
@@ -115,7 +115,7 @@ sub serve_asset {
 }
 
 sub warmup {
-  my $self = shift;
+  my $self  = shift;
   my $index = $self->{index} = {};
   for my $class (reverse @{$self->classes}) {
     $index->{$_} = $class for keys %{data_section $class};

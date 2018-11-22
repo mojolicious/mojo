@@ -11,7 +11,7 @@ use Mojo::Util qw(decode encode getopt);
 use Scalar::Util 'weaken';
 
 has description => 'Perform HTTP request';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -73,8 +73,8 @@ sub run {
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
   my @content = %form ? (form => \%form) : defined $in ? ($in) : ();
-  my $tx = $ua->start($ua->build_tx($method, $url, \%headers, @content));
-  my $res = $tx->result;
+  my $tx      = $ua->start($ua->build_tx($method, $url, \%headers, @content));
+  my $res     = $tx->result;
 
   # JSON Pointer
   return unless defined $selector;

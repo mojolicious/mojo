@@ -109,7 +109,7 @@ sub watch {
   croak 'I/O watcher not active' unless my $io = $self->{io}{fileno $handle};
   $io->{mode} = 0;
   $io->{mode} |= POLLIN | POLLPRI if $read;
-  $io->{mode} |= POLLOUT if $write;
+  $io->{mode} |= POLLOUT          if $write;
 
   return $self;
 }

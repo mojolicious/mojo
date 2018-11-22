@@ -14,7 +14,7 @@ has
 has description => 'No description';
 has 'quiet';
 has template => sub { {vars => 1} };
-has usage => "Usage: APPLICATION\n";
+has usage    => "Usage: APPLICATION\n";
 
 sub chmod_file {
   my ($self, $path, $mode) = @_;

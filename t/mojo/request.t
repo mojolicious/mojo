@@ -1741,7 +1741,7 @@ is $req->content->get_body_chunk(320), "-\x0d\x0a", 'right chunk';
 # Parse multipart/form-data request with charset
 $req = Mojo::Message::Request->new;
 is $req->default_charset, 'UTF-8', 'default charset is UTF-8';
-my $yatta = 'やった';
+my $yatta      = 'やった';
 my $yatta_sjis = encode 'Shift_JIS', $yatta;
 my $multipart
   = "------1234567890\x0d\x0a"

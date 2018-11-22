@@ -38,7 +38,7 @@ sub register {
     for qw(csrf_token current_route flash inactivity_timeout is_fresh),
     qw(redirect_to respond_to url_with validation);
 
-  $app->helper(dumper => sub { shift; dumper @_ });
+  $app->helper(dumper  => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);

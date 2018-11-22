@@ -5,7 +5,7 @@ use Mojo::DynamicMethods;
 use Mojo::Util 'trim';
 use Mojolicious::Validator::Validation;
 
-has checks => sub { {} };
+has checks  => sub { {} };
 has filters => sub { {trim => \&_trim} };
 
 sub add_check {

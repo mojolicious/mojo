@@ -55,7 +55,7 @@ use Mojo::BaseTest::Base3;
 use Scalar::Util 'isweak';
 
 # Basic functionality
-my $object = Mojo::BaseTest->new->foo(23);
+my $object  = Mojo::BaseTest->new->foo(23);
 my $object2 = Mojo::BaseTestTest->new(foo => 24);
 is $object2->foo, 24, 'right attribute value';
 is $object->foo,  23, 'right attribute value';

@@ -83,7 +83,7 @@ sub _headers {
   my ($self, $msg, $head) = @_;
 
   # Prepare header chunk
-  my $buffer = $msg->get_header_chunk($self->{offset});
+  my $buffer  = $msg->get_header_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} -= $written;
   $self->{offset} += $written;
@@ -103,7 +103,7 @@ sub _start_line {
   my ($self, $msg) = @_;
 
   # Prepare start-line chunk
-  my $buffer = $msg->get_start_line_chunk($self->{offset});
+  my $buffer  = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} -= $written;
   $self->{offset} += $written;

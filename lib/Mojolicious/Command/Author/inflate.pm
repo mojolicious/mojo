@@ -5,7 +5,7 @@ use Mojo::Loader qw(data_section file_is_binary);
 use Mojo::Util 'encode';
 
 has description => 'Inflate embedded files to real files';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my $self = shift;

@@ -244,7 +244,7 @@ sub punycode_encode {
         }
 
         $output .= chr $q + ($q < 26 ? 0x61 : 0x30 - 26);
-        $bias = _adapt($delta, $h + 1, $h == $basic);
+        $bias  = _adapt($delta, $h + 1, $h == $basic);
         $delta = 0;
         $h++;
       }
@@ -370,7 +370,7 @@ sub xor_encode {
   my ($input, $key) = @_;
 
   # Encode with variable key length
-  my $len = length $key;
+  my $len    = length $key;
   my $buffer = my $output = '';
   $output .= $buffer ^ $key
     while length($buffer = substr($input, 0, $len, '')) == $len;

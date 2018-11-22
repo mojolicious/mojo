@@ -50,7 +50,7 @@ websocket '/json' => sub {
 get '/plain' => {text => 'Nothing to see here!'};
 
 websocket '/push' => sub {
-  my $c = shift;
+  my $c  = shift;
   my $id = Mojo::IOLoop->recurring(0.1 => sub { $c->send('push') });
   $c->on(finish => sub { Mojo::IOLoop->remove($id) });
 };

@@ -80,7 +80,7 @@ my $result;
 $ua->websocket(
   "ws+unix://$encoded/echo" => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('roundtrip works!');
   }
@@ -93,7 +93,7 @@ $result = undef;
 $ua->websocket(
   "ws+unix://$encoded/echo" => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('roundtrip works!');
   }
@@ -110,7 +110,7 @@ $ua->proxy->http("http+unix://$encoded_proxy");
 $ua->websocket(
   'ws://example.com/echo' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('roundtrip works!');
   }

@@ -43,7 +43,7 @@ use Mojolicious::Controller;
 
 # Optional home detection
 my @path = qw(th is mojo dir wil l never-ever exist);
-my $app = Mojolicious->new(home => Mojo::Home->new(@path));
+my $app  = Mojolicious->new(home => Mojo::Home->new(@path));
 is $app->home, path(@path), 'right home directory';
 
 # Config override
@@ -180,7 +180,7 @@ $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
 # Plugin::Test::SomePlugin2::register (security violation again)
 $t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
-my $cb = $t->app->log->on(message => sub { $log .= pop });
+my $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
   ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
   ->content_unlike(qr/Something/)->content_like(qr/Page not found/);
@@ -224,7 +224,7 @@ $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
 
 # Foo::baz (missing action without template)
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
   ->content_like(qr/Page not found/);
@@ -233,7 +233,7 @@ $t->app->log->unsubscribe(message => $cb);
 
 # Foo::render (action not allowed)
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/render')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
 like $log, qr/Action "render" is not allowed/, 'right message';
@@ -251,7 +251,7 @@ $t->get_ok('/syntax_error/foo')->status_is(500)
 
 # Foo::syntaxerror (syntax error in template)
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Missing right curly/);
@@ -399,7 +399,7 @@ $t->get_ok('/another/file')->status_is(200)
 
 # Static directory /another
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/another')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)');
 like $log, qr/Controller "MojoliciousTest::Another" does not exist/,
@@ -554,7 +554,7 @@ $t->get_ok('/foo/routes')->status_is(200)
 # SingleFileTestApp::Redispatch::handler
 $t->app->log->level('debug')->unsubscribe('message');
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/redispatch')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Redispatch!');
 like $log, qr/Routing to application "SingleFileTestApp::Redispatch"/,
@@ -594,7 +594,7 @@ $t->get_ok('/staged')->status_is(200)
 # MojoliciousTestController::Foo::suspended
 $t->app->log->level('debug')->unsubscribe('message');
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended')->status_is(200)
   ->header_is(Server        => 'Mojolicious (Perl)')
   ->header_is('X-Suspended' => '0, 1, 1, 2')->content_is('<p>Have fun!</p>');

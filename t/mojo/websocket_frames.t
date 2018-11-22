@@ -257,7 +257,7 @@ my $payload = $compressed->build_message({binary => 'just works'})->[5];
 isnt $frame->[5], $payload, 'different payload';
 ok length $frame->[5] > length $payload, 'payload is smaller';
 my $uncompressed = Mojo::Transaction::WebSocket->new;
-my $frame2 = $uncompressed->build_message({binary => 'just works'});
+my $frame2       = $uncompressed->build_message({binary => 'just works'});
 is $frame2->[0], 1, 'fin flag is set';
 is $frame2->[1], 0, 'rsv1 flag is not set';
 is $frame2->[2], 0, 'rsv2 flag is not set';

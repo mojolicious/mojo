@@ -21,12 +21,12 @@ post '/upload' => sub {
   $c->render(text => $file->filename
       . $file->asset->slurp
       . $c->param('test')
-      . ($headers->content_type // '')
+      . ($headers->content_type  // '')
       . ($headers->header('X-X') // ''));
 };
 
 post '/multi' => sub {
-  my $c = shift;
+  my $c       = shift;
   my @uploads = map { @{$c->every_param($_)} } @{$c->every_param('name')};
   $c->render(text => join '', map { $_->filename, $_->asset->slurp } @uploads);
 };

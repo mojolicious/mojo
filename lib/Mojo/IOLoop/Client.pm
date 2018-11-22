@@ -73,7 +73,7 @@ sub _cleanup {
 sub _connect {
   my ($self, $args) = @_;
 
-  my $path = $args->{path};
+  my $path   = $args->{path};
   my $handle = $self->{handle} = $args->{handle};
 
   unless ($handle) {

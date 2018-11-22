@@ -4,7 +4,7 @@ use Test::More;
 use Mojo::Parameters;
 
 # Basic functionality
-my $params = Mojo::Parameters->new('foo=b%3Bar&baz=23');
+my $params  = Mojo::Parameters->new('foo=b%3Bar&baz=23');
 my $params2 = Mojo::Parameters->new('x', 1, 'y', 2);
 is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
 is $params2->to_string, 'x=1&y=2',           'right format';

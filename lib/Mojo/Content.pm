@@ -121,7 +121,7 @@ sub parse {
   # Normal content
   $len = 0 unless looks_like_number $len;
   if ((my $need = $len - ($self->{size} ||= 0)) > 0) {
-    my $len = length $self->{buffer};
+    my $len   = length $self->{buffer};
     my $chunk = substr $self->{buffer}, 0, $need > $len ? $len : $need, '';
     $self->_decompress($chunk);
     $self->{size} += length $chunk;

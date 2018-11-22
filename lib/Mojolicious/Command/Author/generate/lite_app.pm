@@ -2,7 +2,7 @@ package Mojolicious::Command::Author::generate::lite_app;
 use Mojo::Base 'Mojolicious::Command';
 
 has description => 'Generate Mojolicious::Lite application';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, $name) = (shift, shift || 'myapp.pl');

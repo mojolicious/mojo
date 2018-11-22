@@ -53,7 +53,7 @@ sub _expand {
     SSL_startHandshake => 0
   };
   $tls->{SSL_alpn_protocols} = $args->{tls_protocols} if $args->{tls_protocols};
-  $tls->{SSL_ca_file} = $args->{tls_ca}
+  $tls->{SSL_ca_file}        = $args->{tls_ca}
     if $args->{tls_ca} && -T $args->{tls_ca};
   $tls->{SSL_cert_file}   = $args->{tls_cert}    if $args->{tls_cert};
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};

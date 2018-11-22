@@ -71,7 +71,7 @@ sub render {
 
     # Placeholder
     else {
-      my $name = (split $start, $value)[0] // '';
+      my $name    = (split $start, $value)[0] // '';
       my $default = $self->defaults->{$name};
       $part = $values->{$name} // $default // '';
       if (!defined $default || ($default ne $part)) { $optional = 0 }
@@ -94,7 +94,7 @@ sub _compile {
   my $start        = $self->type_start;
   my $types        = $self->types;
 
-  my $block = my $regex = '';
+  my $block    = my $regex = '';
   my $optional = 1;
   for my $token (reverse @{$self->tree}) {
     my ($op, $value, $type) = @$token;

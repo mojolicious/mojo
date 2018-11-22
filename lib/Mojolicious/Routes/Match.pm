@@ -5,7 +5,7 @@ use Mojo::Util;
 
 has [qw(endpoint root)];
 has position => 0;
-has stack => sub { [] };
+has stack    => sub { [] };
 
 sub find { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
 

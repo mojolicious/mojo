@@ -37,7 +37,7 @@ websocket '/test' => sub {
 # HTTP server for testing
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
-my $port = $daemon->listen(['http://127.0.0.1'])->start->ports->[0];
+my $port   = $daemon->listen(['http://127.0.0.1'])->start->ports->[0];
 
 # CONNECT proxy server for testing
 my $id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
@@ -61,7 +61,7 @@ $result = undef;
 $ua->websocket(
   "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
   }
@@ -91,7 +91,7 @@ $ua->websocket(
   "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
   }
@@ -112,7 +112,7 @@ $result = undef;
 $ua->websocket(
   "ws://127.0.0.1:$port/test" => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
   }

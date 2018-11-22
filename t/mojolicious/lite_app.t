@@ -24,7 +24,7 @@ app->defaults(default => 23);
 # Secret
 app->log->level('debug')->unsubscribe('message');
 my $log = '';
-my $cb = app->log->on(message => sub { $log .= pop });
+my $cb  = app->log->on(message => sub { $log .= pop });
 is app->secrets->[0], app->moniker, 'secret defaults to moniker';
 like $log, qr/Your secret passphrase needs to be changed/, 'right message';
 app->log->unsubscribe(message => $cb);
@@ -187,7 +187,7 @@ get '/stream' => sub {
   my $cb;
   $cb = sub {
     my $content = shift;
-    my $chunk = shift @$chunks || '';
+    my $chunk   = shift @$chunks || '';
     $content->write_chunk($chunk, $chunk ? $cb : undef);
   };
   $c->res->content->$cb;
@@ -243,7 +243,7 @@ get '/to_string' => sub {
 };
 
 get '/source' => sub {
-  my $c = shift;
+  my $c    = shift;
   my $file = $c->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
   $c->render_maybe('this_does_not_ever_exist')
     or $c->reply->static($file)
@@ -644,7 +644,7 @@ $t->get_ok('/static.txt')->status_is(200)
 
 # Partial inline file
 $t->get_ok('/static.txt' => {Range => 'bytes=2-5'})->status_is(206)
-  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
   ->content_is('st s');
 
@@ -781,7 +781,7 @@ $t->get_ok('/source')->status_is(200)
 
 # File does not exist
 $log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
+$cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/source?fail=1')->status_is(404)->header_is('X-Missing' => 1)
   ->content_is("Oops!\n");
 like $log, qr/Static file "does_not_exist.txt" not found/, 'right message';
@@ -791,7 +791,7 @@ $t->app->log->unsubscribe(message => $cb);
 {
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
   $log = '';
-  $cb = $t->app->log->on(message => sub { $log .= pop });
+  $cb  = $t->app->log->on(message => sub { $log .= pop });
   $t->get_ok('/', '1234' x 1024)->status_is(200)
     ->header_is(Connection => 'close')
     ->content_is("Maximum message size exceeded\n"

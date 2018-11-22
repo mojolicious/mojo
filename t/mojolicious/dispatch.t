@@ -24,7 +24,7 @@ use Mojolicious;
 
 # Fresh controller
 my $app = Mojolicious->new(secrets => ['works']);
-my $c = $app->build_controller;
+my $c   = $app->build_controller;
 is $c->url_for('/'), '/', 'routes are working';
 
 # Set
@@ -57,8 +57,8 @@ $stash = $c->stash;
 delete $stash->{foo};
 delete $stash->{0};
 delete $stash->{zero};
-is $c->stash->{foo}, undef, 'element has been deleted';
-is $c->stash->{0}, undef, 'element has been deleted';
+is $c->stash->{foo},  undef, 'element has been deleted';
+is $c->stash->{0},    undef, 'element has been deleted';
 is $c->stash->{zero}, undef, 'element has been deleted';
 $c->stash('foo' => 'zoo');
 delete $c->stash->{foo};

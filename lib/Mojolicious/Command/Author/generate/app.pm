@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Util qw(class_to_file class_to_path decamelize);
 
 has description => 'Generate Mojolicious application directory structure';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, $class) = (shift, shift || 'MyApp');

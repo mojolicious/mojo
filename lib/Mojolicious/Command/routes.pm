@@ -5,7 +5,7 @@ use re 'regexp_pattern';
 use Mojo::Util qw(encode getopt tablify);
 
 has description => 'Show available routes';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;

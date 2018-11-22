@@ -36,7 +36,7 @@ sub attr {
     state %weak_names;
     unless ($weak_names{$class}) {
       my $names = $weak_names{$class} = [];
-      my $sub = sub {
+      my $sub   = sub {
         my $self = shift->next::method(@_);
         ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$names;
         return $self;

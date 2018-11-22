@@ -28,7 +28,7 @@ ok time < ($time + 10), 'stopped automatically';
 
 # Listen
 my $listen = IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1');
-my $port = $listen->sockport;
+my $port   = $listen->sockport;
 my ($readable, $writable);
 $reactor->io($listen => sub { pop() ? $writable++ : $readable++ })
   ->watch($listen, 0, 0)->watch($listen, 1, 1);

@@ -138,7 +138,7 @@ app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $ua->websocket(
   '/' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('test1');
   }
@@ -231,7 +231,7 @@ $ua->websocket(
     my ($ua, $tx) = @_;
     $code = $tx->res->code;
     $tx->on(message => sub { $result .= pop });
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
   }
 );
 Mojo::IOLoop->start;
@@ -265,7 +265,7 @@ $ua->websocket(
     my ($ua, $tx) = @_;
     $code2 = $tx->res->code;
     $tx->on(message => sub { $result2 .= pop });
-    $tx->on(finish => sub { $end2->() });
+    $tx->on(finish  => sub { $end2->() });
   }
 );
 $delay->wait;
@@ -326,7 +326,7 @@ $result = undef;
 $ua->websocket(
   '/trim' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send(b(' foo bar '));
   }
@@ -339,7 +339,7 @@ $result = undef;
 $ua->websocket_p('/trim')->then(sub {
   my $tx      = shift;
   my $promise = Mojo::Promise->new;
-  $tx->on(finish => sub { $promise->resolve });
+  $tx->on(finish  => sub { $promise->resolve });
   $tx->on(message => sub { shift->finish; $result = pop });
   $tx->send(' also works! ');
   return $promise;
@@ -418,7 +418,7 @@ $result = undef;
 $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
     $tx->send('hi!' x 100);
   }
@@ -428,7 +428,7 @@ is $result, 'hi!' x 100, 'right result';
 
 # Timeout
 my $log = '';
-$msg = app->log->on(message => sub { $log .= pop });
+$msg   = app->log->on(message => sub { $log .= pop });
 $stash = undef;
 app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $ua->websocket(

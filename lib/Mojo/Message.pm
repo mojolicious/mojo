@@ -282,7 +282,7 @@ sub _parse_formdata {
     $part = $part->asset->slurp unless $upload;
 
     if ($charset) {
-      $name     = decode($charset, $name) // $name         if $name;
+      $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;
       $part = decode($charset, $part) // $part unless $upload;
     }

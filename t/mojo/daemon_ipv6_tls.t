@@ -55,7 +55,7 @@ SKIP: {
     . '&example.com_cert=t/mojo/certs/domain.crt'
     . '&example.com_key=t/mojo/certs/domain.key';
   my $forward = $daemon->listen([$listen])->start->ports->[0];
-  my $id = Mojo::TestConnectProxy::proxy({address => '[::1]'},
+  my $id      = Mojo::TestConnectProxy::proxy({address => '[::1]'},
     {address => '[::1]', port => $forward});
   my $proxy = Mojo::IOLoop->acceptor($id)->port;
   $ua = Mojo::UserAgent->new(

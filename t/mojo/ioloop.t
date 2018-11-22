@@ -150,7 +150,7 @@ is $stream->timeout, 15, 'right default';
 is $stream->timeout(16)->timeout, 16, 'right timeout';
 $id = Mojo::IOLoop->stream($stream);
 $stream->on(close => sub { Mojo::IOLoop->stop });
-$stream->on(read => sub { $buffer .= pop });
+$stream->on(read  => sub { $buffer .= pop });
 $stream->write('hello');
 ok !!Mojo::IOLoop->stream($id), 'stream exists';
 is $stream->timeout, 16, 'right timeout';
@@ -161,7 +161,7 @@ ok !Mojo::IOLoop->stream($id), 'stream does not exist anymore';
 is $buffer, 'acceptedhelloworld', 'right result';
 
 # Removed listen socket
-$id = $loop->server({address => '127.0.0.1'} => sub { });
+$id   = $loop->server({address => '127.0.0.1'} => sub { });
 $port = $loop->acceptor($id)->port;
 my $connected;
 $loop->client(
@@ -262,7 +262,7 @@ ok !$err, 'no error';
 is $finish, 1, 'finish event has been emitted once';
 
 # Graceful shutdown (without connection)
-$err = $finish = '';
+$err  = $finish = '';
 $loop = Mojo::IOLoop->new;
 $loop->on(finish => sub { $finish++ });
 $loop->next_tick(sub { shift->stop_gracefully });

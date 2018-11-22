@@ -32,7 +32,7 @@ sub attr {
   my $self = shift;
 
   # Hash
-  my $tree = $self->tree;
+  my $tree  = $self->tree;
   my $attrs = $tree->[0] ne 'tag' ? {} : $tree->[2];
   return $attrs unless @_;
 
@@ -99,7 +99,7 @@ sub namespace {
 
 sub new {
   my $class = shift;
-  my $self = bless \Mojo::DOM::HTML->new, ref $class || $class;
+  my $self  = bless \Mojo::DOM::HTML->new, ref $class || $class;
   return @_ ? $self->parse(@_) : $self;
 }
 

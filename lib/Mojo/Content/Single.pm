@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Content';
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 
-has asset => sub { Mojo::Asset::Memory->new(auto_upgrade => 1) };
+has asset        => sub { Mojo::Asset::Memory->new(auto_upgrade => 1) };
 has auto_upgrade => 1;
 
 sub body_contains { shift->asset->contains(shift) >= 0 }

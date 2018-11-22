@@ -5,7 +5,7 @@ use Mojo::File 'path';
 use Mojo::Util 'getopt';
 
 has description => 'Upload distribution to CPAN';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;

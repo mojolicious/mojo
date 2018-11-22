@@ -43,7 +43,7 @@ my $id  = $loop->server(
     my ($loop, $stream) = @_;
     $stream->write($upgraded => sub { shift->write('321') });
     $stream->on(close => $end);
-    $stream->on(read => sub { $server .= pop });
+    $stream->on(read  => sub { $server .= pop });
   }
 );
 my $port = $loop->acceptor($id)->port;
@@ -53,7 +53,7 @@ $loop->client(
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => $end2);
-    $stream->on(read => sub { $client .= pop });
+    $stream->on(read  => sub { $client .= pop });
     $stream->timeout(0.5);
   }
 );
@@ -85,7 +85,7 @@ $id  = Mojo::IOLoop->server(
       }
     );
     $stream->on(error => sub { $server_err = pop });
-    $stream->on(read => sub { $server .= pop });
+    $stream->on(read  => sub { $server .= pop });
     $stream->timeout(0.5);
   }
 );
@@ -194,7 +194,7 @@ $id  = Mojo::IOLoop->server(
       }
     );
     $stream->on(error => sub { $server_err = pop });
-    $stream->on(read => sub { $server .= pop });
+    $stream->on(read  => sub { $server .= pop });
   }
 );
 $port = Mojo::IOLoop->acceptor($id)->port;

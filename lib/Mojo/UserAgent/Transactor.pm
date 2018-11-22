@@ -101,7 +101,7 @@ sub redirect {
     $new->req($clone);
   }
   else {
-    my $m = uc $req->method;
+    my $m       = uc $req->method;
     my $headers = $new->req->method($code == 303 || $m eq 'POST' ? 'GET' : $m)
       ->content->headers($req->headers->clone)->headers;
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
@@ -152,7 +152,7 @@ sub websocket {
 
   # New WebSocket transaction
   my $sub = ref $_[-1] eq 'ARRAY' ? pop : [];
-  my $tx = $self->tx(GET => @_);
+  my $tx  = $self->tx(GET => @_);
   my $req = $tx->req;
   $req->headers->sec_websocket_protocol(join ', ', @$sub) if @$sub;
 
@@ -189,7 +189,7 @@ sub _form {
 
   # Query parameters or urlencoded
   my $method = uc $req->method;
-  my @form = map { $_ => $form->{$_} } sort keys %$form;
+  my @form   = map { $_ => $form->{$_} } sort keys %$form;
   if ($method eq 'GET' || $method eq 'HEAD') { $req->url->query->merge(@form) }
   else {
     $req->body(
@@ -266,7 +266,7 @@ sub _parts {
     # Content-Disposition
     next unless defined $name;
     $name = url_escape $name, '"';
-    $name = encode $charset, $name if $charset;
+    $name = encode $charset,  $name if $charset;
     my $disposition = qq{form-data; name="$name"};
     $disposition .= qq{; filename="$filename"} if defined $filename;
     $headers->content_disposition($disposition);

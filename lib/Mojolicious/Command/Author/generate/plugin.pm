@@ -5,7 +5,7 @@ use Mojo::Util qw(camelize class_to_path);
 use Mojolicious;
 
 has description => 'Generate Mojolicious plugin directory structure';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, $name) = (shift, shift || 'MyPlugin');

@@ -95,7 +95,7 @@ C<$ref> to L</"register">.
     };
   }
 
-Note that this modules is EXPERIMENTAL and might change without warning!
+Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 FUNCTIONS
 
@@ -107,7 +107,7 @@ L<Mojo::DynamicMethods> implements the following functions.
 
 Registers the method C<$name> as eligible for dynamic dispatch for C<$class>,
 and sets C<$cb> to be looked up for C<$name> by reference C<$ref> in a dynamic
-method contructed by C<BUILD_DYNAMIC>.
+method constructed by C<BUILD_DYNAMIC>.
 
 =head1 SEE ALSO
 

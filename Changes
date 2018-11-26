@@ -1,5 +1,6 @@
 
-8.08  2018-11-22
+8.08  2018-11-26
+  - Added stat method to Mojo::File.
 
 8.07  2018-11-16
   - Fixed a bug that caused debug log messages to be generated for static files.

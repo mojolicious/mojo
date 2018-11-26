@@ -160,6 +160,10 @@ $dir = tempdir;
 eval { $dir->child('does_not_exist')->chmod(644) };
 like $@, qr/^Can't chmod file/, 'right error';
 
+# Stat
+$dir = tempdir;
+is $dir->child('test.txt')->spurt('1234')->stat->size, 4, 'right size';
+
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
 is_deeply path(__FILE__)->list->to_array,         [], 'no files';

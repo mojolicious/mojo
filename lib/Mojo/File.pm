@@ -15,6 +15,7 @@ use File::Find 'find';
 use File::Path ();
 use File::Spec::Functions
   qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
+use File::stat ();
 use File::Temp ();
 use IO::File   ();
 use Mojo::Collection;
@@ -131,6 +132,8 @@ sub spurt {
     or croak qq{Can't write to file "$$self": $!};
   return $self;
 }
+
+sub stat { File::stat::stat(${shift()}) }
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
@@ -430,6 +433,18 @@ Read all data at once from the file.
   $path = $path->spurt(@chunks_of_bytes);
 
 Write all data at once to the file.
+
+=head2 stat
+
+  my $stat = $path->stat;
+
+Return a L<File::stat> object for the path.
+
+  # Get file size
+  say path('/home/sri/.bashrc')->stat->size;
+
+  # Get file modification time
+  say path('/home/sri/.bashrc')->stat->mtime;
 
 =head2 tap
 

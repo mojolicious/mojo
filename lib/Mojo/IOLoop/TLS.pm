@@ -78,14 +78,14 @@ sub _expand {
 sub _tls {
   my ($self, $handle, $server) = @_;
 
-  return $self->_cleanup->emit(upgrade => delete $self->{handle})
-    if $server ? $handle->accept_SSL : $handle->connect_SSL;
-
   # Switch between reading and writing
-  my $err = $IO::Socket::SSL::SSL_ERROR;
-  if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
-  elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
-  return undef;
+  if (!($server ? $handle->accept_SSL : $handle->connect_SSL)) {
+    my $err = $IO::Socket::SSL::SSL_ERROR;
+    if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
+    elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
+  }
+
+  else { $self->_cleanup->emit(upgrade => delete $self->{handle}) }
 }
 
 1;

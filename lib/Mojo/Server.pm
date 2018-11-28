@@ -33,9 +33,9 @@ sub daemonize {
   POSIX::setsid or die "Can't start a new session: $!";
 
   # Close filehandles
-  open STDIN,  '</dev/null';
-  open STDOUT, '>/dev/null';
-  open STDERR, '>&STDOUT';
+  open STDIN,  '<',  '/dev/null';
+  open STDOUT, '>',  '/dev/null';
+  open STDERR, '>&', STDOUT;
 }
 
 sub load_app {

@@ -89,7 +89,7 @@ sub match {
 
   # Check routes
   $match->find($c => {method => $method, path => $path, websocket => $ws});
-  return unless my $route = $match->endpoint;
+  return undef unless my $route = $match->endpoint;
   $cache->set(
     "$method:$path:$ws" => {endpoint => $route, stack => $match->stack});
 }

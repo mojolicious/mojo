@@ -77,7 +77,7 @@ sub run {
   my $res     = $tx->result;
 
   # JSON Pointer
-  return unless defined $selector;
+  return undef unless defined $selector;
   return _json($buffer, $selector) if !length $selector || $selector =~ m!^/!;
 
   # Selector

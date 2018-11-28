@@ -104,7 +104,7 @@ sub _read {
   }
 
   # Retry
-  return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
+  return undef if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
   # Closed (maybe real error)
   $! == ECONNRESET ? $self->close : $self->emit(error => $!)->close;
@@ -116,14 +116,15 @@ sub _write {
   # Handle errors only when reading (to avoid timing problems)
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
-    return unless defined(my $written = $handle->syswrite($self->{buffer}));
+    return undef
+      unless defined(my $written = $handle->syswrite($self->{buffer}));
     $self->{written} += $written;
     $self->emit(write => substr($self->{buffer}, 0, $written, ''))->_again;
   }
 
   # Clear the buffer to free the underlying SV* memory
   undef $self->{buffer}, $self->emit('drain') unless length $self->{buffer};
-  return if $self->is_writing;
+  return undef if $self->is_writing;
   return $self->close if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0) if $self->{handle};
 }

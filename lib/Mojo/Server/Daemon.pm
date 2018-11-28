@@ -130,7 +130,7 @@ sub _finish {
 
   # Always remove connection for WebSockets
   my $c = $self->{connections}{$id};
-  return unless my $tx = $c->{tx};
+  return undef unless my $tx = $c->{tx};
   return $self->_remove($id) if $tx->is_websocket;
 
   # Finish transaction
@@ -155,7 +155,7 @@ sub _finish {
   return $self->_remove($id) if $tx->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return unless length(my $leftovers = $tx->req->content->leftovers);
+  return undef unless length(my $leftovers = $tx->req->content->leftovers);
   $tx = $c->{tx} = $self->_build_tx($id, $c);
   $tx->server_read($leftovers);
 }
@@ -232,7 +232,7 @@ sub _write {
 
   # Protect from resume event recursion
   my $c = $self->{connections}{$id};
-  return if !(my $tx = $c->{tx}) || $c->{writing};
+  return undef if !(my $tx = $c->{tx}) || $c->{writing};
   local $c->{writing} = 1;
   my $chunk = $tx->server_write;
   warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;

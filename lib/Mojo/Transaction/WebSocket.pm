@@ -74,7 +74,7 @@ sub parse_message {
   # Ping/Pong
   my $op = $frame->[4];
   return $self->send([1, 0, 0, 0, WS_PONG, $frame->[5]]) if $op == WS_PING;
-  return if $op == WS_PONG;
+  return undef if $op == WS_PONG;
 
   # Close
   if ($op == WS_CLOSE) {
@@ -91,7 +91,7 @@ sub parse_message {
   return $self->finish(1009) if length $self->{message} > $max;
 
   # No FIN bit (Continuation)
-  return unless $frame->[0];
+  return undef unless $frame->[0];
 
   # "permessage-deflate" extension (handshake and RSV1)
   my $msg = delete $self->{message};

@@ -39,7 +39,7 @@ sub new { shift->SUPER::new(handle => shift) }
 
 sub _cleanup {
   my $self = shift;
-  return unless my $reactor = $self->reactor;
+  return undef unless my $reactor = $self->reactor;
   $reactor->remove($self->{handle}) if $self->{handle};
   return $self;
 }
@@ -85,6 +85,7 @@ sub _tls {
   my $err = $IO::Socket::SSL::SSL_ERROR;
   if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
   elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
+  return undef;
 }
 
 1;

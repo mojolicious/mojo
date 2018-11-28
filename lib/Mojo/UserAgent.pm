@@ -224,7 +224,7 @@ sub _finish {
   my ($self, $id, $close) = @_;
 
   # Remove request timeout and finish transaction
-  return unless my $c = $self->{connections}{$id};
+  return undef unless my $c = $self->{connections}{$id};
   $c->{ioloop}->remove($c->{timeout}) if $c->{timeout};
   return $self->_reuse($id, $close) unless my $old = $c->{tx};
 

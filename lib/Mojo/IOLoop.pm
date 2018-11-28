@@ -189,15 +189,15 @@ sub _remove {
   my ($self, $id) = @_;
 
   # Timer
-  return unless my $reactor = $self->reactor;
-  return if $reactor->remove($id);
+  return undef unless my $reactor = $self->reactor;
+  return undef if $reactor->remove($id);
 
   # Acceptor
   return $self->_not_accepting->_maybe_accepting
     if delete $self->{acceptors}{$id};
 
   # Connection
-  return unless delete $self->{in}{$id} || delete $self->{out}{$id};
+  return undef unless delete $self->{in}{$id} || delete $self->{out}{$id};
   return $self->stop if $self->{stop} && !$self->_in;
   $self->_maybe_accepting;
   warn "-- $id <<< $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;

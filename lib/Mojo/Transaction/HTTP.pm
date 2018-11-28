@@ -9,12 +9,12 @@ sub client_read {
   # Skip body for HEAD request
   my $res = $self->res;
   $res->content->skip_body(1) if uc $self->req->method eq 'HEAD';
-  return unless $res->parse($chunk)->is_finished;
+  return undef unless $res->parse($chunk)->is_finished;
 
   # Unexpected 1xx response
   return $self->completed if !$res->is_info || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);
-  return unless length(my $leftovers = $res->content->leftovers);
+  return undef unless length(my $leftovers = $res->content->leftovers);
   $self->client_read($leftovers);
 }
 

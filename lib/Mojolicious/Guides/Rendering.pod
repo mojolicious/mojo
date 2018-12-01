@@ -809,10 +809,11 @@ that will vanish if they decide to reload the page they've been redirected to.
 
 You can use L<Mojolicious::Plugin::DefaultHelpers/"validation"> to validate
 C<GET> and C<POST> parameters submitted to your application. All unknown fields
-will be ignored by default, so you have to decide which should be required or
-optional before you can perform checks on their values. Every check is performed
-right away, so you can use the results immediately to build more advanced
-validation logic with methods like
+will be ignored by default, so you have to decide which should be
+L<required|Mojolicious::Validator::Validation/"required"> or
+L<optional|Mojolicious::Validator::Validation/"optional"> before you can perform
+checks on their values. Every check is performed right away, so you can use the
+results immediately to build more advanced validation logic with methods like
 L<Mojolicious::Validator::Validation/"is_valid">.
 
   use Mojolicious::Lite;
@@ -822,15 +823,18 @@ L<Mojolicious::Validator::Validation/"is_valid">.
 
     # Check if parameters have been submitted
     my $v = $c->validation;
-    return $c->render unless $v->has_data;
+    return $c->render('index') unless $v->has_data;
 
     # Validate parameters ("pass_again" depends on "pass")
     $v->required('user')->size(1, 20)->like(qr/^[a-z0-9]+$/);
     $v->required('pass_again')->equal_to('pass')
       if $v->optional('pass')->size(7, 500)->is_valid;
 
-    # Render confirmation if validation was successful
-    $c->render('thanks') unless $v->has_error;
+    # Check if validation failed
+    return $c->render('index') if $v->has_error;
+
+    # Render confirmation
+    $c->render('thanks');
   } => 'index';
 
   app->start;

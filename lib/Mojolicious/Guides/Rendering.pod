@@ -835,7 +835,7 @@ L<Mojolicious::Validator::Validation/"is_valid">.
 
     # Render confirmation
     $c->render('thanks');
-  } => 'index';
+  };
 
   app->start;
   __DATA__

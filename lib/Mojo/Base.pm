@@ -52,9 +52,10 @@ sub attr {
     Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
     # Very performance-sensitive code with lots of micro-optimizations
+    my $sub;
     if ($kv{weak}) {
       if (ref $value) {
-        my $sub = sub {
+        $sub = sub {
           return exists $_[0]{$attr}
             ? $_[0]{$attr}
             : (
@@ -65,40 +66,37 @@ sub attr {
           ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
           $_[0];
         };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
       }
       else {
-        my $sub = sub {
+        $sub = sub {
           return $_[0]{$attr} if @_ == 1;
           ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
           $_[0];
         };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
       }
     }
     elsif (ref $value) {
-      my $sub = sub {
+      $sub = sub {
         return
           exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
           if @_ == 1;
         $_[0]{$attr} = $_[1];
         $_[0];
       };
-      Mojo::Util::monkey_patch($class, $attr, $sub);
     }
     elsif (defined $value) {
-      my $sub = sub {
+      $sub = sub {
         return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
           if @_ == 1;
         $_[0]{$attr} = $_[1];
         $_[0];
       };
-      Mojo::Util::monkey_patch($class, $attr, $sub);
     }
     else {
-      Mojo::Util::monkey_patch($class, $attr,
-        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
+      $sub
+        = sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
     }
+    Mojo::Util::monkey_patch($class, $attr, $sub);
   }
 }
 

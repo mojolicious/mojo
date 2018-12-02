@@ -508,6 +508,9 @@ Stringify the path.
 Create file if it does not exist or change the modification and access time to
 the current time.
 
+  # Safely read file
+  say path('.bashrc')->touch->slurp;
+
 =head2 with_roles
 
   my $new_class = Mojo::File->with_roles('Mojo::File::Role::One');

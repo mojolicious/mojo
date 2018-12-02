@@ -1,5 +1,6 @@
 
 8.09  2018-12-02
+  - Added touch method to Mojo::File.
   - Added max_depth option to list_tree method in Mojo::File.
 
 8.08  2018-11-26

@@ -153,6 +153,13 @@ sub to_rel { $_[0]->new(abs2rel(${$_[0]}, $_[1])) }
 
 sub to_string {"${$_[0]}"}
 
+sub touch {
+  my $self = shift;
+  $self->open('>') unless -e $$self;
+  utime undef, undef, $$self or croak qq{Can't touch file "$$self": $!};
+  return $self;
+}
+
 sub with_roles { shift->Mojo::Base::with_roles(@_) }
 
 1;
@@ -493,6 +500,13 @@ L<Mojo::File> object.
   my $str = $path->to_string;
 
 Stringify the path.
+
+=head2 touch
+
+  $path = $path->touch;
+
+Create file if it does not exist or change the modification and access time to
+the current time.
 
 =head2 with_roles
 

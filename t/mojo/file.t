@@ -257,6 +257,18 @@ my @three = map { path($lib)->child(split '/') } (
 is_deeply path($lib)->list_tree({dir => 1, hidden => 1, max_depth => 3})
   ->map('to_string')->to_array, [@three], 'right files';
 
+# Touch
+$dir  = tempdir;
+$file = $dir->child('test.txt');
+ok !-e $file, 'file does not exist';
+ok -e $file->touch, 'file exists';
+is $file->spurt('test!')->slurp, 'test!', 'right content';
+is $file->touch->slurp, 'test!', 'right content';
+my $future = time + 1000;
+utime $future, $future, $file->to_string;
+is $file->stat->mtime, $future, 'right mtime';
+isnt $file->touch->stat->mtime, $future, 'different mtime';
+
 # I/O
 $dir  = tempdir;
 $file = $dir->child('test.txt')->spurt('just works!');

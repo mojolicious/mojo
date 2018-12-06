@@ -443,4 +443,8 @@ like $@, qr/Method "parse" not implemented by subclass/, 'right error';
 eval { Mojo::Cookie->to_string };
 like $@, qr/Method "to_string" not implemented by subclass/, 'right error';
 
+$cookies = Mojo::Cookie::Response->parse(
+  'foo=bar; Path=/; Expires=Tuesday, 09-Nov-99 23:12:40 GMT; SameSite=Lax');
+is $cookies->[0]->samesite, 'Lax', 'right samesite';
+
 done_testing();

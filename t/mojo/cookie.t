@@ -164,9 +164,14 @@ $cookie->max_age(60);
 $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->httponly(1);
+$cookie->samesite('Lax');
 is $cookie->to_string,
   '0="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
-  . ' path=/test; secure; HttpOnly; Max-Age=60', 'right format';
+  . ' path=/test; secure; HttpOnly; Max-Age=60; SameSite=Lax', 'right format';
+
+$cookies = Mojo::Cookie::Response->parse(
+  'foo=bar; Path=/; Expires=Tuesday, 09-Nov-99 23:12:40 GMT; SameSite=Lax');
+is $cookies->[0]->samesite, 'Lax', 'right samesite';
 
 # Empty response cookie
 is_deeply(Mojo::Cookie::Response->parse, [], 'no cookies');

@@ -4,9 +4,9 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires host_only httponly max_age path secure)];
+has [qw(domain expires host_only httponly max_age path samesite secure)];
 
-my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path samesite secure);
 
 sub parse {
   my ($self, $str) = @_;
@@ -55,6 +55,9 @@ sub to_string {
 
   # "Max-Age"
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
+
+  # "Same-Site"
+  if (defined(my $samesite = $self->samesite)) { $cookie .= "; SameSite=$samesite" }
 
   return $cookie;
 }
@@ -129,6 +132,16 @@ Max age for cookie.
   $cookie  = $cookie->path('/test');
 
 Cookie path.
+
+=head2 samesite
+
+  my $samesite = $cookie->samesite;
+  $cookie      = $cookie->samesite('Lax');
+
+SameSite option. prevents the browser from sending cookies along with cross-site
+requests. The B<Strict> option blocks all cross-site cookies, even for top-level
+navigation (such as clicking on links).  B<Lax> will only block cross-site
+cookies for cross-site resource requires, such as images.
 
 =head2 secure
 

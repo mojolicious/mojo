@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 
-has [qw(cookie_domain secure)];
+has [qw(cookie_domain secure samesite)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
@@ -55,7 +55,8 @@ sub store {
     expires  => $session->{expires},
     httponly => 1,
     path     => $self->cookie_path,
-    secure   => $self->secure
+    secure   => $self->secure,
+    samesite => $self->samesite
   };
   $c->signed_cookie($self->cookie_name, $value, $options);
 }

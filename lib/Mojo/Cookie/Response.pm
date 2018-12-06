@@ -4,9 +4,9 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires host_only httponly max_age path secure)];
+has [qw(domain expires host_only httponly max_age path secure samesite)];
 
-my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure samesite);
 
 sub parse {
   my ($self, $str) = @_;
@@ -55,6 +55,9 @@ sub to_string {
 
   # "Max-Age"
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
+
+  # "Same-Site"
+  if (defined(my $samesite = $self->samesite)) { $cookie .= "; SameSite=$samesite" }
 
   return $cookie;
 }
@@ -122,6 +125,11 @@ cookie.
   $cookie     = $cookie->max_age(60);
 
 Max age for cookie.
+
+=head2 samesite
+
+  my $samesite = $cookie->samesite;
+  $cookie       = $cookie->samesite('Lax');
 
 =head2 path
 

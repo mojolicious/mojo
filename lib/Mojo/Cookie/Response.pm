@@ -129,7 +129,13 @@ Max age for cookie.
 =head2 samesite
 
   my $samesite = $cookie->samesite;
-  $cookie       = $cookie->samesite('Lax');
+  $cookie      = $cookie->samesite('Lax');
+  # or
+  $cookie      = $cookie->samesite('Strict');
+
+SameSite flag, prevents the browser from sending cookies along with cross-site requests.
+The B<Strict> option blocks all cross-site cookies, even for top-level navigation (such as clicking on links).
+B<Lax> will only block cross-site cookies for cross-site resource requires, such as images.
 
 =head2 path
 

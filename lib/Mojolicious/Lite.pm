@@ -50,7 +50,7 @@ sub import {
   Mojo::UserAgent::Server->app($app) unless Mojo::UserAgent::Server->app;
 
   # Lite apps are strict!
-  unshift @_, 'Mojo::Base', -strict;
+  unshift @_, 'Mojo::Base', '-strict';
   goto &Mojo::Base::import;
 }
 

@@ -283,12 +283,6 @@ reason.
     say "We are done!";
   });
 
-=head2 new
-
-  my $promise = Mojo::Promise->new;
-
-Construct a new L<Mojo::Promise> object.
-
 =head2 race
 
   my $new = Mojo::Promise->race(@promises);

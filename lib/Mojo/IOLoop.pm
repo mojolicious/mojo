@@ -328,7 +328,8 @@ for all existing connections to be closed.
     ...
   });
 
-Emitted when the event loop is resetted.
+Emitted when the event loop is reset, this usually happens after the process is
+forked to clean up resources that cannot be shared.
 
 =head1 ATTRIBUTES
 

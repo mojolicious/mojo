@@ -75,7 +75,8 @@ ok($count > 1,  'more than one recurring event');
 ok($count < 10, 'less than ten recurring events');
 
 # Handle and reset
-my ($handle, $handle2);
+my ($handle, $handle2, $reset);
+Mojo::IOLoop->singleton->on(reset => sub { $reset++ });
 $id = Mojo::IOLoop->server(
   (address => '127.0.0.1') => sub {
     my ($loop, $stream) = @_;
@@ -101,6 +102,7 @@ ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
 ok !Mojo::IOLoop->stream($id2),  'stream has been removed';
 is $handle, $handle2, 'handles are equal';
 isa_ok $handle, 'IO::Socket', 'right reference';
+is $reset,      1,            'reset event has been emitted once';
 
 # The poll reactor stops when there are no events being watched anymore
 my $time = time;

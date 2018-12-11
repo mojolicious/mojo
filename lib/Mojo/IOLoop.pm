@@ -95,7 +95,7 @@ sub remove {
 }
 
 sub reset {
-  my $self = _instance(shift);
+  my $self = _instance(shift)->emit('reset');
   delete @$self{qw(accepting acceptors events in out stop)};
   $self->reactor->reset;
   $self->stop;
@@ -320,6 +320,15 @@ following new ones.
 
 Emitted when the event loop wants to shut down gracefully and is just waiting
 for all existing connections to be closed.
+
+=head2 reset
+
+  $loop->on(reset => sub {
+    my $loop = shift;
+    ...
+  });
+
+Emitted when the event loop is resetted.
 
 =head1 ATTRIBUTES
 

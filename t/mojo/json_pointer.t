@@ -15,6 +15,8 @@ ok $pointer->new({foo => {bar => undef}})->contains('/foo/bar'),
 # "contains" (string)
 $pointer = Mojo::JSON::Pointer->new('works');
 ok $pointer->contains(''), 'contains ""';
+ok !$pointer->contains('foo'), 'pointer without leading slash -> false';
+ok !$pointer->contains('/bar'), 'pointer to non-existent path -> false';
 ok !$pointer->contains('/'),    'does not contain "/"';
 ok !$pointer->contains('/foo'), 'does not contain "/foo"';
 ok $pointer->new('0')->contains(''), 'contains ""';
@@ -90,6 +92,8 @@ my $hash = {
 };
 $pointer = Mojo::JSON::Pointer->new($hash);
 is_deeply $pointer->get(''), $hash, 'empty pointer is whole document';
+is_deeply $pointer->get('foo'), undef, 'pointer without leading slash is undef';
+is_deeply $pointer->get('/bar'), undef, 'pointer to non-existent path is undef';
 is_deeply $pointer->get('/foo'), ['bar', 'baz'], '"/foo" is "["bar", "baz"]"';
 is $pointer->get('/foo/0'), 'bar', '"/foo/0" is "bar"';
 is $pointer->get('/'),      0,     '"/" is 0';

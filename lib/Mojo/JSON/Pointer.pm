@@ -12,7 +12,8 @@ sub _pointer {
   my ($self, $contains, $pointer) = @_;
 
   my $data = $self->data;
-  return $contains ? 1 : $data unless $pointer =~ s!^/!!;
+  return $contains ? 1 : $data if $pointer eq '';
+  return $contains ? 0 : undef unless $pointer =~ s!^/!!;
   for my $p (length $pointer ? (split '/', $pointer, -1) : ($pointer)) {
     $p =~ s!~1!/!g;
     $p =~ s/~0/~/g;

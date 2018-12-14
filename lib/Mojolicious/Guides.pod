@@ -216,6 +216,17 @@ checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck>
 will show you how to integrate background jobs into well-structured
 L<Mojolicious> applications.
 
+=item L<JSON::Validator>
+
+A data structure validation library based around
+L<JSON Schema|https://json-schema.org>. Use an elegant DSL to generate schemas
+to efficiently validate arbitrary Perl data structures with.
+
+And it comes with a great example application you can use for inspiration. The
+L<blog|https://github.com/mojolicious/json-validator/tree/master/examples/blog>
+will show you how to properly validate JSON submitted via Ajax requests to your
+REST APIs.
+
 =back
 
 =head1 REFERENCE

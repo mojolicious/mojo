@@ -1,5 +1,5 @@
 
-8.10  2018-12-11
+8.10  2018-12-15
   - Added reset event to Mojo::IOLoop.
 
 8.09  2018-12-02

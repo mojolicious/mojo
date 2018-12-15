@@ -191,10 +191,7 @@ PostgreSQL has to offer, generate CRUD queries from data structures, manage your
 database schema with migrations and build scalable real-time web applications
 with the publish/subscribe pattern.
 
-And it comes with two great
-L<example
-applications|https://github.com/mojolicious/mojo-pg/tree/master/examples/>
-you can use for inspiration. The minimal
+B<Examples:> The minimal
 L<chat|https://github.com/mojolicious/mojo-pg/tree/master/examples/chat.pl>
 application will show you how to scale WebSockets to multiple servers, and the
 well-structured
@@ -210,7 +207,7 @@ outside of the request/response lifecycle. Among those tasks you'll commonly
 find image resizing, spam filtering, HTTP downloads, building tarballs, warming
 caches and basically everything else you can imagine that's not super fast.
 
-And it comes with a great example application you can use for inspiration. The
+B<Examples:> The
 L<link
 checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck>
 will show you how to integrate background jobs into well-structured
@@ -220,12 +217,12 @@ L<Mojolicious> applications.
 
 A data structure validation library based around
 L<JSON Schema|https://json-schema.org>. Use an elegant DSL to generate schemas
-to efficiently validate arbitrary Perl data structures with.
+to efficiently validate arbitrary Perl data structures.
 
-And it comes with a great example application you can use for inspiration. The
+B<Examples:> The
 L<blog|https://github.com/mojolicious/json-validator/tree/master/examples/blog>
-will show you how to properly validate JSON submitted via Ajax requests to your
-REST APIs.
+application will show you how to properly validate JSON submitted via Ajax
+requests to your REST APIs.
 
 =back
 

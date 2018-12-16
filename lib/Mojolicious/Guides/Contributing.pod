@@ -88,6 +88,12 @@ official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
 now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>),
 to avoid unnecessary work and to increase its chances of getting accepted.
 
+To get early feedback and reviews for your code changes you can also open a
+B<work in progress> pull request. But you will have to declare a deadline after
+which the pull request should be considered finished or failed in the
+description. Otherwise all pull requests are considered finished and ready for
+voting.
+
 The following mission statement and rules are the foundation of all L<Mojo> and
 L<Mojolicious> development. Please make sure that your contribution aligns well
 with them before sending a pull request.

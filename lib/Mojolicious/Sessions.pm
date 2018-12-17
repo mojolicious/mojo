@@ -9,6 +9,7 @@ has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 has deserialize        => sub { \&Mojo::JSON::j };
+has samesite           => 'Lax';
 has serialize          => sub { \&Mojo::JSON::encode_json };
 
 sub load {
@@ -55,7 +56,7 @@ sub store {
     expires  => $session->{expires},
     httponly => 1,
     path     => $self->cookie_path,
-    samesite => 'Lax',
+    samesite => $self->samesite,
     secure   => $self->secure,
   };
   $c->signed_cookie($self->cookie_name, $value, $options);
@@ -140,6 +141,39 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
     my $bytes = shift;
     return {};
   });
+
+=head2 samesite
+
+  my $str   = $sessions->samesite;
+  $sessions = $sessions->samesite('Lax')
+
+SameSite attribute for session cookies.
+
+This attribute is used to control when the browser is allowed to send cookies
+for cross-site requests.
+
+
+=over 4
+
+=item C<"Lax">
+
+This is the default value.
+
+Cookies will be sent for clicking on links and for C<method="get"> forms. They
+will not be sent for cross-site images, iframes, ajax, and C<method="post">
+forms.
+
+=item C<"Strict">
+
+Cookies will never be sent for cross-site requests. Even when the user follows a
+link to the application, the session cookies will not be sent.
+
+=item C<undef>
+
+Cookies will be sent for all cross-site requests. This is the traditional
+behavior of cookies.
+
+=back
 
 =head2 secure
 

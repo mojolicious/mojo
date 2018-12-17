@@ -633,7 +633,16 @@ $t->get_ok('/shortcut/act')->status_is(200)
 # Session with domain
 $t->get_ok('/foo/session')->status_is(200)
   ->header_like('Set-Cookie' => qr/; domain=\.example\.com/)
+  ->header_like('Set-Cookie' => qr/; SameSite=Lax/)
   ->header_like('Set-Cookie' => qr!; path=/bar!)->content_is('Bender rockzzz!');
+
+$t->app->sessions->samesite('Strict');
+$t->get_ok('/foo/session')
+  ->header_like('Set-Cookie' => qr/; SameSite=Strict/);
+
+$t->app->sessions->samesite(undef);
+$t->get_ok('/foo/session')
+  ->header_unlike('Set-Cookie' => qr/; SameSite=/);
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')

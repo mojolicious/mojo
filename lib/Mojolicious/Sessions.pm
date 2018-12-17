@@ -152,7 +152,6 @@ SameSite attribute for session cookies.
 This attribute is used to control when the browser is allowed to send cookies
 for cross-site requests.
 
-
 =over 4
 
 =item C<"Lax">

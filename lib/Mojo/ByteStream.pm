@@ -48,8 +48,8 @@ sub secure_compare { Mojo::Util::secure_compare ${shift()}, shift }
 sub size { length ${$_[0]} }
 
 sub split {
-  my ($self, $pattern) = @_;
-  return Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
+  my ($self, $pat, $lim) = (shift, shift, shift // 0);
+  return Mojo::Collection->new(map { $self->new($_) } split $pat, $$self, $lim);
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }
@@ -274,12 +274,16 @@ Generate URL slug for bytestream with L<Mojo::Util/"slugify">.
 =head2 split
 
   my $collection = $stream->split(',');
+  my $collection = $stream->split(',', -1);
 
 Turn bytestream into L<Mojo::Collection> object containing L<Mojo::ByteStream>
 objects.
 
   # "One,Two,Three"
   b("one,two,three")->split(',')->map('camelize')->join(',');
+
+  # "One,Two,Three,,,"
+  b("one,two,three,,,")->split(',', -1)->map('camelize')->join(',');
 
 =head2 tap
 

@@ -78,6 +78,8 @@ sub list_tree {
   return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
 }
 
+sub lstat { File::stat::lstat(${shift()}) }
+
 sub make_path {
   my $self = shift;
   File::Path::make_path $$self, @_;
@@ -368,6 +370,18 @@ Include hidden files and directories.
 Maximum number of levels to descend when searching for files.
 
 =back
+
+=head2 lstat
+
+  my $stat = $path->lstat;
+
+Return a L<File::stat> object for the symlink.
+
+  # Get symlink size
+  say path('/usr/sbin/sendmail')->lstat->size;
+
+  # Get symlink modification time
+  say path('/usr/sbin/sendmail')->lstat->mtime;
 
 =head2 make_path
 

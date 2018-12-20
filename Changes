@@ -1,4 +1,6 @@
 
+8.11  2018-12-20
+
 8.10  2018-12-18
   - Added reset event to Mojo::IOLoop.
   - Added limit argument to split method in Mojo::ByteStream. (s1037989)

@@ -22,8 +22,9 @@
         #raptor {
           background-size: contain;
           width: 100%;
-          left: 0;
-          margin-left: 0;
+          height: 100vh;
+          margin: 0;
+          position: static;
         }
       }
     </style>

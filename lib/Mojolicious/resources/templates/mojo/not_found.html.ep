@@ -25,10 +25,9 @@
     </style>
   </head>
   <body>
-    %= link_to url_for->base => begin
+    %= link_to url_for->base, id => 'notfound', begin
       %= image '/mojo/noraptor.png', alt => 'Bye!', id => 'noraptor'
     % end
-    <div id="notfound"></div>
   </body>
 </html>
 <!-- a padding to disable MSIE and Chrome friendly error page -->

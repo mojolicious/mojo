@@ -4,6 +4,7 @@
   <head>
     % my $title = stash('exception') ? 'Server error' : 'Page not found';
     <title><%= $title %> (<%= app->mode %> mode)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
@@ -82,14 +83,12 @@
         font-weight: 300;
         margin: 0;
         text-shadow: #333 0 1px 0;
+        word-break: word-break;
+        margin-top: 60px;
       }
       #footer {
         padding-top: 0.5em;
         text-align: center;
-      }
-      #nothing {
-        border-bottom: 0;
-        padding-top: 60px;
       }
       #showcase {
         border-bottom: 0;
@@ -127,6 +126,17 @@
         max-width: 1000px;
         margin: 0 auto;
       }
+      @media (max-width: 900px) {
+        .box {
+          overflow-x: auto;
+          padding: 0.5em;
+        }
+        .spaced {
+          margin: 0;
+          border: 0;
+          border-radius: 0 !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -155,7 +165,6 @@
         </tr>
       % end
       % if (my $exception = stash 'exception') {
-        <div id="nothing" class="box spaced"></div>
         % my $cv = begin
           % my ($key, $value, $i) = @_;
           %= tag 'tr', $i ? (class => 'important') : (), begin

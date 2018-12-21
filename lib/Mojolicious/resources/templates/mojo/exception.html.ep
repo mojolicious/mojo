@@ -3,17 +3,28 @@
 <html>
   <head>
     <title>Server error</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
       body { background-color: #caecf6 }
       #raptor {
         background: url(<%= url_for '/mojo/failraptor.png' %>);
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        width: 743px;
         height: 488px;
-        left: 50%;
         margin-left: -371px;
         margin-top: -244px;
-        position:absolute;
+        position: absolute;
         top: 50%;
-        width: 743px;
+        left: 50%;
+      }
+      @media (max-width: 700px) {
+        #raptor {
+          background-size: contain;
+          width: 100%;
+          left: 0;
+          margin-left: 0;
+        }
       }
     </style>
   </head>

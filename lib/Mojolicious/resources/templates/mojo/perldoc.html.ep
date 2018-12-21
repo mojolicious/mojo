@@ -3,6 +3,7 @@
 <html>
   <head>
     <title><%= $title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     %= javascript '/mojo/prettify/run_prettify.js'
     <style>
       a { color: inherit }

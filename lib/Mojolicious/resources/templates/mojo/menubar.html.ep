@@ -50,6 +50,71 @@
     }
     #mojobar-links form { display: inline }
     .animated { transition: all 0.25s ease }
+    @media (max-width: 900px) {
+      #mojobar.open {
+        overflow: visible;
+        box-shadow: none;
+        transform: translateY(0) !important; /* prevent for being hidden on scroll */
+      }
+      #mojobar-brand {
+        line-height: 46px;
+        padding: 0 1rem;
+        display: block;
+        overflow: visible;
+      }
+      #mojobar-brand img {
+        vertical-align: middle;
+      }
+      #mojobar-brand picture:after {
+        content: "\2261";
+        color: #f0f9fc;
+        font-size: 46px;
+        line-height: 16px;
+        text-align: center;
+        width: 28px;
+        height: 28px;
+        position: absolute;
+        top: 12px;
+        right: 1rem;
+        transition: transform 0.26s ease;
+        display: block;
+      }
+      #mojobar.open #mojobar-brand picture:after {
+        content: "\2715";
+        font-size: 26px;
+        line-height: 32px;
+        transform: rotate(180deg);
+      }
+      #mojobar-links {
+        background-color: #1a1a1a;
+        padding: 0.5rem 0 1rem 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        float: none !important;
+        display: block !important;
+        transform: scaleY(0);
+        transform-origin: top;
+        transition: transform 0.26s ease;
+        box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
+      }
+      #mojobar-links a {
+        font-size: 1rem !important;
+        padding: 0.3rem 1rem;
+        display: block;
+      }
+      #mojobar-links input {
+        font-size: 1rem !important;
+        margin: 0.3rem 1rem !important;
+        width: calc(100% - 2rem) !important;
+        display: block !important;
+      }
+      #mojobar-links input:focus {
+        background-color: #eee !important;
+      }
+      #mojobar.open #mojobar-links {
+        transform: scaleY(1);
+      }
+    }
   </style>
   %= link_to 'https://mojolicious.org' => (id => 'mojobar-brand') => begin
     <picture>
@@ -86,6 +151,11 @@
       $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
     }
   }
+  document.querySelector("#mojobar-brand").addEventListener("click", function (e) {
+    if (window.innerWidth > 900) return;
+    e.preventDefault();
+    document.querySelector("#mojobar").classList.toggle("open");
+  });
   $(window).on('load', function () {
     if (window.location.hash) {
       fixOffset();

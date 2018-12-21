@@ -54,7 +54,6 @@
       #mojobar.open {
         overflow: visible;
         box-shadow: none;
-        transform: translateY(0) !important; /* prevent for being hidden on scroll */
       }
       #mojobar-brand {
         line-height: 46px;
@@ -166,7 +165,7 @@
     var hidden = mojobarHeight + 1;
     $(window).on('scroll', function () {
       var st = $(window).scrollTop();
-      if (fixed) {
+      if (fixed && !mojobar.hasClass('open')) {
         if (st <= start) {
           fixed = false;
           mojobar.removeClass('animated');

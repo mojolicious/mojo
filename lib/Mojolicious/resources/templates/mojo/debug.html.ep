@@ -48,6 +48,9 @@
         border-collapse: collapse;
         width: 100%;
       }
+      td, th {
+        text-align: left;
+      }
       td { padding: 0.5em }
       .box {
         background-color: #fff;

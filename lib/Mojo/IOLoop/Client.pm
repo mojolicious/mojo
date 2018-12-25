@@ -45,21 +45,24 @@ sub connect {
     if !NNR || $args->{handle} || $args->{path};
 
   # Non-blocking name resolution
-  $NDN //= Net::DNS::Native->new(pool => 5, extra_thread => 1);
-  my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
-    {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
-  $reactor->io(
-    $handle => sub {
-      my $reactor = shift;
+  $reactor->next_tick(sub {
+    my $reactor = shift;
+    $NDN //= Net::DNS::Native->new(pool => 5, extra_thread => 1);
+    my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
+      {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
+    $reactor->io(
+      $handle => sub {
+        my $reactor = shift;
 
-      $reactor->remove($self->{dns});
-      my ($err, @res) = $NDN->get_result(delete $self->{dns});
-      return $self->emit(error => "Can't resolve: $err") if $err;
+        $reactor->remove($self->{dns});
+        my ($err, @res) = $NDN->get_result(delete $self->{dns});
+        return $self->emit(error => "Can't resolve: $err") if $err;
 
-      $args->{addr_info} = \@res;
-      $self->_connect($args);
-    }
-  )->watch($handle, 1, 0);
+        $args->{addr_info} = \@res;
+        $self->_connect($args);
+      }
+    )->watch($handle, 1, 0);
+  });
 }
 
 sub _cleanup {

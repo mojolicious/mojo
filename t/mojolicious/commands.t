@@ -217,6 +217,15 @@ $buffer = '';
   $eval->run('-v', 'app->controller_class');
 }
 like $buffer, qr/Mojolicious::Controller/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $eval->run('-v', 'Mojo::Promise->new->resolve("Zoidberg")');
+}
+like $buffer, qr/Zoidberg/, 'right output';
+eval { $eval->run('-v', 'Mojo::Promise->new->reject("DOOM")') };
+like $@, qr/DOOM/, 'right output';
 
 # generate
 require Mojolicious::Command::Author::generate;

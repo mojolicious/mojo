@@ -9,6 +9,7 @@ has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 has deserialize        => sub { \&Mojo::JSON::j };
+has samesite           => 'Lax';
 has serialize          => sub { \&Mojo::JSON::encode_json };
 
 sub load {
@@ -55,6 +56,7 @@ sub store {
     expires  => $session->{expires},
     httponly => 1,
     path     => $self->cookie_path,
+    samesite => $self->samesite,
     secure   => $self->secure
   };
   $c->signed_cookie($self->cookie_name, $value, $options);
@@ -139,6 +141,19 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
     my $bytes = shift;
     return {};
   });
+
+=head2 samesite
+
+  my $samesite = $sessions->samesite;
+  $sessions    = $sessions->samesite('Strict');
+
+Set the SameSite value on all session cookies, defaults to C<Lax>. Note that
+this attribute is EXPERIMENTAL because even though most commonly used browsers
+support the feature, there is no specification yet besides
+L<this draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
+
+  # Disable SameSite feature
+  $sessions->samesite(undef);
 
 =head2 secure
 

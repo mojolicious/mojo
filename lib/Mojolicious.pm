@@ -553,6 +553,9 @@ session data.
   # Change name of cookie used for all sessions
   $app->sessions->cookie_name('mysession');
 
+  # Disable SameSite feature
+  $app->sessions->samesite(undef);
+
 =head2 static
 
   my $static = $app->static;

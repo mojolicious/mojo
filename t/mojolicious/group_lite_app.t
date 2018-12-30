@@ -272,7 +272,15 @@ like $log, qr/Cookie "foo" is not signed/,       'right message';
 like $log, qr/Cookie "bad" has a bad signature/, 'right message';
 ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
+is $t->tx->res->cookie('mojolicious')->samesite, 'Lax', 'right SameSite value';
 $t->app->log->unsubscribe(message => $cb);
+$t->app->sessions->samesite('Strict');
+$t->get_ok('/bridge2stash')->status_is(200);
+is $t->tx->res->cookie('mojolicious')->samesite, 'Strict',
+  'right SameSite value';
+$t->app->sessions->samesite(undef);
+$t->get_ok('/bridge2stash')->status_is(200);
+is $t->tx->res->cookie('mojolicious')->samesite, undef, 'no SameSite value';
 
 # Broken session cookie
 $t->reset_session;

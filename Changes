@@ -1,5 +1,8 @@
 
-8.11  2018-12-20
+8.11  2018-12-30
+  - Added EXPERIMENTAL support for SameSite cookies. (dylanwh, sri)
+  - Added EXPERIMENTAL samesite attributes to Mojo::Cookie::Response and
+    Mojolicious::Cookies. (dylanwh, sri)
   - Added lstat method to Mojo::File. (Grinnz)
 
 8.10  2018-12-18

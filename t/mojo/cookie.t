@@ -164,9 +164,10 @@ $cookie->max_age(60);
 $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->httponly(1);
+$cookie->samesite('Lax');
 is $cookie->to_string,
   '0="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
-  . ' path=/test; secure; HttpOnly; Max-Age=60', 'right format';
+  . ' path=/test; secure; HttpOnly; SameSite=Lax; Max-Age=60', 'right format';
 
 # Empty response cookie
 is_deeply(Mojo::Cookie::Response->parse, [], 'no cookies');
@@ -370,6 +371,18 @@ is $cookies->[0]->secure,  1,             'right secure flag';
 is $cookies->[0]->to_string,
   'foo=; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
   . ' path=/test; secure; Max-Age=60', 'right result';
+is $cookies->[1], undef, 'no more cookies';
+
+# Parse response cookie with SameSite value
+$cookies = Mojo::Cookie::Response->parse(
+  'foo=bar; Path=/; Expires=Tuesday, 09-Nov-99 23:12:40 GMT; SameSite=Lax');
+is $cookies->[0]->name,     'foo',     'right name';
+is $cookies->[0]->value,    'bar',     'right value';
+is $cookies->[0]->domain,   undef,     'no domain';
+is $cookies->[0]->path,     '/',       'right path';
+is $cookies->[0]->max_age,  undef,     'no max age value';
+is $cookies->[0]->expires,  942189160, 'right expires value';
+is $cookies->[0]->samesite, 'Lax',     'right samesite value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie with broken Expires and Domain values

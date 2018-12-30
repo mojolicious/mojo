@@ -4,9 +4,10 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires host_only httponly max_age path secure)];
+has [qw(domain expires host_only httponly max_age path samesite secure)];
 
-my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path secure);
+my %ATTRS
+  = map { $_ => 1 } qw(domain expires httponly max-age path samesite secure);
 
 sub parse {
   my ($self, $str) = @_;
@@ -52,6 +53,9 @@ sub to_string {
 
   # "HttpOnly"
   $cookie .= "; HttpOnly" if $self->httponly;
+
+  # "Same-Site"
+  if (my $samesite = $self->samesite) { $cookie .= "; SameSite=$samesite" }
 
   # "Max-Age"
   if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
@@ -129,6 +133,16 @@ Max age for cookie.
   $cookie  = $cookie->path('/test');
 
 Cookie path.
+
+=head2 samesite
+
+  my $samesite = $cookie->samesite;
+  $cookie      = $cookie->samesite('Lax');
+
+SameSite value. Note that this attribute is EXPERIMENTAL because even though
+most commonly used browsers support the feature, there is no specification yet
+besides
+L<this draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
 
 =head2 secure
 

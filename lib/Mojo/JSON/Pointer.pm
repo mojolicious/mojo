@@ -3,16 +3,16 @@ use Mojo::Base -base;
 
 has 'data';
 
-sub contains { shift->_pointer(1, @_) }
-sub get      { shift->_pointer(0, @_) }
+sub contains { shift->_pointer(0, @_) }
+sub get      { shift->_pointer(1, @_) }
 
 sub new { @_ > 1 ? shift->SUPER::new(data => shift) : shift->SUPER::new }
 
 sub _pointer {
-  my ($self, $contains, $pointer) = @_;
+  my ($self, $get, $pointer) = @_;
 
   my $data = $self->data;
-  return $contains ? 1 : $data unless $pointer =~ s!^/!!;
+  return length $pointer ? undef : $get ? $data : 1 unless $pointer =~ s!^/!!;
   for my $p (length $pointer ? (split '/', $pointer, -1) : ($pointer)) {
     $p =~ s!~1!/!g;
     $p =~ s/~0/~/g;
@@ -29,7 +29,7 @@ sub _pointer {
     else { return undef }
   }
 
-  return $contains ? 1 : $data;
+  return $get ? $data : 1;
 }
 
 1;

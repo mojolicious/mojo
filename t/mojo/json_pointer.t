@@ -8,6 +8,7 @@ my $pointer = Mojo::JSON::Pointer->new({foo => 23, '' => 24});
 ok $pointer->contains(''),     'contains ""';
 ok $pointer->contains('/'),    'contains "/"';
 ok $pointer->contains('/foo'), 'contains "/foo"';
+ok !$pointer->contains('foo'),  '"foo" is invalid';
 ok !$pointer->contains('/bar'), 'does not contains "/bar"';
 ok $pointer->new({foo => {bar => undef}})->contains('/foo/bar'),
   'contains "/foo/bar"';
@@ -34,6 +35,7 @@ is_deeply $pointer->get(''), {foo => 'bar', '' => 'baz'},
   '"" is "{foo => "bar", "" => "baz"}"';
 is $pointer->get('/'),    'baz', '"/" is "baz"';
 is $pointer->get('/foo'), 'bar', '"/foo" is "bar"';
+is $pointer->get('foo'),  undef, '"foo" is invalid';
 is $pointer->new({foo => {bar => 42}})->get('/foo/bar'), 42,
   '"/foo/bar" is "42"';
 is_deeply $pointer->new({foo => {23 => {baz => 0}}})->get('/foo/23'),

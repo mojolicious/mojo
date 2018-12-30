@@ -5,6 +5,7 @@
   - Added EXPERIMENTAL samesite attributes to Mojo::Cookie::Response and
     Mojolicious::Cookies. (dylanwh, sri)
   - Added lstat method to Mojo::File. (Grinnz)
+  - Improved Mojo::JSON::Pointer to ignore many invalid JSON Pointers.
 
 8.10  2018-12-18
   - Added reset event to Mojo::IOLoop.

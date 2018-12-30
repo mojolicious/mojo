@@ -1,8 +1,8 @@
 package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
+use Mojo::Promise;
 use Mojo::Util 'getopt';
-use Scalar::Util 'blessed';
 
 has description => 'Run code against application';
 has usage       => sub { shift->extract_usage };
@@ -18,11 +18,10 @@ sub run {
   no warnings;
   my $result = eval "package main; sub app; local *app = sub { \$app }; $code";
   die $@ if $@;
-  if (blessed $result && $result->isa('Mojo::Promise')) {
-    my $err;
-    $result->then(sub { $result = shift }, sub { $err = shift })->wait;
-    die $err if $err;
-  }
+  my $err;
+  Mojo::Promise->resolve($result)
+    ->then(sub { $result = shift }, sub { $err = shift })->wait;
+  die $err if $err;
   return $result unless defined $result && ($v1 || $v2);
   $v2 ? print($app->dumper($result)) : say $result;
 }
@@ -56,7 +55,7 @@ Mojolicious::Command::eval - Eval command
 =head1 DESCRIPTION
 
 L<Mojolicious::Command::eval> runs code against applications. If the result is
-a L<Mojo::Promise>, it will wait until the promise is fulfilled or rejected and
+a promise (then-able), it will wait until the promise is fulfilled or rejected and
 the result is returned.
 
 This is a core command, that means it is always enabled and its code a good

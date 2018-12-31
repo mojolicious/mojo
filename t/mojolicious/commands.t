@@ -217,6 +217,8 @@ $buffer = '';
   $eval->run('-v', 'app->controller_class');
 }
 like $buffer, qr/Mojolicious::Controller/, 'right output';
+eval { $eval->run('-v', 'die "TEST"') };
+like $@, qr/TEST/, 'right output';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;

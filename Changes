@@ -1,10 +1,11 @@
 
-8.11  2018-12-30
+8.11  2018-12-31
   - Added EXPERIMENTAL support for SameSite cookies to better protect
     Mojolicious applications from CSRF attacks. (dylanwh, sri)
   - Added EXPERIMENTAL samesite attributes to Mojo::Cookie::Response and
     Mojolicious::Cookies. (dylanwh, sri)
   - Added lstat method to Mojo::File. (Grinnz)
+  - Improved eval command with support for promises. (jberger)
   - Improved Mojo::JSON::Pointer to ignore many invalid JSON Pointers.
 
 8.10  2018-12-18

@@ -1,6 +1,13 @@
 package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
+# Non-blocking name resolution requires Net::DNS::Native
+# This must be loaded before IO::Socket::IP
+use constant NNR => $ENV{MOJO_NO_NNR}
+  ? 0
+  : eval { require Net::DNS::Native; Net::DNS::Native->VERSION('0.15'); 1 };
+my $NDN;
+
 use Errno 'EINPROGRESS';
 use IO::Socket::IP;
 use IO::Socket::UNIX;
@@ -8,12 +15,6 @@ use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
-
-# Non-blocking name resolution requires Net::DNS::Native
-use constant NNR => $ENV{MOJO_NO_NNR}
-  ? 0
-  : eval { require Net::DNS::Native; Net::DNS::Native->VERSION('0.15'); 1 };
-my $NDN;
 
 # SOCKS support requires IO::Socket::Socks
 use constant SOCKS => $ENV{MOJO_NO_SOCKS}

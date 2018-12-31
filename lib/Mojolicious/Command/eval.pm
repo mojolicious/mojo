@@ -1,6 +1,7 @@
 package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
+use Mojo::Promise;
 use Mojo::Util 'getopt';
 
 has description => 'Run code against application';
@@ -16,7 +17,12 @@ sub run {
   my $app = $self->app;
   no warnings;
   my $result = eval "package main; sub app; local *app = sub { \$app }; $code";
-  return $@ ? die $@ : $result unless defined $result && ($v1 || $v2);
+  die $@ if $@;
+  my $err;
+  Mojo::Promise->resolve($result)
+    ->then(sub { $result = shift }, sub { $err = shift })->wait;
+  die $err if $err;
+  return $result unless defined $result && ($v1 || $v2);
   $v2 ? print($app->dumper($result)) : say $result;
 }
 
@@ -48,7 +54,9 @@ Mojolicious::Command::eval - Eval command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::eval> runs code against applications.
+L<Mojolicious::Command::eval> runs code against applications. If the result is
+a promise (then-able), it will wait until the promise is fulfilled or rejected and
+the result is returned.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.

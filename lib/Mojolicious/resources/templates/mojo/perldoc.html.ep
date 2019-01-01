@@ -98,7 +98,6 @@
     </style>
   </head>
   <body>
-    %= include 'mojo/menubar'
     <div id="wrapperlicious">
       <div id="perldoc">
         <div id="links">

@@ -50,9 +50,6 @@
         width: 100%;
       }
       td { padding: 0.5em }
-      .animated {
-        transition: all 0.25s ease;
-       }
       .box {
         background-color: #fff;
         border: 1px solid #c1c1c1;

@@ -67,21 +67,21 @@
       #mojobar-brand picture:after {
         content: "\2261";
         color: #f0f9fc;
-        font-size: 46px;
-        line-height: 16px;
+        font-size: 36px;
         text-align: center;
         width: 28px;
-        height: 28px;
+        height: 46px;
+        line-height: 46px;
+        vertical-align: middle;
         position: absolute;
-        top: 12px;
+        top: 0;
         right: 1rem;
         transition: transform 0.26s ease;
         display: block;
       }
       #mojobar.open #mojobar-brand picture:after {
         content: "\2715";
-        font-size: 26px;
-        line-height: 32px;
+        font-size: 30px;
         transform: rotate(180deg);
       }
       #mojobar-links {
@@ -150,10 +150,11 @@
       $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
     }
   }
-  document.querySelector("#mojobar-brand").addEventListener("click", function (e) {
-    if (window.innerWidth > 900) return;
-    e.preventDefault();
-    document.querySelector("#mojobar").classList.toggle("open");
+  $("#mojobar-brand").on("click", function (e) {
+    if (window.innerWidth <= 900) {
+      e.preventDefault();
+      $("#mojobar").toggleClass("open");
+    }
   });
   $(window).on('load', function () {
     if (window.location.hash) {

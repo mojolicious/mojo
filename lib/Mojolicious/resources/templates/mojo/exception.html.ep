@@ -4,7 +4,9 @@
   <head>
     <title>Server error</title>
     <style>
-      body { background-color: #caecf6 }
+      body {
+        background-color: #caecf6;
+      }
       #raptor {
         background: url(<%= url_for '/mojo/failraptor.png' %>);
         height: 488px;

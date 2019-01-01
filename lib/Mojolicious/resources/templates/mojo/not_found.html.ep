@@ -4,8 +4,12 @@
   <head>
     <title>Page not found</title>
     <style>
-      a img { border: 0 }
-      body { background-color: #caecf6 }
+      a img {
+        border: 0;
+      }
+      body {
+        background-color: #caecf6;
+      }
       #noraptor {
         left: 0%;
         position: fixed;

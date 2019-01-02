@@ -108,6 +108,13 @@ my $nextdir = $dir->child('foo', 'foobar')->make_path({error => \my $error});
 ok -d $nextdir, 'directory exists';
 ok $error, 'directory already existed';
 
+# Remove
+$dir = tempdir;
+$dir->child('test.txt')->spurt('test!');
+ok -e $dir->child('test.txt'), 'file exists';
+is $dir->child('test.txt')->slurp, 'test!', 'right content';
+ok !-e $dir->child('test.txt')->remove->touch->remove, 'file no longer exists';
+
 # Remove tree
 $dir = tempdir;
 $dir->child('foo', 'bar')->make_path->child('test.txt')->spurt('test!');

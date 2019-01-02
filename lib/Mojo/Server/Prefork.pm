@@ -17,19 +17,18 @@ has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
 has spare              => 2;
 has workers            => 4;
 
-sub DESTROY { unlink $_[0]->pid_file if $_[0]->cleanup }
+sub DESTROY { path($_[0]->pid_file)->remove if $_[0]->cleanup }
 
 sub check_pid {
-  my $file = shift->pid_file;
-  return undef unless open my $handle, '<', $file;
-  my $pid = <$handle>;
+  return undef unless -r (my $file = path(shift->pid_file));
+  my $pid = $file->slurp;
   chomp $pid;
 
   # Running
   return $pid if $pid && kill 0, $pid;
 
   # Not running
-  unlink $file;
+  $file->remove;
   return undef;
 }
 
@@ -37,15 +36,14 @@ sub ensure_pid_file {
   my ($self, $pid) = @_;
 
   # Check if PID file already exists
-  return if -e (my $file = $self->pid_file);
+  return if -e (my $file = path($self->pid_file));
 
   # Create PID file
-  $self->app->log->error(qq{Can't create process id file "$file": $!})
-    and die qq{Can't create process id file "$file": $!}
-    unless open my $handle, '>', $file;
+  if (my $err = eval { $file->spurt("$pid\n")->chmod(0644) } ? undef : $@) {
+    $self->app->log->error(qq{Can't create process id file "$file": $err})
+      and die qq{Can't create process id file "$file": $err};
+  }
   $self->app->log->info(qq{Creating process id file "$file"});
-  chmod 0644, $handle;
-  print $handle "$pid\n";
 }
 
 sub healthy {

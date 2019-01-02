@@ -92,7 +92,7 @@ sub _finish {
   return unless my $new = $self->{new};
 
   my $prefork = $self->prefork->cleanup(0);
-  unlink $prefork->pid_file;
+  path($prefork->pid_file)->remove;
   $prefork->ensure_pid_file($new);
 }
 

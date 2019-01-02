@@ -34,7 +34,7 @@ sub DESTROY {
   if (my $handle = $self->handle) { close $handle }
 
   # Only the process that created the file is allowed to remove it
-  unlink $path if -w $path && ($self->{pid} // $$) == $$;
+  Mojo::File->new($path)->remove if -w $path && ($self->{pid} // $$) == $$;
 }
 
 sub add_chunk {

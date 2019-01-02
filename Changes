@@ -5,6 +5,7 @@
   - Added EXPERIMENTAL samesite attributes to Mojo::Cookie::Response and
     Mojolicious::Cookies. (dylanwh, sri)
   - Added lstat method to Mojo::File. (Grinnz)
+  - Added remove method to Mojo::File.
   - Improved eval command with support for promises. (jberger)
   - Improved Mojo::JSON::Pointer to ignore many invalid JSON Pointers.
 

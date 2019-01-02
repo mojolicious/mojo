@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use IO::Socket::IP;
 use IO::Socket::UNIX;
+use Mojo::File 'path';
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
 use Scalar::Util 'weaken';
@@ -57,7 +58,7 @@ sub listen {
     # UNIX domain socket
     my $reuse;
     if ($path) {
-      unlink $path if -S $path;
+      path($path)->remove if -S $path;
       $options{Local} = $path;
       $handle = $class->new(%options) or croak "Can't create listen socket: $!";
       $reuse = $self->{reuse} = join ':', 'unix', $path, fileno $handle;

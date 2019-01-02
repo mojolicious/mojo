@@ -1,4 +1,6 @@
 
+8.12  2019-01-02
+
 8.11  2019-01-01
   - Added EXPERIMENTAL support for SameSite cookies to better protect
     Mojolicious applications from CSRF attacks. (dylanwh, sri)

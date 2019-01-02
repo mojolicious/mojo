@@ -97,6 +97,13 @@ is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
 $file->spurt(encode('UTF-8', '♥'));
 $handle = $file->open('<:encoding(UTF-8)');
 is_deeply [<$handle>], ['♥'], 'right structure';
+$dir = tempdir;
+eval { $dir->child('does_not_exist')->open('<') };
+like $@, qr/^Can't open file/, 'right error';
+eval { $dir->child('does_not_exist')->slurp };
+like $@, qr/^Can't open file/, 'right error';
+eval { $dir->child('foo')->make_path->spurt('fail') };
+like $@, qr/^Can't open file/, 'right error';
 
 # Make path
 $dir = tempdir;
@@ -113,7 +120,10 @@ $dir = tempdir;
 $dir->child('test.txt')->spurt('test!');
 ok -e $dir->child('test.txt'), 'file exists';
 is $dir->child('test.txt')->slurp, 'test!', 'right content';
-ok !-e $dir->child('test.txt')->remove->touch->remove, 'file no longer exists';
+ok !-e $dir->child('test.txt')->remove->touch->remove->remove,
+  'file no longer exists';
+eval { $dir->child('foo')->make_path->remove };
+like $@, qr/^Can't remove file/, 'right error';
 
 # Remove tree
 $dir = tempdir;

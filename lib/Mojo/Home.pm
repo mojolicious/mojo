@@ -1,7 +1,7 @@
 package Mojo::Home;
 use Mojo::Base 'Mojo::File';
 
-use Mojo::Util qw(class_to_path deprecated);
+use Mojo::Util 'class_to_path';
 
 sub detect {
   my ($self, $class) = @_;
@@ -19,12 +19,6 @@ sub detect {
 
   $$self = Mojo::File->new(@$home)->to_abs->to_string if $home;
   return $self;
-}
-
-# DEPRECATED!
-sub mojo_lib_dir {
-  deprecated 'Mojo::Home::mojo_lib_dir is DEPRECATED';
-  shift->new(__FILE__)->sibling('..');
 }
 
 sub rel_file { shift->child(split('/', shift)) }

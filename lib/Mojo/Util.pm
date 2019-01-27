@@ -602,7 +602,8 @@ failed.
   deprecated 'foo is DEPRECATED in favor of bar';
 
 Warn about deprecated feature from perspective of caller. You can also set the
-C<MOJO_FATAL_DEPRECATIONS> environment variable to make them die instead.
+C<MOJO_FATAL_DEPRECATIONS> environment variable to make them die instead with
+L<Carp>.
 
 =head2 dumper
 

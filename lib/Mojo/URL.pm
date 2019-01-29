@@ -58,15 +58,13 @@ sub parse {
   my ($self, $url) = @_;
 
   # Official regex from RFC 3986
-  $url =~ m!^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
+  $url =~ m!^(?:([^:/?#]+):)?(?://(?:([^@/]+?)\@)?([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
   $self->scheme($1)                         if defined $1;
-  $self->path($3)                           if defined $3;
-  $self->query($4)                          if defined $4;
-  $self->fragment(_decode(url_unescape $5)) if defined $5;
-  if (defined(my $auth = $2)) {
-    $self->userinfo(_decode(url_unescape $1)) if $auth =~ s/^([^\@]+)\@//;
-    $self->host_port($auth);
-  }
+ 	$self->userinfo(_decode(url_unescape $2)) if defined $2;
+	$self->host_port($3);
+  $self->path($4)                           if defined $4;
+  $self->query($5)                          if defined $5;
+  $self->fragment(_decode(url_unescape $6)) if defined $6;
 
   return $self;
 }

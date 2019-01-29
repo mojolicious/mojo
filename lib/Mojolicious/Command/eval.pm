@@ -19,10 +19,7 @@ sub run {
   die $@ if $@;
 
   # Handle promises
-  my $err;
-  Mojo::Promise->resolve($result)
-    ->then(sub { $result = shift }, sub { $err = shift })->wait;
-  die $err if $err;
+  $result = Mojo::Promise->resolve($result)->get_one;
 
   return $result unless defined $result && ($v1 || $v2);
   $v2 ? print($app->dumper($result)) : say $result;

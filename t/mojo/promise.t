@@ -224,4 +224,38 @@ Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
   'promises rejected';
 
+# Get
+$promise = Mojo::Promise->new->resolve('early');
+is_deeply $promise->get_all, ['early'], 'promise resolved';
+is $promise->get_one, 'early', 'promise resolved';
+$promise = Mojo::Promise->new->resolve('hello', 'world');
+is_deeply $promise->get_all, ['hello', 'world'], 'promise resolved';
+is $promise->get_one, 'hello', 'promise resolved';
+$promise = Mojo::Promise->new->resolve;
+is_deeply $promise->get_all, [], 'promise resolved';
+is $promise->get_one, undef, 'promise resolved';
+$promise = Mojo::Promise->new->resolve('test');
+is $promise->then(sub {"$_[0]:1"})->then(sub {"$_[0]:2"})->get_one, 'test:1:2',
+  'promises resolved';
+$promise  = Mojo::Promise->new->resolve('first');
+$promise2 = Mojo::Promise->new->resolve('second');
+is $promise->then(sub {$promise2})->get_one, 'second', 'promises resolved';
+$promise = Mojo::Promise->new->reject('early');
+ok !eval { $promise->get_one }, 'promise rejected';
+like $@, qr/early/, 'right error';
+$promise = Mojo::Promise->new->reject;
+ok !eval { $promise->get_one }, 'promise rejected';
+like $@, qr/rejected/, 'right error';
+$promise  = Mojo::Promise->new->resolve('hello');
+$promise2 = Mojo::Promise->new;
+Mojo::IOLoop->next_tick(sub {
+  $promise2->resolve(eval { $promise->get_one } || $@);
+});
+like $promise2->get_one, qr/event loop is running/, 'right error';
+$loop = Mojo::IOLoop->new;
+$promise  = Mojo::Promise->new(ioloop => $loop)->resolve('hello');
+$promise2 = Mojo::Promise->new;
+Mojo::IOLoop->next_tick(sub { $promise2->resolve($promise->get_one) });
+is $promise2->get_one, 'hello', 'promises resolved';
+
 done_testing();

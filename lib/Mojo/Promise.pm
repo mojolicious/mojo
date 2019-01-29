@@ -1,6 +1,7 @@
 package Mojo::Promise;
 use Mojo::Base -base;
 
+use Carp 'croak';
 use Mojo::IOLoop;
 use Scalar::Util 'blessed';
 
@@ -40,6 +41,20 @@ sub finally {
 
   return $new;
 }
+
+sub get_all {
+  my $self = shift;
+  croak q{'get' cannot be called when the event loop is running}
+    if $self->ioloop->is_running;
+  my ($res, $err);
+  my $p = $self->then(sub { $res = [@_] }, sub { $err = [@_] });
+  $p->wait until $res or $err;
+  return $res if $res;
+  my $reason = $err->[0] // 'Promise rejected';
+  ref($reason) || $reason =~ m/\n\z/ ? die $reason : croak $reason;
+}
+
+sub get_one { shift->get_all->[0] }
 
 sub race {
   my ($class, @promises) = @_;
@@ -175,6 +190,12 @@ Mojo::Promise - Promises/A+
     warn "Something went wrong: $err";
   })->wait;
 
+  # Get results synchronously or throw exception if rejected
+  my $mojo = get('https://mojolicious.org');
+  my $cpan = get('https://metacpan.org');
+  my $responses = Mojo::Promise->all($mojo, $cpan)->get_all;
+  say $_->[0]->res->code for @$responses;
+
 =head1 DESCRIPTION
 
 L<Mojo::Promise> is a Perl-ish implementation of
@@ -282,6 +303,21 @@ reason.
     my @value_or_reason = @_;
     say "We are done!";
   });
+
+=head2 get_all
+
+  my $results = $promise->get_all;
+
+Start L</"ioloop"> and stop it again once the promise has been fulfilled or
+rejected, then return the results in an array reference if it was fulfilled, or
+throw an exception with the reason if it was rejected. An exception will be
+thrown if the L</"ioloop"> is already running.
+
+=head2 get_one
+
+  my $result = $promise->get_one;
+
+Similar to L</"get_all">, but returns the first result value.
 
 =head2 race
 

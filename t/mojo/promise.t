@@ -134,7 +134,7 @@ is_deeply \@results, ['pass'], 'promise resolved';
 
 # Clone
 my $loop = Mojo::IOLoop->new;
-$promise = Mojo::Promise->new(ioloop => $loop)->resolve('failed');
+$promise  = Mojo::Promise->new(ioloop => $loop)->resolve('failed');
 $promise2 = $promise->clone;
 (@results, @errors) = ();
 $promise2->then(sub { @results = @_ }, sub { @errors = @_ });

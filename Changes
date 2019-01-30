@@ -3,6 +3,7 @@
   - Added EXPERIMENTAL timeout method to Mojo::Promise. (batman)
   - Removed deprecated module Mojolicious::Plugin::PODRenderer.
   - Removed deprecated method mojo_lib_dir from Mojo::Home.
+  - Fixed rare warning in Mojo::Log. (Grinnz)
 
 8.11  2019-01-01
   - Added EXPERIMENTAL support for SameSite cookies to better protect

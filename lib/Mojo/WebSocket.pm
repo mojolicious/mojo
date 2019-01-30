@@ -276,6 +276,13 @@ Opcode for C<Pong> frames.
 
 Opcode for C<Text> frames.
 
+=head1 DEBUGGING
+
+You can set the C<MOJO_WEBSOCKET_DEBUG> environment variable to get some
+advanced diagnostics information printed to C<STDERR>.
+
+  MOJO_WEBSOCKET_DEBUG=1
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.

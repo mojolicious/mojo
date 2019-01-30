@@ -52,6 +52,8 @@ like $log->format->(time, 'debug', qw(Test 1 2 3)),
   qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
 like $log->format->(time, 'error', 'I ♥ Mojolicious'),
   qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
+like $log->format->(CORE::time, 'error', 'I ♥ Mojolicious'),
+  qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
 $log->format(sub {
   my ($time, $level, @lines) = @_;
   return join ':', $level, $time, @lines;

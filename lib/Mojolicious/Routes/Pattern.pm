@@ -113,7 +113,7 @@ sub _compile {
     # Placeholder
     else {
       if ($value =~ /^(.+)\Q$start\E(.+)$/) {
-        ($value, $part) = ($1, _compile_req($types->{$2} // '?!'));
+        ($value, $part) = ($1, _compile_req($types->{$2} // die qq{Unknown route type "$2"}));
       }
       else {
         $part = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)';

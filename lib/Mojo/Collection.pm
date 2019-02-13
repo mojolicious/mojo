@@ -9,13 +9,12 @@ use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');
 
-sub TO_JSON { [@{shift()}] }
+sub TO_JSON { [@{$_[0]}] }
 
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
-  my $self = shift;
-  return $self->new(grep { defined && (ref || length) } @$self);
+  return $_[0]->new(grep { defined && (ref || length) } @{$_[0]});
 }
 
 sub each {
@@ -27,7 +26,7 @@ sub each {
 }
 
 sub first {
-  my ($self, $cb) = (shift, shift);
+  my ($self, $cb) = (CORE::shift, CORE::shift);
   return $self->[0] unless $cb;
   return List::Util::first { $_ =~ $cb } @$self if ref $cb eq 'Regexp';
   return List::Util::first { $_->$cb(@_) } @$self;
@@ -36,7 +35,7 @@ sub first {
 sub flatten { $_[0]->new(_flatten(@{$_[0]})) }
 
 sub grep {
-  my ($self, $cb) = (shift, shift);
+  my ($self, $cb) = (CORE::shift, CORE::shift);
   return $self->new(grep { $_ =~ $cb } @$self) if ref $cb eq 'Regexp';
   return $self->new(grep { $_->$cb(@_) } @$self);
 }
@@ -45,32 +44,45 @@ sub join {
   Mojo::ByteStream->new(join $_[1] // '', map {"$_"} @{$_[0]});
 }
 
-sub last { shift->[-1] }
+sub last { $_[0]->[-1] }
 
 sub map {
-  my ($self, $cb) = (shift, shift);
+  my ($self, $cb) = (CORE::shift, CORE::shift);
   return $self->new(map { $_->$cb(@_) } @$self);
 }
 
 sub new {
-  my $class = shift;
+  my $class = CORE::shift;
   return bless [@_], ref $class || $class;
 }
 
+sub pop {
+  return $_[0]->new(@{$_[0]}[0 .. $#{$_[0]} - 1]);
+}
+
+sub push {
+  my $self = CORE::shift;
+  return $self->new(@$self, @_);
+}
+
 sub reduce {
-  my $self = shift;
+  my $self = CORE::shift;
   @_ = (@_, @$self);
   goto &List::Util::reduce;
 }
 
 sub reverse { $_[0]->new(reverse @{$_[0]}) }
 
+sub shift {
+  return $_[0]->new(@{$_[0]}[1 .. $#{$_[0]}]);
+}
+
 sub shuffle { $_[0]->new(List::Util::shuffle @{$_[0]}) }
 
 sub size { scalar @{$_[0]} }
 
 sub slice {
-  my $self = shift;
+  my $self = CORE::shift;
   return $self->new(@$self[@_]);
 }
 
@@ -88,18 +100,23 @@ sub sort {
   return $self->new(@sorted);
 }
 
-sub tap { shift->Mojo::Base::tap(@_) }
+sub tap { CORE::shift->Mojo::Base::tap(@_) }
 
-sub to_array { [@{shift()}] }
+sub to_array { [@{$_[0]}] }
 
 sub uniq {
-  my ($self, $cb) = (shift, shift);
+  my ($self, $cb) = (CORE::shift, CORE::shift);
   my %seen;
   return $self->new(grep { !$seen{$_->$cb(@_) // ''}++ } @$self) if $cb;
   return $self->new(grep { !$seen{$_ // ''}++ } @$self);
 }
 
-sub with_roles { shift->Mojo::Base::with_roles(@_) }
+sub unshift {
+  my $self = CORE::shift;
+  return $self->new(@_, @$self);
+}
+
+sub with_roles { CORE::shift->Mojo::Base::with_roles(@_) }
 
 sub _flatten {
   map { _ref($_) ? _flatten(@$_) : $_ } @_;
@@ -304,6 +321,28 @@ C<$b> will always be set to the next element in the collection.
 
 Create a new collection with all elements in reverse order.
 
+=head2 pop
+
+  # [1, 2, 3, 4]
+  my $new = c(1 .. 5)->pop;
+
+Create a new collection with last element removed.
+
+=head2 push
+
+  # [1, 2, 3, 4, 5]
+  my $new = c(1, 2, 3)->push(4, 5);
+
+Create a new collection with all the elements and the specified elements
+appended.
+
+=head2 shift
+
+  # [2, 3, 4, 5]
+  my $new = c(1 .. 5)->shift;
+
+Create a new collection with the first element removed.
+
 =head2 slice
 
   my $new = $collection->slice(4 .. 7);
@@ -369,6 +408,14 @@ treated the same.
 
   # "[[1, 2], [2, 1]]"
   c([1, 2], [2, 1], [3, 2])->uniq(sub{ $_->[1] })->to_array;
+
+=head2 unshift
+
+  # [1, 2, 3, 4, 5]
+  my $new = c(3 .. 5)->unshift(1, 2);
+
+Create a new collection with all the elements and the specified elements
+prepended.
 
 =head2 with_roles
 

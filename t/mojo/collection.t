@@ -171,6 +171,19 @@ $collection = c(undef, '', 3, 2, 1, 0);
 is_deeply $collection->uniq(sub {$_})->to_array, [undef, 3, 2, 1, 0],
   'right result';
 
+# array functions
+$collection = c(1 .. 10);
+is_deeply $collection->pop->to_array,      [1 .. 9], 'removed 10';
+is_deeply $collection->push(11)->to_array, [1 .. 11], 'added 11';
+is_deeply $collection->shift->to_array,    [2 .. 10], 'remove 1';
+is_deeply $collection->unshift(0)->to_array, [0 .. 10], 'zero based, chained';
+is_deeply $collection, [1 .. 10], 'original collection untouched';
+is_deeply c(1)->shift, [], 'empty';
+is_deeply c(1)->pop, [], 'also empty';
+is_deeply c()->shift, [], 'really empty';
+is_deeply c()->pop, [], 'empty, empty, empty';
+is_deeply c()->push(1 .. 5)->pop->shift->unshift(9), [9, 2, 3, 4], 'long chain';
+
 # TO_JSON
 is encode_json(c(1, 2, 3)), '[1,2,3]', 'right result';
 

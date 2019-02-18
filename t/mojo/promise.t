@@ -239,4 +239,45 @@ Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
   'promises rejected';
 
+# map
+my @started;
+(@results, @errors) = ();
+$promise = Mojo::Promise->map(sub { push @started, $_; $_ }, 1 .. 5)
+  ->then(sub { @results = @_ }, sub { @errors = @_ });
+is_deeply \@started, [1, 2, 3, 4, 5], 'all started without concurrency';
+$promise->wait;
+is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
+is_deeply \@errors, [], 'promise not rejected';
+
+my $concurrent = 0;
+(@results, @errors) = ();
+Mojo::Promise->map(
+  {concurrency => 3},
+  sub {
+    my $n = $_;
+    fail 'Concurrency too high' if ++$concurrent > 3;
+    Mojo::Promise->resolve->then(sub {
+      fail 'Concurrency too high' if $concurrent-- > 3;
+      $n;
+    });
+  },
+  1 .. 5
+)->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
+is_deeply \@errors, [], 'promise not rejected';
+
+(@started, @results, @errors) = ();
+Mojo::Promise->map(
+  {concurrency => 3},
+  sub {
+    my $n = $_;
+    push @started, $n;
+    Mojo::Promise->resolve->then(sub { Mojo::Promise->reject($n) });
+  },
+  1 .. 5
+)->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+is_deeply \@results, [], 'promise not resolved';
+is_deeply \@errors, [1], 'correct errors';
+is_deeply \@started, [1, 2, 3], 'only initial batch started';
+
 done_testing();

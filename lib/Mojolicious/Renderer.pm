@@ -14,6 +14,7 @@ has [qw(compress default_handler)];
 has default_format => 'html';
 has encoding       => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
+has min_compress_size => '860';
 has paths => sub { [] };
 
 # Bundled templates
@@ -122,7 +123,7 @@ sub respond {
 
   # Gzip compression
   my $res = $c->res;
-  if ($self->compress) {
+  if ($self->compress && length($output) >= $self->min_compress_size) {
     my $headers = $res->headers;
     $headers->append(Vary => 'Accept-Encoding');
     my $gzip = ($c->req->headers->accept_encoding // '') =~ /gzip/i;
@@ -327,6 +328,15 @@ Registered handlers.
   $renderer   = $renderer->helpers({url_for => sub {...}});
 
 Registered helpers.
+
+=head2 min_compress_size
+
+  my $min   = $renderer->min_compress_size;
+  $renderer = $renderer->min_compress_size(1024);
+
+Minimum output size in bytes required for compression to be used if enabled,
+defaults to 860. Note that this attribute is EXPERIMENTAL and might change
+without warning!
 
 =head2 paths
 

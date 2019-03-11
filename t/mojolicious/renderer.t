@@ -143,6 +143,17 @@ is $c->res->headers->content_encoding, 'whatever',
   'right "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
 
+# Compression (below minimum length)
+my $output = 'a' x 850;
+$c = $app->build_controller;
+$c->req->headers->accept_encoding('gzip');
+$renderer->respond($c, $output, 'html');
+is $c->res->headers->content_type, 'text/html;charset=UTF-8',
+  'right "Content-Type" value';
+ok !$c->res->headers->vary,             'no "Vary" value';
+ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
+is $c->res->body, $output, 'same string';
+
 # Missing method (AUTOLOAD)
 my $class = ref $first->myapp;
 eval { $first->myapp->missing };

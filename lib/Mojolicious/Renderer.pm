@@ -11,6 +11,7 @@ use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
 has [qw(compress default_handler)];
+has minimum_compress_size => '860';
 has default_format => 'html';
 has encoding       => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
@@ -123,12 +124,15 @@ sub respond {
   # Gzip compression
   my $res = $c->res;
   if ($self->compress) {
-    my $headers = $res->headers;
-    $headers->append(Vary => 'Accept-Encoding');
-    my $gzip = ($c->req->headers->accept_encoding // '') =~ /gzip/i;
-    if ($gzip && !$headers->content_encoding) {
-      $headers->content_encoding('gzip');
-      $output = gzip $output;
+    my $byte_length = do { use bytes; length($output) };
+    if ($byte_length >= $self->minimum_compress_size) {
+      my $headers = $res->headers;
+      $headers->append(Vary => 'Accept-Encoding');
+      my $gzip = ($c->req->headers->accept_encoding // '') =~ /gzip/i;
+      if ($gzip && !$headers->content_encoding) {
+        $headers->content_encoding('gzip');
+        $output = gzip $output;
+      }
     }
   }
 
@@ -287,6 +291,15 @@ application startup.
 Try to negotiate compression for dynamically generated response content and
 C<gzip> compress it automatically, defaults to false. Note that this attribute
 is EXPERIMENTAL and might change without warning!
+
+=head2 minimum_compress_size
+
+  my $byte_length = $renderer->minimum_compress_size;
+  $renderer = $renderer->minimum_compress_size( $byte_length );
+
+Return or set a minimum size in bytes below which it is not efficient to compress
+the output. Default is 860 bytes, following the behaviour of Akamai CDN. Note that
+this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 default_format
 

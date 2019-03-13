@@ -85,7 +85,7 @@ sub every_signed_cookie {
 
       my $valid;
       for my $secret (@$secrets) {
-        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
+        my $check = Mojo::Util::hmac_sha1_sum("$name=$value", $secret);
         ++$valid and last if Mojo::Util::secure_compare($signature, $check);
       }
       if ($valid) { push @results, $value }
@@ -239,8 +239,8 @@ sub signed_cookie {
   return $self->every_signed_cookie($name)->[-1] unless defined $value;
 
   # Response cookie
-  my $checksum = Mojo::Util::hmac_sha1_sum($value, $self->app->secrets->[0]);
-  return $self->cookie($name, "$value--$checksum", $options);
+  my $sum = Mojo::Util::hmac_sha1_sum("$name=$value", $self->app->secrets->[0]);
+  return $self->cookie($name, "$value--$sum", $options);
 }
 
 sub stash { Mojo::Util::_stash(stash => @_) }

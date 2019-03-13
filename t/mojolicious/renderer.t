@@ -145,7 +145,7 @@ is $c->res->body, $output, 'same string';
 
 # Compression (below minimum length)
 $output = 'a' x 850;
-$c = $app->build_controller;
+$c      = $app->build_controller;
 $c->req->headers->accept_encoding('gzip');
 $renderer->respond($c, $output, 'html');
 is $c->res->headers->content_type, 'text/html;charset=UTF-8',

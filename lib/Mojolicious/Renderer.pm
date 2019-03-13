@@ -15,7 +15,7 @@ has default_format => 'html';
 has encoding       => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
 has min_compress_size => '860';
-has paths => sub { [] };
+has paths             => sub { [] };
 
 # Bundled templates
 my $TEMPLATES = path(__FILE__)->sibling('resources', 'templates');
@@ -331,11 +331,11 @@ Registered helpers.
 
 =head2 min_compress_size
 
-  my $min   = $renderer->min_compress_size;
+  my $size  = $renderer->min_compress_size;
   $renderer = $renderer->min_compress_size(1024);
 
 Minimum output size in bytes required for compression to be used if enabled,
-defaults to 860. Note that this attribute is EXPERIMENTAL and might change
+defaults to C<860>. Note that this attribute is EXPERIMENTAL and might change
 without warning!
 
 =head2 paths

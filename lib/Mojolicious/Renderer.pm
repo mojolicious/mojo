@@ -14,7 +14,7 @@ has [qw(compress default_handler)];
 has default_format => 'html';
 has encoding       => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
-has min_compress_size => '860';
+has min_compress_size => 860;
 has paths             => sub { [] };
 
 # Bundled templates

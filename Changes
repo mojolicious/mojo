@@ -1,5 +1,5 @@
 
-8.13  2019-03-13
+8.13  2019-03-14
   - Added EXPERIMENTAL min_compress_size attribute to Mojolicious::Renderer.
     (CandyAngel, mjemmeson)
 

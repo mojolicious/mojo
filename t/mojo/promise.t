@@ -280,4 +280,14 @@ is_deeply \@results, [], 'promise not resolved';
 is_deeply \@errors, [1], 'correct errors';
 is_deeply \@started, [1, 2, 3], 'only initial batch started';
 
+my $ok;
+$loop = Mojo::IOLoop->new;
+$promise
+  = Mojo::Promise->map(sub { Mojo::Promise->new(ioloop => $loop)->resolve }, 1);
+is $promise->ioloop, $loop, 'same loop';
+isnt $promise->ioloop, Mojo::IOLoop->singleton, 'not the singleton';
+$promise->then(sub{ $ok = 1; $loop->stop });
+$loop->start;
+ok $ok, 'loop completed';
+
 done_testing();

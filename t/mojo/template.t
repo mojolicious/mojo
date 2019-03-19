@@ -1189,4 +1189,12 @@ like $@, qr/invalid encoding/, 'right error';
 $mt = Mojo::Template->new(escape => sub { '+' . $_[0] });
 is $mt->render('<%== "hi" =%>'), '+hi', 'right escaped string';
 
+# No 'Use of "scalar" without parentheses is ambiguous' warnings
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% use warnings FATAL => 'ambiguous';
+%= "ABC"
+EOF
+is $output, "ABC\n", 'no "ambiguous scalar" warning';
+
 done_testing();

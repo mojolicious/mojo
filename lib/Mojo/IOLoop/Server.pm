@@ -91,7 +91,8 @@ sub start {
   my $self = shift;
   weaken $self;
   ++$self->{active}
-    and $self->reactor->io($self->{handle} => sub { $self->_accept });
+    and $self->reactor->io($self->{handle} => sub { $self->_accept })
+    ->watch($self->{handle}, 1, 0);
 }
 
 sub stop { delete($_[0]{active}) and $_[0]->reactor->remove($_[0]{handle}) }

@@ -39,6 +39,11 @@ $mt     = Mojo::Template->new;
 $output = $mt->render('<%= (1,2,3)[1] %><%== (1,2,3)[2] %>');
 is $output, "23\n", 'no ambiguity';
 
+# String
+$mt     = Mojo::Template->new;
+$output = $mt->render('Just a <%= "test" %>');
+is $output, "Just a test\n", 'rendered string';
+
 # Trim tag
 $mt     = Mojo::Template->new;
 $output = $mt->render(" ♥    <%= 'test♥' =%> \n");

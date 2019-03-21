@@ -239,7 +239,7 @@ Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
   'promises rejected';
 
-# map
+# Map
 my @started;
 (@results, @errors) = ();
 $promise = Mojo::Promise->map(sub { push @started, $_; $_ }, 1 .. 5)
@@ -249,6 +249,7 @@ $promise->wait;
 is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
 is_deeply \@errors, [], 'promise not rejected';
 
+# Map (with concurrency limit)
 my $concurrent = 0;
 (@results, @errors) = ();
 Mojo::Promise->map(
@@ -266,6 +267,7 @@ Mojo::Promise->map(
 is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
 is_deeply \@errors, [], 'promise not rejected';
 
+# Map (with reject)
 (@started, @results, @errors) = ();
 Mojo::Promise->map(
   {concurrency => 3},
@@ -280,13 +282,14 @@ is_deeply \@results, [], 'promise not resolved';
 is_deeply \@errors, [1], 'correct errors';
 is_deeply \@started, [1, 2, 3], 'only initial batch started';
 
+# Map (custom event loop)
 my $ok;
 $loop = Mojo::IOLoop->new;
 $promise
   = Mojo::Promise->map(sub { Mojo::Promise->new(ioloop => $loop)->resolve }, 1);
 is $promise->ioloop, $loop, 'same loop';
 isnt $promise->ioloop, Mojo::IOLoop->singleton, 'not the singleton';
-$promise->then(sub{ $ok = 1; $loop->stop });
+$promise->then(sub { $ok = 1; $loop->stop });
 $loop->start;
 ok $ok, 'loop completed';
 

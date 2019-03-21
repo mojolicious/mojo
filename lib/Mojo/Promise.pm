@@ -318,16 +318,16 @@ reason.
 
 =head2 map
 
-  my $promise = Mojo::Promise->map(sub { ... }, @items);
-  my $promise = Mojo::Promise->map({concurrency => 3}, sub { ... }, @items);
+  my $new = Mojo::Promise->map(sub { ... }, @items);
+  my $new = Mojo::Promise->map({concurrency => 3}, sub { ... }, @items);
 
 Apply a function that returns a L<Mojo::Promise> to each item in a list of
 items while optionally limiting concurrency. Returns a L<Mojo::Promise> that
-collects the results in the same manner as L</all>.
+collects the results in the same manner as L</all>. If any item's promise is
+rejected, any remaining items which have not yet been mapped will not be. Note
+that this method is EXPERIMENTAL and might change without warning!
 
-Note that if any item's promise is rejected, any remaining items which have not
-yet been mapped will not be.
-
+  # Perform 3 requests at a time concurrently
   Mojo::Promise->map({concurrency => 3}, sub { $ua->get_p($_) }, @urls)
     ->then(sub{ say $_->[0]->res->dom->at('title')->text for @_ });
 
@@ -339,7 +339,7 @@ These options are currently available:
 
   concurrency => 3
 
-The maximum number of items are in progress at the same time.
+The maximum number of items that are in progress at the same time.
 
 =back
 

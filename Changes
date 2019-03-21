@@ -1,5 +1,6 @@
 
-8.13  2019-03-19
+8.13  2019-03-21
+  - Added EXPERIMENTAL map method to Mojo::Promise. (jberger)
   - Added EXPERIMENTAL min_compress_size attribute to Mojolicious::Renderer.
     (CandyAngel, mjemmeson)
   - Improved the security of signed cookies by also signing the cookie name.

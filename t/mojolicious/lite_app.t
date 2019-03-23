@@ -726,7 +726,10 @@ $t->get_ok('/root.txt')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('root fallback!');
 
 # Root with format
-$t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/.html')->status_is(200)->header_exists_not('Servers')
+  ->header_exists_not('Servers', 'the header is missing')
+  ->header_exists('Server')->header_exists('Server', 'the header exists')
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # Reverse proxy with "X-Forwarded-For"

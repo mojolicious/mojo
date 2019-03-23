@@ -121,6 +121,20 @@ sub finished_ok {
 sub get_ok  { shift->_build_ok(GET  => @_) }
 sub head_ok { shift->_build_ok(HEAD => @_) }
 
+sub header_exists {
+  my ($self, $name, $desc) = @_;
+  $desc = _desc($desc, qq{header "$name" exists});
+  return $self->_test('ok', !!@{$self->tx->res->headers->every_header($name)},
+    $desc);
+}
+
+sub header_exists_not {
+  my ($self, $name, $desc) = @_;
+  $desc = _desc($desc, qq{no "$name" header});
+  return $self->_test('ok', !@{$self->tx->res->headers->every_header($name)},
+    $desc);
+}
+
 sub header_is {
   my ($self, $name, $value, $desc) = @_;
   $desc = _desc($desc, "$name: " . ($value // ''));
@@ -723,6 +737,20 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
 
 Perform a C<HEAD> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"head">, except for the callback.
+
+=head2 header_exists
+
+  $t = $t->header_exists('ETag');
+  $t = $t->header_exists('ETag', 'header exists');
+
+Check if response header exists.
+
+=head2 header_exists_not
+
+  $t = $t->header_exists_not('ETag');
+  $t = $t->header_exists_not('ETag', 'header is missing');
+
+Opposite of L</"header_exists">.
 
 =head2 header_is
 

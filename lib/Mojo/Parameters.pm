@@ -53,8 +53,9 @@ sub every_param {
 sub merge {
   my $self = shift;
 
-  my @pairs = @_ == 1 ? @{shift->pairs} : @_;
-  while (my ($name, $value) = splice @pairs, 0, 2) {
+  my $merge = @_ == 1 ? shift->to_hash : {@_};
+  for my $name (sort keys %$merge) {
+    my $value = $merge->{$name};
     defined $value ? $self->param($name => $value) : $self->remove($name);
   }
 

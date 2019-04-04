@@ -855,7 +855,7 @@ with L<Mojolicious::Routes/"add_shortcut">.
     my $resource = $r->any("/$name")->to("$name#");
 
     # Render a list of resources
-    $resource->get->to('#index')->name($name);
+    $resource->get('/')->to('#index')->name($name);
 
     # Render a form to create a new resource (submitted to "store")
     $resource->get('/create')->to('#create')->name("create_$name");

@@ -242,7 +242,7 @@ L<Role::Tiny> (2.000001+).
   use Role::Tiny;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
-On Perl 5.20+ you can also append a C<-signatures> flag to all three forms and
+On Perl 5.20+ you can also append a C<-signatures> flag to all four forms and
 enable support for L<subroutine signatures|perlsub/"Signatures">.
 
   # Also enable signatures

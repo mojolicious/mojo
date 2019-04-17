@@ -120,6 +120,15 @@ $promise2->reject('hello world');
 Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['hello world'], 'promise rejected';
 
+# Double finally
+$promise = Mojo::Promise->new;
+@results = ();
+$promise->finally(sub { push @results, "@{_}s" })
+  ->finally(sub { push @results, "@{_}ss" });
+$promise->resolve('pass');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['passs', 'passss'], 'promise not resolved';
+
 # Resolved nested with finally
 $promise  = Mojo::Promise->new;
 $promise2 = Mojo::Promise->new;
@@ -127,10 +136,15 @@ $promise2 = Mojo::Promise->new;
 $promise->finally(sub {$promise2})->finally(sub { @results = @_ });
 $promise->resolve('pass');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, [], 'promise not resolved';
-$promise2->resolve('fail');
+is_deeply \@results, ['pass'], 'promise already resolved';
+
+# Exception in inally
+$promise = Mojo::Promise->new;
+@results = ();
+$promise->finally(sub { die "Test!\n" })->catch(sub { push @results, @_ });
+$promise->resolve('pass');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, ['pass'], 'promise resolved';
+is_deeply \@results, ["Test!\n"], 'promise rejected';
 
 # Clone
 my $loop = Mojo::IOLoop->new;

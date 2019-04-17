@@ -1,6 +1,8 @@
 
-8.14  2019-04-02
+8.14  2019-04-17
   - Added header_exists and header_exists_not methods to Test::Mojo.
+  - Fixed a bug in Mojo::Promise where the finally method could change promise
+    values.
   - Fixed a merge bug in Mojo::Parameters where multiple values sharing the same
     name could get lost.
 

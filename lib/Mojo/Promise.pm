@@ -114,10 +114,8 @@ sub _defer {
 
 sub _finally {
   my ($new, $finally, $method, @result) = @_;
-  my ($res) = eval { $finally->(@result) };
-  return $new->$method(@result)
-    unless $res && blessed $res && $res->can('then');
-  $res->then(sub { $new->$method(@result) }, sub { $new->$method(@result) });
+  return $new->reject($@) unless eval { $finally->(@result); 1 };
+  return $new->$method(@result);
 }
 
 sub _settle {

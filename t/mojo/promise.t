@@ -138,7 +138,7 @@ $promise->resolve('pass');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['pass'], 'promise already resolved';
 
-# Exception in inally
+# Exception in finally
 $promise = Mojo::Promise->new;
 @results = ();
 $promise->finally(sub { die "Test!\n" })->catch(sub { push @results, @_ });

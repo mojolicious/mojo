@@ -2,6 +2,8 @@
 8.14  2019-04-18
   - Added EXPERIMENTAL timer method to Mojo::Promise.
   - Added header_exists and header_exists_not methods to Test::Mojo.
+  - Fixed a bug where the finally callback in Mojo::Promise was passed a value,
+    which is incompatible with the JavaScript API.
   - Fixed a bug in Mojo::Promise where the finally method could change promise
     values.
   - Fixed a merge bug in Mojo::Parameters where multiple values sharing the same

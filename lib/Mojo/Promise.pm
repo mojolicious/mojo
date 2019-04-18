@@ -110,7 +110,7 @@ sub _defer {
 
 sub _finally {
   my ($new, $finally, $method, @result) = @_;
-  return $new->reject($@) unless eval { $finally->(@result); 1 };
+  return $new->reject($@) unless eval { $finally->(); 1 };
   return $new->$method(@result);
 }
 
@@ -314,7 +314,6 @@ reason.
 
   # Do something on fulfillment and rejection
   $promise->finally(sub {
-    my @value_or_reason = @_;
     say "We are done!";
   });
 

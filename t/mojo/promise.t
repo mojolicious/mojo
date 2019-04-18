@@ -31,11 +31,11 @@ is_deeply \@errors, [], 'promise not rejected';
 # Resolved with finally
 $promise = Mojo::Promise->new;
 @results = ();
-$promise->finally(sub { @results = @_; 'fail' })
+$promise->finally(sub { @results = ('finally'); 'fail' })
   ->then(sub { push @results, @_ });
 $promise->resolve('hello', 'world');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, ['hello', 'world', 'hello', 'world'], 'promise settled';
+is_deeply \@results, ['finally', 'hello', 'world'], 'promise settled';
 
 # Rejected
 $promise = Mojo::Promise->new;
@@ -62,11 +62,11 @@ is_deeply \@errors, ['early'], 'promise rejected';
 # Rejected with finally
 $promise = Mojo::Promise->new;
 @errors  = ();
-$promise->finally(sub { @errors = @_; 'fail' })
+$promise->finally(sub { @errors = ('finally'); 'fail' })
   ->then(undef, sub { push @errors, @_ });
 $promise->reject('bye', 'world');
 Mojo::IOLoop->one_tick;
-is_deeply \@errors, ['bye', 'world', 'bye', 'world'], 'promise settled';
+is_deeply \@errors, ['finally', 'bye', 'world'], 'promise settled';
 
 # No state change
 $promise = Mojo::Promise->new;
@@ -123,20 +123,20 @@ is_deeply \@errors, ['hello world'], 'promise rejected';
 # Double finally
 $promise = Mojo::Promise->new;
 @results = ();
-$promise->finally(sub { push @results, "@{_}s" })
-  ->finally(sub { push @results, "@{_}ss" });
+$promise->finally(sub { push @results, 'finally1' })
+  ->finally(sub { push @results, 'finally2' });
 $promise->resolve('pass');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, ['passs', 'passss'], 'promise not resolved';
+is_deeply \@results, ['finally1', 'finally2'], 'promise not resolved';
 
 # Resolved nested with finally
 $promise  = Mojo::Promise->new;
 $promise2 = Mojo::Promise->new;
 @results  = ();
-$promise->finally(sub {$promise2})->finally(sub { @results = @_ });
+$promise->finally(sub {$promise2})->finally(sub { @results = ('finally') });
 $promise->resolve('pass');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, ['pass'], 'promise already resolved';
+is_deeply \@results, ['finally'], 'promise already resolved';
 
 # Exception in finally
 $promise = Mojo::Promise->new;

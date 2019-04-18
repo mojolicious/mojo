@@ -210,6 +210,17 @@ is_deeply \@errors, ['Timeout2'], 'promise rejected';
 Mojo::Promise->timeout(0.025)->catch(sub { @errors = @_ })->wait;
 is_deeply \@errors, ['Promise timeout'], 'default timeout message';
 
+# Timer without value
+@results = ();
+Mojo::Promise->timer(0.025)->then(sub { @results = (@_, 'works!') })->wait;
+is_deeply \@results, ['works!'], 'default timer result';
+
+# Timer with values
+@results = ();
+Mojo::Promise->new->timer(0, 'first', 'second')
+  ->then(sub { @results = (@_, 'works too!') })->wait;
+is_deeply \@results, ['first', 'second', 'works too!'], 'timer result';
+
 # All
 $promise  = Mojo::Promise->new->then(sub {@_});
 $promise2 = Mojo::Promise->new->then(sub {@_});

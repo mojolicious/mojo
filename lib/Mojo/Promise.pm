@@ -319,8 +319,8 @@ reason.
 
 =head2 map
 
-  my $new = Mojo::Promise->map(sub { ... }, @items);
-  my $new = Mojo::Promise->map({concurrency => 3}, sub { ... }, @items);
+  my $new = Mojo::Promise->map(sub {...}, @items);
+  my $new = Mojo::Promise->map({concurrency => 3}, sub {...}, @items);
 
 Apply a function that returns a L<Mojo::Promise> to each item in a list of
 items while optionally limiting concurrency. Returns a L<Mojo::Promise> that

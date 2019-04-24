@@ -142,6 +142,26 @@ is_deeply $array, ['stuff'], 'right structure';
   is_deeply \@ARGV,    ['test'],   'right structure';
 }
 
+{
+  my $getopt_success = getopt ['--lang', 'de'], 'l|lang=s' => \my $lang;
+  is $lang, 'de';
+  is $getopt_success, 1;
+}
+
+{
+  local $SIG{__WARN__} = sub {};
+  my $getopt_success = getopt ['--lnag', 'de'], 'l|lang=s' => \my $lang;
+  is $lang, undef;
+  is $getopt_success, '';
+}
+
+{
+  local $SIG{__WARN__} = sub {};
+  my $getopt_success = getopt ['--lnag', 'de', '--lang', 'de'], 'l|lang=s' => \my $lang;
+  is $lang, 'de';
+  is $getopt_success, '';
+}
+
 # unindent
 is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",
   'right unindented result';

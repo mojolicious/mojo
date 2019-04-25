@@ -362,7 +362,8 @@ Construct a new L<Mojo::Promise> object.
   my $promise = Mojo::Promise->new(sub {
     my ($resolve, $reject) = @_;
     Mojo::IOLoop->timer(5 => sub {
-      int rand 2 ? $resolve->('Lucky!') : $reject->('Unlucky!')
+      if (int rand 2) { $resolve->('Lucky!') }
+      else            { $reject->('Unlucky!') }
     });
   });
 

@@ -1,5 +1,8 @@
 
-8.15  2019-04-19
+8.15  2019-04-26
+  - Fixed a bug where the new method in Mojo::Promise could not be passed a
+    callback to wrap continuation-passing style APIs, which is incompatible with
+    the JavaScript API.
 
 8.14  2019-04-18
   - Added EXPERIMENTAL timer method to Mojo::Promise.

@@ -67,7 +67,7 @@ sub client {
 }
 
 sub delay {
-  my $delay = Mojo::IOLoop::Delay->new(ioloop => _instance(shift));
+  my $delay = Mojo::IOLoop::Delay->new->ioloop(_instance(shift));
   return @_ ? $delay->steps(@_) : $delay;
 }
 

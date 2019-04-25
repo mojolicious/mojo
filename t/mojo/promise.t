@@ -68,6 +68,24 @@ $promise->reject('bye', 'world');
 Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['finally', 'bye', 'world'], 'promise settled';
 
+# Wrap
+(@results, @errors) = ();
+$promise = Mojo::Promise->new(sub {
+  my ($resolve, $reject) = @_;
+  Mojo::IOLoop->timer(0 => sub { $resolve->('resolved', '!') });
+});
+$promise->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+is_deeply \@results, ['resolved', '!'], 'promise resolved';
+is_deeply \@errors, [], 'promise not rejected';
+(@results, @errors) = ();
+$promise = Mojo::Promise->new(sub {
+  my ($resolve, $reject) = @_;
+  Mojo::IOLoop->timer(0 => sub { $reject->('rejected', '!') });
+});
+$promise->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+is_deeply \@results, [], 'promise not resolved';
+is_deeply \@errors, ['rejected', '!'], 'promise rejected';
+
 # No state change
 $promise = Mojo::Promise->new;
 (@results, @errors) = ();
@@ -148,7 +166,7 @@ is_deeply \@results, ["Test!\n"], 'promise rejected';
 
 # Clone
 my $loop = Mojo::IOLoop->new;
-$promise  = Mojo::Promise->new(ioloop => $loop)->resolve('failed');
+$promise  = Mojo::Promise->new->ioloop($loop)->resolve('failed');
 $promise2 = $promise->clone;
 (@results, @errors) = ();
 $promise2->then(sub { @results = @_ }, sub { @errors = @_ });
@@ -311,7 +329,7 @@ is_deeply \@started, [1, 2, 3], 'only initial batch started';
 my $ok;
 $loop = Mojo::IOLoop->new;
 $promise
-  = Mojo::Promise->map(sub { Mojo::Promise->new(ioloop => $loop)->resolve }, 1);
+  = Mojo::Promise->map(sub { Mojo::Promise->new->ioloop($loop)->resolve }, 1);
 is $promise->ioloop, $loop, 'same loop';
 isnt $promise->ioloop, Mojo::IOLoop->singleton, 'not the singleton';
 $promise->then(sub { $ok = 1; $loop->stop });

@@ -100,8 +100,9 @@ sub timeout { shift->_timer('reject',  @_) }
 sub wait {
   my $self = shift;
   return if (my $loop = $self->ioloop)->is_running;
-  $self->finally(sub { $loop->stop });
-  $loop->start;
+  my $done;
+  $self->finally(sub { $done++; $loop->stop });
+  $loop->start until $done;
 }
 
 sub _defer {

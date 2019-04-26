@@ -336,4 +336,14 @@ $promise->then(sub { $ok = 1; $loop->stop });
 $loop->start;
 ok $ok, 'loop completed';
 
+# Wait for stopped loop
+@results = ();
+$promise = Mojo::Promise->new;
+Mojo::IOLoop->next_tick(sub {
+  Mojo::IOLoop->stop;
+  Mojo::IOLoop->timer(0.1 => sub { $promise->resolve('wait') });
+});
+$promise->then(sub { @results = @_ })->wait;
+is_deeply \@results, ['wait'], 'promise resolved';
+
 done_testing();

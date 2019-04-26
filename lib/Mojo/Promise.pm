@@ -220,7 +220,7 @@ Mojo::Promise - Promises/A+
 
 L<Mojo::Promise> is a Perl-ish implementation of
 L<Promises/A+|https://promisesaplus.com> and a superset of
-L<ES6 Promises|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise>.
+L<ES6 Promises|https://duckduckgo.com/?q=\mdn%20Promise>.
 
 =head1 STATES
 

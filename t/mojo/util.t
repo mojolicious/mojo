@@ -143,23 +143,21 @@ is_deeply $array, ['stuff'], 'right structure';
 }
 
 {
-  my $getopt_success = getopt ['--lang', 'de'], 'l|lang=s' => \my $lang;
-  is $lang, 'de';
-  ok $getopt_success;
-}
-
-{
   local $SIG{__WARN__} = sub {};
-  my $getopt_success = getopt ['--lnag', 'de'], 'l|lang=s' => \my $lang;
-  is $lang, undef;
-  ok !$getopt_success;
-}
 
-{
-  local $SIG{__WARN__} = sub {};
-  my $getopt_success = getopt ['--lnag', 'de', '--lang', 'de'], 'l|lang=s' => \my $lang;
-  is $lang, 'de';
-  ok !$getopt_success;
+  my $return = getopt ['--lang', 'de'], 'l|lang=s' => \my $lang;
+  is $lang, 'de', 'right result';
+  ok $return, 'right return value';
+
+  $lang = undef;
+  $return = getopt ['--lnag', 'de'], 'l|lang=s' => \$lang;
+  is $lang, undef, 'right result';
+  ok !$return, 'right return value';
+
+  $lang = undef;
+  $return = getopt ['--lnag', 'de', '--lang', 'de'], 'l|lang=s' => \$lang;
+  is $lang, 'de', 'right result';
+  ok !$return, 'right return value';
 }
 
 # unindent

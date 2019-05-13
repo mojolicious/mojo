@@ -148,8 +148,10 @@ sub getopt {
   my ($array, $opts) = map { ref $_[0] eq 'ARRAY' ? shift : $_ } \@ARGV, [];
   my $save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case),
     @$opts);
-  GetOptionsFromArray $array, @_;
+  my $result = GetOptionsFromArray $array, @_;
   Getopt::Long::Configure($save);
+
+  return $result;
 }
 
 sub gunzip {

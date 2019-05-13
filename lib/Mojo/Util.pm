@@ -146,6 +146,7 @@ sub extract_usage {
 
 sub getopt {
   my ($array, $opts) = map { ref $_[0] eq 'ARRAY' ? shift : $_ } \@ARGV, [];
+
   my $save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case),
     @$opts);
   my $result = GetOptionsFromArray $array, @_;

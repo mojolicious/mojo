@@ -142,19 +142,20 @@ is_deeply $array, ['stuff'], 'right structure';
   is_deeply \@ARGV,    ['test'],   'right structure';
 }
 
+# getopt (return value)
 {
-  local $SIG{__WARN__} = sub {};
+  local $SIG{__WARN__} = sub { };
 
   my $return = getopt ['--lang', 'de'], 'l|lang=s' => \my $lang;
   is $lang, 'de', 'right result';
   ok $return, 'right return value';
 
-  $lang = undef;
+  $lang   = undef;
   $return = getopt ['--lnag', 'de'], 'l|lang=s' => \$lang;
   is $lang, undef, 'right result';
   ok !$return, 'right return value';
 
-  $lang = undef;
+  $lang   = undef;
   $return = getopt ['--lnag', 'de', '--lang', 'de'], 'l|lang=s' => \$lang;
   is $lang, 'de', 'right result';
   ok !$return, 'right return value';

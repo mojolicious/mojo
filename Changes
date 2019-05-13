@@ -1,5 +1,7 @@
 
-8.16  2019-04-27
+8.16  2019-05-14
+  - Fixed getopt function in Mojo::Util to behave more like GetOptionsFromArray.
+    (jberger, reneeb)
 
 8.15  2019-04-26
   - Updated jQuery to version 3.4.0.

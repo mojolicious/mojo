@@ -1,5 +1,7 @@
 
 8.16  2019-05-14
+  - Improved Mojo::Headers to reject characters in header values that would
+    corrupt the HTTP message.
   - Fixed getopt function in Mojo::Util to behave more like GetOptionsFromArray.
     (jberger, reneeb)
 

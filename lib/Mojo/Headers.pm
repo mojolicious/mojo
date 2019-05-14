@@ -1,6 +1,7 @@
 package Mojo::Headers;
 use Mojo::Base -base;
 
+use Carp 'croak';
 use Mojo::Util 'monkey_patch';
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
@@ -32,6 +33,8 @@ for my $header (keys %NAMES) {
 
 sub add {
   my ($self, $name) = (shift, shift);
+
+  /[\x0d\x0a]/ and croak "Invalid characters in $name header" for @_;
 
   # Make sure we have a normal case entry for name
   my $key = lc $name;

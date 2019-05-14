@@ -247,9 +247,9 @@ is $headers->header('X-Bender'), 'Bite my shiny, metal ass!', 'right value';
 $headers = Mojo::Headers->new;
 eval { $headers->add(Foo => "test\x0a") };
 like $@, qr/Invalid characters in Foo header/, 'right error';
-eval { $headers->add(Foo => "test\x0d") };
+eval { $headers->header(Foo => "test\x0d") };
 like $@, qr/Invalid characters in Foo header/, 'right error';
-eval { $headers->add(Foo => "\x0atest") };
+eval { $headers->append(Foo => "\x0atest") };
 like $@, qr/Invalid characters in Foo header/, 'right error';
 
 done_testing();

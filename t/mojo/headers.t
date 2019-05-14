@@ -251,5 +251,7 @@ eval { $headers->header(Foo => "test\x0d") };
 like $@, qr/Invalid characters in Foo header/, 'right error';
 eval { $headers->append(Foo => "\x0atest") };
 like $@, qr/Invalid characters in Foo header/, 'right error';
+eval { $headers->header(Bar => "\x0a\x0dtest") };
+like $@, qr/Invalid characters in Bar header/, 'right error';
 
 done_testing();

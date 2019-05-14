@@ -34,7 +34,7 @@ for my $header (keys %NAMES) {
 sub add {
   my ($self, $name) = (shift, shift);
 
-  /[\x0d\x0a]/ and croak "Invalid characters in $name header" for @_;
+  tr/\x0d\x0a// and croak "Invalid characters in $name header" for @_;
 
   # Make sure we have a normal case entry for name
   my $key = lc $name;

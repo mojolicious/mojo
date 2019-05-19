@@ -1,4 +1,6 @@
 
+8.17  2019-05-19
+
 8.16  2019-05-14
   - Improved Mojo::Headers to reject characters in header values that would
     corrupt the HTTP message.

@@ -427,6 +427,15 @@ $ua->get(
 Mojo::IOLoop->start;
 ok !Mojo::IOLoop->stream($id), 'connection timed out';
 
+# Request timeout with keepalive
+$ua->request_timeout(3600);
+ok !$ua->get('/')->error, 'priming the keepalive connection';
+$ua->request_timeout(0.01);
+$tx = $ua->get('/timeout?timeout=5');
+is $tx->error->{message}, 'Request timeout', 'right error message';
+is $tx->error->{code}, undef, 'no status';
+$ua->request_timeout(0);
+
 # Response exceeding message size limit
 $ua->once(
   start => sub {

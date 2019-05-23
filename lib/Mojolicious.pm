@@ -974,6 +974,8 @@ Daniel Mantovani
 
 Danijel Tasov
 
+Dagfinn Ilmari Mannsaker
+
 Danny Thomas
 
 David Davis

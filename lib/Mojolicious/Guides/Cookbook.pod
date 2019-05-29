@@ -600,7 +600,7 @@ that create them for you.
     my $c = shift;
 
     # Create two promises
-    my $url   = Mojo::URL->new('fastapi.metacpan.org/v1/module/_search');
+    my $url   = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
     my $mojo   = $c->ua->get_p($url->clone->query({q => 'mojo'}));
     my $minion = $c->ua->get_p($url->clone->query({q => 'minion'}));
 

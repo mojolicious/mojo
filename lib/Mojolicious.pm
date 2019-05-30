@@ -868,6 +868,8 @@ Current members of the core team in alphabetical order:
 
 =over 2
 
+CandyAngel, C<candyangel@mojolicious.org>
+
 Jan Henning Thorsen, C<batman@mojolicious.org>
 
 Joel Berger, C<jberger@mojolicious.org>

@@ -870,6 +870,8 @@ Current members of the core team in alphabetical order:
 
 CandyAngel, C<candyangel@mojolicious.org>
 
+Christopher Rasch-Olsen Raa, C<christopher@mojolicious.org>
+
 Jan Henning Thorsen, C<batman@mojolicious.org>
 
 Joel Berger, C<jberger@mojolicious.org>

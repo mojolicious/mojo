@@ -1,6 +1,7 @@
 
-8.18  2019-05-30
-  - Welcome to the Mojolicious core team CandyAngel.
+8.18  2019-05-31
+  - Welcome to the Mojolicious core team CandyAngel and Christopher Rasch-Olsen
+    Raa.
 
 8.17  2019-05-23
   - Fixed a bug in Mojo::UserAgent where the request timeout would not work for

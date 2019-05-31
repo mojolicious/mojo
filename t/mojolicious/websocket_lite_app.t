@@ -244,7 +244,7 @@ is $t->tx->protocol, undef, 'no protocol';
 # JSON roundtrips (with a lot of different tests)
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})
   ->message_ok->json_message_is('' => {test => 24, snowman => '☃'})
-  ->json_message_is('' => {test => 24, snowman => '☃'})
+  ->json_message_is('' => {test             => 24, snowman => '☃'})
   ->json_message_has('/test')->json_message_hasnt('/test/2')
   ->send_ok({binary => encode_json([1, 2, 3])}, 'with description')
   ->message_ok('with description')->message_is('[1,2,3,4]')

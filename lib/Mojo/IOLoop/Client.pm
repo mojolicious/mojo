@@ -77,7 +77,7 @@ sub _connect {
   my $handle = $self->{handle} = $args->{handle};
 
   unless ($handle) {
-    my $class = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
+    my $class   = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
     my %options = (Blocking => 0);
 
     # UNIX domain socket
@@ -169,7 +169,7 @@ sub _try_tls {
   weaken $self;
   my $tls = Mojo::IOLoop::TLS->new($handle)->reactor($self->reactor);
   $tls->on(upgrade => sub { $self->_cleanup->emit(connect => pop) });
-  $tls->on(error => sub { $self->emit(error => pop) });
+  $tls->on(error   => sub { $self->emit(error => pop) });
   $tls->negotiate(%$args);
 }
 

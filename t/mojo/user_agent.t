@@ -111,7 +111,7 @@ is(Mojo::UserAgent::Server->app, app, 'applications are equal again');
 # Clean up non-blocking requests
 my $ua  = Mojo::UserAgent->new;
 my $get = my $post = '';
-$ua->get('/' => sub { $get = pop->error });
+$ua->get('/' => sub  { $get  = pop->error });
 $ua->post('/' => sub { $post = pop->error });
 undef $ua;
 is $get->{message},  'Premature connection close', 'right error';
@@ -287,7 +287,7 @@ $ua->once(
   start => sub {
     my ($ua, $tx) = @_;
     $tx->req->on(finish => sub { $finished_req++ });
-    $tx->on(finish => sub { $finished_tx++ });
+    $tx->on(finish => sub      { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
   }
 );
@@ -310,7 +310,7 @@ $ua->once(
   start => sub {
     my ($ua, $tx) = @_;
     $tx->req->on(finish => sub { $finished_req++ });
-    $tx->on(finish => sub { $finished_tx++ });
+    $tx->on(finish => sub      { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
   }
 );

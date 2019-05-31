@@ -68,9 +68,9 @@ sub _content {
 
   my $hash = $c->stash->{'mojo.content'} ||= {};
   if (defined $content) {
-    if ($append) { $hash->{$name} .= _block($content) }
-    if ($replace) { $hash->{$name} = _block($content) }
-    else          { $hash->{$name} //= _block($content) }
+    if   ($append)  { $hash->{$name} .= _block($content) }
+    if   ($replace) { $hash->{$name} = _block($content) }
+    else            { $hash->{$name} //= _block($content) }
   }
 
   return Mojo::ByteStream->new($hash->{$name} // '');

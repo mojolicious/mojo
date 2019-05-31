@@ -494,7 +494,7 @@ $t->get_ok('/just/some/template')->status_is(200)
 }
 
 # Make sure we can override attributes with constructor arguments
-is(MojoliciousTest->new(mode => 'test')->mode, 'test', 'right mode');
+is(MojoliciousTest->new(mode => 'test')->mode,   'test', 'right mode');
 is(MojoliciousTest->new({mode => 'test'})->mode, 'test', 'right mode');
 
 # Persistent error

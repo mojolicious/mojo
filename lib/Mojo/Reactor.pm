@@ -11,7 +11,7 @@ sub again { croak 'Method "again" not implemented by subclass' }
 
 sub detect {
   my $default = 'Mojo::Reactor::' . ($Config{d_pseudofork} ? 'Poll' : 'EV');
-  my $try = $ENV{MOJO_REACTOR} || $default;
+  my $try     = $ENV{MOJO_REACTOR} || $default;
   return $DETECTED{$try} ||= load_class($try) ? 'Mojo::Reactor::Poll' : $try;
 }
 

@@ -142,7 +142,7 @@ is_deeply \@errors, ['hello world'], 'promise rejected';
 $promise = Mojo::Promise->new;
 @results = ();
 $promise->finally(sub { push @results, 'finally1' })
-  ->finally(sub { push @results, 'finally2' });
+  ->finally(sub       { push @results, 'finally2' });
 $promise->resolve('pass');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['finally1', 'finally2'], 'promise not resolved';
@@ -215,7 +215,7 @@ is_deeply \@errors, ['second'], 'promise rejected';
 
 # Timeout
 (@errors, @results) = @_;
-$promise = Mojo::Promise->timeout(0.25 => 'Timeout1');
+$promise  = Mojo::Promise->timeout(0.25 => 'Timeout1');
 $promise2 = Mojo::Promise->new->timeout(0.025 => 'Timeout2');
 $promise3
   = Mojo::Promise->race($promise, $promise2)->then(sub { @results = @_ })

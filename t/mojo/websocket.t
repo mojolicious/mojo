@@ -66,7 +66,7 @@ websocket '/early_finish' => sub {
 websocket '/denied' => sub {
   my $c = shift;
   $c->tx->handshake->on(finish => sub { $c->stash->{handshake}++ });
-  $c->on(finish => sub { shift->stash->{finished}++ });
+  $c->on(finish => sub                { shift->stash->{finished}++ });
   $c->render(text => 'denied', status => 403);
 };
 

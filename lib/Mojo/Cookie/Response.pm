@@ -35,7 +35,7 @@ sub to_string {
 
   # Name and value
   return '' unless length(my $name = $self->name // '');
-  my $value = $self->value // '';
+  my $value  = $self->value // '';
   my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote $value : $value;
 
   # "expires"

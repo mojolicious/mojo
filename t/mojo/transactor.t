@@ -200,7 +200,7 @@ is $tx->req->default_charset('shift_jis')->param('やった'), 'やった',
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/form-data'} => form =>
-    {'♥'          => '☃', nothing => undef});
+    {'♥' => '☃', nothing => undef});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -238,7 +238,7 @@ is $tx->req->default_charset('shift_jis')->param('やった'), 'やった',
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/form-data'} => form =>
-    {a              => [1, 2, 3], b => 4});
+    {a => [1, 2, 3], b => 4});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',

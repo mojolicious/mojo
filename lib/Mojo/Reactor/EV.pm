@@ -38,7 +38,7 @@ sub watch {
   $mode |= EV::READ  if $read;
   $mode |= EV::WRITE if $write;
 
-  if ($mode == 0) { delete $io->{watcher} }
+  if    ($mode == 0)             { delete $io->{watcher} }
   elsif (my $w = $io->{watcher}) { $w->events($mode) }
   else {
     my $cb = sub {

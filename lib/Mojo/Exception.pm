@@ -5,7 +5,7 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::Util 'decode';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
-has message => 'Exception!';
+has message                                    => 'Exception!';
 has 'verbose';
 
 sub inspect {
@@ -44,7 +44,7 @@ sub to_string {
   $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
   $str .= $self->line->[0] . ': ' . $self->line->[1] . "\n" if $self->line->[0];
   $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
-  $str .= "$_->[1]:$_->[2] ($_->[0])\n" for @{$self->frames};
+  $str .= "$_->[1]:$_->[2] ($_->[0])\n"   for @{$self->frames};
 
   return $str;
 }

@@ -51,7 +51,7 @@ sub connection { shift->handshake->connection }
 sub finish {
   my $self = shift;
 
-  my $close = $self->{close} = [@_];
+  my $close   = $self->{close} = [@_];
   my $payload = $close->[0] ? pack('n', $close->[0]) : '';
   $payload .= encode 'UTF-8', $close->[1] if defined $close->[1];
   $close->[0] //= 1005;

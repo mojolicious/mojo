@@ -53,7 +53,7 @@ sub map {
   for my $item (@items) {
     my $p = $proto->clone;
     push @trigger, $p;
-    push @wait, $p->then(sub { local $_ = $item; $_->$cb });
+    push @wait,    $p->then(sub { local $_ = $item; $_->$cb });
   }
 
   my @all = map {

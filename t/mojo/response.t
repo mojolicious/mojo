@@ -348,8 +348,8 @@ is $res->body, '', 'no content';
 
 # Parse full HTTP 1.1 response (204 No Content)
 $res = Mojo::Message::Response->new;
-$res->content->on(body => sub { shift->headers->header('X-Body' => 'one') });
-$res->on(finish => sub { shift->headers->header('X-Finish' => 'two') });
+$res->content->on(body => sub { shift->headers->header('X-Body'   => 'one') });
+$res->on(finish => sub        { shift->headers->header('X-Finish' => 'two') });
 $res->parse("HTTP/1.1 204 No Content\x0d\x0a");
 $res->parse("Content-Type: text/html\x0d\x0a");
 $res->parse("Content-Length: 9001\x0d\x0a");
@@ -982,6 +982,7 @@ $res->content->write('' => $cb);
 my $full   = '';
 my $count  = 0;
 my $offset = 0;
+
 while (1) {
   my $chunk = $res->get_body_chunk($offset);
   last unless $chunk;
@@ -1004,6 +1005,7 @@ $res->fix_headers;
 $full   = '';
 $count  = 0;
 $offset = 0;
+
 while (1) {
   my $chunk = $res->get_body_chunk($offset);
   last unless $chunk;

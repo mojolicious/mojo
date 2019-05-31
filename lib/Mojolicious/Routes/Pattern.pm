@@ -3,9 +3,9 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 
-has [qw(constraints defaults types)] => sub { {} };
+has [qw(constraints defaults types)]   => sub { {} };
 has [qw(placeholder_start type_start)] => ':';
-has [qw(placeholders tree)] => sub { [] };
+has [qw(placeholders tree)]            => sub { [] };
 has quote_end   => '>';
 has quote_start => '<';
 has [qw(regex unparsed)];

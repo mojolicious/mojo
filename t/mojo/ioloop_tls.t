@@ -208,7 +208,7 @@ Mojo::IOLoop->client(
   sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
-    $stream->on(timeout => sub { $timeout++ });
+    $stream->on(timeout => sub   { $timeout++ });
     $stream->on(
       close => sub {
         $client_close++;

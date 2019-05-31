@@ -265,8 +265,7 @@ my @two = map { path($lib)->child(split '/') } (
   'BaseTest/Base3.pm',  'DeprecationTest.pm',
   'LoaderException.pm', 'LoaderException2.pm',
   'LoaderTest/A.pm',    'LoaderTest/B.pm',
-  'LoaderTest/C.pm',,
-  'TestConnectProxy.pm'
+  'LoaderTest/C.pm',    'TestConnectProxy.pm'
 );
 is_deeply path($lib)->list_tree({max_depth => 2})->map('to_string')->to_array,
   [@two], 'right files';

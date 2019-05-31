@@ -11,11 +11,11 @@ use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
 has [qw(compress default_handler)];
-has default_format => 'html';
-has encoding       => 'UTF-8';
+has default_format         => 'html';
+has encoding               => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
-has min_compress_size => 860;
-has paths             => sub { [] };
+has min_compress_size      => 860;
+has paths                  => sub { [] };
 
 # Bundled templates
 my $TEMPLATES = path(__FILE__)->sibling('resources', 'templates');

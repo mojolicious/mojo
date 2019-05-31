@@ -11,9 +11,9 @@ use Mojolicious::Routes::Match;
 has base_classes => sub { [qw(Mojolicious::Controller Mojolicious)] };
 has cache        => sub { Mojo::Cache->new };
 has [qw(conditions shortcuts)] => sub { {} };
-has types      => sub { {num => qr/[0-9]+/} };
-has hidden     => sub { [qw(attr has new tap)] };
-has namespaces => sub { [] };
+has types                      => sub { {num => qr/[0-9]+/} };
+has hidden                     => sub { [qw(attr has new tap)] };
+has namespaces                 => sub { [] };
 
 sub add_condition { $_[0]->conditions->{$_[1]} = $_[2] and return $_[0] }
 
@@ -71,15 +71,15 @@ sub match {
   # Path (partial path gets priority)
   my $req  = $c->req;
   my $path = $c->stash->{path};
-  if (defined $path) { $path = "/$path" if $path !~ m!^/! }
-  else               { $path = $req->url->path->to_route }
+  if   (defined $path) { $path = "/$path" if $path !~ m!^/! }
+  else                 { $path = $req->url->path->to_route }
 
   # Method (HEAD will be treated as GET)
   my $method = uc($req->url->query->clone->param('_method') || $req->method);
   $method = 'GET' if $method eq 'HEAD';
 
   # Check cache
-  my $ws = $c->tx->is_websocket ? 1 : 0;
+  my $ws    = $c->tx->is_websocket ? 1 : 0;
   my $match = Mojolicious::Routes::Match->new(root => $self);
   $c->match($match);
   my $cache = $self->cache;
@@ -117,8 +117,8 @@ sub _class {
 
   # Specific namespace
   elsif (defined(my $ns = $field->{namespace})) {
-    if ($class) { push @classes, $ns ? "${ns}::$class" : $class }
-    elsif ($ns) { push @classes, $ns }
+    if    ($class) { push @classes, $ns ? "${ns}::$class" : $class }
+    elsif ($ns)    { push @classes, $ns }
   }
 
   # All namespaces

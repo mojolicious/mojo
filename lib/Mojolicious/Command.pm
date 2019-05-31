@@ -10,7 +10,7 @@ use Mojo::Template;
 has
   app =>
   sub { $_[0]{app_ref} = Mojo::Server->new->build_app('Mojo::HelloWorld') },
-  weak          => 1;
+  weak => 1;
 has description => 'No description';
 has 'quiet';
 has template => sub { {vars => 1} };

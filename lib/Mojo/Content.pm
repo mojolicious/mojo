@@ -272,7 +272,7 @@ sub _parse_until_body {
   $self->{raw_size} += length($chunk //= '');
   $self->{pre_buffer} .= $chunk;
   $self->_parse_headers if ($self->{state} ||= 'headers') eq 'headers';
-  $self->emit('body') if $self->{state} ne 'headers' && !$self->{body}++;
+  $self->emit('body')   if $self->{state} ne 'headers' && !$self->{body}++;
 }
 
 1;

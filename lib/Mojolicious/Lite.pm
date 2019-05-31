@@ -22,7 +22,7 @@ sub import {
 
   # Generate moniker based on filename
   my $moniker = path($ENV{MOJO_EXE})->basename('.pl', '.pm', '.t');
-  my $app = shift->new(moniker => $moniker);
+  my $app     = shift->new(moniker => $moniker);
 
   # Initialize routes without namespaces
   my $routes = $app->routes->namespaces([]);
@@ -34,7 +34,7 @@ sub import {
     monkey_patch $caller, $name, sub { $routes->$name(@_) };
   }
   monkey_patch($caller, $_, sub {$app}) for qw(new app);
-  monkey_patch $caller, del => sub { $routes->delete(@_) };
+  monkey_patch $caller, del   => sub { $routes->delete(@_) };
   monkey_patch $caller, group => sub (&) {
     (my $old, $root) = ($root, $routes);
     shift->();

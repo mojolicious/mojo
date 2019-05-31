@@ -87,7 +87,7 @@ $result = undef;
 $delay  = Mojo::IOLoop::Delay->new;
 $end    = $delay->begin(0);
 Mojo::IOLoop->next_tick(sub { $end->(23) });
-$delay->steps(sub { $result = pop });
+$delay->steps(sub           { $result = pop });
 is $result, undef, 'no result';
 $delay->wait;
 is $result, 23, 'right result';

@@ -332,7 +332,7 @@ is $p->size, 1, 'right number of elements';
 my @p;
 @div = ();
 $dom->find('div')->each(sub { push @div, $_->attr('id') });
-$dom->find('p')->each(sub { push @p, $_->attr('id') });
+$dom->find('p')->each(sub   { push @p,   $_->attr('id') });
 is_deeply \@p, [qw(foo bar)], 'found all p elements';
 my $ids = [qw(container header logo buttons buttons content)];
 is_deeply \@div, $ids, 'found all div elements';

@@ -10,7 +10,7 @@ use Mojo::Base -base, -signatures;
 sub foo ($self, $bar, $baz) { $bar + $baz }
 
 package MojoSignatureBaseTest2;
-use Mojo::Base -signatures, -base;
+use Mojo::Base -signatures, -base, -strict;
 
 sub foo ($self, $bar, $baz) { $bar - $baz }
 

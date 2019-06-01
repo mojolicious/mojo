@@ -1,7 +1,8 @@
 
-8.18  2019-05-31
+8.18  2019-06-01
   - Welcome to the Mojolicious core team CandyAngel and Christopher Rasch-Olsen
     Raa.
+  - Improved Mojo::Base flags not to require a certain order.
 
 8.17  2019-05-23
   - Fixed a bug in Mojo::UserAgent where the request timeout would not work for

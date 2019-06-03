@@ -189,8 +189,8 @@ Mojolicious::Command::get - Get command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::get> is a command line interface for
-L<Mojo::UserAgent>.
+L<Mojolicious::Command::get> performs requests to remote hosts or local
+applications.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
@@ -200,8 +200,8 @@ available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::get> performs requests to remote hosts or local
-applications.
+L<Mojolicious::Command::get> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
 

@@ -221,7 +221,7 @@ is_deeply $array, ["\x{10346}"], 'successful roundtrip';
 $array = decode_json '["\\ud800\\udf46"]';
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
-# Complicated roudtrips
+# Complicated roundtrips
 $bytes = '{"":""}';
 $hash  = decode_json $bytes;
 is_deeply $hash, {'' => ''}, 'decode {"":""}';

@@ -68,7 +68,7 @@ $dir = tempdir 'mytestXXXXX';
 ok -d $dir, 'directory exists';
 like $dir->basename, qr/mytest.{5}$/, 'right format';
 
-# Temporary diectory (separate object)
+# Temporary directory (separate object)
 $dir  = Mojo::File->new(File::Temp->newdir);
 $path = "$dir";
 ok -d $path, 'directory exists';

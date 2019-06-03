@@ -735,7 +735,7 @@ is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
-# 302 redirect (lowecase HEAD)
+# 302 redirect (lowercase HEAD)
 $tx = $t->tx(head => 'http://mojolicious.org/foo');
 $tx->res->code(302);
 $tx->res->headers->location('http://example.com/bar');

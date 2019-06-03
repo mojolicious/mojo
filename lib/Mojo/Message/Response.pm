@@ -7,7 +7,7 @@ use Mojo::Date;
 has [qw(code message)];
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} // 2147483648 };
 
-# Umarked codes are from RFC 7231
+# Unmarked codes are from RFC 7231
 my %MESSAGES = (
   100 => 'Continue',
   101 => 'Switching Protocols',
@@ -54,7 +54,7 @@ my %MESSAGES = (
   422 => 'Unprocessable Entity',               # RFC 2518 (WebDAV)
   423 => 'Locked',                             # RFC 2518 (WebDAV)
   424 => 'Failed Dependency',                  # RFC 2518 (WebDAV)
-  425 => 'Unordered Colection',                # RFC 3648 (WebDAV)
+  425 => 'Unordered Collection',               # RFC 3648 (WebDAV)
   426 => 'Upgrade Required',                   # RFC 2817
   428 => 'Precondition Required',              # RFC 6585
   429 => 'Too Many Requests',                  # RFC 6585

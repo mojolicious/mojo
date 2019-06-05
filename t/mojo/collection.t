@@ -96,6 +96,20 @@ is $collection->map('reverse')->map(join => "\n")->join("\n"),
 is $collection->map(join => '-')->join("\n"), "1-2-3\n4-5-6\n7-8-9",
   'right result';
 
+# range
+$collection = c(1 .. 5);
+is_deeply $collection->range(0)->to_array, [1 .. 5], 'right result';
+is_deeply $collection->range(0, 0)->to_array, [], 'right result';
+is_deeply $collection->range(0, 4)->to_array,  [1 .. 5], 'right result';
+is_deeply $collection->range(0, 10)->to_array, [1 .. 5], 'right result';
+is_deeply $collection->range(4)->to_array, [5], 'right result';
+is_deeply $collection->range(5)->to_array, [], 'right result';
+is_deeply $collection->range(5, 10)->to_array, [], 'right result';
+is_deeply $collection->range(-1, -1)->to_array, [5], 'right result';
+is_deeply $collection->range(-10, -7)->to_array, [], 'right result';
+is_deeply $collection->range(-10, 10)->to_array, [1 .. 5], 'right result';
+is_deeply $collection->range(-3)->to_array, [3 .. 5], 'right result';
+
 # reverse
 $collection = c(3, 2, 1);
 is_deeply $collection->reverse->to_array, [1, 2, 3], 'right order';
@@ -140,7 +154,7 @@ $collection = c(qw(Test perl Mojo));
 is_deeply $collection->sort(sub { uc(shift) cmp uc(shift) })->to_array,
   [qw(Mojo perl Test)], 'right order';
 $collection = c();
-is_deeply $collection->sort->to_array,                    [], 'no elements';
+is_deeply $collection->sort->to_array, [], 'no elements';
 is_deeply $collection->sort(sub { $a cmp $b })->to_array, [], 'no elements';
 
 # slice

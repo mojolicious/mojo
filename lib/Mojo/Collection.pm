@@ -57,6 +57,16 @@ sub new {
   return bless [@_], ref $class || $class;
 }
 
+sub range {
+  my $self = shift;
+  my ($begin, $end)
+    = map { my $i = $_ < 0 ? @$self + $_ : $_; $i < 0 ? 0 : $i }
+    ($_[0] // 0, $_[1] // int @$self);
+  return $self->new if $begin >= @$self || $end == 0;
+  $end = @$self - 1 if $end >= @$self;
+  return $self->new(@$self[$begin .. $end]);
+}
+
 sub reduce {
   my $self = shift;
   @_ = (@_, @$self);
@@ -96,7 +106,7 @@ sub uniq {
   my ($self, $cb) = (shift, shift);
   my %seen;
   return $self->new(grep { !$seen{$_->$cb(@_) // ''}++ } @$self) if $cb;
-  return $self->new(grep { !$seen{$_          // ''}++ } @$self);
+  return $self->new(grep { !$seen{$_ // ''}++ } @$self);
 }
 
 sub with_roles { shift->Mojo::Base::with_roles(@_) }
@@ -280,6 +290,26 @@ passed to the callback, and is also available as C<$_>.
   my $collection = Mojo::Collection->new(1, 2, 3);
 
 Construct a new array-based L<Mojo::Collection> object.
+
+=head2 range
+
+  my $new = $collection->range($begin, $end);
+  my $new = $collection->range(0, 2);
+  my $new = $collection->range(-4, -1);
+  my $new = $collection->range;
+  my $new = $collection->range;
+
+Creates a new collection with the portion of the collection from C<$begin> to
+C<$end> - C<$end> not included. C<$begin> will default to "0" unless specified,
+and C<$end> will default to the L</size> of the collection. If C<$begin> is
+greater than the L</size> of the collection, then an empty collection will be
+returned. C<$begin> and C<$end> can also be negative, indicating an offset from
+the end of the collection.
+
+  # "C D E"
+  c('A', 'B', 'C', 'D', 'E')->range(2)->join(' ');
+  c('A', 'B', 'C', 'D', 'E')->range(2, -1)->join(' ');
+  c('A', 'B', 'C', 'D', 'E')->range(-3, -1)->join(' ');
 
 =head2 reduce
 

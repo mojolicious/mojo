@@ -872,6 +872,8 @@ CandyAngel, C<candyangel@mojolicious.org>
 
 Christopher Rasch-Olsen Raa, C<christopher@mojolicious.org>
 
+Dan Book, C<grinnz@mojolicious.org>
+
 Jan Henning Thorsen, C<batman@mojolicious.org>
 
 Joel Berger, C<jberger@mojolicious.org>
@@ -969,8 +971,6 @@ Christian Hansen
 chromatic
 
 Curt Tilmes
-
-Dan Book
 
 Daniel Kimsey
 

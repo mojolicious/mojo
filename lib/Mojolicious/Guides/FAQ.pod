@@ -75,7 +75,7 @@ now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>).
 
 First of all, you need to be aware that according to the L<perlpolicy>, only
 the two most recent stable release series of Perl are supported by the
-community and receive bug fixes, which are currently 5.28.x and 5.26.x.
+community and receive bug fixes, which are currently 5.30.x and 5.28.x.
 L<Mojolicious> follows this model and fully supports these two release series.
 In addition we will also keep the distribution installable (and that means
 passing all tests) up to a certain legacy version that the core team deems

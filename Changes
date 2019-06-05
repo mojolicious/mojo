@@ -3,6 +3,8 @@
   - Welcome to the Mojolicious core team CandyAngel, Christopher Rasch-Olsen
     Raa and Dan Book.
   - Improved Mojo::Base flags not to require a certain order.
+  - Fixed a typo in the 425 status message in Mojo::Message::Response.
+    (CandyAngel)
   - Fixed a missing deprecation warning in Mojo::Promise. (marcus)
 
 8.17  2019-05-23

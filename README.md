@@ -7,13 +7,19 @@
 
  # [![Build Status](https://travis-ci.com/mojolicious/mojo.svg?branch=master)](https://travis-ci.com/mojoliocus/mojo) [![Windows build status](https://ci.appveyor.com/api/projects/status/b748ehchfsd4edac?svg=true)](https://ci.appveyor.com/project/kraih73737/mojo)
 
-  Back in the early days of the web, many people learned Perl because of a
-  wonderful Perl library called [CGI](https://metacpan.org/module/CGI). It was
-  simple enough to get started without knowing much about the language and
-  powerful enough to keep you going, learning by doing was much fun. While
-  most of the techniques used are outdated now, the idea behind it is not.
-  Mojolicious is a new endeavor to implement this idea using bleeding edge
-  technologies.
+  Mojolicious is a fresh take on Perl web development, based on years of
+  experience developing the Catalyst framework, and utilizing the latest
+  web standards and technologies. You can get started with your project
+  quickly, with a framework that grows with your needs.
+
+  The Mojo stack provides a consistent set of components that can be used in
+  any project. The guides cover most aspects of using the framework and the
+  components have comprehensive reference documentation. Mojolicious is a
+  real-time web framework, which allows a new class of web applications
+  using WebSockets and having long-running requests without blocking.
+
+  Join us now, and be a part of a friendly and knowledgeable community of
+  developers!
 
 ## Features
 

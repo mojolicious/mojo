@@ -810,7 +810,7 @@ You can also use the helper L<Mojolicious::Plugin::DefaultHelpers/"url_with">
 to inherit query parameters from the current request.
 
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
-  $c->url_with->query([page => 2]);
+  $c->url_with->query({page => 2});
 
 =head2 write
 

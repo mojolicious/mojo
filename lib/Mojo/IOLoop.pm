@@ -9,6 +9,7 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::IOLoop::Subprocess;
+use Mojo::IOLoop::UDP;
 use Mojo::Reactor::Poll;
 use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
@@ -69,6 +70,23 @@ sub client {
 sub delay {
   my $delay = Mojo::IOLoop::Delay->new->ioloop(_instance(shift));
   return @_ ? $delay->steps(@_) : $delay;
+}
+
+sub dgram {
+  my ($self, $cb) = (_instance(shift), pop);
+
+  return $self->{out}{$cb}{udp} unless ref $cb;
+
+  my $id  = $self->_id;
+  my $udp = $self->{out}{$id}{udp}
+    = Mojo::IOLoop::UDP->new(reactor => $self->reactor);
+
+  weaken $self;
+  $udp->on(recv  => sub { shift; $self->$cb(@_) });
+  $udp->on(error => sub { $self->_remove($id) });
+  $udp->bind(@_);
+
+  return $id;
 }
 
 sub is_running { _instance(shift)->reactor->is_running }

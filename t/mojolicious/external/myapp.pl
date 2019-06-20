@@ -68,4 +68,4 @@ __DATA__
 
 @@ menubar.html.ep
 %= same_name
-<%= $config->{just} %><%= $config->{one} %><%= $config->{two} %>
+<%= config->{just} %><%= config->{one} %><%= config->{two} %>

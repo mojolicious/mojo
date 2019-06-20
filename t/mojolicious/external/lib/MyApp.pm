@@ -31,7 +31,7 @@ sub startup {
   $r->get(
     '/inline' => sub {
       my $self = shift;
-      $self->render(inline => '<%= $config->{whatever} =%>');
+      $self->render(inline => '<%= config->{whatever} =%>');
     }
   );
 }

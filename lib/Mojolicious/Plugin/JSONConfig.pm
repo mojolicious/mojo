@@ -60,7 +60,7 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
   say $config->{foo};
 
   # foo.html.ep
-  %= $config->{foo}
+  %= config->{foo}
 
   # The configuration is available application-wide
   my $config = app->config;

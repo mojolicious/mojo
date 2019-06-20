@@ -23,4 +23,4 @@ done_testing();
 
 __DATA__
 @@ index.html.ep
-<%= $config->{foo} %><%= $config->{bar} %>
+<%= config->{foo} %><%= config->{bar} %>

@@ -44,7 +44,7 @@ get '/' => 'index';
 
 my $t = Test::Mojo->new;
 
-$t->get_ok('/')->status_is(200)->content_is("barbarbar\n");
+$t->get_ok('/')->status_is(200)->content_is("barbar\n");
 
 # No config file, default only
 $config
@@ -65,4 +65,4 @@ done_testing();
 
 __DATA__
 @@ index.html.ep
-<%= $config->{foo} %><%= config->{foo} %><%= config 'foo' %>
+<%= config->{foo} %><%= config 'foo' %>

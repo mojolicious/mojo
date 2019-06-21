@@ -5,6 +5,7 @@ use Carp 'croak';
 use Exporter 'import';
 use List::Util;
 use Mojo::ByteStream;
+use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');
@@ -69,7 +70,9 @@ sub shuffle { $_[0]->new(List::Util::shuffle @{$_[0]}) }
 
 sub size { scalar @{$_[0]} }
 
+# DEPRECATED!
 sub slice {
+  deprecated 'Mojo::Collection::slice is DEPRECATED';
   my $self = shift;
   return $self->new(@$self[@_]);
 }
@@ -303,15 +306,6 @@ C<$b> will always be set to the next element in the collection.
   my $new = $collection->reverse;
 
 Create a new collection with all elements in reverse order.
-
-=head2 slice
-
-  my $new = $collection->slice(4 .. 7);
-
-Create a new collection with all selected elements.
-
-  # "B C E"
-  c('A', 'B', 'C', 'D', 'E')->slice(1, 2, 4)->join(' ');
 
 =head2 shuffle
 

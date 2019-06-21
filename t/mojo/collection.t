@@ -143,17 +143,6 @@ $collection = c();
 is_deeply $collection->sort->to_array,                    [], 'no elements';
 is_deeply $collection->sort(sub { $a cmp $b })->to_array, [], 'no elements';
 
-# slice
-$collection = c(1, 2, 3, 4, 5, 6, 7, 10, 9, 8);
-is_deeply $collection->slice(0)->to_array,  [1], 'right result';
-is_deeply $collection->slice(1)->to_array,  [2], 'right result';
-is_deeply $collection->slice(2)->to_array,  [3], 'right result';
-is_deeply $collection->slice(-1)->to_array, [8], 'right result';
-is_deeply $collection->slice(-3, -5)->to_array, [10, 6], 'right result';
-is_deeply $collection->slice(1, 2, 3)->to_array, [2, 3, 4], 'right result';
-is_deeply $collection->slice(6, 1, 4)->to_array, [7, 2, 5], 'right result';
-is_deeply $collection->slice(6 .. 9)->to_array, [7, 10, 9, 8], 'right result';
-
 # uniq
 $collection = c(1, 2, 3, 2, 3, 4, 5, 4);
 is_deeply $collection->uniq->to_array, [1, 2, 3, 4, 5], 'right result';

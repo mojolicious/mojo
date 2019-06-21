@@ -6,6 +6,8 @@
     templates by Mojolicious::Plugin::Config. You can use the config helper
     instead. Unfortunately there is no good way to warn users, so this
     deprecation will be in effect until the next major release.
+  - Deprecated Mojo::Collection::slice since nobody remembers anymore what its
+    intended purpose was.
   - Improved Mojo::Base flags not to require a certain order.
   - Fixed a typo in the 425 status message in Mojo::Message::Response.
     (CandyAngel)

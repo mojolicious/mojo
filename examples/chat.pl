@@ -1,3 +1,6 @@
+#
+# Minimal single-process WebSocket chat application for browser testing
+#
 use Mojolicious::Lite;
 use Mojo::EventEmitter;
 
@@ -18,7 +21,6 @@ websocket '/channel' => sub {
   $c->on(finish => sub { shift->events->unsubscribe(mojochat => $cb) });
 };
 
-# Minimal single-process WebSocket chat application for browser testing
 app->start;
 __DATA__
 

@@ -31,6 +31,12 @@ for my $header (keys %NAMES) {
   };
 }
 
+# Hop-by-hop headers
+my @HOP_BY_HOP = map {lc} (
+  qw(Connection Keep-Alive Proxy-Authenticate Proxy-Authorization TE Trailer),
+  qw(Transfer-Encoding Upgrade)
+);
+
 sub add {
   my ($self, $name) = (shift, shift);
 
@@ -50,7 +56,22 @@ sub append {
   return $self->header($name => defined $old ? "$old, $value" : $value);
 }
 
-sub clone { $_[0]->new->from_hash($_[0]->to_hash(1)) }
+sub clone {
+  my $self = shift;
+
+  my $clone = $self->new;
+  %{$clone->{names}} = %{$self->{names} // {}};
+  @{$clone->{headers}{$_}} = @{$self->{headers}{$_}}
+    for keys %{$self->{headers}};
+
+  return $clone;
+}
+
+sub dehop {
+  my $self = shift;
+  delete @{$self->{headers}}{@HOP_BY_HOP};
+  return $self;
+}
 
 sub every_header { shift->{headers}{lc shift} || [] }
 
@@ -385,6 +406,13 @@ L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
   $headers = $headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Get or replace current header value, shortcut for the C<Date> header.
+
+=head2 dehop
+
+  $heders = $headers->dehop;
+
+Remove hop-by-hop headers that should not be retransmitted. Note that this
+method is EXPERIMENTAL and might change without warning!
 
 =head2 dnt
 

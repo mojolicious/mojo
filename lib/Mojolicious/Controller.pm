@@ -174,12 +174,13 @@ sub rendered {
   my ($self, $status) = @_;
 
   # Make sure we have a status
-  my $res = $self->res;
-  $res->code($status || 200) if $status || !$res->code;
+  $self->res->code($status) if $status;
 
   # Finish transaction
   my $stash = $self->stash;
   if (!$stash->{'mojo.finished'} && ++$stash->{'mojo.finished'}) {
+    my $res = $self->res;
+    $res->code(200) if !$status && !$res->code;
 
     # Disable auto rendering and stop timer
     my $app = $self->render_later->app;

@@ -6,12 +6,18 @@ use Mojo::IOLoop;
 use Mojo::Util;
 use Scalar::Util 'weaken';
 
-has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
+has high_water_mark => 1048576;
+has reactor         => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
 sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
 
-sub bytes_read    { shift->{read}    || 0 }
+sub bytes_read { shift->{read} || 0 }
+
+sub bytes_waiting { length(shift->{buffer} // '') }
+
 sub bytes_written { shift->{written} || 0 }
+
+sub can_write { $_[0]{handle} && $_[0]->bytes_waiting < $_[0]->high_water_mark }
 
 sub close {
   my $self = shift;
@@ -43,6 +49,7 @@ sub start {
   my $self = shift;
 
   # Resume
+  return unless $self->{handle};
   my $reactor = $self->reactor;
   return $reactor->watch($self->{handle}, 1, $self->is_writing)
     if delete $self->{paused};
@@ -61,7 +68,7 @@ sub steal_handle {
 sub stop {
   my $self = shift;
   $self->reactor->watch($self->{handle}, 0, $self->is_writing)
-    unless $self->{paused}++;
+    if $self->{handle} && !$self->{paused}++;
 }
 
 sub timeout {
@@ -231,6 +238,15 @@ Emitted if new data has been written to the stream.
 
 L<Mojo::IOLoop::Stream> implements the following attributes.
 
+=head2 high_water_mark
+
+  my $size = $msg->high_water_mark;
+  $msg     = $msg->high_water_mark(1024);
+
+Maximum size of L</"write"> buffer in bytes before L</"can_write"> returns
+false, defaults to C<1048576> (1MiB). Note that this attribute is EXPERIMENTAL
+and might change without warning!
+
 =head2 reactor
 
   my $reactor = $stream->reactor;
@@ -250,11 +266,25 @@ implements the following new ones.
 
 Number of bytes received.
 
+=head2 bytes_waiting
+
+  my $num = $stream->bytes_waiting;
+
+Number of bytes that have been enqueued with L</"write"> and are waiting to be
+written. Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 bytes_written
 
   my $num = $stream->bytes_written;
 
 Number of bytes written.
+
+=head2 can_write
+
+  my $bool = $stream->can_write;
+
+Returns true if calling L</"write"> is safe. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 close
 
@@ -326,8 +356,8 @@ stream to be inactive indefinitely.
   $stream = $stream->write($bytes);
   $stream = $stream->write($bytes => sub {...});
 
-Write data to stream, the optional drain callback will be executed once all data
-has been written.
+Enqueue data to be written to the stream as soon as possible, the optional drain
+callback will be executed once all data has been written.
 
 =head1 SEE ALSO
 

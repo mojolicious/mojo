@@ -35,7 +35,7 @@ sub run {
   if (!$ENV{MOJO_NO_DETECT} && (my $env = $self->detect)) { $name = $env }
 
   # Run command
-  if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
+  if ($name && $name =~ /^[\w-]+$/ && ($name ne 'help' || $args[0])) {
 
     # Help
     $name = shift @args if my $help = $name eq 'help';
@@ -43,6 +43,8 @@ sub run {
 
     # Remove options shared by all commands before loading the command
     _args(\@args);
+
+    $name =~ s/(?<=.)-/_/g;
     my $module;
     $module = _command("${_}::$name", 1) and last for @{$self->namespaces};
 
@@ -123,6 +125,7 @@ Mojolicious::Commands - Command line interface
 L<Mojolicious::Commands> is the interactive command line interface for the
 L<Mojolicious> framework. It will automatically detect available commands in
 the C<Mojolicious::Command> and C<Mojolicious::Command::Author> namespaces.
+C<-> is translated to C<_> when looking for packages.
 
 =head1 COMMANDS
 

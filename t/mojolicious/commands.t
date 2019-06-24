@@ -78,10 +78,11 @@ my $app;
   $app = Mojolicious::Commands->start_app('MojoliciousTest');
 }
 is $app->start('test_command'), 'works!', 'right result';
-{
-  is(Mojolicious::Commands->start_app(MojoliciousTest => 'test_command'),
-    'works!', 'right result');
-}
+is(Mojolicious::Commands->start_app(MojoliciousTest => 'test_command'),
+  'works!', 'right result');
+is $app->start('test-command'), 'works!', 'right result';
+is(Mojolicious::Commands->start_app(MojoliciousTest => 'test-command'),
+  'works!', 'right result');
 
 # Do not pick up options for detected environments
 {

@@ -14,8 +14,9 @@ use constant WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
-# To regenerate the certificate run this command (18.04.2012)
-# openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
+# To regenerate the certificate run this command (28.06.2019)
+# openssl req -x509 -newkey rsa:4096 -nodes -sha256 -out server.crt \
+#   -keyout server.key -days 7300 -subj '/CN=localhost'
 my $CERT = path(__FILE__)->sibling('resources', 'server.crt')->to_string;
 my $KEY  = path(__FILE__)->sibling('resources', 'server.key')->to_string;
 

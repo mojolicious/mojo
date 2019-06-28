@@ -14,6 +14,7 @@
   - Added EXPERIMENTAL bytes_waiting and can_write methods to
     Mojo::IOLoop::Stream.
   - Added EXPERIMENTAL high_water_mark attribute to Mojo::IOLoop::Stream.
+  - Updated bundled TLS certificate.
   - Improved Mojo::Base flags not to require a certain order.
   - Improved clone performance in Mojo::Headers by 100%.
   - Improved streaming response performance slightly.

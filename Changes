@@ -1,5 +1,5 @@
 
-8.18  2019-06-20
+8.18  2019-06-28
   - Welcome to the Mojolicious core team CandyAngel, Christopher Rasch-Olsen
     Raa and Dan Book.
   - Deprecated the use of the config stash value and $config variable in
@@ -8,7 +8,15 @@
     deprecation will be in effect until the next major release.
   - Deprecated Mojo::Collection::slice since nobody remembers anymore what its
     intended purpose was.
+  - Added EXPERIMENTAL proxy->get_p, proxy->post_p and proxy->start_p helpers to
+    Mojolicious::Plugin::DefaultHelpers.
+  - Added EXPERIMENTAL dehop method to Mojo::Headers.
+  - Added EXPERIMENTAL bytes_waiting and can_write methods to
+    Mojo::IOLoop::Stream.
+  - Added EXPERIMENTAL high_water_mark attribute to Mojo::IOLoop::Stream.
   - Improved Mojo::Base flags not to require a certain order.
+  - Improved clone performance in Mojo::Headers by 100%.
+  - Improved streaming response performance slightly.
   - Fixed a typo in the 425 status message in Mojo::Message::Response.
     (CandyAngel)
   - Fixed a missing deprecation warning in Mojo::Promise. (marcus)

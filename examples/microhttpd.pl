@@ -1,7 +1,9 @@
+#
+# Minimal event loop example demonstrating how to cheat at HTTP benchmarks :)
+#
 use Mojo::Base -strict;
 use Mojo::IOLoop;
 
-# Minimal event loop example demonstrating how to cheat at HTTP benchmarks :)
 my %buffer;
 Mojo::IOLoop->server(
   {port => 8080} => sub {

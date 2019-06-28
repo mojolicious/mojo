@@ -126,6 +126,11 @@ is $headers->expect, '100-continue', 'right value';
 is $clone->expect,   'nothing',      'right value';
 $clone = Mojo::Headers->new->add(Foo => [qw(bar baz)])->clone;
 is_deeply $clone->to_hash(1)->{Foo}, [[qw(bar baz)]], 'right structure';
+$clone = $headers->clone;
+$headers->add(Expect => 'whatever');
+is_deeply $clone->to_hash(1), {Expect => ['100-continue']}, 'right structure';
+is_deeply $headers->to_hash(1), {Expect => ['100-continue', 'whatever']},
+  'right structure';
 
 # Parse headers
 $headers = Mojo::Headers->new;
@@ -242,6 +247,23 @@ EOF
 ok $headers->is_finished, 'parser is finished';
 is $headers->content_type, 'text/plain', 'right value';
 is $headers->header('X-Bender'), 'Bite my shiny, metal ass!', 'right value';
+
+# Dehop
+$headers = Mojo::Headers->new;
+my $fail = {
+  Connection            => 'fail',
+  'Keep-Alive'          => 'fail',
+  'Proxy-Authenticate'  => 'fail',
+  'Proxy-Authorization' => 'fail',
+  Server                => 'pass',
+  TE                    => 'fail',
+  Trailer               => 'fail',
+  'Transfer-Encoding'   => 'fail',
+  Upgrade               => 'fail'
+};
+$headers->from_hash($fail);
+is_deeply $headers->to_hash, $fail, 'right structure';
+is_deeply $headers->dehop->to_hash, {Server => 'pass'}, 'right structure';
 
 # Invalid characters
 $headers = Mojo::Headers->new;

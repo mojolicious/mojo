@@ -30,7 +30,7 @@ sub daemonize {
   # Fork and kill parent
   die "Can't fork: $!" unless defined(my $pid = fork);
   exit 0 if $pid;
-  POSIX::setsid or die "Can't start a new session: $!";
+  POSIX::setsid == -1 and die "Can't start a new session: $!";
 
   # Close filehandles
   open STDIN,  '<',  '/dev/null';

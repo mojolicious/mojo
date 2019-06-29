@@ -1,5 +1,6 @@
 
 8.19  2019-06-29
+  - Fixed daemonize exception handling in Mojo::Server. (skaji)
 
 8.18  2019-06-28
   - Welcome to the Mojolicious core team CandyAngel, Christopher Rasch-Olsen

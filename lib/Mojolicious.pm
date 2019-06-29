@@ -1156,6 +1156,8 @@ Simon Bertrang
 
 Simone Tampieri
 
+Shoichi Kaji
+
 Shu Cho
 
 Skye Shaw

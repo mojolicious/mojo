@@ -337,9 +337,9 @@ $buffer = '';
   $plugin->run('-f', 'MyApp::Ext::Test');
 }
 like $buffer, qr/Test\.pm/, 'right output';
-ok -e $app->rel_file('Myapp-Ext-Test/lib/Myapp/Ext/Test.pm'), 'class exists';
-ok -e $app->rel_file('Myapp-Ext-Test/t/basic.t'),             'test exists';
-ok -e $app->rel_file('Myapp-Ext-Test/Makefile.PL'), 'Makefile.PL exists';
+ok -e $app->rel_file('MyApp-Ext-Test/lib/Myapp/Ext/Test.pm'), 'class exists';
+ok -e $app->rel_file('MyApp-Ext-Test/t/basic.t'),             'test exists';
+ok -e $app->rel_file('MyApp-Ext-Test/Makefile.PL'), 'Makefile.PL exists';
 chdir $cwd;
 
 # inflate

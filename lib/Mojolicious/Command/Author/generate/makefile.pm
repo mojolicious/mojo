@@ -1,8 +1,6 @@
 package Mojolicious::Command::Author::generate::makefile;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojolicious;
-
 has description => 'Generate "Makefile.PL"';
 has usage       => sub { shift->extract_usage };
 

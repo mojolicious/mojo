@@ -9,12 +9,6 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, $class) = (shift, shift || 'MyApp');
 
-  # Prevent bad applications
-  die <<EOF unless $class =~ /^[A-Z](?:\w|::)+$/;
-Your application name has to be a well formed (CamelCase) Perl module name
-like "MyApp".
-EOF
-
   # Script
   my $name = class_to_file $class;
   $self->render_to_rel_file('mojo', "$name/script/$name", {class => $class});

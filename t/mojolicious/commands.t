@@ -330,6 +330,16 @@ ok -e $app->rel_file(
 ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/t/basic.t'), 'test exists';
 ok -e $app->rel_file('Mojolicious-Plugin-MyPlugin/Makefile.PL'),
   'Makefile.PL exists';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $plugin->run('-f', 'MyApp::Ext::Test');
+}
+like $buffer, qr/Test\.pm/, 'right output';
+ok -e $app->rel_file('Myapp-Ext-Test/lib/Myapp/Ext/Test.pm'), 'class exists';
+ok -e $app->rel_file('Myapp-Ext-Test/t/basic.t'),             'test exists';
+ok -e $app->rel_file('Myapp-Ext-Test/Makefile.PL'), 'Makefile.PL exists';
 chdir $cwd;
 
 # inflate

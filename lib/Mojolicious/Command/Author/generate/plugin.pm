@@ -1,20 +1,21 @@
 package Mojolicious::Command::Author::generate::plugin;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Util qw(camelize class_to_path);
-use Mojolicious;
+use Mojo::Util qw(camelize class_to_path getopt);
 
 has description => 'Generate Mojolicious plugin directory structure';
 has usage       => sub { shift->extract_usage };
 
 sub run {
-  my ($self, $name) = (shift, shift || 'MyPlugin');
+  my ($self, @args) = @_;
+
+  getopt \@args, 'f|full' => \(my $full);
 
   # Class
-  my $class = $name =~ /^[a-z]/ ? camelize $name : $name;
-  $class = "Mojolicious::Plugin::$class";
-  my $app = class_to_path $class;
-  my $dir = join '-', split('::', $class);
+  my $name  = $args[0] // 'MyPlugin';
+  my $class = $full ? $name : "Mojolicious::Plugin::$name";
+  my $dir   = join '-', split('::', $class);
+  my $app   = class_to_path $class;
   $self->render_to_rel_file('class', "$dir/lib/$app",
     {class => $class, name => $name});
 
@@ -40,8 +41,10 @@ Mojolicious::Command::Author::generate::plugin - Plugin generator command
 
     mojo generate plugin
     mojo generate plugin TestPlugin
+    mojo generate plugin -f MyApp::Plugin::AwesomeFeature
 
   Options:
+    -f, --full   Do not prepend "Mojolicious::Plugin::" to the plugin name
     -h, --help   Show this summary of available options
 
 =head1 DESCRIPTION

@@ -1,6 +1,10 @@
 
-8.19  2019-06-29
+8.19  2019-07-06
   - Added -f option to generate plugin command.
+  - Improved inspect method in Mojo::Exception to be safe to call more than
+    once.
+  - Fixed bugs in reply->exception helper that could result in exceptions
+    without error message.
   - Fixed daemonize exception handling in Mojo::Server. (skaji)
 
 8.18  2019-06-28

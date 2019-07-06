@@ -126,6 +126,17 @@ get '/dead_helper';
 
 my $t = Test::Mojo->new;
 
+# Missing error
+my $c = $t->app->build_controller;
+$c->reply->exception(undef);
+like $c->res->body, qr/Exception!/, 'right result';
+$c = $t->app->build_controller;
+$c->reply->exception;
+like $c->res->body, qr/Exception!/, 'right result';
+$c = $t->app->build_controller;
+$c->reply->exception(Mojo::Exception->new);
+like $c->res->body, qr/Exception!/, 'right result';
+
 # Debug
 $t->get_ok('/logger?level=debug&message=one')->status_is(200)
   ->content_is('debug: one');

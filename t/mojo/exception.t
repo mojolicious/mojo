@@ -26,7 +26,7 @@ eval {
 };
 $e = $@;
 isa_ok $e, 'Mojo::Exception', 'right class';
-is $e,     'Works!',          'right result';
+is $e->inspect, 'Works!', 'right result';
 like $e->frames->[0][1], qr/exception\.t/, 'right file';
 is $e->lines_before->[0][0], $line + 1, 'right number';
 is $e->lines_before->[0][1], 'eval {', 'right line';
@@ -70,7 +70,7 @@ $e->inspect;
 is_deeply $e->lines_before->[-1], [2, 'use warnings;'], 'right line';
 is_deeply $e->line,               [3, 'use utf8;'],     'right line';
 is_deeply $e->lines_after->[0],   [4, ''],              'right line';
-$e->message("Died at $file line 4.")->inspect;
+$e = Mojo::Exception->new("Died at $file line 4.")->inspect;
 is_deeply $e->lines_before->[-1], [3, 'use utf8;'], 'right line';
 is_deeply $e->line,               [4, ''],          'right line';
 is_deeply $e->lines_after->[0], [5, "my \$s = 'Über•résumé';"],
@@ -82,17 +82,21 @@ $e    = Mojo::Exception->new("Whatever at $file line 3.");
 is_deeply $e->lines_before, [], 'no lines';
 is_deeply $e->line,         [], 'no line';
 is_deeply $e->lines_after,  [], 'no lines';
-$e->inspect;
+$e->inspect->inspect;
 is_deeply $e->lines_before->[-1], [2, 'use warnings;'], 'right line';
 is_deeply $e->line,               [3, 'no utf8;'],      'right line';
 is_deeply $e->lines_after->[0],   [4, ''],              'right line';
-$e->message("Died at $file line 4.")->inspect;
+$e = Mojo::Exception->new("Died at $file line 4.")->inspect;
 is_deeply $e->lines_before->[-1], [3, 'no utf8;'], 'right line';
 is_deeply $e->line,               [4, ''],         'right line';
 is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"],
   'right line';
 
 # Verbose
+$e = Mojo::Exception->new->verbose(1);
+is $e, "Exception!\n", 'right result';
+$e = Mojo::Exception->new->inspect->inspect->verbose(1);
+is $e, "Exception!\n", 'right result';
 $e = Mojo::Exception->new('Test!')->verbose(1);
 $e->frames([
   ['Sandbox',     'template',      4],
@@ -118,5 +122,22 @@ template:4 (Sandbox)
 MyApp/Test.pm:3 (MyApp::Test)
 foo.pl:4 (main)
 EOF
+
+# Missing error
+$e = Mojo::Exception->new->inspect;
+is_deeply $e->lines_before, [], 'no lines';
+is_deeply $e->line,         [], 'no line';
+is_deeply $e->lines_after,  [], 'no lines';
+is $e->message, 'Exception!', 'right message';
+$e = Mojo::Exception->new(undef)->inspect;
+is_deeply $e->lines_before, [], 'no lines';
+is_deeply $e->line,         [], 'no line';
+is_deeply $e->lines_after,  [], 'no lines';
+is $e->message, 'Exception!', 'right message';
+$e = Mojo::Exception->new('')->inspect;
+is_deeply $e->lines_before, [], 'no lines';
+is_deeply $e->line,         [], 'no line';
+is_deeply $e->lines_after,  [], 'no lines';
+is $e->message, '', 'right message';
 
 done_testing();

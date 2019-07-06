@@ -11,10 +11,12 @@ has 'verbose';
 sub inspect {
   my ($self, @sources) = @_;
 
+  return $self if @{$self->line};
+
   # Extract file and line from message
   my @files;
-  my $msg = $self->lines_before([])->line([])->lines_after([])->message;
-  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @files, [$1, $2] }
+  my $msg = $self->message;
+  unshift @files, [$1, $2] while $msg =~ /at\s+(.+?)\s+line\s+(\d+)/g;
 
   # Extract file and line from stack trace
   if (my $zero = $self->frames->[0]) { push @files, [$zero->[1], $zero->[2]] }
@@ -32,7 +34,9 @@ sub inspect {
   return $self;
 }
 
-sub new { @_ > 1 ? shift->SUPER::new(message => shift) : shift->SUPER::new }
+sub new {
+  defined $_[1] ? shift->SUPER::new(message => shift) : shift->SUPER::new;
+}
 
 sub to_string {
   my $self = shift;
@@ -49,7 +53,7 @@ sub to_string {
   return $str;
 }
 
-sub throw { CORE::die shift->new(shift)->trace(2)->inspect }
+sub throw { CORE::die shift->new(shift)->trace(2) }
 
 sub trace {
   my ($self, $start) = (shift, shift // 1);
@@ -202,7 +206,7 @@ Render exception.
 Throw exception from the current execution context.
 
   # Longer version
-  die Mojo::Exception->new('Something went wrong!')->trace->inspect;
+  die Mojo::Exception->new('Something went wrong!')->trace;
 
 =head2 trace
 

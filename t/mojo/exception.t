@@ -1,8 +1,19 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::Exception;
+use Mojo::Exception 'check';
 use Mojo::File 'path';
+
+package MojoTest::X::Foo;
+use Mojo::Base 'Mojo::Exception';
+
+package MojoTest::X::Bar;
+use Mojo::Base 'Mojo::Exception';
+
+package MojoTest::X::Yada;
+use Mojo::Base 'MojoTest::X::Bar';
+
+package main;
 
 # Basics
 my $e = Mojo::Exception->new;
@@ -139,5 +150,103 @@ is_deeply $e->lines_before, [], 'no lines';
 is_deeply $e->line,         [], 'no line';
 is_deeply $e->lines_after,  [], 'no lines';
 is $e->message, '', 'right message';
+
+# Check (string exception)
+my $result;
+eval { die "test1\n" };
+ok check(default => sub { $result = $_ }), 'exception handled';
+is $result, "test1\n", 'exception arrived in handler';
+$result = undef;
+eval { die "test2\n" };
+ok check(default => sub { $result = shift }), 'exception handled';
+is $result, "test2\n", 'exception arrived in handler';
+$result = undef;
+eval { die "test3\n" };
+check
+  default    => sub { $result = 'fail' },
+  qr/^test2/ => sub { $result = 'fail' },
+  qr/^test3/ => sub { $result = 'test10' },
+  qr/^test4/ => sub { $result = 'fail' };
+is $result, 'test10', 'regular expression matched';
+$result = undef;
+check "test4\n",
+  qr/^test3/ => sub { $result = 'fail' },
+  qr/^test4/ => sub { $result = 'test11' },
+  qr/^test5/ => sub { $result = 'fail' };
+is $result, 'test11', 'regular expression matched';
+
+# Check (exception objects)
+$result = undef;
+eval { MojoTest::X::Foo->throw('whatever') };
+check
+  default            => sub { $result = 'fail' },
+  'MojoTest::X::Foo' => sub { $result = 'test12' },
+  'MojoTest::X::Bar' => sub { $result = 'fail' };
+is $result, 'test12', 'class matched';
+$result = undef;
+eval { MojoTest::X::Bar->throw('whatever') };
+check
+  'MojoTest::X::Foo' => sub { $result = 'fail' },
+  'MojoTest::X::Bar' => sub { $result = 'test13' };
+is $result, 'test13', 'class matched';
+$result = undef;
+check(
+  MojoTest::X::Yada->new('whatever'),
+  qr/whatever/       => sub { $result = 'fail' },
+  'MojoTest::X::Foo' => sub { $result = 'fail' },
+  'MojoTest::X::Bar' => sub { $result = 'test14' }
+);
+is $result, 'test14', 'class matched';
+
+# Check (multiple)
+$result = undef;
+check(
+  MojoTest::X::Yada->new('whatever'),
+  ['MojoTest::X::Foo', 'MojoTest::X::Bar'] => sub { $result = 'test15' },
+  default => sub { $result = 'fail' }
+);
+is $result, 'test15', 'class matched';
+$result = undef;
+check(
+  MojoTest::X::Bar->new('whatever'),
+  ['MojoTest::X::Foo', 'MojoTest::X::Yada'] => sub { $result = 'fail' },
+  ['MojoTest::X::Bar'] => sub { $result = 'test16' }
+);
+is $result, 'test16', 'class matched';
+
+# Check (rethrow)
+eval {
+  check "test5\n", qr/test4/ => sub { die 'fail' };
+};
+is $@, "test5\n", 'exception has been rethrown';
+
+# Check (finally)
+my $finally;
+eval {
+  check "test7\n", finally => sub { $finally = 'finally7' };
+};
+is $@,       "test7\n",  'exception has been rethrown';
+is $finally, 'finally7', 'finally handler used';
+$result = [];
+check "test8\n",
+  qr/test7/ => sub { push @$result, 'fail' },
+  default   => sub { push @$result, $_ },
+  finally   => sub { push @$result, 'finally8' };
+is_deeply $result, ["test8\n", 'finally8'], 'default and finally handlers used';
+$finally = undef;
+eval {
+  check "fail\n",
+    default => sub { die "test17\n" },
+    finally => sub { $finally = 'finally17' };
+};
+is $@,       "test17\n",  'right exception';
+is $finally, 'finally17', 'finally handler used';
+
+# Check (nothing)
+ok !check(undef, default => sub { die 'fail' }), 'no exception';
+{
+  local $@;
+  ok !check(default => sub { die 'fail' }), 'no exception';
+}
 
 done_testing();

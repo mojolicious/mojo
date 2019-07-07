@@ -96,7 +96,7 @@ sub _development {
   my ($page, $c, $e) = @_;
 
   my $app = $c->app;
-  $app->log->error(($e = _exc($e) ? $e : Mojo::Exception->new($e))->inspect)
+  $app->log->error(($e = _is_e($e) ? $e : Mojo::Exception->new($e))->inspect)
     if $page eq 'exception';
 
   # Filtered stash snapshot
@@ -119,7 +119,6 @@ sub _development {
   return $c;
 }
 
-sub _exc { blessed $_[0] && $_[0]->isa('Mojo::Exception') }
 
 sub _fallbacks {
   my ($c, $options, $template, $bundled) = @_;
@@ -160,6 +159,8 @@ sub _inactivity_timeout {
   $stream->timeout($timeout) if $stream;
   return $c;
 }
+
+sub _is_e { blessed $_[0] && $_[0]->isa('Mojo::Exception') }
 
 sub _is_fresh {
   my ($c, %options) = @_;

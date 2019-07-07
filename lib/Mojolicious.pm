@@ -197,10 +197,11 @@ sub start {
 
 sub startup { }
 
+sub _die { CORE::die ref $_[0] ? $_[0] : Mojo::Exception->new(shift)->trace(1) }
+
 sub _exception {
   my ($next, $c) = @_;
-  local $SIG{__DIE__}
-    = sub { ref $_[0] ? CORE::die $_[0] : Mojo::Exception->throw(shift) };
+  local $SIG{__DIE__} = \&_die;
   $c->helpers->reply->exception($@) unless eval { $next->(); 1 };
 }
 

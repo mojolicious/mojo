@@ -1,5 +1,6 @@
 
 8.19  2019-07-07
+  - Deprecated Mojo::Exception::verbose.
   - Added EXPERIMENTAL check and raise functions to Mojo::Exception.
   - Added -f option to generate plugin command.
   - Improved inspect method in Mojo::Exception to be safe to call more than

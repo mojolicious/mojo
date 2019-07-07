@@ -146,8 +146,7 @@ sub process {
   unless ($compiled) {
     my $code = $self->_compile->code;
     monkey_patch $self->namespace, '_escape', $self->escape;
-    return Mojo::Exception->new($@)->inspect($self->unparsed, $code)
-      ->trace->verbose(1)
+    return Mojo::Exception->new($@)->inspect($self->unparsed, $code)->trace
       unless $compiled = eval $self->_wrap($code, @_);
     $self->compiled($compiled);
   }
@@ -156,7 +155,7 @@ sub process {
   local $SIG{__DIE__} = sub {
     CORE::die $_[0] if ref $_[0];
     CORE::die Mojo::Exception->new(shift)
-      ->trace->inspect($self->unparsed, $self->code)->verbose(1);
+      ->trace->inspect($self->unparsed, $self->code);
   };
 
   my $output;

@@ -103,12 +103,12 @@ is_deeply $e->line,               [4, ''],         'right line';
 is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"],
   'right line';
 
-# Verbose
-$e = Mojo::Exception->new->verbose(1);
+# Context
+$e = Mojo::Exception->new;
 is $e, "Exception!\n", 'right result';
-$e = Mojo::Exception->new->inspect->inspect->verbose(1);
+$e = Mojo::Exception->new->inspect->inspect;
 is $e, "Exception!\n", 'right result';
-$e = Mojo::Exception->new('Test!')->verbose(1);
+$e = Mojo::Exception->new('Test!');
 $e->frames([
   ['Sandbox',     'template',      4],
   ['MyApp::Test', 'MyApp/Test.pm', 3],

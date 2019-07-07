@@ -3,12 +3,11 @@ use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Exporter 'import';
-use Mojo::Util 'decode';
+use Mojo::Util qw(decode deprecated);
 use Scalar::Util 'blessed';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message                                    => 'Exception!';
-has 'verbose';
 
 our @EXPORT_OK = qw(check raise);
 
@@ -95,14 +94,12 @@ sub to_string {
   my $str = $self->message;
   $str .= "\n" unless $str =~ /\n$/;
 
-  if ($self->verbose) {
-    my $line = $self->line;
-    if (@$line) {
-      $str .= "Context:\n";
-      $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_before};
-      $str .= "  $line->[0]: $line->[1]\n" if $line->[0];
-      $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_after};
-    }
+  my $line = $self->line;
+  if (@$line) {
+    $str .= "Context:\n";
+    $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_before};
+    $str .= "  $line->[0]: $line->[1]\n" if $line->[0];
+    $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_after};
   }
 
   my $frames = $self->frames;
@@ -152,6 +149,12 @@ sub _context {
     push @{$self->lines_after}, [$next + 1];
     _append($self->lines_after->[-1], $_->[$next]) for @$sources;
   }
+}
+
+# DEPRECATED!
+sub verbose {
+  deprecated 'Mojo::Exception::verbose is DEPRECATED';
+  return $_[0];
 }
 
 package Mojo::Exception::_Guard;
@@ -339,13 +342,6 @@ Lines before the line where the exception occurred if available.
 
 Exception message, defaults to C<Exception!>.
 
-=head2 verbose
-
-  my $bool = $e->verbose;
-  $e       = $e->verbose($bool);
-
-Enable context information for L</"to_string">.
-
 =head1 METHODS
 
 L<Mojo::Exception> inherits all methods from L<Mojo::Base> and implements the
@@ -372,9 +368,6 @@ Construct a new L<Mojo::Exception> object and assign L</"message"> if necessary.
 
 Render exception. Note that the output format may change as more features are
 added, only the error message at the beginning is guaranteed not be modified.
-
-  # Render exception with context
-  say $e->verbose(1)->to_string;
 
 =head2 throw
 

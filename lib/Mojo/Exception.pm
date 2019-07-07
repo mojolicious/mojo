@@ -96,8 +96,6 @@ sub to_string {
   $str .= "\n" unless $str =~ /\n$/;
 
   if ($self->verbose) {
-    $str = ref($self) . ": $str";
-
     my $line = $self->line;
     if (@$line) {
       $str .= "Context:\n";

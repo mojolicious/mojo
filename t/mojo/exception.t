@@ -112,9 +112,9 @@ is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"],
 
 # Verbose
 $e = Mojo::Exception->new->verbose(1);
-is $e, "Mojo::Exception: Exception!\n", 'right result';
+is $e, "Exception!\n", 'right result';
 $e = Mojo::Exception->new->inspect->inspect->verbose(1);
-is $e, "Mojo::Exception: Exception!\n", 'right result';
+is $e, "Exception!\n", 'right result';
 $e = Mojo::Exception->new('Test!')->verbose(1);
 $e->frames([
   ['Sandbox',     'template',      4],
@@ -124,7 +124,7 @@ $e->frames([
 $e->lines_before([[3, 'foo();']])->line([4, 'die;'])
   ->lines_after([[5, 'bar();']]);
 is $e, <<EOF, 'right result';
-Mojo::Exception: Test!
+Test!
 Context:
   3: foo();
   4: die;
@@ -136,7 +136,7 @@ Traceback (most recent call first):
 EOF
 $e->message("Works!\n")->lines_before([])->lines_after([]);
 is $e, <<EOF, 'right result';
-Mojo::Exception: Works!
+Works!
 Context:
   4: die;
 Traceback (most recent call first):

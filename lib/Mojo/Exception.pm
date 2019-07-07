@@ -77,12 +77,12 @@ sub new {
 }
 
 sub raise {
-  my ($class, $err) = @_ > 1 ? (@_) : ('Mojo::Exception', shift);
+  my ($class, $err) = @_ > 1 ? (@_) : (__PACKAGE__, shift);
 
   if (!$class->can('new')) {
     die $@ unless eval "package $class; use Mojo::Base 'Mojo::Exception'; 1";
   }
-  elsif (!$class->isa('Mojo::Exception')) {
+  elsif (!$class->isa(__PACKAGE__)) {
     die "$class is not a Mojo::Exception subclass";
   }
 
@@ -192,11 +192,11 @@ Mojo::Exception - Exception base class
   # Create exceptions dynamically and handle them gracefully
   use Mojo::Exception qw(check raise);
   eval {
-    raise 'MyApp::X::NameError', 'The name Minion is already taken';
+    raise 'MyApp::X::Name', 'The name Minion is already taken';
   };
   check(
-    'MyApp::X::NameError' => sub { say "Name error: $_" },
-    default               => sub { say "Error: $_" }
+    'MyApp::X::Name' => sub { say "Name error: $_" },
+    default          => sub { say "Error: $_" }
   );
 
 =head1 DESCRIPTION

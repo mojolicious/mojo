@@ -293,10 +293,9 @@ exception was rethrown or if there was no exception to be handled at all.
 
   raise 'MyApp::X::Foo', 'Something went wrong!';
 
-Raise a L<Mojo::Exception> exception, if the class does not exist yet (classes
-are checked for a C<new> method), one is created as a L<Mojo::Exception>
-subclass on demand. Note that this function is B<EXPERIMENTAL> and might change
-without warning!
+Raise a L<Mojo::Exception>, if the class does not exist yet (classes are checked
+for a C<new> method), one is created as a L<Mojo::Exception> subclass on demand.
+Note that this function is B<EXPERIMENTAL> and might change without warning!
 
 =head1 ATTRIBUTES
 

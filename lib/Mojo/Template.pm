@@ -412,7 +412,8 @@ The compilation of templates to Perl code can make debugging a bit tricky, but
 L<Mojo::Template> will return L<Mojo::Exception> objects that stringify to
 error messages with context.
 
-  Bareword "xx" not allowed while "strict subs" in use at template line 4.
+  Mojo::Exception: Bareword "xx" not allowed while "strict subs" in use at
+  template line 4.
   Context:
     2: </head>
     3: <body>

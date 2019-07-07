@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::Exception 'check';
+use Mojo::Exception qw(check raise);
 use Mojo::File 'path';
 
 package MojoTest::X::Foo;
@@ -25,10 +25,10 @@ package main;
 # Basics
 my $e = Mojo::Exception->new;
 is $e->message, 'Exception!', 'right message';
-is "$e", 'Exception!', 'right message';
+is "$e", "Exception!\n", 'right message';
 $e = Mojo::Exception->new('Test!');
 is $e->message, 'Test!', 'right message';
-is "$e", 'Test!', 'right message';
+is "$e", "Test!\n", 'right message';
 
 # Context information
 my $line = __LINE__;
@@ -44,31 +44,31 @@ eval {
 };
 $e = $@;
 isa_ok $e, 'Mojo::Exception', 'right class';
-is $e->inspect, 'Works!', 'right result';
+like $e->inspect, qr/^Works!/, 'right result';
 like $e->frames->[0][1], qr/exception\.t/, 'right file';
-is $e->lines_before->[0][0], $line + 1, 'right number';
-is $e->lines_before->[0][1], 'eval {', 'right line';
-is $e->lines_before->[1][0], $line + 2, 'right number';
-ok !$e->lines_before->[1][1], 'empty line';
-is $e->lines_before->[2][0], $line + 3, 'right number';
-is $e->lines_before->[2][1], '  # test', 'right line';
-is $e->lines_before->[3][0], $line + 4, 'right number';
-ok !$e->lines_before->[3][1], 'empty line';
-is $e->lines_before->[4][0], $line + 5, 'right number';
-is $e->lines_before->[4][1],
-  "  my \$wrapper = sub { Mojo::Exception->throw('Works!') };", 'right line';
-is $e->line->[0], $line + 6, 'right number';
-is $e->line->[1], "  \$wrapper->();", 'right line';
-is $e->lines_after->[0][0], $line + 7, 'right number';
-ok !$e->lines_after->[0][1], 'empty line';
-is $e->lines_after->[1][0], $line + 8, 'right number';
-is $e->lines_after->[1][1], '  # test', 'right line';
-is $e->lines_after->[2][0], $line + 9, 'right number';
-ok !$e->lines_after->[2][1], 'empty line';
-is $e->lines_after->[3][0], $line + 10, 'right number';
-is $e->lines_after->[3][1], '};', 'right line';
-is $e->lines_after->[4][0], $line + 11, 'right number';
-is $e->lines_after->[4][1], '$e = $@;', 'right line';
+is $e->lines_before->[0][0], $line, 'right number';
+is $e->lines_before->[0][1], 'my $line = __LINE__;', 'right line';
+is $e->lines_before->[1][0], $line + 1, 'right number';
+is $e->lines_before->[1][1], 'eval {', 'right line';
+is $e->lines_before->[2][0], $line + 2, 'right number';
+ok !$e->lines_before->[2][1], 'empty line';
+is $e->lines_before->[3][0], $line + 3, 'right number';
+is $e->lines_before->[3][1], '  # test', 'right line';
+is $e->lines_before->[4][0], $line + 4, 'right number';
+ok !$e->lines_before->[4][1], 'empty line';
+is $e->line->[0], $line + 5, 'right number';
+is $e->line->[1], "  my \$wrapper = sub { Mojo::Exception->throw('Works!') };",
+  'right line';
+is $e->lines_after->[0][0], $line + 6, 'right number';
+is $e->lines_after->[0][1], '  $wrapper->();', 'right line';
+is $e->lines_after->[1][0], $line + 7, 'right number';
+ok !$e->lines_after->[1][1], 'empty line';
+is $e->lines_after->[2][0], $line + 8, 'right number';
+is $e->lines_after->[2][1], '  # test', 'right line';
+is $e->lines_after->[3][0], $line + 9, 'right number';
+ok !$e->lines_after->[3][1], 'empty line';
+is $e->lines_after->[4][0], $line + 10, 'right number';
+is $e->lines_after->[4][1], '};', 'right line';
 
 # Trace
 sub wrapper2 { Mojo::Exception->new->trace(@_) }
@@ -112,9 +112,9 @@ is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"],
 
 # Verbose
 $e = Mojo::Exception->new->verbose(1);
-is $e, "Exception!\n", 'right result';
+is $e, "Mojo::Exception: Exception!\n", 'right result';
 $e = Mojo::Exception->new->inspect->inspect->verbose(1);
-is $e, "Exception!\n", 'right result';
+is $e, "Mojo::Exception: Exception!\n", 'right result';
 $e = Mojo::Exception->new('Test!')->verbose(1);
 $e->frames([
   ['Sandbox',     'template',      4],
@@ -124,21 +124,25 @@ $e->frames([
 $e->lines_before([[3, 'foo();']])->line([4, 'die;'])
   ->lines_after([[5, 'bar();']]);
 is $e, <<EOF, 'right result';
-Test!
-3: foo();
-4: die;
-5: bar();
-template:4 (Sandbox)
-MyApp/Test.pm:3 (MyApp::Test)
-foo.pl:4 (main)
+Mojo::Exception: Test!
+Context:
+  3: foo();
+  4: die;
+  5: bar();
+Traceback (most recent call first):
+  File "template", line 4, in "Sandbox"
+  File "MyApp/Test.pm", line 3, in "MyApp::Test"
+  File "foo.pl", line 4, in "main"
 EOF
 $e->message("Works!\n")->lines_before([])->lines_after([]);
 is $e, <<EOF, 'right result';
-Works!
-4: die;
-template:4 (Sandbox)
-MyApp/Test.pm:3 (MyApp::Test)
-foo.pl:4 (main)
+Mojo::Exception: Works!
+Context:
+  4: die;
+Traceback (most recent call first):
+  File "template", line 4, in "Sandbox"
+  File "MyApp/Test.pm", line 3, in "MyApp::Test"
+  File "foo.pl", line 4, in "main"
 EOF
 
 # Missing error
@@ -255,5 +259,23 @@ ok !check(undef, default => sub { die 'fail' }), 'no exception';
   local $@;
   ok !check(default => sub { die 'fail' }), 'no exception';
 }
+
+# Raise
+eval { raise 'MyApp::X::Baz', 'test19' };
+my $err = $@;
+isa_ok $err, 'MyApp::X::Baz',   'is a MyApp::X::Baz';
+isa_ok $err, 'Mojo::Exception', 'is a Mojo::Exception';
+like $err,   qr/^test19/,       'right error';
+eval { raise 'MyApp::X::Baz', 'test20' };
+$err = $@;
+isa_ok $err, 'MyApp::X::Baz',   'is a MyApp::X::Baz';
+isa_ok $err, 'Mojo::Exception', 'is a Mojo::Exception';
+like $err,   qr/^test20/,       'right error again';
+eval { raise 'MojoTest::X::Foo', 'test21' };
+$err = $@;
+isa_ok $err, 'MojoTest::X::Foo', 'is a MojoTest::X::Baz';
+like $err,   qr/^test21/,        'right error';
+eval { raise 'Mojo::Base', 'fail' };
+like $@, qr/^Mojo::Base is not a Mojo::Exception subclass/, 'right error';
 
 done_testing();

@@ -616,7 +616,7 @@ ok $output->lines_before->[1][2], 'contains code';
 is $output->line->[0], 3,              'right number';
 is $output->line->[1], '% die "x\n";', 'right line';
 ok $output->line->[2], 'contains code';
-like "$output", qr/^x/, 'right result';
+like "$output", qr/^Mojo::Exception: x/, 'right result';
 
 # Compile time exception
 $mt     = Mojo::Template->new;
@@ -703,16 +703,18 @@ is $output->lines_after->[1][0], 7,          'right number';
 is $output->lines_after->[1][1], 'test',     'right line';
 $output->frames([['Sandbox', 'template', 5], ['main', 'template.t', 673]]);
 is $output, <<EOF, 'right result';
-oops! at template line 5.
-1: test
-2: 123\\
-3: 456
-4:  %# This dies
-5: % die 'oops!';
-6: %= 1 + 1
-7: test
-template:5 (Sandbox)
-template.t:673 (main)
+Mojo::Exception: oops! at template line 5.
+Context:
+  1: test
+  2: 123\\
+  3: 456
+  4:  %# This dies
+  5: % die 'oops!';
+  6: %= 1 + 1
+  7: test
+Traceback (most recent call first):
+  File "template", line 5, in "Sandbox"
+  File "template.t", line 673, in "main"
 EOF
 
 # Exception in template (empty perl lines)
@@ -768,7 +770,7 @@ EOT
 $-= $output
 EOF
 like $output,
-  qr/test\n\nBareword "bar".+in use at template line 1\.\n1: %= bar/,
+  qr/test\n\nMojo::Exception: Bareword "bar".+in use at template line 1\./,
   'exception in nested template';
 
 # Control structures

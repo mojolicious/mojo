@@ -10,7 +10,7 @@ has [qw(frames line lines_after lines_before)] => sub { [] };
 has message                                    => 'Exception!';
 has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} };
 
-our @EXPORT_OK = ('check');
+our @EXPORT_OK = qw(check raise);
 
 sub check {
   my ($err, @spec) = @_ % 2 ? @_ : ($@, @_);
@@ -76,22 +76,47 @@ sub new {
   defined $_[1] ? shift->SUPER::new(message => shift) : shift->SUPER::new;
 }
 
+sub raise {
+  my $class = shift || 'Mojo::Exception';
+
+  if (!$class->can('new')) {
+    die $@ unless eval "package $class; use Mojo::Base 'Mojo::Exception'; 1";
+  }
+  elsif (!$class->isa('Mojo::Exception')) {
+    die "$class is not a Mojo::Exception subclass";
+  }
+
+  die $class->new(@_)->trace(1);
+}
+
 sub to_string {
   my $self = shift;
 
   my $str = $self->message;
-  return $str unless $self->verbose;
-
   $str .= "\n" unless $str =~ /\n$/;
-  $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
-  $str .= $self->line->[0] . ': ' . $self->line->[1] . "\n" if $self->line->[0];
-  $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
-  $str .= "$_->[1]:$_->[2] ($_->[0])\n"   for @{$self->frames};
+
+  if ($self->verbose) {
+    $str = ref($self) . ": $str";
+
+    my $line = $self->line;
+    if (@$line) {
+      $str .= "Context:\n";
+      $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_before};
+      $str .= "  $line->[0]: $line->[1]\n" if $line->[0];
+      $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_after};
+    }
+  }
+
+  my $frames = $self->frames;
+  if (@$frames) {
+    $str .= "Traceback (most recent call first):\n";
+    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n} for @$frames;
+  }
 
   return $str;
 }
 
-sub throw { CORE::die shift->new(shift)->trace(2) }
+sub throw { die shift->new(shift)->trace(1) }
 
 sub trace {
   my ($self, $start) = (shift, shift // 1);
@@ -164,6 +189,16 @@ Mojo::Exception - Exception base class
     'MyApp::X::Bar' => sub { say "Bar: $_" }
   );
 
+  # Create exceptions dynamically and handle them gracefully
+  use Mojo::Exception qw(check raise);
+  eval {
+    raise 'MyApp::X::NameError', 'The name Minion is already taken';
+  };
+  check(
+    'MyApp::X::NameError' => sub { say "Name error: $_" },
+    default               => sub { say "Error: $_" }
+  );
+
 =head1 DESCRIPTION
 
 L<Mojo::Exception> is a container for exceptions with context information.
@@ -190,13 +225,13 @@ change without warning!
   };
   check(
     'MyApp::X::Foo' => sub {
-      warn "Foo: $_";
+      say "Foo: $_";
     },
     qr/Could not open/ => sub {
-      warn "Open error: $_";
+      say "Open error: $_";
     },
     default => sub {
-      warn "Something went wrong: $_";
+      say "Something went wrong: $_";
     },
     finally => sub {
       say 'Dangerous code is done';
@@ -213,10 +248,10 @@ the first argument passed to the callback, and is also available as C<$_>.
   };
   check(
     'MyApp::X::Foo' => sub {
-      warn "Foo: $_";
+      say "Foo: $_";
     },
     qr/^Could not open/ => sub {
-      warn "Open error: $_";
+      say "Open error: $_";
     }
   );
 
@@ -229,10 +264,10 @@ conditions, of which only one needs to match.
   };
   check(
     ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub {
-      warn "Foo/Bar: $_";
+      say "Foo/Bar: $_";
     },
     'MyApp::X::Yada' => sub {
-      warn "Yada: $_";
+      say "Yada: $_";
     }
   );
 
@@ -247,12 +282,21 @@ exception was rethrown or if there was no exception to be handled at all.
   };
   check(
     default => sub {
-      warn "Error: $_";
+      say "Error: $_";
     },
     finally => sub {
       say 'Dangerous code is done';
     }
   );
+
+=head2 raise
+
+  raise 'MyApp::X::Foo', 'Something went wrong!';
+
+Raise a L<Mojo::Exception> exception, if the class does not exist yet (classes
+are checked for a C<new> method), one is created as a L<Mojo::Exception>
+subclass on demand. Note that this function is B<EXPERIMENTAL> and might change
+without warning!
 
 =head1 ATTRIBUTES
 

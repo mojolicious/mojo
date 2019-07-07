@@ -113,7 +113,7 @@ hook after_dispatch => sub {
 hook around_dispatch => sub {
   my ($next, $c) = @_;
   unless (eval { $next->(); 1 }) {
-    die $@ unless $@ eq "CUSTOM\n";
+    die $@ unless $@ =~ /^CUSTOM\n/;
     $c->render(text => 'Custom handling works!');
   }
 };
@@ -205,9 +205,8 @@ like $log, qr/dead template with layout!/, 'right result';
 
 # Dead action
 $t->get_ok('/dead_action')->status_is(500)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr!get &#39;/dead_action&#39;!)
-  ->content_like(qr/dead action!/)->text_is('#error' => "dead action!\n");
+  ->content_type_is('text/html;charset=UTF-8')->content_like(qr/dead action!/)
+  ->text_is('#error' => "dead action!\n");
 like $log, qr/dead action!/, 'right result';
 
 # Dead action with different format
@@ -216,13 +215,12 @@ $t->get_ok('/dead_action.xml')->status_is(500)
 
 # Dead action with unsupported format
 $t->get_ok('/dead_action.json')->status_is(500)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr!get &#39;/dead_action&#39;!)
-  ->content_like(qr/dead action!/);
+  ->content_type_is('text/html;charset=UTF-8')->content_like(qr/dead action!/);
 
 # Dead action with custom exception rendering
 $t->get_ok('/dead_action' => {Accept => 'text/plain'})->status_is(500)
-  ->content_type_is('text/plain;charset=UTF-8')->content_is("dead action!\n");
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_like(qr/^dead action!\n/);
 
 # Action dies twice
 $t->get_ok('/double_dead_action_☃')->status_is(500)

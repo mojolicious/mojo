@@ -197,7 +197,7 @@ sub start {
 
 sub startup { }
 
-sub _die { CORE::die ref $_[0] ? $_[0] : Mojo::Exception->new(shift)->trace(1) }
+sub _die { CORE::die ref $_[0] ? $_[0] : Mojo::Exception->new(shift)->trace }
 
 sub _exception {
   my ($next, $c) = @_;

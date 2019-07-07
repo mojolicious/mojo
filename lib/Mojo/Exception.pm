@@ -77,7 +77,7 @@ sub new {
 }
 
 sub raise {
-  my $class = shift || 'Mojo::Exception';
+  my ($class, $err) = @_ > 1 ? (@_) : ('Mojo::Exception', shift);
 
   if (!$class->can('new')) {
     die $@ unless eval "package $class; use Mojo::Base 'Mojo::Exception'; 1";
@@ -86,7 +86,7 @@ sub raise {
     die "$class is not a Mojo::Exception subclass";
   }
 
-  die $class->new(@_)->trace(1);
+  CORE::die $class->new($err)->trace;
 }
 
 sub to_string {
@@ -116,7 +116,7 @@ sub to_string {
   return $str;
 }
 
-sub throw { die shift->new(shift)->trace(1) }
+sub throw { CORE::die shift->new(shift)->trace }
 
 sub trace {
   my ($self, $start) = (shift, shift // 1);
@@ -291,6 +291,7 @@ exception was rethrown or if there was no exception to be handled at all.
 
 =head2 raise
 
+  raise 'Something went wrong!';
   raise 'MyApp::X::Foo', 'Something went wrong!';
 
 Raise a L<Mojo::Exception>, if the class does not exist yet (classes are checked

@@ -367,7 +367,8 @@ Construct a new L<Mojo::Exception> object and assign L</"message"> if necessary.
   my $str = $e->to_string;
 
 Render exception. Note that the output format may change as more features are
-added, only the error message at the beginning is guaranteed not be modified.
+added, only the error message at the beginning is guaranteed not to be modified
+to allow regex matching.
 
 =head2 throw
 

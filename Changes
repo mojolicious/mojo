@@ -1,7 +1,6 @@
 
 8.19  2019-07-07
   - Added EXPERIMENTAL check and raise functions to Mojo::Exception.
-  - Added support for MOJO_EXCEPTION_VERBOSE environment variable.
   - Added -f option to generate plugin command.
   - Improved inspect method in Mojo::Exception to be safe to call more than
     once.

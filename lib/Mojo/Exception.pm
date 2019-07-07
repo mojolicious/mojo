@@ -8,7 +8,7 @@ use Scalar::Util 'blessed';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message                                    => 'Exception!';
-has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} };
+has 'verbose';
 
 our @EXPORT_OK = qw(check raise);
 
@@ -344,9 +344,7 @@ Exception message, defaults to C<Exception!>.
   my $bool = $e->verbose;
   $e       = $e->verbose($bool);
 
-Enable context information for L</"to_string">, defaults to the value of the
-C<MOJO_EXCEPTION_VERBOSE> environment variable. Note that the output format may
-change as more features are added, so use this feature only for debugging.
+Enable context information for L</"to_string">.
 
 =head1 METHODS
 
@@ -372,7 +370,8 @@ Construct a new L<Mojo::Exception> object and assign L</"message"> if necessary.
 
   my $str = $e->to_string;
 
-Render exception.
+Render exception. Note that the output format may change as more features are
+added, only the error message at the beginning is guaranteed not be modified.
 
   # Render exception with context
   say $e->verbose(1)->to_string;

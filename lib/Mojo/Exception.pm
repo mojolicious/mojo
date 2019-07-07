@@ -192,9 +192,6 @@ change without warning!
     'MyApp::X::Foo' => sub {
       warn "Foo: $_";
     },
-    'MyApp::X::Bar' => sub {
-      warn "Bar: $_";
-    },
     qr/Could not open/ => sub {
       warn "Open error: $_";
     },

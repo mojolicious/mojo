@@ -159,9 +159,10 @@ Mojo::Exception - Exception base class
   eval {
     MyApp::X::Foo->throw('Something went wrong!');
   };
-  check
+  check(
     'MyApp::X::Foo' => sub { say "Foo: $_" },
-    'MyApp::X::Bar' => sub { say "Bar: $_" };
+    'MyApp::X::Bar' => sub { say "Bar: $_" }
+  );
 
 =head1 DESCRIPTION
 
@@ -213,9 +214,14 @@ the first argument passed to the callback, and is also available as C<$_>.
   eval {
     dangerous_code();
   };
-  check
-    'MyApp::X::Foo'     => sub { warn "Foo: $_" },
-    qr/^Could not open/ => sub { warn "Open error: $_" };
+  check(
+    'MyApp::X::Foo' => sub {
+      warn "Foo: $_";
+    },
+    qr/^Could not open/ => sub {
+      warn "Open error: $_";
+    }
+  );
 
 An array reference can be used to share the same handler with multiple
 conditions, of which only one needs to match.
@@ -224,23 +230,32 @@ conditions, of which only one needs to match.
   eval {
     dangerous_code();
   };
-  check
-    ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub { warn "Foo/Bar: $_" },
-    'MyApp::X::Yada'                   => sub { warn "Yada: $_" };
+  check(
+    ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub {
+      warn "Foo/Bar: $_";
+    },
+    'MyApp::X::Yada' => sub {
+      warn "Yada: $_";
+    }
+  );
 
 There are currently two keywords you can use to set special handlers. The
 C<default> handler is used when no other handler matched. And the C<finally>
 handler runs always, it does not affect normal handlers and even runs if the
 exception was rethrown or if there was no exception to be handled at all.
 
-  # Use the "default" fallback if nothing else matched
+  # Use "default" to catch everything
   eval {
     dangerous_code();
   };
-  check
-    'MyApp::X::Bar' => sub { warn "Bar: $_" },
-    default         => sub { warn "Error: $_" },
-    finally         => sub { say 'Dangerous code is done' };
+  check(
+    default => sub {
+      warn "Error: $_";
+    },
+    finally => sub {
+      say 'Dangerous code is done';
+    }
+  );
 
 =head1 ATTRIBUTES
 

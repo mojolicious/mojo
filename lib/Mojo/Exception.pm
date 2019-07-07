@@ -98,7 +98,7 @@ sub to_string {
   if (@$line) {
     $str .= "Context:\n";
     $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_before};
-    $str .= "  $line->[0]: $line->[1]\n" if $line->[0];
+    $str .= "  $line->[0]: $line->[1]\n";
     $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_after};
   }
 
@@ -118,6 +118,12 @@ sub trace {
   my @frames;
   while (my @trace = caller($start++)) { push @frames, \@trace }
   return $self->frames(\@frames);
+}
+
+# DEPRECATED!
+sub verbose {
+  deprecated 'Mojo::Exception::verbose is DEPRECATED';
+  return $_[0];
 }
 
 sub _append {
@@ -149,12 +155,6 @@ sub _context {
     push @{$self->lines_after}, [$next + 1];
     _append($self->lines_after->[-1], $_->[$next]) for @$sources;
   }
-}
-
-# DEPRECATED!
-sub verbose {
-  deprecated 'Mojo::Exception::verbose is DEPRECATED';
-  return $_[0];
 }
 
 package Mojo::Exception::_Guard;

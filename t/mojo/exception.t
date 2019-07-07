@@ -15,6 +15,13 @@ use Mojo::Base 'MojoTest::X::Bar';
 
 package main;
 
+# Verbose
+{
+  ok(!Mojo::Exception->new->verbose, 'not verbose');
+  local $ENV{MOJO_EXCEPTION_VERBOSE} = 1;
+  ok(Mojo::Exception->new->verbose, 'verbose');
+}
+
 # Basics
 my $e = Mojo::Exception->new;
 is $e->message, 'Exception!', 'right message';

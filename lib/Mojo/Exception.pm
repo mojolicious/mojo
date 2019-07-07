@@ -8,7 +8,7 @@ use Scalar::Util 'blessed';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message                                    => 'Exception!';
-has 'verbose';
+has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} };
 
 our @EXPORT_OK = ('check');
 
@@ -25,23 +25,23 @@ sub check {
 
   return undef unless $err;
 
-  my ($default, $cb);
+  my ($default, $handler);
   my $is_obj = blessed $err;
 CHECK: for (my $i = 0; $i < @spec; $i += 2) {
-    my ($checks, $handler) = @spec[$i, $i + 1];
+    my ($checks, $cb) = @spec[$i, $i + 1];
 
-    ($default = $handler) and next if $checks eq 'default';
+    ($default = $cb) and next if $checks eq 'default';
 
     for my $c (ref $checks eq 'ARRAY' ? @$checks : $checks) {
       my $is_re = ref $c eq 'Regexp';
-      ($cb = $handler) and last CHECK if $is_obj  && !$is_re && $err->isa($c);
-      ($cb = $handler) and last CHECK if !$is_obj && $is_re  && $err =~ $c;
+      ($handler = $cb) and last CHECK if $is_obj  && !$is_re && $err->isa($c);
+      ($handler = $cb) and last CHECK if !$is_obj && $is_re  && $err =~ $c;
     }
   }
 
   # Rethrow if no handler could be found
-  die $err unless $cb ||= $default;
-  $cb->($_) for $err;
+  die $err unless $handler ||= $default;
+  $handler->($_) for $err;
 
   return 1;
 }
@@ -290,7 +290,9 @@ Exception message, defaults to C<Exception!>.
   my $bool = $e->verbose;
   $e       = $e->verbose($bool);
 
-Enable context information for L</"to_string">.
+Enable context information for L</"to_string">, defaults to the value of the
+C<MOJO_EXCEPTION_VERBOSE> environment variable. Note that the output format may
+change as more features are added, so use this feature only for debugging.
 
 =head1 METHODS
 

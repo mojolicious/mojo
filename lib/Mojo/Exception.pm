@@ -180,7 +180,7 @@ individually.
 Process exceptions by dispatching them to handlers with one or more matching
 conditions. Exceptions that could not be handled will be rethrown automatically.
 By default C<$@> will be used as exception source, so C<check> needs to be
-called right after C<eval>. Note that this function is EXPERIMENTAL and might
+called right after C<eval>. Note that this function is B<EXPERIMENTAL> and might
 change without warning!
 
   # Handle various types of exceptions

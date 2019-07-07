@@ -95,7 +95,7 @@ C<$ref> to L</"register">.
     };
   }
 
-Note that this module is EXPERIMENTAL and might change without warning!
+Note that this module is B<EXPERIMENTAL> and might change without warning!
 
 =head1 FUNCTIONS
 

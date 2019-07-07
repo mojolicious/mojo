@@ -412,7 +412,7 @@ Get or replace current header value, shortcut for the C<Date> header.
   $heders = $headers->dehop;
 
 Remove hop-by-hop headers that should not be retransmitted. Note that this
-method is EXPERIMENTAL and might change without warning!
+method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 dnt
 

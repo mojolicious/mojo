@@ -287,7 +287,7 @@ application startup.
 
 Try to negotiate compression for dynamically generated response content and
 C<gzip> compress it automatically, defaults to false. Note that this attribute
-is EXPERIMENTAL and might change without warning!
+is B<EXPERIMENTAL> and might change without warning!
 
 =head2 default_format
 
@@ -335,7 +335,7 @@ Registered helpers.
   $renderer = $renderer->min_compress_size(1024);
 
 Minimum output size in bytes required for compression to be used if enabled,
-defaults to C<860>. Note that this attribute is EXPERIMENTAL and might change
+defaults to C<860>. Note that this attribute is B<EXPERIMENTAL> and might change
 without warning!
 
 =head2 paths
@@ -427,7 +427,7 @@ L<Mojolicious::Controller/"render"> for a more user-friendly interface.
     Mojolicious::Controller->new, $output, $format, $status);
 
 Finalize dynamically generated response content and L</"compress"> it if
-possible. Note that this method is EXPERIMENTAL and might change without
+possible. Note that this method is B<EXPERIMENTAL> and might change without
 warning!
 
 =head2 template_for

@@ -148,8 +148,8 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
   $sessions    = $sessions->samesite('Strict');
 
 Set the SameSite value on all session cookies, defaults to C<Lax>. Note that
-this attribute is EXPERIMENTAL because even though most commonly used browsers
-support the feature, there is no specification yet besides
+this attribute is B<EXPERIMENTAL> because even though most commonly used
+browsers support the feature, there is no specification yet besides
 L<this draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
 
   # Disable SameSite feature

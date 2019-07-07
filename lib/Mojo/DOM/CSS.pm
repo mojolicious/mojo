@@ -387,7 +387,7 @@ An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
 An C<E> element whose C<foo> attribute value is exactly equal to any
 (ASCII-range) case-permutation of C<bar>. Note that this selector is
-EXPERIMENTAL and might change without warning!
+B<EXPERIMENTAL> and might change without warning!
 
   my $case_insensitive = $css->select('input[type="hidden" i]');
   my $case_insensitive = $css->select('input[type=hidden i]');
@@ -555,7 +555,7 @@ An C<E> element with C<ID> equal to "myid".
 =head2 E:not(s1, s2)
 
 An C<E> element that does not match either compound selector C<s1> or compound
-selector C<s2>. Note that support for compound selectors is EXPERIMENTAL and
+selector C<s2>. Note that support for compound selectors is B<EXPERIMENTAL> and
 might change without warning!
 
   my $others = $css->select('div p:not(:first-child, :last-child)');
@@ -567,7 +567,8 @@ in progress.
 =head2 E:matches(s1, s2)
 
 An C<E> element that matches compound selector C<s1> and/or compound selector
-C<s2>. Note that this selector is EXPERIMENTAL and might change without warning!
+C<s2>. Note that this selector is B<EXPERIMENTAL> and might change without
+warning!
 
   my $headers = $css->select(':matches(section, article, aside, nav) h1');
 

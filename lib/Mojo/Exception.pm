@@ -31,7 +31,7 @@ CHECK: for (my $i = 0; $i < @spec; $i += 2) {
     ($default = $cb) and next if $checks eq 'default';
 
     for my $c (ref $checks eq 'ARRAY' ? @$checks : $checks) {
-      my $is_re = ref $c eq 'Regexp';
+      my $is_re = !!ref $c;
       ($handler = $cb) and last CHECK if $is_obj && !$is_re && $err->isa($c);
       ($handler = $cb) and last CHECK if $is_re  && $str =~ $c;
     }

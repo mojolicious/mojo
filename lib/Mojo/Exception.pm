@@ -17,9 +17,8 @@ sub check {
   # Finally (search backwards since it is usually at the end)
   my $guard;
   for (my $i = $#spec - 1; $i >= 0; $i -= 2) {
-    next unless $spec[$i] eq 'finally';
-    $guard = Mojo::Exception::_Guard->new(finally => $spec[$i + 1]);
-    last;
+    ($guard = Mojo::Exception::_Guard->new(finally => $spec[$i + 1])) and last
+      if $spec[$i] eq 'finally';
   }
 
   return undef unless $err;

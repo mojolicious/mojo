@@ -304,7 +304,7 @@ True, this is a L<Mojo::Content::MultiPart> object.
   my $multi
     = Mojo::Content::MultiPart->new({parts => [Mojo::Content::Single->new]});
 
-Construct a new L<Mojo::Content::MultiPart> object and subscribe to L</"read">
+Construct a new L<Mojo::Content::MultiPart> object and subscribe to L<Mojo::Content/"read">
 event with default content parser.
 
 =head1 SEE ALSO

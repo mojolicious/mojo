@@ -25,7 +25,7 @@ sub check {
   return undef unless $err;
 
   my ($default, $handler);
-  my $is_obj = blessed $err;
+  my ($is_obj, $str) = (!!blessed($err), "$err");
 CHECK: for (my $i = 0; $i < @spec; $i += 2) {
     my ($checks, $cb) = @spec[$i, $i + 1];
 
@@ -33,8 +33,8 @@ CHECK: for (my $i = 0; $i < @spec; $i += 2) {
 
     for my $c (ref $checks eq 'ARRAY' ? @$checks : $checks) {
       my $is_re = ref $c eq 'Regexp';
-      ($handler = $cb) and last CHECK if $is_obj  && !$is_re && $err->isa($c);
-      ($handler = $cb) and last CHECK if !$is_obj && $is_re  && $err =~ $c;
+      ($handler = $cb) and last CHECK if $is_obj && !$is_re && $err->isa($c);
+      ($handler = $cb) and last CHECK if $is_re  && $str =~ $c;
     }
   }
 
@@ -240,8 +240,9 @@ change without warning!
   );
 
 Matching conditions can be class names for ISA checks on exception objects, or
-regular expressions to match string exceptions. The matching exception will be
-the first argument passed to the callback, and is also available as C<$_>.
+regular expressions to match string exceptions or stringified exception objects.
+The matching exception will be the first argument passed to the callback, and is
+also available as C<$_>.
 
   # Catch MyApp::X::Foo object or a specific string exception
   eval {

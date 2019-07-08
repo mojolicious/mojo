@@ -181,26 +181,33 @@ is $result, 'test11', 'regular expression matched';
 
 # Check (exception objects)
 $result = undef;
-eval { MojoTest::X::Foo->throw('whatever') };
+eval { MojoTest::X::Foo->throw('fail') };
 check
   default            => sub { $result = 'fail' },
   'MojoTest::X::Foo' => sub { $result = 'test12' },
   'MojoTest::X::Bar' => sub { $result = 'fail' };
 is $result, 'test12', 'class matched';
 $result = undef;
-eval { MojoTest::X::Bar->throw('whatever') };
+eval { MojoTest::X::Bar->throw('fail') };
 check
   'MojoTest::X::Foo' => sub { $result = 'fail' },
   'MojoTest::X::Bar' => sub { $result = 'test13' };
 is $result, 'test13', 'class matched';
 $result = undef;
 check(
-  MojoTest::X::Yada->new('whatever'),
-  qr/whatever/       => sub { $result = 'fail' },
+  MojoTest::X::Yada->new('fail'),
+  qr/^MojoTest/      => sub { $result = 'fail' },
   'MojoTest::X::Foo' => sub { $result = 'fail' },
   'MojoTest::X::Bar' => sub { $result = 'test14' }
 );
 is $result, 'test14', 'class matched';
+$result = undef;
+check(
+  MojoTest::X::Yada->new('whatever'),
+  'MojoTest::X::Foo' => sub { $result = 'fail' },
+  qr/^whatever/      => sub { $result = 'test23' },
+);
+is $result, 'test23', 'regex matched';
 
 # Check (multiple)
 $result = undef;

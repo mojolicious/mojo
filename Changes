@@ -1,5 +1,7 @@
 
 8.20  2019-07-08
+  - Improved check function in Mojo::Exception to match regular expressions
+    against stringified exception objects too.
 
 8.19  2019-07-07
   - Deprecated Mojo::Exception::verbose.

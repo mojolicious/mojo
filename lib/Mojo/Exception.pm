@@ -26,6 +26,7 @@ sub check {
 
   my ($default, $handler);
   my $is_obj = blessed $err;
+  my $can_re = !$is_obj || $is_obj && overload::Method($err, '""');
 CHECK: for (my $i = 0; $i < @spec; $i += 2) {
     my ($checks, $cb) = @spec[$i, $i + 1];
 
@@ -33,8 +34,8 @@ CHECK: for (my $i = 0; $i < @spec; $i += 2) {
 
     for my $c (ref $checks eq 'ARRAY' ? @$checks : $checks) {
       my $is_re = ref $c eq 'Regexp';
-      ($handler = $cb) and last CHECK if $is_obj  && !$is_re && $err->isa($c);
-      ($handler = $cb) and last CHECK if !$is_obj && $is_re  && $err =~ $c;
+      ($handler = $cb) and last CHECK if $is_obj && !$is_re && $err->isa($c);
+      ($handler = $cb) and last CHECK if $can_re && $err =~ $c;
     }
   }
 

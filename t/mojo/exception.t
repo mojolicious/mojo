@@ -13,6 +13,11 @@ use Mojo::Base 'Mojo::Exception';
 package MojoTest::X::Yada;
 use Mojo::Base 'MojoTest::X::Bar';
 
+package MojoTest::X::NotOverloaded;
+use Mojo::Base -base;
+has 'message';
+sub throw { die shift->new(message => shift) }
+
 package main;
 
 # Basics
@@ -196,7 +201,6 @@ is $result, 'test13', 'class matched';
 $result = undef;
 check(
   MojoTest::X::Yada->new('whatever'),
-  qr/whatever/       => sub { $result = 'fail' },
   'MojoTest::X::Foo' => sub { $result = 'fail' },
   'MojoTest::X::Bar' => sub { $result = 'test14' }
 );
@@ -252,6 +256,18 @@ ok !check(undef, default => sub { die 'fail' }), 'no exception';
   local $@;
   ok !check(default => sub { die 'fail' }), 'no exception';
 }
+
+# Check (overloaded object)
+$result = [];
+eval { Mojo::Exception->throw('String overloaded') };
+check qr/String/ => sub { push @$result, $_ };
+like $result->[0], qr{^String}, 'overloaded';
+$result = [];
+eval { MojoTest::X::NotOverloaded->throw('Not string overloaded') };
+check
+  qr/Not/                      => sub { },
+  'MojoTest::X::NotOverloaded' => sub { push @$result, $_ };
+is $result->[0]->message, 'Not string overloaded', 'not overloaded';
 
 # Raise
 eval { raise 'MyApp::X::Baz', 'test19' };

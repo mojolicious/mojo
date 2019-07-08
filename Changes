@@ -1,4 +1,6 @@
 
+8.20  2019-07-08
+
 8.19  2019-07-07
   - Deprecated Mojo::Exception::verbose.
   - Added EXPERIMENTAL check and raise functions to Mojo::Exception.

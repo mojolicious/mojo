@@ -158,6 +158,11 @@ $v = $t->app->validation->input({foo => 23});
 ok !$v->required('foo')->num(undef, 22)->is_valid, 'not valid';
 ok $v->has_error, 'has error';
 is_deeply $v->error('foo'), ['num', 1, undef, 22], 'right error';
+$v = $t->app->validation->input({foo => -5});
+ok $v->required('foo')->num->is_valid, 'valid';
+ok $v->required('foo')->num(undef, -1)->is_valid, 'valid';
+ok $v->required('foo')->num(-10, 10)->is_valid, 'valid';
+ok $v->required('foo')->num(-20, undef)->is_valid, 'valid';
 
 # Size
 $v = $t->app->validation->input({foo => 'bar', baz => 'yada', yada => 'yada'});

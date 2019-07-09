@@ -189,7 +189,7 @@ Mojo::Exception - Exception base class
     'MyApp::X::Bar' => sub { say "Bar: $_" }
   );
 
-  # Create exceptions dynamically and handle them gracefully
+  # Generate exception classes on demand
   use Mojo::Exception qw(check raise);
   eval {
     raise 'MyApp::X::Name', 'The name Minion is already taken';
@@ -224,52 +224,36 @@ change without warning!
     dangerous_code();
   };
   check(
-    'MyApp::X::Foo' => sub {
-      say "Foo: $_";
-    },
-    qr/Could not open/ => sub {
-      say "Open error: $_";
-    },
-    default => sub {
-      say "Something went wrong: $_";
-    },
-    finally => sub {
-      say 'Dangerous code is done';
-    }
+    'MyApp::X::Foo'     => sub { say "Foo: $_" },
+    qr/^Could not open/ => sub { say "Open error: $_" },
+    default             => sub { say "Something went wrong: $_" },
+    finally             => sub { say 'Dangerous code is done' }
   );
 
 Matching conditions can be class names for ISA checks on exception objects, or
-regular expressions to match string exceptions or stringified exception objects.
-The matching exception will be the first argument passed to the callback, and is
-also available as C<$_>.
+regular expressions to match string exceptions and stringified exception
+objects. The matching exception will be the first argument passed to the
+callback, and is also available as C<$_>.
 
   # Catch MyApp::X::Foo object or a specific string exception
   eval {
     dangerous_code();
   };
   check(
-    'MyApp::X::Foo' => sub {
-      say "Foo: $_";
-    },
-    qr/^Could not open/ => sub {
-      say "Open error: $_";
-    }
+    'MyApp::X::Foo'     => sub { say "Foo: $_" },
+    qr/^Could not open/ => sub { say "Open error: $_" }
   );
 
 An array reference can be used to share the same handler with multiple
-conditions, of which only one needs to match.
+conditions, of which only one needs to match. And since exception handlers are
+just callbacks, they can also throw their own exceptions.
 
   # Handle MyApp::X::Foo and MyApp::X::Bar the same
   eval {
     dangerous_code();
   };
   check(
-    ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub {
-      say "Foo/Bar: $_";
-    },
-    'MyApp::X::Yada' => sub {
-      say "Yada: $_";
-    }
+    ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub { die "Foo/Bar: $_" }
   );
 
 There are currently two keywords you can use to set special handlers. The
@@ -282,12 +266,8 @@ exception was rethrown or if there was no exception to be handled at all.
     dangerous_code();
   };
   check(
-    default => sub {
-      say "Error: $_";
-    },
-    finally => sub {
-      say 'Dangerous code is done';
-    }
+    default => sub { say "Error: $_" },
+    finally => sub { say 'Dangerous code is done' }
   );
 
 =head2 raise

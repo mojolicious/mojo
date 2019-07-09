@@ -152,8 +152,8 @@ dynamically.
   my $single = Mojo::Content::Single->new(asset => Mojo::Asset::File->new);
   my $single = Mojo::Content::Single->new({asset => Mojo::Asset::File->new});
 
-Construct a new L<Mojo::Content::Single> object and subscribe to L</"read">
-event with default content parser.
+Construct a new L<Mojo::Content::Single> object and subscribe to event
+L<Mojo::Content/"read"> with default content parser.
 
 =head2 parse
 

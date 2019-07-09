@@ -1,4 +1,6 @@
 
+8.21  2019-07-09
+
 8.20  2019-07-08
   - Improved check function in Mojo::Exception to match regular expressions
     against stringified exception objects too.

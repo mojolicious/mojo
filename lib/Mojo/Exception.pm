@@ -156,7 +156,8 @@ sub _context {
   }
 }
 
-package Mojo::Exception::_Guard;
+package    # hide from PAUSE
+  Mojo::Exception::_Guard;
 use Mojo::Base -base;
 
 sub DESTROY { shift->{finally}->() }

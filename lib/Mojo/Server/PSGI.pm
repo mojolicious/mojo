@@ -38,7 +38,8 @@ sub to_psgi_app {
   return sub { $self->run(@_) }
 }
 
-package Mojo::Server::PSGI::_IO;
+package    # hide from PAUSE
+  Mojo::Server::PSGI::_IO;
 use Mojo::Base -base;
 
 # Finish transaction

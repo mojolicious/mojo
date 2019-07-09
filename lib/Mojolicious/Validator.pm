@@ -109,6 +109,7 @@ String value needs to match the regular expression.
 
   $v = $v->num;
   $v = $v->num(2, 5);
+  $v = $v->num(-3, 7);
   $v = $v->num(2, undef);
   $v = $v->num(undef, 5);
 

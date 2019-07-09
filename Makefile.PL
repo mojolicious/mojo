@@ -18,9 +18,12 @@ WriteMakefile(
   META_MERGE   => {
     dynamic_config => 0,
     'meta-spec'    => {version => 2},
-    no_index       => {directory => ['examples', 't']},
-    prereqs        => {runtime => {requires => {perl => '5.010001'}}},
-    resources      => {
+    no_index       => {
+      directory => [qw(examples t)],
+      package   => [qw(Mojo::Exception::_Guard Mojo::Server::PSGI::_IO)],
+    },
+    prereqs   => {runtime => {requires => {perl => '5.010001'}}},
+    resources => {
       bugtracker => {web => 'https://github.com/mojolicious/mojo/issues'},
       homepage   => 'https://mojolicious.org',
       license    => ['http://www.opensource.org/licenses/artistic-license-2.0'],

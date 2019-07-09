@@ -49,7 +49,7 @@ sub _in {
 
 sub _num {
   my ($v, $name, $value, $min, $max) = @_;
-  return 1 if $value !~ /^[0-9]+$/;
+  return 1 if $value !~ /^-?[0-9]+$/;
   return defined $min && $min > $value || defined $max && $max < $value;
 }
 
@@ -112,8 +112,8 @@ String value needs to match the regular expression.
   $v = $v->num(2, undef);
   $v = $v->num(undef, 5);
 
-String value needs to be a non-fractional number and if provided in the given
-range.
+String value needs to be a non-fractional number (positive or negative) and if
+provided in the given range.
 
 =head2 size
 

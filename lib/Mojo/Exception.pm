@@ -3,11 +3,12 @@ use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Exporter 'import';
-use Mojo::Util qw(decode deprecated);
+use Mojo::Util 'decode';
 use Scalar::Util 'blessed';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message                                    => 'Exception!';
+has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} };
 
 our @EXPORT_OK = qw(check raise);
 
@@ -102,9 +103,12 @@ sub to_string {
   }
 
   my $frames = $self->frames;
-  if (@$frames) {
+  if (my $max = @$frames) {
     $str .= "Traceback (most recent call first):\n";
-    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n} for @$frames;
+    my $offset = $self->verbose ? $#$frames : $#$frames <= 4 ? $#$frames : 4;
+    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n}
+      for @$frames[0 .. $offset];
+    $str .= "  ...\n" if $max > ($offset + 1);
   }
 
   return $str;
@@ -117,12 +121,6 @@ sub trace {
   my @frames;
   while (my @trace = caller($start++)) { push @frames, \@trace }
   return $self->frames(\@frames);
-}
-
-# DEPRECATED!
-sub verbose {
-  deprecated 'Mojo::Exception::verbose is DEPRECATED';
-  return $_[0];
 }
 
 sub _append {
@@ -321,6 +319,14 @@ Lines before the line where the exception occurred if available.
   $e      = $e->message('Died at test.pl line 3.');
 
 Exception message, defaults to C<Exception!>.
+
+=head2 verbose
+
+  my $bool = $e->verbose;
+  $e       = $e->verbose($bool);
+
+Show more information with L</"to_string">, such as additional L</"frames">,
+defaults to the value of the C<MOJO_EXCEPTION_VERBOSE> environment variable.
 
 =head1 METHODS
 

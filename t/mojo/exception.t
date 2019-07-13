@@ -15,6 +15,13 @@ use Mojo::Base 'MojoTest::X::Bar';
 
 package main;
 
+# Verbose
+{
+  ok(!Mojo::Exception->new->verbose, 'not verbose');
+  local $ENV{MOJO_EXCEPTION_VERBOSE} = 1;
+  ok(Mojo::Exception->new->verbose, 'verbose');
+}
+
 # Basics
 my $e = Mojo::Exception->new;
 is $e->message, 'Exception!', 'right message';
@@ -135,6 +142,37 @@ Context:
 Traceback (most recent call first):
   File "template", line 4, in "Sandbox"
   File "MyApp/Test.pm", line 3, in "MyApp::Test"
+  File "foo.pl", line 4, in "main"
+EOF
+
+# Verbose
+$e = Mojo::Exception->new('Test!');
+$e->frames([
+  ['Sandbox',     'template',      4],
+  ['MyApp::Test', 'MyApp/Test.pm', 3],
+  ['MyApp::Test', 'MyApp/Test.pm', 4],
+  ['MyApp::Test', 'MyApp/Test.pm', 5],
+  ['MyApp::Test', 'MyApp/Test.pm', 6],
+  ['main',        'foo.pl',        4]
+]);
+is $e, <<EOF, 'right result';
+Test!
+Traceback (most recent call first):
+  File "template", line 4, in "Sandbox"
+  File "MyApp/Test.pm", line 3, in "MyApp::Test"
+  File "MyApp/Test.pm", line 4, in "MyApp::Test"
+  File "MyApp/Test.pm", line 5, in "MyApp::Test"
+  File "MyApp/Test.pm", line 6, in "MyApp::Test"
+  ...
+EOF
+is $e->verbose(1), <<EOF, 'right result';
+Test!
+Traceback (most recent call first):
+  File "template", line 4, in "Sandbox"
+  File "MyApp/Test.pm", line 3, in "MyApp::Test"
+  File "MyApp/Test.pm", line 4, in "MyApp::Test"
+  File "MyApp/Test.pm", line 5, in "MyApp::Test"
+  File "MyApp/Test.pm", line 6, in "MyApp::Test"
   File "foo.pl", line 4, in "main"
 EOF
 

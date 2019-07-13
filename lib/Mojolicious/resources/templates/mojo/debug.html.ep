@@ -322,7 +322,8 @@
                 % for my $frame (@{$exception->frames}) {
                   <tr>
                     <td class="striped value wide">
-                      <pre><%= $frame->[1] . ':' . $frame->[2] %></pre>
+                      <pre>File "<%= $frame->[1] %>", line <%= 
+                        $frame->[2] %>, in "<%= $frame->[0] %>"</pre>
                     </td>
                   </tr>
                 % }

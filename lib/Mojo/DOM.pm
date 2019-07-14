@@ -178,9 +178,26 @@ sub type { shift->tree->[0] }
 
 sub val {
   my $self = shift;
+  # "form"
+  return {
+    $self->find('button, checkbox, input, radio, select, textarea')
+      ->map(sub {
+        return () if $_->matches('[disabled]');
+        return () if $_->ancestors('fieldset[disabled]')->size &&
+          !$_->ancestors('fieldset legend:first-child')->size;
+        return () unless (my $name = $_->attr("name"));
+        $name => $_->val();
+      })->each,
+    $self->find('input[type=image]')
+      ->map(sub {
+        return () if $_->matches('[disabled]');
+        return (x => 1, y => 1) unless (my $name = $_->attr("name"));
+        return ("$name.x" => 1, "$name.y" => 1);
+      })->each
+  } if (my $tag = $self->tag) eq 'form';
 
   # "option"
-  return $self->{value} // $self->text if (my $tag = $self->tag) eq 'option';
+  return $self->{value} // $self->text if $tag eq 'option';
 
   # "input" ("type=checkbox" and "type=radio")
   my $type = $self->{type} // '';
@@ -1020,11 +1037,13 @@ C<root>, C<tag> or C<text>.
 
   my $value = $dom->val;
 
-Extract value from form element (such as C<button>, C<input>, C<option>,
-C<select> and C<textarea>), or return C<undef> if this element has no value. In
-the case of C<select> with C<multiple> attribute, find C<option> elements with
-C<selected> attribute and return an array reference with all values, or C<undef>
-if none could be found.
+Extract value from form (C<form>) and form elements (such as C<button>,
+C<input>, C<option>, C<select> and C<textarea>), or return C<undef> if this
+element has no value. In the case of C<select> with C<multiple> attribute, find
+C<option> elements with C<selected> attribute and return an array reference with
+all values, or C<undef> if none could be found. In the case of C<form> a hash
+reference of all the child form element names and L<values|/"val"> will be
+returned.
 
   # "a"
   $dom->parse('<input name=test value=a>')->at('input')->val;
@@ -1045,6 +1064,11 @@ if none could be found.
 
   # "on"
   $dom->parse('<input name=test type=checkbox>')->at('input')->val;
+
+  # {cars => ["audi"]}
+  $dom->parse('<form><select name=cars multiple>'.
+              '<option value=audi selected /></select></form>')
+    ->at('form')->val;
 
 =head2 with_roles
 

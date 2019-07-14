@@ -2290,6 +2290,37 @@ is $dom->at('input[name=r]')->val, 'on',  'right value';
 is $dom->at('input[name=s]')->val, undef, 'no value';
 is $dom->at('input[name=t]')->val, '',    'right value';
 is $dom->at('input[name=u]')->val, undef, 'no value';
+is_deeply $dom->at('form')->val, { a => 'A', b => 'B', c => 'C', d => 'D',
+    f => ['I', 'J'], m => 'M', n => undef, o => 'O', p => 'P', q => undef,
+    r => 'on', s => undef, t => '', u => undef,
+}, 'correct hash';
+
+$dom =
+  Mojo::DOM->new('<form><input type=image /><input name=car value=vw></form>');
+is_deeply $dom->at('form')->val, {car => 'vw', x => 1, y => 1}, 'x + y coords';
+$dom =
+  Mojo::DOM->new('<form><input type=image name=pic /></form>');
+is_deeply $dom->at('form')->val, {'pic.x' => 1, 'pic.y' => 1, pic => undef},
+  'x + y coords';
+
+$dom = Mojo::DOM->new(<<EOF);
+<!-- https://html.spec.whatwg.org/multipage/form-elements.html#dom-fieldset-elements -->
+<form>
+<fieldset name="clubfields" disabled>
+ <legend> <label>
+  <input type=checkbox name=club onchange="form.clubfields.disabled = !checked">
+  Use Club Card
+ </label> </legend>
+ <p><label>Name on card: <input name=clubname required></label></p>
+ <p><label>Card num: <input name=clubnum required pattern="[-0-9]+"></label></p>
+ <p><label>Expiry date: <input name=clubexp type=month></label></p>
+</fieldset>
+</form>
+EOF
+
+is_deeply $dom->at('form')->val, {club => 'on'}, # todo: check this should be on
+  q{excluding those that are descendants of the fieldset}.
+  q{ element's first legend element child};
 
 # PoCo example with whitespace-sensitive text
 $dom = Mojo::DOM->new(<<EOF);

@@ -59,6 +59,12 @@ L<features|feature> are enabled, even if examples don't specifically mention it.
 Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for
 you automatically, whenever they are used.
 
+=item Signatures
+
+On Perl 5.20+ you can also use a C<-signatures> flag to enable support for
+L<subroutine signatures|perlsub/"Signatures">. Signatures are used in all
+examples for clarity, even when C<-signatures> is omitted for brevity.
+
 =item Variable names
 
 For brevity and clarity, example variables will reflect the type of data the API

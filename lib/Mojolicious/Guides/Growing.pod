@@ -185,10 +185,9 @@ We start our new application with a single executable Perl script.
 This will be the foundation for our login manager example application.
 
   #!/usr/bin/env perl
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     $c->render(text => 'Hello World!');
   };
 
@@ -264,9 +263,7 @@ separation of concerns more visible.
 
   package MyApp::Model::Users;
 
-  use strict;
-  use warnings;
-
+  use Mojo::Base -strict;
   use Mojo::Util 'secure_compare';
 
   my $USERS = {
@@ -294,7 +291,7 @@ L<Mojolicious::Lite/"helper"> to make our model available to all actions and
 templates.
 
   #!/usr/bin/env perl
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   use lib 'lib';
   use MyApp::Model::Users;
@@ -303,8 +300,7 @@ templates.
   helper users => sub { state $users = MyApp::Model::Users->new };
 
   # /?user=sebastian&pass=secr3t
-  any '/' => sub {
-    my $c = shift;
+  any '/' => sub ($c) {
 
     # Query parameters
     my $user = $c->param('user') || '';
@@ -443,7 +439,7 @@ A final C<myapp.pl> prototype passing all of the tests above could look like
 this.
 
   #!/usr/bin/env perl
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   use lib 'lib';
   use MyApp::Model::Users;
@@ -454,8 +450,7 @@ this.
   helper users => sub { state $users = MyApp::Model::Users->new };
 
   # Main login action
-  any '/' => sub {
-    my $c = shift;
+  any '/' => sub ($c) {
 
     # Query or POST parameters
     my $user = $c->param('user') || '';
@@ -476,8 +471,7 @@ this.
 
   # Make sure user is logged in for actions in this group
   group {
-    under sub {
-      my $c = shift;
+    under sub ($c) {
 
       # Redirect to main page with a 302 response if user is not logged in
       return 1 if $c->session('user');
@@ -490,8 +484,7 @@ this.
   };
 
   # Logout action
-  get '/logout' => sub {
-    my $c = shift;
+  get '/logout' => sub ($c) {
 
     # Expire and in turn clear session automatically
     $c->session(expires => 1);
@@ -576,20 +569,18 @@ simplified hybrid routes in the L<Mojolicious::Routes> router, none of the
 actual action code needs to be changed.
 
   package MyApp;
-  use Mojo::Base 'Mojolicious';
+  use Mojo::Base 'Mojolicious', -signatures;
 
   use MyApp::Model::Users;
 
-  sub startup {
-    my $self = shift;
+  sub startup ($self) {
 
     $self->secrets(['Mojolicious rocks']);
     $self->helper(users => sub { state $users = MyApp::Model::Users->new });
 
     my $r = $self->routes;
 
-    $r->any('/' => sub {
-      my $c = shift;
+    $r->any('/' => sub ($c) {
 
       my $user = $c->param('user') || '';
       my $pass = $c->param('pass') || '';
@@ -600,16 +591,14 @@ actual action code needs to be changed.
       $c->redirect_to('protected');
     } => 'index');
 
-    my $logged_in = $r->under(sub {
-      my $c = shift;
+    my $logged_in = $r->under(sub ($c) {
       return 1 if $c->session('user');
       $c->redirect_to('index');
       return undef;
     });
     $logged_in->get('/protected');
 
-    $r->get('/logout' => sub {
-      my $c = shift;
+    $r->get('/logout' => sub ($c) {
       $c->session(expires => 1);
       $c->redirect_to('index');
     });
@@ -628,9 +617,7 @@ allow running tests again.
 
   #!/usr/bin/env perl
 
-  use strict;
-  use warnings;
-
+  use Mojo::Base -strict;
   use lib 'lib';
   use Mojolicious::Commands;
 
@@ -668,11 +655,9 @@ Once again the actual action code does not need to change, we just rename C<$c>
 to C<$self> since the controller is now the invocant.
 
   package MyApp::Controller::Login;
-  use Mojo::Base 'Mojolicious::Controller';
+  use Mojo::Base 'Mojolicious::Controller', -signatures;
 
-  sub index {
-    my $self = shift;
-
+  sub index ($self) {
     my $user = $self->param('user') || '';
     my $pass = $self->param('pass') || '';
     return $self->render unless $self->users->check($user, $pass);
@@ -682,15 +667,13 @@ to C<$self> since the controller is now the invocant.
     $self->redirect_to('protected');
   }
 
-  sub logged_in {
-    my $self = shift;
+  sub logged_in ($self) {
     return 1 if $self->session('user');
     $self->redirect_to('index');
     return undef;
   }
 
-  sub logout {
-    my $self = shift;
+  sub logout ($self) {
     $self->session(expires => 1);
     $self->redirect_to('index');
   }
@@ -706,12 +689,11 @@ The application class C<lib/MyApp.pm> can now be reduced to model and routing
 information.
 
   package MyApp;
-  use Mojo::Base 'Mojolicious';
+  use Mojo::Base 'Mojolicious', -signatures;
 
   use MyApp::Model::Users;
 
-  sub startup {
-    my $self = shift;
+  sub startup ($self) {
 
     $self->secrets(['Mojolicious rocks']);
     $self->helper(users => sub { state $users = MyApp::Model::Users->new });

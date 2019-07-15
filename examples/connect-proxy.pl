@@ -3,19 +3,15 @@
 #
 #   $ HTTPS_PROXY=http://127.0.0.1:3000 mojo get https://mojolicious.org
 #
-use Mojo::Base -strict;
+use Mojo::Base -strict, -signatures;
 use Mojo::IOLoop;
 
 my %buffer;
 Mojo::IOLoop->server(
-  {port => 3000} => sub {
-    my ($loop, $stream, $id) = @_;
-
+  {port => 3000} => sub ($loop, $stream, $id) {
     # Connection to client
     $stream->on(
-      read => sub {
-        my ($stream, $chunk) = @_;
-
+      read => sub ($stream, $chunk) {
         # Write chunk from client to server
         my $server = $buffer{$id}{connection};
         return Mojo::IOLoop->stream($server)->write($chunk) if $server;
@@ -45,8 +41,7 @@ Mojo::IOLoop->server(
                   ->write("HTTP/1.1 200 OK\x0d\x0a"
                     . "Connection: keep-alive\x0d\x0a\x0d\x0a");
                 $stream->on(
-                  read => sub {
-                    my ($stream, $chunk) = @_;
+                  read => sub ($stream, $chunk) {
                     Mojo::IOLoop->stream($id)->write($chunk);
                   }
                 );

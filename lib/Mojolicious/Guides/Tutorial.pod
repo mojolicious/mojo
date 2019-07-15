@@ -26,10 +26,9 @@ L<functions|Mojolicious::Lite/"FUNCTIONS"> imported, when you use
 L<Mojolicious::Lite>, turning your script into a full featured web application.
 
   #!/usr/bin/env perl
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     $c->render(text => 'Hello World!');
   };
 
@@ -91,11 +90,10 @@ request URL. The first argument passed to all actions (C<$c>) is a
 L<Mojolicious::Controller> object, containing both the HTTP request and
 response.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Route leading to an action that renders some text
-  get '/foo' => sub {
-    my $c = shift;
+  get '/foo' => sub ($c) {
     $c->render(text => 'Hello World!');
   };
 
@@ -109,11 +107,10 @@ L<Mojolicious::Controller/"render">, but more about that later.
 All C<GET> and C<POST> parameters sent with the request are accessible via
 L<Mojolicious::Controller/"param">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /foo?user=sri
-  get '/foo' => sub {
-    my $c    = shift;
+  get '/foo' => sub ($c) {
     my $user = $c->param('user');
     $c->render(text => "Hello $user.");
   };
@@ -128,11 +125,10 @@ C<text> and C<data> are reserved and will be used by
 L<Mojolicious::Controller/"render"> to decide how a response should be
 generated.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Route leading to an action that renders a template
-  get '/foo' => sub {
-    my $c = shift;
+  get '/foo' => sub ($c) {
     $c->stash(one => 23);
     $c->render(template => 'magic', two => 24);
   };
@@ -151,19 +147,17 @@ L<Mojolicious::Guides::Rendering/"Embedded Perl">.
 L<Mojolicious::Controller/"req"> and L<Mojolicious::Controller/"res"> give you
 full access to all HTTP features and information.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Access request information
-  get '/agent' => sub {
-    my $c    = shift;
+  get '/agent' => sub ($c) {
     my $host = $c->req->url->to_abs->host;
     my $ua   = $c->req->headers->user_agent;
     $c->render(text => "Request by $ua reached $host.");
   };
 
   # Echo the request body and send custom header with response
-  post '/echo' => sub {
-    my $c = shift;
+  post '/echo' => sub ($c) {
     $c->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     $c->render(data => $c->req->body);
   };
@@ -182,11 +176,10 @@ L<Mojolicious> loves JSON and comes with the possibly fastest pure-Perl
 implementation L<Mojo::JSON> built right in, which is accessible through
 L<Mojo::Message/"json"> as well as the reserved stash value C<json>.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Modify the received JSON document and return it
-  put '/reverse' => sub {
-    my $c    = shift;
+  put '/reverse' => sub ($c) {
     my $hash = $c->req->json;
     $hash->{message} = reverse $hash->{message};
     $c->render(json => $hash);
@@ -205,10 +198,10 @@ During development you will encounter these pages whenever you make a mistake,
 they are gorgeous and contain a lot of valuable information that will aid you
 in debugging your application.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Not found (404)
-  get '/missing' => sub { shift->render(template => 'does_not_exist') };
+  get '/missing' => sub ($c) { $c->render(template => 'does_not_exist') };
 
   # Exception (500)
   get '/dies' => sub { die 'Intentional error' };
@@ -231,11 +224,10 @@ detection and backreferencing with L<Mojolicious::Controller/"url_for">, on
 which many methods and helpers like
 L<Mojolicious::Plugin::TagHelpers/"link_to"> rely.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Render the template "index.html.ep"
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     $c->render;
   } => 'index';
 
@@ -316,19 +308,17 @@ Helpers are little functions you can create with the keyword
 L<Mojolicious::Lite/"helper"> and reuse throughout your whole application, from
 actions to templates.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # A helper to identify visitors
-  helper whois => sub {
-    my $c     = shift;
+  helper whois => sub ($c) {
     my $agent = $c->req->headers->user_agent || 'Anonymous';
     my $ip    = $c->tx->remote_address;
     return "$agent ($ip)";
   };
 
   # Use helper in action and template
-  get '/secret' => sub {
-    my $c    = shift;
+  get '/secret' => sub ($c) {
     my $user = $c->whois;
     $c->app->log->debug("Request from $user");
   };
@@ -349,20 +339,18 @@ separator occurs, similar to the regular expression C<([^/.]+)>. Results are
 accessible via L<Mojolicious::Controller/"stash"> and
 L<Mojolicious::Controller/"param">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /foo/test
   # /foo/test123
-  get '/foo/:bar' => sub {
-    my $c   = shift;
+  get '/foo/:bar' => sub ($c) {
     my $bar = $c->stash('bar');
     $c->render(text => "Our :bar placeholder matched $bar");
   };
 
   # /testsomething/foo
   # /test123something/foo
-  get '/<:bar>something/foo' => sub {
-    my $c   = shift;
+  get '/<:bar>something/foo' => sub ($c) {
     my $bar = $c->param('bar');
     $c->render(text => "Our :bar placeholder matched $bar");
   };
@@ -412,30 +400,26 @@ C<.>, similar to the regular expression C<(.+)>.
 Routes can be restricted to specific request methods with different keywords
 like L<Mojolicious::Lite/"get"> and L<Mojolicious::Lite/"any">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # GET /hello
-  get '/hello' => sub {
-    my $c = shift;
+  get '/hello' => sub ($c) {
     $c->render(text => 'Hello World!');
   };
 
   # PUT /hello
-  put '/hello' => sub {
-    my $c    = shift;
+  put '/hello' => sub ($c) {
     my $size = length $c->req->body;
     $c->render(text => "You uploaded $size bytes to /hello.");
   };
 
   # GET|POST|PATCH /bye
-  any ['GET', 'POST', 'PATCH'] => '/bye' => sub {
-    my $c = shift;
+  any ['GET', 'POST', 'PATCH'] => '/bye' => sub ($c) {
     $c->render(text => 'Bye World!');
   };
 
   # * /whatever
-  any '/whatever' => sub {
-    my $c      = shift;
+  any '/whatever' => sub ($c) {
     my $method = $c->req->method;
     $c->render(text => "You called /whatever with $method.");
   };
@@ -447,12 +431,11 @@ like L<Mojolicious::Lite/"get"> and L<Mojolicious::Lite/"any">.
 All placeholders require a value, but by assigning them default values you can
 make capturing optional.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /hello
   # /hello/Sara
-  get '/hello/:name' => {name => 'Sebastian', day => 'Monday'} => sub {
-    my $c = shift;
+  get '/hello/:name' => {name => 'Sebastian', day => 'Monday'} => sub ($c) {
     $c->render(template => 'groovy', format => 'txt');
   };
 
@@ -470,12 +453,11 @@ stash all the time.
 A very easy way to make placeholders more restrictive are alternatives, you just
 make a list of possible values.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /test
   # /123
-  any '/:foo' => [foo => ['test', '123']] => sub {
-    my $c   = shift;
+  any '/:foo' => [foo => ['test', '123']] => sub ($c) {
     my $foo = $c->param('foo');
     $c->render(text => "Our :foo placeholder matched $foo");
   };
@@ -486,12 +468,11 @@ All placeholders get compiled to a regular expression internally, this process
 can also be customized. Just make sure not to use C<^> and C<$>, or capturing
 groups C<(...)>, non-capturing groups C<(?:...)> are fine though.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /1
   # /123
-  any '/:bar' => [bar => qr/\d+/] => sub {
-    my $c   = shift;
+  any '/:bar' => [bar => qr/\d+/] => sub ($c) {
     my $bar = $c->param('bar');
     $c->render(text => "Our :bar placeholder matched $bar");
   };
@@ -509,11 +490,10 @@ Authentication and code shared between multiple routes can be realized easily
 with routes generated by L<Mojolicious::Lite/"under">. All following routes are
 only evaluated if the callback returned a true value.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Authenticate based on name parameter
-  under sub {
-    my $c = shift;
+  under sub ($c) {
 
     # Authenticated
     my $name = $c->param('name') || '';
@@ -560,11 +540,10 @@ Prefixing multiple routes is another good use for it.
 You can also group related routes with L<Mojolicious::Lite/"group">, which
 allows nesting of routes generated with L<Mojolicious::Lite/"under">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Global logic shared by all routes
-  under sub {
-    my $c = shift;
+  under sub ($c) {
     return 1 if $c->req->headers->header('X-Bender');
     $c->render(text => "You're not Bender.");
     return undef;
@@ -574,8 +553,7 @@ allows nesting of routes generated with L<Mojolicious::Lite/"under">.
   group {
 
     # Local logic shared only by routes in this group
-    under '/admin' => sub {
-      my $c = shift;
+    under '/admin' => sub ($c) {
       return 1 if $c->req->headers->header('X-Awesome');
       $c->render(text => "You're not awesome enough.");
       return undef;
@@ -596,13 +574,12 @@ Formats can be automatically detected from file extensions like C<.html>, they
 are used to find the right template and generate the correct C<Content-Type>
 header.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /detection
   # /detection.html
   # /detection.txt
-  get '/detection' => sub {
-    my $c = shift;
+  get '/detection' => sub ($c) {
     $c->render(template => 'detected');
   };
 
@@ -622,12 +599,11 @@ header.
 The default format is C<html>, and restrictive placeholders can be used to
 limit possible values.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /hello.json
   # /hello.txt
-  get '/hello' => [format => ['json', 'txt']] => sub {
-    my $c = shift;
+  get '/hello' => [format => ['json', 'txt']] => sub ($c) {
     return $c->render(json => {hello => 'world'})
       if $c->stash('format') eq 'json';
     $c->render(text => 'hello world');
@@ -660,7 +636,7 @@ For resources with different representations and that require truly RESTful
 content negotiation you can also use
 L<Mojolicious::Plugin::DefaultHelpers/"respond_to">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # /hello (Accept: application/json)
   # /hello (Accept: application/xml)
@@ -668,8 +644,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"respond_to">.
   # /hello.xml
   # /hello?format=json
   # /hello?format=xml
-  get '/hello' => sub {
-    my $c = shift;
+  get '/hello' => sub ($c) {
     $c->respond_to(
       json => {json => {hello => 'world'}},
       xml  => {text => '<hello>world</hello>'},
@@ -725,11 +700,10 @@ if it exists.
 
 They have a higher precedence than templates in the C<DATA> section.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Render template "templates/foo/bar.html.ep"
-  any '/external' => sub {
-    my $c = shift;
+  any '/external' => sub ($c) {
     $c->render(template => 'foo/bar');
   };
 
@@ -749,14 +723,13 @@ There are many useful methods L<Mojo::Home> inherits from L<Mojo::File>, like
 L<Mojo::File/"child"> and L<Mojo::File/"slurp">, that will help you keep your
 application portable across many different operating systems.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Load message into memory
   my $hello = app->home->child('cache', 'hello.txt')->slurp;
 
   # Display message
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     $c->render(text => $hello);
   };
 
@@ -771,23 +744,20 @@ Conditions such as C<agent> and C<host> from
 L<Mojolicious::Plugin::HeaderCondition> allow even more powerful route
 constructs.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Firefox
-  get '/foo' => (agent => qr/Firefox/) => sub {
-    my $c = shift;
+  get '/foo' => (agent => qr/Firefox/) => sub ($c) {
     $c->render(text => 'Congratulations, you are using a cool browser.');
   };
 
   # Internet Explorer
-  get '/foo' => (agent => qr/Internet Explorer/) => sub {
-    my $c = shift;
+  get '/foo' => (agent => qr/Internet Explorer/) => sub ($c) {
     $c->render(text => 'Dude, you really need to upgrade to Firefox.');
   };
 
   # http://mojolicious.org/bar
-  get '/bar' => (host => 'mojolicious.org') => sub {
-    my $c = shift;
+  get '/bar' => (host => 'mojolicious.org') => sub ($c) {
     $c->render(text => 'Hello Mojolicious.');
   };
 
@@ -800,11 +770,10 @@ through the helper L<Mojolicious::Plugin::DefaultHelpers/"session">. Just be
 aware that all session data gets serialized with L<Mojo::JSON> and stored
 client-side, with a cryptographic signature to prevent tampering.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Access session data in action and template
-  get '/counter' => sub {
-    my $c = shift;
+  get '/counter' => sub ($c) {
     $c->session->{counter}++;
   };
 
@@ -828,14 +797,13 @@ will be automatically streamed into a temporary file. To build HTML forms more
 efficiently, you can also use tag helpers like
 L<Mojolicious::Plugin::TagHelpers/"form_for">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Upload form in DATA section
   get '/' => 'form';
 
   # Multipart upload handler
-  post '/upload' => sub {
-    my $c = shift;
+  post '/upload' => sub ($c) {
 
     # Check file size
     return $c->render(text => 'File is too big.', status => 200)
@@ -877,32 +845,27 @@ L<Mojolicious::Plugin::DefaultHelpers/"ua">, there's a full featured HTTP and
 WebSocket user agent built right in. Especially in combination with
 L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Blocking
-  get '/headers' => sub {
-    my $c   = shift;
+  get '/headers' => sub ($c) {
     my $url = $c->param('url') || 'https://mojolicious.org';
     my $dom = $c->ua->get($url)->result->dom;
     $c->render(json => $dom->find('h1, h2, h3')->map('text')->to_array);
   };
 
   # Non-blocking
-  get '/title' => sub {
-    my $c = shift;
-    $c->ua->get('mojolicious.org' => sub {
-      my ($ua, $tx) = @_;
+  get '/title' => sub ($c) {
+    $c->ua->get('mojolicious.org' => sub ($ua, $tx) {
       $c->render(data => $tx->result->dom->at('title')->text);
     });
   };
 
   # Concurrent non-blocking
-  get '/titles' => sub {
-    my $c  = shift;
+  get '/titles' => sub ($c) {
     my $mojo = $c->ua->get_p('https://mojolicious.org');
     my $cpan = $c->ua->get_p('https://metacpan.org');
-    Mojo::Promise->all($mojo, $cpan)->then(sub {
-      my ($mojo, $cpan) = @_;
+    Mojo::Promise->all($mojo, $cpan)->then(sub ($mojo, $cpan) {
       $c->render(json => {
         mojo => $mojo->[0]->result->dom->at('title')->text,
         cpan => $cpan->[0]->result->dom->at('title')->text
@@ -922,12 +885,10 @@ messages by subscribing to events such as
 L<Mojo::Transaction::WebSocket/"json"> with L<Mojolicious::Controller/"on"> and
 return them with L<Mojolicious::Controller/"send">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  websocket '/echo' => sub {
-    my $c = shift;
-    $c->on(json => sub {
-      my ($c, $hash) = @_;
+  websocket '/echo' => sub ($c) {
+    $c->on(json => sub ($c, $hash) {
       $hash->{msg} = "echo: $hash->{msg}";
       $c->send({json => $hash});
     });
@@ -965,13 +926,12 @@ collect debug messages and automatically disable them later in a production
 setup by changing the L<Mojolicious> operating mode, which can also be retrieved
 from the attribute L<Mojolicious/"mode">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Prepare mode specific message during startup
   my $msg = app->mode eq 'development' ? 'Development!' : 'Something else!';
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     $c->app->log->debug('Rendering mode specific message');
     $c->render(text => $msg);
   };

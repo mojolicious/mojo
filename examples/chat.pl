@@ -1,24 +1,26 @@
 #
 # Minimal single-process WebSocket chat application for browser testing
 #
-use Mojolicious::Lite;
+use Mojolicious::Lite -signatures;
 use Mojo::EventEmitter;
 
 helper events => sub { state $events = Mojo::EventEmitter->new };
 
 get '/' => 'chat';
 
-websocket '/channel' => sub {
-  my $c = shift;
-
+websocket '/channel' => sub ($c) {
   $c->inactivity_timeout(3600);
 
   # Forward messages from the browser
-  $c->on(message => sub { shift->events->emit(mojochat => shift) });
+  $c->on(message => sub ($c, $msg) { $c->events->emit(mojochat => $msg) });
 
   # Forward messages to the browser
   my $cb = $c->events->on(mojochat => sub { $c->send(pop) });
-  $c->on(finish => sub { shift->events->unsubscribe(mojochat => $cb) });
+  $c->on(
+    finish => sub ($c, $code, $reason = undef) {
+      $c->events->unsubscribe(mojochat => $cb);
+    }
+  );
 };
 
 app->start;

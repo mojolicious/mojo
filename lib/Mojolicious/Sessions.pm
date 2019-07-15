@@ -129,14 +129,11 @@ have security implications though. For more control you can also use the C<expir
 =head2 deserialize
 
   my $cb    = $sessions->deserialize;
-  $sessions = $sessions->deserialize(sub {...});
+  $sessions = $sessions->deserialize(sub ($bytes) {...});
 
 A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
 
-  $sessions->deserialize(sub {
-    my $bytes = shift;
-    return {};
-  });
+  $sessions->deserialize(sub ($bytes) { return {}; });
 
 =head2 samesite
 
@@ -160,14 +157,11 @@ Set the secure flag on all session cookies, so that browsers send them only over
 =head2 serialize
 
   my $cb    = $sessions->serialize;
-  $sessions = $sessions->serialize(sub {...});
+  $sessions = $sessions->serialize(sub ($hash) {...});
 
 A callback used to serialize sessions, defaults to L<Mojo::JSON/"encode_json">.
 
-  $sessions->serialize(sub {
-    my $hash = shift;
-    return '';
-  });
+  $sessions->serialize(sub ($hash) { return ''; });
 
 =head1 METHODS
 

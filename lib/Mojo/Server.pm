@@ -80,10 +80,9 @@ Mojo::Server - HTTP/WebSocket server base class
 =head1 SYNOPSIS
 
   package Mojo::Server::MyServer;
-  use Mojo::Base 'Mojo::Server';
+  use Mojo::Base 'Mojo::Server', -signatures;
 
-  sub run {
-    my $self = shift;
+  sub run ($self) {
 
     # Get a transaction
     my $tx = $self->build_tx;
@@ -104,15 +103,11 @@ L<Mojo::Server> inherits all events from L<Mojo::EventEmitter> and can emit the 
 
 =head2 request
 
-  $server->on(request => sub {
-    my ($server, $tx) = @_;
-    ...
-  });
+  $server->on(request => sub ($server, $tx) {...});
 
 Emitted when a request is ready and needs to be handled.
 
-  $server->on(request => sub {
-    my ($server, $tx) = @_;
+  $server->on(request => sub ($server, $tx) {
     $tx->res->code(200);
     $tx->res->headers->content_type('text/plain');
     $tx->res->body('Hello World!');

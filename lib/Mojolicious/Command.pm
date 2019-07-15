@@ -83,16 +83,15 @@ Mojolicious::Command - Command base class
 
   # Lowercase command name
   package Mojolicious::Command::mycommand;
-  use Mojo::Base 'Mojolicious::Command';
+  use Mojo::Base 'Mojolicious::Command', -signatures;
 
   # Short description
   has description => 'My first Mojo command';
 
   # Usage message from SYNOPSIS
-  has usage => sub { shift->extract_usage };
+  has usage => sub ($self) { $self->extract_usage };
 
-  sub run {
-    my ($self, @args) = @_;
+  sub run ($self, @args) {
 
     # Magic here! :)
   }

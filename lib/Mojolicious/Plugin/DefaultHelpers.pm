@@ -523,8 +523,7 @@ Perform non-blocking C<GET> request and forward response as efficiently as possi
 L<Mojo::UserAgent/"get"> and returns a L<Mojo::Promise> object.
 
   # Forward with exception handling
-  $c->proxy->get_p('http://mojolicious.org')->catch(sub {
-    my $err = shift;
+  $c->proxy->get_p('http://mojolicious.org')->catch(sub ($err) {
     $c->log->debug("Proxy error: $err");
     $c->render(text => 'Something went wrong!', status => 400);
   });
@@ -537,8 +536,7 @@ Perform non-blocking C<POST> request and forward response as efficiently as poss
 L<Mojo::UserAgent/"post"> and returns a L<Mojo::Promise> object.
 
   # Forward with exception handling
-  $c->proxy->post_p('example.com' => form => {test => 'pass'})->catch(sub {
-    my $err = shift;
+  $c->proxy->post_p('example.com' => form => {test => 'pass'})->catch(sub ($err) {
     $c->log->debug("Proxy error: $err");
     $c->render(text => 'Something went wrong!', status => 400);
   });
@@ -552,8 +550,7 @@ possible, returns a L<Mojo::Promise> object.
 
   # Forward with exception handling
   my $tx = $c->ua->build_tx(GET => 'http://mojolicious.org');
-  $c->proxy->start_p($tx)->catch(sub {
-    my $err = shift;
+  $c->proxy->start_p($tx)->catch(sub ($err) {
     $c->log->debug("Proxy error: $err");
     $c->render(text => 'Something went wrong!', status => 400);
   });
@@ -563,9 +560,7 @@ possible, returns a L<Mojo::Promise> object.
   $headers->header('X-Proxy' => 'Mojo');
   my $tx = $c->ua->build_tx(GET => 'http://example.com' => $headers->to_hash);
   $c->proxy->start_p($tx);
-  $tx->res->content->once(body => sub {
-    $c->res->headers->header('X-Proxy' => 'Mojo');
-  });
+  $tx->res->content->once(body => sub ($content) { $c->res->headers->header('X-Proxy' => 'Mojo'); });
 
 =head2 redirect_to
 

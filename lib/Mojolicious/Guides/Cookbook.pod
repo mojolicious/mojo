@@ -28,8 +28,7 @@ is not yet finished. Instead of waiting, the calling subroutine passes along a c
 subroutine is finished, this is called continuation-passing style.
 
   sub foo {
-    non_blocking_subroutine(sub {
-      my $result = shift;
+    non_blocking_subroutine(sub ($result) {
       ...
     });
     ...
@@ -171,7 +170,7 @@ L<Mojo::IOLoop/"next_tick"> to run code whenever a new worker process has been f
 
   use Mojolicious::Lite;
 
-  Mojo::IOLoop->next_tick(sub {
+  Mojo::IOLoop->next_tick(sub ($ioloop) {
     app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
   });
 
@@ -397,11 +396,10 @@ L<Mojo::Server::PSGI> can be used directly to load and customize applications in
 
 But you could even use middleware right in your application.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Plack::Builder;
 
-  get '/welcome' => sub {
-    my $c = shift;
+  get '/welcome' => sub ($c) {
     $c->render(text => 'Hello Mojo!');
   };
 
@@ -417,8 +415,7 @@ configuration or behind a reverse proxy that passes along additional information
 cases you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming requests.
 
   # Change scheme if "X-Forwarded-HTTPS" header is set
-  $app->hook(before_dispatch => sub {
-    my $c = shift;
+  $app->hook(before_dispatch => sub ($c) {
     $c->req->url->base->scheme('https')
       if $c->req->headers->header('X-Forwarded-HTTPS');
   });
@@ -428,8 +425,7 @@ under, rewriting the base path of incoming requests is also quite common. This a
 L<Mojolicious::Controller/"url_for"> for example, to generate portable URLs based on the current environment.
 
   # Move first part and slash from path to base path in production mode
-  $app->hook(before_dispatch => sub {
-    my $c = shift;
+  $app->hook(before_dispatch => sub ($c) {
     push @{$c->req->url->base->path->trailing_slash(1)},
       shift @{$c->req->url->path->leading_slash(0)};
   }) if $app->mode eq 'production';
@@ -500,13 +496,11 @@ of concurrent client connections.
 Since L<Mojo::UserAgent> is also based on the L<Mojo::IOLoop> event loop, it won't block the built-in web servers when
 used non-blocking, even for high latency backend web services.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Search MetaCPAN for "mojolicious"
-  get '/' => sub {
-    my $c = shift;
-    $c->ua->get('fastapi.metacpan.org/v1/module/_search?q=mojolicious' => sub {
-      my ($ua, $tx) = @_;
+  get '/' => sub ($c) {
+    $c->ua->get('fastapi.metacpan.org/v1/module/_search?q=mojolicious' => sub ($ua, $tx) {
       $c->render('metacpan', hits => $tx->result->json->{hits}{hits});
     });
   };
@@ -534,13 +528,12 @@ Multiple non-blocking operations, such as concurrent requests, can be easily syn
 L<Mojo::Promise/"all">. You create L<Mojo::Promise> objects manually or use methods like L<Mojo::UserAgent/"get_p">
 that create them for you.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::Promise;
   use Mojo::URL;
 
   # Search MetaCPAN for "mojo" and "minion"
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
 
     # Create two promises
     my $url   = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
@@ -548,14 +541,12 @@ that create them for you.
     my $minion = $c->ua->get_p($url->clone->query({q => 'minion'}));
 
     # Render a response once both promises have been resolved
-    Mojo::Promise->all($mojo, $minion)->then(sub {
-      my ($mojo, $minion) = @_;
+    Mojo::Promise->all($mojo, $minion)->then(sub ($mojo, $minion) {
       $c->render(json => {
         mojo   => $mojo->[0]->result->json('/hits/hits/0/_source/release'),
         minion => $minion->[0]->result->json('/hits/hits/0/_source/release')
       });
-    })->catch(sub {
-      my $err = shift;
+    })->catch(sub ($err) {
       $c->reply->exception($err);
     })->wait;
   };
@@ -572,8 +563,7 @@ Here's an example for how L<Mojo::UserAgent/"get_p"> works internally.
   my $ua = Mojo::UserAgent->new;
   sub get_p {
     my $promise = Mojo::Promise->new;
-    $ua->get(@_ => sub {
-      my ($ua, $tx) = @_;
+    $ua->get(@_ => sub ($ua, $tx) {
       my $err = $tx->error;
       $promise->resolve($tx) if !$err || $err->{code};
       $promise->reject($err->{message});
@@ -582,8 +572,7 @@ Here's an example for how L<Mojo::UserAgent/"get_p"> works internally.
   }
 
   # Use our new promise generating function
-  get_p('https://mojolicious.org')->then(sub {
-    my $tx = shift;
+  get_p('https://mojolicious.org')->then(sub ($tx) {
     say $tx->result->dom->at('title')->text;
   })->wait;
 
@@ -698,13 +687,12 @@ Timers, another primary feature of the event loop, are created with L<Mojo::IOLo
 used to delay rendering of a response, and unlike C<sleep>, won't block any other requests that might be processed
 concurrently.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::IOLoop;
 
   # Wait 3 seconds before rendering a response
-  get '/' => sub {
-    my $c = shift;
-    Mojo::IOLoop->timer(3 => sub {
+  get '/' => sub ($c) {
+    Mojo::IOLoop->timer(3 => sub ($ioloop) {
       $c->render(text => 'Delayed by 3 seconds!');
     });
   };
@@ -714,43 +702,40 @@ concurrently.
 Recurring timers created with L<Mojo::IOLoop/"recurring"> are slightly more powerful, but need to be stopped manually,
 or they would just keep getting emitted.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::IOLoop;
 
   # Count to 5 in 1 second steps
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
 
     # Start recurring timer
     my $i = 1;
-    my $id = Mojo::IOLoop->recurring(1 => sub {
+    my $id = Mojo::IOLoop->recurring(1 => sub ($ioloop) {
       $c->write_chunk($i);
       $c->finish if $i++ == 5;
     });
 
     # Stop recurring timer
-    $c->on(finish => sub { Mojo::IOLoop->remove($id) });
+    $c->on(finish => sub ($ioloop) { $ioloop->remove($id) });
   };
 
   app->start;
 
 Timers are not tied to a specific request or connection, and can even be created at startup time.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::IOLoop;
 
   # Check title in the background every 10 seconds
   my $title = 'Got no title yet.';
-  Mojo::IOLoop->recurring(10 => sub {
-    app->ua->get('https://mojolicious.org' => sub {
-      my ($ua, $tx) = @_;
+  Mojo::IOLoop->recurring(10 => sub ($ioloop) {
+    app->ua->get('https://mojolicious.org' => sub ($ua, $tx) {
       $title = $tx->result->dom->at('title')->text;
     });
   });
 
   # Show current title
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     $c->render(json => {title => $title});
   };
 
@@ -764,21 +749,17 @@ too long.
 You can also use subprocesses, created with L<Mojo::IOLoop/"subprocess">, to perform computationally expensive
 operations without blocking the event loop.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::IOLoop;
 
   # Operation that would block the event loop for 5 seconds
-  get '/' => sub {
-    my $c = shift;
-
+  get '/' => sub ($c) {
     Mojo::IOLoop->subprocess->run_p(sub {
       sleep 5;
       return '♥', 'Mojolicious';
-    })->then(sub {
-      my @results = @_;
+    })->then(sub (@results) {
       $c->render(text => "I $results[0] $results[1]!");
-    })->catch(sub  {
-      my $err = shift;
+    })->catch(sub ($err) {
       $c->reply->exception($err);
     });
   };
@@ -795,27 +776,24 @@ Since timers and other non-blocking operations are running solely in the event l
 exceptions that get thrown in callbacks can't get caught and handled automatically. But you can handle them manually by
 subscribing to the event L<Mojo::Reactor/"error"> or catching them inside the callback.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::IOLoop;
 
   # Forward error messages to the application log
-  Mojo::IOLoop->singleton->reactor->on(error => sub {
-    my ($reactor, $err) = @_;
+  Mojo::IOLoop->singleton->reactor->on(error => sub ($reactor, $err) {
     app->log->error($err);
   });
 
   # Exception only gets logged (and connection times out)
-  get '/connection_times_out' => sub {
-    my $c = shift;
-    Mojo::IOLoop->timer(2 => sub {
+  get '/connection_times_out' => sub ($c) {
+    Mojo::IOLoop->timer(2 => sub ($ioloop) {
       die 'This request will not be getting a response';
     });
   };
 
   # Exception gets caught and handled
-  get '/catch_exception' => sub {
-    my $c = shift;
-    Mojo::IOLoop->timer(2 => sub {
+  get '/catch_exception' => sub ($c) {
+    Mojo::IOLoop->timer(2 => sub ($ioloop) {
       eval { die 'This request will be getting a response' };
       $c->reply->exception($@) if $@;
     });
@@ -836,14 +814,13 @@ The WebSocket protocol offers full bi-directional low-latency communication chan
 Receive messages just by subscribing to events such as L<Mojo::Transaction::WebSocket/"message"> with
 L<Mojolicious::Controller/"on"> and return them with L<Mojolicious::Controller/"send">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Template with browser-side code
   get '/' => 'index';
 
   # WebSocket echo service
-  websocket '/echo' => sub {
-    my $c = shift;
+  websocket '/echo' => sub ($c) {
 
     # Opened
     $c->app->log->debug('WebSocket opened');
@@ -852,14 +829,12 @@ L<Mojolicious::Controller/"on"> and return them with L<Mojolicious::Controller/"
     $c->inactivity_timeout(300);
 
     # Incoming message
-    $c->on(message => sub {
-      my ($c, $msg) = @_;
+    $c->on(message => sub ($c, $msg) {
       $c->send("echo: $msg");
     });
 
     # Closed
-    $c->on(finish => sub {
-      my ($c, $code, $reason) = @_;
+    $c->on(finish => sub ($c, $code, $reason = undef) {
       $c->app->log->debug("WebSocket closed with status $code");
     });
   };
@@ -907,14 +882,13 @@ events from servers to clients. It is uni-directional, that means you will have 
 from clients to servers, the advantage however is low infrastructure requirements, since it reuses the HTTP protocol
 for transport.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Template with browser-side code
   get '/' => 'index';
 
   # EventSource for log messages
-  get '/events' => sub {
-    my $c = shift;
+  get '/events' => sub ($c) {
 
     # Increase inactivity timeout for connection a bit
     $c->inactivity_timeout(300);
@@ -924,14 +898,12 @@ for transport.
     $c->write;
 
     # Subscribe to "message" event and forward "log" events to browser
-    my $cb = $c->app->log->on(message => sub {
-      my ($log, $level, @lines) = @_;
+    my $cb = $c->app->log->on(message => sub ($log, $level, @lines) {
       $c->write("event:log\ndata: [$level] @lines\n\n");
     });
 
     # Unsubscribe from "message" event again once we are done
-    $c->on(finish => sub {
-      my $c = shift;
+    $c->on(finish => sub ($c, $code, $reason = undef) {
       $c->app->log->unsubscribe(message => $cb);
     });
   };
@@ -963,31 +935,26 @@ right after the transaction has been finished.
 L<Mojolicious> contains a very sophisticated event system based on L<Mojo::EventEmitter>, with ready-to-use events on
 almost all layers, and which can be combined to solve some of the hardest problems in web development.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Scalar::Util qw(weaken);
 
   # Intercept multipart uploads and log each chunk received
-  hook after_build_tx => sub {
-    my $tx = shift;
+  hook after_build_tx => sub ($tx) {
 
     # Subscribe to "upgrade" event to identify multipart uploads
     weaken $tx;
-    $tx->req->content->on(upgrade => sub {
-      my ($single, $multi) = @_;
+    $tx->req->content->on(upgrade => sub ($single, $multi) {
       return unless $tx->req->url->path->contains('/upload');
 
       # Subscribe to "part" event to find the right one
-      $multi->on(part => sub {
-        my ($multi, $single) = @_;
+      $multi->on(part => sub ($multi, $single) {
 
         # Subscribe to "body" event of part to make sure we have all headers
-        $single->on(body => sub {
-          my $single = shift;
+        $single->on(body => sub ($single) {
 
           # Make sure we have the right part and replace "read" event
           return unless $single->headers->content_disposition =~ /example/;
-          $single->unsubscribe('read')->on(read => sub {
-            my ($single, $bytes) = @_;
+          $single->unsubscribe('read')->on(read => sub ($single, $bytes) {
 
             # Log size of every chunk we receive
             app->log->debug(length($bytes) . ' bytes uploaded');
@@ -1023,13 +990,12 @@ almost all layers, and which can be combined to solve some of the hardest proble
 Internally, the L<Mojo::IOLoop> event loop can use multiple reactor backends, L<EV> for example, will be automatically
 used if possible. Which in turn allows other event loops like L<AnyEvent> to just work.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use EV;
   use AnyEvent;
 
   # Wait 3 seconds before rendering a response
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     my $w;
     $w = AE::timer 3, 0, sub {
       $c->render(text => 'Delayed by 3 seconds!');
@@ -1083,7 +1049,7 @@ can be a very powerful tool especially for testing web application.
   say 'Title: ', $res->dom->at('head > title')->text;
 
   # Extract headings
-  $res->dom('h1, h2, h3')->each(sub { say 'Heading: ', shift->all_text });
+  $res->dom('h1, h2, h3')->each(sub ($dom, $i) { say 'Heading: ', $dom->all_text; });
 
   # Visit all nodes recursively to extract more than just text
   for my $n ($res->dom->descendant_nodes->each) {
@@ -1146,8 +1112,7 @@ each transaction right after they have been initialized and before a connection 
   my $ua = Mojo::UserAgent->new(max_redirects => 10);
 
   # Add a witty header to every request
-  $ua->on(start => sub {
-    my ($ua, $tx) = @_;
+  $ua->on(start => sub ($ua, $tx) {
     $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     say 'Request: ', $tx->req->url->clone->to_abs;
   });
@@ -1167,8 +1132,7 @@ content repeatedly for multiple requests.
 
   # Add "stream" generator
   my $ua = Mojo::UserAgent->new;
-  $ua->transactor->add_generator(stream => sub {
-    my ($transactor, $tx, $path) = @_;
+  $ua->transactor->add_generator(stream => sub ($transactor, $tx, $path) {
     $tx->req->content->asset(Mojo::Asset::File->new(path => $path));
   });
 
@@ -1245,8 +1209,7 @@ easy.
   my $tx = $ua->build_tx(GET => 'http://example.com');
 
   # Replace "read" events to disable default content parser
-  $tx->res->content->unsubscribe('read')->on(read => sub {
-    my ($content, $bytes) = @_;
+  $tx->res->content->unsubscribe('read')->on(read => sub ($content, $bytes) {
     say "Streaming: $bytes";
   });
 
@@ -1271,8 +1234,7 @@ Sending a streaming request is almost just as easy.
   $tx->req->headers->content_length(length $body);
 
   # Start writing directly with a drain callback
-  my $drain = sub {
-    my $content = shift;
+  my $drain = sub ($content) {
     my $chunk = substr $body, 0, 1, '';
     $content->write($chunk, length $body ? __SUB__ : undef);
   };
@@ -1295,12 +1257,10 @@ keep many concurrent connections active at the same time.
 
   # Concurrent non-blocking requests
   my $ua = Mojo::UserAgent->new;
-  $ua->get('https://metacpan.org/search?q=mojo' => sub {
-    my ($ua, $mojo) = @_;
+  $ua->get('https://metacpan.org/search?q=mojo' => sub ($ua, $mojo) {
     say $mojo->result->dom->at('title')->text;
   });
-  $ua->get('https://metacpan.org/search?q=minion' => sub {
-    my ($ua, $minion) = @_;
+  $ua->get('https://metacpan.org/search?q=minion' => sub ($ua, $minion) {
     say $minion->result->dom->at('title')->text;
   });
 
@@ -1332,8 +1292,7 @@ to process requests in smaller batches.
 
     # Fetch the next title
     my $end = $delay->begin;
-    $ua->get($url => sub {
-      my ($ua, $tx) = @_;
+    $ua->get($url => sub ($ua, $tx) {
       say "$url: ", $tx->result->dom->at('title')->text;
 
       # Next request
@@ -1359,10 +1318,9 @@ portable, allowing them to work inside an already running event loop or start on
 
   # Synchronize non-blocking requests with promises
   my $ua = Mojo::UserAgent->new;
-  my $mojo   = $ua->get_p('https://metacpan.org/search?q=mojo');
-  my $minion = $ua->get_p('https://metacpan.org/search?q=minion');
-  Mojo::Promise->all($mojo, $minion)->then(sub {
-    my ($mojo, $minion) = @_;
+  my $mojo_promise   = $ua->get_p('https://metacpan.org/search?q=mojo');
+  my $minion_promise = $ua->get_p('https://metacpan.org/search?q=minion');
+  Mojo::Promise->all($mojo_promise, $minion_promise)->then(sub ($mojo, $minion) {
     say $mojo->[0]->result->dom->at('title')->text;
     say $minion->[0]->result->dom->at('title')->text;
   })->wait;
@@ -1379,22 +1337,19 @@ that the connection has been established and it can start using the bi-direction
 
   # Open WebSocket to echo service
   my $ua = Mojo::UserAgent->new;
-  $ua->websocket_p('ws://echo.websocket.org')->then(sub {
-    my $tx = shift;
+  $ua->websocket_p('ws://echo.websocket.org')->then(sub ($tx) {
 
     # Prepare a followup promise so we can wait for messages
     my $promise = Mojo::Promise->new;
 
     # Wait for WebSocket to be closed
-    $tx->on(finish => sub {
-      my ($tx, $code, $reason) = @_;
+    $tx->on(finish => sub ($tx, $code, $reason) {
       say "WebSocket closed with status $code.";
       $promise->resolve;
     });
 
     # Close WebSocket after receiving one message
-    $tx->on(message => sub {
-      my ($tx, $msg) = @_;
+    $tx->on(message => sub ($tx, $msg) {
       say "WebSocket message: $msg";
       $tx->finish;
     });
@@ -1404,8 +1359,7 @@ that the connection has been established and it can start using the bi-direction
 
     # Insert a new promise into the promise chain
     return $promise;
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
 
     # Handle failed WebSocket handshakes and other exceptions
     warn "WebSocket error: $err";
@@ -1430,22 +1384,19 @@ hostname.
   say $tx->result->body;
 
   # WebSocket connection via UNIX domain socket "/tmp/baz.sock"
-  $ua->websocket_p('ws+unix://%2Ftmp%2Fbaz.sock/echo')->then(sub {
-    my $tx = shift;
+  $ua->websocket_p('ws+unix://%2Ftmp%2Fbaz.sock/echo')->then(sub ($tx) {
 
     my $promise = Mojo::Promise->new;
-    $tx->on(finish => sub { $promise->resolve });
+    $tx->on(finish => sub ($tx) { $promise->resolve });
 
-    $tx->on(message => sub {
-      my ($tx, $msg) = @_;
+    $tx->on(message => sub ($tx, $msg) {
       say "WebSocket message: $msg";
       $tx->finish;
     });
     $tx->send('Hi!');
 
     return $promise;
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
     warn "WebSocket error: $err";
   })->wait;
 
@@ -1525,15 +1476,13 @@ Fun L<Mojolicious> application hacks for all occasions.
 
 Basic authentication data will be automatically extracted from the C<Authorization> header.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::Util qw(secure_compare);
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
 
     # Check for username "Bender" and password "rocks"
-    return $c->render(text => 'Hello Bender!')
-      if secure_compare $c->req->url->to_abs->userinfo, 'Bender:rocks';
+    return $c->render(text => 'Hello Bender!') if secure_compare $c->req->url->to_abs->userinfo, 'Bender:rocks';
 
     # Require authentication
     $c->res->headers->www_authenticate('Basic');
@@ -1594,12 +1543,10 @@ They work just like normal plugins and are also subclasses of L<Mojolicious::Plu
 based on the plugin name are an easy way to avoid conflicts.
 
   package MyApp::Plugin::MyHelpers;
-  use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
-  sub register {
-    my ($self, $app) = @_;
-    $app->helper('my_helpers.render_with_header' => sub {
-      my ($c, @args) = @_;
+  sub register ($self, $app, $conf) {
+    $app->helper('my_helpers.render_with_header' => sub ($c, @args) {
       $c->res->headers->header('X-Mojo' => 'I <3 Mojolicious!');
       $c->render(@args);
     });
@@ -1610,16 +1557,13 @@ based on the plugin name are an easy way to avoid conflicts.
 You can have as many application specific plugins as you like, the only difference to normal plugins is that you load
 them using their full class name.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   use lib qw(lib);
 
   plugin 'MyApp::Plugin::MyHelpers';
 
-  get '/' => sub {
-    my $c = shift;
-    $c->my_helpers->render_with_header(text => 'I ♥ Mojolicious!');
-  };
+  get '/' => sub ($c) { $c->my_helpers->render_with_header(text => 'I ♥ Mojolicious!'); };
 
   app->start;
 
@@ -1633,13 +1577,12 @@ you can just add new ones and that they will be picked up automatically by the c
 placed in a directory from C<@INC>?
 
   package Mojolicious::Command::spy;
-  use Mojo::Base 'Mojolicious::Command';
+  use Mojo::Base 'Mojolicious::Command', -signatures;
 
   has description => 'Spy on application';
   has usage       => "Usage: APPLICATION spy [TARGET]\n";
 
-  sub run {
-    my ($self, @args) = @_;
+  sub run ($self, @args) {
 
     # Leak secret passphrases
     if ($args[0] eq 'secrets') { say for @{$self->app->secrets} }
@@ -1664,10 +1607,9 @@ and use a class name like C<MyApp::Command::spy> instead of C<Mojolicious::Comma
 
   # Application
   package MyApp;
-  use Mojo::Base 'Mojolicious';
+  use Mojo::Base 'Mojolicious', -signatures;
 
-  sub startup {
-    my $self = shift;
+  sub startup ($self) {
 
     # Add another namespace to load commands from
     push @{$self->commands->namespaces}, 'MyApp::Command';
@@ -1712,7 +1654,7 @@ installed application so they can be excluded.
 
   # Application
   package MyApp;
-  use Mojo::Base 'Mojolicious';
+  use Mojo::Base 'Mojolicious', -signatures;
 
   use Mojo::File qw(curfile);
   use Mojo::Home;
@@ -1720,8 +1662,7 @@ installed application so they can be excluded.
   # Every CPAN module needs a version
   our $VERSION = '1.0';
 
-  sub startup {
-    my $self = shift;
+  sub startup ($self) {
 
     # Switch to installable home directory
     $self->home(Mojo::Home->new(curfile->sibling('MyApp')));

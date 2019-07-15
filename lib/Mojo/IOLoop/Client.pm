@@ -183,14 +183,8 @@ Mojo::IOLoop::Client - Non-blocking TCP/IP and UNIX domain socket client
 
   # Create socket connection
   my $client = Mojo::IOLoop::Client->new;
-  $client->on(connect => sub {
-    my ($client, $handle) = @_;
-    ...
-  });
-  $client->on(error => sub {
-    my ($client, $err) = @_;
-    ...
-  });
+  $client->on(connect => sub ($client, $handle) {...});
+  $client->on(error => sub ($client, $err) {...});
   $client->connect(address => 'example.com', port => 80);
 
   # Start reactor if necessary
@@ -206,19 +200,13 @@ L<Mojo::IOLoop::Client> inherits all events from L<Mojo::EventEmitter> and can e
 
 =head2 connect
 
-  $client->on(connect => sub {
-    my ($client, $handle) = @_;
-    ...
-  });
+  $client->on(connect => sub ($client, $handle) {...});
 
 Emitted once the connection is established.
 
 =head2 error
 
-  $client->on(error => sub {
-    my ($client, $err) = @_;
-    ...
-  });
+  $client->on(error => sub ($client, $err) {...});
 
 Emitted if an error occurs on the connection, fatal if unhandled.
 

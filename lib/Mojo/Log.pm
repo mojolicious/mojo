@@ -122,17 +122,11 @@ L<Mojo::Log> inherits all events from L<Mojo::EventEmitter> and can emit the fol
 
 =head2 message
 
-  $log->on(message => sub {
-    my ($log, $level, @lines) = @_;
-    ...
-  });
+  $log->on(message => sub ($log, $level, @lines) {...});
 
 Emitted when a new message gets logged.
 
-  $log->on(message => sub {
-    my ($log, $level, @lines) = @_;
-    say "$level: ", @lines;
-  });
+  $log->on(message => sub ($log, $level, @lines) { say "$level: ", @lines; });
 
 =head1 ATTRIBUTES
 
@@ -145,10 +139,7 @@ L<Mojo::Log> implements the following attributes.
 
 A callback for formatting log messages.
 
-  $log->format(sub {
-    my ($time, $level, @lines) = @_;
-    return "[2018-11-08 14:20:13.77168] [28320] [info] I ♥ Mojolicious\n";
-  });
+  $log->format(sub ($time, $level, @lines) { return "[2018-11-08 14:20:13.77168] [28320] [info] I ♥ Mojolicious\n"; });
 
 =head2 handle
 

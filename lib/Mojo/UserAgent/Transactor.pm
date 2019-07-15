@@ -369,10 +369,7 @@ L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and imple
 
 Register a content generator.
 
-  $t->add_generator(foo => sub {
-    my ($t, $tx, @args) = @_;
-    ...
-  });
+  $t->add_generator(foo => sub ($t, $tx, @args) {...});
 
 =head2 endpoint
 

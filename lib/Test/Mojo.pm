@@ -474,10 +474,7 @@ L<Test::Mojo> implements the following attributes.
 
 A callback to connect L<Test::Mojo> with L<Test::More>.
 
-  $t->handler(sub {
-    my ($name, @args) = @_;
-    return Test::More->can($name)->(@args);
-  });
+  $t->handler(sub ($name, @args) { return Test::More->can($name)->(@args); });
 
 =head2 message
 
@@ -506,8 +503,7 @@ Current WebSocket message represented as an array reference containing the frame
 True if the last test was successful.
 
   # Build custom tests
-  my $location_is = sub {
-    my ($t, $value, $desc) = @_;
+  my $location_is = sub ($t, $value, $desc = '') {
     $desc ||= "Location: $value";
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return $t->success(is($t->tx->res->headers->location, $value, $desc));
@@ -551,10 +547,7 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
     ->json_is('/1/content', 'Mojo rocks!');
 
   # Customize all transactions (including followed redirects)
-  $t->ua->on(start => sub {
-    my ($ua, $tx) = @_;
-    $tx->req->headers->accept_language('en-US');
-  });
+  $t->ua->on(start => sub ($ua, $tx) { $tx->req->headers->accept_language('en-US'); });
   $t->get_ok('/hello')->status_is(200)->content_like(qr/Howdy/);
 
 =head1 METHODS
@@ -580,16 +573,14 @@ Access application with L<Mojo::UserAgent::Server/"app">.
   is $c->res->body, 'Foo!', 'right content';
 
   # Change application behavior
-  $t->app->hook(before_dispatch => sub {
-    my $c = shift;
-    $c->render(text => 'This request did not reach the router.')
-      if $c->req->url->path->contains('/user');
+  $t->app->hook(before_dispatch => sub ($c) {
+    $c->render(text => 'This request did not reach the router.') if $c->req->url->path->contains('/user');
   });
   $t->get_ok('/user')->status_is(200)->content_like(qr/not reach the router/);
 
   # Extract additional information
   my $stash;
-  $t->app->hook(after_dispatch => sub { $stash = shift->stash });
+  $t->app->hook(after_dispatch => sub ($c) { $stash = $c->stash });
   $t->get_ok('/hello')->status_is(200);
   is $stash->{foo}, 'bar', 'right value';
 

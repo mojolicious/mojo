@@ -219,7 +219,7 @@ Mojolicious::Routes - Always find your destination with routes
   my $blog = $r->under('/blog');
   $blog->get('/list')->to('blog#list');
   $blog->get('/:id' => [id => qr/\d+/])->to('blog#show', id => 23);
-  $blog->patch(sub { shift->render(text => 'Go away!', status => 405) });
+  $blog->patch(sub ($c) { $c->render(text => 'Go away!', status => 405) });
 
 =head1 DESCRIPTION
 
@@ -300,26 +300,22 @@ L<Mojolicious::Routes> inherits all methods from L<Mojolicious::Routes::Route> a
 
 =head2 add_condition
 
-  $r = $r->add_condition(foo => sub {...});
+  $r = $r->add_condition(foo => sub ($route, $c, $captures, $arg) {...});
 
 Register a condition.
 
-  $r->add_condition(foo => sub {
-    my ($route, $c, $captures, $arg) = @_;
+  $r->add_condition(foo => sub ($route, $c, $captures, $arg) {
     ...
     return 1;
   });
 
 =head2 add_shortcut
 
-  $r = $r->add_shortcut(foo => sub {...});
+  $r = $r->add_shortcut(foo => sub ($route, @args) {...});
 
 Register a shortcut.
 
-  $r->add_shortcut(foo => sub {
-    my ($route, @args) = @_;
-    ...
-  });
+  $r->add_shortcut(foo => sub ($route, @args) {...});
 
 =head2 add_type
 

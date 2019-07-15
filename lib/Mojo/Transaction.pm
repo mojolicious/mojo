@@ -84,19 +84,13 @@ L<Mojo::Transaction> inherits all events from L<Mojo::EventEmitter> and can emit
 
 =head2 connection
 
-  $tx->on(connection => sub {
-    my ($tx, $connection) = @_;
-    ...
-  });
+  $tx->on(connection => sub ($tx, $connection) {...});
 
 Emitted when a connection has been assigned to transaction.
 
 =head2 finish
 
-  $tx->on(finish => sub {
-    my $tx = shift;
-    ...
-  });
+  $tx->on(finish => sub ($tx) {...});
 
 Emitted when transaction is finished.
 

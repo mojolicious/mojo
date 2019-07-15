@@ -67,8 +67,7 @@ Mojolicious::Lite - Micro real-time web framework
   use Mojolicious::Lite;
 
   # Route with placeholder
-  get '/:foo' => sub {
-    my $c   = shift;
+  get '/:foo' => sub ($c) {
     my $foo = $c->param('foo');
     $c->render(text => "Hello from $foo.");
   };
@@ -106,18 +105,13 @@ how similar both of them are.
 The functions L</"get">, L</"post"> and friends all have equivalent methods.
 
   # Mojolicious::Lite
-  get '/foo' => sub {
-    my $c = shift;
-    $c->render(text => 'Hello World!');
-  };
+  get '/foo' => sub ($c) { $c->render(text => 'Hello World!'); };
 
   # Mojolicious
-  sub startup {
-    my $self = shift;
-
+  sub startup ($self) {
+  
     my $routes = $self->routes;
-    $routes->get('/foo' => sub {
-      my $c = shift;
+    $routes->get('/foo' => sub ($c) {
       $c->render(text => 'Hello World!');
     });
   }
@@ -131,8 +125,7 @@ method.
   app->max_request_size(16777216);
 
   # Mojolicious
-  sub startup {
-    my $self = shift;
+  sub startup ($self) {
     $self->max_request_size(16777216);
   }
 
@@ -144,8 +137,7 @@ Instead of the L</"plugin"> function you just use the method L<Mojolicious/"plug
   plugin 'Config';
 
   # Mojolicious
-  sub startup {
-    my $self = shift;
+  sub startup ($self) {
     $self->plugin('Config');
   }
 
@@ -154,16 +146,13 @@ Instead of the L</"plugin"> function you just use the method L<Mojolicious/"plug
 Similar to plugins, instead of the L</"helper"> function you just use the method L<Mojolicious/"helper">.
 
   # Mojolicious::Lite
-  helper two => sub {
-    my $c = shift;
+  helper two => sub ($c) {
     return 1 + 1;
   };
 
   # Mojolicious
-  sub startup {
-    my $self = shift;
-    $self->helper(two => sub {
-      my $c = shift;
+  sub startup ($self) {
+    $self->helper(two => sub ($c) {
       return 1 + 1;
     });
   }
@@ -175,15 +164,14 @@ illustrates how routes work internally.
 
   # Mojolicious::Lite
   under '/foo';
-  get '/bar' => sub {...};
+  get '/bar' => sub ($c) {...};
 
   # Mojolicious
-  sub startup {
-    my $self = shift;
+  sub startup ($self) {
 
     my $routes = $self->routes;
     my $foo = $routes->under('/foo');
-    $foo->get('/bar' => sub {...});
+    $foo->get('/bar' => sub ($c) {...});
   }
 
 =head1 FUNCTIONS
@@ -192,14 +180,13 @@ L<Mojolicious::Lite> implements the following functions, which are automatically
 
 =head2 any
 
-  my $route = any '/:foo' => sub {...};
-  my $route = any '/:foo' => sub {...} => 'name';
-  my $route = any '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = any '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = any ['GET', 'POST'] => '/:foo' => sub {...};
-  my $route = any ['GET', 'POST'] => '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = any
-    ['GET', 'POST'] => '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = any '/:foo' => sub ($c) {...};
+  my $route = any '/:foo' => sub ($c) {...} => 'name';
+  my $route = any '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = any '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = any ['GET', 'POST'] => '/:foo' => sub ($c) {...};
+  my $route = any ['GET', 'POST'] => '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = any ['GET', 'POST'] => '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the listed HTTP request methods or all. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
@@ -216,22 +203,22 @@ Returns the L<Mojolicious::Lite> application object, which is a subclass of L<Mo
 
 =head2 del
 
-  my $route = del '/:foo' => sub {...};
-  my $route = del '/:foo' => sub {...} => 'name';
-  my $route = del '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = del '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = del '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = del '/:foo' => sub ($c) {...};
+  my $route = del '/:foo' => sub ($c) {...} => 'name';
+  my $route = del '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = del '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = del '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"delete">, matching only C<DELETE> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 get
 
-  my $route = get '/:foo' => sub {...};
-  my $route = get '/:foo' => sub {...} => 'name';
-  my $route = get '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = get '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = get '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = get '/:foo' => sub ($c) {...};
+  my $route = get '/:foo' => sub ($c) {...} => 'name';
+  my $route = get '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = get '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = get '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
@@ -244,34 +231,34 @@ Start a new route group.
 
 =head2 helper
 
-  helper foo => sub {...};
+  helper foo => sub ($c, @args) {...};
 
 Add a new helper with L<Mojolicious/"helper">.
 
 =head2 hook
 
-  hook after_dispatch => sub {...};
+  hook after_dispatch => sub ($c) {...};
 
 Share code with L<Mojolicious/"hook">.
 
 =head2 options
 
-  my $route = options '/:foo' => sub {...};
-  my $route = options '/:foo' => sub {...} => 'name';
-  my $route = options '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = options '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = options '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = options '/:foo' => sub ($c) {...};
+  my $route = options '/:foo' => sub ($c) {...} => 'name';
+  my $route = options '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = options '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = options '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"options">, matching only C<OPTIONS> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 patch
 
-  my $route = patch '/:foo' => sub {...};
-  my $route = patch '/:foo' => sub {...} => 'name';
-  my $route = patch '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = patch '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = patch '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = patch '/:foo' => sub ($c) {...};
+  my $route = patch '/:foo' => sub ($c) {...} => 'name';
+  my $route = patch '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = patch '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = patch '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"patch">, matching only C<PATCH> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
@@ -284,30 +271,30 @@ Load a plugin with L<Mojolicious/"plugin">.
 
 =head2 post
 
-  my $route = post '/:foo' => sub {...};
-  my $route = post '/:foo' => sub {...} => 'name';
-  my $route = post '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = post '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = post '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = post '/:foo' => sub ($c) {...};
+  my $route = post '/:foo' => sub ($c) {...} => 'name';
+  my $route = post '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = post '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = post '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"post">, matching only C<POST> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 put
 
-  my $route = put '/:foo' => sub {...};
-  my $route = put '/:foo' => sub {...} => 'name';
-  my $route = put '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = put '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = put '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = put '/:foo' => sub ($c) {...};
+  my $route = put '/:foo' => sub ($c) {...} => 'name';
+  my $route = put '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = put '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = put '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 under
 
-  my $route = under sub {...};
-  my $route = under '/:foo' => sub {...};
+  my $route = under sub ($c) {...};
+  my $route = under '/:foo' => sub ($c) {...};
   my $route = under '/:foo' => {foo => 'bar'};
   my $route = under '/:foo' => [foo => qr/\w+/];
   my $route = under '/:foo' => (agent => qr/Firefox/);
@@ -318,11 +305,11 @@ appended. See L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routin
 
 =head2 websocket
 
-  my $route = websocket '/:foo' => sub {...};
-  my $route = websocket '/:foo' => sub {...} => 'name';
-  my $route = websocket '/:foo' => {foo => 'bar'} => sub {...};
-  my $route = websocket '/:foo' => [foo => qr/\w+/] => sub {...};
-  my $route = websocket '/:foo' => (agent => qr/Firefox/) => sub {...};
+  my $route = websocket '/:foo' => sub ($c) {...};
+  my $route = websocket '/:foo' => sub ($c) {...} => 'name';
+  my $route = websocket '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = websocket '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = websocket '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"websocket">, matching only WebSocket handshakes. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.

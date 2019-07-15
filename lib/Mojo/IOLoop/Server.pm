@@ -124,10 +124,7 @@ Mojo::IOLoop::Server - Non-blocking TCP and UNIX domain socket server
 
   # Create listen socket
   my $server = Mojo::IOLoop::Server->new;
-  $server->on(accept => sub {
-    my ($server, $handle) = @_;
-    ...
-  });
+  $server->on(accept => sub ($server, $handle) {...});
   $server->listen(port => 3000);
 
   # Start and stop accepting connections
@@ -147,10 +144,7 @@ L<Mojo::IOLoop::Server> inherits all events from L<Mojo::EventEmitter> and can e
 
 =head2 accept
 
-  $server->on(accept => sub {
-    my ($server, $handle) = @_;
-    ...
-  });
+  $server->on(accept => sub ($server, $handle) {...});
 
 Emitted for each accepted connection.
 

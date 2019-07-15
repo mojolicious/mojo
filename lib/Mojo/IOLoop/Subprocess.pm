@@ -106,13 +106,11 @@ Mojo::IOLoop::Subprocess - Subprocesses
   # Operation that would block the event loop for 5 seconds
   my $subprocess = Mojo::IOLoop::Subprocess->new;
   $subprocess->run(
-    sub {
-      my $subprocess = shift;
+    sub ($subprocess) {
       sleep 5;
       return '♥', 'Mojolicious';
     },
-    sub {
-      my ($subprocess, $err, @results) = @_;
+    sub ($subprocess, $err, @results) {
       say "Subprocess error: $err" and return if $err;
       say "I $results[0] $results[1]!";
     }
@@ -122,8 +120,7 @@ Mojo::IOLoop::Subprocess - Subprocesses
   $subprocess->run_p(sub {
     sleep 5;
     return '♥', 'Mojolicious';
-  })->then(sub {
-    my @results = @_;
+  })->then(sub (@results) {
     say "I $results[0] $results[1]!";
   })->catch(sub  {
     my $err = shift;
@@ -144,38 +141,25 @@ L<Mojo::IOLoop::Subprocess> inherits all events from L<Mojo::EventEmitter> and c
 
 =head2 cleanup
 
-  $subprocess->on(cleanup => sub {
-    my $subprocess = shift;
-    ...
-  });
+  $subprocess->on(cleanup => sub ($subprocess) {...});
 
 Emitted in the subprocess right before the process will exit.
 
-  $subprocess->on(cleanup => sub {
-    my $subprocess = shift;
-    say "Process $$ is about to exit";
-  });
+  $subprocess->on(cleanup => sub ($subprocess) { say "Process $$ is about to exit"; });
 
 =head2 progress
 
-  $subprocess->on(progress => sub {
-    my ($subprocess, @data) = @_;
-    ...
-  });
+  $subprocess->on(progress => sub ($subprocess, @data) {...});
 
 Emitted in the parent process when the subprocess calls the L<progress|/"progress1"> method.
 
 =head2 spawn
 
-  $subprocess->on(spawn => sub {
-    my $subprocess = shift;
-    ...
-  });
+  $subprocess->on(spawn => sub ($subprocess) {...});
 
 Emitted in the parent process when the subprocess has been spawned.
 
-  $subprocess->on(spawn => sub {
-    my $subprocess = shift;
+  $subprocess->on(spawn => sub ($subprocess) {
     my $pid = $subprocess->pid;
     say "Performing work in process $pid";
   });
@@ -191,10 +175,7 @@ L<Mojo::IOLoop::Subprocess> implements the following attributes.
 
 A callback used to deserialize subprocess return values, defaults to using L<Mojo::JSON>.
 
-  $subprocess->deserialize(sub {
-    my $bytes = shift;
-    return [];
-  });
+  $subprocess->deserialize(sub ($bytes) { return []; });
 
 =head2 ioloop
 
@@ -210,10 +191,7 @@ Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton. 
 
 A callback used to serialize subprocess return values, defaults to using L<Mojo::JSON>.
 
-  $subprocess->serialize(sub {
-    my $array = shift;
-    return '';
-  });
+  $subprocess->serialize(sub ($array) { return ''; });
 
 =head1 METHODS
 
@@ -240,24 +218,19 @@ called by the subprocess and emits the L</"progress"> event in the parent proces
 
   # Send progress information to the parent process
   $subprocess->run(
-    sub {
-      my $subprocess = shift;
+    sub ($subprocess) {
       $subprocess->progress('0%');
       sleep 5;
       $subprocess->progress('50%');
       sleep 5;
       return 'Hello Mojo!';
     },
-    sub {
-      my ($subprocess, $err, @results) = @_;
+    sub ($subprocess, $err, @results) {
       say 'Progress is 100%';
       say $results[0];
     }
   );
-  $subprocess->on(progress => sub {
-    my ($subprocess, @data) = @_;
-    say "Progress is $data[0]";
-  });
+  $subprocess->on(progress => sub ($subprocess, @data) { say "Progress is $data[0]"; });
 
 =head2 run
 
@@ -277,11 +250,9 @@ Same as L</"run">, but returns a L<Mojo::Promise> object instead of accepting a 
   $subprocess->run_p(sub {
     sleep 5;
     return '♥', 'Mojolicious';
-  })->then(sub {
-    my @results = @_;
+  })->then(sub (@results) {
     say "I $results[0] $results[1]!";
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
     say "Subprocess error: $err";
   })->wait;
 

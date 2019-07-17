@@ -1,4 +1,6 @@
 
+8.23  2019-07-18
+
 8.22  2019-07-17
   - Fixed a bug where Mojo::Exception would not stringify correctly for error
     messages that end with a newline.

@@ -123,8 +123,9 @@ $e->frames([
 ]);
 $e->lines_before([[3, 'foo();']])->line([4, 'die;'])
   ->lines_after([[5, 'bar();']]);
-is $e, <<EOF, 'right result';
-Test!
+is $e, "Test! at template line 4.\n", 'right result';
+is $e->verbose(1), <<EOF, 'right result';
+Test! at template line 4.
 Context:
   3: foo();
   4: die;
@@ -142,37 +143,6 @@ Context:
 Traceback (most recent call first):
   File "template", line 4, in "Sandbox"
   File "MyApp/Test.pm", line 3, in "MyApp::Test"
-  File "foo.pl", line 4, in "main"
-EOF
-
-# Verbose
-$e = Mojo::Exception->new('Test!');
-$e->frames([
-  ['Sandbox',     'template',      4],
-  ['MyApp::Test', 'MyApp/Test.pm', 3],
-  ['MyApp::Test', 'MyApp/Test.pm', 4],
-  ['MyApp::Test', 'MyApp/Test.pm', 5],
-  ['MyApp::Test', 'MyApp/Test.pm', 6],
-  ['main',        'foo.pl',        4]
-]);
-is $e, <<EOF, 'right result';
-Test!
-Traceback (most recent call first):
-  File "template", line 4, in "Sandbox"
-  File "MyApp/Test.pm", line 3, in "MyApp::Test"
-  File "MyApp/Test.pm", line 4, in "MyApp::Test"
-  File "MyApp/Test.pm", line 5, in "MyApp::Test"
-  File "MyApp/Test.pm", line 6, in "MyApp::Test"
-  ...
-EOF
-is $e->verbose(1), <<EOF, 'right result';
-Test!
-Traceback (most recent call first):
-  File "template", line 4, in "Sandbox"
-  File "MyApp/Test.pm", line 3, in "MyApp::Test"
-  File "MyApp/Test.pm", line 4, in "MyApp::Test"
-  File "MyApp/Test.pm", line 5, in "MyApp::Test"
-  File "MyApp/Test.pm", line 6, in "MyApp::Test"
   File "foo.pl", line 4, in "main"
 EOF
 

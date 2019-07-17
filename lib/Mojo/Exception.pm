@@ -92,7 +92,12 @@ sub to_string {
   my $self = shift;
 
   my $str = $self->message;
-  $str .= "\n" unless $str =~ /\n$/;
+
+  my $frames = $self->frames;
+  if ($str !~ /\n$/) {
+    $str .= @$frames ? " at $frames->[0][1] line $frames->[0][2].\n" : "\n";
+  }
+  return $str unless $self->verbose;
 
   my $line = $self->line;
   if (@$line) {
@@ -102,13 +107,9 @@ sub to_string {
     $str .= "  $_->[0]: $_->[1]\n" for @{$self->lines_after};
   }
 
-  my $frames = $self->frames;
   if (my $max = @$frames) {
     $str .= "Traceback (most recent call first):\n";
-    my $offset = $self->verbose ? $#$frames : $#$frames <= 4 ? $#$frames : 4;
-    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n}
-      for @$frames[0 .. $offset];
-    $str .= "  ...\n" if $max > ($offset + 1);
+    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n} for @$frames;
   }
 
   return $str;
@@ -325,8 +326,8 @@ Exception message, defaults to C<Exception!>.
   my $bool = $e->verbose;
   $e       = $e->verbose($bool);
 
-Show more information with L</"to_string">, such as additional L</"frames">,
-defaults to the value of the C<MOJO_EXCEPTION_VERBOSE> environment variable.
+Show more information with L</"to_string">, such as L</"frames">, defaults to
+the value of the C<MOJO_EXCEPTION_VERBOSE> environment variable.
 
 =head1 METHODS
 

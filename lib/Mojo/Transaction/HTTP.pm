@@ -1,5 +1,6 @@
 package Mojo::Transaction::HTTP;
 use Mojo::Base 'Mojo::Transaction';
+use Mojo::UserAgent::Transactor;
 
 has 'previous';
 
@@ -61,6 +62,30 @@ sub server_read {
 }
 
 sub server_write { shift->_write(1) }
+
+sub submit {
+  my $any = 'button:not([disabled]), input:matches([type=button],'
+	    . ' [type=submit], [type=image]):not([disabled])';
+  my ($self, $selector, $overlay) = (shift, (@_ % 2 ? shift : $any, {@_}));
+  # cannot continue from error state
+  return if $self->error;
+  # form from selector
+  return unless defined(my $form = $self->res->dom->find('form')
+    ->grep(sub { $_->at($selector) })->first);
+  return unless (my ($method, $target, $type) = $form->target($selector));
+  $target = $self->req->url->new($target);
+  $target = $target->to_abs($self->req->url) unless $target->is_abs;
+  # values from form
+  my $state = $form->val;
+  # merge in new values of form elements
+  my @keys = grep { exists $overlay->{$_} } keys %$state;
+  @$state{@keys} = @$overlay{@keys};
+
+  # build a new transaction ...
+  return Mojo::UserAgent::Transactor->new->tx(
+    $method => $target, {}, form => $state
+    );
+}
 
 sub _body {
   my ($self, $msg, $finish) = @_;
@@ -296,6 +321,16 @@ L<Mojo::Server::Daemon>.
 
 Write data server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>.
+
+=head2 submit
+
+  # new Mojo::Transaction::HTTP to pass to $ua->start;
+  my $submit_tx = $tx->submit('#submit-id', firstname => 'Fry');
+
+Submit a form contained in a L<transaction|Mojo::Transaction::HTTP>,
+L<response|Mojo::Message::Response>, by constructing a new
+L<transaction|Mojo::Transaction::HTTP> object for use by a
+L<user agent|Mojo::UserAgent>.
 
 =head1 SEE ALSO
 

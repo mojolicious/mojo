@@ -166,6 +166,18 @@ sub tag {
   return $self;
 }
 
+sub target {
+  my ($self, $submit) = @_;
+  return () if ($self->tag // '') ne 'form';
+  return () unless defined($submit = $self->at($submit || ''));
+  return () if $submit->matches('[disabled]');
+  my $method = uc($submit->attr('formmethod') || $self->attr('method') || 'GET');
+  my $action = $submit->attr('formaction') || $self->attr('action') || '#';
+  my $enctyp = $submit->attr('formenctype') || $self->attr('enctype') ||
+    'url-encoded';
+  return $method, $action, $enctyp;
+}
+
 sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { _text(_nodes(shift->tree), 0) }
@@ -178,17 +190,41 @@ sub type { shift->tree->[0] }
 
 sub val {
   my $self = shift;
+  # "form"
+  return {
+    $self->find('button, checkbox, input, radio, select, textarea')
+      ->map(sub {
+        my $is_image = !!$_->matches('input[type=image]');
+        # ignore disabled nodes
+        return () if _form_element_disabled($_);
+        # ignore those without name, unless image type
+        return () if !defined(my $name = $_->attr("name")) && !$is_image;
+        # only continue if the clickable element matches (synthesize click)
+        return () if _form_element_submits($_) && !$_->matches($_[1]);
+        # client only buttons ignored
+        return () if _form_element_client_only_button($_);
+        # simply return name => value for all but image types
+        return $name => $_->val() unless $is_image;
+        # synthesize image click
+        return _form_image_click($_, $name);
+      }, $_[0] || _form_default_submit($self))->each,
+  } if (my $tag = $self->tag) eq 'form';
 
   # "option"
-  return $self->{value} // $self->text if (my $tag = $self->tag) eq 'option';
+  return $self->{value} // $self->text if $tag eq 'option';
 
   # "input" ("type=checkbox" and "type=radio")
   my $type = $self->{type} // '';
   return $self->{value} // 'on'
     if $tag eq 'input' && ($type eq 'radio' || $type eq 'checkbox');
 
-  # "textarea", "input" or "button"
-  return $tag eq 'textarea' ? $self->text : $self->{value} if $tag ne 'select';
+  # "textarea", "input" or "button". Give input[type=submit] default value
+  return (
+    $tag eq 'textarea'
+    ? $self->text
+    : ($self->matches('input[type=submit]')
+      ? $self->{value} || 'Submit'
+      : $self->{value})) if $tag ne 'select';
 
   # "select"
   my $v = $self->find('option:checked:not([disabled])')
@@ -256,6 +292,48 @@ sub _content {
 }
 
 sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
+
+sub _form_default_submit {
+  # filter for those submittable nodes
+  return shift->find('*')->grep(sub { !!$_->_form_element_submits; })
+    # only the first continues, save some cycles
+    ->tap(sub { splice @$_, 1; })
+    ->map(sub {
+      $_->selector;
+      # get the selector and relativise to form - not req
+      # (my $s = $_->selector) =~ s/^.*form[^\s]*\s>\s//;
+      # return $s;
+    })->first || '';
+}
+
+sub _form_element_client_only_button {
+  my $s = 'input[type=button], button:matches([type=button], [type=reset])';
+  return !!$_[0]->matches($s);
+}
+
+sub _form_element_disabled {
+  return 1 if $_[0]->matches('[disabled]');
+  return 1 if $_[0]->ancestors('fieldset[disabled]')->size &&
+    !$_[0]->ancestors('fieldset legend:first-child')->size;
+  return 0;
+}
+
+sub _form_element_submits {
+  my $s = join ', ', 'button:not([type=button], [type=reset])',
+    'button', # submit is the default
+    'input:matches([type=submit], [type=image])';
+  return 1 if $_[0]->matches($s) && !_form_element_disabled($_[0]);
+  return 0;
+}
+
+sub _form_image_click {
+  my ($self, $name) = (shift, shift);
+  my ($x, $y) = map { int(rand($self->attr($_) || 1)) + 1 } qw{width height};
+  # x and y if no name
+  return (x => $x, y => $y) unless $name;
+  # named x and y, with name
+  return ("$name.x" => $x, "$name.y" => $y);
+}
 
 sub _fragment { _link(my $r = ['root', @_], [@_]); $r }
 
@@ -956,6 +1034,17 @@ This element's tag name.
 
 Alias for L<Mojo::Base/"tap">.
 
+=head2 target
+
+  $dom = $dom->at('form');
+  my ($method, $action, $enctype) = $dom->target('#submit-id');
+
+Extract the C<$method>, C<$action> and C<$enctype> from a C<form> element.
+
+  # "GET", "/form", "url-encoded"
+  $dom->parse('<form action="/form"><input type=submit name=submit /></form>')
+    ->at('form')->target('input[name=submit]');
+
 =head2 text
 
   my $text = $dom->text;
@@ -1020,11 +1109,13 @@ C<root>, C<tag> or C<text>.
 
   my $value = $dom->val;
 
-Extract value from form element (such as C<button>, C<input>, C<option>,
-C<select> and C<textarea>), or return C<undef> if this element has no value. In
-the case of C<select> with C<multiple> attribute, find C<option> elements with
-C<selected> attribute and return an array reference with all values, or C<undef>
-if none could be found.
+Extract value from form (C<form>) and form elements (such as C<button>,
+C<input>, C<option>, C<select> and C<textarea>), or return C<undef> if this
+element has no value. In the case of C<select> with C<multiple> attribute, find
+C<option> elements with C<selected> attribute and return an array reference with
+all values, or C<undef> if none could be found. In the case of C<form> a hash
+reference of all the child form element names and L<values|/"val"> will be
+returned.
 
   # "a"
   $dom->parse('<input name=test value=a>')->at('input')->val;
@@ -1045,6 +1136,11 @@ if none could be found.
 
   # "on"
   $dom->parse('<input name=test type=checkbox>')->at('input')->val;
+
+  # {cars => ["audi"]}
+  $dom->parse('<form><select name=cars multiple>'.
+              '<option value=audi selected /></select></form>')
+    ->at('form')->val;
 
 =head2 with_roles
 

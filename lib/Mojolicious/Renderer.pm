@@ -121,15 +121,28 @@ sub render {
 sub respond {
   my ($self, $c, $output, $format, $status) = @_;
 
-  # Gzip compression
   my $res = $c->res;
+
   if ($self->compress && length($output) >= $self->min_compress_size) {
     my $headers = $res->headers;
     $headers->append(Vary => 'Accept-Encoding');
-    my $gzip = ($c->req->headers->accept_encoding // '') =~ /gzip/i;
-    if ($gzip && !$headers->content_encoding) {
-      $headers->content_encoding('gzip');
-      $output = gzip $output;
+
+    my $br   = ($c->req->headers->accept_encoding // '') =~ /\bbr\b/i;
+    my $gzip = ($c->req->headers->accept_encoding // '') =~ /\bgzip\b/i;
+
+    unless ($headers->content_encoding) {
+      if (Mojo::Util::IO_COMPRESS_BROTLI && $br) {
+
+        # Brotli compression
+        $headers->content_encoding('br');
+        $output = Mojo::Util::bro($output);
+      }
+      elsif ($gzip) {
+
+        # Gzip compression
+        $headers->content_encoding('gzip');
+        $output = gzip $output;
+      }
     }
   }
 

@@ -35,8 +35,8 @@ L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently
 discourage adding non-optional ones in favor of a faster and more painless
 installation process. And we do in fact already use several optional CPAN
 modules such as L<Cpanel::JSON::XS>, L<EV>, L<IO::Socket::Socks>,
-L<IO::Socket::SSL>, L<Net::DNS::Native>, L<Plack> and L<Role::Tiny> to provide
-advanced functionality if possible.
+L<IO::Socket::SSL>, L<Net::DNS::Native>, L<Plack>, L<Role::Tiny>, and
+L<IO::Compress::Brotli> to provide advanced functionality if possible.
 
 =head2 Why reinvent wheels?
 

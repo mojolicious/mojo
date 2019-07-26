@@ -19,6 +19,19 @@ use Symbol 'delete_package';
 use Time::HiRes        ();
 use Unicode::Normalize ();
 
+# For better compression IO::Compress::Brotli is required
+use constant IO_COMPRESS_BROTLI => eval {
+  require IO::Compress::Brotli;
+  IO::Compress::Brotli->VERSION('0.004001');
+  IO::Compress::Brotli->import;
+
+  require IO::Uncompress::Brotli;
+  IO::Uncompress::Brotli->VERSION('0.004001');
+  IO::Uncompress::Brotli->import;
+
+  1;
+};
+
 # Check for monotonic clock support
 use constant MONOTONIC =>
   eval { !!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
@@ -70,6 +83,8 @@ our @EXPORT_OK = (
   qw(tablify term_escape trim unindent unquote url_escape url_unescape),
   qw(xml_escape xor_encode)
 );
+
+push @EXPORT_OK, qw(bro unbro) if IO_COMPRESS_BROTLI;
 
 # Aliases
 monkey_patch(__PACKAGE__, 'b64_decode',    \&decode_base64);
@@ -533,6 +548,12 @@ Base64 decode bytes with L<MIME::Base64>.
 
 Base64 encode bytes with L<MIME::Base64>, the line ending defaults to a newline.
 
+=head2 bro
+
+  my $compressed = bro $uncompressed;
+
+Compress bytes with L<IO::Compress::Brotli>.
+
 =head2 camelize
 
   my $camelcase = camelize $snakecase;
@@ -861,6 +882,18 @@ Trim whitespace characters from both ends of string.
 
   # "foo bar"
   trim '  foo bar  ';
+
+=head2 unbro
+
+  my $uncompressed = unbro $compressed, 10_000_000;
+
+Uncompress bytes with L<IO::Compress::Brotli>.
+
+The second parameter is the maximum size of the uncompressed buffer in bytes;
+the buffer is allocated in native code before decompression begins.
+
+The function croaks if the uncompressed data does not fit into the allocated
+buffer.
 
 =head2 unindent
 

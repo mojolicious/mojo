@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::TLS;
 use Mojo::JSON;
+use Mojo::Util;
 use Mojolicious;
 
 has description => 'Show versions of available modules';
@@ -19,6 +20,8 @@ sub run {
   my $tls = Mojo::IOLoop::TLS->can_tls    ? $IO::Socket::SSL::VERSION  : 'n/a';
   my $nnr = Mojo::IOLoop::Client->can_nnr ? $Net::DNS::Native::VERSION : 'n/a';
   my $roles = Mojo::Base->ROLES ? $Role::Tiny::VERSION : 'n/a';
+  my $brotli
+    = Mojo::Util->IO_COMPRESS_BROTLI ? $IO::Compress::Brotli::VERSION : 'n/a';
 
   print <<EOF;
 CORE
@@ -26,12 +29,13 @@ CORE
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
-  Cpanel::JSON::XS 4.09+  ($json)
-  EV 4.0+                 ($ev)
-  IO::Socket::Socks 0.64+ ($socks)
-  IO::Socket::SSL 2.009+  ($tls)
-  Net::DNS::Native 0.15+  ($nnr)
-  Role::Tiny 2.000001+    ($roles)
+  Cpanel::JSON::XS 4.09+         ($json)
+  EV 4.0+                        ($ev)
+  IO::Socket::Socks 0.64+        ($socks)
+  IO::Socket::SSL 2.009+         ($tls)
+  Net::DNS::Native 0.15+         ($nnr)
+  Role::Tiny 2.000001+           ($roles)
+  IO::Compress::Brotli 0.004001+ ($brotli)
 
 EOF
 

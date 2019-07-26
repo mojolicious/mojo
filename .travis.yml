@@ -30,6 +30,7 @@ env:
 install:
   - cpanm -n Cpanel::JSON::XS EV IO::Socket::Socks IO::Socket::SSL
   - cpanm -n Net::DNS::Native Role::Tiny Test::Pod Test::Pod::Coverage
+  - cpanm -n IO::Compress::Brotli
   - cpanm -n --installdeps .
 sudo: false
 notifications:

@@ -530,6 +530,15 @@ Mojo::Util - Portable utility functions
 
 L<Mojo::Util> provides portable utility functions for L<Mojo>.
 
+=head1 CONSTANTS
+
+L<Mojo::Util> relies on the following constants.
+
+=head2 IO_COMPRESS_BROTLI
+
+Set to true if L<IO::Compress::Brotli> is available, false otherwise. This
+decides whether the C<bro> and C<unbro> functions are exported to callers.
+
 =head1 FUNCTIONS
 
 L<Mojo::Util> implements the following functions, which can be imported

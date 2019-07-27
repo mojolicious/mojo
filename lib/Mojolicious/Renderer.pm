@@ -127,10 +127,11 @@ sub respond {
     my $headers = $res->headers;
     $headers->append(Vary => 'Accept-Encoding');
 
-    my $br   = ($c->req->headers->accept_encoding // '') =~ /\bbr\b/i;
-    my $gzip = ($c->req->headers->accept_encoding // '') =~ /\bgzip\b/i;
-
     unless ($headers->content_encoding) {
+      my $aenc = $c->req->headers->accept_encoding // '';
+      my $br   = $aenc =~ /\bbr\b/i;
+      my $gzip = $aenc =~ /\bgzip\b/i;
+
       if (Mojo::Util::IO_COMPRESS_BROTLI && $br) {
 
         # Brotli compression

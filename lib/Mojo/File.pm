@@ -24,7 +24,7 @@ our @EXPORT_OK = ('path', 'tempdir', 'tempfile');
 
 sub basename { File::Basename::basename ${shift()}, @_ }
 
-sub child { $_[0]->new(@_) }
+sub child { $_[0]->new(${shift()}, @_) }
 
 sub chmod {
   my ($self, $mode) = @_;

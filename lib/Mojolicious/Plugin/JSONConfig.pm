@@ -83,6 +83,11 @@ like C<$moniker.$mode.json>, which will be detected automatically.
 If the configuration value C<config_override> has been set in
 L<Mojolicious/"config"> when this plugin is loaded, it will not do anything.
 
+Note that this plugin allows embedded Perl templating only for convenience, and
+not to encourage complex configuration logic within the file. You should not
+use it with untrusted input, nor do anything significantly more complicated
+than accessing the application's home directory for relative paths.
+
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.
 

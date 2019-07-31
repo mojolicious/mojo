@@ -7,6 +7,7 @@ use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::File 'path';
 use Mojo::DeprecationTest;
+use Sub::Util 'subname';
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
@@ -486,10 +487,8 @@ ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
 
 # monkey_patch (with name)
-is Sub::Util::subname(MojoMonkeyTest->can('foo')), 'MojoMonkeyTest::foo',
-  'right name';
-is Sub::Util::subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar',
-  'right name';
+is subname(MojoMonkeyTest->can('foo')), 'MojoMonkeyTest::foo', 'right name';
+is subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar', 'right name';
 
 # tablify
 is tablify([["f\r\no o\r\n", 'bar']]),     "fo o  bar\n",      'right result';

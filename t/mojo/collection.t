@@ -163,4 +163,28 @@ is_deeply $collection->uniq(sub {$_})->to_array, [undef, 3, 2, 1, 0],
 # TO_JSON
 is encode_json(c(1, 2, 3)), '[1,2,3]', 'right result';
 
+# head
+$collection = c(1, 2, 5, 4, 3);
+is_deeply $collection->head(0)->to_array, [], 'right result';
+is_deeply $collection->head(1)->to_array, [1], 'right result';
+is_deeply $collection->head(2)->to_array, [1, 2], 'right result';
+is_deeply $collection->head(-1)->to_array, [1, 2, 5, 4], 'right result';
+is_deeply $collection->head(-3)->to_array, [1, 2], 'right result';
+is_deeply $collection->head(5)->to_array, [1, 2, 5, 4, 3], 'right result';
+is_deeply $collection->head(6)->to_array, [1, 2, 5, 4, 3], 'right result';
+is_deeply $collection->head(-5)->to_array, [], 'right result';
+is_deeply $collection->head(-6)->to_array, [], 'right result';
+
+# tail
+$collection = c(1, 2, 5, 4, 3);
+is_deeply $collection->tail(0)->to_array, [], 'right result';
+is_deeply $collection->tail(1)->to_array, [3], 'right result';
+is_deeply $collection->tail(2)->to_array, [4, 3], 'right result';
+is_deeply $collection->tail(-1)->to_array, [2, 5, 4, 3], 'right result';
+is_deeply $collection->tail(-3)->to_array, [4, 3], 'right result';
+is_deeply $collection->tail(5)->to_array, [1, 2, 5, 4, 3], 'right result';
+is_deeply $collection->tail(6)->to_array, [1, 2, 5, 4, 3], 'right result';
+is_deeply $collection->tail(-5)->to_array, [], 'right result';
+is_deeply $collection->tail(-6)->to_array, [], 'right result';
+
 done_testing();

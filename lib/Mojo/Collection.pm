@@ -43,6 +43,13 @@ sub grep {
   return $self->new(grep { $_->$cb(@_) } @$self);
 }
 
+sub head {
+  my ($self, $size) = @_;
+  return $self->new(@$self) if $size > @$self;
+  return $self->new(@$self[0 .. ($size - 1)]) if $size >= 0;
+  return $self->new(@$self[0 .. ($#$self + $size)]);
+}
+
 sub join {
   Mojo::ByteStream->new(join $_[1] // '', map {"$_"} @{$_[0]});
 }
@@ -90,6 +97,13 @@ sub sort {
     $a->$cb($b);
   } @$self;
   return $self->new(@sorted);
+}
+
+sub tail {
+  my ($self, $size) = @_;
+  return $self->new(@$self) if $size > @$self;
+  return $self->new(@$self[($#$self - ($size - 1)) .. $#$self]) if $size >= 0;
+  return $self->new(@$self[(0 - $size) .. $#$self]);
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }
@@ -247,6 +261,20 @@ C<$_>.
   # Find all values that are greater than 5
   my $greater = $collection->grep(sub { $_ > 5 });
 
+=head2 head
+
+  my $new = $collection->head(4);
+  my $new = $collection->head(-2);
+
+Create a new collection with up to the specified number of elements from the
+beginning of the collection. A negative number will count from the end.
+
+  # "A B C"
+  c('A', 'B', 'C', 'D', 'E')->head(3)->join(' ');
+
+  # "A B"
+  c('A', 'B', 'C', 'D', 'E')->head(-3)->join(' ');
+
 =head2 join
 
   my $stream = $collection->join;
@@ -331,6 +359,20 @@ time the callback is executed.
 
   # Sort values case-insensitive
   my $case_insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
+
+=head2 tail
+
+  my $new = $collection->tail(4);
+  my $new = $collection->tail(-2);
+
+Create a new collection with up to the specified number of elements from the
+end of the collection. A negative number will count from the beginning.
+
+  # "C D E"
+  c('A', 'B', 'C', 'D', 'E')->tail(3)->join(' ');
+
+  # "D E"
+  c('A', 'B', 'C', 'D', 'E')->tail(-3)->join(' ');
 
 =head2 tap
 

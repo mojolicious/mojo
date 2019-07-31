@@ -94,6 +94,7 @@ sub move_to {
 
 sub new {
   my $class = shift;
+  croak('Invalid path') if grep { !defined } @_;
   my $value = @_ == 1 ? $_[0] : @_ > 1 ? catfile @_ : canonpath getcwd;
   return bless \$value, ref $class || $class;
 }

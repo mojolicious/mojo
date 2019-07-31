@@ -295,6 +295,12 @@ utime $future, $future, $file->to_string;
 is $file->stat->mtime, $future, 'right mtime';
 isnt $file->touch->stat->mtime, $future, 'different mtime';
 
+# Dangerous paths
+eval { path('foo', undef, 'bar') };
+like $@, qr/Invalid path/, 'right error';
+eval { path(undef) };
+like $@, qr/Invalid path/, 'right error';
+
 # I/O
 $dir  = tempdir;
 $file = $dir->child('test.txt')->spurt('just works!');

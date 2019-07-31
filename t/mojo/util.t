@@ -486,14 +486,10 @@ ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
 
 # monkey_patch (with name)
-SKIP: {
-  skip 'Sub::Util required!', 2
-    unless eval { require Sub::Util; !!Sub::Util->can('set_subname') };
-  is Sub::Util::subname(MojoMonkeyTest->can('foo')), 'MojoMonkeyTest::foo',
-    'right name';
-  is Sub::Util::subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar',
-    'right name';
-}
+is Sub::Util::subname(MojoMonkeyTest->can('foo')), 'MojoMonkeyTest::foo',
+  'right name';
+is Sub::Util::subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar',
+  'right name';
 
 # tablify
 is tablify([["f\r\no o\r\n", 'bar']]),     "fo o  bar\n",      'right result';

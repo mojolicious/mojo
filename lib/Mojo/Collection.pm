@@ -43,12 +43,7 @@ sub grep {
   return $self->new(grep { $_->$cb(@_) } @$self);
 }
 
-sub head {
-  my ($self, $size) = @_;
-  return $self->new(@$self) if $size > @$self;
-  return $self->new(@$self[0 .. ($size - 1)]) if $size >= 0;
-  return $self->new(@$self[0 .. ($#$self + $size)]);
-}
+sub head { $_[0]->new(List::Util::head $_[1], @{$_[0]}) }
 
 sub join {
   Mojo::ByteStream->new(join $_[1] // '', map {"$_"} @{$_[0]});
@@ -99,12 +94,7 @@ sub sort {
   return $self->new(@sorted);
 }
 
-sub tail {
-  my ($self, $size) = @_;
-  return $self->new(@$self) if $size > @$self;
-  return $self->new(@$self[($#$self - ($size - 1)) .. $#$self]) if $size >= 0;
-  return $self->new(@$self[(0 - $size) .. $#$self]);
-}
+sub tail { $_[0]->new(List::Util::tail $_[1], @{$_[0]}) }
 
 sub tap { shift->Mojo::Base::tap(@_) }
 

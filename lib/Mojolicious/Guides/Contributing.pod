@@ -136,8 +136,11 @@ C<@mojolicious/core>).
 A feature can be added or mofified when at least 3 voting members of the core
 team have cast a vote in favour, or the pumpkin-holder overruled the vote.
 
-Any core developer may nominate a new one, who must then be accepted by a 2/3
+For especially controversial decisions it is also possible to call for a
 majority vote.
+
+Any core team member may nominate new members, who must then be accepted by a
+2/3 majority vote.
 
 The pumpkin-holder has veto rights and may select their successor.
 
@@ -160,9 +163,10 @@ name based on a Unicode character.
 Only add dependencies if absolutely necessary and make them optional if
 possible.
 
-Domain specific languages should be avoided in favor of Perl-ish solutions.
+Emulate the style of the existing code and documentation, but don't be afraid to
+adopt newer best practices if you can apply them consistently.
 
-No inline POD.
+Domain specific languages should be avoided in favor of Perl-ish solutions.
 
 Documentation belongs to the guides, module POD is just an API reference.
 

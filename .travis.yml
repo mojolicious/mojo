@@ -1,15 +1,23 @@
 language: perl
-perl:
-  - "5.28"
-  - "5.26"
-  - "5.24"
-  - "5.22"
-  - "5.20"
-  - "5.18"
-  - "5.16"
-  - "5.14"
-  - "5.12"
-  - "5.10"
+matrix:
+  include:
+  - perl: "5.30"
+  - perl: "5.28"
+  - perl: "5.26"
+  - perl: "5.24"
+  - perl: "5.22"
+  - perl: "5.20"
+    dist: trusty
+  - perl: "5.18"
+    dist: trusty
+  - perl: "5.16"
+    dist: trusty
+  - perl: "5.14"
+    dist: trusty
+  - perl: "5.12"
+    dist: trusty
+  - perl: "5.10"
+    dist: trusty
 env:
   global:
     - HARNESS_OPTIONS=j9

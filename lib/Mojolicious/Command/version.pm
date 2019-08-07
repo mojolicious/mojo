@@ -26,7 +26,7 @@ CORE
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
-  Cpanel::JSON::XS 4.04+  ($json)
+  Cpanel::JSON::XS 4.09+  ($json)
   EV 4.0+                 ($ev)
   IO::Socket::Socks 0.64+ ($socks)
   IO::Socket::SSL 2.009+  ($tls)

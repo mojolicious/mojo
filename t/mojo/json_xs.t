@@ -22,7 +22,7 @@ use Mojo::Util qw(decode encode);
 
 # Basics
 my $array = decode_json '[]';
-is_deeply $array, [], 'decode_jsom';
+is_deeply $array, [], 'decode_json';
 my $bytes = encode_json [];
 is $bytes, '[]', 'encode_json';
 $array = from_json '[]';

@@ -136,8 +136,9 @@ C<@mojolicious/core>).
 A feature can be added or mofified when at least 3 voting members of the core
 team have cast a vote in favour, or the pumpkin-holder overruled the vote.
 
-Votes for pull requests on GitHub need to be cast as code review comments,
-spelled out as C<+1>, C<-1> or C<neutral>.
+Votes for pull requests on GitHub need to be cast with the final code review
+comment and spelled out as C<+1>, C<-1> or C<neutral>. A C<+1> vote may only be
+cast in combination with an approved code review.
 
 For especially controversial decisions it is also possible to call for a
 majority vote.

@@ -1,5 +1,5 @@
 
-8.23  2019-07-31
+8.23  2019-08-11
   - Added head and tail methods to Mojo::Collection. (Grinnz)
   - Improved Mojo::File not to allow undefined values in paths.
 

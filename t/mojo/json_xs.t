@@ -4,7 +4,7 @@ use Test::More;
 use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
 
 BEGIN {
-  plan skip_all => 'Cpanel::JSON::XS 4.04+ required for this test!'
+  plan skip_all => 'Cpanel::JSON::XS 4.09+ required for this test!'
     unless Mojo::JSON->JSON_XS;
 }
 
@@ -71,5 +71,9 @@ like encode_json({test => -sin(9**9**9)}), qr/^{"test":".*"}$/,
 
 # "escape_slash"
 is_deeply encode_json('/test/123'), '"\/test\/123"', 'escaped slash';
+
+# "allow_dupkeys"
+is_deeply decode_json('{"test":1,"test":2}'), {test => 2},
+  'no duplicate keys error';
 
 done_testing();

@@ -1,4 +1,6 @@
 
+8.24  2019-08-13
+
 8.23  2019-08-12
   - Updated Cpanel::JSON::XS requirement to 4.09 for duplicate keys support.
     (Grinnz)

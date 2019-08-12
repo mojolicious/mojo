@@ -1,5 +1,7 @@
 
-8.23  2019-08-11
+8.23  2019-08-12
+  - Updated Cpanel::JSON::XS requirement to 4.09 for duplicate keys support.
+    (Grinnz)
   - Added head and tail methods to Mojo::Collection. (Grinnz)
   - Improved Mojo::File not to allow undefined values in paths.
 

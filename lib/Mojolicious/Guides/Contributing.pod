@@ -133,7 +133,7 @@ a minute on most common hardware is a good rule of thumb)
 
 Any member of the core team can call for a vote to decide about the addition and
 modification of features (usually with a GitHub comment mentioning the team
-C<@mojolicious/core>).
+C<@mojolicious/core> and the C<vote> label).
 
 A feature can be added or mofified when at least 3 voting members of the core
 team have cast a vote in favour, or the pumpkin-holder overruled the vote.

@@ -115,7 +115,7 @@ distribution an example application.
 
 =head2 Rules
 
-General rules for the project.
+General rules for the project:
 
 =over 2
 
@@ -178,7 +178,7 @@ No names outside of C<Mojolicious.pm>.
 
 =head2 Voting Rules
 
-The voting process used to make decisions for the project.
+The voting process used to make decisions for the project:
 
 =over 2
 

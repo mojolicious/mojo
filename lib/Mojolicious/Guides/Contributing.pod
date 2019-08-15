@@ -79,7 +79,7 @@ process, which usually ends when members of the community have voiced their
 opinions and the core team voted for or against a change. To reach the formal
 voting stage, a member of the core team needs to endorse the pull request and
 call for a vote. You are responsible for securing this endorsement as well as
-the required votes.
+the required votes. The exact L</"Voting Rules"> can be found below.
 
 All code changes should emulate the style of the surrounding code, include tests
 that fail without them, and update relevant documentation.
@@ -91,11 +91,6 @@ advance on the L<mailing list|http://groups.google.com/group/mojolicious> or the
 official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
 now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>),
 to avoid unnecessary work and to increase its chances of getting accepted.
-
-Any member of the core team can call for a vote with a GitHub comment mentioning
-the team C<@mojolicious/core>. Then there will be a review period of 14 days (or
-less if enough votes have been cast), after which all votes are counted and the
-pull request will be accepted or rejected.
 
 The following mission statement and rules are the foundation of all L<Mojo> and
 L<Mojolicious> development. Please make sure that your contribution aligns well
@@ -120,6 +115,8 @@ distribution an example application.
 
 =head2 Rules
 
+General rules for the project.
+
 =over 2
 
 Web development should be easy and fun, this is what we optimize for.
@@ -130,28 +127,6 @@ Keep it simple, no magic unless absolutely necessary.
 
 The installation process should be as fast and painless as possible. (Less than
 a minute on most common hardware is a good rule of thumb)
-
-Any member of the core team can call for a vote to decide about the addition and
-modification of features (usually with a GitHub comment mentioning the team
-C<@mojolicious/core> and the C<vote> label).
-
-A feature can be added or mofified when at least 3 voting members of the core
-team have cast a vote in favour, or the pumpkin-holder overruled the vote.
-
-A vote ends once enough votes have been cast, or after 14 a day review period
-has passed.
-
-Votes for pull requests on GitHub need to be cast with the final code review
-comment and spelled out as C<+1>, C<-1> or C<neutral>. A C<+1> vote may only be
-cast in combination with an approved code review.
-
-For especially controversial decisions it is also possible to call for a
-majority vote.
-
-Any core team member may nominate new members, who must then be accepted by a
-2/3 majority vote.
-
-The pumpkin-holder has veto rights and may select their successor.
 
 It's not a feature without a test and documentation.
 
@@ -198,6 +173,44 @@ Comments should be correctly capitalized, and funny if possible, punctuation is
 optional if it doesn't increase readability.
 
 No names outside of C<Mojolicious.pm>.
+
+=back
+
+=head2 Voting Rules
+
+The voting process used to make decisions for the project.
+
+=over 2
+
+Any member of the core team can call for a vote to decide about the addition and
+modification of features (usually with a GitHub comment mentioning the team
+C<@mojolicious/core> and the C<vote> label).
+
+A feature can be added or mofified when at least 3 voting members of the core
+team have cast a vote in favour, or the pumpkin-holder overruled the vote.
+
+A vote ends once enough votes have been cast, or after 14 a day review period
+has passed.
+
+Votes for pull requests on GitHub need to be cast with the final code review
+comment and spelled out as C<+1>, C<-1> or C<neutral>. A C<+1> vote may only be
+cast in combination with an approved code review.
+
+For especially controversial decisions it is also possible to call for a
+majority vote.
+
+Voting is the primary responsibility of the core team, therefore only members
+that participate regularly should be considered active.
+
+Any core team member may nominate new members, who must then be accepted by a
+2/3 majority vote.
+
+Votes are public, so non-members can participate as well. Non-members that
+regularly have a positive impact on decisions should be considered for core team
+membership.
+
+The pumpkin-holder has veto rights on all decisions and may select their
+successor.
 
 =back
 

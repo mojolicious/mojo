@@ -190,7 +190,8 @@ A feature can be added or modified when at least 3 voting members of the core
 team have cast a vote in favour, or the pumpkin-holder overruled the vote.
 
 A vote ends once enough votes have been cast, or after a 14 day review period
-has passed.
+has passed. Any non-trivial changes (more than a typo fix) will invalidate the
+vote, and require a new vote to be called.
 
 Votes for pull requests on GitHub need to be cast with the final code review
 comment and spelled out as C<+1>, C<-1> or C<neutral>. A C<+1> vote may only be

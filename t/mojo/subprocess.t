@@ -9,6 +9,7 @@ plan skip_all => 'set TEST_SUBPROCESS to enable this test (developer only!)'
 
 use Mojo::IOLoop;
 use Mojo::IOLoop::Subprocess;
+use Mojo::File 'tempfile';
 
 # Huge result
 my ($fail, $result, @start);
@@ -201,5 +202,26 @@ is_deeply $result, ['yay'], 'correct result';
 is_deeply \@progress,
   [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]],
   'correct progress';
+
+# Cleanup
+($fail, $result) = ();
+my $file   = tempfile;
+my $called = 0;
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->on(
+  cleanup => sub { $file->spurt(shift->serialize->({test => ++$called})) });
+$subprocess->run(
+  sub {'Hello Mojo!'},
+  sub {
+    my ($subprocess, $err, $hello) = @_;
+    $fail   = $err;
+    $result = $hello;
+  }
+);
+Mojo::IOLoop->start;
+is_deeply $subprocess->deserialize->($file->slurp), {test => 1},
+  'cleanup event emitted once';
+ok !$fail, 'no error';
+is $result, 'Hello Mojo!', 'right result';
 
 done_testing();

@@ -1,5 +1,6 @@
 
-8.24  2019-08-13
+8.24  2019-09-02
+  - Added EXPERIMENTAL cleanup event to Mojo::IOLoop::Subprocess.
 
 8.23  2019-08-12
   - Updated Cpanel::JSON::XS requirement to 4.09 for duplicate keys support.

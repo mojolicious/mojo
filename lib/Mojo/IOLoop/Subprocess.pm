@@ -38,6 +38,7 @@ sub _start {
     $self->ioloop->reset;
     my $results = eval { [$self->$child] } || [];
     print {$self->{writer}} '0-', $self->serialize->([$@, @$results]);
+    $self->emit('cleanup');
     POSIX::_exit(0);
   }
 
@@ -115,6 +116,21 @@ expensive operations in subprocesses, without blocking the event loop.
 
 L<Mojo::IOLoop::Subprocess> inherits all events from L<Mojo::EventEmitter> and
 can emit the following new ones.
+
+=head2 cleanup
+
+  $subprocess->on(cleanup => sub {
+    my $subprocess = shift;
+    ...
+  });
+
+Emitted in the subprocess right before the process will exit. Note that this
+event is EXPERIMENTAL and might change without warning!
+
+  $subprocess->on(cleanup => sub {
+    my $subprocess = shift;
+    say "Process $$ is about to exit";
+  });
 
 =head2 progress
 

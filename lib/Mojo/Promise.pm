@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Util 'deprecated';
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed isweak weaken);
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
@@ -116,11 +116,12 @@ sub wait {
 sub _defer {
   my $self = shift;
 
-  return unless my $result = $self->{result};
+  return unless $self->{result};
   my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
   @{$self}{qw(resolve reject)} = ([], []);
 
-  $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
+# XXX --> this is as far as I've gotten
+  $self->ioloop->next_tick(sub { $_->(@{$self->{result}}) for @$cbs });
 }
 
 sub _finally {
@@ -140,7 +141,8 @@ sub _settle {
 
   return $self if $self->{result};
 
-  @{$self}{qw(result status)} = ([@_], $status);
+  @{$self}{qw(result status)} = (\@_, $status);
+
   $self->_defer;
   return $self;
 }

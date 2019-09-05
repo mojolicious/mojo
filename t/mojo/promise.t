@@ -5,6 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop;
 use Mojo::Promise;
+use Scalar::Util qw(isweak weaken);
 
 # Resolved
 my $promise = Mojo::Promise->new;
@@ -345,5 +346,15 @@ Mojo::IOLoop->next_tick(sub {
 });
 $promise->then(sub { @results = @_ })->wait;
 is_deeply \@results, ['wait'], 'promise resolved';
+
+# Callbacks do not strengthen weakened args
+$promise = Mojo::Promise->new;
+$promise->then(
+  sub { ok(isweak($_[0]), 'promise callback args are not strengthened') });
+my $arg = [qw(foo bar baz)];
+weaken(my $weakarg = $arg);
+$promise->resolve($weakarg);
+$promise->wait;
+
 
 done_testing();

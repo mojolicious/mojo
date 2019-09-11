@@ -532,8 +532,7 @@ L</"stash">.
   my $log = $c->log;
 
 Alternative to L<Mojolicious/"log"> that includes
-L<Mojo::Message::Request/"request_id"> with every log message. Note that this
-helper is B<EXPERIMENTAL> and might change without warning!
+L<Mojo::Message::Request/"request_id"> with every log message.
 
   # Log message with context
   $c->log->debug('This is a log message with request id');

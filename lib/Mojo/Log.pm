@@ -40,9 +40,8 @@ sub append {
 sub debug { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
 
 sub context {
-  my ($self, $context) = (shift, shift);
-  return $self->new(parent => $self, context => $context,
-    level => $self->level);
+  my ($self, $str) = @_;
+  return $self->new(parent => $self, context => $str, level => $self->level);
 }
 
 sub error { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }

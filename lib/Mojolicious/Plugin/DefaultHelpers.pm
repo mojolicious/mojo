@@ -42,13 +42,7 @@ sub register {
   $app->helper(dumper  => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
 
-  $app->helper(
-    log => sub {
-      my $c = shift;
-      return $c->stash->{'mojo.log'}
-        ||= $c->app->log->context('[' . $c->req->request_id . ']');
-    }
-  );
+  $app->helper(log => \&_log);
 
   $app->helper('proxy.get_p'  => sub { _proxy_method_p('GET',  @_) });
   $app->helper('proxy.post_p' => sub { _proxy_method_p('POST', @_) });
@@ -174,6 +168,12 @@ sub _is_e { blessed $_[0] && $_[0]->isa('Mojo::Exception') }
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
+}
+
+sub _log {
+  my $c = shift;
+  return $c->stash->{'mojo.log'}
+    ||= $c->app->log->context('[' . $c->req->request_id . ']');
 }
 
 sub _proxy_method_p {

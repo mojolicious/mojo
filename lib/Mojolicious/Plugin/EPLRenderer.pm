@@ -15,7 +15,7 @@ sub _render {
 
   # Cached
   if ($mt->compiled) {
-    $c->app->log->debug("Rendering cached @{[$mt->name]}");
+    $c->helpers->log->debug("Rendering cached @{[$mt->name]}");
     $$output = $mt->process(@args);
   }
 
@@ -27,7 +27,7 @@ sub _render {
 
     # Inline
     if (defined $inline) {
-      $c->app->log->debug(qq{Rendering inline template "$name"});
+      $c->helpers->log->debug(qq{Rendering inline template "$name"});
       $$output = $mt->name(qq{inline template "$name"})->render($inline, @args);
     }
 
@@ -37,19 +37,20 @@ sub _render {
 
       # Try template
       if (defined(my $path = $renderer->template_path($options))) {
-        $c->app->log->debug(qq{Rendering template "$name"});
+        $c->helpers->log->debug(qq{Rendering template "$name"});
         $$output = $mt->name(qq{template "$name"})->render_file($path, @args);
       }
 
       # Try DATA section
       elsif (defined(my $d = $renderer->get_data_template($options))) {
-        $c->app->log->debug(qq{Rendering template "$name" from DATA section});
+        $c->helpers->log->debug(
+          qq{Rendering template "$name" from DATA section});
         $$output = $mt->name(qq{template "$name" from DATA section})
           ->render($d, @args);
       }
 
       # No template
-      else { $c->app->log->debug(qq{Template "$name" not found}) }
+      else { $c->helpers->log->debug(qq{Template "$name" not found}) }
     }
   }
 

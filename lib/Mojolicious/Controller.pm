@@ -40,7 +40,7 @@ sub cookie {
 
     # Cookie too big
     my $cookie = {name => $name, value => shift, %{shift || {}}};
-    $self->app->log->error(qq{Cookie "$name" is bigger than 4096 bytes})
+    $self->helpers->log->error(qq{Cookie "$name" is bigger than 4096 bytes})
       if length $cookie->{value} > 4096;
 
     $self->res->cookies($cookie);
@@ -90,10 +90,10 @@ sub every_signed_cookie {
       }
       if ($valid) { push @results, $value }
 
-      else { $self->app->log->debug(qq{Cookie "$name" has a bad signature}) }
+      else { $self->helpers->log->debug(qq{Cookie "$name" has bad signature}) }
     }
 
-    else { $self->app->log->debug(qq{Cookie "$name" is not signed}) }
+    else { $self->helpers->log->debug(qq{Cookie "$name" is not signed}) }
   }
 
   return \@results;
@@ -184,7 +184,7 @@ sub rendered {
 
     # Disable auto rendering and stop timer
     my $app = $self->render_later->app;
-    $app->log->debug(sub {
+    $self->helpers->log->debug(sub {
       my $timing  = $self->helpers->timing;
       my $elapsed = $timing->elapsed('mojo.timer') // 0;
       my $rps     = $timing->rps($elapsed) // '??';

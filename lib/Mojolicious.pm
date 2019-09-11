@@ -118,13 +118,12 @@ sub dispatch {
 
   # Start timer (ignore static files)
   my $stash = $c->stash;
-  $self->log->debug(sub {
+  $c->helpers->log->debug(sub {
     my $req    = $c->req;
     my $method = $req->method;
     my $path   = $req->url->path->to_abs_string;
-    my $id     = $req->request_id;
     $c->helpers->timing->begin('mojo.timer');
-    return qq{$method "$path" ($id)};
+    return qq{$method "$path"};
   }) unless $stash->{'mojo.static'};
 
   # Routes
@@ -147,7 +146,8 @@ sub handler {
   $self->plugins->emit_chain(around_dispatch => $c);
 
   # Delayed response
-  $self->log->debug('Nothing has been rendered, expecting delayed response')
+  $c->helpers->log->debug(
+    'Nothing has been rendered, expecting delayed response')
     unless $c->stash->{'mojo.rendered'};
 }
 

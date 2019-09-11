@@ -222,7 +222,7 @@ sub _render_template {
 
   my $handler = $options->{handler} ||= $self->template_handler($options);
   return undef unless $handler;
-  $c->app->log->error(qq{No handler for "$handler" available}) and return undef
+  $c->helpers->log->error(qq{No handler for "$handler" found}) and return undef
     unless my $renderer = $self->handlers->{$handler};
 
   $renderer->($self, $c, $output, $options);

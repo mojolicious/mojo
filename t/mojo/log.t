@@ -172,4 +172,24 @@ ok !$log->is_level('info'),  '"info" log level is inactive';
 ok !$log->is_level('warn'),  '"warn" log level is inactive';
 ok !$log->is_level('error'), '"error" log level is inactive';
 
+# Context
+$log = Mojo::Log->new(level => 'warn');
+my $context = $log->context('[123]');
+is $context->level, 'warn';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  my $log = Mojo::Log->new;
+  $context->debug('Fail');
+  $context->error('Just works');
+  $log->warn('No context');
+  $context->fatal('Mojolicious rocks');
+}
+unlike $buffer, qr/\[debug\]/, 'no debug message';
+like $buffer, qr/\[.*\] \[error\] \[123\] Just works\n/, 'right error message';
+like $buffer, qr/\[.*\] \[warn\] No context\n/,          'right warn message';
+like $buffer, qr/\[.*\] \[fatal\] \[123\] Mojolicious rocks\n/,
+  'right fatal message';
+
 done_testing();

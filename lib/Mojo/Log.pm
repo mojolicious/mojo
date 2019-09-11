@@ -38,6 +38,13 @@ sub append {
 }
 
 sub debug { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
+
+sub context {
+  my ($self, $context) = (shift, shift);
+  return $self->new(parent => $self, context => $context,
+    level => $self->level);
+}
+
 sub error { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
 sub fatal { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
 sub info  { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'info')  : $_[0] }
@@ -60,7 +67,12 @@ sub _default {
   return "[$time] [$$] [$level] " . join "\n", @_, '';
 }
 
-sub _log { shift->emit('message', pop, ref $_[0] eq 'CODE' ? $_[0]() : @_) }
+sub _log {
+  my ($self, $level) = (shift, pop);
+  my @msgs = ref $_[0] eq 'CODE' ? $_[0]() : @_;
+  $msgs[0] = "$self->{context} $msgs[0]" if $self->{context};
+  ($self->{parent} || $self)->emit('message', $level, @msgs);
+}
 
 sub _message {
   my ($self, $level) = (shift, shift);
@@ -198,6 +210,20 @@ following new ones.
   $log->append("[2018-11-08 14:20:13.77168] [28320] [info] I ♥ Mojolicious\n");
 
 Append message to L</"handle">.
+
+=head2 context
+
+  my $new = $log->context('[extra] [information]');
+
+Construct a new child L<Mojo::Log> object that will include context information
+with every log message. Note that this method is B<EXPERIMENTAL> and might
+change without warning!
+
+  # Log with context
+  my $log = Mojo::Log->new;
+  my $context = $log->context('[17a60115]');
+  $context->debug('This is a log message with context information'); 
+  $context->info('And another');
 
 =head2 debug
 

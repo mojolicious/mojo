@@ -99,9 +99,8 @@ sub _action { shift->plugins->emit_chain(around_action => @_) }
 sub _callback {
   my ($self, $c, $cb, $last) = @_;
   $c->stash->{'mojo.routed'} = 1 if $last;
-  my $app = $c->app;
-  $app->log->debug('Routing to a callback');
-  return _action($app, $c, $cb, $last);
+  $c->helpers->log->debug('Routing to a callback');
+  return _action($c->app, $c, $cb, $last);
 }
 
 sub _class {
@@ -125,7 +124,7 @@ sub _class {
   elsif ($class) { push @classes, "${_}::$class" for @{$self->namespaces} }
 
   # Try to load all classes
-  my $log = $c->app->log;
+  my $log = $c->helpers->log;
   for my $class (@classes) {
 
     # Failed
@@ -150,8 +149,7 @@ sub _controller {
 
   # Application
   my $class = ref $new;
-  my $app   = $old->app;
-  my $log   = $app->log;
+  my $log   = $old->helpers->log;
   if ($new->isa('Mojolicious')) {
     $log->debug(qq{Routing to application "$class"});
 
@@ -171,7 +169,7 @@ sub _controller {
 
       if (my $sub = $new->can($method)) {
         $old->stash->{'mojo.routed'} = 1 if $last;
-        return 1 if _action($app, $new, $sub, $last);
+        return 1 if _action($old->app, $new, $sub, $last);
       }
 
       else { $log->debug('Action not found in controller') }

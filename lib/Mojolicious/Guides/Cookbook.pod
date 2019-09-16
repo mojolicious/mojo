@@ -1753,7 +1753,7 @@ installed application so they can be excluded.
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
-  use Mojo::File 'path';
+  use Mojo::File 'curfile';
   use Mojo::Home;
 
   # Every CPAN module needs a version
@@ -1763,7 +1763,7 @@ installed application so they can be excluded.
     my $self = shift;
 
     # Switch to installable home directory
-    $self->home(Mojo::Home->new(path(__FILE__)->sibling('MyApp')));
+    $self->home(Mojo::Home->new(curfile->sibling('MyApp')));
 
     # Switch to installable "public" directory
     $self->static->paths->[0] = $self->home->child('public');
@@ -1789,8 +1789,8 @@ to the proper shebang during installation.
   use strict;
   use warnings;
 
-  use FindBin;
-  BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+  use Mojo::File 'curfile';
+  use lib curfile->dirname->sibling('lib')->to_string;
   use Mojolicious::Commands;
 
   # Start command line interface for application

@@ -6,7 +6,7 @@ use Test::Mojo;
 use Test::More;
 use Mojo::Asset::Memory;
 use Mojo::Date;
-use Mojo::File 'path';
+use Mojo::File 'curfile';
 use Mojolicious::Lite;
 
 hook after_static => sub { shift->app->log->debug('Static file served') };
@@ -36,7 +36,7 @@ get '/asset' => sub {
 
 get '/file' => sub {
   my $c = shift;
-  $c->reply->file(path(__FILE__)->dirname->child('templates2', '42.html.ep'));
+  $c->reply->file(curfile->sibling('templates2', '42.html.ep'));
 };
 
 my $t = Test::Mojo->new;

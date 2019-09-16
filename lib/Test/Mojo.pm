@@ -928,8 +928,8 @@ configuration plugins like L<Mojolicious::Plugin::Config> and
 L<Mojolicious::Plugin::JSONConfig> for tests.
 
   # Load application script relative to the "t" directory
-  use Mojo::File 'path';
-  my $t = Test::Mojo->new(path(__FILE__)->dirname->sibling('myapp.pl'));
+  use Mojo::File 'curfile';
+  my $t = Test::Mojo->new(curfile->dirname->sibling('myapp.pl'));
 
 =head2 options_ok
 

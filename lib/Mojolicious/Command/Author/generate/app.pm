@@ -113,8 +113,8 @@ __DATA__
 use strict;
 use warnings;
 
-use FindBin;
-BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+use Mojo::File 'curfile';
+use lib curfile->dirname->sibling('lib')->to_string;
 use Mojolicious::Commands;
 
 # Start command line interface for application

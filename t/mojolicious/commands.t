@@ -7,8 +7,8 @@ BEGIN {
 
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 use Mojo::File qw(path tempdir);
 

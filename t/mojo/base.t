@@ -2,8 +2,8 @@ use Mojo::Base -strict;
 
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 package Mojo::BaseTest;
 use Mojo::Base -strict;

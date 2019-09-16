@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::File 'path';
+use Mojo::File qw(curfile path);
 use Mojo::Template;
 
 package MyTemplateExporter;
@@ -1125,13 +1125,13 @@ EOF
 
 # File
 $mt = Mojo::Template->new;
-my $file = path(__FILE__)->sibling('templates', 'test.mt');
+my $file = curfile->sibling('templates', 'test.mt');
 $output = $mt->render_file($file, 3);
 like $output, qr/23\nHello World!/, 'file';
 
 # Exception in file
 $mt     = Mojo::Template->new;
-$file   = path(__FILE__)->sibling('templates', 'exception.mt');
+$file   = curfile->sibling('templates', 'exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt line 2/, 'message contains filename';
@@ -1159,7 +1159,7 @@ like "$output", qr/foo\.mt from DATA section line 2/, 'right result';
 
 # Exception with UTF-8 context
 $mt     = Mojo::Template->new;
-$file   = path(__FILE__)->sibling('templates', 'utf8_exception.mt');
+$file   = curfile->sibling('templates', 'utf8_exception.mt');
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->lines_before->[0][1], '☃', 'right line';
@@ -1178,7 +1178,7 @@ is $output->lines_after->[0], undef, 'no lines after';
 
 # Different encodings
 $mt   = Mojo::Template->new(encoding => 'shift_jis');
-$file = path(__FILE__)->sibling('templates', 'utf8_exception.mt');
+$file = curfile->sibling('templates', 'utf8_exception.mt');
 ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';
 

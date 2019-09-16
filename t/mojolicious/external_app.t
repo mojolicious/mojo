@@ -7,8 +7,8 @@ BEGIN {
 
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/external/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('external', 'lib')->to_string;
 
 use Test::Mojo;
 

@@ -7,7 +7,7 @@ BEGIN {
 
 use Test::Mojo;
 use Test::More;
-use Mojo::File 'path';
+use Mojo::File 'curfile';
 use Mojolicious::Lite;
 
 # Default
@@ -21,7 +21,7 @@ like $@, qr/JSON/, 'right error';
 # Load plugins
 my $config
   = plugin j_s_o_n_config => {default => {foo => 'baz', hello => 'there'}};
-my $path = path(__FILE__)->to_abs->sibling('json_config_lite_app_abs.json');
+my $path = curfile->sibling('json_config_lite_app_abs.json');
 plugin JSONConfig => {file => $path};
 is $config->{foo},          'bar',            'right value';
 is $config->{hello},        'there',          'right value';

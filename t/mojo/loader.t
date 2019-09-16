@@ -4,8 +4,8 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 use Mojo::Loader
   qw(data_section file_is_binary find_packages find_modules load_class);

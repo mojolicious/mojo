@@ -5,8 +5,8 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::Mojo;
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 use Mojolicious::Lite;
 

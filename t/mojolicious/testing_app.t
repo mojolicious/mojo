@@ -8,8 +8,8 @@ BEGIN {
 use Test::Mojo;
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 my $t       = Test::Mojo->new('MojoliciousTest');
 my $success = '';

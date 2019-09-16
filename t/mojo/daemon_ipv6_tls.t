@@ -5,8 +5,8 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::TLS;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)'
   unless $ENV{TEST_IPV6} || $ENV{TEST_ALL};

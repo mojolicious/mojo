@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::Cache;
 use Mojo::DynamicMethods;
-use Mojo::File 'path';
+use Mojo::File qw(curfile path);
 use Mojo::JSON 'encode_json';
 use Mojo::Loader 'data_section';
 use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
@@ -18,7 +18,7 @@ has min_compress_size      => 860;
 has paths                  => sub { [] };
 
 # Bundled templates
-my $TEMPLATES = path(__FILE__)->sibling('resources', 'templates');
+my $TEMPLATES = curfile->sibling('resources', 'templates');
 
 sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 

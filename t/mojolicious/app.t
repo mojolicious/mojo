@@ -9,8 +9,8 @@ BEGIN {
 use Test::Mojo;
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 use Mojo::Asset::File;
 use Mojo::Date;
@@ -407,7 +407,7 @@ like $log, qr/Controller "MojoliciousTest::Another" does not exist/,
 $t->app->log->unsubscribe(message => $cb);
 
 # Check Last-Modified header for static files
-my $path = path($FindBin::Bin, 'public_dev', 'hello.txt');
+my $path = curfile->sibling('public_dev', 'hello.txt');
 my $size = Mojo::Asset::File->new(path => $path)->size;
 my $mtime
   = Mojo::Date->new(Mojo::Asset::File->new(path => $path)->mtime)->to_string;

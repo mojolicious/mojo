@@ -385,7 +385,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hi!');
 
   # Quick JSON API request with Basic authentication
-  my $value = $ua->get('https://sri:t3st@example.com/test.json')->result->json;
+  my $url = Mojo::URL->new('https://example.com/test.json')->userinfo('sri:☃');
+  my $value = $ua->get($url)->result->json;
 
   # JSON POST (application/json) with TLS certificate authentication
   my $tx = $ua->cert('tls.crt')->key('tls.key')

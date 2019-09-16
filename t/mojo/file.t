@@ -6,7 +6,7 @@ use Fcntl 'O_RDONLY';
 use File::Basename qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
 use File::Temp;
-use Mojo::File qw(path tempdir tempfile);
+use Mojo::File qw(curfile path tempdir tempfile);
 use Mojo::Util 'encode';
 
 # Constructor
@@ -57,6 +57,10 @@ is path('file.t')->to_abs->dirname, scalar dirname(rel2abs 'file.t'),
 # Checks
 ok path(__FILE__)->to_abs->is_abs, 'path is absolute';
 ok !path('file.t')->is_abs, 'path is not absolute';
+
+# Current file
+ok curfile->is_abs, 'path is absolute';
+is curfile, realpath(__FILE__), 'same path';
 
 # Temporary directory
 my $dir  = tempdir;

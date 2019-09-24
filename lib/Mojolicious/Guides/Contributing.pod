@@ -207,8 +207,8 @@ Any core team member may nominate new members, who must then be accepted by a
 2/3 majority vote.
 
 Votes should be public if possible, so non-members can participate as well.
-Non-members that regularly have a positive impact on decisions should be
-considered for core team membership.
+Non-members that regularly have a positive impact on decisions and participate
+in IRC discussions should be considered for core team membership.
 
 The pumpkin-holder has veto rights on all decisions and may select their
 successor.

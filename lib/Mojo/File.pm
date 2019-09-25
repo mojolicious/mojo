@@ -38,7 +38,7 @@ sub copy_to {
   return $self->new(-d $to ? ($to, File::Basename::basename $self) : $to);
 }
 
-sub curfile { __PACKAGE__->new((caller)[1])->realpath }
+sub curfile { __PACKAGE__->new(Cwd::realpath((caller)[1])) }
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 

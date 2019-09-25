@@ -3,11 +3,10 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use Mojo::File 'tempdir';
+use Mojo::File qw(curfile tempdir);
 use IO::Socket::UNIX;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use lib curfile->sibling('lib')->to_string;
 
 plan skip_all => 'set TEST_UNIX to enable this test (developer only!)'
   unless $ENV{TEST_UNIX} || $ENV{TEST_ALL};

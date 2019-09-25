@@ -6,6 +6,7 @@ BEGIN {
 }
 
 use Test::More;
+use Mojo::File 'curfile';
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -13,8 +14,7 @@ use Test::Mojo;
 app->secrets(['very secr3t!']);
 
 # Mount full external application a few times
-use FindBin;
-my $external = "$FindBin::Bin/external/script/my_app";
+my $external = curfile->sibling('external', 'script', 'my_app');
 plugin Mount => {'/x/1' => $external};
 plugin(Mount => ('/x/♥' => $external));
 plugin Mount => {'MOJOLICIOUS.ORG/' => $external};

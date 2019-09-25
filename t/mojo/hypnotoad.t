@@ -7,9 +7,8 @@ use Test::More;
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD} || $ENV{TEST_ALL};
 
-use FindBin;
 use IO::Socket::INET;
-use Mojo::File 'tempdir';
+use Mojo::File qw(curfile tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Hypnotoad;
 use Mojo::UserAgent;
@@ -95,7 +94,7 @@ app->start;
 EOF
 
 # Start
-my $prefix = "$FindBin::Bin/../../script";
+my $prefix = curfile->dirname->dirname->sibling('script');
 open my $start, '-|', $^X, "$prefix/hypnotoad", $script;
 sleep 3;
 sleep 1 while !_port($port2);

@@ -1,7 +1,7 @@
 package Mojo::IOLoop::TLS;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Mojo::File 'path';
+use Mojo::File 'curfile';
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 
@@ -17,8 +17,8 @@ has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 # To regenerate the certificate run this command (28.06.2019)
 # openssl req -x509 -newkey rsa:4096 -nodes -sha256 -out server.crt \
 #   -keyout server.key -days 7300 -subj '/CN=localhost'
-my $CERT = path(__FILE__)->sibling('resources', 'server.crt')->to_string;
-my $KEY  = path(__FILE__)->sibling('resources', 'server.key')->to_string;
+my $CERT = curfile->sibling('resources', 'server.crt')->to_string;
+my $KEY  = curfile->sibling('resources', 'server.key')->to_string;
 
 sub DESTROY { shift->_cleanup }
 

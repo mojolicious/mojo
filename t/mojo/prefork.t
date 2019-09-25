@@ -7,7 +7,7 @@ use Test::More;
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK} || $ENV{TEST_ALL};
 
-use Mojo::File qw(path tempdir);
+use Mojo::File qw(curfile path tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
@@ -32,7 +32,7 @@ undef $prefork;
 ok !-e $file, 'file has been cleaned up';
 
 # Bad PID file
-my $bad = path(__FILE__)->sibling('does_not_exist', 'test.pid');
+my $bad = curfile->sibling('does_not_exist', 'test.pid');
 $prefork = Mojo::Server::Prefork->new(pid_file => $bad);
 $prefork->app->log->level('debug')->unsubscribe('message');
 my $log = '';

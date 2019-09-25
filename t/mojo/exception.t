@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Exception qw(check raise);
-use Mojo::File 'path';
+use Mojo::File 'curfile';
 
 package MojoTest::X::Foo;
 use Mojo::Base 'Mojo::Exception';
@@ -79,7 +79,7 @@ like wrapper1(1)->frames->[0][3], qr/wrapper2/, 'right subroutine';
 like wrapper1(2)->frames->[0][3], qr/wrapper1/, 'right subroutine';
 
 # Inspect (UTF-8)
-my $file = path(__FILE__)->sibling('exception', 'utf8.txt');
+my $file = curfile->sibling('exception', 'utf8.txt');
 $e = Mojo::Exception->new("Whatever at $file line 3.");
 is_deeply $e->lines_before, [], 'no lines';
 is_deeply $e->line,         [], 'no line';

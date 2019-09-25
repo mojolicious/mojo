@@ -6,7 +6,7 @@ use Fcntl 'O_RDONLY';
 use File::Basename qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
 use File::Temp;
-use Mojo::File qw(path tempdir tempfile);
+use Mojo::File qw(curfile path tempdir tempfile);
 use Mojo::Util 'encode';
 
 # Constructor
@@ -53,6 +53,10 @@ is path('file.t')->basename('.t'), basename('file.t', '.t'), 'same path';
 # Dirname
 is path('file.t')->to_abs->dirname, scalar dirname(rel2abs 'file.t'),
   'same path';
+
+# Current file
+ok curfile->is_abs, 'path is absolute';
+is curfile, realpath(__FILE__), 'same path';
 
 # Checks
 ok path(__FILE__)->to_abs->is_abs, 'path is absolute';
@@ -193,8 +197,8 @@ SKIP: {
 
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
-is_deeply path(__FILE__)->list->to_array,         [], 'no files';
-my $lib   = path(__FILE__)->sibling('lib', 'Mojo');
+is_deeply curfile->list->to_array,                [], 'no files';
+my $lib   = curfile->sibling('lib', 'Mojo');
 my @files = map { path($lib)->child(split '/') } (
   'DeprecationTest.pm',  'LoaderException.pm',
   'LoaderException2.pm', 'TestConnectProxy.pm'
@@ -217,7 +221,7 @@ is_deeply path($lib)->list({dir => 1, hidden => 1})->map('to_string')->to_array,
 
 # List tree
 is_deeply path('does_not_exist')->list_tree->to_array, [], 'no files';
-is_deeply path(__FILE__)->list_tree->to_array,         [], 'no files';
+is_deeply curfile->list_tree->to_array,                [], 'no files';
 @files = map { path($lib)->child(split '/') } (
   'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
   'BaseTest/Base3.pm',  'DeprecationTest.pm',

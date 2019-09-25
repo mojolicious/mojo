@@ -8,9 +8,9 @@ BEGIN {
 use Test::More;
 
 use Test::Mojo;
-use Mojo::File 'path';
+use Mojo::File 'curfile';
 
-my $t = Test::Mojo->new(path(__FILE__)->dirname->child('external', 'myapp.pl'));
+my $t = Test::Mojo->new(curfile->sibling('external', 'myapp.pl'));
 
 # Template from myapp.pl
 $t->get_ok('/')->status_is(200)->content_is(<<'EOF');

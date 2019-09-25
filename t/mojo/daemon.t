@@ -6,9 +6,8 @@ BEGIN {
 }
 
 use Test::More;
-use FindBin;
 use IO::Socket::INET;
-use Mojo::File 'path';
+use Mojo::File qw(curfile path);
 use Mojo::IOLoop;
 use Mojo::Log;
 use Mojo::Server::Daemon;
@@ -79,14 +78,14 @@ is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
 
 # Loading
 my $daemon = Mojo::Server::Daemon->new;
-my $path   = "$FindBin::Bin/lib/../lib/myapp.pl";
+my $path   = curfile->sibling('lib', '..', 'lib', 'myapp.pl');
 is ref $daemon->load_app($path), 'Mojolicious::Lite', 'right reference';
 is $daemon->app->config('script'), path($path)->to_abs, 'right script name';
 is ref $daemon->build_app('TestApp'), 'TestApp', 'right reference';
 is ref $daemon->app, 'TestApp', 'right reference';
 
 # Load broken app
-my $bin = $FindBin::Bin;
+my $bin = curfile->dirname;
 eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderTest/A.pm"); };
 like $@, qr/did not return an application object/, 'right error';
 eval {

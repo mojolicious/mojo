@@ -20,7 +20,7 @@ use File::Temp ();
 use IO::File   ();
 use Mojo::Collection;
 
-our @EXPORT_OK = ('path', 'tempdir', 'tempfile');
+our @EXPORT_OK = ('curfile', 'path', 'tempdir', 'tempfile');
 
 sub basename { File::Basename::basename ${shift()}, @_ }
 
@@ -37,6 +37,8 @@ sub copy_to {
   copy($$self, $to) or croak qq{Can't copy file "$$self" to "$to": $!};
   return $self->new(-d $to ? ($to, File::Basename::basename $self) : $to);
 }
+
+sub curfile { __PACKAGE__->new((caller)[1])->realpath }
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
@@ -208,6 +210,13 @@ friendly API for dealing with different operating systems.
 
 L<Mojo::File> implements the following functions, which can be imported
 individually.
+
+=head2 curfile
+
+  my $path = curfile;
+
+Construct a new scalar-based L<Mojo::File> object for the absolute path to the
+current source file.
 
 =head2 path
 

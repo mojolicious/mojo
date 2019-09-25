@@ -1,11 +1,10 @@
 use Mojo::Base -strict;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 use Test::More;
 use Mojo::ByteStream 'b';
-use Mojo::File 'path';
 use Mojo::DeprecationTest;
 use Sub::Util 'subname';
 
@@ -116,7 +115,7 @@ is_deeply split_cookie_header($header), $tree, 'right result';
 
 # extract_usage
 is extract_usage, "extract_usage test!\n", 'right result';
-is extract_usage(path($FindBin::Bin, 'lib', 'myapp.pl')),
+is extract_usage(curfile->sibling('lib', 'myapp.pl')),
   "USAGE: myapp.pl daemon\n\n test\n123\n", 'right result';
 
 =head1 SYNOPSIS

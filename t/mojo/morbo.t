@@ -7,8 +7,8 @@ use Test::More;
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO} || $ENV{TEST_ALL};
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use Mojo::File 'curfile';
+use lib curfile->sibling('lib')->to_string;
 
 use IO::Socket::INET;
 use Mojo::File 'tempdir';
@@ -38,7 +38,7 @@ EOF
 
 # Start
 my $port   = Mojo::IOLoop::Server->generate_port;
-my $prefix = "$FindBin::Bin/../../script";
+my $prefix = curfile->dirname->dirname->sibling('script');
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
   "http://127.0.0.1:$port", $script;
 sleep 1 while !_port($port);

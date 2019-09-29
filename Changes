@@ -1,5 +1,6 @@
 
-8.25  2019-09-12
+8.25  2019-09-29
+  - Added curfile function to Mojo::File. (Grinnz)
 
 8.24  2019-09-11
   - Added EXPERIMENTAL context method to Mojo::Log.

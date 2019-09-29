@@ -221,7 +221,7 @@ is $pattern->render({'' => 'bar/baz'}, 1), '/bar/baz', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('/:/:0');
 $result  = $pattern->match('/foo/bar', 1);
 is_deeply $result, {'' => 'foo', '0' => 'bar'}, 'right structure';
-is $pattern->render($result, 1), '/foo/bar', 'right result';
+is $pattern->render($result,                     1), '/foo/bar', 'right result';
 is $pattern->render({'' => 'bar', '0' => 'baz'}, 1), '/bar/baz', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('/<:>test/<0>');
 $result  = $pattern->match('/footest/bar', 1);

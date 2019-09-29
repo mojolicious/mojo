@@ -77,7 +77,7 @@ sub _connect {
   my $handle = $self->{handle} = $args->{handle};
 
   unless ($handle) {
-    my $class   = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
+    my $class = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
     my %options = (Blocking => 0);
 
     # UNIX domain socket

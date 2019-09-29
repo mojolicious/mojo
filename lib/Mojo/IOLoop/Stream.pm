@@ -131,8 +131,8 @@ sub _write {
 
   # Clear the buffer to free the underlying SV* memory
   undef $self->{buffer}, $self->emit('drain') unless length $self->{buffer};
-  return undef if $self->is_writing;
-  return $self->close if $self->{graceful};
+  return undef                                        if $self->is_writing;
+  return $self->close                                 if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0) if $self->{handle};
 }
 

@@ -173,8 +173,8 @@ sub _tokenize {
   for my $char (split '', $pattern) {
 
     # Quoted
-    if ($char eq $quote_start) { push @tree, ['placeholder', ''] if ++$spec }
-    elsif ($char eq $quote_end) { $spec = $more = 0 }
+    if    ($char eq $quote_start) { push @tree, ['placeholder', ''] if ++$spec }
+    elsif ($char eq $quote_end)   { $spec = $more = 0 }
 
     # Placeholder
     elsif (!$more && $char eq $start) {

@@ -98,8 +98,8 @@ sub _connect {
   my ($proto, $host, $port) = $handle ? $t->endpoint($tx) : $t->peer($tx);
 
   my %options = (timeout => $self->connect_timeout);
-  if ($proto eq 'http+unix') { $options{path} = $host }
-  else                       { @options{qw(address port)} = ($host, $port) }
+  if   ($proto eq 'http+unix') { $options{path}             = $host }
+  else                         { @options{qw(address port)} = ($host, $port) }
   if (my $local = $self->local_address) { $options{local_address} = $local }
   $options{handle} = $handle if $handle;
 
@@ -131,7 +131,7 @@ sub _connect {
       $stream->on(timeout => sub { $self->_error($id, 'Inactivity timeout') });
       $stream->on(close => sub { $self && $self->_finish($id, 1) });
       $stream->on(error => sub { $self && $self->_error($id, pop) });
-      $stream->on(read  => sub { $self->_read($id, pop) });
+      $stream->on(read => sub { $self->_read($id, pop) });
       $self->_process($id);
     }
   );

@@ -173,7 +173,7 @@ $timer = 0;
 $reactor->recurring(0 => sub { $timer++ });
 my $timer2;
 $reactor2->recurring(0 => sub { $timer2++ });
-$reactor->timer(0.025 => sub  { shift->stop });
+$reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok $timer, 'timer was triggered';
 ok !$timer2, 'timer was not triggered';

@@ -334,8 +334,8 @@ sub unindent {
 sub unquote {
   my $str = shift;
   return $str unless $str =~ s/^"(.*)"$/$1/g;
-  $str =~ s/\\\\/\\/g;
-  $str =~ s/\\"/"/g;
+  $str                    =~ s/\\\\/\\/g;
+  $str                    =~ s/\\"/"/g;
   return $str;
 }
 
@@ -389,7 +389,7 @@ sub _adapt {
   my $k = 0;
   while ($delta > ((PC_BASE - PC_TMIN) * PC_TMAX) / 2) {
     $delta /= PC_BASE - PC_TMIN;
-    $k += PC_BASE;
+    $k     += PC_BASE;
   }
 
   return $k + (((PC_BASE - PC_TMIN + 1) * $delta) / ($delta + PC_SKEW));

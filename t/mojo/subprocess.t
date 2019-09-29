@@ -86,7 +86,7 @@ is $result, 23, 'right result';
 Mojo::IOLoop->delay(
   sub {
     my $delay = shift;
-    Mojo::IOLoop->subprocess(sub {1}, $delay->begin);
+    Mojo::IOLoop->subprocess(sub      {1}, $delay->begin);
     Mojo::IOLoop->subprocess->run(sub {2}, $delay->begin);
   },
   sub {

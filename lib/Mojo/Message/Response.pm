@@ -132,8 +132,8 @@ sub is_empty {
   return $self->is_info || $code == 204 || $code == 304;
 }
 
-sub is_error { shift->_status_class(400, 500) }
-sub is_info { shift->_status_class(100) }
+sub is_error        { shift->_status_class(400, 500) }
+sub is_info         { shift->_status_class(100) }
 sub is_redirect     { shift->_status_class(300) }
 sub is_server_error { shift->_status_class(500) }
 

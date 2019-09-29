@@ -30,8 +30,8 @@ sub _ancestor {
 
   while ($current = $current->[3]) {
     return undef if $current->[0] eq 'root' || $current eq $tree;
-    return 1 if _combinator($selectors, $current, $tree, $pos);
-    last if $one;
+    return 1     if _combinator($selectors, $current, $tree, $pos);
+    last         if $one;
   }
 
   return undef;

@@ -70,7 +70,7 @@ $prefork->on(
     kill 'QUIT', $$;
   }
 );
-$prefork->on(reap   => sub { push @reap, pop });
+$prefork->on(reap => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
 $prefork->app->log->level('debug')->unsubscribe('message');
 $log = '';
@@ -133,7 +133,7 @@ $prefork->once(
     kill 'TERM', $$;
   }
 );
-$prefork->on(reap   => sub { push @reap, pop });
+$prefork->on(reap => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
 $prefork->run;
 is $prefork->ioloop->max_accepts, 500, 'right value';

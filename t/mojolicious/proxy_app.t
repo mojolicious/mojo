@@ -112,7 +112,7 @@ $t->get_ok('/proxy1/res5')->status_is(400)->content_like(qr/Error: /);
 
 # Custom request
 $t->patch_ok('/proxy2/res3')->status_is(200)
-  ->header_is('X-Mojo-App'  => 'Three')->header_is('X-Mojo-Method' => 'POST')
+  ->header_is('X-Mojo-App' => 'Three')->header_is('X-Mojo-Method' => 'POST')
   ->header_is('X-Mojo-More' => 'Less')->header_is('X-Mojo-Body' => 6)
   ->content_is('Three!');
 

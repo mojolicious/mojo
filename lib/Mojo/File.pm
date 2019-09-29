@@ -51,7 +51,7 @@ sub list {
   opendir(my $dir, $$self) or croak qq{Can't open directory "$$self": $!};
   my @files = grep { $_ ne '.' && $_ ne '..' } readdir $dir;
   @files = grep { !/^\./ } @files unless $options->{hidden};
-  @files = map { catfile $$self, $_ } @files;
+  @files = map  { catfile $$self, $_ } @files;
   @files = grep { !-d } @files unless $options->{dir};
 
   return Mojo::Collection->new(map { $self->new($_) } sort @files);

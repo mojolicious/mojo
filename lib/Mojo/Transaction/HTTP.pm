@@ -85,7 +85,7 @@ sub _headers {
   # Prepare header chunk
   my $buffer  = $msg->get_header_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $self->{write} -= $written;
+  $self->{write}  -= $written;
   $self->{offset} += $written;
 
   # Switch to body
@@ -105,7 +105,7 @@ sub _start_line {
   # Prepare start-line chunk
   my $buffer  = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $self->{write} -= $written;
+  $self->{write}  -= $written;
   $self->{offset} += $written;
 
   # Switch to headers

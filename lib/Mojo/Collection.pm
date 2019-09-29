@@ -114,7 +114,7 @@ sub uniq {
   my ($self, $cb) = (shift, shift);
   my %seen;
   return $self->new(grep { !$seen{$_->$cb(@_) // ''}++ } @$self) if $cb;
-  return $self->new(grep { !$seen{$_          // ''}++ } @$self);
+  return $self->new(grep { !$seen{$_ // ''}++ } @$self);
 }
 
 sub with_roles { shift->Mojo::Base::with_roles(@_) }

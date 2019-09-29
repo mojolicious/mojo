@@ -278,7 +278,7 @@ $port
 $id = $loop->client({port => $port} => sub { shift->stop_gracefully });
 my $finish;
 $loop->on(finish => sub { ++$finish and shift->stream($id)->close });
-$loop->timer(30 => sub  { shift->stop; $err = 'failed' });
+$loop->timer(30 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$loop->stream($id), 'stopped gracefully';
 ok !$err, 'no error';
@@ -300,7 +300,7 @@ $loop = Mojo::IOLoop->new->max_accepts(1);
 $id   = $loop->server({address => '127.0.0.1'} => sub { });
 $port = $loop->acceptor($id)->port;
 $loop->client({port => $port} => sub { pop->close });
-$loop->timer(30 => sub               { shift->stop; $err = 'failed' });
+$loop->timer(30 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $loop->max_accepts, 1, 'right value';

@@ -280,7 +280,7 @@ is $tx->req->content->parts->[1], undef, 'no more parts';
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/mojo-form'} => form =>
-    {mytext         => {file => Mojo::Asset::File->new(path => __FILE__)}});
+    {mytext => {file => Mojo::Asset::File->new(path => __FILE__)}});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/mojo-form',

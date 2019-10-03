@@ -19,19 +19,49 @@ my $ATTR_RE   = qr/
 
 sub matches {
   my $tree = shift->tree;
-  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree);
+  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree, _root($tree));
 }
 
 sub select     { _select(0, shift->tree, _compile(@_)) }
 sub select_one { _select(1, shift->tree, _compile(@_)) }
 
-sub _ancestor {
-  my ($selectors, $current, $tree, $one, $pos) = @_;
+sub _absolute {
+  my ($selector) = @_;
 
-  while ($current = $current->[3]) {
-    return undef if ($current->[0] eq 'root' || $current eq $tree)
-                 && !_scope($selectors->[$pos]);
-    return 1     if _combinator($selectors, $current, $tree, $pos);
+  # Traverse through selector to see if it's absolute.
+  # https://drafts.csswg.org/selectors-4/#absolutizing
+  for my $part (@$selector) {
+    next unless ref($part);
+
+    for my $pc (@$part) {
+      next unless ref($pc) && $pc->[0] eq 'pc';
+
+      # If ":root" or ":scope" are mentioned, it's absolute.
+      return 1 if $pc->[1] eq 'root' || $pc->[1] eq 'scope';
+
+      # If the arguments of a functional pseudoclass are
+      # absolute, the selector is absolute.
+      return 1 if ($pc->[1] eq 'not' || $pc->[1] eq 'matches')
+               && grep { _absolute($_) } @{$pc->[2]};
+    }
+  }
+  return undef;
+}
+
+sub _absolutize {
+  my ($group) = @_;
+
+  return [map {
+    _absolute($_) ? $_ : [[['pc', 'scope', []]], ' ', @$_]
+  } @$group];
+}
+
+sub _ancestor {
+  my ($selectors, $current, $tree, $scope, $one, $pos) = @_;
+
+  while ($current ne $scope and $current = _parent($current)) {
+    return 1     if _combinator($selectors, $current, $tree, $scope, $pos);
+    return undef if $current eq $scope;
     last         if $one;
   }
 
@@ -40,6 +70,8 @@ sub _ancestor {
 
 sub _attr {
   my ($name_re, $value_re, $current) = @_;
+
+  return undef unless $current->[0] eq 'tag';
 
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
@@ -52,26 +84,29 @@ sub _attr {
 }
 
 sub _combinator {
-  my ($selectors, $current, $tree, $pos) = @_;
+  my ($selectors, $current, $tree, $scope, $pos) = @_;
 
   # Selector
   return undef unless my $c = $selectors->[$pos];
   if (ref $c) {
-    return undef unless _selector($c, $current, $tree);
+    return undef unless _selector($c, $current, $tree, $scope);
     return 1 unless $c = $selectors->[++$pos];
   }
 
   # ">" (parent only)
-  return _ancestor($selectors, $current, $tree, 1, ++$pos) if $c eq '>';
+  return _ancestor($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '>';
 
   # "~" (preceding siblings)
-  return _sibling($selectors, $current, $tree, 0, ++$pos) if $c eq '~';
+  return _sibling($selectors, $current, $tree, $scope, 0, ++$pos) if $c eq '~';
 
   # "+" (immediately preceding siblings)
-  return _sibling($selectors, $current, $tree, 1, ++$pos) if $c eq '+';
+  return _sibling($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '+';
 
   # " " (ancestor)
-  return _ancestor($selectors, $current, $tree, 0, ++$pos);
+  return _ancestor($selectors, $current, $tree, $scope, 0, ++$pos) if $c eq ' ';
+
+  # Invalid selector
+  return undef;
 }
 
 sub _compile {
@@ -155,8 +190,8 @@ sub _equation {
 }
 
 sub _match {
-  my ($group, $current, $tree) = @_;
-  _combinator([reverse @$_], $current, $tree, 0) and return 1 for @$group;
+  my ($group, $current, $tree, $scope) = @_;
+  _combinator([reverse @$_], $current, $tree, $scope, 0) and return 1 for @$group;
   return undef;
 }
 
@@ -177,21 +212,28 @@ sub _namespace {
   return !length $ns;
 }
 
+sub _parent {
+  my ($tree) = @_;
+  return $tree->[3] if $tree->[0] eq 'tag';
+  return $tree->[2] if $tree->[0] eq 'text';
+  return undef if $tree->[0] eq 'root';
+}
+
 sub _pc {
-  my ($class, $args, $current, $tree) = @_;
+  my ($class, $args, $current, $tree, $scope) = @_;
 
   # ":scope"
-  return $current->[0] eq 'root' || $current eq $tree if $class eq 'scope';
+  return $current eq $scope if $class eq 'scope';
 
   # ":checked"
   return exists $current->[2]{checked} || exists $current->[2]{selected}
     if $class eq 'checked';
 
   # ":not"
-  return !_match($args, $current, $current) if $class eq 'not';
+  return !_match($args, $current, $current, $scope) if $class eq 'not';
 
   # ":matches"
-  return !!_match($args, $current, $current) if $class eq 'matches';
+  return !!_match($args, $current, $current, $scope) if $class eq 'matches';
 
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
@@ -231,10 +273,22 @@ sub _pc {
   return undef;
 }
 
-sub _scope { $_[0] && $_[0][0][0] eq 'pc' && $_[0][0][1] eq 'scope' }
+sub _root {
+  my ($tree) = @_;
+  $tree = _parent($tree) while $tree->[0] ne 'root';
+  return $tree;
+}
 
 sub _select {
-  my ($one, $tree, $group) = @_;
+  my ($one, $scope, $group) = @_;
+
+  my $tree = $scope;
+  if (grep { _absolute($_) } @$group) {
+    # If any of the selectors are absolutely scoped, we need to search
+    # the whole tree; not just the current subtree.
+    $group = _absolutize($group);
+    $tree = _root($scope)
+  }
 
   my @results;
   my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
@@ -242,7 +296,7 @@ sub _select {
     next unless $current->[0] eq 'tag';
 
     unshift @queue, @$current[4 .. $#$current];
-    next unless _match($group, $current, $tree);
+    next unless _match($group, $current, $tree, $scope);
     $one ? return $current : push @results, $current;
   }
 
@@ -250,7 +304,7 @@ sub _select {
 }
 
 sub _selector {
-  my ($selector, $current, $tree) = @_;
+  my ($selector, $current, $tree, $scope) = @_;
 
   for my $s (@$selector) {
     my $type = $s->[0];
@@ -266,7 +320,7 @@ sub _selector {
 
     # Pseudo-class
     elsif ($type eq 'pc') {
-      return undef unless _pc(@$s[1, 2], $current, $tree);
+      return undef unless _pc(@$s[1, 2], $current, $tree, $scope);
     }
 
     # Invalid selector
@@ -277,17 +331,17 @@ sub _selector {
 }
 
 sub _sibling {
-  my ($selectors, $current, $tree, $immediate, $pos) = @_;
+  my ($selectors, $current, $tree, $scope, $immediate, $pos) = @_;
 
   my $found;
   for my $sibling (@{_siblings($current)}) {
     return $found if $sibling eq $current;
 
     # "+" (immediately preceding sibling)
-    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $pos) }
+    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $scope, $pos) }
 
     # "~" (preceding sibling)
-    else { return 1 if _combinator($selectors, $sibling, $tree, $pos) }
+    else { return 1 if _combinator($selectors, $sibling, $tree, $scope, $pos) }
   }
 
   return undef;
@@ -452,6 +506,18 @@ An C<E> element, root of the document.
 
   my $root = $css->select(':root');
 
+=head2 E:scope
+
+An C<E> element, which acts as the current scope of the traversal - i.e. the top
+of L</"tree">.
+
+  my $element = $css->select(':scope + p');
+  my $element = $css->select('a:not(:scope > a)')
+
+This selector is part of
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
+
 =head2 E:nth-child(n)
 
 An C<E> element, the C<n-th> child of its parent.
@@ -612,17 +678,23 @@ An C<F> element child of an C<E> element.
 
   my $headlines = $css->select('html > body > div > h1');
 
+If E is empty, E is implicitly set to L<:scope|/"E:scope">.
+
 =head2 E + F
 
 An C<F> element immediately preceded by an C<E> element.
 
   my $second = $css->select('h1 + h2');
 
+If E is empty, E is implicitly set to L<:scope|/"E:scope">.
+
 =head2 E ~ F
 
 An C<F> element preceded by an C<E> element.
 
   my $second = $css->select('h1 ~ h2');
+
+If E is empty, E is implicitly set to L<:scope|/"E:scope">.
 
 =head2 E, F, G
 

@@ -1288,7 +1288,8 @@ is $dom->at('#♥ + *:nth-last-child(2)')->text,        'F', 'right text';
 is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
 
 # Scoped selectors
-$dom = Mojo::DOM::->new(<<EOF);
+$dom = Mojo::DOM->new(<<EOF);
+<p>Zero</p>
 <div>
   <p>One</p>
   <p>Two</p>
@@ -1298,22 +1299,34 @@ $dom = Mojo::DOM::->new(<<EOF);
   <p>Three</p>
   <p>Four</p>
 </div>
+<p>Five</p>
 EOF
+
+is $dom->at('div p')->at(':scope')->text, 'One', 'right text';
 is $dom->at('div')->at(':scope p')->text, 'One', 'right text';
 is $dom->at('div')->at(':scope > p')->text, 'One', 'right text';
 is $dom->at('div')->at('> p')->text, 'One', 'right text';
+is $dom->at('div p')->at('+ p')->text, 'Two', 'right text';
+is $dom->at('div p')->at('~ p')->text, 'Two', 'right text';
+is $dom->at('div p')->at('~ p a')->text, 'Link', 'right text';
 is $dom->at('div')->at(':scope a')->text, 'Link', 'right text';
 ok !$dom->at('div')->at(':scope > a'), 'not a child';
 is $dom->at('div')->at(':scope > p > a')->text, 'Link','right text';
 is $dom->find('div')->last->at(':scope p')->text, 'Three', 'right text';
 is $dom->find('div')->last->at(':scope > p')->text, 'Three', 'right text';
 is $dom->find('div')->last->at('> p')->text, 'Three', 'right text';
-TODO: {
-  local $TODO = 'sibling :scope selectors are a work in progress';
-  #is $dom->at('p')->at(':scope + p')->text, 'Two', 'right text';
-  ok $dom->at('p')->at(':scope + p'), 'right text';
-}
-
+is $dom->at('div p')->at(':scope + p')->text, 'Two', 'right text';
+is $dom->at('div')->at(':scope > p:nth-child(2), p a')->text, 'Two', "don't prioritize non-scoped selector";
+is $dom->at('div')->at('p, :scope > p:nth-child(2)')->text, 'One', "don't prioritize scoped selector";
+is $dom->at('div')->at('p:not(:scope > *)')->text, 'Zero', "scope inside functional selector";
+is $dom->at('div p:nth-child(2)')->at('*:matches(:scope)')->text, 'Two', "scope inside functional selector";
+is $dom->at('div')->at('div p, ~ p')->text, 'Five', 'absolutization';
+is $dom->at('> p')->text, 'Zero', 'scope from root';
+is $dom->at(':scope p')->text, 'Zero', 'scope from root';
+is $dom->at(':scope div p')->text, 'One', 'scope from root';
+is $dom->at(':scope p a')->text, 'Link', 'scope from root';
+is $dom->at('> p')->at('p ~ :scope'), undef, 'nonexistent element before scope';
+is $dom->at('> p:last-child')->at('p ~ :scope')->text, 'Five', 'element before scope';
 
 # Adding nodes
 $dom = Mojo::DOM->new(<<EOF);

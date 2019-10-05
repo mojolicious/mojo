@@ -58,6 +58,16 @@ my $obj = Mojo::RoleTest->new(name => 'Ted');
 is $obj->name,  'Ted',       'attribute';
 is $obj->hello, 'hello Ted', 'method';
 
+# Empty roles
+my $fred = Mojo::RoleTest->with_roles()->new(name => 'Fred');
+is $fred->name,  'Fred',       'attribute';
+is $fred->hello, 'hello Fred', 'method';
+
+# Empty object roles
+my $obj_empty = $obj->with_roles();
+is $obj_empty->name,  'Ted',       'attribute';
+is $obj_empty->hello, 'hello Ted', 'method';
+
 # Single role
 my $obj2 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::LOUD')->new;
 is $obj2->hello, 'HEY! BOB!!!', 'role method';

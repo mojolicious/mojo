@@ -303,7 +303,7 @@ sub _unescape {
   $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack 'U', hex $1/ge;
 
   # Remove backslash
-  $value =~ s/\\//g;
+  $value =~ y/\\//d;
 
   return $value;
 }

@@ -28,6 +28,13 @@ get '/etag' => sub {
     : $c->render(text => 'I ♥ Mojolicious!');
 };
 
+get '/etag_weak' => sub {
+  my $c = shift;
+  $c->is_fresh(etag => 'W/"abc"')
+    ? $c->rendered(304)
+    : $c->render(text => 'I ♥ Mojolicious!');
+};
+
 get '/asset' => sub {
   my $c   = shift;
   my $mem = Mojo::Asset::Memory->new->add_chunk('I <3 Assets!');
@@ -46,7 +53,19 @@ my $c = $t->app->build_controller;
 ok !$c->is_fresh, 'content is stale';
 $c->res->headers->etag('"abc"');
 $c->req->headers->if_none_match('"abc"');
-ok $c->is_fresh, 'content is fresh';
+ok $c->is_fresh, 'content is fresh (strong If-None-Match + strong ETag)';
+$c->res->headers->etag('W/"abc"');
+ok $c->is_fresh, 'content is fresh (strong If-None-Match + weak ETag)';
+$c->req->headers->if_none_match('W/"abc"');
+ok $c->is_fresh, 'content is fresh (weak If-None-Match + weak ETag)';
+$c->res->headers->etag('"abc"');
+ok !$c->is_fresh, 'content is not fresh (weak If-None-Match + strong ETag)';
+$c->res->headers->etag('"abc"');
+$c->req->headers->if_none_match('"fooie"', 'W/"abc"');
+ok !$c->is_fresh, 'content is not fresh (multiple If-None-Match + strong ETag)';
+$c->res->headers->etag('W/"abc"');
+$c->req->headers->if_none_match('W/"fooie"', '"abc"');
+ok $c->is_fresh, 'content is fresh (multiple If-None-Match + weak ETag)';
 
 # Freshness (Last-Modified)
 $c = $t->app->build_controller;
@@ -183,10 +202,22 @@ $t->post_ok('/hello4.txt')->status_is(200)
 # Fresh content
 $t->get_ok('/etag')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is(ETag => '"abc"')->content_is('I ♥ Mojolicious!');
+$t->get_ok('/etag_weak')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is(ETag => 'W/"abc"')
+  ->content_is('I ♥ Mojolicious!');
+$t->get_ok('/etag' => {'If-None-Match' => 'W/"abc"'})->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is(ETag => '"abc"')
+  ->content_is('I ♥ Mojolicious!');
 
 # Stale content
 $t->get_ok('/etag' => {'If-None-Match' => '"abc"'})->status_is(304)
   ->header_is(Server => 'Mojolicious (Perl)')->header_is(ETag => '"abc"')
+  ->content_is('');
+$t->get_ok('/etag_weak' => {'If-None-Match' => '"abc"'})->status_is(304)
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is(ETag => 'W/"abc"')
+  ->content_is('');
+$t->get_ok('/etag_weak' => {'If-None-Match' => 'W/"abc"'})->status_is(304)
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is(ETag => 'W/"abc"')
   ->content_is('');
 
 # Fresh asset

@@ -508,6 +508,7 @@ Alias for L<Mojolicious::Controller/"render_to_string">.
 
   my $bool = $c->is_fresh;
   my $bool = $c->is_fresh(etag => 'abc');
+  my $bool = $c->is_fresh(etag => 'W/"def"');
   my $bool = $c->is_fresh(last_modified => $epoch);
 
 Check freshness of request by comparing the C<If-None-Match> and

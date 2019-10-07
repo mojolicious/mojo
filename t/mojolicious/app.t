@@ -457,6 +457,11 @@ my $etag = $t->tx->res->headers->etag;
 $t->get_ok('/hello.txt' => {'If-None-Match' => $etag})->status_is(304)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('');
 
+# Check weak If-None-Match against strong ETag
+$t->get_ok('/hello.txt' => {'If-None-Match' => qq{W/"$etag"}})->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Hello Mojo from a development static file!/);
+
 # Check If-None-Match and If-Last-Modified
 $t->get_ok(
   '/hello.txt' => {'If-None-Match' => $etag, 'If-Last-Modified' => $mtime})

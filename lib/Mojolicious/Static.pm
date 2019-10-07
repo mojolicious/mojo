@@ -62,7 +62,7 @@ sub is_fresh {
   my $res_headers = $c->res->headers;
   my ($last, $etag) = @$options{qw(last_modified etag)};
   $res_headers->last_modified(Mojo::Date->new($last)->to_string) if $last;
-  $res_headers->etag($etag = qq{"$etag"}) if $etag;
+  $res_headers->etag($etag = ($etag =~ m!^W/"! ? $etag : qq{"$etag"})) if $etag;
 
   # Unconditional
   my $req_headers = $c->req->headers;
@@ -71,7 +71,9 @@ sub is_fresh {
 
   # If-None-Match
   $etag //= $res_headers->etag // '';
-  return undef if $match && !grep { trim($_) eq $etag } split ',', $match;
+  return undef
+    if $match && !grep { $_ eq $etag || "W/$_" eq $etag }
+    map { trim($_) } split ',', $match;
 
   # If-Modified-Since
   return !!$match unless ($last //= $res_headers->last_modified) && $since;
@@ -242,6 +244,7 @@ traversing to parent directories.
 =head2 is_fresh
 
   my $bool = $static->is_fresh(Mojolicious::Controller->new, {etag => 'abc'});
+  my $bool = $static->is_fresh(Mojolicious::Controller->new, {etag => 'W/"def"'});
 
 Check freshness of request by comparing the C<If-None-Match> and
 C<If-Modified-Since> request headers to the C<ETag> and C<Last-Modified>

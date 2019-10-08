@@ -332,7 +332,7 @@ is $p->size, 1, 'right number of elements';
 my @p;
 @div = ();
 $dom->find('div')->each(sub { push @div, $_->attr('id') });
-$dom->find('p')->each(sub   { push @p,   $_->attr('id') });
+$dom->find('p')->each(sub { push @p, $_->attr('id') });
 is_deeply \@p, [qw(foo bar)], 'found all p elements';
 my $ids = [qw(container header logo buttons buttons content)];
 is_deeply \@div, $ids, 'found all div elements';
@@ -1302,31 +1302,36 @@ $dom = Mojo::DOM->new(<<EOF);
 <p>Five</p>
 EOF
 
-is $dom->at('div p')->at(':scope')->text, 'One', 'right text';
-is $dom->at('div')->at(':scope p')->text, 'One', 'right text';
-is $dom->at('div')->at(':scope > p')->text, 'One', 'right text';
-is $dom->at('div')->at('> p')->text, 'One', 'right text';
-is $dom->at('div p')->at('+ p')->text, 'Two', 'right text';
-is $dom->at('div p')->at('~ p')->text, 'Two', 'right text';
-is $dom->at('div p')->at('~ p a')->text, 'Link', 'right text';
-is $dom->at('div')->at(':scope a')->text, 'Link', 'right text';
+is $dom->at('div p')->at(':scope')->text,   'One',  'right text';
+is $dom->at('div')->at(':scope p')->text,   'One',  'right text';
+is $dom->at('div')->at(':scope > p')->text, 'One',  'right text';
+is $dom->at('div')->at('> p')->text,        'One',  'right text';
+is $dom->at('div p')->at('+ p')->text,      'Two',  'right text';
+is $dom->at('div p')->at('~ p')->text,      'Two',  'right text';
+is $dom->at('div p')->at('~ p a')->text,    'Link', 'right text';
+is $dom->at('div')->at(':scope a')->text,   'Link', 'right text';
 ok !$dom->at('div')->at(':scope > a'), 'not a child';
-is $dom->at('div')->at(':scope > p > a')->text, 'Link','right text';
-is $dom->find('div')->last->at(':scope p')->text, 'Three', 'right text';
+is $dom->at('div')->at(':scope > p > a')->text, 'Link', 'right text';
+is $dom->find('div')->last->at(':scope p')->text,   'Three', 'right text';
 is $dom->find('div')->last->at(':scope > p')->text, 'Three', 'right text';
-is $dom->find('div')->last->at('> p')->text, 'Three', 'right text';
+is $dom->find('div')->last->at('> p')->text,        'Three', 'right text';
 is $dom->at('div p')->at(':scope + p')->text, 'Two', 'right text';
-is $dom->at('div')->at(':scope > p:nth-child(2), p a')->text, 'Two', "don't prioritize non-scoped selector";
-is $dom->at('div')->at('p, :scope > p:nth-child(2)')->text, 'One', "don't prioritize scoped selector";
-is $dom->at('div')->at('p:not(:scope > *)')->text, 'Zero', "scope inside functional selector";
-is $dom->at('div p:nth-child(2)')->at('*:matches(:scope)')->text, 'Two', "scope inside functional selector";
+is $dom->at('div')->at(':scope > p:nth-child(2), p a')->text, 'Two',
+  "don't prioritize non-scoped selector";
+is $dom->at('div')->at('p, :scope > p:nth-child(2)')->text, 'One',
+  "don't prioritize scoped selector";
+is $dom->at('div')->at('p:not(:scope > *)')->text, 'Zero',
+  "scope inside functional selector";
+is $dom->at('div p:nth-child(2)')->at('*:matches(:scope)')->text, 'Two',
+  "scope inside functional selector";
 is $dom->at('div')->at('div p, ~ p')->text, 'Five', 'absolutization';
-is $dom->at('> p')->text, 'Zero', 'scope from root';
-is $dom->at(':scope p')->text, 'Zero', 'scope from root';
-is $dom->at(':scope div p')->text, 'One', 'scope from root';
-is $dom->at(':scope p a')->text, 'Link', 'scope from root';
+is $dom->at('> p')->text,          'Zero', 'scope from root';
+is $dom->at(':scope p')->text,     'Zero', 'scope from root';
+is $dom->at(':scope div p')->text, 'One',  'scope from root';
+is $dom->at(':scope p a')->text,   'Link', 'scope from root';
 is $dom->at('> p')->at('p ~ :scope'), undef, 'nonexistent element before scope';
-is $dom->at('> p:last-child')->at('p ~ :scope')->text, 'Five', 'element before scope';
+is $dom->at('> p:last-child')->at('p ~ :scope')->text, 'Five',
+  'element before scope';
 
 # Adding nodes
 $dom = Mojo::DOM->new(<<EOF);

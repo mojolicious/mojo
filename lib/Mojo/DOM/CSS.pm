@@ -19,7 +19,9 @@ my $ATTR_RE   = qr/
 
 sub matches {
   my $tree = shift->tree;
-  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree, _root($tree));
+  return $tree->[0] ne 'tag'
+    ? undef
+    : _match(_compile(@_), $tree, $tree, _root($tree));
 }
 
 sub select     { _select(0, shift->tree, _compile(@_)) }
@@ -41,8 +43,9 @@ sub _absolute {
 
       # If the arguments of a functional pseudoclass are
       # absolute, the selector is absolute.
-      return 1 if ($pc->[1] eq 'not' || $pc->[1] eq 'matches')
-               && grep { _absolute($_) } @{$pc->[2]};
+      return 1
+        if ($pc->[1] eq 'not' || $pc->[1] eq 'matches')
+        && grep { _absolute($_) } @{$pc->[2]};
     }
   }
   return undef;
@@ -51,18 +54,17 @@ sub _absolute {
 sub _absolutize {
   my ($group) = @_;
 
-  return [map {
-    _absolute($_) ? $_ : [[['pc', 'scope', []]], ' ', @$_]
-  } @$group];
+  return [map { _absolute($_) ? $_ : [[['pc', 'scope', []]], ' ', @$_] }
+      @$group];
 }
 
 sub _ancestor {
   my ($selectors, $current, $tree, $scope, $one, $pos) = @_;
 
   while ($current ne $scope and $current = _parent($current)) {
-    return 1     if _combinator($selectors, $current, $tree, $scope, $pos);
+    return 1 if _combinator($selectors, $current, $tree, $scope, $pos);
     return undef if $current eq $scope;
-    last         if $one;
+    last if $one;
   }
 
   return undef;
@@ -191,7 +193,8 @@ sub _equation {
 
 sub _match {
   my ($group, $current, $tree, $scope) = @_;
-  _combinator([reverse @$_], $current, $tree, $scope, 0) and return 1 for @$group;
+  _combinator([reverse @$_], $current, $tree, $scope, 0) and return 1
+    for @$group;
   return undef;
 }
 
@@ -216,7 +219,7 @@ sub _parent {
   my ($tree) = @_;
   return $tree->[3] if $tree->[0] eq 'tag';
   return $tree->[2] if $tree->[0] eq 'text';
-  return undef if $tree->[0] eq 'root';
+  return undef      if $tree->[0] eq 'root';
 }
 
 sub _pc {
@@ -284,10 +287,11 @@ sub _select {
 
   my $tree = $scope;
   if (grep { _absolute($_) } @$group) {
+
     # If any of the selectors are absolutely scoped, we need to search
     # the whole tree; not just the current subtree.
     $group = _absolutize($group);
-    $tree = _root($scope)
+    $tree  = _root($scope);
   }
 
   my @results;
@@ -338,7 +342,9 @@ sub _sibling {
     return $found if $sibling eq $current;
 
     # "+" (immediately preceding sibling)
-    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $scope, $pos) }
+    if ($immediate) {
+      $found = _combinator($selectors, $sibling, $tree, $scope, $pos);
+    }
 
     # "~" (preceding sibling)
     else { return 1 if _combinator($selectors, $sibling, $tree, $scope, $pos) }

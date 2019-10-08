@@ -342,7 +342,7 @@ L<Mojo::DOM>.
 
   # Include application
   use Mojo::File 'curfile';
-  require curfile->dirname->sibling('myapp.pl');
+  require(curfile->dirname->sibling('myapp.pl'));
 
   # Allow 302 redirect responses
   my $t = Test::Mojo->new;

@@ -186,9 +186,9 @@ Any member of the core team can call for a vote to decide about the addition and
 modification of features (usually with a GitHub comment mentioning the team
 C<@mojolicious/core> and the C<vote> label).
 
-For GitHub pull requests, additionally anyone who has had one of their pull
-requests previously accepted can call for a vote with a GitHub comment of the
-form C<Calling for a vote @mojolicious/core>.
+Additionally for GitHub pull requests, everyone who has had one of their pull
+requests accepted previously (C<Contributor>) can call for a vote with a GitHub
+comment of the form C<Calling for a vote @mojolicious/core>.
 
 A feature can be added or modified when at least 3 voting members of the core
 team have cast a vote in favour, or the BDFL overruled the vote.
@@ -214,7 +214,8 @@ Votes should be public if possible, so non-members can participate as well.
 Non-members that regularly have a positive impact on decisions and participate
 in IRC discussions should be considered for core team membership.
 
-Sebastian has veto rights on all decisions.
+Sebastian has veto rights on all decisions and will resolve issues that could
+not be decided with a vote.
 
 =back
 

@@ -36,9 +36,9 @@ activity it will get reopened just as quickly.
 
 =head2 Reporting security issues
 
-Please report security issues directly to the pumpkin-holder via email, which is
-currently Sebastian Riedel (C<kraih@mojolicious.org>), and give us a few days to
-develop and release a proper fix.
+Please report security issues directly to Sebastian Riedel
+(C<kraih@mojolicious.org>), and give us a few days to develop and release a
+proper fix.
 
 =head1 RESOLVING ISSUES
 
@@ -191,7 +191,7 @@ requests previously accepted can call for a vote with a GitHub comment of the
 form C<Calling for a vote @mojolicious/core>.
 
 A feature can be added or modified when at least 3 voting members of the core
-team have cast a vote in favour, or the pumpkin-holder overruled the vote.
+team have cast a vote in favour, or the BDFL overruled the vote.
 
 A vote ends once enough votes have been cast, or after a 14 day review period
 has passed. Any non-trivial changes (more than a typo fix) will invalidate the
@@ -214,9 +214,7 @@ Votes should be public if possible, so non-members can participate as well.
 Non-members that regularly have a positive impact on decisions and participate
 in IRC discussions should be considered for core team membership.
 
-The pumpkin-holder, which is currently Sebastian Riedel
-(C<kraih@mojolicious.org>), has veto rights on all decisions and may select
-their successor.
+Sebastian has veto rights on all decisions.
 
 =back
 

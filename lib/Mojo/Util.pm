@@ -36,18 +36,18 @@ use constant {
 };
 
 # To generate a new HTML entity table run this command
-# perl examples/entities.pl
+# perl examples/entities.pl > lib/Mojo/resources/html_entities.txt
 my %ENTITIES;
 {
   # Don't use Mojo::File here due to circular dependencies
-  my $html_path = File::Spec->catfile(dirname(__FILE__),
-    'resources', 'html_entities.txt');
+  my $path
+    = File::Spec->catfile(dirname(__FILE__), 'resources', 'html_entities.txt');
 
-  open my $html_fh, '<', $html_path
-    or croak "Unable to open html entities file ($html_path): $!";
-  my $entity_lines = do { local $/; <$html_fh> };
+  open my $file, '<', $path
+    or croak "Unable to open html entities file ($path): $!";
+  my $lines = do { local $/; <$file> };
 
-  for my $line (split "\n", $entity_lines) {
+  for my $line (split "\n", $lines) {
     next unless $line =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
     $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
   }

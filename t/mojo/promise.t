@@ -213,6 +213,69 @@ Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promises not resolved';
 is_deeply \@errors, ['second'], 'promise rejected';
 
+# All Settled
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+@results  = ();
+Mojo::Promise->all_settled($promise2, $promise, $promise3)
+  ->then(sub { @results = @_ });
+$promise2->resolve('second');
+$promise3->resolve('third');
+$promise->resolve('first');
+Mojo::IOLoop->one_tick;
+is_deeply(
+  \@results,
+  [
+    {status => 'fulfilled', value => ['second']},
+    {status => 'fulfilled', value => ['first']},
+    {status => 'fulfilled', value => ['third']},
+  ],
+  'promises fulfilled'
+);
+
+# All Settled some rejected
+$promise  = Mojo::Promise->new->timer(0.1 => 'first');
+$promise2 = Mojo::Promise->new(sub {
+  my ($resolve, $reject) = @_;
+  Mojo::IOLoop->timer(0.2 => sub { $reject->('second') });
+});
+$promise3 = Mojo::Promise->new->timer(0.3 => 'third');
+@results  = ();
+Mojo::Promise->all_settled($promise2, $promise3, $promise)
+  ->then(sub { @results = @_ })->wait;
+is_deeply(
+  \@results,
+  [
+    {status => 'rejected',  reason => ['second']},
+    {status => 'fulfilled', value  => ['third']},
+    {status => 'fulfilled', value  => ['first']},
+  ],
+  'promises mixed'
+);
+
+# All Settled all rejected
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+@results  = ();
+Mojo::Promise->all_settled($promise2, $promise, $promise3)
+  ->then(sub { @results = @_ });
+$promise2->reject('second');
+$promise3->reject('third');
+$promise->reject('first');
+Mojo::IOLoop->one_tick;
+is_deeply(
+  \@results,
+  [
+    {status => 'rejected', reason => ['second']},
+    {status => 'rejected', reason => ['first']},
+    {status => 'rejected', reason => ['third']},
+  ],
+  'promises rejected'
+);
+
+
 # Timeout
 (@errors, @results) = @_;
 $promise  = Mojo::Promise->timeout(0.25 => 'Timeout1');

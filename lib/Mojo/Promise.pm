@@ -26,6 +26,28 @@ sub all {
   return $all;
 }
 
+sub all_settled {
+  my ($class, @promises) = @_;
+
+  my $all_settled = $promises[0]->clone;
+  my $results     = [];
+  my $remaining   = scalar @promises;
+  for my $i (0 .. $#promises) {
+    $promises[$i]->then(
+      sub {
+        $results->[$i] = {status => 'fulfilled', value => [@_]};
+        $all_settled->resolve(@$results) if --$remaining <= 0;
+      },
+      sub {
+        $results->[$i] = {status => 'rejected', reason => [@_]};
+        $all_settled->resolve(@$results) if --$remaining <= 0;
+      }
+    );
+  }
+
+  return $all_settled;
+}
+
 sub catch { shift->then(undef, shift) }
 
 sub clone { $_[0]->new->ioloop($_[0]->ioloop) }
@@ -287,6 +309,40 @@ passed L<Mojo::Promise> objects have fulfilled or rejects as soon as one of them
 rejects. If the returned promise fulfills, it is fulfilled with the values from
 the fulfilled promises in the same order as the passed promises. This method can
 be useful for aggregating results of multiple promises.
+
+=head2 all_settled
+
+  # create two pending promises
+  my $promise_1 = Mojo::Promise->new(sub ($resolve, $reject) {
+    Mojo::IOLoop->timer(0.5 => sub { $resolve->(3) });
+  });
+  my $promise_2 = Mojo::Promise->new(sub ($resolve, $reject) {
+    Mojo::IOLoop->timer(0.1 => sub { $reject->('foo') });
+  });
+
+  # create new promise
+  my $new = Mojo::Promise->all_settled($promise_1, $promise_2);
+
+  # check the status of promises
+  $new->then(sub (@results) {
+    for my $result (@results) {
+      say "$result->{status}: $result->{value}[0]"
+        if $result->{status} eq 'fulfilled';
+      say "$result->{status}: $result->{reason}[0]"
+        if $result->{status} eq 'rejected';
+    }
+  })->wait;
+
+Returns a new L<Mojo::Promise> object that fulfills when all of the
+passed L<Mojo::Promise> objects have either fulfilled or rejected.
+
+It is fulfilled with the list of hash references that each describes
+the outcome of each promise. Each hash has a C<status> key. If the C<status>
+is fulfilled, then a C<value> key is present. If the status is rejected,
+then a C<reason> key is present. The C<value> (or C<reason>) reflects what value
+each promise was fulfilled (or rejected) with.
+This method can be useful for aggregating results of multiple promises.
+Note that this method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 catch
 

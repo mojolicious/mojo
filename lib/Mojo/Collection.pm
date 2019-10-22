@@ -6,7 +6,6 @@ use Carp 'croak';
 use Exporter 'import';
 use List::Util;
 use Mojo::ByteStream;
-use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');
@@ -77,13 +76,6 @@ sub reverse { $_[0]->new(reverse @{$_[0]}) }
 sub shuffle { $_[0]->new(List::Util::shuffle @{$_[0]}) }
 
 sub size { scalar @{$_[0]} }
-
-# DEPRECATED!
-sub slice {
-  deprecated 'Mojo::Collection::slice is DEPRECATED';
-  my $self = shift;
-  return $self->new(@$self[@_]);
-}
 
 sub sort {
   my ($self, $cb) = @_;

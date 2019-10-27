@@ -172,7 +172,8 @@ sub new {
   $r->hide(qw(stash tx url_for write write_chunk));
 
   $self->plugin($_)
-    for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
+    for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer),
+    split ';', $ENV{MOJO_PLUGINS} || '';
 
   # Exception handling should be first in chain
   $self->hook(around_dispatch => \&_exception);

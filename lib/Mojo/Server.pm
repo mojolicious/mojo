@@ -35,7 +35,7 @@ sub daemonize {
   # Close filehandles
   open STDIN,  '<',  '/dev/null';
   open STDOUT, '>',  '/dev/null';
-  open STDERR, '>&', STDOUT;
+  open STDERR, '>&', *STDOUT;
 }
 
 sub load_app {

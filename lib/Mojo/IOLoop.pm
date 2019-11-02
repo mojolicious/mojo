@@ -126,7 +126,7 @@ sub server {
   return $self->acceptor($server);
 }
 
-sub singleton { state $loop = shift->SUPER::new }
+sub singleton { state $loop = shift->new }
 
 sub start {
   my $self = _instance(shift);

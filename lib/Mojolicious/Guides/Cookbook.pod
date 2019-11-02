@@ -1014,21 +1014,6 @@ other event loops like L<AnyEvent> to just work.
 
   app->start;
 
-Who actually controls the event loop backend is not important.
-
-  use Mojo::UserAgent;
-  use EV;
-  use AnyEvent;
-
-  # Search MetaCPAN for "mojolicious"
-  my $cv = AE::cv;
-  my $ua = Mojo::UserAgent->new;
-  $ua->get('fastapi.metacpan.org/v1/module/_search?q=mojolicious' => sub {
-    my ($ua, $tx) = @_;
-    $cv->send($tx->result->json('/hits/hits/0/_source/release'));
-  });
-  say $cv->recv;
-
 =head1 USER AGENT
 
 When we say L<Mojolicious> is a web framework we actually mean it, with

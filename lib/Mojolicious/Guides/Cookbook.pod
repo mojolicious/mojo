@@ -1029,25 +1029,6 @@ Who actually controls the event loop backend is not important.
   });
   say $cv->recv;
 
-You could, for example, just embed the built-in web server into an L<AnyEvent>
-application.
-
-  use Mojolicious::Lite;
-  use Mojo::Server::Daemon;
-  use EV;
-  use AnyEvent;
-
-  # Normal action
-  get '/' => {text => 'Hello World!'};
-
-  # Connect application with web server and start accepting connections
-  my $daemon
-    = Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
-  $daemon->start;
-
-  # Let AnyEvent take control
-  AE::cv->recv;
-
 =head1 USER AGENT
 
 When we say L<Mojolicious> is a web framework we actually mean it, with

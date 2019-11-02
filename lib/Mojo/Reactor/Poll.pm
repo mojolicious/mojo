@@ -91,7 +91,9 @@ sub remove {
   return !!delete $self->{io}{fileno($remove) // croak 'Handle is closed'};
 }
 
-sub reset { delete @{shift()}{qw(events io next_tick next_timer timers)} }
+sub reset {
+  delete @{shift()}{qw(events io next_tick next_timer running timers)};
+}
 
 sub start {
   my $self = shift;

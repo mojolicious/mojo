@@ -9,6 +9,7 @@ plan skip_all => 'set TEST_SUBPROCESS to enable this test (developer only!)'
 
 use Mojo::IOLoop;
 use Mojo::IOLoop::Subprocess;
+use Mojo::Promise;
 use Mojo::File 'tempfile';
 
 # Huge result
@@ -80,6 +81,29 @@ $subprocess->run(
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is $result, 23, 'right result';
+
+# Event loop in subprocess (already running event loop)
+($fail, $result) = ();
+Mojo::IOLoop->next_tick(sub {
+  Mojo::IOLoop->subprocess(
+    sub {
+      my $result;
+      my $promise = Mojo::Promise->new;
+      $promise->then(sub          { $result = shift });
+      Mojo::IOLoop->next_tick(sub { $promise->resolve(25) });
+      $promise->wait;
+      return $result;
+    },
+    sub {
+      my ($subprocess, $err, $twenty_five) = @_;
+      $fail   = $err;
+      $result = $twenty_five;
+    }
+  );
+});
+Mojo::IOLoop->start;
+ok !$fail, 'no error';
+is $result, 25, 'right result';
 
 # Concurrent subprocesses
 ($fail, $result) = ();

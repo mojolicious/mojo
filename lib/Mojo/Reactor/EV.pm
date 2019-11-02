@@ -13,16 +13,22 @@ sub again {
   $timer->{watcher}->again;
 }
 
-sub is_running { !!EV::depth }
-
 # We have to fall back to Mojo::Reactor::Poll, since EV is unique
 sub new { $EV++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
 
-sub one_tick { EV::run(EV::RUN_ONCE) }
+sub one_tick {
+  my $self = shift;
+  local $self->{running} = 1 unless $self->{running};
+  EV::run(EV::RUN_ONCE);
+}
 
 sub recurring { shift->_timer(1, @_) }
 
-sub start {EV::run}
+sub start {
+  my $self = shift;
+  local $self->{running} = 1 unless $self->{running};
+  EV::run;
+}
 
 sub stop { EV::break(EV::BREAK_ALL) }
 
@@ -127,12 +133,6 @@ implements the following new ones.
   $reactor->again($id);
 
 Restart timer. Note that this method requires an active timer.
-
-=head2 is_running
-
-  my $bool = $reactor->is_running;
-
-Check if reactor is running.
 
 =head2 new
 

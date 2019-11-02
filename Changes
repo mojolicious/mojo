@@ -1,7 +1,9 @@
 
-8.26  2019-10-22
+8.26  2019-11-02
   - Removed deprecated slice method from Mojo::Collection.
   - Moved HTML entities from Mojo::Util into a separate file. (rage311)
+  - Changed how the state of the event loop is determined in Mojo::Reactor::EV
+    to be more consistent with Mojo::Reactor::Poll.
 
 8.25  2019-09-29
   - Added curfile function to Mojo::File. (Grinnz)

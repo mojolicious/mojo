@@ -1,4 +1,6 @@
 
+8.27  2019-11-03
+
 8.26  2019-11-02
   - Removed deprecated slice method from Mojo::Collection.
   - Moved HTML entities from Mojo::Util into a separate file. (rage311)

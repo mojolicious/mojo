@@ -153,6 +153,7 @@ sub tap {
 sub with_roles {
   Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
   my ($self, @roles) = @_;
+  return $self unless @roles;
 
   return Role::Tiny->create_class_with_roles($self,
     map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles)

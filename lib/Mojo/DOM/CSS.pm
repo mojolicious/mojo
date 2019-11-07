@@ -219,7 +219,6 @@ sub _parent {
   my ($tree) = @_;
   return $tree->[3] if $tree->[0] eq 'tag';
   return $tree->[2] if $tree->[0] eq 'text';
-  return undef      if $tree->[0] eq 'root';
 }
 
 sub _pc {

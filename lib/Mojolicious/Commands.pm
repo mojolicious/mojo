@@ -52,7 +52,7 @@ sub run {
 
     # Run command
     my $app     = $self->app;
-    my $command = $module->new(app => $self->app);
+    my $command = $module->new(app => $app);
     return $command->help(@args) if $help;
     $app->plugins->emit_hook(before_command => $command, \@args);
     return $command->run(@args);

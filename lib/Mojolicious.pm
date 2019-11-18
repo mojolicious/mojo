@@ -249,6 +249,20 @@ Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
 L<Mojolicious> will emit the following hooks in the listed order.
 
+=head2 before_command
+
+Emitted right before the application runs a command through the command line
+interface. Note that this hook is B<EXPERIMENTAL> and might change without
+warning!
+
+  $app->hook(before_command => sub {
+    my ($command, $args) = @_;
+    ...
+  });
+
+Useful for reconfiguring the application before running a command or to modify
+the behavior of a command. (Passed the command object and the command arguments)
+
 =head2 before_server_start
 
 Emitted right before the application server is started, for web servers that

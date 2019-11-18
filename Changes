@@ -1,5 +1,6 @@
 
-8.27  2019-11-03
+8.27  2019-11-18
+  - Added EXPERIMENTAL before_command hook.
 
 8.26  2019-11-02
   - Removed deprecated slice method from Mojo::Collection.

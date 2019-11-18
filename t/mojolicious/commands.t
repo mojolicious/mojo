@@ -406,4 +406,22 @@ like $buffer, qr/Perl/, 'right output';
 like $buffer, qr/You might want to update your Mojolicious to 1000!/,
   'right output';
 
+# Hooks
+$app = Mojolicious->new;
+$app->hook(
+  before_command => sub {
+    my ($command, $args) = @_;
+    return unless $command->isa('Mojolicious::Command::eval');
+    $command->app->config->{test} = 'works!';
+    unshift @$args, '-v';
+  }
+);
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $app->start('eval', 'app->config->{test}');
+}
+like $buffer, qr/works!/, 'right output';
+
 done_testing();

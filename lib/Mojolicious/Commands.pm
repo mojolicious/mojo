@@ -39,7 +39,7 @@ sub run {
 
     # Help
     $name = shift @args if my $help = $name eq 'help';
-    $help = $ENV{MOJO_HELP} ||= $help;
+    local $ENV{MOJO_HELP} = $help = $ENV{MOJO_HELP} || $help;
 
     # Remove options shared by all commands before loading the command
     _args(\@args);
@@ -51,8 +51,11 @@ sub run {
       unless $module;
 
     # Run command
+    my $app     = $self->app;
     my $command = $module->new(app => $self->app);
-    return $help ? $command->help(@args) : $command->run(@args);
+    return $command->help(@args) if $help;
+    $app->plugins->emit_hook(before_command => $command, \@args);
+    return $command->run(@args);
   }
 
   # Hide list for tests

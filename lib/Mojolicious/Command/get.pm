@@ -1,6 +1,7 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojolicious::Command';
 
+use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON qw(to_json j);
@@ -108,7 +109,7 @@ sub _select {
   while (defined(my $command = shift @args)) {
 
     # Number
-    ($results = $results->slice($command)) and next if $command =~ /^\d+$/;
+    ($results = c($results->[$command])) and next if $command =~ /^\d+$/;
 
     # Text
     return _say($results->map('text')->each) if $command eq 'text';

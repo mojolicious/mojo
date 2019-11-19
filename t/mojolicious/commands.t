@@ -151,14 +151,14 @@ $buffer = '';
 }
 like $buffer, qr/Your Mojo is working!/, 'right output';
 my $template
-  = '<p><%= param "just" %> <%= $c->req->headers->header("X-Test") %></p>';
+  = '<p></p><p><%= param "just" %> <%= $c->req->headers->header("X-Test") %></p>';
 $get->app->plugins->once(
   before_dispatch => sub { shift->render(inline => $template) });
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $get->run('-f', 'just=works', '-H', 'X-Test: fine', '/html', 'p', 'text');
+  $get->run('-f', 'just=works', '-H', 'X-Test: fine', '/html', 'p', 1, 'text');
 }
 like $buffer, qr/works fine/, 'right output';
 $get->app->plugins->once(

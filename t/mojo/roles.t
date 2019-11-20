@@ -46,6 +46,11 @@ use Mojo::Base -role;
 
 sub hello {'hello mojo!'}
 
+package Mojo::RoleApplied;
+use Mojo::Base -base;
+
+__PACKAGE__->with_roles('Mojo::RoleTest::Hello', { apply_to_package => 1 } );
+
 package main;
 
 use Mojo::ByteStream;
@@ -123,6 +128,10 @@ my $dom = Mojo::DOM->with_roles('Mojo::RoleTest::Hello')->new;
 is $dom->hello, 'hello mojo!', 'right result';
 my $file = Mojo::File->with_roles('Mojo::RoleTest::Hello')->new;
 is $file->hello, 'hello mojo!', 'right result';
+
+# role applied to package, do not create a new class
+my $applied = Mojo::RoleApplied->new;
+is $applied->hello, 'hello mojo!';
 
 done_testing();
 

@@ -153,9 +153,17 @@ sub tap {
 sub with_roles {
   Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
   my ($self, @roles) = @_;
+
+  my $opts = pop @roles if ref $roles[-1];
+
   return $self unless @roles;
 
-  return Role::Tiny->create_class_with_roles($self,
+  my $method = 'create_class_with_roles';
+  if ( $opts && $opts->{apply_to_package} ) {
+    $method = 'apply_roles_to_package';
+  }
+
+  return Role::Tiny->$method($self,
     map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles)
     unless my $class = Scalar::Util::blessed $self;
 
@@ -388,6 +396,24 @@ L<Role::Tiny> (2.000001+).
   # Create a new class with the role "SubClass::Role::Foo" and instantiate it
   my $new_class = SubClass->with_roles('+Foo');
   my $object    = $new_class->new;
+
+When the last parameter passed to C<with_roles> is a hash reference, you can
+pass options. Then you can use roles and apply them to the package where
+C<with_roles> is used.
+
+  # a simple class that applies a role
+  package AppliedRoles;
+  use Mojo::Base -base;
+
+  # Logger provides a method 'log'
+  __PACKAGE__->with_roles( '+Logger', { apply_to_package => 1 } );
+  1;
+
+  # in other code
+  use AppliedRoles;
+
+  my $obj = AppliedRoles->new;
+  $obj->log( 'a message' );
 
 =head1 SEE ALSO
 

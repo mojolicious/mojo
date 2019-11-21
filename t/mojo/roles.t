@@ -46,10 +46,24 @@ use Mojo::Base -role;
 
 sub hello {'hello mojo!'}
 
-package Mojo::RoleApplied;
-use Mojo::Base -base;
+package Mojo::RoleListApplied::Role::LOUD;
+use Role::Tiny;
 
-__PACKAGE__->with_roles('Mojo::RoleTest::Hello', { apply_to_package => 1 } );
+sub yell {'HEY!'}
+
+package Mojo::RoleApplied::Role::LOUD;
+use Role::Tiny;
+
+sub yell {'HEY!'}
+
+package Mojo::RoleListApplied;
+use Mojo::Base -base, -with => ['Mojo::RoleTest::Hello', '+LOUD'];
+
+package Mojo::RoleApplied;
+use Mojo::Base -base, -with => '+LOUD';
+
+package Mojo::RolePathApplied;
+use Mojo::Base -base, -with => 'Mojo::RoleTest::Hello';
 
 package main;
 
@@ -130,8 +144,15 @@ my $file = Mojo::File->with_roles('Mojo::RoleTest::Hello')->new;
 is $file->hello, 'hello mojo!', 'right result';
 
 # role applied to package, do not create a new class
-my $applied = Mojo::RoleApplied->new;
-is $applied->hello, 'hello mojo!';
+my $list_applied = Mojo::RoleListApplied->new;
+is $list_applied->hello, 'hello mojo!';
+is $list_applied->yell, 'HEY!';
+
+my $role_applied = Mojo::RoleApplied->new;
+is $role_applied->yell, 'HEY!';
+
+my $path_applied = Mojo::RolePathApplied->new;
+is $path_applied->hello, 'hello mojo!';
 
 done_testing();
 

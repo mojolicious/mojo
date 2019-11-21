@@ -127,6 +127,18 @@ sub import {
       experimental->import('signatures');
     }
 
+    # apply role to package
+    elsif ($flag eq '-with') {
+      Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+
+      my $role_list = shift @flags;
+      my @roles = map {
+        /^\+(.+)$/ ? "${caller}::Role::$1" : $_
+      } (ref $role_list ? @{$role_list} : $role_list);
+
+      Role::Tiny->apply_roles_to_package($caller, @roles);
+    }
+
     # Module
     elsif ($flag !~ /^-/) {
       no strict 'refs';
@@ -153,17 +165,9 @@ sub tap {
 sub with_roles {
   Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
   my ($self, @roles) = @_;
-
-  my $opts = pop @roles if ref $roles[-1];
-
   return $self unless @roles;
 
-  my $method = 'create_class_with_roles';
-  if ( $opts && $opts->{apply_to_package} ) {
-    $method = 'apply_roles_to_package';
-  }
-
-  return Role::Tiny->$method($self,
+  return Role::Tiny->create_class_with_roles($self,
     map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles)
     unless my $class = Scalar::Util::blessed $self;
 
@@ -267,6 +271,11 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
 
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.
+
+If you use Roles, you can apply them to your class with C<-with>:
+
+  use Mojo::Base -with => ['Some::Role','+Logger'];
+  use Mojo::Base -with => 'Some::Role';
 
 =head1 FLUENT INTERFACES
 
@@ -392,28 +401,6 @@ returns the new class, or if called on an object reblesses the object into the
 new class. For roles following the naming scheme C<MyClass::Role::RoleName> you
 can use the shorthand C<+RoleName>. Note that role support depends on
 L<Role::Tiny> (2.000001+).
-
-  # Create a new class with the role "SubClass::Role::Foo" and instantiate it
-  my $new_class = SubClass->with_roles('+Foo');
-  my $object    = $new_class->new;
-
-When the last parameter passed to C<with_roles> is a hash reference, you can
-pass options. Then you can use roles and apply them to the package where
-C<with_roles> is used.
-
-  # a simple class that applies a role
-  package AppliedRoles;
-  use Mojo::Base -base;
-
-  # Logger provides a method 'log'
-  __PACKAGE__->with_roles( '+Logger', { apply_to_package => 1 } );
-  1;
-
-  # in other code
-  use AppliedRoles;
-
-  my $obj = AppliedRoles->new;
-  $obj->log( 'a message' );
 
 =head1 SEE ALSO
 

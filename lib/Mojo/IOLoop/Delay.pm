@@ -100,7 +100,7 @@ style.
 
   # These deep nested closures are often referred to as "Callback Hell"
   Mojo::IOLoop->timer(3 => sub {
-    my loop = shift;
+    my $loop = shift;
 
     say '3 seconds';
     Mojo::IOLoop->timer(3 => sub {

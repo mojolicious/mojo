@@ -394,7 +394,7 @@ $t->get_ok('/' => {'X-Test' => 'Hi there!'})->status_is(404)
 # Static file /another/file (no extension)
 $t->get_ok('/another/file')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_type_is('application/octet-stream')
   ->content_like(qr/Hello Mojolicious!/);
 
 # Static directory /another

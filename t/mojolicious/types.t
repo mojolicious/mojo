@@ -97,7 +97,7 @@ $t->content_type($c, {ext => 'html'});
 is $c->res->headers->content_type, 'text/html;charset=UTF-8', 'right type';
 $c->res->headers->remove('Content-Type');
 $t->content_type($c, {ext => 'unknown'});
-is $c->res->headers->content_type, 'text/plain;charset=UTF-8', 'right type';
+is $c->res->headers->content_type, 'application/octet-stream', 'right type';
 $c->res->headers->remove('Content-Type');
 $t->content_type($c, {file => 'foo/bar.png'});
 is $c->res->headers->content_type, 'image/png', 'right type';

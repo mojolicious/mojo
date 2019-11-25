@@ -1,6 +1,8 @@
 
-8.27  2019-11-18
+8.27  2019-11-25
   - Added EXPERIMENTAL before_command hook.
+  - Changed default MIME type of content_type method in Mojolicious::Types to
+    application/octet-stream. (aitap)
 
 8.26  2019-11-02
   - Removed deprecated slice method from Mojo::Collection.

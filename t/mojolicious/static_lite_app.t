@@ -204,7 +204,7 @@ $t->get_ok('/asset' => {'Range' => 'bytes=3-5'})->status_is(206)
 
 # File
 $t->get_ok('/file' => {'Range' => 'bytes=4-9'})->status_is(206)
-  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_type_is('application/octet-stream')
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('answer');
 
 # Empty file

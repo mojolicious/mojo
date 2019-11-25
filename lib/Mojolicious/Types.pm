@@ -40,7 +40,7 @@ sub content_type {
   return undef if $headers->content_type;
 
   my $type = $o->{file} ? $self->file_type($o->{file}) : $self->type($o->{ext});
-  $headers->content_type($type // $self->type('txt'));
+  $headers->content_type($type // 'application/octet-stream');
 }
 
 sub detect {

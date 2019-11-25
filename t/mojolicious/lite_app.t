@@ -779,7 +779,7 @@ $t->get_ok('/to_string')->status_is(200)->content_is('beforeafter');
 
 # Render static file outside of public directory
 $t->get_ok('/source')->status_is(200)
-  ->content_type_is('text/plain;charset=UTF-8')->header_isnt('X-Missing' => 1)
+  ->content_type_is('application/octet-stream')->header_isnt('X-Missing' => 1)
   ->content_like(qr!get_ok\('/source!);
 
 # File does not exist

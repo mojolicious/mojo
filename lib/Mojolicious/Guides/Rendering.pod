@@ -503,7 +503,8 @@ renderer.
     return unless $template eq 'exception';
 
     # Switch to JSON rendering if content negotiation allows it
-    $args->{json} = {exception => $args->{exception}} if $c->accepts('json');
+    return unless $c->accepts('json');
+    $args->{json} = {exception => $c->stash('exception')};
   };
 
   get '/' => sub { die "This sho...ALL GLORY TO THE HYPNOTOAD!\n" };

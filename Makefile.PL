@@ -20,7 +20,7 @@ WriteMakefile(
     'meta-spec'    => {version => 2},
     no_index       => {
       directory => [qw(examples t)],
-      package   => [qw(Mojo::Exception::_Guard Mojo::Server::PSGI::_IO)],
+      package   => [qw(Mojo::Server::PSGI::_IO Mojo::Util::_Guard)],
     },
     prereqs   => {runtime => {requires => {perl => '5.010001'}}},
     resources => {

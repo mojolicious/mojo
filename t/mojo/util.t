@@ -12,9 +12,10 @@ use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode dumper encode extract_usage getopt gunzip gzip hmac_sha1_sum),
   qw(html_unescape html_attr_unescape md5_bytes md5_sum monkey_patch),
-  qw(punycode_decode punycode_encode quote secure_compare sha1_bytes sha1_sum),
-  qw(slugify split_cookie_header split_header steady_time tablify term_escape),
-  qw(trim unindent unquote url_escape url_unescape xml_escape xor_encode);
+  qw(punycode_decode punycode_encode quote scope_guard secure_compare),
+  qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time),
+  qw(tablify term_escape trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -552,6 +553,15 @@ isnt $compressed, $uncompressed, 'string changed';
 ok length $compressed < length $uncompressed, 'string is shorter';
 my $result = gunzip $compressed;
 is $result, $uncompressed, 'same string';
+
+# scope_guard
+$test = 'a';
+{
+  my $guard = scope_guard sub { $test .= 'c' };
+  $test .= 'b';
+}
+$test .= 'd';
+is $test, 'abcd', 'right order';
 
 # Hide DATA usage from error messages
 eval { die 'whatever' };

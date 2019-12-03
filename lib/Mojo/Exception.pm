@@ -3,7 +3,7 @@ use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Exporter 'import';
-use Mojo::Util 'decode';
+use Mojo::Util qw(decode scope_guard);
 use Scalar::Util 'blessed';
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
@@ -18,8 +18,7 @@ sub check {
   # Finally (search backwards since it is usually at the end)
   my $guard;
   for (my $i = $#spec - 1; $i >= 0; $i -= 2) {
-    ($guard = Mojo::Exception::_Guard->new(finally => $spec[$i + 1])) and last
-      if $spec[$i] eq 'finally';
+    ($guard = scope_guard($spec[$i + 1])) and last if $spec[$i] eq 'finally';
   }
 
   return undef unless $err;
@@ -154,11 +153,6 @@ sub _context {
     _append($self->lines_after->[-1], $_->[$next]) for @$sources;
   }
 }
-
-package Mojo::Exception::_Guard;
-use Mojo::Base -base;
-
-sub DESTROY { shift->{finally}->() }
 
 1;
 

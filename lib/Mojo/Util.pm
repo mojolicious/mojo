@@ -75,10 +75,10 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode deprecated dumper encode extract_usage getopt gunzip gzip),
   qw(hmac_sha1_sum html_attr_unescape html_unescape md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
-  qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time),
-  qw(tablify term_escape trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode)
+  qw(monkey_patch punycode_decode punycode_encode quote scope_guard),
+  qw(secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
+  qw(split_header steady_time tablify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -275,6 +275,8 @@ sub quote {
   $str =~ s/(["\\])/\\$1/g;
   return qq{"$str"};
 }
+
+sub scope_guard { Mojo::Util::_Guard->new(cb => shift) }
 
 sub secure_compare {
   my ($one, $two) = @_;
@@ -503,6 +505,11 @@ sub _teardown {
   @{"${class}::ISA"} = ();
   delete_package $class;
 }
+
+package Mojo::Util::_Guard;
+use Mojo::Base -base;
+
+sub DESTROY { shift->{cb}() }
 
 1;
 
@@ -765,6 +772,20 @@ L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
   my $quoted = quote $str;
 
 Quote string.
+
+=head2 scope_guard
+
+  my $guard = scope_guard sub {...};
+
+Create anonymous scope guard object that will execute the passed callback when
+the object is destroyed. Note that this function is B<EXPERIMENTAL> and might
+change without warning
+
+  # Execute closure at end of scope
+  {
+    my $guard = scope_guard sub { say "Mojo!" };
+    say "Hello";
+  }
 
 =head2 secure_compare
 

@@ -215,13 +215,12 @@ Append message to L</"handle">.
   my $new = $log->context('[extra] [information]');
 
 Construct a new child L<Mojo::Log> object that will include context information
-with every log message. Note that this method is B<EXPERIMENTAL> and might
-change without warning!
+with every log message.
 
   # Log with context
   my $log = Mojo::Log->new;
   my $context = $log->context('[17a60115]');
-  $context->debug('This is a log message with context information'); 
+  $context->debug('This is a log message with context information');
   $context->info('And another');
 
 =head2 debug

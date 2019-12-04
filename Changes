@@ -1,7 +1,8 @@
 
-8.27  2019-12-03
+8.27  2019-12-04
   - Added EXPERIMENTAL before_command hook.
   - Added EXPERIMENTAL scope_guard function to Mojo::Util.
+  - Removed experimental status from context method in Mojo::Log.
   - Changed default MIME type of content_type method in Mojolicious::Types to
     application/octet-stream. (aitap)
 

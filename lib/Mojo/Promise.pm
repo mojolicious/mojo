@@ -202,7 +202,9 @@ sub _timer {
 sub done { shift->resolve(@_) }
 
 sub get {
-  my @results = @{shift->{result} // []};
+  my $self    = shift;
+  my @results = @{$self->{result} // []};
+  die $results[0] unless $self->{status} eq 'resolve';
   return wantarray ? @results : $results[0];
 }
 

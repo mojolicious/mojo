@@ -30,6 +30,16 @@ get '/three' => async sub {
   $c->render(text => "$first$second$third");
 };
 
+get '/four' => async sub {
+  my $c = shift;
+
+  my $text     = await Mojo::Promise->resolve('fail');
+  my $rejected = Mojo::Promise->reject('this went perfectly');
+  eval { await $rejected };
+  if ($@) { $c->render(text => $@, status => 500) }
+  else    { $c->render(text => $text) }
+};
+
 my $ua = Mojo::UserAgent->new;
 
 async sub test_one {
@@ -64,5 +74,10 @@ is $text, 'also works!', 'right content';
 # Application with async/await action
 $tx = $ua->get('/three');
 is $tx->res->body, 'this works too!', 'right content';
+
+# Exception handling and async/await
+$tx = $ua->get('/four');
+is $tx->res->code, 500, 'right code';
+like $tx->res->body, qr/this went perfectly/, 'right content';
 
 done_testing();

@@ -20,6 +20,13 @@ use IO::Handle ();
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
+# async/await support requires Future::AsyncAwait X.XX+
+use constant ASYNC => !!(eval {
+  require Future::AsyncAwait;
+  Future::AsyncAwait->VERSION('0.000001');
+  1;
+});
+
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
 
@@ -118,6 +125,15 @@ sub import {
       Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
       Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
       eval "package $caller; use Role::Tiny; 1" or die $@;
+    }
+
+    # async/await
+    elsif ($flag eq '-async') {
+      Carp::croak 'Future::AsyncAwait X.XX+ is required for async/await'
+        unless ASYNC;
+      eval "package $caller;"
+        . " Future::AsyncAwait->import(future_class => 'Mojo::Promise'); 1"
+        or die $@;
     }
 
     # Signatures (Perl 5.20+)

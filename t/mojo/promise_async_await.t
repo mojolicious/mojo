@@ -4,12 +4,14 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 
-plan skip_all => 'set TEST_ASYNC_AWAIT to enable this test (developer only!)'
-  unless $ENV{TEST_ASYNC_AWAIT} || $ENV{TEST_ALL};
-plan skip_all => 'Future::AsyncAwait X.XX required for this test!'
-  unless eval { require Future::AsyncAwait };
+BEGIN {
+  plan skip_all => 'set TEST_ASYNC_AWAIT to enable this test (developer only!)'
+    unless $ENV{TEST_ASYNC_AWAIT} || $ENV{TEST_ALL};
+  plan skip_all => 'Future::AsyncAwait X.XX+ required for this test!'
+    unless Mojo::Base->ASYNC;
+}
+use Mojo::Base -async;
 
-use Future::AsyncAwait future_class => 'Mojo::Promise';
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 

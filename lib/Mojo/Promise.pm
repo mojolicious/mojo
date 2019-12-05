@@ -196,6 +196,22 @@ sub _timer {
   return $self;
 }
 
+#
+# async/await hacks (please fix this LeoNerd!)
+#
+sub done { shift->resolve(@_) }
+
+sub get {
+  my @results = @{shift->{result} // []};
+  return wantarray ? @results : $results[0];
+}
+
+sub is_cancelled {undef}
+sub is_ready     { !!shift->{result} }
+sub on_cancel    { }
+sub on_ready     { shift->finally(@_) }
+sub fail         { shift->reject(@_) }
+
 1;
 
 =encoding utf8

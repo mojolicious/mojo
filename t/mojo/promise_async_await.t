@@ -20,6 +20,14 @@ get '/one' => {text => 'works!'};
 
 get '/two' => {text => 'also'};
 
+get '/three' => async sub {
+  my $c      = shift;
+  my $first  = await Mojo::Promise->resolve('this ');
+  my $second = await Mojo::Promise->resolve('works');
+  my $third  = await Mojo::Promise->resolve(' too!');
+  $c->render(text => "$first$second$third");
+};
+
 my $ua = Mojo::UserAgent->new;
 
 async sub test_one {
@@ -50,5 +58,9 @@ is $tx->res->body, 'works!', 'right content';
 my $text;
 test_two(' ')->then(sub { $text = shift })->catch(sub { warn @_ })->wait;
 is $text, 'also works!', 'right content';
+
+# Application with async/await action
+$tx = $ua->get('/three');
+is $tx->res->body, 'this works too!', 'right content';
 
 done_testing();

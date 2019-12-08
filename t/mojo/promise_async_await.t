@@ -26,6 +26,13 @@ helper defer_resolve_p => sub {
   return $promise;
 };
 
+helper defer_reject_p => sub {
+  my ($c, $msg) = @_;
+  my $promise = Mojo::Promise->new;
+  Mojo::IOLoop->next_tick(sub { $promise->reject($msg) });
+  return $promise;
+};
+
 get '/one' => {text => 'works!'};
 
 get '/two' => {text => 'also'};
@@ -41,9 +48,9 @@ get '/three' => async sub {
 get '/four' => async sub {
   my $c = shift;
 
-  my $text     = await Mojo::Promise->resolve('fail');
-  my $rejected = Mojo::Promise->reject('this went perfectly');
-  eval { await $rejected };
+  my $text    = await Mojo::Promise->resolve('fail');
+  my $promise = $c->defer_reject_p('this went perfectly');
+  eval { await $promise };
   if   ($@) { $c->render(text => $@, status => 500) }
   else      { $c->render(text => $text) }
 };

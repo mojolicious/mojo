@@ -201,6 +201,7 @@ sub _action {
   my ($next, $c, $action, $last) = @_;
   my $val = $action->($c);
   $val->catch(sub { $c->helpers->reply->exception(shift) })
+    ->finally(sub { undef $val })
     if Scalar::Util::blessed $val && $val->isa('Mojo::Promise');
   return $val;
 }

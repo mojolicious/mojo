@@ -48,11 +48,19 @@ get '/three' => async sub {
 get '/four' => async sub {
   my $c = shift;
 
-  my $text    = await Mojo::Promise->resolve('fail');
-  my $promise = $c->defer_reject_p('this went perfectly');
-  eval { await $promise };
+  # TODO: Remove "scalar" once this is fixed in Future::AsyncAwait
+  my $text = await Mojo::Promise->resolve('fail');
+  eval { await scalar $c->defer_reject_p('this went perfectly') };
   if   ($@) { $c->render(text => $@, status => 500) }
   else      { $c->render(text => $text) }
+};
+
+get '/five' => async sub {
+  my $c       = shift;
+  my $runaway = Mojo::Promise->new;
+  Mojo::IOLoop->next_tick(sub { $runaway->reject('runaway too') });
+  await $c->defer_resolve_p('fail');
+  await $runaway;
 };
 
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
@@ -94,5 +102,10 @@ is $tx->res->body, 'this works too!', 'right content';
 $tx = $ua->get('/four');
 is $tx->res->code,   500,                     'right code';
 like $tx->res->body, qr/this went perfectly/, 'right content';
+
+# Runaway exception
+$tx = $ua->get('/five');
+is $tx->res->code,   500,             'right code';
+like $tx->res->body, qr/runaway too/, 'right content';
 
 done_testing();

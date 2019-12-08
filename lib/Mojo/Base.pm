@@ -131,9 +131,7 @@ sub import {
     elsif ($flag eq '-async') {
       Carp::croak 'Future::AsyncAwait X.XX+ is required for async/await'
         unless ASYNC;
-      eval "package $caller;"
-        . " Future::AsyncAwait->import(future_class => 'Mojo::Promise'); 1"
-        or die $@;
+      Future::AsyncAwait->import_into($caller, future_class => 'Mojo::Promise');
     }
 
     # Signatures (Perl 5.20+)
@@ -272,6 +270,15 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
   use Mojo::Base -base, -signatures;
   use Mojo::Base 'SomeBaseClass', -signatures;
   use Mojo::Base -role, -signatures;
+
+If you have L<Future::AsyncAwait> X.XX+ installed you can also use the C<-async>
+flag to activate the C<async> and C<await> keywords to deal much more
+efficiently with promises. Note that this feature is B<EXPERIMENTAL> and might
+change without warning!
+
+  # Also enable async/await
+  use Mojo::Base -strict, -async;
+  use Mojo::Base -base, -signature, -async;
 
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.

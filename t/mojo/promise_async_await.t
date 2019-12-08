@@ -48,7 +48,7 @@ get '/four' => async sub {
   else      { $c->render(text => $text) }
 };
 
-my $ua = Mojo::UserAgent->new;
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 
 async sub test_one {
   await $ua->get_p('/one');

@@ -12,11 +12,19 @@ BEGIN {
 }
 use Mojo::Base -async;
 
+use Mojo::Promise;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 
 # Silence
 app->log->level('fatal');
+
+helper defer_resolve_p => sub {
+  my ($c, $msg) = @_;
+  my $promise = Mojo::Promise->new;
+  Mojo::IOLoop->next_tick(sub { $promise->resolve($msg) });
+  return $promise;
+};
 
 get '/one' => {text => 'works!'};
 
@@ -24,9 +32,9 @@ get '/two' => {text => 'also'};
 
 get '/three' => async sub {
   my $c      = shift;
-  my $first  = await Mojo::Promise->resolve('this ');
-  my $second = await Mojo::Promise->resolve('works');
-  my $third  = await Mojo::Promise->resolve(' too!');
+  my $first  = await $c->defer_resolve_p('this ');
+  my $second = await $c->defer_resolve_p('works');
+  my $third  = await $c->defer_resolve_p(' too!');
   $c->render(text => "$first$second$third");
 };
 
@@ -36,8 +44,8 @@ get '/four' => async sub {
   my $text     = await Mojo::Promise->resolve('fail');
   my $rejected = Mojo::Promise->reject('this went perfectly');
   eval { await $rejected };
-  if ($@) { $c->render(text => $@, status => 500) }
-  else    { $c->render(text => $text) }
+  if   ($@) { $c->render(text => $@, status => 500) }
+  else      { $c->render(text => $text) }
 };
 
 my $ua = Mojo::UserAgent->new;
@@ -77,7 +85,7 @@ is $tx->res->body, 'this works too!', 'right content';
 
 # Exception handling and async/await
 $tx = $ua->get('/four');
-is $tx->res->code, 500, 'right code';
+is $tx->res->code,   500,                     'right code';
 like $tx->res->body, qr/this went perfectly/, 'right content';
 
 done_testing();

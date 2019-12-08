@@ -209,7 +209,7 @@ sub get {
 }
 
 sub is_cancelled {undef}
-sub is_ready     { !!shift->{result} }
+sub is_ready     { !!$_[0]{result} && !@{$_[0]{resolve}} && !@{$_[0]{reject}} }
 sub on_cancel    { }
 sub on_ready     { shift->finally(@_) }
 sub fail         { shift->reject(@_) }

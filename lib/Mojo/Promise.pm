@@ -199,20 +199,33 @@ sub _timer {
 #
 # async/await hacks (please fix this LeoNerd!)
 #
-sub done { shift->resolve(@_) }
+*done         = \&AWAIT_DONE;
+*fail         = \&AWAIT_FAIL;
+*get          = \&AWAIT_GET;
+*is_cancelled = \&AWAIT_IS_CANCELLED;
+*is_ready     = \&AWAIT_IS_READY;
+*on_cancel    = \&AWAIT_ON_CANCEL;
+*on_ready     = \&AWAIT_ON_READY;
 
-sub get {
+sub AWAIT_DONE { shift->resolve(@_) }
+sub AWAIT_FAIL { shift->reject(@_) }
+
+sub AWAIT_GET {
   my $self    = shift;
   my @results = @{$self->{result} // []};
   die $results[0] unless $self->{status} eq 'resolve';
   return wantarray ? @results : $results[0];
 }
 
-sub is_cancelled {undef}
-sub is_ready     { !!$_[0]{result} && !@{$_[0]{resolve}} && !@{$_[0]{reject}} }
-sub on_cancel    { }
-sub on_ready     { shift->finally(@_) }
-sub fail         { shift->reject(@_) }
+sub AWAIT_IS_CANCELLED {undef}
+
+sub AWAIT_IS_READY {
+  my $self = shift;
+  return !!$self->{result} && !@{$self->{resolve}} && !@{$self->{reject}};
+}
+
+sub AWAIT_ON_CANCEL { }
+sub AWAIT_ON_READY  { shift->finally(@_) }
 
 1;
 

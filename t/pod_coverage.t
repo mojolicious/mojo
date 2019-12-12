@@ -7,6 +7,13 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 plan skip_all => 'Test::Pod::Coverage 1.04+ required for this test!'
   unless eval 'use Test::Pod::Coverage 1.04; 1';
 
-my @await = qw(done get is_cancelled is_ready on_cancel on_ready fail);
+# async/await hooks
+my @await = (
+  qw(AWAIT_DONE AWAIT_FAIL AWAIT_GET AWAIT_IS_CANCELLED AWAIT_IS_READY),
+  qw(AWAIT_ON_CANCEL AWAIT_ON_READY)
+);
+
+# async/await hacks (please fix LeoNerd)
+push @await, qw(done get is_cancelled is_ready on_cancel on_ready fail);
 
 all_pod_coverage_ok({also_private => ['BUILD_DYNAMIC', 'success', @await]});

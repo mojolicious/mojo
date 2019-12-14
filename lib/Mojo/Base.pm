@@ -278,7 +278,7 @@ change without warning!
 
   # Also enable async/await
   use Mojo::Base -strict, -async;
-  use Mojo::Base -base, -signature, -async;
+  use Mojo::Base -base, -signatures, -async;
 
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.

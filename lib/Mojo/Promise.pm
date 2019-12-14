@@ -207,6 +207,8 @@ sub _timer {
 *on_cancel    = \&AWAIT_ON_CANCEL;
 *on_ready     = \&AWAIT_ON_READY;
 
+sub AWAIT_CLONE { shift->clone }
+
 sub AWAIT_DONE { shift->resolve(@_) }
 sub AWAIT_FAIL { shift->reject(@_) }
 

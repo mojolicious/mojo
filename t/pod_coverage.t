@@ -9,8 +9,8 @@ plan skip_all => 'Test::Pod::Coverage 1.04+ required for this test!'
 
 # async/await hooks
 my @await = (
-  qw(AWAIT_DONE AWAIT_FAIL AWAIT_GET AWAIT_IS_CANCELLED AWAIT_IS_READY),
-  qw(AWAIT_ON_CANCEL AWAIT_ON_READY)
+  qw(AWAIT_CLONE AWAIT_DONE AWAIT_FAIL AWAIT_GET AWAIT_IS_CANCELLED),
+  qw(AWAIT_IS_READY AWAIT_ON_CANCEL AWAIT_ON_READY)
 );
 
 # async/await hacks (please fix LeoNerd)

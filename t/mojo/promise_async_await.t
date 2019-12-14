@@ -48,9 +48,8 @@ get '/three' => async sub {
 get '/four' => async sub {
   my $c = shift;
 
-  # TODO: Remove "scalar" once this is fixed in Future::AsyncAwait
   my $text = await Mojo::Promise->resolve('fail');
-  eval { await scalar $c->defer_reject_p('this went perfectly') };
+  eval { await $c->defer_reject_p('this went perfectly') };
   if   ($@) { $c->render(text => $@, status => 500) }
   else      { $c->render(text => $text) }
 };

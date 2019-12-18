@@ -30,6 +30,30 @@ sub app {
   return $self;
 }
 
+sub attr_is {
+  my ($self, $selector, $attribute, $value, $desc) = @_;
+  return $self->_test('is', $self->_attr($selector, $attribute),
+    $value, _desc($desc, qq{exact match for attribute "$attribute" at selector "$selector"}));
+}
+
+sub attr_isnt {
+  my ($self, $selector, $attribute, $value, $desc) = @_;
+  return $self->_test('isnt', $self->_attr($selector, $attribute),
+    $value, _desc($desc, qq{no match for attribute "$attribute" at selector "$selector"}));
+}
+
+sub attr_like {
+  my ($self, $selector, $attribute, $regex, $desc) = @_;
+  return $self->_test('like', $self->_attr($selector, $attribute),
+    $regex, _desc($desc, qq{similar match for attribute "$attribute" at selector "$selector"}));
+}
+
+sub attr_unlike {
+  my ($self, $selector, $attribute, $regex, $desc) = @_;
+  return $self->_test('unlike', $self->_attr($selector, $attribute),
+    $regex, _desc($desc, qq{no similar match for attribute "$attribute" at selector "$selector"}));
+}
+
 sub content_is {
   my ($self, $value, $desc) = @_;
   return $self->_test('is', $self->tx->res->text,
@@ -337,6 +361,13 @@ sub websocket_ok {
   return $self->_request_ok($self->ua->build_websocket_tx(@_), $_[0]);
 }
 
+sub _attr {
+  my ($self, $selector, $attribute) = @_;
+  return '' unless my $e = $self->tx->res->dom->at($selector);
+  return '' unless my $attr_value = $e->attr($attribute);
+  return $attr_value;
+}
+
 sub _build_ok {
   my ($self, $method, $url) = (shift, shift, shift);
   local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -589,6 +620,36 @@ Access application with L<Mojo::UserAgent::Server/"app">.
   $t->app->hook(after_dispatch => sub { $stash = shift->stash });
   $t->get_ok('/hello')->status_is(200);
   is $stash->{foo}, 'bar', 'right value';
+
+=head2 attr_is
+
+  $t = $t->attr_is('img.cat', 'alt', 'Grumpy cat');
+  $t = $t->attr_is('img.cat', 'alt', 'Grumpy cat', 'right alt text');
+
+Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors
+first matching HTML/XML element for exact match with L<Mojo::DOM/"at">.
+
+=head2 attr_isnt
+
+  $t = $t->attr_isnt('img.cat', 'alt', 'Calm cat');
+  $t = $t->attr_isnt('img.cat', 'alt', 'Calm cat', 'different alt text');
+
+Opposite of L</"attr_is">.
+
+=head2 attr_like
+
+  $t = $t->attr_like('img.cat', 'alt', qr/Grumpy/);
+  $t = $t->attr_like('img.cat', 'alt', qr/Grumpy/, 'right alt text');
+
+Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors
+first matching HTML/XML element for similar match with L<Mojo::DOM/"at">.
+
+=head2 attr_unlike
+
+  $t = $t->attr_unlike('img.cat', 'alt', qr/Calm/);
+  $t = $t->attr_unlike('img.cat', 'alt', qr/Calm/, 'different alt text');
+
+Opposite of L</"attr_like">.
 
 =head2 content_is
 

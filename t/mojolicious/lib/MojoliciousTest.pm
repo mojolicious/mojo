@@ -77,6 +77,9 @@ sub startup {
   # /happy/fun/time
   $r->route('/happy')->fun('/time')->to('foo#fun');
 
+  # /fun/joy
+  $r->fun('/joy')->to('foo#joy');
+
   # /stash_config
   $r->route('/stash_config')
     ->to(controller => 'foo', action => 'config', config => {test => 123});

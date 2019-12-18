@@ -196,17 +196,6 @@ sub _timer {
   return $self;
 }
 
-#
-# async/await hacks (please fix this LeoNerd!)
-#
-*done         = \&AWAIT_DONE;
-*fail         = \&AWAIT_FAIL;
-*get          = \&AWAIT_GET;
-*is_cancelled = \&AWAIT_IS_CANCELLED;
-*is_ready     = \&AWAIT_IS_READY;
-*on_cancel    = \&AWAIT_ON_CANCEL;
-*on_ready     = \&AWAIT_ON_READY;
-
 sub AWAIT_CLONE { shift->clone }
 
 sub AWAIT_DONE { shift->resolve(@_) }

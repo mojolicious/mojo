@@ -79,6 +79,13 @@ async sub test_two {
   return $text;
 }
 
+async sub test_three {
+  return Mojo::Promise->new(sub {
+    my ($resolve, $reject) = @_;
+    Mojo::IOLoop->next_tick(sub { $resolve->('value') });
+  });
+}
+
 # Basic async/await
 my $promise = test_one();
 isa_ok $promise, 'Mojo::Promise', 'right class';
@@ -105,5 +112,10 @@ like $tx->res->body, qr/this went perfectly/, 'right content';
 $tx = $ua->get('/five');
 is $tx->res->code,   500,             'right code';
 like $tx->res->body, qr/runaway too/, 'right content';
+
+# Async function body returning a promise
+$text = undef;
+test_three()->then(sub { $text = shift })->catch(sub { warn @_ })->wait;
+is $text, 'value', 'right content';
 
 done_testing();

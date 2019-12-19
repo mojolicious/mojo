@@ -26,6 +26,9 @@ sub AWAIT_IS_READY {
   return !!$self->{result} && !@{$self->{resolve}} && !@{$self->{reject}};
 }
 
+sub AWAIT_NEW_DONE { shift->resolve(@_) }
+sub AWAIT_NEW_FAIL { shift->reject(@_) }
+
 sub AWAIT_ON_CANCEL { }
 sub AWAIT_ON_READY  { shift->finally(@_) }
 

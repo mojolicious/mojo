@@ -21,7 +21,7 @@ use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
 # async/await support requires Future::AsyncAwait X.XX+
-use constant ASYNC => !!(eval {
+use constant ASYNC => $ENV{MOJO_NO_ASYNC} ? 0 : !!(eval {
   require Future::AsyncAwait;
   Future::AsyncAwait->VERSION('0.000001');
   1;

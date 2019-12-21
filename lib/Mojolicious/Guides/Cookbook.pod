@@ -649,6 +649,86 @@ Promises have three states, they start out as C<pending> and you call
 L<Mojo::Promise/"resolve"> to transition them to C<fulfilled>, or
 L<Mojo::Promise/"reject"> to transition them to C<rejected>.
 
+=head2 async/await
+
+And if you have L<Future::AsyncAwait> installed you can make using promises even
+easier. The C<async> and C<await> keywords are enabled with the C<-async> flag
+of L<Mojo::Base>, and make the use of closures with promises completely
+optional.
+
+  use Mojo::Base -strict, -async;
+
+The C<async> keyword is placed before the C<sub> keyword, and means that this
+function always returns a promise. Returned values that are not L<Mojo::Promise>
+objects will be wrapped in a resolved promise automatically.
+
+  use Mojo::Base -strict, -async;
+
+  async sub hello_p {
+    return 'Hello Mojo!';
+  }
+
+  hello_p()->then(sub { say @_ })->wait;
+
+The C<await> keyword on the other hand makes Perl wait for the promise to be
+settled. It then returns the fulfillment values or throws an exception with the
+rejection reason. While waiting, the event loop is free to perform other tasks
+however, so no resources are wasted.
+
+  use Mojo::Base -strict, -signatures, -async;
+  use Mojo::UserAgent;
+  use Mojo::URL;
+
+  my $ua = Mojo::UserAgent->new;
+
+  # Search MetaCPAN non-blocking for multiple terms
+  async sub search_cpan_p ($terms) {
+    my $url = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
+    for my $term (@$terms) {
+      my $tx = await $ua->get_p($url->clone->query({q => $term}));
+      say $tx->result->json('/hits/hits/0/_source/release');
+    }
+  }
+
+  search_cpan_p(['mojo', 'minion'])->wait;
+
+That also means that you can use normal Perl exception handling again. Even many
+3rd party exception handling modules from CPAN work just fine.
+
+  use Mojo::Base -strict, -async;
+  use Mojo::Promise;
+
+  # Catch a non-blocking exception
+  async sub hello_p {
+    eval { await Mojo::Promise->reject('This is an exception') };
+    if (my $err = $@) { warn "Error: $err" }
+  }
+
+  hello_p()->wait;
+
+And it works just the same in L<Mojolicious> and L<Mojolicious::Lite>
+applications. Just declare your actions with the C<async> keyword and use
+C<await> to wait for promises to be C<fulfilled> or C<rejected>.
+
+  use Mojolicious::Lite -signatures, -async;
+
+  # Request HTML titles from two sites non-blocking
+  get '/' => async sub ($c) {
+    my $mojo_tx    = await $c->ua->get_p('https://mojolicious.org');
+    my $mojo_title = $mojo_tx->result->dom->at('title')->text;
+
+    my $cpan_tx    = await $c->ua->get_p('https://metacpan.org');
+    my $cpan_title = $cpan_tx->result->dom->at('title')->text;
+
+    $c->render(json => {mojo => $mojo_title, cpan => $cpan_title});
+  };
+
+  app->start;
+
+Promises returned by actions will automatically get the default L<Mojolicious>
+exception handler attached. Making it much harder to ever miss a non-blocking
+exception again, even if you forgot to handle it yourself.
+
 =head2 Timers
 
 Timers, another primary feature of the event loop, are created with

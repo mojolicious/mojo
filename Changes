@@ -1,5 +1,6 @@
 
-8.28  2019-12-05
+8.28  2019-12-23
+  - Added EXPERIMENTAL all_settled method to Mojo::Promise.
 
 8.27  2019-12-04
   - Added EXPERIMENTAL before_command hook.

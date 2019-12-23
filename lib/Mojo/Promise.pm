@@ -7,24 +7,8 @@ use Scalar::Util 'blessed';
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
-sub all {
-  my ($class, @promises) = @_;
-
-  my $all       = $promises[0]->clone;
-  my $results   = [];
-  my $remaining = scalar @promises;
-  for my $i (0 .. $#promises) {
-    $promises[$i]->then(
-      sub {
-        $results->[$i] = [@_];
-        $all->resolve(@$results) if --$remaining <= 0;
-      },
-      sub { $all->reject(@_) }
-    );
-  }
-
-  return $all;
-}
+sub all         { _all(0, @_) }
+sub all_settled { _all(1, @_) }
 
 sub catch { shift->then(undef, shift) }
 
@@ -44,7 +28,7 @@ sub finally {
 
 sub map {
   my ($class, $options) = (shift, ref $_[0] eq 'HASH' ? shift : {});
-  my ($cb, @items) = @_;
+  my ($cb,    @items)   = @_;
 
   my @start = map { $_->$cb } splice @items, 0,
     $options->{concurrency} // @items;
@@ -111,6 +95,43 @@ sub wait {
   my $done;
   $self->finally(sub { $done++; $loop->stop });
   $loop->start until $done;
+}
+
+sub _all {
+  my ($settled, $class, @promises) = @_;
+
+  my $all       = $promises[0]->clone;
+  my $results   = [];
+  my $remaining = scalar @promises;
+  for my $i (0 .. $#promises) {
+
+    # "all_settled"
+    if ($settled) {
+      $promises[$i]->then(
+        sub {
+          $results->[$i] = {status => 'fulfilled', value => [@_]};
+          $all->resolve(@$results) if --$remaining <= 0;
+        },
+        sub {
+          $results->[$i] = {status => 'rejected', reason => [@_]};
+          $all->resolve(@$results) if --$remaining <= 0;
+        }
+      );
+    }
+
+    # "all"
+    else {
+      $promises[$i]->then(
+        sub {
+          $results->[$i] = [@_];
+          $all->resolve(@$results) if --$remaining <= 0;
+        },
+        sub { $all->reject(@_) }
+      );
+    }
+  }
+
+  return $all;
 }
 
 sub _defer {
@@ -287,6 +308,16 @@ passed L<Mojo::Promise> objects have fulfilled or rejects as soon as one of them
 rejects. If the returned promise fulfills, it is fulfilled with the values from
 the fulfilled promises in the same order as the passed promises. This method can
 be useful for aggregating results of multiple promises.
+
+=head2 all_settled
+
+  my $new = Mojo::Promise->all_settled(@promises);
+
+Returns a new L<Mojo::Promise> object that fulfills when all of the passed
+L<Mojo::Promise> objects have fulfilled or rejected, with hash references that
+describe the outcome of each promise. This method can be useful for aggregating
+results of multiple promises. Note that this method is B<EXPERIMENTAL> and might
+change without warning!
 
 =head2 catch
 

@@ -64,12 +64,7 @@ sub new {
   return $self;
 }
 
-sub race {
-  my ($class, @promises) = @_;
-  my $new = $promises[0]->clone;
-  $_->then(sub { $new->resolve(@_) }, sub { $new->reject(@_) }) for @promises;
-  return $new;
-}
+sub race { _all(2, @_) }
 
 sub reject  { shift->_settle('reject',  @_) }
 sub resolve { shift->_settle('resolve', @_) }
@@ -98,7 +93,7 @@ sub wait {
 }
 
 sub _all {
-  my ($settled, $class, @promises) = @_;
+  my ($type, $class, @promises) = @_;
 
   my $all       = $promises[0]->clone;
   my $results   = [];
@@ -106,7 +101,7 @@ sub _all {
   for my $i (0 .. $#promises) {
 
     # "all_settled"
-    if ($settled) {
+    if ($type == 1) {
       $promises[$i]->then(
         sub {
           $results->[$i] = {status => 'fulfilled', value => [@_]};
@@ -117,6 +112,11 @@ sub _all {
           $all->resolve(@$results) if --$remaining <= 0;
         }
       );
+    }
+
+    # "race"
+    elsif ($type == 2) {
+      $promises[$i]->then(sub { $all->resolve(@_) }, sub { $all->reject(@_) });
     }
 
     # "all"

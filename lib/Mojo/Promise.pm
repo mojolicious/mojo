@@ -335,7 +335,7 @@ and might change without warning!
 
 Returns a new L<Mojo::Promise> object that fulfills as soon as one of
 the passed L<Mojo::Promise> objects fulfills, with the value from that promise.
-If no promises fulfill, it is rejected with the reasons from the fulfilled
+If no promises fulfill, it is rejected with the reasons from the rejected
 promises in the same order as the passed promises. Note that this method is
 B<EXPERIMENTAL> and might change without warning!
 

@@ -211,7 +211,7 @@ Mojo::Promise - Promises/A+
 
   # Wrap continuation-passing style APIs with promises
   my $ua = Mojo::UserAgent->new;
-  sub get {
+  sub get_p {
     my $promise = Mojo::Promise->new;
     $ua->get(@_ => sub {
       my ($ua, $tx) = @_;
@@ -223,7 +223,7 @@ Mojo::Promise - Promises/A+
   }
 
   # Perform non-blocking operations sequentially
-  get('https://mojolicious.org')->then(sub {
+  get_p('https://mojolicious.org')->then(sub {
     my $mojo = shift;
     say $mojo->res->code;
     return get('https://metacpan.org');
@@ -236,8 +236,8 @@ Mojo::Promise - Promises/A+
   })->wait;
 
   # Synchronize non-blocking operations (all)
-  my $mojo = get('https://mojolicious.org');
-  my $cpan = get('https://metacpan.org');
+  my $mojo = get_p('https://mojolicious.org');
+  my $cpan = get_p('https://metacpan.org');
   Mojo::Promise->all($mojo, $cpan)->then(sub {
     my ($mojo, $cpan) = @_;
     say $mojo->[0]->res->code;
@@ -248,8 +248,8 @@ Mojo::Promise - Promises/A+
   })->wait;
 
   # Synchronize non-blocking operations (race)
-  my $mojo = get('https://mojolicious.org');
-  my $cpan = get('https://metacpan.org');
+  my $mojo = get_p('https://mojolicious.org');
+  my $cpan = get_p('https://metacpan.org');
   Mojo::Promise->race($mojo, $cpan)->then(sub {
     my $tx = shift;
     say $tx->req->url, ' won!';

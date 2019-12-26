@@ -20,6 +20,13 @@ use IO::Handle ();
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
+# async/await support requires Future::AsyncAwait::Frozen 0.36+
+use constant ASYNC => $ENV{MOJO_NO_ASYNC} ? 0 : !!(eval {
+  require Future::AsyncAwait::Frozen;
+  Future::AsyncAwait::Frozen->VERSION('0.000001');
+  1;
+});
+
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
 
@@ -118,6 +125,14 @@ sub import {
       Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
       Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
       eval "package $caller; use Role::Tiny; 1" or die $@;
+    }
+
+    # async/await
+    elsif ($flag eq '-async') {
+      Carp::croak 'Future::AsyncAwait::Frozen 0.36+ is required for async/await'
+        unless ASYNC;
+      Future::AsyncAwait::Frozen->import_into($caller,
+        future_class => 'Mojo::Promise');
     }
 
     # Signatures (Perl 5.20+)
@@ -256,6 +271,15 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
   use Mojo::Base -base, -signatures;
   use Mojo::Base 'SomeBaseClass', -signatures;
   use Mojo::Base -role, -signatures;
+
+If you have L<Future::AsyncAwait::Frozen> 0.36+ installed you can also use the
+C<-async> flag to activate the C<async> and C<await> keywords to deal much more
+efficiently with promises. Note that this feature is B<EXPERIMENTAL> and might
+change without warning!
+
+  # Also enable async/await
+  use Mojo::Base -strict, -async;
+  use Mojo::Base -base, -signatures, -async;
 
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.

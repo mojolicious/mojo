@@ -137,7 +137,7 @@ sub handler {
 
   # Dispatcher has to be last in the chain
   ++$self->{dispatch}
-    and $self->hook(around_action   => sub { $_[2]($_[1]) })
+    and $self->hook(around_action   => \&_action)
     and $self->hook(around_dispatch => sub { $_[1]->app->dispatch($_[1]) })
     unless $self->{dispatch};
 
@@ -196,6 +196,17 @@ sub start {
 }
 
 sub startup { }
+
+sub _action {
+  my ($next, $c, $action, $last) = @_;
+
+  my $val = $action->($c);
+  $val->catch(sub { $c->helpers->reply->exception(shift) })
+    ->finally(sub { undef $val })
+    if Scalar::Util::blessed $val && $val->isa('Mojo::Promise');
+
+  return $val;
+}
 
 sub _die { CORE::die ref $_[0] ? $_[0] : Mojo::Exception->new(shift)->trace }
 

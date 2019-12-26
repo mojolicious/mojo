@@ -7,6 +7,31 @@ use Scalar::Util 'blessed';
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
+sub AWAIT_CLONE { shift->clone }
+
+sub AWAIT_DONE { shift->resolve(@_) }
+sub AWAIT_FAIL { shift->reject(@_) }
+
+sub AWAIT_GET {
+  my $self    = shift;
+  my @results = @{$self->{result} // []};
+  die $results[0] unless $self->{status} eq 'resolve';
+  return wantarray ? @results : $results[0];
+}
+
+sub AWAIT_IS_CANCELLED {undef}
+
+sub AWAIT_IS_READY {
+  my $self = shift;
+  return !!$self->{result} && !@{$self->{resolve}} && !@{$self->{reject}};
+}
+
+sub AWAIT_NEW_DONE { shift->resolve(@_) }
+sub AWAIT_NEW_FAIL { shift->reject(@_) }
+
+sub AWAIT_ON_CANCEL { }
+sub AWAIT_ON_READY  { shift->finally(@_) }
+
 sub all         { _all(2, @_) }
 sub all_settled { _all(0, @_) }
 sub any         { _all(3, @_) }

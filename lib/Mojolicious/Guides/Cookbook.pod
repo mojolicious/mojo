@@ -676,7 +676,6 @@ rejection reason. While waiting, the event loop is free to perform other tasks
 however, so no resources are wasted.
 
   use Mojo::Base -strict, -signatures, -async;
-
   use Mojo::UserAgent;
   use Mojo::URL;
 
@@ -684,9 +683,11 @@ however, so no resources are wasted.
 
   # Search MetaCPAN non-blocking for multiple terms sequentially
   async sub search_cpan_p ($terms) {
-    my $url = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
-    for my $term (@$terms) {
-      my $tx = await $ua->get_p($url->clone->query({q => $term}));
+    my $cpan = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
+    my @urls = map { $cpan->clone->query(q => $_) } @$terms;
+
+    for my $url (@urls) {
+      my $tx = await $ua->get_p($url);
       say $tx->result->json('/hits/hits/0/_source/release');
     }
   }
@@ -696,10 +697,9 @@ however, so no resources are wasted.
 The loop above performs all requests sequentially, awaiting a result before
 sending the next request. But you can also perform those requests concurrently
 instead, by using methods like L<Mojo::Promise/"all"> to combine multiple
-promises.
+promises before awaiting the results.
 
   use Mojo::Base -strict, -signatures, -async;
-
   use Mojo::Promise;
   use Mojo::UserAgent;
   use Mojo::URL;
@@ -708,8 +708,10 @@ promises.
 
   # Search MetaCPAN non-blocking for multiple terms concurrently
   async sub search_cpan_p ($terms) {
-    my $url = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
-    my @promises = map { $ua->get_p($url->clone->query({q => $_})) } @$terms;
+    my $cpan = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
+    my @urls = map { $cpan->clone->query(q => $_) } @$terms;
+
+    my @promises = map { $ua->get_p($_) } @urls;
     my @results  = await Mojo::Promise->all(@promises);
     for my $result (@results) {
       say $result->[0]->result->json('/hits/hits/0/_source/release');
@@ -742,7 +744,6 @@ C<await> to wait for promises to be C<fulfilled> or C<rejected>.
   get '/' => async sub ($c) {
     my $mojo_tx    = await $c->ua->get_p('https://mojolicious.org');
     my $mojo_title = $mojo_tx->result->dom->at('title')->text;
-
     my $cpan_tx    = await $c->ua->get_p('https://metacpan.org');
     my $cpan_title = $cpan_tx->result->dom->at('title')->text;
 
@@ -752,8 +753,10 @@ C<await> to wait for promises to be C<fulfilled> or C<rejected>.
   app->start;
 
 Promises returned by actions will automatically get the default L<Mojolicious>
-exception handler attached. Making it much harder to ever miss a non-blocking
-exception again, even if you forgot to handle it yourself.
+exception handler attached. And since C<async> functions also capture
+exceptions (to turn them into C<rejected> promises), this will make it much
+harder for you to ever miss a non-blocking exception again. Even if you forgot
+to handle it yourself.
 
 =head2 Timers
 

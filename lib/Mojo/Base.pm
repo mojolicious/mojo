@@ -288,7 +288,7 @@ feature was still experimental.
 
 Fluent interfaces are a way to design object-oriented APIs around method
 chaining to create domain-specific languages, with the goal of making the
-readablity of the source code close to written prose.
+readability of the source code close to written prose.
 
   package Duck;
   use Mojo::Base -base;

@@ -660,7 +660,8 @@ completely optional.
 
 The C<async> keyword is placed before the C<sub> keyword, and means that this
 function always returns a promise. Returned values that are not L<Mojo::Promise>
-objects will be wrapped in a resolved promise automatically.
+objects will be wrapped in a resolved promise automatically. And if an exception
+gets thrown in the function it will result in a rejected promise.
 
   use Mojo::Base -strict, -async;
 
@@ -753,10 +754,8 @@ C<await> to wait for promises to be C<fulfilled> or C<rejected>.
   app->start;
 
 Promises returned by actions will automatically get the default L<Mojolicious>
-exception handler attached. And since C<async> functions also capture
-exceptions (to turn them into C<rejected> promises), this will make it much
-harder for you to ever miss a non-blocking exception again. Even if you forgot
-to handle it yourself.
+exception handler attached. Making it much harder to ever miss a non-blocking
+exception again, even if you forgot to handle it yourself.
 
 =head2 Timers
 

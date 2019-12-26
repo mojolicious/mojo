@@ -1,4 +1,6 @@
 
+8.29  2019-12-27
+
 8.28  2019-12-26
   - Added EXPERIMENTAL support for async/await (with -async Mojo::Base flag).
   - Added EXPERIMENTAL all_settled and any methods to Mojo::Promise.

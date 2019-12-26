@@ -7,7 +7,7 @@ use Test::More;
 BEGIN {
   plan skip_all => 'set TEST_ASYNC_AWAIT to enable this test (developer only!)'
     unless $ENV{TEST_ASYNC_AWAIT} || $ENV{TEST_ALL};
-  plan skip_all => 'Future::AsyncAwait::Frozen 0.35+ required for this test!'
+  plan skip_all => 'Future::AsyncAwait::Frozen 0.36+ required for this test!'
     unless Mojo::Base->ASYNC;
 }
 use Mojo::Base -async;

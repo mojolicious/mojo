@@ -676,12 +676,13 @@ rejection reason. While waiting, the event loop is free to perform other tasks
 however, so no resources are wasted.
 
   use Mojo::Base -strict, -signatures, -async;
+
   use Mojo::UserAgent;
   use Mojo::URL;
 
   my $ua = Mojo::UserAgent->new;
 
-  # Search MetaCPAN non-blocking for multiple terms
+  # Search MetaCPAN non-blocking for multiple terms sequentially
   async sub search_cpan_p ($terms) {
     my $url = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
     for my $term (@$terms) {
@@ -692,8 +693,33 @@ however, so no resources are wasted.
 
   search_cpan_p(['mojo', 'minion'])->wait;
 
-That also means that you can use normal Perl exception handling again. Even many
-3rd party exception handling modules from CPAN work just fine.
+The loop above performs all requests sequentially, awaiting a result before
+sending the next request. But you can also perform those requests concurrently
+instead, by using methods like L<Mojo::Promise/"all"> to combine multiple
+promises.
+
+  use Mojo::Base -strict, -signatures, -async;
+
+  use Mojo::Promise;
+  use Mojo::UserAgent;
+  use Mojo::URL;
+
+  my $ua = Mojo::UserAgent->new;
+
+  # Search MetaCPAN non-blocking for multiple terms concurrently
+  async sub search_cpan_p ($terms) {
+    my $url = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
+    my @promises = map { $ua->get_p($url->clone->query({q => $_})) } @$terms;
+    my @results  = await Mojo::Promise->all(@promises);
+    for my $result (@results) {
+      say $result->[0]->result->json('/hits/hits/0/_source/release');
+    }
+  }
+
+  search_cpan_p(['mojo', 'minion'])->wait;
+
+All of this also means that you can use normal Perl exception handling again.
+Even many 3rd party exception handling modules from CPAN work just fine.
 
   use Mojo::Base -strict, -async;
   use Mojo::Promise;

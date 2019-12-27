@@ -12,6 +12,7 @@ BEGIN {
 }
 use Mojo::Base -async;
 
+use Test::Mojo;
 use Mojo::Promise;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
@@ -59,6 +60,18 @@ get '/five' => async sub {
   my $runaway = $c->defer_reject_p('runaway too');
   await $c->defer_resolve_p('fail');
   await $runaway;
+};
+
+get '/six' => sub {
+  my $c = shift;
+  $c->on(
+    message => async sub {
+      my ($c, $msg) = @_;
+      my $first  = await $c->defer_resolve_p("One: $msg");
+      my $second = await $c->defer_resolve_p("Two: $msg");
+      $c->send("$first $second")->finish;
+    }
+  );
 };
 
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
@@ -121,5 +134,10 @@ is $text, 'value', 'right content';
 $text = undef;
 test_three(0)->then(sub { warn @_ })->catch(sub { $text = shift })->wait;
 is $text, 'value', 'right content';
+
+# Async WebSocket
+my $t = Test::Mojo->new;
+$t->websocket_ok('/six')->send_ok('test')
+  ->message_ok->message_is('One: test Two: test')->finish_ok;
 
 done_testing();

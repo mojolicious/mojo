@@ -172,9 +172,10 @@ sub _all {
 }
 
 sub _await {
-  my ($method, $class, @args) = @_;
-  my $promise = $class->$method(@args);
-  return $promise->finally(sub { undef $promise });
+  my ($method, $class) = (shift, shift);
+  my $promise = $class->$method(@_);
+  $promise->{cycle} = $promise;
+  return $promise;
 }
 
 sub _defer {
@@ -182,7 +183,7 @@ sub _defer {
 
   return unless my $result = $self->{result};
   my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
-  @{$self}{qw(resolve reject)} = ([], []);
+  @{$self}{qw(cycle resolve reject)} = (undef, [], []);
 
   $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
 }

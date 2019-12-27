@@ -12,11 +12,15 @@ sub emit {
 
   if (my $s = $self->{events}{$name}) {
     warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n" if DEBUG;
-    for my $cb (@$s) { $self->$cb(@_) }
+    for my $cb (@$s) {
+      my $val = $self->$cb(@_);
+      $val->catch(sub { warn @_ })->finally(sub { undef $val })
+        if blessed $val && $val->isa('Mojo::Promise');
+    }
   }
   else {
     warn "-- Emit $name in @{[blessed $self]} (0)\n" if DEBUG;
-    die "@{[blessed $self]}: $_[0]" if $name eq 'error';
+    die "@{[blessed $self]}: $_[0]"                  if $name eq 'error';
   }
 
   return $self;

@@ -100,6 +100,8 @@ async sub test_three {
   });
 }
 
+my $t = Test::Mojo->new;
+
 # Basic async/await
 my $promise = test_one();
 isa_ok $promise, 'Mojo::Promise', 'right class';
@@ -114,18 +116,13 @@ test_two(' ')->then(sub { $text = shift })->catch(sub { warn @_ })->wait;
 is $text, 'also works!', 'right content';
 
 # Application with async/await action
-$tx = $ua->get('/three');
-is $tx->res->body, 'this works too!', 'right content';
+$t->get_ok('/three')->content_is('this works too!');
 
 # Exception handling and async/await
-$tx = $ua->get('/four');
-is $tx->res->code,   500,                     'right code';
-like $tx->res->body, qr/this went perfectly/, 'right content';
+$t->get_ok('/four')->status_is(500)->content_like(qr/this went perfectly/);
 
 # Runaway exception
-$tx = $ua->get('/five');
-is $tx->res->code,   500,             'right code';
-like $tx->res->body, qr/runaway too/, 'right content';
+$t->get_ok('/five')->status_is(500)->content_like(qr/runaway too/);
 
 # Async function body returning a promise
 $text = undef;
@@ -136,7 +133,6 @@ test_three(0)->then(sub { warn @_ })->catch(sub { $text = shift })->wait;
 is $text, 'value', 'right content';
 
 # Async WebSocket
-my $t = Test::Mojo->new;
 $t->websocket_ok('/six')->send_ok('test')
   ->message_ok->message_is('One: test Two: test')->finish_ok;
 

@@ -1,4 +1,6 @@
 
+8.30  2019-12-29
+
 8.29  2019-12-28
   - Improved async/await support to work in many more cases, such as WebSocket
     handlers.

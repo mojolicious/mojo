@@ -651,10 +651,10 @@ L<Mojo::Promise/"reject"> to transition them to C<rejected>.
 
 =head2 async/await
 
-And if you have L<Future::AsyncAwait::Frozen> installed you can make using
-promises even easier. The C<async> and C<await> keywords are enabled with the
-C<-async> flag of L<Mojo::Base>, and make the use of closures with promises
-completely optional.
+And if you have L<Future::AsyncAwait> installed you can make using promises even
+easier. The C<async> and C<await> keywords are enabled with the C<-async> flag
+of L<Mojo::Base>, and make the use of closures with promises completely
+optional.
 
   use Mojo::Base -strict, -async;
 

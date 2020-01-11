@@ -191,7 +191,10 @@ requests accepted previously (C<Contributor>) can call for a vote with a GitHub
 comment of the form C<Calling for a vote @mojolicious/core>.
 
 A feature can be added or modified when at least 3 voting members of the core
-team have cast a vote in favour, or the BDFL overruled the vote.
+team have cast a vote in favour, or the BDFL overruled the vote. But votes
+shouldn't be a race, and we benefit greatly from more data about how popular
+features really are. So everyone is encouraged to vote even on already merged
+pull requests.
 
 A vote ends once enough votes have been cast, or after a 14 day review period
 has passed. Any non-trivial changes (more than a typo fix) will invalidate the

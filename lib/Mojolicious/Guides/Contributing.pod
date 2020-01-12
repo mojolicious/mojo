@@ -182,36 +182,8 @@ The voting process used to make decisions for the project:
 
 =over 2
 
-Any member of the core team can call for a vote to decide about the addition and
-modification of features (usually with a GitHub comment mentioning the team
-C<@mojolicious/core> and the C<vote> label).
-
-Additionally for GitHub pull requests, everyone who has had one of their pull
-requests accepted previously (C<Contributor>) can call for a vote with a GitHub
-comment of the form C<Calling for a vote @mojolicious/core>.
-
-A feature can be added or modified when at least 3 voting members of the core
-team have cast a vote in favour, or the BDFL overruled the vote.
-
-Votes should be public if possible, so non-members can participate as well.
-Non-members that regularly have a positive impact on decisions and participate
-in IRC discussions should be considered for core team membership.
-
-A vote ends once enough votes have been cast, or after a 14 day review period
-has passed. Any non-trivial changes (more than a typo fix) will invalidate the
-vote, and require a new vote to be called. Everyone is encouraged to vote, even
-for already merged pull requests, because it is very beneficial for us to know
-how popular features really are.
-
-Votes for pull requests on GitHub need to be cast with the final code review
-comment and spelled out as C<+1>, C<-1> or C<neutral>. A C<+1> vote may only be
-cast in combination with an approved code review.
-
-For especially controversial decisions it is also possible to call for a
-majority vote.
-
-Voting is the primary responsibility of the core team, therefore only members
-that participate regularly should be considered active.
+A feature can be added or modified when the majority of all voting members of
+the core team have cast a vote in favour, or the BDFL overruled the vote.
 
 Any core team member may nominate new members, who must then be accepted by a
 2/3 majority vote.

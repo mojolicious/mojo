@@ -367,9 +367,8 @@ sub websocket_ok {
 
 sub _attr {
   my ($self, $selector, $attr) = @_;
-  return '' unless my $e     = $self->tx->res->dom->at($selector);
-  return '' unless my $value = $e->attr($attr);
-  return $value;
+  return '' unless my $e = $self->tx->res->dom->at($selector);
+  return $e->attr($attr) || '';
 }
 
 sub _build_ok {

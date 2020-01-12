@@ -31,27 +31,31 @@ sub app {
 }
 
 sub attr_is {
-  my ($self, $selector, $attribute, $value, $desc) = @_;
-  return $self->_test('is', $self->_attr($selector, $attribute),
-    $value, _desc($desc, qq{exact match for attribute "$attribute" at selector "$selector"}));
+  my ($self, $selector, $attr, $value, $desc) = @_;
+  $desc = _desc($desc,
+    qq{exact match for attribute "$attr" at selector "$selector"});
+  return $self->_test('is', $self->_attr($selector, $attr), $value, $desc);
 }
 
 sub attr_isnt {
-  my ($self, $selector, $attribute, $value, $desc) = @_;
-  return $self->_test('isnt', $self->_attr($selector, $attribute),
-    $value, _desc($desc, qq{no match for attribute "$attribute" at selector "$selector"}));
+  my ($self, $selector, $attr, $value, $desc) = @_;
+  $desc
+    = _desc($desc, qq{no match for attribute "$attr" at selector "$selector"});
+  return $self->_test('isnt', $self->_attr($selector, $attr), $value, $desc);
 }
 
 sub attr_like {
-  my ($self, $selector, $attribute, $regex, $desc) = @_;
-  return $self->_test('like', $self->_attr($selector, $attribute),
-    $regex, _desc($desc, qq{similar match for attribute "$attribute" at selector "$selector"}));
+  my ($self, $selector, $attr, $regex, $desc) = @_;
+  $desc = _desc($desc,
+    qq{similar match for attribute "$attr" at selector "$selector"});
+  return $self->_test('like', $self->_attr($selector, $attr), $regex, $desc);
 }
 
 sub attr_unlike {
-  my ($self, $selector, $attribute, $regex, $desc) = @_;
-  return $self->_test('unlike', $self->_attr($selector, $attribute),
-    $regex, _desc($desc, qq{no similar match for attribute "$attribute" at selector "$selector"}));
+  my ($self, $selector, $attr, $regex, $desc) = @_;
+  $desc = _desc($desc,
+    qq{no similar match for attribute "$attr" at selector "$selector"});
+  return $self->_test('unlike', $self->_attr($selector, $attr), $regex, $desc);
 }
 
 sub content_is {
@@ -362,10 +366,10 @@ sub websocket_ok {
 }
 
 sub _attr {
-  my ($self, $selector, $attribute) = @_;
-  return '' unless my $e = $self->tx->res->dom->at($selector);
-  return '' unless my $attr_value = $e->attr($attribute);
-  return $attr_value;
+  my ($self, $selector, $attr) = @_;
+  return '' unless my $e     = $self->tx->res->dom->at($selector);
+  return '' unless my $value = $e->attr($attr);
+  return $value;
 }
 
 sub _build_ok {
@@ -413,7 +417,7 @@ sub _request_ok {
         $self->{finished} = [] unless $self->tx($tx)->tx->is_websocket;
         $tx->on(finish => sub { shift; $self->{finished} = [@_] });
         $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });
-        $tx->on(text   => sub { push @{$self->{messages}}, [text   => pop] });
+        $tx->on(text => sub { push @{$self->{messages}}, [text => pop] });
         Mojo::IOLoop->stop;
       }
     );

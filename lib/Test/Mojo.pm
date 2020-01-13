@@ -191,23 +191,29 @@ sub header_unlike {
     $regex, $desc);
 }
 
+sub _does_json_contain {
+  my ($self, $p) = @_;
+  Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p);
+}
+
 sub json_has {
   my ($self, $p, $desc) = @_;
   $desc = _desc($desc, qq{has value for JSON Pointer "$p"});
-  return $self->_test('ok',
-    !!Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
+  return $self->_test('ok', !!_does_json_contain($self, $p), $desc);
 }
 
 sub json_hasnt {
   my ($self, $p, $desc) = @_;
   $desc = _desc($desc, qq{has no value for JSON Pointer "$p"});
-  return $self->_test('ok',
-    !Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
+  return $self->_test('ok', !_does_json_contain($self, $p), $desc);
 }
 
 sub json_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
+  if($p && !_does_json_contain($self, $p)) {
+      return $self->_test('fail', "no data for pointer $p");
+  }
   my $desc = _desc(shift, qq{exact match for JSON Pointer "$p"});
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }

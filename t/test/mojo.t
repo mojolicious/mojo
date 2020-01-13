@@ -18,7 +18,6 @@ my %call_counter = (
     is_deeply => 0,
     fail      => 0,
 );
-my $fail_message;
 
 # we're going to test that is_deeply is called as we expect each time.
 # later we'll also test that it's called the expected number of times.

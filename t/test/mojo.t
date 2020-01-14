@@ -34,7 +34,7 @@ my @is_deeply_expects = (
     $orig_is_deeply->(\@_, shift(@is_deeply_expects), 'is_deeply() called correctly');
 };
 
-*Test::More::fail = sub {
+*Test::More::fail = sub (;$) {
     $call_counter{fail}++;
     ok($_[0] eq 'no data for pointer /animal', "fail() called correctly");
 };

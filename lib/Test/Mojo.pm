@@ -211,10 +211,10 @@ sub json_hasnt {
 sub json_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
-  if($p && !_does_json_contain($self, $p)) {
-      return $self->_test('fail', "no data for pointer $p");
-  }
   my $desc = _desc(shift, qq{exact match for JSON Pointer "$p"});
+  if($p && !_does_json_contain($self, $p)) {
+      return $self->_test('fail', $desc);
+  }
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 

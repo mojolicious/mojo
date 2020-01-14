@@ -57,7 +57,6 @@ $t->get_ok('/testdata')->json_is( '/fruit' => 'bat' );
 # the first of these will call is_deeply, the second will notice that there's nothing
 # to compare (/animal doesn't exist in the JSON) so will call fail() instead to make
 # sure is_deeply doesn't magic up an undef and whine misleadingly about that
-# is_deeply, the second will just fail
 $t->get_ok('/testdata')->json_is({ animal   => 'bat' });
 $t->get_ok('/testdata')->json_is( '/animal' => 'bat' );
 

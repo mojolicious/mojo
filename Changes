@@ -1,7 +1,9 @@
 
-8.31  2020-01-12
+8.31  2020-01-14
   - Added attr_is, attr_isnt, attr_like and attr_unlike methods to Test::Mojo.
     (pau4o)
+  - Improved is_fresh method in Mojolicious::Static with support for weak etags.
+    (ether)
 
 8.30  2020-01-07
   - Switch from Future::AsyncAwait::Frozen to Future::AsyncAwait for async/await

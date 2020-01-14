@@ -197,7 +197,7 @@ SKIP: {
 
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
-is_deeply curfile->list->to_array,                [], 'no files';
+is_deeply curfile->list->to_array, [], 'no files';
 my $lib   = curfile->sibling('lib', 'Mojo');
 my @files = map { path($lib)->child(split '/') } (
   'DeprecationTest.pm',  'LoaderException.pm',
@@ -221,7 +221,7 @@ is_deeply path($lib)->list({dir => 1, hidden => 1})->map('to_string')->to_array,
 
 # List tree
 is_deeply path('does_not_exist')->list_tree->to_array, [], 'no files';
-is_deeply curfile->list_tree->to_array,                [], 'no files';
+is_deeply curfile->list_tree->to_array, [], 'no files';
 @files = map { path($lib)->child(split '/') } (
   'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
   'BaseTest/Base3.pm',  'DeprecationTest.pm',

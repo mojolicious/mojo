@@ -7,7 +7,7 @@ use Mojolicious::Types;
 # Basic functionality
 my $t = Mojolicious::Types->new;
 is $t->type('json'), 'application/json;charset=UTF-8', 'right type';
-is $t->type('foo'), undef, 'no type';
+is $t->type('foo'),  undef,                            'no type';
 $t->type(foo => 'foo/bar');
 is $t->type('foo'), 'foo/bar', 'right type';
 $t->type(BAR => 'bar/baz');
@@ -54,7 +54,7 @@ $t->type(json => ['application/json', 'text/x-json']);
 is $t->mapping->{json}[0], 'application/json', 'right type';
 is $t->mapping->{json}[1], 'text/x-json',      'right type';
 ok !$t->mapping->{json}[2], 'no type';
-is_deeply $t->mapping->{htm}, ['text/html'], 'right type';
+is_deeply $t->mapping->{htm},  ['text/html'],               'right type';
 is_deeply $t->mapping->{html}, ['text/html;charset=UTF-8'], 'right type';
 is_deeply $t->detect('application/json'),  ['json'], 'right formats';
 is_deeply $t->detect('text/x-json'),       ['json'], 'right formats';

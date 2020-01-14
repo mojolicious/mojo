@@ -127,8 +127,8 @@ $content = decode 'UTF-8', $buffer;
 like $content,
   qr/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{5}\] \[$$\] \[error\] First\n/,
   'right error message';
-like $content, qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
-unlike $content, qr/debug/, 'no debug message';
+like $content,   qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
+unlike $content, qr/debug/,                           'no debug message';
 like $history->[0][0], qr/^[0-9.]+$/, 'right epoch time';
 is $history->[0][1],   'fatal',       'right level';
 is $history->[0][2],   'Second',      'right message';

@@ -332,14 +332,14 @@ is $p->size, 1, 'right number of elements';
 my @p;
 @div = ();
 $dom->find('div')->each(sub { push @div, $_->attr('id') });
-$dom->find('p')->each(sub   { push @p,   $_->attr('id') });
+$dom->find('p')->each(sub { push @p, $_->attr('id') });
 is_deeply \@p, [qw(foo bar)], 'found all p elements';
 my $ids = [qw(container header logo buttons buttons content)];
 is_deeply \@div, $ids, 'found all div elements';
 is_deeply [$dom->at('p')->ancestors->map('tag')->each],
   [qw(div div div body html)], 'right results';
 is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
-is_deeply [$dom->ancestors->each],             [], 'no results';
+is_deeply [$dom->ancestors->each], [], 'no results';
 
 # Script tag
 $dom = Mojo::DOM->new(<<EOF);
@@ -1898,7 +1898,7 @@ $dom = Mojo::DOM->new(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html head title')->text, 'Test', 'right text';
+is $dom->at('html head title')->text,      'Test',              'right text';
 is $dom->at('html body font > div')->text, "test1\n      \n  ", 'right text';
 is $dom->at('html body font > div > div')->text, "test2\n    ", 'right text';
 
@@ -2663,28 +2663,28 @@ $dom = Mojo::DOM->new('<div></div>');
 is $fragment, '<a><b>C</b></a>', 'right result';
 $dom->at('div')->append($fragment);
 $dom->at('div')->append($fragment);
-is $dom, '<div></div><a><b>C</b></a><a><b>C</b></a>', 'right result';
-is $fragment, '<a><b>C</b></a>', 'right result';
+is $dom,      '<div></div><a><b>C</b></a><a><b>C</b></a>', 'right result';
+is $fragment, '<a><b>C</b></a>',                           'right result';
 $dom = Mojo::DOM->new('<div></div>');
 $dom->at('div')->append_content($fragment);
 $dom->at('div')->append_content($fragment);
-is $dom, '<div><a><b>C</b></a><a><b>C</b></a></div>', 'right result';
-is $fragment, '<a><b>C</b></a>', 'right result';
+is $dom,      '<div><a><b>C</b></a><a><b>C</b></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>',                           'right result';
 $dom = Mojo::DOM->new('<div></div>');
 $dom->at('div')->content($fragment);
 $dom->at('div a')->content($fragment);
-is $dom, '<div><a><a><b>C</b></a></a></div>', 'right result';
-is $fragment, '<a><b>C</b></a>', 'right result';
+is $dom,      '<div><a><a><b>C</b></a></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>',                   'right result';
 $dom = Mojo::DOM->new('<div></div>');
 $dom->at('div')->prepend($fragment);
 $dom->at('div')->prepend($fragment);
-is $dom, '<a><b>C</b></a><a><b>C</b></a><div></div>', 'right result';
-is $fragment, '<a><b>C</b></a>', 'right result';
+is $dom,      '<a><b>C</b></a><a><b>C</b></a><div></div>', 'right result';
+is $fragment, '<a><b>C</b></a>',                           'right result';
 $dom = Mojo::DOM->new('<div></div>');
 $dom->at('div')->prepend_content($fragment);
 $dom->at('div')->prepend_content($fragment);
-is $dom, '<div><a><b>C</b></a><a><b>C</b></a></div>', 'right result';
-is $fragment, '<a><b>C</b></a>', 'right result';
+is $dom,      '<div><a><b>C</b></a><a><b>C</b></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>',                           'right result';
 $dom = Mojo::DOM->new('<div></div>');
 $dom->at('div')->replace($fragment);
 $dom->at('b')->replace($fragment);
@@ -2693,13 +2693,13 @@ is $fragment, '<a><b>C</b></a>',        'right result';
 $dom = Mojo::DOM->new('<div></div>');
 $dom->at('div')->wrap($fragment);
 $dom->at('b')->wrap($fragment);
-is $dom, '<a><a><b>C<b>C<div></div></b></b></a></a>', 'right result';
-is $fragment, '<a><b>C</b></a>', 'right result';
+is $dom,      '<a><a><b>C<b>C<div></div></b></b></a></a>', 'right result';
+is $fragment, '<a><b>C</b></a>',                           'right result';
 $dom = Mojo::DOM->new('<div></div>');
 $dom->at('div')->wrap_content($fragment);
 $dom->at('b')->wrap_content($fragment);
-is $dom, '<div><a><b><a><b>CC</b></a></b></a></div>', 'right result';
-is $fragment, '<a><b>C</b></a>', 'right result';
+is $dom,      '<div><a><b><a><b>CC</b></a></b></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>',                           'right result';
 
 # Generate tags
 is(Mojo::DOM->new_tag('br')->to_string,  '<br>',        'right result');

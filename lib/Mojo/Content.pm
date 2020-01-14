@@ -40,7 +40,7 @@ sub generate_body_chunk {
 
   $self->emit(drain => $offset) unless length($self->{body_buffer} //= '');
   return delete $self->{body_buffer} if length $self->{body_buffer};
-  return '' if $self->{eof};
+  return ''                          if $self->{eof};
 
   my $len = $self->headers->content_length;
   return looks_like_number $len && $len == $offset ? '' : undef;

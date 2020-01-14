@@ -175,7 +175,7 @@ is $tx->req->param('♥'), '☃', 'right value';
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {Accept => '*/*', 'Content-Type' => 'application/mojo-form'} => form =>
-    {'♥'  => '☃', nothing        => undef});
+    {'♥' => '☃', nothing => undef});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/mojo-form',
@@ -200,7 +200,7 @@ is $tx->req->default_charset('shift_jis')->param('やった'), 'やった',
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/form-data'} => form =>
-    {'♥' => '☃', nothing => undef});
+    {'♥'          => '☃', nothing => undef});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -238,7 +238,7 @@ is $tx->req->default_charset('shift_jis')->param('やった'), 'やった',
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/form-data'} => form =>
-    {a => [1, 2, 3], b => 4});
+    {a              => [1, 2, 3], b => 4});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -280,7 +280,7 @@ is $tx->req->content->parts->[1], undef, 'no more parts';
 $tx
   = $t->tx(POST => 'http://example.com/foo' =>
     {'Content-Type' => 'multipart/mojo-form'} => form =>
-    {mytext => {file => Mojo::Asset::File->new(path => __FILE__)}});
+    {mytext         => {file => Mojo::Asset::File->new(path => __FILE__)}});
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/mojo-form',
@@ -696,8 +696,8 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*',                    'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
@@ -712,8 +712,8 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'DELETE', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*',                    'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
@@ -774,8 +774,8 @@ is $tx->req->headers->content_length, 8, 'right "Content-Length" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*',                    'right "Accept" value';
 is $tx->req->headers->content_type,   undef, 'no "Content-Type" value';
 is $tx->req->headers->content_length, undef, 'no "Content-Length" value';
 is $tx->req->headers->location,       undef, 'no "Location" value';
@@ -869,8 +869,8 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*',                    'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, 'whatever', 'right content';
 is $tx->res->code, undef,      'no status';
@@ -939,8 +939,8 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->url->to_abs, 'https://example.com/bar', 'right URL';
-is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->url->to_abs,     'https://example.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*',                     'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, 'whatever', 'right content';
 is $tx->res->code, undef,      'no status';

@@ -200,7 +200,7 @@ is $err->{message}, 'Proxy connection failed', 'right error';
 
 # Blocking proxy request again
 $tx = $ua->get("https://127.0.0.1:$port/proxy");
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                             'right status';
 is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
 
 # Failed TLS handshake through proxy

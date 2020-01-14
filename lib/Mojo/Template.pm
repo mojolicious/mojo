@@ -17,12 +17,12 @@ has comment_mark  => '#';
 has encoding      => 'UTF-8';
 has escape        => sub { \&Mojo::Util::xml_escape };
 has [qw(escape_mark expression_mark trim_mark)] => '=';
-has [qw(line_start replace_mark)] => '%';
-has name      => 'template';
-has namespace => 'Mojo::Template::SandBox';
-has tag_start => '<%';
-has tag_end   => '%>';
-has tree      => sub { [] };
+has [qw(line_start replace_mark)]               => '%';
+has name                                        => 'template';
+has namespace                                   => 'Mojo::Template::SandBox';
+has tag_start                                   => '<%';
+has tag_end                                     => '%>';
+has tree                                        => sub { [] };
 
 sub parse {
   my ($self, $template) = @_;
@@ -193,7 +193,7 @@ sub _compile {
     # Text (quote and fix line ending)
     if ($op eq 'text') {
       $value = join "\n", map { quotemeta $_ } split("\n", $value, -1);
-      $value .= '\n' if $newline;
+      $value      .= '\n'                          if $newline;
       $blocks[-1] .= "\$_O .= \"" . $value . "\";" if length $value;
     }
 

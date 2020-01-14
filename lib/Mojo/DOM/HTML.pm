@@ -66,8 +66,8 @@ my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
 my %CLOSE
   = (li => [{li => 1}, {ul => 1, ol => 1}], tr => [{tr => 1}, {table => 1}]);
 $CLOSE{$_} = [\%TABLE, {table => 1}] for qw(colgroup tbody tfoot thead);
-$CLOSE{$_} = [{dd => 1, dt => 1}, {dl    => 1}] for qw(dd dt);
-$CLOSE{$_} = [{rp => 1, rt => 1}, {ruby  => 1}] for qw(rp rt);
+$CLOSE{$_} = [{dd => 1, dt => 1}, {dl => 1}] for qw(dd dt);
+$CLOSE{$_} = [{rp => 1, rt => 1}, {ruby => 1}] for qw(rp rt);
 $CLOSE{$_} = [{th => 1, td => 1}, {table => 1}] for qw(td th);
 
 # HTML elements without end tags

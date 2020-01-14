@@ -14,7 +14,7 @@ use ojo;
 my $app = a('/' => sub ($c) { $_->render(data => 'signatures work') });
 my $tx  = $app->ua->get('/');
 ok !$tx->error, 'no error';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,               'right status';
 is $tx->res->body, 'signatures work', 'right content';
 
 done_testing();

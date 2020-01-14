@@ -276,7 +276,7 @@ $m->find($c => {method => 'GET', path => '/alternatives'});
 is_deeply $m->stack, [{foo => 11}], 'right strucutre';
 is $m->path_for->{path}, '/alternatives', 'right path';
 is $m->path_for(format => 'txt')->{path}, '/alternatives/11.txt', 'right path';
-is $m->path_for(foo => 12, format => 'txt')->{path}, '/alternatives/12.txt',
+is $m->path_for(foo    => 12, format => 'txt')->{path}, '/alternatives/12.txt',
   'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/alternatives/0'});
@@ -369,7 +369,7 @@ $m->find($c => {method => 'GET', path => '/optional/23'});
 is_deeply $m->stack, [{foo => 23, bar => 'test'}], 'right structure';
 is $m->path_for->{path}, '/optional/23', 'right path';
 is $m->path_for(format => 'txt')->{path}, '/optional/23/test.txt', 'right path';
-is $m->path_for(foo => 12, format => 'txt')->{path}, '/optional/12/test.txt',
+is $m->path_for(foo    => 12, format => 'txt')->{path}, '/optional/12/test.txt',
   'right path';
 is $m->path_for('optionalfoobar', format => 'txt')->{path},
   '/optional/23/test.txt', 'right path';

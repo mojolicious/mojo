@@ -224,14 +224,14 @@ $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
 
 # Foo::joy (testing HTML attributes in template)
 $t->get_ok('/fun/joy')->status_is(200)
-  ->attr_is('p.joy', 'style' ,'background-color: darkred;')
-  ->attr_is('p.joy', 'style' ,'background-color: darkred;', 'with description')
-  ->attr_isnt('p.joy', 'style' ,'float: left;')
-  ->attr_isnt('p.joy', 'style' ,'float: left;', 'with description')
-  ->attr_like('p.joy', 'style' ,qr/color/)
-  ->attr_like('p.joy', 'style' ,qr/color/, 'with description')
-  ->attr_unlike('p.joy', 'style' ,qr/^float/)
-  ->attr_unlike('p.joy', 'style' ,qr/^float/, 'with description');
+  ->attr_is('p.joy', 'style', 'background-color: darkred;')
+  ->attr_is('p.joy', 'style', 'background-color: darkred;', 'with description')
+  ->attr_isnt('p.joy', 'style', 'float: left;')
+  ->attr_isnt('p.joy', 'style', 'float: left;', 'with description')
+  ->attr_like('p.joy', 'style', qr/color/)
+  ->attr_like('p.joy', 'style', qr/color/, 'with description')
+  ->attr_unlike('p.joy', 'style', qr/^float/)
+  ->attr_unlike('p.joy', 'style', qr/^float/, 'with description');
 
 # Foo::baz (missing action without template)
 $log = '';
@@ -271,7 +271,7 @@ like $log, qr/Missing right curly/,                       'right message';
 like $log, qr/Template "exception.development.html.ep" not found/,
   'right message';
 like $log, qr/Rendering template "exception.html.epl"/, 'right message';
-like $log, qr/500 Internal Server Error/, 'right message';
+like $log, qr/500 Internal Server Error/,               'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Exceptional::this_one_dies (action dies)
@@ -510,7 +510,7 @@ $t->get_ok('/just/some/template')->status_is(200)
 }
 
 # Make sure we can override attributes with constructor arguments
-is(MojoliciousTest->new(mode => 'test')->mode, 'test', 'right mode');
+is(MojoliciousTest->new(mode => 'test')->mode,   'test', 'right mode');
 is(MojoliciousTest->new({mode => 'test'})->mode, 'test', 'right mode');
 
 # Persistent error

@@ -6,8 +6,8 @@ use Carp 'croak';
 has [qw(constraints defaults types)]   => sub { {} };
 has [qw(placeholder_start type_start)] => ':';
 has [qw(placeholders tree)]            => sub { [] };
-has quote_end   => '>';
-has quote_start => '<';
+has quote_end                          => '>';
+has quote_start                        => '<';
 has [qw(regex unparsed)];
 has relaxed_start  => '#';
 has wildcard_start => '*';
@@ -74,8 +74,8 @@ sub render {
       my $name    = (split $start, $value)[0] // '';
       my $default = $self->defaults->{$name};
       $part = $values->{$name} // $default // '';
-      if (!defined $default || ($default ne $part)) { $optional = 0 }
-      elsif ($optional) { $part = '' }
+      if    (!defined $default || ($default ne $part)) { $optional = 0 }
+      elsif ($optional)                                { $part     = '' }
     }
 
     $str = $part . $str;

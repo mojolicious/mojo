@@ -22,7 +22,7 @@ sub load {
   # "expiration" value is inherited
   my $expiration = $session->{expiration} // $self->default_expiration;
   return if !(my $expires = delete $session->{expires}) && $expiration;
-  return if defined $expires && $expires <= time;
+  return if defined $expires                            && $expires <= time;
 
   my $stash = $c->stash;
   return unless $stash->{'mojo.active_session'} = keys %$session;

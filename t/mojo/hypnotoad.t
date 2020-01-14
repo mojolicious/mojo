@@ -106,7 +106,7 @@ my $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Application is alive (second port)
@@ -114,7 +114,7 @@ $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Same result
@@ -122,7 +122,7 @@ $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Same result (second port)
@@ -130,7 +130,7 @@ $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Update script (broken)
@@ -154,7 +154,7 @@ $tx = $ua->get("http://127.0.0.1:$port1/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Connection did not get lost (second port)
@@ -162,7 +162,7 @@ $tx = $ua->get("http://127.0.0.1:$port2/hello");
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->keep_alive,  'connection will be kept alive';
 ok $tx->kept_alive,  'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Request that will be served after graceful shutdown has been initiated
@@ -207,7 +207,7 @@ while (1) {
 Mojo::IOLoop->one_tick until $tx->is_finished;
 ok !$tx->keep_alive, 'connection will not be kept alive';
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                  'right status';
 is $tx->res->body, 'Graceful shutdown!', 'right content';
 
 # One uncertain request that may or may not be served by the old worker

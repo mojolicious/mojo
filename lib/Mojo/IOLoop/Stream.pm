@@ -92,7 +92,7 @@ sub write {
   # IO::Socket::SSL will corrupt data with the wrong internal representation
   utf8::downgrade $chunk;
   $self->{buffer} .= $chunk;
-  if ($cb) { $self->once(drain => $cb) }
+  if    ($cb)                     { $self->once(drain => $cb) }
   elsif (!length $self->{buffer}) { return $self }
   $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};

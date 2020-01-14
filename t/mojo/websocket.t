@@ -66,7 +66,7 @@ websocket '/early_finish' => sub {
 websocket '/denied' => sub {
   my $c = shift;
   $c->tx->handshake->on(finish => sub { $c->stash->{handshake}++ });
-  $c->on(finish => sub                { shift->stash->{finished}++ });
+  $c->on(finish => sub { shift->stash->{finished}++ });
   $c->render(text => 'denied', status => 403);
 };
 
@@ -124,12 +124,12 @@ websocket '/timeout' => sub {
 # URL for WebSocket
 my $ua  = app->ua;
 my $res = $ua->get('/link')->result;
-is $res->code, 200, 'right status';
+is $res->code,   200,                        'right status';
 like $res->body, qr!ws://127\.0\.0\.1:\d+/!, 'right content';
 
 # Plain HTTP request
 $res = $ua->get('/early_start')->res;
-is $res->code, 404, 'right status';
+is $res->code,   404,                'right status';
 like $res->body, qr/Page not found/, 'right content';
 
 # Plain WebSocket
@@ -347,7 +347,7 @@ $ua->websocket_p('/trim')->then(sub {
 is $result, 'also works!', 'right result';
 $result = undef;
 $ua->websocket_p('/foo')->then(sub { $result = 'test failed' })
-  ->catch(sub                      { $result = shift })->wait;
+  ->catch(sub { $result = shift })->wait;
 is $result, 'WebSocket handshake failed', 'right result';
 $result = undef;
 $ua->websocket_p($ua->server->url->to_abs->scheme('wsss'))
@@ -370,8 +370,8 @@ $ua->websocket(
 Mojo::IOLoop->start;
 ok $finished, 'transaction is finished';
 ok !$ws, 'not a websocket';
-is $code, 500, 'right status';
-is $msg, 'Internal Server Error', 'right message';
+is $code, 500,                     'right status';
+is $msg,  'Internal Server Error', 'right message';
 
 # Forbidden
 ($ws, $code, $msg) = ();

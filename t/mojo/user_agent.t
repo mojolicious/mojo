@@ -287,7 +287,7 @@ $ua->once(
   start => sub {
     my ($ua, $tx) = @_;
     $tx->req->on(finish => sub { $finished_req++ });
-    $tx->on(finish => sub      { $finished_tx++ });
+    $tx->on(finish => sub { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
   }
 );
@@ -310,7 +310,7 @@ $ua->once(
   start => sub {
     my ($ua, $tx) = @_;
     $tx->req->on(finish => sub { $finished_req++ });
-    $tx->on(finish => sub      { $finished_tx++ });
+    $tx->on(finish => sub { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
   }
 );
@@ -392,8 +392,8 @@ my $msg = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');
 app->log->unsubscribe(message => $msg);
 is $tx->error->{message}, 'Premature connection close', 'right error';
-is $timeout, 1, 'finish event has been emitted';
-like $log, qr/Inactivity timeout/, 'right log message';
+is $timeout, 1,                      'finish event has been emitted';
+like $log,   qr/Inactivity timeout/, 'right log message';
 eval { $tx->result };
 like $@, qr/Premature connection close/, 'right error';
 
@@ -445,7 +445,7 @@ $ua->once(
 );
 $tx = $ua->get('/echo' => 'Hello World!');
 is $tx->error->{message}, 'Maximum message size exceeded', 'right error';
-is $tx->error->{code}, undef, 'no status';
+is $tx->error->{code},    undef,                           'no status';
 ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 
 # 404 response

@@ -79,7 +79,7 @@ sub match {
   $method = 'GET' if $method eq 'HEAD';
 
   # Check cache
-  my $ws = $c->tx->is_websocket ? 1 : 0;
+  my $ws    = $c->tx->is_websocket ? 1 : 0;
   my $match = Mojolicious::Routes::Match->new(root => $self);
   $c->match($match);
   my $cache = $self->cache;

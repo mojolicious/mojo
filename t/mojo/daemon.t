@@ -30,7 +30,7 @@ package main;
 my $ua = Mojo::UserAgent->new;
 $ua->server->app(TestApp->new);
 my $tx = $ua->get('/');
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,              'right status';
 is $tx->res->body, 'Hello TestApp!', 'right content';
 
 # Timeout

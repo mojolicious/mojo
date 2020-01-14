@@ -102,7 +102,7 @@ is $result, 'test1test2', 'right result';
 
 # Blocking proxy request
 my $tx = $ua->get('http://example.com/proxy');
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                        'right status';
 is $tx->res->body, 'http://example.com/proxy', 'right content';
 
 # Proxy WebSocket

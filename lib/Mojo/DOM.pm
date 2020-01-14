@@ -19,7 +19,7 @@ sub all_text { _text(_nodes(shift->tree), 1) }
 
 sub ancestors { _select($_[0]->_collect([_ancestors($_[0]->tree)]), $_[1]) }
 
-sub append { shift->_add(1, @_) }
+sub append         { shift->_add(1, @_) }
 sub append_content { shift->_content(1, 0, @_) }
 
 sub at {
@@ -125,7 +125,7 @@ sub parse { ${$_[0]}->parse($_[1]) and return $_[0] }
 sub preceding { _select($_[0]->_collect(_siblings($_[0]->tree, 1, 0)), $_[1]) }
 sub preceding_nodes { $_[0]->_collect(_siblings($_[0]->tree, 0)) }
 
-sub prepend { shift->_add(0, @_) }
+sub prepend         { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
 sub previous      { $_[0]->_maybe(_siblings($_[0]->tree, 1, 0, -1)) }

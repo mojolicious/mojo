@@ -191,16 +191,16 @@ $ua = Mojo::UserAgent->new;
 
 # Simple keep-alive form POST
 $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojolicious'});
-is $tx->req->method, 'POST', 'right method';
-is $tx->req->url, 'https://metacpan.org/search', 'right url';
+is $tx->req->method, 'POST',                        'right method';
+is $tx->req->url,    'https://metacpan.org/search', 'right url';
 is $tx->req->headers->content_length, 13, 'right content length';
 is $tx->req->body,   'q=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/, 'right content';
 is $tx->res->code,   200,             'right status';
 ok $tx->keep_alive, 'connection will be kept alive';
 $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojolicious'});
-is $tx->req->method, 'POST', 'right method';
-is $tx->req->url, 'https://metacpan.org/search', 'right url';
+is $tx->req->method, 'POST',                        'right method';
+is $tx->req->url,    'https://metacpan.org/search', 'right url';
 is $tx->req->headers->content_length, 13, 'right content length';
 is $tx->req->body,   'q=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/, 'right content';

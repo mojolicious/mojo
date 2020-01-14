@@ -48,7 +48,7 @@ is $e->lines_before->[1][0], 2,                                 'right number';
 is $e->lines_before->[1][1], 'use Mojo::Base -strict;',         'right line';
 is $e->lines_before->[2][0], 3,                                 'right number';
 is $e->lines_before->[2][1], '',                                'right line';
-is $e->line->[0], 4, 'right number';
+is $e->line->[0], 4,                                          'right number';
 is $e->line->[1], 'Mojo::LoaderException2_2::throw_error();', 'right line';
 is $e->lines_after->[0][0], 5,    'right number';
 is $e->lines_after->[0][1], '',   'right line';
@@ -149,7 +149,7 @@ is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
   ok !file_is_binary('Example::Package::DoesNotExist', 'test.bin'),
     'file is not binary';
   ok file_is_binary('Example::Package::Base64', 'test.bin'), 'file is binary';
-  is data_section('Example::Package::Base64', 'test.bin'), "\xe2\x99\xa5",
+  is data_section('Example::Package::Base64', 'test.bin'),   "\xe2\x99\xa5",
     'right template';
   is_deeply [sort keys %{data_section 'Example::Package::Base64'}],
     ['test.bin'], 'right DATA files';

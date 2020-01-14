@@ -85,7 +85,7 @@ get '/param_auth/too' =>
 under sub {
   my $c = shift;
   $c->stash(_name => 'stash');
-  $c->cookie(foo => 'cookie',               {expires => time + 60});
+  $c->cookie(foo => 'cookie', {expires => time + 60});
   $c->signed_cookie(bar => 'signed_cookie', {expires => time + 120});
   $c->cookie(bad => 'bad_cookie--12345678');
   1;

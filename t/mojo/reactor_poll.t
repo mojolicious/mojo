@@ -83,7 +83,7 @@ $reactor->start;
 ok $readable, 'handle is readable';
 ok !$writable, 'handle is not writable';
 ($readable, $writable) = ();
-$reactor->io($server => sub  { pop() ? $writable++ : $readable++ });
+$reactor->io($server => sub { pop() ? $writable++ : $readable++ });
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok $readable, 'handle is readable';

@@ -89,11 +89,11 @@ is $params->to_string, '0=0', 'right format';
 # Semicolon
 $params = Mojo::Parameters->new('foo=bar;baz');
 is $params->to_string, 'foo=bar;baz', 'right format';
-is_deeply $params->pairs, [foo => 'bar;baz'],   'right structure';
+is_deeply $params->pairs, [foo => 'bar;baz'], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
 is $params->to_string, 'foo=bar%3Bbaz', 'right format';
 $params = Mojo::Parameters->new($params->to_string);
-is_deeply $params->pairs, [foo => 'bar;baz'],   'right structure';
+is_deeply $params->pairs, [foo => 'bar;baz'], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
 is $params->to_string, 'foo=bar%3Bbaz', 'right format';
 

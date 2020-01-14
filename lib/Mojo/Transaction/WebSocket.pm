@@ -51,7 +51,7 @@ sub connection { shift->handshake->connection }
 sub finish {
   my $self = shift;
 
-  my $close = $self->{close} = [@_];
+  my $close   = $self->{close} = [@_];
   my $payload = $close->[0] ? pack('n', $close->[0]) : '';
   $payload .= encode 'UTF-8', $close->[1] if defined $close->[1];
   $close->[0] //= 1005;
@@ -74,7 +74,7 @@ sub parse_message {
   # Ping/Pong
   my $op = $frame->[4];
   return $self->send([1, 0, 0, 0, WS_PONG, $frame->[5]]) if $op == WS_PING;
-  return undef if $op == WS_PONG;
+  return undef                                           if $op == WS_PONG;
 
   # Close
   if ($op == WS_CLOSE) {

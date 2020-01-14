@@ -462,7 +462,7 @@ $req->parse("o World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
-is $req->url->host, undef, 'no host';
+is $req->url->host, undef,                 'no host';
 is $req->url->path, '//foo/bar//baz.html', 'right path';
 is $req->url, '//foo/bar//baz.html?foo=13', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
@@ -565,7 +565,7 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_length, 13,           'right "Content-Length" value';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
-is $req->content->asset->size, 13, 'right size';
+is $req->content->asset->size,  13,              'right size';
 is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 chunked request with callbacks
@@ -613,13 +613,13 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
 is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
-is $req->content->asset->size, 25, 'right size';
+is $req->content->asset->size,  25,                          'right size';
 is $req->content->asset->slurp, 'foo=bar&+tset=23+&foo=bar', 'right content';
 is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
 is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
-is_deeply $req->every_param('foo'),     [qw(bar bar 13)], 'right values';
+is_deeply $req->every_param('foo'), [qw(bar bar 13)], 'right values';
 is $req->param(' tset'), '23 ', 'right value';
 $req->param('set', 'single');
 is $req->param('set'), 'single', 'setting single param works';
@@ -650,7 +650,7 @@ is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
 is $req->headers->header('X-Trailer2'), '123',  'right "X-Trailer2" value';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
-is $req->content->asset->size, 13, 'right size';
+is $req->content->asset->size,  13,              'right size';
 is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 chunked request with trailing headers (different variation)
@@ -673,7 +673,7 @@ ok !defined $req->headers->transfer_encoding, 'no "Transfer-Encoding" value';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer'), '777', 'right "X-Trailer" value';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
-is $req->content->asset->size, 13, 'right size';
+is $req->content->asset->size,  13,              'right size';
 is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 chunked request with trailing headers (different variation)
@@ -696,7 +696,7 @@ is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
 is $req->headers->header('X-Trailer2'), '123',  'right "X-Trailer2" value';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
-is $req->content->asset->size, 13, 'right size';
+is $req->content->asset->size,  13,              'right size';
 is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 chunked request with trailing headers (no Trailer header)
@@ -718,7 +718,7 @@ is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
 is $req->headers->header('X-Trailer2'), '123',  'right "X-Trailer2" value';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
-is $req->content->asset->size, 13, 'right size';
+is $req->content->asset->size,  13,              'right size';
 is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 multipart request
@@ -765,7 +765,7 @@ ok !$req->content->parts->[0]->asset->is_file, 'stored in memory';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
-is $req->body_params->to_hash->{text2}, '', 'right value';
+is $req->body_params->to_hash->{text2}, '',                     'right value';
 is $req->upload('upload')->filename, 'hello.pl', 'right filename';
 ok !$req->upload('upload')->asset->is_file, 'stored in memory';
 is $req->upload('upload')->asset->size, 69, 'right size';
@@ -834,7 +834,7 @@ ok $req->content->parts->[0]->asset->is_file, 'stored in file';
 is $req->content->parts->[0]->asset->slurp,   "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
-is $req->body_params->to_hash->{text2}, '', 'right value';
+is $req->body_params->to_hash->{text2}, '',                     'right value';
 is $req->upload('upload')->filename, 'bye.txt', 'right filename';
 is $req->upload('upload')->asset->size, 4, 'right size';
 is $req->every_upload('upload')->[0]->filename, 'hello.pl', 'right filename';
@@ -914,7 +914,7 @@ ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
-is $req->body_params->to_hash->{text2}, '', 'right value';
+is $req->body_params->to_hash->{text2}, '',                     'right value';
 is $stream,
     "#!/usr/bin/perl\n\n"
   . "use strict;\n"
@@ -992,7 +992,7 @@ ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
-is $req->body_params->to_hash->{text2}, '', 'right value';
+is $req->body_params->to_hash->{text2}, '',                     'right value';
 is $req->body_params->to_hash->{upload}, undef, 'not a body parameter';
 is $req->upload('upload')->filename, '0', 'right filename';
 ok !$req->upload('upload')->asset->is_file, 'stored in memory';
@@ -1366,8 +1366,8 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1', 'right "Host" value';
+is $req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->host, '127.0.0.1',                'right "Host" value';
 is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
@@ -1488,8 +1488,8 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1', 'right "Host" value';
+is $req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->host, '127.0.0.1',                'right "Host" value';
 is $req->headers->content_length, '106', 'right "Content-Length" value';
 is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
   'right "Content-Type" value';
@@ -1518,8 +1518,8 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1', 'right "Host" value';
+is $req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->host, '127.0.0.1',                'right "Host" value';
 is $req->headers->content_length, '106', 'right "Content-Length" value';
 is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
   'right "Content-Type" value';
@@ -1534,8 +1534,8 @@ ok $clone->is_finished, 'request is finished';
 is $clone->method,      'GET', 'right method';
 is $clone->version,     '1.1', 'right version';
 is $clone->url,         '/foo/bar', 'right URL';
-is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $clone->headers->host, '127.0.0.1', 'right "Host" value';
+is $clone->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->headers->host, '127.0.0.1',                'right "Host" value';
 is $clone->headers->content_length, '106', 'right "Content-Length" value';
 is $clone->headers->content_type, 'multipart/mixed; boundary=7am1X',
   'right "Content-Type" value';
@@ -1569,8 +1569,8 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs, 'http://127.0.0.1:8080/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1:8080', 'right "Host" value';
+is $req->url->to_abs,   'http://127.0.0.1:8080/foo/bar', 'right absolute URL';
+is $req->headers->host, '127.0.0.1:8080',                'right "Host" value';
 is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $req->body, "hello world!hello world2!\n\n", 'right content';
 ok $counter, 'right counter';
@@ -1588,8 +1588,8 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->url->to_abs, 'http://127.0.0.1/', 'right absolute URL';
-is $req->headers->host, '127.0.0.1', 'right "Host" value';
+is $req->url->to_abs,   'http://127.0.0.1/', 'right absolute URL';
+is $req->headers->host, '127.0.0.1',         'right "Host" value';
 is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $req->body, "hello world!hello world2!\n\n", 'right content';
 
@@ -2077,7 +2077,7 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo', 'right URL';
 like $req->headers->content_type, qr!multipart/form-data!,
   'right "Content-Type" value';
-is $req->upload('☃')->name, '☃', 'right name';
+is $req->upload('☃')->name,     '☃',              'right name';
 is $req->upload('☃')->filename, 'foo bär ☃.txt', 'right filename';
 is $req->upload('☃')->headers->content_type, 'text/plain',
   'right "Content-Type" value';

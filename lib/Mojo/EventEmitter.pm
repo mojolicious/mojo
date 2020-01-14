@@ -16,7 +16,7 @@ sub emit {
   }
   else {
     warn "-- Emit $name in @{[blessed $self]} (0)\n" if DEBUG;
-    die "@{[blessed $self]}: $_[0]" if $name eq 'error';
+    die "@{[blessed $self]}: $_[0]"                  if $name eq 'error';
   }
 
   return $self;

@@ -89,7 +89,7 @@ Mojo::IOLoop->next_tick(sub {
     sub {
       my $result;
       my $promise = Mojo::Promise->new;
-      $promise->then(sub          { $result = shift });
+      $promise->then(sub { $result = shift });
       Mojo::IOLoop->next_tick(sub { $promise->resolve(25) });
       $promise->wait;
       return $result;
@@ -110,7 +110,7 @@ is $result, 25, 'right result';
 Mojo::IOLoop->delay(
   sub {
     my $delay = shift;
-    Mojo::IOLoop->subprocess(sub      {1}, $delay->begin);
+    Mojo::IOLoop->subprocess(sub {1}, $delay->begin);
     Mojo::IOLoop->subprocess->run(sub {2}, $delay->begin);
   },
   sub {

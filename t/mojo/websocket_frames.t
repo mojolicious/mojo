@@ -115,7 +115,7 @@ is $frame->[5], 'works', 'right payload';
 is $bytes = build_frame(0, 1, 0, 0, 0, 2, 'works'), $bytes, 'frames are equal';
 
 # Masked text frame roundtrip
-$bytes = build_frame 1, 1, 0, 0, 0, 1, 'also works';
+$bytes = build_frame 1,                  1, 0, 0, 0, 1, 'also works';
 $frame = parse_frame \($dummy = $bytes), 262144;
 is $frame->[0], 1,            'fin flag is set';
 is $frame->[1], 0,            'rsv1 flag is not set';

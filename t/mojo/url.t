@@ -99,8 +99,8 @@ is $url->path,     '', 'no path';
 is $url->query,    '_monkeybiz%3B&_monkey;23', 'right query';
 is_deeply $url->query->pairs, ['_monkeybiz;', '', '_monkey;23', ''],
   'right structure';
-is $url->query, '_monkeybiz%3B=&_monkey%3B23=', 'right query';
-is $url->fragment, '23', 'right fragment';
+is $url->query,    '_monkeybiz%3B=&_monkey%3B23=', 'right query';
+is $url->fragment, '23',                           'right fragment';
 is "$url", 'wss://example.com:8080?_monkeybiz%3B=&_monkey%3B23=#23',
   'right format';
 $url = Mojo::URL->new('https://example.com/0?0#0');

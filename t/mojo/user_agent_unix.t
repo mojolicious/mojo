@@ -71,7 +71,7 @@ is $tx->res->body, '/', 'right content';
 
 # Connection information
 $tx = $ua->get("http+unix://$encoded/info");
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                   'right status';
 is $tx->res->body, 'None:None:None:None', 'right content';
 
 # WebSocket
@@ -122,11 +122,11 @@ Mojo::IOLoop->remove($id);
 $ua->proxy->http("http+unix://$encoded");
 $tx = $ua->get('http://example.com');
 ok !$tx->kept_alive, 'connection was not kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                  'right status';
 is $tx->res->body, 'http://example.com', 'right content';
 $tx = $ua->get('http://example.com');
 ok $tx->kept_alive, 'connection was kept alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                  'right status';
 is $tx->res->body, 'http://example.com', 'right content';
 
 # Cleanup

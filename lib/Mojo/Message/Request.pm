@@ -61,7 +61,7 @@ sub extract_start_line {
     unless $1 =~ /^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$/;
   my $url    = $self->method($1)->version($3)->url;
   my $target = $2;
-  return !!$url->host_port($target) if $1 eq 'CONNECT';
+  return !!$url->host_port($target)              if $1 eq 'CONNECT';
   return !!$url->parse($target)->fragment(undef) if $target =~ /^[^:\/?#]+:/;
   return !!$url->path_query($target);
 }

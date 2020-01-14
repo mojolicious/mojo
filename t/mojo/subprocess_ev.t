@@ -19,7 +19,7 @@ Mojo::IOLoop->next_tick(sub {
     sub {
       my $result;
       my $promise = Mojo::Promise->new;
-      $promise->then(sub          { $result = shift });
+      $promise->then(sub { $result = shift });
       Mojo::IOLoop->next_tick(sub { $promise->resolve(25) });
       $promise->wait;
       return $result;

@@ -49,9 +49,9 @@ ok $v->required('foo')->is_valid, 'valid';
 is_deeply $v->output, {foo => 'bar'}, 'right result';
 is $v->param, 'bar', 'right value';
 is $v->param('foo'), 'bar', 'right value';
-is_deeply $v->every_param,        ['bar'], 'right values';
+is_deeply $v->every_param, ['bar'], 'right values';
 is_deeply $v->every_param('foo'), ['bar'], 'right values';
-is_deeply $v->passed,             ['foo'], 'right names';
+is_deeply $v->passed, ['foo'], 'right names';
 ok !$v->has_error, 'no error';
 ok $v->optional('baz')->is_valid, 'valid';
 is_deeply $v->output, {foo => 'bar', baz => 'yada'}, 'right result';
@@ -95,7 +95,7 @@ ok !$v->optional('yada')->equal_to('foo')->is_valid, 'not valid';
 is_deeply $v->output, {foo => 'bar'}, 'right result';
 ok $v->has_error, 'has error';
 is_deeply $v->error('yada'), [qw(equal_to 1 foo)], 'right error';
-is_deeply $v->failed,        [qw(baz yada)],       'right names';
+is_deeply $v->failed, [qw(baz yada)], 'right names';
 
 # In
 $v = $t->app->validation->input(

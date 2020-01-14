@@ -86,11 +86,11 @@ is_deeply $e->line,         [], 'no line';
 is_deeply $e->lines_after,  [], 'no lines';
 $e->inspect;
 is_deeply $e->lines_before->[-1], [2, 'use warnings;'], 'right line';
-is_deeply $e->line,               [3, 'use utf8;'],     'right line';
-is_deeply $e->lines_after->[0],   [4, ''],              'right line';
+is_deeply $e->line, [3, 'use utf8;'], 'right line';
+is_deeply $e->lines_after->[0], [4, ''], 'right line';
 $e = Mojo::Exception->new("Died at $file line 4.")->inspect;
 is_deeply $e->lines_before->[-1], [3, 'use utf8;'], 'right line';
-is_deeply $e->line,               [4, ''],          'right line';
+is_deeply $e->line, [4, ''], 'right line';
 is_deeply $e->lines_after->[0], [5, "my \$s = 'Über•résumé';"],
   'right line';
 
@@ -102,11 +102,11 @@ is_deeply $e->line,         [], 'no line';
 is_deeply $e->lines_after,  [], 'no lines';
 $e->inspect->inspect;
 is_deeply $e->lines_before->[-1], [2, 'use warnings;'], 'right line';
-is_deeply $e->line,               [3, 'no utf8;'],      'right line';
-is_deeply $e->lines_after->[0],   [4, ''],              'right line';
+is_deeply $e->line, [3, 'no utf8;'], 'right line';
+is_deeply $e->lines_after->[0], [4, ''], 'right line';
 $e = Mojo::Exception->new("Died at $file line 4.")->inspect;
 is_deeply $e->lines_before->[-1], [3, 'no utf8;'], 'right line';
-is_deeply $e->line,               [4, ''],         'right line';
+is_deeply $e->line, [4, ''], 'right line';
 is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"],
   'right line';
 
@@ -222,14 +222,14 @@ $result = undef;
 check(
   MojoTest::X::Yada->new('whatever'),
   ['MojoTest::X::Foo', 'MojoTest::X::Bar'] => sub { $result = 'test15' },
-  default => sub { $result = 'fail' }
+  default                                  => sub { $result = 'fail' }
 );
 is $result, 'test15', 'class matched';
 $result = undef;
 check(
   MojoTest::X::Bar->new('whatever'),
   ['MojoTest::X::Foo', 'MojoTest::X::Yada'] => sub { $result = 'fail' },
-  ['MojoTest::X::Bar'] => sub { $result = 'test16' }
+  ['MojoTest::X::Bar']                      => sub { $result = 'test16' }
 );
 is $result, 'test16', 'class matched';
 

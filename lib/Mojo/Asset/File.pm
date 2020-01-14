@@ -69,7 +69,7 @@ sub contains {
     # Search window
     my $pos = index $window, $str;
     return $offset + $pos if $pos >= 0;
-    return -1 if $read == 0 || ($offset += $read) == $end;
+    return -1             if $read == 0 || ($offset += $read) == $end;
 
     # Resize window
     substr $window, 0, $read, '';

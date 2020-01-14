@@ -140,7 +140,7 @@ $collection = c(qw(Test perl Mojo));
 is_deeply $collection->sort(sub { uc(shift) cmp uc(shift) })->to_array,
   [qw(Mojo perl Test)], 'right order';
 $collection = c();
-is_deeply $collection->sort->to_array,                    [], 'no elements';
+is_deeply $collection->sort->to_array, [], 'no elements';
 is_deeply $collection->sort(sub { $a cmp $b })->to_array, [], 'no elements';
 
 # uniq

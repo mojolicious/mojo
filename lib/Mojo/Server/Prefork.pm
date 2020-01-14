@@ -67,7 +67,7 @@ sub run {
     }
   };
   local $SIG{INT}  = local $SIG{TERM} = sub { $self->_term };
-  local $SIG{QUIT} = sub { $self->_term(1) };
+  local $SIG{QUIT} = sub                    { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
   local $SIG{TTOU} = sub {
     $self->workers > 0 ? $self->workers($self->workers - 1) : return;

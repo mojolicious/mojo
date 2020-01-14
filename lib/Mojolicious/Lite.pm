@@ -22,7 +22,7 @@ sub import {
 
   # Generate moniker based on filename
   my $moniker = path($ENV{MOJO_EXE})->basename('.pl', '.pm', '.t');
-  my $app = shift->new(moniker => $moniker);
+  my $app     = shift->new(moniker => $moniker);
 
   # Initialize routes without namespaces
   my $routes = $app->routes->namespaces([]);

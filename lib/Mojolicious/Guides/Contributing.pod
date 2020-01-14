@@ -77,9 +77,9 @@ single typo fix somewhere in the documentation or comments.
 An expressive title and detailed description are invaluable during the review
 process, which usually ends when members of the community have voiced their
 opinions and the core team voted for or against a change. To reach the formal
-voting stage, someone with vote calling permissions needs to call for a vote.
-You are responsible for securing this vote call as well as the required votes.
-The exact L</"Voting Rules"> can be found below.
+voting stage, a member of the core team needs to call for a vote. You are
+responsible for securing this vote call as well as the required votes. The exact
+L</"Voting Rules"> can be found below.
 
 All code changes should emulate the style of the surrounding code, include tests
 that fail without them, and update relevant documentation.

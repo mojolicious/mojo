@@ -61,7 +61,7 @@ sub is_fresh {
 
   my $res_headers = $c->res->headers;
   my ($last, $etag) = @$options{qw(last_modified etag)};
-  $res_headers->last_modified(Mojo::Date->new($last)->to_string) if $last;
+  $res_headers->last_modified(Mojo::Date->new($last)->to_string)       if $last;
   $res_headers->etag($etag = ($etag =~ m!^W/"! ? $etag : qq{"$etag"})) if $etag;
 
   # Unconditional
@@ -244,7 +244,8 @@ traversing to parent directories.
 =head2 is_fresh
 
   my $bool = $static->is_fresh(Mojolicious::Controller->new, {etag => 'abc'});
-  my $bool = $static->is_fresh(Mojolicious::Controller->new, {etag => 'W/"def"'});
+  my $bool = $static->is_fresh(
+    Mojolicious::Controller->new, {etag => 'W/"def"'});
 
 Check freshness of request by comparing the C<If-None-Match> and
 C<If-Modified-Since> request headers to the C<ETag> and C<Last-Modified>
@@ -257,6 +258,7 @@ These options are currently available:
 =item etag
 
   etag => 'abc'
+  etag => 'W/"abc"'
 
 Add C<ETag> header before comparing.
 

@@ -1,4 +1,6 @@
 
+8.32  2020-01-15
+
 8.31  2020-01-14
   - Added attr_is, attr_isnt, attr_like and attr_unlike methods to Test::Mojo.
     (pau4o)

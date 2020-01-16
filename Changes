@@ -1,7 +1,7 @@
 
 8.32  2020-01-16
   - Changed experimental -async flag to -async_await in Mojo::Base, because of a
-    quirk in Perl thay Future::AsyncAwait can't handle itself.
+    Perl quirk that Future::AsyncAwait can't handle itself.
 
 8.31  2020-01-14
   - Added attr_is, attr_isnt, attr_like and attr_unlike methods to Test::Mojo.

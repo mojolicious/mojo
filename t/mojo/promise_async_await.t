@@ -10,7 +10,7 @@ BEGIN {
   plan skip_all => 'Future::AsyncAwait 0.35+ required for this test!'
     unless Mojo::Base->ASYNC;
 }
-use Mojo::Base -async;
+use Mojo::Base -async_await;
 
 use Test::Mojo;
 use Mojo::Promise;

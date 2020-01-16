@@ -652,18 +652,18 @@ L<Mojo::Promise/"reject"> to transition them to C<rejected>.
 =head2 async/await
 
 And if you have L<Future::AsyncAwait> installed you can make using promises even
-easier. The C<async> and C<await> keywords are enabled with the C<-async> flag
-of L<Mojo::Base>, and make the use of closures with promises completely
+easier. The C<async> and C<await> keywords are enabled with the C<-async_await>
+flag of L<Mojo::Base>, and make the use of closures with promises completely
 optional.
 
-  use Mojo::Base -strict, -async;
+  use Mojo::Base -strict, -async_await;
 
 The C<async> keyword is placed before the C<sub> keyword, and means that this
 function always returns a promise. Returned values that are not L<Mojo::Promise>
 objects will be wrapped in a resolved promise automatically. And if an exception
 gets thrown in the function it will result in a rejected promise.
 
-  use Mojo::Base -strict, -async;
+  use Mojo::Base -strict, -async_await;
 
   async sub hello_p {
     return 'Hello Mojo!';
@@ -676,7 +676,7 @@ settled. It then returns the fulfillment values or throws an exception with the
 rejection reason. While waiting, the event loop is free to perform other tasks
 however, so no resources are wasted.
 
-  use Mojo::Base -strict, -signatures, -async;
+  use Mojo::Base -strict, -signatures, -async_await;
   use Mojo::UserAgent;
   use Mojo::URL;
 
@@ -700,7 +700,7 @@ sending the next request. But you can also perform those requests concurrently
 instead, by using methods like L<Mojo::Promise/"all"> to combine multiple
 promises before awaiting the results.
 
-  use Mojo::Base -strict, -signatures, -async;
+  use Mojo::Base -strict, -signatures, -async_await;
   use Mojo::Promise;
   use Mojo::UserAgent;
   use Mojo::URL;
@@ -724,7 +724,7 @@ promises before awaiting the results.
 All of this also means that you can use normal Perl exception handling again.
 Even many 3rd party exception handling modules from CPAN work just fine.
 
-  use Mojo::Base -strict, -async;
+  use Mojo::Base -strict, -async_await;
   use Mojo::Promise;
 
   # Catch a non-blocking exception
@@ -739,7 +739,7 @@ And it works just the same in L<Mojolicious> and L<Mojolicious::Lite>
 applications. Just declare your actions with the C<async> keyword and use
 C<await> to wait for promises to be C<fulfilled> or C<rejected>.
 
-  use Mojolicious::Lite -signatures, -async;
+  use Mojolicious::Lite -signatures, -async_await;
 
   # Request HTML titles from two sites non-blocking
   get '/' => async sub ($c) {

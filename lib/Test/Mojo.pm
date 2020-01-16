@@ -220,8 +220,11 @@ sub json_is {
 
 sub json_like {
   my ($self, $p, $regex, $desc) = @_;
-  return $self->_test('like', $self->tx->res->json($p),
-    $regex, _desc($desc, qq{similar match for JSON Pointer "$p"}));
+  $desc = _desc($desc, qq{similar match for JSON Pointer "$p"});
+  if($p && !_does_json_contain($self, $p)) {
+      return $self->_test('fail', $desc);
+  }
+  return $self->_test('like', $self->tx->res->json($p), $regex, $desc);
 }
 
 sub json_message_has {

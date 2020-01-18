@@ -131,6 +131,7 @@ sub import {
     elsif ($flag eq '-async_await') {
       Carp::croak 'Future::AsyncAwait 0.35+ is required for async/await'
         unless ASYNC;
+      require Mojo::Promise;
       Future::AsyncAwait->import_into($caller, future_class => 'Mojo::Promise');
     }
 

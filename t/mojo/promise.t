@@ -4,7 +4,6 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Mojo::IOLoop;
-use Mojo::Promise;
 
 # Resolved
 my $promise = Mojo::Promise->new;

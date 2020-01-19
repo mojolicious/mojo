@@ -1,4 +1,6 @@
 
+8.33  2020-01-19
+
 8.32  2020-01-18
   - Changed experimental -async flag to -async_await in Mojo::Base, because of a
     Perl quirk that Future::AsyncAwait can't handle itself.

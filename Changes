@@ -1,5 +1,6 @@
 
 8.33  2020-01-21
+  - Updated Future::AsyncAwait requirement to 0.36 for better tests. (ilmari)
 
 8.32  2020-01-18
   - Changed experimental -async flag to -async_await in Mojo::Base, because of a

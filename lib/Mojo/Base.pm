@@ -23,7 +23,7 @@ use constant ROLES =>
 # async/await support requires Future::AsyncAwait 0.35+
 use constant ASYNC => $ENV{MOJO_NO_ASYNC} ? 0 : !!(eval {
   require Future::AsyncAwait;
-  Future::AsyncAwait->VERSION('0.35');
+  Future::AsyncAwait->VERSION('0.36');
   1;
 });
 
@@ -129,7 +129,7 @@ sub import {
 
     # async/await
     elsif ($flag eq '-async_await') {
-      Carp::croak 'Future::AsyncAwait 0.35+ is required for async/await'
+      Carp::croak 'Future::AsyncAwait 0.36+ is required for async/await'
         unless ASYNC;
       require Mojo::Promise;
       Future::AsyncAwait->import_into($caller, future_class => 'Mojo::Promise');
@@ -272,7 +272,7 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
   use Mojo::Base 'SomeBaseClass', -signatures;
   use Mojo::Base -role, -signatures;
 
-If you have L<Future::AsyncAwait> 0.35+ installed you can also use the
+If you have L<Future::AsyncAwait> 0.36+ installed you can also use the
 C<-async_await> flag to activate the C<async> and C<await> keywords to deal much
 more efficiently with promises. Note that this feature is B<EXPERIMENTAL> and
 might change without warning!

@@ -153,6 +153,9 @@ sub _parse_env {
   my $headers = $self->headers;
   my $url     = $self->url;
   my $base    = $url->base;
+
+  my $port = $env->{SERVER_PORT};
+
   for my $name (keys %$env) {
     my $value = $env->{$name};
     next unless $name =~ s/^HTTP_//i;
@@ -160,8 +163,13 @@ sub _parse_env {
     $headers->header($name => $value);
 
     # Host/Port
-    $value =~ s/:(\d+)$// ? $base->host($value)->port($1) : $base->host($value) if $name eq 'HOST';
+    if ($name eq 'HOST') {
+      $value =~ s/:(\d+)$//;
+      $base->host($value);
+      $port //= $1;
+    }
   }
+  $base->port($port) if $port;
 
   # Content-Type is a special case on some servers
   $headers->content_type($env->{CONTENT_TYPE}) if $env->{CONTENT_TYPE};

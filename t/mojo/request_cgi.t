@@ -291,6 +291,38 @@ subtest 'Parse Apache 2.2.14 CGI environment variables and body (root)' => sub {
   is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload/', 'right absolute URL';
 };
 
+subtest 'SERVER_PORT (spec) superior to HTTP_HOST (not-spec)' => sub {
+  my $req = Mojo::Message::Request->new;
+  $req->parse({
+    SCRIPT_NAME       => '/upload',
+    SERVER_NAME       => '127.0.0.1',
+    SERVER_ADMIN      => '[no address given]',
+    PATH_INFO         => '/upload',
+    HTTP_CONNECTION   => 'Keep-Alive',
+    REQUEST_METHOD    => 'POST',
+    CONTENT_LENGTH    => '11',
+    SCRIPT_FILENAME   => '/tmp/SnLu1cQ3t2/test.fcgi',
+    SERVER_SOFTWARE   => 'Apache/2.2.14 (Unix) mod_fastcgi/2.4.2',
+    QUERY_STRING      => '',
+    REMOTE_PORT       => '58232',
+    HTTP_USER_AGENT   => 'Mojolicious (Perl)',
+    SERVER_PORT       => '13042',                                              # NOTE: When this line is present
+    SERVER_SIGNATURE  => '',
+    REMOTE_ADDR       => '127.0.0.1',
+    CONTENT_TYPE      => 'application/x-www-form-urlencoded; charset=UTF-8',
+    SERVER_PROTOCOL   => 'HTTP/1.1',
+    REQUEST_URI       => '/upload',
+    GATEWAY_INTERFACE => 'CGI/1.1',
+    SERVER_ADDR       => '127.0.0.1',
+    DOCUMENT_ROOT     => '/tmp/SnLu1cQ3t2',
+    PATH_TRANSLATED   => '/tmp/test.fcgi/upload',
+    HTTP_HOST         => '127.0.0.1:13028'                                     # NOTE: Ignore this PORT.
+  });
+  $req->parse('hello=world');
+  is $req->url->base->port,        13042,                            'right base port';       # from SERVER_PORT
+  is $req->url->to_abs->to_string, 'http://127.0.0.1:13042/upload/', 'right absolute URL';    # from SERVER_PORT
+};
+
 subtest 'Parse Apache 2.2.11 CGI environment variables and body (HTTPS=ON)' => sub {
   my $req = Mojo::Message::Request->new;
   $req->parse({

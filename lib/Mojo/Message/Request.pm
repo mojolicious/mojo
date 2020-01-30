@@ -7,13 +7,13 @@ use Mojo::URL;
 
 my ($SEED, $COUNTER) = ($$ . time . rand, int rand 0xffffff);
 
-has env    => sub { {} };
+has env => sub { {} };
 has method => 'GET';
 has [qw(proxy reverse_proxy)];
 has request_id => sub {
   substr sha1_sum($SEED . ($COUNTER = ($COUNTER + 1) % 0xffffff)), 0, 8;
 };
-has url       => sub { Mojo::URL->new };
+has url => sub { Mojo::URL->new };
 has via_proxy => 1;
 
 sub clone {
@@ -61,7 +61,7 @@ sub extract_start_line {
     unless $1 =~ /^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$/;
   my $url    = $self->method($1)->version($3)->url;
   my $target = $2;
-  return !!$url->host_port($target)              if $1 eq 'CONNECT';
+  return !!$url->host_port($target) if $1 eq 'CONNECT';
   return !!$url->parse($target)->fragment(undef) if $target =~ /^[^:\/?#]+:/;
   return !!$url->path_query($target);
 }
@@ -166,6 +166,9 @@ sub _parse_env {
   my $headers = $self->headers;
   my $url     = $self->url;
   my $base    = $url->base;
+
+  my $port = $env->{SERVER_PORT};
+
   for my $name (keys %$env) {
     my $value = $env->{$name};
     next unless $name =~ s/^HTTP_//i;
@@ -173,9 +176,13 @@ sub _parse_env {
     $headers->header($name => $value);
 
     # Host/Port
-    $value =~ s/:(\d+)$// ? $base->host($value)->port($1) : $base->host($value)
-      if $name eq 'HOST';
+    if ($name eq 'HOST') {
+      $value =~ s/:(\d+)$//;
+      $base->host($value);
+      $port //= $1;
+    }
   }
+  $base->port($port) if $port;
 
   # Content-Type is a special case on some servers
   $headers->content_type($env->{CONTENT_TYPE}) if $env->{CONTENT_TYPE};
@@ -207,7 +214,7 @@ sub _parse_env {
 
     # Remove SCRIPT_NAME prefix if necessary
     my $buffer = $path->to_string;
-    $value  =~ s!^/|/$!!g;
+    $value =~ s!^/|/$!!g;
     $buffer =~ s!^/?\Q$value\E/?!!;
     $buffer =~ s!^/!!;
     $path->parse($buffer);

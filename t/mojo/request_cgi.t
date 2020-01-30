@@ -176,7 +176,7 @@ is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 # Parse Apache 2.2 (win32) CGI environment variables and body
 $req = Mojo::Message::Request->new;
 my ($finished, $progress);
-$req->on(finish   => sub { $finished = shift->is_finished });
+$req->on(finish => sub { $finished = shift->is_finished });
 $req->on(progress => sub { $progress++ });
 ok !$finished, 'not finished';
 ok !$progress, 'no progress';
@@ -267,7 +267,7 @@ $req->parse({
   QUERY_STRING      => '',
   REMOTE_PORT       => '58232',
   HTTP_USER_AGENT   => 'Mojolicious (Perl)',
-  SERVER_PORT       => '13028',
+  SERVER_PORT       => '42',
   SERVER_SIGNATURE  => '',
   REMOTE_ADDR       => '127.0.0.1',
   CONTENT_TYPE      => 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -283,14 +283,14 @@ $req->parse('hello=world');
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
 is $req->url->base->host, '127.0.0.1', 'right base host';
-is $req->url->base->port, 13028,       'right base port';
+is $req->url->base->port, 42,          'right base port';
 is $req->url->path, '', 'no path';
 is $req->url->base->path, '/upload/', 'right base path';
 is $req->version, '1.1', 'right version';
 ok !$req->is_secure, 'not secure';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
-is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload/',
+is $req->url->to_abs->to_string, 'http://127.0.0.1:42/upload/',
   'right absolute URL';
 
 # Parse Apache 2.2.11 CGI environment variables and body (HTTPS=ON)

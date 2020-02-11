@@ -736,7 +736,7 @@ Unescape all HTML entities in string.
 
 =head2 humanize_bytes
 
-  my $str = humainze_bytes 1234;
+  my $str = humanize_bytes 1234;
 
 Turn number of bytes into a simplified human readable format. Note that this
 function is B<EXPERIMENTAL> and might change without warning!

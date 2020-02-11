@@ -187,7 +187,7 @@ sub humanize_bytes {
 
   my $prefix = $size < 0 ? '-' : '';
 
-  return "$prefix$size Byte" if ($size = abs $size) < 3000;
+  return "$prefix${size}B" if ($size = abs $size) < 3000;
   return $prefix . _round($size) . 'KiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size) . 'MiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size) . 'GiB' if ($size /= 1024) < 1024;
@@ -741,7 +741,7 @@ Unescape all HTML entities in string.
 Turn number of bytes into a simplified human readable format. Note that this
 function is B<EXPERIMENTAL> and might change without warning!
 
-  # "1 Byte"
+  # "1B"
   humanize_bytes 1;
 
   # "7.5GiB"

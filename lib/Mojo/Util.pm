@@ -74,8 +74,8 @@ my (%ENCODING, %PATTERN);
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode deprecated dumper encode extract_usage getopt gunzip gzip),
-  qw(hmac_sha1_sum html_attr_unescape html_unescape md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote scope_guard),
+  qw(hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes md5_bytes),
+  qw(md5_sum monkey_patch punycode_decode punycode_encode quote scope_guard),
   qw(secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
   qw(split_header steady_time tablify term_escape trim unindent unquote),
   qw(url_escape url_unescape xml_escape xor_encode)
@@ -181,6 +181,18 @@ sub gzip {
 
 sub html_attr_unescape { _html(shift, 1) }
 sub html_unescape      { _html(shift, 0) }
+
+sub humanize_bytes {
+  my $size = shift;
+
+  my $prefix = $size < 0 ? '-' : '';
+
+  return "$prefix$size Byte" if ($size = abs $size) < 3000;
+  return $prefix . _round($size) . 'KiB' if ($size /= 1024) < 1024;
+  return $prefix . _round($size) . 'MiB' if ($size /= 1024) < 1024;
+  return $prefix . _round($size) . 'GiB' if ($size /= 1024) < 1024;
+  return $prefix . _round($size /= 1024) . 'TiB';
+}
 
 sub monkey_patch {
   my ($class, %patch) = @_;
@@ -481,6 +493,8 @@ sub _options {
 # This may break in the future, but is worth it for performance
 sub _readable { !!(IO::Poll::_poll(@_[0, 1], my $m = POLLIN | POLLPRI) > 0) }
 
+sub _round { $_[0] < 10 ? int($_[0] * 10 + .5) / 10 : int($_[0] + .5) }
+
 sub _stash {
   my ($name, $object) = (shift, shift);
 
@@ -720,6 +734,25 @@ Unescape all HTML entities in string.
   # "<div>"
   html_unescape '&lt;div&gt;';
 
+=head2 humanize_bytes
+
+  my $str = humainze_bytes 1234;
+
+Turn number of bytes into a simplified human readable format. Note that this
+function is B<EXPERIMENTAL> and might change without warning!
+
+  # "1 Byte"
+  humanize_bytes 1;
+
+  # "7.5GiB"
+  humanize_bytes 8007188480;
+
+  # "13GiB"
+  humanize_bytes 13443399680;
+
+  # "-685MiB"
+  humanize_bytes -717946880;
+
 =head2 md5_bytes
 
   my $checksum = md5_bytes $bytes;
@@ -779,7 +812,7 @@ Quote string.
 
 Create anonymous scope guard object that will execute the passed callback when
 the object is destroyed. Note that this function is B<EXPERIMENTAL> and might
-change without warning
+change without warning!
 
   # Execute closure at end of scope
   {

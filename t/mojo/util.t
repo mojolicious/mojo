@@ -11,11 +11,11 @@ use Sub::Util 'subname';
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode dumper encode extract_usage getopt gunzip gzip hmac_sha1_sum),
-  qw(html_unescape html_attr_unescape md5_bytes md5_sum monkey_patch),
-  qw(punycode_decode punycode_encode quote scope_guard secure_compare),
-  qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time),
-  qw(tablify term_escape trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode);
+  qw(html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum),
+  qw(monkey_patch punycode_decode punycode_encode quote scope_guard),
+  qw(secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
+  qw(split_header steady_time tablify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -562,6 +562,25 @@ $test = 'a';
 }
 $test .= 'd';
 is $test, 'abcd', 'right order';
+
+# humanize_bytes
+is humanize_bytes(0),     '0 Byte',     'zero Byte';
+is humanize_bytes(1),     '1 Byte',     'one Byte';
+is humanize_bytes(-1024), '-1024 Byte', 'negative Byte';
+is humanize_bytes(1024 * 1024), '1MiB', 'one MiB';
+is humanize_bytes(1024 * 1024 * 1024), '1GiB', 'one GiB';
+is humanize_bytes(1024 * 1024 * 1024 * 1024), '1TiB', 'one TiB';
+is humanize_bytes(2999),           '2999 Byte',  'not quite 3KiB';
+is humanize_bytes(3000),           '2.9KiB',     'almost 3KiB';
+is humanize_bytes(-2999),          '-2999 Byte', 'not quite -3KiB';
+is humanize_bytes(-3000),          '-2.9KiB',    'almost -3KiB';
+is humanize_bytes(13443399680),    '13GiB',      'two digits GiB';
+is humanize_bytes(8007188480),     '7.5GiB',     'smaller GiB';
+is humanize_bytes(-8007188480),    '-7.5GiB',    'negative smaller GiB';
+is humanize_bytes(-1099511627776), '-1TiB',      'negative smaller TiB';
+is humanize_bytes(717946880),      '685MiB',     'large MiB';
+is humanize_bytes(-717946880),     '-685MiB',    'large negative MiB';
+is humanize_bytes(245760),         '240KiB',     'less than a MiB';
 
 # Hide DATA usage from error messages
 eval { die 'whatever' };

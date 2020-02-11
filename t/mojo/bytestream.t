@@ -151,4 +151,8 @@ isnt $compressed->to_string, $uncompressed->to_string, 'bytestream changed';
 ok $compressed->size < $uncompressed->size, 'bytestream is shorter';
 is $compressed->gunzip->to_string, $uncompressed->to_string, 'same bytestream';
 
+# humanize_bytes
+is b(8007188480)->humanize_bytes,  '7.5GiB',  'humanized';
+is b(-8007188480)->humanize_bytes, '-7.5GiB', 'humanized';
+
 done_testing();

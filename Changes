@@ -1,6 +1,7 @@
 
 8.33  2020-02-11
   - Added EXPERIMENTAL humanize_bytes function to Mojo::Util. (kraih, coolo)
+  - Added EXPERIMENTAL humanize_bytes method to Mojo::ByteStream.
   - Updated Future::AsyncAwait requirement to 0.36 for better tests. (ilmari)
 
 8.32  2020-01-18

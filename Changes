@@ -1,4 +1,6 @@
 
+8.34  2020-02-12
+
 8.33  2020-02-11
   - Added EXPERIMENTAL humanize_bytes function to Mojo::Util. (kraih, coolo)
   - Added EXPERIMENTAL humanize_bytes method to Mojo::ByteStream.

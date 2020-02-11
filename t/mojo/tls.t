@@ -43,7 +43,7 @@ $delay  = $loop->delay;
 $server = Mojo::IOLoop::TLS->new($server_sock2)->reactor($loop->reactor);
 $server->once(upgrade => $delay->begin);
 $server->once(error   => sub { warn pop });
-$server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL');
+$server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL', tls_version => 'TLSv1_2');
 $client = Mojo::IOLoop::TLS->new($client_sock2)->reactor($loop->reactor);
 $client->once(upgrade => $delay->begin);
 $client->once(error   => sub { warn pop });

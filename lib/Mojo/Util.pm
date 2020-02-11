@@ -187,7 +187,7 @@ sub humanize_bytes {
 
   my $prefix = $size < 0 ? '-' : '';
 
-  return "$prefix${size}B" if ($size = abs $size) < 3000;
+  return "$prefix${size}B" if ($size = abs $size) < 1024;
   return $prefix . _round($size) . 'KiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size) . 'MiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size) . 'GiB' if ($size /= 1024) < 1024;
@@ -493,7 +493,7 @@ sub _options {
 # This may break in the future, but is worth it for performance
 sub _readable { !!(IO::Poll::_poll(@_[0, 1], my $m = POLLIN | POLLPRI) > 0) }
 
-sub _round { $_[0] < 10 ? int($_[0] * 10 + .5) / 10 : int($_[0] + .5) }
+sub _round { $_[0] < 10 ? int($_[0] * 10 + 0.5) / 10 : int($_[0] + 0.5) }
 
 sub _stash {
   my ($name, $object) = (shift, shift);

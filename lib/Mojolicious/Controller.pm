@@ -40,7 +40,7 @@ sub cookie {
 
     # Cookie too big
     my $cookie = {name => $name, value => shift, %{shift || {}}};
-    $self->helpers->log->error(qq{Cookie "$name" is bigger than 4096 bytes})
+    $self->helpers->log->error(qq{Cookie "$name" is bigger than 4KiB})
       if length $cookie->{value} > 4096;
 
     $self->res->cookies($cookie);

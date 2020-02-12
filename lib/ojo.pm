@@ -80,7 +80,7 @@ Every L<ojo> one-liner is also a L<Mojolicious::Lite> application.
 On Perl 5.20+ L<subroutine signatures|perlsub/"Signatures"> will be enabled
 automatically.
 
-  $ perl -Mojo -E 'a(sub ($c) { $c->render(text => 'Hello!') })->start' get /
+  $ perl -Mojo -E 'a(sub ($c) { $c->render(text => "Hello!") })->start' get /
 
 If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
 be set to C<fatal>.

@@ -43,7 +43,7 @@ $delay  = $loop->delay;
 $server = Mojo::IOLoop::TLS->new($server_sock2)->reactor($loop->reactor);
 $server->once(upgrade => $delay->begin);
 $server->once(error   => sub { warn pop });
-$server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL', tls_version => 'TLSv1_2');
+$server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL');
 $client = Mojo::IOLoop::TLS->new($client_sock2)->reactor($loop->reactor);
 $client->once(upgrade => $delay->begin);
 $client->once(error   => sub { warn pop });
@@ -55,28 +55,5 @@ is ref $client_result, 'IO::Socket::SSL', 'right class';
 is $client_result->get_cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
 is ref $server_result, 'IO::Socket::SSL', 'right class';
 is $server_result->get_cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
-
-# Built-in certificate (custom event loop and cipher)
-$loop = Mojo::IOLoop->new;
-socketpair(my $client_sock3, my $server_sock3, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
-  or die "Couldn't create socket pair: $!";
-$client_sock3->blocking(0);
-$server_sock3->blocking(0);
-$delay  = $loop->delay;
-$server = Mojo::IOLoop::TLS->new($server_sock3)->reactor($loop->reactor);
-$server->once(upgrade => $delay->begin);
-$server->once(error   => sub { warn pop });
-$server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL', tls_version => 'TLSv1_3');
-$client = Mojo::IOLoop::TLS->new($client_sock3)->reactor($loop->reactor);
-$client->once(upgrade => $delay->begin);
-$client->once(error   => sub { warn pop });
-$client->negotiate(tls_verify => 0x00);
-$client_result = $server_result = undef;
-$delay->then(sub { ($server_result, $client_result) = @_ });
-$delay->wait;
-is ref $client_result, 'IO::Socket::SSL', 'right class';
-is $client_result->get_cipher, 'TLS_AES_256_GCM_SHA384', 'TLS_AES_256_GCM_SHA384 has been negotiatied';
-is ref $server_result, 'IO::Socket::SSL', 'right class';
-is $server_result->get_cipher, 'TLS_AES_256_GCM_SHA384', 'TLS_AES_256_GCM_SHA384 has been negotiatied';
 
 done_testing;

@@ -1,4 +1,5 @@
 language: perl
+dist: bionic
 matrix:
   include:
   - perl: "5.30"

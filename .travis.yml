@@ -27,6 +27,8 @@ env:
     - TEST_SUBPROCESS=1
     - TEST_UNIX=1
     - TEST_TLS=1
+before_install:
+  - which perl | grep perlbrew
 install:
   - cpanm -n Cpanel::JSON::XS EV~"!= 4.28" IO::Socket::Socks IO::Socket::SSL
   - cpanm -n Net::DNS::Native Role::Tiny Test::Pod Test::Pod::Coverage

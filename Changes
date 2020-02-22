@@ -1,5 +1,6 @@
 
-8.34  2020-02-12
+8.34  2020-02-22
+  - Fixed plugin generator not to use an __END__ section.
 
 8.33  2020-02-11
   - Added EXPERIMENTAL humanize_bytes function to Mojo::Util. (kraih, coolo)

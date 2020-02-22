@@ -3,7 +3,7 @@ matrix:
   include:
   - perl: "5.30"
     dist: bionic
-  - perl: "5.28"
+  - perl: "5.28.2"  # 5.28 temp fix, revert when travis fixes env
     dist: bionic
   - perl: "5.26"
     dist: bionic

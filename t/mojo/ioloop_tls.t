@@ -303,7 +303,7 @@ ok $client_err, 'has error';
 
 # Ignore invalid client certificate
 $loop = Mojo::IOLoop->new;
-my $cipher;
+my ($cipher, $sslversion);
 ($server, $client, $client_err) = ();
 $id = $loop->server(
   address     => '127.0.0.1',
@@ -317,6 +317,7 @@ $id = $loop->server(
     my ($loop, $stream) = @_;
     $stream->on(close => sub { $loop->stop });
     $server = 'accepted';
+    $sslversion = $stream->handle->get_sslversion;
   }
 );
 $port = $loop->acceptor($id)->port;
@@ -338,7 +339,12 @@ $loop->start;
 is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
-is $cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
+
+if ($sslversion eq 'TLSv1_3') {
+  is $cipher, 'TLS_AES_256_GCM_SHA384', 'TLS_AES_256_GCM_SHA384 has been negotiatied';
+} else {
+  is $cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
+}
 
 # Ignore missing client certificate
 ($server, $client, $client_err) = ();

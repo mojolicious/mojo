@@ -2,10 +2,27 @@ language: perl
 matrix:
   include:
   - perl: "5.30"
+    dist: bionic
   - perl: "5.28"
+    dist: bionic
   - perl: "5.26"
+    dist: bionic
   - perl: "5.24"
+    dist: bionic
   - perl: "5.22"
+    dist: bionic
+
+  - perl: "5.30"
+    dist: xenial
+  - perl: "5.28"
+    dist: xenial
+  - perl: "5.26"
+    dist: xenial
+  - perl: "5.24"
+    dist: xenial
+  - perl: "5.22"
+    dist: xenial
+
   - perl: "5.20"
     dist: trusty
   - perl: "5.18"

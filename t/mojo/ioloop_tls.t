@@ -355,6 +355,7 @@ $id = Mojo::IOLoop->server(
   tls_cert   => 't/mojo/certs/server.crt',
   tls_key    => 't/mojo/certs/server.key',
   tls_verify => 0x01,
+  tls_version => 'TLSv1_2',
   sub { $server = 'accepted' }
 );
 $port = Mojo::IOLoop->acceptor($id)->port;

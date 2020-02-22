@@ -146,6 +146,9 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 @@ test
 use Mojo::Base -strict;
 
+use Mojo::File 'curfile';
+use lib curfile->dirname->sibling('lib')->to_string;
+
 use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;

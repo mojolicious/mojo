@@ -173,6 +173,9 @@ sub welcome {
 @@ test
 use Mojo::Base -strict;
 
+use Mojo::File 'curfile';
+use lib curfile->dirname->sibling('lib')->to_string;
+
 use Test::More;
 use Test::Mojo;
 

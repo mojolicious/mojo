@@ -104,9 +104,9 @@ global default.
 
 =head2 nb_url
 
-  my $url = $ua->nb_url;
-  my $url = $ua->nb_url('http');
-  my $url = $ua->nb_url('https');
+  my $url = $server->nb_url;
+  my $url = $server->nb_url('http');
+  my $url = $server->nb_url('https');
 
 Get absolute L<Mojo::URL> object for server processing non-blocking requests
 with L</"app"> and switch protocol if necessary.
@@ -119,9 +119,9 @@ Restart server with new port.
 
 =head2 url
 
-  my $url = $ua->url;
-  my $url = $ua->url('http');
-  my $url = $ua->url('https');
+  my $url = $server->url;
+  my $url = $server->url('http');
+  my $url = $server->url('https');
 
 Get absolute L<Mojo::URL> object for server processing blocking requests with
 L</"app"> and switch protocol if necessary.

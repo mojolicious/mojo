@@ -109,6 +109,10 @@ like $@, qr/^Can't open file/, 'right error';
 eval { $dir->child('foo')->make_path->spurt('fail') };
 like $@, qr/^Can't open file/, 'right error';
 
+# Lines
+is_deeply $file->spurt(join $/, 'test', '123')->lines->to_array,
+  ['test', '123'], 'right content';
+
 # Make path
 $dir = tempdir;
 my $subdir = $dir->child('foo', 'bar');

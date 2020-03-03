@@ -44,6 +44,8 @@ sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
 sub is_abs { file_name_is_absolute ${shift()} }
 
+sub lines { Mojo::Collection->new(split $/, shift->slurp) }
+
 sub list {
   my ($self, $options) = (shift, shift // {});
 
@@ -314,6 +316,13 @@ Check if the path is absolute.
 
   # False (on UNIX)
   path('.vimrc')->is_abs;
+
+=head2 lines
+
+  my $collection = $path->lines;
+
+Read the entire file, split it by C<$/> and return a L<Mojo::Collection> object
+containing the result.
 
 =head2 list
 

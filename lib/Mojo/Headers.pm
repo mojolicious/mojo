@@ -409,7 +409,7 @@ Get or replace current header value, shortcut for the C<Date> header.
 
 =head2 dehop
 
-  $heders = $headers->dehop;
+  $headers = $headers->dehop;
 
 Remove hop-by-hop headers that should not be retransmitted.
 

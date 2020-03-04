@@ -811,8 +811,7 @@ Quote string.
   my $guard = scope_guard sub {...};
 
 Create anonymous scope guard object that will execute the passed callback when
-the object is destroyed. Note that this function is B<EXPERIMENTAL> and might
-change without warning!
+the object is destroyed.
 
   # Execute closure at end of scope
   {

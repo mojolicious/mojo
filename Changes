@@ -1,5 +1,16 @@
 
-8.34  2020-02-22
+8.34  2020-03-03
+  - Removed experimental status from proxy->get_p, proxy->post_p and
+    proxy->start_p helpers in Mojolicious::Plugin::DefaultHelpers.
+  - Removed experimental status from compress and min_compress_size attributes
+    in Mojolicious::Renderer.
+  - Removed experimental status from high_water_mark attribute in
+    Mojo::IOLoop::Stream.
+  - Removed experimental status from respond method in Mojolicious::Renderer.
+  - Removed experimental status from bytes_waiting and can_write methods in
+    Mojo::IOLoop::Stream.
+  - Removed experimental status from dehop method in Mojo::Headers.
+  - Removed experimental status from scope_guard function in Mojo::Util.
   - Fixed plugin generator not to use an __END__ section.
 
 8.33  2020-02-11
@@ -2232,8 +2243,8 @@
 4.49  2013-10-17
   - Added tls_ciphers option to Mojo::IOLoop::Server::listen.
   - Added ciphers parameter to Mojo::Server::Daemon::listen.
-  - Removed experimental status from Mojolicioua::Validator.
-  - Removed experimental status from Mojolicioua::Validator::Validation.
+  - Removed experimental status from Mojolicious::Validator.
+  - Removed experimental status from Mojolicious::Validator::Validation.
   - Removed experimental status from validation method in
     Mojolicious::Controller.
   - Removed experimental status from validator attribute in Mojolicious.

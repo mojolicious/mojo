@@ -244,8 +244,7 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
   $msg     = $msg->high_water_mark(1024);
 
 Maximum size of L</"write"> buffer in bytes before L</"can_write"> returns
-false, defaults to C<1048576> (1MiB). Note that this attribute is
-B<EXPERIMENTAL> and might change without warning!
+false, defaults to C<1048576> (1MiB).
 
 =head2 reactor
 
@@ -271,8 +270,7 @@ Number of bytes received.
   my $num = $stream->bytes_waiting;
 
 Number of bytes that have been enqueued with L</"write"> and are waiting to be
-written. Note that this method is B<EXPERIMENTAL> and might change without
-warning!
+written.
 
 =head2 bytes_written
 
@@ -284,8 +282,7 @@ Number of bytes written.
 
   my $bool = $stream->can_write;
 
-Returns true if calling L</"write"> is safe. Note that this method is
-B<EXPERIMENTAL> and might change without warning!
+Returns true if calling L</"write"> is safe.
 
 =head2 close
 

@@ -554,8 +554,7 @@ Alias for L<Mojolicious::Controller/"param">.
 
 Perform non-blocking C<GET> request and forward response as efficiently as
 possible, takes the same arguments as L<Mojo::UserAgent/"get"> and returns a
-L<Mojo::Promise> object. Note that this helper is B<EXPERIMENTAL> and might
-change without warning!
+L<Mojo::Promise> object.
 
   # Forward with exception handling
   $c->proxy->get_p('http://mojolicious.org')->catch(sub {
@@ -570,8 +569,7 @@ change without warning!
 
 Perform non-blocking C<POST> request and forward response as efficiently as
 possible, takes the same arguments as L<Mojo::UserAgent/"post"> and returns a
-L<Mojo::Promise> object. Note that this helper is B<EXPERIMENTAL> and might
-change without warning!
+L<Mojo::Promise> object.
 
   # Forward with exception handling
   $c->proxy->post_p('example.com' => form => {test => 'pass'})->catch(sub {
@@ -586,7 +584,6 @@ change without warning!
 
 Perform non-blocking request for a custom L<Mojo::Transaction::HTTP> object and
 forward response as efficiently as possible, returns a L<Mojo::Promise> object.
-Note that this helper is B<EXPERIMENTAL> and might change without warning!
 
   # Forward with exception handling
   my $tx = $c->ua->build_tx(GET => 'http://mojolicious.org');

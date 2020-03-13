@@ -237,7 +237,7 @@ Emitted once all data has been sent.
 =head2 finish
 
   $ws->on(finish => sub {
-    my ($ws, $code, $reason) = @_;
+    my ($ws, $code, $reason_chars) = @_;
     ...
   });
 
@@ -402,7 +402,7 @@ Connection identifier.
 
   $ws = $ws->finish;
   $ws = $ws->finish(1000);
-  $ws = $ws->finish(1003 => 'Cannot accept data!');
+  $ws = $ws->finish(1003 => do { use utf8; 'Can’t accept data!' });
 
 Close WebSocket connection gracefully.
 

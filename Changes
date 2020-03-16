@@ -1,5 +1,5 @@
 
-8.34  2020-03-03
+8.34  2020-03-16
   - Removed experimental status from proxy->get_p, proxy->post_p and
     proxy->start_p helpers in Mojolicious::Plugin::DefaultHelpers.
   - Removed experimental status from compress and min_compress_size attributes
@@ -11,6 +11,9 @@
     Mojo::IOLoop::Stream.
   - Removed experimental status from dehop method in Mojo::Headers.
   - Removed experimental status from scope_guard function in Mojo::Util.
+  - Improved size check in Mojolicious::Validator to only require one argument.
+  - Fixed Mojolicious::Validator to also validate empty string values instead of
+    ignoring them. This behaviour had caused a lot of confusion in the past.
   - Fixed plugin generator not to use an __END__ section.
 
 8.33  2020-02-11

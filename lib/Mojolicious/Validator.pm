@@ -56,7 +56,7 @@ sub _num {
 sub _size {
   my ($v, $name, $value, $min, $max) = @_;
   my $len = ref $value ? $value->size : length $value;
-  return $len < $min || $len > $max;
+  return (defined $min && $len < $min) || (defined $max && $len > $max);
 }
 
 sub _trim { defined $_[2] ? trim $_[2] : undef }
@@ -119,6 +119,8 @@ provided in the given range.
 =head2 size
 
   $v = $v->size(2, 5);
+  $v = $v->size(2, undef);
+  $v = $v->size(undef, 5);
 
 String value length or size of L<Mojo::Upload> object in bytes needs to be
 between these two values.

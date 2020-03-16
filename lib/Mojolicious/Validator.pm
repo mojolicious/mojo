@@ -59,7 +59,7 @@ sub _size {
   return $len < $min || $len > $max;
 }
 
-sub _trim { trim $_[2] // '' }
+sub _trim { defined $_[2] ? trim $_[2] : undef }
 
 1;
 

@@ -1,5 +1,6 @@
 
-8.35  2020-03-17
+8.35  2020-03-20
+  - Added not_empty filter to Mojolicious::Validator.
 
 8.34  2020-03-16
   - Removed experimental status from proxy->get_p, proxy->post_p and

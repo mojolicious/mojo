@@ -6,7 +6,7 @@ use Mojo::Util 'trim';
 use Mojolicious::Validator::Validation;
 
 has checks  => sub { {} };
-has filters => sub { {trim => \&_trim} };
+has filters => sub { {not_empty => \&_not_empty, trim => \&_trim} };
 
 sub add_check {
   my ($self, $name, $cb) = @_;
@@ -46,6 +46,8 @@ sub _in {
   $value eq $_ && return undef for @_;
   return 1;
 }
+
+sub _not_empty { length $_[2] ? $_[2] : undef }
 
 sub _num {
   my ($v, $name, $value, $min, $max) = @_;
@@ -134,6 +136,12 @@ Value needs to be a L<Mojo::Upload> object, representing a file upload.
 =head1 FILTERS
 
 These filters are available by default.
+
+=head2 not_empty
+
+  $v = $v->optional('foo', 'not_empty');
+
+Remove empty string values and treat them as if they had not been submitted.
 
 =head2 trim
 

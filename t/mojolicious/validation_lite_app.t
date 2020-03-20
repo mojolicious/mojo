@@ -237,6 +237,19 @@ is_deeply $v->output, {nothing => '  '}, 'right result';
 ok !$v->optional('more', 'trim')->is_valid, 'not valid';
 is_deeply $v->output, {nothing => '  '}, 'right result';
 
+# Not empty
+$v = $t->app->validation->input({foo => 'bar', baz => ''});
+ok $v->required('foo', 'not_empty')->in('bar')->is_valid, 'valid';
+ok !$v->required('baz', 'not_empty')->is_valid, 'not valid';
+ok $v->has_error, 'has error';
+is_deeply $v->error('baz'), ['required'], 'right error';
+is_deeply $v->output, {foo => 'bar'}, 'right result';
+$v = $t->app->validation->input({foo => [' bar'], baz => ['', '  ', undef]});
+ok $v->optional('foo', 'trim', 'not_empty')->is_valid, 'valid';
+ok !$v->optional('baz', 'trim', 'not_empty')->is_valid, 'not valid';
+ok !$v->has_error, 'no error';
+is_deeply $v->output, {foo => ['bar']}, 'right result';
+
 # Custom filter
 $t->app->validator->add_filter(quote => sub {qq{$_[1]="$_[2]"}});
 $v = $t->app->validation->input({foo => [' bar', 'baz']});

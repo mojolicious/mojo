@@ -1,4 +1,6 @@
 
+8.36  2020-03-21
+
 8.35  2020-03-20
   - Added not_empty filter to Mojolicious::Validator.
 

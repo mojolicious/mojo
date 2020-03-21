@@ -1009,7 +1009,7 @@ applications under a domain and/or prefix.
   use Mojolicious::Lite;
 
   # Whole application mounted under "/prefix"
-  plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
+  plugin Mount => {'/prefix' => '/home/sri/myapp/script/myapp'};
 
   # Mount application with subdomain
   plugin Mount => {'test.example.com' => '/home/sri/myapp2.pl'};

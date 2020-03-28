@@ -1,9 +1,9 @@
 package Mojo::IOLoop::TLS;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use Mojo::IOLoop;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}

@@ -2,7 +2,7 @@ package Mojolicious::Command::cgi;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Server::CGI;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description => 'Start application with CGI';
 has usage       => sub { shift->extract_usage };

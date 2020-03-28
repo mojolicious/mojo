@@ -2,7 +2,7 @@ package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Server::Daemon;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description => 'Start application with HTTP and WebSocket server';
 has usage       => sub { shift->extract_usage };

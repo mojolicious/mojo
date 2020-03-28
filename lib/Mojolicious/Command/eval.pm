@@ -2,7 +2,7 @@ package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Promise;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description => 'Run code against application';
 has usage       => sub { shift->extract_usage };

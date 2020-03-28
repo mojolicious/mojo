@@ -1,13 +1,13 @@
 package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
-use Carp 'croak';
+use Carp qw(croak);
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util 'term_escape';
-use Mojo::WebSocket 'server_handshake';
-use Scalar::Util 'weaken';
+use Mojo::Util qw(term_escape);
+use Mojo::WebSocket qw(server_handshake);
+use Scalar::Util qw(weaken);
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 

@@ -1,7 +1,7 @@
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
-use Mojo::Util 'trim';
+use Mojo::Util qw(trim);
 
 has 'tree';
 

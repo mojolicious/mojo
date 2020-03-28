@@ -1,7 +1,7 @@
 package Mojo::Home;
 use Mojo::Base 'Mojo::File';
 
-use Mojo::Util 'class_to_path';
+use Mojo::Util qw(class_to_path);
 
 sub detect {
   my ($self, $class) = @_;

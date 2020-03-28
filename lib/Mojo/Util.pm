@@ -5,18 +5,18 @@ use Carp qw(carp croak);
 use Data::Dumper ();
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
-use Encode 'find_encoding';
-use Exporter 'import';
-use File::Basename 'dirname';
-use Getopt::Long 'GetOptionsFromArray';
+use Encode qw(find_encoding);
+use Exporter qw(import);
+use File::Basename qw(dirname);
+use Getopt::Long qw(GetOptionsFromArray);
 use IO::Compress::Gzip;
 use IO::Poll qw(POLLIN POLLPRI);
 use IO::Uncompress::Gunzip;
-use List::Util 'min';
+use List::Util qw(min);
 use MIME::Base64 qw(decode_base64 encode_base64);
-use Pod::Usage 'pod2usage';
-use Sub::Util 'set_subname';
-use Symbol 'delete_package';
+use Pod::Usage qw(pod2usage);
+use Sub::Util qw(set_subname);
+use Symbol qw(delete_package);
 use Time::HiRes        ();
 use Unicode::Normalize ();
 
@@ -973,7 +973,7 @@ do not escape L<Mojo::ByteStream> objects.
   xml_escape '<div>';
 
   # "<div>"
-  use Mojo::ByteStream 'b';
+  use Mojo::ByteStream qw(b);
   xml_escape b('<div>');
 
 =head2 xor_encode

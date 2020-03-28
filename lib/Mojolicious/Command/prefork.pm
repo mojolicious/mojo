@@ -2,7 +2,7 @@ package Mojolicious::Command::prefork;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Server::Prefork;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description =>
   'Start application with pre-forking HTTP and WebSocket server';

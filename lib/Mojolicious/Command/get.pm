@@ -1,7 +1,7 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Collection 'c';
+use Mojo::Collection qw(c);
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON qw(to_json j);
@@ -9,7 +9,7 @@ use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode getopt);
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 has description => 'Perform HTTP request';
 has usage       => sub { shift->extract_usage };

@@ -2,8 +2,8 @@ package Mojo::Promise;
 use Mojo::Base -base;
 
 use Mojo::IOLoop;
-use Mojo::Util 'deprecated';
-use Scalar::Util 'blessed';
+use Mojo::Util qw(deprecated);
+use Scalar::Util qw(blessed);
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 

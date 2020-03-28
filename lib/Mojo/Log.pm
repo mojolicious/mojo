@@ -1,11 +1,11 @@
 package Mojo::Log;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
-use Fcntl ':flock';
+use Carp qw(croak);
+use Fcntl qw(:flock);
 use Mojo::File;
-use Mojo::Util 'encode';
-use Time::HiRes 'time';
+use Mojo::Util qw(encode);
+use Time::HiRes qw(time);
 
 has format => sub { shift->short ? \&_short : \&_default };
 has handle => sub {

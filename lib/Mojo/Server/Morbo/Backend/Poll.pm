@@ -1,7 +1,7 @@
 package Mojo::Server::Morbo::Backend::Poll;
 use Mojo::Base 'Mojo::Server::Morbo::Backend';
 
-use Mojo::File 'path';
+use Mojo::File qw(path);
 
 sub modified_files {
   my $self = shift;

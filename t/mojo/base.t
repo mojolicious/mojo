@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 package Mojo::BaseTest;
@@ -52,7 +52,7 @@ use Mojo::Base;
 use Mojo::BaseTest::Base1;
 use Mojo::BaseTest::Base2;
 use Mojo::BaseTest::Base3;
-use Scalar::Util 'isweak';
+use Scalar::Util qw(isweak);
 
 # Basic functionality
 my $object  = Mojo::BaseTest->new->foo(23);

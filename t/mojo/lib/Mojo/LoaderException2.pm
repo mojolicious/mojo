@@ -7,7 +7,7 @@ Mojo::LoaderException2_2::throw_error();
 
 package Mojo::LoaderException2_2;
 
-use Carp 'croak';
+use Carp qw(croak);
 
 sub throw_error {
   eval { Mojo::LoaderException2_3::throw_error() };
@@ -16,7 +16,7 @@ sub throw_error {
 
 package Mojo::LoaderException2_3;
 
-use Carp 'croak';
+use Carp qw(croak);
 
 sub throw_error {
   croak "Exception";

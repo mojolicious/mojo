@@ -4,8 +4,8 @@ use Mojo::Base -base;
 use Mojo::Cache;
 use Mojo::DynamicMethods;
 use Mojo::File qw(curfile path);
-use Mojo::JSON 'encode_json';
-use Mojo::Loader 'data_section';
+use Mojo::JSON qw(encode_json);
+use Mojo::Loader qw(data_section);
 use Mojo::Util qw(decamelize encode gzip md5_sum monkey_patch);
 
 has cache   => sub { Mojo::Cache->new };

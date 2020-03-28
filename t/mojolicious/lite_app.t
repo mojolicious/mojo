@@ -7,11 +7,11 @@ BEGIN {
 
 use Test::Mojo;
 use Test::More;
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream qw(b);
 use Mojo::Cookie::Response;
 use Mojo::IOLoop;
 use Mojolicious::Lite;
-use Time::HiRes 'usleep';
+use Time::HiRes qw(usleep);
 
 # Missing plugin
 eval { plugin 'does_not_exist' };

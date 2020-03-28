@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::DOM;
-use Mojo::DOM::HTML 'tag_to_html';
+use Mojo::DOM::HTML qw(tag_to_html);
 
 # Empty
 is(Mojo::DOM->new,                     '',    'right result');

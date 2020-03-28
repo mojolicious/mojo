@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Errno qw(EAGAIN ECONNRESET EINTR EWOULDBLOCK);
 use Mojo::IOLoop;
 use Mojo::Util;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 has high_water_mark => 1048576;
 has reactor         => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;

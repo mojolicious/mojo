@@ -1,10 +1,10 @@
 package Mojo::Transaction;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
+use Carp qw(croak);
 use Mojo::Message::Request;
 use Mojo::Message::Response;
-use Mojo::Util 'deprecated';
+use Mojo::Util qw(deprecated);
 
 has [
   qw(kept_alive local_address local_port original_remote_address remote_port)];

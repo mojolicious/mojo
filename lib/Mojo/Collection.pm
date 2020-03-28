@@ -1,12 +1,12 @@
 package Mojo::Collection;
 use Mojo::Base -strict;
 
-use re 'is_regexp';
-use Carp 'croak';
-use Exporter 'import';
+use re qw(is_regexp);
+use Carp qw(croak);
+use Exporter qw(import);
 use List::Util;
 use Mojo::ByteStream;
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
 
 our @EXPORT_OK = ('c');
 
@@ -141,7 +141,7 @@ Mojo::Collection - Collection
   });
 
   # Use the alternative constructor
-  use Mojo::Collection 'c';
+  use Mojo::Collection qw(c);
   c(qw(a b c))->join('/')->url_escape->say;
 
 =head1 DESCRIPTION

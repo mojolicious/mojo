@@ -6,7 +6,7 @@ use Test::Mojo;
 use Test::More;
 use Mojo::Asset::Memory;
 use Mojo::Date;
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use Mojolicious::Lite;
 
 hook after_static => sub { shift->app->log->debug('Static file served') };

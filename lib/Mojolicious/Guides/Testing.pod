@@ -278,7 +278,7 @@ how to set specific application configuration directives from a test file.
 Let's say we register a helper in our application to generate an HTTP Basic
 Authorization header:
 
-  use Mojo::Util 'b64_encode';
+  use Mojo::Util qw(b64_encode);
 
   app->helper(basic_auth => sub {
     my ($c, @values) = @_;

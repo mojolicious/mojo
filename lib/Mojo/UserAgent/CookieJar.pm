@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
 use Mojo::Path;
-use Scalar::Util 'looks_like_number';
+use Scalar::Util qw(looks_like_number);
 
 has 'ignore';
 has max_cookie_size => 4096;

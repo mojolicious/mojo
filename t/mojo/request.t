@@ -4,7 +4,7 @@ use Test::More;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Request;
-use Mojo::File 'tempdir';
+use Mojo::File qw(tempdir);
 use Mojo::Message::Request;
 use Mojo::URL;
 use Mojo::Util qw(encode gzip);

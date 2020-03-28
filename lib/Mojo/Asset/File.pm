@@ -1,10 +1,10 @@
 package Mojo::Asset::File;
 use Mojo::Base 'Mojo::Asset';
 
-use Carp 'croak';
-use Fcntl 'SEEK_SET';
+use Carp qw(croak);
+use Fcntl qw(SEEK_SET);
 use File::Spec::Functions ();
-use Mojo::File 'tempfile';
+use Mojo::File qw(tempfile);
 
 has [qw(cleanup path)];
 has handle => sub {

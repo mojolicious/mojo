@@ -3,8 +3,8 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::File qw(path tempdir);
 use Mojo::Log;
-use Mojo::Util 'decode';
-use Time::HiRes 'time';
+use Mojo::Util qw(decode);
+use Time::HiRes qw(time);
 
 # Logging to file
 my $dir  = tempdir;

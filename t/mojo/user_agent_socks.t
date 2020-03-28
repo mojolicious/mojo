@@ -18,7 +18,7 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 # Silence
 app->log->level('fatal');

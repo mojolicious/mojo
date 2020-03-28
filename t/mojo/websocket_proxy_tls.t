@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::TLS;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'

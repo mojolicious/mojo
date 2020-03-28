@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream qw(b);
 
 # Tap into method chain
 is b('test')->tap(sub { $$_ .= '1' })->camelize, 'Test1', 'right result';

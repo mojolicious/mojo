@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::JSON 'decode_json';
+use Mojo::JSON qw(decode_json);
 use Mojo::Server::PSGI;
 use Mojolicious::Command::psgi;
 use Mojolicious::Lite;

@@ -9,7 +9,7 @@ use Mojo::Base -base;
 #  Bender: You're better off dead, I'm telling you, dude.
 #  Fry: Santa Claus is gunning you down!"
 use Mojo::IOLoop;
-use Mojo::JSON 'j';
+use Mojo::JSON qw(j);
 use Mojo::JSON::Pointer;
 use Mojo::Server;
 use Mojo::UserAgent;
@@ -516,7 +516,7 @@ Current WebSocket message represented as an array reference containing the
 frame type and payload.
 
   # More specific tests
-  use Mojo::JSON 'decode_json';
+  use Mojo::JSON qw(decode_json);
   my $hash = decode_json $t->message->[1];
   is ref $hash, 'HASH', 'right reference';
   is $hash->{foo}, 'bar', 'right value';
@@ -992,7 +992,7 @@ configuration plugins like L<Mojolicious::Plugin::Config> and
 L<Mojolicious::Plugin::JSONConfig> for tests.
 
   # Load application script relative to the "t" directory
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   my $t = Test::Mojo->new(curfile->dirname->sibling('myapp.pl'));
 
 =head2 options_ok

@@ -549,7 +549,7 @@ L</"stash">.
   $c->stash(text => 'I ♥ Mojolicious!')->render;
 
   # Render binary data
-  use Mojo::JSON 'encode_json';
+  use Mojo::JSON qw(encode_json);
   $c->render(data => encode_json({test => 'I ♥ Mojolicious!'}));
 
   # Render JSON
@@ -689,11 +689,11 @@ establish the WebSocket connection.
   $c->send({json => {test => 'I ♥ Mojolicious!'}});
 
   # Send JSON object as "Binary" message
-  use Mojo::JSON 'encode_json';
+  use Mojo::JSON qw(encode_json);
   $c->send({binary => encode_json({test => 'I ♥ Mojolicious!'})});
 
   # Send "Ping" frame
-  use Mojo::WebSocket 'WS_PING';
+  use Mojo::WebSocket qw(WS_PING);
   $c->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
 
   # Make sure the first message has been written before continuing

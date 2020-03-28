@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Exception qw(check raise);
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 
 package MojoTest::X::Foo;
 use Mojo::Base 'Mojo::Exception';

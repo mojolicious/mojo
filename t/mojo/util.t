@@ -1,12 +1,12 @@
 use Mojo::Base -strict;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 use Test::More;
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream qw(b);
 use Mojo::DeprecationTest;
-use Sub::Util 'subname';
+use Sub::Util qw(subname);
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),

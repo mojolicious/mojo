@@ -1,7 +1,7 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
-use Carp 'croak';
+use Carp qw(croak);
 
 has [qw(constraints defaults types)]   => sub { {} };
 has [qw(placeholder_start type_start)] => ':';

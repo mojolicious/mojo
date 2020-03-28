@@ -1,8 +1,8 @@
 package Mojolicious::Plugin::Config;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Mojo::File 'path';
-use Mojo::Util 'decode';
+use Mojo::File qw(path);
+use Mojo::Util qw(decode);
 
 sub load { $_[0]->parse(decode('UTF-8', path($_[1])->slurp), @_[1, 2, 3]) }
 

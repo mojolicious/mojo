@@ -2,7 +2,7 @@ package Mojo::Asset::Memory;
 use Mojo::Base 'Mojo::Asset';
 
 use Mojo::Asset::File;
-use Mojo::File 'path';
+use Mojo::File qw(path);
 
 has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };

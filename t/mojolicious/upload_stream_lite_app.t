@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 # Stream multipart uploads into cache
 my %cache;

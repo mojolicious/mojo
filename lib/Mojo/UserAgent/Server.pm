@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 

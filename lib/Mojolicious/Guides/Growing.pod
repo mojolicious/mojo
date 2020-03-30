@@ -267,7 +267,7 @@ separation of concerns more visible.
   use strict;
   use warnings;
 
-  use Mojo::Util 'secure_compare';
+  use Mojo::Util qw(secure_compare);
 
   my $USERS = {
     joel      => 'las3rs',
@@ -296,7 +296,7 @@ templates.
   #!/usr/bin/env perl
   use Mojolicious::Lite;
 
-  use lib 'lib';
+  use lib qw(lib);
   use MyApp::Model::Users;
 
   # Helper to lazy initialize and store our model object
@@ -341,7 +341,7 @@ L<Mojo::DOM>.
   use Test::Mojo;
 
   # Include application
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   require(curfile->dirname->sibling('myapp.pl'));
 
   # Allow 302 redirect responses
@@ -445,7 +445,7 @@ this.
   #!/usr/bin/env perl
   use Mojolicious::Lite;
 
-  use lib 'lib';
+  use lib qw(lib);
   use MyApp::Model::Users;
 
   # Make signed cookies tamper resistant
@@ -631,7 +631,7 @@ allow running tests again.
   use strict;
   use warnings;
 
-  use lib 'lib';
+  use lib qw(lib);
   use Mojolicious::Commands;
 
   # Start command line interface for application
@@ -756,7 +756,7 @@ from outside its home directory.
   use strict;
   use warnings;
 
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   use lib curfile->dirname->sibling('lib')->to_string;
   use Mojolicious::Commands;
 

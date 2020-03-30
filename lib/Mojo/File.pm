@@ -6,12 +6,12 @@ use overload
   '""'     => sub { ${$_[0]} },
   fallback => 1;
 
-use Carp 'croak';
-use Cwd 'getcwd';
-use Exporter 'import';
+use Carp qw(croak);
+use Cwd qw(getcwd);
+use Exporter qw(import);
 use File::Basename ();
 use File::Copy qw(copy move);
-use File::Find 'find';
+use File::Find qw(find);
 use File::Path ();
 use File::Spec::Functions
   qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
@@ -193,7 +193,7 @@ Mojo::File - File system paths
   say $path->sibling('.bashrc');
 
   # Use the alternative constructor
-  use Mojo::File 'path';
+  use Mojo::File qw(path);
   my $path = path('/tmp/foo/bar')->make_path;
   $path->child('test.txt')->spurt('Hello Mojo!');
 

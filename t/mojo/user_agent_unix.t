@@ -18,7 +18,7 @@ plan skip_all => 'UNIX domain socket support required for this test!'
 use Mojo::Server::Daemon;
 use Mojo::TestConnectProxy;
 use Mojo::UserAgent;
-use Mojo::Util 'url_escape';
+use Mojo::Util qw(url_escape);
 use Mojolicious::Lite;
 
 # Silence

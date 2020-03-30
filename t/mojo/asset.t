@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Carp 'croak';
+use Carp qw(croak);
 use Config;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;

@@ -1,9 +1,9 @@
 package Mojo::Loader;
 use Mojo::Base -strict;
 
-use Exporter 'import';
+use Exporter qw(import);
 use Mojo::Exception;
-use Mojo::File 'path';
+use Mojo::File qw(path);
 use Mojo::Util qw(b64_decode class_to_path);
 
 our @EXPORT_OK

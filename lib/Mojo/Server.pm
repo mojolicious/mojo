@@ -1,12 +1,12 @@
 package Mojo::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
-use Mojo::File 'path';
-use Mojo::Loader 'load_class';
-use Mojo::Util 'md5_sum';
+use Carp qw(croak);
+use Mojo::File qw(path);
+use Mojo::Loader qw(load_class);
+use Mojo::Util qw(md5_sum);
 use POSIX ();
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
 
 has app           => sub { shift->build_app('Mojo::HelloWorld') };
 has reverse_proxy => sub { $ENV{MOJO_REVERSE_PROXY} };

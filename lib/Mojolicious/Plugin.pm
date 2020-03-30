@@ -1,7 +1,7 @@
 package Mojolicious::Plugin;
 use Mojo::Base -base;
 
-use Carp 'croak';
+use Carp qw(croak);
 
 sub register { croak 'Method "register" not implemented by subclass' }
 

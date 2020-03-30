@@ -1,13 +1,13 @@
 package Mojo::IOLoop::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
+use Carp qw(croak);
 use IO::Socket::IP;
 use IO::Socket::UNIX;
-use Mojo::File 'path';
+use Mojo::File qw(path);
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;

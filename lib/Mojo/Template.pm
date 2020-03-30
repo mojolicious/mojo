@@ -1,10 +1,10 @@
 package Mojo::Template;
 use Mojo::Base -base;
 
-use Carp 'croak';
+use Carp qw(croak);
 use Mojo::ByteStream;
 use Mojo::Exception;
-use Mojo::File 'path';
+use Mojo::File qw(path);
 use Mojo::Util qw(decode encode monkey_patch);
 
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
@@ -352,7 +352,7 @@ the default in L<Mojolicious> C<.ep> templates, for example.
 
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 
-  % use Mojo::ByteStream 'b';
+  % use Mojo::ByteStream qw(b);
   <%= b('<div>excluded!</div>') %>
 
 Whitespace characters around tags can be trimmed by adding an additional equal

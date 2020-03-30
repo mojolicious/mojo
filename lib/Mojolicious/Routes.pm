@@ -1,11 +1,11 @@
 package Mojolicious::Routes;
 use Mojo::Base 'Mojolicious::Routes::Route';
 
-use List::Util 'first';
+use List::Util qw(first);
 use Mojo::Cache;
 use Mojo::DynamicMethods;
-use Mojo::Loader 'load_class';
-use Mojo::Util 'camelize';
+use Mojo::Loader qw(load_class);
+use Mojo::Util qw(camelize);
 use Mojolicious::Routes::Match;
 
 has base_classes => sub { [qw(Mojolicious::Controller Mojolicious)] };

@@ -10,7 +10,7 @@ use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Proxy;
 use Mojo::UserAgent::Server;
 use Mojo::UserAgent::Transactor;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 

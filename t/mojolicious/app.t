@@ -9,12 +9,12 @@ BEGIN {
 use Test::Mojo;
 use Test::More;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 use Mojo::Asset::File;
 use Mojo::Date;
-use Mojo::File 'path';
+use Mojo::File qw(path);
 use Mojo::Home;
 use Mojo::IOLoop;
 use Mojolicious;

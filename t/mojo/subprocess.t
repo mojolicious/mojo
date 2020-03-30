@@ -10,7 +10,7 @@ plan skip_all => 'set TEST_SUBPROCESS to enable this test (developer only!)'
 use Mojo::IOLoop;
 use Mojo::IOLoop::Subprocess;
 use Mojo::Promise;
-use Mojo::File 'tempfile';
+use Mojo::File qw(tempfile);
 
 # Huge result
 my ($fail, $result, @start);

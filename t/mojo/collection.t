@@ -1,9 +1,9 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::ByteStream 'b';
-use Mojo::Collection 'c';
-use Mojo::JSON 'encode_json';
+use Mojo::ByteStream qw(b);
+use Mojo::Collection qw(c);
+use Mojo::JSON qw(encode_json);
 
 # Array
 is c(1, 2, 3)->[1], 2, 'right result';

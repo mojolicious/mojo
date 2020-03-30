@@ -10,7 +10,7 @@ use Mojo::IOLoop;
 use Mojo::Message::Request;
 use Mojo::UserAgent;
 use Mojo::UserAgent::Server;
-use Mojo::Util 'gzip';
+use Mojo::Util qw(gzip);
 use Mojolicious::Lite;
 
 # Silence

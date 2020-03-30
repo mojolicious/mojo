@@ -1,8 +1,8 @@
 package Mojolicious::Command::Author::cpanify;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::File 'path';
-use Mojo::Util 'getopt';
+use Mojo::File qw(path);
+use Mojo::Util qw(getopt);
 
 has description => 'Upload distribution to CPAN';
 has usage       => sub { shift->extract_usage };

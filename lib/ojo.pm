@@ -2,11 +2,11 @@ package ojo;
 use Mojo::Base -strict;
 
 use Benchmark qw(timeit timestr :hireswallclock);
-use Mojo::ByteStream 'b';
-use Mojo::Collection 'c';
+use Mojo::ByteStream qw(b);
+use Mojo::Collection qw(c);
 use Mojo::DOM;
-use Mojo::File 'path';
-use Mojo::JSON 'j';
+use Mojo::File qw(path);
+use Mojo::JSON qw(j);
 use Mojo::Util qw(dumper monkey_patch);
 
 # Silent one-liners

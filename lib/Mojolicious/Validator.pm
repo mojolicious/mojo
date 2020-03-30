@@ -2,7 +2,7 @@ package Mojolicious::Validator;
 use Mojo::Base -base;
 
 use Mojo::DynamicMethods;
-use Mojo::Util 'trim';
+use Mojo::Util qw(trim);
 use Mojolicious::Validator::Validation;
 
 has checks  => sub { {} };

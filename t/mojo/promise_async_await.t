@@ -12,7 +12,7 @@ BEGIN {
 }
 use Mojo::Base -async_await;
 
-use Test::Future::AsyncAwait::Awaitable 'test_awaitable';
+use Test::Future::AsyncAwait::Awaitable qw(test_awaitable);
 use Test::Mojo;
 use Mojo::Promise;
 use Mojo::UserAgent;

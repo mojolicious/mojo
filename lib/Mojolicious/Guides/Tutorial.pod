@@ -1003,7 +1003,7 @@ with normal Perl tests like C<t/basic.t>, which can be a lot of fun thanks to
 L<Test::Mojo>.
 
   use Test::More;
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   use Test::Mojo;
 
   # Portably point to "../myapp.pl"

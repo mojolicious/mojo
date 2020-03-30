@@ -8,7 +8,7 @@ BEGIN {
 
 use Test::More;
 use ojo;
-use File::Basename 'basename';
+use File::Basename qw(basename);
 
 # Application
 a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })

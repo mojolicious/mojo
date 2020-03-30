@@ -7,11 +7,11 @@ use Test::More;
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO} || $ENV{TEST_ALL};
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 use IO::Socket::INET;
-use Mojo::File 'tempdir';
+use Mojo::File qw(tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Morbo::Backend;
 use Mojo::Server::Daemon;

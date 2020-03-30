@@ -2,9 +2,9 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-use Exporter 'import';
+use Exporter qw(import);
 use Mojo::Util qw(decode scope_guard);
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message                                    => 'Exception!';
@@ -173,7 +173,7 @@ Mojo::Exception - Exception base class
   }
 
   # Throw exceptions and handle them gracefully
-  use Mojo::Exception 'check';
+  use Mojo::Exception qw(check);
   eval {
     MyApp::X::Foo->throw('Something went wrong!');
   };

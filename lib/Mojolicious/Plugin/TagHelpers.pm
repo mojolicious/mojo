@@ -2,8 +2,8 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
-use Mojo::DOM::HTML 'tag_to_html';
-use Scalar::Util 'blessed';
+use Mojo::DOM::HTML qw(tag_to_html);
+use Scalar::Util qw(blessed);
 
 sub register {
   my ($self, $app) = @_;

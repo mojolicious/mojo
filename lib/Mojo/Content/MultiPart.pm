@@ -1,7 +1,7 @@
 package Mojo::Content::MultiPart;
 use Mojo::Base 'Mojo::Content';
 
-use Mojo::Util 'b64_encode';
+use Mojo::Util qw(b64_encode);
 
 has parts => sub { [] };
 

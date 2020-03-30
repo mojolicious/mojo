@@ -4,7 +4,7 @@
 use Mojo::Base -strict;
 
 use Mojo::UserAgent;
-use Mojo::Util 'trim';
+use Mojo::Util qw(trim);
 
 my $res = Mojo::UserAgent->new->get('https://html.spec.whatwg.org')->result;
 for my $row ($res->dom('#named-character-references-table tbody > tr')->each) {

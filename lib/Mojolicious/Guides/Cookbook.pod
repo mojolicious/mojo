@@ -1046,7 +1046,7 @@ L<Mojo::EventEmitter>, with ready-to-use events on almost all layers, and which
 can be combined to solve some of the hardest problems in web development.
 
   use Mojolicious::Lite;
-  use Scalar::Util 'weaken';
+  use Scalar::Util qw(weaken);
 
   # Intercept multipart uploads and log each chunk received
   hook after_build_tx => sub {
@@ -1628,7 +1628,7 @@ Basic authentication data will be automatically extracted from the
 C<Authorization> header.
 
   use Mojolicious::Lite;
-  use Mojo::Util 'secure_compare';
+  use Mojo::Util qw(secure_compare);
 
   get '/' => sub {
     my $c = shift;
@@ -1718,7 +1718,7 @@ difference to normal plugins is that you load them using their full class name.
 
   use Mojolicious::Lite;
 
-  use lib 'lib';
+  use lib qw(lib);
 
   plugin 'MyApp::Plugin::MyHelpers';
 
@@ -1827,7 +1827,7 @@ installed application so they can be excluded.
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   use Mojo::Home;
 
   # Every CPAN module needs a version
@@ -1863,7 +1863,7 @@ to the proper shebang during installation.
   use strict;
   use warnings;
 
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   use lib curfile->dirname->sibling('lib')->to_string;
   use Mojolicious::Commands;
 

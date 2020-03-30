@@ -2,9 +2,9 @@ package Mojolicious::Lite;
 use Mojo::Base 'Mojolicious';
 
 # "Bender: Bite my shiny metal ass!"
-use Mojo::File 'path';
+use Mojo::File qw(path);
 use Mojo::UserAgent::Server;
-use Mojo::Util 'monkey_patch';
+use Mojo::Util qw(monkey_patch);
 
 sub import {
 

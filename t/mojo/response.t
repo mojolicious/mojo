@@ -4,8 +4,8 @@ use Test::More;
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
-use Mojo::File 'tempdir';
-use Mojo::JSON 'encode_json';
+use Mojo::File qw(tempdir);
+use Mojo::JSON qw(encode_json);
 use Mojo::Message::Response;
 use Mojo::Util qw(encode gzip);
 

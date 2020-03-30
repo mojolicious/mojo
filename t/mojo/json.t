@@ -16,10 +16,10 @@ use overload '&' => sub {die}, '""' => sub {'works!'};
 package main;
 
 use Test::More;
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream qw(b);
 use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
-use Mojo::Util 'encode';
-use Scalar::Util 'dualvar';
+use Mojo::Util qw(encode);
+use Scalar::Util qw(dualvar);
 
 # Decode array
 my $array = decode_json '[]';

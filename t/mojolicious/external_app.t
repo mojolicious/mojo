@@ -7,7 +7,7 @@ BEGIN {
 
 use Test::More;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('external', 'lib')->to_string;
 
 use Test::Mojo;

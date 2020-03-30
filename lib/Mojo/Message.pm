@@ -1,15 +1,15 @@
 package Mojo::Message;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
+use Carp qw(croak);
 use Mojo::Asset::Memory;
 use Mojo::Content::Single;
 use Mojo::DOM;
-use Mojo::JSON 'j';
+use Mojo::JSON qw(j);
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
-use Mojo::Util 'decode';
+use Mojo::Util qw(decode);
 
 has content          => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';

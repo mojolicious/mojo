@@ -8,7 +8,7 @@ BEGIN {
 use Test::Mojo;
 use Test::More;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 my $t = Test::Mojo->new('MojoliciousTest');

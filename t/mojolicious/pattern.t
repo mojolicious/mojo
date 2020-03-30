@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream qw(b);
 use Mojolicious::Routes::Pattern;
 
 # Text pattern (optimized)

@@ -8,7 +8,7 @@ BEGIN {
 use Test::More;
 
 use Test::Mojo;
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 
 my $t = Test::Mojo->new(curfile->sibling('external', 'myapp.pl'));
 

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 # "Professor: Amy, technology isn't intrinsically good or evil. It's how it's
 #             used. Like the death ray."
-use Carp 'croak';
+use Carp qw(croak);
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;

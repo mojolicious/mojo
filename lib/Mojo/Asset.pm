@@ -1,7 +1,7 @@
 package Mojo::Asset;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
+use Carp qw(croak);
 
 has 'end_range';
 has start_range => 0;

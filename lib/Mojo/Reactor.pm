@@ -1,9 +1,9 @@
 package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
+use Carp qw(croak);
 use Config;
-use Mojo::Loader 'load_class';
+use Mojo::Loader qw(load_class);
 
 my %DETECTED;
 

@@ -1,8 +1,8 @@
 package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
-use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
-use List::Util 'first';
+use Compress::Raw::Zlib qw(Z_SYNC_FLUSH);
+use List::Util qw(first);
 use Mojo::JSON qw(encode_json j);
 use Mojo::Util qw(decode encode trim);
 use Mojo::WebSocket
@@ -485,7 +485,7 @@ Send message or frame non-blocking via WebSocket, the optional drain callback
 will be executed once all data has been written.
 
   # Send "Ping" frame
-  use Mojo::WebSocket 'WS_PING';
+  use Mojo::WebSocket qw(WS_PING);
   $ws->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
 
 =head2 server_read

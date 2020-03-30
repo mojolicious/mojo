@@ -1,12 +1,12 @@
 package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Errno 'EINPROGRESS';
+use Errno qw(EINPROGRESS);
 use IO::Socket::IP;
 use IO::Socket::UNIX;
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native

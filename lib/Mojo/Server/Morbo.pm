@@ -4,9 +4,9 @@ use Mojo::Base -base;
 # "Linda: With Haley's Comet out of ice, Earth is experiencing the devastating
 #         effects of sudden, intense global warming.
 #  Morbo: Morbo is pleased but sticky."
-use Mojo::Loader 'load_class';
+use Mojo::Loader qw(load_class);
 use Mojo::Server::Daemon;
-use POSIX 'WNOHANG';
+use POSIX qw(WNOHANG);
 
 has backend => sub {
   my $backend = $ENV{MOJO_MORBO_BACKEND} || 'Poll';

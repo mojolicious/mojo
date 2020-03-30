@@ -2,7 +2,7 @@ package Mojo::ByteStream;
 use Mojo::Base -strict;
 use overload bool => sub {1}, '""' => sub { ${$_[0]} }, fallback => 1;
 
-use Exporter 'import';
+use Exporter qw(import);
 use Mojo::Collection;
 use Mojo::Util;
 
@@ -86,7 +86,7 @@ Mojo::ByteStream - ByteStream
   say "$stream";
 
   # Use the alternative constructor
-  use Mojo::ByteStream 'b';
+  use Mojo::ByteStream qw(b);
   my $stream = b('foobarbaz')->b64_encode('')->say;
 
 =head1 DESCRIPTION

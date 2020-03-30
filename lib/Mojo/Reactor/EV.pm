@@ -1,7 +1,7 @@
 package Mojo::Reactor::EV;
 use Mojo::Base 'Mojo::Reactor::Poll';
 
-use Carp 'croak';
+use Carp qw(croak);
 use EV 4.0;
 
 my $EV;

@@ -1,11 +1,11 @@
 package Mojo::Reactor::Poll;
 use Mojo::Base 'Mojo::Reactor';
 
-use Carp 'croak';
+use Carp qw(croak);
 use IO::Poll qw(POLLERR POLLHUP POLLIN POLLNVAL POLLOUT POLLPRI);
-use List::Util 'min';
+use List::Util qw(min);
 use Mojo::Util qw(md5_sum steady_time);
-use Time::HiRes 'usleep';
+use Time::HiRes qw(usleep);
 
 sub again {
   croak 'Timer not active' unless my $timer = shift->{timers}{shift()};

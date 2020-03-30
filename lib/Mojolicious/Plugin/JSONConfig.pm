@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::JSONConfig;
 use Mojo::Base 'Mojolicious::Plugin::Config';
 
-use Mojo::JSON 'from_json';
+use Mojo::JSON qw(from_json);
 use Mojo::Template;
 
 sub parse {

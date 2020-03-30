@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::HeaderCondition;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use re 'is_regexp';
+use re qw(is_regexp);
 
 sub register {
   my ($self, $app) = @_;

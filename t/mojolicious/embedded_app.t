@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use Test::More;
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use Mojolicious::Lite;
 use Test::Mojo;
 

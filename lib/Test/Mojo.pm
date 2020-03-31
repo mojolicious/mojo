@@ -1139,7 +1139,8 @@ Opposite of L</"status_is">.
 
 Use L<Test::More> functions such as C<is>, C<ok> and C<is_deeply> safely
 (telling L<Test::Builder> how far up the call stack to look when something
-fails) through L</"handler"> and store the result in L</"success">.
+fails) through L</"handler"> and store the result in L</"success">. Used to
+implement L<Test::Mojo> roles.
 
 =head2 text_is
 

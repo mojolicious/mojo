@@ -544,7 +544,7 @@ arguments as L<Mojo::IOLoop::Server/"listen">.
 
   my $loop = Mojo::IOLoop->singleton;
 
-The global L<Mojo::IOLoop> singleton, used to access a single shared event loop
+The global L<Mojo::IOLoop> singleton. Used to access a single shared event loop
 object from everywhere inside the process.
 
   # Many methods also allow you to take shortcuts

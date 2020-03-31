@@ -194,14 +194,14 @@ implements the following new ones.
 
   $tx->client_read($bytes);
 
-Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
+Read data client-side. Used to implement user agents such as L<Mojo::UserAgent>.
 Meant to be overloaded in a subclass.
 
 =head2 client_write
 
   my $bytes = $tx->client_write;
 
-Write data client-side, used to implement user agents such as
+Write data client-side. Used to implement user agents such as
 L<Mojo::UserAgent>. Meant to be overloaded in a subclass.
 
 =head2 closed
@@ -278,14 +278,14 @@ connection error has occurred.
 
   $tx->server_read($bytes);
 
-Read data server-side, used to implement web servers such as
+Read data server-side. Used to implement web servers such as
 L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
 
 =head2 server_write
 
   my $bytes = $tx->server_write;
 
-Write data server-side, used to implement web servers such as
+Write data server-side. Used to implement web servers such as
 L<Mojo::Server::Daemon>. Meant to be overloaded in a subclass.
 
 =head1 SEE ALSO

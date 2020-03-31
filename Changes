@@ -1,5 +1,8 @@
 
-8.36  2020-03-30
+8.36  2020-03-31
+  - Added handler attribute to Test::Mojo.
+  - Added test method to Test::Mojo.
+  - Improved Test::Mojo to allow for extensions to be tested more easily.
   - Improved request_id attribute in Mojo::Message::Request to be a little more
     unique. (mst)
 

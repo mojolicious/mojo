@@ -64,7 +64,7 @@ is $res->code(421)->default_message, 'Misdirected Request',   'right message';
 is $res->code(422)->default_message, 'Unprocessable Entity',  'right message';
 is $res->code(423)->default_message, 'Locked',                'right message';
 is $res->code(424)->default_message, 'Failed Dependency',     'right message';
-is $res->code(425)->default_message, 'Unordered Collection',  'right message';
+is $res->code(425)->default_message, 'Too Early',             'right message';
 is $res->code(426)->default_message, 'Upgrade Required',      'right message';
 is $res->code(428)->default_message, 'Precondition Required', 'right message';
 is $res->code(429)->default_message, 'Too Many Requests',     'right message';

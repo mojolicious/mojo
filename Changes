@@ -1,5 +1,6 @@
 
-8.37  2020-04-02
+8.37  2020-04-03
+  - Fixed support for 425 status in Mojo::Message::Response.
 
 8.36  2020-03-31
   - Added handler attribute to Test::Mojo.

@@ -364,7 +364,7 @@ Encode Perl value to JSON.
 
   my $false = false;
 
-False value. Used because Perl has no native equivalent.
+False value, used because Perl has no native equivalent.
 
 =head2 from_json
 
@@ -393,7 +393,7 @@ Encode Perl value to JSON text without C<UTF-8> encoding it.
 
   my $true = true;
 
-True value. Used because Perl has no native equivalent.
+True value, used because Perl has no native equivalent.
 
 =head1 SEE ALSO
 

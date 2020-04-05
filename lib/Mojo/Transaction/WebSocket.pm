@@ -376,13 +376,13 @@ Build WebSocket message.
 
   $ws->client_read($data);
 
-Read data client-side. Used to implement user agents such as L<Mojo::UserAgent>.
+Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
 
 =head2 client_write
 
   my $bytes = $ws->client_write;
 
-Write data client-side. Used to implement user agents such as
+Write data client-side, used to implement user agents such as
 L<Mojo::UserAgent>.
 
 =head2 closed
@@ -492,14 +492,14 @@ will be executed once all data has been written.
 
   $ws->server_read($data);
 
-Read data server-side. Used to implement web servers such as
+Read data server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>.
 
 =head2 server_write
 
   my $bytes = $ws->server_write;
 
-Write data server-side. Used to implement web servers such as
+Write data server-side, used to implement web servers such as
 L<Mojo::Server::Daemon>.
 
 =head2 with_compression

@@ -247,7 +247,7 @@ L<Mojolicious::Routes::Route> implements the following attributes.
   my $children = $r->children;
   $r           = $r->children([Mojolicious::Routes::Route->new]);
 
-The children of this route. Used for nesting routes.
+The children of this route, used for nesting routes.
 
 =head2 inline
 

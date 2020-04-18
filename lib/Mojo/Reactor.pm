@@ -87,9 +87,10 @@ the following new ones.
 =head2 again
 
   $reactor->again($id);
+  $reactor->again($id, 0.5);
 
-Restart timer. Meant to be overloaded in a subclass. Note that this method
-requires an active timer.
+Restart timer and optionally change the invocation time. Meant to be overloaded
+in a subclass. Note that this method requires an active timer.
 
 =head2 detect
 

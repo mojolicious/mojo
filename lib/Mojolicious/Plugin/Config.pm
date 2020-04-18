@@ -10,8 +10,10 @@ sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Run Perl code in sandbox
+  ( my $file_oneline = $file ) =~ s/\n/\\n/g; # work around breaking "#line"
   my $config = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
-    . "sub app; local *app = sub { \$app }; use Mojo::Base -strict;\n#line 1 $file\n$content";
+    . "sub app; local *app = sub { \$app }; use Mojo::Base -strict;"
+    . "\n#line 1 $file_oneline\n$content";
   die qq{Can't load configuration from file "$file": $@} if $@;
   die qq{Configuration file "$file" did not return a hash reference.\n}
     unless ref $config eq 'HASH';

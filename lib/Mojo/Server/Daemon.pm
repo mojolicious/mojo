@@ -15,7 +15,7 @@ has acceptors => sub { [] };
 has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
-has keep_alive_timeout => sub { $ENV{MOJO_KEEP_ALIVE_TIMEOUT} // 10 };
+has keep_alive_timeout => sub { $ENV{MOJO_KEEP_ALIVE_TIMEOUT} // 5 };
 has listen       => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_requests => 100;
 
@@ -282,7 +282,7 @@ HTTP and WebSocket server, with IPv6, TLS, SNI, Comet (long polling), keep-alive
 and multiple event loop support.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
+resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
 L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
@@ -346,11 +346,11 @@ L<Mojo::IOLoop> singleton.
 =head2 keep_alive_timeout
 
   my $timeout = $daemon->keep_alive_timeout;
-  $daemon     = $daemon->keep_alive_timeout(5);
+  $daemon     = $daemon->keep_alive_timeout(10);
 
 Maximum amount of time in seconds a connection without an active request can be
 inactive before getting closed, defaults to the value of the
-C<MOJO_KEEP_ALIVE_TIMEOUT> environment variable or C<10>. Setting the value to
+C<MOJO_KEEP_ALIVE_TIMEOUT> environment variable or C<5>. Setting the value to
 C<0> will allow connections to be inactive indefinitely.
 
 =head2 listen

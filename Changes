@@ -1,4 +1,6 @@
 
+8.38  2020-04-20
+
 8.37  2020-04-19
   - Added keep_alive_timeout attribute to Mojo::Server::Daemon.
   - Added -k options to daemon and prefork commands.

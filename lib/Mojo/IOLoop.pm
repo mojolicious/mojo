@@ -286,10 +286,11 @@ scalability. The C<LIBEV_FLAGS> environment variable should also be used to
 select the best possible L<EV> backend, which usually defaults to the not very
 scalable C<select>.
 
-  LIBEV_FLAGS=1   # select
-  LIBEV_FLAGS=2   # poll
-  LIBEV_FLAGS=4   # epoll (Linux)
-  LIBEV_FLAGS=8   # kqueue (*BSD, OS X)
+  LIBEV_FLAGS=1    # select
+  LIBEV_FLAGS=2    # poll
+  LIBEV_FLAGS=4    # epoll (Linux)
+  LIBEV_FLAGS=8    # kqueue (*BSD, OS X)
+  LIBEV_FLAGS=64   # Linux AIO
 
 The event loop will be resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>. A TLS certificate and key are also built

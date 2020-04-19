@@ -81,7 +81,7 @@ get '/redirect_close' => sub {
   is(Mojo::UserAgent->new->connect_timeout, 10, 'right value');
   local $ENV{MOJO_CONNECT_TIMEOUT} = 25;
   is(Mojo::UserAgent->new->connect_timeout,    25, 'right value');
-  is(Mojo::UserAgent->new->inactivity_timeout, 20, 'right value');
+  is(Mojo::UserAgent->new->inactivity_timeout, 40, 'right value');
   local $ENV{MOJO_INACTIVITY_TIMEOUT} = 25;
   is(Mojo::UserAgent->new->inactivity_timeout, 25, 'right value');
   $ENV{MOJO_INACTIVITY_TIMEOUT} = 0;

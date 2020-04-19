@@ -35,7 +35,7 @@ is $tx->res->body, 'Hello TestApp!', 'right content';
 
 # Timeouts
 {
-  is(Mojo::Server::Daemon->new->inactivity_timeout, 15, 'right value');
+  is(Mojo::Server::Daemon->new->inactivity_timeout, 30, 'right value');
   local $ENV{MOJO_INACTIVITY_TIMEOUT} = 25;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 25, 'right value');
   $ENV{MOJO_INACTIVITY_TIMEOUT} = 0;
@@ -253,7 +253,7 @@ ok $remote_port > 0, 'has remote port';
 $tx = $ua->get('/timeout');
 ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code, 200, 'right status';
-is $tx->res->body, 15,  'inactivity timeout was used for the request';
+is $tx->res->body, 30,  'inactivity timeout was used for the request';
 is(Mojo::IOLoop->stream($tx->res->headers->header('X-Connection-ID'))->timeout,
   5, 'keep-alive timeout was assigned after the request');
 

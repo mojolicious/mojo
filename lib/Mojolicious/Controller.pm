@@ -704,7 +704,7 @@ establish the WebSocket connection.
 
 For mostly idle WebSockets you might also want to increase the inactivity
 timeout with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which
-usually defaults to C<15> seconds.
+usually defaults to C<30> seconds.
 
   # Increase inactivity timeout for connection to 300 seconds
   $c->inactivity_timeout(300);
@@ -860,7 +860,7 @@ the stream.
 
 For Comet (long polling) you might also want to increase the inactivity timeout
 with L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which usually
-defaults to C<15> seconds.
+defaults to C<30> seconds.
 
   # Increase inactivity timeout for connection to 300 seconds
   $c->inactivity_timeout(300);

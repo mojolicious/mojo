@@ -39,8 +39,8 @@ is $tx->res->body, 'Hello TestApp!', 'right content';
   local $ENV{MOJO_INACTIVITY_TIMEOUT} = 25;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 25, 'right value');
   $ENV{MOJO_INACTIVITY_TIMEOUT} = 0;
-  is(Mojo::Server::Daemon->new->inactivity_timeout, 0,  'right value');
-  is(Mojo::Server::Daemon->new->keep_alive_timeout, 10, 'right value');
+  is(Mojo::Server::Daemon->new->inactivity_timeout, 0, 'right value');
+  is(Mojo::Server::Daemon->new->keep_alive_timeout, 5, 'right value');
   local $ENV{MOJO_KEEP_ALIVE_TIMEOUT} = 25;
   is(Mojo::Server::Daemon->new->keep_alive_timeout, 25, 'right value');
   $ENV{MOJO_KEEP_ALIVE_TIMEOUT} = 0;
@@ -255,7 +255,7 @@ ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 15,  'inactivity timeout was used for the request';
 is(Mojo::IOLoop->stream($tx->res->headers->header('X-Connection-ID'))->timeout,
-  10, 'keep-alive timeout was assigned after the request');
+  5, 'keep-alive timeout was assigned after the request');
 
 # Pipelined
 $daemon

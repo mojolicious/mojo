@@ -28,7 +28,7 @@ CORE
 
 OPTIONAL
   Cpanel::JSON::XS 4.09+   ($json)
-  EV 4.0+                  ($ev)
+  EV 4.32+                 ($ev)
   IO::Socket::Socks 0.64+  ($socks)
   IO::Socket::SSL 2.009+   ($tls)
   Net::DNS::Native 0.15+   ($nnr)

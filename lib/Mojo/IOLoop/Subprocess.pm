@@ -22,12 +22,14 @@ sub run {
 
 sub run_p {
   my ($self, $child) = @_;
+
   my $p      = Mojo::Promise->new;
   my $parent = sub {
     my ($self, $err) = (shift, shift);
     $err ? $p->reject($err) : $p->resolve(@_);
   };
   $self->ioloop->next_tick(sub { $self->_start($child, $parent) });
+
   return $p;
 }
 
@@ -268,7 +270,7 @@ second callback.
     sleep 5;
     return '♥', 'Mojolicious';
   })->then(sub {
-    my (@results) = @_;
+    my @results = @_;
     say "I $results[0] $results[1]!";
   })->catch(sub {
     my $err = shift;

@@ -47,7 +47,7 @@ L<Mojolicious::Commands> and implements the following new ones.
   my $description = $generator->description;
   $generator      = $generator->description('Foo');
 
-Short description of this command. Used for the command list.
+Short description of this command, used for the command list.
 
 =head2 hint
 

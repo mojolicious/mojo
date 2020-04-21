@@ -62,6 +62,21 @@ Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 
+# Promises
+$result     = [];
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run_p(sub { return '♥', [{two => 2}], 3 })
+  ->then(sub { $result = [@_] })->wait;
+is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
+$fail       = undef;
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run_p(sub { die 'Whatever' })->catch(sub { $fail = shift })->wait;
+like $fail, qr/Whatever/, 'right error';
+$result = [];
+Mojo::IOLoop->subprocess->run_p(sub { return '♥' })
+  ->then(sub { $result = [@_] })->wait;
+is_deeply $result, ['♥'], 'right structure';
+
 # Event loop in subprocess
 ($fail, $result) = ();
 $subprocess = Mojo::IOLoop::Subprocess->new;

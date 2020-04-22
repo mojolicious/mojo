@@ -326,7 +326,7 @@ sub _start {
   $self->emit(start => $tx);
 
   # Allow test servers sharing the same event loop to clean up connections
-  $loop->next_tick(sub { }) or $loop->one_tick unless $loop->is_running;
+  !$loop->next_tick(sub { }) and $loop->one_tick unless $loop->is_running;
   return undef unless my $id = $self->_connection($loop, $tx, $cb);
 
   if (my $t = $self->request_timeout) {

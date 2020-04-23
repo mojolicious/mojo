@@ -215,7 +215,8 @@ $t->finish_ok->finished_ok(1005);
 
 # Timeout
 $t->websocket_ok('/timeout')->send_ok('timeout')
-  ->message_ok->message_is('timeout: 30')->send_ok('120')
+  ->message_ok->message_is('timeout: 30')->send_ok('0')
+  ->message_ok->message_is('0: 0')->send_ok('120')
   ->message_ok->message_is('120: 120')->finish_ok;
 
 # Compressed message exceeding the limit when decompressed

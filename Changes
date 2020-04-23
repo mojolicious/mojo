@@ -1,4 +1,6 @@
 
+8.41  2020-04-24
+
 8.40  2020-04-23
   - Fixed support for disabling the inactivity timeout in Mojo::UserAgent.
 

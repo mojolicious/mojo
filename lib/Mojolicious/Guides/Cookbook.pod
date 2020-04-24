@@ -838,26 +838,25 @@ perform computationally expensive operations without blocking the event loop.
   # Operation that would block the event loop for 5 seconds
   get '/' => sub {
     my $c = shift;
-    Mojo::IOLoop->subprocess(
-      sub {
-        my $subprocess = shift;
-        sleep 5;
-        return '♥', 'Mojolicious';
-      },
-      sub {
-        my ($subprocess, $err, @results) = @_;
-        $c->reply->exception($err) and return if $err;
-        $c->render(text => "I $results[0] $results[1]!");
-      }
-    );
+
+    Mojo::IOLoop->subprocess->run_p(sub {
+      sleep 5;
+      return '♥', 'Mojolicious';
+    })->then(sub {
+      my @results = @_;
+      $c->render(text => "I $results[0] $results[1]!");
+    })->catch(sub  {
+      my $err = shift;
+      $c->reply->exception($err);
+    });
   };
 
   app->start;
 
-The first callback will be executed in a child process, without blocking the
-event loop of the parent process. The results of the first callback will then be
-shared between both processes, and the second callback executed in the parent
-process.
+The callback passed to L<Mojo::IOLoop::Subprocess/"run_p"> will be executed in a
+child process, without blocking the event loop of the parent process. The
+results of the callback will then be shared between both processes, and the
+promise fulfilled or rejected in the parent process.
 
 =head2 Exceptions in non-blocking operations
 

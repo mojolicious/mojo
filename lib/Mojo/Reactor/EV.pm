@@ -2,15 +2,17 @@ package Mojo::Reactor::EV;
 use Mojo::Base 'Mojo::Reactor::Poll';
 
 use Carp qw(croak);
-use EV 4.0;
+use EV 4.32;
 
 my $EV;
 
 sub DESTROY { undef $EV }
 
 sub again {
-  croak 'Timer not active' unless my $timer = shift->{timers}{shift()};
-  $timer->{watcher}->again;
+  my ($self, $id, $after) = @_;
+  croak 'Timer not active' unless my $timer = $self->{timers}{$id};
+  my $w = $timer->{watcher};
+  defined $after ? $w->set($after, $w->repeat ? $after : 0) : $w->again;
 }
 
 # We have to fall back to Mojo::Reactor::Poll, since EV is unique
@@ -117,7 +119,7 @@ Mojo::Reactor::EV - Low-level event reactor with libev support
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::EV> is a low-level event reactor based on L<EV> (4.0+).
+L<Mojo::Reactor::EV> is a low-level event reactor based on L<EV> (4.32+).
 
 =head1 EVENTS
 
@@ -131,8 +133,10 @@ implements the following new ones.
 =head2 again
 
   $reactor->again($id);
+  $reactor->again($id, 0.5);
 
-Restart timer. Note that this method requires an active timer.
+Restart timer and optionally change the invocation time. Note that this method
+requires an active timer.
 
 =head2 new
 

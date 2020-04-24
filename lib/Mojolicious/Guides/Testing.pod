@@ -666,13 +666,10 @@ L<Role::Tiny> that implements a test assertion named C<location_is>:
   package Test::Mojo::Role::Location;
   use Mojo::Base -role;
 
-  use Test::More;
-
   sub location_is {
-    my ($t, $value, $desc) = @_;
+    my ($self, $value, $desc) = @_;
     $desc ||= "Location: $value";
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    return $t->success(is($t->tx->res->headers->location, $value, $desc));
+    return $self->test('is', $t->tx->res->headers->location, $value, $desc);
   }
 
   1;
@@ -681,12 +678,9 @@ When we make new test assertions using roles, we want to use method signatures
 that match other C<*_is> methods in L<Test::Mojo>, so here we accept the test
 object, the value to compare, and an optional description.
 
-We assign a default description value (C<$desc>), set the L<Test::Builder>
-C<Level> global variable one level higher (which tells L<Test::Builder> how far
-up the call stack to look when something fails), then we use L<Test::More>'s
-C<is> function to compare the location header with the expected header value. We
-wrap that in the C<success> attribute, which records the boolean test result and
-propagates the L<Test::Mojo> object for method chaining.
+We assign a default description value (C<$desc>), then we use
+L<Test::Mojo/"test"> to compare the location header with the expected header
+value, and finally propagates the L<Test::Mojo> object for method chaining.
 
 With this new package, we're ready to compose a new test object that uses the
 role:

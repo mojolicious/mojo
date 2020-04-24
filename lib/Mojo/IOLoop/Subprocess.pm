@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Config;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
+use Mojo::Promise;
 use POSIX ();
 use Storable;
 
@@ -17,6 +18,19 @@ sub run {
   my ($self, @args) = @_;
   $self->ioloop->next_tick(sub { $self->_start(@args) });
   return $self;
+}
+
+sub run_p {
+  my ($self, $child) = @_;
+
+  my $p      = Mojo::Promise->new;
+  my $parent = sub {
+    my ($self, $err) = (shift, shift);
+    $err ? $p->reject($err) : $p->resolve(@_);
+  };
+  $self->ioloop->next_tick(sub { $self->_start($child, $parent) });
+
+  return $p;
 }
 
 sub _start {
@@ -103,6 +117,18 @@ Mojo::IOLoop::Subprocess - Subprocesses
       say "I $results[0] $results[1]!";
     }
   );
+
+  # Operation that would block the event loop for 5 seconds (with promise)
+  $subprocess->run_p(sub {
+    sleep 5;
+    return '♥', 'Mojolicious';
+  })->then(sub {
+    my @results = @_;
+    say "I $results[0] $results[1]!";
+  })->catch(sub  {
+    my $err = shift;
+    say "Subprocess error: $err";
+  });
 
   # Start event loop if necessary
   $subprocess->ioloop->start unless $subprocess->ioloop->is_running;
@@ -244,6 +270,24 @@ more values, without blocking L</"ioloop"> in the parent process. Then execute
 the second callback in the parent process with the results. The return values of
 the first callback and exceptions thrown by it, will be serialized with
 L<Storable>, so they can be shared between processes.
+
+=head2 run_p
+
+  my $promise = $subprocess->run_p(sub {...});
+
+Same as L</"run">, but returns a L<Mojo::Promise> object instead of accepting a
+second callback.
+
+  $subprocess->run_p(sub {
+    sleep 5;
+    return '♥', 'Mojolicious';
+  })->then(sub {
+    my @results = @_;
+    say "I $results[0] $results[1]!";
+  })->catch(sub {
+    my $err = shift;
+    say "Subprocess error: $err";
+  })->wait;
 
 =head1 SEE ALSO
 

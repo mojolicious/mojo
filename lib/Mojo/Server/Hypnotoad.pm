@@ -26,7 +26,8 @@ sub configure {
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout listen pid_file spare workers);
+    qw(heartbeat_timeout inactivity_timeout keep_alive_timeout listen pid_file),
+    qw(spare workers);
 }
 
 sub run {
@@ -182,7 +183,7 @@ This second invocation will load the application again, detect the process id
 file with it, and send a L</"USR2"> signal to the already running server.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
+resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
 L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
@@ -304,9 +305,19 @@ operation to block the event loop.
 
   inactivity_timeout => 10
 
-Maximum amount of time in seconds a connection can be inactive before getting
-closed, defaults to the value of L<Mojo::Server::Daemon/"inactivity_timeout">.
-Setting the value to C<0> will allow connections to be inactive indefinitely.
+Maximum amount of time in seconds a connection with an active request can be
+inactive before getting closed, defaults to the value of
+L<Mojo::Server::Daemon/"inactivity_timeout">. Setting the value to C<0> will
+allow connections to be inactive indefinitely.
+
+=head2 keep_alive_timeout
+
+  keep_alive_timeout => 10
+
+Maximum amount of time in seconds a connection without an active request can be
+inactive before getting closed, defaults to the value of
+L<Mojo::Server::Daemon/"keep_alive_timeout">. Setting the value to C<0> will
+allow connections to be inactive indefinitely.
 
 =head2 listen
 

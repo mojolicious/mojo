@@ -18,7 +18,7 @@ has ca                 => sub { $ENV{MOJO_CA_FILE} };
 has cert               => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout    => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
 has cookie_jar         => sub { Mojo::UserAgent::CookieJar->new };
-has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
+has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 40 };
 has insecure           => sub { $ENV{MOJO_INSECURE} };
 has [qw(local_address max_response_size)];
 has ioloop => sub { Mojo::IOLoop->new };
@@ -324,7 +324,11 @@ sub _start {
   my $max = $self->max_response_size;
   $tx->res->max_message_size($max) if defined $max;
   $self->emit(start => $tx);
+
+  # Allow test servers sharing the same event loop to clean up connections
+  !$loop->next_tick(sub { }) and $loop->one_tick unless $loop->is_running;
   return undef unless my $id = $self->_connection($loop, $tx, $cb);
+
   if (my $t = $self->request_timeout) {
     weaken $self;
     $self->{connections}{$id}{timeout}
@@ -449,7 +453,7 @@ this allows multiple processes to share the same L<Mojo::UserAgent> object
 safely.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
+resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
 L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
@@ -563,7 +567,7 @@ L<Mojo::UserAgent::CookieJar> object.
 
 Maximum amount of time in seconds a connection can be inactive before getting
 closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
-variable or C<20>. Setting the value to C<0> will allow connections to be
+variable or C<40>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 
 =head2 insecure

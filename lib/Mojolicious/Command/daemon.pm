@@ -15,6 +15,7 @@ sub run {
     'b|backlog=i'            => sub { $daemon->backlog($_[1]) },
     'c|clients=i'            => sub { $daemon->max_clients($_[1]) },
     'i|inactivity-timeout=i' => sub { $daemon->inactivity_timeout($_[1]) },
+    'k|keep-alive-timeout=i' => sub { $daemon->keep_alive_timeout($_[1]) },
     'l|listen=s'             => \my @listen,
     'p|proxy'                => sub { $daemon->reverse_proxy(1) },
     'r|requests=i'           => sub { $daemon->max_requests($_[1]) };
@@ -51,7 +52,9 @@ Mojolicious::Command::daemon - Daemon command
                                          application, defaults to the value of
                                          MOJO_HOME or auto-detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
-                                         value of MOJO_INACTIVITY_TIMEOUT or 15
+                                         value of MOJO_INACTIVITY_TIMEOUT or 30
+    -k, --keep-alive-timeout <seconds>   Keep-alive timeout, defaults to the
+                                         value of MOJO_KEEP_ALIVE_TIMEOUT or 5
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"

@@ -208,8 +208,8 @@ timers to finally generate a response.
 
 To protect your applications from denial-of-service attacks, all connections
 have an inactivity timeout which limits how long a connection may be inactive
-before being closed automatically. It defaults to C<20> seconds for the user
-agent and C<15> seconds for all built-in web servers, and can be changed with
+before being closed automatically. It defaults to C<40> seconds for the user
+agent and C<30> seconds for all built-in web servers, and can be changed with
 the attributes L<Mojo::UserAgent/"inactivity_timeout"> and
 L<Mojo::Server::Daemon/"inactivity_timeout"> or the C<MOJO_INACTIVITY_TIMEOUT>
 environment variable. In L<Mojolicious> applications you can also use the helper
@@ -234,14 +234,14 @@ be closed immediately.
     });
   });
 
-=head2 What does "Worker 31842 has no heartbeat (30 seconds), restarting" mean?
+=head2 What does "Worker 31842 has no heartbeat (50 seconds), restarting" mean?
 
 As long as they are accepting new connections, worker processes of all built-in
 pre-forking web servers send heartbeat messages to the manager process at
 regular intervals, to signal that they are still responsive. A blocking
 operation such as an infinite loop in your application can prevent this, and
 will force the affected worker to be restarted after a timeout. This timeout
-defaults to C<30> seconds and can be extended with the attribute
+defaults to C<50> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
 
 =head2 What does "Transaction already destroyed" mean?

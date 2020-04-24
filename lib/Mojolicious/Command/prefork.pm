@@ -20,6 +20,7 @@ sub run {
     'I|heartbeat-interval=i' => sub { $prefork->heartbeat_interval($_[1]) },
     'H|heartbeat-timeout=i'  => sub { $prefork->heartbeat_timeout($_[1]) },
     'i|inactivity-timeout=i' => sub { $prefork->inactivity_timeout($_[1]) },
+    'k|keep-alive-timeout=i' => sub { $prefork->keep_alive_timeout($_[1]) },
     'l|listen=s'             => \my @listen,
     'P|pid-file=s'           => sub { $prefork->pid_file($_[1]) },
     'p|proxy'                => sub { $prefork->reverse_proxy(1) },
@@ -58,13 +59,15 @@ Mojolicious::Command::prefork - Pre-fork command
                                          connections, defaults to 1000
     -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 120.
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
-    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 30
+    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 50
     -h, --help                           Show this summary of available options
         --home <path>                    Path to home directory of your
                                          application, defaults to the value of
                                          MOJO_HOME or auto-detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
-                                         value of MOJO_INACTIVITY_TIMEOUT or 15
+                                         value of MOJO_INACTIVITY_TIMEOUT or 30
+    -k, --keep-alive-timeout <seconds>   Keep-alive timeout, defaults to the
+                                         value of MOJO_KEEP_ALIVE_TIMEOUT or 5
     -l, --listen <location>              One or more locations you want to
                                          listen on, defaults to the value of
                                          MOJO_LISTEN or "http://*:3000"

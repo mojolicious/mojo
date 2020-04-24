@@ -33,13 +33,18 @@ my $tx = $ua->get('/');
 is $tx->res->code, 200,              'right status';
 is $tx->res->body, 'Hello TestApp!', 'right content';
 
-# Timeout
+# Timeouts
 {
-  is(Mojo::Server::Daemon->new->inactivity_timeout, 15, 'right value');
+  is(Mojo::Server::Daemon->new->inactivity_timeout, 30, 'right value');
   local $ENV{MOJO_INACTIVITY_TIMEOUT} = 25;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 25, 'right value');
   $ENV{MOJO_INACTIVITY_TIMEOUT} = 0;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 0, 'right value');
+  is(Mojo::Server::Daemon->new->keep_alive_timeout, 5, 'right value');
+  local $ENV{MOJO_KEEP_ALIVE_TIMEOUT} = 25;
+  is(Mojo::Server::Daemon->new->keep_alive_timeout, 25, 'right value');
+  $ENV{MOJO_KEEP_ALIVE_TIMEOUT} = 0;
+  is(Mojo::Server::Daemon->new->keep_alive_timeout, 0, 'right value');
 }
 
 # Listen
@@ -150,6 +155,15 @@ $app->routes->any(
   }
 );
 
+$app->routes->any(
+  '/timeout' => sub {
+    my $c  = shift;
+    my $id = $c->tx->connection;
+    $c->res->headers->header('X-Connection-ID' => $id);
+    $c->render(text => Mojo::IOLoop->stream($id)->timeout);
+  }
+);
+
 $app->routes->any('/*whatever' => {text => 'Whatever!'});
 
 # Normal request
@@ -234,6 +248,14 @@ ok $local_address, 'has local address';
 ok $local_port > 0, 'has local port';
 ok $remote_address, 'has remote address';
 ok $remote_port > 0, 'has remote port';
+
+# Timeout
+$tx = $ua->get('/timeout');
+ok $tx->keep_alive, 'will be kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 30,  'inactivity timeout was used for the request';
+is(Mojo::IOLoop->stream($tx->res->headers->header('X-Connection-ID'))->timeout,
+  5, 'keep-alive timeout was assigned after the request');
 
 # Pipelined
 $daemon

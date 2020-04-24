@@ -11,7 +11,7 @@ use Scalar::Util qw(weaken);
 has accepts            => 10000;
 has cleanup            => 1;
 has graceful_timeout   => 120;
-has heartbeat_timeout  => 30;
+has heartbeat_timeout  => 50;
 has heartbeat_interval => 5;
 has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
 has spare              => 2;
@@ -235,7 +235,7 @@ server uses signals for process management, so you should avoid modifying signal
 handlers in your applications.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
+resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
 L<IO::Socket::SSL> (1.84+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
@@ -397,7 +397,7 @@ Heartbeat interval in seconds, defaults to C<5>.
   $prefork    = $prefork->heartbeat_timeout(2);
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped gracefully, defaults to C<30>. Note that this value should usually be a
+stopped gracefully, defaults to C<50>. Note that this value should usually be a
 little larger than the maximum amount of time you expect any one operation to
 block the event loop.
 

@@ -286,10 +286,11 @@ scalability. The C<LIBEV_FLAGS> environment variable should also be used to
 select the best possible L<EV> backend, which usually defaults to the not very
 scalable C<select>.
 
-  LIBEV_FLAGS=1   # select
-  LIBEV_FLAGS=2   # poll
-  LIBEV_FLAGS=4   # epoll (Linux)
-  LIBEV_FLAGS=8   # kqueue (*BSD, OS X)
+  LIBEV_FLAGS=1    # select
+  LIBEV_FLAGS=2    # poll
+  LIBEV_FLAGS=4    # epoll (Linux)
+  LIBEV_FLAGS=8    # kqueue (*BSD, OS X)
+  LIBEV_FLAGS=64   # Linux AIO
 
 The event loop will be resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>. A TLS certificate and key are also built
@@ -298,7 +299,7 @@ convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop> is
 loaded.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
+resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
 L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
@@ -602,7 +603,7 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 =head2 subprocess
 
-  my $subprocess = Mojo::IOLoop->subprocess(sub {...}, sub {...});
+  my $subprocess = Mojo::IOLoop->subprocess;
   my $subprocess = $loop->subprocess;
   my $subprocess = $loop->subprocess(sub {...}, sub {...});
 
@@ -611,18 +612,16 @@ operations in subprocesses, without blocking the event loop. Callbacks will be
 passed along to L<Mojo::IOLoop::Subprocess/"run">.
 
   # Operation that would block the event loop for 5 seconds
-  Mojo::IOLoop->subprocess(
-    sub {
-      my $subprocess = shift;
-      sleep 5;
-      return '♥', 'Mojolicious';
-    },
-    sub {
-      my ($subprocess, $err, @results) = @_;
-      say "Subprocess error: $err" and return if $err;
-      say "I $results[0] $results[1]!";
-    }
-  );
+  Mojo::IOLoop->subprocess->run_p(sub {
+    sleep 5;
+    return '♥', 'Mojolicious';
+  })->then(sub {
+    my @results = @_;
+    say "I $results[0] $results[1]!";
+  })->catch(sub  {
+    my $err = shift;
+    say "Subprocess error: $err";
+  });
 
 =head2 timer
 

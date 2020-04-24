@@ -968,6 +968,8 @@ Extract text content from this element only (not including child elements).
   # "foo\nbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->text;
 
+To extract text content from all descendant nodes see L</"all_text">.
+
 =head2 to_string
 
   my $str = $dom->to_string;

@@ -25,7 +25,7 @@ Mojolicious::Command::Author::generate - Generator command
   Usage: APPLICATION generate GENERATOR [OPTIONS]
 
     mojo generate app
-    mojo generate lite_app
+    mojo generate lite-app
 
 =head1 DESCRIPTION
 

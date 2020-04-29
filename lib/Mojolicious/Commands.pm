@@ -35,7 +35,8 @@ sub run {
   if (!$ENV{MOJO_NO_DETECT} && (my $env = $self->detect)) { $name = $env }
 
   # Run command
-  if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
+  if ($name && $name =~ /^\w[\w-]+$/ && ($name ne 'help' || $args[0])) {
+    $name =~ s/-/_/g;
 
     # Help
     $name = shift @args if my $help = $name eq 'help';
@@ -68,7 +69,12 @@ sub run {
       for grep { _command($_) } find_modules($ns), find_packages($ns);
   }
 
-  my @rows = map { [" $_", $all{$_}] } sort keys %all;
+  my @rows;
+  for my $class (sort keys %all) {
+    my $command = $class;
+    $command =~ s/(?<!^)_/-/g;
+    push @rows, [" $command", $all{$class}];
+  }
   return print $self->message, tablify(\@rows), $self->hint;
 }
 
@@ -106,7 +112,7 @@ Mojolicious::Commands - Command line interface
   Usage: APPLICATION COMMAND [OPTIONS]
 
     mojo version
-    mojo generate lite_app
+    mojo generate lite-app
     ./myapp.pl daemon -m production -l http://*:8080
     ./myapp.pl get /foo
     ./myapp.pl routes -v
@@ -177,9 +183,9 @@ List available options for generator command with short descriptions.
 Use L<Mojolicious::Command::Author::generate::app> to generate application
 directory structure for a fully functional L<Mojolicious> application.
 
-=head2 generate lite_app
+=head2 generate lite-app
 
-  $ mojo generate lite_app
+  $ mojo generate lite-app
 
 Use L<Mojolicious::Command::Author::generate::lite_app> to generate a fully
 functional L<Mojolicious::Lite> application.

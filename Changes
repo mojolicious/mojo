@@ -1,5 +1,7 @@
 
-8.41  2020-04-24
+8.41  2020-04-30
+  - Improved Mojolicious::Commands to treat commands like
+    "mojo generate lite_app" as "mojo generate lite-app".
 
 8.40  2020-04-23
   - Fixed support for disabling the inactivity timeout in Mojo::UserAgent.

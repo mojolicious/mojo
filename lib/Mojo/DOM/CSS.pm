@@ -12,7 +12,7 @@ my $ATTR_RE   = qr/
   (?:
     (\W)?=                                              # Operator
     (?:"((?:\\"|[^"])*)"|'((?:\\'|[^'])*)'|([^\]]+?))   # Value
-    (?:\s+(i|I))?                                       # Case-sensitivity
+    (?:\s+(?:(i|I)|s|S))?                               # Case-sensitivity
   )?
   \]
 /x;
@@ -392,6 +392,18 @@ B<EXPERIMENTAL> and might change without warning!
   my $case_insensitive = $css->select('input[type="hidden" i]');
   my $case_insensitive = $css->select('input[type=hidden i]');
   my $case_insensitive = $css->select('input[class~="foo" i]');
+
+This selector is part of
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
+
+=head2 E[foo="bar" s]
+
+An C<E> element whose C<foo> attribute value is exactly and case-sensitively
+equal to C<bar>. Note that this selector is B<EXPERIMENTAL> and might change
+without warning!
+
+  my $case_sensitive = $css->select('input[type="hidden" s]');
 
 This selector is part of
 L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work

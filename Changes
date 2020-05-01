@@ -1,5 +1,6 @@
 
 8.42  2020-05-01
+  - Added support for :any-link pseudo-class to Mojo::DOM::CSS.
 
 8.41  2020-04-30
   - Improved Mojolicious::Commands to treat commands like

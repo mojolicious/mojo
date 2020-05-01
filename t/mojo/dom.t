@@ -1225,16 +1225,21 @@ $dom = Mojo::DOM->new(<<EOF);
 <area href=/ alt=F>
 <div href=borked>very borked</div>
 EOF
+is $dom->find(':any-link')->map(sub { $_->tag })->join(','), 'a,link,area',
+  'right tags';
 is $dom->find(':link')->map(sub { $_->tag })->join(','), 'a,link,area',
   'right tags';
 is $dom->find(':visited')->map(sub { $_->tag })->join(','), 'a,link,area',
   'right tags';
-is $dom->at('a:link')->text,    'B', 'right result';
-is $dom->at('a:visited')->text, 'B', 'right result';
-is $dom->at('link:link')->{rel},    'D', 'right result';
-is $dom->at('link:visited')->{rel}, 'D', 'right result';
-is $dom->at('area:link')->{alt},    'F', 'right result';
-is $dom->at('area:visited')->{alt}, 'F', 'right result';
+is $dom->at('a:link')->text,     'B', 'right result';
+is $dom->at('a:any-link')->text, 'B', 'right result';
+is $dom->at('a:visited')->text,  'B', 'right result';
+is $dom->at('link:any-link')->{rel}, 'D', 'right result';
+is $dom->at('link:link')->{rel},     'D', 'right result';
+is $dom->at('link:visited')->{rel},  'D', 'right result';
+is $dom->at('area:link')->{alt},     'F', 'right result';
+is $dom->at('area:any-link')->{alt}, 'F', 'right result';
+is $dom->at('area:visited')->{alt},  'F', 'right result';
 
 # Sibling combinator
 $dom = Mojo::DOM->new(<<EOF);

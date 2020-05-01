@@ -192,8 +192,8 @@ sub _pc {
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
-  # ":link" and ":visited"
-  if ($class eq 'link' || $class eq 'visited') {
+  # ":any-link", ":link" and ":visited"
+  if ($class eq 'any-link' || $class eq 'link' || $class eq 'visited') {
     return undef unless $current->[0] eq 'tag' && exists $current->[2]{href};
     return !!grep { $current->[1] eq $_ } qw(a area link);
   }
@@ -519,13 +519,18 @@ An C<E> element that has no children (including text nodes).
 
   my $empty = $css->select(':empty');
 
+=head2 E:any-link
+
+Alias for L</"E:any-link">.
+
 =head2 E:link
 
 An C<E> element being the source anchor of a hyperlink of which the target is
 not yet visited (C<:link>) or already visited (C<:visited>). Note that
-L<Mojo::DOM::CSS> is not stateful, therefore C<:link> and C<:visited> yield
-exactly the same results.
+L<Mojo::DOM::CSS> is not stateful, therefore C<:any-link>, C<:link> and
+C<:visited> yield exactly the same results.
 
+  my $links = $css->select(':any-link');
   my $links = $css->select(':link');
   my $links = $css->select(':visited');
 

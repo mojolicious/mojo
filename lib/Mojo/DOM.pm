@@ -337,7 +337,10 @@ sub _text {
     }
 
     # Nested tag
-    elsif ($type eq 'tag' && $all) { unshift @$nodes, @{_nodes($node)} }
+    elsif ($type eq 'tag' && $all) {
+      unshift @$nodes, @{_nodes($node)}
+        unless $node->[1] eq 'script' || $node->[1] eq 'style';
+    }
   }
 
   return $text;
@@ -470,7 +473,8 @@ L<Mojo::DOM> implements the following methods.
 
   my $text = $dom->all_text;
 
-Extract text content from all descendant nodes of this element.
+Extract text content from all descendant nodes of this element, with the
+exception of C<script> and C<style> elements.
 
   # "foo\nbarbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->all_text;

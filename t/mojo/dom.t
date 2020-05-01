@@ -2790,6 +2790,27 @@ is $dom->at('title')->selector,
 is $dom->at($dom->at('title')->selector)->text, 'Test', 'right text';
 is $dom->at('html')->selector, 'html:nth-child(1)', 'right selector';
 
+# Exclude "<script>" and "<style>" from text extraction
+$dom = Mojo::DOM->new(<<EOF);
+<html>
+  <head>
+    <title>Hello</title>
+    <script>123</script>
+    <style>456</style>
+  </head>
+  <body>
+    <script>123</script>
+    <div>Mojo!</div>
+    <style>456</style>
+  </body>
+<html>
+EOF
+like $dom->at('html')->all_text,   qr/Hello.*Mojo!/s, 'title and div';
+unlike $dom->at('html')->all_text, qr/123/,           'no script';
+unlike $dom->at('html')->all_text, qr/456/,           'no style';
+like $dom->at('script')->text,     qr/123/,           'script text';
+like $dom->at('style')->text,      qr/456/,           'style text';
+
 # Reusing partial DOM trees
 $dom = $dom->parse('<div><b>Test</b></div>');
 is $dom->at('div')->prepend($dom->at('b'))->root,

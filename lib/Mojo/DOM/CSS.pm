@@ -521,7 +521,7 @@ An C<E> element that has no children (including text nodes).
 
 =head2 E:any-link
 
-Alias for L</"E:any-link">.
+Alias for L</"E:link">.
 
 =head2 E:link
 

@@ -24,7 +24,6 @@ use Mojo::UserAgent;
     heartbeat_interval => 7,
     heartbeat_timeout  => 9,
     inactivity_timeout => 5,
-    keep_alive_timeout => 3,
     listen             => ['http://*:8081'],
     pid_file           => '/foo/bar.pid',
     proxy              => 1,
@@ -43,7 +42,6 @@ use Mojo::UserAgent;
   is $hypnotoad->prefork->heartbeat_interval, 7,  'right value';
   is $hypnotoad->prefork->heartbeat_timeout,  9,  'right value';
   is $hypnotoad->prefork->inactivity_timeout, 5,  'right value';
-  is $hypnotoad->prefork->keep_alive_timeout, 3,  'right value';
   is_deeply $hypnotoad->prefork->listen, ['http://*:8081'], 'right value';
   is $hypnotoad->prefork->max_clients,  1,              'right value';
   is $hypnotoad->prefork->max_requests, 3,              'right value';

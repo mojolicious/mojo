@@ -26,8 +26,7 @@ sub configure {
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout keep_alive_timeout listen pid_file),
-    qw(spare workers);
+    qw(heartbeat_timeout inactivity_timeout listen pid_file spare workers);
 }
 
 sub run {
@@ -305,19 +304,9 @@ operation to block the event loop.
 
   inactivity_timeout => 10
 
-Maximum amount of time in seconds a connection with an active request can be
-inactive before getting closed, defaults to the value of
-L<Mojo::Server::Daemon/"inactivity_timeout">. Setting the value to C<0> will
-allow connections to be inactive indefinitely.
-
-=head2 keep_alive_timeout
-
-  keep_alive_timeout => 5
-
-Maximum amount of time in seconds a connection without an active request can be
-inactive before getting closed, defaults to the value of
-L<Mojo::Server::Daemon/"keep_alive_timeout">. Setting the value to C<0> will
-allow connections to be inactive indefinitely.
+Maximum amount of time in seconds a connection can be inactive before getting
+closed, defaults to the value of L<Mojo::Server::Daemon/"inactivity_timeout">.
+Setting the value to C<0> will allow connections to be inactive indefinitely.
 
 =head2 listen
 

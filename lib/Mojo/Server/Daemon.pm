@@ -15,7 +15,6 @@ has acceptors => sub { [] };
 has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
-has keep_alive_timeout => sub { $ENV{MOJO_KEEP_ALIVE_TIMEOUT} // 10 };
 has listen       => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_requests => 100;
 
@@ -79,8 +78,7 @@ sub _build_tx {
 
   my $tx = $self->build_tx->connection($id);
   $tx->res->headers->server('Mojolicious (Perl)');
-  my $handle
-    = $self->ioloop->stream($id)->timeout($self->inactivity_timeout)->handle;
+  my $handle = $self->ioloop->stream($id)->handle;
   unless ($handle->isa('IO::Socket::UNIX')) {
     $tx->local_address($handle->sockhost)->local_port($handle->sockport);
     $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
@@ -157,8 +155,7 @@ sub _finish {
   return $self->_remove($id) if $tx->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return $self->ioloop->stream($id)->timeout($self->keep_alive_timeout)
-    unless length(my $leftovers = $tx->req->content->leftovers);
+  return unless length(my $leftovers = $tx->req->content->leftovers);
   $tx = $c->{tx} = $self->_build_tx($id, $c);
   $tx->server_read($leftovers);
 }
@@ -330,10 +327,10 @@ Listen backlog size, defaults to C<SOMAXCONN>.
   my $timeout = $daemon->inactivity_timeout;
   $daemon     = $daemon->inactivity_timeout(5);
 
-Maximum amount of time in seconds a connection with an active request can be
-inactive before getting closed, defaults to the value of the
-C<MOJO_INACTIVITY_TIMEOUT> environment variable or C<15>. Setting the value to
-C<0> will allow connections to be inactive indefinitely.
+Maximum amount of time in seconds a connection can be inactive before getting
+closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
+variable or C<15>. Setting the value to C<0> will allow connections to be
+inactive indefinitely.
 
 =head2 ioloop
 
@@ -342,16 +339,6 @@ C<0> will allow connections to be inactive indefinitely.
 
 Event loop object to use for I/O operations, defaults to the global
 L<Mojo::IOLoop> singleton.
-
-=head2 keep_alive_timeout
-
-  my $timeout = $daemon->keep_alive_timeout;
-  $daemon     = $daemon->keep_alive_timeout(5);
-
-Maximum amount of time in seconds a connection without an active request can be
-inactive before getting closed, defaults to the value of the
-C<MOJO_KEEP_ALIVE_TIMEOUT> environment variable or C<10>. Setting the value to
-C<0> will allow connections to be inactive indefinitely.
 
 =head2 listen
 

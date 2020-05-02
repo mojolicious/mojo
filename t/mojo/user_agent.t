@@ -8,7 +8,6 @@ BEGIN {
 use Test::More;
 use Mojo::IOLoop;
 use Mojo::Message::Request;
-use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojo::UserAgent::Server;
 use Mojo::Util qw(gzip);
@@ -490,33 +489,13 @@ is $tx->res->headers->content_encoding, 'gzip',
   'right "Content-Encoding" value';
 isnt $tx->res->body, 'Hello GZip!', 'different content';
 
-# Keep-alive timeout in between requests
-my $daemon = Mojo::Server::Daemon->new(
-  app                => app,
-  ioloop             => $ua->ioloop,
-  keep_alive_timeout => 0.5,
-  listen             => ['http://127.0.0.1'],
-  silent             => 1
-);
-my $port = $daemon->start->ports->[0];
-$tx = $ua->get("http://127.0.0.1:$port");
-ok $tx->keep_alive, 'keep connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-sleep 1;
-$tx = $ua->get("http://127.0.0.1:$port");
-ok !$tx->kept_alive, 'kept connection not alive';
-ok $tx->keep_alive, 'keep connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
 # Fork-safety
 $tx = $ua->get('/');
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->body, 'works!', 'right content';
 my $last = $tx->connection;
-$port = $ua->server->url->port;
-$tx   = $ua->get('/');
+my $port = $ua->server->url->port;
+$tx = $ua->get('/');
 is $tx->res->body, 'works!', 'right content';
 is $tx->connection, $last, 'same connection';
 is $ua->server->url->port, $port, 'same port';

@@ -324,11 +324,7 @@ sub _start {
   my $max = $self->max_response_size;
   $tx->res->max_message_size($max) if defined $max;
   $self->emit(start => $tx);
-
-  # Allow test servers sharing the same event loop to clean up connections
-  $loop->next_tick(sub { }) or $loop->one_tick unless $loop->is_running;
   return undef unless my $id = $self->_connection($loop, $tx, $cb);
-
   if (my $t = $self->request_timeout) {
     weaken $self;
     $self->{connections}{$id}{timeout}

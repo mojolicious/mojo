@@ -2,8 +2,6 @@
 8.39  2020-04-22
   - Fixed a bug in Mojo::Server::Daemon where active connections could get the
     keep-alive timeout assigned instead of the inactivity timeout.
-  - Fixed a race condition in Mojo::UserAgent where test servers would close
-    connections prematurely.
 
 8.38  2020-04-21
   - Added run_p method to Mojo::IOLoop::Subprocess. (batman)

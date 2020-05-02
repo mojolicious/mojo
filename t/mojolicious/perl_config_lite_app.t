@@ -22,14 +22,16 @@ my $tempdir = tempdir CLEANUP => 1;
     'space in path works';
 }
 {
-  my $cf = $tempdir->child(qq{foo\rquz\tbaz.conf});
+  my $cf = $tempdir->child(
+    $^O eq 'MSWin32' ? qq{foo\tbar.conf} : qq{foo\rquz\tbaz.conf});
   $conffile->copy_to($cf);
   my $config = plugin Config => {file => $cf};
   is_deeply $config,
     {foo => "bar", utf => "утф", file => $cf->to_string, line => 7},
     'other whitespace in path works';
 }
-{
+SKIP: {
+  skip 'quotes not allowed in filenames on win', 2 if $^O eq 'MSWin32';
   my $cf = $tempdir->child(qq{quz"baz.conf});
   $conffile->copy_to($cf);
   my $config = plugin Config => {file => $cf};

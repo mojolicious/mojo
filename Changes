@@ -1,6 +1,5 @@
 
 8.40  2020-04-23
-  - Fixed support for disabling the inactivity timeout in Mojo::UserAgent.
 
 8.39  2020-04-22
   - Fixed a bug in Mojo::Server::Daemon where active connections could get the

@@ -82,7 +82,7 @@ sub timeout {
     if (!$self->{timeout}) { $reactor->remove(delete $self->{timer}) }
     else                   { $reactor->again($self->{timer}, $self->{timeout}) }
   }
-  elsif ($self->{timeout}) {
+  else {
     weaken $self;
     $self->{timer} = $reactor->timer(
       $timeout => sub {

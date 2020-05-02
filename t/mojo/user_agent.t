@@ -176,21 +176,9 @@ $ua->start_p($ua->build_tx(TEST => '/method'))
   ->then(sub { $result = shift->res->body })->wait;
 is $result, 'TEST', 'right result';
 
-# No timeout
-$ua = Mojo::UserAgent->new(inactivity_timeout => 0);
-my $tx = $ua->get('/');
-ok $tx->keep_alive, 'keep connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-$tx = $ua->get('/');
-ok $tx->kept_alive, 'kept connection alive';
-ok $tx->keep_alive, 'keep connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
 # SOCKS proxy request without SOCKS support
 $ua = Mojo::UserAgent->new;
-$tx = $ua->build_tx(GET => '/');
+my $tx = $ua->build_tx(GET => '/');
 $tx->req->proxy($ua->server->url->scheme('socks'));
 $tx = $ua->start($tx);
 like $tx->error->{message}, qr/IO::Socket::Socks/, 'right error';

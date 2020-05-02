@@ -842,7 +842,7 @@ perform computationally expensive operations without blocking the event loop.
     Mojo::IOLoop->subprocess->run_p(sub {
       sleep 5;
       return '♥', 'Mojolicious';
-    })->then(sub {
+    })->then( sub {
       my @results = @_;
       $c->render(text => "I $results[0] $results[1]!");
     })->catch(sub  {

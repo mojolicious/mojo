@@ -1,6 +1,4 @@
 
-8.40  2020-04-23
-
 8.39  2020-04-22
   - Fixed a bug in Mojo::Server::Daemon where active connections could get the
     keep-alive timeout assigned instead of the inactivity timeout.

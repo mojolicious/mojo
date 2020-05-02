@@ -118,18 +118,6 @@ Mojo::IOLoop::Subprocess - Subprocesses
     }
   );
 
-  # Operation that would block the event loop for 5 seconds (with promise)
-  $subprocess->run_p(sub {
-    sleep 5;
-    return '♥', 'Mojolicious';
-  })->then(sub {
-    my @results = @_;
-    say "I $results[0] $results[1]!";
-  })->catch(sub  {
-    my $err = shift;
-    say "Subprocess error: $err";
-  });
-
   # Start event loop if necessary
   $subprocess->ioloop->start unless $subprocess->ioloop->is_running;
 

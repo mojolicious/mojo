@@ -12,7 +12,7 @@ my $ATTR_RE   = qr/
   (?:
     (\W)?=                                              # Operator
     (?:"((?:\\"|[^"])*)"|'((?:\\'|[^'])*)'|([^\]]+?))   # Value
-    (?:\s+(i|I))?                                       # Case-sensitivity
+    (?:\s+(i))?                                         # Case-sensitivity
   )?
   \]
 /x;

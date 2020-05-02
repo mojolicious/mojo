@@ -449,7 +449,7 @@ this allows multiple processes to share the same L<Mojo::UserAgent> object
 safely.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
+resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
 L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and

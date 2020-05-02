@@ -183,7 +183,7 @@ This second invocation will load the application again, detect the process id
 file with it, and send a L</"USR2"> signal to the already running server.
 
 For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
+resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
 L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
 L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
 features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
@@ -312,7 +312,7 @@ allow connections to be inactive indefinitely.
 
 =head2 keep_alive_timeout
 
-  keep_alive_timeout => 10
+  keep_alive_timeout => 5
 
 Maximum amount of time in seconds a connection without an active request can be
 inactive before getting closed, defaults to the value of

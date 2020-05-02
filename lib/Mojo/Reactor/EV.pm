@@ -2,7 +2,7 @@ package Mojo::Reactor::EV;
 use Mojo::Base 'Mojo::Reactor::Poll';
 
 use Carp qw(croak);
-use EV 4.32;
+use EV 4.0;
 
 my $EV;
 
@@ -119,7 +119,7 @@ Mojo::Reactor::EV - Low-level event reactor with libev support
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::EV> is a low-level event reactor based on L<EV> (4.32+).
+L<Mojo::Reactor::EV> is a low-level event reactor based on L<EV> (4.0+).
 
 =head1 EVENTS
 

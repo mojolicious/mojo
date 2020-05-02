@@ -23,7 +23,7 @@ my $tempdir = tempdir CLEANUP => 1;
 }
 SKIP: {
   skip 'these filenames are all invalid in Windows anyway', 5
-    if $^O eq 'MSWin32';
+    if $^O eq 'MSWin32' || $^O eq 'cygwin';
   {
     my $cf = $tempdir->child(qq{foo\rquz\tbaz.conf});
     $conffile->copy_to($cf);

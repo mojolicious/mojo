@@ -9,25 +9,11 @@ sub load { $_[0]->parse(decode('UTF-8', path($_[1])->slurp), @_[1, 2, 3]) }
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
-  # add the "#line" directive *only* if it's safe to do so
-  my $line_directive = $file =~ /[\r\n]/
-    ? ''    # can't break "#line" across lines
-    : (
-    $file =~ /\s/
-    ? (
-      $file =~ /"/
-      ? ''    # can't escape double-quotes
-      : qq{\n#line 1 "$file"\n}
-      )
-    : qq{\n#line 1 $file\n}
-    );
-
   # Run Perl code in sandbox
-  my $config
-    = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
-    . "sub app; local *app = sub { \$app }; use Mojo::Base -strict;"
-    . $line_directive
-    . $content;
+  my $config = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
+    . "sub app; local *app = sub { \$app }; use Mojo::Base -strict;\n#line 1"
+    # add the file to "#line" directive *only* if it's safe to do so
+    . ($file =~ /[\n"]/ ? '' : qq{ "$file"}) . "\n" . $content;
   die qq{Can't load configuration from file "$file": $@} if $@;
   die qq{Configuration file "$file" did not return a hash reference.\n}
     unless ref $config eq 'HASH';
@@ -125,6 +111,10 @@ will be detected automatically.
 
 If the configuration value C<config_override> has been set in
 L<Mojolicious/"config"> when this plugin is loaded, it will not do anything.
+
+The C<__LINE__> and C<__FILE__> directives, and related things such
+as L<Mojo::File/"curfile">, I<won't> work if the filename contains
+double quotes (C<">) or newlines (C<\n>).
 
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.

@@ -167,7 +167,7 @@ Both application skeletons can be automatically generated with the commands
 L<Mojolicious::Command::Author::generate::lite_app> and
 L<Mojolicious::Command::Author::generate::app>.
 
-  $ mojo generate lite-app myapp.pl
+  $ mojo generate lite_app myapp.pl
   $ mojo generate app MyApp
 
 Feature-wise both are almost equal, the only real differences are

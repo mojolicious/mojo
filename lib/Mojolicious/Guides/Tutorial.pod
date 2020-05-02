@@ -38,7 +38,7 @@ L<Mojolicious::Lite>, turning your script into a full featured web application.
 With L<Mojolicious::Command::Author::generate::lite_app> there is also a helper
 command to generate a small example application.
 
-  $ mojo generate lite-app myapp.pl
+  $ mojo generate lite_app myapp.pl
 
 =head2 Commands
 

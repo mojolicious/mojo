@@ -1797,7 +1797,7 @@ application to test something? Thanks to the command
 L<Mojolicious::Command::eval> you can do just that, the application object
 itself can be accessed via C<app>.
 
-  $ mojo generate lite-app myapp.pl
+  $ mojo generate lite_app myapp.pl
   $ ./myapp.pl eval 'say for @{app->static->paths}'
   $ ./myapp.pl eval 'say for sort keys %{app->renderer->helpers}'
 

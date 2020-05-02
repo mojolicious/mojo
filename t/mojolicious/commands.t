@@ -71,47 +71,17 @@ is ref Mojolicious::Commands->new->run('psgi'), 'CODE', 'right reference';
     'right reference';
 }
 
-# Start application with application specific commands
+# Start application with application specific command
 my $app;
 {
   local $ENV{MOJO_APP_LOADER} = 1;
   $app = Mojolicious::Commands->start_app('MojoliciousTest');
 }
-is $app->start('test_command'),   'works!',   'right result';
-is $app->start('test-command'),   'works!',   'right result';
-is $app->start('_test2-command'), 'works 2!', 'right result';
+is $app->start('test_command'), 'works!', 'right result';
 {
   is(Mojolicious::Commands->start_app(MojoliciousTest => 'test_command'),
     'works!', 'right result');
-  is(Mojolicious::Commands->start_app(MojoliciousTest => 'test-command'),
-    'works!', 'right result');
-  is(Mojolicious::Commands->start_app(MojoliciousTest => '_test2-command'),
-    'works 2!', 'right result');
 }
-
-# Application specific help
-my $buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDOUT = $handle;
-  local $ENV{HARNESS_ACTIVE} = 0;
-  $app->start;
-}
-like $buffer,
-  qr/Usage: APPLICATION COMMAND \[OPTIONS\].*_test2-command.*cgi.*test-comm/s,
-  'right output';
-
-# Commands starting with a dash are not allowed
-$buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDOUT = $handle;
-  local $ENV{HARNESS_ACTIVE} = 0;
-  $app->start('-test2-command');
-}
-like $buffer,
-  qr/Usage: APPLICATION COMMAND \[OPTIONS\].*_test2-command.*cgi.*test-comm/s,
-  'right output';
 
 # Do not pick up options for detected environments
 {
@@ -129,7 +99,7 @@ is_deeply $commands->namespaces,
 ok $commands->description, 'has a description';
 like $commands->message,   qr/COMMAND/, 'has a message';
 like $commands->hint,      qr/help/, 'has a hint';
-$buffer = '';
+my $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
@@ -137,19 +107,19 @@ $buffer = '';
   $commands->run;
 }
 like $buffer,
-  qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*my-test-command.*version/s,
+  qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*my_test_command.*version/s,
   'right output';
 like $buffer,   qr/See, it works/,        'description has been picked up';
-unlike $buffer, qr/my-fake-test-command/, 'fake command has been ignored';
+unlike $buffer, qr/my_fake_test_command/, 'fake command has been ignored';
 
 # help
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $commands->run('help', 'generate', 'lite-app');
+  $commands->run('help', 'generate', 'lite_app');
 }
-like $buffer, qr/Usage: APPLICATION generate lite-app \[OPTIONS\] \[NAME\]/,
+like $buffer, qr/Usage: APPLICATION generate lite_app \[OPTIONS\] \[NAME\]/,
   'right output';
 $buffer = '';
 {
@@ -163,9 +133,9 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $commands->run('generate', 'lite-app', '--help');
+  $commands->run('generate', 'lite_app', '--help');
 }
-like $buffer, qr/Usage: APPLICATION generate lite-app \[OPTIONS\] \[NAME\]/,
+like $buffer, qr/Usage: APPLICATION generate lite_app \[OPTIONS\] \[NAME\]/,
   'right output';
 
 # get
@@ -275,7 +245,7 @@ $buffer = '';
   $generator->run;
 }
 like $buffer,
-  qr/Usage: APPLICATION generate GENERATOR \[OPTIONS\].*lite-app.*plugin/s,
+  qr/Usage: APPLICATION generate GENERATOR \[OPTIONS\].*lite_app.*plugin/s,
   'right output';
 
 # generate app
@@ -310,7 +280,7 @@ chdir $cwd;
 require Mojolicious::Command::Author::generate::lite_app;
 $app = Mojolicious::Command::Author::generate::lite_app->new;
 ok $app->description, 'has a description';
-like $app->usage, qr/lite-app/, 'has usage information';
+like $app->usage, qr/lite_app/, 'has usage information';
 $dir = tempdir CLEANUP => 1;
 chdir $dir;
 $buffer = '';

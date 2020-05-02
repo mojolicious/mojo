@@ -171,7 +171,7 @@ Mojolicious::Command::get - Get command
                                          application, defaults to the value of
                                          MOJO_HOME or auto-detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
-                                         value of MOJO_INACTIVITY_TIMEOUT or 40
+                                         value of MOJO_INACTIVITY_TIMEOUT or 20
     -k, --insecure                       Do not require a valid TLS certificate
                                          to access HTTPS sites
     -M, --method <method>                HTTP method to use, defaults to "GET"

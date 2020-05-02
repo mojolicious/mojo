@@ -303,7 +303,7 @@ ok $client_err, 'has error';
 
 # Ignore invalid client certificate
 $loop = Mojo::IOLoop->new;
-my $cipher;
+my ($cipher, $version);
 ($server, $client, $client_err) = ();
 $id = $loop->server(
   address     => '127.0.0.1',
@@ -331,24 +331,28 @@ $loop->client(
     $stream->timeout(0.5);
     $client_err = $err;
     $client     = 'connected';
-    $cipher     = $stream->handle->get_cipher;
+    my $handle = $stream->handle;
+    $cipher  = $handle->get_cipher;
+    $version = $handle->get_sslversion;
   }
 );
 $loop->start;
 is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
-is $cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
+my $expect = $version eq 'TLSv1_3' ? 'TLS_AES_256_GCM_SHA384' : 'AES256-SHA';
+is $cipher, $expect, "$expect has been negotiatied";
 
 # Ignore missing client certificate
 ($server, $client, $client_err) = ();
 $id = Mojo::IOLoop->server(
-  address    => '127.0.0.1',
-  tls        => 1,
-  tls_ca     => 't/mojo/certs/ca.crt',
-  tls_cert   => 't/mojo/certs/server.crt',
-  tls_key    => 't/mojo/certs/server.key',
-  tls_verify => 0x01,
+  address     => '127.0.0.1',
+  tls         => 1,
+  tls_ca      => 't/mojo/certs/ca.crt',
+  tls_cert    => 't/mojo/certs/server.crt',
+  tls_key     => 't/mojo/certs/server.key',
+  tls_verify  => 0x01,
+  tls_version => 'TLSv1_2',
   sub { $server = 'accepted' }
 );
 $port = Mojo::IOLoop->acceptor($id)->port;

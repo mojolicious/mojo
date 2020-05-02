@@ -617,10 +617,10 @@ passed along to L<Mojo::IOLoop::Subprocess/"run">.
     return '♥', 'Mojolicious';
   })->then(sub {
     my @results = @_;
-    say "I $results[0] $results[1]!";
+    $c->render(text => "I $results[0] $results[1]!");
   })->catch(sub  {
     my $err = shift;
-    say "Subprocess error: $err";
+    $c->reply->exception($err);
   });
 
 =head2 timer

@@ -3,8 +3,6 @@
   - Added keep_alive_timeout attribute to Mojo::Server::Daemon.
   - Added -k options to daemon and prefork commands.
   - Added keep_alive_timeout setting to Hypnotoad.
-  - Increased various default timeouts because keep_alive_timeout takes over
-    some of their previous responsibility.
   - Improved timeout setting performance significantly in Mojo::IOLoop::Stream.
   - Improved again method in Mojo::Reactor, Mojo::Reactor::EV and
     Mojo::Reactor::Poll to allow changing the invocation time of active timers.

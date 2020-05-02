@@ -13,7 +13,7 @@ use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
 has acceptors => sub { [] };
 has [qw(backlog max_clients silent)];
-has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 30 };
+has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
 has keep_alive_timeout => sub { $ENV{MOJO_KEEP_ALIVE_TIMEOUT} // 5 };
 has listen       => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
@@ -332,7 +332,7 @@ Listen backlog size, defaults to C<SOMAXCONN>.
 
 Maximum amount of time in seconds a connection with an active request can be
 inactive before getting closed, defaults to the value of the
-C<MOJO_INACTIVITY_TIMEOUT> environment variable or C<30>. Setting the value to
+C<MOJO_INACTIVITY_TIMEOUT> environment variable or C<15>. Setting the value to
 C<0> will allow connections to be inactive indefinitely.
 
 =head2 ioloop

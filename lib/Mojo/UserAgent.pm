@@ -18,7 +18,7 @@ has ca                 => sub { $ENV{MOJO_CA_FILE} };
 has cert               => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout    => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
 has cookie_jar         => sub { Mojo::UserAgent::CookieJar->new };
-has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 40 };
+has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
 has insecure           => sub { $ENV{MOJO_INSECURE} };
 has [qw(local_address max_response_size)];
 has ioloop => sub { Mojo::IOLoop->new };
@@ -563,7 +563,7 @@ L<Mojo::UserAgent::CookieJar> object.
 
 Maximum amount of time in seconds a connection can be inactive before getting
 closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
-variable or C<40>. Setting the value to C<0> will allow connections to be
+variable or C<20>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 
 =head2 insecure

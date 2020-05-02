@@ -162,7 +162,7 @@ $ua->websocket(
 Mojo::IOLoop->start;
 ok !$ws, 'not a WebSocket';
 is $code, 200, 'right status';
-ok $body =~ /^(\d+)failed!$/ && $1 == 30, 'right content';
+ok $body =~ /^(\d+)failed!$/ && $1 == 15, 'right content';
 
 # Server directly sends a message
 $result = '';

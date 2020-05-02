@@ -157,14 +157,10 @@ sub _finish {
   return $self->_remove($id) if $tx->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  if (length(my $leftovers = $tx->req->content->leftovers)) {
-    $tx = $c->{tx} = $self->_build_tx($id, $c);
-    $tx->server_read($leftovers);
-  }
-
-  # Keep-alive connection
-  $self->ioloop->stream($id)->timeout($self->keep_alive_timeout)
-    unless $c->{tx};
+  return $self->ioloop->stream($id)->timeout($self->keep_alive_timeout)
+    unless length(my $leftovers = $tx->req->content->leftovers);
+  $tx = $c->{tx} = $self->_build_tx($id, $c);
+  $tx->server_read($leftovers);
 }
 
 sub _listen {

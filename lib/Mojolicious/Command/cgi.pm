@@ -56,14 +56,14 @@ L<Mojolicious::Command> and implements the following new ones.
   my $description = $cgi->description;
   $cgi            = $cgi->description('Foo');
 
-Short description of this command, used for the command list.
+Short description of this command. Used for the command list.
 
 =head2 usage
 
   my $usage = $cgi->usage;
   $cgi      = $cgi->usage('Foo');
 
-Usage information for this command, used for the help screen.
+Usage information for this command. Used for the help screen.
 
 =head1 METHODS
 

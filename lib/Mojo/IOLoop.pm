@@ -603,7 +603,7 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 =head2 subprocess
 
-  my $subprocess = Mojo::IOLoop->subprocess;
+  my $subprocess = Mojo::IOLoop->subprocess(sub {...}, sub {...});
   my $subprocess = $loop->subprocess;
   my $subprocess = $loop->subprocess(sub {...}, sub {...});
 
@@ -612,16 +612,18 @@ operations in subprocesses, without blocking the event loop. Callbacks will be
 passed along to L<Mojo::IOLoop::Subprocess/"run">.
 
   # Operation that would block the event loop for 5 seconds
-  Mojo::IOLoop->subprocess->run_p(sub {
-    sleep 5;
-    return '♥', 'Mojolicious';
-  })->then(sub {
-    my @results = @_;
-    $c->render(text => "I $results[0] $results[1]!");
-  })->catch(sub  {
-    my $err = shift;
-    $c->reply->exception($err);
-  });
+  Mojo::IOLoop->subprocess(
+    sub {
+      my $subprocess = shift;
+      sleep 5;
+      return '♥', 'Mojolicious';
+    },
+    sub {
+      my ($subprocess, $err, @results) = @_;
+      say "Subprocess error: $err" and return if $err;
+      say "I $results[0] $results[1]!";
+    }
+  );
 
 =head2 timer
 

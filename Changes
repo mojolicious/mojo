@@ -1,7 +1,6 @@
 
 8.42  2020-05-01
-  - Added EXPERIMENTAL support for :any-link pseudo-class to Mojo::DOM::CSS.
-  - Renamed experimental :matches pseudo-class to :is in Mojo::DOM::CSS.
+  - Added support for :any-link pseudo-class to Mojo::DOM::CSS.
 
 8.41  2020-04-30
   - Improved Mojolicious::Commands to treat commands like

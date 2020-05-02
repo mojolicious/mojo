@@ -1117,7 +1117,7 @@ $dom->find('ul li:not(:first-child, :last-child)')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(C E F H)], 'found all odd li elements';
 @e = ();
-$dom->find('ul li:is(:first-child, :last-child)')
+$dom->find('ul li:matches(:first-child, :last-child)')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(A I)], 'found all odd li elements';
 @e = ();
@@ -2616,11 +2616,11 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 </foo>
 EOF
 %ns = (foons => 'ns:foo', barns => 'ns:bar');
-ok $dom->at('foons|foo',              %ns), 'result';
-ok $dom->at('foons|foo:not(barns|*)', %ns), 'result';
-ok $dom->at('foo:not(|foo)',          %ns), 'result';
-ok $dom->at('foons|foo:root',         %ns), 'result';
-ok $dom->at('foo:is(:root, foons|*)', %ns), 'result';
+ok $dom->at('foons|foo',                   %ns), 'result';
+ok $dom->at('foons|foo:not(barns|*)',      %ns), 'result';
+ok $dom->at('foo:not(|foo)',               %ns), 'result';
+ok $dom->at('foons|foo:root',              %ns), 'result';
+ok $dom->at('foo:matches(:root, foons|*)', %ns), 'result';
 ok !$dom->at('foons|foo:not(:root)', %ns), 'no result';
 is $dom->at('foons|tag',       %ns)->{val}, 1, 'right value';
 is $dom->at('foons|tag:empty', %ns)->{val}, 1, 'right value';
@@ -2633,11 +2633,11 @@ ok $dom->at('foons|foo foons|tag[val="1"]',   %ns), 'result';
 ok $dom->at('barns|bar',                      %ns), 'result';
 ok $dom->at('barns|bar:not(foons|*)',         %ns), 'result';
 ok $dom->at('bar:not(|bar)',                  %ns), 'result';
-ok $dom->at('bar:is(barns|*)',                %ns), 'result';
+ok $dom->at('bar:matches(barns|*)',           %ns), 'result';
 ok !$dom->at('barns|bar:root', %ns), 'no result';
-ok $dom->at('barns|bar:not(:root)',         %ns), 'result';
-ok $dom->at('bar:is(barns|*, :not(:root))', %ns), 'result';
-ok $dom->at('foons|foo barns|bar',          %ns), 'result';
+ok $dom->at('barns|bar:not(:root)',              %ns), 'result';
+ok $dom->at('bar:matches(barns|*, :not(:root))', %ns), 'result';
+ok $dom->at('foons|foo barns|bar',               %ns), 'result';
 is $dom->at('barns|tag',       %ns)->{val}, 2, 'right value';
 is $dom->at('barns|tag:empty', %ns)->{val}, 2, 'right value';
 ok $dom->at('barns|tag[val="2"]',                           %ns), 'result';

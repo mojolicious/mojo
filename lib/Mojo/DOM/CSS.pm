@@ -102,8 +102,8 @@ sub _compile {
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
 
-      # ":is" and ":not" (contains more selectors)
-      $args = _compile($args, %ns) if $name eq 'is' || $name eq 'not';
+      # ":matches" and ":not" (contains more selectors)
+      $args = _compile($args, %ns) if $name eq 'matches' || $name eq 'not';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
@@ -183,8 +183,8 @@ sub _pc {
   # ":not"
   return !_match($args, $current, $current) if $class eq 'not';
 
-  # ":is"
-  return !!_match($args, $current, $current) if $class eq 'is';
+  # ":matches"
+  return !!_match($args, $current, $current) if $class eq 'matches';
 
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
@@ -521,10 +521,7 @@ An C<E> element that has no children (including text nodes).
 
 =head2 E:any-link
 
-Alias for L</"E:link">. Note that this selector is B<EXPERIMENTAL> and might
-change without warning! This selector is part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
-in progress.
+Alias for L</"E:link">.
 
 =head2 E:link
 
@@ -572,13 +569,13 @@ Support for compound selectors was added as part of
 L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
 in progress.
 
-=head2 E:is(s1, s2)
+=head2 E:matches(s1, s2)
 
 An C<E> element that matches compound selector C<s1> and/or compound selector
 C<s2>. Note that this selector is B<EXPERIMENTAL> and might change without
 warning!
 
-  my $headers = $css->select(':is(section, article, aside, nav) h1');
+  my $headers = $css->select(':matches(section, article, aside, nav) h1');
 
 This selector is part of
 L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work

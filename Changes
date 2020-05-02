@@ -1,6 +1,4 @@
 
-8.42  2020-05-01
-
 8.41  2020-04-30
   - Improved Mojolicious::Commands to treat commands like
     "mojo generate lite_app" as "mojo generate lite-app".

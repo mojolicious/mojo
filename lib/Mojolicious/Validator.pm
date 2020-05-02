@@ -162,14 +162,6 @@ L<Mojolicious::Validator> implements the following attributes.
 Registered validation checks, by default only L</"equal_to">, L</"in">,
 L</"like">, L</"num">, L</"size"> and L</"upload"> are already defined.
 
-=head2 filters
-
-  my $filters = $validator->filters;
-  $validator  = $validator->filters({trim => sub {...}});
-
-Registered filters, by default only L</"not_empty"> and L</"trim"> are already
-defined.
-
 =head1 METHODS
 
 L<Mojolicious::Validator> inherits all methods from L<Mojo::Base> and

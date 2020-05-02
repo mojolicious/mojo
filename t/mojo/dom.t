@@ -2423,26 +2423,19 @@ EOF
 is $dom->find('.foo')->map('text')->join(','),            'A,B', 'right result';
 is $dom->find('.FOO')->map('text')->join(','),            'C',   'right result';
 is $dom->find('[class=foo]')->map('text')->join(','),     'A',   'right result';
-is $dom->find('[class=foo s]')->map('text')->join(','),   'A',   'right result';
-is $dom->find('[class=foo S]')->map('text')->join(','),   'A',   'right result';
 is $dom->find('[class=foo i]')->map('text')->join(','),   'A,C', 'right result';
 is $dom->find('[class="foo" i]')->map('text')->join(','), 'A,C', 'right result';
 is $dom->find('[class="foo" I]')->map('text')->join(','), 'A,C', 'right result';
-is $dom->find('[class="foo bar"]')->size,   0, 'no results';
-is $dom->find('[class="foo bar s"]')->size, 0, 'no results';
-is $dom->find('[class="foo bar S"]')->size, 0, 'no results';
+is $dom->find('[class="foo bar"]')->size, 0, 'no results';
 is $dom->find('[class="foo bar" i]')->map('text')->join(','), 'B',
   'right result';
-is $dom->find('[class~=foo]')->map('text')->join(','),   'A,B', 'right result';
-is $dom->find('[class~=foo s]')->map('text')->join(','), 'A,B', 'right result';
+is $dom->find('[class~=foo]')->map('text')->join(','), 'A,B', 'right result';
 is $dom->find('[class~=foo i]')->map('text')->join(','), 'A,B,C',
   'right result';
-is $dom->find('[class*=f]')->map('text')->join(','),   'A,B,D', 'right result';
-is $dom->find('[class*=f s]')->map('text')->join(','), 'A,B,D', 'right result';
+is $dom->find('[class*=f]')->map('text')->join(','), 'A,B,D', 'right result';
 is $dom->find('[class*=f i]')->map('text')->join(','), 'A,B,C,D',
   'right result';
-is $dom->find('[class^=F]')->map('text')->join(','),   'C', 'right result';
-is $dom->find('[class^=F S]')->map('text')->join(','), 'C', 'right result';
+is $dom->find('[class^=F]')->map('text')->join(','), 'C', 'right result';
 is $dom->find('[class^=F i]')->map('text')->join(','), 'A,B,C,D',
   'right result';
 is $dom->find('[class^=F I]')->map('text')->join(','), 'A,B,C,D',

@@ -1138,7 +1138,7 @@ Opposite of L</"status_is">.
   $t = $t->test('is', 'first value', 'second value', 'right value');
 
 Call L<Test::More> functions through L</"handler">, used to implement
-L<Test::Mojo> roles. The result will be stored in L</"success">.
+L<Test::Mojo> roles. Result is stored in L</"success">.
 
 =head2 text_is
 

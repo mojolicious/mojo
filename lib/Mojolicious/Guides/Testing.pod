@@ -669,7 +669,7 @@ L<Role::Tiny> that implements a test assertion named C<location_is>:
   sub location_is {
     my ($self, $value, $desc) = @_;
     $desc ||= "Location: $value";
-    return $self->test('is', $self->tx->res->headers->location, $value, $desc);
+    return $self->test('is', $t->tx->res->headers->location, $value, $desc);
   }
 
   1;

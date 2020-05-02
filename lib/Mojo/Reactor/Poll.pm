@@ -8,10 +8,8 @@ use Mojo::Util qw(md5_sum steady_time);
 use Time::HiRes qw(usleep);
 
 sub again {
-  my ($self, $id, $after) = @_;
-  croak 'Timer not active' unless my $timer = $self->{timers}{$id};
-  $timer->{after} = $after if defined $after;
-  $timer->{time}  = steady_time + $timer->{after};
+  croak 'Timer not active' unless my $timer = shift->{timers}{shift()};
+  $timer->{time} = steady_time + $timer->{after};
 }
 
 sub io {
@@ -75,7 +73,7 @@ sub one_tick {
       next unless $t->{time} <= $now;
 
       # Recurring timer
-      if ($t->{recurring}) { $t->{time} = $now + $t->{after} }
+      if (exists $t->{recurring}) { $t->{time} = $now + $t->{recurring} }
 
       # Normal timer
       else { $self->remove($id) }
@@ -135,12 +133,9 @@ sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
 
   my $id    = $self->_id;
-  my $timer = $self->{timers}{$id} = {
-    cb        => $cb,
-    after     => $after,
-    recurring => $recurring,
-    time      => steady_time + $after
-  };
+  my $timer = $self->{timers}{$id}
+    = {cb => $cb, after => $after, time => steady_time + $after};
+  $timer->{recurring} = $after if $recurring;
 
   return $id;
 }
@@ -206,10 +201,8 @@ implements the following new ones.
 =head2 again
 
   $reactor->again($id);
-  $reactor->again($id, 0.5);
 
-Restart timer and optionally change the invocation time. Note that this method
-requires an active timer.
+Restart timer. Note that this method requires an active timer.
 
 =head2 io
 

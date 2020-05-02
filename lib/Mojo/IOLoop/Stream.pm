@@ -72,24 +72,16 @@ sub stop {
 }
 
 sub timeout {
-  my ($self, $timeout) = @_;
+  my $self = shift;
 
-  return $self->{timeout} unless defined $timeout;
-  $self->{timeout} = $timeout;
+  return $self->{timeout} unless @_;
 
   my $reactor = $self->reactor;
-  if ($self->{timer}) {
-    if (!$self->{timeout}) { $reactor->remove(delete $self->{timer}) }
-    else                   { $reactor->again($self->{timer}, $self->{timeout}) }
-  }
-  else {
-    weaken $self;
-    $self->{timer} = $reactor->timer(
-      $timeout => sub {
-        $self and delete($self->{timer}) and $self->emit('timeout')->close;
-      }
-    );
-  }
+  $reactor->remove(delete $self->{timer}) if $self->{timer};
+  return $self unless my $timeout = $self->{timeout} = shift;
+  weaken $self;
+  $self->{timer} = $reactor->timer(
+    $timeout => sub { delete $self->{timer}; $self->emit('timeout')->close });
 
   return $self;
 }

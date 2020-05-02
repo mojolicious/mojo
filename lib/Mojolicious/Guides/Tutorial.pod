@@ -342,32 +342,6 @@ actions to templates.
 A list of all built-in ones can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
-=head2 Plugins
-
-Plugins are application extensions that help with code sharing and
-organization. You can load a plugin with the keyword
-L<Mojolicious::Lite/"plugin">, which can omit the C<Mojolicious::Plugin::> part
-of the name, and optionally provide configuration for the plugin.
-
-  use Mojolicious::Lite;
-
-  plugin Config => {file => '/etc/myapp.conf', default => {foo => 'bar'}};
-
-  # Return configured foo value, or default if no configuration file
-  get '/foo' => sub {
-    my $c   = shift;
-    my $foo = $c->app->config('foo');
-    $c->render(json => {foo => $foo});
-  };
-
-  app->start;
-
-L<Mojolicious::Plugin::Config> is a built-in plugin which can populate
-L<Mojolicious/"config"> using a config file. Plugins can also set up routes,
-hooks, handlers, or even load other plugins. A list of built-in plugins can be
-found at L<Mojolicious::Plugins/"PLUGINS">, and many more are available from
-L<CPAN|https://metacpan.org/search?q=Mojolicious+Plugin>.
-
 =head2 Placeholders
 
 Route placeholders allow capturing parts of a request path until a C</> or C<.>

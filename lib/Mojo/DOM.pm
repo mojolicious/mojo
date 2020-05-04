@@ -196,6 +196,12 @@ sub val {
   return exists $self->{multiple} ? $v->size ? $v->to_array : undef : $v->last;
 }
 
+sub walk {
+  my $self = shift;
+  if (not defined wantarray) { $self->_walk_void(0, @_); return }
+  $self->_walk(0, @_) || Mojo::Collection->new;
+}
+
 sub with_roles { shift->Mojo::Base::with_roles(@_) }
 
 sub wrap         { shift->_wrap(0, @_) }
@@ -341,6 +347,21 @@ sub _text {
   }
 
   return $text;
+}
+
+sub _walk {
+  my ($self, $depth, $cb) = (shift, shift, shift);
+  my $c = Mojo::Collection->new(
+    (map { $_->$cb(ref $cb ? ($depth, @_) : @_) } $self),
+    map { $_->_walk($depth+1, $cb, @_) } @{$self->child_nodes}
+  );
+  @$c ? $c : ();    # prune empty subtrees
+}
+
+sub _walk_void {    # roughly 10% faster than _walk
+  my ($self, $depth, $cb) = (shift, shift, shift);
+  $_->$cb(ref $cb ? ($depth, @_) : @_) for $self;
+  $_->_walk_void($depth+1, $cb, @_) for @{$self->child_nodes};
 }
 
 sub _wrap {
@@ -1045,6 +1066,42 @@ if none could be found.
 
   # "on"
   $dom->parse('<input name=test type=checkbox>')->at('input')->val;
+
+=head2 walk
+
+  my $collection = $dom->walk(sub { my ($node, $depth) = @_; ... } );
+  my $collection = $dom->walk('some_method');
+  my $collection = $dom->walk('some_method', @args);
+
+  # build a nested structure of all non-whitespace text-containing nodes
+  my $collection = $dom->walk(sub {
+    if ( $_->type=~/^(text|cdata|raw)$/ && $_->content=~/\S/ ) {
+      return $_->content =~ s/^\s+|\s+$//gr
+    } else { return }
+  });
+
+  # prints the contents of text nodes in the body, indented by their depth
+  $dom->at('body')->walk(sub {
+    my ($node, $depth) = @_;
+    say "  " x $depth, $node->content if $node->type eq 'text';
+  });
+
+  # get a flat list of selectors for each element in the document
+  my $collection = $dom->walk('selector')->flatten->grep(sub {defined});
+
+Similar in spirit to L<Mojo::Collection/"map">, this method walks the tree of
+DOM nodes depth-first, invoking the callback or method for each node, and
+building a nested set of L<Mojo::Collection>s of the return values of the
+callback. A new L<Mojo::Collection> is created for each node encountered. The
+first value(s) in that collection are the return value(s) of the callback, if
+any, followed by the collection objects created for the child nodes, if any.
+Completely empty collections are dropped.
+
+If you pass a C<sub> as the callback, it will receive the current node and
+the current depth in the tree as arguments, followed by any additional
+arguments passed to C<walk>. The current node is also available as C<$_>. If
+you pass a method name to C<walk>, it will not receive the depth as the first
+argument.
 
 =head2 with_roles
 

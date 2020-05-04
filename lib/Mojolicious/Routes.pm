@@ -75,8 +75,10 @@ sub match {
   else               { $path = $req->url->path->to_route }
 
   # Method (HEAD will be treated as GET)
-  my $method = uc($req->url->query->clone->param('_method') || $req->method);
-  $method = 'GET' if $method eq 'HEAD';
+  my $method   = uc $req->method;
+  my $override = $req->url->query->clone->param('_method');
+  $method = uc $override if $override && $method eq 'POST';
+  $method = 'GET'        if $method eq 'HEAD';
 
   # Check cache
   my $ws    = $c->tx->is_websocket ? 1 : 0;

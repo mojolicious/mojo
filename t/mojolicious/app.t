@@ -336,9 +336,11 @@ $t->get_ok('/foo-bar' => {'X-Test' => 'Hi there!'})->status_is(200)
 # Foo::something
 $t->put_ok('/somethingtest' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/test4/42');
-$t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})
+$t->post_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('/test4/42');
+$t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})
+  ->status_is(404);
 
 # Foo::url_for_missing
 $t->get_ok('/something_missing' => {'X-Test' => 'Hi there!'})->status_is(200)

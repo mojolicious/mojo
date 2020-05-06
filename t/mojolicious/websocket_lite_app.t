@@ -18,9 +18,15 @@ websocket '/echo' => sub {
       $c->send("echo: $bytes");
     }
   );
-};
+} => 'echo';
 
 get '/echo' => {text => 'plain echo!'};
+
+any '/not_echo/<code:num>' => sub {
+  my $c = shift;
+  $c->res->code($c->param('code'));
+  $c->redirect_to('echo');
+};
 
 websocket '/no_compression' => sub {
   my $c = shift;
@@ -130,6 +136,15 @@ my $t = Test::Mojo->new;
 
 # Simple roundtrip
 $t->websocket_ok('/echo')->send_ok('hello')
+  ->message_ok->message_is('echo: hello')->finish_ok;
+
+# Simple roundtrip with redirect
+$t->get_ok('/not_echo/308')->status_is(308);
+$t->ua->max_redirects(10);
+$t->get_ok('/not_echo/302')->status_is(200)->content_is('plain echo!');
+$t->websocket_ok('/not_echo/308')->send_ok('hello')
+  ->message_ok->message_is('echo: hello')->finish_ok;
+$t->websocket_ok('/not_echo/307')->send_ok('hello')
   ->message_ok->message_is('echo: hello')->finish_ok;
 
 # Multiple roundtrips

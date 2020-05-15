@@ -1,5 +1,6 @@
 
 8.43  2020-05-15
+  - Removed deprecated argument handling from Mojo::Promise::new.
 
 8.42  2020-05-04
   - This release contains fixes for security issues, everybody should upgrade!

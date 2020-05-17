@@ -68,7 +68,7 @@ sub map {
 
   my @start = map { $_->$cb } splice @items, 0,
     $options->{concurrency} // @items;
-  my $proto = $class->resolve($start[0]);
+  my $proto = $class->resolve($start[0])->catch(sub {});
 
   my (@trigger, @wait);
   for my $item (@items) {
@@ -132,7 +132,7 @@ sub _all {
 
     # "race"
     if ($type == 1) {
-      $promises[$i]->then(sub { $all->resolve(@_) }, sub { $all->reject(@_) });
+      $promises[$i]->then(sub { $all->resolve(@_); () }, sub { $all->reject(@_); () });
     }
 
     # "all"
@@ -141,18 +141,20 @@ sub _all {
         sub {
           $results->[$i] = [@_];
           $all->resolve(@$results) if --$remaining <= 0;
+          ();
         },
-        sub { $all->reject(@_) }
+        sub { $all->reject(@_); () }
       );
     }
 
     # "any"
     elsif ($type == 3) {
       $promises[$i]->then(
-        sub { $all->resolve(@_) },
+        sub { $all->resolve(@_); () },
         sub {
           $results->[$i] = [@_];
           $all->reject(@$results) if --$remaining <= 0;
+          ();
         }
       );
     }
@@ -163,10 +165,12 @@ sub _all {
         sub {
           $results->[$i] = {status => 'fulfilled', value => [@_]};
           $all->resolve(@$results) if --$remaining <= 0;
+          ();
         },
         sub {
           $results->[$i] = {status => 'rejected', reason => [@_]};
           $all->resolve(@$results) if --$remaining <= 0;
+          ();
         }
       );
     }

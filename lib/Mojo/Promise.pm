@@ -23,6 +23,7 @@ sub AWAIT_IS_CANCELLED {undef}
 
 sub AWAIT_IS_READY {
   my $self = shift;
+  $self->{handled} = 1;
   return !!$self->{result} && !@{$self->{resolve}} && !@{$self->{reject}};
 }
 
@@ -31,6 +32,14 @@ sub AWAIT_NEW_FAIL { _await('reject',  @_) }
 
 sub AWAIT_ON_CANCEL { }
 sub AWAIT_ON_READY  { shift->finally(@_) }
+
+sub DESTROY {
+  my $self = shift;
+  warn "Unhandled rejected promise: @{$self->{result}}\n"
+    if !$self->{handled}
+    && ($self->{status} // '') eq 'reject'
+    && $self->{result};
+}
 
 sub all         { _all(2, @_) }
 sub all_settled { _all(0, @_) }
@@ -44,6 +53,7 @@ sub finally {
   my ($self, $finally) = @_;
 
   my $new = $self->clone;
+  $self->{handled} = 1;
   push @{$self->{resolve}}, sub { _finally($new, $finally, 'resolve', @_) };
   push @{$self->{reject}},  sub { _finally($new, $finally, 'reject',  @_) };
 
@@ -92,6 +102,7 @@ sub then {
   my ($self, $resolve, $reject) = @_;
 
   my $new = $self->clone;
+  $self->{handled} = 1;
   push @{$self->{resolve}}, sub { _then($new, $resolve, 'resolve', @_) };
   push @{$self->{reject}},  sub { _then($new, $reject,  'reject',  @_) };
 

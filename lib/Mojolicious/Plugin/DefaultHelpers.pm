@@ -221,7 +221,7 @@ sub _proxy_start_p {
   weaken $source_tx;
   $source_tx->once(finish => sub { $promise->reject(_tx_error(@_)) });
 
-  $c->ua->start_p($source_tx);
+  $c->ua->start_p($source_tx)->catch(sub { });
 
   return $promise;
 }

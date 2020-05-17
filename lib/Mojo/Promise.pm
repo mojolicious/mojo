@@ -1,6 +1,7 @@
 package Mojo::Promise;
 use Mojo::Base -base;
 
+use Carp qw(carp);
 use Mojo::IOLoop;
 use Mojo::Util qw(deprecated);
 use Scalar::Util qw(blessed);
@@ -23,6 +24,7 @@ sub AWAIT_IS_CANCELLED {undef}
 
 sub AWAIT_IS_READY {
   my $self = shift;
+  $self->{handled} = 1;
   return !!$self->{result} && !@{$self->{resolve}} && !@{$self->{reject}};
 }
 
@@ -30,7 +32,16 @@ sub AWAIT_NEW_DONE { _await('resolve', @_) }
 sub AWAIT_NEW_FAIL { _await('reject',  @_) }
 
 sub AWAIT_ON_CANCEL { }
-sub AWAIT_ON_READY  { shift->finally(@_) }
+
+sub AWAIT_ON_READY {
+  shift->_finally(0, @_)->catch(sub { });
+}
+
+sub DESTROY {
+  my $self = shift;
+  return if $self->{handled} || ($self->{status} // '') ne 'reject';
+  carp "Unhandled rejected promise: @{$self->{result}}" if $self->{result};
+}
 
 sub all         { _all(2, @_) }
 sub all_settled { _all(0, @_) }
@@ -40,17 +51,7 @@ sub catch { shift->then(undef, shift) }
 
 sub clone { $_[0]->new->ioloop($_[0]->ioloop) }
 
-sub finally {
-  my ($self, $finally) = @_;
-
-  my $new = $self->clone;
-  push @{$self->{resolve}}, sub { _finally($new, $finally, 'resolve', @_) };
-  push @{$self->{reject}},  sub { _finally($new, $finally, 'reject',  @_) };
-
-  $self->_defer if $self->{result};
-
-  return $new;
-}
+sub finally { shift->_finally(1, @_) }
 
 sub new {
   my $self = shift->SUPER::new;
@@ -67,8 +68,9 @@ sub then {
   my ($self, $resolve, $reject) = @_;
 
   my $new = $self->clone;
-  push @{$self->{resolve}}, sub { _then($new, $resolve, 'resolve', @_) };
-  push @{$self->{reject}},  sub { _then($new, $reject,  'reject',  @_) };
+  $self->{handled} = 1;
+  push @{$self->{resolve}}, sub { _then_cb($new, $resolve, 'resolve', @_) };
+  push @{$self->{reject}},  sub { _then_cb($new, $reject,  'reject',  @_) };
 
   $self->_defer if $self->{result};
 
@@ -82,7 +84,7 @@ sub wait {
   my $self = shift;
   return if (my $loop = $self->ioloop)->is_running;
   my $done;
-  $self->finally(sub { $done++; $loop->stop });
+  $self->_finally(0, sub { $done++; $loop->stop })->catch(sub { });
   $loop->start until $done;
 }
 
@@ -162,6 +164,19 @@ sub _defer {
 }
 
 sub _finally {
+  my ($self, $handled, $finally) = @_;
+
+  my $new = $self->clone;
+  $self->{handled} = 1 if $handled;
+  push @{$self->{resolve}}, sub { _finally_cb($new, $finally, 'resolve', @_) };
+  push @{$self->{reject}},  sub { _finally_cb($new, $finally, 'reject',  @_) };
+
+  $self->_defer if $self->{result};
+
+  return $new;
+}
+
+sub _finally_cb {
   my ($new, $finally, $method, @result) = @_;
   return $new->reject($@) unless eval { $finally->(); 1 };
   return $new->$method(@result);
@@ -190,7 +205,7 @@ sub _settle {
   return $self;
 }
 
-sub _then {
+sub _then_cb {
   my ($new, $cb, $method, @result) = @_;
 
   return $new->$method(@result) unless defined $cb;

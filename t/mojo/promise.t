@@ -347,7 +347,11 @@ is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
 
 # Promisify
 is ref Mojo::Promise->resolve('foo'), 'Mojo::Promise', 'right class';
-is ref Mojo::Promise->reject('foo'),  'Mojo::Promise', 'right class';
+$promise = Mojo::Promise->reject('foo');
+is ref $promise, 'Mojo::Promise', 'right class';
+@errors = ();
+$promise->catch(sub { push @errors, @_ })->wait;
+is_deeply \@errors, ['foo'], 'promise rejected';
 $promise = Mojo::Promise->resolve('foo');
 is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise), 'same object';
 $promise = Mojo::Promise->resolve('foo');
@@ -355,9 +359,72 @@ isnt refaddr(Mojo::Promise->new->resolve($promise)), refaddr($promise),
   'different object';
 $promise = Mojo::Promise->reject('foo');
 is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise), 'same object';
-$promise = Mojo::Promise->reject('foo');
-isnt refaddr(Mojo::Promise->reject($promise)), refaddr($promise),
-  'different object';
+@errors = ();
+$promise->catch(sub { push @errors, @_ })->wait;
+is_deeply \@errors, ['foo'], 'promise rejected';
+$promise  = Mojo::Promise->reject('foo');
+$promise2 = Mojo::Promise->reject($promise);
+isnt refaddr($promise2), refaddr($promise), 'different object';
+@errors = ();
+$promise2->catch(sub { push @errors, @_ })->wait;
+is_deeply \@errors, ['foo'], 'promise rejected';
+
+# Warnings
+{
+  my @warn;
+  local $SIG{__WARN__} = sub { push @warn, shift };
+  Mojo::Promise->reject('one');
+  like $warn[0], qr/Unhandled rejected promise: one/, 'unhandled';
+  is $warn[1],   undef,                               'no more warnings';
+  @warn = ();
+  Mojo::Promise->reject('two')->then(sub { })->wait;
+  like $warn[0], qr/Unhandled rejected promise: two/, 'unhandled';
+  is $warn[1],   undef,                               'no more warnings';
+  @warn = ();
+  Mojo::Promise->reject('three')->finally(sub { })->wait;
+  like $warn[0], qr/Unhandled rejected promise: three/, 'unhandled';
+  is $warn[1],   undef,                                 'no more warnings';
+  @warn    = ();
+  $promise = Mojo::Promise->new;
+  $promise->reject('four');
+  Mojo::IOLoop->one_tick;
+  is $warn[0], undef, 'no warnings';
+  undef $promise;
+  like $warn[0], qr/Unhandled rejected promise: four/, 'unhandled';
+  is $warn[1],   undef,                                'no more warnings';
+}
+
+# Warnings (multiple branches)
+{
+  my @warn;
+  local $SIG{__WARN__} = sub { push @warn, shift };
+  @errors  = ();
+  $promise = Mojo::Promise->new;
+  $promise->catch(sub { push @errors, @_ });
+  $promise->reject('branches');
+  $promise->wait;
+  is_deeply \@errors, ['branches'], 'promise rejected';
+  is $warn[0], undef, 'no warnings';
+  @errors  = @warn = ();
+  $promise = Mojo::Promise->new;
+  $promise->catch(sub { push @errors, @_ });
+  $promise->then(sub { });
+  $promise->reject('branches2');
+  $promise->wait;
+  is_deeply \@errors, ['branches2'], 'promise rejected';
+  like $warn[0], qr/Unhandled rejected promise: branches2/, 'unhandled';
+  is $warn[1],   undef,                                     'no more warnings';
+  @warn    = ();
+  $promise = Mojo::Promise->new;
+  $promise->then(sub { })->then(sub { })->then(sub { });
+  $promise->then(sub { });
+  $promise->reject('branches3');
+  $promise->wait;
+  like $warn[0], qr/Unhandled rejected promise: branches3/, 'unhandled';
+  like $warn[1], qr/Unhandled rejected promise: branches3/, 'unhandled';
+  is $warn[2],   undef,                                     'no more warnings';
+}
+
 
 # Wait for stopped loop
 @results = ();

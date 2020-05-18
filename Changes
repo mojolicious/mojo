@@ -1,6 +1,7 @@
 
-8.43  2020-05-15
+8.43  2020-05-18
   - Removed deprecated argument handling from Mojo::Promise::new.
+  - Fixed a promise chaining bug in Mojo::Promise. (karjala)
 
 8.42  2020-05-04
   - This release contains fixes for security issues, everybody should upgrade!

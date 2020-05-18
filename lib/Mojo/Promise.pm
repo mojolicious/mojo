@@ -193,18 +193,25 @@ sub _finally {
 }
 
 sub _settle {
-  my ($self, $status) = (shift, shift);
-  my $thenable = blessed $_[0] && $_[0]->can('then');
-  $self = $thenable ? $_[0]->clone : $self->new unless ref $self;
+  my ($self, $status, @result) = @_;
 
-  $_[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () })
-    and return $self
-    if $thenable;
+  my $thenable = blessed $result[0] && $result[0]->can('then');
+  unless (ref $self) {
+    return $result[0]
+      if $status eq 'resolve' && $thenable && $result[0]->isa('Mojo::Promise');
+    $self = $self->new;
+  }
 
-  return $self if $self->{result};
+  if ($thenable) {
+    $result[0]
+      ->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () });
+  }
 
-  @{$self}{qw(result status)} = ([@_], $status);
-  $self->_defer;
+  elsif (!$self->{result}) {
+    @{$self}{qw(result status)} = (\@result, $status);
+    $self->_defer;
+  }
+
   return $self;
 }
 

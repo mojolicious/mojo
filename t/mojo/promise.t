@@ -4,6 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Mojo::IOLoop;
+use Scalar::Util 'refaddr';
 
 # Resolved
 my $promise = Mojo::Promise->new;
@@ -343,6 +344,20 @@ $promise2->then(sub { push @errors, 'second', @_ });
 Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
   'promises rejected';
+
+# Promisify
+is ref Mojo::Promise->resolve('foo'), 'Mojo::Promise', 'right class';
+is ref Mojo::Promise->reject('foo'),  'Mojo::Promise', 'right class';
+$promise = Mojo::Promise->resolve('foo');
+is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise), 'same object';
+$promise = Mojo::Promise->resolve('foo');
+isnt refaddr(Mojo::Promise->new->resolve($promise)), refaddr($promise),
+  'different object';
+$promise = Mojo::Promise->reject('foo');
+is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise), 'same object';
+$promise = Mojo::Promise->reject('foo');
+isnt refaddr(Mojo::Promise->reject($promise)), refaddr($promise),
+  'different object';
 
 # Map
 my @started;

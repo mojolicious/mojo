@@ -206,6 +206,7 @@ sub _finally {
 sub _settle {
   my ($self, $status) = (shift, shift);
   my $thenable = blessed $_[0] && $_[0]->can('then');
+  return $_[0] if !ref $self and $status eq 'resolve' and $thenable;
   $self = $thenable ? $_[0]->clone : $self->new unless ref $self;
 
   $_[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () })

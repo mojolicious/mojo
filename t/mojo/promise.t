@@ -382,9 +382,9 @@ Mojo::Promise->map(
       $n;
     });
   },
-  1 .. 5
+  1 .. 7
 )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
-is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
+is_deeply \@results, [[1], [2], [3], [4], [5], [6], [7]], 'correct result';
 is_deeply \@errors, [], 'promise not rejected';
 
 # Map (with reject)

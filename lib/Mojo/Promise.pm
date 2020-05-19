@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Util qw(deprecated);
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed weaken);
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
@@ -56,21 +56,28 @@ sub map {
   my ($class, $options) = (shift, ref $_[0] eq 'HASH' ? shift : {});
   my ($cb,    @items)   = @_;
 
+  # initially active items
   my @start = map { $_->$cb } splice @items, 0,
     $options->{concurrency} // @items;
-  my $proto = $class->resolve($start[0]);
 
+  # the first item defines the promise ioloop we'll use
+  my $loop = blessed $start[0]
+    && $start[0]->can('then') ? $start[0]->ioloop : Mojo::IOLoop->singleton;
+  weaken $loop;
+
+  # build a trigger promise to start each remaining item
   my (@trigger, @wait);
   for my $item (@items) {
-    my $p = $proto->clone;
-    push @trigger, $p;
-    push @wait,    $p->then(sub { local $_ = $item; $_->$cb });
+    push @trigger, my $p = $class->new->ioloop($loop);
+    push @wait,    $p->then(sub { return $_->$cb for $item });
   }
 
+  # any resolved promise should then trigger another to start if possible or
+  # any rejected promise should bail out entirely
   my @all = map {
-    $proto->clone->resolve($_)->then(
+    $class->new->ioloop($loop)->resolve($_)->then(
       sub { shift(@trigger)->resolve if @trigger; @_ },
-      sub { @trigger = (); $proto->clone->reject($_[0]) },
+      sub { @trigger = (); $class->new->ioloop($loop)->reject($_[0]) },
     )
   } (@start, @wait);
 

@@ -145,9 +145,7 @@ the following new ones.
 
 Detect MIME type for L<Mojolicious::Controller> object unless a C<Content-Type>
 response header has already been set, defaults to using
-C<application/octet-stream> if no better alternative could be found. Note that
-this method is B<EXPERIMENTAL> and might change without warning!
-
+C<application/octet-stream> if no better alternative could be found.
 These options are currently available:
 
 =over 2
@@ -179,8 +177,7 @@ Detect file extensions from C<Accept> header value.
 
   my $type = $types->file_type('foo/bar.png');
 
-Get MIME type for file path. Note that this method is B<EXPERIMENTAL> and might
-change without warning!
+Get MIME type for file path.
 
 =head2 type
 

@@ -150,8 +150,7 @@ can emit the following new ones.
     ...
   });
 
-Emitted in the subprocess right before the process will exit. Note that this
-event is EXPERIMENTAL and might change without warning!
+Emitted in the subprocess right before the process will exit.
 
   $subprocess->on(cleanup => sub {
     my $subprocess = shift;

@@ -3,6 +3,10 @@
   - Removed experimental map method from Mojo::Promise, since its test coverage
     was lacking, getting in the way of new feature development.
   - Removed deprecated argument handling from Mojo::Promise::new.
+  - Removed experimental status from all_settled method in Mojo::Promise.
+  - Removed experimental status from content_type and file_type methods in
+    Mojolicious::Types.
+  - Removed experimental status from cleanup event in Mojo::IOLoop::Subprocess
   - Fixed a bug where the resolve class method in Mojo::Promise would
     unnecessarily create new promises.
   - Fixed a promise chaining bug in Mojo::Promise. (karjala)

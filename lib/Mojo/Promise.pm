@@ -338,8 +338,7 @@ the fulfilled promises in the same order as the passed promises.
 
 Returns a new L<Mojo::Promise> object that fulfills when all of the passed
 L<Mojo::Promise> objects have fulfilled or rejected, with hash references that
-describe the outcome of each promise. Note that this method is B<EXPERIMENTAL>
-and might change without warning!
+describe the outcome of each promise.
 
 =head2 any
 

@@ -1,7 +1,5 @@
 
 8.43  2020-05-18
-  - Removed experimental map method from Mojo::Promise, since its test coverage
-    was lacking, getting in the way of new feature development.
   - Removed deprecated argument handling from Mojo::Promise::new.
   - Removed experimental status from all_settled method in Mojo::Promise.
   - Removed experimental status from content_type and file_type methods in

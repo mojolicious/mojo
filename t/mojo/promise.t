@@ -6,71 +6,79 @@ use Test::More;
 use Mojo::IOLoop;
 use Scalar::Util 'refaddr';
 
-# Resolved
-my $promise = Mojo::Promise->new;
-my (@results, @errors);
-$promise->then(sub { @results = @_ }, sub { @errors = @_ });
-$promise->resolve('hello', 'world');
-Mojo::IOLoop->one_tick;
-is_deeply \@results, ['hello', 'world'], 'promise resolved';
-is_deeply \@errors, [], 'promise not rejected';
-$promise = Mojo::Promise->resolve('test');
-$promise->then(sub { @results = @_ }, sub { @errors = @_ });
-Mojo::IOLoop->one_tick;
-is_deeply \@results, ['test'], 'promise resolved';
-is_deeply \@errors, [], 'promise not rejected';
+subtest 'Resolved' => sub {
+  my $promise = Mojo::Promise->new;
+  my (@results, @errors);
+  $promise->then(sub { @results = @_ }, sub { @errors = @_ });
+  $promise->resolve('hello', 'world');
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, ['hello', 'world'], 'promise resolved';
+  is_deeply \@errors, [], 'promise not rejected';
 
-# Already resolved
-$promise = Mojo::Promise->new->resolve('early');
-(@results, @errors) = ();
-$promise->then(sub { @results = @_ }, sub { @errors = @_ });
-Mojo::IOLoop->one_tick;
-is_deeply \@results, ['early'], 'promise resolved';
-is_deeply \@errors, [], 'promise not rejected';
+  $promise = Mojo::Promise->resolve('test');
+  $promise->then(sub { @results = @_ }, sub { @errors = @_ });
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, ['test'], 'promise resolved';
+  is_deeply \@errors, [], 'promise not rejected';
+};
 
-# Resolved with finally
-$promise = Mojo::Promise->new;
-@results = ();
-$promise->finally(sub { @results = ('finally'); 'fail' })
-  ->then(sub { push @results, @_ });
-$promise->resolve('hello', 'world');
-Mojo::IOLoop->one_tick;
-is_deeply \@results, ['finally', 'hello', 'world'], 'promise settled';
+subtest 'Already resolved' => sub {
+  my $promise = Mojo::Promise->new->resolve('early');
+  my (@results, @errors);
+  $promise->then(sub { @results = @_ }, sub { @errors = @_ });
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, ['early'], 'promise resolved';
+  is_deeply \@errors, [], 'promise not rejected';
+};
 
-# Rejected
-$promise = Mojo::Promise->new;
-(@results, @errors) = ();
-$promise->then(sub { @results = @_ }, sub { @errors = @_ });
-$promise->reject('bye', 'world');
-Mojo::IOLoop->one_tick;
-is_deeply \@results, [], 'promise not resolved';
-is_deeply \@errors, ['bye', 'world'], 'promise rejected';
-$promise = Mojo::Promise->reject('test');
-$promise->then(sub { @results = @_ }, sub { @errors = @_ });
-Mojo::IOLoop->one_tick;
-is_deeply \@results, [], 'promise not resolved';
-is_deeply \@errors, ['test'], 'promise rejected';
+subtest 'Resolved with finally' => sub {
+  my $promise = Mojo::Promise->new;
+  my @results;
+  $promise->finally(sub { @results = ('finally'); 'fail' })
+    ->then(sub { push @results, @_ });
+  $promise->resolve('hello', 'world');
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, ['finally', 'hello', 'world'], 'promise settled';
+};
 
-# Rejected early
-$promise = Mojo::Promise->new->reject('early');
-(@results, @errors) = ();
-$promise->then(sub { @results = @_ }, sub { @errors = @_ });
-Mojo::IOLoop->one_tick;
-is_deeply \@results, [], 'promise not resolved';
-is_deeply \@errors, ['early'], 'promise rejected';
+subtest 'Rejected' => sub {
+  my $promise = Mojo::Promise->new;
+  my (@results, @errors);
+  $promise->then(sub { @results = @_ }, sub { @errors = @_ });
+  $promise->reject('bye', 'world');
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  is_deeply \@errors, ['bye', 'world'], 'promise rejected';
 
-# Rejected with finally
-$promise = Mojo::Promise->new;
-@errors  = ();
-$promise->finally(sub { @errors = ('finally'); 'fail' })
-  ->then(undef, sub { push @errors, @_ });
-$promise->reject('bye', 'world');
-Mojo::IOLoop->one_tick;
-is_deeply \@errors, ['finally', 'bye', 'world'], 'promise settled';
+  $promise = Mojo::Promise->reject('test');
+  $promise->then(sub { @results = @_ }, sub { @errors = @_ });
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  is_deeply \@errors, ['test'], 'promise rejected';
+};
+
+subtest 'Rejected early' => sub {
+  my $promise = Mojo::Promise->new->reject('early');
+  my (@results, @errors);
+  $promise->then(sub { @results = @_ }, sub { @errors = @_ });
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  is_deeply \@errors, ['early'], 'promise rejected';
+};
+
+subtest 'Rejected with finally' => sub {
+  my $promise = Mojo::Promise->new;
+  my @errors;
+  $promise->finally(sub { @errors = ('finally'); 'fail' })
+    ->then(undef, sub { push @errors, @_ });
+  $promise->reject('bye', 'world');
+  Mojo::IOLoop->one_tick;
+  is_deeply \@errors, ['finally', 'bye', 'world'], 'promise settled';
+};
 
 # Wrap
-(@results, @errors) = ();
-$promise = Mojo::Promise->new(sub {
+my (@results, @errors);
+my $promise = Mojo::Promise->new(sub {
   my ($resolve, $reject) = @_;
   Mojo::IOLoop->timer(0 => sub { $resolve->('resolved', '!') });
 });
@@ -345,29 +353,37 @@ Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
   'promises rejected';
 
-# Promisify
-is ref Mojo::Promise->resolve('foo'), 'Mojo::Promise', 'right class';
-$promise = Mojo::Promise->reject('foo');
-is ref $promise, 'Mojo::Promise', 'right class';
-@errors = ();
-$promise->catch(sub { push @errors, @_ })->wait;
-is_deeply \@errors, ['foo'], 'promise rejected';
-$promise = Mojo::Promise->resolve('foo');
-is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise), 'same object';
-$promise = Mojo::Promise->resolve('foo');
-isnt refaddr(Mojo::Promise->new->resolve($promise)), refaddr($promise),
-  'different object';
-$promise = Mojo::Promise->reject('foo');
-is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise), 'same object';
-@errors = ();
-$promise->catch(sub { push @errors, @_ })->wait;
-is_deeply \@errors, ['foo'], 'promise rejected';
-$promise  = Mojo::Promise->reject('foo');
-$promise2 = Mojo::Promise->reject($promise);
-isnt refaddr($promise2), refaddr($promise), 'different object';
-@errors = ();
-$promise2->catch(sub { push @errors, @_ })->wait;
-is_deeply \@errors, ['foo'], 'promise rejected';
+subtest 'Promisify' => sub {
+  is ref Mojo::Promise->resolve('foo'), 'Mojo::Promise', 'right class';
+
+  $promise = Mojo::Promise->reject('foo');
+  is ref $promise, 'Mojo::Promise', 'right class';
+  @errors = ();
+  $promise->catch(sub { push @errors, @_ })->wait;
+  is_deeply \@errors, ['foo'], 'promise rejected';
+
+  $promise = Mojo::Promise->resolve('foo');
+  is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise),
+    'same object';
+
+  $promise = Mojo::Promise->resolve('foo');
+  isnt refaddr(Mojo::Promise->new->resolve($promise)), refaddr($promise),
+    'different object';
+
+  $promise = Mojo::Promise->reject('foo');
+  is refaddr(Mojo::Promise->resolve($promise)), refaddr($promise),
+    'same object';
+  @errors = ();
+  $promise->catch(sub { push @errors, @_ })->wait;
+  is_deeply \@errors, ['foo'], 'promise rejected';
+
+  $promise  = Mojo::Promise->reject('foo');
+  $promise2 = Mojo::Promise->reject($promise);
+  isnt refaddr($promise2), refaddr($promise), 'different object';
+  @errors = ();
+  $promise2->catch(sub { push @errors, @_ })->wait;
+  is_deeply \@errors, ['foo'], 'promise rejected';
+};
 
 subtest 'Warnings' => sub {
   my @warn;

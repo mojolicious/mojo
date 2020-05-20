@@ -369,21 +369,23 @@ isnt refaddr($promise2), refaddr($promise), 'different object';
 $promise2->catch(sub { push @errors, @_ })->wait;
 is_deeply \@errors, ['foo'], 'promise rejected';
 
-# Warnings
-{
+subtest 'Warnings' => sub {
   my @warn;
   local $SIG{__WARN__} = sub { push @warn, shift };
   Mojo::Promise->reject('one');
   like $warn[0], qr/Unhandled rejected promise: one/, 'unhandled';
   is $warn[1],   undef,                               'no more warnings';
+
   @warn = ();
   Mojo::Promise->reject('two')->then(sub { })->wait;
   like $warn[0], qr/Unhandled rejected promise: two/, 'unhandled';
   is $warn[1],   undef,                               'no more warnings';
+
   @warn = ();
   Mojo::Promise->reject('three')->finally(sub { })->wait;
   like $warn[0], qr/Unhandled rejected promise: three/, 'unhandled';
   is $warn[1],   undef,                                 'no more warnings';
+
   @warn    = ();
   $promise = Mojo::Promise->new;
   $promise->reject('four');
@@ -392,10 +394,9 @@ is_deeply \@errors, ['foo'], 'promise rejected';
   undef $promise;
   like $warn[0], qr/Unhandled rejected promise: four/, 'unhandled';
   is $warn[1],   undef,                                'no more warnings';
-}
+};
 
-# Warnings (multiple branches)
-{
+subtest 'Warnings (multiple branches)' => sub {
   my @warn;
   local $SIG{__WARN__} = sub { push @warn, shift };
   @errors  = ();
@@ -405,6 +406,7 @@ is_deeply \@errors, ['foo'], 'promise rejected';
   $promise->wait;
   is_deeply \@errors, ['branches'], 'promise rejected';
   is $warn[0], undef, 'no warnings';
+
   @errors  = @warn = ();
   $promise = Mojo::Promise->new;
   $promise->catch(sub { push @errors, @_ });
@@ -414,6 +416,7 @@ is_deeply \@errors, ['foo'], 'promise rejected';
   is_deeply \@errors, ['branches2'], 'promise rejected';
   like $warn[0], qr/Unhandled rejected promise: branches2/, 'unhandled';
   is $warn[1],   undef,                                     'no more warnings';
+
   @warn    = ();
   $promise = Mojo::Promise->new;
   $promise->then(sub { })->then(sub { })->then(sub { });
@@ -423,7 +426,7 @@ is_deeply \@errors, ['foo'], 'promise rejected';
   like $warn[0], qr/Unhandled rejected promise: branches3/, 'unhandled';
   like $warn[1], qr/Unhandled rejected promise: branches3/, 'unhandled';
   is $warn[2],   undef,                                     'no more warnings';
-}
+};
 
 # Map
 my @started;

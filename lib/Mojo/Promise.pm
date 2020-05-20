@@ -53,6 +53,33 @@ sub clone { $_[0]->new->ioloop($_[0]->ioloop) }
 
 sub finally { shift->_finally(1, @_) }
 
+sub map {
+  my ($class, $options, $cb, @items)
+    = (shift, ref $_[0] eq 'HASH' ? shift : {}, @_);
+
+  return $class->all(map { $_->$cb } @items)
+    if !$options->{concurrency} || @items <= $options->{concurrency};
+
+  my @start = map { $_->$cb } splice @items, 0, $options->{concurrency};
+
+  my $loop = $start[0]->ioloop;
+  my @wait = map { $class->new->ioloop($loop) } 0 .. $#items;
+
+  my $start_next;
+  $start_next = sub {
+    return unless my $item = shift @items;
+    my $chain = shift @wait;
+    $_->$cb->then(
+      sub { $start_next->() if $start_next; $chain->resolve(@_); () },
+      sub { $chain->reject(@_); () })
+      for $item;
+  };
+
+  $_->then(sub { $start_next->() if $start_next; () }, sub { }) for @start;
+
+  return $class->all(@start, @wait)->finally(sub { undef $start_next });
+}
+
 sub new {
   my $self = shift->SUPER::new;
   shift->(sub { $self->resolve(@_) }, sub { $self->reject(@_) }) if @_;
@@ -409,6 +436,33 @@ reason.
   $promise->finally(sub {
     say "We are done!";
   });
+
+=head2 map
+
+  my $new = Mojo::Promise->map(sub {...}, @items);
+  my $new = Mojo::Promise->map({concurrency => 3}, sub {...}, @items);
+
+Apply a function that returns a L<Mojo::Promise> to each item in a list of items
+while optionally limiting concurrency. Returns a L<Mojo::Promise> that collects
+the results in the same manner as L</all>. If any item's promise is rejected,
+any remaining items which have not yet been mapped will not be. Note that this
+method is B<EXPERIMENTAL> and might change without warning!
+
+  # Perform 3 requests at a time concurrently
+  Mojo::Promise->map({concurrency => 3}, sub { $ua->get_p($_) }, @urls)
+    ->then(sub{ say $_->[0]->res->dom->at('title')->text for @_ });
+
+These options are currently available:
+
+=over 2
+
+=item concurrency
+
+  concurrency => 3
+
+The maximum number of items that are in progress at the same time.
+
+=back
 
 =head2 new
 

@@ -425,6 +425,60 @@ is_deeply \@errors, ['foo'], 'promise rejected';
   is $warn[2],   undef,                                     'no more warnings';
 }
 
+# Map
+my @started;
+(@results, @errors) = ();
+$promise
+  = Mojo::Promise->map(sub { push @started, $_; Mojo::Promise->resolve($_) },
+  1 .. 5)->then(sub { @results = @_ }, sub { @errors = @_ });
+is_deeply \@started, [1, 2, 3, 4, 5], 'all started without concurrency';
+$promise->wait;
+is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
+is_deeply \@errors, [], 'promise not rejected';
+
+# Map (with concurrency limit)
+my $concurrent = 0;
+(@results, @errors) = ();
+Mojo::Promise->map(
+  {concurrency => 3},
+  sub {
+    my $n = $_;
+    fail 'Concurrency too high' if ++$concurrent > 3;
+    Mojo::Promise->resolve->then(sub {
+      fail 'Concurrency too high' if $concurrent-- > 3;
+      $n;
+    });
+  },
+  1 .. 7
+)->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+is_deeply \@results, [[1], [2], [3], [4], [5], [6], [7]], 'correct result';
+is_deeply \@errors, [], 'promise not rejected';
+
+# Map (with reject)
+(@started, @results, @errors) = ();
+Mojo::Promise->map(
+  {concurrency => 3},
+  sub {
+    my $n = $_;
+    push @started, $n;
+    Mojo::Promise->resolve->then(sub { Mojo::Promise->reject($n) });
+  },
+  1 .. 5
+)->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+is_deeply \@results, [], 'promise not resolved';
+is_deeply \@errors, [1], 'correct errors';
+is_deeply \@started, [1, 2, 3], 'only initial batch started';
+
+# Map (custom event loop)
+my $ok;
+$loop = Mojo::IOLoop->new;
+$promise
+  = Mojo::Promise->map(sub { Mojo::Promise->new->ioloop($loop)->resolve }, 1);
+is $promise->ioloop, $loop, 'same loop';
+isnt $promise->ioloop, Mojo::IOLoop->singleton, 'not the singleton';
+$promise->then(sub { $ok = 1; $loop->stop });
+$loop->start;
+ok $ok, 'loop completed';
 
 # Wait for stopped loop
 @results = ();

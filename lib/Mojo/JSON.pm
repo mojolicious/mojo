@@ -70,7 +70,7 @@ sub _decode {
   eval {
 
     # Missing input
-    die "Missing or empty input\n" unless length(local $_ = shift);
+    die "Missing or empty input at offset 0\n" unless length(local $_ = shift);
 
     # UTF-8
     $_ = decode('UTF-8', $_) unless shift;

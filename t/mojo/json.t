@@ -376,7 +376,7 @@ eval { decode_json '{"foo":"bar"}lala' };
 like $@, qr/Malformed JSON: Unexpected data at line 1, offset 13/,
   'right error';
 eval { decode_json '' };
-like $@, qr/Missing or empty input/, 'right error';
+like $@, qr/Missing or empty input at offset 0/, 'right error';
 eval { decode_json "[\"foo\",\n\"bar\"]lala" };
 like $@, qr/Malformed JSON: Unexpected data at line 2, offset 6/, 'right error';
 eval { decode_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };

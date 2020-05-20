@@ -26,8 +26,10 @@ $subprocess->run(
 );
 $result = $$;
 ok !$subprocess->pid, 'no process id available yet';
+is $subprocess->exit_code, undef, 'no exit code';
 Mojo::IOLoop->start;
 ok $subprocess->pid, 'process id available';
+is $subprocess->exit_code, 0, 'zero exit code';
 ok !$fail, 'no error';
 is $result, $$ . 0 . $subprocess->pid . ('x' x 100000), 'right result';
 is_deeply \@start, [$subprocess->pid], 'spawn event has been emitted once';
@@ -65,12 +67,14 @@ is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 # Promises
 $result     = [];
 $subprocess = Mojo::IOLoop::Subprocess->new;
+is $subprocess->exit_code, undef, 'no exit code';
 $subprocess->run_p(sub { return '♥', [{two => 2}], 3 })
   ->then(sub { $result = [@_] })->wait;
 is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 $fail       = undef;
 $subprocess = Mojo::IOLoop::Subprocess->new;
 $subprocess->run_p(sub { die 'Whatever' })->catch(sub { $fail = shift })->wait;
+is $subprocess->exit_code, 0, 'zero exit code';
 like $fail, qr/Whatever/, 'right error';
 $result = [];
 Mojo::IOLoop->subprocess->run_p(sub { return '♥' })
@@ -186,8 +190,9 @@ Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
 
 # Non-zero exit status
-$fail = undef;
-Mojo::IOLoop::Subprocess->new->run(
+$fail       = undef;
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run(
   sub { exit 3 },
   sub {
     my ($subprocess, $err) = @_;
@@ -195,7 +200,8 @@ Mojo::IOLoop::Subprocess->new->run(
   }
 );
 Mojo::IOLoop->start;
-like $fail, qr/Storable/, 'right error';
+is $subprocess->exit_code, 3, 'right exit code';
+like $fail, qr/offset 0/, 'right error';
 
 # Serialization error
 $fail       = undef;

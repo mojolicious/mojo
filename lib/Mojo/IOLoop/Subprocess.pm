@@ -4,13 +4,15 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Config;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
+use Mojo::JSON;
 use Mojo::Promise;
 use POSIX ();
-use Storable;
 
-has deserialize => sub { \&Storable::thaw };
+has deserialize => sub { \&Mojo::JSON::decode_json };
 has ioloop      => sub { Mojo::IOLoop->singleton }, weak => 1;
-has serialize   => sub { \&Storable::freeze };
+has serialize   => sub { \&Mojo::JSON::encode_json };
+
+sub exit_code { shift->{exit_code} }
 
 sub pid { shift->{pid} }
 
@@ -78,6 +80,7 @@ sub _start {
     close => sub {
       return unless $$ == $me;
       waitpid $pid, 0;
+      $self->{exit_code} = $? >> 8;
       substr $buffer, 0, 2, '';
       my $results = eval { $self->deserialize->($buffer) } || [];
       $self->$parent(shift(@$results) // $@, @$results);
@@ -192,7 +195,7 @@ L<Mojo::IOLoop::Subprocess> implements the following attributes.
   $subprocess = $subprocess->deserialize(sub {...});
 
 A callback used to deserialize subprocess return values, defaults to using
-L<Storable>.
+L<Mojo::JSON>.
 
   $subprocess->deserialize(sub {
     my $bytes = shift;
@@ -213,7 +216,7 @@ Note that this attribute is weakened.
   $subprocess = $subprocess->serialize(sub {...});
 
 A callback used to serialize subprocess return values, defaults to using
-L<Storable>.
+L<Mojo::JSON>.
 
   $subprocess->serialize(sub {
     my $array = shift;
@@ -225,6 +228,13 @@ L<Storable>.
 L<Mojo::IOLoop::Subprocess> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 exit_code
+
+  my $code = $subprocess->exit_code;
+
+Returns the subprocess exit code, or C<undef> if the subprocess is still
+running.
+
 =head2 pid
 
   my $pid = $subprocess->pid;
@@ -235,7 +245,7 @@ Process id of the spawned subprocess if available.
 
   $subprocess->progress(@data);
 
-Send data serialized with L<Storable> to the parent process at any time during
+Send data serialized with L<Mojo::JSON> to the parent process at any time during
 the subprocess's execution. Must be called by the subprocess and emits the
 L</"progress"> event in the parent process with the data.
 
@@ -268,7 +278,7 @@ Execute the first callback in a child process and wait for it to return one or
 more values, without blocking L</"ioloop"> in the parent process. Then execute
 the second callback in the parent process with the results. The return values of
 the first callback and exceptions thrown by it, will be serialized with
-L<Storable>, so they can be shared between processes.
+L<Mojo::JSON>, so they can be shared between processes.
 
 =head2 run_p
 

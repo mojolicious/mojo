@@ -7,9 +7,9 @@ use ExtUtils::MakeMaker;
 
 # JSON::PP 2.27103 first shipped with Perl 5.13.9
 # Time::Local 1.2 first shipped with Perl 5.13.9
+# Test::Simple 1.001002 first shipped with Perl 5.19.6
 # List::Util 1.41 first shipped with Perl 5.21.4
 # IO::Socket::IP 0.37 first shipped with Perl 5.21.11
-# Test::Simple 1.001002 first shipped with Perl 5.19.6
 WriteMakefile(
   NAME         => 'Mojolicious',
   VERSION_FROM => 'lib/Mojolicious.pm',

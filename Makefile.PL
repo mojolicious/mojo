@@ -5,8 +5,7 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
-# Test::Simple 1.001002 first shipped with Perl 5.19.6
-# List::Util 1.41 first shipped with Perl 5.21.4
+# Sub::Util 1.41 first shipped with Perl 5.21.4
 # IO::Socket::IP 0.37 first shipped with Perl 5.21.11
 WriteMakefile(
   NAME         => 'Mojolicious',
@@ -34,11 +33,7 @@ WriteMakefile(
       x_IRC => 'irc://irc.freenode.net/#mojo'
     },
   },
-  PREREQ_PM => {
-    'IO::Socket::IP' => '0.37',
-    'List::Util'     => '1.41',
-    'Test::Simple'   => '1.001002'
-  },
+  PREREQ_PM => {'IO::Socket::IP' => '0.37', 'Sub::Util' => '1.41'},
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
   test      => {TESTS => 't/*.t t/*/*.t'}
 );

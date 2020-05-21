@@ -15,7 +15,7 @@ sub AWAIT_FAIL { shift->reject(@_) }
 
 sub AWAIT_GET {
   my $self    = shift;
-  my @results = @{$self->{result} // []};
+  my @results = @{$self->{results} // []};
   die $results[0] unless $self->{status} eq 'resolve';
   return wantarray ? @results : $results[0];
 }
@@ -25,7 +25,7 @@ sub AWAIT_IS_CANCELLED {undef}
 sub AWAIT_IS_READY {
   my $self = shift;
   $self->{handled} = 1;
-  return !!$self->{result} && !@{$self->{resolve}} && !@{$self->{reject}};
+  return !!$self->{results} && !@{$self->{resolve}} && !@{$self->{reject}};
 }
 
 sub AWAIT_NEW_DONE { _await('resolve', @_) }
@@ -40,7 +40,7 @@ sub AWAIT_ON_READY {
 sub DESTROY {
   my $self = shift;
   return if $self->{handled} || ($self->{status} // '') ne 'reject';
-  carp "Unhandled rejected promise: @{$self->{result}}" if $self->{result};
+  carp "Unhandled rejected promise: @{$self->{results}}" if $self->{results};
 }
 
 sub all         { _all(2, @_) }
@@ -99,7 +99,7 @@ sub then {
   push @{$self->{resolve}}, sub { _then_cb($new, $resolve, 'resolve', @_) };
   push @{$self->{reject}},  sub { _then_cb($new, $reject,  'reject',  @_) };
 
-  $self->_defer if $self->{result};
+  $self->_defer if $self->{results};
 
   return $new;
 }
@@ -183,11 +183,11 @@ sub _await {
 sub _defer {
   my $self = shift;
 
-  return unless my $result = $self->{result};
+  return unless my $results = $self->{results};
   my $cbs = $self->{status} eq 'resolve' ? $self->{resolve} : $self->{reject};
   @{$self}{qw(cycle resolve reject)} = (undef, [], []);
 
-  $self->ioloop->next_tick(sub { $_->(@$result) for @$cbs });
+  $self->ioloop->next_tick(sub { $_->(@$results) for @$cbs });
 }
 
 sub _finally {
@@ -198,34 +198,34 @@ sub _finally {
   push @{$self->{resolve}}, sub { _finally_cb($new, $finally, 'resolve', @_) };
   push @{$self->{reject}},  sub { _finally_cb($new, $finally, 'reject',  @_) };
 
-  $self->_defer if $self->{result};
+  $self->_defer if $self->{results};
 
   return $new;
 }
 
 sub _finally_cb {
-  my ($new, $finally, $method, @result) = @_;
+  my ($new, $finally, $method, @results) = @_;
   return $new->reject($@) unless eval { $finally->(); 1 };
-  return $new->$method(@result);
+  return $new->$method(@results);
 }
 
 sub _settle {
-  my ($self, $status, @result) = @_;
+  my ($self, $status, @results) = @_;
 
-  my $thenable = blessed $result[0] && $result[0]->can('then');
+  my $thenable = blessed $results[0] && $results[0]->can('then');
   unless (ref $self) {
-    return $result[0]
-      if $status eq 'resolve' && $thenable && $result[0]->isa('Mojo::Promise');
+    return $results[0]
+      if $thenable && $status eq 'resolve' && $results[0]->isa('Mojo::Promise');
     $self = $self->new;
   }
 
-  if ($thenable) {
-    $result[0]
+  if ($thenable && $status eq 'resolve') {
+    $results[0]
       ->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () });
   }
 
-  elsif (!$self->{result}) {
-    @{$self}{qw(result status)} = (\@result, $status);
+  elsif (!$self->{results}) {
+    @{$self}{qw(results status)} = (\@results, $status);
     $self->_defer;
   }
 
@@ -233,20 +233,20 @@ sub _settle {
 }
 
 sub _then_cb {
-  my ($new, $cb, $method, @result) = @_;
+  my ($new, $cb, $method, @results) = @_;
 
-  return $new->$method(@result) unless defined $cb;
+  return $new->$method(@results) unless defined $cb;
 
   my @res;
-  return $new->reject($@) unless eval { @res = $cb->(@result); 1 };
+  return $new->reject($@) unless eval { @res = $cb->(@results); 1 };
   return $new->resolve(@res);
 }
 
 sub _timer {
-  my ($self, $method, $after, @result) = @_;
+  my ($self, $method, $after, @results) = @_;
   $self = $self->new unless ref $self;
-  $result[0] = 'Promise timeout' if $method eq 'reject' && !@result;
-  $self->ioloop->timer($after => sub { $self->$method(@result) });
+  $results[0] = 'Promise timeout' if $method eq 'reject' && !@results;
+  $self->ioloop->timer($after => sub { $self->$method(@results) });
   return $self;
 }
 

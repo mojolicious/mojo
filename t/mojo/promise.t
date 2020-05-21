@@ -376,12 +376,14 @@ subtest 'Settle with promise' => sub {
 
   $promise = Mojo::Promise->new->reject('works too');
   my @errors;
+  @results  = ();
   $promise2 = Mojo::Promise->new->reject($promise)
-    ->catch(sub { push @errors, 'first', @_; @_ });
-  $promise2->then(sub { push @errors, 'second', @_ });
+    ->catch(sub { push @errors, 'first', @_; () });
+  $promise2->then(sub { push @results, 'second', @_ });
   Mojo::IOLoop->one_tick;
-  is_deeply \@errors, ['first', 'works too', 'second', 'works too'],
-    'promises rejected';
+  is_deeply \@errors, ['first', $promise], 'promises rejected';
+  is_deeply \@results, ['second'], 'promises resolved';
+  $promise->catch(sub { });
 };
 
 subtest 'Promisify' => sub {
@@ -406,13 +408,6 @@ subtest 'Promisify' => sub {
     'same object';
   @errors = ();
   $promise->catch(sub { push @errors, @_ })->wait;
-  is_deeply \@errors, ['foo'], 'promise rejected';
-
-  $promise = Mojo::Promise->reject('foo');
-  my $promise2 = Mojo::Promise->reject($promise);
-  isnt refaddr($promise2), refaddr($promise), 'different object';
-  @errors = ();
-  $promise2->catch(sub { push @errors, @_ })->wait;
   is_deeply \@errors, ['foo'], 'promise rejected';
 };
 

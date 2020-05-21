@@ -80,12 +80,7 @@ L<Mojolicious> follows this model and fully supports these two release series.
 In addition we will also keep the distribution installable (and that means
 passing all tests) up to a certain legacy version that the core team deems
 worthy of supporting, but not specifically optimize for it, this is currently
-5.10.1.
-
-Note that Perl versions 5.10.x and 5.12.x are known to work very poorly with
-L<Mojolicious>, and we strongly suggest you do not use them, to avoid stability
-and security issues. If it wasn't for a very vocal minority within the community
-we would not support these versions at all.
+5.16.0.
 
 =head2 How well is Windows supported by Mojolicious?
 

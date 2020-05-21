@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.016;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ WriteMakefile(
       directory => [qw(examples t)],
       package   => [qw(Mojo::Server::PSGI::_IO Mojo::Util::_Guard)],
     },
-    prereqs   => {runtime => {requires => {perl => '5.010001'}}},
+    prereqs   => {runtime => {requires => {perl => '5.016'}}},
     resources => {
       bugtracker => {web => 'https://github.com/mojolicious/mojo/issues'},
       homepage   => 'https://mojolicious.org',

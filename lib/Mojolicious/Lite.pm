@@ -64,7 +64,7 @@ Mojolicious::Lite - Micro real-time web framework
 
 =head1 SYNOPSIS
 
-  # Automatically enables "strict", "warnings", "utf8" and Perl 5.10 features
+  # Automatically enables "strict", "warnings", "utf8" and Perl 5.16 features
   use Mojolicious::Lite;
 
   # Route with placeholder

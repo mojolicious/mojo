@@ -184,11 +184,10 @@ get '/stream' => sub {
     = [qw(foo bar), $c->req->url->to_abs->userinfo, $c->url_for->to_abs];
   $c->res->code(200);
   $c->res->headers->content_type('text/plain');
-  my $cb;
-  $cb = sub {
+  my $cb = sub {
     my $content = shift;
     my $chunk   = shift @$chunks || '';
-    $content->write_chunk($chunk, $chunk ? $cb : undef);
+    $content->write_chunk($chunk, $chunk ? __SUB__ : undef);
   };
   $c->res->content->$cb;
   $c->rendered;

@@ -1359,12 +1359,10 @@ Sending a streaming request is almost just as easy.
   $tx->req->headers->content_length(length $body);
 
   # Start writing directly with a drain callback
-  my $drain;
-  $drain = sub {
+  my $drain = sub {
     my $content = shift;
     my $chunk = substr $body, 0, 1, '';
-    $drain = undef unless length $body;
-    $content->write($chunk, $drain);
+    $content->write($chunk, length $body ? __SUB__ : undef);
   };
   $tx->req->content->$drain;
 

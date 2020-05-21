@@ -3,7 +3,7 @@ package Mojo::Base;
 use strict;
 use warnings;
 use utf8;
-use feature ':5.10';
+use feature ':5.16';
 use mro;
 
 # No imports because we get subclassed, a lot!
@@ -12,9 +12,6 @@ use Scalar::Util ();
 
 # Defer to runtime so Mojo::Util can use "-strict"
 require Mojo::Util;
-
-# Only Perl 5.14+ requires it on demand
-use IO::Handle ();
 
 # Role support requires Role::Tiny 2.000001+
 use constant ROLES =>
@@ -113,7 +110,7 @@ sub import {
 
   # Mojo modules are strict!
   $_->import for qw(strict warnings utf8);
-  feature->import(':5.10');
+  feature->import(':5.16');
 
   while (my $flag = shift @flags) {
 
@@ -215,7 +212,7 @@ Mojo::Base - Minimal base class for Mojo projects
 L<Mojo::Base> is a simple base class for L<Mojo> projects with fluent
 interfaces.
 
-  # Automatically enables "strict", "warnings", "utf8" and Perl 5.10 features
+  # Automatically enables "strict", "warnings", "utf8" and Perl 5.16 features
   use Mojo::Base -strict;
   use Mojo::Base -base;
   use Mojo::Base 'SomeBaseClass';
@@ -228,17 +225,15 @@ L<Role::Tiny> (2.000001+).
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
 
   # use Mojo::Base -base;
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
   push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
@@ -246,9 +241,8 @@ L<Role::Tiny> (2.000001+).
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
@@ -257,9 +251,8 @@ L<Role::Tiny> (2.000001+).
   use strict;
   use warnings;
   use utf8;
-  use feature ':5.10';
+  use feature ':5.16';
   use mro;
-  use IO::Handle ();
   use Role::Tiny;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 

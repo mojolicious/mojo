@@ -30,13 +30,11 @@ sub once {
   my ($self, $name, $cb) = @_;
 
   weaken $self;
-  my $wrapper;
-  $wrapper = sub {
-    $self->unsubscribe($name => $wrapper);
+  my $wrapper = sub {
+    $self->unsubscribe($name => __SUB__);
     $cb->(@_);
   };
   $self->on($name => $wrapper);
-  weaken $wrapper;
 
   return $wrapper;
 }

@@ -18,11 +18,10 @@ post '/chunked' => sub {
   my @chunks;
   for my $key (sort keys %$params) { push @chunks, $params->{$key} }
 
-  my $cb;
-  $cb = sub {
-    my $c = shift;
-    $cb = undef unless my $chunk = shift @chunks || '';
-    $c->write_chunk($chunk, $cb);
+  my $cb = sub {
+    my $c     = shift;
+    my $chunk = shift @chunks || '';
+    $c->write_chunk($chunk, $chunk ? __SUB__ : ());
   };
   $c->$cb;
 };

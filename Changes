@@ -1,5 +1,6 @@
 
 8.44  2020-05-21
+  - Updated Perl requirement to version 5.16.0.
   - Fixed Test::Simple dependency for older versions of Perl.
 
 8.43  2020-05-20

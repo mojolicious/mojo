@@ -100,7 +100,7 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
 L<Mojolicious::Plugin::Config> is a Perl-ish configuration plugin.
 
 The application object can be accessed via C<$app> or the C<app> function,
-L<strict>, L<warnings>, L<utf8> and Perl 5.10 L<features|feature> are
+L<strict>, L<warnings>, L<utf8> and Perl 5.16 L<features|feature> are
 automatically enabled. A default configuration filename in the application home
 directory will be generated from the value of L<Mojolicious/"moniker">
 (C<$moniker.conf>). You can extend the normal configuration file

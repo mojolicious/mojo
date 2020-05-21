@@ -13,7 +13,9 @@ jobs:
       matrix:
         perl-version:
           - '5.16'
+          - '5.18'
           - '5.20'
+          - '5.22'
           - '5.30'
     container:
       image: perl:${{ matrix.perl-version }}
@@ -24,6 +26,6 @@ jobs:
       - name: Install Dependencies
         run: |
           cpanm -n --installdeps .
-          cpanm Sub::Util
+          cpanm -n Sub::Util IO::Socket::IP
       - name: Run Tests
         run: prove -l t t/mojo t/mojolicious

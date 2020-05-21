@@ -28,7 +28,7 @@ jobs:
           cpanm -n --installdeps .
           cpanm -n Sub::Util IO::Socket::IP
           cpanm -n Cpanel::JSON::XS EV IO::Socket::SSL IO::Socket::Socks
-          cpanm -n Test::Pod Test::Pod::Coverage
+          cpanm -n Role::Tiny Test::Pod Test::Pod::Coverage
       - name: Run Tests
         run: prove -l t t/mojo t/mojolicious
         env:

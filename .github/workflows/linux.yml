@@ -22,6 +22,8 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        run: cpanm -n --installdeps .
+        run: |
+          cpanm -n --installdeps .
+          cpanm Sub::Util
       - name: Run Tests
         run: prove -l t t/mojo t/mojolicious

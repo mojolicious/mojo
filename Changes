@@ -1,6 +1,6 @@
 
 8.50  2020-05-21
-  - Updated Perl requirement to version 5.16.0.
+  - Increased Perl version requirement to 5.16.0.
 
 8.43  2020-05-20
   - Removed deprecated argument handling from Mojo::Promise::new.

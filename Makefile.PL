@@ -5,8 +5,6 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
-# JSON::PP 2.27103 first shipped with Perl 5.13.9
-# Time::Local 1.2 first shipped with Perl 5.13.9
 # Test::Simple 1.001002 first shipped with Perl 5.19.6
 # List::Util 1.41 first shipped with Perl 5.21.4
 # IO::Socket::IP 0.37 first shipped with Perl 5.21.11
@@ -39,9 +37,7 @@ WriteMakefile(
   PREREQ_PM => {
     'IO::Socket::IP' => '0.37',
     'List::Util'     => '1.41',
-    'JSON::PP'       => '2.27103',
-    'Test::Simple'   => '1.001002',
-    'Time::Local'    => '1.2'
+    'Test::Simple'   => '1.001002'
   },
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
   test      => {TESTS => 't/*.t t/*/*.t'}

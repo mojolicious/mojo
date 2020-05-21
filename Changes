@@ -1,6 +1,8 @@
 
-8.50  2020-05-21
+8.50  2020-05-22
   - Increased Perl version requirement to 5.16.0.
+  - Improved Mojo::Base to enable the Perl 5.16 feature bundle with
+    "unicode_strings", "unicode_eval", "evalbytes", "current_sub" and "fc".
 
 8.43  2020-05-20
   - Removed deprecated argument handling from Mojo::Promise::new.

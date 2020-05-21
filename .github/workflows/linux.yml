@@ -24,6 +24,15 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        run: cpanm -n --installdeps .
+        run: |
+          cpanm -n --installdeps .
+          cpanm TAP::Harness::Archive
       - name: Run Tests
-        run: prove -l t t/mojo t/mojolicious
+        run: |
+          mkdir results
+          prove -l -a results/tap.tgz t t/mojo t/mojolicious
+          cd results; tar -zvxf tap.tgz; rm tap.tgz; cd ..
+      - uses: actions/upload-artifact@v2
+        with:
+          name: TAP
+          path: results/

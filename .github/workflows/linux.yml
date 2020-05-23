@@ -30,7 +30,10 @@ jobs:
           cpanm -n Cpanel::JSON::XS EV Role::Tiny
           cpanm -n Test::Pod Test::Pod::Coverage
       - name: Run Tests
-        run: prove -l t t/mojo t/mojolicious
+        run: |
+          useradd user
+          chown -R user:user .
+          su user -c 'prove -l t t/mojo t/mojolicious'
         env:
           TEST_POD: 1
           TEST_EV: 1

@@ -66,9 +66,8 @@ sub map {
   my @wait = map { $class->new->ioloop($loop) } 0 .. $#items;
 
   my $start_next = sub {
-    return unless my $item = shift @items;
-    my $chain      = shift @wait;
-    my $start_next = __SUB__;
+    return () unless my $item = shift @items;
+    my ($start_next, $chain) = (__SUB__, shift @wait);
     $_->$cb->then(
       sub { $chain->resolve(@_); $start_next->() },
       sub { $chain->reject(@_);  @items = () }

@@ -65,19 +65,20 @@ sub map {
   my $loop = $start[0]->ioloop;
   my @wait = map { $class->new->ioloop($loop) } 0 .. $#items;
 
-  my $start_next;
-  $start_next = sub {
+  my $start_next = sub {
     return unless my $item = shift @items;
-    my $chain = shift @wait;
+    my $chain      = shift @wait;
+    my $start_next = __SUB__;
     $_->$cb->then(
-      sub { $start_next->() if $start_next; $chain->resolve(@_); () },
-      sub { $chain->reject(@_); () })
-      for $item;
+      sub { $chain->resolve(@_); $start_next->() },
+      sub { $chain->reject(@_);  @items = () }
+    ) for $item;
+    return ();
   };
 
-  $_->then(sub { $start_next->() if $start_next; () }, sub { }) for @start;
+  $_->then($start_next, sub { }) for @start;
 
-  return $class->all(@start, @wait)->finally(sub { undef $start_next });
+  return $class->all(@start, @wait);
 }
 
 sub new {

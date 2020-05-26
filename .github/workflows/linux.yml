@@ -25,12 +25,12 @@ jobs:
         run: perl -V
       - name: Fix ExtUtils::MakeMaker (for Perl 5.16 and 5.18)
         run: cpanm -n App::cpanminus ExtUtils::MakeMaker
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           cpanm -n --installdeps .
           cpanm -n Cpanel::JSON::XS EV Role::Tiny
           cpanm -n Test::Pod Test::Pod::Coverage
-      - name: Run Tests
+      - name: Run tests
         run: prove -l t t/mojo t/mojolicious
         env:
           TEST_POD: 1

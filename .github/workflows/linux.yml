@@ -25,8 +25,8 @@ jobs:
         run: perl -V
       - name: Install Dependencies
         run: |
+          cpanm -n App::cpanminus ExtUtils::MakeMaker
           cpanm -n --installdeps .
-          cpanm -n Sub::Util IO::Socket::IP
           cpanm -n Cpanel::JSON::XS EV Role::Tiny
           cpanm -n Test::Pod Test::Pod::Coverage
       - name: Run Tests

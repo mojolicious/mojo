@@ -23,9 +23,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: perl -V
         run: perl -V
+      - name: Fix ExtUtils::MakeMaker (for Perl 5.16 and 5.18)
+        run: cpanm -n App::cpanminus ExtUtils::MakeMaker
       - name: Install Dependencies
         run: |
-          cpanm -n App::cpanminus ExtUtils::MakeMaker
           cpanm -n --installdeps .
           cpanm -n Cpanel::JSON::XS EV Role::Tiny
           cpanm -n Test::Pod Test::Pod::Coverage

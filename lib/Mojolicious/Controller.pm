@@ -153,7 +153,7 @@ sub render {
   # All other arguments just become part of the stash
   @$stash{keys %$args} = values %$args;
   my $renderer = $app->renderer;
-  my ($output, $format) = $renderer->render($self, $args);
+  my ($output, $format) = $renderer->render($self);
 
   # Maybe no 404
   return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;

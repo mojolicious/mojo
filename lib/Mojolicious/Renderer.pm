@@ -76,7 +76,7 @@ sub get_helper {
 }
 
 sub render {
-  my ($self, $c, $args) = @_;
+  my ($self, $c) = @_;
 
   my $stash   = $c->stash;
   my $options = {
@@ -114,7 +114,7 @@ sub render {
     $content->{content} //= $output if $output =~ /\S/;
   }
 
-  return $output if $args->{'mojo.string'};
+  return $output if $stash->{'mojo.string'};
   return _maybe($options->{encoding}, $output), $options->{format};
 }
 
@@ -410,10 +410,7 @@ helpers can be called.
 
 =head2 render
 
-  my ($output, $format) = $renderer->render(Mojolicious::Controller->new, {
-    template => 'foo/bar',
-    foo      => 'bar'
-  });
+  my ($output, $format) = $renderer->render(Mojolicious::Controller->new);
 
 Render output through one of the renderers. See
 L<Mojolicious::Controller/"render"> for a more user-friendly interface.

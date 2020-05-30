@@ -60,8 +60,7 @@ is $req->body, '', 'no content';
 # (alternative)
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse("Content-Length: 4\x0d\x0aCookie: @{['a=b; ' x 131072]}\x0d\x0a"
-    . "X-Test: 23\x0d\x0a\x0d\x0aabcd");
+$req->parse("Content-Length: 4\x0d\x0aCookie: @{['a=b; ' x 131072]}\x0d\x0a" . "X-Test: 23\x0d\x0a\x0d\x0aabcd");
 ok $req->is_finished, 'request is finished';
 is $req->error->{message}, 'Maximum header size exceeded', 'right error';
 ok $req->is_limit_exceeded, 'limit is exceeded';
@@ -239,8 +238,7 @@ is $req->url,         '/', 'right URL';
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0aGET / HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
-is $req->content->leftovers, "GET / HTTP/1.1\x0d\x0a\x0d\x0a",
-  'second request in leftovers';
+is $req->content->leftovers, "GET / HTTP/1.1\x0d\x0a\x0d\x0a", 'second request in leftovers';
 
 # Parse HTTP 1.1 start-line, no headers and body with leading CRLFs
 $req = Mojo::Message::Request->new;
@@ -263,13 +261,11 @@ ok $req->is_handshake, 'request is WebSocket handshake';
 is $req->method,       'GET', 'right method';
 is $req->version,      '1.1', 'right version';
 is $req->url,          '/demo', 'right URL';
-is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->connection, 'Upgrade',     'right "Connection" value';
-is $req->headers->sec_websocket_protocol, 'sample',
-  'right "Sec-WebSocket-Protocol" value';
-is $req->headers->upgrade, 'websocket', 'right "Upgrade" value';
-is $req->headers->sec_websocket_key, 'abcdef=',
-  'right "Sec-WebSocket-Key" value';
+is $req->headers->host,                   'example.com', 'right "Host" value';
+is $req->headers->connection,             'Upgrade',     'right "Connection" value';
+is $req->headers->sec_websocket_protocol, 'sample',      'right "Sec-WebSocket-Protocol" value';
+is $req->headers->upgrade,                'websocket',   'right "Upgrade" value';
+is $req->headers->sec_websocket_key,      'abcdef=',     'right "Sec-WebSocket-Key" value';
 is $req->body, '', 'no content';
 
 # Parse HTTP 1.0 start-line and headers, no body
@@ -282,10 +278,9 @@ ok !$req->is_handshake, 'request is not a WebSocket handshake';
 is $req->method,  'GET',               'right method';
 is $req->version, '1.0',               'right version';
 is $req->url,     '/foo/bar/baz.html', 'right URL';
-is $req->headers->content_type, 'text/plain;charset=UTF-8',
-  'right "Content-Type" value';
-is $req->headers->content_length, 0,       'right "Content-Length" value';
-is $req->content->charset,        'UTF-8', 'right charset';
+is $req->headers->content_type,   'text/plain;charset=UTF-8', 'right "Content-Type" value';
+is $req->headers->content_length, 0,                          'right "Content-Length" value';
+is $req->content->charset,        'UTF-8',                    'right charset';
 
 # Parse HTTP 1.0 start-line and headers, no body (missing Content-Length)
 $req = Mojo::Message::Request->new;
@@ -333,8 +328,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is $req->method,      'GET', 'right method';
   is $req->version,     '1.0', 'right version';
   is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
-  is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-  is $req->headers->content_length, 27, 'right "Content-Length" value';
+  is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+  is $req->headers->content_length, 27,           'right "Content-Length" value';
 }
 
 # Parse HTTP 1.0 start-line and headers, no body (missing Content-Length)
@@ -481,10 +476,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
 is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
-is $req->url->to_abs, 'http://mojolicious.org/foo/bar/baz.html?foo=13',
-  'right absolute URL';
-is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, 27,           'right "Content-Length" value';
+is $req->url->to_abs,             'http://mojolicious.org/foo/bar/baz.html?foo=13', 'right absolute URL';
+is $req->headers->content_type,   'text/plain',                                     'right "Content-Type" value';
+is $req->headers->content_length, 27,                                               'right "Content-Length" value';
 
 # Parse full HTTP 1.0 request with zero chunk
 $req      = Mojo::Message::Request->new;
@@ -517,9 +511,8 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
 is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
-is $req->headers->content_type, 'application/x-www-form-urlencoded',
-  'right "Content-Type" value';
-is $req->headers->content_length, 14, 'right "Content-Length" value';
+is $req->headers->content_type,   'application/x-www-form-urlencoded', 'right "Content-Type" value';
+is $req->headers->content_length, 14,                                  'right "Content-Length" value';
 is $req->param('name'), '☃', 'right value';
 
 # Parse HTTP 1.1 gzip compressed request (no decompression)
@@ -537,8 +530,7 @@ is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, length($compressed),
-  'right "Content-Length" value';
+is $req->headers->content_length, length($compressed), 'right "Content-Length" value';
 is $req->body, $compressed, 'right content';
 
 # Parse HTTP 1.1 chunked request
@@ -611,8 +603,7 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar/baz.html?foo=13', 'right URL';
-is $req->headers->content_type, 'application/x-www-form-urlencoded',
-  'right "Content-Type" value';
+is $req->headers->content_type, 'application/x-www-form-urlencoded', 'right "Content-Type" value';
 is $req->content->asset->size,  25,                          'right size';
 is $req->content->asset->slurp, 'foo=bar&+tset=23+&foo=bar', 'right content';
 is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
@@ -624,8 +615,7 @@ is $req->param(' tset'), '23 ', 'right value';
 $req->param('set', 'single');
 is $req->param('set'), 'single', 'setting single param works';
 $req->param('multi', 1, 2, 3);
-is_deeply $req->every_param('multi'), [qw(1 2 3)],
-  'setting multiple value param works';
+is_deeply $req->every_param('multi'), [qw(1 2 3)], 'setting multiple value param works';
 is $req->param('test23'), undef, 'no value';
 
 # Parse HTTP 1.1 chunked request with trailing headers
@@ -754,16 +744,13 @@ is $req->method,       'GET',                     'right method';
 is $req->version,      '1.1',                     'right version';
 is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
 is $req->query_params, 'foo13',                   'right parameters';
-is $req->headers->content_type,
-  'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
-  'right "Content-Type" value';
+is $req->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY', 'right "Content-Type" value';
 is $req->headers->content_length, 416, 'right "Content-Length" value';
 ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[0]->asset->is_file, 'stored in memory';
-is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
-  'right content';
+is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n", 'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
 is $req->body_params->to_hash->{text2}, '',                     'right value';
 is $req->upload('upload')->filename, 'hello.pl', 'right filename';
@@ -771,8 +758,7 @@ ok !$req->upload('upload')->asset->is_file, 'stored in memory';
 is $req->upload('upload')->asset->size, 69, 'right size';
 my $tempdir = tempdir;
 my $file    = $tempdir->child('MOJO_TMP.' . time . '.txt');
-is $req->upload('upload')->move_to($file)->filename, 'hello.pl',
-  'right filename';
+is $req->upload('upload')->move_to($file)->filename, 'hello.pl', 'right filename';
 ok unlink($file), 'unlinked file';
 is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';
 
@@ -823,16 +809,13 @@ is $req->method,       'GET',                     'right method';
 is $req->version,      '1.1',                     'right version';
 is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
 is $req->query_params, 'foo13',                   'right parameters';
-is $req->headers->content_type,
-  'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
-  'right "Content-Type" value';
+is $req->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY', 'right "Content-Type" value';
 is $req->headers->content_length, 562, 'right "Content-Length" value';
 ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
 ok $req->content->parts->[0]->asset->is_file, 'stored in file';
-is $req->content->parts->[0]->asset->slurp,   "hallo welt test123\n",
-  'right content';
+is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n", 'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
 is $req->body_params->to_hash->{text2}, '',                     'right value';
 is $req->upload('upload')->filename, 'bye.txt', 'right filename';
@@ -859,8 +842,7 @@ $req->content->on(
             $part->on(
               body => sub {
                 my $part = shift;
-                return
-                  unless $part->headers->content_disposition =~ /hello\.pl/;
+                return unless $part->headers->content_disposition =~ /hello\.pl/;
                 $part->on(
                   read => sub {
                     my ($part, $chunk) = @_;
@@ -904,22 +886,16 @@ is $req->method,       'GET',                     'right method';
 is $req->version,      '1.1',                     'right version';
 is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
 is $req->query_params, 'foo13',                   'right parameters';
-is $req->headers->content_type,
-  'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
-  'right "Content-Type" value';
+is $req->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY', 'right "Content-Type" value';
 is $req->headers->content_length, 418, 'right "Content-Length" value';
 ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
-is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
-  'right content';
+is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n", 'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
 is $req->body_params->to_hash->{text2}, '',                     'right value';
-is $stream,
-    "#!/usr/bin/perl\n\n"
-  . "use strict;\n"
-  . "use warnings;\n\n"
-  . "print \"Hello World :)\\n\"\n", 'right content';
+is $stream, "#!/usr/bin/perl\n\n" . "use strict;\n" . "use warnings;\n\n" . "print \"Hello World :)\\n\"\n",
+  'right content';
 
 # Parse HTTP 1.1 multipart request (without upgrade)
 $req = Mojo::Message::Request->new;
@@ -948,13 +924,10 @@ is $req->method,       'GET',                     'right method';
 is $req->version,      '1.1',                     'right version';
 is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
 is $req->query_params, 'foo13',                   'right parameters';
-is $req->headers->content_type,
-  'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
-  'right "Content-Type" value';
+is $req->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY', 'right "Content-Type" value';
 is $req->headers->content_length, 418, 'right "Content-Length" value';
 ok !$req->content->is_multipart, 'no multipart content';
-like $req->content->asset->slurp, qr/------------0xKhTmLbOuNdArY--$/,
-  'right content';
+like $req->content->asset->slurp, qr/------------0xKhTmLbOuNdArY--$/, 'right content';
 
 # Parse HTTP 1.1 multipart request with "0" filename
 $req = Mojo::Message::Request->new;
@@ -982,18 +955,15 @@ is $req->method,       'GET',                     'right method';
 is $req->version,      '1.1',                     'right version';
 is $req->url,          '/foo/bar/baz.html?foo13', 'right URL';
 is $req->query_params, 'foo13',                   'right parameters';
-is $req->headers->content_type,
-  'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
-  'right "Content-Type" value';
+is $req->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY', 'right "Content-Type" value';
 is $req->headers->content_length, 410, 'right "Content-Length" value';
 ok !$req->content->parts->[0]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[1]->is_multipart, 'no multipart content';
 ok !$req->content->parts->[2]->is_multipart, 'no multipart content';
-is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
-  'right content';
-is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
-is $req->body_params->to_hash->{text2}, '',                     'right value';
-is $req->body_params->to_hash->{upload}, undef, 'not a body parameter';
+is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n", 'right content';
+is $req->body_params->to_hash->{text1},  "hallo welt test123\n", 'right value';
+is $req->body_params->to_hash->{text2},  '',                     'right value';
+is $req->body_params->to_hash->{upload}, undef,                  'not a body parameter';
 is $req->upload('upload')->filename, '0', 'right filename';
 ok !$req->upload('upload')->asset->is_file, 'stored in memory';
 is $req->upload('upload')->asset->size, 69, 'right size';
@@ -1100,9 +1070,9 @@ ok $clone->is_finished, 'request is finished';
 is $clone->method,      'POST', 'right method';
 is $clone->version,     '1.2', 'right version';
 is $clone->url,         '/foo/bar/baz', 'right URL';
-is $clone->url->to_abs, 'http://127.0.0.1/foo/bar/baz', 'right absolute URL';
-is $clone->headers->expect, 'nothing',   'right "Expect" value';
-is $clone->headers->host,   '127.0.0.1', 'right "Host" value';
+is $clone->url->to_abs,     'http://127.0.0.1/foo/bar/baz', 'right absolute URL';
+is $clone->headers->expect, 'nothing',                      'right "Expect" value';
+is $clone->headers->host,   '127.0.0.1',                    'right "Host" value';
 
 # Build full HTTP 1.1 request
 $req      = Mojo::Message::Request->new;
@@ -1117,10 +1087,10 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->expect, '100-continue',             'right "Expect" value';
-is $req->headers->host,   '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect,         '100-continue',             'right "Expect" value';
+is $req->headers->host,           '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13',                       'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
@@ -1174,10 +1144,10 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->expect, '100-continue',             'right "Expect" value';
-is $req->headers->host,   '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect,         '100-continue',             'right "Expect" value';
+is $req->headers->host,           '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13',                       'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
@@ -1187,10 +1157,10 @@ ok $clone->is_finished, 'request is finished';
 is $clone->method,      'GET', 'right method';
 is $clone->version,     '1.1', 'right version';
 is $clone->url,         '/foo/bar', 'right URL';
-is $clone->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $clone->headers->expect, '100-continue',             'right "Expect" value';
-is $clone->headers->host,   '127.0.0.1',                'right "Host" value';
-is $clone->headers->content_length, '13', 'right "Content-Length" value';
+is $clone->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->headers->expect,         '100-continue',             'right "Expect" value';
+is $clone->headers->host,           '127.0.0.1',                'right "Host" value';
+is $clone->headers->content_length, '13',                       'right "Content-Length" value';
 is $clone->body, "Hello World!\n", 'right content';
 ok !$finished, 'finish event has been emitted';
 ok $clone->is_finished, 'request is finished';
@@ -1206,10 +1176,10 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->expect, '100-continue',             'right "Expect" value';
-is $req->headers->host,   '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect,         '100-continue',             'right "Expect" value';
+is $req->headers->host,           '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13',                       'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 my $req2 = Mojo::Message::Request->new->parse($req->to_string);
 is $req->content->leftovers, '', 'no leftovers';
@@ -1220,10 +1190,10 @@ ok $req2->is_finished, 'request is finished';
 is $req2->method,      'GET', 'right method';
 is $req2->version,     '1.1', 'right version';
 is $req2->url,         '/foo/bar', 'right URL';
-is $req2->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req2->headers->expect, '100-continue',             'right "Expect" value';
-is $req2->headers->host,   '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req2->url->to_abs,            'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req2->headers->expect,        '100-continue',             'right "Expect" value';
+is $req2->headers->host,          '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13',                       'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
 # Build HTTP 1.1 request body
@@ -1253,15 +1223,13 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
-is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection,     'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
-is $req->headers->host,           'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
-is $req->headers->sec_websocket_accept, 'abcdef=',
-  'right "Sec-WebSocket-Key" value';
-is $req->headers->sec_websocket_protocol, 'sample',
-  'right "Sec-WebSocket-Protocol" value';
+is $req->url->to_abs,                     'http://example.com/demo', 'right absolute URL';
+is $req->headers->connection,             'Upgrade',                 'right "Connection" value';
+is $req->headers->upgrade,                'websocket',               'right "Upgrade" value';
+is $req->headers->host,                   'example.com',             'right "Host" value';
+is $req->headers->content_length,         0,                         'right "Content-Length" value';
+is $req->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
+is $req->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
 is $req->body, '', 'no content';
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
@@ -1281,15 +1249,13 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
-is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection,     'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
-is $req->headers->host,           'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
-is $req->headers->sec_websocket_accept, 'abcdef=',
-  'right "Sec-WebSocket-Key" value';
-is $req->headers->sec_websocket_protocol, 'sample',
-  'right "Sec-WebSocket-Protocol" value';
+is $req->url->to_abs,                     'http://example.com/demo', 'right absolute URL';
+is $req->headers->connection,             'Upgrade',                 'right "Connection" value';
+is $req->headers->upgrade,                'websocket',               'right "Upgrade" value';
+is $req->headers->host,                   'example.com',             'right "Host" value';
+is $req->headers->content_length,         0,                         'right "Content-Length" value';
+is $req->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
+is $req->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
 is $req->body, '', 'no content';
 ok $req->is_finished, 'request is finished';
 $clone = Mojo::Message::Request->new->parse($clone->to_string);
@@ -1297,15 +1263,13 @@ ok $clone->is_finished, 'request is finished';
 is $clone->method,      'GET', 'right method';
 is $clone->version,     '1.1', 'right version';
 is $clone->url,         '/demo', 'right URL';
-is $clone->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $clone->headers->connection,   'Upgrade',     'right "Connection" value';
-is $clone->headers->upgrade,      'websocket',   'right "Upgrade" value';
-is $clone->headers->host,         'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
-is $clone->headers->sec_websocket_accept, 'abcdef=',
-  'right "Sec-WebSocket-Key" value';
-is $clone->headers->sec_websocket_protocol, 'sample',
-  'right "Sec-WebSocket-Protocol" value';
+is $clone->url->to_abs,                     'http://example.com/demo', 'right absolute URL';
+is $clone->headers->connection,             'Upgrade',                 'right "Connection" value';
+is $clone->headers->upgrade,                'websocket',               'right "Upgrade" value';
+is $clone->headers->host,                   'example.com',             'right "Host" value';
+is $req->headers->content_length,           0,                         'right "Content-Length" value';
+is $clone->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
+is $clone->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
 is $clone->body, '', 'no content';
 ok $clone->is_finished, 'request is finished';
 
@@ -1324,15 +1288,13 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/demo', 'right URL';
-is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
-is $req->headers->connection,     'Upgrade',     'right "Connection" value';
-is $req->headers->upgrade,        'websocket',   'right "Upgrade" value';
-is $req->headers->host,           'example.com', 'right "Host" value';
-is $req->headers->content_length, 0,             'right "Content-Length" value';
-is $req->headers->sec_websocket_accept, 'abcdef=',
-  'right "Sec-WebSocket-Key" value';
-is $req->headers->sec_websocket_protocol, 'sample',
-  'right "Sec-WebSocket-Protocol" value';
+is $req->url->to_abs,                     'http://example.com/demo', 'right absolute URL';
+is $req->headers->connection,             'Upgrade',                 'right "Connection" value';
+is $req->headers->upgrade,                'websocket',               'right "Upgrade" value';
+is $req->headers->host,                   'example.com',             'right "Host" value';
+is $req->headers->content_length,         0,                         'right "Content-Length" value';
+is $req->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
+is $req->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
 is $req->body, '', 'no content';
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
@@ -1349,10 +1311,10 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         'http://127.0.0.1/foo/bar', 'right URL';
-is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->expect, '100-continue',             'right "Expect" value';
-is $req->headers->host,   '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect,         '100-continue',             'right "Expect" value';
+is $req->headers->host,           '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13',                       'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
 # Build full HTTP 1.1 proxy request (proxy disabled)
@@ -1366,9 +1328,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->host,           '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13',                       'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
 # Build full HTTP 1.1 proxy request (HTTPS)
@@ -1383,10 +1345,10 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->expect, '100-continue',             'right "Expect" value';
-is $req->headers->host,   '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect,         '100-continue',             'right "Expect" value';
+is $req->headers->host,           '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13',                       'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
 # Build full HTTP 1.1 proxy request with basic authentication
@@ -1401,15 +1363,13 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         'http://127.0.0.1/foo/bar', 'right URL';
-is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo';
-is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Authorization" value';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->headers->host,   '127.0.0.1',    'right "Host" value';
-is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Proxy-Authorization" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,                  'http://127.0.0.1/foo/bar',           'right absolute URL';
+is $req->proxy->userinfo,              'Aladdin:open sesame',                'right proxy userinfo';
+is $req->headers->authorization,       'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Authorization" value';
+is $req->headers->expect,              '100-continue',                       'right "Expect" value';
+is $req->headers->host,                '127.0.0.1',                          'right "Host" value';
+is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Proxy-Authorization" value';
+is $req->headers->content_length,      '13',                                 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
 # Build full HTTP 1.1 proxy request with basic authentication (and clone)
@@ -1425,30 +1385,26 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         'http://127.0.0.1/foo/bar', 'right URL';
-is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo';
-is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Authorization" value';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->headers->host,   '127.0.0.1',    'right "Host" value';
-is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Proxy-Authorization" value';
-is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->url->to_abs,                  'http://127.0.0.1/foo/bar',           'right absolute URL';
+is $req->proxy->userinfo,              'Aladdin:open sesame',                'right proxy userinfo';
+is $req->headers->authorization,       'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Authorization" value';
+is $req->headers->expect,              '100-continue',                       'right "Expect" value';
+is $req->headers->host,                '127.0.0.1',                          'right "Host" value';
+is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Proxy-Authorization" value';
+is $req->headers->content_length,      '13',                                 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 $clone = Mojo::Message::Request->new->parse($clone->to_string);
 ok $clone->is_finished, 'request is finished';
 is $clone->method,      'GET', 'right method';
 is $clone->version,     '1.1', 'right version';
 is $clone->url,         'http://127.0.0.1/foo/bar', 'right URL';
-is $clone->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $clone->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo';
-is $clone->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Authorization" value';
-is $clone->headers->expect, '100-continue', 'right "Expect" value';
-is $clone->headers->host,   '127.0.0.1',    'right "Host" value';
-is $clone->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Proxy-Authorization" value';
-is $clone->headers->content_length, '13', 'right "Content-Length" value';
+is $clone->url->to_abs,                  'http://127.0.0.1/foo/bar',           'right absolute URL';
+is $clone->proxy->userinfo,              'Aladdin:open sesame',                'right proxy userinfo';
+is $clone->headers->authorization,       'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Authorization" value';
+is $clone->headers->expect,              '100-continue',                       'right "Expect" value';
+is $clone->headers->host,                '127.0.0.1',                          'right "Host" value';
+is $clone->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Proxy-Authorization" value';
+is $clone->headers->content_length,      '13',                                 'right "Content-Length" value';
 is $clone->body, "Hello World!\n", 'right content';
 
 # Build full HTTP 1.1 proxy connect request with basic authentication
@@ -1461,15 +1417,13 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'CONNECT', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '//xn--bcher-kva.ch:3000', 'right URL';
-is $req->url->host,   'xn--bcher-kva.ch',             'right host';
-is $req->url->port,   '3000',                         'right port';
-is $req->url->to_abs, 'http://xn--bcher-kva.ch:3000', 'right absolute URL';
-is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
-is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Authorization" value';
-is $req->headers->host, 'xn--bcher-kva.ch:3000', 'right "Host" value';
-is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-  'right "Proxy-Authorization" value';
+is $req->url->host,                    'xn--bcher-kva.ch',                   'right host';
+is $req->url->port,                    '3000',                               'right port';
+is $req->url->to_abs,                  'http://xn--bcher-kva.ch:3000',       'right absolute URL';
+is $req->proxy->userinfo,              'Aladdin:open sesame',                'right proxy userinfo';
+is $req->headers->authorization,       'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Authorization" value';
+is $req->headers->host,                'xn--bcher-kva.ch:3000',              'right "Host" value';
+is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'right "Proxy-Authorization" value';
 
 # Build HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;
@@ -1488,17 +1442,13 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '106', 'right "Content-Length" value';
-is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
-  'right "Content-Type" value';
-is $req->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
-  'right content';
-is $req->content->parts->[1]->headers->content_type, 'text/plain',
-  'right "Content-Type" value';
-is $req->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
-  'right content';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar',        'right absolute URL';
+is $req->headers->host,           '127.0.0.1',                       'right "Host" value';
+is $req->headers->content_length, '106',                             'right "Content-Length" value';
+is $req->headers->content_type,   'multipart/mixed; boundary=7am1X', 'right "Content-Type" value';
+is $req->content->parts->[0]->asset->slurp,          'Hallo Welt lalalala!',       'right content';
+is $req->content->parts->[1]->headers->content_type, 'text/plain',                 'right "Content-Type" value';
+is $req->content->parts->[1]->asset->slurp,          "lala\nfoobar\nperl rocks\n", 'right content';
 
 # Build HTTP 1.1 multipart request (with clone)
 $req = Mojo::Message::Request->new;
@@ -1518,33 +1468,25 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1',                'right "Host" value';
-is $req->headers->content_length, '106', 'right "Content-Length" value';
-is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
-  'right "Content-Type" value';
-is $req->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
-  'right content';
-is $req->content->parts->[1]->headers->content_type, 'text/plain',
-  'right "Content-Type" value';
-is $req->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
-  'right content';
+is $req->url->to_abs,             'http://127.0.0.1/foo/bar',        'right absolute URL';
+is $req->headers->host,           '127.0.0.1',                       'right "Host" value';
+is $req->headers->content_length, '106',                             'right "Content-Length" value';
+is $req->headers->content_type,   'multipart/mixed; boundary=7am1X', 'right "Content-Type" value';
+is $req->content->parts->[0]->asset->slurp,          'Hallo Welt lalalala!',       'right content';
+is $req->content->parts->[1]->headers->content_type, 'text/plain',                 'right "Content-Type" value';
+is $req->content->parts->[1]->asset->slurp,          "lala\nfoobar\nperl rocks\n", 'right content';
 $clone = Mojo::Message::Request->new->parse($clone->to_string);
 ok $clone->is_finished, 'request is finished';
 is $clone->method,      'GET', 'right method';
 is $clone->version,     '1.1', 'right version';
 is $clone->url,         '/foo/bar', 'right URL';
-is $clone->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $clone->headers->host, '127.0.0.1',                'right "Host" value';
-is $clone->headers->content_length, '106', 'right "Content-Length" value';
-is $clone->headers->content_type, 'multipart/mixed; boundary=7am1X',
-  'right "Content-Type" value';
-is $clone->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
-  'right content';
-is $clone->content->parts->[1]->headers->content_type, 'text/plain',
-  'right "Content-Type" value';
-is $clone->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
-  'right content';
+is $clone->url->to_abs,             'http://127.0.0.1/foo/bar',        'right absolute URL';
+is $clone->headers->host,           '127.0.0.1',                       'right "Host" value';
+is $clone->headers->content_length, '106',                             'right "Content-Length" value';
+is $clone->headers->content_type,   'multipart/mixed; boundary=7am1X', 'right "Content-Type" value';
+is $clone->content->parts->[0]->asset->slurp,          'Hallo Welt lalalala!',       'right content';
+is $clone->content->parts->[1]->headers->content_type, 'text/plain',                 'right "Content-Type" value';
+is $clone->content->parts->[1]->asset->slurp,          "lala\nfoobar\nperl rocks\n", 'right content';
 
 # Build HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
@@ -1569,9 +1511,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs,   'http://127.0.0.1:8080/foo/bar', 'right absolute URL';
-is $req->headers->host, '127.0.0.1:8080',                'right "Host" value';
-is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
+is $req->url->to_abs,                'http://127.0.0.1:8080/foo/bar', 'right absolute URL';
+is $req->headers->host,              '127.0.0.1:8080',                'right "Host" value';
+is $req->headers->transfer_encoding, undef,                           'no "Transfer-Encoding" value';
 is $req->body, "hello world!hello world2!\n\n", 'right content';
 ok $counter, 'right counter';
 
@@ -1588,9 +1530,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->url->to_abs,   'http://127.0.0.1/', 'right absolute URL';
-is $req->headers->host, '127.0.0.1',         'right "Host" value';
-is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
+is $req->url->to_abs,                'http://127.0.0.1/', 'right absolute URL';
+is $req->headers->host,              '127.0.0.1',         'right "Host" value';
+is $req->headers->transfer_encoding, undef,               'no "Transfer-Encoding" value';
 is $req->body, "hello world!hello world2!\n\n", 'right content';
 
 # Build full HTTP 1.1 request with cookies
@@ -1607,10 +1549,10 @@ $req2->parse($req->to_string);
 ok $req2->is_finished, 'request is finished';
 is $req2->method,      'GET', 'right method';
 is $req2->version,     '1.1', 'right version';
-is $req2->headers->expect, '100-continue', 'right "Expect" value';
-is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
-is $req2->headers->content_length, 13, 'right "Content-Length" value';
-is $req2->headers->cookie, 'foo=bar; bar=baz; baz=yada', 'right "Cookie" value';
+is $req2->headers->expect,         '100-continue',               'right "Expect" value';
+is $req2->headers->host,           '127.0.0.1',                  'right "Host" value';
+is $req2->headers->content_length, 13,                           'right "Content-Length" value';
+is $req2->headers->cookie,         'foo=bar; bar=baz; baz=yada', 'right "Cookie" value';
 is $req2->url, '/foo/bar?0', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar?0', 'right absolute URL';
 ok defined $req2->cookie('foo'),   'cookie "foo" exists';
@@ -1637,15 +1579,12 @@ $req2->parse($req->to_string);
 ok $req2->is_finished, 'request is finished';
 is $req2->method,      'GET', 'right method';
 is $req2->version,     '1.1', 'right version';
-is $req2->headers->host, '127.0.0.1', 'right "Host" value';
-is $req2->headers->cookie, 'foo=bar; foo=baz; foo=yada; bar=foo',
-  'right "Cookie" value';
+is $req2->headers->host,   '127.0.0.1',                           'right "Host" value';
+is $req2->headers->cookie, 'foo=bar; foo=baz; foo=yada; bar=foo', 'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is_deeply [map { $_->value } @{$req2->every_cookie('foo')}],
-  [qw(bar baz yada)], 'right values';
-is_deeply [map { $_->value } @{$req2->every_cookie('bar')}], ['foo'],
-  'right values';
+is_deeply [map { $_->value } @{$req2->every_cookie('foo')}], [qw(bar baz yada)], 'right values';
+is_deeply [map { $_->value } @{$req2->every_cookie('bar')}], ['foo'], 'right values';
 
 # Parse full HTTP 1.0 request with cookies and progress callback
 $req     = Mojo::Message::Request->new;
@@ -1816,9 +1755,8 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->upload('foo \\%22bar%22 baz\\')->filename, 'fo\\%22o%22.txt\\',
-  'right filename';
-is $req->upload('foo \\%22bar%22 baz\\')->slurp, 'test', 'right content';
+is $req->upload('foo \\%22bar%22 baz\\')->filename, 'fo\\%22o%22.txt\\', 'right filename';
+is $req->upload('foo \\%22bar%22 baz\\')->slurp,    'test',              'right content';
 
 # Firefox 24 multipart/form-data request (with quotation marks)
 $req = Mojo::Message::Request->new;
@@ -1845,14 +1783,12 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->upload('foo \\\"bar\" baz')->filename, 'fo\\\\"o\\".txt',
-  'right filename';
-is $req->upload('foo \\\"bar\" baz')->slurp, 'test', 'right content';
+is $req->upload('foo \\\"bar\" baz')->filename, 'fo\\\\"o\\".txt', 'right filename';
+is $req->upload('foo \\\"bar\" baz')->slurp,    'test',            'right content';
 
 # Chrome 5 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
-my ($fname, $sname, $sex, $avatar, $submit)
-  = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
+my ($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
   'аватар.jpg', 'Сохранить';
 my $chrome
   = "------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
@@ -1895,11 +1831,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.0', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->cookie('mojolicious')->value,
-  'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
+is $req->cookie('mojolicious')->value, 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
   . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a', 'right value';
-like $req->headers->content_type, qr!multipart/form-data!,
-  'right "Content-Type" value';
+like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
 is $req->param('fname'),  'Иван',           'right value';
 is $req->param('sname'),  'Иванов',       'right value';
 is $req->param('sex'),    'мужской',     'right value';
@@ -1916,8 +1850,7 @@ is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
 # Firefox 3.5.8 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
-($fname, $sname, $sex, $avatar, $submit)
-  = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
+($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
   'аватар.jpg', 'Сохранить';
 my $firefox
   = "-----------------------------213090722714721300002030499922\x0d\x0a"
@@ -1964,11 +1897,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.0', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->cookie('mojolicious')->value,
-  'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
+is $req->cookie('mojolicious')->value, 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
   . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7', 'right value';
-like $req->headers->content_type, qr!multipart/form-data!,
-  'right "Content-Type" value';
+like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
 is $req->param('fname'),  'Иван',           'right value';
 is $req->param('sname'),  'Иванов',       'right value';
 is $req->param('sex'),    'мужской',     'right value';
@@ -1985,8 +1916,7 @@ is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
 # Opera 9.8 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
-($fname, $sname, $sex, $avatar, $submit)
-  = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
+($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
   'аватар.jpg', 'Сохранить';
 my $opera
   = "------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
@@ -2029,11 +1959,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.0', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->cookie('mojolicious')->value,
-  'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
+is $req->cookie('mojolicious')->value, 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
   . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672', 'right value';
-like $req->headers->content_type, qr!multipart/form-data!,
-  'right "Content-Type" value';
+like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
 is $req->param('fname'),  'Иван',           'right value';
 is $req->param('sname'),  'Иванов',       'right value';
 is $req->param('sex'),    'мужской',     'right value';
@@ -2075,14 +2003,12 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo', 'right URL';
-like $req->headers->content_type, qr!multipart/form-data!,
-  'right "Content-Type" value';
+like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
 is $req->upload('☃')->name,     '☃',              'right name';
 is $req->upload('☃')->filename, 'foo bär ☃.txt', 'right filename';
-is $req->upload('☃')->headers->content_type, 'text/plain',
-  'right "Content-Type" value';
-is $req->upload('☃')->asset->size,  8,          'right size';
-is $req->upload('☃')->asset->slurp, 'test 123', 'right content';
+is $req->upload('☃')->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $req->upload('☃')->asset->size,           8,            'right size';
+is $req->upload('☃')->asset->slurp,          'test 123',   'right content';
 
 # Parse "~" in URL
 $req = Mojo::Message::Request->new;
@@ -2108,21 +2034,16 @@ $req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,
-  "/09azAZ!\$%&'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~%C3%83%C2%9F",
-  'right URL';
+is $req->url,         "/09azAZ!\$%&'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~%C3%83%C2%9F", 'right URL';
 
 # Abstract methods
 eval { Mojo::Message->cookies };
 like $@, qr/Method "cookies" not implemented by subclass/, 'right error';
 eval { Mojo::Message->extract_start_line };
-like $@, qr/Method "extract_start_line" not implemented by subclass/,
-  'right error';
+like $@, qr/Method "extract_start_line" not implemented by subclass/, 'right error';
 eval { Mojo::Message->get_start_line_chunk };
-like $@, qr/Method "get_start_line_chunk" not implemented by subclass/,
-  'right error';
+like $@, qr/Method "get_start_line_chunk" not implemented by subclass/, 'right error';
 eval { Mojo::Message->start_line_size };
-like $@, qr/Method "start_line_size" not implemented by subclass/,
-  'right error';
+like $@, qr/Method "start_line_size" not implemented by subclass/, 'right error';
 
 done_testing();

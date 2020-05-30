@@ -11,8 +11,7 @@ has filters => sub { {not_empty => \&_not_empty, trim => \&_trim} };
 sub add_check {
   my ($self, $name, $cb) = @_;
   $self->checks->{$name} = $cb;
-  Mojo::DynamicMethods::register 'Mojolicious::Validator::Validation', $self,
-    $name, $cb;
+  Mojo::DynamicMethods::register 'Mojolicious::Validator::Validation', $self, $name, $cb;
   return $self;
 }
 
@@ -26,7 +25,7 @@ sub new {
   $self->add_check(like     => sub { $_[2] !~ $_[3] });
   $self->add_check(num      => \&_num);
   $self->add_check(size     => \&_size);
-  $self->add_check(upload => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') });
+  $self->add_check(upload   => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') });
 
   return $self;
 }
@@ -115,8 +114,7 @@ String value needs to match the regular expression.
   $v = $v->num(2, undef);
   $v = $v->num(undef, 5);
 
-String value needs to be a non-fractional number (positive or negative) and if
-provided in the given range.
+String value needs to be a non-fractional number (positive or negative) and if provided in the given range.
 
 =head2 size
 
@@ -124,8 +122,7 @@ provided in the given range.
   $v = $v->size(2, undef);
   $v = $v->size(undef, 5);
 
-String value length or size of L<Mojo::Upload> object in bytes needs to be
-between these two values.
+String value length or size of L<Mojo::Upload> object in bytes needs to be between these two values.
 
 =head2 upload
 
@@ -147,8 +144,7 @@ Remove empty string values and treat them as if they had not been submitted.
 
   $v = $v->optional('foo', 'trim');
 
-Trim whitespace characters from both ends of string value with
-L<Mojo::Util/"trim">.
+Trim whitespace characters from both ends of string value with L<Mojo::Util/"trim">.
 
 =head1 ATTRIBUTES
 
@@ -159,21 +155,19 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered validation checks, by default only L</"equal_to">, L</"in">,
-L</"like">, L</"num">, L</"size"> and L</"upload"> are already defined.
+Registered validation checks, by default only L</"equal_to">, L</"in">, L</"like">, L</"num">, L</"size"> and
+L</"upload"> are already defined.
 
 =head2 filters
 
   my $filters = $validator->filters;
   $validator  = $validator->filters({trim => sub {...}});
 
-Registered filters, by default only L</"not_empty"> and L</"trim"> are already
-defined.
+Registered filters, by default only L</"not_empty"> and L</"trim"> are already defined.
 
 =head1 METHODS
 
-L<Mojolicious::Validator> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojolicious::Validator> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 add_check
 

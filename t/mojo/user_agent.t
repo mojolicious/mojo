@@ -100,8 +100,7 @@ is(Mojo::UserAgent->new->server->app, app, 'applications are equal');
 Mojo::UserAgent::Server->app(app);
 is(Mojo::UserAgent::Server->app, app, 'applications are equal');
 my $dummy = Mojolicious::Lite->new;
-isnt(Mojo::UserAgent->new->server->app($dummy)->app,
-  app, 'applications are not equal');
+isnt(Mojo::UserAgent->new->server->app($dummy)->app, app, 'applications are not equal');
 is(Mojo::UserAgent::Server->app, app, 'applications are still equal');
 Mojo::UserAgent::Server->app($dummy);
 isnt(Mojo::UserAgent::Server->app, app, 'applications are not equal');
@@ -172,8 +171,7 @@ $ua->post_p('/method')->then(sub { $result = shift->res->body })->wait;
 is $result, 'POST', 'right result';
 $ua->put_p('/method')->then(sub { $result = shift->res->body })->wait;
 is $result, 'PUT', 'right result';
-$ua->start_p($ua->build_tx(TEST => '/method'))
-  ->then(sub { $result = shift->res->body })->wait;
+$ua->start_p($ua->build_tx(TEST => '/method'))->then(sub { $result = shift->res->body })->wait;
 is $result, 'TEST', 'right result';
 
 # No timeout
@@ -204,8 +202,7 @@ ok !Mojo::IOLoop::TLS->can_tls, 'no TLS support';
 
 # Promises (rejected)
 my $error;
-$ua->get_p($ua->server->url->scheme('https'))->catch(sub { $error = shift })
-  ->wait;
+$ua->get_p($ua->server->url->scheme('https'))->catch(sub { $error = shift })->wait;
 like $error, qr/IO::Socket::SSL/, 'right error';
 
 # No non-blocking name resolution
@@ -280,8 +277,7 @@ is $tx->res->body, 'One!', 'right content';
 # Error in callback
 Mojo::IOLoop->singleton->reactor->unsubscribe('error');
 my $err;
-Mojo::IOLoop->singleton->reactor->once(
-  error => sub { $err .= pop; Mojo::IOLoop->stop });
+Mojo::IOLoop->singleton->reactor->once(error => sub { $err .= pop; Mojo::IOLoop->stop });
 app->ua->get('/' => sub { die 'error event works' });
 Mojo::IOLoop->start;
 like $err, qr/error event works/, 'right error';
@@ -498,8 +494,7 @@ $tx->res->content->auto_decompress(0);
 $tx = $ua->start($tx);
 ok !$tx->error, 'no error';
 is $tx->res->code, 200, 'right status';
-is $tx->res->headers->content_encoding, 'gzip',
-  'right "Content-Encoding" value';
+is $tx->res->headers->content_encoding, 'gzip', 'right "Content-Encoding" value';
 isnt $tx->res->body, 'Hello GZip!', 'different content';
 
 # Keep-alive timeout in between requests
@@ -588,10 +583,8 @@ $tx = $ua->get('/', 'whatever');
 ok !$tx->error, 'no error';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
-is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 0,
-  'unsubscribed successfully';
-is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')}, 1,
-  'unsubscribed successfully';
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 0, 'unsubscribed successfully';
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')},  1, 'unsubscribed successfully';
 like $req, qr!^GET / .*whatever$!s,      'right request';
 like $res, qr|^HTTP/.*200 OK.*works!$|s, 'right response';
 is_deeply \@num, [0, 0, length $res, length $req], 'right structure';
@@ -644,8 +637,7 @@ $tx = $ua->post('/echo' => 'Hello Mojo!');
 ok !$tx->error, 'no error';
 is $tx->res->code, 200,           'right status';
 is $tx->res->body, 'Hello Mojo!', 'right content';
-is_deeply $progress, {start_line => 1, headers => 1, body => 1, finish => 1},
-  'right structure';
+is_deeply $progress, {start_line => 1, headers => 1, body => 1, finish => 1}, 'right structure';
 
 # Mixed blocking and non-blocking requests, with custom URL
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);

@@ -7,8 +7,7 @@ use Test::More;
 BEGIN {
   plan skip_all => 'set TEST_ASYNC_AWAIT to enable this test (developer only!)'
     unless $ENV{TEST_ASYNC_AWAIT} || $ENV{TEST_ALL};
-  plan skip_all => 'Future::AsyncAwait 0.36+ required for this test!'
-    unless Mojo::Base->ASYNC;
+  plan skip_all => 'Future::AsyncAwait 0.36+ required for this test!' unless Mojo::Base->ASYNC;
 }
 use Mojo::Base -async_await;
 
@@ -19,11 +18,7 @@ use Mojo::UserAgent;
 use Mojolicious::Lite;
 
 # async/await spec
-test_awaitable(
-  'Mojo::Promise conforms to Awaitable API',
-  class => "Mojo::Promise",
-  force => sub { shift->wait },
-);
+test_awaitable('Mojo::Promise conforms to Awaitable API', class => "Mojo::Promise", force => sub { shift->wait },);
 
 # Silence
 app->log->level('fatal');
@@ -141,7 +136,6 @@ test_three(0)->then(sub { warn @_ })->catch(sub { $text = shift })->wait;
 is $text, 'value', 'right content';
 
 # Async WebSocket
-$t->websocket_ok('/six')->send_ok('test')
-  ->message_ok->message_is('One: test Two: test')->finish_ok;
+$t->websocket_ok('/six')->send_ok('test')->message_ok->message_is('One: test Two: test')->finish_ok;
 
 done_testing();

@@ -275,8 +275,7 @@ $t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
 EOF
 
 # Checkboxes with multiple values
-$t->get_ok('/multibox?foo=two&foo=one&foo=on')->status_is(200)
-  ->content_is(<<EOF);
+$t->get_ok('/multibox?foo=two&foo=one&foo=on')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input checked name="foo" type="checkbox">
   <input checked name="foo" type="checkbox" value="one">
@@ -287,8 +286,7 @@ $t->get_ok('/multibox?foo=two&foo=one&foo=on')->status_is(200)
 EOF
 
 # Advanced form with values
-$t->get_ok('/form/lala?a=3&a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
-  ->content_is(<<EOF);
+$t->get_ok('/form/lala?a=3&a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)->content_is(<<EOF);
 <form action="/links" method="post">
   <input name="foo">
 </form>
@@ -321,8 +319,7 @@ $t->get_ok('/form/lala?a=3&a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 EOF
 
 # Advanced form with different values
-$t->get_ok('/form/lala?c=b&d=3&e=4&f=<5&b=on')->status_is(200)
-  ->content_is(<<EOF);
+$t->get_ok('/form/lala?c=b&d=3&e=4&f=<5&b=on')->status_is(200)->content_is(<<EOF);
 <form action="/links" method="post">
   <input name="foo">
 </form>
@@ -419,8 +416,7 @@ $t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b&h=j')->status_is(200)
     . "\n</form>\n");
 
 # Selection with multiple values
-$t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b&h=i&h=j')
-  ->status_is(200)
+$t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b&h=i&h=j')->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'

@@ -54,8 +54,7 @@ sub run {
   my $self = shift;
 
   # No fork emulation support
-  say 'Pre-forking does not support fork emulation.' and exit 0
-    if $Config{d_pseudofork};
+  say 'Pre-forking does not support fork emulation.' and exit 0 if $Config{d_pseudofork};
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
@@ -68,7 +67,7 @@ sub run {
   };
   local $SIG{INT}  = local $SIG{TERM} = sub { $self->_term };
   local $SIG{QUIT} = sub                    { $self->_term(1) };
-  local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
+  local $SIG{TTIN} = sub                    { $self->workers($self->workers + 1) };
   local $SIG{TTOU} = sub {
     $self->workers > 0 ? $self->workers($self->workers - 1) : return;
     for my $w (values %{$self->{pool}}) {
@@ -115,20 +114,17 @@ sub _manage {
     next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
-    $log->error("Worker $pid has no heartbeat ($ht seconds), restarting")
-      and $w->{graceful} = $time
+    $log->error("Worker $pid has no heartbeat ($ht seconds), restarting") and $w->{graceful} = $time
       if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 
     # Graceful stop with timeout
     my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
-    $log->info("Stopping worker $pid gracefully ($gt seconds)")
-      and (kill 'QUIT', $pid or $self->_stopped($pid))
+    $log->info("Stopping worker $pid gracefully ($gt seconds)") and (kill 'QUIT', $pid or $self->_stopped($pid))
       if $graceful && !$w->{quit}++;
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
-    $log->warn("Stopping worker $pid immediately")
-      and (kill 'KILL', $pid or $self->_stopped($pid))
+    $log->warn("Stopping worker $pid immediately") and (kill 'KILL', $pid or $self->_stopped($pid))
       if $w->{force} || ($self->{finished} && !$graceful);
   }
 }
@@ -138,8 +134,7 @@ sub _spawn {
 
   # Manager
   die "Can't fork: $!" unless defined(my $pid = fork);
-  return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time}
-    if $pid;
+  return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time} if $pid;
 
   # Heartbeat messages
   my $loop     = $self->cleanup(0)->ioloop;
@@ -169,8 +164,7 @@ sub _stopped {
 
   my $log = $self->app->log;
   $log->info("Worker $pid stopped");
-  $log->error("Worker $pid stopped too early, shutting down") and $self->_term
-    unless $w->{healthy};
+  $log->error("Worker $pid stopped too early, shutting down") and $self->_term unless $w->{healthy};
 }
 
 sub _term {
@@ -227,26 +221,21 @@ Mojo::Server::Prefork - Pre-forking non-blocking I/O HTTP and WebSocket server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Prefork> is a full featured, UNIX optimized, pre-forking
-non-blocking I/O HTTP and WebSocket server, built around the very well tested
-and reliable L<Mojo::Server::Daemon>, with IPv6, TLS, SNI, UNIX domain socket,
-Comet (long polling), keep-alive and multiple event loop support. Note that the
-server uses signals for process management, so you should avoid modifying signal
-handlers in your applications.
+L<Mojo::Server::Prefork> is a full featured, UNIX optimized, pre-forking non-blocking I/O HTTP and WebSocket server,
+built around the very well tested and reliable L<Mojo::Server::Daemon>, with IPv6, TLS, SNI, UNIX domain socket, Comet
+(long polling), keep-alive and multiple event loop support. Note that the server uses signals for process management,
+so you should avoid modifying signal handlers in your applications.
 
-For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
-L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
-L<IO::Socket::SSL> (1.84+) will be used automatically if possible. Individual
-features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
-C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide non-blocking name resolution, SOCKS5 as well as TLS support, the
+optional modules L<EV> (4.32+), L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL>
+(1.84+) will be used automatically if possible. Individual features can also be disabled with the C<MOJO_NO_NNR>,
+C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 =head1 MANAGER SIGNALS
 
-The L<Mojo::Server::Prefork> manager process can be controlled at runtime with
-the following signals.
+The L<Mojo::Server::Prefork> manager process can be controlled at runtime with the following signals.
 
 =head2 INT, TERM
 
@@ -266,8 +255,7 @@ Decrease worker pool by one.
 
 =head1 WORKER SIGNALS
 
-L<Mojo::Server::Prefork> worker processes can be controlled at runtime with the
-following signals.
+L<Mojo::Server::Prefork> worker processes can be controlled at runtime with the following signals.
 
 =head2 QUIT
 
@@ -275,8 +263,7 @@ Stop worker gracefully.
 
 =head1 EVENTS
 
-L<Mojo::Server::Prefork> inherits all events from L<Mojo::Server::Daemon> and
-can emit the following new ones.
+L<Mojo::Server::Prefork> inherits all events from L<Mojo::Server::Daemon> and can emit the following new ones.
 
 =head2 finish
 
@@ -351,38 +338,32 @@ Emitted when the manager starts waiting for new heartbeat messages.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Server::Prefork> inherits all attributes from L<Mojo::Server::Daemon>
-and implements the following new ones.
+L<Mojo::Server::Prefork> inherits all attributes from L<Mojo::Server::Daemon> and implements the following new ones.
 
 =head2 accepts
 
   my $accepts = $prefork->accepts;
   $prefork    = $prefork->accepts(100);
 
-Maximum number of connections a worker is allowed to accept, before stopping
-gracefully and then getting replaced with a newly started worker, passed along
-to L<Mojo::IOLoop/"max_accepts">, defaults to C<10000>. Setting the value to
-C<0> will allow workers to accept new connections indefinitely. Note that up to
-half of this value can be subtracted randomly to improve load balancing, and to
-make sure that not all workers restart at the same time.
+Maximum number of connections a worker is allowed to accept, before stopping gracefully and then getting replaced with
+a newly started worker, passed along to L<Mojo::IOLoop/"max_accepts">, defaults to C<10000>. Setting the value to C<0>
+will allow workers to accept new connections indefinitely. Note that up to half of this value can be subtracted
+randomly to improve load balancing, and to make sure that not all workers restart at the same time.
 
 =head2 cleanup
 
   my $bool = $prefork->cleanup;
   $prefork = $prefork->cleanup($bool);
 
-Delete L</"pid_file"> automatically once it is not needed anymore, defaults to
-a true value.
+Delete L</"pid_file"> automatically once it is not needed anymore, defaults to a true value.
 
 =head2 graceful_timeout
 
   my $timeout = $prefork->graceful_timeout;
   $prefork    = $prefork->graceful_timeout(15);
 
-Maximum amount of time in seconds stopping a worker gracefully may take before
-being forced, defaults to C<120>. Note that this value should usually be a
-little larger than the maximum amount of time you expect any one request to
-take.
+Maximum amount of time in seconds stopping a worker gracefully may take before being forced, defaults to C<120>. Note
+that this value should usually be a little larger than the maximum amount of time you expect any one request to take.
 
 =head2 heartbeat_interval
 
@@ -396,9 +377,8 @@ Heartbeat interval in seconds, defaults to C<5>.
   my $timeout = $prefork->heartbeat_timeout;
   $prefork    = $prefork->heartbeat_timeout(2);
 
-Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped gracefully, defaults to C<50>. Note that this value should usually be a
-little larger than the maximum amount of time you expect any one operation to
+Maximum amount of time in seconds before a worker without a heartbeat will be stopped gracefully, defaults to C<50>.
+Note that this value should usually be a little larger than the maximum amount of time you expect any one operation to
 block the event loop.
 
 =head2 pid_file
@@ -406,17 +386,15 @@ block the event loop.
   my $file = $prefork->pid_file;
   $prefork = $prefork->pid_file('/tmp/prefork.pid');
 
-Full path of process id file, defaults to C<prefork.pid> in a temporary
-directory.
+Full path of process id file, defaults to C<prefork.pid> in a temporary directory.
 
 =head2 spare
 
   my $spare = $prefork->spare;
   $prefork  = $prefork->spare(4);
 
-Temporarily spawn up to this number of additional workers if there is a need,
-defaults to C<2>. This allows for new workers to be started while old ones are
-still shutting down gracefully, drastically reducing the performance cost of
+Temporarily spawn up to this number of additional workers if there is a need, defaults to C<2>. This allows for new
+workers to be started while old ones are still shutting down gracefully, drastically reducing the performance cost of
 worker restarts.
 
 =head2 workers
@@ -424,22 +402,19 @@ worker restarts.
   my $workers = $prefork->workers;
   $prefork    = $prefork->workers(10);
 
-Number of worker processes, defaults to C<4>. A good rule of thumb is two
-worker processes per CPU core for applications that perform mostly non-blocking
-operations, blocking operations often require more and benefit from decreasing
-concurrency with L<Mojo::Server::Daemon/"clients"> (often as low as C<1>).
+Number of worker processes, defaults to C<4>. A good rule of thumb is two worker processes per CPU core for
+applications that perform mostly non-blocking operations, blocking operations often require more and benefit from
+decreasing concurrency with L<Mojo::Server::Daemon/"clients"> (often as low as C<1>).
 
 =head1 METHODS
 
-L<Mojo::Server::Prefork> inherits all methods from L<Mojo::Server::Daemon> and
-implements the following new ones.
+L<Mojo::Server::Prefork> inherits all methods from L<Mojo::Server::Daemon> and implements the following new ones.
 
 =head2 check_pid
 
   my $pid = $prefork->check_pid;
 
-Get process id for running server from L</"pid_file"> or delete it if server is
-not running.
+Get process id for running server from L</"pid_file"> or delete it if server is not running.
 
   say 'Server is not running' unless $prefork->check_pid;
 

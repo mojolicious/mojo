@@ -33,19 +33,16 @@ sub _url {
     $proto = $self->{proto} = $proto || 'http';
 
     # Blocking
-    my $server = $self->{server}
-      = Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
+    my $server = $self->{server} = Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
     weaken $server->app($self->app)->{app};
     my $port = $self->{port} ? ":$self->{port}" : '';
-    $self->{port}
-      = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
+    $self->{port} = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
 
     # Non-blocking
     $server = $self->{nb_server} = Mojo::Server::Daemon->new(silent => 1);
     weaken $server->app($self->app)->{app};
     $port = $self->{nb_port} ? ":$self->{nb_port}" : '';
-    $self->{nb_port}
-      = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
+    $self->{nb_port} = $server->listen(["$proto://127.0.0.1$port"])->start->ports->[0];
   }
 
   my $port = $nb ? $self->{nb_port} : $self->{port};
@@ -69,8 +66,8 @@ Mojo::UserAgent::Server - Application server
 
 =head1 DESCRIPTION
 
-L<Mojo::UserAgent::Server> is an embedded web server based on
-L<Mojo::Server::Daemon> that processes requests for L<Mojo::UserAgent>.
+L<Mojo::UserAgent::Server> is an embedded web server based on L<Mojo::Server::Daemon> that processes requests for
+L<Mojo::UserAgent>.
 
 =head1 ATTRIBUTES
 
@@ -81,13 +78,11 @@ L<Mojo::UserAgent::Server> implements the following attributes.
   my $loop = $server->ioloop;
   $server  = $server->ioloop(Mojo::IOLoop->new);
 
-Event loop object to use for I/O operations, defaults to the global
-L<Mojo::IOLoop> singleton.
+Event loop object to use for I/O operations, defaults to the global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS
 
-L<Mojo::UserAgent::Server> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojo::UserAgent::Server> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 app
 
@@ -96,8 +91,7 @@ implements the following new ones.
   my $app = $server->app;
   $server = $server->app(Mojolicious->new);
 
-Application this server handles, instance specific applications override the
-global default.
+Application this server handles, instance specific applications override the global default.
 
   # Change application behavior
   $server->app->defaults(testing => 'oh yea!');
@@ -108,8 +102,8 @@ global default.
   my $url = $server->nb_url('http');
   my $url = $server->nb_url('https');
 
-Get absolute L<Mojo::URL> object for server processing non-blocking requests
-with L</"app"> and switch protocol if necessary.
+Get absolute L<Mojo::URL> object for server processing non-blocking requests with L</"app"> and switch protocol if
+necessary.
 
 =head2 restart
 
@@ -123,8 +117,8 @@ Restart server with new port.
   my $url = $server->url('http');
   my $url = $server->url('https');
 
-Get absolute L<Mojo::URL> object for server processing blocking requests with
-L</"app"> and switch protocol if necessary.
+Get absolute L<Mojo::URL> object for server processing blocking requests with L</"app"> and switch protocol if
+necessary.
 
 =head1 SEE ALSO
 

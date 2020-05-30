@@ -79,8 +79,7 @@ is_deeply $array, ["hello\nworld!"], 'decode ["hello\nworld!"]';
 $array = decode_json '["hello\t\"world!"]';
 is_deeply $array, ["hello\t\"world!"], 'decode ["hello\t\"world!"]';
 $array = decode_json '["hello\u0152world\u0152!"]';
-is_deeply $array, ["hello\x{0152}world\x{0152}!"],
-  'decode ["hello\u0152world\u0152!"]';
+is_deeply $array, ["hello\x{0152}world\x{0152}!"], 'decode ["hello\u0152world\u0152!"]';
 $array = decode_json '["0."]';
 is_deeply $array, ['0.'], 'decode ["0."]';
 $array = decode_json '[" 0"]';
@@ -121,10 +120,9 @@ EOF
 is $hash->{Image}{Width},  800,                    'right value';
 is $hash->{Image}{Height}, 600,                    'right value';
 is $hash->{Image}{Title},  'View from 15th Floor', 'right value';
-is $hash->{Image}{Thumbnail}{Url}, 'http://www.example.com/image/481989943',
-  'right value';
-is $hash->{Image}{Thumbnail}{Height}, 125, 'right value';
-is $hash->{Image}{Thumbnail}{Width},  100, 'right value';
+is $hash->{Image}{Thumbnail}{Url},    'http://www.example.com/image/481989943', 'right value';
+is $hash->{Image}{Thumbnail}{Height}, 125,                                      'right value';
+is $hash->{Image}{Thumbnail}{Width},  100,                                      'right value';
 is $hash->{Image}{IDs}[0], 116,   'right value';
 is $hash->{Image}{IDs}[1], 943,   'right value';
 is $hash->{Image}{IDs}[2], 234,   'right value';
@@ -153,8 +151,7 @@ is b($bytes)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
 $bytes = encode_json ["123abc"];
 is $bytes, '["123abc"]', 'encode ["123abc"]';
 $bytes = encode_json ["\x00\x1f \a\b/\f\r"];
-is $bytes, '["\\u0000\\u001F \\u0007\\b\/\f\r"]',
-  'encode ["\x00\x1f \a\b/\f\r"]';
+is $bytes, '["\\u0000\\u001F \\u0007\\b\/\f\r"]', 'encode ["\x00\x1f \a\b/\f\r"]';
 $bytes = encode_json '';
 is $bytes, '""', 'encode ""';
 $bytes = encode_json "hell\no";
@@ -172,8 +169,7 @@ is $bytes, '{"foo":[]}', 'encode {foo => []}';
 $bytes = encode_json {foo => ['bar']};
 is $bytes, '{"foo":["bar"]}', 'encode {foo => [\'bar\']}';
 $bytes = encode_json {foo => 'bar', baz => 'yada'};
-is $bytes, '{"baz":"yada","foo":"bar"}',
-  'encode {foo => \'bar\', baz => \'yada\'}';
+is $bytes, '{"baz":"yada","foo":"bar"}', 'encode {foo => \'bar\', baz => \'yada\'}';
 
 # Encode name
 $bytes = encode_json [Mojo::JSON->true];
@@ -228,8 +224,7 @@ is_deeply $hash, {'' => ''}, 'decode {"":""}';
 is encode_json($hash), $bytes, 're-encode';
 $bytes = '[null,false,true,"",0,1]';
 $array = decode_json $bytes;
-is_deeply $array, [undef, Mojo::JSON->false, Mojo::JSON->true, '', 0, 1],
-  'decode [null,false,true,"",0,1]';
+is_deeply $array, [undef, Mojo::JSON->false, Mojo::JSON->true, '', 0, 1], 'decode [null,false,true,"",0,1]';
 is encode_json($array), $bytes, 're-encode';
 $array = [undef, 0, 1, '', Mojo::JSON->true, Mojo::JSON->false];
 $bytes = encode_json($array);
@@ -241,8 +236,7 @@ $bytes = encode_json({foo => 'c:\progra~1\mozill~1\firefox.exe'});
 is $bytes, '{"foo":"c:\\\\progra~1\\\\mozill~1\\\\firefox.exe"}',
   'encode {foo => \'c:\progra~1\mozill~1\firefox.exe\'}';
 $hash = decode_json $bytes;
-is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
-  'successful roundtrip';
+is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'}, 'successful roundtrip';
 
 # Huge string
 $bytes = encode_json(['a' x 32768]);
@@ -265,8 +259,7 @@ is_deeply decode_json($bytes), ['test'], 'successful roundtrip';
 # Blessed reference with TO_JSON method
 $bytes = encode_json(JSONTest->new);
 is_deeply decode_json($bytes), {}, 'successful roundtrip';
-$bytes = encode_json(JSONTest->new(
-  something => {just => 'works'}, else => {not => 'working'}));
+$bytes = encode_json(JSONTest->new(something => {just => 'works'}, else => {not => 'working'}));
 is_deeply decode_json($bytes), {just => 'works'}, 'successful roundtrip';
 
 # Unknown reference
@@ -287,22 +280,18 @@ is false + 0, 0, 'right numeric value';
 # Upgraded numbers
 my $num = 3;
 my $str = "$num";
-is encode_json({test => [$num, $str]}), '{"test":[3,"3"]}',
-  'upgraded number detected';
+is encode_json({test => [$num, $str]}), '{"test":[3,"3"]}', 'upgraded number detected';
 $num = 3.21;
 $str = "$num";
-is encode_json({test => [$num, $str]}), '{"test":[3.21,"3.21"]}',
-  'upgraded number detected';
+is encode_json({test => [$num, $str]}), '{"test":[3.21,"3.21"]}', 'upgraded number detected';
 $str = '0 but true';
 $num = 1 + $str;
-is encode_json({test => [$num, $str]}), '{"test":[1,"0 but true"]}',
-  'upgraded number detected';
+is encode_json({test => [$num, $str]}), '{"test":[1,"0 but true"]}', 'upgraded number detected';
 
 # Upgraded string
 $str = "bar";
 { no warnings 'numeric'; $num = 23 + $str }
-is encode_json({test => [$num, $str]}), '{"test":[23,"bar"]}',
-  'upgraded string detected';
+is encode_json({test => [$num, $str]}), '{"test":[23,"bar"]}', 'upgraded string detected';
 
 # dualvar
 my $dual = dualvar 23, 'twenty three';
@@ -313,16 +302,12 @@ is encode_json([JSONTest2->new]), "[\"works!\"]", 'object stringified';
 
 # Ensure numbers and strings are not upgraded
 my $mixed = [3, 'three', '3', 0, "0"];
-is encode_json($mixed), '[3,"three","3",0,"0"]',
-  'all have been detected correctly';
-is encode_json($mixed), '[3,"three","3",0,"0"]',
-  'all have been detected correctly again';
+is encode_json($mixed), '[3,"three","3",0,"0"]', 'all have been detected correctly';
+is encode_json($mixed), '[3,"three","3",0,"0"]', 'all have been detected correctly again';
 
 # "inf" and "nan"
-like encode_json({test => 9**9**9}), qr/^{"test":".*"}$/,
-  'encode "inf" as string';
-like encode_json({test => -sin(9**9**9)}), qr/^{"test":".*"}$/,
-  'encode "nan" as string';
+like encode_json({test => 9**9**9}), qr/^{"test":".*"}$/, 'encode "inf" as string';
+like encode_json({test => -sin(9**9**9)}), qr/^{"test":".*"}$/, 'encode "nan" as string';
 
 # "null"
 is j('null'), undef, 'decode null';
@@ -332,49 +317,34 @@ eval { decode_json 'test' };
 like $@, qr/Malformed JSON: Expected string, array, object/,      'right error';
 like $@, qr/object, number, boolean or null at line 0, offset 0/, 'right error';
 eval { decode_json b('["\\ud800"]')->encode };
-like $@, qr/Malformed JSON: Missing low-surrogate at line 1, offset 8/,
-  'right error';
+like $@, qr/Malformed JSON: Missing low-surrogate at line 1, offset 8/, 'right error';
 eval { decode_json b('["\\udf46"]')->encode };
-like $@, qr/Malformed JSON: Missing high-surrogate at line 1, offset 8/,
-  'right error';
+like $@, qr/Malformed JSON: Missing high-surrogate at line 1, offset 8/, 'right error';
 eval { decode_json '[[]' };
-like $@, qr/Malformed JSON: Expected comma or right square bracket/,
-  'right error';
-like $@, qr/bracket while parsing array at line 1, offset 3/, 'right error';
+like $@, qr/Malformed JSON: Expected comma or right square bracket/, 'right error';
+like $@, qr/bracket while parsing array at line 1, offset 3/,        'right error';
 eval { decode_json '{{}' };
-like $@,
-  qr/Malformed JSON: Expected string while parsing object at line 1, offset 1/,
-  'right error';
+like $@, qr/Malformed JSON: Expected string while parsing object at line 1, offset 1/, 'right error';
 eval { decode_json "[\"foo\x00]" };
-like $@, qr/Malformed JSON: Unexpected character or invalid escape/,
-  'right error';
-like $@, qr/escape while parsing string at line 1, offset 5/, 'right error';
+like $@, qr/Malformed JSON: Unexpected character or invalid escape/, 'right error';
+like $@, qr/escape while parsing string at line 1, offset 5/,        'right error';
 eval { decode_json '{"foo":"bar"{' };
-like $@, qr/Malformed JSON: Expected comma or right curly bracket/,
-  'right error';
-like $@, qr/bracket while parsing object at line 1, offset 12/, 'right error';
+like $@, qr/Malformed JSON: Expected comma or right curly bracket/, 'right error';
+like $@, qr/bracket while parsing object at line 1, offset 12/,     'right error';
 eval { decode_json '{"foo""bar"}' };
-like $@,
-  qr/Malformed JSON: Expected colon while parsing object at line 1, offset 6/,
-  'right error';
+like $@, qr/Malformed JSON: Expected colon while parsing object at line 1, offset 6/, 'right error';
 eval { decode_json '[[]...' };
-like $@, qr/Malformed JSON: Expected comma or right square bracket/,
-  'right error';
-like $@, qr/bracket while parsing array at line 1, offset 3/, 'right error';
+like $@, qr/Malformed JSON: Expected comma or right square bracket/, 'right error';
+like $@, qr/bracket while parsing array at line 1, offset 3/,        'right error';
 eval { decode_json '{{}...' };
-like $@,
-  qr/Malformed JSON: Expected string while parsing object at line 1, offset 1/,
-  'right error';
+like $@, qr/Malformed JSON: Expected string while parsing object at line 1, offset 1/, 'right error';
 eval { decode_json '[nan]' };
-like $@, qr/Malformed JSON: Expected string, array, object, number/,
-  'right error';
-like $@, qr/number, boolean or null at line 1, offset 1/, 'right error';
+like $@, qr/Malformed JSON: Expected string, array, object, number/, 'right error';
+like $@, qr/number, boolean or null at line 1, offset 1/,            'right error';
 eval { decode_json '["foo]' };
-like $@, qr/Malformed JSON: Unterminated string at line 1, offset 6/,
-  'right error';
+like $@, qr/Malformed JSON: Unterminated string at line 1, offset 6/, 'right error';
 eval { decode_json '{"foo":"bar"}lala' };
-like $@, qr/Malformed JSON: Unexpected data at line 1, offset 13/,
-  'right error';
+like $@, qr/Malformed JSON: Unexpected data at line 1, offset 13/, 'right error';
 eval { decode_json '' };
 like $@, qr/Missing or empty input at offset 0/, 'right error';
 eval { decode_json "[\"foo\",\n\"bar\"]lala" };
@@ -387,10 +357,8 @@ eval { decode_json encode('Shift_JIS', 'やった') };
 like $@, qr/Input is not UTF-8 encoded/, 'right error';
 is j('{'), undef, 'syntax error';
 eval { decode_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };
-like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/,
-  'right error';
+like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/, 'right error';
 eval { from_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };
-like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/,
-  'right error';
+like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/, 'right error';
 
 done_testing();

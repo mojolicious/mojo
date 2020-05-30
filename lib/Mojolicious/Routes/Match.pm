@@ -25,10 +25,7 @@ sub path_for {
   my $captures = $self->stack->[-1] || {};
   %values = (%$captures, format => undef, %values);
   my $pattern = $route->pattern;
-  $values{format}
-    //= defined $captures->{format}
-    ? $captures->{format}
-    : $pattern->defaults->{format}
+  $values{format} //= defined $captures->{format} ? $captures->{format} : $pattern->defaults->{format}
     if $pattern->constraints->{format};
 
   my $path = $route->render(\%values);
@@ -42,8 +39,7 @@ sub _match {
   my $path    = $options->{path};
   my $partial = $r->partial;
   my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
-  return undef
-    unless my $captures = $r->pattern->match_partial(\$path, $detect);
+  return undef unless my $captures = $r->pattern->match_partial(\$path, $detect);
   local $options->{path} = $path;
   local @{$self->{captures} ||= {}}{keys %$captures} = values %$captures;
   $captures = $self->{captures};
@@ -123,8 +119,7 @@ Mojolicious::Routes::Match - Find routes
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Routes::Match> finds routes in L<Mojolicious::Routes>
-structures.
+L<Mojolicious::Routes::Match> finds routes in L<Mojolicious::Routes> structures.
 
 =head1 ATTRIBUTES
 
@@ -135,8 +130,7 @@ L<Mojolicious::Routes::Match> implements the following attributes.
   my $route = $match->endpoint;
   $match    = $match->endpoint(Mojolicious::Routes::Route->new);
 
-The route endpoint that matched, usually a L<Mojolicious::Routes::Route>
-object.
+The route endpoint that matched, usually a L<Mojolicious::Routes::Route> object.
 
 =head2 position
 
@@ -161,15 +155,13 @@ Captured parameters with nesting history.
 
 =head1 METHODS
 
-L<Mojolicious::Routes::Match> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojolicious::Routes::Match> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 find
 
   $match->find(Mojolicious::Controller->new, {method => 'GET', path => '/'});
 
-Match controller and options against L</"root"> to find an appropriate
-L</"endpoint">.
+Match controller and options against L</"root"> to find an appropriate L</"endpoint">.
 
 =head2 path_for
 

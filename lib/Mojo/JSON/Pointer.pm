@@ -50,8 +50,7 @@ Mojo::JSON::Pointer - JSON Pointers
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON::Pointer> is an implementation of
-L<RFC 6901|http://tools.ietf.org/html/rfc6901>.
+L<Mojo::JSON::Pointer> is an implementation of L<RFC 6901|http://tools.ietf.org/html/rfc6901>.
 
 =head1 ATTRIBUTES
 
@@ -66,15 +65,13 @@ Data structure to be processed.
 
 =head1 METHODS
 
-L<Mojo::JSON::Pointer> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::JSON::Pointer> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 contains
 
   my $bool = $pointer->contains('/foo/1');
 
-Check if L</"data"> contains a value that can be identified with the given JSON
-Pointer.
+Check if L</"data"> contains a value that can be identified with the given JSON Pointer.
 
   # True
   Mojo::JSON::Pointer->new('just a string')->contains('');

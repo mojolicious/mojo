@@ -15,32 +15,29 @@ Essentials every L<Mojolicious> developer should know.
 
 =head2 Renderer
 
-The renderer is a tiny black box turning stash data into actual responses
-utilizing multiple template systems and data encoding modules.
+The renderer is a tiny black box turning stash data into actual responses utilizing multiple template systems and data
+encoding modules.
 
   {text => 'Hello.'}                 -> 200 OK, text/html, 'Hello.'
   {json => {x => 3}}                 -> 200 OK, application/json, '{"x":3}'
   {text => 'Oops.', status => '410'} -> 410 Gone, text/html, 'Oops.'
 
-Templates can be automatically detected if enough information is provided by
-the developer or routes. Template names are expected to follow the
-C<template.format.handler> scheme, with C<template> defaulting to
-C<controller/action> or the route name, C<format> defaulting to C<html> and
-C<handler> to C<ep>.
+Templates can be automatically detected if enough information is provided by the developer or routes. Template names
+are expected to follow the C<template.format.handler> scheme, with C<template> defaulting to C<controller/action> or
+the route name, C<format> defaulting to C<html> and C<handler> to C<ep>.
 
   {controller => 'users', action => 'list'} -> 'users/list.html.ep'
   {template => 'foo', format => 'txt'}      -> 'foo.txt.ep'
   {template => 'foo', handler => 'epl'}     -> 'foo.html.epl'
 
-The C<controller> value gets converted from C<CamelCase> to C<snake_case> using
-L<Mojo::Util/"decamelize"> and C<-> characters replaced with C</>.
+The C<controller> value gets converted from C<CamelCase> to C<snake_case> using L<Mojo::Util/"decamelize"> and C<->
+characters replaced with C</>.
 
   {controller => 'My::Users', action => 'add'} -> 'my/users/add.html.ep'
   {controller => 'my-users', action => 'show'} -> 'my/users/show.html.ep'
 
-All templates should be in the C<templates> directories of the application,
-which can be customized with L<Mojolicious::Renderer/"paths">, or one of the
-the C<DATA> sections from L<Mojolicious::Renderer/"classes">.
+All templates should be in the C<templates> directories of the application, which can be customized with
+L<Mojolicious::Renderer/"paths">, or one of the the C<DATA> sections from L<Mojolicious::Renderer/"classes">.
 
   __DATA__
 
@@ -56,17 +53,14 @@ the C<DATA> sections from L<Mojolicious::Renderer/"classes">.
   @@ hello.txt.ep
   ...
 
-The renderer can be easily extended to support additional template systems with
-plugins, but more about that later.
+The renderer can be easily extended to support additional template systems with plugins, but more about that later.
 
 =head2 Embedded Perl
 
-L<Mojolicious> includes a minimalistic but very powerful template system out of
-the box called Embedded Perl or C<ep> for short. It is based on
-L<Mojo::Template> and allows the embedding of Perl code right into actual
-content using a small set of special tags and line start characters. For all
-templates L<strict>, L<warnings>, L<utf8> and Perl 5.16 L<features|feature> are
-automatically enabled.
+L<Mojolicious> includes a minimalistic but very powerful template system out of the box called Embedded Perl or C<ep>
+for short. It is based on L<Mojo::Template> and allows the embedding of Perl code right into actual content using a
+small set of special tags and line start characters. For all templates L<strict>, L<warnings>, L<utf8> and Perl 5.16
+L<features|feature> are automatically enabled.
 
   <% Perl code %>
   <%= Perl expression, replaced with XML escaped result %>
@@ -79,9 +73,8 @@ automatically enabled.
   %# Comment line, useful for debugging
   %% Replaced with "%", useful for generating templates
 
-Tags and lines work pretty much the same, but depending on context one will
-usually look a bit better. Semicolons get automatically appended to all
-expressions.
+Tags and lines work pretty much the same, but depending on context one will usually look a bit better. Semicolons get
+automatically appended to all expressions.
 
   <% my $i = 10; %>
   <ul>
@@ -101,8 +94,8 @@ expressions.
     % }
   </ul>
 
-Aside from differences in whitespace handling, both examples generate similar
-Perl code, a naive translation could look like this.
+Aside from differences in whitespace handling, both examples generate similar Perl code, a naive translation could look
+like this.
 
   my $output = '';
   my $i = 10;
@@ -115,9 +108,8 @@ Perl code, a naive translation could look like this.
   $output .= '</ul>';
   return $output;
 
-An additional equal sign can be used to disable escaping of the characters
-C<E<lt>>, C<E<gt>>, C<&>, C<'> and C<"> in results from Perl expressions, which
-is the default to prevent XSS attacks against your application.
+An additional equal sign can be used to disable escaping of the characters C<E<lt>>, C<E<gt>>, C<&>, C<'> and C<"> in
+results from Perl expressions, which is the default to prevent XSS attacks against your application.
 
   <%= 'I ♥ Mojolicious!' %>
   <%== '<p>I ♥ Mojolicious!</p>' %>
@@ -126,8 +118,7 @@ Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
 
   <%= b('<p>I ♥ Mojolicious!</p>') %>
 
-Whitespace characters around tags can be trimmed by adding an additional equal
-sign to the end of a tag.
+Whitespace characters around tags can be trimmed by adding an additional equal sign to the end of a tag.
 
   <% for (1 .. 3) { %>
     <%= 'Trim all whitespace characters around this expression' =%>
@@ -138,29 +129,25 @@ Newline characters can be escaped with a backslash.
   This is <%= 1 + 1 %> a\
   single line
 
-And a backslash in front of a newline character can be escaped with another
-backslash.
+And a backslash in front of a newline character can be escaped with another backslash.
 
   This will <%= 1 + 1 %> result\\
   in multiple\\
   lines
 
-A newline character gets appended automatically to every template, unless the
-last character is a backslash. And empty lines at the end of a template are
-ignored.
+A newline character gets appended automatically to every template, unless the last character is a backslash. And empty
+lines at the end of a template are ignored.
 
   There is <%= 1 + 1 %> no newline at the end here\
 
-At the beginning of the template, stash values that don't have invalid
-characters in their name get automatically initialized as normal variables, and
-the controller object as both C<$self> and C<$c>.
+At the beginning of the template, stash values that don't have invalid characters in their name get automatically
+initialized as normal variables, and the controller object as both C<$self> and C<$c>.
 
   $c->stash(name => 'tester');
 
   Hello <%= $name %> from <%= $c->tx->remote_address %>.
 
-A prefix like C<myapp.*> is commonly used for stash values that you don't want
-to expose in templates.
+A prefix like C<myapp.*> is commonly used for stash values that you don't want to expose in templates.
 
   $c->stash('myapp.name' => 'tester');
 
@@ -174,29 +161,24 @@ Most commonly used features every L<Mojolicious> developer should know about.
 
 =head2 Automatic rendering
 
-The renderer can be manually started by calling the method
-L<Mojolicious::Controller/"render">, but that's usually not necessary, because
-it will get automatically called if nothing has been rendered after the router
-finished its work. This also means you can have routes pointing only to
-templates without actual actions.
+The renderer can be manually started by calling the method L<Mojolicious::Controller/"render">, but that's usually not
+necessary, because it will get automatically called if nothing has been rendered after the router finished its work.
+This also means you can have routes pointing only to templates without actual actions.
 
   $c->render;
 
-There is one big difference though, by calling it manually you can make sure
-that templates use the current controller object, and not the default
-controller specified with the attribute L<Mojolicious/"controller_class">.
+There is one big difference though, by calling it manually you can make sure that templates use the current controller
+object, and not the default controller specified with the attribute L<Mojolicious/"controller_class">.
 
   $c->render_later;
 
-You can also disable automatic rendering with the method
-L<Mojolicious::Controller/"render_later">, which can be very useful to delay
-rendering when a non-blocking operation has to be performed first.
+You can also disable automatic rendering with the method L<Mojolicious::Controller/"render_later">, which can be very
+useful to delay rendering when a non-blocking operation has to be performed first.
 
 =head2 Rendering templates
 
-The renderer will always try to detect the right template, but you can also use
-the C<template> stash value to render a specific one. Everything before the
-last slash will be interpreted as the subdirectory path in which to find the
+The renderer will always try to detect the right template, but you can also use the C<template> stash value to render a
+specific one. Everything before the last slash will be interpreted as the subdirectory path in which to find the
 template.
 
   # foo/bar/baz.*.*
@@ -207,46 +189,40 @@ Choosing a specific C<format> and C<handler> is just as easy.
   # foo/bar/baz.txt.epl
   $c->render(template => 'foo/bar/baz', format => 'txt', handler => 'epl');
 
-Because rendering a specific template is the most common task it also has a
-shortcut.
+Because rendering a specific template is the most common task it also has a shortcut.
 
   $c->render('foo/bar/baz');
 
-If you're not sure in advance if a template actually exists, you can also use
-the method L<Mojolicious::Controller/"render_maybe"> to try multiple
-alternatives.
+If you're not sure in advance if a template actually exists, you can also use the method
+L<Mojolicious::Controller/"render_maybe"> to try multiple alternatives.
 
   $c->render_maybe('localized/baz') or $c->render('foo/bar/baz');
 
 =head2 Rendering to strings
 
-Sometimes you might want to use the rendered result directly instead of
-generating a response, for example, to send emails, this can be done with
-L<Mojolicious::Controller/"render_to_string">.
+Sometimes you might want to use the rendered result directly instead of generating a response, for example, to send
+emails, this can be done with L<Mojolicious::Controller/"render_to_string">.
 
   my $html = $c->render_to_string('mail');
 
-No encoding will be performed, making it easy to reuse the result in other
-templates or to generate binary data.
+No encoding will be performed, making it easy to reuse the result in other templates or to generate binary data.
 
   my $pdf = $c->render_to_string('invoice', format => 'pdf');
   $c->render(data => $pdf, format => 'pdf');
 
-All arguments passed will get localized automatically and are only available
-during this render operation.
+All arguments passed will get localized automatically and are only available during this render operation.
 
 =head2 Template variants
 
-To make your application look great on many different devices you can also use
-the C<variant> stash value to choose between different variants of your
-templates.
+To make your application look great on many different devices you can also use the C<variant> stash value to choose
+between different variants of your templates.
 
   # foo/bar/baz.html+phone.ep
   # foo/bar/baz.html.ep
   $c->render('foo/bar/baz', variant => 'phone');
 
-This can be done very liberally since it only applies when a template with the
-correct name actually exists and falls back to the generic one otherwise.
+This can be done very liberally since it only applies when a template with the correct name actually exists and falls
+back to the generic one otherwise.
 
 =head2 Rendering inline templates
 
@@ -254,29 +230,27 @@ Some renderers such as C<ep> allow templates to be passed C<inline>.
 
   $c->render(inline => 'The result is <%= 1 + 1 %>.');
 
-Since auto-detection depends on a path you might have to supply a C<handler>
-too.
+Since auto-detection depends on a path you might have to supply a C<handler> too.
 
   $c->render(inline => "<%= shift->param('foo') %>", handler => 'epl');
 
 =head2 Rendering text
 
-Characters can be rendered to bytes with the C<text> stash value, the given
-content will be automatically encoded with L<Mojolicious::Renderer/"encoding">.
+Characters can be rendered to bytes with the C<text> stash value, the given content will be automatically encoded with
+L<Mojolicious::Renderer/"encoding">.
 
   $c->render(text => 'I ♥ Mojolicious!');
 
 =head2 Rendering data
 
-Bytes can be rendered with the C<data> stash value, no encoding will be
-performed.
+Bytes can be rendered with the C<data> stash value, no encoding will be performed.
 
   $c->render(data => $bytes);
 
 =head2 Rendering JSON
 
-The C<json> stash value allows you to pass Perl data structures to the renderer
-which get directly encoded to JSON with L<Mojo::JSON>.
+The C<json> stash value allows you to pass Perl data structures to the renderer which get directly encoded to JSON with
+L<Mojo::JSON>.
 
   $c->render(json => {foo => [1, 'test', 3]});
 
@@ -288,8 +262,7 @@ Response status codes can be changed with the C<status> stash value.
 
 =head2 Content type
 
-The C<Content-Type> header of the response is actually based on the MIME type
-mapping of the C<format> stash value.
+The C<Content-Type> header of the response is actually based on the MIME type mapping of the C<format> stash value.
 
   # Content-Type: text/plain
   $c->render(text => 'Hello.', format => 'txt');
@@ -304,8 +277,8 @@ These mappings can be easily extended or changed with L<Mojolicious/"types">.
 
 =head2 Stash data
 
-Any of the native Perl data types can be passed to templates as references
-through the L<Mojolicious::Controller/"stash">.
+Any of the native Perl data types can be passed to templates as references through the
+L<Mojolicious::Controller/"stash">.
 
   $c->stash(description => 'web framework');
   $c->stash(frameworks  => ['Catalyst', 'Mojolicious']);
@@ -325,9 +298,8 @@ Since everything is just Perl normal control structures just work.
     Minion is a <%= $description %>.
   % }
 
-For templates that might get rendered in different ways and where you're not
-sure if a stash value will actually be set, you can just use the helper
-L<Mojolicious::Plugin::DefaultHelpers/"stash">.
+For templates that might get rendered in different ways and where you're not sure if a stash value will actually be
+set, you can just use the helper L<Mojolicious::Plugin::DefaultHelpers/"stash">.
 
   % if (my $spinoffs = stash 'spinoffs') {
     Minion is a <%= $spinoffs->{minion} %>.
@@ -335,8 +307,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"stash">.
 
 =head2 Helpers
 
-Helpers are little functions you can use in templates as well as application
-and controller code.
+Helpers are little functions you can use in templates as well as application and controller code.
 
   # Template
   %= dumper [1, 2, 3]
@@ -348,27 +319,23 @@ and controller code.
   my $serialized = $c->dumper([1, 2, 3]);
 
 We differentiate between default helpers, which are more general purpose like
-L<Mojolicious::Plugin::DefaultHelpers/"dumper">, and tag helpers like
-L<Mojolicious::Plugin::TagHelpers/"link_to">, which are template specific and
-mostly used to generate HTML tags.
+L<Mojolicious::Plugin::DefaultHelpers/"dumper">, and tag helpers like L<Mojolicious::Plugin::TagHelpers/"link_to">,
+which are template specific and mostly used to generate HTML tags.
 
   %= link_to Mojolicious => 'https://mojolicious.org'
 
-In controllers you can also use the method L<Mojolicious::Controller/"helpers">
-to fully qualify helper calls and ensure that they don't conflict with existing
-methods you may already have.
+In controllers you can also use the method L<Mojolicious::Controller/"helpers"> to fully qualify helper calls and
+ensure that they don't conflict with existing methods you may already have.
 
   my $serialized = $c->helpers->dumper([1, 2, 3]);
 
-A list of all built-in helpers can be found in
-L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
+A list of all built-in helpers can be found in L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>.
 
 =head2 Content negotiation
 
-For resources with different representations and that require truly RESTful
-content negotiation you can also use
-L<Mojolicious::Plugin::DefaultHelpers/"respond_to"> instead of
-L<Mojolicious::Controller/"render">.
+For resources with different representations and that require truly RESTful content negotiation you can also use
+L<Mojolicious::Plugin::DefaultHelpers/"respond_to"> instead of L<Mojolicious::Controller/"render">.
 
   # /hello (Accept: application/json) -> "json"
   # /hello (Accept: application/xml)  -> "xml"
@@ -381,11 +348,9 @@ L<Mojolicious::Controller/"render">.
     xml  => {text => '<hello>world</hello>'}
   );
 
-The best possible representation will be automatically selected from the
-C<format> C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request
-header and stored in the C<format> stash value. To change MIME type mappings for
-the C<Accept> request header or the C<Content-Type> response header you can use
-L<Mojolicious/"types">.
+The best possible representation will be automatically selected from the C<format> C<GET>/C<POST> parameter, C<format>
+stash value or C<Accept> request header and stored in the C<format> stash value. To change MIME type mappings for the
+C<Accept> request header or the C<Content-Type> response header you can use L<Mojolicious/"types">.
 
   $c->respond_to(
     json => {json => {hello => 'world'}},
@@ -395,8 +360,7 @@ L<Mojolicious/"types">.
     }
   );
 
-Callbacks can be used for representations that are too complex to fit into a
-single render call.
+Callbacks can be used for representations that are too complex to fit into a single render call.
 
   # /hello (Accept: application/json) -> "json"
   # /hello (Accept: text/html)        -> "html"
@@ -413,8 +377,8 @@ single render call.
     any  => {text => '', status => 204}
   );
 
-And if no viable representation could be found, the C<any> fallback will be
-used or an empty C<204> response rendered automatically.
+And if no viable representation could be found, the C<any> fallback will be used or an empty C<204> response rendered
+automatically.
 
   # /hello                      -> "html"
   # /hello (Accept: text/html)  -> "html"
@@ -430,17 +394,15 @@ used or an empty C<204> response rendered automatically.
     ...
   }
 
-For even more advanced negotiation logic you can also use the helper
-L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
+For even more advanced negotiation logic you can also use the helper L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
 
 =head2 Rendering C<exception> and C<not_found> pages
 
-By now you've probably already encountered the built-in C<404> (Not Found) and
-C<500> (Server Error) pages, that get rendered automatically when you make a
-mistake. Those are fallbacks for when your own exception handling fails, which
-can be especially helpful during development. You can also render them manually
-with the helpers L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception">
-and L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
+By now you've probably already encountered the built-in C<404> (Not Found) and C<500> (Server Error) pages, that get
+rendered automatically when you make a mistake. Those are fallbacks for when your own exception handling fails, which
+can be especially helpful during development. You can also render them manually with the helpers
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> and
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
   use Mojolicious::Lite;
   use Scalar::Util qw(looks_like_number);
@@ -464,11 +426,9 @@ and L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
   app->start;
 
-You can also change the templates of those pages, since you most likely want to
-show your users something more closely related to your application in
-production. The renderer will always try to find C<exception.$mode.$format.*>
-or C<not_found.$mode.$format.*> before falling back to the built-in default
-templates.
+You can also change the templates of those pages, since you most likely want to show your users something more closely
+related to your application in production. The renderer will always try to find C<exception.$mode.$format.*> or
+C<not_found.$mode.$format.*> before falling back to the built-in default templates.
 
   use Mojolicious::Lite;
 
@@ -489,9 +449,8 @@ templates.
     </body>
   </html>
 
-The hook L<Mojolicious/"before_render"> makes even more advanced customizations
-possible by allowing you to intercept and modify the arguments passed to the
-renderer.
+The hook L<Mojolicious/"before_render"> makes even more advanced customizations possible by allowing you to intercept
+and modify the arguments passed to the renderer.
 
   use Mojolicious::Lite;
 
@@ -513,9 +472,8 @@ renderer.
 
 =head2 Layouts
 
-Most of the time when using C<ep> templates you will want to wrap your
-generated content in an HTML skeleton, thanks to layouts that's absolutely
-trivial.
+Most of the time when using C<ep> templates you will want to wrap your generated content in an HTML skeleton, thanks to
+layouts that's absolutely trivial.
 
   use Mojolicious::Lite;
 
@@ -535,11 +493,9 @@ trivial.
     <body><%= content %></body>
   </html>
 
-You just select the right layout template with the helper
-L<Mojolicious::Plugin::DefaultHelpers/"layout"> and place the result of the
-current template with the helper
-L<Mojolicious::Plugin::DefaultHelpers/"content">. You can also pass along
-normal stash values to the C<layout> helper.
+You just select the right layout template with the helper L<Mojolicious::Plugin::DefaultHelpers/"layout"> and place the
+result of the current template with the helper L<Mojolicious::Plugin::DefaultHelpers/"content">. You can also pass
+along normal stash values to the C<layout> helper.
 
   use Mojolicious::Lite;
 
@@ -559,27 +515,24 @@ normal stash values to the C<layout> helper.
     <body><%= content %></body>
   </html>
 
-Instead of the C<layout> helper you could also just use the C<layout> stash
-value, or call L<Mojolicious::Controller/"render"> with the C<layout> argument.
+Instead of the C<layout> helper you could also just use the C<layout> stash value, or call
+L<Mojolicious::Controller/"render"> with the C<layout> argument.
 
   $c->render(template => 'mytemplate', layout => 'mylayout');
 
-To set a C<layout> stash value application-wide you can use
-L<Mojolicious/"defaults">.
+To set a C<layout> stash value application-wide you can use L<Mojolicious/"defaults">.
 
   $app->defaults(layout => 'mylayout');
 
-Layouts can also be used with L<Mojolicious::Controller/"render_to_string">,
-but the C<layout> value needs to be passed as a render argument (not a stash
-value).
+Layouts can also be used with L<Mojolicious::Controller/"render_to_string">, but the C<layout> value needs to be passed
+as a render argument (not a stash value).
 
   my $html = $c->render_to_string('reminder', layout => 'mail');
 
 =head2 Partial templates
 
-You can break up bigger templates into smaller, more manageable chunks. These
-partial templates can also be shared with other templates. Just use the helper
-L<Mojolicious::Plugin::DefaultHelpers/"include"> to include one template into
+You can break up bigger templates into smaller, more manageable chunks. These partial templates can also be shared with
+other templates. Just use the helper L<Mojolicious::Plugin::DefaultHelpers/"include"> to include one template into
 another.
 
   use Mojolicious::Lite;
@@ -599,16 +552,13 @@ another.
   @@ _header.html.ep
   <head><title><%= $title %></title></head>
 
-You can name partial templates however you like, but a leading underscore is a
-commonly used naming convention.
+You can name partial templates however you like, but a leading underscore is a commonly used naming convention.
 
 =head2 Reusable template blocks
 
-It's never fun to repeat yourself, that's why you can build reusable template
-blocks in C<ep> that work very similar to normal Perl functions, with the
-C<begin> and C<end> keywords. Just be aware that both keywords are part of the
-surrounding tag and not actual Perl code, so there can only be whitespace after
-C<begin> and before C<end>.
+It's never fun to repeat yourself, that's why you can build reusable template blocks in C<ep> that work very similar to
+normal Perl functions, with the C<begin> and C<end> keywords. Just be aware that both keywords are part of the
+surrounding tag and not actual Perl code, so there can only be whitespace after C<begin> and before C<end>.
 
   use Mojolicious::Lite;
 
@@ -640,15 +590,14 @@ A naive translation of the template to Perl code could look like this.
   $output .= xml_escape scalar + $block->('Baerbel');
   return $output;
 
-While template blocks cannot be shared between templates, they are most
-commonly used to pass parts of a template to helpers.
+While template blocks cannot be shared between templates, they are most commonly used to pass parts of a template to
+helpers.
 
 =head2 Adding helpers
 
-You should always try to keep your actions small and reuse as much code as
-possible. Helpers make this very easy, they get passed the current controller
-object as first argument, and you can use them to do pretty much anything an
-action could do.
+You should always try to keep your actions small and reuse as much code as possible. Helpers make this very easy, they
+get passed the current controller object as first argument, and you can use them to do pretty much anything an action
+could do.
 
   use Mojolicious::Lite;
 
@@ -668,9 +617,8 @@ action could do.
   @@ index.html.ep
   % debug 'Hello from a template!';
 
-Helpers can also accept template blocks as last argument, this for example,
-allows very pleasant to use tag helpers and filters. Wrapping the helper result
-into a L<Mojo::ByteStream> object can prevent accidental double escaping.
+Helpers can also accept template blocks as last argument, this for example, allows very pleasant to use tag helpers and
+filters. Wrapping the helper result into a L<Mojo::ByteStream> object can prevent accidental double escaping.
 
   use Mojolicious::Lite;
   use Mojo::ByteStream;
@@ -694,11 +642,9 @@ into a L<Mojo::ByteStream> object can prevent accidental double escaping.
     More text.
   % end
 
-Similar to stash values, you can use a prefix like C<myapp.*> to keep helpers
-from getting exposed in templates as functions, and to organize them into
-namespaces as your application grows. Every prefix automatically becomes a
-helper that returns a proxy object containing the current controller object and
-on which you can call the nested helpers.
+Similar to stash values, you can use a prefix like C<myapp.*> to keep helpers from getting exposed in templates as
+functions, and to organize them into namespaces as your application grows. Every prefix automatically becomes a helper
+that returns a proxy object containing the current controller object and on which you can call the nested helpers.
 
   use Mojolicious::Lite;
 
@@ -726,14 +672,12 @@ on which you can call the nested helpers.
 
   app->start;
 
-While helpers can also be redefined, this should only be done very carefully to
-avoid conflicts.
+While helpers can also be redefined, this should only be done very carefully to avoid conflicts.
 
 =head2 Content blocks
 
-The helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> allows you to
-pass whole blocks of content from one template to another. This can be very
-useful when your layout has distinct sections, such as sidebars, where content
+The helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> allows you to pass whole blocks of content from one
+template to another. This can be very useful when your layout has distinct sections, such as sidebars, where content
 should be inserted by the template.
 
   use Mojolicious::Lite;
@@ -762,12 +706,10 @@ should be inserted by the template.
 
 =head2 Forms
 
-To build HTML forms more efficiently you can use tag helpers like
-L<Mojolicious::Plugin::TagHelpers/"form_for">, which can automatically select a
-request method for you if a route name is provided. And since most browsers
-only allow forms to be submitted with C<GET> and C<POST>, but not request
-methods like C<PUT> or C<DELETE>, they are spoofed with an C<_method> query
-parameter.
+To build HTML forms more efficiently you can use tag helpers like L<Mojolicious::Plugin::TagHelpers/"form_for">, which
+can automatically select a request method for you if a route name is provided. And since most browsers only allow forms
+to be submitted with C<GET> and C<POST>, but not request methods like C<PUT> or C<DELETE>, they are spoofed with an
+C<_method> query parameter.
 
   use Mojolicious::Lite;
 
@@ -801,21 +743,17 @@ parameter.
     </body>
   </html>
 
-The helpers L<Mojolicious::Plugin::DefaultHelpers/"flash"> and
-L<Mojolicious::Plugin::DefaultHelpers/"redirect_to"> are often used together to
-prevent double form submission, allowing users to receive a confirmation message
-that will vanish if they decide to reload the page they've been redirected to.
+The helpers L<Mojolicious::Plugin::DefaultHelpers/"flash"> and L<Mojolicious::Plugin::DefaultHelpers/"redirect_to"> are
+often used together to prevent double form submission, allowing users to receive a confirmation message that will
+vanish if they decide to reload the page they've been redirected to.
 
 =head2 Form validation
 
-You can use L<Mojolicious::Plugin::DefaultHelpers/"validation"> to validate
-C<GET> and C<POST> parameters submitted to your application. All unknown fields
-will be ignored by default, so you have to decide which should be
-L<required|Mojolicious::Validator::Validation/"required"> or
-L<optional|Mojolicious::Validator::Validation/"optional"> before you can perform
-checks on their values. Every check is performed right away, so you can use the
-results immediately to build more advanced validation logic with methods like
-L<Mojolicious::Validator::Validation/"is_valid">.
+You can use L<Mojolicious::Plugin::DefaultHelpers/"validation"> to validate C<GET> and C<POST> parameters submitted to
+your application. All unknown fields will be ignored by default, so you have to decide which should be
+L<required|Mojolicious::Validator::Validation/"required"> or L<optional|Mojolicious::Validator::Validation/"optional">
+before you can perform checks on their values. Every check is performed right away, so you can use the results
+immediately to build more advanced validation logic with methods like L<Mojolicious::Validator::Validation/"is_valid">.
 
   use Mojolicious::Lite;
 
@@ -872,24 +810,21 @@ L<Mojolicious::Validator::Validation/"is_valid">.
   <!DOCTYPE html>
   <html><body>Thank you <%= validation->param('user') %>.</body></html>
 
-Form elements generated with tag helpers from
-L<Mojolicious::Plugin::TagHelpers> will automatically remember their previous
-values and add the class C<field-with-error> for fields that failed validation
-to make styling with CSS easier.
+Form elements generated with tag helpers from L<Mojolicious::Plugin::TagHelpers> will automatically remember their
+previous values and add the class C<field-with-error> for fields that failed validation to make styling with CSS
+easier.
 
   <label class="field-with-error" for="user">
     Username (required, only characters e-t)
   </label>
   <input class="field-with-error" type="text" name="user" value="sri">
 
-For a full list of available checks see also
-L<Mojolicious::Validator/"CHECKS">.
+For a full list of available checks see also L<Mojolicious::Validator/"CHECKS">.
 
 =head2 Adding form validation checks
 
-Validation checks can be registered with L<Mojolicious::Validator/"add_check">
-and return a false value if they were successful. A true value may be used to
-pass along additional information which can then be retrieved with
+Validation checks can be registered with L<Mojolicious::Validator/"add_check"> and return a false value if they were
+successful. A true value may be used to pass along additional information which can then be retrieved with
 L<Mojolicious::Validator::Validation/"error">.
 
   use Mojolicious::Lite;
@@ -942,11 +877,9 @@ L<Mojolicious::Validator::Validation/"error">.
 
 =head2 Cross-site request forgery
 
-CSRF is a very common attack on web applications that trick your logged in
-users to submit forms they did not intend to send, with something as mundane as
-a link. All you have to do, to protect your users from this, is to add an
-additional hidden field to your forms with
-L<Mojolicious::Plugin::TagHelpers/"csrf_field">, and validate it with
+CSRF is a very common attack on web applications that trick your logged in users to submit forms they did not intend to
+send, with something as mundane as a link. All you have to do, to protect your users from this, is to add an additional
+hidden field to your forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field">, and validate it with
 L<Mojolicious::Validator::Validation/"csrf_protect">.
 
   use Mojolicious::Lite;
@@ -982,9 +915,8 @@ L<Mojolicious::Validator::Validation/"csrf_protect">.
     </body>
   </html>
 
-For Ajax requests and the like, you can also generate a token directly with the
-helper L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">, and then pass it
-along with the C<X-CSRF-Token> request header.
+For Ajax requests and the like, you can also generate a token directly with the helper
+L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">, and then pass it along with the C<X-CSRF-Token> request header.
 
 =head1 ADVANCED
 
@@ -993,9 +925,8 @@ Less commonly used and more powerful features.
 =head2 Template inheritance
 
 Inheritance takes the layout concept above one step further, the helpers
-L<Mojolicious::Plugin::DefaultHelpers/"content"> and
-L<Mojolicious::Plugin::DefaultHelpers/"extends"> allow you to build skeleton
-templates with named blocks that child templates can override.
+L<Mojolicious::Plugin::DefaultHelpers/"content"> and L<Mojolicious::Plugin::DefaultHelpers/"extends"> allow you to
+build skeleton templates with named blocks that child templates can override.
 
   use Mojolicious::Lite;
 
@@ -1040,11 +971,9 @@ This chain could go on and on to allow a very high level of template reuse.
 
 =head2 Serving static files
 
-Static files are automatically served from the C<public> directories of the
-application, which can be customized with L<Mojolicious::Static/"paths">, or one
-of the C<DATA> sections from L<Mojolicious::Static/"classes">. And if that's not
-enough you can also serve them manually with
-L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static"> and
+Static files are automatically served from the C<public> directories of the application, which can be customized with
+L<Mojolicious::Static/"paths">, or one of the C<DATA> sections from L<Mojolicious::Static/"classes">. And if that's not
+enough you can also serve them manually with L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static"> and
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>file">.
 
   use Mojolicious::Lite;
@@ -1069,12 +998,10 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>file">.
 
 =head2 Custom responses
 
-Most response content, static as well as dynamic, gets served through
-L<Mojo::Asset::File> and L<Mojo::Asset::Memory> objects. For somewhat static
-content, like cached JSON data or temporary files, you can create your own and
-use the helper L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>asset"> to
-serve them while allowing content negotiation to be performed with C<Range>,
-C<If-Modified-Since> and C<If-None-Match> headers.
+Most response content, static as well as dynamic, gets served through L<Mojo::Asset::File> and L<Mojo::Asset::Memory>
+objects. For somewhat static content, like cached JSON data or temporary files, you can create your own and use the
+helper L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>asset"> to serve them while allowing content negotiation to be
+performed with C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
 
   use Mojolicious::Lite;
   use Mojo::Asset::File;
@@ -1087,9 +1014,8 @@ C<If-Modified-Since> and C<If-None-Match> headers.
 
   app->start;
 
-For even more control you can also just skip the helper and use
-L<Mojolicious::Controller/"rendered"> to tell the renderer when you're done
-generating a response.
+For even more control you can also just skip the helper and use L<Mojolicious::Controller/"rendered"> to tell the
+renderer when you're done generating a response.
 
   use Mojolicious::Lite;
   use Mojo::Asset::File;
@@ -1105,8 +1031,7 @@ generating a response.
 
 =head2 Helper plugins
 
-Some helpers might be useful enough for you to share them between multiple
-applications, plugins make that very simple.
+Some helpers might be useful enough for you to share them between multiple applications, plugins make that very simple.
 
   package Mojolicious::Plugin::DebugHelper;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -1121,8 +1046,8 @@ applications, plugins make that very simple.
 
   1;
 
-The C<register> method will be called when you load the plugin. And to add your
-helper to the application, you can use L<Mojolicious/"helper">.
+The C<register> method will be called when you load the plugin. And to add your helper to the application, you can use
+L<Mojolicious/"helper">.
 
   use Mojolicious::Lite;
 
@@ -1136,14 +1061,12 @@ helper to the application, you can use L<Mojolicious/"helper">.
 
   app->start;
 
-A skeleton for a full CPAN compatible plugin distribution can be automatically
-generated.
+A skeleton for a full CPAN compatible plugin distribution can be automatically generated.
 
   $ mojo generate plugin DebugHelper
 
-And if you have a C<PAUSE> account (which can be requested at
-L<http://pause.perl.org>), you are only a few commands away from releasing it
-to CPAN.
+And if you have a C<PAUSE> account (which can be requested at L<http://pause.perl.org>), you are only a few commands
+away from releasing it to CPAN.
 
   $ perl Makefile.PL
   $ make test
@@ -1153,8 +1076,8 @@ to CPAN.
 
 =head2 Bundling assets with plugins
 
-Assets such as templates and static files can be easily bundled with your
-plugins, even if you plan to release them to CPAN.
+Assets such as templates and static files can be easily bundled with your plugins, even if you plan to release them to
+CPAN.
 
   $ mojo generate plugin AlertAssets
   $ mkdir Mojolicious-Plugin-AlertAssets/lib/Mojolicious/Plugin/AlertAssets
@@ -1164,9 +1087,8 @@ plugins, even if you plan to release them to CPAN.
   $ mkdir templates
   $ echo '%= javascript "/alertassets.js"' > templates/alertassets.html.ep
 
-Just give them reasonably unique names, ideally based on the name of your
-plugin, and append their respective directories to the list of search paths
-when C<register> is called.
+Just give them reasonably unique names, ideally based on the name of your plugin, and append their respective
+directories to the list of search paths when C<register> is called.
 
   package Mojolicious::Plugin::AlertAssets;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -1184,8 +1106,8 @@ when C<register> is called.
 
   1;
 
-Both will work just like normal C<templates> and C<public> directories once
-you've installed and loaded the plugin, with slightly lower precedence.
+Both will work just like normal C<templates> and C<public> directories once you've installed and loaded the plugin,
+with slightly lower precedence.
 
   use Mojolicious::Lite;
 
@@ -1206,8 +1128,7 @@ you've installed and loaded the plugin, with slightly lower precedence.
     <body>You've been alerted.</body>
   </html>
 
-And it works just the same for assets bundled in the C<DATA> section of your
-plugin.
+And it works just the same for assets bundled in the C<DATA> section of your plugin.
 
   package Mojolicious::Plugin::AlertAssets;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -1231,9 +1152,8 @@ plugin.
 
 =head2 Post-processing dynamic content
 
-While post-processing tasks are generally very easy with the hook
-L<Mojolicious/"after_dispatch">, for content generated by the renderer it is a
-lot more efficient to use L<Mojolicious/"after_render">.
+While post-processing tasks are generally very easy with the hook L<Mojolicious/"after_dispatch">, for content
+generated by the renderer it is a lot more efficient to use L<Mojolicious/"after_render">.
 
   use Mojolicious::Lite;
   use IO::Compress::Gzip qw(gzip);
@@ -1266,14 +1186,12 @@ lot more efficient to use L<Mojolicious/"after_render">.
     <body>Compressed content.</body>
   </html>
 
-If you want to compress all dynamically generated content you can also activate
-L<Mojolicious::Renderer/"compress">.
+If you want to compress all dynamically generated content you can also activate L<Mojolicious::Renderer/"compress">.
 
 =head2 Streaming
 
-You don't have to render all content at once, the method
-L<Mojolicious::Controller/"write"> can also be used to stream a series of
-smaller chunks.
+You don't have to render all content at once, the method L<Mojolicious::Controller/"write"> can also be used to stream
+a series of smaller chunks.
 
   use Mojolicious::Lite;
 
@@ -1295,8 +1213,7 @@ smaller chunks.
 
   app->start;
 
-The drain callback will be executed whenever the entire previous chunk of data
-has actually been written.
+The drain callback will be executed whenever the entire previous chunk of data has actually been written.
 
   HTTP/1.1 200 OK
   Date: Sat, 13 Sep 2014 16:48:29 GMT
@@ -1305,9 +1222,8 @@ has actually been written.
 
   Hello World!
 
-Instead of providing a C<Content-Length> header you can also call
-L<Mojolicious::Controller/"finish"> and close the connection manually once you
-are done.
+Instead of providing a C<Content-Length> header you can also call L<Mojolicious::Controller/"finish"> and close the
+connection manually once you are done.
 
   use Mojolicious::Lite;
 
@@ -1328,8 +1244,8 @@ are done.
 
   app->start;
 
-While this is rather inefficient, as it prevents keep-alive, it is sometimes
-necessary for EventSource and similar applications.
+While this is rather inefficient, as it prevents keep-alive, it is sometimes necessary for EventSource and similar
+applications.
 
   HTTP/1.1 200 OK
   Date: Sat, 13 Sep 2014 16:48:29 GMT
@@ -1340,11 +1256,9 @@ necessary for EventSource and similar applications.
 
 =head2 Chunked transfer encoding
 
-For very dynamic content you might not know the response content length in
-advance, that's where the chunked transfer encoding and
-L<Mojolicious::Controller/"write_chunk"> come in handy. A common use would be
-to send the C<head> section of an HTML document to the browser in advance and
-speed up preloading of referenced images and stylesheets.
+For very dynamic content you might not know the response content length in advance, that's where the chunked transfer
+encoding and L<Mojolicious::Controller/"write_chunk"> come in handy. A common use would be to send the C<head> section
+of an HTML document to the browser in advance and speed up preloading of referenced images and stylesheets.
 
   use Mojolicious::Lite;
 
@@ -1358,9 +1272,8 @@ speed up preloading of referenced images and stylesheets.
 
   app->start;
 
-The optional drain callback ensures that all previous chunks have been written
-before processing continues. To end the stream you can call
-L<Mojolicious::Controller/"finish"> or write an empty chunk of data.
+The optional drain callback ensures that all previous chunks have been written before processing continues. To end the
+stream you can call L<Mojolicious::Controller/"finish"> or write an empty chunk of data.
 
   HTTP/1.1 200 OK
   Date: Sat, 13 Sep 2014 16:48:29 GMT
@@ -1373,19 +1286,17 @@ L<Mojolicious::Controller/"finish"> or write an empty chunk of data.
   <body>Example</body></html>
   0
 
-Especially in combination with long inactivity timeouts this can be very useful
-for Comet (long polling). Due to limitations in some web servers this might not
-work perfectly in all deployment environments.
+Especially in combination with long inactivity timeouts this can be very useful for Comet (long polling). Due to
+limitations in some web servers this might not work perfectly in all deployment environments.
 
 =head2 Encoding
 
-Templates stored in files are expected to be C<UTF-8> by default, but that can
-be easily changed with L<Mojolicious::Renderer/"encoding">.
+Templates stored in files are expected to be C<UTF-8> by default, but that can be easily changed with
+L<Mojolicious::Renderer/"encoding">.
 
   $app->renderer->encoding('koi8-r');
 
-All templates from the C<DATA> section are bound to the encoding of the Perl
-script.
+All templates from the C<DATA> section are bound to the encoding of the Perl script.
 
   use Mojolicious::Lite;
 
@@ -1399,8 +1310,8 @@ script.
 
 =head2 Base64 encoded DATA files
 
-Base64 encoded static files such as images can be easily stored in the C<DATA>
-section of your application, similar to templates.
+Base64 encoded static files such as images can be easily stored in the C<DATA> section of your application, similar to
+templates.
 
   use Mojolicious::Lite;
 
@@ -1414,19 +1325,17 @@ section of your application, similar to templates.
 
 =head2 Inflating DATA templates
 
-Templates stored in files get preferred over files from the C<DATA> section,
-this allows you to include a default set of templates in your application that
-the user can later customize. The command
-L<Mojolicious::Command::Author::inflate> will write all templates and static
-files from the C<DATA> section into actual files in the C<templates> and
-C<public> directories.
+Templates stored in files get preferred over files from the C<DATA> section, this allows you to include a default set
+of templates in your application that the user can later customize. The command
+L<Mojolicious::Command::Author::inflate> will write all templates and static files from the C<DATA> section into actual
+files in the C<templates> and C<public> directories.
 
   $ ./myapp.pl inflate
 
 =head2 Customizing the template syntax
 
-You can easily change the whole template syntax by loading
-L<Mojolicious::Plugin::EPRenderer> with a custom configuration.
+You can easily change the whole template syntax by loading L<Mojolicious::Plugin::EPRenderer> with a custom
+configuration.
 
   use Mojolicious::Lite;
 
@@ -1450,9 +1359,8 @@ L<Mojo::Template> contains the whole list of available options.
 
 =head2 Adding your favorite template system
 
-Maybe you would prefer a different template system than C<ep>, which is provided
-by L<Mojolicious::Plugin::EPRenderer>, and there is not already a plugin on CPAN
-for your favorite one. All you have to do, is to add a new C<handler> with
+Maybe you would prefer a different template system than C<ep>, which is provided by L<Mojolicious::Plugin::EPRenderer>,
+and there is not already a plugin on CPAN for your favorite one. All you have to do, is to add a new C<handler> with
 L<Mojolicious::Renderer/"add_handler"> when C<register> is called.
 
   package Mojolicious::Plugin::MyRenderer;
@@ -1487,9 +1395,8 @@ L<Mojolicious::Renderer/"add_handler"> when C<register> is called.
 
   1;
 
-An C<inline> template, if provided by the user, will be passed along with the
-options. You can use L<Mojolicious::Renderer/"template_path"> to search the
-C<templates> directories of the application, and
+An C<inline> template, if provided by the user, will be passed along with the options. You can use
+L<Mojolicious::Renderer/"template_path"> to search the C<templates> directories of the application, and
 L<Mojolicious::Renderer/"get_data_template"> to search the C<DATA> sections.
 
   use Mojolicious::Lite;
@@ -1510,9 +1417,8 @@ L<Mojolicious::Renderer/"get_data_template"> to search the C<DATA> sections.
 
 =head2 Adding a handler to generate binary data
 
-By default the renderer assumes that every C<handler> generates characters that
-need to be automatically encoded, but this can be easily disabled if you're
-generating bytes instead.
+By default the renderer assumes that every C<handler> generates characters that need to be automatically encoded, but
+this can be easily disabled if you're generating bytes instead.
 
   use Mojolicious::Lite;
   use Storable qw(nfreeze);
@@ -1539,9 +1445,8 @@ generating bytes instead.
 
   app->start;
 
-The hook L<Mojolicious/"before_render"> can be used to make stash values like
-C<storable> special, so that they no longer require a C<handler> value to be set
-explicitly.
+The hook L<Mojolicious/"before_render"> can be used to make stash values like C<storable> special, so that they no
+longer require a C<handler> value to be set explicitly.
 
   # Explicit "handler" value
   $c->render(storable => {i => '♥ mojolicious'}, handler => 'storable');
@@ -1551,16 +1456,14 @@ explicitly.
 
 =head1 MORE
 
-You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
-lot more documentation and examples by many different authors.
+You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious
+wiki|http://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
+authors.
 
 =head1 SUPPORT
 
-If you have any questions the documentation might not yet answer, don't
-hesitate to ask on the
-L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.freenode.net> (L<chat
+If you have any questions the documentation might not yet answer, don't hesitate to ask on the L<mailing
+list|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
 now!|https://webchat.freenode.net/#mojo>).
 
 =cut

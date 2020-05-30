@@ -134,8 +134,7 @@ sub _compile {
   $regex = $block . $regex if $block;
 
   # Format
-  $regex .= _compile_format($constraints->{format}, $defaults->{format})
-    if $detect;
+  $regex .= _compile_format($constraints->{format}, $defaults->{format}) if $detect;
 
   $self->regex(qr/^$regex/ps);
 }
@@ -298,8 +297,7 @@ Character indicating a relaxed placeholder, defaults to C<#>.
   my $tree = $pattern->tree;
   $pattern = $pattern->tree([['text', '/foo']]);
 
-Pattern in parsed form. Note that this structure should only be used very
-carefully since it is very dynamic.
+Pattern in parsed form. Note that this structure should only be used very carefully since it is very dynamic.
 
 =head2 type_start
 
@@ -331,8 +329,7 @@ Character indicating the start of a wildcard placeholder, defaults to C<*>.
 
 =head1 METHODS
 
-L<Mojolicious::Routes::Pattern> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojolicious::Routes::Pattern> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 match
 
@@ -346,8 +343,7 @@ Match pattern against entire path, format detection is disabled by default.
   my $captures = $pattern->match_partial(\$path);
   my $captures = $pattern->match_partial(\$path, 1);
 
-Match pattern against path and remove matching parts, format detection is
-disabled by default.
+Match pattern against path and remove matching parts, format detection is disabled by default.
 
 =head2 new
 
@@ -357,8 +353,7 @@ disabled by default.
     = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
   my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
-Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern
-if necessary.
+Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern if necessary.
 
 =head2 parse
 
@@ -373,8 +368,7 @@ Parse pattern.
   my $path = $pattern->render({action => 'foo'});
   my $path = $pattern->render({action => 'foo'}, 1);
 
-Render pattern into a path with parameters, format rendering is disabled by
-default.
+Render pattern into a path with parameters, format rendering is disabled by default.
 
 =head1 SEE ALSO
 

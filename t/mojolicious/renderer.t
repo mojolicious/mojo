@@ -27,22 +27,19 @@ is_deeply [$renderer->render($c)], ['Hello Mojo!', 'test'], 'normal rendering';
 $c->stash->{format}   = 'something';
 $c->stash->{template} = 'something';
 $c->stash->{handler}  = 'debug';
-is_deeply [$renderer->render($c)], ['Hello Mojo!', 'something'],
-  'normal rendering';
+is_deeply [$renderer->render($c)], ['Hello Mojo!', 'something'], 'normal rendering';
 
 # Normal rendering with layout
 delete $c->stash->{format};
 $c->stash->{template} = 'something';
 $c->stash->{layout}   = 'something';
 $c->stash->{handler}  = 'debug';
-is_deeply [$renderer->render($c)], ['Hello Mojo!Hello Mojo!', 'test'],
-  'normal rendering with layout';
+is_deeply [$renderer->render($c)], ['Hello Mojo!Hello Mojo!', 'test'], 'normal rendering with layout';
 
 # Rendering a path with dots
 $c->stash->{template} = 'some.path.with.dots/template';
 $c->stash->{handler}  = 'debug';
-is_deeply [$renderer->render($c)], ['Hello Mojo!', 'test'],
-  'rendering a path with dots';
+is_deeply [$renderer->render($c)], ['Hello Mojo!', 'test'], 'rendering a path with dots';
 
 # Unrecognized handler
 my $log = '';
@@ -95,16 +92,14 @@ is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
 
 # Reuse proxy objects
 my $helpers = $first->helpers;
-is $helpers->myapp->multi_level->test, $helpers->myapp->multi_level->test,
-  'same result';
+is $helpers->myapp->multi_level->test, $helpers->myapp->multi_level->test, 'same result';
 
 # Compression (disabled)
 my $output = 'a' x 1000;
 $c = $app->build_controller;
 $c->req->headers->accept_encoding('gzip');
 $renderer->respond($c, $output, 'html');
-is $c->res->headers->content_type, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
+is $c->res->headers->content_type, 'text/html;charset=UTF-8', 'right "Content-Type" value';
 ok !$c->res->headers->vary,             'no "Vary" value';
 ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
@@ -114,10 +109,9 @@ $renderer->compress(1);
 $c = $app->build_controller;
 $c->req->headers->accept_encoding('gzip');
 $renderer->respond($c, $output, 'html');
-is $c->res->headers->content_type, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
-is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
-is $c->res->headers->content_encoding, 'gzip', 'right "Content-Encoding" value';
+is $c->res->headers->content_type,     'text/html;charset=UTF-8', 'right "Content-Type" value';
+is $c->res->headers->vary,             'Accept-Encoding',         'right "Vary" value';
+is $c->res->headers->content_encoding, 'gzip',                    'right "Content-Encoding" value';
 isnt $c->res->body, $output, 'different string';
 is gunzip($c->res->body), $output, 'same string';
 
@@ -125,9 +119,8 @@ is gunzip($c->res->body), $output, 'same string';
 $c = $app->build_controller;
 $renderer->respond($c, $output, 'html');
 is $c->res->code, 200, 'right status';
-is $c->res->headers->content_type, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
-is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
+is $c->res->headers->content_type, 'text/html;charset=UTF-8', 'right "Content-Type" value';
+is $c->res->headers->vary,         'Accept-Encoding',         'right "Vary" value';
 ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
 
@@ -136,11 +129,9 @@ $c = $app->build_controller;
 $c->res->headers->content_encoding('whatever');
 $renderer->respond($c, $output, 'html', 500);
 is $c->res->code, 500, 'right status';
-is $c->res->headers->content_type, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
-is $c->res->headers->vary, 'Accept-Encoding', 'right "Vary" value';
-is $c->res->headers->content_encoding, 'whatever',
-  'right "Content-Encoding" value';
+is $c->res->headers->content_type,     'text/html;charset=UTF-8', 'right "Content-Type" value';
+is $c->res->headers->vary,             'Accept-Encoding',         'right "Vary" value';
+is $c->res->headers->content_encoding, 'whatever',                'right "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
 
 # Compression (below minimum length)
@@ -148,8 +139,7 @@ $output = 'a' x 850;
 $c      = $app->build_controller;
 $c->req->headers->accept_encoding('gzip');
 $renderer->respond($c, $output, 'html');
-is $c->res->headers->content_type, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
+is $c->res->headers->content_type, 'text/html;charset=UTF-8', 'right "Content-Type" value';
 ok !$c->res->headers->vary,             'no "Vary" value';
 ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
@@ -157,20 +147,16 @@ is $c->res->body, $output, 'same string';
 # Missing method (AUTOLOAD)
 my $class = ref $first->myapp;
 eval { $first->myapp->missing };
-like $@, qr/^Can't locate object method "missing" via package "$class"/,
-  'right error';
+like $@, qr/^Can't locate object method "missing" via package "$class"/, 'right error';
 eval { $first->app->myapp->missing };
-like $@, qr/^Can't locate object method "missing" via package "$class"/,
-  'right error';
+like $@, qr/^Can't locate object method "missing" via package "$class"/, 'right error';
 
 # No leaky namespaces
 my $helper_class = ref $second->myapp;
 is ref $second->myapp, $helper_class, 'same class';
 ok $helper_class->can('defaults'), 'helpers are active';
-my $template_class = decode 'UTF-8',
-  $second->render_to_string(inline => "<%= __PACKAGE__ =%>");
-is decode('UTF-8', $second->render_to_string(inline => "<%= __PACKAGE__ =%>")),
-  $template_class, 'same class';
+my $template_class = decode 'UTF-8', $second->render_to_string(inline => "<%= __PACKAGE__ =%>");
+is decode('UTF-8', $second->render_to_string(inline => "<%= __PACKAGE__ =%>")), $template_class, 'same class';
 ok $template_class->can('stash'), 'helpers are active';
 undef $app2;
 ok !$helper_class->can('defaults'), 'helpers have been cleaned up';

@@ -176,11 +176,9 @@ $loop->client(
   }
 );
 my $fd = fileno $loop->acceptor($id)->handle;
-like $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/,
-  'file descriptor can be reused';
+like $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/, 'file descriptor can be reused';
 $loop->start;
-unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/,
-  'environment is clean';
+unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/, 'environment is clean';
 ok $connected, 'connected';
 ok !$loop->acceptor($id), 'acceptor has been removed';
 
@@ -273,9 +271,8 @@ undef $stream;
 # Graceful shutdown
 $err  = '';
 $loop = Mojo::IOLoop->new;
-$port
-  = $loop->acceptor($loop->server({address => '127.0.0.1'} => sub { }))->port;
-$id = $loop->client({port => $port} => sub { shift->stop_gracefully });
+$port = $loop->acceptor($loop->server({address => '127.0.0.1'} => sub { }))->port;
+$id   = $loop->client({port => $port} => sub { shift->stop_gracefully });
 my $finish;
 $loop->on(finish => sub { ++$finish and shift->stream($id)->close });
 $loop->timer(30 => sub { shift->stop; $err = 'failed' });
@@ -337,21 +334,9 @@ ok !$accepting[1], 'connection limit reached';
 }
 
 # Defaults
-is(
-  Mojo::IOLoop::Client->new->reactor,
-  Mojo::IOLoop->singleton->reactor,
-  'right default'
-);
-is(Mojo::IOLoop::Delay->new->ioloop, Mojo::IOLoop->singleton, 'right default');
-is(
-  Mojo::IOLoop::Server->new->reactor,
-  Mojo::IOLoop->singleton->reactor,
-  'right default'
-);
-is(
-  Mojo::IOLoop::Stream->new->reactor,
-  Mojo::IOLoop->singleton->reactor,
-  'right default'
-);
+is(Mojo::IOLoop::Client->new->reactor, Mojo::IOLoop->singleton->reactor, 'right default');
+is(Mojo::IOLoop::Delay->new->ioloop,   Mojo::IOLoop->singleton,          'right default');
+is(Mojo::IOLoop::Server->new->reactor, Mojo::IOLoop->singleton->reactor, 'right default');
+is(Mojo::IOLoop::Stream->new->reactor, Mojo::IOLoop->singleton->reactor, 'right default');
 
 done_testing();

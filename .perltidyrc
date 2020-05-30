@@ -1,7 +1,7 @@
 -pbp     # Start with Perl Best Practices
 -w       # Show all warnings
 -iob     # Ignore old breakpoints
--l=80    # 80 characters per line
+-l=120   # 120 characters per line
 -mbl=2   # No more than 2 blank lines
 -i=2     # Indentation is 2 columns
 -ci=2    # Continuation indentation is 2 columns

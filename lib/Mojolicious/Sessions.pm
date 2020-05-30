@@ -27,7 +27,7 @@ sub load {
   my $stash = $c->stash;
   return unless $stash->{'mojo.active_session'} = keys %$session;
   $stash->{'mojo.session'} = $session;
-  $session->{flash} = delete $session->{new_flash} if $session->{new_flash};
+  $session->{flash}        = delete $session->{new_flash} if $session->{new_flash};
 }
 
 sub store {
@@ -46,8 +46,7 @@ sub store {
   # Generate "expires" value from "expiration" if necessary
   my $expiration = $session->{expiration} // $self->default_expiration;
   my $default    = delete $session->{expires};
-  $session->{expires} = $default || time + $expiration
-    if $expiration || $default;
+  $session->{expires} = $default || time + $expiration if $expiration || $default;
 
   my $value = b64_encode $self->serialize->($session), '';
   $value =~ y/=/-/;
@@ -80,10 +79,9 @@ Mojolicious::Sessions - Session manager based on signed cookies
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Sessions> manages sessions based on signed cookies for
-L<Mojolicious>. All data gets serialized with L<Mojo::JSON> and stored Base64
-encoded on the client-side, but is protected from unwanted changes with a
-HMAC-SHA1 signature.
+L<Mojolicious::Sessions> manages sessions based on signed cookies for L<Mojolicious>. All data gets serialized with
+L<Mojo::JSON> and stored Base64 encoded on the client-side, but is protected from unwanted changes with a HMAC-SHA1
+signature.
 
 =head1 ATTRIBUTES
 
@@ -115,11 +113,9 @@ Path for session cookies, defaults to C</>.
   my $time  = $sessions->default_expiration;
   $sessions = $sessions->default_expiration(3600);
 
-Default time for sessions to expire in seconds from now, defaults to C<3600>.
-The expiration timeout gets refreshed for every request. Setting the value to
-C<0> will allow sessions to persist until the browser window is closed, this
-can have security implications though. For more control you can also use the
-C<expiration> and C<expires> session values.
+Default time for sessions to expire in seconds from now, defaults to C<3600>. The expiration timeout gets refreshed for
+every request. Setting the value to C<0> will allow sessions to persist until the browser window is closed, this can
+have security implications though. For more control you can also use the C<expiration> and C<expires> session values.
 
   # Expiration date in seconds from now (persists between requests)
   $c->session(expiration => 604800);
@@ -147,10 +143,9 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
   my $samesite = $sessions->samesite;
   $sessions    = $sessions->samesite('Strict');
 
-Set the SameSite value on all session cookies, defaults to C<Lax>. Note that
-this attribute is B<EXPERIMENTAL> because even though most commonly used
-browsers support the feature, there is no specification yet besides
-L<this draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
+Set the SameSite value on all session cookies, defaults to C<Lax>. Note that this attribute is B<EXPERIMENTAL> because
+even though most commonly used browsers support the feature, there is no specification yet besides L<this
+draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
 
   # Disable SameSite feature
   $sessions->samesite(undef);
@@ -160,8 +155,7 @@ L<this draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
   my $bool  = $sessions->secure;
   $sessions = $sessions->secure($bool);
 
-Set the secure flag on all session cookies, so that browsers send them only
-over HTTPS connections.
+Set the secure flag on all session cookies, so that browsers send them only over HTTPS connections.
 
 =head2 serialize
 
@@ -177,8 +171,7 @@ A callback used to serialize sessions, defaults to L<Mojo::JSON/"encode_json">.
 
 =head1 METHODS
 
-L<Mojolicious::Sessions> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojolicious::Sessions> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 load
 

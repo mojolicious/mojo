@@ -29,21 +29,18 @@ Mojolicious::Plugin - Plugin base class
 
 L<Mojolicious::Plugin> is an abstract base class for L<Mojolicious> plugins.
 
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available by default.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojolicious::Plugin> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 register
 
   $plugin->register(Mojolicious->new);
   $plugin->register(Mojolicious->new, {foo => 'bar'});
 
-This method will be called by L<Mojolicious::Plugins> at startup time. Meant to
-be overloaded in a subclass.
+This method will be called by L<Mojolicious::Plugins> at startup time. Meant to be overloaded in a subclass.
 
 =head1 SEE ALSO
 

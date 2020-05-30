@@ -10,24 +10,14 @@ use Mojo::UserAgent::CookieJar;
 my $jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(Mojo::Cookie::Response->new(domain => 'example.com'));
 $jar->add(Mojo::Cookie::Response->new(name   => 'foo'));
-$jar->add(Mojo::Cookie::Response->new(name => 'foo', domain => 'example.com'));
+$jar->add(Mojo::Cookie::Response->new(name   => 'foo', domain => 'example.com'));
 $jar->add(Mojo::Cookie::Response->new(domain => 'example.com', path => '/'));
 is_deeply $jar->all, [], 'no cookies';
 
 # Session cookie
 $jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar'
-  ),
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/',
-    name   => 'just',
-    value  => 'works'
-  )
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'foo',  value => 'bar'),
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/',    name => 'just', value => 'works')
 );
 my $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
 is $cookies->[0]->name,  'foo',   'right name';
@@ -66,18 +56,8 @@ is $cookies->[0], undef, 'no cookies';
 # "localhost"
 $jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'localhost',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar'
-  ),
-  Mojo::Cookie::Response->new(
-    domain => 'foo.localhost',
-    path   => '/foo',
-    name   => 'bar',
-    value  => 'baz'
-  )
+  Mojo::Cookie::Response->new(domain => 'localhost',     path => '/foo', name => 'foo', value => 'bar'),
+  Mojo::Cookie::Response->new(domain => 'foo.localhost', path => '/foo', name => 'bar', value => 'baz')
 );
 $cookies = $jar->find(Mojo::URL->new('http://localhost/foo'));
 is $cookies->[0]->name,  'foo', 'right name';
@@ -103,24 +83,9 @@ is $cookies->[2], undef, 'no third cookie';
 # Huge cookie
 $jar = Mojo::UserAgent::CookieJar->new->max_cookie_size(1024);
 $jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'small',
-    value  => 'x'
-  ),
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'big',
-    value  => 'x' x 1024
-  ),
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'huge',
-    value  => 'x' x 1025
-  )
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'small', value => 'x'),
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'big',   value => 'x' x 1024),
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'huge',  value => 'x' x 1025)
 );
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
 is $cookies->[0]->name,  'small', 'right name';
@@ -132,33 +97,11 @@ is $cookies->[2], undef, 'no second cookie';
 # Expired cookies
 $jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar'
-  ),
-  Mojo::Cookie::Response->new(
-    domain  => 'labs.example.com',
-    path    => '/',
-    name    => 'baz',
-    value   => '24',
-    max_age => -1
-  ),
-  Mojo::Cookie::Response->new(
-    domain  => 'labs.example.com',
-    path    => '/',
-    name    => 'qux',
-    value   => 'qux',
-    max_age => 0
-  )
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'foo', value => 'bar'),
+  Mojo::Cookie::Response->new(domain => 'labs.example.com', path => '/', name => 'baz', value => '24', max_age => -1),
+  Mojo::Cookie::Response->new(domain => 'labs.example.com', path => '/', name => 'qux', value => 'qux', max_age => 0)
 );
-my $expired = Mojo::Cookie::Response->new(
-  domain => 'labs.example.com',
-  path   => '/',
-  name   => 'baz',
-  value  => '23'
-);
+my $expired = Mojo::Cookie::Response->new(domain => 'labs.example.com', path => '/', name => 'baz', value => '23');
 $jar->add($expired->expires(time - 1));
 $cookies = $jar->find(Mojo::URL->new('http://labs.example.com/foo'));
 is $cookies->[0]->name,  'foo', 'right name';
@@ -168,18 +111,8 @@ is $cookies->[1], undef, 'no second cookie';
 # Replace cookie
 $jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar1'
-  ),
-  Mojo::Cookie::Response->new(
-    domain => 'example.com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar2'
-  )
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'foo', value => 'bar1'),
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'foo', value => 'bar2')
 );
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
 is $cookies->[0]->name,  'foo',  'right name';
@@ -188,24 +121,14 @@ is $cookies->[1], undef, 'no second cookie';
 
 # Switch between secure and normal cookies
 $jar = Mojo::UserAgent::CookieJar->new;
-$jar->add(Mojo::Cookie::Response->new(
-  domain => 'example.com',
-  path   => '/foo',
-  name   => 'foo',
-  value  => 'foo',
-  secure => 1
-));
+$jar->add(
+  Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'foo', value => 'foo', secure => 1));
 $cookies = $jar->find(Mojo::URL->new('https://example.com/foo'));
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'foo', 'right value';
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
 is scalar @$cookies, 0, 'no insecure cookie';
-$jar->add(Mojo::Cookie::Response->new(
-  domain => 'example.com',
-  path   => '/foo',
-  name   => 'foo',
-  value  => 'bar'
-));
+$jar->add(Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'foo', value => 'bar'));
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';
@@ -216,12 +139,7 @@ is $cookies->[1], undef, 'no second cookie';
 
 # "(" in path
 $jar = Mojo::UserAgent::CookieJar->new;
-$jar->add(Mojo::Cookie::Response->new(
-  domain => 'example.com',
-  path   => '/foo(bar',
-  name   => 'foo',
-  value  => 'bar'
-));
+$jar->add(Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo(bar', name => 'foo', value => 'bar'));
 $cookies = $jar->find(Mojo::URL->new('http://example.com/foo(bar'));
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';
@@ -235,8 +153,7 @@ is $cookies->[1], undef, 'no second cookie';
 $jar = Mojo::UserAgent::CookieJar->new;
 my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicious.org/perldoc/Mojolicious');
-$tx->res->cookies(
-  Mojo::Cookie::Response->new(name => 'foo', value => 'without'));
+$tx->res->cookies(Mojo::Cookie::Response->new(name => 'foo', value => 'without'));
 $jar->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicious.org/perldoc');
@@ -269,14 +186,8 @@ is $tx->req->cookie('foo'), undef, 'no cookie';
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://example.com/test');
-$tx->res->cookies(
-  Mojo::Cookie::Response->new(name => 'foo', value => 'without'),
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'with',
-    domain => 'example.com'
-  )
-);
+$tx->res->cookies(Mojo::Cookie::Response->new(name => 'foo', value => 'without'),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'with', domain => 'example.com'));
 $jar->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://example.com/test');
@@ -298,16 +209,8 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://localhost:3000');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'local',
-    domain => 'localhost'
-  ),
-  Mojo::Cookie::Response->new(
-    name   => 'bar',
-    value  => 'local',
-    domain => 'bar.localhost'
-  )
+  Mojo::Cookie::Response->new(name => 'foo', value => 'local', domain => 'localhost'),
+  Mojo::Cookie::Response->new(name => 'bar', value => 'local', domain => 'bar.localhost')
 );
 $jar->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
@@ -322,18 +225,8 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://bücher.com/foo');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    domain => 'com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar'
-  ),
-  Mojo::Cookie::Response->new(
-    domain => 'xn--bcher-kva.com',
-    path   => '/foo',
-    name   => 'bar',
-    value  => 'baz'
-  )
+  Mojo::Cookie::Response->new(domain => 'com',               path => '/foo', name => 'foo', value => 'bar'),
+  Mojo::Cookie::Response->new(domain => 'xn--bcher-kva.com', path => '/foo', name => 'bar', value => 'baz')
 );
 $jar->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
@@ -349,18 +242,8 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://bücher.com/foo');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    domain => 'com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar'
-  ),
-  Mojo::Cookie::Response->new(
-    domain => 'xn--bcher-kva.com',
-    path   => '/foo',
-    name   => 'bar',
-    value  => 'baz'
-  )
+  Mojo::Cookie::Response->new(domain => 'com',               path => '/foo', name => 'foo', value => 'bar'),
+  Mojo::Cookie::Response->new(domain => 'xn--bcher-kva.com', path => '/foo', name => 'bar', value => 'baz')
 );
 $jar->ignore(sub { shift->domain eq 'com' })->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
@@ -375,18 +258,8 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://LABS.bücher.Com/perldoc/Mojolicious');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'with',
-    domain => 'labs.xn--bcher-kva.com',
-    path   => '/perldoc'
-  ),
-  Mojo::Cookie::Response->new(
-    name   => 'bar',
-    value  => 'with',
-    domain => 'xn--bcher-kva.com',
-    path   => '/'
-  ),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'with', domain => 'labs.xn--bcher-kva.com', path => '/perldoc'),
+  Mojo::Cookie::Response->new(name => 'bar', value => 'with', domain => 'xn--bcher-kva.com',      path => '/'),
   Mojo::Cookie::Response->new(
     name   => '0',
     value  => 'with',
@@ -423,14 +296,8 @@ is $tx->req->cookie('bar')->value, 'with', 'right value';
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
-$tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'valid',
-    domain => '213.133.102.53'
-  ),
-  Mojo::Cookie::Response->new(name => 'bar', value => 'too')
-);
+$tx->res->cookies(Mojo::Cookie::Response->new(name => 'foo', value => 'valid', domain => '213.133.102.53'),
+  Mojo::Cookie::Response->new(name => 'bar', value => 'too'));
 $jar->collect($tx);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
@@ -445,11 +312,7 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://example.com');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    name    => 'foo',
-    value   => 'bar',
-    max_age => 'invalid'
-  ),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'bar', max_age => 'invalid'),
   Mojo::Cookie::Response->new(name => 'bar', value => 'baz', max_age => 86400)
 );
 $jar->collect($tx);
@@ -465,16 +328,8 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://labs.example.com/perldoc/Mojolicious');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'invalid',
-    domain => 'a.s.example.com'
-  ),
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'invalid',
-    domain => 'mojolicious.org'
-  )
+  Mojo::Cookie::Response->new(name => 'foo', value => 'invalid', domain => 'a.s.example.com'),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'invalid', domain => 'mojolicious.org')
 );
 $jar->collect($tx);
 is_deeply $jar->all, [], 'no cookies';
@@ -484,26 +339,10 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'valid',
-    domain => '213.133.102.53.'
-  ),
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'valid',
-    domain => '.133.102.53'
-  ),
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'invalid',
-    domain => '102.53'
-  ),
-  Mojo::Cookie::Response->new(
-    name   => 'foo',
-    value  => 'invalid',
-    domain => '53'
-  )
+  Mojo::Cookie::Response->new(name => 'foo', value => 'valid',   domain => '213.133.102.53.'),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'valid',   domain => '.133.102.53'),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'invalid', domain => '102.53'),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'invalid', domain => '53')
 );
 $jar->collect($tx);
 is_deeply $jar->all, [], 'no cookies';
@@ -513,21 +352,9 @@ $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://labs.example.com/perldoc/Mojolicious');
 $tx->res->cookies(
-  Mojo::Cookie::Response->new(
-    name  => 'foo',
-    value => 'invalid',
-    path  => '/perldoc/index.html'
-  ),
-  Mojo::Cookie::Response->new(
-    name  => 'foo',
-    value => 'invalid',
-    path  => '/perldocMojolicious'
-  ),
-  Mojo::Cookie::Response->new(
-    name  => 'foo',
-    value => 'invalid',
-    path  => '/perldoc.Mojolicious'
-  )
+  Mojo::Cookie::Response->new(name => 'foo', value => 'invalid', path => '/perldoc/index.html'),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'invalid', path => '/perldocMojolicious'),
+  Mojo::Cookie::Response->new(name => 'foo', value => 'invalid', path => '/perldoc.Mojolicious')
 );
 $jar->collect($tx);
 is_deeply $jar->all, [], 'no cookies';

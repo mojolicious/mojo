@@ -68,8 +68,7 @@ is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 $result     = [];
 $subprocess = Mojo::IOLoop::Subprocess->new;
 is $subprocess->exit_code, undef, 'no exit code';
-$subprocess->run_p(sub { return '♥', [{two => 2}], 3 })
-  ->then(sub { $result = [@_] })->wait;
+$subprocess->run_p(sub { return '♥', [{two => 2}], 3 })->then(sub { $result = [@_] })->wait;
 is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 $fail       = undef;
 $subprocess = Mojo::IOLoop::Subprocess->new;
@@ -77,8 +76,7 @@ $subprocess->run_p(sub { die 'Whatever' })->catch(sub { $fail = shift })->wait;
 is $subprocess->exit_code, 0, 'zero exit code';
 like $fail, qr/Whatever/, 'right error';
 $result = [];
-Mojo::IOLoop->subprocess->run_p(sub { return '♥' })
-  ->then(sub { $result = [@_] })->wait;
+Mojo::IOLoop->subprocess->run_p(sub { return '♥' })->then(sub { $result = [@_] })->wait;
 is_deeply $result, ['♥'], 'right structure';
 
 # Event loop in subprocess
@@ -244,17 +242,14 @@ $subprocess->on(
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['yay'], 'correct result';
-is_deeply \@progress,
-  [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]],
-  'correct progress';
+is_deeply \@progress, [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]], 'correct progress';
 
 # Cleanup
 ($fail, $result) = ();
 my $file   = tempfile;
 my $called = 0;
 $subprocess = Mojo::IOLoop::Subprocess->new;
-$subprocess->on(
-  cleanup => sub { $file->spurt(shift->serialize->({test => ++$called})) });
+$subprocess->on(cleanup => sub { $file->spurt(shift->serialize->({test => ++$called})) });
 $subprocess->run(
   sub {'Hello Mojo!'},
   sub {
@@ -264,8 +259,7 @@ $subprocess->run(
   }
 );
 Mojo::IOLoop->start;
-is_deeply $subprocess->deserialize->($file->slurp), {test => 1},
-  'cleanup event emitted once';
+is_deeply $subprocess->deserialize->($file->slurp), {test => 1}, 'cleanup event emitted once';
 ok !$fail, 'no error';
 is $result, 'Hello Mojo!', 'right result';
 

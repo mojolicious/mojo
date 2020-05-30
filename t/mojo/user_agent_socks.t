@@ -6,12 +6,9 @@ use Test::More;
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::TLS;
 
-plan skip_all => 'set TEST_SOCKS to enable this test (developer only!)'
-  unless $ENV{TEST_SOCKS} || $ENV{TEST_ALL};
-plan skip_all => 'IO::Socket::Socks 0.64+ required for this test!'
-  unless Mojo::IOLoop::Client->can_socks;
-plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
-  unless Mojo::IOLoop::TLS->can_tls;
+plan skip_all => 'set TEST_SOCKS to enable this test (developer only!)' unless $ENV{TEST_SOCKS} || $ENV{TEST_ALL};
+plan skip_all => 'IO::Socket::Socks 0.64+ required for this test!'      unless Mojo::IOLoop::Client->can_socks;
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'       unless Mojo::IOLoop::TLS->can_tls;
 
 use Mojo::IOLoop;
 use Mojo::IOLoop::Server;
@@ -40,8 +37,7 @@ websocket '/echo' => sub {
 
 get '/secure' => sub {
   my $c = shift;
-  $c->render(
-    text => $c->req->url->to_abs->protocol . ':' . $c->tx->remote_port);
+  $c->render(text => $c->req->url->to_abs->protocol . ':' . $c->tx->remote_port);
 };
 
 my $port   = Mojo::IOLoop::Server->generate_port;
@@ -89,8 +85,7 @@ Mojo::IOLoop->singleton->reactor->io(
 
           else {
             ($address, $port) = @{$client->command}[1, 2];
-            $client->command_reply(IO::Socket::Socks::REPLY_SUCCESS(),
-              $address, $port);
+            $client->command_reply(IO::Socket::Socks::REPLY_SUCCESS(), $address, $port);
           }
         }
         elsif ($err == IO::Socket::Socks::SOCKS_WANT_WRITE()) {
@@ -117,11 +112,9 @@ ok !$tx->error,      'no error';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200, 'right status';
-is $tx->req->headers->proxy_authorization, undef,
-  'no "Proxy-Authorization" value';
+is $tx->req->headers->proxy_authorization, undef, 'no "Proxy-Authorization" value';
 is $tx->res->body, $last, 'right content';
-isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
-  $last, 'different ports');
+isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport, $last, 'different ports');
 
 # Keep alive request with SOCKS proxy
 my $before = $last;
@@ -132,8 +125,7 @@ ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $last, 'right content';
 is $before, $last, 'same port';
-isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
-  $last, 'different ports');
+isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport, $last, 'different ports');
 
 # WebSocket with SOCKS proxy
 my ($result, $id);
@@ -158,8 +150,7 @@ ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,           'right status';
 is $tx->res->body, "https:$last", 'right content';
-isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport,
-  $last, 'different ports');
+isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport, $last, 'different ports');
 
 # Disabled SOCKS proxy
 $ua->server->url('http');

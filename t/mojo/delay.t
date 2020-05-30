@@ -117,11 +117,7 @@ is $result, 'success', 'right result';
 @results = ();
 $delay   = Mojo::IOLoop::Delay->new;
 $delay->then(sub { push @results, [@_] });
-$delay->steps(
-  sub { shift->pass(23) },
-  sub { shift; push @results, [@_] },
-  sub { push @results, 'fail' }
-)->wait;
+$delay->steps(sub { shift->pass(23) }, sub { shift; push @results, [@_] }, sub { push @results, 'fail' })->wait;
 is_deeply \@results, [[23], [23]], 'right results';
 
 # Nested delays
@@ -158,16 +154,15 @@ is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23, 24], 'right results';
 my $failed;
 $result = undef;
 $delay  = Mojo::IOLoop::Delay->new;
-$delay->steps(sub { die 'First step!' }, sub { $result = 'failed' })
-  ->catch(sub { $failed = shift })->wait;
+$delay->steps(sub { die 'First step!' }, sub { $result = 'failed' })->catch(sub { $failed = shift })->wait;
 like $failed, qr/^First step!/, 'right error';
 ok !$result, 'no result';
 
 # Exception in last step
 $failed = undef;
 $delay  = Mojo::IOLoop::Delay->new;
-$delay->steps(sub { Mojo::IOLoop->next_tick(shift->begin) },
-  sub { die 'Last step!' })->catch(sub { $failed = pop })->wait;
+$delay->steps(sub { Mojo::IOLoop->next_tick(shift->begin) }, sub { die 'Last step!' })->catch(sub { $failed = pop })
+  ->wait;
 like $failed, qr/^Last step!/, 'right error';
 
 # Exception in second step

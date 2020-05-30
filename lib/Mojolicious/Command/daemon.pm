@@ -69,19 +69,17 @@ Mojolicious::Command::daemon - Daemon command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::daemon> starts applications with the
-L<Mojo::Server::Daemon> backend.
+L<Mojolicious::Command::daemon> starts applications with the L<Mojo::Server::Daemon> backend.
 
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
+This is a core command, that means it is always enabled and its code a good example for learning to build new commands,
+you're welcome to fork it.
 
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::daemon> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::daemon> inherits all attributes from L<Mojolicious::Command> and implements the following new
+ones.
 
 =head2 description
 
@@ -99,8 +97,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::daemon> inherits all methods from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::daemon> inherits all methods from L<Mojolicious::Command> and implements the following new
+ones.
 
 =head2 run
 

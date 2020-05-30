@@ -15,7 +15,7 @@ has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 sub DESTROY {
   my $self = shift;
   $ENV{MOJO_REUSE} =~ s/(?:^|\,)\Q$self->{reuse}\E// if $self->{reuse};
-  $self->stop if $self->{handle} && $self->reactor;
+  $self->stop                                        if $self->{handle} && $self->reactor;
 }
 
 sub generate_port {
@@ -34,11 +34,8 @@ sub listen {
   my $address = $args->{address} || '0.0.0.0';
   my $port    = $args->{port};
   $ENV{MOJO_REUSE} ||= '';
-  my $fd
-    = ($path && $ENV{MOJO_REUSE} =~ /(?:^|\,)unix:\Q$path\E:(\d+)/)
-    || ($port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/)
-    ? $1
-    : undef;
+  my $fd = ($path && $ENV{MOJO_REUSE} =~ /(?:^|\,)unix:\Q$path\E:(\d+)/)
+    || ($port && $ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$address:$port\E:(\d+)/) ? $1 : undef;
 
   # Allow file descriptor inheritance
   local $^F = 1023;
@@ -47,13 +44,11 @@ sub listen {
   my $handle;
   my $class = $path ? 'IO::Socket::UNIX' : 'IO::Socket::IP';
   if (defined($fd //= $args->{fd})) {
-    $handle = $class->new_from_fd($fd, 'r')
-      or croak "Can't open file descriptor $fd: $!";
+    $handle = $class->new_from_fd($fd, 'r') or croak "Can't open file descriptor $fd: $!";
   }
 
   else {
-    my %options
-      = (Listen => $args->{backlog} // SOMAXCONN, Type => SOCK_STREAM);
+    my %options = (Listen => $args->{backlog} // SOMAXCONN, Type => SOCK_STREAM);
 
     # UNIX domain socket
     my $reuse;
@@ -61,7 +56,7 @@ sub listen {
       path($path)->remove if -S $path;
       $options{Local} = $path;
       $handle = $class->new(%options) or croak "Can't create listen socket: $!";
-      $reuse  = $self->{reuse} = join ':', 'unix', $path, fileno $handle;
+      $reuse = $self->{reuse} = join ':', 'unix', $path, fileno $handle;
     }
 
     # IP socket
@@ -71,9 +66,9 @@ sub listen {
       $options{LocalPort} = $port if $port;
       $options{ReuseAddr} = 1;
       $options{ReusePort} = $args->{reuse};
-      $handle = $class->new(%options) or croak "Can't create listen socket: $@";
-      $fd     = fileno $handle;
-      $reuse  = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
+      $handle             = $class->new(%options) or croak "Can't create listen socket: $@";
+      $fd                 = fileno $handle;
+      $reuse = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
     }
 
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";
@@ -81,8 +76,7 @@ sub listen {
   $handle->blocking(0);
   @$self{qw(args handle)} = ($args, $handle);
 
-  croak 'IO::Socket::SSL 2.009+ required for TLS support'
-    if !Mojo::IOLoop::TLS->can_tls && $args->{tls};
+  croak 'IO::Socket::SSL 2.009+ required for TLS support' if !Mojo::IOLoop::TLS->can_tls && $args->{tls};
 }
 
 sub port { shift->{handle}->sockport }
@@ -90,9 +84,7 @@ sub port { shift->{handle}->sockport }
 sub start {
   my $self = shift;
   weaken $self;
-  ++$self->{active}
-    and $self->reactor->io($self->{handle} => sub { $self->_accept })
-    ->watch($self->{handle}, 1, 0);
+  ++$self->{active} and $self->reactor->io($self->{handle} => sub { $self->_accept })->watch($self->{handle}, 1, 0);
 }
 
 sub stop { delete($_[0]{active}) and $_[0]->reactor->remove($_[0]{handle}) }
@@ -149,13 +141,11 @@ Mojo::IOLoop::Server - Non-blocking TCP and UNIX domain socket server
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Server> accepts TCP/IP and UNIX domain socket connections for
-L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Server> accepts TCP/IP and UNIX domain socket connections for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Server> inherits all events from L<Mojo::EventEmitter> and can
-emit the following new ones.
+L<Mojo::IOLoop::Server> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 accept
 
@@ -175,13 +165,12 @@ L<Mojo::IOLoop::Server> implements the following attributes.
   my $reactor = $server->reactor;
   $server     = $server->reactor(Mojo::Reactor::Poll->new);
 
-Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
+Low-level event reactor, defaults to the C<reactor> attribute value of the global L<Mojo::IOLoop> singleton. Note that
+this attribute is weakened.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Server> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::IOLoop::Server> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 generate_port
 
@@ -206,8 +195,7 @@ Check if connections are currently being accepted.
   $server->listen(port => 3000);
   $server->listen({port => 3000});
 
-Create a new listen socket. Note that TLS support depends on L<IO::Socket::SSL>
-(2.009+).
+Create a new listen socket. Note that TLS support depends on L<IO::Socket::SSL> (2.009+).
 
 These options are currently available:
 
@@ -247,8 +235,7 @@ Port to listen on, defaults to a random port.
 
   reuse => 1
 
-Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
-option.
+Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket option.
 
 =item single_accept
 

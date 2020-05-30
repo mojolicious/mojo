@@ -39,7 +39,7 @@ sub AWAIT_ON_READY {
 
 sub DESTROY {
   my $self = shift;
-  return if $self->{handled} || ($self->{status} // '') ne 'reject';
+  return                                                 if $self->{handled} || ($self->{status} // '') ne 'reject';
   carp "Unhandled rejected promise: @{$self->{results}}" if $self->{results};
 }
 
@@ -54,11 +54,9 @@ sub clone { $_[0]->new->ioloop($_[0]->ioloop) }
 sub finally { shift->_finally(1, @_) }
 
 sub map {
-  my ($class, $options, $cb, @items)
-    = (shift, ref $_[0] eq 'HASH' ? shift : {}, @_);
+  my ($class, $options, $cb, @items) = (shift, ref $_[0] eq 'HASH' ? shift : {}, @_);
 
-  return $class->all(map { $_->$cb } @items)
-    if !$options->{concurrency} || @items <= $options->{concurrency};
+  return $class->all(map { $_->$cb } @items) if !$options->{concurrency} || @items <= $options->{concurrency};
 
   my @start = map { $_->$cb } splice @items, 0, $options->{concurrency};
 
@@ -68,10 +66,7 @@ sub map {
   my $start_next = sub {
     return () unless my $item = shift @items;
     my ($start_next, $chain) = (__SUB__, shift @wait);
-    $_->$cb->then(
-      sub { $chain->resolve(@_); $start_next->() },
-      sub { $chain->reject(@_);  @items = () }
-    ) for $item;
+    $_->$cb->then(sub { $chain->resolve(@_); $start_next->() }, sub { $chain->reject(@_); @items = () }) for $item;
     return ();
   };
 
@@ -125,8 +120,7 @@ sub _all {
 
     # "race"
     if ($type == 1) {
-      $promises[$i]
-        ->then(sub { $all->resolve(@_); () }, sub { $all->reject(@_); () });
+      $promises[$i]->then(sub { $all->resolve(@_); () }, sub { $all->reject(@_); () });
     }
 
     # "all"
@@ -214,14 +208,12 @@ sub _settle {
 
   my $thenable = blessed $results[0] && $results[0]->can('then');
   unless (ref $self) {
-    return $results[0]
-      if $thenable && $status eq 'resolve' && $results[0]->isa('Mojo::Promise');
+    return $results[0] if $thenable && $status eq 'resolve' && $results[0]->isa('Mojo::Promise');
     $self = $self->new;
   }
 
   if ($thenable && $status eq 'resolve') {
-    $results[0]
-      ->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () });
+    $results[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () });
   }
 
   elsif (!$self->{results}) {
@@ -314,17 +306,14 @@ Mojo::Promise - Promises/A+
 
 =head1 DESCRIPTION
 
-L<Mojo::Promise> is a Perl-ish implementation of
-L<Promises/A+|https://promisesaplus.com> and a superset of
-L<ES6 Promises|https://duckduckgo.com/?q=\mdn%20Promise>.
+L<Mojo::Promise> is a Perl-ish implementation of L<Promises/A+|https://promisesaplus.com> and a superset of L<ES6
+Promises|https://duckduckgo.com/?q=\mdn%20Promise>.
 
 =head1 STATES
 
-A promise is an object representing the eventual completion or failure of a
-non-blocking operation. It allows non-blocking functions to return values, like
-blocking functions. But instead of immediately returning the final value, the
-non-blocking function returns a promise to supply the value at some point in the
-future.
+A promise is an object representing the eventual completion or failure of a non-blocking operation. It allows
+non-blocking functions to return values, like blocking functions. But instead of immediately returning the final value,
+the non-blocking function returns a promise to supply the value at some point in the future.
 
 A promise can be in one of three states:
 
@@ -344,9 +333,8 @@ Meaning that the operation failed.
 
 =back
 
-A pending promise can either be fulfilled with a value or rejected with a
-reason. When either happens, the associated handlers queued up by a promise's
-L</"then"> method are called.
+A pending promise can either be fulfilled with a value or rejected with a reason. When either happens, the associated
+handlers queued up by a promise's L</"then"> method are called.
 
 =head1 ATTRIBUTES
 
@@ -357,49 +345,41 @@ L<Mojo::Promise> implements the following attributes.
   my $loop = $promise->ioloop;
   $promise = $promise->ioloop(Mojo::IOLoop->new);
 
-Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
-Note that this attribute is weakened.
+Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
 
 =head1 METHODS
 
-L<Mojo::Promise> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::Promise> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 all
 
   my $new = Mojo::Promise->all(@promises);
 
-Returns a new L<Mojo::Promise> object that either fulfills when all of the
-passed L<Mojo::Promise> objects have fulfilled or rejects as soon as one of them
-rejects. If the returned promise fulfills, it is fulfilled with the values from
-the fulfilled promises in the same order as the passed promises.
+Returns a new L<Mojo::Promise> object that either fulfills when all of the passed L<Mojo::Promise> objects have
+fulfilled or rejects as soon as one of them rejects. If the returned promise fulfills, it is fulfilled with the values
+from the fulfilled promises in the same order as the passed promises.
 
 =head2 all_settled
 
   my $new = Mojo::Promise->all_settled(@promises);
 
-Returns a new L<Mojo::Promise> object that fulfills when all of the passed
-L<Mojo::Promise> objects have fulfilled or rejected, with hash references that
-describe the outcome of each promise.
+Returns a new L<Mojo::Promise> object that fulfills when all of the passed L<Mojo::Promise> objects have fulfilled or
+rejected, with hash references that describe the outcome of each promise.
 
 =head2 any
 
   my $new = Mojo::Promise->any(@promises);
 
-Returns a new L<Mojo::Promise> object that fulfills as soon as one of
-the passed L<Mojo::Promise> objects fulfills, with the value from that promise.
-If no promises fulfill, it is rejected with the reasons from the rejected
-promises in the same order as the passed promises. Note that this method is
-B<EXPERIMENTAL> and might change without warning!
+Returns a new L<Mojo::Promise> object that fulfills as soon as one of the passed L<Mojo::Promise> objects fulfills,
+with the value from that promise. If no promises fulfill, it is rejected with the reasons from the rejected promises in
+the same order as the passed promises. Note that this method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 catch
 
   my $new = $promise->catch(sub {...});
 
-Appends a rejection handler callback to the promise, and returns a new
-L<Mojo::Promise> object resolving to the return value of the callback if it is
-called, or to its original fulfillment value if the promise is instead
-fulfilled.
+Appends a rejection handler callback to the promise, and returns a new L<Mojo::Promise> object resolving to the return
+value of the callback if it is called, or to its original fulfillment value if the promise is instead fulfilled.
 
   # Longer version
   my $new = $promise->then(undef, sub {...});
@@ -421,16 +401,14 @@ fulfilled.
 
   my $new = $promise->clone;
 
-Return a new L<Mojo::Promise> object cloned from this promise that is still
-pending.
+Return a new L<Mojo::Promise> object cloned from this promise that is still pending.
 
 =head2 finally
 
   my $new = $promise->finally(sub {...});
 
-Appends a fulfillment and rejection handler to the promise, and returns a new
-L<Mojo::Promise> object resolving to the original fulfillment value or rejection
-reason.
+Appends a fulfillment and rejection handler to the promise, and returns a new L<Mojo::Promise> object resolving to the
+original fulfillment value or rejection reason.
 
   # Do something on fulfillment and rejection
   $promise->finally(sub {
@@ -442,11 +420,10 @@ reason.
   my $new = Mojo::Promise->map(sub {...}, @items);
   my $new = Mojo::Promise->map({concurrency => 3}, sub {...}, @items);
 
-Apply a function that returns a L<Mojo::Promise> to each item in a list of items
-while optionally limiting concurrency. Returns a L<Mojo::Promise> that collects
-the results in the same manner as L</all>. If any item's promise is rejected,
-any remaining items which have not yet been mapped will not be. Note that this
-method is B<EXPERIMENTAL> and might change without warning!
+Apply a function that returns a L<Mojo::Promise> to each item in a list of items while optionally limiting concurrency.
+Returns a L<Mojo::Promise> that collects the results in the same manner as L</all>. If any item's promise is rejected,
+any remaining items which have not yet been mapped will not be. Note that this method is B<EXPERIMENTAL> and might
+change without warning!
 
   # Perform 3 requests at a time concurrently
   Mojo::Promise->map({concurrency => 3}, sub { $ua->get_p($_) }, @urls)
@@ -484,17 +461,15 @@ Construct a new L<Mojo::Promise> object.
 
   my $new = Mojo::Promise->race(@promises);
 
-Returns a new L<Mojo::Promise> object that fulfills or rejects as soon as one of
-the passed L<Mojo::Promise> objects fulfills or rejects, with the value or
-reason from that promise.
+Returns a new L<Mojo::Promise> object that fulfills or rejects as soon as one of the passed L<Mojo::Promise> objects
+fulfills or rejects, with the value or reason from that promise.
 
 =head2 reject
 
   my $new  = Mojo::Promise->reject(@reason);
   $promise = $promise->reject(@reason);
 
-Build rejected L<Mojo::Promise> object or reject the promise with one or more
-rejection reasons.
+Build rejected L<Mojo::Promise> object or reject the promise with one or more rejection reasons.
 
   # Longer version
   my $promise = Mojo::Promise->new->reject(@reason);
@@ -504,8 +479,7 @@ rejection reasons.
   my $new  = Mojo::Promise->resolve(@value);
   $promise = $promise->resolve(@value);
 
-Build resolved L<Mojo::Promise> object or resolve the promise with one or more
-fulfillment values.
+Build resolved L<Mojo::Promise> object or resolve the promise with one or more fulfillment values.
 
   # Longer version
   my $promise = Mojo::Promise->new->resolve(@value);
@@ -516,8 +490,8 @@ fulfillment values.
   my $new = $promise->then(sub {...}, sub {...});
   my $new = $promise->then(undef, sub {...});
 
-Appends fulfillment and rejection handlers to the promise, and returns a new
-L<Mojo::Promise> object resolving to the return value of the called handler.
+Appends fulfillment and rejection handlers to the promise, and returns a new L<Mojo::Promise> object resolving to the
+return value of the called handler.
 
   # Pass along the fulfillment value or rejection reason
   $promise->then(
@@ -551,10 +525,9 @@ L<Mojo::Promise> object resolving to the return value of the called handler.
   $promise = $promise->timer(5 => 'Success!');
   $promise = $promise->timer(5);
 
-Create a new L<Mojo::Promise> object with a timer or attach a timer to an
-existing promise. The promise will be resolved after the given amount of time in
-seconds with or without a value. Note that this method is B<EXPERIMENTAL> and
-might change without warning!
+Create a new L<Mojo::Promise> object with a timer or attach a timer to an existing promise. The promise will be
+resolved after the given amount of time in seconds with or without a value. Note that this method is B<EXPERIMENTAL>
+and might change without warning!
 
 =head2 timeout
 
@@ -562,17 +535,16 @@ might change without warning!
   $promise = $promise->timeout(5 => 'Timeout!');
   $promise = $promise->timeout(5);
 
-Create a new L<Mojo::Promise> object with a timeout or attach a timeout to an
-existing promise. The promise will be rejected after the given amount of time in
-seconds with a reason, which defaults to C<Promise timeout>. Note that this
+Create a new L<Mojo::Promise> object with a timeout or attach a timeout to an existing promise. The promise will be
+rejected after the given amount of time in seconds with a reason, which defaults to C<Promise timeout>. Note that this
 method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 wait
 
   $promise->wait;
 
-Start L</"ioloop"> and stop it again once the promise has been fulfilled or
-rejected, does nothing when L</"ioloop"> is already running.
+Start L</"ioloop"> and stop it again once the promise has been fulfilled or rejected, does nothing when L</"ioloop"> is
+already running.
 
 =head1 SEE ALSO
 

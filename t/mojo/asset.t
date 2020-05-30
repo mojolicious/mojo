@@ -135,8 +135,7 @@ is $file->contains('ddd'),  262145, '"ddd" at position 262145';
 is $file->contains('e'),    -1,     'does not contain "e"';
 is $file->contains('a' x 131072), 0,      '"a" x 131072 at position 0';
 is $file->contains('c' x 131072), 131073, '"c" x 131072 at position 131073';
-is $file->contains('b' . ('c' x 131072) . "ddd"), 131072,
-  '"b" . ("c" x 131072) . "ddd" at position 131072';
+is $file->contains('b' . ('c' x 131072) . "ddd"), 131072, '"b" . ("c" x 131072) . "ddd" at position 131072';
 
 # Huge file asset with range
 $file = Mojo::Asset::File->new(start_range => 1, end_range => 262146);
@@ -151,8 +150,7 @@ is $file->contains('abc'),  131070, '"abc" at position 131070';
 is $file->contains('ccdd'), 262142, '"ccdd" at position 262142';
 is $file->contains('dd'),   262144, '"dd" at position 262144';
 is $file->contains('ddd'),  -1,     'does not contain "ddd"';
-is $file->contains('b' . ('c' x 131072) . 'ddd'), -1,
-  'does not contain "b" . ("c" x 131072) . "ddd"';
+is $file->contains('b' . ('c' x 131072) . 'ddd'), -1, 'does not contain "b" . ("c" x 131072) . "ddd"';
 
 # Move memory asset to file
 $mem = Mojo::Asset::Memory->new->add_chunk('abc');

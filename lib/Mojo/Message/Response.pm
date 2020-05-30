@@ -82,8 +82,7 @@ sub cookies {
   return [@{Mojo::Cookie::Response->parse($headers->set_cookie)}] unless @_;
 
   # Add cookies
-  $headers->add('Set-Cookie' => "$_")
-    for map { ref $_ eq 'HASH' ? Mojo::Cookie::Response->new($_) : $_ } @_;
+  $headers->add('Set-Cookie' => "$_") for map { ref $_ eq 'HASH' ? Mojo::Cookie::Response->new($_) : $_ } @_;
 
   return $self;
 }
@@ -95,8 +94,7 @@ sub extract_start_line {
 
   # We have a full response line
   return undef unless $$bufref =~ s/^(.*?)\x0d?\x0a//;
-  return !$self->error({message => 'Bad response start-line'})
-    unless $1 =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
+  return !$self->error({message => 'Bad response start-line'}) unless $1 =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
 
   my $content = $self->content;
   $content->skip_body(1) if $self->code($2)->is_empty;
@@ -189,9 +187,8 @@ Mojo::Message::Response - HTTP response
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Response> is a container for HTTP responses, based on
-L<RFC 7230|http://tools.ietf.org/html/rfc7230> and
-L<RFC 7231|http://tools.ietf.org/html/rfc7231>.
+L<Mojo::Message::Response> is a container for HTTP responses, based on L<RFC 7230|http://tools.ietf.org/html/rfc7230>
+and L<RFC 7231|http://tools.ietf.org/html/rfc7231>.
 
 =head1 EVENTS
 
@@ -199,8 +196,7 @@ L<Mojo::Message::Response> inherits all events from L<Mojo::Message>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Message::Response> inherits all attributes from L<Mojo::Message> and
-implements the following new ones.
+L<Mojo::Message::Response> inherits all attributes from L<Mojo::Message> and implements the following new ones.
 
 =head2 code
 
@@ -214,9 +210,8 @@ HTTP response status code.
   my $size = $res->max_message_size;
   $res     = $res->max_message_size(1024);
 
-Maximum message size in bytes, defaults to the value of the
-C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<2147483648> (2GiB). Setting
-the value to C<0> will allow messages of indefinite size.
+Maximum message size in bytes, defaults to the value of the C<MOJO_MAX_MESSAGE_SIZE> environment variable or
+C<2147483648> (2GiB). Setting the value to C<0> will allow messages of indefinite size.
 
 =head2 message
 
@@ -227,8 +222,7 @@ HTTP response status message.
 
 =head1 METHODS
 
-L<Mojo::Message::Response> inherits all methods from L<Mojo::Message> and
-implements the following new ones.
+L<Mojo::Message::Response> inherits all methods from L<Mojo::Message> and implements the following new ones.
 
 =head2 cookies
 
@@ -246,8 +240,7 @@ Access response cookies, usually L<Mojo::Cookie::Response> objects.
   my $msg = $res->default_message;
   my $msg = $res->default_message(418);
 
-Generate default response message for status code, defaults to using
-L</"code">.
+Generate default response message for status code, defaults to using L</"code">.
 
 =head2 extract_start_line
 
@@ -265,8 +258,7 @@ Make sure response has all required headers.
 
   my $bytes = $res->get_start_line_chunk($offset);
 
-Get a chunk of status-line data starting from a specific position. Note that
-this method finalizes the response.
+Get a chunk of status-line data starting from a specific position. Note that this method finalizes the response.
 
 =head2 is_client_error
 

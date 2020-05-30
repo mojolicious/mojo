@@ -8,12 +8,9 @@ BEGIN {
 use Test::More;
 use Mojo::IOLoop::TLS;
 
-plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
-  unless $ENV{TEST_ONLINE} || $ENV{TEST_ALL};
-plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
-  unless Mojo::IOLoop::TLS->can_tls;
-plan skip_all => 'Mozilla::CA required for this test!'
-  unless eval { require Mozilla::CA; 1 };
+plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)' unless $ENV{TEST_ONLINE} || $ENV{TEST_ALL};
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'        unless Mojo::IOLoop::TLS->can_tls;
+plan skip_all => 'Mozilla::CA required for this test!'                   unless eval { require Mozilla::CA; 1 };
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -51,7 +48,7 @@ $ua = Mojo::UserAgent->new;
 
 # Local address
 $ua->server->app(app);
-my $sock = IO::Socket::INET->new(PeerAddr => 'mojolicious.org', PeerPort => 80);
+my $sock    = IO::Socket::INET->new(PeerAddr => 'mojolicious.org', PeerPort => 80);
 my $address = $sock->sockhost;
 isnt $address, '127.0.0.1', 'different address';
 $ua->local_address('127.0.0.1')->max_connections(0);
@@ -219,13 +216,12 @@ $ua->max_redirects(0);
 is $tx->req->method, 'GET',                                'right method';
 is $tx->req->url,    'https://en.wikipedia.org/wiki/Perl', 'right url';
 is $tx->res->code,   200,                                  'right status';
-is $tx->previous->req->method, 'GET', 'right method';
-is $tx->previous->req->url, 'https://www.wikipedia.org/wiki/Perl', 'right url';
-is $tx->previous->res->code, 301, 'right status';
-is $tx->redirects->[-1]->req->method, 'GET', 'right method';
-is $tx->redirects->[-1]->req->url, 'https://www.wikipedia.org/wiki/Perl',
-  'right url';
-is $tx->redirects->[-1]->res->code, 301, 'right status';
+is $tx->previous->req->method, 'GET',                                 'right method';
+is $tx->previous->req->url,    'https://www.wikipedia.org/wiki/Perl', 'right url';
+is $tx->previous->res->code,   301,                                   'right status';
+is $tx->redirects->[-1]->req->method, 'GET',                                 'right method';
+is $tx->redirects->[-1]->req->url,    'https://www.wikipedia.org/wiki/Perl', 'right url';
+is $tx->redirects->[-1]->res->code,   301,                                   'right status';
 
 # Connect timeout (non-routable address)
 $tx = $ua->connect_timeout(0.5)->get('192.0.2.1');

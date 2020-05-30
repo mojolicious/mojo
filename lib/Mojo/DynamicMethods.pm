@@ -73,16 +73,15 @@ Mojo::DynamicMethods - Fast dynamic method dispatch
 
 =head1 DESCRIPTION
 
-L<Mojo::DynamicMethods> provides dynamic method dispatch for per-object helper
-methods without requiring use of C<AUTOLOAD>.
+L<Mojo::DynamicMethods> provides dynamic method dispatch for per-object helper methods without requiring use of
+C<AUTOLOAD>.
 
 To opt your class into dynamic dispatch simply pass the C<-dispatch> flag.
 
   use Mojo::DynamicMethods -dispatch;
 
-And then implement a C<BUILD_DYNAMIC> method in your class, making sure that the
-key you use to lookup methods in C<$dyn_methods> is the same thing you pass as
-C<$ref> to L</"register">.
+And then implement a C<BUILD_DYNAMIC> method in your class, making sure that the key you use to lookup methods in
+C<$dyn_methods> is the same thing you pass as C<$ref> to L</"register">.
 
   sub BUILD_DYNAMIC {
     my ($class, $method, $dyn_methods) = @_;
@@ -105,9 +104,8 @@ L<Mojo::DynamicMethods> implements the following functions.
 
   Mojo::DynamicMethods::register $class, $ref, $name, $cb;
 
-Registers the method C<$name> as eligible for dynamic dispatch for C<$class>,
-and sets C<$cb> to be looked up for C<$name> by reference C<$ref> in a dynamic
-method constructed by C<BUILD_DYNAMIC>.
+Registers the method C<$name> as eligible for dynamic dispatch for C<$class>, and sets C<$cb> to be looked up for
+C<$name> by reference C<$ref> in a dynamic method constructed by C<BUILD_DYNAMIC>.
 
 =head1 SEE ALSO
 

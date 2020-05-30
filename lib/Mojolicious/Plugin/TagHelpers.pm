@@ -25,7 +25,7 @@ sub register {
   $app->helper(check_box      => sub { _input(@_, type => 'checkbox') });
   $app->helper(csrf_button_to => sub { _button_to(1, @_) });
   $app->helper(file_field     => sub { _empty_field('file', @_) });
-  $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
+  $app->helper(image          => sub { _tag('img', src => shift->url_for(shift), @_) });
   $app->helper(input_tag      => sub { _input(@_) });
   $app->helper(password_field => sub { _empty_field('password', @_) });
   $app->helper(radio_button   => sub { _input(@_, type => 'radio') });
@@ -91,10 +91,9 @@ sub _input {
 }
 
 sub _javascript {
-  my $c = shift;
-  my $content
-    = ref $_[-1] eq 'CODE' ? "//<![CDATA[\n" . pop->() . "\n//]]>" : '';
-  my @src = @_ % 2 ? (src => $c->url_for(shift)) : ();
+  my $c       = shift;
+  my $content = ref $_[-1] eq 'CODE' ? "//<![CDATA[\n" . pop->() . "\n//]]>" : '';
+  my @src     = @_ % 2 ? (src => $c->url_for(shift)) : ();
   return _tag('script', @src, @_, sub {$content});
 }
 
@@ -154,9 +153,8 @@ sub _select_field {
 }
 
 sub _stylesheet {
-  my $c = shift;
-  my $content
-    = ref $_[-1] eq 'CODE' ? "/*<![CDATA[*/\n" . pop->() . "\n/*]]>*/" : '';
+  my $c       = shift;
+  my $content = ref $_[-1] eq 'CODE' ? "/*<![CDATA[*/\n" . pop->() . "\n/*]]>*/" : '';
   return _tag('style', @_, sub {$content}) unless @_ % 2;
   return _tag('link', rel => 'stylesheet', href => $c->url_for(shift), @_);
 }
@@ -209,32 +207,27 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::TagHelpers> is a collection of HTML tag helpers for
-L<Mojolicious>, based on the
-L<HTML Living Standard|https://html.spec.whatwg.org>.
+L<Mojolicious::Plugin::TagHelpers> is a collection of HTML tag helpers for L<Mojolicious>, based on the L<HTML Living
+Standard|https://html.spec.whatwg.org>.
 
-Most form helpers can automatically pick up previous input values and will show
-them as default. You can also use
-L<Mojolicious::Plugin::DefaultHelpers/"param"> to set them manually and let
-necessary attributes always be generated automatically.
+Most form helpers can automatically pick up previous input values and will show them as default. You can also use
+L<Mojolicious::Plugin::DefaultHelpers/"param"> to set them manually and let necessary attributes always be generated
+automatically.
 
   % param country => 'germany' unless param 'country';
   <%= radio_button country => 'germany' %> Germany
   <%= radio_button country => 'france'  %> France
   <%= radio_button country => 'uk'      %> UK
 
-For fields that failed validation with
-L<Mojolicious::Plugin::DefaultHelpers/"validation"> the C<field-with-error>
-class will be automatically added through L</"tag_with_error">, to make styling
-with CSS easier.
+For fields that failed validation with L<Mojolicious::Plugin::DefaultHelpers/"validation"> the C<field-with-error>
+class will be automatically added through L</"tag_with_error">, to make styling with CSS easier.
 
   <input class="field-with-error" name="age" type="text" value="250">
 
-This is a core plugin, that means it is always enabled and its code a good
-example for learning how to build new plugins, you're welcome to fork it.
+This is a core plugin, that means it is always enabled and its code a good example for learning how to build new
+plugins, you're welcome to fork it.
 
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available by default.
 
 =head1 HELPERS
 
@@ -268,8 +261,7 @@ Generate portable C<form> tag with L</"form_for">, containing a single button.
   %= check_box employed => 1
   %= check_box employed => 1, checked => undef, id => 'foo'
 
-Generate C<input> tag of type C<checkbox>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<checkbox>. Previous input values will automatically get picked up and shown as default.
 
   <input name="employed" type="checkbox">
   <input name="employed" type="checkbox" value="1">
@@ -281,8 +273,7 @@ automatically get picked up and shown as default.
   %= color_field background => '#ffffff'
   %= color_field background => '#ffffff', id => 'foo'
 
-Generate C<input> tag of type C<color>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<color>. Previous input values will automatically get picked up and shown as default.
 
   <input name="background" type="color">
   <input name="background" type="color" value="#ffffff">
@@ -303,8 +294,7 @@ Same as L</"button_to">, but also includes a L</"csrf_field">.
 
   %= csrf_field
 
-Generate C<input> tag of type C<hidden> with
-L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">.
+Generate C<input> tag of type C<hidden> with L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">.
 
   <input name="csrf_token" type="hidden" value="fa6a08...">
 
@@ -314,8 +304,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">.
   %= date_field end => '2012-12-21'
   %= date_field end => '2012-12-21', id => 'foo'
 
-Generate C<input> tag of type C<date>. Previous input values will automatically
-get picked up and shown as default.
+Generate C<input> tag of type C<date>. Previous input values will automatically get picked up and shown as default.
 
   <input name="end" type="date">
   <input name="end" type="date" value="2012-12-21">
@@ -327,8 +316,8 @@ get picked up and shown as default.
   %= datetime_field end => '2012-12-21T23:59:59'
   %= datetime_field end => '2012-12-21T23:59:59', id => 'foo'
 
-Generate C<input> tag of type C<datetime-local>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<datetime-local>. Previous input values will automatically get picked up and shown as
+default.
 
   <input name="end" type="datetime-local">
   <input name="end" type="datetime-local" value="2012-12-21T23:59:59">
@@ -340,8 +329,7 @@ automatically get picked up and shown as default.
   %= email_field notify => 'nospam@example.com'
   %= email_field notify => 'nospam@example.com', id => 'foo'
 
-Generate C<input> tag of type C<email>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<email>. Previous input values will automatically get picked up and shown as default.
 
   <input name="notify" type="email">
   <input name="notify" type="email" value="nospam@example.com">
@@ -379,10 +367,9 @@ Generate C<input> tag of type C<file>.
     %= submit_button 'Remove'
   % end
 
-Generate portable C<form> tag with L<Mojolicious::Controller/"url_for">. For
-routes that do not allow C<GET>, a C<method> attribute with the value C<POST>
-will be automatically added. And for methods other than C<GET> or C<POST>, an
-C<_method> query parameter will be added as well.
+Generate portable C<form> tag with L<Mojolicious::Controller/"url_for">. For routes that do not allow C<GET>, a
+C<method> attribute with the value C<POST> will be automatically added. And for methods other than C<GET> or C<POST>,
+an C<_method> query parameter will be added as well.
 
   <form action="/path/to/login">
     <input name="first_name" type="text">
@@ -430,8 +417,7 @@ Generate portable C<img> tag.
   %= input_tag first_name => 'Default'
   %= input_tag 'employed', type => 'checkbox'
 
-Generate C<input> tag. Previous input values will automatically get picked up
-and shown as default.
+Generate C<input> tag. Previous input values will automatically get picked up and shown as default.
 
   <input name="first_name">
   <input name="first_name" value="Default">
@@ -488,8 +474,8 @@ Generate C<label> tag.
   <%= link_to 'https://mojolicious.org' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
-Generate portable C<a> tag with L<Mojolicious::Controller/"url_for">, defaults
-to using the capitalized link target as content.
+Generate portable C<a> tag with L<Mojolicious::Controller/"url_for">, defaults to using the capitalized link target as
+content.
 
   <a href="/path/to/index">Home</a>
   <a class="menu" href="/path/to/index.txt">Home</a>
@@ -508,8 +494,7 @@ to using the capitalized link target as content.
   %= month_field vacation => '2012-12'
   %= month_field vacation => '2012-12', id => 'foo'
 
-Generate C<input> tag of type C<month>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<month>. Previous input values will automatically get picked up and shown as default.
 
   <input name="vacation" type="month">
   <input name="vacation" type="month" value="2012-12">
@@ -521,8 +506,7 @@ automatically get picked up and shown as default.
   %= number_field age => 25
   %= number_field age => 25, id => 'foo', min => 0, max => 200
 
-Generate C<input> tag of type C<number>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<number>. Previous input values will automatically get picked up and shown as default.
 
   <input name="age" type="number">
   <input name="age" type="number" value="25">
@@ -544,8 +528,7 @@ Generate C<input> tag of type C<password>.
   %= radio_button country => 'germany'
   %= radio_button country => 'germany', checked => undef, id => 'foo'
 
-Generate C<input> tag of type C<radio>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<radio>. Previous input values will automatically get picked up and shown as default.
 
   <input name="test" type="radio">
   <input name="country" type="radio" value="germany">
@@ -557,8 +540,7 @@ automatically get picked up and shown as default.
   %= range_field age => 25
   %= range_field age => 25, id => 'foo', min => 0, max => 200
 
-Generate C<input> tag of type C<range>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<range>. Previous input values will automatically get picked up and shown as default.
 
   <input name="age" type="range">
   <input name="age" type="range" value="25">
@@ -570,8 +552,7 @@ automatically get picked up and shown as default.
   %= search_field q => 'perl'
   %= search_field q => 'perl', id => 'foo'
 
-Generate C<input> tag of type C<search>. Previous input values will
-automatically get picked up and shown as default.
+Generate C<input> tag of type C<search>. Previous input values will automatically get picked up and shown as default.
 
   <input name="q" type="search">
   <input name="q" type="search" value="perl">
@@ -585,9 +566,8 @@ automatically get picked up and shown as default.
   %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
   %= select_field country => [c(EU => ['de', 'en']), c(Asia => ['cn', 'jp'])]
 
-Generate C<select> and C<option> tags from array references and C<optgroup>
-tags from L<Mojo::Collection> objects. Previous input values will automatically
-get picked up and shown as default.
+Generate C<select> and C<option> tags from array references and C<optgroup> tags from L<Mojo::Collection> objects.
+Previous input values will automatically get picked up and shown as default.
 
   <select name="country">
     <option value="de">de</option>
@@ -685,8 +665,8 @@ Very useful for reuse in more specific tag helpers.
   my $output = $c->tag('div', '<p>This will be escaped</p>');
   my $output = $c->tag('div', sub { '<p>This will not be escaped</p>' });
 
-Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
-accidental double escaping in C<ep> templates.
+Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent accidental double escaping in C<ep>
+templates.
 
 =head2 tag_with_error
 
@@ -702,8 +682,7 @@ Same as L</"tag">, but adds the class C<field-with-error>.
   %= tel_field work => '123456789'
   %= tel_field work => '123456789', id => 'foo'
 
-Generate C<input> tag of type C<tel>. Previous input values will automatically
-get picked up and shown as default.
+Generate C<input> tag of type C<tel>. Previous input values will automatically get picked up and shown as default.
 
   <input name="work" type="tel">
   <input name="work" type="tel" value="123456789">
@@ -718,8 +697,7 @@ get picked up and shown as default.
     Default
   % end
 
-Generate C<textarea> tag. Previous input values will automatically get picked
-up and shown as default.
+Generate C<textarea> tag. Previous input values will automatically get picked up and shown as default.
 
   <textarea name="story"></textarea>
   <textarea cols="40" name="story"></textarea>
@@ -734,8 +712,7 @@ up and shown as default.
   %= text_field first_name => 'Default'
   %= text_field first_name => 'Default', class => 'user'
 
-Generate C<input> tag of type C<text>. Previous input values will automatically
-get picked up and shown as default.
+Generate C<input> tag of type C<text>. Previous input values will automatically get picked up and shown as default.
 
   <input name="first_name" type="text">
   <input name="first_name" type="text" value="Default">
@@ -747,8 +724,7 @@ get picked up and shown as default.
   %= time_field start => '23:59:59'
   %= time_field start => '23:59:59', id => 'foo'
 
-Generate C<input> tag of type C<time>. Previous input values will automatically
-get picked up and shown as default.
+Generate C<input> tag of type C<time>. Previous input values will automatically get picked up and shown as default.
 
   <input name="start" type="time">
   <input name="start" type="time" value="23:59:59">
@@ -760,8 +736,7 @@ get picked up and shown as default.
   %= url_field address => 'https://mojolicious.org'
   %= url_field address => 'https://mojolicious.org', id => 'foo'
 
-Generate C<input> tag of type C<url>. Previous input values will automatically
-get picked up and shown as default.
+Generate C<input> tag of type C<url>. Previous input values will automatically get picked up and shown as default.
 
   <input name="address" type="url">
   <input name="address" type="url" value="https://mojolicious.org">
@@ -773,8 +748,7 @@ get picked up and shown as default.
   %= week_field vacation => '2012-W17'
   %= week_field vacation => '2012-W17', id => 'foo'
 
-Generate C<input> tag of type C<week>. Previous input values will automatically
-get picked up and shown as default.
+Generate C<input> tag of type C<week>. Previous input values will automatically get picked up and shown as default.
 
   <input name="vacation" type="week">
   <input name="vacation" type="week" value="2012-W17">
@@ -782,8 +756,8 @@ get picked up and shown as default.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::TagHelpers> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin::TagHelpers> inherits all methods from L<Mojolicious::Plugin> and implements the following new
+ones.
 
 =head2 register
 

@@ -57,8 +57,7 @@ is $e->lines_before->[3][1], '  # test', 'right line';
 is $e->lines_before->[4][0], $line + 4, 'right number';
 ok !$e->lines_before->[4][1], 'empty line';
 is $e->line->[0], $line + 5, 'right number';
-is $e->line->[1], "  my \$wrapper = sub { Mojo::Exception->throw('Works!') };",
-  'right line';
+is $e->line->[1], "  my \$wrapper = sub { Mojo::Exception->throw('Works!') };", 'right line';
 is $e->lines_after->[0][0], $line + 6, 'right number';
 is $e->lines_after->[0][1], '  $wrapper->();', 'right line';
 is $e->lines_after->[1][0], $line + 7, 'right number';
@@ -91,8 +90,7 @@ is_deeply $e->lines_after->[0], [4, ''], 'right line';
 $e = Mojo::Exception->new("Died at $file line 4.")->inspect;
 is_deeply $e->lines_before->[-1], [3, 'use utf8;'], 'right line';
 is_deeply $e->line, [4, ''], 'right line';
-is_deeply $e->lines_after->[0], [5, "my \$s = 'Über•résumé';"],
-  'right line';
+is_deeply $e->lines_after->[0], [5, "my \$s = 'Über•résumé';"], 'right line';
 
 # Inspect (non UTF-8)
 $file = $file->sibling('non_utf8.txt');
@@ -107,8 +105,7 @@ is_deeply $e->lines_after->[0], [4, ''], 'right line';
 $e = Mojo::Exception->new("Died at $file line 4.")->inspect;
 is_deeply $e->lines_before->[-1], [3, 'no utf8;'], 'right line';
 is_deeply $e->line, [4, ''], 'right line';
-is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"],
-  'right line';
+is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"], 'right line';
 
 # Context
 $e = Mojo::Exception->new;
@@ -116,13 +113,8 @@ is $e, "Exception!\n", 'right result';
 $e = Mojo::Exception->new->inspect->inspect;
 is $e, "Exception!\n", 'right result';
 $e = Mojo::Exception->new('Test!');
-$e->frames([
-  ['Sandbox',     'template',      4],
-  ['MyApp::Test', 'MyApp/Test.pm', 3],
-  ['main',        'foo.pl',        4]
-]);
-$e->lines_before([[3, 'foo();']])->line([4, 'die;'])
-  ->lines_after([[5, 'bar();']]);
+$e->frames([['Sandbox', 'template', 4], ['MyApp::Test', 'MyApp/Test.pm', 3], ['main', 'foo.pl', 4]]);
+$e->lines_before([[3, 'foo();']])->line([4, 'die;'])->lines_after([[5, 'bar();']]);
 is $e, "Test! at template line 4.\n", 'right result';
 is $e->verbose(1), <<EOF, 'right result';
 Test! at template line 4.
@@ -220,16 +212,14 @@ is $result, 'test23', 'regex matched';
 # Check (multiple)
 $result = undef;
 check(
-  MojoTest::X::Yada->new('whatever'),
-  ['MojoTest::X::Foo', 'MojoTest::X::Bar'] => sub { $result = 'test15' },
-  default                                  => sub { $result = 'fail' }
+  MojoTest::X::Yada->new('whatever'), ['MojoTest::X::Foo', 'MojoTest::X::Bar'] => sub { $result = 'test15' },
+  default => sub { $result = 'fail' }
 );
 is $result, 'test15', 'class matched';
 $result = undef;
 check(
-  MojoTest::X::Bar->new('whatever'),
-  ['MojoTest::X::Foo', 'MojoTest::X::Yada'] => sub { $result = 'fail' },
-  ['MojoTest::X::Bar']                      => sub { $result = 'test16' }
+  MojoTest::X::Bar->new('whatever'), ['MojoTest::X::Foo', 'MojoTest::X::Yada'] => sub { $result = 'fail' },
+  ['MojoTest::X::Bar'] => sub { $result = 'test16' }
 );
 is $result, 'test16', 'class matched';
 

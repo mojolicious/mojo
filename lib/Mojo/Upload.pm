@@ -37,8 +37,7 @@ L<Mojo::Upload> implements the following attributes.
   my $asset = $upload->asset;
   $upload   = $upload->asset(Mojo::Asset::File->new);
 
-Asset containing the uploaded data, usually a L<Mojo::Asset::File> or
-L<Mojo::Asset::Memory> object.
+Asset containing the uploaded data, usually a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object.
 
 =head2 filename
 
@@ -63,8 +62,7 @@ Name of the upload.
 
 =head1 METHODS
 
-L<Mojo::Upload> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Upload> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 move_to
 

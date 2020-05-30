@@ -200,9 +200,8 @@ Mojo::Parameters - Parameters
 
 =head1 DESCRIPTION
 
-L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>,
-based on L<RFC 3986|http://tools.ietf.org/html/rfc3986> and the
-L<HTML Living Standard|https://html.spec.whatwg.org>.
+L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>, based on L<RFC
+3986|http://tools.ietf.org/html/rfc3986> and the L<HTML Living Standard|https://html.spec.whatwg.org>.
 
 =head1 ATTRIBUTES
 
@@ -220,8 +219,7 @@ Charset used for encoding and decoding parameters, defaults to C<UTF-8>.
 
 =head1 METHODS
 
-L<Mojo::Parameters> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Parameters> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 append
 
@@ -254,8 +252,8 @@ Return a new L<Mojo::Parameters> object cloned from these parameters.
 
   my $values = $params->every_param('foo');
 
-Similar to L</"param">, but returns all values sharing the same name as an
-array reference. Note that this method will normalize the parameters.
+Similar to L</"param">, but returns all values sharing the same name as an array reference. Note that this method will
+normalize the parameters.
 
   # Get first value
   say $params->every_param('foo')->[0];
@@ -295,8 +293,7 @@ Return an array reference with all parameter names.
   my $params = Mojo::Parameters->new(foo => ['ba&r', 'baz']);
   my $params = Mojo::Parameters->new(foo => ['bar', 'baz'], bar => 23);
 
-Construct a new L<Mojo::Parameters> object and L</"parse"> parameters if
-necessary.
+Construct a new L<Mojo::Parameters> object and L</"parse"> parameters if necessary.
 
 =head2 pairs
 
@@ -315,9 +312,8 @@ Parsed parameter pairs. Note that this method will normalize the parameters.
   $params   = $params->param(foo => qw(ba&r baz));
   $params   = $params->param(foo => ['ba;r', 'baz']);
 
-Access parameter values. If there are multiple values sharing the same name,
-and you want to access more than just the last one, you can use
-L</"every_param">. Note that this method will normalize the parameters.
+Access parameter values. If there are multiple values sharing the same name, and you want to access more than just the
+last one, you can use L</"every_param">. Note that this method will normalize the parameters.
 
 =head2 parse
 
@@ -338,8 +334,7 @@ Remove parameters. Note that this method will normalize the parameters.
 
   my $hash = $params->to_hash;
 
-Turn parameters into a hash reference. Note that this method will normalize the
-parameters.
+Turn parameters into a hash reference. Note that this method will normalize the parameters.
 
   # "baz"
   Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}[1];

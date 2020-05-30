@@ -48,9 +48,7 @@ sub detect {
 
   # Extract and prioritize MIME types
   my %types;
-  /^\s*([^,; ]+)(?:\s*\;\s*q\s*=\s*(\d+(?:\.\d+)?))?\s*$/i
-    and $types{lc $1} = $2 // 1
-    for split ',', $accept // '';
+  /^\s*([^,; ]+)(?:\s*\;\s*q\s*=\s*(\d+(?:\.\d+)?))?\s*$/i and $types{lc $1} = $2 // 1 for split ',', $accept // '';
   my @detected = sort { $types{$b} <=> $types{$a} } sort keys %types;
 
   # Detect extensions from MIME types
@@ -136,17 +134,15 @@ MIME type mapping.
 
 =head1 METHODS
 
-L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 content_type
 
   $types->content_type(Mojolicious::Controller->new, {ext => 'json'});
 
-Detect MIME type for L<Mojolicious::Controller> object unless a C<Content-Type>
-response header has already been set, defaults to using
-C<application/octet-stream> if no better alternative could be found.
-These options are currently available:
+Detect MIME type for L<Mojolicious::Controller> object unless a C<Content-Type> response header has already been set,
+defaults to using C<application/octet-stream> if no better alternative could be found. These options are currently
+available:
 
 =over 2
 
@@ -185,8 +181,7 @@ Get MIME type for file path.
   $types   = $types->type(png => 'image/png');
   $types   = $types->type(json => ['application/json', 'text/x-json']);
 
-Get or set MIME types for file extension, alternatives are only used for
-detection.
+Get or set MIME types for file extension, alternatives are only used for detection.
 
 =head1 SEE ALSO
 

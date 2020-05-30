@@ -11,8 +11,7 @@ use ojo;
 use File::Basename qw(basename);
 
 # Application
-a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })
-  ->secrets(['foobarbaz']);
+a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })->secrets(['foobarbaz']);
 is a->secrets->[0], 'foobarbaz', 'right secret';
 
 # Requests

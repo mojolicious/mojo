@@ -7,14 +7,12 @@ Mojolicious::Guides - The Mojolicious Guide to the Galaxy
 
 =head1 DON'T PANIC!
 
-The L<Mojolicious|https://mojolicious.org> documentation is structured into
-three parts. The L</"TUTORIAL"> everyone starts with, the L</"GUIDES"> that
-explain all major features in detail, and the class L</"REFERENCE"> listing
-all available APIs.
+The L<Mojolicious|https://mojolicious.org> documentation is structured into three parts. The L</"TUTORIAL"> everyone
+starts with, the L</"GUIDES"> that explain all major features in detail, and the class L</"REFERENCE"> listing all
+available APIs.
 
-Some parts of the documentation only use the L<Mojolicious::Lite> micro web
-framework for examples, but that's merely a convenience for the reader. Almost
-all features are exactly the same for full L<Mojolicious> applications.
+Some parts of the documentation only use the L<Mojolicious::Lite> micro web framework for examples, but that's merely a
+convenience for the reader. Almost all features are exactly the same for full L<Mojolicious> applications.
 
 =head1 BASICS
 
@@ -22,21 +20,16 @@ all features are exactly the same for full L<Mojolicious> applications.
 
 =item Learning Perl
 
-If you are new to Perl, we recommend
-L<Learn Perl in 2 hours 30 minutes|http://qntm.org/files/perl/perl.html> for a
-quick introduction, or the
-L<Modern Perl book|https://pragprog.com/book/swperl/modern-perl-fourth-edition>,
-freely available in many formats. Both are excellent introductions to the
-language. For more books and documentation, check out
-L<learn.perl.org|http://learn.perl.org/>.
+If you are new to Perl, we recommend L<Learn Perl in 2 hours 30 minutes|http://qntm.org/files/perl/perl.html> for a
+quick introduction, or the L<Modern Perl book|https://pragprog.com/book/swperl/modern-perl-fourth-edition>, freely
+available in many formats. Both are excellent introductions to the language. For more books and documentation, check
+out L<learn.perl.org|http://learn.perl.org/>.
 
 =item Learning Web Technologies
 
-All web development starts with HTML, CSS and JavaScript, to learn the basics
-we recommend the
-L<Mozilla Developer Network|https://developer.mozilla.org/en-US/docs/Web>. And
-if you want to know more about how browsers and web servers actually
-communicate, there's also a very nice introduction to
+All web development starts with HTML, CSS and JavaScript, to learn the basics we recommend the L<Mozilla Developer
+Network|https://developer.mozilla.org/en-US/docs/Web>. And if you want to know more about how browsers and web servers
+actually communicate, there's also a very nice introduction to
 L<HTTP|https://developer.mozilla.org/en-US/docs/Web/HTTP>.
 
 =back
@@ -47,25 +40,23 @@ L<HTTP|https://developer.mozilla.org/en-US/docs/Web/HTTP>.
 
 =item Modern Perl
 
-L<Mojolicious> uses a modern subset of Perl exclusively, and therefore all
-documentation assumes that L<strict>, L<warnings>, L<utf8> and Perl 5.16
-L<features|feature> are enabled, even if examples don't specifically mention it.
+L<Mojolicious> uses a modern subset of Perl exclusively, and therefore all documentation assumes that L<strict>,
+L<warnings>, L<utf8> and Perl 5.16 L<features|feature> are enabled, even if examples don't specifically mention it.
 
   use strict;
   use warnings;
   use utf8;
   use feature ':5.16';
 
-Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for
-you automatically, whenever they are used.
+Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for you automatically, whenever they are
+used.
 
 =item Variable names
 
-For brevity and clarity, example variables will reflect the type of data the API
-uses. For instance, C<$bytes> or C<$chars> to distinguish whether it is encoded
-bytes or decoded characters in a Perl L<string|perlunifaq>, C<$bool> if the
-value just indicates true or false, C<$c> to denote a L<Mojolicious::Controller>
-object, or C<$app> to denote the L<application|Mojolicious> object.
+For brevity and clarity, example variables will reflect the type of data the API uses. For instance, C<$bytes> or
+C<$chars> to distinguish whether it is encoded bytes or decoded characters in a Perl L<string|perlunifaq>, C<$bool> if
+the value just indicates true or false, C<$c> to denote a L<Mojolicious::Controller> object, or C<$app> to denote the
+L<application|Mojolicious> object.
 
 =back
 
@@ -75,12 +66,10 @@ object, or C<$app> to denote the L<application|Mojolicious> object.
 
 =item L<Mojolicious::Guides::Tutorial>
 
-A fast and fun way to get started developing web applications with
-L<Mojolicious>. The tutorial introduces the L<Mojolicious::Lite> micro web
-framework, which is only a thin wrapper around the full web framework. The
-simplified notation introduced in the tutorial is commonly used throughout the
-guides and is therefore considered a prerequisite, you should definitely take a
-look!
+A fast and fun way to get started developing web applications with L<Mojolicious>. The tutorial introduces the
+L<Mojolicious::Lite> micro web framework, which is only a thin wrapper around the full web framework. The simplified
+notation introduced in the tutorial is commonly used throughout the guides and is therefore considered a prerequisite,
+you should definitely take a look!
 
 =back
 
@@ -90,8 +79,8 @@ look!
 
 =item L<Mojolicious::Guides::Growing>
 
-Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
-well-structured L<Mojolicious> application.
+Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a well-structured L<Mojolicious>
+application.
 
 =item L<Mojolicious::Guides::Routing>
 
@@ -103,8 +92,7 @@ Generating content with the L<Mojolicious> renderer.
 
 =item L<Mojolicious::Guides::Testing>
 
-Powerful yet elegant testing techniques and tools for L<Mojolicious> and other
-web applications.
+Powerful yet elegant testing techniques and tools for L<Mojolicious> and other web applications.
 
 =item L<Mojolicious::Guides::Cookbook>
 
@@ -122,9 +110,8 @@ Answers to the most frequently asked questions.
 
 =head1 HIGHLIGHTS
 
-L<Mojolicious> and L<Mojolicious::Lite> are the sum of many parts, built on top
-of the L<Mojo> web development toolkit. Small building blocks that can be used
-independently for all kinds of applications, these are the most prominent ones.
+L<Mojolicious> and L<Mojolicious::Lite> are the sum of many parts, built on top of the L<Mojo> web development toolkit.
+Small building blocks that can be used independently for all kinds of applications, these are the most prominent ones.
 
 =over 2
 
@@ -142,15 +129,13 @@ Minimalistic JSON implementation that just works.
 
 =item L<Mojo::Server::Daemon>
 
-Full featured, highly portable non-blocking I/O HTTP and WebSocket server, with
-self-restart support through L<Mojo::Server::Morbo>, perfect for development
-and testing.
+Full featured, highly portable non-blocking I/O HTTP and WebSocket server, with self-restart support through
+L<Mojo::Server::Morbo>, perfect for development and testing.
 
 =item L<Mojo::Server::Prefork>
 
-Full featured, UNIX optimized, preforking non-blocking I/O HTTP and WebSocket
-server with support for zero downtime software upgrades (hot deployment)
-through L<Mojo::Server::Hypnotoad>.
+Full featured, UNIX optimized, preforking non-blocking I/O HTTP and WebSocket server with support for zero downtime
+software upgrades (hot deployment) through L<Mojo::Server::Hypnotoad>.
 
 =item L<Mojo::Server::CGI>, L<Mojo::Server::PSGI>
 
@@ -176,42 +161,34 @@ Fun one-liners using everything above.
 
 =head1 SPIN-OFFS
 
-These modules are not part of the L<Mojolicious> distribution, but have been
-designed to be used with it and are being developed under the same umbrella.
+These modules are not part of the L<Mojolicious> distribution, but have been designed to be used with it and are being
+developed under the same umbrella.
 
 =over 2
 
 =item L<Mojo::Pg>
 
-A tiny wrapper around L<DBD::Pg> that makes
-L<PostgreSQL|http://www.postgresql.org> a lot of fun to use with
-L<Mojolicious>. Perform queries blocking and non-blocking, use all
-L<SQL features|https://www.postgresql.org/docs/current/static/sql.html>
-PostgreSQL has to offer, generate CRUD queries from data structures, manage your
-database schema with migrations and build scalable real-time web applications
-with the publish/subscribe pattern.
+A tiny wrapper around L<DBD::Pg> that makes L<PostgreSQL|http://www.postgresql.org> a lot of fun to use with
+L<Mojolicious>. Perform queries blocking and non-blocking, use all L<SQL
+features|https://www.postgresql.org/docs/current/static/sql.html> PostgreSQL has to offer, generate CRUD queries from
+data structures, manage your database schema with migrations and build scalable real-time web applications with the
+publish/subscribe pattern.
 
-B<Examples:> The minimal
-L<chat|https://github.com/mojolicious/mojo-pg/tree/master/examples/chat.pl>
-application will show you how to scale WebSockets to multiple servers, and the
-well-structured
-L<blog|https://github.com/mojolicious/mojo-pg/tree/master/examples/blog> 
-application how to apply the MVC design pattern in practice.
+B<Examples:> The minimal L<chat|https://github.com/mojolicious/mojo-pg/tree/master/examples/chat.pl> application will
+show you how to scale WebSockets to multiple servers, and the well-structured
+L<blog|https://github.com/mojolicious/mojo-pg/tree/master/examples/blog>  application how to apply the MVC design
+pattern in practice.
 
 =item L<Minion>
 
-A full featured job queue for L<Mojolicious> with support for multiple backends
-(such as L<PostgreSQL|http://www.postgresql.org>). Job queues allow you to
-process time and/or computationally intensive tasks in background processes,
-outside of the request/response lifecycle. Among those tasks you'll commonly
-find image resizing, spam filtering, HTTP downloads, building tarballs, warming
-caches and basically everything else you can imagine that's not super fast.
+A full featured job queue for L<Mojolicious> with support for multiple backends (such as
+L<PostgreSQL|http://www.postgresql.org>). Job queues allow you to process time and/or computationally intensive tasks
+in background processes, outside of the request/response lifecycle. Among those tasks you'll commonly find image
+resizing, spam filtering, HTTP downloads, building tarballs, warming caches and basically everything else you can
+imagine that's not super fast.
 
-B<Examples:> The
-L<link
-checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck>
-will show you how to integrate background jobs into well-structured
-L<Mojolicious> applications.
+B<Examples:> The L<link checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck> will show you how
+to integrate background jobs into well-structured L<Mojolicious> applications.
 
 =back
 
@@ -527,15 +504,13 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =head1 MORE
 
-A lot more documentation and examples by many different authors can be found in
-the L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>.
+A lot more documentation and examples by many different authors can be found in the L<Mojolicious
+wiki|http://github.com/mojolicious/mojo/wiki>.
 
 =head1 SUPPORT
 
-If you have any questions the documentation might not yet answer, don't
-hesitate to ask on the
-L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.freenode.net> (L<chat
+If you have any questions the documentation might not yet answer, don't hesitate to ask on the L<mailing
+list|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
 now!|https://webchat.freenode.net/#mojo>).
 
 =cut

@@ -4,8 +4,7 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Parameters;
 use Mojo::Path;
-use Mojo::Util
-  qw(decode encode punycode_decode punycode_encode url_escape url_unescape);
+use Mojo::Util qw(decode encode punycode_decode punycode_encode url_escape url_unescape);
 
 has base => sub { Mojo::URL->new };
 has [qw(fragment host port scheme userinfo)];
@@ -36,18 +35,14 @@ sub ihost {
   my $self = shift;
 
   # Decode
-  return $self->host(join '.',
-    map { /^xn--(.+)$/ ? punycode_decode $1 : $_ } split(/\./, shift, -1))
-    if @_;
+  return $self->host(join '.', map { /^xn--(.+)$/ ? punycode_decode $1 : $_ } split(/\./, shift, -1)) if @_;
 
   # Check if host needs to be encoded
   return undef unless defined(my $host = $self->host);
   return $host unless $host =~ /[^\x00-\x7f]/;
 
   # Encode
-  return join '.',
-    map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ }
-    split(/\./, $host, -1);
+  return join '.', map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ } split(/\./, $host, -1);
 }
 
 sub is_abs { !!shift->scheme }
@@ -221,11 +216,9 @@ Mojo::URL - Uniform Resource Locator
 
 =head1 DESCRIPTION
 
-L<Mojo::URL> implements a subset of
-L<RFC 3986|http://tools.ietf.org/html/rfc3986>,
-L<RFC 3987|http://tools.ietf.org/html/rfc3987> and the
-L<URL Living Standard|https://url.spec.whatwg.org> for Uniform Resource
-Locators with support for IDNA and IRIs.
+L<Mojo::URL> implements a subset of L<RFC 3986|http://tools.ietf.org/html/rfc3986>, L<RFC
+3987|http://tools.ietf.org/html/rfc3987> and the L<URL Living Standard|https://url.spec.whatwg.org> for Uniform
+Resource Locators with support for IDNA and IRIs.
 
 =head1 ATTRIBUTES
 
@@ -293,8 +286,7 @@ Userinfo part of this URL.
 
 =head1 METHODS
 
-L<Mojo::URL> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::URL> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 clone
 
@@ -384,8 +376,7 @@ Password part of L</"userinfo">.
   $url     = $url->path('/foo/bar');
   $url     = $url->path(Mojo::Path->new);
 
-Path part of this URL, relative paths will be merged with
-L<Mojo::Path/"merge">, defaults to a L<Mojo::Path> object.
+Path part of this URL, relative paths will be merged with L<Mojo::Path/"merge">, defaults to a L<Mojo::Path> object.
 
   # "perldoc"
   Mojo::URL->new('http://example.com/perldoc/Mojo')->path->parts->[0];
@@ -433,10 +424,8 @@ Normalized version of L</"scheme">.
   $url      = $url->query('a=1&b=2');
   $url      = $url->query(Mojo::Parameters->new);
 
-Query part of this URL, key/value pairs in an array reference will be appended
-with L<Mojo::Parameters/"append">, and key/value pairs in a hash reference
-merged with L<Mojo::Parameters/"merge">, defaults to a L<Mojo::Parameters>
-object.
+Query part of this URL, key/value pairs in an array reference will be appended with L<Mojo::Parameters/"append">, and
+key/value pairs in a hash reference merged with L<Mojo::Parameters/"merge">, defaults to a L<Mojo::Parameters> object.
 
   # "2"
   Mojo::URL->new('http://example.com?a=1&b=2')->query->param('b');
@@ -464,8 +453,8 @@ object.
   my $abs = $url->to_abs;
   my $abs = $url->to_abs(Mojo::URL->new('http://example.com/foo'));
 
-Return a new L<Mojo::URL> object cloned from this relative URL and turn it into
-an absolute one using L</"base"> or provided base URL.
+Return a new L<Mojo::URL> object cloned from this relative URL and turn it into an absolute one using L</"base"> or
+provided base URL.
 
   # "http://example.com/foo/baz.xml?test=123"
   Mojo::URL->new('baz.xml?test=123')
@@ -483,8 +472,7 @@ an absolute one using L</"base"> or provided base URL.
 
   my $str = $url->to_string;
 
-Turn URL into a string. Note that L</"userinfo"> will not be included for
-security reasons.
+Turn URL into a string. Note that L</"userinfo"> will not be included for security reasons.
 
   # "http://mojolicious.org"
   Mojo::URL->new->scheme('http')->host('mojolicious.org')->to_string;

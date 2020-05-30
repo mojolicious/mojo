@@ -15,17 +15,16 @@ Essentials every L<Mojolicious> developer should know.
 
 =head2 Blocking and non-blocking operations
 
-A I<blocking> operation is a subroutine that blocks the execution of the
-calling subroutine until the subroutine is finished.
+A I<blocking> operation is a subroutine that blocks the execution of the calling subroutine until the subroutine is
+finished.
 
   sub foo {
     my $result = blocking_subroutine();
     ...
   }
 
-A I<non-blocking> operation on the other hand lets the calling subroutine
-continue execution even though the subroutine is not yet finished. Instead of
-waiting, the calling subroutine passes along a callback to be executed once the
+A I<non-blocking> operation on the other hand lets the calling subroutine continue execution even though the subroutine
+is not yet finished. Instead of waiting, the calling subroutine passes along a callback to be executed once the
 subroutine is finished, this is called continuation-passing style.
 
   sub foo {
@@ -36,21 +35,17 @@ subroutine is finished, this is called continuation-passing style.
     ...
   }
 
-While L<Mojolicious> has been designed from the ground up for non-blocking I/O
-and event loops, it is not possible to magically make Perl code non-blocking.
-You have to use specialized non-blocking code available through modules like
-L<Mojo::IOLoop> and L<Mojo::UserAgent>, or third-party event loops. You can wrap
-your blocking code in L<subprocesses|Mojo::IOLoop/"subprocess"> though to
-prevent it from interfering with your non-blocking code.
+While L<Mojolicious> has been designed from the ground up for non-blocking I/O and event loops, it is not possible to
+magically make Perl code non-blocking. You have to use specialized non-blocking code available through modules like
+L<Mojo::IOLoop> and L<Mojo::UserAgent>, or third-party event loops. You can wrap your blocking code in
+L<subprocesses|Mojo::IOLoop/"subprocess"> though to prevent it from interfering with your non-blocking code.
 
 =head2 Event loops
 
-An event loop is basically a loop that continually tests for external events
-and executes the appropriate callbacks to handle them, it is often the main
-loop in a program. Non-blocking tests for readability/writability of file
-descriptors and timers are commonly used events for highly scalable network
-servers, because they allow a single process to handle thousands of client
-connections concurrently.
+An event loop is basically a loop that continually tests for external events and executes the appropriate callbacks to
+handle them, it is often the main loop in a program. Non-blocking tests for readability/writability of file descriptors
+and timers are commonly used events for highly scalable network servers, because they allow a single process to handle
+thousands of client connections concurrently.
 
   while (1) {
     my @readable = test_fds_for_readability();
@@ -67,13 +62,11 @@ In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
 
 =head2 Reverse proxy
 
-A reverse proxy architecture is a deployment technique used in many production
-environments, where a I<reverse proxy> server is put in front of your
-application to act as the endpoint accessible by external clients. It can
-provide a lot of benefits, like terminating SSL connections from the outside,
-limiting the number of concurrent open sockets towards the Mojolicious
-application (or even using Unix sockets), balancing load across multiple
-instances, or supporting several applications through the same IP/port.
+A reverse proxy architecture is a deployment technique used in many production environments, where a I<reverse proxy>
+server is put in front of your application to act as the endpoint accessible by external clients. It can provide a lot
+of benefits, like terminating SSL connections from the outside, limiting the number of concurrent open sockets towards
+the Mojolicious application (or even using Unix sockets), balancing load across multiple instances, or supporting
+several applications through the same IP/port.
 
                    ..........................................
                    :                                        :
@@ -86,14 +79,12 @@ instances, or supporting several applications through the same IP/port.
                    :                                        :
                    .. system boundary (e.g. same host) ......
 
-This setup introduces some problems, though: the application will receive
-requests from the reverse proxy instead of the original client; the
-address/hostname where your application lives internally will be different from
-the one visible from the outside; and if terminating SSL, the reverse proxy
-exposes services via HTTPS while using HTTP towards the Mojolicious application.
+This setup introduces some problems, though: the application will receive requests from the reverse proxy instead of
+the original client; the address/hostname where your application lives internally will be different from the one
+visible from the outside; and if terminating SSL, the reverse proxy exposes services via HTTPS while using HTTP towards
+the Mojolicious application.
 
-As an example, compare a sample request from the client and what the Mojolicious
-application receives:
+As an example, compare a sample request from the client and what the Mojolicious application receives:
 
    client                       reverse proxy                Mojolicious app
     __|__              _______________|______________             ____|____
@@ -105,9 +96,8 @@ application receives:
    User-Agent: Firefox                |    User-Agent: ShinyProxy/1.2
    ...                                |    ...
 
-However, now the client address is no longer available (which might be useful
-for analytics, or Geo-IP) and URLs generated via
-L<Mojolicious::Controller/"url_for"> will look like this:
+However, now the client address is no longer available (which might be useful for analytics, or Geo-IP) and URLs
+generated via L<Mojolicious::Controller/"url_for"> will look like this:
 
    http://10.20.30.40/bar/2
 
@@ -115,47 +105,39 @@ instead of something meaningful for the client, like this:
 
    https://api.example.com/bar/2
 
-To solve these problems, you can configure your reverse proxy to send the
-missing data (see L</Nginx> and L</"Apache/mod_proxy">) and tell your
-application about it by setting the environment variable C<MOJO_REVERSE_PROXY>.
-For finer control, L</Rewriting> includes examples of how the changes could be
-implemented manually.
+To solve these problems, you can configure your reverse proxy to send the missing data (see L</Nginx> and
+L</"Apache/mod_proxy">) and tell your application about it by setting the environment variable C<MOJO_REVERSE_PROXY>.
+For finer control, L</Rewriting> includes examples of how the changes could be implemented manually.
 
 =head1 DEPLOYMENT
 
-Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
-different platforms. Note that many real-time web features are based on the
-L<Mojo::IOLoop> event loop, and therefore require one of the built-in web
-servers to be able to use them to their full potential.
+Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on different platforms. Note that many real-time
+web features are based on the L<Mojo::IOLoop> event loop, and therefore require one of the built-in web servers to be
+able to use them to their full potential.
 
 =head2 Built-in web server
 
-L<Mojolicious> contains a very portable non-blocking I/O HTTP and WebSocket
-server with L<Mojo::Server::Daemon>. It is usually used during development and
-in the construction of more advanced web servers, but is solid and fast enough
-for small to mid sized applications.
+L<Mojolicious> contains a very portable non-blocking I/O HTTP and WebSocket server with L<Mojo::Server::Daemon>. It is
+usually used during development and in the construction of more advanced web servers, but is solid and fast enough for
+small to mid sized applications.
 
   $ ./script/my_app daemon
   Server available at http://127.0.0.1:3000
 
-It is available to every application through the command
-L<Mojolicious::Command::daemon>, which has many configuration options and is
-known to work on every platform Perl works on with its single-process
-architecture.
+It is available to every application through the command L<Mojolicious::Command::daemon>, which has many configuration
+options and is known to work on every platform Perl works on with its single-process architecture.
 
   $ ./script/my_app daemon -h
   ...List of available options...
 
-Another huge advantage is that it supports TLS and WebSockets out of the box, a
-development certificate for testing purposes is built right in, so it just
-works, but you can specify all listen locations supported by
+Another huge advantage is that it supports TLS and WebSockets out of the box, a development certificate for testing
+purposes is built right in, so it just works, but you can specify all listen locations supported by
 L<Mojo::Server::Daemon/"listen">.
 
   $ ./script/my_app daemon -l https://[::]:3000
   Server available at https://[::]:3000
 
-To manage the web server with systemd, you can use a unit configuration file
-like this.
+To manage the web server with systemd, you can use a unit configuration file like this.
 
   [Unit]
   Description=My Mojolicious application
@@ -170,25 +152,22 @@ like this.
 
 =head2 Pre-forking
 
-On UNIX platforms you can also add pre-forking to the built-in web server and
-switch to a multi-process architecture with L<Mojolicious::Command::prefork>, to
-take advantage of multiple CPU cores and copy-on-write memory management.
+On UNIX platforms you can also add pre-forking to the built-in web server and switch to a multi-process architecture
+with L<Mojolicious::Command::prefork>, to take advantage of multiple CPU cores and copy-on-write memory management.
 
   $ ./script/my_app prefork
   Server available at http://127.0.0.1:3000
 
-Since all built-in web servers are based on the L<Mojo::IOLoop> event loop,
-they scale best with non-blocking operations. But if your application for some
-reason needs to perform many blocking operations, you can improve performance
-by increasing the number of worker processes and decreasing the number of
-concurrent connections each worker is allowed to handle (often as low as C<1>).
+Since all built-in web servers are based on the L<Mojo::IOLoop> event loop, they scale best with non-blocking
+operations. But if your application for some reason needs to perform many blocking operations, you can improve
+performance by increasing the number of worker processes and decreasing the number of concurrent connections each
+worker is allowed to handle (often as low as C<1>).
 
   $ ./script/my_app prefork -m production -w 10 -c 1
   Server available at http://127.0.0.1:3000
 
-During startup your application is preloaded in the manager process, which does
-not run an event loop, so you can use L<Mojo::IOLoop/"next_tick"> to run code
-whenever a new worker process has been forked and its event loop gets started.
+During startup your application is preloaded in the manager process, which does not run an event loop, so you can use
+L<Mojo::IOLoop/"next_tick"> to run code whenever a new worker process has been forked and its event loop gets started.
 
   use Mojolicious::Lite;
 
@@ -200,8 +179,7 @@ whenever a new worker process has been forked and its event loop gets started.
 
   app->start;
 
-And to manage the pre-forking web server with systemd, you can use a unit
-configuration file like this.
+And to manage the pre-forking web server with systemd, you can use a unit configuration file like this.
 
   [Unit]
   Description=My Mojolicious application
@@ -216,15 +194,13 @@ configuration file like this.
 
 =head2 Morbo
 
-After reading the L<Mojolicious::Guides::Tutorial>, you should already be
-familiar with L<Mojo::Server::Morbo>.
+After reading the L<Mojolicious::Guides::Tutorial>, you should already be familiar with L<Mojo::Server::Morbo>.
 
   Mojo::Server::Morbo
   +- Mojo::Server::Daemon
 
-It is basically a restarter that forks a new L<Mojo::Server::Daemon> web server
-whenever a file in your project changes, and should therefore only be used
-during development. To start applications with it you can use the L<morbo>
+It is basically a restarter that forks a new L<Mojo::Server::Daemon> web server whenever a file in your project
+changes, and should therefore only be used during development. To start applications with it you can use the L<morbo>
 script.
 
   $ morbo ./script/my_app
@@ -232,10 +208,9 @@ script.
 
 =head2 Hypnotoad
 
-For bigger applications L<Mojolicious> contains the UNIX optimized pre-forking
-web server L<Hypnotoad|Mojo::Server::Hypnotoad>, which can take advantage of
-multiple CPU cores and copy-on-write memory management to scale up to thousands
-of concurrent client connections.
+For bigger applications L<Mojolicious> contains the UNIX optimized pre-forking web server
+L<Hypnotoad|Mojo::Server::Hypnotoad>, which can take advantage of multiple CPU cores and copy-on-write memory
+management to scale up to thousands of concurrent client connections.
 
   Mojo::Server::Hypnotoad
   |- Mojo::Server::Daemon [1]
@@ -243,18 +218,15 @@ of concurrent client connections.
   |- Mojo::Server::Daemon [3]
   +- Mojo::Server::Daemon [4]
 
-It is based on the L<Mojo::Server::Prefork> web server, which adds pre-forking
-to L<Mojo::Server::Daemon>, but optimized specifically for production
-environments out of the box. To start applications with it you can use the
-L<hypnotoad> script, which listens on port C<8080>, automatically daemonizes
-the server process and defaults to C<production> mode for L<Mojolicious> and
-L<Mojolicious::Lite> applications.
+It is based on the L<Mojo::Server::Prefork> web server, which adds pre-forking to L<Mojo::Server::Daemon>, but
+optimized specifically for production environments out of the box. To start applications with it you can use the
+L<hypnotoad> script, which listens on port C<8080>, automatically daemonizes the server process and defaults to
+C<production> mode for L<Mojolicious> and L<Mojolicious::Lite> applications.
 
   $ hypnotoad ./script/my_app
 
-Many configuration settings can be tweaked right from within your application
-with L<Mojolicious/"config">, for a full list see
-L<Mojo::Server::Hypnotoad/"SETTINGS">.
+Many configuration settings can be tweaked right from within your application with L<Mojolicious/"config">, for a full
+list see L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   use Mojolicious::Lite;
 
@@ -264,8 +236,8 @@ L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   app->start;
 
-Or just add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or
-L<Mojolicious::Plugin::JSONConfig> configuration file.
+Or just add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
+configuration file.
 
   # myapp.conf
   {
@@ -275,24 +247,20 @@ L<Mojolicious::Plugin::JSONConfig> configuration file.
     }
   };
 
-But one of its biggest advantages is the support for effortless zero downtime
-software upgrades (hot deployment). That means you can upgrade L<Mojolicious>,
-Perl or even system libraries at runtime without ever stopping the server or
+But one of its biggest advantages is the support for effortless zero downtime software upgrades (hot deployment). That
+means you can upgrade L<Mojolicious>, Perl or even system libraries at runtime without ever stopping the server or
 losing a single incoming connection, just by running the command above again.
 
   $ hypnotoad ./script/my_app
   Starting hot deployment for Hypnotoad server 31841.
 
-You might also want to enable proxy support if you're using
-L<Hypnotoad|Mojo::Server::Hypnotoad> behind a reverse proxy. This allows
-L<Mojolicious> to automatically pick up the C<X-Forwarded-For> and
-C<X-Forwarded-Proto> headers.
+You might also want to enable proxy support if you're using L<Hypnotoad|Mojo::Server::Hypnotoad> behind a reverse
+proxy. This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
 
   # myapp.conf
   {hypnotoad => {proxy => 1}};
 
-To manage L<Hypnotoad|Mojo::Server::Hypnotoad> with systemd, you can use a unit
-configuration file like this.
+To manage L<Hypnotoad|Mojo::Server::Hypnotoad> with systemd, you can use a unit configuration file like this.
 
   [Unit]
   Description=My Mojolicious application
@@ -310,29 +278,26 @@ configuration file like this.
 
 =head2 Zero downtime software upgrades
 
-L<Hypnotoad|Mojo::Server::Hypnotoad> makes zero downtime software upgrades (hot
-deployment) very simple, as you can see above, but on modern operating systems
-that support the C<SO_REUSEPORT> socket option, there is also another method
+L<Hypnotoad|Mojo::Server::Hypnotoad> makes zero downtime software upgrades (hot deployment) very simple, as you can see
+above, but on modern operating systems that support the C<SO_REUSEPORT> socket option, there is also another method
 available that works with all built-in web servers.
 
   $ ./script/my_app prefork -P /tmp/first.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080
 
-All you have to do, is to start a second web server listening to the same port,
-and stop the first web server gracefully afterwards.
+All you have to do, is to start a second web server listening to the same port, and stop the first web server
+gracefully afterwards.
 
   $ ./script/my_app prefork -P /tmp/second.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080
   $ kill -s TERM `cat /tmp/first.pid`
 
-Just remember that both web servers need to be started with the C<reuse>
-parameter.
+Just remember that both web servers need to be started with the C<reuse> parameter.
 
 =head2 Nginx
 
-One of the most popular setups these days is
-L<Hypnotoad|Mojo::Server::Hypnotoad> behind an L<Nginx|http://nginx.org> reverse
-proxy, which even supports WebSockets in newer versions.
+One of the most popular setups these days is L<Hypnotoad|Mojo::Server::Hypnotoad> behind an L<Nginx|http://nginx.org>
+reverse proxy, which even supports WebSockets in newer versions.
 
   upstream myapp {
     server 127.0.0.1:8080;
@@ -353,9 +318,8 @@ proxy, which even supports WebSockets in newer versions.
 
 =head2 Apache/mod_proxy
 
-Another good reverse proxy is L<Apache|http://httpd.apache.org> with
-C<mod_proxy>, the configuration looks quite similar to the Nginx one above. And
-if you need WebSocket support, newer versions come with C<mod_proxy_wstunnel>.
+Another good reverse proxy is L<Apache|http://httpd.apache.org> with C<mod_proxy>, the configuration looks quite
+similar to the Nginx one above. And if you need WebSocket support, newer versions come with C<mod_proxy_wstunnel>.
 
   <VirtualHost *:80>
     ServerName localhost
@@ -372,50 +336,42 @@ if you need WebSocket support, newer versions come with C<mod_proxy_wstunnel>.
 
 =head2 Apache/CGI
 
-C<CGI> is supported out of the box and your L<Mojolicious> application will
-automatically detect that it is executed as a C<CGI> script. Its use in
-production environments is discouraged though, because as a result of how
-C<CGI> works, it is very slow and many web servers are making it exceptionally
-hard to configure properly. Additionally, many real-time web features, such as
-WebSockets, are not available.
+C<CGI> is supported out of the box and your L<Mojolicious> application will automatically detect that it is executed as
+a C<CGI> script. Its use in production environments is discouraged though, because as a result of how C<CGI> works, it
+is very slow and many web servers are making it exceptionally hard to configure properly. Additionally, many real-time
+web features, such as WebSockets, are not available.
 
   ScriptAlias / /home/sri/my_app/script/my_app/
 
 =head2 PSGI/Plack
 
-L<PSGI> is an interface between Perl web frameworks and web servers, and
-L<Plack> is a Perl module and toolkit that contains L<PSGI> middleware, helpers
-and adapters to web servers. L<PSGI> and L<Plack> are inspired by Python's WSGI
-and Ruby's Rack. L<Mojolicious> applications are ridiculously simple to deploy
-with L<Plack>, but be aware that many real-time web features, such as
-WebSockets, are not available.
+L<PSGI> is an interface between Perl web frameworks and web servers, and L<Plack> is a Perl module and toolkit that
+contains L<PSGI> middleware, helpers and adapters to web servers. L<PSGI> and L<Plack> are inspired by Python's WSGI
+and Ruby's Rack. L<Mojolicious> applications are ridiculously simple to deploy with L<Plack>, but be aware that many
+real-time web features, such as WebSockets, are not available.
 
   $ plackup ./script/my_app
 
-L<Plack> provides many server and protocol adapters for you to choose from,
-such as C<FCGI>, C<uWSGI> and C<mod_perl>.
+L<Plack> provides many server and protocol adapters for you to choose from, such as C<FCGI>, C<uWSGI> and C<mod_perl>.
 
   $ plackup ./script/my_app -s FCGI -l /tmp/myapp.sock
 
-The C<MOJO_REVERSE_PROXY> environment variable can be used to enable proxy
-support, this allows L<Mojolicious> to automatically pick up the
-C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
+The C<MOJO_REVERSE_PROXY> environment variable can be used to enable proxy support, this allows L<Mojolicious> to
+automatically pick up the C<X-Forwarded-For> and C<X-Forwarded-Proto> headers.
 
   $ MOJO_REVERSE_PROXY=1 plackup ./script/my_app
 
-If an older server adapter is unable to correctly detect the application home
-directory, you can simply use the C<MOJO_HOME> environment variable.
+If an older server adapter is unable to correctly detect the application home directory, you can simply use the
+C<MOJO_HOME> environment variable.
 
   $ MOJO_HOME=/home/sri/my_app plackup ./script/my_app
 
-There is no need for a C<.psgi> file, just point the server adapter at your
-application script, it will automatically act like one if it detects the
-presence of a C<PLACK_ENV> environment variable.
+There is no need for a C<.psgi> file, just point the server adapter at your application script, it will automatically
+act like one if it detects the presence of a C<PLACK_ENV> environment variable.
 
 =head2 Plack middleware
 
-Wrapper scripts like C<myapp.fcgi> are a great way to separate deployment and
-application logic.
+Wrapper scripts like C<myapp.fcgi> are a great way to separate deployment and application logic.
 
   #!/usr/bin/env plackup -s FCGI
   use Plack::Builder;
@@ -425,8 +381,7 @@ application logic.
     require './script/my_app';
   };
 
-L<Mojo::Server::PSGI> can be used directly to load and customize applications
-in the wrapper script.
+L<Mojo::Server::PSGI> can be used directly to load and customize applications in the wrapper script.
 
   #!/usr/bin/env plackup -s FCGI
   use Mojo::Server::PSGI;
@@ -457,11 +412,9 @@ But you could even use middleware right in your application.
 
 =head2 Rewriting
 
-Sometimes you might have to deploy your application in a blackbox environment
-where you can't just change the server configuration or behind a reverse proxy
-that passes along additional information with C<X-Forwarded-*> headers. In such
-cases you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming
-requests.
+Sometimes you might have to deploy your application in a blackbox environment where you can't just change the server
+configuration or behind a reverse proxy that passes along additional information with C<X-Forwarded-*> headers. In such
+cases you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming requests.
 
   # Change scheme if "X-Forwarded-HTTPS" header is set
   $app->hook(before_dispatch => sub {
@@ -470,11 +423,9 @@ requests.
       if $c->req->headers->header('X-Forwarded-HTTPS');
   });
 
-Since reverse proxies generally don't pass along information about path
-prefixes your application might be deployed under, rewriting the base path of
-incoming requests is also quite common. This allows
-L<Mojolicious::Controller/"url_for"> for example, to generate portable URLs
-based on the current environment.
+Since reverse proxies generally don't pass along information about path prefixes your application might be deployed
+under, rewriting the base path of incoming requests is also quite common. This allows
+L<Mojolicious::Controller/"url_for"> for example, to generate portable URLs based on the current environment.
 
   # Move first part and slash from path to base path in production mode
   $app->hook(before_dispatch => sub {
@@ -483,16 +434,14 @@ based on the current environment.
       shift @{$c->req->url->path->leading_slash(0)};
   }) if $app->mode eq 'production';
 
-L<Mojo::URL> objects are very easy to manipulate, just make sure that the URL
-(C<foo/bar?baz=yada>), which represents the routing destination, is always
-relative to the base URL (C<http://example.com/myapp/>), which represents the
+L<Mojo::URL> objects are very easy to manipulate, just make sure that the URL (C<foo/bar?baz=yada>), which represents
+the routing destination, is always relative to the base URL (C<http://example.com/myapp/>), which represents the
 deployment location of your application.
 
 =head2 Application embedding
 
-From time to time you might want to reuse parts of L<Mojolicious> applications
-like configuration files, database connection or helpers for other scripts,
-with this little L<Mojo::Server> based mock server you can just embed them.
+From time to time you might want to reuse parts of L<Mojolicious> applications like configuration files, database
+connection or helpers for other scripts, with this little L<Mojo::Server> based mock server you can just embed them.
 
   use Mojo::Server;
 
@@ -506,8 +455,8 @@ with this little L<Mojo::Server> based mock server you can just embed them.
   say $app->dumper({just => 'a helper test'});
   say $app->build_controller->render_to_string(template => 'foo');
 
-The plugin L<Mojolicious::Plugin::Mount> uses this functionality to allow you
-to combine multiple applications into one and deploy them together.
+The plugin L<Mojolicious::Plugin::Mount> uses this functionality to allow you to combine multiple applications into one
+and deploy them together.
 
   use Mojolicious::Lite;
 
@@ -520,9 +469,8 @@ to combine multiple applications into one and deploy them together.
 
 =head2 Web server embedding
 
-You can also use L<Mojo::IOLoop/"one_tick"> to embed the built-in web server
-L<Mojo::Server::Daemon> into alien environments like foreign event loops that
-for some reason can't just be integrated with a new reactor backend.
+You can also use L<Mojo::IOLoop/"one_tick"> to embed the built-in web server L<Mojo::Server::Daemon> into alien
+environments like foreign event loops that for some reason can't just be integrated with a new reactor backend.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -541,19 +489,16 @@ for some reason can't just be integrated with a new reactor backend.
 
 =head1 REAL-TIME WEB
 
-The real-time web is a collection of technologies that include Comet (long
-polling), EventSource and WebSockets, which allow content to be pushed to
-consumers with long-lived connections as soon as it is generated, instead of
-relying on the more traditional pull model. All built-in web servers use
-non-blocking I/O and are based on the L<Mojo::IOLoop> event loop, which
-provides many very powerful features that allow real-time web applications to
-scale up to thousands of concurrent client connections.
+The real-time web is a collection of technologies that include Comet (long polling), EventSource and WebSockets, which
+allow content to be pushed to consumers with long-lived connections as soon as it is generated, instead of relying on
+the more traditional pull model. All built-in web servers use non-blocking I/O and are based on the L<Mojo::IOLoop>
+event loop, which provides many very powerful features that allow real-time web applications to scale up to thousands
+of concurrent client connections.
 
 =head2 Backend web services
 
-Since L<Mojo::UserAgent> is also based on the L<Mojo::IOLoop> event loop, it
-won't block the built-in web servers when used non-blocking, even for high
-latency backend web services.
+Since L<Mojo::UserAgent> is also based on the L<Mojo::IOLoop> event loop, it won't block the built-in web servers when
+used non-blocking, even for high latency backend web services.
 
   use Mojolicious::Lite;
 
@@ -580,15 +525,13 @@ latency backend web services.
     </body>
   </html>
 
-The callback passed to L<Mojo::UserAgent/"get"> will be executed once the
-request to the backend web service has been finished, this is called
-continuation-passing style.
+The callback passed to L<Mojo::UserAgent/"get"> will be executed once the request to the backend web service has been
+finished, this is called continuation-passing style.
 
 =head2 Synchronizing non-blocking operations
 
-Multiple non-blocking operations, such as concurrent requests, can be easily
-synchronized with promises and L<Mojo::Promise/"all">. You create
-L<Mojo::Promise> objects manually or use methods like L<Mojo::UserAgent/"get_p">
+Multiple non-blocking operations, such as concurrent requests, can be easily synchronized with promises and
+L<Mojo::Promise/"all">. You create L<Mojo::Promise> objects manually or use methods like L<Mojo::UserAgent/"get_p">
 that create them for you.
 
   use Mojolicious::Lite;
@@ -619,9 +562,8 @@ that create them for you.
 
   app->start;
 
-To create promises manually you just wrap your continuation-passing style APIs
-in functions that return promises. Here's an example for how
-L<Mojo::UserAgent/"get_p"> works internally.
+To create promises manually you just wrap your continuation-passing style APIs in functions that return promises.
+Here's an example for how L<Mojo::UserAgent/"get_p"> works internally.
 
   use Mojo::UserAgent;
   use Mojo::Promise;
@@ -645,23 +587,20 @@ L<Mojo::UserAgent/"get_p"> works internally.
     say $tx->result->dom->at('title')->text;
   })->wait;
 
-Promises have three states, they start out as C<pending> and you call
-L<Mojo::Promise/"resolve"> to transition them to C<fulfilled>, or
-L<Mojo::Promise/"reject"> to transition them to C<rejected>.
+Promises have three states, they start out as C<pending> and you call L<Mojo::Promise/"resolve"> to transition them to
+C<fulfilled>, or L<Mojo::Promise/"reject"> to transition them to C<rejected>.
 
 =head2 async/await
 
-And if you have L<Future::AsyncAwait> installed you can make using promises even
-easier. The C<async> and C<await> keywords are enabled with the C<-async_await>
-flag of L<Mojo::Base>, and make the use of closures with promises completely
-optional.
+And if you have L<Future::AsyncAwait> installed you can make using promises even easier. The C<async> and C<await>
+keywords are enabled with the C<-async_await> flag of L<Mojo::Base>, and make the use of closures with promises
+completely optional.
 
   use Mojo::Base -strict, -async_await;
 
-The C<async> keyword is placed before the C<sub> keyword, and means that this
-function always returns a promise. Returned values that are not L<Mojo::Promise>
-objects will be wrapped in a resolved promise automatically. And if an exception
-gets thrown in the function it will result in a rejected promise.
+The C<async> keyword is placed before the C<sub> keyword, and means that this function always returns a promise.
+Returned values that are not L<Mojo::Promise> objects will be wrapped in a resolved promise automatically. And if an
+exception gets thrown in the function it will result in a rejected promise.
 
   use Mojo::Base -strict, -async_await;
 
@@ -671,9 +610,8 @@ gets thrown in the function it will result in a rejected promise.
 
   hello_p()->then(sub { say @_ })->wait;
 
-The C<await> keyword on the other hand makes Perl wait for the promise to be
-settled. It then returns the fulfillment values or throws an exception with the
-rejection reason. While waiting, the event loop is free to perform other tasks
+The C<await> keyword on the other hand makes Perl wait for the promise to be settled. It then returns the fulfillment
+values or throws an exception with the rejection reason. While waiting, the event loop is free to perform other tasks
 however, so no resources are wasted.
 
   use Mojo::Base -strict, -signatures, -async_await;
@@ -695,10 +633,9 @@ however, so no resources are wasted.
 
   search_cpan_p(['mojo', 'minion'])->wait;
 
-The loop above performs all requests sequentially, awaiting a result before
-sending the next request. But you can also perform those requests concurrently
-instead, by using methods like L<Mojo::Promise/"all"> to combine multiple
-promises before awaiting the results.
+The loop above performs all requests sequentially, awaiting a result before sending the next request. But you can also
+perform those requests concurrently instead, by using methods like L<Mojo::Promise/"all"> to combine multiple promises
+before awaiting the results.
 
   use Mojo::Base -strict, -signatures, -async_await;
   use Mojo::Promise;
@@ -721,8 +658,8 @@ promises before awaiting the results.
 
   search_cpan_p(['mojo', 'minion'])->wait;
 
-All of this also means that you can use normal Perl exception handling again.
-Even many 3rd party exception handling modules from CPAN work just fine.
+All of this also means that you can use normal Perl exception handling again. Even many 3rd party exception handling
+modules from CPAN work just fine.
 
   use Mojo::Base -strict, -async_await;
   use Mojo::Promise;
@@ -735,9 +672,8 @@ Even many 3rd party exception handling modules from CPAN work just fine.
 
   hello_p()->wait;
 
-And it works just the same in L<Mojolicious> and L<Mojolicious::Lite>
-applications. Just declare your actions with the C<async> keyword and use
-C<await> to wait for promises to be C<fulfilled> or C<rejected>.
+And it works just the same in L<Mojolicious> and L<Mojolicious::Lite> applications. Just declare your actions with the
+C<async> keyword and use C<await> to wait for promises to be C<fulfilled> or C<rejected>.
 
   use Mojolicious::Lite -signatures, -async_await;
 
@@ -753,16 +689,14 @@ C<await> to wait for promises to be C<fulfilled> or C<rejected>.
 
   app->start;
 
-Promises returned by actions will automatically get the default L<Mojolicious>
-exception handler attached. Making it much harder to ever miss a non-blocking
-exception again, even if you forgot to handle it yourself.
+Promises returned by actions will automatically get the default L<Mojolicious> exception handler attached. Making it
+much harder to ever miss a non-blocking exception again, even if you forgot to handle it yourself.
 
 =head2 Timers
 
-Timers, another primary feature of the event loop, are created with
-L<Mojo::IOLoop/"timer"> and can, for example, be used to delay rendering of a
-response, and unlike C<sleep>, won't block any other requests that might be
-processed concurrently.
+Timers, another primary feature of the event loop, are created with L<Mojo::IOLoop/"timer"> and can, for example, be
+used to delay rendering of a response, and unlike C<sleep>, won't block any other requests that might be processed
+concurrently.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -777,9 +711,8 @@ processed concurrently.
 
   app->start;
 
-Recurring timers created with L<Mojo::IOLoop/"recurring"> are slightly more
-powerful, but need to be stopped manually, or they would just keep getting
-emitted.
+Recurring timers created with L<Mojo::IOLoop/"recurring"> are slightly more powerful, but need to be stopped manually,
+or they would just keep getting emitted.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -801,8 +734,7 @@ emitted.
 
   app->start;
 
-Timers are not tied to a specific request or connection, and can even be
-created at startup time.
+Timers are not tied to a specific request or connection, and can even be created at startup time.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -824,13 +756,13 @@ created at startup time.
 
   app->start;
 
-Just remember that all these non-blocking operations are processed
-cooperatively, so your callbacks shouldn't block for too long.
+Just remember that all these non-blocking operations are processed cooperatively, so your callbacks shouldn't block for
+too long.
 
 =head2 Subprocesses
 
-You can also use subprocesses, created with L<Mojo::IOLoop/"subprocess">, to
-perform computationally expensive operations without blocking the event loop.
+You can also use subprocesses, created with L<Mojo::IOLoop/"subprocess">, to perform computationally expensive
+operations without blocking the event loop.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -853,18 +785,15 @@ perform computationally expensive operations without blocking the event loop.
 
   app->start;
 
-The callback passed to L<Mojo::IOLoop::Subprocess/"run_p"> will be executed in a
-child process, without blocking the event loop of the parent process. The
-results of the callback will then be shared between both processes, and the
+The callback passed to L<Mojo::IOLoop::Subprocess/"run_p"> will be executed in a child process, without blocking the
+event loop of the parent process. The results of the callback will then be shared between both processes, and the
 promise fulfilled or rejected in the parent process.
 
 =head2 Exceptions in non-blocking operations
 
-Since timers and other non-blocking operations are running solely in the event
-loop, outside of the application, exceptions that get thrown in callbacks can't
-get caught and handled automatically. But you can handle them manually by
-subscribing to the event L<Mojo::Reactor/"error"> or catching them inside the
-callback.
+Since timers and other non-blocking operations are running solely in the event loop, outside of the application,
+exceptions that get thrown in callbacks can't get caught and handled automatically. But you can handle them manually by
+subscribing to the event L<Mojo::Reactor/"error"> or catching them inside the callback.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -894,22 +823,18 @@ callback.
 
   app->start;
 
-A default subscriber that turns all errors into warnings will usually be added
-by L<Mojo::IOLoop> as a fallback.
+A default subscriber that turns all errors into warnings will usually be added by L<Mojo::IOLoop> as a fallback.
 
   Mojo::IOLoop->singleton->reactor->unsubscribe('error');
 
-During development or for applications where crashing is simply preferable, you
-can also make every exception that gets thrown in a callback fatal by removing
-all of its subscribers.
+During development or for applications where crashing is simply preferable, you can also make every exception that gets
+thrown in a callback fatal by removing all of its subscribers.
 
 =head2 WebSocket web service
 
-The WebSocket protocol offers full bi-directional low-latency communication
-channels between clients and servers. Receive messages just by subscribing to
-events such as L<Mojo::Transaction::WebSocket/"message"> with
-L<Mojolicious::Controller/"on"> and return them with
-L<Mojolicious::Controller/"send">.
+The WebSocket protocol offers full bi-directional low-latency communication channels between clients and servers.
+Receive messages just by subscribing to events such as L<Mojo::Transaction::WebSocket/"message"> with
+L<Mojolicious::Controller/"on"> and return them with L<Mojolicious::Controller/"send">.
 
   use Mojolicious::Lite;
 
@@ -963,28 +888,24 @@ L<Mojolicious::Controller/"send">.
     </body>
   </html>
 
-The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right after
-the WebSocket connection has been closed.
+The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right after the WebSocket connection has been
+closed.
 
   $c->tx->with_compression;
 
-You can activate C<permessage-deflate> compression with
-L<Mojo::Transaction::WebSocket/"with_compression">, this can result in much
-better performance, but also increases memory usage by up to 300KiB per
-connection.
+You can activate C<permessage-deflate> compression with L<Mojo::Transaction::WebSocket/"with_compression">, this can
+result in much better performance, but also increases memory usage by up to 300KiB per connection.
 
   my $proto = $c->tx->with_protocols('v2.proto', 'v1.proto');
 
-You can also use L<Mojo::Transaction::WebSocket/"with_protocols"> to negotiate a
-subprotocol.
+You can also use L<Mojo::Transaction::WebSocket/"with_protocols"> to negotiate a subprotocol.
 
 =head2 EventSource web service
 
-EventSource is a special form of long polling where you can use
-L<Mojolicious::Controller/"write"> to directly send DOM events from servers to
-clients. It is uni-directional, that means you will have to use Ajax requests
-for sending data from clients to servers, the advantage however is low
-infrastructure requirements, since it reuses the HTTP protocol for transport.
+EventSource is a special form of long polling where you can use L<Mojolicious::Controller/"write"> to directly send DOM
+events from servers to clients. It is uni-directional, that means you will have to use Ajax requests for sending data
+from clients to servers, the advantage however is low infrastructure requirements, since it reuses the HTTP protocol
+for transport.
 
   use Mojolicious::Lite;
 
@@ -1034,15 +955,13 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     </body>
   </html>
 
-The event L<Mojo::Log/"message"> will be emitted for every new log message and
-the event L<Mojo::Transaction/"finish"> right after the transaction has been
-finished.
+The event L<Mojo::Log/"message"> will be emitted for every new log message and the event L<Mojo::Transaction/"finish">
+right after the transaction has been finished.
 
 =head2 Streaming multipart uploads
 
-L<Mojolicious> contains a very sophisticated event system based on
-L<Mojo::EventEmitter>, with ready-to-use events on almost all layers, and which
-can be combined to solve some of the hardest problems in web development.
+L<Mojolicious> contains a very sophisticated event system based on L<Mojo::EventEmitter>, with ready-to-use events on
+almost all layers, and which can be combined to solve some of the hardest problems in web development.
 
   use Mojolicious::Lite;
   use Scalar::Util qw(weaken);
@@ -1101,9 +1020,8 @@ can be combined to solve some of the hardest problems in web development.
 
 =head2 More event loops
 
-Internally, the L<Mojo::IOLoop> event loop can use multiple reactor backends,
-L<EV> for example, will be automatically used if possible. Which in turn allows
-other event loops like L<AnyEvent> to just work.
+Internally, the L<Mojo::IOLoop> event loop can use multiple reactor backends, L<EV> for example, will be automatically
+used if possible. Which in turn allows other event loops like L<AnyEvent> to just work.
 
   use Mojolicious::Lite;
   use EV;
@@ -1123,18 +1041,15 @@ other event loops like L<AnyEvent> to just work.
 
 =head1 USER AGENT
 
-When we say L<Mojolicious> is a web framework we actually mean it, with
-L<Mojo::UserAgent> there's a full featured HTTP and WebSocket user agent built
-right in.
+When we say L<Mojolicious> is a web framework we actually mean it, with L<Mojo::UserAgent> there's a full featured HTTP
+and WebSocket user agent built right in.
 
 =head2 REST web services
 
-Requests can be performed very comfortably with methods like
-L<Mojo::UserAgent/"get">, and always result in a L<Mojo::Transaction::HTTP>
-object, which has many useful attributes and methods. You can check for
-connection errors with L<Mojo::Transaction/"result">, or access HTTP request and
-response information directly through L<Mojo::Transaction/"req"> and
-L<Mojo::Transaction/"res">.
+Requests can be performed very comfortably with methods like L<Mojo::UserAgent/"get">, and always result in a
+L<Mojo::Transaction::HTTP> object, which has many useful attributes and methods. You can check for connection errors
+with L<Mojo::Transaction/"result">, or access HTTP request and response information directly through
+L<Mojo::Transaction/"req"> and L<Mojo::Transaction/"res">.
 
   use Mojo::UserAgent;
 
@@ -1149,17 +1064,14 @@ L<Mojo::Transaction/"res">.
   elsif ($res->code == 301) { say $res->headers->location }
   else                      { say 'Whatever...' }
 
-While methods like L<Mojo::Message::Response/"is_success"> and
-L<Mojo::Message::Response/"is_error"> serve as building blocks for more
-sophisticated REST clients.
+While methods like L<Mojo::Message::Response/"is_success"> and L<Mojo::Message::Response/"is_error"> serve as building
+blocks for more sophisticated REST clients.
 
 =head2 Web scraping
 
-Scraping information from websites has never been this much fun before. The
-built-in HTML/XML parser L<Mojo::DOM> is accessible through
-L<Mojo::Message/"dom"> and supports all CSS selectors that make sense for a
-standalone parser, it can be a very powerful tool especially for testing web
-application.
+Scraping information from websites has never been this much fun before. The built-in HTML/XML parser L<Mojo::DOM> is
+accessible through L<Mojo::Message/"dom"> and supports all CSS selectors that make sense for a standalone parser, it
+can be a very powerful tool especially for testing web application.
 
   use Mojo::UserAgent;
 
@@ -1187,9 +1099,8 @@ For a full list of available CSS selectors see L<Mojo::DOM::CSS/"SELECTORS">.
 
 =head2 JSON web services
 
-Most web services these days are based on the JSON data-interchange format.
-That's why L<Mojolicious> comes with the possibly fastest pure-Perl
-implementation L<Mojo::JSON> built right in, which is accessible through
+Most web services these days are based on the JSON data-interchange format. That's why L<Mojolicious> comes with the
+possibly fastest pure-Perl implementation L<Mojo::JSON> built right in, which is accessible through
 L<Mojo::Message/"json">.
 
   use Mojo::UserAgent;
@@ -1207,8 +1118,7 @@ L<Mojo::Message/"json">.
 
 =head2 Basic authentication
 
-You can just add username and password to the URL, an C<Authorization> header
-will be automatically generated.
+You can just add username and password to the URL, an C<Authorization> header will be automatically generated.
 
   use Mojo::UserAgent;
 
@@ -1217,10 +1127,8 @@ will be automatically generated.
 
 =head2 Decorating follow-up requests
 
-L<Mojo::UserAgent> can automatically follow redirects, the event
-L<Mojo::UserAgent/"start"> allows you direct access to each transaction right
-after they have been initialized and before a connection gets associated with
-them.
+L<Mojo::UserAgent> can automatically follow redirects, the event L<Mojo::UserAgent/"start"> allows you direct access to
+each transaction right after they have been initialized and before a connection gets associated with them.
 
   use Mojo::UserAgent;
 
@@ -1241,8 +1149,7 @@ This even works for proxy C<CONNECT> requests.
 
 =head2 Content generators
 
-Content generators can be registered with
-L<Mojo::UserAgent::Transactor/"add_generator"> to generate the same type of
+Content generators can be registered with L<Mojo::UserAgent::Transactor/"add_generator"> to generate the same type of
 content repeatedly for multiple requests.
 
   use Mojo::UserAgent;
@@ -1280,15 +1187,13 @@ The C<json>, C<form> and C<multipart> content generators are always available.
   # Send custom multipart content via PUT
   my $tx5 = $ua->put('api.example.com' => multipart => ['Hello', 'World!']);
 
-For more information about available content generators see also
-L<Mojo::UserAgent::Transactor/"tx">.
+For more information about available content generators see also L<Mojo::UserAgent::Transactor/"tx">.
 
 =head2 Large file downloads
 
-When downloading large files with L<Mojo::UserAgent> you don't have to worry
-about memory usage at all, because it will automatically stream everything
-above 250KiB into a temporary file, which can then be moved into a permanent
-file with L<Mojo::Message/"save_to">.
+When downloading large files with L<Mojo::UserAgent> you don't have to worry about memory usage at all, because it will
+automatically stream everything above 250KiB into a temporary file, which can then be moved into a permanent file with
+L<Mojo::Message/"save_to">.
 
   use Mojo::UserAgent;
 
@@ -1297,9 +1202,8 @@ file with L<Mojo::Message/"save_to">.
   my $tx = $ua->get('https://www.github.com/mojolicious/mojo/tarball/master');
   $tx->result->save_to('mojo.tar.gz');
 
-To protect you from excessively large files there is also a limit of 2GiB by
-default, which you can tweak with the attribute
-L<Mojo::UserAgent/"max_response_size">.
+To protect you from excessively large files there is also a limit of 2GiB by default, which you can tweak with the
+attribute L<Mojo::UserAgent/"max_response_size">.
 
   # Increase limit to 10GiB
   $ua->max_response_size(10737418240);
@@ -1315,13 +1219,12 @@ Uploading a large file is even easier.
   $ua->post('example.com/upload' =>
     form => {image => {file => '/home/sri/hello.png'}});
 
-And once again you don't have to worry about memory usage, all data will be
-streamed directly from the file.
+And once again you don't have to worry about memory usage, all data will be streamed directly from the file.
 
 =head2 Streaming response
 
-Receiving a streaming response can be really tricky in most HTTP clients, but
-L<Mojo::UserAgent> makes it actually easy.
+Receiving a streaming response can be really tricky in most HTTP clients, but L<Mojo::UserAgent> makes it actually
+easy.
 
   use Mojo::UserAgent;
 
@@ -1340,9 +1243,8 @@ L<Mojo::UserAgent> makes it actually easy.
   # Process transaction
   $tx = $ua->start($tx);
 
-The event L<Mojo::Content/"read"> will be emitted for every chunk of data that
-is received, even chunked transfer encoding and gzip content encoding will be
-handled transparently if necessary.
+The event L<Mojo::Content/"read"> will be emitted for every chunk of data that is received, even chunked transfer
+encoding and gzip content encoding will be handled transparently if necessary.
 
 =head2 Streaming request
 
@@ -1369,14 +1271,13 @@ Sending a streaming request is almost just as easy.
   # Process transaction
   $tx = $ua->start($tx);
 
-The drain callback passed to L<Mojo::Content/"write"> will be executed whenever
-the entire previous chunk of data has actually been written.
+The drain callback passed to L<Mojo::Content/"write"> will be executed whenever the entire previous chunk of data has
+actually been written.
 
 =head2 Non-blocking
 
-L<Mojo::UserAgent> has been designed from the ground up to be non-blocking, the
-whole blocking API is just a simple convenience wrapper. Especially for high
-latency tasks like web crawling this can be extremely useful, because you can
+L<Mojo::UserAgent> has been designed from the ground up to be non-blocking, the whole blocking API is just a simple
+convenience wrapper. Especially for high latency tasks like web crawling this can be extremely useful, because you can
 keep many concurrent connections active at the same time.
 
   use Mojo::UserAgent;
@@ -1396,9 +1297,8 @@ keep many concurrent connections active at the same time.
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-But don't try to open too many connections to one server at the same time, it
-might get overwhelmed. Better use a queue to process requests in smaller
-batches.
+But don't try to open too many connections to one server at the same time, it might get overwhelmed. Better use a queue
+to process requests in smaller batches.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
@@ -1436,15 +1336,13 @@ batches.
   $fetch->() for 1 .. 2;
   $delay->wait;
 
-It is also strongly recommended to respect every sites C<robots.txt> file as
-well as terms of service, and to wait a little before reopening connections to
-the same host, or the operators might be forced to block your access.
+It is also strongly recommended to respect every sites C<robots.txt> file as well as terms of service, and to wait a
+little before reopening connections to the same host, or the operators might be forced to block your access.
 
 =head2 Concurrent blocking requests
 
-You might have seen L<Mojo::Promise/"wait"> already in some examples
-above. It is used to make non-blocking operations portable, allowing them to
-work inside an already running event loop or start one on demand.
+You might have seen L<Mojo::Promise/"wait"> already in some examples above. It is used to make non-blocking operations
+portable, allowing them to work inside an already running event loop or start one on demand.
 
   use Mojo::UserAgent;
   use Mojo::Promise;
@@ -1461,13 +1359,10 @@ work inside an already running event loop or start one on demand.
 
 =head2 WebSockets
 
-WebSockets are not just for the server-side, you can use
-L<Mojo::UserAgent/"websocket_p"> to open new connections, which are always
-non-blocking. The WebSocket handshake uses HTTP, and is a normal C<GET> request
-with a few additional headers. It can even contain cookies, and is followed by
-a C<101> response from the server, notifying our user agent that the connection
-has been established and it can start using the bi-directional WebSocket
-protocol.
+WebSockets are not just for the server-side, you can use L<Mojo::UserAgent/"websocket_p"> to open new connections,
+which are always non-blocking. The WebSocket handshake uses HTTP, and is a normal C<GET> request with a few additional
+headers. It can even contain cookies, and is followed by a C<101> response from the server, notifying our user agent
+that the connection has been established and it can start using the bi-directional WebSocket protocol.
 
   use Mojo::UserAgent;
   use Mojo::Promise;
@@ -1508,11 +1403,10 @@ protocol.
 
 =head2 UNIX domain sockets
 
-Not just TCP/IP sockets are supported, but also UNIX domain sockets, which can
-have significant security and performance benefits when used for inter-process
-communication. Instead of C<http://> and C<ws://> you can use the
-C<http+unix://> and C<ws+unix://> schemes, and pass along a percent encoded path
-(C</> becomes C<%2F>) instead of a hostname.
+Not just TCP/IP sockets are supported, but also UNIX domain sockets, which can have significant security and
+performance benefits when used for inter-process communication. Instead of C<http://> and C<ws://> you can use the
+C<http+unix://> and C<ws+unix://> schemes, and pass along a percent encoded path (C</> becomes C<%2F>) instead of a
+hostname.
 
   use Mojo::UserAgent;
   use Mojo::Promise;
@@ -1549,10 +1443,9 @@ You can set the C<Host> header manually to pass along a hostname.
 
 =head2 Command line
 
-Don't you hate checking huge HTML files from the command line? Thanks to the
-command L<Mojolicious::Command::get> that is about to change. You can just pick
-the parts that actually matter with the CSS selectors from L<Mojo::DOM> and
-JSON Pointers from L<Mojo::JSON::Pointer>.
+Don't you hate checking huge HTML files from the command line? Thanks to the command L<Mojolicious::Command::get> that
+is about to change. You can just pick the parts that actually matter with the CSS selectors from L<Mojo::DOM> and JSON
+Pointers from L<Mojo::JSON::Pointer>.
 
   $ mojo get https://mojolicious.org 'head > title'
 
@@ -1610,8 +1503,7 @@ This can be an invaluable tool for testing your applications.
 
 =head2 One-liners
 
-For quick hacks and especially testing, L<ojo> one-liners are also a great
-choice.
+For quick hacks and especially testing, L<ojo> one-liners are also a great choice.
 
   $ perl -Mojo -E 'say g("mojolicious.org")->dom->at("title")->text'
 
@@ -1621,8 +1513,7 @@ Fun L<Mojolicious> application hacks for all occasions.
 
 =head2 Basic authentication
 
-Basic authentication data will be automatically extracted from the
-C<Authorization> header.
+Basic authentication data will be automatically extracted from the C<Authorization> header.
 
   use Mojolicious::Lite;
   use Mojo::Util qw(secure_compare);
@@ -1647,9 +1538,8 @@ This can be combined with TLS for a secure authentication mechanism.
 
 =head2 Adding a configuration file
 
-Adding a configuration file to your application is as easy as adding a file to
-its home directory and loading the plugin L<Mojolicious::Plugin::Config>. The
-default name is based on the value of L<Mojolicious/"moniker"> (C<myapp>),
+Adding a configuration file to your application is as easy as adding a file to its home directory and loading the
+plugin L<Mojolicious::Plugin::Config>. The default name is based on the value of L<Mojolicious/"moniker"> (C<myapp>),
 appended with a C<.conf> extension (C<myapp.conf>).
 
   $ mkdir myapp
@@ -1658,9 +1548,8 @@ appended with a C<.conf> extension (C<myapp.conf>).
   $ chmod 744 myapp.pl
   $ echo '{name => "my Mojolicious application"};' > myapp.conf
 
-Configuration files themselves are just Perl scripts that return a hash
-reference with configuration settings of your choice. All those settings are
-then available through the method L<Mojolicious/"config"> and the helper
+Configuration files themselves are just Perl scripts that return a hash reference with configuration settings of your
+choice. All those settings are then available through the method L<Mojolicious/"config"> and the helper
 L<Mojolicious::Plugin::DefaultHelpers/"config">.
 
   use Mojolicious::Lite;
@@ -1681,20 +1570,18 @@ L<Mojolicious::Plugin::DefaultHelpers/"config">.
     <body>Welcome to <%= config 'name' %></body>
   </html>
 
-Alternatively you can also use configuration files in the JSON format with
-L<Mojolicious::Plugin::JSONConfig>.
+Alternatively you can also use configuration files in the JSON format with L<Mojolicious::Plugin::JSONConfig>.
 
 =head2 Adding a plugin to your application
 
-To organize your code better and to prevent helpers from cluttering your
-application, you can use application specific plugins.
+To organize your code better and to prevent helpers from cluttering your application, you can use application specific
+plugins.
 
   $ mkdir -p lib/MyApp/Plugin
   $ touch lib/MyApp/Plugin/MyHelpers.pm
 
-They work just like normal plugins and are also subclasses of
-L<Mojolicious::Plugin>. Nested helpers with a prefix based on the plugin name
-are an easy way to avoid conflicts.
+They work just like normal plugins and are also subclasses of L<Mojolicious::Plugin>. Nested helpers with a prefix
+based on the plugin name are an easy way to avoid conflicts.
 
   package MyApp::Plugin::MyHelpers;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -1710,8 +1597,8 @@ are an easy way to avoid conflicts.
 
   1;
 
-You can have as many application specific plugins as you like, the only
-difference to normal plugins is that you load them using their full class name.
+You can have as many application specific plugins as you like, the only difference to normal plugins is that you load
+them using their full class name.
 
   use Mojolicious::Lite;
 
@@ -1726,15 +1613,14 @@ difference to normal plugins is that you load them using their full class name.
 
   app->start;
 
-Of course these plugins can contain more than just helpers, take a look at
-L<Mojolicious::Plugins/"PLUGINS"> for a few ideas.
+Of course these plugins can contain more than just helpers, take a look at L<Mojolicious::Plugins/"PLUGINS"> for a few
+ideas.
 
 =head2 Adding commands to Mojolicious
 
-By now you've probably used many of the built-in commands described in
-L<Mojolicious::Commands>, but did you know that you can just add new ones and
-that they will be picked up automatically by the command line interface if they
-are placed in a directory from C<@INC>?
+By now you've probably used many of the built-in commands described in L<Mojolicious::Commands>, but did you know that
+you can just add new ones and that they will be picked up automatically by the command line interface if they are
+placed in a directory from C<@INC>?
 
   package Mojolicious::Command::spy;
   use Mojo::Base 'Mojolicious::Command';
@@ -1754,8 +1640,8 @@ are placed in a directory from C<@INC>?
 
   1;
 
-Command line arguments are passed right through and there are many useful
-attributes and methods in L<Mojolicious::Command> that you can use or overload.
+Command line arguments are passed right through and there are many useful attributes and methods in
+L<Mojolicious::Command> that you can use or overload.
 
   $ mojo spy secrets
   HelloWorld
@@ -1763,9 +1649,8 @@ attributes and methods in L<Mojolicious::Command> that you can use or overload.
   $ ./script/myapp spy secrets
   secr3t
 
-And to make your commands application specific, just add a custom namespace to
-L<Mojolicious::Commands/"namespaces"> and use a class name like
-C<MyApp::Command::spy> instead of C<Mojolicious::Command::spy>.
+And to make your commands application specific, just add a custom namespace to L<Mojolicious::Commands/"namespaces">
+and use a class name like C<MyApp::Command::spy> instead of C<Mojolicious::Command::spy>.
 
   # Application
   package MyApp;
@@ -1780,8 +1665,8 @@ C<MyApp::Command::spy> instead of C<Mojolicious::Command::spy>.
 
   1;
 
-The options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode> are handled
-automatically by L<Mojolicious::Commands> and are shared by all commands.
+The options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode> are handled automatically by L<Mojolicious::Commands> and
+are shared by all commands.
 
   $ ./script/myapp spy -m production mode
   production
@@ -1790,34 +1675,29 @@ For a full list of shared options see L<Mojolicious::Commands/"SYNOPSIS">.
 
 =head2 Running code against your application
 
-Ever thought about running a quick one-liner against your L<Mojolicious>
-application to test something? Thanks to the command
-L<Mojolicious::Command::eval> you can do just that, the application object
-itself can be accessed via C<app>.
+Ever thought about running a quick one-liner against your L<Mojolicious> application to test something? Thanks to the
+command L<Mojolicious::Command::eval> you can do just that, the application object itself can be accessed via C<app>.
 
   $ mojo generate lite-app myapp.pl
   $ ./myapp.pl eval 'say for @{app->static->paths}'
   $ ./myapp.pl eval 'say for sort keys %{app->renderer->helpers}'
 
-The C<verbose> options will automatically print the return value or returned
-data structure to C<STDOUT>.
+The C<verbose> options will automatically print the return value or returned data structure to C<STDOUT>.
 
   $ ./myapp.pl eval -v 'app->static->paths->[0]'
   $ ./myapp.pl eval -V 'app->static->paths'
 
 =head2 Making your application installable
 
-Ever thought about releasing your L<Mojolicious> application to CPAN? It's
-actually much easier than you might think.
+Ever thought about releasing your L<Mojolicious> application to CPAN? It's actually much easier than you might think.
 
   $ mojo generate app MyApp
   $ cd my_app
   $ mv public lib/MyApp/
   $ mv templates lib/MyApp/
 
-The trick is to move the C<public> and C<templates> directories so they can get
-automatically installed with the modules. Additionally author commands from the
-C<Mojolicious::Command::Author> namespace are not usually wanted by an
+The trick is to move the C<public> and C<templates> directories so they can get automatically installed with the
+modules. Additionally author commands from the C<Mojolicious::Command::Author> namespace are not usually wanted by an
 installed application so they can be excluded.
 
   # Application
@@ -1851,9 +1731,8 @@ installed application so they can be excluded.
 
   1;
 
-Finally there is just one small change to be made to the application script. The
-shebang line becomes the recommended C<#!perl>, which the toolchain can rewrite
-to the proper shebang during installation.
+Finally there is just one small change to be made to the application script. The shebang line becomes the recommended
+C<#!perl>, which the toolchain can rewrite to the proper shebang during installation.
 
   #!perl
 
@@ -1867,8 +1746,7 @@ to the proper shebang during installation.
   # Start command line interface for application
   Mojolicious::Commands->start_app('MyApp');
 
-That's really everything, now you can package your application like any other
-CPAN module.
+That's really everything, now you can package your application like any other CPAN module.
 
   $ ./script/my_app generate makefile
   $ perl Makefile.PL
@@ -1876,29 +1754,24 @@ CPAN module.
   $ make manifest
   $ make dist
 
-And if you have a PAUSE account (which can be requested at
-L<http://pause.perl.org>) even upload it.
+And if you have a PAUSE account (which can be requested at L<http://pause.perl.org>) even upload it.
 
   $ mojo cpanify -u USER -p PASS MyApp-0.01.tar.gz
 
 =head2 Hello World
 
-If every byte matters this is the smallest C<Hello World> application you can
-write with L<Mojolicious::Lite>.
+If every byte matters this is the smallest C<Hello World> application you can write with L<Mojolicious::Lite>.
 
   use Mojolicious::Lite;
   any {text => 'Hello World!'};
   app->start;
 
-It works because all routes without a pattern default to C</> and automatic
-rendering kicks in even if no actual code gets executed by the router. The
-renderer just picks up the C<text> value from the stash and generates a
-response.
+It works because all routes without a pattern default to C</> and automatic rendering kicks in even if no actual code
+gets executed by the router. The renderer just picks up the C<text> value from the stash and generates a response.
 
 =head2 Hello World one-liners
 
-The C<Hello World> example above can get even a little bit shorter in an L<ojo>
-one-liner.
+The C<Hello World> example above can get even a little bit shorter in an L<ojo> one-liner.
 
   $ perl -Mojo -E 'a({text => "Hello World!"})->start' daemon
 
@@ -1908,16 +1781,14 @@ And you can use all the commands from L<Mojolicious::Commands>.
 
 =head1 MORE
 
-You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
-lot more documentation and examples by many different authors.
+You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious
+wiki|http://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
+authors.
 
 =head1 SUPPORT
 
-If you have any questions the documentation might not yet answer, don't
-hesitate to ask on the
-L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.freenode.net> (L<chat
+If you have any questions the documentation might not yet answer, don't hesitate to ask on the L<mailing
+list|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
 now!|https://webchat.freenode.net/#mojo>).
 
 =cut

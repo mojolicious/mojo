@@ -19,8 +19,7 @@ ok !$t->success, 'no success';
 
 # or
 my $or = '';
-$t->success(0)->or(sub { $or .= 'false' })->success(1)
-  ->or(sub { $or .= 'true' });
+$t->success(0)->or(sub { $or .= 'false' })->success(1)->or(sub { $or .= 'true' });
 is $or, 'false', 'right result';
 
 # get_ok
@@ -68,11 +67,8 @@ is_deeply \@args, ['is', 200, 404, 'some description'], 'right result';
 
 # content_is
 $t->content_is('Hello Test!');
-is_deeply \@args,
-  ['is', 'Hello Test!', 'Hello Test!', 'exact match for content'],
-  'right result';
+is_deeply \@args, ['is', 'Hello Test!', 'Hello Test!', 'exact match for content'], 'right result';
 $t->content_is('Hello Test!', 'some description');
-is_deeply \@args, ['is', 'Hello Test!', 'Hello Test!', 'some description'],
-  'right result';
+is_deeply \@args, ['is', 'Hello Test!', 'Hello Test!', 'some description'], 'right result';
 
 done_testing();

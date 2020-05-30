@@ -12,8 +12,7 @@ sub register {
 
   # Extract host
   my $host;
-  ($host, $path) = ($1 ? qr/^(?:.*\.)?\Q$2\E$/i : qr/^\Q$2\E$/i, $3)
-    if $path =~ m!^(\*\.)?([^/]+)(/.*)?$!;
+  ($host, $path) = ($1 ? qr/^(?:.*\.)?\Q$2\E$/i : qr/^\Q$2\E$/i, $3) if $path =~ m!^(\*\.)?([^/]+)(/.*)?$!;
 
   my $route = $app->routes->route($path)->detour(app => $embed);
   return $host ? $route->over(host => $host) : $route;
@@ -53,26 +52,22 @@ Mojolicious::Plugin::Mount - Application mount plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::Mount> is a plugin that allows you to mount whole
-L<Mojolicious> applications.
+L<Mojolicious::Plugin::Mount> is a plugin that allows you to mount whole L<Mojolicious> applications.
 
-The code of this plugin is a good example for learning to build new plugins,
-you're welcome to fork it.
+The code of this plugin is a good example for learning to build new plugins, you're welcome to fork it.
 
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available by default.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::Mount> inherits all methods from L<Mojolicious::Plugin>
-and implements the following new ones.
+L<Mojolicious::Plugin::Mount> inherits all methods from L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 register
 
   my $route = $plugin->register(Mojolicious->new, {'/foo' => '/some/app.pl'});
 
-Mount L<Mojolicious> application and return the generated route, which is
-usually a L<Mojolicious::Routes::Route> object.
+Mount L<Mojolicious> application and return the generated route, which is usually a L<Mojolicious::Routes::Route>
+object.
 
 =head1 SEE ALSO
 

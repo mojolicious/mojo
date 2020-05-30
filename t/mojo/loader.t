@@ -7,8 +7,7 @@ use Test::More;
 use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
-use Mojo::Loader
-  qw(data_section file_is_binary find_packages find_modules load_class);
+use Mojo::Loader qw(data_section file_is_binary find_packages find_modules load_class);
 
 package MyLoaderTest::Foo::Bar;
 
@@ -58,18 +57,14 @@ like "$e", qr/Exception/, 'right message';
 
 # Search modules
 my @modules = find_modules 'Mojo::LoaderTest';
-is_deeply \@modules,
-  [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)],
-  'found the right modules';
-is_deeply [find_modules "Mojo'LoaderTest"],
-  [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
+is_deeply \@modules, [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)], 'found the right modules';
+is_deeply [find_modules "Mojo'LoaderTest"], [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
   'found the right modules';
 is_deeply [find_modules 'MyLoaderTest::DoesNotExist'], [], 'no modules found';
 
 # Search packages
 my @pkgs = find_packages 'MyLoaderTest::Foo';
-is_deeply \@pkgs, ['MyLoaderTest::Foo::Bar', 'MyLoaderTest::Foo::Baz'],
-  'found the right packages';
+is_deeply \@pkgs, ['MyLoaderTest::Foo::Bar', 'MyLoaderTest::Foo::Baz'], 'found the right packages';
 is_deeply [find_packages 'MyLoaderTest::DoesNotExist'], [], 'no packages found';
 
 # Load
@@ -99,29 +94,21 @@ is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
   open my $data, '<', \$unix;
   no strict 'refs';
   *{"Example::Package::UNIX::DATA"} = $data;
-  ok !file_is_binary('Example::Package::UNIX', 'template1'),
-    'file is not binary';
-  is data_section('Example::Package::UNIX', 'template1'), "First Template\n",
-    'right template';
-  is data_section('Example::Package::UNIX', 'template2'), "Second Template\n",
-    'right template';
-  is_deeply [sort keys %{data_section 'Example::Package::UNIX'}],
-    [qw(template1 template2)], 'right DATA files';
+  ok !file_is_binary('Example::Package::UNIX', 'template1'), 'file is not binary';
+  is data_section('Example::Package::UNIX', 'template1'), "First Template\n",  'right template';
+  is data_section('Example::Package::UNIX', 'template2'), "Second Template\n", 'right template';
+  is_deeply [sort keys %{data_section 'Example::Package::UNIX'}], [qw(template1 template2)], 'right DATA files';
 }
 
 # Windows DATA templates
 {
-  my $windows
-    = "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
+  my $windows = "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
   open my $data, '<', \$windows;
   no strict 'refs';
   *{"Example::Package::Windows::DATA"} = $data;
-  is data_section('Example::Package::Windows', 'template3'),
-    "Third Template\r\n", 'right template';
-  is data_section('Example::Package::Windows', 'template4'),
-    "Fourth Template\r\n", 'right template';
-  is_deeply [sort keys %{data_section 'Example::Package::Windows'}],
-    [qw(template3 template4)], 'right DATA files';
+  is data_section('Example::Package::Windows', 'template3'), "Third Template\r\n",  'right template';
+  is data_section('Example::Package::Windows', 'template4'), "Fourth Template\r\n", 'right template';
+  is_deeply [sort keys %{data_section 'Example::Package::Windows'}], [qw(template3 template4)], 'right DATA files';
 }
 
 # Mixed whitespace
@@ -130,14 +117,11 @@ is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
   open my $data, '<', \$mixed;
   no strict 'refs';
   *{"Example::Package::Mixed::DATA"} = $data;
-  is data_section('Example::Package::Mixed', 'template5'), "5\n\n",
-    'right template';
-  is data_section('Example::Package::Mixed', 'template6'), "6\n",
-    'right template';
-  is data_section('Example::Package::Mixed', 'template7'), '7',
-    'right template';
-  is_deeply [sort keys %{data_section 'Example::Package::Mixed'}],
-    [qw(template5 template6 template7)], 'right DATA files';
+  is data_section('Example::Package::Mixed', 'template5'), "5\n\n", 'right template';
+  is data_section('Example::Package::Mixed', 'template6'), "6\n",   'right template';
+  is data_section('Example::Package::Mixed', 'template7'), '7',     'right template';
+  is_deeply [sort keys %{data_section 'Example::Package::Mixed'}], [qw(template5 template6 template7)],
+    'right DATA files';
 }
 
 # Base64
@@ -146,13 +130,10 @@ is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
   open my $data, '<', \$b64;
   no strict 'refs';
   *{"Example::Package::Base64::DATA"} = $data;
-  ok !file_is_binary('Example::Package::DoesNotExist', 'test.bin'),
-    'file is not binary';
-  ok file_is_binary('Example::Package::Base64', 'test.bin'), 'file is binary';
-  is data_section('Example::Package::Base64', 'test.bin'),   "\xe2\x99\xa5",
-    'right template';
-  is_deeply [sort keys %{data_section 'Example::Package::Base64'}],
-    ['test.bin'], 'right DATA files';
+  ok !file_is_binary('Example::Package::DoesNotExist', 'test.bin'), 'file is not binary';
+  ok file_is_binary('Example::Package::Base64', 'test.bin'),        'file is binary';
+  is data_section('Example::Package::Base64', 'test.bin'), "\xe2\x99\xa5", 'right template';
+  is_deeply [sort keys %{data_section 'Example::Package::Base64'}], ['test.bin'], 'right DATA files';
 }
 
 # Hide DATA usage from error messages

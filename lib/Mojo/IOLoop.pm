@@ -48,8 +48,7 @@ sub client {
   my ($self, $cb) = (_instance(shift), pop);
 
   my $id     = $self->_id;
-  my $client = $self->{out}{$id}{client}
-    = Mojo::IOLoop::Client->new(reactor => $self->reactor);
+  my $client = $self->{out}{$id}{client} = Mojo::IOLoop::Client->new(reactor => $self->reactor);
 
   weaken $self;
   $client->on(
@@ -158,8 +157,7 @@ sub timer { shift->_timer(timer => @_) }
 sub _id {
   my $self = shift;
   my $id;
-  do { $id = md5_sum 'c' . steady_time . rand }
-    while $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
+  do { $id = md5_sum 'c' . steady_time . rand } while $self->{in}{$id} || $self->{out}{$id} || $self->{acceptors}{$id};
   return $id;
 }
 
@@ -193,8 +191,7 @@ sub _remove {
   return undef if $reactor->remove($id);
 
   # Acceptor
-  return $self->_not_accepting->_maybe_accepting
-    if delete $self->{acceptors}{$id};
+  return $self->_not_accepting->_maybe_accepting if delete $self->{acceptors}{$id};
 
   # Connection
   return undef unless delete $self->{in}{$id} || delete $self->{out}{$id};
@@ -207,8 +204,7 @@ sub _stream {
   my ($self, $stream, $id, $server) = @_;
 
   # Connect stream with reactor
-  $self->{$server ? 'in' : 'out'}{$id}{stream}
-    = $stream->reactor($self->reactor);
+  $self->{$server ? 'in' : 'out'}{$id}{stream} = $stream->reactor($self->reactor);
   warn "-- $id >>> $$ (@{[$self->_in]}:@{[$self->_out]})\n" if DEBUG;
   weaken $self;
   $stream->on(close => sub { $self && $self->_remove($id) });
@@ -276,15 +272,12 @@ Mojo::IOLoop - Minimalistic event loop
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>, it
-has been reduced to the absolute minimal feature set required to build solid
-and scalable non-blocking clients and servers.
+L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>, it has been reduced to the absolute
+minimal feature set required to build solid and scalable non-blocking clients and servers.
 
-Depending on operating system, the default per-process and system-wide file
-descriptor limits are often very low and need to be tuned for better
-scalability. The C<LIBEV_FLAGS> environment variable should also be used to
-select the best possible L<EV> backend, which usually defaults to the not very
-scalable C<select>.
+Depending on operating system, the default per-process and system-wide file descriptor limits are often very low and
+need to be tuned for better scalability. The C<LIBEV_FLAGS> environment variable should also be used to select the best
+possible L<EV> backend, which usually defaults to the not very scalable C<select>.
 
   LIBEV_FLAGS=1    # select
   LIBEV_FLAGS=2    # poll
@@ -292,25 +285,20 @@ scalable C<select>.
   LIBEV_FLAGS=8    # kqueue (*BSD, OS X)
   LIBEV_FLAGS=64   # Linux AIO
 
-The event loop will be resilient to time jumps if a monotonic clock is
-available through L<Time::HiRes>. A TLS certificate and key are also built
-right in, to make writing test servers as easy as possible. Also note that for
-convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop> is
-loaded.
+The event loop will be resilient to time jumps if a monotonic clock is available through L<Time::HiRes>. A TLS
+certificate and key are also built right in, to make writing test servers as easy as possible. Also note that for
+convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop> is loaded.
 
-For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.32+),
-L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
-L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
-features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
-C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide non-blocking name resolution, SOCKS5 as well as TLS support, the
+optional modules L<EV> (4.32+), L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL>
+(2.009+) will be used automatically if possible. Individual features can also be disabled with the C<MOJO_NO_NNR>,
+C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB"> for more.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop> inherits all events from L<Mojo::EventEmitter> and can emit the
-following new ones.
+L<Mojo::IOLoop> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 finish
 
@@ -319,8 +307,8 @@ following new ones.
     ...
   });
 
-Emitted when the event loop wants to shut down gracefully and is just waiting
-for all existing connections to be closed.
+Emitted when the event loop wants to shut down gracefully and is just waiting for all existing connections to be
+closed.
 
 =head2 reset
 
@@ -329,8 +317,8 @@ for all existing connections to be closed.
     ...
   });
 
-Emitted when the event loop is reset, this usually happens after the process is
-forked to clean up resources that cannot be shared.
+Emitted when the event loop is reset, this usually happens after the process is forked to clean up resources that
+cannot be shared.
 
 =head1 ATTRIBUTES
 
@@ -341,30 +329,26 @@ L<Mojo::IOLoop> implements the following attributes.
   my $max = $loop->max_accepts;
   $loop   = $loop->max_accepts(1000);
 
-The maximum number of connections this event loop is allowed to accept, before
-shutting down gracefully without interrupting existing connections, defaults to
-C<0>. Setting the value to C<0> will allow this event loop to accept new
-connections indefinitely. Note that up to half of this value can be subtracted
-randomly to improve load balancing between multiple server processes, and to
-make sure that not all of them restart at the same time.
+The maximum number of connections this event loop is allowed to accept, before shutting down gracefully without
+interrupting existing connections, defaults to C<0>. Setting the value to C<0> will allow this event loop to accept new
+connections indefinitely. Note that up to half of this value can be subtracted randomly to improve load balancing
+between multiple server processes, and to make sure that not all of them restart at the same time.
 
 =head2 max_connections
 
   my $max = $loop->max_connections;
   $loop   = $loop->max_connections(100);
 
-The maximum number of accepted connections this event loop is allowed to handle
-concurrently, before stopping to accept new incoming connections, defaults to
-C<1000>.
+The maximum number of accepted connections this event loop is allowed to handle concurrently, before stopping to accept
+new incoming connections, defaults to C<1000>.
 
 =head2 reactor
 
   my $reactor = $loop->reactor;
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
-Low-level event reactor, usually a L<Mojo::Reactor::Poll> or
-L<Mojo::Reactor::EV> object with a default subscriber to the event
-L<Mojo::Reactor/"error">.
+Low-level event reactor, usually a L<Mojo::Reactor::Poll> or L<Mojo::Reactor::EV> object with a default subscriber to
+the event L<Mojo::Reactor/"error">.
 
   # Watch if handle becomes readable or writable
   Mojo::IOLoop->singleton->reactor->io($handle => sub {
@@ -380,8 +364,7 @@ L<Mojo::Reactor/"error">.
 
 =head1 METHODS
 
-L<Mojo::IOLoop> inherits all methods from L<Mojo::EventEmitter> and implements
-the following new ones.
+L<Mojo::IOLoop> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 acceptor
 
@@ -398,9 +381,8 @@ Get L<Mojo::IOLoop::Server> object for id or turn object into an acceptor.
   my $id = $loop->client(address => '127.0.0.1', port => 3000, sub {...});
   my $id = $loop->client({address => '127.0.0.1', port => 3000} => sub {...});
 
-Open a TCP/IP or UNIX domain socket connection with L<Mojo::IOLoop::Client> and
-create a stream object (usually L<Mojo::IOLoop::Stream>), takes the same
-arguments as L<Mojo::IOLoop::Client/"connect">.
+Open a TCP/IP or UNIX domain socket connection with L<Mojo::IOLoop::Client> and create a stream object (usually
+L<Mojo::IOLoop::Stream>), takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
 
 =head2 delay
 
@@ -409,8 +391,8 @@ arguments as L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay(sub {...});
   my $delay = $loop->delay(sub {...}, sub {...});
 
-Build L<Mojo::IOLoop::Delay> object to use as a promise and/or for flow-control.
-Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
+Build L<Mojo::IOLoop::Delay> object to use as a promise and/or for flow-control. Callbacks will be passed along to
+L<Mojo::IOLoop::Delay/"steps">.
 
   # Wrap continuation-passing style APIs with promises
   my $ua = Mojo::UserAgent->new;
@@ -473,8 +455,8 @@ Check if event loop is running.
   my $undef = Mojo::IOLoop->next_tick(sub {...});
   my $undef = $loop->next_tick(sub {...});
 
-Execute callback as soon as possible, but not before returning or other
-callbacks that have been registered with this method, always returns C<undef>.
+Execute callback as soon as possible, but not before returning or other callbacks that have been registered with this
+method, always returns C<undef>.
 
   # Perform operation on next reactor tick
   Mojo::IOLoop->next_tick(sub {
@@ -500,8 +482,7 @@ Run event loop until an event occurs.
   my $id = $loop->recurring(0 => sub {...});
   my $id = $loop->recurring(0.25 => sub {...});
 
-Create a new recurring timer, invoking the callback repeatedly after a given
-amount of time in seconds.
+Create a new recurring timer, invoking the callback repeatedly after a given amount of time in seconds.
 
   # Perform operation every 5 seconds
   Mojo::IOLoop->recurring(5 => sub {
@@ -514,8 +495,8 @@ amount of time in seconds.
   Mojo::IOLoop->remove($id);
   $loop->remove($id);
 
-Remove anything with an id, connections will be dropped gracefully by allowing
-them to finish writing all data in their write buffers.
+Remove anything with an id, connections will be dropped gracefully by allowing them to finish writing all data in their
+write buffers.
 
 =head2 reset
 
@@ -530,9 +511,8 @@ Remove everything and stop the event loop.
   my $id = $loop->server(port => 3000, sub {...});
   my $id = $loop->server({port => 3000} => sub {...});
 
-Accept TCP/IP and UNIX domain socket connections with L<Mojo::IOLoop::Server>
-and create stream objects (usually L<Mojo::IOLoop::Stream>, takes the same
-arguments as L<Mojo::IOLoop::Server/"listen">.
+Accept TCP/IP and UNIX domain socket connections with L<Mojo::IOLoop::Server> and create stream objects (usually
+L<Mojo::IOLoop::Stream>, takes the same arguments as L<Mojo::IOLoop::Server/"listen">.
 
   # Listen on random port
   my $id = Mojo::IOLoop->server({address => '127.0.0.1'} => sub {
@@ -545,8 +525,8 @@ arguments as L<Mojo::IOLoop::Server/"listen">.
 
   my $loop = Mojo::IOLoop->singleton;
 
-The global L<Mojo::IOLoop> singleton, used to access a single shared event loop
-object from everywhere inside the process.
+The global L<Mojo::IOLoop> singleton, used to access a single shared event loop object from everywhere inside the
+process.
 
   # Many methods also allow you to take shortcuts
   Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });
@@ -568,8 +548,8 @@ object from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the event loop, this will block until L</"stop"> is called. Note that
-some reactors stop automatically if there are no events being watched anymore.
+Start the event loop, this will block until L</"stop"> is called. Note that some reactors stop automatically if there
+are no events being watched anymore.
 
   # Start event loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
@@ -579,16 +559,15 @@ some reactors stop automatically if there are no events being watched anymore.
   Mojo::IOLoop->stop;
   $loop->stop;
 
-Stop the event loop, this will not interrupt any existing connections and the
-event loop can be restarted by running L</"start"> again.
+Stop the event loop, this will not interrupt any existing connections and the event loop can be restarted by running
+L</"start"> again.
 
 =head2 stop_gracefully
 
   Mojo::IOLoop->stop_gracefully;
   $loop->stop_gracefully;
 
-Stop accepting new connections and wait for already accepted connections to be
-closed, before stopping the event loop.
+Stop accepting new connections and wait for already accepted connections to be closed, before stopping the event loop.
 
 =head2 stream
 
@@ -607,9 +586,8 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
   my $subprocess = $loop->subprocess;
   my $subprocess = $loop->subprocess(sub {...}, sub {...});
 
-Build L<Mojo::IOLoop::Subprocess> object to perform computationally expensive
-operations in subprocesses, without blocking the event loop. Callbacks will be
-passed along to L<Mojo::IOLoop::Subprocess/"run">.
+Build L<Mojo::IOLoop::Subprocess> object to perform computationally expensive operations in subprocesses, without
+blocking the event loop. Callbacks will be passed along to L<Mojo::IOLoop::Subprocess/"run">.
 
   # Operation that would block the event loop for 5 seconds
   Mojo::IOLoop->subprocess->run_p(sub {
@@ -629,8 +607,7 @@ passed along to L<Mojo::IOLoop::Subprocess/"run">.
   my $id = $loop->timer(0 => sub {...});
   my $id = $loop->timer(0.25 => sub {...});
 
-Create a new timer, invoking the callback after a given amount of time in
-seconds.
+Create a new timer, invoking the callback after a given amount of time in seconds.
 
   # Perform operation in 5 seconds
   Mojo::IOLoop->timer(5 => sub {
@@ -640,8 +617,8 @@ seconds.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_IOLOOP_DEBUG> environment variable to get some advanced
-diagnostics information printed to C<STDERR>.
+You can set the C<MOJO_IOLOOP_DEBUG> environment variable to get some advanced diagnostics information printed to
+C<STDERR>.
 
   MOJO_IOLOOP_DEBUG=1
 

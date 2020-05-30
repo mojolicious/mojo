@@ -11,8 +11,7 @@ has headers           => sub { Mojo::Headers->new };
 has max_buffer_size   => sub { $ENV{MOJO_MAX_BUFFER_SIZE} || 262144 };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
-my $BOUNDARY_RE
-  = qr!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i;
+my $BOUNDARY_RE = qr!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i;
 
 sub body_contains {
   croak 'Method "body_contains" not implemented by subclass';
@@ -89,8 +88,7 @@ sub parse {
   # Not chunked, pass through to second buffer
   else {
     $self->{real_size} += length $self->{pre_buffer};
-    my $limit = $self->is_finished
-      && length($self->{buffer}) > $self->max_leftover_size;
+    my $limit = $self->is_finished && length($self->{buffer}) > $self->max_leftover_size;
     $self->{buffer} .= $self->{pre_buffer} unless $limit;
     $self->{pre_buffer} = '';
   }
@@ -182,23 +180,19 @@ sub _decompress {
   my ($self, $chunk) = @_;
 
   # No compression
-  return $self->emit(read => $chunk)
-    unless $self->auto_decompress && $self->is_compressed;
+  return $self->emit(read => $chunk) unless $self->auto_decompress && $self->is_compressed;
 
   # Decompress
   $self->{post_buffer} .= $chunk;
-  my $gz = $self->{gz}
-    //= Compress::Raw::Zlib::Inflate->new(WindowBits => WANT_GZIP);
+  my $gz     = $self->{gz} //= Compress::Raw::Zlib::Inflate->new(WindowBits => WANT_GZIP);
   my $status = $gz->inflate(\$self->{post_buffer}, my $out);
   $self->emit(read => $out) if defined $out;
 
   # Replace Content-Encoding with Content-Length
-  $self->headers->content_length($gz->total_out)->remove('Content-Encoding')
-    if $status == Z_STREAM_END;
+  $self->headers->content_length($gz->total_out)->remove('Content-Encoding') if $status == Z_STREAM_END;
 
   # Check buffer size
-  @$self{qw(state limit)} = ('finished', 1)
-    if length($self->{post_buffer} // '') > $self->max_buffer_size;
+  @$self{qw(state limit)} = ('finished', 1) if length($self->{post_buffer} // '') > $self->max_buffer_size;
 }
 
 sub _headers {
@@ -213,15 +207,13 @@ sub _parse_chunked {
   my $self = shift;
 
   # Trailing headers
-  return $self->_parse_chunked_trailing_headers
-    if ($self->{chunk_state} // '') eq 'trailing_headers';
+  return $self->_parse_chunked_trailing_headers if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   while (my $len = length $self->{pre_buffer}) {
 
     # Start new chunk (ignore the chunk extension)
     unless ($self->{chunk_len}) {
-      last
-        unless $self->{pre_buffer} =~ s/^(?:\x0d?\x0a)?([0-9a-fA-F]+).*\x0a//;
+      last unless $self->{pre_buffer} =~ s/^(?:\x0d?\x0a)?([0-9a-fA-F]+).*\x0a//;
       next if $self->{chunk_len} = hex $1;
 
       # Last chunk
@@ -237,12 +229,10 @@ sub _parse_chunked {
   }
 
   # Trailing headers
-  $self->_parse_chunked_trailing_headers
-    if ($self->{chunk_state} // '') eq 'trailing_headers';
+  $self->_parse_chunked_trailing_headers if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   # Check buffer size
-  @$self{qw(state limit)} = ('finished', 1)
-    if length($self->{pre_buffer} // '') > $self->max_buffer_size;
+  @$self{qw(state limit)} = ('finished', 1) if length($self->{pre_buffer} // '') > $self->max_buffer_size;
 }
 
 sub _parse_chunked_trailing_headers {
@@ -298,15 +288,13 @@ Mojo::Content - HTTP content base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Content> is an abstract base class for HTTP content containers, based on
-L<RFC 7230|http://tools.ietf.org/html/rfc7230> and
-L<RFC 7231|http://tools.ietf.org/html/rfc7231>, like
+L<Mojo::Content> is an abstract base class for HTTP content containers, based on L<RFC
+7230|http://tools.ietf.org/html/rfc7230> and L<RFC 7231|http://tools.ietf.org/html/rfc7231>, like
 L<Mojo::Content::MultiPart> and L<Mojo::Content::Single>.
 
 =head1 EVENTS
 
-L<Mojo::Content> inherits all events from L<Mojo::EventEmitter> and can emit
-the following new ones.
+L<Mojo::Content> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 body
 
@@ -380,25 +368,23 @@ Content headers, defaults to a L<Mojo::Headers> object.
   my $size = $content->max_buffer_size;
   $content = $content->max_buffer_size(1024);
 
-Maximum size in bytes of buffer for content parser, defaults to the value of
-the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144> (256KiB).
+Maximum size in bytes of buffer for content parser, defaults to the value of the C<MOJO_MAX_BUFFER_SIZE> environment
+variable or C<262144> (256KiB).
 
 =head2 max_leftover_size
 
   my $size = $content->max_leftover_size;
   $content = $content->max_leftover_size(1024);
 
-Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
-value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>
-(256KiB).
+Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the value of the C<MOJO_MAX_LEFTOVER_SIZE>
+environment variable or C<262144> (256KiB).
 
 =head2 relaxed
 
   my $bool = $content->relaxed;
   $content = $content->relaxed($bool);
 
-Activate relaxed parsing for responses that are terminated with a connection
-close.
+Activate relaxed parsing for responses that are terminated with a connection close.
 
 =head2 skip_body
 
@@ -409,15 +395,13 @@ Skip body parsing and finish after headers.
 
 =head1 METHODS
 
-L<Mojo::Content> inherits all methods from L<Mojo::EventEmitter> and implements
-the following new ones.
+L<Mojo::Content> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 body_contains
 
   my $bool = $content->body_contains('foo bar baz');
 
-Check if content contains a specific string. Meant to be overloaded in a
-subclass.
+Check if content contains a specific string. Meant to be overloaded in a subclass.
 
 =head2 body_size
 
@@ -441,8 +425,7 @@ Extract charset from C<Content-Type> header.
 
   my $clone = $content->clone;
 
-Return a new L<Mojo::Content> object cloned from this content if possible,
-otherwise return C<undef>.
+Return a new L<Mojo::Content> object cloned from this content if possible, otherwise return C<undef>.
 
 =head2 generate_body_chunk
 
@@ -454,15 +437,13 @@ Generate dynamic content.
 
   my $bytes = $content->get_body_chunk(0);
 
-Get a chunk of content starting from a specific position. Meant to be
-overloaded in a subclass.
+Get a chunk of content starting from a specific position. Meant to be overloaded in a subclass.
 
 =head2 get_header_chunk
 
   my $bytes = $content->get_header_chunk(13);
 
-Get a chunk of the headers starting from a specific position. Note that this
-method finalizes the content.
+Get a chunk of the headers starting from a specific position. Note that this method finalizes the content.
 
 =head2 header_size
 
@@ -474,8 +455,7 @@ Size of headers in bytes. Note that this method finalizes the content.
 
   my $bool = $content->headers_contain('foo bar baz');
 
-Check if headers contain a specific string. Note that this method finalizes the
-content.
+Check if headers contain a specific string. Note that this method finalizes the content.
 
 =head2 is_chunked
 
@@ -493,8 +473,7 @@ Check C<Content-Encoding> header for C<gzip> value.
 
   my $bool = $content->is_dynamic;
 
-Check if content will be dynamically generated, which prevents L</"clone"> from
-working.
+Check if content will be dynamically generated, which prevents L</"clone"> from working.
 
 =head2 is_finished
 
@@ -552,9 +531,8 @@ Size of content already received from message in bytes.
   $content = $content->write($bytes);
   $content = $content->write($bytes => sub {...});
 
-Write dynamic content non-blocking, the optional drain callback will be executed
-once all data has been written. Calling this method without a chunk of data
-will finalize the L</"headers"> and allow for dynamic content to be written
+Write dynamic content non-blocking, the optional drain callback will be executed once all data has been written.
+Calling this method without a chunk of data will finalize the L</"headers"> and allow for dynamic content to be written
 later. You can write an empty chunk of data at any time to end the stream.
 
   # Make sure previous chunk of data has been written before continuing
@@ -573,11 +551,9 @@ later. You can write an empty chunk of data at any time to end the stream.
   $content = $content->write_chunk($bytes);
   $content = $content->write_chunk($bytes => sub {...});
 
-Write dynamic content non-blocking with chunked transfer encoding, the optional
-drain callback will be executed once all data has been written. Calling this
-method without a chunk of data will finalize the L</"headers"> and allow for
-dynamic content to be written later. You can write an empty chunk of data at any
-time to end the stream.
+Write dynamic content non-blocking with chunked transfer encoding, the optional drain callback will be executed once
+all data has been written. Calling this method without a chunk of data will finalize the L</"headers"> and allow for
+dynamic content to be written later. You can write an empty chunk of data at any time to end the stream.
 
   # Make sure previous chunk of data has been written before continuing
   $content->write_chunk('He' => sub {

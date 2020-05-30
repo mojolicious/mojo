@@ -2,9 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Transaction::WebSocket;
-use Mojo::WebSocket
-  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT),
-  qw(build_frame parse_frame);
+use Mojo::WebSocket qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT), qw(build_frame parse_frame);
 
 # Simple text frame roundtrip
 my $bytes = build_frame 0, 1, 0, 0, 0, WS_TEXT, 'whatever';
@@ -123,8 +121,7 @@ is $frame->[2], 0,            'rsv2 flag is not set';
 is $frame->[3], 0,            'rsv3 flag is not set';
 is $frame->[4], 1,            'text frame';
 is $frame->[5], 'also works', 'right payload';
-isnt(build_frame(0, 1, 0, 0, 0, 2, 'also works'),
-  $bytes, 'frames are not equal');
+isnt(build_frame(0, 1, 0, 0, 0, 2, 'also works'), $bytes, 'frames are not equal');
 
 # Masked binary frame roundtrip
 $bytes = build_frame(1, 1, 0, 0, 0, 2, 'just works');
@@ -135,8 +132,7 @@ is $frame->[2], 0,            'rsv2 flag is not set';
 is $frame->[3], 0,            'rsv3 flag is not set';
 is $frame->[4], 2,            'binary frame';
 is $frame->[5], 'just works', 'right payload';
-isnt(build_frame(0, 1, 0, 0, 0, 2, 'just works'),
-  $bytes, 'frames are not equal');
+isnt(build_frame(0, 1, 0, 0, 0, 2, 'just works'), $bytes, 'frames are not equal');
 
 # One-character text frame roundtrip
 $bytes = build_frame(0, 1, 0, 0, 0, 1, 'a');
@@ -176,8 +172,7 @@ is build_frame(0, 1, 0, 0, 0, 1, 'hi' x 10000), $bytes, 'frames are equal';
 
 # 64-bit text frame roundtrip
 $bytes = build_frame(0, 1, 0, 0, 0, 1, 'hi' x 200000);
-is $bytes, "\x81\x7f\x00\x00\x00\x00\x00\x06\x1a\x80" . ("\x68\x69" x 200000),
-  'right frame';
+is $bytes, "\x81\x7f\x00\x00\x00\x00\x00\x06\x1a\x80" . ("\x68\x69" x 200000), 'right frame';
 $frame = parse_frame \($dummy = $bytes), 500000;
 is $frame->[0], 1, 'fin flag is set';
 is $frame->[1], 0, 'rsv1 flag is not set';
@@ -230,8 +225,7 @@ ok $frame, 'true';
 ok !ref $frame, 'not a reference';
 
 # Incomplete frame
-is parse_frame(\($dummy = "\x82\x05\x77\x6f\x72\x6b"), 262144), undef,
-  'incomplete frame';
+is parse_frame(\($dummy = "\x82\x05\x77\x6f\x72\x6b"), 262144), undef, 'incomplete frame';
 
 # Fragmented message
 my $fragmented = Mojo::Transaction::WebSocket->new;
@@ -265,28 +259,19 @@ is $frame2->[3], 0, 'rsv3 flag is not set';
 is $frame2->[4], WS_BINARY, 'binary frame';
 ok $frame2->[5], 'has payload';
 isnt $frame->[5], $frame2->[5], 'different payload';
-is $frame2->[5], $uncompressed->build_message({binary => 'just works'})->[5],
-  'same payload';
+is $frame2->[5], $uncompressed->build_message({binary => 'just works'})->[5], 'same payload';
 
 # Compressed fragmented message
-my $fragmented_compressed
-  = Mojo::Transaction::WebSocket->new({compressed => 1});
+my $fragmented_compressed = Mojo::Transaction::WebSocket->new({compressed => 1});
 $text = undef;
 $fragmented_compressed->on(message => sub { $text = pop });
-my $compressed_payload
-  = $fragmented_compressed->build_message({text => 'just works'})->[5];
+my $compressed_payload = $fragmented_compressed->build_message({text => 'just works'})->[5];
 ok !$text, 'message event has not been emitted yet';
-$fragmented_compressed->parse_message([
-  0, 1, 0, 0, WS_TEXT, substr($compressed_payload, 0, 3)
-]);
+$fragmented_compressed->parse_message([0, 1, 0, 0, WS_TEXT, substr($compressed_payload, 0, 3)]);
 ok !$text, 'message event has not been emitted yet';
-$fragmented_compressed->parse_message([
-  0, 0, 0, 0, WS_CONTINUATION, substr($compressed_payload, 3, 3)
-]);
+$fragmented_compressed->parse_message([0, 0, 0, 0, WS_CONTINUATION, substr($compressed_payload, 3, 3)]);
 ok !$text, 'message event has not been emitted yet';
-$fragmented_compressed->parse_message([
-  1, 0, 0, 0, WS_CONTINUATION, substr($compressed_payload, 6)
-]);
+$fragmented_compressed->parse_message([1, 0, 0, 0, WS_CONTINUATION, substr($compressed_payload, 6)]);
 is $text, 'just works', 'decoded correctly';
 
 done_testing();

@@ -10,9 +10,7 @@ use Scalar::Util qw(weaken);
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native
-use constant NNR => $ENV{MOJO_NO_NNR}
-  ? 0
-  : eval { require Net::DNS::Native; Net::DNS::Native->VERSION('0.15'); 1 };
+use constant NNR => $ENV{MOJO_NO_NNR} ? 0 : eval { require Net::DNS::Native; Net::DNS::Native->VERSION('0.15'); 1 };
 my $NDN;
 
 # SOCKS support requires IO::Socket::Socks
@@ -35,19 +33,17 @@ sub connect {
   # Timeout
   weaken $self;
   my $reactor = $self->reactor;
-  $self->{timer} = $reactor->timer($args->{timeout} || 10,
-    sub { $self->emit(error => 'Connect timeout') });
+  $self->{timer} = $reactor->timer($args->{timeout} || 10, sub { $self->emit(error => 'Connect timeout') });
 
   # Blocking name resolution
   $_ && s/[[\]]//g for @$args{qw(address socks_address)};
   my $address = $args->{socks_address} || ($args->{address} ||= '127.0.0.1');
-  return $reactor->next_tick(sub { $self && $self->_connect($args) })
-    if !NNR || $args->{handle} || $args->{path};
+  return $reactor->next_tick(sub { $self && $self->_connect($args) }) if !NNR || $args->{handle} || $args->{path};
 
   # Non-blocking name resolution
   $NDN //= Net::DNS::Native->new(pool => 5, extra_thread => 1);
-  my $handle = $self->{dns} = $NDN->getaddrinfo($address, _port($args),
-    {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
+  my $handle = $self->{dns}
+    = $NDN->getaddrinfo($address, _port($args), {protocol => IPPROTO_TCP, socktype => SOCK_STREAM});
   $reactor->io(
     $handle => sub {
       my $reactor = shift;
@@ -93,8 +89,7 @@ sub _connect {
       $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     }
 
-    return $self->emit(error => "Can't connect: $@")
-      unless $self->{handle} = $handle = $class->new(%options);
+    return $self->emit(error => "Can't connect: $@") unless $self->{handle} = $handle = $class->new(%options);
   }
   $handle->blocking(0);
 
@@ -141,18 +136,13 @@ sub _try_socks {
 
   my $handle = $self->{handle};
   return $self->_try_tls($args) unless $args->{socks_address};
-  return $self->emit(
-    error => 'IO::Socket::Socks 0.64+ required for SOCKS support')
-    unless SOCKS;
+  return $self->emit(error => 'IO::Socket::Socks 0.64+ required for SOCKS support') unless SOCKS;
 
   my %options = (ConnectAddr => $args->{address}, ConnectPort => $args->{port});
-  @options{qw(AuthType Username Password)}
-    = ('userpass', @$args{qw(socks_user socks_pass)})
-    if $args->{socks_user};
+  @options{qw(AuthType Username Password)} = ('userpass', @$args{qw(socks_user socks_pass)}) if $args->{socks_user};
   my $reactor = $self->reactor;
   $reactor->remove($handle);
-  return $self->emit(error => 'SOCKS upgrade failed')
-    unless IO::Socket::Socks->start_SOCKS($handle, %options);
+  return $self->emit(error => 'SOCKS upgrade failed') unless IO::Socket::Socks->start_SOCKS($handle, %options);
 
   $self->_wait('_socks', $handle, $args);
 }
@@ -176,8 +166,7 @@ sub _try_tls {
 sub _wait {
   my ($self, $next, $handle, $args) = @_;
   weaken $self;
-  $self->reactor->io($handle => sub { $self->$next($args) })
-    ->watch($handle, 0, 1);
+  $self->reactor->io($handle => sub { $self->$next($args) })->watch($handle, 0, 1);
 }
 
 1;
@@ -209,13 +198,11 @@ Mojo::IOLoop::Client - Non-blocking TCP/IP and UNIX domain socket client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> opens TCP/IP and UNIX domain socket connections for
-L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Client> opens TCP/IP and UNIX domain socket connections for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Client> inherits all events from L<Mojo::EventEmitter> and can
-emit the following new ones.
+L<Mojo::IOLoop::Client> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 connect
 
@@ -244,20 +231,18 @@ L<Mojo::IOLoop::Client> implements the following attributes.
   my $reactor = $client->reactor;
   $client     = $client->reactor(Mojo::Reactor::Poll->new);
 
-Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
+Low-level event reactor, defaults to the C<reactor> attribute value of the global L<Mojo::IOLoop> singleton. Note that
+this attribute is weakened.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Client> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::IOLoop::Client> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 can_nnr
 
   my $bool = Mojo::IOLoop::Client->can_nnr;
 
-True if L<Net::DNS::Native> 0.15+ is installed and non-blocking name resolution
-support enabled.
+True if L<Net::DNS::Native> 0.15+ is installed and non-blocking name resolution support enabled.
 
 =head2 can_socks
 
@@ -270,9 +255,8 @@ True if L<IO::Socket::SOCKS> 0.64+ is installed and SOCKS5 support enabled.
   $client->connect(address => '127.0.0.1', port => 3000);
   $client->connect({address => '127.0.0.1', port => 3000});
 
-Open a socket connection to a remote host. Note that non-blocking name
-resolution depends on L<Net::DNS::Native> (0.15+), SOCKS5 support on
-L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (2.009+).
+Open a socket connection to a remote host. Note that non-blocking name resolution depends on L<Net::DNS::Native>
+(0.15+), SOCKS5 support on L<IO::Socket::Socks> (0.64), and TLS support on L<IO::Socket::SSL> (2.009+).
 
 These options are currently available:
 
@@ -336,8 +320,7 @@ Username to use for SOCKS5 authentication.
 
   timeout => 15
 
-Maximum amount of time in seconds establishing connection may take before
-getting canceled, defaults to C<10>.
+Maximum amount of time in seconds establishing connection may take before getting canceled, defaults to C<10>.
 
 =item tls
 

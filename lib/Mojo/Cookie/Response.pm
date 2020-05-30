@@ -6,8 +6,7 @@ use Mojo::Util qw(quote split_cookie_header);
 
 has [qw(domain expires host_only httponly max_age path samesite secure)];
 
-my %ATTRS
-  = map { $_ => 1 } qw(domain expires httponly max-age path samesite secure);
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path samesite secure);
 
 sub parse {
   my ($self, $str) = @_;
@@ -22,7 +21,7 @@ sub parse {
       next unless $ATTRS{my $attr = lc $name};
       $value =~ s/^\.// if $attr eq 'domain' && defined $value;
       $value = Mojo::Date->new($value // '')->epoch if $attr eq 'expires';
-      $value = 1 if $attr eq 'secure' || $attr eq 'httponly';
+      $value = 1                                    if $attr eq 'secure' || $attr eq 'httponly';
       $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr} = $value;
     }
   }
@@ -82,13 +81,12 @@ Mojo::Cookie::Response - HTTP response cookie
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Response> is a container for HTTP response cookies, based on
-L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
+L<Mojo::Cookie::Response> is a container for HTTP response cookies, based on L<RFC
+6265|http://tools.ietf.org/html/rfc6265>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie> and
-implements the following new ones.
+L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie> and implements the following new ones.
 
 =head2 domain
 
@@ -109,16 +107,14 @@ Expiration for cookie.
   my $bool = $cookie->host_only;
   $cookie  = $cookie->host_only($bool);
 
-Host-only flag, indicating that the canonicalized request-host is identical to
-the cookie's L</"domain">.
+Host-only flag, indicating that the canonicalized request-host is identical to the cookie's L</"domain">.
 
 =head2 httponly
 
   my $bool = $cookie->httponly;
   $cookie  = $cookie->httponly($bool);
 
-HttpOnly flag, which can prevent client-side scripts from accessing this
-cookie.
+HttpOnly flag, which can prevent client-side scripts from accessing this cookie.
 
 =head2 max_age
 
@@ -139,23 +135,20 @@ Cookie path.
   my $samesite = $cookie->samesite;
   $cookie      = $cookie->samesite('Lax');
 
-SameSite value. Note that this attribute is B<EXPERIMENTAL> because even though
-most commonly used browsers support the feature, there is no specification yet
-besides
-L<this draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
+SameSite value. Note that this attribute is B<EXPERIMENTAL> because even though most commonly used browsers support the
+feature, there is no specification yet besides L<this
+draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
 
 =head2 secure
 
   my $bool = $cookie->secure;
   $cookie  = $cookie->secure($bool);
 
-Secure flag, which instructs browsers to only send this cookie over HTTPS
-connections.
+Secure flag, which instructs browsers to only send this cookie over HTTPS connections.
 
 =head1 METHODS
 
-L<Mojo::Cookie::Response> inherits all methods from L<Mojo::Cookie> and
-implements the following new ones.
+L<Mojo::Cookie::Response> inherits all methods from L<Mojo::Cookie> and implements the following new ones.
 
 =head2 parse
 

@@ -37,19 +37,17 @@ Mojolicious::Command::cgi - CGI command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::cgi> starts applications with the L<Mojo::Server::CGI>
-backend.
+L<Mojolicious::Command::cgi> starts applications with the L<Mojo::Server::CGI> backend.
 
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
+This is a core command, that means it is always enabled and its code a good example for learning to build new commands,
+you're welcome to fork it.
 
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::cgi> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::cgi> inherits all attributes from L<Mojolicious::Command> and implements the following new
+ones.
 
 =head2 description
 
@@ -67,8 +65,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::cgi> inherits all methods from L<Mojolicious::Command>
-and implements the following new ones.
+L<Mojolicious::Command::cgi> inherits all methods from L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run
 

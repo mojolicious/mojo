@@ -67,19 +67,13 @@ is $t->type('html'), 'text/html;charset=UTF-8', 'right type';
 
 # Prioritize
 is_deeply $t->detect('text/plain'), ['txt'], 'right formats';
-is_deeply $t->detect('text/plain,text/html'), ['htm', 'html', 'txt'],
-  'right formats';
-is_deeply $t->detect('TEXT/HTML; q=0.8 '), ['htm', 'html'], 'right formats';
-is_deeply $t->detect('TEXT/HTML  ;  q  =  0.8 '), ['htm', 'html'],
-  'right formats';
-is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9'),
-  ['txt', 'htm', 'html'], 'right formats';
-is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9'), ['htm', 'html', 'txt'],
-  'right formats';
-is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1'),
-  ['xml', 'txt', 'xml'], 'right formats';
-is_deeply $t->detect('application/json, text/javascript, */*; q=0.01'),
-  ['json'], 'right formats';
+is_deeply $t->detect('text/plain,text/html'), ['htm', 'html', 'txt'], 'right formats';
+is_deeply $t->detect('TEXT/HTML; q=0.8 '),        ['htm', 'html'], 'right formats';
+is_deeply $t->detect('TEXT/HTML  ;  q  =  0.8 '), ['htm', 'html'], 'right formats';
+is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9'),                  ['txt', 'htm',  'html'], 'right formats';
+is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9'),                     ['htm', 'html', 'txt'],  'right formats';
+is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1'), ['xml', 'txt',  'xml'],  'right formats';
+is_deeply $t->detect('application/json, text/javascript, */*; q=0.01'), ['json'], 'right formats';
 
 # File types
 is $t->file_type('foo/bar.png'), 'image/png',              'right type';

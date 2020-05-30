@@ -6,8 +6,7 @@ use Mojo::Exception;
 use Mojo::File qw(path);
 use Mojo::Util qw(b64_decode class_to_path);
 
-our @EXPORT_OK
-  = qw(data_section file_is_binary find_modules find_packages load_class);
+our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class);
 
 my (%BIN, %CACHE);
 
@@ -21,8 +20,7 @@ sub find_modules {
   my %modules;
   for my $directory (@INC) {
     next unless -d (my $path = path($directory, split(/::|'/, $ns)));
-    $modules{"${ns}::$_"}++
-      for $path->list->grep(qr/\.pm$/)->map('basename', '.pm')->each;
+    $modules{"${ns}::$_"}++ for $path->list->grep(qr/\.pm$/)->map('basename', '.pm')->each;
   }
 
   return sort keys %modules;
@@ -73,8 +71,7 @@ sub _all {
   my $all = $CACHE{$class} = {};
   while (@files) {
     my ($name, $data) = splice @files, 0, 2;
-    $all->{$name} = $name =~ s/\s*\(\s*base64\s*\)$//
-      && ++$BIN{$class}{$name} ? b64_decode $data : $data;
+    $all->{$name} = $name =~ s/\s*\(\s*base64\s*\)$// && ++$BIN{$class}{$name} ? b64_decode $data : $data;
   }
 
   return $all;
@@ -105,9 +102,8 @@ Mojo::Loader - Load all kinds of things
 
 =head1 DESCRIPTION
 
-L<Mojo::Loader> is a class loader and plugin framework. Aside from finding
-modules and loading classes, it allows multiple files to be stored in the
-C<DATA> section of a class, which can then be accessed individually.
+L<Mojo::Loader> is a class loader and plugin framework. Aside from finding modules and loading classes, it allows
+multiple files to be stored in the C<DATA> section of a class, which can then be accessed individually.
 
   package Foo;
 
@@ -124,23 +120,20 @@ C<DATA> section of a class, which can then be accessed individually.
   This is the
   third file.
 
-Each file has a header starting with C<@@>, followed by the file name and
-optional instructions for decoding its content. Currently only the Base64
-encoding is supported, which can be quite convenient for the storage of binary
-data.
+Each file has a header starting with C<@@>, followed by the file name and optional instructions for decoding its
+content. Currently only the Base64 encoding is supported, which can be quite convenient for the storage of binary data.
 
 =head1 FUNCTIONS
 
-L<Mojo::Loader> implements the following functions, which can be imported
-individually.
+L<Mojo::Loader> implements the following functions, which can be imported individually.
 
 =head2 data_section
 
   my $all   = data_section 'Foo::Bar';
   my $index = data_section 'Foo::Bar', 'index.html';
 
-Extract embedded file from the C<DATA> section of a class, all files will be
-cached once they have been accessed for the first time.
+Extract embedded file from the C<DATA> section of a class, all files will be cached once they have been accessed for
+the first time.
 
   # List embedded files
   say for keys %{data_section 'Foo::Bar'};
@@ -167,11 +160,9 @@ Search for modules in a namespace non-recursively.
 
   my $e = load_class 'Foo::Bar';
 
-Load a class and catch exceptions, returns a false value if loading was
-successful, a true value if the class was not found, or a L<Mojo::Exception>
-object if loading failed. Note that classes are checked for a C<new> method to
-see if they are already loaded, so trying to load the same class multiple times
-may yield different results.
+Load a class and catch exceptions, returns a false value if loading was successful, a true value if the class was not
+found, or a L<Mojo::Exception> object if loading failed. Note that classes are checked for a C<new> method to see if
+they are already loaded, so trying to load the same class multiple times may yield different results.
 
   # Handle exceptions
   if (my $e = load_class 'Foo::Bar') {

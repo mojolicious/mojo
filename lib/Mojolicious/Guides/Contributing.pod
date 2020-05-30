@@ -89,8 +89,8 @@ rather conservative when it comes to adding new ones. So if your contribution
 is not a simple bug fix, it is B<strongly recommended> that you discuss it in
 advance on the L<mailing list|http://groups.google.com/group/mojolicious> or the
 official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
-now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>),
-to avoid unnecessary work and to increase its chances of getting accepted.
+now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo>), to avoid
+unnecessary work and to increase its chances of getting accepted.
 
 The following mission statement and rules are the foundation of all L<Mojo> and
 L<Mojolicious> development. Please make sure that your contribution aligns well
@@ -311,6 +311,6 @@ If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
 L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
 channel C<#mojo> on C<irc.freenode.net> (L<chat
-now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>).
+now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo>).
 
 =cut

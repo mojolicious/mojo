@@ -1,7 +1,8 @@
 
-8.51  2020-05-26
+8.51  2020-05-30
   - Improved map efficiency in Mojo::Promise. (mst)
   - Improved more tests to use subtests. (veesh)
+  - Improved .perltidyrc with more modern settings.
 
 8.50  2020-05-23
   - Increased Perl version requirement to 5.16.0. This is just a first step however, at some point in the not so distant

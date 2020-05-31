@@ -1,4 +1,6 @@
 
+8.52  2020-06-01
+
 8.51  2020-05-30
   - Improved map efficiency in Mojo::Promise. (mst)
   - Improved more tests to use subtests. (veesh)

@@ -71,20 +71,17 @@ sub content_like {
 
 sub content_type_is {
   my ($self, $type, $desc) = @_;
-  $desc = _desc($desc, "Content-Type: $type");
-  return $self->test('is', $self->tx->res->headers->content_type, $type, $desc);
+  return $self->test('is', $self->tx->res->headers->content_type, $type, _desc($desc, "Content-Type: $type"));
 }
 
 sub content_type_isnt {
   my ($self, $type, $desc) = @_;
-  $desc = _desc($desc, "not Content-Type: $type");
-  return $self->test('isnt', $self->tx->res->headers->content_type, $type, $desc);
+  return $self->test('isnt', $self->tx->res->headers->content_type, $type, _desc($desc, "not Content-Type: $type"));
 }
 
 sub content_type_like {
   my ($self, $regex, $desc) = @_;
-  $desc = _desc($desc, 'Content-Type is similar');
-  return $self->test('like', $self->tx->res->headers->content_type, $regex, $desc);
+  return $self->test('like', $self->tx->res->headers->content_type, $regex, _desc($desc, 'Content-Type is similar'));
 }
 
 sub content_type_unlike {
@@ -114,8 +111,7 @@ sub element_exists {
 
 sub element_exists_not {
   my ($self, $selector, $desc) = @_;
-  $desc = _desc($desc, qq{no element for selector "$selector"});
-  return $self->test('ok', !$self->tx->res->dom->at($selector), $desc);
+  return $self->test('ok', !$self->tx->res->dom->at($selector), _desc($desc, qq{no element for selector "$selector"}));
 }
 
 sub finish_ok {
@@ -137,20 +133,17 @@ sub head_ok { shift->_build_ok(HEAD => @_) }
 
 sub header_exists {
   my ($self, $name, $desc) = @_;
-  $desc = _desc($desc, qq{header "$name" exists});
-  return $self->test('ok', !!@{$self->tx->res->headers->every_header($name)}, $desc);
+  return $self->test('ok', !!@{$self->tx->res->headers->every_header($name)}, _desc($desc, qq{header "$name" exists}));
 }
 
 sub header_exists_not {
   my ($self, $name, $desc) = @_;
-  $desc = _desc($desc, qq{no "$name" header});
-  return $self->test('ok', !@{$self->tx->res->headers->every_header($name)}, $desc);
+  return $self->test('ok', !@{$self->tx->res->headers->every_header($name)}, _desc($desc, qq{no "$name" header}));
 }
 
 sub header_is {
   my ($self, $name, $value, $desc) = @_;
-  $desc = _desc($desc, "$name: " . ($value // ''));
-  return $self->test('is', $self->tx->res->headers->header($name), $value, $desc);
+  return $self->test('is', $self->tx->res->headers->header($name), $value, _desc($desc, "$name: " . ($value // '')));
 }
 
 sub header_isnt {
@@ -167,8 +160,7 @@ sub header_like {
 
 sub header_unlike {
   my ($self, $name, $regex, $desc) = @_;
-  $desc = _desc($desc, "$name is not similar");
-  return $self->test('unlike', $self->tx->res->headers->header($name), $regex, $desc);
+  return $self->test('unlike', $self->tx->res->headers->header($name), $regex, _desc($desc, "$name is not similar"));
 }
 
 sub json_has {
@@ -197,21 +189,18 @@ sub json_like {
 
 sub json_message_has {
   my ($self, $p, $desc) = @_;
-  $desc = _desc($desc, qq{has value for JSON Pointer "$p"});
-  return $self->test('ok', $self->_json(contains => $p), $desc);
+  return $self->test('ok', $self->_json(contains => $p), _desc($desc, qq{has value for JSON Pointer "$p"}));
 }
 
 sub json_message_hasnt {
   my ($self, $p, $desc) = @_;
-  $desc = _desc($desc, qq{has no value for JSON Pointer "$p"});
-  return $self->test('ok', !$self->_json(contains => $p), $desc);
+  return $self->test('ok', !$self->_json(contains => $p), _desc($desc, qq{has no value for JSON Pointer "$p"}));
 }
 
 sub json_message_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
-  my $desc = _desc(shift, qq{exact match for JSON Pointer "$p"});
-  return $self->test('is_deeply', $self->_json(get => $p), $data, $desc);
+  return $self->test('is_deeply', $self->_json(get => $p), $data, _desc(shift, qq{exact match for JSON Pointer "$p"}));
 }
 
 sub json_message_like {

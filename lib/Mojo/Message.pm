@@ -79,9 +79,7 @@ sub error {
 sub every_cookie { shift->_cache('cookies', 1, @_) }
 sub every_upload { shift->_cache('uploads', 1, @_) }
 
-sub extract_start_line {
-  croak 'Method "extract_start_line" not implemented by subclass';
-}
+sub extract_start_line { croak 'Method "extract_start_line" not implemented by subclass' }
 
 sub finish {
   my $self = shift;
@@ -121,9 +119,7 @@ sub get_header_chunk {
   return $self->fix_headers->content->get_header_chunk($offset);
 }
 
-sub get_start_line_chunk {
-  croak 'Method "get_start_line_chunk" not implemented by subclass';
-}
+sub get_start_line_chunk { croak 'Method "get_start_line_chunk" not implemented by subclass' }
 
 sub header_size { shift->fix_headers->content->header_size }
 
@@ -183,9 +179,7 @@ sub save_to {
   return $self;
 }
 
-sub start_line_size {
-  croak 'Method "start_line_size" not implemented by subclass';
-}
+sub start_line_size { croak 'Method "start_line_size" not implemented by subclass' }
 
 sub text {
   my $self    = shift;

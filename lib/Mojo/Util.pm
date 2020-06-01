@@ -402,9 +402,7 @@ sub _adapt {
   return $k + (((PC_BASE - PC_TMIN + 1) * $delta) / ($delta + PC_SKEW));
 }
 
-sub _encoding {
-  $ENCODING{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
-}
+sub _encoding { $ENCODING{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'" }
 
 sub _entity {
   my ($point, $name, $attr) = @_;
@@ -423,9 +421,7 @@ sub _entity {
 }
 
 # Supported on Perl 5.14+
-sub _global_destruction {
-  defined ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT';
-}
+sub _global_destruction { defined ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT' }
 
 sub _header {
   my ($str, $cookie) = @_;

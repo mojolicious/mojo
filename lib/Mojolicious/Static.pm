@@ -114,9 +114,7 @@ sub serve_asset {
 sub warmup {
   my $self  = shift;
   my $index = $self->{index} = {};
-  for my $class (reverse @{$self->classes}) {
-    $index->{$_} = $class for keys %{data_section $class};
-  }
+  for my $class (reverse @{$self->classes}) { $index->{$_} = $class for keys %{data_section $class} }
 }
 
 sub _epoch { Mojo::Date->new(shift)->epoch }

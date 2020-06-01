@@ -64,10 +64,7 @@ sub steal_handle {
   return delete $self->{handle};
 }
 
-sub stop {
-  my $self = shift;
-  $self->reactor->watch($self->{handle}, 0, $self->is_writing) if $self->{handle} && !$self->{paused}++;
-}
+sub stop { $_[0]->reactor->watch($_[0]{handle}, 0, $_[0]->is_writing) if $_[0]{handle} && !$_[0]{paused}++ }
 
 sub timeout {
   my ($self, $timeout) = @_;

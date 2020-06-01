@@ -6,9 +6,7 @@ use Carp qw(croak);
 has watch         => sub { [qw(lib templates)] };
 has watch_timeout => sub { $ENV{MOJO_MORBO_TIMEOUT} || 1 };
 
-sub modified_files {
-  croak 'Method "modified_files" not implemented by subclass';
-}
+sub modified_files { croak 'Method "modified_files" not implemented by subclass' }
 
 1;
 

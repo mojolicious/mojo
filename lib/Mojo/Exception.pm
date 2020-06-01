@@ -70,9 +70,7 @@ sub inspect {
   return $self;
 }
 
-sub new {
-  defined $_[1] ? shift->SUPER::new(message => shift) : shift->SUPER::new;
-}
+sub new { defined $_[1] ? shift->SUPER::new(message => shift) : shift->SUPER::new }
 
 sub raise {
   my ($class, $err) = @_ > 1 ? (@_) : (__PACKAGE__, shift);

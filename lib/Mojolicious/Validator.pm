@@ -30,9 +30,7 @@ sub new {
   return $self;
 }
 
-sub validation {
-  Mojolicious::Validator::Validation->new(validator => shift);
-}
+sub validation { Mojolicious::Validator::Validation->new(validator => shift) }
 
 sub _equal_to {
   my ($v, $name, $value, $to) = @_;

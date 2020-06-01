@@ -13,15 +13,10 @@ has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
 my $BOUNDARY_RE = qr!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i;
 
-sub body_contains {
-  croak 'Method "body_contains" not implemented by subclass';
-}
+sub body_contains { croak 'Method "body_contains" not implemented by subclass' }
+sub body_size     { croak 'Method "body_size" not implemented by subclass' }
 
-sub body_size { croak 'Method "body_size" not implemented by subclass' }
-
-sub boundary {
-  (shift->headers->content_type // '') =~ $BOUNDARY_RE ? $1 // $2 : undef;
-}
+sub boundary { (shift->headers->content_type // '') =~ $BOUNDARY_RE ? $1 // $2 : undef }
 
 sub charset {
   my $type = shift->headers->content_type // '';
@@ -45,9 +40,7 @@ sub generate_body_chunk {
   return looks_like_number $len && $len == $offset ? '' : undef;
 }
 
-sub get_body_chunk {
-  croak 'Method "get_body_chunk" not implemented by subclass';
-}
+sub get_body_chunk { croak 'Method "get_body_chunk" not implemented by subclass' }
 
 sub get_header_chunk { substr shift->_headers->{header_buffer}, shift, 131072 }
 

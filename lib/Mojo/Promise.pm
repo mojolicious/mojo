@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 use Carp qw(carp);
 use Mojo::IOLoop;
-use Mojo::Util qw(deprecated);
 use Scalar::Util qw(blessed);
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;

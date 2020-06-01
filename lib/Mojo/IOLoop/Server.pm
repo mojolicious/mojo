@@ -18,9 +18,7 @@ sub DESTROY {
   $self->stop                                        if $self->{handle} && $self->reactor;
 }
 
-sub generate_port {
-  IO::Socket::IP->new(Listen => 5, LocalAddr => '127.0.0.1')->sockport;
-}
+sub generate_port { IO::Socket::IP->new(Listen => 5, LocalAddr => '127.0.0.1')->sockport }
 
 sub handle { shift->{handle} }
 

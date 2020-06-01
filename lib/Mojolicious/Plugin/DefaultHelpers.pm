@@ -82,10 +82,7 @@ sub _content {
   return Mojo::ByteStream->new($hash->{$name} // '');
 }
 
-sub _csrf_token {
-  my $c = shift;
-  return $c->session->{csrf_token} ||= hmac_sha1_sum($$ . steady_time . rand, $c->app->secrets->[0]);
-}
+sub _csrf_token { $_[0]->session->{csrf_token} ||= hmac_sha1_sum($$ . steady_time . rand, $_[0]->app->secrets->[0]) }
 
 sub _current_route {
   return '' unless my $route = shift->match->endpoint;
@@ -164,10 +161,7 @@ sub _is_fresh {
   return $c->app->static->is_fresh($c, \%options);
 }
 
-sub _log {
-  my $c = shift;
-  return $c->stash->{'mojo.log'} ||= $c->app->log->context('[' . $c->req->request_id . ']');
-}
+sub _log { $_[0]->stash->{'mojo.log'} ||= $_[0]->app->log->context('[' . $_[0]->req->request_id . ']') }
 
 sub _proxy_method_p {
   my ($method, $c) = (shift, shift);

@@ -96,9 +96,7 @@ sub is_secure {
   return ($url->protocol || $url->base->protocol) eq 'https';
 }
 
-sub is_xhr {
-  (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpRequest/i;
-}
+sub is_xhr { (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpRequest/i }
 
 sub param { shift->params->param(@_) }
 

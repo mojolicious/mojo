@@ -34,9 +34,7 @@ sub get_chunk {
   $max //= 131072;
 
   $offset += $self->start_range;
-  if (my $end = $self->end_range) {
-    $max = $end + 1 - $offset if ($offset + $max) > $end;
-  }
+  if (my $end = $self->end_range) { $max = $end + 1 - $offset if ($offset + $max) > $end }
 
   return substr shift->{content} // '', $offset, $max;
 }

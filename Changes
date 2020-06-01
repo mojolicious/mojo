@@ -1,5 +1,6 @@
 
 8.52  2020-06-01
+  - Fixed a bug in Mojo::Asset::Memory where the upgrade event could not change the temporary directory.
 
 8.51  2020-05-30
   - Improved map efficiency in Mojo::Promise. (mst)

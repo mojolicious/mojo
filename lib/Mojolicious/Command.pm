@@ -99,8 +99,6 @@ Mojolicious::Command - Command base class
     # Magic here! :)
   }
 
-  1;
-
   =head1 SYNOPSIS
 
     Usage: APPLICATION mycommand [OPTIONS]

@@ -1,4 +1,6 @@
 
+8.53  2020-06-02
+
 8.52  2020-06-01
   - Updated project metadata.
   - Fixed a bug in Mojo::Asset::Memory where the upgrade event could not change the temporary directory.

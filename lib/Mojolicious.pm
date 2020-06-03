@@ -58,7 +58,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.52';
+our $VERSION  = '8.53';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;

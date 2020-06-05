@@ -21,9 +21,7 @@ sub _pointer {
     if (ref $data eq 'HASH' && exists $data->{$p}) { $data = $data->{$p} }
 
     # Array
-    elsif (ref $data eq 'ARRAY' && $p =~ /^\d+$/ && @$data > $p) {
-      $data = $data->[$p];
-    }
+    elsif (ref $data eq 'ARRAY' && $p =~ /^\d+$/ && @$data > $p) { $data = $data->[$p] }
 
     # Nothing
     else { return undef }

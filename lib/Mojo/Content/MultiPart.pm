@@ -170,19 +170,13 @@ sub _read {
   until (($self->{multi_state} //= 'multipart_preamble') eq 'finished') {
 
     # Preamble
-    if ($self->{multi_state} eq 'multipart_preamble') {
-      last unless $self->_parse_multipart_preamble($boundary);
-    }
+    if ($self->{multi_state} eq 'multipart_preamble') { last unless $self->_parse_multipart_preamble($boundary) }
 
     # Boundary
-    elsif ($self->{multi_state} eq 'multipart_boundary') {
-      last unless $self->_parse_multipart_boundary($boundary);
-    }
+    elsif ($self->{multi_state} eq 'multipart_boundary') { last unless $self->_parse_multipart_boundary($boundary) }
 
     # Body
-    elsif ($self->{multi_state} eq 'multipart_body') {
-      last unless $self->_parse_multipart_body($boundary);
-    }
+    elsif ($self->{multi_state} eq 'multipart_body') { last unless $self->_parse_multipart_body($boundary) }
   }
 
   # Check buffer size

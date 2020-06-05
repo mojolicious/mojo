@@ -326,9 +326,7 @@ sub _text {
     my $type = $node->[0];
 
     # Text
-    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
-      $text .= $node->[1];
-    }
+    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') { $text .= $node->[1] }
 
     # Nested tag
     elsif ($type eq 'tag' && $all) { unshift @$nodes, @{_nodes($node)} }

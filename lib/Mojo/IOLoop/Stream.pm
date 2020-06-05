@@ -79,11 +79,8 @@ sub timeout {
   }
   elsif ($self->{timeout}) {
     weaken $self;
-    $self->{timer} = $reactor->timer(
-      $timeout => sub {
-        $self and delete($self->{timer}) and $self->emit('timeout')->close;
-      }
-    );
+    $self->{timer}
+      = $reactor->timer($timeout => sub { $self and delete($self->{timer}) and $self->emit('timeout')->close });
   }
 
   return $self;

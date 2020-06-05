@@ -15,11 +15,9 @@ sub canonicalize {
 
   my $parts = $self->parts;
   for (my $i = 0; $i <= $#$parts;) {
-    if (!length $parts->[$i] || $parts->[$i] eq '.' || $parts->[$i] eq '...') {
-      splice @$parts, $i, 1;
-    }
-    elsif ($i < 1 || $parts->[$i] ne '..' || $parts->[$i - 1] eq '..') { $i++ }
-    else                                                               { splice @$parts, --$i, 2 }
+    if    (!length $parts->[$i] || $parts->[$i] eq '.' || $parts->[$i] eq '...') { splice @$parts, $i, 1 }
+    elsif ($i < 1 || $parts->[$i] ne '..' || $parts->[$i - 1] eq '..')           { $i++ }
+    else                                                                         { splice @$parts, --$i, 2 }
   }
 
   return @$parts ? $self : $self->trailing_slash(undef);

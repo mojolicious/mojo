@@ -14,9 +14,7 @@ sub path_for {
 
   # Current route
   my $route;
-  if (!$name || $name eq 'current') {
-    return {} unless $route = $self->endpoint;
-  }
+  if (!$name || $name eq 'current') { return {} unless $route = $self->endpoint }
 
   # Find endpoint
   else { return {path => $name} unless $route = $self->root->lookup($name) }

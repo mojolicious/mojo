@@ -44,9 +44,7 @@ sub register {
   if (-e $file) { $config = $self->load($file, $conf, $app) }
 
   # Check for default and mode specific config file
-  elsif (!$conf->{default} && !$mode) {
-    die qq{Configuration file "$file" missing, maybe you need to create it?\n};
-  }
+  elsif (!$conf->{default} && !$mode) { die qq{Configuration file "$file" missing, maybe you need to create it?\n} }
 
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}} if $mode;

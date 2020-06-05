@@ -112,12 +112,8 @@ sub _compile {
 
     # Placeholder
     else {
-      if ($value =~ /^(.+)\Q$start\E(.+)$/) {
-        ($value, $part) = ($1, _compile_req($types->{$2} // '?!'));
-      }
-      else {
-        $part = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)';
-      }
+      if ($value =~ /^(.+)\Q$start\E(.+)$/) { ($value, $part) = ($1, _compile_req($types->{$2} // '?!')) }
+      else                                  { $part = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)' }
       unshift @$placeholders, $value;
 
       # Custom regex
@@ -176,9 +172,7 @@ sub _tokenize {
     elsif ($char eq $quote_end)   { $spec = $more = 0 }
 
     # Placeholder
-    elsif (!$more && $char eq $start) {
-      push @tree, ['placeholder', ''] unless $spec++;
-    }
+    elsif (!$more && $char eq $start) { push @tree, ['placeholder', ''] unless $spec++ }
 
     # Relaxed or wildcard (upgrade when quoted)
     elsif (!$more && ($char eq $relaxed || $char eq $wildcard)) {
@@ -196,14 +190,10 @@ sub _tokenize {
     elsif ($spec && ++$more) { $tree[-1][1] .= $char }
 
     # Text (optimize slash+text and *+text+slash+text)
-    elsif ($tree[-1][0] eq 'text') { $tree[-1][-1] .= $char }
-    elsif (!$tree[-2] && $tree[-1][0] eq 'slash') {
-      @tree = (['text', "/$char"]);
-    }
-    elsif ($tree[-2] && $tree[-2][0] eq 'text' && $tree[-1][0] eq 'slash') {
-      pop @tree && ($tree[-1][-1] .= "/$char");
-    }
-    else { push @tree, ['text', $char] }
+    elsif ($tree[-1][0] eq 'text')                                         { $tree[-1][-1] .= $char }
+    elsif (!$tree[-2] && $tree[-1][0] eq 'slash')                          { @tree = (['text', "/$char"]) }
+    elsif ($tree[-2] && $tree[-2][0] eq 'text' && $tree[-1][0] eq 'slash') { pop @tree && ($tree[-1][-1] .= "/$char") }
+    else                                                                   { push @tree, ['text', $char] }
   }
 
   return $self->unparsed($pattern)->tree(\@tree);

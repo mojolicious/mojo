@@ -16,8 +16,8 @@ sub register {
   $app->helper(datetime_field => sub { _input(@_, type => 'datetime-local') });
 
   my @helpers = (
-    qw(csrf_field form_for hidden_field javascript label_for link_to),
-    qw(select_field stylesheet submit_button tag_with_error text_area)
+    qw(csrf_field form_for hidden_field javascript label_for link_to select_field stylesheet submit_button),
+    qw(tag_with_error text_area)
   );
   $app->helper($_ => __PACKAGE__->can("_$_")) for @helpers;
 

@@ -227,9 +227,7 @@ sub _finish {
 
   # Premature connection close
   my $res = $old->closed->res->finish;
-  if ($close && !$res->code && !$res->error) {
-    $res->error({message => 'Premature connection close'});
-  }
+  $res->error({message => 'Premature connection close'}) if $close && !$res->code && !$res->error;
 
   # Always remove connection for WebSockets
   return $self->_remove($id) if $old->is_websocket;

@@ -61,18 +61,14 @@ sub run {
 
   # Clean manager environment
   local $SIG{CHLD} = sub {
-    while ((my $pid = waitpid -1, WNOHANG) > 0) {
-      $self->emit(reap => $pid)->_stopped($pid);
-    }
+    while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->emit(reap => $pid)->_stopped($pid) }
   };
   local $SIG{INT}  = local $SIG{TERM} = sub { $self->_term };
   local $SIG{QUIT} = sub                    { $self->_term(1) };
   local $SIG{TTIN} = sub                    { $self->workers($self->workers + 1) };
   local $SIG{TTOU} = sub {
     $self->workers > 0 ? $self->workers($self->workers - 1) : return;
-    for my $w (values %{$self->{pool}}) {
-      ($w->{graceful} = steady_time) and last unless $w->{graceful};
-    }
+    for my $w (values %{$self->{pool}}) { ($w->{graceful} = steady_time) and last unless $w->{graceful} }
   };
 
   # Preload application before starting workers

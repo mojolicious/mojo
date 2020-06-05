@@ -18,8 +18,8 @@ use constant {WS_CONTINUATION => 0x0, WS_TEXT => 0x1, WS_BINARY => 0x2, WS_CLOSE
   WS_PONG => 0xa};
 
 our @EXPORT_OK = (
-  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT),
-  qw(build_frame challenge client_handshake parse_frame server_handshake)
+  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT build_frame challenge client_handshake),
+  qw(parse_frame server_handshake)
 );
 
 sub build_frame {

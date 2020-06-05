@@ -75,12 +75,8 @@ sub new { defined $_[1] ? shift->SUPER::new(message => shift) : shift->SUPER::ne
 sub raise {
   my ($class, $err) = @_ > 1 ? (@_) : (__PACKAGE__, shift);
 
-  if (!$class->can('new')) {
-    die $@ unless eval "package $class; use Mojo::Base 'Mojo::Exception'; 1";
-  }
-  elsif (!$class->isa(__PACKAGE__)) {
-    die "$class is not a Mojo::Exception subclass";
-  }
+  if    (!$class->can('new'))       { die $@ unless eval "package $class; use Mojo::Base 'Mojo::Exception'; 1" }
+  elsif (!$class->isa(__PACKAGE__)) { die "$class is not a Mojo::Exception subclass" }
 
   CORE::die $class->new($err)->trace;
 }

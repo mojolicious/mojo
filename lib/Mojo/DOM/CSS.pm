@@ -94,9 +94,7 @@ sub _compile {
     }
 
     # Attributes
-    elsif ($css =~ /\G$ATTR_RE/gco) {
-      push @$last, ['attr', _name($1), _value($2 // '', $3 // $4 // $5, $6)];
-    }
+    elsif ($css =~ /\G$ATTR_RE/gco) { push @$last, ['attr', _name($1), _value($2 // '', $3 // $4 // $5, $6)] }
 
     # Pseudo-class
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {

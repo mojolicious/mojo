@@ -15,8 +15,8 @@ has match => sub { Mojolicious::Routes::Match->new(root => shift->app->routes) }
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
-  qw(action app cb controller data extends format handler inline json layout),
-  qw(namespace path status template text variant)
+  qw(action app cb controller data extends format handler inline json layout namespace path status template),
+  qw(text variant)
 );
 
 sub BUILD_DYNAMIC {
@@ -50,9 +50,7 @@ sub cookie {
   return $cookie->value;
 }
 
-sub every_cookie {
-  [map { $_->value } @{shift->req->every_cookie(shift)}];
-}
+sub every_cookie { [map { $_->value } @{shift->req->every_cookie(shift)}] }
 
 sub every_param {
   my ($self, $name) = @_;

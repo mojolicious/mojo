@@ -77,9 +77,7 @@ sub build_controller {
 
   # Embedded application
   my $stash = {};
-  if ($tx && (my $sub = $tx->can('stash'))) {
-    ($stash, $tx) = ($tx->$sub, $tx->tx);
-  }
+  if ($tx && (my $sub = $tx->can('stash'))) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
 
   # Build default controller
   my $defaults = $self->defaults;

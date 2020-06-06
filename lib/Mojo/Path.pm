@@ -1,10 +1,6 @@
 package Mojo::Path;
 use Mojo::Base -base;
-use overload
-  '@{}'    => sub { shift->parts },
-  bool     => sub {1},
-  '""'     => sub { shift->to_string },
-  fallback => 1;
+use overload '@{}' => sub { shift->parts }, bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Util qw(decode encode url_escape url_unescape);
 

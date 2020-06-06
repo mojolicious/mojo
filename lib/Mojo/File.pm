@@ -1,10 +1,6 @@
 package Mojo::File;
 use Mojo::Base -strict;
-use overload
-  '@{}'    => sub { shift->to_array },
-  bool     => sub {1},
-  '""'     => sub { ${$_[0]} },
-  fallback => 1;
+use overload '@{}' => sub { shift->to_array }, bool => sub {1}, '""' => sub { ${$_[0]} }, fallback => 1;
 
 use Carp qw(croak);
 use Cwd qw(getcwd);

@@ -82,6 +82,20 @@ is $file->spurt('test')->slurp, 'test', 'right result';
 undef $file;
 ok !-f $path, 'file does not exist anymore';
 
+subtest 'Persistent temporary file' => sub {
+  my $dir  = tempdir;
+  my $file = tempfile(DIR => $dir);
+  $file->spurt('works');
+  is $file->slurp, 'works', 'right content';
+  my $file2 = $dir->child('test.txt');
+  $file->move_to($file2);
+  ok -e $file2, 'file exists';
+  ok !-e $file, 'file does not exist anymore';
+  undef $file;
+  is $file2->slurp, 'works', 'right content';
+  ok -e $file2, 'file still exists';
+};
+
 # Open
 $file = tempfile;
 $file->spurt("test\n123\n");

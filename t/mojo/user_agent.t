@@ -8,6 +8,7 @@ BEGIN {
 use Test::More;
 use Mojo::IOLoop;
 use Mojo::Message::Request;
+use Mojo::Promise;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojo::UserAgent::Server;
@@ -510,7 +511,7 @@ $tx = $ua->get("http://127.0.0.1:$port");
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
-sleep 1;
+Mojo::Promise->timer(1)->wait;
 $tx = $ua->get("http://127.0.0.1:$port");
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';

@@ -76,9 +76,15 @@ is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1'), ['xml
 is_deeply $t->detect('application/json, text/javascript, */*; q=0.01'), ['json'], 'right formats';
 
 # File types
-is $t->file_type('foo/bar.png'), 'image/png',              'right type';
-is $t->file_type('foo/bar.js'),  'application/javascript', 'right type';
-is $t->file_type('foo/bar'),     undef,                    'no type';
+is $t->file_type('foo/bar.png'),  'image/png',              'right type';
+is $t->file_type('foo/bar.js'),   'application/javascript', 'right type';
+is $t->file_type('foo/bar'),      undef,                    'no type';
+is $t->file_type('foo/.vimrc'),   undef,                    'no type';
+is $t->file_type('foo/.js'),      undef,                    'no type';
+is $t->file_type('foo/.test.js'), 'application/javascript', 'right type';
+is $t->file_type('.vimrc'),       undef,                    'no type';
+is $t->file_type('.js'),          undef,                    'no type';
+is $t->file_type('.test.js'),     'application/javascript', 'right type';
 
 # Content types
 my $c = Mojolicious->new->build_controller;

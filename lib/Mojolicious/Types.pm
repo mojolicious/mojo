@@ -1,6 +1,8 @@
 package Mojolicious::Types;
 use Mojo::Base -base;
 
+use Mojo::File qw(path);
+
 has mapping => sub {
   {
     appcache => ['text/cache-manifest'],
@@ -62,7 +64,7 @@ sub detect {
   return [map { @{$reverse{$_} // []} } @detected];
 }
 
-sub file_type { $_[1] =~ /\.(\w+)$/ ? $_[0]->type($1) : undef }
+sub file_type { $_[0]->type(path($_[1])->extname) }
 
 sub type {
   my ($self, $ext, $type) = @_;

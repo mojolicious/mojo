@@ -37,6 +37,8 @@ sub curfile { __PACKAGE__->new(Cwd::realpath((caller)[1])) }
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
+sub extname { shift->basename =~ /.+\.([^.]+)$/ ? $1 : '' }
+
 sub is_abs { file_name_is_absolute ${shift()} }
 
 sub list {
@@ -184,6 +186,7 @@ Mojo::File - File system paths
   say $path->slurp;
   say $path->dirname;
   say $path->basename;
+  say $path->extname;
   say $path->sibling('.bashrc');
 
   # Use the alternative constructor
@@ -289,6 +292,15 @@ Return all but the last level of the path with L<File::Basename> as a L<Mojo::Fi
 
   # "/home/sri" (on UNIX)
   path('/home/sri/.vimrc')->dirname;
+
+=head2 extname
+
+  my $ext = $path->extname;
+
+Return file extension of the path. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
+  # "js"
+  path('/home/sri/test.js')->extname;
 
 =head2 is_abs
 

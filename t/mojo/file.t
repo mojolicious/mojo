@@ -39,13 +39,26 @@ is path('test.txt')->to_abs->to_rel(getcwd), abs2rel(rel2abs('test.txt'), getcwd
 # Resolved
 is path('.')->realpath, realpath('.'), 'same path';
 
-# Basename
-is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';
-is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'), 'same path';
-is path('file.t')->basename('.t'), basename('file.t', '.t'), 'same path';
+subtest 'Basename' => sub {
+  is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';
+  is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'), 'same path';
+  is path('file.t')->basename('.t'), basename('file.t', '.t'), 'same path';
+};
 
 # Dirname
 is path('file.t')->to_abs->dirname, scalar dirname(rel2abs 'file.t'), 'same path';
+
+subtest 'Extname' => sub {
+  is path('.file.txt')->extname, 'txt', 'right extension';
+  is path('file.txt')->extname,  'txt', 'right extension';
+  is path('file')->extname,      '',    'no extension';
+  is path('.file')->extname,     '',    'no extension';
+  is path('home', 'foo', 'file.txt')->extname,     'txt', 'right extension';
+  is path('home', 'foo', 'file.txt.gz')->extname,  'gz',  'right extension';
+  is path('home', 'foo', '.file.txt.gz')->extname, 'gz',  'right extension';
+  is path('home', 'foo', 'file')->extname,         '',    'no extension';
+  is path('home', 'foo', '.file')->extname,        '',    'no extension';
+};
 
 # Current file
 ok curfile->is_abs, 'path is absolute';

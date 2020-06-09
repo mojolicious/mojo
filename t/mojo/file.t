@@ -100,7 +100,7 @@ subtest 'Persistent temporary file' => sub {
   my $file = tempfile(DIR => $dir);
   $file->spurt('works');
   is $file->slurp, 'works', 'right content';
-  my $file2 = $dir->child('test.txt');
+  my $file2 = tempfile(DIR => $dir);
   $file->move_to($file2);
   ok -e $file2, 'file exists';
   ok !-e $file, 'file does not exist anymore';

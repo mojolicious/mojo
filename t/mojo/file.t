@@ -96,6 +96,7 @@ undef $file;
 ok !-f $path, 'file does not exist anymore';
 
 subtest 'Persistent temporary file' => sub {
+  plan skip_all => 'cannot move open file' if $^O eq 'MSWin32';
   my $dir  = tempdir;
   my $file = tempfile(DIR => $dir);
   $file->spurt('works');
@@ -203,15 +204,14 @@ like $@, qr/^Can't chmod file/, 'right error';
 $dir = tempdir;
 is $dir->child('test.txt')->spurt('1234')->stat->size, 4, 'right size';
 
-# Lstat
-$dir = tempdir;
-my $orig = $dir->child('test.txt')->spurt('');
-my $link = $orig->sibling('test.link');
-SKIP: {
-  skip 'symlinks unimplemented', 2 unless eval { symlink $orig, $link };
+subtest 'Lstat' => sub {
+  my $dir  = tempdir;
+  my $orig = $dir->child('test.txt')->spurt('');
+  my $link = $orig->sibling('test.link');
+  plan skip_all => 'symlink unimplemented' unless eval { symlink $orig, $link };
   is $link->stat->size,    0, 'target file is empty';
   isnt $link->lstat->size, 0, 'link is not empty';
-}
+};
 
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';

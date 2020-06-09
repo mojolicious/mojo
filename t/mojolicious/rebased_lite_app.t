@@ -39,8 +39,7 @@ get '/baz' => sub { shift->render('root') };
 my $t = Test::Mojo->new;
 
 # Rebased root
-$t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
-  ->content_is(<<'EOF');
+$t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')->content_is(<<'EOF');
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png">
@@ -55,8 +54,7 @@ root
 EOF
 
 # Rebased route
-$t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')
-  ->content_is(<<EOF);
+$t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')->content_is(<<EOF);
 http://example.com/rebased/
 <link href="/rebased/b.css" media="test" rel="stylesheet">
 <img alt="Test" src="/rebased/images/test.png">
@@ -68,12 +66,9 @@ foo
 EOF
 
 # Rebased route with flash
-ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0],
-  'no session cookie';
-$t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')
-  ->header_is(Location => '/rebased/foo');
-ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0],
-  'session cookie';
+ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0], 'no session cookie';
+$t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')->header_is(Location => '/rebased/foo');
+ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0], 'session cookie';
 
 # Rebased route with message from flash
 $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
@@ -88,8 +83,7 @@ foo
 EOF
 
 # Rebased route sharing a template
-$t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
-  ->content_is(<<'EOF');
+$t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')->content_is(<<'EOF');
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png">

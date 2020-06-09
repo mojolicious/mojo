@@ -47,16 +47,14 @@ sub parse {
   else { return $self->epoch(undef) }
 
   my $epoch = eval { timegm $s, $m, $h, $day, $month, $year };
-  return $self->epoch(
-    (defined $epoch && ($epoch += $offset) >= 0) ? $epoch : undef);
+  return $self->epoch((defined $epoch && ($epoch += $offset) >= 0) ? $epoch : undef);
 }
 
 sub to_datetime {
 
   # RFC 3339 (1994-11-06T08:49:37Z)
   my ($s, $m, $h, $day, $month, $year) = gmtime(my $epoch = shift->epoch);
-  my $str = sprintf '%04d-%02d-%02dT%02d:%02d:%02d', $year + 1900, $month + 1,
-    $day, $h, $m, $s;
+  my $str = sprintf '%04d-%02d-%02dT%02d:%02d:%02d', $year + 1900, $month + 1, $day, $h, $m, $s;
   return $str . ($epoch =~ /(\.\d+)$/ ? $1 : '') . 'Z';
 }
 
@@ -64,8 +62,7 @@ sub to_string {
 
   # RFC 7231 (Sun, 06 Nov 1994 08:49:37 GMT)
   my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime shift->epoch;
-  return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT', $DAYS[$wday], $mday,
-    $MONTHS[$month], $year + 1900, $h, $m, $s;
+  return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT', $DAYS[$wday], $mday, $MONTHS[$month], $year + 1900, $h, $m, $s;
 }
 
 1;
@@ -90,10 +87,8 @@ Mojo::Date - HTTP date
 
 =head1 DESCRIPTION
 
-L<Mojo::Date> implements HTTP date and time functions, based on
-L<RFC 7230|http://tools.ietf.org/html/rfc7230>,
-L<RFC 7231|http://tools.ietf.org/html/rfc7231> and
-L<RFC 3339|http://tools.ietf.org/html/rfc3339>.
+L<Mojo::Date> implements HTTP date and time functions, based on L<RFC 7230|http://tools.ietf.org/html/rfc7230>, L<RFC
+7231|http://tools.ietf.org/html/rfc7231> and L<RFC 3339|http://tools.ietf.org/html/rfc3339>.
 
 =head1 ATTRIBUTES
 
@@ -108,8 +103,7 @@ Epoch seconds, defaults to the current time.
 
 =head1 METHODS
 
-L<Mojo::Date> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Date> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 new
 

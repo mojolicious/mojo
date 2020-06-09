@@ -29,8 +29,7 @@ post '/params' => sub {
 
 get '/proxy' => sub {
   my $c       = shift;
-  my $reverse = join ':', $c->tx->remote_address,
-    $c->req->url->to_abs->protocol;
+  my $reverse = join ':', $c->tx->remote_address, $c->req->url->to_abs->protocol;
   $c->render(text => $reverse);
 };
 
@@ -75,17 +74,14 @@ my %headers = @{$res->[1]};
 ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date},             'has "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
-is $headers{'Content-Type'},   'application/json;charset=UTF-8',
-  'right "Content-Type" value';
+is $headers{'Content-Type'},   'application/json;charset=UTF-8', 'right "Content-Type" value';
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
 $res->[2]->close;
 is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
-is_deeply decode_json($params), {bar => 'baz', hello => 'world', lalala => 23},
-  'right structure';
-is_deeply \@server, ['Mojo::Server::PSGI', 'development'],
-  'hook has been emitted once';
+is_deeply decode_json($params), {bar => 'baz', hello => 'world', lalala => 23}, 'right structure';
+is_deeply \@server, ['Mojo::Server::PSGI', 'development'], 'hook has been emitted once';
 
 # Command
 $content = 'world=hello';
@@ -114,15 +110,13 @@ is $res->[0], 200, 'right status';
 ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date},             'has "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
-is $headers{'Content-Type'},   'application/json;charset=UTF-8',
-  'right "Content-Type" value';
+is $headers{'Content-Type'},   'application/json;charset=UTF-8', 'right "Content-Type" value';
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
 $res->[2]->close;
 is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
-is_deeply decode_json($params), {bar => 'baz', world => 'hello', lalala => 23},
-  'right structure';
+is_deeply decode_json($params), {bar => 'baz', world => 'hello', lalala => 23}, 'right structure';
 
 # Simple
 $env = {
@@ -144,9 +138,8 @@ $app = Mojolicious::Command::psgi->new(app => app)->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
-is $headers{'Content-Length'}, 21, 'right "Content-Length" value';
-is $headers{'Content-Type'}, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
+is $headers{'Content-Length'}, 21,                        'right "Content-Length" value';
+is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
 $body = '';
 while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
 is $body, 'Your Mojo is working!', 'right content';
@@ -174,9 +167,8 @@ $app = Mojolicious::Command::psgi->new(app => app)->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
-is $headers{'Content-Length'}, 21, 'right "Content-Length" value';
-is $headers{'Content-Type'}, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
+is $headers{'Content-Length'}, 21,                        'right "Content-Length" value';
+is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
 $body = '';
 while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
 is $body, '', 'no content';
@@ -234,9 +226,8 @@ $env = {
 }
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
-is $headers{'Content-Length'}, 15, 'right "Content-Length" value';
-is $headers{'Content-Type'}, 'text/html;charset=UTF-8',
-  'right "Content-Type" value';
+is $headers{'Content-Length'}, 15,                        'right "Content-Length" value';
+is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
 $body = '';
 while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
 is $body, '192.0.2.1:https', 'right content';

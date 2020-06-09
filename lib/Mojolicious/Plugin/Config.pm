@@ -13,8 +13,7 @@ sub parse {
   my $config = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
     . "sub app; local *app = sub { \$app }; use Mojo::Base -strict; $content";
   die qq{Can't load configuration from file "$file": $@} if $@;
-  die qq{Configuration file "$file" did not return a hash reference.\n}
-    unless ref $config eq 'HASH';
+  die qq{Configuration file "$file" did not return a hash reference.\n} unless ref $config eq 'HASH';
 
   return $config;
 }
@@ -45,9 +44,7 @@ sub register {
   if (-e $file) { $config = $self->load($file, $conf, $app) }
 
   # Check for default and mode specific config file
-  elsif (!$conf->{default} && !$mode) {
-    die qq{Configuration file "$file" missing, maybe you need to create it?\n};
-  }
+  elsif (!$conf->{default} && !$mode) { die qq{Configuration file "$file" missing, maybe you need to create it?\n} }
 
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}} if $mode;
@@ -99,22 +96,18 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
 
 L<Mojolicious::Plugin::Config> is a Perl-ish configuration plugin.
 
-The application object can be accessed via C<$app> or the C<app> function,
-L<strict>, L<warnings>, L<utf8> and Perl 5.16 L<features|feature> are
-automatically enabled. A default configuration filename in the application home
-directory will be generated from the value of L<Mojolicious/"moniker">
-(C<$moniker.conf>). You can extend the normal configuration file
-C<$moniker.conf> with C<mode> specific ones like C<$moniker.$mode.conf>, which
-will be detected automatically.
+The application object can be accessed via C<$app> or the C<app> function, L<strict>, L<warnings>, L<utf8> and Perl
+5.16 L<features|feature> are automatically enabled. A default configuration filename in the application home directory
+will be generated from the value of L<Mojolicious/"moniker"> (C<$moniker.conf>). You can extend the normal
+configuration file C<$moniker.conf> with C<mode> specific ones like C<$moniker.$mode.conf>, which will be detected
+automatically.
 
-If the configuration value C<config_override> has been set in
-L<Mojolicious/"config"> when this plugin is loaded, it will not do anything.
+If the configuration value C<config_override> has been set in L<Mojolicious/"config"> when this plugin is loaded, it
+will not do anything.
 
-The code of this plugin is a good example for learning to build new plugins,
-you're welcome to fork it.
+The code of this plugin is a good example for learning to build new plugins, you're welcome to fork it.
 
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available by default.
 
 =head1 OPTIONS
 
@@ -140,14 +133,12 @@ File extension for generated configuration filenames, defaults to C<conf>.
   plugin Config => {file => 'myapp.conf'};
   plugin Config => {file => '/etc/foo.stuff'};
 
-Path to configuration file, absolute or relative to the application home
-directory, defaults to the value of the C<MOJO_CONFIG> environment variable or
-C<$moniker.conf> in the application home directory.
+Path to configuration file, absolute or relative to the application home directory, defaults to the value of the
+C<MOJO_CONFIG> environment variable or C<$moniker.conf> in the application home directory.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::Config> inherits all methods from L<Mojolicious::Plugin>
-and implements the following new ones.
+L<Mojolicious::Plugin::Config> inherits all methods from L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 load
 

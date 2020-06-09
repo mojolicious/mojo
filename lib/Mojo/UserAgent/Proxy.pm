@@ -81,16 +81,14 @@ Domains that don't require a proxy server to be used.
 
 =head1 METHODS
 
-L<Mojo::UserAgent::Proxy> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojo::UserAgent::Proxy> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 detect
 
   $proxy = $proxy->detect;
 
-Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>,
-C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information. Automatic
-proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
+Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>, C<https_proxy>, C<NO_PROXY> and C<no_proxy>
+for proxy information. Automatic proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
 
 =head2 is_needed
 

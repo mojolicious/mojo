@@ -8,8 +8,7 @@ use Mojo::ByteStream qw(b);
 use Mojo::DeprecationTest;
 use Sub::Util qw(subname);
 
-use Mojo::Util
-  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
+use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode dumper encode extract_usage getopt gunzip gzip hmac_sha1_sum),
   qw(html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum),
   qw(monkey_patch punycode_decode punycode_encode quote scope_guard),
@@ -53,71 +52,46 @@ is class_to_path("Foo'Bar'Baz"),   'Foo/Bar/Baz.pm', 'right path';
 # split_header
 is_deeply split_header(''), [], 'right result';
 is_deeply split_header('foo=b=a=r'), [['foo', 'b=a=r']], 'right result';
-is_deeply split_header('a=b ,, , c=d ;; ; e=f g h=i'),
-  [['a', 'b'], ['c', 'd', 'e', 'f', 'g', undef, 'h', 'i']], 'right result';
-is_deeply split_header(',,foo,, ,bar'), [['foo', undef], ['bar', undef]],
+is_deeply split_header('a=b ,, , c=d ;; ; e=f g h=i'), [['a', 'b'], ['c', 'd', 'e', 'f', 'g', undef, 'h', 'i']],
   'right result';
-is_deeply split_header(';;foo; ; ;bar'), [['foo', undef, 'bar', undef]],
+is_deeply split_header(',,foo,, ,bar'), [['foo', undef], ['bar', undef]], 'right result';
+is_deeply split_header(';;foo; ; ;bar'),    [['foo', undef, 'bar', undef]],  'right result';
+is_deeply split_header('foo=;bar=""'),      [['foo', '',    'bar', '']],     'right result';
+is_deeply split_header('foo=bar baz=yada'), [['foo', 'bar', 'baz', 'yada']], 'right result';
+is_deeply split_header('foo,bar,baz'), [['foo', undef], ['bar', undef], ['baz', undef]], 'right result';
+is_deeply split_header('f "o" o , ba  r'), [['f', undef, '"o"', undef, 'o', undef], ['ba', undef, 'r', undef]],
   'right result';
-is_deeply split_header('foo=;bar=""'), [['foo', '', 'bar', '']], 'right result';
-is_deeply split_header('foo=bar baz=yada'), [['foo', 'bar', 'baz', 'yada']],
-  'right result';
-is_deeply split_header('foo,bar,baz'),
-  [['foo', undef], ['bar', undef], ['baz', undef]], 'right result';
-is_deeply split_header('f "o" o , ba  r'),
-  [['f', undef, '"o"', undef, 'o', undef], ['ba', undef, 'r', undef]],
-  'right result';
-is_deeply split_header('foo="b,; a\" r\"\\\\"'), [['foo', 'b,; a" r"\\']],
-  'right result';
-is_deeply split_header('foo = "b a\" r\"\\\\"; bar="ba z"'),
-  [['foo', 'b a" r"\\', 'bar', 'ba z']], 'right result';
+is_deeply split_header('foo="b,; a\" r\"\\\\"'), [['foo', 'b,; a" r"\\']], 'right result';
+is_deeply split_header('foo = "b a\" r\"\\\\"; bar="ba z"'), [['foo', 'b a" r"\\', 'bar', 'ba z']], 'right result';
 my $header = q{</foo/bar>; rel="x"; t*=UTF-8'de'a%20b};
 my $tree   = [['</foo/bar>', undef, 'rel', 'x', 't*', 'UTF-8\'de\'a%20b']];
 is_deeply split_header($header), $tree, 'right result';
-$header
-  = 'a=b c; A=b.c; D=/E; a-b=3; expires=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
-$tree = [
-  ['a', 'b', 'c', undef, 'A', 'b.c', 'D', '/E', 'a-b', '3', 'expires', 'Thu'],
-  [
-    '07',       undef, 'Aug', undef, '2008', undef,
-    '07:07:59', undef, 'GMT', undef, 'Ab',   undef
-  ]
+$header = 'a=b c; A=b.c; D=/E; a-b=3; expires=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
+$tree   = [
+  ['a',  'b',   'c',   undef, 'A',    'b.c', 'D',        '/E',  'a-b', '3',   'expires', 'Thu'],
+  ['07', undef, 'Aug', undef, '2008', undef, '07:07:59', undef, 'GMT', undef, 'Ab',      undef]
 ];
 is_deeply split_header($header), $tree, 'right result';
 
 # split_cookie_header
 is_deeply split_cookie_header(''), [], 'right result';
 is_deeply split_cookie_header('a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT,c=d'),
-  [['a', 'b', 'expires', 'Thu, 07 Aug 2008 07:07:59 GMT'], ['c', 'd']],
-  'right result';
-is_deeply split_cookie_header(
-  'a=b; expires=Tuesday, 09-Nov-1999 23:12:40 GMT, c=d'),
-  [['a', 'b', 'expires', 'Tuesday, 09-Nov-1999 23:12:40 GMT'], ['c', 'd']],
-  'right result';
-is_deeply split_cookie_header(
-  'a=b; expires=Tuesday, 09-Nov-1999 23:12:40 GMT;, c=d;'),
-  [['a', 'b', 'expires', 'Tuesday, 09-Nov-1999 23:12:40 GMT'], ['c', 'd']],
-  'right result';
-is_deeply split_cookie_header(
-  'a=b; expires=Sun,06  Nov  1994  08:49:37  UTC; path=/'),
-  [['a', 'b', 'expires', 'Sun,06  Nov  1994  08:49:37  UTC', 'path', '/']],
-  'right result';
-is_deeply split_cookie_header(
-  'a=b ; expires = Sunday 06 Nov 94 08:49:37UTC ; path=/'),
-  [['a', 'b', 'expires', 'Sunday 06 Nov 94 08:49:37UTC', 'path', '/']],
-  'right result';
+  [['a', 'b', 'expires', 'Thu, 07 Aug 2008 07:07:59 GMT'], ['c', 'd']], 'right result';
+is_deeply split_cookie_header('a=b; expires=Tuesday, 09-Nov-1999 23:12:40 GMT, c=d'),
+  [['a', 'b', 'expires', 'Tuesday, 09-Nov-1999 23:12:40 GMT'], ['c', 'd']], 'right result';
+is_deeply split_cookie_header('a=b; expires=Tuesday, 09-Nov-1999 23:12:40 GMT;, c=d;'),
+  [['a', 'b', 'expires', 'Tuesday, 09-Nov-1999 23:12:40 GMT'], ['c', 'd']], 'right result';
+is_deeply split_cookie_header('a=b; expires=Sun,06  Nov  1994  08:49:37  UTC; path=/'),
+  [['a', 'b', 'expires', 'Sun,06  Nov  1994  08:49:37  UTC', 'path', '/']], 'right result';
+is_deeply split_cookie_header('a=b ; expires = Sunday 06 Nov 94 08:49:37UTC ; path=/'),
+  [['a', 'b', 'expires', 'Sunday 06 Nov 94 08:49:37UTC', 'path', '/']], 'right result';
 $header = 'expires=Thu, 07 Aug 2008 07:07:59 GMT, a=b';
-$tree   = [
-  ['expires', 'Thu'],
-  ['07', undef, 'Aug', undef, '2008', undef, '07:07:59', undef, 'GMT', undef],
-  ['a',  'b']
-];
+$tree   = [['expires', 'Thu'], ['07', undef, 'Aug', undef, '2008', undef, '07:07:59', undef, 'GMT', undef], ['a', 'b']];
 is_deeply split_cookie_header($header), $tree, 'right result';
 
 # extract_usage
 is extract_usage, "extract_usage test!\n", 'right result';
-is extract_usage(curfile->sibling('lib', 'myapp.pl')),
-  "USAGE: myapp.pl daemon\n\n test\n123\n", 'right result';
+is extract_usage(curfile->sibling('lib', 'myapp.pl')), "USAGE: myapp.pl daemon\n\n test\n123\n", 'right result';
 
 =head1 SYNOPSIS
 
@@ -163,43 +137,33 @@ is_deeply $array, ['stuff'], 'right structure';
 }
 
 # unindent
-is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",
-  'right unindented result';
-is unindent("\ttest\n\t\t123\n\t456\n"), "test\n\t123\n456\n",
-  'right unindented result';
-is unindent("\t \ttest\n\t \t\t123\n\t \t456\n"), "test\n\t123\n456\n",
-  'right unindented result';
-is unindent("\n\n\n test\n  123\n 456\n"), "\n\n\ntest\n 123\n456\n",
-  'right unindented result';
-is unindent("   test\n    123\n   456\n"), "test\n 123\n456\n",
-  'right unindented result';
-is unindent("    test\n  123\n   456\n"), "  test\n123\n 456\n",
-  'right unindented result';
-is unindent("test\n123\n"),     "test\n123\n",   'right unindented result';
-is unindent(" test\n\n 123\n"), "test\n\n123\n", 'right unindented result';
-is unindent('  test'),          'test',          'right unindented result';
-is unindent(" te st\r\n\r\n  1 2 3\r\n 456\r\n"),
-  "te st\r\n\r\n 1 2 3\r\n456\r\n", 'right unindented result';
+is unindent(" test\n  123\n 456\n"),              "test\n 123\n456\n",              'right unindented result';
+is unindent("\ttest\n\t\t123\n\t456\n"),          "test\n\t123\n456\n",             'right unindented result';
+is unindent("\t \ttest\n\t \t\t123\n\t \t456\n"), "test\n\t123\n456\n",             'right unindented result';
+is unindent("\n\n\n test\n  123\n 456\n"),        "\n\n\ntest\n 123\n456\n",        'right unindented result';
+is unindent("   test\n    123\n   456\n"),        "test\n 123\n456\n",              'right unindented result';
+is unindent("    test\n  123\n   456\n"),         "  test\n123\n 456\n",            'right unindented result';
+is unindent("test\n123\n"),                       "test\n123\n",                    'right unindented result';
+is unindent(" test\n\n 123\n"),                   "test\n\n123\n",                  'right unindented result';
+is unindent('  test'),                            'test',                           'right unindented result';
+is unindent(" te st\r\n\r\n  1 2 3\r\n 456\r\n"), "te st\r\n\r\n 1 2 3\r\n456\r\n", 'right unindented result';
 
 # b64_encode
-is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",
-  'right Base64 encoded result';
+is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n", 'right Base64 encoded result';
 
 # b64_decode
-is b64_decode("Zm9vYmFyJCVeJjMyMTc=\n"), 'foobar$%^&3217',
-  'right Base64 decoded result';
+is b64_decode("Zm9vYmFyJCVeJjMyMTc=\n"), 'foobar$%^&3217', 'right Base64 decoded result';
 
 # b64_encode (UTF-8)
-is b64_encode(encode 'UTF-8', "foo\x{df}\x{0100}bar%23\x{263a}"),
-  "Zm9vw5/EgGJhciUyM+KYug==\n", 'right Base64 encoded result';
+is b64_encode(encode 'UTF-8', "foo\x{df}\x{0100}bar%23\x{263a}"), "Zm9vw5/EgGJhciUyM+KYug==\n",
+  'right Base64 encoded result';
 
 # b64_decode (UTF-8)
-is decode('UTF-8', b64_decode "Zm9vw5/EgGJhciUyM+KYug==\n"),
-  "foo\x{df}\x{0100}bar%23\x{263a}", 'right Base64 decoded result';
+is decode('UTF-8', b64_decode "Zm9vw5/EgGJhciUyM+KYug==\n"), "foo\x{df}\x{0100}bar%23\x{263a}",
+  'right Base64 decoded result';
 
 # b64_encode (custom line ending)
-is b64_encode('foobar$%^&3217', ''), 'Zm9vYmFyJCVeJjMyMTc=',
-  'right Base64 encoded result';
+is b64_encode('foobar$%^&3217', ''), 'Zm9vYmFyJCVeJjMyMTc=', 'right Base64 encoded result';
 
 # decode (invalid UTF-8)
 is decode('UTF-8', "\x{1000}"), undef, 'decoding invalid UTF-8 worked';
@@ -215,8 +179,7 @@ like $@, qr/Unknown encoding 'does_not_exist'/, 'right error';
 is url_escape('business;23'), 'business%3B23', 'right URL escaped result';
 
 # url_escape (custom pattern)
-is url_escape('&business;23', 's&'), '%26bu%73ine%73%73;23',
-  'right URL escaped result';
+is url_escape('&business;23', 's&'), '%26bu%73ine%73%73;23', 'right URL escaped result';
 
 # url_escape (nothing to escape)
 is url_escape('foobar123-._~'), 'foobar123-._~', 'no changes';
@@ -225,58 +188,47 @@ is url_escape('foobar123-._~'), 'foobar123-._~', 'no changes';
 is url_unescape('business%3B23'), 'business;23', 'right URL unescaped result';
 
 # UTF-8 url_escape
-is url_escape(encode 'UTF-8', "foo\x{df}\x{0100}bar\x{263a}"),
-  'foo%C3%9F%C4%80bar%E2%98%BA', 'right URL escaped result';
+is url_escape(encode 'UTF-8', "foo\x{df}\x{0100}bar\x{263a}"), 'foo%C3%9F%C4%80bar%E2%98%BA',
+  'right URL escaped result';
 
 # UTF-8 url_unescape
-is decode('UTF-8', url_unescape 'foo%C3%9F%C4%80bar%E2%98%BA'),
-  "foo\x{df}\x{0100}bar\x{263a}", 'right URL unescaped result';
+is decode('UTF-8', url_unescape 'foo%C3%9F%C4%80bar%E2%98%BA'), "foo\x{df}\x{0100}bar\x{263a}",
+  'right URL unescaped result';
 
 # html_unescape
-is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'),
-  "<foo>bar<baz>&\"", 'right HTML unescaped result';
-is html_unescape('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
-  "foo<baz>&\"\x{152}&Foo;", 'right HTML unescaped result';
+is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'), "<foo>bar<baz>&\"", 'right HTML unescaped result';
+is html_unescape('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'), "foo<baz>&\"\x{152}&Foo;", 'right HTML unescaped result';
 
 # html_unescape (special entities)
-is html_unescape('foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
-  "foo ☃ \x{2233} bar ¹baz", 'right HTML unescaped result';
+is html_unescape('foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'), "foo ☃ \x{2233} bar ¹baz",
+  'right HTML unescaped result';
 
 # html_unescape (multi-character entity)
 is html_unescape('&acE;'), "\x{223e}\x{0333}", 'right HTML unescaped result';
 
 # html_unescape (apos)
-is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
-  'right HTML unescaped result';
+is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"", 'right HTML unescaped result';
 
 # html_unescape (nothing to unescape)
 is html_unescape('foobar'), 'foobar', 'no changes';
 
 # html_unescape (relaxed)
-is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r",
-  'right HTML unescaped result';
+is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r", 'right HTML unescaped result';
 
 # html_attr_unescape
-is html_attr_unescape('/?foo&lt=bar'), '/?foo&lt=bar',
-  'right HTML unescaped result';
-is html_attr_unescape('/?f&ltoo=bar'), '/?f&ltoo=bar',
-  'right HTML unescaped result';
-is html_attr_unescape('/?f&lt-oo=bar'), '/?f<-oo=bar',
-  'right HTML unescaped result';
-is html_attr_unescape('/?foo=&lt'), '/?foo=<', 'right HTML unescaped result';
-is html_attr_unescape('/?f&lt;oo=bar'), '/?f<oo=bar',
-  'right HTML unescaped result';
+is html_attr_unescape('/?foo&lt=bar'),  '/?foo&lt=bar', 'right HTML unescaped result';
+is html_attr_unescape('/?f&ltoo=bar'),  '/?f&ltoo=bar', 'right HTML unescaped result';
+is html_attr_unescape('/?f&lt-oo=bar'), '/?f<-oo=bar',  'right HTML unescaped result';
+is html_attr_unescape('/?foo=&lt'),     '/?foo=<',      'right HTML unescaped result';
+is html_attr_unescape('/?f&lt;oo=bar'), '/?f<oo=bar',   'right HTML unescaped result';
 
 # url_unescape (bengal numbers with nothing to unescape)
-is html_unescape('&#০৩৯;&#x০৩৯;'), '&#০৩৯;&#x০৩৯;',
-  'no changes';
+is html_unescape('&#০৩৯;&#x০৩৯;'), '&#০৩৯;&#x০৩৯;', 'no changes';
 
 # xml_escape
-is xml_escape(qq{la<f>\nbar"baz"'yada\n'&lt;la}),
-  "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
+is xml_escape(qq{la<f>\nbar"baz"'yada\n'&lt;la}), "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
   'right XML escaped result';
-is xml_escape('привет<foo>'), 'привет&lt;foo&gt;',
-  'right XML escaped result';
+is xml_escape('привет<foo>'), 'привет&lt;foo&gt;', 'right XML escaped result';
 
 # xml_escape (nothing to escape)
 is xml_escape('привет'), 'привет', 'no changes';
@@ -299,12 +251,10 @@ my @tests = (
     . "\x{061f}",
   'egbpdaj6bu4bxfgehfvwxn',
   '(B) Chinese (simplified):',
-  "\x{4ed6}\x{4eec}\x{4e3a}\x{4ec0}\x{4e48}\x{4e0d}\x{8bf4}\x{4e2d}"
-    . "\x{6587}",
+  "\x{4ed6}\x{4eec}\x{4e3a}\x{4ec0}\x{4e48}\x{4e0d}\x{8bf4}\x{4e2d}" . "\x{6587}",
   'ihqwcrb4cv8a8dqg056pqjye',
   '(C) Chinese (traditional):',
-  "\x{4ed6}\x{5011}\x{7232}\x{4ec0}\x{9ebd}\x{4e0d}\x{8aaa}\x{4e2d}"
-    . "\x{6587}",
+  "\x{4ed6}\x{5011}\x{7232}\x{4ec0}\x{9ebd}\x{4e0d}\x{8aaa}\x{4e2d}" . "\x{6587}",
   'ihqwctvzc91f659drss3x8bo0yb',
   '(D) Czech: Pro<ccaron>prost<ecaron>nemluv<iacute><ccaron>esky',
   "\x{0050}\x{0072}\x{006f}\x{010d}\x{0070}\x{0072}\x{006f}\x{0073}"
@@ -371,19 +321,16 @@ my @tests = (
   "\x{3072}\x{3068}\x{3064}\x{5c4b}\x{6839}\x{306e}\x{4e0b}\x{0032}",
   '2-u9tlzr9756bt3uc0v',
   '(P) Maji<de>Koi<suru>5<byou><mae>',
-  "\x{004d}\x{0061}\x{006a}\x{0069}\x{3067}\x{004b}\x{006f}\x{0069}"
-    . "\x{3059}\x{308b}\x{0035}\x{79d2}\x{524d}",
+  "\x{004d}\x{0061}\x{006a}\x{0069}\x{3067}\x{004b}\x{006f}\x{0069}" . "\x{3059}\x{308b}\x{0035}\x{79d2}\x{524d}",
   'MajiKoi5-783gue6qz075azm5e',
   '(Q) <pafii>de<runba>',
-  "\x{30d1}\x{30d5}\x{30a3}\x{30fc}\x{0064}\x{0065}\x{30eb}\x{30f3}"
-    . "\x{30d0}",
+  "\x{30d1}\x{30d5}\x{30a3}\x{30fc}\x{0064}\x{0065}\x{30eb}\x{30f3}" . "\x{30d0}",
   'de-jg4avhby1noc0d',
   '(R) <sono><supiido><de>',
   "\x{305d}\x{306e}\x{30b9}\x{30d4}\x{30fc}\x{30c9}\x{3067}",
   'd9juau41awczczp',
   '(S) -> $1.00 <-',
-  "\x{002d}\x{003e}\x{0020}\x{0024}\x{0031}\x{002e}\x{0030}\x{0030}"
-    . "\x{0020}\x{003c}\x{002d}",
+  "\x{002d}\x{003e}\x{0020}\x{0024}\x{0031}\x{002e}\x{0030}\x{0030}" . "\x{0020}\x{003c}\x{002d}",
   '-> $1.00 <--'
 );
 
@@ -408,24 +355,20 @@ is trim("\n la\nla la \n"),         "la\nla la",         'right trimmed result';
 is trim(" \nla \n  \t\nla\nla\n "), "la \n  \t\nla\nla", 'right trimmed result';
 
 # md5_bytes
-is unpack('H*', md5_bytes(encode 'UTF-8', 'foo bar baz ♥')),
-  'a740aeb6e066f158cbf19fd92e890d2d', 'right binary md5 checksum';
+is unpack('H*', md5_bytes(encode 'UTF-8', 'foo bar baz ♥')), 'a740aeb6e066f158cbf19fd92e890d2d',
+  'right binary md5 checksum';
 
 # md5_sum
-is md5_sum('foo bar baz'), 'ab07acbb1e496801937adfa772424bf7',
-  'right md5 checksum';
+is md5_sum('foo bar baz'), 'ab07acbb1e496801937adfa772424bf7', 'right md5 checksum';
 
 # sha1_bytes
-is unpack('H*', sha1_bytes 'foo bar baz'),
-  'c7567e8b39e2428e38bf9c9226ac68de4c67dc39', 'right binary sha1 checksum';
+is unpack('H*', sha1_bytes 'foo bar baz'), 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39', 'right binary sha1 checksum';
 
 # sha1_sum
-is sha1_sum('foo bar baz'), 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39',
-  'right sha1 checksum';
+is sha1_sum('foo bar baz'), 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39', 'right sha1 checksum';
 
 # hmac_sha1_sum
-is hmac_sha1_sum('Hi there', 'abc1234567890'),
-  '5344f37e1948dd3ffb07243a4d9201a227abd6e1', 'right hmac sha1 checksum';
+is hmac_sha1_sum('Hi there', 'abc1234567890'), '5344f37e1948dd3ffb07243a4d9201a227abd6e1', 'right hmac sha1 checksum';
 
 # secure_compare
 ok secure_compare('hello', 'hello'), 'values are equal';
@@ -449,14 +392,12 @@ ok !secure_compare('',      '♥'),   'values are not equal';
 ok !secure_compare('♥',   ''),      'values are not equal';
 
 # xor_encode
-is xor_encode('hello', 'foo'), "\x0e\x0a\x03\x0a\x00", 'right result';
-is xor_encode("\x0e\x0a\x03\x0a\x00", 'foo'), 'hello', 'right result';
-is xor_encode('hello world', 'x'),
-  "\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'right result';
-is xor_encode("\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'x'),
-  'hello world', 'right result';
-is xor_encode('hello', '123456789'), "\x59\x57\x5f\x58\x5a", 'right result';
-is xor_encode("\x59\x57\x5f\x58\x5a", '123456789'), 'hello', 'right result';
+is xor_encode('hello',                'foo'), "\x0e\x0a\x03\x0a\x00",                         'right result';
+is xor_encode("\x0e\x0a\x03\x0a\x00", 'foo'), 'hello',                                        'right result';
+is xor_encode('hello world',          'x'),   "\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'right result';
+is xor_encode("\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'x'),         'hello world',          'right result';
+is xor_encode('hello',                                        '123456789'), "\x59\x57\x5f\x58\x5a", 'right result';
+is xor_encode("\x59\x57\x5f\x58\x5a",                         '123456789'), 'hello',                'right result';
 
 # steady_time
 like steady_time, qr/^[\d.]+$/, 'high resolution time';
@@ -494,13 +435,10 @@ is subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar', 'right name';
 is tablify([["f\r\no o\r\n", 'bar']]),     "fo o  bar\n",      'right result';
 is tablify([["  foo",        '  b a r']]), "  foo    b a r\n", 'right result';
 is tablify([['foo']]), "foo\n", 'right result';
-is tablify([['foo', 'yada'], ['yada', 'yada']]), "foo   yada\nyada  yada\n",
-  'right result';
-is tablify([[undef, 'yada'], ['yada', undef]]), "      yada\nyada  \n",
-  'right result';
-is tablify([['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]),
-  "foo   bar   baz\nyada  yada  yada\n", 'right result';
-is tablify([['a', '', 0], [0, '', 'b']]), "a    0\n0    b\n", 'right result';
+is tablify([['foo', 'yada'], ['yada', 'yada']]), "foo   yada\nyada  yada\n", 'right result';
+is tablify([[undef, 'yada'], ['yada', undef]]),  "      yada\nyada  \n",     'right result';
+is tablify([['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]), "foo   bar   baz\nyada  yada  yada\n", 'right result';
+is tablify([['a',   '',    0],     [0,      '',     'b']]),    "a    0\n0    b\n",                    'right result';
 is tablify([[1, 2], [3]]), "1  2\n3\n", 'right result';
 is tablify([[1], [2, 3]]), "1\n2  3\n", 'right result';
 is tablify([[1], [], [2, 3]]), "1\n\n2  3\n", 'right result';
@@ -524,10 +462,9 @@ is tablify([[1], [], [2, 3]]), "1\n\n2  3\n", 'right result';
 is dumper([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
 
 # term_escape
-is term_escape("Accept: */*\x0d\x0a"), "Accept: */*\\x0d\x0a",   'right result';
-is term_escape("\t\b\r\n\f"),          "\\x09\\x08\\x0d\n\\x0c", 'right result';
-is term_escape("\x00\x09\x0b\x1f\x7f\x80\x9f"), '\x00\x09\x0b\x1f\x7f\x80\x9f',
-  'right result';
+is term_escape("Accept: */*\x0d\x0a"),          "Accept: */*\\x0d\x0a",         'right result';
+is term_escape("\t\b\r\n\f"),                   "\\x09\\x08\\x0d\n\\x0c",       'right result';
+is term_escape("\x00\x09\x0b\x1f\x7f\x80\x9f"), '\x00\x09\x0b\x1f\x7f\x80\x9f', 'right result';
 
 # slugify
 is slugify('a & b'),     'a-b',     'right result';
@@ -535,10 +472,9 @@ is slugify('a &amp; b'), 'a-amp-b', 'right result';
 is slugify(123),         '123',     'right result';
 is slugify(' Jack & Jill like numbers 1,2,3 and 4 and silly characters ?%.$!/'),
   'jack-jill-like-numbers-123-and-4-and-silly-characters', 'right result';
-is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois"),
-  'un-elephant-a-loree-du-bois', 'right result';
-is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois", 1),
-  "un-\x{e9}l\x{e9}phant-\x{e0}-lor\x{e9}e-du-bois", 'right result';
+is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois"), 'un-elephant-a-loree-du-bois', 'right result';
+is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois", 1), "un-\x{e9}l\x{e9}phant-\x{e0}-lor\x{e9}e-du-bois",
+  'right result';
 is slugify('Hello, World!'), 'hello-world', 'right result';
 is slugify('spam & eggs'),   'spam-eggs',   'right result';
 is slugify('spam & ıçüş',  1), 'spam-ıçüş', 'right result';

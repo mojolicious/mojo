@@ -96,8 +96,7 @@ Mojo::Server::CGI - CGI server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::CGI> is a simple and portable implementation of
-L<RFC 3875|http://tools.ietf.org/html/rfc3875>.
+L<Mojo::Server::CGI> is a simple and portable implementation of L<RFC 3875|http://tools.ietf.org/html/rfc3875>.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
@@ -107,8 +106,7 @@ L<Mojo::Server::CGI> inherits all events from L<Mojo::Server>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Server::CGI> inherits all attributes from L<Mojo::Server> and
-implements the following new ones.
+L<Mojo::Server::CGI> inherits all attributes from L<Mojo::Server> and implements the following new ones.
 
 =head2 nph
 
@@ -119,8 +117,7 @@ Activate non-parsed header mode.
 
 =head1 METHODS
 
-L<Mojo::Server::CGI> inherits all methods from L<Mojo::Server> and implements
-the following new ones.
+L<Mojo::Server::CGI> inherits all methods from L<Mojo::Server> and implements the following new ones.
 
 =head2 run
 

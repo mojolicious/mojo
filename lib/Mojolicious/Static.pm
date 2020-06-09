@@ -10,8 +10,7 @@ use Mojo::Util qw(encode md5_sum trim);
 
 # Bundled files
 my $PUBLIC = curfile->sibling('resources', 'public');
-my %EXTRA  = $PUBLIC->list_tree->map(
-  sub { join('/', @{$_->to_rel($PUBLIC)}), $_->realpath->to_string })->each;
+my %EXTRA  = $PUBLIC->list_tree->map(sub { join('/', @{$_->to_rel($PUBLIC)}), $_->realpath->to_string })->each;
 
 has classes => sub { ['main'] };
 has extra   => sub { +{%EXTRA} };
@@ -71,9 +70,7 @@ sub is_fresh {
 
   # If-None-Match
   $etag //= $res_headers->etag // '';
-  return undef
-    if $match && !grep { $_ eq $etag || "W/$_" eq $etag }
-    map { trim($_) } split ',', $match;
+  return undef if $match && !grep { $_ eq $etag || "W/$_" eq $etag } map { trim($_) } split ',', $match;
 
   # If-Modified-Since
   return !!$match unless ($last //= $res_headers->last_modified) && $since;
@@ -101,8 +98,7 @@ sub serve_asset {
   return $res->code(304) if $self->is_fresh($c, $options);
 
   # Range
-  return $res->content->asset($asset)
-    unless my $range = $c->req->headers->range;
+  return $res->content->asset($asset) unless my $range = $c->req->headers->range;
 
   # Not satisfiable
   return $res->code(416) unless my $size = $asset->size;
@@ -111,17 +107,14 @@ sub serve_asset {
   return $res->code(416) if $start > $end;
 
   # Satisfiable
-  $res->code(206)->headers->content_length($end - $start + 1)
-    ->content_range("bytes $start-$end/$size");
+  $res->code(206)->headers->content_length($end - $start + 1)->content_range("bytes $start-$end/$size");
   return $res->content->asset($asset->start_range($start)->end_range($end));
 }
 
 sub warmup {
   my $self  = shift;
   my $index = $self->{index} = {};
-  for my $class (reverse @{$self->classes}) {
-    $index->{$_} = $class for keys %{data_section $class};
-  }
+  for my $class (reverse @{$self->classes}) { $index->{$_} = $class for keys %{data_section $class} }
 }
 
 sub _epoch { Mojo::Date->new(shift)->epoch }
@@ -137,8 +130,7 @@ sub _get_data_file {
   # Find file
   my @args = ($self->{index}{$rel}, $rel);
   return undef unless defined(my $data = data_section(@args));
-  return Mojo::Asset::Memory->new->add_chunk(
-    file_is_binary(@args) ? $data : encode 'UTF-8', $data);
+  return Mojo::Asset::Memory->new->add_chunk(file_is_binary(@args) ? $data : encode 'UTF-8', $data);
 }
 
 sub _get_file {
@@ -165,10 +157,8 @@ Mojolicious::Static - Serve static files
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Static> is a static file server with C<Range>,
-C<If-Modified-Since> and C<If-None-Match> support, based on
-L<RFC 7232|http://tools.ietf.org/html/rfc7232> and
-L<RFC 7233|http://tools.ietf.org/html/rfc7233>.
+L<Mojolicious::Static> is a static file server with C<Range>, C<If-Modified-Since> and C<If-None-Match> support, based
+on L<RFC 7232|http://tools.ietf.org/html/rfc7232> and L<RFC 7233|http://tools.ietf.org/html/rfc7233>.
 
 =head1 ATTRIBUTES
 
@@ -179,12 +169,10 @@ L<Mojolicious::Static> implements the following attributes.
   my $classes = $static->classes;
   $static     = $static->classes(['main']);
 
-Classes to use for finding files in C<DATA> sections with L<Mojo::Loader>,
-first one has the highest precedence, defaults to C<main>. Only files with
-exactly one extension will be used, like C<index.html>. Note that for files to
-be detected, these classes need to have already been loaded and added before
-L</"warmup"> is called, which usually happens automatically during application
-startup.
+Classes to use for finding files in C<DATA> sections with L<Mojo::Loader>, first one has the highest precedence,
+defaults to C<main>. Only files with exactly one extension will be used, like C<index.html>. Note that for files to be
+detected, these classes need to have already been loaded and added before L</"warmup"> is called, which usually happens
+automatically during application startup.
 
   # Add another class with static files in DATA section
   push @{$static->classes}, 'Mojolicious::Plugin::Fun';
@@ -197,9 +185,8 @@ startup.
   my $extra = $static->extra;
   $static   = $static->extra({'foo/bar.txt' => '/home/sri/myapp/bar.txt'});
 
-Paths for extra files to be served from locations other than L</"paths">, such
-as the images used by the built-in exception and not found pages. Note that
-extra files are only served if no better alternative could be found in
+Paths for extra files to be served from locations other than L</"paths">, such as the images used by the built-in
+exception and not found pages. Note that extra files are only served if no better alternative could be found in
 L</"paths"> and L</"classes">.
 
   # Remove built-in favicon
@@ -220,8 +207,7 @@ Directories to serve static files from, first one has the highest precedence.
 
 =head1 METHODS
 
-L<Mojolicious::Static> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojolicious::Static> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 dispatch
 
@@ -234,9 +220,8 @@ Serve static file for L<Mojolicious::Controller> object.
   my $asset = $static->file('images/logo.png');
   my $asset = $static->file('../lib/MyApp.pm');
 
-Build L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object for a file,
-relative to L</"paths"> or from L</"classes">, or return C<undef> if it doesn't
-exist. Note that this method uses a relative path, but does not protect from
+Build L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object for a file, relative to L</"paths"> or from L</"classes">,
+or return C<undef> if it doesn't exist. Note that this method uses a relative path, but does not protect from
 traversing to parent directories.
 
   my $content = $static->file('foo/bar.html')->slurp;
@@ -247,9 +232,8 @@ traversing to parent directories.
   my $bool = $static->is_fresh(
     Mojolicious::Controller->new, {etag => 'W/"def"'});
 
-Check freshness of request by comparing the C<If-None-Match> and
-C<If-Modified-Since> request headers to the C<ETag> and C<Last-Modified>
-response headers.
+Check freshness of request by comparing the C<If-None-Match> and C<If-Modified-Since> request headers to the C<ETag>
+and C<Last-Modified> response headers.
 
 These options are currently available:
 
@@ -275,16 +259,15 @@ Add C<Last-Modified> header before comparing.
   my $bool = $static->serve(Mojolicious::Controller->new, 'images/logo.png');
   my $bool = $static->serve(Mojolicious::Controller->new, '../lib/MyApp.pm');
 
-Serve a specific file, relative to L</"paths"> or from L</"classes">. Note that
-this method uses a relative path, but does not protect from traversing to parent
-directories.
+Serve a specific file, relative to L</"paths"> or from L</"classes">. Note that this method uses a relative path, but
+does not protect from traversing to parent directories.
 
 =head2 serve_asset
 
   $static->serve_asset(Mojolicious::Controller->new, Mojo::Asset::File->new);
 
-Serve a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object with C<Range>,
-C<If-Modified-Since> and C<If-None-Match> support.
+Serve a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object with C<Range>, C<If-Modified-Since> and C<If-None-Match>
+support.
 
 =head2 warmup
 

@@ -65,8 +65,7 @@ ok !$v->required('does_not_exist')->is_valid, 'not valid';
 is_deeply $v->output, {foo => 'bar', baz => 'yada'}, 'right result';
 ok $v->has_error, 'has error';
 is_deeply $v->error('does_not_exist'), ['required'], 'right error';
-$v = $t->app->validation->input(
-  {foo => [], bar => ['a'], baz => undef, yada => [undef]});
+$v = $t->app->validation->input({foo => [], bar => ['a'], baz => undef, yada => [undef]});
 ok !$v->optional('foo')->is_valid, 'not valid';
 is_deeply $v->output, {}, 'right result';
 ok !$v->has_error, 'no error';
@@ -103,8 +102,7 @@ is_deeply $v->error('yada'), [qw(equal_to 1 foo)], 'right error';
 is_deeply $v->failed, [qw(baz yada)], 'right names';
 
 # In
-$v = $t->app->validation->input(
-  {foo => [qw(bar whatever)], baz => [qw(yada ohoh)]});
+$v = $t->app->validation->input({foo => [qw(bar whatever)], baz => [qw(yada ohoh)]});
 ok $v->required('foo')->in(qw(23 bar whatever))->is_valid, 'valid';
 is_deeply $v->every_param('foo'), [qw(bar whatever)], 'right results';
 is $v->param('foo'), 'whatever', 'right result';
@@ -191,11 +189,10 @@ ok $v->required('foo')->size(undef, 3)->is_valid, 'valid';
 ok !$v->required('foo')->size(undef, 2)->is_valid, 'not valid';
 
 # Upload
-$v = $t->app->validation->input({
-  foo => Mojo::Upload->new,
-  bar => [Mojo::Upload->new, Mojo::Upload->new],
-  baz => [Mojo::Upload->new, 'test']
-});
+$v
+  = $t->app->validation->input({
+  foo => Mojo::Upload->new, bar => [Mojo::Upload->new, Mojo::Upload->new], baz => [Mojo::Upload->new, 'test']
+  });
 ok $v->required('foo')->upload->is_valid, 'valid';
 ok $v->required('bar')->upload->is_valid, 'valid';
 ok $v->required('baz')->is_valid, 'valid';
@@ -207,13 +204,8 @@ is_deeply $v->failed, ['baz'], 'right names';
 
 # Upload size
 $v = $t->app->validation->input({
-  foo =>
-    [Mojo::Upload->new(asset => Mojo::Asset::Memory->new->add_chunk('valid'))],
-  bar => [
-    Mojo::Upload->new(
-      asset => Mojo::Asset::Memory->new->add_chunk('not valid')
-    )
-  ]
+  foo => [Mojo::Upload->new(asset => Mojo::Asset::Memory->new->add_chunk('valid'))],
+  bar => [Mojo::Upload->new(asset => Mojo::Asset::Memory->new->add_chunk('not valid'))]
 });
 ok $v->required('foo')->upload->size(1, 6)->is_valid, 'valid';
 ok !$v->has_error, 'no error';
@@ -292,110 +284,86 @@ ok $v->has_data, 'has data';
 ok $v->csrf_protect->has_error, 'has error';
 ok $v->has_data, 'has data';
 is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
-$v = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})
-  ->csrf_token('cba')->csrf_protect;
+$v = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})->csrf_token('cba')->csrf_protect;
 ok $v->has_error, 'has error';
 is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
-$v = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})
-  ->csrf_token('abc')->csrf_protect;
+$v = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})->csrf_token('abc')->csrf_protect;
 ok !$v->has_error, 'no error';
 ok $v->required('foo')->is_valid, 'valid';
 is_deeply $v->output, {foo => 'bar'}, 'right result';
-$v = $t->app->validation->input({csrf_token => ['abc', 'abc']})
-  ->csrf_token('abc')->csrf_protect;
+$v = $t->app->validation->input({csrf_token => ['abc', 'abc']})->csrf_token('abc')->csrf_protect;
 ok $v->has_error, 'has error';
 is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
 
 # Missing method and function (AUTOLOAD)
 eval { $t->app->validation->missing };
 my $package = 'Mojolicious::Validator::Validation';
-like $@, qr/^Can't locate object method "missing" via package "$package"/,
-  'right error';
+like $@, qr/^Can't locate object method "missing" via package "$package"/, 'right error';
 eval { Mojolicious::Validator::Validation::missing() };
 like $@, qr/^Undefined subroutine &${package}::missing called/, 'right error';
 
 # No validation
-$t->get_ok('/')->status_is(200)->element_exists_not('div:root')
-  ->text_is('label[for="foo"]' => '<Foo>')
-  ->element_exists('input[type="text"]')->element_exists('textarea')
-  ->text_like('label[for="baz"]' => qr/Baz/)->element_exists('select')
-  ->element_exists('input[type="password"]');
+$t->get_ok('/')->status_is(200)->element_exists_not('div:root')->text_is('label[for="foo"]' => '<Foo>')
+  ->element_exists('input[type="text"]')->element_exists('textarea')->text_like('label[for="baz"]' => qr/Baz/)
+  ->element_exists('select')->element_exists('input[type="password"]');
 
 # Successful validation
-$t->get_ok('/' => form => {foo => '☃☃'})->status_is(200)
-  ->element_exists_not('div:root')->text_is('label[for="foo"]' => '<Foo>')
-  ->element_exists('input[type="text"]')->element_exists('textarea')
-  ->text_like('label[for="baz"]' => qr/Baz/)->element_exists('select')
-  ->element_exists('input[type="password"]');
+$t->get_ok('/' => form => {foo => '☃☃'})->status_is(200)->element_exists_not('div:root')
+  ->text_is('label[for="foo"]' => '<Foo>')->element_exists('input[type="text"]')->element_exists('textarea')
+  ->text_like('label[for="baz"]' => qr/Baz/)->element_exists('select')->element_exists('input[type="password"]');
 
 # Validation failed for required fields
-$t->post_ok('/' => form => {foo => 'no'})->status_is(200)
-  ->text_like('div:root' => qr/in.+1/s)
+$t->post_ok('/' => form => {foo => 'no'})->status_is(200)->text_like('div:root' => qr/in.+1/s)
   ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
   ->element_exists('input.custom.field-with-error[type="text"][value="no"]')
-  ->element_exists_not('textarea.field-with-error')
-  ->element_exists_not('label.custom.field-with-error[for="baz"]')
-  ->element_exists_not('select.field-with-error')
-  ->element_exists_not('input.field-with-error[type="password"]')
-  ->element_count_is('.field-with-error', 2)
-  ->element_count_is('.field-with-error', 2, 'with description');
+  ->element_exists_not('textarea.field-with-error')->element_exists_not('label.custom.field-with-error[for="baz"]')
+  ->element_exists_not('select.field-with-error')->element_exists_not('input.field-with-error[type="password"]')
+  ->element_count_is('.field-with-error', 2)->element_count_is('.field-with-error', 2, 'with description');
 
 # Successful file upload
-$t->post_ok(
-  '/upload' => form => {foo => {content => 'bar', filename => 'test.txt'}})
+$t->post_ok('/upload' => form => {foo => {content => 'bar', filename => 'test.txt'}})
   ->element_exists_not('.field-with-error');
 
 # Successful file upload (multiple files)
 $t->post_ok(
-  '/upload' => form => {
-    foo => [
-      {content => 'One', filename => 'one.txt'},
-      {content => 'Two', filename => 'two.txt'}
-    ]
-  }
-)->element_exists_not('.field-with-error');
+  '/upload' => form => {foo => [{content => 'One', filename => 'one.txt'}, {content => 'Two', filename => 'two.txt'}]})
+  ->element_exists_not('.field-with-error');
 
 # Failed file upload
-$t->post_ok('/upload' => form => {foo => 'bar'})
-  ->element_exists('.field-with-error');
+$t->post_ok('/upload' => form => {foo => 'bar'})->element_exists('.field-with-error');
 
 # Failed file upload (multiple files)
-$t->post_ok('/upload' => form => {foo => ['one', 'two']})
-  ->element_exists('.field-with-error');
+$t->post_ok('/upload' => form => {foo => ['one', 'two']})->element_exists('.field-with-error');
 
 # Missing CSRF token
-$t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
-  ->content_like(qr/Wrong or missing CSRF token!/)
+$t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)->content_like(qr/Wrong or missing CSRF token!/)
   ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
 
 # Correct CSRF token
 my $token = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->val;
-$t->post_ok('/forgery' => form => {csrf_token => $token, foo => 'bar'})
-  ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]')->element_exists_not('.field-with-error')
-  ->element_count_is('[name=csrf_token]', 2)->element_count_is('form', 2)
+$t->post_ok('/forgery' => form => {csrf_token => $token, foo => 'bar'})->status_is(200)
+  ->content_unlike(qr/Wrong or missing CSRF token!/)->element_exists('[value=bar]')
+  ->element_exists_not('.field-with-error')->element_count_is('[name=csrf_token]', 2)->element_count_is('form', 2)
   ->element_exists('form > input[name=csrf_token] + input[type=submit]');
-is $t->tx->res->dom->find('[name=csrf_token]')->[0]->val,
-  $t->tx->res->dom->find('[name=csrf_token]')->[1]->val, 'same token';
+is $t->tx->res->dom->find('[name=csrf_token]')->[0]->val, $t->tx->res->dom->find('[name=csrf_token]')->[1]->val,
+  'same token';
 
 # Correct CSRF token (header)
-$t->post_ok('/forgery' => {'X-CSRF-Token' => $token} => form => {foo => 'bar'})
-  ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
+$t->post_ok('/forgery' => {'X-CSRF-Token' => $token} => form => {foo => 'bar'})->status_is(200)
+  ->content_unlike(qr/Wrong or missing CSRF token!/)->element_exists('[value=bar]')
+  ->element_exists_not('.field-with-error');
 
 # Wrong CSRF token (header)
-$t->post_ok('/forgery' => {'X-CSRF-Token' => 'abc'} => form => {foo => 'bar'})
-  ->status_is(200)->content_like(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
+$t->post_ok('/forgery' => {'X-CSRF-Token' => 'abc'} => form => {foo => 'bar'})->status_is(200)
+  ->content_like(qr/Wrong or missing CSRF token!/)->element_exists('[value=bar]')
+  ->element_exists_not('.field-with-error');
 
 # Missing CSRF token and form
-$t->get_ok('/forgery')->status_is(200)
-  ->content_unlike(qr/Wrong or missing CSRF token!/)
+$t->get_ok('/forgery')->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
   ->element_exists_not('.field-with-error');
 
 # Correct CSRF token and missing form
-$t->post_ok('/forgery' => {'X-CSRF-Token' => $token})->status_is(200)
-  ->content_unlike(qr/Wrong or missing CSRF token!/)
+$t->post_ok('/forgery' => {'X-CSRF-Token' => $token})->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
   ->element_exists('.field-with-error');
 
 # Failed validation for all fields (with custom helper)
@@ -403,18 +371,14 @@ $t->app->helper(
   tag_with_error => sub {
     my ($c, $tag) = (shift, shift);
     my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
-    $attrs{class}
-      .= $attrs{class} ? ' my-field-with-error' : 'my-field-with-error';
+    $attrs{class} .= $attrs{class} ? ' my-field-with-error' : 'my-field-with-error';
     return $c->tag($tag, %attrs, defined $content ? $content : ());
   }
 );
-$t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
-  ->status_is(200)->text_like('div:root' => qr/two.+e:foo/s)
-  ->text_is('label.custom.my-field-with-error[for="foo"]' => '<Foo>')
-  ->element_exists('input.custom.my-field-with-error[type="text"]')
-  ->element_exists('textarea.my-field-with-error')
-  ->text_like('label.custom.my-field-with-error[for="baz"]' => qr/Baz/)
-  ->element_exists('select.my-field-with-error')
+$t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')->status_is(200)
+  ->text_like('div:root' => qr/two.+e:foo/s)->text_is('label.custom.my-field-with-error[for="foo"]' => '<Foo>')
+  ->element_exists('input.custom.my-field-with-error[type="text"]')->element_exists('textarea.my-field-with-error')
+  ->text_like('label.custom.my-field-with-error[for="baz"]' => qr/Baz/)->element_exists('select.my-field-with-error')
   ->element_exists('input.my-field-with-error[type="password"]');
 
 done_testing();

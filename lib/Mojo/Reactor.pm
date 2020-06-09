@@ -55,13 +55,12 @@ Mojo::Reactor - Low-level event reactor base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor> is an abstract base class for low-level event reactors, like
-L<Mojo::Reactor::EV> and L<Mojo::Reactor::Poll>.
+L<Mojo::Reactor> is an abstract base class for low-level event reactors, like L<Mojo::Reactor::EV> and
+L<Mojo::Reactor::Poll>.
 
 =head1 EVENTS
 
-L<Mojo::Reactor> inherits all events from L<Mojo::EventEmitter> and can emit
-the following new ones.
+L<Mojo::Reactor> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 error
 
@@ -70,9 +69,8 @@ the following new ones.
     ...
   });
 
-Emitted for exceptions caught in callbacks, fatal if unhandled. Note that if
-this event is unhandled or fails it might kill your program, so you need to be
-careful.
+Emitted for exceptions caught in callbacks, fatal if unhandled. Note that if this event is unhandled or fails it might
+kill your program, so you need to be careful.
 
   $reactor->on(error => sub {
     my ($reactor, $err) = @_;
@@ -81,24 +79,22 @@ careful.
 
 =head1 METHODS
 
-L<Mojo::Reactor> inherits all methods from L<Mojo::EventEmitter> and implements
-the following new ones.
+L<Mojo::Reactor> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 again
 
   $reactor->again($id);
   $reactor->again($id, 0.5);
 
-Restart timer and optionally change the invocation time. Meant to be overloaded
-in a subclass. Note that this method requires an active timer.
+Restart timer and optionally change the invocation time. Meant to be overloaded in a subclass. Note that this method
+requires an active timer.
 
 =head2 detect
 
   my $class = Mojo::Reactor->detect;
 
-Detect and load the best reactor implementation available, will try the value
-of the C<MOJO_REACTOR> environment variable, L<Mojo::Reactor::EV> or
-L<Mojo::Reactor::Poll>.
+Detect and load the best reactor implementation available, will try the value of the C<MOJO_REACTOR> environment
+variable, L<Mojo::Reactor::EV> or L<Mojo::Reactor::Poll>.
 
   # Instantiate best reactor implementation available
   my $reactor = Mojo::Reactor->detect->new;
@@ -107,8 +103,8 @@ L<Mojo::Reactor::Poll>.
 
   $reactor = $reactor->io($handle => sub {...});
 
-Watch handle for I/O events, invoking the callback whenever handle becomes
-readable or writable. Meant to be overloaded in a subclass.
+Watch handle for I/O events, invoking the callback whenever handle becomes readable or writable. Meant to be overloaded
+in a subclass.
 
   # Callback will be executed twice if handle becomes readable and writable
   $reactor->io($handle => sub {
@@ -126,16 +122,15 @@ Check if reactor is running. Meant to be overloaded in a subclass.
 
   my $undef = $reactor->next_tick(sub {...});
 
-Execute callback as soon as possible, but not before returning or other
-callbacks that have been registered with this method, always returns C<undef>.
-Meant to be overloaded in a subclass.
+Execute callback as soon as possible, but not before returning or other callbacks that have been registered with this
+method, always returns C<undef>. Meant to be overloaded in a subclass.
 
 =head2 one_tick
 
   $reactor->one_tick;
 
-Run reactor until an event occurs. Note that this method can recurse back into
-the reactor, so you need to be careful. Meant to be overloaded in a subclass.
+Run reactor until an event occurs. Note that this method can recurse back into the reactor, so you need to be careful.
+Meant to be overloaded in a subclass.
 
   # Don't block longer than 0.5 seconds
   my $id = $reactor->timer(0.5 => sub {});
@@ -146,8 +141,8 @@ the reactor, so you need to be careful. Meant to be overloaded in a subclass.
 
   my $id = $reactor->recurring(0.25 => sub {...});
 
-Create a new recurring timer, invoking the callback repeatedly after a given
-amount of time in seconds. Meant to be overloaded in a subclass.
+Create a new recurring timer, invoking the callback repeatedly after a given amount of time in seconds. Meant to be
+overloaded in a subclass.
 
 =head2 remove
 
@@ -166,9 +161,8 @@ Remove all handles and timers. Meant to be overloaded in a subclass.
 
   $reactor->start;
 
-Start watching for I/O and timer events, this will block until L</"stop"> is
-called. Note that some reactors stop automatically if there are no events being
-watched anymore. Meant to be overloaded in a subclass.
+Start watching for I/O and timer events, this will block until L</"stop"> is called. Note that some reactors stop
+automatically if there are no events being watched anymore. Meant to be overloaded in a subclass.
 
   # Start reactor only if it is not running already
   $reactor->start unless $reactor->is_running;
@@ -183,15 +177,15 @@ Stop watching for I/O and timer events. Meant to be overloaded in a subclass.
 
   my $id = $reactor->timer(0.5 => sub {...});
 
-Create a new timer, invoking the callback after a given amount of time in
-seconds. Meant to be overloaded in a subclass.
+Create a new timer, invoking the callback after a given amount of time in seconds. Meant to be overloaded in a
+subclass.
 
 =head2 watch
 
   $reactor = $reactor->watch($handle, $readable, $writable);
 
-Change I/O events to watch handle for with true and false values. Meant to be
-overloaded in a subclass. Note that this method requires an active I/O watcher.
+Change I/O events to watch handle for with true and false values. Meant to be overloaded in a subclass. Note that this
+method requires an active I/O watcher.
 
   # Watch only for readable events
   $reactor->watch($handle, 1, 0);

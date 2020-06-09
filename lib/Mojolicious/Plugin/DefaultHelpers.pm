@@ -36,8 +36,7 @@ sub register {
   $app->helper(continue => sub { $_[0]->app->routes->continue($_[0]) });
 
   $app->helper($_ => $self->can("_$_"))
-    for qw(csrf_token current_route flash inactivity_timeout is_fresh),
-    qw(redirect_to respond_to url_with validation);
+    for qw(csrf_token current_route flash inactivity_timeout is_fresh), qw(redirect_to respond_to url_with validation);
 
   $app->helper(dumper  => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
@@ -83,11 +82,7 @@ sub _content {
   return Mojo::ByteStream->new($hash->{$name} // '');
 }
 
-sub _csrf_token {
-  my $c = shift;
-  return $c->session->{csrf_token}
-    ||= hmac_sha1_sum($$ . steady_time . rand, $c->app->secrets->[0]);
-}
+sub _csrf_token { $_[0]->session->{csrf_token} ||= hmac_sha1_sum($$ . steady_time . rand, $_[0]->app->secrets->[0]) }
 
 sub _current_route {
   return '' unless my $route = shift->match->endpoint;
@@ -97,14 +92,11 @@ sub _current_route {
 sub _development {
   my ($page, $c, $e) = @_;
 
-  $c->helpers->log->error(
-    ($e = _is_e($e) ? $e : Mojo::Exception->new($e))->inspect)
-    if $page eq 'exception';
+  $c->helpers->log->error(($e = _is_e($e) ? $e : Mojo::Exception->new($e))->inspect) if $page eq 'exception';
 
   # Filtered stash snapshot
   my $stash = $c->stash;
-  %{$stash->{snapshot} = {}} = map { $_ => $stash->{$_} }
-    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
+  %{$stash->{snapshot} = {}} = map { $_ => $stash->{$_} } grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
   $stash->{exception} = $page eq 'exception' ? $e : undef;
 
   # Render with fallbacks
@@ -146,8 +138,7 @@ sub _flash {
 
   # Check old flash
   my $session = $c->session;
-  return $session->{flash} ? $session->{flash}{$_[0]} : undef
-    if @_ == 1 && !ref $_[0];
+  return $session->{flash} ? $session->{flash}{$_[0]} : undef if @_ == 1 && !ref $_[0];
 
   # Initialize new flash and merge values
   my $values = ref $_[0] ? $_[0] : {@_};
@@ -170,11 +161,7 @@ sub _is_fresh {
   return $c->app->static->is_fresh($c, \%options);
 }
 
-sub _log {
-  my $c = shift;
-  return $c->stash->{'mojo.log'}
-    ||= $c->app->log->context('[' . $c->req->request_id . ']');
-}
+sub _log { $_[0]->stash->{'mojo.log'} ||= $_[0]->app->log->context('[' . $_[0]->req->request_id . ']') }
 
 sub _proxy_method_p {
   my ($method, $c) = (shift, shift);
@@ -326,14 +313,12 @@ Mojolicious::Plugin::DefaultHelpers - Default helpers plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::DefaultHelpers> is a collection of helpers for
-L<Mojolicious>.
+L<Mojolicious::Plugin::DefaultHelpers> is a collection of helpers for L<Mojolicious>.
 
-This is a core plugin, that means it is always enabled and its code a good
-example for learning to build new plugins, you're welcome to fork it.
+This is a core plugin, that means it is always enabled and its code a good example for learning to build new plugins,
+you're welcome to fork it.
 
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available by default.
 
 =head1 HELPERS
 
@@ -344,10 +329,9 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
   my $formats = $c->accepts;
   my $format  = $c->accepts('html', 'json', 'txt');
 
-Select best possible representation for resource from C<format> C<GET>/C<POST>
-parameter, C<format> stash value or C<Accept> request header with
-L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension if
-no preference could be detected.
+Select best possible representation for resource from C<format> C<GET>/C<POST> parameter, C<format> stash value or
+C<Accept> request header with L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension if no
+preference could be detected.
 
   # Check if JSON is acceptable
   $c->render(json => {hello => 'world'}) if $c->accepts('json');
@@ -396,10 +380,9 @@ Alias for L<Mojolicious/"config">.
   %= content 'bar'
   %= content
 
-Store partial rendered content in a named buffer and retrieve it later,
-defaults to retrieving the named buffer C<content>, which is used by the
-renderer for the C<layout> and C<extends> features. New content will be ignored
-if the named buffer is already in use.
+Store partial rendered content in a named buffer and retrieve it later, defaults to retrieving the named buffer
+C<content>, which is used by the renderer for the C<layout> and C<extends> features. New content will be ignored if the
+named buffer is already in use.
 
 =head2 content_for
 
@@ -408,8 +391,7 @@ if the named buffer is already in use.
   % end
   %= content_for 'foo'
 
-Same as L</"content">, but appends content to named buffers if they are already
-in use.
+Same as L</"content">, but appends content to named buffers if they are already in use.
 
   % content_for message => begin
     Hello
@@ -426,8 +408,7 @@ in use.
   % end
   %= content_with 'foo'
 
-Same as L</"content">, but replaces content of named buffers if they are
-already in use.
+Same as L</"content">, but replaces content of named buffers if they are already in use.
 
   % content message => begin
     world!
@@ -441,8 +422,7 @@ already in use.
 
   $c->continue;
 
-Continue dispatch chain from an intermediate destination with
-L<Mojolicious::Routes/"continue">.
+Continue dispatch chain from an intermediate destination with L<Mojolicious::Routes/"continue">.
 
 =head2 csrf_token
 
@@ -463,16 +443,14 @@ Check or get name of current route.
 
   %= dumper {some => 'data'}
 
-Dump a Perl data structure with L<Mojo::Util/"dumper">, very useful for
-debugging.
+Dump a Perl data structure with L<Mojo::Util/"dumper">, very useful for debugging.
 
 =head2 extends
 
   % extends 'blue';
   % extends 'blue', title => 'Blue!';
 
-Set C<extends> stash value, all additional key/value pairs get merged into the
-L</"stash">.
+Set C<extends> stash value, all additional key/value pairs get merged into the L</"stash">.
 
 =head2 flash
 
@@ -491,8 +469,7 @@ Data storage persistent only for the next request, stored in the L</"session">.
 
   $c = $c->inactivity_timeout(3600);
 
-Use L<Mojo::IOLoop/"stream"> to find the current connection and increase
-timeout if possible.
+Use L<Mojo::IOLoop/"stream"> to find the current connection and increase timeout if possible.
 
   # Longer version
   Mojo::IOLoop->stream($c->tx->connection)->timeout(3600);
@@ -511,9 +488,8 @@ Alias for L<Mojolicious::Controller/"render_to_string">.
   my $bool = $c->is_fresh(etag => 'W/"def"');
   my $bool = $c->is_fresh(last_modified => $epoch);
 
-Check freshness of request by comparing the C<If-None-Match> and
-C<If-Modified-Since> request headers to the C<ETag> and C<Last-Modified>
-response headers with L<Mojolicious::Static/"is_fresh">.
+Check freshness of request by comparing the C<If-None-Match> and C<If-Modified-Since> request headers to the C<ETag>
+and C<Last-Modified> response headers with L<Mojolicious::Static/"is_fresh">.
 
   # Add ETag/Last-Modified headers and check freshness before rendering
   $c->is_fresh(etag => 'abc', last_modified => 1424985708)
@@ -525,15 +501,13 @@ response headers with L<Mojolicious::Static/"is_fresh">.
   % layout 'green';
   % layout 'green', title => 'Green!';
 
-Set C<layout> stash value, all additional key/value pairs get merged into the
-L</"stash">.
+Set C<layout> stash value, all additional key/value pairs get merged into the L</"stash">.
 
 =head2 log
 
   my $log = $c->log;
 
-Alternative to L<Mojolicious/"log"> that includes
-L<Mojo::Message::Request/"request_id"> with every log message.
+Alternative to L<Mojolicious/"log"> that includes L<Mojo::Message::Request/"request_id"> with every log message.
 
   # Log message with context
   $c->log->debug('This is a log message with request id');
@@ -552,9 +526,8 @@ Alias for L<Mojolicious::Controller/"param">.
 
   my $promise = $c->proxy->get_p('http://example.com' => {Accept => '*/*'});
 
-Perform non-blocking C<GET> request and forward response as efficiently as
-possible, takes the same arguments as L<Mojo::UserAgent/"get"> and returns a
-L<Mojo::Promise> object.
+Perform non-blocking C<GET> request and forward response as efficiently as possible, takes the same arguments as
+L<Mojo::UserAgent/"get"> and returns a L<Mojo::Promise> object.
 
   # Forward with exception handling
   $c->proxy->get_p('http://mojolicious.org')->catch(sub {
@@ -567,9 +540,8 @@ L<Mojo::Promise> object.
 
   my $promise = $c->proxy->post_p('http://example.com' => {Accept => '*/*'});
 
-Perform non-blocking C<POST> request and forward response as efficiently as
-possible, takes the same arguments as L<Mojo::UserAgent/"post"> and returns a
-L<Mojo::Promise> object.
+Perform non-blocking C<POST> request and forward response as efficiently as possible, takes the same arguments as
+L<Mojo::UserAgent/"post"> and returns a L<Mojo::Promise> object.
 
   # Forward with exception handling
   $c->proxy->post_p('example.com' => form => {test => 'pass'})->catch(sub {
@@ -582,8 +554,8 @@ L<Mojo::Promise> object.
 
   my $promise = $c->proxy->start_p(Mojo::Transaction::HTTP->new);
 
-Perform non-blocking request for a custom L<Mojo::Transaction::HTTP> object and
-forward response as efficiently as possible, returns a L<Mojo::Promise> object.
+Perform non-blocking request for a custom L<Mojo::Transaction::HTTP> object and forward response as efficiently as
+possible, returns a L<Mojo::Promise> object.
 
   # Forward with exception handling
   my $tx = $c->ua->build_tx(GET => 'http://mojolicious.org');
@@ -609,8 +581,8 @@ forward response as efficiently as possible, returns a L<Mojo::Promise> object.
   $c = $c->redirect_to('/index.html');
   $c = $c->redirect_to('http://example.com/index.html');
 
-Prepare a C<302> (if the status code is not already C<3xx>) redirect response
-with C<Location> header, takes the same arguments as L</"url_for">.
+Prepare a C<302> (if the status code is not already C<3xx>) redirect response with C<Location> header, takes the same
+arguments as L</"url_for">.
 
   # Moved Permanently
   $c->res->code(301);
@@ -624,9 +596,8 @@ with C<Location> header, takes the same arguments as L</"url_for">.
 
   $c->reply->asset(Mojo::Asset::File->new);
 
-Reply with a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object using
-L<Mojolicious::Static/"serve_asset">, and perform content negotiation with
-C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
+Reply with a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object using L<Mojolicious::Static/"serve_asset">, and
+perform content negotiation with C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
 
   # Serve asset with custom modification time
   my $asset = Mojo::Asset::Memory->new;
@@ -645,17 +616,15 @@ C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
   $c = $c->reply->exception('Oops!');
   $c = $c->reply->exception(Mojo::Exception->new);
 
-Render the exception template C<exception.$mode.$format.*> or
-C<exception.$format.*> and set the response status code to C<500>. Also sets
-the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot> to
-a copy of the L</"stash"> for use in the templates.
+Render the exception template C<exception.$mode.$format.*> or C<exception.$format.*> and set the response status code
+to C<500>. Also sets the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot> to a copy of the
+L</"stash"> for use in the templates.
 
 =head2 reply->file
 
   $c->reply->file('/etc/passwd');
 
-Reply with a static file from an absolute path anywhere on the file system using
-L<Mojolicious/"static">.
+Reply with a static file from an absolute path anywhere on the file system using L<Mojolicious/"static">.
 
   # Longer version
   $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
@@ -671,19 +640,16 @@ L<Mojolicious/"static">.
 
   $c = $c->reply->not_found;
 
-Render the not found template C<not_found.$mode.$format.*> or
-C<not_found.$format.*> and set the response status code to C<404>. Also sets
-the stash value C<snapshot> to a copy of the L</"stash"> for use in the
-templates.
+Render the not found template C<not_found.$mode.$format.*> or C<not_found.$format.*> and set the response status code
+to C<404>. Also sets the stash value C<snapshot> to a copy of the L</"stash"> for use in the templates.
 
 =head2 reply->static
 
   my $bool = $c->reply->static('images/logo.png');
   my $bool = $c->reply->static('../lib/MyApp.pm');
 
-Reply with a static file using L<Mojolicious/"static">, usually from the
-C<public> directories or C<DATA> sections of your application. Note that this
-helper uses a relative path, but does not protect from traversing to parent
+Reply with a static file using L<Mojolicious/"static">, usually from the C<public> directories or C<DATA> sections of
+your application. Note that this helper uses a relative path, but does not protect from traversing to parent
 directories.
 
   # Serve file from a relative path with a custom content type
@@ -698,11 +664,9 @@ directories.
     any  => sub {...}
   );
 
-Automatically select best possible representation for resource from C<format>
-C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request header,
-defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty
-C<204> response. Each representation can be handled with a callback or a hash
-reference containing arguments to be passed to
+Automatically select best possible representation for resource from C<format> C<GET>/C<POST> parameter, C<format> stash
+value or C<Accept> request header, defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty C<204>
+response. Each representation can be handled with a callback or a hash reference containing arguments to be passed to
 L<Mojolicious::Controller/"render">.
 
   # Everything else than "json" and "xml" gets a 204 response
@@ -739,8 +703,8 @@ Create named timestamp for L<"timing-E<gt>elapsed">.
 
   my $elapsed = $c->timing->elapsed('foo');
 
-Return fractional amount of time in seconds since named timstamp has been
-created with L</"timing-E<gt>begin"> or C<undef> if no such timestamp exists.
+Return fractional amount of time in seconds since named timstamp has been created with L</"timing-E<gt>begin"> or
+C<undef> if no such timestamp exists.
 
   # Log timing information
   $c->timing->begin('database_stuff');
@@ -752,9 +716,8 @@ created with L</"timing-E<gt>begin"> or C<undef> if no such timestamp exists.
 
   my $rps = $c->timing->rps('0.001');
 
-Return fractional number of requests that could be performed in one second if
-every singe one took the given amount of time in seconds or C<undef> if the
-number is too low.
+Return fractional number of requests that could be performed in one second if every singe one took the given amount of
+time in seconds or C<undef> if the number is too low.
 
   # Log more timing information
   $c->timing->begin('web_stuff');
@@ -793,8 +756,7 @@ Create C<Server-Timing> header with optional description and duration.
   % title 'Welcome!';
   % title 'Welcome!', foo => 'bar';
 
-Get or set C<title> stash value, all additional key/value pairs get merged into
-the L</"stash">.
+Get or set C<title> stash value, all additional key/value pairs get merged into the L</"stash">.
 
 =head2 ua
 
@@ -814,8 +776,7 @@ Alias for L<Mojolicious::Controller/"url_for">.
 
   %= url_with 'named', controller => 'bar', action => 'baz'
 
-Does the same as L</"url_for">, but inherits query parameters from the current
-request.
+Does the same as L</"url_for">, but inherits query parameters from the current request.
 
   %= url_with->query({page => 2})
 
@@ -823,12 +784,10 @@ request.
 
   my $v = $c->validation;
 
-Get L<Mojolicious::Validator::Validation> object for current request to
-validate file uploads as well as C<GET> and C<POST> parameters extracted from
-the query string and C<application/x-www-form-urlencoded> or
-C<multipart/form-data> message body. Parts of the request body need to be loaded
-into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large. There's a 16MiB limit for requests by default.
+Get L<Mojolicious::Validator::Validation> object for current request to validate file uploads as well as C<GET> and
+C<POST> parameters extracted from the query string and C<application/x-www-form-urlencoded> or C<multipart/form-data>
+message body. Parts of the request body need to be loaded into memory to parse C<POST> parameters, so you have to make
+sure it is not excessively large. There's a 16MiB limit for requests by default.
 
   # Validate GET/POST parameter
   my $v = $c->validation;
@@ -842,8 +801,8 @@ excessively large. There's a 16MiB limit for requests by default.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::DefaultHelpers> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin::DefaultHelpers> inherits all methods from L<Mojolicious::Plugin> and implements the following
+new ones.
 
 =head2 register
 

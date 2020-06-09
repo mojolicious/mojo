@@ -13,8 +13,7 @@ use Mojolicious::Lite;
 # Max WebSocket size
 {
   local $ENV{MOJO_MAX_WEBSOCKET_SIZE} = 1024;
-  is(Mojo::Transaction::WebSocket->new->max_websocket_size, 1024,
-    'right value');
+  is(Mojo::Transaction::WebSocket->new->max_websocket_size, 1024, 'right value');
 }
 
 # Silence
@@ -109,16 +108,14 @@ websocket '/trim' => sub {
 
 websocket '/dead' => sub { die 'i see dead processes' };
 
-websocket '/foo' =>
-  sub { shift->rendered->res->code('403')->message("i'm a teapot") };
+websocket '/foo' => sub { shift->rendered->res->code('403')->message("i'm a teapot") };
 
 websocket '/close' => sub {
   shift->on(message => sub { Mojo::IOLoop->remove(shift->tx->connection) });
 };
 
 websocket '/timeout' => sub {
-  shift->inactivity_timeout(0.25)
-    ->on(finish => sub { shift->stash->{finished}++ });
+  shift->inactivity_timeout(0.25)->on(finish => sub { shift->stash->{finished}++ });
 };
 
 # URL for WebSocket
@@ -291,8 +288,7 @@ $ua->websocket(
     $tx->send(
       'hi!' => sub {
         shift->send('there!');
-        $drain
-          += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};
+        $drain += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};
       }
     );
   }
@@ -346,12 +342,11 @@ $ua->websocket_p('/trim')->then(sub {
 })->wait;
 is $result, 'also works!', 'right result';
 $result = undef;
-$ua->websocket_p('/foo')->then(sub { $result = 'test failed' })
-  ->catch(sub { $result = shift })->wait;
+$ua->websocket_p('/foo')->then(sub { $result = 'test failed' })->catch(sub { $result = shift })->wait;
 is $result, 'WebSocket handshake failed', 'right result';
 $result = undef;
-$ua->websocket_p($ua->server->url->to_abs->scheme('wsss'))
-  ->then(sub { $result = 'test failed' })->catch(sub { $result = shift })->wait;
+$ua->websocket_p($ua->server->url->to_abs->scheme('wsss'))->then(sub { $result = 'test failed' })
+  ->catch(sub { $result = shift })->wait;
 is $result, 'Unsupported protocol: wsss', 'right result';
 
 # Dies

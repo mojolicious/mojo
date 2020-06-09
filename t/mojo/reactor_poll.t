@@ -31,8 +31,7 @@ ok time < ($time + 10), 'stopped automatically';
 my $listen = IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1');
 my $port   = $listen->sockport;
 my ($readable, $writable);
-$reactor->io($listen => sub { pop() ? $writable++ : $readable++ })
-  ->watch($listen, 0, 0)->watch($listen, 1, 1);
+$reactor->io($listen => sub { pop() ? $writable++ : $readable++ })->watch($listen, 0, 0)->watch($listen, 1, 1);
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok !$readable, 'handle is not readable';
@@ -160,8 +159,7 @@ is_deeply $result, [1 .. 10], 'right result';
 
 # Reset while watchers are active
 $writable = undef;
-$reactor->io($_ => sub { ++$writable and shift->reset })->watch($_, 0, 1)
-  for $client, $server;
+$reactor->io($_ => sub { ++$writable and shift->reset })->watch($_, 0, 1) for $client, $server;
 $reactor->start;
 is $writable, 1, 'only one handle was writable';
 

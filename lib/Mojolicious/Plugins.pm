@@ -42,9 +42,7 @@ sub load_plugin {
   die qq{Plugin "$name" missing, maybe you need to install it?\n};
 }
 
-sub register_plugin {
-  shift->load_plugin(shift)->register(shift, ref $_[0] ? $_[0] : {@_});
-}
+sub register_plugin { shift->load_plugin(shift)->register(shift, ref $_[0] ? $_[0] : {@_}) }
 
 sub _load {
   my $module = shift;
@@ -73,8 +71,7 @@ L<Mojolicious::Plugins> is the plugin manager of L<Mojolicious>.
 
 =head1 PLUGINS
 
-The following plugins are included in the L<Mojolicious> distribution as
-examples.
+The following plugins are included in the L<Mojolicious> distribution as examples.
 
 =over 2
 
@@ -132,8 +129,7 @@ Namespaces to load plugins from, defaults to L<Mojolicious::Plugin>.
 
 =head1 METHODS
 
-L<Mojolicious::Plugins> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojolicious::Plugins> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 emit_chain
 
@@ -178,8 +174,8 @@ Load a plugin from the configured namespaces or by full module name.
   $plugins->register_plugin(
     'MyApp::Plugin::SomeThing', Mojolicious->new, {foo => 23});
 
-Load a plugin from the configured namespaces or by full module name and run
-C<register>, optional arguments are passed through.
+Load a plugin from the configured namespaces or by full module name and run C<register>, optional arguments are passed
+through.
 
 =head1 SEE ALSO
 

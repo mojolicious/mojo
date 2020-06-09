@@ -7,48 +7,38 @@
 
  [![](https://github.com/mojolicious/mojo/workflows/linux/badge.svg)](https://github.com/mojolicious/mojo/actions) [![](https://github.com/mojolicious/mojo/workflows/macos/badge.svg)](https://github.com/mojolicious/mojo/actions) [![](https://github.com/mojolicious/mojo/workflows/windows/badge.svg)](https://github.com/mojolicious/mojo/actions)
 
-  Mojolicious is a fresh take on Perl web development, based on years of
-  experience developing the Catalyst framework, and utilizing the latest
-  web standards and technologies. You can get started with your project
-  quickly, with a framework that grows with your needs.
+  Mojolicious is a fresh take on Perl web development, based on years of experience developing the Catalyst framework,
+  and utilizing the latest web standards and technologies. You can get started with your project quickly, with a
+  framework that grows with your needs.
 
-  The Mojo stack provides a consistent set of components that can be used in
-  any project. The guides cover most aspects of using the framework and the
-  components have comprehensive reference documentation. Mojolicious is a
-  real-time web framework, which allows a new class of web applications
-  using WebSockets and having long-running requests without blocking.
+  The Mojo stack provides a consistent set of components that can be used in any project. The guides cover most aspects
+  of using the framework and the components have comprehensive reference documentation. Mojolicious is a real-time web
+  framework, which allows a new class of web applications using WebSockets and having long-running requests without
+  blocking.
 
-  Join us now, and be a part of a friendly and knowledgeable community of
-  developers!
+  Join us now, and be a part of a friendly and knowledgeable community of developers!
 
 ## Features
 
-  * An amazing **real-time web framework**, allowing you to easily grow single
-    file prototypes into well-structured MVC web applications.
-    * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish
-      templates, content negotiation, session management, form validation,
-      testing framework, static file server, CGI/[PSGI](http://plackperl.org)
-      detection, first class Unicode support and much more for you to
-      discover.
-  * A powerful **web development toolkit**, that you can use for all kinds of
-    applications, independently of the web framework.
-    * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
-      SNI, IDNA, HTTP/SOCKS5 proxy, UNIX domain socket, Comet (long polling),
-      Promises/A+, async/await, keep-alive, connection pooling, timeout, cookie,
+  * An amazing **real-time web framework**, allowing you to easily grow single file prototypes into well-structured MVC
+    web applications.
+    * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish templates, content negotiation, session
+      management, form validation, testing framework, static file server, CGI/[PSGI](http://plackperl.org) detection,
+      first class Unicode support and much more for you to discover.
+  * A powerful **web development toolkit**, that you can use for all kinds of applications, independently of the web
+    framework.
+    * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS, SNI, IDNA, HTTP/SOCKS5 proxy, UNIX
+      domain socket, Comet (long polling), Promises/A+, async/await, keep-alive, connection pooling, timeout, cookie,
       multipart, and gzip compression support.
-    * Built-in non-blocking I/O web server, supporting multiple event loops as
-      well as optional pre-forking and hot deployment, perfect for building
-      highly scalable web services.
+    * Built-in non-blocking I/O web server, supporting multiple event loops as well as optional pre-forking and hot
+      deployment, perfect for building highly scalable web services.
     * JSON and HTML/XML parser with CSS selector support.
-  * Very clean, portable and object-oriented pure-Perl API with no hidden
-    magic and no requirements besides Perl 5.26.0 (versions as old as 5.16.0
-    can be used too, but may require additional CPAN modules to be installed)
-  * Fresh code based upon years of experience developing
-    [Catalyst](http://www.catalystframework.org), free and open source.
-  * Hundreds of 3rd party
-    [extensions](https://metacpan.org/requires/distribution/Mojolicious) and
-    high quality spin-off projects like the
-    [Minion](https://metacpan.org/pod/Minion) job queue.
+  * Very clean, portable and object-oriented pure-Perl API with no hidden magic and no requirements besides Perl 5.26.0
+    (versions as old as 5.16.0 can be used too, but may require additional CPAN modules to be installed)
+  * Fresh code based upon years of experience developing [Catalyst](http://www.catalystframework.org), free and open
+    source.
+  * Hundreds of 3rd party [extensions](https://metacpan.org/requires/distribution/Mojolicious) and high quality spin-off
+    projects like the [Minion](https://metacpan.org/pod/Minion) job queue.
 
 ## Installation
 
@@ -70,8 +60,7 @@ get '/' => {text => 'I ♥ Mojolicious!'};
 app->start;
 ```
 
-  To run this example with the built-in development web server just put the
-  code into a file and start it with `morbo`.
+  To run this example with the built-in development web server just put the code into a file and start it with `morbo`.
 
     $ morbo hello.pl
     Server available at http://127.0.0.1:3000
@@ -81,10 +70,9 @@ app->start;
 
 ## Duct tape for the HTML5 web
 
-  Use all the latest Perl and HTML features in beautiful single file
-  prototypes like this one, and
-  [grow](https://mojolicious.org/perldoc/Mojolicious/Guides/Growing#Differences)
-  them easily into well-structured **Model-View-Controller** web applications.
+  Use all the latest Perl and HTML features in beautiful single file prototypes like this one, and
+  [grow](https://mojolicious.org/perldoc/Mojolicious/Guides/Growing#Differences) them easily into well-structured
+  **Model-View-Controller** web applications.
 
 ```perl
 use Mojolicious::Lite -signatures;

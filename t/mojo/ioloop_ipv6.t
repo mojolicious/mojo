@@ -5,8 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::Server;
 
-plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)'
-  unless $ENV{TEST_IPV6} || $ENV{TEST_ALL};
+plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)' unless $ENV{TEST_IPV6} || $ENV{TEST_ALL};
 
 use Mojo::IOLoop;
 

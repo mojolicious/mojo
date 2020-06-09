@@ -6,9 +6,7 @@ use Mojo::IOLoop;
 use Scalar::Util qw(weaken);
 
 # TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.009'); 1 };
+use constant TLS => $ENV{MOJO_NO_TLS} ? 0 : eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.009'); 1 };
 use constant READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -27,8 +25,7 @@ sub can_tls {TLS}
 sub negotiate {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
 
-  return $self->emit(error => 'IO::Socket::SSL 2.009+ required for TLS support')
-    unless TLS;
+  return $self->emit(error => 'IO::Socket::SSL 2.009+ required for TLS support') unless TLS;
 
   my $handle = $self->{handle};
   return $self->emit(error => $IO::Socket::SSL::SSL_ERROR)
@@ -49,27 +46,22 @@ sub _expand {
   my ($self, $args) = @_;
 
   weaken $self;
-  my $tls = {
-    SSL_error_trap     => sub { $self->_cleanup->emit(error => $_[1]) },
-    SSL_startHandshake => 0
-  };
+  my $tls = {SSL_error_trap => sub { $self->_cleanup->emit(error => $_[1]) }, SSL_startHandshake => 0};
   $tls->{SSL_alpn_protocols} = $args->{tls_protocols} if $args->{tls_protocols};
-  $tls->{SSL_ca_file}        = $args->{tls_ca}
-    if $args->{tls_ca} && -T $args->{tls_ca};
-  $tls->{SSL_cert_file}   = $args->{tls_cert}    if $args->{tls_cert};
-  $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
-  $tls->{SSL_key_file}    = $args->{tls_key}     if $args->{tls_key};
-  $tls->{SSL_server}      = $args->{server}      if $args->{server};
-  $tls->{SSL_verify_mode} = $args->{tls_verify}  if defined $args->{tls_verify};
-  $tls->{SSL_version}     = $args->{tls_version} if $args->{tls_version};
+  $tls->{SSL_ca_file}        = $args->{tls_ca}        if $args->{tls_ca} && -T $args->{tls_ca};
+  $tls->{SSL_cert_file}      = $args->{tls_cert}      if $args->{tls_cert};
+  $tls->{SSL_cipher_list}    = $args->{tls_ciphers}   if $args->{tls_ciphers};
+  $tls->{SSL_key_file}       = $args->{tls_key}       if $args->{tls_key};
+  $tls->{SSL_server}         = $args->{server}        if $args->{server};
+  $tls->{SSL_verify_mode}    = $args->{tls_verify}    if defined $args->{tls_verify};
+  $tls->{SSL_version}        = $args->{tls_version}   if $args->{tls_version};
 
   if ($args->{server}) {
     $tls->{SSL_cert_file} ||= $CERT;
     $tls->{SSL_key_file}  ||= $KEY;
   }
   else {
-    $tls->{SSL_hostname}
-      = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
+    $tls->{SSL_hostname}      = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
     $tls->{SSL_verifycn_name} = $args->{address};
   }
 
@@ -122,8 +114,7 @@ L<Mojo::IOLoop::TLS> negotiates TLS for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::TLS> inherits all events from L<Mojo::EventEmitter> and can
-emit the following new ones.
+L<Mojo::IOLoop::TLS> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 upgrade
 
@@ -152,13 +143,12 @@ L<Mojo::IOLoop::TLS> implements the following attributes.
   my $reactor = $tls->reactor;
   $tls        = $tls->reactor(Mojo::Reactor::Poll->new);
 
-Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
+Low-level event reactor, defaults to the C<reactor> attribute value of the global L<Mojo::IOLoop> singleton. Note that
+this attribute is weakened.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::TLS> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::IOLoop::TLS> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 can_tls
 
@@ -194,8 +184,7 @@ Path to TLS certificate authority file.
   tls_cert => '/etc/tls/server.crt'
   tls_cert => {'mojolicious.org' => '/etc/tls/mojo.crt'}
 
-Path to the TLS cert file, defaults to a built-in test certificate on the
-server-side.
+Path to the TLS cert file, defaults to a built-in test certificate on the server-side.
 
 =item tls_ciphers
 

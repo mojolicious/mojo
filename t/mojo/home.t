@@ -34,8 +34,7 @@ use Mojo::Home;
 # Specific class detection (with "blib/lib")
 {
   my $fake = path->to_abs->child('does_not_exist_3');
-  local $INC{'My/Class.pm'}
-    = $fake->child('blib', 'lib', 'My', 'Class.pm')->to_string;
+  local $INC{'My/Class.pm'} = $fake->child('blib', 'lib', 'My', 'Class.pm')->to_string;
   my $home = Mojo::Home->new->detect('My::Class');
   is_deeply $home->to_array, $fake->to_array, 'right path detected';
 }

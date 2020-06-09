@@ -259,10 +259,9 @@ sleep 1 while _port($port2);
 
 # Check log
 $log = $log->slurp;
-like $log, qr/Worker \d+ started/, 'right message';
-like $log, qr/Starting zero downtime software upgrade \(180 seconds\)/,
-  'right message';
-like $log, qr/Upgrade successful, stopping $old/, 'right message';
+like $log, qr/Worker \d+ started/,                                      'right message';
+like $log, qr/Starting zero downtime software upgrade \(180 seconds\)/, 'right message';
+like $log, qr/Upgrade successful, stopping $old/,                       'right message';
 
 sub _pid {
   return undef unless open my $file, '<', $dir->child('hypnotoad.pid');

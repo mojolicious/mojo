@@ -48,13 +48,11 @@ L<Mojo::Cache> implements the following attributes.
   my $max = $cache->max_keys;
   $cache  = $cache->max_keys(50);
 
-Maximum number of cache keys, defaults to C<100>. Setting the value to C<0>
-will disable caching.
+Maximum number of cache keys, defaults to C<100>. Setting the value to C<0> will disable caching.
 
 =head1 METHODS
 
-L<Mojo::Cache> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Cache> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 get
 

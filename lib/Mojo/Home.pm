@@ -47,16 +47,14 @@ L<Mojo::Home> is a container for home directories based on L<Mojo::File>.
 
 =head1 METHODS
 
-L<Mojo::Home> inherits all methods from L<Mojo::File> and implements the
-following new ones.
+L<Mojo::Home> inherits all methods from L<Mojo::File> and implements the following new ones.
 
 =head2 detect
 
   $home = $home->detect;
   $home = $home->detect('My::App');
 
-Detect home directory from the value of the C<MOJO_HOME> environment variable or
-the location of the application class.
+Detect home directory from the value of the C<MOJO_HOME> environment variable or the location of the application class.
 
 =head2 rel_file
 

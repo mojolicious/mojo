@@ -16,15 +16,13 @@ sub run {
   my $class = $full ? $name : "Mojolicious::Plugin::$name";
   my $dir   = join '-', split('::', $class);
   my $app   = class_to_path $class;
-  $self->render_to_rel_file('class', "$dir/lib/$app",
-    {class => $class, name => $name});
+  $self->render_to_rel_file('class', "$dir/lib/$app", {class => $class, name => $name});
 
   # Test
   $self->render_to_rel_file('test', "$dir/t/basic.t", {name => $name});
 
   # Makefile
-  $self->render_to_rel_file('makefile', "$dir/Makefile.PL",
-    {class => $class, path => $app});
+  $self->render_to_rel_file('makefile', "$dir/Makefile.PL", {class => $class, path => $app});
 }
 
 1;
@@ -49,19 +47,18 @@ Mojolicious::Command::Author::generate::plugin - Plugin generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::Author::generate::plugin> generates directory structures
-for fully functional L<Mojolicious> plugins.
+L<Mojolicious::Command::Author::generate::plugin> generates directory structures for fully functional L<Mojolicious>
+plugins.
 
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
+This is a core command, that means it is always enabled and its code a good example for learning to build new commands,
+you're welcome to fork it.
 
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::Author::generate::plugin> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::Author::generate::plugin> inherits all attributes from L<Mojolicious::Command> and implements
+the following new ones.
 
 =head2 description
 
@@ -79,8 +76,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::Author::generate::plugin> inherits all methods from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::Author::generate::plugin> inherits all methods from L<Mojolicious::Command> and implements the
+following new ones.
 
 =head2 run
 

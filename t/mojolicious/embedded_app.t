@@ -56,8 +56,7 @@ $t->get_ok('/x/1/secondary')->status_is(200)->content_is(22);
 $t->get_ok('/x/1')->status_is(200)->content_is('too%21');
 
 # Static file from external app
-$t->get_ok('/x/1/index.html')->status_is(200)
-  ->content_is("External static file!\n");
+$t->get_ok('/x/1/index.html')->status_is(200)->content_is("External static file!\n");
 
 # External app with different prefix
 $t->get_ok('/x/1/test')->status_is(200)->content_is('works%21');
@@ -66,35 +65,28 @@ $t->get_ok('/x/1/test')->status_is(200)->content_is('works%21');
 $t->get_ok('/x/♥')->status_is(200)->content_is('too%21');
 
 # Static file from external app with Unicode prefix
-$t->get_ok('/x/♥/index.html')->status_is(200)
-  ->content_is("External static file!\n");
+$t->get_ok('/x/♥/index.html')->status_is(200)->content_is("External static file!\n");
 
 # External app with Unicode prefix again
 $t->get_ok('/x/♥/test')->status_is(200)->content_is('works%21');
 
 # External app with domain
-$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
-  ->content_is('too%21');
+$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)->content_is('too%21');
 
 # Static file from external app with domain
-$t->get_ok('/index.html' => {Host => 'mojolicious.org'})->status_is(200)
-  ->content_is("External static file!\n");
+$t->get_ok('/index.html' => {Host => 'mojolicious.org'})->status_is(200)->content_is("External static file!\n");
 
 # External app with domain again
-$t->get_ok('/test' => {Host => 'mojolicious.org'})->status_is(200)
-  ->content_is('works%21');
+$t->get_ok('/test' => {Host => 'mojolicious.org'})->status_is(200)->content_is('works%21');
 
 # External app with a bit of everything
-$t->get_ok('/♥/123/' => {Host => 'test.foo-bar.de'})->status_is(200)
-  ->content_is('too%21');
+$t->get_ok('/♥/123/' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is('too%21');
 
 # Static file from external app with a bit of everything
-$t->get_ok('/♥/123/index.html' => {Host => 'test.foo-bar.de'})
-  ->status_is(200)->content_is("External static file!\n");
+$t->get_ok('/♥/123/index.html' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is("External static file!\n");
 
 # External app with a bit of everything again
-$t->get_ok('/♥/123/test' => {Host => 'test.foo-bar.de'})->status_is(200)
-  ->content_is('works%21');
+$t->get_ok('/♥/123/test' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is('works%21');
 
 done_testing();
 

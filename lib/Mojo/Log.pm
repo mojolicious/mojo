@@ -39,10 +39,7 @@ sub append {
 
 sub debug { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
 
-sub context {
-  my ($self, $str) = @_;
-  return $self->new(parent => $self, context => $str, level => $self->level);
-}
+sub context { $_[0]->new(parent => $_[0], context => $_[1], level => $_[0]->level) }
 
 sub error { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
 sub fatal { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
@@ -61,8 +58,8 @@ sub warn { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn') : $_[0] }
 sub _default {
   my ($time, $level) = (shift, shift);
   my ($s, $m, $h, $day, $month, $year) = localtime $time;
-  $time = sprintf '%04d-%02d-%02d %02d:%02d:%08.5f', $year + 1900, $month + 1,
-    $day, $h, $m, "$s." . ((split /\./, $time)[1] // 0);
+  $time = sprintf '%04d-%02d-%02d %02d:%02d:%08.5f', $year + 1900, $month + 1, $day, $h, $m,
+    "$s." . ((split /\./, $time)[1] // 0);
   return "[$time] [$$] [$level] " . join "\n", @_, '';
 }
 
@@ -121,8 +118,7 @@ L<Mojo::Log> is a simple logger for L<Mojo> projects.
 
 =head1 EVENTS
 
-L<Mojo::Log> inherits all events from L<Mojo::EventEmitter> and can emit the
-following new ones.
+L<Mojo::Log> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 message
 
@@ -159,8 +155,7 @@ A callback for formatting log messages.
   my $handle = $log->handle;
   $log       = $log->handle(IO::Handle->new);
 
-Log filehandle used by default L</"message"> event, defaults to opening
-L</"path"> or C<STDERR>.
+Log filehandle used by default L</"message"> event, defaults to opening L</"path"> or C<STDERR>.
 
 =head2 history
 
@@ -174,8 +169,8 @@ The last few logged messages.
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level, defaults to C<debug>. Available log levels are C<debug>,
-C<info>, C<warn>, C<error> and C<fatal>, in that order.
+Active log level, defaults to C<debug>. Available log levels are C<debug>, C<info>, C<warn>, C<error> and C<fatal>, in
+that order.
 
 =head2 max_history_size
 
@@ -196,13 +191,12 @@ Log file path used by L</"handle">.
   my $bool = $log->short;
   $log     = $log->short($bool);
 
-Generate short log messages without a timestamp, suitable for systemd, defaults
-to the value of the C<MOJO_LOG_SHORT> environment variables.
+Generate short log messages without a timestamp, suitable for systemd, defaults to the value of the C<MOJO_LOG_SHORT>
+environment variables.
 
 =head1 METHODS
 
-L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements the
-following new ones.
+L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 append
 
@@ -214,8 +208,7 @@ Append message to L</"handle">.
 
   my $new = $log->context('[extra] [information]');
 
-Construct a new child L<Mojo::Log> object that will include context information
-with every log message.
+Construct a new child L<Mojo::Log> object that will include context information with every log message.
 
   # Log with context
   my $log = Mojo::Log->new;
@@ -275,8 +268,7 @@ Check active log L</"level">.
   my $log = Mojo::Log->new(level => 'warn');
   my $log = Mojo::Log->new({level => 'warn'});
 
-Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with
-default logger.
+Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with default logger.
 
 =head2 warn
 

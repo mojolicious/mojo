@@ -5,10 +5,8 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::TLS;
 
-plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
-plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
-  unless Mojo::IOLoop::TLS->can_tls;
+plan skip_all => 'set TEST_TLS to enable this test (developer only!)' unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Mojo::IOLoop::TLS->can_tls;
 
 # To regenerate all required certificates run these commands (12.12.2014)
 # openssl genrsa -out ca.key 1024
@@ -31,10 +29,9 @@ plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
 use Mojo::IOLoop;
 
 # Built-in certificate (and upgraded string)
-my $loop  = Mojo::IOLoop->new;
-my $delay = $loop->delay;
-my $upgraded
-  = "\x01\x00\x00\x00\x00\x00\xD0\x00\x0A\x00\x0B\x00\x00\x00\x84\x0B";
+my $loop     = Mojo::IOLoop->new;
+my $delay    = $loop->delay;
+my $upgraded = "\x01\x00\x00\x00\x00\x00\xD0\x00\x0A\x00\x0B\x00\x00\x00\x84\x0B";
 utf8::upgrade $upgraded;
 my ($server, $client);
 my $end = $delay->begin;

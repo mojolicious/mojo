@@ -78,32 +78,29 @@ is $c->param(foo => qw(just works))->param('foo'), 'works', 'right value';
 is_deeply $c->every_param('foo'), [qw(just works)], 'right values';
 is_deeply $c->every_param('bar'), [], 'no values';
 is $c->param(foo => undef)->param('foo'), undef, 'no value';
-is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name,
-  'bar', 'right value';
+is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name, 'bar', 'right value';
 is $c->param(foo => ['ba;r', 'baz'])->param('foo'), 'baz', 'right value';
 is_deeply $c->every_param('foo'), ['ba;r', 'baz'], 'right values';
 
 # Reserved stash values are hidden
 $c = $app->build_controller;
-is $c->param(action => 'test')->param('action'), undef, 'value is reserved';
-is $c->param(app    => 'test')->param('app'),    undef, 'value is reserved';
-is $c->param(cb     => 'test')->param('cb'),     undef, 'value is reserved';
-is $c->param(controller => 'test')->param('controller'), undef,
-  'value is reserved';
-is $c->param(data    => 'test')->param('data'),    undef, 'value is reserved';
-is $c->param(extends => 'test')->param('extends'), undef, 'value is reserved';
-is $c->param(format  => 'test')->param('format'),  undef, 'value is reserved';
-is $c->param(handler => 'test')->param('handler'), undef, 'value is reserved';
-is $c->param(inline  => 'test')->param('inline'),  undef, 'value is reserved';
-is $c->param(json    => 'test')->param('json'),    undef, 'value is reserved';
-is $c->param(layout  => 'test')->param('layout'),  undef, 'value is reserved';
-is $c->param(namespace => 'test')->param('namespace'), undef,
-  'value is reserved';
-is $c->param(path     => 'test')->param('path'),     undef, 'value is reserved';
-is $c->param(status   => 'test')->param('status'),   undef, 'value is reserved';
-is $c->param(template => 'test')->param('template'), undef, 'value is reserved';
-is $c->param(text     => 'test')->param('text'),     undef, 'value is reserved';
-is $c->param(variant  => 'test')->param('variant'),  undef, 'value is reserved';
+is $c->param(action     => 'test')->param('action'),     undef, 'value is reserved';
+is $c->param(app        => 'test')->param('app'),        undef, 'value is reserved';
+is $c->param(cb         => 'test')->param('cb'),         undef, 'value is reserved';
+is $c->param(controller => 'test')->param('controller'), undef, 'value is reserved';
+is $c->param(data       => 'test')->param('data'),       undef, 'value is reserved';
+is $c->param(extends    => 'test')->param('extends'),    undef, 'value is reserved';
+is $c->param(format     => 'test')->param('format'),     undef, 'value is reserved';
+is $c->param(handler    => 'test')->param('handler'),    undef, 'value is reserved';
+is $c->param(inline     => 'test')->param('inline'),     undef, 'value is reserved';
+is $c->param(json       => 'test')->param('json'),       undef, 'value is reserved';
+is $c->param(layout     => 'test')->param('layout'),     undef, 'value is reserved';
+is $c->param(namespace  => 'test')->param('namespace'),  undef, 'value is reserved';
+is $c->param(path       => 'test')->param('path'),       undef, 'value is reserved';
+is $c->param(status     => 'test')->param('status'),     undef, 'value is reserved';
+is $c->param(template   => 'test')->param('template'),   undef, 'value is reserved';
+is $c->param(text       => 'test')->param('text'),       undef, 'value is reserved';
+is $c->param(variant    => 'test')->param('variant'),    undef, 'value is reserved';
 
 # Controller with application and routes
 $c = $app->controller_class('Test::Controller')->build_controller;

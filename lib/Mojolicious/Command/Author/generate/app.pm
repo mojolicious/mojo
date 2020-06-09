@@ -24,8 +24,7 @@ sub run {
   # Controller
   my $controller = "${class}::Controller::Example";
   my $path       = class_to_path $controller;
-  $self->render_to_rel_file('controller', "$name/lib/$path",
-    {class => $controller});
+  $self->render_to_rel_file('controller', "$name/lib/$path", {class => $controller});
 
   # Test
   $self->render_to_rel_file('test', "$name/t/basic.t", {class => $class});
@@ -34,10 +33,8 @@ sub run {
   $self->render_to_rel_file('static', "$name/public/index.html");
 
   # Templates
-  $self->render_to_rel_file('layout',
-    "$name/templates/layouts/default.html.ep");
-  $self->render_to_rel_file('welcome',
-    "$name/templates/example/welcome.html.ep");
+  $self->render_to_rel_file('layout',  "$name/templates/layouts/default.html.ep");
+  $self->render_to_rel_file('welcome', "$name/templates/example/welcome.html.ep");
 }
 
 1;
@@ -60,19 +57,18 @@ Mojolicious::Command::Author::generate::app - App generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::Author::generate::app> generates application directory
-structures for fully functional L<Mojolicious> applications.
+L<Mojolicious::Command::Author::generate::app> generates application directory structures for fully functional
+L<Mojolicious> applications.
 
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
+This is a core command, that means it is always enabled and its code a good example for learning to build new commands,
+you're welcome to fork it.
 
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::Author::generate::app> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::Author::generate::app> inherits all attributes from L<Mojolicious::Command> and implements the
+following new ones.
 
 =head2 description
 
@@ -90,8 +86,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::Author::generate::app> inherits all methods from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::Author::generate::app> inherits all methods from L<Mojolicious::Command> and implements the
+following new ones.
 
 =head2 run
 

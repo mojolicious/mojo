@@ -93,8 +93,7 @@ Mojo::Server::PSGI - PSGI server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::PSGI> allows L<Mojolicious> applications to run on all L<PSGI>
-compatible servers.
+L<Mojo::Server::PSGI> allows L<Mojolicious> applications to run on all L<PSGI> compatible servers.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
@@ -108,8 +107,7 @@ L<Mojo::Server::PSGI> inherits all attributes from L<Mojo::Server>.
 
 =head1 METHODS
 
-L<Mojo::Server::PSGI> inherits all methods from L<Mojo::Server> and implements
-the following new ones.
+L<Mojo::Server::PSGI> inherits all methods from L<Mojo::Server> and implements the following new ones.
 
 =head2 run
 

@@ -91,8 +91,8 @@ Mojo::ByteStream - ByteStream
 
 =head1 DESCRIPTION
 
-L<Mojo::ByteStream> is a scalar-based container for bytestreams that provides a
-more friendly API for many of the functions in L<Mojo::Util>.
+L<Mojo::ByteStream> is a scalar-based container for bytestreams that provides a more friendly API for many of the
+functions in L<Mojo::Util>.
 
   # Access scalar directly to manipulate bytestream
   my $stream = Mojo::ByteStream->new('foo');
@@ -100,8 +100,7 @@ more friendly API for many of the functions in L<Mojo::Util>.
 
 =head1 FUNCTIONS
 
-L<Mojo::ByteStream> implements the following functions, which can be imported
-individually.
+L<Mojo::ByteStream> implements the following functions, which can be imported individually.
 
 =head2 b
 
@@ -201,9 +200,8 @@ Unescape all HTML entities in bytestream with L<Mojo::Util/"html_unescape">.
 
   $stream = $stream->humanize_bytes;
 
-Turn number of bytes into a simplified human readable format for bytestream with
-L<Mojo::Util/"humanize_bytes">. Note that this method is B<EXPERIMENTAL> and
-might change without warning!
+Turn number of bytes into a simplified human readable format for bytestream with L<Mojo::Util/"humanize_bytes">. Note
+that this method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 md5_bytes
 
@@ -284,8 +282,7 @@ Generate URL slug for bytestream with L<Mojo::Util/"slugify">.
   my $collection = $stream->split(',');
   my $collection = $stream->split(',', -1);
 
-Turn bytestream into L<Mojo::Collection> object containing L<Mojo::ByteStream>
-objects.
+Turn bytestream into L<Mojo::Collection> object containing L<Mojo::ByteStream> objects.
 
   # "One,Two,Three"
   b("one,two,three")->split(',')->map('camelize')->join(',');
@@ -318,8 +315,7 @@ Stringify bytestream.
 
   $stream = $stream->trim;
 
-Trim whitespace characters from both ends of bytestream with
-L<Mojo::Util/"trim">.
+Trim whitespace characters from both ends of bytestream with L<Mojo::Util/"trim">.
 
 =head2 unindent
 
@@ -338,8 +334,7 @@ Unquote bytestream with L<Mojo::Util/"unquote">.
   $stream = $stream->url_escape;
   $stream = $stream->url_escape('^A-Za-z0-9\-._~');
 
-Percent encode all unsafe characters in bytestream with
-L<Mojo::Util/"url_escape">.
+Percent encode all unsafe characters in bytestream with L<Mojo::Util/"url_escape">.
 
   # "%E2%98%83"
   b('☃')->encode->url_escape;
@@ -348,8 +343,7 @@ L<Mojo::Util/"url_escape">.
 
   $stream = $stream->url_unescape;
 
-Decode percent encoded characters in bytestream with
-L<Mojo::Util/"url_unescape">.
+Decode percent encoded characters in bytestream with L<Mojo::Util/"url_unescape">.
 
   # "&lt;html&gt;"
   b('%3Chtml%3E')->url_unescape->xml_escape;
@@ -366,8 +360,7 @@ Alias for L<Mojo::Base/"with_roles">.
 
   $stream = $stream->xml_escape;
 
-Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in
-bytestream with L<Mojo::Util/"xml_escape">.
+Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in bytestream with L<Mojo::Util/"xml_escape">.
 
 =head2 xor_encode
 

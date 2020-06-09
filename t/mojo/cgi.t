@@ -34,8 +34,7 @@ get '/params' => sub {
 
 get '/proxy' => sub {
   my $c       = shift;
-  my $reverse = join ':', $c->tx->remote_address,
-    $c->req->url->to_abs->protocol;
+  my $reverse = join ':', $c->tx->remote_address, $c->req->url->to_abs->protocol;
   $c->render(text => $reverse);
 };
 
@@ -60,10 +59,9 @@ subtest 'Simple' => sub {
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
   is $res->code, 200, 'right status';
-  is $res->headers->status,         '200 OK', 'right "Status" value';
-  is $res->headers->content_length, 21,       'right "Content-Length" value';
-  is $res->headers->content_type,   'text/html;charset=UTF-8',
-    'right "Content-Type" value';
+  is $res->headers->status,         '200 OK',                  'right "Status" value';
+  is $res->headers->content_length, 21,                        'right "Content-Length" value';
+  is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
   is $res->body, 'Your Mojo is working!', 'right content';
 };
 
@@ -82,10 +80,9 @@ subtest 'HEAD request' => sub {
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
   is $res->code, 200, 'right status';
-  is $res->headers->status,         '200 OK', 'right "Status" value';
-  is $res->headers->content_length, 21,       'right "Content-Length" value';
-  is $res->headers->content_type,   'text/html;charset=UTF-8',
-    'right "Content-Type" value';
+  is $res->headers->status,         '200 OK',                  'right "Status" value';
+  is $res->headers->content_length, 21,                        'right "Content-Length" value';
+  is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
   is $res->body, '', 'no content';
 };
 
@@ -100,15 +97,13 @@ subtest 'Non-parsed headers' => sub {
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  is(Mojolicious::Command::cgi->new(app => app)->run('--nph'),
-    200, 'right status');
+  is(Mojolicious::Command::cgi->new(app => app)->run('--nph'), 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse($msg);
   is $res->code, 200, 'right status';
-  is $res->headers->status,         undef, 'no "Status" value';
-  is $res->headers->content_length, 21,    'right "Content-Length" value';
-  is $res->headers->content_type,   'text/html;charset=UTF-8',
-    'right "Content-Type" value';
+  is $res->headers->status,         undef,                     'no "Status" value';
+  is $res->headers->content_length, 21,                        'right "Content-Length" value';
+  is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
   is $res->body, 'Your Mojo is working!', 'right content';
 };
 
@@ -153,10 +148,9 @@ subtest 'Parameters' => sub {
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
   is $res->code, 200, 'right status';
-  is $res->headers->status, '200 OK', 'right "Status" value';
-  is $res->headers->content_type, 'application/json;charset=UTF-8',
-    'right "Content-Type" value';
-  is $res->headers->content_length, 27, 'right "Content-Length" value';
+  is $res->headers->status,         '200 OK',                         'right "Status" value';
+  is $res->headers->content_type,   'application/json;charset=UTF-8', 'right "Content-Type" value';
+  is $res->headers->content_length, 27,                               'right "Content-Length" value';
   is $res->json->{lalala}, 23,    'right value';
   is $res->json->{bar},    'baz', 'right value';
 };
@@ -179,10 +173,9 @@ subtest 'Reverse proxy' => sub {
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
   is $res->code, 200, 'right status';
-  is $res->headers->status,         '200 OK', 'right "Status" value';
-  is $res->headers->content_length, 15,       'right "Content-Length" value';
-  is $res->headers->content_type,   'text/html;charset=UTF-8',
-    'right "Content-Type" value';
+  is $res->headers->status,         '200 OK',                  'right "Status" value';
+  is $res->headers->content_length, 15,                        'right "Content-Length" value';
+  is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
   is $res->body, '192.0.2.1:https', 'right content';
 };
 

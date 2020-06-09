@@ -12,8 +12,7 @@ sub import {
   $ENV{MOJO_EXE} ||= (caller)[1];
 
   # Reuse home directory if possible
-  local $ENV{MOJO_HOME} = path($ENV{MOJO_EXE})->dirname->to_string
-    unless $ENV{MOJO_HOME};
+  local $ENV{MOJO_HOME} = path($ENV{MOJO_EXE})->dirname->to_string unless $ENV{MOJO_HOME};
 
   # Initialize application class
   my $caller = caller;
@@ -31,7 +30,7 @@ sub import {
   # The Mojolicious::Lite DSL
   my $root = $routes;
   for my $name (qw(any get options patch post put websocket)) {
-    monkey_patch $caller, $name, sub { $routes->$name(@_) };
+    monkey_patch $caller, $name, sub { $routes->$name(@_) }
   }
   monkey_patch($caller, $_, sub {$app}) for qw(new app);
   monkey_patch $caller, del   => sub { $routes->delete(@_) };
@@ -79,11 +78,11 @@ Mojolicious::Lite - Micro real-time web framework
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Lite> is a tiny domain specific language built around
-L<Mojolicious>, made up of only about a dozen Perl functions.
+L<Mojolicious::Lite> is a tiny domain specific language built around L<Mojolicious>, made up of only about a dozen Perl
+functions.
 
-On Perl 5.20+ you can also use a C<-signatures> flag to enable support for
-L<subroutine signatures|perlsub/"Signatures">.
+On Perl 5.20+ you can also use a C<-signatures> flag to enable support for L<subroutine
+signatures|perlsub/"Signatures">.
 
   use Mojolicious::Lite -signatures;
 
@@ -98,10 +97,9 @@ See L<Mojolicious::Guides::Tutorial> for more!
 
 =head1 GROWING
 
-While L<Mojolicious::Guides::Growing> will give you a detailed introduction to
-growing a L<Mojolicious::Lite> prototype into a well-structured L<Mojolicious>
-application, here we have collected a few snippets that illustrate very well
-just how similar both of them are.
+While L<Mojolicious::Guides::Growing> will give you a detailed introduction to growing a L<Mojolicious::Lite> prototype
+into a well-structured L<Mojolicious> application, here we have collected a few snippets that illustrate very well just
+how similar both of them are.
 
 =head2 Routes
 
@@ -126,8 +124,8 @@ The functions L</"get">, L</"post"> and friends all have equivalent methods.
 
 =head2 Application
 
-The application object you can access with the function L</"app"> is the first
-argument passed to the C<startup> method.
+The application object you can access with the function L</"app"> is the first argument passed to the C<startup>
+method.
 
   # Mojolicious::Lite
   app->max_request_size(16777216);
@@ -140,8 +138,7 @@ argument passed to the C<startup> method.
 
 =head2 Plugins
 
-Instead of the L</"plugin"> function you just use the method
-L<Mojolicious/"plugin">.
+Instead of the L</"plugin"> function you just use the method L<Mojolicious/"plugin">.
 
   # Mojolicious::Lite
   plugin 'Config';
@@ -154,8 +151,7 @@ L<Mojolicious/"plugin">.
 
 =head2 Helpers
 
-Similar to plugins, instead of the L</"helper"> function you just use the method
-L<Mojolicious/"helper">.
+Similar to plugins, instead of the L</"helper"> function you just use the method L<Mojolicious/"helper">.
 
   # Mojolicious::Lite
   helper two => sub {
@@ -174,8 +170,8 @@ L<Mojolicious/"helper">.
 
 =head2 Under
 
-Instead of sequential function calls, we can use methods to build a tree with
-nested routes, that much better illustrates how routes work internally.
+Instead of sequential function calls, we can use methods to build a tree with nested routes, that much better
+illustrates how routes work internally.
 
   # Mojolicious::Lite
   under '/foo';
@@ -192,8 +188,7 @@ nested routes, that much better illustrates how routes work internally.
 
 =head1 FUNCTIONS
 
-L<Mojolicious::Lite> implements the following functions, which are
-automatically exported.
+L<Mojolicious::Lite> implements the following functions, which are automatically exported.
 
 =head2 any
 
@@ -206,16 +201,14 @@ automatically exported.
   my $route = any
     ['GET', 'POST'] => '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the
-listed HTTP request methods or all. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the listed HTTP request methods or all. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 app
 
   my $app = app;
 
-Returns the L<Mojolicious::Lite> application object, which is a subclass of
-L<Mojolicious>.
+Returns the L<Mojolicious::Lite> application object, which is a subclass of L<Mojolicious>.
 
   # Use all the available attributes and methods
   app->log->level('error');
@@ -229,9 +222,8 @@ L<Mojolicious>.
   my $route = del '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = del '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"delete">, matching only
-C<DELETE> requests. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"delete">, matching only C<DELETE> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 get
 
@@ -241,9 +233,8 @@ L<Mojolicious::Guides::Routing> for more information.
   my $route = get '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = get '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET>
-requests. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 group
 
@@ -271,9 +262,8 @@ Share code with L<Mojolicious/"hook">.
   my $route = options '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = options '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"options">, matching only
-C<OPTIONS> requests. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"options">, matching only C<OPTIONS> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 patch
 
@@ -283,9 +273,8 @@ L<Mojolicious::Guides::Routing> for more information.
   my $route = patch '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = patch '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"patch">, matching only
-C<PATCH> requests. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"patch">, matching only C<PATCH> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 plugin
 
@@ -301,9 +290,8 @@ Load a plugin with L<Mojolicious/"plugin">.
   my $route = post '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = post '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"post">, matching only C<POST>
-requests. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"post">, matching only C<POST> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 put
 
@@ -313,9 +301,8 @@ L<Mojolicious::Guides::Routing> for more information.
   my $route = put '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = put '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT>
-requests. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 under
 
@@ -326,10 +313,8 @@ L<Mojolicious::Guides::Routing> for more information.
   my $route = under '/:foo' => (agent => qr/Firefox/);
   my $route = under [format => 0];
 
-Generate nested route with L<Mojolicious::Routes::Route/"under">, to which all
-following routes are automatically appended. See
-L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more
-information.
+Generate nested route with L<Mojolicious::Routes::Route/"under">, to which all following routes are automatically
+appended. See L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 websocket
 
@@ -339,9 +324,8 @@ information.
   my $route = websocket '/:foo' => [foo => qr/\w+/] => sub {...};
   my $route = websocket '/:foo' => (agent => qr/Firefox/) => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"websocket">, matching only
-WebSocket handshakes. See L<Mojolicious::Guides::Tutorial> and
-L<Mojolicious::Guides::Routing> for more information.
+Generate route with L<Mojolicious::Routes::Route/"websocket">, matching only WebSocket handshakes. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head1 ATTRIBUTES
 

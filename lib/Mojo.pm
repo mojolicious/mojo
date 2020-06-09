@@ -48,11 +48,9 @@ Mojo - Web development toolkit
 
 =head1 DESCRIPTION
 
-A powerful web development toolkit, with all the basic tools and helpers needed
-to write simple web applications and higher level web frameworks, such as
-L<Mojolicious>. Some of the most commonly used tools are L<Mojo::UserAgent>,
-L<Mojo::DOM>, L<Mojo::JSON>, L<Mojo::Server::Daemon>, L<Mojo::Server::Prefork>,
-L<Mojo::IOLoop> and L<Mojo::Template>.
+A powerful web development toolkit, with all the basic tools and helpers needed to write simple web applications and
+higher level web frameworks, such as L<Mojolicious>. Some of the most commonly used tools are L<Mojo::UserAgent>,
+L<Mojo::DOM>, L<Mojo::JSON>, L<Mojo::Server::Daemon>, L<Mojo::Server::Prefork>, L<Mojo::IOLoop> and L<Mojo::Template>.
 
 See L<Mojolicious::Guides> for more!
 

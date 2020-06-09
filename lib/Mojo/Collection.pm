@@ -93,7 +93,7 @@ sub sort {
 
 sub tail {
   my ($self, $size) = @_;
-  return $self->new(@$self) if $size > @$self;
+  return $self->new(@$self)                                     if $size > @$self;
   return $self->new(@$self[($#$self - ($size - 1)) .. $#$self]) if $size >= 0;
   return $self->new(@$self[(0 - $size) .. $#$self]);
 }
@@ -155,8 +155,7 @@ L<Mojo::Collection> is an array-based container for collections.
 
 =head1 FUNCTIONS
 
-L<Mojo::Collection> implements the following functions, which can be imported
-individually.
+L<Mojo::Collection> implements the following functions, which can be imported individually.
 
 =head2 c
 
@@ -178,8 +177,7 @@ Alias for L</"to_array">.
 
   my $new = $collection->compact;
 
-Create a new collection with all elements that are defined and not an empty
-string.
+Create a new collection with all elements that are defined and not an empty string.
 
   # "0, 1, 2, 3"
   c(0, 1, undef, 2, '', 3)->compact->join(', ');
@@ -189,9 +187,8 @@ string.
   my @elements = $collection->each;
   $collection  = $collection->each(sub {...});
 
-Evaluate callback for each element in collection, or return all elements as a
-list if none has been provided. The element will be the first argument passed
-to the callback, and is also available as C<$_>.
+Evaluate callback for each element in collection, or return all elements as a list if none has been provided. The
+element will be the first argument passed to the callback, and is also available as C<$_>.
 
   # Make a numbered list
   $collection->each(sub {
@@ -207,9 +204,8 @@ to the callback, and is also available as C<$_>.
   my $first = $collection->first('some_method');
   my $first = $collection->first('some_method', @args);
 
-Evaluate regular expression/callback for, or call method on, each element in
-collection and return the first one that matched the regular expression, or for
-which the callback/method returned true. The element will be the first argument
+Evaluate regular expression/callback for, or call method on, each element in collection and return the first one that
+matched the regular expression, or for which the callback/method returned true. The element will be the first argument
 passed to the callback, and is also available as C<$_>.
 
   # Longer version
@@ -225,8 +221,7 @@ passed to the callback, and is also available as C<$_>.
 
   my $new = $collection->flatten;
 
-Flatten nested collections/arrays recursively and create a new collection with
-all elements.
+Flatten nested collections/arrays recursively and create a new collection with all elements.
 
   # "1, 2, 3, 4, 5, 6, 7"
   c(1, [2, [3, 4], 5, [6]], 7)->flatten->join(', ');
@@ -238,11 +233,9 @@ all elements.
   my $new = $collection->grep('some_method');
   my $new = $collection->grep('some_method', @args);
 
-Evaluate regular expression/callback for, or call method on, each element in
-collection and create a new collection with all elements that matched the
-regular expression, or for which the callback/method returned true. The element
-will be the first argument passed to the callback, and is also available as
-C<$_>.
+Evaluate regular expression/callback for, or call method on, each element in collection and create a new collection
+with all elements that matched the regular expression, or for which the callback/method returned true. The element will
+be the first argument passed to the callback, and is also available as C<$_>.
 
   # Longer version
   my $new = $collection->grep(sub { $_->some_method(@args) });
@@ -258,8 +251,8 @@ C<$_>.
   my $new = $collection->head(4);
   my $new = $collection->head(-2);
 
-Create a new collection with up to the specified number of elements from the
-beginning of the collection. A negative number will count from the end.
+Create a new collection with up to the specified number of elements from the beginning of the collection. A negative
+number will count from the end.
 
   # "A B C"
   c('A', 'B', 'C', 'D', 'E')->head(3)->join(' ');
@@ -289,9 +282,8 @@ Return the last element in collection.
   my $new = $collection->map('some_method');
   my $new = $collection->map('some_method', @args);
 
-Evaluate callback for, or call method on, each element in collection and create
-a new collection from the results. The element will be the first argument
-passed to the callback, and is also available as C<$_>.
+Evaluate callback for, or call method on, each element in collection and create a new collection from the results. The
+element will be the first argument passed to the callback, and is also available as C<$_>.
 
   # Longer version
   my $new = $collection->map(sub { $_->some_method(@args) });
@@ -310,11 +302,10 @@ Construct a new array-based L<Mojo::Collection> object.
   my $result = $collection->reduce(sub {...});
   my $result = $collection->reduce(sub {...}, $initial);
 
-Reduce elements in collection with a callback and return its final result,
-setting C<$a> and C<$b> each time the callback is executed. The first time C<$a>
-will be set to an optional initial value or the first element in the collection.
-And from then on C<$a> will be set to the return value of the callback, while
-C<$b> will always be set to the next element in the collection.
+Reduce elements in collection with a callback and return its final result, setting C<$a> and C<$b> each time the
+callback is executed. The first time C<$a> will be set to an optional initial value or the first element in the
+collection. And from then on C<$a> will be set to the return value of the callback, while C<$b> will always be set to
+the next element in the collection.
 
   # Calculate the sum of all values
   my $sum = $collection->reduce(sub { $a + $b });
@@ -345,9 +336,8 @@ Number of elements in collection.
   my $new = $collection->sort;
   my $new = $collection->sort(sub {...});
 
-Sort elements based on return value of a callback and create a new collection
-from the results, setting C<$a> and C<$b> to the elements being compared, each
-time the callback is executed.
+Sort elements based on return value of a callback and create a new collection from the results, setting C<$a> and C<$b>
+to the elements being compared, each time the callback is executed.
 
   # Sort values case-insensitive
   my $case_insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
@@ -357,8 +347,8 @@ time the callback is executed.
   my $new = $collection->tail(4);
   my $new = $collection->tail(-2);
 
-Create a new collection with up to the specified number of elements from the
-end of the collection. A negative number will count from the beginning.
+Create a new collection with up to the specified number of elements from the end of the collection. A negative number
+will count from the beginning.
 
   # "C D E"
   c('A', 'B', 'C', 'D', 'E')->tail(3)->join(' ');
@@ -385,10 +375,8 @@ Turn collection into array reference.
   my $new = $collection->uniq('some_method');
   my $new = $collection->uniq('some_method', @args);
 
-Create a new collection without duplicate elements, using the string
-representation of either the elements or the return value of the
-callback/method to decide uniqueness. Note that C<undef> and empty string are
-treated the same.
+Create a new collection without duplicate elements, using the string representation of either the elements or the
+return value of the callback/method to decide uniqueness. Note that C<undef> and empty string are treated the same.
 
   # Longer version
   my $new = $collection->uniq(sub { $_->some_method(@args) });

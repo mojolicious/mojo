@@ -51,8 +51,7 @@ sub start {
   # Resume
   return unless $self->{handle};
   my $reactor = $self->reactor;
-  return $reactor->watch($self->{handle}, 1, $self->is_writing)
-    if delete $self->{paused};
+  return $reactor->watch($self->{handle}, 1, $self->is_writing) if delete $self->{paused};
 
   weaken $self;
   my $cb = sub { pop() ? $self->_write : $self->_read };
@@ -65,11 +64,7 @@ sub steal_handle {
   return delete $self->{handle};
 }
 
-sub stop {
-  my $self = shift;
-  $self->reactor->watch($self->{handle}, 0, $self->is_writing)
-    if $self->{handle} && !$self->{paused}++;
-}
+sub stop { $_[0]->reactor->watch($_[0]{handle}, 0, $_[0]->is_writing) if $_[0]{handle} && !$_[0]{paused}++ }
 
 sub timeout {
   my ($self, $timeout) = @_;
@@ -79,16 +74,13 @@ sub timeout {
 
   my $reactor = $self->reactor;
   if ($self->{timer}) {
-    if (!$self->{timeout}) { $reactor->remove(delete $self->{timer}) }
-    else                   { $reactor->again($self->{timer}, $self->{timeout}) }
+    if   (!$self->{timeout}) { $reactor->remove(delete $self->{timer}) }
+    else                     { $reactor->again($self->{timer}, $self->{timeout}) }
   }
   elsif ($self->{timeout}) {
     weaken $self;
-    $self->{timer} = $reactor->timer(
-      $timeout => sub {
-        $self and delete($self->{timer}) and $self->emit('timeout')->close;
-      }
-    );
+    $self->{timer}
+      = $reactor->timer($timeout => sub { $self and delete($self->{timer}) and $self->emit('timeout')->close });
   }
 
   return $self;
@@ -102,8 +94,7 @@ sub write {
   $self->{buffer} .= $chunk;
   if    ($cb)                     { $self->once(drain => $cb) }
   elsif (!length $self->{buffer}) { return $self }
-  $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
-    if $self->{handle};
+  $self->reactor->watch($self->{handle}, !$self->{paused}, 1) if $self->{handle};
 
   return $self;
 }
@@ -131,8 +122,7 @@ sub _write {
   # Handle errors only when reading (to avoid timing problems)
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
-    return undef
-      unless defined(my $written = $handle->syswrite($self->{buffer}));
+    return undef unless defined(my $written = $handle->syswrite($self->{buffer}));
     $self->{written} += $written;
     $self->emit(write => substr($self->{buffer}, 0, $written, ''))->_again;
   }
@@ -184,8 +174,7 @@ L<Mojo::IOLoop::Stream> is a container for I/O streams used by L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Stream> inherits all events from L<Mojo::EventEmitter> and can
-emit the following new ones.
+L<Mojo::IOLoop::Stream> inherits all events from L<Mojo::EventEmitter> and can emit the following new ones.
 
 =head2 close
 
@@ -230,8 +219,7 @@ Emitted if new data arrives on the stream.
     ...
   });
 
-Emitted if the stream has been inactive for too long and will get closed
-automatically.
+Emitted if the stream has been inactive for too long and will get closed automatically.
 
 =head2 write
 
@@ -251,21 +239,19 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
   my $size = $msg->high_water_mark;
   $msg     = $msg->high_water_mark(1024);
 
-Maximum size of L</"write"> buffer in bytes before L</"can_write"> returns
-false, defaults to C<1048576> (1MiB).
+Maximum size of L</"write"> buffer in bytes before L</"can_write"> returns false, defaults to C<1048576> (1MiB).
 
 =head2 reactor
 
   my $reactor = $stream->reactor;
   $stream     = $stream->reactor(Mojo::Reactor::Poll->new);
 
-Low-level event reactor, defaults to the C<reactor> attribute value of the
-global L<Mojo::IOLoop> singleton. Note that this attribute is weakened.
+Low-level event reactor, defaults to the C<reactor> attribute value of the global L<Mojo::IOLoop> singleton. Note that
+this attribute is weakened.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 bytes_read
 
@@ -277,8 +263,7 @@ Number of bytes received.
 
   my $num = $stream->bytes_waiting;
 
-Number of bytes that have been enqueued with L</"write"> and are waiting to be
-written.
+Number of bytes that have been enqueued with L</"write"> and are waiting to be written.
 
 =head2 bytes_written
 
@@ -308,15 +293,13 @@ Close stream gracefully.
 
   my $handle = $stream->handle;
 
-Get handle for stream, usually an L<IO::Socket::IP> or L<IO::Socket::SSL>
-object.
+Get handle for stream, usually an L<IO::Socket::IP> or L<IO::Socket::SSL> object.
 
 =head2 is_readable
 
   my $bool = $stream->is_readable;
 
-Quick non-blocking check if stream is readable, useful for identifying tainted
-sockets.
+Quick non-blocking check if stream is readable, useful for identifying tainted sockets.
 
 =head2 is_writing
 
@@ -353,17 +336,16 @@ Stop watching for new data on the stream.
   my $timeout = $stream->timeout;
   $stream     = $stream->timeout(45);
 
-Maximum amount of time in seconds stream can be inactive before getting closed
-automatically, defaults to C<15>. Setting the value to C<0> will allow this
-stream to be inactive indefinitely.
+Maximum amount of time in seconds stream can be inactive before getting closed automatically, defaults to C<15>.
+Setting the value to C<0> will allow this stream to be inactive indefinitely.
 
 =head2 write
 
   $stream = $stream->write($bytes);
   $stream = $stream->write($bytes => sub {...});
 
-Enqueue data to be written to the stream as soon as possible, the optional drain
-callback will be executed once all data has been written.
+Enqueue data to be written to the stream as soon as possible, the optional drain callback will be executed once all
+data has been written.
 
 =head1 SEE ALSO
 

@@ -17,42 +17,35 @@ is path('/foo/bar'), '/foo/bar', 'same path';
 is path('foo', 'bar', 'baz'), catfile('foo', 'bar', 'baz'), 'same path';
 
 # Tap into method chain
-is path('/home')->tap(sub { $$_ .= '/sri' })->to_string, '/home/sri',
-  'same path';
+is path('/home')->tap(sub { $$_ .= '/sri' })->to_string, '/home/sri', 'same path';
 
 # Children
-is path('foo', 'bar')->child('baz', 'yada'),
-  catfile(catfile('foo', 'bar'), 'baz', 'yada'), 'same path';
+is path('foo', 'bar')->child('baz', 'yada'), catfile(catfile('foo', 'bar'), 'baz', 'yada'), 'same path';
 
 # Siblings
-is path('foo', 'bar')->sibling('baz', 'yada'),
-  catfile(scalar dirname(catfile('foo', 'bar')), 'baz', 'yada'), 'same path';
+is path('foo', 'bar')->sibling('baz', 'yada'), catfile(scalar dirname(catfile('foo', 'bar')), 'baz', 'yada'),
+  'same path';
 
 # Array
-is_deeply path('foo', 'bar')->to_array, [splitdir catfile('foo', 'bar')],
-  'same structure';
-is_deeply [@{path('foo', 'bar')}], [splitdir catfile('foo', 'bar')],
-  'same structure';
+is_deeply path('foo', 'bar')->to_array, [splitdir catfile('foo', 'bar')], 'same structure';
+is_deeply [@{path('foo', 'bar')}], [splitdir catfile('foo', 'bar')], 'same structure';
 
 # Absolute
 is path('file.t')->to_abs, rel2abs('file.t'), 'same path';
 
 # Relative
-is path('test.txt')->to_abs->to_rel(getcwd),
-  abs2rel(rel2abs('test.txt'), getcwd), 'same path';
+is path('test.txt')->to_abs->to_rel(getcwd), abs2rel(rel2abs('test.txt'), getcwd), 'same path';
 
 # Resolved
 is path('.')->realpath, realpath('.'), 'same path';
 
 # Basename
 is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';
-is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'),
-  'same path';
+is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'), 'same path';
 is path('file.t')->basename('.t'), basename('file.t', '.t'), 'same path';
 
 # Dirname
-is path('file.t')->to_abs->dirname, scalar dirname(rel2abs 'file.t'),
-  'same path';
+is path('file.t')->to_abs->dirname, scalar dirname(rel2abs 'file.t'), 'same path';
 
 # Current file
 ok curfile->is_abs, 'path is absolute';
@@ -89,6 +82,20 @@ is $file->spurt('test')->slurp, 'test', 'right result';
 undef $file;
 ok !-f $path, 'file does not exist anymore';
 
+subtest 'Persistent temporary file' => sub {
+  my $dir  = tempdir;
+  my $file = tempfile(DIR => $dir);
+  $file->spurt('works');
+  is $file->slurp, 'works', 'right content';
+  my $file2 = $dir->child('test.txt');
+  $file->move_to($file2);
+  ok -e $file2, 'file exists';
+  ok !-e $file, 'file does not exist anymore';
+  undef $file;
+  is $file2->slurp, 'works', 'right content';
+  ok -e $file2, 'file still exists';
+};
+
 # Open
 $file = tempfile;
 $file->spurt("test\n123\n");
@@ -124,8 +131,7 @@ $dir = tempdir;
 $dir->child('test.txt')->spurt('test!');
 ok -e $dir->child('test.txt'), 'file exists';
 is $dir->child('test.txt')->slurp, 'test!', 'right content';
-ok !-e $dir->child('test.txt')->remove->touch->remove->remove,
-  'file no longer exists';
+ok !-e $dir->child('test.txt')->remove->touch->remove->remove, 'file no longer exists';
 eval { $dir->child('foo')->make_path->remove };
 like $@, qr/^Can't remove file/, 'right error';
 
@@ -134,8 +140,7 @@ $dir = tempdir;
 $dir->child('foo', 'bar')->make_path->child('test.txt')->spurt('test!');
 is $dir->child('foo', 'bar', 'test.txt')->slurp, 'test!', 'right content';
 $subdir = $dir->child('foo', 'foobar')->make_path;
-ok -e $subdir->child('bar')->make_path->child('test.txt')->spurt('test'),
-  'file created';
+ok -e $subdir->child('bar')->make_path->child('test.txt')->spurt('test'), 'file created';
 ok -d $subdir->remove_tree({keep_root => 1}), 'directory still exists';
 ok !-e $subdir->child('bar'), 'children have been removed';
 ok !-e $dir->child('foo')->remove_tree->to_string, 'directory has been removed';
@@ -199,25 +204,18 @@ SKIP: {
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';
 is_deeply curfile->list->to_array, [], 'no files';
 my $lib   = curfile->sibling('lib', 'Mojo');
-my @files = map { path($lib)->child(split '/') } (
-  'DeprecationTest.pm',  'LoaderException.pm',
-  'LoaderException2.pm', 'TestConnectProxy.pm'
-);
+my @files = map { path($lib)->child(split '/') }
+  ('DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm', 'TestConnectProxy.pm');
 is_deeply path($lib)->list->map('to_string')->to_array, \@files, 'right files';
 unshift @files, $lib->child('.hidden.txt')->to_string;
-is_deeply path($lib)->list({hidden => 1})->map('to_string')->to_array, \@files,
-  'right files';
+is_deeply path($lib)->list({hidden => 1})->map('to_string')->to_array, \@files, 'right files';
 @files = map { path($lib)->child(split '/') } (
-  'BaseTest',           'DeprecationTest.pm',
-  'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest',         'Server',
-  'TestConnectProxy.pm'
+  'BaseTest',   'DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm',
+  'LoaderTest', 'Server',             'TestConnectProxy.pm'
 );
-is_deeply path($lib)->list({dir => 1})->map('to_string')->to_array, \@files,
-  'right files';
+is_deeply path($lib)->list({dir => 1})->map('to_string')->to_array, \@files, 'right files';
 my @hidden = map { path($lib)->child(split '/') } '.hidden.txt', '.test';
-is_deeply path($lib)->list({dir => 1, hidden => 1})->map('to_string')->to_array,
-  [@hidden, @files], 'right files';
+is_deeply path($lib)->list({dir => 1, hidden => 1})->map('to_string')->to_array, [@hidden, @files], 'right files';
 
 # List tree
 is_deeply path('does_not_exist')->list_tree->to_array, [], 'no files';
@@ -230,12 +228,9 @@ is_deeply curfile->list_tree->to_array, [], 'no files';
   'LoaderTest/C.pm',    'Server/Morbo/Backend/TestBackend.pm',
   'TestConnectProxy.pm'
 );
-is_deeply path($lib)->list_tree->map('to_string')->to_array, \@files,
-  'right files';
-@hidden = map { path($lib)->child(split '/') } '.hidden.txt',
-  '.test/hidden.txt';
-is_deeply path($lib)->list_tree({hidden => 1})->map('to_string')->to_array,
-  [@hidden, @files], 'right files';
+is_deeply path($lib)->list_tree->map('to_string')->to_array, \@files, 'right files';
+@hidden = map { path($lib)->child(split '/') } '.hidden.txt', '.test/hidden.txt';
+is_deeply path($lib)->list_tree({hidden => 1})->map('to_string')->to_array, [@hidden, @files], 'right files';
 my @all = map { path($lib)->child(split '/') } (
   '.hidden.txt',          '.test',
   '.test/hidden.txt',     'BaseTest',
@@ -248,44 +243,30 @@ my @all = map { path($lib)->child(split '/') } (
   'Server/Morbo/Backend', 'Server/Morbo/Backend/TestBackend.pm',
   'TestConnectProxy.pm'
 );
-is_deeply path($lib)->list_tree({dir => 1, hidden => 1})->map('to_string')
-  ->to_array, [@all], 'right files';
-my @one = map { path($lib)->child(split '/') } (
-  'DeprecationTest.pm',  'LoaderException.pm',
-  'LoaderException2.pm', 'TestConnectProxy.pm'
-);
-is_deeply path($lib)->list_tree({max_depth => 1})->map('to_string')->to_array,
-  [@one], 'right files';
+is_deeply path($lib)->list_tree({dir => 1, hidden => 1})->map('to_string')->to_array, [@all], 'right files';
+my @one = map { path($lib)->child(split '/') }
+  ('DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm', 'TestConnectProxy.pm');
+is_deeply path($lib)->list_tree({max_depth => 1})->map('to_string')->to_array, [@one], 'right files';
 my @one_dir = map { path($lib)->child(split '/') } (
-  'BaseTest',           'DeprecationTest.pm',
-  'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest',         'Server',
-  'TestConnectProxy.pm'
+  'BaseTest',   'DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm',
+  'LoaderTest', 'Server',             'TestConnectProxy.pm'
 );
-is_deeply path($lib)->list_tree({dir => 1, max_depth => 1})->map('to_string')
-  ->to_array, [@one_dir], 'right files';
+is_deeply path($lib)->list_tree({dir => 1, max_depth => 1})->map('to_string')->to_array, [@one_dir], 'right files';
 my @two = map { path($lib)->child(split '/') } (
-  'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
-  'BaseTest/Base3.pm',  'DeprecationTest.pm',
-  'LoaderException.pm', 'LoaderException2.pm',
-  'LoaderTest/A.pm',    'LoaderTest/B.pm',
+  'BaseTest/Base1.pm',  'BaseTest/Base2.pm',   'BaseTest/Base3.pm', 'DeprecationTest.pm',
+  'LoaderException.pm', 'LoaderException2.pm', 'LoaderTest/A.pm',   'LoaderTest/B.pm',
   'LoaderTest/C.pm',    'TestConnectProxy.pm'
 );
-is_deeply path($lib)->list_tree({max_depth => 2})->map('to_string')->to_array,
-  [@two], 'right files';
+is_deeply path($lib)->list_tree({max_depth => 2})->map('to_string')->to_array, [@two], 'right files';
 my @three = map { path($lib)->child(split '/') } (
-  '.hidden.txt',          '.test',
-  '.test/hidden.txt',     'BaseTest',
-  'BaseTest/Base1.pm',    'BaseTest/Base2.pm',
-  'BaseTest/Base3.pm',    'DeprecationTest.pm',
-  'LoaderException.pm',   'LoaderException2.pm',
-  'LoaderTest',           'LoaderTest/A.pm',
-  'LoaderTest/B.pm',      'LoaderTest/C.pm',
-  'Server',               'Server/Morbo',
+  '.hidden.txt',          '.test',               '.test/hidden.txt',  'BaseTest',
+  'BaseTest/Base1.pm',    'BaseTest/Base2.pm',   'BaseTest/Base3.pm', 'DeprecationTest.pm',
+  'LoaderException.pm',   'LoaderException2.pm', 'LoaderTest',        'LoaderTest/A.pm',
+  'LoaderTest/B.pm',      'LoaderTest/C.pm',     'Server',            'Server/Morbo',
   'Server/Morbo/Backend', 'TestConnectProxy.pm'
 );
-is_deeply path($lib)->list_tree({dir => 1, hidden => 1, max_depth => 3})
-  ->map('to_string')->to_array, [@three], 'right files';
+is_deeply path($lib)->list_tree({dir => 1, hidden => 1, max_depth => 3})->map('to_string')->to_array, [@three],
+  'right files';
 
 # Touch
 $dir  = tempdir;

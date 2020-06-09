@@ -40,8 +40,7 @@ my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 my $port   = $daemon->listen(['http://127.0.0.1'])->start->ports->[0];
 
 # CONNECT proxy server for testing
-my $id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
-  {address => '127.0.0.1', port => $port});
+my $id    = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'}, {address => '127.0.0.1', port => $port});
 my $proxy = Mojo::IOLoop->acceptor($id)->port;
 
 # Normal non-blocking request

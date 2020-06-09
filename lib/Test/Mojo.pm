@@ -18,8 +18,7 @@ use Test::More ();
 
 has handler => sub { \&_handler };
 has [qw(message success tx)];
-has ua =>
-  sub { Mojo::UserAgent->new(insecure => 1)->ioloop(Mojo::IOLoop->singleton) };
+has ua => sub { Mojo::UserAgent->new(insecure => 1)->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
@@ -33,81 +32,67 @@ sub app {
 
 sub attr_is {
   my ($self, $selector, $attr, $value, $desc) = @_;
-  $desc = _desc($desc,
-    qq{exact match for attribute "$attr" at selector "$selector"});
+  $desc = _desc($desc, qq{exact match for attribute "$attr" at selector "$selector"});
   return $self->test('is', $self->_attr($selector, $attr), $value, $desc);
 }
 
 sub attr_isnt {
   my ($self, $selector, $attr, $value, $desc) = @_;
-  $desc
-    = _desc($desc, qq{no match for attribute "$attr" at selector "$selector"});
+  $desc = _desc($desc, qq{no match for attribute "$attr" at selector "$selector"});
   return $self->test('isnt', $self->_attr($selector, $attr), $value, $desc);
 }
 
 sub attr_like {
   my ($self, $selector, $attr, $regex, $desc) = @_;
-  $desc = _desc($desc,
-    qq{similar match for attribute "$attr" at selector "$selector"});
+  $desc = _desc($desc, qq{similar match for attribute "$attr" at selector "$selector"});
   return $self->test('like', $self->_attr($selector, $attr), $regex, $desc);
 }
 
 sub attr_unlike {
   my ($self, $selector, $attr, $regex, $desc) = @_;
-  $desc = _desc($desc,
-    qq{no similar match for attribute "$attr" at selector "$selector"});
+  $desc = _desc($desc, qq{no similar match for attribute "$attr" at selector "$selector"});
   return $self->test('unlike', $self->_attr($selector, $attr), $regex, $desc);
 }
 
 sub content_is {
   my ($self, $value, $desc) = @_;
-  return $self->test('is', $self->tx->res->text,
-    $value, _desc($desc, 'exact match for content'));
+  return $self->test('is', $self->tx->res->text, $value, _desc($desc, 'exact match for content'));
 }
 
 sub content_isnt {
   my ($self, $value, $desc) = @_;
-  return $self->test('isnt', $self->tx->res->text,
-    $value, _desc($desc, 'no match for content'));
+  return $self->test('isnt', $self->tx->res->text, $value, _desc($desc, 'no match for content'));
 }
 
 sub content_like {
   my ($self, $regex, $desc) = @_;
-  return $self->test('like', $self->tx->res->text,
-    $regex, _desc($desc, 'content is similar'));
+  return $self->test('like', $self->tx->res->text, $regex, _desc($desc, 'content is similar'));
 }
 
 sub content_type_is {
   my ($self, $type, $desc) = @_;
-  $desc = _desc($desc, "Content-Type: $type");
-  return $self->test('is', $self->tx->res->headers->content_type, $type, $desc);
+  return $self->test('is', $self->tx->res->headers->content_type, $type, _desc($desc, "Content-Type: $type"));
 }
 
 sub content_type_isnt {
   my ($self, $type, $desc) = @_;
-  $desc = _desc($desc, "not Content-Type: $type");
-  return $self->test('isnt', $self->tx->res->headers->content_type, $type,
-    $desc);
+  return $self->test('isnt', $self->tx->res->headers->content_type, $type, _desc($desc, "not Content-Type: $type"));
 }
 
 sub content_type_like {
   my ($self, $regex, $desc) = @_;
-  $desc = _desc($desc, 'Content-Type is similar');
-  return $self->test('like', $self->tx->res->headers->content_type, $regex,
-    $desc);
+  return $self->test('like', $self->tx->res->headers->content_type, $regex, _desc($desc, 'Content-Type is similar'));
 }
 
 sub content_type_unlike {
   my ($self, $regex, $desc) = @_;
   $desc = _desc($desc, 'Content-Type is not similar');
-  return $self->test('unlike', $self->tx->res->headers->content_type, $regex,
-    $desc);
+  return $self->test('unlike', $self->tx->res->headers->content_type, $regex, $desc);
 }
 
 sub content_unlike {
   my ($self, $regex, $desc) = @_;
-  return $self->test('unlike', $self->tx->res->text,
-    $regex, _desc($desc, 'content is not similar'));
+  return $self->test('unlike', $self->tx->res->text, $regex, _desc($desc, 'content is not similar'));
 }
 
 sub delete_ok { shift->_build_ok(DELETE => @_) }
@@ -115,8 +100,7 @@ sub delete_ok { shift->_build_ok(DELETE => @_) }
 sub element_count_is {
   my ($self, $selector, $count, $desc) = @_;
   my $size = $self->tx->res->dom->find($selector)->size;
-  return $self->test('is', $size, $count,
-    _desc($desc, qq{element count for selector "$selector"}));
+  return $self->test('is', $size, $count, _desc($desc, qq{element count for selector "$selector"}));
 }
 
 sub element_exists {
@@ -127,8 +111,7 @@ sub element_exists {
 
 sub element_exists_not {
   my ($self, $selector, $desc) = @_;
-  $desc = _desc($desc, qq{no element for selector "$selector"});
-  return $self->test('ok', !$self->tx->res->dom->at($selector), $desc);
+  return $self->test('ok', !$self->tx->res->dom->at($selector), _desc($desc, qq{no element for selector "$selector"}));
 }
 
 sub finish_ok {
@@ -141,8 +124,7 @@ sub finish_ok {
 sub finished_ok {
   my ($self, $code) = @_;
   Mojo::IOLoop->one_tick while !$self->{finished};
-  Test::More::diag "WebSocket closed with status $self->{finished}[0]"
-    unless my $ok = $self->{finished}[0] == $code;
+  Test::More::diag "WebSocket closed with status $self->{finished}[0]" unless my $ok = $self->{finished}[0] == $code;
   return $self->test('ok', $ok, "WebSocket closed with status $code");
 }
 
@@ -151,58 +133,46 @@ sub head_ok { shift->_build_ok(HEAD => @_) }
 
 sub header_exists {
   my ($self, $name, $desc) = @_;
-  $desc = _desc($desc, qq{header "$name" exists});
-  return $self->test('ok', !!@{$self->tx->res->headers->every_header($name)},
-    $desc);
+  return $self->test('ok', !!@{$self->tx->res->headers->every_header($name)}, _desc($desc, qq{header "$name" exists}));
 }
 
 sub header_exists_not {
   my ($self, $name, $desc) = @_;
-  $desc = _desc($desc, qq{no "$name" header});
-  return $self->test('ok', !@{$self->tx->res->headers->every_header($name)},
-    $desc);
+  return $self->test('ok', !@{$self->tx->res->headers->every_header($name)}, _desc($desc, qq{no "$name" header}));
 }
 
 sub header_is {
   my ($self, $name, $value, $desc) = @_;
-  $desc = _desc($desc, "$name: " . ($value // ''));
-  return $self->test('is', $self->tx->res->headers->header($name), $value,
-    $desc);
+  return $self->test('is', $self->tx->res->headers->header($name), $value, _desc($desc, "$name: " . ($value // '')));
 }
 
 sub header_isnt {
   my ($self, $name, $value, $desc) = @_;
   $desc = _desc($desc, "not $name: " . ($value // ''));
-  return $self->test('isnt', $self->tx->res->headers->header($name), $value,
-    $desc);
+  return $self->test('isnt', $self->tx->res->headers->header($name), $value, $desc);
 }
 
 sub header_like {
   my ($self, $name, $regex, $desc) = @_;
   $desc = _desc($desc, "$name is similar");
-  return $self->test('like', $self->tx->res->headers->header($name), $regex,
-    $desc);
+  return $self->test('like', $self->tx->res->headers->header($name), $regex, $desc);
 }
 
 sub header_unlike {
   my ($self, $name, $regex, $desc) = @_;
-  $desc = _desc($desc, "$name is not similar");
-  return $self->test('unlike', $self->tx->res->headers->header($name), $regex,
-    $desc);
+  return $self->test('unlike', $self->tx->res->headers->header($name), $regex, _desc($desc, "$name is not similar"));
 }
 
 sub json_has {
   my ($self, $p, $desc) = @_;
   $desc = _desc($desc, qq{has value for JSON Pointer "$p"});
-  return $self->test('ok',
-    !!Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
+  return $self->test('ok', !!Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
 
 sub json_hasnt {
   my ($self, $p, $desc) = @_;
   $desc = _desc($desc, qq{has no value for JSON Pointer "$p"});
-  return $self->test('ok',
-    !Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
+  return $self->test('ok', !Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
 
 sub json_is {
@@ -214,45 +184,40 @@ sub json_is {
 
 sub json_like {
   my ($self, $p, $regex, $desc) = @_;
-  return $self->test('like', $self->tx->res->json($p),
-    $regex, _desc($desc, qq{similar match for JSON Pointer "$p"}));
+  return $self->test('like', $self->tx->res->json($p), $regex, _desc($desc, qq{similar match for JSON Pointer "$p"}));
 }
 
 sub json_message_has {
   my ($self, $p, $desc) = @_;
-  $desc = _desc($desc, qq{has value for JSON Pointer "$p"});
-  return $self->test('ok', $self->_json(contains => $p), $desc);
+  return $self->test('ok', $self->_json(contains => $p), _desc($desc, qq{has value for JSON Pointer "$p"}));
 }
 
 sub json_message_hasnt {
   my ($self, $p, $desc) = @_;
-  $desc = _desc($desc, qq{has no value for JSON Pointer "$p"});
-  return $self->test('ok', !$self->_json(contains => $p), $desc);
+  return $self->test('ok', !$self->_json(contains => $p), _desc($desc, qq{has no value for JSON Pointer "$p"}));
 }
 
 sub json_message_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
-  my $desc = _desc(shift, qq{exact match for JSON Pointer "$p"});
-  return $self->test('is_deeply', $self->_json(get => $p), $data, $desc);
+  return $self->test('is_deeply', $self->_json(get => $p), $data, _desc(shift, qq{exact match for JSON Pointer "$p"}));
 }
 
 sub json_message_like {
   my ($self, $p, $regex, $desc) = @_;
-  return $self->test('like', $self->_json(get => $p),
-    $regex, _desc($desc, qq{similar match for JSON Pointer "$p"}));
+  return $self->test('like', $self->_json(get => $p), $regex, _desc($desc, qq{similar match for JSON Pointer "$p"}));
 }
 
 sub json_message_unlike {
   my ($self, $p, $regex, $desc) = @_;
-  return $self->test('unlike', $self->_json(get => $p),
-    $regex, _desc($desc, qq{no similar match for JSON Pointer "$p"}));
+  return $self->test('unlike', $self->_json(get => $p), $regex,
+    _desc($desc, qq{no similar match for JSON Pointer "$p"}));
 }
 
 sub json_unlike {
   my ($self, $p, $regex, $desc) = @_;
-  return $self->test('unlike', $self->tx->res->json($p),
-    $regex, _desc($desc, qq{no similar match for JSON Pointer "$p"}));
+  return $self->test('unlike', $self->tx->res->json($p), $regex,
+    _desc($desc, qq{no similar match for JSON Pointer "$p"}));
 }
 
 sub message_is {
@@ -277,8 +242,7 @@ sub message_ok {
 
 sub message_unlike {
   my ($self, $regex, $desc) = @_;
-  return $self->_message('unlike', $regex,
-    _desc($desc, 'message is not similar'));
+  return $self->_message('unlike', $regex, _desc($desc, 'message is not similar'));
 }
 
 sub new {
@@ -332,8 +296,7 @@ sub status_is {
 sub status_isnt {
   my ($self, $status, $desc) = @_;
   return $self->test('isnt', $self->tx->res->code,
-    $status,
-    _desc($desc, "not $status " . $self->tx->res->default_message($status)));
+    $status, _desc($desc, "not $status " . $self->tx->res->default_message($status)));
 }
 
 sub test {
@@ -344,26 +307,23 @@ sub test {
 
 sub text_is {
   my ($self, $selector, $value, $desc) = @_;
-  return $self->test('is', $self->_text($selector),
-    $value, _desc($desc, qq{exact match for selector "$selector"}));
+  return $self->test('is', $self->_text($selector), $value, _desc($desc, qq{exact match for selector "$selector"}));
 }
 
 sub text_isnt {
   my ($self, $selector, $value, $desc) = @_;
-  return $self->test('isnt', $self->_text($selector),
-    $value, _desc($desc, qq{no match for selector "$selector"}));
+  return $self->test('isnt', $self->_text($selector), $value, _desc($desc, qq{no match for selector "$selector"}));
 }
 
 sub text_like {
   my ($self, $selector, $regex, $desc) = @_;
-  return $self->test('like', $self->_text($selector),
-    $regex, _desc($desc, qq{similar match for selector "$selector"}));
+  return $self->test('like', $self->_text($selector), $regex, _desc($desc, qq{similar match for selector "$selector"}));
 }
 
 sub text_unlike {
   my ($self, $selector, $regex, $desc) = @_;
-  return $self->test('unlike', $self->_text($selector),
-    $regex, _desc($desc, qq{no similar match for selector "$selector"}));
+  return $self->test('unlike', $self->_text($selector), $regex,
+    _desc($desc, qq{no similar match for selector "$selector"}));
 }
 
 sub websocket_ok {
@@ -440,8 +400,7 @@ sub _request_ok {
   # Perform request
   $self->tx($self->ua->start($tx));
   my $err = $self->tx->error;
-  Test::More::diag $err->{message}
-    if !(my $ok = !$err->{message} || $err->{code}) && $err;
+  Test::More::diag $err->{message} if !(my $ok = !$err->{message} || $err->{code}) && $err;
   return $self->test('ok', $ok, _desc("@{[uc $tx->req->method]} $url"));
 }
 
@@ -493,18 +452,15 @@ Test::Mojo - Testing Mojo
 
 =head1 DESCRIPTION
 
-L<Test::Mojo> is a test user agent based on L<Mojo::UserAgent>, it is usually
-used together with L<Test::More> to test L<Mojolicious> applications. Just run
-your tests with L<prove>.
+L<Test::Mojo> is a test user agent based on L<Mojo::UserAgent>, it is usually used together with L<Test::More> to test
+L<Mojolicious> applications. Just run your tests with L<prove>.
 
   $ prove -l -v
   $ prove -l -v t/foo.t
 
-If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
-be set to C<debug> or C<fatal>, depending on the value of the
-C<HARNESS_IS_VERBOSE> environment variable. And to make it esier to test
-HTTPS/WSS web services L<Mojo::UserAgent/"insecure"> will be activated by
-default for L</"ua">.
+If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will be set to C<debug> or C<fatal>, depending
+on the value of the C<HARNESS_IS_VERBOSE> environment variable. And to make it esier to test HTTPS/WSS web services
+L<Mojo::UserAgent/"insecure"> will be activated by default for L</"ua">.
 
 See L<Mojolicious::Guides::Testing> for more.
 
@@ -529,8 +485,7 @@ A callback to connect L<Test::Mojo> with L<Test::More>.
   my $msg = $t->message;
   $t      = $t->message([text => $bytes]);
 
-Current WebSocket message represented as an array reference containing the
-frame type and payload.
+Current WebSocket message represented as an array reference containing the frame type and payload.
 
   # More specific tests
   use Mojo::JSON qw(decode_json);
@@ -568,8 +523,7 @@ True if the last test was successful.
   my $tx = $t->tx;
   $t     = $t->tx(Mojo::Transaction::HTTP->new);
 
-Current transaction, usually a L<Mojo::Transaction::HTTP> or
-L<Mojo::Transaction::WebSocket> object.
+Current transaction, usually a L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
   # More specific tests
   is $t->tx->res->json->{foo}, 'bar', 'right value';
@@ -606,8 +560,7 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
 
 =head1 METHODS
 
-L<Test::Mojo> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Test::Mojo> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 app
 
@@ -646,8 +599,8 @@ Access application with L<Mojo::UserAgent::Server/"app">.
   $t = $t->attr_is('img.cat', 'alt', 'Grumpy cat');
   $t = $t->attr_is('img.cat', 'alt', 'Grumpy cat', 'right alt text');
 
-Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors
-first matching HTML/XML element for exact match with L<Mojo::DOM/"at">.
+Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors first matching HTML/XML element for
+exact match with L<Mojo::DOM/"at">.
 
 =head2 attr_isnt
 
@@ -661,8 +614,8 @@ Opposite of L</"attr_is">.
   $t = $t->attr_like('img.cat', 'alt', qr/Grumpy/);
   $t = $t->attr_like('img.cat', 'alt', qr/Grumpy/, 'right alt text');
 
-Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors
-first matching HTML/XML element for similar match with L<Mojo::DOM/"at">.
+Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors first matching HTML/XML element for
+similar match with L<Mojo::DOM/"at">.
 
 =head2 attr_unlike
 
@@ -676,8 +629,7 @@ Opposite of L</"attr_like">.
   $t = $t->content_is('working!');
   $t = $t->content_is('working!', 'right content');
 
-Check response content for exact match after retrieving it from
-L<Mojo::Message/"text">.
+Check response content for exact match after retrieving it from L<Mojo::Message/"text">.
 
 =head2 content_isnt
 
@@ -691,8 +643,7 @@ Opposite of L</"content_is">.
   $t = $t->content_like(qr/working!/);
   $t = $t->content_like(qr/working!/, 'right content');
 
-Check response content for similar match after retrieving it from
-L<Mojo::Message/"text">.
+Check response content for similar match after retrieving it from L<Mojo::Message/"text">.
 
 =head2 content_type_is
 
@@ -737,24 +688,22 @@ Opposite of L</"content_like">.
   $t = $t->delete_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->delete_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform a C<DELETE> request and check for transport errors, takes the same
-arguments as L<Mojo::UserAgent/"delete">, except for the callback.
+Perform a C<DELETE> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"delete">,
+except for the callback.
 
 =head2 element_count_is
 
   $t = $t->element_count_is('div.foo[x=y]', 5);
   $t = $t->element_count_is('html body div', 30, 'thirty elements');
 
-Checks the number of HTML/XML elements matched by the CSS selector with
-L<Mojo::DOM/"find">.
+Checks the number of HTML/XML elements matched by the CSS selector with L<Mojo::DOM/"find">.
 
 =head2 element_exists
 
   $t = $t->element_exists('div.foo[x=y]');
   $t = $t->element_exists('html head title', 'has a title');
 
-Checks for existence of the CSS selectors first matching HTML/XML element with
-L<Mojo::DOM/"at">.
+Checks for existence of the CSS selectors first matching HTML/XML element with L<Mojo::DOM/"at">.
 
   # Check attribute values
   $t->get_ok('/login')
@@ -793,8 +742,8 @@ Wait for WebSocket connection to be closed gracefully and check status.
   $t = $t->get_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->get_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform a C<GET> request and check for transport errors, takes the same
-arguments as L<Mojo::UserAgent/"get">, except for the callback.
+Perform a C<GET> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"get">, except
+for the callback.
 
   # Run tests against remote host
   $t->get_ok('https://mojolicious.org/perldoc')->status_is(200);
@@ -816,8 +765,8 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
   $t = $t->head_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->head_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform a C<HEAD> request and check for transport errors, takes the same
-arguments as L<Mojo::UserAgent/"head">, except for the callback.
+Perform a C<HEAD> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"head">, except
+for the callback.
 
 =head2 header_exists
 
@@ -866,8 +815,8 @@ Opposite of L</"header_like">.
   $t = $t->json_has('/foo');
   $t = $t->json_has('/minibar', 'has a minibar');
 
-Check if JSON response contains a value that can be identified using the given
-JSON Pointer with L<Mojo::JSON::Pointer>.
+Check if JSON response contains a value that can be identified using the given JSON Pointer with
+L<Mojo::JSON::Pointer>.
 
 =head2 json_hasnt
 
@@ -882,24 +831,24 @@ Opposite of L</"json_has">.
   $t = $t->json_is('/foo' => [1, 2, 3]);
   $t = $t->json_is('/foo/1' => 2, 'right value');
 
-Check the value extracted from JSON response using the given JSON Pointer with
-L<Mojo::JSON::Pointer>, which defaults to the root value if it is omitted.
+Check the value extracted from JSON response using the given JSON Pointer with L<Mojo::JSON::Pointer>, which defaults
+to the root value if it is omitted.
 
 =head2 json_like
 
   $t = $t->json_like('/foo/1' => qr/^\d+$/);
   $t = $t->json_like('/foo/1' => qr/^\d+$/, 'right value');
 
-Check the value extracted from JSON response using the given JSON Pointer with
-L<Mojo::JSON::Pointer> for similar match.
+Check the value extracted from JSON response using the given JSON Pointer with L<Mojo::JSON::Pointer> for similar
+match.
 
 =head2 json_message_has
 
   $t = $t->json_message_has('/foo');
   $t = $t->json_message_has('/minibar', 'has a minibar');
 
-Check if JSON WebSocket message contains a value that can be identified using
-the given JSON Pointer with L<Mojo::JSON::Pointer>.
+Check if JSON WebSocket message contains a value that can be identified using the given JSON Pointer with
+L<Mojo::JSON::Pointer>.
 
 =head2 json_message_hasnt
 
@@ -914,17 +863,16 @@ Opposite of L</"json_message_has">.
   $t = $t->json_message_is('/foo' => [1, 2, 3]);
   $t = $t->json_message_is('/foo/1' => 2, 'right value');
 
-Check the value extracted from JSON WebSocket message using the given JSON
-Pointer with L<Mojo::JSON::Pointer>, which defaults to the root value if it is
-omitted.
+Check the value extracted from JSON WebSocket message using the given JSON Pointer with L<Mojo::JSON::Pointer>, which
+defaults to the root value if it is omitted.
 
 =head2 json_message_like
 
   $t = $t->json_message_like('/foo/1' => qr/^\d+$/);
   $t = $t->json_message_like('/foo/1' => qr/^\d+$/, 'right value');
 
-Check the value extracted from JSON WebSocket message using the given JSON
-Pointer with L<Mojo::JSON::Pointer> for similar match.
+Check the value extracted from JSON WebSocket message using the given JSON Pointer with L<Mojo::JSON::Pointer> for
+similar match.
 
 =head2 json_message_unlike
 
@@ -1000,13 +948,11 @@ Opposite of L</"message_like">.
   my $t = Test::Mojo->new(MyApp->new);
   my $t = Test::Mojo->new(MyApp->new, {foo => 'bar'});
 
-Construct a new L<Test::Mojo> object. In addition to a class name or
-L<Mojo::File> object pointing to the application script, you can pass along a
-hash reference with configuration values that will be used to override the
-application configuration. The special configuration value C<config_override>
-will be set in L<Mojolicious/"config"> as well, which is used to disable
-configuration plugins like L<Mojolicious::Plugin::Config> and
-L<Mojolicious::Plugin::JSONConfig> for tests.
+Construct a new L<Test::Mojo> object. In addition to a class name or L<Mojo::File> object pointing to the application
+script, you can pass along a hash reference with configuration values that will be used to override the application
+configuration. The special configuration value C<config_override> will be set in L<Mojolicious/"config"> as well, which
+is used to disable configuration plugins like L<Mojolicious::Plugin::Config> and L<Mojolicious::Plugin::JSONConfig> for
+tests.
 
   # Load application script relative to the "t" directory
   use Mojo::File qw(curfile);
@@ -1020,8 +966,8 @@ L<Mojolicious::Plugin::JSONConfig> for tests.
   $t = $t->options_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->options_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform a C<OPTIONS> request and check for transport errors, takes the same
-arguments as L<Mojo::UserAgent/"options">, except for the callback.
+Perform a C<OPTIONS> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"options">,
+except for the callback.
 
 =head2 or
 
@@ -1041,8 +987,8 @@ Execute callback if the value of L</"success"> is false.
   $t = $t->patch_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->patch_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform a C<PATCH> request and check for transport errors, takes the same
-arguments as L<Mojo::UserAgent/"patch">, except for the callback.
+Perform a C<PATCH> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"patch">,
+except for the callback.
 
 =head2 post_ok
 
@@ -1052,8 +998,8 @@ arguments as L<Mojo::UserAgent/"patch">, except for the callback.
   $t = $t->post_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->post_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform a C<POST> request and check for transport errors, takes the same
-arguments as L<Mojo::UserAgent/"post">, except for the callback.
+Perform a C<POST> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"post">, except
+for the callback.
 
   # Test file upload
   my $upload = {foo => {content => 'bar', filename => 'baz.txt'}};
@@ -1072,8 +1018,8 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
   $t = $t->put_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
   $t = $t->put_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
 
-Perform a C<PUT> request and check for transport errors, takes the same
-arguments as L<Mojo::UserAgent/"put">, except for the callback.
+Perform a C<PUT> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"put">, except
+for the callback.
 
 =head2 request_ok
 
@@ -1137,16 +1083,15 @@ Opposite of L</"status_is">.
 
   $t = $t->test('is', 'first value', 'second value', 'right value');
 
-Call L<Test::More> functions through L</"handler">, used to implement
-L<Test::Mojo> roles. The result will be stored in L</"success">.
+Call L<Test::More> functions through L</"handler">, used to implement L<Test::Mojo> roles. The result will be stored in
+L</"success">.
 
 =head2 text_is
 
   $t = $t->text_is('div.foo[x=y]' => 'Hello!');
   $t = $t->text_is('html head title' => 'Hello!', 'right title');
 
-Checks text content of the CSS selectors first matching HTML/XML element for
-exact match with L<Mojo::DOM/"at">.
+Checks text content of the CSS selectors first matching HTML/XML element for exact match with L<Mojo::DOM/"at">.
 
 =head2 text_isnt
 
@@ -1160,8 +1105,7 @@ Opposite of L</"text_is">.
   $t = $t->text_like('div.foo[x=y]' => qr/Hello/);
   $t = $t->text_like('html head title' => qr/Hello/, 'right title');
 
-Checks text content of the CSS selectors first matching HTML/XML element for
-similar match with L<Mojo::DOM/"at">.
+Checks text content of the CSS selectors first matching HTML/XML element for similar match with L<Mojo::DOM/"at">.
 
 =head2 text_unlike
 
@@ -1176,8 +1120,8 @@ Opposite of L</"text_like">.
   $t = $t->websocket_ok('/echo');
   $t = $t->websocket_ok('/echo' => {DNT => 1} => ['v1.proto']);
 
-Open a WebSocket connection with transparent handshake, takes the same
-arguments as L<Mojo::UserAgent/"websocket">, except for the callback.
+Open a WebSocket connection with transparent handshake, takes the same arguments as L<Mojo::UserAgent/"websocket">,
+except for the callback.
 
   # WebSocket with permessage-deflate compression
   $t->websocket_ok('/' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})

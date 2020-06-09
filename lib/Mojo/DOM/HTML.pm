@@ -54,48 +54,39 @@ my %END = (body => 'head', optgroup => 'optgroup', option => 'option');
 
 # HTML elements that break paragraphs
 map { $END{$_} = 'p' } (
-  qw(address article aside blockquote details dialog div dl fieldset),
-  qw(figcaption figure footer form h1 h2 h3 h4 h5 h6 header hgroup hr main),
-  qw(menu nav ol p pre section table ul)
+  qw(address article aside blockquote details dialog div dl fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6),
+  qw(header hgroup hr main menu nav ol p pre section table ul)
 );
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
 
 # HTML elements with optional end tags and scoping rules
-my %CLOSE
-  = (li => [{li => 1}, {ul => 1, ol => 1}], tr => [{tr => 1}, {table => 1}]);
+my %CLOSE = (li => [{li => 1}, {ul => 1, ol => 1}], tr => [{tr => 1}, {table => 1}]);
 $CLOSE{$_} = [\%TABLE, {table => 1}] for qw(colgroup tbody tfoot thead);
 $CLOSE{$_} = [{dd => 1, dt => 1}, {dl => 1}] for qw(dd dt);
 $CLOSE{$_} = [{rp => 1, rt => 1}, {ruby => 1}] for qw(rp rt);
 $CLOSE{$_} = [{th => 1, td => 1}, {table => 1}] for qw(td th);
 
 # HTML elements without end tags
-my %EMPTY = map { $_ => 1 } (
-  qw(area base br col embed hr img input keygen link menuitem meta param),
-  qw(source track wbr)
-);
+my %EMPTY = map { $_ => 1 } qw(area base br col embed hr img input keygen link menuitem meta param source track wbr);
 
 # HTML elements categorized as phrasing content (and obsolete inline elements)
 my @PHRASING = (
-  qw(a abbr area audio b bdi bdo br button canvas cite code data datalist),
-  qw(del dfn em embed i iframe img input ins kbd keygen label link map mark),
-  qw(math meta meter noscript object output picture progress q ruby s samp),
-  qw(script select slot small span strong sub sup svg template textarea time u),
-  qw(var video wbr)
+  qw(a abbr area audio b bdi bdo br button canvas cite code data datalist del dfn em embed i iframe img input ins kbd),
+  qw(keygen label link map mark math meta meter noscript object output picture progress q ruby s samp script select),
+  qw(slot small span strong sub sup svg template textarea time u var video wbr)
 );
 my @OBSOLETE = qw(acronym applet basefont big font strike tt);
 my %PHRASING = map { $_ => 1 } @OBSOLETE, @PHRASING;
 
 # HTML elements that don't get their self-closing flag acknowledged
 my %BLOCK = map { $_ => 1 } (
-  qw(a address applet article aside b big blockquote body button caption),
-  qw(center code col colgroup dd details dialog dir div dl dt em fieldset),
-  qw(figcaption figure font footer form frameset h1 h2 h3 h4 h5 h6 head),
-  qw(header hgroup html i iframe li listing main marquee menu nav nobr),
-  qw(noembed noframes noscript object ol optgroup option p plaintext pre rp),
-  qw(rt s script section select small strike strong style summary table),
-  qw(tbody td template textarea tfoot th thead title tr tt u ul xmp)
+  qw(a address applet article aside b big blockquote body button caption center code col colgroup dd details dialog),
+  qw(dir div dl dt em fieldset figcaption figure font footer form frameset h1 h2 h3 h4 h5 h6 head header hgroup html),
+  qw(i iframe li listing main marquee menu nav nobr noembed noframes noscript object ol optgroup option p plaintext),
+  qw(pre rp rt s script section select small strike strong style summary table tbody td template textarea tfoot th),
+  qw(thead title tr tt u ul xmp)
 );
 
 sub parse {
@@ -104,8 +95,7 @@ sub parse {
   my $xml     = $self->xml;
   my $current = my $tree = ['root'];
   while ($html =~ /\G$TOKEN_RE/gcso) {
-    my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway)
-      = ($1, $2, $3, $4, $5, $6, $11);
+    my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway) = ($1, $2, $3, $4, $5, $6, $11);
 
     # Text (and runaway "<")
     $text .= '<' if defined $runaway;
@@ -137,8 +127,7 @@ sub parse {
         _start($start, \%attrs, $xml, \$current);
 
         # Element without end tag (self-closing)
-        _end($start, $xml, \$current)
-          if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
+        _end($start, $xml, \$current) if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
 
         # Raw text elements
         next if $xml || !$RAW{$start} && !$RCDATA{$start};
@@ -212,14 +201,12 @@ sub _render {
     # Attributes
     for my $key (sort keys %{$tree->[2]}) {
       my $value = $tree->[2]{$key};
-      $result .= $xml ? qq{ $key="$key"} : " $key" and next
-        unless defined $value;
+      $result .= $xml ? qq{ $key="$key"} : " $key" and next unless defined $value;
       $result .= qq{ $key="} . xml_escape($value) . '"';
     }
 
     # No children
-    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
-      unless $tree->[4];
+    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>" unless $tree->[4];
 
     # Children
     no warnings 'recursion';
@@ -236,8 +223,7 @@ sub _render {
   return $tree->[1] if $type eq 'raw';
 
   # Root
-  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
-    if $type eq 'root';
+  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree] if $type eq 'root';
 
   # DOCTYPE
   return '<!DOCTYPE' . $tree->[1] . '>' if $type eq 'doctype';
@@ -284,8 +270,7 @@ sub _tag {
   my $tree = ['tag', shift, undef, undef];
 
   # Content
-  push @$tree, ref $_[-1] eq 'CODE' ? ['raw', pop->()] : ['text', pop]
-    if @_ % 2;
+  push @$tree, ref $_[-1] eq 'CODE' ? ['raw', pop->()] : ['text', pop] if @_ % 2;
 
   # Attributes
   my $attrs = $tree->[2] = {@_};
@@ -314,22 +299,19 @@ Mojo::DOM::HTML - HTML/XML engine
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM>, based on the
-L<HTML Living Standard|https://html.spec.whatwg.org> and the
-L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/xml/>.
+L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM>, based on the L<HTML Living
+Standard|https://html.spec.whatwg.org> and the L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/xml/>.
 
 =head1 FUNCTIONS
 
-L<Mojo::DOM::HTML> implements the following functions, which can be imported
-individually.
+L<Mojo::DOM::HTML> implements the following functions, which can be imported individually.
 
 =head2 tag_to_html
 
   my $str = tag_to_html 'div', id => 'foo', 'safe content';
 
-Generate HTML/XML tag and render it right away. This is a significantly faster
-alternative to L</"tag"> for template systems that have to generate a lot of
-tags.
+Generate HTML/XML tag and render it right away. This is a significantly faster alternative to L</"tag"> for template
+systems that have to generate a lot of tags.
 
 =head1 ATTRIBUTES
 
@@ -340,21 +322,18 @@ L<Mojo::DOM::HTML> implements the following attributes.
   my $tree = $html->tree;
   $html    = $html->tree(['root']);
 
-Document Object Model. Note that this structure should only be used very
-carefully since it is very dynamic.
+Document Object Model. Note that this structure should only be used very carefully since it is very dynamic.
 
 =head2 xml
 
   my $bool = $html->xml;
   $html    = $html->xml($bool);
 
-Disable HTML semantics in parser and activate case-sensitivity, defaults to
-auto-detection based on XML declarations.
+Disable HTML semantics in parser and activate case-sensitivity, defaults to auto-detection based on XML declarations.
 
 =head1 METHODS
 
-L<Mojo::DOM::HTML> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::DOM::HTML> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 parse
 

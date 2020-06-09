@@ -281,20 +281,18 @@ subtest 'Incomplete write' => sub {
 };
 
 subtest 'Forked process' => sub {
-SKIP: {
-    skip 'Real fork is required!', 5 if $Config{d_pseudofork};
-    my $file = Mojo::Asset::File->new->add_chunk('Fork test!');
-    my $path = $file->path;
-    ok -e $path, 'file exists';
-    is $file->slurp, 'Fork test!', 'right content';
-    croak "Can't fork: $!" unless defined(my $pid = fork);
-    exit 0 unless $pid;
-    waitpid $pid, 0 if $pid;
-    ok -e $path, 'file still exists';
-    is $file->slurp, 'Fork test!', 'right content';
-    undef $file;
-    ok !-e $path, 'file has been cleaned up';
-  }
+  plan skip_all => 'Real fork is required!' if $Config{d_pseudofork};
+  my $file = Mojo::Asset::File->new->add_chunk('Fork test!');
+  my $path = $file->path;
+  ok -e $path, 'file exists';
+  is $file->slurp, 'Fork test!', 'right content';
+  croak "Can't fork: $!" unless defined(my $pid = fork);
+  exit 0 unless $pid;
+  waitpid $pid, 0 if $pid;
+  ok -e $path, 'file still exists';
+  is $file->slurp, 'Fork test!', 'right content';
+  undef $file;
+  ok !-e $path, 'file has been cleaned up';
 };
 
 subtest 'Abstract methods' => sub {

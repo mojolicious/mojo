@@ -36,9 +36,8 @@ my $tx     = $ua->get("https://[::1]:$port/");
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# IPv6, TLS, SNI and a proxy
-SKIP: {
-  skip 'SNI support required!', 1 unless IO::Socket::SSL->can_client_sni && IO::Socket::SSL->can_server_sni;
+subtest 'IPv6, TLS, SNI and a proxy' => sub {
+  plan skip_all => 'SNI support required!' unless IO::Socket::SSL->can_client_sni && IO::Socket::SSL->can_server_sni;
   $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
   my $listen
     = 'https://[::1]'
@@ -61,6 +60,6 @@ SKIP: {
   ok !$tx->error, 'no error';
   $tx = $ua->get("https://has.no.cert/");
   like $tx->error->{message}, qr/hostname verification failed/, 'right error';
-}
+};
 
 done_testing();

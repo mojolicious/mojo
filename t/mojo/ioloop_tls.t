@@ -365,10 +365,8 @@ is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
 
-# ALPN
-SKIP: {
-  skip 'ALPN support required!', 1 unless IO::Socket::SSL->can_alpn;
-
+subtest 'ALPN' => sub {
+  plan skip_all => 'ALPN support required!' unless IO::Socket::SSL->can_alpn;
   my ($server_proto, $client_proto);
   $id = Mojo::IOLoop->server(
     address       => '127.0.0.1',
@@ -395,6 +393,6 @@ SKIP: {
   Mojo::IOLoop->start;
   is $server_proto, 'baz', 'right protocol';
   is $client_proto, 'baz', 'right protocol';
-}
+};
 
 done_testing();

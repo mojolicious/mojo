@@ -123,9 +123,8 @@ is_deeply $morbo->backend->modified_files, \@new, 'two files have changed';
 $subdir->child('.hidden.txt')->spurt('whatever');
 is_deeply $morbo->backend->modified_files, [], 'directory has not changed again';
 
-# Broken symlink
-SKIP: {
-  skip 'Symlink support required!', 4 unless eval { symlink '', ''; 1 };
+subtest 'Broken symlink' => sub {
+  plan skip_all => 'Symlink support required!' unless eval { symlink '', ''; 1 };
   my $missing = $subdir->child('missing.txt');
   my $broken  = $subdir->child('broken.txt');
   symlink $missing, $broken;
@@ -135,7 +134,7 @@ SKIP: {
   local $SIG{__WARN__} = sub { $warned++ };
   is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
   ok !$warned, 'no warnings';
-}
+};
 
 # Stop
 kill 'INT', $pid;
@@ -151,10 +150,8 @@ sleep 1 while _port($port);
   is $test_morbo->backend->watch_timeout, 2, 'right timeout';
 }
 
-# SO_REUSEPORT
-SKIP: {
-  skip 'SO_REUSEPORT support required!', 2 unless eval { _reuse_port() };
-
+subtest 'SO_REUSEPORT' => sub {
+  plan skip_all => 'SO_REUSEPORT support required!' unless eval { _reuse_port() };
   my $port   = Mojo::IOLoop::Server->generate_port;
   my $daemon = Mojo::Server::Daemon->new(listen => ["http://127.0.0.1:$port"], silent => 1)->start;
   ok !$daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
@@ -163,7 +160,7 @@ SKIP: {
   $daemon->start;
   ok $daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
     'SO_REUSEPORT socket option';
-}
+};
 
 # Abstract methods
 eval { Mojo::Server::Morbo::Backend->modified_files };

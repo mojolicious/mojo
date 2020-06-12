@@ -190,6 +190,17 @@ subtest 'Promises' => sub {
   Mojo::IOLoop->next_tick(sub { $e->emit(test => ('works', 'too!'))->emit(test => 'fail!') });
   $promise->wait;
   is_deeply \@results, ['works', 'too!'], 'promise resolved';
+
+  my @errors;
+  @results = ();
+  ok !$e->has_subscribers('test'), 'no subscribers';
+  $promise = $e->once_p('test')->then(sub { push @results, @_ });
+  ok $e->has_subscribers('test'), 'has subscribers';
+  $promise->timeout(0)->catch(sub { push @errors, @_ })->wait;
+  $e->emit(test => 'fail');
+  ok !$e->has_subscribers('test'), 'no subscribers';
+  is_deeply \@errors, ['Promise timeout'], 'promise rejected';
+  is_deeply \@results, [], 'promise not resolved';
 };
 
 done_testing();

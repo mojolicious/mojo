@@ -42,7 +42,8 @@ sub once {
 sub once_p {
   my ($self, $name) = @_;
   my $promise = Mojo::Promise->new;
-  $self->once($name => sub { shift; $promise->resolve(@_) });
+  my $cb      = $self->once($name => sub { shift; $promise->resolve(@_) });
+  $promise->finally(sub { $self->unsubscribe($name => $cb) })->catch(sub { });
   return $promise;
 }
 

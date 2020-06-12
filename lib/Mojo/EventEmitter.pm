@@ -39,6 +39,13 @@ sub once {
   return $wrapper;
 }
 
+sub once_p {
+  my ($self, $name) = @_;
+  my $promise = Mojo::Promise->new;
+  $self->once($name => sub { shift; $promise->resolve(@_) });
+  return $promise;
+}
+
 sub subscribers { shift->{events}{shift()} ||= [] }
 
 sub unsubscribe {
@@ -155,6 +162,13 @@ Subscribe to event and unsubscribe again after it has been emitted once.
     my ($e, @args) = @_;
     ...
   });
+
+=head2 once_p
+
+  my $promise = $e->once_p('foo');
+
+Same as L</"once">, but returns a L<Mojo::Promise> object instead of accepting a callback. Note that this method is
+B<EXPERIMENTAL> and might change without warning!
 
 =head2 subscribers
 

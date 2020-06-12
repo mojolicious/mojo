@@ -42,10 +42,10 @@ Many different L<commands|Mojolicious::Commands/"COMMANDS"> are automatically av
 L<PSGI> environments can even be detected and will usually just work without commands.
 
   $ ./myapp.pl daemon
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
   $ ./myapp.pl daemon -l http://*:8080
-  Server available at http://127.0.0.1:8080
+  Web application available at http://127.0.0.1:8080
 
   $ ./myapp.pl cgi
   ...CGI output...
@@ -71,7 +71,7 @@ Your application will automatically reload itself if you start it with the L<mor
 don't have to restart the server after every change.
 
   $ morbo ./myapp.pl
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
 For more information about how to deploy your application see also L<Mojolicious::Guides::Cookbook/"DEPLOYMENT">.
 

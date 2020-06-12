@@ -122,7 +122,7 @@ usually used during development and in the construction of more advanced web ser
 small to mid sized applications.
 
   $ ./script/my_app daemon
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
 It is available to every application through the command L<Mojolicious::Command::daemon>, which has many configuration
 options and is known to work on every platform Perl works on with its single-process architecture.
@@ -135,7 +135,7 @@ purposes is built right in, so it just works, but you can specify all listen loc
 L<Mojo::Server::Daemon/"listen">.
 
   $ ./script/my_app daemon -l https://[::]:3000
-  Server available at https://[::]:3000
+  Web application available at https://[::]:3000
 
 To manage the web server with systemd, you can use a unit configuration file like this.
 
@@ -156,7 +156,7 @@ On UNIX platforms you can also add pre-forking to the built-in web server and sw
 with L<Mojolicious::Command::prefork>, to take advantage of multiple CPU cores and copy-on-write memory management.
 
   $ ./script/my_app prefork
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
 Since all built-in web servers are based on the L<Mojo::IOLoop> event loop, they scale best with non-blocking
 operations. But if your application for some reason needs to perform many blocking operations, you can improve
@@ -164,7 +164,7 @@ performance by increasing the number of worker processes and decreasing the numb
 worker is allowed to handle (often as low as C<1>).
 
   $ ./script/my_app prefork -m production -w 10 -c 1
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
 During startup your application is preloaded in the manager process, which does not run an event loop, so you can use
 L<Mojo::IOLoop/"next_tick"> to run code whenever a new worker process has been forked and its event loop gets started.
@@ -204,7 +204,7 @@ changes, and should therefore only be used during development. To start applicat
 script.
 
   $ morbo ./script/my_app
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
 =head2 Hypnotoad
 
@@ -283,13 +283,13 @@ above, but on modern operating systems that support the C<SO_REUSEPORT> socket o
 available that works with all built-in web servers.
 
   $ ./script/my_app prefork -P /tmp/first.pid -l http://*:8080?reuse=1
-  Server available at http://127.0.0.1:8080
+  Web application available at http://127.0.0.1:8080
 
 All you have to do, is to start a second web server listening to the same port, and stop the first web server
 gracefully afterwards.
 
   $ ./script/my_app prefork -P /tmp/second.pid -l http://*:8080?reuse=1
-  Server available at http://127.0.0.1:8080
+  Web application available at http://127.0.0.1:8080
   $ kill -s TERM `cat /tmp/first.pid`
 
 Just remember that both web servers need to be started with the C<reuse> parameter.

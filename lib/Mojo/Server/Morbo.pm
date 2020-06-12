@@ -95,7 +95,7 @@ should avoid modifying signal handlers in your applications.
 To start applications with it you can use the L<morbo> script.
 
   $ morbo ./myapp.pl
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
 For better scalability (epoll, kqueue) and to provide non-blocking name resolution, SOCKS5 as well as TLS support, the
 optional modules L<EV> (4.32+), L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL>

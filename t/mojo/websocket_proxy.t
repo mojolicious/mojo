@@ -4,7 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 use Mojo::IOLoop;
@@ -40,8 +40,7 @@ my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 my $port   = $daemon->listen(['http://127.0.0.1'])->start->ports->[0];
 
 # CONNECT proxy server for testing
-my $id = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'},
-  {address => '127.0.0.1', port => $port});
+my $id    = Mojo::TestConnectProxy::proxy({address => '127.0.0.1'}, {address => '127.0.0.1', port => $port});
 my $proxy = Mojo::IOLoop->acceptor($id)->port;
 
 # Normal non-blocking request
@@ -102,7 +101,7 @@ is $result, 'test1test2', 'right result';
 
 # Blocking proxy request
 my $tx = $ua->get('http://example.com/proxy');
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,                        'right status';
 is $tx->res->body, 'http://example.com/proxy', 'right content';
 
 # Proxy WebSocket

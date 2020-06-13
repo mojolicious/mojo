@@ -10,8 +10,7 @@ ok $pointer->contains('/'),    'contains "/"';
 ok $pointer->contains('/foo'), 'contains "/foo"';
 ok !$pointer->contains('foo'),  '"foo" is invalid';
 ok !$pointer->contains('/bar'), 'does not contains "/bar"';
-ok $pointer->new({foo => {bar => undef}})->contains('/foo/bar'),
-  'contains "/foo/bar"';
+ok $pointer->new({foo => {bar => undef}})->contains('/foo/bar'), 'contains "/foo/bar"';
 
 # "contains" (string)
 $pointer = Mojo::JSON::Pointer->new('works');
@@ -31,18 +30,14 @@ ok !$pointer->contains('/'),        'does not contain "/"';
 
 # "get" (hash)
 $pointer = Mojo::JSON::Pointer->new({foo => 'bar', '' => 'baz'});
-is_deeply $pointer->get(''), {foo => 'bar', '' => 'baz'},
-  '"" is "{foo => "bar", "" => "baz"}"';
+is_deeply $pointer->get(''), {foo => 'bar', '' => 'baz'}, '"" is "{foo => "bar", "" => "baz"}"';
 is $pointer->get('/'),    'baz', '"/" is "baz"';
 is $pointer->get('/foo'), 'bar', '"/foo" is "bar"';
 is $pointer->get('foo'),  undef, '"foo" is invalid';
-is $pointer->new({foo => {bar => 42}})->get('/foo/bar'), 42,
-  '"/foo/bar" is "42"';
-is_deeply $pointer->new({foo => {23 => {baz => 0}}})->get('/foo/23'),
-  {baz => 0}, '"/foo/23" is "{baz => 0}"';
+is $pointer->new({foo => {bar => 42}})->get('/foo/bar'), 42, '"/foo/bar" is "42"';
+is_deeply $pointer->new({foo => {23 => {baz => 0}}})->get('/foo/23'), {baz => 0}, '"/foo/23" is "{baz => 0}"';
 is $pointer->new({foo => {'' => 42}})->get('/foo/'), 42, '"/foo/" is "42"';
-is $pointer->new({foo => {'' => {'' => 42}}})->get('/foo//'), 42,
-  '"/foo//" is "42"';
+is $pointer->new({foo => {'' => {'' => 42}}})->get('/foo//'), 42, '"/foo//" is "42"';
 
 # "get" (string)
 $pointer = Mojo::JSON::Pointer->new('works');
@@ -52,8 +47,7 @@ is $pointer->get('/foo'), undef,   '"/foo" is undef';
 is $pointer->new('0')->get(''), 0, '"/foo" is "0"';
 
 # "get" (mixed)
-is_deeply $pointer->new({foo => {bar => [1, 2, 3]}})->get('/foo/bar'),
-  [1, 2, 3], '"/foo/bar" is "[1, 2, 3]"';
+is_deeply $pointer->new({foo => {bar => [1, 2, 3]}})->get('/foo/bar'), [1, 2, 3], '"/foo/bar" is "[1, 2, 3]"';
 $pointer = Mojo::JSON::Pointer->new({foo => {bar => [0, undef, 3]}});
 is $pointer->get('/foo/bar/0'), 0,     '"/foo/bar/0" is "0"';
 is $pointer->get('/foo/bar/1'), undef, '"/foo/bar/1" is undef';
@@ -61,21 +55,16 @@ is $pointer->get('/foo/bar/2'), 3,     '"/foo/bar/2" is "3"';
 is $pointer->get('/foo/bar/6'), undef, '"/foo/bar/6" is undef';
 
 # "get" (encoded)
-is $pointer->new([{'foo/bar' => 'bar'}])->get('/0/foo~1bar'), 'bar',
-  '"/0/foo~1bar" is "bar"';
-is $pointer->new([{'foo/bar/baz' => 'yada'}])->get('/0/foo~1bar~1baz'), 'yada',
-  '"/0/foo~1bar~1baz" is "yada"';
-is $pointer->new([{'foo~/bar' => 'bar'}])->get('/0/foo~0~1bar'), 'bar',
-  '"/0/foo~0~1bar" is "bar"';
-is $pointer->new([{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}])
-  ->get('/0/f~0o~0o~0~1b~0/a~0/r'), 'baz', '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
+is $pointer->new([{'foo/bar'     => 'bar'}])->get('/0/foo~1bar'),       'bar',  '"/0/foo~1bar" is "bar"';
+is $pointer->new([{'foo/bar/baz' => 'yada'}])->get('/0/foo~1bar~1baz'), 'yada', '"/0/foo~1bar~1baz" is "yada"';
+is $pointer->new([{'foo~/bar'    => 'bar'}])->get('/0/foo~0~1bar'),     'bar',  '"/0/foo~0~1bar" is "bar"';
+is $pointer->new([{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}])->get('/0/f~0o~0o~0~1b~0/a~0/r'), 'baz',
+  '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
 is $pointer->new({'~1' => 'foo'})->get('/~01'), 'foo', '"/~01" is "foo"';
 
 # Unicode
-is $pointer->new({'☃' => 'snowman'})->get('/☃'), 'snowman',
-  'found the snowman';
-is $pointer->new->data({'☃' => ['snowman']})->get('/☃/0'), 'snowman',
-  'found the snowman';
+is $pointer->new({'☃' => 'snowman'})->get('/☃'), 'snowman', 'found the snowman';
+is $pointer->new->data({'☃' => ['snowman']})->get('/☃/0'), 'snowman', 'found the snowman';
 
 # RFC 6901
 my $hash = {

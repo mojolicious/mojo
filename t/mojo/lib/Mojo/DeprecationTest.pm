@@ -1,6 +1,6 @@
 package Mojo::DeprecationTest;
 
-use Mojo::Util 'deprecated';
+use Mojo::Util qw(deprecated);
 
 sub foo {
   deprecated 'foo is DEPRECATED';

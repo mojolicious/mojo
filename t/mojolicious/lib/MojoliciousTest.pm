@@ -27,8 +27,7 @@ sub startup {
   push @{$self->commands->namespaces}, 'MojoliciousTest::Command';
 
   # Plugins in custom namespace
-  unshift @{$self->plugins->namespaces},
-    $self->routes->namespaces->[-1] . '::Plugin';
+  unshift @{$self->plugins->namespaces}, $self->routes->namespaces->[-1] . '::Plugin';
   $self->plugin('test-some_plugin2');
   $self->plugin('UPPERCASETestPlugin');
 
@@ -68,8 +67,7 @@ sub startup {
   $r->route('/exceptional/:action')->to('exceptional#');
 
   # /exceptional_too/*
-  $r->route('/exceptional_too')->inline(1)
-    ->to('exceptional#this_one_might_die')->route('/:action');
+  $r->route('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->route('/:action');
 
   # /fun/time
   $r->fun('/time')->to('foo#fun');
@@ -77,13 +75,14 @@ sub startup {
   # /happy/fun/time
   $r->route('/happy')->fun('/time')->to('foo#fun');
 
+  # /fun/joy
+  $r->fun('/joy')->to('foo#joy');
+
   # /stash_config
-  $r->route('/stash_config')
-    ->to(controller => 'foo', action => 'config', config => {test => 123});
+  $r->route('/stash_config')->to(controller => 'foo', action => 'config', config => {test => 123});
 
   # /test4 (named route for url_for)
-  $r->route('/test4/:something')->to('foo#something', something => 23)
-    ->name('something');
+  $r->route('/test4/:something')->to('foo#something', something => 23)->name('something');
 
   # /somethingtest (refer to another route with url_for)
   $r->put('/somethingtest')->to('foo#something');
@@ -92,26 +91,16 @@ sub startup {
   $r->route('/something_missing')->to('foo#url_for_missing');
 
   # /test3 (no class, just a namespace)
-  $r->route('/test3')
-    ->to(namespace => 'MojoliciousTestController', action => 'index');
+  $r->route('/test3')->to(namespace => 'MojoliciousTestController', action => 'index');
 
   # /test2 (different namespace test)
-  $r->route('/test2')->to(
-    namespace  => 'MojoliciousTest2',
-    controller => 'Foo',
-    action     => 'test'
-  );
+  $r->route('/test2')->to(namespace => 'MojoliciousTest2', controller => 'Foo', action => 'test');
 
   # /test5 (only namespace test)
-  $r->route('/test5')
-    ->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
+  $r->route('/test5')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
 
   # /test6 (no namespace test)
-  $r->route('/test6')->to(
-    namespace  => '',
-    controller => 'mojolicious_test2-foo',
-    action     => 'test'
-  );
+  $r->route('/test6')->to(namespace => '', controller => 'mojolicious_test2-foo', action => 'test');
 
   # /test7 (controller class shortcut)
   $r->route('/test7')->to('Foo::Bar#test');
@@ -133,8 +122,7 @@ sub startup {
   $b->route->to(action => 'stage2');
 
   # /suspended (suspended intermediate destination)
-  $r->route('/suspended')->inline(1)->to('foo#suspended')->route->inline(1)
-    ->to('foo#suspended')->route->to('foo#fun');
+  $r->route('/suspended')->inline(1)->to('foo#suspended')->route->inline(1)->to('foo#suspended')->route->to('foo#fun');
 
   # /longpoll (long polling)
   $r->route('/longpoll')->to('foo#longpoll');
@@ -142,12 +130,9 @@ sub startup {
   # /shortcut/act
   # /shortcut/ctrl
   # /shortcut/ctrl-act (shortcuts to controller#action)
-  $r->route('/shortcut/ctrl-act')
-    ->to('foo#config', config => {test => 'ctrl-act'});
-  $r->route('/shortcut/ctrl')
-    ->to('foo#', action => 'config', config => {test => 'ctrl'});
-  $r->route('/shortcut/act')
-    ->to('#config', controller => 'foo', config => {test => 'act'});
+  $r->route('/shortcut/ctrl-act')->to('foo#config', config => {test => 'ctrl-act'});
+  $r->route('/shortcut/ctrl')->to('foo#', action => 'config', config => {test => 'ctrl'});
+  $r->route('/shortcut/act')->to('#config', controller => 'foo', config => {test => 'act'});
 
   # /foo/session (session cookie with domain)
   $r->route('/foo/session')->to('foo#session_domain');

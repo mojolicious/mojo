@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 # Stream multipart uploads into cache
 my %cache;
@@ -51,16 +51,14 @@ get '/download' => sub {
 my $t = Test::Mojo->new;
 
 # Small upload
-$t->post_ok('/upload?id=23' => form => {my_file => {content => 'whatever'}})
-  ->status_is(200)->content_is('whatever');
+$t->post_ok('/upload?id=23' => form => {my_file => {content => 'whatever'}})->status_is(200)->content_is('whatever');
 
 # Small download
 $t->get_ok('/download?id=23')->status_is(200)->content_is('whatever');
 
 # Big upload
-$t->post_ok(
-  '/upload?id=24' => form => {my_file => {content => '1234' x 131072}})
-  ->status_is(200)->content_is('1234' x 131072);
+$t->post_ok('/upload?id=24' => form => {my_file => {content => '1234' x 131072}})->status_is(200)
+  ->content_is('1234' x 131072);
 
 # Big download
 $t->get_ok('/download?id=24')->status_is(200)->content_is('1234' x 131072);

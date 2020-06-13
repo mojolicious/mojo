@@ -16,7 +16,7 @@ sub emit {
   }
   else {
     warn "-- Emit $name in @{[blessed $self]} (0)\n" if DEBUG;
-    die "@{[blessed $self]}: $_[0]" if $name eq 'error';
+    die "@{[blessed $self]}: $_[0]"                  if $name eq 'error';
   }
 
   return $self;
@@ -30,13 +30,11 @@ sub once {
   my ($self, $name, $cb) = @_;
 
   weaken $self;
-  my $wrapper;
-  $wrapper = sub {
-    $self->unsubscribe($name => $wrapper);
+  my $wrapper = sub {
+    $self->unsubscribe($name => __SUB__);
     $cb->(@_);
   };
   $self->on($name => $wrapper);
-  weaken $wrapper;
 
   return $wrapper;
 }
@@ -102,9 +100,8 @@ L<Mojo::EventEmitter> can emit the following events.
     ...
   });
 
-This is a special event for errors, it will not be emitted directly by this
-class, but is fatal if unhandled. Subclasses may choose to emit it, but are not
-required to do so.
+This is a special event for errors, it will not be emitted directly by this class, but is fatal if unhandled.
+Subclasses may choose to emit it, but are not required to do so.
 
   $e->on(error => sub {
     my ($e, $err) = @_;
@@ -113,8 +110,7 @@ required to do so.
 
 =head1 METHODS
 
-L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 catch
 
@@ -181,8 +177,8 @@ Unsubscribe from event.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_EVENTEMITTER_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
+You can set the C<MOJO_EVENTEMITTER_DEBUG> environment variable to get some advanced diagnostics information printed to
+C<STDERR>.
 
   MOJO_EVENTEMITTER_DEBUG=1
 

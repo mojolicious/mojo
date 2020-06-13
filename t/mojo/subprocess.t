@@ -10,7 +10,7 @@ plan skip_all => 'set TEST_SUBPROCESS to enable this test (developer only!)'
 use Mojo::IOLoop;
 use Mojo::IOLoop::Subprocess;
 use Mojo::Promise;
-use Mojo::File 'tempfile';
+use Mojo::File qw(tempfile);
 
 # Huge result
 my ($fail, $result, @start);
@@ -26,8 +26,10 @@ $subprocess->run(
 );
 $result = $$;
 ok !$subprocess->pid, 'no process id available yet';
+is $subprocess->exit_code, undef, 'no exit code';
 Mojo::IOLoop->start;
 ok $subprocess->pid, 'process id available';
+is $subprocess->exit_code, 0, 'zero exit code';
 ok !$fail, 'no error';
 is $result, $$ . 0 . $subprocess->pid . ('x' x 100000), 'right result';
 is_deeply \@start, [$subprocess->pid], 'spawn event has been emitted once';
@@ -62,6 +64,21 @@ Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
 
+# Promises
+$result     = [];
+$subprocess = Mojo::IOLoop::Subprocess->new;
+is $subprocess->exit_code, undef, 'no exit code';
+$subprocess->run_p(sub { return '♥', [{two => 2}], 3 })->then(sub { $result = [@_] })->wait;
+is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
+$fail       = undef;
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run_p(sub { die 'Whatever' })->catch(sub { $fail = shift })->wait;
+is $subprocess->exit_code, 0, 'zero exit code';
+like $fail, qr/Whatever/, 'right error';
+$result = [];
+Mojo::IOLoop->subprocess->run_p(sub { return '♥' })->then(sub { $result = [@_] })->wait;
+is_deeply $result, ['♥'], 'right structure';
+
 # Event loop in subprocess
 ($fail, $result) = ();
 $subprocess = Mojo::IOLoop::Subprocess->new;
@@ -89,7 +106,7 @@ Mojo::IOLoop->next_tick(sub {
     sub {
       my $result;
       my $promise = Mojo::Promise->new;
-      $promise->then(sub          { $result = shift });
+      $promise->then(sub { $result = shift });
       Mojo::IOLoop->next_tick(sub { $promise->resolve(25) });
       $promise->wait;
       return $result;
@@ -110,7 +127,7 @@ is $result, 25, 'right result';
 Mojo::IOLoop->delay(
   sub {
     my $delay = shift;
-    Mojo::IOLoop->subprocess(sub      {1}, $delay->begin);
+    Mojo::IOLoop->subprocess(sub {1}, $delay->begin);
     Mojo::IOLoop->subprocess->run(sub {2}, $delay->begin);
   },
   sub {
@@ -171,8 +188,9 @@ Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
 
 # Non-zero exit status
-$fail = undef;
-Mojo::IOLoop::Subprocess->new->run(
+$fail       = undef;
+$subprocess = Mojo::IOLoop::Subprocess->new;
+$subprocess->run(
   sub { exit 3 },
   sub {
     my ($subprocess, $err) = @_;
@@ -180,7 +198,8 @@ Mojo::IOLoop::Subprocess->new->run(
   }
 );
 Mojo::IOLoop->start;
-like $fail, qr/Storable/, 'right error';
+is $subprocess->exit_code, 3, 'right exit code';
+like $fail, qr/offset 0/, 'right error';
 
 # Serialization error
 $fail       = undef;
@@ -223,17 +242,14 @@ $subprocess->on(
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['yay'], 'correct result';
-is_deeply \@progress,
-  [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]],
-  'correct progress';
+is_deeply \@progress, [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]], 'correct progress';
 
 # Cleanup
 ($fail, $result) = ();
 my $file   = tempfile;
 my $called = 0;
 $subprocess = Mojo::IOLoop::Subprocess->new;
-$subprocess->on(
-  cleanup => sub { $file->spurt(shift->serialize->({test => ++$called})) });
+$subprocess->on(cleanup => sub { $file->spurt(shift->serialize->({test => ++$called})) });
 $subprocess->run(
   sub {'Hello Mojo!'},
   sub {
@@ -243,8 +259,7 @@ $subprocess->run(
   }
 );
 Mojo::IOLoop->start;
-is_deeply $subprocess->deserialize->($file->slurp), {test => 1},
-  'cleanup event emitted once';
+is_deeply $subprocess->deserialize->($file->slurp), {test => 1}, 'cleanup event emitted once';
 ok !$fail, 'no error';
 is $result, 'Hello Mojo!', 'right result';
 

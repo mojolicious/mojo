@@ -41,9 +41,7 @@ Mojo::IOLoop->server(
 
                 # Start forwarding data in both directions
                 say "Forwarding to $address:$port";
-                Mojo::IOLoop->stream($id)
-                  ->write("HTTP/1.1 200 OK\x0d\x0a"
-                    . "Connection: keep-alive\x0d\x0a\x0d\x0a");
+                Mojo::IOLoop->stream($id)->write("HTTP/1.1 200 OK\x0d\x0a" . "Connection: keep-alive\x0d\x0a\x0d\x0a");
                 $stream->on(
                   read => sub {
                     my ($stream, $chunk) = @_;

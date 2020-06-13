@@ -1,0 +1,37 @@
+name: linux
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  perl:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        perl-version:
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.30'
+    container:
+      image: perl:${{ matrix.perl-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Fix ExtUtils::MakeMaker (for Perl 5.16 and 5.18)
+        run: cpanm -n App::cpanminus ExtUtils::MakeMaker
+      - name: Install dependencies
+        run: |
+          cpanm -n --installdeps .
+          cpanm -n Cpanel::JSON::XS EV Role::Tiny
+          cpanm -n Test::Pod Test::Pod::Coverage
+      - name: Run tests
+        run: prove -l t t/mojo t/mojolicious
+        env:
+          TEST_POD: 1
+          TEST_EV: 1

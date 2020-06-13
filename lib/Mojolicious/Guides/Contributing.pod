@@ -7,111 +7,89 @@ Mojolicious::Guides::Contributing - Contributing to Mojolicious
 
 =head1 OVERVIEW
 
-There are many ways to contribute to L<Mojolicious>, this guide will show you a
-few of them.
+There are many ways to contribute to L<Mojolicious>, this guide will show you a few of them.
 
 =head1 REPORTING BUGS
 
-We use the L<GitHub issue tracker|https://github.com/mojolicious/mojo/issues>, 
-so you'll need to create a (free) GitHub account to be able to submit issues,
-comments and pull requests.
+We use the L<GitHub issue tracker|https://github.com/mojolicious/mojo/issues>,  so you'll need to create a (free)
+GitHub account to be able to submit issues, comments and pull requests.
 
-First of all, make sure you are using the latest version of L<Mojolicious>, it
-is quite likely that your bug has already been fixed. If that doesn't help,
-take a look at the list of currently open issues, perhaps it has already been
+First of all, make sure you are using the latest version of L<Mojolicious>, it is quite likely that your bug has
+already been fixed. If that doesn't help, take a look at the list of currently open issues, perhaps it has already been
 reported by someone else and you can just add a comment confirming it.
 
-If it hasn't been reported yet, try to prepare a test case demonstrating the
-bug, you are not expected to fix it yourself, but you'll have to make sure the
-developers can replicate your problem. Sending in your whole application
-generally does more harm than good, the C<t> directory of this distribution has
-many good examples for how to do it right. Writing a test is usually the
-hardest part of fixing a bug, so the better your test case the faster it can be
+If it hasn't been reported yet, try to prepare a test case demonstrating the bug, you are not expected to fix it
+yourself, but you'll have to make sure the developers can replicate your problem. Sending in your whole application
+generally does more harm than good, the C<t> directory of this distribution has many good examples for how to do it
+right. Writing a test is usually the hardest part of fixing a bug, so the better your test case the faster it can be
 fixed. ;)
 
-And don't forget to add a descriptive title and text, when you create a new
-issue. If your issue does not contain enough information or is unintelligible,
-it might get closed pretty quickly. But don't be disheartened, if there's new
+And don't forget to add a descriptive title and text, when you create a new issue. If your issue does not contain
+enough information or is unintelligible, it might get closed pretty quickly. But don't be disheartened, if there's new
 activity it will get reopened just as quickly.
 
 =head2 Reporting security issues
 
-Please report security issues directly to Sebastian Riedel
-(C<kraih@mojolicious.org>), and give us a few days to develop and release a
-proper fix.
+Please report security issues directly to Sebastian Riedel (C<kraih@mojolicious.org>), and give us a few days to
+develop and release a proper fix.
 
 =head1 RESOLVING ISSUES
 
-There are many ways in which you can help us resolve existing issues on the
-L<GitHub issue tracker|https://github.com/mojolicious/mojo/issues>.
+There are many ways in which you can help us resolve existing issues on the L<GitHub issue
+tracker|https://github.com/mojolicious/mojo/issues>.
 
-Can you replicate the problem on your computer? Add a comment saying that
-you're seeing the same. Perhaps you can provide additional information that
-will make it easier for others to replicate the problem, maybe even contribute
-a better test case.
+Can you replicate the problem on your computer? Add a comment saying that you're seeing the same. Perhaps you can
+provide additional information that will make it easier for others to replicate the problem, maybe even contribute a
+better test case.
 
-And for all code contributions we very much appreciate additional testing and
-code review, just add a comment to show your approval or to point out flaws
-that need to be addressed.
+And for all code contributions we very much appreciate additional testing and code review, just add a comment to show
+your approval or to point out flaws that need to be addressed.
 
 =head1 CONTRIBUTING DOCUMENTATION
 
-One of the easiest ways to contribute to L<Mojolicious> is through
-documentation improvements. While the L<Mojolicious::Guides> are carefully
-curated by the core team, everybody with a (free) GitHub account can make
-changes and add new information to the
-L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>.
+One of the easiest ways to contribute to L<Mojolicious> is through documentation improvements. While the
+L<Mojolicious::Guides> are carefully curated by the core team, everybody with a (free) GitHub account can make changes
+and add new information to the L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>.
 
-Pull requests with additions or changes to the documentation included in the
-L<Mojolicious> distribution follow the same rules as code contributions. Please
-don't send pull requests for overly simplistic changes, such as the addition of
-a comma or semicolon.
+Pull requests with additions or changes to the documentation included in the L<Mojolicious> distribution follow the
+same rules as code contributions. Please don't send pull requests for overly simplistic changes, such as the addition
+of a comma or semicolon.
 
 =head1 CONTRIBUTING CODE
 
-All code contributions should be sent as
-L<GitHub pull requests|https://help.github.com/articles/using-pull-requests>.
-But please try to avoid pull requests with very simplistic changes, such as a
-single typo fix somewhere in the documentation or comments.
+All code contributions should be sent as L<GitHub pull requests|https://help.github.com/articles/using-pull-requests>.
+But please try to avoid pull requests with very simplistic changes, such as a single typo fix somewhere in the
+documentation or comments.
 
-An expressive title and detailed description are invaluable during the review
-process, which usually ends when members of the community have voiced their
-opinions and the core team voted for or against a change. To reach the formal
-voting stage, someone with vote calling permissions needs to call for a vote.
-You are responsible for securing this vote call as well as the required votes.
-The exact L</"Voting Rules"> can be found below.
+An expressive title and detailed description are invaluable during the review process, which usually ends when members
+of the community have voiced their opinions and the core team voted for or against a change. To reach the formal voting
+stage, a member of the core team needs to call for a vote. You are responsible for securing this vote call as well as
+the required votes. The exact L</"Voting Rules"> can be found below.
 
-All code changes should emulate the style of the surrounding code, include tests
-that fail without them, and update relevant documentation.
+All code changes should emulate the style of the surrounding code, include tests that fail without them, and update
+relevant documentation.
 
-While the L<Mojolicious> distribution covers a wide range of features, we are
-rather conservative when it comes to adding new ones. So if your contribution
-is not a simple bug fix, it is B<strongly recommended> that you discuss it in
-advance on the L<mailing list|http://groups.google.com/group/mojolicious> or the
-official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
-now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>),
-to avoid unnecessary work and to increase its chances of getting accepted.
+While the L<Mojolicious> distribution covers a wide range of features, we are rather conservative when it comes to
+adding new ones. So if your contribution is not a simple bug fix, it is B<strongly recommended> that you discuss it in
+advance on the L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on
+C<irc.freenode.net> (L<chat now!|https://webchat.freenode.net/#mojo>), to avoid unnecessary work and to increase its
+chances of getting accepted.
 
-The following mission statement and rules are the foundation of all L<Mojo> and
-L<Mojolicious> development. Please make sure that your contribution aligns well
-with them before sending a pull request.
+The following mission statement and rules are the foundation of all L<Mojo> and L<Mojolicious> development. Please make
+sure that your contribution aligns well with them before sending a pull request.
 
 =head2 Mission statement
 
-L<Mojo> is a web development toolkit, with all the basic tools and helpers
-needed to write simple web applications and higher level web frameworks, such as
-L<Mojolicious>.
+L<Mojo> is a web development toolkit, with all the basic tools and helpers needed to write simple web applications and
+higher level web frameworks, such as L<Mojolicious>.
 
-All components should be reusable in other projects, and in a UNIXish way only
-loosely coupled.
+All components should be reusable in other projects, and in a UNIXish way only loosely coupled.
 
-Especially for people new to Perl it should be as easy as possible to install
-L<Mojolicious> and get started. Writing web applications can be one of the most
-fun ways to learn a language!
+Especially for people new to Perl it should be as easy as possible to install L<Mojolicious> and get started. Writing
+web applications can be one of the most fun ways to learn a language!
 
-For developers of other web frameworks, it should be possible to reuse all the
-infrastructure and just consider the higher levels of the L<Mojolicious>
-distribution an example application.
+For developers of other web frameworks, it should be possible to reuse all the infrastructure and just consider the
+higher levels of the L<Mojolicious> distribution an example application.
 
 =head2 Rules
 
@@ -125,52 +103,46 @@ The web is a moving target, to stay relevant we have to stay in motion too.
 
 Keep it simple, no magic unless absolutely necessary.
 
-The installation process should be as fast and painless as possible. (Less than
-a minute on most common hardware is a good rule of thumb)
+The installation process should be as fast and painless as possible. (Less than a minute on most common hardware is a
+good rule of thumb)
 
 It's not a feature without a test and documentation.
 
 A feature is only needed when the majority of the user base benefits from it.
 
-Features may only be changed in a major release, to fix a serious security
-issue, or after being deprecated for at least 3 months.
+Features may only be changed in a major release, to fix a serious security issue, or after being deprecated for at
+least 3 months.
 
-Refactoring and deprecations should be avoided if there are no substantial
-benefits.
+Refactoring and deprecations should be avoided if there are no substantial benefits.
 
-New features can be marked as experimental to be excluded from deprecation
-policies.
+New features can be marked as experimental to be excluded from deprecation policies.
 
-A major release is signaled by a new major version number and a unique code
-name based on a Unicode character.
+A major release is signaled by a new major version number and a unique code name based on a Unicode character.
 
-Only add dependencies if absolutely necessary and make them optional if
-possible.
+Only add dependencies if absolutely necessary and make them optional if possible.
 
-Emulate the style of the existing code and documentation, but don't be afraid to
-adopt newer best practices if you can apply them consistently.
+Emulate the style of the existing code and documentation, but don't be afraid to adopt newer best practices if you can
+apply them consistently.
 
 Domain specific languages should be avoided in favor of Perl-ish solutions.
 
 Documentation belongs to the guides, module POD is just an API reference.
 
-The main focus of the included documentation should be on examples, no walls of
-text. (An example for every one or two sentences is a good rule of thumb)
+The main focus of the included documentation should be on examples, no walls of text. (An example for every one or two
+sentences is a good rule of thumb)
 
-Everything should be ordered alphabetically if possible, or at least be
-consistent if not.
+Everything should be ordered alphabetically if possible, or at least be consistent if not.
 
-The master source code repository should always be kept in a stable state, use
-feature branches for actual development.
+The master source code repository should always be kept in a stable state, use feature branches for actual development.
 
 Code has to be run through L<Perl::Tidy> with the included
-L<.perltidyrc|https://github.com/mojolicious/mojo/blob/master/.perltidyrc>, and
-everything should look like it was written by a single person.
+L<.perltidyrc|https://github.com/mojolicious/mojo/blob/master/.perltidyrc>, and everything should look like it was
+written by a single person.
 
 Functions and methods should be as short as possible, no spaghetti code.
 
-Comments should be correctly capitalized, and funny if possible, punctuation is
-optional if it doesn't increase readability.
+Comments should be correctly capitalized, and funny if possible, punctuation is optional if it doesn't increase
+readability.
 
 No names outside of C<Mojolicious.pm>.
 
@@ -182,68 +154,34 @@ The voting process used to make decisions for the project:
 
 =over 2
 
-Any member of the core team can call for a vote to decide about the addition and
-modification of features (usually with a GitHub comment mentioning the team
-C<@mojolicious/core> and the C<vote> label).
+A feature can be added or modified when at least 3 members of the core team have cast a vote in favour, or the BDFL
+overruled the vote.
 
-Additionally for GitHub pull requests, everyone who has had one of their pull
-requests accepted previously (C<Contributor>) can call for a vote with a GitHub
-comment of the form C<Calling for a vote @mojolicious/core>.
+Any core team member may nominate new members, who must then be accepted by a 2/3 majority vote.
 
-A feature can be added or modified when at least 3 voting members of the core
-team have cast a vote in favour, or the BDFL overruled the vote.
-
-A vote ends once enough votes have been cast, or after a 14 day review period
-has passed. Any non-trivial changes (more than a typo fix) will invalidate the
-vote, and require a new vote to be called.
-
-Votes for pull requests on GitHub need to be cast with the final code review
-comment and spelled out as C<+1>, C<-1> or C<neutral>. A C<+1> vote may only be
-cast in combination with an approved code review.
-
-For especially controversial decisions it is also possible to call for a
-majority vote.
-
-Voting is the primary responsibility of the core team, therefore only members
-that participate regularly should be considered active.
-
-Any core team member may nominate new members, who must then be accepted by a
-2/3 majority vote.
-
-Votes should be public if possible, so non-members can participate as well.
-Non-members that regularly have a positive impact on decisions and participate
-in IRC discussions should be considered for core team membership.
-
-Sebastian has veto rights on all decisions and will resolve issues that could
-not be decided with a vote.
+Sebastian has veto rights on all decisions and will resolve issues that could not be decided with a vote.
 
 =back
 
 =head1 CODE OF CONDUCT
 
-Like the technical community as a whole, the L<Mojolicious> team and community
-is made up of a mixture of professionals and volunteers from all over the world,
-working on every aspect of the mission - including mentorship, teaching, and
+Like the technical community as a whole, the L<Mojolicious> team and community is made up of a mixture of professionals
+and volunteers from all over the world, working on every aspect of the mission - including mentorship, teaching, and
 connecting people.
 
-Diversity is one of our huge strengths, but it can also lead to communication
-issues and unhappiness. To that end, we have a few ground rules that we ask
-people to adhere to. This code applies equally to founders, mentors and those
+Diversity is one of our huge strengths, but it can also lead to communication issues and unhappiness. To that end, we
+have a few ground rules that we ask people to adhere to. This code applies equally to founders, mentors and those
 seeking help and guidance.
 
-This isn't an exhaustive list of things that you can't do. Rather, take it in
-the spirit in which it’s intended - a guide to make it easier to enrich all of
-us and the technical communities in which we participate.
+This isn't an exhaustive list of things that you can't do. Rather, take it in the spirit in which it’s intended - a
+guide to make it easier to enrich all of us and the technical communities in which we participate.
 
-This code of conduct applies to all spaces managed by the L<Mojolicious>
-project. This includes IRC, the mailing lists, the issue tracker, and any other
-forums created by the project team which the community uses for communication.
-In addition, violations of this code outside these spaces may affect a person's
-ability to participate within them.
+This code of conduct applies to all spaces managed by the L<Mojolicious> project. This includes IRC, the mailing lists,
+the issue tracker, and any other forums created by the project team which the community uses for communication. In
+addition, violations of this code outside these spaces may affect a person's ability to participate within them.
 
-If you believe someone is violating the code of conduct, we ask that you report
-it by emailing Joel Berger (C<jberger@mojolicious.org>) or other members of
-L<the team|Mojolicious/"CORE DEVELOPERS">.
+If you believe someone is violating the code of conduct, we ask that you report it by emailing Joel Berger
+(C<jberger@mojolicious.org>) or other members of L<the team|Mojolicious/"CORE DEVELOPERS">.
 
 =over 2
 
@@ -311,32 +249,26 @@ resolve issues and learning from mistakes.
 
 =head1 FORK POLICY
 
-The L<Mojolicious> core team believes that there is a lot of value in the entire
-toolkit being a unified project. Forks drain resources from a project, not just
-mindshare but also very valuable bug reports and patches, which can have very
-serious security implications. Therefore we ask that you please not publically
-fork pieces of the L<Mojolicious> distribution without our consent. As doing so
-is against our express wishes, individuals who engage in unauthorized forking
-may be denied from participating in community sponsored spaces.
+The L<Mojolicious> core team believes that there is a lot of value in the entire toolkit being a unified project. Forks
+drain resources from a project, not just mindshare but also very valuable bug reports and patches, which can have very
+serious security implications. Therefore we ask that you please not publically fork pieces of the L<Mojolicious>
+distribution without our consent. As doing so is against our express wishes, individuals who engage in unauthorized
+forking may be denied from participating in community sponsored spaces.
 
-For developers considering the use of a forked module, we strongly recommend
-that you make yourself familiar with its history and track record. While many
-parts of L<Mojolicious> have been forked in the past, very few forks have been
-able to keep up with L<Mojolicious> development, and most are missing critical
-bug fixes.
+For developers considering the use of a forked module, we strongly recommend that you make yourself familiar with its
+history and track record. While many parts of L<Mojolicious> have been forked in the past, very few forks have been
+able to keep up with L<Mojolicious> development, and most are missing critical bug fixes.
 
 =head1 MORE
 
-You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
-lot more documentation and examples by many different authors.
+You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious
+wiki|http://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
+authors.
 
 =head1 SUPPORT
 
-If you have any questions the documentation might not yet answer, don't
-hesitate to ask on the
-L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.freenode.net> (L<chat
-now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>).
+If you have any questions the documentation might not yet answer, don't hesitate to ask on the L<mailing
+list|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
+now!|https://webchat.freenode.net/#mojo>).
 
 =cut

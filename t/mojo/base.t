@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 package Mojo::BaseTest;
@@ -52,7 +52,7 @@ use Mojo::Base;
 use Mojo::BaseTest::Base1;
 use Mojo::BaseTest::Base2;
 use Mojo::BaseTest::Base3;
-use Scalar::Util 'isweak';
+use Scalar::Util qw(isweak);
 
 # Basic functionality
 my $object  = Mojo::BaseTest->new->foo(23);
@@ -76,8 +76,7 @@ is $object->yada(5)->yada, 5, 'right attribute value';
 
 # Default value support
 $object = Mojo::BaseTest->new;
-isa_ok $object->name('foobarbaz'), 'Mojo::BaseTest',
-  'attribute value has right class';
+isa_ok $object->name('foobarbaz'), 'Mojo::BaseTest', 'attribute value has right class';
 $object2 = Mojo::BaseTest->new->tests('3');
 is $object2->tests, 3, 'right attribute value';
 is $object->tests,  1, 'right attribute default value';
@@ -92,8 +91,7 @@ is $object->baz(6)->baz, 6, 'right chained attribute value';
 # Tap into chain
 $object = Mojo::BaseTest->new;
 is $object->tap(sub { $_->name('foo') })->name, 'foo', 'right attribute value';
-is $object->tap(sub { shift->name('bar')->name })->name, 'bar',
-  'right attribute value';
+is $object->tap(sub { shift->name('bar')->name })->name, 'bar', 'right attribute value';
 is $object->tap('tests')->tests, 1, 'right attribute value';
 is $object->more_tests, 2, 'right attribute value';
 is $object->tap('more_tests')->tests, 3, 'right attribute value';
@@ -107,20 +105,16 @@ is $object->foo(3)->foo, 3, 'right attribute value';
 
 # Exceptions
 eval { Mojo::BaseTest->attr(foo => []) };
-like $@, qr/Default has to be a code reference or constant value/,
-  'right error';
+like $@, qr/Default has to be a code reference or constant value/, 'right error';
 eval { Mojo::BaseTest->attr(23) };
 like $@, qr/Attribute "23" invalid/, 'right error';
 eval { Mojo::BaseTest->attr(foo => undef, fail => 1) };
 like $@, qr/Unsupported attribute option/, 'right error';
 
 # Weaken
-my ($one, $two, $three) = (
-  $Mojo::BaseTest::Weak1::ONE, $Mojo::BaseTest::Weak2::TWO,
-  $Mojo::BaseTest::Weak3::THREE
-) = ({}, {}, {});
-my $weak
-  = Mojo::BaseTest::Weak3->new(one => $one, two => $two, three => $three);
+my ($one, $two, $three) = ($Mojo::BaseTest::Weak1::ONE, $Mojo::BaseTest::Weak2::TWO, $Mojo::BaseTest::Weak3::THREE)
+  = ({}, {}, {});
+my $weak = Mojo::BaseTest::Weak3->new(one => $one, two => $two, three => $three);
 ok isweak($weak->{$_}), "weakened $_ ok with value" for qw(one two three);
 $weak = Mojo::BaseTest::Weak3->new->tap('one')->tap('two')->tap('three');
 ok isweak($weak->{$_}), "weakened $_ ok with default" for qw(one two three);

@@ -17,8 +17,7 @@ mojo - The Mojolicious command system
 
 =head1 DESCRIPTION
 
-List and run L<Mojolicious> commands as described in
-L<Mojolicious::Commands>.
+List and run L<Mojolicious> commands as described in L<Mojolicious::Commands>.
 
 =head1 SEE ALSO
 

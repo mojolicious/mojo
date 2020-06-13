@@ -30,8 +30,7 @@ has log              => sub {
   my $log  = Mojo::Log->new;
   my $home = $self->home;
   my $mode = $self->mode;
-  $log->path($home->child('log', "$mode.log"))
-    if -d $home->child('log') && -w _;
+  $log->path($home->child('log', "$mode.log")) if -d $home->child('log') && -w _;
 
   # Reduced log output outside of development mode
   return $log->level($ENV{MOJO_LOG_LEVEL}) if $ENV{MOJO_LOG_LEVEL};
@@ -59,7 +58,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.27';
+our $VERSION  = '8.54';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -78,15 +77,12 @@ sub build_controller {
 
   # Embedded application
   my $stash = {};
-  if ($tx && (my $sub = $tx->can('stash'))) {
-    ($stash, $tx) = ($tx->$sub, $tx->tx);
-  }
+  if ($tx && (my $sub = $tx->can('stash'))) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
 
   # Build default controller
   my $defaults = $self->defaults;
   @$stash{keys %$defaults} = values %$defaults;
-  my $c
-    = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+  my $c = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   $c->{tx} ||= $self->build_tx;
 
   return $c;
@@ -113,8 +109,7 @@ sub dispatch {
 
   # Try to find a static file
   my $tx = $c->tx;
-  $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c)
-    unless $tx->res->code;
+  $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c) unless $tx->res->code;
 
   # Start timer (ignore static files)
   my $stash = $c->stash;
@@ -128,8 +123,7 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  $c->helpers->reply->not_found
-    unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
+  $c->helpers->reply->not_found unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
 }
 
 sub handler {
@@ -137,7 +131,7 @@ sub handler {
 
   # Dispatcher has to be last in the chain
   ++$self->{dispatch}
-    and $self->hook(around_action   => sub { $_[2]($_[1]) })
+    and $self->hook(around_action   => \&_action)
     and $self->hook(around_dispatch => sub { $_[1]->app->dispatch($_[1]) })
     unless $self->{dispatch};
 
@@ -146,9 +140,7 @@ sub handler {
   $self->plugins->emit_chain(around_dispatch => $c);
 
   # Delayed response
-  $c->helpers->log->debug(
-    'Nothing has been rendered, expecting delayed response')
-    unless $c->stash->{'mojo.rendered'};
+  $c->helpers->log->debug('Nothing has been rendered, expecting delayed response') unless $c->stash->{'mojo.rendered'};
 }
 
 sub helper { shift->renderer->add_helper(@_) }
@@ -171,8 +163,7 @@ sub new {
   $r->hide(qw(render_to_string rendered req res send session signed_cookie));
   $r->hide(qw(stash tx url_for write write_chunk));
 
-  $self->plugin($_)
-    for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
+  $self->plugin($_) for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
 
   # Exception handling should be first in chain
   $self->hook(around_dispatch => \&_exception);
@@ -196,6 +187,13 @@ sub start {
 }
 
 sub startup { }
+
+sub _action {
+  my ($next, $c, $action, $last) = @_;
+  my $val = $action->($c);
+  $val->catch(sub { $c->helpers->reply->exception(shift) }) if Scalar::Util::blessed $val && $val->isa('Mojo::Promise');
+  return $val;
+}
 
 sub _die { CORE::die ref $_[0] ? $_[0] : Mojo::Exception->new(shift)->trace }
 
@@ -237,11 +235,10 @@ Mojolicious - Real-time web framework
 
 =head1 DESCRIPTION
 
-An amazing real-time web framework built on top of the powerful L<Mojo> web
-development toolkit. With support for RESTful routes, plugins, commands,
-Perl-ish templates, content negotiation, session management, form validation,
-testing framework, static file server, C<CGI>/C<PSGI> detection, first class
-Unicode support and much more for you to discover.
+An amazing real-time web framework built on top of the powerful L<Mojo> web development toolkit. With support for
+RESTful routes, plugins, commands, Perl-ish templates, content negotiation, session management, form validation,
+testing framework, static file server, C<CGI>/C<PSGI> detection, first class Unicode support and much more for you to
+discover.
 
 Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
@@ -249,42 +246,51 @@ Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
 L<Mojolicious> will emit the following hooks in the listed order.
 
+=head2 before_command
+
+Emitted right before the application runs a command through the command line interface. Note that this hook is
+B<EXPERIMENTAL> and might change without warning!
+
+  $app->hook(before_command => sub {
+    my ($command, $args) = @_;
+    ...
+  });
+
+Useful for reconfiguring the application before running a command or to modify the behavior of a command. (Passed the
+command object and the command arguments)
+
 =head2 before_server_start
 
-Emitted right before the application server is started, for web servers that
-support it, which includes all the built-in ones (except for
-L<Mojo::Server::CGI>).
+Emitted right before the application server is started, for web servers that support it, which includes all the
+built-in ones (except for L<Mojo::Server::CGI>).
 
   $app->hook(before_server_start => sub {
     my ($server, $app) = @_;
     ...
   });
 
-Useful for reconfiguring application servers dynamically or collecting server
-diagnostics information. (Passed the server and application objects)
+Useful for reconfiguring application servers dynamically or collecting server diagnostics information. (Passed the
+server and application objects)
 
 =head2 after_build_tx
 
-Emitted right after the transaction is built and before the HTTP request gets
-parsed.
+Emitted right after the transaction is built and before the HTTP request gets parsed.
 
   $app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;
     ...
   });
 
-This is a very powerful hook and should not be used lightly, it makes some
-rather advanced features such as upload progress bars possible. Note that this
-hook will not work for embedded applications, because only the host application
+This is a very powerful hook and should not be used lightly, it makes some rather advanced features such as upload
+progress bars possible. Note that this hook will not work for embedded applications, because only the host application
 gets to build transactions. (Passed the transaction and application objects)
 
 =head2 around_dispatch
 
-Emitted right after a new request has been received and wraps around the whole
-dispatch process, so you have to manually forward to the next hook if you want
-to continue the chain. Default exception handling with
-L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> is the first hook
-in the chain and a call to L</"dispatch"> the last, yours will be in between.
+Emitted right after a new request has been received and wraps around the whole dispatch process, so you have to
+manually forward to the next hook if you want to continue the chain. Default exception handling with
+L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> is the first hook in the chain and a call to
+L</"dispatch"> the last, yours will be in between.
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;
@@ -293,10 +299,9 @@ in the chain and a call to L</"dispatch"> the last, yours will be in between.
     ...
   });
 
-This is a very powerful hook and should not be used lightly, it allows you to,
-for example, customize application-wide exception handling, consider it the
-sledgehammer in your toolbox. (Passed a callback leading to the next hook and
-the default controller object)
+This is a very powerful hook and should not be used lightly, it allows you to, for example, customize application-wide
+exception handling, consider it the sledgehammer in your toolbox. (Passed a callback leading to the next hook and the
+default controller object)
 
 =head2 before_dispatch
 
@@ -307,40 +312,35 @@ Emitted right before the static file server and router start their work.
     ...
   });
 
-Very useful for rewriting incoming requests and other preprocessing tasks.
-(Passed the default controller object)
+Very useful for rewriting incoming requests and other preprocessing tasks. (Passed the default controller object)
 
 =head2 after_static
 
-Emitted after a static file response has been generated by the static file
-server.
+Emitted after a static file response has been generated by the static file server.
 
   $app->hook(after_static => sub {
     my $c = shift;
     ...
   });
 
-Mostly used for post-processing static file responses. (Passed the default
-controller object)
+Mostly used for post-processing static file responses. (Passed the default controller object)
 
 =head2 before_routes
 
-Emitted after the static file server determined if a static file should be
-served and before the router starts its work.
+Emitted after the static file server determined if a static file should be served and before the router starts its
+work.
 
   $app->hook(before_routes => sub {
     my $c = shift;
     ...
   });
 
-Mostly used for custom dispatchers and collecting metrics. (Passed the default
-controller object)
+Mostly used for custom dispatchers and collecting metrics. (Passed the default controller object)
 
 =head2 around_action
 
-Emitted right before an action gets executed and wraps around it, so you have to
-manually forward to the next hook if you want to continue the chain. Default
-action dispatching is the last hook in the chain, yours will run before it.
+Emitted right before an action gets executed and wraps around it, so you have to manually forward to the next hook if
+you want to continue the chain. Default action dispatching is the last hook in the chain, yours will run before it.
 
   $app->hook(around_action => sub {
     my ($next, $c, $action, $last) = @_;
@@ -348,55 +348,49 @@ action dispatching is the last hook in the chain, yours will run before it.
     return $next->();
   });
 
-This is a very powerful hook and should not be used lightly, it allows you for
-example to pass additional arguments to actions or handle return values
-differently. Note that this hook can trigger more than once for the same
-request if there are nested routes. (Passed a callback leading to the next hook,
-the current controller object, the action callback and a flag indicating if this
-action is an endpoint)
+This is a very powerful hook and should not be used lightly, it allows you for example to pass additional arguments to
+actions or handle return values differently. Note that this hook can trigger more than once for the same request if
+there are nested routes. (Passed a callback leading to the next hook, the current controller object, the action
+callback and a flag indicating if this action is an endpoint)
 
 =head2 before_render
 
-Emitted before content is generated by the renderer. Note that this hook can
-trigger out of order due to its dynamic nature, and with embedded applications
-will only work for the application that is rendering.
+Emitted before content is generated by the renderer. Note that this hook can trigger out of order due to its dynamic
+nature, and with embedded applications will only work for the application that is rendering.
 
   $app->hook(before_render => sub {
     my ($c, $args) = @_;
     ...
   });
 
-Mostly used for pre-processing arguments passed to the renderer. (Passed the
-current controller object and the render arguments)
+Mostly used for pre-processing arguments passed to the renderer. (Passed the current controller object and the render
+arguments)
 
 =head2 after_render
 
-Emitted after content has been generated by the renderer that will be assigned
-to the response. Note that this hook can trigger out of order due to its
-dynamic nature, and with embedded applications will only work for the
-application that is rendering.
+Emitted after content has been generated by the renderer that will be assigned to the response. Note that this hook can
+trigger out of order due to its dynamic nature, and with embedded applications will only work for the application that
+is rendering.
 
   $app->hook(after_render => sub {
     my ($c, $output, $format) = @_;
     ...
   });
 
-Mostly used for post-processing dynamically generated content. (Passed the
-current controller object, a reference to the content and the format)
+Mostly used for post-processing dynamically generated content. (Passed the current controller object, a reference to
+the content and the format)
 
 =head2 after_dispatch
 
-Emitted in reverse order after a response has been generated. Note that this
-hook can trigger out of order due to its dynamic nature, and with embedded
-applications will only work for the application that is generating the response.
+Emitted in reverse order after a response has been generated. Note that this hook can trigger out of order due to its
+dynamic nature, and with embedded applications will only work for the application that is generating the response.
 
   $app->hook(after_dispatch => sub {
     my $c = shift;
     ...
   });
 
-Useful for rewriting outgoing responses and other post-processing tasks.
-(Passed the current controller object)
+Useful for rewriting outgoing responses and other post-processing tasks. (Passed the current controller object)
 
 =head1 ATTRIBUTES
 
@@ -407,8 +401,7 @@ L<Mojolicious> implements the following attributes.
   my $commands = $app->commands;
   $app         = $app->commands(Mojolicious::Commands->new);
 
-Command line interface for your application, defaults to a
-L<Mojolicious::Commands> object.
+Command line interface for your application, defaults to a L<Mojolicious::Commands> object.
 
   # Add another namespace to load commands from
   push @{$app->commands->namespaces}, 'MyApp::Command';
@@ -418,17 +411,15 @@ L<Mojolicious::Commands> object.
   my $class = $app->controller_class;
   $app      = $app->controller_class('Mojolicious::Controller');
 
-Class to be used for the default controller, defaults to
-L<Mojolicious::Controller>. Note that this class needs to have already been
-loaded before the first request arrives.
+Class to be used for the default controller, defaults to L<Mojolicious::Controller>. Note that this class needs to have
+already been loaded before the first request arrives.
 
 =head2 home
 
   my $home = $app->home;
   $app     = $app->home(Mojo::Home->new);
 
-The home directory of your application, defaults to a L<Mojo::Home> object
-which stringifies to the actual path.
+The home directory of your application, defaults to a L<Mojo::Home> object which stringifies to the actual path.
 
   # Portably generate path relative to home directory
   my $path = $app->home->child('data', 'important.txt');
@@ -438,11 +429,9 @@ which stringifies to the actual path.
   my $log = $app->log;
   $app    = $app->log(Mojo::Log->new);
 
-The logging layer of your application, defaults to a L<Mojo::Log> object. The
-level will default to either the C<MOJO_LOG_LEVEL> environment variable,
-C<debug> if the L</mode> is C<development>, or C<info> otherwise. All messages
-will be written to C<STDERR>, or a C<log/$mode.log> file if a C<log> directory
-exists.
+The logging layer of your application, defaults to a L<Mojo::Log> object. The level will default to either the
+C<MOJO_LOG_LEVEL> environment variable, C<debug> if the L</mode> is C<development>, or C<info> otherwise. All messages
+will be written to C<STDERR>, or a C<log/$mode.log> file if a C<log> directory exists.
 
   # Log debug message
   $app->log->debug('It works');
@@ -452,11 +441,9 @@ exists.
   my $max = $app->max_request_size;
   $app    = $app->max_request_size(16777216);
 
-Maximum request size in bytes, defaults to the value of
-L<Mojo::Message/"max_message_size">. Setting the value to C<0> will allow
-requests of indefinite size. Note that increasing this value can also
-drastically increase memory usage, should you for example attempt to parse an
-excessively large request body with the methods L<Mojo::Message/"dom"> or
+Maximum request size in bytes, defaults to the value of L<Mojo::Message/"max_message_size">. Setting the value to C<0>
+will allow requests of indefinite size. Note that increasing this value can also drastically increase memory usage,
+should you for example attempt to parse an excessively large request body with the methods L<Mojo::Message/"dom"> or
 L<Mojo::Message/"json">.
 
 =head2 mode
@@ -464,25 +451,24 @@ L<Mojo::Message/"json">.
   my $mode = $app->mode;
   $app     = $app->mode('production');
 
-The operating mode for your application, defaults to a value from the
-C<MOJO_MODE> and C<PLACK_ENV> environment variables or C<development>.
+The operating mode for your application, defaults to a value from the C<MOJO_MODE> and C<PLACK_ENV> environment
+variables or C<development>.
 
 =head2 moniker
 
   my $moniker = $app->moniker;
   $app        = $app->moniker('foo_bar');
 
-Moniker of this application, often used as default filename for configuration
-files and the like, defaults to decamelizing the application class with
-L<Mojo::Util/"decamelize">.
+Moniker of this application, often used as default filename for configuration files and the like, defaults to
+decamelizing the application class with L<Mojo::Util/"decamelize">.
 
 =head2 plugins
 
   my $plugins = $app->plugins;
   $app        = $app->plugins(Mojolicious::Plugins->new);
 
-The plugin manager, defaults to a L<Mojolicious::Plugins> object. See the
-L</"plugin"> method below if you want to load a plugin.
+The plugin manager, defaults to a L<Mojolicious::Plugins> object. See the L</"plugin"> method below if you want to load
+a plugin.
 
   # Add another namespace to load plugins from
   push @{$app->plugins->namespaces}, 'MyApp::Plugin';
@@ -492,9 +478,8 @@ L</"plugin"> method below if you want to load a plugin.
   my $renderer = $app->renderer;
   $app         = $app->renderer(Mojolicious::Renderer->new);
 
-Used to render content, defaults to a L<Mojolicious::Renderer> object. For more
-information about how to generate content see
-L<Mojolicious::Guides::Rendering>.
+Used to render content, defaults to a L<Mojolicious::Renderer> object. For more information about how to generate
+content see L<Mojolicious::Guides::Rendering>.
 
   # Enable compression
   $app->renderer->compress(1);
@@ -513,8 +498,8 @@ L<Mojolicious::Guides::Rendering>.
   my $routes = $app->routes;
   $app       = $app->routes(Mojolicious::Routes->new);
 
-The router, defaults to a L<Mojolicious::Routes> object. You use this in your
-startup method to define the url endpoints for your application.
+The router, defaults to a L<Mojolicious::Routes> object. You use this in your startup method to define the url
+endpoints for your application.
 
   # Add routes
   my $r = $app->routes;
@@ -529,14 +514,11 @@ startup method to define the url endpoints for your application.
   my $secrets = $app->secrets;
   $app        = $app->secrets([$bytes]);
 
-Secret passphrases used for signed cookies and the like, defaults to the
-L</"moniker"> of this application, which is not very secure, so you should
-change it!!! As long as you are using the insecure default there will be debug
-messages in the log file reminding you to change your passphrase. Only the
-first passphrase is used to create new signatures, but all of them for
-verification. So you can increase security without invalidating all your
-existing signed cookies by rotating passphrases, just add new ones to the front
-and remove old ones from the back.
+Secret passphrases used for signed cookies and the like, defaults to the L</"moniker"> of this application, which is
+not very secure, so you should change it!!! As long as you are using the insecure default there will be debug messages
+in the log file reminding you to change your passphrase. Only the first passphrase is used to create new signatures,
+but all of them for verification. So you can increase security without invalidating all your existing signed cookies by
+rotating passphrases, just add new ones to the front and remove old ones from the back.
 
   # Rotate passphrases
   $app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);
@@ -546,10 +528,8 @@ and remove old ones from the back.
   my $sessions = $app->sessions;
   $app         = $app->sessions(Mojolicious::Sessions->new);
 
-Signed cookie based session manager, defaults to a L<Mojolicious::Sessions>
-object. You can usually leave this alone, see
-L<Mojolicious::Controller/"session"> for more information about working with
-session data.
+Signed cookie based session manager, defaults to a L<Mojolicious::Sessions> object. You can usually leave this alone,
+see L<Mojolicious::Controller/"session"> for more information about working with session data.
 
   # Change name of cookie used for all sessions
   $app->sessions->cookie_name('mysession');
@@ -562,8 +542,7 @@ session data.
   my $static = $app->static;
   $app       = $app->static(Mojolicious::Static->new);
 
-For serving static files from your C<public> directories, defaults to a
-L<Mojolicious::Static> object.
+For serving static files from your C<public> directories, defaults to a L<Mojolicious::Static> object.
 
   # Add another "public" directory
   push @{$app->static->paths}, '/home/sri/public';
@@ -582,8 +561,7 @@ L<Mojolicious::Static> object.
   my $types = $app->types;
   $app      = $app->types(Mojolicious::Types->new);
 
-Responsible for connecting file extensions with MIME types, defaults to a
-L<Mojolicious::Types> object.
+Responsible for connecting file extensions with MIME types, defaults to a L<Mojolicious::Types> object.
 
   # Add custom MIME type
   $app->types->type(twt => 'text/tweet');
@@ -593,8 +571,7 @@ L<Mojolicious::Types> object.
   my $ua = $app->ua;
   $app   = $app->ua(Mojo::UserAgent->new);
 
-A full featured HTTP user agent for use in your applications, defaults to a
-L<Mojo::UserAgent> object.
+A full featured HTTP user agent for use in your applications, defaults to a L<Mojo::UserAgent> object.
 
   # Perform blocking request
   say $app->ua->get('example.com')->result->body;
@@ -620,8 +597,7 @@ Validate values, defaults to a L<Mojolicious::Validator> object.
 
 =head1 METHODS
 
-L<Mojolicious> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojolicious> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 build_controller
 
@@ -662,8 +638,7 @@ Application configuration.
   $app     = $app->defaults({foo => 'bar', baz => 23});
   $app     = $app->defaults(foo => 'bar', baz => 23);
 
-Default values for L<Mojolicious::Controller/"stash">, assigned for every new
-request.
+Default values for L<Mojolicious::Controller/"stash">, assigned for every new request.
 
   # Remove value
   my $foo = delete $app->defaults->{foo};
@@ -675,25 +650,22 @@ request.
 
   $app->dispatch(Mojolicious::Controller->new);
 
-The heart of every L<Mojolicious> application, calls the L</"static"> and
-L</"routes"> dispatchers for every request and passes them a
-L<Mojolicious::Controller> object.
+The heart of every L<Mojolicious> application, calls the L</"static"> and L</"routes"> dispatchers for every request
+and passes them a L<Mojolicious::Controller> object.
 
 =head2 handler
 
   $app->handler(Mojo::Transaction::HTTP->new);
   $app->handler(Mojolicious::Controller->new);
 
-Sets up the default controller and emits the L</"around_dispatch"> hook for
-every request.
+Sets up the default controller and emits the L</"around_dispatch"> hook for every request.
 
 =head2 helper
 
   $app->helper(foo => sub {...});
 
-Add or replace a helper that will be available as a method of the controller
-object and the application object, as well as a function in C<ep> templates. For
-a full list of helpers that are available by default see
+Add or replace a helper that will be available as a method of the controller object and the application object, as well
+as a function in C<ep> templates. For a full list of helpers that are available by default see
 L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
   # Helper
@@ -715,8 +687,8 @@ L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
   $app->hook(after_dispatch => sub {...});
 
-Extend L<Mojolicious> with hooks, which allow code to be shared with all
-requests indiscriminately, for a full list of available hooks see L</"HOOKS">.
+Extend L<Mojolicious> with hooks, which allow code to be shared with all requests indiscriminately, for a full list of
+available hooks see L</"HOOKS">.
 
   # Dispatchers will not run if there's already a response code defined
   $app->hook(before_dispatch => sub {
@@ -731,10 +703,9 @@ requests indiscriminately, for a full list of available hooks see L</"HOOKS">.
   my $app = Mojolicious->new(moniker => 'foo_bar');
   my $app = Mojolicious->new({moniker => 'foo_bar'});
 
-Construct a new L<Mojolicious> application and call L</"startup">. Will
-automatically detect your home directory. Also sets up the renderer, static file
-server, a default set of plugins and an L</"around_dispatch"> hook with the
-default exception handling.
+Construct a new L<Mojolicious> application and call L</"startup">. Will automatically detect your home directory. Also
+sets up the renderer, static file server, a default set of plugins and an L</"around_dispatch"> hook with the default
+exception handling.
 
 =head2 plugin
 
@@ -748,8 +719,8 @@ default exception handling.
   $app->plugin('MyApp::Plugin::SomeThing', foo => 23);
   $app->plugin('MyApp::Plugin::SomeThing', {foo => 23});
 
-Load a plugin, for a full list of example plugins included in the
-L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
+Load a plugin, for a full list of example plugins included in the L<Mojolicious> distribution see
+L<Mojolicious::Plugins/"PLUGINS">.
 
 =head2 server
 
@@ -762,9 +733,8 @@ Emits the L</"before_server_start"> hook.
   $app->start;
   $app->start(@ARGV);
 
-Start the command line interface for your application. For a full list of
-commands that are available by default see L<Mojolicious::Commands/"COMMANDS">.
-Note that the options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode>, which are
+Start the command line interface for your application. For a full list of commands that are available by default see
+L<Mojolicious::Commands/"COMMANDS">. Note that the options C<-h>/C<--help>, C<--home> and C<-m>/C<--mode>, which are
 shared by all commands, will be parsed from C<@ARGV> during compile time.
 
   # Always start daemon
@@ -774,8 +744,8 @@ shared by all commands, will be parsed from C<@ARGV> during compile time.
 
   $app->startup;
 
-This is your main hook into the application, it will be called at application
-startup. Meant to be overloaded in a subclass.
+This is your main hook into the application, it will be called at application startup. Meant to be overloaded in a
+subclass.
 
   sub startup {
     my $self = shift;
@@ -784,12 +754,10 @@ startup. Meant to be overloaded in a subclass.
 
 =head1 HELPERS
 
-In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
-helpers on L<Mojolicious> objects. This includes all helpers from
-L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
-Note that application helpers are always called with a new default controller
-object, so they can't depend on or change controller state, which includes
-request, response and stash.
+In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call helpers on L<Mojolicious> objects. This
+includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>. Note that
+application helpers are always called with a new default controller object, so they can't depend on or change
+controller state, which includes request, response and stash.
 
   # Call helper
   say $app->dumper({foo => 'bar'});
@@ -799,15 +767,13 @@ request, response and stash.
 
 =head1 BUNDLED FILES
 
-The L<Mojolicious> distribution includes a few files with different licenses
-that have been bundled for internal use.
+The L<Mojolicious> distribution includes a few files with different licenses that have been bundled for internal use.
 
 =head2 Mojolicious Artwork
 
-  Copyright (C) 2010-2019, Sebastian Riedel.
+  Copyright (C) 2010-2020, Sebastian Riedel.
 
-Licensed under the CC-SA License, Version 4.0
-L<http://creativecommons.org/licenses/by-sa/4.0>.
+Licensed under the CC-SA License, Version 4.0 L<http://creativecommons.org/licenses/by-sa/4.0>.
 
 =head2 jQuery
 
@@ -819,13 +785,11 @@ Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
   Copyright (C) 2006, 2013 Google Inc..
 
-Licensed under the Apache License, Version 2.0
-L<http://www.apache.org/licenses/LICENSE-2.0>.
+Licensed under the Apache License, Version 2.0 L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 =head1 CODE NAMES
 
-Every major release of L<Mojolicious> has a code name, these are the ones that
-have been used in the past.
+Every major release of L<Mojolicious> has a code name, these are the ones that have been used in the past.
 
 8.0, C<Supervillain> (U+1F9B9)
 
@@ -849,13 +813,12 @@ have been used in the past.
 
 =item
 
-L<Stix|https://stix.no> sponsored the creation of the Mojolicious logo (designed
-by Nicolai Graesdal) and transferred its copyright to Sebastian Riedel.
+L<Stix|https://stix.no> sponsored the creation of the Mojolicious logo (designed by Nicolai Graesdal) and transferred
+its copyright to Sebastian Riedel.
 
 =item
 
-Some of the work on this distribution has been sponsored by
-L<The Perl Foundation|http://www.perlfoundation.org>.
+Some of the work on this distribution has been sponsored by L<The Perl Foundation|http://www.perlfoundation.org>.
 
 =back
 
@@ -870,6 +833,8 @@ Current voting members of the core team in alphabetical order:
 =over 2
 
 CandyAngel, C<candyangel@mojolicious.org>
+
+Christopher Rasch-Olsen Raa, C<christopher@mojolicious.org>
 
 Dan Book, C<grinnz@mojolicious.org>
 
@@ -886,8 +851,6 @@ The following members of the core team are currently on hiatus:
 =over 2
 
 Abhijit Menon-Sen, C<ams@cpan.org>
-
-Christopher Rasch-Olsen Raa, C<christopher@mojolicious.org>
 
 Glen Hinkle, C<tempire@cpan.org>
 
@@ -1045,6 +1008,10 @@ Jonathan Yu
 
 Josh Leder
 
+Kamen Naydenov
+
+Karen Etheridge
+
 Kazuhiro Shibuya
 
 Kevin Old
@@ -1070,6 +1037,8 @@ Mark Fowler
 Mark Grimes
 
 Mark Stosberg
+
+Martin McGrath
 
 Marty Tennison
 
@@ -1193,6 +1162,8 @@ Ulrich Kautz
 
 Uwe Voelker
 
+Veesh Goldman
+
 Viacheslav Tykhanovskyi
 
 Victor Engmark
@@ -1215,14 +1186,13 @@ Zoffix Znet
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019, Sebastian Riedel and others.
+Copyright (C) 2008-2020, Sebastian Riedel and others.
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License version 2.0.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
+2.0.
 
 =head1 SEE ALSO
 
-L<https://github.com/mojolicious/mojo>, L<Mojolicious::Guides>,
-L<https://mojolicious.org>.
+L<https://github.com/mojolicious/mojo>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

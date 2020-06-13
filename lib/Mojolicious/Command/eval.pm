@@ -2,7 +2,7 @@ package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Promise;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description => 'Run code against application';
 has usage       => sub { shift->extract_usage };
@@ -20,8 +20,7 @@ sub run {
 
   # Handle promises
   my $err;
-  Mojo::Promise->resolve($result)
-    ->then(sub { $result = shift }, sub { $err = shift })->wait;
+  Mojo::Promise->resolve($result)->then(sub { $result = shift }, sub { $err = shift })->wait;
   die $err if $err;
 
   return $result unless defined $result && ($v1 || $v2);
@@ -56,20 +55,18 @@ Mojolicious::Command::eval - Eval command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::eval> runs code against applications. If the result is a
-promise (then-able), it will wait until the promise is fulfilled or rejected and
-the result is returned.
+L<Mojolicious::Command::eval> runs code against applications. If the result is a promise (then-able), it will wait
+until the promise is fulfilled or rejected and the result is returned.
 
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
+This is a core command, that means it is always enabled and its code a good example for learning to build new commands,
+you're welcome to fork it.
 
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::eval> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::eval> inherits all attributes from L<Mojolicious::Command> and implements the following new
+ones.
 
 =head2 description
 
@@ -87,8 +84,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::eval> inherits all methods from L<Mojolicious::Command>
-and implements the following new ones.
+L<Mojolicious::Command::eval> inherits all methods from L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run
 

@@ -30,31 +30,30 @@ package main;
 my $ua = Mojo::UserAgent->new;
 $ua->server->app(TestApp->new);
 my $tx = $ua->get('/');
-is $tx->res->code, 200, 'right status';
+is $tx->res->code, 200,              'right status';
 is $tx->res->body, 'Hello TestApp!', 'right content';
 
-# Timeout
+# Timeouts
 {
-  is(Mojo::Server::Daemon->new->inactivity_timeout, 15, 'right value');
+  is(Mojo::Server::Daemon->new->inactivity_timeout, 30, 'right value');
   local $ENV{MOJO_INACTIVITY_TIMEOUT} = 25;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 25, 'right value');
   $ENV{MOJO_INACTIVITY_TIMEOUT} = 0;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 0, 'right value');
+  is(Mojo::Server::Daemon->new->keep_alive_timeout, 5, 'right value');
+  local $ENV{MOJO_KEEP_ALIVE_TIMEOUT} = 25;
+  is(Mojo::Server::Daemon->new->keep_alive_timeout, 25, 'right value');
+  $ENV{MOJO_KEEP_ALIVE_TIMEOUT} = 0;
+  is(Mojo::Server::Daemon->new->keep_alive_timeout, 0, 'right value');
 }
 
 # Listen
 {
-  is_deeply(Mojo::Server::Daemon->new->listen, ['http://*:3000'],
-    'right value');
+  is_deeply(Mojo::Server::Daemon->new->listen, ['http://*:3000'], 'right value');
   local $ENV{MOJO_LISTEN} = 'http://127.0.0.1:8080';
-  is_deeply(Mojo::Server::Daemon->new->listen,
-    ['http://127.0.0.1:8080'], 'right value');
+  is_deeply(Mojo::Server::Daemon->new->listen, ['http://127.0.0.1:8080'], 'right value');
   $ENV{MOJO_LISTEN} = 'http://*:80,https://*:443';
-  is_deeply(
-    Mojo::Server::Daemon->new->listen,
-    ['http://*:80', 'https://*:443'],
-    'right value'
-  );
+  is_deeply(Mojo::Server::Daemon->new->listen, ['http://*:80', 'https://*:443'], 'right value');
 }
 
 # Reverse proxy
@@ -73,8 +72,7 @@ delete $app->config->{foo};
 is $app->config('foo'), undef, 'no value';
 $app->config(foo => 'bar', baz => 'yada');
 is $app->config({test => 23})->config->{test}, 23, 'right value';
-is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
-  'right value';
+is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23}, 'right value';
 
 # Loading
 my $daemon = Mojo::Server::Daemon->new;
@@ -88,15 +86,12 @@ is ref $daemon->app, 'TestApp', 'right reference';
 my $bin = curfile->dirname;
 eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderTest/A.pm"); };
 like $@, qr/did not return an application object/, 'right error';
-eval {
-  Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderException.pm");
-};
+eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderException.pm"); };
 like $@, qr/^Can't load application/, 'right error';
 
 # Load missing application class
 eval { Mojo::Server::Daemon->new->build_app('Mojo::DoesNotExist') };
-like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/,
-  'right error';
+like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/, 'right error';
 
 # Invalid listen location
 eval { Mojo::Server::Daemon->new(listen => ['fail'])->start };
@@ -121,11 +116,10 @@ $app->routes->post(
     my @chunks;
     for my $key (sort keys %$params) { push @chunks, $params->{$key} }
 
-    my $cb;
-    $cb = sub {
-      my $c = shift;
-      $cb = undef unless my $chunk = shift @chunks || '';
-      $c->write_chunk($chunk, $cb);
+    my $cb = sub {
+      my $c     = shift;
+      my $chunk = shift @chunks || '';
+      $c->write_chunk($chunk, $chunk ? __SUB__ : ());
     };
     $c->$cb;
   }
@@ -147,6 +141,15 @@ $app->routes->any(
   '/port' => sub {
     my $c = shift;
     $c->render(text => $c->req->url->to_abs->port);
+  }
+);
+
+$app->routes->any(
+  '/timeout' => sub {
+    my $c  = shift;
+    my $id = $c->tx->connection;
+    $c->res->headers->header('X-Connection-ID' => $id);
+    $c->render(text => Mojo::IOLoop->stream($id)->timeout);
   }
 );
 
@@ -198,8 +201,7 @@ is $tx->res->body, 'Whatever!', 'right content';
 my ($tx2, $tx3);
 my $delay = Mojo::IOLoop->delay(sub { (undef, $tx, $tx2, $tx3) = @_ });
 $ua->get('/concurrent1/' => $delay->begin);
-$ua->post(
-  '/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
+$ua->post('/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
 $ua->get('/concurrent3/' => $delay->begin);
 $delay->wait;
 ok $tx->is_finished, 'transaction is finished';
@@ -235,9 +237,16 @@ ok $local_port > 0, 'has local port';
 ok $remote_address, 'has remote address';
 ok $remote_port > 0, 'has remote port';
 
+# Timeout
+$tx = $ua->get('/timeout');
+ok $tx->keep_alive, 'will be kept alive';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 30,  'inactivity timeout was used for the request';
+is(Mojo::IOLoop->stream($tx->res->headers->header('X-Connection-ID'))->timeout,
+  5, 'keep-alive timeout was assigned after the request');
+
 # Pipelined
-$daemon
-  = Mojo::Server::Daemon->new({listen => ['http://127.0.0.1'], silent => 1});
+$daemon = Mojo::Server::Daemon->new({listen => ['http://127.0.0.1'], silent => 1});
 my $port = $daemon->start->ports->[0];
 is $daemon->app->moniker, 'mojo-hello_world', 'right moniker';
 my $buffer = '';
@@ -249,8 +258,7 @@ $id = Mojo::IOLoop->client(
       read => sub {
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
-        Mojo::IOLoop->remove($id) and Mojo::IOLoop->stop
-          if $buffer =~ s/ is working!.*is working!$//gs;
+        Mojo::IOLoop->remove($id) and Mojo::IOLoop->stop if $buffer =~ s/ is working!.*is working!$//gs;
       }
     );
     $stream->write("GET /pipeline1/ HTTP/1.1\x0d\x0a"
@@ -263,12 +271,7 @@ Mojo::IOLoop->start;
 like $buffer, qr/Mojo$/, 'transactions were pipelined';
 
 # Throttling
-$daemon = Mojo::Server::Daemon->new(
-  app         => $app,
-  listen      => ['http://127.0.0.1'],
-  max_clients => 23,
-  silent      => 1
-);
+$daemon = Mojo::Server::Daemon->new(app => $app, listen => ['http://127.0.0.1'], max_clients => 23, silent => 1);
 is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
 is scalar @{$daemon->start->start->acceptors}, 1, 'one active acceptor';
 is $daemon->ioloop->max_connections, 23, 'right value';
@@ -308,12 +311,8 @@ ok $accepting[0], 'accepting connections';
 ok !$accepting[1], 'connection limit reached';
 
 # Request limit
-$daemon = Mojo::Server::Daemon->new(
-  app    => $app,
-  listen => ['http://127.0.0.1'],
-  silent => 1
-)->start;
-$port = $daemon->ports->[0];
+$daemon = Mojo::Server::Daemon->new(app => $app, listen => ['http://127.0.0.1'], silent => 1)->start;
+$port   = $daemon->ports->[0];
 is $daemon->max_requests, 100, 'right value';
 is $daemon->max_requests(2)->max_requests, 2, 'right value';
 $tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
@@ -328,22 +327,15 @@ is $tx->res->body, 'Whatever!', 'right content';
 # File descriptor
 my $listen = IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1');
 my $fd     = fileno $listen;
-$daemon = Mojo::Server::Daemon->new(
-  app    => $app,
-  listen => ["http://127.0.0.1?fd=$fd"],
-  silent => 1
-)->start;
-$port = $listen->sockport;
+$daemon = Mojo::Server::Daemon->new(app => $app, listen => ["http://127.0.0.1?fd=$fd"], silent => 1)->start;
+$port   = $listen->sockport;
 is $daemon->ports->[0], $port, 'same port';
 $tx = $ua->get("http://127.0.0.1:$port/port");
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $port, 'right content';
 
 # No TLS support
-eval {
-  Mojo::Server::Daemon->new(listen => ['https://127.0.0.1'], silent => 1)
-    ->start;
-};
+eval { Mojo::Server::Daemon->new(listen => ['https://127.0.0.1'], silent => 1)->start; };
 like $@, qr/IO::Socket::SSL/, 'right error';
 
 # Abstract methods

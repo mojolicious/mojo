@@ -5,17 +5,14 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::TLS;
 
-plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
-plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
-  unless Mojo::IOLoop::TLS->can_tls;
+plan skip_all => 'set TEST_TLS to enable this test (developer only!)' unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Mojo::IOLoop::TLS->can_tls;
 
 use Mojo::IOLoop;
 use Socket;
 
 # Built-in certificate
-socketpair(my $client_sock, my $server_sock, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
-  or die "Couldn't create socket pair: $!";
+socketpair(my $client_sock, my $server_sock, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die "Couldn't create socket pair: $!";
 $client_sock->blocking(0);
 $server_sock->blocking(0);
 my $delay  = Mojo::IOLoop->delay;
@@ -52,8 +49,9 @@ $client_result = $server_result = undef;
 $delay->then(sub { ($server_result, $client_result) = @_ });
 $delay->wait;
 is ref $client_result, 'IO::Socket::SSL', 'right class';
-is $client_result->get_cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
 is ref $server_result, 'IO::Socket::SSL', 'right class';
-is $server_result->get_cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
+my $expect = $server_result->get_sslversion eq 'TLSv1_3' ? 'TLS_AES_256_GCM_SHA384' : 'AES256-SHA';
+is $client_result->get_cipher, $expect, "$expect has been negotiatied";
+is $server_result->get_cipher, $expect, "$expect has been negotiatied";
 
 done_testing;

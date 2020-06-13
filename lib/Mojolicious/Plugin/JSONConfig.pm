@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::JSONConfig;
 use Mojo::Base 'Mojolicious::Plugin::Config';
 
-use Mojo::JSON 'from_json';
+use Mojo::JSON qw(from_json);
 use Mojo::Template;
 
 sub parse {
@@ -71,41 +71,36 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::JSONConfig> is a JSON configuration plugin that
-preprocesses its input with L<Mojo::Template>.
+L<Mojolicious::Plugin::JSONConfig> is a JSON configuration plugin that preprocesses its input with L<Mojo::Template>.
 
-The application object can be accessed via C<$app> or the C<app> function. A
-default configuration filename in the application home directory will be
-generated from the value of L<Mojolicious/"moniker"> (C<$moniker.json>). You can
-extend the normal configuration file C<$moniker.json> with C<mode> specific ones
-like C<$moniker.$mode.json>, which will be detected automatically.
+The application object can be accessed via C<$app> or the C<app> function. A default configuration filename in the
+application home directory will be generated from the value of L<Mojolicious/"moniker"> (C<$moniker.json>). You can
+extend the normal configuration file C<$moniker.json> with C<mode> specific ones like C<$moniker.$mode.json>, which
+will be detected automatically.
 
-If the configuration value C<config_override> has been set in
-L<Mojolicious/"config"> when this plugin is loaded, it will not do anything.
+If the configuration value C<config_override> has been set in L<Mojolicious/"config"> when this plugin is loaded, it
+will not do anything.
 
-The code of this plugin is a good example for learning to build new plugins,
-you're welcome to fork it.
+The code of this plugin is a good example for learning to build new plugins, you're welcome to fork it.
 
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available by default.
 
 =head1 OPTIONS
 
-L<Mojolicious::Plugin::JSONConfig> inherits all options from
-L<Mojolicious::Plugin::Config> and supports the following new ones.
+L<Mojolicious::Plugin::JSONConfig> inherits all options from L<Mojolicious::Plugin::Config> and supports the following
+new ones.
 
 =head2 template
 
   # Mojolicious::Lite
   plugin JSONConfig => {template => {line_start => '.'}};
 
-Attribute values passed to L<Mojo::Template> object used to preprocess
-configuration files.
+Attribute values passed to L<Mojo::Template> object used to preprocess configuration files.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::JSONConfig> inherits all methods from
-L<Mojolicious::Plugin::Config> and implements the following new ones.
+L<Mojolicious::Plugin::JSONConfig> inherits all methods from L<Mojolicious::Plugin::Config> and implements the
+following new ones.
 
 =head2 parse
 

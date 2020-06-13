@@ -2,12 +2,11 @@ use Mojo::Base -strict;
 
 use Test::More;
 
-plan skip_all => 'set TEST_EV to enable this test (developer only!)'
-  unless $ENV{TEST_EV} || $ENV{TEST_ALL};
-plan skip_all => 'EV 4.0+ required for this test!'
-  unless eval { require EV; EV->VERSION('4.0'); 1 };
+plan skip_all => 'set TEST_EV to enable this test (developer only!)' unless $ENV{TEST_EV} || $ENV{TEST_ALL};
+plan skip_all => 'EV 4.32+ required for this test!'                  unless eval { require EV; EV->VERSION('4.32'); 1 };
 
 use IO::Socket::INET;
+use Mojo::Util qw(steady_time);
 
 # Instantiation
 use_ok 'Mojo::Reactor::EV';
@@ -34,8 +33,7 @@ ok time < ($time + 10), 'stopped automatically';
 my $listen = IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1');
 my $port   = $listen->sockport;
 my ($readable, $writable);
-$reactor->io($listen => sub { pop() ? $writable++ : $readable++ })
-  ->watch($listen, 0, 0)->watch($listen, 1, 1);
+$reactor->io($listen => sub { pop() ? $writable++ : $readable++ })->watch($listen, 0, 0)->watch($listen, 1, 1);
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok !$readable, 'handle is not readable';
@@ -87,7 +85,7 @@ $reactor->start;
 ok $readable, 'handle is readable';
 ok !$writable, 'handle is not writable';
 ($readable, $writable) = ();
-$reactor->io($server => sub  { pop() ? $writable++ : $readable++ });
+$reactor->io($server => sub { pop() ? $writable++ : $readable++ });
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;
 ok $readable, 'handle is readable';
@@ -163,8 +161,7 @@ is_deeply $result, [1 .. 10], 'right result';
 
 # Reset while watchers are active
 $writable = undef;
-$reactor->io($_ => sub { ++$writable and shift->reset })->watch($_, 0, 1)
-  for $client, $server;
+$reactor->io($_ => sub { ++$writable and shift->reset })->watch($_, 0, 1) for $client, $server;
 $reactor->start;
 is $writable, 1, 'only one handle was writable';
 
@@ -192,6 +189,7 @@ $reactor2->timer(0.025 => sub { shift->stop });
 $reactor2->start;
 ok !$timer, 'timer was not triggered';
 ok $timer2, 'timer was triggered';
+$reactor->reset;
 
 # Restart timer
 my ($single, $pair, $one, $two, $last);
@@ -214,6 +212,28 @@ $reactor->start;
 is $pair, 2, 'timer pair was triggered';
 ok $single, 'single timer was triggered';
 ok $last,   'timers were triggered in the right order';
+
+# Reset timer
+my $before = steady_time;
+my ($after, $again);
+$one = $reactor->timer(300 => sub { $after = steady_time });
+$two = $reactor->recurring(
+  300 => sub {
+    my $reactor = shift;
+    $reactor->remove($two) if ++$again > 3;
+  }
+);
+$reactor->timer(
+  0.025 => sub {
+    my $reactor = shift;
+    $reactor->again($one, 0.025);
+    $reactor->again($two, 0.025);
+  }
+);
+$reactor->start;
+ok $after, 'timer was triggered';
+ok(($after - $before) < 200, 'less than 200 seconds');
+is $again, 4, 'recurring timer triggered four times';
 
 # Restart inactive timer
 $id = $reactor->timer(0 => sub { });

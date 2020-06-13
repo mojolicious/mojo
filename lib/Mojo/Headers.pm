@@ -1,23 +1,20 @@
 package Mojo::Headers;
 use Mojo::Base -base;
 
-use Carp 'croak';
-use Mojo::Util 'monkey_patch';
+use Carp qw(croak);
+use Mojo::Util qw(monkey_patch);
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
 has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 100 };
 
 # Common headers
 my %NAMES = map { lc() => $_ } (
-  qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
-  qw(Access-Control-Allow-Origin Allow Authorization Cache-Control Connection),
-  qw(Content-Disposition Content-Encoding Content-Language Content-Length),
-  qw(Content-Location Content-Range Content-Security-Policy Content-Type),
-  qw(Cookie DNT Date ETag Expect Expires Host If-Modified-Since If-None-Match),
-  qw(Last-Modified Link Location Origin Proxy-Authenticate),
-  qw(Proxy-Authorization Range Sec-WebSocket-Accept Sec-WebSocket-Extensions),
-  qw(Sec-WebSocket-Key Sec-WebSocket-Protocol Sec-WebSocket-Version Server),
-  qw(Server-Timing Set-Cookie Status Strict-Transport-Security TE Trailer),
+  qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges Access-Control-Allow-Origin Allow),
+  qw(Authorization Cache-Control Connection Content-Disposition Content-Encoding Content-Language Content-Length),
+  qw(Content-Location Content-Range Content-Security-Policy Content-Type Cookie DNT Date ETag Expect Expires Host),
+  qw(If-Modified-Since If-None-Match Last-Modified Link Location Origin Proxy-Authenticate Proxy-Authorization),
+  qw(Range Sec-WebSocket-Accept Sec-WebSocket-Extensions Sec-WebSocket-Key Sec-WebSocket-Protocol),
+  qw(Sec-WebSocket-Version Server Server-Timing Set-Cookie Status Strict-Transport-Security TE Trailer),
   qw(Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
 );
 for my $header (keys %NAMES) {
@@ -32,10 +29,8 @@ for my $header (keys %NAMES) {
 }
 
 # Hop-by-hop headers
-my @HOP_BY_HOP = map {lc} (
-  qw(Connection Keep-Alive Proxy-Authenticate Proxy-Authorization TE Trailer),
-  qw(Transfer-Encoding Upgrade)
-);
+my @HOP_BY_HOP
+  = map {lc} qw(Connection Keep-Alive Proxy-Authenticate Proxy-Authorization TE Trailer Transfer-Encoding Upgrade);
 
 sub add {
   my ($self, $name) = (shift, shift);
@@ -61,8 +56,7 @@ sub clone {
 
   my $clone = $self->new;
   %{$clone->{names}} = %{$self->{names} // {}};
-  @{$clone->{headers}{$_}} = @{$self->{headers}{$_}}
-    for keys %{$self->{headers}};
+  @{$clone->{headers}{$_}} = @{$self->{headers}{$_}} for keys %{$self->{headers}};
 
   return $clone;
 }
@@ -201,9 +195,8 @@ Mojo::Headers - HTTP headers
 
 =head1 DESCRIPTION
 
-L<Mojo::Headers> is a container for HTTP headers, based on
-L<RFC 7230|http://tools.ietf.org/html/rfc7230> and
-L<RFC 7231|http://tools.ietf.org/html/rfc7231>.
+L<Mojo::Headers> is a container for HTTP headers, based on L<RFC 7230|http://tools.ietf.org/html/rfc7230> and L<RFC
+7231|http://tools.ietf.org/html/rfc7231>.
 
 =head1 ATTRIBUTES
 
@@ -214,21 +207,19 @@ L<Mojo::Headers> implements the following attributes.
   my $size = $headers->max_line_size;
   $headers = $headers->max_line_size(1024);
 
-Maximum header line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<8192> (8KiB).
+Maximum header line size in bytes, defaults to the value of the C<MOJO_MAX_LINE_SIZE> environment variable or C<8192>
+(8KiB).
 
 =head2 max_lines
 
   my $num  = $headers->max_lines;
   $headers = $headers->max_lines(200);
 
-Maximum number of header lines, defaults to the value of the C<MOJO_MAX_LINES>
-environment variable or C<100>.
+Maximum number of header lines, defaults to the value of the C<MOJO_MAX_LINES> environment variable or C<100>.
 
 =head1 METHODS
 
-L<Mojo::Headers> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Headers> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 accept
 
@@ -270,9 +261,8 @@ Get or replace current header value, shortcut for the C<Accept-Ranges> header.
   my $origin = $headers->access_control_allow_origin;
   $headers   = $headers->access_control_allow_origin('*');
 
-Get or replace current header value, shortcut for the
-C<Access-Control-Allow-Origin> header from
-L<Cross-Origin Resource Sharing|http://www.w3.org/TR/cors/>.
+Get or replace current header value, shortcut for the C<Access-Control-Allow-Origin> header from L<Cross-Origin
+Resource Sharing|http://www.w3.org/TR/cors/>.
 
 =head2 add
 
@@ -336,24 +326,21 @@ Get or replace current header value, shortcut for the C<Connection> header.
   my $disposition = $headers->content_disposition;
   $headers        = $headers->content_disposition('foo');
 
-Get or replace current header value, shortcut for the C<Content-Disposition>
-header.
+Get or replace current header value, shortcut for the C<Content-Disposition> header.
 
 =head2 content_encoding
 
   my $encoding = $headers->content_encoding;
   $headers     = $headers->content_encoding('gzip');
 
-Get or replace current header value, shortcut for the C<Content-Encoding>
-header.
+Get or replace current header value, shortcut for the C<Content-Encoding> header.
 
 =head2 content_language
 
   my $language = $headers->content_language;
   $headers     = $headers->content_language('en');
 
-Get or replace current header value, shortcut for the C<Content-Language>
-header.
+Get or replace current header value, shortcut for the C<Content-Language> header.
 
 =head2 content_length
 
@@ -367,8 +354,7 @@ Get or replace current header value, shortcut for the C<Content-Length> header.
   my $location = $headers->content_location;
   $headers     = $headers->content_location('http://127.0.0.1/foo');
 
-Get or replace current header value, shortcut for the C<Content-Location>
-header.
+Get or replace current header value, shortcut for the C<Content-Location> header.
 
 =head2 content_range
 
@@ -382,8 +368,8 @@ Get or replace current header value, shortcut for the C<Content-Range> header.
   my $policy = $headers->content_security_policy;
   $headers   = $headers->content_security_policy('default-src https:');
 
-Get or replace current header value, shortcut for the C<Content-Security-Policy>
-header from L<Content Security Policy 1.0|http://www.w3.org/TR/CSP/>.
+Get or replace current header value, shortcut for the C<Content-Security-Policy> header from L<Content Security Policy
+1.0|http://www.w3.org/TR/CSP/>.
 
 =head2 content_type
 
@@ -397,8 +383,8 @@ Get or replace current header value, shortcut for the C<Content-Type> header.
   my $cookie = $headers->cookie;
   $headers   = $headers->cookie('f=b');
 
-Get or replace current header value, shortcut for the C<Cookie> header from
-L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
+Get or replace current header value, shortcut for the C<Cookie> header from L<RFC
+6265|http://tools.ietf.org/html/rfc6265>.
 
 =head2 date
 
@@ -409,18 +395,17 @@ Get or replace current header value, shortcut for the C<Date> header.
 
 =head2 dehop
 
-  $heders = $headers->dehop;
+  $headers = $headers->dehop;
 
-Remove hop-by-hop headers that should not be retransmitted. Note that this
-method is B<EXPERIMENTAL> and might change without warning!
+Remove hop-by-hop headers that should not be retransmitted.
 
 =head2 dnt
 
   my $dnt  = $headers->dnt;
   $headers = $headers->dnt(1);
 
-Get or replace current header value, shortcut for the C<DNT> (Do Not Track)
-header, which has no specification yet, but is very commonly used.
+Get or replace current header value, shortcut for the C<DNT> (Do Not Track) header, which has no specification yet, but
+is very commonly used.
 
 =head2 etag
 
@@ -433,8 +418,7 @@ Get or replace current header value, shortcut for the C<ETag> header.
 
   my $all = $headers->every_header('Location');
 
-Similar to L</"header">, but returns all headers sharing the same name as an
-array reference.
+Similar to L</"header">, but returns all headers sharing the same name as an array reference.
 
   # Get first header value
   say $headers->every_header('Location')->[0];
@@ -481,8 +465,7 @@ Get or replace current header value, shortcut for the C<Host> header.
   my $date = $headers->if_modified_since;
   $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
 
-Get or replace current header value, shortcut for the C<If-Modified-Since>
-header.
+Get or replace current header value, shortcut for the C<If-Modified-Since> header.
 
 =head2 if_none_match
 
@@ -521,8 +504,8 @@ Get and remove leftover data from header parser.
   my $link = $headers->link;
   $headers = $headers->link('<http://127.0.0.1/foo/3>; rel="next"');
 
-Get or replace current header value, shortcut for the C<Link> header from
-L<RFC 5988|http://tools.ietf.org/html/rfc5988>.
+Get or replace current header value, shortcut for the C<Link> header from L<RFC
+5988|http://tools.ietf.org/html/rfc5988>.
 
 =head2 location
 
@@ -545,8 +528,8 @@ Return an array reference with all currently defined headers.
   my $origin = $headers->origin;
   $headers   = $headers->origin('http://example.com');
 
-Get or replace current header value, shortcut for the C<Origin> header from
-L<RFC 6454|http://tools.ietf.org/html/rfc6454>.
+Get or replace current header value, shortcut for the C<Origin> header from L<RFC
+6454|http://tools.ietf.org/html/rfc6454>.
 
 =head2 parse
 
@@ -559,16 +542,14 @@ Parse formatted headers.
   my $authenticate = $headers->proxy_authenticate;
   $headers         = $headers->proxy_authenticate('Basic "realm"');
 
-Get or replace current header value, shortcut for the C<Proxy-Authenticate>
-header.
+Get or replace current header value, shortcut for the C<Proxy-Authenticate> header.
 
 =head2 proxy_authorization
 
   my $authorization = $headers->proxy_authorization;
   $headers          = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
 
-Get or replace current header value, shortcut for the C<Proxy-Authorization>
-header.
+Get or replace current header value, shortcut for the C<Proxy-Authorization> header.
 
 =head2 range
 
@@ -582,9 +563,8 @@ Get or replace current header value, shortcut for the C<Range> header.
   my $referrer = $headers->referrer;
   $headers     = $headers->referrer('http://example.com');
 
-Get or replace current header value, shortcut for the C<Referer> header, there
-was a typo in L<RFC 2068|http://tools.ietf.org/html/rfc2068> which resulted in
-C<Referer> becoming an official header.
+Get or replace current header value, shortcut for the C<Referer> header, there was a typo in L<RFC
+2068|http://tools.ietf.org/html/rfc2068> which resulted in C<Referer> becoming an official header.
 
 =head2 remove
 
@@ -597,41 +577,40 @@ Remove a header.
   my $accept = $headers->sec_websocket_accept;
   $headers   = $headers->sec_websocket_accept('s3pPLMBiTxaQ9kYGzzhZRbK+xOo=');
 
-Get or replace current header value, shortcut for the C<Sec-WebSocket-Accept>
-header from L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
+Get or replace current header value, shortcut for the C<Sec-WebSocket-Accept> header from L<RFC
+6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_extensions
 
   my $extensions = $headers->sec_websocket_extensions;
   $headers       = $headers->sec_websocket_extensions('foo');
 
-Get or replace current header value, shortcut for the
-C<Sec-WebSocket-Extensions> header from
-L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
+Get or replace current header value, shortcut for the C<Sec-WebSocket-Extensions> header from L<RFC
+6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_key
 
   my $key  = $headers->sec_websocket_key;
   $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
-Get or replace current header value, shortcut for the C<Sec-WebSocket-Key>
-header from L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
+Get or replace current header value, shortcut for the C<Sec-WebSocket-Key> header from L<RFC
+6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_protocol
 
   my $proto = $headers->sec_websocket_protocol;
   $headers  = $headers->sec_websocket_protocol('sample');
 
-Get or replace current header value, shortcut for the C<Sec-WebSocket-Protocol>
-header from L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
+Get or replace current header value, shortcut for the C<Sec-WebSocket-Protocol> header from L<RFC
+6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_version
 
   my $version = $headers->sec_websocket_version;
   $headers    = $headers->sec_websocket_version(13);
 
-Get or replace current header value, shortcut for the C<Sec-WebSocket-Version>
-header from L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
+Get or replace current header value, shortcut for the C<Sec-WebSocket-Version> header from L<RFC
+6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 server
 
@@ -645,33 +624,32 @@ Get or replace current header value, shortcut for the C<Server> header.
   my $timing = $headers->server_timing;
   $headers   = $headers->server_timing('app;desc=Mojolicious;dur=0.0001');
 
-Get or replace current header value, shortcut for the C<Server-Timing> header
-from L<Server Timing|https://www.w3.org/TR/server-timing/>.
+Get or replace current header value, shortcut for the C<Server-Timing> header from L<Server
+Timing|https://www.w3.org/TR/server-timing/>.
 
 =head2 set_cookie
 
   my $cookie = $headers->set_cookie;
   $headers   = $headers->set_cookie('f=b; path=/');
 
-Get or replace current header value, shortcut for the C<Set-Cookie> header from
-L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
+Get or replace current header value, shortcut for the C<Set-Cookie> header from L<RFC
+6265|http://tools.ietf.org/html/rfc6265>.
 
 =head2 status
 
   my $status = $headers->status;
   $headers   = $headers->status('200 OK');
 
-Get or replace current header value, shortcut for the C<Status> header from
-L<RFC 3875|http://tools.ietf.org/html/rfc3875>.
+Get or replace current header value, shortcut for the C<Status> header from L<RFC
+3875|http://tools.ietf.org/html/rfc3875>.
 
 =head2 strict_transport_security
 
   my $policy = $headers->strict_transport_security;
   $headers   = $headers->strict_transport_security('max-age=31536000');
 
-Get or replace current header value, shortcut for the
-C<Strict-Transport-Security> header from
-L<RFC 6797|http://tools.ietf.org/html/rfc6797>.
+Get or replace current header value, shortcut for the C<Strict-Transport-Security> header from L<RFC
+6797|http://tools.ietf.org/html/rfc6797>.
 
 =head2 te
 
@@ -685,8 +663,8 @@ Get or replace current header value, shortcut for the C<TE> header.
   my $single = $headers->to_hash;
   my $multi  = $headers->to_hash(1);
 
-Turn headers into hash reference, array references to represent multiple
-headers with the same name are disabled by default.
+Turn headers into hash reference, array references to represent multiple headers with the same name are disabled by
+default.
 
   say $headers->to_hash->{DNT};
 
@@ -708,8 +686,7 @@ Get or replace current header value, shortcut for the C<Trailer> header.
   my $encoding = $headers->transfer_encoding;
   $headers     = $headers->transfer_encoding('chunked');
 
-Get or replace current header value, shortcut for the C<Transfer-Encoding>
-header.
+Get or replace current header value, shortcut for the C<Transfer-Encoding> header.
 
 =head2 upgrade
 
@@ -737,8 +714,7 @@ Get or replace current header value, shortcut for the C<Vary> header.
   my $authenticate = $headers->www_authenticate;
   $headers         = $headers->www_authenticate('Basic realm="realm"');
 
-Get or replace current header value, shortcut for the C<WWW-Authenticate>
-header.
+Get or replace current header value, shortcut for the C<WWW-Authenticate> header.
 
 =head1 SEE ALSO
 

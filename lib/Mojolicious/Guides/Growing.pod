@@ -7,8 +7,8 @@ Mojolicious::Guides::Growing - Growing Mojolicious applications
 
 =head1 OVERVIEW
 
-This document explains the process of starting a L<Mojolicious::Lite> prototype
-from scratch and growing it into a well-structured L<Mojolicious> application.
+This document explains the process of starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
+well-structured L<Mojolicious> application.
 
 =head1 CONCEPTS
 
@@ -16,17 +16,15 @@ Essentials every L<Mojolicious> developer should know.
 
 =head2 Model View Controller
 
-MVC is a software architectural pattern for graphical user interface
-programming originating in Smalltalk-80, that separates application logic,
-presentation and input.
+MVC is a software architectural pattern for graphical user interface programming originating in Smalltalk-80, that
+separates application logic, presentation and input.
 
            +------------+    +-------+    +------+
   Input -> | Controller | -> | Model | -> | View | -> Output
            +------------+    +-------+    +------+
 
-A slightly modified version of the pattern moving some application logic into
-the I<controller> is the foundation of pretty much every web framework these
-days, including L<Mojolicious>.
+A slightly modified version of the pattern moving some application logic into the I<controller> is the foundation of
+pretty much every web framework these days, including L<Mojolicious>.
 
               +----------------+     +-------+
   Request  -> |                | <-> | Model |
@@ -36,20 +34,16 @@ days, including L<Mojolicious>.
   Response <- |                | <-> | View  |
               +----------------+     +-------+
 
-The I<controller> receives a request from a user, passes incoming data to the
-I<model> and retrieves data from it, which then gets turned into an actual
-response by the I<view>. But note that this pattern is just a guideline that
-most of the time results in cleaner more maintainable code, not a rule that
-should be followed at all costs.
+The I<controller> receives a request from a user, passes incoming data to the I<model> and retrieves data from it,
+which then gets turned into an actual response by the I<view>. But note that this pattern is just a guideline that most
+of the time results in cleaner more maintainable code, not a rule that should be followed at all costs.
 
 =head2 REpresentational State Transfer
 
-REST is a software architectural style for distributed hypermedia systems such
-as the web. While it can be applied to many protocols it is most commonly used
-with HTTP these days. In REST terms, when you are opening a URL like
-C<http://mojolicious.org/foo> with your browser, you are basically asking the
-web server for the HTML I<representation> of the C<http://mojolicious.org/foo>
-I<resource>.
+REST is a software architectural style for distributed hypermedia systems such as the web. While it can be applied to
+many protocols it is most commonly used with HTTP these days. In REST terms, when you are opening a URL like
+C<http://mojolicious.org/foo> with your browser, you are basically asking the web server for the HTML I<representation>
+of the C<http://mojolicious.org/foo> I<resource>.
 
   +--------+                                  +--------+
   |        | -> http://mojolicious.org/foo -> |        |
@@ -57,10 +51,9 @@ I<resource>.
   |        | <-  <html>Mojo rocks!</html>  <- |        |
   +--------+                                  +--------+
 
-The fundamental idea here is that all resources are uniquely addressable with
-URLs and every resource can have different representations such as HTML, RSS or
-JSON. User interface concerns are separated from data storage concerns and all
-session state is kept client-side.
+The fundamental idea here is that all resources are uniquely addressable with URLs and every resource can have
+different representations such as HTML, RSS or JSON. User interface concerns are separated from data storage concerns
+and all session state is kept client-side.
 
   +---------+                        +------------+
   |         | ->    PUT /foo      -> |            |
@@ -78,15 +71,13 @@ session state is kept client-side.
   |         | <-    200 OK        <- |            |
   +---------+                        +------------+
 
-While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part
-of REST they go very well with it and are commonly used to manipulate
-I<resources>.
+While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part of REST they go very well with it and are
+commonly used to manipulate I<resources>.
 
 =head2 Sessions
 
-HTTP was designed as a stateless protocol, web servers don't know anything
-about previous requests, which makes user-friendly login systems very tricky.
-Sessions solve this problem by allowing web applications to keep stateful
+HTTP was designed as a stateless protocol, web servers don't know anything about previous requests, which makes
+user-friendly login systems very tricky. Sessions solve this problem by allowing web applications to keep stateful
 information across several HTTP requests.
 
   GET /login?user=sebastian&pass=s3cret HTTP/1.1
@@ -106,41 +97,36 @@ information across several HTTP requests.
   Content-Length: 16
   Hello again sebastian.
 
-Traditionally all session data was stored on the server-side and only session
-ids were exchanged between browser and web server in the form of cookies.
+Traditionally all session data was stored on the server-side and only session ids were exchanged between browser and
+web server in the form of cookies.
 
   Set-Cookie: session=hmac-sha1(base64(json($session)))
 
-In L<Mojolicious> however we are taking this concept one step further by
-storing everything JSON serialized and Base64 encoded in HMAC-SHA1 signed
-cookies, which is more compatible with the REST philosophy and reduces
-infrastructure requirements.
+In L<Mojolicious> however we are taking this concept one step further by storing everything JSON serialized and Base64
+encoded in HMAC-SHA1 signed cookies, which is more compatible with the REST philosophy and reduces infrastructure
+requirements.
 
 =head2 Test-Driven Development
 
-TDD is a software development process where the developer starts writing
-failing test cases that define the desired functionality and then moves on to
-producing code that passes these tests. There are many advantages such as
-always having good test coverage and code being designed for testability, which
-will in turn often prevent future changes from breaking old code. Much of
-L<Mojolicious> was developed using TDD.
+TDD is a software development process where the developer starts writing failing test cases that define the desired
+functionality and then moves on to producing code that passes these tests. There are many advantages such as always
+having good test coverage and code being designed for testability, which will in turn often prevent future changes from
+breaking old code. Much of L<Mojolicious> was developed using TDD.
 
 =head1 PROTOTYPE
 
-One of the main differences between L<Mojolicious> and other web frameworks is
-that it also includes L<Mojolicious::Lite>, a micro web framework optimized for
-rapid prototyping.
+One of the main differences between L<Mojolicious> and other web frameworks is that it also includes
+L<Mojolicious::Lite>, a micro web framework optimized for rapid prototyping.
 
 =head2 Differences
 
-You likely know the feeling, you've got a really cool idea and want to try it
-as quickly as possible, that's exactly why L<Mojolicious::Lite> applications
-don't need more than a single file.
+You likely know the feeling, you've got a really cool idea and want to try it as quickly as possible, that's exactly
+why L<Mojolicious::Lite> applications don't need more than a single file.
 
   myapp.pl   # Templates and even static files can be inlined
 
-Full L<Mojolicious> applications on the other hand are much closer to a well
-organized CPAN distribution to maximize maintainability.
+Full L<Mojolicious> applications on the other hand are much closer to a well organized CPAN distribution to maximize
+maintainability.
 
   myapp                      # Application directory
   |- script                  # Script directory
@@ -164,14 +150,13 @@ organized CPAN distribution to maximize maintainability.
         +- welcome.html.ep   # Template for "welcome" action
 
 Both application skeletons can be automatically generated with the commands
-L<Mojolicious::Command::Author::generate::lite_app> and
-L<Mojolicious::Command::Author::generate::app>.
+L<Mojolicious::Command::Author::generate::lite_app> and L<Mojolicious::Command::Author::generate::app>.
 
-  $ mojo generate lite_app myapp.pl
+  $ mojo generate lite-app myapp.pl
   $ mojo generate app MyApp
 
-Feature-wise both are almost equal, the only real differences are
-organizational, so each one can be gradually transformed into the other.
+Feature-wise both are almost equal, the only real differences are organizational, so each one can be gradually
+transformed into the other.
 
 =head2 Foundation
 
@@ -194,14 +179,12 @@ This will be the foundation for our login manager example application.
 
   app->start;
 
-The built-in development web server makes working on your application a lot of
-fun thanks to automatic reloading.
+The built-in development web server makes working on your application a lot of fun thanks to automatic reloading.
 
   $ morbo ./myapp.pl
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
-Just save your changes and they will be automatically in effect the next time
-you refresh your browser.
+Just save your changes and they will be automatically in effect the next time you refresh your browser.
 
 =head2 A bird's-eye view
 
@@ -210,9 +193,8 @@ It all starts with an HTTP request like this, sent by your browser.
   GET / HTTP/1.1
   Host: localhost:3000
 
-Once the request has been received by the web server through the event loop, it
-will be passed on to L<Mojolicious>, where it will be handled in a few simple
-steps.
+Once the request has been received by the web server through the event loop, it will be passed on to L<Mojolicious>,
+where it will be handled in a few simple steps.
 
 =over 2
 
@@ -234,14 +216,13 @@ Process the request, maybe generating a response with the renderer.
 
 =item 5.
 
-Return control to the web server, and if no response has been generated yet,
-wait for a non-blocking operation to do so through the event loop.
+Return control to the web server, and if no response has been generated yet, wait for a non-blocking operation to do so
+through the event loop.
 
 =back
 
-With our application the router would have found an action in step 2, and
-rendered some text in step 4, resulting in an HTTP response like this being
-sent back to the browser.
+With our application the router would have found an action in step 2, and rendered some text in step 4, resulting in an
+HTTP response like this being sent back to the browser.
 
   HTTP/1.1 200 OK
   Content-Length: 12
@@ -249,25 +230,23 @@ sent back to the browser.
 
 =head2 Model
 
-In L<Mojolicious> we consider web applications simple frontends for existing
-business logic, that means L<Mojolicious> is by design entirely I<model> layer
-agnostic and you just use whatever Perl modules you like most.
+In L<Mojolicious> we consider web applications simple frontends for existing business logic, that means L<Mojolicious>
+is by design entirely I<model> layer agnostic and you just use whatever Perl modules you like most.
 
   $ mkdir -p lib/MyApp/Model
   $ touch lib/MyApp/Model/Users.pm
   $ chmod 644 lib/MyApp/Model/Users.pm
 
-Our login manager will simply use a plain old Perl module abstracting away all
-logic related to matching usernames and passwords. The name
-C<MyApp::Model::Users> is an arbitrary choice, and is simply used to make the
-separation of concerns more visible.
+Our login manager will simply use a plain old Perl module abstracting away all logic related to matching usernames and
+passwords. The name C<MyApp::Model::Users> is an arbitrary choice, and is simply used to make the separation of
+concerns more visible.
 
   package MyApp::Model::Users;
 
   use strict;
   use warnings;
 
-  use Mojo::Util 'secure_compare';
+  use Mojo::Util qw(secure_compare);
 
   my $USERS = {
     joel      => 'las3rs',
@@ -289,14 +268,13 @@ separation of concerns more visible.
 
   1;
 
-A simple helper can be registered with the function
-L<Mojolicious::Lite/"helper"> to make our model available to all actions and
-templates.
+A simple helper can be registered with the function L<Mojolicious::Lite/"helper"> to make our model available to all
+actions and templates.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
 
-  use lib 'lib';
+  use lib qw(lib);
   use MyApp::Model::Users;
 
   # Helper to lazy initialize and store our model object
@@ -320,28 +298,25 @@ templates.
 
   app->start;
 
-The method L<Mojolicious::Controller/"param"> is used to access query
-parameters, C<POST> parameters, file uploads and route placeholders, all at
-once.
+The method L<Mojolicious::Controller/"param"> is used to access query parameters, C<POST> parameters, file uploads and
+route placeholders, all at once.
 
 =head2 Testing
 
-In L<Mojolicious> we take testing very serious and try to make it a pleasant
-experience.
+In L<Mojolicious> we take testing very serious and try to make it a pleasant experience.
 
   $ mkdir t
   $ touch t/login.t
   $ chmod 644 t/login.t
 
-L<Test::Mojo> is a scriptable HTTP user agent designed specifically for
-testing, with many fun state of the art features such as CSS selectors based on
-L<Mojo::DOM>.
+L<Test::Mojo> is a scriptable HTTP user agent designed specifically for testing, with many fun state of the art
+features such as CSS selectors based on L<Mojo::DOM>.
 
   use Test::More;
   use Test::Mojo;
 
   # Include application
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   require(curfile->dirname->sibling('myapp.pl'));
 
   # Allow 302 redirect responses
@@ -372,15 +347,13 @@ L<Mojo::DOM>.
 
   done_testing();
 
-Your application won't pass these tests, but from now on you can use them to
-check your progress.
+Your application won't pass these tests, but from now on you can use them to check your progress.
 
   $ prove -l
   $ prove -l t/login.t
   $ prove -l -v t/login.t
 
-Or perform quick requests right from the command line with
-L<Mojolicious::Command::get>.
+Or perform quick requests right from the command line with L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get /
   Wrong username or password.
@@ -402,50 +375,46 @@ L<Mojolicious::Command::get>.
 
 =head2 State keeping
 
-Sessions in L<Mojolicious> pretty much just work out of the box once you start
-using the method L<Mojolicious::Controller/"session">, there is no setup
-required, but we suggest setting a more secure passphrase with
+Sessions in L<Mojolicious> pretty much just work out of the box once you start using the method
+L<Mojolicious::Controller/"session">, there is no setup required, but we suggest setting a more secure passphrase with
 L<Mojolicious/"secrets">.
 
   $app->secrets(['Mojolicious rocks']);
 
-This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies tamper
-resistant and can be changed at any time to invalidate all existing sessions.
+This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies tamper resistant and can be changed at any
+time to invalidate all existing sessions.
 
   $c->session(user => 'sebastian');
   my $user = $c->session('user');
 
-By default all sessions expire after one hour, for more control you can use the
-C<expiration> session value to set an expiration date in seconds from now.
+By default all sessions expire after one hour, for more control you can use the C<expiration> session value to set an
+expiration date in seconds from now.
 
   $c->session(expiration => 3600);
 
-And the whole session can be deleted by using the C<expires> session value to
-set an absolute expiration date in the past.
+And the whole session can be deleted by using the C<expires> session value to set an absolute expiration date in the
+past.
 
   $c->session(expires => 1);
 
-For data that should only be visible on the next request, like a confirmation
-message after a C<302> redirect performed with
-L<Mojolicious::Plugin::DefaultHelpers/"redirect_to">, you can use the flash,
-accessible through L<Mojolicious::Plugin::DefaultHelpers/"flash">.
+For data that should only be visible on the next request, like a confirmation message after a C<302> redirect performed
+with L<Mojolicious::Plugin::DefaultHelpers/"redirect_to">, you can use the flash, accessible through
+L<Mojolicious::Plugin::DefaultHelpers/"flash">.
 
   $c->flash(message => 'Everything is fine.');
   $c->redirect_to('goodbye');
 
-Just remember that all session data gets serialized with L<Mojo::JSON> and
-stored in HMAC-SHA1 signed cookies, which usually have a C<4096> byte (4KiB)
-limit, depending on browser.
+Just remember that all session data gets serialized with L<Mojo::JSON> and stored in HMAC-SHA1 signed cookies, which
+usually have a C<4096> byte (4KiB) limit, depending on browser.
 
 =head2 Final prototype
 
-A final C<myapp.pl> prototype passing all of the tests above could look like
-this.
+A final C<myapp.pl> prototype passing all of the tests above could look like this.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
 
-  use lib 'lib';
+  use lib qw(lib);
   use MyApp::Model::Users;
 
   # Make signed cookies tamper resistant
@@ -543,37 +512,33 @@ And the directory structure should be looking like this now.
   +- t
      +- login.t
 
-Our templates are using quite a few features of the renderer,
-L<Mojolicious::Guides::Rendering> explains them all in great detail.
+Our templates are using quite a few features of the renderer, L<Mojolicious::Guides::Rendering> explains them all in
+great detail.
 
 =head1 WELL-STRUCTURED APPLICATION
 
-Due to the flexibility of L<Mojolicious> there are many variations of the
-actual growing process, but this should give you a good overview of the
-possibilities.
+Due to the flexibility of L<Mojolicious> there are many variations of the actual growing process, but this should give
+you a good overview of the possibilities.
 
 =head2 Inflating templates
 
-All templates and static files inlined in the C<DATA> section can be
-automatically turned into separate files in the C<templates> and C<public>
-directories with the command L<Mojolicious::Command::Author::inflate>.
+All templates and static files inlined in the C<DATA> section can be automatically turned into separate files in the
+C<templates> and C<public> directories with the command L<Mojolicious::Command::Author::inflate>.
 
   $ ./myapp.pl inflate
 
-Those directories have a higher precedence, so inflating can also be a great
-way to allow your users to customize their applications.
+Those directories have a higher precedence, so inflating can also be a great way to allow your users to customize their
+applications.
 
 =head2 Simplified application class
 
-This is the heart of every full L<Mojolicious> application and always gets
-instantiated during server startup.
+This is the heart of every full L<Mojolicious> application and always gets instantiated during server startup.
 
   $ touch lib/MyApp.pm
   $ chmod 644 lib/MyApp.pm
 
-We will start by extracting all actions from C<myapp.pl> and turn them into
-simplified hybrid routes in the L<Mojolicious::Routes> router, none of the
-actual action code needs to be changed.
+We will start by extracting all actions from C<myapp.pl> and turn them into simplified hybrid routes in the
+L<Mojolicious::Routes> router, none of the actual action code needs to be changed.
 
   package MyApp;
   use Mojo::Base 'Mojolicious';
@@ -617,28 +582,25 @@ actual action code needs to be changed.
 
   1;
 
-The C<startup> method gets called right after instantiation and is the place
-where the whole application gets set up. Since full L<Mojolicious> applications
-can use nested routes they have no need for C<group> blocks.
+The C<startup> method gets called right after instantiation and is the place where the whole application gets set up.
+Since full L<Mojolicious> applications can use nested routes they have no need for C<group> blocks.
 
 =head2 Simplified application script
 
-C<myapp.pl> itself can now be turned into a simplified application script to
-allow running tests again.
+C<myapp.pl> itself can now be turned into a simplified application script to allow running tests again.
 
   #!/usr/bin/env perl
 
   use strict;
   use warnings;
 
-  use lib 'lib';
+  use lib qw(lib);
   use Mojolicious::Commands;
 
   # Start command line interface for application
   Mojolicious::Commands->start_app('MyApp');
 
-And the directory structure of our hybrid application should be looking like
-this.
+And the directory structure of our hybrid application should be looking like this.
 
   myapp
   |- myapp.pl
@@ -657,15 +619,15 @@ this.
 
 =head2 Controller class
 
-Hybrid routes are a nice intermediate step, but to maximize maintainability it
-makes sense to split our action code from its routing information.
+Hybrid routes are a nice intermediate step, but to maximize maintainability it makes sense to split our action code
+from its routing information.
 
   $ mkdir lib/MyApp/Controller
   $ touch lib/MyApp/Controller/Login.pm
   $ chmod 644 lib/MyApp/Controller/Login.pm
 
-Once again the actual action code does not need to change, we just rename C<$c>
-to C<$self> since the controller is now the invocant.
+Once again the actual action code does not need to change, we just rename C<$c> to C<$self> since the controller is now
+the invocant.
 
   package MyApp::Controller::Login;
   use Mojo::Base 'Mojolicious::Controller';
@@ -697,13 +659,11 @@ to C<$self> since the controller is now the invocant.
 
   1;
 
-All L<Mojolicious::Controller> controllers are plain old Perl classes and get
-instantiated on demand.
+All L<Mojolicious::Controller> controllers are plain old Perl classes and get instantiated on demand.
 
 =head2 Application class
 
-The application class C<lib/MyApp.pm> can now be reduced to model and routing
-information.
+The application class C<lib/MyApp.pm> can now be reduced to model and routing information.
 
   package MyApp;
   use Mojo::Base 'Mojolicious';
@@ -727,13 +687,11 @@ information.
 
   1;
 
-The router allows many different route variations,
-L<Mojolicious::Guides::Routing> explains them all in great detail.
+The router allows many different route variations, L<Mojolicious::Guides::Routing> explains them all in great detail.
 
 =head2 Templates
 
-Templates are our views, and usually bound to controllers, so they need to be
-moved into the appropriate directories.
+Templates are our views, and usually bound to controllers, so they need to be moved into the appropriate directories.
 
   $ mkdir templates/login
   $ mv templates/index.html.ep templates/login/index.html.ep
@@ -741,22 +699,20 @@ moved into the appropriate directories.
 
 =head2 Script
 
-Finally C<myapp.pl> can be moved into a C<script> directory and renamed to
-C<my_app> to follow the CPAN standard.
+Finally C<myapp.pl> can be moved into a C<script> directory and renamed to C<my_app> to follow the CPAN standard.
 
   $ mkdir script
   $ mv myapp.pl script/my_app
 
-Just a few small details change, instead of a relative path to L<lib> we now
-use L<Mojo::File> to get an absolute path, allowing us to start the application
-from outside its home directory.
+Just a few small details change, instead of a relative path to L<lib> we now use L<Mojo::File> to get an absolute path,
+allowing us to start the application from outside its home directory.
 
   #!/usr/bin/env perl
 
   use strict;
   use warnings;
 
-  use Mojo::File 'curfile';
+  use Mojo::File qw(curfile);
   use lib curfile->dirname->sibling('lib')->to_string;
   use Mojolicious::Commands;
 
@@ -765,8 +721,7 @@ from outside its home directory.
 
 =head2 Simplified tests
 
-Full L<Mojolicious> applications are a little easier to test, so C<t/login.t>
-can be simplified.
+Full L<Mojolicious> applications are a little easier to test, so C<t/login.t> can be simplified.
 
   use Test::More;
   use Test::Mojo;
@@ -816,21 +771,18 @@ And our final directory structure should be looking like this.
         |- index.html.ep
         +- protected.html.ep
 
-Test-driven development takes a little getting used to, but can be a very
-powerful tool.
+Test-driven development takes a little getting used to, but can be a very powerful tool.
 
 =head1 MORE
 
-You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
-lot more documentation and examples by many different authors.
+You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious
+wiki|http://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
+authors.
 
 =head1 SUPPORT
 
-If you have any questions the documentation might not yet answer, don't
-hesitate to ask on the
-L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.freenode.net> (L<chat
-now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>).
+If you have any questions the documentation might not yet answer, don't hesitate to ask on the L<mailing
+list|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
+now!|https://webchat.freenode.net/#mojo>).
 
 =cut

@@ -5,10 +5,8 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 use Mojo::IOLoop::TLS;
 
-plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
-plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
-  unless Mojo::IOLoop::TLS->can_tls;
+plan skip_all => 'set TEST_TLS to enable this test (developer only!)' unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Mojo::IOLoop::TLS->can_tls;
 
 # To regenerate all required certificates run these commands (12.12.2014)
 # openssl genrsa -out ca.key 1024
@@ -31,10 +29,9 @@ plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
 use Mojo::IOLoop;
 
 # Built-in certificate (and upgraded string)
-my $loop  = Mojo::IOLoop->new;
-my $delay = $loop->delay;
-my $upgraded
-  = "\x01\x00\x00\x00\x00\x00\xD0\x00\x0A\x00\x0B\x00\x00\x00\x84\x0B";
+my $loop     = Mojo::IOLoop->new;
+my $delay    = $loop->delay;
+my $upgraded = "\x01\x00\x00\x00\x00\x00\xD0\x00\x0A\x00\x0B\x00\x00\x00\x84\x0B";
 utf8::upgrade $upgraded;
 my ($server, $client);
 my $end = $delay->begin;
@@ -208,7 +205,7 @@ Mojo::IOLoop->client(
   sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
-    $stream->on(timeout => sub   { $timeout++ });
+    $stream->on(timeout => sub { $timeout++ });
     $stream->on(
       close => sub {
         $client_close++;
@@ -303,7 +300,7 @@ ok $client_err, 'has error';
 
 # Ignore invalid client certificate
 $loop = Mojo::IOLoop->new;
-my $cipher;
+my ($cipher, $version);
 ($server, $client, $client_err) = ();
 $id = $loop->server(
   address     => '127.0.0.1',
@@ -331,24 +328,28 @@ $loop->client(
     $stream->timeout(0.5);
     $client_err = $err;
     $client     = 'connected';
-    $cipher     = $stream->handle->get_cipher;
+    my $handle = $stream->handle;
+    $cipher  = $handle->get_cipher;
+    $version = $handle->get_sslversion;
   }
 );
 $loop->start;
 is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
-is $cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';
+my $expect = $version eq 'TLSv1_3' ? 'TLS_AES_256_GCM_SHA384' : 'AES256-SHA';
+is $cipher, $expect, "$expect has been negotiatied";
 
 # Ignore missing client certificate
 ($server, $client, $client_err) = ();
 $id = Mojo::IOLoop->server(
-  address    => '127.0.0.1',
-  tls        => 1,
-  tls_ca     => 't/mojo/certs/ca.crt',
-  tls_cert   => 't/mojo/certs/server.crt',
-  tls_key    => 't/mojo/certs/server.key',
-  tls_verify => 0x01,
+  address     => '127.0.0.1',
+  tls         => 1,
+  tls_ca      => 't/mojo/certs/ca.crt',
+  tls_cert    => 't/mojo/certs/server.crt',
+  tls_key     => 't/mojo/certs/server.key',
+  tls_verify  => 0x01,
+  tls_version => 'TLSv1_2',
   sub { $server = 'accepted' }
 );
 $port = Mojo::IOLoop->acceptor($id)->port;
@@ -364,10 +365,8 @@ is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
 
-# ALPN
-SKIP: {
-  skip 'ALPN support required!', 1 unless IO::Socket::SSL->can_alpn;
-
+subtest 'ALPN' => sub {
+  plan skip_all => 'ALPN support required!' unless IO::Socket::SSL->can_alpn;
   my ($server_proto, $client_proto);
   $id = Mojo::IOLoop->server(
     address       => '127.0.0.1',
@@ -394,6 +393,6 @@ SKIP: {
   Mojo::IOLoop->start;
   is $server_proto, 'baz', 'right protocol';
   is $client_proto, 'baz', 'right protocol';
-}
+};
 
 done_testing();

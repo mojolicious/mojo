@@ -4,8 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 
-plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
-  unless $ENV{TEST_PREFORK} || $ENV{TEST_ALL};
+plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)' unless $ENV{TEST_PREFORK} || $ENV{TEST_ALL};
 
 use Mojo::File qw(curfile path tempdir);
 use Mojo::IOLoop::Server;
@@ -45,11 +44,7 @@ $prefork->app->log->unsubscribe(message => $cb);
 
 # Multiple workers and graceful shutdown
 my $port = Mojo::IOLoop::Server::->generate_port;
-$prefork = Mojo::Server::Prefork->new(
-  heartbeat_interval => 0.5,
-  listen             => ["http://*:$port"],
-  pid_file           => $file
-);
+$prefork = Mojo::Server::Prefork->new(heartbeat_interval => 0.5, listen => ["http://*:$port"], pid_file => $file);
 $prefork->unsubscribe('request');
 $prefork->on(
   request => sub {
@@ -70,7 +65,7 @@ $prefork->on(
     kill 'QUIT', $$;
   }
 );
-$prefork->on(reap => sub { push @reap, pop });
+$prefork->on(reap   => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
 $prefork->app->log->level('debug')->unsubscribe('message');
 $log = '';
@@ -92,13 +87,12 @@ ok $graceful, 'server has been stopped gracefully';
 is_deeply [sort @spawn], [sort @reap], 'same process ids';
 is $tx->res->code, 200,           'right status';
 is $tx->res->body, 'just works!', 'right content';
-like $log, qr/Listening at/,             'right message';
-like $log, qr/Manager $$ started/,       'right message';
-like $log, qr/Creating process id file/, 'right message';
-like $log, qr/Stopping worker $spawn[0] gracefully \(120 seconds\)/,
-  'right message';
-like $log, qr/Worker $spawn[0] stopped/, 'right message';
-like $log, qr/Manager $$ stopped/,       'right message';
+like $log, qr/Listening at/,                                         'right message';
+like $log, qr/Manager $$ started/,                                   'right message';
+like $log, qr/Creating process id file/,                             'right message';
+like $log, qr/Stopping worker $spawn[0] gracefully \(120 seconds\)/, 'right message';
+like $log, qr/Worker $spawn[0] stopped/,                             'right message';
+like $log, qr/Manager $$ stopped/,                                   'right message';
 $prefork->app->log->unsubscribe(message => $cb);
 
 # Process id file
@@ -109,13 +103,9 @@ undef $prefork;
 ok !-e $pid, 'process id file has been removed';
 
 # One worker and immediate shutdown
-$port    = Mojo::IOLoop::Server->generate_port;
-$prefork = Mojo::Server::Prefork->new(
-  accepts            => 500,
-  heartbeat_interval => 0.5,
-  listen             => ["http://*:$port"],
-  workers            => 1
-);
+$port = Mojo::IOLoop::Server->generate_port;
+$prefork
+  = Mojo::Server::Prefork->new(accepts => 500, heartbeat_interval => 0.5, listen => ["http://*:$port"], workers => 1);
 $prefork->unsubscribe('request');
 $prefork->on(
   request => sub {
@@ -133,7 +123,7 @@ $prefork->once(
     kill 'TERM', $$;
   }
 );
-$prefork->on(reap => sub { push @reap, pop });
+$prefork->on(reap   => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
 $prefork->run;
 is $prefork->ioloop->max_accepts, 500, 'right value';

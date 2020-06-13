@@ -2,7 +2,7 @@ package Mojo::Cookie;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-use Carp 'croak';
+use Carp qw(croak);
 
 has [qw(name value)];
 
@@ -27,9 +27,8 @@ Mojo::Cookie - HTTP cookie base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie> is an abstract base class for HTTP cookie containers, based on
-L<RFC 6265|http://tools.ietf.org/html/rfc6265>, like L<Mojo::Cookie::Request>
-and L<Mojo::Cookie::Response>.
+L<Mojo::Cookie> is an abstract base class for HTTP cookie containers, based on L<RFC
+6265|http://tools.ietf.org/html/rfc6265>, like L<Mojo::Cookie::Request> and L<Mojo::Cookie::Response>.
 
 =head1 ATTRIBUTES
 
@@ -51,8 +50,7 @@ Cookie value.
 
 =head1 METHODS
 
-L<Mojo::Cookie> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Cookie> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 parse
 

@@ -10,6 +10,8 @@ sub config {
 
 sub fun { shift->render }
 
+sub joy { shift->render }
+
 sub index {
   my $self = shift;
   $self->layout('default');
@@ -99,6 +101,9 @@ __DATA__
 
 @@ foo/fun.html.ep
 <p>Have fun!</p>\
+
+@@ foo/joy.html.ep
+<p class="joy" style="background-color: darkred;">Joy for all!</p>\
 
 @@ just/some/template.html.epl
 Development template with high precedence.

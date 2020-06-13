@@ -1,16 +1,14 @@
 package Mojolicious::Plugin::HeaderCondition;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use re 'is_regexp';
+use re qw(is_regexp);
 
 sub register {
   my ($self, $app) = @_;
 
   $app->routes->add_condition(headers => \&_headers);
-  $app->routes->add_condition(
-    agent => sub { _headers(@_[0 .. 2], {'User-Agent' => $_[3]}) });
-  $app->routes->add_condition(
-    host => sub { _check($_[1]->req->url->to_abs->host, $_[3]) });
+  $app->routes->add_condition(agent   => sub { _headers(@_[0 .. 2], {'User-Agent' => $_[3]}) });
+  $app->routes->add_condition(host    => sub { _check($_[1]->req->url->to_abs->host, $_[3]) });
 }
 
 sub _check {
@@ -25,8 +23,7 @@ sub _headers {
 
   # All headers need to match
   my $headers = $c->req->headers;
-  _check($headers->header($_), $patterns->{$_}) || return undef
-    for keys %$patterns;
+  _check($headers->header($_), $patterns->{$_}) || return undef for keys %$patterns;
   return 1;
 }
 
@@ -63,19 +60,17 @@ Mojolicious::Plugin::HeaderCondition - Header condition plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::HeaderCondition> is a route condition for header-based
-routes.
+L<Mojolicious::Plugin::HeaderCondition> is a route condition for header-based routes.
 
-This is a core plugin, that means it is always enabled and its code a good
-example for learning to build new plugins, you're welcome to fork it.
+This is a core plugin, that means it is always enabled and its code a good example for learning to build new plugins,
+you're welcome to fork it.
 
-See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
-by default.
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available by default.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::HeaderCondition> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin::HeaderCondition> inherits all methods from L<Mojolicious::Plugin> and implements the following
+new ones.
 
 =head2 register
 

@@ -1,21 +1,22 @@
 package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
-use Carp 'croak';
+use Carp qw(croak);
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util 'term_escape';
-use Mojo::WebSocket 'server_handshake';
-use Scalar::Util 'weaken';
+use Mojo::Util qw(term_escape);
+use Mojo::WebSocket qw(server_handshake);
+use Scalar::Util qw(weaken);
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
 has acceptors => sub { [] };
 has [qw(backlog max_clients silent)];
-has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
+has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 30 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
-has listen       => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
+has keep_alive_timeout => sub { $ENV{MOJO_KEEP_ALIVE_TIMEOUT} // 5 };
+has listen             => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_requests => 100;
 
 sub DESTROY {
@@ -46,8 +47,7 @@ sub start {
 
   # Resume accepting connections
   if (my $servers = $self->{servers}) {
-    push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_})
-      for keys %$servers;
+    push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_}) for keys %$servers;
   }
 
   # Start listening
@@ -78,7 +78,7 @@ sub _build_tx {
 
   my $tx = $self->build_tx->connection($id);
   $tx->res->headers->server('Mojolicious (Perl)');
-  my $handle = $self->ioloop->stream($id)->handle;
+  my $handle = $self->ioloop->stream($id)->timeout($self->inactivity_timeout)->handle;
   unless ($handle->isa('IO::Socket::UNIX')) {
     $tx->local_address($handle->sockhost)->local_port($handle->sockport);
     $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
@@ -95,8 +95,7 @@ sub _build_tx {
 
       # WebSocket
       if ($req->is_handshake) {
-        my $ws = $self->{connections}{$id}{next}
-          = Mojo::Transaction::WebSocket->new(handshake => $tx);
+        my $ws = $self->{connections}{$id}{next} = Mojo::Transaction::WebSocket->new(handshake => $tx);
         $self->emit(request => server_handshake $ws);
       }
 
@@ -105,8 +104,7 @@ sub _build_tx {
 
       # Last keep-alive request or corrupted connection
       my $c = $self->{connections}{$id};
-      $tx->res->headers->connection('close')
-        if ($c->{requests} || 1) >= $self->max_requests || $req->error;
+      $tx->res->headers->connection('close') if ($c->{requests} || 1) >= $self->max_requests || $req->error;
 
       $tx->on(resume => sub { $self->_write($id) });
       $self->_write($id);
@@ -155,9 +153,13 @@ sub _finish {
   return $self->_remove($id) if $tx->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return unless length(my $leftovers = $tx->req->content->leftovers);
-  $tx = $c->{tx} = $self->_build_tx($id, $c);
-  $tx->server_read($leftovers);
+  if (length(my $leftovers = $tx->req->content->leftovers)) {
+    $tx = $c->{tx} = $self->_build_tx($id, $c);
+    $tx->server_read($leftovers);
+  }
+
+  # Keep-alive connection
+  $self->ioloop->stream($id)->timeout($self->keep_alive_timeout) unless $c->{tx};
 }
 
 sub _listen {
@@ -165,8 +167,7 @@ sub _listen {
 
   my $url   = Mojo::URL->new($listen);
   my $proto = $url->protocol;
-  croak qq{Invalid listen location "$listen"}
-    unless $proto eq 'http' || $proto eq 'https' || $proto eq 'http+unix';
+  croak qq{Invalid listen location "$listen"} unless $proto eq 'http' || $proto eq 'https' || $proto eq 'http+unix';
 
   my $query   = $url->query;
   my $options = {backlog => $self->backlog};
@@ -177,8 +178,7 @@ sub _listen {
     if (my $port = $url->port) { $options->{port} = $port }
   }
   $options->{"tls_$_"} = $query->param($_) for qw(ca ciphers version);
-  /^(.*)_(cert|key)$/ and $options->{"tls_$2"}{$1} = $query->param($_)
-    for @{$query->names};
+  /^(.*)_(cert|key)$/ and $options->{"tls_$2"}{$1} = $query->param($_) for @{$query->names};
   if (my $cert = $query->param('cert')) { $options->{'tls_cert'}{''} = $cert }
   if (my $key  = $query->param('key'))  { $options->{'tls_key'}{''}  = $key }
   my $verify = $query->param('verify');
@@ -195,8 +195,7 @@ sub _listen {
       $stream->timeout($self->inactivity_timeout);
 
       $stream->on(close => sub { $self && $self->_close($id) });
-      $stream->on(error =>
-          sub { $self && $self->app->log->error(pop) && $self->_close($id) });
+      $stream->on(error => sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read    => sub { $self->_read($id => pop) });
       $stream->on(timeout => sub { $self->_debug($id, 'Inactivity timeout') });
     }
@@ -206,7 +205,7 @@ sub _listen {
   $self->app->log->info(qq{Listening at "$url"});
   $query->pairs([]);
   $url->host('127.0.0.1') if $url->host eq '*';
-  say 'Server available at ', $options->{path} // $url;
+  say 'Web application available at ', $options->{path} // $url;
 }
 
 sub _read {
@@ -274,23 +273,19 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Daemon> is a full featured, highly portable non-blocking I/O
-HTTP and WebSocket server, with IPv6, TLS, SNI, Comet (long polling), keep-alive
-and multiple event loop support.
+L<Mojo::Server::Daemon> is a full featured, highly portable non-blocking I/O HTTP and WebSocket server, with IPv6, TLS,
+SNI, Comet (long polling), keep-alive and multiple event loop support.
 
-For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
-L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
-L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
-features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
-C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide non-blocking name resolution, SOCKS5 as well as TLS support, the
+optional modules L<EV> (4.32+), L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL>
+(2.009+) will be used automatically if possible. Individual features can also be disabled with the C<MOJO_NO_NNR>,
+C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 =head1 SIGNALS
 
-The L<Mojo::Server::Daemon> process can be controlled at runtime with the
-following signals.
+The L<Mojo::Server::Daemon> process can be controlled at runtime with the following signals.
 
 =head2 INT, TERM
 
@@ -302,8 +297,7 @@ L<Mojo::Server::Daemon> inherits all events from L<Mojo::Server>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
-implements the following new ones.
+L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and implements the following new ones.
 
 =head2 acceptors
 
@@ -327,27 +321,33 @@ Listen backlog size, defaults to C<SOMAXCONN>.
   my $timeout = $daemon->inactivity_timeout;
   $daemon     = $daemon->inactivity_timeout(5);
 
-Maximum amount of time in seconds a connection can be inactive before getting
-closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
-variable or C<15>. Setting the value to C<0> will allow connections to be
-inactive indefinitely.
+Maximum amount of time in seconds a connection with an active request can be inactive before getting closed, defaults
+to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment variable or C<30>. Setting the value to C<0> will allow
+connections to be inactive indefinitely.
 
 =head2 ioloop
 
   my $loop = $daemon->ioloop;
   $daemon  = $daemon->ioloop(Mojo::IOLoop->new);
 
-Event loop object to use for I/O operations, defaults to the global
-L<Mojo::IOLoop> singleton.
+Event loop object to use for I/O operations, defaults to the global L<Mojo::IOLoop> singleton.
+
+=head2 keep_alive_timeout
+
+  my $timeout = $daemon->keep_alive_timeout;
+  $daemon     = $daemon->keep_alive_timeout(10);
+
+Maximum amount of time in seconds a connection without an active request can be inactive before getting closed,
+defaults to the value of the C<MOJO_KEEP_ALIVE_TIMEOUT> environment variable or C<5>. Setting the value to C<0> will
+allow connections to be inactive indefinitely.
 
 =head2 listen
 
   my $listen = $daemon->listen;
   $daemon    = $daemon->listen(['https://127.0.0.1:8080']);
 
-Array reference with one or more locations to listen on, defaults to the value
-of the C<MOJO_LISTEN> environment variable or C<http://*:3000> (shortcut for
-C<http://0.0.0.0:3000>).
+Array reference with one or more locations to listen on, defaults to the value of the C<MOJO_LISTEN> environment
+variable or C<http://*:3000> (shortcut for C<http://0.0.0.0:3000>).
 
   # Listen on all IPv4 interfaces
   $daemon->listen(['http://*:3000']);
@@ -425,8 +425,7 @@ Path to the TLS key file, defaults to a built-in test key.
 
   reuse=1
 
-Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
-option.
+Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket option.
 
 =item single_accept
 
@@ -453,9 +452,8 @@ TLS protocol version.
   my $max = $daemon->max_clients;
   $daemon = $daemon->max_clients(100);
 
-Maximum number of accepted connections this server is allowed to handle
-concurrently, before stopping to accept new incoming connections, passed along
-to L<Mojo::IOLoop/"max_connections">.
+Maximum number of accepted connections this server is allowed to handle concurrently, before stopping to accept new
+incoming connections, passed along to L<Mojo::IOLoop/"max_connections">.
 
 =head2 max_requests
 
@@ -473,8 +471,7 @@ Disable console messages.
 
 =head1 METHODS
 
-L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
-implements the following new ones.
+L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and implements the following new ones.
 
 =head2 ports
 
@@ -513,8 +510,8 @@ Stop accepting connections through L</"ioloop">.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_SERVER_DEBUG> environment variable to get some advanced
-diagnostics information printed to C<STDERR>.
+You can set the C<MOJO_SERVER_DEBUG> environment variable to get some advanced diagnostics information printed to
+C<STDERR>.
 
   MOJO_SERVER_DEBUG=1
 

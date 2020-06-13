@@ -136,8 +136,7 @@ get '/stream' => sub {
     my $c = shift;
     return $c->finish if $i >= 10;
     $c->write_chunk($i++, $drain);
-    $c->stash->{subscribers}
-      += @{Mojo::IOLoop->stream($c->tx->connection)->subscribers('drain')};
+    $c->stash->{subscribers} += @{Mojo::IOLoop->stream($c->tx->connection)->subscribers('drain')};
   };
   $c->$drain;
 };
@@ -166,27 +165,24 @@ my $log = '';
 my $cb  = $t->app->log->on(message => sub { $log .= pop });
 my $stash;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-$t->get_ok('/write')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('this was short.');
+$t->get_ok('/write')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
+  ->content_is('this was short.');
 Mojo::IOLoop->one_tick until $stash->{finished};
 ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
-unlike $log, qr/Nothing has been rendered, expecting delayed response/,
-  'right message';
+unlike $log, qr/Nothing has been rendered, expecting delayed response/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Stream without delay and content length
-$t->get_ok('/write/length')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
+$t->get_ok('/write/length')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
   ->content_is('this was short and plain.');
 ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok $t->tx->keep_alive, 'connection will be kept alive';
 
 # Stream without delay and empty write
-$t->get_ok('/write/nolength')->status_is(200)
-  ->header_is(Server           => 'Mojolicious (Perl)')
+$t->get_ok('/write/nolength')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => undef)->content_type_is('text/plain')
   ->content_is('this was short and had no length.');
 ok $t->tx->kept_alive, 'connection was kept alive';
@@ -195,9 +191,8 @@ ok !$t->tx->keep_alive, 'connection will not be kept alive';
 # Chunked response with delay
 $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-$t->get_ok('/longpoll/chunked')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
-  ->content_is('hi there, whats up?');
+$t->get_ok('/longpoll/chunked')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_is('hi there, whats up?');
 Mojo::IOLoop->one_tick until $stash->{finished};
 ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok $t->tx->keep_alive, 'connection will be kept alive';
@@ -237,57 +232,46 @@ is $buffer, 'hi ', 'right content';
 # Stream with delay and content length
 $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-$t->get_ok('/longpoll/length')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
-  ->content_is('hi there plain, whats up?');
+$t->get_ok('/longpoll/length')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_is('hi there plain, whats up?');
 is $stash->{drain}, 1, 'drain event has been emitted once';
 
 # Stream with delay and finish
-$t->get_ok('/longpoll/nolength')->status_is(200)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => undef)->content_type_is('text/plain')
-  ->content_is('hi there, what length?');
+$t->get_ok('/longpoll/nolength')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => undef)->content_type_is('text/plain')->content_is('hi there, what length?');
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 
 # The drain event should be emitted on the next reactor tick
 $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-$t->get_ok('/longpoll/order')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/longpoll/order')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('First, second, third!');
 is $stash->{order}, 1, 'the drain event was emitted on the next reactor tick';
 
 # Static file with cookies and session
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/longpoll/static')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_like('Set-Cookie' => qr/bar=baz/)
-  ->header_like('Set-Cookie' => qr/mojolicious=/)
-  ->content_type_is('text/plain;charset=UTF-8')
-  ->content_is("Hello Mojo from a static file!\n");
-like $log, qr/Nothing has been rendered, expecting delayed response/,
-  'right message';
+$t->get_ok('/longpoll/static')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_like('Set-Cookie' => qr/bar=baz/)->header_like('Set-Cookie' => qr/mojolicious=/)
+  ->content_type_is('text/plain;charset=UTF-8')->content_is("Hello Mojo from a static file!\n");
+like $log, qr/Nothing has been rendered, expecting delayed response/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Custom response
-$t->get_ok('/longpoll/dynamic')->status_is(201)
-  ->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/longpoll/dynamic')->status_is(201)->header_is(Server => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');
 
 # Chunked response streaming with drain event
 $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-$t->get_ok('/stream')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('0123456789');
+$t->get_ok('/stream')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('0123456789');
 is $stash->{subscribers}, 0, 'no leaking subscribers';
 ok $stash->{destroyed}, 'controller has been destroyed';
 
 # Rendering of template
 $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-$t->get_ok('/render')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Finish!');
+$t->get_ok('/render')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('Finish!');
 Mojo::IOLoop->one_tick until $stash->{destroyed};
 ok !$stash->{writing}, 'finish event timing is right';
 ok $stash->{destroyed}, 'controller has been destroyed';

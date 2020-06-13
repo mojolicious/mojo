@@ -3,8 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 
 BEGIN {
-  plan skip_all => 'Role::Tiny 2.000001+ required for this test!'
-    unless Mojo::Base->ROLES;
+  plan skip_all => 'Role::Tiny 2.000001+ required for this test!' unless Mojo::Base->ROLES;
 }
 
 package Mojo::RoleTest::Role::LOUD;
@@ -79,8 +78,7 @@ is $obj4->hello, 'HEY! BOB!!!', 'role method';
 is $obj4->yell,  'HEY!',        'another role method';
 
 # Multiple roles
-my $obj3 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet',
-  'Mojo::RoleTest::Role::LOUD')->new(name => 'Joel');
+my $obj3 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet', 'Mojo::RoleTest::Role::LOUD')->new(name => 'Joel');
 is $obj3->name,    'Joel',       'base attribute';
 is $obj3->whisper, 'psst, joel', 'method from first role';
 $obj3->prefix('psssst, ');
@@ -94,22 +92,19 @@ is $obj5->whisper, 'psst, joel',   'method from first role';
 is $obj5->hello,   'HEY! JOEL!!!', 'method from second role';
 
 # Multiple roles (mixed)
-my $obj6 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet', '+LOUD')
-  ->new(name => 'Joel');
+my $obj6 = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet', '+LOUD')->new(name => 'Joel');
 is $obj6->name,    'Joel',         'base attribute';
 is $obj6->whisper, 'psst, joel',   'method from first role';
 is $obj6->hello,   'HEY! JOEL!!!', 'method from second role';
 
 # Multiple object roles (mixed)
-my $obj7 = Mojo::RoleTest->new(name => 'Joel')
-  ->with_roles('Mojo::RoleTest::Role::quiet', '+LOUD');
+my $obj7 = Mojo::RoleTest->new(name => 'Joel')->with_roles('Mojo::RoleTest::Role::quiet', '+LOUD');
 is $obj7->name,    'Joel',         'base attribute';
 is $obj7->whisper, 'psst, joel',   'method from first role';
 is $obj7->hello,   'HEY! JOEL!!!', 'method from second role';
 
 # Multiple Mojo::Base roles
-my $obj8 = Mojo::RoleTest->with_roles('+quiet', 'Mojo::RoleTest::Hello')
-  ->new(name => 'Joel');
+my $obj8 = Mojo::RoleTest->with_roles('+quiet', 'Mojo::RoleTest::Hello')->new(name => 'Joel');
 is $obj8->name,    'Joel',        'base attribute';
 is $obj8->whisper, 'psst, joel',  'method from first role';
 is $obj8->hello,   'hello mojo!', 'method from second role';

@@ -1,6 +1,7 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojolicious::Command';
 
+use Mojo::Collection qw(c);
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON qw(to_json j);
@@ -8,7 +9,7 @@ use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode getopt);
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 has description => 'Perform HTTP request';
 has usage       => sub { shift->extract_usage };
@@ -23,10 +24,10 @@ sub run {
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   my %form;
   getopt \@args,
-    'C|charset=s' => \my $charset,
-    'c|content=s' => \$in,
-    'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
-    'H|header=s'  => \my @headers,
+    'C|charset=s'            => \my $charset,
+    'c|content=s'            => \$in,
+    'f|form=s'               => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
+    'H|header=s'             => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
     'k|insecure'             => sub { $ua->insecure(1) },
     'M|method=s'             => \(my $method = 'GET'),
@@ -55,9 +56,7 @@ sub run {
 
       # Verbose
       weaken $tx;
-      $tx->res->content->on(
-        body => sub { warn _header($tx->req), _header($tx->res) })
-        if $verbose;
+      $tx->res->content->on(body => sub { warn _header($tx->req), _header($tx->res) }) if $verbose;
 
       # Stream content (ignore redirects)
       $tx->res->content->unsubscribe('read')->on(
@@ -108,7 +107,7 @@ sub _select {
   while (defined(my $command = shift @args)) {
 
     # Number
-    ($results = $results->slice($command)) and next if $command =~ /^\d+$/;
+    ($results = c($results->[$command])) and next if $command =~ /^\d+$/;
 
     # Text
     return _say($results->map('text')->each) if $command eq 'text';
@@ -117,8 +116,7 @@ sub _select {
     return _say($results->map('all_text')->each) if $command eq 'all';
 
     # Attribute
-    return _say($results->map(attr => $args[0] // '')->each)
-      if $command eq 'attr';
+    return _say($results->map(attr => $args[0] // '')->each) if $command eq 'attr';
 
     # Unknown
     die qq{Unknown command "$command".\n};
@@ -170,7 +168,7 @@ Mojolicious::Command::get - Get command
                                          application, defaults to the value of
                                          MOJO_HOME or auto-detection
     -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
-                                         value of MOJO_INACTIVITY_TIMEOUT or 20
+                                         value of MOJO_INACTIVITY_TIMEOUT or 40
     -k, --insecure                       Do not require a valid TLS certificate
                                          to access HTTPS sites
     -M, --method <method>                HTTP method to use, defaults to "GET"
@@ -189,19 +187,17 @@ Mojolicious::Command::get - Get command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::get> performs requests to remote hosts or local
-applications.
+L<Mojolicious::Command::get> performs requests to remote hosts or local applications.
 
-This is a core command, that means it is always enabled and its code a good
-example for learning to build new commands, you're welcome to fork it.
+This is a core command, that means it is always enabled and its code a good example for learning to build new commands,
+you're welcome to fork it.
 
-See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
-available by default.
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are available by default.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::get> inherits all attributes from
-L<Mojolicious::Command> and implements the following new ones.
+L<Mojolicious::Command::get> inherits all attributes from L<Mojolicious::Command> and implements the following new
+ones.
 
 =head2 description
 
@@ -219,8 +215,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::get> inherits all methods from L<Mojolicious::Command>
-and implements the following new ones.
+L<Mojolicious::Command::get> inherits all methods from L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run
 

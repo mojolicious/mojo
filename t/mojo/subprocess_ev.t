@@ -4,10 +4,8 @@ use Test::More;
 
 plan skip_all => 'set TEST_SUBPROCESS to enable this test (developer only!)'
   unless $ENV{TEST_SUBPROCESS} || $ENV{TEST_ALL};
-plan skip_all => 'set TEST_EV to enable this test (developer only!)'
-  unless $ENV{TEST_EV} || $ENV{TEST_ALL};
-plan skip_all => 'EV 4.0+ required for this test!'
-  unless eval { require EV; EV->VERSION('4.0'); 1 };
+plan skip_all => 'set TEST_EV to enable this test (developer only!)' unless $ENV{TEST_EV} || $ENV{TEST_ALL};
+plan skip_all => 'EV 4.32+ required for this test!'                  unless eval { require EV; EV->VERSION('4.32'); 1 };
 
 use Mojo::IOLoop;
 use Mojo::Promise;
@@ -19,7 +17,7 @@ Mojo::IOLoop->next_tick(sub {
     sub {
       my $result;
       my $promise = Mojo::Promise->new;
-      $promise->then(sub          { $result = shift });
+      $promise->then(sub { $result = shift });
       Mojo::IOLoop->next_tick(sub { $promise->resolve(25) });
       $promise->wait;
       return $result;

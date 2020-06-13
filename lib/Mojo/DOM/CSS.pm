@@ -1,7 +1,7 @@
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
-use Mojo::Util 'trim';
+use Mojo::Util qw(trim);
 
 has 'tree';
 
@@ -12,7 +12,7 @@ my $ATTR_RE   = qr/
   (?:
     (\W)?=                                              # Operator
     (?:"((?:\\"|[^"])*)"|'((?:\\'|[^'])*)'|([^\]]+?))   # Value
-    (?:\s+(i))?                                         # Case-sensitivity
+    (?:\s+(?:(i|I)|s|S))?                               # Case-sensitivity
   )?
   \]
 /x;
@@ -135,16 +135,14 @@ sub _compile {
     }
 
     # Attributes
-    elsif ($css =~ /\G$ATTR_RE/gco) {
-      push @$last, ['attr', _name($1), _value($2 // '', $3 // $4 // $5, $6)];
-    }
+    elsif ($css =~ /\G$ATTR_RE/gco) { push @$last, ['attr', _name($1), _value($2 // '', $3 // $4 // $5, $6)] }
 
     # Pseudo-class
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
 
-      # ":matches" and ":not" (contains more selectors)
-      $args = _compile($args, %ns) if $name eq 'matches' || $name eq 'not';
+      # ":is" and ":not" (contains more selectors)
+      $args = _compile($args, %ns) if $name eq 'is' || $name eq 'not';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
@@ -160,8 +158,8 @@ sub _compile {
 
     # Tag
     elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
-      my $alias = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1 : undef;
-      my $ns = length $alias ? $ns{$alias} // return [['invalid']] : $alias;
+      my $alias = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1                                  : undef;
+      my $ns    = length $alias                                  ? $ns{$alias} // return [['invalid']] : $alias;
       push @$last, ['tag', $name eq '*' ? undef : _name($name), _unescape($ns)];
     }
 
@@ -186,8 +184,7 @@ sub _equation {
   return [0, $1] if $equation =~ /^\s*((?:\+|-)?\d+)\s*$/;
 
   # "n", "4n", "+4n", "-4n", "n+1", "4n-1", "+4n-1" (and other variations)
-  return [0, 0]
-    unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
+  return [0, 0] unless $equation =~ /^\s*((?:\+|-)?(?:\d+)?)?n\s*((?:\+|-)\s*\d+)?\s*$/i;
   return [$1 eq '-' ? -1 : !length $1 ? 1 : $1, join('', split(' ', $2 // 0))];
 }
 
@@ -205,7 +202,7 @@ sub _namespace {
 
   my $attr = $current->[1] =~ /^([^:]+):/ ? "xmlns:$1" : 'xmlns';
   while ($current) {
-    last if $current->[0] eq 'root';
+    last                               if $current->[0] eq 'root';
     return $current->[2]{$attr} eq $ns if exists $current->[2]{$attr};
 
     $current = $current->[3];
@@ -228,14 +225,13 @@ sub _pc {
   return $current eq $scope if $class eq 'scope';
 
   # ":checked"
-  return exists $current->[2]{checked} || exists $current->[2]{selected}
-    if $class eq 'checked';
+  return exists $current->[2]{checked} || exists $current->[2]{selected} if $class eq 'checked';
 
   # ":not"
   return !_match($args, $current, $current, $scope) if $class eq 'not';
 
-  # ":matches"
-  return !!_match($args, $current, $current, $scope) if $class eq 'matches';
+  # ":is"
+  return !!_match($args, $current, $current, $scope) if $class eq 'is';
 
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
@@ -243,8 +239,8 @@ sub _pc {
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
-  # ":link" and ":visited"
-  if ($class eq 'link' || $class eq 'visited') {
+  # ":any-link", ":link" and ":visited"
+  if ($class eq 'any-link' || $class eq 'link' || $class eq 'visited') {
     return undef unless $current->[0] eq 'tag' && exists $current->[2]{href};
     return !!grep { $current->[1] eq $_ } qw(a area link);
   }
@@ -258,11 +254,9 @@ sub _pc {
 
   # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
   if (ref $args) {
-    my $type = $class eq 'nth-of-type'
-      || $class eq 'nth-last-of-type' ? $current->[1] : undef;
+    my $type     = $class eq 'nth-of-type' || $class eq 'nth-last-of-type' ? $current->[1] : undef;
     my @siblings = @{_siblings($current, $type)};
-    @siblings = reverse @siblings
-      if $class eq 'nth-last-child' || $class eq 'nth-last-of-type';
+    @siblings = reverse @siblings if $class eq 'nth-last-child' || $class eq 'nth-last-of-type';
 
     for my $i (0 .. $#siblings) {
       next if (my $result = $args->[0] * $i + $args->[1]) < 1;
@@ -356,8 +350,7 @@ sub _siblings {
   my ($current, $type) = @_;
 
   my $parent   = $current->[3];
-  my @siblings = grep { $_->[0] eq 'tag' }
-    @$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent];
+  my @siblings = grep { $_->[0] eq 'tag' } @$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent];
   @siblings = grep { $type eq $_->[1] } @siblings if defined $type;
 
   return \@siblings;
@@ -420,9 +413,8 @@ Mojo::DOM::CSS - CSS selector engine
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::CSS> is the CSS selector engine used by L<Mojo::DOM>, based on the
-L<HTML Living Standard|https://html.spec.whatwg.org> and
-L<Selectors Level 3|http://www.w3.org/TR/css3-selectors/>.
+L<Mojo::DOM::CSS> is the CSS selector engine used by L<Mojo::DOM>, based on the L<HTML Living
+Standard|https://html.spec.whatwg.org> and L<Selectors Level 3|http://www.w3.org/TR/css3-selectors/>.
 
 =head1 SELECTORS
 
@@ -455,38 +447,42 @@ An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
 =head2 E[foo="bar" i]
 
-An C<E> element whose C<foo> attribute value is exactly equal to any
-(ASCII-range) case-permutation of C<bar>. Note that this selector is
-B<EXPERIMENTAL> and might change without warning!
+An C<E> element whose C<foo> attribute value is exactly equal to any (ASCII-range) case-permutation of C<bar>. Note
+that this selector is B<EXPERIMENTAL> and might change without warning!
 
   my $case_insensitive = $css->select('input[type="hidden" i]');
   my $case_insensitive = $css->select('input[type=hidden i]');
   my $case_insensitive = $css->select('input[class~="foo" i]');
 
-This selector is part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
-in progress.
+This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
+
+=head2 E[foo="bar" s]
+
+An C<E> element whose C<foo> attribute value is exactly and case-sensitively equal to C<bar>. Note that this selector
+is B<EXPERIMENTAL> and might change without warning!
+
+  my $case_sensitive = $css->select('input[type="hidden" s]');
+
+This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
 
 =head2 E[foo~="bar"]
 
-An C<E> element whose C<foo> attribute value is a list of whitespace-separated
-values, one of which is exactly equal to C<bar>.
+An C<E> element whose C<foo> attribute value is a list of whitespace-separated values, one of which is exactly equal to
+C<bar>.
 
   my $foo = $css->select('input[class~="foo"]');
   my $foo = $css->select('input[class~=foo]');
 
 =head2 E[foo^="bar"]
 
-An C<E> element whose C<foo> attribute value begins exactly with the string
-C<bar>.
+An C<E> element whose C<foo> attribute value begins exactly with the string C<bar>.
 
   my $begins_with = $css->select('input[name^="f"]');
   my $begins_with = $css->select('input[name^=f]');
 
 =head2 E[foo$="bar"]
 
-An C<E> element whose C<foo> attribute value ends exactly with the string
-C<bar>.
+An C<E> element whose C<foo> attribute value ends exactly with the string C<bar>.
 
   my $ends_with = $css->select('input[name$="o"]');
   my $ends_with = $css->select('input[name$=o]');
@@ -500,8 +496,7 @@ An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
 =head2 E[foo|="en"]
 
-An C<E> element whose C<foo> attribute has a hyphen-separated list of values
-beginning (from the left) with C<en>.
+An C<E> element whose C<foo> attribute has a hyphen-separated list of values beginning (from the left) with C<en>.
 
   my $english = $css->select('link[hreflang|=en]');
 
@@ -601,13 +596,18 @@ An C<E> element that has no children (including text nodes).
 
   my $empty = $css->select(':empty');
 
+=head2 E:any-link
+
+Alias for L</"E:link">. Note that this selector is B<EXPERIMENTAL> and might change without warning! This selector is
+part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
+
 =head2 E:link
 
-An C<E> element being the source anchor of a hyperlink of which the target is
-not yet visited (C<:link>) or already visited (C<:visited>). Note that
-L<Mojo::DOM::CSS> is not stateful, therefore C<:link> and C<:visited> yield
-exactly the same results.
+An C<E> element being the source anchor of a hyperlink of which the target is not yet visited (C<:link>) or already
+visited (C<:visited>). Note that L<Mojo::DOM::CSS> is not stateful, therefore C<:any-link>, C<:link> and C<:visited>
+yield exactly the same results.
 
+  my $links = $css->select(':any-link');
   my $links = $css->select(':link');
   my $links = $css->select(':visited');
 
@@ -617,8 +617,7 @@ Alias for L</"E:link">.
 
 =head2 E:checked
 
-A user interface element C<E> which is checked (for instance a radio-button or
-checkbox).
+A user interface element C<E> which is checked (for instance a radio-button or checkbox).
 
   my $input = $css->select(':checked');
 
@@ -636,33 +635,27 @@ An C<E> element with C<ID> equal to "myid".
 
 =head2 E:not(s1, s2)
 
-An C<E> element that does not match either compound selector C<s1> or compound
-selector C<s2>. Note that support for compound selectors is B<EXPERIMENTAL> and
-might change without warning!
+An C<E> element that does not match either compound selector C<s1> or compound selector C<s2>. Note that support for
+compound selectors is B<EXPERIMENTAL> and might change without warning!
 
   my $others = $css->select('div p:not(:first-child, :last-child)');
 
-Support for compound selectors was added as part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
-in progress.
+Support for compound selectors was added as part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is
+still a work in progress.
 
-=head2 E:matches(s1, s2)
+=head2 E:is(s1, s2)
 
-An C<E> element that matches compound selector C<s1> and/or compound selector
-C<s2>. Note that this selector is B<EXPERIMENTAL> and might change without
-warning!
+An C<E> element that matches compound selector C<s1> and/or compound selector C<s2>. Note that this selector is
+B<EXPERIMENTAL> and might change without warning!
 
-  my $headers = $css->select(':matches(section, article, aside, nav) h1');
+  my $headers = $css->select(':is(section, article, aside, nav) h1');
 
-This selector is part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
-in progress.
+This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
 
 =head2 A|E
 
-An C<E> element that belongs to the namespace alias C<A> from
-L<CSS Namespaces Module Level 3|https://www.w3.org/TR/css-namespaces-3/>.
-Key/value pairs passed to selector methods are used to declare namespace
+An C<E> element that belongs to the namespace alias C<A> from L<CSS Namespaces Module Level
+3|https://www.w3.org/TR/css-namespaces-3/>. Key/value pairs passed to selector methods are used to declare namespace
 aliases.
 
   my $elem = $css->select('lq|elem', lq => 'http://example.com/q-markup');
@@ -722,29 +715,26 @@ L<Mojo::DOM::CSS> implements the following attributes.
   my $tree = $css->tree;
   $css     = $css->tree(['root']);
 
-Document Object Model. Note that this structure should only be used very
-carefully since it is very dynamic.
+Document Object Model. Note that this structure should only be used very carefully since it is very dynamic.
 
 =head1 METHODS
 
-L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 matches
 
   my $bool = $css->matches('head > title');
   my $bool = $css->matches('svg|line', svg => 'http://www.w3.org/2000/svg');
 
-Check if first node in L</"tree"> matches the CSS selector. Trailing key/value
-pairs can be used to declare xml namespace aliases.
+Check if first node in L</"tree"> matches the CSS selector. Trailing key/value pairs can be used to declare xml
+namespace aliases.
 
 =head2 select
 
   my $results = $css->select('head > title');
   my $results = $css->select('svg|line', svg => 'http://www.w3.org/2000/svg');
 
-Run CSS selector against L</"tree">. Trailing key/value pairs can be used to
-declare xml namespace aliases.
+Run CSS selector against L</"tree">. Trailing key/value pairs can be used to declare xml namespace aliases.
 
 =head2 select_one
 
@@ -752,8 +742,8 @@ declare xml namespace aliases.
   my $result =
     $css->select_one('svg|line', svg => 'http://www.w3.org/2000/svg');
 
-Run CSS selector against L</"tree"> and stop as soon as the first node matched.
-Trailing key/value pairs can be used to declare xml namespace aliases.
+Run CSS selector against L</"tree"> and stop as soon as the first node matched. Trailing key/value pairs can be used to
+declare xml namespace aliases.
 
 =head1 SEE ALSO
 

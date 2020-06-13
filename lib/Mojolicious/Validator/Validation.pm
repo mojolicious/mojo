@@ -39,8 +39,7 @@ sub check {
 sub csrf_protect {
   my $self  = shift;
   my $token = $self->input->{csrf_token};
-  $self->error(csrf_token => ['csrf_protect'])
-    unless $token && $token eq ($self->csrf_token // '');
+  $self->error(csrf_token => ['csrf_protect']) unless $token && $token eq ($self->csrf_token // '');
   return $self;
 }
 
@@ -74,8 +73,7 @@ sub optional {
   for my $cb (map { $self->validator->filters->{$_} } @filters) {
     @input = map { $self->$cb($name, $_) } @input;
   }
-  $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0]
-    if @input && !grep { !length } @input;
+  $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0] if @input && !grep { !defined } @input;
 
   return $self->topic($name);
 }
@@ -111,8 +109,7 @@ Mojolicious::Validator::Validation - Perform validations
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Validator::Validation> performs L<Mojolicious::Validator>
-validation checks.
+L<Mojolicious::Validator::Validation> performs L<Mojolicious::Validator> validation checks.
 
 =head1 ATTRIBUTES
 
@@ -155,16 +152,14 @@ L<Mojolicious::Validator> object this validation belongs to.
 
 =head1 METHODS
 
-L<Mojolicious::Validator::Validation> inherits all methods from L<Mojo::Base>
-and implements the following new ones.
+L<Mojolicious::Validator::Validation> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 check
 
   $v = $v->check('size', 2, 7);
 
-Perform validation check on all values of the current L</"topic">, no more
-checks will be performed on them after the first one failed. All checks from
-L<Mojolicious::Validator/"CHECKS"> are supported.
+Perform validation check on all values of the current L</"topic">, no more checks will be performed on them after the
+first one failed. All checks from L<Mojolicious::Validator/"CHECKS"> are supported.
 
 =head2 csrf_protect
 
@@ -178,8 +173,7 @@ Validate C<csrf_token> and protect from cross-site request forgery.
   $v      = $v->error(foo => ['custom_check']);
   $v      = $v->error(foo => [$check, $result, @args]);
 
-Get or set details for failed validation check, at any given time there can
-only be one per field.
+Get or set details for failed validation check, at any given time there can only be one per field.
 
   # Details about failed validation
   my ($check, $result, @args) = @{$v->error('foo')};
@@ -192,8 +186,7 @@ only be one per field.
   my $values = $v->every_param;
   my $values = $v->every_param('foo');
 
-Similar to L</"param">, but returns all values sharing the same name as an
-array reference.
+Similar to L</"param">, but returns all values sharing the same name as an array reference.
 
   # Get first value
   my $first = $v->every_param('foo')->[0];
@@ -225,16 +218,14 @@ Check if validation resulted in errors, defaults to checking all fields.
   my $bool = $v->is_valid;
   my $bool = $v->is_valid('foo');
 
-Check if validation was successful and field has a value, defaults to checking
-the current L</"topic">.
+Check if validation was successful and field has a value, defaults to checking the current L</"topic">.
 
 =head2 optional
 
   $v = $v->optional('foo');
-  $v = $v->optional('foo', 'filter1', 'filter2');
+  $v = $v->optional('foo', @filters);
 
-Change validation L</"topic"> and apply filters. All filters from
-L<Mojolicious::Validator/"FILTERS"> are supported.
+Change validation L</"topic"> and apply filters. All filters from L<Mojolicious::Validator/"FILTERS"> are supported.
 
   # Trim value and check size
   $v->optional('user', 'trim')->size(1, 15);
@@ -244,9 +235,8 @@ L<Mojolicious::Validator/"FILTERS"> are supported.
   my $value = $v->param;
   my $value = $v->param('foo');
 
-Access validated values, defaults to the current L</"topic">. If there are
-multiple values sharing the same name, and you want to access more than just the
-last one, you can use L</"every_param">.
+Access validated values, defaults to the current L</"topic">. If there are multiple values sharing the same name, and
+you want to access more than just the last one, you can use L</"every_param">.
 
   # Get value right away
   my $user = $v->optional('user')->size(1, 15)->param;
@@ -263,20 +253,18 @@ Return an array reference with all names for values that passed validation.
 =head2 required
 
   $v = $v->required('foo');
-  $v = $v->required('foo', 'filter1', 'filter2');
+  $v = $v->required('foo', @filters);
 
-Change validation L</"topic">, apply filters, and make sure a value is present
-and not an empty string. All filters from L<Mojolicious::Validator/"FILTERS">
-are supported.
+Change validation L</"topic">, apply filters, and make sure a value is present. All filters from
+L<Mojolicious::Validator/"FILTERS"> are supported.
 
   # Trim value and check size
   $v->required('user', 'trim')->size(1, 15);
 
 =head1 CHECKS
 
-In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
-validation checks provided by L</"validator"> on
-L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
+In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call validation checks provided by
+L</"validator"> on L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
 
   # Call validation checks
   $v->required('foo')->size(2, 5)->like(qr/^[A-Z]/);

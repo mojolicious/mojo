@@ -59,8 +59,7 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $command->template({vars => 1})
-    ->render_to_rel_file('bar_baz', 'bar/two.txt', {word => 'works'});
+  $command->template({vars => 1})->render_to_rel_file('bar_baz', 'bar/two.txt', {word => 'works'});
 }
 like $buffer, qr/\[exist\].*\[write\]/s, 'right output';
 open $txt, '<', $command->rel_file('bar/two.txt');

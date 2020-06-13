@@ -1,10 +1,10 @@
 package Mojo::Asset::File;
 use Mojo::Base 'Mojo::Asset';
 
-use Carp 'croak';
-use Fcntl 'SEEK_SET';
+use Carp qw(croak);
+use Fcntl qw(SEEK_SET);
 use File::Spec::Functions ();
-use Mojo::File 'tempfile';
+use Mojo::File qw(tempfile);
 
 has [qw(cleanup path)];
 has handle => sub {
@@ -21,7 +21,7 @@ has handle => sub {
 
   # Create a temporary file
   my $template = 'mojo.tmp.XXXXXXXXXXXXXXXX';
-  my $file = tempfile DIR => $self->tmpdir, TEMPLATE => $template, UNLINK => 0;
+  my $file     = tempfile DIR => $self->tmpdir, TEMPLATE => $template, UNLINK => 0;
   $self->path($file->to_string);
   return $file->open('+>>');
 };
@@ -39,8 +39,7 @@ sub DESTROY {
 
 sub add_chunk {
   my ($self, $chunk) = @_;
-  ($self->handle->syswrite($chunk) // -1) == length $chunk
-    or croak "Can't write to asset: $!";
+  ($self->handle->syswrite($chunk) // -1) == length $chunk or croak "Can't write to asset: $!";
   return $self;
 }
 
@@ -69,7 +68,7 @@ sub contains {
     # Search window
     my $pos = index $window, $str;
     return $offset + $pos if $pos >= 0;
-    return -1 if $read == 0 || ($offset += $read) == $end;
+    return -1             if $read == 0 || ($offset += $read) == $end;
 
     # Resize window
     substr $window, 0, $read, '';
@@ -163,8 +162,7 @@ L<Mojo::Asset::File> inherits all events from L<Mojo::Asset>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and implements
-the following new ones.
+L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and implements the following new ones.
 
 =head2 cleanup
 
@@ -178,8 +176,7 @@ Delete L</"path"> automatically once the file is not used anymore.
   my $handle = $file->handle;
   $file      = $file->handle(IO::File->new);
 
-Filehandle, created on demand for L</"path">, which can be generated
-automatically and safely based on L</"tmpdir">.
+Filehandle, created on demand for L</"path">, which can be generated automatically and safely based on L</"tmpdir">.
 
 =head2 path
 
@@ -193,13 +190,12 @@ File path used to create L</"handle">.
   my $tmpdir = $file->tmpdir;
   $file      = $file->tmpdir('/tmp');
 
-Temporary directory used to generate L</"path">, defaults to the value of the
-C<MOJO_TMPDIR> environment variable or auto-detection.
+Temporary directory used to generate L</"path">, defaults to the value of the C<MOJO_TMPDIR> environment variable or
+auto-detection.
 
 =head1 METHODS
 
-L<Mojo::Asset::File> inherits all methods from L<Mojo::Asset> and implements
-the following new ones.
+L<Mojo::Asset::File> inherits all methods from L<Mojo::Asset> and implements the following new ones.
 
 =head2 add_chunk
 
@@ -218,8 +214,7 @@ Check if asset contains a specific string.
   my $bytes = $file->get_chunk($offset);
   my $bytes = $file->get_chunk($offset, $max);
 
-Get chunk of data starting from a specific position, defaults to a maximum
-chunk size of C<131072> bytes (128KiB).
+Get chunk of data starting from a specific position, defaults to a maximum chunk size of C<131072> bytes (128KiB).
 
 =head2 is_file
 
@@ -263,8 +258,7 @@ Read all asset data at once.
 
   $file = $file->to_file;
 
-Does nothing but return the invocant, since we already have a
-L<Mojo::Asset::File> object.
+Does nothing but return the invocant, since we already have a L<Mojo::Asset::File> object.
 
 =head1 SEE ALSO
 

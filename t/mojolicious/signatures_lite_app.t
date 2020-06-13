@@ -29,7 +29,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->content_is('works!');
 
 # WebSocket
-$t->websocket_ok('/json')->send_ok({json => {snowman => '☃'}})
-  ->message_ok->json_message_is('' => {snowman => '☃'})->finish_ok;
+$t->websocket_ok('/json')->send_ok({json => {snowman => '☃'}})->message_ok->json_message_is('' => {snowman => '☃'})
+  ->finish_ok;
 
 done_testing();

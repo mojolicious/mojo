@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
 use Mojo::Path;
-use Scalar::Util 'looks_like_number';
+use Scalar::Util qw(looks_like_number);
 
 has 'ignore';
 has max_cookie_size => 4096;
@@ -102,10 +102,7 @@ sub prepare {
 
 sub _compare {
   my ($cookie, $path, $name, $domain) = @_;
-  return
-       $cookie->path ne $path
-    || $cookie->name ne $name
-    || $cookie->domain ne $domain;
+  return $cookie->path ne $path || $cookie->name ne $name || $cookie->domain ne $domain;
 }
 
 sub _path { $_[0] eq '/' || $_[0] eq $_[1] || index($_[1], "$_[0]/") == 0 }
@@ -141,8 +138,8 @@ Mojo::UserAgent::CookieJar - Cookie jar for HTTP user agents
 
 =head1 DESCRIPTION
 
-L<Mojo::UserAgent::CookieJar> is a minimalistic and relaxed cookie jar used by
-L<Mojo::UserAgent>, based on L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
+L<Mojo::UserAgent::CookieJar> is a minimalistic and relaxed cookie jar used by L<Mojo::UserAgent>, based on L<RFC
+6265|http://tools.ietf.org/html/rfc6265>.
 
 =head1 ATTRIBUTES
 
@@ -174,8 +171,7 @@ Maximum cookie size in bytes, defaults to C<4096> (4KiB).
 
 =head1 METHODS
 
-L<Mojo::UserAgent::CookieJar> inherits all methods from L<Mojo::Base> and
-implements the following new ones.
+L<Mojo::UserAgent::CookieJar> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 add
 
@@ -187,8 +183,7 @@ Add multiple L<Mojo::Cookie::Response> objects to the jar.
 
   my $cookies = $jar->all;
 
-Return all L<Mojo::Cookie::Response> objects that are currently stored in the
-jar.
+Return all L<Mojo::Cookie::Response> objects that are currently stored in the jar.
 
   # Names of all cookies
   say $_->name for @{$jar->all};

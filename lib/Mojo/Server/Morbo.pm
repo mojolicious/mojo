@@ -4,9 +4,9 @@ use Mojo::Base -base;
 # "Linda: With Haley's Comet out of ice, Earth is experiencing the devastating
 #         effects of sudden, intense global warming.
 #  Morbo: Morbo is pleased but sticky."
-use Mojo::Loader 'load_class';
+use Mojo::Loader qw(load_class);
 use Mojo::Server::Daemon;
-use POSIX 'WNOHANG';
+use POSIX qw(WNOHANG);
 
 has backend => sub {
   my $backend = $ENV{MOJO_MORBO_BACKEND} || 'Poll';
@@ -87,31 +87,26 @@ Mojo::Server::Morbo - Tonight at 11...DOOOOOOOOOOOOOOOM!
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Morbo> is a full featured, self-restart capable non-blocking
-I/O HTTP and WebSocket server, built around the very well tested and reliable
-L<Mojo::Server::Daemon>, with IPv6, TLS, SNI, UNIX domain socket, Comet (long
-polling), keep-alive and multiple event loop support. Note that the server uses
-signals for process management, so you should avoid modifying signal handlers in
-your applications.
+L<Mojo::Server::Morbo> is a full featured, self-restart capable non-blocking I/O HTTP and WebSocket server, built
+around the very well tested and reliable L<Mojo::Server::Daemon>, with IPv6, TLS, SNI, UNIX domain socket, Comet (long
+polling), keep-alive and multiple event loop support. Note that the server uses signals for process management, so you
+should avoid modifying signal handlers in your applications.
 
 To start applications with it you can use the L<morbo> script.
 
   $ morbo ./myapp.pl
-  Server available at http://127.0.0.1:3000
+  Web application available at http://127.0.0.1:3000
 
-For better scalability (epoll, kqueue) and to provide non-blocking name
-resolution, SOCKS5 as well as TLS support, the optional modules L<EV> (4.0+),
-L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and
-L<IO::Socket::SSL> (2.009+) will be used automatically if possible. Individual
-features can also be disabled with the C<MOJO_NO_NNR>, C<MOJO_NO_SOCKS> and
-C<MOJO_NO_TLS> environment variables.
+For better scalability (epoll, kqueue) and to provide non-blocking name resolution, SOCKS5 as well as TLS support, the
+optional modules L<EV> (4.32+), L<Net::DNS::Native> (0.15+), L<IO::Socket::Socks> (0.64+) and L<IO::Socket::SSL>
+(2.009+) will be used automatically if possible. Individual features can also be disabled with the C<MOJO_NO_NNR>,
+C<MOJO_NO_SOCKS> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 =head1 SIGNALS
 
-The L<Mojo::Server::Morbo> process can be controlled at runtime with the
-following signals.
+The L<Mojo::Server::Morbo> process can be controlled at runtime with the following signals.
 
 =head2 INT, TERM
 
@@ -137,8 +132,7 @@ L<Mojo::Server::Daemon> object this server manages.
 
 =head1 METHODS
 
-L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 run
 

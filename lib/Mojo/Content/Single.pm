@@ -29,8 +29,7 @@ sub get_body_chunk {
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->{read}
-    = $self->on(read => sub { $_[0]->asset($_[0]->asset->add_chunk($_[1])) });
+  $self->{read} = $self->on(read => sub { $_[0]->asset($_[0]->asset->add_chunk($_[1])) });
   return $self;
 }
 
@@ -41,8 +40,7 @@ sub parse {
   $self->_parse_until_body(@_);
 
   # Parse body
-  return $self->SUPER::parse
-    unless $self->auto_upgrade && defined $self->boundary;
+  return $self->SUPER::parse unless $self->auto_upgrade && defined $self->boundary;
 
   # Content needs to be upgraded to multipart
   $self->unsubscribe(read => $self->{read});
@@ -69,14 +67,12 @@ Mojo::Content::Single - HTTP content
 
 =head1 DESCRIPTION
 
-L<Mojo::Content::Single> is a container for HTTP content, based on
-L<RFC 7230|http://tools.ietf.org/html/rfc7230> and
+L<Mojo::Content::Single> is a container for HTTP content, based on L<RFC 7230|http://tools.ietf.org/html/rfc7230> and
 L<RFC 7231|http://tools.ietf.org/html/rfc7231>.
 
 =head1 EVENTS
 
-L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can emit
-the following new ones.
+L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can emit the following new ones.
 
 =head2 upgrade
 
@@ -95,29 +91,26 @@ Emitted when content gets upgraded to a L<Mojo::Content::MultiPart> object.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Content::Single> inherits all attributes from L<Mojo::Content> and
-implements the following new ones.
+L<Mojo::Content::Single> inherits all attributes from L<Mojo::Content> and implements the following new ones.
 
 =head2 asset
 
   my $asset = $single->asset;
   $single   = $single->asset(Mojo::Asset::Memory->new);
 
-The actual content, defaults to a L<Mojo::Asset::Memory> object with
-L<Mojo::Asset::Memory/"auto_upgrade"> enabled.
+The actual content, defaults to a L<Mojo::Asset::Memory> object with L<Mojo::Asset::Memory/"auto_upgrade"> enabled.
 
 =head2 auto_upgrade
 
   my $bool = $single->auto_upgrade;
   $single  = $single->auto_upgrade($bool);
 
-Try to detect multipart content and automatically upgrade to a
-L<Mojo::Content::MultiPart> object, defaults to a true value.
+Try to detect multipart content and automatically upgrade to a L<Mojo::Content::MultiPart> object, defaults to a true
+value.
 
 =head1 METHODS
 
-L<Mojo::Content::Single> inherits all methods from L<Mojo::Content> and
-implements the following new ones.
+L<Mojo::Content::Single> inherits all methods from L<Mojo::Content> and implements the following new ones.
 
 =head2 body_contains
 
@@ -135,16 +128,14 @@ Content size in bytes.
 
   my $clone = $single->clone;
 
-Return a new L<Mojo::Content::Single> object cloned from this content if
-possible, otherwise return C<undef>.
+Return a new L<Mojo::Content::Single> object cloned from this content if possible, otherwise return C<undef>.
 
 =head2 get_body_chunk
 
   my $bytes = $single->get_body_chunk(0);
 
-Get a chunk of content starting from a specific position. Note that it might
-not be possible to get the same chunk twice if content was generated
-dynamically.
+Get a chunk of content starting from a specific position. Note that it might not be possible to get the same chunk
+twice if content was generated dynamically.
 
 =head2 new
 
@@ -152,8 +143,8 @@ dynamically.
   my $single = Mojo::Content::Single->new(asset => Mojo::Asset::File->new);
   my $single = Mojo::Content::Single->new({asset => Mojo::Asset::File->new});
 
-Construct a new L<Mojo::Content::Single> object and subscribe to event
-L<Mojo::Content/"read"> with default content parser.
+Construct a new L<Mojo::Content::Single> object and subscribe to event L<Mojo::Content/"read"> with default content
+parser.
 
 =head2 parse
 
@@ -161,8 +152,7 @@ L<Mojo::Content/"read"> with default content parser.
   my $multi
     = $single->parse("Content-Type: multipart/form-data\x0d\x0a\x0d\x0a");
 
-Parse content chunk and upgrade to L<Mojo::Content::MultiPart> object if
-necessary.
+Parse content chunk and upgrade to L<Mojo::Content::MultiPart> object if necessary.
 
 =head1 SEE ALSO
 

@@ -4,14 +4,13 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 
-plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
-  unless $ENV{TEST_MORBO} || $ENV{TEST_ALL};
+plan skip_all => 'set TEST_MORBO to enable this test (developer only!)' unless $ENV{TEST_MORBO} || $ENV{TEST_ALL};
 
-use Mojo::File 'curfile';
+use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
 use IO::Socket::INET;
-use Mojo::File 'tempdir';
+use Mojo::File qw(tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Morbo::Backend;
 use Mojo::Server::Daemon;
@@ -39,8 +38,7 @@ EOF
 # Start
 my $port   = Mojo::IOLoop::Server->generate_port;
 my $prefix = curfile->dirname->dirname->sibling('script');
-my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
-  "http://127.0.0.1:$port", $script;
+my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l', "http://127.0.0.1:$port", $script;
 sleep 1 while !_port($port);
 
 # Application is alive
@@ -123,12 +121,10 @@ my @new = map { $subdir->child("$_.txt") } qw/test testing/;
 $_->spurt('whatever') for @new;
 is_deeply $morbo->backend->modified_files, \@new, 'two files have changed';
 $subdir->child('.hidden.txt')->spurt('whatever');
-is_deeply $morbo->backend->modified_files, [],
-  'directory has not changed again';
+is_deeply $morbo->backend->modified_files, [], 'directory has not changed again';
 
-# Broken symlink
-SKIP: {
-  skip 'Symlink support required!', 4 unless eval { symlink '', ''; 1 };
+subtest 'Broken symlink' => sub {
+  plan skip_all => 'Symlink support required!' unless eval { symlink '', ''; 1 };
   my $missing = $subdir->child('missing.txt');
   my $broken  = $subdir->child('broken.txt');
   symlink $missing, $broken;
@@ -138,7 +134,7 @@ SKIP: {
   local $SIG{__WARN__} = sub { $warned++ };
   is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
   ok !$warned, 'no warnings';
-}
+};
 
 # Stop
 kill 'INT', $pid;
@@ -149,34 +145,22 @@ sleep 1 while _port($port);
   local $ENV{MOJO_MORBO_BACKEND} = 'TestBackend';
   local $ENV{MOJO_MORBO_TIMEOUT} = 2;
   my $test_morbo = Mojo::Server::Morbo->new;
-  isa_ok $test_morbo->backend, 'Mojo::Server::Morbo::Backend::TestBackend',
-    'right backend';
-  is_deeply $test_morbo->backend->modified_files, ['always_changed'],
-    'always changes';
+  isa_ok $test_morbo->backend, 'Mojo::Server::Morbo::Backend::TestBackend', 'right backend';
+  is_deeply $test_morbo->backend->modified_files, ['always_changed'], 'always changes';
   is $test_morbo->backend->watch_timeout, 2, 'right timeout';
 }
 
-# SO_REUSEPORT
-SKIP: {
-  skip 'SO_REUSEPORT support required!', 2 unless eval { _reuse_port() };
-
+subtest 'SO_REUSEPORT' => sub {
+  plan skip_all => 'SO_REUSEPORT support required!' unless eval { _reuse_port() };
   my $port   = Mojo::IOLoop::Server->generate_port;
-  my $daemon = Mojo::Server::Daemon->new(
-    listen => ["http://127.0.0.1:$port"],
-    silent => 1
-  )->start;
-  ok !$daemon->ioloop->acceptor($daemon->acceptors->[0])
-    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
+  my $daemon = Mojo::Server::Daemon->new(listen => ["http://127.0.0.1:$port"], silent => 1)->start;
+  ok !$daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
     'no SO_REUSEPORT socket option';
-  $daemon = Mojo::Server::Daemon->new(
-    listen => ["http://127.0.0.1:$port?reuse=1"],
-    silent => 1
-  );
+  $daemon = Mojo::Server::Daemon->new(listen => ["http://127.0.0.1:$port?reuse=1"], silent => 1);
   $daemon->start;
-  ok $daemon->ioloop->acceptor($daemon->acceptors->[0])
-    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
+  ok $daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
     'SO_REUSEPORT socket option';
-}
+};
 
 # Abstract methods
 eval { Mojo::Server::Morbo::Backend->modified_files };
@@ -185,11 +169,7 @@ like $@, qr/Method "modified_files" not implemented by subclass/, 'right error';
 sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
 
 sub _reuse_port {
-  IO::Socket::INET->new(
-    Listen    => 1,
-    LocalPort => Mojo::IOLoop::Server->generate_port,
-    ReusePort => 1
-  );
+  IO::Socket::INET->new(Listen => 1, LocalPort => Mojo::IOLoop::Server->generate_port, ReusePort => 1);
 }
 
 done_testing();

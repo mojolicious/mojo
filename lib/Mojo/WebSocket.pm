@@ -2,7 +2,7 @@ package Mojo::WebSocket;
 use Mojo::Base -strict;
 
 use Config;
-use Exporter 'import';
+use Exporter qw(import);
 use Mojo::Util qw(b64_encode dumper sha1_bytes xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
@@ -11,22 +11,15 @@ use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 # Perl with support for quads
-use constant MODERN =>
-  (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
+use constant MODERN => (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
 
 # Opcodes
-use constant {
-  WS_CONTINUATION => 0x0,
-  WS_TEXT         => 0x1,
-  WS_BINARY       => 0x2,
-  WS_CLOSE        => 0x8,
-  WS_PING         => 0x9,
-  WS_PONG         => 0xa
-};
+use constant {WS_CONTINUATION => 0x0, WS_TEXT => 0x1, WS_BINARY => 0x2, WS_CLOSE => 0x8, WS_PING => 0x9,
+  WS_PONG => 0xa};
 
 our @EXPORT_OK = (
-  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT),
-  qw(build_frame challenge client_handshake parse_frame server_handshake)
+  qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT build_frame challenge client_handshake),
+  qw(parse_frame server_handshake)
 );
 
 sub build_frame {
@@ -74,11 +67,9 @@ sub challenge {
 
   # "permessage-deflate" extension
   my $headers = $tx->res->headers;
-  $tx->compressed(1)
-    if ($headers->sec_websocket_extensions // '') =~ /permessage-deflate/;
+  $tx->compressed(1) if ($headers->sec_websocket_extensions // '') =~ /permessage-deflate/;
 
-  return _challenge($tx->req->headers->sec_websocket_key) eq
-    $headers->sec_websocket_accept;
+  return _challenge($tx->req->headers->sec_websocket_key) eq $headers->sec_websocket_accept;
 }
 
 sub client_handshake {
@@ -156,8 +147,7 @@ sub server_handshake {
 
   my $headers = $tx->res->headers;
   $headers->upgrade('websocket')->connection('Upgrade');
-  $headers->sec_websocket_accept(
-    _challenge($tx->req->headers->sec_websocket_key));
+  $headers->sec_websocket_accept(_challenge($tx->req->headers->sec_websocket_key));
 
   return $tx;
 }
@@ -181,14 +171,12 @@ Mojo::WebSocket - The WebSocket protocol
 
 =head1 DESCRIPTION
 
-L<Mojo::WebSocket> implements the WebSocket protocol as described in
-L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64-bit frames require
-a Perl with support for quads or they are limited to 32-bit.
+L<Mojo::WebSocket> implements the WebSocket protocol as described in L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
+Note that 64-bit frames require a Perl with support for quads or they are limited to 32-bit.
 
 =head1 FUNCTIONS
 
-L<Mojo::WebSocket> implements the following functions, which can be imported
-individually.
+L<Mojo::WebSocket> implements the following functions, which can be imported individually.
 
 =head2 build_frame
 
@@ -249,8 +237,7 @@ Perform WebSocket handshake server-side.
 
 =head1 CONSTANTS
 
-L<Mojo::WebSocket> implements the following constants, which can be imported
-individually.
+L<Mojo::WebSocket> implements the following constants, which can be imported individually.
 
 =head2 WS_BINARY
 
@@ -278,8 +265,8 @@ Opcode for C<Text> frames.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_WEBSOCKET_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
+You can set the C<MOJO_WEBSOCKET_DEBUG> environment variable to get some advanced diagnostics information printed to
+C<STDERR>.
 
   MOJO_WEBSOCKET_DEBUG=1
 

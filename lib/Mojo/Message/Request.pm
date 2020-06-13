@@ -1,6 +1,7 @@
 package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
+use Digest::SHA qw(sha1_base64);
 use Mojo::Cookie::Request;
 use Mojo::Util qw(b64_encode b64_decode sha1_sum);
 use Mojo::URL;
@@ -11,7 +12,9 @@ has env    => sub { {} };
 has method => 'GET';
 has [qw(proxy reverse_proxy)];
 has request_id => sub {
-  substr sha1_sum($SEED . ($COUNTER = ($COUNTER + 1) % 0xffffff)), 0, 8;
+  my $b64 = substr(sha1_base64($SEED . ($COUNTER = ($COUNTER + 1) % 0xffffff)), 0, 8);
+  $b64 =~ tr!+/!-_!;
+  return $b64;
 };
 has url       => sub { Mojo::URL->new };
 has via_proxy => 1;
@@ -21,12 +24,8 @@ sub clone {
 
   # Dynamic requests cannot be cloned
   return undef unless my $content = $self->content->clone;
-  my $clone = $self->new(
-    content => $content,
-    method  => $self->method,
-    url     => $self->url->clone,
-    version => $self->version
-  );
+  my $clone
+    = $self->new(content => $content, method => $self->method, url => $self->url->clone, version => $self->version);
   $clone->{proxy} = $self->{proxy}->clone if $self->{proxy};
 
   return $clone;
@@ -37,12 +36,10 @@ sub cookies {
 
   # Parse cookies
   my $headers = $self->headers;
-  return [map { @{Mojo::Cookie::Request->parse($_)} } $headers->cookie]
-    unless @_;
+  return [map { @{Mojo::Cookie::Request->parse($_)} } $headers->cookie] unless @_;
 
   # Add cookies
-  my @cookies = map { ref $_ eq 'HASH' ? Mojo::Cookie::Request->new($_) : $_ }
-    $headers->cookie || (), @_;
+  my @cookies = map { ref $_ eq 'HASH' ? Mojo::Cookie::Request->new($_) : $_ } $headers->cookie || (), @_;
   $headers->cookie(join '; ', @cookies);
 
   return $self;
@@ -57,11 +54,10 @@ sub extract_start_line {
   return undef unless $$bufref =~ s/^\s*(.*?)\x0d?\x0a//;
 
   # We have a (hopefully) full request-line
-  return !$self->error({message => 'Bad request start-line'})
-    unless $1 =~ /^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$/;
+  return !$self->error({message => 'Bad request start-line'}) unless $1 =~ /^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$/;
   my $url    = $self->method($1)->version($3)->url;
   my $target = $2;
-  return !!$url->host_port($target) if $1 eq 'CONNECT';
+  return !!$url->host_port($target)              if $1 eq 'CONNECT';
   return !!$url->parse($target)->fragment(undef) if $target =~ /^[^:\/?#]+:/;
   return !!$url->path_query($target);
 }
@@ -83,8 +79,7 @@ sub fix_headers {
   # Basic proxy authentication
   return $self unless (my $proxy = $self->proxy) && $self->via_proxy;
   return $self unless my $info = $proxy->userinfo;
-  $headers->proxy_authorization('Basic ' . b64_encode($info, ''))
-    unless $headers->proxy_authorization;
+  $headers->proxy_authorization('Basic ' . b64_encode($info, '')) unless $headers->proxy_authorization;
   return $self;
 }
 
@@ -101,16 +96,13 @@ sub is_secure {
   return ($url->protocol || $url->base->protocol) eq 'https';
 }
 
-sub is_xhr {
-  (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpRequest/i;
-}
+sub is_xhr { (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpRequest/i }
 
 sub param { shift->params->param(@_) }
 
 sub params {
   my $self = shift;
-  return $self->{params}
-    ||= $self->body_params->clone->append($self->query_params);
+  return $self->{params} ||= $self->body_params->clone->append($self->query_params);
 }
 
 sub parse {
@@ -143,9 +135,7 @@ sub parse {
   $self->proxy(Mojo::URL->new->userinfo($basic)) if $basic;
 
   # "X-Forwarded-Proto"
-  $base->scheme('https')
-    if $self->reverse_proxy
-    && ($headers->header('X-Forwarded-Proto') // '') eq 'https';
+  $base->scheme('https') if $self->reverse_proxy && ($headers->header('X-Forwarded-Proto') // '') eq 'https';
 
   return $self;
 }
@@ -173,8 +163,7 @@ sub _parse_env {
     $headers->header($name => $value);
 
     # Host/Port
-    $value =~ s/:(\d+)$// ? $base->host($value)->port($1) : $base->host($value)
-      if $name eq 'HOST';
+    $value =~ s/:(\d+)$// ? $base->host($value)->port($1) : $base->host($value) if $name eq 'HOST';
   }
 
   # Content-Type is a special case on some servers
@@ -190,8 +179,7 @@ sub _parse_env {
   $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
 
   # Scheme/Version
-  $base->scheme($1) and $self->version($2)
-    if ($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!;
+  $base->scheme($1) and $self->version($2) if ($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!;
 
   # HTTPS
   $base->scheme('https') if uc($env->{HTTPS} // '') eq 'ON';
@@ -271,11 +259,9 @@ Mojo::Message::Request - HTTP request
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Request> is a container for HTTP requests, based on
-L<RFC 7230|http://tools.ietf.org/html/rfc7230>,
-L<RFC 7231|http://tools.ietf.org/html/rfc7231>,
-L<RFC 7235|http://tools.ietf.org/html/rfc7235> and
-L<RFC 2817|http://tools.ietf.org/html/rfc2817>.
+L<Mojo::Message::Request> is a container for HTTP requests, based on L<RFC 7230|http://tools.ietf.org/html/rfc7230>,
+L<RFC 7231|http://tools.ietf.org/html/rfc7231>, L<RFC 7235|http://tools.ietf.org/html/rfc7235> and L<RFC
+2817|http://tools.ietf.org/html/rfc2817>.
 
 =head1 EVENTS
 
@@ -283,8 +269,7 @@ L<Mojo::Message::Request> inherits all events from L<Mojo::Message>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Message::Request> inherits all attributes from L<Mojo::Message> and
-implements the following new ones.
+L<Mojo::Message::Request> inherits all attributes from L<Mojo::Message> and implements the following new ones.
 
 =head2 env
 
@@ -348,15 +333,13 @@ Request can be performed through a proxy server.
 
 =head1 METHODS
 
-L<Mojo::Message::Request> inherits all methods from L<Mojo::Message> and
-implements the following new ones.
+L<Mojo::Message::Request> inherits all methods from L<Mojo::Message> and implements the following new ones.
 
 =head2 clone
 
   my $clone = $req->clone;
 
-Return a new L<Mojo::Message::Request> object cloned from this request if
-possible, otherwise return C<undef>.
+Return a new L<Mojo::Message::Request> object cloned from this request if possible, otherwise return C<undef>.
 
 =head2 cookies
 
@@ -373,8 +356,7 @@ Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
   my $values = $req->every_param('foo');
 
-Similar to L</"param">, but returns all values sharing the same name as an
-array reference.
+Similar to L</"param">, but returns all values sharing the same name as an array reference.
 
   # Get first value
   say $req->every_param('foo')->[0];
@@ -395,8 +377,7 @@ Make sure request has all required headers.
 
   my $bytes = $req->get_start_line_chunk($offset);
 
-Get a chunk of request-line data starting from a specific position. Note that
-this method finalizes the request.
+Get a chunk of request-line data starting from a specific position. Note that this method finalizes the request.
 
 =head2 is_handshake
 
@@ -420,25 +401,21 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
   my $value = $req->param('foo');
 
-Access C<GET> and C<POST> parameters extracted from the query string and
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message body. If
-there are multiple values sharing the same name, and you want to access more
-than just the last one, you can use L</"every_param">. Note that this method
-caches all data, so it should not be called before the entire request body has
-been received. Parts of the request body need to be loaded into memory to parse
-C<POST> parameters, so you have to make sure it is not excessively large.
-There's a 16MiB limit for requests by default.
+Access C<GET> and C<POST> parameters extracted from the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body. If there are multiple values sharing the same name, and you want to access more
+than just the last one, you can use L</"every_param">. Note that this method caches all data, so it should not be
+called before the entire request body has been received. Parts of the request body need to be loaded into memory to
+parse C<POST> parameters, so you have to make sure it is not excessively large. There's a 16MiB limit for requests by
+default.
 
 =head2 params
 
   my $params = $req->params;
 
-All C<GET> and C<POST> parameters extracted from the query string and
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
-usually a L<Mojo::Parameters> object. Note that this method caches all data, so
-it should not be called before the entire request body has been received. Parts
-of the request body need to be loaded into memory to parse C<POST> parameters,
-so you have to make sure it is not excessively large. There's a 16MiB limit for
+All C<GET> and C<POST> parameters extracted from the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body, usually a L<Mojo::Parameters> object. Note that this method caches all data, so it
+should not be called before the entire request body has been received. Parts of the request body need to be loaded into
+memory to parse C<POST> parameters, so you have to make sure it is not excessively large. There's a 16MiB limit for
 requests by default.
 
   # Get parameter names and values

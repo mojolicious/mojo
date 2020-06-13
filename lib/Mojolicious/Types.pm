@@ -1,6 +1,8 @@
 package Mojolicious::Types;
 use Mojo::Base -base;
 
+use Mojo::File qw(path);
+
 has mapping => sub {
   {
     appcache => ['text/cache-manifest'],
@@ -40,7 +42,7 @@ sub content_type {
   return undef if $headers->content_type;
 
   my $type = $o->{file} ? $self->file_type($o->{file}) : $self->type($o->{ext});
-  $headers->content_type($type // $self->type('txt'));
+  $headers->content_type($type // 'application/octet-stream');
 }
 
 sub detect {
@@ -48,9 +50,7 @@ sub detect {
 
   # Extract and prioritize MIME types
   my %types;
-  /^\s*([^,; ]+)(?:\s*\;\s*q\s*=\s*(\d+(?:\.\d+)?))?\s*$/i
-    and $types{lc $1} = $2 // 1
-    for split ',', $accept // '';
+  /^\s*([^,; ]+)(?:\s*\;\s*q\s*=\s*(\d+(?:\.\d+)?))?\s*$/i and $types{lc $1} = $2 // 1 for split ',', $accept // '';
   my @detected = sort { $types{$b} <=> $types{$a} } sort keys %types;
 
   # Detect extensions from MIME types
@@ -64,7 +64,7 @@ sub detect {
   return [map { @{$reverse{$_} // []} } @detected];
 }
 
-sub file_type { $_[1] =~ /\.(\w+)$/ ? $_[0]->type($1) : undef }
+sub file_type { $_[0]->type(path($_[1])->extname) }
 
 sub type {
   my ($self, $ext, $type) = @_;
@@ -136,19 +136,15 @@ MIME type mapping.
 
 =head1 METHODS
 
-L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
 =head2 content_type
 
   $types->content_type(Mojolicious::Controller->new, {ext => 'json'});
 
-Detect MIME type for L<Mojolicious::Controller> object unless a C<Content-Type>
-response header has already been set, defaults to using the MIME type for the
-C<txt> extension if no better alternative could be found. Note that this method
-is B<EXPERIMENTAL> and might change without warning!
-
-These options are currently available:
+Detect MIME type for L<Mojolicious::Controller> object unless a C<Content-Type> response header has already been set,
+defaults to using C<application/octet-stream> if no better alternative could be found. These options are currently
+available:
 
 =over 2
 
@@ -179,8 +175,7 @@ Detect file extensions from C<Accept> header value.
 
   my $type = $types->file_type('foo/bar.png');
 
-Get MIME type for file path. Note that this method is B<EXPERIMENTAL> and might
-change without warning!
+Get MIME type for file path.
 
 =head2 type
 
@@ -188,8 +183,7 @@ change without warning!
   $types   = $types->type(png => 'image/png');
   $types   = $types->type(json => ['application/json', 'text/x-json']);
 
-Get or set MIME types for file extension, alternatives are only used for
-detection.
+Get or set MIME types for file extension, alternatives are only used for detection.
 
 =head1 SEE ALSO
 

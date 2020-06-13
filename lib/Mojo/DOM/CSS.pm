@@ -1,3 +1,4 @@
+
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
@@ -19,18 +20,20 @@ my $ATTR_RE   = qr/
 
 sub matches {
   my $tree = shift->tree;
-  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree);
+  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree, _root($tree));
 }
 
 sub select     { _select(0, shift->tree, _compile(@_)) }
 sub select_one { _select(1, shift->tree, _compile(@_)) }
 
-sub _ancestor {
-  my ($selectors, $current, $tree, $one, $pos) = @_;
+sub _absolutize { [map { _is_scoped($_) ? $_ : [[['pc', 'scope']], ' ', @$_] } @{shift()}] }
 
-  while ($current = $current->[3]) {
-    return undef if $current->[0] eq 'root' || $current eq $tree;
-    return 1     if _combinator($selectors, $current, $tree, $pos);
+sub _ancestor {
+  my ($selectors, $current, $tree, $scope, $one, $pos) = @_;
+
+  while ($current ne $scope && $current->[0] ne 'root' && ($current = $current->[3])) {
+    return 1     if _combinator($selectors, $current, $tree, $scope, $pos);
+    return undef if $current eq $scope;
     last         if $one;
   }
 
@@ -51,26 +54,26 @@ sub _attr {
 }
 
 sub _combinator {
-  my ($selectors, $current, $tree, $pos) = @_;
+  my ($selectors, $current, $tree, $scope, $pos) = @_;
 
   # Selector
   return undef unless my $c = $selectors->[$pos];
   if (ref $c) {
-    return undef unless _selector($c, $current);
+    return undef unless _selector($c, $current, $tree, $scope);
     return 1 unless $c = $selectors->[++$pos];
   }
 
   # ">" (parent only)
-  return _ancestor($selectors, $current, $tree, 1, ++$pos) if $c eq '>';
+  return _ancestor($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '>';
 
   # "~" (preceding siblings)
-  return _sibling($selectors, $current, $tree, 0, ++$pos) if $c eq '~';
+  return _sibling($selectors, $current, $tree, $scope, 0, ++$pos) if $c eq '~';
 
   # "+" (immediately preceding siblings)
-  return _sibling($selectors, $current, $tree, 1, ++$pos) if $c eq '+';
+  return _sibling($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '+';
 
   # " " (ancestor)
-  return _ancestor($selectors, $current, $tree, 0, ++$pos);
+  return _ancestor($selectors, $current, $tree, $scope, 0, ++$pos);
 }
 
 sub _compile {
@@ -85,7 +88,10 @@ sub _compile {
     if ($css =~ /\G\s*,\s*/gc) { push @$group, [] }
 
     # Combinator
-    elsif ($css =~ /\G\s*([ >+~])\s*/gc) { push @$selectors, $1 }
+    elsif ($css =~ /\G\s*([ >+~])\s*/gc) {
+      push @$last, ['pc', 'scope'] unless @$last;
+      push @$selectors, $1;
+    }
 
     # Class or ID
     elsif ($css =~ /\G([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
@@ -147,9 +153,24 @@ sub _equation {
   return [$1 eq '-' ? -1 : !length $1 ? 1 : $1, join('', split(' ', $2 // 0))];
 }
 
+sub _is_scoped {
+  my $selector = shift;
+
+  for my $pc (grep { $_->[0] eq 'pc' } map { ref $_ ? @$_ : () } @$selector) {
+
+    # Selector with ":scope"
+    return 1 if $pc->[1] eq 'scope';
+
+    # Argument of functional pseudo-class with ":scope"
+    return 1 if ($pc->[1] eq 'not' || $pc->[1] eq 'is') && grep { _is_scoped($_) } @{$pc->[2]};
+  }
+
+  return undef;
+}
+
 sub _match {
-  my ($group, $current, $tree) = @_;
-  _combinator([reverse @$_], $current, $tree, 0) and return 1 for @$group;
+  my ($group, $current, $tree, $scope) = @_;
+  _combinator([reverse @$_], $current, $tree, $scope, 0) and return 1 for @$group;
   return undef;
 }
 
@@ -171,16 +192,19 @@ sub _namespace {
 }
 
 sub _pc {
-  my ($class, $args, $current) = @_;
+  my ($class, $args, $current, $tree, $scope) = @_;
+
+  # ":scope"
+  return $current eq $scope if $class eq 'scope';
 
   # ":checked"
   return exists $current->[2]{checked} || exists $current->[2]{selected} if $class eq 'checked';
 
   # ":not"
-  return !_match($args, $current, $current) if $class eq 'not';
+  return !_match($args, $current, $current, $scope) if $class eq 'not';
 
   # ":is"
-  return !!_match($args, $current, $current) if $class eq 'is';
+  return !!_match($args, $current, $current, $scope) if $class eq 'is';
 
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
@@ -218,8 +242,18 @@ sub _pc {
   return undef;
 }
 
+sub _root {
+  my $tree = shift;
+  $tree = $tree->[3] while $tree->[0] ne 'root';
+  return $tree;
+}
+
 sub _select {
-  my ($one, $tree, $group) = @_;
+  my ($one, $scope, $group) = @_;
+
+  # Scoped selectors require the whole tree to be searched
+  my $tree = $scope;
+  ($group, $tree) = (_absolutize($group), _root($scope)) if grep { _is_scoped($_) } @$group;
 
   my @results;
   my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
@@ -227,7 +261,7 @@ sub _select {
     next unless $current->[0] eq 'tag';
 
     unshift @queue, @$current[4 .. $#$current];
-    next unless _match($group, $current, $tree);
+    next unless _match($group, $current, $tree, $scope);
     $one ? return $current : push @results, $current;
   }
 
@@ -235,42 +269,41 @@ sub _select {
 }
 
 sub _selector {
-  my ($selector, $current) = @_;
+  my ($selector, $current, $tree, $scope) = @_;
 
+  # The root might be the scope
+  my $is_tag = $current->[0] eq 'tag';
   for my $s (@$selector) {
     my $type = $s->[0];
 
     # Tag
-    if ($type eq 'tag') {
+    if ($is_tag && $type eq 'tag') {
       return undef if defined $s->[1] && $current->[1] !~ $s->[1];
       return undef if defined $s->[2] && !_namespace($s->[2], $current);
     }
 
     # Attribute
-    elsif ($type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
+    elsif ($is_tag && $type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
 
     # Pseudo-class
-    elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current) }
-
-    # Invalid selector
-    else { return undef }
+    else { return undef unless _pc(@$s[1, 2], $current, $tree, $scope) }
   }
 
   return 1;
 }
 
 sub _sibling {
-  my ($selectors, $current, $tree, $immediate, $pos) = @_;
+  my ($selectors, $current, $tree, $scope, $immediate, $pos) = @_;
 
   my $found;
   for my $sibling (@{_siblings($current)}) {
     return $found if $sibling eq $current;
 
     # "+" (immediately preceding sibling)
-    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $pos) }
+    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $scope, $pos) }
 
     # "~" (preceding sibling)
-    else { return 1 if _combinator($selectors, $sibling, $tree, $pos) }
+    else { return 1 if _combinator($selectors, $sibling, $tree, $scope, $pos) }
   }
 
   return undef;
@@ -532,6 +565,16 @@ yield exactly the same results.
 =head2 E:visited
 
 Alias for L</"E:link">.
+
+=head2 E:scope
+
+An C<E> element being a designated reference element. Note that this selector is B<EXPERIMENTAL> and might change
+without warning! This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a
+work in progress.
+
+  my $scoped = $css->select('a:not(:scope > a)');
+  my $scoped = $css->select('div :scope p');
+  my $scoped = $css->select('~ p');
 
 =head2 E:checked
 

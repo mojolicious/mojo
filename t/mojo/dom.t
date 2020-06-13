@@ -1271,6 +1271,47 @@ EOF
   is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
 };
 
+subtest 'Scoped selectors' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+<p>Zero</p>
+<div>
+  <p>One</p>
+  <p>Two</p>
+  <p><a href="#">Link</a></p>
+</div>
+<div>
+  <p>Three</p>
+  <p>Four</p>
+</div>
+<p>Five</p>
+EOF
+  is $dom->at('div p')->at(':scope')->text,   'One',  'right text';
+  is $dom->at('div')->at(':scope p')->text,   'One',  'right text';
+  is $dom->at('div')->at(':scope > p')->text, 'One',  'right text';
+  is $dom->at('div')->at('> p')->text,        'One',  'right text';
+  is $dom->at('div p')->at('+ p')->text,      'Two',  'right text';
+  is $dom->at('div p')->at('~ p')->text,      'Two',  'right text';
+  is $dom->at('div p')->at('~ p a')->text,    'Link', 'right text';
+  is $dom->at('div')->at(':scope a')->text,   'Link', 'right text';
+  is $dom->at('div')->at(':scope > a'), undef, 'no result';
+  is $dom->at('div')->at(':scope > p > a')->text, 'Link', 'right text';
+  is $dom->find('div')->last->at(':scope p')->text,   'Three', 'right text';
+  is $dom->find('div')->last->at(':scope > p')->text, 'Three', 'right text';
+  is $dom->find('div')->last->at('> p')->text,        'Three', 'right text';
+  is $dom->at('div p')->at(':scope + p')->text,                 'Two',  'right text';
+  is $dom->at('div')->at(':scope > p:nth-child(2), p a')->text, 'Two',  'right text';
+  is $dom->at('div')->at('p, :scope > p:nth-child(2)')->text,   'One',  'right text';
+  is $dom->at('div')->at('p:not(:scope > *)')->text,            'Zero', 'right text';
+  is $dom->at('div p:nth-child(2)')->at('*:is(:scope)')->text,  'Two',  'right text';
+  is $dom->at('div')->at('div p, ~ p')->text,                   'Five', 'right text';
+  is $dom->at('> p')->text,          'Zero', 'right text';
+  is $dom->at(':scope p')->text,     'Zero', 'right text';
+  is $dom->at(':scope div p')->text, 'One',  'right text';
+  is $dom->at(':scope p a')->text,   'Link', 'right text';
+  is $dom->at('> p')->at('p ~ :scope'), undef, 'no result';
+  is $dom->at('> p:last-child')->at('p ~ :scope')->text, 'Five', 'righ text';
+};
+
 subtest 'Adding nodes' => sub {
   my $dom = Mojo::DOM->new(<<EOF);
 <ul>

@@ -68,8 +68,8 @@ $CLOSE{$_} = [{dd => 1, dt => 1}, {dl => 1}] for qw(dd dt);
 $CLOSE{$_} = [{rp => 1, rt => 1}, {ruby => 1}] for qw(rp rt);
 $CLOSE{$_} = [{th => 1, td => 1}, {table => 1}] for qw(td th);
 
-# HTML parent elements that signal no more content but are also phrasing content
-my %NO_CONTENT = (ruby => [qw(rt rp)], select => [qw(option optgroup)]);
+# HTML parent elements that signal no more content when closed, but that are also phrasing content
+my %NO_MORE_CONTENT = (ruby => [qw(rt rp)], select => [qw(option optgroup)]);
 
 # HTML elements without end tags
 my %EMPTY = map { $_ => 1 } qw(area base br col embed hr img input keygen link menuitem meta param source track wbr);
@@ -112,7 +112,7 @@ sub parse {
         my $end = $xml ? $1 : lc $1;
 
         # No more content
-        if (!$xml && (my $tags = $NO_CONTENT{$end})) { _end($_, $xml, \$current) for @$tags }
+        if (!$xml && (my $tags = $NO_MORE_CONTENT{$end})) { _end($_, $xml, \$current) for @$tags }
 
         _end($xml ? $1 : lc $1, $xml, \$current);
       }

@@ -283,8 +283,7 @@ sub write {
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
-  my $content = $self->res->content;
-  $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
+  $self->res->content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
 }
 

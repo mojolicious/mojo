@@ -172,6 +172,11 @@ Same as L</"once">, but returns a L<Mojo::Promise> object instead of accepting a
 be rejected by default, but if it is rejected manually the event subscription is also removed. Note that this method is
 B<EXPERIMENTAL> and might change without warning!
 
+  $e->once_p('foo')->then(sub {
+    my @args = @_;
+    ...
+  });
+
 =head2 subscribers
 
   my $subscribers = $e->subscribers('foo');

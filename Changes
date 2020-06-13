@@ -1,6 +1,6 @@
 
 8.54  2020-06-13
-  - Added EXPERIMENTAL support for :scope pseudo-class to Mojo::DOM::CSS. (eckankar, kraih)
+  - Added EXPERIMENTAL support for :scope pseudo-class to Mojo::DOM::CSS. (Eckankar, kraih)
   - Fixed a bug in Mojo::DOM where select and ruby elements were parsed incorrectly.
   - Fixed a but in Mojo::UserAgent::Transactor that prevented compression settings to be inherited across redirects.
 

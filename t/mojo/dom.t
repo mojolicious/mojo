@@ -1304,7 +1304,8 @@ EOF
   is $dom->at('div')->at('p:not(:scope > *)')->text,            'Zero', 'right text';
   is $dom->at('div p:nth-child(2)')->at('*:is(:scope)')->text,  'Two',  'right text';
   is $dom->at('div')->at('div p, ~ p')->text,                   'Five', 'right text';
-  is $dom->at('> p')->text,          'Zero', 'right text';
+  is $dom->at('> p')->text, 'Zero', 'right text';
+  is $dom->at(':scope'), undef, 'no result';
   is $dom->at(':scope p')->text,     'Zero', 'right text';
   is $dom->at(':scope div p')->text, 'One',  'right text';
   is $dom->at(':scope p a')->text,   'Link', 'right text';

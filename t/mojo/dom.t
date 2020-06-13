@@ -1443,7 +1443,7 @@ EOF
   is $dom->find('ruby > rp')->[1]->text, 'C',     'right text';
   is $dom->find('ruby > rt')->[1]->text, "D\n  ", 'right text';
   is $dom->find('ruby > rp')->[2]->text, "E\n  ", 'right text';
-  is $dom->find('ruby > rt')->[2]->text, "F\n\n", 'right text';
+  is $dom->find('ruby > rt')->[2]->text, "F\n",   'right text';
 };
 
 subtest 'Optional "optgroup" and "option" tags' => sub {
@@ -2640,6 +2640,87 @@ EOF
   is $dom->at('barns|bar [hreflang|=en-US]', %ns)->text, 'YADA', 'right text';
   ok !$dom->at('barns|bar [hreflang|=en-US-yada]', %ns), 'no result';
   ok !$dom->at('barns|bar [hreflang|=e]',          %ns), 'no result';
+};
+
+subtest 'No more content' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <select>
+      <option>A
+      <option>B
+    </select>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > select > option')->[0]->text, "A\n      ", 'right text';
+  is $dom->find('body > select > option')->[1]->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <select>
+      <optgroup>
+        <option>A
+        <option>B
+    </select>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > select > optgroup > option')->[0]->text, "A\n        ", 'right text';
+  is $dom->find('body > select > optgroup > option')->[1]->text, "B\n    ",     'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <ul>
+      <li>A
+      <li>B
+    </ul>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > ul > li')->[0]->text, "A\n      ", 'right text';
+  is $dom->find('body > ul > li')->[1]->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <dl>
+      <dd>A
+      <dd>B
+    </dl>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > dl > dd')->[0]->text, "A\n      ", 'right text';
+  is $dom->find('body > dl > dd')->[1]->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <ruby>
+      <rp>A
+      <rt>B
+    </ruby>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->at('body > ruby > rp')->text, "A\n      ", 'right text';
+  is $dom->at('body > ruby > rt')->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text,  'C',         'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <ruby>
+      <rt>A
+      <rp>B
+    </ruby>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->at('body > ruby > rt')->text, "A\n      ", 'right text';
+  is $dom->at('body > ruby > rp')->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text,  'C',         'right text';
 };
 
 subtest 'Reusing fragments' => sub {

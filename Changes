@@ -1,5 +1,6 @@
 
-8.54  2020-06-12
+8.54  2020-06-13
+  - Fixed a but in Mojo::UserAgent::Transactor that prevented compression settings to be inherited across redirects.
 
 8.53  2020-06-09
   - Added EXPERIMENTAL extname method to Mojo::File.

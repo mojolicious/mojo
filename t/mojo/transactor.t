@@ -19,19 +19,19 @@ $t->add_generator(
   }
 );
 
-# Compression
-{
+subtest 'Compression' => sub {
   local $ENV{MOJO_GZIP} = 1;
   my $t = Mojo::UserAgent::Transactor->new;
   ok $t->compressed, 'compressed';
   is $t->tx(GET => '/')->req->headers->accept_encoding, 'gzip', 'right value';
   is $t->tx(GET => '/')->res->content->auto_decompress, undef,  'no value';
+
   $ENV{MOJO_GZIP} = 0;
   $t = Mojo::UserAgent::Transactor->new;
   ok !$t->compressed, 'not compressed';
   is $t->tx(GET => '/')->req->headers->accept_encoding, undef, 'no value';
   is $t->tx(GET => '/')->res->content->auto_decompress, 0,     'right value';
-}
+};
 
 # Simple GET
 my $tx = $t->tx(GET => 'mojolicious.org/foo.html?bar=baz');
@@ -579,9 +579,10 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept,   'application/json',       'right "Accept" value';
-is $tx->req->headers->location, undef,                    'no "Location" value';
+is $tx->req->url->to_abs,         'http://example.com/bar', 'right URL';
+is $tx->req->headers->user_agent, 'MyUA 1.0',               'right "User-Agent" value';
+is $tx->req->headers->accept,     'application/json',       'right "Accept" value';
+is $tx->req->headers->location,   undef,                    'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -898,6 +899,24 @@ $tx->res->code(302);
 $tx->res->headers->location('http://example.com/bar');
 is $t->redirect($tx), undef, 'unsupported redirect';
 
+subtest '301 redirect without compression' => sub {
+  my $t  = Mojo::UserAgent::Transactor->new(compressed => 0);
+  my $tx = $t->tx(POST => 'http://mojolicious.org/foo' => {Accept => 'application/json'});
+  $tx->res->code(301);
+  $tx->res->headers->location('http://example.com/bar');
+  is $tx->res->content->auto_decompress, 0, 'right value';
+  $tx = $t->redirect($tx);
+  is $tx->res->content->auto_decompress, 0, 'right value';
+  is $tx->req->method, 'GET', 'right method';
+  is $tx->req->url->to_abs,         'http://example.com/bar', 'right URL';
+  is $tx->req->headers->user_agent, 'Mojolicious (Perl)',     'right "User-Agent" value';
+  is $tx->req->headers->accept,     'application/json',       'right "Accept" value';
+  is $tx->req->headers->location,   undef,                    'no "Location" value';
+  is $tx->req->body, '',    'no content';
+  is $tx->res->code, undef, 'no status';
+  is $tx->res->headers->location, undef, 'no "Location" value';
+};
+
 # Promisify
 my $promise = Mojo::Promise->new;
 my (@results, @errors);
@@ -925,14 +944,15 @@ $promise->wait;
 is_deeply \@results, [], 'promise not resolved';
 is_deeply \@errors, ['Premature connection close'], 'promise rejected';
 
-# Abstract methods
-eval { Mojo::Transaction->client_read };
-like $@, qr/Method "client_read" not implemented by subclass/, 'right error';
-eval { Mojo::Transaction->client_write };
-like $@, qr/Method "client_write" not implemented by subclass/, 'right error';
-eval { Mojo::Transaction->server_read };
-like $@, qr/Method "server_read" not implemented by subclass/, 'right error';
-eval { Mojo::Transaction->server_write };
-like $@, qr/Method "server_write" not implemented by subclass/, 'right error';
+subtest 'Abstract methods' => sub {
+  eval { Mojo::Transaction->client_read };
+  like $@, qr/Method "client_read" not implemented by subclass/, 'right error';
+  eval { Mojo::Transaction->client_write };
+  like $@, qr/Method "client_write" not implemented by subclass/, 'right error';
+  eval { Mojo::Transaction->server_read };
+  like $@, qr/Method "server_read" not implemented by subclass/, 'right error';
+  eval { Mojo::Transaction->server_write };
+  like $@, qr/Method "server_write" not implemented by subclass/, 'right error';
+};
 
 done_testing();

@@ -97,13 +97,16 @@ sub redirect {
     $new->req($clone);
   }
   else {
-    my $m = uc $req->method;
-    my $headers
-      = $new->req->method($code == 303 || $m eq 'POST' ? 'GET' : $m)->content->headers($req->headers->clone)->headers;
+    my $method = uc $req->method;
+    $method = $code == 303 || $method eq 'POST' ? 'GET' : $method;
+    $new->req->method($method)->content->headers(my $headers = $req->headers->clone);
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
   }
+
+  $new->res->content->auto_decompress(0) unless $self->compressed;
   my $headers = $new->req->url($location)->headers;
   $headers->remove($_) for qw(Authorization Cookie Host Referer);
+
   return $new->previous($old);
 }
 
@@ -113,8 +116,7 @@ sub tx {
   # Method and URL
   my $tx  = Mojo::Transaction::HTTP->new;
   my $req = $tx->req->method($method);
-  if   (ref $url) { $req->url($url) }
-  else            { $req->url->parse($url =~ m!^/|://! ? $url : "http://$url") }
+  ref $url ? $req->url($url) : $req->url->parse($url =~ m!^/|://! ? $url : "http://$url");
 
   # Headers (we identify ourselves and accept gzip compression)
   my $headers = $req->headers;
@@ -191,6 +193,7 @@ sub _form {
     $req->body(Mojo::Parameters->new(@form)->charset($options{charset})->to_string);
     _type($headers, 'application/x-www-form-urlencoded');
   }
+
   return $tx;
 }
 

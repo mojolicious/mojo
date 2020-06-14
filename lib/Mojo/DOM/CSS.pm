@@ -1,4 +1,3 @@
-
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
@@ -107,7 +106,7 @@ sub _compile {
       my ($name, $args) = (lc $1, $2);
 
       # ":is" and ":not" (contains more selectors)
-      $args = _compile($args, %ns) if $name eq 'is' || $name eq 'not';
+      $args = _compile($args, %ns) if $name eq 'has' || $name eq 'is' || $name eq 'not';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
@@ -162,7 +161,7 @@ sub _is_scoped {
     return 1 if $pc->[1] eq 'scope';
 
     # Argument of functional pseudo-class with ":scope"
-    return 1 if ($pc->[1] eq 'not' || $pc->[1] eq 'is') && grep { _is_scoped($_) } @{$pc->[2]};
+    return 1 if ($pc->[1] eq 'has' || $pc->[1] eq 'is' || $pc->[1] eq 'not') && grep { _is_scoped($_) } @{$pc->[2]};
   }
 
   return undef;
@@ -205,6 +204,9 @@ sub _pc {
 
   # ":is"
   return !!_match($args, $current, $current, $scope) if $class eq 'is';
+
+  # ":has"
+  return !!_select(1, $current, $args) if $class eq 'has';
 
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
@@ -569,12 +571,13 @@ Alias for L</"E:link">.
 =head2 E:scope
 
 An C<E> element being a designated reference element. Note that this selector is B<EXPERIMENTAL> and might change
-without warning! This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a
-work in progress.
+without warning!
 
   my $scoped = $css->select('a:not(:scope > a)');
   my $scoped = $css->select('div :scope p');
   my $scoped = $css->select('~ p');
+
+This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
 
 =head2 E:checked
 
@@ -610,6 +613,15 @@ An C<E> element that matches compound selector C<s1> and/or compound selector C<
 B<EXPERIMENTAL> and might change without warning!
 
   my $headers = $css->select(':is(section, article, aside, nav) h1');
+
+This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
+
+=head2 E:has(rs1, rs2)
+
+An C<E> element, if either of the relative selectors C<rs1> or C<rs2>, when evaluated with C<E> as the :scope elements,
+match an element. Note that this selector is B<EXPERIMENTAL> and might change without warning!
+
+  my $link = $css->select('a:has(> img)');
 
 This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
 

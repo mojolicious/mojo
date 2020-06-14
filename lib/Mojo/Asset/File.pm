@@ -20,8 +20,7 @@ has handle => sub {
   return Mojo::File->new($path)->open('+>>') if defined $path;
 
   # Create a temporary file
-  my $template = 'mojo.tmp.XXXXXXXXXXXXXXXX';
-  my $file     = tempfile DIR => $self->tmpdir, TEMPLATE => $template, UNLINK => 0;
+  my $file = tempfile DIR => $self->tmpdir, TEMPLATE => 'mojo.tmp.XXXXXXXXXXXXXXXX', UNLINK => 0;
   $self->path($file->to_string);
   return $file->open('+>>');
 };

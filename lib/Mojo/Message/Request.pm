@@ -100,14 +100,10 @@ sub is_xhr { (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpReque
 
 sub param { shift->params->param(@_) }
 
-sub params {
-  my $self = shift;
-  return $self->{params} ||= $self->body_params->clone->append($self->query_params);
-}
+sub params { $_[0]->{params} ||= $_[0]->body_params->clone->append($_[0]->query_params) }
 
 sub parse {
-  my $self = shift;
-  my ($env, $chunk) = ref $_[0] ? (shift, '') : (undef, shift);
+  my ($self, $env, $chunk) = (shift, ref $_[0] ? (shift, '') : (undef, shift));
 
   # Parse CGI environment
   $self->env($env)->_parse_env($env) if $env;

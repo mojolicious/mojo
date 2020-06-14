@@ -17,11 +17,9 @@ require Mojo::Util;
 use constant ROLES => !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
 # async/await support requires Future::AsyncAwait 0.36+
-use constant ASYNC => $ENV{MOJO_NO_ASYNC} ? 0 : !!(eval {
-  require Future::AsyncAwait;
-  Future::AsyncAwait->VERSION('0.36');
-  1;
-});
+use constant ASYNC => $ENV{MOJO_NO_ASYNC}
+  ? 0
+  : !!(eval { require Future::AsyncAwait; Future::AsyncAwait->VERSION('0.36'); 1; });
 
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }

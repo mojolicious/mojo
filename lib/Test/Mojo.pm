@@ -210,14 +210,14 @@ sub json_message_like {
 
 sub json_message_unlike {
   my ($self, $p, $regex, $desc) = @_;
-  return $self->test('unlike', $self->_json(get => $p), $regex,
-    _desc($desc, qq{no similar match for JSON Pointer "$p"}));
+  $desc = _desc($desc, qq{no similar match for JSON Pointer "$p"});
+  return $self->test('unlike', $self->_json(get => $p), $regex, $desc);
 }
 
 sub json_unlike {
   my ($self, $p, $regex, $desc) = @_;
-  return $self->test('unlike', $self->tx->res->json($p), $regex,
-    _desc($desc, qq{no similar match for JSON Pointer "$p"}));
+  $desc = _desc($desc, qq{no similar match for JSON Pointer "$p"});
+  return $self->test('unlike', $self->tx->res->json($p), $regex, $desc);
 }
 
 sub message_is {
@@ -295,8 +295,8 @@ sub status_is {
 
 sub status_isnt {
   my ($self, $status, $desc) = @_;
-  return $self->test('isnt', $self->tx->res->code,
-    $status, _desc($desc, "not $status " . $self->tx->res->default_message($status)));
+  $desc = _desc($desc, "not $status " . $self->tx->res->default_message($status));
+  return $self->test('isnt', $self->tx->res->code, $status, $desc);
 }
 
 sub test {
@@ -322,8 +322,8 @@ sub text_like {
 
 sub text_unlike {
   my ($self, $selector, $regex, $desc) = @_;
-  return $self->test('unlike', $self->_text($selector), $regex,
-    _desc($desc, qq{no similar match for selector "$selector"}));
+  $desc = _desc($desc, qq{no similar match for selector "$selector"});
+  return $self->test('unlike', $self->_text($selector), $regex, $desc);
 }
 
 sub websocket_ok {
@@ -393,8 +393,7 @@ sub _request_ok {
     );
     Mojo::IOLoop->start;
 
-    my $desc = _desc("WebSocket handshake with $url");
-    return $self->test('ok', $self->tx->is_websocket, $desc);
+    return $self->test('ok', $self->tx->is_websocket, _desc("WebSocket handshake with $url"));
   }
 
   # Perform request

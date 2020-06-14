@@ -624,6 +624,8 @@ match an element. Note that this selector is B<EXPERIMENTAL> and might change wi
   my $link = $css->select('a:has(> img)');
 
 This selector is part of L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
+Also be aware that this feature is currently marked C<at-risk>, so there is a high chance that it will get removed
+completely.
 
 =head2 A|E
 

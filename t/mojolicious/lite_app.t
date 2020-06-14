@@ -211,6 +211,8 @@ get ':number' => [number => qr/0/] => sub {
   $c->render(text => "$url-$address-$num");
 };
 
+get '/continue';
+
 del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1 %> ☃') };
 
 get '/inline/ep' => sub { shift->render(inline => "<%= param 'foo' %>works!", handler => 'ep') };
@@ -686,6 +688,9 @@ $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200
 $t->get_ok('/0' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_like(qr!^http://127\.0\.0\.1:\d+/0-!)
   ->content_like(qr/-0$/)->content_unlike(qr!-192\.0\.2\.1-0$!);
 
+# "continue" keyword in template
+$t->get_ok('/continue')->status_is(200)->content_like(qr/1.+2.+3/s);
+
 # Inline "epl" template
 $t->delete_ok('/inline/epl')->status_is(200)->content_is("2 ☃\n");
 
@@ -1002,6 +1007,12 @@ Test ok!
 
 @@ not_found.html.epl
 Oops!
+
+@@ continue.html.ep
+% for ( 1 .. 3 ) {
+% } continue {
+%= $_;
+% }
 
 @@ index.html.epl
 Just works!\

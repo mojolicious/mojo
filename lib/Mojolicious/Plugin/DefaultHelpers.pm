@@ -33,8 +33,6 @@ sub register {
   $app->helper(content_for  => sub { _content(1, 0, @_) });
   $app->helper(content_with => sub { _content(0, 1, @_) });
 
-  $app->helper(continue => sub { $_[0]->app->routes->continue($_[0]) });
-
   $app->helper($_ => $self->can("_$_"))
     for qw(csrf_token current_route flash inactivity_timeout is_fresh), qw(redirect_to respond_to url_with validation);
 
@@ -417,12 +415,6 @@ Same as L</"content">, but replaces content of named buffers if they are already
     Hello <%= content 'message' %>
   % end
   %= content 'message'
-
-=head2 continue
-
-  $c->continue;
-
-Continue dispatch chain from an intermediate destination with L<Mojolicious::Routes/"continue">.
 
 =head2 csrf_token
 

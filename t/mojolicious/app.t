@@ -103,6 +103,7 @@ ok $t->app->routes->is_hidden('DESTROY'),             'is hidden';
 ok $t->app->routes->is_hidden('FOO_BAR'),             'is hidden';
 ok $t->app->routes->is_hidden('app'),                 'is hidden';
 ok $t->app->routes->is_hidden('attr'),                'is hidden';
+ok $t->app->routes->is_hidden('continue'),            'is hidden';
 ok $t->app->routes->is_hidden('cookie'),              'is hidden';
 ok $t->app->routes->is_hidden('every_cookie'),        'is hidden';
 ok $t->app->routes->is_hidden('every_param'),         'is hidden';

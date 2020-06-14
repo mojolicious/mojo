@@ -158,10 +158,9 @@ sub new {
   my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
 
   # Hide controller attributes/methods
-  $r->hide(qw(app cookie every_cookie every_param every_signed_cookie finish));
-  $r->hide(qw(helpers match on param render render_later render_maybe));
-  $r->hide(qw(render_to_string rendered req res send session signed_cookie));
-  $r->hide(qw(stash tx url_for write write_chunk));
+  $r->hide(qw(app continue cookie every_cookie every_param every_signed_cookie finish helpers match on param render));
+  $r->hide(qw(render_later render_maybe render_to_string rendered req res send session signed_cookie stash tx url_for));
+  $r->hide(qw(write write_chunk));
 
   $self->plugin($_) for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
 

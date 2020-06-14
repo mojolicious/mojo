@@ -1,8 +1,9 @@
 
-8.54  2020-06-13
+8.54  2020-06-14
   - Added EXPERIMENTAL support for :scope and :has pseudo-classes to Mojo::DOM::CSS. (Eckankar, kraih)
   - Fixed a bug in Mojo::DOM where select and ruby elements were parsed incorrectly.
   - Fixed a but in Mojo::UserAgent::Transactor that prevented compression settings to be inherited across redirects.
+  - Fixed a bug where Mojolicious templates could not use the continue Perl keyword.
 
 8.53  2020-06-09
   - Added EXPERIMENTAL extname method to Mojo::File.

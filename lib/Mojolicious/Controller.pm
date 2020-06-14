@@ -31,6 +31,8 @@ sub BUILD_DYNAMIC {
   };
 }
 
+sub continue { $_[0]->app->routes->continue($_[0]) }
+
 sub cookie {
   my ($self, $name) = (shift, shift);
 
@@ -369,6 +371,12 @@ elsewhere as well when you're performing non-blocking operations and the underly
 =head1 METHODS
 
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and implements the following new ones.
+
+=head2 continue
+
+  $c->continue;
+
+Continue dispatch chain from an intermediate destination with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 

@@ -1,4 +1,6 @@
 
+8.55  2020-06-15
+
 8.54  2020-06-14
   - Added EXPERIMENTAL support for :scope and :has pseudo-classes to Mojo::DOM::CSS. (Eckankar, kraih)
   - Fixed a bug in Mojo::DOM where select and ruby elements were parsed incorrectly.

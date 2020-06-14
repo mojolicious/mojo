@@ -58,9 +58,7 @@ sub map {
   return $class->all(map { $_->$cb } @items) if !$options->{concurrency} || @items <= $options->{concurrency};
 
   my @start = map { $_->$cb } splice @items, 0, $options->{concurrency};
-
-  my $loop = $start[0]->ioloop;
-  my @wait = map { $class->new->ioloop($loop) } 0 .. $#items;
+  my @wait  = map { $start[0]->clone } 0 .. $#items;
 
   my $start_next = sub {
     return () unless my $item = shift @items;

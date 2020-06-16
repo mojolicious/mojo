@@ -9,6 +9,10 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, $class) = (shift, shift || 'MyApp');
 
+  unless($class =~ /^[a-zA-Z][a-zA-Z0-9_]*$/) {
+      die "Bad app name[$class]\n";
+  }
+
   # Script
   my $name = class_to_file $class;
   $self->render_to_rel_file('mojo', "$name/script/$name", {class => $class});

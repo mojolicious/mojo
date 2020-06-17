@@ -1,7 +1,9 @@
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
-use Mojo::Util qw(trim);
+use Mojo::Util qw(dumper trim);
+
+use constant DEBUG => $ENV{MOJO_DOM_CSS_DEBUG} || 0;
 
 has 'tree';
 
@@ -130,6 +132,7 @@ sub _compile {
     else {last}
   }
 
+  warn qq{-- CSS Selector ($css)\n@{[dumper $group]}} if DEBUG;
   return $group;
 }
 
@@ -713,6 +716,13 @@ Run CSS selector against L</"tree">. Trailing key/value pairs can be used to dec
 
 Run CSS selector against L</"tree"> and stop as soon as the first node matched. Trailing key/value pairs can be used to
 declare xml namespace aliases.
+
+=head1 DEBUGGING
+
+You can set the C<MOJO_DOM_CSS_DEBUG> environment variable to get some advanced diagnostics information printed to
+C<STDERR>.
+
+  MOJO_DOM_CSS_DEBUG=1
 
 =head1 SEE ALSO
 

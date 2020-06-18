@@ -2878,4 +2878,38 @@ subtest 'Reusing partial DOM trees' => sub {
   is $dom->at('div')->prepend($dom->at('b'))->root, '<b>Test</b><div><b>Test</b></div>', 'right result';
 };
 
+subtest 'Real world table with optional elements' => sub {
+  my $dom = Mojo::DOM->new->parse(<<EOF);
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>key</th>
+          <th>secret</th>
+          <th>expires</th>
+          <th>action</th>
+      </thead>
+      <tbody>
+        <tr id="api_key_4">
+          <td class="key">PERCIVALKEY01</td>
+          <td class="secret">PERCIVALSECRET01</td>
+          <td class="expiration">2020-06-18 11:12:03 +0000</td>
+        <tr id="api_key_5">
+          <td class="key">PERCIVALKEY02</td>
+          <td class="secret">PERCIVALSECRET02</td>
+          <td class="expiration">never</td>
+      </tbody>
+    </table>
+  </body>
+</html>
+EOF
+  is $dom->at('thead tr th')->text,            'key',                       'right text';
+  is $dom->at('#api_key_4 .key')->text,        'PERCIVALKEY01',             'right text';
+  is $dom->at('#api_key_4 .secret')->text,     'PERCIVALSECRET01',          'right text';
+  is $dom->at('#api_key_4 .expiration')->text, '2020-06-18 11:12:03 +0000', 'right text';
+  is $dom->at('#api_key_5 .expiration')->text, 'never',                     'right text';
+};
+
 done_testing();

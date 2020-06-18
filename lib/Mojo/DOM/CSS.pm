@@ -291,7 +291,10 @@ sub _selector {
     elsif ($is_tag && $type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
 
     # Pseudo-class
-    else { return undef unless _pc(@$s[1, 2], $current, $tree, $scope) }
+    elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current, $tree, $scope) }
+
+    # No match
+    else { return undef }
   }
 
   return 1;

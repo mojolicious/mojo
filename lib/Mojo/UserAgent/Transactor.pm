@@ -16,7 +16,7 @@ use Mojo::WebSocket qw(challenge client_handshake);
 
 has compressed => sub { $ENV{MOJO_GZIP} // 1 };
 has generators => sub { {form => \&_form, json => \&_json, multipart => \&_multipart} };
-has name => 'Mojolicious (Perl)';
+has name       => 'Mojolicious (Perl)';
 
 sub add_generator { $_[0]->generators->{$_[1]} = $_[2] and return $_[0] }
 

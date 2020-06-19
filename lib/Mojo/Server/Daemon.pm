@@ -17,7 +17,7 @@ has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 30 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
 has keep_alive_timeout => sub { $ENV{MOJO_KEEP_ALIVE_TIMEOUT} // 5 };
 has listen             => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
-has max_requests => 100;
+has max_requests       => 100;
 
 sub DESTROY {
   return if Mojo::Util::_global_destruction();

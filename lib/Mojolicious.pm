@@ -42,7 +42,7 @@ has moniker  => sub { Mojo::Util::decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
 has routes   => sub { Mojolicious::Routes->new };
-has secrets => sub {
+has secrets  => sub {
   my $self = shift;
 
   # Warn developers about insecure default

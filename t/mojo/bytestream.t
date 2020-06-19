@@ -52,8 +52,7 @@ is b('"foo 23 \"bar"')->unquote, 'foo 23 "bar', 'right unquoted result';
 is b(' la la la ')->trim, 'la la la', 'right trimmed result';
 
 # md5_bytes
-is unpack('H*', b('foo bar baz ♥')->encode->md5_bytes), 'a740aeb6e066f158cbf19fd92e890d2d',
-  'right binary md5 checksum';
+is unpack('H*', b('foo bar baz ♥')->encode->md5_bytes), 'a740aeb6e066f158cbf19fd92e890d2d', 'right binary md5 checksum';
 is unpack('H*', b('foo bar baz ♥')->encode('UTF-8')->md5_bytes), 'a740aeb6e066f158cbf19fd92e890d2d',
   'right binary md5 checksum';
 

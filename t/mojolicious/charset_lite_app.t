@@ -91,8 +91,7 @@ $t->post_ok('/data', $yatta_sjis)->status_is(200)->content_is($yatta_sjis);
 $t->get_ok('/json')->status_is(200)->content_type_is('application/json;charset=UTF-8')->json_is({test => $yatta});
 
 # IRI
-$t->get_ok('/привет/мир')->status_is(200)->content_type_is('application/json;charset=UTF-8')
-  ->json_is({foo => $yatta});
+$t->get_ok('/привет/мир')->status_is(200)->content_type_is('application/json;charset=UTF-8')->json_is({foo => $yatta});
 
 # Shift_JIS parameters
 my $url = $t->ua->server->url->path('/params')->query(foo => 3, yatta => $yatta);

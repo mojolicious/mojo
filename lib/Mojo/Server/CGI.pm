@@ -32,7 +32,7 @@ sub run {
   my $code = $res->code    || 404;
   my $msg  = $res->message || $res->default_message;
   $res->headers->status("$code $msg") unless $self->nph;
-  return undef unless _write($res, 'get_header_chunk');
+  return undef                        unless _write($res, 'get_header_chunk');
 
   # Response body
   return undef unless $tx->is_empty || _write($res, 'get_body_chunk');

@@ -115,13 +115,13 @@ ok $path->contains('/'),  'contains path';
 ok $path->contains('/0'), 'contains path';
 ok !$path->contains('/0/0'), 'does not contain path';
 $path = Mojo::Path->new('/0/♥.html');
-ok $path->contains('/'),           'contains path';
-ok $path->contains('/0'),          'contains path';
+ok $path->contains('/'),         'contains path';
+ok $path->contains('/0'),        'contains path';
 ok $path->contains('/0/♥.html'), 'contains path';
-ok !$path->contains('/0/♥'),    'does not contain path';
+ok !$path->contains('/0/♥'),      'does not contain path';
 ok !$path->contains('/0/0.html'), 'does not contain path';
 ok !$path->contains('/0.html'),   'does not contain path';
-ok !$path->contains('/♥.html'), 'does not contain path';
+ok !$path->contains('/♥.html'),   'does not contain path';
 
 # Merge
 $path = Mojo::Path->new('/foo');
@@ -234,7 +234,7 @@ ok !$path->trailing_slash, 'no trailing slash';
 is "$path", '/foob%E4r', 'right path';
 is $path->to_string,     '/foob%E4r', 'right path';
 is $path->to_abs_string, '/foob%E4r', 'right absolute path';
-is $path->to_route,      '/foobär',  'right route';
+is $path->to_route,      '/foobär',   'right route';
 is $path->clone->to_string, '/foob%E4r', 'right path';
 
 # No charset

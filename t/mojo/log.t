@@ -18,7 +18,7 @@ $log->debug(sub { return 'And this', 'too' });
 undef $log;
 my $content = decode 'UTF-8', path($path)->slurp;
 like $content,   qr/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{5}] \[\d+\] \[error\] Works/, 'right error message';
-like $content,   qr/\[.*\] \[\d+\] \[fatal\] I ♥ Mojolicious/,                            'right fatal message';
+like $content,   qr/\[.*\] \[\d+\] \[fatal\] I ♥ Mojolicious/,                              'right fatal message';
 like $content,   qr/\[.*\] \[\d+\] \[error\] This too/,                                     'right error message';
 unlike $content, qr/\[.*\] \[\d+\] \[debug\] Does not work/,                                'no debug message';
 unlike $content, qr/\[.*\] \[\d+\] \[debug\] And this\ntoo\n/,                              'right debug message';
@@ -35,18 +35,17 @@ my $buffer = '';
   $log->debug(sub { return 'And this', 'too' });
 }
 $content = decode 'UTF-8', $buffer;
-like $content, qr/\[.*\] \[error\] Just works\n/,        'right error message';
+like $content, qr/\[.*\] \[error\] Just works\n/,      'right error message';
 like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\n/, 'right fatal message';
-like $content, qr/\[.*\] \[debug\] Works too\n/,         'right debug message';
-like $content, qr/\[.*\] \[debug\] And this\ntoo\n/,     'right debug message';
+like $content, qr/\[.*\] \[debug\] Works too\n/,       'right debug message';
+like $content, qr/\[.*\] \[debug\] And this\ntoo\n/,   'right debug message';
 
 # Formatting
 $log = Mojo::Log->new;
 like $log->format->(time, 'debug', 'Test 123'), qr/^\[.*\] \[debug\] Test 123\n$/, 'right format';
 like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
-like $log->format->(time, 'error', 'I ♥ Mojolicious'), qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
-like $log->format->(CORE::time, 'error', 'I ♥ Mojolicious'), qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/,
-  'right format';
+like $log->format->(time,       'error', 'I ♥ Mojolicious'), qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
+like $log->format->(CORE::time, 'error', 'I ♥ Mojolicious'), qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
 $log->format(sub {
   my ($time, $level, @lines) = @_;
   return join ':', $level, $time, @lines;

@@ -128,7 +128,7 @@ sub _class {
   for my $class (@classes) {
 
     # Failed
-    next unless defined(my $found = $self->_load($class));
+    next                                                        unless defined(my $found = $self->_load($class));
     return !$log->debug(qq{Class "$class" is not a controller}) unless $found;
 
     # Success

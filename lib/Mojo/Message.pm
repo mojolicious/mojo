@@ -272,7 +272,7 @@ sub _parse_formdata {
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;
-      $part = decode($charset, $part) // $part unless $upload;
+      $part     = decode($charset, $part)     // $part unless $upload;
     }
 
     push @formdata, [$name, $part, $filename];

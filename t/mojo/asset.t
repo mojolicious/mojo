@@ -287,7 +287,7 @@ subtest 'Forked process' => sub {
   ok -e $path, 'file exists';
   is $file->slurp, 'Fork test!', 'right content';
   croak "Can't fork: $!" unless defined(my $pid = fork);
-  exit 0 unless $pid;
+  exit 0                 unless $pid;
   waitpid $pid, 0 if $pid;
   ok -e $path, 'file still exists';
   is $file->slurp, 'Fork test!', 'right content';

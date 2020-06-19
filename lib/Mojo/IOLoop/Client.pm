@@ -135,7 +135,7 @@ sub _try_socks {
   my ($self, $args) = @_;
 
   my $handle = $self->{handle};
-  return $self->_try_tls($args) unless $args->{socks_address};
+  return $self->_try_tls($args)                                                     unless $args->{socks_address};
   return $self->emit(error => 'IO::Socket::Socks 0.64+ required for SOCKS support') unless SOCKS;
 
   my %options = (ConnectAddr => $args->{address}, ConnectPort => $args->{port});

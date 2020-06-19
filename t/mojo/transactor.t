@@ -191,8 +191,9 @@ is $tx->req->content->parts->[1], undef, 'no more parts';
 is $tx->req->param('♥'), '☃', 'right value';
 
 # Multipart form (shift_jis)
-$tx = $t->tx(POST => 'http://example.com/foo' => {'Content-Type' => 'multipart/form-data'} => form =>
-    {'やった' => 'やった'} => charset => 'shift_jis');
+$tx
+  = $t->tx(POST => 'http://example.com/foo' => {'Content-Type' => 'multipart/form-data'} => form => {'やった' => 'やった'} =>
+    charset => 'shift_jis');
 is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data', 'right "Content-Type" value';
@@ -285,8 +286,8 @@ like $tx->req->content->parts->[0]->headers->content_disposition, qr/$snowman/, 
 is $tx->req->content->parts->[0]->asset->slurp,                   'snowman',    'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 is $tx->req->upload('%22☃%22')->filename, '%22☃%22.jpg', 'right filename';
-is $tx->req->upload('%22☃%22')->size,     7,               'right size';
-is $tx->req->upload('%22☃%22')->slurp,    'snowman',       'right content';
+is $tx->req->upload('%22☃%22')->size,     7,             'right size';
+is $tx->req->upload('%22☃%22')->slurp,    'snowman',     'right content';
 
 # Multipart form with multiple uploads sharing the same name
 $tx = $t->tx(POST => 'http://example.com/foo' => form =>

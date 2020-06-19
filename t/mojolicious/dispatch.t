@@ -207,11 +207,11 @@ $c = $app->build_controller;
 $c->req->method('GET');
 $c->req->url->parse('/foo/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82');
 ok $d->dispatch($c), 'dispatched';
-is $c->stash->{controller}, 'foo',          'right value';
-is $c->stash->{action},     'bar',          'right value';
+is $c->stash->{controller}, 'foo',    'right value';
+is $c->stash->{action},     'bar',    'right value';
 is $c->stash->{capture},    'привет', 'right value';
-is $c->param('controller'), undef,          'no value';
-is $c->param('action'),     undef,          'no value';
+is $c->param('controller'), undef,    'no value';
+is $c->param('action'),     undef,    'no value';
 is $c->param('capture'),    'привет', 'right value';
 ok $c->render_called, 'rendered';
 

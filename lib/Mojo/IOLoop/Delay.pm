@@ -35,7 +35,7 @@ sub _step {
   }
 
   ($self->{steps} = []) and return $self->resolve(@args) unless $self->{counter};
-  $self->ioloop->next_tick($self->begin) unless $self->{pending};
+  $self->ioloop->next_tick($self->begin)                 unless $self->{pending};
   return $self;
 }
 

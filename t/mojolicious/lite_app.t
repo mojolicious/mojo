@@ -422,7 +422,7 @@ get '/type/<test:my_num>' => {inline => '%= $test'};
 app->routes->add_condition(
   redirect => sub {
     my ($route, $c, $captures, $active) = @_;
-    return 1 unless $active;
+    return 1                                  unless $active;
     $c->redirect_to('index') and return undef unless $c->req->headers->header('X-Condition-Test');
     return 1;
   }
@@ -647,8 +647,7 @@ Mojo::IOLoop->one_tick until $stash->{finished};
 is $stash->{finished}, 1, 'finish event has been emitted once';
 
 # IRI
-$t->get_ok('/привет/мир')->status_is(200)->content_type_is('text/html;charset=UTF-8')
-  ->content_is('привет мир');
+$t->get_ok('/привет/мир')->status_is(200)->content_type_is('text/html;charset=UTF-8')->content_is('привет мир');
 
 # Route with format
 $t->get_ok('/root.html')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is("/\n");
@@ -805,8 +804,7 @@ $t->get_ok('/url_for_foxy')->status_is(200)->header_is(Server => 'Mojolicious (P
 
 # UTF-8 form
 $t->post_ok('/utf8' => form => {name => 'табак'})->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 22)->content_type_is('text/html;charset=UTF-8')
-  ->content_is("табак ангел\n");
+  ->header_is('Content-Length' => 22)->content_type_is('text/html;charset=UTF-8')->content_is("табак ангел\n");
 
 # UTF-8 "multipart/form-data" form
 $t->post_ok('/utf8' => {'Content-Type' => 'multipart/form-data'} => form => {name => 'табак'})->status_is(200)
@@ -888,9 +886,8 @@ $t->get_ok('/static')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # Redirect to named route with redirecting enabled in user agent
 $t->ua->max_redirects(3);
 $t->get_ok('/redirect_named')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->header_is(Location => undef)
-  ->element_exists('#☃')->element_exists_not('#foo')->text_isnt('#foo' => 'whatever')
-  ->text_isnt('div#☃' => 'Redirect')->text_is('div#☃' => 'Redirect works!')->text_unlike('div#☃' => qr/Foo/)
-  ->text_like('div#☃' => qr/^Redirect/);
+  ->element_exists('#☃')->element_exists_not('#foo')->text_isnt('#foo' => 'whatever')->text_isnt('div#☃' => 'Redirect')
+  ->text_is('div#☃' => 'Redirect works!')->text_unlike('div#☃' => qr/Foo/)->text_like('div#☃' => qr/^Redirect/);
 $t->ua->max_redirects(0);
 is $t->tx->previous->res->code, 302, 'right status';
 like $t->tx->previous->res->headers->location, qr!/template.txt$!, 'right "Location" value';

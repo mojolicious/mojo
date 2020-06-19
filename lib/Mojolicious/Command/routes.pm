@@ -31,7 +31,7 @@ sub _walk {
   push @flags, (my $partial = $route->partial) ? 'D' : '.';
   push @flags, $route->inline       ? 'U' : '.';
   push @flags, $route->is_websocket ? 'W' : '.';
-  push @$row, join('', @flags) if $verbose;
+  push @$row,  join('', @flags) if $verbose;
 
   # Methods
   my $via = $route->via;

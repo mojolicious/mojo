@@ -1789,8 +1789,8 @@ is $req->upload('foo \\\"bar\" baz')->slurp,    'test',            'right conten
 
 # Chrome 5 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
-my ($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
-  'аватар.jpg', 'Сохранить';
+my ($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской', 'аватар.jpg',
+  'Сохранить';
 my $chrome
   = "------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
   . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
@@ -1835,24 +1835,24 @@ is $req->url,         '/', 'right URL';
 is $req->cookie('mojolicious')->value, 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
   . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a', 'right value';
 like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
-is $req->param('fname'),  'Иван',           'right value';
-is $req->param('sname'),  'Иванов',       'right value';
-is $req->param('sex'),    'мужской',     'right value';
-is $req->param('bdate'),  '16.02.1987',         'right value';
-is $req->param('phone'),  '1234567890',         'right value';
-is $req->param('submit'), 'Сохранить', 'right value';
+is $req->param('fname'),  'Иван',       'right value';
+is $req->param('sname'),  'Иванов',     'right value';
+is $req->param('sex'),    'мужской',    'right value';
+is $req->param('bdate'),  '16.02.1987', 'right value';
+is $req->param('phone'),  '1234567890', 'right value';
+is $req->param('submit'), 'Сохранить',  'right value';
 my $upload = $req->upload('avatar');
 is $upload->isa('Mojo::Upload'), 1, 'right upload';
 is $upload->headers->content_type, 'image/jpeg', 'right "Content-Type" value';
 is $upload->filename, 'аватар.jpg', 'right filename';
-is $upload->size,     4,                  'right size';
-is $upload->slurp,    '1234',             'right content';
+is $upload->size,     4,            'right size';
+is $upload->slurp,    '1234',       'right content';
 is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
 # Firefox 3.5.8 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
-($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
-  'аватар.jpg', 'Сохранить';
+($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской', 'аватар.jpg',
+  'Сохранить';
 my $firefox
   = "-----------------------------213090722714721300002030499922\x0d\x0a"
   . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
@@ -1901,24 +1901,24 @@ is $req->url,         '/', 'right URL';
 is $req->cookie('mojolicious')->value, 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
   . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7', 'right value';
 like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
-is $req->param('fname'),  'Иван',           'right value';
-is $req->param('sname'),  'Иванов',       'right value';
-is $req->param('sex'),    'мужской',     'right value';
-is $req->param('bdate'),  '16.02.1987',         'right value';
-is $req->param('phone'),  '1234567890',         'right value';
-is $req->param('submit'), 'Сохранить', 'right value';
+is $req->param('fname'),  'Иван',       'right value';
+is $req->param('sname'),  'Иванов',     'right value';
+is $req->param('sex'),    'мужской',    'right value';
+is $req->param('bdate'),  '16.02.1987', 'right value';
+is $req->param('phone'),  '1234567890', 'right value';
+is $req->param('submit'), 'Сохранить',  'right value';
 $upload = $req->upload('avatar');
 is $upload->isa('Mojo::Upload'), 1, 'right upload';
 is $upload->headers->content_type, 'image/jpeg', 'right "Content-Type" value';
 is $upload->filename, 'аватар.jpg', 'right filename';
-is $upload->size,     4,                  'right size';
-is $upload->slurp,    '1234',             'right content';
+is $upload->size,     4,            'right size';
+is $upload->slurp,    '1234',       'right content';
 is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
 # Opera 9.8 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
-($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
-  'аватар.jpg', 'Сохранить';
+($fname, $sname, $sex, $avatar, $submit) = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской', 'аватар.jpg',
+  'Сохранить';
 my $opera
   = "------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
   . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
@@ -1963,18 +1963,18 @@ is $req->url,         '/', 'right URL';
 is $req->cookie('mojolicious')->value, 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
   . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672', 'right value';
 like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
-is $req->param('fname'),  'Иван',           'right value';
-is $req->param('sname'),  'Иванов',       'right value';
-is $req->param('sex'),    'мужской',     'right value';
-is $req->param('bdate'),  '16.02.1987',         'right value';
-is $req->param('phone'),  '1234567890',         'right value';
-is $req->param('submit'), 'Сохранить', 'right value';
+is $req->param('fname'),  'Иван',       'right value';
+is $req->param('sname'),  'Иванов',     'right value';
+is $req->param('sex'),    'мужской',    'right value';
+is $req->param('bdate'),  '16.02.1987', 'right value';
+is $req->param('phone'),  '1234567890', 'right value';
+is $req->param('submit'), 'Сохранить',  'right value';
 $upload = $req->upload('avatar');
 is $upload->isa('Mojo::Upload'), 1, 'right upload';
 is $upload->headers->content_type, 'image/jpeg', 'right "Content-Type" value';
 is $upload->filename, 'аватар.jpg', 'right filename';
-is $upload->size,     4,                  'right size';
-is $upload->slurp,    '1234',             'right content';
+is $upload->size,     4,            'right size';
+is $upload->slurp,    '1234',       'right content';
 is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
 # Firefox 14 multipart/form-data request (UTF-8)
@@ -2005,7 +2005,7 @@ is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/foo', 'right URL';
 like $req->headers->content_type, qr!multipart/form-data!, 'right "Content-Type" value';
-is $req->upload('☃')->name,     '☃',              'right name';
+is $req->upload('☃')->name,     '☃',             'right name';
 is $req->upload('☃')->filename, 'foo bär ☃.txt', 'right filename';
 is $req->upload('☃')->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->upload('☃')->asset->size,           8,            'right size';

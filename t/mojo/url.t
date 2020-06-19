@@ -333,15 +333,15 @@ is $url->path,   '/foo', 'right path';
 is "$url", 'http://xn--bcher-kva.xn--bcher-kva.xn--bcher-kva.ch:3000/foo', 'right format';
 $url = Mojo::URL->new->scheme('http')->ihost('xn--n3h.xn--n3h.net');
 is $url->scheme, 'http',                'right scheme';
-is $url->host,   '☃.☃.net',         'right host';
+is $url->host,   '☃.☃.net',             'right host';
 is $url->ihost,  'xn--n3h.xn--n3h.net', 'right internationalized host';
 is "$url", 'http://xn--n3h.xn--n3h.net', 'right format';
 
 # IDNA (escaped userinfo and host)
 $url = Mojo::URL->new('https://%E2%99%A5:%E2%99%A5@kr%E4ih.com:3000');
-is $url->userinfo, '♥:♥',          'right userinfo';
-is $url->username, '♥',              'right username';
-is $url->password, '♥',              'right password';
+is $url->userinfo, '♥:♥',              'right userinfo';
+is $url->username, '♥',                'right username';
+is $url->password, '♥',                'right password';
 is $url->host,     "kr\xe4ih.com",     'right host';
 is $url->ihost,    'xn--krih-moa.com', 'right internationalized host';
 is $url->port,     3000,               'right port';
@@ -648,7 +648,7 @@ is "$url", 'http://mojolicious.org/100%25_fun', 'right format';
 # Trailing dot
 $url = Mojo::URL->new('http://☃.net./♥');
 is $url->ihost, 'xn--n3h.net.', 'right internationalized host';
-is $url->host,  '☃.net.',     'right host';
+is $url->host,  '☃.net.',       'right host';
 is "$url", 'http://xn--n3h.net./%E2%99%A5', 'right format';
 
 # No charset

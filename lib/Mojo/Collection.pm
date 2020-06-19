@@ -44,7 +44,7 @@ sub grep {
 
 sub head {
   my ($self, $size) = @_;
-  return $self->new(@$self) if $size > @$self;
+  return $self->new(@$self)                   if $size > @$self;
   return $self->new(@$self[0 .. ($size - 1)]) if $size >= 0;
   return $self->new(@$self[0 .. ($#$self + $size)]);
 }

@@ -388,8 +388,8 @@ ok secure_compare('♥1', '♥1'), 'values are equal';
 ok !secure_compare('♥',   '♥0'),  'values are not equal';
 ok !secure_compare('0♥',  '♥'),   'values are not equal';
 ok !secure_compare('0♥1', '1♥0'), 'values are not equal';
-ok !secure_compare('',      '♥'),   'values are not equal';
-ok !secure_compare('♥',   ''),      'values are not equal';
+ok !secure_compare('',    '♥'),   'values are not equal';
+ok !secure_compare('♥',   ''),    'values are not equal';
 
 # xor_encode
 is xor_encode('hello',                'foo'), "\x0e\x0a\x03\x0a\x00",                         'right result';
@@ -477,10 +477,10 @@ is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois", 1), "un-\x{e9}l\x
   'right result';
 is slugify('Hello, World!'), 'hello-world', 'right result';
 is slugify('spam & eggs'),   'spam-eggs',   'right result';
-is slugify('spam & ıçüş',  1), 'spam-ıçüş', 'right result';
-is slugify('foo ıç bar',     1), 'foo-ıç-bar',  'right result';
-is slugify('    foo ıç bar', 1), 'foo-ıç-bar',  'right result';
-is slugify('你好',           1), '你好',        'right result';
+is slugify('spam & ıçüş',    1), 'spam-ıçüş',  'right result';
+is slugify('foo ıç bar',     1), 'foo-ıç-bar', 'right result';
+is slugify('    foo ıç bar', 1), 'foo-ıç-bar', 'right result';
+is slugify('你好',             1), '你好',         'right result';
 
 # gzip/gunzip
 my $uncompressed = 'a' x 1000;

@@ -22,7 +22,7 @@ sub import {
   $ua->server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]() });
 
   $ua->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
-  $ua->proxy->detect unless defined $ENV{MOJO_PROXY};
+  $ua->proxy->detect     unless defined $ENV{MOJO_PROXY};
 
   # The ojo DSL
   monkey_patch $caller,

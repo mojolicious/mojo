@@ -201,7 +201,7 @@ sub _compile {
       $blocks[-1] .= 'return Mojo::ByteStream->new($_O) }';
 
       # No following code
-      $blocks[-1] .= ';' if ($next->[1] // '') =~ /^\s*$/;
+      $blocks[-1] .= ';' if $next->[0] ne 'cpst' && ($next->[1] // '') =~ /^\s*$/;
     }
 
     # Expression

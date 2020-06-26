@@ -1,4 +1,6 @@
 
+8.57  2020-06-26
+
 8.56  2020-06-19
   - Fixed a bug that prevented "% end, begin" to work in Mojo::Template. (jberger)
 

@@ -1,5 +1,6 @@
 
 8.56  2020-06-19
+  - Fixed a bug that prevented "% end, begin" to work in Mojo::Template. (jberger)
 
 8.55  2020-06-18
   - Fixed a regression in Mojo::DOM::CSS that caused some selectors to not be valid anymore.

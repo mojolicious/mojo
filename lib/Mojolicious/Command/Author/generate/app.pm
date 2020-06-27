@@ -1,7 +1,7 @@
 package Mojolicious::Command::Author::generate::app;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Util qw(class_to_file class_to_path decamelize);
+use Mojo::Util qw(class_to_file class_to_path decamelize PACKAGE_RE);
 
 has description => 'Generate Mojolicious application directory structure';
 has usage       => sub { shift->extract_usage };
@@ -9,7 +9,7 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, $class) = (shift, shift || 'MyApp');
 
-  $class =~ /^[a-zA-Z][a-zA-Z0-9_]*\z/ or die "Bad app name[$class]\n";
+  $class =~ PACKAGE_RE or die "Bad app name[$class]\n";
 
   # Script
   my $name = class_to_file $class;

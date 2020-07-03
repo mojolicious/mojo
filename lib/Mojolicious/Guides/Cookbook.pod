@@ -1125,6 +1125,16 @@ You can just add username and password to the URL, an C<Authorization> header wi
   my $ua = Mojo::UserAgent->new;
   say $ua->get('https://sri:secret@example.com/hideout')->result->body;
 
+If you're using L<Mojo::URL> to build the URL, be aware that the userinfo part will not be included if the object is
+stringified. You'll have to pass the object itself to L<Mojo::UserAgent> or use L<Mojo::URL/"to_unsafe_string">.
+
+  use Mojo::UserAgent;
+  use Mojo::URL;
+
+  my $ua  = Mojo::UserAgent->new;
+  my $url = Mojo::URL->new('https://example.com/hideout')->userinfo('sri:secret');
+  say $ua->get($url)->result->body;
+
 =head2 Decorating follow-up requests
 
 L<Mojo::UserAgent> can automatically follow redirects, the event L<Mojo::UserAgent/"start"> allows you direct access to

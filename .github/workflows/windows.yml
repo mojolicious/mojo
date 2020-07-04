@@ -9,19 +9,33 @@ on:
 jobs:
   perl:
     runs-on: windows-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        # any Strawberry Portable Perl version can be selected here
+        perl-version:
+          - '5.30'
     steps:
+      - name: Setup perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+          distribution: strawberry
       - name: Set git to use LF
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
       - uses: actions/checkout@v2
-      - name: Set up Perl
-        run: |
-          choco install strawberryperl
-          echo "##[add-path]C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin"
       - name: perl -V
         run: perl -V
+      # Make sure we have a newer cpanm and ExtUtils::Manifest
+      # this is problematic on some older Perls on Windows
       - name: Install Dependencies
-        run: curl -L https://cpanmin.us | perl - --installdeps .
+        run: |
+          cpanm ExtUtils::Manifest App::cpanminus
+          cpanm --installdeps -n .
+      # the prove app has some issues on Windows. Testing with
+      # cpanm this way tends to solve some of the oddities of
+      # dmake vs gmake, etc.
       - name: Run Tests
-        run: prove -l t t/mojo t/mojolicious
+        run: cpanm --test-only -v .

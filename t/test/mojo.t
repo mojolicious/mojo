@@ -83,4 +83,12 @@ subtest 'content_is' => sub {
   is_deeply \@args, ['is', 'Hello Test!', 'Hello Test!', 'some description'], 'right result';
 };
 
+subtest 'attr_is' => sub {
+  $t->tx->res->body('<p id="test">Test</p>');
+  $t->attr_is('p', 'id', 'wrong');
+  is_deeply \@args, ['is', 'test', 'wrong', 'exact match for attribute "id" at selector "p"'], 'right result';
+  $t->attr_is('p', 'id', 'wrong', 'some description');
+  is_deeply \@args, ['is', 'test', 'wrong', 'some description'], 'right result';
+};
+
 done_testing();

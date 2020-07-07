@@ -15,7 +15,7 @@ use Mojolicious::Lite;
 hook around_dispatch => sub {
   my ($next, $c) = @_;
   $next->();
-  if ($c->res->code == 404) {
+  if ($c->res->code && $c->res->code == 404) {
     $c->req->url->path($c->param('wrap') ? '/wrap/again' : '/');
     delete @{$c->stash}{keys %{$c->stash}};
     $c->tx->res(Mojo::Message::Response->new);
@@ -41,6 +41,17 @@ hook around_dispatch => sub {
 hook before_dispatch => sub {
   my $c = shift;
   $c->render(text => 'Custom static file works!') if $c->req->url->path->contains('/hello.txt');
+};
+
+# Custom dispatcher /hello-delay.txt
+hook before_dispatch => sub {
+  my $c = shift;
+  if ($c->req->url->path->contains('/hello-delay.txt')) {
+    $c->render_later;
+    Mojo::IOLoop->next_tick(sub {
+      $c->render(text => 'Delayed!');
+    });
+  }
 };
 
 # Custom dispatcher /custom
@@ -120,6 +131,9 @@ $t->get_ok('/test.txt')->status_is(200)->header_is('Cache-Control' => 'max-age=3
 
 # Override static file
 $t->get_ok('/hello.txt')->status_is(200)->content_is('Custom static file works!');
+
+# render_later from before_dispatch
+$t->get_ok('/hello-delay.txt')->status_is(200)->content_is('Delayed!');
 
 # Custom dispatcher
 $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');

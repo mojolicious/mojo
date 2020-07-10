@@ -269,7 +269,7 @@ Mojo::Promise - Promises/A+
   get_p('https://mojolicious.org')->then(sub {
     my $mojo = shift;
     say $mojo->res->code;
-    return get('https://metacpan.org');
+    return get_p('https://metacpan.org');
   })->then(sub {
     my $cpan = shift;
     say $cpan->res->code;

@@ -57,6 +57,14 @@ $r->get(
     Mojo::IOLoop->stream($c->tx->connection)->close;
   }
 );
+$r->get(
+  '/res6' => sub {
+    my $c = shift;
+    $c->res->headers->content_length(4);
+    $c->write;
+    Mojo::IOLoop->timer(0.1 => sub { $c->write("Six!") });
+  }
+);
 
 get '/proxy1/*target' => sub {
   my $c      = shift;
@@ -100,6 +108,7 @@ $t->get_ok('/proxy1/res3')->status_is(200)->header_is('X-Mojo-App' => 'Three')->
   ->header_is('X-Mojo-More' => '')->header_is('X-Mojo-Body' => 0)->content_is('Three!');
 $t->get_ok('/proxy1/res4')->status_is(204)->header_is('X-Mojo-App' => 'Four')->content_is('');
 $t->get_ok('/proxy1/res5')->status_is(400)->content_like(qr/Error: /);
+$t->get_ok('/proxy1/res6')->status_is(200)->content_is('Six!');
 
 # Custom request
 $t->patch_ok('/proxy2/res3')->status_is(200)->header_is('X-Mojo-App' => 'Three')->header_is('X-Mojo-Method' => 'POST')

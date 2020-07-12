@@ -190,7 +190,7 @@ sub _proxy_start_p {
       $source_content->unsubscribe('read')->on(
         read => sub {
           my $data = pop;
-          $content->$write(length $data ? $data : undef) and $tx->resume;
+          $content->$write(length $data ? $data : ()) and $tx->resume;
 
           # Throttle transparently when backpressure rises
           return if $stream->can_write;

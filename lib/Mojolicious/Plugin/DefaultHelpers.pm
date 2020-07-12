@@ -189,7 +189,8 @@ sub _proxy_start_p {
       my $write = $source_content->is_chunked ? 'write_chunk' : 'write';
       $source_content->unsubscribe('read')->on(
         read => sub {
-          $content->$write(pop) and $tx->resume;
+          my $data = pop;
+          $content->$write(length $data ? $data : undef) and $tx->resume;
 
           # Throttle transparently when backpressure rises
           return if $stream->can_write;

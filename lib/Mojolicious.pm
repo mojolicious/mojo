@@ -123,7 +123,8 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  $c->helpers->reply->not_found unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
+  $c->helpers->reply->not_found
+    unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code || $c->stash->{'mojo.rendered'};
 }
 
 sub handler {

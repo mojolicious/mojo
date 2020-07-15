@@ -1,0 +1,20 @@
+pull_request_rules:
+  - name: automatic merge
+    conditions:
+      - "#approved-reviews-by>=3"
+      - "#changes-requested-reviews-by=0"
+      - base=master
+    actions:
+      merge:
+        method: merge
+  - name: remove outdated reviews
+    conditions:
+      - base=master
+    actions:
+      dismiss_reviews: {}
+  - name: ask to resolve conflict
+    conditions:
+      - conflict
+    actions:
+        comment:
+          message: This pull request is now in conflicts. Could you fix it @{{author}}? 🙏

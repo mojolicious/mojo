@@ -1,2 +1,3 @@
-foo: yada
-utf8: утф
+%# Just a comment
+foo: barbaz
+utf: утф

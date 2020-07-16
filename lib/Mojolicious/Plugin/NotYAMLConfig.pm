@@ -7,7 +7,7 @@ use Mojo::Util qw(decode encode);
 sub register {
   my ($self, $app, $conf) = @_;
 
-  $conf->{ext} //= 'yaml';
+  $conf->{ext} //= 'yml';
   $self->{yaml} = sub { CPAN::Meta::YAML::Load(decode 'UTF-8', shift) };
   if (my $mod = $conf->{module}) {
     die qq{YAML module $mod has no Load function} unless $self->{yaml} = $mod->can('Load');
@@ -34,7 +34,7 @@ Mojolicious::Plugin::NotYAMLConfig - Not quite YAML configuration plugin
 
 =head1 SYNOPSIS
 
-  # myapp.yaml (it's just YAML with embedded Perl)
+  # myapp.yml (it's just YAML with embedded Perl)
   ---
   foo: bar
   baz:
@@ -67,9 +67,9 @@ most config files. If you need something more correct you can use a different mo
 L</"module"> option.
 
 The application object can be accessed via C<$app> or the C<app> function. A default configuration filename in the
-application home directory will be generated from the value of L<Mojolicious/"moniker"> (C<$moniker.yaml>). You can
-extend the normal configuration file C<$moniker.yaml> with C<mode> specific ones like C<$moniker.$mode.yaml>, which
-will be detected automatically.
+application home directory will be generated from the value of L<Mojolicious/"moniker"> (C<$moniker.yml>). You can
+extend the normal configuration file C<$moniker.yml> with C<mode> specific ones like C<$moniker.$mode.yml>, which will
+be detected automatically.
 
 If the configuration value C<config_override> has been set in L<Mojolicious/"config"> when this plugin is loaded, it
 will not do anything.

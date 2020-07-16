@@ -22,7 +22,7 @@ subtest 'Invalid config file' => sub {
 
 subtest 'Load plugins' => sub {
   my $config = plugin NotYAMLConfig => {default => {foo => 'baz', hello => 'there'}};
-  my $path   = curfile->sibling('yaml_config_lite_app_abs.yaml');
+  my $path   = curfile->sibling('yaml_config_lite_app_abs.yml');
   plugin NotYAMLConfig => {file => $path};
   is $config->{foo},          'barbaz',                                'right value';
   is $config->{hello},        'there',                                 'right value';
@@ -65,7 +65,7 @@ subtest 'No config file, no default' => sub {
 subtest 'YAML::XS' => sub {
   plan skip_all => 'YAML::XS required!' unless eval "use YAML::XS; 1";
   my $config
-    = plugin NotYAMLConfig => {module => 'YAML::XS', ext => 'yml', default => {foo => 'baz', hello => 'there'}};
+    = plugin NotYAMLConfig => {module => 'YAML::XS', ext => 'yaml', default => {foo => 'baz', hello => 'there'}};
   is $config->{foo},   'yada',  'right value';
   is $config->{hello}, 'there', 'right value';
   is $config->{utf8},  'утф',   'right value';

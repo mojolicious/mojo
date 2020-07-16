@@ -136,7 +136,7 @@ maintainability.
   |  +- MyApp                # Application namespace
   |     +- Controller        # Controller namespace
   |        +- Example.pm     # Controller class
-  |- my_app.yaml             # Configuration file
+  |- my_app.yml              # Configuration file
   |- t                       # Test directory
   |  +- basic.t              # Random test
   |- log                     # Log directory

@@ -19,7 +19,7 @@ sub run {
   $self->render_to_rel_file('appclass', "$name/lib/$app", {class => $class});
 
   # Config file (using the default moniker)
-  $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.yaml");
+  $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.yml");
 
   # Controller
   my $controller = "${class}::Controller::Example";

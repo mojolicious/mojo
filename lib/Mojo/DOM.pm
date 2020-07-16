@@ -198,7 +198,6 @@ sub val {
 
 sub walk {
   my $self = shift;
-  if (not defined wantarray) { $self->_walk_void(0, @_); return }
   $self->_walk(0, @_) || Mojo::Collection->new;
 }
 
@@ -356,12 +355,6 @@ sub _walk {
     map { $_->_walk($depth+1, $cb, @_) } @{$self->child_nodes}
   );
   @$c ? $c : ();    # prune empty subtrees
-}
-
-sub _walk_void {    # roughly 10% faster than _walk
-  my ($self, $depth, $cb) = (shift, shift, shift);
-  $_->$cb(ref $cb ? ($depth, @_) : @_) for $self;
-  $_->_walk_void($depth+1, $cb, @_) for @{$self->child_nodes};
 }
 
 sub _wrap {

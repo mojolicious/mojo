@@ -236,8 +236,8 @@ list see L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   app->start;
 
-Or just add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or L<Mojolicious::Plugin::JSONConfig>
-configuration file.
+Or just add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config>, L<Mojolicious::Plugin::JSONConfig> or
+L<Mojolicious::Plugin::NotYAMLConfig> configuration file.
 
   # myapp.conf
   {

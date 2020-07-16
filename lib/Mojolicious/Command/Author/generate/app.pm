@@ -19,7 +19,7 @@ sub run {
   $self->render_to_rel_file('appclass', "$name/lib/$app", {class => $class});
 
   # Config file (using the default moniker)
-  $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.conf");
+  $self->render_to_rel_file('config', "$name/@{[decamelize $class]}.yaml");
 
   # Controller
   my $controller = "${class}::Controller::Example";
@@ -124,8 +124,8 @@ use Mojo::Base 'Mojolicious';
 sub startup {
   my $self = shift;
 
-  # Load configuration from hash returned by config file
-  my $config = $self->plugin('Config');
+  # Load configuration from config file
+  my $config = $self->plugin('NotYAMLConfig');
 
   # Configure the application
   $self->secrets($config->{secrets});
@@ -197,6 +197,6 @@ done_testing();
 
 @@ config
 % use Mojo::Util qw(sha1_sum steady_time);
-{
-  secrets => ['<%= sha1_sum $$ . steady_time . rand  %>']
-}
+---
+secrets:
+  - <%= sha1_sum $$ . steady_time . rand  %>

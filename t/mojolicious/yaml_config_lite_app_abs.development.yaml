@@ -1,0 +1,2 @@
+---
+absolute_dev: dev works too <%= app->moniker %>!!!

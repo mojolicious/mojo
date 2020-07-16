@@ -92,8 +92,8 @@ character.
 
 No, you can't, L<Hypnotoad|Mojo::Server::Hypnotoad> is a bit special in this regard. Because when you initiate a zero
 downtime software upgrade (hot deployment), you are only really sending a C<USR2> signal to the already running server,
-and no other information can be passed along. What you can do instead, is to use a L<Mojolicious::Plugin::Config> or
-L<Mojolicious::Plugin::JSONConfig> configuration file.
+and no other information can be passed along. What you can do instead, is to use a L<Mojolicious::Plugin::Config>,
+L<Mojolicious::Plugin::JSONConfig> or L<Mojolicious::Plugin::NotYAMLConfig> configuration file.
 
   # myapp.conf
   {

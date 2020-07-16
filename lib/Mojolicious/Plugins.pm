@@ -103,6 +103,10 @@ JSON configuration files.
 
 Mount whole L<Mojolicious> applications.
 
+=item L<Mojolicious::Plugin::NotYAMLConfig>
+
+YAML configuration files.
+
 =item L<Mojolicious::Plugin::TagHelpers>
 
 Template specific helper collection, loaded automatically.

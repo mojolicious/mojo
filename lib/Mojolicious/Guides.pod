@@ -426,6 +426,12 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Plugin::JSONConfig>
 
+=over 2
+
+=item * L<Mojolicious::Plugin::NotYAMLConfig>
+
+=back
+
 =back
 
 =item * L<Mojolicious::Plugin::DefaultHelpers>

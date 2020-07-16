@@ -1,5 +1,8 @@
 
 8.57  2020-07-16
+  - Added support for YAML config files.
+  - Added module Mojolicious::Plugin::NotYAMLConfig.
+  - Improved app generator command to use a YAML config file.
   - Fixed a bug in proxy helpers that caused response content to be ignored in some cases. (mohawk2)
   - Fixed attr_is bug in Test::Mojo that prevented false value comparisons from working correctly. (tim-2)
 

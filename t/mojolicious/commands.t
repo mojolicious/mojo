@@ -273,7 +273,7 @@ like $buffer, qr/my_app/, 'right output';
 ok -e $app->rel_file('my_app/script/my_app'),                     'script exists';
 ok -e $app->rel_file('my_app/lib/MyApp.pm'),                      'application class exists';
 ok -e $app->rel_file('my_app/lib/MyApp/Controller/Example.pm'),   'controller exists';
-ok -e $app->rel_file('my_app/my_app.conf'),                       'config file exists';
+ok -e $app->rel_file('my_app/my_app.yaml'),                       'config file exists';
 ok -e $app->rel_file('my_app/t/basic.t'),                         'test exists';
 ok -e $app->rel_file('my_app/public/index.html'),                 'static file exists';
 ok -e $app->rel_file('my_app/templates/layouts/default.html.ep'), 'layout exists';

@@ -950,8 +950,8 @@ Opposite of L</"message_like">.
 Construct a new L<Test::Mojo> object. In addition to a class name or L<Mojo::File> object pointing to the application
 script, you can pass along a hash reference with configuration values that will be used to override the application
 configuration. The special configuration value C<config_override> will be set in L<Mojolicious/"config"> as well, which
-is used to disable configuration plugins like L<Mojolicious::Plugin::Config> and L<Mojolicious::Plugin::JSONConfig> for
-tests.
+is used to disable configuration plugins like L<Mojolicious::Plugin::Config>, L<Mojolicious::Plugin::JSONConfig> and
+L<Mojolicious::Plugin::NotYAMLConfig> for tests.
 
   # Load application script relative to the "t" directory
   use Mojo::File qw(curfile);

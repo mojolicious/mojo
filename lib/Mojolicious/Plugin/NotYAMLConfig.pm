@@ -2,22 +2,25 @@ package Mojolicious::Plugin::NotYAMLConfig;
 use Mojo::Base 'Mojolicious::Plugin::JSONConfig';
 
 use CPAN::Meta::YAML;
+use Mojo::Util qw(decode encode);
 
 sub register {
   my ($self, $app, $conf) = @_;
-  $conf->{ext} = 'yaml';
-  $conf->{module} ||= 'CPAN::Meta::YAML';
+
+  $conf->{ext} //= 'yaml';
+  $self->{yaml} = sub { CPAN::Meta::YAML::Load(decode 'UTF-8', shift) };
+  if (my $mod = $conf->{module}) {
+    die qq{YAML module "$mod" has no Load function} unless $self->{yaml} = $mod->can('Load');
+  }
+
   return $self->SUPER::register($app, $conf);
 }
 
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
-
-  die qq{YAML module "$conf->{module}" has no Load function} unless my $sub = $conf->{module}->can('Load');
-  my $config = eval { $sub->($self->render($content, $file, $conf, $app)) };
+  my $config = eval { $self->{yaml}->(encode('UTF-8', $self->render($content, $file, $conf, $app))) };
   die qq{Can't parse config "$file": $@} if $@;
   die qq{Invalid config "$file"} unless ref $config eq 'HASH';
-
   return $config;
 }
 
@@ -60,7 +63,8 @@ Mojolicious::Plugin::NotYAMLConfig - Not quite YAML configuration plugin
 
 L<Mojolicious::Plugin::NotYAMLConfig> is a YAML configuration plugin that preprocesses its input with L<Mojo::Template>.
 By default it uses L<CPAN::Meta::YAML> for parsing, which is not the best YAML module available, but good enough for
-most config files. If you need something more correct you can use a different module with the L</"module"> option.
+most config files. If you need something more correct you can use a different module like L<YAML::XS> with the
+L</"module"> option.
 
 The application object can be accessed via C<$app> or the C<app> function. A default configuration filename in the
 application home directory will be generated from the value of L<Mojolicious/"moniker"> (C<$moniker.yaml>). You can

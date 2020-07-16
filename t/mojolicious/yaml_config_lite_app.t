@@ -62,6 +62,18 @@ subtest 'No config file, no default' => sub {
   ok !(eval { plugin 'NotYAMLConfig' }), 'no config file';
 };
 
+subtest 'YAML::XS' => sub {
+  plan skip_all => 'YAML::XS required!' unless eval "use YAML::XS; 1";
+  my $config
+    = plugin NotYAMLConfig => {module => 'YAML::XS', ext => 'yml', default => {foo => 'baz', hello => 'there'}};
+  is $config->{foo},   'yada',  'right value';
+  is $config->{hello}, 'there', 'right value';
+  is $config->{utf8},  'утф',   'right value';
+  is app->config->{foo},   'yada',  'right value';
+  is app->config->{hello}, 'there', 'right value';
+  is app->config->{utf8},  'утф',   'right value';
+};
+
 done_testing();
 
 __DATA__

@@ -188,6 +188,7 @@ $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)-
 # Foo::joy (testing HTML attributes in template)
 $t->get_ok('/fun/joy')->status_is(200)->attr_is('p.joy', 'style', 'background-color: darkred;')
   ->attr_is('p.joy', 'style', 'background-color: darkred;', 'with description')
+  ->attr_is('p.joy', 'data-foo', '0')
   ->attr_isnt('p.joy', 'style', 'float: left;')->attr_isnt('p.joy', 'style', 'float: left;', 'with description')
   ->attr_like('p.joy', 'style', qr/color/)->attr_like('p.joy', 'style', qr/color/, 'with description')
   ->attr_unlike('p.joy', 'style', qr/^float/)->attr_unlike('p.joy', 'style', qr/^float/, 'with description');

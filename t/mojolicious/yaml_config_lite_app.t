@@ -74,6 +74,11 @@ subtest 'YAML::XS' => sub {
   is app->config->{utf8},  'утф',   'right value';
 };
 
+subtest 'Missing YAML parser' => sub {
+  eval { plugin NotYAMLConfig => {module => 'ThisYAMLModuleDoesNotExist'} };
+  like $@, qr/YAML module ThisYAMLModuleDoesNotExist has no Load function/, 'right error';
+};
+
 done_testing();
 
 __DATA__

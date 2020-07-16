@@ -10,7 +10,7 @@ sub register {
   $conf->{ext} //= 'yaml';
   $self->{yaml} = sub { CPAN::Meta::YAML::Load(decode 'UTF-8', shift) };
   if (my $mod = $conf->{module}) {
-    die qq{YAML module "$mod" has no Load function} unless $self->{yaml} = $mod->can('Load');
+    die qq{YAML module $mod has no Load function} unless $self->{yaml} = $mod->can('Load');
   }
 
   return $self->SUPER::register($app, $conf);

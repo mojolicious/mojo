@@ -1,4 +1,6 @@
 
+8.58  2020-07-17
+
 8.57  2020-07-16
   - Added support for YAML config files.
   - Added module Mojolicious::Plugin::NotYAMLConfig.

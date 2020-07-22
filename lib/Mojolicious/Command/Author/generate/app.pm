@@ -9,7 +9,9 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, $class) = (shift, shift || 'MyApp');
 
-  $class =~ /^[a-zA-Z][a-zA-Z0-9_]*\z/ or die "Bad app name[$class]\n";
+  unless($class =~ /^[a-zA-Z][a-zA-Z0-9_]*$/) {
+      die "Bad app name[$class]\n";
+  }
 
   # Script
   my $name = class_to_file $class;

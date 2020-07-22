@@ -23,17 +23,6 @@ use Unicode::Normalize ();
 # Check for monotonic clock support
 use constant MONOTONIC => eval { !!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
 
-use constant PACKAGE_RE => qr/
-    ^
-    [a-zA-Z_]         # Can't begin from digit
-    [a-zA-Z0-9_]*
-    (?:
-        (?: :: | ' )  # Package::name eq Package'name
-        [a-zA-Z0-9_]+
-    )*
-    \z
-    /x;
-
 # Punycode bootstring parameters
 use constant {
   PC_BASE         => 36,
@@ -80,7 +69,7 @@ our @EXPORT_OK = (
   qw(md5_sum monkey_patch punycode_decode punycode_encode quote scope_guard),
   qw(secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
   qw(split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode PACKAGE_RE),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases

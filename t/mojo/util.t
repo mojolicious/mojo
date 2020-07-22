@@ -14,30 +14,7 @@ use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path dec
   qw(monkey_patch punycode_decode punycode_encode quote scope_guard),
   qw(secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
   qw(split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode PACKAGE_RE);
-
-# PACKAGE_RE
-# To check cases use
-# perl -e"package aaa::a; print __PACKAGE__"
-
-#valid
-ok 'A' =~ PACKAGE_RE, 'valid package';
-ok 'a::aaa' =~ PACKAGE_RE, 'valid package';
-ok 'A::aaa' =~ PACKAGE_RE, 'valid package';
-ok 'a1::aaa' =~ PACKAGE_RE, 'valid package';
-ok 'a1::AaA::a' =~ PACKAGE_RE, 'valid package';
-ok "a1'AaA::a" =~ PACKAGE_RE, 'valid package';
-ok '_::aaa' =~ PACKAGE_RE, 'valid package';
-ok '_::111' =~ PACKAGE_RE, 'valid package';
-
-#invalid
-ok 'A:::aaa' !~ PACKAGE_RE, 'invalid package';
-ok '1::aaa' !~ PACKAGE_RE, 'invalid package';
-ok 'a:aaa' !~ PACKAGE_RE, 'invalid package';
-ok 'a::' !~ PACKAGE_RE, 'invalid package';
-ok "a'" !~ PACKAGE_RE, 'invalid package';
-ok '::a' !~ PACKAGE_RE, 'invalid package';
-ok 'aa-a' !~ PACKAGE_RE, 'valid package';
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';

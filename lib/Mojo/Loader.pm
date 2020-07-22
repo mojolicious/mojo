@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 use Exporter qw(import);
 use Mojo::Exception;
 use Mojo::File qw(path);
-use Mojo::Util qw(b64_decode class_to_path PACKAGE_RE);
+use Mojo::Util qw(b64_decode class_to_path);
 
 our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class);
 
@@ -36,7 +36,7 @@ sub load_class {
   my $class = shift;
 
   # Invalid class name
-  return 1 if ($class || '') !~ PACKAGE_RE;
+  return 1 if ($class || '') !~ /^\w(?:[\w:']*\w)?$/;
 
   # Load if not already loaded
   return undef if $class->can('new') || eval "require $class; 1";

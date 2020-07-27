@@ -2,12 +2,15 @@ package Mojolicious::Command::Author::generate::app;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
+use Mojo::Loader qw(is_package);
 
 has description => 'Generate Mojolicious application directory structure';
 has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, $class) = (shift, shift || 'MyApp');
+
+  is_package($class) or die "Bad app name[$class]\n";
 
   # Script
   my $name = class_to_file $class;

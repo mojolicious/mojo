@@ -27,4 +27,8 @@ get '/res4' => sub {
   $c->render(data => '', status => 204);
 };
 
+get '/res5' => sub {
+  die 'Hello World!';
+};
+
 app->start;

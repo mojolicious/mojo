@@ -16,29 +16,23 @@ convenience for the reader. Almost all features are exactly the same for full L<
 
 =head1 BASICS
 
-=over 2
-
-=item Learning Perl
+=head2 Learning Perl
 
 If you are new to Perl, we recommend L<Learn Perl in 2 hours 30 minutes|http://qntm.org/files/perl/perl.html> for a
 quick introduction, or the L<Modern Perl book|https://pragprog.com/book/swperl/modern-perl-fourth-edition>, freely
 available in many formats. Both are excellent introductions to the language. For more books and documentation, check
 out L<learn.perl.org|http://learn.perl.org/>.
 
-=item Learning Web Technologies
+=head2 Learning Web Technologies
 
 All web development starts with HTML, CSS and JavaScript, to learn the basics we recommend the L<Mozilla Developer
 Network|https://developer.mozilla.org/en-US/docs/Web>. And if you want to know more about how browsers and web servers
 actually communicate, there's also a very nice introduction to
 L<HTTP|https://developer.mozilla.org/en-US/docs/Web/HTTP>.
 
-=back
-
 =head1 CONVENTIONS
 
-=over 2
-
-=item Modern Perl
+=head2 Modern Perl
 
 L<Mojolicious> uses a modern subset of Perl exclusively, and therefore all documentation assumes that L<strict>,
 L<warnings>, L<utf8> and Perl 5.16 L<features|feature> are enabled, even if examples don't specifically mention it.
@@ -51,14 +45,12 @@ L<warnings>, L<utf8> and Perl 5.16 L<features|feature> are enabled, even if exam
 Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for you automatically, whenever they are
 used.
 
-=item Variable names
+=head2 Variable names
 
 For brevity and clarity, example variables will reflect the type of data the API uses. For instance, C<$bytes> or
 C<$chars> to distinguish whether it is encoded bytes or decoded characters in a Perl L<string|perlunifaq>, C<$bool> if
 the value just indicates true or false, C<$c> to denote a L<Mojolicious::Controller> object, or C<$app> to denote the
 L<application|Mojolicious> object.
-
-=back
 
 =head1 TUTORIAL
 

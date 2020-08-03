@@ -8,8 +8,8 @@ Mojolicious::Guides - The Mojolicious Guide to the Galaxy
 =head1 DON'T PANIC!
 
 The L<Mojolicious|https://mojolicious.org> documentation is structured into three parts. The L</"TUTORIAL"> everyone
-starts with, the L</"GUIDES"> that explain all major features in detail, and the class L</"REFERENCE"> listing all
-available APIs.
+starts with, the L</"GUIDES"> that explain all major features in detail, and the L</"API"> reference listing all
+available classes.
 
 Some parts of the documentation only use the L<Mojolicious::Lite> micro web framework for examples, but that's merely a
 convenience for the reader. Almost all features are exactly the same for full L<Mojolicious> applications.
@@ -184,7 +184,7 @@ to integrate background jobs into well-structured L<Mojolicious> applications.
 
 =back
 
-=head1 REFERENCE
+=head1 API
 
 This is the class hierarchy of the L<Mojolicious> distribution.
 

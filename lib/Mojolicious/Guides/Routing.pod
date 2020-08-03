@@ -1041,7 +1041,7 @@ authors.
 
 =head1 SUPPORT
 
-If you have any questions the documentation might not yet answer, don't hesitate to ask on the
+If you have any questions the documentation might not yet answer, don't hesitate to ask in the
 L<Google Group|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
 (L<chat now!|https://webchat.freenode.net/#mojo>).
 

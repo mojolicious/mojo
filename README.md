@@ -60,10 +60,12 @@ get '/' => {text => 'I ♥ Mojolicious!'};
 app->start;
 ```
 
-  To run this example with the built-in development web server just put the code into a file and start it with `morbo`.
+  To run the example with the built-in development web server, just put the code into a file and start it with `morbo`.
 
     $ morbo hello.pl
     Web application available at http://127.0.0.1:3000
+
+  Test it with any HTTP client you prefer.
 
     $ curl http://127.0.0.1:3000/
     I ♥ Mojolicious!
@@ -71,7 +73,7 @@ app->start;
 ## Duct tape for the HTML5 web
 
   Use all the latest Perl and HTML features in beautiful single file prototypes like this one, and
-  [grow](https://mojolicious.org/perldoc/Mojolicious/Guides/Growing#Differences) them easily into well-structured
+  [grow](https://docs.mojolicious.org/Mojolicious/Guides/Growing#Differences) them easily into well-structured
   **Model-View-Controller** web applications.
 
 ```perl
@@ -104,4 +106,4 @@ __DATA__
 
 ## Want to know more?
 
-  Take a look at our excellent [documentation](https://mojolicious.org/perldoc)!
+  Take a look at our excellent [documentation](https://docs.mojolicious.org)!

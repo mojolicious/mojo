@@ -691,8 +691,8 @@ route with the method L<Mojolicious::Routes::Route/"over">, and allow even more 
   # / (Internet Explorer)
   $r->get('/')->over(agent => qr/Internet Explorer/)->to('browser-test#ie');
 
-  # http://mojolicious.org/perldoc
-  $r->get('/perldoc')->over(host => 'mojolicious.org')->to('perldoc#index');
+  # http://docs.mojolicious.org/Mojolicious
+  $r->get('/')->over(host => 'docs.mojolicious.org')->to('perldoc#index');
 
 Just be aware that conditions are too complex for the routing cache, which normally speeds up recurring requests, and
 can therefore reduce performance.

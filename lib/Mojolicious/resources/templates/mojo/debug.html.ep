@@ -219,7 +219,7 @@
         </picture>
       % end
       <div id="mojobar-links">
-        %= link_to Documentation => 'https://mojolicious.org/perldoc'
+        %= link_to Documentation => 'https://docs.mojolicious.org'
         %= link_to Chat => 'https://webchat.freenode.net/#mojo'
         %= link_to Wiki => 'https://github.com/mojolicious/mojo/wiki'
         %= link_to GitHub => 'https://github.com/mojolicious/mojo'

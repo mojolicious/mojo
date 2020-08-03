@@ -362,7 +362,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   # Fine grained response handling (dies on connection errors)
   my $ua  = Mojo::UserAgent->new;
-  my $res = $ua->get('mojolicious.org/perldoc')->result;
+  my $res = $ua->get('docs.mojolicious.org')->result;
   if    ($res->is_success)  { say $res->body }
   elsif ($res->is_error)    { say $res->message }
   elsif ($res->code == 301) { say $res->headers->location }
@@ -395,7 +395,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')->result->json('/Abstract');
 
   # GET request via UNIX domain socket "/tmp/myapp.sock" (percent encoded slash)
-  say $ua->get('http+unix://%2Ftmp%2Fmyapp.sock/perldoc')->result->body;
+  say $ua->get('http+unix://%2Ftmp%2Fmyapp.sock/test')->result->body;
 
   # Follow redirects to download Mojolicious from GitHub
   $ua->max_redirects(5)
@@ -534,8 +534,8 @@ Cookie jar to use for requests performed by this user agent, defaults to a L<Moj
     Mojo::Cookie::Response->new(
       name   => 'foo',
       value  => 'bar',
-      domain => 'mojolicious.org',
-      path   => '/perldoc'
+      domain => 'docs.mojolicious.org',
+      path   => '/Mojolicious'
     )
   );
 

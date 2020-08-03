@@ -1055,7 +1055,7 @@ L<Mojo::Transaction/"req"> and L<Mojo::Transaction/"res">.
 
   # Request a resource and make sure there were no connection errors
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->get('mojolicious.org/perldoc/Mojo' => {Accept => 'text/plain'});
+  my $tx = $ua->get('https://docs.mojolicious.org/Mojo' => {Accept => 'text/plain'});
   my $res = $tx->result;
 
   # Decide what to do with its representation
@@ -1077,7 +1077,7 @@ can be a very powerful tool especially for testing web application.
 
   # Fetch website
   my $ua = Mojo::UserAgent->new;
-  my $res = $ua->get('mojolicious.org/perldoc')->result;
+  my $res = $ua->get('https://docs.mojolicious.org')->result;
 
   # Extract title
   say 'Title: ', $res->dom->at('head > title')->text;
@@ -1314,8 +1314,8 @@ to process requests in smaller batches.
   use Mojo::IOLoop;
 
   my @urls = (
-    'mojolicious.org/perldoc/Mojo/DOM',  'mojolicious.org/perldoc/Mojo',
-    'mojolicious.org/perldoc/Mojo/File', 'mojolicious.org/perldoc/Mojo/URL'
+    'https://docs.mojolicious.org/Mojo/DOM',  'https://docs.mojolicious.org/Mojo',
+    'https://docs.mojolicious.org/Mojo/File', 'https://docs.mojolicious.org/Mojo/URL'
   );
 
   # User agent with a custom name, following up to 5 redirects

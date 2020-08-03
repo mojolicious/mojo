@@ -745,7 +745,7 @@ Perform a C<GET> request and check for transport errors, takes the same argument
 for the callback.
 
   # Run tests against remote host
-  $t->get_ok('https://mojolicious.org/perldoc')->status_is(200);
+  $t->get_ok('https://docs.mojolicious.org')->status_is(200);
 
   # Use relative URL for request with Basic authentication
   $t->get_ok('//sri:secr3t@/secrets.json')

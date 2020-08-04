@@ -2,8 +2,11 @@ package Mojo::Promise;
 use Mojo::Base -base;
 
 use Carp qw(carp);
+use Mojo::Exception;
 use Mojo::IOLoop;
 use Scalar::Util qw(blessed);
+
+use constant DEBUG => $ENV{MOJO_PROMISE_DEBUG} || 0;
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
@@ -38,8 +41,9 @@ sub AWAIT_ON_READY {
 
 sub DESTROY {
   my $self = shift;
-  return                                                 if $self->{handled} || ($self->{status} // '') ne 'reject';
-  carp "Unhandled rejected promise: @{$self->{results}}" if $self->{results};
+  return if $self->{handled} || ($self->{status} // '') ne 'reject' || !$self->{results};
+  carp "Unhandled rejected promise: @{$self->{results}}";
+  warn $self->{debug}->message("-- Destroyed promise\n")->verbose(1)->to_string if DEBUG;
 }
 
 sub all         { _all(2, @_) }
@@ -74,6 +78,7 @@ sub map {
 
 sub new {
   my $self = shift->SUPER::new;
+  $self->{debug} = Mojo::Exception->new->trace if DEBUG;
   shift->(sub { $self->resolve(@_) }, sub { $self->reject(@_) }) if @_;
   return $self;
 }
@@ -542,6 +547,13 @@ method is B<EXPERIMENTAL> and might change without warning!
 
 Start L</"ioloop"> and stop it again once the promise has been fulfilled or rejected, does nothing when L</"ioloop"> is
 already running.
+
+=head1 DEBUGGING
+
+You can set the C<MOJO_PROMISE_DEBUG> environment variable to get some advanced diagnostics information printed to
+C<STDERR>.
+
+  MOJO_PROMISE_DEBUG=1
 
 =head1 SEE ALSO
 

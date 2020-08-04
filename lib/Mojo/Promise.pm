@@ -39,7 +39,7 @@ sub AWAIT_ON_READY {
 sub DESTROY {
   my $self = shift;
   return                                                 if $self->{handled} || ($self->{status} // '') ne 'reject';
-  carp "Unhandled rejected promise: @{$self->{results}}" if $self->{results};
+  carp "Unhandled rejected promise: @{$self->{results}}" if $self->{results} &! $ENV{MOJO_NO_PROMISE_WARN};
 }
 
 sub all         { _all(2, @_) }

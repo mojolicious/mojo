@@ -415,6 +415,11 @@ subtest 'Warnings' => sub {
   undef $promise;
   like $warn[0], qr/Unhandled rejected promise: four/, 'unhandled';
   is $warn[1],   undef,                                'no more warnings';
+
+  @warn = ();
+  $ENV{MOJO_NO_PROMISE_WARN} = 1;
+  Mojo::Promise->reject('one');
+  is $warn[0], undef, 'no warning when environment variable set';
 };
 
 subtest 'Warnings (multiple branches)' => sub {

@@ -824,7 +824,7 @@ Some of the work on this distribution has been sponsored by L<The Perl Foundatio
 
 =head1 AUTHORS
 
-L<Mojolicious> is an Open Source project that relies on the tireless support of its contributors.
+L<Mojolicious> is an open source project that relies on the tireless support of its contributors.
 
 =head2 PROJECT FOUNDER
 

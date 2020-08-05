@@ -826,11 +826,11 @@ Some of the work on this distribution has been sponsored by L<The Perl Foundatio
 
 L<Mojolicious> is an open source project that relies on the tireless support of its contributors.
 
-=head2 PROJECT FOUNDER
+=head2 Project Founder
 
 Sebastian Riedel, C<kraih@mojolicious.org>
 
-=head2 CORE DEVELOPERS
+=head2 Core Developers
 
 Current voting members of the core team in alphabetical order:
 
@@ -860,7 +860,7 @@ Glen Hinkle, C<tempire@cpan.org>
 
 =back
 
-=head2 CONTRIBUTORS
+=head2 Contributors
 
 In alphabetical order:
 

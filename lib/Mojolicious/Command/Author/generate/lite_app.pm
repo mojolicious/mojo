@@ -77,10 +77,9 @@ __DATA__
 
 @@ liteapp
 #!/usr/bin/env perl
-use Mojolicious::Lite;
+use Mojolicious::Lite -signatures;
 
-get '/' => sub {
-  my $c = shift;
+get '/' => sub ($c) {
   $c->render(template => 'index');
 };
 

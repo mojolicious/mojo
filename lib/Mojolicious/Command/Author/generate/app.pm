@@ -118,11 +118,10 @@ Mojolicious::Commands->start_app('<%= $class %>');
 
 @@ appclass
 package <%= $class %>;
-use Mojo::Base 'Mojolicious';
+use Mojo::Base 'Mojolicious', -signatures;
 
 # This method will run once at server start
-sub startup {
-  my $self = shift;
+sub startup ($self) {
 
   # Load configuration from config file
   my $config = $self->plugin('NotYAMLConfig');
@@ -141,11 +140,10 @@ sub startup {
 
 @@ controller
 package <%= $class %>;
-use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller', -signatures;
 
 # This action will render a template
-sub welcome {
-  my $self = shift;
+sub welcome ($self) {
 
   # Render template "example/welcome.html.ep" with message
   $self->render(msg => 'Welcome to the Mojolicious real-time web framework!');

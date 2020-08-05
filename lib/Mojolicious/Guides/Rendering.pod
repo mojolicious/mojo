@@ -404,11 +404,10 @@ can be especially helpful during development. You can also render them manually 
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>exception"> and
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Scalar::Util qw(looks_like_number);
 
-  get '/divide/:dividend/by/:divisor' => sub {
-    my $c = shift;
+  get '/divide/:dividend/by/:divisor' => sub ($c) {
 
     my $dividend = $c->param('dividend');
     my $divisor  = $c->param('divisor');
@@ -452,10 +451,9 @@ C<not_found.$mode.$format.*> before falling back to the built-in default templat
 The hook L<Mojolicious/"before_render"> makes even more advanced customizations possible by allowing you to intercept
 and modify the arguments passed to the renderer.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  hook before_render => sub {
-    my ($c, $args) = @_;
+  hook before_render => sub ($c, $args) {
 
     # Make sure we are rendering the exception template
     return unless my $template = $args->{template};
@@ -578,8 +576,7 @@ surrounding tag and not actual Perl code, so there can only be whitespace after 
 A naive translation of the template to Perl code could look like this.
 
   my $output = '';
-  my $block  = sub {
-    my $name   = shift;
+  my $block  = sub ($name) {
     my $output = '';
     $output .= 'Hello ';
     $output .= xml_escape scalar + $name;
@@ -599,17 +596,11 @@ You should always try to keep your actions small and reuse as much code as possi
 get passed the current controller object as first argument, and you can use them to do pretty much anything an action
 could do.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  helper debug => sub {
-    my ($c, $str) = @_;
-    $c->app->log->debug($str);
-  };
+  helper debug => sub ($c, $str) { $c->app->log->debug($str); };
 
-  get '/' => sub {
-    my $c = shift;
-    $c->debug('Hello from an action!');
-  } => 'index';
+  get '/' => sub ($c) { $c->debug('Hello from an action!'); } => 'index';
 
   app->start;
   __DATA__
@@ -620,11 +611,10 @@ could do.
 Helpers can also accept template blocks as last argument, this for example, allows very pleasant to use tag helpers and
 filters. Wrapping the helper result into a L<Mojo::ByteStream> object can prevent accidental double escaping.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::ByteStream;
 
-  helper trim_newline => sub {
-    my ($c, $block) = @_;
+  helper trim_newline => sub ($c, $block) {
     my $result = $block->();
     $result =~ s/\n//g;
     return Mojo::ByteStream->new($result);
@@ -646,26 +636,18 @@ Similar to stash values, you can use a prefix like C<myapp.*> to keep helpers fr
 functions, and to organize them into namespaces as your application grows. Every prefix automatically becomes a helper
 that returns a proxy object containing the current controller object and on which you can call the nested helpers.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  helper 'cache_control.no_caching' => sub {
-    my $c = shift;
-    $c->res->headers->cache_control('private, max-age=0, no-cache');
-  };
+  helper 'cache_control.no_caching' => sub ($c) { $c->res->headers->cache_control('private, max-age=0, no-cache'); };
 
-  helper 'cache_control.five_minutes' => sub {
-    my $c = shift;
-    $c->res->headers->cache_control('public, max-age=300');
-  };
+  helper 'cache_control.five_minutes' => sub ($c) { $c->res->headers->cache_control('public, max-age=300'); };
 
-  get '/news' => sub {
-    my $c = shift;
+  get '/news' => sub ($c) {
     $c->cache_control->no_caching;
     $c->render(text => 'Always up to date.');
   };
 
-  get '/some_older_story' => sub {
-    my $c = shift;
+  get '/some_older_story' => sub ($c) {
     $c->cache_control->five_minutes;
     $c->render(text => 'This one can be cached for a bit.');
   };
@@ -711,14 +693,13 @@ can automatically select a request method for you if a route name is provided. A
 to be submitted with C<GET> and C<POST>, but not request methods like C<PUT> or C<DELETE>, they are spoofed with an
 C<_method> query parameter.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   get '/' => 'form';
 
   # PUT  /nothing
   # POST /nothing?_method=PUT
-  put '/nothing' => sub {
-    my $c = shift;
+  put '/nothing' => sub ($c) {
 
     # Prevent double form submission with redirect
     my $value = $c->param('whatever');
@@ -755,10 +736,9 @@ L<required|Mojolicious::Validator::Validation/"required"> or L<optional|Mojolici
 before you can perform checks on their values. Every check is performed right away, so you can use the results
 immediately to build more advanced validation logic with methods like L<Mojolicious::Validator::Validation/"is_valid">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
 
     # Check if parameters have been submitted
     my $v = $c->validation;
@@ -827,18 +807,16 @@ Validation checks can be registered with L<Mojolicious::Validator/"add_check"> a
 successful. A true value may be used to pass along additional information which can then be retrieved with
 L<Mojolicious::Validator::Validation/"error">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   # Add "range" check
-  app->validator->add_check(range => sub {
-    my ($v, $name, $value, $min, $max) = @_;
+  app->validator->add_check(range => sub ($v, $name, $value, $min, $max) {
     return $value < $min || $value > $max;
   });
 
   get '/' => 'form';
 
-  post '/test' => sub {
-    my $c = shift;
+  post '/test' => sub ($c) {
 
     # Validate parameters with custom check
     my $v = $c->validation;
@@ -882,21 +860,18 @@ send, with something as mundane as a link. All you have to do, to protect your u
 hidden field to your forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field">, and validate it with
 L<Mojolicious::Validator::Validation/"csrf_protect">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   get '/' => {template => 'target'};
 
-  post '/' => sub {
-    my $c = shift;
+  post '/' => sub ($c) {
 
     # Check CSRF token
     my $v = $c->validation;
-    return $c->render(text => 'Bad CSRF token!', status => 403)
-      if $v->csrf_protect->has_error('csrf_token');
+    return $c->render(text => 'Bad CSRF token!', status => 403) if $v->csrf_protect->has_error('csrf_token');
 
     my $city = $v->required('city')->param('city');
-    $c->render(text => "Low orbit ion cannon pointed at $city!")
-      unless $v->has_error;
+    $c->render(text => "Low orbit ion cannon pointed at $city!") unless $v->has_error;
   } => 'target';
 
   app->start;
@@ -976,23 +951,16 @@ L<Mojolicious::Static/"paths">, or one of the C<DATA> sections from L<Mojoliciou
 enough you can also serve them manually with L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>static"> and
 L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>file">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  get '/' => sub {
-    my $c = shift;
-    $c->reply->static('index.html');
-  };
+  get '/' => sub ($c) { $c->reply->static('index.html'); };
 
-  get '/some_download' => sub {
-    my $c = shift;
+  get '/some_download' => sub ($c) {
     $c->res->headers->content_disposition('attachment; filename=bar.png;');
     $c->reply->static('foo/bar.png');
   };
 
-  get '/leak' => sub {
-    my $c = shift;
-    $c->reply->file('/etc/passwd');
-  };
+  get '/leak' => sub ($c) { $c->reply->file('/etc/passwd'); };
 
   app->start;
 
@@ -1003,11 +971,10 @@ objects. For somewhat static content, like cached JSON data or temporary files, 
 helper L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>asset"> to serve them while allowing content negotiation to be
 performed with C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::Asset::File;
 
-  get '/leak' => sub {
-    my $c = shift;
+  get '/leak' => sub ($c) {
     $c->res->headers->content_type('text/plain');
     $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
   };
@@ -1017,11 +984,10 @@ performed with C<Range>, C<If-Modified-Since> and C<If-None-Match> headers.
 For even more control you can also just skip the helper and use L<Mojolicious::Controller/"rendered"> to tell the
 renderer when you're done generating a response.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Mojo::Asset::File;
 
-  get '/leak' => sub {
-    my $c = shift;
+  get '/leak' => sub ($c) {
     $c->res->headers->content_type('text/plain');
     $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
     $c->rendered(200);
@@ -1034,27 +1000,20 @@ renderer when you're done generating a response.
 Some helpers might be useful enough for you to share them between multiple applications, plugins make that very simple.
 
   package Mojolicious::Plugin::DebugHelper;
-  use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
-  sub register {
-    my ($self, $app) = @_;
-    $app->helper(debug => sub {
-      my ($c, $str) = @_;
-      $c->app->log->debug($str);
-    });
-  }
+  sub register ($self, $app, $conf) { $app->helper(debug => sub ($c, $str) { $c->app->log->debug($str); }); }
 
   1;
 
 The C<register> method will be called when you load the plugin. And to add your helper to the application, you can use
 L<Mojolicious/"helper">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
   plugin 'DebugHelper';
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
     $c->debug('It works!');
     $c->render(text => 'Hello!');
   };
@@ -1091,12 +1050,11 @@ Just give them reasonably unique names, ideally based on the name of your plugin
 directories to the list of search paths when C<register> is called.
 
   package Mojolicious::Plugin::AlertAssets;
-  use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
   use Mojo::File qw(curfile);
 
-  sub register {
-    my ($self, $app) = @_;
+  sub register ($self, $app, $conf) {
 
     # Append "templates" and "public" directories
     my $base = curfile->sibling('AlertAssets');
@@ -1131,10 +1089,9 @@ with slightly lower precedence.
 And it works just the same for assets bundled in the C<DATA> section of your plugin.
 
   package Mojolicious::Plugin::AlertAssets;
-  use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
-  sub register {
-    my ($self, $app) = @_;
+  sub register ($self, $app, $conf) {
 
     # Append class
     push @{$app->renderer->classes}, __PACKAGE__;
@@ -1155,11 +1112,10 @@ And it works just the same for assets bundled in the C<DATA> section of your plu
 While post-processing tasks are generally very easy with the hook L<Mojolicious/"after_dispatch">, for content
 generated by the renderer it is a lot more efficient to use L<Mojolicious/"after_render">.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use IO::Compress::Gzip qw(gzip);
 
-  hook after_render => sub {
-    my ($c, $output, $format) = @_;
+  hook after_render => sub ($c, $output, $format) {
 
     # Check if "gzip => 1" has been set in the stash
     return unless $c->stash->{gzip};
@@ -1193,18 +1149,16 @@ If you want to compress all dynamically generated content you can also activate 
 You don't have to render all content at once, the method L<Mojolicious::Controller/"write"> can also be used to stream
 a series of smaller chunks.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
 
     # Prepare body
     my $body = 'Hello World!';
     $c->res->headers->content_length(length $body);
 
     # Start writing directly with a drain callback
-    my $drain = sub {
-      my $c = shift;
+    my $drain = sub ($c) {
       my $chunk = substr $body, 0, 1, '';
       $c->write($chunk, length $body ? __SUB__ : undef);
     };
@@ -1225,17 +1179,15 @@ The drain callback will be executed whenever the entire previous chunk of data h
 Instead of providing a C<Content-Length> header you can also call L<Mojolicious::Controller/"finish"> and close the
 connection manually once you are done.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  get '/' => sub {
-    my $c = shift;
+  get '/' => sub ($c) {
 
     # Prepare body
     my $body = 'Hello World!';
 
     # Start writing directly with a drain callback
-    my $drain = sub {
-      my $c = shift;
+    my $drain = sub ($c) {
       my $chunk = substr $body, 0, 1, '';
       length $chunk ? $c->write($chunk, __SUB__) : $c->finish;
     };
@@ -1260,12 +1212,10 @@ For very dynamic content you might not know the response content length in advan
 encoding and L<Mojolicious::Controller/"write_chunk"> come in handy. A common use would be to send the C<head> section
 of an HTML document to the browser in advance and speed up preloading of referenced images and stylesheets.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
 
-  get '/' => sub {
-    my $c = shift;
-    $c->write_chunk('<html><head><title>Example</title></head>' => sub {
-      my $c = shift;
+  get '/' => sub ($c) {
+    $c->write_chunk('<html><head><title>Example</title></head>' => sub ($c) {
       $c->finish('<body>Example</body></html>');
     });
   };
@@ -1364,14 +1314,12 @@ and there is not already a plugin on CPAN for your favorite one. All you have to
 L<Mojolicious::Renderer/"add_handler"> when C<register> is called.
 
   package Mojolicious::Plugin::MyRenderer;
-  use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
-  sub register {
-    my ($self, $app) = @_;
+  sub register ($self, $app, $conf) {
 
     # Add "mine" handler
-    $app->renderer->add_handler(mine => sub {
-      my ($renderer, $c, $output, $options) = @_;
+    $app->renderer->add_handler(mine => sub ($renderer, $c, $output, $options) {
 
       # Check for one-time use inline template
       my $inline_template = $options->{inline};
@@ -1420,12 +1368,11 @@ L<Mojolicious::Renderer/"get_data_template"> to search the C<DATA> sections.
 By default the renderer assumes that every C<handler> generates characters that need to be automatically encoded, but
 this can be easily disabled if you're generating bytes instead.
 
-  use Mojolicious::Lite;
+  use Mojolicious::Lite -signatures;
   use Storable qw(nfreeze);
 
   # Add "storable" handler
-  app->renderer->add_handler(storable => sub {
-    my ($renderer, $c, $output, $options) = @_;
+  app->renderer->add_handler(storable => sub ($renderer, $c, $output, $options) {
 
     # Disable automatic encoding
     delete $options->{encoding};
@@ -1435,10 +1382,8 @@ this can be easily disabled if you're generating bytes instead.
   });
 
   # Set "handler" value automatically if "storable" value is set already
-  app->hook(before_render => sub {
-    my ($c, $args) = @_;
-    $args->{handler} = 'storable'
-      if exists $args->{storable} || exists $c->stash->{storable};
+  app->hook(before_render => sub ($c, $args) {
+    $args->{handler} = 'storable' if exists $args->{storable} || exists $c->stash->{storable};
   });
 
   get '/' => {storable => {i => '♥ mojolicious'}};

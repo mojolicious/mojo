@@ -77,8 +77,7 @@ Mojo::Server::CGI - CGI server
   use Mojo::Server::CGI;
 
   my $cgi = Mojo::Server::CGI->new;
-  $cgi->unsubscribe('request')->on(request => sub {
-    my ($cgi, $tx) = @_;
+  $cgi->unsubscribe('request')->on(request => sub ($cgi, $tx) {
 
     # Request
     my $method = $tx->req->method;

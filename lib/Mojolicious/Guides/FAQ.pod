@@ -177,10 +177,7 @@ closed immediately.
   # The variable $ua goes out of scope and gets destroyed too early
   Mojo::IOLoop->timer(5 => sub {
     my $ua = Mojo::UserAgent->new;
-    $ua->get('https://mojolicious.org' => sub {
-      my ($ua, $tx) = @_;
-      say $tx->result->dom->at('title')->text;
-    });
+    $ua->get('https://mojolicious.org' => sub ($ua, $tx) { say $tx->result->dom->at('title')->text; });
   });
 
 =head2 What does "Worker 31842 has no heartbeat (50 seconds), restarting" mean?
@@ -203,8 +200,7 @@ weakened.
   my $tx = $c->render_later->tx;
   $c->ua->get_p('https://mojolicious.org')->then(sub {
     $c->render(text => 'Visited mojolicious.org');
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
     $tx;
     $c->reply->exception($err);
   });

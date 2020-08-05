@@ -156,8 +156,7 @@ A callback used to decide if a cookie should be ignored by L</"collect">.
   $jar->ignore(sub { 1 });
 
   # Ignore cookies for domains "com", "net" and "org"
-  $jar->ignore(sub {
-    my $cookie = shift;
+  $jar->ignore(sub ($cookie) {
     return undef unless my $domain = $cookie->domain;
     return $domain eq 'com' || $domain eq 'net' || $domain eq 'org';
   });

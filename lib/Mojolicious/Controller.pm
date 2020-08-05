@@ -301,11 +301,10 @@ Mojolicious::Controller - Controller base class
 
   # Controller
   package MyApp::Controller::Foo;
-  use Mojo::Base 'Mojolicious::Controller';
+  use Mojo::Base 'Mojolicious::Controller', -signatures;
 
   # Action
-  sub bar {
-    my $self = shift;
+  sub bar ($self) {
     my $name = $self->param('name');
     $self->res->headers->cache_control('max-age=1, no-cache');
     $self->render(json => {hello => $name});
@@ -364,9 +363,7 @@ elsewhere as well when you're performing non-blocking operations and the underly
 
   # Perform non-blocking operation without knowing the connection status
   my $tx = $c->tx;
-  Mojo::IOLoop->timer(2 => sub {
-    $c->app->log->debug($tx->is_finished ? 'Finished' : 'In progress');
-  });
+  Mojo::IOLoop->timer(2 => sub { $c->app->log->debug($tx->is_finished ? 'Finished' : 'In progress'); });
 
 =head1 METHODS
 
@@ -453,26 +450,16 @@ object. This method will automatically respond to WebSocket handshake requests w
 establish the WebSocket connection.
 
   # Do something after the transaction has been finished
-  $c->on(finish => sub {
-    my $c = shift;
-    $c->app->log->debug('All data has been sent');
-  });
+  $c->on(finish => sub ($c) { $c->app->log->debug('All data has been sent'); });
 
   # Receive WebSocket message
-  $c->on(message => sub {
-    my ($c, $msg) = @_;
-    $c->app->log->debug("Message: $msg");
-  });
+  $c->on(message => sub ($c, $msg) { $c->app->log->debug("Message: $msg"); });
 
   # Receive JSON object via WebSocket message
-  $c->on(json => sub {
-    my ($c, $hash) = @_;
-    $c->app->log->debug("Test: $hash->{test}");
-  });
+  $c->on(json => sub ($c, $hash) { $c->app->log->debug("Test: $hash->{test}"); });
 
   # Receive WebSocket "Binary" message
-  $c->on(binary => sub {
-    my ($c, $bytes) = @_;
+  $c->on(binary => sub ($c, $bytes) {
     my $len = length $bytes;
     $c->app->log->debug("Received $len bytes");
   });
@@ -560,9 +547,7 @@ response.
 
   # Delayed rendering
   $c->render_later;
-  Mojo::IOLoop->timer(2 => sub {
-    $c->render(text => 'Delayed by 2 seconds!');
-  });
+  Mojo::IOLoop->timer(2 => sub { $c->render(text => 'Delayed by 2 seconds!'); });
 
 =head2 render_maybe
 
@@ -651,7 +636,7 @@ Get L<Mojo::Message::Response> object from L</"tx">.
   $c = $c->send({json   => {test => [1, 2, 3]}});
   $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
   $c = $c->send($chars);
-  $c = $c->send($chars => sub {...});
+  $c = $c->send($chars => sub ($c) {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback will be executed once all data has been
 written. This method will automatically respond to WebSocket handshake requests with a C<101> response status, to
@@ -672,10 +657,7 @@ establish the WebSocket connection.
   $c->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
 
   # Make sure the first message has been written before continuing
-  $c->send('First message!' => sub {
-    my $c = shift;
-    $c->send('Second message!');
-  });
+  $c->send('First message!' => sub ($c) { $c->send('Second message!'); });
 
 For mostly idle WebSockets you might also want to increase the inactivity timeout with
 L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which usually defaults to C<30> seconds.
@@ -788,7 +770,7 @@ current request.
   $c = $c->write;
   $c = $c->write('');
   $c = $c->write($bytes);
-  $c = $c->write($bytes => sub {...});
+  $c = $c->write($bytes => sub ($c) {...});
 
 Write dynamic content non-blocking, the optional drain callback will be executed once all data has been written.
 Calling this method without a chunk of data will finalize the response headers and allow for dynamic content to be
@@ -796,18 +778,11 @@ written later.
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
-  $c->write('Hel' => sub {
-    my $c = shift;
-    $c->write('lo!');
-  });
+  $c->write('Hel' => sub ($c) { $c->write('lo!'); });
 
   # Close connection when finished (without Content-Length header)
-  $c->write('Hel' => sub {
-    my $c = shift;
-    $c->write('lo!' => sub {
-      my $c = shift;
-      $c->finish;
-    });
+  $c->write('Hel' => sub ($c) {
+    $c->write('lo!' => sub ($c) { $c->finish; });
   });
 
 You can call L</"finish"> or write an empty chunk of data at any time to end the stream.
@@ -837,19 +812,15 @@ L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which usually defau
   $c = $c->write_chunk;
   $c = $c->write_chunk('');
   $c = $c->write_chunk($bytes);
-  $c = $c->write_chunk($bytes => sub {...});
+  $c = $c->write_chunk($bytes => sub ($c) {...});
 
 Write dynamic content non-blocking with chunked transfer encoding, the optional drain callback will be executed once
 all data has been written. Calling this method without a chunk of data will finalize the response headers and allow for
 dynamic content to be written later.
 
   # Make sure previous chunk has been written before continuing
-  $c->write_chunk('H' => sub {
-    my $c = shift;
-    $c->write_chunk('ell' => sub {
-      my $c = shift;
-      $c->finish('o!');
-    });
+  $c->write_chunk('H' => sub ($c) {
+    $c->write_chunk('ell' => sub ($c) { $c->finish('o!'); });
   });
 
 You can call L</"finish"> or write an empty chunk of data at any time to end the stream.

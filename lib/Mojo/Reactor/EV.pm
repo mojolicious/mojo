@@ -89,8 +89,7 @@ Mojo::Reactor::EV - Low-level event reactor with libev support
 
   # Watch if handle becomes readable or writable
   my $reactor = Mojo::Reactor::EV->new;
-  $reactor->io($first => sub {
-    my ($reactor, $writable) = @_;
+  $reactor->io($first => sub ($reactor, $writable) {
     say $writable ? 'First handle is writable' : 'First handle is readable';
   });
 
@@ -99,14 +98,12 @@ Mojo::Reactor::EV - Low-level event reactor with libev support
 
   # Turn file descriptor into handle and watch if it becomes readable
   my $second = IO::Handle->new_from_fd($fd, 'r');
-  $reactor->io($second => sub {
-    my ($reactor, $writable) = @_;
+  $reactor->io($second => sub ($reactor, $writable) {
     say $writable ? 'Second handle is writable' : 'Second handle is readable';
   })->watch($second, 1, 0);
 
   # Add a timer
-  $reactor->timer(15 => sub {
-    my $reactor = shift;
+  $reactor->timer(15 => sub ($reactor) {
     $reactor->remove($first);
     $reactor->remove($second);
     say 'Timeout!';

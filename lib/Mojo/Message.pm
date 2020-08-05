@@ -311,37 +311,24 @@ L<Mojo::Message> inherits all events from L<Mojo::EventEmitter> and can emit the
 
 =head2 finish
 
-  $msg->on(finish => sub {
-    my $msg = shift;
-    ...
-  });
+  $msg->on(finish => sub ($msg) {...});
 
 Emitted after message building or parsing is finished.
 
   my $before = time;
-  $msg->on(finish => sub {
-    my $msg = shift;
-    $msg->headers->header('X-Parser-Time' => time - $before);
-  });
+  $msg->on(finish => sub ($msg) { $msg->headers->header('X-Parser-Time' => time - $before); });
 
 =head2 progress
 
-  $msg->on(progress => sub {
-    my $msg = shift;
-    ...
-  });
+  $msg->on(progress => sub ($msg) {...});
 
 Emitted when message building or parsing makes progress.
 
   # Building
-  $msg->on(progress => sub {
-    my ($msg, $state, $offset) = @_;
-    say qq{Building "$state" at offset $offset};
-  });
+  $msg->on(progress => sub ($msg, $state, $offset) { say qq{Building "$state" at offset $offset}; });
 
   # Parsing
-  $msg->on(progress => sub {
-    my $msg = shift;
+  $msg->on(progress => sub ($msg) {
     return unless my $len = $msg->headers->content_length;
     my $size = $msg->content->progress;
     say 'Progress: ', $size == $len ? 100 : int($size / ($len / 100)), '%';

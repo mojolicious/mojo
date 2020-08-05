@@ -31,8 +31,7 @@ Mojo - Web development toolkit
   # HTTP/WebSocket server
   use Mojo::Server::Daemon;
   my $daemon = Mojo::Server::Daemon->new(listen => ['http://*:8080']);
-  $daemon->unsubscribe('request')->on(request => sub {
-    my ($daemon, $tx) = @_;
+  $daemon->unsubscribe('request')->on(request => sub ($daemon, $tx) {
     $tx->res->code(200);
     $tx->res->body('Hello Mojo!');
     $tx->resume;

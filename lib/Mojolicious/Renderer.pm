@@ -357,8 +357,7 @@ detected.
 
 Register a handler.
 
-  $renderer->add_handler(foo => sub {
-    my ($renderer, $c, $output, $options) = @_;
+  $renderer->add_handler(foo => sub ($renderer, $c, $output, $options) {
     ...
     $$output = 'Hello World!';
   });
@@ -369,8 +368,7 @@ Register a handler.
 
 Register a helper.
 
-  $renderer->add_helper(foo => sub {
-    my ($c, @args) = @_;
+  $renderer->add_helper(foo => sub ($c, @args) {
     ...
   });
 

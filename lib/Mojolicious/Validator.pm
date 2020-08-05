@@ -151,7 +151,7 @@ L<Mojolicious::Validator> implements the following attributes.
 =head2 checks
 
   my $checks = $validator->checks;
-  $validator = $validator->checks({size => sub {...}});
+  $validator = $validator->checks({size => sub ($v, $name, $value, @args) {...}});
 
 Registered validation checks, by default only L</"equal_to">, L</"in">, L</"like">, L</"num">, L</"size"> and
 L</"upload"> are already defined.
@@ -169,24 +169,22 @@ L<Mojolicious::Validator> inherits all methods from L<Mojo::Base> and implements
 
 =head2 add_check
 
-  $validator = $validator->add_check(size => sub {...});
+  $validator = $validator->add_check(size => sub ($v, $name, $value, @args) {...});
 
 Register a validation check.
 
-  $validator->add_check(foo => sub {
-    my ($v, $name, $value, @args) = @_;
+  $validator->add_check(foo => sub ($v, $name, $value, @args) {
     ...
     return undef;
   });
 
 =head2 add_filter
 
-  $validator = $validator->add_filter(trim => sub {...});
+  $validator = $validator->add_filter(trim => sub ($v, $name, $value) {...});
 
 Register a new filter.
 
-  $validator->add_filter(foo => sub {
-    my ($v, $name, $value) = @_;
+  $validator->add_filter(foo => sub ($v, $name, $value) {
     ...
     return $value;
   });

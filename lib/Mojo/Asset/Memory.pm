@@ -73,17 +73,11 @@ L<Mojo::Asset::Memory> inherits all events from L<Mojo::Asset> and can emit the 
 
 =head2 upgrade
 
-  $mem->on(upgrade => sub {
-    my ($mem, $file) = @_;
-    ...
-  });
+  $mem->on(upgrade => sub ($mem, $file) {...});
 
 Emitted when asset gets upgraded to a L<Mojo::Asset::File> object.
 
-  $mem->on(upgrade => sub {
-    my ($mem, $file) = @_;
-    $file->tmpdir('/tmp');
-  });
+  $mem->on(upgrade => sub ($mem, $file) { $file->tmpdir('/tmp'); });
 
 =head1 ATTRIBUTES
 

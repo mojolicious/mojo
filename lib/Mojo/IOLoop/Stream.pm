@@ -148,18 +148,9 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
 
   # Create stream
   my $stream = Mojo::IOLoop::Stream->new($handle);
-  $stream->on(read => sub {
-    my ($stream, $bytes) = @_;
-    ...
-  });
-  $stream->on(close => sub {
-    my $stream = shift;
-    ...
-  });
-  $stream->on(error => sub {
-    my ($stream, $err) = @_;
-    ...
-  });
+  $stream->on(read => sub ($stream, $bytes) {...});
+  $stream->on(close => sub ($stream) {...});
+  $stream->on(error => sub ($stream, $err) {...});
 
   # Start and stop watching for new data
   $stream->start;
@@ -178,55 +169,37 @@ L<Mojo::IOLoop::Stream> inherits all events from L<Mojo::EventEmitter> and can e
 
 =head2 close
 
-  $stream->on(close => sub {
-    my $stream = shift;
-    ...
-  });
+  $stream->on(close => sub ($stream) {...});
 
 Emitted if the stream gets closed.
 
 =head2 drain
 
-  $stream->on(drain => sub {
-    my $stream = shift;
-    ...
-  });
+  $stream->on(drain => sub ($stream) {...});
 
 Emitted once all data has been written.
 
 =head2 error
 
-  $stream->on(error => sub {
-    my ($stream, $err) = @_;
-    ...
-  });
+  $stream->on(error => sub ($stream, $err) {...});
 
 Emitted if an error occurs on the stream, fatal if unhandled.
 
 =head2 read
 
-  $stream->on(read => sub {
-    my ($stream, $bytes) = @_;
-    ...
-  });
+  $stream->on(read => sub ($stream, $bytes) {...});
 
 Emitted if new data arrives on the stream.
 
 =head2 timeout
 
-  $stream->on(timeout => sub {
-    my $stream = shift;
-    ...
-  });
+  $stream->on(timeout => sub ($stream) {...});
 
 Emitted if the stream has been inactive for too long and will get closed automatically.
 
 =head2 write
 
-  $stream->on(write => sub {
-    my ($stream, $bytes) = @_;
-    ...
-  });
+  $stream->on(write => sub ($stream, $bytes) {...});
 
 Emitted if new data has been written to the stream.
 

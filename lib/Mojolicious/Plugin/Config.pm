@@ -146,8 +146,7 @@ L<Mojolicious::Plugin::Config> inherits all methods from L<Mojolicious::Plugin> 
 
 Loads configuration file and passes the content to L</"parse">.
 
-  sub load {
-    my ($self, $file, $conf, $app) = @_;
+  sub load ($self, $file, $conf, $app) {
     ...
     return $self->parse($content, $file, $conf, $app);
   }
@@ -158,8 +157,7 @@ Loads configuration file and passes the content to L</"parse">.
 
 Parse configuration file.
 
-  sub parse {
-    my ($self, $content, $file, $conf, $app) = @_;
+  sub parse ($self, $content, $file, $conf, $app) {
     ...
     return $hash;
   }

@@ -173,14 +173,8 @@ Mojo::Transaction::WebSocket - WebSocket transaction
   # Send and receive WebSocket messages
   my $ws = Mojo::Transaction::WebSocket->new;
   $ws->send('Hello World!');
-  $ws->on(message => sub {
-    my ($ws, $msg) = @_;
-    say "Message: $msg";
-  });
-  $ws->on(finish => sub {
-    my ($ws, $code, $reason) = @_;
-    say "WebSocket closed with status $code.";
-  });
+  $ws->on(message => sub ($ws, $msg) { say "Message: $msg"; });
+  $ws->on(finish => sub ($ws, $code, $reason) { say "WebSocket closed with status $code."; });
 
 =head1 DESCRIPTION
 
@@ -193,52 +187,33 @@ L<Mojo::Transaction::WebSocket> inherits all events from L<Mojo::Transaction> an
 
 =head2 binary
 
-  $ws->on(binary => sub {
-    my ($ws, $bytes) = @_;
-    ...
-  });
+  $ws->on(binary => sub ($ws, $bytes) {...});
 
 Emitted when a complete WebSocket binary message has been received.
 
-  $ws->on(binary => sub {
-    my ($ws, $bytes) = @_;
-    say "Binary: $bytes";
-  });
+  $ws->on(binary => sub ($ws, $bytes) { say "Binary: $bytes"; });
 
 =head2 drain
 
-  $ws->on(drain => sub {
-    my $ws = shift;
-    ...
-  });
+  $ws->on(drain => sub ($ws) {...});
 
 Emitted once all data has been sent.
 
-  $ws->on(drain => sub {
-    my $ws = shift;
-    $ws->send(time);
-  });
+  $ws->on(drain => sub ($ws) { $ws->send(time); });
 
 =head2 finish
 
-  $ws->on(finish => sub {
-    my ($ws, $code, $reason) = @_;
-    ...
-  });
+  $ws->on(finish => sub ($ws, $code, $reason) {...});
 
 Emitted when the WebSocket connection has been closed.
 
 =head2 frame
 
-  $ws->on(frame => sub {
-    my ($ws, $frame) = @_;
-    ...
-  });
+  $ws->on(frame => sub ($ws, $frame) {...});
 
 Emitted when a WebSocket frame has been received.
 
-  $ws->on(frame => sub {
-    my ($ws, $frame) = @_;
+  $ws->on(frame => sub ($ws, $frame) {
     say "FIN: $frame->[0]";
     say "RSV1: $frame->[1]";
     say "RSV2: $frame->[2]";
@@ -249,56 +224,35 @@ Emitted when a WebSocket frame has been received.
 
 =head2 json
 
-  $ws->on(json => sub {
-    my ($ws, $json) = @_;
-    ...
-  });
+  $ws->on(json => sub ($ws, $json) {...});
 
 Emitted when a complete WebSocket message has been received, all text and binary messages will be automatically JSON
 decoded. Note that this event only gets emitted when it has at least one subscriber.
 
-  $ws->on(json => sub {
-    my ($ws, $hash) = @_;
-    say "Message: $hash->{msg}";
-  });
+  $ws->on(json => sub ($ws, $hash) { say "Message: $hash->{msg}"; });
 
 =head2 message
 
-  $ws->on(message => sub {
-    my ($ws, $msg) = @_;
-    ...
-  });
+  $ws->on(message => sub ($ws, $msg) {...});
 
 Emitted when a complete WebSocket message has been received, text messages will be automatically decoded. Note that
 this event only gets emitted when it has at least one subscriber.
 
-  $ws->on(message => sub {
-    my ($ws, $msg) = @_;
-    say "Message: $msg";
-  });
+  $ws->on(message => sub ($ws, $msg) { say "Message: $msg"; });
 
 =head2 resume
 
-  $tx->on(resume => sub {
-    my $tx = shift;
-    ...
-  });
+  $tx->on(resume => sub ($tx) {...});
 
 Emitted when transaction is resumed.
 
 =head2 text
 
-  $ws->on(text => sub {
-    my ($ws, $bytes) = @_;
-    ...
-  });
+  $ws->on(text => sub ($ws, $bytes) {...});
 
 Emitted when a complete WebSocket text message has been received.
 
-  $ws->on(text => sub {
-    my ($ws, $bytes) = @_;
-    say "Text: $bytes";
-  });
+  $ws->on(text => sub ($ws, $bytes) { say "Text: $bytes"; });
 
 =head1 ATTRIBUTES
 

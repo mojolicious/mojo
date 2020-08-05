@@ -266,12 +266,11 @@ Fluent interfaces are a way to design object-oriented APIs around method chainin
 with the goal of making the readability of the source code close to written prose.
 
   package Duck;
-  use Mojo::Base -base;
+  use Mojo::Base -base, -signatures;
 
   has 'name';
 
-  sub quack {
-    my $self = shift;
+  sub quack ($self) {
     my $name = $self->name;
     say "$name: Quack!"
   }

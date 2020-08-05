@@ -256,8 +256,7 @@ Mojo::Promise - Promises/A+
   my $ua = Mojo::UserAgent->new;
   sub get_p {
     my $promise = Mojo::Promise->new;
-    $ua->get(@_ => sub {
-      my ($ua, $tx) = @_;
+    $ua->get(@_ => sub ($ua, $tx) {
       my $err = $tx->error;
       if   (!$err || $err->{code}) { $promise->resolve($tx) }
       else                         { $promise->reject($err->{message}) }
@@ -266,38 +265,31 @@ Mojo::Promise - Promises/A+
   }
 
   # Perform non-blocking operations sequentially
-  get_p('https://mojolicious.org')->then(sub {
-    my $mojo = shift;
+  get_p('https://mojolicious.org')->then(sub ($mojo) {
     say $mojo->res->code;
     return get_p('https://metacpan.org');
-  })->then(sub {
-    my $cpan = shift;
+  })->then(sub ($cpan) {
     say $cpan->res->code;
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
     warn "Something went wrong: $err";
   })->wait;
 
   # Synchronize non-blocking operations (all)
   my $mojo = get_p('https://mojolicious.org');
   my $cpan = get_p('https://metacpan.org');
-  Mojo::Promise->all($mojo, $cpan)->then(sub {
-    my ($mojo, $cpan) = @_;
+  Mojo::Promise->all($mojo, $cpan)->then(sub ($mojo, $cpan) {
     say $mojo->[0]->res->code;
     say $cpan->[0]->res->code;
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
     warn "Something went wrong: $err";
   })->wait;
 
   # Synchronize non-blocking operations (race)
   my $mojo = get_p('https://mojolicious.org');
   my $cpan = get_p('https://metacpan.org');
-  Mojo::Promise->race($mojo, $cpan)->then(sub {
-    my $tx = shift;
+  Mojo::Promise->race($mojo, $cpan)->then(sub ($tx) {
     say $tx->req->url, ' won!';
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
     warn "Something went wrong: $err";
   })->wait;
 
@@ -382,17 +374,13 @@ value of the callback if it is called, or to its original fulfillment value if t
   my $new = $promise->then(undef, sub {...});
 
   # Pass along the rejection reason
-  $promise->catch(sub {
-    my @reason = @_;
+  $promise->catch(sub (@reason) {
     warn "Something went wrong: $reason[0]";
     return @reason;
   });
 
   # Change the rejection reason
-  $promise->catch(sub {
-    my @reason = @_;
-    return "This is bad: $reason[0]";
-  });
+  $promise->catch(sub (@reason) { return "This is bad: $reason[0]"; });
 
 =head2 clone
 
@@ -408,9 +396,7 @@ Appends a fulfillment and rejection handler to the promise, and returns a new L<
 original fulfillment value or rejection reason.
 
   # Do something on fulfillment and rejection
-  $promise->finally(sub {
-    say "We are done!";
-  });
+  $promise->finally(sub { say "We are done!"; });
 
 =head2 map
 
@@ -446,8 +432,7 @@ The maximum number of items that are in progress at the same time.
 Construct a new L<Mojo::Promise> object.
 
   # Wrap a continuation-passing style API
-  my $promise = Mojo::Promise->new(sub {
-    my ($resolve, $reject) = @_;
+  my $promise = Mojo::Promise->new(sub ($resolve, $reject) {
     Mojo::IOLoop->timer(5 => sub {
       if (int rand 2) { $resolve->('Lucky!') }
       else            { $reject->('Unlucky!') }
@@ -492,13 +477,11 @@ return value of the called handler.
 
   # Pass along the fulfillment value or rejection reason
   $promise->then(
-    sub {
-      my @value = @_;
+    sub (@value) {
       say "The result is $value[0]";
       return @value;
     },
-    sub {
-      my @reason = @_;
+    sub (@reason) {
       warn "Something went wrong: $reason[0]";
       return @reason;
     }
@@ -506,14 +489,8 @@ return value of the called handler.
 
   # Change the fulfillment value or rejection reason
   $promise->then(
-    sub {
-      my @value = @_;
-      return "This is good: $value[0]";
-    },
-    sub {
-      my @reason = @_;
-      return "This is bad: $reason[0]";
-    }
+    sub (@value) { return "This is good: $value[0]"; },
+    sub (@reason) { return "This is bad: $reason[0]"; }
   );
 
 =head2 timer

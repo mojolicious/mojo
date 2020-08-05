@@ -45,6 +45,12 @@ L<warnings>, L<utf8> and Perl 5.16 L<features|feature> are enabled, even if exam
 Some modules, like L<Mojo::Base> and L<Mojolicious::Lite>, will enable them for you automatically, whenever they are
 used.
 
+=head2 Signatures
+
+On Perl 5.20+ you can also use the C<-signatures> flag with L<Mojo::Base> to enable support for
+L<subroutine signatures|perlsub/"Signatures">. Signatures are used in all examples for clarity, even when C<-signatures>
+is omitted for brevity.
+
 =head2 Variable names
 
 For brevity and clarity, example variables will reflect the type of data the API uses. For instance, C<$bytes> or

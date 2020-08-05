@@ -291,45 +291,27 @@ L<Mojo::Content> inherits all events from L<Mojo::EventEmitter> and can emit the
 
 =head2 body
 
-  $content->on(body => sub {
-    my $content = shift;
-    ...
-  });
+  $content->on(body => sub ($content) {...});
 
 Emitted once all headers have been parsed and the body starts.
 
-  $content->on(body => sub {
-    my $content = shift;
-    $content->auto_upgrade(0) if $content->headers->header('X-No-MultiPart');
-  });
+  $content->on(body => sub ($content) { $content->auto_upgrade(0) if $content->headers->header('X-No-MultiPart'); });
 
 =head2 drain
 
-  $content->on(drain => sub {
-    my ($content, $offset) = @_;
-    ...
-  });
+  $content->on(drain => sub ($content, $offset) {...});
 
 Emitted once all data has been written.
 
-  $content->on(drain => sub {
-    my $content = shift;
-    $content->write_chunk(time);
-  });
+  $content->on(drain => sub ($content) { $content->write_chunk(time); });
 
 =head2 read
 
-  $content->on(read => sub {
-    my ($content, $bytes) = @_;
-    ...
-  });
+  $content->on(read => sub ($content, $bytes) {...});
 
 Emitted when a new chunk of content arrives.
 
-  $content->on(read => sub {
-    my ($content, $bytes) = @_;
-    say "Streaming: $bytes";
-  });
+  $content->on(read => sub ($content, $bytes) { say "Streaming: $bytes"; });
 
 =head1 ATTRIBUTES
 
@@ -529,10 +511,8 @@ Calling this method without a chunk of data will finalize the L</"headers"> and 
 later. You can write an empty chunk of data at any time to end the stream.
 
   # Make sure previous chunk of data has been written before continuing
-  $content->write('He' => sub {
-    my $content = shift;
-    $content->write('llo!' => sub {
-      my $content = shift;
+  $content->write('He' => sub ($content) {
+    $content->write('llo!' => sub ($content) {
       $content->write('');
     });
   });
@@ -549,10 +529,8 @@ all data has been written. Calling this method without a chunk of data will fina
 dynamic content to be written later. You can write an empty chunk of data at any time to end the stream.
 
   # Make sure previous chunk of data has been written before continuing
-  $content->write_chunk('He' => sub {
-    my $content = shift;
-    $content->write_chunk('llo!' => sub {
-      my $content = shift;
+  $content->write_chunk('He' => sub ($content) {
+    $content->write_chunk('llo!' => sub ($content) {
       $content->write_chunk('');
     });
   });

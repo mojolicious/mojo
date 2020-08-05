@@ -211,15 +211,11 @@ L<Mojo::Content::Multipart> inherits all events from L<Mojo::Content> and can em
 
 =head2 part
 
-  $multi->on(part => sub {
-    my ($multi, $single) = @_;
-    ...
-  });
+  $multi->on(part => sub ($multi, $single) {...});
 
 Emitted when a new L<Mojo::Content::Single> part starts.
 
-  $multi->on(part => sub {
-    my ($multi, $single) = @_;
+  $multi->on(part => sub ($multi, $single) {
     return unless $single->headers->content_disposition =~ /name="([^"]+)"/;
     say "Field: $1";
   });

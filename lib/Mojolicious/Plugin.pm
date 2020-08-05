@@ -17,10 +17,9 @@ Mojolicious::Plugin - Plugin base class
 
   # CamelCase plugin name
   package Mojolicious::Plugin::MyPlugin;
-  use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
-  sub register {
-    my ($self, $app, $conf) = @_;
+  sub register ($self, $app, $conf) {
 
     # Magic here! :)
   }

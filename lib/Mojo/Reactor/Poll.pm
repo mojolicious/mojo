@@ -160,8 +160,7 @@ Mojo::Reactor::Poll - Low-level event reactor with poll support
 
   # Watch if handle becomes readable or writable
   my $reactor = Mojo::Reactor::Poll->new;
-  $reactor->io($first => sub {
-    my ($reactor, $writable) = @_;
+  $reactor->io($first => sub ($reactor, $writable) {
     say $writable ? 'First handle is writable' : 'First handle is readable';
   });
 
@@ -170,14 +169,12 @@ Mojo::Reactor::Poll - Low-level event reactor with poll support
 
   # Turn file descriptor into handle and watch if it becomes readable
   my $second = IO::Handle->new_from_fd($fd, 'r');
-  $reactor->io($second => sub {
-    my ($reactor, $writable) = @_;
+  $reactor->io($second => sub ($reactor, $writable) {
     say $writable ? 'Second handle is writable' : 'Second handle is readable';
   })->watch($second, 1, 0);
 
   # Add a timer
-  $reactor->timer(15 => sub {
-    my $reactor = shift;
+  $reactor->timer(15 => sub ($reactor) {
     $reactor->remove($first);
     $reactor->remove($second);
     say 'Timeout!';
@@ -212,10 +209,7 @@ Restart timer and optionally change the invocation time. Note that this method r
 Watch handle for I/O events, invoking the callback whenever handle becomes readable or writable.
 
   # Callback will be executed twice if handle becomes readable and writable
-  $reactor->io($handle => sub {
-    my ($reactor, $writable) = @_;
-    say $writable ? 'Handle is writable' : 'Handle is readable';
-  });
+  $reactor->io($handle => sub ($reactor, $writable) { say $writable ? 'Handle is writable' : 'Handle is readable'; });
 
 =head2 is_running
 

@@ -101,8 +101,7 @@ following new ones.
 
 Process content with L<Mojolicious::Plugin::JSONConfig/"render"> and parse it with L<CPAN::Meta::YAML>.
 
-  sub parse {
-    my ($self, $content, $file, $conf, $app) = @_;
+  sub parse ($self, $content, $file, $conf, $app) {
     ...
     $content = $self->render($content, $file, $conf, $app);
     ...

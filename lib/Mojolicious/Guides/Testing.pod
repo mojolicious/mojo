@@ -231,7 +231,7 @@ value is set:
 
   # NEW: this route only exists if "enable_weather" is set in the configuration
   if ($config->{enable_weather}) {
-    $r->get('/weather' => sub { shift->render(text => "It's hot! 🔥") }
+    $r->get('/weather' => sub ($c) { $c->render(text => "It's hot! 🔥") }
   }
 
 To test this new feature, we don't even need to create a configuration file—we can simply pass the configuration data
@@ -256,8 +256,7 @@ Let's say we register a helper in our application to generate an HTTP Basic Auth
 
   use Mojo::Util qw(b64_encode);
 
-  app->helper(basic_auth => sub {
-    my ($c, @values) = @_;
+  app->helper(basic_auth => sub ($c, @values) {
     return {Authorization => 'Basic ' . b64_encode join(':' => @values), ''};
   });
 
@@ -606,11 +605,9 @@ test assertions. Let's say we want to test the C<Location> header after a redire
 L<Role::Tiny> that implements a test assertion named C<location_is>:
 
   package Test::Mojo::Role::Location;
-  use Mojo::Base -role;
+  use Mojo::Base -role, -signatures;
 
-  sub location_is {
-    my ($self, $value, $desc) = @_;
-    $desc ||= "Location: $value";
+  sub location_is ($self, $value, $desc = "Location: $value") {
     return $self->test('is', $self->tx->res->headers->location, $value, $desc);
   }
 

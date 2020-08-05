@@ -198,8 +198,7 @@ Mojo::Server::Prefork - Pre-forking non-blocking I/O HTTP and WebSocket server
   use Mojo::Server::Prefork;
 
   my $prefork = Mojo::Server::Prefork->new(listen => ['http://*:8080']);
-  $prefork->unsubscribe('request')->on(request => sub {
-    my ($prefork, $tx) = @_;
+  $prefork->unsubscribe('request')->on(request => sub ($prefork, $tx) {
 
     # Request
     my $method = $tx->req->method;
@@ -263,71 +262,43 @@ L<Mojo::Server::Prefork> inherits all events from L<Mojo::Server::Daemon> and ca
 
 =head2 finish
 
-  $prefork->on(finish => sub {
-    my ($prefork, $graceful) = @_;
-    ...
-  });
+  $prefork->on(finish => sub ($prefork, $graceful) {...});
 
 Emitted when the server shuts down.
 
-  $prefork->on(finish => sub {
-    my ($prefork, $graceful) = @_;
-    say $graceful ? 'Graceful server shutdown' : 'Server shutdown';
-  });
+  $prefork->on(finish => sub ($prefork, $graceful) { say $graceful ? 'Graceful server shutdown' : 'Server shutdown'; });
 
 =head2 heartbeat
 
-  $prefork->on(heartbeat => sub {
-    my ($prefork, $pid) = @_;
-    ...
-  });
+  $prefork->on(heartbeat => sub ($prefork, $pid) {...});
 
 Emitted when a heartbeat message has been received from a worker.
 
-  $prefork->on(heartbeat => sub {
-    my ($prefork, $pid) = @_;
-    say "Worker $pid has a heartbeat";
-  });
+  $prefork->on(heartbeat => sub ($prefork, $pid) { say "Worker $pid has a heartbeat"; });
 
 =head2 reap
 
-  $prefork->on(reap => sub {
-    my ($prefork, $pid) = @_;
-    ...
-  });
+  $prefork->on(reap => sub ($prefork, $pid) {...});
 
 Emitted when a child process exited.
 
-  $prefork->on(reap => sub {
-    my ($prefork, $pid) = @_;
-    say "Worker $pid stopped";
-  });
+  $prefork->on(reap => sub ($prefork, $pid) { say "Worker $pid stopped"; });
 
 =head2 spawn
 
-  $prefork->on(spawn => sub {
-    my ($prefork, $pid) = @_;
-    ...
-  });
+  $prefork->on(spawn => sub ($prefork, $pid) {...});
 
 Emitted when a worker process is spawned.
 
-  $prefork->on(spawn => sub {
-    my ($prefork, $pid) = @_;
-    say "Worker $pid started";
-  });
+  $prefork->on(spawn => sub ($prefork, $pid) { say "Worker $pid started"; });
 
 =head2 wait
 
-  $prefork->on(wait => sub {
-    my $prefork = shift;
-    ...
-  });
+  $prefork->on(wait => sub ($prefork) {...});
 
 Emitted when the manager starts waiting for new heartbeat messages.
 
-  $prefork->on(wait => sub {
-    my $prefork = shift;
+  $prefork->on(wait => sub ($prefork) {
     my $workers = $prefork->workers;
     say "Waiting for heartbeat messages from $workers workers";
   });

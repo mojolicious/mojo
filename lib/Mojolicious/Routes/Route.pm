@@ -328,7 +328,9 @@ A hash reference is used to specify optional placeholders and default values for
 And a code reference can be used to specify a C<cb> value to be merged into the default values for the stash.
 
   # Route with pattern and a closure as destination
-  $r->any('/:foo' => sub ($c) { $c->render(text => 'Hello World!'); });
+  $r->any('/:foo' => sub ($c) {
+    $c->render(text => 'Hello World!');
+  });
 
 See L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
@@ -627,7 +629,9 @@ In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call sh
 L<Mojolicious::Routes::Route> objects.
 
   # Add a "firefox" shortcut
-  $r->root->add_shortcut(firefox => sub ($r, $path) { $r->get($path, agent => qr/Firefox/); });
+  $r->root->add_shortcut(firefox => sub ($r, $path) {
+    $r->get($path, agent => qr/Firefox/);
+  });
 
   # Use "firefox" shortcut to generate routes
   $r->firefox('/welcome')->to('firefox#welcome');

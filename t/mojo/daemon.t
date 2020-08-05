@@ -84,9 +84,9 @@ is ref $daemon->app, 'TestApp', 'right reference';
 
 # Load broken app
 my $bin = curfile->dirname;
-eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderTest/A.pm"); };
+eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderTest/A.pm") };
 like $@, qr/did not return an application object/, 'right error';
-eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderException.pm"); };
+eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderException.pm") };
 like $@, qr/^Can't load application/, 'right error';
 
 # Load missing application class
@@ -335,7 +335,7 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->body, $port, 'right content';
 
 # No TLS support
-eval { Mojo::Server::Daemon->new(listen => ['https://127.0.0.1'], silent => 1)->start; };
+eval { Mojo::Server::Daemon->new(listen => ['https://127.0.0.1'], silent => 1)->start };
 like $@, qr/IO::Socket::SSL/, 'right error';
 
 # Abstract methods

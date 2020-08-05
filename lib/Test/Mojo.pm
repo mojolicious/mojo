@@ -474,7 +474,9 @@ L<Test::Mojo> implements the following attributes.
 
 A callback to connect L<Test::Mojo> with L<Test::More>.
 
-  $t->handler(sub ($name, @args) { return Test::More->can($name)->(@args); });
+  $t->handler(sub ($name, @args) {
+    return Test::More->can($name)->(@args);
+  });
 
 =head2 message
 
@@ -547,7 +549,7 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
     ->json_is('/1/content', 'Mojo rocks!');
 
   # Customize all transactions (including followed redirects)
-  $t->ua->on(start => sub ($ua, $tx) { $tx->req->headers->accept_language('en-US'); });
+  $t->ua->on(start => sub ($ua, $tx) { $tx->req->headers->accept_language('en-US') });
   $t->get_ok('/hello')->status_is(200)->content_like(qr/Howdy/);
 
 =head1 METHODS

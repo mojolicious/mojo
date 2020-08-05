@@ -209,7 +209,9 @@ Restart timer and optionally change the invocation time. Note that this method r
 Watch handle for I/O events, invoking the callback whenever handle becomes readable or writable.
 
   # Callback will be executed twice if handle becomes readable and writable
-  $reactor->io($handle => sub ($reactor, $writable) { say $writable ? 'Handle is writable' : 'Handle is readable'; });
+  $reactor->io($handle => sub ($reactor, $writable) {
+    say $writable ? 'Handle is writable' : 'Handle is readable';
+  });
 
 =head2 is_running
 

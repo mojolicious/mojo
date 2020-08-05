@@ -380,7 +380,7 @@ value of the callback if it is called, or to its original fulfillment value if t
   });
 
   # Change the rejection reason
-  $promise->catch(sub (@reason) { return "This is bad: $reason[0]"; });
+  $promise->catch(sub (@reason) { "This is bad: $reason[0]" });
 
 =head2 clone
 
@@ -396,7 +396,7 @@ Appends a fulfillment and rejection handler to the promise, and returns a new L<
 original fulfillment value or rejection reason.
 
   # Do something on fulfillment and rejection
-  $promise->finally(sub { say "We are done!"; });
+  $promise->finally(sub { say "We are done!" });
 
 =head2 map
 
@@ -489,8 +489,8 @@ return value of the called handler.
 
   # Change the fulfillment value or rejection reason
   $promise->then(
-    sub (@value) { return "This is good: $value[0]"; },
-    sub (@reason) { return "This is bad: $reason[0]"; }
+    sub (@value)  { return "This is good: $value[0]" },
+    sub (@reason) { return "This is bad: $reason[0]" }
   );
 
 =head2 timer

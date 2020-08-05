@@ -24,7 +24,9 @@ L<Mojolicious::Lite>, turning your script into a full featured web application.
   #!/usr/bin/env perl
   use Mojolicious::Lite -signatures;
 
-  get '/' => sub ($c) { $c->render(text => 'Hello World!'); };
+  get '/' => sub ($c) {
+    $c->render(text => 'Hello World!');
+  };
 
   app->start;
 
@@ -81,7 +83,9 @@ L<Mojolicious::Controller> object, containing both the HTTP request and response
   use Mojolicious::Lite -signatures;
 
   # Route leading to an action that renders some text
-  get '/foo' => sub ($c) { $c->render(text => 'Hello World!'); };
+  get '/foo' => sub ($c) {
+    $c->render(text => 'Hello World!');
+  };
 
   app->start;
 
@@ -202,7 +206,9 @@ L<Mojolicious::Plugin::TagHelpers/"link_to"> rely.
   use Mojolicious::Lite -signatures;
 
   # Render the template "index.html.ep"
-  get '/' => sub ($c) { $c->render; } => 'index';
+  get '/' => sub ($c) {
+    $c->render;
+  } => 'index';
 
   # Render the template "hello.html.ep"
   get '/hello';
@@ -394,7 +400,9 @@ L<Mojolicious::Lite/"any">.
   use Mojolicious::Lite -signatures;
 
   # GET /hello
-  get '/hello' => sub ($c) { $c->render(text => 'Hello World!'); };
+  get '/hello' => sub ($c) {
+    $c->render(text => 'Hello World!');
+  };
 
   # PUT /hello
   put '/hello' => sub ($c) {
@@ -403,7 +411,9 @@ L<Mojolicious::Lite/"any">.
   };
 
   # GET|POST|PATCH /bye
-  any ['GET', 'POST', 'PATCH'] => '/bye' => sub ($c) { $c->render(text => 'Bye World!'); };
+  any ['GET', 'POST', 'PATCH'] => '/bye' => sub ($c) {
+    $c->render(text => 'Bye World!');
+  };
 
   # * /whatever
   any '/whatever' => sub ($c) {
@@ -676,7 +686,9 @@ They have a higher precedence than templates in the C<DATA> section.
   use Mojolicious::Lite -signatures;
 
   # Render template "templates/foo/bar.html.ep"
-  any '/external' => sub ($c) { $c->render(template => 'foo/bar'); };
+  any '/external' => sub ($c) {
+    $c->render(template => 'foo/bar');
+  };
 
   app->start;
 
@@ -698,7 +710,9 @@ L<Mojo::File/"slurp">, that will help you keep your application portable across 
   my $hello = app->home->child('cache', 'hello.txt')->slurp;
 
   # Display message
-  get '/' => sub ($c) { $c->render(text => $hello); };
+  get '/' => sub ($c) {
+    $c->render(text => $hello);
+  };
 
 You can also introspect your application from the command line with L<Mojolicious::Command::eval>.
 
@@ -722,7 +736,9 @@ constructs.
   };
 
   # http://mojolicious.org/bar
-  get '/bar' => (host => 'mojolicious.org') => sub ($c) { $c->render(text => 'Hello Mojolicious.'); };
+  get '/bar' => (host => 'mojolicious.org') => sub ($c) {
+    $c->render(text => 'Hello Mojolicious.');
+  };
 
   app->start;
 
@@ -735,7 +751,9 @@ L<Mojo::JSON> and stored client-side, with a cryptographic signature to prevent 
   use Mojolicious::Lite -signatures;
 
   # Access session data in action and template
-  get '/counter' => sub ($c) { $c->session->{counter}++; };
+  get '/counter' => sub ($c) {
+    $c->session->{counter}++;
+  };
 
   app->start;
   __DATA__
@@ -811,7 +829,9 @@ L<Mojo::DOM> this can be a very powerful tool.
 
   # Non-blocking
   get '/title' => sub ($c) {
-    $c->ua->get('mojolicious.org' => sub ($ua, $tx) { $c->render(data => $tx->result->dom->at('title')->text); });
+    $c->ua->get('mojolicious.org' => sub ($ua, $tx) {
+      $c->render(data => $tx->result->dom->at('title')->text);
+    });
   };
 
   # Concurrent non-blocking

@@ -70,13 +70,13 @@ Mojo::EventEmitter - Event emitter base class
   use Mojo::Base 'Mojo::EventEmitter', -signatures;
 
   # Emit events
-  sub poke ($self) { $self->emit(roar => 3); }
+  sub poke ($self) { $self->emit(roar => 3) }
 
   package main;
 
   # Subscribe to events
   my $tiger = Cat->new;
-  $tiger->on(roar => sub ($tiger, $times) { say 'RAWR!' for 1 .. $times; });
+  $tiger->on(roar => sub ($tiger, $times) { say 'RAWR!' for 1 .. $times });
   $tiger->poke;
 
 =head1 DESCRIPTION
@@ -94,7 +94,7 @@ L<Mojo::EventEmitter> can emit the following events.
 This is a special event for errors, it will not be emitted directly by this class, but is fatal if unhandled.
 Subclasses may choose to emit it, but are not required to do so.
 
-  $e->on(error => sub ($e, $err) { say "This looks bad: $err"; });
+  $e->on(error => sub ($e, $err) { say "This looks bad: $err" });
 
 =head1 METHODS
 

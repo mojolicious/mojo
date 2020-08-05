@@ -358,11 +358,15 @@ L<Mojolicious::Routes/"namespaces">, which usually defaults to a namespace based
 The C<cb> stash value, which won't be inherited by nested routes, can be used to bypass controllers and execute a
 callback instead.
 
-  $r->get('/bye')->to(cb => sub ($c) { $c->render(text => 'Good bye.'); });
+  $r->get('/bye')->to(cb => sub ($c) {
+    $c->render(text => 'Good bye.');
+  });
 
 But just like in L<Mojolicious::Lite> you can also pass the callback directly, which usually looks much better.
 
-  $r->get('/bye' => sub ($c) { $c->render(text => 'Good bye.'); });
+  $r->get('/bye' => sub ($c) {
+    $c->render(text => 'Good bye.');
+  });
 
 =head2 Named routes
 
@@ -617,7 +621,11 @@ normal C<GET> requests with some additional information.
   use Mojo::Base 'Mojolicious::Controller', -signatures;
 
   # Action
-  sub echo ($self) { $self->on(message => sub ($self, $msg) { $self->send("echo: $msg"); }); }
+  sub echo ($self) {
+    $self->on(message => sub ($self, $msg) {
+      $self->send("echo: $msg");
+    });
+  }
 
   1;
 
@@ -698,10 +706,14 @@ indiscriminately through L<Mojolicious/"hook">, which makes them a very powerful
 Post-processing the response to add or remove headers is a very common use.
 
   # Make sure static files are cached
-  $app->hook(after_static => sub ($c) { $c->res->headers->cache_control('max-age=3600, must-revalidate'); });
+  $app->hook(after_static => sub ($c) {
+    $c->res->headers->cache_control('max-age=3600, must-revalidate');
+  });
 
   # Remove a default header
-  $app->hook(after_dispatch => sub ($c) { $c->res->headers->remove('Server'); });
+  $app->hook(after_dispatch => sub ($c) {
+    $c->res->headers->remove('Server');
+  });
 
 Same for pre-processing the request.
 
@@ -728,7 +740,9 @@ You can even extend much of the core functionality.
   });
 
   # Pass route name as argument to actions
-  $app->hook(around_action => sub ($next, $c, $action, $last) { return $c->$action($c->current_route); });
+  $app->hook(around_action => sub ($next, $c, $action, $last) {
+    return $c->$action($c->current_route);
+  });
 
 For a full list of available hooks see L<Mojolicious/"HOOKS">.
 

@@ -145,7 +145,7 @@ L<Mojo::IOLoop::Subprocess> inherits all events from L<Mojo::EventEmitter> and c
 
 Emitted in the subprocess right before the process will exit.
 
-  $subprocess->on(cleanup => sub ($subprocess) { say "Process $$ is about to exit"; });
+  $subprocess->on(cleanup => sub ($subprocess) { say "Process $$ is about to exit" });
 
 =head2 progress
 
@@ -175,7 +175,7 @@ L<Mojo::IOLoop::Subprocess> implements the following attributes.
 
 A callback used to deserialize subprocess return values, defaults to using L<Mojo::JSON>.
 
-  $subprocess->deserialize(sub ($bytes) { return []; });
+  $subprocess->deserialize(sub ($bytes) { return [] });
 
 =head2 ioloop
 
@@ -191,7 +191,7 @@ Event loop object to control, defaults to the global L<Mojo::IOLoop> singleton. 
 
 A callback used to serialize subprocess return values, defaults to using L<Mojo::JSON>.
 
-  $subprocess->serialize(sub ($array) { return ''; });
+  $subprocess->serialize(sub ($array) { return '' });
 
 =head1 METHODS
 
@@ -230,7 +230,7 @@ called by the subprocess and emits the L</"progress"> event in the parent proces
       say $results[0];
     }
   );
-  $subprocess->on(progress => sub ($subprocess, @data) { say "Progress is $data[0]"; });
+  $subprocess->on(progress => sub ($subprocess, @data) { say "Progress is $data[0]" });
 
 =head2 run
 

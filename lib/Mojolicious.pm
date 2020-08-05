@@ -218,14 +218,18 @@ Mojolicious - Real-time web framework
   use Mojo::Base 'Mojolicious', -signatures;
 
   # Route
-  sub startup ($self) { $self->routes->get('/hello')->to('foo#hello'); }
+  sub startup ($self) {
+    $self->routes->get('/hello')->to('foo#hello');
+  }
 
   # Controller
   package MyApp::Controller::Foo;
   use Mojo::Base 'Mojolicious::Controller', -signatures;
 
   # Action
-  sub hello ($self) { $self->render(text => 'Hello World!'); }
+  sub hello ($self) {
+    $self->render(text => 'Hello World!');
+  }
 
 =head1 DESCRIPTION
 
@@ -549,10 +553,14 @@ A full featured HTTP user agent for use in your applications, defaults to a L<Mo
 Validate values, defaults to a L<Mojolicious::Validator> object.
 
   # Add validation check
-  $app->validator->add_check(foo => sub ($v, $name, $value) { return $value ne 'foo'; });
+  $app->validator->add_check(foo => sub ($v, $name, $value) {
+    return $value ne 'foo';
+  });
 
   # Add validation filter
-  $app->validator->add_filter(quotemeta => sub ($v, $name, $value) { return quotemeta $value; });
+  $app->validator->add_filter(quotemeta => sub ($v, $name, $value) {
+    return quotemeta $value;
+  });
 
 =head1 METHODS
 

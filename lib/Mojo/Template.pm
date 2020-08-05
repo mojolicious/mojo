@@ -492,7 +492,7 @@ Encoding used for template files, defaults to C<UTF-8>.
 
 A callback used to escape the results of escaped expressions, defaults to L<Mojo::Util/"xml_escape">.
 
-  $mt->escape(sub ($str) { return reverse $str; });
+  $mt->escape(sub ($str) { return reverse $str });
 
 =head2 escape_mark
 

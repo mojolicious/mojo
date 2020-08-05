@@ -54,9 +54,13 @@ Mojo::DynamicMethods - Fast dynamic method dispatch
 
   use Mojo::DynamicMethods -dispatch;
 
-  sub BUILD_DYNAMIC ($class, $method, $dyn_methods) { return sub {...}; }
+  sub BUILD_DYNAMIC ($class, $method, $dyn_methods) {
+    return sub {...};
+  }
 
-  sub add_helper ($self, $name, $cb) { Mojo::DynamicMethods::register 'MyClass', $self, $name, $cb; }
+  sub add_helper ($self, $name, $cb) {
+    Mojo::DynamicMethods::register 'MyClass', $self, $name, $cb;
+  }
 
   package main;
 

@@ -9,8 +9,11 @@ use Mojo::IOLoop;
 my %buffer;
 Mojo::IOLoop->server(
   {port => 3000} => sub ($loop, $stream, $id) {
+
     # Connection to client
-    $stream->on(read => sub ($stream, $chunk) {
+    $stream->on(
+      read => sub ($stream, $chunk) {
+
         # Write chunk from client to server
         my $server = $buffer{$id}{connection};
         return Mojo::IOLoop->stream($server)->write($chunk) if $server;
@@ -37,7 +40,7 @@ Mojo::IOLoop->server(
                 # Start forwarding data in both directions
                 say "Forwarding to $address:$port";
                 Mojo::IOLoop->stream($id)->write("HTTP/1.1 200 OK\x0d\x0a" . "Connection: keep-alive\x0d\x0a\x0d\x0a");
-                $stream->on(read => sub ($stream, $chunk) { Mojo::IOLoop->stream($id)->write($chunk); });
+                $stream->on(read => sub ($stream, $chunk) { Mojo::IOLoop->stream($id)->write($chunk) });
 
                 # Server closed connection
                 $stream->on(

@@ -69,7 +69,7 @@ L<Mojo::Reactor> inherits all events from L<Mojo::EventEmitter> and can emit the
 Emitted for exceptions caught in callbacks, fatal if unhandled. Note that if this event is unhandled or fails it might
 kill your program, so you need to be careful.
 
-  $reactor->on(error => sub ($reactor, $err) { say "Something very bad happened: $err"; });
+  $reactor->on(error => sub ($reactor, $err) { say "Something very bad happened: $err" });
 
 =head1 METHODS
 
@@ -101,7 +101,9 @@ Watch handle for I/O events, invoking the callback whenever handle becomes reada
 in a subclass.
 
   # Callback will be executed twice if handle becomes readable and writable
-  $reactor->io($handle => sub ($reactor, $writable) { say $writable ? 'Handle is writable' : 'Handle is readable'; });
+  $reactor->io($handle => sub ($reactor, $writable) {
+    say $writable ? 'Handle is writable' : 'Handle is readable';
+  });
 
 =head2 is_running
 

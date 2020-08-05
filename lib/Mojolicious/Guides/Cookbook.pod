@@ -1049,7 +1049,7 @@ can be a very powerful tool especially for testing web application.
   say 'Title: ', $res->dom->at('head > title')->text;
 
   # Extract headings
-  $res->dom('h1, h2, h3')->each(sub ($dom, $i) { say 'Heading: ', $dom->all_text; });
+  $res->dom('h1, h2, h3')->each(sub ($dom, $i) { say 'Heading: ', $dom->all_text });
 
   # Visit all nodes recursively to extract more than just text
   for my $n ($res->dom->descendant_nodes->each) {
@@ -1563,7 +1563,9 @@ them using their full class name.
 
   plugin 'MyApp::Plugin::MyHelpers';
 
-  get '/' => sub ($c) { $c->my_helpers->render_with_header(text => 'I ♥ Mojolicious!'); };
+  get '/' => sub ($c) {
+    $c->my_helpers->render_with_header(text => 'I ♥ Mojolicious!');
+  };
 
   app->start;
 

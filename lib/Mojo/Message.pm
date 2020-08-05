@@ -316,7 +316,7 @@ L<Mojo::Message> inherits all events from L<Mojo::EventEmitter> and can emit the
 Emitted after message building or parsing is finished.
 
   my $before = time;
-  $msg->on(finish => sub ($msg) { $msg->headers->header('X-Parser-Time' => time - $before); });
+  $msg->on(finish => sub ($msg) { $msg->headers->header('X-Parser-Time' => time - $before) });
 
 =head2 progress
 
@@ -325,7 +325,7 @@ Emitted after message building or parsing is finished.
 Emitted when message building or parsing makes progress.
 
   # Building
-  $msg->on(progress => sub ($msg, $state, $offset) { say qq{Building "$state" at offset $offset}; });
+  $msg->on(progress => sub ($msg, $state, $offset) { say qq{Building "$state" at offset $offset} });
 
   # Parsing
   $msg->on(progress => sub ($msg) {

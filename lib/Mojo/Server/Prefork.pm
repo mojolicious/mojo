@@ -266,7 +266,9 @@ L<Mojo::Server::Prefork> inherits all events from L<Mojo::Server::Daemon> and ca
 
 Emitted when the server shuts down.
 
-  $prefork->on(finish => sub ($prefork, $graceful) { say $graceful ? 'Graceful server shutdown' : 'Server shutdown'; });
+  $prefork->on(finish => sub ($prefork, $graceful) {
+    say $graceful ? 'Graceful server shutdown' : 'Server shutdown';
+  });
 
 =head2 heartbeat
 
@@ -274,7 +276,7 @@ Emitted when the server shuts down.
 
 Emitted when a heartbeat message has been received from a worker.
 
-  $prefork->on(heartbeat => sub ($prefork, $pid) { say "Worker $pid has a heartbeat"; });
+  $prefork->on(heartbeat => sub ($prefork, $pid) { say "Worker $pid has a heartbeat" });
 
 =head2 reap
 
@@ -282,7 +284,7 @@ Emitted when a heartbeat message has been received from a worker.
 
 Emitted when a child process exited.
 
-  $prefork->on(reap => sub ($prefork, $pid) { say "Worker $pid stopped"; });
+  $prefork->on(reap => sub ($prefork, $pid) { say "Worker $pid stopped" });
 
 =head2 spawn
 
@@ -290,7 +292,7 @@ Emitted when a child process exited.
 
 Emitted when a worker process is spawned.
 
-  $prefork->on(spawn => sub ($prefork, $pid) { say "Worker $pid started"; });
+  $prefork->on(spawn => sub ($prefork, $pid) { say "Worker $pid started" });
 
 =head2 wait
 

@@ -105,7 +105,9 @@ how similar both of them are.
 The functions L</"get">, L</"post"> and friends all have equivalent methods.
 
   # Mojolicious::Lite
-  get '/foo' => sub ($c) { $c->render(text => 'Hello World!'); };
+  get '/foo' => sub ($c) {
+    $c->render(text => 'Hello World!');
+  };
 
   # Mojolicious
   sub startup ($self) {

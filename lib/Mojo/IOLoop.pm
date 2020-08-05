@@ -254,7 +254,7 @@ Mojo::IOLoop - Minimalistic event loop
   });
 
   # Add a timer
-  Mojo::IOLoop->timer(5 => sub ($loop) { $loop->remove($id); });
+  Mojo::IOLoop->timer(5 => sub ($loop) { $loop->remove($id) });
 
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

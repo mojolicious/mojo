@@ -133,7 +133,7 @@ have security implications though. For more control you can also use the C<expir
 
 A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
 
-  $sessions->deserialize(sub ($bytes) { return {}; });
+  $sessions->deserialize(sub ($bytes) { return {} });
 
 =head2 samesite
 
@@ -161,7 +161,7 @@ Set the secure flag on all session cookies, so that browsers send them only over
 
 A callback used to serialize sessions, defaults to L<Mojo::JSON/"encode_json">.
 
-  $sessions->serialize(sub ($hash) { return ''; });
+  $sessions->serialize(sub ($hash) { return '' });
 
 =head1 METHODS
 

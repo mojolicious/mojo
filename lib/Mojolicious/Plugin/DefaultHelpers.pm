@@ -560,7 +560,7 @@ possible, returns a L<Mojo::Promise> object.
   $headers->header('X-Proxy' => 'Mojo');
   my $tx = $c->ua->build_tx(GET => 'http://example.com' => $headers->to_hash);
   $c->proxy->start_p($tx);
-  $tx->res->content->once(body => sub ($content) { $c->res->headers->header('X-Proxy' => 'Mojo'); });
+  $tx->res->content->once(body => sub ($content) { $c->res->headers->header('X-Proxy' => 'Mojo') });
 
 =head2 redirect_to
 

@@ -598,9 +598,13 @@ could do.
 
   use Mojolicious::Lite -signatures;
 
-  helper debug => sub ($c, $str) { $c->app->log->debug($str); };
+  helper debug => sub ($c, $str) {
+    $c->app->log->debug($str);
+  };
 
-  get '/' => sub ($c) { $c->debug('Hello from an action!'); } => 'index';
+  get '/' => sub ($c) {
+    $c->debug('Hello from an action!');
+  } => 'index';
 
   app->start;
   __DATA__
@@ -638,9 +642,8 @@ that returns a proxy object containing the current controller object and on whic
 
   use Mojolicious::Lite -signatures;
 
-  helper 'cache_control.no_caching' => sub ($c) { $c->res->headers->cache_control('private, max-age=0, no-cache'); };
-
-  helper 'cache_control.five_minutes' => sub ($c) { $c->res->headers->cache_control('public, max-age=300'); };
+  helper 'cache_control.no_caching'   => sub ($c) { $c->res->headers->cache_control('private, max-age=0, no-cache') };
+  helper 'cache_control.five_minutes' => sub ($c) { $c->res->headers->cache_control('public, max-age=300') };
 
   get '/news' => sub ($c) {
     $c->cache_control->no_caching;
@@ -953,14 +956,18 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>file">.
 
   use Mojolicious::Lite -signatures;
 
-  get '/' => sub ($c) { $c->reply->static('index.html'); };
+  get '/' => sub ($c) {
+    $c->reply->static('index.html');
+  };
 
   get '/some_download' => sub ($c) {
     $c->res->headers->content_disposition('attachment; filename=bar.png;');
     $c->reply->static('foo/bar.png');
   };
 
-  get '/leak' => sub ($c) { $c->reply->file('/etc/passwd'); };
+  get '/leak' => sub ($c) {
+    $c->reply->file('/etc/passwd');
+  };
 
   app->start;
 
@@ -1002,7 +1009,11 @@ Some helpers might be useful enough for you to share them between multiple appli
   package Mojolicious::Plugin::DebugHelper;
   use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
-  sub register ($self, $app, $conf) { $app->helper(debug => sub ($c, $str) { $c->app->log->debug($str); }); }
+  sub register ($self, $app, $conf) {
+    $app->helper(debug => sub ($c, $str) {
+      $c->app->log->debug($str);
+    });
+  }
 
   1;
 

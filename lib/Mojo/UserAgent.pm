@@ -403,7 +403,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     ->result->save_to('/home/sri/mojo.tar.gz');
 
   # Non-blocking request
-  $ua->get('mojolicious.org' => sub ($ua, $tx) { say $tx->result->dom->at('title')->text; });
+  $ua->get('mojolicious.org' => sub ($ua, $tx) { say $tx->result->dom->at('title')->text });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
   # Concurrent non-blocking requests (synchronized with promises)
@@ -463,7 +463,9 @@ includes automatically prepared proxy C<CONNECT> requests and followed redirects
 Emitted whenever a new transaction is about to start. This includes automatically prepared proxy C<CONNECT> requests
 and followed redirects.
 
-  $ua->on(start => sub ($ua, $tx) { $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!'); });
+  $ua->on(start => sub ($ua, $tx) {
+    $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
+  });
 
 =head1 ATTRIBUTES
 
@@ -630,7 +632,7 @@ Application server relative URLs will be processed with, defaults to a L<Mojo::U
 
   # Mock web service
   $ua->server->app(Mojolicious->new);
-  $ua->server->app->routes->get('/time' => sub ($c) { $c->render(json => {now => time}); });
+  $ua->server->app->routes->get('/time' => sub ($c) { $c->render(json => {now => time}) });
   my $time = $ua->get('/time')->result->json->{now};
 
   # Change log level
@@ -717,7 +719,7 @@ Perform blocking C<DELETE> request and return resulting L<Mojo::Transaction::HTT
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<DELETE> method, which is implied). You can also append a callback
 to perform requests non-blocking.
 
-  $ua->delete('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->delete('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 delete_p
@@ -744,7 +746,7 @@ Perform blocking C<GET> request and return resulting L<Mojo::Transaction::HTTP> 
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<GET> method, which is implied). You can also append a callback to
 perform requests non-blocking.
 
-  $ua->get('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->get('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 get_p
@@ -771,7 +773,7 @@ Perform blocking C<HEAD> request and return resulting L<Mojo::Transaction::HTTP>
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<HEAD> method, which is implied). You can also append a callback
 to perform requests non-blocking.
 
-  $ua->head('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->head('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 head_p
@@ -798,7 +800,7 @@ Perform blocking C<OPTIONS> request and return resulting L<Mojo::Transaction::HT
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<OPTIONS> method, which is implied). You can also append a
 callback to perform requests non-blocking.
 
-  $ua->options('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->options('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 options_p
@@ -825,7 +827,7 @@ Perform blocking C<PATCH> request and return resulting L<Mojo::Transaction::HTTP
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PATCH> method, which is implied). You can also append a callback
 to perform requests non-blocking.
 
-  $ua->patch('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->patch('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 patch_p
@@ -852,7 +854,7 @@ Perform blocking C<POST> request and return resulting L<Mojo::Transaction::HTTP>
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<POST> method, which is implied). You can also append a callback
 to perform requests non-blocking.
 
-  $ua->post('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->post('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 post_p
@@ -879,7 +881,7 @@ Perform blocking C<PUT> request and return resulting L<Mojo::Transaction::HTTP> 
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PUT> method, which is implied). You can also append a callback to
 perform requests non-blocking.
 
-  $ua->put('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->put('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 put_p
@@ -903,7 +905,7 @@ Perform blocking request for a custom L<Mojo::Transaction::HTTP> object, which c
 L</"build_tx">. You can also append a callback to perform requests non-blocking.
 
   my $tx = $ua->build_tx(GET => 'http://example.com');
-  $ua->start($tx => sub ($ua, $tx) { say $tx->result->body; });
+  $ua->start($tx => sub ($ua, $tx) { say $tx->result->body });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 start_p
@@ -932,7 +934,7 @@ L<Mojo::Transaction::HTTP> object, depending on if the handshake was successful.
   $ua->websocket('wss://example.com/echo' => ['v1.proto'] => sub ($ua, $tx) {
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     say 'Subprotocol negotiation failed!' and return unless $tx->protocol;
-    $tx->on(finish => sub ($tx, $code, $reason) { say "WebSocket closed with status $code."; });
+    $tx->on(finish => sub ($tx, $code, $reason) { say "WebSocket closed with status $code." });
     $tx->on(message => sub ($tx, $msg) {
       say "WebSocket message: $msg";
       $tx->finish;

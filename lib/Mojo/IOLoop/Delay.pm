@@ -117,7 +117,7 @@ callback, and that leads to the next closure in the series when executed.
 
   # Instead of nested closures we now have a simple chain of steps
   my $delay = Mojo::IOLoop->delay(
-    sub ($delay) { Mojo::IOLoop->timer(3 => $delay->begin); },
+    sub ($delay) { Mojo::IOLoop->timer(3 => $delay->begin) },
     sub ($delay) {
       say '3 seconds';
       Mojo::IOLoop->timer(3 => $delay->begin);
@@ -126,7 +126,7 @@ callback, and that leads to the next closure in the series when executed.
       say '6 seconds';
       Mojo::IOLoop->timer(3 => $delay->begin);
     },
-    sub ($delay) { say '9 seconds'; }
+    sub ($delay) { say '9 seconds' }
   );
   $delay->wait;
 

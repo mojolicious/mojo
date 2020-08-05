@@ -295,7 +295,9 @@ L<Mojo::Content> inherits all events from L<Mojo::EventEmitter> and can emit the
 
 Emitted once all headers have been parsed and the body starts.
 
-  $content->on(body => sub ($content) { $content->auto_upgrade(0) if $content->headers->header('X-No-MultiPart'); });
+  $content->on(body => sub ($content) {
+    $content->auto_upgrade(0) if $content->headers->header('X-No-MultiPart');
+  });
 
 =head2 drain
 
@@ -303,7 +305,9 @@ Emitted once all headers have been parsed and the body starts.
 
 Emitted once all data has been written.
 
-  $content->on(drain => sub ($content) { $content->write_chunk(time); });
+  $content->on(drain => sub ($content) {
+    $content->write_chunk(time);
+  });
 
 =head2 read
 
@@ -311,7 +315,9 @@ Emitted once all data has been written.
 
 Emitted when a new chunk of content arrives.
 
-  $content->on(read => sub ($content, $bytes) { say "Streaming: $bytes"; });
+  $content->on(read => sub ($content, $bytes) {
+    say "Streaming: $bytes";
+  });
 
 =head1 ATTRIBUTES
 

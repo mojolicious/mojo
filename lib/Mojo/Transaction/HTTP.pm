@@ -184,7 +184,7 @@ L<Mojo::Transaction::HTTP> inherits all events from L<Mojo::Transaction> and can
 
 Emitted when a request is ready and needs to be handled.
 
-  $tx->on(request => sub ($tx) { $tx->res->headers->header('X-Bender' => 'Bite my shiny metal ass!'); });
+  $tx->on(request => sub ($tx) { $tx->res->headers->header('X-Bender' => 'Bite my shiny metal ass!') });
 
 =head2 resume
 
@@ -198,7 +198,7 @@ Emitted when transaction is resumed.
 
 Emitted for unexpected C<1xx> responses that will be ignored.
 
-  $tx->on(unexpected => sub ($tx) { $tx->res->on(finish => sub { say 'Follow-up response is finished.' }); });
+  $tx->on(unexpected => sub ($tx) { $tx->res->on(finish => sub { say 'Follow-up response is finished.' }) });
 
 =head1 ATTRIBUTES
 

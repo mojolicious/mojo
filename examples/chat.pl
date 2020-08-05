@@ -16,7 +16,7 @@ websocket '/channel' => sub ($c) {
 
   # Forward messages to the browser
   my $cb = $c->events->on(mojochat => sub { $c->send(pop) });
-  $c->on(finish => sub ($c, $code, $reason = undef) { $c->events->unsubscribe(mojochat => $cb); });
+  $c->on(finish => sub ($c, $code, $reason = undef) { $c->events->unsubscribe(mojochat => $cb) });
 };
 
 app->start;

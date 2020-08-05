@@ -452,13 +452,19 @@ object. This method will automatically respond to WebSocket handshake requests w
 establish the WebSocket connection.
 
   # Do something after the transaction has been finished
-  $c->on(finish => sub ($c) { $c->app->log->debug('All data has been sent') });
+  $c->on(finish => sub ($c) {
+    $c->app->log->debug('All data has been sent');
+  });
 
   # Receive WebSocket message
-  $c->on(message => sub ($c, $msg) { $c->app->log->debug("Message: $msg") });
+  $c->on(message => sub ($c, $msg) {
+    $c->app->log->debug("Message: $msg");
+  });
 
   # Receive JSON object via WebSocket message
-  $c->on(json => sub ($c, $hash) { $c->app->log->debug("Test: $hash->{test}") });
+  $c->on(json => sub ($c, $hash) {
+    $c->app->log->debug("Test: $hash->{test}");
+  });
 
   # Receive WebSocket "Binary" message
   $c->on(binary => sub ($c, $bytes) {

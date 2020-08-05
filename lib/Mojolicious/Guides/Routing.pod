@@ -911,7 +911,9 @@ self-contained applications under a domain and/or prefix.
   plugin Mount => {'test.example.com' => '/home/sri/myapp2.pl'};
 
   # Normal route
-  get '/' => sub ($c) { $c->render(text => 'Hello World!') };
+  get '/' => sub ($c) {
+    $c->render(text => 'Hello World!');
+  };
 
   app->start;
 

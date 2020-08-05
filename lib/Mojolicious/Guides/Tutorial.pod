@@ -182,7 +182,9 @@ valuable information that will aid you in debugging your application.
   use Mojolicious::Lite -signatures;
 
   # Not found (404)
-  get '/missing' => sub ($c) { $c->render(template => 'does_not_exist') };
+  get '/missing' => sub ($c) {
+    $c->render(template => 'does_not_exist');
+  };
 
   # Exception (500)
   get '/dies' => sub { die 'Intentional error' };

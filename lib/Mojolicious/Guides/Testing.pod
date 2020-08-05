@@ -231,7 +231,9 @@ value is set:
 
   # NEW: this route only exists if "enable_weather" is set in the configuration
   if ($config->{enable_weather}) {
-    $r->get('/weather' => sub ($c) { $c->render(text => "It's hot! 🔥") }
+    $r->get('/weather' => sub ($c) {
+      $c->render(text => "It's hot! 🔥");
+    });
   }
 
 To test this new feature, we don't even need to create a configuration file—we can simply pass the configuration data

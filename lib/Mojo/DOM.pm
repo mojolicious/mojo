@@ -686,6 +686,9 @@ Trailing key/value pairs can be used to declare xml namespace aliases.
 
 Find this element's namespace, or return C<undef> if none could be found.
 
+  # "http://www.w3.org/2000/svg"
+  Mojo::DOM->new('<svg xmlns:svg="http://www.w3.org/2000/svg"><svg:circle>3.14</svg:circle></svg>')->at('svg\:circle')->namespace;
+
   # Find namespace for an element with namespace prefix
   my $namespace = $dom->at('svg > svg\:circle')->namespace;
 

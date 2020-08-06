@@ -62,7 +62,7 @@ But please try to avoid pull requests with very simplistic changes, such as a si
 documentation or comments.
 
 An expressive title and detailed description are invaluable during the review process, which usually ends when members
-of the community have voiced their opinions and the core team reviewed the changes. For a change to get merged it
+of the community have voiced their opinions and the core team reviewed the changes. For a pull request to get merged it
 requires three positive reviews from voting members of the core team.
 
 All code changes should emulate the style of the surrounding code, include tests that fail without them, and update

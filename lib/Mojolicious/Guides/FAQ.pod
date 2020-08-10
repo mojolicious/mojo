@@ -212,6 +212,29 @@ weakened.
     $c->reply->exception($err);
   });
 
+=head2 What does "Illegal character in prototype" mean?
+
+Mojolicious assumes L<subroutine signatures|Mojolicious::Guides/"Signatures"> are enabled in documentation examples. If
+the signatures feature has not been enabled in that scope, they are interpreted as L<prototypes|perlsub/"Prototypes">,
+an unrelated parser feature. Mojolicious does not require signatures; if you don't want to or cannot use signatures
+(which require Perl 5.20+), you can translate most signatures into a standard subroutine parameter assignment.
+
+  # With signatures feature
+  get '/title' => sub ($c) {
+    $c->ua->get('mojolicious.org' => sub ($ua, $tx) {
+      $c->render(data => $tx->result->dom->at('title')->text);
+    });
+  };
+
+  # Without signatures feature
+  get '/title' => sub {
+    my ($c) = @_;
+    $c->ua->get('mojolicious.org' => sub {
+      my ($ua, $tx) = @_;
+      $c->render(data => $tx->result->dom->at('title')->text);
+    });
+  };
+
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious

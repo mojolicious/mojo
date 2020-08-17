@@ -72,6 +72,11 @@ may be serious security and/or reliability issues. Some of the more advanced fea
 L<subprocesses|Mojo::IOLoop/"subprocess"> and the L<Hypnotoad|Mojo::Server::Hypnotoad> web server, will also require
 the use of the L<Windows Subsystem for Linux|https://msdn.microsoft.com/commandline/wsl/>.
 
+=head2 Is Perl's taint mode supported by Mojolicious?
+
+No. There is no benefit at all to using taint mode. Modern Perl applications are much too complex to benefit from such a
+naive mechanism in any meaningful way. At best it would give you a false sense of security.
+
 =head2 Do I need to clean my environment before testing Mojolicious?
 
 L<Mojolicious> uses many environment variables both internally and externally, notably (but not exclusively) those

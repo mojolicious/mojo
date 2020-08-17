@@ -170,6 +170,14 @@ Check if embedded file from the C<DATA> section of a class was Base64 encoded.
 
 Search for packages in a namespace non-recursively.
 
+=head2 is_package
+
+  if( is_package('a1::aaa') ){
+    say "package name valid";
+  }
+
+Check package name.
+
 =head2 find_modules
 
   my @modules = find_modules 'MyApp::Namespace';

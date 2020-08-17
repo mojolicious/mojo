@@ -34,7 +34,7 @@ sub run {
   if (!$ENV{MOJO_NO_DETECT} && (my $env = $self->detect)) { $name = $env }
 
   # Run command
-  if ($name && $name =~ /^\w[\w-]+$/ && ($name ne 'help' || $args[0])) {
+  if ($name && (($name) = $name =~ /^(\w[\w-]+)$/) && ($name ne 'help' || $args[0])) {
     $name =~ s/-/_/g;
 
     # Help

@@ -7,6 +7,7 @@ use Mojo::Collection qw(c);
 use Mojo::DOM;
 use Mojo::File qw(path);
 use Mojo::JSON qw(j);
+use Mojo::URL;
 use Mojo::Util qw(dumper monkey_patch);
 
 # Silent one-liners
@@ -34,6 +35,7 @@ sub import {
     g => sub { $ua->get(@_)->result },
     h => sub { $ua->head(@_)->result },
     j => \&j,
+    l => sub { Mojo::URL->new(@_) },
     n => sub (&@) { say STDERR timestr timeit($_[1] // 1, $_[0]) },
     o => sub { $ua->options(@_)->result },
     p => sub { $ua->post(@_)->result },
@@ -154,6 +156,14 @@ Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting L<Mo
 Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 
   $ perl -Mojo -E 'f("hello.json")->spurt(j {hello => "world!"})'
+
+=head2 l
+
+  my $url = l('https://mojolicious.org');
+
+Turn a string into a L<Mojo::URL> object.
+
+  $ perl -Mojo -E 'say l("/perldoc")->to_abs(l("https://mojolicious.org"))'
 
 =head2 n
 

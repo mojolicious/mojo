@@ -64,4 +64,7 @@ is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
   like $buffer, qr/wallclock.*wallclock/s, 'right output';
 }
 
+# Link
+is l("http://mojolicious.org/")->path, '/', 'right result';
+
 done_testing();

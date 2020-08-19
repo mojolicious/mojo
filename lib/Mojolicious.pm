@@ -781,7 +781,7 @@ its copyright to Sebastian Riedel.
 
 =item
 
-Some of the work on this distribution has been sponsored by L<The Perl Foundation|http://www.perlfoundation.org>.
+Some of the work on this distribution has been sponsored by L<The Perl Foundation|https://www.perlfoundation.org>.
 
 =back
 

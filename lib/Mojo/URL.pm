@@ -216,8 +216,8 @@ Mojo::URL - Uniform Resource Locator
 
 =head1 DESCRIPTION
 
-L<Mojo::URL> implements a subset of L<RFC 3986|http://tools.ietf.org/html/rfc3986>, L<RFC
-3987|http://tools.ietf.org/html/rfc3987> and the L<URL Living Standard|https://url.spec.whatwg.org> for Uniform
+L<Mojo::URL> implements a subset of L<RFC 3986|https://tools.ietf.org/html/rfc3986>, L<RFC
+3987|https://tools.ietf.org/html/rfc3987> and the L<URL Living Standard|https://url.spec.whatwg.org> for Uniform
 Resource Locators with support for IDNA and IRIs.
 
 =head1 ATTRIBUTES

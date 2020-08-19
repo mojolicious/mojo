@@ -49,7 +49,7 @@ your approval or to point out flaws that need to be addressed.
 
 One of the easiest ways to contribute to L<Mojolicious> is through documentation improvements. While the
 L<Mojolicious::Guides> are carefully curated by the core team, everybody with a (free) GitHub account can make changes
-and add new information to the L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>.
+and add new information to the L<Mojolicious wiki|https://github.com/mojolicious/mojo/wiki>.
 
 Pull requests with additions or changes to the documentation included in the L<Mojolicious> distribution follow the
 same rules as code contributions. Please don't send pull requests for overly simplistic changes, such as the addition
@@ -70,7 +70,7 @@ relevant documentation.
 
 While the L<Mojolicious> distribution covers a wide range of features, we are rather conservative when it comes to
 adding new ones. So if your contribution is not a simple bug fix, it is B<strongly recommended> that you discuss it in
-advance in the L<Google Group|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on
+advance in the L<Google Group|https://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on
 C<irc.freenode.net> (L<chat now!|https://webchat.freenode.net/#mojo>), to avoid unnecessary work and to increase its
 chances of getting accepted.
 
@@ -252,13 +252,13 @@ able to keep up with L<Mojolicious> development, and most are missing critical b
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious
-wiki|http://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
+wiki|https://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
 authors.
 
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Google Group|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
+L<Google Group|https://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
 (L<chat now!|https://webchat.freenode.net/#mojo>).
 
 =cut

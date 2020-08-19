@@ -295,7 +295,7 @@ Just remember that both web servers need to be started with the C<reuse> paramet
 
 =head2 Nginx
 
-One of the most popular setups these days is L<Hypnotoad|Mojo::Server::Hypnotoad> behind an L<Nginx|http://nginx.org>
+One of the most popular setups these days is L<Hypnotoad|Mojo::Server::Hypnotoad> behind an L<Nginx|https://nginx.org>
 reverse proxy, which even supports WebSockets in newer versions.
 
   upstream myapp {
@@ -317,7 +317,7 @@ reverse proxy, which even supports WebSockets in newer versions.
 
 =head2 Apache/mod_proxy
 
-Another good reverse proxy is L<Apache|http://httpd.apache.org> with C<mod_proxy>, the configuration looks quite
+Another good reverse proxy is L<Apache|https://httpd.apache.org> with C<mod_proxy>, the configuration looks quite
 similar to the Nginx one above. And if you need WebSocket support, newer versions come with C<mod_proxy_wstunnel>.
 
   <VirtualHost *:80>
@@ -1735,13 +1735,13 @@ And you can use all the commands from L<Mojolicious::Commands>.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious
-wiki|http://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
+wiki|https://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
 authors.
 
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Google Group|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
+L<Google Group|https://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
 (L<chat now!|https://webchat.freenode.net/#mojo>).
 
 =cut

@@ -158,7 +158,7 @@ Mojolicious::Static - Serve static files
 =head1 DESCRIPTION
 
 L<Mojolicious::Static> is a static file server with C<Range>, C<If-Modified-Since> and C<If-None-Match> support, based
-on L<RFC 7232|http://tools.ietf.org/html/rfc7232> and L<RFC 7233|http://tools.ietf.org/html/rfc7233>.
+on L<RFC 7232|https://tools.ietf.org/html/rfc7232> and L<RFC 7233|https://tools.ietf.org/html/rfc7233>.
 
 =head1 ATTRIBUTES
 

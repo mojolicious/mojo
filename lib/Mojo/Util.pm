@@ -756,7 +756,7 @@ Monkey patch functions into package.
 
   my $str = punycode_decode $punycode;
 
-Punycode decode string as described in L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
+Punycode decode string as described in L<RFC 3492|https://tools.ietf.org/html/rfc3492>.
 
   # "bücher"
   punycode_decode 'bcher-kva';
@@ -765,7 +765,7 @@ Punycode decode string as described in L<RFC 3492|http://tools.ietf.org/html/rfc
 
   my $punycode = punycode_encode $str;
 
-Punycode encode string as described in L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
+Punycode encode string as described in L<RFC 3492|https://tools.ietf.org/html/rfc3492>.
 
   # "bcher-kva"
   punycode_encode 'bücher';
@@ -832,7 +832,7 @@ in the result according to unicode semantics.
 
   my $tree = split_cookie_header 'a=b; expires=Thu, 07 Aug 2008 07:07:59 GMT';
 
-Same as L</"split_header">, but handles C<expires> values from L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
+Same as L</"split_header">, but handles C<expires> values from L<RFC 6265|https://tools.ietf.org/html/rfc6265>.
 
 =head2 split_header
 
@@ -910,7 +910,7 @@ Unquote string.
   my $escaped = url_escape $str;
   my $escaped = url_escape $str, '^A-Za-z0-9\-._~';
 
-Percent encode unsafe characters in string as described in L<RFC 3986|http://tools.ietf.org/html/rfc3986>, the pattern
+Percent encode unsafe characters in string as described in L<RFC 3986|https://tools.ietf.org/html/rfc3986>, the pattern
 used defaults to C<^A-Za-z0-9\-._~>.
 
   # "foo%3Bbar"
@@ -920,7 +920,7 @@ used defaults to C<^A-Za-z0-9\-._~>.
 
   my $str = url_unescape $escaped;
 
-Decode percent encoded characters in string as described in L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
+Decode percent encoded characters in string as described in L<RFC 3986|https://tools.ietf.org/html/rfc3986>.
 
   # "foo;bar"
   url_unescape 'foo%3Bbar';

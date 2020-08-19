@@ -215,13 +215,13 @@ weakened.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the L<Mojolicious
-wiki|http://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
+wiki|https://github.com/mojolicious/mojo/wiki>, which contains a lot more documentation and examples by many different
 authors.
 
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Google Group|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
+L<Google Group|https://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
 (L<chat now!|https://webchat.freenode.net/#mojo>).
 
 =cut

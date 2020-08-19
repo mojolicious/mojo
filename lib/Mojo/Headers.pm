@@ -193,8 +193,8 @@ Mojo::Headers - HTTP headers
 
 =head1 DESCRIPTION
 
-L<Mojo::Headers> is a container for HTTP headers, based on L<RFC 7230|http://tools.ietf.org/html/rfc7230> and L<RFC
-7231|http://tools.ietf.org/html/rfc7231>.
+L<Mojo::Headers> is a container for HTTP headers, based on L<RFC 7230|https://tools.ietf.org/html/rfc7230> and L<RFC
+7231|https://tools.ietf.org/html/rfc7231>.
 
 =head1 ATTRIBUTES
 
@@ -260,7 +260,7 @@ Get or replace current header value, shortcut for the C<Accept-Ranges> header.
   $headers   = $headers->access_control_allow_origin('*');
 
 Get or replace current header value, shortcut for the C<Access-Control-Allow-Origin> header from L<Cross-Origin
-Resource Sharing|http://www.w3.org/TR/cors/>.
+Resource Sharing|https://www.w3.org/TR/cors/>.
 
 =head2 add
 
@@ -367,7 +367,7 @@ Get or replace current header value, shortcut for the C<Content-Range> header.
   $headers   = $headers->content_security_policy('default-src https:');
 
 Get or replace current header value, shortcut for the C<Content-Security-Policy> header from L<Content Security Policy
-1.0|http://www.w3.org/TR/CSP/>.
+1.0|https://www.w3.org/TR/CSP/>.
 
 =head2 content_type
 
@@ -382,7 +382,7 @@ Get or replace current header value, shortcut for the C<Content-Type> header.
   $headers   = $headers->cookie('f=b');
 
 Get or replace current header value, shortcut for the C<Cookie> header from L<RFC
-6265|http://tools.ietf.org/html/rfc6265>.
+6265|https://tools.ietf.org/html/rfc6265>.
 
 =head2 date
 
@@ -503,7 +503,7 @@ Get and remove leftover data from header parser.
   $headers = $headers->link('<http://127.0.0.1/foo/3>; rel="next"');
 
 Get or replace current header value, shortcut for the C<Link> header from L<RFC
-5988|http://tools.ietf.org/html/rfc5988>.
+5988|https://tools.ietf.org/html/rfc5988>.
 
 =head2 location
 
@@ -527,7 +527,7 @@ Return an array reference with all currently defined headers.
   $headers   = $headers->origin('http://example.com');
 
 Get or replace current header value, shortcut for the C<Origin> header from L<RFC
-6454|http://tools.ietf.org/html/rfc6454>.
+6454|https://tools.ietf.org/html/rfc6454>.
 
 =head2 parse
 
@@ -562,7 +562,7 @@ Get or replace current header value, shortcut for the C<Range> header.
   $headers     = $headers->referrer('http://example.com');
 
 Get or replace current header value, shortcut for the C<Referer> header, there was a typo in L<RFC
-2068|http://tools.ietf.org/html/rfc2068> which resulted in C<Referer> becoming an official header.
+2068|https://tools.ietf.org/html/rfc2068> which resulted in C<Referer> becoming an official header.
 
 =head2 remove
 
@@ -576,7 +576,7 @@ Remove a header.
   $headers   = $headers->sec_websocket_accept('s3pPLMBiTxaQ9kYGzzhZRbK+xOo=');
 
 Get or replace current header value, shortcut for the C<Sec-WebSocket-Accept> header from L<RFC
-6455|http://tools.ietf.org/html/rfc6455>.
+6455|https://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_extensions
 
@@ -584,7 +584,7 @@ Get or replace current header value, shortcut for the C<Sec-WebSocket-Accept> he
   $headers       = $headers->sec_websocket_extensions('foo');
 
 Get or replace current header value, shortcut for the C<Sec-WebSocket-Extensions> header from L<RFC
-6455|http://tools.ietf.org/html/rfc6455>.
+6455|https://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_key
 
@@ -592,7 +592,7 @@ Get or replace current header value, shortcut for the C<Sec-WebSocket-Extensions
   $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
 Get or replace current header value, shortcut for the C<Sec-WebSocket-Key> header from L<RFC
-6455|http://tools.ietf.org/html/rfc6455>.
+6455|https://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_protocol
 
@@ -600,7 +600,7 @@ Get or replace current header value, shortcut for the C<Sec-WebSocket-Key> heade
   $headers  = $headers->sec_websocket_protocol('sample');
 
 Get or replace current header value, shortcut for the C<Sec-WebSocket-Protocol> header from L<RFC
-6455|http://tools.ietf.org/html/rfc6455>.
+6455|https://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_version
 
@@ -608,7 +608,7 @@ Get or replace current header value, shortcut for the C<Sec-WebSocket-Protocol> 
   $headers    = $headers->sec_websocket_version(13);
 
 Get or replace current header value, shortcut for the C<Sec-WebSocket-Version> header from L<RFC
-6455|http://tools.ietf.org/html/rfc6455>.
+6455|https://tools.ietf.org/html/rfc6455>.
 
 =head2 server
 
@@ -631,7 +631,7 @@ Timing|https://www.w3.org/TR/server-timing/>.
   $headers   = $headers->set_cookie('f=b; path=/');
 
 Get or replace current header value, shortcut for the C<Set-Cookie> header from L<RFC
-6265|http://tools.ietf.org/html/rfc6265>.
+6265|https://tools.ietf.org/html/rfc6265>.
 
 =head2 status
 
@@ -639,7 +639,7 @@ Get or replace current header value, shortcut for the C<Set-Cookie> header from 
   $headers   = $headers->status('200 OK');
 
 Get or replace current header value, shortcut for the C<Status> header from L<RFC
-3875|http://tools.ietf.org/html/rfc3875>.
+3875|https://tools.ietf.org/html/rfc3875>.
 
 =head2 strict_transport_security
 
@@ -647,7 +647,7 @@ Get or replace current header value, shortcut for the C<Status> header from L<RF
   $headers   = $headers->strict_transport_security('max-age=31536000');
 
 Get or replace current header value, shortcut for the C<Strict-Transport-Security> header from L<RFC
-6797|http://tools.ietf.org/html/rfc6797>.
+6797|https://tools.ietf.org/html/rfc6797>.
 
 =head2 te
 

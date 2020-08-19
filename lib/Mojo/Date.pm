@@ -87,8 +87,8 @@ Mojo::Date - HTTP date
 
 =head1 DESCRIPTION
 
-L<Mojo::Date> implements HTTP date and time functions, based on L<RFC 7230|http://tools.ietf.org/html/rfc7230>, L<RFC
-7231|http://tools.ietf.org/html/rfc7231> and L<RFC 3339|http://tools.ietf.org/html/rfc3339>.
+L<Mojo::Date> implements HTTP date and time functions, based on L<RFC 7230|https://tools.ietf.org/html/rfc7230>, L<RFC
+7231|https://tools.ietf.org/html/rfc7231> and L<RFC 3339|https://tools.ietf.org/html/rfc3339>.
 
 =head1 ATTRIBUTES
 
@@ -142,7 +142,7 @@ Parse date.
 
   my $str = $date->to_datetime;
 
-Render L<RFC 3339|http://tools.ietf.org/html/rfc3339> date and time.
+Render L<RFC 3339|https://tools.ietf.org/html/rfc3339> date and time.
 
   # "1994-11-06T08:49:37Z"
   Mojo::Date->new(784111777)->to_datetime;

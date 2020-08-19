@@ -302,8 +302,8 @@ Mojo::Message - HTTP message base class
 =head1 DESCRIPTION
 
 L<Mojo::Message> is an abstract base class for HTTP message containers, based on L<RFC
-7230|http://tools.ietf.org/html/rfc7230>, L<RFC 7231|http://tools.ietf.org/html/rfc7231> and L<RFC
-2388|http://tools.ietf.org/html/rfc2388>, like L<Mojo::Message::Request> and L<Mojo::Message::Response>.
+7230|https://tools.ietf.org/html/rfc7230>, L<RFC 7231|https://tools.ietf.org/html/rfc7231> and L<RFC
+2388|https://tools.ietf.org/html/rfc2388>, like L<Mojo::Message::Request> and L<Mojo::Message::Response>.
 
 =head1 EVENTS
 

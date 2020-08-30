@@ -7,8 +7,8 @@ use Test::More;
 use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
-use Mojo::Loader qw(data_section file_is_binary find_packages find_modules load_class);
-
+use Mojo::Loader qw(data_section file_is_binary find_packages find_modules load_class is_package);
+ 
 package MyLoaderTest::Foo::Bar;
 
 package MyLoaderTest::Foo::Baz;
@@ -70,6 +70,31 @@ subtest 'Search packages' => sub {
   my @pkgs = find_packages 'MyLoaderTest::Foo';
   is_deeply \@pkgs, ['MyLoaderTest::Foo::Bar', 'MyLoaderTest::Foo::Baz'], 'found the right packages';
   is_deeply [find_packages 'MyLoaderTest::DoesNotExist'], [], 'no packages found';
+};
+
+# is_package
+# To check cases use
+# perl -e"package aaa::a; print __PACKAGE__"
+
+subtest 'is_package valid' => sub {
+  ok is_package('A'), 'valid package';
+  ok is_package('a::aaa'), 'valid package';
+  ok is_package('A::aaa'), 'valid package';
+  ok is_package('a1::aaa'), 'valid package';
+  ok is_package('a1::AaA::a'), 'valid package';
+  ok is_package("a1'AaA::a"), 'valid package';
+  ok is_package('_::aaa'), 'valid package';
+  ok is_package('_::111'), 'valid package';
+};
+
+subtest 'is_package invalid' => sub {
+  ok !is_package('A:::aaa'), 'invalid package';
+  ok !is_package('1::aaa'), 'invalid package';
+  ok !is_package('a:aaa'), 'invalid package';
+  ok !is_package('a::'), 'invalid package';
+  ok !is_package("a'"), 'invalid package';
+  ok !is_package('::a'), 'invalid package';
+  ok !is_package('aa-a'), 'valid package';
 };
 
 subtest 'Load' => sub {

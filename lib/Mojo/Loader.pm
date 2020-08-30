@@ -6,7 +6,7 @@ use Mojo::Exception;
 use Mojo::File qw(path);
 use Mojo::Util qw(b64_decode class_to_path);
 
-our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class);
+our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class is_package);
 
 my (%BIN, %CACHE);
 
@@ -32,11 +32,31 @@ sub find_packages {
   return sort map { /^(.+)::$/ ? "${ns}::$1" : () } keys %{"${ns}::"};
 }
 
+sub is_package {
+  my $package = shift;
+  if($package && $package =~
+    /
+      ^
+      [a-zA-Z_]         # Can't begin from digit
+      [a-zA-Z0-9_]*
+      (?:
+          (?: :: | ' )  # Package::name eq Package'name
+          [a-zA-Z0-9_]+
+      )*
+      \z
+    /x) {
+      return 1;
+  }
+  return 0;
+}
+
+
+
 sub load_class {
   my $class = shift;
 
   # Invalid class name
-  return 1 if ($class || '') !~ /^\w(?:[\w:']*\w)?$/;
+  return 1 unless is_package($class);
 
   # Load if not already loaded
   return undef if $class->can('new') || eval "require $class; 1";
@@ -149,6 +169,14 @@ Check if embedded file from the C<DATA> section of a class was Base64 encoded.
   my @pkgs = find_packages 'MyApp::Namespace';
 
 Search for packages in a namespace non-recursively.
+
+=head2 is_package
+
+  if( is_package('a1::aaa') ){
+    say "package name valid";
+  }
+
+Check package name.
 
 =head2 find_modules
 

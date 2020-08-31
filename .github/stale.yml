@@ -1,4 +1,4 @@
-daysUntilStale: 60
+daysUntilStale: 30
 daysUntilClose: 365
 exemptLabels:
   - scheduled

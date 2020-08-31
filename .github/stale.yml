@@ -10,6 +10,8 @@ exemptLabels:
 staleLabel: stale
 markComment: >
   This issue has been automatically marked as stale because it has not had
-  recent activity. It may be closed if no further activity occurs. Thank you
-  for your contributions.
+  recent activity. It may be closed if no further activity occurs. This is
+  not a judgment on the merits of the issue, but an indication that more
+  information may be needed to determine the appropriate course of action, if
+  any. Thank you for your contributions.
 closeComment: false

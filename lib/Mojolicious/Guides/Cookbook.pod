@@ -903,7 +903,7 @@ for transport.
     });
 
     # Unsubscribe from "message" event again once we are done
-    $c->on(finish => sub ($c, $code, $reason = undef) {
+    $c->on(finish => sub ($c) {
       $c->app->log->unsubscribe(message => $cb);
     });
   };

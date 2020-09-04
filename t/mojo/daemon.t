@@ -26,10 +26,8 @@ sub handler {
 
 package main;
 
-my $app = Mojolicious->new;
-my $ua  = Mojo::UserAgent->new;
-
 subtest 'Minimal application' => sub {
+  my $ua = Mojo::UserAgent->new;
   $ua->server->app(TestApp->new);
   my $tx = $ua->get('/');
   is $tx->res->code, 200,              'right status';
@@ -107,9 +105,10 @@ subtest 'Transaction' => sub {
   isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right transaction';
 };
 
-subtest 'Fresh application' => sub {
-  $app = Mojolicious->new;
-  $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+my $app = Mojolicious->new;
+my $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+
+subtest 'Moniker' => sub {
   is $ua->server->app($app)->app->moniker, 'mojolicious', 'right moniker';
 };
 
@@ -231,7 +230,7 @@ subtest 'Concurrent requests' => sub {
 };
 
 subtest 'Form with chunked response' => sub {
-   my %params;
+  my %params;
   for my $i (1 .. 10) { $params{"test$i"} = $i }
   my $result = '';
   for my $key (sort keys %params) { $result .= $params{$key} }
@@ -242,7 +241,7 @@ subtest 'Form with chunked response' => sub {
 
 subtest 'Upload' => sub {
   my $result = '';
-  my $tx = $ua->post('/upload' => form => {file => {content => $result}});
+  my $tx     = $ua->post('/upload' => form => {file => {content => $result}});
   is $tx->res->code, 200, 'right status';
   is $tx->res->body, $result, 'right content';
   ok $tx->local_address, 'has local address';
@@ -267,7 +266,7 @@ subtest 'Timeout' => sub {
 
 subtest 'Pipelined' => sub {
   my $daemon = Mojo::Server::Daemon->new({listen => ['http://127.0.0.1'], silent => 1});
-  my $port = $daemon->start->ports->[0];
+  my $port   = $daemon->start->ports->[0];
   is $daemon->app->moniker, 'mojo-hello_world', 'right moniker';
   my $buffer = '';
   my $id;
@@ -308,7 +307,7 @@ subtest 'Throttling' => sub {
 };
 
 subtest 'Single-accept and connection limit' => sub {
-  my $loop = Mojo::IOLoop->new;
+  my $loop   = Mojo::IOLoop->new;
   my $daemon = Mojo::Server::Daemon->new(
     app         => $app,
     ioloop      => $loop,

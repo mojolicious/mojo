@@ -349,7 +349,7 @@ subtest 'All settled (with rejection)' => sub {
   is_deeply \@results, $result, 'promise resolved';
 };
 
-subtest 'Settle with promise' => sub {
+subtest 'Settle with settled promise' => sub {
   my $promise = Mojo::Promise->new->resolve('works');
   my @results;
   my $promise2 = Mojo::Promise->new->resolve($promise)->then(sub { push @results, 'first', @_; @_ });
@@ -366,6 +366,47 @@ subtest 'Settle with promise' => sub {
   is_deeply \@errors, ['first', $promise], 'promises rejected';
   is_deeply \@results, ['second'], 'promises resolved';
   $promise->catch(sub { });
+};
+
+subtest 'Settle with self' => sub {
+  my $promise = Mojo::Promise->new;
+  my (@results, @errors);
+  $promise->resolve($promise)->then(sub { @results = @_ }, sub { @errors = @_ });
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  cmp_ok scalar(@errors), '==', 1, 'correct number of errors';
+  like $errors[0], qr/^Chaining cycle detected for promise \S/, 'correct error';
+
+  $promise = Mojo::Promise->new;
+  (@results, @errors) = ();
+  $promise->reject($promise)->then(sub { @results = @_ }, sub { @errors = @_; () });
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  is_deeply \@errors, [$promise], 'correct errors';
+};
+
+subtest 'Settle with unsettled promise' => sub {
+  my $promise  = Mojo::Promise->new;
+  my $promise2 = Mojo::Promise->new;
+  my @results;
+  $promise->then(sub { @results = @_ });
+  $promise->resolve($promise2);
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  $promise->resolve(123);
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  $promise2->resolve(1_000);
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [1_000], 'promise resolved';
+
+  $promise = Mojo::Promise->new;
+  (@results, my @errors) = ();
+  $promise->then(sub { @results = @_ }, sub { @errors = @_ });
+  $promise->reject($promise2);
+  Mojo::IOLoop->one_tick;
+  is_deeply \@results, [], 'promise not resolved';
+  is_deeply \@errors, [$promise2], 'correct errors';
 };
 
 subtest 'Promisify' => sub {
@@ -490,7 +531,7 @@ subtest 'Map (with reject)' => sub {
     1 .. 5
   )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
   is_deeply \@results, [], 'promise not resolved';
-  is_deeply \@errors, [1], 'correct errors';
+  is_deeply \@errors,  [1], 'correct errors';
   is_deeply \@started, [1, 2, 3], 'only initial batch started';
 };
 

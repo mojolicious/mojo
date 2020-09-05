@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp qw(carp);
 use Mojo::Exception;
 use Mojo::IOLoop;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed refaddr);
 
 use constant DEBUG => $ENV{MOJO_PROMISE_DEBUG} || 0;
 
@@ -214,8 +214,19 @@ sub _settle {
     $self = $self->new;
   }
 
+  return $self if $self->{semi_settled}++;
+
   if ($thenable && $status eq 'resolve') {
-    $results[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () });
+    if (refaddr $results[0] == refaddr $self) {
+      undef $self->{semi_settled};
+      $self->reject("Chaining cycle detected for promise $self");
+    }
+    else {
+      $results[0]->then(
+        sub { undef $self->{semi_settled}; $self->resolve(@_); () },
+        sub { undef $self->{semi_settled}; $self->reject(@_); () }
+      );
+    }
   }
 
   elsif (!$self->{results}) {

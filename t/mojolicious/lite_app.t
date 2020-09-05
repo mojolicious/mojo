@@ -457,7 +457,7 @@ get '/timing' => sub {
   $c->timing->server_timing('miss');
   $c->timing->server_timing('dc',   'atl');
   $c->timing->server_timing('test', 'Some Test', '0.002');
-  $c->timing->server_timing('app',  undef, '0.001');
+  $c->timing->server_timing('app',  undef,       '0.001');
   my $rps = $c->timing->rps($bar);
   $c->render(text => "Foo: $foo, Bar: $bar ($rps)");
 };
@@ -473,7 +473,7 @@ is $t->app->build_controller->req->url, '', 'no URL';
 is $t->app->build_controller->stash->{default}, 23, 'right value';
 is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url, '/foo', 'right URL';
 is $t->app->build_controller->render_to_string('index', handler => 'epl'), 'Just works!', 'right result';
-is $t->app->build_controller->render_to_string(inline           => '0'),   "0\n",         'right result';
+is $t->app->build_controller->render_to_string(inline => '0'), "0\n", 'right result';
 
 # Empty template
 $t->get_ok('/empty')->status_is(200)->content_is('');

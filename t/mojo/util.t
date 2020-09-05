@@ -50,16 +50,16 @@ is class_to_path("Foo::Bar::Baz"), 'Foo/Bar/Baz.pm', 'right path';
 is class_to_path("Foo'Bar'Baz"),   'Foo/Bar/Baz.pm', 'right path';
 
 # split_header
-is_deeply split_header(''), [], 'right result';
+is_deeply split_header(''),          [], 'right result';
 is_deeply split_header('foo=b=a=r'), [['foo', 'b=a=r']], 'right result';
 is_deeply split_header('a=b ,, , c=d ;; ; e=f g h=i'), [['a', 'b'], ['c', 'd', 'e', 'f', 'g', undef, 'h', 'i']],
   'right result';
-is_deeply split_header(',,foo,, ,bar'), [['foo', undef], ['bar', undef]], 'right result';
+is_deeply split_header(',,foo,, ,bar'),     [['foo', undef], ['bar', undef]], 'right result';
 is_deeply split_header(';;foo; ; ;bar'),    [['foo', undef, 'bar', undef]],  'right result';
-is_deeply split_header('foo=;bar=""'),      [['foo', '',    'bar', '']],     'right result';
+is_deeply split_header('foo=;bar=""'),      [['foo', '', 'bar', '']],        'right result';
 is_deeply split_header('foo=bar baz=yada'), [['foo', 'bar', 'baz', 'yada']], 'right result';
-is_deeply split_header('foo,bar,baz'), [['foo', undef], ['bar', undef], ['baz', undef]], 'right result';
-is_deeply split_header('f "o" o , ba  r'), [['f', undef, '"o"', undef, 'o', undef], ['ba', undef, 'r', undef]],
+is_deeply split_header('foo,bar,baz'),      [['foo', undef], ['bar', undef], ['baz', undef]], 'right result';
+is_deeply split_header('f "o" o , ba  r'),  [['f', undef, '"o"', undef, 'o', undef], ['ba', undef, 'r', undef]],
   'right result';
 is_deeply split_header('foo="b,; a\" r\"\\\\"'), [['foo', 'b,; a" r"\\']], 'right result';
 is_deeply split_header('foo = "b a\" r\"\\\\"; bar="ba z"'), [['foo', 'b a" r"\\', 'bar', 'ba z']], 'right result';
@@ -103,12 +103,12 @@ is extract_usage(curfile->sibling('lib', 'myapp.pl')), "USAGE: myapp.pl daemon\n
 getopt ['--charset', 'UTF-8'], 'c|charset=s' => \my $charset;
 is $charset, 'UTF-8', 'right string';
 my $array = ['-t', 'test', '-h', '--whatever', 'Whatever!', 'stuff'];
-getopt $array, ['pass_through'], 't|test=s' => \my $test;
-is $test, 'test', 'right string';
+getopt $array,    ['pass_through'], 't|test=s' => \my $test;
+is $test,         'test', 'right string';
 is_deeply $array, ['-h', '--whatever', 'Whatever!', 'stuff'], 'right structure';
-getopt $array, 'h' => \my $flag, 'w|whatever=s' => \my $whatever;
-ok $flag, 'flag has been set';
-is $whatever, 'Whatever!', 'right string';
+getopt $array,    'h' => \my $flag, 'w|whatever=s' => \my $whatever;
+ok $flag,         'flag has been set';
+is $whatever,     'Whatever!', 'right string';
 is_deeply $array, ['stuff'], 'right structure';
 {
   local @ARGV = ('--charset', 'UTF-16', 'test');
@@ -371,30 +371,30 @@ is sha1_sum('foo bar baz'), 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39', 'right s
 is hmac_sha1_sum('Hi there', 'abc1234567890'), '5344f37e1948dd3ffb07243a4d9201a227abd6e1', 'right hmac sha1 checksum';
 
 # secure_compare
-ok secure_compare('hello', 'hello'), 'values are equal';
+ok secure_compare('hello',  'hello'), 'values are equal';
 ok !secure_compare('hell',  'hello'), 'values are not equal';
 ok !secure_compare('hallo', 'hello'), 'values are not equal';
-ok secure_compare('0', '0'), 'values are equal';
-ok secure_compare('1', '1'), 'values are equal';
-ok !secure_compare('1', '0'), 'values are not equal';
-ok !secure_compare('0', '1'), 'values are not equal';
-ok secure_compare('00', '00'), 'values are equal';
-ok secure_compare('11', '11'), 'values are equal';
-ok !secure_compare('11', '00'), 'values are not equal';
-ok !secure_compare('00', '11'), 'values are not equal';
-ok secure_compare('♥',  '♥'),  'values are equal';
-ok secure_compare('0♥', '0♥'), 'values are equal';
-ok secure_compare('♥1', '♥1'), 'values are equal';
-ok !secure_compare('♥',   '♥0'),  'values are not equal';
-ok !secure_compare('0♥',  '♥'),   'values are not equal';
-ok !secure_compare('0♥1', '1♥0'), 'values are not equal';
-ok !secure_compare('',    '♥'),   'values are not equal';
-ok !secure_compare('♥',   ''),    'values are not equal';
+ok secure_compare('0',      '0'),     'values are equal';
+ok secure_compare('1',      '1'),     'values are equal';
+ok !secure_compare('1',     '0'),     'values are not equal';
+ok !secure_compare('0',     '1'),     'values are not equal';
+ok secure_compare('00',     '00'),    'values are equal';
+ok secure_compare('11',     '11'),    'values are equal';
+ok !secure_compare('11',    '00'),    'values are not equal';
+ok !secure_compare('00',    '11'),    'values are not equal';
+ok secure_compare('♥',      '♥'),     'values are equal';
+ok secure_compare('0♥',     '0♥'),    'values are equal';
+ok secure_compare('♥1',     '♥1'),    'values are equal';
+ok !secure_compare('♥',     '♥0'),    'values are not equal';
+ok !secure_compare('0♥',    '♥'),     'values are not equal';
+ok !secure_compare('0♥1',   '1♥0'),   'values are not equal';
+ok !secure_compare('',      '♥'),     'values are not equal';
+ok !secure_compare('♥',     ''),      'values are not equal';
 
 # xor_encode
-is xor_encode('hello',                'foo'), "\x0e\x0a\x03\x0a\x00",                         'right result';
-is xor_encode("\x0e\x0a\x03\x0a\x00", 'foo'), 'hello',                                        'right result';
-is xor_encode('hello world',          'x'),   "\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'right result';
+is xor_encode('hello',                'foo'), "\x0e\x0a\x03\x0a\x00",                               'right result';
+is xor_encode("\x0e\x0a\x03\x0a\x00", 'foo'), 'hello',                                              'right result';
+is xor_encode('hello world',          'x'),   "\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c",       'right result';
 is xor_encode("\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'x'),         'hello world',          'right result';
 is xor_encode('hello',                                        '123456789'), "\x59\x57\x5f\x58\x5a", 'right result';
 is xor_encode("\x59\x57\x5f\x58\x5a",                         '123456789'), 'hello',                'right result';
@@ -432,13 +432,13 @@ is subname(MojoMonkeyTest->can('foo')), 'MojoMonkeyTest::foo', 'right name';
 is subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar', 'right name';
 
 # tablify
-is tablify([["f\r\no o\r\n", 'bar']]),     "fo o  bar\n",      'right result';
-is tablify([["  foo",        '  b a r']]), "  foo    b a r\n", 'right result';
+is tablify([["f\r\no o\r\n", 'bar']]), "fo o  bar\n",      'right result';
+is tablify([["  foo", '  b a r']]),    "  foo    b a r\n", 'right result';
 is tablify([['foo']]), "foo\n", 'right result';
 is tablify([['foo', 'yada'], ['yada', 'yada']]), "foo   yada\nyada  yada\n", 'right result';
 is tablify([[undef, 'yada'], ['yada', undef]]),  "      yada\nyada  \n",     'right result';
 is tablify([['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]), "foo   bar   baz\nyada  yada  yada\n", 'right result';
-is tablify([['a',   '',    0],     [0,      '',     'b']]),    "a    0\n0    b\n",                    'right result';
+is tablify([['a', '', 0],          [0, '', 'b']]),             "a    0\n0    b\n",                    'right result';
 is tablify([[1, 2], [3]]), "1  2\n3\n", 'right result';
 is tablify([[1], [2, 3]]), "1\n2  3\n", 'right result';
 is tablify([[1], [], [2, 3]]), "1\n\n2  3\n", 'right result';
@@ -477,10 +477,10 @@ is slugify("Un \x{e9}l\x{e9}phant \x{e0} l'or\x{e9}e du bois", 1), "un-\x{e9}l\x
   'right result';
 is slugify('Hello, World!'), 'hello-world', 'right result';
 is slugify('spam & eggs'),   'spam-eggs',   'right result';
-is slugify('spam & ıçüş',    1), 'spam-ıçüş',  'right result';
-is slugify('foo ıç bar',     1), 'foo-ıç-bar', 'right result';
+is slugify('spam & ıçüş', 1),    'spam-ıçüş',  'right result';
+is slugify('foo ıç bar', 1),     'foo-ıç-bar', 'right result';
 is slugify('    foo ıç bar', 1), 'foo-ıç-bar', 'right result';
-is slugify('你好',             1), '你好',         'right result';
+is slugify('你好', 1),             '你好',         'right result';
 
 # gzip/gunzip
 my $uncompressed = 'a' x 1000;

@@ -182,7 +182,8 @@ subtest 'Empty response cookie' => sub {
 };
 
 subtest 'Parse response cookie (Netscape)' => sub {
-  my $cookies = Mojo::Cookie::Response->parse('CUSTOMER=WILE_E_COYOTE; path=/; expires=Tuesday, 09-Nov-1999 23:12:40 GMT');
+  my $cookies
+    = Mojo::Cookie::Response->parse('CUSTOMER=WILE_E_COYOTE; path=/; expires=Tuesday, 09-Nov-1999 23:12:40 GMT');
   is $cookies->[0]->name,    'CUSTOMER',      'right name';
   is $cookies->[0]->value,   'WILE_E_COYOTE', 'right value';
   is $cookies->[0]->expires, 942189160,       'right expires value';
@@ -190,7 +191,8 @@ subtest 'Parse response cookie (Netscape)' => sub {
 };
 
 subtest 'Parse multiple response cookies (Netscape)' => sub {
-  my $cookies = Mojo::Cookie::Response->parse('CUSTOMER=WILE_E_COYOTE; expires=Tuesday, 09-Nov-1999 23:12:40 GMT; path=/'
+  my $cookies
+    = Mojo::Cookie::Response->parse('CUSTOMER=WILE_E_COYOTE; expires=Tuesday, 09-Nov-1999 23:12:40 GMT; path=/'
       . ',SHIPPING=FEDEX; path=/; expires=Tuesday, 09-Nov-1999 23:12:41 GMT');
   is $cookies->[0]->name,    'CUSTOMER',      'right name';
   is $cookies->[0]->value,   'WILE_E_COYOTE', 'right value';

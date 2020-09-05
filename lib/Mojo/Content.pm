@@ -8,7 +8,7 @@ use Scalar::Util qw(looks_like_number);
 
 has [qw(auto_decompress auto_relax relaxed skip_body)];
 has headers           => sub { Mojo::Headers->new };
-has max_buffer_size   => sub { $ENV{MOJO_MAX_BUFFER_SIZE} || 262144 };
+has max_buffer_size   => sub { $ENV{MOJO_MAX_BUFFER_SIZE}   || 262144 };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
 my $BOUNDARY_RE = qr!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i;
@@ -139,8 +139,8 @@ sub write {
 
   $self->{dynamic} = 1;
   $self->{body_buffer} .= $chunk if defined $chunk;
-  $self->once(drain => $cb) if $cb;
-  $self->{eof} = 1 if defined $chunk && !length $chunk;
+  $self->once(drain => $cb)      if $cb;
+  $self->{eof} = 1               if defined $chunk && !length $chunk;
 
   return $self;
 }
@@ -152,8 +152,8 @@ sub write_chunk {
   @{$self}{qw(chunked dynamic)} = (1, 1);
 
   $self->{body_buffer} .= $self->_build_chunk($chunk) if defined $chunk;
-  $self->once(drain => $cb) if $cb;
-  $self->{eof} = 1 if defined $chunk && !length $chunk;
+  $self->once(drain => $cb)                           if $cb;
+  $self->{eof} = 1                                    if defined $chunk && !length $chunk;
 
   return $self;
 }

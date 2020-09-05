@@ -32,7 +32,7 @@ subtest 'Memory asset' => sub {
   is $mem->contains('abc'), 0,  '"abc" at position 0';
   is $mem->contains('bc'),  1,  '"bc" at position 1';
   is $mem->contains('db'),  -1, 'does not contain "db"';
-  is $mem->size, 3, 'right size';
+  is $mem->size,  3, 'right size';
   is $mem->mtime, $^T, 'right mtime';
   is $mem->mtime, Mojo::Asset::Memory->new->mtime, 'same mtime';
   my $mtime = $mem->mtime;
@@ -263,7 +263,7 @@ subtest 'Temporary file without cleanup' => sub {
   my $file = Mojo::Asset::File->new(cleanup => 0)->add_chunk('test');
   ok $file->is_file, 'stored in file';
   is $file->slurp,   'test', 'right content';
-  is $file->size,    4, 'right size';
+  is $file->size,    4,      'right size';
   is $file->mtime, (stat $file->handle)[9], 'right mtime';
   is $file->contains('es'), 1, '"es" at position 1';
   my $path = $file->path;

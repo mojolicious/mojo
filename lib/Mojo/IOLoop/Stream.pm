@@ -7,7 +7,7 @@ use Mojo::Util;
 use Scalar::Util qw(weaken);
 
 has high_water_mark => 1048576;
-has reactor         => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
+has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
 sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
 

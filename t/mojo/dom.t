@@ -1707,10 +1707,10 @@ EOF
   is $dom->find('body > ul > li > p')->[1]->text,  "\n      ",                                        'no text';
   is $dom->find('body > ul > li')->[1]->all_text,  "\n        Test\n        \n        321\n        \n      ",
     'right text';
-  is $dom->find('body > ul > li > p')->[1]->all_text, "\n      ", 'no text';
+  is $dom->find('body > ul > li > p')->[1]->all_text, "\n      ",                                          'no text';
   is $dom->find('body > ul > li')->[2]->text, "\n        Test\n        3\n        2\n        1\n        ", 'right text';
-  is $dom->find('body > ul > li > p')->[2]->text, "\n    ", 'no text';
-  is $dom->find('body > ul > li')->[2]->all_text, "\n        Test\n        3\n        2\n        1\n        \n    ";
+  is $dom->find('body > ul > li > p')->[2]->text,     "\n    ",                                            'no text';
+  is $dom->find('body > ul > li')->[2]->all_text,     "\n        Test\n        3\n        2\n        1\n        \n    ";
   is $dom->find('body > ul > li > p')->[2]->all_text, "\n    ", 'no text';
 };
 
@@ -1745,8 +1745,8 @@ subtest 'Real world JavaScript and CSS' => sub {
     < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }< / scRiPt >
   <body>Foo!</body>
 EOF
-  is $dom->find('html > body')->[0]->text,         'Foo!',                             'right text';
-  is $dom->find('html > head > style')->[0]->text, "#style { foo: style('<test>'); }", 'right text';
+  is $dom->find('html > body')->[0]->text,          'Foo!',                             'right text';
+  is $dom->find('html > head > style')->[0]->text,  "#style { foo: style('<test>'); }", 'right text';
   is $dom->find('html > head > script')->[0]->text, "\n      if (a < b) {\n        alert('<123>');\n      }\n    ",
     'right text';
   is $dom->find('html > head > script')->[1]->text, "if (b > c) { alert('&<ohoh>') }", 'right text';
@@ -2293,7 +2293,7 @@ EOF
   is $dom->at('input')->val,                     'A',   'right value';
   is $dom->at('input:checked')->val,             'B',   'right value';
   is $dom->at('input:checked[type=radio]')->val, 'C',   'right value';
-  is_deeply $dom->at('select')->val, ['I', 'J'], 'right values';
+  is_deeply $dom->at('select')->val,             ['I', 'J'], 'right values';
   is $dom->at('select option')->val,                          'F', 'right value';
   is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
   is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
@@ -2620,7 +2620,7 @@ EOF
   is_deeply $dom->find('cool|this', %ns)->map('text'), ['bar'], 'right result';
   is_deeply $dom->find('cool|*',    %ns)->map('text'), ['bar'], 'right result';
   is_deeply $dom->find('|this',     %ns)->map('text'), ['foo'], 'right result';
-  is_deeply $dom->find('*|this', %ns)->map('text'), ['foo', 'bar'], 'right result';
+  is_deeply $dom->find('*|this',    %ns)->map('text'), ['foo', 'bar'], 'right result';
   ok !$dom->at('foo|*'), 'no result';
 };
 
@@ -2646,30 +2646,30 @@ subtest 'Nested namespaces' => sub {
 </foo>
 EOF
   my %ns = (foons => 'ns:foo', barns => 'ns:bar');
-  ok $dom->at('foons|foo',              %ns), 'result';
-  ok $dom->at('foons|foo:not(barns|*)', %ns), 'result';
-  ok $dom->at('foo:not(|foo)',          %ns), 'result';
-  ok $dom->at('foons|foo:root',         %ns), 'result';
-  ok $dom->at('foo:is(:root, foons|*)', %ns), 'result';
-  ok !$dom->at('foons|foo:not(:root)', %ns), 'no result';
-  is $dom->at('foons|tag',       %ns)->{val}, 1, 'right value';
-  is $dom->at('foons|tag:empty', %ns)->{val}, 1, 'right value';
-  ok $dom->at('foons|tag[val="1"]',             %ns), 'result';
-  ok $dom->at('foons|tag[val="1"]:empty',       %ns), 'result';
-  ok $dom->at('foo > foons|tag[val="1"]',       %ns), 'result';
-  ok $dom->at('foons|foo > foons|tag[val="1"]', %ns), 'result';
-  ok $dom->at('foo foons|tag[val="1"]',         %ns), 'result';
-  ok $dom->at('foons|foo foons|tag[val="1"]',   %ns), 'result';
-  ok $dom->at('barns|bar',                      %ns), 'result';
-  ok $dom->at('barns|bar:not(foons|*)',         %ns), 'result';
-  ok $dom->at('bar:not(|bar)',                  %ns), 'result';
-  ok $dom->at('bar:is(barns|*)',                %ns), 'result';
-  ok !$dom->at('barns|bar:root', %ns), 'no result';
-  ok $dom->at('barns|bar:not(:root)',         %ns), 'result';
-  ok $dom->at('bar:is(barns|*, :not(:root))', %ns), 'result';
-  ok $dom->at('foons|foo barns|bar',          %ns), 'result';
-  is $dom->at('barns|tag',       %ns)->{val}, 2, 'right value';
-  is $dom->at('barns|tag:empty', %ns)->{val}, 2, 'right value';
+  ok $dom->at('foons|foo',                                          %ns), 'result';
+  ok $dom->at('foons|foo:not(barns|*)',                             %ns), 'result';
+  ok $dom->at('foo:not(|foo)',                                      %ns), 'result';
+  ok $dom->at('foons|foo:root',                                     %ns), 'result';
+  ok $dom->at('foo:is(:root, foons|*)',                             %ns), 'result';
+  ok !$dom->at('foons|foo:not(:root)',                              %ns), 'no result';
+  is $dom->at('foons|tag',                                          %ns)->{val}, 1, 'right value';
+  is $dom->at('foons|tag:empty',                                    %ns)->{val}, 1, 'right value';
+  ok $dom->at('foons|tag[val="1"]',                                 %ns), 'result';
+  ok $dom->at('foons|tag[val="1"]:empty',                           %ns), 'result';
+  ok $dom->at('foo > foons|tag[val="1"]',                           %ns), 'result';
+  ok $dom->at('foons|foo > foons|tag[val="1"]',                     %ns), 'result';
+  ok $dom->at('foo foons|tag[val="1"]',                             %ns), 'result';
+  ok $dom->at('foons|foo foons|tag[val="1"]',                       %ns), 'result';
+  ok $dom->at('barns|bar',                                          %ns), 'result';
+  ok $dom->at('barns|bar:not(foons|*)',                             %ns), 'result';
+  ok $dom->at('bar:not(|bar)',                                      %ns), 'result';
+  ok $dom->at('bar:is(barns|*)',                                    %ns), 'result';
+  ok !$dom->at('barns|bar:root',                                    %ns), 'no result';
+  ok $dom->at('barns|bar:not(:root)',                               %ns), 'result';
+  ok $dom->at('bar:is(barns|*, :not(:root))',                       %ns), 'result';
+  ok $dom->at('foons|foo barns|bar',                                %ns), 'result';
+  is $dom->at('barns|tag',                                          %ns)->{val}, 2, 'right value';
+  is $dom->at('barns|tag:empty',                                    %ns)->{val}, 2, 'right value';
   ok $dom->at('barns|tag[val="2"]',                                 %ns), 'result';
   ok $dom->at('barns|tag[val="2"]:empty',                           %ns), 'result';
   ok $dom->at('bar > barns|tag[val="2"]',                           %ns), 'result';
@@ -2682,11 +2682,11 @@ EOF
   ok $dom->at('foons|foo barns|bar barns|tag[val="2"] + barns|baz', %ns), 'result';
   ok $dom->at('foons|foo barns|bar barns|tag[val="2"] ~ baz',       %ns), 'result';
   ok $dom->at('foons|foo barns|bar barns|tag[val="2"] ~ barns|baz', %ns), 'result';
-  ok !$dom->at('foons|bar', %ns), 'no result';
-  ok !$dom->at('foons|baz', %ns), 'no result';
+  ok !$dom->at('foons|bar',                                         %ns), 'no result';
+  ok !$dom->at('foons|baz',                                         %ns), 'no result';
   ok $dom->at('baz')->matches('barns|*', %ns), 'match';
-  is $dom->at('barns|bar [hreflang|=en]',    %ns)->text, 'YADA', 'right text';
-  is $dom->at('barns|bar [hreflang|=en-US]', %ns)->text, 'YADA', 'right text';
+  is $dom->at('barns|bar [hreflang|=en]',          %ns)->text, 'YADA', 'right text';
+  is $dom->at('barns|bar [hreflang|=en-US]',       %ns)->text, 'YADA', 'right text';
   ok !$dom->at('barns|bar [hreflang|=en-US-yada]', %ns), 'no result';
   ok !$dom->at('barns|bar [hreflang|=e]',          %ns), 'no result';
 };
@@ -2818,10 +2818,10 @@ subtest 'Reusing fragments' => sub {
 };
 
 subtest 'Generate tags' => sub {
-  is(Mojo::DOM->new_tag('br')->to_string,  '<br>',        'right result');
-  is(Mojo::DOM->new_tag('div')->to_string, '<div></div>', 'right result');
+  is(Mojo::DOM->new_tag('br')->to_string,                                '<br>',                        'right result');
+  is(Mojo::DOM->new_tag('div')->to_string,                               '<div></div>',                 'right result');
   is(Mojo::DOM->new_tag('div', id => 'foo', hidden => undef)->to_string, '<div hidden id="foo"></div>', 'right result');
-  is(Mojo::DOM->new_tag('div', 'safe & content'), '<div>safe &amp; content</div>', 'right result');
+  is(Mojo::DOM->new_tag('div', 'safe & content'), '<div>safe &amp; content</div>',                      'right result');
   is(Mojo::DOM->new_tag('div', id => 'foo', 'safe & content'), '<div id="foo">safe &amp; content</div>',
     'right result');
   is(

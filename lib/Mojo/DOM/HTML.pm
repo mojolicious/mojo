@@ -64,8 +64,8 @@ my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
 # HTML elements with optional end tags and scoping rules
 my %CLOSE = (li => [{li => 1}, {ul => 1, ol => 1}], tr => [{tr => 1}, {table => 1}]);
 $CLOSE{$_} = [\%TABLE, {table => 1}] for qw(colgroup tbody tfoot thead);
-$CLOSE{$_} = [{dd => 1, dt => 1}, {dl => 1}] for qw(dd dt);
-$CLOSE{$_} = [{rp => 1, rt => 1}, {ruby => 1}] for qw(rp rt);
+$CLOSE{$_} = [{dd => 1, dt => 1}, {dl    => 1}] for qw(dd dt);
+$CLOSE{$_} = [{rp => 1, rt => 1}, {ruby  => 1}] for qw(rp rt);
 $CLOSE{$_} = [{th => 1, td => 1}, {table => 1}] for qw(td th);
 
 # HTML parent elements that signal no more content when closed, but that are also phrasing content
@@ -101,7 +101,7 @@ sub parse {
     my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway) = ($1, $2, $3, $4, $5, $6, $11);
 
     # Text (and runaway "<")
-    $text .= '<' if defined $runaway;
+    $text .= '<'                                 if defined $runaway;
     _node($current, 'text', html_unescape $text) if defined $text;
 
     # Tag

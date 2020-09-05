@@ -207,7 +207,7 @@ $two = $reactor->timer(
   }
 );
 $reactor->start;
-is $pair, 2, 'timer pair was triggered';
+is $pair,   2, 'timer pair was triggered';
 ok $single, 'single timer was triggered';
 ok $last,   'timers were triggered in the right order';
 
@@ -304,8 +304,8 @@ Mojo::IOLoop->client(
 );
 Mojo::IOLoop->singleton->reactor->start;
 ok !Mojo::IOLoop->is_running, 'loop is not running';
-like $server_err, qr/^Mojo::IOLoop already running/, 'right error';
-like $client_err, qr/^Mojo::IOLoop already running/, 'right error';
+like $server_err,   qr/^Mojo::IOLoop already running/, 'right error';
+like $client_err,   qr/^Mojo::IOLoop already running/, 'right error';
 ok $server_running, 'loop is running';
 ok $client_running, 'loop is running';
 

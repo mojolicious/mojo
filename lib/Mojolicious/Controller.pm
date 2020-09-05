@@ -182,7 +182,7 @@ sub rendered {
     $self->helpers->log->debug(sub {
       my $timing  = $self->helpers->timing;
       my $elapsed = $timing->elapsed('mojo.timer') // 0;
-      my $rps     = $timing->rps($elapsed) // '??';
+      my $rps     = $timing->rps($elapsed)         // '??';
       my $code    = $res->code;
       my $msg     = $res->message || $res->default_message($code);
       return "$code $msg (${elapsed}s, $rps/s)";

@@ -90,7 +90,7 @@ sub _compile {
 
     # Combinator
     elsif ($css =~ /\G\s*([ >+~])\s*/gc) {
-      push @$last, ['pc', 'scope'] unless @$last;
+      push @$last,      ['pc', 'scope'] unless @$last;
       push @$selectors, $1;
     }
 

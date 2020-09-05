@@ -171,7 +171,7 @@ sub humanize_bytes {
 
   my $prefix = $size < 0 ? '-' : '';
 
-  return "$prefix${size}B" if ($size = abs $size) < 1024;
+  return "$prefix${size}B"               if ($size = abs $size) < 1024;
   return $prefix . _round($size) . 'KiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size) . 'MiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size) . 'GiB' if ($size /= 1024) < 1024;
@@ -238,7 +238,7 @@ sub punycode_encode {
 
     for my $c (@input) {
 
-      if ($c < $n) { $delta++ }
+      if    ($c < $n) { $delta++ }
       elsif ($c == $n) {
         my $q = $delta;
 

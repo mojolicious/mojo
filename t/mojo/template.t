@@ -577,7 +577,7 @@ is $output, " \n    2\n\n    3\n\n    4\n", 'block loop';
 
 subtest 'End and begin in the same perl line' => sub {
   my $concat = 'no warnings "redefine"; sub concat { $_[0]->() . $_[1]->() }';
-  my $mt = Mojo::Template->new(prepend => $concat);
+  my $mt     = Mojo::Template->new(prepend => $concat);
   my $output = $mt->render(<<'  EOF');
   %= concat begin
     1
@@ -742,12 +742,12 @@ like $output->message, qr/oops!/, 'right message';
 is $output->lines_before->[0][0], 1,          'right number';
 is $output->lines_before->[0][1], 'test\\\\', 'right line';
 ok $output->lines_before->[0][2], 'contains code';
-is $output->lines_before->[1][0], 2,          'right number';
-is $output->lines_before->[1][1], '123',      'right line';
+is $output->lines_before->[1][0], 2,     'right number';
+is $output->lines_before->[1][1], '123', 'right line';
 ok $output->lines_before->[1][2], 'contains code';
-is $output->lines_before->[2][0], 3,          'right number';
-is $output->lines_before->[2][1], '%',        'right line';
-is $output->lines_before->[2][2], ' ',        'right code';
+is $output->lines_before->[2][0], 3,   'right number';
+is $output->lines_before->[2][1], '%', 'right line';
+is $output->lines_before->[2][2], ' ', 'right code';
 is $output->line->[0], 4,                'right number';
 is $output->line->[1], "% die 'oops!';", 'right line';
 is $output->lines_after->[0][0], 5,     'right number';

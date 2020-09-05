@@ -6,8 +6,8 @@ use Mojo::Path;
 # Basic functionality
 my $path = Mojo::Path->new;
 is $path->parse('/path')->to_string, '/path', 'right path';
-is $path->to_dir, '/', 'right directory';
-is_deeply $path->parts, ['path'], 'right structure';
+is $path->to_dir,        '/', 'right directory';
+is_deeply $path->parts,  ['path'], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 is $path->parse('path/')->to_string, 'path/', 'right path';
@@ -33,8 +33,8 @@ is "$path", '/AZaz09-._~!$&\'()*+,;=:@/f%2Foo', 'right path';
 
 # Unicode
 is $path->parse('/foo/♥/bar')->to_string, '/foo/%E2%99%A5/bar', 'right path';
-is $path->to_dir, '/foo/%E2%99%A5/', 'right directory';
-is_deeply $path->parts, [qw(foo ♥ bar)], 'right structure';
+is $path->to_dir,        '/foo/%E2%99%A5/', 'right directory';
+is_deeply $path->parts,  [qw(foo ♥ bar)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 is $path->to_route, '/foo/♥/bar', 'right route';
@@ -50,7 +50,7 @@ is_deeply $path->parts, [qw(path 0)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 $path = Mojo::Path->new('0');
-is_deeply $path->parts, [0], 'right structure';
+is_deeply $path->parts,  [0], 'right structure';
 is $path->to_string,     '0',  'right path';
 is $path->to_abs_string, '/0', 'right absolute path';
 is $path->to_route,      '/0', 'right route';
@@ -60,8 +60,8 @@ $path = Mojo::Path->new('/%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fe
 is "$path", '/%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd', 'same path';
 is_deeply $path->parts, ['', qw(.. .. .. .. .. .. .. .. .. .. etc passwd)], 'right structure';
 is "$path", '//../../../../../../../../../../etc/passwd', 'normalized path';
-is $path->canonicalize, '/../../../../../../../../../../etc/passwd', 'canonicalized path';
-is_deeply $path->parts, [qw(.. .. .. .. .. .. .. .. .. .. etc passwd)], 'right structure';
+is $path->canonicalize,  '/../../../../../../../../../../etc/passwd', 'canonicalized path';
+is_deeply $path->parts,  [qw(.. .. .. .. .. .. .. .. .. .. etc passwd)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 
@@ -70,17 +70,17 @@ $path = Mojo::Path->new('%2ftest%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f
 is "$path", '%2ftest%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd', 'same path';
 is_deeply $path->parts, [qw(test .. .. .. .. .. .. .. .. .. etc passwd)], 'right structure';
 is "$path", '/test/../../../../../../../../../etc/passwd', 'normalized path';
-is $path->canonicalize, '/../../../../../../../../etc/passwd', 'canonicalized path';
-is_deeply $path->parts, [qw(.. .. .. .. .. .. .. .. etc passwd)], 'right structure';
+is $path->canonicalize,  '/../../../../../../../../etc/passwd', 'canonicalized path';
+is_deeply $path->parts,  [qw(.. .. .. .. .. .. .. .. etc passwd)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 
 # Canonicalize (triple dot)
 $path = Mojo::Path->new('/foo/.../.../windows/win.ini');
 is "$path", '/foo/.../.../windows/win.ini', 'same path';
-is_deeply $path->parts, [qw(foo ... ... windows win.ini)], 'right structure';
-is $path->canonicalize, '/foo/windows/win.ini', 'canonicalized path';
-is_deeply $path->parts, [qw(foo windows win.ini)], 'right structure';
+is_deeply $path->parts,  [qw(foo ... ... windows win.ini)], 'right structure';
+is $path->canonicalize,  '/foo/windows/win.ini', 'canonicalized path';
+is_deeply $path->parts,  [qw(foo windows win.ini)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 
@@ -89,8 +89,8 @@ $path = Mojo::Path->new('%2ftest%2f..%252f..%2f..%2f..%2f..%2fetc%2fpasswd');
 is "$path", '%2ftest%2f..%252f..%2f..%2f..%2f..%2fetc%2fpasswd', 'same path';
 is_deeply $path->parts, [qw(test ..%2f.. .. .. .. etc passwd)], 'right structure';
 is "$path", '/test/..%252f../../../../etc/passwd', 'normalized path';
-is $path->canonicalize, '/../etc/passwd', 'canonicalized path';
-is_deeply $path->parts, [qw(.. etc passwd)], 'right structure';
+is $path->canonicalize,  '/../etc/passwd', 'canonicalized path';
+is_deeply $path->parts,  [qw(.. etc passwd)], 'right structure';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 
@@ -161,39 +161,39 @@ is $path->to_route, '/foo/baz/yada', 'right route';
 # Empty path elements
 $path = Mojo::Path->new('//');
 is "$path", '//', 'right path';
-is_deeply $path->parts, [], 'no parts';
+is_deeply $path->parts,   [], 'no parts';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 is "$path", '//', 'right normalized path';
 $path = Mojo::Path->new('%2F%2f');
 is "$path", '%2F%2f', 'right path';
-is_deeply $path->parts, [], 'no parts';
+is_deeply $path->parts,   [], 'no parts';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 is "$path", '//', 'right normalized path';
 $path = Mojo::Path->new('/foo//bar/23/');
 is "$path", '/foo//bar/23/', 'right path';
-is_deeply $path->parts, ['foo', '', 'bar', 23], 'right structure';
+is_deeply $path->parts,   ['foo', '', 'bar', 23], 'right structure';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('//foo/bar/23/');
 is "$path", '//foo/bar/23/', 'right path';
-is_deeply $path->parts, ['', 'foo', 'bar', 23], 'right structure';
+is_deeply $path->parts,   ['', 'foo', 'bar', 23], 'right structure';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('/foo///bar/23/');
 is "$path", '/foo///bar/23/', 'right path';
-is_deeply $path->parts, ['foo', '', '', 'bar', 23], 'right structure';
+is_deeply $path->parts,   ['foo', '', '', 'bar', 23], 'right structure';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('///foo/bar/23/');
 is "$path", '///foo/bar/23/', 'right path';
-is_deeply $path->parts, ['', '', 'foo', 'bar', 23], 'right structure';
+is_deeply $path->parts,   ['', '', 'foo', 'bar', 23], 'right structure';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('///foo///bar/23///');
 is "$path", '///foo///bar/23///', 'right path';
-is_deeply $path->parts, ['', '', 'foo', '', '', 'bar', 23, '', ''], 'right structure';
+is_deeply $path->parts,   ['', '', 'foo', '', '', 'bar', 23, '', ''], 'right structure';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 

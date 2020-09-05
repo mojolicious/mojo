@@ -223,7 +223,7 @@ sub _compile {
     }
 
     # Capture start
-    if ($op eq 'cpst') { $capture = 1 }
+    if    ($op eq 'cpst') { $capture = 1 }
     elsif ($capture) {
       $blocks[-1] .= "sub { my \$_O = ''; ";
       $capture = 0;

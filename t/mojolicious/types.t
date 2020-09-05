@@ -22,26 +22,26 @@ subtest 'Detect common MIME types' => sub {
   is_deeply $t->detect('text/css'),                 ['css'],      'right formats';
   is_deeply $t->detect('image/gif'),                ['gif'],      'right formats';
   is_deeply $t->detect('application/x-gzip'),       ['gz'],       'right formats';
-  is_deeply $t->detect('text/html'), ['htm', 'html'], 'right formats';
-  is_deeply $t->detect('image/x-icon'), ['ico'], 'right formats';
-  is_deeply $t->detect('image/jpeg'), ['jpeg', 'jpg'], 'right formats';
-  is_deeply $t->detect('application/javascript'), ['js'],    'right formats';
-  is_deeply $t->detect('application/json'),       ['json'],  'right formats';
-  is_deeply $t->detect('audio/mpeg'),             ['mp3'],   'right formats';
-  is_deeply $t->detect('video/mp4'),              ['mp4'],   'right formats';
-  is_deeply $t->detect('audio/ogg'),              ['ogg'],   'right formats';
-  is_deeply $t->detect('video/ogg'),              ['ogv'],   'right formats';
-  is_deeply $t->detect('application/pdf'),        ['pdf'],   'right formats';
-  is_deeply $t->detect('image/png'),              ['png'],   'right formats';
-  is_deeply $t->detect('application/rss+xml'),    ['rss'],   'right formats';
-  is_deeply $t->detect('image/svg+xml'),          ['svg'],   'right formats';
-  is_deeply $t->detect('text/plain'),             ['txt'],   'right formats';
-  is_deeply $t->detect('video/webm'),             ['webm'],  'right formats';
-  is_deeply $t->detect('font/woff'),              ['woff'],  'right formats';
-  is_deeply $t->detect('font/woff2'),             ['woff2'], 'right formats';
-  is_deeply $t->detect('application/xml'),        ['xml'],   'right formats';
-  is_deeply $t->detect('text/xml'),               ['xml'],   'right formats';
-  is_deeply $t->detect('application/zip'),        ['zip'],   'right format';
+  is_deeply $t->detect('text/html'),                ['htm', 'html'], 'right formats';
+  is_deeply $t->detect('image/x-icon'),             ['ico'], 'right formats';
+  is_deeply $t->detect('image/jpeg'),               ['jpeg', 'jpg'], 'right formats';
+  is_deeply $t->detect('application/javascript'),   ['js'],    'right formats';
+  is_deeply $t->detect('application/json'),         ['json'],  'right formats';
+  is_deeply $t->detect('audio/mpeg'),               ['mp3'],   'right formats';
+  is_deeply $t->detect('video/mp4'),                ['mp4'],   'right formats';
+  is_deeply $t->detect('audio/ogg'),                ['ogg'],   'right formats';
+  is_deeply $t->detect('video/ogg'),                ['ogv'],   'right formats';
+  is_deeply $t->detect('application/pdf'),          ['pdf'],   'right formats';
+  is_deeply $t->detect('image/png'),                ['png'],   'right formats';
+  is_deeply $t->detect('application/rss+xml'),      ['rss'],   'right formats';
+  is_deeply $t->detect('image/svg+xml'),            ['svg'],   'right formats';
+  is_deeply $t->detect('text/plain'),               ['txt'],   'right formats';
+  is_deeply $t->detect('video/webm'),               ['webm'],  'right formats';
+  is_deeply $t->detect('font/woff'),                ['woff'],  'right formats';
+  is_deeply $t->detect('font/woff2'),               ['woff2'], 'right formats';
+  is_deeply $t->detect('application/xml'),          ['xml'],   'right formats';
+  is_deeply $t->detect('text/xml'),                 ['xml'],   'right formats';
+  is_deeply $t->detect('application/zip'),          ['zip'],   'right format';
 };
 
 subtest 'Detect special cases' => sub {
@@ -64,21 +64,21 @@ subtest 'Alternatives' => sub {
   is_deeply $t->detect('text/x-json'),       ['json'], 'right formats';
   is_deeply $t->detect('TEXT/X-JSON;q=0.1'), ['json'], 'right formats';
   is_deeply $t->detect('APPLICATION/JsoN'),  ['json'], 'right formats';
-  is_deeply $t->detect('text/html'), ['htm', 'html'], 'right formats';
-  is $t->type('json'), 'application/json',        'right type';
-  is $t->type('htm'),  'text/html',               'right type';
-  is $t->type('html'), 'text/html;charset=UTF-8', 'right type';
+  is_deeply $t->detect('text/html'),         ['htm', 'html'], 'right formats';
+  is $t->type('json'),                       'application/json',        'right type';
+  is $t->type('htm'),                        'text/html',               'right type';
+  is $t->type('html'),                       'text/html;charset=UTF-8', 'right type';
 };
 
 subtest 'Prioritize' => sub {
-  is_deeply $t->detect('text/plain'), ['txt'], 'right formats';
-  is_deeply $t->detect('text/plain,text/html'), ['htm', 'html', 'txt'], 'right formats';
-  is_deeply $t->detect('TEXT/HTML; q=0.8 '),        ['htm', 'html'], 'right formats';
-  is_deeply $t->detect('TEXT/HTML  ;  q  =  0.8 '), ['htm', 'html'], 'right formats';
-  is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9'),                  ['txt', 'htm',  'html'], 'right formats';
-  is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9'),                     ['htm', 'html', 'txt'],  'right formats';
-  is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1'), ['xml', 'txt',  'xml'],  'right formats';
-  is_deeply $t->detect('application/json, text/javascript, */*; q=0.01'), ['json'], 'right formats';
+  is_deeply $t->detect('text/plain'),                                        ['txt'], 'right formats';
+  is_deeply $t->detect('text/plain,text/html'),                              ['htm', 'html', 'txt'], 'right formats';
+  is_deeply $t->detect('TEXT/HTML; q=0.8 '),                                 ['htm', 'html'], 'right formats';
+  is_deeply $t->detect('TEXT/HTML  ;  q  =  0.8 '),                          ['htm', 'html'], 'right formats';
+  is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9'),                  ['txt', 'htm', 'html'], 'right formats';
+  is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9'),                     ['htm', 'html', 'txt'], 'right formats';
+  is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1'), ['xml', 'txt', 'xml'],  'right formats';
+  is_deeply $t->detect('application/json, text/javascript, */*; q=0.01'),    ['json'], 'right formats';
 };
 
 subtest 'File types' => sub {

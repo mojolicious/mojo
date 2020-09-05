@@ -182,11 +182,11 @@ ok $v->has_error('baz'), 'has error';
 is_deeply $v->output, {foo => 'bar'}, 'right result';
 ok $v->has_error, 'has error';
 is_deeply $v->error('yada'), [qw(size 1 5 10)], 'right error';
-ok $v->required('foo')->size(1, undef)->is_valid, 'valid';
-ok !$v->required('foo')->size(4, undef)->is_valid, 'not valid';
-ok $v->required('foo')->size(undef, 4)->is_valid, 'valid';
-ok $v->required('foo')->size(undef, 3)->is_valid, 'valid';
-ok !$v->required('foo')->size(undef, 2)->is_valid, 'not valid';
+ok $v->required('foo')->size(1,      undef)->is_valid, 'valid';
+ok !$v->required('foo')->size(4,     undef)->is_valid, 'not valid';
+ok $v->required('foo')->size(undef,  4)->is_valid,     'valid';
+ok $v->required('foo')->size(undef,  3)->is_valid,     'valid';
+ok !$v->required('foo')->size(undef, 2)->is_valid,     'not valid';
 
 # Upload
 $v

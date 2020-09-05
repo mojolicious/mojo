@@ -58,7 +58,7 @@ is $pointer->get('/foo/bar/6'), undef, '"/foo/bar/6" is undef';
 is $pointer->new([{'foo/bar'     => 'bar'}])->get('/0/foo~1bar'),       'bar',  '"/0/foo~1bar" is "bar"';
 is $pointer->new([{'foo/bar/baz' => 'yada'}])->get('/0/foo~1bar~1baz'), 'yada', '"/0/foo~1bar~1baz" is "yada"';
 is $pointer->new([{'foo~/bar'    => 'bar'}])->get('/0/foo~0~1bar'),     'bar',  '"/0/foo~0~1bar" is "bar"';
-is $pointer->new([{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}])->get('/0/f~0o~0o~0~1b~0/a~0/r'), 'baz',
+is $pointer->new([{'f~o~o~/b~'   => {'a~' => {'r' => 'baz'}}}])->get('/0/f~0o~0o~0~1b~0/a~0/r'), 'baz',
   '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
 is $pointer->new({'~1' => 'foo'})->get('/~01'), 'foo', '"/~01" is "foo"';
 
@@ -80,17 +80,17 @@ my $hash = {
   'm~n'  => 8
 };
 $pointer = Mojo::JSON::Pointer->new($hash);
-is_deeply $pointer->get(''), $hash, 'empty pointer is whole document';
+is_deeply $pointer->get(''),     $hash, 'empty pointer is whole document';
 is_deeply $pointer->get('/foo'), ['bar', 'baz'], '"/foo" is "["bar", "baz"]"';
-is $pointer->get('/foo/0'), 'bar', '"/foo/0" is "bar"';
-is $pointer->get('/'),      0,     '"/" is 0';
-is $pointer->get('/a~1b'),  1,     '"/a~1b" is 1';
-is $pointer->get('/c%d'),   2,     '"/c%d" is 2';
-is $pointer->get('/e^f'),   3,     '"/e^f" is 3';
-is $pointer->get('/g|h'),   4,     '"/g|h" is 4';
-is $pointer->get('/i\\j'),  5,     '"/i\\\\j" is 5';
-is $pointer->get('/k"l'),   6,     '"/k\\"l" is 6';
-is $pointer->get('/ '),     7,     '"/ " is 7';
-is $pointer->get('/m~0n'),  8,     '"/m~0n" is 8';
+is $pointer->get('/foo/0'),      'bar', '"/foo/0" is "bar"';
+is $pointer->get('/'),           0,     '"/" is 0';
+is $pointer->get('/a~1b'),       1,     '"/a~1b" is 1';
+is $pointer->get('/c%d'),        2,     '"/c%d" is 2';
+is $pointer->get('/e^f'),        3,     '"/e^f" is 3';
+is $pointer->get('/g|h'),        4,     '"/g|h" is 4';
+is $pointer->get('/i\\j'),       5,     '"/i\\\\j" is 5';
+is $pointer->get('/k"l'),        6,     '"/k\\"l" is 6';
+is $pointer->get('/ '),          7,     '"/ " is 7';
+is $pointer->get('/m~0n'),       8,     '"/m~0n" is 8';
 
 done_testing();

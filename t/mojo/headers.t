@@ -133,9 +133,9 @@ Expires: Thu, 01 Dec 1994 16:00:00 GMT
 
 EOF
   ok $headers->is_finished,   'parser is finished';
-  is $headers->content_type,  'text/plain', 'right value';
-  is $headers->expect,        '100-continue', 'right value';
-  is $headers->cache_control, 'public', 'right value';
+  is $headers->content_type,  'text/plain',                    'right value';
+  is $headers->expect,        '100-continue',                  'right value';
+  is $headers->cache_control, 'public',                        'right value';
   is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
   is $headers->header('o'), 'x', 'right value';
 };
@@ -205,8 +205,8 @@ subtest 'Multiple headers with the same name' => sub {
   is $hash->{'X-Test2'},  'foo',    'right value';
   is $hash->{Connection}, 'a, b',   'right value';
   $hash = $headers->to_hash(1);
-  is_deeply $hash->{'X-Test'}, [23, 24], 'right structure';
-  is_deeply $hash->{'X-Test2'}, ['foo'], 'right structure';
+  is_deeply $hash->{'X-Test'},   [23, 24], 'right structure';
+  is_deeply $hash->{'X-Test2'},  ['foo'], 'right structure';
   is_deeply $hash->{Connection}, ['a', 'b'], 'right structure';
   $headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
   is_deeply $headers->to_hash(1), {'X-Test' => [23, 24], 'X-Test2' => ['foo'], Connection => ['a', 'b']},

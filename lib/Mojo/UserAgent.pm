@@ -129,9 +129,9 @@ sub _connect {
 
       # Connection established
       $stream->on(timeout => sub { $self->_error($id, 'Inactivity timeout') });
-      $stream->on(close => sub { $self && $self->_finish($id, 1) });
-      $stream->on(error => sub { $self && $self->_error($id, pop) });
-      $stream->on(read => sub { $self->_read($id, pop) });
+      $stream->on(close   => sub { $self && $self->_finish($id, 1) });
+      $stream->on(error   => sub { $self && $self->_error($id, pop) });
+      $stream->on(read    => sub { $self->_read($id, pop) });
       $self->_process($id);
     }
   );
@@ -321,7 +321,7 @@ sub _start {
 
   # Allow test servers sharing the same event loop to clean up connections
   !$loop->next_tick(sub { }) and $loop->one_tick unless $loop->is_running;
-  return undef unless my $id = $self->_connection($loop, $tx, $cb);
+  return undef                                   unless my $id = $self->_connection($loop, $tx, $cb);
 
   if (my $t = $self->request_timeout) {
     weaken $self;

@@ -137,7 +137,7 @@ $ua->get(
 is $ua->get('/')->res->code, 200, 'right status';
 Mojo::IOLoop->start;
 ok $success, 'successful';
-is $code,    200, 'right status';
+is $code,    200,      'right status';
 is $body,    'works!', 'right content';
 
 # Promises
@@ -308,7 +308,7 @@ is $finished_res, 1, 'finish event has been emitted once';
 ok $tx->req->is_finished, 'request is finished';
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->res->is_finished, 'response is finished';
-is $tx->res->code,        200, 'right status';
+is $tx->res->code,        200,      'right status';
 is $tx->res->body,        'works!', 'right content';
 
 # Missing Content-Length header
@@ -375,7 +375,7 @@ $ua->post(
 );
 Mojo::IOLoop->start;
 ok $success, 'successful';
-is $code,    200, 'right status';
+is $code,    200,           'right status';
 is $body,    'hello=world', 'right content';
 
 # Non-blocking JSON
@@ -391,7 +391,7 @@ $ua->post(
 );
 Mojo::IOLoop->start;
 ok $success, 'successful';
-is $code,    200, 'right status';
+is $code,    200,                 'right status';
 is $body,    '{"hello":"world"}', 'right content';
 
 # Built-in web server times out

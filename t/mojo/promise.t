@@ -490,7 +490,7 @@ subtest 'Map (with reject)' => sub {
     1 .. 5
   )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
   is_deeply \@results, [], 'promise not resolved';
-  is_deeply \@errors, [1], 'correct errors';
+  is_deeply \@errors,  [1], 'correct errors';
   is_deeply \@started, [1, 2, 3], 'only initial batch started';
 };
 

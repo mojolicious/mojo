@@ -66,7 +66,7 @@ sub listen {
       $options{ReusePort} = $args->{reuse};
       $handle             = $class->new(%options) or croak "Can't create listen socket: $@";
       $fd                 = fileno $handle;
-      $reuse = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
+      $reuse              = $self->{reuse} = join ':', $address, $handle->sockport, $fd;
     }
 
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse" : "$reuse";

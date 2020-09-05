@@ -41,8 +41,8 @@ sub register {
 
   $app->helper(log => \&_log);
 
-  $app->helper('proxy.get_p'  => sub { _proxy_method_p('GET',  @_) });
-  $app->helper('proxy.post_p' => sub { _proxy_method_p('POST', @_) });
+  $app->helper('proxy.get_p'   => sub { _proxy_method_p('GET',  @_) });
+  $app->helper('proxy.post_p'  => sub { _proxy_method_p('POST', @_) });
   $app->helper('proxy.start_p' => \&_proxy_start_p);
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);

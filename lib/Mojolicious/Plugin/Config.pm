@@ -37,7 +37,7 @@ sub register {
   my $home = $app->home;
   $file = $home->child($file) unless path($file)->is_abs;
   $mode = $home->child($mode) if $mode && !path($mode)->is_abs;
-  $mode = undef unless $mode && -e $mode;
+  $mode = undef unless $mode           && -e $mode;
 
   # Read config file
   my $config = {};

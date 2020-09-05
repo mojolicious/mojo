@@ -30,10 +30,10 @@ get '/' => sub {
 
 get '/info' => sub {
   my $c              = shift;
-  my $local_address  = $c->tx->local_address // 'None';
-  my $local_port     = $c->tx->local_port // 'None';
+  my $local_address  = $c->tx->local_address  // 'None';
+  my $local_port     = $c->tx->local_port     // 'None';
   my $remote_address = $c->tx->remote_address // 'None';
-  my $remote_port    = $c->tx->remote_port // 'None';
+  my $remote_port    = $c->tx->remote_port    // 'None';
   $c->render(text => "$local_address:$local_port:$remote_address:$remote_port");
 };
 

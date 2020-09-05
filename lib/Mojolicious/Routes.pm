@@ -169,7 +169,7 @@ sub _controller {
 
       if (my $sub = $new->can($method)) {
         $old->stash->{'mojo.routed'} = 1 if $last;
-        return 1 if _action($old->app, $new, $sub, $last);
+        return 1                         if _action($old->app, $new, $sub, $last);
       }
 
       else { $log->debug('Action not found in controller') }

@@ -516,8 +516,8 @@ is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
 is length(b64_decode $tx->req->headers->sec_websocket_key), 16, '16 byte "Sec-WebSocket-Key" value';
 is $tx->req->headers->sec_websocket_protocol, 'foo', 'right "Sec-WebSocket-Protocol" value';
-ok $tx->req->headers->sec_websocket_version, 'has "Sec-WebSocket-Version" value';
-is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
+ok $tx->req->headers->sec_websocket_version,  'has "Sec-WebSocket-Version" value';
+is $tx->req->headers->upgrade,                'websocket', 'right "Upgrade" value';
 
 # WebSocket handshake with header and protocols
 $tx = $t->websocket('wss://127.0.0.1:3000/echo' => {DNT => 1} => ['v1.bar.example.com', 'foo', 'v2.baz.example.com']);

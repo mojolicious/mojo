@@ -44,13 +44,13 @@ use Mojo::UserAgent;
   is $hypnotoad->prefork->heartbeat_timeout,  9,  'right value';
   is $hypnotoad->prefork->inactivity_timeout, 5,  'right value';
   is $hypnotoad->prefork->keep_alive_timeout, 3,  'right value';
-  is_deeply $hypnotoad->prefork->listen, ['http://*:8081'], 'right value';
-  is $hypnotoad->prefork->max_clients,  1,              'right value';
-  is $hypnotoad->prefork->max_requests, 3,              'right value';
-  is $hypnotoad->prefork->pid_file,     '/foo/bar.pid', 'right value';
-  ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
-  is $hypnotoad->prefork->spare,         4, 'right value';
-  is $hypnotoad->prefork->workers,       7, 'right value';
+  is_deeply $hypnotoad->prefork->listen,      ['http://*:8081'], 'right value';
+  is $hypnotoad->prefork->max_clients,        1,              'right value';
+  is $hypnotoad->prefork->max_requests,       3,              'right value';
+  is $hypnotoad->prefork->pid_file,           '/foo/bar.pid', 'right value';
+  ok $hypnotoad->prefork->reverse_proxy,      'reverse proxy enabled';
+  is $hypnotoad->prefork->spare,              4, 'right value';
+  is $hypnotoad->prefork->workers,            7, 'right value';
   is $hypnotoad->upgrade_timeout, 45, 'right value';
 }
 

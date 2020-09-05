@@ -115,9 +115,9 @@ like $buffer, qr/Usage: APPLICATION COMMAND \[OPTIONS\].*_test2-command.*cgi.*te
 
 # mojo
 is_deeply $commands->namespaces, ['Mojolicious::Command::Author', 'Mojolicious::Command'], 'right namespaces';
-ok $commands->description, 'has a description';
-like $commands->message,   qr/COMMAND/, 'has a message';
-like $commands->hint,      qr/help/, 'has a hint';
+ok $commands->description,       'has a description';
+like $commands->message,         qr/COMMAND/, 'has a message';
+like $commands->hint,            qr/help/,    'has a hint';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
@@ -125,7 +125,7 @@ $buffer = '';
   local $ENV{HARNESS_ACTIVE} = 0;
   $commands->run;
 }
-like $buffer, qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*my-test-command.*version/s, 'right output';
+like $buffer,   qr/Usage: APPLICATION COMMAND \[OPTIONS\].*daemon.*my-test-command.*version/s, 'right output';
 like $buffer,   qr/See, it works/,        'description has been picked up';
 unlike $buffer, qr/my-fake-test-command/, 'fake command has been ignored';
 
@@ -243,9 +243,9 @@ like $@, qr/DOOM/, 'right output';
 require Mojolicious::Command::Author::generate;
 my $generator = Mojolicious::Command::Author::generate->new;
 is_deeply $generator->namespaces, ['Mojolicious::Command::Author::generate'], 'right namespaces';
-ok $generator->description, 'has a description';
-like $generator->message,   qr/generate/, 'has a message';
-like $generator->hint,      qr/help/, 'has a hint';
+ok $generator->description,       'has a description';
+like $generator->message,         qr/generate/, 'has a message';
+like $generator->hint,            qr/help/,     'has a hint';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;

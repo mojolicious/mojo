@@ -1,6 +1,7 @@
 
-8.59  2020-08-17
+8.59  2020-09-05
   - Added l function to ojo. (kiwiroy)
+  - Added MOJO_PROMISE_DEBUG environment variable to Mojo::Promise.
 
 8.58  2020-08-05
   - Improved app and lite_app generators to use templates with subroutine signatures.

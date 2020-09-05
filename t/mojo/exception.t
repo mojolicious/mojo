@@ -45,7 +45,7 @@ subtest 'Context information' => sub {
   my $e = $@;
   isa_ok $e, 'Mojo::Exception', 'right class';
   like $e->inspect, qr/^Works!/, 'right result';
-  like $e->frames->[0][1], qr/exception\.t/, 'right file';
+  like $e->frames->[0][1],     qr/exception\.t/, 'right file';
   is $e->lines_before->[0][0], $line, 'right number';
   is $e->lines_before->[0][1], '  my $line = __LINE__;', 'right line';
   is $e->lines_before->[1][0], $line + 1, 'right number';
@@ -147,19 +147,19 @@ subtest 'Missing error' => sub {
   is_deeply $e->lines_before, [], 'no lines';
   is_deeply $e->line,         [], 'no line';
   is_deeply $e->lines_after,  [], 'no lines';
-  is $e->message, 'Exception!', 'right message';
+  is $e->message,             'Exception!', 'right message';
 
   $e = Mojo::Exception->new(undef)->inspect;
   is_deeply $e->lines_before, [], 'no lines';
   is_deeply $e->line,         [], 'no line';
   is_deeply $e->lines_after,  [], 'no lines';
-  is $e->message, 'Exception!', 'right message';
+  is $e->message,             'Exception!', 'right message';
 
   $e = Mojo::Exception->new('')->inspect;
   is_deeply $e->lines_before, [], 'no lines';
   is_deeply $e->line,         [], 'no line';
   is_deeply $e->lines_after,  [], 'no lines';
-  is $e->message, '', 'right message';
+  is $e->message,             '', 'right message';
 };
 
 subtest 'Check (string exception)' => sub {

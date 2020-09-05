@@ -56,8 +56,8 @@ sub _form_for {
 
   # Method detection
   my $r      = $c->app->routes->lookup($url[0]);
-  my $method = $r ? $r->suggested_method : 'GET';
-  my @post   = $method ne 'GET' ? (method => 'POST') : ();
+  my $method = $r               ? $r->suggested_method : 'GET';
+  my @post   = $method ne 'GET' ? (method => 'POST')   : ();
 
   my $url = $c->url_for(@url);
   $url->query({_method => $method}) if @post && $method ne 'POST';
@@ -93,7 +93,7 @@ sub _input {
 sub _javascript {
   my $c       = shift;
   my $content = ref $_[-1] eq 'CODE' ? "//<![CDATA[\n" . pop->() . "\n//]]>" : '';
-  my @src     = @_ % 2 ? (src => $c->url_for(shift)) : ();
+  my @src     = @_ % 2               ? (src => $c->url_for(shift))           : ();
   return _tag('script', @src, @_, sub {$content});
 }
 
@@ -124,7 +124,7 @@ sub _option {
 
   $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
   my %attrs = (value => $pair->[1], @$pair[2 .. $#$pair]);
-  delete $attrs{selected} if keys %$values;
+  delete $attrs{selected}  if keys %$values;
   $attrs{selected} = undef if $values->{$pair->[1]};
 
   return _tag('option', %attrs, $pair->[0]);

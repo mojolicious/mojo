@@ -302,9 +302,9 @@ is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->version, '1.0', 'right version';
+is $req->version,   '1.0', 'right version';
 ok $req->is_secure, 'is secure';
-is $req->body, 'hello=world', 'right content';
+is $req->body,      'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'https://localhost/test/index.cgi/foo/bar', 'right absolute URL';
 

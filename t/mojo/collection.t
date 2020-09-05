@@ -105,7 +105,7 @@ subtest 'reverse' => sub {
 
 subtest 'shuffle' => sub {
   my $collection = c(0 .. 10000);
-  my $random = $collection->shuffle;
+  my $random     = $collection->shuffle;
   is $collection->size, $random->size, 'same number of elements';
   isnt "@$collection", "@$random", 'different order';
   is_deeply c()->shuffle->to_array, [], 'no elements';
@@ -163,26 +163,26 @@ subtest 'TO_JSON' => sub {
 
 subtest 'head' => sub {
   my $collection = c(1, 2, 5, 4, 3);
-  is_deeply $collection->head(0)->to_array, [], 'right result';
-  is_deeply $collection->head(1)->to_array, [1], 'right result';
-  is_deeply $collection->head(2)->to_array, [1, 2], 'right result';
+  is_deeply $collection->head(0)->to_array,  [], 'right result';
+  is_deeply $collection->head(1)->to_array,  [1], 'right result';
+  is_deeply $collection->head(2)->to_array,  [1, 2], 'right result';
   is_deeply $collection->head(-1)->to_array, [1, 2, 5, 4], 'right result';
   is_deeply $collection->head(-3)->to_array, [1, 2], 'right result';
-  is_deeply $collection->head(5)->to_array, [1, 2, 5, 4, 3], 'right result';
-  is_deeply $collection->head(6)->to_array, [1, 2, 5, 4, 3], 'right result';
+  is_deeply $collection->head(5)->to_array,  [1, 2, 5, 4, 3], 'right result';
+  is_deeply $collection->head(6)->to_array,  [1, 2, 5, 4, 3], 'right result';
   is_deeply $collection->head(-5)->to_array, [], 'right result';
   is_deeply $collection->head(-6)->to_array, [], 'right result';
 };
 
 subtest 'tail' => sub {
   my $collection = c(1, 2, 5, 4, 3);
-  is_deeply $collection->tail(0)->to_array, [], 'right result';
-  is_deeply $collection->tail(1)->to_array, [3], 'right result';
-  is_deeply $collection->tail(2)->to_array, [4, 3], 'right result';
+  is_deeply $collection->tail(0)->to_array,  [], 'right result';
+  is_deeply $collection->tail(1)->to_array,  [3], 'right result';
+  is_deeply $collection->tail(2)->to_array,  [4, 3], 'right result';
   is_deeply $collection->tail(-1)->to_array, [2, 5, 4, 3], 'right result';
   is_deeply $collection->tail(-3)->to_array, [4, 3], 'right result';
-  is_deeply $collection->tail(5)->to_array, [1, 2, 5, 4, 3], 'right result';
-  is_deeply $collection->tail(6)->to_array, [1, 2, 5, 4, 3], 'right result';
+  is_deeply $collection->tail(5)->to_array,  [1, 2, 5, 4, 3], 'right result';
+  is_deeply $collection->tail(6)->to_array,  [1, 2, 5, 4, 3], 'right result';
   is_deeply $collection->tail(-5)->to_array, [], 'right result';
   is_deeply $collection->tail(-6)->to_array, [], 'right result';
 };

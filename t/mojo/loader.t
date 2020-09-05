@@ -135,7 +135,7 @@ subtest 'Base64' => sub {
   no strict 'refs';
   *{"Example::Package::Base64::DATA"} = $data;
   ok !file_is_binary('Example::Package::DoesNotExist', 'test.bin'), 'file is not binary';
-  ok file_is_binary('Example::Package::Base64', 'test.bin'),        'file is binary';
+  ok file_is_binary('Example::Package::Base64',        'test.bin'), 'file is binary';
   is data_section('Example::Package::Base64', 'test.bin'), "\xe2\x99\xa5", 'right template';
   is_deeply [sort keys %{data_section 'Example::Package::Base64'}], ['test.bin'], 'right DATA files';
 };

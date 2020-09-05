@@ -194,8 +194,8 @@ sub _listen {
       warn "-- Accept $id (@{[$stream->handle->peerhost]})\n" if DEBUG;
       $stream->timeout($self->inactivity_timeout);
 
-      $stream->on(close => sub { $self && $self->_close($id) });
-      $stream->on(error => sub { $self && $self->app->log->error(pop) && $self->_close($id) });
+      $stream->on(close   => sub { $self && $self->_close($id) });
+      $stream->on(error   => sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read    => sub { $self->_read($id => pop) });
       $stream->on(timeout => sub { $self->_debug($id, 'Inactivity timeout') });
     }

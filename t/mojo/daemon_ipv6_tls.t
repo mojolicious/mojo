@@ -10,7 +10,7 @@ use lib curfile->sibling('lib')->to_string;
 
 plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)' unless $ENV{TEST_IPV6} || $ENV{TEST_ALL};
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'  unless $ENV{TEST_TLS}  || $ENV{TEST_ALL};
-plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!' unless Mojo::IOLoop::TLS->can_tls;
+plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'      unless Mojo::IOLoop::TLS->can_tls;
 
 # To regenerate all required certificates run these commands (07.01.2016)
 # openssl genrsa -out domain.key 1024

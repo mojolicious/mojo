@@ -231,8 +231,8 @@ is $m->path_for->{path}, '/clean/too', 'right path';
 # No match
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/does_not_exist'});
-is $m->root, $r, 'right root';
-is $m->endpoint, undef, 'no endpoint';
+is $m->root,         $r, 'right root';
+is $m->endpoint,     undef, 'no endpoint';
 is_deeply $m->stack, [], 'empty stack';
 
 # Introspect
@@ -255,7 +255,7 @@ $m->find($c => {method => 'GET', path => '/alternatives'});
 is_deeply $m->stack, [{foo => 11}], 'right strucutre';
 is $m->path_for->{path}, '/alternatives', 'right path';
 is $m->path_for(format => 'txt')->{path}, '/alternatives/11.txt', 'right path';
-is $m->path_for(foo    => 12, format => 'txt')->{path}, '/alternatives/12.txt', 'right path';
+is $m->path_for(foo => 12, format => 'txt')->{path}, '/alternatives/12.txt', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/alternatives/0'});
 is_deeply $m->stack, [{foo => 0}], 'right strucutre';
@@ -344,7 +344,7 @@ $m->find($c => {method => 'GET', path => '/optional/23'});
 is_deeply $m->stack, [{foo => 23, bar => 'test'}], 'right structure';
 is $m->path_for->{path}, '/optional/23', 'right path';
 is $m->path_for(format => 'txt')->{path}, '/optional/23/test.txt', 'right path';
-is $m->path_for(foo    => 12, format => 'txt')->{path}, '/optional/12/test.txt', 'right path';
+is $m->path_for(foo => 12, format => 'txt')->{path}, '/optional/12/test.txt', 'right path';
 is $m->path_for('optionalfoobar', format => 'txt')->{path}, '/optional/23/test.txt', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/optional/23/24'});
@@ -385,8 +385,8 @@ my @stack = (
 );
 is_deeply $m->stack, \@stack, 'right structure';
 is $m->path_for->{path}, '/articles/1/edit', 'right path';
-is $m->path_for(format                    => 'html')->{path}, '/articles/1/edit.html', 'right path';
-is $m->path_for('articles_delete', format => undef)->{path},  '/articles/1/delete',    'right path';
+is $m->path_for(format => 'html')->{path}, '/articles/1/edit.html', 'right path';
+is $m->path_for('articles_delete', format => undef)->{path}, '/articles/1/delete', 'right path';
 is $m->path_for('articles_delete')->{path}, '/articles/1/delete', 'right path';
 is $m->path_for('articles_delete', id => 12)->{path}, '/articles/12/delete', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);

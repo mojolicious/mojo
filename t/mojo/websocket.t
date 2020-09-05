@@ -186,9 +186,9 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok $established, 'connection established';
-is $status,      1000, 'right status';
+is $status,      1000,               'right status';
 is $msg,         'I ♥ Mojolicious!', 'right message';
-is $result,      'test0test2test1', 'right result';
+is $result,      'test0test2test1',  'right result';
 
 # WebSocket connection gets closed very fast
 $status = undef;

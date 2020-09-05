@@ -65,7 +65,7 @@ sub _decode {
     die "Missing or empty input at offset 0\n" unless length(local $_ = shift);
 
     # UTF-8
-    $_ = decode('UTF-8', $_) unless shift;
+    $_ = decode('UTF-8', $_)           unless shift;
     die "Input is not UTF-8 encoded\n" unless defined;
 
     # Value

@@ -10,8 +10,8 @@ subtest 'Missing values' => sub {
   my $jar = Mojo::UserAgent::CookieJar->new;
   $jar->add(Mojo::Cookie::Response->new(domain => 'example.com'));
   $jar->add(Mojo::Cookie::Response->new(name   => 'foo'));
-  $jar->add(Mojo::Cookie::Response->new(name   => 'foo', domain => 'example.com'));
-  $jar->add(Mojo::Cookie::Response->new(domain => 'example.com', path => '/'));
+  $jar->add(Mojo::Cookie::Response->new(name   => 'foo',         domain => 'example.com'));
+  $jar->add(Mojo::Cookie::Response->new(domain => 'example.com', path   => '/'));
   is_deeply $jar->all, [], 'no cookies';
 };
 
@@ -102,7 +102,7 @@ subtest 'Huge cookie' => sub {
 subtest 'Expired cookies' => sub {
   my $jar = Mojo::UserAgent::CookieJar->new;
   $jar->add(
-    Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'foo', value => 'bar'),
+    Mojo::Cookie::Response->new(domain => 'example.com',      path => '/foo', name => 'foo', value => 'bar'),
     Mojo::Cookie::Response->new(domain => 'labs.example.com', path => '/', name => 'baz', value => '24', max_age => -1),
     Mojo::Cookie::Response->new(domain => 'labs.example.com', path => '/', name => 'qux', value => 'qux', max_age => 0)
   );
@@ -335,8 +335,8 @@ subtest 'Gather cookies with invalid expiration' => sub {
   is $jar->all->[0]->name,  'foo', 'right name';
   is $jar->all->[0]->value, 'bar', 'right value';
   ok !$jar->all->[0]->expires, 'does not expire';
-  is $jar->all->[1]->name,  'bar', 'right name';
-  is $jar->all->[1]->value, 'baz', 'right value';
+  is $jar->all->[1]->name,    'bar', 'right name';
+  is $jar->all->[1]->value,   'baz', 'right value';
   ok $jar->all->[1]->expires, 'expires';
 };
 

@@ -6,7 +6,7 @@ use Mojo::Exception;
 use Mojo::File qw(path);
 use Mojo::Util qw(b64_decode class_to_path);
 
-our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class is_package);
+our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages is_package load_class);
 
 my (%BIN, %CACHE);
 

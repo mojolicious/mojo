@@ -7,7 +7,7 @@ use Test::More;
 use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
-use Mojo::Loader qw(data_section file_is_binary find_packages find_modules load_class is_package);
+use Mojo::Loader qw(data_section file_is_binary find_modules find_packages is_package load_class);
  
 package MyLoaderTest::Foo::Bar;
 

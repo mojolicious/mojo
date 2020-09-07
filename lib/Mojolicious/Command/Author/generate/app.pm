@@ -10,7 +10,7 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, $class) = (shift, shift || 'MyApp');
 
-  is_package($class) or die "Bad app name[$class]\n";
+  is_package($class) or die "Can't generate application: Bad name[$class]\n";
 
   # Script
   my $name = class_to_file $class;

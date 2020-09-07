@@ -280,6 +280,10 @@ ok -e $app->rel_file('my_app/templates/layouts/default.html.ep'), 'layout exists
 ok -e $app->rel_file('my_app/templates/example/welcome.html.ep'), 'template exists';
 chdir $cwd;
 
+# generate app with bad name
+eval{$commands->run('generate', 'app', 'bad:::package')};
+is $@, "Can't generate application: Bad name[bad:::package]\n", 'right output';
+
 # generate lite_app
 require Mojolicious::Command::Author::generate::lite_app;
 $app = Mojolicious::Command::Author::generate::lite_app->new;

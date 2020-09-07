@@ -172,11 +172,17 @@ Search for packages in a namespace non-recursively.
 
 =head2 is_package
 
-  if( is_package('a1::aaa') ){
-    say "package name valid";
-  }
+  my $bool = is_package 'Mojo::Base';
 
-Check package name.
+Check if value is a package name.
+
+  # False
+  is_package 'MyApp.pm';
+  is_package 'My/App.pm';
+
+  # True
+  is_package 'MyApp';
+  is_package 'My::App';
 
 =head2 find_modules
 

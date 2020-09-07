@@ -342,10 +342,10 @@ web features, such as WebSockets, are not available.
 
   ScriptAlias / /home/sri/my_app/script/my_app/
 
-=head2 Envoy Proxy
+=head2 Envoy
 
-For deploying L<Mojolicious> applications on "cloud-native" environments that use L<Envoy|https://www.envoyproxy.io>,
-here is a configuration for a basic reverse proxy similar to Apache and Nginx:
+L<Mojolicious> applications can be deployed on "cloud-native" environments that use L<Envoy|https://www.envoyproxy.io>,
+such as with this reverse proxy configuration similar to the Apache and Nginx ones above.
 
   static_resources:
     listeners:

@@ -386,6 +386,11 @@ such as with this reverse proxy configuration similar to the Apache and Nginx on
           - endpoint:
               address:
                 socket_address: { address: mojo, port_value: 8080 }
+                
+While this configuration works for simple applications, Envoy's typical use case is for implementing proxies of
+applications as a "service mesh" providing advanced filtering, load balancing, and observability features, such as
+seen in L<Istio|https://istio.io/latest/docs/ops/deployment/architecture/>.  More examples can be found at the
+L<Envoy documentation|https://www.envoyproxy.io/docs/envoy/latest/start/start>.
 
 =head2 PSGI/Plack
 

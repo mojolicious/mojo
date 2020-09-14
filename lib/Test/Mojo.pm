@@ -1095,7 +1095,7 @@ Check response status for regex match.
   $t = $t->status_unlike(qr/^3/);
   $t = $t->status_unlike(qr/^3/, 'not any kind of redirect');
 
-Check response status for B<not> matching a regex.
+Opposite of L</"status_like">.
 
 =head2 test
 

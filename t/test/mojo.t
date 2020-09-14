@@ -11,6 +11,8 @@ my $t = Test::Mojo->new;
 subtest 'Basics' => sub {
   isa_ok $t->app, 'Mojolicious', 'right class';
   $t->get_ok('/')->status_is(200)->content_is('Hello Test!');
+  $t->status_like(qr/^2/);
+  $t->status_unlike(qr/^4/);
   ok $t->success, 'success';
   $t->handler(sub {1})->status_is(404);
   ok $t->success, 'success';

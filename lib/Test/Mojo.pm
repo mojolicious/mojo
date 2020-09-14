@@ -299,6 +299,18 @@ sub status_isnt {
   return $self->test('isnt', $self->tx->res->code, $status, $desc);
 }
 
+sub status_like {
+  my ($self, $status, $desc) = @_;
+  $desc = _desc($desc, $self->tx->res->code . " like $status");
+  return $self->test('like', $self->tx->res->code, $status, $desc);
+};
+
+sub status_unlike {
+  my ($self, $status, $desc) = @_;
+  $desc = _desc($desc, $self->tx->res->code . " unlike $status");
+  return $self->test('unlike', $self->tx->res->code, $status, $desc);
+};
+
 sub test {
   my ($self, $name, @args) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 3;
@@ -1070,6 +1082,20 @@ Check response status for exact match.
   $t = $t->status_isnt(200, 'different status');
 
 Opposite of L</"status_is">.
+
+=head2 status_like
+
+  $t = $t->status_like(qr/^4/);
+  $t = $t->status_like(qr/^4/, 'some kind of error');
+
+Check response status for regex match.
+
+=head2 status_unlike
+
+  $t = $t->status_unlike(qr/^3/);
+  $t = $t->status_unlike(qr/^3/, 'not any kind of redirect');
+
+Check response status for B<not> matching a regex.
 
 =head2 test
 

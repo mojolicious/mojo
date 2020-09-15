@@ -11,8 +11,6 @@ my $t = Test::Mojo->new;
 subtest 'Basics' => sub {
   isa_ok $t->app, 'Mojolicious', 'right class';
   $t->get_ok('/')->status_is(200)->content_is('Hello Test!');
-  $t->status_like(qr/^2/);
-  $t->status_unlike(qr/^4/);
   ok $t->success, 'success';
   $t->handler(sub {1})->status_is(404);
   ok $t->success, 'success';
@@ -76,6 +74,20 @@ subtest 'status_is' => sub {
   is_deeply \@args, ['is', 200, 200, '200 OK'], 'right result';
   $t->status_is(404, 'some description');
   is_deeply \@args, ['is', 200, 404, 'some description'], 'right result';
+};
+
+subtest 'status_like' => sub {
+  $t->status_like(qr/^2/);
+  is_deeply \@args, ['like', 200, qr/^2/, '200 like '.qr/^2/], 'right result';
+  $t->status_like(qr/^2/, 'some description');
+  is_deeply \@args, ['like', 200, qr/^2/, 'some description'], 'right result';
+};
+
+subtest 'status_unlike' => sub {
+  $t->status_unlike(qr/^2/);
+  is_deeply \@args, ['unlike', 200, qr/^2/, '200 unlike '.qr/^2/], 'right result';
+  $t->status_unlike(qr/^2/, 'some description');
+  is_deeply \@args, ['unlike', 200, qr/^2/, 'some description'], 'right result';
 };
 
 subtest 'content_is' => sub {

@@ -29,10 +29,39 @@ jobs:
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
-          cpanm -n Cpanel::JSON::XS EV Role::Tiny
+          cpanm -n Cpanel::JSON::XS EV Role::Tiny IO::Socket::SSL
           cpanm -n Test::Pod Test::Pod::Coverage
+      - name: Generate temporary SSL certificates
+        run: |
+          openssl genrsa -out $CERT_DIR/ca.key $BITS
+          openssl req -new -key $CERT_DIR/ca.key -out $CERT_DIR/ca.csr -subj "/C=US/CN=ca"
+          openssl req -x509 -days $DAYS -key $CERT_DIR/ca.key -in $CERT_DIR/ca.csr -out $CERT_DIR/ca.crt
+
+          openssl genrsa -out $CERT_DIR/server.key $BITS
+          openssl req -new -key $CERT_DIR/server.key -out $CERT_DIR/server.csr -subj "/C=US/CN=127.0.0.1"
+          openssl x509 -req -days $DAYS -in $CERT_DIR/server.csr -out $CERT_DIR/server.crt -CA $CERT_DIR/ca.crt \
+            -CAkey $CERT_DIR/ca.key -CAcreateserial
+
+          openssl genrsa -out $CERT_DIR/client.key $BITS
+          openssl req -new -key $CERT_DIR/client.key -out $CERT_DIR/client.csr -subj "/C=US/CN=127.0.0.1"
+          openssl x509 -req -days $DAYS -in $CERT_DIR/client.csr -out $CERT_DIR/client.crt -CA $CERT_DIR/ca.crt \
+            -CAkey $CERT_DIR/ca.key -CAcreateserial
+
+          openssl genrsa -out $CERT_DIR/bad.key $BITS
+          openssl req -new -key $CERT_DIR/bad.key -out $CERT_DIR/bad.csr -subj "/C=US/CN=bad"
+          openssl req -x509 -days $DAYS -key $CERT_DIR/bad.key -in $CERT_DIR/bad.csr -out $CERT_DIR/bad.crt
+
+          openssl x509 -noout -serial -dates -subject -issuer -in $CERT_DIR/ca.crt
+          openssl x509 -noout -serial -dates -subject -issuer -in $CERT_DIR/server.crt
+          openssl x509 -noout -serial -dates -subject -issuer -in $CERT_DIR/client.crt
+          openssl x509 -noout -serial -dates -subject -issuer -in $CERT_DIR/bad.crt
+        env:
+          CERT_DIR: t/mojo/certs
+          BITS: 2048
+          DAYS: 1
       - name: Run tests
         run: prove -l t t/mojo t/mojolicious
         env:
           TEST_POD: 1
           TEST_EV: 1
+          TEST_TLS: 1

@@ -77,7 +77,7 @@ $listen
   . '&ca=t/mojo/certs/ca.crt'
   . '&ciphers=AES256-SHA:ALL'
   . '&verify=0x00'
-  . '&version=TLSv1';
+  . '&version=TLSv1_2';
 $port = $daemon->listen([$listen])->start->ports->[0];
 
 # Invalid certificate
@@ -90,6 +90,6 @@ $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
 $tx = $ua->get("https://127.0.0.1:$port");
 ok !$tx->error, 'no error';
 is $ua->ioloop->stream($tx->connection)->handle->get_cipher,     'AES256-SHA', 'AES256-SHA has been negotiatied';
-is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',      'TLSv1 has been negotiatied';
+is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1_2',    'TLSv1_2 has been negotiatied';
 
 done_testing();

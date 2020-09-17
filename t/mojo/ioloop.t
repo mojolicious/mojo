@@ -107,7 +107,7 @@ subtest 'Handle and reset' => sub {
   is $count, 0, 'no recurring events';
   ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
   ok !Mojo::IOLoop->stream($id2),  'stream has been removed';
-  is $handle, $handle2, 'handles are equal';
+  is $handle,     $handle2, 'handles are equal';
   isa_ok $handle, 'IO::Socket', 'right reference';
   is $reset,      1,            'reset event has been emitted once';
 };

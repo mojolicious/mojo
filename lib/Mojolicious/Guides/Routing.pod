@@ -376,7 +376,7 @@ internally rely on L<Mojolicious::Controller/"url_for"> for this.
   # /foo/marcus -> {controller => 'foo', action => 'bar', user => 'marcus'}
   $r->get('/foo/:user')->to('foo#bar')->name('baz');
 
-  # Generate URL "/foo/marcus" for route "baz"
+  # Generate URL "/foo/marcus" for route "baz" (in previous request context)
   my $url = $c->url_for('baz');
 
   # Generate URL "/foo/jan" for route "baz"

@@ -1,7 +1,7 @@
 
 8.60  2020-09-27
   - Improved reset method in Mojo::IOLoop to prevent close event to be emitted in affected streams. (kiwiroy)
-  - Improved cookbok with Envoy deployment recipe. (zakame)
+  - Improved cookbook with Envoy deployment recipe. (zakame)
 
 8.59  2020-09-05
   - Added l function to ojo. (kiwiroy)

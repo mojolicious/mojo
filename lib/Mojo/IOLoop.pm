@@ -95,6 +95,7 @@ sub remove {
 
 sub reset {
   my $self = _instance(shift)->emit('reset');
+  $self->stream($_)->unsubscribe('close') for (keys %{$self->{in}}, keys %{$self->{out}});
   delete @$self{qw(accepting acceptors events in out stop)};
   $self->reactor->reset;
   $self->stop;

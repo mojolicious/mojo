@@ -83,19 +83,18 @@ subtest 'Recurring timer' => sub {
 };
 
 subtest 'Handle and reset' => sub {
-  my ($handle, $handle2, $reset, $close);
+  my ($handle, $handle2, $reset);
   Mojo::IOLoop->singleton->on(reset => sub { $reset++ });
   my $id = Mojo::IOLoop->server(
     (address => '127.0.0.1') => sub {
       my ($loop, $stream) = @_;
-      $stream->on(close => sub { $close++ });
       $handle = $stream->handle;
       Mojo::IOLoop->stop;
     }
   );
   my $port = Mojo::IOLoop->acceptor($id)->port;
   Mojo::IOLoop->acceptor($id)->on(accept => sub { $handle2 = pop });
-  my $id2 = Mojo::IOLoop->client((address => '127.0.0.1', port => $port) => sub { pop->on(close => sub { $close++ })});
+  my $id2 = Mojo::IOLoop->client((address => '127.0.0.1', port => $port) => sub { });
   Mojo::IOLoop->start;
   my ($count, $running, $timer) = (0) x 3;
   Mojo::IOLoop->recurring(10 => sub { $timer++ });
@@ -111,7 +110,6 @@ subtest 'Handle and reset' => sub {
   is $handle,     $handle2, 'handles are equal';
   isa_ok $handle, 'IO::Socket', 'right reference';
   is $reset,      1,            'reset event has been emitted once';
-  is $close,      undef,        'reset unsubscribed close on streams';
 };
 
 subtest 'The poll reactor stops when there are no events being watched anymore' => sub {

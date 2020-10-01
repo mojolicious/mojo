@@ -517,33 +517,39 @@ ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# Fork-safety
-$tx = $ua->get('/');
-ok $tx->keep_alive, 'keep connection alive';
-is $tx->res->body, 'works!', 'right content';
-my $last = $tx->connection;
-$port = $ua->server->url->port;
-$tx   = $ua->get('/');
-is $tx->res->body, 'works!', 'right content';
-is $tx->connection, $last, 'same connection';
-is $ua->server->url->port, $port, 'same port';
-{
-  local $$ = -23;
-  $tx = $ua->get('/');
-  ok !$tx->kept_alive, 'kept connection not alive';
+subtest 'Fork-safety' => sub {
+  my $tx = $ua->get('/');
   ok $tx->keep_alive, 'keep connection alive';
   is $tx->res->body, 'works!', 'right content';
-  isnt $tx->connection, $last, 'new connection';
-  isnt $ua->server->url->port, $port, 'new port';
-  $port = $ua->server->url->port;
-  $last = $tx->connection;
-  $tx   = $ua->get('/');
-  ok $tx->kept_alive, 'kept connection alive';
-  ok $tx->keep_alive, 'keep connection alive';
+  my $last = $tx->connection;
+  my $port = $ua->server->url->port;
+  $tx = $ua->get('/');
   is $tx->res->body, 'works!', 'right content';
   is $tx->connection, $last, 'same connection';
   is $ua->server->url->port, $port, 'same port';
-}
+  {
+    local $$ = -23;
+    my $tx = $ua->get('/');
+    ok !$tx->kept_alive, 'kept connection not alive';
+    ok $tx->keep_alive, 'keep connection alive';
+    is $tx->res->body, 'works!', 'right content';
+    isnt $tx->connection, $last, 'new connection';
+    isnt $ua->server->url->port, $port, 'new port';
+    my $port2 = $ua->server->url->port;
+    my $last2 = $tx->connection;
+    {
+      local $$ = -24;
+      my $tx = $ua->get('/');
+      ok !$tx->kept_alive, 'kept connection not alive';
+      ok $tx->keep_alive, 'keep connection alive';
+      is $tx->res->body, 'works!', 'right content';
+      isnt $tx->connection, $last,  'new connection';
+      isnt $tx->connection, $last2, 'new connection';
+      isnt $ua->server->url->port, $port,  'new port';
+      isnt $ua->server->url->port, $port2, 'new port';
+    }
+  }
+};
 
 # Introspect
 my $req = my $res = '';

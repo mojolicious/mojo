@@ -51,7 +51,8 @@ sub start {
   my ($self, $tx, $cb) = @_;
 
   # Fork-safety
-  $self->_cleanup->server->restart unless ($self->{pid} //= $$) eq $$;
+  $self->_cleanup->server->restart if $self->{pid} && $self->{pid} ne $$;
+  $self->{pid} //= $$;
 
   # Non-blocking
   if ($cb) {

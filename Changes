@@ -1,4 +1,6 @@
 
+8.62  2020-10-02
+
 8.61  2020-10-01
   - Fixed fork-safety feature in Mojo::UserAgent to work with more than one fork.
   - Fixed reset method in Mojo::IOLoop to not interfere with close events anymore, since that resulted in leaks.

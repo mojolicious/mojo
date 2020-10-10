@@ -10,7 +10,7 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  getopt \@args, 'v|verbose' => \my $verbose;
+  die $self->usage unless getopt \@args, 'v|verbose' => \my $verbose;
 
   my $rows = [];
   _walk($_, 0, $rows, $verbose) for @{$self->app->routes->children};

@@ -11,7 +11,8 @@ sub run {
   my ($self, @args) = @_;
 
   my $daemon = Mojo::Server::Daemon->new(app => $self->app);
-  getopt \@args,
+  die $self->usage
+    unless getopt \@args,
     'b|backlog=i'            => sub { $daemon->backlog($_[1]) },
     'c|clients=i'            => sub { $daemon->max_clients($_[1]) },
     'i|inactivity-timeout=i' => sub { $daemon->inactivity_timeout($_[1]) },

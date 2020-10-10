@@ -10,7 +10,7 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  getopt \@args,
+  die $self->usage unless getopt \@args,
     'p|password=s' => \(my $password = ''),
     'u|user=s'     => \(my $user     = '');
   die $self->usage unless my $file = shift @args;

@@ -181,12 +181,28 @@ $buffer = '';
   $get->run('/json', '/works');
 }
 like $buffer, qr/too/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $get->run('--unknown') };
+  like $@, qr/Usage: APPLICATION get/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 
 # cgi
 require Mojolicious::Command::cgi;
 my $cgi = Mojolicious::Command::cgi->new;
 ok $cgi->description, 'has a description';
 like $cgi->usage, qr/cgi/, 'has usage information';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $cgi->run('--unknown') };
+  like $@, qr/Usage: APPLICATION cgi/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 
 # cpanify
 require Mojolicious::Command::Author::cpanify;
@@ -208,12 +224,28 @@ $buffer = '';
   $cpanify->run('-u', 'sri', '-p', 's3cret', __FILE__);
 }
 like $buffer, qr/Upload successful!/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $cpanify->run('--unknown') };
+  like $@, qr/Usage: APPLICATION cpanify/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 
 # daemon
 require Mojolicious::Command::daemon;
 my $daemon = Mojolicious::Command::daemon->new;
 ok $daemon->description, 'has a description';
 like $daemon->usage, qr/daemon/, 'has usage information';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $daemon->run('--unknown') };
+  like $@, qr/Usage: APPLICATION daemon/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 
 # eval
 require Mojolicious::Command::eval;
@@ -238,6 +270,14 @@ $buffer = '';
 like $buffer, qr/Zoidberg/, 'right output';
 eval { $eval->run('-v', 'Mojo::Promise->new->reject("DOOM")') };
 like $@, qr/DOOM/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $eval->run('--unknown') };
+  like $@, qr/Usage: APPLICATION eval/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 
 # generate
 require Mojolicious::Command::Author::generate;
@@ -341,6 +381,14 @@ like $buffer, qr/Test\.pm/, 'right output';
 ok -e $app->rel_file('MyApp-Ext-Test/lib/MyApp/Ext/Test.pm'), 'class exists';
 ok -e $app->rel_file('MyApp-Ext-Test/t/basic.t'),             'test exists';
 ok -e $app->rel_file('MyApp-Ext-Test/Makefile.PL'),           'Makefile.PL exists';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $plugin->run('--unknown') };
+  like $@, qr/Usage: APPLICATION generate plugin/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 chdir $cwd;
 
 # inflate
@@ -354,6 +402,14 @@ require Mojolicious::Command::prefork;
 my $prefork = Mojolicious::Command::prefork->new;
 ok $prefork->description, 'has a description';
 like $prefork->usage, qr/prefork/, 'has usage information';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $prefork->run('--unknown') };
+  like $@, qr/Usage: APPLICATION prefork/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 
 # psgi
 require Mojolicious::Command::psgi;
@@ -382,6 +438,14 @@ $buffer = '';
 }
 like $buffer, qr!/\*whatever!, 'right output';
 like $buffer, qr!/\(\.\+\)\?!, 'verbose';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  eval { $routes->run('--unknown') };
+  like $@, qr/Usage: APPLICATION routes/, 'unknown option';
+}
+like $buffer, qr/Unknown option: unknown/, 'right output';
 
 # version
 require Mojolicious::Command::version;

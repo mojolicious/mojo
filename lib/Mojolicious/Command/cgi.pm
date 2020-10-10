@@ -9,7 +9,7 @@ has usage       => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
-  getopt \@args, nph => \(my $nph = 0);
+  die $self->usage unless getopt \@args, nph => \(my $nph = 0);
   Mojo::Server::CGI->new(app => $self->app, nph => $nph)->run;
 }
 

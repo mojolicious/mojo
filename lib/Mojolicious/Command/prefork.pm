@@ -11,7 +11,8 @@ sub run {
   my ($self, @args) = @_;
 
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
-  getopt \@args,
+  die $self->usage
+    unless getopt \@args,
     'a|accepts=i'            => sub { $prefork->accepts($_[1]) },
     'b|backlog=i'            => sub { $prefork->backlog($_[1]) },
     'c|clients=i'            => sub { $prefork->max_clients($_[1]) },

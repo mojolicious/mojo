@@ -10,7 +10,7 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  getopt \@args, 'v|verbose' => \my $v1, 'V' => \my $v2;
+  die $self->usage unless getopt \@args, 'v|verbose' => \my $v1, 'V' => \my $v2;
   my $code = shift @args || '';
 
   # Run code against application

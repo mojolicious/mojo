@@ -9,7 +9,7 @@ has usage       => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
-  getopt \@args, 'f|full' => \(my $full);
+  die $self->usage unless getopt \@args, 'f|full' => \(my $full);
 
   # Class
   my $name  = $args[0] // 'MyPlugin';

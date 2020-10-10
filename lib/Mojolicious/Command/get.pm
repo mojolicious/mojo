@@ -23,7 +23,8 @@ sub run {
 
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   my %form;
-  getopt \@args,
+  die $self->usage
+    unless getopt \@args,
     'C|charset=s'            => \my $charset,
     'c|content=s'            => \$in,
     'f|form=s'               => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },

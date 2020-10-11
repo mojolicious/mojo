@@ -11,23 +11,20 @@ use Mojo::Base 'Mojo::Reactor::Poll';
 
 package main;
 
-# Detection (success)
-{
+subtest 'Detection (success)' => sub {
   local $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Test';
   is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
-}
+};
 
-# Detection (fail)
-{
+subtest 'Detection (fail)' => sub {
   local $ENV{MOJO_REACTOR} = 'Mojo::Reactor::DoesNotExist';
   is(Mojo::Reactor->detect, 'Mojo::Reactor::Poll', 'right class');
-}
+};
 
-# Event loop detection
-{
+subtest 'Event loop detection' => sub {
   local $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Test';
   require Mojo::IOLoop;
   is ref Mojo::IOLoop->new->reactor, 'Mojo::Reactor::Test', 'right class';
-}
+};
 
 done_testing();

@@ -48,10 +48,12 @@ sub _start {
   # Child
   return $self->$parent("Can't fork: $!") unless defined(my $pid = $self->{pid} = fork);
   unless ($pid) {
-    $self->ioloop->reset;
-    my $results = eval { [$self->$child] } || [];
-    print {$self->{writer}} '0-', $self->serialize->([$@, @$results]);
-    $self->emit('cleanup');
+    eval {
+      $self->ioloop->reset;
+      my $results = eval { [$self->$child] } || [];
+      print {$self->{writer}} '0-', $self->serialize->([$@, @$results]);
+      $self->emit('cleanup');
+    } or warn $@;
     POSIX::_exit(0);
   }
 

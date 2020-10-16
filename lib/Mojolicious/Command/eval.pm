@@ -15,7 +15,7 @@ sub run {
 
   # Run code against application
   my $app    = $self->app;
-  my $result = eval "package main; sub app; local *app = sub { \$app }; $code";
+  my $result = eval "package main; no warnings qw(redefine); sub app; local *app = sub { \$app }; $code";
   die $@ if $@;
 
   # Handle promises

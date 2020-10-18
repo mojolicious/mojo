@@ -799,8 +799,6 @@ Current voting members of the core team in alphabetical order:
 
 =over 2
 
-CandyAngel, C<candyangel@mojolicious.org>
-
 Christopher Rasch-Olsen Raa, C<christopher@mojolicious.org>
 
 Dan Book, C<grinnz@mojolicious.org>
@@ -818,6 +816,8 @@ The following members of the core team are currently on hiatus:
 =over 2
 
 Abhijit Menon-Sen, C<ams@cpan.org>
+
+CandyAngel, C<candyangel@mojolicious.org>
 
 Glen Hinkle, C<tempire@cpan.org>
 

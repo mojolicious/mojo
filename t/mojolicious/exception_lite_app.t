@@ -126,149 +126,186 @@ get '/dead_helper';
 
 my $t = Test::Mojo->new;
 
-# Missing error
-my $c = $t->app->build_controller;
-$c->reply->exception(undef);
-like $c->res->body, qr/Exception!/, 'right result';
-$c = $t->app->build_controller;
-$c->reply->exception;
-like $c->res->body, qr/Exception!/, 'right result';
-$c = $t->app->build_controller;
-$c->reply->exception(Mojo::Exception->new);
-like $c->res->body, qr/Exception!/, 'right result';
+subtest 'Missing error' => sub {
+  my $c = $t->app->build_controller;
+  $c->reply->exception(undef);
+  like $c->res->body, qr/Exception!/, 'right result';
 
-# Debug
-$t->get_ok('/logger?level=debug&message=one')->status_is(200)->content_is('debug: one');
-like $log, qr/debug:one/, 'right result';
+  $c = $t->app->build_controller;
+  $c->reply->exception;
+  like $c->res->body, qr/Exception!/, 'right result';
 
-# Info
-$t->get_ok('/logger?level=info&message=two')->status_is(200)->content_is('info: two');
-like $log, qr/info:two/, 'right result';
+  $c = $t->app->build_controller;
+  $c->reply->exception(Mojo::Exception->new);
+  like $c->res->body, qr/Exception!/, 'right result';
+};
 
-# Warn
-$t->get_ok('/logger?level=warn&message=three')->status_is(200)->content_is('warn: three');
-like $log, qr/warn:three/, 'right result';
+subtest Debug => sub {
+  $t->get_ok('/logger?level=debug&message=one')->status_is(200)->content_is('debug: one');
+  like $log, qr/debug:one/, 'right result';
+};
 
-# Error
-$t->get_ok('/logger?level=error&message=four')->status_is(200)->content_is('error: four');
-like $log, qr/error:four/, 'right result';
+subtest Info => sub {
+  $t->get_ok('/logger?level=info&message=two')->status_is(200)->content_is('info: two');
+  like $log, qr/info:two/, 'right result';
+};
 
-# Fatal
-$t->get_ok('/logger?level=fatal&message=five')->status_is(200)->content_is('fatal: five');
-like $log, qr/fatal:five/, 'right result';
+subtest Warn => sub {
+  $t->get_ok('/logger?level=warn&message=three')->status_is(200)->content_is('warn: three');
+  like $log, qr/warn:three/, 'right result';
+};
 
-# "debug.html.ep" route suggestion
-$t->get_ok('/does_not_exist')->status_is(404)->element_exists('#mojobar')->content_like(qr!/does_not_exist!);
+subtest Error => sub {
+  $t->get_ok('/logger?level=error&message=four')->status_is(200)->content_is('error: four');
+  like $log, qr/error:four/, 'right result';
+};
 
-# "debug.html.ep" route suggestion
-$t->post_ok('/does_not_exist')->status_is(404)->content_like(qr!/does_not_exist!);
+subtest Fatal => sub {
+  $t->get_ok('/logger?level=fatal&message=five')->status_is(200)->content_is('fatal: five');
+  like $log, qr/fatal:five/, 'right result';
+};
 
-# Custom exception
-$t->get_ok('/custom_exception')->status_is(500)->content_like(qr/Mojo::Base/);
+subtest '"debug.html.ep" route suggestion' => sub {
+  $t->get_ok('/does_not_exist')->status_is(404)->element_exists('#mojobar')->content_like(qr!/does_not_exist!);
+};
 
-# Dead template
-$t->get_ok('/dead_template')->status_is(500)->content_like(qr/dead template!/)->content_like(qr/line 1/);
-like $log, qr/dead template!/, 'right result';
+subtest '"debug.html.ep" route suggestion' => sub {
+  $t->post_ok('/does_not_exist')->status_is(404)->content_like(qr!/does_not_exist!);
+};
 
-# Dead template with a different handler
-$t->get_ok('/dead_template_too.xml')->status_is(500)->content_is("<very>bad</very>\n");
-like $log, qr/dead template too!/, 'right result';
+subtest 'Custom exception' => sub {
+  $t->get_ok('/custom_exception')->status_is(500)->content_like(qr/Mojo::Base/);
+};
 
-# Dead handler
-$t->get_ok('/dead_handler.xml')->status_is(500)->content_is("<very>bad</very>\n");
-like $log, qr/dead handler!/, 'right result';
+subtest 'Dead template' => sub {
+  $t->get_ok('/dead_template')->status_is(500)->content_like(qr/dead template!/)->content_like(qr/line 1/);
+  like $log, qr/dead template!/, 'right result';
+};
 
-# Dead action (with a different handler)
-$t->get_ok('/dead_action_epl.xml')->status_is(500)->content_is("<very>bad</very>\n");
-like $log, qr/dead action epl!/, 'right result';
+subtest 'Dead template with a different handler' => sub {
+  $t->get_ok('/dead_template_too.xml')->status_is(500)->content_is("<very>bad</very>\n");
+  like $log, qr/dead template too!/, 'right result';
+};
 
-# Dead included template
-$t->get_ok('/dead_included_template')->status_is(500)->content_like(qr/dead template!/)->content_like(qr/line 1/);
+subtest 'Dead handler' => sub {
+  $t->get_ok('/dead_handler.xml')->status_is(500)->content_is("<very>bad</very>\n");
+  like $log, qr/dead handler!/, 'right result';
+};
 
-# Dead template with layout
-$t->get_ok('/dead_template_with_layout')->status_is(500)->content_like(qr/dead template with layout!/)
-  ->content_like(qr/line 2/)->content_unlike(qr/Green/);
-like $log, qr/dead template with layout!/, 'right result';
+subtest 'Dead action (with a different handler)' => sub {
+  $t->get_ok('/dead_action_epl.xml')->status_is(500)->content_is("<very>bad</very>\n");
+  like $log, qr/dead action epl!/, 'right result';
+};
 
-# Dead action
-$t->get_ok('/dead_action')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr!get &#39;/dead_action&#39;!)->content_like(qr/dead action!/)->text_is('#error' => "dead action!\n");
-like $log, qr/dead action!/, 'right result';
+subtest 'Dead included template' => sub {
+  $t->get_ok('/dead_included_template')->status_is(500)->content_like(qr/dead template!/)->content_like(qr/line 1/);
+};
 
-# Dead action with different format
-$t->get_ok('/dead_action.xml')->status_is(500)->content_type_is('application/xml')->content_is("<very>bad</very>\n");
+subtest 'Dead template with layout' => sub {
+  $t->get_ok('/dead_template_with_layout')->status_is(500)->content_like(qr/dead template with layout!/)
+    ->content_like(qr/line 2/)->content_unlike(qr/Green/);
+  like $log, qr/dead template with layout!/, 'right result';
+};
 
-# Dead action with unsupported format
-$t->get_ok('/dead_action.json')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr!get &#39;/dead_action&#39;!)->content_like(qr/dead action!/);
+subtest 'Dead action' => sub {
+  $t->get_ok('/dead_action')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr!get &#39;/dead_action&#39;!)->content_like(qr/dead action!/)
+    ->text_is('#error' => "dead action!\n");
+  like $log, qr/dead action!/, 'right result';
+};
 
-# Dead action with custom exception rendering
-$t->get_ok('/dead_action' => {Accept => 'text/plain'})->status_is(500)->content_type_is('text/plain;charset=UTF-8')
-  ->content_like(qr/^dead action!\n/);
+subtest 'Dead action with different format' => sub {
+  $t->get_ok('/dead_action.xml')->status_is(500)->content_type_is('application/xml')->content_is("<very>bad</very>\n");
+};
 
-# Action dies twice
-$t->get_ok('/double_dead_action_☃')->status_is(500)->content_like(qr!get &#39;/double_dead_action_☃&#39;!)
-  ->content_like(qr/File.+lite_app\.t\", line \d/)->content_like(qr/double dead action!/);
+subtest 'Dead action with unsupported format' => sub {
+  $t->get_ok('/dead_action.json')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr!get &#39;/dead_action&#39;!)->content_like(qr/dead action!/);
+};
 
-# Trapped exception
-$t->get_ok('/trapped')->status_is(200)->content_is('bar');
+subtest 'Dead action with custom exception rendering' => sub {
+  $t->get_ok('/dead_action' => {Accept => 'text/plain'})->status_is(500)->content_type_is('text/plain;charset=UTF-8')
+    ->content_like(qr/^dead action!\n/);
+};
 
-# Another trapped exception
-$t->get_ok('/trapped/too')->status_is(200)->content_is('works');
+subtest 'Action dies twice' => sub {
+  $t->get_ok('/double_dead_action_☃')->status_is(500)->content_like(qr!get &#39;/double_dead_action_☃&#39;!)
+    ->content_like(qr/File.+lite_app\.t\", line \d/)->content_like(qr/double dead action!/);
+};
 
-# Custom exception handling
-$t->get_ok('/custom')->status_is(200)->content_is('Custom handling works!');
+subtest 'Trapped exception' => sub {
+  $t->get_ok('/trapped')->status_is(200)->content_is('bar');
+};
 
-# Exception in helper
-$t->get_ok('/dead_helper')->status_is(500)->content_like(qr/dead helper!/);
+subtest 'Another trapped exception' => sub {
+  $t->get_ok('/trapped/too')->status_is(200)->content_is('works');
+};
 
-# Missing template
-$t->get_ok('/missing_template')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr/Page not found/);
+subtest 'Custom exception handling' => sub {
+  $t->get_ok('/custom')->status_is(200)->content_is('Custom handling works!');
+};
 
-# Missing template with different format
-$t->get_ok('/missing_template.xml')->status_is(404)->content_type_is('application/xml')
-  ->content_is("<somewhat>bad</somewhat>\n");
+subtest 'Exception in helper' => sub {
+  $t->get_ok('/dead_helper')->status_is(500)->content_like(qr/dead helper!/);
+};
 
-# Missing template with unsupported format
-$t->get_ok('/missing_template.json')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr/Page not found/);
+subtest 'Missing template' => sub {
+  $t->get_ok('/missing_template')->status_is(404)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr/Page not found/);
+};
 
-# Missing template with custom rendering
-$t->get_ok('/missing_template.txt')->status_is(404)->content_type_is('text/plain;charset=UTF-8')
-  ->content_is('Missing template, whatever.');
+subtest 'Missing template with different format' => sub {
+  $t->get_ok('/missing_template.xml')->status_is(404)->content_type_is('application/xml')
+    ->content_is("<somewhat>bad</somewhat>\n");
+};
 
-# Missing template (failed rendering)
-$t->get_ok('/missing_template/too')->status_is(404)->header_is('X-Not-Found' => 1)
-  ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Page not found/);
+subtest 'Missing template with unsupported format' => sub {
+  $t->get_ok('/missing_template.json')->status_is(404)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr/Page not found/);
+};
 
-# Missing helper (correct context)
-$t->get_ok('/missing_helper')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr/Server error/)->content_like(qr/shift-&gt;missing_helper/);
+subtest 'Missing template with custom rendering' => sub {
+  $t->get_ok('/missing_template.txt')->status_is(404)->content_type_is('text/plain;charset=UTF-8')
+    ->content_is('Missing template, whatever.');
+};
 
-# Reuse exception
-ok !$exception, 'no exception';
-ok !$snapshot,  'no snapshot';
-$t->get_ok('/reuse/exception')->status_is(500)->content_like(qr/Reusable exception/);
-isa_ok $exception, 'Mojo::Exception',      'right exception';
-like $exception,   qr/Reusable exception/, 'right message';
-is $snapshot->{foo}, 'bar', 'right snapshot value';
-ok !$snapshot->{exception}, 'no exception in snapshot';
+subtest 'Missing template (failed rendering)' => sub {
+  $t->get_ok('/missing_template/too')->status_is(404)->header_is('X-Not-Found' => 1)
+    ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Page not found/);
+};
 
-# Bundled static files
-$t->get_ok('/mojo/jquery/jquery.js')->status_is(200)->content_type_is('application/javascript');
-$t->get_ok('/mojo/prettify/run_prettify.js')->status_is(200)->content_type_is('application/javascript');
-$t->get_ok('/mojo/prettify/prettify-mojo-dark.css')->status_is(200)->content_type_is('text/css');
-$t->get_ok('/mojo/failraptor.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/logo.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/logo-black.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/logo-black-2x.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/logo-white.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/logo-white-2x.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/notfound.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/pinstripe-dark.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/pinstripe-light.png')->status_is(200)->content_type_is('image/png');
+subtest 'Missing helper (correct context)' => sub {
+  $t->get_ok('/missing_helper')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr/Server error/)->content_like(qr/shift-&gt;missing_helper/);
+};
+
+subtest 'Reuse exception' => sub {
+  ok !$exception, 'no exception';
+  ok !$snapshot, 'no snapshot';
+  $t->get_ok('/reuse/exception')->status_is(500)->content_like(qr/Reusable exception/);
+  isa_ok $exception, 'Mojo::Exception', 'right exception';
+  like $exception, qr/Reusable exception/, 'right message';
+  is $snapshot->{foo}, 'bar', 'right snapshot value';
+  ok !$snapshot->{exception}, 'no exception in snapshot';
+};
+
+subtest 'Bundled static files' => sub {
+  $t->get_ok('/mojo/jquery/jquery.js')->status_is(200)->content_type_is('application/javascript');
+
+  $t->get_ok('/mojo/prettify/run_prettify.js')->status_is(200)->content_type_is('application/javascript');
+  $t->get_ok('/mojo/prettify/prettify-mojo-dark.css')->status_is(200)->content_type_is('text/css');
+
+  $t->get_ok('/mojo/failraptor.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/logo.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/logo-black.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/logo-black-2x.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/logo-white.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/logo-white-2x.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/notfound.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/pinstripe-dark.png')->status_is(200)->content_type_is('image/png');
+  $t->get_ok('/mojo/pinstripe-light.png')->status_is(200)->content_type_is('image/png');
+};
 
 done_testing();
 

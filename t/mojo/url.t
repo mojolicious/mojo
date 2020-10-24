@@ -255,7 +255,7 @@ subtest 'Absolute with query' => sub {
 };
 
 subtest 'Clone (advanced)' => sub {
-  my $url = Mojo::URL->new('ws://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23');
+  my $url   = Mojo::URL->new('ws://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23');
   my $clone = $url->clone;
   ok $clone->is_abs,   'is absolute';
   is $clone->scheme,   'ws',               'right scheme';
@@ -379,7 +379,7 @@ subtest 'IDNA (snowman)' => sub {
   is "$url", 'http://xn--n3h.xn--n3h.de/%E2%98%83?%E2%98%83#%E2%98%83', 'right format';
   is $url->to_unsafe_string, 'http://%E2%98%83:%E2%98%83@xn--n3h.xn--n3h.de/%E2%98%83?%E2%98%83#%E2%98%83',
     'right format';
-  };
+};
 
 subtest 'IRI/IDNA' => sub {
   my $url = Mojo::URL->new('http://☃.net/♥/?q=♥☃');

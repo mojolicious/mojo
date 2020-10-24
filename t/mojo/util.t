@@ -452,6 +452,7 @@ subtest 'steady_time' => sub {
 
 subtest 'monkey_patch' => sub {
   {
+
     package MojoMonkeyTest;
     sub foo {'foo'}
   }

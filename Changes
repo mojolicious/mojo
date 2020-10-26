@@ -1,5 +1,6 @@
 
 8.64  2020-10-18
+  - Added reset method to Mojo::UserAgent.
   - Fixed a redefined subroutine warning in eval command. (elmar)
 
 8.63  2020-10-11

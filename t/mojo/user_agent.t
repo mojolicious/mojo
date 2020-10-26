@@ -480,6 +480,29 @@ is $tx->res->code,    200,      'right status';
 is $tx->res->body,    'works!', 'right content';
 $ua->max_redirects(0);
 
+subtest 'Reset connection cache' => sub {
+  $tx = $ua->reset->get('/');
+  is $tx->res->code, 200, 'right status';
+  ok !$tx->kept_alive, 'kept connection not alive';
+  ok $tx->keep_alive, 'keep connection alive';
+  $tx = $ua->get('/');
+  is $tx->res->code, 200, 'right status';
+  ok $tx->kept_alive, 'kept connection alive';
+  ok $tx->keep_alive, 'keep connection alive';
+  $tx = $ua->get('/');
+  is $tx->res->code, 200, 'right status';
+  ok $tx->kept_alive, 'kept connection alive';
+  ok $tx->keep_alive, 'keep connection alive';
+  $tx = $ua->reset->get('/');
+  is $tx->res->code, 200, 'right status';
+  ok !$tx->kept_alive, 'kept connection not alive';
+  ok $tx->keep_alive, 'keep connection alive';
+  $tx = $ua->get('/');
+  is $tx->res->code, 200, 'right status';
+  ok $tx->kept_alive, 'kept connection alive';
+  ok $tx->keep_alive, 'keep connection alive';
+};
+
 # Compressed response
 $tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');
 $tx = $ua->start($ua->build_tx(GET => '/echo' => 'Hello GZip!'));

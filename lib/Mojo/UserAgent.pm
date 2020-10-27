@@ -42,23 +42,16 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
   };
 }
 
-sub DESTROY { Mojo::Util::_global_destruction() or shift->reset }
+sub DESTROY { Mojo::Util::_global_destruction() or shift->_cleanup }
 
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
-
-sub reset {
-  my $self = shift;
-  delete $self->{pid};
-  $self->_finish($_, 1) for keys %{$self->{connections} || {}};
-  return $self;
-}
 
 sub start {
   my ($self, $tx, $cb) = @_;
 
   # Fork-safety
-  $self->reset->server->restart if $self->{pid} && $self->{pid} ne $$;
+  $self->_cleanup->server->restart if $self->{pid} && $self->{pid} ne $$;
   $self->{pid} //= $$;
 
   # Non-blocking
@@ -90,6 +83,13 @@ sub websocket {
 sub websocket_p {
   my $self = shift;
   return $self->start_p($self->build_websocket_tx(@_));
+}
+
+sub _cleanup {
+  my $self = shift;
+  delete $self->{pid};
+  $self->_finish($_, 1) for keys %{$self->{connections} || {}};
+  return $self;
 }
 
 sub _connect {
@@ -899,12 +899,6 @@ callback.
   })->catch(sub ($err) {
     warn "Connection error: $err";
   })->wait;
-
-=head2 reset
-
-  $ua = $ua->reset;
-
-Reset connection cache.
 
 =head2 start
 

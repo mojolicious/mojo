@@ -2912,4 +2912,10 @@ EOF
   is $dom->at('#api_key_5 .expiration')->text, 'never',                     'right text';
 };
 
+subtest 'Root pseudo-class' => sub {
+  my $dom = Mojo::DOM->new('<html><head></head><body><div><div>x</div></div></body></html>');
+  is $dom->find('body > :first-child > :first-child')->first->text, 'x', 'right text';
+  is $dom->at(':scope:first-child'), undef, 'no result';
+};
+
 done_testing();

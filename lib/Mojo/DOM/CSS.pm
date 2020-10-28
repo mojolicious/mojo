@@ -196,8 +196,9 @@ sub _namespace {
 sub _pc {
   my ($class, $args, $current, $tree, $scope) = @_;
 
-  # ":scope"
+  # ":scope" (root can only be a :scope)
   return $current eq $scope if $class eq 'scope';
+  return undef              if $current->[0] eq 'root';
 
   # ":checked"
   return exists $current->[2]{checked} || exists $current->[2]{selected} if $class eq 'checked';

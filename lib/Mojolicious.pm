@@ -744,11 +744,11 @@ Licensed under the CC-SA License, Version 4.0 L<http://creativecommons.org/licen
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
-=head2 prettify.js
+=head2 highlight.js
 
-  Copyright (C) 2006, 2013 Google Inc..
+  Copyright (C) 2006, Ivan Sagalaev.
 
-Licensed under the Apache License, Version 2.0 L<http://www.apache.org/licenses/LICENSE-2.0>.
+Licensed under the BSD License, L<https://github.com/highlightjs/highlight.js/blob/master/LICENSE>.
 
 =head1 CODE NAMES
 

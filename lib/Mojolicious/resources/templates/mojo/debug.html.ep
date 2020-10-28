@@ -7,8 +7,12 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
-    %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo-dark.css'
+    %= javascript '/mojo/highlight.js/highlight.min.js'
+    %= javascript '/mojo/highlight.js/mojolicious.min.js'
+    %= stylesheet '/mojo/highlight.js/highlight-mojo-dark.css'
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
     <style>
       a img {
         border: 0;
@@ -263,7 +267,7 @@
           %= tag 'tr', $i ? (class => 'important') : (), begin
             <td class="key"><%= $key %></td>
             <td class="value wide">
-              <pre><code class="prettyprint"><%= $value %></code></pre>
+              <pre><code><%= $value %></code></pre>
             </td>
           % end
         % end

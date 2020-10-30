@@ -91,4 +91,29 @@ subtest 'attr_is' => sub {
   is_deeply \@args, ['is', 'test', 'wrong', 'some description'], 'right result';
 };
 
+subtest 'attr_isnt' => sub {
+  $t->tx->res->body('<p id="test">Test</p>');
+  $t->attr_isnt('p', 'id', 'wrong');
+  is_deeply \@args, ['isnt', 'test', 'wrong', 'no match for attribute "id" at selector "p"'], 'right result';
+  $t->attr_isnt('p', 'id', 'wrong', 'some description');
+  is_deeply \@args, ['isnt', 'test', 'wrong', 'some description'], 'right result';
+};
+
+subtest 'attr_like' => sub {
+  $t->tx->res->body('<p id="test">Test</p>');
+  $t->attr_like('p', 'id', qr/test/);
+  is_deeply \@args, ['like', 'test', qr/test/, 'similar match for attribute "id" at selector "p"'], 'right result';
+  $t->attr_like('p', 'id', qr/test/, 'some description');
+  is_deeply \@args, ['like', 'test', qr/test/, 'some description'], 'right result';
+};
+
+subtest 'attr_unlike' => sub {
+  $t->tx->res->body('<p id="test">Test</p>');
+  $t->attr_unlike('p', 'id', qr/wrong/);
+  is_deeply \@args, ['unlike', 'test', qr/wrong/, 'no similar match for attribute "id" at selector "p"'],
+    'right result';
+  $t->attr_unlike('p', 'id', qr/wrong/, 'some description');
+  is_deeply \@args, ['unlike', 'test', qr/wrong/, 'some description'], 'right result';
+};
+
 done_testing();

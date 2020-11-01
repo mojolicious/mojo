@@ -27,46 +27,56 @@ my $listen
   . '&ca=t/mojo/certs/ca.crt&verify=0x03';
 my $port = $daemon->listen([$listen])->start->ports->[0];
 
-# No certificate
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-my $tx = $ua->get("https://127.0.0.1:$port");
-ok $tx->error, 'has error';
-$tx = $ua->get("https://127.0.0.1:$port");
-ok $tx->error, 'has error';
-$tx = $ua->ca('t/mojo/certs/ca.crt')->get("https://127.0.0.1:$port");
-ok $tx->error, 'has error';
-$tx = $ua->get("https://127.0.0.1:$port");
-ok $tx->error, 'has error';
+my $ua;
+subtest "No certificate" => sub {
+  $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+  my $tx = $ua->get("https://127.0.0.1:$port");
+  ok $tx->error, 'has error';
 
-# Valid certificates
-$ua->ca('t/mojo/certs/ca.crt')->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key');
-$tx = $ua->get("https://127.0.0.1:$port");
-ok !$tx->error, 'no error';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# Valid certificates (env)
-$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-{
-  local $ENV{MOJO_CA_FILE}   = 't/mojo/certs/ca.crt';
-  local $ENV{MOJO_CERT_FILE} = 't/mojo/certs/client.crt';
-  local $ENV{MOJO_KEY_FILE}  = 't/mojo/certs/client.key';
-  local $ENV{MOJO_INSECURE}  = 0;
   $tx = $ua->get("https://127.0.0.1:$port");
-  is $ua->ca,       't/mojo/certs/ca.crt',     'right path';
-  is $ua->cert,     't/mojo/certs/client.crt', 'right path';
-  is $ua->key,      't/mojo/certs/client.key', 'right path';
-  is $ua->insecure, 0,                         'secure';
+  ok $tx->error, 'has error';
+
+  $tx = $ua->ca('t/mojo/certs/ca.crt')->get("https://127.0.0.1:$port");
+  ok $tx->error, 'has error';
+
+  $tx = $ua->get("https://127.0.0.1:$port");
+  ok $tx->error, 'has error';
+};
+
+subtest "Valid certificates" => sub {
+  $ua->ca('t/mojo/certs/ca.crt')->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key');
+  my $tx = $ua->get("https://127.0.0.1:$port");
   ok !$tx->error, 'no error';
   is $tx->res->code, 200,      'right status';
   is $tx->res->body, 'works!', 'right content';
-}
+};
 
-# Invalid certificate
-$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-$ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
-$tx = $ua->get("https://127.0.0.1:$port");
-ok $tx->error, 'has error';
+subtest "Valid certificates (env)" => sub {
+  $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+  {
+    local $ENV{MOJO_CA_FILE}   = 't/mojo/certs/ca.crt';
+    local $ENV{MOJO_CERT_FILE} = 't/mojo/certs/client.crt';
+    local $ENV{MOJO_KEY_FILE}  = 't/mojo/certs/client.key';
+    local $ENV{MOJO_INSECURE}  = 0;
+    my $tx = $ua->get("https://127.0.0.1:$port");
+    is $ua->ca,       't/mojo/certs/ca.crt',     'right path';
+    is $ua->cert,     't/mojo/certs/client.crt', 'right path';
+    is $ua->key,      't/mojo/certs/client.key', 'right path';
+    is $ua->insecure, 0,                         'secure';
+    ok !$tx->error, 'no error';
+    is $tx->res->code, 200,      'right status';
+    is $tx->res->body, 'works!', 'right content';
+  }
+
+};
+
+subtest "Invalid certificate" => sub {
+  $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+  $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
+  my $tx = $ua->get("https://127.0.0.1:$port");
+  ok $tx->error, 'has error';
+
+};
 
 # Web server with valid certificates and no verification
 $daemon = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton, silent => 1);
@@ -80,16 +90,18 @@ $listen
   . '&version=TLSv1';
 $port = $daemon->listen([$listen])->start->ports->[0];
 
-# Invalid certificate
-$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-$ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
-$tx = $ua->get("https://127.0.0.1:$port");
-ok $tx->error, 'has error';
-$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop, insecure => 1);
-$ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
-$tx = $ua->get("https://127.0.0.1:$port");
-ok !$tx->error, 'no error';
-is $ua->ioloop->stream($tx->connection)->handle->get_cipher,     'AES256-SHA', 'AES256-SHA has been negotiatied';
-is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',      'TLSv1 has been negotiatied';
+subtest "Invalid certificate" => sub {
+  $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+  $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
+  my $tx = $ua->get("https://127.0.0.1:$port");
+  ok $tx->error, 'has error';
+  $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop, insecure => 1);
+  $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
+  $tx = $ua->get("https://127.0.0.1:$port");
+  ok !$tx->error, 'no error';
+  is $ua->ioloop->stream($tx->connection)->handle->get_cipher,     'AES256-SHA', 'AES256-SHA has been negotiatied';
+  is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',      'TLSv1 has been negotiatied';
+};
+
 
 done_testing();

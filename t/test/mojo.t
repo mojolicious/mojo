@@ -91,4 +91,51 @@ subtest 'attr_is' => sub {
   is_deeply \@args, ['is', 'test', 'wrong', 'some description'], 'right result';
 };
 
+subtest 'header_exists' => sub {
+  $t->header_exists('Content-Type');
+  is_deeply \@args, ['ok', 1, 'header "Content-Type" exists'], 'right result';
+  $t->header_exists('Content-Type', 'some description');
+  is_deeply \@args, ['ok', 1, 'some description'], 'right result';
+};
+
+subtest 'header_exists_not' => sub {
+  $t->header_exists_not('X-Exists-Not');
+  is_deeply \@args, ['ok', 1, 'no "X-Exists-Not" header'], 'right result';
+  $t->header_exists_not('X-Exists-Not', 'some description');
+  is_deeply \@args, ['ok', 1, 'some description'], 'right result';
+};
+
+subtest 'header_is' => sub {
+  $t->header_is('Content-Type', 'text/html;charset=UTF-8');
+  is_deeply \@args,
+    ['is', 'text/html;charset=UTF-8', 'text/html;charset=UTF-8', 'Content-Type: text/html;charset=UTF-8'],
+    'right result';
+  $t->header_is('Content-Type', 'text/html;charset=UTF-8', 'some description');
+  is_deeply \@args, ['is', 'text/html;charset=UTF-8', 'text/html;charset=UTF-8', 'some description'], 'right result';
+};
+
+subtest 'header_isnt' => sub {
+  $t->header_isnt('Content-Type', 'image/png');
+  is_deeply \@args, ['isnt', 'text/html;charset=UTF-8', 'image/png', 'not Content-Type: image/png'], 'right result';
+  $t->header_isnt('Content-Type', 'image/png', 'some description');
+  is_deeply \@args, ['isnt', 'text/html;charset=UTF-8', 'image/png', 'some description'], 'right result';
+};
+
+subtest 'header_like' => sub {
+  $t->header_like('Content-Type', qr/text\/html;charset=UTF-8/);
+  is_deeply \@args, ['like', 'text/html;charset=UTF-8', qr/text\/html;charset=UTF-8/, 'Content-Type is similar'],
+    'right result';
+  $t->header_like('Content-Type', qr/text\/html;charset=UTF-8/, 'some description');
+  is_deeply \@args, ['like', 'text/html;charset=UTF-8', qr/text\/html;charset=UTF-8/, 'some description'],
+    'right result';
+};
+
+subtest 'header_unlike' => sub {
+  $t->header_unlike('Content-Type', qr/image\/png/);
+  is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'Content-Type is not similar'],
+    'right result';
+  $t->header_unlike('Content-Type', qr/image\/png/, 'some description');
+  is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'some description'], 'right result';
+};
+
 done_testing();

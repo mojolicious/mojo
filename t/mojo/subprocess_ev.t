@@ -10,27 +10,28 @@ plan skip_all => 'EV 4.32+ required for this test!'                  unless eval
 use Mojo::IOLoop;
 use Mojo::Promise;
 
-# Event loop in subprocess (already running event loop)
-my ($fail, $result);
-Mojo::IOLoop->next_tick(sub {
-  Mojo::IOLoop->subprocess(
-    sub {
-      my $result;
-      my $promise = Mojo::Promise->new;
-      $promise->then(sub { $result = shift });
-      Mojo::IOLoop->next_tick(sub { $promise->resolve(25) });
-      $promise->wait;
-      return $result;
-    },
-    sub {
-      my ($subprocess, $err, $twenty_five) = @_;
-      $fail   = $err;
-      $result = $twenty_five;
-    }
-  );
-});
-Mojo::IOLoop->start;
-ok !$fail, 'no error';
-is $result, 25, 'right result';
+subtest "Event loop in subprocess (already running event loop)" => sub {
+  my ($fail, $result);
+  Mojo::IOLoop->next_tick(sub {
+    Mojo::IOLoop->subprocess(
+      sub {
+        my $result;
+        my $promise = Mojo::Promise->new;
+        $promise->then(sub { $result = shift });
+        Mojo::IOLoop->next_tick(sub { $promise->resolve(25) });
+        $promise->wait;
+        return $result;
+      },
+      sub {
+        my ($subprocess, $err, $twenty_five) = @_;
+        $fail   = $err;
+        $result = $twenty_five;
+      }
+    );
+  });
+  Mojo::IOLoop->start;
+  ok !$fail, 'no error';
+  is $result, 25, 'right result';
+};
 
 done_testing;

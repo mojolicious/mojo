@@ -6,7 +6,6 @@ use Mojo::Cache;
 use Mojo::DynamicMethods;
 use Mojo::Loader qw(load_class);
 use Mojo::Util qw(camelize);
-use Mojolicious::Routes::Match;
 
 has base_classes               => sub { [qw(Mojolicious::Controller Mojolicious)] };
 has cache                      => sub { Mojo::Cache->new };
@@ -81,8 +80,8 @@ sub match {
 
   # Check cache
   my $ws    = $c->tx->is_websocket ? 1 : 0;
-  my $match = Mojolicious::Routes::Match->new(root => $self);
-  $c->match($match);
+  my $match = $c->match;
+  $match->root($self);
   my $cache = $self->cache;
   if (my $result = $cache->get("$method:$path:$ws")) {
     return $match->endpoint($result->{endpoint})->stack($result->{stack});

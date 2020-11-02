@@ -83,6 +83,60 @@ subtest 'content_is' => sub {
   is_deeply \@args, ['is', 'Hello Test!', 'Hello Test!', 'some description'], 'right result';
 };
 
+subtest 'content_isnt' => sub {
+  $t->content_isnt('Goodbye Test!');
+  is_deeply \@args, ['isnt', 'Hello Test!', 'Goodbye Test!', 'no match for content'], 'right result';
+  $t->content_isnt('Goodbye Test!', 'some description');
+  is_deeply \@args, ['isnt', 'Hello Test!', 'Goodbye Test!', 'some description'], 'right result';
+};
+
+subtest 'content_like' => sub {
+  $t->content_like(qr/Hello Test!/);
+  is_deeply \@args, ['like', 'Hello Test!', qr/Hello Test!/, 'content is similar'], 'right result';
+  $t->content_like(qr/Hello Test!/, 'some description');
+  is_deeply \@args, ['like', 'Hello Test!', qr/Hello Test!/, 'some description'], 'right result';
+};
+
+subtest 'content_type_is' => sub {
+  $t->content_type_is('text/html;charset=UTF-8');
+  is_deeply \@args,
+    ['is', 'text/html;charset=UTF-8', 'text/html;charset=UTF-8', 'Content-Type: text/html;charset=UTF-8'],
+    'right result';
+  $t->content_type_is('text/html;charset=UTF-8', 'some description');
+  is_deeply \@args, ['is', 'text/html;charset=UTF-8', 'text/html;charset=UTF-8', 'some description'], 'right result';
+};
+
+subtest 'content_type_isnt' => sub {
+  $t->content_type_isnt('image/png');
+  is_deeply \@args, ['isnt', 'text/html;charset=UTF-8', 'image/png', 'not Content-Type: image/png'], 'right result';
+  $t->content_type_isnt('image/png', 'some description');
+  is_deeply \@args, ['isnt', 'text/html;charset=UTF-8', 'image/png', 'some description'], 'right result';
+};
+
+subtest 'content_type_like' => sub {
+  $t->content_type_like(qr/text\/html;charset=UTF-8/);
+  is_deeply \@args, ['like', 'text/html;charset=UTF-8', qr/text\/html;charset=UTF-8/, 'Content-Type is similar'],
+    'right result';
+  $t->content_type_like(qr/text\/html;charset=UTF-8/, 'some description');
+  is_deeply \@args, ['like', 'text/html;charset=UTF-8', qr/text\/html;charset=UTF-8/, 'some description'],
+    'right result';
+};
+
+subtest 'content_type_unlike' => sub {
+  $t->content_type_unlike(qr/image\/png/);
+  is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'Content-Type is not similar'],
+    'right result';
+  $t->content_type_unlike(qr/image\/png/, 'some description');
+  is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'some description'], 'right result';
+};
+
+subtest 'content_unlike' => sub {
+  $t->content_unlike(qr/Goodbye Test!/);
+  is_deeply \@args, ['unlike', 'Hello Test!', qr/Goodbye Test!/, 'content is not similar'], 'right result';
+  $t->content_unlike(qr/Goodbye Test!/, 'some description');
+  is_deeply \@args, ['unlike', 'Hello Test!', qr/Goodbye Test!/, 'some description'], 'right result';
+};
+
 subtest 'attr_is' => sub {
   $t->tx->res->body('<p id="test">Test</p>');
   $t->attr_is('p', 'id', 'wrong');
@@ -114,6 +168,53 @@ subtest 'attr_unlike' => sub {
     'right result';
   $t->attr_unlike('p', 'id', qr/wrong/, 'some description');
   is_deeply \@args, ['unlike', 'test', qr/wrong/, 'some description'], 'right result';
+};
+
+subtest 'header_exists' => sub {
+  $t->header_exists('Content-Type');
+  is_deeply \@args, ['ok', 1, 'header "Content-Type" exists'], 'right result';
+  $t->header_exists('Content-Type', 'some description');
+  is_deeply \@args, ['ok', 1, 'some description'], 'right result';
+};
+
+subtest 'header_exists_not' => sub {
+  $t->header_exists_not('X-Exists-Not');
+  is_deeply \@args, ['ok', 1, 'no "X-Exists-Not" header'], 'right result';
+  $t->header_exists_not('X-Exists-Not', 'some description');
+  is_deeply \@args, ['ok', 1, 'some description'], 'right result';
+};
+
+subtest 'header_is' => sub {
+  $t->header_is('Content-Type', 'text/html;charset=UTF-8');
+  is_deeply \@args,
+    ['is', 'text/html;charset=UTF-8', 'text/html;charset=UTF-8', 'Content-Type: text/html;charset=UTF-8'],
+    'right result';
+  $t->header_is('Content-Type', 'text/html;charset=UTF-8', 'some description');
+  is_deeply \@args, ['is', 'text/html;charset=UTF-8', 'text/html;charset=UTF-8', 'some description'], 'right result';
+};
+
+subtest 'header_isnt' => sub {
+  $t->header_isnt('Content-Type', 'image/png');
+  is_deeply \@args, ['isnt', 'text/html;charset=UTF-8', 'image/png', 'not Content-Type: image/png'], 'right result';
+  $t->header_isnt('Content-Type', 'image/png', 'some description');
+  is_deeply \@args, ['isnt', 'text/html;charset=UTF-8', 'image/png', 'some description'], 'right result';
+};
+
+subtest 'header_like' => sub {
+  $t->header_like('Content-Type', qr/text\/html;charset=UTF-8/);
+  is_deeply \@args, ['like', 'text/html;charset=UTF-8', qr/text\/html;charset=UTF-8/, 'Content-Type is similar'],
+    'right result';
+  $t->header_like('Content-Type', qr/text\/html;charset=UTF-8/, 'some description');
+  is_deeply \@args, ['like', 'text/html;charset=UTF-8', qr/text\/html;charset=UTF-8/, 'some description'],
+    'right result';
+};
+
+subtest 'header_unlike' => sub {
+  $t->header_unlike('Content-Type', qr/image\/png/);
+  is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'Content-Type is not similar'],
+    'right result';
+  $t->header_unlike('Content-Type', qr/image\/png/, 'some description');
+  is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'some description'], 'right result';
 };
 
 done_testing();

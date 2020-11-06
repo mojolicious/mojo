@@ -1,4 +1,6 @@
 
+8.65  2020-11-06
+
 8.64  2020-11-01
   - Replaced prettify.js with highlight.js. (zakame)
   - Fixed a bug in Mojo::DOM where the tree root would be checked for all pseudo-classes.

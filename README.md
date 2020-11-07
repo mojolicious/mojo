@@ -22,6 +22,7 @@
 
   * An amazing **real-time web framework**, allowing you to easily grow single file prototypes into well-structured MVC
     web applications.
+    * Everything you need to build cloud native web applications for state of the art container environments.
     * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish templates, content negotiation, session
       management, form validation, testing framework, static file server, CGI/[PSGI](http://plackperl.org) detection,
       first class Unicode support and much more for you to discover.

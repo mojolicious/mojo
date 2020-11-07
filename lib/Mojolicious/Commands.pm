@@ -177,6 +177,13 @@ List available options for generator command with short descriptions.
 Use L<Mojolicious::Command::Author::generate::app> to generate application directory structure for a fully functional
 L<Mojolicious> application.
 
+=head2 generate dockerfile
+
+  $ ./myapp.pl generate dockerfile
+  $ ./script/my_app generate dockerfile
+
+Use L<Mojolicious::Command::Author::generate::dockerfile> to generate C<Dockerfile> for application.
+
 =head2 generate lite-app
 
   $ mojo generate lite-app

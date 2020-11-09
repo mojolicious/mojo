@@ -407,7 +407,7 @@ L<Mojo::Exception> objects that stringify to error messages with context.
     5: %= $i * 2
     6: </body>
   Traceback (most recent call first):
-    File "template", line 4, in "Mojo::Template::Sandbox"
+    File "template", line 4, in "Mojo::Template::SandBox"
     File "path/to/Mojo/Template.pm", line 123, in "Mojo::Template"
     File "path/to/myapp.pl", line 123, in "main"
 

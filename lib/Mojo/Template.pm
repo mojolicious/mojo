@@ -19,7 +19,7 @@ has escape                                      => sub { \&Mojo::Util::xml_escap
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)]               => '%';
 has name                                        => 'template';
-has namespace                                   => 'Mojo::Template::SandBox';
+has namespace                                   => 'Mojo::Template::Sandbox';
 has tag_start                                   => '<%';
 has tag_end                                     => '%>';
 has tree                                        => sub { [] };
@@ -407,7 +407,7 @@ L<Mojo::Exception> objects that stringify to error messages with context.
     5: %= $i * 2
     6: </body>
   Traceback (most recent call first):
-    File "template", line 4, in "Mojo::Template::SandBox"
+    File "template", line 4, in "Mojo::Template::Sandbox"
     File "path/to/Mojo/Template.pm", line 123, in "Mojo::Template"
     File "path/to/myapp.pl", line 123, in "main"
 
@@ -534,7 +534,7 @@ newline characters, or error messages might end up being wrong.
   my $namespace = $mt->namespace;
   $mt           = $mt->namespace('main');
 
-Namespace used to compile templates, defaults to C<Mojo::Template::SandBox>. Note that namespaces should only be shared
+Namespace used to compile templates, defaults to C<Mojo::Template::Sandbox>. Note that namespaces should only be shared
 very carefully between templates, since functions and global variables will not be cleared automatically.
 
 =head2 prepend

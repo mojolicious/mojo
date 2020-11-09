@@ -1,5 +1,6 @@
 
-8.65  2020-11-06
+8.65  2020-11-09
+  - Fixed all generated code to consistently use a *::Sandbox class, instead of *::SandBox.
 
 8.64  2020-11-01
   - Replaced prettify.js with highlight.js. (zakame)

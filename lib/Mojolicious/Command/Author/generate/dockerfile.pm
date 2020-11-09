@@ -43,8 +43,8 @@ See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are availabl
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::Author::generate::dockerfile> inherits all attributes from L<Mojolicious::Command> and implements
-the following new ones.
+L<Mojolicious::Command::Author::generate::dockerfile> inherits all attributes from L<Mojolicious::Command> and
+implements the following new ones.
 
 =head2 description
 

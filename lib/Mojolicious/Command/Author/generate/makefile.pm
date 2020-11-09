@@ -18,6 +18,7 @@ Mojolicious::Command::Author::generate::makefile - Makefile generator command
 
   Usage: APPLICATION generate makefile [OPTIONS]
 
+    ./myapp.pl generate makefile
     mojo generate makefile
 
   Options:

@@ -151,8 +151,18 @@ To manage the web server with systemd, you can use a unit configuration file lik
 
 =head2 Pre-forking
 
-On UNIX platforms you can also add pre-forking to the built-in web server and switch to a multi-process architecture
-with L<Mojolicious::Command::prefork>, to take advantage of multiple CPU cores and copy-on-write memory management.
+For bigger applications L<Mojolicious> contains the UNIX optimized pre-forking web server L<Mojo::Server::Prefork>,
+which can take advantage of multiple CPU cores and copy-on-write memory management to scale up to thousands of
+concurrent client connections.
+
+  Mojo::Server::Prefork
+  |- Mojo::Server::Daemon [1]
+  |- Mojo::Server::Daemon [2]
+  |- Mojo::Server::Daemon [3]
+  +- Mojo::Server::Daemon [4]
+
+It is based on L<Mojo::Server::Daemon> and available to every application through the command
+L<Mojolicious::Command::prefork>.
 
   $ ./script/my_app prefork
   Web application available at http://127.0.0.1:3000
@@ -207,20 +217,10 @@ script.
 
 =head2 Hypnotoad
 
-For bigger applications L<Mojolicious> contains the UNIX optimized pre-forking web server
-L<Hypnotoad|Mojo::Server::Hypnotoad>, which can take advantage of multiple CPU cores and copy-on-write memory
-management to scale up to thousands of concurrent client connections.
-
-  Mojo::Server::Hypnotoad
-  |- Mojo::Server::Daemon [1]
-  |- Mojo::Server::Daemon [2]
-  |- Mojo::Server::Daemon [3]
-  +- Mojo::Server::Daemon [4]
-
-It is based on the L<Mojo::Server::Prefork> web server, which adds pre-forking to L<Mojo::Server::Daemon>, but
-optimized specifically for production environments out of the box. To start applications with it you can use the
-L<hypnotoad> script, which listens on port C<8080>, automatically daemonizes the server process and defaults to
-C<production> mode for L<Mojolicious> and L<Mojolicious::Lite> applications.
+L<Hypnotoad|Mojo::Server::Hypnotoad> is based on the L<Mojo::Server::Prefork> web server, and adds some features
+especially optimized for high availability non-containerized production environments. To start applications with it you
+can use the L<hypnotoad> script, which listens on port C<8080>, automatically daemonizes the server process and defaults
+to C<production> mode for L<Mojolicious> and L<Mojolicious::Lite> applications.
 
   $ hypnotoad ./script/my_app
 

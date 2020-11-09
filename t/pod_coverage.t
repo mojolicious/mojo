@@ -7,8 +7,8 @@ plan skip_all => 'Test::Pod::Coverage 1.04+ required for this test!'  unless eva
 
 # async/await hooks
 my @await = (
-  qw(AWAIT_CLONE AWAIT_DONE AWAIT_FAIL AWAIT_GET AWAIT_IS_CANCELLED AWAIT_IS_READY AWAIT_NEW_DONE AWAIT_NEW_FAIL),
-  qw(AWAIT_ON_CANCEL AWAIT_ON_READY)
+  qw(AWAIT_CHAIN_CANCEL AWAIT_CLONE AWAIT_DONE AWAIT_FAIL AWAIT_GET AWAIT_IS_CANCELLED AWAIT_IS_READY AWAIT_NEW_DONE),
+  qw(AWAIT_NEW_FAIL AWAIT_ON_CANCEL AWAIT_ON_READY)
 );
 
 all_pod_coverage_ok({also_private => ['BUILD_DYNAMIC', @await, 'success']});

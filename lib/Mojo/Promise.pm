@@ -10,6 +10,8 @@ use constant DEBUG => $ENV{MOJO_PROMISE_DEBUG} || 0;
 
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
+sub AWAIT_CHAIN_CANCEL { }
+
 sub AWAIT_CLONE { _await('clone', @_) }
 
 sub AWAIT_DONE { shift->resolve(@_) }

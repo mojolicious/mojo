@@ -394,6 +394,8 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Command::Author::generate::app>
 
+=item * L<Mojolicious::Command::Author::generate::dockerfile>
+
 =item * L<Mojolicious::Command::Author::generate::lite_app>
 
 =item * L<Mojolicious::Command::Author::generate::makefile>

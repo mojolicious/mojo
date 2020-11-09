@@ -320,6 +320,24 @@ ok -e $app->rel_file('my_app/templates/layouts/default.html.ep'), 'layout exists
 ok -e $app->rel_file('my_app/templates/example/welcome.html.ep'), 'template exists';
 chdir $cwd;
 
+subtest 'generate dockerfile' => sub {
+  require Mojolicious::Command::Author::generate::dockerfile;
+  my $dockerfile = Mojolicious::Command::Author::generate::dockerfile->new;
+  ok $dockerfile->description, 'has a description';
+  like $dockerfile->usage, qr/dockerfile/, 'has usage information';
+  my $dir = tempdir CLEANUP => 1;
+  chdir $dir;
+  $buffer = '';
+  {
+    open my $handle, '>', \$buffer;
+    local *STDOUT = $handle;
+    $dockerfile->run;
+  }
+  like $buffer, qr/Dockerfile/, 'right output';
+  ok -e $app->rel_file('Dockerfile'), 'Dockerfile exists';
+  chdir $cwd;
+};
+
 # generate lite_app
 require Mojolicious::Command::Author::generate::lite_app;
 $app = Mojolicious::Command::Author::generate::lite_app->new;

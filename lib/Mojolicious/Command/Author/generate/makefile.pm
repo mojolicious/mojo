@@ -79,6 +79,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   VERSION   => '0.01',
-  PREREQ_PM => {'Mojolicious' => '<%= $Mojolicious::VERSION %>'},
-  test      => {TESTS => 't/*.t'}
+  PREREQ_PM => {
+    'Mojolicious' => '<%= $Mojolicious::VERSION %>'
+  },
+  test => {TESTS => 't/*.t'}
 );

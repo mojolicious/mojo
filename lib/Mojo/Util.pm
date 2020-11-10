@@ -792,8 +792,8 @@ Create anonymous scope guard object that will execute the passed callback when t
 
   my $bool = secure_compare $str1, $str2;
 
-Constant time comparison algorithm to prevent timing attacks. The secret string should be the second argument, to
-avoid leaking information about the length of the string.
+Constant time comparison algorithm to prevent timing attacks. The secret string should be the second argument, to avoid
+leaking information about the length of the string.
 
 =head2 sha1_bytes
 

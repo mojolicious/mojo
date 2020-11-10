@@ -276,8 +276,8 @@ sub scope_guard { Mojo::Util::_Guard->new(cb => shift) }
 
 sub secure_compare {
   my ($one, $two) = @_;
-  return undef if length $one != length $two;
-  my $r = 0;
+  my $r = length $one != length $two;
+  $two = $one if $r;
   $r |= ord(substr $one, $_) ^ ord(substr $two, $_) for 0 .. length($one) - 1;
   return $r == 0;
 }
@@ -792,7 +792,8 @@ Create anonymous scope guard object that will execute the passed callback when t
 
   my $bool = secure_compare $str1, $str2;
 
-Constant time comparison algorithm to prevent timing attacks.
+Constant time comparison algorithm to prevent timing attacks. The secret string should be the second argument, to
+avoid leaking information about the length of the string.
 
 =head2 sha1_bytes
 

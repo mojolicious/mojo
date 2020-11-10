@@ -11,7 +11,7 @@ sub run {
   my $self = shift;
   my $name = $self->app->moniker;
   my $exe  = $ENV{MOJO_EXE} ? path($ENV{MOJO_EXE})->to_rel($self->app->home)->to_string : "script/$name";
-  $self->render_to_rel_file('dockerfile', 'Dockerfile', {name => $name, cmd => encode_json [$exe, 'prefork']});
+  $self->render_to_rel_file('dockerfile', 'Dockerfile', {name => $name, cmd => encode_json ["./$exe", 'prefork']});
 }
 
 1;

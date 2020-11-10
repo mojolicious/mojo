@@ -215,6 +215,60 @@ script.
   $ morbo ./script/my_app
   Web application available at http://127.0.0.1:3000
 
+=head2 Containers
+
+There are many ways to go cloud-native with L<Mojolicious>. To get you started with containerizing your web applications
+we will explore one of them in this recipe. First, you will need to declare the CPAN dependencies of your application,
+for example in a C<Makefile.PL> file. This should always include at the very least L<Mojolicious> itself.
+
+  use strict;
+  use warnings;
+
+  use ExtUtils::MakeMaker;
+
+  WriteMakefile(
+    VERSION   => '0.01',
+    PREREQ_PM => {
+      'Mojolicious' => '8.65',
+      'Mojolicious::Plugin::Status' => '1.12'
+    },
+    test => {TESTS => 't/*.t'}
+  );
+
+The helper command L<Mojolicious::Command::Author::generate::makefile> can also generate a minimal C<Makefile.PL> for
+you.
+
+  $ ./myapp.pl generate makefile
+  ...
+
+And then we are going to need a C<Dockerfile> describing the container. A very simple one will do for now.
+
+  FROM perl
+  WORKDIR /opt/myapp
+  COPY . .
+  RUN cpanm --installdeps -n .
+  EXPOSE 3000
+  CMD ["./myapp.pl","prefork"]
+
+It uses the latest L<Perl container|https://hub.docker.com/_/perl> from Docker Hub, copies all the contents of your
+application directory into the container, installs CPAN dependencies with L<App::cpanminus>, and then starts the
+application on port C<3000> with the pre-forking web server. With L<Mojolicious::Command::generate::dockerfile> there is
+also a helper command to generate a minimal C<Dockerfile> for you.
+
+  $ ./myapp.pl generate dockerfile
+  ...
+
+To build and deploy our container there are also many options available, here we will simply use Docker.
+
+  $ docker build -t myapp_image .
+  ...
+  $ docker run -d -p 3000:3000 --name myapp_container myapp_image
+  ...
+
+And now your web application should be deployed as a container under C<http://127.0.0.1:3000>. For more information and
+many more container deployment options we recommend the L<Docker|https://docs.docker.com/> and
+L<Kubernetes|https://kubernetes.io/docs/> documentation.
+
 =head2 Hypnotoad
 
 L<Hypnotoad|Mojo::Server::Hypnotoad> is based on the L<Mojo::Server::Prefork> web server, and adds some features
@@ -344,7 +398,7 @@ web features, such as WebSockets, are not available.
 
 =head2 Envoy
 
-L<Mojolicious> applications can be deployed on "cloud-native" environments that use L<Envoy|https://www.envoyproxy.io>,
+L<Mojolicious> applications can be deployed on cloud-native environments that use L<Envoy|https://www.envoyproxy.io>,
 such as with this reverse proxy configuration similar to the Apache and Nginx ones above.
 
   static_resources:

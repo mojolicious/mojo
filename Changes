@@ -1,4 +1,6 @@
 
+8.66  2020-11-11
+
 8.65  2020-11-10
   - Added generate dockerfile command. (tianon)
   - Improved cookbook with container deployment recipe.

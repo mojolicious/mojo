@@ -49,13 +49,17 @@ sub _not_empty { length $_[2] ? $_[2] : undef }
 sub _num {
   my ($v, $name, $value, $min, $max) = @_;
   return 1 if $value !~ /^-?[0-9]+$/;
-  return defined $min && $min > $value || defined $max && $max < $value;
+  return 2 if defined $min && $value < $min;
+  return 3 if defined $max && $value > $max;
+  return undef;
 }
 
 sub _size {
   my ($v, $name, $value, $min, $max) = @_;
   my $len = ref $value ? $value->size : length $value;
-  return (defined $min && $len < $min) || (defined $max && $len > $max);
+  return 2 if defined $min && $len < $min;
+  return 3 if defined $max && $len > $max;
+  return undef;
 }
 
 sub _trim { defined $_[2] ? trim $_[2] : undef }

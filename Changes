@@ -1,5 +1,7 @@
 
-8.66  2020-11-11
+8.66  2020-11-17
+  - Fixed a bug in Mojolicious::Commands where help messages would not be displayed correctly for some commands.
+    (kiwiroy)
 
 8.65  2020-11-10
   - Added generate dockerfile command. (tianon)

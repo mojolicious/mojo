@@ -263,8 +263,8 @@ Mojo::Promise - Promises/A+
     my $promise = Mojo::Promise->new;
     $ua->get(@_ => sub ($ua, $tx) {
       my $err = $tx->error;
-      if   (!$err || $err->{code}) { $promise->resolve($tx) }
-      else                         { $promise->reject($err->{message}) }
+      if   (!$err || !$err->{code}) { $promise->resolve($tx) }
+      else                          { $promise->reject($err->{message}) }
     });
     return $promise;
   }

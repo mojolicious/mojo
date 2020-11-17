@@ -35,11 +35,11 @@ sub run {
 
   # Run command
   if ($name && $name =~ /^\w[\w-]+$/ && ($name ne 'help' || $args[0])) {
-    $name =~ s/-/_/g;
 
     # Help
     $name = shift @args if my $help = $name eq 'help';
     local $ENV{MOJO_HELP} = $help = $ENV{MOJO_HELP} || $help;
+    $name =~ s/-/_/g;
 
     # Remove options shared by all commands before loading the command
     _args(\@args);

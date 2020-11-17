@@ -141,6 +141,13 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
+  $commands->run('generate', 'help', 'lite-app');
+}
+like $buffer, qr/Usage: APPLICATION generate lite-app \[OPTIONS\] \[NAME\]/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
   $commands->run('generate', 'app', '-h');
 }
 like $buffer, qr/Usage: APPLICATION generate app \[OPTIONS\] \[NAME\]/, 'right output';

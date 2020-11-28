@@ -49,6 +49,9 @@ sub size { length ${$_[0]} }
 
 sub split {
   my ($self, $pat, $lim) = (shift, shift, shift // 0);
+
+  # awk compatible special case on 5.16
+  return Mojo::Collection->new(map { $self->new($_) } split ' ',  $$self, $lim) if !ref $pat and $pat eq ' ';
   return Mojo::Collection->new(map { $self->new($_) } split $pat, $$self, $lim);
 }
 
@@ -281,13 +284,19 @@ Generate URL slug for bytestream with L<Mojo::Util/"slugify">.
   my $collection = $stream->split(',');
   my $collection = $stream->split(',', -1);
 
-Turn bytestream into L<Mojo::Collection> object containing L<Mojo::ByteStream> objects.
+Turn bytestream into L<Mojo::Collection> object containing L<Mojo::ByteStream> objects with L<perlfunc/"split">.
 
   # "One,Two,Three"
   b("one,two,three")->split(',')->map('camelize')->join(',');
 
   # "One,Two,Three,,,"
   b("one,two,three,,,")->split(',', -1)->map('camelize')->join(',');
+
+  # "One,Two,Three"
+  b("one,,,two,,three")->split(',+')->map('camelize')->join(',');
+
+  # "One Two Three"
+  b("one   two\nthree")->split(' ')->map('camelize')->join(' ');
 
 =head2 tap
 

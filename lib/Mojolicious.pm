@@ -26,11 +26,15 @@ has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {
   my $self = shift;
 
-  # Check if we have a log directory that is writable
-  my $log  = Mojo::Log->new;
-  my $home = $self->home;
   my $mode = $self->mode;
-  $log->path($home->child('log', "$mode.log")) if -d $home->child('log') && -w _;
+  my $log  = Mojo::Log->new;
+
+  # DEPRECATED!
+  my $home = $self->home;
+  if (-d $home->child('log') && -w _) {
+    $log->path($home->child('log', "$mode.log"));
+    Mojo::Util::deprecated(qq{Logging to "log/$mode.log" is DEPRECATED});
+  }
 
   # Reduced log output outside of development mode
   return $log->level($ENV{MOJO_LOG_LEVEL}) if $ENV{MOJO_LOG_LEVEL};
@@ -400,7 +404,7 @@ The home directory of your application, defaults to a L<Mojo::Home> object which
 
 The logging layer of your application, defaults to a L<Mojo::Log> object. The level will default to either the
 C<MOJO_LOG_LEVEL> environment variable, C<debug> if the L</mode> is C<development>, or C<info> otherwise. All messages
-will be written to C<STDERR>, or a C<log/$mode.log> file if a C<log> directory exists.
+will be written to C<STDERR> by default.
 
   # Log debug message
   $app->log->debug('It works');

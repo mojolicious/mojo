@@ -1,5 +1,7 @@
 
-8.66  2020-11-17
+8.66  2020-11-28
+  - Deprecated logging to "log/$mode.log" (if a log directory exists) in Mojolicious. The default will simply be STDERR
+    in the future.
   - Fixed a bug in Mojolicious::Commands where help messages would not be displayed correctly for some commands.
     (kiwiroy)
 

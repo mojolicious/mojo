@@ -2,6 +2,8 @@
 8.66  2020-11-28
   - Deprecated logging to "log/$mode.log" (if a log directory exists) in Mojolicious. The default will simply be STDERR
     in the future.
+  - Removed experimental status from humanize_bytes method in Mojo::ByteStream.
+  - Removed experimental status from humanize_bytes function in Mojo::Util.
   - Fixed a bug in Mojolicious::Commands where help messages would not be displayed correctly for some commands.
     (kiwiroy)
 

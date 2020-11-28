@@ -200,8 +200,7 @@ Unescape all HTML entities in bytestream with L<Mojo::Util/"html_unescape">.
 
   $stream = $stream->humanize_bytes;
 
-Turn number of bytes into a simplified human readable format for bytestream with L<Mojo::Util/"humanize_bytes">. Note
-that this method is B<EXPERIMENTAL> and might change without warning!
+Turn number of bytes into a simplified human readable format for bytestream with L<Mojo::Util/"humanize_bytes">.
 
 =head2 md5_bytes
 

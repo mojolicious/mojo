@@ -710,8 +710,7 @@ Unescape all HTML entities in string.
 
   my $str = humanize_bytes 1234;
 
-Turn number of bytes into a simplified human readable format. Note that this function is B<EXPERIMENTAL> and might
-change without warning!
+Turn number of bytes into a simplified human readable format.
 
   # "1B"
   humanize_bytes 1;

@@ -7,7 +7,7 @@ use Test::More;
 use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
-use Mojo::Loader qw(data_section file_is_binary find_packages find_modules load_class);
+use Mojo::Loader qw(data_section file_is_binary find_packages find_modules load_class load_classes);
 
 package MyLoaderTest::Foo::Bar;
 
@@ -59,11 +59,14 @@ subtest 'Complicated exception' => sub {
 };
 
 subtest 'Search modules' => sub {
-  my @modules = find_modules 'Mojo::LoaderTest';
-  is_deeply \@modules, [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)], 'found the right modules';
-  is_deeply [find_modules "Mojo'LoaderTest"], [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
+  is_deeply [find_modules 'Mojo::LoaderTest'], [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)],
     'found the right modules';
+
+  is_deeply [find_modules 'Mojo::LoaderTest', {recursive => 1}],
+    [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C Mojo::LoaderTest::E::F)], 'found the right modules';
+
   is_deeply [find_modules 'MyLoaderTest::DoesNotExist'], [], 'no modules found';
+  is_deeply [find_modules 'MyLoaderTest::DoesNotExist', {recursive => 1}], [], 'no modules found';
 };
 
 subtest 'Search packages' => sub {
@@ -94,6 +97,17 @@ subtest 'Invalid class' => sub {
   is load_class('Mojolicious::Lite::'),   1,     'nothing to load';
   is load_class('::Mojolicious::Lite::'), 1,     'nothing to load';
   is load_class('Mojolicious::Lite'),     undef, 'loaded successfully';
+};
+
+subtest 'Load classes recursively' => sub {
+  is_deeply [load_classes 'Mojo::LoaderTest'],
+    ['Mojo::LoaderTest::A', 'Mojo::LoaderTest::B', 'Mojo::LoaderTest::C', 'Mojo::LoaderTest::E::F'], 'classes loaded';
+  ok !!Mojo::LoaderTest::E::F->can('new'), 'loaded successfully';
+};
+
+subtest 'Exception in namespace' => sub {
+  eval { load_classes 'Mojo::LoaderTestException' };
+  like $@, qr/Missing right curly.*A\.pm/, 'right error';
 };
 
 subtest 'UNIX DATA templates' => sub {

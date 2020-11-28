@@ -71,7 +71,7 @@ sub render {
 
     # Placeholder
     else {
-      my $name    = (split $start, $value)[0] // '';
+      my $name    = (split /\Q$start/, $value)[0] // '';
       my $default = $self->defaults->{$name};
       $part = $values->{$name} // $default // '';
       if    (!defined $default || ($default ne $part)) { $optional = 0 }

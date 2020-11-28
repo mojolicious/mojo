@@ -6,6 +6,7 @@ use Carp ();
 use Mojo::DynamicMethods -dispatch;
 use Mojo::Exception;
 use Mojo::Home;
+use Mojo::Loader;
 use Mojo::Log;
 use Mojo::Util;
 use Mojo::UserAgent;
@@ -41,12 +42,13 @@ has log              => sub {
   return $mode eq 'development' ? $log : $log->level('info');
 };
 has 'max_request_size';
-has mode     => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
-has moniker  => sub { Mojo::Util::decamelize ref shift };
-has plugins  => sub { Mojolicious::Plugins->new };
-has renderer => sub { Mojolicious::Renderer->new };
-has routes   => sub { Mojolicious::Routes->new };
-has secrets  => sub {
+has mode               => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
+has moniker            => sub { Mojo::Util::decamelize ref shift };
+has plugins            => sub { Mojolicious::Plugins->new };
+has preload_namespaces => sub { [] };
+has renderer           => sub { Mojolicious::Renderer->new };
+has routes             => sub { Mojolicious::Routes->new };
+has secrets            => sub {
   my $self = shift;
 
   # Warn developers about insecure default
@@ -160,7 +162,8 @@ sub new {
   push @{$self->static->paths},   $home->child('public')->to_string;
 
   # Default to controller and application namespace
-  my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
+  my $controller = "@{[ref $self]}::Controller";
+  my $r          = $self->preload_namespaces([$controller])->routes->namespaces([$controller, ref $self]);
 
   # Hide controller attributes/methods
   $r->hide(qw(app continue cookie every_cookie every_param every_signed_cookie finish helpers match on param render));
@@ -186,11 +189,13 @@ sub server { $_[0]->plugins->emit_hook(before_server_start => @_[1, 0]) }
 
 sub start {
   my $self = shift;
-  $_->warmup for $self->static, $self->renderer;
+  $_->warmup for $self, $self->static, $self->renderer;
   return $self->commands->run(@_ ? @_ : @ARGV);
 }
 
 sub startup { }
+
+sub warmup { Mojo::Loader::load_classes $_ for @{shift->preload_namespaces} }
 
 sub _action {
   my ($next, $c, $action, $last) = @_;
@@ -445,6 +450,14 @@ a plugin.
 
   # Add another namespace to load plugins from
   push @{$app->plugins->namespaces}, 'MyApp::Plugin';
+
+=head2 preload_namespaces
+
+  my $namespaces = $app->preload_namespaces;
+  $app           = $app->preload_namespaces(['MyApp:Controller']);
+
+Namespaces to preload classes from during application startup. Note that this attribute is B<EXPERIMENTAL> and might
+change without warning!
 
 =head2 renderer
 
@@ -718,6 +731,13 @@ This is your main hook into the application, it will be called at application st
 subclass.
 
   sub startup ($self) {...}
+
+=head2 warmup
+
+  $app->warmup;
+
+Preload classes from L</"preload_namespaces"> for future use. Note that this method is B<EXPERIMENTAL> and might change
+without warning!
 
 =head1 HELPERS
 

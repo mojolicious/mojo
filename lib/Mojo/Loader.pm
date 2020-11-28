@@ -6,7 +6,7 @@ use Mojo::Exception;
 use Mojo::File qw(path);
 use Mojo::Util qw(b64_decode class_to_path);
 
-our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class);
+our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class load_classes);
 
 my (%BIN, %CACHE);
 
@@ -15,12 +15,17 @@ sub data_section { $_[0] ? $_[1] ? _all($_[0])->{$_[1]} : _all($_[0]) : undef }
 sub file_is_binary { keys %{_all($_[0])} ? !!$BIN{$_[0]}{$_[1]} : undef }
 
 sub find_modules {
-  my $ns = shift;
+  my ($ns, $options) = (shift, shift // {});
+
+  my @ns  = split '::', $ns;
+  my @inc = grep { -d $$_ } map { path($_, @ns) } @INC;
 
   my %modules;
-  for my $directory (@INC) {
-    next unless -d (my $path = path($directory, split(/::|'/, $ns)));
-    $modules{"${ns}::$_"}++ for $path->list->grep(qr/\.pm$/)->map('basename', '.pm')->each;
+  for my $dir (@inc) {
+    for my $file ($options->{recursive} ? $dir->list_tree->each : $dir->list->each) {
+      next unless $$file =~ s/\.pm$//;
+      $modules{join('::', $ns, @{$file->to_rel($$dir)})}++;
+    }
   }
 
   return sort keys %modules;
@@ -46,6 +51,18 @@ sub load_class {
 
   # Real error
   return Mojo::Exception->new($@)->inspect;
+}
+
+sub load_classes {
+  my $ns = shift;
+
+  my @classes;
+  for my $module (find_modules($ns, {recursive => 1})) {
+    push @classes, $module unless my $e = load_class($module);
+    die $e if ref $e;
+  }
+
+  return @classes;
 }
 
 sub _all {
@@ -153,8 +170,21 @@ Search for packages in a namespace non-recursively.
 =head2 find_modules
 
   my @modules = find_modules 'MyApp::Namespace';
+  my @modules = find_modules 'MyApp::Namespace', {recursive => 1};
 
-Search for modules in a namespace non-recursively.
+Search for modules in a namespace.
+
+These options are currently available:
+
+=over 2
+
+=item recursive
+
+  recursive => 1
+
+Search namespace recursively.
+
+=back
 
 =head2 load_class
 
@@ -168,6 +198,13 @@ they are already loaded, so trying to load the same class multiple times may yie
   if (my $e = load_class 'Foo::Bar') {
     die ref $e ? "Exception: $e" : 'Not found!';
   }
+
+=head2 load_classes
+
+  my @classes = load_classes 'Foo::Bar';
+
+Load all classes in a namespace recursively. Note that this function is B<EXPERIMENTAL> and might change without
+warning!
 
 =head1 SEE ALSO
 

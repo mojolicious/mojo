@@ -58,6 +58,10 @@ is $t->app->config->{foo}, 'baz', 'right value';
 
 $t = Test::Mojo->new('MojoliciousTest');
 
+subtest 'Preload namespaces' => sub {
+  is_deeply $t->app->preload_namespaces, ['MojoliciousTest::Controller'], 'right namespaces';
+};
+
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something', 'right pattern';
 is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTestController', 'right namespace';

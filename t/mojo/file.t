@@ -245,8 +245,8 @@ subtest 'list/list_tree' => sub {
   unshift @files, $lib->child('.hidden.txt')->to_string;
   is_deeply path($lib)->list({hidden => 1})->map('to_string')->to_array, \@files, 'right files';
   @files = map { path($lib)->child(split '/') } (
-    'BaseTest',   'DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm',
-    'LoaderTest', 'Server',             'TestConnectProxy.pm'
+    'BaseTest',   'DeprecationTest.pm',  'LoaderException.pm', 'LoaderException2.pm',
+    'LoaderTest', 'LoaderTestException', 'Server',             'TestConnectProxy.pm'
   );
   is_deeply path($lib)->list({dir => 1})->map('to_string')->to_array, \@files, 'right files';
   my @hidden = map { path($lib)->child(split '/') } '.hidden.txt', '.test';
@@ -255,11 +255,13 @@ subtest 'list/list_tree' => sub {
   is_deeply path('does_not_exist')->list_tree->to_array, [], 'no files';
   is_deeply curfile->list_tree->to_array, [], 'no files';
   @files = map { path($lib)->child(split '/') } (
-    'BaseTest/Base1.pm',  'BaseTest/Base2.pm',
-    'BaseTest/Base3.pm',  'DeprecationTest.pm',
-    'LoaderException.pm', 'LoaderException2.pm',
-    'LoaderTest/A.pm',    'LoaderTest/B.pm',
-    'LoaderTest/C.pm',    'Server/Morbo/Backend/TestBackend.pm',
+    'BaseTest/Base1.pm',        'BaseTest/Base2.pm',
+    'BaseTest/Base3.pm',        'DeprecationTest.pm',
+    'LoaderException.pm',       'LoaderException2.pm',
+    'LoaderTest/A.pm',          'LoaderTest/B.pm',
+    'LoaderTest/C.pm',          'LoaderTest/D.txt',
+    'LoaderTest/E/F.pm',        'LoaderTest/E/G.txt',
+    'LoaderTestException/A.pm', 'Server/Morbo/Backend/TestBackend.pm',
     'TestConnectProxy.pm'
   );
   is_deeply path($lib)->list_tree->map('to_string')->to_array, \@files, 'right files';
@@ -273,6 +275,9 @@ subtest 'list/list_tree' => sub {
     'LoaderException.pm',   'LoaderException2.pm',
     'LoaderTest',           'LoaderTest/A.pm',
     'LoaderTest/B.pm',      'LoaderTest/C.pm',
+    'LoaderTest/D.txt',     'LoaderTest/E',
+    'LoaderTest/E/F.pm',    'LoaderTest/E/G.txt',
+    'LoaderTestException',  'LoaderTestException/A.pm',
     'Server',               'Server/Morbo',
     'Server/Morbo/Backend', 'Server/Morbo/Backend/TestBackend.pm',
     'TestConnectProxy.pm'
@@ -282,22 +287,23 @@ subtest 'list/list_tree' => sub {
     ('DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm', 'TestConnectProxy.pm');
   is_deeply path($lib)->list_tree({max_depth => 1})->map('to_string')->to_array, [@one], 'right files';
   my @one_dir = map { path($lib)->child(split '/') } (
-    'BaseTest',   'DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm',
-    'LoaderTest', 'Server',             'TestConnectProxy.pm'
+    'BaseTest',   'DeprecationTest.pm',  'LoaderException.pm', 'LoaderException2.pm',
+    'LoaderTest', 'LoaderTestException', 'Server',             'TestConnectProxy.pm'
   );
   is_deeply path($lib)->list_tree({dir => 1, max_depth => 1})->map('to_string')->to_array, [@one_dir], 'right files';
   my @two = map { path($lib)->child(split '/') } (
-    'BaseTest/Base1.pm',  'BaseTest/Base2.pm',   'BaseTest/Base3.pm', 'DeprecationTest.pm',
-    'LoaderException.pm', 'LoaderException2.pm', 'LoaderTest/A.pm',   'LoaderTest/B.pm',
-    'LoaderTest/C.pm',    'TestConnectProxy.pm'
+    'BaseTest/Base1.pm',  'BaseTest/Base2.pm',   'BaseTest/Base3.pm',        'DeprecationTest.pm',
+    'LoaderException.pm', 'LoaderException2.pm', 'LoaderTest/A.pm',          'LoaderTest/B.pm',
+    'LoaderTest/C.pm',    'LoaderTest/D.txt',    'LoaderTestException/A.pm', 'TestConnectProxy.pm'
   );
   is_deeply path($lib)->list_tree({max_depth => 2})->map('to_string')->to_array, [@two], 'right files';
   my @three = map { path($lib)->child(split '/') } (
-    '.hidden.txt',          '.test',               '.test/hidden.txt',  'BaseTest',
-    'BaseTest/Base1.pm',    'BaseTest/Base2.pm',   'BaseTest/Base3.pm', 'DeprecationTest.pm',
-    'LoaderException.pm',   'LoaderException2.pm', 'LoaderTest',        'LoaderTest/A.pm',
-    'LoaderTest/B.pm',      'LoaderTest/C.pm',     'Server',            'Server/Morbo',
-    'Server/Morbo/Backend', 'TestConnectProxy.pm'
+    '.hidden.txt',        '.test',               '.test/hidden.txt',     'BaseTest',
+    'BaseTest/Base1.pm',  'BaseTest/Base2.pm',   'BaseTest/Base3.pm',    'DeprecationTest.pm',
+    'LoaderException.pm', 'LoaderException2.pm', 'LoaderTest',           'LoaderTest/A.pm',
+    'LoaderTest/B.pm',    'LoaderTest/C.pm',     'LoaderTest/D.txt',     'LoaderTest/E',
+    'LoaderTest/E/F.pm',  'LoaderTest/E/G.txt',  'LoaderTestException',  'LoaderTestException/A.pm',
+    'Server',             'Server/Morbo',        'Server/Morbo/Backend', 'TestConnectProxy.pm'
   );
   is_deeply path($lib)->list_tree({dir => 1, hidden => 1, max_depth => 3})->map('to_string')->to_array, [@three],
     'right files';

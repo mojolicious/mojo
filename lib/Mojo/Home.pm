@@ -13,7 +13,7 @@ sub detect {
   # Location of the application class (Windows mixes backslash and slash)
   elsif ($class && (my $path = $INC{my $file = class_to_path $class})) {
     $home = Mojo::File->new($path)->to_array;
-    splice @$home, (my @dummy = split('/', $file)) * -1;
+    splice @$home, (my @dummy = split(/\//, $file)) * -1;
     @$home && $home->[-1] eq $_ && pop @$home for qw(lib blib);
   }
 
@@ -21,7 +21,7 @@ sub detect {
   return $self;
 }
 
-sub rel_file { shift->child(split('/', shift)) }
+sub rel_file { shift->child(split(/\//, shift)) }
 
 1;
 

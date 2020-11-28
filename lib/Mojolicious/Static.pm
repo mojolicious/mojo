@@ -41,7 +41,7 @@ sub file {
   my ($self, $rel) = @_;
 
   # Search all paths
-  my @parts = split '/', $rel;
+  my @parts = split /\//, $rel;
   for my $path (@{$self->paths}) {
     next unless my $asset = _get_file(path($path, @parts)->to_string);
     return $asset;
@@ -70,7 +70,7 @@ sub is_fresh {
 
   # If-None-Match
   $etag //= $res_headers->etag // '';
-  return undef if $match && !grep { $_ eq $etag || "W/$_" eq $etag } map { trim($_) } split ',', $match;
+  return undef if $match && !grep { $_ eq $etag || "W/$_" eq $etag } map { trim($_) } split /,/, $match;
 
   # If-Modified-Since
   return !!$match unless ($last //= $res_headers->last_modified) && $since;

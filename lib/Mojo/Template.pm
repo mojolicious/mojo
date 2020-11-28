@@ -59,7 +59,7 @@ sub parse {
   # Split lines
   my $op = 'text';
   my ($trimming, $capture);
-  for my $line (split "\n", $template) {
+  for my $line (split /\n/, $template) {
 
     # Turn Perl line into mixed line
     if ($op eq 'text' && $line =~ $line_re) {
@@ -188,7 +188,7 @@ sub _compile {
 
     # Text (quote and fix line ending)
     if ($op eq 'text') {
-      $value = join "\n", map { quotemeta $_ } split("\n", $value, -1);
+      $value = join "\n", map { quotemeta $_ } split(/\n/, $value, -1);
       $value      .= '\n'                          if $newline;
       $blocks[-1] .= "\$_O .= \"" . $value . "\";" if length $value;
     }

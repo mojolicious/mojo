@@ -34,7 +34,7 @@ sub extract_usage { Mojo::Util::extract_usage((caller)[1]) }
 
 sub help { print shift->usage }
 
-sub rel_file { path->child(split('/', pop)) }
+sub rel_file { path->child(split(/\//, pop)) }
 
 sub render_data {
   my ($self, $name) = (shift, shift);

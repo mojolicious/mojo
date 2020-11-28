@@ -165,7 +165,7 @@ sub _tokenize {
   my $wildcard    = $self->wildcard_start;
 
   my (@tree, $spec, $more);
-  for my $char (split '', $pattern) {
+  for my $char (split //, $pattern) {
 
     # Quoted
     if    ($char eq $quote_start) { push @tree, ['placeholder', ''] if ++$spec }

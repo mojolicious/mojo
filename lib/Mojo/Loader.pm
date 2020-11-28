@@ -17,7 +17,7 @@ sub file_is_binary { keys %{_all($_[0])} ? !!$BIN{$_[0]}{$_[1]} : undef }
 sub find_modules {
   my ($ns, $options) = (shift, shift // {});
 
-  my @ns  = split '::', $ns;
+  my @ns  = split /::/, $ns;
   my @inc = grep { -d $$_ } map { path($_, @ns) } @INC;
 
   my %modules;

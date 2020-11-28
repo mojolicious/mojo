@@ -1,4 +1,4 @@
-package MojoliciousTest::Foo::Bar;
+package MojoliciousTest::Controller::Foo::Bar;
 use Mojolicious::Controller -base;
 
 sub index {1}

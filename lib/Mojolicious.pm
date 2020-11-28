@@ -176,6 +176,7 @@ sub new {
   $self->hook(around_dispatch => \&_exception);
 
   $self->startup;
+  $self->warmup;
 
   return $self;
 }
@@ -189,7 +190,7 @@ sub server { $_[0]->plugins->emit_hook(before_server_start => @_[1, 0]) }
 
 sub start {
   my $self = shift;
-  $_->warmup for $self, $self->static, $self->renderer;
+  $_->warmup for $self->static, $self->renderer;
   return $self->commands->run(@_ ? @_ : @ARGV);
 }
 

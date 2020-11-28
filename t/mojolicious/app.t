@@ -60,6 +60,7 @@ $t = Test::Mojo->new('MojoliciousTest');
 
 subtest 'Preload namespaces' => sub {
   is_deeply $t->app->preload_namespaces, ['MojoliciousTest::Controller'], 'right namespaces';
+  ok !!MojoliciousTest::Controller::Foo::Bar->can('new'), 'preloaded controller';
 };
 
 # Application is already available

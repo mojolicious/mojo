@@ -250,4 +250,23 @@ is_deeply $result, {'bar' => 23}, 'right structure';
 is $pattern->render($result, 1), '/foo/23/baz', 'right result';
 ok !$pattern->match('/foo/bar/baz', 1), 'no result';
 
+subtest 'Alternate placeholder characters' => sub {
+  my $pattern = Mojolicious::Routes::Pattern->new->placeholder_start('|')->parse('/|test');
+  my $result  = $pattern->match('/foo');
+  is_deeply $result, {test => 'foo'}, 'right structure';
+  is $pattern->render($result, 1), '/foo', 'right result';
+  $pattern = Mojolicious::Routes::Pattern->new->relaxed_start('|')->parse('/|test');
+  $result  = $pattern->match('/foo');
+  is_deeply $result, {test => 'foo'}, 'right structure';
+  is $pattern->render($result, 1), '/foo', 'right result';
+  $pattern = Mojolicious::Routes::Pattern->new->wildcard_start('|')->parse('/|test');
+  $result  = $pattern->match('/foo');
+  is_deeply $result, {test => 'foo'}, 'right structure';
+  is $pattern->render($result, 1), '/foo', 'right result';
+  $pattern = Mojolicious::Routes::Pattern->new->types({num => qr/\d+/})->type_start('|')->parse('/<test|num>');
+  $result  = $pattern->match('/42');
+  is_deeply $result, {test => '42'}, 'right structure';
+  is $pattern->render($result, 1), '/42', 'right result';
+};
+
 done_testing();

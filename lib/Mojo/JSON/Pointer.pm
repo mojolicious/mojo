@@ -13,7 +13,7 @@ sub _pointer {
 
   my $data = $self->data;
   return length $pointer ? undef : $get ? $data : 1 unless $pointer =~ s!^/!!;
-  for my $p (length $pointer ? (split '/', $pointer, -1) : ($pointer)) {
+  for my $p (length $pointer ? (split /\//, $pointer, -1) : ($pointer)) {
     $p =~ s!~1!/!g;
     $p =~ s/~0/~/g;
 

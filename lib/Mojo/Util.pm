@@ -44,7 +44,7 @@ my %ENTITIES;
   open my $file, '<', $path or croak "Unable to open html entities file ($path): $!";
   my $lines = do { local $/; <$file> };
 
-  for my $line (split "\n", $lines) {
+  for my $line (split /\n/, $lines) {
     next unless $line =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
     $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
   }
@@ -91,8 +91,8 @@ sub camelize {
 
   # CamelCase words
   return join '::', map {
-    join('', map { ucfirst lc } split '_')
-  } split '-', $str;
+    join('', map { ucfirst lc } split /_/)
+  } split /-/, $str;
 }
 
 sub class_to_file {
@@ -111,7 +111,7 @@ sub decamelize {
   # snake_case words
   return join '-', map {
     join('_', map {lc} grep {length} split /([A-Z]{1}[^A-Z]*)/)
-  } split '::', $str;
+  } split /::/, $str;
 }
 
 sub decode {
@@ -193,7 +193,7 @@ sub punycode_decode {
   my ($n, $i, $bias, @output) = (PC_INITIAL_N, 0, PC_INITIAL_BIAS);
 
   # Consume all code points before the last delimiter
-  push @output, split('', $1) if $input =~ s/(.*)\x2d//s;
+  push @output, split(//, $1) if $input =~ s/(.*)\x2d//s;
 
   while (length $input) {
     my ($oldi, $w) = ($i, 1);
@@ -226,7 +226,7 @@ sub punycode_encode {
   my ($n, $delta, $bias) = (PC_INITIAL_N, 0, PC_INITIAL_BIAS);
 
   # Extract basic code points
-  my @input = map {ord} split '', $output;
+  my @input = map {ord} split //, $output;
   $output =~ s/[^\x00-\x7f]+//gs;
   my $h = my $basic = length $output;
   $output .= "\x2d" if $basic > 0;
@@ -334,7 +334,7 @@ sub trim {
 
 sub unindent {
   my $str = shift;
-  my $min = min map { m/^([ \t]*)/; length $1 || () } split "\n", $str;
+  my $min = min map { m/^([ \t]*)/; length $1 || () } split /\n/, $str;
   $str =~ s/^[ \t]{0,$min}//gm if $min;
   return $str;
 }

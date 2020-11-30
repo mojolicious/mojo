@@ -78,7 +78,7 @@ sub pairs {
     return $pairs unless length $str;
 
     my $charset = $self->charset;
-    for my $pair (split '&', $str) {
+    for my $pair (split /&/, $str) {
       next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
       my ($name, $value) = ($1, $2 // '');
 

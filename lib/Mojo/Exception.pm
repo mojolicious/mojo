@@ -65,7 +65,7 @@ sub inspect {
   }
 
   # Search for context in sources
-  $self->_context($files[-1][1], [map { [split "\n"] } @sources]) if @sources;
+  $self->_context($files[-1][1], [map { [split /\n/] } @sources]) if @sources;
 
   return $self;
 }

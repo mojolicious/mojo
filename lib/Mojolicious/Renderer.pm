@@ -141,7 +141,7 @@ sub template_for {
   # Normal default template
   my $stash = $c->stash;
   my ($controller, $action) = @$stash{qw(controller action)};
-  return join '/', split('-', decamelize $controller), $action if $controller && $action;
+  return join '/', split(/-/, decamelize $controller), $action if $controller && $action;
 
   # Try the route name if we don't have controller and action
   return undef unless my $route = $c->match->endpoint;
@@ -178,7 +178,7 @@ sub template_name {
 sub template_path {
   my ($self, $options) = @_;
   return undef unless my $name = $self->template_name($options);
-  my @parts = split '/', $name;
+  my @parts = split /\//, $name;
   -r and return $_ for map { path($_, @parts)->to_string } @{$self->paths}, $TEMPLATES;
   return undef;
 }

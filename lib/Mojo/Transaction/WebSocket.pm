@@ -151,7 +151,7 @@ sub with_compression {
 sub with_protocols {
   my $self = shift;
 
-  my %protos = map { trim($_) => 1 } split ',', $self->req->headers->sec_websocket_protocol // '';
+  my %protos = map { trim($_) => 1 } split /,/, $self->req->headers->sec_websocket_protocol // '';
   return undef unless defined(my $proto = first { $protos{$_} } @_);
 
   $self->res->headers->sec_websocket_protocol($proto);

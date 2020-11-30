@@ -1,4 +1,6 @@
 
+8.67  2020-11-30
+
 8.66  2020-11-28
   - Deprecated logging to "log/$mode.log" (if a log directory exists) in Mojolicious. The default will simply be STDERR
     in the future.

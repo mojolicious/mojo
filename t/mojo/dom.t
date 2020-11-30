@@ -2918,4 +2918,12 @@ subtest 'Root pseudo-class' => sub {
   is $dom->at(':scope:first-child'), undef, 'no result';
 };
 
+subtest 'Unknown CSS selector' => sub {
+  my $dom = Mojo::DOM->new('<html><head></head><body><div><div>x</div></div></body></html>');
+  eval { $dom->at('div[') };
+  like $@, qr/Unknown CSS selector: div\[/, 'right error';
+  eval { $dom->find('p[') };
+  like $@, qr/Unknown CSS selector: p\[/, 'right error';
+};
+
 done_testing();

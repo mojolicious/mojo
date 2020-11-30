@@ -9,6 +9,7 @@
   - Removed experimental status from humanize_bytes method in Mojo::ByteStream.
   - Removed experimental status from humanize_bytes function in Mojo::Util.
   - Improved find_modules function in Mojo::Loader with recursive option.
+  - Improved Mojo::DOM::CSS to throw exceptions for unknown CSS selectors.
   - Fixed a bug in Mojolicious::Commands where help messages would not be displayed correctly for some commands.
     (kiwiroy)
   - Fixed a bug in Mojolicious::Routes::Pattern where type_start was treated as a regex. (Grinnz)

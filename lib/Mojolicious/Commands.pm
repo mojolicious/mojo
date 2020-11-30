@@ -57,6 +57,8 @@ sub run {
     return $command->run(@args);
   }
 
+  elsif ($name) { die qq{Invalid command "$name".\n} }
+
   # Hide list for tests
   return 1 if $ENV{HARNESS_ACTIVE};
 
@@ -73,6 +75,7 @@ sub run {
     $command =~ s/(?<!^)_/-/g;
     push @rows, [" $command", $all{$class}];
   }
+
   return print $self->message, tablify(\@rows), $self->hint;
 }
 

@@ -94,15 +94,11 @@ my $buffer = '';
 }
 like $buffer, qr/Usage: APPLICATION COMMAND \[OPTIONS\].*_test2-command.*cgi.*test-comm/s, 'right output';
 
-# Commands starting with a dash are not allowed
-$buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDOUT = $handle;
+subtest 'Commands starting with a dash are not allowed' => sub {
   local $ENV{HARNESS_ACTIVE} = 0;
-  $app->start('-test2-command');
-}
-like $buffer, qr/Usage: APPLICATION COMMAND \[OPTIONS\].*_test2-command.*cgi.*test-comm/s, 'right output';
+  eval { $app->start('-test2-command') };
+  like $@, qr/Invalid command "-test2-command"\./, 'not allowed';
+};
 
 # Do not pick up options for detected environments
 {

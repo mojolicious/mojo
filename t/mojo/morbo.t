@@ -117,6 +117,7 @@ EOF
   ok((stat $script)[9] == $mtime, 'modify time has not changed');
   isnt((stat $script)[7], $size, 'size has changed');
   sleep 0.1 until -f $started;
+  $started = $started->sibling('started4.txt');
 
   # Application has been reloaded again
   my $tx = $ua->get("http://127.0.0.1:$port/hello");
@@ -151,6 +152,53 @@ subtest 'Broken symlink' => sub {
   local $SIG{__WARN__} = sub { $warned++ };
   is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
   ok !$warned, 'no warnings';
+};
+
+subtest 'Randomized Request IDs' => sub {
+  my @ids;
+  $script->spurt(<<"EOF");
+use Mojolicious::Lite;
+use Mojo::File qw(path);
+use Mojo::IOLoop;
+
+app->log->level('fatal');
+
+Mojo::IOLoop->next_tick(sub { path('$started')->touch });
+
+# Return "request_id"
+get '/request_id' => sub {
+  my \$c = shift;
+  \$c->render( text => \$c->req->request_id );
+};
+
+app->start;
+EOF
+  sleep 0.1 until -f $started;
+
+  # Fetch initial request_ids
+  my $tx = $ua->get("http://127.0.0.1:$port/request_id");
+  like $tx->res->body, qr/^[\-_0-9a-z]+$/i, 'request_id is valid';
+  $ids[0] = $tx->res->body;
+
+  $tx = $ua->get("http://127.0.0.1:$port/request_id");
+  like $tx->res->body, qr/^[\-_0-9a-z]+$/i, 'request_id is valid';
+  $ids[1] = $tx->res->body;
+
+  isnt $ids[1], $ids[0], 'request_ids differ';
+
+  # Restart Morbo and fetch new request_ids
+  $started->remove;
+  $script->touch;
+  sleep 0.1 until -f $started;
+  $started = $started->sibling('started5.txt');
+
+  $tx = $ua->get("http://127.0.0.1:$port/request_id");
+  like $tx->res->body, qr/^[\-_0-9a-z]+$/i, 'request_id is valid';
+  isnt $tx->res->body, $ids[0], 'request_ids differ';
+
+  $tx = $ua->get("http://127.0.0.1:$port/request_id");
+  like $tx->res->body, qr/^[\-_0-9a-z]+$/i, 'request_id is valid';
+  isnt $tx->res->body, $ids[1], 'request_ids differ';
 };
 
 # Stop

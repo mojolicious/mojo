@@ -119,12 +119,10 @@ sub requires {
   return $self;
 }
 
+# DEPRECATED!
 sub route {
-  my $self   = shift;
-  my $route  = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
-  my $format = $self->pattern->constraints->{format};
-  $route->pattern->constraints->{format} //= 0 if defined $format && !$format;
-  return $route;
+  Mojo::Util::deprecated 'Mojolicious::Routes::Route::route is DEPRECATED in favor of Mojolicious::Routes::Route::any';
+  shift->_route(@_);
 }
 
 sub suggested_method {
@@ -214,7 +212,7 @@ sub _generate_route {
     elsif (ref $arg eq 'HASH') { %defaults = (%defaults, %$arg) }
   }
 
-  my $route = $self->route($pattern, @constraints)->requires(\@conditions)->to(\%defaults);
+  my $route = $self->_route($pattern, @constraints)->requires(\@conditions)->to(\%defaults);
   $methods eq 'under' ? $route->inline(1) : $route->methods($methods);
 
   return defined $name ? $route->name($name) : $route;
@@ -232,6 +230,14 @@ sub _index {
   }
 
   return {%auto, %custom};
+}
+
+sub _route {
+  my $self   = shift;
+  my $route  = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
+  my $format = $self->pattern->constraints->{format};
+  $route->pattern->constraints->{format} //= 0 if defined $format && !$format;
+  return $route;
 }
 
 1;
@@ -528,7 +534,7 @@ Remove route from parent.
   $r->find('foo')->remove;
 
   # Reattach route to new parent
-  $r->route('/foo')->add_child($r->find('bar')->remove);
+  $r->any('/foo')->add_child($r->find('bar')->remove);
 
 =head2 render
 
@@ -554,15 +560,6 @@ complex for caching.
 
   # Route with condition and destination
   $r->get('/foo')->requires(host => qr/mojolicious\.org/)->to('foo#bar');
-
-=head2 route
-
-  my $route = $r->route;
-  my $route = $r->route('/:action');
-  my $route = $r->route('/:action', action => qr/\w+/);
-  my $route = $r->route(format => 0);
-
-Low-level generator for routes matching all HTTP request methods, returns a L<Mojolicious::Routes::Route> object.
 
 =head2 suggested_method
 

@@ -7,171 +7,171 @@ use Mojolicious::Routes::Match;
 
 # /clean
 my $r = Mojolicious::Routes->new;
-$r->route('/clean')->to(clean => 1)->name('very_clean');
+$r->any('/clean')->to(clean => 1)->name('very_clean');
 
 # /clean/too
-$r->route('/clean/too')->to(something => 1)->name('very_clean');
+$r->any('/clean/too')->to(something => 1)->name('very_clean');
 
 # /0
-$r->route('0')->to(null => 1);
+$r->any('0')->to(null => 1);
 
 # /alternatives
 # /alternatives/0
 # /alternatives/test
 # /alternatives/23
-$r->route('/alternatives/:foo', foo => [qw(0 test 23)])->to(foo => 11);
+$r->any('/alternatives/:foo', [foo => [qw(0 test 23)]])->to(foo => 11);
 
 # /alternatives2/0
 # /alternatives2/test
 # /alternatives2/23
-$r->route('/alternatives2/:foo/', foo => [qw(0 test 23)]);
+$r->any('/alternatives2/:foo/', [foo => [qw(0 test 23)]]);
 
 # /alternatives3/foo
 # /alternatives3/foobar
-$r->route('/alternatives3/:foo', foo => [qw(foo foobar)]);
+$r->any('/alternatives3/:foo', [foo => [qw(foo foobar)]]);
 
 # /alternatives4/foo
 # /alternatives4/foo.bar
-$r->route('/alternatives4/:foo', foo => [qw(foo foo.bar)]);
+$r->any('/alternatives4/:foo', [foo => [qw(foo foo.bar)]]);
 
 # /optional/*
 # /optional/*/*
-$r->route('/optional/:foo/:bar')->to(bar => 'test');
+$r->any('/optional/:foo/:bar')->to(bar => 'test');
 
 # /optional2
 # /optional2/*
 # /optional2/*/*
-$r->route('/optional2/:foo')->to(foo => 'one')->route('/:bar')->to(bar => 'two');
+$r->any('/optional2/:foo')->to(foo => 'one')->any('/:bar')->to(bar => 'two');
 
 # /*/test
-my $test = $r->route('/:controller/test')->to(action => 'test');
+my $test = $r->any('/:controller/test')->to(action => 'test');
 
 # /*/test/edit
-$test->route('/edit')->to(action => 'edit')->name('test_edit');
+$test->any('/edit')->to(action => 'edit')->name('test_edit');
 
 # /*/testedit
-$r->route('/:controller/testedit')->to(action => 'testedit');
+$r->any('/:controller/testedit')->to(action => 'testedit');
 
 # /*/test/delete/*
-$test->route('/delete/<id>', id => qr/\d+/)->to(action => 'delete', id => 23);
+$test->any('/delete/<id>', [id => qr/\d+/])->to(action => 'delete', id => 23);
 
 # /test2
-my $test2 = $r->route('/test2/')->inline(1)->to(controller => 'test2');
+my $test2 = $r->any('/test2/')->inline(1)->to(controller => 'test2');
 
 # /test2 (inline)
-my $test4 = $test2->route('/')->inline(1)->to(controller => 'index');
+my $test4 = $test2->any('/')->inline(1)->to(controller => 'index');
 
 # /test2/foo
-$test4->route('/foo')->to(controller => 'baz');
+$test4->any('/foo')->to(controller => 'baz');
 
 # /test2/bar
-$test4->route('/bar')->to(controller => 'lalala');
+$test4->any('/bar')->to(controller => 'lalala');
 
 # /test2/baz
-$test2->route('/baz')->to('just#works');
+$test2->any('/baz')->to('just#works');
 
 # /
-$r->route('/')->to(controller => 'hello', action => 'world');
+$r->any('/')->to(controller => 'hello', action => 'world');
 
 # /wildcards/1/*
-$r->route('/wildcards/1/<*wildcard>', wildcard => qr/(?:.*)/)->to(controller => 'wild', action => 'card');
+$r->any('/wildcards/1/<*wildcard>', [wildcard => qr/(?:.*)/])->to(controller => 'wild', action => 'card');
 
 # /wildcards/2/*
-$r->route('/wildcards/2/*wildcard')->to(controller => 'card', action => 'wild');
+$r->any('/wildcards/2/*wildcard')->to(controller => 'card', action => 'wild');
 
 # /wildcards/3/*/foo
-$r->route('/wildcards/3/<*wildcard>/foo')->to(controller => 'very', action => 'dangerous');
+$r->any('/wildcards/3/<*wildcard>/foo')->to(controller => 'very', action => 'dangerous');
 
 # /wildcards/4/*/foo
-$r->route('/wildcards/4/*wildcard/foo')->to(controller => 'somewhat', action => 'dangerous');
+$r->any('/wildcards/4/*wildcard/foo')->to(controller => 'somewhat', action => 'dangerous');
 
 # /format
 # /format.html
-$r->route('/format')->to(controller => 'hello')->to(action => 'you', format => 'html');
+$r->any('/format')->to(controller => 'hello')->to(action => 'you', format => 'html');
 
 # /format2.txt
-$r->route('/format2', format => qr/txt/)->to(controller => 'we', action => 'howdy');
+$r->any('/format2', [format => qr/txt/])->to(controller => 'we', action => 'howdy');
 
 # /format3.txt
 # /format3.text
-$r->route('/format3', format => [qw(txt text)])->to(controller => 'we', action => 'cheers');
+$r->any('/format3', [format => [qw(txt text)]])->to(controller => 'we', action => 'cheers');
 
 # /format4
 # /format4.html
-$r->route('/format4', format => ['html'])->to(controller => 'us', action => 'yay', format => 'html');
+$r->any('/format4', [format => ['html']])->to(controller => 'us', action => 'yay', format => 'html');
 
 # /format5
-$r->route('/format5', format => 0)->to(controller => 'us', action => 'wow');
+$r->any('/format5', [format => 0])->to(controller => 'us', action => 'wow');
 
 # /format6
-$r->route('/format6', format => 0)->to(controller => 'us', action => 'doh', format => 'xml');
+$r->any('/format6', [format => 0])->to(controller => 'us', action => 'doh', format => 'xml');
 
 # /format7.foo
 # /format7.foobar
-$r->route('/format7', format => [qw(foo foobar)])->to('perl#rocks');
+$r->any('/format7', [format => [qw(foo foobar)]])->to('perl#rocks');
 
 # /type/23
 # /type/24
 $r->add_type(my_num => [23, 24]);
-$r->route('/type/<id:my_num>')->to('foo#bar');
+$r->any('/type/<id:my_num>')->to('foo#bar');
 
 # /articles/1/edit
 # /articles/1/delete
-my $inline = $r->route('/articles/:id')->inline(1)->to(controller => 'articles', action => 'load', format => 'html');
-$inline->route('/edit')->to(controller => 'articles', action => 'edit');
-$inline->route('/delete')->to(controller => 'articles', action => 'delete', format => undef)->name('articles_delete');
+my $inline = $r->any('/articles/:id')->inline(1)->to(controller => 'articles', action => 'load', format => 'html');
+$inline->any('/edit')->to(controller => 'articles', action => 'edit');
+$inline->any('/delete')->to(controller => 'articles', action => 'delete', format => undef)->name('articles_delete');
 
 # GET /method/get
-$r->route('/method/get')->methods('GET')->to(controller => 'method', action => 'get');
+$r->any('/method/get')->methods('GET')->to(controller => 'method', action => 'get');
 
 # POST /method/post
-$r->route('/method/post')->methods('post')->to(controller => 'method', action => 'post');
+$r->any('/method/post')->methods('post')->to(controller => 'method', action => 'post');
 
 # POST|GET /method/post_get
-$r->route('/method/post_get')->methods(qw(POST get))->to(controller => 'method', action => 'post_get');
+$r->any('/method/post_get')->methods(qw(POST get))->to(controller => 'method', action => 'post_get');
 
 # /simple/form
-$r->route('/simple/form')->to('test-test#test');
+$r->any('/simple/form')->to('test-test#test');
 
 # /regex/alternatives/*
-$r->route('/regex/alternatives/:alternatives', alternatives => qr/foo|bar|baz/)
+$r->any('/regex/alternatives/:alternatives', [alternatives => qr/foo|bar|baz/])
   ->to(controller => 'regex', action => 'alternatives');
 
 # /versioned/1.0/test
 # /versioned/1.0/test.xml
 # /versioned/2.4/test
 # /versioned/2.4/test.xml
-my $versioned = $r->route('/versioned');
-$versioned->route('/1.0')->to(controller => 'bar')->route('/test')->to(action => 'baz');
-$versioned->route('/2.4')->to(controller => 'foo')->route('/test')->to(action => 'bar');
+my $versioned = $r->any('/versioned');
+$versioned->any('/1.0')->to(controller => 'bar')->any('/test')->to(action => 'baz');
+$versioned->any('/2.4')->to(controller => 'foo')->any('/test')->to(action => 'bar');
 
 # /versioned/too/1.0
-my $too = $r->route('/versioned/too')->to('too#');
-$too->route('/1.0')->to('#foo');
-$too->route('/2.0', format => 0)->to('#bar');
+my $too = $r->any('/versioned/too')->to('too#');
+$too->any('/1.0')->to('#foo');
+$too->any('/2.0', [format => 0])->to('#bar');
 
 # /multi/foo.bar
-my $multi = $r->route('/multi');
-$multi->route('/foo.bar', format => 0)->to('just#works');
-$multi->route('/bar.baz')->to('works#too', format => 'xml');
+my $multi = $r->any('/multi');
+$multi->any('/foo.bar', [format => 0])->to('just#works');
+$multi->any('/bar.baz')->to('works#too', format => 'xml');
 
 # /nodetect
 # /nodetect2.txt
 # /nodetect2.html
-my $inactive = $r->route(format => 0);
-$inactive->route('/nodetect')->to('foo#none');
-$inactive->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
+my $inactive = $r->any('/', [format => 0]);
+$inactive->any('/nodetect')->to('foo#none');
+$inactive->any('/nodetect2', [format => ['txt', 'html']])->to('bar#hyper');
 
 # /target/first
 # /target/second
 # /target/second.xml
 # /source/third
 # /source/third.xml
-my $source = $r->route('/source')->to('source#');
-my $first  = $source->route(format => 0)->route('/first')->to('#first');
-$source->route('/second')->to('#second');
-my $third  = $source->route('/third')->to('#third');
-my $target = $r->remove->route('/target')->to('target#');
+my $source = $r->any('/source')->to('source#');
+my $first  = $source->any('/', [format => 0])->any('/first')->to('#first');
+$source->any('/second')->to('#second');
+my $third  = $source->any('/third')->to('#third');
+my $target = $r->remove->any('/target')->to('target#');
 my $second = $r->find('second');
 is $second->render({}), '/source/second', 'right result';
 $second->remove;
@@ -180,26 +180,26 @@ $target->add_child($first)->add_child($second);
 is $second->render({}), '/target/second', 'right result';
 
 # /websocket
-$r->websocket('/websocket' => {controller => 'ws'})->route('/')->to(action => 'just')->route->to(works => 1);
+$r->websocket('/websocket' => {controller => 'ws'})->any('/')->to(action => 'just')->any->to(works => 1);
 
 # /slash
-$r->route('/slash')->to(controller => 'just')->route('/')->to(action => 'slash');
+$r->any('/slash')->to(controller => 'just')->any('/')->to(action => 'slash');
 
 # /missing/*/name
 # /missing/too
 # /missing/too/test
-$r->route('/missing/:/name')->to('missing#placeholder');
-$r->route('/missing/*/name')->to('missing#wildcard');
-$r->route('/missing/too/*', '' => ['test'])->to('missing#too', '' => 'missing');
+$r->any('/missing/:/name')->to('missing#placeholder');
+$r->any('/missing/*/name')->to('missing#wildcard');
+$r->any('/missing/too/*', ['' => ['test']])->to('missing#too', '' => 'missing');
 
 # /partial/*
-$r->route('/partial')->partial(1)->to('foo#bar');
+$r->any('/partial')->partial(1)->to('foo#bar');
 
 # GET   /similar/*
 # PATCH /similar/too
-my $similar = $r->route('/similar')->methods(qw(DELETE GET PATCH))->inline(1);
-$similar->route('/:something')->methods('GET')->to('similar#get');
-$similar->route('/too')->methods('PATCH')->to('similar#post');
+my $similar = $r->any('/similar')->methods(qw(DELETE GET PATCH))->inline(1);
+$similar->any('/:something')->methods('GET')->to('similar#get');
+$similar->any('/too')->methods('PATCH')->to('similar#post');
 
 # /custom_pattern/test_*_test
 my $custom = $r->get->to(four => 4);
@@ -207,10 +207,10 @@ $custom->pattern->quote_start('{')->quote_end('}')->placeholder_start('.')->rela
 $custom->parse('/custom_pattern/a_{.one}_b/{$two}/{@three}');
 
 # Cached lookup
-my $fast = $r->route('/fast');
+my $fast = $r->any('/fast');
 is $r->find('fast'),   $fast, 'fast route found';
 is $r->lookup('fast'), $fast, 'fast route found';
-my $faster = $r->route('/faster')->name('fast');
+my $faster = $r->any('/faster')->name('fast');
 is $r->find('fast'),   $faster, 'faster route found';
 is $r->lookup('fast'), $fast,   'fast route found';
 

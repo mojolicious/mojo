@@ -30,7 +30,7 @@ get '/expiration' => sub {
   $c->render(text => $c->session('expiration'));
 };
 
-under('/missing' => sub {1})->route->to('does_not_exist#not_at_all');
+under('/missing' => sub {1})->any->to('does_not_exist#not_at_all');
 
 under '/suspended' => sub {
   my $c = shift;

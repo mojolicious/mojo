@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
   my ($self, $app) = @_;
-  $app->routes->route('/plugin')->partial(1)->to(PluginWithEmbeddedApp::App::app());
+  $app->routes->any('/plugin')->partial(1)->to(PluginWithEmbeddedApp::App::app());
 }
 
 package PluginWithEmbeddedApp::App;

@@ -49,7 +49,7 @@ sub startup {
   $self->routes->add_shortcut(
     fun => sub {
       my ($r, $append) = @_;
-      $r->route("/fun$append");
+      $r->any("/fun$append");
     }
   );
 
@@ -60,91 +60,91 @@ sub startup {
   # /plugin/upper_case
   # /plugin/camel_case (plugins loaded correctly)
   my $r = $self->routes;
-  $r->route('/plugin/upper_case')->to('foo#plugin_upper_case');
-  $r->route('/plugin/camel_case')->to('foo#plugin_camel_case');
+  $r->any('/plugin/upper_case')->to('foo#plugin_upper_case');
+  $r->any('/plugin/camel_case')->to('foo#plugin_camel_case');
 
   # /exceptional/*
-  $r->route('/exceptional/:action')->to('exceptional#');
+  $r->any('/exceptional/:action')->to('exceptional#');
 
   # /exceptional_too/*
-  $r->route('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->route('/:action');
+  $r->any('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->any('/:action');
 
   # /fun/time
   $r->fun('/time')->to('foo#fun');
 
   # /happy/fun/time
-  $r->route('/happy')->fun('/time')->to('foo#fun');
+  $r->any('/happy')->fun('/time')->to('foo#fun');
 
   # /fun/joy
   $r->fun('/joy')->to('foo#joy');
 
   # /stash_config
-  $r->route('/stash_config')->to(controller => 'foo', action => 'config', config => {test => 123});
+  $r->any('/stash_config')->to(controller => 'foo', action => 'config', config => {test => 123});
 
   # /test4 (named route for url_for)
-  $r->route('/test4/:something')->to('foo#something', something => 23)->name('something');
+  $r->any('/test4/:something')->to('foo#something', something => 23)->name('something');
 
   # /somethingtest (refer to another route with url_for)
   $r->put('/somethingtest')->to('foo#something');
 
   # /something_missing (refer to a non-existing route with url_for)
-  $r->route('/something_missing')->to('foo#url_for_missing');
+  $r->any('/something_missing')->to('foo#url_for_missing');
 
   # /test3 (no class, just a namespace)
-  $r->route('/test3')->to(namespace => 'MojoliciousTestController', action => 'index');
+  $r->any('/test3')->to(namespace => 'MojoliciousTestController', action => 'index');
 
   # /test2 (different namespace test)
-  $r->route('/test2')->to(namespace => 'MojoliciousTest2', controller => 'Foo', action => 'test');
+  $r->any('/test2')->to(namespace => 'MojoliciousTest2', controller => 'Foo', action => 'test');
 
   # /test5 (only namespace test)
-  $r->route('/test5')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
+  $r->any('/test5')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
 
   # /test6 (no namespace test)
-  $r->route('/test6')->to(namespace => '', controller => 'mojolicious_test2-foo', action => 'test');
+  $r->any('/test6')->to(namespace => '', controller => 'mojolicious_test2-foo', action => 'test');
 
   # /test7 (controller class shortcut)
-  $r->route('/test7')->to('Foo::Bar#test');
+  $r->any('/test7')->to('Foo::Bar#test');
 
   # /test8 (controller class)
-  $r->route('/test8')->to(controller => 'Foo::Bar', action => 'test');
+  $r->any('/test8')->to(controller => 'Foo::Bar', action => 'test');
 
   # /test9 (controller in development namespace)
-  $r->route('/test9')->to('bar#index');
+  $r->any('/test9')->to('bar#index');
 
   # /test10 (controller in both namespaces)
-  $r->route('/test10')->to('baz#index');
+  $r->any('/test10')->to('baz#index');
 
   # /withblock (template with blocks)
-  $r->route('/withblock')->to('foo#withBlock');
+  $r->any('/withblock')->to('foo#withBlock');
 
   # /staged (authentication with intermediate destination)
-  my $b = $r->route('/staged')->inline(1)->to('foo#stage1', return => 1);
-  $b->route->to(action => 'stage2');
+  my $b = $r->any('/staged')->inline(1)->to('foo#stage1', return => 1);
+  $b->any->to(action => 'stage2');
 
   # /suspended (suspended intermediate destination)
-  $r->route('/suspended')->inline(1)->to('foo#suspended')->route->inline(1)->to('foo#suspended')->route->to('foo#fun');
+  $r->any('/suspended')->inline(1)->to('foo#suspended')->any->inline(1)->to('foo#suspended')->any->to('foo#fun');
 
   # /longpoll (long polling)
-  $r->route('/longpoll')->to('foo#longpoll');
+  $r->any('/longpoll')->to('foo#longpoll');
 
   # /shortcut/act
   # /shortcut/ctrl
   # /shortcut/ctrl-act (shortcuts to controller#action)
-  $r->route('/shortcut/ctrl-act')->to('foo#config', config => {test => 'ctrl-act'});
-  $r->route('/shortcut/ctrl')->to('foo#', action => 'config', config => {test => 'ctrl'});
-  $r->route('/shortcut/act')->to('#config', controller => 'foo', config => {test => 'act'});
+  $r->any('/shortcut/ctrl-act')->to('foo#config', config => {test => 'ctrl-act'});
+  $r->any('/shortcut/ctrl')->to('foo#', action => 'config', config => {test => 'ctrl'});
+  $r->any('/shortcut/act')->to('#config', controller => 'foo', config => {test => 'act'});
 
   # /foo/session (session cookie with domain)
-  $r->route('/foo/session')->to('foo#session_domain');
+  $r->any('/foo/session')->to('foo#session_domain');
 
   # /rss.xml (mixed formats)
-  $r->route('/rss.xml')->to('foo#bar', format => 'rss');
+  $r->any('/rss.xml')->to('foo#bar', format => 'rss');
 
   # /*/* (the default route)
-  $r->route('/<controller>/<action>')->to(action => 'index');
+  $r->any('/<controller>/<action>')->to(action => 'index');
 
   # /just/some/template (embedded template)
-  $r->route('/just/some/template')->to(template => 'just/some/template');
+  $r->any('/just/some/template')->to(template => 'just/some/template');
 }
 
 1;

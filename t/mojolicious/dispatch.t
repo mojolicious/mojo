@@ -107,8 +107,8 @@ $c = $app->controller_class('Test::Controller')->build_controller;
 my $d = $c->app->routes;
 ok $d, 'initialized';
 $d->namespaces(['Test']);
-$d->route('/')->requires([])->to(controller => 'foo', action => 'home');
-$d->route('/foo/<capture>')->to(controller => 'foo', action => 'bar');
+$d->any('/')->requires([])->to(controller => 'foo', action => 'home');
+$d->any('/foo/<capture>')->to(controller => 'foo', action => 'bar');
 
 # Cache
 $c = $app->build_controller;

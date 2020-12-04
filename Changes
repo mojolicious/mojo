@@ -1,5 +1,6 @@
 
 8.67  2020-12-04
+  - Deprecated Mojolicious::Routes::Route::route in favor of Mojolicious::Routes::Route::any.
   - Deprecated Mojolicious::Routes::Route::over in favor of Mojolicious::Routes::Route::requires.
   - Deprecated Mojolicious::Routes::Route::via in favor of Mojolicious::Routes::Route::methods.
   - Deprecated Mojolicious::Routes::Route::detour.

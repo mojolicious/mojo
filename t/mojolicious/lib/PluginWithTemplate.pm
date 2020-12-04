@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
   push @{$app->renderer->classes}, __PACKAGE__;
-  $app->routes->route('/plugin_with_template')->to(cb => sub { shift->render('plugin_with_template') });
+  $app->routes->any('/plugin_with_template')->to(cb => sub { shift->render('plugin_with_template') });
 }
 
 1;

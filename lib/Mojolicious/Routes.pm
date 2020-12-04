@@ -212,7 +212,7 @@ Mojolicious::Routes - Always find your destination with routes
 
   # Simple route
   my $r = Mojolicious::Routes->new;
-  $r->route('/')->to(controller => 'blog', action => 'welcome');
+  $r->any('/')->to(controller => 'blog', action => 'welcome');
 
   # More advanced routes
   my $blog = $r->under('/blog');

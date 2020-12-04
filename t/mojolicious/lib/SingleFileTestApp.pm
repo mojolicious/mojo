@@ -17,7 +17,7 @@ sub startup {
   push @{$self->static->classes},   'SingleFileTestApp::Foo';
 
   # Helper route
-  $self->routes->route('/helper')->to(
+  $self->routes->any('/helper')->to(
     cb => sub {
       my $c = shift;
       $c->render(text => $c->some_plugin);
@@ -25,7 +25,7 @@ sub startup {
   );
 
   # The default route
-  $self->routes->route('/:controller/:action')->to(action => 'index');
+  $self->routes->any('/:controller/:action')->to(action => 'index');
 }
 
 package SingleFileTestApp::Redispatch;

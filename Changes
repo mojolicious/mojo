@@ -1,5 +1,9 @@
 
-8.67  2020-11-30
+8.67  2020-12-04
+  - Deprecated Mojolicious::Routes::Route::over in favor of Mojolicious::Routes::Route::requires.
+  - Deprecated Mojolicious::Routes::Route::via in favor of Mojolicious::Routes::Route::methods.
+  - Deprecated Mojolicious::Routes::Route::detour.
+  - Added methods and requires methods to Mojolicious::Routes::Route.
   - Improved Mojolicious::Commands to throw an exception for invalid commands.
 
 8.66  2020-11-28

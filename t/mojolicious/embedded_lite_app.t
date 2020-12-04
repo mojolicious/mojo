@@ -89,23 +89,23 @@ plugin(Mount => ('*.foo-bar.de/♥/123' => $external))->to(message => 'works 3!'
 
 get '/hello' => 'works';
 
-get('/bye' => {name => 'second embedded'})->detour('MyTestApp::Test1');
+get('/bye' => {name => 'second embedded'})->partial(1)->to('MyTestApp::Test1');
 
-get('/bar' => {name => 'third embedded'})->detour(app => 'MyTestApp::Test1');
+get('/bar' => {name => 'third embedded'})->partial(1)->to(app => 'MyTestApp::Test1');
 
-get('/baz')->detour('test1#', name => 'fourth embedded');
+get('/baz')->partial(1)->to('test1#', name => 'fourth embedded');
 
 get('/yada')->to('test1#', name => 'fifth embedded');
 
 get('/yada/yada/yada')->to('test1#', path => '/yada', name => 'sixth embedded');
 
-get('/basic')->detour(MyTestApp::Basic->new, test => 'lalala');
+get('/basic')->partial(1)->to(MyTestApp::Basic->new, test => 'lalala');
 
 get '/third/*path' => {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
 
-app->routes->route('/hello')->detour(TestApp::app())->to(name => 'embedded');
+app->routes->route('/hello')->partial(1)->to(TestApp::app())->to(name => 'embedded');
 
-get('/just' => {name => 'working'})->detour('EmbeddedTestApp');
+get('/just' => {name => 'working'})->partial(1)->to('EmbeddedTestApp');
 
 get '/host' => {text => 'main application!'};
 

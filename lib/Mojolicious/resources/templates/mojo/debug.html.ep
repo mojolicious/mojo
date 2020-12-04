@@ -353,7 +353,7 @@
                 <pre><%= '  ' x $depth %><%= $pattern %></pre>
               </td>
               <td class="striped value">
-                <pre><%= uc(join ',', @{$route->via || []}) || '*' %></pre>
+                <pre><%= uc(join ',', @{$route->methods || []}) || '*' %></pre>
               </td>
               <td class="striped value">
                 % my $name = $route->name;

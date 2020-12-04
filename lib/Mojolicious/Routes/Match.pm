@@ -43,11 +43,11 @@ sub _match {
   $captures = $self->{captures};
 
   # Method
-  my $methods = $r->via;
+  my $methods = $r->methods;
   return undef if $methods && !grep { $_ eq $options->{method} } @$methods;
 
   # Conditions
-  if (my $over = $r->over) {
+  if (my $over = $r->requires) {
     my $conditions = $self->{conditions} ||= $self->root->conditions;
     for (my $i = 0; $i < @$over; $i += 2) {
       return undef unless my $condition = $conditions->{$over->[$i]};

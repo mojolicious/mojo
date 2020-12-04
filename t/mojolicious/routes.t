@@ -122,13 +122,13 @@ $inline->route('/edit')->to(controller => 'articles', action => 'edit');
 $inline->route('/delete')->to(controller => 'articles', action => 'delete', format => undef)->name('articles_delete');
 
 # GET /method/get
-$r->route('/method/get')->via('GET')->to(controller => 'method', action => 'get');
+$r->route('/method/get')->methods('GET')->to(controller => 'method', action => 'get');
 
 # POST /method/post
-$r->route('/method/post')->via('post')->to(controller => 'method', action => 'post');
+$r->route('/method/post')->methods('post')->to(controller => 'method', action => 'post');
 
 # POST|GET /method/post_get
-$r->route('/method/post_get')->via(qw(POST get))->to(controller => 'method', action => 'post_get');
+$r->route('/method/post_get')->methods(qw(POST get))->to(controller => 'method', action => 'post_get');
 
 # /simple/form
 $r->route('/simple/form')->to('test-test#test');
@@ -193,13 +193,13 @@ $r->route('/missing/*/name')->to('missing#wildcard');
 $r->route('/missing/too/*', '' => ['test'])->to('missing#too', '' => 'missing');
 
 # /partial/*
-$r->route('/partial')->detour('foo#bar');
+$r->route('/partial')->partial(1)->to('foo#bar');
 
 # GET   /similar/*
 # PATCH /similar/too
-my $similar = $r->route('/similar')->via(qw(DELETE GET PATCH))->inline(1);
-$similar->route('/:something')->via('GET')->to('similar#get');
-$similar->route('/too')->via('PATCH')->to('similar#post');
+my $similar = $r->route('/similar')->methods(qw(DELETE GET PATCH))->inline(1);
+$similar->route('/:something')->methods('GET')->to('similar#get');
+$similar->route('/too')->methods('PATCH')->to('similar#post');
 
 # /custom_pattern/test_*_test
 my $custom = $r->get->to(four => 4);

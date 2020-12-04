@@ -14,8 +14,8 @@ sub register {
   my $host;
   ($host, $path) = ($1 ? qr/^(?:.*\.)?\Q$2\E$/i : qr/^\Q$2\E$/i, $3) if $path =~ m!^(\*\.)?([^/]+)(/.*)?$!;
 
-  my $route = $app->routes->route($path)->detour(app => $embed);
-  return $host ? $route->over(host => $host) : $route;
+  my $route = $app->routes->route($path)->partial(1)->to(app => $embed);
+  return $host ? $route->requires(host => $host) : $route;
 }
 
 1;

@@ -27,15 +27,15 @@ sub _walk {
 
   # Flags
   my @flags;
-  push @flags, @{$route->over || []} ? 'C' : '.';
-  push @flags, (my $partial = $route->partial) ? 'D' : '.';
+  push @flags, @{$route->requires || []} ? 'C' : '.';
+  push @flags, (my $partial = $route->partial) ? 'P' : '.';
   push @flags, $route->inline       ? 'U' : '.';
   push @flags, $route->is_websocket ? 'W' : '.';
   push @$row,  join('', @flags) if $verbose;
 
   # Methods
-  my $via = $route->via;
-  push @$row, !$via ? '*' : uc join ',', @$via;
+  my $methods = $route->methods;
+  push @$row, !$methods ? '*' : uc join ',', @$methods;
 
   # Name
   my $name = $route->name;
@@ -73,7 +73,7 @@ Mojolicious::Command::routes - Routes command
     -m, --mode <name>   Operating mode for your application, defaults to the
                         value of MOJO_MODE/PLACK_ENV or "development"
     -v, --verbose       Print additional details about routes, flags indicate
-                        C=Conditions, D=Detour, U=Under and W=WebSocket
+                        C=Conditions, P=Partial, U=Under and W=WebSocket
 
 =head1 DESCRIPTION
 

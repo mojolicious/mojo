@@ -553,7 +553,7 @@ Check if message parser/generator is finished.
   my $bool = $msg->is_limit_exceeded;
 
 Check if message has exceeded L</"max_line_size">, L</"max_message_size">, L<Mojo::Content/"max_buffer_size"> or
-L<Mojo::Headers/"max_line_size">.
+L<Mojo::Headers/"max_line_size">. L</"max_message_size"> may be set by L<Mojolicious/"max_request_size">.
 
 =head2 json
 

@@ -425,6 +425,9 @@ will allow requests of indefinite size. Note that increasing this value can also
 should you for example attempt to parse an excessively large request body with the methods L<Mojo::Message/"dom"> or
 L<Mojo::Message/"json">.
 
+If a request exceeds this limit it may be truncated, but your action will still process. Your action should test for
+requests which exceed this limit with L<Mojo::Message/"is_limit_exceeded">.
+
 =head2 mode
 
   my $mode = $app->mode;

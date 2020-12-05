@@ -783,7 +783,7 @@ like L<Mojolicious::Plugin::TagHelpers/"form_for">.
   post '/upload' => sub ($c) {
 
     # Check file size
-    return $c->render(text => 'File is too big.', status => 200) if $c->req->is_limit_exceeded;
+    return $c->render(text => 'File is too big.', status => 413) if $c->req->is_limit_exceeded;
 
     # Process uploaded file
     return $c->redirect_to('form') unless my $example = $c->param('example');

@@ -891,8 +891,7 @@ Now just load the plugin and you are ready to use the condition in all your appl
     $self->plugin('WerewolfCondition');
 
     # /hideout (keep them out for 4 days after full moon)
-    $self->routes->get('/hideout')->requires(werewolf => 4)
-      ->to(controller => 'foo', action => 'bar');
+    $self->routes->get('/hideout')->requires(werewolf => 4)->to(controller => 'foo', action => 'bar');
   }
 
   1;

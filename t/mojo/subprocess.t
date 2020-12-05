@@ -16,14 +16,12 @@ use Mojo::File qw(tempfile);
 my ($fail, $result, @start);
 my $subprocess = Mojo::IOLoop::Subprocess->new;
 $subprocess->on(spawn => sub { push @start, shift->pid });
-$subprocess->run(
-  sub { shift->pid . $$ . ('x' x 100000) },
+$subprocess->run(sub { shift->pid . $$ . ('x' x 100000) },
   sub {
-    my ($subprocess, $err, $two) = @_;
-    $fail = $err;
-    $result .= $two;
-  }
-);
+  my ($subprocess, $err, $two) = @_;
+  $fail = $err;
+  $result .= $two;
+  });
 $result = $$;
 ok !$subprocess->pid, 'no process id available yet';
 is $subprocess->exit_code, undef, 'no exit code';
@@ -37,14 +35,12 @@ is_deeply \@start, [$subprocess->pid], 'spawn event has been emitted once';
 # Custom event loop
 ($fail, $result) = ();
 my $loop = Mojo::IOLoop->new;
-$loop->subprocess(
-  sub {'♥'},
+$loop->subprocess(sub {'♥'},
   sub {
-    my ($subprocess, $err, @results) = @_;
-    $fail   = $err;
-    $result = \@results;
-  }
-);
+  my ($subprocess, $err, @results) = @_;
+  $fail   = $err;
+  $result = \@results;
+  });
 $loop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['♥'], 'right structure';
@@ -52,14 +48,12 @@ is_deeply $result, ['♥'], 'right structure';
 # Multiple return values
 ($fail, $result) = ();
 $subprocess = Mojo::IOLoop::Subprocess->new;
-$subprocess->run(
-  sub { return '♥', [{two => 2}], 3 },
+$subprocess->run(sub { return '♥', [{two => 2}], 3 },
   sub {
-    my ($subprocess, $err, @results) = @_;
-    $fail   = $err;
-    $result = \@results;
-  }
-);
+  my ($subprocess, $err, @results) = @_;
+  $fail   = $err;
+  $result = \@results;
+  });
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['♥', [{two => 2}], 3], 'right structure';
@@ -141,14 +135,12 @@ is_deeply $result, [1, 2], 'right structure';
 
 # No result
 ($fail, $result) = ();
-Mojo::IOLoop::Subprocess->new->run(
-  sub {return},
+Mojo::IOLoop::Subprocess->new->run(sub {return},
   sub {
-    my ($subprocess, $err, @results) = @_;
-    $fail   = $err;
-    $result = \@results;
-  }
-);
+  my ($subprocess, $err, @results) = @_;
+  $fail   = $err;
+  $result = \@results;
+  });
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, [], 'right structure';
@@ -160,16 +152,14 @@ my $me    = $$;
 for (0 .. 1) {
   my $end        = $delay->begin;
   my $subprocess = Mojo::IOLoop::Subprocess->new;
-  $subprocess->run(
-    sub { 1 + 1 },
+  $subprocess->run(sub { 1 + 1 },
     sub {
-      my ($subprocess, $err, $two) = @_;
-      $fail ||= $err;
-      push @$result, $two;
-      is $me, $$, 'we are the parent';
-      $end->();
-    }
-  );
+    my ($subprocess, $err, $two) = @_;
+    $fail ||= $err;
+    push @$result, $two;
+    is $me, $$, 'we are the parent';
+    $end->();
+    });
 }
 $delay->wait;
 ok !$fail, 'no error';
@@ -177,26 +167,22 @@ is_deeply $result, [2, 2], 'right structure';
 
 # Exception
 $fail = undef;
-Mojo::IOLoop::Subprocess->new->run(
-  sub { die 'Whatever' },
+Mojo::IOLoop::Subprocess->new->run(sub { die 'Whatever' },
   sub {
-    my ($subprocess, $err) = @_;
-    $fail = $err;
-  }
-);
+  my ($subprocess, $err) = @_;
+  $fail = $err;
+  });
 Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
 
 # Non-zero exit status
 $fail       = undef;
 $subprocess = Mojo::IOLoop::Subprocess->new;
-$subprocess->run(
-  sub { exit 3 },
+$subprocess->run(sub { exit 3 },
   sub {
-    my ($subprocess, $err) = @_;
-    $fail = $err;
-  }
-);
+  my ($subprocess, $err) = @_;
+  $fail = $err;
+  });
 Mojo::IOLoop->start;
 is $subprocess->exit_code, 3, 'right exit code';
 like $fail, qr/offset 0/, 'right error';
@@ -205,13 +191,11 @@ like $fail, qr/offset 0/, 'right error';
 $fail       = undef;
 $subprocess = Mojo::IOLoop::Subprocess->new;
 $subprocess->deserialize(sub { die 'Whatever' });
-$subprocess->run(
-  sub { 1 + 1 },
+$subprocess->run(sub { 1 + 1 },
   sub {
-    my ($subprocess, $err) = @_;
-    $fail = $err;
-  }
-);
+  my ($subprocess, $err) = @_;
+  $fail = $err;
+  });
 Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
 
@@ -250,14 +234,12 @@ my $file   = tempfile;
 my $called = 0;
 $subprocess = Mojo::IOLoop::Subprocess->new;
 $subprocess->on(cleanup => sub { $file->spurt(shift->serialize->({test => ++$called})) });
-$subprocess->run(
-  sub {'Hello Mojo!'},
+$subprocess->run(sub {'Hello Mojo!'},
   sub {
-    my ($subprocess, $err, $hello) = @_;
-    $fail   = $err;
-    $result = $hello;
-  }
-);
+  my ($subprocess, $err, $hello) = @_;
+  $fail   = $err;
+  $result = $hello;
+  });
 Mojo::IOLoop->start;
 is_deeply $subprocess->deserialize->($file->slurp), {test => 1}, 'cleanup event emitted once';
 ok !$fail, 'no error';

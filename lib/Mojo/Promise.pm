@@ -141,14 +141,12 @@ sub _all {
 
     # "any"
     elsif ($type == 3) {
-      $promises[$i]->then(
-        sub { $all->resolve(@_); () },
+      $promises[$i]->then(sub { $all->resolve(@_); () },
         sub {
-          $results->[$i] = [@_];
-          $all->reject(@$results) if --$remaining <= 0;
-          return ();
-        }
-      );
+        $results->[$i] = [@_];
+        $all->reject(@$results) if --$remaining <= 0;
+        return ();
+        });
     }
 
     # "all_settled"

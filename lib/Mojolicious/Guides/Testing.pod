@@ -135,8 +135,7 @@ web application. For example, with this object, we could test any running web ap
 
 You can access the user agent directly if you want to make web requests without triggering test assertions:
 
-  my $tx = $t->ua->post(
-    'https://duckduckgo.com/html' => form => {q => 'hypnotoad'});
+  my $tx = $t->ua->post('https://duckduckgo.com/html' => form => {q => 'hypnotoad'});
   $tx->result->dom->find('a.result__a')->each(sub { say $_->text });
 
 See L<Mojo::UserAgent> for the complete API and return values.
@@ -193,8 +192,7 @@ Let's run the tests (we'll create the C<log> directory to quiet the application 
   1..3
   ok
   All tests successful.
-  Files=1, Tests=3,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.33 cusr  0.07
-   csys =  0.44 CPU)
+  Files=1, Tests=3,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.33 cusr  0.07 csys =  0.44 CPU)
   Result: PASS
 
 The boilerplate test file looks like this:
@@ -267,8 +265,7 @@ invoke helpers from our test file:
 
   my $t = Test::Mojo->new('MyApp');
 
-  is_deeply $t->app->basic_auth(bif => "Bif's Passwerdd"),
-    {Authorization => 'Basic YmlmOkJpZidzIFBhc3N3ZXJkZA=='},
+  is_deeply $t->app->basic_auth(bif => "Bif's Passwerdd"), {Authorization => 'Basic YmlmOkJpZidzIFBhc3N3ZXJkZA=='},
     'correct header value';
 
 Any aspect of the application (helpers, plugins, routes, etc.) can be introspected from L<Test::Mojo> through the
@@ -321,8 +318,7 @@ The C<*_ok> HTTP request assertion methods accept the same arguments as their co
 (except for the callback argument). This allows us to set headers and build query strings for authentic test
 situations:
 
-  $t->get_ok('/internal/personnel' => {Authorization => 'Token secret-password'}
-    => form => {q => 'Professor Plum'});
+  $t->get_ok('/internal/personnel' => {Authorization => 'Token secret-password'} => form => {q => 'Professor Plum'});
 
 which generates the following request:
 

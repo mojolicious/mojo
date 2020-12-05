@@ -20,13 +20,13 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
 use Time::HiRes qw(sleep);
 
 # Start
-my $dir     = tempdir;
-my $started = $dir->child('started1.txt');
-my $script  = $dir->child('myapp.pl');
-my $subdir  = $dir->child('test', 'stuff')->make_path;
-my $morbo   = Mojo::Server::Morbo->new();
+my $dir    = tempdir;
+my $script = $dir->child('myapp.pl');
+my $subdir = $dir->child('test', 'stuff')->make_path;
+my $morbo  = Mojo::Server::Morbo->new();
 $morbo->backend->watch([$subdir, $script]);
 is_deeply $morbo->backend->modified_files, [], 'no files have changed';
+my $started = $dir->child('started1.txt');
 $script->spurt(<<EOF);
 use Mojolicious::Lite;
 use Mojo::File qw(path);
@@ -44,7 +44,6 @@ my $port   = Mojo::IOLoop::Server->generate_port;
 my $prefix = curfile->dirname->dirname->sibling('script');
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l', "http://127.0.0.1:$port", $script;
 sleep 0.1 while !_port($port);
-$started = $started->sibling('started2.txt');
 my $ua = Mojo::UserAgent->new;
 
 subtest 'Basics' => sub {
@@ -61,6 +60,7 @@ subtest 'Basics' => sub {
 
 subtest 'Update script without changing size' => sub {
   my ($size, $mtime) = (stat $script)[7, 9];
+  $started = $started->sibling('started2.txt');
   $script->spurt(<<EOF);
 use Mojolicious::Lite;
 use Mojo::File qw(path);
@@ -78,7 +78,6 @@ EOF
   ok((stat $script)[9] > $mtime, 'modify time has changed');
   is((stat $script)[7], $size, 'still equal size');
   sleep 0.1 until -f $started;
-  $started = $started->sibling('started3.txt');
 
   # Application has been reloaded
   my $tx = $ua->get("http://127.0.0.1:$port/hello");
@@ -96,6 +95,7 @@ EOF
 subtest 'Update script without changing mtime' => sub {
   my ($size, $mtime) = (stat $script)[7, 9];
   is_deeply $morbo->backend->modified_files, [], 'no files have changed';
+  $started = $started->sibling('started3.txt');
   $script->spurt(<<"EOF");
 use Mojolicious::Lite;
 use Mojo::File qw(path);

@@ -733,14 +733,16 @@ is $tx->res->body, 'Hi!', 'right content';
 # Connection limit
 $ua     = Mojo::UserAgent->new(max_connections => 2);
 $result = undef;
-Mojo::IOLoop->delay(sub {
+Mojo::IOLoop->delay(
+  sub {
     my $delay = shift;
     $ua->get('/' => $delay->begin) for 1 .. 5;
   },
   sub {
-  my $delay = shift;
-  $result = [grep {defined} map { Mojo::IOLoop->stream($_->connection) } @_];
-  })->wait;
+    my $delay = shift;
+    $result = [grep {defined} map { Mojo::IOLoop->stream($_->connection) } @_];
+  }
+)->wait;
 is scalar @$result, 2, 'two active connections';
 
 done_testing();

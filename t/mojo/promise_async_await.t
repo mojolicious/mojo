@@ -54,8 +54,8 @@ get '/four' => async sub {
 
   my $text = await Mojo::Promise->resolve('fail');
   eval { await $c->defer_reject_p('this went perfectly') };
-  if (my $err = $@) { $c->render(text => $err, status => 500) }
-  else              { $c->render(text => $text) }
+  if   (my $err = $@) { $c->render(text => $err, status => 500) }
+  else                { $c->render(text => $text) }
 };
 
 get '/five' => async sub {

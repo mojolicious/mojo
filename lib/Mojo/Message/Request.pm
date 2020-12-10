@@ -6,13 +6,13 @@ use Mojo::Cookie::Request;
 use Mojo::Util qw(b64_encode b64_decode sha1_sum);
 use Mojo::URL;
 
-my ($SEED, $COUNTER) = ($$ . time . rand, int rand 0xffffff);
-
 has env    => sub { {} };
 has method => 'GET';
 has [qw(proxy reverse_proxy)];
 has request_id => sub {
-  my $b64 = substr(sha1_base64($SEED . ($COUNTER = ($COUNTER + 1) % 0xffffff)), 0, 8);
+  state $seed    = $$ . time . rand;
+  state $counter = int rand 0xffffff;
+  my $b64 = substr(sha1_base64($seed . ($counter = ($counter + 1) % 0xffffff)), 0, 8);
   $b64 =~ tr!+/!-_!;
   return $b64;
 };

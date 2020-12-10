@@ -1,5 +1,6 @@
 
-8.68  2020-12-05
+8.68  2020-12-10
+  - Fixed a bug in Mojo::Message::Request that resulted in duplicate request ids for Mojo::Server::Prefork workers.
 
 8.67  2020-12-04
   - Deprecated Mojolicious::Routes::Route::route in favor of Mojolicious::Routes::Route::any.

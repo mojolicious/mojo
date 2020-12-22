@@ -66,8 +66,8 @@ Mojolicious::Lite - Micro real-time web framework
   # Automatically enables "strict", "warnings", "utf8" and Perl 5.16 features
   use Mojolicious::Lite;
 
-  # Route with placeholder
-  get '/:foo' => sub ($c) {
+  get '/:foo' => sub {
+    my $c = shift;
     my $foo = $c->param('foo');
     $c->render(text => "Hello from $foo.");
   };
@@ -85,6 +85,7 @@ signatures|perlsub/"Signatures">.
 
   use Mojolicious::Lite -signatures;
 
+  # Route with placeholder
   get '/:foo' => sub ($c) {
     my $foo = $c->param('foo');
     $c->render(text => "Hello from $foo.");

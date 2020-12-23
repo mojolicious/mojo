@@ -32,7 +32,7 @@ has log              => sub {
 
   # DEPRECATED!
   my $home = $self->home;
-  if (-d $home->child('log') && -w _) {
+  if (!-d $home->child('Log') && -d $home->child('log') && -w _) {
     $log->path($home->child('log', "$mode.log"));
     Mojo::Util::deprecated(qq{Logging to "log/$mode.log" is DEPRECATED});
   }

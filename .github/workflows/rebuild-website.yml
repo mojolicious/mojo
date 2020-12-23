@@ -15,4 +15,4 @@ jobs:
             -H "Accept: application/vnd.github.everest-preview+json" \
             -H "Content-Type: application/json" \
             --data '{"ref": "master"}' \
-            https://api.github.com/repos/mojolicious/mojolicious.org/actions/workflows/docker-publish.yml/dispatches
+            https://api.github.com/repos/mojolicious/mojolicious.org/actions/workflows/publish-website.yml/dispatches

@@ -166,7 +166,7 @@ subtest Fatal => sub {
 };
 
 subtest '"debug.html.ep" route suggestion' => sub {
-  $t->get_ok('/does_not_exist')->status_is(404)->element_exists('#mojobar')->content_like(qr!/does_not_exist!);
+  $t->get_ok('/does_not_exist')->status_is(404)->element_exists('nav')->content_like(qr!/does_not_exist!);
 };
 
 subtest '"debug.html.ep" route suggestion' => sub {
@@ -296,10 +296,13 @@ subtest 'Bundled static files' => sub {
   $t->get_ok('/mojo/highlight.js/mojolicious.min.js')->status_is(200)->content_type_is('application/javascript');
   $t->get_ok('/mojo/highlight.js/highlight-mojo-dark.css')->status_is(200)->content_type_is('text/css');
 
+  $t->get_ok('/mojo/bootstrap/bootstrap.js')->status_is(200)->content_type_is('application/javascript');
+  $t->get_ok('/mojo/bootstrap/bootstrap.css')->status_is(200)->content_type_is('text/css');
+
+  $t->get_ok('/mojo/fontawesome/fontawesome.css')->status_is(200)->content_type_is('text/css');
+
   $t->get_ok('/mojo/failraptor.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/logo.png')->status_is(200)->content_type_is('image/png');
-  $t->get_ok('/mojo/logo-black.png')->status_is(200)->content_type_is('image/png');
-  $t->get_ok('/mojo/logo-black-2x.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/logo-white.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/logo-white-2x.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');

@@ -283,9 +283,7 @@ $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)->content_is("sta
 
 # Random static requests
 $t->get_ok('/mojo/logo-white.png')->status_is(200);
-$t->get_ok('/mojo/logo-black.png')->status_is(200);
 $t->get_ok('/mojo/logo-white.png')->status_is(200);
-$t->get_ok('/mojo/logo-black.png')->status_is(200);
 
 # With cookies, session and flash again
 $t->get_ok('/bridge2stash')->status_is(200)

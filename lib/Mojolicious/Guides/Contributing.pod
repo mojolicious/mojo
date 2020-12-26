@@ -180,7 +180,7 @@ the issue tracker, and any other forums created by the project team which the co
 addition, violations of this code outside these spaces may affect a person's ability to participate within them.
 
 If you believe someone is violating the code of conduct, we ask that you report it by emailing Joel Berger
-(C<jberger@mojolicious.org>) or other members of L<the team|Mojolicious/"CORE DEVELOPERS">.
+(C<jberger@mojolicious.org>) or other members of L<the team|Mojolicious/"Core Developers">.
 
 =over 2
 

@@ -206,7 +206,8 @@
                     </td>
                     <td class="value">
                       % my $name = $route->name;
-                      <pre><%= $route->has_custom_name ? qq{"$name"} : $name %></pre>
+                      % my $class = $route->has_custom_name ? 'badge-success' : 'badge-secondary';
+                      <span class="badge <%= $class %>"><%= $name %></span>
                     </td>
                   </tr>
                   % $depth++;

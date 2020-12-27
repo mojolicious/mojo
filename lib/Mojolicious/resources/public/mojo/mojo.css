@@ -28,6 +28,9 @@ table {
 td {
   padding: 0.5em;
 }
+th {
+  padding-left: 1em;
+}
 .border-radius-bottom {
   border-radius: 0px 0px 6px 6px;
 }
@@ -49,6 +52,9 @@ td {
   background: url(../mojo/pinstripe-dark.png);
   color: #eee;
   text-shadow: #333 0 1px 0;
+}
+.context-value {
+  padding-left: 1em;
 }
 .error {
   color: #fff;
@@ -124,37 +130,50 @@ td {
   text-align: left;
   white-space: pre-wrap;
 }
-.more table {
-  margin-bottom: 1em;
-}
 .no-bottom-border {
   border-bottom: 0;
 }
 .no-overflow {
   overflow: hidden;
 }
+.no-padding {
+  padding: 0;
+}
 .no-top-border {
   border-top: 0;
+}
+.padded-content {
+  padding: 1em;
 }
 .striped tr:nth-child(odd) .value {
   background-color: #ddeeff;
  }
 .striped tr:nth-child(even) .value {
   background-color: #eef9ff;
- }
-.striped .value {
+}
+.striped .key {
+  border-right: 1px solid #e1e4e8;
+}
+.striped tr:not(:first-of-type) .value {
   border-top: solid #cce4ff 1px;
- }
+}
+.striped-grey .value {
+  border-top: solid #e1e4e8 1px;
+}
 .tap {
   font: 0.5em Verdana, sans-serif;
+  padding: 20px;
   text-align: center;
 }
+.tap-border-top, #infos {
+  border-top: 1px solid #e1e4e8;
+}
 .value {
-  padding-left: 1em;
- }
- .value pre {
-   padding-right: 1em;
- }
+  padding: 1em;
+}
+.value pre {
+  padding-right: 1em;
+}
 .wide {
   width: 100%;
- }
+}

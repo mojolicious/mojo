@@ -109,7 +109,7 @@
                 % my ($key, $value, $i) = @_;
                 %= tag 'tr', $i ? (class => 'important') : (), begin
                   <td class="key"><%= $key %></td>
-                  <td class="value wide">
+                  <td class="context-value wide">
                     <pre><code><%= $value %></code></pre>
                   </td>
                 % end
@@ -160,7 +160,7 @@
                   </script>
                 % }
               </div>
-              <div id="trace" class="box more no-top-border border-radius-bottom">
+              <div id="trace" class="box no-padding more no-top-border border-radius-bottom">
                 % if (@{$exception->frames}) {
                   <div id="frames" class="more">
                     <table class="striped">
@@ -179,14 +179,16 @@
               </div>
             % }
             % else {
-              <div id="routes" class="box border-radius-both">
-                <h1>Page not found... yet!</h1>
-                <p>
-                  None of these routes could generate a response for your
-                  <code><%= $c->req->method %></code> request for
-                  <code><%= $c->req->url->path->to_route %></code>, maybe you need
-                  to add a new one?
-                </p>
+              <div id="routes" class="box no-padding border-radius-both">
+                <div class="padded-content">
+                  <h1>Page not found... yet!</h1>
+                  <p>
+                    None of these routes could generate a response for your
+                    <code><%= $c->req->method %></code> request for
+                    <code><%= $c->req->url->path->to_route %></code>, maybe you need
+                    to add a new one?
+                  </p>
+                </div>
                 % my $walk = begin
                   % my ($walk, $route, $depth) = @_;
                   <tr>
@@ -207,7 +209,7 @@
                   %= $walk->($walk, $_, $depth) for @{$route->children};
                   % $depth--;
                 % end
-                <table class="striped">
+                <table class="striped-grey">
                   <thead>
                     <tr>
                       <th>Pattern</th>
@@ -221,27 +223,25 @@
             % }
           </div>
           <div class="row mojo-divider">
-            <div id="request" class="box border-radius-top">
-              <div class="no-overflow">
-                <table class="striped">
-                  % my $req = $c->req;
-                  %= $kv->('Request ID' => $req->request_id)
-                  %= $kv->(Method => $req->method)
-                  % my $url = $req->url;
-                  %= $kv->(URL => $url->to_string)
-                  %= $kv->('Base URL' => $url->base->to_string)
-                  %= $kv->(Parameters => dumper $req->params->to_hash)
-                  %= $kv->(Stash => dumper $snapshot)
-                  %= $kv->(Session => dumper session)
-                  %= $kv->(Version => $req->version)
-                  % for my $name (sort @{$c->req->headers->names}) {
-                    % my $value = $c->req->headers->header($name);
-                    %= $kv->($name, $value)
-                  % }
-                </table>
-              </div>
+            <div id="request" class="box no-padding no-bottom-border border-radius-top">
+              <table class="striped">
+                % my $req = $c->req;
+                %= $kv->('Request ID' => $req->request_id)
+                %= $kv->(Method => $req->method)
+                % my $url = $req->url;
+                %= $kv->(URL => $url->to_string)
+                %= $kv->('Base URL' => $url->base->to_string)
+                %= $kv->(Parameters => dumper $req->params->to_hash)
+                %= $kv->(Stash => dumper $snapshot)
+                %= $kv->(Session => dumper session)
+                %= $kv->(Version => $req->version)
+                % for my $name (sort @{$c->req->headers->names}) {
+                  % my $value = $c->req->headers->header($name);
+                  %= $kv->($name, $value)
+                % }
+              </table>
             </div>
-            <div id="more" class="box more no-top-border border-radius-bottom">
+            <div id="more" class="box no-padding more no-top-border border-radius-bottom">
               <div id="infos">
                 <table class="striped">
                   %= $kv->(Perl => "$^V ($^O)")
@@ -262,7 +262,7 @@
                   %= $kv->(Time => scalar localtime(time))
                 </table>
               </div>
-              <div class="tap">tap for more</div>
+              <div class="tap tap-border-top">tap for more</div>
             </div>
           </div>
           % if (@{app->log->history}) {

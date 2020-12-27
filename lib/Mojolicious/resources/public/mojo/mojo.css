@@ -54,6 +54,7 @@ th {
   text-shadow: #333 0 1px 0;
 }
 .context-value {
+  padding: 0;
   padding-left: 1em;
 }
 .error {

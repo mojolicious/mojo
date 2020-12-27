@@ -8,13 +8,11 @@ use Mojo::ByteStream qw(b);
 use Mojo::DeprecationTest;
 use Sub::Util qw(subname);
 
-use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode dumper encode extract_usage getopt gunzip gzip hmac_sha1_sum),
-  qw(html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote scope_guard),
-  qw(secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
-  qw(split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode);
+use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode dumper encode),
+  qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum),
+  qw(monkey_patch punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes sha1_sum slugify),
+  qw(split_cookie_header split_header steady_time tablify term_escape trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode);
 
 subtest 'camelize' => sub {
   is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';

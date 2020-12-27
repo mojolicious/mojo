@@ -10,10 +10,9 @@ our @EXPORT_OK = ('b');
 
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
-  qw(b64_decode b64_encode camelize decamelize gunzip gzip hmac_sha1_sum),
-  qw(html_unescape humanize_bytes md5_bytes md5_sum punycode_decode),
-  qw(punycode_encode quote sha1_bytes sha1_sum slugify term_escape trim),
-  qw(unindent unquote url_escape url_unescape xml_escape xor_encode)
+  qw(b64_decode b64_encode camelize decamelize gunzip gzip hmac_sha1_sum html_unescape humanize_bytes md5_bytes),
+  qw(md5_sum punycode_decode punycode_encode quote sha1_bytes sha1_sum slugify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);

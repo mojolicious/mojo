@@ -15,8 +15,8 @@ has match => sub { Mojolicious::Routes::Match->new(root => shift->app->routes) }
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
-  qw(action app cb controller data extends format handler inline json layout namespace path status template),
-  qw(text variant)
+  qw(action app cb controller data extends format handler inline json layout namespace path status template text),
+  qw(variant)
 );
 
 sub BUILD_DYNAMIC {

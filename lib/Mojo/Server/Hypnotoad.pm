@@ -25,8 +25,8 @@ sub configure {
   $prefork->max_clients($c->{clients})   if $c->{clients};
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
-    for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout keep_alive_timeout listen pid_file), qw(spare workers);
+    for qw(accepts backlog graceful_timeout heartbeat_interval heartbeat_timeout inactivity_timeout keep_alive_timeout),
+    qw(listen pid_file spare workers);
 }
 
 sub run {

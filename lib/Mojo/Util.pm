@@ -63,13 +63,11 @@ my $ENTITY_RE = qr/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+[;=]?))/;
 my (%ENCODING, %PATTERN);
 
 our @EXPORT_OK = (
-  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated dumper encode extract_usage getopt gunzip gzip),
-  qw(hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes md5_bytes),
-  qw(md5_sum monkey_patch punycode_decode punycode_encode quote scope_guard),
-  qw(secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
-  qw(split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode)
+  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode deprecated dumper encode),
+  qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes md5_bytes md5_sum),
+  qw(monkey_patch punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes sha1_sum slugify),
+  qw(split_cookie_header split_header steady_time tablify term_escape trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode)
 );
 
 # Aliases

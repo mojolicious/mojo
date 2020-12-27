@@ -2,7 +2,7 @@
 <!-- Request ID: <%= $c->req->request_id %> -->
 <html>
   <head>
-    % my $title = stash('exception') ? 'Server error' : 'Page not found';
+    % my $title = stash('exception') ? 'Server Error' : 'Page Not Found';
     <title><%= $title %> (<%= app->mode %> mode)</title>
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
@@ -104,7 +104,9 @@
               </tr>
             % end
             % if (my $exception = stash 'exception') {
-              <div id="nothing" class="box no-bottom-border border-radius-top"></div>
+              <div class="alert alert-danger wide" role="alert">
+                <h2>Server Error</h2>
+              </div>
               % my $cv = begin
                 % my ($key, $value, $i) = @_;
                 %= tag 'tr', $i ? (class => 'important') : (), begin
@@ -114,7 +116,7 @@
                   </td>
                 % end
               % end
-              <div id="showcase" class="box code no-bottom-border no-top-border">
+              <div id="showcase" class="box code no-bottom-border no-top-border border-radius-top">
                 <pre id="error" class="error"><%= $exception->message %></pre>
                 <div id="context" class="more">
                   <table>
@@ -179,9 +181,11 @@
               </div>
             % }
             % else {
+              <div class="alert alert-warning wide" role="alert">
+                <h2>Page Not Found</h2>
+              </div>
               <div id="routes" class="box no-padding border-radius-both">
                 <div class="padded-content">
-                  <h1>Page not found... yet!</h1>
                   <p>
                     None of these routes could generate a response for your
                     <code><%= $c->req->method %></code> request for

@@ -130,6 +130,9 @@ td {
 .no-bottom-border {
   border-bottom: 0;
 }
+.no-overflow {
+  overflow: hidden;
+}
 .no-top-border {
   border-top: 0;
 }
@@ -148,6 +151,9 @@ td {
 }
 .value {
   padding-left: 1em;
+ }
+ .value pre {
+   padding-right: 1em;
  }
 .wide {
   width: 100%;

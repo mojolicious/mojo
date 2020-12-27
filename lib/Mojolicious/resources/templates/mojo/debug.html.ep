@@ -222,22 +222,24 @@
           </div>
           <div class="row mojo-divider">
             <div id="request" class="box border-radius-top">
-              <table class="striped">
-                % my $req = $c->req;
-                %= $kv->('Request ID' => $req->request_id)
-                %= $kv->(Method => $req->method)
-                % my $url = $req->url;
-                %= $kv->(URL => $url->to_string)
-                %= $kv->('Base URL' => $url->base->to_string)
-                %= $kv->(Parameters => dumper $req->params->to_hash)
-                %= $kv->(Stash => dumper $snapshot)
-                %= $kv->(Session => dumper session)
-                %= $kv->(Version => $req->version)
-                % for my $name (sort @{$c->req->headers->names}) {
-                  % my $value = $c->req->headers->header($name);
-                  %= $kv->($name, $value)
-                % }
-              </table>
+              <div class="no-overflow">
+                <table class="striped">
+                  % my $req = $c->req;
+                  %= $kv->('Request ID' => $req->request_id)
+                  %= $kv->(Method => $req->method)
+                  % my $url = $req->url;
+                  %= $kv->(URL => $url->to_string)
+                  %= $kv->('Base URL' => $url->base->to_string)
+                  %= $kv->(Parameters => dumper $req->params->to_hash)
+                  %= $kv->(Stash => dumper $snapshot)
+                  %= $kv->(Session => dumper session)
+                  %= $kv->(Version => $req->version)
+                  % for my $name (sort @{$c->req->headers->names}) {
+                    % my $value = $c->req->headers->header($name);
+                    %= $kv->($name, $value)
+                  % }
+                </table>
+              </div>
             </div>
             <div id="more" class="box more no-top-border border-radius-bottom">
               <div id="infos">

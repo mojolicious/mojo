@@ -115,7 +115,7 @@
                 % end
               % end
               <div id="showcase" class="box code no-bottom-border no-top-border">
-                <pre class="error"><%= $exception->message %></pre>
+                <pre id="error" class="error"><%= $exception->message %></pre>
                 <div id="context" class="more">
                   <table>
                     % for my $line (@{$exception->lines_before}) {

@@ -15,6 +15,7 @@ use IO::Uncompress::Gunzip;
 use List::Util qw(min);
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Pod::Usage qw(pod2usage);
+use Socket qw(inet_aton inet_pton AF_INET6);
 use Sub::Util qw(set_subname);
 use Symbol qw(delete_package);
 use Time::HiRes        ();
@@ -65,9 +66,9 @@ my (%ENCODING, %PATTERN);
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode deprecated dumper encode),
   qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes sha1_sum slugify),
-  qw(split_cookie_header split_header steady_time tablify term_escape trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode)
+  qw(monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes),
+  qw(sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -181,6 +182,27 @@ sub monkey_patch {
   no strict 'refs';
   no warnings 'redefine';
   *{"${class}::$_"} = set_subname("${class}::$_", $patch{$_}) for keys %patch;
+}
+
+sub network_contains {
+  my ($cidr, $addr) = @_;
+  return undef unless length $cidr && length $addr;
+
+  # Parse inputs
+  my ($net, $mask) = split m!/!, $cidr, 2;
+  my $v6 = $net =~ /:/;
+  return undef if $v6 xor $addr =~ /:/;
+
+  # Convert addresses to binary
+  return undef unless $net  = $v6 ? inet_pton(AF_INET6, $net)  : inet_aton($net);
+  return undef unless $addr = $v6 ? inet_pton(AF_INET6, $addr) : inet_aton($addr);
+  my $length = $v6 ? 128 : 32;
+
+  # Apply mask if given
+  $addr &= pack "B$length", '1' x $mask if defined $mask;
+
+  # Compare
+  return 0 == unpack "B$length", ($net ^ $addr);
 }
 
 # Direct translation of RFC 3492
@@ -754,6 +776,23 @@ Punycode decode string as described in L<RFC 3492|https://tools.ietf.org/html/rf
 
   # "bücher"
   punycode_decode 'bcher-kva';
+
+=head2 network_contains
+
+  my $bool = network_contains $network, $address;
+
+Check that a given address is contained within a network in CIDR form. If the network is a single address, the
+addresses must be equivalent.
+
+  # True
+  network_contains('10.0.0.0/8', '10.10.10.10');
+  network_contains('10.10.10.10', '10.10.10.10');
+  network_contains('fc00::/7', 'fc::c0:ff:ee');
+
+  # False
+  network_contains('10.0.0.0/29', '10.10.10.10');
+  network_contains('10.10.10.12', '10.10.10.10');
+  network_contains('fc00::/7', '::1');
 
 =head2 punycode_encode
 

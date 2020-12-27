@@ -10,9 +10,9 @@ use Sub::Util qw(subname);
 
 use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode dumper encode),
   qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes sha1_sum slugify),
-  qw(split_cookie_header split_header steady_time tablify term_escape trim unindent unquote url_escape url_unescape),
-  qw(xml_escape xor_encode);
+  qw(monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes),
+  qw(sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent unquote),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 subtest 'camelize' => sub {
   is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -477,6 +477,78 @@ subtest 'monkey_patch' => sub {
 subtest 'monkey_patch (with name)' => sub {
   is subname(MojoMonkeyTest->can('foo')), 'MojoMonkeyTest::foo', 'right name';
   is subname(MojoMonkeyTest->can('bar')), 'MojoMonkeyTest::bar', 'right name';
+};
+
+subtest 'network_contains' => sub {
+  ok !network_contains('10.0/8',         ''),            'empty address';
+  ok !network_contains('',               '10.10.10.10'), 'empty network';
+  ok !network_contains('foo',            '10.10.10.10'), 'invalid v4 network';
+  ok !network_contains('10.10.10.10',    'foo'),         'invalid v4 address';
+  ok !network_contains('foo:',           '::'),          'invalid v6 network';
+  ok !network_contains('::',             'foo:'),        'invalid v6 address';
+  ok !network_contains('::/96',          '192.168.0.1'), 'v6 network, v4 address';
+  ok !network_contains('10.10.10.10/32', '::'),          'v4 network, v6 address';
+
+  ok network_contains('192.168.0.1/33', '192.168.0.1'), 'oversize v4 mask';
+  ok network_contains('::/130',         '::'),          'oversize v6 mask';
+
+  ok network_contains('0/0',                '0'),               'v4 network contains addresss';
+  ok network_contains('0/0',                '255.255.255.255'), 'v4 network contains addresss';
+  ok network_contains('192.168.0.0/24',     '192.168.0.1'),     'v4 network contains addresss';
+  ok network_contains('10.10.10.8/30',      '10.10.10.11'),     'v4 network contains addresss';
+  ok network_contains('10.10.10.8/30',      '10.10.10.8'),      'v4 network contains addresss';
+  ok network_contains('10.10.10.8/31',      '10.10.10.9'),      'v4 network contains addresss';
+  ok network_contains('10.0.0.0/8',         '10.255.255.255'),  'v4 network contains addresss';
+  ok network_contains('255.255.255.255/32', '255.255.255.255'), 'v4 network contains addresss';
+  ok network_contains('10.10.10.8/29',      '10.10.10.10'),     'v4 network contains addresss';
+  ok network_contains('127.0.0.1',          '127.0.0.1'),       'v4 network contains addresss';
+
+  ok !network_contains('0/32',           '1'),              'v4 network does not contain address';
+  ok !network_contains('192.168.1.0/24', '192.168.0.1'),    'v4 network does not contain address';
+  ok !network_contains('10.10.0.8/29',   '10.10.10.8'),     'v4 network does not contain address';
+  ok !network_contains('10.10.10.8/29',  '10.10.10.7'),     'v4 network does not contain address';
+  ok !network_contains('10.10.10.8/29',  '10.10.10.16'),    'v4 network does not contain address';
+  ok !network_contains('10.0.0.0/9',     '10.255.255.255'), 'v4 network does not contain address';
+  ok !network_contains('10.10.10.8/29',  '10.10.10.19'),    'v4 network does not contain address';
+  ok !network_contains('127.0.0.1',      '127.0.0.2'),      'v4 network does not contain address';
+  ok !network_contains('10.0.0.1/8',     '10.0.0.2'),       'v4 network does not contain address';
+
+  ok network_contains('::/128',             '::'),                                      'v6 network contains addresss';
+  ok network_contains('::/0',               '::'),                                      'v6 network contains addresss';
+  ok network_contains('::1',                '::1'),                                     'v6 network contains addresss';
+  ok network_contains('::/0',               'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'), 'v6 network contains addresss';
+  ok network_contains('1:2:3:4:5:6:0::/96', '1:2:3:4:5:6:8000:8'),                      'v6 network contains addresss';
+  ok network_contains('1:2:3:4:5:6:8000::/112',       '1:2:3:4:5:6:8000:F1'),           'v6 network contains addresss';
+  ok network_contains('1:2:3:4:5:6:8000:20/123',      '1:2:3:4:5:6:8000:3F'),           'v6 network contains addresss';
+  ok network_contains('ff:ff:ff:ff:ff:ff:8000::/127', 'ff:ff:ff:ff:ff:ff:8000:0'),      'v6 network contains addresss';
+  ok network_contains('ff:ff:ff:ff:ff:ff:8000::/127', 'ff:ff:ff:ff:ff:ff:8000:1'),      'v6 network contains addresss';
+  ok network_contains('::1',                          '::1'),                           'v6 network contains addresss';
+  ok network_contains('::1/128',                      '::1'),                           'v6 network contains addresss';
+  ok network_contains('a0:a0:a0:a0::/64',             'a0:a0:a0:a0:1::1'),              'v6 network contains addresss';
+  ok network_contains('a0::/16',                      'a0:b0:a0:a0:1::1'),              'v6 network contains addresss';
+  ok network_contains('a000::/8',                     'a0ff:dd0:1234:a0:1::1'),         'v6 network contains addresss';
+  ok network_contains('::ffff:0:0/96',                '::ffff:10.10.10.10'),            'v6 network contains addresss';
+  ok network_contains('::ffff:127.0.0.0/120',         '::ffff:127.0.0.255'),            'v6 network contains addresss';
+  ok network_contains('::ffff:10.10.10.8/127',        '::ffff:10.10.10.9'),             'v6 network contains addresss';
+
+  ok !network_contains('::1/0', '::'),                                         'v6 network does not contain address';
+  ok !network_contains('::1',   '::2'),                                        'v6 network does not contain address';
+  ok !network_contains('1::/0', 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'),    'v6 network does not contain address';
+  ok !network_contains('1:2:3:4:5:6:0::/96',           '1:2:3:4:5:7:8000:8'),  'v6 network does not contain address';
+  ok !network_contains('1:2:3:4:5:6:8000::/112',       '1:2:3:4:5:6:8001:F1'), 'v6 network does not contain address';
+  ok !network_contains('1:2:3:4:5:6:8000:20/123',      '1:2:3:4:5:6:8000:40'), 'v6 network does not contain address';
+  ok !network_contains('ff:ff:ff:ff:ff:ff:8000::/127', 'ff:ff:ff:ff:ff:ff:8000:4'),
+    'v6 network does not contain address';
+  ok !network_contains('ff:ff:ff:ff:ff:ff:8000::/127', 'ff:ff:ff:ff:ff:ff:7FFF:0'),
+    'v6 network does not contain address';
+  ok !network_contains('::1',                   '1::1'),                  'v6 network does not contain address';
+  ok !network_contains('::1/128',               '::11'),                  'v6 network does not contain address';
+  ok !network_contains('a0:a0:a0:a0::/64',      'a0:a0:a0:a1:1::1'),      'v6 network does not contain address';
+  ok !network_contains('a0::/16',               'a1:b0:a0:a0:1::1'),      'v6 network does not contain address';
+  ok !network_contains('a000::/8',              'b0ff:dd0:1234:a0:1::1'), 'v6 network does not contain address';
+  ok !network_contains('::ffff:0:0/96',         '::fffe:0a0a:0a0a'),      'v6 network does not contain address';
+  ok !network_contains('::ffff:127.0.0.0/120',  '::ffff:127.0.1.255'),    'v6 network does not contain address';
+  ok !network_contains('::ffff:10.10.10.8/127', '::ffff:10.10.10.12'),    'v6 network does not contain address';
 };
 
 subtest 'tablify' => sub {

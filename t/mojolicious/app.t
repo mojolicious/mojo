@@ -158,14 +158,14 @@ is $t->app->start(qw(test_command --to)), 'works too!', 'right result';
 
 # Plugin::Test::SomePlugin2::register (security violation)
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page Not Found/);
 
 # Plugin::Test::SomePlugin2::register (security violation again)
 $t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
 my $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page Not Found/);
 like $log, qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -201,14 +201,14 @@ $t->get_ok('/fun/joy')->status_is(200)->attr_is('p.joy', 'style', 'background-co
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/baz')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 like $log, qr/Action not found in controller/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Foo::render (action not allowed)
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/foo/render')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
+$t->get_ok('/foo/render')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
 like $log, qr/Action "render" is not allowed/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -246,11 +246,11 @@ $t->get_ok('/exceptional_too/this_one_dies' => {'X-DoNotDie' => 1})->status_is(5
 
 # Exceptional::this_one_does_not_exist (action does not exist)
 $t->get_ok('/exceptional/this_one_does_not_exist')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 
 # Exceptional::this_one_does_not_exist (action behind bridge does not exist)
 $t->get_ok('/exceptional_too/this_one_does_not_exist' => {'X-DoNotDie' => 1})->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page not found/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
 
 # Foo::fun
 $t->get_ok('/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => undef)
@@ -341,7 +341,7 @@ $t->get_ok('/test10')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 
 # 404
 $t->get_ok('/' => {'X-Test' => 'Hi there!'})->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 
 # Static file /another/file (no extension)
 $t->get_ok('/another/file')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -366,27 +366,27 @@ $t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl
 
 # Try to access a file which is not under the web root via path traversal
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 
 # Try to access a file which is not under the web root via path traversal (goes
 # back and forth one directory)
 $t->get_ok('/another/../../../mojolicious/secret.txt')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 
 # Try to access a file which is not under the web root via path traversal
 # (triple dot)
 $t->get_ok('/.../mojolicious/secret.txt')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 
 # Try to access a file which is not under the web root via path traversal
 # (backslashes)
 $t->get_ok('/..\\..\\mojolicious\\secret.txt')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 
 # Try to access a file which is not under the web root via path traversal
 # (escaped backslashes)
 $t->get_ok('/..%5C..%5Cmojolicious%5Csecret.txt')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_like(qr/Page Not Found/);
 
 # Check that backslashes in query or fragment parts don't block access
 $t->get_ok('/another/file?one=\\1#two=\\2')->status_is(200)->content_like(qr/Hello Mojolicious!/);

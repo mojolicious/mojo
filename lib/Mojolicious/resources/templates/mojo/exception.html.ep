@@ -2,7 +2,7 @@
 <!-- Request ID: <%= $c->req->request_id %> -->
 <html>
   <head>
-    <title>Server error</title>
+    <title>Server Error</title>
     <style>
       body {
         background-color: #caecf6;

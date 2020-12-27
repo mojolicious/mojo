@@ -2,7 +2,7 @@
 <!-- Request ID: <%= $c->req->request_id %> -->
 <html>
   <head>
-    <title>Page not found</title>
+    <title>Page Not Found</title>
     <style>
       a img {
         border: 0;

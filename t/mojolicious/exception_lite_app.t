@@ -251,7 +251,7 @@ subtest 'Exception in helper' => sub {
 
 subtest 'Missing template' => sub {
   $t->get_ok('/missing_template')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Page not found/);
+    ->content_like(qr/Page Not Found/);
 };
 
 subtest 'Missing template with different format' => sub {
@@ -261,7 +261,7 @@ subtest 'Missing template with different format' => sub {
 
 subtest 'Missing template with unsupported format' => sub {
   $t->get_ok('/missing_template.json')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Page not found/);
+    ->content_like(qr/Page Not Found/);
 };
 
 subtest 'Missing template with custom rendering' => sub {
@@ -271,12 +271,12 @@ subtest 'Missing template with custom rendering' => sub {
 
 subtest 'Missing template (failed rendering)' => sub {
   $t->get_ok('/missing_template/too')->status_is(404)->header_is('X-Not-Found' => 1)
-    ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Page not found/);
+    ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Page Not Found/);
 };
 
 subtest 'Missing helper (correct context)' => sub {
   $t->get_ok('/missing_helper')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Server error/)->content_like(qr/shift-&gt;missing_helper/);
+    ->content_like(qr/Server Error/)->content_like(qr/shift-&gt;missing_helper/);
 };
 
 subtest 'Reuse exception' => sub {

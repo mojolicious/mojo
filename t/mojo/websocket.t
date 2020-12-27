@@ -127,7 +127,7 @@ like $res->body, qr!ws://127\.0\.0\.1:\d+/!, 'right content';
 # Plain HTTP request
 $res = $ua->get('/early_start')->res;
 is $res->code,   404,                'right status';
-like $res->body, qr/Page not found/, 'right content';
+like $res->body, qr/Page Not Found/, 'right content';
 
 # Plain WebSocket
 my ($stash, $result);

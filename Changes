@@ -1,4 +1,6 @@
 
+8.69  2020-12-28
+
 8.68  2020-12-27
   - Update built-in templates with new responsive design from mojolicious.org.
   - Fixed a bug in Mojo::Message::Request that resulted in duplicate request ids for Mojo::Server::Prefork workers.

@@ -662,21 +662,59 @@ $t->get_ok('/.html')->status_is(200)->header_exists_not('Servers')
   ->header_exists('Server', 'the header exists')->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
-# Reverse proxy with "X-Forwarded-For"
-{
+subtest 'Reverse proxy with "X-Forwarded-For"' => sub {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
-  $t->ua->server->restart;
+  my $t = Test::Mojo->new;
   $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
     ->header_unlike('X-Original' => qr/192\.0\.2\.1/)->content_like(qr!http://127\.0\.0\.1:\d+/0-192\.0\.2\.1-0$!);
-}
+};
 
-# Reverse proxy with "X-Forwarded-Proto"
-{
+subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies' => sub {
+  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.1, 192.0.2.1';
+  my $t = Test::Mojo->new;
+  $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
+    ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
+    ->content_like(qr!http://127\.0\.0\.1:\d+/0-192\.0\.2\.2-0$!);
+};
+
+subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies (untrusted original)' => sub {
+  local $ENV{MOJO_TRUSTED_PROXIES} = '192.0.2.1';
+  my $t = Test::Mojo->new;
+  $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
+    ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
+    ->content_like(qr!http://127\.0\.0\.1:\d+/0-127\.0\.0\.1-0$!);
+};
+
+subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxy networks' => sub {
+  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0.2.1/32';
+  my $t = Test::Mojo->new;
+  $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
+    ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
+    ->content_like(qr!http://127\.0\.0\.1:\d+/0-192\.0\.2\.2-0$!);
+};
+
+subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies (all addresses trusted)' => sub {
+  local $ENV{MOJO_TRUSTED_PROXIES} = '0/0';
+  my $t = Test::Mojo->new;
+  $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
+    ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
+    ->content_like(qr!http://127\.0\.0\.1:\d+/0-192\.0\.2\.2-0$!);
+};
+
+subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies (unexpected leading address)' => sub {
+  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0.2.1';
+  my $t = Test::Mojo->new;
+  $t->get_ok('/0' => {'X-Forwarded-For' => '7.7.7.7, 192.0.2.2, 192.0.2.1'})->status_is(200)
+    ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
+    ->content_like(qr!http://127\.0\.0\.1:\d+/0-192\.0\.2\.2-0$!);
+};
+
+subtest 'Reverse proxy with "X-Forwarded-Proto"' => sub {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
-  $t->ua->server->restart;
+  my $t = Test::Mojo->new;
   $t->get_ok('/0' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_like(qr!^https://127\.0\.0\.1:\d+/0-!)
     ->content_like(qr/-0$/)->content_unlike(qr!-192\.0\.2\.1-0$!);
-}
+};
 
 # "X-Forwarded-For"
 $t->ua->server->restart;

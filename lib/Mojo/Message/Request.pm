@@ -16,8 +16,9 @@ has request_id => sub {
   $b64 =~ tr!+/!-_!;
   return $b64;
 };
-has url       => sub { Mojo::URL->new };
-has via_proxy => 1;
+has trusted_proxies => sub { [] };
+has url             => sub { Mojo::URL->new };
+has via_proxy       => 1;
 
 sub clone {
   my $self = shift;
@@ -300,6 +301,13 @@ Proxy URL for request.
   $req     = $req->reverse_proxy($bool);
 
 Request has been performed through a reverse proxy.
+
+=head2 trusted_proxies
+
+  my $proxies = $req->trusted_proxies;
+  $req        = $req->trusted_proxies(['10.0/8', '127.0.0.1', '172.16.0/12', '192.168.0/16', 'fc00::/7']);
+
+Trusted reverse proxies, addresses or networks in CIDR form.
 
 =head2 request_id
 

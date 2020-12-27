@@ -35,6 +35,7 @@ subtest 'Detect common MIME types' => sub {
   is_deeply $t->detect('image/png'),                ['png'],   'right formats';
   is_deeply $t->detect('application/rss+xml'),      ['rss'],   'right formats';
   is_deeply $t->detect('image/svg+xml'),            ['svg'],   'right formats';
+  is_deeply $t->detect('font/ttf'),                 ['ttf'],   'right formats';
   is_deeply $t->detect('text/plain'),               ['txt'],   'right formats';
   is_deeply $t->detect('video/webm'),               ['webm'],  'right formats';
   is_deeply $t->detect('font/woff'),                ['woff'],  'right formats';

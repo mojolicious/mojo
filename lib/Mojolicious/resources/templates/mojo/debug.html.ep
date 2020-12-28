@@ -272,12 +272,18 @@
               <div class="tap tap-border-top">tap for more</div>
             </div>
           </div>
-          % if (@{app->log->history}) {
-            <div class="row">
-              % my $log = join '', map { scalar app->log->format->(@$_) } @{app->log->history};
-              <pre class="mojo-terminal"><code class="nohighlight"><%= $log %></code></pre>
-            </div>
-          % }
+          <div class="row">
+            % if (@{app->log->history}) {
+                % my $log = join '', map { scalar app->log->format->(@$_) } @{app->log->history};
+                <pre class="mojo-terminal"><code class="nohighlight"><%= $log %></code></pre>
+            % }
+            % else {
+              <div class="alert alert-warning wide" role="alert">
+                The application log appears to be empty, perhaps the log level <b><%= app->log->level %></b> is too
+                high?
+              </div>
+            % }
+          </div>
         </main>
       </div>
     </div>

@@ -106,7 +106,7 @@
             % if (my $exception = stash 'exception') {
               <div class="alert alert-danger wide" role="alert">
                 <h2>Server Error</h2>
-                This page is only available in <b>development</b> mode.
+                This application is in <b>development</b> mode, showing internal information to help you with debugging.
               </div>
               % my $cv = begin
                 % my ($key, $value, $i) = @_;
@@ -184,7 +184,7 @@
             % else {
               <div class="alert alert-warning wide" role="alert">
                 <h2>Page Not Found</h2>
-                This page is only available in <b>development</b> mode.
+                This application is in <b>development</b> mode, showing internal information to help you with debugging.
               </div>
               <div id="routes" class="box no-padding border-radius-both">
                 <div class="padded-content">

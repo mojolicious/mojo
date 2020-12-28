@@ -10,6 +10,10 @@ main {
   font: 14px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;;
   padding: 0.4em;
 }
+h2 {
+  font-weight: 300;
+  font-size: 2em;
+}
 pre {
   font: 14px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
   margin: 0;

@@ -67,11 +67,14 @@ th {
   font-weight: 300;
   margin: 0;
 }
+.fixed-table {
+  table-layout: fixed;
+}
 .important {
   background-color: rgba(47, 48, 50, .75);
  }
 .key {
-  text-align: right;
+  width: 20%;
 }
 .mojobar {
   background-color: #1a1a1a;

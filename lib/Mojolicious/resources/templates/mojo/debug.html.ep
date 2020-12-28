@@ -99,19 +99,20 @@
             % my $kv = begin
               % my ($key, $value) = @_;
               <tr>
-                <td class="key"><%= $key %>:</td>
-                <td class="value wide"><pre><%= $value %></pre></td>
+                <td class="key text-right"><%= $key %>:</td>
+                <td class="value"><pre><%= $value %></pre></td>
               </tr>
             % end
             % if (my $exception = stash 'exception') {
               <div class="alert alert-danger wide" role="alert">
                 <h2>Server Error</h2>
-                This application is in <b>development</b> mode, showing internal information to help you with debugging.
+                This application is in <b>development</b> mode and will show internal information to help you with
+                debugging.
               </div>
               % my $cv = begin
                 % my ($key, $value, $i) = @_;
                 %= tag 'tr', $i ? (class => 'important') : (), begin
-                  <td class="key"><%= $key %></td>
+                  <td class="text-right"><%= $key %></td>
                   <td class="context-value wide">
                     <pre><code><%= $value %></code></pre>
                   </td>
@@ -120,7 +121,7 @@
               <div id="showcase" class="box code no-bottom-border no-top-border border-radius-top">
                 <pre id="error" class="error"><%= $exception->message %></pre>
                 <div id="context" class="more">
-                  <table>
+                  <table class="wide">
                     % for my $line (@{$exception->lines_before}) {
                       %= $cv->($line->[0], $line->[1])
                     % }
@@ -134,7 +135,7 @@
                 </div>
                 % if (defined $exception->line->[2]) {
                   <div id="insight" class="more">
-                    <table>
+                    <table class="wide">
                       % for my $line (@{$exception->lines_before}) {
                         %= $cv->($line->[0], $line->[2])
                       % }
@@ -166,12 +167,11 @@
               <div id="trace" class="box no-padding more no-top-border border-radius-bottom">
                 % if (@{$exception->frames}) {
                   <div id="frames" class="more">
-                    <table class="striped">
+                    <table class="striped wide">
                       % for my $frame (@{$exception->frames}) {
                         <tr>
-                          <td class="value wide">
-                            <pre>File "<%= $frame->[1] %>", line <%= 
-                              $frame->[2] %>, in "<%= $frame->[0] %>"</pre>
+                          <td class="value">
+                            <pre>File "<%= $frame->[1] %>", line <%= $frame->[2] %>, in "<%= $frame->[0] %>"</pre>
                           </td>
                         </tr>
                       % }
@@ -184,7 +184,8 @@
             % else {
               <div class="alert alert-warning wide" role="alert">
                 <h2>Page Not Found</h2>
-                This application is in <b>development</b> mode, showing internal information to help you with debugging.
+                This application is in <b>development</b> mode and will show internal information to help you with
+                debugging.
               </div>
               <div id="routes" class="box no-padding border-radius-both">
                 <div class="padded-content">
@@ -216,7 +217,7 @@
                   %= $walk->($walk, $_, $depth) for @{$route->children};
                   % $depth--;
                 % end
-                <table class="striped-grey">
+                <table class="striped-grey wide">
                   <thead>
                     <tr>
                       <th>Pattern</th>
@@ -231,7 +232,7 @@
           </div>
           <div class="row mojo-divider">
             <div id="request" class="box no-padding no-bottom-border border-radius-top">
-              <table class="striped">
+              <table class="striped fixed-table wide">
                 % my $req = $c->req;
                 %= $kv->('Request ID' => $req->request_id)
                 %= $kv->(Method => $req->method)
@@ -250,7 +251,7 @@
             </div>
             <div id="more" class="box no-padding more no-top-border border-radius-bottom">
               <div id="infos">
-                <table class="striped">
+                <table class="striped fixed-table wide">
                   %= $kv->(Perl => "$^V ($^O)")
                   % my $version  = $Mojolicious::VERSION;
                   % my $codename = $Mojolicious::CODENAME;

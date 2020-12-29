@@ -154,6 +154,14 @@ $buffer = '';
   $commands->run('generate', 'lite-app', '--help');
 }
 like $buffer, qr/Usage: APPLICATION generate lite-app \[OPTIONS\] \[NAME\]/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  local $ENV{HARNESS_ACTIVE} = 0;
+  $commands->run('help');
+}
+like $buffer, qr/Usage: APPLICATION COMMAND \[OPTIONS\]/, 'right output';
 
 # get
 require Mojolicious::Command::get;

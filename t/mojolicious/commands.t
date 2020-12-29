@@ -244,19 +244,48 @@ $buffer = '';
 }
 like $buffer, qr/Unknown option: unknown/, 'right output';
 
-# daemon
-require Mojolicious::Command::daemon;
-my $daemon = Mojolicious::Command::daemon->new;
-ok $daemon->description, 'has a description';
-like $daemon->usage, qr/daemon/, 'has usage information';
-$buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDERR = $handle;
-  eval { $daemon->run('--unknown') };
-  like $@, qr/Usage: APPLICATION daemon/, 'unknown option';
-}
-like $buffer, qr/Unknown option: unknown/, 'right output';
+subtest 'daemon' => sub {
+  require Mojolicious::Command::daemon;
+
+  subtest 'Description' => sub {
+    my $command = Mojolicious::Command::daemon->new;
+    ok $command->description, 'has a description';
+    like $command->usage, qr/daemon/, 'has usage information';
+  };
+
+  subtest 'Unknown option' => sub {
+    my $command = Mojolicious::Command::daemon->new;
+    $buffer = '';
+    {
+      open my $handle, '>', \$buffer;
+      local *STDERR = $handle;
+      eval { $command->run('--unknown') };
+      like $@, qr/Usage: APPLICATION daemon/, 'unknown option';
+    }
+    like $buffer, qr/Unknown option: unknown/, 'right output';
+  };
+
+  subtest 'Proxy boolean' => sub {
+    my $command = Mojolicious::Command::daemon->new;
+    my $daemon = $command->build_server('-p');
+    ok $daemon->reverse_proxy, 'right value';
+    is_deeply $daemon->trusted_proxies, [], 'right value';
+  };
+
+  subtest 'Trusted proxies' => sub {
+    my $command = Mojolicious::Command::daemon->new;
+    my $daemon = $command->build_server('-p', '127.0/8', '-p', '10.0/8');
+    ok $daemon->reverse_proxy, 'right value';
+    is_deeply $daemon->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+  };
+
+  subtest 'Proxy boolean and trusted' => sub {
+    my $command = Mojolicious::Command::daemon->new;
+    my $daemon = $command->build_server('-p', '-p', '127.0/8', '-p', '10.0/8');
+    ok $daemon->reverse_proxy, 'right value';
+    is_deeply $daemon->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+  };
+};
 
 # eval
 require Mojolicious::Command::eval;
@@ -426,19 +455,48 @@ my $inflate = Mojolicious::Command::Author::inflate->new;
 ok $inflate->description, 'has a description';
 like $inflate->usage, qr/inflate/, 'has usage information';
 
-# prefork
-require Mojolicious::Command::prefork;
-my $prefork = Mojolicious::Command::prefork->new;
-ok $prefork->description, 'has a description';
-like $prefork->usage, qr/prefork/, 'has usage information';
-$buffer = '';
-{
-  open my $handle, '>', \$buffer;
-  local *STDERR = $handle;
-  eval { $prefork->run('--unknown') };
-  like $@, qr/Usage: APPLICATION prefork/, 'unknown option';
-}
-like $buffer, qr/Unknown option: unknown/, 'right output';
+subtest 'prefork' => sub {
+  require Mojolicious::Command::prefork;
+
+  subtest 'Description' => sub {
+    my $command = Mojolicious::Command::prefork->new;
+    ok $command->description, 'has a description';
+    like $command->usage, qr/prefork/, 'has usage information';
+  };
+
+  subtest 'Unknown option' => sub {
+    my $command = Mojolicious::Command::prefork->new;
+    $buffer = '';
+    {
+      open my $handle, '>', \$buffer;
+      local *STDERR = $handle;
+      eval { $command->run('--unknown') };
+      like $@, qr/Usage: APPLICATION prefork/, 'unknown option';
+    }
+    like $buffer, qr/Unknown option: unknown/, 'right output';
+  };
+
+  subtest 'Proxy boolean' => sub {
+    my $command = Mojolicious::Command::prefork->new;
+    my $prefork = $command->build_server('-p');
+    ok $prefork->reverse_proxy, 'right value';
+    is_deeply $prefork->trusted_proxies, [], 'right value';
+  };
+
+  subtest 'Trusted proxies' => sub {
+    my $command = Mojolicious::Command::prefork->new;
+    my $prefork = $command->build_server('-p', '127.0/8', '-p', '10.0/8');
+    ok $prefork->reverse_proxy, 'right value';
+    is_deeply $prefork->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+  };
+
+  subtest 'Proxy boolean and trusted' => sub {
+    my $command = Mojolicious::Command::prefork->new;
+    my $prefork = $command->build_server('-p', '-p', '127.0/8', '-p', '10.0/8');
+    ok $prefork->reverse_proxy, 'right value';
+    is_deeply $prefork->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+  };
+};
 
 # psgi
 require Mojolicious::Command::psgi;

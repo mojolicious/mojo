@@ -1,5 +1,6 @@
 
 8.70  2020-12-29
+  - Fixed top-level help command in Mojolicious::Commands. (schelcj)
 
 8.69  2020-12-28
   - Improved design of built-in templates.

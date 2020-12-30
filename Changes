@@ -1,4 +1,6 @@
 
+8.71  2020-12-30
+
 8.70  2020-12-29
   - Fixed top-level help command in Mojolicious::Commands. (schelcj)
 

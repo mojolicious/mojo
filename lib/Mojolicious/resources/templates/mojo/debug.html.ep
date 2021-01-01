@@ -295,7 +295,7 @@
             <b>Free</b> and <b>Open Source</b>.
           </div>
           <div class="col-sm align-self-center text-center mojo-copy">
-              <i class="far fa-copyright"></i> 2008-2020 Sebastian Riedel and the
+              <i class="far fa-copyright"></i> 2008-2021 Sebastian Riedel and the
               <a href="https://docs.mojolicious.org/Mojolicious#AUTHORS">Mojolicious contributors</a>.
           </div>
           <div class="col-sm align-self-center text-center mojo-social">

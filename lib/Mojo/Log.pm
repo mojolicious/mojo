@@ -5,6 +5,7 @@ use Carp qw(croak);
 use Fcntl qw(:flock);
 use Mojo::File;
 use Mojo::Util qw(encode);
+use Scalar::Util qw(blessed);
 use Time::HiRes qw(time);
 
 has format => sub { shift->short ? \&_short : \&_default };
@@ -66,7 +67,22 @@ sub _default {
 sub _log {
   my ($self, $level) = (shift, pop);
   my @msgs = ref $_[0] eq 'CODE' ? $_[0]() : @_;
-  $msgs[0] = "$self->{context} $msgs[0]" if $self->{context};
+  if ($self->{context}) {
+    if (@msgs == 1 && blessed($msgs[0]) && $msgs[0]->isa('Mojo::Exception')) {
+      my $exception = $msgs[0];
+      $msgs[0] = Mojo::Exception->new(
+        message      => "$self->{context} ".$exception->message,
+        frames       => $exception->frames,
+        line         => $exception->line,
+        lines_after  => $exception->lines_after,
+        lines_before => $exception->lines_before,
+        verbose      => $exception->verbose,
+      );
+    }
+    else {
+      $msgs[0] = "$self->{context} $msgs[0]";
+    }
+  }
   ($self->{parent} || $self)->emit('message', $level, @msgs);
 }
 

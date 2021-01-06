@@ -826,6 +826,9 @@ Opposite of L</"json_has">.
 Check the value extracted from JSON response using the given JSON Pointer with L<Mojo::JSON::Pointer>, which defaults
 to the root value if it is omitted.
 
+  # Use an empty JSON Pointer to test the whole JSON response with a test description
+  $t->json_is('' => {foo => [1, 2, 3]}, 'right object');
+
 =head2 json_like
 
   $t = $t->json_like('/foo/1' => qr/^\d+$/);

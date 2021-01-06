@@ -4,6 +4,7 @@ use Mojo::Base -base;
 use Carp qw(carp);
 use Mojo::Exception;
 use Mojo::IOLoop;
+use Mojo::Util;
 use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{MOJO_PROMISE_DEBUG} || 0;
@@ -19,7 +20,7 @@ sub AWAIT_FAIL { shift->reject(@_) }
 
 sub AWAIT_GET {
   my $self    = shift;
-  my @results = @{$self->{results} // []};
+  my @results = @{$self->{results} // Mojo::Util::_EMPTY_ARRAY};
   die $results[0] unless $self->{status} eq 'resolve';
   return wantarray ? @results : $results[0];
 }

@@ -6,6 +6,7 @@ use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
 use Mojo::JSON;
 use Mojo::Promise;
+use Mojo::Util;
 use POSIX ();
 
 has deserialize => sub { \&Mojo::JSON::decode_json };
@@ -50,7 +51,7 @@ sub _start {
   unless ($pid) {
     eval {
       $self->ioloop->reset({freeze => 1});
-      my $results = eval { [$self->$child] } // [];
+      my $results = eval { [$self->$child] } // Mojo::Util::_EMPTY_ARRAY;
       print {$self->{writer}} '0-', $self->serialize->([$@, @$results]);
       $self->emit('cleanup');
     } or warn $@;
@@ -81,7 +82,7 @@ sub _start {
       waitpid $pid, 0;
       $self->{exit_code} = $? >> 8;
       substr $buffer, 0, 2, '';
-      my $results = eval { $self->deserialize->($buffer) } // [];
+      my $results = eval { $self->deserialize->($buffer) } // Mojo::Util::_EMPTY_ARRAY;
       $self->$parent(shift(@$results) // $@, @$results);
     }
   );

@@ -2,6 +2,7 @@ package Mojolicious::Types;
 use Mojo::Base -base;
 
 use Mojo::File qw(path);
+use Mojo::Util;
 
 has mapping => sub {
   {
@@ -62,7 +63,7 @@ sub detect {
     push @{$reverse{$_}}, $ext for map { s/\;.*$//; lc $_ } @types;
   }
 
-  return [map { @{$reverse{$_} // []} } @detected];
+  return [map { @{$reverse{$_} // Mojo::Util::_EMPTY_ARRAY} } @detected];
 }
 
 sub file_type { $_[0]->type(path($_[1])->extname) }

@@ -12,6 +12,7 @@ use overload
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
+use Mojo::Util;
 use Scalar::Util qw(blessed weaken);
 use Storable qw(dclone);
 
@@ -229,7 +230,7 @@ sub _ancestors {
 sub _build { shift->new->tree(shift)->xml(shift) }
 
 sub _collect {
-  my ($self, $nodes) = (shift, shift // []);
+  my ($self, $nodes) = (shift, shift // Mojo::Util::_EMPTY_ARRAY);
   my $xml = $self->xml;
   return Mojo::Collection->new(map { $self->_build($_, $xml) } @$nodes);
 }

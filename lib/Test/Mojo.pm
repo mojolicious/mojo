@@ -352,13 +352,13 @@ sub _handler {
 
 sub _json {
   my ($self, $method, $p) = @_;
-  return Mojo::JSON::Pointer->new(j(@{$self->message // []}[1]))->$method($p);
+  return Mojo::JSON::Pointer->new(j(@{$self->message // Mojo::Util::_EMPTY_ARRAY}[1]))->$method($p);
 }
 
 sub _message {
   my ($self, $name, $value, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  my ($type, $msg) = @{$self->message // []};
+  my ($type, $msg) = @{$self->message // Mojo::Util::_EMPTY_ARRAY};
 
   # Type check
   if (ref $value eq 'HASH') {

@@ -23,6 +23,12 @@ use Unicode::Normalize ();
 # Check for monotonic clock support
 use constant MONOTONIC => eval { !!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
 
+# Speed up @{ $foo // [] } and similar by avoiding having to construct a new empty arrayref each time
+use constant _EMPTY_ARRAY => [];
+
+# Make sure nobody accidentally modifies the referenced array
+BEGIN { Internals::SvREADONLY(@{+_EMPTY_ARRAY}, 1) }
+
 # Punycode bootstring parameters
 use constant {
   PC_BASE         => 36,

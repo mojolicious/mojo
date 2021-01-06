@@ -130,7 +130,7 @@ sub suggested_method {
 
   my %via;
   for my $route (@{$self->_chain}) {
-    next unless my @via = @{$route->methods || []};
+    next unless my @via = @{$route->methods // Mojo::Util::_EMPTY_ARRAY};
     %via = map { $_ => 1 } keys %via ? grep { $via{$_} } @via : @via;
   }
 

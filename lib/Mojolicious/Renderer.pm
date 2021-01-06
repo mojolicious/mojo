@@ -168,7 +168,7 @@ sub template_name {
   my $handler = $options->{handler};
   if (defined(my $variant = $options->{variant})) {
     $variant = "$template+$variant";
-    my $handlers = $self->{templates}{$variant} // [];
+    my $handlers = $self->{templates}{$variant} // Mojo::Util::_EMPTY_ARRAY;
     $template = $variant if @$handlers && !defined $handler || grep { $_ eq $handler } @$handlers;
   }
 

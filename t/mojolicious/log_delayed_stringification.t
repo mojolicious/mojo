@@ -11,6 +11,7 @@ use Test::More;
     get '/error' => sub { die "Log Me" };
 }
 
+local $ENV{MOJO_LOG_LEVEL} = 'info';
 my $t   = Test::Mojo->new('Mojolicious::Test::Log');
 my $app = $t->app;
 
@@ -24,7 +25,6 @@ $app->log->unsubscribe('message')->on(message => sub {
     }
 });
 
-local $ENV{MOJO_LOG_LEVEL} = 'info';
 # this succeeds, but the isa_ok above fails
 $t->get_ok('/error')
   ->status_is(500 => 'threw exception');

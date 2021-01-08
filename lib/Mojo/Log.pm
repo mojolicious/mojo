@@ -69,13 +69,9 @@ sub _log {
   my @msgs = ref $_[0] eq 'CODE' ? $_[0]() : @_;
   if ($self->{context}) {
     if (@msgs == 1 && blessed($msgs[0]) && $msgs[0]->isa('Mojo::Exception')) {
-      $msgs[0] = Mojo::Exception
-        ->new("$self->{context} ".$msgs[0]->message)
-        ->frames($msgs[0]->frames)
-        ->line($msgs[0]->line)
-        ->lines_after($msgs[0]->lines_after)
-        ->lines_before($msgs[0]->lines_before)
-        ->verbose($msgs[0]->verbose);
+      $msgs[0]
+        = Mojo::Exception->new("$self->{context} " . $msgs[0]->message)->frames($msgs[0]->frames)->line($msgs[0]->line)
+        ->lines_after($msgs[0]->lines_after)->lines_before($msgs[0]->lines_before)->verbose($msgs[0]->verbose);
     }
     else {
       $msgs[0] = "$self->{context} $msgs[0]";

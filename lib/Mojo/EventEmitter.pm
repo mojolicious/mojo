@@ -3,26 +3,22 @@ use Mojo::Base -base;
 
 use Scalar::Util qw(blessed weaken);
 
-use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
+use constant DEBUG  => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 
 sub catch { $_[0]->on(error => $_[1]) and return $_[0] }
 
 sub emit {
   my ($self, $name) = (shift, shift);
+  my @s = (@{$self->{events}{$name} // Mojo::Util::_EMPTY_ARRAY}, @{$self->{events}{'*'} // Mojo::Util::_EMPTY_ARRAY});
 
-  if (my $s = $self->{events}{$name}) {
-    warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n" if DEBUG;
-    for my $cb (@$s) { $self->$cb(@_) }
-  }
-  else {
-    warn "-- Emit $name in @{[blessed $self]} (0)\n" if DEBUG;
-    die "@{[blessed $self]}: $_[0]"                  if $name eq 'error';
-  }
+  warn "-- Emit $name in @{[blessed $self]} (@{[scalar @s]})\n" if DEBUG;
+  die "@{[blessed $self]}: $_[0]"                               if !@s && $name eq 'error';
+  for my $cb (@s) { $self->$cb(@_) }
 
   return $self;
 }
 
-sub has_subscribers { !!shift->{events}{shift()} }
+sub has_subscribers { !!($_[0]{events}{$_[1]} || $_[0]{events}{'*'}) }
 
 sub on { push @{$_[0]{events}{$_[1]}}, $_[2] and return $_[2] }
 

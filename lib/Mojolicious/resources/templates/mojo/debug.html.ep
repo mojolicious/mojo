@@ -61,12 +61,14 @@
               <div class="dropdown-menu" aria-labelledby="communityDropdown">
                 <a class="dropdown-item" href="https://webchat.freenode.net/#mojo">Chat</a>
                 <a class="dropdown-item" href="https://forum.mojolicious.org">Forum</a>
-                <a class="dropdown-item" href="https://github.com/mojolicious/mojo/">GitHub</a>
                 <a class="dropdown-item" href="https://twitter.com/perlmojo">Twitter</a>
                 <a class="dropdown-item" href="https://www.linkedin.com/groups/8963713/">LinkedIn</a>
                 <a class="dropdown-item" href="https://github.com/mojolicious/mojo/wiki">Wiki</a>
                 <a class="dropdown-item" href="https://metacpan.org/release/Mojolicious/">CPAN</a>
               </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/mojolicious/mojo/">Contribute on GitHub</a>
             </li>
           </ul>
           <form action="https://www.google.com/cse" target="_blank" class="form-inline my-2 my-lg-0">

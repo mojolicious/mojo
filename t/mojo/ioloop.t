@@ -83,11 +83,12 @@ subtest 'Recurring timer' => sub {
 };
 
 subtest 'Handle and reset' => sub {
-  my ($handle, $handle2, $reset);
+  my ($handle, $handle2, $reset, $close);
   Mojo::IOLoop->singleton->on(reset => sub { $reset++ });
   my $id = Mojo::IOLoop->server(
     (address => '127.0.0.1') => sub {
       my ($loop, $stream) = @_;
+      $stream->on(close => sub { $close++ });
       $handle = $stream->handle;
       Mojo::IOLoop->stop;
     }
@@ -110,6 +111,39 @@ subtest 'Handle and reset' => sub {
   is $handle,     $handle2, 'handles are equal';
   isa_ok $handle, 'IO::Socket', 'right reference';
   is $reset,      1,            'reset event has been emitted once';
+  is $close,      1,            'close event has been emitted once';
+};
+
+subtest 'Handle and reset with freeze' => sub {
+  my ($handle, $handle2, $reset, $close);
+  Mojo::IOLoop->singleton->on(reset => sub { $reset++ });
+  my $id = Mojo::IOLoop->server(
+    (address => '127.0.0.1') => sub {
+      my ($loop, $stream) = @_;
+      $stream->on(close => sub { $close++ });
+      $handle = $stream->handle;
+      Mojo::IOLoop->stop;
+    }
+  );
+  my $port = Mojo::IOLoop->acceptor($id)->port;
+  Mojo::IOLoop->acceptor($id)->on(accept => sub { $handle2 = pop });
+  my $id2 = Mojo::IOLoop->client((address => '127.0.0.1', port => $port) => sub { });
+  Mojo::IOLoop->start;
+  my ($count, $running, $timer) = (0) x 3;
+  Mojo::IOLoop->recurring(10 => sub { $timer++ });
+  Mojo::IOLoop->next_tick(sub {
+    Mojo::IOLoop->reset({freeze => 1});
+    $running = Mojo::IOLoop->is_running;
+  });
+  Mojo::IOLoop->start;
+  ok !$running, 'not running';
+  is $count, 0, 'no recurring events';
+  ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
+  ok !Mojo::IOLoop->stream($id2),  'stream has been removed';
+  is $handle,     $handle2, 'handles are equal';
+  isa_ok $handle, 'IO::Socket', 'right reference';
+  is $reset,      1,            'reset event has been emitted once';
+  ok !$close, 'close event has not been emitted';
 };
 
 subtest 'The poll reactor stops when there are no events being watched anymore' => sub {

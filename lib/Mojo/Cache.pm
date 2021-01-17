@@ -3,15 +3,15 @@ use Mojo::Base -base;
 
 has 'max_keys' => 100;
 
-sub get { (shift->{cache} || {})->{shift()} }
+sub get { (shift->{cache} // {})->{shift()} }
 
 sub set {
   my ($self, $key, $value) = @_;
 
   return $self unless (my $max = $self->max_keys) > 0;
 
-  my $cache = $self->{cache} ||= {};
-  my $queue = $self->{queue} ||= [];
+  my $cache = $self->{cache} //= {};
+  my $queue = $self->{queue} //= [];
   delete $cache->{shift @$queue} while @$queue >= $max;
   push @$queue, $key unless exists $cache->{$key};
   $cache->{$key} = $value;

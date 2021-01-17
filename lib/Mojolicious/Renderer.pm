@@ -102,7 +102,7 @@ sub render {
   return () unless $self->_render_template($c, \my $output, $options);
 
   # Inheritance
-  my $content = $stash->{'mojo.content'} ||= {};
+  my $content = $stash->{'mojo.content'} //= {};
   local $content->{content} = $output =~ /\S/ ? $output : undef if $stash->{extends} || $stash->{layout};
   while ((my $next = _next($stash)) && !defined $inline) {
     @$options{qw(handler template)} = ($stash->{handler}, $next);

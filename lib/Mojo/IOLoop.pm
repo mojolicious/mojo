@@ -143,7 +143,7 @@ sub stop_gracefully {
 sub stream {
   my ($self, $stream) = (_instance(shift), @_);
   return $self->_stream($stream => $self->_id) if ref $stream;
-  my $c = $self->{in}{$stream} || $self->{out}{$stream} || {};
+  my $c = $self->{in}{$stream} || $self->{out}{$stream} // {};
   return $c->{stream};
 }
 
@@ -161,7 +161,7 @@ sub _id {
   return $id;
 }
 
-sub _in { scalar keys %{shift->{in} || {}} }
+sub _in { scalar keys %{shift->{in} // {}} }
 
 sub _instance { ref $_[0] ? $_[0] : $_[0]->singleton }
 
@@ -170,18 +170,18 @@ sub _limit { $_[0]{stop} ? 1 : $_[0]->_in >= $_[0]->max_connections }
 sub _maybe_accepting {
   my $self = shift;
   return if $self->{accepting} || $self->_limit;
-  $_->start for values %{$self->{acceptors} || {}};
+  $_->start for values %{$self->{acceptors} // {}};
   $self->{accepting} = 1;
 }
 
 sub _not_accepting {
   my $self = shift;
   return $self unless delete $self->{accepting};
-  $_->stop for values %{$self->{acceptors} || {}};
+  $_->stop for values %{$self->{acceptors} // {}};
   return $self;
 }
 
-sub _out { scalar keys %{shift->{out} || {}} }
+sub _out { scalar keys %{shift->{out} // {}} }
 
 sub _remove {
   my ($self, $id) = @_;

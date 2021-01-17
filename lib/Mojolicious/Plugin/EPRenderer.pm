@@ -10,7 +10,7 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Auto escape by default to prevent XSS attacks
-  my $ep = {auto_escape => 1, %{$conf->{template} || {}}, vars => 1};
+  my $ep = {auto_escape => 1, %{$conf->{template} // {}}, vars => 1};
   my $ns = $self->{namespace} = $ep->{namespace} //= 'Mojo::Template::Sandbox::' . md5_sum "$self";
 
   # Make "$self" and "$c" available in templates

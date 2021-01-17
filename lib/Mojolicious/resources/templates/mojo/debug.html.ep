@@ -207,7 +207,7 @@
                       <pre><%= '  ' x $depth %><%= $pattern %></pre>
                     </td>
                     <td class="value">
-                      <pre><%= uc(join ',', @{$route->methods || []}) || '*' %></pre>
+                      <pre><%= uc(join ',', @{$route->methods // []}) || '*' %></pre>
                     </td>
                     <td class="value">
                       % my $name = $route->name;

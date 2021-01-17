@@ -23,7 +23,7 @@ sub DESTROY {
   return if Mojo::Util::_global_destruction();
   my $self = shift;
   my $loop = $self->ioloop;
-  $loop->remove($_) for keys %{$self->{connections} || {}}, @{$self->acceptors};
+  $loop->remove($_) for keys %{$self->{connections} // {}}, @{$self->acceptors};
 }
 
 sub ports { [map { $_[0]->ioloop->acceptor($_)->port } @{$_[0]->acceptors}] }

@@ -240,7 +240,7 @@ sub _cache {
     push @{$self->{$method}{$_->name}}, $_ for @{$self->$method};
   }
 
-  my $objects = $self->{$method}{$name} || [];
+  my $objects = $self->{$method}{$name} // [];
   return $all ? $objects : $objects->[-1];
 }
 

@@ -13,7 +13,7 @@ sub detect {
 }
 
 sub is_needed {
-  !grep { $_[1] =~ /\Q$_\E$/ } @{$_[0]->not || []};
+  !grep { $_[1] =~ /\Q$_\E$/ } @{$_[0]->not // []};
 }
 
 sub prepare {

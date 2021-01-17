@@ -6,7 +6,7 @@ use Mojo::File qw(path);
 sub modified_files {
   my $self = shift;
 
-  my $cache = $self->{cache} ||= {};
+  my $cache = $self->{cache} //= {};
   my @files;
   for my $file (map { -f $_ && -r _ ? $_ : _list($_) } @{$self->watch}) {
     my ($size, $mtime) = (stat $file)[7, 9];

@@ -39,7 +39,7 @@ sub once {
   return $wrapper;
 }
 
-sub subscribers { shift->{events}{shift()} ||= [] }
+sub subscribers { shift->{events}{shift()} //= [] }
 
 sub unsubscribe {
   my ($self, $name, $cb) = @_;

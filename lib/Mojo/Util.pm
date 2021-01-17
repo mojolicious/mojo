@@ -473,7 +473,7 @@ sub _stash {
   my ($name, $object) = (shift, shift);
 
   # Hash
-  return $object->{$name} ||= {} unless @_;
+  return $object->{$name} //= {} unless @_;
 
   # Get
   return $object->{$name}{$_[0]} unless @_ > 1 || ref $_[0];

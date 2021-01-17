@@ -67,7 +67,7 @@ sub dehop {
   return $self;
 }
 
-sub every_header { shift->{headers}{lc shift} || [] }
+sub every_header { shift->{headers}{lc shift} // [] }
 
 sub from_hash {
   my ($self, $hash) = @_;
@@ -110,7 +110,7 @@ sub parse {
 
   $self->{state} = 'headers';
   $self->{buffer} .= $chunk;
-  my $headers = $self->{cache} ||= [];
+  my $headers = $self->{cache} //= [];
   my $size    = $self->max_line_size;
   my $lines   = $self->max_lines;
   while ($self->{buffer} =~ s/^(.*?)\x0d?\x0a//) {

@@ -40,7 +40,7 @@ sub cookie {
   if (@_) {
 
     # Cookie too big
-    my $cookie = {name => $name, value => shift, %{shift || {}}};
+    my $cookie = {name => $name, value => shift, %{shift // {}}};
     $self->helpers->log->error(qq{Cookie "$name" is bigger than 4KiB}) if length $cookie->{value} > 4096;
 
     $self->res->cookies($cookie);
@@ -58,7 +58,7 @@ sub every_param {
   my ($self, $name) = @_;
 
   # Captured unreserved values
-  my $captures = $self->stash->{'mojo.captures'} ||= {};
+  my $captures = $self->stash->{'mojo.captures'} //= {};
   if (!$RESERVED{$name} && exists $captures->{$name}) {
     my $value = $captures->{$name};
     return ref $value eq 'ARRAY' ? $value : [$value];
@@ -213,7 +213,7 @@ sub session {
   $self->app->sessions->load($self) unless exists $stash->{'mojo.active_session'};
 
   # Hash
-  my $session = $stash->{'mojo.session'} ||= {};
+  my $session = $stash->{'mojo.session'} //= {};
   return $session unless @_;
 
   # Get

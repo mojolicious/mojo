@@ -17,7 +17,7 @@ sub configure {
 
   # Hypnotoad settings
   my $prefork = $self->prefork;
-  my $c       = $prefork->app->config($name) || {};
+  my $c       = $prefork->app->config($name) // {};
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
   # Pre-fork settings

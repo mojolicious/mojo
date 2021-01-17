@@ -27,7 +27,7 @@ sub _walk {
 
   # Flags
   my @flags;
-  push @flags, @{$route->requires || []} ? 'C' : '.';
+  push @flags, @{$route->requires // []} ? 'C' : '.';
   push @flags, (my $partial = $route->partial) ? 'P' : '.';
   push @flags, $route->inline       ? 'U' : '.';
   push @flags, $route->is_websocket ? 'W' : '.';

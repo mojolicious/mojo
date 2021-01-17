@@ -93,7 +93,7 @@ sub pairs {
     }
   }
 
-  return $self->{pairs} ||= [];
+  return $self->{pairs} //= [];
 }
 
 sub param {

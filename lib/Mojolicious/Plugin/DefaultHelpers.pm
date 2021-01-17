@@ -70,7 +70,7 @@ sub _content {
   my ($append, $replace, $c, $name, $content) = @_;
   $name ||= 'content';
 
-  my $hash = $c->stash->{'mojo.content'} ||= {};
+  my $hash = $c->stash->{'mojo.content'} //= {};
   if (defined $content) {
     if   ($append)  { $hash->{$name} .= _block($content) }
     if   ($replace) { $hash->{$name} = _block($content) }
@@ -140,7 +140,7 @@ sub _flash {
 
   # Initialize new flash and merge values
   my $values = ref $_[0] ? $_[0] : {@_};
-  @{$session->{new_flash} ||= {}}{keys %$values} = values %$values;
+  @{$session->{new_flash} //= {}}{keys %$values} = values %$values;
 
   return $c;
 }
@@ -271,7 +271,7 @@ sub _timing_server_timing {
   $c->res->headers->append('Server-Timing' => $value);
 }
 
-sub _tx_error { (shift->error || {})->{message} // 'Unknown error' }
+sub _tx_error { (shift->error // {})->{message} // 'Unknown error' }
 
 sub _url_with {
   my $c = shift;

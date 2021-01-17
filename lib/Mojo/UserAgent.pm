@@ -88,7 +88,7 @@ sub websocket_p {
 sub _cleanup {
   my $self = shift;
   delete $self->{pid};
-  $self->_finish($_, 1) for keys %{$self->{connections} || {}};
+  $self->_finish($_, 1) for keys %{$self->{connections} // {}};
   return $self;
 }
 
@@ -197,7 +197,7 @@ sub _connection {
 sub _dequeue {
   my ($self, $loop, $name, $test) = @_;
 
-  my $old = $self->{queue}{$loop} ||= [];
+  my $old = $self->{queue}{$loop} //= [];
   my ($found, @new);
   for my $queued (@$old) {
     push @new, $queued and next if $found || !grep { $_ eq $name } @$queued;
@@ -299,7 +299,7 @@ sub _reuse {
   return $self->_remove($id) if $close || !$tx || !$max || !$tx->keep_alive || $tx->error;
 
   # Keep connection alive
-  my $queue = $self->{queue}{$c->{ioloop}} ||= [];
+  my $queue = $self->{queue}{$c->{ioloop}} //= [];
   $self->_remove(shift(@$queue)->[1]) while @$queue && @$queue >= $max;
   push @$queue, [join(':', $self->transactor->endpoint($tx)), $id];
 }

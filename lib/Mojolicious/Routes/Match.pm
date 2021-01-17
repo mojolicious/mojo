@@ -20,7 +20,7 @@ sub path_for {
   else { return {path => $name} unless $route = $self->root->lookup($name) }
 
   # Merge values (clear format)
-  my $captures = $self->stack->[-1] || {};
+  my $captures = $self->stack->[-1] // {};
   %values = (%$captures, format => undef, %values);
   my $pattern = $route->pattern;
   $values{format} //= defined $captures->{format} ? $captures->{format} : $pattern->defaults->{format}
@@ -39,7 +39,7 @@ sub _match {
   my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
   return undef unless my $captures = $r->pattern->match_partial(\$path, $detect);
   local $options->{path} = $path;
-  local @{$self->{captures} ||= {}}{keys %$captures} = values %$captures;
+  local @{$self->{captures} //= {}}{keys %$captures} = values %$captures;
   $captures = $self->{captures};
 
   # Method

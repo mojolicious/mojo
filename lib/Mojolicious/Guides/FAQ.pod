@@ -54,7 +54,7 @@ already have done in the past.
 
 =head2 Where can i discuss my patches for Mojolicious?
 
-We'd love to discuss your contributions to L<Mojolicious> on our official IRC channel C<#mojo> on C<irc.freenode.net>
+We'd love to discuss your contributions to L<Mojolicious> on our official IRC channel C<#mojo> on C<chat.freenode.net>
 (L<chat now!|https://webchat.freenode.net/#mojo>).
 
 =head2 Which versions of Perl are supported by Mojolicious?
@@ -244,7 +244,7 @@ authors.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.freenode.net>
+L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<chat.freenode.net>
 (L<chat now!|https://webchat.freenode.net/#mojo>).
 
 =cut

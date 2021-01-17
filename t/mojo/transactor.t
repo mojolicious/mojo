@@ -33,7 +33,6 @@ subtest 'Compression' => sub {
   is $t->tx(GET => '/')->res->content->auto_decompress, 0,     'right value';
 };
 
-
 subtest 'Simple GET' => sub {
   my $tx = $t->tx(GET => 'mojolicious.org/foo.html?bar=baz');
   is $tx->req->url->to_abs, 'http://mojolicious.org/foo.html?bar=baz', 'right URL';
@@ -212,7 +211,7 @@ subtest 'UTF-8 multipart form' => sub {
 subtest 'Multipart form (shift_jis)' => sub {
   my $tx
     = $t->tx(
-    POST      => 'http://example.com/foo' => {'Content-Type' => 'multipart/form-data'} => form => {'やった' => 'やった'} =>
+    POST => 'http://example.com/foo' => {'Content-Type' => 'multipart/form-data'} => form => {'やった' => 'やった'} =>
       charset => 'shift_jis');
   is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
   is $tx->req->method, 'POST', 'right method';
@@ -303,7 +302,7 @@ subtest 'Multipart form with filename ("0")' => sub {
 
 subtest 'Multipart form with asset and filename (UTF-8)' => sub {
   my $snowman = encode 'UTF-8', '☃';
-  my $tx = $t->tx(POST => 'http://example.com/foo' => form =>
+  my $tx      = $t->tx(POST => 'http://example.com/foo' => form =>
       {'"☃"' => {file => Mojo::Asset::Memory->new->add_chunk('snowman'), filename => '"☃".jpg'}});
   is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
   is $tx->req->method, 'POST', 'right method';

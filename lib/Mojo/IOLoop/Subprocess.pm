@@ -49,7 +49,7 @@ sub _start {
   return $self->$parent("Can't fork: $!") unless defined(my $pid = $self->{pid} = fork);
   unless ($pid) {
     eval {
-      $self->ioloop->reset;
+      $self->ioloop->reset({freeze => 1});
       my $results = eval { [$self->$child] } // [];
       print {$self->{writer}} '0-', $self->serialize->([$@, @$results]);
       $self->emit('cleanup');

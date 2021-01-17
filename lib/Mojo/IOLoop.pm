@@ -94,10 +94,17 @@ sub remove {
 }
 
 sub reset {
-  my $self = _instance(shift)->emit('reset');
+  my ($self, $options) = (_instance(shift), shift // {});
+
+  $self->emit('reset')->stop;
+  if ($options->{freeze}) {
+    state @frozen;
+    push @frozen, {%$self};
+    delete $self->{reactor};
+  }
+  else { $self->reactor->reset }
+
   delete @$self{qw(accepting acceptors events in out stop)};
-  $self->reactor->reset;
-  $self->stop;
 }
 
 sub server {
@@ -474,8 +481,23 @@ write buffers.
 
   Mojo::IOLoop->reset;
   $loop->reset;
+  $loop->reset({freeze => 1});
 
 Remove everything and stop the event loop.
+
+These options are currently available:
+
+=over 2
+
+=item freeze
+
+  freeze => 1
+
+Freeze the current state of the event loop in time before resetting it. This will prevent active connections from
+getting closed immediately, which can help with many unintended side effects when processes are forked. Note that this
+option is B<EXPERIMENTAL> and might change without warning!
+
+=back
 
 =head2 server
 

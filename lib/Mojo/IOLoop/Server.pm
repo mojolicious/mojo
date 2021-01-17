@@ -53,8 +53,8 @@ sub listen {
     if ($path) {
       path($path)->remove if -S $path;
       $options{Local} = $path;
-      $handle = $class->new(%options) or croak "Can't create listen socket: $!";
-      $reuse = $self->{reuse} = join ':', 'unix', $path, fileno $handle;
+      $handle         = $class->new(%options) or croak "Can't create listen socket: $!";
+      $reuse          = $self->{reuse} = join ':', 'unix', $path, fileno $handle;
     }
 
     # IP socket

@@ -16,7 +16,7 @@ sub run {
   for my $class (@{$app->renderer->classes}, @{$app->static->classes}) {
     for my $name (keys %{data_section $class}) {
       my $data = data_section $class, $name;
-      $data = encode 'UTF-8', $data unless file_is_binary $class, $name;
+      $data       = encode 'UTF-8', $data unless file_is_binary $class, $name;
       $all{$name} = $data;
     }
   }

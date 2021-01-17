@@ -1,4 +1,6 @@
 
+8.72  2021-01-18
+
 8.71  2021-01-17
   - Added EXPERIMENTAL freeze option to reset method in Mojo::IOLoop.
   - Improved Mojo::IOLoop::Subprocess not to close connections after fork.

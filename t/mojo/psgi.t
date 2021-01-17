@@ -28,7 +28,7 @@ post '/params' => sub {
 };
 
 get '/proxy' => sub {
-  my $c = shift;
+  my $c       = shift;
   my $reverse = join ':', $c->tx->remote_address, $c->req->url->to_abs->protocol;
   $c->render(text => $reverse);
 };

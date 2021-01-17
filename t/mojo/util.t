@@ -217,7 +217,7 @@ subtest 'UTF-8 url_unescape' => sub {
 };
 
 subtest 'html_unescape' => sub {
-  is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'), "<foo>bar<baz>&\"", 'right HTML unescaped result';
+  is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'), "<foo>bar<baz>&\"",   'right HTML unescaped result';
   is html_unescape('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'), "foo<baz>&\"\x{152}&Foo;", 'right HTML unescaped result';
 };
 

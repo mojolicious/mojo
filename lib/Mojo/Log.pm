@@ -39,7 +39,10 @@ sub append {
 
 sub debug { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
 
-sub context { $_[0]->new(parent => $_[0], context => $_[1], level => $_[0]->level) }
+sub context {
+  my ($self, @context) = @_;
+  return $self->new(parent => $self, context => \@context, level => $self->level);
+}
 
 sub error { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
 sub fatal { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
@@ -60,13 +63,13 @@ sub _default {
   my ($s, $m, $h, $day, $month, $year) = localtime $time;
   $time = sprintf '%04d-%02d-%02d %02d:%02d:%08.5f', $year + 1900, $month + 1, $day, $h, $m,
     "$s." . ((split /\./, $time)[1] // 0);
-  return "[$time] [$$] [$level] " . join "\n", @_, '';
+  return "[$time] [$$] [$level] " . join(' ', @_) . "\n";
 }
 
 sub _log {
   my ($self, $level) = (shift, pop);
   my @msgs = ref $_[0] eq 'CODE' ? $_[0]() : @_;
-  $msgs[0] = "$self->{context} $msgs[0]" if $self->{context};
+  unshift @msgs, @{$self->{context}} if $self->{context};
   ($self->{parent} || $self)->emit('message', $level, @msgs);
 }
 
@@ -197,7 +200,7 @@ Append message to L</"handle">.
 
 =head2 context
 
-  my $new = $log->context('[extra] [information]');
+  my $new = $log->context('[extra]', '[information]');
 
 Construct a new child L<Mojo::Log> object that will include context information with every log message.
 

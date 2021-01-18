@@ -21,9 +21,6 @@ sub parse {
 sub register {
   my ($self, $app, $conf) = @_;
 
-  # DEPRECATED!
-  $app->defaults(config => $app->config);
-
   # Override
   return $app->config if $app->config->{config_override};
 

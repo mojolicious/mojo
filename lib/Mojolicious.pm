@@ -27,19 +27,10 @@ has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {
   my $self = shift;
 
-  my $mode = $self->mode;
-  my $log  = Mojo::Log->new;
-
-  # DEPRECATED!
-  my $home = $self->home;
-  if (-d $home->child('log') && -w _) {
-    $log->path($home->child('log', "$mode.log"));
-    Mojo::Util::deprecated(qq{Logging to "log/$mode.log" is DEPRECATED});
-  }
-
   # Reduced log output outside of development mode
+  my $log = Mojo::Log->new;
   return $log->level($ENV{MOJO_LOG_LEVEL}) if $ENV{MOJO_LOG_LEVEL};
-  return $mode eq 'development' ? $log : $log->level('info');
+  return $self->mode eq 'development' ? $log : $log->level('info');
 };
 has 'max_request_size';
 has mode               => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
@@ -63,7 +54,7 @@ has types     => sub { Mojolicious::Types->new };
 has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Potted Plant';
+our $CODENAME = 'Waffle';
 our $VERSION  = '9.0';
 
 sub BUILD_DYNAMIC {

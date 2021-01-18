@@ -34,12 +34,6 @@ sub any { shift->_generate_route(ref $_[0] eq 'ARRAY' ? shift : [], @_) }
 
 sub delete { shift->_generate_route(DELETE => @_) }
 
-# DEPRECATED!
-sub detour {
-  Mojo::Util::deprecated 'Mojolicious::Routes::Route::detour is DEPRECATED';
-  shift->partial(1)->to(@_);
-}
-
 sub find { shift->_index->{shift()} }
 
 sub get { shift->_generate_route(GET => @_) }
@@ -72,13 +66,6 @@ sub name {
 }
 
 sub options { shift->_generate_route(OPTIONS => @_) }
-
-# DEPRECATED!
-sub over {
-  Mojo::Util::deprecated
-    'Mojolicious::Routes::Route::over is DEPRECATED in favor of Mojolicious::Routes::Route::requires';
-  shift->requires(@_);
-}
 
 sub parse {
   my $self = shift;
@@ -117,12 +104,6 @@ sub requires {
   $self->root->cache->max_keys(0);
 
   return $self;
-}
-
-# DEPRECATED!
-sub route {
-  Mojo::Util::deprecated 'Mojolicious::Routes::Route::route is DEPRECATED in favor of Mojolicious::Routes::Route::any';
-  shift->_route(@_);
 }
 
 sub suggested_method {
@@ -167,13 +148,6 @@ sub to_string {
 }
 
 sub under { shift->_generate_route(under => @_) }
-
-# DEPRECATED!
-sub via {
-  Mojo::Util::deprecated
-    'Mojolicious::Routes::Route::via is DEPRECATED in favor of Mojolicious::Routes::Route::methods';
-  shift->methods(@_);
-}
 
 sub websocket {
   my $route = shift->get(@_);

@@ -9,6 +9,7 @@ use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
+use Mojo::Promise;
 
 subtest 'Defaults' => sub {
   my $loop = Mojo::IOLoop->new;
@@ -177,20 +178,19 @@ subtest 'Stream' => sub {
       );
     }
   );
-  my $port  = Mojo::IOLoop->acceptor($id)->port;
-  my $delay = Mojo::IOLoop->delay;
-  my $end   = $delay->begin;
+  my $port    = Mojo::IOLoop->acceptor($id)->port;
+  my $promise = Mojo::Promise->new;
   my $handle;
   Mojo::IOLoop->client(
     {port => $port} => sub {
       my ($loop, $err, $stream) = @_;
       $handle = $stream->steal_handle;
-      $end->();
+      $promise->resolve;
       $stream->on(close => sub { $buffer .= 'should not happen' });
       $stream->on(error => sub { $buffer .= 'should not happen either' });
     }
   );
-  $delay->wait;
+  $promise->wait;
   my $stream = Mojo::IOLoop::Stream->new($handle);
   is $stream->timeout, 15, 'right default';
   is $stream->timeout(16)->timeout, 16, 'right timeout';
@@ -228,26 +228,26 @@ subtest 'Removed listen socket' => sub {
   ok !$loop->acceptor($id), 'acceptor has been removed';
 };
 
-subtest 'Removed connection (with delay)' => sub {
+subtest 'Removed connection (with promise)' => sub {
   my $removed;
-  my $delay = Mojo::IOLoop->delay(sub { $removed++ });
-  my $end   = $delay->begin;
-  my $id    = Mojo::IOLoop->server(
+  my $promise = Mojo::Promise->new;
+  $promise->then(sub { $removed++ });
+  my $id = Mojo::IOLoop->server(
     (address => '127.0.0.1') => sub {
       my ($loop, $stream) = @_;
-      $stream->on(close => $end);
+      $stream->on(close => sub { $promise->resolve });
     }
   );
-  my $port = Mojo::IOLoop->acceptor($id)->port;
-  my $end2 = $delay->begin;
+  my $port     = Mojo::IOLoop->acceptor($id)->port;
+  my $promise2 = Mojo::Promise->new;
   $id = Mojo::IOLoop->client(
     (port => $port) => sub {
       my ($loop, $err, $stream) = @_;
-      $stream->on(close => $end2);
+      $stream->on(close => sub { $promise2->resolve });
       $loop->remove($id);
     }
   );
-  $delay->wait;
+  Mojo::Promise->all($promise, $promise2)->wait;
   is $removed, 1, 'connection has been removed';
 };
 

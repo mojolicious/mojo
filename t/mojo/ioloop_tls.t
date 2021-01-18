@@ -27,44 +27,43 @@ plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Moj
 # openssl req -new -key bad.key -out bad.csr -subj "/C=US/CN=bad"
 # openssl req -x509 -days 7300 -key bad.key -in bad.csr -out bad.crt
 use Mojo::IOLoop;
+use Mojo::Promise;
 
 # Built-in certificate (and upgraded string)
 my $loop     = Mojo::IOLoop->new;
-my $delay    = $loop->delay;
 my $upgraded = "\x01\x00\x00\x00\x00\x00\xD0\x00\x0A\x00\x0B\x00\x00\x00\x84\x0B";
 utf8::upgrade $upgraded;
 my ($server, $client);
-my $end = $delay->begin;
-my $id  = $loop->server(
+my $promise = Mojo::Promise->new->ioloop($loop);
+my $id      = $loop->server(
   {address => '127.0.0.1', tls => 1} => sub {
     my ($loop, $stream) = @_;
     $stream->write($upgraded => sub { shift->write('321') });
-    $stream->on(close => $end);
+    $stream->on(close => sub { $promise->resolve });
     $stream->on(read  => sub { $server .= pop });
   }
 );
-my $port = $loop->acceptor($id)->port;
-my $end2 = $delay->begin;
+my $port     = $loop->acceptor($id)->port;
+my $promise2 = Mojo::Promise->new->ioloop($loop);
 $loop->client(
   {port => $port, tls => 1, tls_verify => 0x00} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
-    $stream->on(close => $end2);
+    $stream->on(close => sub { $promise2->resolve });
     $stream->on(read  => sub { $client .= pop });
     $stream->timeout(0.5);
   }
 );
-$delay->wait;
+Mojo::Promise->all($promise, $promise2)->wait;
 is $server, 'tset123',        'right content';
 is $client, "${upgraded}321", 'right content';
 
 # Valid client certificate
-$delay = Mojo::IOLoop->delay;
 ($server, $client) = ();
 my ($remove, $running, $timeout, $server_err, $server_close, $client_close);
 Mojo::IOLoop->remove(Mojo::IOLoop->recurring(0 => sub { $remove++ }));
-$end = $delay->begin;
-$id  = Mojo::IOLoop->server(
+$promise = Mojo::Promise->new;
+$id      = Mojo::IOLoop->server(
   address  => '127.0.0.1',
   tls      => 1,
   tls_ca   => 't/mojo/certs/ca.crt',
@@ -78,7 +77,7 @@ $id  = Mojo::IOLoop->server(
     $stream->on(
       close => sub {
         $server_close++;
-        $end->();
+        $promise->resolve;
       }
     );
     $stream->on(error => sub { $server_err = pop });
@@ -86,8 +85,8 @@ $id  = Mojo::IOLoop->server(
     $stream->timeout(0.5);
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->port;
-$end2 = $delay->begin;
+$port     = Mojo::IOLoop->acceptor($id)->port;
+$promise2 = Mojo::Promise->new;
 Mojo::IOLoop->client(
   port       => $port,
   tls        => 1,
@@ -100,13 +99,13 @@ Mojo::IOLoop->client(
     $stream->on(
       close => sub {
         $client_close++;
-        $end2->();
+        $promise2->resolve;
       }
     );
     $stream->on(read => sub { $client .= pop });
   }
 );
-$delay->wait;
+Mojo::Promise->all($promise, $promise2)->wait;
 is $server,       'tset123', 'right content';
 is $client,       'test321', 'right content';
 is $timeout,      1,         'server emitted timeout event once';
@@ -170,11 +169,10 @@ ok !$server_err, 'no error';
 ok $client_err, 'has error';
 
 # Valid client and server certificates
-$delay = Mojo::IOLoop->delay;
 ($running, $timeout, $server, $server_err, $server_close) = ();
 ($client, $client_close) = ();
-$end = $delay->begin;
-$id  = Mojo::IOLoop->server(
+$promise = Mojo::Promise->new;
+$id      = Mojo::IOLoop->server(
   address  => '127.0.0.1',
   tls      => 1,
   tls_ca   => 't/mojo/certs/ca.crt',
@@ -187,15 +185,15 @@ $id  = Mojo::IOLoop->server(
     $stream->on(
       close => sub {
         $server_close++;
-        $end->();
+        $promise->resolve;
       }
     );
     $stream->on(error => sub { $server_err = pop });
     $stream->on(read  => sub { $server .= pop });
   }
 );
-$port = Mojo::IOLoop->acceptor($id)->port;
-$end2 = $delay->begin;
+$port     = Mojo::IOLoop->acceptor($id)->port;
+$promise2 = Mojo::Promise->new;
 Mojo::IOLoop->client(
   port     => $port,
   tls      => 1,
@@ -209,14 +207,14 @@ Mojo::IOLoop->client(
     $stream->on(
       close => sub {
         $client_close++;
-        $end2->();
+        $promise2->resolve;
       }
     );
     $stream->on(read => sub { $client .= pop });
     $stream->timeout(0.5);
   }
 );
-$delay->wait;
+Mojo::Promise->all($promise, $promise2)->wait;
 is $server,       'tset123', 'right content';
 is $client,       'test321', 'right content';
 is $timeout,      1,         'server emitted timeout event once';

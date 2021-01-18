@@ -124,18 +124,11 @@ is $result, 25, 'right result';
 
 # Concurrent subprocesses
 ($fail, $result) = ();
-Mojo::IOLoop->delay(
-  sub {
-    my $delay = shift;
-    Mojo::IOLoop->subprocess(sub {1}, $delay->begin);
-    Mojo::IOLoop->subprocess->run(sub {2}, $delay->begin);
-  },
-  sub {
-    my ($delay, $err1, $result1, $err2, $result2) = @_;
-    $fail   = $err1 || $err2;
-    $result = [$result1, $result2];
-  }
-)->wait;
+my $promise  = Mojo::IOLoop->subprocess->run_p(sub {1});
+my $promise2 = Mojo::IOLoop->subprocess->run_p(sub {2});
+Mojo::Promise->all($promise, $promise2)->then(sub {
+  $result = [map { $_->[0] } @_];
+})->catch(sub { $fail = shift })->wait;
 ok !$fail, 'no error';
 is_deeply $result, [1, 2], 'right structure';
 
@@ -155,10 +148,10 @@ is_deeply $result, [], 'right structure';
 
 # Stream inherited from previous subprocesses
 ($fail, $result) = ();
-my $delay = Mojo::IOLoop->delay;
-my $me    = $$;
+my @promises;
+my $me = $$;
 for (0 .. 1) {
-  my $end        = $delay->begin;
+  push @promises, my $promise = Mojo::Promise->new;
   my $subprocess = Mojo::IOLoop::Subprocess->new;
   $subprocess->run(
     sub { 1 + 1 },
@@ -167,11 +160,11 @@ for (0 .. 1) {
       $fail ||= $err;
       push @$result, $two;
       is $me, $$, 'we are the parent';
-      $end->();
+      $promise->resolve;
     }
   );
 }
-$delay->wait;
+Mojo::Promise->all(@promises)->wait;
 ok !$fail, 'no error';
 is_deeply $result, [2, 2], 'right structure';
 

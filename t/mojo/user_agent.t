@@ -8,6 +8,7 @@ BEGIN {
 use Test::More;
 use Mojo::IOLoop;
 use Mojo::Message::Request;
+use Mojo::Promise;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojo::UserAgent::Server;
@@ -510,7 +511,7 @@ $tx = $ua->get("http://127.0.0.1:$port");
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
-$ua->ioloop->delay->timer(1)->wait;
+Mojo::Promise->new->ioloop($ua->ioloop)->timer(1)->wait;
 $tx = $ua->get("http://127.0.0.1:$port");
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
@@ -733,16 +734,10 @@ is $tx->res->body, 'Hi!', 'right content';
 # Connection limit
 $ua     = Mojo::UserAgent->new(max_connections => 2);
 $result = undef;
-Mojo::IOLoop->delay(
-  sub {
-    my $delay = shift;
-    $ua->get('/' => $delay->begin) for 1 .. 5;
-  },
-  sub {
-    my $delay = shift;
-    $result = [grep {defined} map { Mojo::IOLoop->stream($_->connection) } @_];
-  }
-)->wait;
+my @txs = map { $ua->get_p('/') } 1 .. 5;
+Mojo::Promise->all(@txs)->then(sub {
+  $result = [grep {defined} map { Mojo::IOLoop->stream($_->connection) } map { $_->[0] } @_];
+})->wait;
 is scalar @$result, 2, 'two active connections';
 
 done_testing();

@@ -9,6 +9,7 @@ use Test::More;
 use IO::Socket::INET;
 use Mojo::File qw(curfile path);
 use Mojo::IOLoop;
+use Mojo::Promise;
 use Mojo::Log;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
@@ -213,11 +214,13 @@ subtest 'POST request' => sub {
 subtest 'Concurrent requests' => sub {
   my $tx = $ua->post('/fun/' => {Expect => 'fun'} => 'foo bar baz' x 128);
   my ($tx2, $tx3);
-  my $delay = Mojo::IOLoop->delay(sub { (undef, $tx, $tx2, $tx3) = @_ });
-  $ua->get('/concurrent1/' => $delay->begin);
-  $ua->post('/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
-  $ua->get('/concurrent3/' => $delay->begin);
-  $delay->wait;
+  Mojo::Promise->all(
+    $ua->get_p('/concurrent1/'),
+    $ua->post_p('/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128),
+    $ua->get_p('/concurrent3/')
+  )->then(sub {
+    ($tx, $tx2, $tx3) = map { $_->[0] } @_;
+  })->wait;
   ok $tx->is_finished, 'transaction is finished';
   is $tx->res->body, 'Whatever!', 'right content';
   ok !$tx->error, 'no error';

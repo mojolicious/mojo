@@ -9,24 +9,27 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)' unless $EN
 plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Mojo::IOLoop::TLS->can_tls;
 
 use Mojo::IOLoop;
+use Mojo::Promise;
 use Socket;
 
 # Built-in certificate
 socketpair(my $client_sock, my $server_sock, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die "Couldn't create socket pair: $!";
 $client_sock->blocking(0);
 $server_sock->blocking(0);
-my $delay  = Mojo::IOLoop->delay;
-my $server = Mojo::IOLoop::TLS->new($server_sock);
-$server->once(upgrade => $delay->begin);
+my $promise  = Mojo::Promise->new;
+my $promise2 = Mojo::Promise->new;
+my $server   = Mojo::IOLoop::TLS->new($server_sock);
+$server->once(upgrade => sub { $promise->resolve(pop) });
 $server->once(error   => sub { warn pop });
 $server->negotiate({server => 1});
 my $client = Mojo::IOLoop::TLS->new($client_sock);
-$client->once(upgrade => $delay->begin);
+$client->once(upgrade => sub { $promise2->resolve(pop) });
 $client->once(error   => sub { warn pop });
 $client->negotiate(tls_verify => 0x00);
 my ($client_result, $server_result);
-$delay->then(sub { ($server_result, $client_result) = @_ });
-$delay->wait;
+Mojo::Promise->all($promise, $promise2)->then(sub {
+  ($server_result, $client_result) = map { $_->[0] } @_;
+})->wait;
 is ref $client_result, 'IO::Socket::SSL', 'right class';
 is ref $server_result, 'IO::Socket::SSL', 'right class';
 
@@ -36,18 +39,20 @@ socketpair(my $client_sock2, my $server_sock2, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
   or die "Couldn't create socket pair: $!";
 $client_sock2->blocking(0);
 $server_sock2->blocking(0);
-$delay  = $loop->delay;
-$server = Mojo::IOLoop::TLS->new($server_sock2)->reactor($loop->reactor);
-$server->once(upgrade => $delay->begin);
+$promise  = Mojo::Promise->new->ioloop($loop);
+$promise2 = Mojo::Promise->new->ioloop($loop);
+$server   = Mojo::IOLoop::TLS->new($server_sock2)->reactor($loop->reactor);
+$server->once(upgrade => sub { $promise->resolve(pop) });
 $server->once(error   => sub { warn pop });
 $server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL');
 $client = Mojo::IOLoop::TLS->new($client_sock2)->reactor($loop->reactor);
-$client->once(upgrade => $delay->begin);
+$client->once(upgrade => sub { $promise2->resolve(pop) });
 $client->once(error   => sub { warn pop });
 $client->negotiate(tls_verify => 0x00);
 $client_result = $server_result = undef;
-$delay->then(sub { ($server_result, $client_result) = @_ });
-$delay->wait;
+Mojo::Promise->all($promise, $promise2)->then(sub {
+  ($server_result, $client_result) = map { $_->[0] } @_;
+})->wait;
 is ref $client_result, 'IO::Socket::SSL', 'right class';
 is ref $server_result, 'IO::Socket::SSL', 'right class';
 my $expect = $server_result->get_sslversion eq 'TLSv1_3' ? 'TLS_AES_256_GCM_SHA384' : 'AES256-SHA';

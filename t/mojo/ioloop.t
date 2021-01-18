@@ -6,7 +6,6 @@ use Test::More;
 use IO::Socket::IP;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Client;
-use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Promise;
@@ -387,7 +386,6 @@ subtest 'Exception in timer' => sub {
 
 subtest 'Defaults' => sub {
   is(Mojo::IOLoop::Client->new->reactor, Mojo::IOLoop->singleton->reactor, 'right default');
-  is(Mojo::IOLoop::Delay->new->ioloop,   Mojo::IOLoop->singleton,          'right default');
   is(Mojo::IOLoop::Server->new->reactor, Mojo::IOLoop->singleton->reactor, 'right default');
   is(Mojo::IOLoop::Stream->new->reactor, Mojo::IOLoop->singleton->reactor, 'right default');
 };

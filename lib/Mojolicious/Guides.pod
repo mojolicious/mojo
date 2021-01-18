@@ -338,12 +338,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojo::Promise>
 
-=over 2
-
-=item * L<Mojo::IOLoop::Delay>
-
-=back
-
 =item * L<Mojo::Server::Hypnotoad>
 
 =item * L<Mojo::Server::Morbo>

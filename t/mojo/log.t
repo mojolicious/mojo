@@ -71,8 +71,7 @@ subtest 'Short log messages (systemd)' => sub {
   like $log->format->(time, 'warn',  'Test 123'), qr/^<4>\[\d+\] \[w\] Test 123\n$/, 'right format';
   like $log->format->(time, 'error', 'Test 123'), qr/^<3>\[\d+\] \[e\] Test 123\n$/, 'right format';
   like $log->format->(time, 'fatal', 'Test 123'), qr/^<2>\[\d+\] \[f\] Test 123\n$/, 'right format';
-  like $log->format->(time, 'debug', 'Test', '1', '2', '3'), qr/^<7>\[\d+\] \[d\] Test\n<7>1\n<7>2\n<7>3\n$/,
-    'right format';
+  like $log->format->(time, 'debug', 'Test', '1', '2', '3'), qr/^<7>\[\d+\] \[d\] Test 1 2 3\n$/, 'right format';
 };
 
 subtest 'Events' => sub {

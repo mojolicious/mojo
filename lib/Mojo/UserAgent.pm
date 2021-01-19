@@ -42,7 +42,7 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
   };
 }
 
-sub DESTROY { Mojo::Util::_global_destruction() or shift->_cleanup }
+sub DESTROY { shift->_cleanup unless ${^GLOBAL_PHASE} eq 'DESTRUCT' }
 
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }

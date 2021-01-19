@@ -9,7 +9,7 @@ use Scalar::Util qw(weaken);
 has high_water_mark => 1048576;
 has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 
-sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
+sub DESTROY { shift->close unless ${^GLOBAL_PHASE} eq 'DESTRUCT' }
 
 sub bytes_read { shift->{read} || 0 }
 

@@ -29,7 +29,7 @@ post '/params' => sub {
 
 get '/proxy' => sub {
   my $c       = shift;
-  my $reverse = join ':', $c->tx->remote_address, $c->req->url->to_abs->protocol;
+  my $reverse = join ':', grep {length} $c->tx->remote_address, $c->req->url->to_abs->protocol;
   $c->render(text => $reverse);
 };
 
@@ -213,8 +213,8 @@ subtest 'Reverse proxy' => sub {
     SCRIPT_NAME              => '/',
     HTTP_HOST                => 'localhost:8080',
     SERVER_PROTOCOL          => 'HTTP/1.1',
-    'HTTP_X_Forwarded_For'   => '192.0.2.2, 192.0.2.1',
-    'HTTP_X_Forwarded_Proto' => 'https',
+    HTTP_X_FORWARDED_FOR     => '192.0.2.2, 192.0.2.1',
+    HTTP_X_FORWARDED_PROTO   => 'https',
     'psgi.version'           => [1, 0],
     'psgi.url_scheme'        => 'http',
     'psgi.input'             => *STDIN,
@@ -236,6 +236,79 @@ subtest 'Reverse proxy' => sub {
   my $body = '';
   while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
   is $body, '192.0.2.1:https', 'right content';
+  is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
+  $res->[2]->close;
+  is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
+};
+
+subtest 'Trusted proxies' => sub {
+  my $env = {
+    CONTENT_LENGTH           => 0,
+    PATH_INFO                => '/proxy',
+    REQUEST_METHOD           => 'GET',
+    SCRIPT_NAME              => '/',
+    HTTP_HOST                => 'localhost:8080',
+    REMOTE_ADDR              => '127.0.0.1',
+    SERVER_PROTOCOL          => 'HTTP/1.1',
+    HTTP_X_FORWARDED_FOR     => '10.10.10.10, 192.0.2.2, 192.0.2.1',
+    HTTP_X_FORWARDED_PROTO   => 'https',
+    'psgi.version'           => [1, 0],
+    'psgi.url_scheme'        => 'http',
+    'psgi.input'             => *STDIN,
+    'psgi.errors'            => *STDERR,
+    'psgi.multithread'       => 0,
+    'psgi.multiprocess'      => 1,
+    'psgi.run_once'          => 0
+  };
+  my ($app, $res);
+  {
+    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
+    $app = Mojolicious::Command::psgi->new(app => app)->run;
+    $res = $app->($env);
+  }
+  is $res->[0], 200, 'right status';
+  my %headers = @{$res->[1]};
+  is $headers{'Content-Length'}, 17,                        'right "Content-Length" value';
+  is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
+  my $body = '';
+  while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
+  is $body, '10.10.10.10:https', 'right content';
+  is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
+  $res->[2]->close;
+  is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
+};
+
+subtest 'Trusted proxies (no REMOTE_ADDR)' => sub {
+  my $env = {
+    CONTENT_LENGTH           => 0,
+    PATH_INFO                => '/proxy',
+    REQUEST_METHOD           => 'GET',
+    SCRIPT_NAME              => '/',
+    HTTP_HOST                => 'localhost:8080',
+    SERVER_PROTOCOL          => 'HTTP/1.1',
+    'HTTP_X_Forwarded_For'   => '10.10.10.10, 192.0.2.2, 192.0.2.1',
+    'HTTP_X_Forwarded_Proto' => 'https',
+    'psgi.version'           => [1, 0],
+    'psgi.url_scheme'        => 'http',
+    'psgi.input'             => *STDIN,
+    'psgi.errors'            => *STDERR,
+    'psgi.multithread'       => 0,
+    'psgi.multiprocess'      => 1,
+    'psgi.run_once'          => 0
+  };
+  my ($app, $res);
+  {
+    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
+    $app = Mojolicious::Command::psgi->new(app => app)->run;
+    $res = $app->($env);
+  }
+  is $res->[0], 200, 'right status';
+  my %headers = @{$res->[1]};
+  is $headers{'Content-Length'}, 5,                         'right "Content-Length" value';
+  is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
+  my $body = '';
+  while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
+  is $body, 'https', 'right content';
   is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
   $res->[2]->close;
   is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';

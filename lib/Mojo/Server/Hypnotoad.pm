@@ -21,9 +21,10 @@ sub configure {
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 
   # Pre-fork settings
-  $prefork->reverse_proxy($c->{proxy})   if defined $c->{proxy};
-  $prefork->max_clients($c->{clients})   if $c->{clients};
-  $prefork->max_requests($c->{requests}) if $c->{requests};
+  $prefork->reverse_proxy($c->{proxy})             if defined $c->{proxy};
+  $prefork->trusted_proxies($c->{trusted_proxies}) if defined $c->{trusted_proxies};
+  $prefork->max_clients($c->{clients})             if $c->{clients};
+  $prefork->max_requests($c->{requests})           if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval heartbeat_timeout inactivity_timeout keep_alive_timeout),
     qw(listen pid_file spare workers);
@@ -330,6 +331,12 @@ Number of keep-alive requests per connection, defaults to the value of L<Mojo::S
 Temporarily spawn up to this number of additional workers if there is a need, defaults to the value of
 L<Mojo::Server::Prefork/"spare">. This allows for new workers to be started while old ones are still shutting down
 gracefully, drastically reducing the performance cost of worker restarts.
+
+=head2 trusted_proxies
+
+  trusted_proxies => ['10.0/8', '127.0.0.1', '172.16.0/12', '192.168.0/16', 'fc00::/7']
+
+Trusted reverse proxies, addresses or networks in CIDR form.
 
 =head2 upgrade_timeout
 

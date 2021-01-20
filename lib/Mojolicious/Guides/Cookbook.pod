@@ -106,7 +106,10 @@ instead of something meaningful for the client, like this:
 
 To solve these problems, you can configure your reverse proxy to send the missing data (see L</Nginx> and
 L</"Apache/mod_proxy">) and tell your application about it by setting the environment variable C<MOJO_REVERSE_PROXY>.
-For finer control, L</Rewriting> includes examples of how the changes could be implemented manually.
+In more complex situations, usually involving multiple proxies or proxies that live outside your network, it can be
+necessary to tell the application from which ip addresses to expect proxy requests by setting C<MOJO_TRUSTED_PROXIES>
+to a list of comma separated addresses or CIDR networks. For even finer control, L</Rewriting> includes examples of how
+the changes could be implemented manually.
 
 =head1 DEPLOYMENT
 

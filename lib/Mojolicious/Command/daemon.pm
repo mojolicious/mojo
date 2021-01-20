@@ -7,7 +7,7 @@ use Mojo::Util qw(getopt);
 has description => 'Start application with HTTP and WebSocket server';
 has usage       => sub { shift->extract_usage };
 
-sub run {
+sub build_server {
   my ($self, @args) = @_;
 
   my $daemon = Mojo::Server::Daemon->new(app => $self->app);
@@ -18,12 +18,16 @@ sub run {
     'i|inactivity-timeout=i' => sub { $daemon->inactivity_timeout($_[1]) },
     'k|keep-alive-timeout=i' => sub { $daemon->keep_alive_timeout($_[1]) },
     'l|listen=s'             => \my @listen,
-    'p|proxy'                => sub { $daemon->reverse_proxy(1) },
+    'p|proxy:s'              => \my @proxy,
     'r|requests=i'           => sub { $daemon->max_requests($_[1]) };
 
   $daemon->listen(\@listen) if @listen;
-  $daemon->run;
+  $daemon->reverse_proxy(1) if @proxy;
+  $daemon->trusted_proxies([grep {length} @proxy]);
+  return $daemon;
 }
+
+sub run { shift->build_server(@_)->run }
 
 1;
 
@@ -38,10 +42,11 @@ Mojolicious::Command::daemon - Daemon command
   Usage: APPLICATION daemon [OPTIONS]
 
     ./myapp.pl daemon
-    ./myapp.pl daemon -m production -l http://*:8080
+    ./myapp.pl daemon -m production -p -l http://*:8080
     ./myapp.pl daemon -l http://127.0.0.1:8080 -l https://[::]:8081
     ./myapp.pl daemon -l 'https://*:443?cert=./server.crt&key=./server.key'
     ./myapp.pl daemon -l http+unix://%2Ftmp%2Fmyapp.sock
+    ./myapp.pl daemon -l http://127.0.0.1:8080 -p 127.0/8 -p fc00::/7
 
   Options:
     -b, --backlog <size>                 Listen backlog size, defaults to
@@ -62,9 +67,11 @@ Mojolicious::Command::daemon - Daemon command
     -m, --mode <name>                    Operating mode for your application,
                                          defaults to the value of
                                          MOJO_MODE/PLACK_ENV or "development"
-    -p, --proxy                          Activate reverse proxy support,
+    -p, --proxy [<network>]              Activate reverse proxy support,
                                          defaults to the value of
-                                         MOJO_REVERSE_PROXY
+                                         MOJO_REVERSE_PROXY, optionally takes
+                                         one or more trusted proxy addresses or
+                                         networks
     -r, --requests <number>              Maximum number of requests per
                                          keep-alive connection, defaults to 100
 
@@ -100,6 +107,12 @@ Usage information for this command, used for the help screen.
 
 L<Mojolicious::Command::daemon> inherits all methods from L<Mojolicious::Command> and implements the following new
 ones.
+
+=head2 build_server
+
+  my $server = $daemon->build_server(@ARGV);
+
+Build L<Mojo::Server::Daemon> instance from command line arguments.
 
 =head2 run
 

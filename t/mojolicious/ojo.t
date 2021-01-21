@@ -10,48 +10,56 @@ use Test::More;
 use ojo;
 use File::Basename qw(basename);
 
-# Application
-a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })->secrets(['foobarbaz']);
-is a->secrets->[0], 'foobarbaz', 'right secret';
+subtest 'Application' => sub {
+  a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })->secrets(['foobarbaz']);
+  is a->secrets->[0], 'foobarbaz', 'right secret';
+};
 
-# Requests
-is g('/')->body, 'GET',     'right content';
-is h('/')->body, '',        'no content';
-is o('/')->body, 'OPTIONS', 'right content';
-is t('/')->body, 'PATCH',   'right content';
-is p('/')->body, 'POST',    'right content';
-is u('/')->body, 'PUT',     'right content';
-is d('/')->body, 'DELETE',  'right content';
-is p('/' => form => {foo => 'bar'})->body, 'POSTfoo=bar',       'right content';
-is p('/' => json => {foo => 'bar'})->body, 'POST{"foo":"bar"}', 'right content';
+subtest 'Requests' => sub {
+  is g('/')->body, 'GET',     'right content';
+  is h('/')->body, '',        'no content';
+  is o('/')->body, 'OPTIONS', 'right content';
+  is t('/')->body, 'PATCH',   'right content';
+  is p('/')->body, 'POST',    'right content';
+  is u('/')->body, 'PUT',     'right content';
+  is d('/')->body, 'DELETE',  'right content';
+  is p('/' => form => {foo => 'bar'})->body, 'POSTfoo=bar',       'right content';
+  is p('/' => json => {foo => 'bar'})->body, 'POST{"foo":"bar"}', 'right content';
+};
 
-# Mojolicious::Lite
-get '/test' => {text => 'pass'};
-is app->ua->get('/test')->res->body, 'pass', 'right content';
+subtest 'Mojolicious::Lite' => sub {
+  get '/test' => {text => 'pass'};
+  is app->ua->get('/test')->res->body, 'pass', 'right content';
+};
 
-# Parse XML
-is x('<title>works</title>')->at('title')->text, 'works', 'right text';
+subtest 'Parse XML' => sub {
+  is x('<title>works</title>')->at('title')->text, 'works', 'right text';
+};
 
-# JSON
-is j([1, 2]), '[1,2]', 'right result';
-is_deeply j('[1,2]'), [1, 2], 'right structure';
-is j({foo => 'bar'}), '{"foo":"bar"}', 'right result';
-is_deeply j('{"foo":"bar"}'), {foo => 'bar'}, 'right structure';
+subtest 'JSON' => sub {
+  is j([1, 2]), '[1,2]', 'right result';
+  is_deeply j('[1,2]'), [1, 2], 'right structure';
+  is j({foo => 'bar'}), '{"foo":"bar"}', 'right result';
+  is_deeply j('{"foo":"bar"}'), {foo => 'bar'}, 'right structure';
+};
 
-# ByteStream
-is b('<foo>')->url_escape, '%3Cfoo%3E', 'right result';
+subtest 'ByteStream' => sub {
+  is b('<foo>')->url_escape, '%3Cfoo%3E', 'right result';
+};
 
-# Collection
-is c(1, 2, 3)->join('-'), '1-2-3', 'right result';
+subtest 'Collection' => sub {
+  is c(1, 2, 3)->join('-'), '1-2-3', 'right result';
+};
 
-# File
-is f(__FILE__)->basename, basename(__FILE__), 'right result';
+subtest 'File' => sub {
+  is f(__FILE__)->basename, basename(__FILE__), 'right result';
+};
 
-# Dumper
-is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
+subtest 'Dumper' => sub {
+  is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
+};
 
-# Benchmark
-{
+subtest 'Benchmark' => sub {
   my $buffer = '';
   open my $handle, '>', \$buffer;
   local *STDERR = $handle;
@@ -60,11 +68,12 @@ is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
   is $i,        1,             'block has been executed once';
   like $buffer, qr/wallclock/, 'right output';
   n { $i++ } 10;
-  is $i,        11,                        'block has been executed ten times';
+  is $i, 11, 'block has been executed ten times';
   like $buffer, qr/wallclock.*wallclock/s, 'right output';
-}
+};
 
-# Link
-is l("http://mojolicious.org/")->path, '/', 'right result';
+subtest 'Link' => sub {
+  is l("http://mojolicious.org/")->path, '/', 'right result';
+};
 
 done_testing();

@@ -1,5 +1,10 @@
 
-8.72  2021-01-18
+8.72  2021-01-21
+  - Added support for trusted reverse proxies. (jberger)
+  - Added network_contains function to Mojo::Util. (jberger)
+  - Added trusted_proxies attribute to Mojo::Server and Mojo::Message::Request. (jberger)
+  - Added trusted_proxies option to Hynotoad. (jberger)
+  - Added build_server method to Mojolicious::Command::daemon and Mojolicious::Command::prefork. (jberger)
 
 8.71  2021-01-17
   - Added EXPERIMENTAL freeze option to reset method in Mojo::IOLoop.

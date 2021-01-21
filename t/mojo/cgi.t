@@ -160,13 +160,13 @@ subtest 'Reverse proxy' => sub {
   local *STDOUT;
   open STDOUT, '>', \$msg;
   local %ENV = (
-    PATH_INFO                => '/proxy',
-    REQUEST_METHOD           => 'GET',
-    SCRIPT_NAME              => '/',
-    HTTP_HOST                => 'localhost:8080',
-    SERVER_PROTOCOL          => 'HTTP/1.0',
-    HTTP_X_FORWARDED_FOR     => '192.0.2.2, 192.0.2.1',
-    HTTP_X_FORWARDED_PROTO   => 'https'
+    PATH_INFO              => '/proxy',
+    REQUEST_METHOD         => 'GET',
+    SCRIPT_NAME            => '/',
+    HTTP_HOST              => 'localhost:8080',
+    SERVER_PROTOCOL        => 'HTTP/1.0',
+    HTTP_X_FORWARDED_FOR   => '192.0.2.2, 192.0.2.1',
+    HTTP_X_FORWARDED_PROTO => 'https'
   );
   local $ENV{MOJO_REVERSE_PROXY} = 1;
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
@@ -184,14 +184,14 @@ subtest 'Trusted proxies' => sub {
   local *STDOUT;
   open STDOUT, '>', \$msg;
   local %ENV = (
-    PATH_INFO                => '/proxy',
-    REQUEST_METHOD           => 'GET',
-    SCRIPT_NAME              => '/',
-    HTTP_HOST                => 'localhost:8080',
-    REMOTE_ADDR              => '127.0.0.1',
-    SERVER_PROTOCOL          => 'HTTP/1.0',
-    HTTP_X_FORWARDED_FOR     => '10.10.10.10, 192.0.2.2, 192.0.2.1',
-    HTTP_X_FORWARDED_PROTO   => 'https'
+    PATH_INFO              => '/proxy',
+    REQUEST_METHOD         => 'GET',
+    SCRIPT_NAME            => '/',
+    HTTP_HOST              => 'localhost:8080',
+    REMOTE_ADDR            => '127.0.0.1',
+    SERVER_PROTOCOL        => 'HTTP/1.0',
+    HTTP_X_FORWARDED_FOR   => '10.10.10.10, 192.0.2.2, 192.0.2.1',
+    HTTP_X_FORWARDED_PROTO => 'https'
   );
   local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
@@ -209,13 +209,13 @@ subtest 'Trusted proxies (no REMOTE_ADDR)' => sub {
   local *STDOUT;
   open STDOUT, '>', \$msg;
   local %ENV = (
-    PATH_INFO                => '/proxy',
-    REQUEST_METHOD           => 'GET',
-    SCRIPT_NAME              => '/',
-    HTTP_HOST                => 'localhost:8080',
-    SERVER_PROTOCOL          => 'HTTP/1.0',
-    HTTP_X_FORWARDED_FOR     => '10.10.10.10, 192.0.2.2, 192.0.2.1',
-    HTTP_X_FORWARDED_PROTO   => 'https'
+    PATH_INFO              => '/proxy',
+    REQUEST_METHOD         => 'GET',
+    SCRIPT_NAME            => '/',
+    HTTP_HOST              => 'localhost:8080',
+    SERVER_PROTOCOL        => 'HTTP/1.0',
+    HTTP_X_FORWARDED_FOR   => '10.10.10.10, 192.0.2.2, 192.0.2.1',
+    HTTP_X_FORWARDED_PROTO => 'https'
   );
   local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');

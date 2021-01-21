@@ -207,21 +207,21 @@ subtest 'Cookies' => sub {
 
 subtest 'Reverse proxy' => sub {
   my $env = {
-    CONTENT_LENGTH           => 0,
-    PATH_INFO                => '/proxy',
-    REQUEST_METHOD           => 'GET',
-    SCRIPT_NAME              => '/',
-    HTTP_HOST                => 'localhost:8080',
-    SERVER_PROTOCOL          => 'HTTP/1.1',
-    HTTP_X_FORWARDED_FOR     => '192.0.2.2, 192.0.2.1',
-    HTTP_X_FORWARDED_PROTO   => 'https',
-    'psgi.version'           => [1, 0],
-    'psgi.url_scheme'        => 'http',
-    'psgi.input'             => *STDIN,
-    'psgi.errors'            => *STDERR,
-    'psgi.multithread'       => 0,
-    'psgi.multiprocess'      => 1,
-    'psgi.run_once'          => 0
+    CONTENT_LENGTH         => 0,
+    PATH_INFO              => '/proxy',
+    REQUEST_METHOD         => 'GET',
+    SCRIPT_NAME            => '/',
+    HTTP_HOST              => 'localhost:8080',
+    SERVER_PROTOCOL        => 'HTTP/1.1',
+    HTTP_X_FORWARDED_FOR   => '192.0.2.2, 192.0.2.1',
+    HTTP_X_FORWARDED_PROTO => 'https',
+    'psgi.version'         => [1, 0],
+    'psgi.url_scheme'      => 'http',
+    'psgi.input'           => *STDIN,
+    'psgi.errors'          => *STDERR,
+    'psgi.multithread'     => 0,
+    'psgi.multiprocess'    => 1,
+    'psgi.run_once'        => 0
   };
   my ($app, $res);
   {
@@ -243,22 +243,22 @@ subtest 'Reverse proxy' => sub {
 
 subtest 'Trusted proxies' => sub {
   my $env = {
-    CONTENT_LENGTH           => 0,
-    PATH_INFO                => '/proxy',
-    REQUEST_METHOD           => 'GET',
-    SCRIPT_NAME              => '/',
-    HTTP_HOST                => 'localhost:8080',
-    REMOTE_ADDR              => '127.0.0.1',
-    SERVER_PROTOCOL          => 'HTTP/1.1',
-    HTTP_X_FORWARDED_FOR     => '10.10.10.10, 192.0.2.2, 192.0.2.1',
-    HTTP_X_FORWARDED_PROTO   => 'https',
-    'psgi.version'           => [1, 0],
-    'psgi.url_scheme'        => 'http',
-    'psgi.input'             => *STDIN,
-    'psgi.errors'            => *STDERR,
-    'psgi.multithread'       => 0,
-    'psgi.multiprocess'      => 1,
-    'psgi.run_once'          => 0
+    CONTENT_LENGTH         => 0,
+    PATH_INFO              => '/proxy',
+    REQUEST_METHOD         => 'GET',
+    SCRIPT_NAME            => '/',
+    HTTP_HOST              => 'localhost:8080',
+    REMOTE_ADDR            => '127.0.0.1',
+    SERVER_PROTOCOL        => 'HTTP/1.1',
+    HTTP_X_FORWARDED_FOR   => '10.10.10.10, 192.0.2.2, 192.0.2.1',
+    HTTP_X_FORWARDED_PROTO => 'https',
+    'psgi.version'         => [1, 0],
+    'psgi.url_scheme'      => 'http',
+    'psgi.input'           => *STDIN,
+    'psgi.errors'          => *STDERR,
+    'psgi.multithread'     => 0,
+    'psgi.multiprocess'    => 1,
+    'psgi.run_once'        => 0
   };
   my ($app, $res);
   {

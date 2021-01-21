@@ -15,7 +15,7 @@ use Mojo::DOM::HTML;
 use Scalar::Util qw(blessed weaken);
 use Storable qw(dclone);
 
-sub all_text { _text(_nodes(shift->tree), 1) }
+sub all_text { _text(_nodes($_[0]->tree), $_[0]->xml, 1) }
 
 sub ancestors { _select($_[0]->_collect([_ancestors($_[0]->tree)]), $_[1]) }
 
@@ -166,7 +166,7 @@ sub tag {
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
-sub text { _text(_nodes(shift->tree), 0) }
+sub text { _text(_nodes(shift->tree), 0, 0) }
 
 sub to_string { ${shift()}->render }
 
@@ -319,7 +319,7 @@ sub _siblings {
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
 
 sub _text {
-  my ($nodes, $all) = @_;
+  my ($nodes, $xml, $all) = @_;
 
   my $text = '';
   while (my $node = shift @$nodes) {
@@ -329,7 +329,9 @@ sub _text {
     if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') { $text .= $node->[1] }
 
     # Nested tag
-    elsif ($type eq 'tag' && $all) { unshift @$nodes, @{_nodes($node)} }
+    elsif ($type eq 'tag' && $all) {
+      unshift @$nodes, @{_nodes($node)} if $xml || ($node->[1] ne 'script' && $node->[1] ne 'style');
+    }
   }
 
   return $text;
@@ -460,7 +462,8 @@ L<Mojo::DOM> implements the following methods.
 
   my $text = $dom->all_text;
 
-Extract text content from all descendant nodes of this element.
+Extract text content from all descendant nodes of this element. For HTML documents C<script> and C<style> elements are
+excluded.
 
   # "foo\nbarbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->all_text;

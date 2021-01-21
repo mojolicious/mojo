@@ -2772,6 +2772,40 @@ EOF
   is $dom->at('body > textarea')->text,  'C',         'right text';
 };
 
+subtest 'Exclude "<script>" and "<style>" from text extraction in HTML documents' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+  <html>
+    <head>
+      <title>Hello</title>
+      <script>123</script>
+      <style>456</style>
+    </head>
+    <body>
+      <script>123</script>
+      <div>Mojo!</div>
+      <style>456</style>
+    </body>
+  <html>
+EOF
+  like $dom->at('html')->all_text,   qr/Hello.*Mojo!/s, 'title and div';
+  unlike $dom->at('html')->all_text, qr/123/,           'no script';
+  unlike $dom->at('html')->all_text, qr/456/,           'no style';
+  like $dom->at('script')->text,     qr/123/,           'script text';
+  like $dom->at('style')->text,      qr/456/,           'style text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <title>Hello</title>
+    <script>123</script>
+    <style>456</style>
+   </foo>
+EOF
+  like $dom->at('foo')->all_text, qr/Hello.*123.*456/s, 'everything';
+  like $dom->at('script')->text,  qr/123/,              'script text';
+  like $dom->at('style')->text,   qr/456/,              'style text';
+};
+
 subtest 'Reusing fragments' => sub {
   my $fragment = Mojo::DOM->new('<a><b>C</b></a>');
   my $dom      = Mojo::DOM->new('<div></div>');

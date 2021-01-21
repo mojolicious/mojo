@@ -68,7 +68,7 @@ subtest 'Benchmark' => sub {
   is $i,        1,             'block has been executed once';
   like $buffer, qr/wallclock/, 'right output';
   n { $i++ } 10;
-  is $i, 11, 'block has been executed ten times';
+  is $i,        11,                        'block has been executed ten times';
   like $buffer, qr/wallclock.*wallclock/s, 'right output';
 };
 

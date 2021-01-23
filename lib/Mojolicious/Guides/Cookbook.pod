@@ -541,6 +541,20 @@ L<Mojo::URL> objects are very easy to manipulate, just make sure that the URL (C
 the routing destination, is always relative to the base URL (C<http://example.com/myapp/>), which represents the
 deployment location of your application.
 
+=head2 Deployment specific plugins
+
+Deployment specific 3rd party plugins such as L<Mojolicious::Plugin::SetUserGroup> do not need to be included in your
+application code. They can also be loaded later on via the reserved C<plugins> value for L<Mojolicious> applications
+that are using any one of the built-in configuration plugins L<Mojolicious::Plguin::Config>,
+L<Mojolicious::Plugin::JSONConfig> or L<Mojolicious::Plugin::NotYAMLConfig>.
+
+  # myapp.conf
+  {
+    plugins => [
+      {SetUserGroup => {user => 'sri', group => 'staff'}}
+    ]
+  };
+
 =head2 Application embedding
 
 From time to time you might want to reuse parts of L<Mojolicious> applications like configuration files, database

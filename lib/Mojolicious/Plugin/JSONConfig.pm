@@ -78,8 +78,24 @@ application home directory will be generated from the value of L<Mojolicious/"mo
 extend the normal configuration file C<$moniker.json> with C<mode> specific ones like C<$moniker.$mode.json>, which
 will be detected automatically.
 
-If the configuration value C<config_override> has been set in L<Mojolicious/"config"> when this plugin is loaded, it
-will not do anything.
+These configuration values are currently reserved:
+
+=over 2
+
+=item C<config_override>
+
+  "config_override": 1
+
+If this configuration value has been set in L<Mojolicious/"config"> when this plugin is loaded, it will not do anything
+besides loading deployment specific plugins.
+
+=item C<plugins>
+
+  "plugins": [{"SetUserGroup": {"user": "sri", "group": "staff"}}]
+
+One or more deployment specific plugins that should be loaded rigth after this plugin has been loaded.
+
+=back
 
 The code of this plugin is a good example for learning to build new plugins, you're welcome to fork it.
 

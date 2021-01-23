@@ -7,7 +7,10 @@ BEGIN {
 
 use Test::Mojo;
 use Test::More;
+
 use Mojo::File qw(curfile);
+use lib curfile->sibling('lib')->to_string;
+
 use Mojolicious::Lite;
 
 subtest 'Default' => sub {
@@ -40,6 +43,8 @@ subtest 'Load plugins' => sub {
   is app->config('absolute'),     'works too!!!',                          'right value';
   is app->config('absolute_dev'), 'dev works too yaml_config_lite_app!!!', 'right value';
   is app->config('it'),           'works',                                 'right value';
+  is app->deployment_helper, 'deployment plugins work!', 'right value';
+  is app->another_helper,    'works too!',               'right value';
 };
 
 get '/' => 'index';

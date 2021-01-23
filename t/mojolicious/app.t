@@ -20,13 +20,19 @@ use Mojo::IOLoop;
 use Mojolicious;
 use Mojolicious::Controller;
 
-# Missing config file
-{
+subtest 'Missing config file' => sub {
   eval { Test::Mojo->new('MojoliciousConfigTest')->app };
   like $@, qr/mojolicious_config_test.conf" missing/, 'right error';
   local $ENV{MOJO_MODE} = 'whatever';
   is(Test::Mojo->new('MojoliciousConfigTest')->app->config->{it}, 'works', 'right result');
-}
+};
+
+subtest 'Bad deployment plugins' => sub {
+  eval { Test::Mojo->new('MojoliciousTest')->app->plugin(Config => {default => {plugins => 'fail'}}) };
+  like $@, qr/Configuration value "plugins" is not an array reference/, 'right error';
+  eval { Test::Mojo->new('MojoliciousTest')->app->plugin(Config => {default => {plugins => ['fail']}}) };
+  like $@, qr/Configuration value "plugins" contains an entry that is not a hash reference/, 'right error';
+};
 
 # Mode detection
 {
@@ -45,18 +51,19 @@ my @path = qw(th is mojo dir wil l never-ever exist);
 my $app  = Mojolicious->new(home => Mojo::Home->new(@path));
 is $app->home, path(@path), 'right home directory';
 
-# Config override
-my $t = Test::Mojo->new('MojoliciousTest');
-ok !$t->app->config->{config_override}, 'no override';
-ok !$t->app->config->{foo},             'no value';
-$t = Test::Mojo->new('MojoliciousTest', {foo => 'bar'});
-ok $t->app->config->{config_override}, 'override';
-is $t->app->config->{foo}, 'bar', 'right value';
-$t = Test::Mojo->new(MojoliciousTest->new, {foo => 'baz'});
-ok $t->app->config->{config_override}, 'override';
-is $t->app->config->{foo}, 'baz', 'right value';
+subtest 'Config override' => sub {
+  my $t = Test::Mojo->new('MojoliciousTest');
+  ok !$t->app->config->{config_override}, 'no override';
+  ok !$t->app->config->{foo},             'no value';
+  $t = Test::Mojo->new('MojoliciousTest', {foo => 'bar'});
+  ok $t->app->config->{config_override}, 'override';
+  is $t->app->config->{foo}, 'bar', 'right value';
+  $t = Test::Mojo->new(MojoliciousTest->new, {foo => 'baz'});
+  ok $t->app->config->{config_override}, 'override';
+  is $t->app->config->{foo}, 'baz', 'right value';
+};
 
-$t = Test::Mojo->new('MojoliciousTest');
+my $t = Test::Mojo->new('MojoliciousTest');
 
 subtest 'Preload namespaces' => sub {
   is_deeply $t->app->preload_namespaces, ['MojoliciousTest::Controller'], 'right namespaces';
@@ -499,6 +506,12 @@ $t->get_ok('/redispatch/secret')->status_is(200)->header_is(Server => 'Mojolicio
 # SingleFileTestApp::Redispatch::secret
 $t->get_ok('/redispatch/secret?rly=1')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Secret!');
+
+subtest 'Override deployment plugins' => sub {
+  my $t = Test::Mojo->new('SingleFileTestApp',
+    {plugins => [{'MojoliciousTest::Plugin::DeploymentPlugin' => {name => 'override_helper'}}]});
+  is $t->app->override_helper, 'deployment plugins work!', 'right value';
+};
 
 $t = Test::Mojo->new('MojoliciousTest');
 

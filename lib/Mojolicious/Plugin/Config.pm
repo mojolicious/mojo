@@ -22,7 +22,7 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Override
-  return $app->config if $app->config->{config_override};
+  return _plugins($app, $app->config) if $app->config->{config_override};
 
   # Config file
   my $file = $conf->{file} || $ENV{MOJO_CONFIG};
@@ -46,7 +46,22 @@ sub register {
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}} if $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
-  return $app->config($config)->config;
+  return _plugins($app, $app->config($config)->config);
+}
+
+sub _plugins {
+  my ($app, $config) = @_;
+
+  if (my $plugins = $config->{plugins}) {
+    die qq{Configuration value "plugins" is not an array reference.\n} unless ref $plugins eq 'ARRAY';
+    for my $plugin (@$plugins) {
+      die qq{Configuration value "plugins" contains an entry that is not a hash reference.\n}
+        unless ref $plugin eq 'HASH';
+      $app->plugin((keys %$plugin)[0], (values %$plugin)[0]);
+    }
+  }
+
+  return $app->config;
 }
 
 1;
@@ -99,8 +114,24 @@ will be generated from the value of L<Mojolicious/"moniker"> (C<$moniker.conf>).
 configuration file C<$moniker.conf> with C<mode> specific ones like C<$moniker.$mode.conf>, which will be detected
 automatically.
 
-If the configuration value C<config_override> has been set in L<Mojolicious/"config"> when this plugin is loaded, it
-will not do anything.
+These configuration values are currently reserved:
+
+=over 2
+
+=item C<config_override>
+
+  config_override => 1
+
+If this configuration value has been set in L<Mojolicious/"config"> when this plugin is loaded, it will not do anything
+besides loading deployment specific plugins.
+
+=item C<plugins>
+
+  plugins => [{SetUserGroup => {user => 'sri', group => 'staff'}}]
+
+One or more deployment specific plugins that should be loaded rigth after this plugin has been loaded.
+
+=back
 
 The code of this plugin is a good example for learning to build new plugins, you're welcome to fork it.
 

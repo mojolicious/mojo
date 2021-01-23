@@ -1,3 +1,8 @@
 %# Just a comment
 foo: barbaz
 utf: утф
+plugins:
+  - MojoliciousTest::Plugin::DeploymentPlugin: {}
+  - MojoliciousTest::Plugin::DeploymentPlugin:
+      name: another_helper
+      message: works too!

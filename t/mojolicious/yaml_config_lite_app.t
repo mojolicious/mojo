@@ -20,7 +20,7 @@ subtest 'Default' => sub {
 
 subtest 'Invalid config file' => sub {
   eval { plugin NotYAMLConfig => {file => 'public/hello.txt'} };
-  like $@, qr/Can't parse config/, 'right error';
+  like $@, qr/Can't load configuration from file/, 'right error';
 };
 
 subtest 'Load plugins' => sub {

@@ -8,8 +8,8 @@ sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
   my $config = eval { from_json $self->render($content, $file, $conf, $app) };
-  die qq{Can't parse config "$file": $@} if $@;
-  die qq{Invalid config "$file"} unless ref $config eq 'HASH';
+  die qq{Can't load configuration from file "$file": $@} if $@;
+  die qq{Configuration file "$file" did not return a JSON object} unless ref $config eq 'HASH';
 
   return $config;
 }
@@ -20,9 +20,8 @@ sub render {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Application instance and helper
-  my $prepend = q[no strict 'refs'; no warnings 'redefine';];
-  $prepend .= q[my $app = shift; sub app; local *app = sub { $app };];
-  $prepend .= q[use Mojo::Base -strict; no warnings 'ambiguous';];
+  my $prepend = q[no strict 'refs'; no warnings 'redefine'; my $app = shift; sub app; local *app = sub { $app };]
+    . q[use Mojo::Base -strict; no warnings 'ambiguous';];
 
   my $mt     = Mojo::Template->new($conf->{template} // {})->name($file);
   my $output = $mt->prepend($prepend . $mt->prepend)->render($content, $app);

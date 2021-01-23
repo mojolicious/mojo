@@ -4,6 +4,14 @@ use Mojo::Base 'Mojolicious::Plugin::JSONConfig';
 use CPAN::Meta::YAML;
 use Mojo::Util qw(decode encode);
 
+sub parse {
+  my ($self, $content, $file, $conf, $app) = @_;
+  my $config = eval { $self->{yaml}->(encode('UTF-8', $self->render($content, $file, $conf, $app))) };
+  die qq{Can't load configuration from file "$file": $@} if $@;
+  die qq{Configuration file "$file" did not return a YAML mapping} unless ref $config eq 'HASH';
+  return $config;
+}
+
 sub register {
   my ($self, $app, $conf) = @_;
 
@@ -14,14 +22,6 @@ sub register {
   }
 
   return $self->SUPER::register($app, $conf);
-}
-
-sub parse {
-  my ($self, $content, $file, $conf, $app) = @_;
-  my $config = eval { $self->{yaml}->(encode('UTF-8', $self->render($content, $file, $conf, $app))) };
-  die qq{Can't parse config "$file": $@} if $@;
-  die qq{Invalid config "$file"} unless ref $config eq 'HASH';
-  return $config;
 }
 
 1;

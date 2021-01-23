@@ -13,7 +13,7 @@ sub parse {
   my $config = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
     . "sub app; local *app = sub { \$app }; use Mojo::Base -strict; $content";
   die qq{Can't load configuration from file "$file": $@} if $@;
-  die qq{Configuration file "$file" did not return a hash reference.\n} unless ref $config eq 'HASH';
+  die qq{Configuration file "$file" did not return a hash reference} unless ref $config eq 'HASH';
 
   return $config;
 }
@@ -53,10 +53,9 @@ sub _plugins {
   my ($app, $config) = @_;
 
   if (my $plugins = $config->{plugins}) {
-    die qq{Configuration value "plugins" is not an array reference.\n} unless ref $plugins eq 'ARRAY';
+    die qq{Configuration value "plugins" is not an array reference} unless ref $plugins eq 'ARRAY';
     for my $plugin (@$plugins) {
-      die qq{Configuration value "plugins" contains an entry that is not a hash reference.\n}
-        unless ref $plugin eq 'HASH';
+      die qq{Configuration value "plugins" contains an entry that is not a hash reference} unless ref $plugin eq 'HASH';
       $app->plugin((keys %$plugin)[0], (values %$plugin)[0]);
     }
   }

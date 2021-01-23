@@ -779,6 +779,8 @@ L<https://opensource.org/licenses/OFL-1.1>.
 
 Every major release of L<Mojolicious> has a code name, these are the ones that have been used in the past.
 
+9.0, C<Waffle> (U+1F9C7)
+
 8.0, C<Supervillain> (U+1F9B9)
 
 7.0, C<Doughnut> (U+1F369)

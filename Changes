@@ -1,4 +1,16 @@
 
+9.0  2021-XX-XX
+  - Code name "Waffle", this is a major release.
+  - Added support for deployment specific plugins.
+  - Removed module Mojo::IOLoop::Delay.
+  - Removed deprecated success method from Mojo::Transaction.
+  - Removed deprecated detour, over, route and via methods from Mojolicious::Routes::Route.
+  - Removed deprecated config stash value.
+  - Changed Mojo::Log to join mutiple log messages with a whitespace instead of a newline.
+  - Improved contextual logging feature in Mojo::Log not to concatenate log messages and context.
+  - Improved all_text method in Mojo::DOM to exclude "<script>" and "<style>" from text extraction in HTML documents.
+  - Improved error messages in config plugins to be more consistent.
+
 8.74  2021-02-06
 
 8.73  2021-02-05

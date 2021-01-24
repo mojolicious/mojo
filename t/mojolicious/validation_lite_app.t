@@ -196,10 +196,11 @@ subtest 'Size' => sub {
 };
 
 subtest 'Upload' => sub {
-  my $v
-    = $t->app->validation->input({
-    foo => Mojo::Upload->new, bar => [Mojo::Upload->new, Mojo::Upload->new], baz => [Mojo::Upload->new, 'test']
-    });
+  my $v = $t->app->validation->input({
+    foo => Mojo::Upload->new,
+    bar => [Mojo::Upload->new, Mojo::Upload->new],
+    baz => [Mojo::Upload->new, 'just another test']
+  });
   ok $v->required('foo')->upload->is_valid, 'valid';
   ok $v->required('bar')->upload->is_valid, 'valid';
   ok $v->required('baz')->is_valid, 'valid';
@@ -346,9 +347,14 @@ subtest 'Successful file upload' => sub {
 };
 
 subtest 'Successful file upload (multiple files)' => sub {
-  $t->post_ok('/upload' => form =>
-      {foo => [{content => 'One', filename => 'one.txt'}, {content => 'Two', filename => 'two.txt'}]})
-    ->element_exists_not('.field-with-error');
+  $t->post_ok(
+    '/upload' => form => {
+      foo => [
+        {content => 'First test file content',  filename => 'one.txt'},
+        {content => 'Second test file content', filename => 'two.txt'}
+      ]
+    }
+  )->element_exists_not('.field-with-error');
 };
 
 subtest 'Failed file upload' => sub {

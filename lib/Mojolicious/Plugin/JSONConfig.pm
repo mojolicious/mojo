@@ -83,8 +83,6 @@ These configuration values are currently reserved:
 
 =item C<config_override>
 
-  "config_override": 1
-
 If this configuration value has been set in L<Mojolicious/"config"> when this plugin is loaded, it will not do anything
 besides loading deployment specific plugins.
 

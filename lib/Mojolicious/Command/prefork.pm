@@ -30,7 +30,8 @@ sub build_server {
 
   $prefork->listen(\@listen) if @listen;
   $prefork->reverse_proxy(1) if @proxy;
-  $prefork->trusted_proxies([grep {length} @proxy]);
+  my @trusted = grep {length} @proxy;
+  $prefork->trusted_proxies(\@trusted) if @trusted;
   return $prefork;
 }
 

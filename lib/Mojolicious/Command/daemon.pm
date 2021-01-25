@@ -23,7 +23,8 @@ sub build_server {
 
   $daemon->listen(\@listen) if @listen;
   $daemon->reverse_proxy(1) if @proxy;
-  $daemon->trusted_proxies([grep {length} @proxy]);
+  my @trusted = grep {length} @proxy;
+  $daemon->trusted_proxies(\@trusted) if @trusted;
   return $daemon;
 }
 

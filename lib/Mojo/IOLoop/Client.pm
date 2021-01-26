@@ -6,7 +6,6 @@ use IO::Socket::IP;
 use IO::Socket::UNIX;
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
-use Mojo::Util qw(deprecated);
 use Scalar::Util qw(weaken);
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
@@ -88,12 +87,6 @@ sub _connect {
         $options{PeerPort} = _port($args);
       }
       @options{keys %{$args->{socket_options}}} = values %{$args->{socket_options}} if $args->{socket_options};
-
-      # DEPRECATED!
-      if ($args->{local_address}) {
-        deprecated 'local_address option is DEPRECATED in favor of socket_options';
-        $options{LocalAddr} = $args->{local_address};
-      }
     }
 
     return $self->emit(error => "Can't connect: $@") unless $self->{handle} = $handle = $class->new(%options);

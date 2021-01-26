@@ -5,6 +5,9 @@
   - Removed module Mojo::IOLoop::Delay.
   - Removed deprecated success method from Mojo::Transaction.
   - Removed deprecated detour, over, route and via methods from Mojolicious::Routes::Route.
+  - Removed deprecated local_address method from Mojo::UserAgent.
+  - Removed deprecated tls_ciphers, tls_protocols, tls_verify and tls_version options from Mojo::IOLoop::TLS.
+  - Removed deprecated local_address option from Mojo::IOLoop::Client.
   - Removed deprecated config stash value.
   - Changed Mojo::Log to join mutiple log messages with a whitespace instead of a newline.
   - Improved contextual logging feature in Mojo::Log not to concatenate log messages and context.

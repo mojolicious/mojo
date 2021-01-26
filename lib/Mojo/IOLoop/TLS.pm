@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::File qw(curfile);
 use Mojo::IOLoop;
-use Mojo::Util qw(deprecated);
 use Scalar::Util qw(weaken);
 
 # TLS support requires IO::Socket::SSL
@@ -53,30 +52,6 @@ sub _expand {
   $tls->{SSL_key_file}  = $args->{tls_key}  if $args->{tls_key};
   $tls->{SSL_server}    = $args->{server}   if $args->{server};
   @{$tls}{keys %{$args->{tls_options}}} = values %{$args->{tls_options}} if $args->{tls_options};
-
-  # DEPRECATED!
-  if ($args->{tls_protocols}) {
-    deprecated 'tls_protocols option is DEPRECATED in favor of tls_options';
-    $tls->{SSL_alpn_protocols} = $args->{tls_protocols};
-  }
-
-  # DEPRECATED!
-  if (defined $args->{tls_verify}) {
-    deprecated 'tls_verify option is DEPRECATED in favor of tls_options';
-    $tls->{SSL_verify_mode} = $args->{tls_verify};
-  }
-
-  # DEPRECATED!
-  if (defined $args->{tls_ciphers}) {
-    deprecated 'tls_ciphers option is DEPRECATED in favor of tls_options';
-    $tls->{SSL_cipher_list} = $args->{tls_ciphers};
-  }
-
-  # DEPRECATED!
-  if (defined $args->{tls_version}) {
-    deprecated 'tls_version option is DEPRECATED in favor of tls_options';
-    $tls->{SSL_version} = $args->{tls_version};
-  }
 
   if ($args->{server}) {
     $tls->{SSL_cert_file} ||= $CERT;

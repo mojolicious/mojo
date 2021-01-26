@@ -46,7 +46,7 @@ my $id      = $loop->server(
 my $port     = $loop->acceptor($id)->port;
 my $promise2 = Mojo::Promise->new->ioloop($loop);
 $loop->client(
-  {port => $port, tls => 1, tls_verify => 0x00} => sub {
+  {port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => sub { $promise2->resolve });
@@ -88,11 +88,11 @@ $id      = Mojo::IOLoop->server(
 $port     = Mojo::IOLoop->acceptor($id)->port;
 $promise2 = Mojo::Promise->new;
 Mojo::IOLoop->client(
-  port       => $port,
-  tls        => 1,
-  tls_cert   => 't/mojo/certs/client.crt',
-  tls_key    => 't/mojo/certs/client.key',
-  tls_verify => 0x00,
+  port        => $port,
+  tls         => 1,
+  tls_cert    => 't/mojo/certs/client.crt',
+  tls_key     => 't/mojo/certs/client.key',
+  tls_options => {SSL_verify_mode => 0x00},
   sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
@@ -305,9 +305,8 @@ $id = $loop->server(
   tls         => 1,
   tls_ca      => 't/mojo/certs/ca.crt',
   tls_cert    => 't/mojo/certs/server.crt',
-  tls_ciphers => 'AES256-SHA:ALL',
   tls_key     => 't/mojo/certs/server.key',
-  tls_verify  => 0x00,
+  tls_options => {SSL_verify_mode => 0x00, SSL_cipher_list => 'AES256-SHA:ALL'},
   sub {
     my ($loop, $stream) = @_;
     $stream->on(close => sub { $loop->stop });
@@ -316,11 +315,11 @@ $id = $loop->server(
 );
 $port = $loop->acceptor($id)->port;
 $loop->client(
-  port       => $port,
-  tls        => 1,
-  tls_cert   => 't/mojo/certs/bad.crt',
-  tls_key    => 't/mojo/certs/bad.key',
-  tls_verify => 0x00,
+  port        => $port,
+  tls         => 1,
+  tls_cert    => 't/mojo/certs/bad.crt',
+  tls_key     => 't/mojo/certs/bad.key',
+  tls_options => {SSL_verify_mode => 0x00},
   sub {
     my ($loop, $err, $stream) = @_;
     $stream->timeout(0.5);
@@ -346,13 +345,12 @@ $id = Mojo::IOLoop->server(
   tls_ca      => 't/mojo/certs/ca.crt',
   tls_cert    => 't/mojo/certs/server.crt',
   tls_key     => 't/mojo/certs/server.key',
-  tls_verify  => 0x01,
-  tls_version => 'TLSv1_2',
+  tls_options => {SSL_verify_mode => 0x01, SSL_version => 'TLSv1_2'},
   sub { $server = 'accepted' }
 );
 $port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->client(
-  {port => $port, tls => 1, tls_verify => 0x00} => sub {
+  {port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
     shift->stop;
     $client     = 'connected';
     $client_err = shift;
@@ -367,9 +365,9 @@ subtest 'ALPN' => sub {
   plan skip_all => 'ALPN support required!' unless IO::Socket::SSL->can_alpn;
   my ($server_proto, $client_proto);
   $id = Mojo::IOLoop->server(
-    address       => '127.0.0.1',
-    tls           => 1,
-    tls_protocols => ['foo', 'bar', 'baz'],
+    address     => '127.0.0.1',
+    tls         => 1,
+    tls_options => {SSL_alpn_protocols => ['foo', 'bar', 'baz']},
     sub {
       my ($loop, $stream) = @_;
       $server_proto = $stream->handle->alpn_selected;
@@ -378,10 +376,9 @@ subtest 'ALPN' => sub {
   );
   $port = Mojo::IOLoop->acceptor($id)->port;
   Mojo::IOLoop->client(
-    port          => $port,
-    tls           => 1,
-    tls_protocols => ['baz', 'bar'],
-    tls_verify    => 0x00,
+    port        => $port,
+    tls         => 1,
+    tls_options => {SSL_alpn_protocols => ['baz', 'bar'], SSL_verify_mode => 0x00},
     sub {
       my ($loop, $err, $stream) = @_;
       $client_proto = $stream->handle->alpn_selected;

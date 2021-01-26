@@ -25,7 +25,7 @@ $server->negotiate({server => 1});
 my $client = Mojo::IOLoop::TLS->new($client_sock);
 $client->once(upgrade => sub { $promise2->resolve(pop) });
 $client->once(error   => sub { warn pop });
-$client->negotiate(tls_verify => 0x00);
+$client->negotiate(tls_options => {SSL_verify_mode => 0x00});
 my ($client_result, $server_result);
 Mojo::Promise->all($promise, $promise2)->then(sub {
   ($server_result, $client_result) = map { $_->[0] } @_;
@@ -44,11 +44,11 @@ $promise2 = Mojo::Promise->new->ioloop($loop);
 $server   = Mojo::IOLoop::TLS->new($server_sock2)->reactor($loop->reactor);
 $server->once(upgrade => sub { $promise->resolve(pop) });
 $server->once(error   => sub { warn pop });
-$server->negotiate(server => 1, tls_ciphers => 'AES256-SHA:ALL');
+$server->negotiate(server => 1, tls_options => {SSL_cipher_list => 'AES256-SHA:ALL'});
 $client = Mojo::IOLoop::TLS->new($client_sock2)->reactor($loop->reactor);
 $client->once(upgrade => sub { $promise2->resolve(pop) });
 $client->once(error   => sub { warn pop });
-$client->negotiate(tls_verify => 0x00);
+$client->negotiate(tls_options => {SSL_verify_mode => 0x00});
 $client_result = $server_result = undef;
 Mojo::Promise->all($promise, $promise2)->then(sub {
   ($server_result, $client_result) = map { $_->[0] } @_;

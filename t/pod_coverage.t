@@ -11,4 +11,5 @@ my @await = (
   qw(AWAIT_NEW_FAIL AWAIT_ON_CANCEL AWAIT_ON_READY)
 );
 
-all_pod_coverage_ok({also_private => ['BUILD_DYNAMIC', @await, 'detour', 'over', 'route', 'success', 'via']});
+all_pod_coverage_ok(
+  {also_private => ['BUILD_DYNAMIC', @await, 'detour', 'local_address', 'over', 'route', 'success', 'via']});

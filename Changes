@@ -1,10 +1,24 @@
 
-8.72  2021-01-21
+8.72  2021-01-26
+  - Deprecated Mojo::UserAgent::local_address in favor of Mojo::UserAgent::socket_options.
+  - Deprecated local_address option of connect method in Mojo::IOLoop::Client in favor of socket_options.
+  - Deprecated tls_protocols option of connect method in Mojo::IOLoop::Client in favor of tls_options.
+  - Deprecated tls_verify option of connect method in Mojo::IOLoop::Client in favor of tls_options.
+  - Deprecated tls_protocols option of negotiate method in Mojo::IOLoop::TLS in favor of tls_options.
+  - Deprecated tls_ciphers option of negotiate method in Mojo::IOLoop::TLS in favor of tls_options.
+  - Deprecated tls_verify option of negotiate method in Mojo::IOLoop::TLS in favor of tls_options.
+  - Deprecated tls_version option of negotiate method in Mojo::IOLoop::TLS in favor of tls_options.
+  - Deprecated tls_ciphers option of listen method in Mojo::IOLoop::Server in favor of tls_options.
+  - Deprecated tls_verify option of listen method in Mojo::IOLoop::Server in favor of tls_options.
+  - Deprecated tls_version option of listen method in Mojo::IOLoop::Server in favor of tls_options.
   - Added support for trusted reverse proxies. (jberger)
   - Added network_contains function to Mojo::Util. (jberger)
   - Added trusted_proxies attribute to Mojo::Server and Mojo::Message::Request. (jberger)
-  - Added trusted_proxies option to Hynotoad. (jberger)
+  - Added socket_options method to Mojo::UserAgent.
   - Added build_server method to Mojolicious::Command::daemon and Mojolicious::Command::prefork. (jberger)
+  - Added trusted_proxies option to Hynotoad. (jberger)
+  - Added socket_options and tls_options options to connect method in Mojo::IOLoop::Client.
+  - Added tls_options option to negotiate method in Mojo::IOLoop::TLS.
 
 8.71  2021-01-17
   - Added EXPERIMENTAL freeze option to reset method in Mojo::IOLoop.

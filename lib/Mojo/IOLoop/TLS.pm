@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::File qw(curfile);
 use Mojo::IOLoop;
+use Mojo::Util qw(deprecated);
 use Scalar::Util qw(weaken);
 
 # TLS support requires IO::Socket::SSL
@@ -47,14 +48,35 @@ sub _expand {
 
   weaken $self;
   my $tls = {SSL_error_trap => sub { $self->_cleanup->emit(error => $_[1]) }, SSL_startHandshake => 0};
-  $tls->{SSL_alpn_protocols} = $args->{tls_protocols} if $args->{tls_protocols};
-  $tls->{SSL_ca_file}        = $args->{tls_ca}        if $args->{tls_ca} && -T $args->{tls_ca};
-  $tls->{SSL_cert_file}      = $args->{tls_cert}      if $args->{tls_cert};
-  $tls->{SSL_cipher_list}    = $args->{tls_ciphers}   if $args->{tls_ciphers};
-  $tls->{SSL_key_file}       = $args->{tls_key}       if $args->{tls_key};
-  $tls->{SSL_server}         = $args->{server}        if $args->{server};
-  $tls->{SSL_verify_mode}    = $args->{tls_verify}    if defined $args->{tls_verify};
-  $tls->{SSL_version}        = $args->{tls_version}   if $args->{tls_version};
+  $tls->{SSL_ca_file}   = $args->{tls_ca}   if $args->{tls_ca} && -T $args->{tls_ca};
+  $tls->{SSL_cert_file} = $args->{tls_cert} if $args->{tls_cert};
+  $tls->{SSL_key_file}  = $args->{tls_key}  if $args->{tls_key};
+  $tls->{SSL_server}    = $args->{server}   if $args->{server};
+  @{$tls}{keys %{$args->{tls_options}}} = values %{$args->{tls_options}} if $args->{tls_options};
+
+  # DEPRECATED!
+  if ($args->{tls_protocols}) {
+    deprecated 'tls_protocols option is DEPRECATED in favor of tls_options';
+    $tls->{SSL_alpn_protocols} = $args->{tls_protocols};
+  }
+
+  # DEPRECATED!
+  if (defined $args->{tls_verify}) {
+    deprecated 'tls_verify option is DEPRECATED in favor of tls_options';
+    $tls->{SSL_verify_mode} = $args->{tls_verify};
+  }
+
+  # DEPRECATED!
+  if (defined $args->{tls_ciphers}) {
+    deprecated 'tls_ciphers option is DEPRECATED in favor of tls_options';
+    $tls->{SSL_cipher_list} = $args->{tls_ciphers};
+  }
+
+  # DEPRECATED!
+  if (defined $args->{tls_version}) {
+    deprecated 'tls_version option is DEPRECATED in favor of tls_options';
+    $tls->{SSL_version} = $args->{tls_version};
+  }
 
   if ($args->{server}) {
     $tls->{SSL_cert_file} ||= $CERT;
@@ -174,13 +196,6 @@ Path to TLS certificate authority file.
 
 Path to the TLS cert file, defaults to a built-in test certificate on the server-side.
 
-=item tls_ciphers
-
-  tls_ciphers => 'AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH'
-
-TLS cipher specification string. For more information about the format see
-L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
-
 =item tls_key
 
   tls_key => '/etc/tls/server.key'
@@ -188,23 +203,11 @@ L<https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER-STRINGS>.
 
 Path to the TLS key file, defaults to a built-in test key on the server-side.
 
-=item tls_protocols
+=item tls_options
 
-  tls_protocols => ['foo', 'bar']
+  tls_options => {SSL_alpn_protocols => ['foo', 'bar'], SSL_verify_mode => 0x00, SSL_version => 'TLSv1_2'}
 
-ALPN protocols to negotiate.
-
-=item tls_verify
-
-  tls_verify => 0x00
-
-TLS verification mode.
-
-=item tls_version
-
-  tls_version => 'TLSv1_2'
-
-TLS protocol version.
+Additional options for L<IO::Socket::SSL>.
 
 =back
 

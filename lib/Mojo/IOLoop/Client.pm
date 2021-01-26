@@ -6,6 +6,7 @@ use IO::Socket::IP;
 use IO::Socket::UNIX;
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
+use Mojo::Util qw(deprecated);
 use Scalar::Util qw(weaken);
 use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
@@ -86,7 +87,13 @@ sub _connect {
         $options{PeerAddr} = $args->{socks_address} || $args->{address};
         $options{PeerPort} = _port($args);
       }
-      $options{LocalAddr} = $args->{local_address} if $args->{local_address};
+      @options{keys %{$args->{socket_options}}} = values %{$args->{socket_options}} if $args->{socket_options};
+
+      # DEPRECATED!
+      if ($args->{local_address}) {
+        deprecated 'local_address option is DEPRECATED in favor of socket_options';
+        $options{LocalAddr} = $args->{local_address};
+      }
     }
 
     return $self->emit(error => "Can't connect: $@") unless $self->{handle} = $handle = $class->new(%options);
@@ -262,12 +269,6 @@ Address or host name of the peer to connect to, defaults to C<127.0.0.1>.
 
 Use an already prepared L<IO::Socket::IP> object.
 
-=item local_address
-
-  local_address => '127.0.0.1'
-
-Local address to bind to.
-
 =item path
 
   path => '/tmp/myapp.sock'
@@ -279,6 +280,12 @@ Path of UNIX domain socket to connect to.
   port => 80
 
 Port to connect to, defaults to C<80> or C<443> with C<tls> option.
+
+=item socket_options
+
+  socket_options => {LocalAddr => '127.0.0.1'}
+
+Additional options for L<IO::Socket::IP> when opening new connections.
 
 =item socks_address
 
@@ -334,17 +341,11 @@ Path to the TLS certificate file.
 
 Path to the TLS key file.
 
-=item tls_protocols
+=item tls_options
 
-  tls_protocols => ['foo', 'bar']
+  tls_options => {SSL_alpn_protocols => ['foo', 'bar'], SSL_verify_mode => 0x00}
 
-ALPN protocols to negotiate.
-
-=item tls_verify
-
-  tls_verify => 0x00
-
-TLS verification mode.
+Additional options for L<IO::Socket::SSL>.
 
 =back
 

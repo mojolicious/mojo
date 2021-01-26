@@ -177,10 +177,11 @@ sub _listen {
     if ((my $host = $url->host) ne '*') { $options->{address} = $host }
     if (my $port = $url->port) { $options->{port} = $port }
   }
+
   $options->{tls_ca} = $query->param('ca');
   /^(.*)_(cert|key)$/ and $options->{"tls_$2"}{$1} = $query->param($_) for @{$query->names};
-  if (my $cert = $query->param('cert')) { $options->{'tls_cert'}{''} = $cert }
-  if (my $key  = $query->param('key'))  { $options->{'tls_key'}{''}  = $key }
+  if (my $cert = $query->param('cert')) { $options->{tls_cert}{''} = $cert }
+  if (my $key  = $query->param('key'))  { $options->{tls_key}{''}  = $key }
   my ($ciphers, $verify, $version) = ($query->param('ciphers'), $query->param('verify'), $query->param('version'));
   $options->{tls_options}{SSL_cipher_list} = $ciphers    if defined $ciphers;
   $options->{tls_options}{SSL_verify_mode} = hex $verify if defined $verify;

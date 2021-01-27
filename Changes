@@ -1,4 +1,6 @@
 
+8.73  2021-01-27
+
 8.72  2021-01-26
   - Deprecated Mojo::UserAgent::local_address in favor of Mojo::UserAgent::socket_options.
   - Deprecated local_address option of connect method in Mojo::IOLoop::Client in favor of socket_options.

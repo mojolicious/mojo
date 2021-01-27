@@ -122,49 +122,62 @@ get '/' => sub { return pop } => 'works';
 
 my $t = Test::Mojo->new;
 
-# Normal route
-$t->get_ok('/')->status_is(200)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')->content_is('works');
+subtest 'Normal route' => sub {
+  $t->get_ok('/')->status_is(200)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')->content_is('works');
+};
 
-# Normal static file
-$t->get_ok('/test.txt')->status_is(200)->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
-  ->content_is("Normal static file!\n");
+subtest 'Normal static file' => sub {
+  $t->get_ok('/test.txt')->status_is(200)->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
+    ->content_is("Normal static file!\n");
+};
 
-# Override static file
-$t->get_ok('/hello.txt')->status_is(200)->content_is('Custom static file works!');
+subtest 'Override static file' => sub {
+  $t->get_ok('/hello.txt')->status_is(200)->content_is('Custom static file works!');
+};
 
-# render_later from before_dispatch
-$t->get_ok('/hello-delay.txt')->status_is(200)->content_is('Delayed!');
+subtest 'render_later from before_dispatch' => sub {
+  $t->get_ok('/hello-delay.txt')->status_is(200)->content_is('Delayed!');
+};
 
-# Custom dispatcher
-$t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
+subtest 'Custom dispatcher' => sub {
+  $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
+};
 
-# Static file
-$t->get_ok('/res.txt')->status_is(200)->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
-  ->content_is("Static response!\n");
+subtest 'Static file' => sub {
+  $t->get_ok('/res.txt')->status_is(200)->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
+    ->content_is("Static response!\n");
+};
 
-# Custom response
-$t->get_ok('/res.txt?route=1')->status_is(202)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
-  ->content_is('Custom response!');
+subtest ' Custom response' => sub {
+  $t->get_ok('/res.txt?route=1')->status_is(202)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+    ->content_is('Custom response!');
+};
 
-# Conditional response
-$t->get_ok('/res.txt?route=1&res=1')->status_is(201)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
-  ->content_is('Conditional response!');
+subtest 'Conditional response' => sub {
+  $t->get_ok('/res.txt?route=1&res=1')->status_is(201)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+    ->content_is('Conditional response!');
+};
 
-# Another custom dispatcher
-$t->get_ok('/custom_too')->status_is(200)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
-  ->content_is('this works too');
+subtest 'Another custom dispatcher' => sub {
+  $t->get_ok('/custom_too')->status_is(200)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+    ->content_is('this works too');
+};
 
-# First wrapper
-$t->get_ok('/wrap')->status_is(200)->content_is('Wrapped!');
+subtest 'First wrapper' => sub {
+  $t->get_ok('/wrap')->status_is(200)->content_is('Wrapped!');
+};
 
-# Second wrapper
-$t->get_ok('/wrap/again')->status_is(200)->content_is('Wrapped again!');
+subtest 'Second wrapper' => sub {
+  $t->get_ok('/wrap/again')->status_is(200)->content_is('Wrapped again!');
+};
 
-# Internal redirect to root
-$t->get_ok('/not_found')->status_is(200)->content_is('works');
+subtest 'Internal redirect to root' => sub {
+  $t->get_ok('/not_found')->status_is(200)->content_is('works');
+};
 
-# Internal redirect to second wrapper
-$t->get_ok('/not_found?wrap=1')->status_is(200)->content_is('Wrapped again!');
+subtest 'Internal redirect to second wrapper' => sub {
+  $t->get_ok('/not_found?wrap=1')->status_is(200)->content_is('Wrapped again!');
+};
 
 done_testing();
 

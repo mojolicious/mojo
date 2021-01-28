@@ -1,0 +1,27 @@
+name: perltidy
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  perltidy:
+    runs-on: ubuntu-latest
+    container:
+      image: perl:5.32
+    steps:
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        run: cpanm -n Perl::Tidy
+      - name: perltidy --version
+        run: perltidy --version
+      - name: Run perltidy
+        shell: bash
+        run: |
+          export GLOBIGNORE=t/mojo/lib/Mojo/LoaderException.pm:t/mojo/lib/Mojo/LoaderTestException/A.pm:t/mojolicious/lib/MojoliciousTest/SyntaxError.pm
+          shopt -s extglob globstar nullglob
+          perltidy --pro=.../.perltidyrc -b -bext='/' **/*.p[lm] **/*.t && git diff --exit-code

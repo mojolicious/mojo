@@ -578,13 +578,13 @@ is $output, " \n    2\n\n    3\n\n    4\n", 'block loop';
 subtest 'End and begin in the same perl line' => sub {
   my $concat = 'no warnings "redefine"; sub concat { $_[0]->() . $_[1]->() }';
   my $mt     = Mojo::Template->new(prepend => $concat);
-  my $output = $mt->render(<<'  EOF');
+  my $output = $mt->render(<<'EOF');
   %= concat begin
     1
   % end, begin
     2
   % end
-  EOF
+EOF
   is $output, "  \n    1\n    2\n", 'end, begin';
 };
 

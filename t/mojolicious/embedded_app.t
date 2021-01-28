@@ -36,57 +36,74 @@ get '/primary' => sub {
 
 my $t = Test::Mojo->new;
 
-# Normal request
-$t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
+subtest 'Normal request' => sub {
+  $t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
+};
 
-# Session
-$t->get_ok('/primary')->status_is(200)->content_is(1);
-$t->get_ok('/primary')->status_is(200)->content_is(2);
+subtest 'Session' => sub {
+  $t->get_ok('/primary')->status_is(200)->content_is(1);
+  $t->get_ok('/primary')->status_is(200)->content_is(2);
+};
 
-# Session in external app
-$t->get_ok('/x/1/secondary')->status_is(200)->content_is(11);
+subtest 'Session in external app' => sub {
+  $t->get_ok('/x/1/secondary')->status_is(200)->content_is(11);
+};
 
-# Session again
-$t->get_ok('/primary')->status_is(200)->content_is(3);
+subtest 'Session again' => sub {
+  $t->get_ok('/primary')->status_is(200)->content_is(3);
+};
 
-# Session in external app again
-$t->get_ok('/x/1/secondary')->status_is(200)->content_is(22);
+subtest 'Session in external app again' => sub {
+  $t->get_ok('/x/1/secondary')->status_is(200)->content_is(22);
+};
 
-# External app
-$t->get_ok('/x/1')->status_is(200)->content_is('too%21');
+subtest 'External app' => sub {
+  $t->get_ok('/x/1')->status_is(200)->content_is('too%21');
+};
 
-# Static file from external app
-$t->get_ok('/x/1/index.html')->status_is(200)->content_is("External static file!\n");
+subtest 'Static file from external app' => sub {
+  $t->get_ok('/x/1/index.html')->status_is(200)->content_is("External static file!\n");
+};
 
-# External app with different prefix
-$t->get_ok('/x/1/test')->status_is(200)->content_is('works%21');
+subtest 'External app with different prefix' => sub {
+  $t->get_ok('/x/1/test')->status_is(200)->content_is('works%21');
+};
 
-# External app with Unicode prefix
-$t->get_ok('/x/♥')->status_is(200)->content_is('too%21');
+subtest 'External app with Unicode prefix' => sub {
+  $t->get_ok('/x/♥')->status_is(200)->content_is('too%21');
+};
 
-# Static file from external app with Unicode prefix
-$t->get_ok('/x/♥/index.html')->status_is(200)->content_is("External static file!\n");
+subtest 'Static file from external app with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/index.html')->status_is(200)->content_is("External static file!\n");
+};
 
-# External app with Unicode prefix again
-$t->get_ok('/x/♥/test')->status_is(200)->content_is('works%21');
+subtest 'External app with Unicode prefix again' => sub {
+  $t->get_ok('/x/♥/test')->status_is(200)->content_is('works%21');
+};
 
-# External app with domain
-$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)->content_is('too%21');
+subtest 'External app with domain' => sub {
+  $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)->content_is('too%21');
+};
 
-# Static file from external app with domain
-$t->get_ok('/index.html' => {Host => 'mojolicious.org'})->status_is(200)->content_is("External static file!\n");
+subtest 'Static file from external app with domain' => sub {
+  $t->get_ok('/index.html' => {Host => 'mojolicious.org'})->status_is(200)->content_is("External static file!\n");
+};
 
-# External app with domain again
-$t->get_ok('/test' => {Host => 'mojolicious.org'})->status_is(200)->content_is('works%21');
+subtest 'External app with domain again' => sub {
+  $t->get_ok('/test' => {Host => 'mojolicious.org'})->status_is(200)->content_is('works%21');
+};
 
-# External app with a bit of everything
-$t->get_ok('/♥/123/' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is('too%21');
+subtest 'External app with a bit of everything' => sub {
+  $t->get_ok('/♥/123/' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is('too%21');
+};
 
-# Static file from external app with a bit of everything
-$t->get_ok('/♥/123/index.html' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is("External static file!\n");
+subtest 'Static file from external app with a bit of everything' => sub {
+  $t->get_ok('/♥/123/index.html' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is("External static file!\n");
+};
 
-# External app with a bit of everything again
-$t->get_ok('/♥/123/test' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is('works%21');
+subtest 'External app with a bit of everything again' => sub {
+  $t->get_ok('/♥/123/test' => {Host => 'test.foo-bar.de'})->status_is(200)->content_is('works%21');
+};
 
 done_testing();
 

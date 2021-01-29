@@ -59,7 +59,7 @@ subtest 'IPv6, TLS, SNI and a proxy' => sub {
   is $tx->res->body, 'works!', 'right content';
   ok !$tx->error, 'no error';
   $tx = $ua->get("https://has.no.cert/");
-  like $tx->error->{message}, qr/hostname verification failed/, 'right error';
+  like $tx->error->{message}, qr/name/, 'right error';
 };
 
 done_testing();

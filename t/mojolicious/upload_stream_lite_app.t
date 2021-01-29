@@ -50,20 +50,25 @@ get '/download' => sub {
 
 my $t = Test::Mojo->new;
 
-# Small upload
-$t->post_ok('/upload?id=23' => form => {my_file => {content => 'whatever'}})->status_is(200)->content_is('whatever');
+subtest 'Small upload' => sub {
+  $t->post_ok('/upload?id=23' => form => {my_file => {content => 'whatever'}})->status_is(200)->content_is('whatever');
+};
 
-# Small download
-$t->get_ok('/download?id=23')->status_is(200)->content_is('whatever');
+subtest 'Small download' => sub {
+  $t->get_ok('/download?id=23')->status_is(200)->content_is('whatever');
+};
 
-# Big upload
-$t->post_ok('/upload?id=24' => form => {my_file => {content => '1234' x 131072}})->status_is(200)
-  ->content_is('1234' x 131072);
+subtest 'Big upload' => sub {
+  $t->post_ok('/upload?id=24' => form => {my_file => {content => '1234' x 131072}})->status_is(200)
+    ->content_is('1234' x 131072);
+};
 
-# Big download
-$t->get_ok('/download?id=24')->status_is(200)->content_is('1234' x 131072);
+subtest 'Big download' => sub {
+  $t->get_ok('/download?id=24')->status_is(200)->content_is('1234' x 131072);
+};
 
-# Small download again
-$t->get_ok('/download?id=23')->status_is(200)->content_is('whatever');
+subtest 'Small download again' => sub {
+  $t->get_ok('/download?id=23')->status_is(200)->content_is('whatever');
+};
 
 done_testing();

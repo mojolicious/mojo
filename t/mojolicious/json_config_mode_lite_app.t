@@ -16,8 +16,9 @@ get '/' => 'index';
 
 my $t = Test::Mojo->new;
 
-# Template with config information
-$t->get_ok('/')->status_is(200)->content_like(qr/bazfoo/);
+subtest 'Template with config information' => sub {
+  $t->get_ok('/')->status_is(200)->content_like(qr/bazfoo/);
+};
 
 done_testing();
 

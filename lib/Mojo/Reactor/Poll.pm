@@ -93,9 +93,7 @@ sub remove {
   return !!delete $self->{io}{fileno($remove) // croak 'Handle is closed'};
 }
 
-sub reset {
-  delete @{shift()}{qw(events io next_tick next_timer running timers)};
-}
+sub reset { delete @{shift()}{qw(events io next_tick next_timer running timers)} }
 
 sub start {
   my $self = shift;
@@ -133,11 +131,8 @@ sub _next {
 
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
-
-  my $id    = $self->_id;
-  my $timer = $self->{timers}{$id}
-    = {cb => $cb, after => $after, recurring => $recurring, time => steady_time + $after};
-
+  my $id = $self->_id;
+  $self->{timers}{$id} = {cb => $cb, after => $after, recurring => $recurring, time => steady_time + $after};
   return $id;
 }
 

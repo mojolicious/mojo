@@ -1,4 +1,4 @@
-package MyApp::Model::Users;
+package LoginApp::Model::Users;
 
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-package MyApp::Controller::Login;
+package LoginApp::Controller::Login;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
 
 sub index ($self) {

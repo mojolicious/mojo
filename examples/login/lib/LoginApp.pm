@@ -1,12 +1,12 @@
-package MyApp;
+package LoginApp;
 use Mojo::Base 'Mojolicious', -signatures;
 
-use MyApp::Model::Users;
+use LoginApp::Model::Users;
 
 sub startup ($self) {
 
   $self->secrets(['Mojolicious rocks']);
-  $self->helper(users => sub { state $users = MyApp::Model::Users->new });
+  $self->helper(users => sub { state $users = LoginApp::Model::Users->new });
 
   my $r = $self->routes;
   $r->any('/')->to('login#index')->name('index');

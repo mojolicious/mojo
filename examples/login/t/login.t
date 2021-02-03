@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
 
-my $t = Test::Mojo->new('MyApp');
+my $t = Test::Mojo->new('LoginApp');
 $t->ua->max_redirects(1);
 
 $t->get_ok('/')->status_is(200)->element_exists('form input[name="user"]')->element_exists('form input[name="pass"]')

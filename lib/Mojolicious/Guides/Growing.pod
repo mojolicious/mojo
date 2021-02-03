@@ -706,6 +706,8 @@ allowing us to start the application from outside its home directory.
 
 Full L<Mojolicious> applications are a little easier to test, so C<t/login.t> can be simplified.
 
+  use Mojo::Base -strict;
+
   use Test::More;
   use Test::Mojo;
 

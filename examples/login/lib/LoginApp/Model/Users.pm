@@ -8,7 +8,7 @@ use Mojo::Util qw(secure_compare);
 
 my $USERS = {joel => 'las3rs', marcus => 'lulz', sebastian => 'secr3t'};
 
-sub new { bless {}, shift }
+sub new ($class) { bless {}, $class }
 
 sub check ($self, $user, $pass) {
 

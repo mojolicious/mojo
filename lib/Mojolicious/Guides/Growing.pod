@@ -254,7 +254,7 @@ concerns more visible.
     sebastian => 'secr3t'
   };
 
-  sub new { bless {}, shift }
+  sub new ($class) { bless {}, $class }
 
   sub check ($self, $user, $pass) {
 

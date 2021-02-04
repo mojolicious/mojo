@@ -9,11 +9,11 @@ getopt
   'h|help'      => \my $help,
   'l|listen=s'  => \my @listen,
   'm|mode=s'    => \$ENV{MOJO_MODE},
-  'v|verbose'   => \$ENV{MORBO_VERBOSE},
+  'v|verbose'   => \my $verbose,
   'w|watch=s'   => \my @watch;
 
 die extract_usage if $help || !(my $app = shift);
-my $morbo = Mojo::Server::Morbo->new;
+my $morbo = Mojo::Server::Morbo->new(silent => !$verbose);
 $morbo->daemon->listen(\@listen) if @listen;
 $morbo->backend->watch(\@watch)  if @watch;
 $morbo->run($app);

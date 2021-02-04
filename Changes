@@ -1,5 +1,6 @@
 
-8.73  2021-01-27
+8.73  2021-02-04
+  - Added silent attribute to Mojo::Server::Morbo.
 
 8.72  2021-01-26
   - Deprecated Mojo::UserAgent::local_address in favor of Mojo::UserAgent::socket_options.

@@ -16,6 +16,7 @@ has backend => sub {
   die qq{Can't find Morbo backend class "$backend" in \@INC. (@INC)\n};
 };
 has daemon => sub { Mojo::Server::Daemon->new };
+has silent => 1;
 
 sub run {
   my ($self, $app) = @_;
@@ -42,7 +43,7 @@ sub _manage {
     say @files == 1
       ? qq{File "@{[$files[0]]}" changed, restarting.}
       : qq{@{[scalar @files]} files changed, restarting.}
-      if $ENV{MORBO_VERBOSE};
+      unless $self->silent;
     kill 'TERM', $self->{worker} if $self->{worker};
     $self->{modified} = 1;
   }
@@ -129,6 +130,13 @@ Backend, usually a L<Mojo::Server::Morbo::Backend::Poll> object.
   $morbo     = $morbo->daemon(Mojo::Server::Daemon->new);
 
 L<Mojo::Server::Daemon> object this server manages.
+
+=head2 silent
+
+  my $bool = $morbo->silent;
+  $morbo   = $morbo->silent($bool);
+
+Disable console messages, defaults to a true value.
 
 =head1 METHODS
 

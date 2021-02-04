@@ -203,8 +203,7 @@ they are already loaded, so trying to load the same class multiple times may yie
 
   my @classes = load_classes 'Foo::Bar';
 
-Load all classes in a namespace recursively. Note that this function is B<EXPERIMENTAL> and might change without
-warning!
+Load all classes in a namespace recursively.
 
 =head1 SEE ALSO
 

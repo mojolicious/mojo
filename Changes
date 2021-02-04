@@ -1,5 +1,6 @@
 
 8.73  2021-02-04
+  - Removed finally keyword from check function in Mojo::Exception.
   - Added silent attribute to Mojo::Server::Morbo.
 
 8.72  2021-01-26

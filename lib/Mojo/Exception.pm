@@ -3,7 +3,7 @@ use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Exporter qw(import);
-use Mojo::Util qw(decode scope_guard);
+use Mojo::Util qw(decode);
 use Scalar::Util qw(blessed);
 
 has [qw(frames line lines_after lines_before)] => sub { [] };
@@ -14,13 +14,6 @@ our @EXPORT_OK = qw(check raise);
 
 sub check {
   my ($err, @spec) = @_ % 2 ? @_ : ($@, @_);
-
-  # Finally (search backwards since it is usually at the end)
-  my $guard;
-  for (my $i = $#spec - 1; $i >= 0; $i -= 2) {
-    ($guard = scope_guard($spec[$i + 1])) and last if $spec[$i] eq 'finally';
-  }
-
   return undef unless $err;
 
   my ($default, $handler);
@@ -210,8 +203,7 @@ called right after C<eval>. Note that this function is B<EXPERIMENTAL> and might
   check(
     'MyApp::X::Foo'     => sub { say "Foo: $_" },
     qr/^Could not open/ => sub { say "Open error: $_" },
-    default             => sub { say "Something went wrong: $_" },
-    finally             => sub { say 'Dangerous code is done' }
+    default             => sub { say "Something went wrong: $_" }
   );
 
 Matching conditions can be class names for ISA checks on exception objects, or regular expressions to match string
@@ -238,17 +230,15 @@ And since exception handlers are just callbacks, they can also throw their own e
     ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub { die "Foo/Bar: $_" }
   );
 
-There are currently two keywords you can use to set special handlers. The C<default> handler is used when no other
-handler matched. And the C<finally> handler runs always, it does not affect normal handlers and even runs if the
-exception was rethrown or if there was no exception to be handled at all.
+There is currently only one keywords you can use to set special handlers. The C<default> handler is used when no other
+handler matched.
 
   # Use "default" to catch everything
   eval {
     dangerous_code();
   };
   check(
-    default => sub { say "Error: $_" },
-    finally => sub { say 'Dangerous code is done' }
+    default => sub { say "Error: $_" }
   );
 
 =head2 raise

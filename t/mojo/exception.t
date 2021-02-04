@@ -240,29 +240,6 @@ subtest 'Check (rethrow)' => sub {
   is $@, "test5\n", 'exception has been rethrown';
 };
 
-subtest 'Check (finally)' => sub {
-  my $finally;
-  eval {
-    check "test7\n", finally => sub { $finally = 'finally7' };
-  };
-  is $@,       "test7\n",  'exception has been rethrown';
-  is $finally, 'finally7', 'finally handler used';
-  my $result = [];
-  check "test8\n",
-    qr/test7/ => sub { push @$result, 'fail' },
-    default   => sub { push @$result, $_ },
-    finally   => sub { push @$result, 'finally8' };
-  is_deeply $result, ["test8\n", 'finally8'], 'default and finally handlers used';
-  $finally = undef;
-  eval {
-    check "fail\n",
-      default => sub { die "test17\n" },
-      finally => sub { $finally = 'finally17' };
-  };
-  is $@,       "test17\n",  'right exception';
-  is $finally, 'finally17', 'finally handler used';
-};
-
 subtest 'Check (nothing)' => sub {
   ok !check(undef, default => sub { die 'fail' }), 'no exception';
   {

@@ -297,7 +297,7 @@ Return all but the last level of the path with L<File::Basename> as a L<Mojo::Fi
 
   my $ext = $path->extname;
 
-Return file extension of the path. Note that this method is B<EXPERIMENTAL> and might change without warning!
+Return file extension of the path.
 
   # "js"
   path('/home/sri/test.js')->extname;

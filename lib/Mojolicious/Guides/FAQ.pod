@@ -52,7 +52,7 @@ Because there are no advantages, it drastically increases maintenance costs and 
 anything in return. It would only make sense if we wanted to pass ownership of a module to a new maintainer, which we
 already have done in the past.
 
-=head2 Where can i discuss my patches for Mojolicious?
+=head2 Where can I discuss my patches for Mojolicious?
 
 We'd love to discuss your contributions to L<Mojolicious> on our official IRC channel C<#mojo> on C<chat.freenode.net>
 (L<chat now!|https://webchat.freenode.net/#mojo>).

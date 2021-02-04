@@ -165,87 +165,98 @@ subtest 'Missing error' => sub {
 subtest 'Check (string exception)' => sub {
   my $result;
   eval { die "test1\n" };
-  ok check(default => sub { $result = $_ }), 'exception handled';
+  ok check($@ => [default => sub { $result = $_ }]), 'exception handled';
   is $result, "test1\n", 'exception arrived in handler';
   $result = undef;
   eval { die "test2\n" };
-  ok check(default => sub { $result = shift }), 'exception handled';
+  ok check($@ => [default => sub { $result = shift }]), 'exception handled';
   is $result, "test2\n", 'exception arrived in handler';
   $result = undef;
   eval { die "test3\n" };
-  check
+  check $@ => [
     default    => sub { $result = 'fail' },
     qr/^test2/ => sub { $result = 'fail' },
     qr/^test3/ => sub { $result = 'test10' },
-    qr/^test4/ => sub { $result = 'fail' };
+    qr/^test4/ => sub { $result = 'fail' }
+  ];
   is $result, 'test10', 'regular expression matched';
   $result = undef;
-  check "test4\n",
+  check "test4\n" => [
     qr/^test3/ => sub { $result = 'fail' },
     qr/^test4/ => sub { $result = 'test11' },
-    qr/^test5/ => sub { $result = 'fail' };
+    qr/^test5/ => sub { $result = 'fail' }
+  ];
   is $result, 'test11', 'regular expression matched';
 };
 
 subtest 'Check (exception objects)' => sub {
   my $result;
   eval { MojoTest::X::Foo->throw('fail') };
-  check
+  check $@ => [
     default            => sub { $result = 'fail' },
     'MojoTest::X::Foo' => sub { $result = 'test12' },
-    'MojoTest::X::Bar' => sub { $result = 'fail' };
+    'MojoTest::X::Bar' => sub { $result = 'fail' }
+  ];
   is $result, 'test12', 'class matched';
   $result = undef;
   eval { MojoTest::X::Bar->throw('fail') };
-  check
-    'MojoTest::X::Foo' => sub { $result = 'fail' },
-    'MojoTest::X::Bar' => sub { $result = 'test13' };
+  check $@ => ['MojoTest::X::Foo' => sub { $result = 'fail' }, 'MojoTest::X::Bar' => sub { $result = 'test13' }];
   is $result, 'test13', 'class matched';
   $result = undef;
   check(
-    MojoTest::X::Yada->new('fail'),
-    qr/^MojoTest/      => sub { $result = 'fail' },
-    'MojoTest::X::Foo' => sub { $result = 'fail' },
-    'MojoTest::X::Bar' => sub { $result = 'test14' }
+    MojoTest::X::Yada->new('fail') => [
+      qr/^MojoTest/      => sub { $result = 'fail' },
+      'MojoTest::X::Foo' => sub { $result = 'fail' },
+      'MojoTest::X::Bar' => sub { $result = 'test14' }
+    ]
   );
   is $result, 'test14', 'class matched';
   $result = undef;
-  check(
-    MojoTest::X::Yada->new('whatever'),
-    'MojoTest::X::Foo' => sub { $result = 'fail' },
-    qr/^whatever/      => sub { $result = 'test23' },
-  );
+  check(MojoTest::X::Yada->new('whatever') =>
+      ['MojoTest::X::Foo' => sub { $result = 'fail' }, qr/^whatever/ => sub { $result = 'test23' }]);
   is $result, 'test23', 'regex matched';
 };
 
 subtest 'Check (multiple)' => sub {
   my $result = undef;
-  check(
-    MojoTest::X::Yada->new('whatever'), ['MojoTest::X::Foo', 'MojoTest::X::Bar'] => sub { $result = 'test15' },
-    default => sub { $result = 'fail' }
-  );
+  check(MojoTest::X::Yada->new('whatever') =>
+      [['MojoTest::X::Foo', 'MojoTest::X::Bar'] => sub { $result = 'test15' }, default => sub { $result = 'fail' }]);
   is $result, 'test15', 'class matched';
   $result = undef;
   check(
-    MojoTest::X::Bar->new('whatever'), ['MojoTest::X::Foo', 'MojoTest::X::Yada'] => sub { $result = 'fail' },
-    ['MojoTest::X::Bar'] => sub { $result = 'test16' }
+    MojoTest::X::Bar->new('whatever') => [
+      ['MojoTest::X::Foo', 'MojoTest::X::Yada'] => sub { $result = 'fail' },
+      ['MojoTest::X::Bar']                      => sub { $result = 'test16' }
+    ]
   );
   is $result, 'test16', 'class matched';
 };
 
 subtest 'Check (rethrow)' => sub {
   eval {
-    check "test5\n", qr/test4/ => sub { die 'fail' };
+    check "test5\n" => [qr/test4/ => sub { die 'fail' }];
   };
   is $@, "test5\n", 'exception has been rethrown';
 };
 
 subtest 'Check (nothing)' => sub {
-  ok !check(undef, default => sub { die 'fail' }), 'no exception';
+  ok !check(undef() => [default => sub { die 'fail' }]), 'no exception';
   {
     local $@;
-    ok !check(default => sub { die 'fail' }), 'no exception';
+    ok !check($@ => [default => sub { die 'fail' }]), 'no exception';
   }
+};
+
+subtest 'Check (bad spec)' => sub {
+  eval {
+    check test => {
+      default => sub { }
+    };
+  };
+  like $@, qr/Array reference of pattern\/handler pairs required to dispatch exceptions/, 'right error';
+
+  eval { check test => ['default']; };
+  like $@, qr/Array reference of pattern\/handler pairs required to dispatch exceptions/, 'right error';
 };
 
 subtest 'Raise' => sub {

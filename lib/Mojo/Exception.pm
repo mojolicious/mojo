@@ -2,6 +2,7 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
+use Carp qw(croak);
 use Exporter qw(import);
 use Mojo::Util qw(decode);
 use Scalar::Util qw(blessed);
@@ -13,13 +14,16 @@ has verbose                                    => sub { $ENV{MOJO_EXCEPTION_VERB
 our @EXPORT_OK = qw(check raise);
 
 sub check {
-  my ($err, @spec) = @_ % 2 ? @_ : ($@, @_);
+  my ($err, $spec) = @_;
   return undef unless $err;
+
+  croak "Array reference of pattern/handler pairs required to dispatch exceptions"
+    if ref $spec ne 'ARRAY' || @$spec % 2;
 
   my ($default, $handler);
   my ($is_obj,  $str) = (!!blessed($err), "$err");
-CHECK: for (my $i = 0; $i < @spec; $i += 2) {
-    my ($checks, $cb) = @spec[$i, $i + 1];
+CHECK: for (my $i = 0; $i < @$spec; $i += 2) {
+    my ($checks, $cb) = @{$spec}[$i, $i + 1];
 
     ($default = $cb) and next if $checks eq 'default';
 
@@ -164,20 +168,20 @@ Mojo::Exception - Exception base class
   eval {
     MyApp::X::Foo->throw('Something went wrong!');
   };
-  check(
+  check $@ => [
     'MyApp::X::Foo' => sub { say "Foo: $_" },
     'MyApp::X::Bar' => sub { say "Bar: $_" }
-  );
+  ];
 
   # Generate exception classes on demand
   use Mojo::Exception qw(check raise);
   eval {
     raise 'MyApp::X::Name', 'The name Minion is already taken';
   };
-  check(
+  check $@ => [
     'MyApp::X::Name' => sub { say "Name error: $_" },
     default          => sub { say "Error: $_" }
-  );
+  ];
 
 =head1 DESCRIPTION
 
@@ -189,22 +193,20 @@ L<Mojo::Exception> implements the following functions, which can be imported ind
 
 =head2 check
 
-  my $bool = check 'MyApp::X::Foo' => sub {...};
-  my $bool = check $err, 'MyApp::X::Foo' => sub {...};
+  my $bool = check $err => ['MyApp::X::Foo' => sub {...}];
 
 Process exceptions by dispatching them to handlers with one or more matching conditions. Exceptions that could not be
-handled will be rethrown automatically. By default C<$@> will be used as exception source, so C<check> needs to be
-called right after C<eval>. Note that this function is B<EXPERIMENTAL> and might change without warning!
+handled will be rethrown automatically. Note that this function is B<EXPERIMENTAL> and might change without warning!
 
   # Handle various types of exceptions
   eval {
     dangerous_code();
   };
-  check(
+  check $@ => [
     'MyApp::X::Foo'     => sub { say "Foo: $_" },
     qr/^Could not open/ => sub { say "Open error: $_" },
     default             => sub { say "Something went wrong: $_" }
-  );
+  ];
 
 Matching conditions can be class names for ISA checks on exception objects, or regular expressions to match string
 exceptions and stringified exception objects. The matching exception will be the first argument passed to the callback,
@@ -214,10 +216,10 @@ and is also available as C<$_>.
   eval {
     dangerous_code();
   };
-  check(
+  check $@ => [
     'MyApp::X::Foo'     => sub { say "Foo: $_" },
     qr/^Could not open/ => sub { say "Open error: $_" }
-  );
+  ];
 
 An array reference can be used to share the same handler with multiple conditions, of which only one needs to match.
 And since exception handlers are just callbacks, they can also throw their own exceptions.
@@ -226,9 +228,9 @@ And since exception handlers are just callbacks, they can also throw their own e
   eval {
     dangerous_code();
   };
-  check(
+  check $@ => [
     ['MyApp::X::Foo', 'MyApp::X::Bar'] => sub { die "Foo/Bar: $_" }
-  );
+  ];
 
 There is currently only one keywords you can use to set special handlers. The C<default> handler is used when no other
 handler matched.
@@ -237,9 +239,9 @@ handler matched.
   eval {
     dangerous_code();
   };
-  check(
+  check $@ => [
     default => sub { say "Error: $_" }
-  );
+  ];
 
 =head2 raise
 

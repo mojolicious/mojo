@@ -13,6 +13,7 @@
   - Removed deprecated config stash value.
   - Changed Mojo::Log to join mutiple log messages with a whitespace instead of a newline.
   - Added is_reserved method to Mojolicious.
+  - Improved Mojolicious::Routes to disallow the use of reserved stash values, such as "/:action", in route patterns.
   - Improved contextual logging feature in Mojo::Log not to concatenate log messages and context.
   - Improved all_text method in Mojo::DOM to exclude "<script>" and "<style>" from text extraction in HTML documents.
   - Improved error messages in config plugins to be more consistent.

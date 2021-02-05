@@ -101,7 +101,7 @@ get('/yada/yada/yada')->to('test1#', path => '/yada', name => 'sixth embedded');
 
 get('/basic')->partial(1)->to(MyTestApp::Basic->new, test => 'lalala');
 
-get '/third/*path' => {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
+get('/third' => {app => 'MyTestApp::Test2', name => 'third embedded'})->partial(1);
 
 app->routes->any('/hello')->partial(1)->to(TestApp::app())->to(name => 'embedded');
 

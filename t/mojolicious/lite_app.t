@@ -395,13 +395,13 @@ get '/captures/:foo/:bar' => sub {
 app->routes->add_condition(
   default => sub {
     my ($route, $c, $captures, $num) = @_;
-    $captures->{test} = $captures->{text} . "$num works!";
+    $captures->{test} = $captures->{foo} . "$num works!";
     return 1 if $c->stash->{default} == $num;
     return undef;
   }
 );
 
-get '/default/:text' => (default => 23) => sub {
+get '/default/:foo' => (default => 23) => sub {
   my $c       = shift;
   my $default = $c->stash('default');
   my $test    = $c->stash('test');

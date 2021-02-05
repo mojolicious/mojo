@@ -429,21 +429,6 @@ name present, this works similar to the regular expression C<([^/.]+)?>.
 
 And if two optional placeholders are only separated by a slash, that slash can become optional as well.
 
-  # /           -> {controller => 'foo',   action => 'bar'}
-  # /users      -> {controller => 'users', action => 'bar'}
-  # /users/list -> {controller => 'users', action => 'list'}
-  $r->get('/:controller/:action')->to('foo#bar');
-
-Special stash values like C<controller> and C<action> can also be placeholders, which is very convenient especially
-during development, but should only be used very carefully, because every controller method becomes a potential route.
-All uppercase methods as well as those starting with an underscore are automatically hidden from the router and you can
-use L<Mojolicious::Routes/"hide"> to add additional ones.
-
-  # Hide "create" method in all controllers
-  $r->hide('create');
-
-This has already been done for all attributes and methods from L<Mojolicious::Controller>.
-
 =head2 Restrictive placeholders
 
 A very easy way to make placeholders more restrictive are alternatives, you just make a list of possible values, which

@@ -64,10 +64,11 @@ sub startup {
   $r->any('/plugin/camel_case')->to('foo#plugin_camel_case');
 
   # /exceptional/*
-  $r->any('/exceptional/:action')->to('exceptional#');
+  $r->any('/exceptional/this_one_dies')->to('exceptional#this_one_dies');
 
   # /exceptional_too/*
-  $r->any('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->any('/:action');
+  $r->any('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->any('/this_one_dies')
+    ->to('#this_one_dies');
 
   # /fun/time
   $r->fun('/time')->to('foo#fun');
@@ -140,8 +141,19 @@ sub startup {
   # /rss.xml (mixed formats)
   $r->any('/rss.xml')->to('foo#bar', format => 'rss');
 
-  # /*/* (the default route)
-  $r->any('/<controller>/<action>')->to(action => 'index');
+  $r->any('/foo/yada')->to('Foo#yada');
+  $r->any('/foo')->to('foo#index');
+  $r->any('/foo-bar')->to('foo-bar#index');
+  $r->any('/foo/baz')->to('foo#baz');
+  $r->any('/plugin-test-some_plugin2/register')->to('plugin-test-some_plugin2#register');
+  $r->any('/foo/syntaxerror')->to('foo#syntaxerror');
+  $r->any('/syntax_error/foo')->to('syntax_error#foo');
+  $r->any('/:foo/test' => [foo => [qw(foo bar)]])->to('foo#test');
+  $r->any('/another')->to('another#index');
+  $r->any('/foo/willdie')->to('foo#willdie');
+  $r->any('/foo/templateless')->to('foo#templateless');
+  $r->any('/foo/withlayout')->to('foo#withlayout');
+  $r->any('/side_effects-test/index')->to('side_effects-test#index');
 
   # /just/some/template (embedded template)
   $r->any('/just/some/template')->to(template => 'just/some/template');

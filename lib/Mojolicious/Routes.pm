@@ -11,7 +11,6 @@ has base_classes               => sub { [qw(Mojolicious::Controller Mojolicious)
 has cache                      => sub { Mojo::Cache->new };
 has [qw(conditions shortcuts)] => sub { {} };
 has types                      => sub { {num => qr/[0-9]+/} };
-has hidden                     => sub { [qw(attr has new tap)] };
 has namespaces                 => sub { [] };
 
 sub add_condition { $_[0]->conditions->{$_[1]} = $_[2] and return $_[0] }
@@ -51,14 +50,6 @@ sub dispatch {
   $self->match($c);
   @{$c->match->stack} ? $self->continue($c) : return undef;
   return 1;
-}
-
-sub hide { push @{shift->hidden}, @_ }
-
-sub is_hidden {
-  my ($self, $method) = @_;
-  my $h = $self->{hiding} ||= {map { $_ => 1 } @{$self->hidden}};
-  return !!($h->{$method} || $method =~ /^_/ || $method =~ /^[A-Z_]+$/);
 }
 
 sub lookup { ($_[0]{reverse} //= $_[0]->_index)->{$_[1]} }
@@ -163,17 +154,14 @@ sub _controller {
 
   # Action
   elsif (my $method = $field->{action}) {
-    if (!$self->is_hidden($method)) {
-      $log->debug(qq{Routing to controller "$class" and action "$method"});
+    $log->debug(qq{Routing to controller "$class" and action "$method"});
 
-      if (my $sub = $new->can($method)) {
-        $old->stash->{'mojo.routed'} = 1 if $last;
-        return 1                         if _action($old->app, $new, $sub, $last);
-      }
-
-      else { $log->debug('Action not found in controller') }
+    if (my $sub = $new->can($method)) {
+      $old->stash->{'mojo.routed'} = 1 if $last;
+      return 1                         if _action($old->app, $new, $sub, $last);
     }
-    else { $log->debug(qq{Action "$method" is not allowed}) }
+
+    else { $log->debug('Action not found in controller') }
   }
 
   return undef;
@@ -262,13 +250,6 @@ Routing cache, defaults to a L<Mojo::Cache> object.
 
 Contains all available conditions.
 
-=head2 hidden
-
-  my $hidden = $r->hidden;
-  $r         = $r->hidden(['attr', 'has', 'new']);
-
-Controller attributes and methods that are hidden from router, defaults to C<attr>, C<has>, C<new> and C<tap>.
-
 =head2 namespaces
 
   my $namespaces = $r->namespaces;
@@ -336,18 +317,6 @@ Continue dispatch chain and emit the hook L<Mojolicious/"around_action"> for eve
   my $bool = $r->dispatch(Mojolicious::Controller->new);
 
 Match routes with L</"match"> and dispatch with L</"continue">.
-
-=head2 hide
-
-  $r = $r->hide('foo', 'bar');
-
-Hide controller attributes and methods from router.
-
-=head2 is_hidden
-
-  my $bool = $r->is_hidden('foo');
-
-Check if controller attribute or method is hidden from router.
 
 =head2 lookup
 

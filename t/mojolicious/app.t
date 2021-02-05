@@ -105,44 +105,35 @@ like $@, qr/^Can't locate object method "missing" via package "Mojolicious::Rout
 eval { Mojolicious::Route::missing() };
 like $@, qr/^Undefined subroutine &Mojolicious::Route::missing called/, 'right error';
 
-# Hidden controller attributes and methods
-$t->app->routes->hide('bar');
-ok !$t->app->routes->is_hidden('foo'), 'not hidden';
-ok $t->app->routes->is_hidden('bar'),                 'is hidden';
-ok $t->app->routes->is_hidden('_foo'),                'is hidden';
-ok $t->app->routes->is_hidden('AUTOLOAD'),            'is hidden';
-ok $t->app->routes->is_hidden('DESTROY'),             'is hidden';
-ok $t->app->routes->is_hidden('FOO_BAR'),             'is hidden';
-ok $t->app->routes->is_hidden('app'),                 'is hidden';
-ok $t->app->routes->is_hidden('attr'),                'is hidden';
-ok $t->app->routes->is_hidden('continue'),            'is hidden';
-ok $t->app->routes->is_hidden('cookie'),              'is hidden';
-ok $t->app->routes->is_hidden('every_cookie'),        'is hidden';
-ok $t->app->routes->is_hidden('every_param'),         'is hidden';
-ok $t->app->routes->is_hidden('every_signed_cookie'), 'is hidden';
-ok $t->app->routes->is_hidden('finish'),              'is hidden';
-ok $t->app->routes->is_hidden('has'),                 'is hidden';
-ok $t->app->routes->is_hidden('helpers'),             'is hidden';
-ok $t->app->routes->is_hidden('match'),               'is hidden';
-ok $t->app->routes->is_hidden('new'),                 'is hidden';
-ok $t->app->routes->is_hidden('on'),                  'is hidden';
-ok $t->app->routes->is_hidden('param'),               'is hidden';
-ok $t->app->routes->is_hidden('render'),              'is hidden';
-ok $t->app->routes->is_hidden('render_later'),        'is hidden';
-ok $t->app->routes->is_hidden('render_maybe'),        'is hidden';
-ok $t->app->routes->is_hidden('render_to_string'),    'is hidden';
-ok $t->app->routes->is_hidden('rendered'),            'is hidden';
-ok $t->app->routes->is_hidden('req'),                 'is hidden';
-ok $t->app->routes->is_hidden('res'),                 'is hidden';
-ok $t->app->routes->is_hidden('send'),                'is hidden';
-ok $t->app->routes->is_hidden('session'),             'is hidden';
-ok $t->app->routes->is_hidden('signed_cookie'),       'is hidden';
-ok $t->app->routes->is_hidden('stash'),               'is hidden';
-ok $t->app->routes->is_hidden('tap'),                 'is hidden';
-ok $t->app->routes->is_hidden('tx'),                  'is hidden';
-ok $t->app->routes->is_hidden('url_for'),             'is hidden';
-ok $t->app->routes->is_hidden('write'),               'is hidden';
-ok $t->app->routes->is_hidden('write_chunk'),         'is hidden';
+subtest 'Reserved stash value' => sub {
+  ok !$t->app->routes->is_reserved('foo'), 'not reserved';
+  ok $t->app->routes->is_reserved('action'),     'is reserved';
+  ok $t->app->routes->is_reserved('app'),        'is reserved';
+  ok $t->app->routes->is_reserved('cb'),         'is reserved';
+  ok $t->app->routes->is_reserved('controller'), 'is reserved';
+  ok $t->app->routes->is_reserved('data'),       'is reserved';
+  ok $t->app->routes->is_reserved('extends'),    'is reserved';
+  ok $t->app->routes->is_reserved('format'),     'is reserved';
+  ok $t->app->routes->is_reserved('handler'),    'is reserved';
+  ok $t->app->routes->is_reserved('inline'),     'is reserved';
+  ok $t->app->routes->is_reserved('json'),       'is reserved';
+  ok $t->app->routes->is_reserved('layout'),     'is reserved';
+  ok $t->app->routes->is_reserved('namespace'),  'is reserved';
+  ok $t->app->routes->is_reserved('path'),       'is reserved';
+  ok $t->app->routes->is_reserved('status'),     'is reserved';
+  ok $t->app->routes->is_reserved('template'),   'is reserved';
+  ok $t->app->routes->is_reserved('text'),       'is reserved';
+  ok $t->app->routes->is_reserved('variant'),    'is reserved';
+};
+
+subtest 'Reserved stash value (in placeholder)' => sub {
+  eval { $t->app->routes->any('/:controller') };
+  like $@, qr/Route pattern contains reserved stash value/, 'right error';
+  eval { $t->app->routes->any('/:action') };
+  like $@, qr/Route pattern contains reserved stash value/, 'right error';
+  eval { $t->app->routes->any('/:text') };
+  like $@, qr/Route pattern contains reserved stash value/, 'right error';
+};
 
 # Unknown hooks
 ok !$t->app->plugins->emit_chain('does_not_exist'),         'hook has been emitted';
@@ -210,13 +201,6 @@ $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/baz')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
   ->content_like(qr/Page Not Found/);
 like $log, qr/Action not found in controller/, 'right message';
-$t->app->log->unsubscribe(message => $cb);
-
-# Foo::render (action not allowed)
-$log = '';
-$cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/foo/render')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
-like $log, qr/Action "render" is not allowed/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Foo::yada (action-less template)

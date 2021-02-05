@@ -11,6 +11,12 @@ has 'children' => sub { [] };
 has parent     => undef, weak => 1;
 has pattern    => sub { Mojolicious::Routes::Pattern->new };
 
+# Reserved stash values
+my %RESERVED = map { $_ => 1 } (
+  qw(action app cb controller data extends format handler inline json layout namespace path status template text),
+  qw(variant)
+);
+
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
 
@@ -47,6 +53,8 @@ sub has_websocket {
 }
 
 sub is_endpoint { $_[0]->inline ? undef : !@{$_[0]->children} }
+
+sub is_reserved { !!$RESERVED{$_[1]} }
 
 sub is_websocket { !!shift->{websocket} }
 
@@ -207,10 +215,14 @@ sub _index {
 }
 
 sub _route {
-  my $self   = shift;
-  my $route  = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
+  my $self = shift;
+
+  my $route = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
+  Carp::croak 'Route pattern contains reserved stash value'
+    if grep { $self->is_reserved($_) } @{$route->pattern->placeholders};
   my $format = $self->pattern->constraints->{format};
   $route->pattern->constraints->{format} //= 0 if defined $format && !$format;
+
   return $route;
 }
 
@@ -392,6 +404,12 @@ Check if this route has a WebSocket ancestor and cache the result for future che
   my $bool = $r->is_endpoint;
 
 Check if this route qualifies as an endpoint.
+
+=head2 is_reserved
+
+  my $bool = $r->is_reserved('controller');
+
+Check if string is a reserved stash value.
 
 =head2 is_websocket
 

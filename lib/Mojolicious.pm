@@ -156,11 +156,6 @@ sub new {
   my $controller = "@{[ref $self]}::Controller";
   my $r          = $self->preload_namespaces([$controller])->routes->namespaces([$controller, ref $self]);
 
-  # Hide controller attributes/methods
-  $r->hide(qw(app continue cookie every_cookie every_param every_signed_cookie finish helpers match on param render));
-  $r->hide(qw(render_later render_maybe render_to_string rendered req res send session signed_cookie stash tx url_for));
-  $r->hide(qw(write write_chunk));
-
   $self->plugin($_) for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
 
   # Exception handling should be first in chain

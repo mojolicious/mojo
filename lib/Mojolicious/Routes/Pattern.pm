@@ -53,8 +53,6 @@ sub parse {
 sub render {
   my ($self, $values, $endpoint) = @_;
 
-  my $start = $self->type_start;
-
   # Placeholders can only be optional without a format
   my $optional = !(my $format = $values->{format});
 
@@ -71,7 +69,7 @@ sub render {
 
     # Placeholder
     else {
-      my $name    = (split /\Q$start/, $value)[0] // '';
+      my $name    = $value->[0];
       my $default = $self->defaults->{$name};
       $part = $values->{$name} // $default // '';
       if    (!defined $default || ($default ne $part)) { $optional = 0 }
@@ -88,11 +86,9 @@ sub render {
 sub _compile {
   my ($self, $detect) = @_;
 
-  my $placeholders = $self->placeholders;
-  my $constraints  = $self->constraints;
-  my $defaults     = $self->defaults;
-  my $start        = $self->type_start;
-  my $types        = $self->types;
+  my $constraints = $self->constraints;
+  my $defaults    = $self->defaults;
+  my $types       = $self->types;
 
   my $block    = my $regex = '';
   my $optional = 1;
@@ -112,15 +108,14 @@ sub _compile {
 
     # Placeholder
     else {
-      if ($value =~ /^(.+)\Q$start\E(.+)$/) { ($value, $part) = ($1, _compile_req($types->{$2} // '?!')) }
-      else                                  { $part = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)' }
-      unshift @$placeholders, $value;
+      if ($value->[1]) { $part = _compile_req($types->{$value->[1]} // '?!') }
+      else             { $part = $type ? $type eq 'relaxed' ? '([^/]+)' : '(.+)' : '([^/.]+)' }
 
       # Custom regex
-      if (my $c = $constraints->{$value}) { $part = _compile_req($c) }
+      if (my $c = $constraints->{$value->[0]}) { $part = _compile_req($c) }
 
       # Optional placeholder
-      exists $defaults->{$value} ? ($part .= '?') : ($optional = 0);
+      exists $defaults->{$value->[0]} ? ($part .= '?') : ($optional = 0);
     }
 
     $block = $part . $block;
@@ -158,11 +153,13 @@ sub _compile_req {
 sub _tokenize {
   my ($self, $pattern) = @_;
 
-  my $quote_end   = $self->quote_end;
-  my $quote_start = $self->quote_start;
-  my $start       = $self->placeholder_start;
-  my $relaxed     = $self->relaxed_start;
-  my $wildcard    = $self->wildcard_start;
+  my $placeholders = $self->placeholders;
+  my $type_start   = $self->type_start;
+  my $quote_end    = $self->quote_end;
+  my $quote_start  = $self->quote_start;
+  my $start        = $self->placeholder_start;
+  my $relaxed      = $self->relaxed_start;
+  my $wildcard     = $self->wildcard_start;
 
   my (@tree, $spec, $more);
   for my $char (split //, $pattern) {
@@ -194,6 +191,13 @@ sub _tokenize {
     elsif (!$tree[-2] && $tree[-1][0] eq 'slash')                          { @tree = (['text', "/$char"]) }
     elsif ($tree[-2] && $tree[-2][0] eq 'text' && $tree[-1][0] eq 'slash') { pop @tree && ($tree[-1][-1] .= "/$char") }
     else                                                                   { push @tree, ['text', $char] }
+  }
+
+  # Placeholder types
+  for my $token (reverse @tree) {
+    next unless $token->[0] eq 'placeholder';
+    $token->[1] = $token->[1] =~ /^(.+)\Q$type_start\E(.+)$/ ? [$1, $2] : [$token->[1]];
+    unshift @$placeholders, $token->[1][0];
   }
 
   return $self->unparsed($pattern)->tree(\@tree);

@@ -82,7 +82,7 @@ sub templateless { shift->render(handler => 'test') }
 sub test {
   my $self = shift;
   $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-  $self->render(text => $self->url_for(controller => 'bar'));
+  $self->render(text => $self->url_for(foo => 'bar'));
 }
 
 sub url_for_missing {

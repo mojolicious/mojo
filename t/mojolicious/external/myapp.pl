@@ -51,7 +51,10 @@ get '/one' => sub { shift->render(text => 'One') };
 
 get '/one/two' => {text => 'Two'};
 
-get '/template/:template';
+get '/template/:foo' => sub {
+  my $c = shift;
+  $c->render($c->param('foo'));
+};
 
 websocket '/url_for' => sub {
   my $c = shift;

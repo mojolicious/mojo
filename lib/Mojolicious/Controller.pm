@@ -13,12 +13,6 @@ use Scalar::Util ();
 has [qw(app tx)] => undef, weak => 1;
 has match => sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
 
-# Reserved stash values
-my %RESERVED = map { $_ => 1 } (
-  qw(action app cb controller data extends format handler inline json layout namespace path status template text),
-  qw(variant)
-);
-
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
 
@@ -59,7 +53,7 @@ sub every_param {
 
   # Captured unreserved values
   my $captures = $self->stash->{'mojo.captures'} //= {};
-  if (!$RESERVED{$name} && exists $captures->{$name}) {
+  if (exists $captures->{$name} && !$self->app->routes->is_reserved($name)) {
     my $value = $captures->{$name};
     return ref $value eq 'ARRAY' ? $value : [$value];
   }

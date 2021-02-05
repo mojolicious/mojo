@@ -47,30 +47,30 @@ just the request path, such as request method and headers like C<Host>, C<User-A
 While regular expressions are quite powerful they also tend to be unpleasant to look at and are generally overkill for
 ordinary path matching.
 
-  qr!/user/show/(\d+)! -> $c->render(text => $users{$1});
+  qr!/user/admin/(\d+)! -> $c->render(text => $users{$1});
 
 This is where routes come into play, they have been designed from the ground up to represent paths with placeholders.
 
-  /user/show/:id -> $c->render(text => $users{$id});
+  /user/admin/:id -> $c->render(text => $users{$id});
 
 The only difference between a static path and the route above is the C<:id> placeholder. One or more placeholders can
 be anywhere in the route.
 
-  /user/:action/:id
+  /user/:role/:id
 
 A fundamental concept of the L<Mojolicious> router is that extracted placeholder values are turned into a hash.
 
-  /user/show/23 -> /user/:action/:id -> {action => 'show', id => 23}
+  /user/admin/23 -> /user/:role/:id -> {role => 'admin', id => 23}
 
 This hash is basically the center of every L<Mojolicious> application, you will learn more about this later on.
 Internally, routes get compiled to regular expressions, so you can get the best of both worlds with a little bit of
 experience.
 
-  /user/show/:id -> qr/(?-xism:^\/user\/show\/([^\/.]+))/
+  /user/admin/:id -> qr/(?-xism:^\/user\/admin\/([^\/.]+))/
 
 A trailing slash in the path is always optional.
 
-  /user/show/23/ -> /user/:action/:id -> {action => 'show', id => 23}
+  /user/admin/23/ -> /user/:role/:id -> {role => 'admin', id => 23}
 
 =head2 Reversibility
 
@@ -585,11 +585,11 @@ placeholders can also be used to limit the allowed formats.
 
 A C<format> value can also be passed to L<Mojolicious::Controller/"url_for">.
 
-  # /foo/bar.txt -> {controller => 'foo', action => 'bar', format => 'txt'}
-  $r->get('/foo/:action')->to('foo#')->name('baz');
+  # /foo/23.txt -> {controller => 'foo', action => 'bar', id => 23, format => 'txt'}
+  $r->get('/foo/:id')->to('foo#bar')->name('baz');
 
-  # Generate URL "/foo/bar.txt" for route "baz"
-  my $url = $c->url_for('baz', action => 'bar', format => 'txt');
+  # Generate URL "/foo/24.txt" for route "baz"
+  my $url = $c->url_for('baz', id => 24, format => 'txt');
 
 Or you can just disable format detection with a special type of restrictive placeholder, which gets inherited by nested
 routes, and then re-enable it on demand.

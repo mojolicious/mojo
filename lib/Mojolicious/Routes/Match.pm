@@ -101,19 +101,18 @@ Mojolicious::Routes::Match - Find routes
 
   # Routes
   my $r = Mojolicious::Routes->new;
-  $r->get('/:controller/:action');
-  $r->put('/:controller/:action');
+  $r->get('/user/:id');
+  $r->put('/user/:id');
 
   # Match
   my $c = Mojolicious::Controller->new;
   my $match = Mojolicious::Routes::Match->new(root => $r);
-  $match->find($c => {method => 'PUT', path => '/foo/bar'});
-  say $match->stack->[0]{controller};
-  say $match->stack->[0]{action};
+  $match->find($c => {method => 'PUT', path => '/user/23'});
+  say $match->stack->[0]{id};
 
   # Render
   say $match->path_for->{path};
-  say $match->path_for(action => 'baz')->{path};
+  say $match->path_for(id => 24)->{path};
 
 =head1 DESCRIPTION
 

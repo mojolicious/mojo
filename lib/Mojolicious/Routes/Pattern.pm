@@ -338,25 +338,24 @@ Match pattern against path and remove matching parts, format detection is disabl
 =head2 new
 
   my $pattern = Mojolicious::Routes::Pattern->new;
-  my $pattern = Mojolicious::Routes::Pattern->new('/:action');
-  my $pattern
-    = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
+  my $pattern = Mojolicious::Routes::Pattern->new('/users/:id');
+  my $pattern = Mojolicious::Routes::Pattern->new('/user/:id', id => qr/\d+/);
   my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
 Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern if necessary.
 
 =head2 parse
 
-  $pattern = $pattern->parse('/:action');
-  $pattern = $pattern->parse('/:action', action => qr/\w+/);
+  $pattern = $pattern->parse('/user/:id');
+  $pattern = $pattern->parse('/user/:id', id=> qr/\d+/);
   $pattern = $pattern->parse(format => 0);
 
 Parse pattern.
 
 =head2 render
 
-  my $path = $pattern->render({action => 'foo'});
-  my $path = $pattern->render({action => 'foo'}, 1);
+  my $path = $pattern->render({id => 24});
+  my $path = $pattern->render({id => 24}, 1);
 
 Render pattern into a path with parameters, format rendering is disabled by default.
 

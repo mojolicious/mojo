@@ -467,8 +467,8 @@ L<Mojolicious::Guides::Routing> for more information.
 
 =head2 parse
 
-  $r = $r->parse('/:action');
-  $r = $r->parse('/:action', action => qr/\w+/);
+  $r = $r->parse('/user/:id');
+  $r = $r->parse('/user/:id', id => qr/\d+/);
   $r = $r->parse(format => 0);
 
 Parse pattern.

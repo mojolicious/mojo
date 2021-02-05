@@ -411,8 +411,7 @@ original fulfillment value or rejection reason.
 
 Apply a function that returns a L<Mojo::Promise> to each item in a list of items while optionally limiting concurrency.
 Returns a L<Mojo::Promise> that collects the results in the same manner as L</all>. If any item's promise is rejected,
-any remaining items which have not yet been mapped will not be. Note that this method is B<EXPERIMENTAL> and might
-change without warning!
+any remaining items which have not yet been mapped will not be.
 
   # Perform 3 requests at a time concurrently
   Mojo::Promise->map({concurrency => 3}, sub { $ua->get_p($_) }, @urls)

@@ -2,7 +2,7 @@
 8.73  2021-02-04
   - Removed finally keyword from check function in Mojo::Exception.
   - Changed arguments of check function in Mojo::Exception to be easier to use with Perl 5.34 try/catch.
-  - Removed experimental status from any, timer and timeout methods in Mojo::Promise.
+  - Removed experimental status from any, map, timer and timeout methods in Mojo::Promise.
   - Removed experimental status from extname method in Mojo::File.
   - Removed experimental status from load_classes function in Mojo::Loader.
   - Added silent attribute to Mojo::Server::Morbo.

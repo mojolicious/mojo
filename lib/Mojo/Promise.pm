@@ -367,8 +367,7 @@ rejected, with hash references that describe the outcome of each promise.
   my $new = Mojo::Promise->any(@promises);
 
 Returns a new L<Mojo::Promise> object that fulfills as soon as one of the passed L<Mojo::Promise> objects fulfills,
-with the value from that promise. If no promises fulfill, it is rejected with the reasons from the rejected promises in
-the same order as the passed promises. Note that this method is B<EXPERIMENTAL> and might change without warning!
+with the value from that promise.
 
 =head2 catch
 

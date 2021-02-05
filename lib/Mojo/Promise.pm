@@ -506,8 +506,7 @@ return value of the called handler.
   $promise = $promise->timer(5);
 
 Create a new L<Mojo::Promise> object with a timer or attach a timer to an existing promise. The promise will be
-resolved after the given amount of time in seconds with or without a value. Note that this method is B<EXPERIMENTAL>
-and might change without warning!
+resolved after the given amount of time in seconds with or without a value.
 
 =head2 timeout
 
@@ -516,8 +515,7 @@ and might change without warning!
   $promise = $promise->timeout(5);
 
 Create a new L<Mojo::Promise> object with a timeout or attach a timeout to an existing promise. The promise will be
-rejected after the given amount of time in seconds with a reason, which defaults to C<Promise timeout>. Note that this
-method is B<EXPERIMENTAL> and might change without warning!
+rejected after the given amount of time in seconds with a reason, which defaults to C<Promise timeout>.
 
 =head2 wait
 

@@ -94,6 +94,9 @@ sub startup {
   # /test3 (no class, just a namespace)
   $r->any('/test3')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
 
+  # /test4 (controller class without action)
+  $r->any('/test1')->to(controller => 'Foo::Bar');
+
   # /test2 (different namespace test)
   $r->any('/test2')->to(namespace => 'MojoliciousTest2', controller => 'Foo', action => 'test');
 

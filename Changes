@@ -15,6 +15,7 @@
   - Added is_reserved method to Mojolicious.
   - Improved Mojolicious::Routes to disallow the use of reserved stash values, such as "/:action", in route patterns.
   - Improved Mojolicious::Routes to throw exceptions for missing controllers.
+  - Improved Mojolicious::Routes to throw exceptions for routes with controllers but without action.
   - Improved Mojolicious::Routes to disallow namespace without controller for routing.
   - Improved contextual logging feature in Mojo::Log not to concatenate log messages and context.
   - Improved all_text method in Mojo::DOM to exclude "<script>" and "<style>" from text extraction in HTML documents.

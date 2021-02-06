@@ -309,6 +309,10 @@ $t->get_ok('/test2' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-
 $t->get_ok('/test3' => {'X-Test' => 'Hi there!'})->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Namespace "MojoliciousTest2::Foo" requires a controller/);
 
+# MojoliciousTest::Foo::Bar (no action)
+$t->get_ok('/test1' => {'X-Test' => 'Hi there!'})->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Controller "MojoliciousTest::Controller::Foo::Bar" requires an action/);
+
 # MojoliciousTestController::index (no namespace)
 $t->get_ok('/test6' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => 'Bite my shiny metal ass!')
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/test6');

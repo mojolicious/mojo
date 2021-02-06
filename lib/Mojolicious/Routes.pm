@@ -164,6 +164,8 @@ sub _controller {
     else { $log->debug('Action not found in controller') }
   }
 
+  else { croak qq{Controller "$class" requires an action} }
+
   return undef;
 }
 

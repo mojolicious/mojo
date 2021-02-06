@@ -218,7 +218,7 @@ sub _route {
   my $self = shift;
 
   my $route = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
-  Carp::croak 'Route pattern contains reserved stash value'
+  Carp::croak qq{Route pattern "@{[$route->pattern->unparsed]}" contains reserved stash value}
     if grep { $self->is_reserved($_) } @{$route->pattern->placeholders};
   my $format = $self->pattern->constraints->{format};
   $route->pattern->constraints->{format} //= 0 if defined $format && !$format;

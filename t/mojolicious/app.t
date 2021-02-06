@@ -128,11 +128,11 @@ subtest 'Reserved stash value' => sub {
 
 subtest 'Reserved stash value (in placeholder)' => sub {
   eval { $t->app->routes->any('/:controller') };
-  like $@, qr/Route pattern contains reserved stash value/, 'right error';
+  like $@, qr/Route pattern "\/:controller" contains reserved stash value/, 'right error';
   eval { $t->app->routes->any('/:action') };
-  like $@, qr/Route pattern contains reserved stash value/, 'right error';
-  eval { $t->app->routes->any('/:text') };
-  like $@, qr/Route pattern contains reserved stash value/, 'right error';
+  like $@, qr/Route pattern "\/:action" contains reserved stash value/, 'right error';
+  eval { $t->app->routes->any('/foo/:text') };
+  like $@, qr/Route pattern "\/foo\/:text" contains reserved stash value/, 'right error';
 };
 
 # Unknown hooks

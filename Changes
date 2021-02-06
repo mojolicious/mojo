@@ -1,4 +1,6 @@
 
+8.74  2021-02-06
+
 8.73  2021-02-05
   - Removed finally keyword from check function in Mojo::Exception.
   - Changed arguments of check function in Mojo::Exception to be easier to use with Perl 5.34 try/catch.

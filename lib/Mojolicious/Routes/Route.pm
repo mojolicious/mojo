@@ -1,7 +1,7 @@
 package Mojolicious::Routes::Route;
 use Mojo::Base -base;
 
-use Carp ();
+use Carp qw(croak);
 use Mojo::DynamicMethods -dispatch;
 use Mojo::Util;
 use Mojolicious::Routes::Pattern;
@@ -25,7 +25,7 @@ sub BUILD_DYNAMIC {
     my $dynamic = $dyn_methods->{$self->root}{$method};
     return $self->$dynamic(@_) if $dynamic;
     my $package = ref($self);
-    Carp::croak qq{Can't locate object method "$method" via package "$package"};
+    croak qq{Can't locate object method "$method" via package "$package"};
   };
 }
 
@@ -218,7 +218,7 @@ sub _route {
   my $self = shift;
 
   my $route = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
-  Carp::croak qq{Route pattern "@{[$route->pattern->unparsed]}" contains reserved stash value}
+  croak qq{Route pattern "@{[$route->pattern->unparsed]}" contains reserved stash value}
     if grep { $self->is_reserved($_) } @{$route->pattern->placeholders};
   my $format = $self->pattern->constraints->{format};
   $route->pattern->constraints->{format} //= 0 if defined $format && !$format;

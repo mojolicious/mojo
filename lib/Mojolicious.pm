@@ -256,8 +256,7 @@ L<Mojolicious> will emit the following hooks in the listed order.
 
 =head2 before_command
 
-Emitted right before the application runs a command through the command line interface. Note that this hook is
-B<EXPERIMENTAL> and might change without warning!
+Emitted right before the application runs a command through the command line interface.
 
   $app->hook(before_command => sub ($command, $args) {...});
 
@@ -457,8 +456,7 @@ a plugin.
   my $namespaces = $app->preload_namespaces;
   $app           = $app->preload_namespaces(['MyApp:Controller']);
 
-Namespaces to preload classes from during application startup. Note that this attribute is B<EXPERIMENTAL> and might
-change without warning!
+Namespaces to preload classes from during application startup.
 
 =head2 renderer
 
@@ -737,8 +735,7 @@ subclass.
 
   $app->warmup;
 
-Preload classes from L</"preload_namespaces"> for future use. Note that this method is B<EXPERIMENTAL> and might change
-without warning!
+Preload classes from L</"preload_namespaces"> for future use.
 
 =head1 HELPERS
 

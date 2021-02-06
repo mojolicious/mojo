@@ -147,7 +147,7 @@ sub render {
 
   # Maybe no 404
   return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
-  return $maybe          ? undef                          : !$self->helpers->reply->not_found unless defined $output;
+  return $maybe          ? undef : Carp::croak("Could not render a response") unless defined $output;
 
   $plugins->emit_hook(after_render => $self, \$output, $format);
   return $renderer->respond($self, $output, $format, $stash->{status});
@@ -509,8 +509,8 @@ For more control you can also access request information directly.
   my $bool = $c->render('foo/index');
 
 Render content with L<Mojolicious/"renderer"> and emit hooks L<Mojolicious/"before_render"> as well as
-L<Mojolicious/"after_render">, or call L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found"> if no response
-could be generated, all additional key/value pairs get merged into the L</"stash">.
+L<Mojolicious/"after_render">, or dies if no response could be generated. All additional key/value pairs get merged into
+the L</"stash">.
 
   # Render characters
   $c->render(text => 'I ♥ Mojolicious!');

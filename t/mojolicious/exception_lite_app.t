@@ -80,7 +80,7 @@ get '/missing_template' => {exception => 'whatever'};
 
 get '/missing_template/too' => sub {
   my $c = shift;
-  $c->render('does_not_exist') or $c->res->headers->header('X-Not-Found' => 1);
+  $c->render('does_not_exist');
 };
 
 get '/missing_helper' => sub { shift->missing_helper };
@@ -270,8 +270,8 @@ subtest 'Missing template with custom rendering' => sub {
 };
 
 subtest 'Missing template (failed rendering)' => sub {
-  $t->get_ok('/missing_template/too')->status_is(404)->header_is('X-Not-Found' => 1)
-    ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Page Not Found/);
+  $t->get_ok('/missing_template/too')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr/Could not render a response/);
 };
 
 subtest 'Missing helper (correct context)' => sub {

@@ -196,7 +196,7 @@ $t->get_ok('/x/1/url/☃')->status_is(200)->content_is('/x/1/url/%E2%98%83.json 
 $t->get_ok('/x/1/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
 
 # Missing template from myapp.pl
-$t->get_ok('/x/1/template/does_not_exist')->status_is(404);
+$t->get_ok('/x/1/template/does_not_exist')->status_is(500)->content_like(qr/Server Error/);
 
 # Template from myapp.pl with Unicode prefix
 $t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
@@ -239,7 +239,7 @@ $t->get_ok('/x/♥/url/☃')->status_is(200)
 $t->get_ok('/x/♥/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
 
 # Missing template from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/template/does_not_exist')->status_is(404);
+$t->get_ok('/x/♥/template/does_not_exist')->status_is(500)->content_like(qr/Server Error/);
 
 # A little bit of everything from myapp2.pl
 $t->get_ok('/y/1')->status_is(200)->content_is("myapp2\nworks 4!\nInsecure too!");

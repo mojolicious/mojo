@@ -1,6 +1,7 @@
 package Mojolicious::Routes;
 use Mojo::Base 'Mojolicious::Routes::Route';
 
+use Carp ();
 use List::Util qw(first);
 use Mojo::Cache;
 use Mojo::DynamicMethods;
@@ -118,16 +119,15 @@ sub _class {
   for my $class (@classes) {
 
     # Failed
-    next                                                        unless defined(my $found = $self->_load($class));
-    return !$log->debug(qq{Class "$class" is not a controller}) unless $found;
+    next                                               unless defined(my $found = $self->_load($class));
+    Carp::croak qq{Class "$class" is not a controller} unless $found;
 
     # Success
     return $class->new(%$c);
   }
 
   # Nothing found
-  $log->debug(qq{Controller "$classes[-1]" does not exist}) if @classes;
-  return @classes ? undef : 0;
+  return @classes ? Carp::croak qq{Controller "$classes[-1]" does not exist} : 0;
 }
 
 sub _controller {

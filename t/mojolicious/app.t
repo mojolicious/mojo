@@ -155,15 +155,17 @@ is $t->app->plugins->emit_chain(custom_chain => 4), 8, 'hook has been emitted';
 is $t->app->start(qw(test_command --to)), 'works too!', 'right result';
 
 # Plugin::Test::SomePlugin2::register (security violation)
-$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page Not Found/);
+$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(500)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
+  ->content_like(qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/);
 
 # Plugin::Test::SomePlugin2::register (security violation again)
 $t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
 my $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page Not Found/);
+$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(500)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
+  ->content_like(qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/);
 like $log, qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -279,7 +281,8 @@ $t->put_ok('/somethingtest' => {'X-Test' => 'Hi there!'})->status_is(200)->heade
   ->content_is('/test4/42');
 $t->post_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/test4/42');
-$t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})->status_is(404);
+$t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})->status_is(500)
+  ->content_like(qr/Controller "MojoliciousTest::Somethingtest" does not exist/);
 
 # Foo::url_for_missing
 $t->get_ok('/something_missing' => {'X-Test' => 'Hi there!'})->status_is(200)
@@ -341,7 +344,7 @@ $t->get_ok('/another/file')->status_is(200)->header_is(Server => 'Mojolicious (P
 # Static directory /another
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/another')->status_is(404)->header_is(Server => 'Mojolicious (Perl)');
+$t->get_ok('/another')->status_is(500)->header_is(Server => 'Mojolicious (Perl)');
 like $log, qr/Controller "MojoliciousTest::Another" does not exist/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 

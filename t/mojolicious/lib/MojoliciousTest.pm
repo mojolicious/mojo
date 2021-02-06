@@ -92,13 +92,10 @@ sub startup {
   $r->any('/something_missing')->to('foo#url_for_missing');
 
   # /test3 (no class, just a namespace)
-  $r->any('/test3')->to(namespace => 'MojoliciousTestController', action => 'index');
+  $r->any('/test3')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
 
   # /test2 (different namespace test)
   $r->any('/test2')->to(namespace => 'MojoliciousTest2', controller => 'Foo', action => 'test');
-
-  # /test5 (only namespace test)
-  $r->any('/test5')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
 
   # /test6 (no namespace test)
   $r->any('/test6')->to(namespace => '', controller => 'mojolicious_test2-foo', action => 'test');

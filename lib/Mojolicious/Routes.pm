@@ -107,8 +107,8 @@ sub _class {
 
   # Specific namespace
   elsif (defined(my $ns = $field->{namespace})) {
-    if    ($class) { push @classes, $ns ? "${ns}::$class" : $class }
-    elsif ($ns)    { push @classes, $ns }
+    Carp::croak qq{Namespace "$ns" requires a controller} unless $class;
+    push @classes, $ns ? "${ns}::$class" : $class;
   }
 
   # All namespaces

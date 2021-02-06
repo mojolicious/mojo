@@ -336,7 +336,7 @@ L<Mojolicious::Controller> or L<Mojo> before dispatching to it.
 You can use the C<namespace> stash value to change the namespace of a whole route with all its children.
 
   # /bye -> MyApp::MyController::Foo::Bar->bye
-  $r->get('/bye')->to(namespace => 'MyApp::MyController::Foo::Bar', action => 'bye');
+  $r->get('/bye')->to(namespace => 'MyApp::MyController', controller => 'Foo::Bar', action => 'bye');
 
 The C<controller> is always converted from C<snake_case> to C<CamelCase> with L<Mojo::Util/"camelize">, and then
 appended to this C<namespace>.

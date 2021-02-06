@@ -72,8 +72,8 @@ subtest 'Preload namespaces' => sub {
 
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something', 'right pattern';
-is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTestController', 'right namespace';
-is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                       'right controller';
+is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTest2::Foo', 'right namespace';
+is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                   'right controller';
 is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route', 'right class';
 is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes', 'right class';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
@@ -306,12 +306,8 @@ $t->get_ok('/test2' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr!/test2!);
 
 # MojoliciousTestController::index
-$t->get_ok('/test3' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => 'Bite my shiny metal ass!')
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/No class works!/);
-
-# MojoliciousTestController::index (only namespace)
-$t->get_ok('/test5' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => 'Bite my shiny metal ass!')
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('/test5');
+$t->get_ok('/test3' => {'X-Test' => 'Hi there!'})->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Namespace "MojoliciousTest2::Foo" requires a controller/);
 
 # MojoliciousTestController::index (no namespace)
 $t->get_ok('/test6' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => 'Bite my shiny metal ass!')

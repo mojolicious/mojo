@@ -90,7 +90,7 @@ besides loading deployment specific plugins.
 
   "plugins": [{"SetUserGroup": {"user": "sri", "group": "staff"}}]
 
-One or more deployment specific plugins that should be loaded rigth after this plugin has been loaded.
+One or more deployment specific plugins that should be loaded right after this plugin has been loaded.
 
 =back
 

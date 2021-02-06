@@ -185,7 +185,7 @@ sub _render {
   my $c     = shift;
   my $stash = $c->stash;
   return if $stash->{'mojo.rendered'};
-  $c->render_maybe or $stash->{'mojo.routed'} or $c->helpers->reply->not_found;
+  $c->render_maybe or $stash->{'mojo.routed'} or croak 'Nothing found to render';
 }
 
 1;

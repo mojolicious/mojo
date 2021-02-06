@@ -25,7 +25,7 @@ app->renderer->add_handler(dead => sub { die "dead handler!\n" });
 # Custom rendering for missing "txt" template
 hook before_render => sub {
   my ($c, $args) = @_;
-  return unless ($args->{template} // '') eq 'not_found';
+  return unless ($args->{template} // '') eq 'exception.development';
   my $stash     = $c->stash;
   my $exception = $stash->{snapshot}{exception};
   $args->{text} = "Missing template, $exception." if $args->{format} eq 'txt';
@@ -250,22 +250,22 @@ subtest 'Exception in helper' => sub {
 };
 
 subtest 'Missing template' => sub {
-  $t->get_ok('/missing_template')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Page Not Found/);
+  $t->get_ok('/missing_template')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr/Nothing found to render/);
 };
 
 subtest 'Missing template with different format' => sub {
-  $t->get_ok('/missing_template.xml')->status_is(404)->content_type_is('application/xml')
-    ->content_is("<somewhat>bad</somewhat>\n");
+  $t->get_ok('/missing_template.xml')->status_is(500)->content_type_is('application/xml')
+    ->content_is("<very>bad</very>\n");
 };
 
 subtest 'Missing template with unsupported format' => sub {
-  $t->get_ok('/missing_template.json')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Page Not Found/);
+  $t->get_ok('/missing_template.json')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr/Nothing found to render/);
 };
 
 subtest 'Missing template with custom rendering' => sub {
-  $t->get_ok('/missing_template.txt')->status_is(404)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/missing_template.txt')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Missing template, whatever.');
 };
 
@@ -347,11 +347,8 @@ works!
 % layout 'green';
 % die 'dead template with layout!';
 
-@@ exception.xml.ep
+@@ exception.development.xml.ep
 <very>bad</very>
-
-@@ not_found.development.xml.ep
-<somewhat>bad</somewhat>
 
 @@ dead_helper.html.ep
 % dead_helper;

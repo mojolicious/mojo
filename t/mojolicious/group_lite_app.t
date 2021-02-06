@@ -198,7 +198,7 @@ $t->get_ok('/multi')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("two\nthree\none\ntwo\nfive\nsix\nfour\nfive\n");
 
 # Missing action behind bridge
-$t->get_ok('/missing')->status_is(404)->content_is("Oops!\n");
+$t->get_ok('/missing')->status_is(500)->content_like(qr/Nothing found to render/);
 
 # Suspended bridge
 $t->app->log->level('debug')->unsubscribe('message');

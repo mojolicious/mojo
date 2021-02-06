@@ -77,7 +77,8 @@ $t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl
   ->content_like(qr/Hello Mojo from a static file!/);
 
 # Foo::bar in production mode (missing action)
-$t->get_ok('/foo/baz')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
+$t->get_ok('/foo/baz')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Not development mode error!/);
 
 # Try to access a file which is not under the web root via path traversal in
 # production mode

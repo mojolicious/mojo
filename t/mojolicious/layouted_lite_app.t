@@ -132,13 +132,19 @@ $t->get_ok('/works?blue=1')->status_is(200)->content_type_is('text/html;charset=
 $t->get_ok('/mixed')->status_is(200)->content_type_is('text/plain;charset=UTF-8')->content_is("Mixed formats\n\n");
 
 # Missing template
-$t->get_ok('/doesnotexist')->status_is(404)->content_is("DefaultNot found happenedNot found happened!\n\n");
+$t->get_ok('/doesnotexist')->status_is(500)->content_is("DefaultException happenedException happened!\n\n");
 
 # Missing template with different layout
-$t->get_ok('/doesnotexist?green=1')->status_is(404)->content_is("GreenNot found happenedNot found happened!\n\n");
+$t->get_ok('/doesnotexist?green=1')->status_is(500)->content_is("GreenException happenedException happened!\n\n");
 
 # Extended missing template
-$t->get_ok('/doesnotexist?blue=1')->status_is(404)->content_is("BlueNot found happenedNot found happened!\n\n");
+$t->get_ok('/doesnotexist?blue=1')->status_is(500)->content_is("BlueException happenedException happened!\n\n");
+
+# Extended missing template (not found)
+$t->get_ok('/doesreallynotexist?green=1')->status_is(404)->content_is("GreenNot found happenedNot found happened!\n\n");
+
+# Extended missing template (not found)
+$t->get_ok('/doesreallynotexist?blue=1')->status_is(404)->content_is("BlueNot found happenedNot found happened!\n\n");
 
 # Dead action
 $t->get_ok('/dies')->status_is(500)->content_is("DefaultException happenedException happened!\n\n");

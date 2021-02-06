@@ -202,8 +202,8 @@ $t->get_ok('/fun/joy')->status_is(200)->attr_is('p.joy', 'style', 'background-co
 # Foo::baz (missing action without template)
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/foo/baz')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
-  ->content_like(qr/Page Not Found/);
+$t->get_ok('/foo/baz')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
+  ->content_like(qr/Nothing found to render/);
 like $log, qr/Action not found in controller/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 

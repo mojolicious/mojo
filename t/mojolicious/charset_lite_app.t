@@ -82,7 +82,7 @@ $t->get_ok('/unicode')->status_is(200)->content_type_is('text/plain;charset=UTF-
 $t->get_ok('/')->status_is(200)->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
 
 # Unicode format
-$t->get_ok("/.$yatta")->status_is(404);
+$t->get_ok("/.$yatta")->status_is(500)->content_like(qr/Nothing found to render/);
 
 # Send and receive raw Shift_JIS octets (like browsers do)
 $t->post_ok('/data', $yatta_sjis)->status_is(200)->content_is($yatta_sjis);

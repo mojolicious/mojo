@@ -598,7 +598,7 @@ $t->get_ok('/static.txt' => {Range => 'bytes=2-5'})->status_is(206)->header_is(S
 
 # Protected DATA template
 $t->get_ok('/template.txt.epl')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Nothing found to render/);
+  ->content_like(qr/Route without action and nothing to render/);
 
 # Captured "0"
 $t->get_ok('/null/0')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('0');

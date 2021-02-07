@@ -251,7 +251,7 @@ subtest 'Exception in helper' => sub {
 
 subtest 'Missing template' => sub {
   $t->get_ok('/missing_template')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Nothing found to render/);
+    ->content_like(qr/Route without action and nothing to render/);
 };
 
 subtest 'Missing template with different format' => sub {
@@ -261,7 +261,7 @@ subtest 'Missing template with different format' => sub {
 
 subtest 'Missing template with unsupported format' => sub {
   $t->get_ok('/missing_template.json')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Nothing found to render/);
+    ->content_like(qr/Route without action and nothing to render/);
 };
 
 subtest 'Missing template with custom rendering' => sub {

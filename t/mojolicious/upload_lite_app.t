@@ -33,39 +33,51 @@ post '/multi' => sub {
 
 my $t = Test::Mojo->new;
 
-# Request size limit
-$t->get_ok('/request_size')->status_is(200)->content_is(16777216);
-$t->app->max_request_size(0);
-$t->get_ok('/request_size')->status_is(200)->content_is(0);
+subtest 'Request size limit' => sub {
+  $t->get_ok('/request_size')->status_is(200)->content_is(16777216);
+  $t->app->max_request_size(0);
+  $t->get_ok('/request_size')->status_is(200)->content_is(0);
+};
 
-# Asset and filename
-my $file = Mojo::Asset::File->new->add_chunk('lalala');
-$t->post_ok('/upload' => form => {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
-  ->content_is('xlalalatset');
+subtest 'Asset and filename' => sub {
+  my $file = Mojo::Asset::File->new->add_chunk('lalala');
+  $t->post_ok('/upload' => form => {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
+    ->content_is('xlalalatset');
+};
 
-# Path
-$t->post_ok('/upload' => form => {file => {file => $file->path}, test => 'foo'})->status_is(200)
-  ->content_like(qr!lalalafoo$!);
+subtest 'Path' => sub {
+  my $file = Mojo::Asset::File->new->add_chunk('lalala');
+  $t->post_ok('/upload' => form => {file => {file => $file->path}, test => 'foo'})->status_is(200)
+    ->content_like(qr!lalalafoo$!);
+};
 
-# Memory
-$t->post_ok('/upload' => form => {file => {content => 'alalal'}, test => 'tset'})->status_is(200)
-  ->content_is('filealalaltset');
+subtest 'Memory' => sub {
+  $t->post_ok('/upload' => form => {file => {content => 'alalal'}, test => 'tset'})->status_is(200)
+    ->content_is('filealalaltset');
+};
 
-# Memory with headers
-my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
-$t->post_ok('/upload' => form => {file => $hash, test => 'tset'})->status_is(200)->content_is('filealalaltsetfoo/barY');
+subtest 'Memory with headers' => sub {
+  my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
+  $t->post_ok('/upload' => form => {file => $hash, test => 'tset'})->status_is(200)
+    ->content_is('filealalaltsetfoo/barY');
+};
 
-# Multiple file uploads
-$t->post_ok('/multi?name=file1&name=file2' => form => {file1 => {content => '1111'}, file2 => {content => '11112222'}})
-  ->status_is(200)->content_is('file11111file211112222');
+subtest 'Multiple file uploads' => sub {
+  $t->post_ok(
+    '/multi?name=file1&name=file2' => form => {file1 => {content => '1111'}, file2 => {content => '11112222'}})
+    ->status_is(200)->content_is('file11111file211112222');
+};
 
-# Multiple file uploads reverse
-$t->post_ok('/multi?name=file2&name=file1' => form => {file1 => {content => '1111'}, file2 => {content => '11112222'}})
-  ->status_is(200)->content_is('file211112222file11111');
+subtest 'Multiple file uploads reverse' => sub {
+  $t->post_ok(
+    '/multi?name=file2&name=file1' => form => {file1 => {content => '1111'}, file2 => {content => '11112222'}})
+    ->status_is(200)->content_is('file211112222file11111');
+};
 
-# Multiple file uploads with same name
-$t->post_ok('/multi?name=file' => form =>
-    {file => [{content => 'just', filename => 'one.txt'}, {content => 'works', filename => 'two.txt'}]})
-  ->status_is(200)->content_is('one.txtjusttwo.txtworks');
+subtest 'Multiple file uploads with same name' => sub {
+  $t->post_ok('/multi?name=file' => form =>
+      {file => [{content => 'just', filename => 'one.txt'}, {content => 'works', filename => 'two.txt'}]})
+    ->status_is(200)->content_is('one.txtjusttwo.txtworks');
+};
 
 done_testing();

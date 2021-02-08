@@ -8,7 +8,8 @@ Mojolicious::Guides::Growing - Growing Mojolicious applications
 =head1 OVERVIEW
 
 This document explains the process of starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
-well-structured L<Mojolicious> application.
+well-structured L<Mojolicious> application. The final result of this guide is also available as an
+L<example application|https://github.com/mojolicious/mojo/tree/master/examples/login>.
 
 =head1 CONCEPTS
 

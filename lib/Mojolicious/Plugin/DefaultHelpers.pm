@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Carp qw(croak);
 use Mojo::Asset::File;
 use Mojo::ByteStream;
 use Mojo::Collection;
@@ -248,9 +249,8 @@ sub _respond_to {
 
 sub _static {
   my ($c, $file) = @_;
-  return !!$c->rendered if $c->app->static->serve($c, $file);
-  $c->helpers->log->debug(qq{Static file "$file" not found});
-  return !$c->helpers->reply->not_found;
+  croak qq{Static file "$file" not found} unless $c->app->static->serve($c, $file);
+  return $c->rendered;
 }
 
 sub _timing_begin { shift->stash->{'mojo.timing'}{shift()} = [gettimeofday] }
@@ -633,8 +633,8 @@ to C<404>. Also sets the stash value C<snapshot> to a copy of the L</"stash"> fo
 
 =head2 reply->static
 
-  my $bool = $c->reply->static('images/logo.png');
-  my $bool = $c->reply->static('../lib/MyApp.pm');
+  $c->reply->static('images/logo.png');
+  $c->reply->static('../lib/MyApp.pm');
 
 Reply with a static file using L<Mojolicious/"static">, usually from the C<public> directories or C<DATA> sections of
 your application. Note that this helper uses a relative path, but does not protect from traversing to parent

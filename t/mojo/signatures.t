@@ -31,4 +31,9 @@ subtest 'Bad flag' => sub {
   like $@, qr/Unsupported flag: -unsupported/, 'right error';
 };
 
+subtest 'Secret feature' => sub {
+  my $foo = {bar => [1, 2, 3]};
+  is_deeply [$foo->{bar}->@*], [1, 2, 3], 'right structure';
+};
+
 done_testing();

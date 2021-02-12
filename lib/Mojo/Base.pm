@@ -125,7 +125,7 @@ sub import {
     elsif ($flag eq '-signatures') {
       Carp::croak 'Subroutine signatures require Perl 5.20+' if $] < 5.020;
       require experimental;
-      experimental->import($_) for qw(signatures postderef_qq);
+      experimental->import($_) for qw(signatures postderef);
     }
 
     # Module

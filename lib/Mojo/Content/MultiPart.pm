@@ -207,7 +207,7 @@ L<Mojo::Content::MultiPart> is a container for HTTP multipart content, based on 
 
 =head1 EVENTS
 
-L<Mojo::Content::Multipart> inherits all events from L<Mojo::Content> and can emit the following new ones.
+L<Mojo::Content::MultiPart> inherits all events from L<Mojo::Content> and can emit the following new ones.
 
 =head2 part
 

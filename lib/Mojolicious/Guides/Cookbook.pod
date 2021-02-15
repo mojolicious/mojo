@@ -255,8 +255,8 @@ And then we are going to need a C<Dockerfile> describing the container. A very s
 
 It uses the latest L<Perl container|https://hub.docker.com/_/perl> from Docker Hub, copies all the contents of your
 application directory into the container, installs CPAN dependencies with L<App::cpanminus>, and then starts the
-application on port C<3000> with the pre-forking web server. With L<Mojolicious::Command::Author::generate::dockerfile> there is
-also a helper command to generate a minimal C<Dockerfile> for you.
+application on port C<3000> with the pre-forking web server. With L<Mojolicious::Command::Author::generate::dockerfile>
+there is also a helper command to generate a minimal C<Dockerfile> for you.
 
   $ ./myapp.pl generate dockerfile
   ...

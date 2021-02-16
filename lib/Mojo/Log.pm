@@ -5,9 +5,11 @@ use Carp qw(croak);
 use Fcntl qw(:flock);
 use Mojo::File;
 use Mojo::Util qw(encode);
+use Term::ANSIColor qw(colored);
 use Time::HiRes qw(time);
 
-has format => sub { shift->short ? \&_short : \&_default };
+has color  => sub { $ENV{MOJO_LOG_COLOR} };
+has format => sub { $_[0]->short ? \&_short : $_[0]->color ? \&_color : \&_default };
 has handle => sub {
 
   # STDERR
@@ -57,6 +59,12 @@ sub new {
 }
 
 sub warn { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn') : $_[0] }
+
+sub _color {
+  my $msg = _default(my $time = shift, my $level = shift, @_);
+  return colored(['red'], $msg) if $level eq 'error' || $level eq 'fatal';
+  return $level eq 'warn' ? colored(['yellow'], $msg) : $msg;
+}
 
 sub _default {
   my ($time, $level) = (shift, shift);
@@ -135,6 +143,14 @@ Emitted when a new message gets logged.
 
 L<Mojo::Log> implements the following attributes.
 
+=head2 color
+
+  my $bool = $log->color;
+  $log     = $log->color($bool);
+
+Colorize log messages with level C<warn>, C<error> and C<fatal>, defaults to the value of the C<MOJO_LOG_COLOR>
+environment variables. Note that this attribute is B<EXPERIMENTAL> and might change without warning!
+
 =head2 format
 
   my $cb = $log->format;
@@ -185,8 +201,8 @@ Log file path used by L</"handle">.
   my $bool = $log->short;
   $log     = $log->short($bool);
 
-Generate short log messages without a timestamp, suitable for systemd, defaults to the value of the C<MOJO_LOG_SHORT>
-environment variables.
+Generate short log messages without a timestamp but with journald log level prefix, suitable for systemd environments,
+defaults to the value of the C<MOJO_LOG_SHORT> environment variables.
 
 =head1 METHODS
 

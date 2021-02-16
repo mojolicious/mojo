@@ -1,5 +1,7 @@
 
-9.01  2021-02-15
+9.01  2021-02-16
+  - Added EXPERIMENTAL color attribute to Mojo::Log.
+  - Added EXPERIMENTAL MOJO_LOG_COLOR environment variable to Mojo::Log.
 
 9.0  2021-02-14
   - Code name "Waffle", this is a major release.

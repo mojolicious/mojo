@@ -30,7 +30,7 @@ use Mojo::UserAgent;
     proxy              => 1,
     requests           => 3,
     spare              => 4,
-    trusted_proxies    => ['127.0/8'],
+    trusted_proxies    => ['127.0.0.0/8'],
     upgrade_timeout    => 45,
     workers            => 7
   };
@@ -51,7 +51,7 @@ use Mojo::UserAgent;
   is $hypnotoad->prefork->pid_file,               '/foo/bar.pid', 'right value';
   ok $hypnotoad->prefork->reverse_proxy,          'reverse proxy enabled';
   is $hypnotoad->prefork->spare,                  4, 'right value';
-  is_deeply $hypnotoad->prefork->trusted_proxies, ['127.0/8'], 'right value';
+  is_deeply $hypnotoad->prefork->trusted_proxies, ['127.0.0.0/8'], 'right value';
   is $hypnotoad->prefork->workers,                7, 'right value';
   is $hypnotoad->upgrade_timeout, 45, 'right value';
 }

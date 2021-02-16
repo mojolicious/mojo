@@ -334,7 +334,7 @@ gracefully, drastically reducing the performance cost of worker restarts.
 
 =head2 trusted_proxies
 
-  trusted_proxies => ['10.0/8', '127.0.0.1', '172.16.0/12', '192.168.0/16', 'fc00::/7']
+  trusted_proxies => ['10.0.0.0/8', '127.0.0.1', '172.16.0.0/12', '192.168.0.0/16', 'fc00::/7']
 
 Trusted reverse proxies, addresses or networks in CIDR form.
 

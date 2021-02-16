@@ -274,24 +274,24 @@ subtest 'daemon' => sub {
 
   subtest 'Trusted proxies' => sub {
     my $command = Mojolicious::Command::daemon->new;
-    my $daemon  = $command->build_server('-p', '127.0/8', '-p', '10.0/8');
+    my $daemon  = $command->build_server('-p', '127.0.0.0/8', '-p', '10.0.0.0/8');
     ok $daemon->reverse_proxy, 'right value';
-    is_deeply $daemon->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+    is_deeply $daemon->trusted_proxies, ['127.0.0.0/8', '10.0.0.0/8'], 'right value';
   };
 
   subtest 'Trusted proxies from environment' => sub {
-    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8,10.0/8';
+    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8,10.0.0.0/8';
     my $command = Mojolicious::Command::daemon->new;
     my $daemon  = $command->build_server;
     ok $daemon->reverse_proxy, 'right value';
-    is_deeply $daemon->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+    is_deeply $daemon->trusted_proxies, ['127.0.0.0/8', '10.0.0.0/8'], 'right value';
   };
 
   subtest 'Proxy boolean and trusted' => sub {
     my $command = Mojolicious::Command::daemon->new;
-    my $daemon  = $command->build_server('-p', '-p', '127.0/8', '-p', '10.0/8');
+    my $daemon  = $command->build_server('-p', '-p', '127.0.0.0/8', '-p', '10.0.0.0/8');
     ok $daemon->reverse_proxy, 'right value';
-    is_deeply $daemon->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+    is_deeply $daemon->trusted_proxies, ['127.0.0.0/8', '10.0.0.0/8'], 'right value';
   };
 };
 
@@ -493,24 +493,24 @@ subtest 'prefork' => sub {
 
   subtest 'Trusted proxies' => sub {
     my $command = Mojolicious::Command::prefork->new;
-    my $prefork = $command->build_server('-p', '127.0/8', '-p', '10.0/8');
+    my $prefork = $command->build_server('-p', '127.0.0.0/8', '-p', '10.0.0.0/8');
     ok $prefork->reverse_proxy, 'right value';
-    is_deeply $prefork->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+    is_deeply $prefork->trusted_proxies, ['127.0.0.0/8', '10.0.0.0/8'], 'right value';
   };
 
   subtest 'Trusted proxies from environment' => sub {
-    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8,10.0/8';
+    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8,10.0.0.0/8';
     my $command = Mojolicious::Command::prefork->new;
     my $prefork = $command->build_server;
     ok $prefork->reverse_proxy, 'right value';
-    is_deeply $prefork->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+    is_deeply $prefork->trusted_proxies, ['127.0.0.0/8', '10.0.0.0/8'], 'right value';
   };
 
   subtest 'Proxy boolean and trusted' => sub {
     my $command = Mojolicious::Command::prefork->new;
-    my $prefork = $command->build_server('-p', '-p', '127.0/8', '-p', '10.0/8');
+    my $prefork = $command->build_server('-p', '-p', '127.0.0.0/8', '-p', '10.0.0.0/8');
     ok $prefork->reverse_proxy, 'right value';
-    is_deeply $prefork->trusted_proxies, ['127.0/8', '10.0/8'], 'right value';
+    is_deeply $prefork->trusted_proxies, ['127.0.0.0/8', '10.0.0.0/8'], 'right value';
   };
 };
 

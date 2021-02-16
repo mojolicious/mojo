@@ -4,7 +4,6 @@ use Test::More;
 use Mojo::File qw(path tempdir);
 use Mojo::Log;
 use Mojo::Util qw(decode);
-use Term::ANSIColor qw(colored);
 use Time::HiRes qw(time);
 
 my $dir  = tempdir;
@@ -84,16 +83,13 @@ subtest 'Colorized log messages' => sub {
   ok $log->color, 'colored messages';
   $log = Mojo::Log->new(color => 1);
   ok $log->color, 'colored messages';
-  is $log->format->(1613484767, 'debug', 'Test 123'), "[2021-02-16 15:12:47.00000] [$$] [debug] Test 123\n",
+  like $log->format->(time, 'debug', 'Test 123'), qr/^\[.+\] \[\d+\] \[debug\] Test 123\n$/,             'right format';
+  like $log->format->(time, 'info',  'Test 123'), qr/^\[.+\] \[\d+\] \[info\] Test 123\n$/,              'right format';
+  like $log->format->(time, 'warn',  'Test 123'), qr/^\e\[33m\[.+\] \[\d+\] \[warn\] Test 123\n\e\[0m$/, 'right format';
+  like $log->format->(time, 'error', 'Test 123'), qr/^\e\[31m\[.+\] \[\d+\] \[error\] Test 123\n\e\[0m$/,
     'right format';
-  is $log->format->(1613484767, 'info', 'Test 123'), "[2021-02-16 15:12:47.00000] [$$] [info] Test 123\n",
+  like $log->format->(time, 'fatal', 'Test 123'), qr/^\e\[37;41m\[.+\] \[\d+\] \[fatal\] Test 123\n\e\[0m$/,
     'right format';
-  is $log->format->(1613484767, 'warn', 'Test 123'),
-    colored(['yellow'], "[2021-02-16 15:12:47.00000] [$$] [warn] Test 123\n"), 'right format';
-  is $log->format->(1613484767, 'error', 'Test 123'),
-    colored(['red'], "[2021-02-16 15:12:47.00000] [$$] [error] Test 123\n"), 'right format';
-  is $log->format->(1613484767, 'fatal', 'Test 123'),
-    colored(['white on_red'], "[2021-02-16 15:12:47.00000] [$$] [fatal] Test 123\n"), 'right format';
   is $log->format->(1613484767, 'debug', 'Test', '1', '2', '3'),
     "[2021-02-16 15:12:47.00000] [$$] [debug] Test 1 2 3\n", 'right format';
 };

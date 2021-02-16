@@ -25,11 +25,13 @@ websocket '/json' => sub ($c) {
 
 my $t = Test::Mojo->new;
 
-# Plain action
-$t->get_ok('/')->status_is(200)->content_is('works!');
+subtest 'Plain action' => sub {
+  $t->get_ok('/')->status_is(200)->content_is('works!');
+};
 
-# WebSocket
-$t->websocket_ok('/json')->send_ok({json => {snowman => '☃'}})->message_ok->json_message_is('' => {snowman => '☃'})
-  ->finish_ok;
+subtest 'WebSocket' => sub {
+  $t->websocket_ok('/json')->send_ok({json => {snowman => '☃'}})->message_ok->json_message_is('' => {snowman => '☃'})
+    ->finish_ok;
+};
 
 done_testing();

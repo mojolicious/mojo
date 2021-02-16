@@ -138,7 +138,7 @@ or true if L</trusted_proxies> is not empty.
 =head2 trusted_proxies
 
   my $proxies = $server->trusted_proxies;
-  $server     = $server->trusted_proxies(['10.0/8', '127.0.0.1', '172.16.0/12', '192.168.0/16', 'fc00::/7']);
+  $server     = $server->trusted_proxies(['10.0.0.0/8', '127.0.0.1', '172.16.0.0/12', '192.168.0.0/16', 'fc00::/7']);
 
 This server expects requests from trusted reverse proxies, defaults to the value of the C<MOJO_TRUSTED_PROXIES>
 environment variable split on commas with optional whitespace. These proxies should be addresses or networks in CIDR

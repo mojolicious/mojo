@@ -193,7 +193,7 @@ subtest 'Trusted proxies' => sub {
     HTTP_X_FORWARDED_FOR   => '10.10.10.10, 192.0.2.2, 192.0.2.1',
     HTTP_X_FORWARDED_PROTO => 'https'
   );
-  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
+  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8, 192.0.0.0/8';
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
@@ -217,7 +217,7 @@ subtest 'Trusted proxies (no REMOTE_ADDR)' => sub {
     HTTP_X_FORWARDED_FOR   => '10.10.10.10, 192.0.2.2, 192.0.2.1',
     HTTP_X_FORWARDED_PROTO => 'https'
   );
-  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
+  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8, 192.0.0.0/8';
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");

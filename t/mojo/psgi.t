@@ -262,7 +262,7 @@ subtest 'Trusted proxies' => sub {
   };
   my ($app, $res);
   {
-    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
+    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8, 192.0.0.0/8';
     $app = Mojolicious::Command::psgi->new(app => app)->run;
     $res = $app->($env);
   }
@@ -298,7 +298,7 @@ subtest 'Trusted proxies (no REMOTE_ADDR)' => sub {
   };
   my ($app, $res);
   {
-    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0/8';
+    local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8, 192.0.0.0/8';
     $app = Mojolicious::Command::psgi->new(app => app)->run;
     $res = $app->($env);
   }

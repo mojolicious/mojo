@@ -15,7 +15,7 @@ use IO::Uncompress::Gunzip;
 use List::Util qw(min);
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Pod::Usage qw(pod2usage);
-use Socket qw(inet_aton inet_pton AF_INET6);
+use Socket qw(inet_pton AF_INET6 AF_INET);
 use Sub::Util qw(set_subname);
 use Symbol qw(delete_package);
 use Time::HiRes        ();
@@ -194,8 +194,8 @@ sub network_contains {
   return undef if $v6 xor $addr =~ /:/;
 
   # Convert addresses to binary
-  return undef unless $net  = $v6 ? inet_pton(AF_INET6, $net)  : inet_aton($net);
-  return undef unless $addr = $v6 ? inet_pton(AF_INET6, $addr) : inet_aton($addr);
+  return undef unless $net  = inet_pton($v6 ? AF_INET6 : AF_INET, $net);
+  return undef unless $addr = inet_pton($v6 ? AF_INET6 : AF_INET, $addr);
   my $length = $v6 ? 128 : 32;
 
   # Apply mask if given

@@ -480,7 +480,7 @@ subtest 'monkey_patch (with name)' => sub {
 };
 
 subtest 'network_contains' => sub {
-  ok !network_contains('10.0/8',         ''),            'empty address';
+  ok !network_contains('10.0.0.0/8',     ''),            'empty address';
   ok !network_contains('',               '10.10.10.10'), 'empty network';
   ok !network_contains('foo',            '10.10.10.10'), 'invalid v4 network';
   ok !network_contains('10.10.10.10',    'foo'),         'invalid v4 address';
@@ -492,8 +492,8 @@ subtest 'network_contains' => sub {
   ok network_contains('192.168.0.1/33', '192.168.0.1'), 'oversize v4 mask';
   ok network_contains('::/130',         '::'),          'oversize v6 mask';
 
-  ok network_contains('0/0',                '0'),               'v4 network contains addresss';
-  ok network_contains('0/0',                '255.255.255.255'), 'v4 network contains addresss';
+  ok network_contains('0.0.0.0/0',          '0.0.0.0'),         'v4 network contains addresss';
+  ok network_contains('0.0.0.0/0',          '255.255.255.255'), 'v4 network contains addresss';
   ok network_contains('192.168.0.0/24',     '192.168.0.1'),     'v4 network contains addresss';
   ok network_contains('10.10.10.8/30',      '10.10.10.11'),     'v4 network contains addresss';
   ok network_contains('10.10.10.8/30',      '10.10.10.8'),      'v4 network contains addresss';
@@ -503,7 +503,7 @@ subtest 'network_contains' => sub {
   ok network_contains('10.10.10.8/29',      '10.10.10.10'),     'v4 network contains addresss';
   ok network_contains('127.0.0.1',          '127.0.0.1'),       'v4 network contains addresss';
 
-  ok !network_contains('0/32',           '1'),              'v4 network does not contain address';
+  ok !network_contains('0.0.0.0/32',     '0.0.0.1'),        'v4 network does not contain address';
   ok !network_contains('192.168.1.0/24', '192.168.0.1'),    'v4 network does not contain address';
   ok !network_contains('10.10.0.8/29',   '10.10.10.8'),     'v4 network does not contain address';
   ok !network_contains('10.10.10.8/29',  '10.10.10.7'),     'v4 network does not contain address';

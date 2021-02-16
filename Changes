@@ -1,4 +1,6 @@
 
+9.02  2021-02-17
+
 9.01  2021-02-16
   - Added EXPERIMENTAL color attribute to Mojo::Log.
   - Added EXPERIMENTAL MOJO_LOG_COLOR environment variable to Mojo::Log.

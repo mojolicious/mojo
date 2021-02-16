@@ -93,7 +93,7 @@ subtest 'Colorized log messages' => sub {
   is $log->format->(1613484767, 'error', 'Test 123'),
     colored(['red'], "[2021-02-16 15:12:47.00000] [$$] [error] Test 123\n"), 'right format';
   is $log->format->(1613484767, 'fatal', 'Test 123'),
-    colored(['red'], "[2021-02-16 15:12:47.00000] [$$] [fatal] Test 123\n"), 'right format';
+    colored(['white on_red'], "[2021-02-16 15:12:47.00000] [$$] [fatal] Test 123\n"), 'right format';
   is $log->format->(1613484767, 'debug', 'Test', '1', '2', '3'),
     "[2021-02-16 15:12:47.00000] [$$] [debug] Test 1 2 3\n", 'right format';
 };

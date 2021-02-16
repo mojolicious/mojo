@@ -30,6 +30,9 @@ my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
 # Systemd magic numbers
 my %MAGIC = (debug => 7, info => 6, warn => 4, error => 3, fatal => 2);
 
+# Colors
+my %COLORS = (warn => ['yellow'], error => ['red'], fatal => ['white on_red']);
+
 sub append {
   my ($self, $msg) = @_;
 
@@ -61,9 +64,8 @@ sub new {
 sub warn { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn') : $_[0] }
 
 sub _color {
-  my $msg = _default(my $time = shift, my $level = shift, @_);
-  return colored(['red'], $msg) if $level eq 'error' || $level eq 'fatal';
-  return $level eq 'warn' ? colored(['yellow'], $msg) : $msg;
+  my $msg = _default(shift, my $level = shift, @_);
+  return $COLORS{$level} ? colored($COLORS{$level}, $msg) : $msg;
 }
 
 sub _default {

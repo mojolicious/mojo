@@ -90,8 +90,8 @@ subtest 'Colorized log messages' => sub {
     'right format';
   like $log->format->(time, 'fatal', 'Test 123'), qr/^\e\[37;41m\[.+\] \[\d+\] \[fatal\] Test 123\n\e\[0m$/,
     'right format';
-  is $log->format->(1613484767, 'debug', 'Test', '1', '2', '3'),
-    "[2021-02-16 15:12:47.00000] [$$] [debug] Test 1 2 3\n", 'right format';
+  like $log->format->(1613484767, 'error', 'Test', '1', '2', '3'),
+    qr/^\e\[31m\[.+\] \[\d+\] \[error\] Test 1 2 3\n\e\[0m$/, 'right format';
 };
 
 subtest 'Events' => sub {

@@ -2,6 +2,7 @@
 9.01  2021-02-16
   - Added EXPERIMENTAL color attribute to Mojo::Log.
   - Added EXPERIMENTAL MOJO_LOG_COLOR environment variable to Mojo::Log.
+  - Fixed Windows support of network_contains function in Mojo::Util. (jberger)
 
 9.0  2021-02-14
   - Code name "Waffle", this is a major release.

@@ -150,8 +150,9 @@ L<Mojo::Log> implements the following attributes.
   my $bool = $log->color;
   $log     = $log->color($bool);
 
-Colorize log messages with level C<warn>, C<error> and C<fatal>, defaults to the value of the C<MOJO_LOG_COLOR>
-environment variables. Note that this attribute is B<EXPERIMENTAL> and might change without warning!
+Colorize log messages with the levels C<warn>, C<error> and C<fatal> using L<Term::ANSIColor>, defaults to the value of
+the C<MOJO_LOG_COLOR> environment variables. Note that this attribute is B<EXPERIMENTAL> and might change without
+warning!
 
 =head2 format
 

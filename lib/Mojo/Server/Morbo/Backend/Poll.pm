@@ -42,7 +42,7 @@ Mojo::Server::Morbo::Backend::Poll - Morbo default backend
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Morbo::Backend:Poll> is the default backend for L<Mojo::Server::Morbo>.
+L<Mojo::Server::Morbo::Backend::Poll> is the default backend for L<Mojo::Server::Morbo>.
 
 =head1 ATTRIBUTES
 

@@ -1,5 +1,6 @@
 
 9.02  2021-02-17
+  - Fixed finally method in Mojo::Promise to deal correctly with promises returned by the handler.
 
 9.01  2021-02-16
   - Added EXPERIMENTAL color attribute to Mojo::Log.

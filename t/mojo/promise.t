@@ -160,14 +160,45 @@ subtest 'Double finally' => sub {
   is_deeply \@results, ['finally1', 'finally2'], 'promise not resolved';
 };
 
-subtest 'Resolved nested with finally' => sub {
+subtest 'Promise returned by finally' => sub {
+  my $loop     = Mojo::IOLoop->new;
+  my $promise  = Mojo::Promise->new->ioloop($loop);
+  my $promise2 = Mojo::Promise->new->ioloop($loop);
+  my @results;
+  my $promise3 = $promise->finally(sub {
+    $loop->next_tick(sub { $promise2->resolve });
+    return $promise2;
+  })->finally(sub { @results = ('finally') });
+  $promise->resolve('pass');
+  $promise3->wait;
+  is_deeply \@results, ['finally'], 'promise already resolved';
+};
+
+subtest 'Promise returned by finally' => sub {
   my $promise  = Mojo::Promise->new;
   my $promise2 = Mojo::Promise->new;
   my @results;
-  $promise->finally(sub {$promise2})->finally(sub { @results = ('finally') });
+  my $promise3 = $promise->finally(sub {
+    Mojo::IOLoop->next_tick(sub { $promise2->resolve });
+    return $promise2;
+  })->finally(sub { @results = ('finally') });
   $promise->resolve('pass');
-  Mojo::IOLoop->one_tick;
+  $promise3->wait;
   is_deeply \@results, ['finally'], 'promise already resolved';
+};
+
+subtest 'Promise returned by finally (rejected)' => sub {
+  my $promise  = Mojo::Promise->new;
+  my $promise2 = Mojo::Promise->new;
+  my (@results, @errors);
+  my $promise3 = $promise->finally(sub {
+    Mojo::IOLoop->next_tick(sub { $promise2->reject('works') });
+    return $promise2;
+  })->then(sub { @results = @_ }, sub { @errors = @_ });
+  $promise->resolve('failed');
+  $promise3->wait;
+  is_deeply \@results, [], 'promises not resolved';
+  is_deeply \@errors, ['works'], 'promises rejected';
 };
 
 subtest 'Exception in finally' => sub {

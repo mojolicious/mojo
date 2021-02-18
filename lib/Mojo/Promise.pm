@@ -56,7 +56,20 @@ sub catch { shift->then(undef, shift) }
 
 sub clone { $_[0]->new->ioloop($_[0]->ioloop) }
 
-sub finally { shift->_finally(1, @_) }
+sub finally {
+  my $class = ref $_[0];
+  my $cb    = $_[1];
+
+  my $big_cb = sub {
+    my @vals = @_;
+
+    $class->resolve($cb->())->then(sub {@vals});
+  };
+
+  $_[0]->catch($big_cb);
+
+  return $_[0]->then($big_cb);
+}
 
 sub map {
   my ($class, $options, $cb, @items) = (shift, ref $_[0] eq 'HASH' ? shift : {}, @_);

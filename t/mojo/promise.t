@@ -160,15 +160,20 @@ subtest 'Double finally' => sub {
   is_deeply \@results, ['finally1', 'finally2'], 'promise not resolved';
 };
 
-subtest 'Resolved nested with finally' => sub {
-  my $promise  = Mojo::Promise->new;
-  my $promise2 = Mojo::Promise->new;
-  my @results;
-  $promise->finally(sub {$promise2})->finally(sub { @results = ('finally') });
-  $promise->resolve('pass');
-  Mojo::IOLoop->one_tick;
-  is_deeply \@results, ['finally'], 'promise already resolved';
-};
+# The expected behaviour here mismatches ES6: the 2nd finally() can’t
+# settle until the first one does, which in turn can’t settle until
+# $promise2 does. Since $promise2 doesn’t settle here, the 2nd finally()
+# should NOT fire.
+#
+#subtest 'Resolved nested with finally' => sub {
+#  my $promise  = Mojo::Promise->new;
+#  my $promise2 = Mojo::Promise->new;
+#  my @results;
+#  $promise->finally(sub {$promise2})->finally(sub { @results = ('finally') });
+#  $promise->resolve('pass');
+#  Mojo::IOLoop->one_tick;
+#  is_deeply \@results, ['finally'], 'promise already resolved';
+#};
 
 subtest 'Exception in finally' => sub {
   my $promise = Mojo::Promise->new;
@@ -514,6 +519,14 @@ subtest 'Wait for stopped loop' => sub {
   });
   $promise->then(sub { @results = @_ })->wait;
   is_deeply \@results, ['wait'], 'promise resolved';
+};
+
+subtest 'rejection returned from finally() callback' => sub {
+  my @fate;
+  Mojo::Promise->resolve(123)->finally(sub { Mojo::Promise->reject(666) })
+    ->then(sub { @fate = (0, @_) }, sub { @fate = (1, @_) },)->wait();
+
+  is_deeply(\@fate, [1, 666], 'reject returned from finally propagates');
 };
 
 done_testing();

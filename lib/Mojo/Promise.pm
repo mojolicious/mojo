@@ -205,12 +205,6 @@ sub _finally {
   return $next;
 }
 
-sub _finally_cb {
-  my ($new, $finally, $method, @results) = @_;
-  return $new->reject($@) unless eval { $finally->(); 1 };
-  return $new->$method(@results);
-}
-
 sub _settle {
   my ($self, $status, @results) = @_;
 

@@ -7,6 +7,9 @@ use Mojolicious::Lite;
 use Mojo::Log;
 use Test::Mojo;
 
+# Test::Mojo sets MOJO_LOG_LEVEL to fatal
+local $ENV{MOJO_LOG_LEVEL} = 'debug';
+
 hook before_dispatch => sub {
   my $c = shift;
   $c->req->request_id('17a60115');

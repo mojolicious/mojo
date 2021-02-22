@@ -210,4 +210,15 @@ subtest 'Context' => sub {
   like $buffer,   qr/\[.*\] \[fatal\] \[123\] Mojolicious rocks\n/, 'right fatal message';
 };
 
+subtest 'MOJO_LOG_LEVEL' => sub {
+  local $ENV{MOJO_LOG_LEVEL} = 'warn';
+
+  my $log = Mojo::Log->new;
+  is $log->level, 'warn', 'right level';
+  ok !$log->is_level('debug'), '"debug" log level is inactive';
+  ok !$log->is_level('info'),  '"info" log level is inactive';
+  ok $log->is_level('warn'),  '"warn" log level is inactive';
+  ok $log->is_level('error'), '"error" log level is inactive';
+};
+
 done_testing();

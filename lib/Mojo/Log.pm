@@ -19,7 +19,7 @@ has handle => sub {
   return Mojo::File->new($path)->open('>>');
 };
 has history          => sub { [] };
-has level            => 'debug';
+has level            => sub { $ENV{MOJO_LOG_LEVEL} || 'debug' };
 has max_history_size => 10;
 has 'path';
 has short => sub { $ENV{MOJO_LOG_SHORT} };
@@ -182,8 +182,8 @@ The last few logged messages.
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level, defaults to C<debug>. Available log levels are C<debug>, C<info>, C<warn>, C<error> and C<fatal>, in
-that order.
+Active log level, defaults to the value of the C<MOJO_LOG_LEVEL>  environment variable or C<debug>. Available log
+levels are C<debug>, C<info>, C<warn>, C<error> and C<fatal>, in that order.
 
 =head2 max_history_size
 

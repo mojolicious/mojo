@@ -207,7 +207,8 @@ sub _listen {
   return if $self->silent;
   $self->app->log->info(qq{Listening at "$url"});
   $query->pairs([]);
-  $url->host('127.0.0.1') if $url->host eq '*';
+  $url->host('127.0.0.1')        if $url->host eq '*';
+  $url->port($self->ports->[-1]) if !$options->{path} && !$url->port;
   say 'Web application available at ', $options->{path} // $url;
 }
 

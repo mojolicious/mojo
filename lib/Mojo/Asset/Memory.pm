@@ -144,7 +144,7 @@ Size of asset data in bytes.
 
 =head2 slurp
 
-  my $bytes = mem->slurp;
+  my $bytes = $mem->slurp;
 
 Read all asset data at once.
 

@@ -7,9 +7,6 @@ use Mojolicious::Lite;
 use Mojo::Log;
 use Test::Mojo;
 
-# Test::Mojo sets MOJO_LOG_LEVEL to fatal
-local $ENV{MOJO_LOG_LEVEL} = 'debug';
-
 hook before_dispatch => sub {
   my $c = shift;
   $c->req->request_id('17a60115');
@@ -29,7 +26,7 @@ my $t = Test::Mojo->new;
 # Simple log messages with and without context
 my $buffer = '';
 open my $handle, '>', \$buffer;
-$t->app->log(Mojo::Log->new(handle => $handle));
+$t->app->log(Mojo::Log->new(handle => $handle, level => 'debug'));
 $t->get_ok('/simple')->status_is(200)->content_is('Simple!');
 like $buffer, qr/First.*Second.*Third.*No context!.*Fourth.*Fifth/s,    'right order';
 like $buffer, qr/\[.+\] \[\d+\] \[debug\] \[17a60115\] First!/,         'message with request id';

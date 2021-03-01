@@ -754,7 +754,7 @@ Alias for L<Mojolicious/"ua">.
 
 =head2 url_for
 
-  %= url_for 'named', controller => 'bar', action => 'baz'
+  %= url_for 'named', foo => 'bar', baz => 'yada'
 
 Alias for L<Mojolicious::Controller/"url_for">.
 
@@ -762,7 +762,7 @@ Alias for L<Mojolicious::Controller/"url_for">.
 
 =head2 url_with
 
-  %= url_with 'named', controller => 'bar', action => 'baz'
+  %= url_with 'named', foo => 'bar', baz => 'yada'
 
 Does the same as L</"url_for">, but inherits query parameters from the current request.
 

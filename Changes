@@ -1,4 +1,6 @@
 
+9.03  2021-03-01
+
 9.02  2021-02-17
   - Fixed finally method in Mojo::Promise to deal correctly with promises returned by the handler.
   - Improved Mojo::Server::Daemon to include random ports in the "Web application available at ..." message.

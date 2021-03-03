@@ -1847,7 +1847,7 @@ the backend web service is faster than the connection to the client and data for
   get '/' => sub ($c) {
     $c->proxy->get_p('https://mojolicious.org')->catch(sub ($err) {
       $c->log->error("Proxy error: $err");
-      $c->render(text => 'Something went wrong!', status => 400);
+      $c->render(text => 'Could not connect to backend web service!', status => 400);
     });
   };
 
@@ -1863,7 +1863,7 @@ the backend web service is faster than the connection to the client and data for
     # Start non-blocking request
     $c->proxy->start_p($tx)->catch(sub ($err) {
       $c->log->error("Proxy error: $err");
-      $c->render(text => 'Something went wrong!', status => 400);
+      $c->render(text => 'Could not connect to backend web service!', status => 400);
     });
 
     # Custom response

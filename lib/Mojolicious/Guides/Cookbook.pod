@@ -1831,6 +1831,58 @@ And if you have a PAUSE account (which can be requested at L<http://pause.perl.o
 
   $ mojo cpanify -u USER -p PASS MyApp-0.01.tar.gz
 
+=head2 Proxy
+
+While every L<Mojolicious> application has the built-in user agent L<Mojolicious::Plugin::DefaultHelpers/"ua"> for you
+to perform requests to backend web services, this is not always the most efficient solution. The specialized proxy
+helpers L<Mojolicious::Plugin::DefaultHelpers/"proxy-E<gt>get_p"> and
+L<Mojolicious::Plugin::DefaultHelpers/"proxy-E<gt>start_p"> can stream response content straight to the client, as soon
+as a new chunk of data is received from the backend web service. Additionally they will take care of removing hop-by-hop
+headers and protect you automatically from backpressure issues. Which can happen in situations where the connection to
+the backend web service is faster than the connection to the client and data forwarding needs to be throttled.
+
+  use Mojolicious::Lite -signatures;
+
+  # Just forward the response
+  get '/' => sub ($c) {
+    $c->proxy->get_p('https://mojolicious.org')->catch(sub ($err) {
+      $c->log->error("Proxy error: $err");
+      $c->render(text => 'Something went wrong!', status => 400);
+    });
+  };
+
+  # Forward response and customize a few things
+  get '/*docs' => sub ($c) {
+
+    # Custom request
+    my $tx = $c->ua->build_tx(GET => 'https://docs.mojolicious.org');
+    my $docs = $c->param('docs');
+    $tx->req->url->path("/$docs");
+    $tx->req->headers->user_agent('MojoProxy/1.0');
+
+    # Start non-blocking request
+    $c->proxy->start_p($tx)->catch(sub ($err) {
+      $c->log->error("Proxy error: $err");
+      $c->render(text => 'Something went wrong!', status => 400);
+    });
+
+    # Custom response
+    $tx->res->content->once(body => sub ($content) {
+      $c->res->headers->server('MojoProxy/1.0');
+    });
+  };
+
+  app->start;
+
+All proxy helpers return a L<Mojo::Promise> object, which should be used to handle connection errors to backend web
+services gracefully. And ff you ever need to forward all headers from the client to the backend web service, make sure
+to use L<Mojo::Headers/"dehop"> to remove all hop-by-hop headers.
+
+  # Clone and modify request headers
+  my $headers = $c->req->headers->clone->dehop;
+  $headers->accept('application/json');
+  my $tx = $c->ua->build_tx(PUT => 'https://mojolicious.org' => $headers->to_hash);
+
 =head2 Hello World
 
 If every byte matters this is the smallest C<Hello World> application you can write with L<Mojolicious::Lite>.

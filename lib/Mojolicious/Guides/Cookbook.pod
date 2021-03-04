@@ -1877,7 +1877,7 @@ waiting for I/O.
   app->start;
 
 All proxy helpers return a L<Mojo::Promise> object, which should be used to handle connection errors to backend web
-services gracefully. And ff you ever need to forward all headers from the client to the backend web service, make sure
+services gracefully. And if you ever need to forward all headers from the client to the backend web service, make sure
 to use L<Mojo::Headers/"dehop"> to remove all hop-by-hop headers.
 
   # Clone and modify request headers

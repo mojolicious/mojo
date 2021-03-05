@@ -388,7 +388,7 @@ $status = undef;
 $ua->websocket(
   '/close' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish => sub { $status = pop; Mojo::IOLoop->stop });
+    $tx->on(finish => sub { (undef, $status, undef) = @_; Mojo::IOLoop->stop });
     $tx->send('test1');
   }
 );

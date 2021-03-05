@@ -39,7 +39,8 @@ sub client_write { shift->server_write(@_) }
 
 sub closed {
   my $self = shift->completed;
-  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
+  my @args = $self->{close} ? (@{$self->{close}}) : (1006);
+  return $self->emit(finish => @args > 1 ? @args : (@args, undef));
 }
 
 sub connection { shift->handshake->connection }

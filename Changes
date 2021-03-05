@@ -1,5 +1,7 @@
 
-9.03  2021-03-01
+9.03  2021-03-05
+  - Fixed a bug in Mojo::Transaction::WebSocket where finish event handlers would not always get the same number of
+    arguments passed.
 
 9.02  2021-02-17
   - Fixed finally method in Mojo::Promise to deal correctly with promises returned by the handler.

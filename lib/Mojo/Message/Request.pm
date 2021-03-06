@@ -305,7 +305,7 @@ Request has been performed through a reverse proxy.
 =head2 trusted_proxies
 
   my $proxies = $req->trusted_proxies;
-  $req        = $req->trusted_proxies(['10.0.0.0/8', '127.0.0.1', '172.16.0.0.0/12', '192.168.0.0/16', 'fc00::/7']);
+  $req        = $req->trusted_proxies(['10.0.0.0/8', '127.0.0.1', '172.16.0.0/12', '192.168.0.0/16', 'fc00::/7']);
 
 Trusted reverse proxies, addresses or networks in CIDR form.
 

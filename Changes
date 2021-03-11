@@ -1,5 +1,7 @@
 
-9.04  2021-03-11
+9.08  2021-03-12
+
+9.07  2021-03-11
   - Improved config override feature to work for Mojolicious::Lite applications.
   - Improved Mojo::UserAgent performance slightly by not including unnecessary "Content-Length: 0" request headers.
 

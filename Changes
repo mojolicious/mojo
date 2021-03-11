@@ -1,6 +1,7 @@
 
 9.04  2021-03-11
   - Improved config override feature to work for Mojolicious::Lite applications.
+  - Improved Mojo::UserAgent performance slightly by not including unnecessary "Content-Length: 0" request headers.
 
 9.03  2021-03-05
   - Fixed a bug in Mojo::Transaction::WebSocket where finish event handlers would not always get the same number of

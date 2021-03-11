@@ -67,9 +67,12 @@ sub fix_headers {
   my $self = shift;
   $self->{fix} ? return $self : $self->SUPER::fix_headers(@_);
 
-  # Host
-  my $url     = $self->url;
+  # Empty
   my $headers = $self->headers;
+  $headers->remove('Content-Length') if ($headers->content_length // '') eq '0';
+
+  # Host
+  my $url = $self->url;
   $headers->host($url->host_port) unless $headers->host;
 
   # Basic authentication

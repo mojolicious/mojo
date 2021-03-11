@@ -1275,7 +1275,7 @@ subtest 'Build WebSocket handshake request' => sub {
   is $req->headers->connection,             'Upgrade',                 'right "Connection" value';
   is $req->headers->upgrade,                'websocket',               'right "Upgrade" value';
   is $req->headers->host,                   'example.com',             'right "Host" value';
-  is $req->headers->content_length,         0,                         'right "Content-Length" value';
+  is $req->headers->content_length,         undef,                     'no "Content-Length" value';
   is $req->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
   is $req->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
   is $req->body, '', 'no content';
@@ -1302,7 +1302,7 @@ subtest 'Build WebSocket handshake request (with clone)' => sub {
   is $req->headers->connection,             'Upgrade',                 'right "Connection" value';
   is $req->headers->upgrade,                'websocket',               'right "Upgrade" value';
   is $req->headers->host,                   'example.com',             'right "Host" value';
-  is $req->headers->content_length,         0,                         'right "Content-Length" value';
+  is $req->headers->content_length,         undef,                     'no "Content-Length" value';
   is $req->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
   is $req->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
   is $req->body, '', 'no content';
@@ -1316,7 +1316,7 @@ subtest 'Build WebSocket handshake request (with clone)' => sub {
   is $clone->headers->connection,             'Upgrade',                 'right "Connection" value';
   is $clone->headers->upgrade,                'websocket',               'right "Upgrade" value';
   is $clone->headers->host,                   'example.com',             'right "Host" value';
-  is $req->headers->content_length,           0,                         'right "Content-Length" value';
+  is $req->headers->content_length,           undef,                     'no "Content-Length" value';
   is $clone->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
   is $clone->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
   is $clone->body, '', 'no content';
@@ -1344,7 +1344,7 @@ subtest 'Build WebSocket handshake proxy request' => sub {
   is $req->headers->connection,             'Upgrade',                 'right "Connection" value';
   is $req->headers->upgrade,                'websocket',               'right "Upgrade" value';
   is $req->headers->host,                   'example.com',             'right "Host" value';
-  is $req->headers->content_length,         0,                         'right "Content-Length" value';
+  is $req->headers->content_length,         undef,                     'no "Content-Length" value';
   is $req->headers->sec_websocket_accept,   'abcdef=',                 'right "Sec-WebSocket-Key" value';
   is $req->headers->sec_websocket_protocol, 'sample',                  'right "Sec-WebSocket-Protocol" value';
   is $req->body, '', 'no content';

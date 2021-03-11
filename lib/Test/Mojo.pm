@@ -252,8 +252,8 @@ sub new {
 
   my @args = @_ ? {config => {config_override => 1, %{shift()}}} : ();
   return $self->app(Mojo::Server->new->build_app($app, @args)) unless ref $app;
-  $app = Mojo::Server->new->load_app($app)                     unless $app->isa('Mojolicious');
-  return $self->app(@args ? $app->config($args[0]{config}) : $app);
+  return $self->app(
+    $app->isa('Mojolicious') ? $app->config($args[0]{config}) : Mojo::Server->new->load_app($app, @args));
 }
 
 sub options_ok { shift->_build_ok(OPTIONS => @_) }

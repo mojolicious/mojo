@@ -9,7 +9,8 @@ app->defaults(secret => 'Insecure!');
 helper same_name => sub {'myapp'};
 
 # Load plugin
-plugin 'Config';
+my $config = plugin 'Config';
+my $one    = $config->{one};
 
 # Message condition
 app->routes->add_condition(
@@ -21,6 +22,8 @@ app->routes->add_condition(
 );
 
 get '/' => 'index';
+
+get '/startup' => {text => $one};
 
 get '/echo' => sub {
   my $c = shift;

@@ -347,7 +347,7 @@ sub _write {
   return unless length $chunk;
 
   weaken $self;
-  $c->{ioloop}->stream($id)->write($chunk => sub { $self->_write($id) });
+  $c->{ioloop}->stream($id)->write($chunk => sub { $self && $self->_write($id) });
 }
 
 1;

@@ -1,5 +1,6 @@
 
-9.04  2021-03-07
+9.04  2021-03-11
+  - Improved config override feature to work for Mojolicious::Lite applications.
 
 9.03  2021-03-05
   - Fixed a bug in Mojo::Transaction::WebSocket where finish event handlers would not always get the same number of

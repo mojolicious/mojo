@@ -1,4 +1,6 @@
 
+9.09  2021-03-13
+
 9.08  2021-03-12
   - Fixed a bug in Test::Mojo where Test::Mojo->new($app) would not work correctly.
 

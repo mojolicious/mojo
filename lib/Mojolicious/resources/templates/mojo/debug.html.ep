@@ -18,7 +18,7 @@
       hljs.initHighlightingOnLoad();
     </script>
   </head>
-  <body>
+  <body class="d-flex flex-column h-100">
     <header>
       <nav class="navbar navbar-expand-lg navbar-dark mojobar">
         <a href="https://mojolicious.org" id="mojobar-brand" class="navbar-brand">
@@ -95,7 +95,7 @@
         mojoDrawer('#more', '#infos');
       });
     </script>
-    <div class="container">
+    <div class="container flex-grow-1">
       <div class="row flex-wrap">
         <main class="col-sm-12 col-md-8 col-lg-10 py-md-3 pl-md-5">
           <div class="row mojo-divider">

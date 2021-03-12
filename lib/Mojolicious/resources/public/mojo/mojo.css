@@ -1,3 +1,6 @@
+html {
+  height:100%;
+}
 main {
   overflow-wrap: break-word;
   word-wrap: break-word;

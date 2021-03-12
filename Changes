@@ -1,5 +1,6 @@
 
 9.08  2021-03-12
+  - Fixed a bug in Test::Mojo where Test::Mojo->new($app) would not work correctly.
 
 9.07  2021-03-11
   - Improved config override feature to work for Mojolicious::Lite applications.

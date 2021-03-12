@@ -61,6 +61,14 @@ subtest 'Config override' => sub {
   $t = Test::Mojo->new(MojoliciousTest->new, {foo => 'baz'});
   ok $t->app->config->{config_override}, 'override';
   is $t->app->config->{foo}, 'baz', 'right value';
+
+  my $app = Mojolicious->new;
+  $t = Test::Mojo->new($app);
+  ok !$t->app->config->{config_override}, 'no override';
+  ok !$t->app->config->{foo},             'no value';
+  $t = Test::Mojo->new($app, {foo => 'bar'});
+  ok $t->app->config->{config_override}, 'override';
+  is $t->app->config->{foo}, 'bar', 'right value';
 };
 
 my $t = Test::Mojo->new('MojoliciousTest');

@@ -1,4 +1,6 @@
 
+9.10  2021-03-14
+
 9.09  2021-03-13
   - Added comma_separated filter to Mojolicious::Validator.
   - Fixed built-in templates to be a bit more responsive.

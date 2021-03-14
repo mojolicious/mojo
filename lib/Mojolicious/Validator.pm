@@ -6,7 +6,7 @@ use Mojo::Util qw(trim);
 use Mojolicious::Validator::Validation;
 
 has checks  => sub { {} };
-has filters => sub { {not_empty => \&_not_empty, trim => \&_trim} };
+has filters => sub { {comma_separated => \&_comma_separated, not_empty => \&_not_empty, trim => \&_trim} };
 
 sub add_check {
   my ($self, $name, $cb) = @_;
@@ -32,6 +32,8 @@ sub new {
 
 sub validation { Mojolicious::Validator::Validation->new(validator => shift) }
 
+sub _comma_separated { defined $_[2] ? split(/\s*,\s*/, $_[2], -1) : undef }
+
 sub _equal_to {
   my ($v, $name, $value, $to) = @_;
   return 1 unless defined(my $other = $v->input->{$to});
@@ -44,7 +46,7 @@ sub _in {
   return 1;
 }
 
-sub _not_empty { length $_[2] ? $_[2] : undef }
+sub _not_empty { length $_[2] ? $_[2] : () }
 
 sub _num {
   my ($v, $name, $value, $min, $max) = @_;
@@ -131,6 +133,12 @@ Value needs to be a L<Mojo::Upload> object, representing a file upload.
 =head1 FILTERS
 
 These filters are available by default.
+
+=head2 comma_separated
+
+  $v = $v->optional('foo', 'comma_separated');
+
+Split string of comma separated values into separate values.
 
 =head2 not_empty
 

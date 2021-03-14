@@ -76,7 +76,7 @@ subtest 'Required and optional values' => sub {
   is_deeply $v->output, {}, 'right result';
   ok !$v->has_error, 'no error';
   ok $v->optional('bar')->is_valid, 'valid';
-  is_deeply $v->output, {bar => ['a']}, 'right result';
+  is_deeply $v->output, {bar => 'a'}, 'right result';
   ok !$v->in('c')->is_valid, 'not valid';
   is_deeply $v->output, {}, 'right result';
   ok $v->has_error, 'has error';
@@ -231,6 +231,7 @@ subtest 'Trim' => sub {
   ok !$v->optional('missing', 'trim')->is_valid, 'not valid';
   ok $v->optional('baz', 'trim')->like(qr/^\d$/)->is_valid, 'valid';
   is_deeply $v->output, {foo => 'bar', baz => [0, 1]}, 'right result';
+
   $v = $t->app->validation->input({nothing => '  ', more => [undef]});
   ok $v->required('nothing', 'trim')->is_valid, 'valid';
   is_deeply $v->output, {nothing => ''}, 'right result';
@@ -247,11 +248,28 @@ subtest 'Not empty' => sub {
   ok $v->has_error, 'has error';
   is_deeply $v->error('baz'), ['required'], 'right error';
   is_deeply $v->output, {foo => 'bar'}, 'right result';
+
   $v = $t->app->validation->input({foo => [' bar'], baz => ['', '  ', undef]});
   ok $v->optional('foo', 'trim', 'not_empty')->is_valid, 'valid';
   ok !$v->optional('baz', 'trim', 'not_empty')->is_valid, 'not valid';
   ok !$v->has_error, 'no error';
-  is_deeply $v->output, {foo => ['bar']}, 'right result';
+  is_deeply $v->output, {foo => 'bar'}, 'right result';
+};
+
+subtest 'Comma separated' => sub {
+  my $v = $t->app->validation->input({foo => 'bar , baz,yada', baz => ['one, two', 'three']});
+  ok $v->required('foo', 'comma_separated')->is_valid, 'valid';
+  is_deeply $v->output, {foo => ['bar', 'baz', 'yada']}, 'right result';
+  ok $v->optional('baz', 'comma_separated')->is_valid, 'valid';
+  is_deeply $v->output, {foo => ['bar', 'baz', 'yada'], baz => ['one', 'two', 'three']}, 'right result';
+
+  $v = $t->app->validation->input({foo => ['One,, Two,', 'Three']});
+  ok $v->required('foo', 'comma_separated')->is_valid, 'valid';
+  is_deeply $v->output, {foo => ['One', '', 'Two', '', 'Three']}, 'right result';
+
+  $v = $t->app->validation->input({foo => ['one,, two,', 'three']});
+  ok $v->required('foo', 'comma_separated', 'trim', 'not_empty')->is_valid, 'valid';
+  is_deeply $v->output, {foo => ['one', 'two', 'three']}, 'right result';
 };
 
 subtest 'Custom filter' => sub {

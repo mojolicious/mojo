@@ -73,7 +73,7 @@ sub optional {
   for my $cb (map { $self->validator->filters->{$_} } @filters) {
     @input = map { $self->$cb($name, $_) } @input;
   }
-  $self->output->{$name} = ref $input eq 'ARRAY' ? \@input : $input[0] if @input && !grep { !defined } @input;
+  $self->output->{$name} = @input > 1 ? \@input : $input[0] if @input && !grep { !defined } @input;
 
   return $self->topic($name);
 }

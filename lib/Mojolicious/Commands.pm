@@ -57,7 +57,7 @@ sub run {
     return $command->run(@args);
   }
 
-  elsif ($name && $name ne 'help') { die qq{Invalid command "$name".\n} }
+  elsif ($name && $name ne 'help' && $name ne '--help' && $name ne '-h') { die qq{Invalid command "$name".\n} }
 
   # Hide list for tests
   return 1 if $ENV{HARNESS_ACTIVE};

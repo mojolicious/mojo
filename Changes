@@ -1,5 +1,7 @@
 
-9.11  2021-03-15
+9.11  2021-03-18
+  - Improved Mojo::UserAgent to include "Content-Length: 0" with non-GET requests for better compatibility with broken
+    web servers.
 
 9.10  2021-03-14
   - Fixed top-level --help and -h options in Mojolicious::Commands.

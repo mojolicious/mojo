@@ -69,7 +69,7 @@ sub fix_headers {
 
   # Empty
   my $headers = $self->headers;
-  $headers->remove('Content-Length') if ($headers->content_length // '') eq '0';
+  $headers->remove('Content-Length') if ($headers->content_length // '') eq '0' && $self->method eq 'GET';
 
   # Host
   my $url = $self->url;

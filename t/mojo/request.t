@@ -1255,6 +1255,21 @@ subtest 'Build HTTP 1.1 request body' => sub {
   ok $req->is_finished, 'request is finished';
 };
 
+subtest 'Build HTTP 1.1 POST request without body' => sub {
+  my $req = Mojo::Message::Request->new;
+  $req->method('POST');
+  $req->url->parse('http://127.0.0.1/foo/bar');
+  $req = Mojo::Message::Request->new->parse($req->to_string);
+  is $req->method,  'POST',     'right method';
+  is $req->version, '1.1',      'right version';
+  is $req->url,     '/foo/bar', 'right URL';
+  is $req->url->to_abs,             'http://127.0.0.1/foo/bar', 'right absolute URL';
+  is $req->headers->host,           '127.0.0.1',                'right "Host" value';
+  is $req->headers->content_length, 0,                          'right "Content-Length" value';
+  is $req->body, '', 'no content';
+  ok $req->is_finished, 'request is finished';
+};
+
 subtest 'Build WebSocket handshake request' => sub {
   my $req      = Mojo::Message::Request->new;
   my $finished = undef;

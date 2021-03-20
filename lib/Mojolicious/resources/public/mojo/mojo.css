@@ -176,6 +176,14 @@ th {
 .tap-border-top, #infos {
   border-top: 1px solid #e1e4e8;
 }
+.tooltip code {
+  background: 0;
+  border: 0;
+  border-radius: 0;
+  color: #dddddd;
+  font: 14px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;;
+  padding: 0;
+}
 .value {
   padding: 1em;
 }

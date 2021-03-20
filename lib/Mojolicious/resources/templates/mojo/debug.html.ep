@@ -210,7 +210,8 @@
                   % $unparsed = "+$unparsed" if $depth;
                   % $pattern->match('/', $route->is_endpoint && !$route->partial);
                   % my $regex = (regexp_pattern $pattern->regex)[0];
-                  <tr data-toggle="tooltip" data-placement="left" title="<%= $regex %>">
+                  <tr data-toggle="tooltip" data-placement="left" data-html="true"
+                    title="<b>Regex:</b> <code><%= $regex %></code>">
                     <td class="value">
                       <pre><%= '  ' x $depth %><%= $unparsed %></pre>
                     </td>

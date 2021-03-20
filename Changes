@@ -1,6 +1,7 @@
 
 9.12  2021-03-21
   - Improved mojo script startup time slightly with a Mojo::HelloWorld optimization.
+  - Improved design of built-in templates.
 
 9.11  2021-03-20
   - This release contains fixes for security issues, everybody should upgrade!

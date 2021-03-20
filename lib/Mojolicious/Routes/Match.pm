@@ -13,11 +13,8 @@ sub path_for {
   my ($self, $name, %values) = (shift, Mojo::Util::_options(@_));
 
   # Current route
-  my ($route, $current);
-  if (!$name || $name eq 'current') {
-    return {} unless $route = $self->endpoint;
-    $current = 1;
-  }
+  my ($route, $current) = (undef, !$name || $name eq 'current');
+  if ($current) { return {} unless $route = $self->endpoint }
 
   # Find endpoint
   else { return {path => $name} unless $route = $self->root->lookup($name) }
@@ -30,8 +27,7 @@ sub path_for {
   $merged{format} = ($current ? $captures->{format} : undef) // $pattern->defaults->{format}
     if !exists $values{format} && $constraints->{format} && $constraints->{format} ne '1';
 
-  my $path = $route->render(\%merged);
-  return {path => $path, websocket => $route->has_websocket};
+  return {path => $route->render(\%merged), websocket => $route->has_websocket};
 }
 
 sub _match {

@@ -413,8 +413,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
     my $divisor  = $c->param('divisor');
 
     # 404
-    return $c->reply->not_found
-      unless looks_like_number $dividend && looks_like_number $divisor;
+    return $c->reply->not_found unless looks_like_number $dividend && looks_like_number $divisor;
 
     # 500
     return $c->reply->exception('Division by zero!') if $divisor == 0;
@@ -753,8 +752,7 @@ immediately to build more advanced validation logic with methods like L<Mojolici
 
     # Validate parameters ("pass_again" depends on "pass")
     $v->required('user')->size(1, 20)->like(qr/^[a-z0-9]+$/);
-    $v->required('pass_again')->equal_to('pass')
-      if $v->optional('pass')->size(7, 500)->is_valid;
+    $v->required('pass_again')->equal_to('pass') if $v->optional('pass')->size(7, 500)->is_valid;
 
     # Check if validation failed
     return $c->render('index') if $v->has_error;

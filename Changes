@@ -1,17 +1,18 @@
 
 9.11  2021-03-20
   - This release contains fixes for security issues, everybody should upgrade!
-  - Disabled format detection by default to fix vulnerabilities in many Mojolicious applications. From now on you will
-    have to explicitly declare the formats your routes are allowed to handle.
+  - Disabled format detection by default to fix vulnerabilities in many Mojolicious applications. That means some of
+    your routes that previously matched "/foo" and "/foo.json", will only match "/foo" after upgrading. From now on you
+    will have to explicitly declare the formats your routes are allowed to handle.
       # /foo
       # /foo.html
       # /foo.json
       $r->get('/foo')->to('bar#yada');
     becomes
       $r->get('/foo' => [format => ['html', 'json']])->to('bar#yada', format => undef);
-    And if you are certain that your application is not vulnerable, then you can also re-enable format detection for a
-    route and all its nested routes. Due to the risk of vulnerabilities, this feature is going to be removed again in a
-    future release.
+    And if you are certain that your application is not vulnerable, you also have the option to re-enable format
+    detection for a route and all its nested routes. Due to the high risk of vulnerabilities, this feature is going to
+    be removed again in a future release however.
       my $active = $r->any([format => 1]);
       $active->get('/foo')->to('Test#first');
       $active->put('/bar')->to('Test#second');

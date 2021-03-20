@@ -15,6 +15,7 @@
       my $active = $r->any([format => 1]);
       $active->get('/foo')->to('Test#first');
       $active->put('/bar')->to('Test#second');
+  - Improved built-in templates not to show embedded apps in the stash snapshot.
   - Improved Mojo::UserAgent to include "Content-Length: 0" with non-GET requests for better compatibility with broken
     web servers.
 

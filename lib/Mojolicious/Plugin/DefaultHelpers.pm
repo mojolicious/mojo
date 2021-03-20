@@ -95,7 +95,8 @@ sub _development {
 
   # Filtered stash snapshot
   my $stash = $c->stash;
-  %{$stash->{snapshot} = {}} = map { $_ => $stash->{$_} } grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
+  %{$stash->{snapshot} = {}}
+    = map { $_ => $_ eq 'app' ? 'DUMMY' : $stash->{$_} } grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
   $stash->{exception} = $page eq 'exception' ? $e : undef;
 
   # Render with fallbacks

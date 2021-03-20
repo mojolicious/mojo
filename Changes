@@ -1,4 +1,6 @@
 
+9.12  2021-03-21
+
 9.11  2021-03-20
   - This release contains fixes for security issues, everybody should upgrade!
   - Disabled format detection by default to fix vulnerabilities in many Mojolicious applications. That means some of

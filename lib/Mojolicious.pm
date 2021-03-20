@@ -441,7 +441,7 @@ a plugin.
 =head2 preload_namespaces
 
   my $namespaces = $app->preload_namespaces;
-  $app           = $app->preload_namespaces(['MyApp:Controller']);
+  $app           = $app->preload_namespaces(['MyApp::Controller']);
 
 Namespaces to preload classes from during application startup.
 

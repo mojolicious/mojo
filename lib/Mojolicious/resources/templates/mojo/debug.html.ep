@@ -206,14 +206,13 @@
                 % my $walk = begin
                   % my ($walk, $route, $depth) = @_;
                   % my $pattern = $route->pattern;
-                  <tr>
+                  % my $unparsed = $pattern->unparsed || '/';
+                  % $unparsed = "+$unparsed" if $depth;
+                  % $pattern->match('/', $route->is_endpoint && !$route->partial);
+                  % my $regex = (regexp_pattern $pattern->regex)[0];
+                  <tr data-toggle="tooltip" data-placement="left" title="<%= $regex %>">
                     <td class="value">
-                      % my $unparsed = $pattern->unparsed || '/';
-                      % $unparsed = "+$unparsed" if $depth;
-                      % $pattern->match('/', $route->is_endpoint && !$route->partial);
-                      % my $regex = (regexp_pattern $pattern->regex)[0];
-                      <pre data-toggle="tooltip" data-placement="left"
-                        title="<%= $regex %>"><%= '  ' x $depth %><%= $unparsed %></pre>
+                      <pre><%= '  ' x $depth %><%= $unparsed %></pre>
                     </td>
                     <td class="value">
                       <pre><%= uc(join ',', @{$route->methods // []}) || '*' %></pre>

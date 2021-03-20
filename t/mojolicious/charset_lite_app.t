@@ -27,7 +27,7 @@ app->renderer->add_handler(
   }
 );
 
-get '/' => 'index';
+get '/' => [format => [$yatta]] => {format => undef} => 'index';
 
 post '/' => sub {
   my $c = shift;

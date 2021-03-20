@@ -116,7 +116,7 @@ sub startup {
   $r->any('/test10')->to('baz#index');
 
   # /withblock (template with blocks)
-  $r->any('/withblock')->to('foo#withBlock');
+  $r->any('/withblock', [format => ['txt']])->to('foo#withBlock');
 
   # /staged (authentication with intermediate destination)
   my $b = $r->any('/staged')->inline(1)->to('foo#stage1', return => 1);

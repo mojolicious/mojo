@@ -552,21 +552,21 @@ L<Mojolicious::Controller/"match">.
 
 =head2 Formats
 
-File extensions like C<.html> and C<.txt> at the end of a route are automatically detected and stored in the stash
-value C<format>.
-
-  # /foo      -> {controller => 'foo', action => 'bar'}
-  # /foo.html -> {controller => 'foo', action => 'bar', format => 'html'}
-  # /foo.txt  -> {controller => 'foo', action => 'bar', format => 'txt'}
-  $r->get('/foo')->to('foo#bar');
-
-This for example, allows multiple templates in different formats to share the same action code. Restrictive
-placeholders can also be used to limit the allowed formats.
+File extensions like C<.html> and C<.txt> at the end of a route can be detected and stored in the stash value C<format>.
+Use a restrictive placeholder to declare the possible values.
 
   # /foo.txt -> undef
   # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
   $r->get('/foo' => [format => ['rss', 'xml']])->to('foo#bar');
+
+This for example, allows multiple templates in different formats to share the same action code. And just like with
+placeholders you can use a default value to make the format optional.
+
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> {controller => 'foo', action => 'bar', format => 'html'}
+  # /foo.txt  -> {controller => 'foo', action => 'bar', format => 'txt'}
+  $r->get('/foo' => [format => ['html', 'txt']])->to('foo#bar', format => undef);
 
 A C<format> value can also be passed to L<Mojolicious::Controller/"url_for">.
 
@@ -575,23 +575,6 @@ A C<format> value can also be passed to L<Mojolicious::Controller/"url_for">.
 
   # Generate URL "/foo/24.txt" for route "baz"
   my $url = $c->url_for('baz', id => 24, format => 'txt');
-
-Or you can just disable format detection with a special type of restrictive placeholder, which gets inherited by nested
-routes, and then re-enable it on demand.
-
-  # /foo      -> {controller => 'foo', action => 'bar'}
-  # /foo.html -> undef
-  $r->get('/foo' => [format => 0])->to('foo#bar');
-
-  # /foo      -> {controller => 'foo', action => 'bar'}
-  # /foo.html -> undef
-  # /baz      -> undef
-  # /baz.txt  -> {controller => 'baz', action => 'yada', format => 'txt'}
-  # /baz.html -> {controller => 'baz', action => 'yada', format => 'html'}
-  # /baz.xml  -> undef
-  my $inactive = $r->under([format => 0]);
-  $inactive->get('/foo')->to('foo#bar');
-  $inactive->get('/baz' => [format => ['txt', 'html']])->to('baz#yada');
 
 =head2 WebSockets
 

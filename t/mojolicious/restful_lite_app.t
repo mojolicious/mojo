@@ -7,24 +7,24 @@ use Test::More;
 use Mojo::JSON qw(false true);
 use Mojolicious::Lite;
 
-any [qw(POST PUT)] => '/json/echo' => sub {
+any [qw(POST PUT)] => '/json/echo' => [format => ['json']] => {format => undef} => sub {
   my $c = shift;
   $c->respond_to(json => {json => $c->req->json});
 };
 
-get '/accepts' => sub {
+get '/accepts' => [format => ['html', 'json', 'txt', 'xml']] => {format => undef} => sub {
   my $c = shift;
   $c->render(json => {best => $c->accepts('html', 'json', 'txt')});
 };
 
-get '/wants_json' => sub {
+get '/wants_json' => [format => ['json', 'xml']] => {format => undef} => sub {
   my $c = shift;
   $c->render(json => {wants_json => $c->accepts('', 'json') ? \1 : \0});
 };
 
 under '/rest';
 
-get sub {
+get [format => ['json', 'html', 'xml']] => {format => undef} => sub {
   my $c = shift;
   $c->respond_to(
     json => sub { $c->render(json => {just => 'works'}) },
@@ -33,7 +33,7 @@ get sub {
   );
 };
 
-post sub {
+post [format => ['json', 'html', 'xml', 'png']] => {format => undef} => sub {
   my $c = shift;
   $c->respond_to(
     json => {json => {just => 'works too'}},

@@ -564,14 +564,13 @@ L<Mojolicious::Lite/"under">.
 =head2 Formats
 
 Formats can be automatically detected from file extensions like C<.html>, they are used to find the right template and
-generate the correct C<Content-Type> header.
+generate the correct C<Content-Type> header. Use a restrictive placeholder to declare the possible values.
 
   use Mojolicious::Lite -signatures;
 
-  # /detection
   # /detection.html
   # /detection.txt
-  get '/detection' => sub ($c) {
+  get '/detection' => [format => ['html', 'txt']] => sub ($c) {
     $c->render(template => 'detected');
   };
 
@@ -588,37 +587,21 @@ generate the correct C<Content-Type> header.
   @@ detected.txt.ep
   TXT was detected.
 
-The default format is C<html>, and restrictive placeholders can be used to limit possible values.
+And just like with placeholders you can use a default value to make the format optional.
 
   use Mojolicious::Lite -signatures;
 
+  # /hello
   # /hello.json
   # /hello.txt
-  get '/hello' => [format => ['json', 'txt']] => sub ($c) {
-    return $c->render(json => {hello => 'world'})
-      if $c->stash('format') eq 'json';
+  get '/hello' => [format => ['json', 'txt']] => {format => 'txt'} => sub ($c) {
+    return $c->render(json => {hello => 'world'}) if $c->stash('format') eq 'json';
     $c->render(text => 'hello world');
   };
 
   app->start;
 
-Or you can just disable format detection with a special type of restrictive placeholder.
-
-  use Mojolicious::Lite;
-
-  # /hello
-  get '/hello' => [format => 0] => {text => 'No format detection.'};
-
-  # Disable detection and allow the following routes to re-enable it on demand
-  under [format => 0];
-
-  # /foo
-  get '/foo' => {text => 'No format detection again.'};
-
-  # /bar.txt
-  get '/bar' => [format => 'txt'] => {text => ' Just one format.'};
-
-  app->start;
+The default format is C<html> and the renderer will fall back to when necessary.
 
 =head2 Content negotiation
 
@@ -633,7 +616,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"respond_to">.
   # /hello.xml
   # /hello?format=json
   # /hello?format=xml
-  get '/hello' => sub ($c) {
+  get '/hello' => [format => ['json', 'xml']] => {format => undef} => sub ($c) {
     $c->respond_to(
       json => {json => {hello => 'world'}},
       xml  => {text => '<hello>world</hello>'},

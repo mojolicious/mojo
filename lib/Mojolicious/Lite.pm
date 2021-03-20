@@ -300,7 +300,7 @@ L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more in
   my $route = under '/:foo' => {foo => 'bar'};
   my $route = under '/:foo' => [foo => qr/\w+/];
   my $route = under '/:foo' => (agent => qr/Firefox/);
-  my $route = under [format => 0];
+  my $route = under [format => ['json', 'yaml']];
 
 Generate nested route with L<Mojolicious::Routes::Route/"under">, to which all following routes are automatically
 appended. See L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.

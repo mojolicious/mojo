@@ -51,11 +51,11 @@ get '/custom_exception' => sub { die Mojo::Base->new };
 
 get '/dead_template';
 
-get '/dead_template_too';
+get '/dead_template_too' => [format => ['xml']];
 
-get '/dead_handler' => {handler => 'dead'};
+get '/dead_handler' => [format => ['xml']] => {handler => 'dead'};
 
-get '/dead_action_epl' => {handler => 'epl'} => sub {
+get '/dead_action_epl' => [format => ['xml']] => {handler => 'epl'} => sub {
   die "dead action epl!\n";
 };
 
@@ -63,7 +63,7 @@ get '/dead_included_template';
 
 get '/dead_template_with_layout';
 
-get '/dead_action' => sub { die "dead action!\n" };
+get '/dead_action' => [format => ['xml', 'json']] => {format => undef} => sub { die "dead action!\n" };
 
 get '/double_dead_action_☃' => sub {
   eval { die 'double dead action!' };
@@ -76,7 +76,7 @@ get '/trapped' => sub {
   $c->render(text => $@->{foo} || 'failed');
 };
 
-get '/missing_template' => {exception => 'whatever'};
+get '/missing_template' => [format => ['xml', 'json', 'txt']] => {exception => 'whatever', format => undef};
 
 get '/missing_template/too' => sub {
   my $c = shift;

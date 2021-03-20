@@ -51,7 +51,7 @@ get '/' => {name => '<sebastian>'} => 'index';
 
 get '/advanced' => 'advanced';
 
-get '/rest' => sub {
+get '/rest' => [format => 'html'] => {format => undef} => sub {
   shift->respond_to(foo => {text => 'foo works!'}, html => {text => 'html works!'})
     ->res->headers->header('X-Rest' => 1);
 };

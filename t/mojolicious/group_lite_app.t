@@ -162,7 +162,7 @@ group {
     return !!0;
   };
 
-  get '/authgroup' => {text => "You're ok."};
+  get '/authgroup' => [format => ['txt']] => {text => "You're ok.", format => undef};
 };
 
 get '/noauthgroup' => {inline => 'Whatever <%= $foo %>.'};

@@ -125,23 +125,23 @@ sub _compile {
   $regex = $block . $regex if $block;
 
   # Format
-  $regex .= _compile_format($constraints->{format}, $defaults->{format}) if $detect;
+  $regex .= _compile_format($constraints->{format}, exists $defaults->{format}) if $detect;
 
   $self->regex(qr/^$regex/ps);
 }
 
 sub _compile_format {
-  my ($format, $default) = @_;
-
-  # Default regex
-  return '/?(?:\.([^/]+))?$' unless defined $format;
+  my ($format, $has_default) = @_;
 
   # No regex
   return '' unless $format;
 
+  # Default regex
+  return '/?(?:\.([^/]+))?$' if $format eq '1';
+
   # Compile custom regex
   my $regex = '\.' . _compile_req($format);
-  return $default ? "/?(?:$regex)?\$" : "/?$regex\$";
+  return $has_default ? "/?(?:$regex)?\$" : "/?$regex\$";
 }
 
 sub _compile_req {
@@ -344,7 +344,7 @@ Match pattern against path and remove matching parts, format detection is disabl
   my $pattern = Mojolicious::Routes::Pattern->new;
   my $pattern = Mojolicious::Routes::Pattern->new('/users/:id');
   my $pattern = Mojolicious::Routes::Pattern->new('/user/:id', id => qr/\d+/);
-  my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
+  my $pattern = Mojolicious::Routes::Pattern->new(format => ['json', 'yaml']);
 
 Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern if necessary.
 
@@ -352,7 +352,7 @@ Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern i
 
   $pattern = $pattern->parse('/user/:id');
   $pattern = $pattern->parse('/user/:id', id=> qr/\d+/);
-  $pattern = $pattern->parse(format => 0);
+  $pattern = $pattern->parse(format => ['json', 'yaml']);
 
 Parse pattern.
 

@@ -221,7 +221,7 @@ sub _route {
   croak qq{Route pattern "@{[$route->pattern->unparsed]}" contains a reserved stash value}
     if grep { $self->is_reserved($_) } @{$route->pattern->placeholders};
   my $format = $self->pattern->constraints->{format};
-  $route->pattern->constraints->{format} //= 0 if defined $format && !$format;
+  $route->pattern->constraints->{format} //= 1 if defined $format && $format eq '1';
 
   return $route;
 }
@@ -461,7 +461,7 @@ L<Mojolicious::Guides::Routing> for more information.
 
   $r = $r->parse('/user/:id');
   $r = $r->parse('/user/:id', id => qr/\d+/);
-  $r = $r->parse(format => 0);
+  $r = $r->parse(format => ['json', 'yaml']);
 
 Parse pattern.
 
@@ -589,7 +589,7 @@ Stringify the whole route.
   my $route = $r->under('/:foo' => {foo => 'bar'});
   my $route = $r->under('/:foo' => [foo => qr/\w+/]);
   my $route = $r->under('/:foo' => (agent => qr/Firefox/));
-  my $route = $r->under([format => 0]);
+  my $route = $r->under([format => ['json', 'yaml']]);
 
 Generate L<Mojolicious::Routes::Route> object for a nested route with its own intermediate destination, takes the same
 arguments as L</"any"> (except for the HTTP methods to match, which are not available). See

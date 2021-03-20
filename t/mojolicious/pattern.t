@@ -126,6 +126,7 @@ is $pattern->render({test => $value}), "/$value", 'right result';
 # Format detection
 $pattern = Mojolicious::Routes::Pattern->new('/test');
 $pattern->defaults({action => 'index'});
+$pattern->constraints({format => 1});
 ok !$pattern->regex, 'no regex';
 is_deeply $pattern->match('/test.xml', 1), {action => 'index', format => 'xml'}, 'right structure';
 ok $pattern->regex, 'regex has been compiled on demand';
@@ -169,6 +170,11 @@ is_deeply $result, {test => 'foo', action => 'index', format => 'html'}, 'right 
 is $pattern->render($result), '/foo/v1.0', 'right result';
 is $pattern->render($result,                     1), '/foo/v1.0.html', 'right result';
 is $pattern->render({%$result, format => undef}, 1), '/foo/v1.0',      'right result';
+
+# Versioned pattern with format
+$pattern = Mojolicious::Routes::Pattern->new('/:test/v1.0');
+$pattern->defaults({action => 'index', format => 'html'});
+$pattern->constraints({format => ['txt']});
 $result = $pattern->match('/foo/v1.0.txt', 1);
 is_deeply $result, {test => 'foo', action => 'index', format => 'txt'}, 'right structure';
 is $pattern->render($result), '/foo/v1.0', 'right result';

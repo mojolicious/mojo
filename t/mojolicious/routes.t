@@ -36,12 +36,12 @@ $r->any('/alternatives4/:foo', [foo => [qw(foo foo.bar)]]);
 
 # /optional/*
 # /optional/*/*
-$r->any('/optional/:foo/:bar')->to(bar => 'test');
+$r->any('/optional/:foo/:bar', [format => 1])->to(bar => 'test');
 
 # /optional2
 # /optional2/*
 # /optional2/*/*
-$r->any('/optional2/:foo')->to(foo => 'one')->any('/:bar')->to(bar => 'two');
+$r->any('/optional2/:foo', [format => 1])->to(foo => 'one')->any('/:bar')->to(bar => 'two');
 
 # /*/test
 my $test = $r->any('/:testcase/test')->to(action => 'test');
@@ -86,8 +86,8 @@ $r->any('/wildcards/3/<*wildcard>/foo')->to(testcase => 'very', action => 'dange
 $r->any('/wildcards/4/*wildcard/foo')->to(testcase => 'somewhat', action => 'dangerous');
 
 # /format
-# /format.html
-$r->any('/format')->to(testcase => 'hello')->to(action => 'you', format => 'html');
+# /format.*
+$r->any('/format', [format => 1])->to(testcase => 'hello')->to(action => 'you', format => 'html');
 
 # /format2.txt
 $r->any('/format2', [format => qr/txt/])->to(testcase => 'we', action => 'howdy');
@@ -117,12 +117,15 @@ $r->any('/type/<id:my_num>')->to('foo#bar');
 
 # /articles/1/edit
 # /articles/1/delete
+# /articles/1/delete.json
 my $inline = $r->any('/articles/:id')->inline(1)->to(testcase => 'articles', action => 'load', format => 'html');
 $inline->any('/edit')->to(testcase => 'articles', action => 'edit');
-$inline->any('/delete')->to(testcase => 'articles', action => 'delete', format => undef)->name('articles_delete');
+$inline->any('/delete', [format => ['json']])->to(testcase => 'articles', action => 'delete', format => undef)
+  ->name('articles_delete');
 
 # GET /method/get
-$r->any('/method/get')->methods('GET')->to(testcase => 'method', action => 'get');
+$r->any('/method/get', [format => ['html']])->methods('GET')
+  ->to(testcase => 'method', action => 'get', format => undef);
 
 # POST /method/post
 $r->any('/method/post')->methods('post')->to(testcase => 'method', action => 'post');
@@ -142,8 +145,8 @@ $r->any('/regex/alternatives/:alternatives', [alternatives => qr/foo|bar|baz/])
 # /versioned/2.4/test
 # /versioned/2.4/test.xml
 my $versioned = $r->any('/versioned');
-$versioned->any('/1.0')->to(testcase => 'bar')->any('/test')->to(action => 'baz');
-$versioned->any('/2.4')->to(testcase => 'foo')->any('/test')->to(action => 'bar');
+$versioned->any('/1.0')->to(testcase => 'bar')->any('/test', [format => ['xml']])->to(action => 'baz', format => undef);
+$versioned->any('/2.4')->to(testcase => 'foo')->any('/test', [format => ['xml']])->to(action => 'bar', format => undef);
 
 # /versioned/too/1.0
 my $too = $r->any('/versioned/too')->to('too#');
@@ -158,7 +161,7 @@ $multi->any('/bar.baz')->to('works#too', format => 'xml');
 # /nodetect
 # /nodetect2.txt
 # /nodetect2.html
-my $inactive = $r->any('/', [format => 0]);
+my $inactive = $r->any('/');
 $inactive->any('/nodetect')->to('foo#none');
 $inactive->any('/nodetect2', [format => ['txt', 'html']])->to('bar#hyper');
 
@@ -169,8 +172,8 @@ $inactive->any('/nodetect2', [format => ['txt', 'html']])->to('bar#hyper');
 # /source/third.xml
 my $source = $r->any('/source')->to('source#');
 my $first  = $source->any('/', [format => 0])->any('/first')->to('#first');
-$source->any('/second')->to('#second');
-my $third  = $source->any('/third')->to('#third');
+$source->any('/second', [format => ['xml']])->to('#second', format => undef);
+my $third  = $source->any('/third', [format => ['xml']])->to('#third', format => undef);
 my $target = $r->remove->any('/target')->to('target#');
 my $second = $r->find('second');
 is $second->render({}), '/source/second', 'right result';
@@ -183,7 +186,8 @@ is $second->render({}), '/target/second', 'right result';
 $r->websocket('/websocket' => {testcase => 'ws'})->any('/')->to(action => 'just')->any->to(works => 1);
 
 # /slash
-$r->any('/slash')->to(testcase => 'just')->any('/')->to(action => 'slash');
+# /slash.txt
+$r->any('/slash')->to(testcase => 'just')->any('/', [format => ['txt']])->to(action => 'slash', format => undef);
 
 # /missing/*/name
 # /missing/too
@@ -240,7 +244,7 @@ is $r->find('very_clean')->to_string,      '/clean',               'right patter
 is $r->find('0')->to_string,               '/0',                   'right pattern';
 is $r->find('test_edit')->to_string,       '/:testcase/test/edit', 'right pattern';
 is $r->find('articles_delete')->to_string, '/articles/:id/delete', 'right pattern';
-is $r->find('nodetect')->pattern->constraints->{format}, 0, 'right value';
+ok !$r->find('nodetect')->pattern->constraints->{format}, 'no value';
 is $r->find('nodetect')->to->{controller}, 'foo', 'right testcase';
 
 # Null route
@@ -404,7 +408,7 @@ $m->find($c => {method => 'GET', path => '/articles/1/delete.json'});
   {testcase => 'articles', action => 'delete', id => 1, format => 'json'}
 );
 is_deeply $m->stack, \@stack, 'right structure';
-is $m->path_for->{path}, '/articles/1/delete', 'right path';
+is $m->path_for->{path}, '/articles/1/delete.json', 'right path';
 
 # Root
 $m = Mojolicious::Routes::Match->new(root => $r);
@@ -611,7 +615,7 @@ is_deeply $m->stack, [], 'empty stack';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/method/get.html'});
 is_deeply $m->stack, [{testcase => 'method', action => 'get', format => 'html'}], 'right structure';
-is $m->path_for->{path}, '/method/get', 'right path';
+is $m->path_for->{path}, '/method/get.html', 'right path';
 is $m->endpoint->suggested_method, 'GET', 'right method';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'POST', path => '/method/post'});
@@ -665,20 +669,20 @@ is_deeply $m->stack, [], 'empty stack';
 # Route with version
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/versioned/1.0/test'});
-is_deeply $m->stack, [{testcase => 'bar', action => 'baz'}], 'right structure';
+is_deeply $m->stack, [{testcase => 'bar', action => 'baz', format => undef}], 'right structure';
 is $m->path_for->{path}, '/versioned/1.0/test', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/versioned/1.0/test.xml'});
 is_deeply $m->stack, [{testcase => 'bar', action => 'baz', format => 'xml'}], 'right structure';
-is $m->path_for->{path}, '/versioned/1.0/test', 'right path';
+is $m->path_for->{path}, '/versioned/1.0/test.xml', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/versioned/2.4/test'});
-is_deeply $m->stack, [{testcase => 'foo', action => 'bar'}], 'right structure';
+is_deeply $m->stack, [{testcase => 'foo', action => 'bar', format => undef}], 'right structure';
 is $m->path_for->{path}, '/versioned/2.4/test', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/versioned/2.4/test.xml'});
 is_deeply $m->stack, [{testcase => 'foo', action => 'bar', format => 'xml'}], 'right structure';
-is $m->path_for->{path}, '/versioned/2.4/test', 'right path';
+is $m->path_for->{path}, '/versioned/2.4/test.xml', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/versioned/3.0/test'});
 is_deeply $m->stack, [], 'empty stack';
@@ -748,23 +752,23 @@ $m->find($c => {method => 'GET', path => '/source/first'});
 is_deeply $m->stack, [], 'empty stack';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/target/second'});
-is_deeply $m->stack, [{controller => 'target', action => 'second'}], 'right structure';
+is_deeply $m->stack, [{controller => 'target', action => 'second', format => undef}], 'right structure';
 is $m->path_for->{path}, '/target/second', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/target/second.xml'});
 is_deeply $m->stack, [{controller => 'target', action => 'second', format => 'xml'}], 'right structure';
-is $m->path_for->{path}, '/target/second', 'right path';
+is $m->path_for->{path}, '/target/second.xml', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/source/second'});
 is_deeply $m->stack, [], 'empty stack';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/source/third'});
-is_deeply $m->stack, [{controller => 'source', action => 'third'}], 'right structure';
+is_deeply $m->stack, [{controller => 'source', action => 'third', format => undef}], 'right structure';
 is $m->path_for->{path}, '/source/third', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/source/third.xml'});
 is_deeply $m->stack, [{controller => 'source', action => 'third', format => 'xml'}], 'right structure';
-is $m->path_for->{path}, '/source/third', 'right path';
+is $m->path_for->{path}, '/source/third.xml', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/target/third'});
 is_deeply $m->stack, [], 'empty stack';
@@ -782,7 +786,7 @@ ok $m->path_for->{websocket}, 'is a websocket';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->find($c => {method => 'GET', path => '/slash.txt'});
 is_deeply $m->stack, [{testcase => 'just', action => 'slash', format => 'txt'}], 'right structure';
-is $m->path_for->{path}, '/slash', 'right path';
+is $m->path_for->{path}, '/slash.txt', 'right path';
 ok !$m->path_for->{websocket}, 'not a websocket';
 is $m->path_for(format => 'html')->{path}, '/slash.html', 'right path';
 

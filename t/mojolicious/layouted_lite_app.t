@@ -101,7 +101,7 @@ get '/inline/again' => {inline => 0};
 
 get '/data' => {data => 0};
 
-get '/variants' => {layout => 'variants'} => sub {
+get '/variants' => [format => ['txt']] => {layout => 'variants', format => undef} => sub {
   my $c = shift;
   $c->stash->{variant} = $c->param('device');
   $c->render('variants');

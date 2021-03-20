@@ -76,7 +76,7 @@ get '/unicode/:0' => sub {
   $c->render(text => $c->param('0') . $c->url_for);
 };
 
-get '/' => 'root';
+get '/' => [format => ['html']] => {format => undef} => 'root';
 
 get '/alternatives/:char' => [char => [qw(☃ ♥)]] => sub {
   my $c = shift;
@@ -132,7 +132,7 @@ get '/template/exception' => 'dies_too';
 
 get '/with-format' => {format => 'html'} => 'with-format';
 
-get '/without-format' => 'without-format';
+get '/without-format' => [format => ['html']] => {format => undef} => 'without-format';
 
 any '/json_too' => {json => {hello => 'world'}};
 
@@ -198,9 +198,9 @@ get '/привет/мир' => sub { shift->render(text => 'привет мир')
 
 get '/root.html' => 'root_path';
 
-get '/root' => sub { shift->render(text => 'root fallback!') };
+get '/root' => [format => ['txt']] => {format => undef} => sub { shift->render(text => 'root fallback!') };
 
-get '/template.txt' => {template => 'template', format => 'txt'};
+get '/template.txt' => [format => ['epl']] => {template => 'template', format => 'txt'};
 
 get ':number' => [number => qr/0/] => sub {
   my $c   = shift;

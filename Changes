@@ -16,6 +16,8 @@
       $active->get('/foo')->to('Test#first');
       $active->put('/bar')->to('Test#second');
   - Improved built-in templates not to show embedded apps in the stash snapshot.
+  - Improved built-in development not found page to include tooltips with the compiled regular expressions for each
+    route.
   - Improved Mojo::UserAgent to include "Content-Length: 0" with non-GET requests for better compatibility with broken
     web servers.
 

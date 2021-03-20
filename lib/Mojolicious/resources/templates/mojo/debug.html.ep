@@ -1,3 +1,4 @@
+% use re qw(regexp_pattern);
 <!DOCTYPE html>
 <!-- Request ID: <%= $c->req->request_id %> -->
 <html>
@@ -16,6 +17,9 @@
     %= stylesheet '/mojo/mojo.css'
     <script>
       hljs.initHighlightingOnLoad();
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      });
     </script>
   </head>
   <body class="d-flex flex-column h-100">
@@ -201,11 +205,15 @@
                 </div>
                 % my $walk = begin
                   % my ($walk, $route, $depth) = @_;
+                  % my $pattern = $route->pattern;
                   <tr>
                     <td class="value">
-                      % my $pattern = $route->pattern->unparsed || '/';
-                      % $pattern = "+$pattern" if $depth;
-                      <pre><%= '  ' x $depth %><%= $pattern %></pre>
+                      % my $unparsed = $pattern->unparsed || '/';
+                      % $unparsed = "+$unparsed" if $depth;
+                      % $pattern->match('/', $route->is_endpoint && !$route->partial);
+                      % my $regex = (regexp_pattern $pattern->regex)[0];
+                      <pre data-toggle="tooltip" data-placement="left"
+                        title="<%= $regex %>"><%= '  ' x $depth %><%= $unparsed %></pre>
                     </td>
                     <td class="value">
                       <pre><%= uc(join ',', @{$route->methods // []}) || '*' %></pre>

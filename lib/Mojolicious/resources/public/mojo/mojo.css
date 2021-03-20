@@ -144,9 +144,6 @@ th {
 .no-bottom-border {
   border-bottom: 0;
 }
-.no-overflow {
-  overflow: hidden;
-}
 .no-padding {
   padding: 0;
 }

@@ -135,7 +135,7 @@ th {
   width: 100%;
 }
 .mojo-terminal > code {
-  color: #dddddd;
+  color: #eee;
   font: 14px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
   line-height: 1.5em;
   text-align: left;
@@ -180,7 +180,7 @@ th {
   background: 0;
   border: 0;
   border-radius: 0;
-  color: #dddddd;
+  color: #eee;
   font: 14px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;;
   padding: 0;
 }

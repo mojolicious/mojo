@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious';
 
 sub startup {
   my $self = shift;
-  $self->log->level('error')->path(undef);
+  $self->preload_namespaces([])->log->level('error')->path(undef);
   $self->routes->any('/*whatever' => {whatever => '', text => 'Your Mojo is working!'});
 }
 

@@ -111,53 +111,68 @@ get '/host' => {text => 'main application!'};
 
 my $t = Test::Mojo->new;
 
-# PluginWithEmbeddedApp
-$t->get_ok('/plugin/foo')->status_is(200)->content_is('plugin works!');
+subtest 'PluginWithEmbeddedApp' => sub {
+  $t->get_ok('/plugin/foo')->status_is(200)->content_is('plugin works!');
+};
 
-# main
-$t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
+subtest 'main' => sub {
+  $t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
+};
 
-# TestApp
-$t->get_ok('/hello/hello')->status_is(200)->content_is('Hello from the embedded (1) app!');
+subtest 'TestApp' => sub {
+  $t->get_ok('/hello/hello')->status_is(200)->content_is('Hello from the embedded (1) app!');
+};
 
-# TestApp again
-$t->get_ok('/hello/hello')->status_is(200)->content_is('Hello from the embedded (2) app!');
+subtest 'TestApp again' => sub {
+  $t->get_ok('/hello/hello')->status_is(200)->content_is('Hello from the embedded (2) app!');
+};
 
-# TestApp again
-$t->get_ok('/hello/hello')->status_is(200)->content_is('Hello from the embedded (3) app!');
+subtest 'TestApp again' => sub {
+  $t->get_ok('/hello/hello')->status_is(200)->content_is('Hello from the embedded (3) app!');
+};
 
-# MyTestApp::Test1
-$t->get_ok('/bye/bye')->status_is(200)->content_is('Hello from the embedded (1) app!second embedded! success!');
+subtest 'MyTestApp::Test1' => sub {
+  $t->get_ok('/bye/bye')->status_is(200)->content_is('Hello from the embedded (1) app!second embedded! success!');
+};
 
-# MyTestApp::Test1 with different prefix
-$t->get_ok('/bar/bye')->status_is(200)->content_is('Hello from the embedded (2) app!third embedded! success!');
+subtest 'MyTestApp::Test1 with different prefix' => sub {
+  $t->get_ok('/bar/bye')->status_is(200)->content_is('Hello from the embedded (2) app!third embedded! success!');
+};
 
-# MyTestApp::Test1 with yet another prefix
-$t->get_ok('/baz/bye')->status_is(200)->content_is('Hello from the embedded (3) app!fourth embedded! success!');
+subtest 'MyTestApp::Test1 with yet another prefix' => sub {
+  $t->get_ok('/baz/bye')->status_is(200)->content_is('Hello from the embedded (3) app!fourth embedded! success!');
+};
 
-# MyTestApp::Test1 without prefix
-$t->get_ok('/yada')->status_is(200)->content_is('yada fifth embedded works!');
+subtest '::Test1 without prefix' => sub {
+  $t->get_ok('/yada')->status_is(200)->content_is('yada fifth embedded works!');
+};
 
-# 404 from MyTestApp::Test1
-$t->get_ok('/yada/yada')->status_is(404);
+subtest '404 from MyTestApp::Test1' => sub {
+  $t->get_ok('/yada/yada')->status_is(404);
+};
 
-# MyTestApp::Test1 with a long prefix
-$t->get_ok('/yada/yada/yada')->status_is(200)->content_is('yada sixth embedded works!');
+subtest 'MyTestApp::Test1 with a long prefix' => sub {
+  $t->get_ok('/yada/yada/yada')->status_is(200)->content_is('yada sixth embedded works!');
+};
 
-# MyTestApp::Basic
-$t->get_ok('/basic')->status_is(200)->content_is('Hello lalala!');
+subtest 'MyTestApp::Basic' => sub {
+  $t->get_ok('/basic')->status_is(200)->content_is('Hello lalala!');
+};
 
-# MyTestApp::Test2
-$t->get_ok('/third')->status_is(200)->content_is('Bye from the third embedded app! /third!');
+subtest 'MyTestApp::Test2' => sub {
+  $t->get_ok('/third')->status_is(200)->content_is('Bye from the third embedded app! /third!');
+};
 
-# EmbeddedTestApp
-$t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
+subtest 'EmbeddedTestApp' => sub {
+  $t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
+};
 
-# EmbeddedTestApp again
-$t->get_ok('/just/works/too')->status_is(200)->content_is("It just works!\n");
+subtest 'EmbeddedTestApp again' => sub {
+  $t->get_ok('/just/works/too')->status_is(200)->content_is("It just works!\n");
+};
 
-# Template from myapp.pl
-$t->get_ok('/x/1/')->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl' => sub {
+  $t->get_ok('/x/1/')->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -167,6 +182,7 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
 subtest 'Template from myapp.pl (no trailing slash)' => sub {
   $t->get_ok('/x/1')->status_is(200)->content_is(<<'EOF');
@@ -181,26 +197,32 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
 EOF
 };
 
-# Static file from myapp.pl
-$t->get_ok('/x/1/index.html')->status_is(200)->content_is("External static file!\n");
+subtest 'Static file from myapp.pl' => sub {
+  $t->get_ok('/x/1/index.html')->status_is(200)->content_is("External static file!\n");
+};
 
-# Echo from myapp.pl
-$t->get_ok('/x/1/echo')->status_is(200)->content_is('echo: nothing!');
+subtest 'Echo from myapp.pl' => sub {
+  $t->get_ok('/x/1/echo')->status_is(200)->content_is('echo: nothing!');
+};
 
-# Stream from myapp.pl
-$t->get_ok('/x/1/stream')->status_is(200)->content_is('hello!');
+subtest 'Stream from myapp.pl' => sub {
+  $t->get_ok('/x/1/stream')->status_is(200)->content_is('hello!');
+};
 
-# URL from myapp.pl
-$t->get_ok('/x/1/url/☃')->status_is(200)->content_is('/x/1/url/%E2%98%83.json -> /x/1/%E2%98%83/stream!');
+subtest 'URL from myapp.pl' => sub {
+  $t->get_ok('/x/1/url/☃')->status_is(200)->content_is('/x/1/url/%E2%98%83.json -> /x/1/%E2%98%83/stream!');
+};
 
-# Route to template from myapp.pl
-$t->get_ok('/x/1/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
+subtest 'Route to template from myapp.pl' => sub {
+  $t->get_ok('/x/1/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
+};
 
-# Missing template from myapp.pl
-$t->get_ok('/x/1/template/does_not_exist')->status_is(500)->content_like(qr/Server Error/);
+subtest 'Missing template from myapp.pl' => sub {
+  $t->get_ok('/x/1/template/does_not_exist')->status_is(500)->content_like(qr/Server Error/);
+};
 
-# Template from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -210,9 +232,10 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
-# Template from myapp.pl with Unicode prefix (no trailing slash)
-$t->get_ok('/x/♥')->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl with Unicode prefix (no trailing slash)' => sub {
+  $t->get_ok('/x/♥')->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -222,58 +245,75 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
-# Static file from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/index.html')->status_is(200)->content_is("External static file!\n");
+subtest 'Static file from myapp.pl with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/index.html')->status_is(200)->content_is("External static file!\n");
+};
 
-# Echo from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/echo')->status_is(200)->content_is('echo: works 2!');
+subtest 'Echo from myapp.pl with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/echo')->status_is(200)->content_is('echo: works 2!');
+};
 
-# Stream from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
+subtest 'Stream from myapp.pl with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
+};
 
-# URL from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/url/☃')->status_is(200)
-  ->content_is('/x/%E2%99%A5/url/%E2%98%83.json -> /x/%E2%99%A5/%E2%98%83/stream!');
+subtest 'URL from myapp.pl with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/url/☃')->status_is(200)
+    ->content_is('/x/%E2%99%A5/url/%E2%98%83.json -> /x/%E2%99%A5/%E2%98%83/stream!');
+};
 
-# Route to template from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
+subtest 'Route to template from myapp.pl with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
+};
 
-# Missing template from myapp.pl with Unicode prefix
-$t->get_ok('/x/♥/template/does_not_exist')->status_is(500)->content_like(qr/Server Error/);
+subtest 'Missing template from myapp.pl with Unicode prefix' => sub {
+  $t->get_ok('/x/♥/template/does_not_exist')->status_is(500)->content_like(qr/Server Error/);
+};
 
-# A little bit of everything from myapp2.pl
-$t->get_ok('/y/1')->status_is(200)->content_is("myapp2\nworks 4!\nInsecure too!");
+subtest 'A little bit of everything from myapp2.pl' => sub {
+  $t->get_ok('/y/1')->status_is(200)->content_is("myapp2\nworks 4!\nInsecure too!");
+};
 
-# Route to template from myapp.pl again (helpers sharing the same name)
-$t->get_ok('/x/1/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
+subtest 'Route to template from myapp.pl again (helpers sharing the same name)' => sub {
+  $t->get_ok('/x/1/template/menubar')->status_is(200)->content_is("myapp\nworks ♥!Insecure!Insecure!\n");
+};
 
-# Caching helper from myapp2.pl
-$t->get_ok('/y/1/cached?cache=foo')->status_is(200)->content_is('foo');
+subtest 'Caching helper from myapp2.pl' => sub {
+  $t->get_ok('/y/1/cached?cache=foo')->status_is(200)->content_is('foo');
+};
 
-# Caching helper with cached value from myapp2.pl
-$t->get_ok('/y/1/cached?cache=fail')->status_is(200)->content_is('foo');
+subtest 'Caching helper with cached value from myapp2.pl' => sub {
+  $t->get_ok('/y/1/cached?cache=fail')->status_is(200)->content_is('foo');
+};
 
-# 404 from myapp2.pl
-$t->get_ok('/y/1/2')->status_is(404);
+subtest '404 from myapp2.pl' => sub {
+  $t->get_ok('/y/1/2')->status_is(404);
+};
 
-# myapp2.pl with Unicode prefix
-$t->get_ok('/y/♥')->status_is(200)->content_is("myapp2\nworks 3!\nInsecure too!");
+subtest 'myapp2.pl with Unicode prefix' => sub {
+  $t->get_ok('/y/♥')->status_is(200)->content_is("myapp2\nworks 3!\nInsecure too!");
+};
 
-# Caching helper from myapp2.pl with Unicode prefix
-$t->get_ok('/y/♥/cached?cache=bar')->status_is(200)->content_is('bar');
+subtest 'Caching helper from myapp2.pl with Unicode prefix' => sub {
+  $t->get_ok('/y/♥/cached?cache=bar')->status_is(200)->content_is('bar');
+};
 
-# Caching helper with cached value from myapp2.pl with Unicode prefix
-$t->get_ok('/y/♥/cached?cache=fail')->status_is(200)->content_is('bar');
+subtest 'Caching helper with cached value from myapp2.pl with Unicode prefix' => sub {
+  $t->get_ok('/y/♥/cached?cache=fail')->status_is(200)->content_is('bar');
+};
 
-# 404 from myapp2.pl with Unicode prefix
-$t->get_ok('/y/♥/2')->status_is(404);
+subtest '404 from myapp2.pl with Unicode prefix' => sub {
+  $t->get_ok('/y/♥/2')->status_is(404);
+};
 
-# main
-$t->get_ok('/host')->status_is(200)->content_is('main application!');
+subtest 'main' => sub {
+  $t->get_ok('/host')->status_is(200)->content_is('main application!');
+};
 
-# Template from myapp.pl with domain
-$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl with domain' => sub {
+  $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -283,13 +323,15 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
-# Host from myapp.pl with domain
-$t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)->header_is('X-Message' => 'it works!')
-  ->content_is('mojolicious.org');
+subtest 'Host from myapp.pl with domain' => sub {
+  $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)->header_is('X-Message' => 'it works!')
+    ->content_is('mojolicious.org');
+};
 
-# Template from myapp.pl with domain again
-$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl with domain again' => sub {
+  $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -299,13 +341,15 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
-# Host from myapp.pl with domain again
-$t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)->header_is('X-Message' => 'it works!')
-  ->content_is('mojolicious.org');
+subtest 'Host from myapp.pl with domain again' => sub {
+  $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)->header_is('X-Message' => 'it works!')
+    ->content_is('mojolicious.org');
+};
 
-# Template from myapp.pl with wildcard domain
-$t->get_ok('/' => {Host => 'example.com'})->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl with wildcard domain' => sub {
+  $t->get_ok('/' => {Host => 'example.com'})->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -315,21 +359,25 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
-# Host from myapp.pl with wildcard domain
-$t->get_ok('/host' => {Host => 'ExAmPlE.CoM'})->status_is(200)->header_is('X-Message' => 'it works!')
-  ->content_is('ExAmPlE.CoM');
+subtest 'Host from myapp.pl with wildcard domain' => sub {
+  $t->get_ok('/host' => {Host => 'ExAmPlE.CoM'})->status_is(200)->header_is('X-Message' => 'it works!')
+    ->content_is('ExAmPlE.CoM');
+};
 
-# Host from myapp.pl with wildcard domain again
-$t->get_ok('/host' => {Host => 'www.example.com'})->status_is(200)->header_is('X-Message' => 'it works!')
-  ->content_is('www.example.com');
+subtest 'Host from myapp.pl with wildcard domain again' => sub {
+  $t->get_ok('/host' => {Host => 'www.example.com'})->status_is(200)->header_is('X-Message' => 'it works!')
+    ->content_is('www.example.com');
+};
 
-# Host from myapp.pl with wildcard domain again
-$t->get_ok('/host' => {Host => 'foo.bar.example.com'})->status_is(200)->header_is('X-Message' => 'it works!')
-  ->content_is('foo.bar.example.com');
+subtest 'Host from myapp.pl with wildcard domain again' => sub {
+  $t->get_ok('/host' => {Host => 'foo.bar.example.com'})->status_is(200)->header_is('X-Message' => 'it works!')
+    ->content_is('foo.bar.example.com');
+};
 
-# Template from myapp.pl with wildcard domain and Unicode prefix
-$t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl with wildcard domain and Unicode prefix' => sub {
+  $t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -339,37 +387,47 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
-# Host from myapp.pl with wildcard domain and Unicode prefix
-$t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})->status_is(200)->header_is('X-Message' => 'it works!')
-  ->content_is('foo-bar.de');
+subtest 'Host from myapp.pl with wildcard domain and Unicode prefix' => sub {
+  $t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})->status_is(200)->header_is('X-Message' => 'it works!')
+    ->content_is('foo-bar.de');
+};
 
-# Echo from myapp.pl with wildcard domain and Unicode prefix
-$t->get_ok('/♥/123/echo' => {Host => 'foo-bar.de'})->status_is(200)->content_is('echo: works 3!');
+subtest 'Echo from myapp.pl with wildcard domain and Unicode prefix' => sub {
+  $t->get_ok('/♥/123/echo' => {Host => 'foo-bar.de'})->status_is(200)->content_is('echo: works 3!');
+};
 
-# Host from myapp.pl with wildcard domain and Unicode prefix again
-$t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})->status_is(200)->header_is('X-Message' => 'it works!')
-  ->content_is('www.foo-bar.de');
+subtest 'Host from myapp.pl with wildcard domain and Unicode prefix again' => sub {
+  $t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})->status_is(200)->header_is('X-Message' => 'it works!')
+    ->content_is('www.foo-bar.de');
+};
 
-# Host from myapp.pl with wildcard domain and Unicode prefix again
-$t->get_ok('/♥/123/echo' => {Host => 'www.foo-bar.de'})->status_is(200)->content_is('echo: works 3!');
+subtest 'Host from myapp.pl with wildcard domain and Unicode prefix again' => sub {
+  $t->get_ok('/♥/123/echo' => {Host => 'www.foo-bar.de'})->status_is(200)->content_is('echo: works 3!');
+};
 
-# Text from myapp.pl with wildcard domain and Unicode prefix
-$t->get_ok('/♥/123/one' => {Host => 'www.foo-bar.de'})->status_is(200)->content_is('One');
+subtest 'Text from myapp.pl with wildcard domain and Unicode prefix' => sub {
+  $t->get_ok('/♥/123/one' => {Host => 'www.foo-bar.de'})->status_is(200)->content_is('One');
+};
 
-# Another text from myapp.pl with wildcard domain and Unicode prefix
-$t->get_ok('/♥/123/one/two' => {Host => 'www.foo-bar.de'})->status_is(200)->content_is('Two');
+subtest 'Another text from myapp.pl with wildcard domain and Unicode prefix' => sub {
+  $t->get_ok('/♥/123/one/two' => {Host => 'www.foo-bar.de'})->status_is(200)->content_is('Two');
+};
 
-# Invalid domain
-$t->get_ok('/' => {Host => 'mojoliciousxorg'})->status_is(404);
+subtest 'Invalid domain' => sub {
+  $t->get_ok('/' => {Host => 'mojoliciousxorg'})->status_is(404);
+};
 
-# Another invalid domain
-$t->get_ok('/' => {Host => 'www.kraihxcom'})->status_is(404);
+subtest 'Another invalid domain' => sub {
+  $t->get_ok('/' => {Host => 'www.kraihxcom'})->status_is(404);
+};
 
-# Embedded WebSocket
-$t->websocket_ok('/x/♥/url_for')->send_ok('ws_test')
-  ->message_ok->message_like(qr!^ws://127\.0\.0\.1:\d+/x/%E2%99%A5/url_for$!)->send_ok('index')
-  ->message_ok->message_like(qr!^http://127\.0\.0\.1:\d+/x/%E2%99%A5$!)->finish_ok;
+subtest 'Embedded WebSocket' => sub {
+  $t->websocket_ok('/x/♥/url_for')->send_ok('ws_test')
+    ->message_ok->message_like(qr!^ws://127\.0\.0\.1:\d+/x/%E2%99%A5/url_for$!)->send_ok('index')
+    ->message_ok->message_like(qr!^http://127\.0\.0\.1:\d+/x/%E2%99%A5$!)->finish_ok;
+};
 
 subtest 'Template from myapp.pl (shared logger)' => sub {
   $t->app->log->level('debug')->unsubscribe('message');

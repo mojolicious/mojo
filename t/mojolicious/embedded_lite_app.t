@@ -168,8 +168,8 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
 </form>
 EOF
 
-# Template from myapp.pl (no trailing slash)
-$t->get_ok('/x/1')->status_is(200)->content_is(<<'EOF');
+subtest 'Template from myapp.pl (no trailing slash)' => sub {
+  $t->get_ok('/x/1')->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
 
@@ -179,6 +179,7 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
+};
 
 # Static file from myapp.pl
 $t->get_ok('/x/1/index.html')->status_is(200)->content_is("External static file!\n");
@@ -369,6 +370,25 @@ $t->get_ok('/' => {Host => 'www.kraihxcom'})->status_is(404);
 $t->websocket_ok('/x/♥/url_for')->send_ok('ws_test')
   ->message_ok->message_like(qr!^ws://127\.0\.0\.1:\d+/x/%E2%99%A5/url_for$!)->send_ok('index')
   ->message_ok->message_like(qr!^http://127\.0\.0\.1:\d+/x/%E2%99%A5$!)->finish_ok;
+
+subtest 'Template from myapp.pl (shared logger)' => sub {
+  $t->app->log->level('debug')->unsubscribe('message');
+  my $log = '';
+  my $cb  = $t->app->log->on(message => sub { $log .= pop });
+  $t->get_ok('/x/1')->status_is(200)->content_is(<<'EOF');
+myapp
+works ♥!Insecure!Insecure!
+
+too!works!!!Mojolicious::Plugin::Config::Sandbox
+<a href="/x/1/">Test</a>
+<form action="/x/1/%E2%98%83">
+  <input type="submit" value="☃">
+</form>
+EOF
+  like $log, qr/Routing to application "Mojolicious::Lite"/,                    'right message';
+  like $log, qr/Rendering cached template "menubar.html.ep" from DATA section/, 'right message';
+  $t->app->log->unsubscribe(message => $cb);
+};
 
 done_testing();
 

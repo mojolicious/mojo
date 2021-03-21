@@ -12,7 +12,7 @@ has [qw(proxy reverse_proxy)];
 has request_id => sub {
   state $seed    = $$ . time . rand;
   state $counter = int rand 0xffffff;
-  my $b64 = substr(sha1_base64($seed . ($counter = ($counter + 1) % 0xffffff)), 0, 8);
+  my $b64 = substr(sha1_base64($seed . ($counter = ($counter + 1) % 0xffffff)), 0, 12);
   $b64 =~ tr!+/!-_!;
   return $b64;
 };

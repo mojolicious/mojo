@@ -108,6 +108,9 @@ sub _compile {
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
 
+      # ":text" (raw text)
+      $args = [qr/\Q$args\E/i] if $name eq 'text';
+
       # ":is" and ":not" (contains more selectors)
       $args = _compile($args, %ns) if $name eq 'has' || $name eq 'is' || $name eq 'not';
 
@@ -216,6 +219,10 @@ sub _pc {
 
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
+
+  # ":text"
+  return grep { ($_->[0] eq 'text' || $_->[0] eq 'raw') && $_->[1] =~ $args->[0] } @$current[4 .. $#$current]
+    if $class eq 'text';
 
   # ":any-link", ":link" and ":visited"
   if ($class eq 'any-link' || $class eq 'link' || $class eq 'visited') {
@@ -632,6 +639,15 @@ match an element. Note that this selector is B<EXPERIMENTAL> and might change wi
 This selector is part of L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
 Also be aware that this feature is currently marked C<at-risk>, so there is a high chance that it will get removed
 completely.
+
+=head2 E:text(string)
+
+An C<E> element containing text content that substring matches C<string> case-insensitively. Note thst this selector is
+B<EXPERIMENTAL> and might change without warning!
+
+  my $login = $css->select(':text(Log in)');
+
+This is a custom selector for L<Mojo::DOM> and not part of any spec.
 
 =head2 A|E
 

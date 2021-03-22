@@ -1320,6 +1320,30 @@ EOF
   is $dom->find('div:has(:not(p)) > p')->last->all_text, 'Four', 'right text';
 };
 
+subtest 'Text matching' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+<p>Zero</p>
+<div>
+  <p>One&lt;Two&gt;</p>
+  <div>Two<!-- Three -->Four</div>
+  <p>Five Six<a href="#">Seven</a>Eight</p>
+</div>
+EOF
+  is $dom->at(':text(ero)')->text,   'Zero', 'right text';
+  is $dom->at(':text(Zero)')->text,  'Zero', 'right text';
+  is $dom->at('p:text(Zero)')->text, 'Zero', 'right text';
+  is $dom->at('div:text(Zero)'), undef, 'no result';
+  is $dom->at('p:text(w)')->text,         'One<Two>',           'right text';
+  is $dom->at(':text(<Two>)')->text,      'One<Two>',           'right text';
+  is $dom->at(':text(Sev)')->text,        'Seven',              'right text';
+  is $dom->at('p a:text(even)')->text,    'Seven',              'right text';
+  is $dom->at(':text(v) :text(e)')->text, 'Seven',              'right text';
+  is $dom->at(':text(eight)')->all_text,  'Five SixSevenEight', 'right text';
+  is $dom->at(':text(v) :text(x)'), undef, 'no result';
+  is $dom->at('div:text(x)'),       undef, 'no result';
+  is $dom->at(':text(three)'),      undef, 'no result';
+};
+
 subtest 'Adding nodes' => sub {
   my $dom = Mojo::DOM->new(<<EOF);
 <ul>

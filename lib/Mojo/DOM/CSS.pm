@@ -137,8 +137,6 @@ sub _compile {
   return $group;
 }
 
-sub _empty { $_[0][0] eq 'comment' || $_[0][0] eq 'pi' }
-
 sub _equation {
   return [0, 0] unless my $equation = shift;
 
@@ -214,7 +212,7 @@ sub _pc {
   return !!_select(1, $current, $args) if $class eq 'has';
 
   # ":empty"
-  return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';
+  return !grep { !($_->[0] eq 'comment' || $_->[0] eq 'pi') } @$current[4 .. $#$current] if $class eq 'empty';
 
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';

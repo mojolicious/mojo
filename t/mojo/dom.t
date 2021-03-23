@@ -1333,15 +1333,21 @@ EOF
   is $dom->at(':text(Zero)')->text,  'Zero', 'right text';
   is $dom->at('p:text(Zero)')->text, 'Zero', 'right text';
   is $dom->at('div:text(Zero)'), undef, 'no result';
-  is $dom->at('p:text(w)')->text,         'One<Two>',           'right text';
-  is $dom->at(':text(<Two>)')->text,      'One<Two>',           'right text';
-  is $dom->at(':text(Sev)')->text,        'Seven',              'right text';
-  is $dom->at('p a:text(even)')->text,    'Seven',              'right text';
-  is $dom->at(':text(v) :text(e)')->text, 'Seven',              'right text';
-  is $dom->at(':text(eight)')->all_text,  'Five SixSevenEight', 'right text';
+  is $dom->at('p:text(w)')->text,               'One<Two>',           'right text';
+  is $dom->at(':text(<Two>)')->text,            'One<Two>',           'right text';
+  is $dom->at(':text(Sev)')->text,              'Seven',              'right text';
+  is $dom->at(':text(/^Seven$/)')->text,        'Seven',              'right text';
+  is $dom->at('p a:text(even)')->text,          'Seven',              'right text';
+  is $dom->at(':text(v) :text(e)')->text,       'Seven',              'right text';
+  is $dom->at(':text(eight)')->all_text,        'Five SixSevenEight', 'right text';
+  is $dom->at(':text(/Ei.ht/)')->all_text,      'Five SixSevenEight', 'right text';
+  is $dom->at(':text(/(?i:ei.ht)/)')->all_text, 'Five SixSevenEight', 'right text';
   is $dom->at(':text(v) :text(x)'), undef, 'no result';
   is $dom->at('div:text(x)'),       undef, 'no result';
   is $dom->at(':text(three)'),      undef, 'no result';
+  is $dom->at(':text(/three/)'),    undef, 'no result';
+  is $dom->at(':text(/zero/)'),     undef, 'no result';
+  is $dom->at(':text(/zero/)'),     undef, 'no result';
 };
 
 subtest 'Adding nodes' => sub {

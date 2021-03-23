@@ -109,7 +109,7 @@ sub _compile {
       my ($name, $args) = (lc $1, $2);
 
       # ":text" (raw text)
-      $args = [qr/\Q$args\E/i] if $name eq 'text';
+      $args = [$args =~ m!^/(.+)/$! ? qr/$1/ : qr/\Q$args\E/i] if $name eq 'text';
 
       # ":is" and ":not" (contains more selectors)
       $args = _compile($args, %ns) if $name eq 'has' || $name eq 'is' || $name eq 'not';
@@ -640,12 +640,20 @@ This selector is part of L<Selectors Level 4|https://dev.w3.org/csswg/selectors-
 Also be aware that this feature is currently marked C<at-risk>, so there is a high chance that it will get removed
 completely.
 
-=head2 E:text(string)
+=head2 E:text(string_or_regex)
 
-An C<E> element containing text content that substring matches C<string> case-insensitively. Note thst this selector is
+An C<E> element containing text content that substring matches C<string_or_regex> case-insensitively or that regex
+matches C<string_or_regex>. For regular expressions use the format C<:text(/.../)>. Note thst this selector is
 B<EXPERIMENTAL> and might change without warning!
 
+  # Substring match
   my $login = $css->select(':text(Log in)');
+
+  # Regex match
+  my $login = $css->select(':text(/Log ?in/)');
+
+  # Regex match (case-insensitive)
+  my $login = $css->select(':text(/(?i:Log ?in)/)');
 
 This is a custom selector for L<Mojo::DOM> and not part of any spec.
 

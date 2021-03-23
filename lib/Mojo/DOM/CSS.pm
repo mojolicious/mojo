@@ -643,7 +643,7 @@ completely.
 =head2 E:text(string_or_regex)
 
 An C<E> element containing text content that substring matches C<string_or_regex> case-insensitively or that regex
-matches C<string_or_regex>. For regular expressions use the format C<:text(/.../)>. Note thst this selector is
+matches C<string_or_regex>. For regular expressions use the format C<:text(/.../)>. Note that this selector is
 B<EXPERIMENTAL> and might change without warning!
 
   # Substring match

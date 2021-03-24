@@ -9,7 +9,7 @@ plan skip_all => 'set TEST_MORBO to enable this test (developer only!)' unless $
 use Mojo::File qw(curfile);
 use lib curfile->sibling('lib')->to_string;
 
-use IO::Socket::INET;
+use IO::Socket::INET ();
 use Mojo::File qw(tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Morbo::Backend;

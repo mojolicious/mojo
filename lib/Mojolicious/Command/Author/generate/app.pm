@@ -51,6 +51,7 @@ Mojolicious::Command::Author::generate::app - App generator command
 
     mojo generate app
     mojo generate app TestApp
+    mojo generate app My::TestApp
 
   Options:
     -h, --help   Show this summary of available options

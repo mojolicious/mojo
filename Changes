@@ -1,5 +1,6 @@
 
-9.15  2021-03-24
+9.15  2021-03-30
+  - Improved form generator in Mojo::UserAgent::Transactor to allow custom Content-Disposition headers.
 
 9.14  2021-03-23
   - Added EXPERIMENTAL support for :text pseudo-class to Mojo::DOM::CSS.

@@ -261,7 +261,7 @@ sub _parts {
     }
 
     # Content-Disposition
-    next unless defined $name;
+    next if !defined $name || defined $headers->content_disposition;
     $name = url_escape $name, '"';
     $name = encode $charset,  $name if $charset;
     my $disposition = qq{form-data; name="$name"};

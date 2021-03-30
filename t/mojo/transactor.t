@@ -259,6 +259,22 @@ subtest 'Multipart form with real file and custom header' => sub {
   is $tx->req->content->parts->[1], undef, 'no more parts';
 };
 
+subtest 'Multipart form with custom Content-Disposition header' => sub {
+  my $tx = $t->tx(POST => 'http://example.com/foo' => form =>
+      {mytext => {file => __FILE__, 'Content-Disposition' => 'form-data; name="works"'}});
+  is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
+  is $tx->req->method, 'POST', 'right method';
+  is $tx->req->headers->content_type, 'multipart/form-data', 'right "Content-Type" value';
+  unlike $tx->req->content->parts->[0]->headers->content_disposition, qr/"transactor.t"/,
+    'different "Content-Disposition" value';
+  is $tx->req->content->parts->[0]->headers->content_disposition, 'form-data; name="works"',
+    'right "Content-Disposition" value';
+  like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
+  ok $tx->req->content->parts->[0]->asset->is_file, 'stored in file';
+  ok !$tx->req->content->parts->[0]->headers->header('file'), 'no "file" header';
+  is $tx->req->content->parts->[1], undef, 'no more parts';
+};
+
 subtest 'Multipart form with asset and custom content type' => sub {
   my $tx = $t->tx(POST => 'http://example.com/foo' => {'Content-Type' => 'multipart/mojo-form'} => form =>
       {mytext => {file => Mojo::Asset::File->new(path => __FILE__)}});
@@ -372,8 +388,9 @@ subtest 'Multipart request with real file and custom header' => sub {
   is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
   like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
   ok $tx->req->content->parts->[0]->asset->is_file, 'stored in file';
-  ok !$tx->req->content->parts->[0]->headers->header('file'), 'no "file" header';
-  is $tx->req->content->parts->[0]->headers->dnt, 1, 'right "DNT" header';
+  is $tx->req->content->parts->[0]->headers->header('file'), undef, 'no "file" header';
+  is $tx->req->content->parts->[0]->headers->content_disposition, undef, 'no "Content-Disposition" value';
+  is $tx->req->content->parts->[0]->headers->dnt,                 1,     'right "DNT" header';
   is $tx->req->content->parts->[1], undef, 'no more parts';
 };
 

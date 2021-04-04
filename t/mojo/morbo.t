@@ -71,6 +71,7 @@ app->log->level('fatal');
 Mojo::IOLoop->next_tick(sub { path('$started')->touch });
 
 get '/hello' => {text => 'Hello World!'};
+get '/start' => {text => 'Started Morbo!'};
 
 app->start;
 EOF
@@ -90,6 +91,12 @@ EOF
   ok $tx->is_finished, 'transaction is finished';
   is $tx->res->code, 200,            'right status';
   is $tx->res->body, 'Hello World!', 'right content';
+
+  # Hook has been properly called
+  $tx = $ua->get("http://127.0.0.1:$port/started");
+  ok $tx->is_finished, 'transaction is finished';
+  is $tx->res->code, 200,              'right status';
+  is $tx->res->body, 'Started Morbo!', 'right content';
 };
 
 subtest 'Update script without changing mtime' => sub {
@@ -108,7 +115,11 @@ Mojo::IOLoop->next_tick(sub { path('$started')->touch });
 my \$message = 'Failed!';
 hook before_server_start => sub { \$message = 'Hello!' };
 
+my \$started = 'Failed!';
+hook before_app_start => sub { \$started = 'YES!' };
+
 get '/hello' => sub { shift->render(text => \$message) };
+get '/start' => sub { shift->render(text => \$started) };
 
 app->start;
 EOF
@@ -129,6 +140,12 @@ EOF
   ok $tx->is_finished, 'transaction is finished';
   is $tx->res->code, 200,      'right status';
   is $tx->res->body, 'Hello!', 'right content';
+
+  # This new one is there
+  $tx = $ua->get("http://127.0.0.1:$port/start");
+  ok $tx->is_finished, 'transaction is finished';
+  is $tx->res->code, 200,    'right status';
+  is $tx->res->body, 'YES!', 'right content';
 };
 
 subtest 'New file(s)' => sub {

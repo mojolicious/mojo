@@ -109,6 +109,15 @@ subtest 'Transaction' => sub {
 my $app = Mojolicious->new;
 my $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 
+my $whatever = 'Failed!';
+$app->hook(
+  before_app_start => sub {
+    my ($app) = shift;
+    my $ok = ref $app && $app->isa('Mojolicious');
+    $whatever = $ok ? 'Whatever!' : 'Wrong type';
+  }
+);
+
 subtest 'Moniker' => sub {
   is $ua->server->app($app)->app->moniker, 'mojolicious', 'right moniker';
 };
@@ -161,7 +170,12 @@ $app->routes->any(
   }
 );
 
-$app->routes->any('/*whatever' => {text => 'Whatever!'});
+$app->routes->any(
+  '/*whatever' => sub {
+    my ($c) = shift;
+    $c->render(text => $whatever);
+  }
+);
 
 subtest 'Normal request' => sub {
   my $tx = $ua->get('/normal/');

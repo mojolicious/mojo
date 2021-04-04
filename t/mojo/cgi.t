@@ -9,7 +9,13 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('fatal');
 
-get '/' => {text => 'Your Mojo is working!'};
+my $working = "NOT working";
+app->hook(before_app_start => sub { $working = "working" });
+
+get '/' => sub {
+  my $c = shift;
+  $c->render(text => "Your Mojo is $working!");
+};
 
 post '/chunked' => sub {
   my $c = shift;

@@ -35,6 +35,7 @@ sub run {
   my $loop = $self->ioloop;
   my $int  = $loop->recurring(1 => sub { });
   local $SIG{INT} = local $SIG{TERM} = sub { $loop->stop };
+  $self->app->app_starting;
   $self->start->ioloop->start;
   $loop->remove($int);
 }
@@ -53,6 +54,7 @@ sub start {
   # Start listening
   elsif (!@{$self->acceptors}) {
     $self->app->server($self);
+    $self->app->app_starting;
     $self->_listen($_) for @{$self->listen};
   }
 

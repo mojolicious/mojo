@@ -40,11 +40,17 @@ subtest 'Reverse proxy' => sub {
 };
 
 subtest 'Binding' => sub {
-  my @server;
+  my (@server, @started);
   app->hook(
     before_server_start => sub {
       my ($server, $app) = @_;
       push @server, ref $server, $app->mode;
+    }
+  );
+  app->hook(
+    before_app_start => sub {
+      my ($app) = @_;
+      push @started, $app->mode;
     }
   );
   my $app     = Mojo::Server::PSGI->new(app => app)->to_psgi_app;
@@ -81,6 +87,7 @@ subtest 'Binding' => sub {
   is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
   is_deeply decode_json($params), {bar => 'baz', hello => 'world', lalala => 23}, 'right structure';
   is_deeply \@server, ['Mojo::Server::PSGI', 'development'], 'hook has been emitted once';
+  is_deeply \@started, ['development'], 'hook has been emitted once';
 };
 
 subtest 'Command' => sub {

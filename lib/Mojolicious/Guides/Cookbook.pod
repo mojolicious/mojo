@@ -178,18 +178,24 @@ worker is allowed to handle (often as low as C<1>).
   $ ./script/my_app prefork -m production -w 10 -c 1
   Web application available at http://127.0.0.1:3000
 
-During startup your application is preloaded in the manager process, which does not run an event loop, so you can use
-L<Mojo::IOLoop/"next_tick"> to run code whenever a new worker process has been forked and its event loop gets started.
+During startup your application is preloaded in the manager process
+but it will not start any processing there.
+
+You can use the hook L<Mojolicious/"before_worker_start"> to run code in each
+child process (the worker processes that are being forked) before it is about
+to start processing incoming requests:
 
   use Mojolicious::Lite;
 
-  Mojo::IOLoop->next_tick(sub ($ioloop) {
-    app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
+  app->hook(before_worker_start => sub ($app) {
+    $app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
   });
 
   get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
 
   app->start;
+
+That can be handy to setup global state once.
 
 And to manage the pre-forking web server with systemd, you can use a unit configuration file like this.
 

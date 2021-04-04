@@ -149,6 +149,7 @@ sub _spawn {
   srand;
 
   $self->app->log->info("Worker $$ started");
+  $self->app->app_starting;
   $loop->start;
   exit 0;
 }

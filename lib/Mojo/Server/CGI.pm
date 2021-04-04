@@ -3,6 +3,14 @@ use Mojo::Base 'Mojo::Server';
 
 has 'nph';
 
+sub new {
+  my $class = shift;
+  my $self  = $class->SUPER::new(@_);
+  my $app   = $self->app;
+  $app->app_starting if ref $app;
+  return $self;
+}
+
 sub run {
   my $self = shift;
 
@@ -117,6 +125,14 @@ Activate non-parsed header mode.
 =head1 METHODS
 
 L<Mojo::Server::CGI> inherits all methods from L<Mojo::Server> and implements the following new ones.
+
+=head2 new
+
+  my $app    = Mojolicious->new;
+  my $server = Mojo::Server::CGI->new(app => $app);
+  my $server = Mojo::Server::CGI->new(app => $app, nph => 1);
+
+Creates a C<Mojo::Server::CGI> object.
 
 =head2 run
 

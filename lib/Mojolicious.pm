@@ -179,7 +179,7 @@ sub app_starting {
   my $self = shift;
 
   # Ensure we run 'before_app_start' only once per process
-  $self->{_started} = {} unless defined $self->{_started};
+  $self->{_started} //= {};
   return if exists $self->{_started}->{$$};
   $self->{_started}->{$$} = undef;
   $self->plugins->emit_hook(before_app_start => $self);

@@ -253,7 +253,7 @@ command object and the command arguments)
 =head2 before_server_start
 
 Emitted right before the application server is started, for web servers that support it, which includes all the
-built-in ones (except for L<Mojo::Server::CGI>).
+built-in ones.
 
   $app->hook(before_server_start => sub ($server, $app) {...});
 

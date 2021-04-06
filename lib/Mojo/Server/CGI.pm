@@ -6,6 +6,7 @@ has 'nph';
 sub run {
   my $self = shift;
 
+  $self->app->server($self);
   my $tx  = $self->build_tx;
   my $req = $tx->req->parse(\%ENV);
   $tx->local_port($ENV{SERVER_PORT})->remote_address($ENV{REMOTE_ADDR});

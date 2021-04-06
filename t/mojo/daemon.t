@@ -112,8 +112,8 @@ my $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $whatever = 'Failed!';
 $app->hook(
   before_app_start => sub {
-    my ($app) = shift;
-    my $ok = ref $app && $app->isa('Mojolicious');
+    my $app = shift;
+    my $ok  = ref $app && $app->isa('Mojolicious');
     $whatever = $ok ? 'Whatever!' : 'Wrong type';
   }
 );

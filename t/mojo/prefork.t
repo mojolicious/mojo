@@ -50,7 +50,7 @@ my $counter = Mojolicious->new;
 my ($counter_events, $counter_spawned, $counter_server);
 $counter->hook(
   before_app_start => sub {
-    my ($app) = shift;
+    my ($app) = @_;
     $counter_events  = {};
     $counter_spawned = {};
     $counter_server  = {};

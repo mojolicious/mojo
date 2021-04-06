@@ -272,14 +272,13 @@ server and application objects)
 
 =head2 before_app_start
 
-Emitted right before the application starts.  It works with all the built-in web
-servers.  In the case of L<Mojo::Server::Prefork>, it will run in each spawned
-worker, not in the master server.
+Emitted right before the application starts.  It works with all the built-in web servers.  In the case of
+L<Mojo::Server::Prefork>, it will run in each spawned worker, not in the master server.
 
   $app->hook(before_app_start => sub ($app) {...});
 
-This can be used to initialize the global state that the application will be
-perusing during its processing. (Passed the application object)
+This can be used to initialize the global state that the application will be perusing during its processing. (Passed
+the application object)
 
 =head2 after_build_tx
 

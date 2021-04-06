@@ -1,4 +1,6 @@
 
+9.16  2021-04-05
+
 9.15  2021-03-30
   - Improved form generator in Mojo::UserAgent::Transactor to allow custom Content-Disposition headers.
 

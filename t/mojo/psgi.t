@@ -49,7 +49,7 @@ subtest 'Binding' => sub {
   );
   app->hook(
     before_app_start => sub {
-      my ($app) = @_;
+      my $app = shift;
       push @started, $app->mode;
     }
   );

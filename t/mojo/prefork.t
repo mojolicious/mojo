@@ -50,7 +50,7 @@ my $counter = Mojolicious->new;
 my ($counter_events, $counter_spawned, $counter_server);
 $counter->hook(
   before_app_start => sub {
-    my ($app) = @_;
+    my $app = shift;
     $counter_events  = {};
     $counter_spawned = {};
     $counter_server  = {};
@@ -146,7 +146,7 @@ $prefork->app->hook(
 );
 $prefork->app->hook(
   before_app_start => sub {
-    my ($app) = @_;
+    my $app = shift;
     Mojo::UserAgent->new->post("$durl}triggered/$$");
   }
 );
@@ -211,7 +211,7 @@ $prefork->app->hook(
 );
 $prefork->app->hook(
   before_app_start => sub {
-    my ($app) = @_;
+    my $app = shift;
     Mojo::UserAgent->new->post("$durl/triggered/$$");
   }
 );
@@ -239,7 +239,7 @@ is $spawned_count, 5, 'right amount of spawned servers';
 is $server_count,  1, 'right amount of master servers';
 
 sub all_values_one {
-  my ($href) = @_;
+  my $href = shift;
   foreach my $val (values %$href) {
     return 0 unless 1 == $val;
   }

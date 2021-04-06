@@ -175,7 +175,15 @@ sub plugin {
 
 sub server { $_[0]->plugins->emit_hook(before_server_start => @_[1, 0]) }
 
-sub app_starting { $_[0]->plugins->emit_hook(before_app_start => $_[0]) }
+sub app_starting {
+  my $self = shift;
+
+  # Ensure we run 'before_app_start' only once per process
+  $self->{_started} = {} unless defined $self->{_started};
+  return if exists $self->{_started}->{$$};
+  $self->{_started}->{$$} = undef;
+  $self->plugins->emit_hook(before_app_start => $self);
+}
 
 sub start {
   my $self = shift;

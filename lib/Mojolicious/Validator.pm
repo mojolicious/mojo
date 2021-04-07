@@ -169,7 +169,7 @@ L</"upload"> are already defined.
   my $filters = $validator->filters;
   $validator  = $validator->filters({trim => sub {...}});
 
-Registered filters, by default only L</"not_empty"> and L</"trim"> are already defined.
+Registered filters, by default only L</"comma_separated">, L</"not_empty"> and L</"trim"> are already defined.
 
 =head1 METHODS
 

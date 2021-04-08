@@ -217,11 +217,16 @@ sub _index {
 sub _route {
   my $self = shift;
 
-  my $route = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
-  croak qq{Route pattern "@{[$route->pattern->unparsed]}" contains a reserved stash value}
-    if grep { $self->is_reserved($_) } @{$route->pattern->placeholders};
-  my $format = $self->pattern->constraints->{format};
-  $route->pattern->constraints->{format} //= 1 if defined $format && $format eq '1';
+  my $route       = $self->add_child(__PACKAGE__->new->parse(@_))->children->[-1];
+  my $new_pattern = $route->pattern;
+  croak qq{Route pattern "@{[$new_pattern->unparsed]}" contains a reserved stash value}
+    if grep { $self->is_reserved($_) } @{$new_pattern->placeholders};
+
+  my $old_pattern = $self->pattern;
+  my $constraints = $old_pattern->constraints;
+  $new_pattern->constraints->{format} //= $constraints->{format} if exists $constraints->{format};
+  my $defaults = $old_pattern->defaults;
+  $new_pattern->defaults->{format} //= $defaults->{format} if exists $defaults->{format};
 
   return $route;
 }

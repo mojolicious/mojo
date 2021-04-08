@@ -210,6 +210,25 @@ my $custom = $r->get->to(four => 4);
 $custom->pattern->quote_start('{')->quote_end('}')->placeholder_start('.')->relaxed_start('$')->wildcard_start('@');
 $custom->parse('/custom_pattern/a_{.one}_b/{$two}/{@three}');
 
+# /inherit/first.html
+# /inherit/first.json
+# /inherit/second
+# /inherit/second.html
+# /inherit/second.json
+my $inherit_format = $r->any('/inherit' => [format => ['json', 'html']]);
+$inherit_format->get('/first')->to('inherit#first');
+$inherit_format->get('/second')->to('inherit#second', format => undef);
+
+# /inherit2/first
+# /inherit2/first.xml
+# /inherit2/second
+# /inherit2/second.html
+# /inherit2/third
+my $inherit_format2 = $r->any('/inherit2' => [format => ['xml']])->to('inherit#', format => undef);
+$inherit_format2->get('/first')->to('#first', format => 'html');
+$inherit_format2->post('/second' => [format => ['html']])->to('#second');
+$inherit_format2->get('/third' => [format => 0])->to('#third');
+
 subtest 'Cached lookup' => sub {
   my $fast = $r->any('/fast');
   is $r->find('fast'),   $fast, 'fast route found';
@@ -661,6 +680,71 @@ subtest 'Placeholder types' => sub {
   is $m->path_for->{path}, '/type/24', 'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/type/25'});
+  is_deeply $m->stack, [], 'empty stack';
+};
+
+subtest 'Format inheritance' => sub {
+  my $c = Mojolicious::Controller->new;
+  my $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit/first.html'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'first', format => 'html'}], 'right structure';
+  is $m->path_for->{path}, '/inherit/first.html', 'right path';
+  is $m->path_for(format => undef)->{path}, '/inherit/first', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit/first.json'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'first', format => 'json'}], 'right structure';
+  is $m->path_for->{path}, '/inherit/first.json', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit/first'});
+  is_deeply $m->stack, [], 'empty stack';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit/first.xml'});
+  is_deeply $m->stack, [], 'empty stack';
+
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit/second.html'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'second', format => 'html'}], 'right structure';
+  is $m->path_for->{path}, '/inherit/second.html', 'right path';
+  is $m->path_for(format => undef)->{path}, '/inherit/second', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit/second.json'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'second', format => 'json'}], 'right structure';
+  is $m->path_for->{path}, '/inherit/second.json', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit/second'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'second', format => undef}], 'right structure';
+  is $m->path_for->{path}, '/inherit/second', 'right path';
+
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit2/first'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'first', format => 'html'}], 'right structure';
+  is $m->path_for->{path}, '/inherit2/first.html', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit2/first.xml'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'first', format => 'xml'}], 'right structure';
+  is $m->path_for->{path}, '/inherit2/first.xml', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit2/first.html'});
+  is_deeply $m->stack, [], 'empty stack';
+
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'POST', path => '/inherit2/second'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'second', format => undef}], 'right structure';
+  is $m->path_for->{path}, '/inherit2/second', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'POST', path => '/inherit2/second.html'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'second', format => 'html'}], 'right structure';
+  is $m->path_for->{path}, '/inherit2/second.html', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'POST', path => '/inherit2/second.xml'});
+  is_deeply $m->stack, [], 'empty stack';
+
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit2/third'});
+  is_deeply $m->stack, [{controller => 'inherit', action => 'third', format => undef}], 'right structure';
+  is $m->path_for->{path}, '/inherit2/third', 'right path';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/inherit2/third.xml'});
   is_deeply $m->stack, [], 'empty stack';
 };
 

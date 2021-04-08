@@ -568,6 +568,18 @@ placeholders you can use a default value to make the format optional.
   # /foo.txt  -> {controller => 'foo', action => 'bar', format => 'txt'}
   $r->get('/foo' => [format => ['html', 'txt']])->to('foo#bar', format => undef);
 
+Formats can be inherited by nested routes.
+
+  # /foo      -> {controller => 'foo', action => 'one', format => undef}
+  # /foo.html -> {controller => 'foo', action => 'one', format => 'html'}
+  # /foo.json -> {controller => 'foo', action => 'one', format => 'json'}
+  # /bar      -> {controller => 'bar', action => 'two', format => undef}
+  # /bar.html -> {controller => 'bar', action => 'two', format => 'html'}
+  # /bar.json -> {controller => 'bar', action => 'two', format => 'json'}
+  my $with_format = $r->any('/' => [format => ['html', 'json']])->to(format => undef);
+  $with_format->get('/foo')->to('foo#one');
+  $with_format->get('/bar')->to('bar#two');
+
 A C<format> value can also be passed to L<Mojolicious::Controller/"url_for">.
 
   # /foo/23.txt -> {controller => 'foo', action => 'bar', id => 23, format => 'txt'}

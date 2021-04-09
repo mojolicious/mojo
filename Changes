@@ -1,4 +1,6 @@
 
+9.17  2021-04-09
+
 9.16  2021-04-08
   - Added support for format inheritance.
   - Improved Mojo::Server::CGI with support for before_server_start hook.

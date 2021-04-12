@@ -614,8 +614,8 @@ L<Mojolicious::Plugin::DefaultHelpers/"respond_to">.
   # /hello (Accept: application/xml)
   # /hello.json
   # /hello.xml
-  # /hello?format=json
-  # /hello?format=xml
+  # /hello?_format=json
+  # /hello?_format=xml
   get '/hello' => [format => ['json', 'xml']] => {format => undef} => sub ($c) {
     $c->respond_to(
       json => {json => {hello => 'world'}},

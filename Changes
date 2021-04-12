@@ -1,5 +1,6 @@
 
-9.17  2021-04-09
+9.17  2021-04-12
+  - Deprecated ?format=* parameter in favor of ?_format=* parameter for content negotiation in Mojolicious::Renderer.
 
 9.16  2021-04-08
   - Added support for format inheritance.

@@ -341,14 +341,14 @@ L<Mojolicious::Plugin::DefaultHelpers/"respond_to"> instead of L<Mojolicious::Co
   # /hello (Accept: application/xml)  -> "xml"
   # /hello.json                       -> "json"
   # /hello.xml                        -> "xml"
-  # /hello?format=json                -> "json"
-  # /hello?format=xml                 -> "xml"
+  # /hello?_format=json               -> "json"
+  # /hello?_format=xml                -> "xml"
   $c->respond_to(
     json => {json => {hello => 'world'}},
     xml  => {text => '<hello>world</hello>'}
   );
 
-The best possible representation will be automatically selected from the C<format> C<GET>/C<POST> parameter, C<format>
+The best possible representation will be automatically selected from the C<_format> C<GET>/C<POST> parameter, C<format>
 stash value or C<Accept> request header and stored in the C<format> stash value. To change MIME type mappings for the
 C<Accept> request header or the C<Content-Type> response header you can use L<Mojolicious/"types">.
 
@@ -368,9 +368,9 @@ Callbacks can be used for representations that are too complex to fit into a sin
   # /hello.json                       -> "json"
   # /hello.html                       -> "html"
   # /hello.png                        -> "any"
-  # /hello?format=json                -> "json"
-  # /hello?format=html                -> "html"
-  # /hello?format=png                 -> "any"
+  # /hello?_format=json                -> "json"
+  # /hello?_format=html                -> "html"
+  # /hello?_format=png                 -> "any"
   $c->respond_to(
     json => {json => {hello => 'world'}},
     html => {template => 'hello', message => 'world'},
@@ -387,9 +387,9 @@ automatically.
   # /hello.html                 -> "html"
   # /hello.xml                  -> "xml"
   # /hello.txt                  -> undef
-  # /hello?format=html          -> "html"
-  # /hello?format=xml           -> "xml"
-  # /hello?format=txt           -> undef
+  # /hello?_format=html          -> "html"
+  # /hello?_format=xml           -> "xml"
+  # /hello?_format=txt           -> undef
   if (my $format = $c->accepts('html', 'xml')) {
     ...
   }

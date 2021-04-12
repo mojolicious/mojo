@@ -25,15 +25,13 @@ sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 sub accepts {
   my ($self, $c) = (shift, shift);
 
-  my $req = $c->req;
-
   # DEPRECATED!
+  my $req   = $c->req;
   my $param = $req->param('format');
   deprecated 'The ?format=* parameter is deprecated in favor of ?_format=* for content negotiation' if defined $param;
-  $param //= $req->param('_format');
 
   # List representations
-  my $fmt  = $param || $c->stash->{format};
+  my $fmt  = $param // $req->param('_format') || $c->stash->{format};
   my @exts = $fmt ? ($fmt) : ();
   push @exts, @{$c->app->types->detect($req->headers->accept)};
   return \@exts unless @_;

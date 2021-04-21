@@ -147,6 +147,7 @@ To manage the web server with systemd, you can use a unit configuration file lik
 
   [Service]
   Type=simple
+  User=sri
   ExecStart=/home/sri/myapp/script/my_app daemon -m production -l http://*:8080
 
   [Install]
@@ -199,6 +200,7 @@ And to manage the pre-forking web server with systemd, you can use a unit config
 
   [Service]
   Type=simple
+  User=sri
   ExecStart=/home/sri/myapp/script/my_app prefork -m production -l http://*:8080
 
   [Install]
@@ -324,6 +326,7 @@ To manage L<Hypnotoad|Mojo::Server::Hypnotoad> with systemd, you can use a unit 
 
   [Service]
   Type=forking
+  User=sri
   PIDFile=/home/sri/myapp/script/hypnotoad.pid
   ExecStart=/path/to/hypnotoad /home/sri/myapp/script/my_app
   ExecReload=/path/to/hypnotoad /home/sri/myapp/script/my_app

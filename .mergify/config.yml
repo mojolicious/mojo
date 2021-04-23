@@ -4,13 +4,13 @@ pull_request_rules:
       - "#approved-reviews-by>=2"
       - "#changes-requested-reviews-by=0"
       - label!=work in progress
-      - base=master
+      - base=main
     actions:
       merge:
         method: merge
   - name: remove outdated reviews
     conditions:
-      - base=master
+      - base=main
     actions:
       dismiss_reviews: {}
   - name: ask to resolve conflict

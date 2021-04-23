@@ -172,10 +172,10 @@ features|https://www.postgresql.org/docs/current/static/sql.html> PostgreSQL has
 data structures, manage your database schema with migrations and build scalable real-time web applications with the
 publish/subscribe pattern.
 
-B<Examples:> The minimal L<chat|https://github.com/mojolicious/mojo-pg/tree/master/examples/chat.pl> application will
+B<Examples:> The minimal L<chat|https://github.com/mojolicious/mojo-pg/tree/main/examples/chat.pl> application will
 show you how to scale WebSockets to multiple servers, and the well-structured
-L<blog|https://github.com/mojolicious/mojo-pg/tree/master/examples/blog>  application how to apply the MVC design
-pattern in practice.
+L<blog|https://github.com/mojolicious/mojo-pg/tree/main/examples/blog>  application how to apply the MVC design pattern
+in practice.
 
 =item L<Minion>
 
@@ -185,8 +185,8 @@ in background processes, outside of the request/response lifecycle. Among those 
 resizing, spam filtering, HTTP downloads, building tarballs, warming caches and basically everything else you can
 imagine that's not super fast.
 
-B<Examples:> The L<link checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck> will show you how
-to integrate background jobs into well-structured L<Mojolicious> applications.
+B<Examples:> The L<link checker|https://github.com/mojolicious/minion/tree/main/examples/linkcheck> will show you how to
+integrate background jobs into well-structured L<Mojolicious> applications.
 
 =back
 

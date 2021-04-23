@@ -401,7 +401,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   # Follow redirects to download Mojolicious from GitHub
   $ua->max_redirects(5)
-    ->get('https://www.github.com/mojolicious/mojo/tarball/master')
+    ->get('https://www.github.com/mojolicious/mojo/tarball/main')
     ->result->save_to('/home/sri/mojo.tar.gz');
 
   # Non-blocking request

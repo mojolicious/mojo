@@ -132,11 +132,11 @@ sentences is a good rule of thumb)
 
 Everything should be ordered alphabetically if possible, or at least be consistent if not.
 
-The master source code repository should always be kept in a stable state, use feature branches for actual development.
+The main source code repository should always be kept in a stable state, use feature branches for actual development.
 
 Code has to be run through L<Perl::Tidy> with the included
-L<.perltidyrc|https://github.com/mojolicious/mojo/blob/master/.perltidyrc>, and everything should look like it was
-written by a single person.
+L<.perltidyrc|https://github.com/mojolicious/mojo/blob/main/.perltidyrc>, and everything should look like it was written
+by a single person.
 
 Functions and methods should be as short as possible, no spaghetti code.
 

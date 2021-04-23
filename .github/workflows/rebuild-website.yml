@@ -2,7 +2,7 @@ name: Rebuild Website
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   rebuild_website:
     runs-on: ubuntu-latest
@@ -14,5 +14,5 @@ jobs:
             -u "${{ secrets.WORKFLOW_DISPATCH_USERINFO }}" \
             -H "Accept: application/vnd.github.everest-preview+json" \
             -H "Content-Type: application/json" \
-            --data '{"ref": "master"}' \
+            --data '{"ref": "main"}' \
             https://api.github.com/repos/mojolicious/mojolicious.org/actions/workflows/publish-website.yml/dispatches

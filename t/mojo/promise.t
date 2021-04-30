@@ -637,6 +637,34 @@ subtest 'Map (concurrency, all settled, partially rejected)' => sub {
   is_deeply \@started, [1, 2, 3, 4, 5], 'all started with concurrency';
 };
 
+subtest 'Map (concurrency, delay, all settled, partially rejected)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 2, delay => 0.1, aggregation => 'all_settled'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub {
+        if   ($n % 2) { Mojo::Promise->reject($n) }
+        else          { Mojo::Promise->resolve($n) }
+      });
+    },
+    1 .. 5
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  my $result = [
+    {status => 'rejected',  reason => [1]},
+    {status => 'fulfilled', value  => [2]},
+    {status => 'rejected',  reason => [3]},
+    {status => 'fulfilled', value  => [4]},
+    {status => 'rejected',  reason => [5]},
+  ];
+  is_deeply \@results, $result, 'promise resolved';
+  is_deeply \@errors, [], 'correct errors';
+
+  # is_deeply \@started, [1, 2, 3, 4, 5], 'all started with concurrency';
+  is scalar @started, 5, 'all started with concurrency';
+};
+
 subtest 'Map (custom event loop)' => sub {
   my $ok;
   my $loop    = Mojo::IOLoop->new;

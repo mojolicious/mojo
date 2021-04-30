@@ -676,6 +676,43 @@ that create them for you.
 
   app->start;
 
+When processing a number of requests towards a non-robust or external resource, the kind of aggregation, maximum
+concurrency and an optional delay can be specified using L<Mojo::Promise/"map">.
+
+  use Mojolicious::Lite -signatures;
+  use Mojo::Promise;
+  use Mojo::URL;
+
+  # Search MetaCPAN for a larger number of items, with mild concurrency and some throttling
+  get '/' => sub ($c) {
+
+    my $url   = Mojo::URL->new('http://fastapi.metacpan.org/v1/module/_search');
+    my @items = (qw(perl mojolicious mojo minion));
+
+    # Render a response once all promises have been resolved
+    Mojo::Promise->map(
+      {concurrency => 2, delay => 0.5}, # average max 4 requests/s
+      sub {
+        my $item = $_;
+        $c->ua->get_p($url->clone->query({q => $item}))->then(sub { my @res = @_; Mojo::Promise->resolve($item, @res); });
+      },
+      @items
+    )->then(sub (@results) {
+      $c->render(
+        json => {
+          map {
+            my ($item, $res) = @$_;
+            $item => $res->result->json('/hits/hits/0/_source/release');
+          } @results
+        }
+      );
+    })->catch(sub ($err) {
+      $c->reply->exception($err);
+    })->wait;
+  };
+
+  app->start;
+
 To create promises manually you just wrap your continuation-passing style APIs in functions that return promises.
 Here's an example for how L<Mojo::UserAgent/"get_p"> works internally.
 

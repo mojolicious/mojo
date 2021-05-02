@@ -9,4 +9,4 @@ app->start;
 __DATA__
 
 @@ hello.html.ep
-Hello World!
+Hello <%= 'World!' %>

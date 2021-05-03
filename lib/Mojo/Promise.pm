@@ -61,18 +61,23 @@ sub finally { shift->_finally(1, @_) }
 sub map {
   my ($class, $options, $cb, @items) = (shift, ref $_[0] eq 'HASH' ? shift : {}, @_);
 
-  my ($akey, $aggregation)
-    = !defined $options->{aggregation}         ? (0, 'all')
-    : $options->{aggregation} eq 'any'         ? (1, 'any')
-    : $options->{aggregation} eq 'all_settled' ? (2, 'all_settled')
-    :                                            (0, 'all');
+  my $start_next;
+  my $block_next = sub { };
+
+  my ($akey, $aggregation, $next_after_fullfil, $next_after_reject)
+    = !defined $options->{aggregation}         ? (0, 'all',         \$start_next, \$block_next)
+    : $options->{aggregation} eq 'any'         ? (1, 'any',         \$block_next, \$start_next)
+    : $options->{aggregation} eq 'all_settled' ? (2, 'all_settled', \$start_next, \$start_next)
+    : $options->{aggregation} eq 'race'        ? (3, 'race',        \$block_next, \$block_next)
+    :                                            (0, 'all', \$start_next, \$block_next);
 
   return $class->$aggregation(map { $_->$cb } @items) if !$options->{concurrency} || @items <= $options->{concurrency};
 
   my @start = map { $_->$cb } splice @items, 0, $options->{concurrency};
   my @wait  = map { $start[0]->clone } 0 .. $#items;
 
-  my $start_next = sub {
+  # N.B. $start_next will never be called for $aggregation eq 'race'
+  $start_next = sub {
     return () unless my $item = shift @items;
     my ($start_next, $chain) = (__SUB__, shift @wait);
     my $exec_next = sub {
@@ -99,15 +104,7 @@ sub map {
     return ();
   };
 
-  if ($akey == 0) {
-    $_->then($start_next, sub { }) for @start;
-  }
-  elsif ($akey == 1) {
-    $_->then(sub { }, $start_next) for @start;
-  }
-  else {
-    $_->then($start_next, $start_next) for @start;
-  }
+  $_->then($$next_after_fullfil, $$next_after_reject) for @start;
 
   return $class->$aggregation(@start, @wait);
 }

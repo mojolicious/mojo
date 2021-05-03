@@ -611,6 +611,25 @@ subtest 'Map (concurrency, any, all rejected)' => sub {
   is_deeply \@started, [1, 2, 3, 4, 5], 'all started with concurrency';
 };
 
+subtest 'Map (concurrency, race, 2 of 3 rejected)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 3, aggregation => 'race'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub {
+        if   ($n % 2) { Mojo::Promise->reject($n) }
+        else          { Mojo::Promise->resolve($n) }
+      });
+    },
+    1 .. 5
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  is_deeply \@results, [], 'promise rejected';
+  is_deeply \@errors,  [1], 'correct errors';
+  is_deeply \@started, [1, 2, 3], 'only 3 of 5 started with concurrency';
+};
+
 subtest 'Map (concurrency, all settled, partially rejected)' => sub {
   my (@results, @errors, @started);
   Mojo::Promise->map(

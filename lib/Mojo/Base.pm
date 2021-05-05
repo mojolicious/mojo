@@ -128,6 +128,13 @@ sub import {
       experimental->import($_) for qw(signatures postderef);
     }
 
+    # Try/Catch syntax (Perl 5.34+)
+    elsif ($flag eq '-try_catch') {
+      Carp::croak 'Try/Catch syntax requires Perl 5.34+' if $] < 5.034;
+      require experimental;
+      experimental->import('try');
+    }
+
     # Module
     elsif ($flag !~ /^-/) {
       no strict 'refs';

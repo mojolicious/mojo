@@ -54,12 +54,14 @@ package main;
 
 subtest 'Handle die message' => sub {
   my $test = MojoTryCatchBaseTest->new;
-  is($test->foo(), "3 is not allowed at ./t/mojo/try_catch.t line 27.\n", 'right result');
+  like($test->foo(), qr/3 is not allowed/, 'right result');
 };
 
 subtest 'Random order flags' => sub {
   my $test2 = MojoTryCatchBaseTest2->new;
-  isa_ok($test2->foo(), 'Mojo::Exception', 'Exception handled');
+  my $result = $test2->foo();
+  isa_ok($result, 'Mojo::Exception', 'Exception handled');
+  is($result->message, 'something wrong', 'Exception message is ok');
 };
 
 subtest 'Bad flag' => sub {

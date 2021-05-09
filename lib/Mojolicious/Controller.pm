@@ -133,13 +133,14 @@ sub render {
 
   # Localize "extends" and "layout" to allow argument overrides
   my ($maybe, $ts) = @{$args}{'mojo.maybe', 'mojo.string'};
-  my $stash = $self->stash;
+  my $stash  = $self->stash;
+  my $inline = exists $args->{inline} || exists $stash->{inline};
   local $stash->{layout}  = $stash->{layout}  if exists $stash->{layout};
   local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
 
-  # Rendering to string
+  # Rendering to string or using inline templates
   local @{$stash}{keys %$args}         if $ts || $maybe;
-  delete @{$stash}{qw(layout extends)} if $ts;
+  delete @{$stash}{qw(layout extends)} if $ts || $inline;
 
   # All other arguments just become part of the stash
   @$stash{keys %$args} = values %$args;

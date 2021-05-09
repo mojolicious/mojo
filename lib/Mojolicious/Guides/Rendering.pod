@@ -525,8 +525,9 @@ To set a C<layout> stash value application-wide you can use L<Mojolicious/"defau
 
   $app->defaults(layout => 'mylayout');
 
-Layouts can also be used with L<Mojolicious::Controller/"render_to_string">, but the C<layout> value needs to be passed
-as a render argument (not a stash value).
+Layouts can also be used with L<Mojolicious::Controller/"render_to_string">, or when rendering
+L<inline templates|/"Rendering inline templates">, but the C<layout> value needs to be passed as a render argument
+(not a stash value).
 
   my $html = $c->render_to_string('reminder', layout => 'mail');
 

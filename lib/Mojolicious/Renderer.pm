@@ -107,7 +107,14 @@ sub render {
 
   # Inheritance
   my $content = $stash->{'mojo.content'} //= {};
-  local $content->{content} = $output =~ /\S/ ? $output : undef if $stash->{extends} || $stash->{layout};
+  local $content->{content} = $output =~ /\S/ ? $output : undef
+    if $stash->{extends} || $stash->{layout} || $stash->{inline_layout};
+  if (defined $stash->{inline_layout}) {
+    local $options->{inline} = delete $stash->{inline_layout};
+    delete $stash->{layout};
+    if ($self->_render_template($c, \my $tmp, $options)) { $output = $tmp }
+    $content->{content} //= $output if $output =~ /\S/;
+  }
   while ((my $next = _next($stash)) && !defined $inline) {
     @$options{qw(handler template)} = ($stash->{handler}, $next);
     $options->{format} = $stash->{format} || $self->default_format;

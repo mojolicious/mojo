@@ -97,6 +97,16 @@ get '/content_with';
 
 get '/inline' => {inline => '<%= "inline!" %>'};
 
+get '/inline/inline_layout' => sub {
+  my $c = shift;
+  $c->render(inline => '<%= "inline!" %>', inline_layout => 'layouted_inline <%== content %>');
+};
+
+get '/inline/template_with_inline_layout' => sub {
+  my $c = shift;
+  $c->render(template => 'variants', format => 'txt', inline_layout => 'layouted_inline <%== content %>');
+};
+
 get '/inline/again' => {inline => 0};
 
 get '/data' => {data => 0};
@@ -252,6 +262,15 @@ subtest 'Content blocks' => sub {
 
 subtest 'Inline template' => sub {
   $t->get_ok('/inline')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is("inline!\n");
+};
+
+subtest 'Inline with layout' => sub {
+  $t->get_ok('/inline/inline_layout')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->content_is("layouted_inline inline!\n\n");
+};
+
+subtest 'Template with inline layout' => sub {
+  $t->get_ok('/inline/template_with_inline_layout')->status_is(200)->content_is("layouted_inline Desktop!\n");
 };
 
 subtest '"0" inline template' => sub {

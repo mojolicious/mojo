@@ -766,11 +766,6 @@ Licensed under the BSD License, L<https://github.com/highlightjs/highlight.js/bl
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
-=head2 Font Awesome
-
-Licensed under the CC-BY License, Version 4.0 L<https://creativecommons.org/licenses/by/4.0/> and SIL OFL, Version 1.1
-L<https://opensource.org/licenses/OFL-1.1>.
-
 =head1 CODE NAMES
 
 Every major release of L<Mojolicious> has a code name, these are the ones that have been used in the past.

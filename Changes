@@ -1,5 +1,6 @@
 
-9.18  2021-04-13
+9.18  2021-05-09
+  - Remove Font Awesome from distribution.
 
 9.17  2021-04-12
   - Deprecated ?format=* parameter in favor of ?_format=* for content negotiation in Mojolicious::Renderer.

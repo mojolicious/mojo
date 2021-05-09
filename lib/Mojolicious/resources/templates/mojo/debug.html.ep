@@ -13,7 +13,7 @@
     %= javascript '/mojo/bootstrap/bootstrap.js'
     %= stylesheet '/mojo/bootstrap/bootstrap.css'
     %= stylesheet '/mojo/highlight.js/highlight-mojo-dark.css'
-    %= stylesheet '/mojo/fontawesome/fontawesome.css'
+    %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'
     %= stylesheet '/mojo/mojo.css'
     <script>
       hljs.initHighlightingOnLoad();

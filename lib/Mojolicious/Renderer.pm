@@ -86,6 +86,7 @@ sub render {
     encoding => $self->encoding,
     handler  => $stash->{handler},
     template => delete $stash->{template},
+    template_path => delete $stash->{template_path},
     variant  => $stash->{variant}
   };
   my $inline = $options->{inline} = delete $stash->{inline};
@@ -102,12 +103,13 @@ sub render {
   return encode_json(delete $stash->{json}), 'json' if exists $stash->{json};
 
   # Template or templateless handler
-  $options->{template} //= $self->template_for($c);
+  $options->{template} //= $self->template_for($c) unless $options->{template_path};
   return () unless $self->_render_template($c, \my $output, $options);
-
+  
   # Inheritance
   my $content = $stash->{'mojo.content'} //= {};
   local $content->{content} = $output =~ /\S/ ? $output : undef if $stash->{extends} || $stash->{layout};
+  delete $options->{template_path};
   while ((my $next = _next($stash)) && !defined $inline) {
     @$options{qw(handler template)} = ($stash->{handler}, $next);
     $options->{format} = $stash->{format} || $self->default_format;
@@ -162,6 +164,7 @@ sub template_handler {
 sub template_name {
   my ($self, $options) = @_;
 
+  return $options->{template_path} if $options->{template_path};
   return undef unless defined(my $template = $options->{template});
   return undef unless my $format = $options->{format};
   $template .= ".$format";
@@ -181,6 +184,7 @@ sub template_name {
 
 sub template_path {
   my ($self, $options) = @_;
+  return $options->{template_path} if $options->{template_path};
   return undef unless my $name = $self->template_name($options);
   my @parts = split /\//, $name;
   -r and return $_ for map { path($_, @parts)->to_string } @{$self->paths}, $TEMPLATES;
@@ -434,7 +438,7 @@ handler could be found.
   });
 
 Return a template name for an options hash reference with C<template>, C<format>, C<variant> and C<handler> values, or
-C<undef> if no template could be found, usually used by handlers.
+C<undef> if no template could be found, usually used by handlers. If C<template_path> is passed then return it as-is.
 
 =head2 template_path
 
@@ -445,7 +449,8 @@ C<undef> if no template could be found, usually used by handlers.
   });
 
 Return the full template path for an options hash reference with C<template>, C<format>, C<variant> and C<handler>
-values, or C<undef> if the file does not exist in L</"paths">, usually used by handlers.
+values, or C<undef> if the file does not exist in L</"paths">, usually used by handlers. If C<template_path> is
+passed then return it as-is.
 
 =head2 warmup
 

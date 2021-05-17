@@ -83,11 +83,11 @@ sub render {
 
   my $stash   = $c->stash;
   my $options = {
-    encoding => $self->encoding,
-    handler  => $stash->{handler},
-    template => delete $stash->{template},
+    encoding      => $self->encoding,
+    handler       => $stash->{handler},
+    template      => delete $stash->{template},
     template_path => delete $stash->{template_path},
-    variant  => $stash->{variant}
+    variant       => $stash->{variant}
   };
   my $inline = $options->{inline} = delete $stash->{inline};
   $options->{handler} //= $self->default_handler if defined $inline;
@@ -104,8 +104,8 @@ sub render {
 
   # Template or templateless handler
   $options->{template} //= $self->template_for($c) unless $options->{template_path};
-  return () unless $self->_render_template($c, \my $output, $options);
-  
+  return ()                                        unless $self->_render_template($c, \my $output, $options);
+
   # Inheritance
   my $content = $stash->{'mojo.content'} //= {};
   local $content->{content} = $output =~ /\S/ ? $output : undef if $stash->{extends} || $stash->{layout};

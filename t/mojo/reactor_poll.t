@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-use IO::Socket::INET;
+use IO::Socket::INET ();
 use Mojo::Reactor::Poll;
 use Mojo::Util qw(steady_time);
 

@@ -50,7 +50,7 @@ package main;
 use Mojo::ByteStream;
 use Mojo::Collection;
 use Mojo::DOM;
-use Mojo::File;
+use Mojo::File ();
 
 # Plain class
 my $obj = Mojo::RoleTest->new(name => 'Ted');

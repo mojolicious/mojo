@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::File qw(curfile path);
+use Mojo::File qw(curfile);
 use Mojo::Template;
 
 package MyTemplateExporter;

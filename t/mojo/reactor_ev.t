@@ -5,7 +5,7 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)' unless $ENV{TEST_EV} || $ENV{TEST_ALL};
 plan skip_all => 'EV 4.32+ required for this test!'                  unless eval { require EV; EV->VERSION('4.32'); 1 };
 
-use IO::Socket::INET;
+use IO::Socket::INET ();
 use Mojo::Util qw(steady_time);
 
 # Instantiation

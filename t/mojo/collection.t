@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojo::ByteStream qw(b);
 use Mojo::Collection qw(c);
 use Mojo::JSON qw(encode_json);
 

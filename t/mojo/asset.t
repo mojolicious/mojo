@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Carp qw(croak);
-use Config;
+use Config qw(%Config);
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::File qw(path tempdir);

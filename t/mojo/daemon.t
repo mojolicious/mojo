@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use Test::More;
-use IO::Socket::INET;
+use IO::Socket::INET ();
 use Mojo::File qw(curfile path);
 use Mojo::IOLoop;
 use Mojo::Promise;

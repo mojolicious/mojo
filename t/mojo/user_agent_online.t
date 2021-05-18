@@ -12,7 +12,7 @@ plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)' unless 
 plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'        unless Mojo::IOLoop::TLS->can_tls;
 plan skip_all => 'Mozilla::CA required for this test!'                   unless eval { require Mozilla::CA; 1 };
 
-use IO::Socket::INET;
+use IO::Socket::INET ();
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;

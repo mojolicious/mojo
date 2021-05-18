@@ -7,10 +7,9 @@ BEGIN {
 
 use Test::More;
 
-use Mojo::File qw(curfile);
+use Mojo::File qw(curfile path tempdir);
 use lib curfile->sibling('lib')->to_string;
 
-use Mojo::File qw(path tempdir);
 
 package Mojolicious::Command::my_fake_test_command;
 

@@ -4,7 +4,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Mojo::File qw(curfile tempdir);
-use IO::Socket::UNIX;
+use IO::Socket::UNIX ();
 
 use lib curfile->sibling('lib')->to_string;
 

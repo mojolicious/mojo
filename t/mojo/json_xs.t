@@ -17,7 +17,7 @@ sub TO_JSON { shift->something }
 package main;
 
 use Mojo::ByteStream;
-use Mojo::Util qw(decode encode);
+use Mojo::Util qw(encode);
 
 subtest 'Basics' => sub {
   my $array = decode_json '[]';

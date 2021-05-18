@@ -7,7 +7,7 @@ use Test::More;
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD} || $ENV{TEST_ALL};
 
-use IO::Socket::INET;
+use IO::Socket::INET ();
 use Mojo::File qw(curfile tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Hypnotoad;

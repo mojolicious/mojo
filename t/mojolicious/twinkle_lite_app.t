@@ -5,7 +5,6 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
-use Mojo::Util;
 
 # Custom format
 app->renderer->default_format('foo');

@@ -10,7 +10,7 @@ plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Moj
 
 use Mojo::IOLoop;
 use Mojo::Promise;
-use Socket;
+use Socket qw(AF_UNIX PF_UNSPEC SOCK_STREAM);
 
 subtest 'Built-in certificate' => sub {
   socketpair(my $client_sock, my $server_sock, AF_UNIX, SOCK_STREAM, PF_UNSPEC)

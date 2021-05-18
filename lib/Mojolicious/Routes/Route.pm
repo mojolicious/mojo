@@ -105,10 +105,10 @@ sub requires {
   my $self = shift;
 
   # Routes with conditions can't be cached
-  return $self->{over} unless @_;
+  return $self->{requires} unless @_;
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   return $self unless @$conditions;
-  $self->{over} = $conditions;
+  $self->{requires} = $conditions;
   $self->root->cache->max_keys(0);
 
   return $self;

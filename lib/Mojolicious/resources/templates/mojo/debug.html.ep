@@ -63,7 +63,7 @@
                 Community
               </a>
               <div class="dropdown-menu" aria-labelledby="communityDropdown">
-                <a class="dropdown-item" href="https://webchat.freenode.net/#mojo">Chat</a>
+                <a class="dropdown-item" href="https://kiwiirc.com/nextclient/#ircs://irc.libera.chat/#mojo">Chat</a>
                 <a class="dropdown-item" href="https://forum.mojolicious.org">Forum</a>
                 <a class="dropdown-item" href="https://twitter.com/mojolicious_org">Twitter</a>
                 <a class="dropdown-item" href="https://blogs.mojolicious.org">Blogs</a>

@@ -510,7 +510,7 @@ wiki|https://github.com/mojolicious/mojo/wiki>.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<chat.freenode.net>
-(L<chat now!|https://webchat.freenode.net/#mojo>).
+L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.libera.chat>
+(L<chat now!|https://kiwiirc.com/nextclient/#ircs://irc.libera.chat/#mojo>).
 
 =cut

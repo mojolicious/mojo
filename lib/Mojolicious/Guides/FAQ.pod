@@ -55,7 +55,7 @@ already have done in the past.
 =head2 Where can I discuss my patches for Mojolicious?
 
 We'd love to discuss your contributions to L<Mojolicious> on our official IRC channel C<#mojo> on C<irc.libera.chat>
-(L<chat now!|https://kiwiirc.com/nextclient/#ircs://irc.libera.chat/#mojo>).
+(L<chat now!|https://web.libera.chat/#mojo>).
 
 =head2 Which versions of Perl are supported by Mojolicious?
 
@@ -245,6 +245,6 @@ authors.
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
 L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.libera.chat>
-(L<chat now!|https://kiwiirc.com/nextclient/#ircs://irc.libera.chat/#mojo>).
+(L<chat now!|https://web.libera.chat/#mojo>).
 
 =cut

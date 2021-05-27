@@ -71,8 +71,8 @@ relevant documentation.
 While the L<Mojolicious> distribution covers a wide range of features, we are rather conservative when it comes to
 adding new ones. So if your contribution is not a simple bug fix, it is B<strongly recommended> that you discuss it in
 advance in the L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.libera.chat>
-(L<chat now!|https://kiwiirc.com/nextclient/#ircs://irc.libera.chat/#mojo>), to avoid unnecessary work and to increase
-its chances of getting accepted.
+(L<chat now!|https://web.libera.chat/#mojo>), to avoid unnecessary work and to increase its chances of getting
+accepted.
 
 The following mission statement and rules are the foundation of all L<Mojo> and L<Mojolicious> development. Please make
 sure that your contribution aligns well with them before sending a pull request.
@@ -259,6 +259,6 @@ authors.
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
 L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.libera.chat>
-(L<chat now!|https://kiwiirc.com/nextclient/#ircs://irc.libera.chat/#mojo>).
+(L<chat now!|https://web.libera.chat/#mojo>).
 
 =cut

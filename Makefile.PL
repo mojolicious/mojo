@@ -27,7 +27,7 @@ WriteMakefile(
         url  => 'https://github.com/mojolicious/mojo.git',
         web  => 'https://github.com/mojolicious/mojo',
       },
-      x_IRC => {url => 'irc://irc.libera.chat/#mojo', web => 'https://kiwiirc.com/nextclient/#ircs://irc.libera.chat/#mojo'}
+      x_IRC => {url => 'irc://irc.libera.chat/#mojo', web => 'https://web.libera.chat/#mojo'}
     },
   },
   PREREQ_PM => {'IO::Socket::IP' => '0.37', 'Sub::Util' => '1.41'},

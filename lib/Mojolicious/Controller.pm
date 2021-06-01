@@ -2,7 +2,8 @@ package Mojolicious::Controller;
 use Mojo::Base -base;
 
 # No imports, for security reasons!
-use Carp ();
+use Carp        ();
+use Digest::SHA ();
 use Mojo::ByteStream;
 use Mojo::DynamicMethods -dispatch;
 use Mojo::URL;
@@ -77,7 +78,7 @@ sub every_signed_cookie {
 
       my $valid;
       for my $secret (@$secrets) {
-        my $check = Mojo::Util::hmac_sha1_sum("$name=$value", $secret);
+        my $check = Digest::SHA::hmac_sha256_hex("$name=$value", $secret);
         ++$valid and last if Mojo::Util::secure_compare($signature, $check);
       }
       if ($valid) { push @results, $value }
@@ -227,7 +228,7 @@ sub signed_cookie {
   return $self->every_signed_cookie($name)->[-1] unless defined $value;
 
   # Response cookie
-  my $sum = Mojo::Util::hmac_sha1_sum("$name=$value", $self->app->secrets->[0]);
+  my $sum = Digest::SHA::hmac_sha256_hex("$name=$value", $self->app->secrets->[0]);
   return $self->cookie($name, "$value--$sum", $options);
 }
 
@@ -675,8 +676,8 @@ L<Mojolicious::Plugin::DefaultHelpers/"inactivity_timeout">, which usually defau
   $c          = $c->session(foo => 'bar');
 
 Persistent data storage for the next few requests, all session data gets serialized with L<Mojo::JSON> and stored
-Base64 encoded in HMAC-SHA1 signed cookies, to prevent tampering. Note that cookies usually have a C<4096> byte (4KiB)
-limit, depending on browser.
+Base64 encoded in HMAC-SHA256 signed cookies, to prevent tampering. Note that cookies usually have a C<4096> byte
+(4KiB) limit, depending on browser.
 
   # Manipulate session
   $c->session->{foo} = 'bar';
@@ -700,7 +701,7 @@ limit, depending on browser.
 
 Access signed request cookie values and create new signed response cookies. If there are multiple values sharing the
 same name, and you want to access more than just the last one, you can use L</"every_signed_cookie">. Cookies are
-cryptographically signed with HMAC-SHA1, to prevent tampering, and the ones failing signature verification will be
+cryptographically signed with HMAC-SHA256, to prevent tampering, and the ones failing signature verification will be
 automatically discarded.
 
 =head2 stash

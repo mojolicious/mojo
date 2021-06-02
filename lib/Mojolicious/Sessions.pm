@@ -8,9 +8,9 @@ has [qw(cookie_domain secure)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
-has deserialize        => sub { \&Mojo::JSON::j };
+has deserialize        => sub { \&_deserialize };
 has samesite           => 'Lax';
-has serialize          => sub { \&Mojo::JSON::encode_json };
+has serialize          => sub { \&_serialize };
 
 sub load {
   my ($self, $c) = @_;
@@ -59,6 +59,14 @@ sub store {
     secure   => $self->secure
   };
   $c->signed_cookie($self->cookie_name, $value, $options);
+}
+
+sub _deserialize { Mojo::JSON::decode_json($_[0] =~ s/\}\KZ*$//r) }
+
+sub _serialize {
+  no warnings 'numeric';
+  my $out = Mojo::JSON::encode_json($_[0]);
+  return $out . 'Z' x (1025 - length $out);
 }
 
 1;

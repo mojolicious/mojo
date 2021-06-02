@@ -1,4 +1,6 @@
 
+9.20  2021-06-02
+
 9.19  2021-06-01
   - This release contains fixes for security issues, everybody should upgrade!
   - Swiched from HMAC-SHA1 to HMAC-SHA256 for signed cookies. Note that this means that all sessions will be reset.

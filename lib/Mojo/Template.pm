@@ -209,11 +209,11 @@ sub _compile {
 
       # Escaped
       if (!$multi && ($op eq 'escp' && !$escape || $op eq 'expr' && $escape)) {
-        $blocks[-1] .= "\$_O .= _escape scalar + $value";
+        $blocks[-1] .= "\$_O .= _escape scalar(+ $value)";
       }
 
       # Raw
-      elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar + $value" }
+      elsif (!$multi) { $blocks[-1] .= "\$_O .= scalar(+ $value)" }
 
       # Multi-line
       $multi = !$next || $next->[0] ne 'text';

@@ -196,13 +196,14 @@ $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)-
   ->content_like(qr/fun/, 'with description')->content_unlike(qr/boring/)
   ->content_unlike(qr/boring/, 'with description')->element_exists('p')->element_exists('p', 'with description')
   ->element_exists_not('b')->element_exists_not('b', 'with description')->text_is('p', 'Have fun!')
-  ->text_is('p', 'Have fun!', 'with description')->text_isnt('p', 'Have')->text_isnt('p', 'Have', 'with description')
-  ->text_like('p', qr/fun/)->text_like('p', qr/fun/, 'with description')->text_unlike('p', qr/boring/)
-  ->text_unlike('p', qr/boring/, 'with description');
+  ->text_is('p', 'Have fun!', 'with description')->text_is('notfound',                 undef)->text_isnt('p', 'Have')
+  ->text_isnt('p', 'Have', 'with description')->text_like('p', qr/fun/)->text_like('p', qr/fun/, 'with description')
+  ->text_unlike('p', qr/boring/)->text_unlike('p', qr/boring/, 'with description');
 
 # Foo::joy (testing HTML attributes in template)
 $t->get_ok('/fun/joy')->status_is(200)->attr_is('p.joy', 'style', 'background-color: darkred;')
   ->attr_is('p.joy', 'style', 'background-color: darkred;', 'with description')->attr_is('p.joy', 'data-foo', '0')
+  ->attr_is('p.joy', 'data-empty', '')->attr_is('notfound', 'style', undef)
   ->attr_isnt('p.joy', 'style', 'float: left;')->attr_isnt('p.joy', 'style', 'float: left;', 'with description')
   ->attr_like('p.joy', 'style', qr/color/)->attr_like('p.joy', 'style', qr/color/, 'with description')
   ->attr_unlike('p.joy', 'style', qr/^float/)->attr_unlike('p.joy', 'style', qr/^float/, 'with description');

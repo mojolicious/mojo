@@ -9,6 +9,17 @@ Mojolicious::Guides::Contributing - Contributing to Mojolicious
 
 There are many ways to contribute to L<Mojolicious>, this guide will show you a few of them.
 
+=head1 PERL FOUNDATION BOYCOTT
+
+Due to a lack of transparency and accountability of and by the board, we are B<boycotting> The Perl Foundation. Recent
+events regarding the Community Affairs Team have unfortunately shown that it does not represent values such as
+B<openness> and B<inclusion> to the same extent we do anymore. The Mojolicious Project and its core team will therefore
+be withdrawing from Foundation involvement and Foundation-run activities, and we ask you to cease personal donations to
+the Foundation until it has been reformed.
+
+Members of the Mojolicious community are encouraged to politely, but firmly, advocate for the same values in a way that
+they see fit, while not violating the Mojolicious L<Code of Conduct|/"CODE OF CONDUCT">.
+
 =head1 REPORTING BUGS
 
 We use the L<GitHub issue tracker|https://github.com/mojolicious/mojo/issues>,  so you'll need to create a (free)

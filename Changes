@@ -1,5 +1,6 @@
 
-9.20  2021-06-02
+9.20  2021-07-06
+  - Added trace log level to Mojo::Log.
 
 9.19  2021-06-01
   - This release contains fixes for security issues, everybody should upgrade!

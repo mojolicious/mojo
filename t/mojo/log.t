@@ -66,12 +66,13 @@ subtest 'Short log messages (systemd)' => sub {
   ok $log->short, 'short messages';
   $log = Mojo::Log->new(short => 1);
   ok $log->short, 'short messages';
-  like $log->format->(time, 'debug', 'Test 123'), qr/^<7>\[\d+\] \[d\] Test 123\n$/, 'right format';
-  like $log->format->(time, 'info',  'Test 123'), qr/^<6>\[\d+\] \[i\] Test 123\n$/, 'right format';
+  like $log->format->(time, 'trace', 'Test 123'), qr/^<7>\[\d+\] \[t\] Test 123\n$/, 'right format';
+  like $log->format->(time, 'debug', 'Test 123'), qr/^<6>\[\d+\] \[d\] Test 123\n$/, 'right format';
+  like $log->format->(time, 'info',  'Test 123'), qr/^<5>\[\d+\] \[i\] Test 123\n$/, 'right format';
   like $log->format->(time, 'warn',  'Test 123'), qr/^<4>\[\d+\] \[w\] Test 123\n$/, 'right format';
   like $log->format->(time, 'error', 'Test 123'), qr/^<3>\[\d+\] \[e\] Test 123\n$/, 'right format';
   like $log->format->(time, 'fatal', 'Test 123'), qr/^<2>\[\d+\] \[f\] Test 123\n$/, 'right format';
-  like $log->format->(time, 'debug', 'Test', '1', '2', '3'), qr/^<7>\[\d+\] \[d\] Test 1 2 3\n$/, 'right format';
+  like $log->format->(time, 'debug', 'Test', '1', '2', '3'), qr/^<6>\[\d+\] \[d\] Test 1 2 3\n$/, 'right format';
 };
 
 subtest 'Colorized log messages' => sub {
@@ -95,7 +96,7 @@ subtest 'Colorized log messages' => sub {
 };
 
 subtest 'Events' => sub {
-  my $log  = Mojo::Log->new;
+  my $log  = Mojo::Log->new(level => 'trace');
   my $msgs = [];
   $log->unsubscribe('message')->on(
     message => sub {
@@ -103,6 +104,9 @@ subtest 'Events' => sub {
       push @$msgs, $level, @lines;
     }
   );
+  $log->trace('Test', 1, 2, 3);
+  is_deeply $msgs, [qw(trace Test 1 2 3)], 'right message';
+  $msgs = [];
   $log->debug('Test', 1, 2, 3);
   is_deeply $msgs, [qw(debug Test 1 2 3)], 'right message';
   $msgs = [];
@@ -145,9 +149,20 @@ subtest 'History' => sub {
   ok !$history->[2], 'no more messages';
 };
 
+subtest '"trace"' => sub {
+  my $log = Mojo::Log->new();
+  is $log->level('trace')->level, 'trace', 'right level';
+  ok $log->is_level('trace'), '"trace" log level is active';
+  ok $log->is_level('debug'), '"debug" log level is active';
+  ok $log->is_level('info'),  '"info" log level is active';
+  ok $log->is_level('warn'),  '"warn" log level is active';
+  ok $log->is_level('error'), '"error" log level is active';
+};
+
 subtest '"debug"' => sub {
   my $log = Mojo::Log->new;
   is $log->level('debug')->level, 'debug', 'right level';
+  ok !$log->is_level('trace'), '"trace" log level is inactive';
   ok $log->is_level('debug'), '"debug" log level is active';
   ok $log->is_level('info'),  '"info" log level is active';
   ok $log->is_level('warn'),  '"warn" log level is active';
@@ -157,6 +172,7 @@ subtest '"debug"' => sub {
 subtest '"info"' => sub {
   my $log = Mojo::Log->new;
   is $log->level('info')->level, 'info', 'right level';
+  ok !$log->is_level('trace'), '"trace" log level is inactive';
   ok !$log->is_level('debug'), '"debug" log level is inactive';
   ok $log->is_level('info'),  '"info" log level is active';
   ok $log->is_level('warn'),  '"warn" log level is active';
@@ -166,6 +182,7 @@ subtest '"info"' => sub {
 subtest '"warn"' => sub {
   my $log = Mojo::Log->new;
   is $log->level('warn')->level, 'warn', 'right level';
+  ok !$log->is_level('trace'), '"trace" log level is inactive';
   ok !$log->is_level('debug'), '"debug" log level is inactive';
   ok !$log->is_level('info'),  '"info" log level is inactive';
   ok $log->is_level('warn'),  '"warn" log level is active';
@@ -175,6 +192,7 @@ subtest '"warn"' => sub {
 subtest '"error"' => sub {
   my $log = Mojo::Log->new;
   is $log->level('error')->level, 'error', 'right level';
+  ok !$log->is_level('trace'), '"trace" log level is inactive';
   ok !$log->is_level('debug'), '"debug" log level is inactive';
   ok !$log->is_level('info'),  '"info" log level is inactive';
   ok !$log->is_level('warn'),  '"warn" log level is inactive';
@@ -184,6 +202,7 @@ subtest '"error"' => sub {
 subtest '"fatal"' => sub {
   my $log = Mojo::Log->new;
   is $log->level('fatal')->level, 'fatal', 'right level';
+  ok !$log->is_level('trace'), '"trace" log level is inactive';
   ok !$log->is_level('debug'), '"debug" log level is inactive';
   ok !$log->is_level('info'),  '"info" log level is inactive';
   ok !$log->is_level('warn'),  '"warn" log level is inactive';

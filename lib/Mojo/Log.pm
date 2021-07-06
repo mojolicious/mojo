@@ -25,10 +25,10 @@ has 'path';
 has short => sub { $ENV{MOJO_LOG_SHORT} };
 
 # Supported log levels
-my %LEVEL = (debug => 1, info => 2, warn => 3, error => 4, fatal => 5);
+my %LEVEL = (trace => 1, debug => 2, info => 3, warn => 4, error => 5, fatal => 6);
 
 # Systemd magic numbers
-my %MAGIC = (debug => 7, info => 6, warn => 4, error => 3, fatal => 2);
+my %MAGIC = (trace => 7, debug => 6, info => 5, warn => 4, error => 3, fatal => 2);
 
 # Colors
 my %COLORS = (warn => ['yellow'], error => ['red'], fatal => ['white on_red']);
@@ -42,16 +42,16 @@ sub append {
   flock $handle, LOCK_UN;
 }
 
-sub debug { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
+sub debug { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
 
 sub context {
   my ($self, @context) = @_;
   return $self->new(parent => $self, context => \@context, level => $self->level);
 }
 
-sub error { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
-sub fatal { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
-sub info  { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'info')  : $_[0] }
+sub error { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
+sub fatal { 6 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
+sub info  { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'info')  : $_[0] }
 
 sub is_level { $LEVEL{pop()} >= $LEVEL{shift->level} }
 
@@ -61,7 +61,8 @@ sub new {
   return $self;
 }
 
-sub warn { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn') : $_[0] }
+sub trace { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'trace') : $_[0] }
+sub warn  { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn')  : $_[0] }
 
 sub _color {
   my $msg = _default(shift, my $level = shift, @_);
@@ -119,6 +120,7 @@ Mojo::Log - Simple logger
   my $log = Mojo::Log->new(path => '/var/log/mojo.log', level => 'warn');
 
   # Log messages
+  $log->trace('Doing stuff');
   $log->debug('Not sure what is happening here');
   $log->info('FYI: it happened again');
   $log->warn('This might be a problem');
@@ -182,8 +184,8 @@ The last few logged messages.
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level, defaults to C<debug>. Available log levels are C<debug>, C<info>, C<warn>, C<error> and C<fatal>, in
-that order.
+Active log level, defaults to C<debug>. Available log levels are C<trace>, C<debug>, C<info>, C<warn>, C<error> and
+C<fatal>, in that order.
 
 =head2 max_history_size
 
@@ -282,6 +284,14 @@ Check active log L</"level">.
   my $log = Mojo::Log->new({level => 'warn'});
 
 Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with default logger.
+
+=head2 trace
+
+  $log = $log->trace('Whatever');
+  $log = $log->trace('Who', 'cares');
+  $log = $log->trace(sub {...});
+
+Emit L</"message"> event and log C<trace> message.
 
 =head2 warn
 

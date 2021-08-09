@@ -84,7 +84,8 @@ subtest 'Single role (shorthand)' => sub {
 };
 
 subtest 'Multiple roles' => sub {
-  my $obj = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet', 'Mojo::RoleTest::Role::LOUD')->new(name => 'Joel');
+  my $obj
+    = Mojo::RoleTest->with_roles('Mojo::RoleTest::Role::quiet', 'Mojo::RoleTest::Role::LOUD')->new(name => 'Joel');
   is $obj->name,    'Joel',       'base attribute';
   is $obj->whisper, 'psst, joel', 'method from first role';
   $obj->prefix('psssst, ');

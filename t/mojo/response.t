@@ -911,7 +911,7 @@ subtest 'Build and parse HTTP 1.1 response with 3 cookies' => sub {
   my $res = Mojo::Message::Response->new;
   $res->code(404);
   $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
-  $res->cookies({name => 'foo', value => 'bar',  path => '/foobar'},
+  $res->cookies({name => 'foo', value => 'bar', path => '/foobar'},
     {name => 'bar', value => 'baz', path => '/test/23'});
   $res->cookies({name => 'baz', value => 'yada', path => '/foobar'});
   ok !!$res->to_string, 'message built';

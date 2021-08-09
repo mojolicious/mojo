@@ -119,7 +119,7 @@ subtest 'Simple request with SOCKS proxy' => sub {
   isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport, $last, 'different ports');
 
   my $before = $last;
-  my $tx     = $ua->get('/');
+  $tx = $ua->get('/');
   ok !$tx->error, 'no error';
   ok $tx->kept_alive, 'kept connection alive';
   ok $tx->keep_alive, 'keep connection alive';

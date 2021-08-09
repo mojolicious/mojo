@@ -103,7 +103,7 @@ __DATA__
 <p>Have fun!</p>\
 
 @@ foo/joy.html.ep
-<p class="joy" style="background-color: darkred;" data-foo="0">Joy for all!</p>\
+<p class="joy" style="background-color: darkred;" data-foo="0" data-empty="">Joy for all!</p>\
 
 @@ just/some/template.html.epl
 Development template with high precedence.

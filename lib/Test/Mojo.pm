@@ -333,7 +333,7 @@ sub websocket_ok {
 
 sub _attr {
   my ($self, $selector, $attr) = @_;
-  return '' unless my $e = $self->tx->res->dom->at($selector);
+  return undef unless my $e = $self->tx->res->dom->at($selector);
   return $e->attr($attr) // '';
 }
 
@@ -404,7 +404,7 @@ sub _request_ok {
 }
 
 sub _text {
-  return '' unless my $e = shift->tx->res->dom->at(shift);
+  return undef unless my $e = shift->tx->res->dom->at(shift);
   return $e->text;
 }
 

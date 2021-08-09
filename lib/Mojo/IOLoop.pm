@@ -233,7 +233,7 @@ Mojo::IOLoop - Minimalistic event loop
   use Mojo::IOLoop;
 
   # Listen on port 3000
-  Mojo::IOLoop->server({port => 3000} => sub ($loop, $stream) {
+  Mojo::IOLoop->server({port => 3000} => sub ($loop, $stream, $id) {
     $stream->on(read => sub ($stream, $bytes) {
       # Process input chunk
       say $bytes;

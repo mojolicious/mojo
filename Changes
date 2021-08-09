@@ -1,5 +1,8 @@
 
 9.21  2021-08-10
+  - Improved *_attr and *_text methods in Test::Mojo to return undef instead of empty string for values that do not
+    exist. (tim-2)
+  - Fixed Mojo::DOM not to auto-close tags in <svg> and <math> blocks. (mkende)
 
 9.20  2021-08-09
   - Added trace log level to Mojo::Log.

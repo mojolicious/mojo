@@ -492,13 +492,14 @@ subtest 'Parse HTTP 1.1 multipart response' => sub {
   is $res->code,        200,   'right status';
   is $res->message,     'OK',  'right message';
   is $res->version,     '1.1', 'right version';
-  is $res->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY', 'right "Content-Type" value';
+  is $res->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
+    'right "Content-Type" value';
   ok !$res->content->parts->[0]->is_multipart, 'no multipart content';
   ok !$res->content->parts->[1]->is_multipart, 'no multipart content';
   ok !$res->content->parts->[2]->is_multipart, 'no multipart content';
   is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n", 'right content';
 
-  my $dir = tempdir;
+  my $dir  = tempdir;
   my $file = $dir->child('multipart.html');
   eval { $res->save_to($file) };
   like $@, qr/^Multipart content cannot be saved to files/, 'right error';
@@ -533,7 +534,8 @@ subtest 'Parse HTTP 1.1 chunked multipart response with leftovers (at once)' => 
   is $res->code,        200,   'right status';
   is $res->message,     'OK',  'right message';
   is $res->version,     '1.1', 'right version';
-  is $res->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY', 'right "Content-Type" value';
+  is $res->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
+    'right "Content-Type" value';
   is $res->headers->content_length,    418,   'right "Content-Length" value';
   is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
   is $res->body_size, 418, 'right size';
@@ -579,9 +581,9 @@ subtest 'Parse HTTP 1.1 chunked multipart response (in multiple small chunks)' =
   is $res->code,        200,   'right status';
   is $res->message,     'OK',  'right message';
   is $res->version,     '1.1', 'right version';
-  is $res->headers->content_type,      'multipart/parallel; boundary=AAA; charset=utf-8', 'right "Content-Type" value';
-  is $res->headers->content_length,    129,                                               'right "Content-Length" value';
-  is $res->headers->transfer_encoding, undef,                                             'no "Transfer-Encoding" value';
+  is $res->headers->content_type,   'multipart/parallel; boundary=AAA; charset=utf-8', 'right "Content-Type" value';
+  is $res->headers->content_length, 129,                                               'right "Content-Length" value';
+  is $res->headers->transfer_encoding, undef,                                          'no "Transfer-Encoding" value';
   is $res->body_size, 129, 'right size';
   ok !$res->content->parts->[0]->is_multipart, 'no multipart content';
   ok !$res->content->parts->[1]->is_multipart, 'no multipart content';
@@ -624,7 +626,7 @@ subtest 'Parse HTTP 1.1 multipart response with missing boundary' => sub {
 subtest 'Parse HTTP 1.1 gzip compressed response' => sub {
   my $uncompressed = 'abc' x 1000;
   my $compressed   = gzip $uncompressed;
-  my $res = Mojo::Message::Response->new;
+  my $res          = Mojo::Message::Response->new;
   $res->parse("HTTP/1.1 200 OK\x0d\x0a");
   $res->parse("Content-Type: text/plain\x0d\x0a");
   $res->parse("Content-Length: @{[length $compressed]}\x0d\x0a");
@@ -650,8 +652,8 @@ subtest 'Parse HTTP 1.1 gzip compressed response' => sub {
 subtest 'Parse HTTP 1.1 chunked gzip compressed response' => sub {
   my $uncompressed = 'abc' x 1000;
   my $compressed   = undef;
-  $compressed      = gzip $uncompressed;
-  my $res          = Mojo::Message::Response->new;
+  $compressed = gzip $uncompressed;
+  my $res = Mojo::Message::Response->new;
   $res->parse("HTTP/1.1 200 OK\x0d\x0a");
   $res->parse("Content-Type: text/plain\x0d\x0a");
   $res->parse("Content-Encoding: gzip\x0d\x0a");
@@ -909,7 +911,8 @@ subtest 'Build and parse HTTP 1.1 response with 3 cookies' => sub {
   my $res = Mojo::Message::Response->new;
   $res->code(404);
   $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
-  $res->cookies({name => 'foo', value => 'bar',  path => '/foobar'}, {name => 'bar', value => 'baz', path => '/test/23'});
+  $res->cookies({name => 'foo', value => 'bar',  path => '/foobar'},
+    {name => 'bar', value => 'baz', path => '/test/23'});
   $res->cookies({name => 'baz', value => 'yada', path => '/foobar'});
   ok !!$res->to_string, 'message built';
   my $res2 = Mojo::Message::Response->new;
@@ -965,7 +968,7 @@ subtest 'Build response with callback (make sure it is called)' => sub {
 };
 
 subtest 'Build response with callback (consistency calls)' => sub {
-  my $res = Mojo::Message::Response->new;
+  my $res  = Mojo::Message::Response->new;
   my $body = 'I is here';
   $res->headers->content_length(length($body));
   my $cb = sub { shift->write(substr($body, pop, 1), __SUB__) };
@@ -992,7 +995,7 @@ subtest 'Build response with callback (no Content-Length header)' => sub {
   my $res  = Mojo::Message::Response->new;
   my $body = 'I is here';
   my $cb;
-  $cb   = sub { shift->write(substr($body, pop, 1), $cb) };
+  $cb = sub { shift->write(substr($body, pop, 1), $cb) };
   $res->content->write('' => $cb);
   $res->fix_headers;
   my $full   = '';
@@ -1031,7 +1034,7 @@ subtest 'Body' => sub {
 };
 
 subtest 'Text' => sub {
-  my $res = Mojo::Message::Response->new;
+  my $res     = Mojo::Message::Response->new;
   my $snowman = encode 'UTF-8', '☃';
   is $res->body($snowman)->text, '☃', 'right content';
   is $res->body($snowman)->dom->text, '☃', 'right text';
@@ -1092,7 +1095,7 @@ subtest 'Parse response and extract HTML' => sub {
   is_deeply \@text, [qw(test test)], 'right values';
   is_deeply $res->dom->find('p > a')->map('text')->to_array, [qw(test test)], 'right values';
 
-  my $dir = tempdir;
+  my $dir  = tempdir;
   my $file = $dir->child('single.html');
   is $res->save_to($file)->body, '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>', 'right content';
   is $file->slurp, '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>', 'right content';

@@ -65,7 +65,7 @@ subtest 'Empty roles' => sub {
 };
 
 subtest 'Empty object roles' => sub {
-  my $obj = Mojo::RoleTest->new(name => 'Ted');
+  my $obj       = Mojo::RoleTest->new(name => 'Ted');
   my $obj_empty = $obj->with_roles();
   is $obj_empty->name,  'Ted',       'attribute';
   is $obj_empty->hello, 'hello Ted', 'method';

@@ -1,4 +1,6 @@
 
+9.21  2021-08-10
+
 9.20  2021-08-09
   - Added trace log level to Mojo::Log.
   - Changed default log level in Mojo::Log from "debug" to "trace" and moved all built-in "debug" log messages to the

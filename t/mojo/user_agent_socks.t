@@ -121,6 +121,7 @@ subtest 'Simple request with SOCKS proxy' => sub {
 
 subtest 'Keep alive request with SOCKS proxy' => sub {
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, insecure => 1);
+  $ua->proxy->http("socks://foo:bar\@127.0.0.1:$port");
   my $before = $last;
   my $tx = $ua->get('/');
   ok !$tx->error, 'no error';
@@ -134,6 +135,7 @@ subtest 'Keep alive request with SOCKS proxy' => sub {
 
 subtest 'WebSocket with SOCKS proxy' => sub {
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, insecure => 1);
+  $ua->proxy->http("socks://foo:bar\@127.0.0.1:$port");
   my ($result, $id);
   $ua->websocket(
     '/echo' => sub {

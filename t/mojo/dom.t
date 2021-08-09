@@ -2596,6 +2596,25 @@ subtest 'Not self-closing' => sub {
   is "$dom", '<p><svg><circle></circle><circle></circle></svg></p>', 'right result';
 };
 
+subtest 'Auto-close tag' => sub {
+  my $dom = Mojo::DOM->new('<p><div />');
+  is "$dom", '<p></p><div></div>', 'right result';
+};
+
+subtest 'No auto-close in scope' => sub {
+  my $dom = Mojo::DOM->new('<p><svg><div /></svg>');
+  is "$dom", '<p><svg><div></div></svg></p>', 'with SVG';
+  $dom = Mojo::DOM->new('<p><math><div /></math>');
+  is "$dom", '<p><math><div></div></math></p>', 'with MathML';
+};
+
+subtest 'Auto-close scope' => sub {
+  my $dom = Mojo::DOM->new('<p><svg></p>');
+  is "$dom", '<p><svg></svg></p>', 'closing tag';
+  $dom = Mojo::DOM->new('<p><math>');
+  is "$dom", '<p><math></math></p>', 'close eof';
+};
+
 subtest '"image"' => sub {
   my $dom = Mojo::DOM->new('<image src="foo.png">test');
   is $dom->at('img')->{src}, 'foo.png', 'right attribute';

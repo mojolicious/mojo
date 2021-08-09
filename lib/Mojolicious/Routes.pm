@@ -90,7 +90,7 @@ sub _action { shift->plugins->emit_chain(around_action => @_) }
 sub _callback {
   my ($self, $c, $cb, $last) = @_;
   $c->stash->{'mojo.routed'} = 1 if $last;
-  $c->helpers->log->debug('Routing to a callback');
+  $c->helpers->log->trace('Routing to a callback');
   return _action($c->app, $c, $cb, $last);
 }
 
@@ -141,7 +141,7 @@ sub _controller {
   my $class = ref $new;
   my $log   = $old->helpers->log;
   if ($new->isa('Mojolicious')) {
-    $log->debug(qq{Routing to application "$class"});
+    $log->trace(qq{Routing to application "$class"});
 
     # Try to connect routes
     if (my $sub = $new->can('routes')) {
@@ -154,14 +154,14 @@ sub _controller {
 
   # Action
   elsif (my $method = $field->{action}) {
-    $log->debug(qq{Routing to controller "$class" and action "$method"});
+    $log->trace(qq{Routing to controller "$class" and action "$method"});
 
     if (my $sub = $new->can($method)) {
       $old->stash->{'mojo.routed'} = 1 if $last;
       return 1                         if _action($old->app, $new, $sub, $last);
     }
 
-    else { $log->debug('Action not found in controller') }
+    else { $log->trace('Action not found in controller') }
   }
 
   else { croak qq{Controller "$class" requires an action} }

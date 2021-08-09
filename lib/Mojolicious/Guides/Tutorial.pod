@@ -894,7 +894,7 @@ from the attribute L<Mojolicious/"mode">.
 
 The default operating mode will usually be C<development> and can be changed with command line options or the
 C<MOJO_MODE> and C<PLACK_ENV> environment variables. A mode other than C<development> will raise the log level from
-C<debug> to C<info>. All messages will be written to C<STDERR> by default.
+C<trace> to C<info>. All messages will be written to C<STDERR> by default.
 
   $ ./myapp.pl daemon -m production
 

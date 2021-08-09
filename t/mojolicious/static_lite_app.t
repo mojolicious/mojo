@@ -103,7 +103,7 @@ subtest 'Freshness (multiple Etag values)' => sub {
 };
 
 subtest 'Static file' => sub {
-  $t->app->log->level('debug')->unsubscribe('message');
+  $t->app->log->level('trace')->unsubscribe('message');
   my $log = '';
   my $cb  = $t->app->log->on(message => sub { $log .= pop });
   $t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

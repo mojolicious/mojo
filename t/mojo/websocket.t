@@ -17,7 +17,7 @@ use Mojolicious::Lite;
 }
 
 # Silence
-app->log->level('debug')->unsubscribe('message');
+app->log->level('trace')->unsubscribe('message');
 
 # Avoid exception template
 app->renderer->paths->[0] = app->home->child('public');

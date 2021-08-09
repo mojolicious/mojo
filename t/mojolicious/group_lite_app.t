@@ -201,7 +201,7 @@ $t->get_ok('/multi')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/missing')->status_is(500)->content_like(qr/Route without action and nothing to render/);
 
 # Suspended bridge
-$t->app->log->level('debug')->unsubscribe('message');
+$t->app->log->level('trace')->unsubscribe('message');
 my $log = '';
 my $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended?ok=1')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('suspended!');

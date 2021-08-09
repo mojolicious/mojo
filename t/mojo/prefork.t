@@ -34,7 +34,7 @@ subtest 'Manage and clean up PID file' => sub {
 subtest 'Bad PID file' => sub {
   my $bad     = curfile->sibling('does_not_exist', 'test.pid');
   my $prefork = Mojo::Server::Prefork->new(pid_file => $bad);
-  $prefork->app->log->level('debug')->unsubscribe('message');
+  $prefork->app->log->level('trace')->unsubscribe('message');
   my $log = '';
   my $cb  = $prefork->app->log->on(message => sub { $log .= pop });
   eval { $prefork->ensure_pid_file($$) };
@@ -71,7 +71,7 @@ subtest 'Multiple workers and graceful shutdown' => sub {
   );
   $prefork->on(reap   => sub { push @reap, pop });
   $prefork->on(finish => sub { $graceful = pop });
-  $prefork->app->log->level('debug')->unsubscribe('message');
+  $prefork->app->log->level('trace')->unsubscribe('message');
   my $log = '';
   my $cb  = $prefork->app->log->on(message => sub { $log .= pop });
   is $prefork->healthy, 0, 'no healthy workers';

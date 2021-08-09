@@ -21,7 +21,7 @@ is $@, qq{Plugin "does_not_exist" missing, maybe you need to install it?\n}, 'ri
 app->defaults(default => 23);
 
 # Secret
-app->log->level('debug')->unsubscribe('message');
+app->log->level('trace')->unsubscribe('message');
 my $log = '';
 my $cb  = app->log->on(message => sub { $log .= pop });
 is app->secrets->[0], app->moniker, 'secret defaults to moniker';

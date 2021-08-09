@@ -430,7 +430,7 @@ subtest 'Embedded WebSocket' => sub {
 };
 
 subtest 'Template from myapp.pl (shared logger)' => sub {
-  $t->app->log->level('debug')->unsubscribe('message');
+  $t->app->log->level('trace')->unsubscribe('message');
   my $log = '';
   my $cb  = $t->app->log->on(message => sub { $log .= pop });
   $t->get_ok('/x/1')->status_is(200)->content_is(<<'EOF');

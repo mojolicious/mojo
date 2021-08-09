@@ -21,7 +21,7 @@ has [qw(message success tx)];
 has ua => sub { Mojo::UserAgent->new(insecure => 1)->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
-$ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
+$ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'trace' : 'fatal';
 
 sub app {
   my ($self, $app) = @_;
@@ -457,7 +457,7 @@ L<Mojolicious> applications. Just run your tests with L<prove>.
   $ prove -l -v
   $ prove -l -v t/foo.t
 
-If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will be set to C<debug> or C<fatal>, depending
+If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will be set to C<trace> or C<fatal>, depending
 on the value of the C<HARNESS_IS_VERBOSE> environment variable. And to make it esier to test HTTPS/WSS web services
 L<Mojo::UserAgent/"insecure"> will be activated by default for L</"ua">.
 

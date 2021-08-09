@@ -16,7 +16,7 @@ use Mojo::Util qw(gzip);
 use Mojolicious::Lite;
 
 # Silence
-app->log->level('debug')->unsubscribe('message');
+app->log->level('trace')->unsubscribe('message');
 
 get '/' => {text => 'works!'};
 

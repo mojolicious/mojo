@@ -7,7 +7,7 @@ use Mojolicious;
 # Partial rendering
 my $app = Mojolicious->new(secrets => ['works']);
 my $c   = $app->build_controller;
-$c->app->log->level('debug')->unsubscribe('message');
+$c->app->log->level('trace')->unsubscribe('message');
 is $c->render_to_string(text => 'works'), 'works', 'renderer is working';
 
 # Normal rendering with default format

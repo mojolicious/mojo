@@ -160,7 +160,7 @@ get '/too_long' => sub {
 my $t = Test::Mojo->new;
 
 subtest 'Stream without delay and finish' => sub {
-  $t->app->log->level('debug')->unsubscribe('message');
+  $t->app->log->level('trace')->unsubscribe('message');
   my $log = '';
   my $cb  = $t->app->log->on(message => sub { $log .= pop });
   my $stash;

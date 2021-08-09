@@ -76,7 +76,7 @@ plugin Config => {
   }
 };
 
-app->log->level('debug');
+app->log->level('trace');
 
 get '/hello' => {text => 'Hello Hypnotoad!'};
 
@@ -185,7 +185,7 @@ plugin Config => {
   }
 };
 
-app->log->level('debug');
+app->log->level('trace');
 
 get '/hello' => sub { shift->render(text => "Hello World \$\$!") };
 

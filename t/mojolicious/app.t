@@ -170,7 +170,7 @@ $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(50
   ->content_like(qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/);
 
 # Plugin::Test::SomePlugin2::register (security violation again)
-$t->app->log->level('debug')->unsubscribe('message');
+$t->app->log->level('trace')->unsubscribe('message');
 my $log = '';
 my $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(500)
@@ -431,7 +431,7 @@ $t->get_ok('/just/some/template')->status_is(200)->header_is(Server => 'Mojolici
 {
   # Check default development mode log level
   local $ENV{MOJO_LOG_LEVEL};
-  is(Mojolicious->new->log->level, 'debug', 'right log level');
+  is(Mojolicious->new->log->level, 'trace', 'right log level');
 
   # Check non-development mode log level
   is(Mojolicious->new->mode('test')->log->level, 'info', 'right log level');
@@ -487,7 +487,7 @@ $t->get_ok('/foo/routes')->status_is(200)->header_is('X-Bender' => 'Bite my shin
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/foo/routes');
 
 # SingleFileTestApp::Redispatch::handler
-$t->app->log->level('debug')->unsubscribe('message');
+$t->app->log->level('trace')->unsubscribe('message');
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/redispatch')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('Redispatch!');
@@ -528,7 +528,7 @@ $t->get_ok('/staged' => {'X-Pass' => 1})->status_is(200)->header_is(Server => 'M
 $t->get_ok('/staged')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('Go away!');
 
 # MojoliciousTestController::Foo::suspended
-$t->app->log->level('debug')->unsubscribe('message');
+$t->app->log->level('trace')->unsubscribe('message');
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

@@ -91,7 +91,7 @@ sub _build_tx {
       my $tx = shift;
 
       my $req = $tx->req;
-      if (my $error = $req->error) { $self->_debug($id, $error->{message}) }
+      if (my $error = $req->error) { $self->_trace($id, $error->{message}) }
 
       # WebSocket
       if ($req->is_handshake) {
@@ -121,7 +121,7 @@ sub _close {
   delete $self->{connections}{$id};
 }
 
-sub _debug { $_[0]->app->log->debug($_[2]) if $_[0]{connections}{$_[1]}{tx} }
+sub _trace { $_[0]->app->log->trace($_[2]) if $_[0]{connections}{$_[1]}{tx} }
 
 sub _finish {
   my ($self, $id) = @_;
@@ -200,7 +200,7 @@ sub _listen {
       $stream->on(close   => sub { $self && $self->_close($id) });
       $stream->on(error   => sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read    => sub { $self->_read($id => pop) });
-      $stream->on(timeout => sub { $self->_debug($id, 'Inactivity timeout') });
+      $stream->on(timeout => sub { $self->_trace($id, 'Inactivity timeout') });
     }
   );
 

@@ -58,7 +58,7 @@ map { $END{$_} = 'p' } (
   qw(header hgroup hr main menu nav ol p pre section table ul)
 );
 
-# Container HTML elements that create their own scope.
+# Container HTML elements that create their own scope
 my %SCOPE = map { $_ => 1 } qw(math svg);
 
 # HTML table elements with optional end tags
@@ -185,7 +185,7 @@ sub _end {
     # Ignore useless end tag
     return if $next->[0] eq 'root';
 
-    # Don’t traverse a container tag.
+    # Don’t traverse a container tag
     return if $SCOPE{$next->[1]} && $next->[1] ne $end;
 
     # Right tag

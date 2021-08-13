@@ -146,8 +146,8 @@ subtest 'Async WebSocket' => sub {
 };
 
 # Top-level await
-is_deeply [await Mojo::Promise->resolve('works')], ['works'], 'top-level await resolved';
-is_deeply [await Mojo::Promise->resolve('just', 'works')], ['just', 'works'], 'top-level await resolved';
+is await Mojo::Promise->resolve('works'), 'works', 'top-level await resolved';
+is await Mojo::Promise->resolve('just works', 'fails'), 'just works', 'top-level await resolved';
 eval { await Mojo::Promise->reject('works too') };
 like $@, qr/works too/, 'top-level await rejected';
 

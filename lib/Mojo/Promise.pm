@@ -43,9 +43,9 @@ sub AWAIT_ON_READY {
 
 sub AWAIT_WAIT {
   my $self = shift;
-  my (@results, $error);
-  $self->then(sub { @results = @_ }, sub { $error = shift })->wait;
-  return defined $error ? die $error : @results;
+  my ($result, $error);
+  $self->then(sub { $result = shift }, sub { $error = shift })->wait;
+  return defined $error ? die $error : $result;
 }
 
 sub DESTROY {

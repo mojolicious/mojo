@@ -41,6 +41,13 @@ sub AWAIT_ON_READY {
   shift->_finally(0, @_)->catch(sub { });
 }
 
+sub AWAIT_WAIT {
+  my $self = shift;
+  my (@results, $error);
+  $self->then(sub { @results = @_ }, sub { $error = shift })->wait;
+  return defined $error ? die $error : @results;
+}
+
 sub DESTROY {
   my $self = shift;
   return if $self->{handled} || ($self->{status} // '') ne 'reject' || !$self->{results};

@@ -105,37 +105,50 @@ async sub test_three {
 
 my $t = Test::Mojo->new;
 
-# Basic async/await
-my $promise = test_one();
-isa_ok $promise, 'Mojo::Promise', 'right class';
-my $tx;
-$promise->then(sub { $tx = shift })->catch(sub { warn @_ });
-$promise->wait;
-is $tx->res->body, 'works!', 'right content';
+subtest 'Basic async/await' => sub {
+  my $promise = test_one();
+  isa_ok $promise, 'Mojo::Promise', 'right class';
+  my $tx;
+  $promise->then(sub { $tx = shift })->catch(sub { warn @_ });
+  $promise->wait;
+  is $tx->res->body, 'works!', 'right content';
+};
 
-# Multiple awaits
-my $text;
-test_two(' ')->then(sub { $text = shift })->catch(sub { warn @_ })->wait;
-is $text, 'also works!', 'right content';
+subtest 'Multiple awaits' => sub {
+  my $text;
+  test_two(' ')->then(sub { $text = shift })->catch(sub { warn @_ })->wait;
+  is $text, 'also works!', 'right content';
+};
 
-# Application with async/await action
-$t->get_ok('/three')->content_is('this works too!');
+subtest 'Application with async/await action' => sub {
+  $t->get_ok('/three')->content_is('this works too!');
+};
 
-# Exception handling and async/await
-$t->get_ok('/four')->status_is(500)->content_like(qr/this went perfectly/);
+subtest 'Exception handling and async/await' => sub {
+  $t->get_ok('/four')->status_is(500)->content_like(qr/this went perfectly/);
+};
 
-# Runaway exception
-$t->get_ok('/five')->status_is(500)->content_like(qr/runaway too/);
+subtest 'Runaway exception' => sub {
+  $t->get_ok('/five')->status_is(500)->content_like(qr/runaway too/);
+};
 
-# Async function body returning a promise
-$text = undef;
-test_three(1)->then(sub { $text = shift })->catch(sub { warn @_ })->wait;
-is $text, 'value', 'right content';
-$text = undef;
-test_three(0)->then(sub { warn @_ })->catch(sub { $text = shift })->wait;
-is $text, 'value', 'right content';
+subtest 'Async function body returning a promise' => sub {
+  my $text;
+  test_three(1)->then(sub { $text = shift })->catch(sub { warn @_ })->wait;
+  is $text, 'value', 'right content';
+  $text = undef;
+  test_three(0)->then(sub { warn @_ })->catch(sub { $text = shift })->wait;
+  is $text, 'value', 'right content';
+};
 
-# Async WebSocket
-$t->websocket_ok('/six')->send_ok('test')->message_ok->message_is('One: test Two: test')->finish_ok;
+subtest 'Async WebSocket' => sub {
+  $t->websocket_ok('/six')->send_ok('test')->message_ok->message_is('One: test Two: test')->finish_ok;
+};
+
+# Top-level await
+is_deeply [await Mojo::Promise->resolve('works')], ['works'], 'top-level await resolved';
+is_deeply [await Mojo::Promise->resolve('just', 'works')], ['just', 'works'], 'top-level await resolved';
+eval { await Mojo::Promise->reject('works too') };
+like $@, qr/works too/, 'top-level await rejected';
 
 done_testing();

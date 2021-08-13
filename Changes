@@ -2,7 +2,7 @@
 9.22  2021-08-14
 
 9.21  2021-08-13
-  - Added EXPERIMENTAL supprt for top-level await to Mojo::Promise.
+  - Added EXPERIMENTAL support for top-level await to Mojo::Promise.
   - Updated Future::AsyncAwait requirement to 0.52 for new features and bug fixes.
   - Improved *_attr and *_text methods in Test::Mojo to return undef instead of empty string for values that do not
     exist. (tim-2)

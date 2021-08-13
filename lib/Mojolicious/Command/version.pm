@@ -32,7 +32,7 @@ OPTIONAL
   IO::Socket::SSL 2.009+   ($tls)
   Net::DNS::Native 0.15+   ($nnr)
   Role::Tiny 2.000001+     ($roles)
-  Future::AsyncAwait 0.36+ ($async)
+  Future::AsyncAwait 0.52+ ($async)
 
 EOF
 

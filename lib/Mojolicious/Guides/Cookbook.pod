@@ -839,7 +839,7 @@ or they would just keep getting emitted.
     });
 
     # Stop recurring timer
-    $c->on(finish => sub ($ioloop) { $ioloop->remove($id) });
+    $c->on(finish => sub ($c) { Mojo::IOLoop->remove($id) });
   };
 
   app->start;
@@ -1062,7 +1062,7 @@ almost all layers, and which can be combined to solve some of the hardest proble
   use Scalar::Util qw(weaken);
 
   # Intercept multipart uploads and log each chunk received
-  hook after_build_tx => sub ($tx) {
+  hook after_build_tx => sub ($tx, $app) {
 
     # Subscribe to "upgrade" event to identify multipart uploads
     weaken $tx;
@@ -1080,7 +1080,7 @@ almost all layers, and which can be combined to solve some of the hardest proble
           $single->unsubscribe('read')->on(read => sub ($single, $bytes) {
 
             # Log size of every chunk we receive
-            app->log->debug(length($bytes) . ' bytes uploaded');
+            $app->log->debug(length($bytes) . ' bytes uploaded');
           });
         });
       });

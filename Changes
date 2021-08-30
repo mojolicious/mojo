@@ -1,5 +1,6 @@
 
-9.22  2021-08-14
+9.22  2021-08-30
+  - Added a referer method to Mojo::Headers, as an alias for the referrer method.
 
 9.21  2021-08-13
   - Added EXPERIMENTAL support for top-level await to Mojo::Promise.

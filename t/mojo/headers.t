@@ -96,6 +96,11 @@ subtest 'Common headers' => sub {
   is $headers->user_agent('foo')->user_agent,                                   'foo', 'right value';
   is $headers->vary('foo')->vary,                                               'foo', 'right value';
   is $headers->www_authenticate('foo')->www_authenticate,                       'foo', 'right value';
+
+  is $headers->referrer('foo')->referrer, 'foo', 'right value';
+  is $headers->referer, 'foo', 'right value';
+  is $headers->referer('bar')->referer, 'bar', 'right value';
+  is $headers->referrer, 'bar', 'right value';
 };
 
 subtest 'Clone' => sub {

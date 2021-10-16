@@ -174,7 +174,7 @@ sub rendered {
 
     # Disable auto rendering and stop timer
     my $app = $self->render_later->app;
-    $self->helpers->log->debug(sub {
+    $self->helpers->log->trace(sub {
       my $timing  = $self->helpers->timing;
       my $elapsed = $timing->elapsed('mojo.timer') // 0;
       my $rps     = $timing->rps($elapsed)         // '??';

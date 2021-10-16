@@ -1,6 +1,7 @@
 
-9.22  2021-08-30
+9.22  2021-10-16
   - Added a referer method to Mojo::Headers, as an alias for the referrer method.
+  - Fixed response status log message to use the "trace" log level instead of "debug".
 
 9.21  2021-08-13
   - Added EXPERIMENTAL support for top-level await to Mojo::Promise.

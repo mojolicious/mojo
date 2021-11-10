@@ -159,9 +159,9 @@ To test a L<Mojolicious::Lite> application, pass the file path to the applicatio
   use Mojo::File qw(curfile);
   my $t = Test::Mojo->new(curfile->dirname->sibling('myapp.pl'));
 
-This object initializes a L<Mojo::UserAgent> object, loads the Mojolicious application C<Frogs>, binds and listens on a
-free TCP port (e.g., 32114), and starts the application event loop. When the L<Test::Mojo> object (C<$t>) goes out of
-scope, the application is stopped.
+The object initializes a L<Mojo::UserAgent> object, loads the Mojolicious application, binds and listens on a free TCP
+port (e.g., 32114), and starts the application event loop. When the L<Test::Mojo> object (C<$t>) goes out of scope, the
+application is stopped.
 
 Relative URLs in the test object method assertions (C<get_ok>, C<post_ok>, etc.) will be sent to the Mojolicious
 application started by L<Test::Mojo>:

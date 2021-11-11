@@ -76,7 +76,7 @@ app->sessions->default_expiration(0);
 # Login again
 $t->get_ok('/login?name=sri' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome sri!');
 ok !$t->tx->res->cookie('mojolicious')->expires, 'session cookie does not expire';
-ok $t->tx->res->cookie('mojolicious')->secure, 'session cookie is secure';
+ok $t->tx->res->cookie('mojolicious')->secure,   'session cookie is secure';
 
 # Return
 $t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back sri!');

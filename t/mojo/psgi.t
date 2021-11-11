@@ -71,7 +71,7 @@ subtest 'Binding' => sub {
   is $res->[0], 200, 'right status';
   my %headers = @{$res->[1]};
   ok keys(%headers) >= 3, 'enough headers';
-  ok $headers{Date},             'has "Date" value';
+  ok $headers{Date},      'has "Date" value';
   is $headers{'Content-Length'}, 43,                               'right "Content-Length" value';
   is $headers{'Content-Type'},   'application/json;charset=UTF-8', 'right "Content-Type" value';
   my $params = '';
@@ -108,7 +108,7 @@ subtest 'Command' => sub {
   is $res->[0], 200, 'right status';
   my %headers = @{$res->[1]};
   ok keys(%headers) >= 3, 'enough headers';
-  ok $headers{Date},             'has "Date" value';
+  ok $headers{Date},      'has "Date" value';
   is $headers{'Content-Length'}, 43,                               'right "Content-Length" value';
   is $headers{'Content-Type'},   'application/json;charset=UTF-8', 'right "Content-Type" value';
   my $params = '';
@@ -143,8 +143,8 @@ subtest 'Simple' => sub {
   is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
   my $body = '';
   while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
-  is $body, 'Your Mojo is working!', 'right content';
-  is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
+  is $body,            'Your Mojo is working!', 'right content';
+  is $ENV{MOJO_HELLO}, undef,                   'finish event has not been emitted';
   $res->[2]->close;
   is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
 };
@@ -173,7 +173,7 @@ subtest 'HEAD request' => sub {
   is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
   my $body = '';
   while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
-  is $body, '', 'no content';
+  is $body,            '',    'no content';
   is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
   $res->[2]->close;
   is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
@@ -235,8 +235,8 @@ subtest 'Reverse proxy' => sub {
   is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
   my $body = '';
   while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
-  is $body, '192.0.2.1:https', 'right content';
-  is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
+  is $body,            '192.0.2.1:https', 'right content';
+  is $ENV{MOJO_HELLO}, undef,             'finish event has not been emitted';
   $res->[2]->close;
   is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
 };
@@ -272,8 +272,8 @@ subtest 'Trusted proxies' => sub {
   is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
   my $body = '';
   while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
-  is $body, '10.10.10.10:https', 'right content';
-  is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
+  is $body,            '10.10.10.10:https', 'right content';
+  is $ENV{MOJO_HELLO}, undef,               'finish event has not been emitted';
   $res->[2]->close;
   is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
 };
@@ -308,8 +308,8 @@ subtest 'Trusted proxies (no REMOTE_ADDR)' => sub {
   is $headers{'Content-Type'},   'text/html;charset=UTF-8', 'right "Content-Type" value';
   my $body = '';
   while (defined(my $chunk = $res->[2]->getline)) { $body .= $chunk }
-  is $body, 'https', 'right content';
-  is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
+  is $body,            'https', 'right content';
+  is $ENV{MOJO_HELLO}, undef,   'finish event has not been emitted';
   $res->[2]->close;
   is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
 };

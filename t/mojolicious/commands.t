@@ -106,14 +106,14 @@ subtest 'Commands starting with a dash are not allowed' => sub {
   local $ENV{PLACK_ENV} = 'testing';
   local @ARGV = qw(psgi -m production);
   is ref Mojolicious::Commands->start_app('MojoliciousTest'), 'CODE', 'right reference';
-  is $ENV{MOJO_MODE}, undef, 'no mode';
+  is $ENV{MOJO_MODE},                                         undef,  'no mode';
 }
 
 # mojo
 is_deeply $commands->namespaces, ['Mojolicious::Command::Author', 'Mojolicious::Command'], 'right namespaces';
-ok $commands->description,       'has a description';
-like $commands->message,         qr/COMMAND/, 'has a message';
-like $commands->hint,            qr/help/,    'has a hint';
+ok $commands->description, 'has a description';
+like $commands->message, qr/COMMAND/, 'has a message';
+like $commands->hint,    qr/help/,    'has a hint';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
@@ -347,9 +347,9 @@ like $buffer, qr/Unknown option: unknown/, 'right output';
 require Mojolicious::Command::Author::generate;
 my $generator = Mojolicious::Command::Author::generate->new;
 is_deeply $generator->namespaces, ['Mojolicious::Command::Author::generate'], 'right namespaces';
-ok $generator->description,       'has a description';
-like $generator->message,         qr/generate/, 'has a message';
-like $generator->hint,            qr/help/,     'has a hint';
+ok $generator->description, 'has a description';
+like $generator->message, qr/generate/, 'has a message';
+like $generator->hint,    qr/help/,     'has a hint';
 $buffer = '';
 {
   open my $handle, '>', \$buffer;

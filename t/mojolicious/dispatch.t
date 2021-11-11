@@ -33,8 +33,8 @@ is $c->stash('foo'), 'bar', 'set and return a stash value';
 
 # Ref value
 my $stash = $c->stash;
-is ref $stash, 'HASH', 'return a hash reference';
-is $stash->{foo}, 'bar', 'right value';
+is ref $stash,    'HASH', 'return a hash reference';
+is $stash->{foo}, 'bar',  'right value';
 
 # Replace
 $c->stash(foo => 'baz');
@@ -72,14 +72,14 @@ is $c->stash->{b}, 2, 'right value';
 
 # Override captures
 is $c->param('foo'), undef, 'no value';
-is $c->param(foo => 'works')->param('foo'), 'works', 'right value';
-is $c->param(foo => 'too')->param('foo'),   'too',   'right value';
+is $c->param(foo => 'works')->param('foo'),        'works', 'right value';
+is $c->param(foo => 'too')->param('foo'),          'too',   'right value';
 is $c->param(foo => qw(just works))->param('foo'), 'works', 'right value';
 is_deeply $c->every_param('foo'), [qw(just works)], 'right values';
-is_deeply $c->every_param('bar'), [], 'no values';
-is $c->param(foo => undef)->param('foo'), undef, 'no value';
+is_deeply $c->every_param('bar'), [],               'no values';
+is $c->param(foo => undef)->param('foo'),                                  undef, 'no value';
 is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name, 'bar', 'right value';
-is $c->param(foo => ['ba;r', 'baz'])->param('foo'), 'baz', 'right value';
+is $c->param(foo => ['ba;r', 'baz'])->param('foo'),                        'baz', 'right value';
 is_deeply $c->every_param('foo'), ['ba;r', 'baz'], 'right values';
 
 # Reserved stash values are hidden
@@ -115,8 +115,8 @@ $c = $app->build_controller;
 $c->req->method('GET');
 $c->req->url->parse('/');
 ok $d->dispatch($c), 'dispatched';
-is $c->stash->{controller}, 'foo',  'right value';
-is $c->stash->{action},     'home', 'right value';
+is $c->stash->{controller},           'foo',  'right value';
+is $c->stash->{action},               'home', 'right value';
 is $c->match->stack->[0]{controller}, 'foo',  'right value';
 is $c->match->stack->[0]{action},     'home', 'right value';
 ok $c->render_called, 'rendered';
@@ -126,8 +126,8 @@ $c = $app->build_controller;
 $c->req->method('GET');
 $c->req->url->parse('/');
 $d->match($c);
-is $c->stash->{controller}, undef, 'no value';
-is $c->stash->{action},     undef, 'no value';
+is $c->stash->{controller},           undef,  'no value';
+is $c->stash->{action},               undef,  'no value';
 is $c->match->stack->[0]{controller}, 'foo',  'right value';
 is $c->match->stack->[0]{action},     'home', 'right value';
 ok !$c->render_called, 'not rendered';
@@ -135,8 +135,8 @@ $c = $app->build_controller;
 $c->req->method('GET');
 $c->req->url->parse('/');
 ok $d->dispatch($c), 'dispatched';
-is $c->stash->{controller}, 'foo',  'right value';
-is $c->stash->{action},     'home', 'right value';
+is $c->stash->{controller},           'foo',  'right value';
+is $c->stash->{action},               'home', 'right value';
 is $c->match->stack->[0]{controller}, 'foo',  'right value';
 is $c->match->stack->[0]{action},     'home', 'right value';
 ok $c->render_called, 'rendered';
@@ -146,7 +146,7 @@ is_deeply $d->cache->get('GET:/:0'), $cache, 'cached route has been reused';
 $c = $app->build_controller;
 $c->req->method('GET');
 $c->req->url->parse('/not_found');
-ok !$d->dispatch($c), 'not dispatched';
+ok !$d->dispatch($c),  'not dispatched';
 ok !$c->render_called, 'nothing rendered';
 
 # No escaping

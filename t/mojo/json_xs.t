@@ -31,7 +31,7 @@ subtest 'Basics' => sub {
   $array = j('[]');
   is_deeply $array, [], 'j() decode';
   $bytes = j([]);
-  is $bytes, '[]', 'j() encode';
+  is $bytes,               '[]',      'j() encode';
   is encode_json([true]),  '[true]',  'true';
   is encode_json([false]), '[false]', 'false';
 };
@@ -67,7 +67,7 @@ subtest '"convert_blessed"' => sub {
 };
 
 subtest '"stringify_infnan"' => sub {
-  like encode_json({test => 9**9**9}), qr/^{"test":".*"}$/, 'encode "inf" as string';
+  like encode_json({test => 9**9**9}),       qr/^{"test":".*"}$/, 'encode "inf" as string';
   like encode_json({test => -sin(9**9**9)}), qr/^{"test":".*"}$/, 'encode "nan" as string';
 };
 

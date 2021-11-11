@@ -111,7 +111,7 @@ is $client,       'test321', 'right content';
 is $timeout,      1,         'server emitted timeout event once';
 is $server_close, 1,         'server emitted close event once';
 is $client_close, 1,         'client emitted close event once';
-ok $running,      'loop was running';
+ok $running,     'loop was running';
 ok !$remove,     'event removed successfully';
 ok !$server_err, 'no error';
 
@@ -140,7 +140,7 @@ Mojo::IOLoop->client(
 );
 Mojo::IOLoop->start;
 ok !$server_err, 'no error';
-ok $client_err, 'has error';
+ok $client_err,  'has error';
 
 # Invalid certificate authority (server)
 $loop = Mojo::IOLoop->new;
@@ -166,7 +166,7 @@ $loop->client(
 );
 $loop->start;
 ok !$server_err, 'no error';
-ok $client_err, 'has error';
+ok $client_err,  'has error';
 
 # Valid client and server certificates
 ($running, $timeout, $server, $server_err, $server_close) = ();
@@ -220,7 +220,7 @@ is $client,       'test321', 'right content';
 is $timeout,      1,         'server emitted timeout event once';
 is $server_close, 1,         'server emitted close event once';
 is $client_close, 1,         'client emitted close event once';
-ok $running,      'loop was running';
+ok $running,     'loop was running';
 ok !$server_err, 'no error';
 
 # Invalid server certificate (unsigned)
@@ -245,7 +245,7 @@ $loop->client(
 );
 $loop->start;
 ok !$server_err, 'no error';
-ok $client_err, 'has error';
+ok $client_err,  'has error';
 
 # Invalid server certificate (hostname)
 $loop = Mojo::IOLoop->new;
@@ -270,7 +270,7 @@ $loop->client(
 );
 $loop->start;
 ok !$server_err, 'no error';
-ok $client_err, 'has error';
+ok $client_err,  'has error';
 
 # Invalid certificate authority (client)
 $loop = Mojo::IOLoop->new;
@@ -294,7 +294,7 @@ $loop->client(
 );
 $loop->start;
 ok !$server_err, 'no error';
-ok $client_err, 'has error';
+ok $client_err,  'has error';
 
 # Ignore invalid client certificate
 $loop = Mojo::IOLoop->new;

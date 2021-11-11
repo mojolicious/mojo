@@ -79,24 +79,24 @@ subtest 'Preload namespaces' => sub {
 };
 
 # Application is already available
-is $t->app->routes->find('something')->to_string, '/test4/:something', 'right pattern';
+is $t->app->routes->find('something')->to_string,                       '/test4/:something',     'right pattern';
 is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTest2::Foo', 'right namespace';
 is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                   'right controller';
-is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route', 'right class';
-is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes', 'right class';
-is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
-is $t->app->sessions->cookie_path,   '/bar',         'right path';
+is ref $t->app->routes->find('something'),                              'Mojolicious::Routes::Route', 'right class';
+is ref $t->app->routes->find('something')->root,                        'Mojolicious::Routes',        'right class';
+is $t->app->sessions->cookie_domain,                                    '.example.com',               'right domain';
+is $t->app->sessions->cookie_path,                                      '/bar',                       'right path';
 is_deeply $t->app->commands->namespaces,
   ['Mojolicious::Command::Author', 'Mojolicious::Command', 'MojoliciousTest::Command'], 'right namespaces';
-is $t->app, $t->app->commands->app, 'applications are equal';
+is $t->app,                                   $t->app->commands->app,                         'applications are equal';
 is $t->app->static->file('hello.txt')->slurp, "Hello Mojo from a development static file!\n", 'right content';
-is $t->app->static->file('does_not_exist.html'), undef, 'no file';
-is $t->app->moniker, 'mojolicious_test', 'right moniker';
-is $t->app->secrets->[0], $t->app->moniker, 'secret defaults to moniker';
-is $t->app->renderer->template_handler({template => 'foo/bar/index', format => 'html'}), 'epl', 'right handler';
-is $t->app->build_controller->req->url, '', 'no URL';
-is $t->app->build_controller->render_to_string('does_not_exist'), undef, 'no result';
-is $t->app->build_controller->render_to_string(inline => '%= $c', c => 'foo'), "foo\n", 'right result';
+is $t->app->static->file('does_not_exist.html'), undef,              'no file';
+is $t->app->moniker,                             'mojolicious_test', 'right moniker';
+is $t->app->secrets->[0],                        $t->app->moniker,   'secret defaults to moniker';
+is $t->app->renderer->template_handler({template => 'foo/bar/index', format => 'html'}), 'epl',   'right handler';
+is $t->app->build_controller->req->url,                                                  '',      'no URL';
+is $t->app->build_controller->render_to_string('does_not_exist'),                        undef,   'no result';
+is $t->app->build_controller->render_to_string(inline => '%= $c', c => 'foo'),           "foo\n", 'right result';
 
 # Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };
@@ -114,7 +114,7 @@ eval { Mojolicious::Route::missing() };
 like $@, qr/^Undefined subroutine &Mojolicious::Route::missing called/, 'right error';
 
 subtest 'Reserved stash value' => sub {
-  ok !$t->app->routes->is_reserved('foo'), 'not reserved';
+  ok !$t->app->routes->is_reserved('foo'),       'not reserved';
   ok $t->app->routes->is_reserved('action'),     'is reserved';
   ok $t->app->routes->is_reserved('app'),        'is reserved';
   ok $t->app->routes->is_reserved('cb'),         'is reserved';
@@ -446,15 +446,15 @@ is(MojoliciousTest->new({mode => 'test'})->mode, 'test', 'right mode');
 $app = MojoliciousTest->new;
 my $tx = $t->ua->build_tx(GET => '/foo');
 $app->handler($tx);
-is $tx->res->code,   200,                                                 'right status';
+is $tx->res->code, 200, 'right status';
 like $tx->res->body, qr|Hello Mojo from the template /foo! Hello World!|, 'right content';
 $tx = $t->ua->build_tx(GET => '/foo/willdie');
 $app->handler($tx);
-is $tx->res->code,   500,         'right status';
+is $tx->res->code, 500, 'right status';
 like $tx->res->body, qr/Foo\.pm/, 'right content';
 $tx = $t->ua->build_tx(GET => '/foo');
 $app->handler($tx);
-is $tx->res->code,   200,                                                 'right status';
+is $tx->res->code, 200, 'right status';
 like $tx->res->body, qr|Hello Mojo from the template /foo! Hello World!|, 'right content';
 
 $t = Test::Mojo->new('SingleFileTestApp');

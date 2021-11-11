@@ -11,30 +11,30 @@ subtest 'Basic functionality' => sub {
   is $headers->header('Connection'), 'close, keep-alive', 'right value';
   $headers->remove('Connection');
   is $headers->header('Connection'), undef, 'no value';
-  is $headers->connection, undef, 'no value';
+  is $headers->connection,           undef, 'no value';
   $headers->content_type('text/text')->content_type('text/html');
   $headers->expect('continue-100');
   $headers->connection('close');
-  is $headers->content_type, 'text/html',                'right value';
-  like $headers->to_string,  qr/.*\x0d\x0a.*\x0d\x0a.*/, 'right format';
+  is $headers->content_type, 'text/html', 'right value';
+  like $headers->to_string, qr/.*\x0d\x0a.*\x0d\x0a.*/, 'right format';
   my $hash = $headers->to_hash;
   is $hash->{Connection},     'close',        'right value';
   is $hash->{Expect},         'continue-100', 'right value';
   is $hash->{'Content-Type'}, 'text/html',    'right value';
   $hash = $headers->to_hash(1);
-  is_deeply $hash->{Connection},     ['close'],        'right structure';
-  is_deeply $hash->{Expect},         ['continue-100'], 'right structure';
-  is_deeply $hash->{'Content-Type'}, ['text/html'],    'right structure';
+  is_deeply $hash->{Connection},       ['close'],                            'right structure';
+  is_deeply $hash->{Expect},           ['continue-100'],                     'right structure';
+  is_deeply $hash->{'Content-Type'},   ['text/html'],                        'right structure';
   is_deeply [sort @{$headers->names}], [qw(Connection Content-Type Expect)], 'right structure';
   $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
   $headers->cache_control('public');
   is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
   is $headers->cache_control, 'public',                        'right value';
   $headers->etag('abc321');
-  is $headers->etag, 'abc321', 'right value';
+  is $headers->etag,           'abc321',       'right value';
   is $headers->header('ETag'), $headers->etag, 'values are equal';
   $headers->status('200 OK');
-  is $headers->status, '200 OK', 'right value';
+  is $headers->status,           '200 OK',         'right value';
   is $headers->header('Status'), $headers->status, 'values are equal';
 };
 
@@ -98,9 +98,9 @@ subtest 'Common headers' => sub {
   is $headers->www_authenticate('foo')->www_authenticate,                       'foo', 'right value';
 
   is $headers->referrer('foo')->referrer, 'foo', 'right value';
-  is $headers->referer, 'foo', 'right value';
-  is $headers->referer('bar')->referer, 'bar', 'right value';
-  is $headers->referrer, 'bar', 'right value';
+  is $headers->referer,                   'foo', 'right value';
+  is $headers->referer('bar')->referer,   'bar', 'right value';
+  is $headers->referrer,                  'bar', 'right value';
 };
 
 subtest 'Clone' => sub {
@@ -123,7 +123,7 @@ subtest 'Clone' => sub {
   is_deeply $clone->to_hash(1)->{Foo}, [[qw(bar baz)]], 'right structure';
   $clone = $headers->clone;
   $headers->add(Expect => 'whatever');
-  is_deeply $clone->to_hash(1), {Expect => ['100-continue']}, 'right structure';
+  is_deeply $clone->to_hash(1),   {Expect => ['100-continue']},             'right structure';
   is_deeply $headers->to_hash(1), {Expect => ['100-continue', 'whatever']}, 'right structure';
 };
 
@@ -137,12 +137,12 @@ Cache-control: public
 Expires: Thu, 01 Dec 1994 16:00:00 GMT
 
 EOF
-  ok $headers->is_finished,   'parser is finished';
+  ok $headers->is_finished, 'parser is finished';
   is $headers->content_type,  'text/plain',                    'right value';
   is $headers->expect,        '100-continue',                  'right value';
   is $headers->cache_control, 'public',                        'right value';
   is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
-  is $headers->header('o'), 'x', 'right value';
+  is $headers->header('o'),   'x',                             'right value';
 };
 
 subtest 'Parse multi-line headers' => sub {
@@ -210,14 +210,14 @@ subtest 'Multiple headers with the same name' => sub {
   is $hash->{'X-Test2'},  'foo',    'right value';
   is $hash->{Connection}, 'a, b',   'right value';
   $hash = $headers->to_hash(1);
-  is_deeply $hash->{'X-Test'},   [23, 24], 'right structure';
-  is_deeply $hash->{'X-Test2'},  ['foo'], 'right structure';
+  is_deeply $hash->{'X-Test'},   [23, 24],   'right structure';
+  is_deeply $hash->{'X-Test2'},  ['foo'],    'right structure';
   is_deeply $hash->{Connection}, ['a', 'b'], 'right structure';
   $headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
   is_deeply $headers->to_hash(1), {'X-Test' => [23, 24], 'X-Test2' => ['foo'], Connection => ['a', 'b']},
     'right structure';
-  is $headers->header('X-Test'), '23, 24', 'right value';
-  is $headers->connection, 'a, b', 'right value';
+  is $headers->header('X-Test'),                      '23, 24',  'right value';
+  is $headers->connection,                            'a, b',    'right value';
   is $headers->connection('c', 'd', 'e')->connection, 'c, d, e', 'right value';
 };
 
@@ -226,19 +226,19 @@ subtest 'Headers in chunks' => sub {
   isa_ok $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 Content-Type: text/plain
 EOF
-  ok !$headers->is_finished, 'parser is not finished';
+  ok !$headers->is_finished,           'parser is not finished';
   ok !defined($headers->content_type), 'no value';
   isa_ok $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 X-Bender: Bite my shiny
 EOF
-  ok !$headers->is_finished, 'parser is not finished';
+  ok !$headers->is_finished,         'parser is not finished';
   ok !defined($headers->connection), 'no value';
   isa_ok $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 X-Bender: metal ass!
 
 EOF
   ok $headers->is_finished, 'parser is finished';
-  is $headers->content_type, 'text/plain', 'right value';
+  is $headers->content_type,       'text/plain',                'right value';
   is $headers->header('X-Bender'), 'Bite my shiny, metal ass!', 'right value';
 };
 

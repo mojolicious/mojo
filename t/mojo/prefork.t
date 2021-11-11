@@ -22,11 +22,11 @@ subtest 'Manage and clean up PID file' => sub {
   ok -e $file, 'file exists';
   is path($file)->slurp, "-23\n", 'right process id';
   ok !$prefork->check_pid, 'no process id';
-  ok !-e $file, 'file has been cleaned up';
+  ok !-e $file,            'file has been cleaned up';
   $prefork->ensure_pid_file($$);
   ok -e $file, 'file exists';
-  is path($file)->slurp, "$$\n", 'right process id';
-  is $prefork->check_pid, $$, 'right process id';
+  is path($file)->slurp,  "$$\n", 'right process id';
+  is $prefork->check_pid, $$,     'right process id';
   undef $prefork;
   ok !-e $file, 'file has been cleaned up';
 };
@@ -87,7 +87,7 @@ subtest 'Multiple workers and graceful shutdown' => sub {
   is scalar @spawn, 4, 'four workers spawned';
   is scalar @reap,  4, 'four workers reaped';
   ok !!grep { $worker eq $_ } @spawn, 'worker has a heartbeat';
-  ok $graceful, 'server has been stopped gracefully';
+  ok $graceful,                       'server has been stopped gracefully';
   is_deeply [sort @spawn], [sort @reap], 'same process ids';
   is $tx->res->code, 200,           'right status';
   is $tx->res->body, 'just works!', 'right content';
@@ -130,8 +130,8 @@ subtest 'One worker and immediate shutdown' => sub {
   $prefork->on(finish => sub { $graceful = pop });
   $prefork->run;
   is $prefork->ioloop->max_accepts, 500, 'right value';
-  is scalar @spawn, 1, 'one worker spawned';
-  is scalar @reap,  1, 'one worker reaped';
+  is scalar @spawn,                 1,   'one worker spawned';
+  is scalar @reap,                  1,   'one worker reaped';
   ok !$graceful, 'server has been stopped immediately';
   is $tx->res->code, 200,          'right status';
   is $tx->res->body, 'works too!', 'right content';

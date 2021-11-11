@@ -37,22 +37,22 @@ subtest 'Configure' => sub {
   $hypnotoad->configure('test');
   is_deeply $hypnotoad->prefork->listen, ['http://*:8080'], 'right value';
   $hypnotoad->configure('myserver');
-  is $hypnotoad->prefork->accepts,                13, 'right value';
-  is $hypnotoad->prefork->backlog,                43, 'right value';
-  is $hypnotoad->prefork->graceful_timeout,       23, 'right value';
-  is $hypnotoad->prefork->heartbeat_interval,     7,  'right value';
-  is $hypnotoad->prefork->heartbeat_timeout,      9,  'right value';
-  is $hypnotoad->prefork->inactivity_timeout,     5,  'right value';
-  is $hypnotoad->prefork->keep_alive_timeout,     3,  'right value';
-  is_deeply $hypnotoad->prefork->listen,          ['http://*:8081'], 'right value';
-  is $hypnotoad->prefork->max_clients,            1,              'right value';
-  is $hypnotoad->prefork->max_requests,           3,              'right value';
-  is $hypnotoad->prefork->pid_file,               '/foo/bar.pid', 'right value';
-  ok $hypnotoad->prefork->reverse_proxy,          'reverse proxy enabled';
-  is $hypnotoad->prefork->spare,                  4, 'right value';
+  is $hypnotoad->prefork->accepts,            13, 'right value';
+  is $hypnotoad->prefork->backlog,            43, 'right value';
+  is $hypnotoad->prefork->graceful_timeout,   23, 'right value';
+  is $hypnotoad->prefork->heartbeat_interval, 7,  'right value';
+  is $hypnotoad->prefork->heartbeat_timeout,  9,  'right value';
+  is $hypnotoad->prefork->inactivity_timeout, 5,  'right value';
+  is $hypnotoad->prefork->keep_alive_timeout, 3,  'right value';
+  is_deeply $hypnotoad->prefork->listen, ['http://*:8081'], 'right value';
+  is $hypnotoad->prefork->max_clients,  1,              'right value';
+  is $hypnotoad->prefork->max_requests, 3,              'right value';
+  is $hypnotoad->prefork->pid_file,     '/foo/bar.pid', 'right value';
+  ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
+  is $hypnotoad->prefork->spare, 4, 'right value';
   is_deeply $hypnotoad->prefork->trusted_proxies, ['127.0.0.0/8'], 'right value';
-  is $hypnotoad->prefork->workers,                7, 'right value';
-  is $hypnotoad->upgrade_timeout, 45, 'right value';
+  is $hypnotoad->prefork->workers, 7,  'right value';
+  is $hypnotoad->upgrade_timeout,  45, 'right value';
 };
 
 subtest 'Hot deployment' => sub {
@@ -226,7 +226,7 @@ EOF
     ok $tx->is_finished, 'transaction is finished';
     ok !$tx->keep_alive, 'connection will not be kept alive';
     ok !$tx->kept_alive, 'connection was not kept alive';
-    is $tx->res->code, 200, 'right status';
+    is $tx->res->code, 200,    'right status';
     is $tx->res->body, $first, 'same content';
 
     $tx = $ua->get("http://127.0.0.1:$port1/hello");
@@ -242,7 +242,7 @@ EOF
     ok $tx->is_finished, 'transaction is finished';
     ok !$tx->keep_alive, 'connection will not be kept alive';
     ok !$tx->kept_alive, 'connection was not kept alive';
-    is $tx->res->code, 200, 'right status';
+    is $tx->res->code, 200,     'right status';
     is $tx->res->body, $second, 'same content';
   };
 

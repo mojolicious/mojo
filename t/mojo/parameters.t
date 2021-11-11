@@ -6,15 +6,15 @@ use Mojo::Parameters;
 subtest 'Basic functionality' => sub {
   my $params  = Mojo::Parameters->new('foo=b%3Bar&baz=23');
   my $params2 = Mojo::Parameters->new('x', 1, 'y', 2);
-  is $params->to_string,    'foo=b%3Bar&baz=23', 'right format';
-  is $params2->to_string,   'x=1&y=2',           'right format';
-  is $params->to_string,    'foo=b%3Bar&baz=23', 'right format';
+  is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
+  is $params2->to_string, 'x=1&y=2',           'right format';
+  is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
   is_deeply $params->pairs, ['foo', 'b;ar', 'baz', 23], 'right structure';
   $params->append(a => 4, a => 5, b => 6, b => 7);
   is $params->to_string, 'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7', 'right format';
   push @$params, c => 'f;oo';
-  is $params->to_string, 'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo', 'right format';
-  is $params->remove('a')->to_string, 'foo=b%3Bar&baz=23&b=6&b=7&c=f%3Boo', 'right format';
+  is $params->to_string,              'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo', 'right format';
+  is $params->remove('a')->to_string, 'foo=b%3Bar&baz=23&b=6&b=7&c=f%3Boo',         'right format';
 };
 
 subtest 'Clone' => sub {
@@ -29,9 +29,9 @@ subtest 'Merge' => sub {
   my $params  = Mojo::Parameters->new('foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo');
   my $params2 = Mojo::Parameters->new('x', 1, 'y', 2);
   $params->merge($params2);
-  is $params->to_string,  'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=2', 'right format';
-  is $params2->to_string, 'x=1&y=2',                                            'right format';
-  is $params->merge(baz => undef)->to_string, 'foo=b%3Bar&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=2', 'right format';
+  is $params->to_string,                      'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=2', 'right format';
+  is $params2->to_string,                     'x=1&y=2',                                            'right format';
+  is $params->merge(baz => undef)->to_string, 'foo=b%3Bar&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=2',        'right format';
   is $params->merge(y => 3, z => [4, 5])->to_string, 'foo=b%3Bar&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=3&z=4&z=5',
     'right format';
   is $params->merge(Mojo::Parameters->new(z => 6))->to_string, 'foo=b%3Bar&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=3&z=6',
@@ -49,13 +49,13 @@ subtest 'Merge (instances)' => sub {
 
 subtest 'Param' => sub {
   my $params = Mojo::Parameters->new('foo=b%3Bar&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=3&z=6');
-  is_deeply $params->param('foo'),       'b;ar', 'right structure';
+  is_deeply $params->param('foo'),       'b;ar',   'right structure';
   is_deeply $params->every_param('foo'), ['b;ar'], 'right structure';
-  is_deeply $params->every_param('a'),   [4, 5], 'right structure';
+  is_deeply $params->every_param('a'),   [4, 5],   'right structure';
   $params->param(foo => 'bar');
-  is_deeply [$params->param('foo')], ['bar'], 'right structure';
-  is_deeply $params->param(foo => qw(baz yada))->every_param('foo'), [qw(baz yada)], 'right structure';
-  is_deeply $params->names, [qw(a b c foo x y z)], 'right structure';
+  is_deeply [$params->param('foo')],                                 ['bar'],               'right structure';
+  is_deeply $params->param(foo => qw(baz yada))->every_param('foo'), [qw(baz yada)],        'right structure';
+  is_deeply $params->names,                                          [qw(a b c foo x y z)], 'right structure';
 };
 
 subtest 'Append' => sub {
@@ -67,16 +67,16 @@ subtest 'Append' => sub {
   $params = Mojo::Parameters->new(foo => '', bar => 'bar');
   is $params->to_string, 'foo=&bar=bar', 'right format';
   $params = Mojo::Parameters->new(bar => 'bar', foo => '');
-  is $params->to_string, 'bar=bar&foo=', 'right format';
+  is $params->to_string,                   'bar=bar&foo=',         'right format';
   is $params->append($params2)->to_string, 'bar=bar&foo=&x=1&y=2', 'right format';
-  is $params2->to_string, 'x=1&y=2', 'right format';
+  is $params2->to_string,                  'x=1&y=2',              'right format';
 };
 
 subtest '"0"' => sub {
   my $params = Mojo::Parameters->new(0 => 0);
-  is $params->param(0),                  0, 'right value';
+  is $params->param(0), 0, 'right value';
   is_deeply $params->every_param(0),     [0], 'right value';
-  is_deeply $params->every_param('foo'), [], 'no values';
+  is_deeply $params->every_param('foo'), [],  'no values';
   is $params->to_string, '0=0', 'right format';
   $params = Mojo::Parameters->new($params->to_string);
   is $params->param(0), 0, 'right value';
@@ -134,8 +134,8 @@ subtest '"+"' => sub {
   $params = Mojo::Parameters->new('a=works+too');
   is "$params", 'a=works+too', 'right format';
   is_deeply $params->to_hash, {a => 'works too'}, 'right structure';
-  is $params->param('a'), 'works too', 'right value';
-  is "$params", 'a=works+too', 'right format';
+  is $params->param('a'), 'works too',   'right value';
+  is "$params",           'a=works+too', 'right format';
 };
 
 subtest 'Array values' => sub {
@@ -163,16 +163,16 @@ subtest 'Unicode' => sub {
   my $params = Mojo::Parameters->new;
   $params->parse('input=say%20%22%C2%AB~%22;');
   is_deeply $params->pairs, ['input', 'say "«~";'], 'right structure';
-  is $params->param('input'), 'say "«~";', 'right value';
-  is "$params", 'input=say+%22%C2%AB%7E%22%3B', 'right result';
+  is $params->param('input'), 'say "«~";',                    'right value';
+  is "$params",               'input=say+%22%C2%AB%7E%22%3B', 'right result';
   $params = Mojo::Parameters->new('♥=☃');
   is_deeply $params->pairs, ['♥', '☃'], 'right structure';
-  is $params->param('♥'), '☃', 'right value';
-  is "$params", '%E2%99%A5=%E2%98%83', 'right result';
+  is $params->param('♥'), '☃',                   'right value';
+  is "$params",           '%E2%99%A5=%E2%98%83', 'right result';
   $params = Mojo::Parameters->new('%E2%99%A5=%E2%98%83');
   is_deeply $params->pairs, ['♥', '☃'], 'right structure';
-  is $params->param('♥'), '☃', 'right value';
-  is "$params", '%E2%99%A5=%E2%98%83', 'right result';
+  is $params->param('♥'), '☃',                   'right value';
+  is "$params",           '%E2%99%A5=%E2%98%83', 'right result';
 };
 
 subtest 'Reparse' => sub {
@@ -184,8 +184,8 @@ subtest 'Reparse' => sub {
 subtest 'Replace' => sub {
   my $params = Mojo::Parameters->new('a=1&b=2');
   $params->pairs([a => 2, b => 3]);
-  is $params->to_string, 'a=2&b=3', 'right result';
-  is $params->pairs([])->to_string, '', 'right result';
+  is $params->to_string,            'a=2&b=3', 'right result';
+  is $params->pairs([])->to_string, '',        'right result';
 };
 
 subtest 'Query string' => sub {
@@ -203,15 +203,15 @@ subtest '"%"' => sub {
 
 subtest 'Special characters' => sub {
   my $params = Mojo::Parameters->new('!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23');
-  is $params->param('!$\'()*,:@/foo?'), '!$\'()*,:@/?', 'right value';
-  is $params->param('bar'),             23,             'right value';
+  is $params->param('!$\'()*,:@/foo?'), '!$\'()*,:@/?',                                           'right value';
+  is $params->param('bar'),             23,                                                       'right value';
   is "$params", '%21%24%27%28%29*%2C%3A%40%2Ffoo%3F=' . '%21%24%27%28%29*%2C%3A%40%2F%3F&bar=23', 'right result';
 };
 
 subtest 'No charset' => sub {
   my $params = Mojo::Parameters->new('%E5=%E4')->charset(undef);
-  is $params->param("\xe5"), "\xe4", 'right value';
-  is "$params", '%E5=%E4', 'right result';
+  is $params->param("\xe5"),    "\xe4",    'right value';
+  is "$params",                 '%E5=%E4', 'right result';
   is $params->clone->to_string, '%E5=%E4', 'right result';
 };
 

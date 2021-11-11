@@ -70,8 +70,8 @@ subtest "Current time roundtrips" => sub {
 
 subtest "Zero time checks" => sub {
   my $date = Mojo::Date->new(0);
-  is $date->epoch, 0, 'right epoch value';
-  is "$date", 'Thu, 01 Jan 1970 00:00:00 GMT', 'right format';
+  is $date->epoch, 0,                               'right epoch value';
+  is "$date",      'Thu, 01 Jan 1970 00:00:00 GMT', 'right format';
   is(Mojo::Date->new('Thu, 01 Jan 1970 00:00:00 GMT')->epoch, 0, 'right epoch value');
 };
 

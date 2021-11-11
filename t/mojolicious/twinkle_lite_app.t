@@ -42,9 +42,9 @@ subtest 'Configuration' => sub {
     template =>
       {%$twinkle, append => '$app->defaults(foo_test => 24)', prepend => 'my $foo = app->defaults("foo_test");'}
   };
-  is $config->{foo},  'bar', 'right value';
-  is $config->{test}, 23,    'right value';
-  is app->defaults('foo_test'), 24, 'right value';
+  is $config->{foo},            'bar', 'right value';
+  is $config->{test},           23,    'right value';
+  is app->defaults('foo_test'), 24,    'right value';
 };
 
 get '/' => {name => '<sebastian>'} => 'index';

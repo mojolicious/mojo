@@ -242,11 +242,11 @@ subtest 'Make sure stash stays clean' => sub {
   my $c = Mojolicious::Controller->new;
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/clean'});
-  is $m->root, $r, 'right root';
+  is $m->root,           $r,           'right root';
   is $m->endpoint->name, 'very_clean', 'right name';
   is_deeply $m->stack, [{clean => 1}], 'right strucutre';
-  is $m->path_for->{path}, '/clean', 'right path';
-  is $m->endpoint->suggested_method, 'GET', 'right method';
+  is $m->path_for->{path},           '/clean', 'right path';
+  is $m->endpoint->suggested_method, 'GET',    'right method';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/clean/too'});
   is_deeply $m->stack, [{something => 1}], 'right strucutre';
@@ -257,8 +257,8 @@ subtest 'No match' => sub {
   my $c = Mojolicious::Controller->new;
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/does_not_exist'});
-  is $m->root,         $r, 'right root';
-  is $m->endpoint,     undef, 'no endpoint';
+  is $m->root,     $r,    'right root';
+  is $m->endpoint, undef, 'no endpoint';
   is_deeply $m->stack, [], 'empty stack';
 };
 
@@ -285,8 +285,8 @@ subtest 'Alternatives with default' => sub {
   $m->find($c => {method => 'GET', path => '/alternatives'});
   is_deeply $m->stack, [{foo => 11}], 'right strucutre';
   is $m->path_for->{path}, '/alternatives', 'right path';
-  is $m->path_for(format => 'txt')->{path}, '/alternatives/11.txt', 'right path';
-  is $m->path_for(foo => 12, format => 'txt')->{path}, '/alternatives/12.txt', 'right path';
+  is $m->path_for(format => 'txt')->{path},               '/alternatives/11.txt', 'right path';
+  is $m->path_for(foo    => 12, format => 'txt')->{path}, '/alternatives/12.txt', 'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/alternatives/0'});
   is_deeply $m->stack, [{foo => 0}], 'right strucutre';
@@ -308,8 +308,8 @@ subtest 'Alternatives with default' => sub {
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/alternatives/00'});
   is_deeply $m->stack, [], 'empty stack';
-  is $m->path_for('alternativesfoo')->{path}, '/alternatives', 'right path';
-  is $m->path_for('alternativesfoo', format => 'txt')->{path}, '/alternatives/11.txt', 'right path';
+  is $m->path_for('alternativesfoo')->{path},                             '/alternatives',        'right path';
+  is $m->path_for('alternativesfoo', format => 'txt')->{path},            '/alternatives/11.txt', 'right path';
   is $m->path_for('alternativesfoo', foo => 12, format => 'txt')->{path}, '/alternatives/12.txt', 'right path';
 };
 
@@ -339,7 +339,7 @@ subtest 'Alternatives without default' => sub {
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/alternatives2/00'});
   is_deeply $m->stack, [], 'empty stack';
-  is $m->path_for('alternatives2foo')->{path}, '/alternatives2/', 'right path';
+  is $m->path_for('alternatives2foo')->{path},           '/alternatives2/',  'right path';
   is $m->path_for('alternatives2foo', foo => 0)->{path}, '/alternatives2/0', 'right path';
 };
 
@@ -381,17 +381,17 @@ subtest 'Optional placeholder' => sub {
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/optional/23'});
   is_deeply $m->stack, [{foo => 23, bar => 'test'}], 'right structure';
-  is $m->path_for->{path}, '/optional/23', 'right path';
-  is $m->path_for(format => 'txt')->{path}, '/optional/23/test.txt', 'right path';
-  is $m->path_for(foo => 12, format => 'txt')->{path}, '/optional/12/test.txt', 'right path';
+  is $m->path_for->{path},                                    '/optional/23',          'right path';
+  is $m->path_for(format => 'txt')->{path},                   '/optional/23/test.txt', 'right path';
+  is $m->path_for(foo => 12, format => 'txt')->{path},        '/optional/12/test.txt', 'right path';
   is $m->path_for('optionalfoobar', format => 'txt')->{path}, '/optional/23/test.txt', 'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/optional/23/24'});
   is_deeply $m->stack, [{foo => 23, bar => 24}], 'right structure';
-  is $m->path_for->{path}, '/optional/23/24', 'right path';
-  is $m->path_for(format => 'txt')->{path}, '/optional/23/24.txt', 'right path';
-  is $m->path_for('optionalfoobar')->{path}, '/optional/23/24', 'right path';
-  is $m->path_for('optionalfoobar', foo => 0)->{path}, '/optional/0/24', 'right path';
+  is $m->path_for->{path},                             '/optional/23/24',     'right path';
+  is $m->path_for(format => 'txt')->{path},            '/optional/23/24.txt', 'right path';
+  is $m->path_for('optionalfoobar')->{path},           '/optional/23/24',     'right path';
+  is $m->path_for('optionalfoobar', foo => 0)->{path}, '/optional/0/24',      'right path';
 };
 
 subtest 'Optional placeholders in nested routes' => sub {
@@ -427,11 +427,11 @@ subtest 'Real world example using most features at once' => sub {
     {testcase => 'articles', action => 'edit', id => 1, format => 'html'}
   );
   is_deeply $m->stack, \@stack, 'right structure';
-  is $m->path_for->{path}, '/articles/1/edit', 'right path';
-  is $m->path_for(format => 'html')->{path}, '/articles/1/edit.html', 'right path';
-  is $m->path_for('articles_delete', format => undef)->{path}, '/articles/1/delete', 'right path';
-  is $m->path_for('articles_delete')->{path}, '/articles/1/delete', 'right path';
-  is $m->path_for('articles_delete', id => 12)->{path}, '/articles/12/delete', 'right path';
+  is $m->path_for->{path},                                     '/articles/1/edit',      'right path';
+  is $m->path_for(format => 'html')->{path},                   '/articles/1/edit.html', 'right path';
+  is $m->path_for('articles_delete', format => undef)->{path}, '/articles/1/delete',    'right path';
+  is $m->path_for('articles_delete')->{path},                  '/articles/1/delete',    'right path';
+  is $m->path_for('articles_delete', id => 12)->{path},        '/articles/12/delete',   'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/articles/1/delete'});
   @stack = (
@@ -467,8 +467,8 @@ subtest 'Path and captures' => sub {
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/foo/testedit'});
   is_deeply $m->stack, [{testcase => 'foo', action => 'testedit'}], 'right structure';
-  is $m->path_for->{path}, '/foo/testedit', 'right path';
-  is $m->endpoint->suggested_method, 'GET', 'right method';
+  is $m->path_for->{path},           '/foo/testedit', 'right path';
+  is $m->endpoint->suggested_method, 'GET',           'right method';
 };
 
 subtest 'Optional captures in sub route with requirement' => sub {
@@ -514,7 +514,7 @@ subtest 'Named path_for' => sub {
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/alternatives/test'});
   is $m->path_for->{path}, '/alternatives/test', 'right path';
-  is $m->path_for('test_edit', testcase => 'foo')->{path}, '/foo/test/edit', 'right path';
+  is $m->path_for('test_edit', testcase => 'foo')->{path},   '/foo/test/edit', 'right path';
   is $m->path_for('test_edit', {testcase => 'foo'})->{path}, '/foo/test/edit', 'right path';
 };
 
@@ -523,8 +523,8 @@ subtest 'Wildcards' => sub {
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/wildcards/1/hello/there'});
   is_deeply $m->stack, [{testcase => 'wild', action => 'card', wildcard => 'hello/there'}], 'right structure';
-  is $m->path_for->{path}, '/wildcards/1/hello/there', 'right path';
-  is $m->path_for(wildcard => '')->{path}, '/wildcards/1/', 'right path';
+  is $m->path_for->{path},                 '/wildcards/1/hello/there', 'right path';
+  is $m->path_for(wildcard => '')->{path}, '/wildcards/1/',            'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/wildcards/2/hello/there'});
   is_deeply $m->stack, [{testcase => 'card', action => 'wild', wildcard => 'hello/there'}], 'right structure';
@@ -688,8 +688,8 @@ subtest 'Format inheritance' => sub {
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/inherit/first.html'});
   is_deeply $m->stack, [{controller => 'inherit', action => 'first', format => 'html'}], 'right structure';
-  is $m->path_for->{path}, '/inherit/first.html', 'right path';
-  is $m->path_for(format => undef)->{path}, '/inherit/first', 'right path';
+  is $m->path_for->{path},                  '/inherit/first.html', 'right path';
+  is $m->path_for(format => undef)->{path}, '/inherit/first',      'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/inherit/first.json'});
   is_deeply $m->stack, [{controller => 'inherit', action => 'first', format => 'json'}], 'right structure';
@@ -704,8 +704,8 @@ subtest 'Format inheritance' => sub {
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/inherit/second.html'});
   is_deeply $m->stack, [{controller => 'inherit', action => 'second', format => 'html'}], 'right structure';
-  is $m->path_for->{path}, '/inherit/second.html', 'right path';
-  is $m->path_for(format => undef)->{path}, '/inherit/second', 'right path';
+  is $m->path_for->{path},                  '/inherit/second.html', 'right path';
+  is $m->path_for(format => undef)->{path}, '/inherit/second',      'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/inherit/second.json'});
   is_deeply $m->stack, [{controller => 'inherit', action => 'second', format => 'json'}], 'right structure';
@@ -753,13 +753,13 @@ subtest 'Request methods' => sub {
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/method/get.html'});
   is_deeply $m->stack, [{testcase => 'method', action => 'get', format => 'html'}], 'right structure';
-  is $m->path_for->{path}, '/method/get.html', 'right path';
-  is $m->endpoint->suggested_method, 'GET', 'right method';
+  is $m->path_for->{path},           '/method/get.html', 'right path';
+  is $m->endpoint->suggested_method, 'GET',              'right method';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'POST', path => '/method/post'});
   is_deeply $m->stack, [{testcase => 'method', action => 'post'}], 'right structure';
-  is $m->path_for->{path}, '/method/post', 'right path';
-  is $m->endpoint->suggested_method, 'POST', 'right method';
+  is $m->path_for->{path},           '/method/post', 'right path';
+  is $m->endpoint->suggested_method, 'POST',         'right method';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/method/post_get'});
   is_deeply $m->stack, [{testcase => 'method', action => 'post_get'}], 'right structure';
@@ -767,8 +767,8 @@ subtest 'Request methods' => sub {
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'POST', path => '/method/post_get'});
   is_deeply $m->stack, [{testcase => 'method', action => 'post_get'}], 'right structure';
-  is $m->path_for->{path}, '/method/post_get', 'right path';
-  is $m->endpoint->suggested_method, 'GET', 'right method';
+  is $m->path_for->{path},           '/method/post_get', 'right path';
+  is $m->endpoint->suggested_method, 'GET',              'right method';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'DELETE', path => '/method/post_get'});
   is_deeply $m->stack, [], 'empty stack';
@@ -788,7 +788,7 @@ subtest 'Simplified form' => sub {
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/simple/form'});
   is_deeply $m->stack, [{controller => 'test-test', action => 'test'}], 'right structure';
-  is $m->path_for->{path}, '/simple/form', 'right path';
+  is $m->path_for->{path},            '/simple/form', 'right path';
   is $m->path_for('current')->{path}, '/simple/form', 'right path';
 };
 
@@ -954,17 +954,17 @@ subtest 'Nameless placeholder' => sub {
   my $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/missing/foo/name'});
   is_deeply $m->stack, [{controller => 'missing', action => 'placeholder', '' => 'foo'}], 'right structure';
-  is $m->path_for->{path}, '/missing/foo/name', 'right path';
+  is $m->path_for->{path},              '/missing/foo/name', 'right path';
   is $m->path_for('' => 'bar')->{path}, '/missing/bar/name', 'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/missing/foo/bar/name'});
   is_deeply $m->stack, [{controller => 'missing', action => 'wildcard', '' => 'foo/bar'}], 'right structure';
-  is $m->path_for->{path}, '/missing/foo/bar/name', 'right path';
+  is $m->path_for->{path},                  '/missing/foo/bar/name', 'right path';
   is $m->path_for('' => 'bar/baz')->{path}, '/missing/bar/baz/name', 'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/missing/too/test'});
   is_deeply $m->stack, [{controller => 'missing', action => 'too', '' => 'test'}], 'right structure';
-  is $m->path_for->{path}, '/missing/too/test', 'right path';
+  is $m->path_for->{path},                  '/missing/too/test',    'right path';
   is $m->path_for('' => 'bar/baz')->{path}, '/missing/too/bar/baz', 'right path';
   $m = Mojolicious::Routes::Match->new(root => $r);
   $m->find($c => {method => 'GET', path => '/missing/too/tset'});

@@ -108,10 +108,10 @@ subtest 'Handle and reset' => sub {
   is $count, 0, 'no recurring events';
   ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
   ok !Mojo::IOLoop->stream($id2),  'stream has been removed';
-  is $handle,     $handle2, 'handles are equal';
+  is $handle, $handle2, 'handles are equal';
   isa_ok $handle, 'IO::Socket', 'right reference';
-  is $reset,      1,            'reset event has been emitted once';
-  is $close,      1,            'close event has been emitted once';
+  is $reset, 1, 'reset event has been emitted once';
+  is $close, 1, 'close event has been emitted once';
 };
 
 subtest 'Handle and reset with freeze' => sub {
@@ -140,9 +140,9 @@ subtest 'Handle and reset with freeze' => sub {
   is $count, 0, 'no recurring events';
   ok !Mojo::IOLoop->acceptor($id), 'acceptor has been removed';
   ok !Mojo::IOLoop->stream($id2),  'stream has been removed';
-  is $handle,     $handle2, 'handles are equal';
+  is $handle, $handle2, 'handles are equal';
   isa_ok $handle, 'IO::Socket', 'right reference';
-  is $reset,      1,            'reset event has been emitted once';
+  is $reset, 1, 'reset event has been emitted once';
   ok !$close, 'close event has not been emitted';
 };
 
@@ -191,7 +191,7 @@ subtest 'Stream' => sub {
   );
   $promise->wait;
   my $stream = Mojo::IOLoop::Stream->new($handle);
-  is $stream->timeout, 15, 'right default';
+  is $stream->timeout,              15, 'right default';
   is $stream->timeout(16)->timeout, 16, 'right timeout';
   $id = Mojo::IOLoop->stream($stream);
   $stream->on(close => sub { Mojo::IOLoop->stop });
@@ -223,7 +223,7 @@ subtest 'Removed listen socket' => sub {
   like $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/, 'file descriptor can be reused';
   $loop->start;
   unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:\Q$port\E:\Q$fd\E/, 'environment is clean';
-  ok $connected, 'connected';
+  ok $connected,            'connected';
   ok !$loop->acceptor($id), 'acceptor has been removed';
 };
 
@@ -294,7 +294,7 @@ subtest 'Stream throttling' => sub {
   is $server_before, $server_after, 'stream has been paused';
   ok length($server) > length($server_after), 'stream has been resumed';
   is $client, $client_after, 'stream was writable while paused';
-  is $client, 'works!', 'full message has been written';
+  is $client, 'works!',      'full message has been written';
   is_deeply \@waiting, [6, 0], 'right buffer sizes';
 };
 
@@ -326,7 +326,7 @@ subtest 'Graceful shutdown' => sub {
   $loop->timer(30 => sub { shift->stop; $err = 'failed' });
   $loop->start;
   ok !$loop->stream($id), 'stopped gracefully';
-  ok !$err, 'no error';
+  ok !$err,               'no error';
   is $finish, 1, 'finish event has been emitted once';
 };
 
@@ -370,8 +370,8 @@ subtest 'Connection limit' => sub {
   $loop->client({port => $port} => sub { }) for 1 .. 2;
   $loop->timer(30 => sub { shift->stop; $err = 'failed' });
   $loop->start;
-  ok !$err, 'no error';
-  ok $accepting[0], 'accepting connections';
+  ok !$err,          'no error';
+  ok $accepting[0],  'accepting connections';
   ok !$accepting[1], 'connection limit reached';
 };
 

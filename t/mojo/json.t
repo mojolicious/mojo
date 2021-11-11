@@ -122,16 +122,16 @@ subtest 'Decode full spec example' => sub {
     }
 }
 EOF
-  is $hash->{Image}{Width},  800,                    'right value';
-  is $hash->{Image}{Height}, 600,                    'right value';
-  is $hash->{Image}{Title},  'View from 15th Floor', 'right value';
+  is $hash->{Image}{Width},             800,                                      'right value';
+  is $hash->{Image}{Height},            600,                                      'right value';
+  is $hash->{Image}{Title},             'View from 15th Floor',                   'right value';
   is $hash->{Image}{Thumbnail}{Url},    'http://www.example.com/image/481989943', 'right value';
   is $hash->{Image}{Thumbnail}{Height}, 125,                                      'right value';
   is $hash->{Image}{Thumbnail}{Width},  100,                                      'right value';
-  is $hash->{Image}{IDs}[0], 116,   'right value';
-  is $hash->{Image}{IDs}[1], 943,   'right value';
-  is $hash->{Image}{IDs}[2], 234,   'right value';
-  is $hash->{Image}{IDs}[3], 38793, 'right value';
+  is $hash->{Image}{IDs}[0],            116,                                      'right value';
+  is $hash->{Image}{IDs}[1],            943,                                      'right value';
+  is $hash->{Image}{IDs}[2],            234,                                      'right value';
+  is $hash->{Image}{IDs}[3],            38793,                                    'right value';
 };
 
 subtest 'Encode array' => sub {
@@ -293,10 +293,10 @@ subtest 'Boolean shortcut' => sub {
 
 subtest 'Booleans in different contexts' => sub {
   ok true, 'true';
-  is true, 1, 'right string value';
+  is true,     1, 'right string value';
   is true + 0, 1, 'right numeric value';
   ok !false, 'false';
-  is false, 0, 'right string value';
+  is false,     0, 'right string value';
   is false + 0, 0, 'right numeric value';
 };
 
@@ -335,7 +335,7 @@ subtest 'Ensure numbers and strings are not upgraded' => sub {
 };
 
 subtest '"inf" and "nan"' => sub {
-  like encode_json({test => 9**9**9}), qr/^{"test":".*"}$/, 'encode "inf" as string';
+  like encode_json({test => 9**9**9}),       qr/^{"test":".*"}$/, 'encode "inf" as string';
   like encode_json({test => -sin(9**9**9)}), qr/^{"test":".*"}$/, 'encode "nan" as string';
 };
 

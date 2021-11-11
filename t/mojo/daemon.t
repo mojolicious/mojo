@@ -77,10 +77,10 @@ subtest 'Config' => sub {
 subtest 'Loading' => sub {
   my $daemon = Mojo::Server::Daemon->new;
   my $path   = curfile->sibling('lib', '..', 'lib', 'myapp.pl');
-  is ref $daemon->load_app($path), 'Mojolicious::Lite', 'right reference';
-  is $daemon->app->config('script'), path($path)->to_abs, 'right script name';
-  is ref $daemon->build_app('TestApp'), 'TestApp', 'right reference';
-  is ref $daemon->app, 'TestApp', 'right reference';
+  is ref $daemon->load_app($path),      'Mojolicious::Lite', 'right reference';
+  is $daemon->app->config('script'),    path($path)->to_abs, 'right script name';
+  is ref $daemon->build_app('TestApp'), 'TestApp',           'right reference';
+  is ref $daemon->app,                  'TestApp',           'right reference';
 };
 
 subtest 'Load broken app' => sub {
@@ -181,7 +181,7 @@ subtest 'Keep-alive request' => sub {
 subtest 'Non-keep-alive request' => sub {
   my $tx = $ua->get('/close/' => {Connection => 'close'});
   ok !$tx->keep_alive, 'will not be kept alive';
-  ok $tx->kept_alive, 'was kept alive';
+  ok $tx->kept_alive,  'was kept alive';
   is $tx->res->code, 200,         'right status';
   is $tx->res->body, 'Whatever!', 'right content';
 };
@@ -223,10 +223,10 @@ subtest 'Concurrent requests' => sub {
   })->wait;
   ok $tx->is_finished, 'transaction is finished';
   is $tx->res->body, 'Whatever!', 'right content';
-  ok !$tx->error, 'no error';
+  ok !$tx->error,       'no error';
   ok $tx2->is_finished, 'transaction is finished';
   is $tx2->res->body, 'Whatever!', 'right content';
-  ok !$tx2->error, 'no error';
+  ok !$tx2->error,      'no error';
   ok $tx3->is_finished, 'transaction is finished';
   is $tx3->res->body, 'Whatever!', 'right content';
   ok !$tx3->error, 'no error';
@@ -238,24 +238,24 @@ subtest 'Form with chunked response' => sub {
   my $result = '';
   for my $key (sort keys %params) { $result .= $params{$key} }
   my $tx = $ua->post('/chunked' => form => \%params);
-  is $tx->res->code, 200, 'right status';
+  is $tx->res->code, 200,     'right status';
   is $tx->res->body, $result, 'right content';
 };
 
 subtest 'Upload' => sub {
   my $result = '';
   my $tx     = $ua->post('/upload' => form => {file => {content => $result}});
-  is $tx->res->code, 200, 'right status';
+  is $tx->res->code, 200,     'right status';
   is $tx->res->body, $result, 'right content';
-  ok $tx->local_address, 'has local address';
-  ok $tx->local_port > 0, 'has local port';
+  ok $tx->local_address,           'has local address';
+  ok $tx->local_port > 0,          'has local port';
   ok $tx->original_remote_address, 'has original remote address';
   ok $tx->remote_address,          'has remote address';
-  ok $tx->remote_port > 0, 'has remote port';
-  ok $local_address, 'has local address';
-  ok $local_port > 0, 'has local port';
-  ok $remote_address, 'has remote address';
-  ok $remote_port > 0, 'has remote port';
+  ok $tx->remote_port > 0,         'has remote port';
+  ok $local_address,               'has local address';
+  ok $local_port > 0,              'has local port';
+  ok $remote_address,              'has remote address';
+  ok $remote_port > 0,             'has remote port';
 };
 
 subtest 'Timeout' => sub {
@@ -295,9 +295,9 @@ subtest 'Pipelined' => sub {
 
 subtest 'Throttling' => sub {
   my $daemon = Mojo::Server::Daemon->new(app => $app, listen => ['http://127.0.0.1'], max_clients => 23, silent => 1);
-  is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
-  is scalar @{$daemon->start->start->acceptors}, 1, 'one active acceptor';
-  is $daemon->ioloop->max_connections, 23, 'right value';
+  is scalar @{$daemon->acceptors},               0,  'no active acceptors';
+  is scalar @{$daemon->start->start->acceptors}, 1,  'one active acceptor';
+  is $daemon->ioloop->max_connections,           23, 'right value';
   my $id = $daemon->acceptors->[0];
   ok !!Mojo::IOLoop->acceptor($id), 'acceptor has been added';
   is scalar @{$daemon->stop->acceptors}, 0, 'no active acceptors';
@@ -331,15 +331,15 @@ subtest 'Single-accept and connection limit' => sub {
   );
   $loop->client({port => $acceptor->port} => sub { }) for 1 .. 2;
   $loop->start;
-  ok $accepting[0], 'accepting connections';
+  ok $accepting[0],  'accepting connections';
   ok !$accepting[1], 'connection limit reached';
 };
 
 subtest 'Request limit' => sub {
   my $daemon = Mojo::Server::Daemon->new(app => $app, listen => ['http://127.0.0.1'], silent => 1)->start;
   my $port   = $daemon->ports->[0];
-  is $daemon->max_requests, 100, 'right value';
-  is $daemon->max_requests(2)->max_requests, 2, 'right value';
+  is $daemon->max_requests,                  100, 'right value';
+  is $daemon->max_requests(2)->max_requests, 2,   'right value';
   my $tx = $ua->get("http://127.0.0.1:$port/keep_alive/1");
   ok $tx->keep_alive, 'will be kept alive';
   is $tx->res->code, 200,         'right status';
@@ -357,7 +357,7 @@ subtest 'File descriptor' => sub {
   my $port   = $listen->sockport;
   is $daemon->ports->[0], $port, 'same port';
   my $tx = $ua->get("http://127.0.0.1:$port/port");
-  is $tx->res->code, 200, 'right status';
+  is $tx->res->code, 200,   'right status';
   is $tx->res->body, $port, 'right content';
 };
 

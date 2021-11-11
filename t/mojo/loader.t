@@ -16,7 +16,7 @@ package MyLoaderTest::Foo::Baz;
 package main;
 
 subtest 'Single character core module' => sub {
-  ok !load_class('B'), 'loaded';
+  ok !load_class('B'),                       'loaded';
   ok !!UNIVERSAL::can(B => 'svref_2object'), 'method found';
 };
 
@@ -34,8 +34,8 @@ subtest 'Exception' => sub {
   is $e->lines_before->[3][1], 'foo {',       'right line';
   is $e->lines_before->[4][0], 8,             'right number';
   is $e->lines_before->[4][1], '',            'right line';
-  is $e->line->[0], 9,    'right number';
-  is $e->line->[1], "1;", 'right line';
+  is $e->line->[0],            9,             'right number';
+  is $e->line->[1],            "1;",          'right line';
   like "$e", qr/Missing right curly/, 'right message';
 };
 
@@ -43,18 +43,18 @@ subtest 'Complicated exception' => sub {
   my $e = load_class 'Mojo::LoaderException2';
   isa_ok $e, 'Mojo::Exception', 'right exception';
   like $e->message, qr/Exception/, 'right message';
-  is $e->lines_before->[0][0], 1,                                 'right number';
-  is $e->lines_before->[0][1], 'package Mojo::LoaderException2;', 'right line';
-  is $e->lines_before->[1][0], 2,                                 'right number';
-  is $e->lines_before->[1][1], 'use Mojo::Base -strict;',         'right line';
-  is $e->lines_before->[2][0], 3,                                 'right number';
-  is $e->lines_before->[2][1], '',                                'right line';
-  is $e->line->[0], 4,                                          'right number';
-  is $e->line->[1], 'Mojo::LoaderException2_2::throw_error();', 'right line';
-  is $e->lines_after->[0][0], 5,    'right number';
-  is $e->lines_after->[0][1], '',   'right line';
-  is $e->lines_after->[1][0], 6,    'right number';
-  is $e->lines_after->[1][1], '1;', 'right line';
+  is $e->lines_before->[0][0], 1,                                          'right number';
+  is $e->lines_before->[0][1], 'package Mojo::LoaderException2;',          'right line';
+  is $e->lines_before->[1][0], 2,                                          'right number';
+  is $e->lines_before->[1][1], 'use Mojo::Base -strict;',                  'right line';
+  is $e->lines_before->[2][0], 3,                                          'right number';
+  is $e->lines_before->[2][1], '',                                         'right line';
+  is $e->line->[0],            4,                                          'right number';
+  is $e->line->[1],            'Mojo::LoaderException2_2::throw_error();', 'right line';
+  is $e->lines_after->[0][0],  5,                                          'right number';
+  is $e->lines_after->[0][1],  '',                                         'right line';
+  is $e->lines_after->[1][0],  6,                                          'right number';
+  is $e->lines_after->[1][1],  '1;',                                       'right line';
   like "$e", qr/Exception/, 'right message';
 };
 
@@ -65,14 +65,14 @@ subtest 'Search modules' => sub {
   is_deeply [find_modules 'Mojo::LoaderTest', {recursive => 1}],
     [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C Mojo::LoaderTest::E::F)], 'found the right modules';
 
-  is_deeply [find_modules 'MyLoaderTest::DoesNotExist'], [], 'no modules found';
+  is_deeply [find_modules 'MyLoaderTest::DoesNotExist'],                   [], 'no modules found';
   is_deeply [find_modules 'MyLoaderTest::DoesNotExist', {recursive => 1}], [], 'no modules found';
 };
 
 subtest 'Search packages' => sub {
   my @pkgs = find_packages 'MyLoaderTest::Foo';
   is_deeply \@pkgs, ['MyLoaderTest::Foo::Bar', 'MyLoaderTest::Foo::Baz'], 'found the right packages';
-  is_deeply [find_packages 'MyLoaderTest::DoesNotExist'], [], 'no packages found';
+  is_deeply [find_packages 'MyLoaderTest::DoesNotExist'], [],             'no packages found';
 };
 
 subtest 'Load' => sub {

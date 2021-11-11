@@ -23,15 +23,15 @@ subtest 'Parse Lighttpd CGI environment variables and body' => sub {
   $req->parse('World');
   is $body, 1, 'body event has been emitted once';
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'POST', 'right method';
-  is $req->url->path, 'foo/bar', 'right path';
+  is $req->method,          'POST',              'right method';
+  is $req->url->path,       'foo/bar',           'right path';
   is $req->url->base->path, '/te+st/index.cgi/', 'right base path';
   is $req->url->base->host, 'localhost',         'right base host';
   is $req->url->base->port, 8080,                'right base port';
-  is $req->url->query, 'lalala=23&bar=baz', 'right query';
-  is $req->version, '1.0', 'right version';
-  is $req->headers->dnt, 1, 'right "DNT" value';
-  is $req->body, 'Hello World', 'right content';
+  is $req->url->query,      'lalala=23&bar=baz', 'right query';
+  is $req->version,         '1.0',               'right version';
+  is $req->headers->dnt,    1,                   'right "DNT" value';
+  is $req->body,            'Hello World',       'right content';
   is $req->url->to_abs->to_string, 'http://localhost:8080/te+st/index.cgi/foo/bar?lalala=23&bar=baz',
     'right absolute URL';
 };
@@ -51,15 +51,15 @@ subtest 'Parse Lighttpd CGI environment variables and body (behind reverse proxy
   });
   $req->parse('Hello World');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'POST', 'right method';
-  is $req->url->path, 'foo/bar', 'right path';
-  is $req->url->base->path, '/test/index.cgi/', 'right base path';
-  is $req->url->base->host, 'mojolicious.org',  'right base host';
-  is $req->url->base->port, undef,              'no base port';
-  is $req->url->query, 'lalala=23&bar=baz', 'right query';
-  is $req->version, '1.0', 'right version';
-  is $req->headers->dnt, 1, 'right "DNT" value';
-  is $req->body, 'Hello World', 'right content';
+  is $req->method,          'POST',              'right method';
+  is $req->url->path,       'foo/bar',           'right path';
+  is $req->url->base->path, '/test/index.cgi/',  'right base path';
+  is $req->url->base->host, 'mojolicious.org',   'right base host';
+  is $req->url->base->port, undef,               'no base port';
+  is $req->url->query,      'lalala=23&bar=baz', 'right query';
+  is $req->version,         '1.0',               'right version';
+  is $req->headers->dnt,    1,                   'right "DNT" value';
+  is $req->body,            'Hello World',       'right content';
   is $req->url->to_abs->to_string, 'http://mojolicious.org/test/index.cgi/foo/bar?lalala=23&bar=baz',
     'right absolute URL';
 };
@@ -79,15 +79,15 @@ subtest 'Parse Apache CGI environment variables and body' => sub {
   });
   $req->parse('hello=world');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'POST', 'right method';
-  is $req->url->path, 'foo/bar', 'right path';
-  is $req->url->base->path, '/test/index.cgi/', 'right base path';
-  is $req->url->base->host, 'localhost',        'right base host';
-  is $req->url->base->port, 8080,               'right base port';
-  is $req->url->query, 'lalala=23&bar=baz', 'right query';
-  is $req->version, '1.0', 'right version';
-  is $req->headers->dnt, 1, 'right "DNT" value';
-  is $req->body, 'hello=world', 'right content';
+  is $req->method,          'POST',              'right method';
+  is $req->url->path,       'foo/bar',           'right path';
+  is $req->url->base->path, '/test/index.cgi/',  'right base path';
+  is $req->url->base->host, 'localhost',         'right base host';
+  is $req->url->base->port, 8080,                'right base port';
+  is $req->url->query,      'lalala=23&bar=baz', 'right query';
+  is $req->version,         '1.0',               'right version';
+  is $req->headers->dnt,    1,                   'right "DNT" value';
+  is $req->body,            'hello=world',       'right content';
   is_deeply $req->param('hello'), 'world', 'right value';
   is $req->url->to_abs->to_string, 'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
     'right absolute URL';
@@ -117,21 +117,21 @@ subtest 'Parse Apache CGI environment variables and body (file storage)' => sub 
   is $req->content->progress, 6, 'right progress';
   $req->parse('World!');
   ok !$req->content->is_parsing_body, 'is not parsing body';
-  ok $req->content->asset->is_file, 'stored in file';
+  ok $req->content->asset->is_file,   'stored in file';
   is $req->content->progress, 12, 'right progress';
-  ok $req->is_finished, 'request is finished';
+  ok $req->is_finished,            'request is finished';
   ok !$req->content->is_multipart, 'no multipart content';
-  is $req->method, 'POST', 'right method';
-  is $req->url->path, 'foo/bar', 'right path';
-  is $req->url->base->path, '/test/index.cgi/', 'right base path';
-  is $req->url->base->host, 'localhost',        'right base host';
-  is $req->url->base->port, 8080,               'right base port';
-  is $req->url->query, 'lalala=23&bar=baz', 'right query';
-  is $req->version, '1.1', 'right version';
-  is $req->headers->dnt,            1,            'right "DNT" value';
-  is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
-  is $req->headers->content_length, 12,           'right "Content-Length" value';
-  is $req->body, 'Hello World!', 'right content';
+  is $req->method,                  'POST',              'right method';
+  is $req->url->path,               'foo/bar',           'right path';
+  is $req->url->base->path,         '/test/index.cgi/',  'right base path';
+  is $req->url->base->host,         'localhost',         'right base host';
+  is $req->url->base->port,         8080,                'right base port';
+  is $req->url->query,              'lalala=23&bar=baz', 'right query';
+  is $req->version,                 '1.1',               'right version';
+  is $req->headers->dnt,            1,                   'right "DNT" value';
+  is $req->headers->content_type,   'text/plain',        'right "Content-Type" value';
+  is $req->headers->content_length, 12,                  'right "Content-Length" value';
+  is $req->body,                    'Hello World!',      'right content';
   is $req->url->to_abs->to_string, 'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
     'right absolute URL';
 };
@@ -153,22 +153,22 @@ subtest 'Parse Apache CGI environment variables with basic authentication' => su
   });
   $req->parse('hello=world');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'POST', 'right method';
-  is $req->url->path, 'foo/bar', 'right path';
-  is $req->url->base->path, '/test/index.cgi/', 'right base path';
-  is $req->url->base->host, 'localhost',        'right base host';
-  is $req->url->base->port, 8080,               'right base port';
-  is $req->url->query, 'lalala=23&bar=baz', 'right query';
-  is $req->version, '1.0', 'right version';
-  is $req->headers->dnt, 1, 'right "DNT" value';
-  is $req->body, 'hello=world', 'right content';
+  is $req->method,          'POST',              'right method';
+  is $req->url->path,       'foo/bar',           'right path';
+  is $req->url->base->path, '/test/index.cgi/',  'right base path';
+  is $req->url->base->host, 'localhost',         'right base host';
+  is $req->url->base->port, 8080,                'right base port';
+  is $req->url->query,      'lalala=23&bar=baz', 'right query';
+  is $req->version,         '1.0',               'right version';
+  is $req->headers->dnt,    1,                   'right "DNT" value';
+  is $req->body,            'hello=world',       'right content';
   is_deeply $req->param('hello'), 'world', 'right value';
   is $req->url->to_abs->to_string, 'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
     'right absolute URL';
-  is $req->url->base, 'http://localhost:8080/test/index.cgi/', 'right base URL';
-  is $req->url->base->userinfo, 'Aladdin:open sesame', 'right userinfo';
-  is $req->url, 'foo/bar?lalala=23&bar=baz', 'right URL';
-  is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
+  is $req->url->base,           'http://localhost:8080/test/index.cgi/', 'right base URL';
+  is $req->url->base->userinfo, 'Aladdin:open sesame',                   'right userinfo';
+  is $req->url,                 'foo/bar?lalala=23&bar=baz',             'right URL';
+  is $req->proxy->userinfo,     'Aladdin:open sesame',                   'right proxy userinfo';
 };
 
 subtest 'Parse Apache 2.2 (win32) CGI environment variables and body' => sub {
@@ -190,12 +190,12 @@ subtest 'Parse Apache 2.2 (win32) CGI environment variables and body' => sub {
     SERVER_PROTOCOL => 'HTTP/1.1'
   });
   ok !$finished, 'not finished';
-  ok $progress, 'made progress';
+  ok $progress,  'made progress';
   $progress = 0;
   is $req->content->progress, 0, 'right progress';
   $req->parse('request=&ajax=true&login=test&password=111&');
   ok !$finished, 'not finished';
-  ok $progress, 'made progress';
+  ok $progress,  'made progress';
   $progress = 0;
   is $req->content->progress, 43, 'right progress';
   $req->parse('edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
@@ -203,8 +203,8 @@ subtest 'Parse Apache 2.2 (win32) CGI environment variables and body' => sub {
   ok $progress, 'made progress';
   is $req->content->progress, 87, 'right progress';
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'POST', 'right method';
-  is $req->url->path, '', 'no path';
+  is $req->method,          'POST',       'right method';
+  is $req->url->path,       '',           'no path';
   is $req->url->base->path, '/index.pl/', 'right base path';
   is $req->url->base->host, 'test1',      'right base host';
   is $req->url->base->port, undef,        'no base port';
@@ -212,11 +212,11 @@ subtest 'Parse Apache 2.2 (win32) CGI environment variables and body' => sub {
   is $req->version, '1.1', 'right version';
   is $req->body, 'request=&ajax=true&login=test&password=111&' . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
     'right content';
-  is $req->param('ajax'),     'true',                                 'right value';
-  is $req->param('login'),    'test',                                 'right value';
-  is $req->param('password'), '111',                                  'right value';
-  is $req->param('edition'),  'db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right value';
-  is $req->url->to_abs->to_string, 'http://test1/index.pl/', 'right absolute URL';
+  is $req->param('ajax'),          'true',                                 'right value';
+  is $req->param('login'),         'test',                                 'right value';
+  is $req->param('password'),      '111',                                  'right value';
+  is $req->param('edition'),       'db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right value';
+  is $req->url->to_abs->to_string, 'http://test1/index.pl/',               'right absolute URL';
 };
 
 subtest 'Parse Apache 2.2 (win32) CGI environment variables and body' => sub {
@@ -234,8 +234,8 @@ subtest 'Parse Apache 2.2 (win32) CGI environment variables and body' => sub {
   $req->parse('request=&ajax=true&login=test&password=111&');
   $req->parse('edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'POST', 'right method';
-  is $req->url->path, '', 'no path';
+  is $req->method,          'POST',       'right method';
+  is $req->url->path,       '',           'no path';
   is $req->url->base->path, '/index.pl/', 'right base path';
   is $req->url->base->host, 'test1',      'right base host';
   is $req->url->base->port, undef,        'no base port';
@@ -243,11 +243,11 @@ subtest 'Parse Apache 2.2 (win32) CGI environment variables and body' => sub {
   is $req->version, '1.1', 'right version';
   is $req->body, 'request=&ajax=true&login=test&password=111&' . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
     'right content';
-  is $req->param('ajax'),     'true',                                 'right value';
-  is $req->param('login'),    'test',                                 'right value';
-  is $req->param('password'), '111',                                  'right value';
-  is $req->param('edition'),  'db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right value';
-  is $req->url->to_abs->to_string, 'http://test1/index.pl/', 'right absolute URL';
+  is $req->param('ajax'),          'true',                                 'right value';
+  is $req->param('login'),         'test',                                 'right value';
+  is $req->param('password'),      '111',                                  'right value';
+  is $req->param('edition'),       'db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right value';
+  is $req->url->to_abs->to_string, 'http://test1/index.pl/',               'right absolute URL';
 };
 
 subtest 'Parse Apache 2.2.14 CGI environment variables and body (root)' => sub {
@@ -279,12 +279,12 @@ subtest 'Parse Apache 2.2.14 CGI environment variables and body (root)' => sub {
   });
   $req->parse('hello=world');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'POST', 'right method';
+  is $req->method,          'POST',      'right method';
   is $req->url->base->host, '127.0.0.1', 'right base host';
   is $req->url->base->port, 13028,       'right base port';
-  is $req->url->path, '', 'no path';
-  is $req->url->base->path, '/upload/', 'right base path';
-  is $req->version, '1.1', 'right version';
+  is $req->url->path,       '',          'no path';
+  is $req->url->base->path, '/upload/',  'right base path';
+  is $req->version,         '1.1',       'right version';
   ok !$req->is_secure, 'not secure';
   is $req->body, 'hello=world', 'right content';
   is_deeply $req->param('hello'), 'world', 'right parameters';
@@ -306,13 +306,13 @@ subtest 'Parse Apache 2.2.11 CGI environment variables and body (HTTPS=ON)' => s
   });
   $req->parse('hello=world');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'GET', 'right method';
-  is $req->url->base->host, 'localhost', 'right base host';
-  is $req->url->path, 'foo/bar', 'right path';
+  is $req->method,          'GET',              'right method';
+  is $req->url->base->host, 'localhost',        'right base host';
+  is $req->url->path,       'foo/bar',          'right path';
   is $req->url->base->path, '/test/index.cgi/', 'right base path';
-  is $req->version,   '1.0', 'right version';
+  is $req->version,         '1.0',              'right version';
   ok $req->is_secure, 'is secure';
-  is $req->body,      'hello=world', 'right content';
+  is $req->body, 'hello=world', 'right content';
   is_deeply $req->param('hello'), 'world', 'right parameters';
   is $req->url->to_abs->to_string, 'https://localhost/test/index.cgi/foo/bar', 'right absolute URL';
 };
@@ -331,12 +331,12 @@ subtest 'Parse Apache 2.2.11 CGI environment variables and body (trailing slash)
   });
   $req->parse('hello=world');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'GET', 'right method';
-  is $req->url->base->host, 'localhost', 'right base host';
-  is $req->url->path, 'foo/bar/', 'right path';
+  is $req->method,          'GET',              'right method';
+  is $req->url->base->host, 'localhost',        'right base host';
+  is $req->url->path,       'foo/bar/',         'right path';
   is $req->url->base->path, '/test/index.cgi/', 'right base path';
-  is $req->version, '1.0',         'right version';
-  is $req->body,    'hello=world', 'right content';
+  is $req->version,         '1.0',              'right version';
+  is $req->body,            'hello=world',      'right content';
   is_deeply $req->param('hello'), 'world', 'right parameters';
   is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar/', 'right absolute URL';
 };
@@ -354,12 +354,12 @@ subtest 'Parse Apache 2.2.11 CGI environment variables and body (no SCRIPT_NAME)
   });
   $req->parse('hello=world');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'GET', 'right method';
-  is $req->url->base->host, 'localhost', 'right base host';
-  is $req->url->path, '/foo/bar', 'right path';
-  is $req->url->base->path, '', 'no base path';
-  is $req->version, '1.0',         'right version';
-  is $req->body,    'hello=world', 'right content';
+  is $req->method,          'GET',         'right method';
+  is $req->url->base->host, 'localhost',   'right base host';
+  is $req->url->path,       '/foo/bar',    'right path';
+  is $req->url->base->path, '',            'no base path';
+  is $req->version,         '1.0',         'right version';
+  is $req->body,            'hello=world', 'right content';
   is_deeply $req->param('hello'), 'world', 'right parameters';
   is $req->url->to_abs->to_string, 'http://localhost/foo/bar', 'right absolute URL';
 };
@@ -377,12 +377,12 @@ subtest 'Parse Apache 2.2.11 CGI environment variables and body (no PATH_INFO)' 
   });
   $req->parse('hello=world');
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'GET', 'right method';
-  is $req->url->base->host, 'localhost', 'right base host';
-  is $req->url->path, '', 'no path';
+  is $req->method,          'GET',              'right method';
+  is $req->url->base->host, 'localhost',        'right base host';
+  is $req->url->path,       '',                 'no path';
   is $req->url->base->path, '/test/index.cgi/', 'right base path';
-  is $req->version, '1.0',         'right version';
-  is $req->body,    'hello=world', 'right content';
+  is $req->version,         '1.0',              'right version';
+  is $req->body,            'hello=world',      'right content';
   is_deeply $req->param('hello'), 'world', 'right parameters';
   is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/', 'right absolute URL';
 };
@@ -399,11 +399,11 @@ subtest 'Parse Apache 2.2.9 CGI environment variables (root without PATH_INFO)' 
     SERVER_PROTOCOL => 'HTTP/1.1',
   });
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'GET', 'right method';
-  is $req->url->base->host, 'getmyapp.org', 'right base host';
-  is $req->url->path, '', 'no path';
-  is $req->url->base->path, '/cgi-bin/myapp/myapp.pl/', 'right base path';
-  is $req->version, '1.1', 'right version';
+  is $req->method,                 'GET',                                         'right method';
+  is $req->url->base->host,        'getmyapp.org',                                'right base host';
+  is $req->url->path,              '',                                            'no path';
+  is $req->url->base->path,        '/cgi-bin/myapp/myapp.pl/',                    'right base path';
+  is $req->version,                '1.1',                                         'right version';
   is $req->url->to_abs->to_string, 'http://getmyapp.org/cgi-bin/myapp/myapp.pl/', 'right absolute URL';
 };
 
@@ -446,13 +446,13 @@ subtest 'Parse Apache mod_fastcgi CGI environment variables (multipart file uplo
   is $req->content->progress, 128, 'right progress';
   $req->parse("\x0d\x0a--8jXGX--");
   is $req->content->progress, 139, 'right progress';
-  ok $req->is_finished, 'request is finished';
+  ok $req->is_finished,           'request is finished';
   ok $req->content->is_multipart, 'multipart content';
-  is $req->method, 'POST', 'right method';
-  is $req->url->base->host, '127.0.0.1', 'right base host';
-  is $req->url->path, '/upload', 'right path';
-  is $req->url->base->path, '', 'no base path';
-  is $req->version, '1.1', 'right version';
+  is $req->method,                 'POST',                          'right method';
+  is $req->url->base->host,        '127.0.0.1',                     'right base host';
+  is $req->url->path,              '/upload',                       'right path';
+  is $req->url->base->path,        '',                              'no base path';
+  is $req->version,                '1.1',                           'right version';
   is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload', 'right absolute URL';
   my $file = $req->upload('file');
   is $file->filename, 'file.txt',    'right filename';
@@ -473,8 +473,8 @@ subtest 'Parse IIS 7.5 like CGI environment (HTTPS=off)' => sub {
     SERVER_PROTOCOL => 'HTTP/1.1'
   });
   ok $req->is_finished, 'request is finished';
-  is $req->method, 'GET', 'right method';
-  is $req->url->path, '', 'right URL';
+  is $req->method,              'GET',        'right method';
+  is $req->url->path,           '',           'right URL';
   is $req->url->base->protocol, 'http',       'right base protocol';
   is $req->url->base->path,     '/index.pl/', 'right base path';
   is $req->url->base->host,     'test',       'right base host';

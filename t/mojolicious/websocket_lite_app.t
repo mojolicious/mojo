@@ -247,14 +247,14 @@ subtest "Huge message that doesn't compress very well" => sub {
 
 subtest 'Protocol negotiation' => sub {
   $t->websocket_ok('/protocols' => ['bar'])->message_ok->message_is('bar')->message_ok->message_is('bar')->finish_ok;
-  is $t->tx->protocol, 'bar', 'right protocol';
+  is $t->tx->protocol,                             'bar', 'right protocol';
   is $t->tx->res->headers->sec_websocket_protocol, 'bar', 'right "Sec-WebSocket-Protocol" value';
   $t->websocket_ok('/protocols' => ['baz', 'bar', 'foo'])->message_ok->message_is('foo')->message_ok->message_is('foo')
     ->finish_ok;
-  is $t->tx->protocol, 'foo', 'right protocol';
+  is $t->tx->protocol,                             'foo', 'right protocol';
   is $t->tx->res->headers->sec_websocket_protocol, 'foo', 'right "Sec-WebSocket-Protocol" value';
   $t->websocket_ok('/protocols' => ['0'])->message_ok->message_is('0')->message_ok->message_is('0')->finish_ok;
-  is $t->tx->protocol, '0', 'right protocol';
+  is $t->tx->protocol,                             '0', 'right protocol';
   is $t->tx->res->headers->sec_websocket_protocol, '0', 'right "Sec-WebSocket-Protocol" value';
   $t->websocket_ok('/protocols' => [''])->message_ok->message_is('none')->message_ok->message_is('none')->finish_ok;
   is $t->tx->protocol, undef, 'no protocol';

@@ -13,13 +13,13 @@ subtest 'Resolved' => sub {
   $promise->resolve('hello', 'world');
   Mojo::IOLoop->one_tick;
   is_deeply \@results, ['hello', 'world'], 'promise resolved';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],                 'promise not rejected';
 
   $promise = Mojo::Promise->resolve('test');
   $promise->then(sub { @results = @_ }, sub { @errors = @_ });
   Mojo::IOLoop->one_tick;
   is_deeply \@results, ['test'], 'promise resolved';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],       'promise not rejected';
 };
 
 subtest 'Already resolved' => sub {
@@ -28,7 +28,7 @@ subtest 'Already resolved' => sub {
   $promise->then(sub { @results = @_ }, sub { @errors = @_ });
   Mojo::IOLoop->one_tick;
   is_deeply \@results, ['early'], 'promise resolved';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],        'promise not rejected';
 };
 
 subtest 'Resolved with finally' => sub {
@@ -46,14 +46,14 @@ subtest 'Rejected' => sub {
   $promise->then(sub { @results = @_ }, sub { @errors = @_ });
   $promise->reject('bye', 'world');
   Mojo::IOLoop->one_tick;
-  is_deeply \@results, [], 'promise not resolved';
-  is_deeply \@errors, ['bye', 'world'], 'promise rejected';
+  is_deeply \@results, [],               'promise not resolved';
+  is_deeply \@errors,  ['bye', 'world'], 'promise rejected';
 
   $promise = Mojo::Promise->reject('test');
   $promise->then(sub { @results = @_ }, sub { @errors = @_ });
   Mojo::IOLoop->one_tick;
-  is_deeply \@results, [], 'promise not resolved';
-  is_deeply \@errors, ['test'], 'promise rejected';
+  is_deeply \@results, [],       'promise not resolved';
+  is_deeply \@errors,  ['test'], 'promise rejected';
 };
 
 subtest 'Rejected early' => sub {
@@ -61,8 +61,8 @@ subtest 'Rejected early' => sub {
   my (@results, @errors);
   $promise->then(sub { @results = @_ }, sub { @errors = @_ });
   Mojo::IOLoop->one_tick;
-  is_deeply \@results, [], 'promise not resolved';
-  is_deeply \@errors, ['early'], 'promise rejected';
+  is_deeply \@results, [],        'promise not resolved';
+  is_deeply \@errors,  ['early'], 'promise rejected';
 };
 
 subtest 'Rejected with finally' => sub {
@@ -82,7 +82,7 @@ subtest 'Wrap' => sub {
   });
   $promise->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
   is_deeply \@results, ['resolved', '!'], 'promise resolved';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],                'promise not rejected';
 
   (@results, @errors) = ();
   $promise = Mojo::Promise->new(sub {
@@ -90,8 +90,8 @@ subtest 'Wrap' => sub {
     Mojo::IOLoop->timer(0 => sub { $reject->('rejected', '!') });
   });
   $promise->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
-  is_deeply \@results, [], 'promise not resolved';
-  is_deeply \@errors, ['rejected', '!'], 'promise rejected';
+  is_deeply \@results, [],                'promise not resolved';
+  is_deeply \@errors,  ['rejected', '!'], 'promise rejected';
 };
 
 subtest 'No state change' => sub {
@@ -101,7 +101,7 @@ subtest 'No state change' => sub {
   $promise->resolve('pass')->reject('fail')->resolve('fail');
   Mojo::IOLoop->one_tick;
   is_deeply \@results, ['pass'], 'promise resolved';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],       'promise not rejected';
 };
 
 subtest 'Resolved chained' => sub {
@@ -197,8 +197,8 @@ subtest 'Promise returned by finally (rejected)' => sub {
   })->then(sub { @results = @_ }, sub { @errors = @_ });
   $promise->resolve('failed');
   $promise3->wait;
-  is_deeply \@results, [], 'promises not resolved';
-  is_deeply \@errors, ['works'], 'promises rejected';
+  is_deeply \@results, [],        'promises not resolved';
+  is_deeply \@errors,  ['works'], 'promises rejected';
 };
 
 subtest 'Exception in finally' => sub {
@@ -220,7 +220,7 @@ subtest 'Clone' => sub {
   is $loop, $promise2->ioloop, 'same loop';
   $loop->one_tick;
   is_deeply \@results, ['success'], 'promise resolved';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],          'promise not rejected';
 };
 
 subtest 'Exception in chain' => sub {
@@ -230,8 +230,8 @@ subtest 'Exception in chain' => sub {
     ->catch(sub { @errors = @_ });
   $promise->resolve('works');
   Mojo::IOLoop->one_tick;
-  is_deeply \@results, [], 'promises not resolved';
-  is_deeply \@errors, ["test: works\n"], 'promises rejected';
+  is_deeply \@results, [],                'promises not resolved';
+  is_deeply \@errors,  ["test: works\n"], 'promises rejected';
 };
 
 subtest 'Race' => sub {
@@ -257,8 +257,8 @@ subtest 'Rejected race' => sub {
   $promise3->resolve('third');
   $promise->resolve('first');
   Mojo::IOLoop->one_tick;
-  is_deeply \@results, [], 'promises not resolved';
-  is_deeply \@errors, ['second'], 'promise rejected';
+  is_deeply \@results, [],         'promises not resolved';
+  is_deeply \@errors,  ['second'], 'promise rejected';
 };
 
 subtest 'Any' => sub {
@@ -284,8 +284,8 @@ subtest 'Any (all rejections)' => sub {
   $promise3->reject('third');
   $promise->reject('first');
   Mojo::IOLoop->one_tick;
-  is_deeply \@results, [], 'promises not resolved';
-  is_deeply \@errors, [['first'], ['second'], ['third']], 'promises rejected';
+  is_deeply \@results, [],                                 'promises not resolved';
+  is_deeply \@errors,  [['first'], ['second'], ['third']], 'promises rejected';
 };
 
 subtest 'Timeout' => sub {
@@ -294,8 +294,8 @@ subtest 'Timeout' => sub {
   my $promise2 = Mojo::Promise->new->timeout(0.025 => 'Timeout2');
   my $promise3
     = Mojo::Promise->race($promise, $promise2)->then(sub { @results = @_ })->catch(sub { @errors = @_ })->wait;
-  is_deeply \@results, [], 'promises not resolved';
-  is_deeply \@errors, ['Timeout2'], 'promise rejected';
+  is_deeply \@results, [],           'promises not resolved';
+  is_deeply \@errors,  ['Timeout2'], 'promise rejected';
 };
 
 subtest 'Timeout with default message' => sub {
@@ -339,8 +339,8 @@ subtest 'Rejected all' => sub {
   $promise3->reject('third');
   $promise->resolve('first');
   Mojo::IOLoop->one_tick;
-  is_deeply \@results, [], 'promises not resolved';
-  is_deeply \@errors, ['third'], 'promise rejected';
+  is_deeply \@results, [],        'promises not resolved';
+  is_deeply \@errors,  ['third'], 'promise rejected';
 };
 
 subtest 'All settled' => sub {
@@ -394,8 +394,8 @@ subtest 'Settle with promise' => sub {
   $promise2 = Mojo::Promise->new->reject($promise)->catch(sub { push @errors, 'first', @_; () });
   $promise2->then(sub { push @results, 'second', @_ });
   Mojo::IOLoop->one_tick;
-  is_deeply \@errors, ['first', $promise], 'promises rejected';
-  is_deeply \@results, ['second'], 'promises resolved';
+  is_deeply \@errors,  ['first', $promise], 'promises rejected';
+  is_deeply \@results, ['second'],          'promises resolved';
   $promise->catch(sub { });
 };
 
@@ -426,17 +426,17 @@ subtest 'Warnings' => sub {
   local $SIG{__WARN__} = sub { push @warn, shift };
   Mojo::Promise->reject('one');
   like $warn[0], qr/Unhandled rejected promise: one/, 'unhandled';
-  is $warn[1],   undef,                               'no more warnings';
+  is $warn[1], undef, 'no more warnings';
 
   @warn = ();
   Mojo::Promise->reject('two')->then(sub { })->wait;
   like $warn[0], qr/Unhandled rejected promise: two/, 'unhandled';
-  is $warn[1],   undef,                               'no more warnings';
+  is $warn[1], undef, 'no more warnings';
 
   @warn = ();
   Mojo::Promise->reject('three')->finally(sub { })->wait;
   like $warn[0], qr/Unhandled rejected promise: three/, 'unhandled';
-  is $warn[1],   undef,                                 'no more warnings';
+  is $warn[1], undef, 'no more warnings';
 
   @warn = ();
   my $promise = Mojo::Promise->new;
@@ -445,7 +445,7 @@ subtest 'Warnings' => sub {
   is $warn[0], undef, 'no warnings';
   undef $promise;
   like $warn[0], qr/Unhandled rejected promise: four/, 'unhandled';
-  is $warn[1],   undef,                                'no more warnings';
+  is $warn[1], undef, 'no more warnings';
 };
 
 subtest 'Warnings (multiple branches)' => sub {
@@ -467,7 +467,7 @@ subtest 'Warnings (multiple branches)' => sub {
   $promise->wait;
   is_deeply \@errors, ['branches2'], 'promise rejected';
   like $warn[0], qr/Unhandled rejected promise: branches2/, 'unhandled';
-  is $warn[1],   undef,                                     'no more warnings';
+  is $warn[1], undef, 'no more warnings';
 
   @warn    = ();
   $promise = Mojo::Promise->new;
@@ -477,7 +477,7 @@ subtest 'Warnings (multiple branches)' => sub {
   $promise->wait;
   like $warn[0], qr/Unhandled rejected promise: branches3/, 'unhandled';
   like $warn[1], qr/Unhandled rejected promise: branches3/, 'unhandled';
-  is $warn[2],   undef,                                     'no more warnings';
+  is $warn[2], undef, 'no more warnings';
 };
 
 subtest 'Map' => sub {
@@ -487,7 +487,7 @@ subtest 'Map' => sub {
   is_deeply \@started, [1, 2, 3, 4, 5], 'all started without concurrency';
   $promise->wait;
   is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],                        'promise not rejected';
 };
 
 subtest 'Map (with concurrency limit)' => sub {
@@ -506,7 +506,7 @@ subtest 'Map (with concurrency limit)' => sub {
     1 .. 7
   )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
   is_deeply \@results, [[1], [2], [3], [4], [5], [6], [7]], 'correct result';
-  is_deeply \@errors, [], 'promise not rejected';
+  is_deeply \@errors,  [],                                  'promise not rejected';
 };
 
 subtest 'Map (with reject)' => sub {
@@ -520,8 +520,8 @@ subtest 'Map (with reject)' => sub {
     },
     1 .. 5
   )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
-  is_deeply \@results, [], 'promise not resolved';
-  is_deeply \@errors,  [1], 'correct errors';
+  is_deeply \@results, [],        'promise not resolved';
+  is_deeply \@errors,  [1],       'correct errors';
   is_deeply \@started, [1, 2, 3], 'only initial batch started';
 };
 
@@ -529,7 +529,7 @@ subtest 'Map (custom event loop)' => sub {
   my $ok;
   my $loop    = Mojo::IOLoop->new;
   my $promise = Mojo::Promise->map(sub { Mojo::Promise->new->ioloop($loop)->resolve }, 1);
-  is $promise->ioloop, $loop, 'same loop';
+  is $promise->ioloop,   $loop,                   'same loop';
   isnt $promise->ioloop, Mojo::IOLoop->singleton, 'not the singleton';
   $promise->then(sub { $ok = 1; $loop->stop });
   $loop->start;

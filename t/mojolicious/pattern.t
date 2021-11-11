@@ -25,7 +25,7 @@ $pattern->defaults({name => 'foo'});
 is_deeply $pattern->match('/test123',    1), {name => 'foo'}, 'right structure';
 is_deeply $pattern->match('/testbar123', 1), {name => 'bar'}, 'right structure';
 ok !$pattern->match('/test/123'), 'no result';
-is $pattern->render, '/testfoo123', 'right result';
+is $pattern->render,                  '/testfoo123', 'right result';
 is $pattern->render({name => 'bar'}), '/testbar123', 'right result';
 $pattern->defaults({name => ''});
 is_deeply $pattern->match('/test123', 1), {name => ''}, 'right structure';
@@ -35,7 +35,7 @@ $pattern->defaults({name => 'foo'});
 is_deeply $pattern->match('/test/123',     1), {name => 'foo'}, 'right structure';
 is_deeply $pattern->match('/test/bar/123', 1), {name => 'bar'}, 'right structure';
 ok !$pattern->match('/test'), 'no result';
-is $pattern->render, '/test/foo/123', 'right result';
+is $pattern->render,                  '/test/foo/123', 'right result';
 is $pattern->render({name => 'bar'}), '/test/bar/123', 'right result';
 
 # Multiple optional placeholders in the middle
@@ -46,8 +46,8 @@ is_deeply $pattern->match('/test/c/123/456',   1), {a => 'c', b => 'b'}, 'right 
 is_deeply $pattern->match('/test/123/c/456',   1), {a => 'a', b => 'c'}, 'right structure';
 is_deeply $pattern->match('/test/c/123/d/456', 1), {a => 'c', b => 'd'}, 'right structure';
 is $pattern->render, '/test/a/123/b/456', 'right result';
-is $pattern->render({a => 'c'}), '/test/c/123/b/456', 'right result';
-is $pattern->render({b => 'c'}), '/test/a/123/c/456', 'right result';
+is $pattern->render({a => 'c'}),           '/test/c/123/b/456', 'right result';
+is $pattern->render({b => 'c'}),           '/test/a/123/c/456', 'right result';
 is $pattern->render({a => 'c', b => 'd'}), '/test/c/123/d/456', 'right result';
 
 # Root
@@ -56,7 +56,7 @@ is $pattern->unparsed, undef, 'slash has been optimized away';
 $pattern->defaults({action => 'index'});
 ok !$pattern->match('/test/foo/bar'), 'no result';
 is_deeply $pattern->match('/'), {action => 'index'}, 'right structure';
-is $pattern->render, '', 'right result';
+is $pattern->render,                       '',     'right result';
 is $pattern->render({format => 'txt'}, 1), '.txt', 'right result';
 
 # Regex in pattern
@@ -65,7 +65,7 @@ $pattern->defaults({action => 'index', id => 1});
 is_deeply $pattern->match('/test/foo/bar/203'), {controller => 'foo', action => 'bar', id => 203}, 'right structure';
 ok !$pattern->match('/test/foo/bar/baz'), 'no result';
 is $pattern->render({controller => 'zzz', action => 'index', id => 13}), '/test/zzz/index/13', 'right result';
-is $pattern->render({controller => 'zzz'}), '/test/zzz', 'right result';
+is $pattern->render({controller => 'zzz'}),                              '/test/zzz',          'right result';
 
 # Quoted placeholders
 $pattern = Mojolicious::Routes::Pattern->new('/<:controller>test/<action>');
@@ -80,7 +80,7 @@ is_deeply $pattern->match('/test/foo.bar/baz'), {controller => 'foo.bar', action
 is $pattern->render({controller => 'foo.bar', action => 'baz'}), '/test/foo.bar/baz', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('/test/<#groovy>');
 is_deeply $pattern->match('/test/foo.bar'), {groovy => 'foo.bar'}, 'right structure';
-is $pattern->defaults->{format}, undef, 'no value';
+is $pattern->defaults->{format},            undef,           'no value';
 is $pattern->render({groovy => 'foo.bar'}), '/test/foo.bar', 'right result';
 
 # Wildcard
@@ -142,9 +142,9 @@ ok !$pattern->match('/test'),     'no result';
 # Formats without detection
 $pattern = Mojolicious::Routes::Pattern->new('/test');
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex, 'no regex';
+ok !$pattern->regex,              'no regex';
 ok !$pattern->match('/test.xml'), 'no result';
-ok $pattern->regex, 'regex has been compiled on demand';
+ok $pattern->regex,               'regex has been compiled on demand';
 is_deeply $pattern->match('/test'), {action => 'index'}, 'right structure';
 
 # Format detection disabled
@@ -152,7 +152,7 @@ $pattern = Mojolicious::Routes::Pattern->new('/test', format => 0);
 $pattern->defaults({action => 'index'});
 ok !$pattern->regex, 'no regex';
 is_deeply $pattern->match('/test', 1), {action => 'index'}, 'right structure';
-ok $pattern->regex, 'regex has been compiled on demand';
+ok $pattern->regex,                  'regex has been compiled on demand';
 ok !$pattern->match('/test.xml', 1), 'no result';
 
 # Special pattern for disabling format detection
@@ -177,7 +177,7 @@ $pattern->defaults({action => 'index', format => 'html'});
 $pattern->constraints({format => ['txt']});
 $result = $pattern->match('/foo/v1.0.txt', 1);
 is_deeply $result, {test => 'foo', action => 'index', format => 'txt'}, 'right structure';
-is $pattern->render($result), '/foo/v1.0', 'right result';
+is $pattern->render($result),    '/foo/v1.0',     'right result';
 is $pattern->render($result, 1), '/foo/v1.0.txt', 'right result';
 ok !$pattern->match('/foo/v2.0', 1), 'no result';
 

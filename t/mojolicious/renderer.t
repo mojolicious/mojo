@@ -67,14 +67,14 @@ $first->app->helper('myapp.multi_level.test' => sub {'works!'});
 ok $first->app->renderer->get_helper('myapp'),                  'found helper';
 ok $first->app->renderer->get_helper('myapp.multi_level'),      'found helper';
 ok $first->app->renderer->get_helper('myapp.multi_level.test'), 'found helper';
-is $first->myapp->multi_level->test, 'works!', 'right result';
+is $first->myapp->multi_level->test,          'works!', 'right result';
 is $first->helpers->myapp->multi_level->test, 'works!', 'right result';
 $first->app->helper('myapp.defaults' => sub { shift->app->defaults(@_) });
 ok $first->app->renderer->get_helper('myapp.defaults'), 'found helper';
-is $first->app->renderer->get_helper('myap.'),          undef, 'no helper';
-is $first->app->renderer->get_helper('yapp'),           undef, 'no helper';
+is $first->app->renderer->get_helper('myap.'), undef, 'no helper';
+is $first->app->renderer->get_helper('yapp'),  undef, 'no helper';
 $first->myapp->defaults(foo => 'bar');
-is $first->myapp->defaults('foo'), 'bar', 'right result';
+is $first->myapp->defaults('foo'),          'bar', 'right result';
 is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
 is $first->app->myapp->defaults('foo'),     'bar', 'right result';
 my $app2   = Mojolicious->new(secrets => ['works']);
@@ -84,11 +84,11 @@ is $second->app->renderer->get_helper('myapp'),          undef, 'no helper';
 is $second->app->renderer->get_helper('myapp.defaults'), undef, 'no helper';
 $second->app->helper('myapp.defaults' => sub {'nothing'});
 my $myapp = $first->myapp;
-is $first->myapp->defaults('foo'),  'bar',     'right result';
-is $second->myapp->defaults('foo'), 'nothing', 'right result';
+is $first->myapp->defaults('foo'),           'bar',     'right result';
+is $second->myapp->defaults('foo'),          'nothing', 'right result';
 is $second->helpers->myapp->defaults('foo'), 'nothing', 'right result';
-is $first->myapp->defaults('foo'), 'bar', 'right result';
-is $first->helpers->myapp->defaults('foo'), 'bar', 'right result';
+is $first->myapp->defaults('foo'),           'bar',     'right result';
+is $first->helpers->myapp->defaults('foo'),  'bar',     'right result';
 
 # Reuse proxy objects
 my $helpers = $first->helpers;
@@ -112,13 +112,13 @@ $renderer->respond($c, $output, 'html');
 is $c->res->headers->content_type,     'text/html;charset=UTF-8', 'right "Content-Type" value';
 is $c->res->headers->vary,             'Accept-Encoding',         'right "Vary" value';
 is $c->res->headers->content_encoding, 'gzip',                    'right "Content-Encoding" value';
-isnt $c->res->body, $output, 'different string';
-is gunzip($c->res->body), $output, 'same string';
+isnt $c->res->body,                    $output,                   'different string';
+is gunzip($c->res->body),              $output,                   'same string';
 
 # Compression (not requested)
 $c = $app->build_controller;
 $renderer->respond($c, $output, 'html');
-is $c->res->code, 200, 'right status';
+is $c->res->code,                  200,                       'right status';
 is $c->res->headers->content_type, 'text/html;charset=UTF-8', 'right "Content-Type" value';
 is $c->res->headers->vary,         'Accept-Encoding',         'right "Vary" value';
 ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
@@ -128,11 +128,11 @@ is $c->res->body, $output, 'same string';
 $c = $app->build_controller;
 $c->res->headers->content_encoding('whatever');
 $renderer->respond($c, $output, 'html', 500);
-is $c->res->code, 500, 'right status';
+is $c->res->code,                      500,                       'right status';
 is $c->res->headers->content_type,     'text/html;charset=UTF-8', 'right "Content-Type" value';
 is $c->res->headers->vary,             'Accept-Encoding',         'right "Vary" value';
 is $c->res->headers->content_encoding, 'whatever',                'right "Content-Encoding" value';
-is $c->res->body, $output, 'same string';
+is $c->res->body,                      $output,                   'same string';
 
 # Compression (below minimum length)
 $output = 'a' x 850;

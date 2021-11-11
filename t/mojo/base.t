@@ -74,7 +74,7 @@ subtest 'Instance method' => sub {
 subtest 'Default value defined but false' => sub {
   my $object = Mojo::BaseTestTestTest->new;
   ok defined($object->yada);
-  is $object->yada, 0, 'right attribute value';
+  is $object->yada,          0, 'right attribute value';
   is $object->yada(5)->yada, 5, 'right attribute value';
 };
 
@@ -88,27 +88,27 @@ subtest 'Default value support' => sub {
 
 subtest 'Chained attributes and callback default value support' => sub {
   my $object = Mojo::BaseTest->new;
-  is $object->bar, 2, 'right attribute value';
+  is $object->bar,         2, 'right attribute value';
   is $object->bar(6)->bar, 6, 'right chained attribute value';
-  is $object->baz, 2, 'right attribute value';
+  is $object->baz,         2, 'right attribute value';
   is $object->baz(6)->baz, 6, 'right chained attribute value';
 };
 
 subtest 'Tap into chain' => sub {
   my $object = Mojo::BaseTest->new;
-  is $object->tap(sub { $_->name('foo') })->name, 'foo', 'right attribute value';
+  is $object->tap(sub { $_->name('foo') })->name,          'foo', 'right attribute value';
   is $object->tap(sub { shift->name('bar')->name })->name, 'bar', 'right attribute value';
-  is $object->tap('tests')->tests, 1, 'right attribute value';
-  is $object->more_tests, 2, 'right attribute value';
-  is $object->tap('more_tests')->tests, 3, 'right attribute value';
-  is $object->tap(more_tests => 3)->tests, 6, 'right attribute value';
+  is $object->tap('tests')->tests,                         1,     'right attribute value';
+  is $object->more_tests,                                  2,     'right attribute value';
+  is $object->tap('more_tests')->tests,                    3,     'right attribute value';
+  is $object->tap(more_tests => 3)->tests,                 6,     'right attribute value';
 };
 
 subtest 'Inherit -base flag' => sub {
   my $object = Mojo::BaseTest::Base3->new(test => 1);
-  is $object->test, 1,     'right attribute value';
-  is $object->foo,  undef, 'no attribute value';
-  is $object->foo(3)->foo, 3, 'right attribute value';
+  is $object->test,        1,     'right attribute value';
+  is $object->foo,         undef, 'no attribute value';
+  is $object->foo(3)->foo, 3,     'right attribute value';
 };
 
 subtest 'Exceptions' => sub {
@@ -138,7 +138,7 @@ subtest 'Weaken' => sub {
   ok isweak($weak->six($weak)->{six}), 'weakened value';
   is $weak->six, $weak, 'circular reference';
   $weak = Mojo::BaseTest::Weak3->new(one => 23);
-  is $weak->one, 23, 'right value';
+  is $weak->one,            23, 'right value';
   is $weak->one(24)->one,   24, 'right value';
   is $weak->four(25)->four, 25, 'right value';
 };

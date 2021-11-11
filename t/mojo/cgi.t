@@ -58,11 +58,11 @@ subtest 'Simple' => sub {
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                       'right status';
   is $res->headers->status,         '200 OK',                  'right "Status" value';
   is $res->headers->content_length, 21,                        'right "Content-Length" value';
   is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
-  is $res->body, 'Your Mojo is working!', 'right content';
+  is $res->body,                    'Your Mojo is working!',   'right content';
 };
 
 subtest 'HEAD request' => sub {
@@ -79,11 +79,11 @@ subtest 'HEAD request' => sub {
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                       'right status';
   is $res->headers->status,         '200 OK',                  'right "Status" value';
   is $res->headers->content_length, 21,                        'right "Content-Length" value';
   is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
-  is $res->body, '', 'no content';
+  is $res->body,                    '',                        'no content';
 };
 
 subtest 'Non-parsed headers' => sub {
@@ -100,11 +100,11 @@ subtest 'Non-parsed headers' => sub {
   is(Mojolicious::Command::cgi->new(app => app)->run('--nph'), 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse($msg);
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                       'right status';
   is $res->headers->status,         undef,                     'no "Status" value';
   is $res->headers->content_length, 21,                        'right "Content-Length" value';
   is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
-  is $res->body, 'Your Mojo is working!', 'right content';
+  is $res->body,                    'Your Mojo is working!',   'right content';
 };
 
 subtest 'Chunked' => sub {
@@ -127,9 +127,9 @@ subtest 'Chunked' => sub {
 
   like $msg, qr/chunked/, 'is chunked';
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
-  is $res->headers->status, '200 OK', 'right "Status" value';
-  is $res->body, '1234567', 'right content';
+  is $res->code,            200,       'right status';
+  is $res->headers->status, '200 OK',  'right "Status" value';
+  is $res->body,            '1234567', 'right content';
 };
 
 subtest 'Parameters' => sub {
@@ -147,12 +147,12 @@ subtest 'Parameters' => sub {
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                              'right status';
   is $res->headers->status,         '200 OK',                         'right "Status" value';
   is $res->headers->content_type,   'application/json;charset=UTF-8', 'right "Content-Type" value';
   is $res->headers->content_length, 27,                               'right "Content-Length" value';
-  is $res->json->{lalala}, 23,    'right value';
-  is $res->json->{bar},    'baz', 'right value';
+  is $res->json->{lalala},          23,                               'right value';
+  is $res->json->{bar},             'baz',                            'right value';
 };
 
 subtest 'Binding' => sub {
@@ -176,11 +176,11 @@ subtest 'Binding' => sub {
   );
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                       'right status';
   is $res->headers->status,         '200 OK',                  'right "Status" value';
   is $res->headers->content_length, 21,                        'right "Content-Length" value';
   is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
-  is $res->body, 'Your Mojo is working!', 'right content';
+  is $res->body,                    'Your Mojo is working!',   'right content';
   is_deeply \@server, ['Mojo::Server::CGI', 'development'], 'hook has been emitted once';
 };
 
@@ -201,11 +201,11 @@ subtest 'Reverse proxy' => sub {
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                       'right status';
   is $res->headers->status,         '200 OK',                  'right "Status" value';
   is $res->headers->content_length, 15,                        'right "Content-Length" value';
   is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
-  is $res->body, '192.0.2.1:https', 'right content';
+  is $res->body,                    '192.0.2.1:https',         'right content';
 };
 
 subtest 'Trusted proxies' => sub {
@@ -226,11 +226,11 @@ subtest 'Trusted proxies' => sub {
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                       'right status';
   is $res->headers->status,         '200 OK',                  'right "Status" value';
   is $res->headers->content_length, 17,                        'right "Content-Length" value';
   is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
-  is $res->body, '10.10.10.10:https', 'right content';
+  is $res->body,                    '10.10.10.10:https',       'right content';
 };
 
 subtest 'Trusted proxies (no REMOTE_ADDR)' => sub {
@@ -250,11 +250,11 @@ subtest 'Trusted proxies (no REMOTE_ADDR)' => sub {
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 
   my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
-  is $res->code, 200, 'right status';
+  is $res->code,                    200,                       'right status';
   is $res->headers->status,         '200 OK',                  'right "Status" value';
   is $res->headers->content_length, 5,                         'right "Content-Length" value';
   is $res->headers->content_type,   'text/html;charset=UTF-8', 'right "Content-Type" value';
-  is $res->body, 'https', 'right content';
+  is $res->body,                    'https',                   'right content';
 };
 
 done_testing();

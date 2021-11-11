@@ -16,13 +16,13 @@ subtest 'Application' => sub {
 };
 
 subtest 'Requests' => sub {
-  is g('/')->body, 'GET',     'right content';
-  is h('/')->body, '',        'no content';
-  is o('/')->body, 'OPTIONS', 'right content';
-  is t('/')->body, 'PATCH',   'right content';
-  is p('/')->body, 'POST',    'right content';
-  is u('/')->body, 'PUT',     'right content';
-  is d('/')->body, 'DELETE',  'right content';
+  is g('/')->body,                           'GET',               'right content';
+  is h('/')->body,                           '',                  'no content';
+  is o('/')->body,                           'OPTIONS',           'right content';
+  is t('/')->body,                           'PATCH',             'right content';
+  is p('/')->body,                           'POST',              'right content';
+  is u('/')->body,                           'PUT',               'right content';
+  is d('/')->body,                           'DELETE',            'right content';
   is p('/' => form => {foo => 'bar'})->body, 'POSTfoo=bar',       'right content';
   is p('/' => json => {foo => 'bar'})->body, 'POST{"foo":"bar"}', 'right content';
 };
@@ -65,10 +65,10 @@ subtest 'Benchmark' => sub {
   local *STDERR = $handle;
   my $i = 0;
   n { ++$i };
-  is $i,        1,             'block has been executed once';
+  is $i, 1, 'block has been executed once';
   like $buffer, qr/wallclock/, 'right output';
   n { $i++ } 10;
-  is $i,        11,                        'block has been executed ten times';
+  is $i, 11, 'block has been executed ten times';
   like $buffer, qr/wallclock.*wallclock/s, 'right output';
 };
 

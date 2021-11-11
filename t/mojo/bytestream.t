@@ -111,16 +111,16 @@ subtest 'Nested bytestreams' => sub {
 
 subtest 'split' => sub {
   my $stream = b('1,2,3,4,5');
-  is_deeply $stream->split(',')->to_array,   [1, 2, 3, 4, 5], 'right elements';
-  is_deeply $stream->split(qr/,/)->to_array, [1, 2, 3, 4, 5], 'right elements';
-  is_deeply b('1,2,3,4,5,,,')->split(',')->to_array, [1, 2, 3, 4, 5], 'right elements';
+  is_deeply $stream->split(',')->to_array,               [1, 2, 3, 4, 5],             'right elements';
+  is_deeply $stream->split(qr/,/)->to_array,             [1, 2, 3, 4, 5],             'right elements';
+  is_deeply b('1,2,3,4,5,,,')->split(',')->to_array,     [1, 2, 3, 4, 5],             'right elements';
   is_deeply b('1,2,3,4,5,,,')->split(',', -1)->to_array, [1, 2, 3, 4, 5, '', '', ''], 'right elements';
-  is_deeply b('54321')->split('')->to_array, [5, 4, 3, 2, 1], 'right elements';
-  is_deeply b('')->split('')->to_array,      [], 'no elements';
-  is_deeply b('')->split(',')->to_array,     [], 'no elements';
-  is_deeply b('')->split(qr/,/)->to_array,   [], 'no elements';
+  is_deeply b('54321')->split('')->to_array,             [5, 4, 3, 2, 1],             'right elements';
+  is_deeply b('')->split('')->to_array,                  [],                          'no elements';
+  is_deeply b('')->split(',')->to_array,                 [],                          'no elements';
+  is_deeply b('')->split(qr/,/)->to_array,               [],                          'no elements';
   $stream = b('1/2/3');
-  is $stream->split('/')->map(sub { $_->quote })->join(', '), '"1", "2", "3"', 'right result';
+  is $stream->split('/')->map(sub { $_->quote })->join(', '),    '"1", "2", "3"', 'right result';
   is $stream->split('/')->map(sub { shift->quote })->join(', '), '"1", "2", "3"', 'right result';
 };
 
@@ -138,7 +138,7 @@ subtest 'clone' => sub {
   my $stream = b('foo');
   my $clone  = $stream->clone;
   isnt $stream->b64_encode->to_string, 'foo', 'original changed';
-  is $clone->to_string, 'foo', 'clone did not change';
+  is $clone->to_string,                'foo', 'clone did not change';
 };
 
 subtest 'say and autojoin' => sub {

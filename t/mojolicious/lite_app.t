@@ -33,14 +33,14 @@ helper test_helper  => sub { shift->param(@_) };
 helper test_helper2 => sub { shift->app->controller_class };
 helper test_helper3 => sub { state $cache = {} };
 helper dead         => sub { die $_[1] || 'works!' };
-is app->test_helper('foo'), undef, 'no value yet';
-is app->test_helper2, 'Mojolicious::Controller', 'right value';
+is app->test_helper('foo'), undef,                     'no value yet';
+is app->test_helper2,       'Mojolicious::Controller', 'right value';
 app->test_helper3->{foo} = 'bar';
 is app->test_helper3->{foo}, 'bar', 'right result';
 
 # Nested helpers
 helper 'test.helper' => sub { shift->app->controller_class };
-is app->test->helper, 'Mojolicious::Controller', 'right value';
+is app->test->helper,                   'Mojolicious::Controller', 'right value';
 is app->build_controller->test->helper, 'Mojolicious::Controller', 'right value';
 
 # Test renderer
@@ -469,15 +469,15 @@ get '/timing' => sub {
 my $t = Test::Mojo->new;
 
 # Application is already available
-is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
-is $t->app->moniker,      'lite_app',                'right moniker';
-is $t->app->stash->{default}, 23, 'right value';
-is $t->app, app->build_controller->app->commands->app, 'applications are equal';
-is $t->app->build_controller->req->url, '', 'no URL';
-is $t->app->build_controller->stash->{default}, 23, 'right value';
-is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url, '/foo', 'right URL';
-is $t->app->build_controller->render_to_string('index', handler => 'epl'), 'Just works!', 'right result';
-is $t->app->build_controller->render_to_string(inline => '0'), "0\n", 'right result';
+is $t->app->test_helper2,                       'Mojolicious::Controller',                   'right class';
+is $t->app->moniker,                            'lite_app',                                  'right moniker';
+is $t->app->stash->{default},                   23,                                          'right value';
+is $t->app,                                     app->build_controller->app->commands->app,   'applications are equal';
+is $t->app->build_controller->req->url,         '',                                          'no URL';
+is $t->app->build_controller->stash->{default}, 23,                                          'right value';
+is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url, '/foo',        'right URL';
+is $t->app->build_controller->render_to_string('index', handler => 'epl'),    'Just works!', 'right result';
+is $t->app->build_controller->render_to_string(inline => '0'),                "0\n",         'right result';
 
 # Empty template
 $t->get_ok('/empty')->status_is(200)->content_is('');
@@ -936,7 +936,7 @@ $t->ua->max_redirects(3);
 $t->get_ok('/redirect_twice')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->text_is('div#☃' => 'Redirect works!');
 my $redirects = $t->tx->redirects;
-is scalar @$redirects, 2, 'two redirects';
+is scalar @$redirects,              2,                 'two redirects';
 is $redirects->[0]->req->url->path, '/redirect_twice', 'right path';
 is $redirects->[1]->req->url->path, '/redirect_named', 'right path';
 $t->ua->max_redirects(0);

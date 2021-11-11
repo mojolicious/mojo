@@ -283,8 +283,8 @@ subtest 'Reuse exception' => sub {
   ok !$exception, 'no exception';
   ok !$snapshot,  'no snapshot';
   $t->get_ok('/reuse/exception')->status_is(500)->content_like(qr/Reusable exception/);
-  isa_ok $exception, 'Mojo::Exception',      'right exception';
-  like $exception,   qr/Reusable exception/, 'right message';
+  isa_ok $exception, 'Mojo::Exception', 'right exception';
+  like $exception, qr/Reusable exception/, 'right message';
   is $snapshot->{foo}, 'bar', 'right snapshot value';
   ok !$snapshot->{exception}, 'no exception in snapshot';
 };

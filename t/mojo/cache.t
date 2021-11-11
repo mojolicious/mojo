@@ -27,7 +27,7 @@ subtest 'Basics' => sub {
 
 subtest 'Bigger cache' => sub {
   my $cache = Mojo::Cache->new(max_keys => 3);
-  is $cache->get('foo'), undef, 'no result';
+  is $cache->get('foo'),                    undef, 'no result';
   is $cache->set(foo => 'bar')->get('foo'), 'bar', 'right result';
   $cache->set(bar => 'baz');
   is $cache->get('foo'), 'bar', 'right result';
@@ -45,7 +45,7 @@ subtest 'Bigger cache' => sub {
 
 subtest 'Cache disabled' => sub {
   my $cache = Mojo::Cache->new(max_keys => 0);
-  is $cache->get('foo'), undef, 'no result';
+  is $cache->get('foo'),                    undef, 'no result';
   is $cache->set(foo => 'bar')->get('foo'), undef, 'no result';
 
   $cache = Mojo::Cache->new(max_keys => -1);

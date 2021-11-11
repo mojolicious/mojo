@@ -14,19 +14,19 @@ use lib curfile->sibling('lib')->to_string;
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available
-is $t->app->routes->find('something')->to_string, '/test4/:something', 'right pattern';
+is $t->app->routes->find('something')->to_string,                       '/test4/:something',     'right pattern';
 is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTest2::Foo', 'right namespace';
 is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                   'right controller';
-is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route', 'right class';
-is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes', 'right class';
-is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
-is $t->app->sessions->cookie_path,   '/bar',         'right path';
+is ref $t->app->routes->find('something'),                              'Mojolicious::Routes::Route', 'right class';
+is ref $t->app->routes->find('something')->root,                        'Mojolicious::Routes',        'right class';
+is $t->app->sessions->cookie_domain,                                    '.example.com',               'right domain';
+is $t->app->sessions->cookie_path,                                      '/bar',                       'right path';
 is_deeply $t->app->commands->namespaces,
   ['Mojolicious::Command::Author', 'Mojolicious::Command', 'MojoliciousTest::Command'], 'right namespaces';
-is $t->app, $t->app->commands->app, 'applications are equal';
-is $t->app->static->file('hello.txt')->slurp, "Hello Mojo from a static file!\n", 'right content';
-is $t->app->static->file('does_not_exist.html'), undef, 'no file';
-is $t->app->moniker, 'mojolicious_test', 'right moniker';
+is $t->app,                                      $t->app->commands->app,             'applications are equal';
+is $t->app->static->file('hello.txt')->slurp,    "Hello Mojo from a static file!\n", 'right content';
+is $t->app->static->file('does_not_exist.html'), undef,                              'no file';
+is $t->app->moniker,                             'mojolicious_test',                 'right moniker';
 
 # Remove extra files
 isnt $t->app->static->file('mojo/jquery/jquery.js'), undef, 'found jQuery';

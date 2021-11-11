@@ -154,7 +154,7 @@ subtest 'One-liner' => sub {
   is g('http://mojolicious.org')->code,   200, 'right status';
   my $res = p('https://metacpan.org/search' => form => {q => 'mojolicious'});
   like $res->body, qr/Mojolicious/, 'right content';
-  is $res->code,   200,             'right status';
+  is $res->code, 200, 'right status';
 };
 
 subtest 'Simple request' => sub {
@@ -170,7 +170,7 @@ subtest 'Simple keep-alive requests' => sub {
   is $tx->req->url,    'https://www.wikipedia.org', 'right url';
   is $tx->req->body,   '',                          'no content';
   is $tx->res->code,   200,                         'right status';
-  ok $tx->keep_alive, 'connection will be kept alive';
+  ok $tx->keep_alive,  'connection will be kept alive';
   ok !$tx->kept_alive, 'connection was not kept alive';
   $tx = $ua->get('https://www.wikipedia.org');
   is $tx->req->method, 'GET',                       'right method';
@@ -197,38 +197,38 @@ $ua = Mojo::UserAgent->new;
 
 subtest 'Simple keep-alive form POST' => sub {
   my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojolicious'});
-  is $tx->req->method, 'POST',                        'right method';
-  is $tx->req->url,    'https://metacpan.org/search', 'right url';
-  is $tx->req->headers->content_length, 13, 'right content length';
-  is $tx->req->body,   'q=mojolicious', 'right content';
+  is $tx->req->method,                  'POST',                        'right method';
+  is $tx->req->url,                     'https://metacpan.org/search', 'right url';
+  is $tx->req->headers->content_length, 13,                            'right content length';
+  is $tx->req->body,                    'q=mojolicious',               'right content';
   like $tx->res->body, qr/Mojolicious/, 'right content';
-  is $tx->res->code,   200,             'right status';
+  is $tx->res->code, 200, 'right status';
   ok $tx->keep_alive, 'connection will be kept alive';
   $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojolicious'});
-  is $tx->req->method, 'POST',                        'right method';
-  is $tx->req->url,    'https://metacpan.org/search', 'right url';
-  is $tx->req->headers->content_length, 13, 'right content length';
-  is $tx->req->body,   'q=mojolicious', 'right content';
+  is $tx->req->method,                  'POST',                        'right method';
+  is $tx->req->url,                     'https://metacpan.org/search', 'right url';
+  is $tx->req->headers->content_length, 13,                            'right content length';
+  is $tx->req->body,                    'q=mojolicious',               'right content';
   like $tx->res->body, qr/Mojolicious/, 'right content';
-  is $tx->res->code,   200,             'right status';
-  ok $tx->kept_alive,    'connection was kept alive';
-  ok $tx->local_address, 'has local address';
-  ok $tx->local_port > 0, 'has local port';
+  is $tx->res->code, 200, 'right status';
+  ok $tx->kept_alive,              'connection was kept alive';
+  ok $tx->local_address,           'has local address';
+  ok $tx->local_port > 0,          'has local port';
   ok $tx->original_remote_address, 'has original remote address';
   ok $tx->remote_address,          'has remote address';
-  ok $tx->remote_port > 0, 'has remote port';
+  ok $tx->remote_port > 0,         'has remote port';
 };
 
 subtest 'Simple request with redirect' => sub {
   $ua->max_redirects(3);
   my $tx = $ua->get('http://wikipedia.org/wiki/Perl');
   $ua->max_redirects(0);
-  is $tx->req->method, 'GET',                                'right method';
-  is $tx->req->url,    'https://en.wikipedia.org/wiki/Perl', 'right url';
-  is $tx->res->code,   200,                                  'right status';
-  is $tx->previous->req->method, 'GET',                                 'right method';
-  is $tx->previous->req->url,    'https://www.wikipedia.org/wiki/Perl', 'right url';
-  is $tx->previous->res->code,   301,                                   'right status';
+  is $tx->req->method,                  'GET',                                 'right method';
+  is $tx->req->url,                     'https://en.wikipedia.org/wiki/Perl',  'right url';
+  is $tx->res->code,                    200,                                   'right status';
+  is $tx->previous->req->method,        'GET',                                 'right method';
+  is $tx->previous->req->url,           'https://www.wikipedia.org/wiki/Perl', 'right url';
+  is $tx->previous->res->code,          301,                                   'right status';
   is $tx->redirects->[-1]->req->method, 'GET',                                 'right method';
   is $tx->redirects->[-1]->req->url,    'https://www.wikipedia.org/wiki/Perl', 'right url';
   is $tx->redirects->[-1]->res->code,   301,                                   'right status';

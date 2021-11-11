@@ -31,7 +31,7 @@ my ($called_foo, $dyn_methods);
 Mojo::DynamicMethods::register 'Mojo::TestDynamic', $t1->hashref, 'foo', sub { $called_foo++; $dyn_methods = $_[1] };
 is $foo, \&Mojo::TestDynamic::_Dynamic::foo, 'foo not reinstalled';
 ok !Mojo::TestDynamic->can('foo'), 'dynamic method is hidden';
-ok eval { $t1->foo; 1 }, 'foo called ok';
+ok eval { $t1->foo; 1 },           'foo called ok';
 cmp_ok $called_foo, '==', 1, 'called dynamic method';
 ok !eval { $t2->foo; 1 }, 'error calling foo on wrong object';
 

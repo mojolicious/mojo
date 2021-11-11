@@ -55,9 +55,9 @@ subtest 'Current working directory' => sub {
 subtest 'Path generation' => sub {
   my $home = Mojo::Home->new(curfile->dirname);
   my $path = curfile->dirname;
-  is $home->rel_file('foo.txt'), $path->child('foo.txt'), 'right path';
-  is $home->rel_file('foo/bar.txt'), $path->child('foo', 'bar.txt'), 'right path';
-  is $home->rel_file('foo/bar.txt')->basename, 'bar.txt', 'right result';
+  is $home->rel_file('foo.txt'),               $path->child('foo.txt'),        'right path';
+  is $home->rel_file('foo/bar.txt'),           $path->child('foo', 'bar.txt'), 'right path';
+  is $home->rel_file('foo/bar.txt')->basename, 'bar.txt',                      'right result';
 };
 
 done_testing();

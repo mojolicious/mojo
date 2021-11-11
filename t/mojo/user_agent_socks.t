@@ -112,20 +112,20 @@ subtest 'Simple request with SOCKS proxy' => sub {
   my $tx = $ua->get('/');
   ok !$tx->error,      'no error';
   ok !$tx->kept_alive, 'kept connection not alive';
-  ok $tx->keep_alive, 'keep connection alive';
-  is $tx->res->code, 200, 'right status';
+  ok $tx->keep_alive,  'keep connection alive';
+  is $tx->res->code,                         200,   'right status';
   is $tx->req->headers->proxy_authorization, undef, 'no "Proxy-Authorization" value';
-  is $tx->res->body, $last, 'right content';
+  is $tx->res->body,                         $last, 'right content';
   isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport, $last, 'different ports');
 
   my $before = $last;
   $tx = $ua->get('/');
-  ok !$tx->error, 'no error';
+  ok !$tx->error,     'no error';
   ok $tx->kept_alive, 'kept connection alive';
   ok $tx->keep_alive, 'keep connection alive';
-  is $tx->res->code, 200, 'right status';
+  is $tx->res->code, 200,   'right status';
   is $tx->res->body, $last, 'right content';
-  is $before, $last, 'same port';
+  is $before,        $last, 'same port';
   isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport, $last, 'different ports');
 };
 
@@ -153,7 +153,7 @@ subtest 'HTTPS request with SOCKS proxy' => sub {
   my $tx = $ua->get('/secure');
   ok !$tx->error,      'no error';
   ok !$tx->kept_alive, 'kept connection not alive';
-  ok $tx->keep_alive, 'keep connection alive';
+  ok $tx->keep_alive,  'keep connection alive';
   is $tx->res->code, 200,           'right status';
   is $tx->res->body, "https:$last", 'right content';
   isnt(Mojo::IOLoop->stream($tx->connection)->handle->sockport, $last, 'different ports');
@@ -167,7 +167,7 @@ subtest 'Disabled SOCKS proxy' => sub {
   $tx->req->via_proxy(0);
   $tx = $ua->start($tx);
   ok !$tx->error, 'no error';
-  is $tx->res->code, 200, 'right status';
+  is $tx->res->code, 200,             'right status';
   is $tx->res->body, $tx->local_port, 'right content';
 };
 

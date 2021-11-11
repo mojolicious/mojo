@@ -23,11 +23,11 @@ subtest 'Verbose' => sub {
 
 subtest 'Basics' => sub {
   my $e = Mojo::Exception->new;
-  is $e->message, 'Exception!', 'right message';
-  is "$e", "Exception!\n", 'right message';
+  is $e->message, 'Exception!',   'right message';
+  is "$e",        "Exception!\n", 'right message';
   $e = Mojo::Exception->new('Test!');
-  is $e->message, 'Test!', 'right message';
-  is "$e", "Test!\n", 'right message';
+  is $e->message, 'Test!',   'right message';
+  is "$e",        "Test!\n", 'right message';
 };
 
 subtest 'Context information' => sub {
@@ -44,36 +44,36 @@ subtest 'Context information' => sub {
   };
   my $e = $@;
   isa_ok $e, 'Mojo::Exception', 'right class';
-  like $e->inspect, qr/^Works!/, 'right result';
-  like $e->frames->[0][1],     qr/exception\.t/, 'right file';
-  is $e->lines_before->[0][0], $line, 'right number';
+  like $e->inspect,        qr/^Works!/,      'right result';
+  like $e->frames->[0][1], qr/exception\.t/, 'right file';
+  is $e->lines_before->[0][0], $line,                    'right number';
   is $e->lines_before->[0][1], '  my $line = __LINE__;', 'right line';
-  is $e->lines_before->[1][0], $line + 1, 'right number';
-  is $e->lines_before->[1][1], '  eval {', 'right line';
-  is $e->lines_before->[2][0], $line + 2, 'right number';
+  is $e->lines_before->[1][0], $line + 1,                'right number';
+  is $e->lines_before->[1][1], '  eval {',               'right line';
+  is $e->lines_before->[2][0], $line + 2,                'right number';
   ok !$e->lines_before->[2][1], '  empty line';
-  is $e->lines_before->[3][0], $line + 3, 'right number';
+  is $e->lines_before->[3][0], $line + 3,    'right number';
   is $e->lines_before->[3][1], '    # test', 'right line';
-  is $e->lines_before->[4][0], $line + 4, 'right number';
+  is $e->lines_before->[4][0], $line + 4,    'right number';
   ok !$e->lines_before->[4][1], 'empty line';
-  is $e->line->[0], $line + 5, 'right number';
-  is $e->line->[1], "    my \$wrapper = sub { Mojo::Exception->throw('Works!') };", 'right line';
-  is $e->lines_after->[0][0], $line + 6, 'right number';
-  is $e->lines_after->[0][1], '    $wrapper->();', 'right line';
-  is $e->lines_after->[1][0], $line + 7, 'right number';
+  is $e->line->[0],           $line + 5,                                                      'right number';
+  is $e->line->[1],           "    my \$wrapper = sub { Mojo::Exception->throw('Works!') };", 'right line';
+  is $e->lines_after->[0][0], $line + 6,                                                      'right number';
+  is $e->lines_after->[0][1], '    $wrapper->();',                                            'right line';
+  is $e->lines_after->[1][0], $line + 7,                                                      'right number';
   ok !$e->lines_after->[1][1], 'empty line';
-  is $e->lines_after->[2][0], $line + 8, 'right number';
+  is $e->lines_after->[2][0], $line + 8,    'right number';
   is $e->lines_after->[2][1], '    # test', 'right line';
-  is $e->lines_after->[3][0], $line + 9, 'right number';
+  is $e->lines_after->[3][0], $line + 9,    'right number';
   ok !$e->lines_after->[3][1], 'empty line';
   is $e->lines_after->[4][0], $line + 10, 'right number';
-  is $e->lines_after->[4][1], '  };', 'right line';
+  is $e->lines_after->[4][1], '  };',     'right line';
 };
 
 subtest 'Trace' => sub {
   sub wrapper2 { Mojo::Exception->new->trace(@_) }
   sub wrapper1 { wrapper2(@_) }
-  like wrapper1()->frames->[0][3], qr/wrapper2/, 'right subroutine';
+  like wrapper1()->frames->[0][3],  qr/wrapper2/, 'right subroutine';
   like wrapper1(0)->frames->[0][3], qr/trace/,    'right subroutine';
   like wrapper1(1)->frames->[0][3], qr/wrapper2/, 'right subroutine';
   like wrapper1(2)->frames->[0][3], qr/wrapper1/, 'right subroutine';
@@ -87,13 +87,13 @@ subtest 'Inspect (UTF-8)' => sub {
   is_deeply $e->lines_after,  [], 'no lines';
   $e->inspect;
   is_deeply $e->lines_before->[-1], [2, 'use warnings;'], 'right line';
-  is_deeply $e->line, [3, 'use utf8;'], 'right line';
-  is_deeply $e->lines_after->[0], [4, ''], 'right line';
+  is_deeply $e->line,               [3, 'use utf8;'],     'right line';
+  is_deeply $e->lines_after->[0],   [4, ''],              'right line';
 
   $e = Mojo::Exception->new("Died at $file line 4.")->inspect;
-  is_deeply $e->lines_before->[-1], [3, 'use utf8;'], 'right line';
-  is_deeply $e->line, [4, ''], 'right line';
-  is_deeply $e->lines_after->[0], [5, "my \$s = 'Über•résumé';"], 'right line';
+  is_deeply $e->lines_before->[-1], [3, 'use utf8;'],               'right line';
+  is_deeply $e->line,               [4, ''],                        'right line';
+  is_deeply $e->lines_after->[0],   [5, "my \$s = 'Über•résumé';"], 'right line';
 
   $file = $file->sibling('non_utf8.txt');
   $e    = Mojo::Exception->new("Whatever at $file line 3.");
@@ -102,12 +102,12 @@ subtest 'Inspect (UTF-8)' => sub {
   is_deeply $e->lines_after,  [], 'no lines';
   $e->inspect->inspect;
   is_deeply $e->lines_before->[-1], [2, 'use warnings;'], 'right line';
-  is_deeply $e->line, [3, 'no utf8;'], 'right line';
-  is_deeply $e->lines_after->[0], [4, ''], 'right line';
+  is_deeply $e->line,               [3, 'no utf8;'],      'right line';
+  is_deeply $e->lines_after->[0],   [4, ''],              'right line';
   $e = Mojo::Exception->new("Died at $file line 4.")->inspect;
-  is_deeply $e->lines_before->[-1], [3, 'no utf8;'], 'right line';
-  is_deeply $e->line, [4, ''], 'right line';
-  is_deeply $e->lines_after->[0], [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"], 'right line';
+  is_deeply $e->lines_before->[-1], [3, 'no utf8;'],                            'right line';
+  is_deeply $e->line,               [4, ''],                                    'right line';
+  is_deeply $e->lines_after->[0],   [5, "my \$s = '\xDCber\x95r\xE9sum\xE9';"], 'right line';
 };
 
 subtest 'Context' => sub {
@@ -118,8 +118,8 @@ subtest 'Context' => sub {
   $e = Mojo::Exception->new('Test!');
   $e->frames([['Sandbox', 'template', 4], ['MyApp::Test', 'MyApp/Test.pm', 3], ['main', 'foo.pl', 4]]);
   $e->lines_before([[3, 'foo();']])->line([4, 'die;'])->lines_after([[5, 'bar();']]);
-  is $e, "Test! at template line 4.\n", 'right result';
-  is $e->verbose(1), <<EOF, 'right result';
+  is $e,             "Test! at template line 4.\n", 'right result';
+  is $e->verbose(1), <<EOF,                         'right result';
 Test! at template line 4.
 Context:
   3: foo();
@@ -147,19 +147,19 @@ subtest 'Missing error' => sub {
   is_deeply $e->lines_before, [], 'no lines';
   is_deeply $e->line,         [], 'no line';
   is_deeply $e->lines_after,  [], 'no lines';
-  is $e->message,             'Exception!', 'right message';
+  is $e->message, 'Exception!', 'right message';
 
   $e = Mojo::Exception->new(undef)->inspect;
   is_deeply $e->lines_before, [], 'no lines';
   is_deeply $e->line,         [], 'no line';
   is_deeply $e->lines_after,  [], 'no lines';
-  is $e->message,             'Exception!', 'right message';
+  is $e->message, 'Exception!', 'right message';
 
   $e = Mojo::Exception->new('')->inspect;
   is_deeply $e->lines_before, [], 'no lines';
   is_deeply $e->line,         [], 'no line';
   is_deeply $e->lines_after,  [], 'no lines';
-  is $e->message,             '', 'right message';
+  is $e->message, '', 'right message';
 };
 
 subtest 'Check (string exception)' => sub {
@@ -264,20 +264,20 @@ subtest 'Raise' => sub {
   my $err = $@;
   isa_ok $err, 'MyApp::X::Baz',   'is a MyApp::X::Baz';
   isa_ok $err, 'Mojo::Exception', 'is a Mojo::Exception';
-  like $err,   qr/^test19/,       'right error';
+  like $err, qr/^test19/, 'right error';
   eval { raise 'MyApp::X::Baz', 'test20' };
   $err = $@;
   isa_ok $err, 'MyApp::X::Baz',   'is a MyApp::X::Baz';
   isa_ok $err, 'Mojo::Exception', 'is a Mojo::Exception';
-  like $err,   qr/^test20/,       'right error again';
+  like $err, qr/^test20/, 'right error again';
   eval { raise 'test22' };
   $err = $@;
   isa_ok $err, 'Mojo::Exception', 'is a Mojo::Exception';
-  like $err,   qr/^test22/,       'right error';
+  like $err, qr/^test22/, 'right error';
   eval { raise 'MojoTest::X::Foo', 'test21' };
   $err = $@;
   isa_ok $err, 'MojoTest::X::Foo', 'is a MojoTest::X::Baz';
-  like $err,   qr/^test21/,        'right error';
+  like $err, qr/^test21/, 'right error';
   eval { raise 'Mojo::Base', 'fail' };
   like $@, qr/^Mojo::Base is not a Mojo::Exception subclass/, 'right error';
 };

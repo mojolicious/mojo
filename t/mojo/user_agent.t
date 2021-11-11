@@ -138,8 +138,8 @@ $ua->get(
 is $ua->get('/')->res->code, 200, 'right status';
 Mojo::IOLoop->start;
 ok $success, 'successful';
-is $code,    200,      'right status';
-is $body,    'works!', 'right content';
+is $code, 200,      'right status';
+is $body, 'works!', 'right content';
 
 # Promises
 my @results;
@@ -221,7 +221,7 @@ is $tx->res->body,             'works!',   'right content';
 
 # Again
 $tx = $ua->get('/');
-ok !$tx->error, 'no error';
+ok !$tx->error,     'no error';
 ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->version, '1.1', 'right version';
 is $tx->res->code,    200,   'right status';
@@ -254,18 +254,18 @@ is $ua->put('/method')->res->body,     'PUT',     'right method';
 $tx = $ua->get('/one?connection=test');
 ok !$tx->error,      'no error';
 ok !$tx->keep_alive, 'connection will not be kept alive';
-is $tx->res->version, '1.0', 'right version';
-is $tx->res->code,    200,   'right status';
+is $tx->res->version,             '1.0',  'right version';
+is $tx->res->code,                200,    'right status';
 is $tx->res->headers->connection, 'test', 'right "Connection" value';
-is $tx->res->body, 'One!', 'right content';
+is $tx->res->body,                'One!', 'right content';
 $tx = $ua->get('/one?connection=test');
 ok !$tx->error,      'no error';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok !$tx->keep_alive, 'connection will not be kept alive';
-is $tx->res->version, '1.0', 'right version';
-is $tx->res->code,    200,   'right status';
+is $tx->res->version,             '1.0',  'right version';
+is $tx->res->code,                200,    'right status';
 is $tx->res->headers->connection, 'test', 'right "Connection" value';
-is $tx->res->body, 'One!', 'right content';
+is $tx->res->body,                'One!', 'right content';
 $tx = $ua->get('/one');
 ok !$tx->error,      'no error';
 ok !$tx->kept_alive, 'kept connection not alive';
@@ -307,10 +307,10 @@ is $finished_req, 1, 'finish event has been emitted once';
 is $finished_tx,  1, 'finish event has been emitted once';
 is $finished_res, 1, 'finish event has been emitted once';
 ok $tx->req->is_finished, 'request is finished';
-ok $tx->is_finished, 'transaction is finished';
+ok $tx->is_finished,      'transaction is finished';
 ok $tx->res->is_finished, 'response is finished';
-is $tx->res->code,        200,      'right status';
-is $tx->res->body,        'works!', 'right content';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 
 # Missing Content-Length header
 ($finished_req, $finished_tx, $finished_res) = ();
@@ -330,11 +330,11 @@ is $finished_req, 1, 'finish event has been emitted once';
 is $finished_tx,  1, 'finish event has been emitted once';
 is $finished_res, 1, 'finish event has been emitted once';
 ok $tx->req->is_finished, 'request is finished';
-ok $tx->is_finished, 'transaction is finished';
+ok $tx->is_finished,      'transaction is finished';
 ok $tx->res->is_finished, 'response is finished';
-ok !$tx->error, 'no error';
-ok $tx->kept_alive, 'kept connection alive';
-ok !$tx->keep_alive, 'keep connection not alive';
+ok !$tx->error,           'no error';
+ok $tx->kept_alive,       'kept connection alive';
+ok !$tx->keep_alive,      'keep connection not alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 
@@ -342,23 +342,23 @@ is $tx->res->body, 'works too!', 'right content';
 $tx = $ua->get('/no_content');
 ok !$tx->error,      'no error';
 ok !$tx->kept_alive, 'kept connection not alive';
-ok $tx->keep_alive, 'keep connection alive';
+ok $tx->keep_alive,  'keep connection alive';
 is $tx->res->code, 204, 'right status';
 ok $tx->is_empty, 'transaction is empty';
 is $tx->res->body, '', 'no content';
 
 # Connection was kept alive
 $tx = $ua->head('/huge');
-ok !$tx->error, 'no error';
+ok !$tx->error,     'no error';
 ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code,                    200,    'right status';
 is $tx->res->headers->content_length, 262144, 'right "Content-Length" value';
 ok $tx->is_empty, 'transaction is empty';
 is $tx->res->body, '', 'no content';
 $tx = $ua->get('/huge');
-ok !$tx->error, 'no error';
+ok !$tx->error,     'no error';
 ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200, 'right status';
+is $tx->res->code,                    200,    'right status';
 is $tx->res->headers->content_length, 262144, 'right "Content-Length" value';
 ok !$tx->is_empty, 'transaction is not empty';
 is $tx->res->body, 'x' x 262144, 'right content';
@@ -376,8 +376,8 @@ $ua->post(
 );
 Mojo::IOLoop->start;
 ok $success, 'successful';
-is $code,    200,           'right status';
-is $body,    'hello=world', 'right content';
+is $code, 200,           'right status';
+is $body, 'hello=world', 'right content';
 
 # Non-blocking JSON
 ($success, $code, $body) = ();
@@ -392,8 +392,8 @@ $ua->post(
 );
 Mojo::IOLoop->start;
 ok $success, 'successful';
-is $code,    200,                 'right status';
-is $body,    '{"hello":"world"}', 'right content';
+is $code, 200,                 'right status';
+is $body, '{"hello":"world"}', 'right content';
 
 # Built-in web server times out
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
@@ -402,8 +402,8 @@ my $msg = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');
 app->log->unsubscribe(message => $msg);
 is $tx->error->{message}, 'Premature connection close', 'right error';
-is $timeout, 1,                      'finish event has been emitted';
-like $log,   qr/Inactivity timeout/, 'right log message';
+is $timeout,              1,                            'finish event has been emitted';
+like $log, qr/Inactivity timeout/, 'right log message';
 eval { $tx->result };
 like $@, qr/Premature connection close/, 'right error';
 
@@ -463,7 +463,7 @@ $tx = $ua->get('/does_not_exist');
 ok $tx->result, 'has a result';
 is $tx->result->code, 404, 'right status';
 ok !$tx->kept_alive, 'kept connection not alive';
-ok $tx->keep_alive, 'keep connection alive';
+ok $tx->keep_alive,  'keep connection alive';
 is $tx->error->{message}, 'Not Found', 'right error';
 is $tx->error->{code},    404,         'right status';
 $tx = $ua->get('/does_not_exist');
@@ -486,17 +486,17 @@ $tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');
 $tx = $ua->start($ua->build_tx(GET => '/echo' => 'Hello GZip!'));
 ok !$tx->error, 'no error';
 ok $tx->result, 'has a result';
-is $tx->result->code, 200, 'right status';
-is $tx->res->code,    200, 'right status';
-is $tx->res->headers->content_encoding, undef, 'no "Content-Encoding" value';
-is $tx->res->body, 'Hello GZip!', 'right content';
+is $tx->result->code,                   200,           'right status';
+is $tx->res->code,                      200,           'right status';
+is $tx->res->headers->content_encoding, undef,         'no "Content-Encoding" value';
+is $tx->res->body,                      'Hello GZip!', 'right content';
 $tx = $ua->build_tx(GET => '/echo' => 'Hello GZip!');
 $tx->res->content->auto_decompress(0);
 $tx = $ua->start($tx);
 ok !$tx->error, 'no error';
-is $tx->res->code, 200, 'right status';
-is $tx->res->headers->content_encoding, 'gzip', 'right "Content-Encoding" value';
-isnt $tx->res->body, 'Hello GZip!', 'different content';
+is $tx->res->code,                      200,           'right status';
+is $tx->res->headers->content_encoding, 'gzip',        'right "Content-Encoding" value';
+isnt $tx->res->body,                    'Hello GZip!', 'different content';
 
 # Keep-alive timeout in between requests
 my $daemon = Mojo::Server::Daemon->new(
@@ -514,7 +514,7 @@ is $tx->res->body, 'works!', 'right content';
 Mojo::Promise->new->ioloop($ua->ioloop)->timer(1)->wait;
 $tx = $ua->get("http://127.0.0.1:$port");
 ok !$tx->kept_alive, 'kept connection not alive';
-ok $tx->keep_alive, 'keep connection alive';
+ok $tx->keep_alive,  'keep connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
@@ -525,29 +525,29 @@ subtest 'Fork-safety' => sub {
   my $last = $tx->connection;
   my $port = $ua->server->url->port;
   $tx = $ua->get('/');
-  is $tx->res->body, 'works!', 'right content';
-  is $tx->connection, $last, 'same connection';
-  is $ua->server->url->port, $port, 'same port';
+  is $tx->res->body,         'works!', 'right content';
+  is $tx->connection,        $last,    'same connection';
+  is $ua->server->url->port, $port,    'same port';
   {
     local $$ = -23;
     my $tx = $ua->get('/');
     ok !$tx->kept_alive, 'kept connection not alive';
-    ok $tx->keep_alive, 'keep connection alive';
-    is $tx->res->body, 'works!', 'right content';
-    isnt $tx->connection, $last, 'new connection';
-    isnt $ua->server->url->port, $port, 'new port';
+    ok $tx->keep_alive,  'keep connection alive';
+    is $tx->res->body,           'works!', 'right content';
+    isnt $tx->connection,        $last,    'new connection';
+    isnt $ua->server->url->port, $port,    'new port';
     my $port2 = $ua->server->url->port;
     my $last2 = $tx->connection;
     {
       local $$ = -24;
       my $tx = $ua->get('/');
       ok !$tx->kept_alive, 'kept connection not alive';
-      ok $tx->keep_alive, 'keep connection alive';
-      is $tx->res->body, 'works!', 'right content';
-      isnt $tx->connection, $last,  'new connection';
-      isnt $tx->connection, $last2, 'new connection';
-      isnt $ua->server->url->port, $port,  'new port';
-      isnt $ua->server->url->port, $port2, 'new port';
+      ok $tx->keep_alive,  'keep connection alive';
+      is $tx->res->body,           'works!', 'right content';
+      isnt $tx->connection,        $last,    'new connection';
+      isnt $tx->connection,        $last2,   'new connection';
+      isnt $ua->server->url->port, $port,    'new port';
+      isnt $ua->server->url->port, $port2,   'new port';
     }
   }
 };
@@ -588,10 +588,10 @@ my $start = $ua->on(
 );
 $tx = $ua->get('/', 'whatever');
 ok !$tx->error, 'no error';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 0, 'unsubscribed successfully';
-is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')},  1, 'unsubscribed successfully';
+is $tx->res->code,                                                        200,      'right status';
+is $tx->res->body,                                                        'works!', 'right content';
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 0,        'unsubscribed successfully';
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')},  1,        'unsubscribed successfully';
 like $req, qr!^GET / .*whatever$!s,      'right request';
 like $res, qr|^HTTP/.*200 OK.*works!$|s, 'right response';
 is_deeply \@num, [0, 0, length $res, length $req], 'right structure';
@@ -618,12 +618,12 @@ $drain = sub {
 };
 $tx->req->content->$drain;
 $ua->start($tx);
-ok !$tx->error, 'no error';
+ok !$tx->error,     'no error';
 ok $tx->kept_alive, 'kept connection alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, '0123456789', 'right content';
-is $stream, 1, 'no leaking subscribers';
+is $stream,        1,            'no leaking subscribers';
 
 # Upload progress
 $ua = Mojo::UserAgent->new;
@@ -651,7 +651,7 @@ $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 $tx = $ua->get($ua->server->url);
 ok !$tx->error,      'no error';
 ok !$tx->kept_alive, 'kept connection not alive';
-ok $tx->keep_alive, 'keep connection alive';
+ok $tx->keep_alive,  'keep connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 my @kept_alive;
@@ -677,7 +677,7 @@ $ua->get(
 Mojo::IOLoop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
 $tx = $ua->get($ua->server->url);
-ok !$tx->error, 'no error';
+ok !$tx->error,     'no error';
 ok $tx->kept_alive, 'kept connection alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,      'right status';
@@ -724,9 +724,9 @@ $tx   = $ua->build_tx(GET => "http://127.0.0.1:$port/");
 my @unexpected;
 $tx->on(unexpected => sub { push @unexpected, pop });
 $tx = $ua->start($tx);
-is $unexpected[0]->code, 100, 'right status';
+is $unexpected[0]->code,                     100,   'right status';
 is $unexpected[0]->headers->header('X-Foo'), 'Bar', 'right "X-Foo" value';
-is $unexpected[1]->code, 101, 'right status';
+is $unexpected[1]->code,                     101,   'right status';
 ok !$tx->error, 'no error';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';

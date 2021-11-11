@@ -121,12 +121,12 @@ websocket '/timeout' => sub {
 # URL for WebSocket
 my $ua  = app->ua;
 my $res = $ua->get('/link')->result;
-is $res->code,   200,                        'right status';
+is $res->code, 200, 'right status';
 like $res->body, qr!ws://127\.0\.0\.1:\d+/!, 'right content';
 
 # Plain HTTP request
 $res = $ua->get('/early_start')->res;
-is $res->code,   404,                'right status';
+is $res->code, 404, 'right status';
 like $res->body, qr/Page Not Found/, 'right content';
 
 # Plain WebSocket
@@ -186,9 +186,9 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok $established, 'connection established';
-is $status,      1000,               'right status';
-is $msg,         'I ♥ Mojolicious!', 'right message';
-is $result,      'test0test2test1',  'right result';
+is $status, 1000,               'right status';
+is $msg,    'I ♥ Mojolicious!', 'right message';
+is $result, 'test0test2test1',  'right result';
 
 # WebSocket connection gets closed very fast
 $status = undef;
@@ -233,9 +233,9 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 Mojo::IOLoop->one_tick until $stash->{finished};
-is $stash->{finished}, 1, 'finish event has been emitted once';
-is $code,   101,          'right status';
-is $result, 'test0test1', 'right result';
+is $stash->{finished}, 1,            'finish event has been emitted once';
+is $code,              101,          'right status';
+is $result,            'test0test1', 'right result';
 
 # Concurrent subrequests
 ($code, $result) = ();
@@ -363,7 +363,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok $finished, 'transaction is finished';
-ok !$ws, 'not a websocket';
+ok !$ws,      'not a websocket';
 is $code, 500,                     'right status';
 is $msg,  'Internal Server Error', 'right message';
 

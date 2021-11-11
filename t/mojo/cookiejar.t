@@ -26,31 +26,31 @@ subtest 'Session cookie' => sub {
   is $cookies->[0]->value, 'bar',   'right value';
   is $cookies->[1]->name,  'just',  'right name';
   is $cookies->[1]->value, 'works', 'right value';
-  is $cookies->[2], undef, 'no third cookie';
+  is $cookies->[2],        undef,   'no third cookie';
   $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
   is $cookies->[0]->name,  'foo',   'right name';
   is $cookies->[0]->value, 'bar',   'right value';
   is $cookies->[1]->name,  'just',  'right name';
   is $cookies->[1]->value, 'works', 'right value';
-  is $cookies->[2], undef, 'no third cookie';
+  is $cookies->[2],        undef,   'no third cookie';
   $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
   is $cookies->[0]->name,  'foo',   'right name';
   is $cookies->[0]->value, 'bar',   'right value';
   is $cookies->[1]->name,  'just',  'right name';
   is $cookies->[1]->value, 'works', 'right value';
-  is $cookies->[2], undef, 'no third cookie';
+  is $cookies->[2],        undef,   'no third cookie';
   $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
   is $cookies->[0]->name,  'foo',   'right name';
   is $cookies->[0]->value, 'bar',   'right value';
   is $cookies->[1]->name,  'just',  'right name';
   is $cookies->[1]->value, 'works', 'right value';
-  is $cookies->[2], undef, 'no third cookie';
+  is $cookies->[2],        undef,   'no third cookie';
   $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
   is $cookies->[0]->name,  'foo',   'right name';
   is $cookies->[0]->value, 'bar',   'right value';
   is $cookies->[1]->name,  'just',  'right name';
   is $cookies->[1]->value, 'works', 'right value';
-  is $cookies->[2], undef, 'no third cookie';
+  is $cookies->[2],        undef,   'no third cookie';
   $jar->empty;
   $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
   is $cookies->[0], undef, 'no cookies';
@@ -65,23 +65,23 @@ subtest '"localhost"' => sub {
   my $cookies = $jar->find(Mojo::URL->new('http://localhost/foo'));
   is $cookies->[0]->name,  'foo', 'right name';
   is $cookies->[0]->value, 'bar', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef, 'no second cookie';
   $cookies = $jar->find(Mojo::URL->new('http://foo.localhost/foo'));
   is $cookies->[0]->name,  'bar', 'right name';
   is $cookies->[0]->value, 'baz', 'right value';
   is $cookies->[1]->name,  'foo', 'right name';
   is $cookies->[1]->value, 'bar', 'right value';
-  is $cookies->[2], undef, 'no third cookie';
+  is $cookies->[2],        undef, 'no third cookie';
   $cookies = $jar->find(Mojo::URL->new('http://foo.bar.localhost/foo'));
   is $cookies->[0]->name,  'foo', 'right name';
   is $cookies->[0]->value, 'bar', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef, 'no second cookie';
   $cookies = $jar->find(Mojo::URL->new('http://bar.foo.localhost/foo'));
   is $cookies->[0]->name,  'bar', 'right name';
   is $cookies->[0]->value, 'baz', 'right value';
   is $cookies->[1]->name,  'foo', 'right name';
   is $cookies->[1]->value, 'bar', 'right value';
-  is $cookies->[2], undef, 'no third cookie';
+  is $cookies->[2],        undef, 'no third cookie';
 };
 
 subtest 'Huge cookie' => sub {
@@ -92,11 +92,11 @@ subtest 'Huge cookie' => sub {
     Mojo::Cookie::Response->new(domain => 'example.com', path => '/foo', name => 'huge',  value => 'x' x 1025)
   );
   my $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
-  is $cookies->[0]->name,  'small', 'right name';
-  is $cookies->[0]->value, 'x',     'right value';
-  is $cookies->[1]->name,  'big',   'right name';
+  is $cookies->[0]->name,  'small',    'right name';
+  is $cookies->[0]->value, 'x',        'right value';
+  is $cookies->[1]->name,  'big',      'right name';
   is $cookies->[1]->value, 'x' x 1024, 'right value';
-  is $cookies->[2], undef, 'no second cookie';
+  is $cookies->[2],        undef,      'no second cookie';
 };
 
 subtest 'Expired cookies' => sub {
@@ -111,7 +111,7 @@ subtest 'Expired cookies' => sub {
   my $cookies = $jar->find(Mojo::URL->new('http://labs.example.com/foo'));
   is $cookies->[0]->name,  'foo', 'right name';
   is $cookies->[0]->value, 'bar', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef, 'no second cookie';
 };
 
 subtest 'Replace cookie' => sub {
@@ -123,7 +123,7 @@ subtest 'Replace cookie' => sub {
   my $cookies = $jar->find(Mojo::URL->new('http://example.com/foo'));
   is $cookies->[0]->name,  'foo',  'right name';
   is $cookies->[0]->value, 'bar2', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef,  'no second cookie';
 };
 
 subtest 'Switch between secure and normal cookies' => sub {
@@ -142,7 +142,7 @@ subtest 'Switch between secure and normal cookies' => sub {
   $cookies = $jar->find(Mojo::URL->new('https://example.com/foo'));
   is $cookies->[0]->name,  'foo', 'right name';
   is $cookies->[0]->value, 'bar', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef, 'no second cookie';
 };
 
 subtest '"(" in path' => sub {
@@ -151,11 +151,11 @@ subtest '"(" in path' => sub {
   my $cookies = $jar->find(Mojo::URL->new('http://example.com/foo(bar'));
   is $cookies->[0]->name,  'foo', 'right name';
   is $cookies->[0]->value, 'bar', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef, 'no second cookie';
   $cookies = $jar->find(Mojo::URL->new('http://example.com/foo(bar/baz'));
   is $cookies->[0]->name,  'foo', 'right name';
   is $cookies->[0]->value, 'bar', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef, 'no second cookie';
 };
 
 subtest 'Gather and prepare cookies without domain and path' => sub {
@@ -172,12 +172,12 @@ subtest 'Gather and prepare cookies without domain and path' => sub {
   $tx = Mojo::Transaction::HTTP->new;
   $tx->req->url->parse('http://mojolicious.org/perldoc');
   $jar->prepare($tx);
-  is $tx->req->cookie('foo')->name,  'foo',     'right name';
-  is $tx->req->cookie('foo')->value, 'without', 'right value';
-  is $jar->all->[0]->name,   'foo',             'right name';
-  is $jar->all->[0]->value,  'without',         'right value';
-  is $jar->all->[0]->domain, 'mojolicious.org', 'right domain';
-  is $jar->all->[1], undef, 'no second cookie';
+  is $tx->req->cookie('foo')->name,  'foo',             'right name';
+  is $tx->req->cookie('foo')->value, 'without',         'right value';
+  is $jar->all->[0]->name,           'foo',             'right name';
+  is $jar->all->[0]->value,          'without',         'right value';
+  is $jar->all->[0]->domain,         'mojolicious.org', 'right domain';
+  is $jar->all->[1],                 undef,             'no second cookie';
   $tx = Mojo::Transaction::HTTP->new;
   $tx->req->url->parse('http://www.mojolicious.org/perldoc');
   $jar->prepare($tx);
@@ -205,14 +205,14 @@ subtest 'Gather and prepare cookies with same name (with and without domain)' =>
   my $cookies = $tx->req->every_cookie('foo');
   is $cookies->[0]->name,  'foo',  'right name';
   is $cookies->[0]->value, 'with', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef,  'no second cookie';
   $tx = Mojo::Transaction::HTTP->new;
   $tx->req->url->parse('http://www.example.com/test');
   $jar->prepare($tx);
   $cookies = $tx->req->every_cookie('foo');
   is $cookies->[0]->name,  'foo',  'right name';
   is $cookies->[0]->value, 'with', 'right value';
-  is $cookies->[1], undef, 'no second cookie';
+  is $cookies->[1],        undef,  'no second cookie';
 };
 
 subtest 'Gather and prepare cookies for "localhost" (valid and invalid)' => sub {
@@ -229,7 +229,7 @@ subtest 'Gather and prepare cookies for "localhost" (valid and invalid)' => sub 
   $jar->prepare($tx);
   is $tx->req->cookie('foo')->name,  'foo',   'right name';
   is $tx->req->cookie('foo')->value, 'local', 'right value';
-  is $tx->req->cookie('bar'), undef, 'no cookie';
+  is $tx->req->cookie('bar'),        undef,   'no cookie';
 };
 
 subtest 'Gather and prepare cookies for unknown public suffix (with IDNA)' => sub {
@@ -262,7 +262,7 @@ subtest 'Gather and prepare cookies for public suffix (with IDNA)' => sub {
   $tx = Mojo::Transaction::HTTP->new;
   $tx->req->url->parse('http://bücher.com/foo');
   $jar->prepare($tx);
-  is $tx->req->cookie('foo'), undef, 'no cookie';
+  is $tx->req->cookie('foo'),        undef, 'no cookie';
   is $tx->req->cookie('bar')->name,  'bar', 'right name';
   is $tx->req->cookie('bar')->value, 'baz', 'right value';
 };
@@ -294,7 +294,7 @@ subtest 'Gather and prepare cookies with domain and path' => sub {
   $tx = Mojo::Transaction::HTTP->new;
   $tx->req->url->parse('http://bücher.COM/perldoc/Mojolicious/Lite');
   $jar->prepare($tx);
-  is $tx->req->cookie('foo'), undef, 'no cookie';
+  is $tx->req->cookie('foo'),        undef,  'no cookie';
   is $tx->req->cookie('bar')->name,  'bar',  'right name';
   is $tx->req->cookie('bar')->value, 'with', 'right value';
   is $tx->req->cookie('0')->name,    '0',    'right name';
@@ -302,7 +302,7 @@ subtest 'Gather and prepare cookies with domain and path' => sub {
   $tx = Mojo::Transaction::HTTP->new;
   $tx->req->url->parse('http://labs.bücher.COM/Perldoc');
   $jar->prepare($tx);
-  is $tx->req->cookie('foo'), undef, 'no cookie';
+  is $tx->req->cookie('foo'),        undef,  'no cookie';
   is $tx->req->cookie('bar')->name,  'bar',  'right name';
   is $tx->req->cookie('bar')->value, 'with', 'right value';
 };
@@ -335,8 +335,8 @@ subtest 'Gather cookies with invalid expiration' => sub {
   is $jar->all->[0]->name,  'foo', 'right name';
   is $jar->all->[0]->value, 'bar', 'right value';
   ok !$jar->all->[0]->expires, 'does not expire';
-  is $jar->all->[1]->name,    'bar', 'right name';
-  is $jar->all->[1]->value,   'baz', 'right value';
+  is $jar->all->[1]->name,  'bar', 'right name';
+  is $jar->all->[1]->value, 'baz', 'right value';
   ok $jar->all->[1]->expires, 'expires';
 };
 

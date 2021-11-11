@@ -11,9 +11,9 @@ use Mojo::Util qw(encode);
 
 subtest 'Constructor' => sub {
   is(Mojo::File->new, canonpath(getcwd), 'same path');
-  is path(), canonpath(getcwd), 'same path';
-  is path()->to_string, canonpath(getcwd), 'same path';
-  is path('/foo/bar'), '/foo/bar', 'same path';
+  is path(),                    canonpath(getcwd),            'same path';
+  is path()->to_string,         canonpath(getcwd),            'same path';
+  is path('/foo/bar'),          '/foo/bar',                   'same path';
   is path('foo', 'bar', 'baz'), catfile('foo', 'bar', 'baz'), 'same path';
 };
 
@@ -32,7 +32,7 @@ subtest 'Siblings' => sub {
 
 subtest 'Array' => sub {
   is_deeply path('foo', 'bar')->to_array, [splitdir catfile('foo', 'bar')], 'same structure';
-  is_deeply [@{path('foo', 'bar')}], [splitdir catfile('foo', 'bar')], 'same structure';
+  is_deeply [@{path('foo', 'bar')}],      [splitdir catfile('foo', 'bar')], 'same structure';
 };
 
 subtest 'Absolute' => sub {
@@ -48,9 +48,9 @@ subtest 'Resolved' => sub {
 };
 
 subtest 'basename' => sub {
-  is path('file.t')->to_abs->basename, basename(rel2abs 'file.t'), 'same path';
+  is path('file.t')->to_abs->basename,       basename(rel2abs 'file.t'), 'same path';
   is path('file.t')->to_abs->basename('.t'), basename(rel2abs('file.t'), '.t'), 'same path';
-  is path('file.t')->basename('.t'), basename('file.t', '.t'), 'same path';
+  is path('file.t')->basename('.t'),         basename('file.t',          '.t'), 'same path';
 };
 
 subtest 'dirname' => sub {
@@ -58,10 +58,10 @@ subtest 'dirname' => sub {
 };
 
 subtest 'extname' => sub {
-  is path('.file.txt')->extname, 'txt', 'right extension';
-  is path('file.txt')->extname,  'txt', 'right extension';
-  is path('file')->extname,      '',    'no extension';
-  is path('.file')->extname,     '',    'no extension';
+  is path('.file.txt')->extname,                   'txt', 'right extension';
+  is path('file.txt')->extname,                    'txt', 'right extension';
+  is path('file')->extname,                        '',    'no extension';
+  is path('.file')->extname,                       '',    'no extension';
   is path('home', 'foo', 'file.txt')->extname,     'txt', 'right extension';
   is path('home', 'foo', 'file.txt.gz')->extname,  'gz',  'right extension';
   is path('home', 'foo', '.file.txt.gz')->extname, 'gz',  'right extension';
@@ -76,7 +76,7 @@ subtest 'Current file' => sub {
 
 subtest 'Checks' => sub {
   ok path(__FILE__)->to_abs->is_abs, 'path is absolute';
-  ok !path('file.t')->is_abs, 'path is not absolute';
+  ok !path('file.t')->is_abs,        'path is not absolute';
 };
 
 subtest 'Temporary directory' => sub {
@@ -103,7 +103,7 @@ subtest 'Temporary file' => sub {
   my $file = tempfile(DIR => $dir);
   my $path = "$file";
   ok -f $path, 'file exists';
-  is $file->dirname, $dir, 'same directory';
+  is $file->dirname,              $dir,   'same directory';
   is $file->spurt('test')->slurp, 'test', 'right result';
   undef $file;
   ok !-f $path, 'file does not exist anymore';
@@ -153,7 +153,7 @@ subtest 'make_path' => sub {
   ok -d $subdir, 'directory exists';
   my $nextdir = $dir->child('foo', 'foobar')->make_path({error => \my $error});
   ok -d $nextdir, 'directory exists';
-  ok $error, 'directory already existed';
+  ok $error,      'directory already existed';
 };
 
 subtest 'remove' => sub {
@@ -172,9 +172,9 @@ subtest 'remove_tree' => sub {
   is $dir->child('foo', 'bar', 'test.txt')->slurp, 'test!', 'right content';
   my $subdir = $dir->child('foo', 'foobar')->make_path;
   ok -e $subdir->child('bar')->make_path->child('test.txt')->spurt('test'), 'file created';
-  ok -d $subdir->remove_tree({keep_root => 1}), 'directory still exists';
-  ok !-e $subdir->child('bar'), 'children have been removed';
-  ok !-e $dir->child('foo')->remove_tree->to_string, 'directory has been removed';
+  ok -d $subdir->remove_tree({keep_root => 1}),                             'directory still exists';
+  ok !-e $subdir->child('bar'),                                             'children have been removed';
+  ok !-e $dir->child('foo')->remove_tree->to_string,                        'directory has been removed';
 };
 
 subtest 'move_to' => sub {
@@ -237,7 +237,7 @@ subtest 'lstat' => sub {
 
 subtest 'list/list_tree' => sub {
   is_deeply path('does_not_exist')->list->to_array, [], 'no files';
-  is_deeply curfile->list->to_array, [], 'no files';
+  is_deeply curfile->list->to_array,                [], 'no files';
   my $lib   = curfile->sibling('lib', 'Mojo');
   my @files = map { path($lib)->child(split /\//) }
     ('DeprecationTest.pm', 'LoaderException.pm', 'LoaderException2.pm', 'TestConnectProxy.pm');
@@ -253,7 +253,7 @@ subtest 'list/list_tree' => sub {
   is_deeply path($lib)->list({dir => 1, hidden => 1})->map('to_string')->to_array, [@hidden, @files], 'right files';
 
   is_deeply path('does_not_exist')->list_tree->to_array, [], 'no files';
-  is_deeply curfile->list_tree->to_array, [], 'no files';
+  is_deeply curfile->list_tree->to_array,                [], 'no files';
   @files = map { path($lib)->child(split /\//) } (
     'BaseTest/Base1.pm',        'BaseTest/Base2.pm',
     'BaseTest/Base3.pm',        'DeprecationTest.pm',
@@ -312,13 +312,13 @@ subtest 'list/list_tree' => sub {
 subtest 'touch' => sub {
   my $dir  = tempdir;
   my $file = $dir->child('test.txt');
-  ok !-e $file, 'file does not exist';
+  ok !-e $file,       'file does not exist';
   ok -e $file->touch, 'file exists';
   is $file->spurt('test!')->slurp, 'test!', 'right content';
-  is $file->touch->slurp, 'test!', 'right content';
+  is $file->touch->slurp,          'test!', 'right content';
   my $future = time + 1000;
   utime $future, $future, $file->to_string;
-  is $file->stat->mtime, $future, 'right mtime';
+  is $file->stat->mtime,          $future, 'right mtime';
   isnt $file->touch->stat->mtime, $future, 'different mtime';
 };
 
@@ -332,8 +332,8 @@ subtest 'Dangerous paths' => sub {
 subtest 'I/O' => sub {
   my $dir  = tempdir;
   my $file = $dir->child('test.txt')->spurt('just works!');
-  is $file->slurp, 'just works!', 'right content';
-  is $file->spurt('w', 'orks', ' too!')->slurp, 'works too!', 'right content';
+  is $file->slurp,                              'just works!', 'right content';
+  is $file->spurt('w', 'orks', ' too!')->slurp, 'works too!',  'right content';
   {
     no warnings 'redefine';
     local *IO::Handle::syswrite = sub { $! = 0; 5 };

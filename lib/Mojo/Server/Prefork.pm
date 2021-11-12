@@ -79,7 +79,7 @@ sub run {
   $self->app->log->info("Manager $$ stopped");
 }
 
-sub _heartbeat { shift->{writer}->syswrite("$$:$_[0]\n") or exit 0 }
+sub _heartbeat { shift->{writer}->syswrite("$$\n") or exit 0 }
 
 sub _manage {
   my $self = shift;
@@ -133,11 +133,9 @@ sub _spawn {
   return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time} if $pid;
 
   # Heartbeat messages
-  my $loop     = $self->cleanup(0)->ioloop;
-  my $finished = 0;
-  $loop->on(finish => sub { $finished = 1 });
+  my $loop = $self->cleanup(0)->ioloop;
   weaken $self;
-  my $cb = sub { $self->_heartbeat($finished) };
+  my $cb = sub { $self->_heartbeat() };
   $loop->next_tick($cb);
   $loop->recurring($self->heartbeat_interval => $cb);
 
@@ -176,12 +174,11 @@ sub _wait {
   return unless Mojo::Util::_readable(1000, fileno($reader));
   return unless $reader->sysread(my $chunk, 4194304);
 
-  # Update heartbeats (and stop gracefully if necessary)
+  # Update heartbeats
   my $time = steady_time;
-  while ($chunk =~ /(\d+):(\d)\n/g) {
+  while ($chunk =~ /(\d+)\n/g) {
     next unless my $w = $self->{pool}{$1};
     @$w{qw(healthy time)} = (1, $time) and $self->emit(heartbeat => $1);
-    $w->{graceful} ||= $time if $2;
   }
 }
 

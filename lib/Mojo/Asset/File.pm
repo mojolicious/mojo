@@ -49,7 +49,7 @@ sub contains {
   $handle->sysseek($self->start_range, SEEK_SET);
 
   # Calculate window size
-  my $end  = $self->end_range // $self->size;
+  my $end  = $self->_end_range;
   my $len  = length $str;
   my $size = $len > 131072 ? $len : 131072;
   $size = $end - $self->start_range if $size > $end - $self->start_range;
@@ -116,7 +116,12 @@ sub new {
   return $file;
 }
 
-sub size { -s shift->handle }
+sub size {
+  my $self = shift;
+  my $size = -s $self->handle;
+  return $size unless $self->is_range;
+  return $self->_end_range - $self->start_range + 1;
+}
 
 sub slurp {
   my $handle = shift->handle;
@@ -127,6 +132,11 @@ sub slurp {
 }
 
 sub to_file {shift}
+
+sub _end_range {
+  my $self = shift;
+  return (!$self->is_range && -s $self->handle) || $self->end_range || (-s $self->handle) - 1;
+}
 
 1;
 
@@ -245,7 +255,7 @@ Construct a new L<Mojo::Asset::File> object.
 
   my $size = $file->size;
 
-Size of asset data in bytes.
+Size of asset data in bytes. If <Mojo::Asset/"is_range"> is true, the size is that of the range.
 
 =head2 slurp
 

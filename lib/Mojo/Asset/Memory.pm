@@ -24,7 +24,7 @@ sub contains {
   my $start = $self->start_range;
   my $pos   = index $self->{content} // '', $str, $start;
   $pos -= $start if $start && $pos >= 0;
-  my $end = $self->end_range;
+  my $end = $self->_end_range(0);
 
   return $end && ($pos + length $str) >= $end ? -1 : $pos;
 }
@@ -41,12 +41,21 @@ sub get_chunk {
 
 sub move_to { path($_[1])->spurt($_[0]{content} // '') and return $_[0] }
 
-sub size { length(shift->{content} // '') }
+sub size {
+  my $self = shift;
+  return length($self->{content} // '') unless $self->is_range;
+  return $self->_end_range(-1) - $self->start_range + 1;
+}
 
 sub slurp { shift->{content} // '' }
 
 sub to_file { Mojo::Asset::File->new->add_chunk(shift->slurp) }
 
+sub _end_range {
+  my $self = shift;
+  return undef unless $self->is_range;
+  return $self->end_range || shift() + length($self->{content} // '');
+}
 1;
 
 =encoding utf8
@@ -140,7 +149,7 @@ Move asset data into a specific file.
 
   my $size = $mem->size;
 
-Size of asset data in bytes.
+Size of asset data in bytes. If <Mojo::Asset/"is_range"> is true, the size is that of the range.
 
 =head2 slurp
 

@@ -72,6 +72,7 @@ subtest 'File asset range support (a[bcdefabc])' => sub {
   my $file = Mojo::Asset::File->new(start_range => 1);
   ok $file->is_range, 'has range';
   $file->add_chunk('abcdefabc');
+  is $file->size,              8,  'correct size';
   is $file->contains('bcdef'), 0,  '"bcdef" at position 0';
   is $file->contains('cdef'),  1,  '"cdef" at position 1';
   is $file->contains('abc'),   5,  '"abc" at position 5';
@@ -82,6 +83,7 @@ subtest 'Memory asset range support (a[bcdefabc])' => sub {
   my $mem = Mojo::Asset::Memory->new(start_range => 1);
   ok $mem->is_range, 'has range';
   $mem->add_chunk('abcdefabc');
+  is $mem->size,              8,  'correct size';
   is $mem->contains('bcdef'), 0,  '"bcdef" at position 0';
   is $mem->contains('cdef'),  1,  '"cdef" at position 1';
   is $mem->contains('abc'),   5,  '"abc" at position 5';
@@ -92,6 +94,7 @@ subtest 'File asset range support (ab[cdefghi]jk)' => sub {
   my $file = Mojo::Asset::File->new(start_range => 2, end_range => 8);
   ok $file->is_range, 'has range';
   $file->add_chunk('abcdefghijk');
+  is $file->size,                7,         'correct size';
   is $file->contains('cdefghi'), 0,         '"cdefghi" at position 0';
   is $file->contains('fghi'),    3,         '"fghi" at position 3';
   is $file->contains('f'),       3,         '"f" at position 3';
@@ -110,6 +113,7 @@ subtest 'Memory asset range support (ab[cdefghi]jk)' => sub {
   my $mem = Mojo::Asset::Memory->new(start_range => 2, end_range => 8);
   ok $mem->is_range, 'has range';
   $mem->add_chunk('abcdefghijk');
+  is $mem->size,                7,         'correct size';
   is $mem->contains('cdefghi'), 0,         '"cdefghi" at position 0';
   is $mem->contains('fghi'),    3,         '"fghi" at position 3';
   is $mem->contains('f'),       3,         '"f" at position 3';
@@ -132,6 +136,7 @@ subtest 'Huge file asset' => sub {
   $file->add_chunk('b');
   $file->add_chunk('c' x 131072);
   $file->add_chunk('ddd');
+  is $file->size,                                   262148, 'correct size';
   is $file->contains('a'),                          0,      '"a" at position 0';
   is $file->contains('b'),                          131072, '"b" at position 131072';
   is $file->contains('c'),                          131073, '"c" at position 131073';
@@ -151,6 +156,7 @@ subtest 'Huge file asset with range' => sub {
   $file->add_chunk('b');
   $file->add_chunk('c' x 131072);
   $file->add_chunk('ddd');
+  is $file->size,                                   262146, 'correct size';
   is $file->contains('a'),                          0,      '"a" at position 0';
   is $file->contains('b'),                          131071, '"b" at position 131071';
   is $file->contains('c'),                          131072, '"c" at position 131072';
@@ -159,6 +165,7 @@ subtest 'Huge file asset with range' => sub {
   is $file->contains('dd'),                         262144, '"dd" at position 262144';
   is $file->contains('ddd'),                        -1,     'does not contain "ddd"';
   is $file->contains('b' . ('c' x 131072) . 'ddd'), -1,     'does not contain "b" . ("c" x 131072) . "ddd"';
+  is $file->size,                                   262146, 'correct size';
 };
 
 subtest 'Move memory asset to file' => sub {

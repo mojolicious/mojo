@@ -45,6 +45,25 @@ subtest 'Asset and filename' => sub {
     ->content_is('xlalalatset');
 };
 
+subtest 'Asset and filename with range' => sub {
+  my $file = Mojo::Asset::File->new->add_chunk('lalaln' x 10)->add_chunk('z')->start_range(19)->end_range(30);
+  $t->post_ok('/upload' => form => {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
+    ->content_is('xalalnlalalnltset', 'correct content with start and end set');
+  $file = Mojo::Asset::File->new->add_chunk('lalaln' x 10)->add_chunk('z')->end_range(30);
+  $t->post_ok('/upload' => form => {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
+    ->content_is('xlalalnlalalnlalalnlalalnlalalnltset', 'content correct with only end set');
+  $file = Mojo::Asset::File->new->add_chunk('lalala' x 10)->add_chunk('z')->start_range(51);
+  $t->post_ok('/upload' => form => {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
+    ->content_is('xalalalalaztset', 'content correct with only start set');
+  $file->add_chunk('est');
+  $t->post_ok('/upload' => form => {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
+    ->content_is('xalalalalazesttset', 'content correct after chunk added');
+  $file->start_range(0);
+  $t->post_ok('/upload' => form => {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
+    ->content_is('xlalalalalalalalalalalalalalalalalalalalalalalalalalalalalalazesttset',
+    'content correct with range removed');
+};
+
 subtest 'Path' => sub {
   my $file = Mojo::Asset::File->new->add_chunk('lalala');
   $t->post_ok('/upload' => form => {file => {file => $file->path}, test => 'foo'})->status_is(200)

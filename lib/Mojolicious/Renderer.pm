@@ -10,8 +10,9 @@ use Mojo::Util qw(decamelize deprecated encode gzip md5_sum monkey_patch);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
-has [qw(compress default_handler)];
+has compress => 1;
 has default_format         => 'html';
+has 'default_handler';
 has encoding               => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
 has min_compress_size      => 860;
@@ -281,7 +282,7 @@ usually happens automatically during application startup.
   $renderer = $renderer->compress($bool);
 
 Try to negotiate compression for dynamically generated response content and C<gzip> compress it automatically, defaults
-to false.
+to true.
 
 =head2 default_format
 

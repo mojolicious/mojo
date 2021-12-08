@@ -1,5 +1,6 @@
 
-9.23  2021-10-21
+9.23  2021-12-08
+  - Enable gzip compression by default in Mojolicious::Renderer.
 
 9.22  2021-10-16
   - Added a referer method to Mojo::Headers, as an alias for the referrer method.

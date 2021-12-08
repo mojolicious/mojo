@@ -8,10 +8,10 @@ use Mojo::JSON qw(encode_json);
 use Mojo::Loader qw(data_section);
 use Mojo::Util qw(decamelize deprecated encode gzip md5_sum monkey_patch);
 
-has cache   => sub { Mojo::Cache->new };
-has classes => sub { ['main'] };
-has compress => 1;
-has default_format         => 'html';
+has cache          => sub { Mojo::Cache->new };
+has classes        => sub { ['main'] };
+has compress       => 1;
+has default_format => 'html';
 has 'default_handler';
 has encoding               => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };

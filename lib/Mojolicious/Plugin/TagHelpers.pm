@@ -428,7 +428,7 @@ Generate C<input> tag. Previous input values will automatically get picked up an
   %= javascript '/script.js'
   %= javascript '/script.js', defer => undef
   %= javascript begin
-    var a = 'b';
+    const a = 'b';
   % end
 
 Generate portable C<script> tag for JavaScript asset.
@@ -436,7 +436,7 @@ Generate portable C<script> tag for JavaScript asset.
   <script src="/path/to/script.js"></script>
   <script defer src="/path/to/script.js"></script>
   <script><![CDATA[
-    var a = 'b';
+    const a = 'b';
   ]]></script>
 
 =head2 label_for

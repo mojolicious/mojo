@@ -99,7 +99,7 @@ __DATA__
 @@ index.html.ep
 % my $url = url_for 'title';
 <script>
-  var ws = new WebSocket('<%= $url->to_abs %>');
+  const ws = new WebSocket('<%= $url->to_abs %>');
   ws.onmessage = function (event) { document.body.innerHTML += event.data };
   ws.onopen    = function (event) { ws.send('https://mojolicious.org') };
 </script>

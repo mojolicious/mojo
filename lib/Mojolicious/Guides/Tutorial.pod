@@ -860,7 +860,7 @@ L<Mojolicious::Controller/"send">.
     <head>
       <title>Echo</title>
       <script>
-        var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
+        const ws = new WebSocket('<%= url_for('echo')->to_abs %>');
         ws.onmessage = function (event) {
           document.body.innerHTML += JSON.parse(event.data).msg;
         };

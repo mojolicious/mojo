@@ -88,7 +88,7 @@
       function mojoDrawer(handle, drawer) {
         $(handle).on('click', function () {
           $(drawer).slideToggle('slow');
-          var text = $(handle + ' div.tap').text();
+          const text = $(handle + ' div.tap').text();
           text = text == "tap for more" ? "tap for less" : "tap for more";
           $(handle + ' div.tap').text(text);
         });
@@ -154,7 +154,7 @@
                   </div>
                   <div class="tap">tap for more</div>
                   <script>
-                    var current = '#context';
+                    let current = '#context';
                     function mojoShowcase() {
                       $('#showcase').on('click', function () {
                         $(this).unbind('click');

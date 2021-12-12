@@ -26,7 +26,7 @@ __DATA__
 <form onsubmit="sendChat(this.children[0]); return false"><input></form>
 <div id="log"></div>
 <script>
-  var ws  = new WebSocket('<%= url_for('channel')->to_abs %>');
+  const ws  = new WebSocket('<%= url_for('channel')->to_abs %>');
   ws.onmessage = function (e) {
     document.getElementById('log').innerHTML += '<p>' + e.data + '</p>';
   };

@@ -136,12 +136,12 @@ $t->get_ok('/script')->status_is(200)->content_is(<<EOF);
 <script async src="/script.js"></script>
 <script>//<![CDATA[
 
-  var a = 'b';
+  const a = 'b';
 
 //]]></script>
 <script type="foo">//<![CDATA[
 
-  var a = 'b';
+  const a = 'b';
 
 //]]></script>
 EOF
@@ -576,10 +576,10 @@ __DATA__
 <%= javascript '/script.js' %>
 <%= javascript '/script.js', async => undef %>
 <%= javascript begin %>
-  var a = 'b';
+  const a = 'b';
 <% end %>
 <%= javascript type => 'foo' => begin %>
-  var a = 'b';
+  const a = 'b';
 <% end %>
 
 @@ style.html.ep

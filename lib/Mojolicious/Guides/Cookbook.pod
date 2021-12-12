@@ -971,7 +971,7 @@ L<Mojolicious::Controller/"on"> and return them with L<Mojolicious::Controller/"
     <head><title>Echo</title></head>
     <body>
       <script>
-        var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
+        const ws = new WebSocket('<%= url_for('echo')->to_abs %>');
 
         // Incoming messages
         ws.onmessage = function (event) {
@@ -1040,7 +1040,7 @@ for transport.
     <head><title>LiveLog</title></head>
     <body>
       <script>
-        var events = new EventSource('<%= url_for 'events' %>');
+        const events = new EventSource('<%= url_for 'events' %>');
 
         // Subscribe to "log" event
         events.addEventListener('log', function (event) {

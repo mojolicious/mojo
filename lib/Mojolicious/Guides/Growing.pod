@@ -72,13 +72,13 @@ and all session state is kept client-side.
   |         | <-    200 OK        <- |            |
   +---------+                        +------------+
 
-While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part of REST they go very well with it and are
+While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part of REST they go well with it and are
 commonly used to manipulate I<resources>.
 
 =head2 Sessions
 
 HTTP was designed as a stateless protocol, web servers don't know anything about previous requests, which makes
-user-friendly login systems very tricky. Sessions solve this problem by allowing web applications to keep stateful
+user-friendly login systems tricky. Sessions solve this problem by allowing web applications to keep stateful
 information across several HTTP requests.
 
   GET /login?user=sebastian&pass=s3cret HTTP/1.1
@@ -98,7 +98,7 @@ information across several HTTP requests.
   Content-Length: 16
   Hello again sebastian.
 
-Traditionally all session data was stored on the server-side and only session ids were exchanged between browser and
+Traditionally all session data was stored on the server-side and only session IDs were exchanged between browser and
 web server in the form of cookies.
 
   Set-Cookie: session=hmac-sha256(base64(json($session)))

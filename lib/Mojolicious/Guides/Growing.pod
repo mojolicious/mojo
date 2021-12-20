@@ -230,14 +230,14 @@ HTTP response like this being sent back to the browser.
 
 =head2 Model
 
-In L<Mojolicious> we consider web applications simple frontends for existing business logic, that means L<Mojolicious>
-is by design entirely I<model> layer agnostic and you just use whatever Perl modules you like most.
+In L<Mojolicious> we consider web applications simple frontends for existing business logic. That means L<Mojolicious>
+is by design entirely I<model> layer agnostic, and you just use whatever Perl modules you like most.
 
   $ mkdir -p lib/MyApp/Model
   $ touch lib/MyApp/Model/Users.pm
   $ chmod 644 lib/MyApp/Model/Users.pm
 
-Our login manager will simply use a plain old Perl module abstracting away all logic related to matching usernames and
+Our login manager will use a plain old Perl module abstracting away all logic related to matching usernames and
 passwords. The name C<MyApp::Model::Users> is an arbitrary choice, and is simply used to make the separation of
 concerns more visible.
 

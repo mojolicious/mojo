@@ -105,12 +105,14 @@ sub dispatch {
 
   my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
 
+  my $stash = $c->stash;
+  return if $stash->{'mojo.rendered'};
+
   # Try to find a static file
   my $tx = $c->tx;
   $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c) unless $tx->res->code;
 
   # Start timer (ignore static files)
-  my $stash = $c->stash;
   $c->helpers->log->trace(sub {
     my $req    = $c->req;
     my $method = $req->method;
@@ -121,8 +123,7 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  $c->helpers->reply->not_found
-    unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code || $stash->{'mojo.rendered'};
+  $c->helpers->reply->not_found unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
 }
 
 sub handler {

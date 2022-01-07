@@ -392,6 +392,24 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Form POST (application/x-www-form-urlencoded)
   my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
 
+  # Form multipart POST with both a local file and document within a string, accepting a JSON return.
+  my $tx = $ua->post(
+    'https://example.com/'
+    => {'Accept' => 'application/json'}
+    => form 
+    => {
+      'file1' => {
+        'content'   =>  '<?xml version="1.0"?><P ID="greeting">Hi!</P>',
+        'type'      =>  'text/xml',
+        'filename'  =>  'submit.xml'
+      }
+    }
+    => {
+     'file2' => {
+        'file'      =>  '/some/file/somewhere.xml'
+      }
+  );
+
   # Search DuckDuckGo anonymously through Tor
   $ua->proxy->http('socks://127.0.0.1:9050');
   say $ua->get('api.3g2upl4pq6kufc4m.onion/?q=mojolicious&format=json')->result->json('/Abstract');

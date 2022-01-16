@@ -277,7 +277,7 @@ they are the foundation for many helpers.
     <head><title>Sebastians frameworks</title></head>
     <body>
       %= $link->('http://mojolicious.org', 'Mojolicious')
-      %= $link->('http://catalystframework.org', 'Catalyst')
+      %= $link->('http://mojojs.org', 'mojo.js')
     </body>
   </html>
 

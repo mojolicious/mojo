@@ -36,8 +36,7 @@
     * JSON and HTML/XML parser with CSS selector support.
   * Very clean, portable and object-oriented pure-Perl API with no hidden magic and no requirements besides Perl 5.26.0
     (versions as old as 5.16.0 can be used too, but may require additional CPAN modules to be installed)
-  * Fresh code based upon years of experience developing [Catalyst](https://en.wikipedia.org/wiki/Catalyst_(software)),
-    free and open source.
+  * Fresh code based upon years of experience developing [Catalyst](http://catalyst.perl.org), free and open source.
   * Hundreds of 3rd party [extensions](https://metacpan.org/requires/distribution/Mojolicious) and high quality spin-off
     projects like the [Minion](https://metacpan.org/pod/Minion) job queue.
 

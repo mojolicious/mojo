@@ -42,16 +42,22 @@ sub append {
   flock $handle, LOCK_UN;
 }
 
-sub debug { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
+sub debug  { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
+sub debugf { shift->debug(sprintf(shift, @_)) }
 
 sub context {
   my ($self, @context) = @_;
   return $self->new(parent => $self, context => \@context, level => $self->level);
 }
 
-sub error { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
-sub fatal { 6 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
+sub error  { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
+sub errorf { shift->error(sprintf(shift, @_)) }
+
+sub fatal  { 6 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
+sub fatalf { shift->fatal(sprintf(shift, @_)) }
+
 sub info  { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'info')  : $_[0] }
+sub infof { shift->info(sprintf(shift, @_)) }
 
 sub is_level { $LEVEL{pop()} >= $LEVEL{shift->level} }
 
@@ -61,8 +67,11 @@ sub new {
   return $self;
 }
 
-sub trace { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'trace') : $_[0] }
+sub trace  { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'trace') : $_[0] }
+sub tracef { shift->trace(sprintf(shift, @_)) }
+
 sub warn  { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn')  : $_[0] }
+sub warnf { shift->warn(sprintf(shift, @_)) }
 
 sub _color {
   my $msg = _default(shift, my $level = shift, @_);
@@ -239,6 +248,12 @@ Construct a new child L<Mojo::Log> object that will include context information 
 
 Emit L</"message"> event and log C<debug> message.
 
+=head2 debugf
+
+  $log = $log->debugf('%s is %s', 'Mojolicious', 'cool');
+
+Simple sprint-based wrapper over L</"debug"> method.
+
 =head2 error
 
   $log = $log->error('You really screwed up this time');
@@ -246,6 +261,12 @@ Emit L</"message"> event and log C<debug> message.
   $log = $log->error(sub {...});
 
 Emit L</"message"> event and log C<error> message.
+
+=head2 errorf
+
+  $log = $log->errorf('%s is %s', 'Mojolicious', 'cool');
+
+Simple sprint-based wrapper over L</"error"> method.
 
 =head2 fatal
 
@@ -255,6 +276,12 @@ Emit L</"message"> event and log C<error> message.
 
 Emit L</"message"> event and log C<fatal> message.
 
+=head2 fatalf
+
+  $log = $log->fatalf('%s is %s', 'Mojolicious', 'cool');
+
+Simple sprint-based wrapper over L</"fatal"> method.
+
 =head2 info
 
   $log = $log->info('You are bad, but you prolly know already');
@@ -262,6 +289,12 @@ Emit L</"message"> event and log C<fatal> message.
   $log = $log->info(sub {...});
 
 Emit L</"message"> event and log C<info> message.
+
+=head2 infof
+
+  $log = $log->infof('%s is %s', 'Mojolicious', 'cool');
+
+Simple sprint-based wrapper over L</"info"> method.
 
 =head2 is_level
 
@@ -293,6 +326,12 @@ Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with de
 
 Emit L</"message"> event and log C<trace> message.
 
+=head2 tracef
+
+  $log = $log->tracef('%s is %s', 'Mojolicious', 'cool');
+
+Simple sprint-based wrapper over L</"trace"> method.
+
 =head2 warn
 
   $log = $log->warn('Dont do that Dave...');
@@ -300,6 +339,12 @@ Emit L</"message"> event and log C<trace> message.
   $log = $log->warn(sub {...});
 
 Emit L</"message"> event and log C<warn> message.
+
+=head2 warnf
+
+  $log = $log->warnf('%s is %s', 'Mojolicious', 'cool');
+
+Simple sprint-based wrapper over L</"warn"> method.
 
 =head1 SEE ALSO
 

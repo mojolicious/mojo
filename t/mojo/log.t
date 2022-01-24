@@ -229,4 +229,27 @@ subtest 'Context' => sub {
   like $buffer,   qr/\[.*\] \[fatal\] \[123\] Mojolicious rocks\n/, 'right fatal message';
 };
 
+subtest 'Text formatting wrappers' => sub {
+  my $log    = Mojo::Log->new(level => 'trace', path => $path);
+  my $buffer = '';
+  {
+    open my $handle, '>', \$buffer;
+    local *STDERR = $handle;
+    my $log = Mojo::Log->new;
+    $log->tracef('Mojolicious %s', 'works');
+    $log->debugf('Mojolicious %s', 'just works');
+    $log->infof( 'Mojolicious %s', 'really works');
+    $log->warnf( 'Mojolicious %s', 'works, really');
+    $log->errorf('Mojolicious %s', 'works great');
+    $log->fatalf('Mojolicious %s', 'works well');
+  }
+  my $content = decode 'UTF-8', $buffer;
+  like $content, qr/\[.*\] \[trace\] Mojolicious works\n/,        'right error message';
+  like $content, qr/\[.*\] \[debug\] Mojolicious just works\n/,   'right error message';
+  like $content, qr/\[.*\] \[info\] Mojolicious really works\n/,  'right error message';
+  like $content, qr/\[.*\] \[warn\] Mojolicious works, really\n/, 'right error message';
+  like $content, qr/\[.*\] \[error\] Mojolicious works great\n/,  'right error message';
+  like $content, qr/\[.*\] \[fatal\] Mojolicious works well\n/,   'right error message';
+};
+
 done_testing();

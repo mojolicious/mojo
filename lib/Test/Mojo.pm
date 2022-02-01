@@ -1017,6 +1017,19 @@ for the callback.
 Perform a C<PUT> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"put">, except
 for the callback.
 
+=head2 query_ok
+
+  $t = $t->query_ok('http://example.com/foo');
+  $t = $t->query_ok('/foo');
+  $t = $t->query_ok('/foo' => {Accept => '*/*'} => 'Content!');
+  $t = $t->query_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->query_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
+
+Perform a C<QUERY> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"query">, except
+for the callback. Note that this HTTP verb is B<EXPERIMENTAL> and might change without warning.
+
+This HTTP verb is part of L<a draft RFC|https://www.ietf.org/archive/id/draft-ietf-httpbis-safe-method-w-body-02.html>, which is still a work in progress.
+
 =head2 request_ok
 
   $t = $t->request_ok(Mojo::Transaction::HTTP->new);

@@ -522,6 +522,25 @@ L<Mojolicious::Guides::Routing> for more information.
   # Route with destination
   $r->put('/user')->to('user#replace');
 
+=head2 query
+
+  my $route = $r->query;
+  my $route = $r->query('/:foo');
+  my $route = $r->query('/:foo' => sub ($c) {...});
+  my $route = $r->query('/:foo' => sub ($c) {...} => 'name');
+  my $route = $r->query('/:foo' => {foo => 'bar'} => sub ($c) {...});
+  my $route = $r->query('/:foo' => [foo => qr/\w+/] => sub ($c) {...});
+  my $route = $r->query('/:foo' => (agent => qr/Firefox/) => sub ($c) {...});
+
+Generate L<Mojolicious::Routes::Route> object matching only C<QUERY> requests, takes the same arguments as L</"any">
+(except for the HTTP methods to match, which are implied). See L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for more information. Note that this HTTP verb is B<EXPERIMENTAL> and might change without warning.
+
+  # Route with destination
+  $r->query('/user')->to('user#replace');
+  
+This HTTP verb is part of L<a draft RFC|https://www.ietf.org/archive/id/draft-ietf-httpbis-safe-method-w-body-02.html>, which is still a work in progress.
+
 =head2 remove
 
   $r = $r->remove;

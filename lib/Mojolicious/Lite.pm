@@ -293,6 +293,20 @@ L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more in
 Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
+=head2 query
+
+  my $route = query '/:foo' => sub ($c) {...};
+  my $route = query '/:foo' => sub ($c) {...} => 'name';
+  my $route = query '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = query '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = query '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
+
+Generate route with L<Mojolicious::Routes::Route/"query">, matching only C<QUERY> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
+Note that this HTTP verb is B<EXPERIMENTAL> and might change without warning.
+
+This HTTP verb is part of L<a draft RFC|https://www.ietf.org/archive/id/draft-ietf-httpbis-safe-method-w-body-02.html>, which is still a work in progress.
+
 =head2 under
 
   my $route = under sub ($c) {...};

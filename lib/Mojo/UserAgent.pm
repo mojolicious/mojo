@@ -32,7 +32,7 @@ has socket_options  => sub { {} };
 has transactor      => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
-for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
+for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT QUERY)) {
   monkey_patch __PACKAGE__, lc $name, sub {
     my ($self, $cb) = (shift, ref $_[-1] eq 'CODE' ? pop : undef);
     return $self->start($self->build_tx($name, @_), $cb);

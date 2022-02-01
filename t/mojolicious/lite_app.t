@@ -97,6 +97,12 @@ get '/noformat' => [format => 0] => {format => 'xml'} => sub {
   $c->render(text => $c->stash('format') . $c->url_for);
 };
 
+query '/echojson' => sub {
+  my $c = shift;
+  my $arg = $c->req->json('/message');
+  $c->render(json => $arg)
+};
+
 del sub { shift->render(text => 'Hello!') };
 
 any sub { shift->render(text => 'Bye!') };
@@ -551,6 +557,10 @@ $t->get_ok('/alterformat.html')->status_is(404)->header_is(Server => 'Mojoliciou
 # No format
 $t->get_ok('/noformat')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('xml/noformat');
 $t->get_ok('/noformat.xml')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# Echo JSON via query request
+$t->query_ok('/echojson', json => { message => { an => [ qw/object of sorts/ ] } })
+  ->json_is('/an' => [ qw/object of sorts/ ]);
 
 # "application/x-www-form-urlencoded"
 $t->post_ok('/multipart/form' => form => {test => [1 .. 5]})->status_is(200)->content_is(join "\n", 1 .. 5);

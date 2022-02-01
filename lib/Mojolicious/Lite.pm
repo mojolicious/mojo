@@ -29,7 +29,7 @@ sub import {
 
   # The Mojolicious::Lite DSL
   my $root = $routes;
-  for my $name (qw(any get options patch post put websocket)) {
+  for my $name (qw(any get options patch post put query websocket)) {
     monkey_patch $caller, $name, sub { $routes->$name(@_) }
   }
   monkey_patch($caller, $_, sub {$app}) for qw(new app);

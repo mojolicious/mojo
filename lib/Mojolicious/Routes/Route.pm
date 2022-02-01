@@ -85,6 +85,7 @@ sub parse {
 sub patch { shift->_generate_route(PATCH => @_) }
 sub post  { shift->_generate_route(POST  => @_) }
 sub put   { shift->_generate_route(PUT   => @_) }
+sub query { shift->_generate_route(QUERY => @_) }
 
 sub remove {
   my $self = shift;

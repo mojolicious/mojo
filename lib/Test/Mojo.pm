@@ -267,6 +267,7 @@ sub or {
 sub patch_ok { shift->_build_ok(PATCH => @_) }
 sub post_ok  { shift->_build_ok(POST  => @_) }
 sub put_ok   { shift->_build_ok(PUT   => @_) }
+sub query_ok { shift->_build_ok(QUERY => @_) }
 
 sub request_ok { shift->_request_ok($_[0], $_[0]->req->url->to_string) }
 

@@ -1,5 +1,5 @@
 
-9.23  2021-12-08
+9.23  2021-03-25
   - Enable gzip compression by default in Mojolicious::Renderer.
 
 9.22  2021-10-16

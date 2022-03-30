@@ -295,6 +295,15 @@ subtest 'Forked process' => sub {
   ok !-e $path, 'file has been cleaned up';
 };
 
+subtest 'Upgrade with missing temporary directory' => sub {
+  my $tmpdir = tempdir;
+  local $ENV{MOJO_TMPDIR} = $tmpdir->child('does_not_exist');
+  my $mem = Mojo::Asset::Memory->new(max_memory_size => 10, auto_upgrade => 1);
+  $mem->add_chunk('abcdef');
+  eval { $mem->add_chunk('ghijkl') };
+  like $@, qr/does not exist/, 'right error';
+};
+
 subtest 'Abstract methods' => sub {
   eval { Mojo::Asset->add_chunk };
   like $@, qr/Method "add_chunk" not implemented by subclass/, 'right error';

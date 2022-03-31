@@ -1,6 +1,7 @@
 package Mojo::Asset::Memory;
 use Mojo::Base 'Mojo::Asset';
 
+use Carp 'croak';
 use Mojo::Asset::File;
 use Mojo::File qw(path);
 
@@ -11,11 +12,14 @@ has mtime           => sub {$^T};
 sub add_chunk {
   my ($self, $chunk) = @_;
 
-  # Upgrade if necessary
+  croak 'Asset has been upgraded and is now frozen' if $self->{frozen};
+  if ($self->auto_upgrade && ($self->size + length $chunk) > $self->max_memory_size) {
+    $self->emit(upgrade => my $file = Mojo::Asset::File->new)->{frozen} = 1;
+    return $file->add_chunk($self->slurp . $chunk);
+  }
+
   $self->{content} .= $chunk;
-  return $self if !$self->auto_upgrade || $self->size <= $self->max_memory_size;
-  $self->emit(upgrade => my $file = Mojo::Asset::File->new);
-  return $file->add_chunk($self->slurp);
+  return $self;
 }
 
 sub contains {

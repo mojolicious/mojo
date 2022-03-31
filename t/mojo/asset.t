@@ -302,6 +302,10 @@ subtest 'Upgrade with missing temporary directory' => sub {
   $mem->add_chunk('abcdef');
   eval { $mem->add_chunk('ghijkl') };
   like $@, qr/does not exist/, 'right error';
+  is $mem->slurp, 'abcdef', 'no memory leak';
+  eval { $mem->add_chunk('g') };
+  like $@, qr/Asset has been upgraded and is now frozen/, 'right error';
+  is $mem->slurp, 'abcdef', 'asset is frozen';
 };
 
 subtest 'Abstract methods' => sub {

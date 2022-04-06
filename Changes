@@ -1,8 +1,8 @@
 
-9.24  2021-03-31
+9.24  2022-03-31
   - Fixed a memory leak in Mojo::Asset::Memory.
 
-9.23  2021-03-25
+9.23  2022-03-25
   - Enable gzip compression by default in Mojolicious::Renderer.
 
 9.22  2021-10-16

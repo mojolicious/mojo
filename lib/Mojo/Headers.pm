@@ -102,7 +102,7 @@ sub leftovers { delete shift->{buffer} }
 
 sub names {
   my $self = shift;
-  return [map { $NAMES{$_} || $self->{names}{$_} } keys %{$self->{headers}}];
+  return [map { $NAMES{$_} || $self->{names}{$_} } sort keys %{$self->{headers}}];
 }
 
 sub parse {

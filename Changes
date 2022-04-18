@@ -1,5 +1,6 @@
 
-9.24  2022-03-31
+9.24  2022-04-18
+  - Improved Mojo::Headers to output headers in a canonical order.
   - Fixed a memory leak in Mojo::Asset::Memory.
 
 9.23  2022-03-25

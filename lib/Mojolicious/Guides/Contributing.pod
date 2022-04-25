@@ -269,7 +269,7 @@ authors.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.libera.chat>
-(L<chat now!|https://web.libera.chat/#mojo>).
+L<Forum|https://forum.mojolicious.org>, on L<Matrix|https://matrix.to/#/#mojo:matrix.org>, or
+L<IRC|https://web.libera.chat/#mojo>.
 
 =cut

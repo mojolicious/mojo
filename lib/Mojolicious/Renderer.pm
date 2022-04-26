@@ -124,8 +124,7 @@ sub render {
 sub respond {
   my ($self, $c, $output, $format, $status) = @_;
 
-  my $stash = $c->stash;
-  croak 'A response has already been rendered' if $stash->{'mojo.respond'}++;
+  croak 'A response has already been rendered' if $c->stash->{'mojo.respond'}++;
 
   # Gzip compression
   my $res = $c->res;

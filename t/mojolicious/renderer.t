@@ -145,6 +145,14 @@ ok !$c->res->headers->vary,             'no "Vary" value';
 ok !$c->res->headers->content_encoding, 'no "Content-Encoding" value';
 is $c->res->body, $output, 'same string';
 
+subtest 'Response has already been rendered' => sub {
+  my $c = $app->build_controller;
+  $c->render(text => 'First call');
+  is $c->render_to_string(text => 'Unrelated call'), 'Unrelated call', 'right result';
+  eval { $c->render(text => 'Second call') };
+  like $@, qr/A response has already been rendered/, 'right error';
+};
+
 # Missing method (AUTOLOAD)
 my $class = ref $first->myapp;
 eval { $first->myapp->missing };

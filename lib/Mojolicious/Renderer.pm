@@ -1,6 +1,7 @@
 package Mojolicious::Renderer;
 use Mojo::Base -base;
 
+use Carp qw(croak);
 use Mojo::Cache;
 use Mojo::DynamicMethods;
 use Mojo::File qw(curfile path);
@@ -122,6 +123,9 @@ sub render {
 
 sub respond {
   my ($self, $c, $output, $format, $status) = @_;
+
+  my $stash = $c->stash;
+  croak 'A response has already been rendered' if $stash->{'mojo.respond'}++ && $stash->{'mojo.respond'};
 
   # Gzip compression
   my $res = $c->res;

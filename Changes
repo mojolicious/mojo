@@ -1,4 +1,6 @@
 
+9.26  2022-04-28
+
 9.25  2022-04-25
   - Improved Mojolicious::Renderer to throw an exception if rendering is attempted more than once.
 

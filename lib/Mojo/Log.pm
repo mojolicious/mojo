@@ -273,6 +273,7 @@ is B<EXPERIMENTAL> and might change without warning!
   $log->trace('Just some debug information');
   like $messages, qr/Something very bad happened/, 'logs contain fatal message';
   like $messages->[-1], qr/Just some debug information/, 'trace message was last';
+  undef $messages;
 
 =head2 context
 

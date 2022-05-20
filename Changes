@@ -1,5 +1,6 @@
 
-9.26  2022-04-28
+9.26  2022-05-20
+  - Added EXPERIMENTAL capture method to Mojo::Log.
 
 9.25  2022-04-25
   - Improved Mojolicious::Renderer to throw an exception if rendering is attempted more than once.

@@ -22,11 +22,10 @@ app->defaults(default => 23);
 
 # Secret
 app->log->level('trace')->unsubscribe('message');
-my $log = '';
-my $cb  = app->log->on(message => sub { $log .= pop });
+my $logs = app->log->capture('trace');
 is app->secrets->[0], app->moniker, 'secret defaults to moniker';
-like $log, qr/Your secret passphrase needs to be changed/, 'right message';
-app->log->unsubscribe(message => $cb);
+like $logs, qr/Your secret passphrase needs to be changed/, 'right message';
+undef $logs;
 
 # Test helpers
 helper test_helper  => sub { shift->param(@_) };
@@ -752,21 +751,19 @@ $t->get_ok('/to_string')->status_is(200)->content_is('beforeafter');
 $t->get_ok('/source')->status_is(200)->content_type_is('application/octet-stream')->content_like(qr!get_ok\('/source!);
 
 # File does not exist
-$log = '';
-$cb  = $t->app->log->on(message => sub { $log .= pop });
+$logs = app->log->capture('trace');
 $t->get_ok('/source?fail=1')->status_is(500)->content_like(qr/Static file "does_not_exist.txt" not found/);
-like $log, qr/Static file "does_not_exist.txt" not found/, 'right message';
-$t->app->log->unsubscribe(message => $cb);
+like $logs, qr/Static file "does_not_exist.txt" not found/, 'right message';
+undef $logs;
 
 # With body and max message size
 {
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
-  $log = '';
-  $cb  = $t->app->log->on(message => sub { $log .= pop });
+  my $logs = app->log->capture('trace');
   $t->get_ok('/', '1234' x 1024)->status_is(200)->header_is(Connection => 'close')
     ->content_is("Maximum message size exceeded\n" . "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
-  like $log, qr/Maximum message size exceeded/, 'right message';
-  $t->app->log->unsubscribe(message => $cb);
+  like $logs, qr/Maximum message size exceeded/, 'right message';
+  undef $logs;
 }
 
 # Relaxed placeholder

@@ -421,8 +421,7 @@ Mojo::IOLoop->start;
 is $result, 'hi!' x 100, 'right result';
 
 # Timeout
-my $log = '';
-$msg   = app->log->on(message => sub { $log .= pop });
+my $logs = app->log->capture('trace');
 $stash = undef;
 app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $ua->websocket(
@@ -433,8 +432,8 @@ $ua->websocket(
 Mojo::IOLoop->start;
 Mojo::IOLoop->one_tick until $stash->{finished};
 is $stash->{finished}, 1, 'finish event has been emitted once';
-like $log, qr/Inactivity timeout/, 'right log message';
-app->log->unsubscribe(message => $msg);
+like $logs, qr/Inactivity timeout/, 'right log message';
+undef $logs;
 
 # Ping/pong
 my $pong;

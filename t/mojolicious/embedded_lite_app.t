@@ -430,9 +430,7 @@ subtest 'Embedded WebSocket' => sub {
 };
 
 subtest 'Template from myapp.pl (shared logger)' => sub {
-  $t->app->log->level('trace')->unsubscribe('message');
-  my $log = '';
-  my $cb  = $t->app->log->on(message => sub { $log .= pop });
+  my $logs = $t->app->log->capture('trace');
   $t->get_ok('/x/1')->status_is(200)->content_is(<<'EOF');
 myapp
 works ♥!Insecure!Insecure!
@@ -443,9 +441,9 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
   <input type="submit" value="☃">
 </form>
 EOF
-  like $log, qr/Routing to application "Mojolicious::Lite"/,                    'right message';
-  like $log, qr/Rendering cached template "menubar.html.ep" from DATA section/, 'right message';
-  $t->app->log->unsubscribe(message => $cb);
+  like $logs, qr/Routing to application "Mojolicious::Lite"/,                    'right message';
+  like $logs, qr/Rendering cached template "menubar.html.ep" from DATA section/, 'right message';
+  undef $logs;
 };
 
 done_testing();

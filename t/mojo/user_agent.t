@@ -397,13 +397,12 @@ is $body, '{"hello":"world"}', 'right content';
 
 # Built-in web server times out
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-my $log = '';
-my $msg = app->log->on(message => sub { $log .= pop });
+my $logs = app->log->capture('trace');
 $tx = $ua->get('/timeout?timeout=0.25');
-app->log->unsubscribe(message => $msg);
 is $tx->error->{message}, 'Premature connection close', 'right error';
 is $timeout,              1,                            'finish event has been emitted';
-like $log, qr/Inactivity timeout/, 'right log message';
+like $logs, qr/Inactivity timeout/, 'right log message';
+undef $logs;
 eval { $tx->result };
 like $@, qr/Premature connection close/, 'right error';
 

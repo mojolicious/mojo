@@ -42,12 +42,37 @@ sub append {
   flock $handle, LOCK_UN;
 }
 
-sub debug { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
+sub capture {
+  my ($self, $level) = @_;
+
+  croak 'Log messages are already being captured' if $self->{capturing}++;
+
+  my $original = $self->level;
+  $self->level($level || $original);
+  my $subscribers = $self->subscribers('message');
+  $self->unsubscribe('message');
+
+  my $capture = Mojo::Log::_Capture->new(sub {
+    delete $self->level($original)->unsubscribe('message')->{capturing};
+    $self->on(message => $_) for @$subscribers;
+  });
+  my $messages = $capture->{messages};
+  $self->on(
+    message => sub {
+      my $self = shift;
+      push @$messages, $self->format->(time, @_);
+    }
+  );
+
+  return $capture;
+}
 
 sub context {
   my ($self, @context) = @_;
   return $self->new(parent => $self, context => \@context, level => $self->level);
 }
+
+sub debug { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
 
 sub error { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
 sub fatal { 6 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
@@ -99,6 +124,21 @@ sub _short {
   my ($time, $level) = (shift, shift);
   my ($magic, $short) = ("<$MAGIC{$level}>", substr($level, 0, 1));
   return "${magic}[$$] [$short] " . join(' ', @_) . "\n";
+}
+
+package Mojo::Log::_Capture;
+use Mojo::Base -base;
+use overload
+  bool     => sub {1},
+  '@{}'    => sub { shift->{messages} },
+  '""'     => sub { join '', @{shift->{messages}} },
+  fallback => 1;
+
+use Mojo::Util qw(scope_guard);
+
+sub new {
+  my ($class, $cb) = @_;
+  return $class->SUPER::new(guard => scope_guard($cb), messages => []);
 }
 
 1;
@@ -218,6 +258,21 @@ L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements the 
   $log->append("[2018-11-08 14:20:13.77168] [28320] [info] I ♥ Mojolicious\n");
 
 Append message to L</"handle">.
+
+=head2 capture
+
+  my $messages = $log->capture;
+  my $messages = $log->capture('debug');
+
+Capture log messages for as long as the returned object exists, useful for testing log messages. Note that this method
+is B<EXPERIMENTAL> and might change without warning!
+
+  # Test your log messages
+  my $messages = $log->capture('trace');
+  $log->fatal('Something very bad happened');
+  $log->trace('Just some debug information');
+  like $messages, qr/Something very bad happened/, 'logs contain fatal message';
+  like $messages->[-1], qr/Just some debug information/, 'trace message was last';
 
 =head2 context
 

@@ -149,6 +149,55 @@ subtest 'History' => sub {
   ok !$history->[2], 'no more messages';
 };
 
+subtest 'Capturing' => sub {
+  my $log = Mojo::Log->new;
+  is $log->level, 'trace', 'rigth level';
+
+  my $logs = $log->capture;
+  is $log->level, 'trace', 'rigth level';
+  undef $logs;
+  is $log->level, 'trace', 'rigth level';
+
+  $logs = $log->capture('info');
+  is $log->level, 'info', 'rigth level';
+  undef $logs;
+  is $log->level, 'trace', 'rigth level';
+
+  $logs = $log->capture;
+  $log->trace('First');
+  $log->debug('Second');
+  $log->fatal('Third');
+  like $logs,      qr/\[trace\].+First\n.+\[debug\].+Second\n.+\[fatal\].+Third\n/, 'right messages';
+  like $logs->[0], qr/First/,                                                       'right message';
+  like $logs->[1], qr/Second/,                                                      'right message';
+  like $logs->[2], qr/Third/,                                                       'right message';
+  is $logs->[3], undef, 'no more messages';
+  undef $logs;
+
+  $logs = $log->capture('info');
+  $log->trace('First');
+  $log->debug('Second');
+  $log->fatal('Third');
+  unlike $logs,    qr/First/,     'no trace messages';
+  unlike $logs,    qr/Second/,    'no debug messages';
+  like $logs,      qr/.+Third\n/, 'right message';
+  like $logs->[0], qr/Third/,     'right message';
+  is $logs->[1], undef, 'no more messages';
+  undef $logs;
+
+  $log  = Mojo::Log->new(short => 1);
+  $logs = $log->capture;
+  $log->trace('First');
+  $log->debug('Second');
+  $log->fatal('Third');
+  like $logs, qr/\[t\].+First\n.+\[d\].+Second\n.+\[f\].+Third\n/, 'right messages';
+  undef $logs;
+
+  $logs = $log->capture;
+  eval { $log->capture };
+  like $@, qr/Log messages are already being captured/, 'right error';
+};
+
 subtest '"trace"' => sub {
   my $log = Mojo::Log->new();
   is $log->level('trace')->level, 'trace', 'right level';

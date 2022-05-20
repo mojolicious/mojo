@@ -42,23 +42,21 @@ $c->stash->{handler}  = 'debug';
 is_deeply [$renderer->render($c)], ['Hello Mojo!', 'test'], 'rendering a path with dots';
 
 # Unrecognized handler
-my $log = '';
-my $cb  = $c->app->log->on(message => sub { $log .= pop });
+my $logs = $c->app->log->capture('trace');
 $c->stash->{handler} = 'not_defined';
 is $renderer->render($c), undef, 'return undef for unrecognized handler';
-like $log, qr/No handler for "not_defined" found/, 'right message';
-$c->app->log->unsubscribe(message => $cb);
+like $logs, qr/No handler for "not_defined" found/, 'right message';
+undef $logs;
 
 # Default template name
 $c->stash(controller => 'foo', action => 'bar');
 is $c->app->renderer->template_for($c), 'foo/bar', 'right template name';
 
 # Big cookie
-$log = '';
-$cb  = $c->app->log->on(message => sub { $log .= pop });
+$logs = $c->app->log->capture('trace');
 $c->cookie(foo => 'x' x 4097);
-like $log, qr/Cookie "foo" is bigger than 4KiB/, 'right message';
-$c->app->log->unsubscribe(message => $cb);
+like $logs, qr/Cookie "foo" is bigger than 4KiB/, 'right message';
+undef $logs;
 
 # Nested helpers
 my $first = $app->build_controller;

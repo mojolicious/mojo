@@ -103,15 +103,13 @@ subtest 'Freshness (multiple Etag values)' => sub {
 };
 
 subtest 'Static file' => sub {
-  $t->app->log->level('trace')->unsubscribe('message');
-  my $log = '';
-  my $cb  = $t->app->log->on(message => sub { $log .= pop });
+  my $logs = $t->app->log->capture('trace');
   $t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
     ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
     ->content_is("Hello Mojo from a static file!\n");
-  like $log,   qr/Static file served/, 'right message';
-  unlike $log, qr/200 OK/,             'no status message';
-  $t->app->log->unsubscribe(message => $cb);
+  like $logs,   qr/Static file served/, 'right message';
+  unlike $logs, qr/200 OK/,             'no status message';
+  undef $logs;
 };
 
 subtest 'Static file (HEAD)' => sub {

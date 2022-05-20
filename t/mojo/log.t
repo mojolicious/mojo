@@ -155,6 +155,8 @@ subtest 'Capturing' => sub {
 
   my $logs = $log->capture;
   is $log->level, 'trace', 'rigth level';
+  is $logs,       '',      'empty log';
+  is $logs->[0],  undef,   'empty log';
   undef $logs;
   is $log->level, 'trace', 'rigth level';
 

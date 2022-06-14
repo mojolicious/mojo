@@ -2,7 +2,7 @@ package Mojolicious::Plugins;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::Loader qw(load_class);
-use Mojo::Util qw(camelize);
+use Mojo::Util   qw(camelize);
 
 has namespaces => sub { ['Mojolicious::Plugin'] };
 

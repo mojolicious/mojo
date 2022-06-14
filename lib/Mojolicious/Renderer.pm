@@ -4,10 +4,10 @@ use Mojo::Base -base;
 use Carp qw(croak);
 use Mojo::Cache;
 use Mojo::DynamicMethods;
-use Mojo::File qw(curfile path);
-use Mojo::JSON qw(encode_json);
+use Mojo::File   qw(curfile path);
+use Mojo::JSON   qw(encode_json);
 use Mojo::Loader qw(data_section);
-use Mojo::Util qw(decamelize deprecated encode gzip md5_sum monkey_patch);
+use Mojo::Util   qw(decamelize deprecated encode gzip md5_sum monkey_patch);
 
 has cache          => sub { Mojo::Cache->new };
 has classes        => sub { ['main'] };

@@ -1,8 +1,8 @@
 package Mojo::Collection;
 use Mojo::Base -strict;
 
-use re qw(is_regexp);
-use Carp qw(croak);
+use re       qw(is_regexp);
+use Carp     qw(croak);
 use Exporter qw(import);
 use List::Util;
 use Mojo::ByteStream;

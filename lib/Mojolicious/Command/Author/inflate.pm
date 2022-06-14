@@ -2,7 +2,7 @@ package Mojolicious::Command::Author::inflate;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Loader qw(data_section file_is_binary);
-use Mojo::Util qw(encode);
+use Mojo::Util   qw(encode);
 
 has description => 'Inflate embedded files to real files';
 has usage       => sub { shift->extract_usage };

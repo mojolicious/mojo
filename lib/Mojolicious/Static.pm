@@ -4,9 +4,9 @@ use Mojo::Base -base;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Date;
-use Mojo::File qw(curfile path);
+use Mojo::File   qw(curfile path);
 use Mojo::Loader qw(data_section file_is_binary);
-use Mojo::Util qw(encode md5_sum trim);
+use Mojo::Util   qw(encode md5_sum trim);
 
 # Bundled files
 my $PUBLIC = curfile->sibling('resources', 'public');

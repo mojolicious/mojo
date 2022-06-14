@@ -1,11 +1,11 @@
 package Mojo::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp qw(croak);
-use Mojo::File qw(path);
+use Carp         qw(croak);
+use Mojo::File   qw(path);
 use Mojo::Loader qw(load_class);
-use Mojo::Util qw(md5_sum);
-use POSIX ();
+use Mojo::Util   qw(md5_sum);
+use POSIX        ();
 use Scalar::Util qw(blessed);
 
 has app             => sub { shift->build_app('Mojo::HelloWorld') };

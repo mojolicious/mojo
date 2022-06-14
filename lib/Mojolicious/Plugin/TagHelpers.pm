@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 use Mojo::DOM::HTML qw(tag_to_html);
-use Scalar::Util qw(blessed);
+use Scalar::Util    qw(blessed);
 
 sub register {
   my ($self, $app) = @_;

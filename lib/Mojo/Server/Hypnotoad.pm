@@ -6,7 +6,7 @@ use Mojo::Base -base;
 use Config;
 use Mojo::File qw(path);
 use Mojo::Server::Prefork;
-use Mojo::Util qw(steady_time);
+use Mojo::Util   qw(steady_time);
 use Scalar::Util qw(weaken);
 
 has prefork         => sub { Mojo::Server::Prefork->new(listen => ['http://*:8080']) };

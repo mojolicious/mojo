@@ -17,9 +17,9 @@ package main;
 
 use Test::More;
 use Mojo::ByteStream qw(b);
-use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
-use Mojo::Util qw(encode);
-use Scalar::Util qw(dualvar);
+use Mojo::JSON       qw(decode_json encode_json false from_json j to_json true);
+use Mojo::Util       qw(encode);
+use Scalar::Util     qw(dualvar);
 
 subtest 'Decode array' => sub {
   my $array = decode_json '[]';

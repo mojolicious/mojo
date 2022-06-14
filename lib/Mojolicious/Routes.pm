@@ -1,12 +1,12 @@
 package Mojolicious::Routes;
 use Mojo::Base 'Mojolicious::Routes::Route';
 
-use Carp qw(croak);
+use Carp       qw(croak);
 use List::Util qw(first);
 use Mojo::Cache;
 use Mojo::DynamicMethods;
 use Mojo::Loader qw(load_class);
-use Mojo::Util qw(camelize);
+use Mojo::Util   qw(camelize);
 
 has base_classes               => sub { [qw(Mojolicious::Controller Mojolicious)] };
 has cache                      => sub { Mojo::Cache->new };

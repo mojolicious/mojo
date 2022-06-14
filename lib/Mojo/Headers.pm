@@ -1,7 +1,7 @@
 package Mojo::Headers;
 use Mojo::Base -base;
 
-use Carp qw(croak);
+use Carp       qw(croak);
 use Mojo::Util qw(monkey_patch);
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };

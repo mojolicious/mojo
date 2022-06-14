@@ -9,7 +9,7 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::IOLoop::Subprocess;
 use Mojo::Reactor::Poll;
-use Mojo::Util qw(md5_sum steady_time);
+use Mojo::Util   qw(md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;

@@ -1,12 +1,12 @@
 package Mojo::Log;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp qw(croak);
+use Carp  qw(croak);
 use Fcntl qw(:flock);
 use Mojo::File;
-use Mojo::Util qw(encode);
+use Mojo::Util      qw(encode);
 use Term::ANSIColor qw(colored);
-use Time::HiRes qw(time);
+use Time::HiRes     qw(time);
 
 has color  => sub { $ENV{MOJO_LOG_COLOR} };
 has format => sub { $_[0]->short ? \&_short : $_[0]->color ? \&_color : \&_default };

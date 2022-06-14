@@ -1,9 +1,9 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Cwd qw(getcwd realpath);
-use Fcntl qw(O_RDONLY);
-use File::Basename qw(basename dirname);
+use Cwd                   qw(getcwd realpath);
+use Fcntl                 qw(O_RDONLY);
+use File::Basename        qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
 use File::Temp;
 use Mojo::File qw(curfile path tempdir tempfile);

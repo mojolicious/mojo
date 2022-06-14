@@ -1,10 +1,10 @@
 package Mojo::Reactor::Poll;
 use Mojo::Base 'Mojo::Reactor';
 
-use Carp qw(croak);
-use IO::Poll qw(POLLERR POLLHUP POLLIN POLLNVAL POLLOUT POLLPRI);
-use List::Util qw(min);
-use Mojo::Util qw(md5_sum steady_time);
+use Carp        qw(croak);
+use IO::Poll    qw(POLLERR POLLHUP POLLIN POLLNVAL POLLOUT POLLPRI);
+use List::Util  qw(min);
+use Mojo::Util  qw(md5_sum steady_time);
 use Time::HiRes qw(usleep);
 
 sub again {

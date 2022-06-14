@@ -1,7 +1,7 @@
 package Mojolicious::Command::routes;
 use Mojo::Base 'Mojolicious::Command';
 
-use re qw(regexp_pattern);
+use re         qw(regexp_pattern);
 use Mojo::Util qw(encode getopt tablify);
 
 has description => 'Show available routes';

@@ -2,17 +2,17 @@ package Mojo::File;
 use Mojo::Base -strict;
 use overload '@{}' => sub { shift->to_array }, bool => sub {1}, '""' => sub { ${$_[0]} }, fallback => 1;
 
-use Carp qw(croak);
-use Cwd qw(getcwd);
-use Exporter qw(import);
-use File::Basename ();
-use File::Copy qw(copy move);
-use File::Find qw(find);
-use File::Path ();
+use Carp                  qw(croak);
+use Cwd                   qw(getcwd);
+use Exporter              qw(import);
+use File::Basename        ();
+use File::Copy            qw(copy move);
+use File::Find            qw(find);
+use File::Path            ();
 use File::Spec::Functions qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
-use File::stat ();
-use File::Temp ();
-use IO::File   ();
+use File::stat            ();
+use File::Temp            ();
+use IO::File              ();
 use Mojo::Collection;
 
 our @EXPORT_OK = ('curfile', 'path', 'tempdir', 'tempfile');

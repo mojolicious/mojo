@@ -1,7 +1,7 @@
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
-use Carp qw(croak);
+use Carp       qw(croak);
 use Mojo::Util qw(dumper trim);
 
 use constant DEBUG => $ENV{MOJO_DOM_CSS_DEBUG} || 0;

@@ -7,7 +7,7 @@ use IO::Socket::UNIX;
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
 use Scalar::Util qw(weaken);
-use Socket qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
+use Socket       qw(IPPROTO_TCP SOCK_STREAM TCP_NODELAY);
 
 # Non-blocking name resolution requires Net::DNS::Native
 use constant NNR => $ENV{MOJO_NO_NNR} ? 0 : eval { require Net::DNS::Native; Net::DNS::Native->VERSION('0.15'); 1 };

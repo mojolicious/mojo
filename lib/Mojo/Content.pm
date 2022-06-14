@@ -1,7 +1,7 @@
 package Mojo::Content;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp qw(croak);
+use Carp                qw(croak);
 use Compress::Raw::Zlib qw(WANT_GZIP Z_STREAM_END);
 use Mojo::Headers;
 use Scalar::Util qw(looks_like_number);

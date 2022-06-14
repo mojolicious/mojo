@@ -1,10 +1,10 @@
 package Mojo::JSON;
 use Mojo::Base -strict;
 
-use Carp qw(croak);
-use Exporter qw(import);
-use JSON::PP ();
-use Mojo::Util qw(decode encode monkey_patch);
+use Carp         qw(croak);
+use Exporter     qw(import);
+use JSON::PP     ();
+use Mojo::Util   qw(decode encode monkey_patch);
 use Scalar::Util qw(blessed);
 
 # For better performance Cpanel::JSON::XS is required

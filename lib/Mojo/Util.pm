@@ -1,23 +1,23 @@
 package Mojo::Util;
 use Mojo::Base -strict;
 
-use Carp qw(carp croak);
-use Data::Dumper ();
-use Digest::MD5 qw(md5 md5_hex);
-use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
-use Encode qw(find_encoding);
-use Exporter qw(import);
+use Carp           qw(carp croak);
+use Data::Dumper   ();
+use Digest::MD5    qw(md5 md5_hex);
+use Digest::SHA    qw(hmac_sha1_hex sha1 sha1_hex);
+use Encode         qw(find_encoding);
+use Exporter       qw(import);
 use File::Basename qw(dirname);
-use Getopt::Long qw(GetOptionsFromArray);
+use Getopt::Long   qw(GetOptionsFromArray);
 use IO::Compress::Gzip;
 use IO::Poll qw(POLLIN POLLPRI);
 use IO::Uncompress::Gunzip;
-use List::Util qw(min);
-use MIME::Base64 qw(decode_base64 encode_base64);
-use Pod::Usage qw(pod2usage);
-use Socket qw(inet_pton AF_INET6 AF_INET);
-use Sub::Util qw(set_subname);
-use Symbol qw(delete_package);
+use List::Util         qw(min);
+use MIME::Base64       qw(decode_base64 encode_base64);
+use Pod::Usage         qw(pod2usage);
+use Socket             qw(inet_pton AF_INET6 AF_INET);
+use Sub::Util          qw(set_subname);
+use Symbol             qw(delete_package);
 use Time::HiRes        ();
 use Unicode::Normalize ();
 

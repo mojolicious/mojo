@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::ByteStream qw(b);
 use Mojo::Collection qw(c);
-use Mojo::JSON qw(encode_json);
+use Mojo::JSON       qw(encode_json);
 
 subtest 'Array' => sub {
   is c(1, 2, 3)->[1], 2, 'right result';

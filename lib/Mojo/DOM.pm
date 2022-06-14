@@ -13,7 +13,7 @@ use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
 use Scalar::Util qw(blessed weaken);
-use Storable qw(dclone);
+use Storable     qw(dclone);
 
 sub all_text { _text(_nodes($_[0]->tree), $_[0]->xml, 1) }
 

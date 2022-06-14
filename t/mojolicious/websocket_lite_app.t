@@ -5,7 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::Mojo;
 use Test::More;
 use Mojo::ByteStream qw(b);
-use Mojo::JSON qw(encode_json);
+use Mojo::JSON       qw(encode_json);
 use Mojolicious::Lite;
 
 websocket '/echo' => sub {

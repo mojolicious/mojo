@@ -1,8 +1,8 @@
 package Mojo::DOM::HTML;
 use Mojo::Base -base;
 
-use Exporter qw(import);
-use Mojo::Util qw(html_attr_unescape html_unescape xml_escape);
+use Exporter     qw(import);
+use Mojo::Util   qw(html_attr_unescape html_unescape xml_escape);
 use Scalar::Util qw(weaken);
 
 our @EXPORT_OK = ('tag_to_html');

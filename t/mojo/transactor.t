@@ -7,7 +7,7 @@ use Mojo::Promise;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::Transactor;
-use Mojo::Util qw(b64_decode encode);
+use Mojo::Util      qw(b64_decode encode);
 use Mojo::WebSocket qw(server_handshake);
 
 # Custom content generator

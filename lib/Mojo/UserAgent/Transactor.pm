@@ -11,7 +11,7 @@ use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util qw(encode url_escape);
+use Mojo::Util      qw(encode url_escape);
 use Mojo::WebSocket qw(challenge client_handshake);
 
 has compressed => sub { $ENV{MOJO_GZIP} // 1 };

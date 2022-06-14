@@ -8,8 +8,8 @@ use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
 use Mojo::Promise;
-use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
-use Time::HiRes qw(gettimeofday tv_interval);
+use Mojo::Util   qw(dumper hmac_sha1_sum steady_time);
+use Time::HiRes  qw(gettimeofday tv_interval);
 use Scalar::Util qw(blessed weaken);
 
 sub register {

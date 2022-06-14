@@ -8,7 +8,7 @@ use Mojo::File qw(path);
 use Mojo::IOLoop;
 use Mojo::IOLoop::TLS;
 use Scalar::Util qw(weaken);
-use Socket qw(IPPROTO_TCP TCP_NODELAY);
+use Socket       qw(IPPROTO_TCP TCP_NODELAY);
 
 has reactor => sub { Mojo::IOLoop->singleton->reactor }, weak => 1;
 

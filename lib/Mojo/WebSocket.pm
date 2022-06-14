@@ -2,7 +2,7 @@ package Mojo::WebSocket;
 use Mojo::Base -strict;
 
 use Config;
-use Exporter qw(import);
+use Exporter   qw(import);
 use Mojo::Util qw(b64_encode dumper sha1_bytes xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;

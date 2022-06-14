@@ -3,10 +3,10 @@ use Mojo::Base 'Mojo::Server::Daemon';
 
 use Config;
 use File::Spec::Functions qw(tmpdir);
-use Mojo::File qw(path);
-use Mojo::Util qw(steady_time);
-use POSIX qw(WNOHANG);
-use Scalar::Util qw(weaken);
+use Mojo::File            qw(path);
+use Mojo::Util            qw(steady_time);
+use POSIX                 qw(WNOHANG);
+use Scalar::Util          qw(weaken);
 
 has accepts            => 10000;
 has cleanup            => 1;

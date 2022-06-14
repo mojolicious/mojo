@@ -2,7 +2,7 @@ package Mojo::DynamicMethods;
 use Mojo::Base -strict;
 
 use Hash::Util::FieldHash qw(fieldhash);
-use Mojo::Util qw(monkey_patch);
+use Mojo::Util            qw(monkey_patch);
 
 sub import {
   my ($flag, $caller) = ($_[1] // '', caller);

@@ -2,9 +2,9 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-use Carp qw(croak);
-use Exporter qw(import);
-use Mojo::Util qw(decode);
+use Carp         qw(croak);
+use Exporter     qw(import);
+use Mojo::Util   qw(decode);
 use Scalar::Util qw(blessed);
 
 has [qw(frames line lines_after lines_before)] => sub { [] };

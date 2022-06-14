@@ -1,8 +1,8 @@
 package Mojolicious::Command;
 use Mojo::Base -base;
 
-use Carp qw(croak);
-use Mojo::File qw(path);
+use Carp         qw(croak);
+use Mojo::File   qw(path);
 use Mojo::Loader qw(data_section);
 use Mojo::Server;
 use Mojo::Template;

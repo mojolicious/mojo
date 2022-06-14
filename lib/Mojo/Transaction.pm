@@ -1,7 +1,7 @@
 package Mojo::Transaction;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp qw(croak);
+use Carp       qw(croak);
 use List::Util qw(any);
 use Mojo::Message::Request;
 use Mojo::Message::Response;

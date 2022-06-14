@@ -8,7 +8,7 @@ use Mojo::JSON qw(to_json j);
 use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Mojo::UserAgent;
-use Mojo::Util qw(decode encode getopt);
+use Mojo::Util   qw(decode encode getopt);
 use Scalar::Util qw(weaken);
 
 has description => 'Perform HTTP request';

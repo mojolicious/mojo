@@ -2,10 +2,10 @@ package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
 use Compress::Raw::Zlib qw(Z_SYNC_FLUSH);
-use List::Util qw(first);
-use Mojo::JSON qw(encode_json j);
-use Mojo::Util qw(decode encode trim);
-use Mojo::WebSocket qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT);
+use List::Util          qw(first);
+use Mojo::JSON          qw(encode_json j);
+use Mojo::Util          qw(decode encode trim);
+use Mojo::WebSocket     qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT);
 
 has [qw(compressed established handshake masked)];
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };

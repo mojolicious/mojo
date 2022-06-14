@@ -1,7 +1,7 @@
 package ojo;
 use Mojo::Base -strict;
 
-use Benchmark qw(timeit timestr :hireswallclock);
+use Benchmark        qw(timeit timestr :hireswallclock);
 use Mojo::ByteStream qw(b);
 use Mojo::Collection qw(c);
 use Mojo::DOM;

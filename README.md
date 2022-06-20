@@ -7,9 +7,9 @@
 
  [![](https://github.com/mojolicious/mojo/workflows/linux/badge.svg)](https://github.com/mojolicious/mojo/actions) [![](https://github.com/mojolicious/mojo/workflows/macos/badge.svg)](https://github.com/mojolicious/mojo/actions) [![](https://github.com/mojolicious/mojo/workflows/windows/badge.svg)](https://github.com/mojolicious/mojo/actions)
 
-  Mojolicious is a fresh take on Perl web development, based on years of experience developing the Catalyst framework,
-  and utilizing the latest web standards and technologies. You can get started with your project quickly, with a
-  framework that grows with your needs.
+  Mojolicious is a fresh take on **Perl** web development, based on years of experience developing the Catalyst
+  framework, and utilizing the latest web standards and technologies. You can get started with your project quickly,
+  with a framework that grows with your needs.
 
   The Mojo stack provides a consistent set of components that can be used in any project. The guides cover most aspects
   of using the framework and the components have comprehensive reference documentation. Mojolicious is a real-time web
@@ -20,6 +20,7 @@
 
 ## Features
 
+  * Most [popular](https://metacpan.org/favorite/leaderboard) distribution on **CPAN**.
   * An amazing **real-time web framework**, allowing you to easily grow single file prototypes into well-structured MVC
     web applications.
     * Everything you need to build cloud-native web applications for state of the art container environments.

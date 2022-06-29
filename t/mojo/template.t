@@ -708,7 +708,7 @@ is $output->lines_after->[0][0],  6,                'right number';
 is $output->lines_after->[0][1],  '%= 1 + 1',       'right line';
 is $output->lines_after->[1][0],  7,                'right number';
 is $output->lines_after->[1][1],  'test',           'right line';
-$output->frames([['Sandbox', 'template', 5], ['main', 'template.t', 673]]);
+$output->frames([['Sandbox', 'template', 5, 'Sandbox::sub'], ['main', 'template.t', 673, 'main::sub']]);
 is $output, <<EOF, 'right result';
 oops! at template line 5.
 Context:
@@ -720,8 +720,8 @@ Context:
   6: %= 1 + 1
   7: test
 Traceback (most recent call first):
-  File "template", line 5, in "Sandbox"
-  File "template.t", line 673, in "main"
+  File "template", line 5, in "Sandbox::sub"
+  File "template.t", line 673, in "main::sub"
 EOF
 
 # Exception in template (empty perl lines)

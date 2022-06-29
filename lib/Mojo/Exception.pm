@@ -99,7 +99,7 @@ sub to_string {
 
   if (my $max = @$frames) {
     $str .= "Traceback (most recent call first):\n";
-    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[0]"\n} for @$frames;
+    $str .= qq{  File "$_->[1]", line $_->[2], in "$_->[3]"\n} for @$frames;
   }
 
   return $str;

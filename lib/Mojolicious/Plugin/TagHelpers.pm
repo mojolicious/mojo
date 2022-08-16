@@ -488,6 +488,12 @@ content.
   <a href="https://mojolicious.org">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
 
+The first argument to C<link_to> is the link content, except when the
+final argument is Perl code such as a template block (created with the
+C<begin> and C<end> keywords); in that case, the link content is
+omitted at the start of the argument list, and the block will become
+the link content.
+
 =head2 month_field
 
   %= month_field 'vacation'

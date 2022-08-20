@@ -116,7 +116,13 @@ subtest 'Context' => sub {
   $e = Mojo::Exception->new->inspect->inspect;
   is $e, "Exception!\n", 'right result';
   $e = Mojo::Exception->new('Test!');
-  $e->frames([['Sandbox', 'template', 4], ['MyApp::Test', 'MyApp/Test.pm', 3], ['main', 'foo.pl', 4]]);
+  $e->frames(
+    [
+      ['Sandbox',     'template',      4, 'Sandbox::sub'],
+      ['MyApp::Test', 'MyApp/Test.pm', 3, 'MyApp::Test::sub'],
+      ['main',        'foo.pl',        4, 'main::sub'],
+    ],
+  );
   $e->lines_before([[3, 'foo();']])->line([4, 'die;'])->lines_after([[5, 'bar();']]);
   is $e,             "Test! at template line 4.\n", 'right result';
   is $e->verbose(1), <<EOF,                         'right result';
@@ -126,9 +132,9 @@ Context:
   4: die;
   5: bar();
 Traceback (most recent call first):
-  File "template", line 4, in "Sandbox"
-  File "MyApp/Test.pm", line 3, in "MyApp::Test"
-  File "foo.pl", line 4, in "main"
+  File "template", line 4, in "Sandbox::sub"
+  File "MyApp/Test.pm", line 3, in "MyApp::Test::sub"
+  File "foo.pl", line 4, in "main::sub"
 EOF
   $e->message("Works!\n")->lines_before([])->lines_after([]);
   is $e, <<EOF, 'right result';
@@ -136,9 +142,29 @@ Works!
 Context:
   4: die;
 Traceback (most recent call first):
-  File "template", line 4, in "Sandbox"
-  File "MyApp/Test.pm", line 3, in "MyApp::Test"
-  File "foo.pl", line 4, in "main"
+  File "template", line 4, in "Sandbox::sub"
+  File "MyApp/Test.pm", line 3, in "MyApp::Test::sub"
+  File "foo.pl", line 4, in "main::sub"
+EOF
+};
+
+subtest 'Traceback (real frames)' => sub {
+  sub mock_frames { frame_level2(@_) }
+
+  sub frame_level2 {
+    my ($e) = @_;
+    $e->trace;
+    @{$e->frames} = grep { $_->[1] =~ m/^t/ } @{$e->frames};
+  }
+
+  my $e                  = Mojo::Exception->new;
+  my @frames             = mock_frames($e);
+  my $expected_backtrace = join "\n", map {qq(  File "$_->[1]", line $_->[2], in "$_->[3]")} @frames;
+
+  is $e->verbose(1), <<"EOF", 'right result';
+Exception! at $frames[0][1] line $frames[0][2].
+Traceback (most recent call first):
+$expected_backtrace
 EOF
 };
 

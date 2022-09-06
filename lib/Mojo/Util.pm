@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 use Carp           qw(carp croak);
 use Data::Dumper   ();
 use Digest::MD5    qw(md5 md5_hex);
-use Digest::SHA    qw(hmac_sha1_hex sha1 sha1_hex);
+use Digest::SHA    qw(hmac_sha1_hex sha1 sha1_hex hmac_sha256_hex sha256 sha256_hex);
 use Encode         qw(find_encoding);
 use Exporter       qw(import);
 use File::Basename qw(dirname);
@@ -65,10 +65,10 @@ my (%ENCODING, %PATTERN);
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode deprecated dumper encode),
-  qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes md5_bytes md5_sum),
-  qw(monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes),
-  qw(sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode)
+  qw(extract_usage getopt gunzip gzip hmac_sha1_sum hmac_sha256_sum html_attr_unescape html_unescape humanize_bytes),
+  qw(md5_bytes md5_sum monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare),
+  qw(sha1_bytes sha256_bytes sha1_sum sha256_sum slugify split_cookie_header split_header steady_time tablify),
+  qw(term_escape trim unindent unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -79,6 +79,9 @@ monkey_patch(__PACKAGE__, 'md5_bytes',     \&md5);
 monkey_patch(__PACKAGE__, 'md5_sum',       \&md5_hex);
 monkey_patch(__PACKAGE__, 'sha1_bytes',    \&sha1);
 monkey_patch(__PACKAGE__, 'sha1_sum',      \&sha1_hex);
+monkey_patch(__PACKAGE__, 'hmac_sha256_sum', \&hmac_sha256_hex);
+monkey_patch(__PACKAGE__, 'sha256_bytes',    \&sha256);
+monkey_patch(__PACKAGE__, 'sha256_sum',      \&sha256_hex);
 
 # Use a monotonic clock if possible
 monkey_patch(__PACKAGE__, 'steady_time',
@@ -701,6 +704,15 @@ Generate HMAC-SHA1 checksum for bytes with L<Digest::SHA>.
   # "11cedfd5ec11adc0ec234466d8a0f2a83736aa68"
   hmac_sha1_sum 'foo', 'passw0rd';
 
+=head2 hmac_sha256_sum
+
+  my $checksum = hmac_sha256_sum $bytes, 'passw0rd';
+
+Generate HMAC-SHA-256 checksum for bytes with L<Digest::SHA>.
+
+  # "e54ce0e8e81828088bc8e81b9f2d96816e4a56ffe691d40f1426365e83623c8c"
+  hmac_sha256_sum 'foo', 'passw0rd';
+
 =head2 html_attr_unescape
 
   my $str = html_attr_unescape $escaped;
@@ -834,6 +846,12 @@ leaking information about the length of the string.
 
 Generate binary SHA1 checksum for bytes with L<Digest::SHA>.
 
+=head2 sha256_bytes
+
+  my $checksum = sha256_bytes $bytes;
+
+Generate binary SHA-256 checksum for bytes with L<Digest::SHA>.
+
 =head2 sha1_sum
 
   my $checksum = sha1_sum $bytes;
@@ -842,6 +860,15 @@ Generate SHA1 checksum for bytes with L<Digest::SHA>.
 
   # "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
   sha1_sum 'foo';
+
+=head2 sha256_sum
+
+  my $checksum = sha256_sum $bytes;
+
+Generate SHA-256 checksum for bytes with L<Digest::SHA>.
+
+  # "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
+  sha256_sum 'foo';
 
 =head2 slugify
 

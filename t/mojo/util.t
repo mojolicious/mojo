@@ -9,10 +9,10 @@ use Mojo::DeprecationTest;
 use Sub::Util qw(subname);
 
 use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode dumper encode),
-  qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum),
-  qw(monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes),
-  qw(sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode);
+  qw(extract_usage getopt gunzip gzip hmac_sha1_sum hmac_sha256_sum html_unescape html_attr_unescape humanize_bytes),
+  qw(md5_bytes md5_sum monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare),
+  qw(sha1_bytes sha256_bytes sha1_sum sha256_sum slugify split_cookie_header split_header steady_time tablify),
+  qw(term_escape trim unindent unquote url_escape url_unescape xml_escape xor_encode);
 
 subtest 'camelize' => sub {
   is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -411,6 +411,21 @@ subtest 'sha1_sum' => sub {
 
 subtest 'hmac_sha1_sum' => sub {
   is hmac_sha1_sum('Hi there', 'abc1234567890'), '5344f37e1948dd3ffb07243a4d9201a227abd6e1', 'right hmac sha1 checksum';
+};
+
+subtest 'sha256_bytes' => sub {
+  is unpack('H*', sha256_bytes 'foo bar baz'), 'dbd318c1c462aee872f41109a4dfd3048871a03dedd0fe0e757ced57dad6f2d7',
+    'right binary sha-256 checksum';
+};
+
+subtest 'sha256_sum' => sub {
+  is sha256_sum('foo bar baz'), 'dbd318c1c462aee872f41109a4dfd3048871a03dedd0fe0e757ced57dad6f2d7',
+    'right sha-256 checksum';
+};
+
+subtest 'hmac_sha256_sum' => sub {
+  is hmac_sha256_sum('Hi there', 'abc256234567890'), 'e6cca557cc5c4843bbd370cffd36ae3df33609da1b5b4743aa0a1acd3168f655',
+    'right hmac sha-256 checksum';
 };
 
 subtest 'secure_compare' => sub {

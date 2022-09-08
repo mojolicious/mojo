@@ -1,5 +1,10 @@
 
-9.27  2022-05-23
+9.27  2022-09-08
+  - Added support for static assets.
+  - Added asset_dir attribute to Mojolicious::Static.
+  - Added asset_path method to Mojolicious::Static.
+  - Added url_for_asset method to Mojolicious::Controller.
+  - Added asset_tag helper to Mojolicious::Plugin::TagHelpers.
 
 9.26  2022-05-20
   - Added EXPERIMENTAL capture method to Mojo::Log.

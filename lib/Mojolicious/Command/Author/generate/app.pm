@@ -31,6 +31,7 @@ sub run {
 
   # Static file
   $self->render_to_rel_file('static', "$name/public/index.html");
+  $self->create_dir("$name/public/assets");
 
   # Templates
   $self->render_to_rel_file('layout',  "$name/templates/layouts/default.html.ep");

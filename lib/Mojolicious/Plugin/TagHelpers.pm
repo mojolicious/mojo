@@ -16,7 +16,7 @@ sub register {
   $app->helper(datetime_field => sub { _input(@_, type => 'datetime-local') });
 
   my @helpers = (
-    qw(csrf_field form_for hidden_field javascript label_for link_to select_field stylesheet submit_button),
+    qw(asset_tag csrf_field form_for hidden_field javascript label_for link_to select_field stylesheet submit_button),
     qw(tag_with_error text_area)
   );
   $app->helper($_ => __PACKAGE__->can("_$_")) for @helpers;
@@ -32,6 +32,16 @@ sub register {
 
   # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
+}
+
+sub _asset_tag {
+  my ($c, $target) = (shift, shift);
+
+  my $url = $c->url_for_asset($target);
+
+  return $c->helpers->javascript($url, @_) if $target =~ /\.js$/;
+  return $c->helpers->stylesheet($url, @_) if $target =~ /\.css$/;
+  return $c->helpers->image($url, @_);
 }
 
 sub _button_to {
@@ -232,6 +242,13 @@ See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available b
 =head1 HELPERS
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
+
+=head2 asset_tag
+
+  %= asset_tag '/app.js'
+  %= asset_tag '/app.js', async => 'async'
+
+Generate C<script>, C<link> or C<img> tag for static asset.
 
 =head2 button_to
 

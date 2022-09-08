@@ -105,7 +105,7 @@ subtest 'Freshness (multiple Etag values)' => sub {
 subtest 'Static file' => sub {
   my $logs = $t->app->log->capture('trace');
   $t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
+    ->header_exists_not('Cache-Control')->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
     ->content_is("Hello Mojo from a static file!\n");
   like $logs,   qr/Static file served/, 'right message';
   unlike $logs, qr/200 OK/,             'no status message';
@@ -128,7 +128,7 @@ subtest 'Unknown method' => sub {
 
 subtest 'Partial static file' => sub {
   $t->get_ok('/hello.txt' => {Range => 'bytes=2-8'})->status_is(206)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 7)
+    ->header_exists_not('Cache-Control')->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 7)
     ->header_is('Content-Range' => 'bytes 2-8/31')->content_is('llo Moj');
 };
 
@@ -224,7 +224,7 @@ subtest 'Stale asset' => sub {
 
 subtest 'Partial asset' => sub {
   $t->get_ok('/asset' => {'Range' => 'bytes=3-5'})->status_is(206)->header_is(Server => 'Mojolicious (Perl)')
-    ->content_is('3 A');
+    ->header_exists_not('Cache-Control')->content_is('3 A');
 };
 
 subtest 'File' => sub {
@@ -282,6 +282,37 @@ subtest 'Base64 partial inline file, invalid range' => sub {
 subtest 'UTF-8 encoded inline file' => sub {
   $t->get_ok('/static_utf8.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("I ♥ Unicode\n");
+};
+
+subtest 'Assets' => sub {
+  my $c = $t->app->build_controller;
+  is $c->url_for_asset('/unknown.css')->path,         '/assets/unknown.css',                        'right asset path';
+  is $c->url_for_asset('foo.css')->path,              '/assets/foo.ab1234cd5678ef.css',             'right asset path';
+  is $c->url_for_asset('/foo.css')->path,             '/assets/foo.ab1234cd5678ef.css',             'right asset path';
+  is $c->url_for_asset('/foo.js')->path,              '/assets/foo.ab1234cd5678ef.js',              'right asset path';
+  is $c->url_for_asset('/foo/bar/baz.js')->path,      '/assets/foo/bar/baz.development.js',         'right asset path';
+  is $c->url_for_asset('/foo/bar.js')->path,          '/assets/foo/bar.321.js',                     'right asset path';
+  is $c->url_for_asset('/foo/bar/test.min.js')->path, '/assets/foo/bar/test.ab1234cd5678ef.min.js', 'right asset path';
+  is $c->url_for_asset('/foo/bar/yada.css')->path,    '/assets/foo/bar/yada.css',                   'right asset path';
+
+  $t->get_ok('/assets/foo.ab1234cd5678ef.css')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_is('Cache-Control', 'no-cache')->content_like(qr/\* foo\.css asset/);
+  $t->get_ok('/assets/foo.ab1234cd5678ef.js')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_is('Cache-Control', 'no-cache')->content_like(qr/\* foo\.js asset/);
+  $t->get_ok('/assets/foo/bar.321.js')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_is('Cache-Control', 'no-cache')->content_like(qr/\* foo\/bar\.js asset/);
+  $t->get_ok('/assets/foo/bar/baz.development.js')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_is('Cache-Control', 'no-cache')->content_like(qr/\* foo\/bar\/baz\.js development asset/);
+  $t->get_ok('/assets/foo/bar/baz.123.js')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_is('Cache-Control', 'no-cache')->content_like(qr/\* foo\/bar\/baz\.js asset/);
+  $t->get_ok('/assets/foo/bar/test.ab1234cd5678ef.min.js')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_is('Cache-Control', 'no-cache')->content_like(qr/\* foo\/bar\/test\.min\.js asset/);
+  $t->get_ok('/assets/foo/bar/yada.css')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_is('Cache-Control', 'no-cache')->content_like(qr/\* foo\/bar\/yada\.css asset/);
+
+  $t->app->mode('production');
+  $t->get_ok('/assets/foo.ab1234cd5678ef.css')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+    ->header_exists_not('Cache-Control')->content_like(qr/\* foo\.css asset/);
 };
 
 done_testing();

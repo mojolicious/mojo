@@ -272,6 +272,11 @@ sub url_for {
   return $url;
 }
 
+sub url_for_asset {
+  my ($self, $asset) = @_;
+  return $self->url_for($self->app->static->asset_path($asset));
+}
+
 sub write {
   my ($self, $chunk, $cb) = @_;
   $self->res->content->write($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
@@ -767,6 +772,13 @@ current request.
 
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
   $c->url_with->query({page => 2});
+
+
+=head2 url_for_asset
+
+  my $url = $c->url_for_asset('/app.js');
+
+Generate a portable L<Mojo::URL> object with base for a static asset.
 
 =head2 write
 

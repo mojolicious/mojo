@@ -12,9 +12,17 @@ use Mojo::Util   qw(encode md5_sum trim);
 my $PUBLIC = curfile->sibling('resources', 'public');
 my %EXTRA  = $PUBLIC->list_tree->map(sub { join('/', @{$_->to_rel($PUBLIC)}), $_->realpath->to_string })->each;
 
-has classes => sub { ['main'] };
-has extra   => sub { +{%EXTRA} };
-has paths   => sub { [] };
+has asset_dir => 'assets';
+has classes   => sub { ['main'] };
+has extra     => sub { +{%EXTRA} };
+has paths     => sub { [] };
+
+sub asset_path {
+  my ($self, $asset) = @_;
+  $asset = "/$asset" unless $asset =~ /^\//;
+  my $assets = $self->{assets} //= {};
+  return '/' . $self->asset_dir . ($assets->{$asset} // $asset);
+}
 
 sub dispatch {
   my ($self, $c) = @_;
@@ -34,11 +42,18 @@ sub dispatch {
   my $canon_path = join '/', @parts;
   return undef if $canon_path =~ /^\.\.\/|\\/ || !$self->serve($c, $canon_path);
   $stash->{'mojo.static'} = 1;
+
+  # Development assets will be rebuilt a lot, do not let browsers cache them
+  $c->res->headers->cache_control('no-cache')
+    if $c->app->mode eq 'development' && index($canon_path, $self->asset_dir) == 0;
+
   return !!$c->rendered;
 }
 
 sub file {
   my ($self, $rel) = @_;
+
+  $self->warmup unless $self->{index};
 
   # Search all paths
   my @parts = split /\//, $rel;
@@ -112,9 +127,32 @@ sub serve_asset {
 }
 
 sub warmup {
-  my $self  = shift;
+  my $self = shift;
+
+  # DATA sections
   my $index = $self->{index} = {};
   for my $class (reverse @{$self->classes}) { $index->{$_} = $class for keys %{data_section $class} }
+
+  # Static assets
+  my $assets    = $self->{assets} = {};
+  my $asset_dir = $self->asset_dir;
+  for my $path (@{$self->paths}) {
+    my $asset_path = path($path, $asset_dir);
+    next unless -d $asset_path;
+
+    for my $asset_file ($asset_path->list_tree({recursive => 1})->each) {
+      my $parts    = $asset_file->to_rel($asset_path)->to_array;
+      my $filename = pop @$parts;
+      my $prefix   = join '/', @$parts;
+
+      next unless $filename =~ /^([^.]+)\.([^.]+)\.(.+)$/;
+      my $checksum = $2;
+      my $short    = $prefix eq '' ? "/$1.$3" : "/$prefix/$1.$3";
+      my $long     = '/' . join('/', @$parts, $filename);
+
+      $assets->{$short} = $long if !exists($assets->{$short}) || $checksum eq 'development';
+    }
+  }
 }
 
 sub _epoch { Mojo::Date->new(shift)->epoch }
@@ -124,8 +162,6 @@ sub _get_data_file {
 
   # Protect files without extensions and templates with two extensions
   return undef if $rel !~ /\.\w+$/ || $rel =~ /\.\w+\.\w+$/;
-
-  $self->warmup unless $self->{index};
 
   # Find file
   my @args = ($self->{index}{$rel}, $rel);
@@ -163,6 +199,13 @@ on L<RFC 7232|https://tools.ietf.org/html/rfc7232> and L<RFC 7233|https://tools.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Static> implements the following attributes.
+
+=head2 asset_dir
+
+  my $dir = $static->asset_dir;
+  $static = $static->asset_dir('assets');
+
+Subdirectory used for all static assets, defaults to C<assets>.
 
 =head2 classes
 
@@ -208,6 +251,12 @@ Directories to serve static files from, first one has the highest precedence.
 =head1 METHODS
 
 L<Mojolicious::Static> inherits all methods from L<Mojo::Base> and implements the following new ones.
+
+=head2 asset_path
+
+  my $path = $static->asset_path('/app.js');
+
+Get static asset path.
 
 =head2 dispatch
 
@@ -271,9 +320,9 @@ support.
 
 =head2 warmup
 
-  $static->warmup;
+  $static->warmup();
 
-Prepare static files from L</"classes"> for future use.
+Prepare static files from L</"classes"> and static assets for future use.
 
 =head1 SEE ALSO
 

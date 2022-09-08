@@ -379,6 +379,7 @@ ok -e $app->rel_file('my_app/lib/MyApp.pm'),                      'application c
 ok -e $app->rel_file('my_app/lib/MyApp/Controller/Example.pm'),   'controller exists';
 ok -e $app->rel_file('my_app/my_app.yml'),                        'config file exists';
 ok -e $app->rel_file('my_app/t/basic.t'),                         'test exists';
+ok -d $app->rel_file('my_app/public/assets'),                     'assets directory exists';
 ok -e $app->rel_file('my_app/public/index.html'),                 'static file exists';
 ok -e $app->rel_file('my_app/templates/layouts/default.html.ep'), 'layout exists';
 ok -e $app->rel_file('my_app/templates/example/welcome.html.ep'), 'template exists';

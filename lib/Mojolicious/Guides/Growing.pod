@@ -129,26 +129,28 @@ why L<Mojolicious::Lite> applications don't need more than a single file.
 Full L<Mojolicious> applications on the other hand are much closer to a well organized CPAN distribution to maximize
 maintainability.
 
-  myapp                      # Application directory
-  |- script                  # Script directory
-  |  +- my_app               # Application script
-  |- lib                     # Library directory
-  |  |- MyApp.pm             # Application class
-  |  +- MyApp                # Application namespace
-  |     +- Controller        # Controller namespace
-  |        +- Example.pm     # Controller class
-  |- my_app.yml              # Configuration file
-  |- t                       # Test directory
-  |  +- basic.t              # Random test
-  |- log                     # Log directory
-  |  +- development.log      # Development mode log file
-  |- public                  # Static file directory (served automatically)
-  |  +- index.html           # Static HTML file
-  +- templates               # Template directory
-     |- layouts              # Template directory for layouts
-     |  +- default.html.ep   # Layout template
-     +- example              # Template directory for "Example" controller
-        +- welcome.html.ep   # Template for "welcome" action
+  myapp                            # Application directory
+  |- script                        # Script directory
+  |  +- my_app                     # Application script
+  |- lib                           # Library directory
+  |  |- MyApp.pm                   # Application class
+  |  +- MyApp                      # Application namespace
+  |     +- Controller              # Controller namespace
+  |        +- Example.pm           # Controller class
+  |- my_app.yml                    # Configuration file
+  |- t                             # Test directory
+  |  +- basic.t                    # Random test
+  |- log                           # Log directory
+  |  +- development.log            # Development mode log file
+  |- public                        # Static file directory (served automatically)
+  |   |-- assets                   # Static assets created by bundlers
+  |   |   `-- *generated assets*
+  |   +- index.html                # Static HTML file
+  +- templates                     # Template directory
+     |- layouts                    # Template directory for layouts
+     |  +- default.html.ep         # Layout template
+     +- example                    # Template directory for "Example" controller
+        +- welcome.html.ep         # Template for "welcome" action
 
 Both application skeletons can be automatically generated with the commands
 L<Mojolicious::Command::Author::generate::lite_app> and L<Mojolicious::Command::Author::generate::app>.

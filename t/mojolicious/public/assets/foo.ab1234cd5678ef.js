@@ -1,0 +1,3 @@
+/*
+ * foo.js asset
+ */

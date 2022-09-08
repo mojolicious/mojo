@@ -6,6 +6,8 @@ use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
 
+get '/assets';
+
 options 'tags';
 
 patch 'more_tags';
@@ -37,6 +39,17 @@ any [qw(PATCH POST)] => '/☃' => 'snowman';
 post '/no_snowman';
 
 my $t = Test::Mojo->new;
+
+subtest 'Assets' => sub {
+  $t->get_ok('/assets')->status_is(200)->content_is(<<EOF);
+<script src="/assets/foo.ab1234cd5678ef.js"></script>
+<script async="async" src="/assets/foo.ab1234cd5678ef.js"></script>
+<link href="/assets/foo.ab1234cd5678ef.css" rel="stylesheet">
+<link href="/assets/foo.ab1234cd5678ef.css" media="foo" rel="stylesheet">
+<img src="/assets/foo.png">
+<img alt="test" src="/assets/foo.png">
+EOF
+};
 
 # Reuse values
 my $values = [app->c(EU => [qw(de en)])];
@@ -524,6 +537,14 @@ EOF
 done_testing();
 
 __DATA__
+@@ assets.html.ep
+<%= asset_tag '/foo.js' %>
+<%= asset_tag '/foo.js', async => 'async' %>
+<%= asset_tag '/foo.css' %>
+<%= asset_tag '/foo.css', media => 'foo' %>
+<%= asset_tag '/foo.png' %>
+<%= asset_tag '/foo.png', alt => 'test' %>
+
 @@ tags.html.ep
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>

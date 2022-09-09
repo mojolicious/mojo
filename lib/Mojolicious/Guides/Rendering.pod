@@ -362,7 +362,7 @@ While Mojolicious does not have any special support for frontend frameworks like
 L<React|https://reactjs.org>, the C<public/assets> directory is reserved for static assets created by bundlers like
 L<Webpack|https://webpack.js.org> and L<Rollup.js|https://rollupjs.org> ahead of time. Asset files can be of any type,
 they just have to follow the C<[name].[checksum].[extensions]> naming scheme, like C<myapp.ab1234cd5678ef.js>. You can
-then use L<Mojolicious::Controller/"url_for_asset"> or L<Mojolicious::Plugin::TagHelpers/"assset_tag"> to generate URLs
+then use L<Mojolicious::Controller/"url_for_asset"> or L<Mojolicious::Plugin::TagHelpers/"asset_tag"> to generate URLs
 without having to know the checksum.
 
   # "/assets/myapp.ab1234cd5678ef.js"

@@ -122,6 +122,12 @@ get '/reuse/exception' => {foo => 'bar'} => sub { die "Reusable exception.\n" };
 
 get '/custom' => sub { die "CUSTOM\n" };
 
+get '/txt/exception' => sub {
+  my $c = shift;
+  $c->exception_format('txt')->res->headers->header('X-Text' => $c->exception_format);
+  die 'Text exception';
+};
+
 get '/dead_helper';
 
 my $t = Test::Mojo->new;
@@ -297,6 +303,9 @@ subtest 'JSON exceptions' => sub {
   $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('application/json;charset=UTF-8')
     ->json_is({error => 'Not Found'});
 
+  $t->get_ok('/txt/exception')->status_is(500)->header_is('X-Text' => 'txt')
+    ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/Text exception/);
+
   $t->app->mode('production');
   $t->get_ok('/dead_template')->status_is(500)->content_type_is('application/json;charset=UTF-8')
     ->json_is({error => 'Internal Server Error'});
@@ -310,6 +319,9 @@ subtest 'Text exceptions' => sub {
   $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
     ->content_like(qr/dead template!/);
   $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('text/plain;charset=UTF-8')->content_is('Not Found');
+
+  $t->get_ok('/txt/exception')->status_is(500)->header_is('X-Text' => 'txt')
+    ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/Text exception/);
 
   $t->app->mode('production');
   $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')

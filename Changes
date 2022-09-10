@@ -10,6 +10,7 @@
     reply->http_exception, reply->http_not_found, reply->txt_exception and reply->txt_not_found helpers to
     Mojolicious::Plugin::DefaultHelpers.
   - Added asset_tag helper to Mojolicious::Plugin::TagHelpers.
+  - Fixed a bug where async rendering did not work properly in the before_dispatch hook. (andrii-suse)
 
 9.26  2022-05-20
   - Added EXPERIMENTAL capture method to Mojo::Log.

@@ -289,6 +289,34 @@ subtest 'Reuse exception' => sub {
   ok !$snapshot->{exception}, 'no exception in snapshot';
 };
 
+subtest 'JSON exceptions' => sub {
+  $t->app->mode('development');
+  is $t->app->exception_format('json')->exception_format, 'json', 'right exception format';
+  $t->get_ok('/dead_template')->status_is(500)->content_type_is('application/json;charset=UTF-8')
+    ->json_like('/error', qr/dead template!/);
+  $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('application/json;charset=UTF-8')
+    ->json_is({error => 'Not Found'});
+
+  $t->app->mode('production');
+  $t->get_ok('/dead_template')->status_is(500)->content_type_is('application/json;charset=UTF-8')
+    ->json_is({error => 'Internal Server Error'});
+  $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('application/json;charset=UTF-8')
+    ->json_is({error => 'Not Found'});
+};
+
+subtest 'Text exceptions' => sub {
+  $t->app->mode('development');
+  is $t->app->exception_format('txt')->exception_format, 'txt', 'right exception format';
+  $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
+    ->content_like(qr/dead template!/);
+  $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('text/plain;charset=UTF-8')->content_is('Not Found');
+
+  $t->app->mode('production');
+  $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
+    ->content_is('Internal Server Error');
+  $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('text/plain;charset=UTF-8')->content_is('Not Found');
+};
+
 subtest 'Bundled static files' => sub {
   $t->get_ok('/mojo/jquery/jquery.js')->status_is(200)->content_type_is('application/javascript');
 

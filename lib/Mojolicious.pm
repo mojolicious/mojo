@@ -24,6 +24,7 @@ use Scalar::Util ();
 
 has commands         => sub { Mojolicious::Commands->new(app => shift) };
 has controller_class => 'Mojolicious::Controller';
+has exception_format => 'html';
 has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {
   my $self = shift;
@@ -378,6 +379,13 @@ Command line interface for your application, defaults to a L<Mojolicious::Comman
 
 Class to be used for the default controller, defaults to L<Mojolicious::Controller>. Note that this class needs to have
 already been loaded before the first request arrives.
+
+=head2 exception_format
+
+  my $format = $app->exception_format;
+  $app       = $app->exception_format('txt');
+
+Format for HTTP exceptions (C<html>, C<json>, or C<txt>), defaults to C<html>.
 
 =head2 home
 

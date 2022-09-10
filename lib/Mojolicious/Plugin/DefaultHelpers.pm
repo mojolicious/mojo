@@ -35,7 +35,8 @@ sub register {
   $app->helper(content_with => sub { _content(0, 1, @_) });
 
   $app->helper($_ => $self->can("_$_"))
-    for qw(csrf_token current_route flash inactivity_timeout is_fresh), qw(redirect_to respond_to url_with validation);
+    for qw(csrf_token current_route exception_format flash inactivity_timeout is_fresh),
+    qw(redirect_to respond_to url_with validation);
 
   $app->helper(dumper  => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
@@ -48,8 +49,16 @@ sub register {
 
   $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
 
-  $app->helper('reply.exception' => sub { _development('exception', @_) });
-  $app->helper('reply.not_found' => sub { _development('not_found', @_) });
+  $app->helper('reply.exception',      => sub { shift->helpers->reply->http_exception(@_) });
+  $app->helper('reply.not_found',      => sub { shift->helpers->reply->http_not_found() });
+  $app->helper('reply.http_exception', => \&_http_exception);
+  $app->helper('reply.http_not_found', => \&_http_not_found);
+  $app->helper('reply.html_exception'  => sub { _development('exception', @_) });
+  $app->helper('reply.html_not_found'  => sub { _development('not_found', @_) });
+  $app->helper('reply.json_exception', => \&_json_exception);
+  $app->helper('reply.json_not_found', => \&_json_not_found);
+  $app->helper('reply.txt_exception',  => \&_txt_exception);
+  $app->helper('reply.txt_not_found',  => \&_txt_not_found);
 
   $app->helper('timing.begin'         => \&_timing_begin);
   $app->helper('timing.elapsed'       => \&_timing_elapsed);
@@ -114,6 +123,14 @@ sub _development {
   return $c;
 }
 
+sub _exception_format {
+  my $c     = shift;
+  my $stash = $c->stash;
+  $stash->{'mojo.exception_format'} ||= $c->app->exception_format;
+  return $stash->{'mojo.exception_format'} unless @_;
+  $stash->{'mojo.exception_format'} = shift;
+  return $c;
+}
 
 sub _fallbacks {
   my ($c, $options, $template, $bundled) = @_;
@@ -147,6 +164,22 @@ sub _flash {
   return $c;
 }
 
+sub _http_exception {
+  my ($c, $e) = @_;
+  my $format = $c->exception_format;
+  return $c->helpers->reply->txt_exception($e)  if $format eq 'txt';
+  return $c->helpers->reply->json_exception($e) if $format eq 'json';
+  return $c->helpers->reply->html_exception($e);
+}
+
+sub _http_not_found {
+  my $c      = shift;
+  my $format = $c->exception_format;
+  return $c->helpers->reply->txt_not_found  if $format eq 'txt';
+  return $c->helpers->reply->json_not_found if $format eq 'json';
+  return $c->helpers->reply->html_not_found;
+}
+
 sub _inactivity_timeout {
   my ($c, $timeout) = @_;
   my $stream = Mojo::IOLoop->stream($c->tx->connection // '');
@@ -160,6 +193,14 @@ sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
 }
+
+sub _json_exception {
+  my ($c, $e) = @_;
+  return $c->render(json => {error => $e},                      status => 500) if $c->app->mode eq 'development';
+  return $c->render(json => {error => 'Internal Server Error'}, status => 500);
+}
+
+sub _json_not_found { shift->render(json => {error => 'Not Found'}, status => 404) }
 
 sub _log { $_[0]->stash->{'mojo.log'} ||= $_[0]->app->log->context('[' . $_[0]->req->request_id . ']') }
 
@@ -273,6 +314,14 @@ sub _timing_server_timing {
 }
 
 sub _tx_error { (shift->error // {})->{message} // 'Unknown error' }
+
+sub _txt_exception {
+  my ($c, $e) = @_;
+  return $c->render(text => $e,                      format => 'txt', status => 500) if $c->app->mode eq 'development';
+  return $c->render(text => 'Internal Server Error', format => 'txt', status => 500);
+}
+
+sub _txt_not_found { shift->render(text => 'Not Found', format => 'txt', status => 404) }
 
 sub _url_with {
   my $c = shift;
@@ -438,6 +487,13 @@ Check or get name of current route.
   %= dumper {some => 'data'}
 
 Dump a Perl data structure with L<Mojo::Util/"dumper">, very useful for debugging.
+
+=head2 exception_format
+
+  my $format = $c->exception_format;
+  $c         = $c->exception_format('txt');
+
+Format for HTTP exceptions (C<html>, C<json>, or C<txt>), defaults to the value of L<Mojolicious/"exception_format">.
 
 =head2 extends
 
@@ -605,9 +661,7 @@ perform content negotiation with C<Range>, C<If-Modified-Since> and C<If-None-Ma
   $c = $c->reply->exception('Oops!');
   $c = $c->reply->exception(Mojo::Exception->new);
 
-Render the exception template C<exception.$mode.$format.*> or C<exception.$format.*> and set the response status code
-to C<500>. Also sets the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot> to a copy of the
-L</"stash"> for use in the templates.
+Render an exception response in the appropriate format by delegating to more specific exception helpers.
 
 =head2 reply->file
 
@@ -625,12 +679,40 @@ Reply with a static file from an absolute path anywhere on the file system using
   # Serve file from a secret application directory
   $c->reply->file($c->app->home->child('secret', 'file.txt'));
 
+=head2 reply->html_exception
+
+  $c = $c->reply->html_exception('Oops!');
+  $c = $c->reply->html_exception(Mojo::Exception->new);
+
+Render the exception template C<exception.$mode.$format.*> or C<exception.$format.*> and set the response status code
+to C<500>. Also sets the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot> to a copy of the
+L</"stash"> for use in the templates.
+
+=head2 reply->html_not_found
+
+  $c = $c->reply->html_not_found;
+
+Render the not found template C<not_found.$mode.$format.*> or C<not_found.$format.*> and set the response status code
+to C<404>. Also sets the stash value C<snapshot> to a copy of the L</"stash"> for use in the templates.
+
+=head2 reply->json_exception
+
+  $c = $c->reply->json_exception('Oops!');
+  $c = $c->reply->json_exception(Mojo::Exception->new);
+
+Render a JSON response and set the response status to C<500>.
+
+=head2 reply->json_not_found
+
+  $c = $c->reply->json_not_found;
+
+Render a JSON response and set the response status to C<404>.
+
 =head2 reply->not_found
 
   $c = $c->reply->not_found;
 
-Render the not found template C<not_found.$mode.$format.*> or C<not_found.$format.*> and set the response status code
-to C<404>. Also sets the stash value C<snapshot> to a copy of the L</"stash"> for use in the templates.
+Render a not found response in the appropriate format by delegating to more specific exception helpers.
 
 =head2 reply->static
 
@@ -644,6 +726,19 @@ directories.
   # Serve file from a relative path with a custom content type
   $c->res->headers->content_type('application/myapp');
   $c->reply->static('foo.txt');
+
+=head2 reply->txt_exception
+
+  $c = $c->reply->txt_exception('Oops!');
+  $c = $c->reply->txt_exception(Mojo::Exception->new);
+
+Render a plain text response and set the response status to C<500>.
+
+=head2 reply->txt_not_found
+
+  $c = $c->reply->txt_not_found;
+
+Render a plain text response and set the response status to C<404>.
 
 =head2 respond_to
 

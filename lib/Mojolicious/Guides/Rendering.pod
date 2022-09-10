@@ -521,6 +521,25 @@ C<not_found.$mode.$format.*> before falling back to the built-in default templat
     </body>
   </html>
 
+The default exception format is C<html>, but that can be changed at application and controller level. By default there
+are handlers for C<html>, C<txt> and C<json> available. There are also various exception helpers in
+L<Mojolicious::Plugin::DefaultHelpers> for you to overload to change the default behavior.
+
+  use Mojolicious::Lite -signatures;
+
+  app->exception_format('json');
+
+  get '/json' => sub ($c) {
+    die 'Just a test';
+  };
+
+  get '/txt' => sub ($c) {
+    $c->exception_format('txt');
+    die 'Just a test';
+  };
+
+  app->start;
+
 The hook L<Mojolicious/"before_render"> makes even more advanced customizations possible by allowing you to intercept
 and modify the arguments passed to the renderer.
 

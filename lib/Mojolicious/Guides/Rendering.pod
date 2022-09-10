@@ -380,8 +380,7 @@ them each time they are rebuilt with a different checksum.
   # "/assets/foo/bar.development.js"
   $c->url_for_asset('/foo/bar.js');
 
-With Webpack, for example, this scenario is very easy to set up with a C<webpack.config.js>
-L<configuration file|https://webpack.js.org/configuration/>.
+Webpack L<configuration|https://webpack.js.org/configuration/> example (C<webpack.config.js>):
 
   import Path from '@mojojs/path';
 
@@ -392,6 +391,22 @@ L<configuration file|https://webpack.js.org/configuration/>.
       filename: isDev ? '[name].development.js' : '[name].[chunkhash].js',
       path: Path.currentFile().sibling('public', 'assets').toString(),
       publicPath: ''
+    },
+
+    // Add your own rules and entry point here
+  };
+
+Rollup L<configuration|https://rollupjs.org/guide/en/#configuration-files> example (C<rollup.config.js>):
+
+  import Path from '@mojojs/path';
+
+  const isDev = process.env.MOJO_MODE === 'development';
+
+  export default {
+    output: {
+      format: 'iife',
+      dir: Path.currentFile().sibling('public', 'assets').toString(),
+      entryFileNames: isDev ? '[name].development.js' : '[name].[hash].js',
     },
 
     // Add your own rules and entry point here

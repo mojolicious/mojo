@@ -264,8 +264,7 @@ Append message to L</"handle">.
   my $messages = $log->capture;
   my $messages = $log->capture('debug');
 
-Capture log messages for as long as the returned object exists, useful for testing log messages. Note that this method
-is B<EXPERIMENTAL> and might change without warning!
+Capture log messages for as long as the returned object exists, useful for testing log messages.
 
   # Test your log messages
   my $messages = $log->capture('trace');

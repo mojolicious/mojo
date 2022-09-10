@@ -2,6 +2,7 @@
 9.27  2022-09-10
   - Added support for static assets.
   - Added support for JSON and plain text exceptions.
+  - Removed experimental status from capture method in Mojo::Log.
   - Added asset_dir attribute to Mojolicious::Static.
   - Added asset_path method to Mojolicious::Static.
   - Added url_for_asset method to Mojolicious::Controller.

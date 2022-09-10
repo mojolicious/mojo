@@ -186,3 +186,5 @@ __DATA__
 Static response!
 @@ test.txt
 Normal static file!
+@@ hello-delay.txt
+This is never rendered and overloaded by before_dispatch

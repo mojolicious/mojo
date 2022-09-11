@@ -413,7 +413,7 @@ Rollup L<configuration|https://rollupjs.org/guide/en/#configuration-files> examp
   };
 
 Everything else is up to your bundler of choice, so you need to consult its documentation for further information. And
-where your keep your asset sources, such as C<.vue> and C<.jsx> files, is not important, as long as your bundler can
+where you keep your asset sources, such as C<.vue> and C<.jsx> files, is not important, as long as your bundler can
 find them. Using a directory named C<assets> or C<frontend> in your application root directory is a good best practice
 though.
 

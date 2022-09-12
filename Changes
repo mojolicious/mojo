@@ -1,4 +1,6 @@
 
+9.28  2022-09-12
+
 9.27  2022-09-10
   - Added support for static assets.
   - Added support for JSON and plain text exceptions.

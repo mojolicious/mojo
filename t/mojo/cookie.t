@@ -453,11 +453,11 @@ subtest 'Abstract methods' => sub {
 };
 
 subtest 'Response cookie auto define Secure if SameSite is like None' => sub {
-    my $cookie = Mojo::Cookie::Response->new;
-    $cookie->name('foo');
-    $cookie->value('bar');
-    $cookie->samesite('None');    
-    is $cookie->to_string, 'foo=bar; secure; SameSite=None', 'right format';
+  my $cookie = Mojo::Cookie::Response->new;
+  $cookie->name('foo');
+  $cookie->value('bar');
+  $cookie->samesite('None');    
+  is $cookie->to_string, 'foo=bar; secure; SameSite=None', 'right format';
 };
 
 done_testing();

@@ -1003,6 +1003,35 @@ subtest 'Parse HTTP 1.1 multipart request with "0" filename' => sub {
   is $req->upload('upload')->asset->size, 69, 'right size';
 };
 
+subtest 'Parse HTTP 1.1 multipart request with missing name' => sub {
+  my $req = Mojo::Message::Request->new;
+  is $req->content->progress, 0, 'right progress';
+  $req->parse("GET /foo/bar.html HTTP/1.1\x0d\x0a");
+  is $req->content->progress, 0, 'right progress';
+  $req->parse("Content-Length: 115\x0d\x0a");
+  $req->parse('Content-Type: multipart/form-data; bo');
+  is $req->content->progress, 0, 'right progress';
+  $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
+  is $req->content->progress, 0, 'right progress';
+  $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+  is $req->content->progress, 31, 'right progress';
+  $req->parse("Content-Disposition: form-data\x0d\x0a");
+  $req->parse("\x0d\x0afield with no name\n");
+  $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
+  is $req->content->progress, 115, 'right progress';
+  ok $req->is_finished,           'request is finished';
+  ok $req->content->is_multipart, 'multipart content';
+  is $req->body,    '',              'no content';
+  is $req->method,  'GET',           'right method';
+  is $req->version, '1.1',           'right version';
+  is $req->url,     '/foo/bar.html', 'right URL';
+  is $req->headers->content_type, 'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
+    'right "Content-Type" value';
+  is $req->headers->content_length, 115, 'right "Content-Length" value';
+  is_deeply $req->params->pairs, [], 'no multipart parameter';
+  is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';
+};
+
 subtest 'Parse full HTTP 1.1 proxy request with basic authentication' => sub {
   my $req = Mojo::Message::Request->new;
   $req->parse("GET http://127.0.0.1/foo/bar#baz HTTP/1.1\x0d\x0a");

@@ -267,6 +267,7 @@ sub _parse_formdata {
     my ($filename) = $disposition =~ /[; ]filename="((?:\\"|[^"])*)"/;
     next if $upload && !defined $filename || !$upload && defined $filename;
     my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
+    next if !defined $name;
     $part = $part->asset->slurp unless $upload;
 
     if ($charset) {

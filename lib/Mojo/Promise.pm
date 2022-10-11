@@ -11,11 +11,9 @@ use constant DEBUG => $ENV{MOJO_PROMISE_DEBUG} || 0;
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
 sub AWAIT_CHAIN_CANCEL { }
-
-sub AWAIT_CLONE { _await('clone', @_) }
-
-sub AWAIT_DONE { shift->resolve(@_) }
-sub AWAIT_FAIL { shift->reject(@_) }
+sub AWAIT_CLONE        { _await('clone', @_) }
+sub AWAIT_DONE         { _settle_await(resolve => @_) }
+sub AWAIT_FAIL         { _settle_await(reject  => @_) }
 
 sub AWAIT_GET {
   my $self    = shift;
@@ -223,13 +221,18 @@ sub _settle {
   if ($thenable && $status eq 'resolve') {
     $results[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () });
   }
-
   elsif (!$self->{results}) {
     @{$self}{qw(results status)} = (\@results, $status);
     $self->_defer;
   }
 
   return $self;
+}
+
+sub _settle_await {
+  my ($status, $self) = (shift, shift);
+  @{$self}{qw(results status)} = ([@_], $status) if !$self->{results};
+  $self->_defer;
 }
 
 sub _then_cb {

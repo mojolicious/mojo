@@ -1,4 +1,6 @@
 
+9.29  2022-10-14
+
 9.28  2022-09-12
   - Fixed a bug where async/await use could result in unhandled promise warnings. (batman)
 

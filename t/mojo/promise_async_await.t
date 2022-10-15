@@ -132,16 +132,22 @@ subtest 'Exception handling and async/await' => sub {
   $t->get_ok('/four')->status_is(500)->content_like(qr/this went perfectly/);
 };
 
+subtest 'Exception handling with file and line reporting' => sub {
+  my $error;
+  reject_p()->catch(sub { $error = shift })->wait;
+  like $error, qr/^Rejected promise at .*promise_async_await\.t line \d+\.$/, 'right content';
+};
+
 subtest 'Exception handling without "Unhandled rejected promise" warning' => sub {
   my ($error, @warn);
   local $SIG{__WARN__} = sub { push @warn, $_[0] };
   reject_p()->catch(sub { $error = shift })->wait;
-  like $error, qr{^Rejected promise at}, 'right content';
+  like $error, qr/^Rejected promise at/, 'right content';
   is @warn, 0, 'no waring';
 
   @warn = ();
   reject_p()->wait;
-  like "@warn", qr{Unhandled rejected promise}, 'unhandled promise';
+  like "@warn", qr/Unhandled rejected promise/, 'unhandled promise';
 };
 
 subtest 'Runaway exception' => sub {

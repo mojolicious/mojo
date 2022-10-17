@@ -230,8 +230,10 @@ sub _settle {
 }
 
 sub _settle_await {
-  my ($status, $self) = (shift, shift);
-  @{$self}{qw(results status)} = ([@_], $status) if !$self->{results};
+  my ($status, $self, @results) = @_;
+  return $results[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () })
+    if blessed $results[0] && $results[0]->can('then');
+  @{$self}{qw(results status)} = ([@results], $status) if !$self->{results};
   $self->_defer;
 }
 

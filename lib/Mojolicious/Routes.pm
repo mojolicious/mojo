@@ -103,7 +103,12 @@ sub _class {
   # Application class
   my @classes;
   my $class = $field->{controller} ? camelize $field->{controller} : '';
-  if ($field->{app}) { push @classes, $field->{app} }
+  if ($field->{app}) { 
+    push @classes, $field->{app};
+    
+    # Maybe add a possible controller
+    push @classes, "${_}::" . camelize $field->{app} for @{$self->namespaces};
+  }
 
   # Specific namespace
   elsif (defined(my $ns = $field->{namespace})) {

@@ -1023,4 +1023,22 @@ subtest 'Unknown placeholder type (matches nothing)' => sub {
   is_deeply $m->stack, [], 'empty stack';
 };
 
+subtest 'Intuitive controller (when it is not app)' => sub {
+  my $c = Mojolicious::Controller->new;
+  
+  $r = Mojolicious::Routes->new;
+  my $panel = $r->any('/panel')->to('panel'); # not added # at the end
+  $panel->get('/users')->to('#users'); 
+  my $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/panel/users'});
+  is_deeply $m->stack, [{app => 'panel', action => 'users'}], 'right structure';
+  
+  $r = Mojolicious::Routes->new;
+  my $admin = $r->any('/admin')->to('admin'); # not added # at the end
+  $admin->get('/articles')->to('#articles'); 
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/admin/articles'});
+  is_deeply $m->stack, [{app => 'admin', action => 'articles'}], 'right structure';
+};
+
 done_testing();

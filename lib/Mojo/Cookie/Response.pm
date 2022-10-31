@@ -48,7 +48,7 @@ sub to_string {
   if (my $path = $self->path) { $cookie .= "; path=$path" }
 
   # "secure"
-  $cookie .= "; secure" if $self->secure;
+  $cookie .= "; secure" if $self->secure || $self->samesite && $self->samesite eq 'None';
 
   # "HttpOnly"
   $cookie .= "; HttpOnly" if $self->httponly;

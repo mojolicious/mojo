@@ -79,6 +79,15 @@ get '/six' => sub {
 
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 
+async sub await_then_return_promise {
+  my $method = shift;
+  return Mojo::Promise->resolve(await Mojo::Promise->$method(0.01, $method));
+}
+
+async sub reject_p {
+  await Mojo::Promise->reject('Rejected promise');
+}
+
 async sub test_one {
   await $ua->get_p('/one');
 }
@@ -128,6 +137,18 @@ subtest 'Exception handling and async/await' => sub {
   $t->get_ok('/four')->status_is(500)->content_like(qr/this went perfectly/);
 };
 
+subtest 'Exception handling without "Unhandled rejected promise" warning' => sub {
+  my ($error, @warn);
+  local $SIG{__WARN__} = sub { push @warn, $_[0] };
+  reject_p()->catch(sub { $error = shift })->wait;
+  like $error, qr/^Rejected promise at/, 'right content';
+  is @warn, 0, 'no waring';
+
+  @warn = ();
+  reject_p()->wait;
+  like "@warn", qr/Unhandled rejected promise/, 'unhandled promise';
+};
+
 subtest 'Runaway exception' => sub {
   $t->get_ok('/five')->status_is(500)->content_like(qr/runaway too/);
 };
@@ -139,6 +160,15 @@ subtest 'Async function body returning a promise' => sub {
   $text = undef;
   test_three(0)->then(sub { warn @_ })->catch(sub { $text = shift })->wait;
   is $text, 'value', 'right content';
+};
+
+subtest 'Async nested function returning a promise' => sub {
+  my $res;
+  await_then_return_promise('timer')->then(sub { $res = shift })->catch(sub { $res = shift })->wait;
+  is $res, 'timer', 'right content';
+
+  await_then_return_promise('timeout')->then(sub { $res = shift })->catch(sub { $res = shift })->wait;
+  like $res, qr/^timeout at/, 'right content';
 };
 
 subtest 'Async WebSocket' => sub {

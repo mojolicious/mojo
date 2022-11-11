@@ -1,4 +1,6 @@
 
+9.30  2022-11-12
+
 9.29  2022-11-11
   - Fixed a bug where promises returning promises were not handled correctly. (batman)
 

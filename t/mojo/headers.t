@@ -260,6 +260,38 @@ subtest 'Dehop' => sub {
   is_deeply $headers->dehop->to_hash, {Server => 'pass'}, 'right structure';
 };
 
+subtest 'Links' => sub {
+  my $headers = Mojo::Headers->new;
+  is_deeply $headers->links, {}, 'right structure';
+
+  $headers->link('</foo>; rel=foo, </bar>; rel=foo');
+  is_deeply $headers->links, {foo => {link => '/foo', rel => 'foo'}}, 'right structure';
+
+  $headers->link('</foo>; rel=foo; title=bar');
+  is_deeply $headers->links, {foo => {link => '/foo', rel => 'foo', title => 'bar'}}, 'right structure';
+
+  $headers->link('<http://example.com?foo=b;,ar>; rel=next, </>; rel=root; title="foo bar"');
+  my $links = {
+    next => {link => 'http://example.com?foo=b;,ar', rel => 'next'},
+    root => {link => '/', rel => 'root', title => 'foo bar'}
+  };
+  is_deeply $headers->links, $links, 'right structure';
+
+  is_deeply $headers->link('</foo>')->links,              {}, 'right structure';
+  is_deeply $headers->link('</foo>;')->links,             {}, 'right structure';
+  is_deeply $headers->link('</foo>; test=failed')->links, {}, 'right structure';
+  is_deeply $headers->link('test=failed')->links,         {}, 'right structure';
+
+  $headers->links({next => '/foo', prev => '/bar'});
+  is_deeply $headers->to_hash, {Link => '</foo>; rel="next", </bar>; rel="prev"'}, 'right structure';
+
+  $headers->links({next => '/foo?bar'});
+  is_deeply $headers->to_hash, {Link => '</foo?bar>; rel="next"'}, 'right structure';
+
+  $headers->links({next => '/foo?ba;,r'});
+  is_deeply $headers->to_hash, {Link => '</foo?ba;,r>; rel="next"'}, 'right structure';
+};
+
 subtest 'Invalid characters' => sub {
   my $headers = Mojo::Headers->new;
   eval { $headers->add(Foo => "test\x0a") };

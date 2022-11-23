@@ -2,7 +2,7 @@ package Mojo::Headers;
 use Mojo::Base -base;
 
 use Carp       qw(croak);
-use Mojo::Util qw(monkey_patch);
+use Mojo::Util qw(header_params monkey_patch);
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 8192 };
 has max_lines     => sub { $ENV{MOJO_MAX_LINES}     || 100 };
@@ -99,6 +99,22 @@ sub is_finished { (shift->{state} // '') eq 'finished' }
 sub is_limit_exceeded { !!shift->{limit} }
 
 sub leftovers { delete shift->{buffer} }
+
+sub links {
+  my ($self, $links) = @_;
+
+  return $self->link(join(', ', map {qq{<$links->{$_}>; rel="$_"}} sort keys %$links)) if $links;
+
+  my $header = $self->link // '';
+  my $data   = {};
+  while ($header =~ s/^[,\s]*<(.+?)>//) {
+    my $target = $1;
+    (my $params, $header) = header_params $header;
+    $data->{$params->{rel}} //= {%$params, link => $target} if defined $params->{rel};
+  }
+
+  return $data;
+}
 
 sub names {
   my $self = shift;
@@ -505,6 +521,18 @@ Get and remove leftover data from header parser.
 
 Get or replace current header value, shortcut for the C<Link> header from L<RFC
 5988|https://tools.ietf.org/html/rfc5988>.
+
+=head2 links
+
+  my $links = $headers->links;
+  $headers  = $headers->links({next => 'http://example.com/foo', prev => 'http://example.com/bar'});
+
+Get or set web links from or to C<Link> header according to L<RFC 5988|http://tools.ietf.org/html/rfc5988>. Note that
+this method is B<EXPERIMENTAL> and might change without warning!
+
+  # Extract information about next page
+  say $headers->links->{next}{link};
+  say $headers->links->{next}{title};
 
 =head2 location
 

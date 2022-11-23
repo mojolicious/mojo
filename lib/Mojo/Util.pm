@@ -65,10 +65,10 @@ my (%ENCODING, %PATTERN);
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode deprecated dumper encode),
-  qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes md5_bytes md5_sum),
-  qw(monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes),
-  qw(sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode)
+  qw(extract_usage getopt gunzip gzip header_params hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes),
+  qw(md5_bytes md5_sum monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare),
+  qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent),
+  qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -160,6 +160,23 @@ sub gzip {
   my $uncompressed = shift;
   IO::Compress::Gzip::gzip \$uncompressed, \my $compressed or croak "Couldn't gzip: $IO::Compress::Gzip::GzipError";
   return $compressed;
+}
+
+sub header_params {
+  my $value = shift;
+
+  my $params = {};
+  while ($value =~ /\G[;\s]*([^=;, ]+)\s*/gc) {
+    my $name = $1;
+
+    # Quoted value
+    if ($value =~ /\G=\s*("(?:\\\\|\\"|[^"])*")/gc) { $params->{$name} = unquote($1) }
+
+    # Unquoted value
+    elsif ($value =~ /\G=\s*([^;, ]*)/gc) { $params->{$name} = $1 }
+  }
+
+  return ($params, substr($value, pos($value) // 0));
 }
 
 sub html_attr_unescape { _html(shift, 1) }
@@ -691,6 +708,13 @@ Uncompress bytes with L<IO::Compress::Gunzip>.
   my $compressed = gzip $uncompressed;
 
 Compress bytes with L<IO::Compress::Gzip>.
+
+=head2 header_params
+
+  my ($params, $remainder) = header_params 'one=foo; two="bar", three=baz';
+
+Extract HTTP header field parameters until the first comma according to L<RFC 5987|http://tools.ietf.org/html/rfc5987>.
+Note that this function is B<EXPERIMENTAL> and might change without warning!
 
 =head2 hmac_sha1_sum
 

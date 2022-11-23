@@ -9,10 +9,10 @@ use Mojo::DeprecationTest;
 use Sub::Util qw(subname);
 
 use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode dumper encode),
-  qw(extract_usage getopt gunzip gzip hmac_sha1_sum html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum),
-  qw(monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare sha1_bytes),
-  qw(sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent unquote),
-  qw(url_escape url_unescape xml_escape xor_encode);
+  qw(extract_usage getopt gunzip gzip header_params hmac_sha1_sum html_unescape html_attr_unescape humanize_bytes),
+  qw(md5_bytes md5_sum monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare),
+  qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent),
+  qw(unquote url_escape url_unescape xml_escape xor_encode);
 
 subtest 'camelize' => sub {
   is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -92,6 +92,16 @@ subtest 'split_cookie_header' => sub {
   my $tree
     = [['expires', 'Thu'], ['07', undef, 'Aug', undef, '2008', undef, '07:07:59', undef, 'GMT', undef], ['a', 'b']];
   is_deeply split_cookie_header($header), $tree, 'right result';
+};
+
+subtest 'header_params' => sub {
+  is_deeply [header_params('')],             [{}, ''], 'right result';
+  is_deeply [header_params('foo=b=a=r')],    [{foo => 'b=a=r'}, ''],      'right result';
+  is_deeply [header_params('a=b; c, d=e')],  [{a   => 'b'},     ', d=e'], 'right result';
+  is_deeply [header_params('a=b; b="c=d"')], [{a   => 'b', b => 'c=d'}, ''], 'right result';
+  is_deeply [header_params('a=b, c=d')],     [{a   => 'b'}, ', c=d'], 'right result';
+  is_deeply [header_params(q{rel="x"; t*=UTF-8'de'a%20b})], [{rel => 'x', 't*' => "UTF-8'de'a%20b"}, ''],
+    'right result';
 };
 
 subtest 'extract_usage' => sub {

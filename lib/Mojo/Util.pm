@@ -57,6 +57,10 @@ my %XML = ('&' => '&amp;', '<' => '&lt;', '>' => '&gt;', '"' => '&quot;', '\'' =
 # "Sun, 06 Nov 1994 08:49:37 GMT" and "Sunday, 06-Nov-94 08:49:37 GMT"
 my $EXPIRES_RE = qr/(\w+\W+\d+\W+\w+\W+\d+\W+\d+:\d+:\d+\W*\w+)/;
 
+# Header key/value pairs
+my $QUOTED_VALUE_RE   = qr/\G=\s*("(?:\\\\|\\"|[^"])*")/;
+my $UNQUOTED_VALUE_RE = qr/\G=\s*([^;, ]*)/;
+
 # HTML entities
 my $ENTITY_RE = qr/&(?:\#((?:[0-9]{1,7}|x[0-9a-fA-F]{1,6}));|(\w+[;=]?))/;
 
@@ -170,10 +174,10 @@ sub header_params {
     my $name = $1;
 
     # Quoted value
-    if ($value =~ /\G=\s*("(?:\\\\|\\"|[^"])*")/gc) { $params->{$name} //= unquote($1) }
+    if ($value =~ /$QUOTED_VALUE_RE/gco) { $params->{$name} //= unquote($1) }
 
     # Unquoted value
-    elsif ($value =~ /\G=\s*([^;, ]*)/gc) { $params->{$name} //= $1 }
+    elsif ($value =~ /$UNQUOTED_VALUE_RE/gco) { $params->{$name} //= $1 }
   }
 
   return ($params, substr($value, pos($value) // 0));
@@ -467,10 +471,10 @@ sub _header {
     if ($expires && $str =~ /\G=\s*$EXPIRES_RE/gco) { $part[-1] = $1 }
 
     # Quoted value
-    elsif ($str =~ /\G=\s*("(?:\\\\|\\"|[^"])*")/gc) { $part[-1] = unquote $1 }
+    elsif ($str =~ /$QUOTED_VALUE_RE/gco) { $part[-1] = unquote $1 }
 
     # Unquoted value
-    elsif ($str =~ /\G=\s*([^;, ]*)/gc) { $part[-1] = $1 }
+    elsif ($str =~ /$UNQUOTED_VALUE_RE/gco) { $part[-1] = $1 }
 
     # Separator
     next unless $str =~ /\G[;\s]*,\s*/gc;

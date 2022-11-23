@@ -170,10 +170,10 @@ sub header_params {
     my $name = $1;
 
     # Quoted value
-    if ($value =~ /\G=\s*("(?:\\\\|\\"|[^"])*")/gc) { $params->{$name} = unquote($1) }
+    if ($value =~ /\G=\s*("(?:\\\\|\\"|[^"])*")/gc) { $params->{$name} //= unquote($1) }
 
     # Unquoted value
-    elsif ($value =~ /\G=\s*([^;, ]*)/gc) { $params->{$name} = $1 }
+    elsif ($value =~ /\G=\s*([^;, ]*)/gc) { $params->{$name} //= $1 }
   }
 
   return ($params, substr($value, pos($value) // 0));

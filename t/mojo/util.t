@@ -98,6 +98,8 @@ subtest 'header_params' => sub {
   is_deeply [header_params('')],             [{}, ''], 'right result';
   is_deeply [header_params('foo=b=a=r')],    [{foo => 'b=a=r'}, ''],      'right result';
   is_deeply [header_params('a=b; c, d=e')],  [{a   => 'b'},     ', d=e'], 'right result';
+  is_deeply [header_params('a=b; a=c')],     [{a   => 'b'},     ''],      'right result';
+  is_deeply [header_params('a=b; a="c"')],   [{a   => 'b'},     ''],      'right result';
   is_deeply [header_params('a=b; b="c=d"')], [{a   => 'b', b => 'c=d'}, ''], 'right result';
   is_deeply [header_params('a=b, c=d')],     [{a   => 'b'}, ', c=d'], 'right result';
   is_deeply [header_params(q{rel="x"; t*=UTF-8'de'a%20b})], [{rel => 'x', 't*' => "UTF-8'de'a%20b"}, ''],

@@ -33,7 +33,7 @@ subtest 'Mojolicious::Lite' => sub {
 };
 
 subtest 'Parse XML' => sub {
-  is x('<title>works</title>')->at('title')->text, 'works', 'right text';
+  is x ('<title>works</title>')->at('title')->text, 'works', 'right text';
 };
 
 subtest 'JSON' => sub {

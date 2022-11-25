@@ -527,8 +527,7 @@ Get or replace current header value, shortcut for the C<Link> header from L<RFC
   my $links = $headers->links;
   $headers  = $headers->links({next => 'http://example.com/foo', prev => 'http://example.com/bar'});
 
-Get or set web links from or to C<Link> header according to L<RFC 5988|http://tools.ietf.org/html/rfc5988>. Note that
-this method is B<EXPERIMENTAL> and might change without warning!
+Get or set web links from or to C<Link> header according to L<RFC 5988|http://tools.ietf.org/html/rfc5988>.
 
   # Extract information about next page
   say $headers->links->{next}{link};

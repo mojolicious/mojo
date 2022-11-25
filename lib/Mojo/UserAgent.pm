@@ -286,6 +286,7 @@ sub _redirect {
 sub _remove {
   my ($self, $id) = @_;
   my $c = delete $self->{connections}{$id};
+  return unless $c->{ioloop};
   $self->_dequeue($c->{ioloop}, $id);
   $c->{ioloop}->remove($id);
 }

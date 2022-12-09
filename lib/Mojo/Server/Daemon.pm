@@ -194,7 +194,7 @@ sub _listen {
       my ($loop, $stream, $id) = @_;
 
       $self->{connections}{$id} = {tls => $tls};
-      warn "-- Accept $id (@{[$stream->handle->peerhost]})\n" if DEBUG;
+      warn "-- Accept $id (@{[_peer($stream->handle)]})\n" if DEBUG;
       $stream->timeout($self->inactivity_timeout);
 
       $stream->on(close   => sub { $self && $self->_close($id) });
@@ -211,6 +211,8 @@ sub _listen {
   $url->port($self->ports->[-1]) if !$options->{path} && !$url->port;
   say 'Web application available at ', $options->{path} // $url;
 }
+
+sub _peer { $_[0]->isa('IO::Socket::UNIX') ? $_[0]->peerpath : $_[0]->peerhost }
 
 sub _read {
   my ($self, $id, $chunk) = @_;

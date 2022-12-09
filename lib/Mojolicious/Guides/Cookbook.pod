@@ -1460,7 +1460,7 @@ that the connection has been established and it can start using the bi-direction
 
   # Open WebSocket to echo service
   my $ua = Mojo::UserAgent->new;
-  $ua->websocket_p('ws://echo.websocket.org')->then(sub ($tx) {
+  $ua->websocket_p('wss://ws.postman-echo.com/raw')->then(sub ($tx) {
 
     # Prepare a followup promise so we can wait for messages
     my $promise = Mojo::Promise->new;

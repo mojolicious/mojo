@@ -3044,6 +3044,14 @@ subtest 'XML name characters' => sub {
   $dom = Mojo::DOM->new->xml(1)->parse('<Foo><a .b -c 1>foo</a></Foo>');
   is $dom->at('Foo')->text, '<a .b -c 1>foo',                  'right text';
   is "$dom",                '<Foo>&lt;a .b -c 1&gt;foo</Foo>', 'right result';
+
+  $dom = Mojo::DOM->new->xml(1)->parse('<😄 😄="😄">foo</😄>');
+  is $dom->at('😄')->text, 'foo',              'right text';
+  is "$dom",              '<😄 😄="😄">foo</😄>', 'right result';
+
+  $dom = Mojo::DOM->new->xml(1)->parse('<こんにちは こんにちは="こんにちは">foo</こんにちは>');
+  is $dom->at('こんにちは')->text, 'foo',                              'right text';
+  is "$dom",                  '<こんにちは こんにちは="こんにちは">foo</こんにちは>', 'right result';
 };
 
 subtest 'Unknown CSS selector' => sub {

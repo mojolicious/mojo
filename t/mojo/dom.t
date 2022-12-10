@@ -3077,6 +3077,16 @@ EOF
   like $dom->at('script')->text, qr/console\.log.+executed.+\/\//s,       'right text';
   like $dom->at('p')->text,      qr/console\.log.+this is not a script/s, 'right text';
   is $dom->at('span')->text, ':-)', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+    <!DOCTYPE html>
+    <h1>Welcome to HTML</h1>
+    <div>
+      <script> console.log('</scriptxyz is safe'); </script>
+    </div>
+EOF
+  like $dom->at('script')->text, qr/console\.log.+scriptxyz is safe/s, 'right text';
+  like $dom->at('div')->text,    qr/^\s+$/s,                           'right text';
 };
 
 subtest 'Unknown CSS selector' => sub {

@@ -1,6 +1,8 @@
 
 9.31  2022-11-25
+  - This release contains fixes for security issues, everybody should upgrade!
   - Removed experimental status from links method in Mojo::Headers.
+  - Fixed multiple "<script>" parsing issues in Mojo::DOM.
   - Fixed a sporadic warning in Mojo::UserAgent. (s1037989)
   - Fixed UNIX domain socket support in Mojo::UserAgent debug feature. (s1037989)
   - Fixed a bug in Mojo::DOM where strings like "<.>" were considered valid tags.

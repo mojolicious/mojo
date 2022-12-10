@@ -144,7 +144,7 @@ sub parse {
 
         # Raw text elements
         next if $xml || !$RAW{$start} && !$RCDATA{$start};
-        next unless $html =~ m!\G(.*?)<\s*/\s*\Q$start\E\s*>!gcsi;
+        next unless $html =~ m!\G(.*?)</\Q$start\E\s*>?!gcsi;
         _node($current, 'raw', $RCDATA{$start} ? html_unescape $1 : $1);
         _end($start, 0, \$current);
       }

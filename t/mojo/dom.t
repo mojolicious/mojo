@@ -1772,7 +1772,7 @@ subtest 'Real world JavaScript and CSS' => sub {
         alert('<123>');
       }
     </script>
-    < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }< / scRiPt >
+    < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }</scRiPt  >
   <body>Foo!</body>
 EOF
   is $dom->find('html > body')->[0]->text,         'Foo!',                             'right text';
@@ -3052,6 +3052,31 @@ subtest 'XML name characters' => sub {
   $dom = Mojo::DOM->new->xml(1)->parse('<こんにちは こんにちは="こんにちは">foo</こんにちは>');
   is $dom->at('こんにちは')->text, 'foo',                              'right text';
   is "$dom",                  '<こんにちは こんにちは="こんにちは">foo</こんにちは>', 'right result';
+};
+
+subtest 'Script end tags' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+    <!DOCTYPE html>
+    <h1>Welcome to HTML</h1>
+    <script>
+        console.log('< /script> is safe');
+        /* <div>XXX this is not a div element</div> */
+    </script>
+EOF
+  like $dom->at('script')->text, qr/console\.log.+< \/script>.+this is not a div element/s, 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+    <!DOCTYPE html>
+    <h1>Welcome to HTML</h1>
+    <script>
+        console.log('this is a script element and should be executed');
+    // </script asdf> <p>
+        console.log('this is not a script');
+        // <span data-wtf="</script>">:-)</span>
+EOF
+  like $dom->at('script')->text, qr/console\.log.+executed.+\/\//s,       'right text';
+  like $dom->at('p')->text,      qr/console\.log.+this is not a script/s, 'right text';
+  is $dom->at('span')->text, ':-)', 'right text';
 };
 
 subtest 'Unknown CSS selector' => sub {

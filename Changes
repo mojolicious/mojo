@@ -2,6 +2,7 @@
 9.31  2022-11-25
   - Removed experimental status from links method in Mojo::Headers.
   - Fixed a sporadic warning in Mojo::UserAgent. (s1037989)
+  - Fixed a bug in Mojo::DOM where strings like "<.>" were considered valid tags.
 
 9.30  2022-11-22
   - Added EXPERIMENTAL support for parsing and generating Link headers.

@@ -11,7 +11,7 @@ has tree => sub { ['root'] };
 has 'xml';
 
 my $ATTR_RE = qr/
-  ([^<>=\s\/]+|\/)                     # Key
+  ([^<>=\s\/0-9.\-][^<>=\s\/]*|\/)     # Key
   (?:
     \s*=\s*
     (?s:(["'])(.*?)\g{-2}|([^>\s]*))   # Value
@@ -19,27 +19,27 @@ my $ATTR_RE = qr/
   \s*
 /x;
 my $TOKEN_RE = qr/
-  ([^<]+)?                                            # Text
+  ([^<]+)?                                                                     # Text
   (?:
     <(?:
       !(?:
         DOCTYPE(
-        \s+\w+                                        # Doctype
-        (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
-        (?:\s+\[.+?\])?                               # Int Subset
+        \s+\w+                                                                 # Doctype
+        (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?                            # External ID
+        (?:\s+\[.+?\])?                                                        # Int Subset
         \s*)
       |
-        --(.*?)--\s*                                  # Comment
+        --(.*?)--\s*                                                           # Comment
       |
-        \[CDATA\[(.*?)\]\]                            # CDATA
+        \[CDATA\[(.*?)\]\]                                                     # CDATA
       )
     |
-      \?(.*?)\?                                       # Processing Instruction
+      \?(.*?)\?                                                                # Processing Instruction
     |
-      \s*([^<>\s]+\s*(?:(?:$ATTR_RE){0,32766})*+)     # Tag
+      \s*((?:\/\s*)?[^<>\s\/0-9.\-][^<>\s\/]*\s*(?:(?:$ATTR_RE){0,32766})*+)   # Tag
     )>
   |
-    (<)                                               # Runaway "<"
+    (<)                                                                        # Runaway "<"
   )??
 /xis;
 
@@ -117,7 +117,7 @@ sub parse {
         # No more content
         if (!$xml && (my $tags = $NO_MORE_CONTENT{$end})) { _end($_, $xml, \$current) for @$tags }
 
-        _end($xml ? $1 : lc $1, $xml, \$current);
+        _end($end, $xml, \$current);
       }
 
       # Start

@@ -3001,6 +3001,47 @@ subtest 'Root pseudo-class' => sub {
   is $dom->at(':scope:first-child'),                                undef, 'no result';
 };
 
+subtest 'Runaway "<"' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+    <table>
+      <tr>
+        <td>
+          <div class="test" data-id="123" data-score="3">works</div>
+          TEST 123<br />
+          Test  12-34-5 test  >= 75% and < 85%  test<br />
+          Test  12-34-5  -test foo >= 5% and < 30% test<br />
+          Test  12-23-4 n/a >=13% and = 1% and < 5% test tset<br />
+          Test  12-34-5  test >= 1% and < 5%   foo, bar, baz<br />
+          Test foo, bar, baz  123-456-78  test < 1%  foo, bar, baz yada, foo, bar and baz, yada
+        </td>
+      </tr>
+    </table>
+EOF
+  is $dom->at('.test')->text, 'works', 'right text';
+};
+
+subtest 'XML name characters' => sub {
+  my $dom = Mojo::DOM->new->xml(1)->parse('<Foo><1a>foo</1a></Foo>');
+  is $dom->at('Foo')->text, '<1a>foo</1a>',                        'right text';
+  is "$dom",                '<Foo>&lt;1a&gt;foo&lt;/1a&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM->new->xml(1)->parse('<Foo><.a>foo</.a></Foo>');
+  is $dom->at('Foo')->text, '<.a>foo</.a>',                        'right text';
+  is "$dom",                '<Foo>&lt;.a&gt;foo&lt;/.a&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM->new->xml(1)->parse('<Foo><.>foo</.></Foo>');
+  is $dom->at('Foo')->text, '<.>foo</.>',                        'right text';
+  is "$dom",                '<Foo>&lt;.&gt;foo&lt;/.&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM->new->xml(1)->parse('<Foo><-a>foo</-a></Foo>');
+  is $dom->at('Foo')->text, '<-a>foo</-a>',                        'right text';
+  is "$dom",                '<Foo>&lt;-a&gt;foo&lt;/-a&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM->new->xml(1)->parse('<Foo><a1>foo</a1></Foo>');
+  is $dom->at('Foo a1')->text, 'foo',                     'right text';
+  is "$dom",                   '<Foo><a1>foo</a1></Foo>', 'right result';
+};
+
 subtest 'Unknown CSS selector' => sub {
   my $dom = Mojo::DOM->new('<html><head></head><body><div><div>x</div></div></body></html>');
   eval { $dom->at('div[') };

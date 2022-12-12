@@ -98,4 +98,28 @@ subtest 'Web server with valid certificates and no verification' => sub {
   is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',      'TLSv1 has been negotiatied';
 };
 
+subtest 'Client side TLS options' => sub {
+  my $daemon = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton, silent => 1);
+  my $listen = 'https://127.0.0.1/?version=TLSv1_1';
+  my $port   = $daemon->listen([$listen])->start->ports->[0];
+
+  subtest '(Not) setting verification mode' => sub {
+    my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+    my $tx = $ua->get("https://127.0.0.1:$port");
+    like $tx->error->{message}, qr/certificate verify failed/, 'has error';
+
+    $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+    $ua->tls_options({SSL_verify_mode => 0x00});
+    $tx = $ua->get("https://127.0.0.1:$port");
+    ok !$tx->error, 'no error';
+  };
+
+  subtest 'Setting acceptable protocol version' => sub {
+    my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+    $ua->tls_options({SSL_version => 'TLSv1_2'});
+    my $tx = $ua->get("https://127.0.0.1:$port");
+    like $tx->error->{message}, qr/wrong ssl version/, 'has error';
+  };
+};
+
 done_testing();

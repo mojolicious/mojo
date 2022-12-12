@@ -21,15 +21,15 @@ has cookie_jar         => sub { Mojo::UserAgent::CookieJar->new };
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 40 };
 has insecure           => sub { $ENV{MOJO_INSECURE} };
 has 'max_response_size';
-has ioloop          => sub { Mojo::IOLoop->new };
-has key             => sub { $ENV{MOJO_KEY_FILE} };
-has max_connections => 5;
-has max_redirects   => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
-has proxy           => sub { Mojo::UserAgent::Proxy->new };
-has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
-has server          => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
-has socket_options  => sub { {} };
-has transactor      => sub { Mojo::UserAgent::Transactor->new };
+has ioloop                           => sub { Mojo::IOLoop->new };
+has key                              => sub { $ENV{MOJO_KEY_FILE} };
+has max_connections                  => 5;
+has max_redirects                    => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
+has proxy                            => sub { Mojo::UserAgent::Proxy->new };
+has request_timeout                  => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
+has server                           => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
+has [qw(socket_options tls_options)] => sub { {} };
+has transactor                       => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
 for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
@@ -116,6 +116,7 @@ sub _connect {
   # TLS
   if ($options{tls} = $proto eq 'https') {
     map { $options{"tls_$_"} = $self->$_ } qw(ca cert key);
+    $options{tls_options} = $self->tls_options;
     $options{tls_options}{SSL_verify_mode} = 0x00 if $self->insecure;
   }
 
@@ -648,6 +649,13 @@ Application server relative URLs will be processed with, defaults to a L<Mojo::U
   $ua         = $ua->socket_options({LocalAddr => '127.0.0.1'});
 
 Additional options for L<IO::Socket::IP> when opening new connections.
+
+=head2 tls_options
+
+  my $options = $ua->tls_options;
+  $ua         = $ua->tls_options({SSL_cipher_list => 'DEFAULT:!DH@SECLEVEL=1'});
+
+Additional options for L<IO::Socket::SSL> when opening new connections.
 
 =head2 transactor
 

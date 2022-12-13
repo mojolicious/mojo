@@ -66,6 +66,7 @@
                 <a class="dropdown-item" href="https://matrix.to/#/#mojo:matrix.org">Matrix</a>
                 <a class="dropdown-item" href="https://web.libera.chat/#mojo">IRC</a>
                 <a class="dropdown-item" href="https://forum.mojolicious.org">Forum</a>
+                <a class="dropdown-item" href="https://mastodon.social/@mojolicious">Mastodon</a>
                 <a class="dropdown-item" href="https://twitter.com/mojolicious_org">Twitter</a>
                 <a class="dropdown-item" href="https://www.linkedin.com/groups/8963713/">LinkedIn</a>
                 <a class="dropdown-item" href="https://github.com/mojolicious/mojo/wiki">Wiki</a>
@@ -311,6 +312,7 @@
           </div>
           <div class="col-sm align-self-center text-center mojo-social">
             <a alt="GitHub" href="https://github.com/mojolicious/mojo"><i class="fab fa-github-alt"></i></a>
+            <a alt="Twitter" href="https://mastodon.social/@mojolicious"><i class="fab fa-mastodon"></i></a>
             <a alt="Twitter" href="https://twitter.com/mojolicious_org"><i class="fab fa-twitter"></i></a>
             <a alt="LinkedIn" href="https://www.linkedin.com/groups/8963713/"><i class="fab fa-linkedin"></i></a>
           </div>

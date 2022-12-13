@@ -312,7 +312,7 @@
           </div>
           <div class="col-sm align-self-center text-center mojo-social">
             <a alt="GitHub" href="https://github.com/mojolicious/mojo"><i class="fab fa-github-alt"></i></a>
-            <a alt="Twitter" href="https://fosstodon.org/@mojolicious"><i class="fab fa-mastodon"></i></a>
+            <a alt="Mastodon" href="https://fosstodon.org/@mojolicious"><i class="fab fa-mastodon"></i></a>
             <a alt="Twitter" href="https://twitter.com/mojolicious_org"><i class="fab fa-twitter"></i></a>
             <a alt="LinkedIn" href="https://www.linkedin.com/groups/8963713/"><i class="fab fa-linkedin"></i></a>
           </div>

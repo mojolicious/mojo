@@ -1799,10 +1799,10 @@ installed application so they can be excluded.
     $self->renderer->paths->[0] = $self->home->child('templates');
 
     # Exclude author commands
-    $self->commands->namespaces(['Mojolicious::Commands']);
+    $self->commands->namespaces(['Mojolicious::Command']);
 
     my $r = $self->routes;
-    $r->get('/welcome')->to('example#welcome');
+    $r->get('/')->to('example#welcome');
   }
 
   1;

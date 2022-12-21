@@ -1,5 +1,5 @@
 
-9.31  2022-11-25
+9.31  2022-12-21
   - This release contains fixes for security issues, everybody should upgrade!
   - Removed experimental status from links method in Mojo::Headers.
   - Added tls_options attribute to Mojo::UserAgent. (heikojansen)

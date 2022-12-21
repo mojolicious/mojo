@@ -17,6 +17,26 @@ my $port   = $daemon->start->ports->[0];
 my $url    = Mojo::URL->new("http://127.0.0.1:$port");
 my $r      = $app->routes;
 $r->get(
+  '/size/:code/:length' => {code => 204, length => 0} => sub {
+    my $c      = shift;
+    my $code   = $c->param('code');
+    my $length = $c->param('length');
+    $c->res->headers->header('X-Mojo-App' => 'Size');
+    $c->render(data => 'x' x $length, status => $code);
+  }
+)->name('size');
+$r->get(
+  '/redirect/:code1/:code2/:length' => {code1 => 302, code2 => 204, length => 0} => sub {
+    my $c      = shift;
+    my $code1  = $c->param('code1');
+    my $code2  = $c->param('code2');
+    my $length = $c->param('length');
+    $c->res->headers->header('X-Mojo-App' => 'Redirect');
+    $c->res->code($code1);
+    $c->redirect_to($c->url_for('size', {code => $code2, length => $length})->to_abs);
+  }
+)->name('redirect');
+$r->get(
   '/res1' => sub {
     my $c = shift;
     $c->res->headers->header('X-Mojo-App' => 'One');
@@ -69,7 +89,7 @@ $r->get(
 get '/proxy1/*target' => sub {
   my $c      = shift;
   my $target = $c->stash('target');
-  $c->proxy->get_p($url->path($target))->catch(sub {
+  $c->proxy->get_p($url->clone->path($target))->catch(sub {
     my $err = shift;
     $c->render(text => "Error: $err", status => 400);
   });
@@ -102,6 +122,32 @@ get '/proxy3/:method/*target' => sub {
 my $t = Test::Mojo->new;
 
 subtest 'Various response variants' => sub {
+  $t->get_ok('/proxy1/size/200/2')->status_is(200)->header_is('X-Mojo-App' => 'Size')->header_is('Content-Length' => 2)
+    ->content_is('xx');
+  $t->get_ok('/proxy1/size/200/1')->status_is(200)->header_is('X-Mojo-App' => 'Size')->header_is('Content-Length' => 1)
+    ->content_is('x');
+  $t->get_ok('/proxy1/size/200/0')->status_is(200)->header_is('X-Mojo-App' => 'Size')->header_is('Content-Length' => 0)
+    ->content_is('');
+  $t->get_ok('/proxy1/size/204/0')->status_is(204)->header_is('X-Mojo-App' => 'Size')
+    ->header_is('Content-Length' => undef)->content_is('');
+  $t->get_ok('/proxy1/redirect/304/200/1')->status_is(304)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => undef)->content_is('');
+  $t->get_ok('/proxy1/redirect/302/200/1')->status_is(302)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => 0)->content_is('');
+  $t->get_ok('/proxy1/redirect/301/200/1')->status_is(301)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => 0)->content_is('');
+  $t->get_ok('/proxy1/redirect/304/200/0')->status_is(304)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => undef)->content_is('');
+  $t->get_ok('/proxy1/redirect/302/200/0')->status_is(302)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => 0)->content_is('');
+  $t->get_ok('/proxy1/redirect/301/200/0')->status_is(301)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => 0)->content_is('');
+  $t->get_ok('/proxy1/redirect/304/204/0')->status_is(304)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => undef)->content_is('');
+  $t->get_ok('/proxy1/redirect/302/204/0')->status_is(302)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => 0)->content_is('');
+  $t->get_ok('/proxy1/redirect/301/204/0')->status_is(301)->header_is('X-Mojo-App' => 'Redirect')
+    ->header_is('Content-Length' => 0)->content_is('');
   $t->get_ok('/proxy1/res1')->status_is(200)->header_is('X-Mojo-App' => 'One')->content_is('One!');
   $t->get_ok('/proxy1/res2')->status_is(200)->header_is('X-Mojo-App' => 'Two')->content_is('Two!');
   $t->get_ok('/proxy1/res3')->status_is(200)->header_is('X-Mojo-App' => 'Three')->header_is('X-Mojo-Method' => 'GET')

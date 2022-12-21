@@ -242,9 +242,7 @@ sub _proxy_start_p {
         }
       );
 
-      # Unknown length (fall back to connection close)
-      $source_res->once(finish => sub { $content->$write('') and $tx->resume })
-        unless length($headers->content_length // '');
+      $source_res->once(finish => sub { $content->$write('') and $tx->resume });
     }
   );
   weaken $source_tx;

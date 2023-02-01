@@ -1040,28 +1040,28 @@ EOF
   is_deeply \@li, ['F'], 'found third last li element';
   @li = ();
   $dom->find('li:nth-child(1n+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(1n-0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:NTH-CHILD(N+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:Nth-Child(N+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(0n+1)')->each(sub { push @li, shift->text });
   is_deeply \@li, [qw(A)], 'found first li element';
@@ -1193,6 +1193,9 @@ EOF
   @e = ();
   $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
   is_deeply \@e, [qw(J K)], 'found only child';
+  @e = ();
+  $dom->find('div :nth-child(-n+2)')->each(sub { push @e, shift->text });
+  is_deeply \@e, [qw(J Mojo! K)], 'found first two children of each div';
 };
 
 subtest 'Links' => sub {

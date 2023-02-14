@@ -458,7 +458,7 @@ L<Mojolicious> applications. Just run your tests with L<prove>.
   $ prove -l -v t/foo.t
 
 If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will be set to C<trace> or C<fatal>, depending
-on the value of the C<HARNESS_IS_VERBOSE> environment variable. And to make it esier to test HTTPS/WSS web services
+on the value of the C<HARNESS_IS_VERBOSE> environment variable. And to make it easier to test HTTPS/WSS web services
 L<Mojo::UserAgent/"insecure"> will be activated by default for L</"ua">.
 
 See L<Mojolicious::Guides::Testing> for more.

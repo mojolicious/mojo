@@ -1,7 +1,7 @@
 package Mojo::Promise;
 use Mojo::Base -base;
 
-use Carp qw(carp);
+use Carp qw(carp croak);
 use Mojo::Exception;
 use Mojo::IOLoop;
 use Scalar::Util qw(blessed);
@@ -18,8 +18,9 @@ sub AWAIT_FAIL         { _settle_await(reject  => @_) }
 sub AWAIT_GET {
   my $self    = shift;
   my @results = @{$self->{results} // []};
-  die $results[0] unless $self->{status} eq 'resolve';
-  return wantarray ? @results : $results[0];
+  return wantarray ? @results : $results[0] if $self->{status} eq 'resolve';
+  die $results[0]                           if ref $results[0] || $results[0] =~ m!\n!;
+  croak $results[0];
 }
 
 sub AWAIT_IS_CANCELLED {undef}

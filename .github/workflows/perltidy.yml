@@ -13,6 +13,9 @@ jobs:
       image: perl:5.32
     steps:
       - uses: actions/checkout@v2
+      - name: Fix git permissions
+        # work around https://github.com/actions/checkout/issues/766
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: perl -V
         run: perl -V
       - name: Install dependencies

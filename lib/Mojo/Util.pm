@@ -22,7 +22,7 @@ use Time::HiRes        ();
 use Unicode::Normalize ();
 
 # Check for monotonic clock support
-use constant MONOTONIC => eval { !!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
+use constant MONOTONIC => !!eval { Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
 
 # Punycode bootstring parameters
 use constant {

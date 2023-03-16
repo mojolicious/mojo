@@ -6,7 +6,7 @@ use Mojo::IOLoop;
 use Scalar::Util qw(weaken);
 
 # TLS support requires IO::Socket::SSL
-use constant TLS   => $ENV{MOJO_NO_TLS} ? 0 : eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.009'); 1 };
+use constant TLS   => $ENV{MOJO_NO_TLS} ? 0 : !!eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.009'); 1 };
 use constant READ  => TLS               ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant WRITE => TLS               ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 

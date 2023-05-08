@@ -1,4 +1,6 @@
 
+9.33  2022-05-10
+
 9.32  2022-05-09
   - Improved file and line number details in async/await exceptions. (batman)
   - Fixed various CSS selector equation bugs in Mojo::DOM::CSS. (mauke)

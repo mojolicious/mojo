@@ -302,9 +302,12 @@ subtest 'JSON exceptions' => sub {
     ->json_like('/error', qr/dead template!/);
   $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('application/json;charset=UTF-8')
     ->json_is({error => 'Not Found'});
-
+  my $stash;
+  $t->app->hook(after_dispatch => sub { $stash = shift->stash });
   $t->get_ok('/txt/exception')->status_is(500)->header_is('X-Text' => 'txt')
     ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/Text exception/);
+  ok $stash->{exception}, 'exception exists in stash';
+  isa_ok $stash->{exception}, 'Mojo::Exception', 'is stash exception correct type?';
 
   $t->app->mode('production');
   $t->get_ok('/dead_template')->status_is(500)->content_type_is('application/json;charset=UTF-8')
@@ -319,9 +322,12 @@ subtest 'Text exceptions' => sub {
   $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
     ->content_like(qr/dead template!/);
   $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('text/plain;charset=UTF-8')->content_is('Not Found');
-
+  my $stash;
+  $t->app->hook(after_dispatch => sub { $stash = shift->stash });
   $t->get_ok('/txt/exception')->status_is(500)->header_is('X-Text' => 'txt')
     ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/Text exception/);
+  ok $stash->{exception}, 'exception exists in stash';
+  isa_ok $stash->{exception}, 'Mojo::Exception', 'is stash exception correct type?';
 
   $t->app->mode('production');
   $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')

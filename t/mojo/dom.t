@@ -16,6 +16,8 @@ subtest 'Empty' => sub {
 subtest 'Simple (basics)' => sub {
   my $dom = Mojo::DOM->new('<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
   is $dom->at('#b')->text, 'B', 'right text';
+  push my @each_txt, $dom->each_text();
+  is_deeply \@each_txt, ['', '', 'A', 'B'];
   my @div;
   push @div, $dom->find('div[id]')->map('text')->each;
   is_deeply \@div, [qw(A B)], 'found all div elements with id';
@@ -89,6 +91,10 @@ EOF
   is $dom->find('body > div > div')->[0]->text, 'test2', 'right text';
   is $dom->find('body > div > div')->[1],       undef,   'no result';
   is $dom->find('body > div > div')->size,      1,       'right number of elements';
+
+  is_deeply [$dom->find('body > div')->[0]->each_text],       ['test1'],     'right text';
+  is_deeply [$dom->find('body > div')->[1]->each_text],       ['', 'test2'], 'empty + inner div text';
+  is_deeply [$dom->find('body > div > div')->[0]->each_text], ['test2'],     'right text';
 };
 
 subtest 'A bit of everything (basic navigation)' => sub {
@@ -134,6 +140,9 @@ EOF
   is $simple->parent->all_text,
     "\n  test\n  easy\n  \n  \n  works well\n   yada yada\n" . "  \n  \n  < very broken\n  \n  more text\n",
     'right text';
+  is_deeply [$simple->parent->each_text],
+    ["\n  test\n  \n  \n  \n  works well\n   yada yada\n  \n  ", 'easy', '', "\n  < very broken\n  \n  more text\n",
+    ''], 'right list';
   is $simple->tag,                        'simple',                                'right tag';
   is $simple->attr('class'),              'working',                               'right class attribute';
   is $simple->text,                       'easy',                                  'right text';
@@ -273,6 +282,7 @@ subtest 'Treating nodes as elements' => sub {
   is $dom->child_nodes->first->tag,       undef, 'no tag';
   is $dom->child_nodes->first->text,      '',    'no text';
   is $dom->child_nodes->first->all_text,  '',    'no text';
+  is_deeply [$dom->child_nodes->first->each_text], [''], 'no text';
 };
 
 subtest 'Class and ID' => sub {
@@ -1351,6 +1361,10 @@ EOF
   is $dom->at(':text(/three/)'),                undef,                'no result';
   is $dom->at(':text(/zero/)'),                 undef,                'no result';
   is $dom->at(':text(/zero/)'),                 undef,                'no result';
+
+  is_deeply [$dom->at(':text(eight)')->each_text],        ['Five SixEight', 'Seven'], 'right text';
+  is_deeply [$dom->at(':text(/Ei.ht/)')->each_text],      ['Five SixEight', 'Seven'], 'right text';
+  is_deeply [$dom->at(':text(/(?i:ei.ht)/)')->each_text], ['Five SixEight', 'Seven'], 'right text';
 };
 
 subtest 'Adding nodes' => sub {
@@ -1745,6 +1759,14 @@ EOF
   is $dom->find('body > ul > li > p')->[2]->text,     "\n    ",                                            'no text';
   is $dom->find('body > ul > li')->[2]->all_text,     "\n        Test\n        3\n        2\n        1\n        \n    ";
   is $dom->find('body > ul > li > p')->[2]->all_text, "\n    ", 'no text';
+
+  is_deeply [$dom->find('body > ul > li > p')->[1]->each_text], ["\n      "], 'no text';
+  is_deeply [$dom->find('body > ul > li > p')->[2]->each_text], ["\n    "],   'no text';
+  is_deeply [$dom->find('body > ul > li > p')->[2]->each_text], ["\n    "],   'no text';
+  is_deeply [$dom->find('body > ul > li')->[1]->each_text],
+    ["\n        Test\n        \n        321\n        ", '', "\n      "], 'right text';
+  is_deeply [$dom->find('body > ul > li')->[2]->each_text],
+    ["\n        Test\n        3\n        2\n        1\n        ", "\n    "], 'right text';
 };
 
 subtest 'Advanced whitespace trimming (punctuation)' => sub {

@@ -168,6 +168,8 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { _text(_nodes(shift->tree), 0, 0) }
 
+sub each_text { _each_text(shift->tree, 0) }
+
 sub to_string { ${shift()}->render }
 
 sub tree { @_ > 1 ? (${$_[0]}->tree($_[1]) and return $_[0]) : ${$_[0]}->tree }
@@ -337,6 +339,22 @@ sub _text {
   return $text;
 }
 
+sub _each_text {
+  my ($xml, @tags) = ($_[1], $_[0]);
+
+  my @text;
+  while (my $tag = shift @tags) {
+
+    # Extract all text from tag
+    push @text, _text(_nodes($tag), $xml, 0);
+
+    # Prepend more tags
+    unshift @tags, @{_nodes($tag, 1)} if $xml || ($tag->[1] ne 'script' && $tag->[1] ne 'style');
+  }
+
+  return @text;
+}
+
 sub _wrap {
   my ($self, $content, $new) = @_;
 
@@ -467,6 +485,16 @@ excluded.
 
   # "foo\nbarbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->all_text;
+
+=head2 each_text
+
+  my @text = $dom->each_text;
+
+Extract text content of every descendant node of this element and return them in a list. For HTML documents C<script>
+and C<style> elements are excluded.
+
+  # ( "foo\nbaz\n", "bar" )
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->each_text;
 
 =head2 ancestors
 

@@ -200,7 +200,7 @@ sub _listen {
       $stream->on(close   => sub { $self && $self->_close($id) });
       $stream->on(error   => sub { $self && $self->app->log->error(pop) && $self->_close($id) });
       $stream->on(read    => sub { $self->_read($id => pop) });
-      $stream->on(timeout => sub { $self->_trace($id, 'Inactivity timeout') });
+      $stream->on(timeout => sub { $self->_trace($id, 'Inactivity timeout (see FAQ for more)') });
     }
   );
 

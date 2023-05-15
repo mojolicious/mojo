@@ -45,7 +45,7 @@ has secrets            => sub {
   my $self = shift;
 
   # Warn developers about insecure default
-  $self->log->trace('Your secret passphrase needs to be changed');
+  $self->log->trace('Your secret passphrase needs to be changed (see FAQ for more)');
 
   # Default to moniker
   return [$self->moniker];
@@ -141,7 +141,8 @@ sub handler {
   $self->plugins->emit_chain(around_dispatch => $c);
 
   # Delayed response
-  $c->helpers->log->trace('Nothing has been rendered, expecting delayed response') unless $c->stash->{'mojo.rendered'};
+  $c->helpers->log->trace('Nothing has been rendered, expecting delayed response (see FAQ for more)')
+    unless $c->stash->{'mojo.rendered'};
 }
 
 sub helper { shift->renderer->add_helper(@_) }

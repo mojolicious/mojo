@@ -1,5 +1,6 @@
 
-9.33  2023-05-10
+9.33  2023-05-15
+  - Improved log messages to refer to the FAQ when they have an entry.
 
 9.32  2023-05-09
   - Improved file and line number details in async/await exceptions. (batman)

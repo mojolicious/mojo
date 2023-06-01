@@ -58,6 +58,43 @@ Mojo::Promise->all($promise, $promise2)->wait;
 is $server, 'tset123',        'right content';
 is $client, "${upgraded}321", 'right content';
 
+# Shutdown
+$loop = Mojo::IOLoop->new;
+$promise = Mojo::Promise->new->ioloop($loop);
+$id = $loop->server(
+  {address => '127.0.0.1', tls => 1} => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(
+      read  => sub {
+        $stream->write("close");
+        shift->close_gracefully();
+        $promise->resolve;
+      }
+    );
+  }
+);
+$promise2 = Mojo::Promise->new->ioloop($loop);
+$port = $loop->acceptor($id)->port;
+my ($shutdown, $handle);
+$loop->client(
+  {port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->write('quit');
+    $stream->on(
+      close => sub {
+        my $ssl = ${*$handle}{_SSL_object};
+        $shutdown = Net::SSLeay::get_shutdown($ssl);
+        $promise2->resolve;
+      }
+    );
+    # keep a reference the IO::Socket::SSL
+    $handle = $stream->{handle};
+    $shutdown = 0;
+  }
+);
+Mojo::Promise->all($promise, $promise2)->wait;
+is $shutdown, 2, 'SSL received shutdown';
+
 # Valid client certificate
 ($server, $client) = ();
 my ($remove, $running, $timeout, $server_err, $server_close, $client_close);

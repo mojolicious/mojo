@@ -59,13 +59,13 @@ is $server, 'tset123',        'right content';
 is $client, "${upgraded}321", 'right content';
 
 # Shutdown
-$loop = Mojo::IOLoop->new;
+$loop    = Mojo::IOLoop->new;
 $promise = Mojo::Promise->new->ioloop($loop);
-$id = $loop->server(
+$id      = $loop->server(
   {address => '127.0.0.1', tls => 1} => sub {
     my ($loop, $stream) = @_;
     $stream->on(
-      read  => sub {
+      read => sub {
         $stream->write("close");
         shift->close_gracefully();
         $promise->resolve;
@@ -74,7 +74,7 @@ $id = $loop->server(
   }
 );
 $promise2 = Mojo::Promise->new->ioloop($loop);
-$port = $loop->acceptor($id)->port;
+$port     = $loop->acceptor($id)->port;
 my ($shutdown, $handle);
 $loop->client(
   {port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
@@ -87,8 +87,9 @@ $loop->client(
         $promise2->resolve;
       }
     );
+
     # keep a reference the IO::Socket::SSL
-    $handle = $stream->{handle};
+    $handle   = $stream->{handle};
     $shutdown = 0;
   }
 );
@@ -118,11 +119,11 @@ $id      = Mojo::IOLoop->server(
       }
     );
     $stream->on(error => sub { $server_err = pop });
-    $stream->on(read  => sub { $server .= pop });
+    $stream->on(read => sub { $server .= pop });
     $stream->timeout(0.5);
   }
 );
-$port     = Mojo::IOLoop->acceptor($id)->port;
+$port = Mojo::IOLoop->acceptor($id)->port;
 $promise2 = Mojo::Promise->new;
 Mojo::IOLoop->client(
   port        => $port,

@@ -181,7 +181,10 @@ sub _wait {
   while ($chunk =~ /(\d+):(\d)\n/g) {
     next unless my $w = $self->{pool}{$1};
     @$w{qw(healthy time)} = (1, $time) and $self->emit(heartbeat => $1);
-    $w->{graceful} ||= $time if $2;
+    if ($2) {
+      $w->{graceful} ||= $time;
+      $w->{quit}++;
+    }
   }
 }
 

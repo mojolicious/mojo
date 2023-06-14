@@ -1,6 +1,8 @@
 
-9.33  2023-05-15
+9.33  2023-06-14
   - Improved log messages to refer to the FAQ when they have an entry.
+  - Fixed a bug where the prefork server could sometimes send redundant QUIT signals, which could result in unintended
+    core dumps because of a race condition. (brsakai-csco)
 
 9.32  2023-05-09
   - Improved file and line number details in async/await exceptions. (batman)

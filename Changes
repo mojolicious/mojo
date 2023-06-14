@@ -1,4 +1,6 @@
 
+9.34  2023-06-15
+
 9.33  2023-06-14
   - Improved log messages to refer to the FAQ when they have an entry.
   - Fixed a bug where the prefork server could sometimes send redundant QUIT signals, which could result in unintended

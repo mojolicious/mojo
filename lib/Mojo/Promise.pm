@@ -66,21 +66,52 @@ sub finally { shift->_finally(1, @_) }
 sub map {
   my ($class, $options, $cb, @items) = (shift, ref $_[0] eq 'HASH' ? shift : {}, @_);
 
-  return $class->all(map { $_->$cb } @items) if !$options->{concurrency} || @items <= $options->{concurrency};
+  my $start_next;
+  my $block_next = sub { };
+
+  my ($akey, $aggregation, $next_after_fullfil, $next_after_reject)
+    = !defined $options->{aggregation}         ? (0, 'all',         \$start_next, \$block_next)
+    : $options->{aggregation} eq 'any'         ? (1, 'any',         \$block_next, \$start_next)
+    : $options->{aggregation} eq 'all_settled' ? (2, 'all_settled', \$start_next, \$start_next)
+    : $options->{aggregation} eq 'race'        ? (3, 'race',        \$block_next, \$block_next)
+    :                                            (0, 'all', \$start_next, \$block_next);
+
+  return $class->$aggregation(map { $_->$cb } @items) if !$options->{concurrency} || @items <= $options->{concurrency};
 
   my @start = map { $_->$cb } splice @items, 0, $options->{concurrency};
   my @wait  = map { $start[0]->clone } 0 .. $#items;
 
-  my $start_next = sub {
+  # N.B. $start_next will never be called for $aggregation eq 'race'
+  $start_next = sub {
     return () unless my $item = shift @items;
     my ($start_next, $chain) = (__SUB__, shift @wait);
-    $_->$cb->then(sub { $chain->resolve(@_); $start_next->() }, sub { $chain->reject(@_); @items = () }) for $item;
+    my $exec_next = sub {
+      $_->$cb->then(
+        sub {
+          $chain->resolve(@_);
+          if ($akey == 1) { @items = () }
+          else            { $start_next->() }
+        },
+        sub {
+          $chain->reject(@_);
+          if ($akey == 0) { @items = () }
+          else            { $start_next->() }
+        }
+      ) for $item;
+      return ();
+    };
+    if (!$options->{delay}) {
+      $exec_next->();
+    }
+    else {
+      Mojo::IOLoop->timer($options->{delay} => sub { $exec_next->() });
+    }
     return ();
   };
 
-  $_->then($start_next, sub { }) for @start;
+  $_->then($$next_after_fullfil, $$next_after_reject) for @start;
 
-  return $class->all(@start, @wait);
+  return $class->$aggregation(@start, @wait);
 }
 
 sub new {
@@ -418,10 +449,14 @@ original fulfillment value or rejection reason.
 
   my $new = Mojo::Promise->map(sub {...}, @items);
   my $new = Mojo::Promise->map({concurrency => 3}, sub {...}, @items);
+  my $new = Mojo::Promise->map({aggregation => 'any', concurrency => 3}, sub {...}, @items);
+  my $new = Mojo::Promise->map({aggregation => 'all_settled', concurrency => 1, delay => 2.5 }, sub {...}, @items);
 
-Apply a function that returns a L<Mojo::Promise> to each item in a list of items while optionally limiting concurrency.
-Returns a L<Mojo::Promise> that collects the results in the same manner as L</all>. If any item's promise is rejected,
-any remaining items which have not yet been mapped will not be.
+Apply a function that returns a L<Mojo::Promise> to each item in a list of items while optionally limiting concurrency and inserting delays between processing items.
+Returns a L<Mojo::Promise> that collects the results in the same manner as L</all>.
+With the C<aggregation> option, the behaviour can be changed to the same manner as L</any> or L</all_settled>.
+If nothing or L</all> is specified, and any item's promise is rejected, any remaining items which have not yet been mapped will not be.
+If L</any> is specified and any item's promise is resolved, any remaining items which have not yet been mapped will not be.
 
   # Perform 3 requests at a time concurrently
   Mojo::Promise->map({concurrency => 3}, sub { $ua->get_p($_) }, @urls)
@@ -431,11 +466,23 @@ These options are currently available:
 
 =over 2
 
+=item aggregation
+
+  aggregation => 'any'
+
+Specifies the aggregation behaviour. Supported values are L</all> (default), L</all_settled>, and L</any>.
+
 =item concurrency
 
   concurrency => 3
 
 The maximum number of items that are in progress at the same time.
+
+=item delay
+
+  delay => 2.5
+
+Insert a delay of 2.5 seconds after each processed items. N.B. delay makes sense only in case concurrency is specified.
 
 =back
 

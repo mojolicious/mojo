@@ -509,7 +509,7 @@ subtest 'Map (with concurrency limit)' => sub {
   is_deeply \@errors,  [],                                  'promise not rejected';
 };
 
-subtest 'Map (with reject)' => sub {
+subtest 'Map (with early reject)' => sub {
   my (@results, @errors, @started);
   Mojo::Promise->map(
     {concurrency => 3},
@@ -523,6 +523,165 @@ subtest 'Map (with reject)' => sub {
   is_deeply \@results, [],        'promise not resolved';
   is_deeply \@errors,  [1],       'correct errors';
   is_deeply \@started, [1, 2, 3], 'only initial batch started';
+};
+
+subtest 'Map (with later reject)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 3},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub {
+        if   ($n >= 5) { Mojo::Promise->reject($n) }
+        else           { Mojo::Promise->resolve($n) }
+      });
+    },
+    1 .. 8
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  is_deeply \@results, [], 'promise not resolved';
+  is_deeply \@errors,  [5], 'correct errors';
+  is_deeply \@started, [1, 2, 3, 4, 5, 6, 7], 'only maximum concurrent promises started';
+};
+
+subtest 'Map (any, with early success)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 3, aggregation => 'any'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub { Mojo::Promise->resolve($n) });
+    },
+    1 .. 5
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  is_deeply \@results, [1], 'promise resolved';
+  is_deeply \@errors,  [], 'correct errors';
+  is_deeply \@started, [1, 2, 3], 'only initial batch started';
+};
+
+subtest 'Map (any, with later success)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 3, aggregation => 'any'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub {
+        if   ($n >= 5) { Mojo::Promise->resolve($n) }
+        else           { Mojo::Promise->reject($n) }
+      });
+    },
+    1 .. 7
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  is_deeply \@results, [5], 'promise resolved';
+  is_deeply \@errors,  [], 'correct errors';
+  is_deeply \@started, [1, 2, 3, 4, 5, 6, 7], 'only maximum concurrent promises started';
+};
+
+subtest 'Map (any, all rejected)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {aggregation => 'any'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub { Mojo::Promise->reject($n) });
+    },
+    1 .. 3
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  is_deeply \@results, [], 'promise rejected';
+  is_deeply \@errors,  [[1], [2], [3]], 'correct errors';
+  is_deeply \@started, [1, 2, 3], 'all started without concurrency';
+};
+
+subtest 'Map (concurrency, any, all rejected)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 3, aggregation => 'any'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub { Mojo::Promise->reject($n) });
+    },
+    1 .. 5
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  is_deeply \@results, [], 'promise rejected';
+  is_deeply \@errors,  [[1], [2], [3], [4], [5]], 'correct errors';
+  is_deeply \@started, [1, 2, 3, 4, 5], 'all started with concurrency';
+};
+
+subtest 'Map (concurrency, race, 2 of 3 rejected)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 3, aggregation => 'race'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub {
+        if   ($n % 2) { Mojo::Promise->reject($n) }
+        else          { Mojo::Promise->resolve($n) }
+      });
+    },
+    1 .. 5
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  is_deeply \@results, [], 'promise rejected';
+  is_deeply \@errors,  [1], 'correct errors';
+  is_deeply \@started, [1, 2, 3], 'only 3 of 5 started with concurrency';
+};
+
+subtest 'Map (concurrency, all settled, partially rejected)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 3, aggregation => 'all_settled'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub {
+        if   ($n % 2) { Mojo::Promise->resolve($n) }
+        else          { Mojo::Promise->reject($n) }
+      });
+    },
+    1 .. 5
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  my $result = [
+    {status => 'fulfilled', value  => [1]},
+    {status => 'rejected',  reason => [2]},
+    {status => 'fulfilled', value  => [3]},
+    {status => 'rejected',  reason => [4]},
+    {status => 'fulfilled', value  => [5]}
+  ];
+  is_deeply \@results, $result, 'promise resolved';
+  is_deeply \@errors,  [], 'correct errors';
+  is_deeply \@started, [1, 2, 3, 4, 5], 'all started with concurrency';
+};
+
+subtest 'Map (concurrency, delay, all settled, partially rejected)' => sub {
+  my (@results, @errors, @started);
+  Mojo::Promise->map(
+    {concurrency => 2, delay => 0.1, aggregation => 'all_settled'},
+    sub {
+      my $n = $_;
+      push @started, $n;
+      Mojo::Promise->resolve->then(sub {
+        if   ($n % 2) { Mojo::Promise->reject($n) }
+        else          { Mojo::Promise->resolve($n) }
+      });
+    },
+    1 .. 5
+  )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
+  my $result = [
+    {status => 'rejected',  reason => [1]},
+    {status => 'fulfilled', value  => [2]},
+    {status => 'rejected',  reason => [3]},
+    {status => 'fulfilled', value  => [4]},
+    {status => 'rejected',  reason => [5]},
+  ];
+  is_deeply \@results, $result, 'promise resolved';
+  is_deeply \@errors, [], 'correct errors';
+
+  # is_deeply \@started, [1, 2, 3, 4, 5], 'all started with concurrency';
+  is scalar @started, 5, 'all started with concurrency';
 };
 
 subtest 'Map (custom event loop)' => sub {

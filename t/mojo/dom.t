@@ -2643,10 +2643,12 @@ subtest 'Comments' => sub {
 <!-- HTML4 -- >
 <!-- bad idea -- HTML4 -- >
 EOF
-  is $dom->tree->[1][1], ' HTML5 ',             'right comment';
-  is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
-  is $dom->tree->[5][1], ' HTML4 ',             'right comment';
-  is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
+  is $dom->tree->[1][1], ' HTML5 ',                      'right comment';
+  is $dom->tree->[3][1], ' bad idea -- HTML5 ',          'right comment';
+  is $dom->tree->[5][1],  '<',                           'not support html style comments';
+  is $dom->tree->[6][1], "!-- HTML4 -- >\n",             'not support html style comments';
+  is $dom->tree->[7][1], '<',                            'not support html style comments';
+  is $dom->tree->[8][1], "!-- bad idea -- HTML4 -- >\n", 'not support html style comments';
 
   # Issue #2030
   for (
@@ -2669,6 +2671,11 @@ EOF
     is $dom->tree->[5][0],    'comment',  "$_: have 2nd comment node";
     is $dom->tree->[5][1],    ' ',        "$_: have 2nd comment string";
   }
+
+  # Issue #2029
+  $dom = Mojo::DOM->new('<!-- a > -- > b <blink>c</blink> -->');
+  is $dom->tree->[1][0], 'comment',  'have comment';
+  is $dom->tree->[1][1], ' a > -- > b <blink>c</blink> ',  'entire string found in comment';
 };
 
 subtest 'Huge number of attributes' => sub {

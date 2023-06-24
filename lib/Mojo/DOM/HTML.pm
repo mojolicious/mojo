@@ -29,12 +29,7 @@ my $TOKEN_RE = qr/
         (?:\s+\[.+?\])?                                                        # Int Subset
         \s*)
       |
-        --(?|                                                                  # Comment
-            () -* !? (?=>)  # Empty comment
-            |
-            (.*?)
-            --!?(?=>)       # Comment end
-        )
+        --(?|()-*!?(?=>)|(.*?)--!?(?=>))                                       # Comment
       |
         \[CDATA\[(.*?)\]\]                                                     # CDATA
       )
@@ -42,7 +37,7 @@ my $TOKEN_RE = qr/
       \?(.*?)\?                                                                # Processing Instruction
     |
       \s*((?:\/\s*)?[^<>\s\/0-9.\-][^<>\s\/]*\s*(?:(?:$ATTR_RE){0,32766})*+)   # Tag
-    )>                                                               # Comment tag can end with a bang
+    )>
   |
     (<)                                                                        # Runaway "<"
   )??

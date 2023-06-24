@@ -2647,6 +2647,28 @@ EOF
   is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
   is $dom->tree->[5][1], ' HTML4 ',             'right comment';
   is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
+
+  # Issue #2030
+  for (
+    '<!-->',
+    '<!--->',
+    '<!-- --!>',
+  ) {
+    my $dom = Mojo::DOM->new( "$_ <p>OK</p> <!-- -->" );
+    my $space = / / ? ' ' : '';
+    is $dom->tree->[1][0],    'comment',  "$_: have 1st comment node";
+    is $dom->tree->[1][1],    $space,     "$_: have 1st comment string";
+    is $dom->tree->[2][0],    'text',     "$_: have text node";
+    is $dom->tree->[2][1],    ' ',        "$_: have 1st text string";
+    is $dom->tree->[3][0],    'tag',      "$_: have 1st tag node";
+    is $dom->tree->[3][1],    'p',        "$_: have tag string";
+    is $dom->tree->[3][4][0], 'text',     "$_: have sub text node";
+    is $dom->tree->[3][4][1], 'OK',       "$_: have sub text string";
+    is $dom->tree->[4][0],    'text',     "$_: have 2nd text node";
+    is $dom->tree->[4][1],    ' ',        "$_: have 2nd text string";
+    is $dom->tree->[5][0],    'comment',  "$_: have 2nd comment node";
+    is $dom->tree->[5][1],    ' ',        "$_: have 2nd comment string";
+  }
 };
 
 subtest 'Huge number of attributes' => sub {

@@ -482,12 +482,12 @@ subtest 'Warnings (multiple branches)' => sub {
 
 subtest 'Map' => sub {
   my (@results, @errors, @started);
-  my $promise = Mojo::Promise->map(sub { push @started, $_; Mojo::Promise->resolve($_) }, 1 .. 5)
+  my $promise = Mojo::Promise->map(sub { push @started, $_; Mojo::Promise->resolve($_) }, 1 .. 5, undef, 0)
     ->then(sub { @results = @_ }, sub { @errors = @_ });
-  is_deeply \@started, [1, 2, 3, 4, 5], 'all started without concurrency';
+  is_deeply \@started, [1, 2, 3, 4, 5, undef, 0], 'all started without concurrency';
   $promise->wait;
-  is_deeply \@results, [[1], [2], [3], [4], [5]], 'correct result';
-  is_deeply \@errors,  [],                        'promise not rejected';
+  is_deeply \@results, [[1], [2], [3], [4], [5], [undef], [0]], 'correct result';
+  is_deeply \@errors,  [],                                      'promise not rejected';
 };
 
 subtest 'Map (with concurrency limit)' => sub {
@@ -503,10 +503,12 @@ subtest 'Map (with concurrency limit)' => sub {
         $n;
       });
     },
-    1 .. 7
+    1 .. 7,
+    undef,
+    0,
   )->then(sub { @results = @_ }, sub { @errors = @_ })->wait;
-  is_deeply \@results, [[1], [2], [3], [4], [5], [6], [7]], 'correct result';
-  is_deeply \@errors,  [],                                  'promise not rejected';
+  is_deeply \@results, [[1], [2], [3], [4], [5], [6], [7], [undef], [0]], 'correct result';
+  is_deeply \@errors,  [],                                                'promise not rejected';
 };
 
 subtest 'Map (with reject)' => sub {

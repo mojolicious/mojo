@@ -1,5 +1,6 @@
 
-9.34  2023-06-19
+9.34  2023-07-06
+  - Fixed a bug in Mojo::Promise where map could hang on false values after concurrency limit. (ilmari)
   - Fixed built-in templates to not require an internet connection. (hernan604)
 
 9.33  2023-06-14

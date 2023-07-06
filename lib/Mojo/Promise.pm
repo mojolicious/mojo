@@ -72,7 +72,8 @@ sub map {
   my @wait  = map { $start[0]->clone } 0 .. $#items;
 
   my $start_next = sub {
-    return () unless my $item = shift @items;
+    return () unless @items;
+    my $item = shift @items;
     my ($start_next, $chain) = (__SUB__, shift @wait);
     $_->$cb->then(sub { $chain->resolve(@_); $start_next->() }, sub { $chain->reject(@_); @items = () }) for $item;
     return ();

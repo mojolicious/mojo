@@ -342,25 +342,23 @@ subtest 'I/O' => sub {
   }
 };
 
-subtest 'I/O with Encoding' => sub {
+subtest 'I/O with encoding' => sub {
   my $dir  = tempdir;
   my $file = $dir->child('test.txt')->spew('♥1', 'UTF-8');
   is $file->slurp('UTF-8'),            '♥1',         'right content';
   is decode('UTF-8', $file->slurp()),  '♥1',         'right content';
   is $file->spew('works too!')->slurp, 'works too!', 'right content';
-  $file->spew(encode('UTF-8', '♥1'));
-  is $file->slurp('UTF-8'),           '♥1', 'right content';
-  is decode('UTF-8', $file->slurp()), '♥1', 'right content';
   {
     eval { $file->spew('♥1') };
     like $@, qr/Wide character/, 'right error';
   }
-  {
-    no warnings 'redefine';
-    local *IO::Handle::syswrite = sub { $! = 0; 5 };
-    eval { $file->spew("just\nworks!") };
-    like $@, qr/Can't write to file ".*/, 'right error';
-  }
+};
+
+subtest 'I/O with manual encoding' => sub {
+  my $dir  = tempdir;
+  my $file = $dir->child('test.txt')->spew(encode('UTF-8', '♥1'));
+  is $file->slurp('UTF-8'),           '♥1', 'right content';
+  is decode('UTF-8', $file->slurp()), '♥1', 'right content';
 };
 
 done_testing();

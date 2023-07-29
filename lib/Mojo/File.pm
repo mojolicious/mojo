@@ -14,6 +14,7 @@ use File::stat            ();
 use File::Temp            ();
 use IO::File              ();
 use Mojo::Collection;
+use Mojo::Util qw(decode encode);
 
 our @EXPORT_OK = ('curfile', 'path', 'tempdir', 'tempfile');
 
@@ -127,22 +128,25 @@ sub sibling {
 }
 
 sub slurp {
-  my $self = shift;
+  my ($self, $encoding) = @_;
 
   CORE::open my $file, '<', $$self or croak qq{Can't open file "$$self": $!};
   my $ret = my $content = '';
   while ($ret = $file->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
   croak qq{Can't read from file "$$self": $!} unless defined $ret;
 
-  return $content;
+  return $encoding ? decode($encoding, $content) : $content;
 }
 
-sub spurt {
-  my ($self, $content) = (shift, join '', @_);
+sub spew {
+  my ($self, $content, $encoding) = @_;
+  $content = encode($encoding, $content) if $encoding;
   CORE::open my $file, '>', $$self or croak qq{Can't open file "$$self": $!};
   ($file->syswrite($content) // -1) == length $content or croak qq{Can't write to file "$$self": $!};
   return $self;
 }
+
+sub spurt { shift->spew(join '', @_) }
 
 sub stat { File::stat::stat(${shift()}) }
 
@@ -471,8 +475,17 @@ Return a new L<Mojo::File> object relative to the directory part of the path.
 =head2 slurp
 
   my $bytes = $path->slurp;
+  my $chars = $path->slurp('UTF-8');
 
-Read all data at once from the file.
+Read all data at once from the file. If an encoding is provided, an attempt will be made to decode the content.
+
+=head2 spew
+
+  $path = $path->spew($bytes);
+  $path = $path->spew($chars, $encoding);
+
+Write all data at once to the file. If an encoding is provided, an attempt to encode the content will be made prior
+to writing.
 
 =head2 spurt
 

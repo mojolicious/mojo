@@ -348,17 +348,18 @@ subtest 'I/O with encoding' => sub {
   is $file->slurp('UTF-8'),            '♥1',         'right content';
   is decode('UTF-8', $file->slurp()),  '♥1',         'right content';
   is $file->spew('works too!')->slurp, 'works too!', 'right content';
+
+  subtest 'I/O with manual encoding' => sub {
+    $file->spew(encode('UTF-8', '♥1'));
+    is $file->slurp('UTF-8'),           '♥1', 'right content';
+    is decode('UTF-8', $file->slurp()), '♥1', 'right content';
+  };
+
   {
+    local $@;
     eval { $file->spew('♥1') };
     like $@, qr/Wide character/, 'right error';
   }
-};
-
-subtest 'I/O with manual encoding' => sub {
-  my $dir  = tempdir;
-  my $file = $dir->child('test.txt')->spew(encode('UTF-8', '♥1'));
-  is $file->slurp('UTF-8'),           '♥1', 'right content';
-  is decode('UTF-8', $file->slurp()), '♥1', 'right content';
 };
 
 done_testing();

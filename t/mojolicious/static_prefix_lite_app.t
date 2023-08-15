@@ -40,6 +40,10 @@ subtest 'Bundled template' => sub {
 
 subtest 'Helpers with prefix' => sub {
   $t->get_ok('/helpers')->status_is(200)->content_is(<<EOF);
+/foo.png
+/static/foo.png
+/static/assets/foo.png
+/static/assets/foo.ab1234cd5678ef.css
 <link href="/static/favicon.ico" rel="icon">
 <link href="/static/foo.ico" rel="icon">
 <img src="/static/foo.png">
@@ -79,6 +83,10 @@ done_testing();
 
 __DATA__
 @@helpers.html.ep
+%= url_for '/foo.png'
+%= url_for_file '/foo.png'
+%= url_for_asset '/foo.png'
+%= url_for_asset '/foo.css'
 %= favicon
 %= favicon '/foo.ico'
 %= image '/foo.png'

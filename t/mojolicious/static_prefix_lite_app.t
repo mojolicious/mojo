@@ -29,7 +29,6 @@ subtest 'Static asset' => sub {
     ->content_like(qr/\* foo\.css asset/);
 };
 
-
 subtest 'Bundled static file' => sub {
   $t->get_ok('/static/favicon.ico')->status_is(200)->content_type_is('image/x-icon');
 };

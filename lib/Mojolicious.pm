@@ -526,6 +526,9 @@ see L<Mojolicious::Controller/"session"> for more information about working with
 
 For serving static files from your C<public> directories, defaults to a L<Mojolicious::Static> object.
 
+  # Serve static files only with a "/static" prefix
+  $app->static->prefix('/static');
+
   # Add another "public" directory
   push @{$app->static->paths}, '/home/sri/public';
 

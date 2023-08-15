@@ -24,6 +24,8 @@ get 'script';
 
 get 'style';
 
+get 'favicon';
+
 get '/basicform';
 
 post '/text';
@@ -173,6 +175,12 @@ $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
   body {color: #000}
 
 /*]]>*/</style>
+EOF
+
+# Favicon
+$t->get_ok('/favicon')->status_is(200)->content_is(<<EOF);
+<link href="/favicon.ico" rel="icon">
+<link href="/foo.ico" rel="icon">
 EOF
 
 # Basic form
@@ -612,6 +620,10 @@ __DATA__
 <%= stylesheet type => 'foo' => begin %>
   body {color: #000}
 <% end %>
+
+@@ favicon.html.ep
+<%= favicon %>
+<%= favicon '/foo.ico' %>
 
 @@ basicform.html.ep
 %= form_for links => begin

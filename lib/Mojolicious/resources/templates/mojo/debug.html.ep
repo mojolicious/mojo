@@ -7,6 +7,7 @@
     <title><%= $title %> (<%= app->mode %> mode)</title>
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
+    %= favicon
     %= javascript '/mojo/jquery/jquery.js'
     %= javascript '/mojo/highlight.js/highlight.min.js'
     %= javascript '/mojo/highlight.js/mojolicious.min.js'
@@ -40,8 +41,8 @@
       <nav class="navbar navbar-expand-lg navbar-dark mojobar">
         <a href="https://mojolicious.org" id="mojobar-brand" class="navbar-brand">
           <picture>
-            <img src="<%= url_for '/mojo/logo-white.png' %>"
-              srcset="<%= url_for '/mojo/logo-white-2x.png' %> 2x">
+            <img src="<%= url_for_file '/mojo/logo-white.png' %>"
+              srcset="<%= url_for_file '/mojo/logo-white-2x.png' %> 2x">
           </picture>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"

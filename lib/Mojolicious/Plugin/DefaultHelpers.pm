@@ -16,7 +16,7 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw(app param stash session url_for)) {
+  for my $name (qw(app param stash session url_for url_for_asset url_for_file)) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -858,6 +858,18 @@ Alias for L<Mojolicious/"ua">.
 Alias for L<Mojolicious::Controller/"url_for">.
 
   %= url_for('/index.html')->query(foo => 'bar')
+
+=head2 url_for_asset
+
+  %= url_for_asset('/app.js');
+
+Alias for L<Mojolicious::Controller/"url_for_asset">.
+
+=head2 url_for_file
+
+  %= url_for_file('/index.html');
+
+Alias for L<Mojolicious::Controller/"url_for_file">.
 
 =head2 url_with
 

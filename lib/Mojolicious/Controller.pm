@@ -277,6 +277,11 @@ sub url_for_asset {
   return $self->url_for($self->app->static->asset_path($asset));
 }
 
+sub url_for_file {
+  my ($self, $file) = @_;
+  return $self->url_for($self->app->static->file_path($file));
+}
+
 sub write {
   my ($self, $chunk, $cb) = @_;
   $self->res->content->write($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
@@ -779,6 +784,12 @@ current request.
   my $url = $c->url_for_asset('/app.js');
 
 Generate a portable L<Mojo::URL> object with base for a static asset.
+
+=head2 url_for_file
+
+  my $url = $c->url_for_file('/index.html');
+
+Generate a portable L<Mojo::URL> object with base for a static file.
 
 =head2 write
 

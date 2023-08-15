@@ -315,6 +315,12 @@ subtest 'Assets' => sub {
     ->header_exists_not('Cache-Control')->content_like(qr/\* foo\.css asset/);
 };
 
+subtest 'File' => sub {
+  my $c = $t->app->build_controller;
+  is $c->url_for_file('/unknown.css')->path, '/unknown.css', 'right file path';
+  is $c->url_for_file('/foo/bar.css')->path, '/foo/bar.css', 'right file path';
+};
+
 done_testing();
 
 __DATA__

@@ -16,12 +16,13 @@ has asset_dir => 'assets';
 has classes   => sub { ['main'] };
 has extra     => sub { +{%EXTRA} };
 has paths     => sub { [] };
+has 'prefix';
 
 sub asset_path {
   my ($self, $asset) = @_;
   $asset = "/$asset" unless $asset =~ /^\//;
   my $assets = $self->{assets} //= {};
-  return '/' . $self->asset_dir . ($assets->{$asset} // $asset);
+  return $self->file_path('/' . $self->asset_dir . ($assets->{$asset} // $asset));
 }
 
 sub dispatch {
@@ -70,6 +71,13 @@ sub file {
   return exists $extra->{$rel} ? _get_file($extra->{$rel}) : undef;
 }
 
+sub file_path {
+  my ($self, $file) = @_;
+  $file = "/$file" unless $file =~ /^\//;
+  return $file unless my $prefix = $self->prefix;
+  return "$prefix$file";
+}
+
 sub is_fresh {
   my ($self, $c, $options) = @_;
 
@@ -94,6 +102,13 @@ sub is_fresh {
 
 sub serve {
   my ($self, $c, $rel) = @_;
+
+  # Prefix
+  if (my $prefix = $self->prefix) {
+    $rel = "/$rel";
+    return undef unless $rel =~ s/^\Q$prefix\E\///;
+  }
+
   return undef unless my $asset = $self->file($rel);
   $c->app->types->content_type($c, {file => $rel});
   return !!$self->serve_asset($c, $asset);
@@ -248,6 +263,14 @@ Directories to serve static files from, first one has the highest precedence.
   # Add another "public" directory with higher precedence
   unshift @{$static->paths}, '/home/sri/themes/blue/public';
 
+=head2 prefix
+
+  my $prefix = $static->prefix;
+  $static    = $static->prefix('/static');
+
+Prefix to use for all static files, defaults to C<undef>. This can be very useful for production deployments where the
+reverse proxy server should take over serving static files.
+
 =head1 METHODS
 
 L<Mojolicious::Static> inherits all methods from L<Mojo::Base> and implements the following new ones.
@@ -274,6 +297,12 @@ or return C<undef> if it doesn't exist. Note that this method uses a relative pa
 traversing to parent directories.
 
   my $content = $static->file('foo/bar.html')->slurp;
+
+=head2 file_path
+
+  my $path = $static->file_path('/index.html');
+
+Get static file path with L</"prefix"> if it has been configured.
 
 =head2 is_fresh
 

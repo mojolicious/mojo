@@ -1,5 +1,8 @@
 
-9.34  2023-07-06
+9.34  2023-08-15
+  - Deprecated Mojo::File::spurt in favor of Mojo::File::spew.
+  - Added spew method to Mojo::File. (genio)
+  - Added encoding option to slurp method in Mojo::File. (genio)
   - Fixed a bug in Mojo::Promise where map could hang on false values after concurrency limit. (ilmari)
   - Fixed built-in templates to not require an internet connection. (hernan604)
 

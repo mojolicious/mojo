@@ -1,5 +1,5 @@
 
-9.34  2023-08-15
+9.34  2023-08-25
   - Added support for serving static files with a prefix.
   - Deprecated Mojo::File::spurt in favor of Mojo::File::spew.
   - Added prefix attribute to Mojolicious::Static.
@@ -9,6 +9,7 @@
   - Added encoding option to slurp method in Mojo::File. (genio)
   - Added url_for_asset and url_for_file helpers to Mojolicious::Plugins::DefaultHelpers.
   - Added favicon helper to Mojolicious::Plugin::TagHelpers.
+  - Fixed support for module_true Perl feature in Mojolicious apps. (haarg)
   - Fixed a bug in Mojo::Promise where map could hang on false values after concurrency limit. (ilmari)
   - Fixed built-in templates to not require an internet connection. (hernan604)
 

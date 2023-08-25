@@ -91,6 +91,15 @@ subtest 'Load broken app' => sub {
   like $@, qr/^Can't load application/, 'right error';
 };
 
+subtest 'Load app using module_true' => sub {
+  plan skip_all => 'module_true feature requires perl 5.38' if $] < 5.038;
+  my $daemon = Mojo::Server::Daemon->new;
+  my $path   = curfile->sibling('lib', '..', 'lib', 'myapp-module-true.pl');
+  my $app    = eval { $daemon->load_app($path) };
+  is $@,       '',                  'no error loading app';
+  is ref $app, 'Mojolicious::Lite', 'right reference';
+};
+
 subtest 'Load missing application class' => sub {
   eval { Mojo::Server::Daemon->new->build_app('Mojo::DoesNotExist') };
   like $@, qr/^Can't find application class "Mojo::DoesNotExist" in \@INC/, 'right error';

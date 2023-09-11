@@ -1,5 +1,5 @@
 
-9.34  2023-08-25
+9.34  2023-09-11
   - Added support for serving static files with a prefix.
   - Deprecated Mojo::File::spurt in favor of Mojo::File::spew.
   - Added prefix attribute to Mojolicious::Static.

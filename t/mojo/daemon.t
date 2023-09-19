@@ -88,7 +88,8 @@ subtest 'Load broken app' => sub {
   eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderTest/A.pm") };
   like $@, qr/did not return an application object/, 'right error';
   eval { Mojo::Server::Daemon->new->load_app("$bin/lib/Mojo/LoaderException.pm") };
-  like $@, qr/^Can't load application/, 'right error';
+  like $@, qr/Missing right curly or square bracket/, 'right error';
+  like $@, qr/^Can't load application/,               'right error';
 };
 
 subtest 'Load app using module_true' => sub {

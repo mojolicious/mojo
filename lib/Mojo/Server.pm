@@ -54,9 +54,11 @@ sub load_app {
     local @ARGS_OVERRIDE = @args;
 
     # Try to load application from script into sandbox
-    my $app = eval "package Mojo::Server::Sandbox::@{[md5_sum $path]}; do \$path";
-    my $err = $app ? undef : $@ || $! || "$path did not return a true value";
-    die qq{Can't load application from file "$path": $err} if $err;
+    my $app = eval sprintf <<'END_CODE', md5_sum($path);
+      package Mojo::Server::Sandbox::%s;
+      do $path or die $@ || $! || "$path did not return a true value";
+END_CODE
+    die qq{Can't load application from file "$path": $@} if $@;
     die qq{File "$path" did not return an application object.\n} unless blessed $app && $app->can('handler');
     $self->app($app);
   };

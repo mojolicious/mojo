@@ -11,6 +11,8 @@ use Mojo::Util;
 use Mojolicious::Routes::Match;
 use Scalar::Util ();
 
+my $ABSOLUTE = qr!^(?:[^:/?#]+:|//|#)!;
+
 has [qw(app tx)] => undef, weak => 1;
 has match => sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
 
@@ -239,7 +241,7 @@ sub url_for {
 
   # Absolute URL
   return $target                 if Scalar::Util::blessed $target && $target->isa('Mojo::URL');
-  return Mojo::URL->new($target) if $target =~ m!^(?:[^:/?#]+:|//|#)!;
+  return Mojo::URL->new($target) if $target =~ $ABSOLUTE;
 
   # Base
   my $url  = Mojo::URL->new;
@@ -274,12 +276,12 @@ sub url_for {
 
 sub url_for_asset {
   my ($self, $asset) = @_;
-  return $self->url_for($self->app->static->asset_path($asset));
+  return $self->url_for($asset =~ $ABSOLUTE ? $asset : $self->app->static->asset_path($asset));
 }
 
 sub url_for_file {
   my ($self, $file) = @_;
-  return $self->url_for($self->app->static->file_path($file));
+  return $self->url_for($file =~ $ABSOLUTE ? $file : $self->app->static->file_path($file));
 }
 
 sub write {

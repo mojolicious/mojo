@@ -77,6 +77,10 @@ subtest 'File' => sub {
   my $c = $t->app->build_controller;
   is $c->url_for_file('/unknown.css')->path, '/static/unknown.css', 'right file path';
   is $c->url_for_file('/foo/bar.css')->path, '/static/foo/bar.css', 'right file path';
+  is $c->url_for_file('https://somesite.com/file.css')->to_string, 'https://somesite.com/file.css',
+    'right absolute file path?';
+  is $c->url_for_asset('https://somesite.com/file.css')->to_string, 'https://somesite.com/file.css',
+    'right absolute asset path?';
 };
 
 done_testing();

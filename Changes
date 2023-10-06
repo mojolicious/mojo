@@ -1,5 +1,6 @@
 
-9.35  2023-09-12
+9.35  2023-10-06
+  - Fixed absolute URL support in url_for_file and url_for_asset methods. (rawleyfowler)
 
 9.34  2023-09-11
   - Added support for serving static files with a prefix.

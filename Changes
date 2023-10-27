@@ -1,5 +1,8 @@
 
-9.35  2023-10-06
+9.35  2023-10-27
+  - Added EXPERIMENTAL support for persistent cookies in Netscape format.
+  - Added EXPERIMENTAL file attribute to Mojo::UserAgent::CookieJar.
+  - Added EXPERIMENTAL load, save and to_string methods to Mojo::UserAgent::CookieJar.
   - Fixed absolute URL support in url_for_file and url_for_asset methods. (rawleyfowler)
 
 9.34  2023-09-11

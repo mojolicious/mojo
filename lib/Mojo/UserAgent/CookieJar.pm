@@ -218,11 +218,11 @@ L<Mojo::UserAgent::CookieJar> implements the following attributes.
 File to L</"load"> cookies from and L</"save"> cookies to in Netscape format. Note that this attribute is
 B<EXPERIMENTAL> and might change without warning!
 
-  # Save cookies in file
+  # Save cookies to file
   $jar->file('cookies.txt')->save;
 
-  # Load cookies from file
-  $jar->file('cookies.txt')->load;
+  # Empty cookie jar and load cookies from file
+  $jar->file('cookies.txt')->empty->load;
 
 =head2 ignore
 

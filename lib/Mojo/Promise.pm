@@ -4,6 +4,7 @@ use Mojo::Base -base;
 use Carp qw(carp croak);
 use Mojo::Exception;
 use Mojo::IOLoop;
+use Mojo::Collection;
 use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{MOJO_PROMISE_DEBUG} || 0;
@@ -137,7 +138,7 @@ sub _all {
     elsif ($type == 2) {
       $promises[$i]->then(
         sub {
-          $results->[$i] = [@_];
+          $results->[$i] = Mojo::Collection->new(@_);
           $all->resolve(@$results) if --$remaining <= 0;
           return ();
         },
@@ -161,12 +162,12 @@ sub _all {
     else {
       $promises[$i]->then(
         sub {
-          $results->[$i] = {status => 'fulfilled', value => [@_]};
+          $results->[$i] = {status => 'fulfilled', value => Mojo::Collection->new(@_)};
           $all->resolve(@$results) if --$remaining <= 0;
           return ();
         },
         sub {
-          $results->[$i] = {status => 'rejected', reason => [@_]};
+          $results->[$i] = {status => 'rejected', reason => Mojo::Collection->new(@_)};
           $all->resolve(@$results) if --$remaining <= 0;
           return ();
         }
@@ -297,7 +298,8 @@ Mojo::Promise - Promises/A+
   my $cpan = get_p('https://metacpan.org');
   Mojo::Promise->all($mojo, $cpan)->then(sub ($mojo, $cpan) {
     say $mojo->[0]->res->code;
-    say $cpan->[0]->res->code;
+    # or
+    say $cpan->first->res->code;
   })->catch(sub ($err) {
     warn "Something went wrong: $err";
   })->wait;

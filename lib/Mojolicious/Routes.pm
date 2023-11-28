@@ -334,6 +334,8 @@ Match routes with L<Mojolicious::Routes::Match>.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>,
+L<Mojolicious::Guides::Routing>, L<Mojolicious::Routes::Route>,`
+L<https://mojolicious.org>.
 
 =cut

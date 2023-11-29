@@ -30,9 +30,9 @@ jobs:
         run: |
           cpanm -n --installdeps .
           cpanm -n Cpanel::JSON::XS EV Role::Tiny
-          cpanm -n Test::Pod Test::Pod::Coverage
+          cpanm -n Test::Pod Test::Pod::Coverage TAP::Formatter::GitHubActions
       - name: Run tests
-        run: prove -l t t/mojo t/mojolicious
+        run: prove --merge --formatter TAP::Formatter::GitHubActions -l t t/mojo t/mojolicious
         env:
           TEST_POD: 1
           TEST_EV: 1

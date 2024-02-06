@@ -6,9 +6,11 @@ use Mojo::File qw(path);
 sub modified_files {
   my $self = shift;
 
-  my $cache = $self->{cache} //= {};
+  my $cache       = $self->{cache} //= {};
+  my $known_files = {map { $_ => 1 } keys %$cache};
   my @files;
   for my $file (map { -f $_ && -r _ ? $_ : _list($_) } @{$self->watch}) {
+    delete $known_files->{$file};
     my ($size, $mtime) = (stat $file)[7, 9];
     next unless defined $size and defined $mtime;
     my $stats = $cache->{$file} ||= [$^T, $size];
@@ -16,6 +18,14 @@ sub modified_files {
     @$stats = ($mtime, $size);
     push @files, $file;
   }
+
+  for my $file (keys %$known_files) {
+
+    # Any leftover file means they were deleted
+    push @files, $file;
+    delete $cache->{$file};
+  }
+
   sleep $self->watch_timeout unless @files;
 
   return \@files;

@@ -131,6 +131,19 @@ EOF
   is $tx->res->body, 'Hello!', 'right content';
 };
 
+subtest 'Watch for deleted files' => sub {
+  my $morbo = Mojo::Server::Morbo->new;
+  $morbo->backend->watch([$dir]);
+  $morbo->backend->modified_files;
+  my $tmp_file = $dir->child('tmp_file.txt');
+  $tmp_file->spew("some data");
+  is_deeply $morbo->backend->modified_files, [$tmp_file], 'file was created';
+  is_deeply $morbo->backend->modified_files, [],          'no files changed';
+  unlink $tmp_file;
+  is_deeply $morbo->backend->modified_files, [$tmp_file], 'file was deleted';
+  is_deeply $morbo->backend->modified_files, [],          'no files changed';
+};
+
 subtest 'New file(s)' => sub {
   is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
   my @new = map { $subdir->child("$_.txt") } qw/test testing/;

@@ -47,6 +47,7 @@ subtest 'Helpers with prefix' => sub {
 <link href="/static/favicon.ico" rel="icon">
 <link href="/static/foo.ico" rel="icon">
 <img src="/static/foo.png">
+<img src="http://example.com/foo.png">
 <script src="/static/foo.js"></script>
 <link href="/static/foo.css" rel="stylesheet">
 <script src="/static/assets/app.js"></script>
@@ -94,6 +95,7 @@ __DATA__
 %= favicon
 %= favicon '/foo.ico'
 %= image '/foo.png'
+%= image 'http://example.com/foo.png'
 %= javascript '/foo.js'
 %= stylesheet '/foo.css'
 %= asset_tag '/app.js'

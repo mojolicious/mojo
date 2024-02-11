@@ -3,8 +3,11 @@ use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
 use Mojolicious::Lite;
+use Mojo::JSON qw/encode_json decode_json/;
 
 any '/' => {text => 'Hello Test!'};
+my $example_json = {test => ['hello', 'bye']};
+any '/json' => {json => $example_json};
 
 my $t = Test::Mojo->new;
 
@@ -215,6 +218,99 @@ subtest 'header_unlike' => sub {
     'right result';
   $t->header_unlike('Content-Type', qr/image\/png/, 'some description');
   is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'some description'], 'right result';
+};
+
+subtest 'json_has' => sub {
+  $t->get_ok('/json')->status_is(200)->json_has('/test/0');
+  is_deeply \@args, ['ok', !!1, 'has value for JSON Pointer "/test/0"'], 'Checking json_has is true.';
+  $t->get_ok('/json')->status_is(200)->json_has('/test/0', 'some description');
+  is_deeply \@args, ['ok', !!1, 'some description'],
+    'Checking json_has is true and the test message is correctly printed.';
+  $t->get_ok('/json')->status_is(200)->json_has('/test0');
+  is_deeply \@args, ['ok', !!0, 'has value for JSON Pointer "/test0"'], 'Checking json_has is false.';
+};
+
+subtest 'json_hasnt' => sub {
+  $t->get_ok('/json')->status_is(200)->json_hasnt('/test/0');
+  is_deeply \@args, ['ok', !!0, 'has no value for JSON Pointer "/test/0"'], 'Checking json_hasnt is false.';
+  $t->get_ok('/json')->status_is(200)->json_hasnt('/test/0', 'some description');
+  is_deeply \@args, ['ok', !!0, 'some description'], 'Checking correct test message in json_hasnt.';
+  $t->get_ok('/json')->status_is(200)->json_hasnt('/test0');
+  is_deeply \@args, ['ok', !!1, 'has no value for JSON Pointer "/test0"'], 'Checking json_hasnt is true.';
+};
+
+subtest 'json_is' => sub {
+  $t->get_ok('/json')->status_is(200)->json_is('/test' => ['hello', 'bye']);
+  is_deeply \@args, ['is_deeply', (['hello', 'bye']) x 2, 'exact match for JSON Pointer "/test"'], 'json_is true case.';
+  $t->get_ok('/json')->status_is(200)->json_is('/test' => ['hello', 'bye'], 'some description');
+  is_deeply \@args, ['is_deeply', (['hello', 'bye']) x 2, 'some description'], 'Test message for json_is matches.';
+  $t->get_ok('/json')->status_is(200)->json_is('/test' => ['hello', 'goodbye']);
+  is_deeply \@args, ['is_deeply', ['hello', 'bye'], ['hello', 'goodbye'], 'exact match for JSON Pointer "/test"'],
+    'Correct parameters json_is.';
+};
+
+subtest 'json_like' => sub {
+  $t->get_ok('/json')->status_is(200)->json_like('/test/0' => qr/^he/);
+  is_deeply \@args, ['like', 'hello', qr/^he/, 'similar match for JSON Pointer "/test/0"'],
+    'json_like matches arguments and contents.';
+  $t->get_ok('/json')->status_is(200)->json_like('/test/0' => qr/^he/, 'some description');
+  is_deeply \@args, ['like', 'hello', qr/^he/, 'some description'], 'json_like prints the correct test message.';
+};
+
+subtest 'json_unlike' => sub {
+  $t->get_ok('/json')->status_is(200)->json_unlike('/test/0' => qr/^he/);
+  is_deeply \@args, ['unlike', 'hello', qr/^he/, 'no similar match for JSON Pointer "/test/0"'],
+    'json_unlike matches arguments and contents.';
+  $t->get_ok('/json')->status_is(200)->json_unlike('/test/0' => qr/^he/, 'some description');
+  is_deeply \@args, ['unlike', 'hello', qr/^he/, 'some description'], 'Correct message printed in json_unlike.';
+};
+
+subtest 'json_message_has' => sub {
+  $t->message([text => encode_json($example_json)])->json_message_has('/test');
+  is_deeply \@args, ['ok', !!1, 'has value for JSON Pointer "/test"'], 'json_message_has is true.';
+  $t->message([text => encode_json($example_json)])->json_message_has('/test', 'some description');
+  is_deeply \@args, ['ok', !!1, 'some description'], 'json_message_has prints the correct test message.';
+  $t->message([text => encode_json($example_json)])->json_message_has('/test0');
+  is_deeply \@args, ['ok', undef, 'has value for JSON Pointer "/test0"'], 'json_message_has is false.';
+};
+
+subtest 'json_message_hasnt' => sub {
+  $t->message([text => encode_json($example_json)])->json_message_hasnt('/test');
+  is_deeply \@args, ['ok', !!0, 'has no value for JSON Pointer "/test"'], 'json_message_hasnt is false.';
+  $t->message([text => encode_json($example_json)])->json_message_hasnt('/test', 'some description');
+  is_deeply \@args, ['ok', !!0, 'some description'], 'json_message_hasnt prints the correct test message.';
+  $t->message([text => encode_json($example_json)])->json_message_hasnt('/test0');
+  is_deeply \@args, ['ok', !!1, 'has no value for JSON Pointer "/test0"'], 'json_message_hasnt is false.';
+};
+
+subtest 'json_message_is' => sub {
+  $t->message([text => encode_json($example_json)])->json_message_is('/test', => ['hello', 'bye']);
+  is_deeply \@args, ['is_deeply', (['hello', 'bye']) x 2, 'exact match for JSON Pointer "/test"'],
+    'json_message_is works in the true case.';
+  $t->message([text => encode_json($example_json)])->json_message_is('/test', => ['hello', 'bye'], 'some description');
+  is_deeply \@args, ['is_deeply', (['hello', 'bye']) x 2, 'some description'],
+    'json_message_is prints the correct test message.';
+  $t->message([text => encode_json($example_json)])->json_message_is('/test', => ['hello', 'goodbye'],);
+  is_deeply \@args, ['is_deeply', ['hello', 'bye'], ['hello', 'goodbye'], 'exact match for JSON Pointer "/test"'],
+    'Correct parameters in json_message_is.';
+};
+
+subtest 'json_message_like' => sub {
+  $t->message([text => encode_json($example_json)])->json_message_like('/test/0', => qr/^he/);
+  is_deeply \@args, ['like', 'hello', qr/^he/, 'similar match for JSON Pointer "/test/0"'],
+    'json_message_like works as expected.';
+  $t->message([text => encode_json($example_json)])->json_message_like('/test/0', => qr/^he/, 'some description');
+  is_deeply \@args, ['like', 'hello', qr/^he/, 'some description'],
+    'json_message_like prints the correct test message.';
+};
+
+subtest 'json_message_unlike' => sub {
+  $t->message([text => encode_json($example_json)])->json_message_unlike('/test/0', => qr/^he/);
+  is_deeply \@args, ['unlike', 'hello', qr/^he/, 'no similar match for JSON Pointer "/test/0"'],
+    'json_message_unlike works as expected.';
+  $t->message([text => encode_json($example_json)])->json_message_unlike('/test/0', => qr/^he/, 'some description');
+  is_deeply \@args, ['unlike', 'hello', qr/^he/, 'some description'],
+    'json_message_unlike prints the correct test message.';
 };
 
 done_testing();

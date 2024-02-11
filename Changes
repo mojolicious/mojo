@@ -1,5 +1,6 @@
 
-9.36  2023-10-28
+9.36  2024-02-11
+  - Improved Morbo to restart on deleted files. (hernan604)
 
 9.35  2023-10-27
   - Added EXPERIMENTAL support for persistent cookies in Netscape format.

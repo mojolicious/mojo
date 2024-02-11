@@ -6,6 +6,11 @@ use Mojolicious::Lite;
 
 any '/' => {text => 'Hello Test!'};
 
+websocket '/websocket' => sub {
+  my $c = shift;
+  $c->send({text => 'testing message'});
+};
+
 my $t = Test::Mojo->new;
 
 subtest 'Basics' => sub {
@@ -215,6 +220,47 @@ subtest 'header_unlike' => sub {
     'right result';
   $t->header_unlike('Content-Type', qr/image\/png/, 'some description');
   is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'some description'], 'right result';
+};
+
+subtest 'message_is' => sub {
+  $t->websocket_ok('/websocket')->message_ok->message_is('testing message');
+  is_deeply \@args, ['is', 'testing message', 'testing message', 'exact match for message'], 'right result';
+  $t->websocket_ok('/websocket')->message_ok->message_is('testing message', 'some description');
+  is_deeply \@args, ['is', 'testing message', 'testing message', 'some description'], 'right result';
+  $t->websocket_ok('/websocket')->message_ok->message_is('incorrect testing message');
+  is_deeply \@args, ['is', 'testing message', 'incorrect testing message', 'exact match for message'], 'right result';
+};
+
+subtest 'message_isnt' => sub {
+  $t->websocket_ok('/websocket')->message_ok->message_isnt('testing message');
+  is_deeply \@args, ['isnt', 'testing message', 'testing message', 'no match for message'], 'right result.';
+  $t->websocket_ok('/websocket')->message_ok->message_isnt('testing message', 'some description');
+  is_deeply \@args, ['isnt', 'testing message', 'testing message', 'some description'], 'right result';
+  $t->websocket_ok('/websocket')->message_ok->message_isnt('incorrect testing message');
+  is_deeply \@args, ['isnt', 'testing message', 'incorrect testing message', 'no match for message'], 'right result';
+};
+
+subtest 'message_like' => sub {
+  $t->websocket_ok('/websocket')->message_ok->message_like(qr/^test/);
+  is_deeply \@args, ['like', 'testing message', qr/^test/, 'message is similar'], 'right result';
+  $t->websocket_ok('/websocket')->message_ok->message_like(qr/^test/, 'some description');
+  is_deeply \@args, ['like', 'testing message', qr/^test/, 'some description'], 'right result';
+};
+
+subtest 'message_ok' => sub {
+  $t->websocket_ok('/websocket')->message_ok;
+  is_deeply \@args, ['ok', !!1, 'message received'], 'right result';
+  $t->websocket_ok('/websocket')->message_ok('some description');
+  is_deeply \@args, ['ok', !!1, 'some description'], 'right result';
+  $t->websocket_ok('/')->message_ok;
+  is_deeply \@args, ['ok', !!0, 'message received'], 'right result';
+};
+
+subtest 'message_unlike' => sub {
+  $t->websocket_ok('/websocket')->message_ok->message_unlike(qr/^test/);
+  is_deeply \@args, ['unlike', 'testing message', qr/^test/, 'message is not similar'], 'right result';
+  $t->websocket_ok('/websocket')->message_ok->message_unlike(qr/^test/, 'some description');
+  is_deeply \@args, ['unlike', 'testing message', qr/^test/, 'some description'], 'right result';
 };
 
 done_testing();

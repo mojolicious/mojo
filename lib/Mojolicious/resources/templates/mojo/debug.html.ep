@@ -8,17 +8,20 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= favicon
-    %= javascript '/mojo/jquery/jquery.js'
     %= javascript '/mojo/highlight.js/highlight.min.js'
     %= javascript '/mojo/highlight.js/mojolicious.min.js'
+    %= javascript '/mojo/popper/popper.js'
     %= javascript '/mojo/bootstrap/bootstrap.js'
     %= stylesheet '/mojo/bootstrap/bootstrap.css'
     %= stylesheet '/mojo/highlight.js/highlight-mojo-dark.css'
     %= stylesheet '/mojo/mojo.css'
     <script>
+      'use strict';
       hljs.initHighlightingOnLoad();
-      $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
+      window.addEventListener('load', () => {
+        for (const tooltip of document.querySelectorAll('[data-bs-toggle="tooltip"]')) {
+          new bootstrap.Tooltip(tooltip);
+        }
       });
     </script>
     <style>
@@ -45,14 +48,14 @@
               srcset="<%= url_for_file '/mojo/logo-white-2x.png' %> 2x">
           </picture>
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
           aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div id="navbarNav" class="collapse navbar-collapse">
-          <ul class="navbar-nav mr-auto">
+          <ul class="navbar-nav me-auto">
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 Documentation
               </a>
@@ -72,7 +75,7 @@
               </div>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button" data-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button" data-bs-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 Community
               </a>
@@ -99,16 +102,20 @@
       </nav>
     </header>
     <script>
+      'use strict';
       function mojoDrawer(handle, drawer) {
-        $(handle).on('click', function () {
-          $(drawer).slideToggle('slow');
-          const text = $(handle + ' div.tap').text();
+        const handleEl = document.querySelector(handle);
+        if (handleEl === null) return;
+        handleEl.addEventListener('click', () => {
+          const drawerEl = document.querySelector(drawer);
+          let text = handleEl.innerText;
           text = text == "tap for more" ? "tap for less" : "tap for more";
-          $(handle + ' div.tap').text(text);
+          const divTap = document.querySelector(handle + ' div.tap');
+          if (divTap !== null) divTap.innerText = text;
+          drawerEl.classList.toggle('d-none');
         });
-        $(drawer).toggle();
       }
-      $(function () {
+      window.addEventListener('load', () => {
         mojoDrawer('#trace', '#frames');
         mojoDrawer('#more', '#infos');
       });
@@ -155,7 +162,7 @@
                   </table>
                 </div>
                 % if (defined $exception->line->[2]) {
-                  <div id="insight" class="more">
+                  <div id="insight">
                     <table class="wide">
                       % for my $line (@{$exception->lines_before}) {
                         %= $cv->($line->[0], $line->[2])
@@ -168,26 +175,30 @@
                   </div>
                   <div class="tap">tap for more</div>
                   <script>
+                    'use strict';
                     let current = '#context';
                     function mojoShowcase() {
-                      $('#showcase').on('click', function () {
-                        $(this).unbind('click');
-                        $(current).slideToggle('slow', function () {
-                          current = current == '#context' ? '#insight' : '#context';
-                          $(current).slideToggle('slow', function () {
-                            mojoShowcase();
-                          });
-                        });
-                      });
+                      const showcase = document.querySelector('#showcase');
+                      function onClickShowcase() {
+                        showcase.removeEventListener('click', onClickShowcase);
+                        let currentEl = document.querySelector(current);
+                        currentEl.classList.toggle('d-none');
+                        current = current == '#context' ? '#insight' : '#context';
+                        currentEl = document.querySelector(current);
+                        currentEl.classList.toggle('d-none');
+                        mojoShowcase();
+                      };
+                      showcase.addEventListener('click', onClickShowcase);
                     }
                     mojoShowcase();
-                    $('#insight').toggle();
+                    const insightEl = document.querySelector('#insight');
+                    insightEl.classList.toggle('d-none');
                   </script>
                 % }
               </div>
               <div id="trace" class="box no-padding more no-top-border border-radius-bottom">
                 % if (@{$exception->frames}) {
-                  <div id="frames" class="more">
+                  <div id="frames" class="d-none">
                     <table class="striped wide">
                       % for my $frame (@{$exception->frames}) {
                         <tr>
@@ -224,8 +235,8 @@
                   % $unparsed = "+$unparsed" if $depth;
                   % $pattern->match('/', $route->is_endpoint && !$route->partial);
                   % my $regex = (regexp_pattern $pattern->regex)[0];
-                  <tr data-toggle="tooltip" data-placement="left" data-html="true"
-                    title="<b>Regex:</b> <code><%= $regex %></code>">
+                  <tr data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true"
+                    data-bs-title="<b>Regex:</b> <code><%= $regex %></code>">
                     <td class="value">
                       <pre><%= '  ' x $depth %><%= $unparsed %></pre>
                     </td>
@@ -275,7 +286,7 @@
               </table>
             </div>
             <div id="more" class="box no-padding more no-top-border border-radius-bottom">
-              <div id="infos">
+              <div id="infos" class="d-none">
                 <table class="striped fixed-table wide">
                   %= $kv->(Perl => "$^V ($^O)")
                   % my $version  = $Mojolicious::VERSION;

@@ -336,8 +336,6 @@ subtest 'Text exceptions' => sub {
 };
 
 subtest 'Bundled static files' => sub {
-  $t->get_ok('/mojo/jquery/jquery.js')->status_is(200)->content_type_is('application/javascript');
-
   $t->get_ok('/mojo/highlight.js/highlight.min.js')->status_is(200)->content_type_is('application/javascript');
   $t->get_ok('/mojo/highlight.js/mojolicious.min.js')->status_is(200)->content_type_is('application/javascript');
   $t->get_ok('/mojo/highlight.js/highlight-mojo-dark.css')->status_is(200)->content_type_is('text/css');

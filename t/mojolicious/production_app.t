@@ -29,8 +29,6 @@ is $t->app->static->file('does_not_exist.html'), undef,                         
 is $t->app->moniker,                             'mojolicious_test',                 'right moniker';
 
 # Remove extra files
-isnt $t->app->static->file('mojo/jquery/jquery.js'), undef, 'found jQuery';
-delete $t->app->static->extra->{'mojo/jquery/jquery.js'};
 is $t->app->static->file('mojo/jquery/jquery.js'), undef, 'no jQuery';
 
 # Default namespaces

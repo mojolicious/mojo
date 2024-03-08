@@ -1,4 +1,6 @@
 
+9.37  2024-03-08
+
 9.36  2024-03-06
   - Updated Bootstrap from version 4 to 5. (sergiotarxz)
   - Improved Morbo to restart on deleted files. (hernan604)

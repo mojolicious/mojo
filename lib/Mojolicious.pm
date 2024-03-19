@@ -760,12 +760,6 @@ The L<Mojolicious> distribution includes a few files with different licenses tha
 
 Licensed under the CC-SA License, Version 4.0 L<http://creativecommons.org/licenses/by-sa/4.0>.
 
-=head2 jQuery
-
-  Copyright (C) jQuery Foundation.
-
-Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
-
 =head2 highlight.js
 
   Copyright (C) 2006, Ivan Sagalaev.

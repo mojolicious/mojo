@@ -25,6 +25,7 @@ sub close {
   return unless my $handle  = delete $self->timeout(0)->{handle};
   $reactor->remove($handle);
   $self->emit('close');
+  $handle->close;
 }
 
 sub close_gracefully { $_[0]->is_writing ? $_[0]{graceful}++ : $_[0]->close }

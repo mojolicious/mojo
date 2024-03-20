@@ -1350,7 +1350,7 @@ Sending a streaming request is almost just as easy.
 
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->build_tx(GET => 'http://example.com');
+  my $tx = $ua->build_tx(POST => 'http://example.com');
 
   # Prepare body
   my $body = 'Hello World!';

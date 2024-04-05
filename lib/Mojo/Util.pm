@@ -14,9 +14,9 @@ use IO::Poll qw(POLLIN POLLPRI);
 use IO::Uncompress::Gunzip;
 use List::Util         qw(min);
 use MIME::Base64       qw(decode_base64 encode_base64);
+use Mojo::BaseUtil     qw(class_to_path monkey_patch);
 use Pod::Usage         qw(pod2usage);
 use Socket             qw(inet_pton AF_INET6 AF_INET);
-use Sub::Util          qw(set_subname);
 use Symbol             qw(delete_package);
 use Time::HiRes        ();
 use Unicode::Normalize ();
@@ -104,8 +104,6 @@ sub class_to_file {
   $class =~ s/([A-Z])([A-Z]*)/$1 . lc $2/ge;
   return decamelize($class);
 }
-
-sub class_to_path { join '.', join('/', split(/::|'/, shift)), 'pm' }
 
 sub decamelize {
   my $str = shift;
@@ -196,13 +194,6 @@ sub humanize_bytes {
   return $prefix . _round($size) . 'MiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size) . 'GiB' if ($size /= 1024) < 1024;
   return $prefix . _round($size /= 1024) . 'TiB';
-}
-
-sub monkey_patch {
-  my ($class, %patch) = @_;
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"${class}::$_"} = set_subname("${class}::$_", $patch{$_}) for keys %patch;
 }
 
 sub network_contains {

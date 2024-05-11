@@ -637,23 +637,23 @@ subtest 'scope_guard' => sub {
 };
 
 subtest 'humanize_bytes' => sub {
-  is humanize_bytes(0),                         '0B',      'zero Bytes';
-  is humanize_bytes(1),                         '1B',      'one Byte';
+  is humanize_bytes( 0),                        '0B',      'zero Bytes';
+  is humanize_bytes( 1),                        '1B',      'one Byte';
   is humanize_bytes(-1023),                     '-1023B',  'negative Bytes';
-  is humanize_bytes(1024),                      '1KiB',    'one KiB';
-  is humanize_bytes(1025),                      '1KiB',    'one KiB';
+  is humanize_bytes( 1024),                     '1KiB',    'one KiB';
+  is humanize_bytes( 1025),                     '1KiB',    'one KiB';
   is humanize_bytes(1024 * 1024),               '1MiB',    'one MiB';
   is humanize_bytes(1024 * 1024 * 1024),        '1GiB',    'one GiB';
   is humanize_bytes(1024 * 1024 * 1024 * 1024), '1TiB',    'one TiB';
-  is humanize_bytes(3000),                      '2.9KiB',  'almost 3KiB';
+  is humanize_bytes( 3000),                     '2.9KiB',  'almost 3KiB';
   is humanize_bytes(-3000),                     '-2.9KiB', 'almost -3KiB';
-  is humanize_bytes(13443399680),               '13GiB',   'two digits GiB';
-  is humanize_bytes(8007188480),                '7.5GiB',  'smaller GiB';
+  is humanize_bytes( 13443399680),              '13GiB',   'two digits GiB';
+  is humanize_bytes( 8007188480),               '7.5GiB',  'smaller GiB';
   is humanize_bytes(-8007188480),               '-7.5GiB', 'negative smaller GiB';
   is humanize_bytes(-1099511627776),            '-1TiB',   'negative smaller TiB';
-  is humanize_bytes(717946880),                 '685MiB',  'large MiB';
+  is humanize_bytes( 717946880),                '685MiB',  'large MiB';
   is humanize_bytes(-717946880),                '-685MiB', 'large negative MiB';
-  is humanize_bytes(245760),                    '240KiB',  'less than a MiB';
+  is humanize_bytes( 245760),                   '240KiB',  'less than a MiB';
 };
 
 subtest 'Hide DATA usage from error messages' => sub {

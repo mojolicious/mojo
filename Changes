@@ -1,5 +1,6 @@
 
-9.37  2024-03-08
+9.37  2024-05-13
+  - Improved Mojo::Base include time with a new Mojo::BaseUtils module. (okurz)
 
 9.36  2024-03-06
   - Updated Bootstrap from version 4 to 5. (sergiotarxz)

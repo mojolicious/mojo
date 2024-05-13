@@ -36,8 +36,8 @@ Mojo::BaseUtil - Common utility functions used in Mojo::Base, re-exported in Moj
 
 =head1 DESCRIPTION
 
-L<Mojo::BaseUtil> provides functions to both L<Mojo::Base> and L<Mojo::Util> so that C<Mojo::Base> does not have to load
-the rest of L<Mojo::Util> while preventing a circular dependency.
+L<Mojo::BaseUtil> provides functions to both L<Mojo::Base> and L<Mojo::Util>, so that C<Mojo::Base> does not have to
+load the rest of L<Mojo::Util>, while preventing a circular dependency.
 
 =head1 SEE ALSO
 

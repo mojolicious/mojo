@@ -7,11 +7,9 @@ use feature ':5.16';
 use mro;
 
 # No imports because we get subclassed, a lot!
-use Carp         ();
-use Scalar::Util ();
-
-# Defer to runtime so Mojo::Util can use "-strict"
-require Mojo::Util;
+use Carp           ();
+use Scalar::Util   ();
+use Mojo::BaseUtil ();
 
 # Role support requires Role::Tiny 2.000001+
 use constant ROLES => !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
@@ -41,7 +39,7 @@ sub attr {
         ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$names;
         return $self;
       };
-      Mojo::Util::monkey_patch(my $base = $class . '::_Base', 'new', $sub);
+      Mojo::BaseUtil::monkey_patch(my $base = $class . '::_Base', 'new', $sub);
       no strict 'refs';
       unshift @{"${class}::ISA"}, $base;
     }
@@ -90,7 +88,7 @@ sub attr {
     else {
       $sub = sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
     }
-    Mojo::Util::monkey_patch($class, $attr, $sub);
+    Mojo::BaseUtil::monkey_patch($class, $attr, $sub);
   }
 }
 
@@ -110,7 +108,7 @@ sub import {
     # Role
     elsif ($flag eq '-role') {
       Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
-      Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
+      Mojo::BaseUtil::monkey_patch($caller, 'has', sub { attr($caller, @_) });
       eval "package $caller; use Role::Tiny; 1" or die $@;
     }
 
@@ -131,9 +129,9 @@ sub import {
     # Module
     elsif ($flag !~ /^-/) {
       no strict 'refs';
-      require(Mojo::Util::class_to_path($flag)) unless $flag->can('new');
+      require(Mojo::BaseUtil::class_to_path($flag)) unless $flag->can('new');
       push @{"${caller}::ISA"}, $flag;
-      Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
+      Mojo::BaseUtil::monkey_patch($caller, 'has', sub { attr($caller, @_) });
     }
 
     elsif ($flag ne '-strict') { Carp::croak "Unsupported flag: $flag" }

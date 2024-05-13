@@ -11,4 +11,7 @@ my @await = (
   qw(AWAIT_NEW_FAIL AWAIT_ON_CANCEL AWAIT_ON_READY AWAIT_WAIT)
 );
 
-all_pod_coverage_ok({also_private => ['BUILD_DYNAMIC', @await, 'spurt']});
+# These are base utils only to be used in Mojo::Base and not elsewhere
+my @base_utils = (qw(class_to_path monkey_patch));
+
+all_pod_coverage_ok({also_private => ['BUILD_DYNAMIC', @await, @base_utils, 'spurt']});

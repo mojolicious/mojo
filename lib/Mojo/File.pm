@@ -64,16 +64,17 @@ sub list_tree {
   # The File::Find documentation lies, this is needed for CIFS
   local $File::Find::dont_use_nlink = 1 if $options->{dont_use_nlink};
 
+  my $path = $^O eq 'MSWin32' ? $$self =~ s!\\!/!gr : $$self;
   my %all;
   my $wanted = sub {
     if ($options->{max_depth}) {
-      (my $rel = $File::Find::name) =~ s!^\Q$$self\E/?!!;
+      (my $rel = $File::Find::name) =~ s!^\Q$path\E/?!!;
       $File::Find::prune = 1 if splitdir($rel) >= $options->{max_depth};
     }
     $all{$File::Find::name}++ if $options->{dir} || !-d $File::Find::name;
   };
-  find {wanted => $wanted, no_chdir => 1}, $$self if -d $$self;
-  delete $all{$$self};
+  find {wanted => $wanted, no_chdir => 1}, $path if -d $path;
+  delete $all{$path};
 
   return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
 }

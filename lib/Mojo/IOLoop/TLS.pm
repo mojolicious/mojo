@@ -59,7 +59,7 @@ sub _expand {
   }
   else {
     $tls->{SSL_hostname}      = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
-    $tls->{SSL_verifycn_name} = $args->{address};
+    $tls->{SSL_verifycn_name} ||= $args->{address};
   }
 
   return $tls;

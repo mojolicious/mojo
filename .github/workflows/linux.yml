@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        codename:
+          - buster
         perl-version:
           - '5.16'
           - '5.18'
@@ -19,7 +21,7 @@ jobs:
           - '5.30'
           - '5.36'
     container:
-      image: perl:${{ matrix.perl-version }}
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
       - uses: actions/checkout@v2
       - name: perl -V

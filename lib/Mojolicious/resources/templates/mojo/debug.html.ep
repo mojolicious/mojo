@@ -83,7 +83,6 @@
                 <a class="dropdown-item" href="https://web.libera.chat/#mojo">IRC</a>
                 <a class="dropdown-item" href="https://forum.mojolicious.org">Forum</a>
                 <a class="dropdown-item" href="https://fosstodon.org/@mojolicious">Mastodon</a>
-                <a class="dropdown-item" href="https://matrix.to/#/#mojo:matrix.org">Matrix</a>
                 <a class="dropdown-item" href="https://www.linkedin.com/groups/8963713/">LinkedIn</a>
                 <a class="dropdown-item" href="https://github.com/mojolicious/mojo/wiki">Wiki</a>
                 <a class="dropdown-item" href="https://metacpan.org/release/Mojolicious/">CPAN</a>

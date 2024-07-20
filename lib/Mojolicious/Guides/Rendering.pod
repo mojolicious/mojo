@@ -1510,7 +1510,6 @@ authors.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org>, on L<IRC|https://web.libera.chat/#mojo>, or
-L<Matrix|https://matrix.to/#/#mojo:matrix.org>.
+L<Forum|https://forum.mojolicious.org>, or on L<IRC|https://web.libera.chat/#mojo>.
 
 =cut

@@ -19,7 +19,7 @@ package Mojo::BaseTestTest;
 use Mojo::Base 'Mojo::BaseTest';
 
 package Mojo::BaseTestTestTest;
-use Mojo::Base "Mojo'BaseTestTest";
+use Mojo::Base 'Mojo::BaseTestTest';
 
 package Mojo::BaseTest::Weak1;
 use Mojo::Base -base;

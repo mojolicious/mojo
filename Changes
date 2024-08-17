@@ -1,5 +1,7 @@
 
-9.38  2024-05-14
+9.38  2024-08-17
+  - Added support for new core booleans in Perl 5.36+ to Mojo::JSON. (haarg)
+  - Deprecated support for "'" package separators that have been deprecated in Perl. (Grinnz)
 
 9.37  2024-05-13
   - Improved Mojo::Base include time with a new Mojo::BaseUtils module. (okurz)

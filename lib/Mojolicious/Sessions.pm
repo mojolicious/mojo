@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 
-has [qw(cookie_domain encrypted secure)];
+has [qw(cookie_domain encrypted partitioned secure)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
@@ -52,12 +52,13 @@ sub store {
   my $value = b64_encode $self->serialize->($session), '';
   $value =~ y/=/-/;
   my $options = {
-    domain   => $self->cookie_domain,
-    expires  => $session->{expires},
-    httponly => 1,
-    path     => $self->cookie_path,
-    samesite => $self->samesite,
-    secure   => $self->secure
+    domain      => $self->cookie_domain,
+    expires     => $session->{expires},
+    httponly    => 1,
+    partitioned => $self->partitioned,
+    path        => $self->cookie_path,
+    samesite    => $self->samesite,
+    secure      => $self->secure,
   };
   my $method = $self->encrypted ? 'encrypted_cookie' : 'signed_cookie';
   $c->$method($self->cookie_name, $value, $options);
@@ -149,6 +150,18 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
 
 Use encrypted session cookies instead of merely cryptographically signed ones. Note that this attribute is
 B<EXPERIMENTAL> and might change without warning!
+
+=head2 partitioned
+
+  my $bool  = $sessions->partitioned;
+  $sessions = $sessions->partitioned($bool);
+
+Partitioned flag, this is to be used in accordance to the CHIPS amendment to RFC 6265.
+Note that this attribute is B<EXPERIMENTAL> because even though most commonly used browsers support the
+feature, there is no specification yet besides L<this
+draft|https://www.ietf.org/archive/id/draft-cutler-httpbis-partitioned-cookies-00.html>.
+
+Partitioned cookies are held within a separate cookie jar per top-level site.
 
 =head2 samesite
 

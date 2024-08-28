@@ -1,5 +1,7 @@
 
-9.39  2024-08-18
+9.39  2024-08-28
+  - Fixed a bug in Mojo::Message::Request where message size limits were not always correctly applied.
+    (Alexander Kuehne)
 
 9.38  2024-08-17
   - Added support for new core booleans in Perl 5.36+ to Mojo::JSON. (haarg)

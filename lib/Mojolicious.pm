@@ -9,7 +9,8 @@ use Mojo::Home;
 use Mojo::Loader;
 use Mojo::Log;
 use Mojo::Server;
-use Mojo::Util;
+use Mojo::Util qw(urandom_urlsafe);
+use Mojo::File qw(path);
 use Mojo::UserAgent;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
@@ -41,14 +42,31 @@ has plugins            => sub { Mojolicious::Plugins->new };
 has preload_namespaces => sub { [] };
 has renderer           => sub { Mojolicious::Renderer->new };
 has routes             => sub { Mojolicious::Routes->new };
+has secrets_file       => sub { $ENV{MOJO_SECRETS_FILE} || shift->home->rel_file('mojo.secrets') };
 has secrets            => sub {
   my $self = shift;
+  my $file = $self->secrets_file;
 
-  # Warn developers about insecure default
-  $self->log->trace('Your secret passphrase needs to be changed (see FAQ for more)');
+  if (-f $file) {
 
-  # Default to moniker
-  return [$self->moniker];
+    # Read secrets and filter out those who are less than 22 characters long
+    # (~128 bits), as they are not likely to be sufficiently strong.
+    my @secrets = grep { length $_ >= 22 } split /\n/, path($file)->slurp;
+
+    die qq{"Your secrets_file "$file" does not contain any acceptable secret (of 22 chars or more)} unless @secrets;
+
+    return [@secrets];
+  }
+
+  # If no secrets file exists, generate one and attempt to write it back to
+  # secrets_file, taking care that the file is only readable by the current
+  # user.
+  my $secret = urandom_urlsafe;
+  path($file)->touch->chmod(0600)->spew($secret);
+
+  $self->log->trace(qq{Your secret passphrase has been set to strong random value and stored in "$file"});
+
+  return [$secret];
 };
 has sessions  => sub { Mojolicious::Sessions->new };
 has static    => sub { Mojolicious::Static->new };
@@ -496,11 +514,13 @@ endpoints for your application.
   my $secrets = $app->secrets;
   $app        = $app->secrets([$bytes]);
 
-Secret passphrases used for signed cookies and the like, defaults to the L</"moniker"> of this application, which is
-not very secure, so you should change it!!! As long as you are using the insecure default there will be debug messages
-in the log file reminding you to change your passphrase. Only the first passphrase is used to create new signatures,
-but all of them for verification. So you can increase security without invalidating all your existing signed cookies by
-rotating passphrases, just add new ones to the front and remove old ones from the back.
+Secret passphrases used for signed cookies and the like, defaults to 256 bits of data from your systems secure
+random number generator and is stored in the file mojo.secrets in your MOJO_HOME directory. You can override
+the location of this file by setting MOJO_SECRETS_FILE in your environment.
+
+Only the first passphrase is used to create new signatures, but all of them for verification. So you can
+increase security without invalidating all your existing signed cookies by rotating passphrases, just add new
+ones to the front and remove old ones from the back.
 
   # Rotate passphrases
   $app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);

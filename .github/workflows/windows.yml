@@ -24,6 +24,6 @@ jobs:
       - name: Install Dependencies
         run: |
           cpanm --installdeps .
-          cpanm -n TAP::Formatter::GitHubActions
+          cpanm -n TAP::Formatter::GitHubActions Crypt::URandom
       - name: Run Tests
         run: prove --merge --formatter TAP::Formatter::GitHubActions -l t t/mojo t/mojolicious

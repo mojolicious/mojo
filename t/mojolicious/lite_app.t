@@ -22,10 +22,8 @@ app->defaults(default => 23);
 
 # Secret
 app->log->level('trace')->unsubscribe('message');
-my $logs = app->log->capture('trace');
-is app->secrets->[0], app->moniker, 'secret defaults to moniker';
-like $logs, qr/Your secret passphrase needs to be changed/, 'right message';
-undef $logs;
+
+is app->secrets->[0], 'NeverGonnaGiveYouUpNeverGonnaLetYouDown', 'secret defaults to content of mojo.secrets';
 
 # Test helpers
 helper test_helper  => sub { shift->param(@_) };
@@ -751,7 +749,7 @@ $t->get_ok('/to_string')->status_is(200)->content_is('beforeafter');
 $t->get_ok('/source')->status_is(200)->content_type_is('application/octet-stream')->content_like(qr!get_ok\('/source!);
 
 # File does not exist
-$logs = app->log->capture('trace');
+my $logs = app->log->capture('trace');
 $t->get_ok('/source?fail=1')->status_is(500)->content_like(qr/Static file "does_not_exist.txt" not found/);
 like $logs, qr/Static file "does_not_exist.txt" not found/, 'right message';
 undef $logs;

@@ -8,7 +8,7 @@ use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
 use Mojo::Promise;
-use Mojo::Util   qw(dumper hmac_sha1_sum steady_time);
+use Mojo::Util   qw(dumper urandom_urlsafe);
 use Time::HiRes  qw(gettimeofday tv_interval);
 use Scalar::Util qw(blessed weaken);
 
@@ -95,7 +95,7 @@ sub _convert_to_exception {
   return (blessed $e && $e->isa('Mojo::Exception')) ? $e : Mojo::Exception->new($e);
 }
 
-sub _csrf_token { $_[0]->session->{csrf_token} ||= hmac_sha1_sum($$ . steady_time . rand, $_[0]->app->secrets->[0]) }
+sub _csrf_token { $_[0]->session->{csrf_token} ||= urandom_urlsafe; }
 
 sub _current_route {
   return '' unless my $route = shift->match->endpoint;

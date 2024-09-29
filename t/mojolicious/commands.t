@@ -158,6 +158,13 @@ $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
+  $commands->run('generate', 'secret', '--help');
+}
+like $buffer, qr/Usage: APPLICATION generate secret \[PATH\]/, 'right output';
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
   local $ENV{HARNESS_ACTIVE} = 0;
   $commands->run('help');
 }
@@ -472,6 +479,34 @@ $buffer = '';
   like $@, qr/Usage: APPLICATION generate plugin/, 'unknown option';
 }
 like $buffer, qr/Unknown option: unknown/, 'right output';
+chdir $cwd;
+
+# generate lite_app
+require Mojolicious::Command::Author::generate::secret;
+$app = Mojolicious::Command::Author::generate::secret->new;
+ok $app->description, 'has a description';
+like $app->usage, qr/secret/, 'has usage information';
+$dir = tempdir CLEANUP => 1;
+chdir $dir;
+{
+  my $check = sub {
+    my $f = path($dir)->child(shift);
+    ok -f $f, "$f exists";
+    like $f->slurp, qr/^[-A-Za-z0-9_]{43}$/, "$f contains a urandom_urlsafe generated secret";
+  };
+
+  local $ENV{MOJO_HOME} = $dir;
+  $app->run;
+  $check->("mojo.secrets");
+
+  local $ENV{MOJO_SECRETS_FILE} = path($dir)->child("from-env-var.secrets");
+  $app = Mojolicious::Command::Author::generate::secret->new;
+  $app->run;
+  $check->("from-env-var.secrets");
+
+  $app->run("from-args.secrets");
+  $check->("from-args.secrets");
+}
 chdir $cwd;
 
 # inflate

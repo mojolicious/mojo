@@ -196,7 +196,7 @@ done_testing();
 </p>
 
 @@ config
-% use Mojo::Util qw(sha1_sum steady_time);
+% use Mojo::Util qw(urandom_urlsafe);
 ---
 secrets:
-  - <%= sha1_sum $$ . steady_time . rand  %>
+  - <%= urandom_urlsafe %>

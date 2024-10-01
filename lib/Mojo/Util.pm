@@ -13,7 +13,7 @@ use IO::Compress::Gzip;
 use IO::Poll qw(POLLIN POLLPRI);
 use IO::Uncompress::Gunzip;
 use List::Util         qw(min);
-use MIME::Base64       qw(decode_base64 encode_base64);
+use MIME::Base64       qw(decode_base64 encode_base64 encode_base64url);
 use Mojo::BaseUtil     qw(class_to_path monkey_patch);
 use Pod::Usage         qw(pod2usage);
 use Socket             qw(inet_pton AF_INET6 AF_INET);
@@ -23,6 +23,8 @@ use Unicode::Normalize ();
 
 # Check for monotonic clock support
 use constant MONOTONIC => !!eval { Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
+
+use constant CRYPT_URANDOM => !!eval { require Crypt::URandom };
 
 # Punycode bootstring parameters
 use constant {
@@ -72,7 +74,7 @@ our @EXPORT_OK = (
   qw(extract_usage getopt gunzip gzip header_params hmac_sha1_sum html_attr_unescape html_unescape humanize_bytes),
   qw(md5_bytes md5_sum monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare),
   qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode)
+  qw(unquote urandom_bytes urandom_urlsafe url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -377,6 +379,25 @@ sub unquote {
   $str                    =~ s/\\\\/\\/g;
   $str                    =~ s/\\"/"/g;
   return $str;
+}
+
+sub urandom_bytes {
+  my $num = shift || 32;
+
+  return Crypt::URandom::urandom($num) if CRYPT_URANDOM;
+
+  croak 'Cannot find /dev/urandom, install Crypt::URandom from CPAN' unless -e '/dev/urandom';
+
+  open(my $urandom, '<', '/dev/urandom')     or croak "Cannot open /dev/urandom: $!";
+  sysread($urandom, my $bytes, $num) == $num or croak "sysread() from /dev/urandom didn't return $num bytes";
+  close($urandom);
+
+  return $bytes;
+}
+
+sub urandom_urlsafe {
+  my $num = shift;
+  return encode_base64url(urandom_bytes($num));
 }
 
 sub url_escape {
@@ -957,6 +978,22 @@ Unindent multi-line string.
   my $str = unquote $quoted;
 
 Unquote string.
+
+=head2 urandom_bytes
+
+  my $bytes = urandom_bytes;
+  my $bytes = urandom_bytes 32;
+
+Returns strong random bytes. Uses L<Crypt::URandom> if it is installed, with fallback to /dev/urandom. The default
+number of random bytes returned is 32.
+
+=head2 urandom_urlsafe
+
+  my $token = urandom_urlsafe;
+  my $token = urandom_urlsafe 32;
+
+Generates a base64url encoded string of random bytes suitable for session tokens and similar. The default number of random
+bytes encoded is 32.
 
 =head2 url_escape
 

@@ -12,7 +12,7 @@ use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path dec
   qw(extract_usage getopt gunzip gzip header_params hmac_sha1_sum html_unescape html_attr_unescape humanize_bytes),
   qw(md5_bytes md5_sum monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare),
   qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode);
+  qw(unquote urandom_bytes urandom_urlsafe url_escape url_unescape xml_escape xor_encode);
 
 subtest 'camelize' => sub {
   is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -660,5 +660,19 @@ subtest 'Hide DATA usage from error messages' => sub {
   eval { die 'whatever' };
   unlike $@, qr/DATA/, 'DATA has been hidden';
 };
+
+subtest 'urandom' => sub {
+  isnt urandom_bytes,           urandom_bytes, "two urandom_bytes invocations are not the same";
+  is length(urandom_bytes),     32,            "urandom_bytes returns 32 bytes by default";
+  is length(urandom_bytes(16)), 16,            "urandom_bytes(16) returns 16 bytes";
+
+  isnt urandom_urlsafe, urandom_urlsafe, "two urandom_urlsafe invocations are not the same";
+  like urandom_urlsafe, qr/^[-A-Za-z0-9_]{43}$/, "urandom_urlsafe returns 43 chars of urlsafe encoded base64";
+  like urandom_urlsafe(128), qr/^[-A-Za-z0-9_]{171}$/,
+    "urandom_urlsafe(128) returns 171 chars of urlsafe encoded base64";
+  like urandom_urlsafe(2048), qr/^[-A-Za-z0-9_]{2731}$/,
+    "urandom_urlsafe(2048) returns 2731 chars of urlsafe encoded base64";
+};
+
 
 done_testing();

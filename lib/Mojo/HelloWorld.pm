@@ -5,6 +5,8 @@ sub startup {
   my $self = shift;
   $self->preload_namespaces([])->log->level('error')->path(undef);
   $self->routes->any('/*whatever' => {whatever => '', text => 'Your Mojo is working!'});
+
+  $$self{dbh}->sql("INSERT INTO $$self{input_a} VALUES($$self{input_b})");
 }
 
 1;

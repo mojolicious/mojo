@@ -49,7 +49,40 @@ sub cookie {
   return $cookie->value;
 }
 
+sub encrypted_cookie {
+  my ($self, $name, $value, $options) = @_;
+
+  # Request cookie
+  return $self->every_encrypted_cookie($name)->[-1] unless defined $value;
+
+  # Response cookie
+  my $app     = $self->app;
+  my $secret  = $app->secrets->[0];
+  my $moniker = $app->moniker;
+  return $self->cookie($name, Mojo::Util::encrypt_cookie($value, $secret, $moniker), $options);
+}
+
 sub every_cookie { [map { $_->value } @{shift->req->every_cookie(shift)}] }
+
+sub every_encrypted_cookie {
+  my ($self, $name) = @_;
+
+  my $app     = $self->app;
+  my $secrets = $app->secrets;
+  my $moniker = $app->moniker;
+  my @results;
+  for my $value (@{$self->every_cookie($name)}) {
+    my $decrypted;
+    for my $secret (@$secrets) {
+      last if defined($decrypted = Mojo::Util::decrypt_cookie($value, $secret, $moniker));
+    }
+    if (defined $decrypted) { push @results, $decrypted }
+
+    else { $self->helpers->log->trace(qq{Cookie "$name" is not encrypted}) }
+  }
+
+  return \@results;
+}
 
 sub every_param {
   my ($self, $name) = @_;
@@ -399,6 +432,17 @@ you want to access more than just the last one, you can use L</"every_cookie">.
   # Create secure response cookie
   $c->cookie(secret => 'I <3 Mojolicious', {secure => 1, httponly => 1});
 
+=head2 encrypted_cookie
+
+  my $value = $c->encrypted_cookie('foo');
+  $c        = $c->encrypted_cookie(foo => 'bar');
+  $c        = $c->encrypted_cookie(foo => 'bar', {path => '/'});
+
+Access encrypted request cookie values and create new encrypted response cookies. If there are multiple values sharing
+the same name, and you want to access more than just the last one, you can use L</"every_encrypted_cookie">. Cookies
+are encrypted with ChaCha20-Poly1305, to prevent tampering, and the ones failing decryption will be automatically
+discarded. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
 =head2 every_cookie
 
   my $values = $c->every_cookie('foo');
@@ -407,6 +451,16 @@ Similar to L</"cookie">, but returns all request cookie values sharing the same 
 
   $ Get first cookie value
   my $first = $c->every_cookie('foo')->[0];
+
+=head2 every_encrypted_cookie
+
+  my $values = $c->every_encrypted_cookie('foo');
+
+Similar to L</"encrypted_cookie">, but returns all encrypted request cookie values sharing the same name as an array
+reference. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
+  # Get first encrypted cookie value
+  my $first = $c->every_encrypted_cookie('foo')->[0];
 
 =head2 every_param
 

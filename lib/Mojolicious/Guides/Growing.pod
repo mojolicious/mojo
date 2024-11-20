@@ -104,8 +104,8 @@ web server in the form of cookies.
   Set-Cookie: session=hmac-sha256(base64(json($session)))
 
 In L<Mojolicious> however we are taking this concept one step further by storing everything JSON serialized and Base64
-encoded in HMAC-SHA256 signed cookies, which is more compatible with the REST philosophy and reduces infrastructure
-requirements.
+encoded in HMAC-SHA256 signed, or ChaCha20-Poly1305 encrypted cookies, which is more compatible with the REST
+philosophy and reduces infrastructure requirements.
 
 =head2 Test-Driven Development
 

@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
-          cpanm -n Cpanel::JSON::XS EV Role::Tiny
+          cpanm -n Cpanel::JSON::XS EV Role::Tiny CryptX
           cpanm -n Test::Pod Test::Pod::Coverage TAP::Formatter::GitHubActions
       - name: Run tests
         run: prove --merge --formatter TAP::Formatter::GitHubActions -l t t/mojo t/mojolicious

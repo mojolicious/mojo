@@ -27,8 +27,8 @@ frameworks, it is more of a web toolkit and can even be used as the foundation f
 We are optimizing L<Mojolicious> for user-friendliness and development speed, without compromises. While there are no
 rules in L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently discourage adding non-optional
 ones in favor of a faster and more painless installation process. And we do in fact already use several optional CPAN
-modules such as L<Cpanel::JSON::XS>, L<EV>, L<IO::Socket::Socks>, L<IO::Socket::SSL>, L<Net::DNS::Native>, L<Plack> and
-L<Role::Tiny> to provide advanced functionality if possible.
+modules such as L<Cpanel::JSON::XS>, L<CryptX>, L<EV>, L<IO::Socket::Socks>, L<IO::Socket::SSL>, L<Net::DNS::Native>,
+L<Plack> and L<Role::Tiny> to provide advanced functionality if possible.
 
 =head2 Why reinvent wheels?
 

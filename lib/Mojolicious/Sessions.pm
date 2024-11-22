@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 
-has [qw(cookie_domain secure)];
+has [qw(cookie_domain encrypted secure)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
@@ -15,7 +15,8 @@ has serialize          => sub { \&_serialize };
 sub load {
   my ($self, $c) = @_;
 
-  return unless my $value = $c->signed_cookie($self->cookie_name);
+  my $method = $self->encrypted ? 'encrypted_cookie' : 'signed_cookie';
+  return unless my $value = $c->$method($self->cookie_name);
   $value =~ y/-/=/;
   return unless my $session = $self->deserialize->(b64_decode $value);
 
@@ -58,16 +59,14 @@ sub store {
     samesite => $self->samesite,
     secure   => $self->secure
   };
-  $c->signed_cookie($self->cookie_name, $value, $options);
+  my $method = $self->encrypted ? 'encrypted_cookie' : 'signed_cookie';
+  $c->$method($self->cookie_name, $value, $options);
 }
 
+# DEPRECATED! (Remove once old sessions with padding are no longer a concern)
 sub _deserialize { Mojo::JSON::decode_json($_[0] =~ s/\}\KZ*$//r) }
 
-sub _serialize {
-  no warnings 'numeric';
-  my $out = Mojo::JSON::encode_json($_[0]);
-  return $out . 'Z' x (1025 - length $out);
-}
+sub _serialize { Mojo::JSON::encode_json($_[0]) }
 
 1;
 
@@ -142,6 +141,14 @@ have security implications though. For more control you can also use the C<expir
 A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
 
   $sessions->deserialize(sub ($bytes) { return {} });
+
+=head2 encrypted
+
+  my $bool  = $sessions->encrypted;
+  $sessions = $sessions->encrypted($bool);
+
+Use encrypted session cookies instead of merely cryptographically signed ones. Note that this attribute is
+B<EXPERIMENTAL> and might change without warning!
 
 =head2 samesite
 

@@ -273,12 +273,6 @@ get '/session_cookie/2' => sub {
   $c->render(text => "Session is $value!");
 };
 
-get '/session_length' => sub {
-  my $c = shift;
-  $c->session->{q} = $c->param('q');
-  $c->rendered(204);
-};
-
 get '/foo' => sub {
   my $c = shift;
   $c->render(text => 'Yea baby!');
@@ -801,30 +795,6 @@ $t->reset_session;
 ok !$t->tx, 'session reset';
 $t->get_ok('/session_cookie/2')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Session is missing!');
-
-
-subtest 'Session length' => sub {
-  my $extract = sub {
-    my $value = $_[0]->tx->res->cookie('mojolicious')->value;
-    $value =~ s/--([^\-]+)$//;
-    $value =~ y/-/=/;
-    return Mojo::Util::b64_decode($value);
-  };
-
-  subtest 'Short session' => sub {
-    $t->reset_session;
-    my $value = $t->get_ok('/session_length?q=a')->status_is(204)->$extract;
-    cmp_ok length($value), '>', 1024, 'session is long enough';
-    ok $value =~ /Z+$/, 'session is padded';
-  };
-
-  subtest 'Long session' => sub {
-    $t->reset_session;
-    my $value = $t->get_ok('/session_length?q=' . 'a' x 1025)->status_is(204)->$extract;
-    cmp_ok length($value), '>', 1024, 'session is long enough';
-    ok $value !~ /Z+$/, 'session is not padded';
-  };
-};
 
 # Text
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('Yea baby!');

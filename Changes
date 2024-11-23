@@ -1,5 +1,12 @@
 
-9.39  2024-08-28
+9.39  2024-11-23
+  - Added EXPERIMENTAL support for encrypted session cookies.
+    This feature is much more secure than signed cookies and can be enabled by installing CryptX and setting the
+    encrypted attribute.
+      $app->sessions->encrypted(1);
+  - Added EXPERIMENTAL encrypted attribute to Mojolicious::Sessions.
+  - Added EXPERIMENTAL encrypted_cookie and every_encrypted_cookie methods to Mojolicious::Controller.
+  - Added EXPERIMENTAL decrypt_cookie, encrypt_cookie and generate_secret functions to Mojo::Util.
   - Fixed a bug in Mojo::Message::Request where message size limits were not always correctly applied.
     (Alexander Kuehne)
 

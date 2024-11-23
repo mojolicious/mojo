@@ -1,4 +1,6 @@
 
+9.40  2024-11-24
+
 9.39  2024-11-23
   - Added EXPERIMENTAL support for encrypted session cookies.
     This feature is much more secure than signed cookies and can be enabled by installing CryptX and setting the

@@ -99,7 +99,7 @@ sub _default {
   my ($s, $m, $h, $day, $month, $year) = localtime $time;
   $time = sprintf '%04d-%02d-%02d %02d:%02d:%08.5f', $year + 1900, $month + 1, $day, $h, $m,
     "$s." . ((split /\./, $time)[1] // 0);
-  return "[$time] [$$] [$level] " . join(' ', @_) . "\n";
+  return "[$time] [$$] [$level] " . join(' ', map {defined $_ ? $_ : 'undef'} @_) . "\n";
 }
 
 sub _log {
@@ -123,7 +123,7 @@ sub _message {
 sub _short {
   my ($time, $level) = (shift, shift);
   my ($magic, $short) = ("<$MAGIC{$level}>", substr($level, 0, 1));
-  return "${magic}[$$] [$short] " . join(' ', @_) . "\n";
+  return "${magic}[$$] [$short] " . join(' ', map {defined $_ ? $_ : 'undef'} @_) . "\n";
 }
 
 package Mojo::Log::_Capture;

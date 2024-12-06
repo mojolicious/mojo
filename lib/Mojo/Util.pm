@@ -678,8 +678,7 @@ Decode bytes to characters with L<Encode>, or return C<undef> if decoding failed
 
   my $value = decrypt_cookie $encrypted, 'passw0rd', 'salt';
 
-Decrypt cookie value encrypted with L</encrypt_cookie>, returns the decrypted value or C<undef>. Note that this
-function is B<EXPERIMENTAL> and might change without warning!
+Decrypt cookie value encrypted with L</encrypt_cookie>, returns the decrypted value or C<undef>.
 
 =head2 deprecated
 
@@ -704,7 +703,7 @@ Encode characters to bytes with L<Encode>.
 
   my $encrypted = encrypt_cookie $value, 'passw0rd', 'salt';
 
-Encrypt cookie value. Note that this function is B<EXPERIMENTAL> and might change without warning!
+Encrypt cookie value.
 
 =head2 extract_usage
 
@@ -728,7 +727,7 @@ function was called from.
   my $secret = generate_secret;
 
 Generate a random secret with a cryptographically secure random number generator if available, and a less secure
-fallback if not. Note that this function is B<EXPERIMENTAL> and might change without warning!
+fallback if not.
 
 =head2 getopt
 
@@ -769,7 +768,6 @@ Compress bytes with L<IO::Compress::Gzip>.
   my ($params, $remainder) = header_params 'one=foo; two="bar", three=baz';
 
 Extract HTTP header field parameters until the first comma according to L<RFC 5987|http://tools.ietf.org/html/rfc5987>.
-Note that this function is B<EXPERIMENTAL> and might change without warning!
 
 =head2 hmac_sha1_sum
 

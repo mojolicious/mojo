@@ -7,7 +7,7 @@ use Mojo::DynamicMethods;
 use Mojo::File   qw(curfile path);
 use Mojo::JSON   qw(encode_json);
 use Mojo::Loader qw(data_section);
-use Mojo::Util   qw(decamelize deprecated encode gzip md5_sum monkey_patch);
+use Mojo::Util   qw(decamelize encode gzip md5_sum monkey_patch);
 
 has cache          => sub { Mojo::Cache->new };
 has classes        => sub { ['main'] };
@@ -27,13 +27,9 @@ sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
 sub accepts {
   my ($self, $c) = (shift, shift);
 
-  # DEPRECATED!
-  my $req   = $c->req;
-  my $param = $req->param('format');
-  deprecated 'The ?format=* parameter is deprecated in favor of ?_format=* for content negotiation' if defined $param;
-
   # List representations
-  my $fmt  = $param // $req->param('_format') || $c->stash->{format};
+  my $req  = $c->req;
+  my $fmt  = $req->param('_format') || $c->stash->{format};
   my @exts = $fmt ? ($fmt) : ();
   push @exts, @{$c->app->types->detect($req->headers->accept)};
   return \@exts unless @_;

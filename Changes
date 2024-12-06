@@ -1,5 +1,16 @@
 
-9.40  2024-11-24
+10.0  2024-12-26
+  - Code name "...", this is a major release.
+  - Removed deprecated support for "'" package separators.
+  - Removed deprecated support for ?format=* parameter in favor of ?_format=* for content negotiation.
+  - Removed deprecated support for padded session cookies.
+  - Removed experimental status from top-level await support in Mojo::Promise.
+  - Removed experimental status from encrypted session cookie support.
+  - Removed experimental status from persistent cookie support.
+  - Removed experimental status from samesite cookie support.
+  - Removed experimental status from colourful log messages.
+  - Removed experimental status from freeze option in Mojo::IOLoop.
+  - Removed experimental status from check and raise functions in Mojo::Exception.
 
 9.39  2024-11-23
   - Added EXPERIMENTAL support for encrypted session cookies.

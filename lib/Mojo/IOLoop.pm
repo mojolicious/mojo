@@ -432,8 +432,7 @@ These options are currently available:
   freeze => 1
 
 Freeze the current state of the event loop in time before resetting it. This will prevent active connections from
-getting closed immediately, which can help with many unintended side effects when processes are forked. Note that this
-option is B<EXPERIMENTAL> and might change without warning!
+getting closed immediately, which can help with many unintended side effects when processes are forked.
 
 =back
 

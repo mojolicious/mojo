@@ -215,8 +215,7 @@ L<Mojo::UserAgent::CookieJar> implements the following attributes.
   my $file = $jar->file;
   $jar     = $jar->file('/home/sri/cookies.txt');
 
-File to L</"load"> cookies from and L</"save"> cookies to in Netscape format. Note that this attribute is
-B<EXPERIMENTAL> and might change without warning!
+File to L</"load"> cookies from and L</"save"> cookies to in Netscape format.
 
   # Save cookies to file
   $jar->file('cookies.txt')->save;
@@ -291,7 +290,7 @@ Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
   $jar = $jar->load;
 
-Load cookies from L</"file">. Note that this method is B<EXPERIMENTAL> and might change without warning!
+Load cookies from L</"file">.
 
 =head2 prepare
 
@@ -303,13 +302,13 @@ Prepare request cookies for transaction.
 
   $jar = $jar->save;
 
-Save cookies to L</"file">. Note that this method is B<EXPERIMENTAL> and might change without warning!
+Save cookies to L</"file">.
 
 =head2 to_string
 
   my $string = $jar->to_string;
 
-Stringify cookies in Netscape format. Note that this method is B<EXPERIMENTAL> and might change without warning!
+Stringify cookies in Netscape format.
 
 =head1 SEE ALSO
 

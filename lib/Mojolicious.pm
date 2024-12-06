@@ -56,7 +56,7 @@ has types     => sub { Mojolicious::Types->new };
 has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = '...';
+our $CODENAME = 'Moose';
 our $VERSION  = '10.0';
 
 sub BUILD_DYNAMIC {
@@ -784,6 +784,8 @@ L<https://opensource.org/licenses/OFL-1.1>.
 =head1 CODE NAMES
 
 Every major release of L<Mojolicious> has a code name, these are the ones that have been used in the past.
+
+10.0 C<Moose> (U+1FACE)
 
 9.0, C<Waffle> (U+1F9C7)
 

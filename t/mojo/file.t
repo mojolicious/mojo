@@ -103,8 +103,9 @@ subtest 'Temporary file' => sub {
   my $file = tempfile(DIR => $dir);
   my $path = "$file";
   ok -f $path, 'file exists';
-  is $file->dirname,             $dir,   'same directory';
-  is $file->spew('test')->slurp, 'test', 'right result';
+  is $file->dirname,                                  $dir,           'same directory';
+  is $file->spew('test')->slurp,                      'test',         'right result';
+  is $file->spurt('just', 'a', 'test', '123')->slurp, 'justatest123', 'right result';
   undef $file;
   ok !-f $path, 'file does not exist anymore';
 };

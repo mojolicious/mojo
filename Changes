@@ -1,6 +1,7 @@
 
 10.0  2024-12-26
-  - Code name "...", this is a major release.
+  - Code name "Moose", this is a major release.
+  - Un-deprecated the spurt method in Mojo::File, it is now an alternative to spew.
   - Removed deprecated support for "'" package separators.
   - Removed deprecated support for ?format=* parameter in favor of ?_format=* for content negotiation.
   - Removed deprecated support for padded session cookies.

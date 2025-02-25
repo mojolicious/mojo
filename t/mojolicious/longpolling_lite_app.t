@@ -163,7 +163,10 @@ subtest 'Stream without delay and finish' => sub {
   my $logs = $t->app->log->capture('trace');
   my $stash;
   $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-  $t->get_ok('/write')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
+  $t->get_ok('/write')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->content_type_is('text/plain')
     ->content_is('this was short.');
   Mojo::IOLoop->one_tick until $stash->{finished};
   ok !$t->tx->kept_alive, 'connection was not kept alive';
@@ -175,15 +178,21 @@ subtest 'Stream without delay and finish' => sub {
 };
 
 subtest 'Stream without delay and content length' => sub {
-  $t->get_ok('/write/length')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
+  $t->get_ok('/write/length')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->content_type_is('text/plain')
     ->content_is('this was short and plain.');
   ok !$t->tx->kept_alive, 'connection was not kept alive';
   ok $t->tx->keep_alive,  'connection will be kept alive';
 };
 
 subtest 'Stream without delay and empty write' => sub {
-  $t->get_ok('/write/nolength')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_is('Content-Length' => undef)->content_type_is('text/plain')
+  $t->get_ok('/write/nolength')
+    ->status_is(200)
+    ->header_is(Server           => 'Mojolicious (Perl)')
+    ->header_is('Content-Length' => undef)
+    ->content_type_is('text/plain')
     ->content_is('this was short and had no length.');
   ok $t->tx->kept_alive,  'connection was kept alive';
   ok !$t->tx->keep_alive, 'connection will not be kept alive';
@@ -192,8 +201,11 @@ subtest 'Stream without delay and empty write' => sub {
 subtest 'Chunked response with delay' => sub {
   my $stash = undef;
   $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-  $t->get_ok('/longpoll/chunked')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->content_type_is('text/plain')->content_is('hi there, whats up?');
+  $t->get_ok('/longpoll/chunked')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->content_type_is('text/plain')
+    ->content_is('hi there, whats up?');
   Mojo::IOLoop->one_tick until $stash->{finished};
   ok !$t->tx->kept_alive, 'connection was not kept alive';
   ok $t->tx->keep_alive,  'connection will be kept alive';
@@ -236,37 +248,53 @@ subtest 'Interrupted by raising an error' => sub {
 subtest 'Stream with delay and content length' => sub {
   my $stash = undef;
   $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-  $t->get_ok('/longpoll/length')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->content_type_is('text/plain')->content_is('hi there plain, whats up?');
+  $t->get_ok('/longpoll/length')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->content_type_is('text/plain')
+    ->content_is('hi there plain, whats up?');
   is $stash->{drain}, 1, 'drain event has been emitted once';
 };
 
 subtest 'Stream with delay and finish' => sub {
-  $t->get_ok('/longpoll/nolength')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_is('Content-Length' => undef)->content_type_is('text/plain')->content_is('hi there, what length?');
+  $t->get_ok('/longpoll/nolength')
+    ->status_is(200)
+    ->header_is(Server           => 'Mojolicious (Perl)')
+    ->header_is('Content-Length' => undef)
+    ->content_type_is('text/plain')
+    ->content_is('hi there, what length?');
   ok !$t->tx->keep_alive, 'connection will not be kept alive';
 };
 
 subtest 'The drain event should be emitted on the next reactor tick' => sub {
   my $stash = undef;
   $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-  $t->get_ok('/longpoll/order')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/longpoll/order')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is('First, second, third!');
   is $stash->{order}, 1, 'the drain event was emitted on the next reactor tick';
 };
 
 subtest 'Static file with cookies and session' => sub {
   my $logs = $t->app->log->capture('trace');
-  $t->get_ok('/longpoll/static')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_like('Set-Cookie' => qr/bar=baz/)->header_like('Set-Cookie' => qr/mojolicious=/)
-    ->content_type_is('text/plain;charset=UTF-8')->content_is("Hello Mojo from a static file!\n");
+  $t->get_ok('/longpoll/static')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->header_like('Set-Cookie' => qr/bar=baz/)
+    ->header_like('Set-Cookie' => qr/mojolicious=/)
+    ->content_type_is('text/plain;charset=UTF-8')
+    ->content_is("Hello Mojo from a static file!\n");
   like $logs, qr/Nothing has been rendered, expecting delayed response/, 'right message';
   undef $logs;
 };
 
 subtest 'Custom response' => sub {
-  $t->get_ok('/longpoll/dynamic')->status_is(201)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');
+  $t->get_ok('/longpoll/dynamic')
+    ->status_is(201)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->header_like('Set-Cookie' => qr/baz=yada/)
+    ->content_is('Dynamic!');
 };
 
 subtest 'Chunked response streaming with drain event' => sub {

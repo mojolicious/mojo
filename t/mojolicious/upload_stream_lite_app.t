@@ -59,7 +59,8 @@ subtest 'Small download' => sub {
 };
 
 subtest 'Big upload' => sub {
-  $t->post_ok('/upload?id=24' => form => {my_file => {content => '1234' x 131072}})->status_is(200)
+  $t->post_ok('/upload?id=24' => form => {my_file => {content => '1234' x 131072}})
+    ->status_is(200)
     ->content_is('1234' x 131072);
 };
 

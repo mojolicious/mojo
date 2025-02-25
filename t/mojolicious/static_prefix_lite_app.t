@@ -19,13 +19,19 @@ subtest 'Action for static file path without prefix' => sub {
 };
 
 subtest 'Static file' => sub {
-  $t->get_ok('/static/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_exists_not('Cache-Control')->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
+  $t->get_ok('/static/hello.txt')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->header_exists_not('Cache-Control')
+    ->header_is('Accept-Ranges'  => 'bytes')
+    ->header_is('Content-Length' => 31)
     ->content_is("Hello Mojo from a static file!\n");
 };
 
 subtest 'Static asset' => sub {
-  $t->get_ok('/static/assets/foo.ab1234cd5678ef.css')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/static/assets/foo.ab1234cd5678ef.css')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_like(qr/\* foo\.css asset/);
 };
 
@@ -34,7 +40,9 @@ subtest 'Bundled static file' => sub {
 };
 
 subtest 'Bundled template' => sub {
-  $t->get_ok('/doesnotexist')->status_is(404)->element_exists('link[href=/static/favicon.ico]')
+  $t->get_ok('/doesnotexist')
+    ->status_is(404)
+    ->element_exists('link[href=/static/favicon.ico]')
     ->element_exists('link[href=/static/mojo/mojo.css]');
 };
 
@@ -63,14 +71,20 @@ subtest 'Hidden inline file' => sub {
 
 subtest 'Base64 partial inline file' => sub {
   $t->get_ok('/static.txt')->status_is(404);
-  $t->get_ok('/static/static.txt' => {Range => 'bytes=2-5'})->status_is(206)->header_is(Server => 'Mojolicious (Perl)')
-    ->header_is('Accept-Ranges'  => 'bytes')->header_is('Content-Range' => 'bytes 2-5/15')
-    ->header_is('Content-Length' => 4)->content_is('st 1');
+  $t->get_ok('/static/static.txt' => {Range => 'bytes=2-5'})
+    ->status_is(206)
+    ->header_is(Server           => 'Mojolicious (Perl)')
+    ->header_is('Accept-Ranges'  => 'bytes')
+    ->header_is('Content-Range'  => 'bytes 2-5/15')
+    ->header_is('Content-Length' => 4)
+    ->content_is('st 1');
 };
 
 subtest 'UTF-8 encoded inline file' => sub {
   $t->get_ok('/static_utf8.txt')->status_is(404);
-  $t->get_ok('/static/static_utf8.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/static/static_utf8.txt')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("I ♥ Unicode\n");
 };
 

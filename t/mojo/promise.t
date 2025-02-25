@@ -116,7 +116,9 @@ subtest 'Resolved chained' => sub {
 subtest 'Rejected chained' => sub {
   my $promise = Mojo::Promise->new;
   my @errors;
-  $promise->then(undef, sub {"$_[0]:1"})->then(sub {"$_[0]:2"}, sub {"$_[0]:fail"})->then(sub {"$_[0]:3"})
+  $promise->then(undef, sub {"$_[0]:1"})
+    ->then(sub {"$_[0]:2"}, sub {"$_[0]:fail"})
+    ->then(sub {"$_[0]:3"})
     ->then(sub { push @errors, "$_[0]:4" });
   $promise->reject('tset');
   Mojo::IOLoop->one_tick;
@@ -226,7 +228,10 @@ subtest 'Clone' => sub {
 subtest 'Exception in chain' => sub {
   my $promise = Mojo::Promise->new;
   my (@results, @errors);
-  $promise->then(sub {@_})->then(sub {@_})->then(sub { die "test: $_[0]\n" })->then(sub { push @results, 'fail' })
+  $promise->then(sub {@_})
+    ->then(sub {@_})
+    ->then(sub { die "test: $_[0]\n" })
+    ->then(sub { push @results, 'fail' })
     ->catch(sub { @errors = @_ });
   $promise->resolve('works');
   Mojo::IOLoop->one_tick;

@@ -128,7 +128,8 @@ $t->post_ok('/links')->status_is(200)->content_is(<<'EOF');
 EOF
 
 # Buttons
-$t->get_ok('/buttons')->status_is(200)
+$t->get_ok('/buttons')
+  ->status_is(200)
   ->content_is('<form action="/links">'
     . '<input type="submit" value="First test">'
     . "</form>\n"
@@ -371,7 +372,8 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5&b=on')->status_is(200)->content_is(<<EOF
 EOF
 
 # Empty selection
-$t->put_ok('/selection')->status_is(200)
+$t->put_ok('/selection')
+  ->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
@@ -404,7 +406,8 @@ $t->put_ok('/selection')->status_is(200)
     . "\n</form>\n");
 
 # Selection with values
-$t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b&h=j')->status_is(200)
+$t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b&h=j')
+  ->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
@@ -437,7 +440,8 @@ $t->put_ok('/selection?a=e&foo=bar&bar=baz&yada=b&h=j')->status_is(200)
     . "\n</form>\n");
 
 # Selection with multiple values
-$t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b&h=i&h=j')->status_is(200)
+$t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b&h=i&h=j')
+  ->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
@@ -470,7 +474,8 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d&yada=a&yada=b&h=i&h=j')->status
     . "\n</form>\n");
 
 # Selection with multiple values preselected
-$t->put_ok('/selection?preselect=1&undef=1')->status_is(200)
+$t->put_ok('/selection?preselect=1&undef=1')
+  ->status_is(200)
   ->content_is("<form action=\"/selection?_method=PUT\" method=\"POST\">\n  "
     . '<select name="a">'
     . '<option selected value="b">b</option>'

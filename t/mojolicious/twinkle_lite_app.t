@@ -61,7 +61,9 @@ get '/dead' => sub {die};
 my $t = Test::Mojo->new;
 
 subtest 'Basic template with "twinkle" syntax and "ep" layout' => sub {
-  $t->get_ok('/')->status_is(200)->header_is('X-Append' => 'bar')
+  $t->get_ok('/')
+    ->status_is(200)
+    ->header_is('X-Append' => 'bar')
     ->content_like(qr/testHello <sebastian>!bar TwinkleSandBoxTest123/);
 };
 

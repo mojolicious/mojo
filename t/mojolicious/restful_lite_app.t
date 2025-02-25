@@ -50,8 +50,10 @@ subtest 'Hash without format' => sub {
 };
 
 subtest 'Hash with "json" format' => sub {
-  $t->post_ok('/json/echo' => {Accept => 'application/json'} => json => {hello => 'world'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({hello => 'world'});
+  $t->post_ok('/json/echo' => {Accept => 'application/json'} => json => {hello => 'world'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({hello => 'world'});
   my $tx = $t->ua->build_tx(PUT => '/json/echo' => {Accept => 'application/json'} => json => {hello => 'world'});
   $t->request_ok($tx)->status_is(200)->content_type_is('application/json;charset=UTF-8')->json_is({hello => 'world'});
 };
@@ -99,7 +101,8 @@ subtest 'Accept "json"' => sub {
 
 subtest 'Ajax' => sub {
   my $ajax = 'text/html;q=0.1,application/json';
-  $t->get_ok('/accepts' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})->status_is(200)
+  $t->get_ok('/accepts' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
+    ->status_is(200)
     ->json_is({best => 'json'});
 };
 
@@ -112,88 +115,122 @@ subtest '"html" format' => sub {
 };
 
 subtest 'Accept "html"' => sub {
-  $t->get_ok('/rest' => {Accept => 'text/html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest 'Accept "html" again' => sub {
-  $t->get_ok('/rest' => {Accept => 'Text/Html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest' => {Accept => 'Text/Html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest 'Accept "html" with format' => sub {
-  $t->get_ok('/rest.html' => {Accept => 'text/html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest.html' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest 'Accept "html" with quality' => sub {
-  $t->get_ok('/rest' => {Accept => 'text/html;q=9'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest' => {Accept => 'text/html;q=9'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest '"html" query' => sub {
-  $t->get_ok('/rest?_format=html')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest?_format=html')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest '"html" format with query' => sub {
-  $t->get_ok('/rest.html?_format=html')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest.html?_format=html')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest 'Accept "html" with query' => sub {
-  $t->get_ok('/rest?_format=html' => {Accept => 'text/html'})->status_is(200)
-    ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
+  $t->get_ok('/rest?_format=html' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->text_is('html > body', 'works');
 };
 
 subtest 'Accept "html" with everything' => sub {
-  $t->get_ok('/rest.html?_format=html' => {Accept => 'text/html'})->status_is(200)
-    ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works');
+  $t->get_ok('/rest.html?_format=html' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->text_is('html > body', 'works');
 };
 
 subtest '"json" format' => sub {
-  $t->get_ok('/rest.json')->status_is(200)->content_type_is('application/json;charset=UTF-8')
+  $t->get_ok('/rest.json')
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({just => 'works'});
 };
 
 subtest 'Accept "json"' => sub {
-  $t->get_ok('/rest' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works'});
+  $t->get_ok('/rest' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works'});
 };
 
 subtest 'Accept "json" again' => sub {
-  $t->get_ok('/rest' => {Accept => 'APPLICATION/JSON'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works'});
+  $t->get_ok('/rest' => {Accept => 'APPLICATION/JSON'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works'});
 };
 
 subtest 'Accept "json" with format' => sub {
-  $t->get_ok('/rest.json' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works'});
+  $t->get_ok('/rest.json' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works'});
 };
 
 subtest 'Accept "json" with quality' => sub {
-  $t->get_ok('/rest' => {Accept => 'application/json;q=9'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works'});
+  $t->get_ok('/rest' => {Accept => 'application/json;q=9'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works'});
 };
 
 subtest '"json" query' => sub {
-  $t->get_ok('/rest?_format=json')->status_is(200)->content_type_is('application/json;charset=UTF-8')
+  $t->get_ok('/rest?_format=json')
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({just => 'works'});
 };
 
 subtest '"json" format with query' => sub {
-  $t->get_ok('/rest.json?_format=json')->status_is(200)->content_type_is('application/json;charset=UTF-8')
+  $t->get_ok('/rest.json?_format=json')
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({just => 'works'});
 };
 
 subtest 'Accept "json" with query' => sub {
-  $t->get_ok('/rest?_format=json' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works'});
+  $t->get_ok('/rest?_format=json' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works'});
 };
 
 subtest 'Accept "json" with everything' => sub {
-  $t->get_ok('/rest.json?_format=json' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works'});
+  $t->get_ok('/rest.json?_format=json' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works'});
 };
 
 subtest '"xml" format' => sub {
@@ -201,22 +238,30 @@ subtest '"xml" format' => sub {
 };
 
 subtest 'Accept "xml"' => sub {
-  $t->get_ok('/rest' => {Accept => 'application/xml'})->status_is(200)->content_type_is('application/xml')
+  $t->get_ok('/rest' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works');
 };
 
 subtest 'Accept "xml" again' => sub {
-  $t->get_ok('/rest' => {Accept => 'APPLICATION/XML'})->status_is(200)->content_type_is('application/xml')
+  $t->get_ok('/rest' => {Accept => 'APPLICATION/XML'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works');
 };
 
 subtest 'Accept "xml" with format' => sub {
-  $t->get_ok('/rest.xml' => {Accept => 'application/xml'})->status_is(200)->content_type_is('application/xml')
+  $t->get_ok('/rest.xml' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works');
 };
 
 subtest 'Accept "xml" with quality' => sub {
-  $t->get_ok('/rest' => {Accept => 'application/xml;q=9'})->status_is(200)->content_type_is('application/xml')
+  $t->get_ok('/rest' => {Accept => 'application/xml;q=9'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works');
 };
 
@@ -229,13 +274,17 @@ subtest '"xml" format with query' => sub {
 };
 
 subtest 'Accept "json" with query' => sub {
-  $t->get_ok('/rest?_format=xml' => {Accept => 'application/xml'})->status_is(200)->content_type_is('application/xml')
+  $t->get_ok('/rest?_format=xml' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works');
 };
 
 subtest 'Accept "json" with everything' => sub {
-  $t->get_ok('/rest.xml?_format=xml' => {Accept => 'application/xml'})->status_is(200)
-    ->content_type_is('application/xml')->text_is(just => 'works');
+  $t->get_ok('/rest.xml?_format=xml' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
+    ->text_is(just => 'works');
 };
 
 subtest 'Unsupported accept' => sub {
@@ -247,133 +296,185 @@ subtest 'Nothing' => sub {
 };
 
 subtest '"html" format' => sub {
-  $t->post_ok('/rest.html')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest.html')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept "html"' => sub {
-  $t->post_ok('/rest' => {Accept => 'text/html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept "html" again' => sub {
-  $t->post_ok('/rest' => {Accept => 'Text/Html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest' => {Accept => 'Text/Html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept "html" with format' => sub {
-  $t->post_ok('/rest.html' => {Accept => 'text/html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest.html' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept "html" with quality' => sub {
-  $t->post_ok('/rest' => {Accept => 'text/html;q=9'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest' => {Accept => 'text/html;q=9'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest '"html" query' => sub {
-  $t->post_ok('/rest?_format=html')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest?_format=html')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest '"html" format with query' => sub {
-  $t->post_ok('/rest.html?_format=html')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest.html?_format=html')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept html with query' => sub {
-  $t->post_ok('/rest?_format=html' => {Accept => 'text/html'})->status_is(200)
-    ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works too');
+  $t->post_ok('/rest?_format=html' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept "html" with everything' => sub {
-  $t->post_ok('/rest.html?_format=html' => {Accept => 'text/html'})->status_is(200)
-    ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works too');
+  $t->post_ok('/rest.html?_format=html' => {Accept => 'text/html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->text_is('html > body', 'works too');
 };
 
 subtest '"html" form' => sub {
-  $t->post_ok('/rest' => form => {_format => 'html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest' => form => {_format => 'html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest '"html" format with form' => sub {
-  $t->post_ok('/rest.html' => form => {_format => 'html'})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest.html' => form => {_format => 'html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept "html" with form' => sub {
-  $t->post_ok('/rest' => {Accept => 'text/html'} => form => {_format => 'html'})->status_is(200)
-    ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works too');
+  $t->post_ok('/rest' => {Accept => 'text/html'} => form => {_format => 'html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->text_is('html > body', 'works too');
 };
 
 subtest 'Accept "html" with everything, form alternative' => sub {
-  $t->post_ok('/rest.html' => {Accept => 'text/html'} => form => {_format => 'html'})->status_is(200)
-    ->content_type_is('text/html;charset=UTF-8')->text_is('html > body', 'works too');
+  $t->post_ok('/rest.html' => {Accept => 'text/html'} => form => {_format => 'html'})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->text_is('html > body', 'works too');
 };
 
 subtest '"json" format' => sub {
-  $t->post_ok('/rest.json')->status_is(200)->content_type_is('application/json;charset=UTF-8')
+  $t->post_ok('/rest.json')
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json"' => sub {
-  $t->post_ok('/rest' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json" again' => sub {
-  $t->post_ok('/rest' => {Accept => 'APPLICATION/JSON'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest' => {Accept => 'APPLICATION/JSON'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json" with format' => sub {
-  $t->post_ok('/rest.json' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest.json' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json" with quality' => sub {
-  $t->post_ok('/rest' => {Accept => 'application/json;q=9'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest' => {Accept => 'application/json;q=9'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest '"json" query' => sub {
-  $t->post_ok('/rest?_format=json')->status_is(200)->content_type_is('application/json;charset=UTF-8')
+  $t->post_ok('/rest?_format=json')
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({just => 'works too'});
 };
 
 subtest '"json" format with query' => sub {
-  $t->post_ok('/rest.json?_format=json')->status_is(200)->content_type_is('application/json;charset=UTF-8')
+  $t->post_ok('/rest.json?_format=json')
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json" with query' => sub {
-  $t->post_ok('/rest?_format=json' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest?_format=json' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json" with everything' => sub {
-  $t->post_ok('/rest.json?_format=json' => {Accept => 'application/json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest.json?_format=json' => {Accept => 'application/json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest '"json" form' => sub {
-  $t->post_ok('/rest' => form => {_format => 'json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest' => form => {_format => 'json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest '"json" format with form' => sub {
-  $t->post_ok('/rest.json' => form => {_format => 'json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest.json' => form => {_format => 'json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json" with form' => sub {
-  $t->post_ok('/rest' => {Accept => 'application/json'} => form => {_format => 'json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest' => {Accept => 'application/json'} => form => {_format => 'json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest 'Accept "json" with everything, form alternative' => sub {
-  $t->post_ok('/rest.json' => {Accept => 'application/json'} => form => {_format => 'json'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works too'});
+  $t->post_ok('/rest.json' => {Accept => 'application/json'} => form => {_format => 'json'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works too'});
 };
 
 subtest '"xml" format' => sub {
@@ -381,22 +482,30 @@ subtest '"xml" format' => sub {
 };
 
 subtest 'Accept "xml"' => sub {
-  $t->post_ok('/rest' => {Accept => 'application/xml'})->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
 subtest 'Accept "xml" again' => sub {
-  $t->post_ok('/rest' => {Accept => 'APPLICATION/XML'})->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest' => {Accept => 'APPLICATION/XML'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
 subtest 'Accept "xml" with format' => sub {
-  $t->post_ok('/rest.xml' => {Accept => 'application/xml'})->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest.xml' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
 subtest 'Accept "xml" with quality' => sub {
-  $t->post_ok('/rest' => {Accept => 'application/xml;q=9'})->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest' => {Accept => 'application/xml;q=9'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
@@ -405,48 +514,66 @@ subtest '"xml" query' => sub {
 };
 
 subtest '"xml" format with query' => sub {
-  $t->post_ok('/rest.xml?_format=xml')->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest.xml?_format=xml')
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
 subtest 'Accept "json" with query' => sub {
-  $t->post_ok('/rest?_format=xml' => {Accept => 'application/xml'})->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest?_format=xml' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
 subtest 'Accept "json" with everything' => sub {
-  $t->post_ok('/rest.xml?_format=xml' => {Accept => 'application/xml'})->status_is(200)
-    ->content_type_is('application/xml')->text_is(just => 'works too');
+  $t->post_ok('/rest.xml?_format=xml' => {Accept => 'application/xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
+    ->text_is(just => 'works too');
 };
 
 subtest '"xml" form' => sub {
-  $t->post_ok('/rest' => form => {_format => 'xml'})->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest' => form => {_format => 'xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
 subtest '"xml" format with form' => sub {
-  $t->post_ok('/rest.xml' => form => {_format => 'xml'})->status_is(200)->content_type_is('application/xml')
+  $t->post_ok('/rest.xml' => form => {_format => 'xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
     ->text_is(just => 'works too');
 };
 
 subtest 'Accept "json" with form' => sub {
-  $t->post_ok('/rest' => {Accept => 'application/xml'} => form => {_format => 'xml'})->status_is(200)
-    ->content_type_is('application/xml')->text_is(just => 'works too');
+  $t->post_ok('/rest' => {Accept => 'application/xml'} => form => {_format => 'xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
+    ->text_is(just => 'works too');
 };
 
 subtest 'Accept "json" with everything, form alternative' => sub {
-  $t->post_ok('/rest.xml' => {Accept => 'application/xml'} => form => {_format => 'xml'})->status_is(200)
-    ->content_type_is('application/xml')->text_is(just => 'works too');
+  $t->post_ok('/rest.xml' => {Accept => 'application/xml'} => form => {_format => 'xml'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
+    ->text_is(just => 'works too');
 };
 
 subtest 'Unsupported accept' => sub {
-  $t->post_ok('/rest' => {Accept => 'image/png'})->status_is(201)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest' => {Accept => 'image/png'})
+    ->status_is(201)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_is('works too');
 };
 
 subtest 'Unsupported everything' => sub {
-  $t->post_ok('/rest.png?_format=jpg' => {Accept => 'image/whatever'})->status_is(201)
-    ->content_type_is('text/html;charset=UTF-8')->content_is('works too');
+  $t->post_ok('/rest.png?_format=jpg' => {Accept => 'image/whatever'})
+    ->status_is(201)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->content_is('works too');
 };
 
 subtest 'Unsupported format' => sub {
@@ -454,7 +581,9 @@ subtest 'Unsupported format' => sub {
 };
 
 subtest 'Unsupported format and query' => sub {
-  $t->post_ok('/rest.png?_format=png')->status_is(201)->content_type_is('text/html;charset=UTF-8')
+  $t->post_ok('/rest.png?_format=png')
+    ->status_is(201)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_is('works too');
 };
 
@@ -464,26 +593,34 @@ subtest 'Does not exist' => sub {
 
 subtest 'Ajax' => sub {
   my $ajax = 'text/html;q=0.1,application/xml';
-  $t->get_ok('/rest' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})->status_is(200)
-    ->content_type_is('application/xml')->text_is(just => 'works');
+  $t->get_ok('/rest' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
+    ->status_is(200)
+    ->content_type_is('application/xml')
+    ->text_is(just => 'works');
 };
 
 subtest 'Chrome 64' => sub {
   my $chrome = 'text/html,application/xhtml+xml,application/xml;q=0.9' . ',image/webp,image/apng,*/*;q=0.8';
-  $t->get_ok('/rest.html' => {Accept => $chrome})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest.html' => {Accept => $chrome})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest 'Chrome 11 with query' => sub {
   my $chrome = 'text/html,application/xhtml+xml,application/xml;q=0.9' . ',image/webp,image/apng,*/*;q=0.8';
-  $t->get_ok('/rest?_format=html' => {Accept => $chrome})->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/rest?_format=html' => {Accept => $chrome})
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->text_is('html > body', 'works');
 };
 
 subtest 'jQuery 1.8' => sub {
   my $jquery = 'application/json, text/javascript, */*; q=0.01';
-  $t->get_ok('/rest' => {Accept => $jquery, 'X-Requested-With' => 'XMLHttpRequest'})->status_is(200)
-    ->content_type_is('application/json;charset=UTF-8')->json_is({just => 'works'});
+  $t->get_ok('/rest' => {Accept => $jquery, 'X-Requested-With' => 'XMLHttpRequest'})
+    ->status_is(200)
+    ->content_type_is('application/json;charset=UTF-8')
+    ->json_is({just => 'works'});
 };
 
 done_testing();

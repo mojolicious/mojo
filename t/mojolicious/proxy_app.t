@@ -122,52 +122,108 @@ get '/proxy3/:method/*target' => sub {
 my $t = Test::Mojo->new;
 
 subtest 'Various response variants' => sub {
-  $t->get_ok('/proxy1/size/200/2')->status_is(200)->header_is('X-Mojo-App' => 'Size')->header_is('Content-Length' => 2)
+  $t->get_ok('/proxy1/size/200/2')
+    ->status_is(200)
+    ->header_is('X-Mojo-App'     => 'Size')
+    ->header_is('Content-Length' => 2)
     ->content_is('xx');
-  $t->get_ok('/proxy1/size/200/1')->status_is(200)->header_is('X-Mojo-App' => 'Size')->header_is('Content-Length' => 1)
+  $t->get_ok('/proxy1/size/200/1')
+    ->status_is(200)
+    ->header_is('X-Mojo-App'     => 'Size')
+    ->header_is('Content-Length' => 1)
     ->content_is('x');
-  $t->get_ok('/proxy1/size/200/0')->status_is(200)->header_is('X-Mojo-App' => 'Size')->header_is('Content-Length' => 0)
+  $t->get_ok('/proxy1/size/200/0')
+    ->status_is(200)
+    ->header_is('X-Mojo-App'     => 'Size')
+    ->header_is('Content-Length' => 0)
     ->content_is('');
-  $t->get_ok('/proxy1/size/204/0')->status_is(204)->header_is('X-Mojo-App' => 'Size')
-    ->header_is('Content-Length' => undef)->content_is('');
-  $t->get_ok('/proxy1/redirect/304/200/1')->status_is(304)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => undef)->content_is('');
-  $t->get_ok('/proxy1/redirect/302/200/1')->status_is(302)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => 0)->content_is('');
-  $t->get_ok('/proxy1/redirect/301/200/1')->status_is(301)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => 0)->content_is('');
-  $t->get_ok('/proxy1/redirect/304/200/0')->status_is(304)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => undef)->content_is('');
-  $t->get_ok('/proxy1/redirect/302/200/0')->status_is(302)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => 0)->content_is('');
-  $t->get_ok('/proxy1/redirect/301/200/0')->status_is(301)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => 0)->content_is('');
-  $t->get_ok('/proxy1/redirect/304/204/0')->status_is(304)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => undef)->content_is('');
-  $t->get_ok('/proxy1/redirect/302/204/0')->status_is(302)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => 0)->content_is('');
-  $t->get_ok('/proxy1/redirect/301/204/0')->status_is(301)->header_is('X-Mojo-App' => 'Redirect')
-    ->header_is('Content-Length' => 0)->content_is('');
+  $t->get_ok('/proxy1/size/204/0')
+    ->status_is(204)
+    ->header_is('X-Mojo-App'     => 'Size')
+    ->header_is('Content-Length' => undef)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/304/200/1')
+    ->status_is(304)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => undef)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/302/200/1')
+    ->status_is(302)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => 0)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/301/200/1')
+    ->status_is(301)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => 0)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/304/200/0')
+    ->status_is(304)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => undef)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/302/200/0')
+    ->status_is(302)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => 0)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/301/200/0')
+    ->status_is(301)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => 0)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/304/204/0')
+    ->status_is(304)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => undef)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/302/204/0')
+    ->status_is(302)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => 0)
+    ->content_is('');
+  $t->get_ok('/proxy1/redirect/301/204/0')
+    ->status_is(301)
+    ->header_is('X-Mojo-App'     => 'Redirect')
+    ->header_is('Content-Length' => 0)
+    ->content_is('');
   $t->get_ok('/proxy1/res1')->status_is(200)->header_is('X-Mojo-App' => 'One')->content_is('One!');
   $t->get_ok('/proxy1/res2')->status_is(200)->header_is('X-Mojo-App' => 'Two')->content_is('Two!');
-  $t->get_ok('/proxy1/res3')->status_is(200)->header_is('X-Mojo-App' => 'Three')->header_is('X-Mojo-Method' => 'GET')
-    ->header_is('X-Mojo-More' => '')->header_is('X-Mojo-Body' => 0)->content_is('Three!');
+  $t->get_ok('/proxy1/res3')
+    ->status_is(200)
+    ->header_is('X-Mojo-App'    => 'Three')
+    ->header_is('X-Mojo-Method' => 'GET')
+    ->header_is('X-Mojo-More'   => '')
+    ->header_is('X-Mojo-Body'   => 0)
+    ->content_is('Three!');
   $t->get_ok('/proxy1/res4')->status_is(204)->header_is('X-Mojo-App' => 'Four')->content_is('');
   $t->get_ok('/proxy1/res5')->status_is(400)->content_like(qr/Error: /);
   $t->get_ok('/proxy1/res6')->status_is(200)->content_is('Six!');
 };
 
 subtest 'Custom request' => sub {
-  $t->patch_ok('/proxy2/res3')->status_is(200)->header_is('X-Mojo-App' => 'Three')
-    ->header_is('X-Mojo-Method' => 'POST')->header_is('X-Mojo-More' => 'Less')->header_is('X-Mojo-Body' => 6)
+  $t->patch_ok('/proxy2/res3')
+    ->status_is(200)
+    ->header_is('X-Mojo-App'    => 'Three')
+    ->header_is('X-Mojo-Method' => 'POST')
+    ->header_is('X-Mojo-More'   => 'Less')
+    ->header_is('X-Mojo-Body'   => 6)
     ->content_is('Three!');
 };
 
 subtest 'Response modification' => sub {
-  $t->get_ok('/proxy3/GET/res1')->status_is(200)->header_exists_not('X-Mojo-App')->header_is('X-Mojo-Proxy1' => 'just')
-    ->header_is('X-Mojo-Proxy2' => 'works!')->content_is('One!');
-  $t->get_ok('/proxy3/POST/res3')->status_is(200)->header_is('X-Mojo-Method' => 'POST')
-    ->header_exists_not('X-Mojo-App')->header_is('X-Mojo-Proxy1' => 'just')->header_is('X-Mojo-Proxy2' => 'works!')
+  $t->get_ok('/proxy3/GET/res1')
+    ->status_is(200)
+    ->header_exists_not('X-Mojo-App')
+    ->header_is('X-Mojo-Proxy1' => 'just')
+    ->header_is('X-Mojo-Proxy2' => 'works!')
+    ->content_is('One!');
+  $t->get_ok('/proxy3/POST/res3')
+    ->status_is(200)
+    ->header_is('X-Mojo-Method' => 'POST')
+    ->header_exists_not('X-Mojo-App')
+    ->header_is('X-Mojo-Proxy1' => 'just')
+    ->header_is('X-Mojo-Proxy2' => 'works!')
     ->content_is('Three!');
 };
 

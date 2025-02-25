@@ -67,7 +67,10 @@ sub startup {
   $r->any('/exceptional/this_one_dies')->to('exceptional#this_one_dies');
 
   # /exceptional_too/*
-  $r->any('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->any('/this_one_dies')
+  $r->any('/exceptional_too')
+    ->inline(1)
+    ->to('exceptional#this_one_might_die')
+    ->any('/this_one_dies')
     ->to('#this_one_dies');
 
   # /fun/time

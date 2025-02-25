@@ -120,11 +120,13 @@ $r->any('/type/<id:my_num>')->to('foo#bar');
 # /articles/1/delete.json
 my $inline = $r->any('/articles/:id')->inline(1)->to(testcase => 'articles', action => 'load', format => 'html');
 $inline->any('/edit')->to(testcase => 'articles', action => 'edit');
-$inline->any('/delete', [format => ['json']])->to(testcase => 'articles', action => 'delete', format => undef)
+$inline->any('/delete', [format => ['json']])
+  ->to(testcase => 'articles', action => 'delete', format => undef)
   ->name('articles_delete');
 
 # GET /method/get
-$r->any('/method/get', [format => ['html']])->methods('GET')
+$r->any('/method/get', [format => ['html']])
+  ->methods('GET')
   ->to(testcase => 'method', action => 'get', format => undef);
 
 # POST /method/post

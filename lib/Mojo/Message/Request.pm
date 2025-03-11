@@ -73,7 +73,7 @@ sub fix_headers {
 
   # Host
   my $url = $self->url;
-  $headers->host($url->host_port) unless $headers->host;
+  $headers->host($url->host_port // '') unless defined $headers->host;
 
   # Basic authentication
   if ((my $info = $url->userinfo) && !$headers->authorization) {

@@ -58,6 +58,10 @@ C<$chars> to distinguish whether it is encoded bytes or decoded characters in a 
 the value just indicates true or false, C<$c> to denote a L<Mojolicious::Controller> object, or C<$app> to denote the
 L<application|Mojolicious> object.
 
+When the return value of a method is the object it was called on, this will be represented by using the same variable
+name in the example. This does not mean the return value needs to be assigned back to it, but indicates that further
+methods can be L<called in a chain|Mojo::Base/"FLUENT INTERFACES">.
+
 =head1 TUTORIAL
 
 =over 2

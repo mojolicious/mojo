@@ -9,7 +9,7 @@ use Mojo::JSON qw(j);
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
-use Mojo::Util qw(decode);
+use Mojo::Util qw(encode decode);
 
 has content          => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
@@ -132,7 +132,8 @@ sub is_limit_exceeded { !!shift->{limit} }
 sub json {
   my ($self, $pointer) = @_;
   return undef if $self->content->is_multipart;
-  my $data = $self->{json} //= j($self->body);
+  my $charset = $self->body_params->charset || $self->default_charset;
+  my $data    = $self->{json} //= j($charset eq 'UTF-8' ? $self->body : encode('UTF-8', decode($charset, $self->body)));
   return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
 

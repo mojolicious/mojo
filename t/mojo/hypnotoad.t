@@ -61,7 +61,7 @@ subtest 'Hot deployment' => sub {
   my $log    = $dir->child('mojo.log');
   my $port1  = Mojo::IOLoop::Server->generate_port;
   my $port2  = Mojo::IOLoop::Server->generate_port;
-  $script->spurt(<<EOF);
+  $script->spew(<<EOF);
 use Mojolicious::Lite;
 use Mojo::IOLoop;
 
@@ -133,7 +133,7 @@ EOF
     is $tx->res->body, 'Hello Hypnotoad!', 'right content';
   };
 
-  $script->spurt(<<'EOF');
+  $script->spew(<<'EOF');
 use Mojolicious::Lite;
 
 die if $ENV{HYPNOTOAD_PID};
@@ -168,7 +168,7 @@ EOF
     $ua->start($tx => sub { });
     Mojo::IOLoop->one_tick until $tx->req->is_finished;
 
-    $script->spurt(<<EOF);
+    $script->spew(<<EOF);
 use Mojolicious::Lite;
 
 app->log->path('$log');

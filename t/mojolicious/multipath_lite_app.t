@@ -25,17 +25,23 @@ subtest '"templates" directory' => sub {
 };
 
 subtest '"templates2" directory' => sub {
-  $t->get_ok('/fourty_two')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/fourty_two')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("The answer is 42.\n");
 };
 
 subtest '"templates2" directory (variant)' => sub {
-  $t->get_ok('/fourty_two_again')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/fourty_two_again')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("The answer is 43!\n");
 };
 
 subtest '"public2" directory' => sub {
-  $t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/hello.txt')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("Also higher precedence!\n");
 };
 
@@ -44,7 +50,9 @@ subtest '"public" directory' => sub {
 };
 
 subtest '"public2" directory' => sub {
-  $t->get_ok('/hello3.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/hello3.txt')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("Hello Mojo from... ALL GLORY TO THE HYPNOTOAD!\n");
 };
 

@@ -7,7 +7,7 @@ use File::Basename        qw(basename dirname);
 use File::Spec::Functions qw(abs2rel canonpath catfile rel2abs splitdir);
 use File::Temp;
 use Mojo::File qw(curfile path tempdir tempfile);
-use Mojo::Util qw(encode);
+use Mojo::Util qw(decode encode);
 
 subtest 'Constructor' => sub {
   is(Mojo::File->new, canonpath(getcwd), 'same path');
@@ -103,8 +103,8 @@ subtest 'Temporary file' => sub {
   my $file = tempfile(DIR => $dir);
   my $path = "$file";
   ok -f $path, 'file exists';
-  is $file->dirname,              $dir,   'same directory';
-  is $file->spurt('test')->slurp, 'test', 'right result';
+  is $file->dirname,             $dir,   'same directory';
+  is $file->spew('test')->slurp, 'test', 'right result';
   undef $file;
   ok !-f $path, 'file does not exist anymore';
 };
@@ -113,7 +113,7 @@ subtest 'Persistent temporary file' => sub {
   plan skip_all => 'cannot move open file' if $^O eq 'MSWin32';
   my $dir  = tempdir;
   my $file = tempfile(DIR => $dir);
-  $file->spurt('works');
+  $file->spew('works');
   is $file->slurp, 'works', 'right content';
   my $file2 = tempfile(DIR => $dir);
   $file->move_to($file2);
@@ -126,14 +126,14 @@ subtest 'Persistent temporary file' => sub {
 
 subtest 'open' => sub {
   my $file = tempfile;
-  $file->spurt("test\n123\n");
+  $file->spew("test\n123\n");
   my $handle = $file->open('<');
   is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
   $handle = $file->open('r');
   is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
   $handle = $file->open(O_RDONLY);
   is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
-  $file->spurt(encode('UTF-8', '♥'));
+  $file->spew(encode('UTF-8', '♥'));
   $handle = $file->open('<:encoding(UTF-8)');
   is_deeply [<$handle>], ['♥'], 'right structure';
   my $dir = tempdir;
@@ -141,7 +141,7 @@ subtest 'open' => sub {
   like $@, qr/^Can't open file/, 'right error';
   eval { $dir->child('does_not_exist')->slurp };
   like $@, qr/^Can't open file/, 'right error';
-  eval { $dir->child('foo')->make_path->spurt('fail') };
+  eval { $dir->child('foo')->make_path->spew('fail') };
   like $@, qr/^Can't open file/, 'right error';
 };
 
@@ -158,7 +158,7 @@ subtest 'make_path' => sub {
 
 subtest 'remove' => sub {
   my $dir = tempdir;
-  $dir->child('test.txt')->spurt('test!');
+  $dir->child('test.txt')->spew('test!');
   ok -e $dir->child('test.txt'), 'file exists';
   is $dir->child('test.txt')->slurp, 'test!', 'right content';
   ok !-e $dir->child('test.txt')->remove->touch->remove->remove, 'file no longer exists';
@@ -168,19 +168,19 @@ subtest 'remove' => sub {
 
 subtest 'remove_tree' => sub {
   my $dir = tempdir;
-  $dir->child('foo', 'bar')->make_path->child('test.txt')->spurt('test!');
+  $dir->child('foo', 'bar')->make_path->child('test.txt')->spew('test!');
   is $dir->child('foo', 'bar', 'test.txt')->slurp, 'test!', 'right content';
   my $subdir = $dir->child('foo', 'foobar')->make_path;
-  ok -e $subdir->child('bar')->make_path->child('test.txt')->spurt('test'), 'file created';
-  ok -d $subdir->remove_tree({keep_root => 1}),                             'directory still exists';
-  ok !-e $subdir->child('bar'),                                             'children have been removed';
-  ok !-e $dir->child('foo')->remove_tree->to_string,                        'directory has been removed';
+  ok -e $subdir->child('bar')->make_path->child('test.txt')->spew('test'), 'file created';
+  ok -d $subdir->remove_tree({keep_root => 1}),                            'directory still exists';
+  ok !-e $subdir->child('bar'),                                            'children have been removed';
+  ok !-e $dir->child('foo')->remove_tree->to_string,                       'directory has been removed';
 };
 
 subtest 'move_to' => sub {
   my $dir         = tempdir;
   my $destination = $dir->child('dest.txt');
-  my $source      = $dir->child('src.txt')->spurt('works!');
+  my $source      = $dir->child('src.txt')->spew('works!');
   ok -f $source,       'file exists';
   ok !-f $destination, 'file does not exists';
   is $source->move_to($destination)->to_string, $destination, 'same path';
@@ -198,7 +198,7 @@ subtest 'move_to' => sub {
 subtest 'copy_to' => sub {
   my $dir         = tempdir;
   my $destination = $dir->child('dest.txt');
-  my $source      = $dir->child('src.txt')->spurt('works!');
+  my $source      = $dir->child('src.txt')->spew('works!');
   ok -f $source,       'file exists';
   ok !-f $destination, 'file does not exists';
   is $source->copy_to($destination)->to_string, $destination, 'same path';
@@ -223,12 +223,12 @@ subtest 'Change permissions' => sub {
 
 subtest 'stat' => sub {
   my $dir = tempdir;
-  is $dir->child('test.txt')->spurt('1234')->stat->size, 4, 'right size';
+  is $dir->child('test.txt')->spew('1234')->stat->size, 4, 'right size';
 };
 
 subtest 'lstat' => sub {
   my $dir  = tempdir;
-  my $orig = $dir->child('test.txt')->spurt('');
+  my $orig = $dir->child('test.txt')->spew('');
   my $link = $orig->sibling('test.link');
   plan skip_all => 'symlink unimplemented' unless eval { symlink $orig, $link };
   is $link->stat->size,    0, 'target file is empty';
@@ -314,8 +314,8 @@ subtest 'touch' => sub {
   my $file = $dir->child('test.txt');
   ok !-e $file,       'file does not exist';
   ok -e $file->touch, 'file exists';
-  is $file->spurt('test!')->slurp, 'test!', 'right content';
-  is $file->touch->slurp,          'test!', 'right content';
+  is $file->spew('test!')->slurp, 'test!', 'right content';
+  is $file->touch->slurp,         'test!', 'right content';
   my $future = time + 1000;
   utime $future, $future, $file->to_string;
   is $file->stat->mtime,          $future, 'right mtime';
@@ -331,14 +331,33 @@ subtest 'Dangerous paths' => sub {
 
 subtest 'I/O' => sub {
   my $dir  = tempdir;
-  my $file = $dir->child('test.txt')->spurt('just works!');
-  is $file->slurp,                              'just works!', 'right content';
-  is $file->spurt('w', 'orks', ' too!')->slurp, 'works too!',  'right content';
+  my $file = $dir->child('test.txt')->spew('just works!');
+  is $file->slurp, 'just works!', 'right content';
   {
     no warnings 'redefine';
     local *IO::Handle::syswrite = sub { $! = 0; 5 };
-    eval { $file->spurt("just\nworks!") };
+    eval { $file->spew("just\nworks!") };
     like $@, qr/Can't write to file ".*/, 'right error';
+  }
+};
+
+subtest 'I/O with encoding' => sub {
+  my $dir  = tempdir;
+  my $file = $dir->child('test.txt')->spew('♥1', 'UTF-8');
+  is $file->slurp('UTF-8'),            '♥1',         'right content';
+  is decode('UTF-8', $file->slurp()),  '♥1',         'right content';
+  is $file->spew('works too!')->slurp, 'works too!', 'right content';
+
+  subtest 'I/O with manual encoding' => sub {
+    $file->spew(encode('UTF-8', '♥1'));
+    is $file->slurp('UTF-8'),           '♥1', 'right content';
+    is decode('UTF-8', $file->slurp()), '♥1', 'right content';
+  };
+
+  {
+    local $@;
+    eval { $file->spew('♥1') };
+    like $@, qr/Wide character/, 'right error';
   }
 };
 

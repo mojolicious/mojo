@@ -93,6 +93,37 @@ subtest 'Parse Apache CGI environment variables and body' => sub {
     'right absolute URL';
 };
 
+subtest 'Parse CGI environment with maximum message size' => sub {
+  my $req = Mojo::Message::Request->new;
+  $req->max_message_size(10);
+  $req->parse({
+    CONTENT_LENGTH  => 26,
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
+    HTTP_DNT        => 1,
+    PATH_INFO       => '/test/index.cgi/foo/bar',
+    QUERY_STRING    => 'lalala=23&bar=baz',
+    REQUEST_METHOD  => 'POST',
+    SCRIPT_NAME     => '/test/index.cgi',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.0'
+  });
+  $req->parse('abcdefghijklm');
+  $req->parse('nopqrstuvwxyz');
+  ok $req->is_finished,       'request is finished';
+  ok $req->is_limit_exceeded, 'limit exceeded';
+  is $req->method,          'POST',              'right method';
+  is $req->url->path,       'foo/bar',           'right path';
+  is $req->url->base->path, '/test/index.cgi/',  'right base path';
+  is $req->url->base->host, 'localhost',         'right base host';
+  is $req->url->base->port, 8080,                'right base port';
+  is $req->url->query,      'lalala=23&bar=baz', 'right query';
+  is $req->version,         '1.0',               'right version';
+  is $req->headers->dnt,    1,                   'right "DNT" value';
+  is $req->body,            'abcdefghijklm',     'right content';
+  is $req->url->to_abs->to_string, 'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
+    'right absolute URL';
+};
+
 subtest 'Parse Apache CGI environment variables and body (file storage)' => sub {
   local $ENV{MOJO_MAX_MEMORY_SIZE} = 10;
   my $req = Mojo::Message::Request->new;

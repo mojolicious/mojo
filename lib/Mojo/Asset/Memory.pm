@@ -43,7 +43,7 @@ sub get_chunk {
   return substr shift->{content} // '', $offset, $max;
 }
 
-sub move_to { path($_[1])->spurt($_[0]{content} // '') and return $_[0] }
+sub move_to { path($_[1])->spew($_[0]{content} // '') and return $_[0] }
 
 sub size { length(shift->{content} // '') }
 

@@ -218,6 +218,14 @@ subtest 'Encode number' => sub {
   is $bytes, '23.3', 'encode 23.3';
 };
 
+subtest 'Encode boolean' => sub {
+  plan skip_all => 'No core boolean support' if !defined &builtin::is_bool;
+  my $bytes = encode_json [!!1];
+  is $bytes, '[true]', 'encode [!!1]';
+  $bytes = encode_json [!!0];
+  is $bytes, '[false]', 'encode [!!0]';
+};
+
 subtest 'Faihu roundtrip' => sub {
   my $bytes = j(["\x{10346}"]);
   is b($bytes)->decode('UTF-8'), "[\"\x{10346}\"]", 'encode ["\x{10346}"]';

@@ -356,8 +356,10 @@ subtest 'Promises' => sub {
   $ua->websocket_p('/foo')->then(sub { $result = 'test failed' })->catch(sub { $result = shift })->wait;
   is $result, 'WebSocket handshake failed', 'right result';
   $result = undef;
-  $ua->websocket_p($ua->server->url->to_abs->scheme('wsss'))->then(sub { $result = 'test failed' })
-    ->catch(sub { $result = shift })->wait;
+  $ua->websocket_p($ua->server->url->to_abs->scheme('wsss'))
+    ->then(sub { $result  = 'test failed' })
+    ->catch(sub { $result = shift })
+    ->wait;
   is $result, 'Unsupported protocol: wsss', 'right result';
 };
 

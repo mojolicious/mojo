@@ -39,7 +39,7 @@ sub ensure_pid_file {
   return if -e (my $file = path($self->pid_file));
 
   # Create PID file
-  if (my $err = eval { $file->spurt("$pid\n")->chmod(0644) } ? undef : $@) {
+  if (my $err = eval { $file->spew("$pid\n")->chmod(0644) } ? undef : $@) {
     $self->app->log->error(qq{Can't create process id file "$file": $err})
       and die qq{Can't create process id file "$file": $err};
   }

@@ -27,8 +27,8 @@ frameworks, it is more of a web toolkit and can even be used as the foundation f
 We are optimizing L<Mojolicious> for user-friendliness and development speed, without compromises. While there are no
 rules in L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently discourage adding non-optional
 ones in favor of a faster and more painless installation process. And we do in fact already use several optional CPAN
-modules such as L<Cpanel::JSON::XS>, L<EV>, L<IO::Socket::Socks>, L<IO::Socket::SSL>, L<Net::DNS::Native>, L<Plack> and
-L<Role::Tiny> to provide advanced functionality if possible.
+modules such as L<Cpanel::JSON::XS>, L<CryptX>, L<EV>, L<IO::Socket::Socks>, L<IO::Socket::SSL>, L<Net::DNS::Native>,
+L<Plack> and L<Role::Tiny> to provide advanced functionality if possible.
 
 =head2 Why reinvent wheels?
 
@@ -54,8 +54,7 @@ already have done in the past.
 
 =head2 Where can I discuss my patches for Mojolicious?
 
-We'd love to discuss your contributions to L<Mojolicious> on L<Matrix|https://matrix.to/#/#mojo:matrix.org> or
-L<IRC|https://web.libera.chat/#mojo>.
+We'd love to discuss your contributions to L<Mojolicious> on L<IRC|https://web.libera.chat/#mojo>.
 
 =head2 Which versions of Perl are supported by Mojolicious?
 
@@ -244,7 +243,6 @@ authors.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org>, on L<Matrix|https://matrix.to/#/#mojo:matrix.org>, or
-L<IRC|https://web.libera.chat/#mojo>.
+L<Forum|https://forum.mojolicious.org>, or on L<IRC|https://web.libera.chat/#mojo>.
 
 =cut

@@ -12,6 +12,12 @@ use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
   ? 0
   : !!eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 };
 
+use constant CORE_BOOLS => defined &builtin::is_bool;
+
+BEGIN {
+  warnings->unimport('experimental::builtin') if CORE_BOOLS;
+}
+
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
 # Escaped special character map
@@ -249,6 +255,9 @@ sub _encode_value {
 
   # Null
   return 'null' unless defined $value;
+
+  # Boolean
+  return $value ? 'true' : 'false' if CORE_BOOLS && builtin::is_bool($value);
 
   # Number
   no warnings 'numeric';

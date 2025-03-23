@@ -194,7 +194,9 @@ $t->reset_session;
 $t->get_ok('/multi')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is("\n\n\n\n\n\n\n\n");
 
 # Multiple cookies with same name (again)
-$t->get_ok('/multi')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/multi')
+  ->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("two\nthree\none\ntwo\nfive\nsix\nfour\nfive\n");
 
 # Missing action behind bridge
@@ -213,15 +215,25 @@ undef $logs;
 $t->get_ok('/suspended?ok=0')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('stopped!');
 
 # Authenticated with header
-$t->get_ok('/with_under' => {'X-Bender' => 'Rodriguez'})->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)->content_is('Unders are cool!');
+$t->get_ok('/with_under' => {'X-Bender' => 'Rodriguez'})
+  ->status_is(200)
+  ->header_is(Server    => 'Mojolicious (Perl)')
+  ->header_is('X-Under' => '23, 24')
+  ->header_like('X-Under' => qr/23, 24/)
+  ->content_is('Unders are cool!');
 
 # Authenticated with header too
-$t->get_ok('/with_under_too' => {'X-Bender' => 'Rodriguez'})->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)->content_is('Unders are cool too!');
+$t->get_ok('/with_under_too' => {'X-Bender' => 'Rodriguez'})
+  ->status_is(200)
+  ->header_is(Server    => 'Mojolicious (Perl)')
+  ->header_is('X-Under' => '23, 24')
+  ->header_like('X-Under' => qr/23, 24/)
+  ->content_is('Unders are cool too!');
 
 # Not authenticated with header
-$t->get_ok('/with_under_too')->status_is(401)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/with_under_too')
+  ->status_is(401)
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Unauthorized/);
 
 # Not authenticated with parameter
@@ -229,14 +241,18 @@ $t->get_ok('/param_auth')->status_is(200)->header_is(Server => 'Mojolicious (Per
 is $stash->{_name}, undef, 'no "_name" value';
 
 # Authenticated with parameter
-$t->get_ok('/param_auth?name=Bender')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/param_auth?name=Bender')
+  ->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("Bender!\n");
 
 # Not authenticated with parameter
 $t->get_ok('/param_auth/too')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is("Not Bender!\n");
 
 # Authenticated with parameter too
-$t->get_ok('/param_auth/too?name=Bender')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/param_auth/too?name=Bender')
+  ->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('You could be Bender too!');
 
 # No cookies, session or flash
@@ -246,7 +262,8 @@ is $stash->{_name}, 'stash', 'right "_name" value';
 
 # Cookies, session and flash
 $logs = $t->app->log->capture('trace');
-$t->get_ok('/bridge2stash')->status_is(200)
+$t->get_ok('/bridge2stash')
+  ->status_is(200)
   ->content_is("stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 like $logs, qr/Cookie "foo" is not signed/,     'right message';
 like $logs, qr/Cookie "bad" has bad signature/, 'right message';
@@ -264,7 +281,8 @@ is $t->tx->res->cookie('mojolicious')->samesite, undef, 'no SameSite value';
 $t->reset_session;
 my $session = b("☃☃☃☃☃")->encode->b64_encode('');
 my $hmac    = $session->clone->hmac_sha1_sum($t->app->secrets->[0]);
-$t->get_ok('/bridge2stash' => {Cookie => "mojolicious=$session--$hmac"})->status_is(200)
+$t->get_ok('/bridge2stash' => {Cookie => "mojolicious=$session--$hmac"})
+  ->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
 
 # Not collecting cookies
@@ -283,12 +301,14 @@ $t->get_ok('/mojo/logo-white.png')->status_is(200);
 $t->get_ok('/mojo/logo-white.png')->status_is(200);
 
 # With cookies, session and flash again
-$t->get_ok('/bridge2stash')->status_is(200)
+$t->get_ok('/bridge2stash')
+  ->status_is(200)
   ->content_is("stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 
 # With cookies and session but no flash (rotating secrets)
 $t->app->secrets(['test2', 'test1']);
-$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
+$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})
+  ->status_is(200)
   ->content_is("stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
 ok $t->tx->res->cookie('mojolicious')->expires < time, 'session cookie expires';
 
@@ -306,20 +326,26 @@ $t->get_ok('/late/session')->status_is(200)->content_is('works!');
 $t->get_ok('/late/session')->status_is(200)->content_is('works!');
 
 # Counter
-$t->get_ok('/with/under/count' => {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->header_is('X-Under' => 1)->content_is("counter\n");
+$t->get_ok('/with/under/count' => {'X-Bender' => 'Rodriguez'})
+  ->status_is(200)
+  ->header_is(Server    => 'Mojolicious (Perl)')
+  ->header_is('X-Under' => 1)
+  ->content_is("counter\n");
 is $stash->{_name}, undef, 'no "_name" value';
 
 # Cookies, session and no flash again
-$t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
+$t->get_ok('/bridge2stash' => {'X-Flash' => 1})
+  ->status_is(200)
   ->content_is("stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
 
 # With cookies, session and flash
-$t->get_ok('/bridge2stash')->status_is(200)
+$t->get_ok('/bridge2stash')
+  ->status_is(200)
   ->content_is("stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 
 # With cookies and session but no flash
-$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
+$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})
+  ->status_is(200)
   ->content_is("stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
 
 # Prefix
@@ -362,7 +388,9 @@ $t->get_ok('/authgroup?ok=1')->status_is(200)->content_type_is('text/html;charse
 $t->get_ok('/authgroup')->status_is(200)->content_type_is('text/html;charset=UTF-8')->content_is("You're not ok.");
 
 # Authenticated by group (with format)
-$t->get_ok('/authgroup.txt?ok=1')->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+$t->get_ok('/authgroup.txt?ok=1')
+  ->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_is("You're ok.");
 
 # Not authenticated by group (with format)
@@ -372,7 +400,9 @@ $t->get_ok('/authgroup.txt')->status_is(200)->content_type_is('text/plain;charse
 $t->get_ok('/noauthgroup')->status_is(200)->content_is("Whatever one.\n");
 
 # Disabled format detection
-$t->get_ok('/no_format')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+$t->get_ok('/no_format')
+  ->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
   ->content_is('No format detection.');
 
 # Invalid format
@@ -382,11 +412,15 @@ $t->get_ok('/no_format.txt')->status_is(404)->content_type_is('text/html;charset
 $t->get_ok('/some_formats')->status_is(404)->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Format "txt" has been detected
-$t->get_ok('/some_formats.txt')->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+$t->get_ok('/some_formats.txt')
+  ->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_is('Some format detection.');
 
 # Format "json" has been detected
-$t->get_ok('/some_formats.json')->status_is(200)->content_type_is('application/json;charset=UTF-8')
+$t->get_ok('/some_formats.json')
+  ->status_is(200)
+  ->content_type_is('application/json;charset=UTF-8')
   ->content_is('Some format detection.');
 
 # Invalid format
@@ -396,7 +430,9 @@ $t->get_ok('/some_formats.xml')->status_is(404)->content_type_is('text/html;char
 $t->get_ok('/no_real_format')->status_is(404)->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # No format detected
-$t->get_ok('/no_real_format.xml')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+$t->get_ok('/no_real_format.xml')
+  ->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
   ->content_is('No real format.');
 
 # Invalid format

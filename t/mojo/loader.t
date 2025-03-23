@@ -76,8 +76,8 @@ subtest 'Search packages' => sub {
 };
 
 subtest 'Load' => sub {
-  ok !load_class("Mojo'LoaderTest::A"), 'loaded successfully';
-  ok !!Mojo::LoaderTest::A->can('new'), 'loaded successfully';
+  ok !load_class('Mojo::LoaderTest::A'), 'loaded successfully';
+  ok !!Mojo::LoaderTest::A->can('new'),  'loaded successfully';
   load_class $_ for find_modules 'Mojo::LoaderTest';
   ok !!Mojo::LoaderTest::B->can('new'), 'loaded successfully';
   ok !!Mojo::LoaderTest::C->can('new'), 'loaded successfully';

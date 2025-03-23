@@ -127,7 +127,9 @@ subtest 'Normal route' => sub {
 };
 
 subtest 'Normal static file' => sub {
-  $t->get_ok('/test.txt')->status_is(200)->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
+  $t->get_ok('/test.txt')
+    ->status_is(200)
+    ->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
     ->content_is("Normal static file!\n");
 };
 
@@ -144,22 +146,30 @@ subtest 'Custom dispatcher' => sub {
 };
 
 subtest 'Static file' => sub {
-  $t->get_ok('/res.txt')->status_is(200)->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
+  $t->get_ok('/res.txt')
+    ->status_is(200)
+    ->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
     ->content_is("Static response!\n");
 };
 
 subtest ' Custom response' => sub {
-  $t->get_ok('/res.txt?route=1')->status_is(202)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+  $t->get_ok('/res.txt?route=1')
+    ->status_is(202)
+    ->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
     ->content_is('Custom response!');
 };
 
 subtest 'Conditional response' => sub {
-  $t->get_ok('/res.txt?route=1&res=1')->status_is(201)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+  $t->get_ok('/res.txt?route=1&res=1')
+    ->status_is(201)
+    ->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
     ->content_is('Conditional response!');
 };
 
 subtest 'Another custom dispatcher' => sub {
-  $t->get_ok('/custom_too')->status_is(200)->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+  $t->get_ok('/custom_too')
+    ->status_is(200)
+    ->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
     ->content_is('this works too');
 };
 

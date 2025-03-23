@@ -1350,7 +1350,7 @@ Sending a streaming request is almost just as easy.
 
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->build_tx(GET => 'http://example.com');
+  my $tx = $ua->build_tx(POST => 'http://example.com');
 
   # Prepare body
   my $body = 'Hello World!';
@@ -1918,7 +1918,6 @@ authors.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org>, on L<Matrix|https://matrix.to/#/#mojo:matrix.org>, or
-L<IRC|https://web.libera.chat/#mojo>.
+L<Forum|https://forum.mojolicious.org>, or on L<IRC|https://web.libera.chat/#mojo>.
 
 =cut

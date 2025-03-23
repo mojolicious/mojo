@@ -260,7 +260,8 @@ subtest 'Stream from myapp.pl with Unicode prefix' => sub {
 };
 
 subtest 'URL from myapp.pl with Unicode prefix' => sub {
-  $t->get_ok('/x/♥/url/☃')->status_is(200)
+  $t->get_ok('/x/♥/url/☃')
+    ->status_is(200)
     ->content_is('/x/%E2%99%A5/url/%E2%98%83.json -> /x/%E2%99%A5/%E2%98%83/stream!');
 };
 
@@ -326,7 +327,9 @@ EOF
 };
 
 subtest 'Host from myapp.pl with domain' => sub {
-  $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)->header_is('X-Message' => 'it works!')
+  $t->get_ok('/host' => {Host => 'mojolicious.org'})
+    ->status_is(200)
+    ->header_is('X-Message' => 'it works!')
     ->content_is('mojolicious.org');
 };
 
@@ -344,7 +347,9 @@ EOF
 };
 
 subtest 'Host from myapp.pl with domain again' => sub {
-  $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)->header_is('X-Message' => 'it works!')
+  $t->get_ok('/host' => {Host => 'mojolicious.org'})
+    ->status_is(200)
+    ->header_is('X-Message' => 'it works!')
     ->content_is('mojolicious.org');
 };
 
@@ -362,17 +367,23 @@ EOF
 };
 
 subtest 'Host from myapp.pl with wildcard domain' => sub {
-  $t->get_ok('/host' => {Host => 'ExAmPlE.CoM'})->status_is(200)->header_is('X-Message' => 'it works!')
+  $t->get_ok('/host' => {Host => 'ExAmPlE.CoM'})
+    ->status_is(200)
+    ->header_is('X-Message' => 'it works!')
     ->content_is('ExAmPlE.CoM');
 };
 
 subtest 'Host from myapp.pl with wildcard domain again' => sub {
-  $t->get_ok('/host' => {Host => 'www.example.com'})->status_is(200)->header_is('X-Message' => 'it works!')
+  $t->get_ok('/host' => {Host => 'www.example.com'})
+    ->status_is(200)
+    ->header_is('X-Message' => 'it works!')
     ->content_is('www.example.com');
 };
 
 subtest 'Host from myapp.pl with wildcard domain again' => sub {
-  $t->get_ok('/host' => {Host => 'foo.bar.example.com'})->status_is(200)->header_is('X-Message' => 'it works!')
+  $t->get_ok('/host' => {Host => 'foo.bar.example.com'})
+    ->status_is(200)
+    ->header_is('X-Message' => 'it works!')
     ->content_is('foo.bar.example.com');
 };
 
@@ -390,7 +401,9 @@ EOF
 };
 
 subtest 'Host from myapp.pl with wildcard domain and Unicode prefix' => sub {
-  $t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})->status_is(200)->header_is('X-Message' => 'it works!')
+  $t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})
+    ->status_is(200)
+    ->header_is('X-Message' => 'it works!')
     ->content_is('foo-bar.de');
 };
 
@@ -399,7 +412,9 @@ subtest 'Echo from myapp.pl with wildcard domain and Unicode prefix' => sub {
 };
 
 subtest 'Host from myapp.pl with wildcard domain and Unicode prefix again' => sub {
-  $t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})->status_is(200)->header_is('X-Message' => 'it works!')
+  $t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})
+    ->status_is(200)
+    ->header_is('X-Message' => 'it works!')
     ->content_is('www.foo-bar.de');
 };
 
@@ -424,8 +439,10 @@ subtest 'Another invalid domain' => sub {
 };
 
 subtest 'Embedded WebSocket' => sub {
-  $t->websocket_ok('/x/♥/url_for')->send_ok('ws_test')
-    ->message_ok->message_like(qr!^ws://127\.0\.0\.1:\d+/x/%E2%99%A5/url_for$!)->send_ok('index')
+  $t->websocket_ok('/x/♥/url_for')
+    ->send_ok('ws_test')
+    ->message_ok->message_like(qr!^ws://127\.0\.0\.1:\d+/x/%E2%99%A5/url_for$!)
+    ->send_ok('index')
     ->message_ok->message_like(qr!^http://127\.0\.0\.1:\d+/x/%E2%99%A5$!)->finish_ok;
 };
 

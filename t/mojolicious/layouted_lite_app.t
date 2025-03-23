@@ -118,17 +118,23 @@ subtest '"0" content reassignment' => sub {
 };
 
 subtest 'Template with layout' => sub {
-  $t->get_ok('/works')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/works')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_is("DefaultJust worksThis <template> just works!\n\n");
 };
 
 subtest 'Different layout' => sub {
-  $t->get_ok('/works?green=1')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/works?green=1')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_is("GreenJust worksThis <template> just works!\n\n");
 };
 
 subtest 'Extended' => sub {
-  $t->get_ok('/works?blue=1')->status_is(200)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/works?blue=1')
+    ->status_is(200)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_is("BlueJust worksThis <template> just works!\n\n");
 };
 
@@ -149,7 +155,8 @@ subtest 'Extended missing template' => sub {
 };
 
 subtest 'Extended missing template (not found)' => sub {
-  $t->get_ok('/doesreallynotexist?green=1')->status_is(404)
+  $t->get_ok('/doesreallynotexist?green=1')
+    ->status_is(404)
     ->content_is("GreenNot found happenedNot found happened!\n\n");
 };
 
@@ -170,32 +177,46 @@ subtest 'Extended dead action' => sub {
 };
 
 subtest 'Template inheritance' => sub {
-  $t->get_ok('/template_inheritance')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/template_inheritance')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("<title>Works!</title>\n<br>\nSidebar!\nHello World!\n\nDefault footer!\n");
 };
 
 subtest 'Just the layout' => sub {
-  $t->get_ok('/layout_without_inheritance')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/layout_without_inheritance')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("<title></title>\nDefault header!\nDefault sidebar!\n\nDefault footer!\n");
 };
 
 subtest 'Double inheritance' => sub {
-  $t->get_ok('/double_inheritance')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/double_inheritance')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n" . "Hello World!\n\nDefault footer!\n");
 };
 
 subtest 'Triple inheritance' => sub {
-  $t->get_ok('/triple_inheritance')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/triple_inheritance')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is(
     "<title>Works!</title>\n<br>\nSidebar too!\n" . "New <content>.\nShared content!\n\nDefault footer!\n");
 };
 
 subtest 'Mixed inheritance (with layout)' => sub {
-  $t->get_ok('/mixed_inheritance/first')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/mixed_inheritance/first')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("Default\n  Default header\nStuff\n\n  Default footer\n\n");
-  $t->get_ok('/mixed_inheritance/second')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/mixed_inheritance/second')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("Green  New header\nStuff\n\n  Default footer\n\n");
-  $t->get_ok('/mixed_inheritance/third')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/mixed_inheritance/third')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("Default  New header\nStuff\n  New footer\n\n");
 };
 
@@ -204,49 +225,71 @@ subtest 'Template from plugin' => sub {
 };
 
 subtest 'Nested included templates' => sub {
-  $t->get_ok('/nested-includes')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/nested-includes')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("layouted Nested <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 };
 
 subtest 'Included template with localized stash values' => sub {
-  $t->get_ok('/localized/include')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->content_type_is('text/html;charset=UTF-8')->content_is("lmth\n\noof\n\n\n123 2dezilacol\noof 1dezilacol");
+  $t->get_ok('/localized/include')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->content_type_is('text/html;charset=UTF-8')
+    ->content_is("lmth\n\noof\n\n\n123 2dezilacol\noof 1dezilacol");
 };
 
 subtest 'Filter' => sub {
-  $t->get_ok('/plain/reverse')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-    ->content_type_is('application/octet-stream')->content_is('oof!olleH');
+  $t->get_ok('/plain/reverse')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
+    ->content_type_is('application/octet-stream')
+    ->content_is('oof!olleH');
 };
 
 subtest 'Layout in render call' => sub {
-  $t->get_ok('/outerlayout')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/outerlayout')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("layouted <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 };
 
 subtest 'Extends in render call' => sub {
-  $t->get_ok('/outerextends')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/outerextends')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("layouted <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 };
 
 subtest 'Layout in route' => sub {
-  $t->get_ok('/outerlayouttwo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/outerlayouttwo')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("layouted <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 };
 
 subtest 'Included template with layout' => sub {
-  $t->get_ok('/outerinnerlayout')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/outerinnerlayout')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 };
 
 subtest 'Layout with block' => sub {
-  $t->get_ok('/withblocklayout')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/withblocklayout')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("\nwith_block \n\nOne: one\nTwo: two\n\n");
 };
 
 subtest 'Content blocks' => sub {
-  $t->get_ok('/content_for')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/content_for')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("Content!This\n\nseems\nto\nHello    World!\n\nwork!\n\nShared content!\n\n");
-  $t->get_ok('/content_with')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  $t->get_ok('/content_with')
+    ->status_is(200)
+    ->header_is(Server => 'Mojolicious (Perl)')
     ->content_is("Default\n\nSomething <b>else</b>!\n\n\n<br>Hello World!\n\n");
 };
 
@@ -263,22 +306,30 @@ subtest '"0" data' => sub {
 };
 
 subtest 'Variants (desktop)' => sub {
-  $t->get_ok('/variants.txt')->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/variants.txt')
+    ->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Variant: Desktop!');
 };
 
 subtest 'Variants (tablet)' => sub {
-  $t->get_ok('/variants.txt?device=tablet')->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/variants.txt?device=tablet')
+    ->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Variant: Tablet!');
 };
 
 subtest 'Variants (desktop fallback)' => sub {
-  $t->get_ok('/variants.txt?device=phone')->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/variants.txt?device=phone')
+    ->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Variant: Desktop!');
 };
 
 subtest 'Variants ("0")' => sub {
-  $t->get_ok('/variants.txt?device=0')->status_is(200)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/variants.txt?device=0')
+    ->status_is(200)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Another variant: Desktop!');
 };
 

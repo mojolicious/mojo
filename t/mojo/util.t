@@ -8,11 +8,11 @@ use Mojo::ByteStream qw(b);
 use Mojo::DeprecationTest;
 use Sub::Util qw(subname);
 
-use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode dumper encode),
-  qw(extract_usage getopt gunzip gzip header_params hmac_sha1_sum html_unescape html_attr_unescape humanize_bytes),
-  qw(md5_bytes md5_sum monkey_patch network_contains punycode_decode punycode_encode quote scope_guard secure_compare),
-  qw(sha1_bytes sha1_sum slugify split_cookie_header split_header steady_time tablify term_escape trim unindent),
-  qw(unquote url_escape url_unescape xml_escape xor_encode);
+use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode decrypt_cookie dumper),
+  qw(encode encrypt_cookie extract_usage generate_secret getopt gunzip gzip header_params hmac_sha1_sum html_unescape),
+  qw(html_attr_unescape humanize_bytes md5_bytes md5_sum monkey_patch network_contains punycode_decode),
+  qw(punycode_encode quote scope_guard secure_compare sha1_bytes sha1_sum slugify split_cookie_header split_header),
+  qw(steady_time tablify term_escape trim unindent unquote url_escape url_unescape xml_escape xor_encode);
 
 subtest 'camelize' => sub {
   is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -637,23 +637,44 @@ subtest 'scope_guard' => sub {
 };
 
 subtest 'humanize_bytes' => sub {
-  is humanize_bytes(0),                         '0B',      'zero Bytes';
-  is humanize_bytes(1),                         '1B',      'one Byte';
+  is humanize_bytes( 0),                        '0B',      'zero Bytes';
+  is humanize_bytes( 1),                        '1B',      'one Byte';
   is humanize_bytes(-1023),                     '-1023B',  'negative Bytes';
-  is humanize_bytes(1024),                      '1KiB',    'one KiB';
-  is humanize_bytes(1025),                      '1KiB',    'one KiB';
+  is humanize_bytes( 1024),                     '1KiB',    'one KiB';
+  is humanize_bytes( 1025),                     '1KiB',    'one KiB';
   is humanize_bytes(1024 * 1024),               '1MiB',    'one MiB';
   is humanize_bytes(1024 * 1024 * 1024),        '1GiB',    'one GiB';
   is humanize_bytes(1024 * 1024 * 1024 * 1024), '1TiB',    'one TiB';
-  is humanize_bytes(3000),                      '2.9KiB',  'almost 3KiB';
+  is humanize_bytes( 3000),                     '2.9KiB',  'almost 3KiB';
   is humanize_bytes(-3000),                     '-2.9KiB', 'almost -3KiB';
-  is humanize_bytes(13443399680),               '13GiB',   'two digits GiB';
-  is humanize_bytes(8007188480),                '7.5GiB',  'smaller GiB';
+  is humanize_bytes( 13443399680),              '13GiB',   'two digits GiB';
+  is humanize_bytes( 8007188480),               '7.5GiB',  'smaller GiB';
   is humanize_bytes(-8007188480),               '-7.5GiB', 'negative smaller GiB';
   is humanize_bytes(-1099511627776),            '-1TiB',   'negative smaller TiB';
-  is humanize_bytes(717946880),                 '685MiB',  'large MiB';
+  is humanize_bytes( 717946880),                '685MiB',  'large MiB';
   is humanize_bytes(-717946880),                '-685MiB', 'large negative MiB';
-  is humanize_bytes(245760),                    '240KiB',  'less than a MiB';
+  is humanize_bytes( 245760),                   '240KiB',  'less than a MiB';
+};
+
+subtest 'encrypt_cookie/decrypt_cookie' => sub {
+  plan skip_all => 'CryptX required!' unless Mojo::Util->CRYPTX;
+
+  subtest 'Roundtrip' => sub {
+    my $encrypted = encrypt_cookie('test', 'foo', 'salt');
+    isnt $encrypted,                              'test', 'encrypted';
+    is decrypt_cookie($encrypted, 'foo', 'salt'), 'test', 'decrypted';
+  };
+
+  is decrypt_cookie('test',                                               'foo', 'salt'), undef,  'not encrypted';
+  is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTM-v7Qm+Xgoi1t94GLSHYGkaW==', 'foo', 'salt'), undef,  'wrong tag';
+  is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTm-v7Qm+Xgoi1t94GLSHYGkaw==', 'foo', 'salt'), undef,  'wrong random bytes';
+  is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTM-v7Qm+Xgoi1t94GLSHYGkaw==', 'bar', 'salt'), undef,  'wrong password';
+  is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTM-v7Qm+Xgoi1t94GLSHYGkaw==', 'foo', 'bar'),  undef,  'wrong salt';
+  is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTM-v7Qm+Xgoi1t94GLSHYGkaw==', 'foo', 'salt'), 'test', 'decrypted';
+};
+
+subtest 'generate_secret' => sub {
+  like generate_secret, qr/^[A-Za-z0-9_-]{32,}$/, 'right format';
 };
 
 subtest 'Hide DATA usage from error messages' => sub {

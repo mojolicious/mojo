@@ -13,10 +13,10 @@ subtest 'File asset' => sub {
   is $file->mtime, (stat $file->handle)[9], 'right mtime';
   is $file->slurp,                          '', 'file is empty';
   $file->add_chunk('abc');
-  is $file->contains('abc'), 0,  '"abc" at position 0';
-  is $file->contains('bc'),  1,  '"bc" at position 1';
+  is $file->contains('abc'),  0, '"abc" at position 0';
+  is $file->contains('bc'),   1, '"bc" at position 1';
   is $file->contains('db'),  -1, 'does not contain "db"';
-  is $file->size,            3,  'right size';
+  is $file->size,             3, 'right size';
   is $file->mtime, (stat $file->handle)[9], 'right mtime';
   is $file->to_file,                        $file, 'same object';
 
@@ -29,10 +29,10 @@ subtest 'File asset' => sub {
 subtest 'Memory asset' => sub {
   my $mem = Mojo::Asset::Memory->new;
   $mem->add_chunk('abc');
-  is $mem->contains('abc'), 0,                               '"abc" at position 0';
-  is $mem->contains('bc'),  1,                               '"bc" at position 1';
+  is $mem->contains('abc'),  0,                              '"abc" at position 0';
+  is $mem->contains('bc'),   1,                              '"bc" at position 1';
   is $mem->contains('db'),  -1,                              'does not contain "db"';
-  is $mem->size,            3,                               'right size';
+  is $mem->size,             3,                              'right size';
   is $mem->mtime,           $^T,                             'right mtime';
   is $mem->mtime,           Mojo::Asset::Memory->new->mtime, 'same mtime';
   my $mtime = $mem->mtime;
@@ -72,9 +72,9 @@ subtest 'File asset range support (a[bcdefabc])' => sub {
   my $file = Mojo::Asset::File->new(start_range => 1);
   ok $file->is_range, 'has range';
   $file->add_chunk('abcdefabc');
-  is $file->contains('bcdef'), 0,  '"bcdef" at position 0';
-  is $file->contains('cdef'),  1,  '"cdef" at position 1';
-  is $file->contains('abc'),   5,  '"abc" at position 5';
+  is $file->contains('bcdef'),  0, '"bcdef" at position 0';
+  is $file->contains('cdef'),   1, '"cdef" at position 1';
+  is $file->contains('abc'),    5, '"abc" at position 5';
   is $file->contains('db'),    -1, 'does not contain "db"';
 };
 
@@ -82,9 +82,9 @@ subtest 'Memory asset range support (a[bcdefabc])' => sub {
   my $mem = Mojo::Asset::Memory->new(start_range => 1);
   ok $mem->is_range, 'has range';
   $mem->add_chunk('abcdefabc');
-  is $mem->contains('bcdef'), 0,  '"bcdef" at position 0';
-  is $mem->contains('cdef'),  1,  '"cdef" at position 1';
-  is $mem->contains('abc'),   5,  '"abc" at position 5';
+  is $mem->contains('bcdef'),  0, '"bcdef" at position 0';
+  is $mem->contains('cdef'),   1, '"cdef" at position 1';
+  is $mem->contains('abc'),    5, '"abc" at position 5';
   is $mem->contains('db'),    -1, 'does not contain "db"';
 };
 
@@ -92,10 +92,10 @@ subtest 'File asset range support (ab[cdefghi]jk)' => sub {
   my $file = Mojo::Asset::File->new(start_range => 2, end_range => 8);
   ok $file->is_range, 'has range';
   $file->add_chunk('abcdefghijk');
-  is $file->contains('cdefghi'), 0,         '"cdefghi" at position 0';
-  is $file->contains('fghi'),    3,         '"fghi" at position 3';
-  is $file->contains('f'),       3,         '"f" at position 3';
-  is $file->contains('hi'),      5,         '"hi" at position 5';
+  is $file->contains('cdefghi'),  0,        '"cdefghi" at position 0';
+  is $file->contains('fghi'),     3,        '"fghi" at position 3';
+  is $file->contains('f'),        3,        '"f" at position 3';
+  is $file->contains('hi'),       5,        '"hi" at position 5';
   is $file->contains('db'),      -1,        'does not contain "db"';
   is $file->get_chunk(0),        'cdefghi', 'chunk from position 0';
   is $file->get_chunk(1),        'defghi',  'chunk from position 1';
@@ -110,10 +110,10 @@ subtest 'Memory asset range support (ab[cdefghi]jk)' => sub {
   my $mem = Mojo::Asset::Memory->new(start_range => 2, end_range => 8);
   ok $mem->is_range, 'has range';
   $mem->add_chunk('abcdefghijk');
-  is $mem->contains('cdefghi'), 0,         '"cdefghi" at position 0';
-  is $mem->contains('fghi'),    3,         '"fghi" at position 3';
-  is $mem->contains('f'),       3,         '"f" at position 3';
-  is $mem->contains('hi'),      5,         '"hi" at position 5';
+  is $mem->contains('cdefghi'),  0,        '"cdefghi" at position 0';
+  is $mem->contains('fghi'),     3,        '"fghi" at position 3';
+  is $mem->contains('f'),        3,        '"f" at position 3';
+  is $mem->contains('hi'),       5,        '"hi" at position 5';
   is $mem->contains('ij'),      -1,        'does not contain "ij"';
   is $mem->contains('db'),      -1,        'does not contain "db"';
   is $mem->get_chunk(0),        'cdefghi', 'chunk from position 0';

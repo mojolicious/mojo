@@ -356,6 +356,15 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>file">.
 
   app->start;
 
+By default static files do not use a prefix and are simply served with a higher precedence than routes. This can be
+changed with L<Mojolicious::Static/"prefix">.
+
+  # Serve static files only with a "/static" prefix
+  $app->static->prefix('/static');
+
+To allow for the prefix to be configured dynamically, you can use L<Mojolicious::Controller/"url_for_file"> to generate
+URLs with it. Many tag helpers will also use the prefix automatically when it makes sense.
+
 =head2 Static assets
 
 While Mojolicious does not have any special support for frontend frameworks like L<Vue.js|https://vuejs.org> and
@@ -1501,7 +1510,6 @@ authors.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org>, on L<Matrix|https://matrix.to/#/#mojo:matrix.org>, or
-L<IRC|https://web.libera.chat/#mojo>.
+L<Forum|https://forum.mojolicious.org>, or on L<IRC|https://web.libera.chat/#mojo>.
 
 =cut

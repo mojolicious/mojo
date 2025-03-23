@@ -1,5 +1,46 @@
 
-9.34  2023-07-06
+9.40  2024-11-24
+
+9.39  2024-11-23
+  - Added EXPERIMENTAL support for encrypted session cookies.
+    This feature is much more secure than signed cookies and can be enabled by installing CryptX and setting the
+    encrypted attribute.
+      $app->sessions->encrypted(1);
+  - Added EXPERIMENTAL encrypted attribute to Mojolicious::Sessions.
+  - Added EXPERIMENTAL encrypted_cookie and every_encrypted_cookie methods to Mojolicious::Controller.
+  - Added EXPERIMENTAL decrypt_cookie, encrypt_cookie and generate_secret functions to Mojo::Util.
+  - Fixed a bug in Mojo::Message::Request where message size limits were not always correctly applied.
+    (Alexander Kuehne)
+
+9.38  2024-08-17
+  - Added support for new core booleans in Perl 5.36+ to Mojo::JSON. (haarg)
+  - Deprecated support for "'" package separators that have been deprecated in Perl. (Grinnz)
+
+9.37  2024-05-13
+  - Improved Mojo::Base include time with a new Mojo::BaseUtils module. (okurz)
+
+9.36  2024-03-06
+  - Updated Bootstrap from version 4 to 5. (sergiotarxz)
+  - Improved Morbo to restart on deleted files. (hernan604)
+
+9.35  2023-10-27
+  - Added EXPERIMENTAL support for persistent cookies in Netscape format.
+  - Added EXPERIMENTAL file attribute to Mojo::UserAgent::CookieJar.
+  - Added EXPERIMENTAL load, save and to_string methods to Mojo::UserAgent::CookieJar.
+  - Fixed error reporting when loading applications with syntax errors. (haarg)
+  - Fixed absolute URL support in url_for_file and url_for_asset methods. (rawleyfowler)
+
+9.34  2023-09-11
+  - Added support for serving static files with a prefix.
+  - Deprecated Mojo::File::spurt in favor of Mojo::File::spew.
+  - Added prefix attribute to Mojolicious::Static.
+  - Added url_for_file method to Mojolicious::Controller.
+  - Added file_path method to Mojolicious::Static.
+  - Added spew method to Mojo::File. (genio)
+  - Added encoding option to slurp method in Mojo::File. (genio)
+  - Added url_for_asset and url_for_file helpers to Mojolicious::Plugins::DefaultHelpers.
+  - Added favicon helper to Mojolicious::Plugin::TagHelpers.
+  - Fixed support for module_true Perl feature in Mojolicious apps. (haarg)
   - Fixed a bug in Mojo::Promise where map could hang on false values after concurrency limit. (ilmari)
   - Fixed built-in templates to not require an internet connection. (hernan604)
 

@@ -140,7 +140,8 @@ subtest 'Simple roundtrip' => sub {
 
 subtest 'Multiple roundtrips' => sub {
   $t->websocket_ok('/echo')->send_ok('hello again')->message_ok->message_is('echo: hello again')
-    ->send_ok('and one more time')->message_ok->message_is('echo: and one more time')->finish_ok;
+    ->send_ok('and one more time')
+    ->message_ok->message_is('echo: and one more time')->finish_ok;
 };
 
 subtest 'Simple roundtrip with redirect' => sub {
@@ -157,24 +158,31 @@ subtest 'Simple roundtrip with redirect' => sub {
 subtest 'Custom headers and protocols' => sub {
   my $headers = {DNT => 1, 'Sec-WebSocket-Key' => 'NTA2MDAyMDU1NjMzNjkwMg=='};
   $t->websocket_ok('/echo' => $headers => ['foo', 'bar', 'baz'])
-    ->header_is('Sec-WebSocket-Accept' => 'I+x5C3/LJxrmDrWw42nMP4pCSes=')->header_is('Sec-WebSocket-Protocol' => undef)
-    ->send_ok('hello')->message_ok->message_is('echo: hello')->finish_ok;
+    ->header_is('Sec-WebSocket-Accept'   => 'I+x5C3/LJxrmDrWw42nMP4pCSes=')
+    ->header_is('Sec-WebSocket-Protocol' => undef)
+    ->send_ok('hello')
+    ->message_ok->message_is('echo: hello')->finish_ok;
   is $t->tx->req->headers->dnt,                    1,               'right "DNT" value';
   is $t->tx->req->headers->sec_websocket_protocol, 'foo, bar, baz', 'right "Sec-WebSocket-Protocol" value';
 };
 
 subtest 'Bytes' => sub {
   $t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})->message_ok->message_is({binary => 'bytes!'})
-    ->send_ok({binary => 'bytes!'})->message_ok->message_isnt({text => 'bytes!'})->finish_ok;
+    ->send_ok({binary => 'bytes!'})
+    ->message_ok->message_isnt({text => 'bytes!'})->finish_ok;
 };
 
 subtest 'Bytes in multiple frames' => sub {
-  $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'a'])->send_ok([0, 0, 0, 0, 0, 'b'])
-    ->send_ok([1, 0, 0, 0, 0, 'c'])->message_ok->message_is({binary => 'abc'})->finish_ok;
+  $t->websocket_ok('/echo')
+    ->send_ok([0, 0, 0, 0, 2, 'a'])
+    ->send_ok([0, 0, 0, 0, 0, 'b'])
+    ->send_ok([1, 0, 0, 0, 0, 'c'])
+    ->message_ok->message_is({binary => 'abc'})->finish_ok;
 };
 
 subtest 'Zero' => sub {
-  $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')->send_ok(0)
+  $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
+    ->send_ok(0)
     ->message_ok->message_like({text => qr/0/})->finish_ok(1000)->finished_ok(1000);
 };
 
@@ -196,7 +204,9 @@ subtest '64-bit binary message (too large for client)' => sub {
 };
 
 subtest 'Binary message in two frames without FIN bit (too large for server)' => sub {
-  $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'd' x 30000])->send_ok([0, 0, 0, 0, 0, 'd' x 35539])
+  $t->websocket_ok('/echo')
+    ->send_ok([0, 0, 0, 0, 2, 'd' x 30000])
+    ->send_ok([0, 0, 0, 0, 0, 'd' x 35539])
     ->finished_ok(1009);
 };
 
@@ -229,19 +239,22 @@ subtest 'Compressed message ("permessage-deflate")' => sub {
 };
 
 subtest 'Timeout' => sub {
-  $t->websocket_ok('/timeout')->send_ok('timeout')->message_ok->message_is('timeout: 30')->send_ok('0')
+  $t->websocket_ok('/timeout')->send_ok('timeout')->message_ok->message_is('timeout: 30')
+    ->send_ok('0')
     ->message_ok->message_is('0: 0')->send_ok('120')->message_ok->message_is('120: 120')->finish_ok;
 };
 
 subtest 'Compressed message exceeding the limit when decompressed' => sub {
   $t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
-    ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate')->send_ok({binary => 'a' x 1000000})
+    ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate')
+    ->send_ok({binary => 'a' x 1000000})
     ->finished_ok(1009);
 };
 
 subtest "Huge message that doesn't compress very well" => sub {
   my $huge = join '', map { int rand(9) } 1 .. 65538;
-  $t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})->send_ok({binary => $huge})
+  $t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
+    ->send_ok({binary => $huge})
     ->message_ok->message_is({binary => $huge})->finish_ok;
 };
 
@@ -266,20 +279,38 @@ subtest 'Protocol negotiation' => sub {
 };
 
 subtest 'JSON roundtrips (with a lot of different tests)' => sub {
-  $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})
+  $t->websocket_ok('/json')
+    ->send_ok({json => {test => 23, snowman => '☃'}})
     ->message_ok->json_message_is('' => {test => 24, snowman => '☃'})
-    ->json_message_is('' => {test => 24, snowman => '☃'})->json_message_has('/test')->json_message_hasnt('/test/2')
-    ->send_ok({binary => encode_json([1, 2, 3])}, 'with description')->message_ok('with description')
-    ->message_is('[1,2,3,4]')->message_is('[1,2,3,4]', 'with description')->message_isnt('[1,2,3]')
-    ->message_isnt('[1,2,3]', 'with description')->message_like(qr/3/)->message_like(qr/3/, 'with description')
-    ->message_unlike(qr/5/)->message_unlike(qr/5/, 'with description')->json_message_is([1, 2, 3, 4])
-    ->json_message_is([1, 2, 3, 4])->send_ok({binary => encode_json([1, 2, 3])})->message_ok->json_message_has('/2')
-    ->json_message_has('/2', 'with description')->json_message_hasnt('/5')
-    ->json_message_hasnt('/5', 'with description')->json_message_is('/2' => 3)
-    ->json_message_is('/2' => 3, 'with description')->send_ok({json => {'☃' => [1, 2, 3]}})
-    ->message_ok->json_message_is('/☃', [1, 2, 3])->json_message_like('/☃/1' => qr/\d/)
-    ->json_message_like('/☃/2' => qr/3/, 'with description')->json_message_unlike('/☃/1' => qr/[a-z]/)
-    ->json_message_unlike('/☃/2' => qr/2/, 'with description')->send_ok({json => 'works'})
+    ->json_message_is('' => {test => 24, snowman => '☃'})
+    ->json_message_has('/test')
+    ->json_message_hasnt('/test/2')
+    ->send_ok({binary => encode_json([1, 2, 3])}, 'with description')
+    ->message_ok('with description')
+    ->message_is('[1,2,3,4]')
+    ->message_is('[1,2,3,4]', 'with description')
+    ->message_isnt('[1,2,3]')
+    ->message_isnt('[1,2,3]', 'with description')
+    ->message_like(qr/3/)
+    ->message_like(qr/3/, 'with description')
+    ->message_unlike(qr/5/)
+    ->message_unlike(qr/5/, 'with description')
+    ->json_message_is([1, 2, 3, 4])
+    ->json_message_is([1, 2, 3, 4])
+    ->send_ok({binary => encode_json([1, 2, 3])})
+    ->message_ok->json_message_has('/2')
+    ->json_message_has('/2', 'with description')
+    ->json_message_hasnt('/5')
+    ->json_message_hasnt('/5', 'with description')
+    ->json_message_is('/2' => 3)
+    ->json_message_is('/2' => 3, 'with description')
+    ->send_ok({json => {'☃' => [1, 2, 3]}})
+    ->message_ok->json_message_is('/☃', [1, 2, 3])
+    ->json_message_like('/☃/1' => qr/\d/)
+    ->json_message_like('/☃/2' => qr/3/, 'with description')
+    ->json_message_unlike('/☃/1' => qr/[a-z]/)
+    ->json_message_unlike('/☃/2' => qr/2/, 'with description')
+    ->send_ok({json => 'works'})
     ->message_ok->json_message_is('works')->send_ok({json => undef})->message_ok->json_message_is(undef)->finish_ok;
 };
 
@@ -311,7 +342,8 @@ subtest 'Another plain request' => sub {
 subtest 'Unicode roundtrips' => sub {
   $t->websocket_ok('/unicode')->send_ok('hello')->message_ok->message_is('♥: hello')->finish_ok;
   $t->websocket_ok('/unicode')->send_ok('hello again')->message_ok->message_is('♥: hello again')
-    ->send_ok('and one ☃ more time')->message_ok->message_is('♥: and one ☃ more time')->finish_ok;
+    ->send_ok('and one ☃ more time')
+    ->message_ok->message_is('♥: and one ☃ more time')->finish_ok;
 };
 
 subtest 'Binary frame and events' => sub {
@@ -338,12 +370,14 @@ subtest 'Binary frame and events' => sub {
 subtest 'Binary roundtrips' => sub {
   my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
   $t->request_ok($t->ua->build_websocket_tx('/bytes'))->send_ok({binary => $bytes})->message_ok->message_is($bytes)
-    ->send_ok({binary => $bytes})->message_ok->message_is($bytes)->finish_ok;
+    ->send_ok({binary => $bytes})
+    ->message_ok->message_is($bytes)->finish_ok;
 };
 
 subtest 'Two responses' => sub {
   $t->websocket_ok('/once')->send_ok('hello')->message_ok->message_is('ONE: hello')
-    ->message_ok->message_is('TWO: hello')->send_ok('hello')->message_ok->message_is('ONE: hello')->send_ok('hello')
+    ->message_ok->message_is('TWO: hello')->send_ok('hello')->message_ok->message_is('ONE: hello')
+    ->send_ok('hello')
     ->message_ok->message_is('ONE: hello')->finish_ok;
 };
 

@@ -57,7 +57,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.34';
+our $VERSION  = '9.40';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -513,6 +513,9 @@ rotating passphrases, just add new ones to the front and remove old ones from th
 Signed cookie based session manager, defaults to a L<Mojolicious::Sessions> object. You can usually leave this alone,
 see L<Mojolicious::Controller/"session"> for more information about working with session data.
 
+  # Enable encrypted sessions
+  $app->sessions->encrypted(1);
+
   # Change name of cookie used for all sessions
   $app->sessions->cookie_name('mysession');
 
@@ -525,6 +528,9 @@ see L<Mojolicious::Controller/"session"> for more information about working with
   $app       = $app->static(Mojolicious::Static->new);
 
 For serving static files from your C<public> directories, defaults to a L<Mojolicious::Static> object.
+
+  # Serve static files only with a "/static" prefix
+  $app->static->prefix('/static');
 
   # Add another "public" directory
   push @{$app->static->paths}, '/home/sri/public';
@@ -753,15 +759,9 @@ The L<Mojolicious> distribution includes a few files with different licenses tha
 
 =head2 Mojolicious Artwork
 
-  Copyright (C) 2010-2023, Sebastian Riedel.
+  Copyright (C) 2010-2024, Sebastian Riedel.
 
 Licensed under the CC-SA License, Version 4.0 L<http://creativecommons.org/licenses/by-sa/4.0>.
-
-=head2 jQuery
-
-  Copyright (C) jQuery Foundation.
-
-Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
 =head2 highlight.js
 
@@ -873,6 +873,8 @@ Alex Efros
 Alex Salimon
 
 Alexander Karelas
+
+Alexander Kuehne
 
 Alexey Likhatskiy
 
@@ -988,6 +990,8 @@ Heiko Jansen
 
 Henry Tang
 
+Hernan Lopes
+
 Hideki Yamamura
 
 Hiroki Toyokawa
@@ -1081,6 +1085,8 @@ Nic Sandfield
 Nils Diewald
 
 Oleg Zhelo
+
+Oliver Kurz
 
 Olivier Mengue
 
@@ -1202,7 +1208,7 @@ Zoffix Znet
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2023, Sebastian Riedel and others.
+Copyright (C) 2008-2024, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
 2.0.

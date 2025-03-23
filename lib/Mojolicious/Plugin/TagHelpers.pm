@@ -24,8 +24,9 @@ sub register {
   $app->helper(button_to      => sub { _button_to(0, @_) });
   $app->helper(check_box      => sub { _input(@_, type => 'checkbox') });
   $app->helper(csrf_button_to => sub { _button_to(1, @_) });
+  $app->helper(favicon        => sub { _favicon(@_) });
   $app->helper(file_field     => sub { _empty_field('file', @_) });
-  $app->helper(image          => sub { _tag('img', src => shift->url_for(shift), @_) });
+  $app->helper(image          => sub { _tag('img', src => _file_url(shift, shift), @_) });
   $app->helper(input_tag      => sub { _input(@_) });
   $app->helper(password_field => sub { _empty_field('password', @_) });
   $app->helper(radio_button   => sub { _input(@_, type => 'radio') });
@@ -58,6 +59,16 @@ sub _csrf_field {
 sub _empty_field {
   my ($type, $c, $name) = (shift, shift, shift);
   return _validation($c, $name, 'input', name => $name, @_, type => $type);
+}
+
+sub _favicon {
+  my ($c, $file) = @_;
+  return _tag('link', rel => 'icon', href => _file_url($c, $file // 'favicon.ico'));
+}
+
+sub _file_url {
+  my ($c, $url) = @_;
+  return blessed $url && $url->isa('Mojo::URL') ? $url : $c->url_for_file($url);
 }
 
 sub _form_for {
@@ -103,7 +114,7 @@ sub _input {
 sub _javascript {
   my $c       = shift;
   my $content = ref $_[-1] eq 'CODE' ? "//<![CDATA[\n" . pop->() . "\n//]]>" : '';
-  my @src     = @_ % 2               ? (src => $c->url_for(shift))           : ();
+  my @src     = @_ % 2               ? (src => _file_url($c, shift))         : ();
   return _tag('script', @src, @_, sub {$content});
 }
 
@@ -166,7 +177,7 @@ sub _stylesheet {
   my $c       = shift;
   my $content = ref $_[-1] eq 'CODE' ? "/*<![CDATA[*/\n" . pop->() . "\n/*]]>*/" : '';
   return _tag('style', @_, sub {$content}) unless @_ % 2;
-  return _tag('link', rel => 'stylesheet', href => $c->url_for(shift), @_);
+  return _tag('link', rel => 'stylesheet', href => _file_url($c, shift), @_);
 }
 
 sub _submit_button {
@@ -351,6 +362,16 @@ Generate C<input> tag of type C<email>. Previous input values will automatically
   <input name="notify" type="email">
   <input name="notify" type="email" value="nospam@example.com">
   <input id="foo" name="notify" type="email" value="nospam@example.com">
+
+=head2 favicon
+
+  %= favicon
+  %= favicon '/favicon.ico';
+
+Generate C<link> tag for favicon, defaulting to the one that comes bundled with Mojolicious.
+
+  <link rel="icon" href="/mojo/favicon.ico">
+  <link rel="icon" href="/favicon.ico">
 
 =head2 file_field
 

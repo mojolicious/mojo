@@ -208,14 +208,20 @@ subtest 'Dead included template' => sub {
 };
 
 subtest 'Dead template with layout' => sub {
-  $t->get_ok('/dead_template_with_layout')->status_is(500)->content_like(qr/dead template with layout!/)
-    ->content_like(qr/line 2/)->content_unlike(qr/Green/);
+  $t->get_ok('/dead_template_with_layout')
+    ->status_is(500)
+    ->content_like(qr/dead template with layout!/)
+    ->content_like(qr/line 2/)
+    ->content_unlike(qr/Green/);
   like $log, qr/dead template with layout!/, 'right result';
 };
 
 subtest 'Dead action' => sub {
-  $t->get_ok('/dead_action')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr!get &#39;/dead_action&#39;!)->content_like(qr/dead action!/)
+  $t->get_ok('/dead_action')
+    ->status_is(500)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr!get &#39;/dead_action&#39;!)
+    ->content_like(qr/dead action!/)
     ->text_is('#error' => "dead action!\n");
   like $log, qr/dead action!/, 'right result';
 };
@@ -225,18 +231,26 @@ subtest 'Dead action with different format' => sub {
 };
 
 subtest 'Dead action with unsupported format' => sub {
-  $t->get_ok('/dead_action.json')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr!get &#39;/dead_action&#39;!)->content_like(qr/dead action!/);
+  $t->get_ok('/dead_action.json')
+    ->status_is(500)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr!get &#39;/dead_action&#39;!)
+    ->content_like(qr/dead action!/);
 };
 
 subtest 'Dead action with custom exception rendering' => sub {
-  $t->get_ok('/dead_action' => {Accept => 'text/plain'})->status_is(500)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/dead_action' => {Accept => 'text/plain'})
+    ->status_is(500)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_like(qr/^dead action!\n/);
 };
 
 subtest 'Action dies twice' => sub {
-  $t->get_ok('/double_dead_action_☃')->status_is(500)->content_like(qr!get &#39;/double_dead_action_☃&#39;!)
-    ->content_like(qr/File.+lite_app\.t\", line \d/)->content_like(qr/double dead action!/);
+  $t->get_ok('/double_dead_action_☃')
+    ->status_is(500)
+    ->content_like(qr!get &#39;/double_dead_action_☃&#39;!)
+    ->content_like(qr/File.+lite_app\.t\", line \d/)
+    ->content_like(qr/double dead action!/);
 };
 
 subtest 'Trapped exception' => sub {
@@ -256,33 +270,46 @@ subtest 'Exception in helper' => sub {
 };
 
 subtest 'Missing template' => sub {
-  $t->get_ok('/missing_template')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/missing_template')
+    ->status_is(500)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_like(qr/Route without action and nothing to render/);
 };
 
 subtest 'Missing template with different format' => sub {
-  $t->get_ok('/missing_template.xml')->status_is(500)->content_type_is('application/xml')
+  $t->get_ok('/missing_template.xml')
+    ->status_is(500)
+    ->content_type_is('application/xml')
     ->content_is("<very>bad</very>\n");
 };
 
 subtest 'Missing template with unsupported format' => sub {
-  $t->get_ok('/missing_template.json')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/missing_template.json')
+    ->status_is(500)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_like(qr/Route without action and nothing to render/);
 };
 
 subtest 'Missing template with custom rendering' => sub {
-  $t->get_ok('/missing_template.txt')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/missing_template.txt')
+    ->status_is(500)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Missing template, whatever.');
 };
 
 subtest 'Missing template (failed rendering)' => sub {
-  $t->get_ok('/missing_template/too')->status_is(500)->content_type_is('text/html;charset=UTF-8')
+  $t->get_ok('/missing_template/too')
+    ->status_is(500)
+    ->content_type_is('text/html;charset=UTF-8')
     ->content_like(qr/Could not render a response/);
 };
 
 subtest 'Missing helper (correct context)' => sub {
-  $t->get_ok('/missing_helper')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Server Error/)->content_like(qr/shift-&gt;missing_helper/);
+  $t->get_ok('/missing_helper')
+    ->status_is(500)
+    ->content_type_is('text/html;charset=UTF-8')
+    ->content_like(qr/Server Error/)
+    ->content_like(qr/shift-&gt;missing_helper/);
 };
 
 subtest 'Reuse exception' => sub {
@@ -298,46 +325,62 @@ subtest 'Reuse exception' => sub {
 subtest 'JSON exceptions' => sub {
   $t->app->mode('development');
   is $t->app->exception_format('json')->exception_format, 'json', 'right exception format';
-  $t->get_ok('/dead_template')->status_is(500)->content_type_is('application/json;charset=UTF-8')
+  $t->get_ok('/dead_template')
+    ->status_is(500)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_like('/error', qr/dead template!/);
-  $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('application/json;charset=UTF-8')
+  $t->get_ok('/does_not_exist')
+    ->status_is(404)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({error => 'Not Found'});
   my $stash;
   $t->app->hook(after_dispatch => sub { $stash = shift->stash });
-  $t->get_ok('/txt/exception')->status_is(500)->header_is('X-Text' => 'txt')
-    ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/Text exception/);
+  $t->get_ok('/txt/exception')
+    ->status_is(500)
+    ->header_is('X-Text' => 'txt')
+    ->content_type_is('text/plain;charset=UTF-8')
+    ->content_like(qr/Text exception/);
   ok $stash->{exception}, 'exception exists in stash';
   isa_ok $stash->{exception}, 'Mojo::Exception', 'is stash exception correct type?';
 
   $t->app->mode('production');
-  $t->get_ok('/dead_template')->status_is(500)->content_type_is('application/json;charset=UTF-8')
+  $t->get_ok('/dead_template')
+    ->status_is(500)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({error => 'Internal Server Error'});
-  $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('application/json;charset=UTF-8')
+  $t->get_ok('/does_not_exist')
+    ->status_is(404)
+    ->content_type_is('application/json;charset=UTF-8')
     ->json_is({error => 'Not Found'});
 };
 
 subtest 'Text exceptions' => sub {
   $t->app->mode('development');
   is $t->app->exception_format('txt')->exception_format, 'txt', 'right exception format';
-  $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/dead_template')
+    ->status_is(500)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_like(qr/dead template!/);
   $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('text/plain;charset=UTF-8')->content_is('Not Found');
   my $stash;
   $t->app->hook(after_dispatch => sub { $stash = shift->stash });
-  $t->get_ok('/txt/exception')->status_is(500)->header_is('X-Text' => 'txt')
-    ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/Text exception/);
+  $t->get_ok('/txt/exception')
+    ->status_is(500)
+    ->header_is('X-Text' => 'txt')
+    ->content_type_is('text/plain;charset=UTF-8')
+    ->content_like(qr/Text exception/);
   ok $stash->{exception}, 'exception exists in stash';
   isa_ok $stash->{exception}, 'Mojo::Exception', 'is stash exception correct type?';
 
   $t->app->mode('production');
-  $t->get_ok('/dead_template')->status_is(500)->content_type_is('text/plain;charset=UTF-8')
+  $t->get_ok('/dead_template')
+    ->status_is(500)
+    ->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Internal Server Error');
   $t->get_ok('/does_not_exist')->status_is(404)->content_type_is('text/plain;charset=UTF-8')->content_is('Not Found');
 };
 
 subtest 'Bundled static files' => sub {
-  $t->get_ok('/mojo/jquery/jquery.js')->status_is(200)->content_type_is('application/javascript');
-
   $t->get_ok('/mojo/highlight.js/highlight.min.js')->status_is(200)->content_type_is('application/javascript');
   $t->get_ok('/mojo/highlight.js/mojolicious.min.js')->status_is(200)->content_type_is('application/javascript');
   $t->get_ok('/mojo/highlight.js/highlight-mojo-dark.css')->status_is(200)->content_type_is('text/css');

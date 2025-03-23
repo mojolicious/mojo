@@ -27,7 +27,7 @@ my $morbo  = Mojo::Server::Morbo->new();
 $morbo->backend->watch([$subdir, $script]);
 is_deeply $morbo->backend->modified_files, [], 'no files have changed';
 my $started = $dir->child('started1.txt');
-$script->spurt(<<EOF);
+$script->spew(<<EOF);
 use Mojolicious::Lite;
 use Mojo::File qw(path);
 use Mojo::IOLoop;
@@ -61,7 +61,7 @@ subtest 'Basics' => sub {
 subtest 'Update script without changing size' => sub {
   my ($size, $mtime) = (stat $script)[7, 9];
   $started = $started->sibling('started2.txt');
-  $script->spurt(<<EOF);
+  $script->spew(<<EOF);
 use Mojolicious::Lite;
 use Mojo::File qw(path);
 use Mojo::IOLoop;
@@ -96,7 +96,7 @@ subtest 'Update script without changing mtime' => sub {
   my ($size, $mtime) = (stat $script)[7, 9];
   is_deeply $morbo->backend->modified_files, [], 'no files have changed';
   $started = $started->sibling('started3.txt');
-  $script->spurt(<<"EOF");
+  $script->spew(<<"EOF");
 use Mojolicious::Lite;
 use Mojo::File qw(path);
 use Mojo::IOLoop;
@@ -131,12 +131,25 @@ EOF
   is $tx->res->body, 'Hello!', 'right content';
 };
 
+subtest 'Watch for deleted files' => sub {
+  my $morbo = Mojo::Server::Morbo->new;
+  $morbo->backend->watch([$dir]);
+  $morbo->backend->modified_files;
+  my $tmp_file = $dir->child('tmp_file.txt');
+  $tmp_file->spew("some data");
+  is_deeply $morbo->backend->modified_files, [$tmp_file], 'file was created';
+  is_deeply $morbo->backend->modified_files, [],          'no files changed';
+  unlink $tmp_file;
+  is_deeply $morbo->backend->modified_files, [$tmp_file], 'file was deleted';
+  is_deeply $morbo->backend->modified_files, [],          'no files changed';
+};
+
 subtest 'New file(s)' => sub {
   is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
   my @new = map { $subdir->child("$_.txt") } qw/test testing/;
-  $_->spurt('whatever') for @new;
+  $_->spew('whatever') for @new;
   is_deeply $morbo->backend->modified_files, \@new, 'two files have changed';
-  $subdir->child('.hidden.txt')->spurt('whatever');
+  $subdir->child('.hidden.txt')->spew('whatever');
   is_deeply $morbo->backend->modified_files, [], 'directory has not changed again';
 };
 

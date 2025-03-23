@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 use Exporter qw(import);
 use Mojo::Exception;
 use Mojo::File qw(path);
-use Mojo::Util qw(b64_decode class_to_path);
+use Mojo::Util qw(b64_decode class_to_path deprecated);
 
 our @EXPORT_OK = qw(data_section file_is_binary find_modules find_packages load_class load_classes);
 
@@ -42,6 +42,9 @@ sub load_class {
 
   # Invalid class name
   return 1 if ($class || '') !~ /^\w(?:[\w:']*\w)?$/;
+  deprecated
+    q{Calling Mojo::Loader::load_class with a class name using the old package separator "'" is deprecated; use "::"}
+    if $class =~ m/'/;
 
   # Load if not already loaded
   return undef if $class->can('new') || eval "require $class; 1";

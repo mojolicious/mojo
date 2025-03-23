@@ -116,7 +116,10 @@ sub parse {
   if (($self->{state} // '') ne 'cgi') { $self->SUPER::parse($chunk) }
 
   # Parse CGI content
-  else { $self->content($self->content->parse_body($chunk))->SUPER::parse('') }
+  else {
+    $self->{raw_size} += length $chunk unless defined $env;
+    $self->content($self->content->parse_body($chunk))->SUPER::parse('');
+  }
 
   # Check if we can fix things that require all headers
   return $self unless $self->is_finished;

@@ -257,7 +257,7 @@ subtest 'Cleanup' => sub {
   my $file       = tempfile;
   my $called     = 0;
   my $subprocess = Mojo::IOLoop::Subprocess->new;
-  $subprocess->on(cleanup => sub { $file->spurt(shift->serialize->({test => ++$called})) });
+  $subprocess->on(cleanup => sub { $file->spew(shift->serialize->({test => ++$called})) });
   $subprocess->run(
     sub {'Hello Mojo!'},
     sub {

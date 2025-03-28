@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Message::Request;
+use Mojo::Util 'encode', 'url_escape';
 
 subtest 'Parse Lighttpd CGI environment variables and body' => sub {
   my $req = Mojo::Message::Request->new;
@@ -122,6 +123,29 @@ subtest 'Parse CGI environment with maximum message size' => sub {
   is $req->body,            'abcdefghijklm',     'right content';
   is $req->url->to_abs->to_string, 'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
     'right absolute URL';
+};
+
+subtest 'Parse CGI environment with SCRIPT_NAME set and path part with UTF8 character' => sub {
+  my $req = Mojo::Message::Request->new;
+  my $script_name = '/app/';
+  my $path_stub   = 'some/action/blub/';
+  my $part_utf8   = encode(q(utf-8), "\x{1d120}");
+  my $path        = $path_stub.url_escape($part_utf8);
+  # test $env is a stripped down version of the result of:
+  #   use HTTP::Request::Common 'GET';
+  #   use HTTP::Message::PSGI 'req_to_psgi';
+  #   $env = req_to_psgi( GET( 'http://www.example.com'.$script_name.$path ), SCRIPT_NAME => $script_name );
+  $req->parse({
+    CONTENT_LENGTH  => 0,
+    PATH_INFO       => '/'.$path_stub.$part_utf8,
+    REQUEST_URI     => $script_name.$path,
+    QUERY_STRING    => '',
+    REQUEST_METHOD  => 'GET',
+    SCRIPT_NAME     => $script_name,
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+  });
+  is $req->url->path->to_string, $path, 'round tripping yields same path';
 };
 
 subtest 'Parse Apache CGI environment variables and body (file storage)' => sub {

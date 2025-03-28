@@ -197,6 +197,8 @@ sub _parse_env {
     $base->path->parse($value =~ m!/$! ? $value : "$value/");
 
     # Remove SCRIPT_NAME prefix if necessary
+    # Make sure $path is decoded and unescaped as expected by to_string
+    $path->parts;
     my $buffer = $path->to_string;
     $value  =~ s!^/|/$!!g;
     $buffer =~ s!^/?\Q$value\E/?!!;

@@ -1,6 +1,7 @@
 package Mojo::UserAgent::Transactor;
 use Mojo::Base -base;
 
+use Carp qw(croak);
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
@@ -19,6 +20,44 @@ has generators => sub { {form => \&_form, json => \&_json, multipart => \&_multi
 has name       => 'Mojolicious (Perl)';
 
 sub add_generator { $_[0]->generators->{$_[1]} = $_[2] and return $_[0] }
+
+sub download {
+  my ($self, $head, $path) = @_;
+
+  my $req = $head->req;
+  my $tx  = $self->tx(GET => $req->url->clone => $req->headers->to_hash);
+  my $res = $tx->res;
+  if (my $error = $head->error) { $res->error($error) and return $tx }
+
+  my $headers       = $head->res->headers;
+  my $accept_ranges = $headers->accept_ranges =~ /bytes/;
+  croak 'Download error: Unknown file size' unless my $size = $headers->content_length;
+
+  my $current_size = 0;
+  my $file         = path($path);
+  if (-f $file) {
+    $current_size = -s $file;
+    $res->error({message => 'Download error', complete_download => 1}) and return $tx if $current_size >= $size;
+    croak "Download error: Server does not support partial requests" unless $accept_ranges;
+    $tx->req->headers->range("bytes=$current_size-$size");
+  }
+  my $fh = $file->open('+>>');
+  $res->content->unsubscribe('read')->on(
+    read => sub {
+      my ($content, $bytes) = @_;
+      $current_size += length $bytes;
+      $fh->syswrite($bytes) == length $bytes or croak qq/Can't write to file "$path": $!/;
+    }
+  );
+  $res->on(
+    finish => sub {
+      my $res = shift;
+      $res->error({message => 'Download error', incomplete_download => 1}) if $current_size < $size;
+    }
+  );
+
+  return $tx;
+}
 
 sub endpoint {
   my ($self, $tx) = @_;
@@ -370,6 +409,14 @@ L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and imple
 Register a content generator.
 
   $t->add_generator(foo => sub ($t, $tx, @args) {...});
+
+=head2 download
+
+  my $tx = $t->download(Mojo::Transaction::HTTP->new, '/home/sri/test.tar.gz');
+  my $tx = $t->download(Mojo::Transaction::HTTP->new, '/home/sri/test.tar.gz', {headers => {Accept => '*/*'}});
+
+Build L<Mojo::Transaction::HTTP> resumable file download request as follow-up to a C<HEAD> request. Note that this
+method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 endpoint
 

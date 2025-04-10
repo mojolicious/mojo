@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
+use Carp qw(croak);
 use Mojo::IOLoop;
 use Mojo::Promise;
 use Mojo::Util qw(monkey_patch term_escape);
@@ -47,6 +48,22 @@ sub DESTROY { shift->_cleanup unless ${^GLOBAL_PHASE} eq 'DESTRUCT' }
 
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
+
+sub download {
+  my ($self, $url, $path, $options) = (shift, shift, shift, shift // {});
+
+  my $tx = _download_error($self->transactor->download($self->head($url => $options->{headers} // {}), $path));
+  return $tx ? !!_download_error($self->start($tx)) : 1;
+}
+
+sub download_p {
+  my ($self, $url, $path, $options) = (shift, shift, shift, shift // {});
+
+  return $self->head_p($url => $options->{headers} // {})->then(sub {
+    my $tx = _download_error($self->transactor->download(shift, $path));
+    return $tx ? $self->start_p($tx) : 1;
+  })->then(sub { ref $_[0] ? !!_download_error($_[0]) : $_[0] });
+}
 
 sub start {
   my ($self, $tx, $cb) = @_;
@@ -211,6 +228,15 @@ sub _dequeue {
   @$old = @new;
 
   return $found;
+}
+
+sub _download_error {
+  my $tx = shift;
+
+  return $tx unless my $err = $tx->error;
+  return undef if $err->{message} eq 'Download complete' || $err->{message} eq 'Download incomplete';
+  croak "$err->{code} response: $err->{message}" if $err->{code};
+  croak "Download error: $err->{message}";
 }
 
 sub _error {
@@ -746,6 +772,27 @@ a callback.
     say $tx->result->body;
   })->catch(sub ($err) {
     warn "Connection error: $err";
+  })->wait;
+
+=head2 download
+
+  my $bool = $ua->download('https://example.com/test.tar.gz', '/home/sri/test.tar.gz');
+  my $bool = $ua->download('https://example.com/test.tar.gz', '/home/sri/test.tar.gz', {headers => {Accept => '*/*'}});
+
+Download file from URL to local file, returns true once the file has been downloaded completely. Incomplete downloads
+are resumed. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
+=head2 download_p
+
+  my $promise = $ua->download_p('https://example.com/test.tar.gz', '/home/sri/test.tar.gz');
+
+Same as L</"download">, but performs all requests non-blocking and returns a L<Mojo::Promise> object. Note that this
+method is B<EXPERIMENTAL> and might change without warning!
+
+  $ua->download_p('https://example.com/test.tar.gz', '/home/sri/test.tar.gz')->then(sub ($finished) {
+    say $finished ? 'Download finished' : 'Download was interrupted';
+  })->catch(sub ($err) {
+    warn $err;
   })->wait;
 
 =head2 get

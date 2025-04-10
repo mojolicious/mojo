@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
+use Mojo::File qw(tempdir);
 use Mojo::Promise;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
@@ -1014,6 +1015,89 @@ subtest '301 redirect without compression' => sub {
   is $tx->req->body,                     '',                       'no content';
   is $tx->res->code,                     undef,                    'no status';
   is $tx->res->headers->location,        undef,                    'no "Location" value';
+};
+
+subtest 'Download' => sub {
+  my $dir          = tempdir;
+  my $no_file      = $dir->child('no_file');
+  my $small_file   = $dir->child('small_file')->spew('x');
+  my $large_file   = $dir->child('large_file')->spew('xxxxxxxxxxx');
+  my $correct_file = $dir->child('correct_file')->spew('xxxxxxxxxx');
+  my $t            = Mojo::UserAgent::Transactor->new;
+
+  subtest 'Partial file exists' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    $head->res->headers->content_length(10);
+    $head->res->headers->accept_ranges('bytes');
+    my $tx = $t->download($head, $small_file);
+    is $tx->req->method,         'GET',                                   'right method';
+    is $tx->req->url->to_abs,    'http://mojolicious.org/release.tar.gz', 'right URL';
+    is $tx->req->headers->range, 'bytes=1-10',                            'right "Range" value';
+  };
+
+  subtest 'Partial file exists (with headers)' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz' => {Accept => 'application/json'});
+    $head->res->headers->content_length(10);
+    $head->res->headers->accept_ranges('bytes');
+    my $tx = $t->download($head, $small_file);
+    is $tx->req->method,          'GET',                                   'right method';
+    is $tx->req->url->to_abs,     'http://mojolicious.org/release.tar.gz', 'right URL';
+    is $tx->req->headers->range,  'bytes=1-10',                            'right "Range" value';
+    is $tx->req->headers->accept, 'application/json',                      'right "Accept" value';
+  };
+
+  subtest 'Failed HEAD request' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    $head->res->error({message => 'Failed to connect'});
+    my $tx = $t->download($head, $no_file);
+    is $tx->error->{message}, 'Failed to connect', 'right error';
+  };
+
+  subtest 'Empty HEAD response' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    my $tx   = $t->download($head, $no_file);
+    is $tx->req->method,         'GET',                                   'right method';
+    is $tx->req->url->to_abs,    'http://mojolicious.org/release.tar.gz', 'right URL';
+    is $tx->req->headers->range, undef,                                   'no "Range" value';
+  };
+
+  subtest 'Empty HEAD response (file exists)' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    my $tx   = $t->download($head, $small_file);
+    is $tx->error->{message}, 'Unknown file size', 'right error';
+  };
+
+  subtest 'Target file does not exist' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    $head->res->headers->content_length(10);
+    my $tx = $t->download($head, $no_file);
+    is $tx->req->method,         'GET',                                   'right method';
+    is $tx->req->url->to_abs,    'http://mojolicious.org/release.tar.gz', 'right URL';
+    is $tx->req->headers->range, undef,                                   'no "Range" value';
+  };
+
+  subtest 'Partial file exists (unsupported server)' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    $head->res->headers->content_length(10);
+    my $tx = $t->download($head, $small_file);
+    is $tx->error->{message}, 'Server does not support partial requests', 'right error';
+  };
+
+  subtest 'Partial file exists (larger than download)' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    $head->res->headers->content_length(10);
+    $head->res->headers->accept_ranges('bytes');
+    my $tx = $t->download($head, $large_file);
+    is $tx->error->{message}, 'File size mismatch', 'right error';
+  };
+
+  subtest 'Download already finished' => sub {
+    my $head = $t->tx(HEAD => 'http://mojolicious.org/release.tar.gz');
+    $head->res->headers->content_length(10);
+    $head->res->headers->accept_ranges('bytes');
+    my $tx = $t->download($head, $correct_file);
+    is $tx->error->{message}, 'Download complete', 'right error';
+  };
 };
 
 subtest 'Promisify' => sub {

@@ -1300,6 +1300,15 @@ L<Mojo::Message/"save_to">.
   my $tx = $ua->get('https://www.github.com/mojolicious/mojo/tarball/main');
   $tx->result->save_to('mojo.tar.gz');
 
+With L<Mojo::UserAgent/"download"> you can also stream file downloads directly into the target file. This allows for
+interrupted downloads to be resumed at a later time.
+
+  use Mojo::UserAgent;
+
+  # Download the latest Mojolicious tarball directly into a file
+  my $ua = Mojo::UserAgent->new(max_redirects => 5);
+  $ua->download('https://www.github.com/mojolicious/mojo/tarball/main' => '/home/sri/mojo.tar.gz');
+
 To protect you from excessively large files there is also a limit of 2GiB by default, which you can tweak with the
 attribute L<Mojo::UserAgent/"max_response_size">.
 

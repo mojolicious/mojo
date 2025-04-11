@@ -20,6 +20,47 @@ has name       => 'Mojolicious (Perl)';
 
 sub add_generator { $_[0]->generators->{$_[1]} = $_[2] and return $_[0] }
 
+sub download {
+  my ($self, $head, $path) = @_;
+
+  my $req = $head->req;
+  my $tx  = $self->tx(GET => $req->url->clone => $req->headers->to_hash);
+  my $res = $tx->res;
+  if (my $error = $head->error) { $res->error($error) and return $tx }
+
+  my $headers       = $head->res->headers;
+  my $accept_ranges = ($headers->accept_ranges // '') =~ /bytes/;
+  my $size          = $headers->content_length // 0;
+
+  my $current_size = 0;
+  my $file         = path($path);
+  if (-f $file) {
+    $current_size = -s $file;
+    $res->error({message => 'Unknown file size'})                        and return $tx unless $size;
+    $res->error({message => 'File size mismatch'})                       and return $tx if $current_size > $size;
+    $res->error({message => 'Download complete'})                        and return $tx if $current_size == $size;
+    $res->error({message => 'Server does not support partial requests'}) and return $tx unless $accept_ranges;
+    $tx->req->headers->range("bytes=$current_size-$size");
+  }
+
+  my $fh = $file->open('>>');
+  $res->content->unsubscribe('read')->on(
+    read => sub {
+      my ($content, $bytes) = @_;
+      $current_size += length $bytes;
+      $fh->syswrite($bytes) == length $bytes or $res->error({message => qq/Can't write to file "$path": $!/});
+    }
+  );
+  $res->on(
+    finish => sub {
+      my $res = shift;
+      $res->error({message => 'Download incomplete'}) if $current_size < $size;
+    }
+  );
+
+  return $tx;
+}
+
 sub endpoint {
   my ($self, $tx) = @_;
 
@@ -370,6 +411,13 @@ L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and imple
 Register a content generator.
 
   $t->add_generator(foo => sub ($t, $tx, @args) {...});
+
+=head2 download
+
+  my $tx = $t->download(Mojo::Transaction::HTTP->new, '/home/sri/test.tar.gz');
+
+Build L<Mojo::Transaction::HTTP> resumable file download request as follow-up to a C<HEAD> request. Note that this
+method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 endpoint
 

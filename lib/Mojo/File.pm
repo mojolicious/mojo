@@ -38,6 +38,14 @@ sub curfile { __PACKAGE__->new(Cwd::realpath((caller)[1])) }
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
+sub download {
+  my ($self, $url, $options) = (shift, shift, shift // {});
+  my $ua = $options->{ua}
+    || do { require Mojo::UserAgent; Mojo::UserAgent->new(max_redirects => 10, max_response_size => 0) };
+  my $tx = _download_error($ua->transactor->download($ua->head($url => $options->{headers} // {}), $$self));
+  return $tx ? !!_download_error($ua->start($tx)) : 1;
+}
+
 sub extname { shift->basename =~ /.+\.([^.]+)$/ ? $1 : '' }
 
 sub is_abs { file_name_is_absolute ${shift()} }
@@ -177,6 +185,15 @@ sub touch {
 
 sub with_roles { shift->Mojo::Base::with_roles(@_) }
 
+sub _download_error {
+  my $tx = shift;
+
+  return $tx unless my $err = $tx->error;
+  return undef if $err->{message} eq 'Download complete' || $err->{message} eq 'Download incomplete';
+  croak "$err->{code} response: $err->{message}" if $err->{code};
+  croak "Download error: $err->{message}";
+}
+
 1;
 
 =encoding utf8
@@ -300,6 +317,16 @@ Return all but the last level of the path with L<File::Basename> as a L<Mojo::Fi
 
   # "/home/sri" (on UNIX)
   path('/home/sri/.vimrc')->dirname;
+
+=head2 download
+
+  my $bool = $path->download('https://example.com/test.tar.gz');
+  my $bool = $path->download('https://example.com/test.tar.gz', {headers => {Accept => '*/*'}});
+  my $bool = $path->download('https://example.com/test.tar.gz', {ua => Mojo::UserAgent->new});
+
+Download file from URL, returns true once the file has been downloaded completely. Incomplete downloads are resumed.
+Follows C<10> redirects by default and does not limit the size of the response, which will be streamed memory
+efficiently. Note that this method is B<EXPERIMENTAL> and might change without warning!
 
 =head2 extname
 

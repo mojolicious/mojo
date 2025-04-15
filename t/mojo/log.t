@@ -36,12 +36,14 @@ subtest 'Logging to STDERR' => sub {
     $log->fatal('I ♥ Mojolicious');
     $log->debug('Works too');
     $log->debug(sub { return 'And this', 'too' });
+    $log->info(undef, 'works');
   }
   my $content = decode 'UTF-8', $buffer;
   like $content, qr/\[.*\] \[error\] Just works\n/,      'right error message';
   like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\n/, 'right fatal message';
   like $content, qr/\[.*\] \[debug\] Works too\n/,       'right debug message';
   like $content, qr/\[.*\] \[debug\] And this too\n/,    'right debug message';
+  like $content, qr/\[.*\] \[info\] undef works\n/,      'right debug message';
 };
 
 subtest 'Formatting' => sub {
@@ -73,6 +75,7 @@ subtest 'Short log messages (systemd)' => sub {
   like $log->format->(time, 'error', 'Test 123'), qr/^<3>\[\d+\] \[e\] Test 123\n$/, 'right format';
   like $log->format->(time, 'fatal', 'Test 123'), qr/^<2>\[\d+\] \[f\] Test 123\n$/, 'right format';
   like $log->format->(time, 'debug', 'Test', '1', '2', '3'), qr/^<6>\[\d+\] \[d\] Test 1 2 3\n$/, 'right format';
+  like $log->format->(time, 'debug', undef, 'works'), qr/^<6>\[\d+\] \[d\] undef works\n$/, 'right format';
 };
 
 subtest 'Colorized log messages' => sub {

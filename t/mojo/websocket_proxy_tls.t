@@ -66,14 +66,14 @@ my $ua = Mojo::UserAgent->new(
 # Normal non-blocking request
 my $result;
 $ua->get(
-  "https://127.0.0.1:$port/" => sub {
+  "https://localhost:$port/" => sub {
     my ($ua, $tx) = @_;
     $result = $tx->res->body;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-is $result, "Hello World! / https://127.0.0.1:$port/", 'right content';
+is $result, "Hello World! / https://localhost:$port/", 'right content';
 
 # Broken redirect
 my $start;
@@ -81,7 +81,7 @@ $ua->on(start => sub { $start++; pop->req->headers->header('X-Works', 'it does!'
 $result = undef;
 my $works;
 $ua->max_redirects(3)->get(
-  "https://127.0.0.1:$port/broken_redirect" => sub {
+  "https://localhost:$port/broken_redirect" => sub {
     my ($ua, $tx) = @_;
     $result = $tx->res->body;
     $works  = $tx->res->headers->header('X-Works');
@@ -89,7 +89,7 @@ $ua->max_redirects(3)->get(
   }
 );
 Mojo::IOLoop->start;
-is $result, "Hello World! / https://127.0.0.1:$port/", 'right content';
+is $result, "Hello World! / https://localhost:$port/", 'right content';
 is $works,  'it does!',                                'right header';
 is $start,  2,                                         'redirected once';
 $ua->unsubscribe('start');
@@ -97,7 +97,7 @@ $ua->unsubscribe('start');
 # Normal WebSocket
 $result = undef;
 $ua->websocket(
-  "wss://127.0.0.1:$port/test" => sub {
+  "wss://localhost:$port/test" => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub { shift->finish; $result = shift });
@@ -112,7 +112,7 @@ $ua->proxy->https("http://sri:secr3t\@127.0.0.1:$proxy");
 $result = undef;
 my ($auth, $kept_alive);
 $ua->get(
-  "https://127.0.0.1:$port/proxy" => sub {
+  "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
     $result     = $tx->res->body;
     $auth       = $tx->req->headers->proxy_authorization;
@@ -123,12 +123,12 @@ $ua->get(
 Mojo::IOLoop->start;
 ok !$auth,       'no "Proxy-Authorization" header';
 ok !$kept_alive, 'connection was not kept alive';
-is $result, "https://127.0.0.1:$port/proxy", 'right content';
+is $result, "https://localhost:$port/proxy", 'right content';
 
 # Non-blocking kept alive proxy request
 ($kept_alive, $result) = ();
 $ua->get(
-  "https://127.0.0.1:$port/proxy" => sub {
+  "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $result     = $tx->res->body;
@@ -136,14 +136,14 @@ $ua->get(
   }
 );
 Mojo::IOLoop->start;
-is $result, "https://127.0.0.1:$port/proxy", 'right content';
+is $result, "https://localhost:$port/proxy", 'right content';
 ok $kept_alive, 'connection was kept alive';
 
 # Kept alive proxy WebSocket
 $ua->proxy->https("http://127.0.0.1:$proxy");
 ($kept_alive, $result) = ();
 $ua->websocket(
-  "wss://127.0.0.1:$port/test" => sub {
+  "wss://localhost:$port/test" => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $tx->on(finish  => sub { Mojo::IOLoop->stop });
@@ -157,15 +157,15 @@ is $result, 'test1test2', 'right result';
 
 # Blocking proxy requests
 $ua->proxy->https("http://sri:secr3t\@127.0.0.1:$proxy");
-my $tx = $ua->max_connections(0)->get("https://127.0.0.1:$port/proxy");
+my $tx = $ua->max_connections(0)->get("https://localhost:$port/proxy");
 is $tx->res->code,             200,                             'right status';
-is $tx->res->body,             "https://127.0.0.1:$port/proxy", 'right content';
+is $tx->res->body,             "https://localhost:$port/proxy", 'right content';
 is $tx->req->method,           'GET',                           'right method';
 is $tx->previous->req->method, 'CONNECT',                       'right method';
-$tx = $ua->max_connections(5)->get("https://127.0.0.1:$port/proxy");
+$tx = $ua->max_connections(5)->get("https://localhost:$port/proxy");
 ok !$tx->kept_alive, 'connection was not kept alive';
 is $tx->res->code,             200,                             'right status';
-is $tx->res->body,             "https://127.0.0.1:$port/proxy", 'right content';
+is $tx->res->body,             "https://localhost:$port/proxy", 'right content';
 is $tx->req->method,           'GET',                           'right method';
 is $tx->previous->req->method, 'CONNECT',                       'right method';
 
@@ -173,7 +173,7 @@ is $tx->previous->req->method, 'CONNECT',                       'right method';
 $ua->proxy->https("http://127.0.0.1:$proxy");
 my ($leak, $err);
 $ua->websocket(
-  "wss://127.0.0.1:0/test" => sub {
+  "wss://localhost:0/test" => sub {
     my ($ua, $tx) = @_;
     $leak = !!Mojo::IOLoop->stream($tx->previous->connection);
     $err  = $tx->error;
@@ -185,9 +185,9 @@ ok !$leak, 'connection has been removed';
 is $err->{message}, 'Proxy connection failed', 'right error';
 
 # Blocking proxy request again
-$tx = $ua->get("https://127.0.0.1:$port/proxy");
+$tx = $ua->get("https://localhost:$port/proxy");
 is $tx->res->code, 200,                             'right status';
-is $tx->res->body, "https://127.0.0.1:$port/proxy", 'right content';
+is $tx->res->body, "https://localhost:$port/proxy", 'right content';
 
 # Failed TLS handshake through proxy
 my $close = Mojo::IOLoop->acceptor(Mojo::IOLoop->server(sub {
@@ -214,13 +214,13 @@ $ua->connect_timeout(10);
 $ua    = Mojo::UserAgent->new;
 $proxy = Mojo::IOLoop::Server->generate_port;
 $ua->proxy->https("http://127.0.0.1:$proxy");
-$tx = $ua->get("https://127.0.0.1:$port/proxy");
+$tx = $ua->get("https://localhost:$port/proxy");
 is $tx->error->{message}, 'Proxy connection failed', 'right error';
 
 # Non-blocking request to bad proxy
 $err = undef;
 $ua->get(
-  "https://127.0.0.1:$port/proxy" => sub {
+  "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
     $err = $tx->error;
     Mojo::IOLoop->stop;

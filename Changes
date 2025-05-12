@@ -1,4 +1,6 @@
 
+9.41  2025-05-13
+
 9.40  2025-05-12
   - Added EXPERIMENTAL support for resumable file downloads.
   - Added EXPERIMENTAL download methods to Mojo::File and Mojo::UserAgent::Transactor.

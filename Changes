@@ -1,5 +1,7 @@
 
-9.40  2024-11-24
+9.40  2025-05-12
+  - Added EXPERIMENTAL support for resumable file downloads.
+  - Added EXPERIMENTAL download methods to Mojo::File and Mojo::UserAgent::Transactor.
 
 9.39  2024-11-23
   - Added EXPERIMENTAL support for encrypted session cookies.

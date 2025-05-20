@@ -91,4 +91,21 @@ subtest 'Rotating secrets' => sub {
   };
 };
 
+subtest 'Insecure secret' => sub {
+  subtest 'Insecure secret (signed cookie)' => sub {
+    $t->reset_session;
+    $t->app->secrets([app->moniker]);
+    $t->app->sessions->encrypted(0);
+    $t->get_ok('/login')->status_is(500);
+  };
+
+  subtest 'Insecure secret (encrypted cookie)' => sub {
+    plan skip_all => 'CryptX required!' unless Mojo::Util->CRYPTX;
+    $t->reset_session;
+    $t->app->secrets([app->moniker]);
+    $t->app->sessions->encrypted(1);
+    $t->get_ok('/login')->status_is(500);
+  };
+};
+
 done_testing();

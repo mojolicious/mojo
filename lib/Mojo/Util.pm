@@ -847,15 +847,6 @@ Monkey patch functions into package.
     two   => sub { say 'Two!' },
     three => sub { say 'Three!' };
 
-=head2 punycode_decode
-
-  my $str = punycode_decode $punycode;
-
-Punycode decode string as described in L<RFC 3492|https://tools.ietf.org/html/rfc3492>.
-
-  # "bücher"
-  punycode_decode 'bcher-kva';
-
 =head2 network_contains
 
   my $bool = network_contains $network, $address;
@@ -872,6 +863,15 @@ addresses must be equivalent.
   network_contains('10.0.0.0/29', '10.10.10.10');
   network_contains('10.10.10.12', '10.10.10.10');
   network_contains('fc00::/7', '::1');
+  
+=head2 punycode_decode
+
+  my $str = punycode_decode $punycode;
+
+Punycode decode string as described in L<RFC 3492|https://tools.ietf.org/html/rfc3492>.
+
+  # "bücher"
+  punycode_decode 'bcher-kva';
 
 =head2 punycode_encode
 

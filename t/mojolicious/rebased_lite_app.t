@@ -5,7 +5,10 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::Mojo;
 use Test::More;
 use Mojo::URL;
+use Mojo::Util qw(generate_secret);
 use Mojolicious::Lite;
+
+app->secrets([generate_secret]);
 
 # Rebase hook
 app->hook(

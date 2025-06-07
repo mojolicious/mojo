@@ -518,11 +518,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"reply-E<gt>not_found">.
 
   app->start;
 
-To change the HTTP status code of the exception, you can use L<Mojolicious::Controller/"rendered">.
-
-  return $c->reply->exception('Division by zero!')->rendered(400) if $divisor == 0;
-
-You can also change the templates of those pages, since you most likely want to show your users something more closely
+You can change the templates of those pages, since you most likely want to show your users something more closely
 related to your application in production. The renderer will always try to find C<exception.$mode.$format.*> or
 C<not_found.$mode.$format.*> before falling back to the built-in default templates.
 

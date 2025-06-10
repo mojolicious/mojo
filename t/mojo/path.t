@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Path;
+use Mojo::Util qw(encode url_escape);
 
 subtest 'Basic functionality' => sub {
   my $path = Mojo::Path->new;
@@ -168,6 +169,31 @@ subtest 'Merge' => sub {
   ok !$path->leading_slash,  'no leading slash';
   ok !$path->trailing_slash, 'no trailing slash';
   is $path->to_route, '/foo/baz/yada', 'right route';
+};
+
+subtest 'Merge path object' => sub {
+  my $charset    = 'ISO-8859-15';
+  my $part       = 'b€r';
+  my $part_enc   = url_escape(encode($charset, $part));
+  my $parse_path = sub { Mojo::Path->new->charset($charset)->parse(@_) };
+
+  for my $has_trailing_slash (!!0, !!1) {
+    my $trailing_slash      = $has_trailing_slash ? '/' : '';
+    my $trailing_slash_diag = 'has'.($has_trailing_slash ? '' : ' no').' trailing slash';
+    my $path = $parse_path->("/$part_enc/");
+    $path->merge($parse_path->($part_enc.$trailing_slash));
+    is_deeply $path->parts, [($part) x 2],              'right structure';
+    is "$path", "/$part_enc/$part_enc".$trailing_slash, 'right path';
+    ok $path->leading_slash,                            'has leading slash';
+    is $path->trailing_slash, $has_trailing_slash,      $trailing_slash_diag;
+    is $path->to_route, "/$part/$part".$trailing_slash, 'right route';
+    $path = $parse_path->("/foo/")->merge($parse_path->("/$part_enc".$trailing_slash));
+    is_deeply $path->parts, [$part],                    'right structure';
+    is "$path", "/$part_enc".$trailing_slash,           'right path';
+    ok $path->leading_slash,                            'has leading slash';
+    is $path->trailing_slash, $has_trailing_slash,      $trailing_slash_diag;
+    is $path->to_route, "/$part".$trailing_slash,       'right route';
+  }
 };
 
 subtest 'Empty path elements' => sub {

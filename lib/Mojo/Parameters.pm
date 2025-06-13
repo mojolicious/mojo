@@ -110,7 +110,7 @@ sub parse {
   return $self->append(@_) if @_ > 1;
 
   # String
-  $self->{string} = shift;
+  $self->{string} = shift // '';
   return $self;
 }
 

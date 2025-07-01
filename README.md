@@ -30,8 +30,8 @@
   * A powerful **web development toolkit**, that you can use for all kinds of applications, independently of the web
     framework.
     * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS, SNI, IDNA, HTTP/SOCKS5 proxy, UNIX
-      domain socket, Comet (long polling), Promises/A+, async/await, keep-alive, connection pooling, timeout, cookie,
-      multipart, and gzip compression support.
+      domain socket, Comet (long polling), Server-Sent Events (SSE), Promises/A+, async/await, keep-alive, connection
+      pooling, timeout, cookie, multipart, and gzip compression support.
     * Built-in non-blocking I/O web server, supporting multiple event loops as well as optional pre-forking and hot
       deployment, perfect for building highly scalable web services.
     * JSON and HTML/XML parser with CSS selector support.

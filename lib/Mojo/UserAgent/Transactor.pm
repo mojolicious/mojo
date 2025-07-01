@@ -144,9 +144,11 @@ sub redirect {
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
   }
 
-  $new->res->content->auto_decompress(0) unless $self->compressed;
+  my $content = $new->res->content;
+  $content->auto_decompress(0) unless $self->compressed;
   my $headers = $new->req->url($location)->headers;
   $headers->remove($_) for qw(Authorization Cookie Host Referer);
+  if ($res->content->has_subscribers('sse')) { $content->on(sse => $_) for @{$res->content->subscribers('sse')} }
 
   return $new->previous($old);
 }

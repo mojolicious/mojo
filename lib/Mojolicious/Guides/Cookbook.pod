@@ -998,12 +998,12 @@ result in much better performance, but also increases memory usage by up to 300K
 
 You can also use L<Mojo::Transaction::WebSocket/"with_protocols"> to negotiate a subprotocol.
 
-=head2 EventSource web service
+=head2 Server-Sent Events web service
 
-EventSource is a special form of long polling where you can use L<Mojolicious::Controller/"write"> to directly send DOM
-events from servers to clients. It is uni-directional, that means you will have to use Ajax requests for sending data
-from clients to servers, the advantage however is low infrastructure requirements, since it reuses the HTTP protocol
-for transport.
+Server-Sent Events (SSE) is a special form of long polling where you can use L<Mojolicious::Controller/"write_sse"> to
+directly send DOM events from servers to clients. It is uni-directional, that means you will have to use Ajax requests
+for sending data from clients to servers, the advantage however is low infrastructure requirements, since it reuses the
+HTTP protocol for transport.
 
   use Mojolicious::Lite -signatures;
 
@@ -1017,12 +1017,11 @@ for transport.
     $c->inactivity_timeout(300);
 
     # Change content type and finalize response headers
-    $c->res->headers->content_type('text/event-stream');
-    $c->write;
+    $c->write_sse;
 
     # Subscribe to "message" event and forward "log" events to browser
     my $cb = $c->app->log->on(message => sub ($log, $level, @lines) {
-      $c->write("event:log\ndata: [$level] @lines\n\n");
+      $c->write_sse({type => 'log', text => "[$level] @lines"});
     });
 
     # Unsubscribe from "message" event again once we are done

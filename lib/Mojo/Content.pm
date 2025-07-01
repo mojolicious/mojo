@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp                qw(croak);
 use Compress::Raw::Zlib qw(WANT_GZIP Z_STREAM_END);
 use Mojo::Headers;
+use Mojo::SSE    qw(build_event parse_event);
 use Scalar::Util qw(looks_like_number);
 
 has [qw(auto_decompress auto_relax relaxed skip_body)];
@@ -62,6 +63,8 @@ sub is_multipart {undef}
 
 sub is_parsing_body { (shift->{state} // '') eq 'body' }
 
+sub is_sse { (shift->headers->content_type // '') eq 'text/event-stream' }
+
 sub leftovers { shift->{buffer} }
 
 sub parse {
@@ -73,10 +76,13 @@ sub parse {
 
   # Chunked content
   $self->{real_size} //= 0;
-  if ($self->is_chunked && $self->{state} ne 'headers') {
+  if ($self->is_chunked) {
     $self->_parse_chunked;
     $self->{state} = 'finished' if ($self->{chunk_state} // '') eq 'finished';
   }
+
+  # SSE
+  elsif ($self->is_sse) { $self->_parse_sse }
 
   # Not chunked, pass through to second buffer
   else {
@@ -156,6 +162,16 @@ sub write_chunk {
   $self->{eof} = 1                                    if defined $chunk && !length $chunk;
 
   return $self;
+}
+
+sub write_sse {
+  my ($self, $event, $cb) = @_;
+
+  $self->headers->content_type('text/event-stream') unless $self->{sse};
+  $self->{sse} = 1;
+
+  return $self->write unless defined $event;
+  return $self->write(build_event($event), $cb);
 }
 
 sub _build_chunk {
@@ -253,6 +269,20 @@ sub _parse_headers {
   $self->{header_size} = $self->{raw_size} - length $leftovers;
 }
 
+sub _parse_sse {
+  my $self = shift;
+
+  # Connection established
+  $self->emit('sse') unless $self->{sse};
+  $self->{sse} = 1;
+
+  # Parse SSE
+  while (my $event = parse_event(\$self->{pre_buffer})) { $self->emit(sse => $event) }
+
+  # Check buffer size
+  @$self{qw(state limit)} = ('finished', 1) if length($self->{pre_buffer} // '') > $self->max_buffer_size;
+}
+
 sub _parse_until_body {
   my ($self, $chunk) = @_;
 
@@ -317,6 +347,18 @@ Emitted when a new chunk of content arrives.
 
   $content->on(read => sub ($content, $bytes) {
     say "Streaming: $bytes";
+  });
+
+=head2 sse
+
+  $content->on(sse => sub ($content, $event) {...});
+
+Emitted when a new Server-Sent Event (SSE) connection has been established and for each new event that arrives. Note
+that this event is B<EXPERIMENTAL> and may change without warning!
+
+  $content->on(sse => sub ($content, $event) {
+    if ($event) { say "Type: $event->{type}, Data: $event->{data}" }
+    else        { say "SSE connection established" }
   });
 
 =head1 ATTRIBUTES
@@ -480,6 +522,13 @@ False, this is not a L<Mojo::Content::MultiPart> object.
 
 Check if body parsing started yet.
 
+=head2 is_sse
+
+  my $bool = $content->is_sse;
+
+Check if C<Content-Type> header indicates Server-Sent Events (SSE). Note that this method is B<EXPERIMENTAL> and may
+change without warning!
+
 =head2 leftovers
 
   my $bytes = $content->leftovers;
@@ -540,6 +589,16 @@ dynamic content to be written later. You can write an empty chunk of data at any
       $content->write_chunk('');
     });
   });
+
+=head2 write_sse
+
+  $content = $content->write_sse;
+  $content = $content->write_sse($event);
+  $content = $content->write_sse($event => sub {...});
+
+Write Server-Sent Event (SSE) non-blocking, the optional drain callback will be executed once all data has been
+written. Calling this method without an event will finalize the response headers and allow for events to be written
+later. Note that this method is B<EXPERIMENTAL> and may change without warning!
 
 =head1 SEE ALSO
 

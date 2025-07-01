@@ -329,6 +329,12 @@ sub write_chunk {
   return $self->rendered;
 }
 
+sub write_sse {
+  my ($self, $event, $cb) = @_;
+  $self->res->content->write_sse($event, $cb ? sub { shift; $self->$cb(@_) } : ());
+  return $self->rendered;
+}
+
 1;
 
 =encoding utf8
@@ -919,6 +925,27 @@ You can call L</"finish"> or write an empty chunk of data at any time to end the
   2
   o!
   0
+
+=head2 write_sse
+
+  $c = $c->write_sse;
+  $c = $c->write_sse($event);
+  $c = $c->write_sse($event => sub ($c) {...});
+
+Write Server-Sent Event (SSE) non-blocking, the optional drain callback will be executed once all data has been
+written. Calling this method without an event will finalize the response headers and allow for events to be written
+later. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
+  # Send event with default "message" type
+  $c->write_sse({text => 'Hello World!'});
+
+  # You can send comments in regular intervals to keep the connection alive
+  $c->write_sse({comment => 'Keep connection alive!'});
+
+  # Make sure previous event has been written before continuing (id and type are optional)
+  $c->write_sse({id => 23, type => 'greeting', text => 'Hello World!'} => sub ($c) {
+    $c->write_sse({id => 24, type => 'farewell', text => 'Goodbye World!'} => sub ($c) { $c->finish });
+  });
 
 =head1 HELPERS
 

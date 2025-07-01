@@ -34,6 +34,7 @@ subtest 'Detect common MIME types' => sub {
   is_deeply $t->detect('application/pdf'),          ['pdf'],         'right formats';
   is_deeply $t->detect('image/png'),                ['png'],         'right formats';
   is_deeply $t->detect('application/rss+xml'),      ['rss'],         'right formats';
+  is_deeply $t->detect('text/event-stream'),        ['sse'],         'right formats';
   is_deeply $t->detect('image/svg+xml'),            ['svg'],         'right formats';
   is_deeply $t->detect('font/ttf'),                 ['ttf'],         'right formats';
   is_deeply $t->detect('text/plain'),               ['txt'],         'right formats';
@@ -46,12 +47,13 @@ subtest 'Detect common MIME types' => sub {
 };
 
 subtest 'Detect special cases' => sub {
-  is_deeply $t->detect('Application/Xml'), ['xml'],         'right formats';
-  is_deeply $t->detect(' Text/Xml '),      ['xml'],         'right formats';
-  is_deeply $t->detect('APPLICATION/XML'), ['xml'],         'right formats';
-  is_deeply $t->detect('TEXT/XML'),        ['xml'],         'right formats';
-  is_deeply $t->detect('text/html;q=0.9'), ['htm', 'html'], 'right formats';
-  is_deeply $t->detect('TEXT/HTML;Q=0.9'), ['htm', 'html'], 'right formats';
+  is_deeply $t->detect('Application/Xml'),                     ['xml'],         'right formats';
+  is_deeply $t->detect(' Text/Xml '),                          ['xml'],         'right formats';
+  is_deeply $t->detect('APPLICATION/XML'),                     ['xml'],         'right formats';
+  is_deeply $t->detect('TEXT/XML'),                            ['xml'],         'right formats';
+  is_deeply $t->detect('text/html;q=0.9'),                     ['htm', 'html'], 'right formats';
+  is_deeply $t->detect('TEXT/HTML;Q=0.9'),                     ['htm', 'html'], 'right formats';
+  is_deeply $t->detect('text/event-stream, application/json'), ['json', 'sse'], 'right formats';
 };
 
 subtest 'Alternatives' => sub {

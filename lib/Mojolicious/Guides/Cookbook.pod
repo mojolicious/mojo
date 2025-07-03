@@ -1850,7 +1850,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"proxy-E<gt>start_p"> can stream response 
 as a new chunk of data is received from the backend web service. Additionally they will take care of removing hop-by-hop
 headers and protect you automatically from backpressure issues. Which can happen in situations where the connection to
 the backend web service is faster than the connection to the client and data forwarding needs to be throttled. And the
-best of all, everything happens non-blocking, that means your web server can process other requestes concurrently while
+best of all, everything happens non-blocking, that means your web server can process other requests concurrently while
 waiting for I/O.
 
   use Mojolicious::Lite -signatures;

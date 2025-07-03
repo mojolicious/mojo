@@ -1,4 +1,6 @@
 
+9.42  2025-07-04
+
 9.41  2025-07-03
   - Added EXPERIMENTAL support for Server-Sent Events.
   - Added EXPERIMENTAL module Mojo::SSE.

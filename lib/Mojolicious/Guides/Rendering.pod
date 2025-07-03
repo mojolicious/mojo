@@ -639,6 +639,11 @@ as a render argument (not a stash value).
 
   my $html = $c->render_to_string('reminder', layout => 'mail');
 
+For renderers that support C<inline> templates, such as C<ep>, you can also pass a layout with the C<inline_layout>
+stash value.
+
+  $c->render(inline => 'World', inline_layout => 'Hello <%= content %>!');
+
 =head2 Partial templates
 
 You can break up bigger templates into smaller, more manageable chunks. These partial templates can also be shared with

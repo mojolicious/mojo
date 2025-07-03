@@ -1,5 +1,13 @@
 
-9.41  2025-05-13
+9.41  2025-07-03
+  - Added EXPERIMENTAL support for Server-Sent Events.
+  - Added EXPERIMENTAL module Mojo::SSE.
+  - Added EXPERIMENTAL sse attribute to Test::Mojo.
+  - Added EXPERIMENTAL get_sse_ok, post_sse_ok, sse_finish_ok, sse_finished_ok, sse_ok, sse_id_is, sse_id_isnt,
+    sse_text_is, sse_text_isnt, sse_text_like, sse_text_unlike, sse_type_is and sse_type_isnt methods to Test::Mojo.
+  - Added EXPERIMENTAL is_sse and write_sse methods to Mojo::Content.
+  - Added EXPERIMENTAL write_sse method to Mojolicious::Controller.
+  - Added EXPERIMENTAL sse event to Mojo::Content.
 
 9.40  2025-05-12
   - Added EXPERIMENTAL support for resumable file downloads.

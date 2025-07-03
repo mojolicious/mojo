@@ -17,7 +17,7 @@ use Mojo::Util qw(decode encode);
 use Test::More ();
 
 has handler => sub { \&_handler };
-has [qw(message success tx)];
+has [qw(message sse success tx)];
 has ua => sub { Mojo::UserAgent->new(insecure => 1)->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
@@ -128,7 +128,10 @@ sub finished_ok {
   return $self->test('ok', $ok, "WebSocket closed with status $code");
 }
 
-sub get_ok  { shift->_build_ok(GET  => @_) }
+sub get_ok { shift->_build_ok(GET => @_) }
+
+sub get_sse_ok { shift->_build_sse_ok(GET => @_) }
+
 sub head_ok { shift->_build_ok(HEAD => @_) }
 
 sub header_exists {
@@ -265,8 +268,12 @@ sub or {
 }
 
 sub patch_ok { shift->_build_ok(PATCH => @_) }
-sub post_ok  { shift->_build_ok(POST  => @_) }
-sub put_ok   { shift->_build_ok(PUT   => @_) }
+
+sub post_ok { shift->_build_ok(POST => @_) }
+
+sub post_sse_ok { shift->_build_sse_ok(POST => @_) }
+
+sub put_ok { shift->_build_ok(PUT => @_) }
 
 sub request_ok { shift->_request_ok($_[0], $_[0]->req->url->to_string) }
 
@@ -285,6 +292,64 @@ sub send_ok {
   $self->tx->send($msg => sub { Mojo::IOLoop->stop });
   Mojo::IOLoop->start;
   return $self->test('ok', 1, $desc);
+}
+
+sub sse_finish_ok {
+  my $self = shift;
+  $self->tx->res->error({message => 'Interrupted by Test::Mojo'});
+  Mojo::IOLoop->one_tick while !$self->{sse_finished};
+  return $self->test('ok', 1, 'closed SSE connection');
+}
+
+sub sse_finished_ok {
+  my $self = shift;
+  Mojo::IOLoop->one_tick while !$self->{sse_finished};
+  return $self->test('ok', 1, 'SSE connection has been closed');
+}
+
+sub sse_ok {
+  my ($self, $desc) = @_;
+  return $self->test('ok', !!$self->_sse_wait, _desc($desc, 'event received'));
+}
+
+sub sse_id_is {
+  my ($self, $type, $desc) = @_;
+  return $self->test('is', $self->sse->{id}, $type, _desc($desc, 'exact match for SSE event id'));
+}
+
+sub sse_id_isnt {
+  my ($self, $type, $desc) = @_;
+  return $self->test('isnt', $self->sse->{id}, $type, _desc($desc, 'no match for SSE event id'));
+}
+
+sub sse_text_is {
+  my ($self, $text, $desc) = @_;
+  return $self->test('is', $self->sse->{text}, $text, _desc($desc, 'exact match for SSE event text'));
+}
+
+sub sse_text_isnt {
+  my ($self, $text, $desc) = @_;
+  return $self->test('isnt', $self->sse->{text}, $text, _desc($desc, 'no match for SSE event text'));
+}
+
+sub sse_text_like {
+  my ($self, $regex, $desc) = @_;
+  return $self->test('like', $self->sse->{text}, $regex, _desc($desc, 'similar match for SSE event text'));
+}
+
+sub sse_text_unlike {
+  my ($self, $regex, $desc) = @_;
+  return $self->test('unlike', $self->sse->{text}, $regex, _desc($desc, 'no similar match for SSE event text'));
+}
+
+sub sse_type_is {
+  my ($self, $type, $desc) = @_;
+  return $self->test('is', $self->sse->{type}, $type, _desc($desc, 'exact match for SSE event type'));
+}
+
+sub sse_type_isnt {
+  my ($self, $type, $desc) = @_;
+  return $self->test('isnt', $self->sse->{type}, $type, _desc($desc, 'no match for SSE event type'));
 }
 
 sub status_is {
@@ -341,6 +406,12 @@ sub _build_ok {
   my ($self, $method, $url) = (shift, shift, shift);
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   return $self->_request_ok($self->ua->build_tx($method, $url, @_), $url);
+}
+
+sub _build_sse_ok {
+  my ($self, $method, $url) = (shift, shift, shift);
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  return $self->_sse_ok($self->ua->build_tx($method, $url, @_), $url);
 }
 
 sub _desc { encode 'UTF-8', shift || shift }
@@ -403,6 +474,40 @@ sub _request_ok {
   return $self->test('ok', $ok, _desc("@{[uc $tx->req->method]} $url"));
 }
 
+sub _sse_ok {
+  my ($self, $tx, $url) = @_;
+
+  my $ok = undef;
+  @$self{qw(sse_finished sse_events)} = (undef, []);
+  $tx->res->content->on(
+    sse => sub {
+      my ($content, $event) = @_;
+      if ($event) { push @{$self->{sse_events}}, $event }
+      else {
+        $ok = 1;
+        Mojo::IOLoop->stop;
+      }
+    }
+  );
+  my $cb = $self->ua->on(start => sub { $self->tx(pop) });
+  $self->ua->start(
+    $tx => sub {
+      $self->{sse_finished} = 1;
+      $self->ua->unsubscribe(start => $cb);
+      Mojo::IOLoop->stop;
+    }
+  );
+  Mojo::IOLoop->start;
+
+  return $self->test('ok', $ok, _desc("SSE connection established: @{[uc $tx->req->method]} $url"));
+}
+
+sub _sse_wait {
+  my $self = shift;
+  Mojo::IOLoop->one_tick while !$self->{sse_finished} && !@{$self->{sse_events}};
+  return $self->sse(shift @{$self->{sse_events}})->sse;
+}
+
 sub _text {
   return undef unless my $e = shift->tx->res->dom->at(shift);
   return $e->text;
@@ -446,6 +551,14 @@ Test::Mojo - Testing Mojo
     ->message_ok
     ->message_is('echo: hello')
     ->finish_ok;
+
+  # Server-Sent Events (SSE)
+  $t->get_sse_ok('/events')
+    ->status_is(200)
+    ->sse_ok
+    ->sse_type_is('message')
+    ->sse_text_is('hello mojo')
+    ->sse_finish_ok;
 
   done_testing();
 
@@ -496,6 +609,14 @@ Current WebSocket message represented as an array reference containing the frame
     ->json_message_has('/foo/bar')
     ->json_message_hasnt('/bar')
     ->json_message_is('/foo/baz' => {yada => [1, 2, 3]});
+
+=head2 sse
+
+  my $event = $t->sse;
+  $t        = $t->sse({type => 'message', text => 'working!'});
+
+Current Server-Sent Event (SSE) represented as a hash reference. Note that this attribute is B<EXPERIMENTAL> and may
+change without warning!
 
 =head2 success
 
@@ -748,6 +869,18 @@ for the callback.
   # Run additional tests on the transaction
   $t->get_ok('/foo')->status_is(200);
   is $t->tx->res->dom->at('input')->val, 'whatever', 'right value';
+
+=head2 get_sse_ok
+
+  $t = $t->get_sse_ok('http://example.com/events');
+  $t = $t->get_sse_ok('/events');
+  $t = $t->get_sse_ok('/events' => {Accept => 'text/event-stream'} => 'Content!');
+  $t = $t->get_sse_ok('/events' => {Accept => 'text/event-stream'} => form => {a => 'b'});
+  $t = $t->get_sse_ok('/events' => {Accept => 'text/event-stream'} => json => {a => 'b'});
+
+Perform a C<GET> reequest to establish a Server-Sent Events (SSE) connection, takes the same arguments as
+L<Mojo::UserAgent/"get">, except for the callback. Note that this method is B<EXPERIMENTAL> and may change without
+warning!
 
 =head2 head_ok
 
@@ -1005,6 +1138,18 @@ for the callback.
     ->status_is(200)
     ->json_is({bye => 'world'});
 
+=head2 post_sse_ok
+
+  $t = $t->post_sse_ok('http://example.com/events');
+  $t = $t->post_sse_ok('/events');
+  $t = $t->post_sse_ok('/events' => {Accept => 'text/event-stream'} => 'Content!');
+  $t = $t->post_sse_ok('/events' => {Accept => 'text/event-stream'} => form => {a => 'b'});
+  $t = $t->post_sse_ok('/events' => {Accept => 'text/event-stream'} => json => {a => 'b'});
+
+Perform a C<POST> reequest to establish a Server-Sent Events (SSE) connection, takes the same arguments as
+L<Mojo::UserAgent/"post">, except for the callback. Note that this method is B<EXPERIMENTAL> and may change without
+warning!
+
 =head2 put_ok
 
   $t = $t->put_ok('http://example.com/foo');
@@ -1059,6 +1204,82 @@ Send message or frame via WebSocket.
     ->message_ok
     ->json_message_is('/test' => 'I ♥ Mojolicious!')
     ->finish_ok;
+
+=head2 sse_finish_ok
+
+  $t = $t->sse_finish_ok;
+
+Close Server-Sent Events connection. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_finished_ok
+
+  $t = $t->sse_finished_ok;
+
+Wait for Server-Sent Events connection to be closed. Note that this method is B<EXPERIMENTAL> and may change without
+warning!
+
+=head2 sse_ok
+
+  $t = $t->sse_ok;
+  $t = $t->sse_ok('got an event');
+
+Wait for next Server-Sent Event to arrive. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_id_is
+
+  $t = $t->sse_id_is(123);
+  $t = $t->sse_id_is(123, 'right id');
+
+Check Server-Sent Event id for exact match. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_id_isnt
+
+  $t = $t->sse_id_isnt(123);
+  $t = $t->sse_id_isnt(123, 'different id');
+
+Opposite of L</"sse_id_is">. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_text_is
+
+  $t = $t->sse_text_is('working!');
+  $t = $t->sse_text_is('working!', 'right text');
+
+Check Server-Sent Event text for exact match. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_text_isnt
+
+  $t = $t->sse_text_isnt('working!');
+  $t = $t->sse_text_isnt('working!', 'different text');
+
+Opposite of L</"sse_text_is">. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_text_like
+
+  $t = $t->sse_text_like(qr/working/);
+  $t = $t->sse_text_like(qr/working/, 'right text');
+
+Check Server-Sent Event text for exact match. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_text_unlike
+
+  $t = $t->sse_text_unlike(qr/working/);
+  $t = $t->sse_text_unlike(qr/working/, 'different text');
+
+Opposite of L</"sse_text_like">. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_type_is
+
+  $t = $t->sse_type_is('message');
+  $t = $t->sse_type_is('message', 'right type');
+
+Check Server-Sent Event type for exact match. Note that this method is B<EXPERIMENTAL> and may change without warning!
+
+=head2 sse_type_isnt
+
+  $t = $t->sse_type_isnt('message');
+  $t = $t->sse_type_isnt('message', 'different type');
+
+Opposite of L</"sse_type_is">. Note that this method is B<EXPERIMENTAL> and may change without warning!
 
 =head2 status_is
 

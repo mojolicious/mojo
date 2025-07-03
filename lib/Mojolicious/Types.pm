@@ -25,6 +25,7 @@ has mapping => sub {
     pdf      => ['application/pdf'],
     png      => ['image/png'],
     rss      => ['application/rss+xml'],
+    sse      => ['text/event-stream'],
     svg      => ['image/svg+xml'],
     ttf      => ['font/ttf'],
     txt      => ['text/plain;charset=UTF-8'],
@@ -114,6 +115,7 @@ L<Mojolicious::Types> manages MIME types for L<Mojolicious>.
   pdf      -> application/pdf
   png      -> image/png
   rss      -> application/rss+xml
+  sse      -> text/event-stream
   svg      -> image/svg+xml
   ttf      -> font/ttf
   txt      -> text/plain;charset=UTF-8

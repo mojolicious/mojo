@@ -11,6 +11,15 @@ websocket '/websocket' => sub {
   $c->send({text => 'testing message'});
 };
 
+any '/sse' => sub {
+  my $c = shift;
+  $c->write_sse({text => 'One', id => 23});
+  $c->write_sse({text => 'Two'});
+  $c->write_sse({text => 'Three'});
+  $c->write_sse({text => 'Four'});
+  $c->finish;
+};
+
 my $t = Test::Mojo->new;
 
 subtest 'Basics' => sub {
@@ -261,6 +270,86 @@ subtest 'message_unlike' => sub {
   is_deeply \@args, ['unlike', 'testing message', qr/^test/, 'message is not similar'], 'right result';
   $t->websocket_ok('/websocket')->message_ok->message_unlike(qr/^test/, 'some description');
   is_deeply \@args, ['unlike', 'testing message', qr/^test/, 'some description'], 'right result';
+};
+
+subtest 'SSE' => sub {
+  subtest 'get_sse_ok' => sub {
+    $t->get_sse_ok('/sse');
+    is_deeply \@args, ['ok', 1, 'SSE connection established: GET /sse'], 'right result';
+    $t->sse_finish_ok;
+    is_deeply \@args, ['ok', 1, 'closed SSE connection'], 'right result';
+  };
+
+  subtest 'post_sse_ok' => sub {
+    $t->post_sse_ok('/sse');
+    is_deeply \@args, ['ok', 1, 'SSE connection established: POST /sse'], 'right result';
+    $t->sse_ok->sse_ok->sse_ok->sse_ok->sse_finished_ok;
+    is_deeply \@args, ['ok', 1, 'SSE connection has been closed'], 'right result';
+  };
+
+  subtest 'sse_id_is' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_id_is('Two');
+    is_deeply \@args, ['is', 23, 'Two', 'exact match for SSE event id'], 'right result';
+    $t->sse_id_is('Two', 'some description');
+    is_deeply \@args, ['is', 23, 'Two', 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
+
+  subtest 'sse_id_isnt' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_id_isnt('Two');
+    is_deeply \@args, ['isnt', 23, 'Two', 'no match for SSE event id'], 'right result';
+    $t->sse_id_isnt('Two', 'some description');
+    is_deeply \@args, ['isnt', 23, 'Two', 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
+
+  subtest 'sse_type_is' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_type_is('Two');
+    is_deeply \@args, ['is', 'message', 'Two', 'exact match for SSE event type'], 'right result';
+    $t->sse_type_is('Two', 'some description');
+    is_deeply \@args, ['is', 'message', 'Two', 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
+
+  subtest 'sse_type_isnt' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_type_isnt('Two');
+    is_deeply \@args, ['isnt', 'message', 'Two', 'no match for SSE event type'], 'right result';
+    $t->sse_type_isnt('Two', 'some description');
+    is_deeply \@args, ['isnt', 'message', 'Two', 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
+
+  subtest 'sse_text_is' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_text_is('Two');
+    is_deeply \@args, ['is', 'One', 'Two', 'exact match for SSE event text'], 'right result';
+    $t->sse_text_is('Two', 'some description');
+    is_deeply \@args, ['is', 'One', 'Two', 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
+
+  subtest 'sse_text_isnt' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_text_isnt('Two');
+    is_deeply \@args, ['isnt', 'One', 'Two', 'no match for SSE event text'], 'right result';
+    $t->sse_text_isnt('Two', 'some description');
+    is_deeply \@args, ['isnt', 'One', 'Two', 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
+
+  subtest 'sse_text_like' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_text_like(qr/Two/);
+    is_deeply \@args, ['like', 'One', qr/Two/, 'similar match for SSE event text'], 'right result';
+    $t->sse_text_like(qr/Two/, 'some description');
+    is_deeply \@args, ['like', 'One', qr/Two/, 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
+
+  subtest 'sse_text_unlike' => sub {
+    $t->get_sse_ok('/sse')->sse_ok->sse_text_unlike(qr/Two/);
+    is_deeply \@args, ['unlike', 'One', qr/Two/, 'no similar match for SSE event text'], 'right result';
+    $t->sse_text_unlike(qr/Two/, 'some description');
+    is_deeply \@args, ['unlike', 'One', qr/Two/, 'some description'], 'right result';
+    $t->sse_finish_ok;
+  };
 };
 
 done_testing();

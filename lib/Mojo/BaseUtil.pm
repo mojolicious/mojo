@@ -29,7 +29,7 @@ Mojo::BaseUtil - Common utility functions used in Mojo::Base, re-exported in Moj
 
 =head1 SYNOPSIS
 
-  use Mojo::BaseUtil qw(class_to_patch monkey_path);
+  use Mojo::BaseUtil qw(class_to_path monkey_patch);
 
   my $path = class_to_path 'Foo::Bar';
   monkey_patch 'MyApp', foo => sub { say 'Foo!' };

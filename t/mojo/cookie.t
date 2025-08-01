@@ -168,13 +168,14 @@ subtest 'Full response cookie as string' => sub {
   $cookie->value('ba r');
   $cookie->domain('example.com');
   $cookie->path('/test');
+  $cookie->partitioned(1);
   $cookie->max_age(60);
   $cookie->expires(1218092879);
   $cookie->secure(1);
   $cookie->httponly(1);
   $cookie->samesite('Lax');
   is $cookie->to_string, '0="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
-    . ' path=/test; secure; HttpOnly; SameSite=Lax; Max-Age=60', 'right format';
+    . ' path=/test; Partitioned; secure; HttpOnly; SameSite=Lax; Max-Age=60', 'right format';
 };
 
 subtest 'Empty response cookie' => sub {
@@ -214,6 +215,18 @@ subtest 'Parse response cookie (RFC 6265)' => sub {
   is $cookies->[0]->expires, 1218092879,    'right expires value';
   is $cookies->[0]->secure,  1,             'right secure flag';
   is $cookies->[1],          undef,         'no more cookies';
+};
+
+subtest 'Partitioned cookie (RFC 6265 CHIPS)' => sub {
+  my $cookies
+    = Mojo::Cookie::Response->parse(
+    'foo="bar"; Domain=example.com; Partitioned; Path=/test; Max-Age=60; Expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure;'
+    );
+  is $cookies->[0]->partitioned, 1, 'right partitioned value';
+
+  $cookies = Mojo::Cookie::Response->parse(
+    'foo="bar"; Domain=example.com; Path=/test; Max-Age=60; Expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure;');
+  is $cookies->[0]->partitioned, undef, 'no partitioned value';
 };
 
 subtest 'Parse response cookie with invalid flag (RFC 6265)' => sub {

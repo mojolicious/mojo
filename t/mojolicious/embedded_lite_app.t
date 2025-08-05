@@ -15,6 +15,9 @@ use Test::Mojo;
 
 package TestApp;
 use Mojolicious::Lite;
+use Mojo::Util qw(generate_secret);
+
+app->secrets([generate_secret]);
 
 get '/hello' => sub {
   my $c       = shift;

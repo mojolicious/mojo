@@ -41,8 +41,8 @@ subtest 'IPv6, TLS, SNI and a proxy' => sub {
   $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
   my $listen
     = 'https://[::1]'
-    . '?127.0.0.1_cert=t/mojo/certs/server.crt'
-    . '&127.0.0.1_key=t/mojo/certs/server.key'
+    . '?localhost_cert=t/mojo/certs/server.crt'
+    . '&localhost_key=t/mojo/certs/server.key'
     . '&example.com_cert=t/mojo/certs/domain.crt'
     . '&example.com_key=t/mojo/certs/domain.key';
   my $forward = $daemon->listen([$listen])->start->ports->[0];
@@ -54,7 +54,7 @@ subtest 'IPv6, TLS, SNI and a proxy' => sub {
   is $tx->res->code, 200,      'right status';
   is $tx->res->body, 'works!', 'right content';
   ok !$tx->error, 'no error';
-  $tx = $ua->get("https://127.0.0.1/");
+  $tx = $ua->get("https://localhost/");
   is $tx->res->code, 200,      'right status';
   is $tx->res->body, 'works!', 'right content';
   ok !$tx->error, 'no error';

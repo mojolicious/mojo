@@ -14,7 +14,7 @@ plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Moj
 # openssl req -x509 -days 7300 -key ca.key -in ca.csr -out ca.crt
 #
 # openssl genrsa -out server.key 1024
-# openssl req -new -key server.key -out server.csr -subj "/C=US/CN=127.0.0.1"
+# openssl req -new -key server.key -out server.csr -subj "/C=US/CN=localhost"
 # openssl x509 -req -days 7300 -in server.csr -out server.crt -CA ca.crt \
 #   -CAkey ca.key -CAcreateserial
 #
@@ -46,7 +46,7 @@ my $id      = $loop->server(
 my $port     = $loop->acceptor($id)->port;
 my $promise2 = Mojo::Promise->new->ioloop($loop);
 $loop->client(
-  {port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
+  {address => 'localhost', port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => sub { $promise2->resolve });
@@ -88,6 +88,7 @@ $id      = Mojo::IOLoop->server(
 $port     = Mojo::IOLoop->acceptor($id)->port;
 $promise2 = Mojo::Promise->new;
 Mojo::IOLoop->client(
+  address     => 'localhost',
   port        => $port,
   tls         => 1,
   tls_cert    => 't/mojo/certs/client.crt',
@@ -118,6 +119,7 @@ ok !$server_err, 'no error';
 # Invalid client certificate
 my $client_err;
 Mojo::IOLoop->client(
+  address  => 'localhost',
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/bad.crt',
@@ -133,7 +135,7 @@ ok $client_err, 'has error';
 # Missing client certificate
 ($server_err, $client_err) = ();
 Mojo::IOLoop->client(
-  {port => $port, tls => 1} => sub {
+  {address => 'localhost', port => $port, tls => 1} => sub {
     shift->stop;
     $client_err = shift;
   }
@@ -155,6 +157,7 @@ $id = $loop->server(
 );
 $port = $loop->acceptor($id)->port;
 $loop->client(
+  address  => 'localhost',
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/client.crt',
@@ -195,6 +198,7 @@ $id      = Mojo::IOLoop->server(
 $port     = Mojo::IOLoop->acceptor($id)->port;
 $promise2 = Mojo::Promise->new;
 Mojo::IOLoop->client(
+  address  => 'localhost',
   port     => $port,
   tls      => 1,
   tls_ca   => 't/mojo/certs/ca.crt',
@@ -235,9 +239,10 @@ $id = $loop->server(
 );
 $port = $loop->acceptor($id)->port;
 $loop->client(
-  port   => $port,
-  tls    => 1,
-  tls_ca => 't/mojo/certs/ca.crt',
+  address => 'localhost',
+  port    => $port,
+  tls     => 1,
+  tls_ca  => 't/mojo/certs/ca.crt',
   sub {
     shift->stop;
     $client_err = shift;
@@ -259,7 +264,7 @@ $id = $loop->server(
 );
 $port = $loop->acceptor($id)->port;
 $loop->client(
-  address => '127.0.0.1',
+  address => 'localhost',
   port    => $port,
   tls     => 1,
   tls_ca  => 't/mojo/certs/ca.crt',
@@ -284,9 +289,10 @@ $id = $loop->server(
 );
 $port = $loop->acceptor($id)->port;
 $loop->client(
-  port   => $port,
-  tls    => 1,
-  tls_ca => 'no cert',
+  address => 'localhost',
+  port    => $port,
+  tls     => 1,
+  tls_ca  => 'no cert',
   sub {
     shift->stop;
     $client_err = shift;
@@ -315,6 +321,7 @@ $id = $loop->server(
 );
 $port = $loop->acceptor($id)->port;
 $loop->client(
+  address     => 'localhost',
   port        => $port,
   tls         => 1,
   tls_cert    => 't/mojo/certs/bad.crt',
@@ -350,7 +357,7 @@ $id = Mojo::IOLoop->server(
 );
 $port = Mojo::IOLoop->acceptor($id)->port;
 Mojo::IOLoop->client(
-  {port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
+  {address => 'localhost', port => $port, tls => 1, tls_options => {SSL_verify_mode => 0x00}} => sub {
     shift->stop;
     $client     = 'connected';
     $client_err = shift;
@@ -376,6 +383,7 @@ subtest 'ALPN' => sub {
   );
   $port = Mojo::IOLoop->acceptor($id)->port;
   Mojo::IOLoop->client(
+    address     => 'localhost',
     port        => $port,
     tls         => 1,
     tls_options => {SSL_alpn_protocols => ['baz', 'bar'], SSL_verify_mode => 0x00},

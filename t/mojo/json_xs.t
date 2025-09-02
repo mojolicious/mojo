@@ -4,7 +4,7 @@ use Test::More;
 use Mojo::JSON qw(decode_json encode_json false from_json j to_json true);
 
 BEGIN {
-  plan skip_all => 'Cpanel::JSON::XS 4.09+ required for this test!' unless Mojo::JSON->JSON_XS;
+  plan skip_all => 'Cpanel::JSON::XS 4.20+ required for this test!' unless Mojo::JSON->JSON_XS;
 }
 
 package JSONTest;
@@ -13,6 +13,13 @@ use Mojo::Base -base;
 has 'something' => sub { {} };
 
 sub TO_JSON { shift->something }
+
+package JSONTest2;
+use Mojo::Base -base;
+use overload '&' => sub {die}, '""' => sub {'works!'};
+
+package JSONTest3;
+use Mojo::Base -base;
 
 package main;
 
@@ -64,6 +71,8 @@ subtest '"convert_blessed"' => sub {
   is_deeply decode_json($bytes), {}, 'successful roundtrip';
   $bytes = encode_json(JSONTest->new(something => {just => 'works'}, else => {not => 'working'}));
   is_deeply decode_json($bytes), {just => 'works'}, 'successful roundtrip';
+  is encode_json([JSONTest2->new]), "[\"works!\"]", 'object stringified';
+  is encode_json([JSONTest3->new]), '[null]',       'object with no stringification overload';
 };
 
 subtest '"stringify_infnan"' => sub {

@@ -13,6 +13,9 @@ package JSONTest2;
 use Mojo::Base -base;
 use overload '&' => sub {die}, '""' => sub {'works!'};
 
+package JSONTest3;
+use Mojo::Base -base;
+
 package main;
 
 use Test::More;
@@ -334,6 +337,7 @@ subtest 'dualvar' => sub {
 
 subtest 'Other reference types' => sub {
   is encode_json([JSONTest2->new]), "[\"works!\"]", 'object stringified';
+  is encode_json([JSONTest3->new]), '[null]',       'object with no stringification overload';
 };
 
 subtest 'Ensure numbers and strings are not upgraded' => sub {

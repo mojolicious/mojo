@@ -289,7 +289,7 @@ any '/something' => sub {
   $c->render(text => 'Just works!');
 };
 
-any [qw(get post whatever)] => '/something/else' => sub {
+any [qw(GET POST whatever)] => '/something/else' => sub {
   my $c = shift;
   $c->render(text => 'Yay!');
 };
@@ -506,7 +506,7 @@ $t->head_ok('/')
   ->content_is('');
 
 # HEAD request (lowercase)
-my $tx = $t->ua->build_tx(head => '/');
+my $tx = $t->ua->build_tx(HEAD => '/');
 $t->request_ok($tx)
   ->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
@@ -890,7 +890,7 @@ $t->delete_ok('/something')->status_is(200)->header_is(Server => 'Mojolicious (P
 # Only GET, POST and a custom request method
 $t->get_ok('/something/else')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
 $t->post_ok('/something/else')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('Yay!');
-$t->request_ok($t->ua->build_tx(WHATEVER => '/something/else'))
+$t->request_ok($t->ua->build_tx(whatever => '/something/else'))
   ->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Yay!');

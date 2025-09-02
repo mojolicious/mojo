@@ -35,7 +35,7 @@ sub _walk {
 
   # Methods
   my $methods = $route->methods;
-  push @$row, !$methods ? '*' : uc join ',', @$methods;
+  push @$row, !$methods ? '*' : join ',', @$methods;
 
   # Name
   my $name = $route->name;

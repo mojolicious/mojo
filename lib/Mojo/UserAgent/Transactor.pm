@@ -94,7 +94,7 @@ sub proxy_connect {
 
   # Already a CONNECT request
   my $req = $old->req;
-  return undef if uc $req->method eq 'CONNECT';
+  return undef if $req->method eq 'CONNECT';
 
   # No proxy
   return undef unless (my $proxy = $req->proxy) && $req->via_proxy;
@@ -122,7 +122,7 @@ sub redirect {
 
   # CONNECT requests cannot be redirected
   my $req = $old->req;
-  return undef if uc $req->method eq 'CONNECT';
+  return undef if $req->method eq 'CONNECT';
 
   # Fix location without authority and/or scheme
   return undef unless my $location = $res->headers->every_header('Location')->[0];
@@ -138,7 +138,7 @@ sub redirect {
     $new->req($clone);
   }
   else {
-    my $method = uc $req->method;
+    my $method = $req->method;
     $method = $code == 303 || $method eq 'POST' ? 'GET' : $method;
     $new->req->method($method)->content->headers(my $headers = $req->headers->clone);
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
@@ -229,7 +229,7 @@ sub _form {
   }
 
   # Query parameters or urlencoded
-  my $method = uc $req->method;
+  my $method = $req->method;
   my @form   = map { $_ => $form->{$_} } sort keys %$form;
   if ($method eq 'GET' || $method eq 'HEAD') { $req->url->query->merge(@form) }
   else {

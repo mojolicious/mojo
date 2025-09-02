@@ -61,7 +61,7 @@ sub is_websocket { !!shift->{websocket} }
 sub methods {
   my $self = shift;
   return $self->{methods} unless @_;
-  my $methods = [map uc($_), @{ref $_[0] ? $_[0] : [@_]}];
+  my $methods = [@{ref $_[0] ? $_[0] : [@_]}];
   $self->{methods} = $methods if @$methods;
   return $self;
 }

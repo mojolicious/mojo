@@ -1149,11 +1149,24 @@ subtest 'Build HTTP 1.1 start-line and header (with clone and changes)' => sub {
   is $clone->headers->host,   '127.0.0.1',                    'right "Host" value';
 };
 
+subtest 'method case and symbols are preserved' => sub {
+  my $req      = Mojo::Message::Request->new;
+  my $finished = undef;
+  $req->on(finish => sub { $finished = shift->is_finished });
+  $req->method('P0$t!!');
+  $req->url->parse('http://127.0.0.1/foo/bar');
+  $req = Mojo::Message::Request->new->parse($req->to_string);
+  ok $req->is_finished, 'request is finished';
+  is $req->method, 'P0$t!!', 'right method, including weird casing';
+  ok $finished,         'finish event has been emitted';
+  ok $req->is_finished, 'request is finished';
+};
+
 subtest 'Build full HTTP 1.1 request' => sub {
   my $req      = Mojo::Message::Request->new;
   my $finished = undef;
   $req->on(finish => sub { $finished = shift->is_finished });
-  $req->method('get');
+  $req->method('GET');
   $req->url->parse('http://127.0.0.1/foo/bar');
   $req->headers->expect('100-continue');
   $req->body("Hello World!\n");
@@ -1184,7 +1197,7 @@ subtest 'Build HTTP 1.1 request parts with progress' => sub {
       $progress += $offset;
     }
   );
-  $req->method('get');
+  $req->method('GET');
   $req->url->parse('http://127.0.0.1/foo/bar');
   $req->headers->expect('100-continue');
   $req->body("Hello World!\n");
@@ -1211,7 +1224,7 @@ subtest 'Build full HTTP 1.1 request (with clone)' => sub {
   my $req      = Mojo::Message::Request->new;
   my $finished = undef;
   $req->on(finish => sub { $finished = shift->is_finished });
-  $req->method('get');
+  $req->method('GET');
   $req->url->parse('http://127.0.0.1/foo/bar');
   $req->headers->expect('100-continue');
   $req->body("Hello World!\n");

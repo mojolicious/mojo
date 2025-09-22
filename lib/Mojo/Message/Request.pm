@@ -216,7 +216,7 @@ sub _start_line {
   $path = "/$path" unless $path =~ m!^/!;
 
   # CONNECT
-  my $method = uc $self->method;
+  my $method = $self->method;
   if ($method eq 'CONNECT') {
     my $port = $url->port // ($url->protocol eq 'https' ? '443' : '80');
     $path = $url->ihost . ":$port";

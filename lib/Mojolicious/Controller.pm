@@ -59,6 +59,10 @@ sub encrypted_cookie {
   my $app     = $self->app;
   my $secret  = $app->secrets->[0];
   my $moniker = $app->moniker;
+
+  Carp::croak 'Your secret passphrase must be changed to set encrypted cookies (see FAQ for more)'
+    if !$ENV{MOJO_ALLOW_INSECURE_SECRET} and (!length $secret or $secret eq $moniker);
+
   return $self->cookie($name, Mojo::Util::encrypt_cookie($value, $secret, $moniker), $options);
 }
 
@@ -242,12 +246,24 @@ sub session {
   my $stash = $self->stash;
   $self->app->sessions->load($self) unless exists $stash->{'mojo.active_session'};
 
-  # Hash
   my $session = $stash->{'mojo.session'} //= {};
+
+  # Require changed secret if session data will be set
+  my $set_operation = !!(@_ > 1 || ref $_[0]);
+  if (!$ENV{MOJO_ALLOW_INSECURE_SECRET} and (keys %$session or $set_operation)) {
+    my $app     = $self->app;
+    my $secret  = $app->secrets->[0];
+    my $moniker = $app->moniker;
+
+    Carp::croak 'Your secret passphrase must be changed to set session data (see FAQ for more)'
+      if !length $secret or $secret eq $moniker;
+  }
+
+  # Hash
   return $session unless @_;
 
   # Get
-  return $session->{$_[0]} unless @_ > 1 || ref $_[0];
+  return $session->{$_[0]} unless $set_operation;
 
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};
@@ -262,8 +278,15 @@ sub signed_cookie {
   # Request cookie
   return $self->every_signed_cookie($name)->[-1] unless defined $value;
 
+  my $app     = $self->app;
+  my $secret  = $app->secrets->[0];
+  my $moniker = $app->moniker;
+
+  Carp::croak 'Your secret passphrase must be changed to set signed cookies (see FAQ for more)'
+    if !$ENV{MOJO_ALLOW_INSECURE_SECRET} and (!length $secret or $secret eq $moniker);
+
   # Response cookie
-  my $sum = Digest::SHA::hmac_sha256_hex("$name=$value", $self->app->secrets->[0]);
+  my $sum = Digest::SHA::hmac_sha256_hex("$name=$value", $secret);
   return $self->cookie($name, "$value--$sum", $options);
 }
 
@@ -448,6 +471,9 @@ Access encrypted request cookie values and create new encrypted response cookies
 the same name, and you want to access more than just the last one, you can use L</"every_encrypted_cookie">. Cookies
 are encrypted with ChaCha20-Poly1305, to prevent tampering, and the ones failing decryption will be automatically
 discarded. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
+The L<application secrets|Mojolicious/secrets> B<MUST> be changed from the default to a secure value to set
+encrypted cookies. This requirement can be bypassed by setting the C<MOJO_ALLOW_INSECURE_SECRET> environment variable.
 
 =head2 every_cookie
 
@@ -751,6 +777,10 @@ Persistent data storage for the next few requests, all session data gets seriali
 Base64 encoded in HMAC-SHA256 signed cookies, to prevent tampering. Note that cookies usually have a C<4096> byte
 (4KiB) limit, depending on browser.
 
+The L<application secrets|Mojolicious/secrets> B<MUST> be changed from the default to a secure value to set
+session data in a signed or encrypted cookie. This requirement can be bypassed by setting the
+C<MOJO_ALLOW_INSECURE_SECRET> environment variable.
+
   # Manipulate session
   $c->session->{foo} = 'bar';
   my $foo = $c->session->{foo};
@@ -775,6 +805,9 @@ Access signed request cookie values and create new signed response cookies. If t
 same name, and you want to access more than just the last one, you can use L</"every_signed_cookie">. Cookies are
 cryptographically signed with HMAC-SHA256, to prevent tampering, and the ones failing signature verification will be
 automatically discarded.
+
+The L<application secrets|Mojolicious/secrets> B<MUST> be changed from the default to a secure value to set
+signed cookies. This requirement can be bypassed by setting the C<MOJO_ALLOW_INSECURE_SECRET> environment variable.
 
 =head2 stash
 

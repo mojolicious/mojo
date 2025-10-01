@@ -1,4 +1,6 @@
 
+9.43  2025-10-02
+
 9.42  2025-10-01
   - Un-deprecated the spurt method in Mojo::File, it is now an alternative to spew.
   - Removed experimental status from top-level await support in Mojo::Promise.

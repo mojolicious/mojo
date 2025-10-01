@@ -14,7 +14,7 @@ use File::stat            ();
 use File::Temp            ();
 use IO::File              ();
 use Mojo::Collection;
-use Mojo::Util qw(decode deprecated encode);
+use Mojo::Util qw(decode encode);
 
 our @EXPORT_OK = ('curfile', 'path', 'tempdir', 'tempfile');
 
@@ -154,11 +154,7 @@ sub spew {
   return $self;
 }
 
-# DEPRECATED!
-sub spurt {
-  deprecated 'Mojo::File::spurt is deprecated in favor of Mojo::File::spew';
-  shift->spew(join '', @_);
-}
+sub spurt { shift->spew(join '', @_) }
 
 sub stat { File::stat::stat(${shift()}) }
 
@@ -517,6 +513,12 @@ Read all data at once from the file. If an encoding is provided, an attempt will
 
 Write all data at once to the file. If an encoding is provided, an attempt to encode the content will be made prior to
 writing.
+
+=head2 spurt
+
+  $path = $path->spurt(@bytes);
+
+Alias for L</"spew"> that writes multiple chunks of bytes.
 
 =head2 stat
 

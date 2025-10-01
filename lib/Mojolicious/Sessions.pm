@@ -147,17 +147,14 @@ A callback used to deserialize sessions, defaults to L<Mojo::JSON/"j">.
   my $bool  = $sessions->encrypted;
   $sessions = $sessions->encrypted($bool);
 
-Use encrypted session cookies instead of merely cryptographically signed ones. Note that this attribute is
-B<EXPERIMENTAL> and might change without warning!
+Use encrypted session cookies instead of merely cryptographically signed ones.
 
 =head2 samesite
 
   my $samesite = $sessions->samesite;
   $sessions    = $sessions->samesite('Strict');
 
-Set the SameSite value on all session cookies, defaults to C<Lax>. Note that this attribute is B<EXPERIMENTAL> because
-even though most commonly used browsers support the feature, there is no specification yet besides L<this
-draft|https://tools.ietf.org/html/draft-west-first-party-cookies-07>.
+Set the SameSite value on all session cookies, defaults to C<Lax>.
 
   # Disable SameSite feature
   $sessions->samesite(undef);

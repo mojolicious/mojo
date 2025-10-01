@@ -447,7 +447,7 @@ you want to access more than just the last one, you can use L</"every_cookie">.
 Access encrypted request cookie values and create new encrypted response cookies. If there are multiple values sharing
 the same name, and you want to access more than just the last one, you can use L</"every_encrypted_cookie">. Cookies
 are encrypted with ChaCha20-Poly1305, to prevent tampering, and the ones failing decryption will be automatically
-discarded. Note that this method is B<EXPERIMENTAL> and might change without warning!
+discarded.
 
 =head2 every_cookie
 
@@ -463,7 +463,7 @@ Similar to L</"cookie">, but returns all request cookie values sharing the same 
   my $values = $c->every_encrypted_cookie('foo');
 
 Similar to L</"encrypted_cookie">, but returns all encrypted request cookie values sharing the same name as an array
-reference. Note that this method is B<EXPERIMENTAL> and might change without warning!
+reference.
 
   # Get first encrypted cookie value
   my $first = $c->every_encrypted_cookie('foo')->[0];

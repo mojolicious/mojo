@@ -196,7 +196,7 @@ L<Mojo::Exception> implements the following functions, which can be imported ind
   my $bool = check $err => ['MyApp::X::Foo' => sub {...}];
 
 Process exceptions by dispatching them to handlers with one or more matching conditions. Exceptions that could not be
-handled will be rethrown automatically. Note that this function is B<EXPERIMENTAL> and might change without warning!
+handled will be rethrown automatically.
 
   # Handle various types of exceptions
   eval {
@@ -249,8 +249,7 @@ handler matched.
   raise 'MyApp::X::Foo', 'Something went wrong!';
 
 Raise a L<Mojo::Exception>, if the class does not exist yet (classes are checked for a C<new> method), one is created
-as a L<Mojo::Exception> subclass on demand. Note that this function is B<EXPERIMENTAL> and might change without
-warning!
+as a L<Mojo::Exception> subclass on demand.
 
 =head1 ATTRIBUTES
 

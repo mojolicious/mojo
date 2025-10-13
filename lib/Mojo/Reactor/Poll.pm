@@ -36,8 +36,8 @@ sub one_tick {
   local $self->{running} = 1 unless $self->{running};
 
   # Wait for one event
-  my $i;
-  until ($i || !$self->{running}) {
+  my $e;
+  until ($e || !$self->{running}) {
 
     # Stop automatically if there is nothing to watch
     return $self->stop unless keys %{$self->{timers}} || keys %{$self->{io}};
@@ -57,10 +57,10 @@ sub one_tick {
 
           if ($mode & (POLLIN | POLLPRI | POLLNVAL | POLLHUP | POLLERR)) {
             next unless my $io = $self->{io}{$fd};
-            ++$i and $self->_try('I/O watcher', $io->{cb}, 0);
+            ++$e and $self->_try('I/O watcher', $io->{cb}, 0);
           }
           next unless $mode & POLLOUT && (my $io = $self->{io}{$fd});
-          ++$i and $self->_try('I/O watcher', $io->{cb}, 1);
+          ++$e and $self->_try('I/O watcher', $io->{cb}, 1);
         }
       }
     }
@@ -80,7 +80,7 @@ sub one_tick {
       # Normal timer
       else { $self->remove($id) }
 
-      ++$i and $self->_try('Timer', $t->{cb}) if $t->{cb};
+      ++$e and $self->_try('Timer', $t->{cb}) if $t->{cb};
     }
   }
 }

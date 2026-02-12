@@ -303,7 +303,7 @@ sub punycode_encode {
   my $h = my $basic = length $output;
   $output .= "\x2d" if $basic > 0;
 
-  for my $m (sort grep { $_ >= PC_INITIAL_N } @input) {
+  for my $m (sort { $a <=> $b } grep { $_ >= PC_INITIAL_N } @input) {
     next if $m < $n;
     $delta += ($m - $n) * ($h + 1);
     $n = $m;

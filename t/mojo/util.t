@@ -289,6 +289,11 @@ subtest 'punycode_decode' => sub {
   is punycode_decode('bcher-kva'), 'bücher', 'right punycode decoded result';
 };
 
+subtest 'punycode_decode/punycode_encode roundtrip' => sub {
+  is punycode_decode(punycode_encode('☃⭐️ ')), '☃⭐️ ', 'right punycode roundtrip result';
+  is punycode_decode(punycode_encode('🐳')),    '🐳',    'right punycode roundtrip result';
+};
+
 subtest 'RFC 3492' => sub {
   my @tests = (
     '(A) Arabic (Egyptian):',

@@ -3100,4 +3100,15 @@ subtest 'Unknown CSS selector' => sub {
   like $@, qr/Unknown CSS selector: p\[/, 'right error';
 };
 
+subtest 'Handle tab in selector' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+<!DOCTYPE html>
+<ul> <li>Ax1</li> </ul>
+EOF
+  for my $selector ("ul li", "ul\tli", "ul \tli", "ul\t li") {
+    is_deeply $dom->find($selector)->map(sub { $_->to_string })->to_array, ['<li>Ax1</li>'],
+      'selector "' . $selector =~ s/\t/\\t/r . '"';
+  }
+};
+
 done_testing();

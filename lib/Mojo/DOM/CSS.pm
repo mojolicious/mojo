@@ -90,13 +90,13 @@ sub _compile {
     if ($css =~ /\G\s*,\s*/gc) { push @$group, [] }
 
     # Combinator
-    elsif ($css =~ /\G\s*([ >+~])\s*/gc) {
+    elsif ($css =~ /\G\s*([ \t>+~])\s*/gc) {
       push @$last,      ['pc', 'scope'] unless @$last;
       push @$selectors, $1;
     }
 
     # Class or ID
-    elsif ($css =~ /\G([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
+    elsif ($css =~ /\G([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ \t>~+])+)/gco) {
       my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
       push @$last, ['attr', _name($name), _value($op, $2)];
     }
@@ -124,7 +124,7 @@ sub _compile {
     }
 
     # Tag
-    elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
+    elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ \t>~+])+)/gco) {
       my $alias = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1                                  : undef;
       my $ns    = length $alias                                  ? $ns{$alias} // return [['invalid']] : $alias;
       push @$last, ['tag', $name eq '*' ? undef : _name($name), _unescape($ns)];

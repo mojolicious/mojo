@@ -36,7 +36,7 @@ has log              => sub {
 };
 has 'max_request_size';
 has mode               => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
-has moniker            => sub { Mojo::Util::decamelize ref shift };
+has moniker            => sub { Mojo::Util::class_to_file ref shift };
 has plugins            => sub { Mojolicious::Plugins->new };
 has preload_namespaces => sub { [] };
 has renderer           => sub { Mojolicious::Renderer->new };
@@ -435,7 +435,7 @@ variables or C<development>.
   $app        = $app->moniker('foo_bar');
 
 Moniker of this application, often used as default filename for configuration files and the like, defaults to
-decamelizing the application class with L<Mojo::Util/"decamelize">.
+transforming the application class with L<Mojo::Util/"class_to_file">.
 
 =head2 plugins
 

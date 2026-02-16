@@ -41,11 +41,18 @@ sub merge {
   my ($self, $path) = @_;
 
   # Replace
-  return $self->parse($path) if $path =~ m!^/!;
+  if (ref $path) {
+     if ($path->leading_slash) {
+       @{$self->parts} = @{$path->parts};
+       $self->trailing_slash($path->trailing_slash);
+       return $self->leading_slash($path->leading_slash);
+     }
+  }
+  elsif ($path =~ m!^/!) { return $self->parse($path) }
 
   # Merge
-  pop @{$self->parts} unless $self->trailing_slash;
-  $path = $self->new($path);
+  pop @{$self->parts}       unless $self->trailing_slash;
+  $path = $self->new($path) unless ref $path;
   push @{$self->parts}, @{$path->parts};
   return $self->trailing_slash($path->trailing_slash);
 }

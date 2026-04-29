@@ -9,21 +9,26 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)' unless $EN
 plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'     unless Mojo::IOLoop::TLS->can_tls;
 
 # To regenerate all required certificates run these commands (12.12.2014)
-# openssl genrsa -out ca.key 1024
+# openssl genrsa -out ca.key 2048
 # openssl req -new -key ca.key -out ca.csr -subj "/C=US/CN=ca"
 # openssl req -x509 -days 7300 -key ca.key -in ca.csr -out ca.crt
 #
-# openssl genrsa -out server.key 1024
+# openssl genrsa -out server.key 2048
 # openssl req -new -key server.key -out server.csr -subj "/C=US/CN=127.0.0.1"
 # openssl x509 -req -days 7300 -in server.csr -out server.crt -CA ca.crt \
 #   -CAkey ca.key -CAcreateserial
 #
-# openssl genrsa -out client.key 1024
+# openssl genrsa -out mojo_server.key 2048
+# openssl req -new -key mojo_server.key -out mojo_server.csr -subj "/C=US/CN=mojolicious.org"
+# openssl x509 -req -days 7300 -in mojo_server.csr -out mojo_server.crt -CA ca.crt \
+#   -CAkey ca.key -CAcreateserial
+#
+# openssl genrsa -out client.key 2048
 # openssl req -new -key client.key -out client.csr -subj "/C=US/CN=127.0.0.1"
 # openssl x509 -req -days 7300 -in client.csr -out client.crt -CA ca.crt \
 #   -CAkey ca.key -CAcreateserial
 #
-# openssl genrsa -out bad.key 1024
+# openssl genrsa -out bad.key 2048
 # openssl req -new -key bad.key -out bad.csr -subj "/C=US/CN=bad"
 # openssl req -x509 -days 7300 -key bad.key -in bad.csr -out bad.crt
 use Mojo::IOLoop;
@@ -388,6 +393,125 @@ subtest 'ALPN' => sub {
   Mojo::IOLoop->start;
   is $server_proto, 'baz', 'right protocol';
   is $client_proto, 'baz', 'right protocol';
+};
+
+subtest 'conditionally override SSL_hostname' => sub {
+  plan skip_all => 'SNI support required!' unless IO::Socket::SSL->can_client_sni;
+  my $sni;
+  $id = Mojo::IOLoop->server(
+    address => '127.0.0.1',
+    tls     => 1,
+    sub {
+      my ($loop, $stream) = @_;
+      $sni = $stream->handle->get_servername;
+      $stream->close;
+    }
+  );
+  $port = Mojo::IOLoop->acceptor($id)->port;
+  Mojo::IOLoop->client(
+    port        => $port,
+    tls         => 1,
+    tls_options => {SSL_hostname => "mojolicious.org", SSL_verify_mode => 0x00},
+    sub {
+      my ($loop, $err, $stream) = @_;
+      $stream->on(close => sub { Mojo::IOLoop->stop });
+    }
+  );
+  Mojo::IOLoop->start;
+  is $sni, 'mojolicious.org', 'right sni';
+};
+
+subtest 'can disable SNI' => sub {
+  plan skip_all => 'SNI support required!' unless IO::Socket::SSL->can_client_sni;
+
+  my ($sni, $id, $port);
+  $id = Mojo::IOLoop->server(
+    address => '127.0.0.1',
+    tls     => 1,
+    sub {
+      my ($loop, $stream) = @_;
+      $sni = $stream->handle->get_servername;
+      $stream->close;
+    }
+  );
+  $port = Mojo::IOLoop->acceptor($id)->port;
+  Mojo::IOLoop->client(
+    port        => $port,
+    tls         => 1,
+    tls_options => {SSL_hostname => "", SSL_verify_mode => 0x00},
+    sub {
+      my ($loop, $err, $stream) = @_;
+      $stream->on(close => sub { Mojo::IOLoop->stop });
+    }
+  );
+  Mojo::IOLoop->start;
+  ok !$sni, 'sni disabled';
+};
+
+subtest 'SNI defaults to address' => sub {
+  plan skip_all => 'SNI support required!' unless IO::Socket::SSL->can_client_sni;
+
+  my ($sni, $id, $port);
+  $id = Mojo::IOLoop->server(
+    address => 'localhost',
+    tls     => 1,
+    sub {
+      my ($loop, $stream) = @_;
+      $sni = $stream->handle->get_servername;
+      $stream->close;
+    }
+  );
+  $port = Mojo::IOLoop->acceptor($id)->port;
+  Mojo::IOLoop->client(
+    address     => 'localhost',
+    port        => $port,
+    tls         => 1,
+    tls_options => {SSL_verify_mode => 0x00},
+    sub {
+      my ($loop, $err, $stream) = @_;
+      $stream->on(close => sub { Mojo::IOLoop->stop });
+    }
+  );
+  Mojo::IOLoop->start;
+  is $sni, 'localhost', 'sni defaults to address';
+};
+
+subtest 'valid certificates with custom verifycn_name' => sub {
+  my ($client_err, $server_err, $running) = ();
+  my $promise = Mojo::Promise->new;
+  my $id      = Mojo::IOLoop->server(
+    address  => '127.0.0.1',
+    tls      => 1,
+    tls_ca   => 't/mojo/certs/ca.crt',
+    tls_cert => 't/mojo/certs/mojo_server.crt',
+    tls_key  => 't/mojo/certs/mojo_server.key',
+    sub {
+      my ($loop, $stream) = @_;
+      $running = Mojo::IOLoop->is_running;
+      $stream->on(close => sub { $promise->resolve; });
+      $stream->on(error => sub { $server_err = pop });
+    }
+  );
+  my $port     = Mojo::IOLoop->acceptor($id)->port;
+  my $promise2 = Mojo::Promise->new;
+  Mojo::IOLoop->client(
+    port        => $port,
+    tls         => 1,
+    tls_ca      => 't/mojo/certs/ca.crt',
+    tls_cert    => 't/mojo/certs/client.crt',
+    tls_key     => 't/mojo/certs/client.key',
+    tls_options => {SSL_verifycn_name => "mojolicious.org"},
+    sub {
+      my ($loop, $err, $stream) = @_;
+      $stream->on(close => sub { $promise2->resolve; });
+      $stream->on(error => sub { $client_err = pop });
+      $stream->close;
+    }
+  );
+  Mojo::Promise->all($promise, $promise2)->wait;
+  ok $running,     'loop was running';
+  ok !$server_err, 'no server error';
+  ok !$client_err, 'no client error';
 };
 
 done_testing();

@@ -65,6 +65,7 @@ sub list {
 
 sub list_tree {
   my ($self, $options) = (shift, shift // {});
+  my $base = canonpath $$self;
 
   # This may break in the future, but is worth it for performance
   local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
@@ -75,13 +76,15 @@ sub list_tree {
   my %all;
   my $wanted = sub {
     if ($options->{max_depth}) {
-      (my $rel = $File::Find::name) =~ s!^\Q$$self\E/?!!;
+      (my $rel = canonpath $File::Find::name) =~ s!^\Q$base\E(?:[/\\])?!!;
       $File::Find::prune = 1 if splitdir($rel) >= $options->{max_depth};
     }
     $all{$File::Find::name}++ if $options->{dir} || !-d $File::Find::name;
   };
   find {wanted => $wanted, no_chdir => 1}, $$self if -d $$self;
   delete $all{$$self};
+  delete $all{$base};
+  delete $all{$base =~ s!\\!/!gr};
 
   return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
 }

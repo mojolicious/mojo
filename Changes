@@ -1,6 +1,7 @@
 
-9.43  2026-02-12
+9.43  2026-05-04
   - Fixed punycode roundtrip bug in Mojo::Util.
+  - Fixed Windows compatibility issues of Mojo::File::list_tree.
 
 9.42  2025-10-01
   - Un-deprecated the spurt method in Mojo::File, it is now an alternative to spew.

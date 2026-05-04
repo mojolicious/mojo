@@ -7,7 +7,6 @@ use Cwd                   qw(getcwd);
 use Exporter              qw(import);
 use File::Basename        ();
 use File::Copy            qw(copy move);
-use File::Find            qw(find);
 use File::Path            ();
 use File::Spec::Functions qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
 use File::stat            ();
@@ -65,25 +64,24 @@ sub list {
 
 sub list_tree {
   my ($self, $options) = (shift, shift // {});
+  return Mojo::Collection->new unless -d $$self;
 
-  # This may break in the future, but is worth it for performance
-  local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
-
-  # The File::Find documentation lies, this is needed for CIFS
-  local $File::Find::dont_use_nlink = 1 if $options->{dont_use_nlink};
-
-  my %all;
-  my $wanted = sub {
-    if ($options->{max_depth}) {
-      (my $rel = $File::Find::name) =~ s!^\Q$$self\E/?!!;
-      $File::Find::prune = 1 if splitdir($rel) >= $options->{max_depth};
+  my (@results, $walk);
+  $walk = sub {
+    my ($path, $depth) = @_;
+    opendir my $dh, $path or return;
+    my @names = sort grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+    @names = grep { !/^\./ } @names unless $options->{hidden};
+    for my $name (@names) {
+      my $child  = $self->new($path, $name);
+      my $is_dir = -d $$child;
+      push @results, $child if $options->{dir} || !$is_dir;
+      $walk->($$child, $depth + 1) if $is_dir && (!$options->{max_depth} || $depth + 1 < $options->{max_depth});
     }
-    $all{$File::Find::name}++ if $options->{dir} || !-d $File::Find::name;
   };
-  find {wanted => $wanted, no_chdir => 1}, $$self if -d $$self;
-  delete $all{$$self};
+  $walk->($$self, 0);
 
-  return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
+  return Mojo::Collection->new(@results);
 }
 
 sub lstat { File::stat::lstat(${shift()}) }
@@ -394,12 +392,6 @@ These options are currently available:
   dir => 1
 
 Include directories.
-
-=item dont_use_nlink
-
-  dont_use_nlink => 1
-
-Force L<File::Find> to always stat directories.
 
 =item hidden
 

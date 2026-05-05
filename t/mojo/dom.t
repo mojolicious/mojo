@@ -2681,6 +2681,17 @@ EOF
   is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
 };
 
+subtest 'Abrupt and bang-terminated comments' => sub {
+  my $dom = Mojo::DOM->new("<!DOCTYPE html>\n<!--> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'abrupt empty comment closure';
+
+  $dom = Mojo::DOM->new("<!DOCTYPE html>\n<!---> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'dash-terminated empty comment';
+
+  $dom = Mojo::DOM->new("<!DOCTYPE html>\n<!-- --!> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'bang-terminated comment';
+};
+
 subtest 'Huge number of attributes' => sub {
   my $dom = Mojo::DOM->new('<div ' . ('a=b ' x 32768) . '>Test</div>');
   is $dom->at('div[a=b]')->text, 'Test', 'right text';

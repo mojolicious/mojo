@@ -327,6 +327,20 @@ EOF
   is $dom->at('script')->text, "alert('lalala');", 'right script content';
 };
 
+subtest 'Script tag with HTML comment containing nested script tags' => sub {
+  my $dom = Mojo::DOM->new(q{<script> console.log("<!--"); </script>});
+  is $dom->at('script')->text, ' console.log("<!--"); ', 'right script content';
+
+  $dom = Mojo::DOM->new(q{<script> console.log("<!-- <script> -->"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> -->"); ', 'right script content';
+
+  $dom = Mojo::DOM->new(q{<script> console.log("<!-- <script> </script>"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> </script>"); ', 'right script content';
+
+  $dom = Mojo::DOM->new(q{<script> console.log("<!-- <script> </script> -->"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> </script> -->"); ', 'right script content';
+};
+
 subtest 'HTML5 (unquoted values)' => sub {
   my $dom = Mojo::DOM->new('<div id = test foo ="bar" class=tset bar=/baz/ value baz=//>works</div>');
   is $dom->at('#test')->text,                'works', 'right text';
@@ -1842,8 +1856,7 @@ EOF
   is $dom->find('html > head > script')->[0]->attr('src'), '/js/one.js',   'right attribute';
   is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',   'right attribute';
   is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js', 'right attribute';
-  is $dom->find('html > head > script')->[2]->text,        "\n  ",         'no text';
-  is $dom->at('html > body')->text,                        'Bar',          'right text';
+  is $dom->find('html > head > script')->[2]->text, "\n  </head>\n  <body>Bar</body>\n</html>\n", 'raw content to EOF';
 };
 
 subtest 'Inline DTD' => sub {

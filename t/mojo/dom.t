@@ -1274,6 +1274,25 @@ EOF
   is $dom->at('#♥ ~ *:nth-last-child(2)')->text,      'F',   'right text';
 };
 
+subtest 'Whitespace as descendant combinator' => sub {
+  my $dom = Mojo::DOM->new("<ul> <li>Ax1</li> </ul>");
+  is $dom->at("ul li")->text,    'Ax1', 'space combinator';
+  is $dom->at("ul\tli")->text,   'Ax1', 'tab combinator';
+  is $dom->at("ul \tli")->text,  'Ax1', 'space + tab combinator';
+  is $dom->at("ul\t li")->text,  'Ax1', 'tab + space combinator';
+  is $dom->at("ul\t\tli")->text, 'Ax1', 'multiple tab combinator';
+  is $dom->at("ul\nli")->text,   'Ax1', 'newline combinator';
+  is $dom->at("ul\rli")->text,   'Ax1', 'carriage return combinator';
+  is $dom->at("ul\fli")->text,   'Ax1', 'form feed combinator';
+
+  my $multi = Mojo::DOM->new("<ul><li>A</li><li>B</li></ul>");
+  is_deeply $multi->find("ul\tli")->map('text')->to_array, ['A', 'B'], 'find with tab combinator';
+
+  my $child = Mojo::DOM->new("<ul><li>Ax1</li></ul>");
+  is $child->at("ul\t>\tli")->text, 'Ax1', 'tabs around child combinator';
+  is $child->at("ul\n>\nli")->text, 'Ax1', 'newlines around child combinator';
+};
+
 subtest 'Scoped selectors' => sub {
   my $dom = Mojo::DOM->new(<<EOF);
 <p>Zero</p>

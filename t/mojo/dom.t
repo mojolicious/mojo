@@ -2676,7 +2676,7 @@ EOF
 
 subtest 'Comment is not terminated by "-- >"' => sub {
   my $dom = Mojo::DOM->new('<!-- a > -- > b <blink>c</blink> -->');
-  is $dom->at('blink'), undef,                          'blink element is inside comment';
+  is $dom->at('blink'),  undef,                           'blink element is inside comment';
   is $dom->tree->[1][1], ' a > -- > b <blink>c</blink> ', 'right comment';
 };
 

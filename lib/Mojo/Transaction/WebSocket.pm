@@ -29,6 +29,7 @@ sub build_message {
     ||= Compress::Raw::Zlib::Deflate->new(AppendOutput => 1, MemLevel => 8, WindowBits => -15);
   $deflate->deflate($frame->[5], my $out);
   $deflate->flush($out, Z_SYNC_FLUSH);
+  $deflate->deflateReset;
   @$frame[1, 5] = (1, substr($out, 0, length($out) - 4));
 
   return $frame;

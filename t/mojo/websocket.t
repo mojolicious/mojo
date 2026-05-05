@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+use Compress::Raw::Zlib;
 use Mojo::ByteStream qw(b);
 use Mojo::IOLoop;
 use Mojo::Promise;
@@ -475,6 +476,36 @@ subtest 'Ping/pong' => sub {
   );
   Mojo::IOLoop->start;
   is $pong, 'test', 'received pong with payload';
+};
+
+subtest 'Compressed messages are independently decodable per message' => sub {
+  my $tx       = Mojo::Transaction::WebSocket->new({compressed => 1});
+  my @payloads = map {qq[{"action":"heartbeat","client_ts":$_}]} 1 .. 3;
+
+  for my $i (0 .. $#payloads) {
+    my $frame = $tx->build_message({text => $payloads[$i]});
+
+    my $inflate = Compress::Raw::Zlib::Inflate->new(WindowBits => -15, LimitOutput => 1, Bufsize => 65536);
+    my $data    = $frame->[5] . "\x00\x00\xff\xff";
+    my $status  = $inflate->inflate($data, my $out);
+
+    cmp_ok $status, '==', Z_OK, "message @{[$i + 1]} inflates without error";
+    is length $data, 0,             "message @{[$i + 1]} fully consumed";
+    is $out,         $payloads[$i], "message @{[$i + 1]} round-trips";
+  }
+};
+
+subtest 'Compressed messages round-trip between two transactions' => sub {
+  my $sender = Mojo::Transaction::WebSocket->new({compressed => 1});
+  my $peer   = Mojo::Transaction::WebSocket->new({compressed => 1});
+
+  my @got;
+  $peer->on(message => sub { push @got, pop });
+
+  my @payloads = map {qq[{"action":"heartbeat","client_ts":$_}]} 1 .. 3;
+  $peer->parse_message($sender->build_message({text => $_})) for @payloads;
+
+  is_deeply \@got, \@payloads, 'all messages decoded';
 };
 
 done_testing();

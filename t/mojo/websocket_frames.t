@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use Compress::Raw::Zlib;
 use Mojo::Transaction::WebSocket;
 use Mojo::WebSocket qw(WS_BINARY WS_CLOSE WS_CONTINUATION WS_PING WS_PONG WS_TEXT), qw(build_frame parse_frame);
 
@@ -268,9 +269,6 @@ subtest 'Compressed binary message' => sub {
   is $frame->[3], 0,         'rsv3 flag is not set';
   is $frame->[4], WS_BINARY, 'binary frame';
   ok $frame->[5], 'has payload';
-  my $payload = $compressed->build_message({binary => 'just works'})->[5];
-  isnt $frame->[5], $payload, 'different payload';
-  ok length $frame->[5] > length $payload, 'payload is smaller';
   my $uncompressed = Mojo::Transaction::WebSocket->new;
   my $frame2       = $uncompressed->build_message({binary => 'just works'});
   is $frame2->[0], 1,         'fin flag is set';
@@ -295,6 +293,36 @@ subtest 'Compressed fragmented message' => sub {
   ok !$text, 'message event has not been emitted yet';
   $fragmented_compressed->parse_message([1, 0, 0, 0, WS_CONTINUATION, substr($compressed_payload, 6)]);
   is $text, 'just works', 'decoded correctly';
+};
+
+subtest 'Compressed messages are independently decodable per message' => sub {
+  my $tx       = Mojo::Transaction::WebSocket->new({compressed => 1});
+  my @payloads = map {qq[{"action":"heartbeat","client_ts":$_}]} 1 .. 3;
+
+  for my $i (0 .. $#payloads) {
+    my $frame = $tx->build_message({text => $payloads[$i]});
+
+    my $inflate = Compress::Raw::Zlib::Inflate->new(WindowBits => -15, LimitOutput => 1, Bufsize => 65536);
+    my $data    = $frame->[5] . "\x00\x00\xff\xff";
+    my $status  = $inflate->inflate($data, my $out);
+
+    cmp_ok $status, '==', Z_OK, "message @{[$i + 1]} inflates without error";
+    is length $data, 0,             "message @{[$i + 1]} fully consumed";
+    is $out,         $payloads[$i], "message @{[$i + 1]} round-trips";
+  }
+};
+
+subtest 'Compressed messages round-trip between two transactions' => sub {
+  my $sender = Mojo::Transaction::WebSocket->new({compressed => 1});
+  my $peer   = Mojo::Transaction::WebSocket->new({compressed => 1});
+
+  my @got;
+  $peer->on(message => sub { push @got, pop });
+
+  my @payloads = map {qq[{"action":"heartbeat","client_ts":$_}]} 1 .. 3;
+  $peer->parse_message($sender->build_message({text => $_})) for @payloads;
+
+  is_deeply \@got, \@payloads, 'all messages decoded';
 };
 
 done_testing();

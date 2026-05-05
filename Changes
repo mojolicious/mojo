@@ -1,5 +1,6 @@
 
-9.45  2026-05-06
+9.45  2026-05-05
+  - Fixed portability issue in WebSocket tests.
 
 9.44  2026-05-05
   - Fixed various spec compliance issues in Mojo::DOM.

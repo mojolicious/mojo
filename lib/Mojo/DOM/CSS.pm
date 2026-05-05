@@ -392,12 +392,11 @@ sub _step_back {
 sub _step_forward {
   my ($combinator, $node) = @_;
 
-  # " " (descendants) and ">" (children only)
-  if ($combinator eq ' ' || $combinator eq '>') {
-    my @children = grep { $_->[0] eq 'tag' } @$node[($node->[0] eq 'root' ? 1 : 4) .. $#$node];
-    return @children if $combinator eq '>';
-    return map { $_, _step_forward(' ', $_) } @children;
-  }
+  # " " (descendants)
+  return @{_all_tags($node)} if $combinator eq ' ';
+
+  # ">" (children only)
+  return grep { $_->[0] eq 'tag' } @$node[($node->[0] eq 'root' ? 1 : 4) .. $#$node] if $combinator eq '>';
 
   # "~" (following siblings) and "+" (immediately following)
   return () if $node->[0] eq 'root';

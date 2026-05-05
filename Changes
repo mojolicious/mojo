@@ -1,5 +1,8 @@
 
 9.44  2026-05-05
+  - Fixed various spec compliance issues in Mojo::DOM.
+  - Fixed permessage-deflate support in Mojo::Transaction::WebSocket to be more interoperable with non-spec compliant
+    implementations.
 
 9.43  2026-05-04
   - Fixed punycode roundtrip bug in Mojo::Util.

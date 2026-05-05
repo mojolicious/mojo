@@ -3154,7 +3154,7 @@ subtest 'Descendant combinator chain with non-matching selector' => sub {
   is $dom->at('#gobbledygook * * * *'), undef, 'no match';
 
   is_deeply $dom->find('* * * * #gobbledygook')->map(sub { $_->to_string })->to_array, [],
-  'non-existent elements have no descendants';
+    'non-existent elements have no descendants';
   is $dom->at('* * * * #gobbledygook'), undef, 'no match';
 
   my $exists = Mojo::DOM->new('<div id="x"><a><b><c><d>ok</d></c></b></a></div>');

@@ -1850,10 +1850,10 @@ subtest 'Even more real world JavaScript' => sub {
   <body>Bar</body>
 </html>
 EOF
-  is $dom->at('title')->text,                              'Foo',          'right text';
-  is $dom->find('html > head > script')->[0]->attr('src'), '/js/one.js',   'right attribute';
-  is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',   'right attribute';
-  is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js', 'right attribute';
+  is $dom->at('title')->text,                              'Foo',                                 'right text';
+  is $dom->find('html > head > script')->[0]->attr('src'), '/js/one.js',                          'right attribute';
+  is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',                          'right attribute';
+  is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js',                        'right attribute';
   is $dom->find('html > head > script')->[2]->text, "\n  </head>\n  <body>Bar</body>\n</html>\n", 'raw content to EOF';
 };
 

@@ -272,8 +272,8 @@ sub _script_content {
   my $state = 0;
 
   while (1) {
-    if ($state == 0) { $$html =~ /\G[^<]*/gcs }
-    else             { $$html =~ /\G[^<\-]*/gcs }
+    if   ($state == 0) { $$html =~ /\G[^<]*/gcs }
+    else               { $$html =~ /\G[^<\-]*/gcs }
 
     my $p = pos $$html;
     return (substr($$html, $start), 0) if $p >= length $$html;
@@ -290,8 +290,8 @@ sub _script_content {
       else                                            { pos($$html) = $p + 1 }
     }
     else {
-      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { $state = 1 }
-      elsif ($$html =~ /\G-->/gcs)                    { $state = 0 }
+      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { $state      = 1 }
+      elsif ($$html =~ /\G-->/gcs)                    { $state      = 0 }
       else                                            { pos($$html) = $p + 1 }
     }
   }

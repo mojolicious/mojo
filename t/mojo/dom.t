@@ -2643,10 +2643,58 @@ subtest 'Comments' => sub {
 <!-- HTML4 -- >
 <!-- bad idea -- HTML4 -- >
 EOF
-  is $dom->tree->[1][1], ' HTML5 ',             'right comment';
-  is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
-  is $dom->tree->[5][1], ' HTML4 ',             'right comment';
-  is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
+  is $dom->tree->[1][1], ' HTML5 ',                      'right comment';
+  is $dom->tree->[3][1], ' bad idea -- HTML5 ',          'right comment';
+  is $dom->tree->[5][1], '<',                            'wrong comment';
+  is $dom->tree->[6][1], "!-- HTML4 -- >\n",             'wrong comment';
+  is $dom->tree->[7][1], '<',                            'wrong comment';
+  is $dom->tree->[8][1], "!-- bad idea -- HTML4 -- >\n", 'wrong comment';
+
+  $dom = Mojo::DOM->new('<!--> <p>OK</p> <!-- -->');
+  is $dom->tree->[1][0],    'comment', 'right node';
+  is $dom->tree->[1][1],    '',        'right text';
+  is $dom->tree->[2][0],    'text',    'right node';
+  is $dom->tree->[2][1],    ' ',       'right text';
+  is $dom->tree->[3][0],    'tag',     'right node';
+  is $dom->tree->[3][1],    'p',       'right text';
+  is $dom->tree->[3][4][0], 'text',    'right node';
+  is $dom->tree->[3][4][1], 'OK',      'right text';
+  is $dom->tree->[4][0],    'text',    'right node';
+  is $dom->tree->[4][1],    ' ',       'right text';
+  is $dom->tree->[5][0],    'comment', 'right node';
+  is $dom->tree->[5][1],    ' ',       'right text';
+
+  $dom = Mojo::DOM->new('<!---> <p>OK</p> <!-- -->');
+  is $dom->tree->[1][0],    'comment', 'right node';
+  is $dom->tree->[1][1],    '',        'right text';
+  is $dom->tree->[2][0],    'text',    'right node';
+  is $dom->tree->[2][1],    ' ',       'right text';
+  is $dom->tree->[3][0],    'tag',     'right node';
+  is $dom->tree->[3][1],    'p',       'right text';
+  is $dom->tree->[3][4][0], 'text',    'right node';
+  is $dom->tree->[3][4][1], 'OK',      'right text';
+  is $dom->tree->[4][0],    'text',    'right node';
+  is $dom->tree->[4][1],    ' ',       'right text';
+  is $dom->tree->[5][0],    'comment', 'right node';
+  is $dom->tree->[5][1],    ' ',       'right text';
+
+  $dom = Mojo::DOM->new('<!-- --!> <p>OK</p> <!-- -->');
+  is $dom->tree->[1][0],    'comment', 'right node';
+  is $dom->tree->[1][1],    ' ',       'right text';
+  is $dom->tree->[2][0],    'text',    'right node';
+  is $dom->tree->[2][1],    ' ',       'right text';
+  is $dom->tree->[3][0],    'tag',     'right node';
+  is $dom->tree->[3][1],    'p',       'right text';
+  is $dom->tree->[3][4][0], 'text',    'right node';
+  is $dom->tree->[3][4][1], 'OK',      'right text';
+  is $dom->tree->[4][0],    'text',    'right node';
+  is $dom->tree->[4][1],    ' ',       'right text';
+  is $dom->tree->[5][0],    'comment', 'right node';
+  is $dom->tree->[5][1],    ' ',       'right text';
+
+  $dom = Mojo::DOM->new('<!-- a > -- > b <blink>c</blink> -->');
+  is $dom->tree->[1][0], 'comment',                       'right node';
+  is $dom->tree->[1][1], ' a > -- > b <blink>c</blink> ', 'right text';
 };
 
 subtest 'Huge number of attributes' => sub {

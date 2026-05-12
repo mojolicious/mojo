@@ -64,7 +64,6 @@ subtest 'Common headers' => sub {
   is $headers->content_range('foo')->content_range,                             'foo', 'right value';
   is $headers->content_security_policy('foo')->content_security_policy,         'foo', 'right value';
   is $headers->content_type('foo')->content_type,                               'foo', 'right value';
-  is $headers->cookie('foo')->cookie,                                           'foo', 'right value';
   is $headers->dnt('foo')->dnt,                                                 'foo', 'right value';
   is $headers->date('foo')->date,                                               'foo', 'right value';
   is $headers->etag('foo')->etag,                                               'foo', 'right value';
@@ -101,6 +100,9 @@ subtest 'Common headers' => sub {
   is $headers->referer,                   'foo', 'right value';
   is $headers->referer('bar')->referer,   'bar', 'right value';
   is $headers->referrer,                  'bar', 'right value';
+
+  is $headers->cookie('foo')->cookie,    'foo',  'right value for single cookie';
+  is $headers->cookie('a', 'b')->cookie, 'a; b', 'right value for multiple cookies';
 };
 
 subtest 'Clone' => sub {
@@ -177,6 +179,15 @@ subtest 'Set headers from hash' => sub {
   my $headers = Mojo::Headers->new;
   $headers->from_hash({Connection => 'close', 'Content-Type' => 'text/html'});
   is_deeply $headers->to_hash, {Connection => 'close', 'Content-Type' => 'text/html'}, 'right structure';
+  is $headers->to_string, "Connection: close\r\nContent-Type: text/html", 'right string';
+
+  $headers = Mojo::Headers->new;
+  $headers->from_hash({'Cookie' => ['a=b', 'c=d']});
+  is_deeply $headers->to_hash, {Cookie => 'a=b; c=d'}, 'right structure';
+  is $headers->to_string, "Cookie: a=b; c=d", 'right string';
+  $headers->from_hash({'Cookie' => ['e=f']});
+  is_deeply $headers->to_hash, {Cookie => 'a=b; c=d; e=f'}, 'right structure';
+  is $headers->to_string, "Cookie: a=b; c=d; e=f", 'right string';
 };
 
 subtest 'Remove all headers' => sub {
@@ -200,6 +211,12 @@ subtest 'Append values' => sub {
   is_deeply $headers->to_hash(1), {Vary => ['Accept', 'Accept-Encoding']}, 'right structure';
   $headers->append(Vary => 'Accept-Language');
   is_deeply $headers->to_hash(1), {Vary => ['Accept, Accept-Encoding, Accept-Language']}, 'right structure';
+  $headers->append(Cookie => 'a=b');
+  is_deeply $headers->to_hash(1), {Cookie => ['a=b'], Vary => ['Accept, Accept-Encoding, Accept-Language']},
+    'right structure';
+  $headers->append(Cookie => 'x=y');
+  is_deeply $headers->to_hash(1), {Cookie => ['a=b; x=y'], Vary => ['Accept, Accept-Encoding, Accept-Language']},
+    'right structure';
 };
 
 subtest 'Multiple headers with the same name' => sub {

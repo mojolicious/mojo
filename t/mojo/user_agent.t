@@ -363,6 +363,19 @@ ok $tx->res->headers->content_length, 'has "Content-Length" value';
 ok !$tx->is_empty,                    'transaction is not empty';
 is $tx->res->body, 'x' x 262144, 'right content';
 
+subtest 'memory->file asset promotion, plus timely cleanup' => sub {
+    local $ENV{MOJO_MAX_MEMORY_SIZE} = 262144/2;
+    $tx = $ua->get('/huge');
+
+    is $tx->res->body, 'x' x 262144, 'right content';
+
+    my $filename = $tx->res->content->asset->path;
+    ok $filename, 'the huge body should be saved to a temporary file';
+
+    undef $tx;
+    ok !(-e $filename), 'the temporary file should be deleted as soon as the transaction is destroyed';
+};
+
 # Non-blocking form
 ($success, $code, $body) = ();
 $ua->post(

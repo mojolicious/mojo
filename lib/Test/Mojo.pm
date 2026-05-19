@@ -471,7 +471,7 @@ sub _request_ok {
   $self->tx($self->ua->start($tx));
   my $err = $self->tx->error;
   Test::More::diag $err->{message} if !(my $ok = !$err->{message} || $err->{code}) && $err;
-  return $self->test('ok', $ok, _desc("@{[uc $tx->req->method]} $url"));
+  return $self->test('ok', $ok, _desc("@{[$tx->req->method]} $url"));
 }
 
 sub _sse_ok {
@@ -499,7 +499,7 @@ sub _sse_ok {
   );
   Mojo::IOLoop->start;
 
-  return $self->test('ok', $ok, _desc("SSE connection established: @{[uc $tx->req->method]} $url"));
+  return $self->test('ok', $ok, _desc("SSE connection established: @{[$tx->req->method]} $url"));
 }
 
 sub _sse_wait {

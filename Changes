@@ -1,4 +1,6 @@
 
+9.47  2026-06-05
+
 9.46  2026-06-04
   - Added random_bytes function to Mojo::Util. (leont)
   - Improved randomness for CSRF token generation. (leont)

@@ -1,5 +1,9 @@
 
-9.46  2026-05-06
+9.46  2026-06-04
+  - Added random_bytes function to Mojo::Util. (leont)
+  - Improved randomness for CSRF token generation. (leont)
+  - Fixed tls_options handling in Mojo::IOLoop::TLS. (krauro)
+  - Fixed spec compliance issue with attribute selectors in Mojo::DOM::CSS.
 
 9.45  2026-05-05
   - Fixed portability issue in WebSocket tests.

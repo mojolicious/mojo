@@ -6,6 +6,7 @@ use Data::Dumper   ();
 use Digest::MD5    qw(md5 md5_hex);
 use Digest::SHA    qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode         qw(find_encoding);
+use Errno          ();
 use Exporter       qw(import);
 use File::Basename qw(dirname);
 use Getopt::Long   qw(GetOptionsFromArray);
@@ -13,7 +14,7 @@ use IO::Compress::Gzip;
 use IO::Poll qw(POLLIN POLLPRI);
 use IO::Uncompress::Gunzip;
 use List::Util         qw(min);
-use MIME::Base64       qw(decode_base64 encode_base64);
+use MIME::Base64       qw(decode_base64 encode_base64 encode_base64url);
 use Mojo::BaseUtil     qw(class_to_path monkey_patch);
 use Pod::Usage         qw(pod2usage);
 use Socket             qw(inet_pton AF_INET6 AF_INET);
@@ -31,6 +32,7 @@ use constant CRYPTX => $ENV{MOJO_NO_CRYPTX} ? 0 : !!(eval {
   CryptX->VERSION('0.080');
   1;
 });
+use constant WIN32_API => eval { require Win32::API };
 
 # Check for monotonic clock support
 use constant MONOTONIC => !!eval { Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC()) };
@@ -82,8 +84,8 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode decrypt_cookie deprecated dumper),
   qw(encode encrypt_cookie extract_usage generate_secret getopt gunzip gzip header_params hmac_sha1_sum),
   qw(html_attr_unescape html_unescape humanize_bytes md5_bytes md5_sum monkey_patch network_contains punycode_decode),
-  qw(punycode_encode quote scope_guard secure_compare sha1_bytes sha1_sum slugify split_cookie_header split_header),
-  qw(steady_time tablify term_escape trim unindent unquote url_escape url_unescape xml_escape xor_encode)
+  qw(punycode_encode quote random_bytes scope_guard secure_compare sha1_bytes sha1_sum slugify split_cookie_header),
+  qw(split_header steady_time tablify term_escape trim unindent unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 # Aliases
@@ -176,9 +178,7 @@ sub extract_usage {
 }
 
 sub generate_secret {
-  return Crypt::Misc::encode_b64u(Crypt::PRNG::random_bytes(128)) if CRYPTX;
-  srand;
-  return sha1_sum($$ . steady_time() . rand);
+  return encode_base64url(random_bytes(128));
 }
 
 sub getopt {
@@ -342,6 +342,36 @@ sub quote {
   my $str = shift;
   $str =~ s/(["\\])/\\$1/g;
   return qq{"$str"};
+}
+
+sub random_bytes {
+  my ($count) = @_;
+  croak 'Byte count must be a defined, non-negative integer' unless defined $count && $count =~ /\A\d+\z/a;
+  if (CRYPTX) {
+    return Crypt::PRNG::random_bytes($count);
+  }
+  elsif (WIN32_API) {
+    state $genrand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)')
+      or die "Could not import SystemFunction036: $^E";
+    return '' if $count == 0;
+    my $buffer = chr(0) x $count;
+    $genrand->Call($buffer, $count) or croak("Could not read random bytes");
+    return $buffer;
+  }
+  elsif (-e '/dev/urandom') {
+    open my $fh, '<:raw', '/dev/urandom' or die "Couldn't open /dev/urandom: $!";
+    my ($result, $offset) = ('', 0);
+    while ($offset < $count) {
+      my $read = sysread $fh, $result, $count - $offset, $offset;
+      next                                 if not defined $read and $!{EINTR};
+      croak("Could not read random bytes") if not defined $read or $read == 0;
+      $offset += $read;
+    }
+    return $result;
+  }
+  else {
+    die "Can't find source of randomness on your system, consider installing CryptX";
+  }
 }
 
 sub scope_guard { Mojo::Util::_Guard->new(cb => shift) }
@@ -726,8 +756,7 @@ function was called from.
 
   my $secret = generate_secret;
 
-Generate a random secret with a cryptographically secure random number generator if available, and a less secure
-fallback if not.
+Generate a random secret with a cryptographically secure random number generator.
 
 =head2 getopt
 
@@ -885,6 +914,12 @@ Punycode encode string as described in L<RFC 3492|https://tools.ietf.org/html/rf
   my $quoted = quote $str;
 
 Quote string.
+
+=head2 random_bytes
+
+ my $random = random_bytes($bytes);
+
+Generate C<$bytes> worth of high entropy randomness.
 
 =head2 scope_guard
 

@@ -9,9 +9,9 @@ use Mojo::DeprecationTest;
 use Sub::Util qw(subname);
 
 use Mojo::Util qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize decode decrypt_cookie dumper),
-  qw(encode encrypt_cookie extract_usage generate_secret getopt gunzip gzip header_params hmac_sha1_sum html_unescape),
-  qw(html_attr_unescape humanize_bytes md5_bytes md5_sum monkey_patch network_contains punycode_decode),
-  qw(punycode_encode quote scope_guard secure_compare sha1_bytes sha1_sum slugify split_cookie_header split_header),
+  qw(encode encrypt_cookie extract_usage generate_secret getopt gunzip gzip header_params hmac_sha1_sum),
+  qw(html_unescape html_attr_unescape humanize_bytes md5_bytes md5_sum monkey_patch network_contains punycode_decode),
+  qw(punycode_encode quote random_bytes scope_guard secure_compare sha1_bytes sha1_sum slugify split_cookie_header split_header),
   qw(steady_time tablify term_escape trim unindent unquote url_escape url_unescape xml_escape xor_encode);
 
 subtest 'camelize' => sub {
@@ -676,6 +676,11 @@ subtest 'encrypt_cookie/decrypt_cookie' => sub {
   is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTM-v7Qm+Xgoi1t94GLSHYGkaw==', 'bar', 'salt'), undef,  'wrong password';
   is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTM-v7Qm+Xgoi1t94GLSHYGkaw==', 'foo', 'bar'),  undef,  'wrong salt';
   is decrypt_cookie('6Y+LKA==-ROhxLDrUBVkXRKTM-v7Qm+Xgoi1t94GLSHYGkaw==', 'foo', 'salt'), 'test', 'decrypted';
+};
+
+subtest 'random_bytes' => sub {
+  isnt random_bytes(16),       random_bytes(16), "two random_bytes invocations are not the same";
+  is length(random_bytes(16)), 16,               "random_bytes(16) returns 16 bytes";
 };
 
 subtest 'generate_secret' => sub {

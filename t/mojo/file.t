@@ -310,6 +310,23 @@ subtest 'list/list_tree' => sub {
     'right files';
 };
 
+subtest 'list_tree with symlinks' => sub {
+  my $dir    = tempdir;
+  my $real   = $dir->child('real')->make_path;
+  my $inside = $real->child('deep.txt')->spew('');
+  my $link   = $dir->child('link');
+  plan skip_all => 'symlink unimplemented' unless eval { symlink $real, $link };
+  my $top = $dir->child('top.txt')->spew('');
+  is_deeply $dir->list_tree->map('to_string')->to_array, [sort $inside->to_string, $top->to_string], 'right files';
+  is_deeply $dir->list_tree({dir => 1})->map('to_string')->to_array,
+    [sort $inside->to_string, $link->to_string, $real->to_string, $top->to_string], 'right files';
+
+  my $loop = $dir->child('loop');
+  symlink $dir, $loop;
+  is_deeply $dir->list_tree({dir => 1})->map('to_string')->to_array,
+    [sort $inside->to_string, $link->to_string, $loop->to_string, $real->to_string, $top->to_string], 'right files';
+};
+
 subtest 'touch' => sub {
   my $dir  = tempdir;
   my $file = $dir->child('test.txt');

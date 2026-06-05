@@ -76,7 +76,8 @@ sub list_tree {
       my $child  = $self->new($path, $name);
       my $is_dir = -d $$child;
       push @results, $child if $options->{dir} || !$is_dir;
-      $walk->($$child, $depth + 1) if $is_dir && (!$options->{max_depth} || $depth + 1 < $options->{max_depth});
+      $walk->($$child, $depth + 1)
+        if $is_dir && !-l $$child && (!$options->{max_depth} || $depth + 1 < $options->{max_depth});
     }
   };
   $walk->($$self, 0);
@@ -378,7 +379,7 @@ Include hidden files.
   my $collection = $path->list_tree({hidden => 1});
 
 List all files recursively in the directory and return a L<Mojo::Collection> object containing the results as
-L<Mojo::File> objects. The list does not include C<.> and C<..>.
+L<Mojo::File> objects. The list does not include C<.> and C<..>, and symbolic links to directories are not followed.
 
   # List all templates
   say for path('/home/sri/myapp/templates')->list_tree->each;

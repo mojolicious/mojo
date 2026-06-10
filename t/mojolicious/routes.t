@@ -130,10 +130,10 @@ $r->any('/method/get', [format => ['html']])
   ->to(testcase => 'method', action => 'get', format => undef);
 
 # POST /method/post
-$r->any('/method/post')->methods('post')->to(testcase => 'method', action => 'post');
+$r->any('/method/post')->methods('POST')->to(testcase => 'method', action => 'post');
 
 # POST|GET /method/post_get
-$r->any('/method/post_get')->methods(qw(POST get))->to(testcase => 'method', action => 'post_get');
+$r->any('/method/post_get')->methods(qw(POST GET))->to(testcase => 'method', action => 'post_get');
 
 # /simple/form
 $r->any('/simple/form')->to('test-test#test');

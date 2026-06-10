@@ -240,7 +240,7 @@
                       <pre><%= '  ' x $depth %><%= $unparsed %></pre>
                     </td>
                     <td class="value">
-                      <pre><%= uc(join ',', @{$route->methods // []}) || '*' %></pre>
+                      <pre><%= (join ',', @{$route->methods // []}) || '*' %></pre>
                     </td>
                     <td class="value">
                       % my $name = $route->name;

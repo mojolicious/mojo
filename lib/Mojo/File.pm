@@ -76,7 +76,7 @@ sub list_tree {
       my $child  = $self->new($path, $name);
       my $is_dir = -d $$child;
       push @results, $child if $options->{dir} || !$is_dir;
-      $walk->($$child, $depth + 1)
+      __SUB__->($$child, $depth + 1)
         if $is_dir && !-l $$child && (!$options->{max_depth} || $depth + 1 < $options->{max_depth});
     }
   };

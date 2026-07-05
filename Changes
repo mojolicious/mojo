@@ -1,4 +1,6 @@
 
+9.48  UNRELEASED
+
 9.47  2026-07-05
   - Added support for the QUERY HTTP request method from RFC 10008.
   - Added query and query_p methods to Mojo::UserAgent.

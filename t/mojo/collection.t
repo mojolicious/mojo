@@ -133,8 +133,8 @@ subtest 'reduce' => sub {
 
 subtest 'sort' => sub {
   my $collection = c(2, 5, 4, 1);
-  is_deeply $collection->sort->to_array,                          [1, 2, 4, 5], 'right order';
-  is_deeply $collection->sort(sub { $b cmp $a })->to_array,       [5, 4, 2, 1], 'right order';
+  is_deeply $collection->sort->to_array, [1, 2, 4, 5], 'right order';
+  is_deeply $collection->sort(sub { $b    cmp $a })->to_array,    [5, 4, 2, 1], 'right order';
   is_deeply $collection->sort(sub { $_[1] cmp $_[0] })->to_array, [5, 4, 2, 1], 'right order';
   $collection = c(qw(Test perl Mojo));
   is_deeply $collection->sort(sub { uc(shift) cmp uc(shift) })->to_array, [qw(Mojo perl Test)], 'right order';

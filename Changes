@@ -1,5 +1,8 @@
 
 9.47 UNRELEASED
+  - Fixed a security issue where the pure-Perl implementation of Mojo::JSON could exhaust all available memory when
+    decoding deeply nested data. Decoding is now limited to 512 levels of nesting, to match the default of
+    Cpanel::JSON::XS.
   - Fixed Mojo::File::list_tree to no longer follow symbolic links to directories.
 
 9.46  2026-06-04

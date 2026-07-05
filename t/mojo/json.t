@@ -405,4 +405,16 @@ subtest 'Errors' => sub {
   like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/, 'right error';
 };
 
+subtest 'Maximum nesting level' => sub {
+  ok decode_json('[' x 512 . ']' x 512), 'decode deeply nested array';
+  eval { decode_json('[' x 513 . ']' x 513) };
+  like $@, qr/Malformed JSON: Nesting too deep at line 1, offset 513/, 'right error';
+  ok decode_json('{"a":' x 512 . '1' . '}' x 512), 'decode deeply nested object';
+  eval { decode_json('{"a":' x 513 . '1' . '}' x 513) };
+  like $@, qr/Malformed JSON: Nesting too deep at line 1, offset 2561/, 'right error';
+  eval { decode_json('[{"a":' x 257 . '1' . '}]' x 257) };
+  like $@, qr/Malformed JSON: Nesting too deep/, 'right error';
+  ok decode_json('[' x 512 . ']' x 512), 'decode deeply nested array again';
+};
+
 done_testing();

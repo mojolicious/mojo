@@ -15,11 +15,20 @@ use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
 
 use constant CORE_BOOLS => defined &builtin::is_bool;
 
+# Maximum nesting level for decoding, to match the default of Cpanel::JSON::XS
+use constant MAX_DEPTH => 512;
+
 BEGIN {
   warnings->unimport('experimental::builtin') if CORE_BOOLS;
 }
 
+# Deep recursion is expected when working with nested data structures
+no warnings 'recursion';
+
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
+
+# Current nesting level while decoding
+our $DEPTH = 0;
 
 # Escaped special character map
 my %ESCAPE
@@ -86,6 +95,10 @@ sub _decode {
 }
 
 sub _decode_array {
+
+  # Nesting limit
+  _throw('Nesting too deep') if (local $DEPTH = $DEPTH + 1) > MAX_DEPTH;
+
   my @array;
   until (m/\G[\x20\x09\x0a\x0d]*\]/gc) {
 
@@ -106,6 +119,10 @@ sub _decode_array {
 }
 
 sub _decode_object {
+
+  # Nesting limit
+  _throw('Nesting too deep') if (local $DEPTH = $DEPTH + 1) > MAX_DEPTH;
+
   my %hash;
   until (m/\G[\x20\x09\x0a\x0d]*\}/gc) {
 

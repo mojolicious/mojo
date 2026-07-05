@@ -32,7 +32,7 @@ has [qw(socket_options tls_options)] => sub { {} };
 has transactor                       => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
-for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
+for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT QUERY)) {
   monkey_patch __PACKAGE__, lc $name, sub {
     my ($self, $cb) = (shift, ref $_[-1] eq 'CODE' ? pop : undef);
     return $self->start($self->build_tx($name, @_), $cb);
@@ -905,6 +905,33 @@ Same as L</"put">, but performs all requests non-blocking and returns a L<Mojo::
 callback.
 
   $ua->put_p('http://example.com' => json => {a => 'b'})->then(sub ($tx) {
+    say $tx->result->body;
+  })->catch(sub ($err) {
+    warn "Connection error: $err";
+  })->wait;
+
+=head2 query
+
+  my $tx = $ua->query('example.com');
+  my $tx = $ua->query('http://example.com' => {Accept => '*/*'} => 'Content!');
+  my $tx = $ua->query('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $tx = $ua->query('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
+
+Perform blocking C<QUERY> request and return resulting L<Mojo::Transaction::HTTP> object, takes the same arguments as
+L<Mojo::UserAgent::Transactor/"tx"> (except for the C<QUERY> method, which is implied). You can also append a callback
+to perform requests non-blocking.
+
+  $ua->query('http://example.com' => json => {a => 'b'} => sub ($ua, $tx) { say $tx->result->body });
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+=head2 query_p
+
+  my $promise = $ua->query_p('http://example.com');
+
+Same as L</"query">, but performs all requests non-blocking and returns a L<Mojo::Promise> object instead of accepting
+a callback.
+
+  $ua->query_p('http://example.com' => json => {a => 'b'})->then(sub ($tx) {
     say $tx->result->body;
   })->catch(sub ($err) {
     warn "Connection error: $err";

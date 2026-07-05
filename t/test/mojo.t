@@ -83,6 +83,12 @@ subtest 'options_ok' => sub {
   is $t->tx->req->method, 'OPTIONS', 'right method';
 };
 
+subtest 'query_ok' => sub {
+  $t->query_ok('/');
+  is_deeply \@args, ['ok', 1, 'QUERY /'], 'right result';
+  is $t->tx->req->method, 'QUERY', 'right method';
+};
+
 subtest 'status_is' => sub {
   $t->status_is(200);
   is_deeply \@args, ['is', 200, 200, '200 OK'], 'right result';

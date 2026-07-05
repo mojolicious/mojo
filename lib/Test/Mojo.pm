@@ -275,6 +275,8 @@ sub post_sse_ok { shift->_build_sse_ok(POST => @_) }
 
 sub put_ok { shift->_build_ok(PUT => @_) }
 
+sub query_ok { shift->_build_ok(QUERY => @_) }
+
 sub request_ok { shift->_request_ok($_[0], $_[0]->req->url->to_string) }
 
 sub reset_session {
@@ -1160,6 +1162,17 @@ warning!
 
 Perform a C<PUT> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"put">, except
 for the callback.
+
+=head2 query_ok
+
+  $t = $t->query_ok('http://example.com/foo');
+  $t = $t->query_ok('/foo');
+  $t = $t->query_ok('/foo' => {Accept => '*/*'} => 'Content!');
+  $t = $t->query_ok('/foo' => {Accept => '*/*'} => form => {a => 'b'});
+  $t = $t->query_ok('/foo' => {Accept => '*/*'} => json => {a => 'b'});
+
+Perform a C<QUERY> request and check for transport errors, takes the same arguments as L<Mojo::UserAgent/"query">,
+except for the callback.
 
 =head2 request_ok
 

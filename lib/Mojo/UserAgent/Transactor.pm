@@ -131,14 +131,14 @@ sub redirect {
   my $proto = $location->protocol;
   return undef if ($proto ne 'http' && $proto ne 'https') || !$location->host;
 
-  # Clone request if necessary
-  my $new = Mojo::Transaction::HTTP->new;
-  if ($code == 307 || $code == 308) {
+  # Clone request if necessary (QUERY is safe and idempotent, so it keeps its content like 307 and 308)
+  my $new    = Mojo::Transaction::HTTP->new;
+  my $method = uc $req->method;
+  if ($code == 307 || $code == 308 || ($method eq 'QUERY' && $code != 303)) {
     return undef unless my $clone = $req->clone;
     $new->req($clone);
   }
   else {
-    my $method = uc $req->method;
     $method = $code == 303 || $method eq 'POST' ? 'GET' : $method;
     $new->req->method($method)->content->headers(my $headers = $req->headers->clone);
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
@@ -450,7 +450,8 @@ Build L<Mojo::Transaction::HTTP> proxy C<CONNECT> request for transaction if pos
   my $tx = $t->redirect(Mojo::Transaction::HTTP->new);
 
 Build L<Mojo::Transaction::HTTP> follow-up request for C<301>, C<302>, C<303>, C<307> or C<308> redirect response if
-possible.
+possible. Since C<QUERY> requests are safe and idempotent, they are never redirected as C<GET> requests and keep their
+content, except for C<303> responses.
 
 =head2 tx
 

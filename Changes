@@ -1,5 +1,10 @@
 
 9.47 UNRELEASED
+  - Added support for the QUERY HTTP request method from RFC 10008.
+  - Added query and query_p methods to Mojo::UserAgent.
+  - Added query method to Mojolicious::Routes::Route.
+  - Added query method to Mojolicious::Lite.
+  - Added query_ok method to Test::Mojo.
   - Fixed a security issue where the pure-Perl implementation of Mojo::JSON could exhaust all available memory when
     decoding deeply nested data. Decoding is now limited to 512 levels of nesting, to match the default of
     Cpanel::JSON::XS.

@@ -924,6 +924,70 @@ subtest '308 redirect (dynamic)' => sub {
   is $t->redirect($tx), undef, 'unsupported redirect';
 };
 
+subtest 'QUERY 301 redirect with content' => sub {
+  my $tx = $t->tx(QUERY => 'http://mojolicious.org/foo' => {Accept => '*/*'} => 'whatever');
+  $tx->res->code(301);
+  $tx->res->headers->location('http://example.com/bar');
+  is $tx->req->headers->accept, '*/*',      'right "Accept" value';
+  is $tx->req->body,            'whatever', 'right content';
+  $tx = $t->redirect($tx);
+  is $tx->req->method,            'QUERY',                  'right method';
+  is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
+  is $tx->req->headers->accept,   '*/*',                    'right "Accept" value';
+  is $tx->req->headers->location, undef,                    'no "Location" value';
+  is $tx->req->body,              'whatever',               'right content';
+  is $tx->res->code,              undef,                    'no status';
+  is $tx->res->headers->location, undef,                    'no "Location" value';
+};
+
+subtest 'QUERY 302 redirect with content' => sub {
+  my $tx = $t->tx(QUERY => 'http://mojolicious.org/foo' => {Accept => '*/*'} => 'whatever');
+  $tx->res->code(302);
+  $tx->res->headers->location('http://example.com/bar');
+  is $tx->req->headers->accept, '*/*',      'right "Accept" value';
+  is $tx->req->body,            'whatever', 'right content';
+  $tx = $t->redirect($tx);
+  is $tx->req->method,            'QUERY',                  'right method';
+  is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
+  is $tx->req->headers->accept,   '*/*',                    'right "Accept" value';
+  is $tx->req->headers->location, undef,                    'no "Location" value';
+  is $tx->req->body,              'whatever',               'right content';
+  is $tx->res->code,              undef,                    'no status';
+  is $tx->res->headers->location, undef,                    'no "Location" value';
+};
+
+subtest 'QUERY 303 redirect with content' => sub {
+  my $tx = $t->tx(QUERY => 'http://mojolicious.org/foo' => {Accept => '*/*'} => 'whatever');
+  $tx->res->code(303);
+  $tx->res->headers->location('http://example.com/bar');
+  is $tx->req->headers->accept, '*/*',      'right "Accept" value';
+  is $tx->req->body,            'whatever', 'right content';
+  $tx = $t->redirect($tx);
+  is $tx->req->method,            'GET',                    'right method';
+  is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
+  is $tx->req->headers->accept,   '*/*',                    'right "Accept" value';
+  is $tx->req->headers->location, undef,                    'no "Location" value';
+  is $tx->req->body,              '',                       'no content';
+  is $tx->res->code,              undef,                    'no status';
+  is $tx->res->headers->location, undef,                    'no "Location" value';
+};
+
+subtest 'QUERY 307 redirect with content' => sub {
+  my $tx = $t->tx(QUERY => 'http://mojolicious.org/foo' => {Accept => '*/*'} => 'whatever');
+  $tx->res->code(307);
+  $tx->res->headers->location('http://example.com/bar');
+  is $tx->req->headers->accept, '*/*',      'right "Accept" value';
+  is $tx->req->body,            'whatever', 'right content';
+  $tx = $t->redirect($tx);
+  is $tx->req->method,            'QUERY',                  'right method';
+  is $tx->req->url->to_abs,       'http://example.com/bar', 'right URL';
+  is $tx->req->headers->accept,   '*/*',                    'right "Accept" value';
+  is $tx->req->headers->location, undef,                    'no "Location" value';
+  is $tx->req->body,              'whatever',               'right content';
+  is $tx->res->code,              undef,                    'no status';
+  is $tx->res->headers->location, undef,                    'no "Location" value';
+};
+
 subtest '309 redirect (unsupported)' => sub {
   my $tx = $t->tx(POST => 'http://mojolicious.org/foo' => {Accept => 'application/json'});
   $tx->res->code(309);

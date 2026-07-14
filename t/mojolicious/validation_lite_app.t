@@ -309,23 +309,35 @@ subtest 'Custom error' => sub {
 };
 
 subtest 'CSRF protection' => sub {
+
+  # Masked token with an all-zero mask, so it unmasks to the session token
+  my $session = 'a' x 40;
+  my $token   = ('0' x 40) . $session;
+
   my $v = $t->app->validation->input({foo => 'bar'})->csrf_protect;
   ok $v->has_data,  'has data';
   ok $v->has_error, 'has error';
   is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
-  $v = $t->app->validation->input({csrf_token => 'abc'});
+  $v = $t->app->validation->input({csrf_token => $token});
   ok $v->has_data,                'has data';
   ok $v->csrf_protect->has_error, 'has error';
   ok $v->has_data,                'has data';
   is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
-  $v = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})->csrf_token('cba')->csrf_protect;
+  $v = $t->app->validation->input({csrf_token => $token, foo => 'bar'})->csrf_token('b' x 40)->csrf_protect;
   ok $v->has_error, 'has error';
   is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
-  $v = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})->csrf_token('abc')->csrf_protect;
+  $v = $t->app->validation->input({csrf_token => $session, foo => 'bar'})->csrf_token($session)->csrf_protect;
+  ok $v->has_error, 'has error';
+  is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
+  (my $tampered = $token) =~ s/.$/f/;
+  $v = $t->app->validation->input({csrf_token => $tampered, foo => 'bar'})->csrf_token($session)->csrf_protect;
+  ok $v->has_error, 'has error';
+  is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
+  $v = $t->app->validation->input({csrf_token => $token, foo => 'bar'})->csrf_token($session)->csrf_protect;
   ok !$v->has_error,                'no error';
   ok $v->required('foo')->is_valid, 'valid';
   is_deeply $v->output, {foo => 'bar'}, 'right result';
-  $v = $t->app->validation->input({csrf_token => ['abc', 'abc']})->csrf_token('abc')->csrf_protect;
+  $v = $t->app->validation->input({csrf_token => [$token, $token]})->csrf_token($session)->csrf_protect;
   ok $v->has_error, 'has error';
   is_deeply $v->error('csrf_token'), ['csrf_protect'], 'right error';
 };
@@ -418,8 +430,22 @@ subtest 'Correct CSRF token' => sub {
     ->element_count_is('[name=csrf_token]', 2)
     ->element_count_is('form',              2)
     ->element_exists('form > input[name=csrf_token] + input[type=submit]');
-  is $t->tx->res->dom->find('[name=csrf_token]')->[0]->val, $t->tx->res->dom->find('[name=csrf_token]')->[1]->val,
-    'same token';
+  isnt $t->tx->res->dom->find('[name=csrf_token]')->[0]->val, $t->tx->res->dom->find('[name=csrf_token]')->[1]->val,
+    'different masked tokens';
+};
+
+subtest 'Different masked CSRF token for every request' => sub {
+  my $first  = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->val;
+  my $second = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->val;
+  isnt $first, $second, 'different tokens';
+  like $first,  qr/^[0-9a-f]{80}$/, 'token is masked';
+  like $second, qr/^[0-9a-f]{80}$/, 'token is masked';
+  $t->post_ok('/forgery' => form => {csrf_token => $first, foo => 'bar'})
+    ->status_is(200)
+    ->content_unlike(qr/Wrong or missing CSRF token!/);
+  $t->post_ok('/forgery' => form => {csrf_token => $second, foo => 'bar'})
+    ->status_is(200)
+    ->content_unlike(qr/Wrong or missing CSRF token!/);
 };
 
 subtest 'Correct CSRF token (header)' => sub {

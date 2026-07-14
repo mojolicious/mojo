@@ -95,7 +95,17 @@ sub _convert_to_exception {
   return (blessed $e && $e->isa('Mojo::Exception')) ? $e : Mojo::Exception->new($e);
 }
 
-sub _csrf_token { $_[0]->session->{csrf_token} ||= unpack "H*", random_bytes(20) }
+sub _csrf_token {
+  my $c = shift;
+
+  # Generate token and store it in the session
+  my $session = $c->session;
+  $session->{csrf_token} ||= unpack "H*", random_bytes(20);
+
+  # Mask token to protect against BREACH attacks
+  my $mask = random_bytes(20);
+  return unpack("H*", $mask) . unpack("H*", $mask ^ pack("H*", $session->{csrf_token}));
+}
 
 sub _current_route {
   return '' unless my $route = shift->match->endpoint;
@@ -474,7 +484,8 @@ Same as L</"content">, but replaces content of named buffers if they are already
 
   %= csrf_token
 
-Get CSRF token from L</"session">, and generate one if none exists.
+Get CSRF token from L</"session">, and generate one if none exists. The token is masked with a fresh random value on
+every call to protect against BREACH attacks.
 
 =head2 current_route
 

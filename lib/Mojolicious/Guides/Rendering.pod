@@ -1007,6 +1007,10 @@ L<Mojolicious::Validator::Validation/"csrf_protect">.
 For Ajax requests and the like, you can also generate a token directly with the helper
 L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">, and then pass it along with the C<X-CSRF-Token> request header.
 
+The token is masked with a fresh random value on every request, so its value changes each time even though it stays
+bound to the same session. This protects against BREACH attacks, which could otherwise recover a static token from
+compressed responses.
+
 =head1 ADVANCED
 
 Less commonly used and more powerful features.

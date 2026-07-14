@@ -1,5 +1,7 @@
 
 9.48  UNRELEASED
+  - Fixed a security issue where CSRF tokens were vulnerable to BREACH attacks. Tokens are now masked with a fresh
+    random value on every request, instead of being reused for the whole lifetime of a session.
 
 9.47  2026-07-05
   - Added support for the QUERY HTTP request method from RFC 10008.

@@ -1,5 +1,5 @@
 
-9.48  UNRELEASED
+9.48  2026-07-14
   - Fixed a security issue where CSRF tokens were vulnerable to BREACH attacks. Tokens are now masked with a fresh
     random value on every request, instead of being reused for the whole lifetime of a session.
 

@@ -110,7 +110,7 @@ sub _manage {
     next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
-    $log->error("Worker $pid has no heartbeat ($ht seconds), restarting (see FAQ for more)") and $w->{graceful} = $time
+    $log->info("Worker $pid has no heartbeat ($ht seconds), restarting (see FAQ for more)") and $w->{graceful} = $time
       if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 
     # Graceful stop with timeout

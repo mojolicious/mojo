@@ -107,6 +107,8 @@ get '/variants' => [format => ['txt']] => {layout => 'variants', format => undef
   $c->render('variants');
 };
 
+get '/specific_template' => {template_path => curfile->sibling('templates2')->child('42.html.ep')->to_string};
+
 my $t = Test::Mojo->new;
 
 subtest '"0" content reassignment' => sub {
@@ -331,6 +333,10 @@ subtest 'Variants ("0")' => sub {
     ->status_is(200)
     ->content_type_is('text/plain;charset=UTF-8')
     ->content_is('Another variant: Desktop!');
+};
+
+subtest 'Specific template path' => sub {
+  $t->get_ok('/specific_template')->status_is(200)->content_is("DefaultThe answer is 42.\n\n");
 };
 
 done_testing();

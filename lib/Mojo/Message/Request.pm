@@ -176,10 +176,10 @@ sub _parse_env {
   $headers->content_length($env->{CONTENT_LENGTH}) if $env->{CONTENT_LENGTH};
 
   # Query
-  $url->query->parse($env->{QUERY_STRING}) if $env->{QUERY_STRING};
+  $url->query->parse($env->{QUERY_STRING}) if length $env->{QUERY_STRING};
 
   # Method
-  $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
+  $self->method($env->{REQUEST_METHOD}) if defined $env->{REQUEST_METHOD};
 
   # Scheme/Version
   $base->scheme($1) and $self->version($2) if ($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!;

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use Config;
 use Exporter   qw(import);
-use Mojo::Util qw(b64_encode dumper sha1_bytes xor_encode);
+use Mojo::Util qw(b64_encode dumper random_bytes sha1_bytes xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
@@ -55,8 +55,10 @@ sub build_frame {
 
   # Mask payload
   if ($masked) {
-    my $mask = pack 'N', int(rand 9 x 7);
-    $payload = $mask . xor_encode($payload, $mask x 128);
+    # RFC 6455 5.3: the masking key MUST be derived from a strong source of
+    # entropy and MUST NOT let a server or proxy predict the next one.
+    my $mask = random_bytes(4);
+    $payload = $mask . xor_encode( $payload, $mask x 128 );
   }
 
   return $frame . $payload;
@@ -81,7 +83,8 @@ sub client_handshake {
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
   # Generate 16 byte WebSocket challenge
-  my $challenge = b64_encode sprintf('%16u', int(rand 9 x 16)), '';
+  # RFC 6455 4.1: a nonce consisting of a randomly selected 16-byte value.
+  my $challenge = b64_encode random_bytes(16), '';
   $headers->sec_websocket_key($challenge) unless $headers->sec_websocket_key;
 
   return $tx;

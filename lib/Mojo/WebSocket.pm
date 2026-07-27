@@ -55,8 +55,6 @@ sub build_frame {
 
   # Mask payload
   if ($masked) {
-    # RFC 6455 5.3: the masking key MUST be derived from a strong source of
-    # entropy and MUST NOT let a server or proxy predict the next one.
     my $mask = random_bytes(4);
     $payload = $mask . xor_encode( $payload, $mask x 128 );
   }
@@ -83,7 +81,6 @@ sub client_handshake {
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
   # Generate 16 byte WebSocket challenge
-  # RFC 6455 4.1: a nonce consisting of a randomly selected 16-byte value.
   my $challenge = b64_encode random_bytes(16), '';
   $headers->sec_websocket_key($challenge) unless $headers->sec_websocket_key;
 

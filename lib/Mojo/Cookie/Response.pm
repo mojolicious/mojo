@@ -4,9 +4,9 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_cookie_header);
 
-has [qw(domain expires host_only httponly max_age path samesite secure)];
+has [qw(domain expires host_only httponly max_age partitioned path samesite secure)];
 
-my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age path samesite secure);
+my %ATTRS = map { $_ => 1 } qw(domain expires httponly max-age partitioned path samesite secure);
 
 sub parse {
   my ($self, $str) = @_;
@@ -21,7 +21,7 @@ sub parse {
       next unless $ATTRS{my $attr = lc $name};
       $value =~ s/^\.// if $attr eq 'domain' && defined $value;
       $value = Mojo::Date->new($value // '')->epoch if $attr eq 'expires';
-      $value = 1                                    if $attr eq 'secure' || $attr eq 'httponly';
+      $value = 1 if $attr eq 'secure' || $attr eq 'httponly' || $attr eq 'partitioned';
       $cookies[-1]{$attr eq 'max-age' ? 'max_age' : $attr} = $value;
     }
   }
@@ -46,6 +46,9 @@ sub to_string {
 
   # "path"
   if (my $path = $self->path) { $cookie .= "; path=$path" }
+
+  # "Partitioned"
+  $cookie .= "; Partitioned" if $self->partitioned;
 
   # "secure"
   $cookie .= "; secure" if $self->secure;
@@ -122,6 +125,16 @@ HttpOnly flag, which can prevent client-side scripts from accessing this cookie.
   $cookie     = $cookie->max_age(60);
 
 Max age for cookie.
+
+=head2 partitioned
+
+  my $partitioned = $cookie->partitioned;
+  $cookie         = $cookie->partitioned(1);
+
+Partitioned flag, this is to be used in accordance to the CHIPS amendment to RFC 6265.
+Note that this attribute is B<EXPERIMENTAL> because even though most commonly used browsers support the
+feature, there is no specification yet besides L<this
+draft|https://www.ietf.org/archive/id/draft-cutler-httpbis-partitioned-cookies-00.html>.
 
 =head2 path
 

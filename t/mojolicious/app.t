@@ -17,6 +17,7 @@ use Mojo::Date;
 use Mojo::File qw(path);
 use Mojo::Home;
 use Mojo::IOLoop;
+use Mojo::Util qw(generate_secret);
 use Mojolicious;
 use Mojolicious::Controller;
 
@@ -658,6 +659,7 @@ subtest 'Override deployment plugins' => sub {
 };
 
 $t = Test::Mojo->new('MojoliciousTest');
+$t->app->secrets([generate_secret]);
 
 # MojoliciousTestController::Foo::plugin_upper_case
 $t->get_ok('/plugin/upper_case')

@@ -190,6 +190,15 @@ subtest 'attr_unlike' => sub {
   is_deeply \@args, ['unlike', 'test', qr/wrong/, 'some description'], 'right result';
 };
 
+subtest 'text_is' => sub {
+  $t->tx->res->body('<p id="test">Test</p>');
+  $t->text_is('p', 'Test');
+  is_deeply \@args, ['is', 'Test', 'Test', 'exact match for selector "p"'], 'right result';
+
+  $t->text_is('p', 'Test', 'some description');
+  is_deeply \@args, ['is', 'Test', 'Test', 'some description'], 'right result';
+};
+
 subtest 'header_exists' => sub {
   $t->header_exists('Content-Type');
   is_deeply \@args, ['ok', 1, 'header "Content-Type" exists'], 'right result';

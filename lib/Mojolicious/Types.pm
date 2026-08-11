@@ -30,6 +30,7 @@ has mapping => sub {
     ttf      => ['font/ttf'],
     txt      => ['text/plain;charset=UTF-8'],
     webm     => ['video/webm'],
+    webp     => ['image/webp'],
     woff     => ['font/woff'],
     woff2    => ['font/woff2'],
     xml      => ['application/xml', 'text/xml'],

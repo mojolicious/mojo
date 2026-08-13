@@ -65,8 +65,10 @@ sub run {
   # Find all available commands
   my %all;
   for my $ns (@{$self->namespaces}) {
-    $all{substr $_, length "${ns}::"} //= $_->new->description
-      for grep { _command($_) } find_modules($ns), find_packages($ns);
+    for my $pkg (find_modules($ns), find_packages($ns)) {
+      next unless _command($pkg);
+      $all{substr $pkg, length "${ns}::"} //= $pkg->new->description;
+    }
   }
 
   my @rows;

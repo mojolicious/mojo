@@ -1420,12 +1420,15 @@ to process requests in smaller batches.
     # Stop if there are no more URLs
     return unless my $url = shift @urls;
 
+    # Save __SUB__ for later use in another callback
+    my $fetch = __SUB__;
+
     # Fetch the next title
     $ua->get($url => sub ($ua, $tx) {
       say "$url: ", $tx->result->dom->at('title')->text;
 
       # Next request
-      __SUB__->();
+      $fetch->();
       $promise->resolve if --$count == 0;
     });
     $count++;

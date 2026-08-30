@@ -20,11 +20,12 @@ my %NAMES = map { lc() => $_ } (
 for my $header (keys %NAMES) {
   my $name = $header;
   $name =~ y/-/_/;
+  my $delim = $name eq 'cookie' ? '; ' : ', ';
   monkey_patch __PACKAGE__, $name, sub {
     my $self = shift;
     $self->{headers}{$header} = [@_] and return $self if @_;
     return undef unless my $headers = $self->{headers}{$header};
-    return join ', ', @$headers;
+    return join($delim, @$headers);
   };
 }
 
@@ -48,7 +49,7 @@ sub add {
 sub append {
   my ($self, $name, $value) = @_;
   my $old = $self->header($name);
-  return $self->header($name => defined $old ? "$old, $value" : $value);
+  return $self->header($name => defined $old ? ($old . (lc $name eq 'cookie' ? '; ' : ', ') . $value) : $value);
 }
 
 sub clone {
@@ -90,8 +91,9 @@ sub header {
   # Replace
   return $self->remove($name)->add($name, @_) if @_;
 
-  return undef unless my $headers = $self->{headers}{lc $name};
-  return join ', ', @$headers;
+  $name = lc $name;
+  return undef unless my $headers = $self->{headers}{$name};
+  return join(($name eq 'cookie' ? '; ' : ', '), @$headers);
 }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
@@ -178,7 +180,14 @@ sub to_string {
 
   # Make sure multi-line values are formatted correctly
   my @headers;
-  for my $name (@{$self->names}) { push @headers, "$name: $_" for @{$self->{headers}{lc $name}} }
+  for my $name (@{$self->names}) {
+    if ($name eq 'Cookie') {
+      push @headers, "$name: " . join('; ', @{$self->{headers}{lc $name}});
+    }
+    else {
+      push @headers, "$name: $_" for @{$self->{headers}{lc $name}};
+    }
+  }
 
   return join "\x0d\x0a", @headers;
 }

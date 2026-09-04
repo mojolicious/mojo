@@ -152,13 +152,13 @@ sub to_deep_hash {
     my ($name, $value) = @{$pairs}[$i, $i + 1];
     my @parts;
     if ($name =~ m{^([^\[\]]+)((?:\[[^\[\]]+\])+)\z}) {
-        @parts = ($1);
+      @parts = ($1);
       push @parts, $2 =~ /\[([^\[\]]+)\]/g;
     }
     else { @parts = ($name) }
     my $target = \%hash;
-      while (@parts > 1) {
-        my $part = shift @parts;
+    while (@parts > 1) {
+      my $part = shift @parts;
       $target->{$part} = {} unless ref $target->{$part} eq 'HASH';
       $target = $target->{$part};
     }

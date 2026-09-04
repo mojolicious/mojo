@@ -329,6 +329,12 @@ sub write_chunk {
   return $self->rendered;
 }
 
+sub write_sse {
+  my ($self, $event, $cb) = @_;
+  $self->res->content->write_sse($event, $cb ? sub { shift; $self->$cb(@_) } : ());
+  return $self->rendered;
+}
+
 1;
 
 =encoding utf8
@@ -441,7 +447,7 @@ you want to access more than just the last one, you can use L</"every_cookie">.
 Access encrypted request cookie values and create new encrypted response cookies. If there are multiple values sharing
 the same name, and you want to access more than just the last one, you can use L</"every_encrypted_cookie">. Cookies
 are encrypted with ChaCha20-Poly1305, to prevent tampering, and the ones failing decryption will be automatically
-discarded. Note that this method is B<EXPERIMENTAL> and might change without warning!
+discarded.
 
 =head2 every_cookie
 
@@ -457,7 +463,7 @@ Similar to L</"cookie">, but returns all request cookie values sharing the same 
   my $values = $c->every_encrypted_cookie('foo');
 
 Similar to L</"encrypted_cookie">, but returns all encrypted request cookie values sharing the same name as an array
-reference. Note that this method is B<EXPERIMENTAL> and might change without warning!
+reference.
 
   # Get first encrypted cookie value
   my $first = $c->every_encrypted_cookie('foo')->[0];
@@ -919,6 +925,27 @@ You can call L</"finish"> or write an empty chunk of data at any time to end the
   2
   o!
   0
+
+=head2 write_sse
+
+  $c = $c->write_sse;
+  $c = $c->write_sse($event);
+  $c = $c->write_sse($event => sub ($c) {...});
+
+Write Server-Sent Event (SSE) non-blocking, the optional drain callback will be executed once all data has been
+written. Calling this method without an event will finalize the response headers and allow for events to be written
+later. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
+  # Send event with default "message" type
+  $c->write_sse({text => 'Hello World!'});
+
+  # You can send comments in regular intervals to keep the connection alive
+  $c->write_sse({comment => 'Keep connection alive!'});
+
+  # Make sure previous event has been written before continuing (id and type are optional)
+  $c->write_sse({id => 23, type => 'greeting', text => 'Hello World!'} => sub ($c) {
+    $c->write_sse({id => 24, type => 'farewell', text => 'Goodbye World!'} => sub ($c) { $c->finish });
+  });
 
 =head1 HELPERS
 

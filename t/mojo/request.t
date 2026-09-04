@@ -475,6 +475,11 @@ subtest 'Parse full HTTP 1.0 request (no scheme and empty elements in path)' => 
   is $req->url,                     '//foo/bar//baz.html?foo=13', 'right URL';
   is $req->headers->content_type,   'text/plain',                 'right "Content-Type" value';
   is $req->headers->content_length, 27,                           'right "Content-Length" value';
+  is $req->headers->host,           undef,                        '"Host" value is not defined';
+
+  $req->fix_headers;
+  is $req->url->host,     undef, 'still no URL host';
+  is $req->headers->host, '',    '"Host" value is fixed';
 };
 
 subtest 'Parse full HTTP 1.0 request (behind reverse proxy)' => sub {

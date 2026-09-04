@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Carp ();
 use Mojo::DynamicMethods -dispatch;
+use Mojo::Util   qw(secure_compare);
 use Scalar::Util ();
 
 has [qw(csrf_token topic validator)];
@@ -39,7 +40,7 @@ sub check {
 sub csrf_protect {
   my $self  = shift;
   my $token = $self->input->{csrf_token};
-  $self->error(csrf_token => ['csrf_protect']) unless $token && $token eq ($self->csrf_token // '');
+  $self->error(csrf_token => ['csrf_protect']) unless _csrf_valid($token, $self->csrf_token);
   return $self;
 }
 
@@ -86,6 +87,16 @@ sub required {
   my ($self, $name) = (shift, shift);
   return $self if $self->optional($name, @_)->is_valid;
   return $self->error($name => ['required']);
+}
+
+sub _csrf_valid {
+  my ($token, $csrf) = @_;
+  return undef unless defined $token && !ref $token && $token =~ /^[0-9a-f]{80}$/;
+
+  # Unmask token to protect against BREACH attacks
+  my $mask   = pack 'H*', substr $token, 0, 40;
+  my $masked = pack 'H*', substr $token, 40;
+  return secure_compare unpack('H*', $mask ^ $masked), $csrf // '';
 }
 
 1;
@@ -165,7 +176,8 @@ first one failed. All checks from L<Mojolicious::Validator/"CHECKS"> are support
 
   $v = $v->csrf_protect;
 
-Validate C<csrf_token> and protect from cross-site request forgery.
+Validate C<csrf_token> and protect from cross-site request forgery. Tokens are masked with a random value to protect
+against BREACH attacks.
 
 =head2 error
 

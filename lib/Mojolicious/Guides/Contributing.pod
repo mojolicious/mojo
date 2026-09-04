@@ -79,6 +79,9 @@ requires three positive reviews from voting members of the core team.
 All code changes should emulate the style of the surrounding code, include tests that fail without them, and update
 relevant documentation.
 
+AI-assisted contributions are welcome, but we expect all contributions to be submitted by a human who takes full
+responsibility for them.
+
 While the L<Mojolicious> distribution covers a wide range of features, we are rather conservative when it comes to
 adding new ones. So if your contribution is not a simple bug fix, it is B<strongly recommended> that you discuss it in
 advance in the L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.libera.chat>

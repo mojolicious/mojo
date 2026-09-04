@@ -7,14 +7,13 @@ use Cwd                   qw(getcwd);
 use Exporter              qw(import);
 use File::Basename        ();
 use File::Copy            qw(copy move);
-use File::Find            qw(find);
 use File::Path            ();
 use File::Spec::Functions qw(abs2rel canonpath catfile file_name_is_absolute rel2abs splitdir);
 use File::stat            ();
 use File::Temp            ();
 use IO::File              ();
 use Mojo::Collection;
-use Mojo::Util qw(decode deprecated encode);
+use Mojo::Util qw(decode encode);
 
 our @EXPORT_OK = ('curfile', 'path', 'tempdir', 'tempfile');
 
@@ -38,6 +37,14 @@ sub curfile { __PACKAGE__->new(Cwd::realpath((caller)[1])) }
 
 sub dirname { $_[0]->new(scalar File::Basename::dirname ${$_[0]}) }
 
+sub download {
+  my ($self, $url, $options) = (shift, shift, shift // {});
+  my $ua = $options->{ua}
+    || do { require Mojo::UserAgent; Mojo::UserAgent->new(max_redirects => 10, max_response_size => 0) };
+  my $tx = _download_error($ua->transactor->download($ua->head($url => $options->{headers} // {}), $$self));
+  return $tx ? !!_download_error($ua->start($tx)) : 1;
+}
+
 sub extname { shift->basename =~ /.+\.([^.]+)$/ ? $1 : '' }
 
 sub is_abs { file_name_is_absolute ${shift()} }
@@ -57,25 +64,25 @@ sub list {
 
 sub list_tree {
   my ($self, $options) = (shift, shift // {});
+  return Mojo::Collection->new unless -d $$self;
 
-  # This may break in the future, but is worth it for performance
-  local $File::Find::skip_pattern = qr/^\./ unless $options->{hidden};
-
-  # The File::Find documentation lies, this is needed for CIFS
-  local $File::Find::dont_use_nlink = 1 if $options->{dont_use_nlink};
-
-  my %all;
-  my $wanted = sub {
-    if ($options->{max_depth}) {
-      (my $rel = $File::Find::name) =~ s!^\Q$$self\E/?!!;
-      $File::Find::prune = 1 if splitdir($rel) >= $options->{max_depth};
+  my (@results, $walk);
+  $walk = sub {
+    my ($path, $depth) = @_;
+    opendir my $dh, $path or return;
+    my @names = sort grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+    @names = grep { !/^\./ } @names unless $options->{hidden};
+    for my $name (@names) {
+      my $child  = $self->new($path, $name);
+      my $is_dir = -d $$child;
+      push @results, $child if $options->{dir} || !$is_dir;
+      __SUB__->($$child, $depth + 1)
+        if $is_dir && !-l $$child && (!$options->{max_depth} || $depth + 1 < $options->{max_depth});
     }
-    $all{$File::Find::name}++ if $options->{dir} || !-d $File::Find::name;
   };
-  find {wanted => $wanted, no_chdir => 1}, $$self if -d $$self;
-  delete $all{$$self};
+  $walk->($$self, 0);
 
-  return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
+  return Mojo::Collection->new(@results);
 }
 
 sub lstat { File::stat::lstat(${shift()}) }
@@ -146,11 +153,7 @@ sub spew {
   return $self;
 }
 
-# DEPRECATED!
-sub spurt {
-  deprecated 'Mojo::File::spurt is deprecated in favor of Mojo::File::spew';
-  shift->spew(join '', @_);
-}
+sub spurt { shift->spew(join '', @_) }
 
 sub stat { File::stat::stat(${shift()}) }
 
@@ -176,6 +179,15 @@ sub touch {
 }
 
 sub with_roles { shift->Mojo::Base::with_roles(@_) }
+
+sub _download_error {
+  my $tx = shift;
+
+  return $tx unless my $err = $tx->error;
+  return undef if $err->{message} eq 'Download complete' || $err->{message} eq 'Download incomplete';
+  croak "$err->{code} response: $err->{message}" if $err->{code};
+  croak "Download error: $err->{message}";
+}
 
 1;
 
@@ -301,6 +313,16 @@ Return all but the last level of the path with L<File::Basename> as a L<Mojo::Fi
   # "/home/sri" (on UNIX)
   path('/home/sri/.vimrc')->dirname;
 
+=head2 download
+
+  my $bool = $path->download('https://example.com/test.tar.gz');
+  my $bool = $path->download('https://example.com/test.tar.gz', {headers => {Accept => '*/*'}});
+  my $bool = $path->download('https://example.com/test.tar.gz', {ua => Mojo::UserAgent->new});
+
+Download file from URL, returns true once the file has been downloaded completely. Incomplete downloads are resumed.
+Follows C<10> redirects by default and does not limit the size of the response, which will be streamed memory
+efficiently. Note that this method is B<EXPERIMENTAL> and might change without warning!
+
 =head2 extname
 
   my $ext = $path->extname;
@@ -357,7 +379,7 @@ Include hidden files.
   my $collection = $path->list_tree({hidden => 1});
 
 List all files recursively in the directory and return a L<Mojo::Collection> object containing the results as
-L<Mojo::File> objects. The list does not include C<.> and C<..>.
+L<Mojo::File> objects. The list does not include C<.> and C<..>, and symbolic links to directories are not followed.
 
   # List all templates
   say for path('/home/sri/myapp/templates')->list_tree->each;
@@ -371,12 +393,6 @@ These options are currently available:
   dir => 1
 
 Include directories.
-
-=item dont_use_nlink
-
-  dont_use_nlink => 1
-
-Force L<File::Find> to always stat directories.
 
 =item hidden
 
@@ -490,6 +506,12 @@ Read all data at once from the file. If an encoding is provided, an attempt will
 
 Write all data at once to the file. If an encoding is provided, an attempt to encode the content will be made prior to
 writing.
+
+=head2 spurt
+
+  $path = $path->spurt(@bytes);
+
+Alias for L</"spew"> that writes multiple chunks of bytes.
 
 =head2 stat
 

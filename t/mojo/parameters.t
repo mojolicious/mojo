@@ -178,7 +178,12 @@ subtest 'Unicode' => sub {
 subtest 'Reparse' => sub {
   my $params = Mojo::Parameters->new('foo=bar&baz=23');
   $params->parse('foo=bar&baz=23');
-  is "$params", 'foo=bar&baz=23', 'right result';
+  is "$params", 'foo=bar&baz=23', 'right string result after assigning new string';
+  is_deeply $params->pairs, ['foo', 'bar', 'baz', '23'], 'right pairs after assigning new string';
+
+  $params->parse(undef);
+  is "$params", '', 'right result after assigning undef string';
+  is_deeply $params->pairs, [], 'right pairs after assigning undef string';
 };
 
 subtest 'Replace' => sub {

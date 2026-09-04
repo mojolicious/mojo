@@ -58,8 +58,10 @@ sub _expand {
     $tls->{SSL_key_file}  ||= $KEY;
   }
   else {
-    $tls->{SSL_hostname}      = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
-    $tls->{SSL_verifycn_name} = $args->{address};
+    unless (exists $tls->{SSL_hostname}) {
+      $tls->{SSL_hostname} = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
+    }
+    $tls->{SSL_verifycn_name} ||= $args->{address};
   }
 
   return $tls;

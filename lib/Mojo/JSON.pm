@@ -5,20 +5,30 @@ use Carp         qw(croak);
 use Exporter     qw(import);
 use JSON::PP     ();
 use Mojo::Util   qw(decode encode monkey_patch);
+use overload     ();
 use Scalar::Util qw(blessed);
 
 # For better performance Cpanel::JSON::XS is required
 use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
   ? 0
-  : !!eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 };
+  : !!eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.20'); 1 };
 
 use constant CORE_BOOLS => defined &builtin::is_bool;
+
+# Maximum nesting level for decoding, to match the default of Cpanel::JSON::XS
+use constant MAX_DEPTH => 512;
 
 BEGIN {
   warnings->unimport('experimental::builtin') if CORE_BOOLS;
 }
 
+# Deep recursion is expected when working with nested data structures
+no warnings 'recursion';
+
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
+
+# Current nesting level while decoding
+our $DEPTH = 0;
 
 # Escaped special character map
 my %ESCAPE
@@ -85,6 +95,10 @@ sub _decode {
 }
 
 sub _decode_array {
+
+  # Nesting limit
+  _throw('Nesting too deep') if (local $DEPTH = $DEPTH + 1) > MAX_DEPTH;
+
   my @array;
   until (m/\G[\x20\x09\x0a\x0d]*\]/gc) {
 
@@ -105,6 +119,10 @@ sub _decode_array {
 }
 
 sub _decode_object {
+
+  # Nesting limit
+  _throw('Nesting too deep') if (local $DEPTH = $DEPTH + 1) > MAX_DEPTH;
+
   my %hash;
   until (m/\G[\x20\x09\x0a\x0d]*\}/gc) {
 
@@ -249,7 +267,7 @@ sub _encode_value {
 
     # Everything else
     return 'null' unless blessed $value;
-    return _encode_string($value) unless my $sub = $value->can('TO_JSON');
+    return overload::Method($value, '""') ? _encode_string($value) : 'null' unless my $sub = $value->can('TO_JSON');
     return _encode_value($value->$sub);
   }
 
@@ -327,7 +345,7 @@ The character C</> will always be escaped to prevent XSS attacks.
 
   "</script>" -> "<\/script>"
 
-For better performance the optional module L<Cpanel::JSON::XS> (4.09+) will be used automatically if possible. This can
+For better performance the optional module L<Cpanel::JSON::XS> (4.20+) will be used automatically if possible. This can
 also be disabled with the C<MOJO_NO_JSON_XS> environment variable.
 
 =head1 FUNCTIONS

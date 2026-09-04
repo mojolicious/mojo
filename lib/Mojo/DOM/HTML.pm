@@ -29,14 +29,14 @@ my $TOKEN_RE = qr/
         (?:\s+\[.+?\])?                                                        # Int Subset
         \s*)
       |
-        --(.*?)--\s*                                                           # Comment
+        --(.*?)(?:--!?|(?<=<!--)-?(?=>))                                      # Comment
       |
         \[CDATA\[(.*?)\]\]                                                     # CDATA
       )
     |
       \?(.*?)\?                                                                # Processing Instruction
     |
-      \s*((?:\/\s*)?[^<>\s\/0-9.\-][^<>\s\/]*\s*(?:(?:$ATTR_RE){0,32766})*+)   # Tag
+      ((?:\/\s*)?[^<>\s\/0-9.\-][^<>\s\/]*\s*(?:(?:$ATTR_RE){0,32766})*+)      # Tag
     )>
   |
     (<)                                                                        # Runaway "<"
@@ -144,6 +144,14 @@ sub parse {
 
         # Raw text elements
         next if $xml || !$RAW{$start} && !$RCDATA{$start};
+
+        if ($start eq 'script') {
+          my ($script, $found_end) = _script_content(\$html);
+          _node($current, 'raw', $script) if length $script;
+          _end($start, 0, \$current)      if $found_end;
+          next;
+        }
+
         next unless $html =~ m!\G(.*?)</\Q$start\E(?:\s+|\s*>)!gcsi;
         _node($current, 'raw', $RCDATA{$start} ? html_unescape $1 : $1);
         _end($start, 0, \$current);
@@ -255,6 +263,38 @@ sub _render {
 
   # Everything else
   return '';
+}
+
+sub _script_content {
+  my $html  = shift;
+  my $start = pos $$html;
+
+  my $state = 0;
+
+  while (1) {
+    if   ($state == 0) { $$html =~ /\G[^<]*/gcs }
+    else               { $$html =~ /\G[^<\-]*/gcs }
+
+    my $p = pos $$html;
+    return (substr($$html, $start), 0) if $p >= length $$html;
+
+    if ($state == 0) {
+      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { return (substr($$html, $start, $p - $start), 1) }
+      elsif ($$html =~ /\G<!--/gcs)                   { $state = 1 }
+      else                                            { pos($$html) = $p + 1 }
+    }
+    elsif ($state == 1) {
+      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { return (substr($$html, $start, $p - $start), 1) }
+      elsif ($$html =~ /\G-->/gcs)                    { $state = 0 }
+      elsif ($$html =~ m!\G<script(?=[\s/>])!gcsi)    { $state = 2 }
+      else                                            { pos($$html) = $p + 1 }
+    }
+    else {
+      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { $state      = 1 }
+      elsif ($$html =~ /\G-->/gcs)                    { $state      = 0 }
+      else                                            { pos($$html) = $p + 1 }
+    }
+  }
 }
 
 sub _start {

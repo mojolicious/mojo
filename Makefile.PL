@@ -22,7 +22,7 @@ WriteMakefile(
     resources => {
       bugtracker => {web => 'https://github.com/mojolicious/mojo/issues'},
       homepage   => 'https://mojolicious.org',
-      license    => ['http://www.opensource.org/licenses/artistic-license-2.0'],
+      license    => ['https://opensource.org/license/artistic-2-0'],
       repository => {
         type => 'git',
         url  => 'https://github.com/mojolicious/mojo.git',

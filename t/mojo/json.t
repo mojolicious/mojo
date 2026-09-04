@@ -13,6 +13,9 @@ package JSONTest2;
 use Mojo::Base -base;
 use overload '&' => sub {die}, '""' => sub {'works!'};
 
+package JSONTest3;
+use Mojo::Base -base;
+
 package main;
 
 use Test::More;
@@ -334,6 +337,7 @@ subtest 'dualvar' => sub {
 
 subtest 'Other reference types' => sub {
   is encode_json([JSONTest2->new]), "[\"works!\"]", 'object stringified';
+  is encode_json([JSONTest3->new]), '[null]',       'object with no stringification overload';
 };
 
 subtest 'Ensure numbers and strings are not upgraded' => sub {
@@ -399,6 +403,18 @@ subtest 'Errors' => sub {
   like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/, 'right error';
   eval { from_json "[\"foo\",\n\"bar\",\n\"bazra\"]lalala" };
   like $@, qr/JSON: Unexpected data at line 3, offset 8 at.*json\.t/, 'right error';
+};
+
+subtest 'Maximum nesting level' => sub {
+  ok decode_json('[' x 512 . ']' x 512), 'decode deeply nested array';
+  eval { decode_json('[' x 513 . ']' x 513) };
+  like $@, qr/Malformed JSON: Nesting too deep at line 1, offset 513/, 'right error';
+  ok decode_json('{"a":' x 512 . '1' . '}' x 512), 'decode deeply nested object';
+  eval { decode_json('{"a":' x 513 . '1' . '}' x 513) };
+  like $@, qr/Malformed JSON: Nesting too deep at line 1, offset 2561/, 'right error';
+  eval { decode_json('[{"a":' x 257 . '1' . '}]' x 257) };
+  like $@, qr/Malformed JSON: Nesting too deep/, 'right error';
+  ok decode_json('[' x 512 . ']' x 512), 'decode deeply nested array again';
 };
 
 done_testing();

@@ -20,6 +20,47 @@ has name       => 'Mojolicious (Perl)';
 
 sub add_generator { $_[0]->generators->{$_[1]} = $_[2] and return $_[0] }
 
+sub download {
+  my ($self, $head, $path) = @_;
+
+  my $req = $head->req;
+  my $tx  = $self->tx(GET => $req->url->clone => $req->headers->to_hash);
+  my $res = $tx->res;
+  if (my $error = $head->error) { $res->error($error) and return $tx }
+
+  my $headers       = $head->res->headers;
+  my $accept_ranges = ($headers->accept_ranges // '') =~ /bytes/;
+  my $size          = $headers->content_length // 0;
+
+  my $current_size = 0;
+  my $file         = path($path);
+  if (-f $file) {
+    $current_size = -s $file;
+    $res->error({message => 'Unknown file size'})                        and return $tx unless $size;
+    $res->error({message => 'File size mismatch'})                       and return $tx if $current_size > $size;
+    $res->error({message => 'Download complete'})                        and return $tx if $current_size == $size;
+    $res->error({message => 'Server does not support partial requests'}) and return $tx unless $accept_ranges;
+    $tx->req->headers->range("bytes=$current_size-$size");
+  }
+
+  my $fh = $file->open('>>');
+  $res->content->unsubscribe('read')->on(
+    read => sub {
+      my ($content, $bytes) = @_;
+      $current_size += length $bytes;
+      $fh->syswrite($bytes) == length $bytes or $res->error({message => qq/Can't write to file "$path": $!/});
+    }
+  );
+  $res->on(
+    finish => sub {
+      my $res = shift;
+      $res->error({message => 'Download incomplete'}) if $current_size < $size;
+    }
+  );
+
+  return $tx;
+}
+
 sub endpoint {
   my ($self, $tx) = @_;
 
@@ -90,22 +131,24 @@ sub redirect {
   my $proto = $location->protocol;
   return undef if ($proto ne 'http' && $proto ne 'https') || !$location->host;
 
-  # Clone request if necessary
-  my $new = Mojo::Transaction::HTTP->new;
-  if ($code == 307 || $code == 308) {
+  # Clone request if necessary (QUERY is safe and idempotent, so it keeps its content like 307 and 308)
+  my $new    = Mojo::Transaction::HTTP->new;
+  my $method = uc $req->method;
+  if ($code == 307 || $code == 308 || ($method eq 'QUERY' && $code != 303)) {
     return undef unless my $clone = $req->clone;
     $new->req($clone);
   }
   else {
-    my $method = uc $req->method;
     $method = $code == 303 || $method eq 'POST' ? 'GET' : $method;
     $new->req->method($method)->content->headers(my $headers = $req->headers->clone);
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
   }
 
-  $new->res->content->auto_decompress(0) unless $self->compressed;
+  my $content = $new->res->content;
+  $content->auto_decompress(0) unless $self->compressed;
   my $headers = $new->req->url($location)->headers;
   $headers->remove($_) for qw(Authorization Cookie Host Referer);
+  if ($res->content->has_subscribers('sse')) { $content->on(sse => $_) for @{$res->content->subscribers('sse')} }
 
   return $new->previous($old);
 }
@@ -371,6 +414,13 @@ Register a content generator.
 
   $t->add_generator(foo => sub ($t, $tx, @args) {...});
 
+=head2 download
+
+  my $tx = $t->download(Mojo::Transaction::HTTP->new, '/home/sri/test.tar.gz');
+
+Build L<Mojo::Transaction::HTTP> resumable file download request as follow-up to a C<HEAD> request. Note that this
+method is B<EXPERIMENTAL> and might change without warning!
+
 =head2 endpoint
 
   my ($proto, $host, $port) = $t->endpoint(Mojo::Transaction::HTTP->new);
@@ -400,7 +450,8 @@ Build L<Mojo::Transaction::HTTP> proxy C<CONNECT> request for transaction if pos
   my $tx = $t->redirect(Mojo::Transaction::HTTP->new);
 
 Build L<Mojo::Transaction::HTTP> follow-up request for C<301>, C<302>, C<303>, C<307> or C<308> redirect response if
-possible.
+possible. Since C<QUERY> requests are safe and idempotent, they are never redirected as C<GET> requests and keep their
+content, except for C<303> responses.
 
 =head2 tx
 

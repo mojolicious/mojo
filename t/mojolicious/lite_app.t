@@ -309,6 +309,11 @@ patch '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
   $c->render(text => $c->url_for('foxy', {stuff => 'foo'}));
 } => 'foxy';
 
+query '/query' => sub {
+  my $c = shift;
+  $c->render(text => $c->req->method);
+};
+
 get '/url_for_foxy' => sub {
   my $c = shift;
   $c->render(text => $c->url_for('foxy', stuff => '#test'));
@@ -919,6 +924,9 @@ $t->patch_ok('/firefox/bar' => {'User-Agent' => 'Explorer'})
   ->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Oops!/);
+
+# QUERY request
+$t->query_ok('/query')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('QUERY');
 
 # URL for route with condition
 $t->get_ok('/url_for_foxy')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('/firefox/%23test');

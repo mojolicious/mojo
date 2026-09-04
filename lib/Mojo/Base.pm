@@ -249,8 +249,7 @@ signatures|perlsub/"Signatures">.
   use Mojo::Base -role, -signatures;
 
 If you have L<Future::AsyncAwait> 0.52+ installed you can also use the C<-async_await> flag to activate the C<async>
-and C<await> keywords to deal much more efficiently with promises. Note that this feature is B<EXPERIMENTAL> and might
-change without warning!
+and C<await> keywords to deal much more efficiently with promises.
 
   # Also enable async/await
   use Mojo::Base -strict, -async_await;

@@ -27,4 +27,10 @@ get '/res5' => sub {
   die 'Hello World!';
 };
 
+get '/res6' => sub ($c) {
+  $c->write_sse({text => 'hello'});
+  $c->write_sse({text => 'world'});
+  $c->finish;
+};
+
 app->start;

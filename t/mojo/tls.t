@@ -58,8 +58,8 @@ subtest 'Built-in certificate (custom event loop and cipher)' => sub {
   is ref $client_result, 'IO::Socket::SSL', 'right class';
   is ref $server_result, 'IO::Socket::SSL', 'right class';
   my $expect = $server_result->get_sslversion eq 'TLSv1_3' ? 'TLS_AES_256_GCM_SHA384' : 'AES256-SHA';
-  is $client_result->get_cipher, $expect, "$expect has been negotiatied";
-  is $server_result->get_cipher, $expect, "$expect has been negotiatied";
+  is $client_result->get_cipher, $expect, "$expect has been negotiated";
+  is $server_result->get_cipher, $expect, "$expect has been negotiated";
 };
 
 done_testing;

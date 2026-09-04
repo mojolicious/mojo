@@ -29,7 +29,7 @@ sub import {
 
   # The Mojolicious::Lite DSL
   my $root = $routes;
-  for my $name (qw(any get options patch post put websocket)) {
+  for my $name (qw(any get options patch post put query websocket)) {
     monkey_patch $caller, $name, sub { $routes->$name(@_) }
   }
   monkey_patch($caller, $_, sub {$app}) for qw(new app);
@@ -291,6 +291,17 @@ L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more in
   my $route = put '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
 
 Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT> requests. See
+L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
+
+=head2 query
+
+  my $route = query '/:foo' => sub ($c) {...};
+  my $route = query '/:foo' => sub ($c) {...} => 'name';
+  my $route = query '/:foo' => {foo => 'bar'} => sub ($c) {...};
+  my $route = query '/:foo' => [foo => qr/\w+/] => sub ($c) {...};
+  my $route = query '/:foo' => (agent => qr/Firefox/) => sub ($c) {...};
+
+Generate route with L<Mojolicious::Routes::Route/"query">, matching only C<QUERY> requests. See
 L<Mojolicious::Guides::Tutorial> and L<Mojolicious::Guides::Routing> for more information.
 
 =head2 under

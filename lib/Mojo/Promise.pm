@@ -37,7 +37,9 @@ sub AWAIT_NEW_FAIL { _await('reject',  @_) }
 sub AWAIT_ON_CANCEL { }
 
 sub AWAIT_ON_READY {
-  shift->_finally(0, @_)->catch(sub { });
+  my ($self, $cb) = @_;
+  push @{$self->{resolve}}, $cb;
+  push @{$self->{reject}},  $cb;
 }
 
 sub AWAIT_WAIT {

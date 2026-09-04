@@ -94,8 +94,8 @@ subtest 'Web server with valid certificates and no verification' => sub {
   $ua->cert('t/mojo/certs/bad.crt')->key('t/mojo/certs/bad.key');
   $tx = $ua->get("https://127.0.0.1:$port");
   ok !$tx->error, 'no error';
-  is $ua->ioloop->stream($tx->connection)->handle->get_cipher,     'AES256-SHA', 'AES256-SHA has been negotiatied';
-  is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',      'TLSv1 has been negotiatied';
+  is $ua->ioloop->stream($tx->connection)->handle->get_cipher,     'AES256-SHA', 'AES256-SHA has been negotiated';
+  is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',      'TLSv1 has been negotiated';
 };
 
 subtest 'Client side TLS options' => sub {

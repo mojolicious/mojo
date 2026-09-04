@@ -1,5 +1,71 @@
 
-9.40  2024-11-24
+9.50  UNRELEASED
+
+9.49  2026-08-10
+  - Added EXPERIMENTAL support for partitioned cookies. (rawleyfowler)
+  - Added EXPERIMENTAL partitioned attributes to Mojo::Cookie::Response and Mojolicious::Sessions.
+
+9.48  2026-07-14
+  - Fixed a security issue where CSRF tokens were vulnerable to BREACH attacks. Tokens are now masked with a fresh
+    random value on every request, instead of being reused for the whole lifetime of a session.
+
+9.47  2026-07-05
+  - Added support for the QUERY HTTP request method from RFC 10008.
+  - Added query and query_p methods to Mojo::UserAgent.
+  - Added query method to Mojolicious::Routes::Route.
+  - Added query method to Mojolicious::Lite.
+  - Added query_ok method to Test::Mojo.
+  - Fixed a security issue where the pure-Perl implementation of Mojo::JSON could exhaust all available memory when
+    decoding deeply nested data. Decoding is now limited to 512 levels of nesting, to match the default of
+    Cpanel::JSON::XS.
+  - Fixed a memory leak in Morbo. (heikojansen)
+  - Fixed Mojo::File::list_tree to no longer follow symbolic links to directories.
+
+9.46  2026-06-04
+  - Added random_bytes function to Mojo::Util. (leont)
+  - Improved randomness for CSRF token generation. (leont)
+  - Fixed tls_options handling in Mojo::IOLoop::TLS. (krauro)
+  - Fixed spec compliance issue with attribute selectors in Mojo::DOM::CSS.
+
+9.45  2026-05-05
+  - Fixed portability issue in WebSocket tests.
+
+9.44  2026-05-05
+  - Fixed various spec compliance issues in Mojo::DOM.
+  - Fixed permessage-deflate support in Mojo::Transaction::WebSocket to be more interoperable with non-spec compliant
+    implementations.
+
+9.43  2026-05-04
+  - Fixed punycode roundtrip bug in Mojo::Util.
+  - Fixed Windows compatibility issues of Mojo::File::list_tree.
+
+9.42  2025-10-01
+  - Un-deprecated the spurt method in Mojo::File, it is now an alternative to spew.
+  - Removed experimental status from top-level await support in Mojo::Promise.
+  - Removed experimental status from encrypted session cookie support.
+  - Removed experimental status from persistent cookie support.
+  - Removed experimental status from samesite cookie support.
+  - Removed experimental status from colourful log messages.
+  - Removed experimental status from freeze option in Mojo::IOLoop.
+  - Removed experimental status from check and raise functions in Mojo::Exception.
+  - Fixed Cpanel::JSON::XS compatibility issues. (ilmari)
+  - Fixed async/await memory leak in Mojo::Promise. (TFBW)
+
+9.41  2025-07-03
+  - Added EXPERIMENTAL support for Server-Sent Events.
+  - Added EXPERIMENTAL module Mojo::SSE.
+  - Added EXPERIMENTAL sse attribute to Test::Mojo.
+  - Added EXPERIMENTAL get_sse_ok, post_sse_ok, sse_finish_ok, sse_finished_ok, sse_ok, sse_id_is, sse_id_isnt,
+    sse_text_is, sse_text_isnt, sse_text_like, sse_text_unlike, sse_type_is and sse_type_isnt methods to Test::Mojo.
+  - Added EXPERIMENTAL is_sse and write_sse methods to Mojo::Content.
+  - Added EXPERIMENTAL write_sse method to Mojolicious::Controller.
+  - Added EXPERIMENTAL sse event to Mojo::Content.
+  - Fixed a bug where query parameters could not be set to undef. (ether)
+  - Fixed a bug where Host headers were not initialized correctly. (ether)
+
+9.40  2025-05-12
+  - Added EXPERIMENTAL support for resumable file downloads.
+  - Added EXPERIMENTAL download methods to Mojo::File and Mojo::UserAgent::Transactor.
 
 9.39  2024-11-23
   - Added EXPERIMENTAL support for encrypted session cookies.

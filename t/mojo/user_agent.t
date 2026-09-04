@@ -172,6 +172,8 @@ $ua->post_p('/method')->then(sub { $result = shift->res->body })->wait;
 is $result, 'POST', 'right result';
 $ua->put_p('/method')->then(sub { $result = shift->res->body })->wait;
 is $result, 'PUT', 'right result';
+$ua->query_p('/method')->then(sub { $result = shift->res->body })->wait;
+is $result, 'QUERY', 'right result';
 $ua->start_p($ua->build_tx(TEST => '/method'))->then(sub { $result = shift->res->body })->wait;
 is $result, 'TEST', 'right result';
 
@@ -249,6 +251,7 @@ is $ua->options('/method')->res->body, 'OPTIONS', 'right method';
 is $ua->patch('/method')->res->body,   'PATCH',   'right method';
 is $ua->post('/method')->res->body,    'POST',    'right method';
 is $ua->put('/method')->res->body,     'PUT',     'right method';
+is $ua->query('/method')->res->body,   'QUERY',   'right method';
 
 # No keep-alive
 $tx = $ua->get('/one?connection=test');

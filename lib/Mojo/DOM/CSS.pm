@@ -22,7 +22,8 @@ my $ATTR_RE   = qr/
 
 sub matches {
   my $tree = shift->tree;
-  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree, _root($tree));
+  return undef if $tree->[0] ne 'tag';
+  return _match(_compile(@_), $tree, $tree, _root($tree));
 }
 
 sub select     { _select(0, shift->tree, _compile(@_)) }
@@ -30,52 +31,31 @@ sub select_one { _select(1, shift->tree, _compile(@_)) }
 
 sub _absolutize { [map { _is_scoped($_) ? $_ : [[['pc', 'scope']], ' ', @$_] } @{shift()}] }
 
-sub _ancestor {
-  my ($selectors, $current, $tree, $scope, $one, $pos) = @_;
+sub _all_tags {
+  my $tree = shift;
 
-  while ($current ne $scope && $current->[0] ne 'root' && ($current = $current->[3])) {
-    return 1     if _combinator($selectors, $current, $tree, $scope, $pos);
-    return undef if $current eq $scope;
-    last         if $one;
+  my @tags;
+  my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
+  while (my $current = shift @queue) {
+    next unless $current->[0] eq 'tag';
+    push @tags, $current;
+    unshift @queue, @$current[4 .. $#$current];
   }
 
-  return undef;
+  return \@tags;
 }
 
 sub _attr {
-  my ($name_re, $value_re, $current) = @_;
+  my ($name, $value_re, $current) = @_;
 
   my $attrs = $current->[2];
-  for my $name (keys %$attrs) {
-    my $value = $attrs->{$name};
-    next if $name !~ $name_re || (!defined $value && defined $value_re);
-    return 1 if !(defined $value && defined $value_re) || $value =~ $value_re;
-  }
+  return undef unless exists $attrs->{$name};
+
+  my $value = $attrs->{$name};
+  return undef if !defined $value && defined $value_re;
+  return 1     if !defined $value_re || $value =~ $value_re;
 
   return undef;
-}
-
-sub _combinator {
-  my ($selectors, $current, $tree, $scope, $pos) = @_;
-
-  # Selector
-  return undef unless my $c = $selectors->[$pos];
-  if (ref $c) {
-    return undef unless _selector($c, $current, $tree, $scope);
-    return 1 unless $c = $selectors->[++$pos];
-  }
-
-  # ">" (parent only)
-  return _ancestor($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '>';
-
-  # "~" (preceding siblings)
-  return _sibling($selectors, $current, $tree, $scope, 0, ++$pos) if $c eq '~';
-
-  # "+" (immediately preceding siblings)
-  return _sibling($selectors, $current, $tree, $scope, 1, ++$pos) if $c eq '+';
-
-  # " " (ancestor)
-  return _ancestor($selectors, $current, $tree, $scope, 0, ++$pos);
 }
 
 sub _compile {
@@ -90,19 +70,25 @@ sub _compile {
     if ($css =~ /\G\s*,\s*/gc) { push @$group, [] }
 
     # Combinator
-    elsif ($css =~ /\G\s*([ >+~])\s*/gc) {
+    elsif ($css =~ /\G\s*([>+~])\s*/gc) {
       push @$last,      ['pc', 'scope'] unless @$last;
       push @$selectors, $1;
     }
 
+    # Descendant combinator
+    elsif ($css =~ /\G\s+/gc) {
+      push @$last,      ['pc', 'scope'] unless @$last;
+      push @$selectors, ' ';
+    }
+
     # Class or ID
-    elsif ($css =~ /\G([.#])((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
+    elsif ($css =~ /\G([.#])((?:$ESCAPE_RE\s?|[^,.#:[\s>~+])+)/gco) {
       my ($name, $op) = $1 eq '.' ? ('class', '~') : ('id', '');
-      push @$last, ['attr', _name($name), _value($op, $2)];
+      push @$last, ['attr', $name, _value($op, $2)];
     }
 
     # Attributes
-    elsif ($css =~ /\G$ATTR_RE/gco) { push @$last, ['attr', _name($1), _value($2 // '', $3 // $4 // $5, $6)] }
+    elsif ($css =~ /\G$ATTR_RE/gco) { push @$last, ['attr', _unescape($1), _value($2 // '', $3 // $4 // $5, $6)] }
 
     # Pseudo-class
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
@@ -124,7 +110,7 @@ sub _compile {
     }
 
     # Tag
-    elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
+    elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\[\s\S]|[^,.#:[\s>~+])+)/gco) {
       my $alias = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1                                  : undef;
       my $ns    = length $alias                                  ? $ns{$alias} // return [['invalid']] : $alias;
       push @$last, ['tag', $name eq '*' ? undef : _name($name), _unescape($ns)];
@@ -154,6 +140,42 @@ sub _equation {
   return [$1 eq '-' ? -1 : !length $1 ? 1 : $1, join('', split(' ', $2 // 0))];
 }
 
+sub _evaluate {
+  my ($group, $tree, $scope, $pool) = @_;
+
+  my (@results, %seen);
+  push @results, grep { !$seen{$_}++ } _evaluate_one($_, $tree, $scope, $pool) for @$group;
+
+  return \@results;
+}
+
+sub _evaluate_one {
+  my ($selector, $tree, $scope, $pool) = @_;
+
+  # Match the leftmost compound, then propagate forward through combinators
+  my @parts    = @$selector;
+  my $compound = shift @parts;
+  return () unless ref $compound;
+  my @candidates = grep { _selector($compound, $_, $tree, $scope) } @$pool;
+
+  while (@parts) {
+    my $combinator = shift @parts;
+    my $next       = shift @parts;
+    return () unless ref $next;
+
+    my (%seen, @new);
+    for my $node (@candidates) {
+      for my $cand (_step_forward($combinator, $node)) {
+        next if $seen{$cand}++;
+        push @new, $cand if _selector($next, $cand, $tree, $scope);
+      }
+    }
+    @candidates = @new;
+  }
+
+  return @candidates;
+}
+
 sub _is_scoped {
   my $selector = shift;
 
@@ -171,8 +193,36 @@ sub _is_scoped {
 
 sub _match {
   my ($group, $current, $tree, $scope) = @_;
-  _combinator([reverse @$_], $current, $tree, $scope, 0) and return 1 for @$group;
+  _match_one($_, $current, $tree, $scope) and return 1 for @$group;
   return undef;
+}
+
+sub _match_one {
+  my ($selector, $current, $tree, $scope) = @_;
+
+  # Match the rightmost compound, then propagate backward through combinators
+  my @parts    = reverse @$selector;
+  my $compound = shift @parts;
+  return undef unless ref $compound && _selector($compound, $current, $tree, $scope);
+
+  my @candidates = ($current);
+  while (@parts) {
+    my $combinator = shift @parts;
+    my $next       = shift @parts;
+    return undef unless ref $next;
+
+    my (%seen, @new);
+    for my $node (@candidates) {
+      for my $cand (_step_back($combinator, $node, $scope)) {
+        next if $seen{$cand}++;
+        push @new, $cand if _selector($next, $cand, $tree, $scope);
+      }
+    }
+    return undef unless @new;
+    @candidates = @new;
+  }
+
+  return 1;
 }
 
 sub _name {qr/(?:^|:)\Q@{[_unescape(shift)]}\E$/}
@@ -267,14 +317,15 @@ sub _select {
   my $tree = $scope;
   ($group, $tree) = (_absolutize($group), _root($scope)) if grep { _is_scoped($_) } @$group;
 
-  my @results;
-  my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
-  while (my $current = shift @queue) {
-    next unless $current->[0] eq 'tag';
+  # Pool includes $tree so ":scope" can match it, but results exclude it
+  my $tags  = _all_tags($tree);
+  my %match = map { $_ => 1 } @{_evaluate($group, $tree, $scope, [$tree, @$tags])};
 
-    unshift @queue, @$current[4 .. $#$current];
-    next unless _match($group, $current, $tree, $scope);
-    $one ? return $current : push @results, $current;
+  my @results;
+  for my $node (@$tags) {
+    next unless $match{$node};
+    return $node if $one;
+    push @results, $node;
   }
 
   return $one ? undef : \@results;
@@ -307,31 +358,54 @@ sub _selector {
   return 1;
 }
 
-sub _sibling {
-  my ($selectors, $current, $tree, $scope, $immediate, $pos) = @_;
-
-  my $found;
-  for my $sibling (@{_siblings($current)}) {
-    return $found if $sibling eq $current;
-
-    # "+" (immediately preceding sibling)
-    if ($immediate) { $found = _combinator($selectors, $sibling, $tree, $scope, $pos) }
-
-    # "~" (preceding sibling)
-    else { return 1 if _combinator($selectors, $sibling, $tree, $scope, $pos) }
-  }
-
-  return undef;
-}
-
 sub _siblings {
   my ($current, $type) = @_;
-
   my $parent   = $current->[3];
   my @siblings = grep { $_->[0] eq 'tag' } @$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent];
   @siblings = grep { $type eq $_->[1] } @siblings if defined $type;
-
   return \@siblings;
+}
+
+sub _step_back {
+  my ($combinator, $node, $scope) = @_;
+
+  # " " (ancestors) and ">" (parent only)
+  if ($combinator eq ' ' || $combinator eq '>') {
+    my @ancestors;
+    while ($node ne $scope && $node->[0] ne 'root' && ($node = $node->[3])) {
+      push @ancestors, $node;
+      last if $combinator eq '>' || $node eq $scope;
+    }
+    return @ancestors;
+  }
+
+  # "~" (preceding siblings) and "+" (immediately preceding)
+  return () if $node->[0] eq 'root';
+  my @prev;
+  for my $sib (@{_siblings($node)}) {
+    last if $sib eq $node;
+    push @prev, $sib;
+  }
+  return $combinator eq '+' ? ($prev[-1] || ()) : @prev;
+}
+
+sub _step_forward {
+  my ($combinator, $node) = @_;
+
+  # " " (descendants)
+  return @{_all_tags($node)} if $combinator eq ' ';
+
+  # ">" (children only)
+  return grep { $_->[0] eq 'tag' } @$node[($node->[0] eq 'root' ? 1 : 4) .. $#$node] if $combinator eq '>';
+
+  # "~" (following siblings) and "+" (immediately following)
+  return () if $node->[0] eq 'root';
+  my (@next, $found);
+  for my $sib (@{_siblings($node)}) {
+    push @next, $sib if $found;
+    $found = 1 if $sib eq $node;
+  }
+  return $combinator eq '+' ? ($next[0] || ()) : @next;
 }
 
 sub _unescape {

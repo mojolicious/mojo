@@ -71,7 +71,9 @@ sub optional {
   return $self->topic($name) unless defined(my $input = $self->input->{$name});
 
   my @input = ref $input eq 'ARRAY' ? @$input : ($input);
-  for my $cb (map { $self->validator->filters->{$_} } @filters) {
+  for my $filter (@filters) {
+    my $cb = $self->validator->filters->{$filter};
+    Carp::croak qq{Unknown filter "$filter"} unless defined $cb;
     @input = map { $self->$cb($name, $_) } @input;
   }
   $self->output->{$name} = @input > 1 ? \@input : $input[0] if @input && !grep { !defined } @input;

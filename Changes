@@ -1,5 +1,8 @@
 
 9.50  UNRELEASED
+  - Fixed Mojolicious::Validator::Validation to croak with a clear message naming the filter when an unknown
+    filter name is passed to "optional" or "required", instead of crashing with a confusing
+    "Can't locate object method """ error.
 
 9.49  2026-08-10
   - Added EXPERIMENTAL support for partitioned cookies. (rawleyfowler)

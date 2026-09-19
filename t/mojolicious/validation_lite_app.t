@@ -279,6 +279,12 @@ subtest 'Custom filter' => sub {
   is_deeply $v->output, {foo => ['foo="bar"', 'foo="baz"']}, 'right result';
 };
 
+subtest 'Unknown filter' => sub {
+  my $v = $t->app->validation->input({foo => 'bar'});
+  eval { $v->optional('foo', 'does_not_exist') };
+  like $@, qr/Unknown filter "does_not_exist"/, 'clear error naming the unknown filter';
+};
+
 subtest 'Multiple empty values' => sub {
   my $v = $t->app->validation;
   ok !$v->has_data, 'no data';

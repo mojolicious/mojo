@@ -153,7 +153,7 @@ sub parse {
         }
 
         next unless $html =~ m!\G(.*?)</\Q$start\E(?:\s+|\s*>)!gcsi;
-        _node($current, 'raw', $RCDATA{$start} ? html_unescape $1 : $1);
+        _node($current, $RCDATA{$start} ? ('text', html_unescape $1) : ('raw', $1));
         _end($start, 0, \$current);
       }
     }

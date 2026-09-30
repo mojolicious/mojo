@@ -2665,14 +2665,22 @@ subtest '"image"' => sub {
 
 subtest '"title"' => sub {
   my $dom = Mojo::DOM->new('<title> <p>test&lt;</title>');
-  is $dom->at('title')->text, ' <p>test<',                'right text';
-  is "$dom",                  '<title> <p>test<</title>', 'right result';
+  is $dom->at('title')->text, ' <p>test<',                         'right text';
+  is "$dom",                  '<title> &lt;p&gt;test&lt;</title>', 'right result';
+
+  $dom = Mojo::DOM->new('<title>&lt;/title&gt;&lt;img src=x onerror=alert(1)&gt;</title>');
+  is $dom->at('title')->text, '</title><img src=x onerror=alert(1)>',           'right text';
+  is "$dom", '<title>&lt;/title&gt;&lt;img src=x onerror=alert(1)&gt;</title>', 'end tag stays escaped';
 };
 
 subtest '"textarea"' => sub {
   my $dom = Mojo::DOM->new('<textarea id="a"> <p>test&lt;</textarea>');
-  is $dom->at('textarea#a')->text, ' <p>test<',                             'right text';
-  is "$dom",                       '<textarea id="a"> <p>test<</textarea>', 'right result';
+  is $dom->at('textarea#a')->text, ' <p>test<',                                      'right text';
+  is "$dom",                       '<textarea id="a"> &lt;p&gt;test&lt;</textarea>', 'right result';
+
+  $dom = Mojo::DOM->new('<textarea>&lt;/textarea&gt;&lt;script&gt;alert(1)&lt;/script&gt;</textarea>');
+  is $dom->at('textarea')->text, '</textarea><script>alert(1)</script>',                    'right text';
+  is "$dom", '<textarea>&lt;/textarea&gt;&lt;script&gt;alert(1)&lt;/script&gt;</textarea>', 'end tag stays escaped';
 };
 
 subtest 'Comments' => sub {

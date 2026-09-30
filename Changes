@@ -1,5 +1,7 @@
 
 9.50  UNRELEASED
+  - Fixed a security issue in Mojo::DOM where the content of title and textarea elements was not escaped during
+    rendering, allowing escaped end tags to break out and turn sanitized HTML into live markup.
 
 9.49  2026-08-10
   - Added EXPERIMENTAL support for partitioned cookies. (rawleyfowler)

@@ -6,7 +6,10 @@ use Test::Mojo;
 use Test::More;
 use Mojo::Asset::Memory;
 use Mojo::Upload;
+use Mojo::Util qw(generate_secret);
 use Mojolicious::Lite;
+
+app->secrets([generate_secret]);
 
 # Custom check
 app->validator->add_check(two => sub { length $_[2] == 2 ? undef : "e:$_[1]" });

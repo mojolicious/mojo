@@ -1,5 +1,5 @@
 
-9.50  UNRELEASED
+9.50  2026-10-16
   - Added SECURITY.md policy for reporting security issues.
   - Fixed a security issue in Mojo::DOM where the content of title and textarea elements was not escaped during
     rendering, allowing escaped end tags to break out and turn sanitized HTML into live markup.

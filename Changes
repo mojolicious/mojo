@@ -1,4 +1,6 @@
 
+9.51  UNRELEASED
+
 9.50  2026-10-16
   - Added SECURITY.md policy for reporting security issues.
   - Fixed a security issue in Mojo::DOM where the content of title and textarea elements was not escaped during

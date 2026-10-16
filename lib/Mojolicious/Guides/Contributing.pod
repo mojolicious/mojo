@@ -41,8 +41,9 @@ activity it will get reopened just as quickly.
 
 =head2 Reporting security issues
 
-Please report security issues directly to Sebastian Riedel (C<kraih@mojolicious.org>), and give us a few days to
-develop and release a proper fix.
+Please report security issues privately through L<GitHub|https://github.com/mojolicious/mojo/security/advisories/new>,
+and do not use the public issue tracker. Reports need to be written in your own words and include a reproducer, see
+L<SECURITY.md|https://github.com/mojolicious/mojo/blob/main/SECURITY.md> for details.
 
 =head1 RESOLVING ISSUES
 

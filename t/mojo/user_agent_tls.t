@@ -82,7 +82,7 @@ subtest 'Web server with valid certificates and no verification' => sub {
     . '&ca=t/mojo/certs/ca.crt'
     . '&ciphers=AES256-SHA:ALL'
     . '&verify=0x00'
-    . '&version=TLSv1';
+    . '&version=TLSv1_2';
   my $port = $daemon->listen([$listen])->start->ports->[0];
 
   # Invalid certificate
@@ -95,12 +95,12 @@ subtest 'Web server with valid certificates and no verification' => sub {
   $tx = $ua->get("https://127.0.0.1:$port");
   ok !$tx->error, 'no error';
   is $ua->ioloop->stream($tx->connection)->handle->get_cipher,     'AES256-SHA', 'AES256-SHA has been negotiated';
-  is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1',      'TLSv1 has been negotiated';
+  is $ua->ioloop->stream($tx->connection)->handle->get_sslversion, 'TLSv1_2',    'TLSv1_2 has been negotiated';
 };
 
 subtest 'Client side TLS options' => sub {
   my $daemon = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton, silent => 1);
-  my $listen = 'https://127.0.0.1/?version=TLSv1_1';
+  my $listen = 'https://127.0.0.1/?version=TLSv1_2';
   my $port   = $daemon->listen([$listen])->start->ports->[0];
 
   subtest '(Not) setting verification mode' => sub {
@@ -116,9 +116,9 @@ subtest 'Client side TLS options' => sub {
 
   subtest 'Setting acceptable protocol version' => sub {
     my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-    $ua->tls_options({SSL_version => 'TLSv1_2'});
+    $ua->tls_options({SSL_version => 'TLSv1_3'});
     my $tx = $ua->get("https://127.0.0.1:$port");
-    like $tx->error->{message}, qr/wrong ssl version/, 'has error';
+    like $tx->error->{message}, qr/SSL connect attempt failed/, 'has error';
   };
 };
 

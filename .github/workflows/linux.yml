@@ -39,3 +39,4 @@ jobs:
         env:
           TEST_POD: 1
           TEST_EV: 1
+          TEST_TLS: 1

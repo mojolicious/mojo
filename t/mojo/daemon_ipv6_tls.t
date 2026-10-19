@@ -12,8 +12,8 @@ plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)' unless $E
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'  unless $ENV{TEST_TLS}  || $ENV{TEST_ALL};
 plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'      unless Mojo::IOLoop::TLS->can_tls;
 
-# To regenerate all required certificates run these commands (07.01.2016)
-# openssl genrsa -out domain.key 1024
+# To regenerate all required certificates run these commands (19.10.2026)
+# openssl genrsa -out domain.key 2048
 # openssl req -new -key domain.key -out domain.csr -subj "/C=US/CN=example.com"
 # openssl x509 -req -days 7300 -in domain.csr -out domain.crt -CA ca.crt \
 #   -CAkey ca.key -CAcreateserial

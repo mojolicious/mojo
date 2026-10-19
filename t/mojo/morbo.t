@@ -3,172 +3,178 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
+use Config;
 
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)' unless $ENV{TEST_MORBO} || $ENV{TEST_ALL};
+plan skip_all => 'Morbo does not support fork emulation' if $Config{d_pseudofork};
 
-use Mojo::File qw(curfile);
+use Mojo::File qw(curfile tempdir);
 use lib curfile->sibling('lib')->to_string;
 
 use IO::Socket::INET ();
-use Mojo::File       qw(tempdir);
 use Mojo::IOLoop::Server;
-use Mojo::Server::Morbo::Backend;
 use Mojo::Server::Daemon;
 use Mojo::Server::Morbo;
+use Mojo::Server::Morbo::Backend;
 use Mojo::UserAgent;
+use Mojo::Util  qw(steady_time);
 use Socket      qw(SO_REUSEPORT SOL_SOCKET);
 use Time::HiRes qw(sleep);
 
-# Start
-my $dir    = tempdir;
-my $script = $dir->child('myapp.pl');
-my $subdir = $dir->child('test', 'stuff')->make_path;
-my $morbo  = Mojo::Server::Morbo->new();
-$morbo->backend->watch([$subdir, $script]);
-is_deeply $morbo->backend->modified_files, [], 'no files have changed';
-my $started = $dir->child('started1.txt');
-$script->spew(<<EOF);
-use Mojolicious::Lite;
-use Mojo::File qw(path);
-use Mojo::IOLoop;
+my $dir   = tempdir;
+my $morbo = curfile->dirname->dirname->sibling('script', 'morbo')->to_string;
+my $ua    = Mojo::UserAgent->new;
 
-app->log->level('fatal');
-
-Mojo::IOLoop->next_tick(sub { path('$started')->touch });
-
-get '/hello' => {text => 'Hello Morbo!'};
-
-app->start;
-EOF
-my $port   = Mojo::IOLoop::Server->generate_port;
-my $prefix = curfile->dirname->dirname->sibling('script');
-my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l', "http://127.0.0.1:$port", $script;
-sleep 0.1 while !_port($port);
-my $ua = Mojo::UserAgent->new;
-
-subtest 'Basics' => sub {
-  my $tx = $ua->get("http://127.0.0.1:$port/hello");
-  ok $tx->is_finished, 'transaction is finished';
-  is $tx->res->code, 200,            'right status';
-  is $tx->res->body, 'Hello Morbo!', 'right content';
-
-  $tx = $ua->get("http://127.0.0.1:$port/hello");
-  ok $tx->is_finished, 'transaction is finished';
-  is $tx->res->code, 200,            'right status';
-  is $tx->res->body, 'Hello Morbo!', 'right content';
-};
-
-subtest 'Update script without changing size' => sub {
-  my ($size, $mtime) = (stat $script)[7, 9];
-  $started = $started->sibling('started2.txt');
-  $script->spew(<<EOF);
-use Mojolicious::Lite;
-use Mojo::File qw(path);
-use Mojo::IOLoop;
-
-app->log->level('fatal');
-
-Mojo::IOLoop->next_tick(sub { path('$started')->touch });
-
-get '/hello' => {text => 'Hello World!'};
-
-app->start;
-EOF
-  is_deeply $morbo->backend->modified_files, [$script], 'file has changed';
-  ok((stat $script)[9] > $mtime, 'modify time has changed');
-  is((stat $script)[7], $size, 'still equal size');
-  sleep 0.1 until -f $started;
-
-  # Application has been reloaded
-  my $tx = $ua->get("http://127.0.0.1:$port/hello");
-  ok $tx->is_finished, 'transaction is finished';
-  is $tx->res->code, 200,            'right status';
-  is $tx->res->body, 'Hello World!', 'right content';
-
-  # Same result
-  $tx = $ua->get("http://127.0.0.1:$port/hello");
-  ok $tx->is_finished, 'transaction is finished';
-  is $tx->res->code, 200,            'right status';
-  is $tx->res->body, 'Hello World!', 'right content';
-};
-
-subtest 'Update script without changing mtime' => sub {
-  my ($size, $mtime) = (stat $script)[7, 9];
-  is_deeply $morbo->backend->modified_files, [], 'no files have changed';
-  $started = $started->sibling('started3.txt');
-  $script->spew(<<"EOF");
-use Mojolicious::Lite;
-use Mojo::File qw(path);
-use Mojo::IOLoop;
-
-app->log->level('fatal');
-
-Mojo::IOLoop->next_tick(sub { path('$started')->touch });
-
-my \$message = 'Failed!';
-hook before_server_start => sub { \$message = 'Hello!' };
-
-get '/hello' => sub { shift->render(text => \$message) };
-
-app->start;
-EOF
-  utime $mtime, $mtime, $script;
-  is_deeply $morbo->backend->modified_files, [$script], 'file has changed';
-  ok((stat $script)[9] == $mtime, 'modify time has not changed');
-  isnt((stat $script)[7], $size, 'size has changed');
-  sleep 0.1 until -f $started;
-
-  # Application has been reloaded again
-  my $tx = $ua->get("http://127.0.0.1:$port/hello");
-  ok $tx->is_finished, 'transaction is finished';
-  is $tx->res->code, 200,      'right status';
-  is $tx->res->body, 'Hello!', 'right content';
-
-  # Same result
-  $tx = $ua->get("http://127.0.0.1:$port/hello");
-  ok $tx->is_finished, 'transaction is finished';
-  is $tx->res->code, 200,      'right status';
-  is $tx->res->body, 'Hello!', 'right content';
-};
-
-subtest 'Watch for deleted files' => sub {
-  my $morbo = Mojo::Server::Morbo->new;
-  $morbo->backend->watch([$dir]);
+subtest 'Watch for modified files' => sub {
+  my $subdir = $dir->child('modified', 'stuff')->make_path;
+  my $file   = $subdir->child('test.txt')->spew('Hello');
+  my $morbo  = Mojo::Server::Morbo->new;
+  $morbo->backend->watch([$subdir->dirname]);
   $morbo->backend->modified_files;
-  my $tmp_file = $dir->child('tmp_file.txt');
-  $tmp_file->spew("some data");
-  is_deeply $morbo->backend->modified_files, [$tmp_file], 'file was created';
-  is_deeply $morbo->backend->modified_files, [],          'no files changed';
-  unlink $tmp_file;
-  is_deeply $morbo->backend->modified_files, [$tmp_file], 'file was deleted';
-  is_deeply $morbo->backend->modified_files, [],          'no files changed';
+  is_deeply $morbo->backend->modified_files, [], 'no files have changed';
+
+  my ($size, $mtime) = (stat $file)[7, 9];
+  $file->spew('World');
+  utime $mtime + 1, $mtime + 1, $file;
+  is_deeply $morbo->backend->modified_files, [$file], 'file has changed';
+  ok((stat $file)[9] > $mtime, 'modify time has changed');
+  is((stat $file)[7], $size, 'still equal size');
+  is_deeply $morbo->backend->modified_files, [], 'no files have changed';
+
+  $mtime = (stat $file)[9];
+  $file->spew('Hello World');
+  utime $mtime, $mtime, $file;
+  is_deeply $morbo->backend->modified_files, [$file], 'file has changed';
+  ok((stat $file)[9] == $mtime, 'modify time has not changed');
+  isnt((stat $file)[7], $size, 'size has changed');
+  is_deeply $morbo->backend->modified_files, [], 'no files have changed';
 };
 
-subtest 'New file(s)' => sub {
-  is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
-  my @new = map { $subdir->child("$_.txt") } qw/test testing/;
+subtest 'Watch for new and deleted files' => sub {
+  my $subdir = $dir->child('new')->make_path;
+  my $morbo  = Mojo::Server::Morbo->new;
+  $morbo->backend->watch([$subdir]);
+  is_deeply $morbo->backend->modified_files, [], 'no files have changed';
+
+  my @new = map { $subdir->child("$_.txt") } qw(test testing);
   $_->spew('whatever') for @new;
-  is_deeply $morbo->backend->modified_files, \@new, 'two files have changed';
+  is_deeply $morbo->backend->modified_files, \@new, 'two files have been created';
+  is_deeply $morbo->backend->modified_files, [],    'no files have changed';
   $subdir->child('.hidden.txt')->spew('whatever');
-  is_deeply $morbo->backend->modified_files, [], 'directory has not changed again';
+  is_deeply $morbo->backend->modified_files, [], 'hidden files are ignored';
+
+  unlink $new[0];
+  is_deeply $morbo->backend->modified_files, [$new[0]], 'file has been deleted';
+  is_deeply $morbo->backend->modified_files, [],        'no files have changed';
 };
 
 subtest 'Broken symlink' => sub {
   plan skip_all => 'Symlink support required!' unless eval { symlink '', ''; 1 };
-  my $missing = $subdir->child('missing.txt');
-  my $broken  = $subdir->child('broken.txt');
-  symlink $missing, $broken;
+  my $subdir = $dir->child('symlink')->make_path;
+  my $morbo  = Mojo::Server::Morbo->new;
+  $morbo->backend->watch([$subdir]);
+  my $broken = $subdir->child('broken.txt');
+  symlink $subdir->child('missing.txt'), $broken;
   ok -l $broken,  'symlink created';
   ok !-f $broken, 'symlink target does not exist';
   my $warned;
   local $SIG{__WARN__} = sub { $warned++ };
-  is_deeply $morbo->backend->modified_files, [], 'directory has not changed';
+  is_deeply $morbo->backend->modified_files, [], 'no files have changed';
   ok !$warned, 'no warnings';
 };
 
-# Stop
-kill 'INT', $pid;
-sleep 0.1 while _port($port);
+subtest 'Default command (daemon)' => sub {
+  my $script = _app('daemon.pl', 'Hello Morbo!');
+  my $port   = Mojo::IOLoop::Server->generate_port;
+  my $log    = $dir->child('daemon.log');
+  my $pid    = _morbo($log, '-v', '-l', "http://127.0.0.1:$port", $script);
+  ok _wait_for($port, 'Hello Morbo!'), 'server has been started';
+  ok _wait_for($port, 'Hello Morbo!'), 'same result';
+
+  _app('daemon.pl', 'Hello World!');
+  ok _wait_for($port, 'Hello World!'), 'server has been restarted';
+  like $log->slurp, qr/File ".*daemon\.pl" changed, restarting/, 'right message';
+  is $ua->get("http://127.0.0.1:$port/server")->res->body, 'Mojo::Server::Daemon', 'right server';
+
+  _app('daemon.pl', 'Failed!', q{hook before_server_start => sub { app->routes->find('hello')->to(text => 'Hook!') };});
+  ok _wait_for($port, 'Hook!'), 'server has been restarted again';
+
+  _stop($pid, $port);
+};
+
+subtest 'Prefork command with arguments' => sub {
+  my $script = _app('prefork.pl', 'Hello Prefork!');
+  my $port   = Mojo::IOLoop::Server->generate_port;
+  my $pid    = _morbo($dir->child('prefork.log'), '-l', "http://127.0.0.1:$port", $script, 'prefork', '-w', 2);
+  ok _wait_for($port, 'Hello Prefork!'), 'server has been started';
+
+  _app('prefork.pl', 'Hello Again!');
+  ok _wait_for($port, 'Hello Again!'), 'server has been restarted';
+  is $ua->get("http://127.0.0.1:$port/server")->res->body, 'Mojo::Server::Prefork', 'right server';
+
+  _stop($pid, $port);
+};
+
+subtest 'Recover from broken application' => sub {
+  my $script = _app('broken.pl', 'Hello!');
+  my $port   = Mojo::IOLoop::Server->generate_port;
+  my $log    = $dir->child('broken.log');
+  my $pid    = _morbo($log, '-l', "http://127.0.0.1:$port", $script);
+  ok _wait_for($port, 'Hello!'), 'server has been started';
+
+  $script->spew('use Mojolicious::Lite; get "/hello" => {text => "Broken!"; app->start;');
+  my $deadline = steady_time + 30;
+  sleep 0.1 until $log->slurp =~ /syntax error/ || steady_time > $deadline;
+  like $log->slurp, qr/syntax error/, 'application is broken';
+
+  _app('broken.pl', 'Fixed!');
+  ok _wait_for($port, 'Fixed!'), 'server has been restarted after fixing the application';
+
+  _stop($pid, $port);
+};
+
+subtest 'Kill server that does not stop' => sub {
+  my $extra  = q{Mojo::IOLoop->next_tick(sub { $SIG{TERM} = 'IGNORE' });};
+  my $script = _app('stuck.pl', 'Stuck!', $extra);
+  my $port   = Mojo::IOLoop::Server->generate_port;
+  my $pid    = _morbo($dir->child('stuck.log'), '-l', "http://127.0.0.1:$port", $script);
+  ok _wait_for($port, 'Stuck!'), 'server has been started';
+
+  my $start = steady_time;
+  _app('stuck.pl', 'Unstuck!', $extra);
+  ok _wait_for($port, 'Unstuck!'), 'server has been killed and restarted';
+  ok steady_time - $start >= 4,    'server got time to stop';
+
+  _stop($pid, $port);
+};
+
+subtest 'Stop subprocesses' => sub {
+  my $file = $dir->child('subprocess.pid');
+  my $extra
+    = qq{die unless defined(my \$pid = fork); unless (\$pid) { sleep 1000; exit 0 } path('$file')->spew(\$pid);};
+  my $script = _app('subprocess.pl', 'Hello!', $extra);
+  my $port   = Mojo::IOLoop::Server->generate_port;
+  my $pid    = _morbo($dir->child('subprocess.log'), '-l', "http://127.0.0.1:$port", $script);
+  ok _wait_for($port, 'Hello!'),    'server has been started';
+  ok my $subprocess = $file->slurp, 'subprocess has been started';
+  ok kill(0, $subprocess),          'subprocess is running';
+
+  _stop($pid, $port);
+  my $deadline = steady_time + 30;
+  sleep 0.1 while kill(0, $subprocess) && steady_time < $deadline;
+  ok !kill(0, $subprocess), 'subprocess has been stopped';
+};
+
+subtest 'Wrong arguments' => sub {
+  my $output = qx{"$^X" "$morbo" 2>&1};
+  like $output, qr/Usage: morbo/, 'usage message';
+  isnt $?, 0, 'failed';
+
+  $output = qx{"$^X" "$morbo" ./myapp.pl -l http://127.0.0.1:3000 2>&1};
+  like $output, qr/Morbo options need to come before the application, e\.g\. "morbo -l \.\.\. \.\/myapp\.pl"/,
+    'right error';
+  isnt $?, 0, 'failed';
+};
 
 subtest 'Custom backend' => sub {
   local $ENV{MOJO_MORBO_BACKEND} = 'TestBackend';
@@ -196,8 +202,58 @@ subtest 'Abstract methods' => sub {
   like $@, qr/Method "modified_files" not implemented by subclass/, 'right error';
 };
 
+sub _app {
+  my ($name, $text, $extra) = (@_, '');
+  return $dir->child($name)->spew(<<EOF);
+use Mojolicious::Lite;
+use Mojo::File qw(path);
+use Mojo::IOLoop;
+
+app->log->level('fatal');
+
+$extra
+
+my \$server = 'none';
+hook before_server_start => sub { \$server = ref shift };
+
+get '/hello' => {text => '$text'} => 'hello';
+get '/server' => sub { shift->render(text => \$server) };
+
+app->start;
+EOF
+}
+
+sub _morbo {
+  my ($log, @args) = @_;
+  die "Can't fork: $!" unless defined(my $pid = fork);
+  return $pid if $pid;
+  open STDOUT, '>>', $log     or die "Can't open log: $!";
+  open STDERR, '>&', \*STDOUT or die "Can't redirect STDERR: $!";
+  exec $^X, $morbo, @args or exit 1;
+}
+
 sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
 
 sub _reuse_port { IO::Socket::INET->new(Listen => 1, LocalPort => Mojo::IOLoop::Server->generate_port, ReusePort => 1) }
+
+sub _stop {
+  my ($pid, $port) = @_;
+  kill 'INT', $pid;
+  is waitpid($pid, 0), $pid, 'morbo has been stopped';
+  is $?,               0,    'morbo exited cleanly';
+  ok !_port($port), 'all server processes have been stopped';
+}
+
+# Retry until the expected response arrives (the listen socket stays open between restarts)
+sub _wait_for {
+  my ($port, $text) = @_;
+  my $deadline = steady_time + 30;
+  while (steady_time < $deadline) {
+    my $tx = $ua->get("http://127.0.0.1:$port/hello");
+    return 1 if ($tx->res->body // '') eq $text;
+    sleep 0.1;
+  }
+  return undef;
+}
 
 done_testing();

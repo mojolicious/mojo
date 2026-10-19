@@ -1,5 +1,8 @@
 
 9.52  UNRELEASED
+  - Improved Morbo to support all server commands, such as prefork. Note that this change is not backwards compatible,
+    Morbo options now need to come before the application, and fork emulation (Windows) is no longer supported.
+  - Improved Morbo to also stop subprocesses and to kill servers that do not stop within 5 seconds.
 
 9.51  2026-10-19
   - Fixed a bug in Mojo::DOM where CDATA sections, processing instructions and DOCTYPE declarations did not end at the

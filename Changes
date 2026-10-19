@@ -1,5 +1,5 @@
 
-9.51  UNRELEASED
+9.51  2026-10-19
   - Fixed a bug in Mojo::DOM where CDATA sections, processing instructions and DOCTYPE declarations did not end at the
     first ">" in HTML documents.
   - Fixed a bug in Mojo::DOM where the content of "<style>" and "<script>" elements in "<svg>" and "<math>" blocks was

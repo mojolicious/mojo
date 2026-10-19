@@ -10,6 +10,8 @@
   - Fixed a bug in Mojo::DOM where any processing instruction containing "xml" would activate XML mode.
   - Fixed a bug in Mojo::Message::Request where the SCRIPT_NAME prefix was sometimes incorrectly removed from
     PATH_INFO in CGI and PSGI environments.
+  - Fixed a bug in Mojo::Asset::Memory where an end_range of 0 was ignored, causing range requests for the first
+    byte of an asset to return the whole asset.
 
 9.50  2026-10-16
   - Added SECURITY.md policy for reporting security issues.

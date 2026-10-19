@@ -125,6 +125,20 @@ subtest 'Memory asset range support (ab[cdefghi]jk)' => sub {
   is $mem->get_chunk(5, 3),     'hi',      'chunk from position 5 (2 byte)';
 };
 
+subtest 'File asset range support ([a]bcdef)' => sub {
+  my $file = Mojo::Asset::File->new(end_range => 0);
+  $file->add_chunk('abcdef');
+  is $file->get_chunk(0), 'a', 'chunk from position 0';
+  is $file->get_chunk(1), '',  'chunk from position 1';
+};
+
+subtest 'Memory asset range support ([a]bcdef)' => sub {
+  my $mem = Mojo::Asset::Memory->new(end_range => 0);
+  $mem->add_chunk('abcdef');
+  is $mem->get_chunk(0), 'a', 'chunk from position 0';
+  is $mem->get_chunk(1), '',  'chunk from position 1';
+};
+
 subtest 'Huge file asset' => sub {
   my $file = Mojo::Asset::File->new;
   ok !$file->is_range, 'no range';

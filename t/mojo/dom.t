@@ -1897,8 +1897,8 @@ EOF
   is $dom->tree->[1][1], ' book
   SYSTEM "usr.dtd"
   [
-    <!ENTITY test "yeah">
-  ]', 'right doctype';
+    <!ENTITY test "yeah"', 'right doctype (ends at first ">" in HTML)';
+  is $dom->tree->[2][1], "\n  ]>\n", 'right text';
   ok !$dom->xml, 'XML mode not detected';
   is $dom->at('foo'), '<foo></foo>', 'right element';
   $dom = Mojo::DOM->new(<<EOF);
@@ -1920,7 +1920,7 @@ EOF
   ]  ', 'right doctype';
   is $dom->at('foo')->attr->{'xml:lang'}, 'de',       'right attribute';
   is $dom->at('foo')->text,               "Check!\n", 'right text';
-  $dom = Mojo::DOM->new(<<EOF);
+  $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 <!DOCTYPE TESTSUITE PUBLIC "my.dtd" 'mhhh' [
     <!ELEMENT foo ANY>
     <!ATTLIST foo bar ENTITY 'true'>
@@ -2681,6 +2681,135 @@ subtest '"textarea"' => sub {
   $dom = Mojo::DOM->new('<textarea>&lt;/textarea&gt;&lt;script&gt;alert(1)&lt;/script&gt;</textarea>');
   is $dom->at('textarea')->text, '</textarea><script>alert(1)</script>',                    'right text';
   is "$dom", '<textarea>&lt;/textarea&gt;&lt;script&gt;alert(1)&lt;/script&gt;</textarea>', 'end tag stays escaped';
+};
+
+subtest 'CDATA, processing instructions and DOCTYPE end at the first ">" in HTML' => sub {
+  my $dom = Mojo::DOM->new('<![CDATA[><img src=x onerror=alert(1)>]]>');
+  is $dom->child_nodes->[0]->type,    'cdata',    'right type';
+  is $dom->child_nodes->[0]->content, '',         'no content';
+  is $dom->at('img')->{onerror},      'alert(1)', 'right attribute';
+  is $dom->child_nodes->[2]->content, ']]>',      'right text';
+  $dom->find('img')->each('remove');
+  is "$dom", '<![CDATA[]]>]]&gt;', 'right result';
+
+  $dom = Mojo::DOM->new('<?><img src=x onerror=alert(1)>?>');
+  is $dom->child_nodes->[0]->type, 'pi',       'right type';
+  is $dom->at('img')->{onerror},   'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<??>?&gt;', 'right result';
+
+  $dom = Mojo::DOM->new('<!DOCTYPE html [><img src=x onerror=alert(1)>]>');
+  is $dom->child_nodes->[0]->type,    'doctype',  'right type';
+  is $dom->child_nodes->[0]->content, ' html [',  'right content';
+  is $dom->at('img')->{onerror},      'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<!DOCTYPE html [>]&gt;', 'right result';
+
+  $dom = Mojo::DOM->new('<p><![CDATA[1 < 2]]><?php echo 1?></p>');
+  is $dom->at('p')->child_nodes->[0]->content, '1 < 2',                                  'right content';
+  is $dom->at('p')->child_nodes->[1]->content, 'php echo 1',                             'right content';
+  is "$dom",                                   '<p><![CDATA[1 < 2]]><?php echo 1?></p>', 'successful roundtrip';
+
+  $dom = Mojo::DOM->new('<svg><script><![CDATA[ if (a > b) {} ]]></script></svg>');
+  is $dom->at('script')->child_nodes->first->type,    'cdata',           'right type';
+  is $dom->at('script')->child_nodes->first->content, ' if (a > b) {} ', 'right content';
+  is "$dom", '<svg><script><![CDATA[ if (a > b) {} ]]></script></svg>',  'successful roundtrip';
+
+  $dom = Mojo::DOM->new('<svg><foreignObject><![CDATA[><img src=x onerror=alert(1)>]]></foreignObject></svg>');
+  is $dom->at('foreignobject img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM->new->xml(1)->parse('<root><![CDATA[><img src=x onerror=alert(1)>]]></root>');
+  ok !$dom->at('img'), 'no img element in XML mode';
+  is $dom->at('root')->text, '><img src=x onerror=alert(1)>', 'right text';
+};
+
+subtest '"style" and "script" in foreign content' => sub {
+  my $dom = Mojo::DOM->new('<svg><style><img src=x onerror=alert(1)></style></svg>');
+  is $dom->at('svg > style > img')->{onerror}, 'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<svg><style></style></svg>', 'right result';
+
+  $dom = Mojo::DOM->new('<math><script><img src=x onerror=alert(1)></script></math>');
+  is $dom->at('math > script > img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM->new('<svg><title><img src=x onerror=alert(1)></title></svg>');
+  is $dom->at('svg > title > img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM->new('<svg><foreignObject><style><b>test</b></style></foreignObject></svg>');
+  ok !$dom->at('b'), 'no b element';
+  is $dom->at('style')->text, '<b>test</b>', 'right text';
+
+  $dom = Mojo::DOM->new('<math><mi><style><b>test</b></style></mi></math>');
+  ok !$dom->at('b'), 'no b element';
+
+  $dom = Mojo::DOM->new('<math><annotation-xml><style><b>test</b></style></annotation-xml></math>');
+  ok $dom->at('b'), 'b element';
+  $dom
+    = Mojo::DOM->new('<math><annotation-xml encoding="text/html"><style><b>test</b></style></annotation-xml></math>');
+  ok !$dom->at('b'), 'no b element';
+};
+
+subtest 'Raw text end tags' => sub {
+  my $dom = Mojo::DOM->new('<style></style/><img src=x onerror=alert(1)></style>');
+  is $dom->at('style')->text,    '',         'no text';
+  is $dom->at('img')->{onerror}, 'alert(1)', 'right attribute';
+  $dom->find('img')->each('remove');
+  is "$dom", '<style></style>', 'right result';
+
+  $dom = Mojo::DOM->new('<script>1</script/><img src=x onerror=alert(1)></script>');
+  is $dom->at('script')->text,   '1',        'right text';
+  is $dom->at('img')->{onerror}, 'alert(1)', 'right attribute';
+
+  $dom = Mojo::DOM->new('<style>a</style foo="bar">b');
+  is $dom->at('style')->text, 'a',                 'right text';
+  is "$dom",                  '<style>a</style>b', 'right result';
+
+  $dom = Mojo::DOM->new('<title>a</title/>b');
+  is $dom->at('title')->text, 'a',                 'right text';
+  is "$dom",                  '<title>a</title>b', 'right result';
+
+  $dom = Mojo::DOM->new('<div><p>a</p/>b</div>');
+  is "$dom", '<div><p>a</p>b</div>', 'right result';
+};
+
+subtest 'Raw text moved out of "style" and "script"' => sub {
+  my $dom = Mojo::DOM->new('<p><style><img src=x onerror=alert(1)></style></p>');
+  $dom->find(':not(p)')->each('strip');
+  is "$dom",                                  '<p>&lt;img src=x onerror=alert(1)&gt;</p>', 'right result';
+  is $dom->at('p')->child_nodes->first->type, 'text',                                      'right type';
+
+  $dom = Mojo::DOM->new('<div><script><b>test</b></script></div>');
+  $dom->at('div')->append_content($dom->at('script')->child_nodes->first);
+  is "$dom", '<div><script><b>test</b></script>&lt;b&gt;test&lt;/b&gt;</div>', 'right result';
+
+  $dom = Mojo::DOM->new('<script></script>');
+  $dom->at('script')->append_content(Mojo::DOM->new('<style>a < b</style>')->at('style')->child_nodes->first);
+  is "$dom", '<script>a < b</script>', 'raw text stays raw';
+
+  is tag_to_html('div', sub {'<b>test</b>'}), '<div><b>test</b></div>', 'raw content';
+  $dom = Mojo::DOM->new('<p></p>');
+  $dom->at('p')->append_content($dom->new_tag('div', sub {'<b>test</b>'}));
+  is "$dom", '<p><div><b>test</b></div></p>', 'raw content';
+};
+
+subtest 'Only a leading XML declaration enables XML mode' => sub {
+  my $dom = Mojo::DOM->new('<p>x</p><?php echo "xml"?><SCRIPT>alert(1)</SCRIPT>');
+  ok !$dom->xml, 'XML mode not detected';
+  is $dom->find('script')->size, 1, 'one script element';
+
+  $dom = Mojo::DOM->new('<?xml-stylesheet href="test.xsl"?><SCRIPT>alert(1)</SCRIPT>');
+  ok !$dom->xml, 'XML mode not detected';
+  is $dom->find('script')->size, 1, 'one script element';
+
+  $dom = Mojo::DOM->new('<p>x</p><?xml version="1.0"?><SCRIPT>alert(1)</SCRIPT>');
+  ok !$dom->xml, 'XML mode not detected';
+  is $dom->find('script')->size, 1, 'one script element';
+
+  ok(Mojo::DOM->new('<?xml version="1.0"?><Foo/>')->xml,           'XML mode detected');
+  ok(Mojo::DOM->new("\n  <?xml version=\"1.0\"?><Foo/>")->xml,     'XML mode detected');
+  ok(Mojo::DOM->new("\x{feff}<?xml version=\"1.0\"?><Foo/>")->xml, 'XML mode detected');
+  ok(Mojo::DOM->new('<?xml?><Foo/>')->xml,                         'XML mode detected');
+  ok !Mojo::DOM->new->xml(0)->parse('<?xml version="1.0"?><Foo/>')->xml, 'XML mode not detected';
 };
 
 subtest 'Comments' => sub {

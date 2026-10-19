@@ -252,13 +252,15 @@ sub _content {
 
 sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
 
-sub _fragment { _link(my $r = ['root', @_], [@_]); $r }
+sub _fragment { _link(my $r = ['root', @_], [@_], 1); $r }
 
 sub _link {
-  my ($parent, $children) = @_;
+  my ($parent, $children, $fragment) = @_;
 
-  # Link parent to children
+  # Link parent to children (raw text is only allowed in script and style elements)
+  my $raw = $fragment || $parent->[0] eq 'tag' && ($parent->[1] eq 'script' || $parent->[1] eq 'style');
   for my $node (@$children) {
+    $node->[0] = 'text' if $node->[0] eq 'raw' && !$raw;
     my $offset = $node->[0] eq 'tag' ? 3 : 2;
     $node->[$offset] = $parent;
     weaken $node->[$offset];
@@ -438,8 +440,8 @@ be lowercase as well.
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
   say $dom->at('p[id]')->text;
 
-If an XML declaration is found, the parser will automatically switch into XML mode and everything becomes
-case-sensitive.
+If the document starts with an XML declaration, the parser will automatically switch into XML mode and everything
+becomes case-sensitive.
 
   # XML semantics
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');

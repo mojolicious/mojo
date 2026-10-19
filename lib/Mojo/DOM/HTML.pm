@@ -61,6 +61,9 @@ map { $END{$_} = 'p' } (
 # Container HTML elements that create their own scope
 my %SCOPE = map { $_ => 1 } qw(math svg);
 
+# SVG and MathML elements that are HTML integration points
+my %INTEGRATION = map { $_ => 1 } qw(desc foreignobject mi mn mo ms mtext title);
+
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
 
@@ -98,10 +101,19 @@ my %BLOCK = map { $_ => 1 } (
 sub parse {
   my ($self, $html) = (shift, "$_[0]");
 
+  # Detect XML from a leading declaration
+  $self->xml(1) if !exists $self->{xml} && $html =~ /^\x{feff}?\s*<\?xml[\s?]/i;
+
   my $xml     = $self->xml;
   my $current = my $tree = ['root'];
   while ($html =~ /\G$TOKEN_RE/gcso) {
     my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway) = ($1, $2, $3, $4, $5, $6, $11);
+
+    # DOCTYPE, CDATA (outside of foreign content) and processing instructions end at the first ">" in HTML
+    if (!$xml && (my $i = index $doctype // $cdata // $pi // '', '>') >= 0 && !(defined $cdata && _foreign($current))) {
+      pos($html) = $-[defined $doctype ? 2 : defined $cdata ? 4 : 5] + $i + 1;
+      defined && ($_ = substr $_, 0, $i) for $doctype, $cdata, $pi;
+    }
 
     # Text (and runaway "<")
     $text .= '<'                                 if defined $runaway;
@@ -111,7 +123,7 @@ sub parse {
     if (defined $tag) {
 
       # End
-      if ($tag =~ /^\/\s*(\S+)/) {
+      if ($tag =~ /^\/\s*([^\s\/]+)/) {
         my $end = $xml ? $1 : lc $1;
 
         # No more content
@@ -142,8 +154,8 @@ sub parse {
         # Element without end tag (self-closing)
         _end($start, $xml, \$current) if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
 
-        # Raw text elements
-        next if $xml || !$RAW{$start} && !$RCDATA{$start};
+        # Raw text elements (not in foreign content)
+        next if $xml || !$RAW{$start} && !$RCDATA{$start} || _foreign($current->[3]);
 
         if ($start eq 'script') {
           my ($script, $found_end) = _script_content(\$html);
@@ -152,7 +164,7 @@ sub parse {
           next;
         }
 
-        next unless $html =~ m!\G(.*?)</\Q$start\E(?:\s+|\s*>)!gcsi;
+        next unless $html =~ m!\G(.*?)</\Q$start\E(?=[\s/>])[^>]*>?!gcsi;
         _node($current, $RCDATA{$start} ? ('text', html_unescape $1) : ('raw', $1));
         _end($start, 0, \$current);
       }
@@ -167,11 +179,8 @@ sub parse {
     # CDATA
     elsif (defined $cdata) { _node($current, 'cdata', $cdata) }
 
-    # Processing instruction (try to detect XML)
-    elsif (defined $pi) {
-      $self->xml($xml = 1) if !exists $self->{xml} && $pi =~ /xml/i;
-      _node($current, 'pi', $pi);
-    }
+    # Processing instruction
+    elsif (defined $pi) { _node($current, 'pi', $pi) }
   }
 
   return $self->tree($tree);
@@ -203,6 +212,21 @@ sub _end {
     return if !$xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
   } while $next = $next->[3];
+}
+
+sub _foreign {
+  my $next = shift;
+
+  # Search stack for SVG and MathML elements, but stop at HTML integration points
+  while ($next->[0] ne 'root') {
+    return 1 if $SCOPE{$next->[1]};
+    return 0 if $INTEGRATION{$next->[1]};
+    return 0
+      if $next->[1] eq 'annotation-xml' && ($next->[2]{encoding} // '') =~ m!^(?:text/html|application/xhtml\+xml)$!i;
+    $next = $next->[3];
+  }
+
+  return 0;
 }
 
 sub _node {
@@ -279,20 +303,20 @@ sub _script_content {
     return (substr($$html, $start), 0) if $p >= length $$html;
 
     if ($state == 0) {
-      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { return (substr($$html, $start, $p - $start), 1) }
-      elsif ($$html =~ /\G<!--/gcs)                   { $state = 1 }
-      else                                            { pos($$html) = $p + 1 }
+      if    ($$html =~ m!\G</script(?=[\s/>])[^>]*>?!gcsi) { return (substr($$html, $start, $p - $start), 1) }
+      elsif ($$html =~ /\G<!--/gcs)                        { $state = 1 }
+      else                                                 { pos($$html) = $p + 1 }
     }
     elsif ($state == 1) {
-      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { return (substr($$html, $start, $p - $start), 1) }
-      elsif ($$html =~ /\G-->/gcs)                    { $state = 0 }
-      elsif ($$html =~ m!\G<script(?=[\s/>])!gcsi)    { $state = 2 }
-      else                                            { pos($$html) = $p + 1 }
+      if    ($$html =~ m!\G</script(?=[\s/>])[^>]*>?!gcsi) { return (substr($$html, $start, $p - $start), 1) }
+      elsif ($$html =~ /\G-->/gcs)                         { $state = 0 }
+      elsif ($$html =~ m!\G<script(?=[\s/>])!gcsi)         { $state = 2 }
+      else                                                 { pos($$html) = $p + 1 }
     }
     else {
-      if    ($$html =~ m!\G</script(?:\s+|\s*>)!gcsi) { $state      = 1 }
-      elsif ($$html =~ /\G-->/gcs)                    { $state      = 0 }
-      else                                            { pos($$html) = $p + 1 }
+      if    ($$html =~ m!\G</script(?=[\s/>])!gcsi) { $state      = 1 }
+      elsif ($$html =~ /\G-->/gcs)                  { $state      = 0 }
+      else                                          { pos($$html) = $p + 1 }
     }
   }
 }
@@ -385,7 +409,8 @@ Document Object Model. Note that this structure should only be used very careful
   my $bool = $html->xml;
   $html    = $html->xml($bool);
 
-Disable HTML semantics in parser and activate case-sensitivity, defaults to auto-detection based on XML declarations.
+Disable HTML semantics in parser and activate case-sensitivity, defaults to auto-detection based on a leading XML
+declaration.
 
 =head1 METHODS
 

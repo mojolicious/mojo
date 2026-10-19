@@ -1,5 +1,13 @@
 
 9.51  UNRELEASED
+  - Fixed a bug in Mojo::DOM where CDATA sections, processing instructions and DOCTYPE declarations did not end at the
+    first ">" in HTML documents.
+  - Fixed a bug in Mojo::DOM where the content of "<style>" and "<script>" elements in "<svg>" and "<math>" blocks was
+    not parsed as markup.
+  - Fixed a bug in Mojo::DOM where end tags like "</style/>" did not end "<style>" and "<script>" elements.
+  - Fixed a bug in Mojo::DOM where raw text moved out of "<style>" and "<script>" elements, for example with strip, was
+    not escaped.
+  - Fixed a bug in Mojo::DOM where any processing instruction containing "xml" would activate XML mode.
 
 9.50  2026-10-16
   - Added SECURITY.md policy for reporting security issues.

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::Message';
 
 use Digest::SHA qw(sha1_base64);
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode sha1_sum);
+use Mojo::Util qw(b64_encode b64_decode sha1_sum url_unescape);
 use Mojo::URL;
 
 has env    => sub { {} };
@@ -196,10 +196,11 @@ sub _parse_env {
     # Make sure there is a trailing slash (important for merging)
     $base->path->parse($value =~ m!/$! ? $value : "$value/");
 
-    # Remove SCRIPT_NAME prefix if necessary
+    # Remove SCRIPT_NAME prefix if necessary (unless the server already did it)
     my $buffer = $path->to_string;
-    $value  =~ s!^/|/$!!g;
-    $buffer =~ s!^/?\Q$value\E/?!!;
+    $value =~ s!^/|/$!!g;
+    my $uri = url_unescape(($env->{REQUEST_URI} // '') =~ s/\?.*$//r);
+    $buffer =~ s!^/?\Q$value\E(?:/|$)!! unless index($uri, "/$value" . ($env->{PATH_INFO} // '')) == 0;
     $buffer =~ s!^/!!;
     $path->parse($buffer);
   }

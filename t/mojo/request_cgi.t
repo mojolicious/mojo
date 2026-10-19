@@ -490,6 +490,51 @@ subtest 'Parse Apache mod_fastcgi CGI environment variables (multipart file uplo
   is $file->slurp,    '11023456789', 'right uploaded content';
 };
 
+subtest 'Parse PSGI like environment (SCRIPT_NAME prefix already removed)' => sub {
+  my $req = Mojo::Message::Request->new;
+  $req->parse({
+    PATH_INFO       => '/app/admin',
+    REQUEST_METHOD  => 'GET',
+    REQUEST_URI     => '/app/app/admin?foo=bar',
+    QUERY_STRING    => 'foo=bar',
+    SCRIPT_NAME     => '/app',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+  });
+  ok $req->is_finished, 'request is finished';
+  is $req->method,                 'GET',                                         'right method';
+  is $req->url->path,              'app/admin',                                   'right path';
+  is $req->url->base->path,        '/app/',                                       'right base path';
+  is $req->url->to_abs->to_string, 'http://localhost:8080/app/app/admin?foo=bar', 'right absolute URL';
+
+  $req = Mojo::Message::Request->new;
+  $req->parse({
+    PATH_INFO       => '/appadmin',
+    REQUEST_METHOD  => 'GET',
+    REQUEST_URI     => '/app/appadmin',
+    SCRIPT_NAME     => '/app',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+  });
+  ok $req->is_finished, 'request is finished';
+  is $req->url->path,              'appadmin',                           'right path';
+  is $req->url->to_abs->to_string, 'http://localhost:8080/app/appadmin', 'right absolute URL';
+};
+
+subtest 'Parse CGI environment (SCRIPT_NAME prefix without segment boundary)' => sub {
+  my $req = Mojo::Message::Request->new;
+  $req->parse({
+    PATH_INFO       => '/appadmin',
+    REQUEST_METHOD  => 'GET',
+    SCRIPT_NAME     => '/app',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+  });
+  ok $req->is_finished, 'request is finished';
+  is $req->url->path,              'appadmin',                           'right path';
+  is $req->url->to_abs->to_string, 'http://localhost:8080/app/appadmin', 'right absolute URL';
+};
+
 subtest 'Parse IIS 7.5 like CGI environment (HTTPS=off)' => sub {
   my $req = Mojo::Message::Request->new;
   $req->parse({

@@ -143,6 +143,7 @@ sub _finish {
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
       $self->_write($id);
+      return $ws->server_read($tx->req->content->leftovers);
     }
 
     # Failed upgrade

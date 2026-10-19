@@ -8,6 +8,7 @@ use Mojo::IOLoop;
 use Mojo::Promise;
 use Mojo::Transaction::WebSocket;
 use Mojo::UserAgent;
+use Mojo::WebSocket qw(build_frame);
 use Mojolicious::Lite;
 
 # Max WebSocket size
@@ -454,6 +455,33 @@ subtest 'Timeout' => sub {
   is $stash->{finished}, 1, 'finish event has been emitted once';
   like $logs, qr/Inactivity timeout/, 'right log message';
   undef $logs;
+};
+
+subtest 'Frame sent together with handshake' => sub {
+  my $stash;
+  app->plugins->once(before_dispatch => sub { $stash = shift->stash });
+  my $buffer = '';
+  Mojo::IOLoop->client(
+    {port => $ua->server->nb_url->port} => sub {
+      my ($loop, $err, $stream) = @_;
+      $stream->on(
+        read => sub {
+          my ($stream, $chunk) = @_;
+          $buffer .= $chunk;
+          $stream->close if $buffer =~ /test1test2ws:/;
+        }
+      );
+      $stream->write("GET / HTTP/1.1\x0d\x0a"
+          . "Connection: Upgrade\x0d\x0a"
+          . "Upgrade: websocket\x0d\x0a"
+          . "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\x0d\x0a"
+          . "Sec-WebSocket-Version: 13\x0d\x0a\x0d\x0a"
+          . build_frame(1, 1, 0, 0, 0, 1, 'test1'));
+    }
+  );
+  Mojo::IOLoop->one_tick until $stash->{finished};
+  like $buffer, qr/101 Switching Protocols.*test1test2ws:/s, 'right response';
+  is $stash->{finished}, 1, 'finish event has been emitted once';
 };
 
 subtest 'Ping/pong' => sub {

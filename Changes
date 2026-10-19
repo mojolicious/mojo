@@ -12,6 +12,8 @@
     PATH_INFO in CGI and PSGI environments.
   - Fixed a bug in Mojo::Asset::Memory where an end_range of 0 was ignored, causing range requests for the first
     byte of an asset to return the whole asset.
+  - Fixed a bug in Mojo::Server::Daemon where WebSocket frames sent together with the handshake would be parsed as
+    a new HTTP request, preventing the finish event from being emitted.
 
 9.50  2026-10-16
   - Added SECURITY.md policy for reporting security issues.

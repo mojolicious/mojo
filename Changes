@@ -1,5 +1,13 @@
 
 9.53  UNRELEASED
+  - Added support for all server commands to morbo, like "morbo ./myapp.pl prefork -w 2". The server now runs in a
+    separate process, so the daemon attribute of Mojo::Server::Morbo is only used to create listen sockets, and server
+    settings need to be passed to the command instead, like "morbo ./myapp.pl daemon -p -i 30". That also means Morbo
+    no longer works on platforms with fork emulation, such as native Windows (use WSL instead).
+  - Added exec attribute to Mojo::Server::Morbo and -x/--exec option to morbo, to start additional commands like asset
+    bundlers in watch mode alongside the server.
+  - Improved url_for_asset in Mojolicious::Controller to find assets that have been rebuilt with different names in
+    development mode.
   - Improved at performance in Mojo::DOM for selectors without combinators, it now stops at the first match.
   - Improved HTML/XML parsing performance in Mojo::DOM by up to 35%, the tokenizer now matches attributes only once.
   - Fixed a bug in Mojo::DOM where many unclosed comments, CDATA sections, processing instructions or RCDATA elements

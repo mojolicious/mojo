@@ -421,6 +421,40 @@ Rollup L<configuration|https://rollupjs.org/guide/en/#configuration-files> examp
     // Add your own rules and entry point here
   };
 
+Vite L<configuration|https://vite.dev/config/> example (C<vite.config.js>):
+
+  import Path from '@mojojs/path';
+
+  const isDev = process.env.MOJO_MODE === 'development';
+
+  export default {
+    // Mojolicious already serves the "public" directory
+    publicDir: false,
+    build: {
+      outDir: Path.currentFile().sibling('public', 'assets').toString(),
+      rollupOptions: {
+        output: {
+          entryFileNames: isDev ? '[name].development.js' : '[name].[hash].js',
+          assetFileNames: isDev ? '[name].development.[ext]' : '[name].[hash].[ext]'
+        }
+      }
+    },
+
+    // Add your own plugins and entry point here
+  };
+
+During development you can let L<Mojo::Server::Morbo> start your bundler in watch mode, so it rebuilds assets whenever
+their sources change. The C<MOJO_MODE> environment variable will be set for it too, and because assets are found again
+for every request in C<development> mode and not cached by browsers, there is no need to restart your application.
+
+  $ morbo -x 'npx webpack --watch' ./script/my_app
+  $ morbo -x 'npx rollup -c -w' ./script/my_app
+  $ morbo -x 'npx vite build --watch' ./script/my_app
+
+For production you just run the bundler once before deploying your application, with C<MOJO_MODE> set accordingly.
+
+  $ MOJO_MODE=production npx webpack
+
 Everything else is up to your bundler of choice, so you need to consult its documentation for further information. And
 where you keep your asset sources, such as C<.vue> and C<.jsx> files, is not important, as long as your bundler can
 find them. Using a directory named C<assets> or C<frontend> in your application root directory is a good best practice

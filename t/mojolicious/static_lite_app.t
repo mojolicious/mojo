@@ -6,7 +6,7 @@ use Test::Mojo;
 use Test::More;
 use Mojo::Asset::Memory;
 use Mojo::Date;
-use Mojo::File qw(curfile);
+use Mojo::File qw(curfile tempdir);
 use Mojolicious::Lite;
 
 hook after_static => sub { shift->app->log->debug('Static file served') };
@@ -446,6 +446,28 @@ subtest 'Assets' => sub {
     ->header_is(Server => 'Mojolicious (Perl)')
     ->header_exists_not('Cache-Control')
     ->content_like(qr/\* foo\.css asset/);
+};
+
+subtest 'Assets rebuilt during development' => sub {
+  my $dir    = tempdir;
+  my $assets = $dir->child('assets')->make_path;
+  unshift @{$t->app->static->paths}, $dir->to_string;
+  my $c = $t->app->build_controller;
+
+  $t->app->mode('development');
+  is $c->url_for_asset('/rebuilt.js')->path, '/assets/rebuilt.js', 'asset has not been built yet';
+  $assets->child('rebuilt.ab1234.js')->spew('production');
+  is $c->url_for_asset('/rebuilt.js')->path, '/assets/rebuilt.ab1234.js', 'new asset has been found';
+  $assets->child('rebuilt.development.js')->spew('development');
+  is $c->url_for_asset('/rebuilt.js')->path, '/assets/rebuilt.development.js', 'development asset has precedence';
+  $t->get_ok('/assets/rebuilt.development.js')->status_is(200)->content_is('development');
+
+  $t->app->mode('production');
+  $assets->child('other.ab1234.js')->spew('production');
+  is $c->url_for_asset('/other.js')->path, '/assets/other.js', 'assets are not rebuilt in production';
+
+  shift @{$t->app->static->paths};
+  $t->app->static->warmup;
 };
 
 subtest 'File' => sub {

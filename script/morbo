@@ -4,19 +4,23 @@ use Mojo::Base -strict;
 use Mojo::Server::Morbo;
 use Mojo::Util qw(extract_usage getopt);
 
-getopt
+getopt \@ARGV, ['require_order'],
   'b|backend=s' => \$ENV{MOJO_MORBO_BACKEND},
   'h|help'      => \my $help,
   'l|listen=s'  => \my @listen,
   'm|mode=s'    => \$ENV{MOJO_MODE},
   'v|verbose'   => \my $verbose,
-  'w|watch=s'   => \my @watch;
+  'w|watch=s'   => \my @watch,
+  'x|exec=s'    => \my @exec;
 
 die extract_usage if $help || !(my $app = shift);
+die qq{Morbo options need to come before the application, e.g. "morbo $ARGV[0] ... $app"\n}
+  if @ARGV && $ARGV[0] =~ /^-/;
 my $morbo = Mojo::Server::Morbo->new(silent => !$verbose);
 $morbo->daemon->listen(\@listen) if @listen;
 $morbo->backend->watch(\@watch)  if @watch;
-$morbo->run($app);
+$morbo->exec(\@exec)             if @exec;
+$morbo->run($app, @ARGV);
 
 =encoding utf8
 
@@ -26,13 +30,16 @@ morbo - Morbo HTTP and WebSocket development server
 
 =head1 SYNOPSIS
 
-  Usage: morbo [OPTIONS] [APPLICATION]
+  Usage: morbo [OPTIONS] APPLICATION [COMMAND] [ARGS]
 
     morbo ./script/my_app
     morbo ./myapp.pl
+    morbo ./myapp.pl prefork -w 1
+    morbo -l http://127.0.0.1:8080 -w assets/css ./script/my_app prefork -w 3
     morbo -m production -l https://*:443 -l http://[::]:3000 ./myapp.pl
     morbo -l 'https://*:443?cert=./server.crt&key=./server.key' ./myapp.pl
     morbo -w /usr/local/lib -w public -w myapp.conf ./myapp.pl
+    morbo -x 'npx webpack --watch' ./script/my_app
 
   Options:
     -b, --backend <name>           Morbo backend to use for reloading, defaults
@@ -51,10 +58,15 @@ morbo - Morbo HTTP and WebSocket development server
                                    script as well as the "lib" and "templates"
                                    directories in the current working
                                    directory
+    -x, --exec <command>           One or more shell commands to start
+                                   alongside the server, like asset bundlers
+                                   in watch mode
 
 =head1 DESCRIPTION
 
-Start L<Mojolicious> and L<Mojolicious::Lite> applications with the L<Mojo::Server::Morbo> web server.
+Start L<Mojolicious> and L<Mojolicious::Lite> applications with the L<Mojo::Server::Morbo> restarter. The server
+command defaults to C<daemon>, and all Morbo options need to come before the application. Shell commands started with
+C<--exec> run for as long as Morbo does, they are not restarted together with the server.
 
 =head1 SEE ALSO
 

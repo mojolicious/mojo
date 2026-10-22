@@ -8,7 +8,7 @@ sub client_read {
 
   # Skip body for HEAD request
   my $res = $self->res;
-  $res->content->skip_body(1) if uc $self->req->method eq 'HEAD';
+  $res->content->skip_body(1) if $self->req->method eq 'HEAD';
   return undef unless $res->parse($chunk)->is_finished;
 
   # Unexpected 1xx response
@@ -20,7 +20,7 @@ sub client_read {
 
 sub client_write { shift->_write(0) }
 
-sub is_empty { !!(uc $_[0]->req->method eq 'HEAD' || $_[0]->res->is_empty) }
+sub is_empty { !!($_[0]->req->method eq 'HEAD' || $_[0]->res->is_empty) }
 
 sub keep_alive {
   my $self = shift;

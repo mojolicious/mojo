@@ -148,13 +148,13 @@ subtest 'Simple form with multiple values' => sub {
   is $tx->req->body, 'a=1&a=2&a=3&b=4', 'right content';
 };
 
-subtest 'Existing query string (lowercase HEAD)' => sub {
+subtest 'Existing query string (lowercase HEAD is not HEAD)' => sub {
   my $tx = $t->tx(head => 'http://example.com?foo=bar' => form => {baz => [1, 2]});
-  is $tx->req->url->to_abs,           'http://example.com?foo=bar&baz=1&baz=2', 'right URL';
-  is $tx->req->method,                'head',                                   'right method';
-  is $tx->req->headers->content_type, undef,                                    'no "Content-Type" value';
-  ok $tx->is_empty, 'transaction is empty';
-  is $tx->req->body, '', 'no content';
+  is $tx->req->url->to_abs,           'http://example.com?foo=bar',        'right URL';
+  is $tx->req->method,                'head',                              'right method';
+  is $tx->req->headers->content_type, 'application/x-www-form-urlencoded', 'right "Content-Type" value';
+  ok !$tx->is_empty, 'transaction is not empty';
+  is $tx->req->body, 'baz=1&baz=2', 'right content';
 };
 
 subtest 'UTF-8 query' => sub {
@@ -637,7 +637,7 @@ subtest 'Proxy CONNECT' => sub {
   is $tx->req->headers->proxy_authorization, 'Basic c3JpOnNlY3IzdA==', 'right "Proxy-Authorization" header';
   is $tx->req->headers->host,                'mojolicious.org',        'right "Host" header';
   is $t->proxy_connect($tx),                 undef,                    'already a CONNECT request';
-  $tx->req->method('Connect');
+  $tx->req->method('CONNECT');
   is $t->proxy_connect($tx), undef, 'already a CONNECT request';
   $tx = $t->tx(GET => 'https://mojolicious.org');
   $tx->req->proxy(Mojo::URL->new('socks://127.0.0.1:3000'));
@@ -713,8 +713,8 @@ subtest 'Simple 302 redirect' => sub {
   is $tx->res->headers->location, undef,                    'no "Location" value';
 };
 
-subtest '302 redirect (lowercase HEAD)' => sub {
-  my $tx = $t->tx(head => 'http://mojolicious.org/foo');
+subtest '302 redirect (HEAD)' => sub {
+  my $tx = $t->tx(HEAD => 'http://mojolicious.org/foo');
   $tx->res->code(302);
   $tx->res->headers->location('http://example.com/bar');
   $tx = $t->redirect($tx);

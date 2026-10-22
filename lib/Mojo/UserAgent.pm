@@ -245,7 +245,7 @@ sub _finish {
   }
 
   # CONNECT requests always have a follow-up request
-  $self->_reuse($id, $close) unless uc $old->req->method eq 'CONNECT';
+  $self->_reuse($id, $close) unless $old->req->method eq 'CONNECT';
   $res->error({message => $res->message, code => $res->code}) if $res->is_error;
   $c->{cb}($self, $old) unless $self->_redirect($c, $old);
 }

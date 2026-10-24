@@ -1,4 +1,6 @@
 
+9.54  UNRELEASED
+
 9.53  2026-10-25
   - Added any, delete, get, options, patch, post, put, query, under and websocket methods to Mojolicious, as shortcuts
     for the same methods on the routes attribute.

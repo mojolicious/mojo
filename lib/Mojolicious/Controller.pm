@@ -299,8 +299,9 @@ sub url_for {
     $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws') if $generated->{websocket};
   }
 
-  # Make path absolute
+  # Make path absolute (skip parsing if there is no base path and nothing would need to be decoded)
   my $base_path = $base->path;
+  return $url if $base_path->to_string eq '' && index($path->to_string, '%') < 0;
   unshift @{$path->parts}, @{$base_path->parts};
   $base_path->parts([])->trailing_slash(0);
 

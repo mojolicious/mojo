@@ -489,6 +489,7 @@ subtest 'xor_encode' => sub {
   is xor_encode("\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'x'),         'hello world',          'right result';
   is xor_encode('hello',                                        '123456789'), "\x59\x57\x5f\x58\x5a", 'right result';
   is xor_encode("\x59\x57\x5f\x58\x5a",                         '123456789'), 'hello',                'right result';
+  is xor_encode('',                                             'foo'),       '',                     'right result';
 };
 
 subtest 'steady_time' => sub {

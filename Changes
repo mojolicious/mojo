@@ -3,6 +3,8 @@
   - Improved multipart/form-data performance in Mojo::Message.
   - Improved Mojo::Server::Daemon performance by up to 27% for keep-alive requests, by finishing static responses
     without an extra write cycle and caching socket addresses per connection.
+  - Improved url_for performance in Mojolicious::Controller by up to 15%.
+  - Improved xor_encode performance in Mojo::Util by up to 3x, which speeds up WebSocket frame masking.
   - Fixed a bug in Mojo::Util where gzip did not accept Mojo::ByteStream objects, causing compressed responses
     rendered from them to fail.
   - Fixed a bug in Mojo::Log where messages from nested contexts were not written to the log file.

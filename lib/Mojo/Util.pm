@@ -511,11 +511,9 @@ sub xml_escape {
 sub xor_encode {
   my ($input, $key) = @_;
 
-  # Encode with variable key length
-  my $len    = length $key;
-  my $buffer = my $output = '';
-  $output .= $buffer ^ $key while length($buffer = substr($input, 0, $len, '')) == $len;
-  return $output .= $buffer ^ substr($key, 0, length $buffer, '');
+  # Encode with variable key length (repeat key to match input length)
+  my $len = length $input;
+  return $input ^ substr($key x (int($len / length $key) + 1), 0, $len);
 }
 
 sub _adapt {

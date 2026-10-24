@@ -629,7 +629,7 @@ Application server relative URLs will be processed with, defaults to a L<Mojo::U
 
   # Mock web service
   $ua->server->app(Mojolicious->new);
-  $ua->server->app->routes->get('/time' => sub ($c) {
+  $ua->server->app->get('/time' => sub ($c) {
     $c->render(json => {now => time});
   });
   my $time = $ua->get('/time')->result->json->{now};

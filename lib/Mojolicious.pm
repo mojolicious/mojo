@@ -71,6 +71,8 @@ sub BUILD_DYNAMIC {
   };
 }
 
+sub any { shift->routes->any(@_) }
+
 sub build_controller {
   my ($self, $tx) = @_;
 
@@ -101,6 +103,8 @@ sub build_tx {
 sub config   { Mojo::Util::_stash(config   => @_) }
 sub defaults { Mojo::Util::_stash(defaults => @_) }
 
+sub delete { shift->routes->delete(@_) }
+
 sub dispatch {
   my ($self, $c) = @_;
 
@@ -126,6 +130,8 @@ sub dispatch {
   $plugins->emit_hook(before_routes => $c);
   $c->helpers->reply->not_found unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
 }
+
+sub get { shift->routes->get(@_) }
 
 sub handler {
   my $self = shift;
@@ -171,10 +177,17 @@ sub new {
   return $self;
 }
 
+sub options { shift->routes->options(@_) }
+sub patch   { shift->routes->patch(@_) }
+
 sub plugin {
   my $self = shift;
   $self->plugins->register_plugin(shift, $self, @_);
 }
+
+sub post  { shift->routes->post(@_) }
+sub put   { shift->routes->put(@_) }
+sub query { shift->routes->query(@_) }
 
 sub server { $_[0]->plugins->emit_hook(before_server_start => @_[1, 0]) }
 
@@ -186,7 +199,11 @@ sub start {
 
 sub startup { }
 
+sub under { shift->routes->under(@_) }
+
 sub warmup { Mojo::Loader::load_classes $_ for @{shift->preload_namespaces} }
+
+sub websocket { shift->routes->websocket(@_) }
 
 sub _action {
   my ($next, $c, $action, $last) = @_;
@@ -219,7 +236,7 @@ Mojolicious - Real-time web framework
 
   # Route
   sub startup ($self) {
-    $self->routes->get('/hello')->to('foo#hello');
+    $self->get('/hello')->to('foo#hello');
   }
 
   # Controller
@@ -585,6 +602,12 @@ Validate values, defaults to a L<Mojolicious::Validator> object.
 
 L<Mojolicious> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
+=head2 any
+
+  my $route = $app->any('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"any"> on L</"routes">, takes the same arguments.
+
 =head2 build_controller
 
   my $c = $app->build_controller;
@@ -632,12 +655,24 @@ Default values for L<Mojolicious::Controller/"stash">, assigned for every new re
   # Assign multiple values at once
   $app->defaults(foo => 'test', bar => 23);
 
+=head2 delete
+
+  my $route = $app->delete('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"delete"> on L</"routes">, takes the same arguments.
+
 =head2 dispatch
 
   $app->dispatch(Mojolicious::Controller->new);
 
 The heart of every L<Mojolicious> application, calls the L</"static"> and L</"routes"> dispatchers for every request
 and passes them a L<Mojolicious::Controller> object.
+
+=head2 get
+
+  my $route = $app->get('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"get"> on L</"routes">, takes the same arguments.
 
 =head2 handler
 
@@ -692,6 +727,18 @@ Construct a new L<Mojolicious> application and call L</"startup">. Will automati
 sets up the renderer, static file server, a default set of plugins and an L</"around_dispatch"> hook with the default
 exception handling.
 
+=head2 options
+
+  my $route = $app->options('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"options"> on L</"routes">, takes the same arguments.
+
+=head2 patch
+
+  my $route = $app->patch('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"patch"> on L</"routes">, takes the same arguments.
+
 =head2 plugin
 
   $app->plugin('some_thing');
@@ -706,6 +753,24 @@ exception handling.
 
 Load a plugin, for a full list of example plugins included in the L<Mojolicious> distribution see
 L<Mojolicious::Plugins/"PLUGINS">.
+
+=head2 post
+
+  my $route = $app->post('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"post"> on L</"routes">, takes the same arguments.
+
+=head2 put
+
+  my $route = $app->put('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"put"> on L</"routes">, takes the same arguments.
+
+=head2 query
+
+  my $route = $app->query('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"query"> on L</"routes">, takes the same arguments.
 
 =head2 server
 
@@ -734,11 +799,23 @@ subclass.
 
   sub startup ($self) {...}
 
+=head2 under
+
+  my $route = $app->under('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"under"> on L</"routes">, takes the same arguments.
+
 =head2 warmup
 
   $app->warmup;
 
 Preload classes from L</"preload_namespaces"> for future use.
+
+=head2 websocket
+
+  my $route = $app->websocket('/:foo' => sub ($c) {...});
+
+Generate route with L<Mojolicious::Routes::Route/"websocket"> on L</"routes">, takes the same arguments.
 
 =head1 HELPERS
 

@@ -184,6 +184,12 @@ away, and the routing performance stays the same even for applications with many
 placeholder, like C</:name>, always have to be tried. A routing cache will also be used automatically to handle sudden
 traffic spikes more gracefully.
 
+For convenience, the application object also has shortcut methods like L<Mojolicious/"get"> and L<Mojolicious/"under">,
+which generate routes directly on L<Mojolicious/"routes">.
+
+  # Same as "$self->routes->get(...)"
+  $self->get('/welcome')->to(controller => 'foo', action => 'welcome');
+
 =head2 Routing destination
 
 After you start a new route with methods like L<Mojolicious::Routes::Route/"get">, you can also give it a destination
@@ -298,7 +304,7 @@ searched in that order. The action value is not changed at all, so both values a
 
   sub startup ($self) {
     # /bye -> MyApp::Controller::Foo->bye
-    $self->routes->get('/bye')->to(controller => 'foo', action => 'bye');
+    $self->get('/bye')->to(controller => 'foo', action => 'bye');
   }
 
   1;
@@ -874,7 +880,7 @@ Now just load the plugin and you are ready to use the condition in all your appl
     $self->plugin('WerewolfCondition');
 
     # /hideout (keep them out for 4 days after full moon)
-    $self->routes->get('/hideout')->requires(werewolf => 4)->to(controller => 'foo', action => 'bar');
+    $self->get('/hideout')->requires(werewolf => 4)->to(controller => 'foo', action => 'bar');
   }
 
   1;
@@ -951,7 +957,7 @@ You can even package applications as self-contained reusable plugins.
   sub register ($self, $app, $conf) {
 
     # Automatically add route
-    $app->routes->any('/foo')->partial(1)->to(app => EmbeddedApp::app());
+    $app->any('/foo')->partial(1)->to(app => EmbeddedApp::app());
   }
 
   package EmbeddedApp;

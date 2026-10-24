@@ -1,5 +1,7 @@
 
 9.53  UNRELEASED
+  - Added any, delete, get, options, patch, post, put, query, under and websocket methods to Mojolicious, as shortcuts
+    for the same methods on the routes attribute.
   - Added support for all server commands to morbo, like "morbo ./myapp.pl prefork -w 2". The server now runs in a
     separate process, so the daemon attribute of Mojo::Server::Morbo is only used to create listen sockets, and server
     settings need to be passed to the command instead, like "morbo ./myapp.pl daemon -p -i 30". That also means Morbo

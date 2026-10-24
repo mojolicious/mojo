@@ -747,4 +747,39 @@ like $@, qr/Transaction already destroyed/, 'right error';
 eval { Mojolicious::Plugin->register };
 like $@, qr/Method "register" not implemented by subclass/, 'right error';
 
+subtest 'Route shortcuts' => sub {
+  my $app = Mojolicious->new;
+  for my $method (qw(delete get options patch post put query)) {
+    my $route = $app->$method('/shortcut' => sub { shift->render(text => $method) });
+    isa_ok $route, 'Mojolicious::Routes::Route', 'right class';
+    is_deeply $route->methods, [uc $method], 'right methods';
+  }
+  $app->any(['PUT'] => '/any' => sub { shift->render(text => 'any') });
+  my $under = $app->under(
+    '/under' => sub {
+      my $c = shift;
+      return 1 if $c->req->headers->header('X-Pass');
+      $c->render(text => 'denied', status => 403);
+      return undef;
+    }
+  );
+  $under->get('/inner' => sub { shift->render(text => 'inner') });
+  $app->websocket(
+    '/ws' => sub {
+      shift->on(message => sub { shift->send("echo: $_[0]") });
+    }
+  );
+
+  my $t = Test::Mojo->new($app);
+  for my $method (qw(delete get options patch post put query)) {
+    my $test = "${method}_ok";
+    $t->$test('/shortcut')->status_is(200)->content_is($method);
+  }
+  $t->put_ok('/any')->status_is(200)->content_is('any');
+  $t->get_ok('/any')->status_is(404);
+  $t->get_ok('/under/inner' => {'X-Pass' => 1})->status_is(200)->content_is('inner');
+  $t->get_ok('/under/inner')->status_is(403)->content_is('denied');
+  $t->websocket_ok('/ws')->send_ok('hi')->message_ok->message_is('echo: hi')->finish_ok;
+};
+
 done_testing();

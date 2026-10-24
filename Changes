@@ -1,5 +1,5 @@
 
-9.52  UNRELEASED
+9.52  2026-10-24
   - Improved multipart/form-data performance in Mojo::Message.
   - Improved Mojo::Server::Daemon performance by up to 27% for keep-alive requests, by finishing static responses
     without an extra write cycle and caching socket addresses per connection.

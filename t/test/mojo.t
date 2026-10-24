@@ -11,6 +11,22 @@ websocket '/websocket' => sub {
   $c->send({text => 'testing message'});
 };
 
+get '/html' => sub {
+  my $c = shift;
+  $c->session(visited => 1);
+  $c->render(inline => '<div><p id="a">One</p><p>Two</p></div>');
+};
+
+get '/json' => {json => {foo => [1, 2, 3], bar => 'baz'}};
+
+websocket '/echo' => sub {
+  my $c = shift;
+  $c->on(binary => sub { $c->send({binary => pop}) });
+  $c->on(text   => sub { $c->send(pop) });
+};
+
+websocket '/close' => sub { shift->finish(4000) };
+
 any '/sse' => sub {
   my $c = shift;
   $c->write_sse({text => 'One', id => 23});
@@ -89,11 +105,24 @@ subtest 'query_ok' => sub {
   is $t->tx->req->method, 'QUERY', 'right method';
 };
 
+subtest 'request_ok' => sub {
+  $t->request_ok($t->ua->build_tx(GET => '/'));
+  is_deeply \@args, ['ok', 1, 'GET /'], 'right result';
+  is $t->tx->req->method, 'GET', 'right method';
+};
+
 subtest 'status_is' => sub {
   $t->status_is(200);
   is_deeply \@args, ['is', 200, 200, '200 OK'], 'right result';
   $t->status_is(404, 'some description');
   is_deeply \@args, ['is', 200, 404, 'some description'], 'right result';
+};
+
+subtest 'status_isnt' => sub {
+  $t->status_isnt(404);
+  is_deeply \@args, ['isnt', 200, 404, 'not 404 Not Found'], 'right result';
+  $t->status_isnt(200, 'some description');
+  is_deeply \@args, ['isnt', 200, 200, 'some description'], 'right result';
 };
 
 subtest 'content_is' => sub {
@@ -237,6 +266,99 @@ subtest 'header_unlike' => sub {
   is_deeply \@args, ['unlike', 'text/html;charset=UTF-8', qr/image\/png/, 'some description'], 'right result';
 };
 
+subtest 'text_is' => sub {
+  $t->get_ok('/html')->text_is('p', 'One');
+  is_deeply \@args, ['is', 'One', 'One', 'exact match for selector "p"'], 'right result';
+  $t->text_is('p', 'Two', 'some description');
+  is_deeply \@args, ['is', 'One', 'Two', 'some description'], 'right result';
+  $t->text_is('span', 'One');
+  is_deeply \@args, ['is', undef, 'One', 'exact match for selector "span"'], 'right result';
+};
+
+subtest 'text_isnt' => sub {
+  $t->get_ok('/html')->text_isnt('p', 'Two');
+  is_deeply \@args, ['isnt', 'One', 'Two', 'no match for selector "p"'], 'right result';
+  $t->text_isnt('p', 'Two', 'some description');
+  is_deeply \@args, ['isnt', 'One', 'Two', 'some description'], 'right result';
+};
+
+subtest 'text_like' => sub {
+  $t->get_ok('/html')->text_like('p', qr/On/);
+  is_deeply \@args, ['like', 'One', qr/On/, 'similar match for selector "p"'], 'right result';
+  $t->text_like('p', qr/On/, 'some description');
+  is_deeply \@args, ['like', 'One', qr/On/, 'some description'], 'right result';
+};
+
+subtest 'text_unlike' => sub {
+  $t->get_ok('/html')->text_unlike('p', qr/Tw/);
+  is_deeply \@args, ['unlike', 'One', qr/Tw/, 'no similar match for selector "p"'], 'right result';
+  $t->text_unlike('p', qr/Tw/, 'some description');
+  is_deeply \@args, ['unlike', 'One', qr/Tw/, 'some description'], 'right result';
+};
+
+subtest 'element_exists' => sub {
+  $t->get_ok('/html')->element_exists('p#a');
+  is $args[0], 'ok', 'right test';
+  isa_ok $args[1], 'Mojo::DOM', 'right element';
+  is $args[1]->text, 'One',                               'right text';
+  is $args[2],       'element for selector "p#a" exists', 'right description';
+  $t->element_exists('span', 'some description');
+  is_deeply \@args, ['ok', undef, 'some description'], 'right result';
+};
+
+subtest 'element_exists_not' => sub {
+  $t->get_ok('/html')->element_exists_not('span');
+  is_deeply \@args, ['ok', 1, 'no element for selector "span"'], 'right result';
+  $t->element_exists_not('p', 'some description');
+  is_deeply \@args, ['ok', '', 'some description'], 'right result';
+};
+
+subtest 'element_count_is' => sub {
+  $t->get_ok('/html')->element_count_is('p', 2);
+  is_deeply \@args, ['is', 2, 2, 'element count for selector "p"'], 'right result';
+  $t->element_count_is('span', 1, 'some description');
+  is_deeply \@args, ['is', 0, 1, 'some description'], 'right result';
+};
+
+subtest 'json_has' => sub {
+  $t->get_ok('/json')->json_has('/foo');
+  is_deeply \@args, ['ok', 1, 'has value for JSON Pointer "/foo"'], 'right result';
+  $t->json_has('/missing', 'some description');
+  is_deeply \@args, ['ok', '', 'some description'], 'right result';
+};
+
+subtest 'json_hasnt' => sub {
+  $t->get_ok('/json')->json_hasnt('/missing');
+  is_deeply \@args, ['ok', 1, 'has no value for JSON Pointer "/missing"'], 'right result';
+  $t->json_hasnt('/foo', 'some description');
+  is_deeply \@args, ['ok', '', 'some description'], 'right result';
+};
+
+subtest 'json_is' => sub {
+  $t->get_ok('/json')->json_is('/foo', [1, 2, 3]);
+  is_deeply \@args, ['is_deeply', [1, 2, 3], [1, 2, 3], 'exact match for JSON Pointer "/foo"'], 'right result';
+  $t->json_is('/foo/1', 2, 'some description');
+  is_deeply \@args, ['is_deeply', 2, 2, 'some description'], 'right result';
+  $t->json_is({foo => [1, 2, 3], bar => 'baz'});
+  is_deeply \@args,
+    ['is_deeply', {foo => [1, 2, 3], bar => 'baz'}, {foo => [1, 2, 3], bar => 'baz'},
+    'exact match for JSON Pointer ""'], 'right result';
+};
+
+subtest 'json_like' => sub {
+  $t->get_ok('/json')->json_like('/bar', qr/baz/);
+  is_deeply \@args, ['like', 'baz', qr/baz/, 'similar match for JSON Pointer "/bar"'], 'right result';
+  $t->json_like('/bar', qr/baz/, 'some description');
+  is_deeply \@args, ['like', 'baz', qr/baz/, 'some description'], 'right result';
+};
+
+subtest 'json_unlike' => sub {
+  $t->get_ok('/json')->json_unlike('/bar', qr/yada/);
+  is_deeply \@args, ['unlike', 'baz', qr/yada/, 'no similar match for JSON Pointer "/bar"'], 'right result';
+  $t->json_unlike('/bar', qr/yada/, 'some description');
+  is_deeply \@args, ['unlike', 'baz', qr/yada/, 'some description'], 'right result';
+};
+
 subtest 'message_is' => sub {
   $t->websocket_ok('/websocket')->message_ok->message_is('testing message');
   is_deeply \@args, ['is', 'testing message', 'testing message', 'exact match for message'], 'right result';
@@ -276,6 +398,80 @@ subtest 'message_unlike' => sub {
   is_deeply \@args, ['unlike', 'testing message', qr/^test/, 'message is not similar'], 'right result';
   $t->websocket_ok('/websocket')->message_ok->message_unlike(qr/^test/, 'some description');
   is_deeply \@args, ['unlike', 'testing message', qr/^test/, 'some description'], 'right result';
+};
+
+subtest 'send_ok' => sub {
+  $t->websocket_ok('/echo')->send_ok('hi');
+  is_deeply \@args, ['ok', 1, 'send message'], 'right result';
+  $t->send_ok('hi', 'some description');
+  is_deeply \@args, ['ok', 1, 'some description'], 'right result';
+  $t->finish_ok;
+  $t->get_ok('/')->send_ok('hi');
+  is_deeply \@args, ['ok', 0, 'send message'], 'right result';
+};
+
+subtest 'Message type checks' => sub {
+  $t->websocket_ok('/echo')->send_ok({binary => 'bin'})->message_ok->message_is({binary => 'bin'});
+  is_deeply \@args, ['is', 'bin', 'bin', 'exact match for message'], 'right result';
+  $t->message_is({text => 'bin'});
+  is_deeply \@args, ['is', '', 'bin', 'exact match for message'], 'right result';
+  $t->send_ok({text => 'txt'})->message_ok->message_is({text => 'txt'});
+  is_deeply \@args, ['is', 'txt', 'txt', 'exact match for message'], 'right result';
+  $t->message_is({binary => 'txt'});
+  is_deeply \@args, ['is', '', 'txt', 'exact match for message'], 'right result';
+  $t->finish_ok;
+};
+
+subtest 'json_message_has' => sub {
+  $t->websocket_ok('/echo')->send_ok({json => {a => [1, 2]}})->message_ok->json_message_has('/a');
+  is_deeply \@args, ['ok', 1, 'has value for JSON Pointer "/a"'], 'right result';
+  $t->json_message_has('/b', 'some description');
+  is_deeply \@args, ['ok', undef, 'some description'], 'right result';
+  $t->finish_ok;
+};
+
+subtest 'json_message_hasnt' => sub {
+  $t->websocket_ok('/echo')->send_ok({json => {a => [1, 2]}})->message_ok->json_message_hasnt('/b');
+  is_deeply \@args, ['ok', 1, 'has no value for JSON Pointer "/b"'], 'right result';
+  $t->json_message_hasnt('/a', 'some description');
+  is_deeply \@args, ['ok', '', 'some description'], 'right result';
+  $t->finish_ok;
+};
+
+subtest 'json_message_is' => sub {
+  $t->websocket_ok('/echo')->send_ok({json => {a => [1, 2]}})->message_ok->json_message_is('/a', [1, 2]);
+  is_deeply \@args, ['is_deeply', [1, 2], [1, 2], 'exact match for JSON Pointer "/a"'], 'right result';
+  $t->json_message_is('/a/1', 2, 'some description');
+  is_deeply \@args, ['is_deeply', 2, 2, 'some description'], 'right result';
+  $t->json_message_is({a => [1, 2]});
+  is_deeply \@args, ['is_deeply', {a => [1, 2]}, {a => [1, 2]}, 'exact match for JSON Pointer ""'], 'right result';
+  $t->finish_ok;
+};
+
+subtest 'json_message_like' => sub {
+  $t->websocket_ok('/echo')->send_ok({json => {a => 'test'}})->message_ok->json_message_like('/a', qr/es/);
+  is_deeply \@args, ['like', 'test', qr/es/, 'similar match for JSON Pointer "/a"'], 'right result';
+  $t->json_message_like('/a', qr/es/, 'some description');
+  is_deeply \@args, ['like', 'test', qr/es/, 'some description'], 'right result';
+  $t->finish_ok;
+};
+
+subtest 'json_message_unlike' => sub {
+  $t->websocket_ok('/echo')->send_ok({json => {a => 'test'}})->message_ok->json_message_unlike('/a', qr/yada/);
+  is_deeply \@args, ['unlike', 'test', qr/yada/, 'no similar match for JSON Pointer "/a"'], 'right result';
+  $t->json_message_unlike('/a', qr/yada/, 'some description');
+  is_deeply \@args, ['unlike', 'test', qr/yada/, 'some description'], 'right result';
+  $t->finish_ok;
+};
+
+subtest 'finish_ok' => sub {
+  $t->websocket_ok('/echo')->finish_ok;
+  is_deeply \@args, ['ok', 1, 'closed WebSocket'], 'right result';
+};
+
+subtest 'finished_ok' => sub {
+  $t->websocket_ok('/close')->finished_ok(4000);
+  is_deeply \@args, ['ok', 1, 'WebSocket closed with status 4000'], 'right result';
 };
 
 subtest 'SSE' => sub {
@@ -356,6 +552,29 @@ subtest 'SSE' => sub {
     is_deeply \@args, ['unlike', 'One', qr/Two/, 'some description'], 'right result';
     $t->sse_finish_ok;
   };
+};
+
+subtest 'Descriptions' => sub {
+  $t->get_ok('/')->status_is(200, 'ä');
+  is_deeply \@args, ['is', 200, 200, "\xc3\xa4"], 'description is encoded';
+};
+
+subtest 'reset_session' => sub {
+  $t->get_ok('/html');
+  ok $t->tx,                     'has transaction';
+  ok @{$t->ua->cookie_jar->all}, 'has cookies';
+  is $t->reset_session, $t,    'returns itself';
+  is $t->tx,            undef, 'no transaction';
+  is_deeply $t->ua->cookie_jar->all, [], 'no cookies';
+};
+
+subtest 'new' => sub {
+  is(Test::Mojo->new->app,      app, 'default application');
+  is(Test::Mojo->new(app)->app, app, 'same application');
+  my $t2 = Test::Mojo->new(app, {test => 23});
+  is $t2->app,                            app, 'same application';
+  is $t2->app->config->{test},            23,  'right value';
+  is $t2->app->config->{config_override}, 1,   'right value';
 };
 
 done_testing();

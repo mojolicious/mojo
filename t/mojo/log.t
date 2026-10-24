@@ -280,4 +280,18 @@ subtest 'Context' => sub {
   like $buffer,   qr/\[.*\] \[fatal\] \[123\] Mojolicious rocks\n/, 'right fatal message';
 };
 
+subtest 'Nested context' => sub {
+  my $path   = $dir->child('nested.log');
+  my $log    = Mojo::Log->new(path => $path);
+  my $buffer = '';
+  {
+    open my $handle, '>', \$buffer;
+    local *STDERR = $handle;
+    $log->context('[123]')->context('[456]')->error('Grandchild');
+  }
+  undef $log;
+  is $buffer, '', 'nothing on STDERR';
+  like decode('UTF-8', path($path)->slurp), qr/\[.*\] \[error\] \[456\] Grandchild\n/, 'right error message';
+};
+
 done_testing();

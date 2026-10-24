@@ -69,7 +69,7 @@ sub capture {
 
 sub context {
   my ($self, @context) = @_;
-  return $self->new(parent => $self, context => \@context, level => $self->level);
+  return $self->new(parent => $self->{parent} || $self, context => \@context, level => $self->level);
 }
 
 sub debug { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }

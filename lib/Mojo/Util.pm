@@ -230,7 +230,7 @@ sub gunzip {
 }
 
 sub gzip {
-  my $uncompressed = shift;
+  my $uncompressed = "" . shift;
   IO::Compress::Gzip::gzip \$uncompressed, \my $compressed or croak "Couldn't gzip: $IO::Compress::Gzip::GzipError";
   return $compressed;
 }

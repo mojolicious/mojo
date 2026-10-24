@@ -658,7 +658,8 @@ subtest 'gzip/gunzip' => sub {
   isnt $compressed, $uncompressed, 'string changed';
   ok length $compressed < length $uncompressed, 'string is shorter';
   my $result = gunzip $compressed;
-  is $result, $uncompressed, 'same string';
+  is $result,                        $uncompressed, 'same string';
+  is gunzip(gzip(b($uncompressed))), $uncompressed, 'same string';
 };
 
 subtest 'scope_guard' => sub {

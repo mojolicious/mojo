@@ -80,8 +80,9 @@ sub _build_tx {
   $tx->res->headers->server('Mojolicious (Perl)');
   my $handle = $self->ioloop->stream($id)->timeout($self->inactivity_timeout)->handle;
   unless ($handle->isa('IO::Socket::UNIX')) {
-    $tx->local_address($handle->sockhost)->local_port($handle->sockport);
-    $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+    my $addr = $c->{addr} //= [$handle->sockhost, $handle->sockport, $handle->peerhost, $handle->peerport];
+    $tx->local_address($addr->[0])->local_port($addr->[1]);
+    $tx->remote_address($addr->[2])->remote_port($addr->[3]);
   }
   $tx->req->url->base->scheme('https') if $c->{tls};
 

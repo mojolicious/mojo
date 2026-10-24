@@ -72,8 +72,11 @@ sub _body {
   # Delayed
   $self->{writing} = 0 unless defined $buffer;
 
-  # Finished
-  $finish ? $self->completed : ($self->{writing} = 0) if defined $buffer && !length $buffer;
+  # Finished (static content does not need an extra round trip for the empty chunk)
+  if (defined $buffer && (!length $buffer || (!$msg->content->is_dynamic && $self->{offset} >= $msg->body_size))) {
+    $msg->finish;
+    $finish ? $self->completed : ($self->{writing} = 0);
+  }
 
   return $buffer // '';
 }

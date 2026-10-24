@@ -4,7 +4,8 @@
   - Improved Mojo::Server::Daemon performance by up to 27% for keep-alive requests, by finishing static responses
     without an extra write cycle and caching socket addresses per connection.
   - Improved header parsing performance in Mojo::Headers by up to 2x.
-  - Improved route matching performance in Mojolicious::Routes::Match by up to 20% for applications with many routes.
+  - Improved route matching performance in Mojolicious::Routes by up to 8x for real world applications, routes are now
+    indexed by the text their patterns start with, so the cost no longer grows with the number of routes.
   - Improved encode and decode performance in Mojo::Util by up to 3x for ASCII strings, which speeds up parameter
     parsing by up to 35%.
   - Improved url_for performance in Mojolicious::Controller by up to 15%.

@@ -1025,4 +1025,64 @@ subtest 'Unknown placeholder type (matches nothing)' => sub {
   is_deeply $m->stack, [], 'empty stack';
 };
 
+subtest 'Routes with overlapping text prefixes' => sub {
+  $r = Mojolicious::Routes->new;
+  $r->get('/res1')->to(n => 1);
+  $r->get('/res10/:id')->to(n => 10);
+  $r->under('/res')->get('/nested/:id')->to(n => 'nested');
+  $r->get('/:any')->to(n => 'any');
+  my $c = Mojolicious::Controller->new;
+  my $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/res10/23'});
+  is_deeply $m->stack, [{n => 10, id => 23}], 'right structure';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/res1'});
+  is_deeply $m->stack, [{n => 1}], 'right structure';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/res/nested/5'});
+  is_deeply $m->stack, [{}, {n => 'nested', id => 5}], 'right structure';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/re'});
+  is_deeply $m->stack, [{n => 'any', any => 're'}], 'right structure';
+};
+
+subtest 'Routes changed after matching' => sub {
+  $r = Mojolicious::Routes->new;
+  my $bridge = $r->under('/')->to(n => 'bridge');
+  my $nested = $bridge->any('/')->to(n => 'nested');
+  $nested->get('/a')->to(n => 'a');
+  my $c = Mojolicious::Controller->new;
+  my $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/a'});
+  is_deeply $m->stack, [{n => 'bridge'}, {n => 'a'}], 'right structure';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/b'});
+  is_deeply $m->stack, [], 'empty stack';
+
+  my $b = $nested->get('/b')->to(n => 'b');
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/b'});
+  is_deeply $m->stack, [{n => 'bridge'}, {n => 'b'}], 'right structure';
+
+  $b->remove;
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/b'});
+  is_deeply $m->stack, [], 'empty stack';
+};
+
+subtest 'Custom regex' => sub {
+  $r = Mojolicious::Routes->new;
+  $r->get('/foo')->to(n => 'foo')->pattern->regex(qr!^/foo!i);
+  my $api = $r->any->to(n => 'api');
+  $api->pattern->regex(qr!^/api!p);
+  $api->get('/users')->to(n => 'users');
+  my $c = Mojolicious::Controller->new;
+  my $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/FOO'});
+  is_deeply $m->stack, [{n => 'foo'}], 'right structure';
+  $m = Mojolicious::Routes::Match->new(root => $r);
+  $m->find($c => {method => 'GET', path => '/api/users'});
+  is_deeply $m->stack, [{n => 'users'}], 'right structure';
+};
+
 done_testing();

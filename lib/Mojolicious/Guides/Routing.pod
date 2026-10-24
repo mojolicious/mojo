@@ -179,8 +179,10 @@ everywhere (even at runtime).
   1;
 
 All routes match in the same order in which they were defined, and matching stops as soon as a suitable route has been
-found. So you can improve the routing performance by declaring your most frequently accessed routes first. A routing
-cache will also be used automatically to handle sudden traffic spikes more gracefully.
+found. Routes are indexed by the text their patterns start with, so routes that cannot match a path are skipped right
+away, and the routing performance stays the same even for applications with many routes. Only routes starting with a
+placeholder, like C</:name>, always have to be tried. A routing cache will also be used automatically to handle sudden
+traffic spikes more gracefully.
 
 =head2 Routing destination
 
@@ -281,9 +283,6 @@ The stash is simply inherited from route to route and newer values override old 
   $cats->get('/')->to(action => 'index');
   $cats->get('/nyan')->to(action => 'nyan');
   $cats->get('/lol');
-
-With a few common prefixes you can also greatly improve the routing performance of applications with many routes,
-because children are only tried if the prefix matched first.
 
 =head2 Special stash values
 

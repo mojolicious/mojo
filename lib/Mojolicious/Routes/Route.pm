@@ -31,6 +31,7 @@ sub BUILD_DYNAMIC {
 
 sub add_child {
   my ($self, $route) = @_;
+  _invalidate($self);
   push @{$self->children}, $route->remove->parent($self);
   $route->pattern->types($self->root->types);
   return $self;
@@ -90,6 +91,7 @@ sub query { shift->_generate_route(QUERY => @_) }
 sub remove {
   my $self = shift;
   return $self unless my $parent = $self->parent;
+  _invalidate($parent);
   @{$parent->children} = grep { $_ ne $self } @{$parent->children};
   return $self->parent(undef);
 }
@@ -199,6 +201,56 @@ sub _generate_route {
   $methods eq 'under' ? $route->inline(1) : $route->methods($methods);
 
   return defined $name ? $route->name($name) : $route;
+}
+
+sub _candidates {
+  my ($self, $path) = @_;
+
+  # Index children by the text their patterns start with (routes are frozen after the first request)
+  my $children = $self->children;
+  return $children unless @$children;
+  my $index = $self->{prefixes};
+  unless ($index) {
+    $index = $self->{prefixes} = {any => [], text => {}};
+    for my $i (0 .. $#$children) {
+      if (my $prefixes = $children->[$i]->_prefixes) { push @{$index->{text}{length $_}{$_}}, $i for @$prefixes }
+      else                                           { push @{$index->{any}}, $i }
+    }
+  }
+
+  # Children that could match the path, in their original order
+  my $text = $index->{text};
+  return $children unless %$text;
+  my %i = map { $_ => 1 } @{$index->{any}};
+  for my $len (keys %$text) {
+    if (my $hit = $text->{$len}{substr $path, 0, $len}) { $i{$_} = 1 for @$hit }
+  }
+  return [@$children[sort { $a <=> $b } keys %i]];
+}
+
+sub _invalidate {
+  for (my $route = shift; $route; $route = $route->parent) { delete $route->{prefixes} }
+}
+
+# Text one of the paths matched by this route has to start with (undef if it could be anything)
+sub _prefixes {
+  my $self = shift;
+
+  # Custom regexes and pattern classes could match anything
+  my $pattern = $self->pattern;
+  my $regex   = $pattern->regex;
+  return undef if ref $pattern ne 'Mojolicious::Routes::Pattern' || ($regex && $regex != ($pattern->{compiled} // 0));
+  if (my $first = $pattern->tree->[0]) { return $first->[0] eq 'text' ? [$first->[1]] : undef }
+
+  # Routes with an empty pattern pass the path on to their children
+  my $children = $self->children;
+  return undef if $self->partial || !@$children;
+  my @prefixes;
+  for my $child (@$children) {
+    return undef unless my $prefixes = $child->_prefixes;
+    push @prefixes, @$prefixes;
+  }
+  return \@prefixes;
 }
 
 sub _index {

@@ -127,7 +127,7 @@ sub _compile {
   # Format
   $regex .= _compile_format($constraints->{format}, exists $defaults->{format}) if $detect;
 
-  $self->regex(qr/^$regex/ps);
+  $self->{compiled} = $self->regex(qr/^$regex/ps)->regex;
 }
 
 sub _compile_format {

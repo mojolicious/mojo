@@ -317,6 +317,17 @@ sub _select {
   my $tree = $scope;
   ($group, $tree) = (_absolutize($group), _root($scope)) if grep { _is_scoped($_) } @$group;
 
+  # Without combinators the first match in document order can be returned right away
+  if ($one && !grep { @$_ != 1 || !ref $_->[0] } @$group) {
+    my @queue = @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
+    while (my $current = shift @queue) {
+      next unless $current->[0] eq 'tag';
+      return $current if grep { _selector($_->[0], $current, $tree, $scope) } @$group;
+      unshift @queue, @$current[4 .. $#$current];
+    }
+    return undef;
+  }
+
   # Pool includes $tree so ":scope" can match it, but results exclude it
   my $tags  = _all_tags($tree);
   my %match = map { $_ => 1 } @{_evaluate($group, $tree, $scope, [$tree, @$tags])};

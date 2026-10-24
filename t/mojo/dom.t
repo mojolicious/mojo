@@ -3308,6 +3308,15 @@ subtest 'Descendant combinator chain with non-matching selector' => sub {
   is $exists->at('#x * * * *')->text, 'ok', 'matching id still resolves descendants';
 };
 
+subtest 'First match without combinators' => sub {
+  my $dom = Mojo::DOM->new('<div><p id="a">A</p><span><b class="x">B</b></span></div><p class="x">C</p>');
+  is $dom->at('b, p')->text,               'A',   'first match in document order';
+  is $dom->at('.x')->text,                 'B',   'nested match comes first';
+  is $dom->at('span')->at('b.x, p')->text, 'B',   'only matches inside the element';
+  is $dom->at('div')->at('p.x'),           undef, 'no match inside the element';
+  is $dom->at('i'),                        undef, 'no match';
+};
+
 subtest 'Unknown CSS selector' => sub {
   my $dom = Mojo::DOM->new('<html><head></head><body><div><div>x</div></div></body></html>');
   eval { $dom->at('div[') };

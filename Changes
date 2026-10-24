@@ -1,5 +1,6 @@
 
 9.53  UNRELEASED
+  - Improved at performance in Mojo::DOM for selectors without combinators, it now stops at the first match.
 
 9.52  2026-10-24
   - Improved multipart/form-data performance in Mojo::Message.

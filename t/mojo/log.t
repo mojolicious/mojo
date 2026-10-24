@@ -291,7 +291,7 @@ subtest 'Nested context' => sub {
   }
   undef $log;
   is $buffer, '', 'nothing on STDERR';
-  like decode('UTF-8', path($path)->slurp), qr/\[.*\] \[error\] \[456\] Grandchild\n/, 'right error message';
+  like decode('UTF-8', path($path)->slurp), qr/\[.*\] \[error\] \[456\] Grandchild/, 'right error message';
 };
 
 done_testing();

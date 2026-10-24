@@ -38,56 +38,60 @@ get '/logout' => sub {
   $c->redirect_to('login');
 };
 
-# Use HTTPS
 my $t = Test::Mojo->new;
 $t->ua->max_redirects(5);
-$t->reset_session->ua->server->url('https');
 
-# Login
-$t->get_ok('/login?name=sri' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome sri!');
-ok $t->tx->res->cookie('mojolicious')->expires, 'session cookie expires';
-ok $t->tx->res->cookie('mojolicious')->secure,  'session cookie is secure';
+subtest 'HTTPS' => sub {
+  $t->reset_session->ua->server->url('https');
 
-# Return
-$t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back sri!');
+  # Login
+  $t->get_ok('/login?name=sri' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome sri!');
+  ok $t->tx->res->cookie('mojolicious')->expires, 'session cookie expires';
+  ok $t->tx->res->cookie('mojolicious')->secure,  'session cookie is secure';
 
-# Logout
-$t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
+  # Return
+  $t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back sri!');
 
-# Expired session
-$t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back anonymous!');
+  # Logout
+  $t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
 
-# No session
-$t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
+  # Expired session
+  $t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back anonymous!');
 
-# Use HTTP
-$t->reset_session->ua->server->url('http');
+  # No session
+  $t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
+};
 
-# Login again
-$t->reset_session->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
+subtest 'HTTP' => sub {
+  $t->reset_session->ua->server->url('http');
 
-# Return
-$t->get_ok('/again')->status_is(200)->content_is('Welcome back anonymous!');
+  # Login again
+  $t->reset_session->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
 
-# Use HTTPS again (without expiration)
-$t->reset_session->ua->server->url('https');
-app->sessions->default_expiration(0);
+  # Return
+  $t->get_ok('/again')->status_is(200)->content_is('Welcome back anonymous!');
+};
 
-# Login again
-$t->get_ok('/login?name=sri' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome sri!');
-ok !$t->tx->res->cookie('mojolicious')->expires, 'session cookie does not expire';
-ok $t->tx->res->cookie('mojolicious')->secure,   'session cookie is secure';
+subtest 'HTTPS again (without expiration)' => sub {
+  $t->reset_session->ua->server->url('https');
+  app->sessions->default_expiration(0);
 
-# Return
-$t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back sri!');
+  # Login again
+  $t->get_ok('/login?name=sri' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome sri!');
+  ok !$t->tx->res->cookie('mojolicious')->expires, 'session cookie does not expire';
+  ok $t->tx->res->cookie('mojolicious')->secure,   'session cookie is secure';
 
-# Logout
-$t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
+  # Return
+  $t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back sri!');
 
-# Expired session
-$t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back anonymous!');
+  # Logout
+  $t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
 
-# No session
-$t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
+  # Expired session
+  $t->get_ok('/again' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome back anonymous!');
+
+  # No session
+  $t->get_ok('/logout' => {'X-Forwarded-Proto' => 'https'})->status_is(200)->content_is('Welcome anonymous!');
+};
 
 done_testing();

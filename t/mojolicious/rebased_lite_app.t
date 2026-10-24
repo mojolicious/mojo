@@ -38,8 +38,8 @@ get '/baz' => sub { shift->render('root') };
 
 my $t = Test::Mojo->new;
 
-# Rebased root
-$t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')->content_is(<<'EOF');
+subtest 'Rebased root' => sub {
+  $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')->content_is(<<'EOF');
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png">
@@ -52,9 +52,10 @@ http://example.com/
 root
   Welcome to the root!
 EOF
+};
 
-# Rebased route
-$t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')->content_is(<<EOF);
+subtest 'Rebased route' => sub {
+  $t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')->content_is(<<EOF);
 http://example.com/rebased/
 <link href="/rebased/b.css" media="test" rel="stylesheet">
 <img alt="Test" src="/rebased/images/test.png">
@@ -64,14 +65,16 @@ http://example.com/rebased
 http://example.com/
 foo
 EOF
+};
 
-# Rebased route with flash
-ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0], 'no session cookie';
-$t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')->header_is(Location => '/rebased/foo');
-ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0], 'session cookie';
+subtest 'Rebased route with flash' => sub {
+  ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0], 'no session cookie';
+  $t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')->header_is(Location => '/rebased/foo');
+  ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo'))->[0], 'session cookie';
+};
 
-# Rebased route with message from flash
-$t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
+subtest 'Rebased route with message from flash' => sub {
+  $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
 http://example.com/rebased/works!too!
 <link href="/rebased/b.css" media="test" rel="stylesheet">
 <img alt="Test" src="/rebased/images/test.png">
@@ -81,9 +84,10 @@ http://example.com/rebased
 http://example.com/
 foo
 EOF
+};
 
-# Rebased route sharing a template
-$t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')->content_is(<<'EOF');
+subtest 'Rebased route sharing a template' => sub {
+  $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')->content_is(<<'EOF');
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png">
@@ -95,9 +99,11 @@ http://example.com/rebased/foo
 http://example.com/
 baz
 EOF
+};
 
-# Does not exist
-$t->get_ok('/yada')->status_is(404)->header_is('X-Route' => '');
+subtest 'Does not exist' => sub {
+  $t->get_ok('/yada')->status_is(404)->header_is('X-Route' => '');
+};
 
 done_testing();
 

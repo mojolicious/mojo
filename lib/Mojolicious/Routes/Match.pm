@@ -33,11 +33,13 @@ sub path_for {
 sub _match {
   my ($self, $r, $c, $options) = @_;
 
-  # Pattern
+  # Pattern (format detection is only relevant for compiling the regex)
   my $path    = $options->{path};
-  my $partial = $r->partial;
-  my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
-  return undef unless my $captures = $r->pattern->match_partial(\$path, $detect);
+  my $pattern = $r->pattern;
+  my $detect  = !$pattern->regex && $r->is_endpoint && !$r->partial;
+  return undef unless my $captures = $pattern->match_partial(\$path, $detect);
+  my $partial  = $r->partial;
+  my $endpoint = $r->is_endpoint;
   local $options->{path} = $path;
   local @{$self->{captures} //= {}}{keys %$captures} = values %$captures;
   $captures = $self->{captures};
@@ -80,8 +82,8 @@ sub _match {
   # Match children
   my $snapshot = $r->parent ? [@{$self->stack}] : [];
   for my $child (@{$r->children}) {
-    return 1 if $self->_match($child, $c, $options);
-    $self->stack([@$snapshot]);
+    return 1                   if $self->_match($child, $c, $options);
+    $self->stack([@$snapshot]) if @{$self->stack} != @$snapshot;         # Children can only add to the stack
   }
 }
 

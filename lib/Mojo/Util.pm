@@ -173,6 +173,7 @@ sub decrypt_cookie {
 
 sub decode {
   my ($encoding, $bytes) = @_;
+  return "$bytes" if $encoding eq 'UTF-8' && $bytes !~ /[^\x00-\x7f]/;    # ASCII is valid UTF-8
   return undef unless eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
   return $bytes;
 }
@@ -184,7 +185,11 @@ sub deprecated {
 
 sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump }
 
-sub encode { _encoding($_[0])->encode("$_[1]", 0) }
+sub encode {
+  return _encoding($_[0])->encode("$_[1]", 0) unless $_[0] eq 'UTF-8' && $_[1] !~ /[^\x00-\x7f]/;
+  utf8::downgrade(my $bytes = "$_[1]");    # ASCII stays the same in UTF-8
+  return $bytes;
+}
 
 sub encrypt_cookie {
   my ($value, $key, $salt) = @_;

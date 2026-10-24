@@ -518,7 +518,12 @@ return value of the called handler.
   $promise = $promise->timer(5);
 
 Create a new L<Mojo::Promise> object with a timer or attach a timer to an existing promise. The promise will be
-resolved after the given amount of time in seconds with or without a value.
+resolved after the given amount of time in seconds with or without a value, unless it has already been settled. Note
+that this does not delay the resolution of an existing promise, to add a delay to a promise chain you have to return a
+new timer promise instead.
+
+  # Wait 5 seconds between two steps
+  $promise->then(sub { Mojo::Promise->timer(5) })->then(sub { say 'Five seconds later' });
 
 =head2 timeout
 
@@ -527,7 +532,8 @@ resolved after the given amount of time in seconds with or without a value.
   $promise = $promise->timeout(5);
 
 Create a new L<Mojo::Promise> object with a timeout or attach a timeout to an existing promise. The promise will be
-rejected after the given amount of time in seconds with a reason, which defaults to C<Promise timeout>.
+rejected after the given amount of time in seconds with a reason, which defaults to C<Promise timeout>, unless it has
+already been settled.
 
 =head2 wait
 

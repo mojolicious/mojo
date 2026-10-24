@@ -345,6 +345,39 @@ subtest 'Single-accept and connection limit' => sub {
   ok !$accepting[1], 'connection limit reached';
 };
 
+subtest 'Destroy daemon while writing' => sub {
+  my $loop = Mojo::IOLoop->new;
+  my $app  = Mojolicious->new;
+  $app->log->level('fatal');
+  my $daemon;
+  $app->routes->get(
+    '/' => sub {
+      my $c = shift;
+      $c->render(text => 'x' x 1_000_000);
+      undef $daemon;
+    }
+  );
+  $daemon = Mojo::Server::Daemon->new(app => $app, ioloop => $loop, listen => ['http://127.0.0.1'], silent => 1)->start;
+  my $port = $loop->acceptor($daemon->acceptors->[0])->port;
+
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, @_ };
+  my ($closed, $timeout);
+  $loop->client(
+    {port => $port} => sub {
+      my ($loop, $err, $stream) = @_;
+      $stream->on(close => sub { $closed++; $loop->stop });
+      $stream->on(read  => sub { });
+      $stream->write("GET / HTTP/1.1\x0d\x0aConnection: close\x0d\x0a\x0d\x0a");
+    }
+  );
+  $loop->timer(5 => sub { $timeout++; shift->stop });
+  $loop->start;
+  ok $closed,   'connection has been closed';
+  ok !$timeout, 'no timeout';
+  is_deeply [grep {/I\/O watcher failed/} @warnings], [], 'no exceptions';
+};
+
 subtest 'Request limit' => sub {
   my $daemon = Mojo::Server::Daemon->new(app => $app, listen => ['http://127.0.0.1'], silent => 1)->start;
   my $port   = $daemon->ports->[0];

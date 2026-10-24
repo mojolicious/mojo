@@ -7,6 +7,8 @@
   - Fixed a bug in Mojo::Util where html_unescape did not replace numeric character references to NUL, surrogates and
     code points beyond Unicode with U+FFFD, and did not remap the C1 control range through windows-1252, as required
     by the WHATWG HTML standard.
+  - Fixed a bug in Mojo::Server::Daemon where destroying the server while a response was being written could cause
+    an exception.
 
 9.51  2026-10-19
   - Fixed a bug in Mojo::DOM where CDATA sections, processing instructions and DOCTYPE declarations did not end at the

@@ -18,30 +18,19 @@ my $ATTR_RE = qr/
   )?
   \s*
 /x;
-my $TOKEN_RE = qr/
-  ([^<]+)?                                                                     # Text
-  (?:
-    <(?:
-      !(?:
-        DOCTYPE(
-        \s+\w+                                                                 # Doctype
-        (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?                            # External ID
-        (?:\s+\[.+?\])?                                                        # Int Subset
-        \s*)
-      |
-        --(.*?)(?:--!?|(?<=<!--)-?(?=>))                                      # Comment
-      |
-        \[CDATA\[(.*?)\]\]                                                     # CDATA
-      )
-    |
-      \?(.*?)\?                                                                # Processing Instruction
-    |
-      ((?:\/\s*)?[^<>\s\/0-9.\-][^<>\s\/]*\s*(?:(?:$ATTR_RE){0,32766})*+)      # Tag
-    )>
-  |
-    (<)                                                                        # Runaway "<"
-  )??
-/xis;
+my %MARKUP = (
+  doctype => qr/
+    \G<!DOCTYPE(
+    \s+\w+                                        # Doctype
+    (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
+    (?:\s+\[.+?\])?                               # Int Subset
+    \s*)>
+  /xis,
+  comment => qr/\G<!--(.*?)(?:--!?|(?<=<!--)-?(?=>))>/s,
+  cdata   => qr/\G<!\[CDATA\[(.*?)\]\]>/is,
+  pi      => qr/\G<\?(.*?)\?>/s
+);
+my $TAG_RE = qr/<(\/\s*)?([^<>\s\/0-9.\-][^<>\s\/]*)\s*/;
 
 # HTML elements that only contain raw text
 my %RAW = map { $_ => 1 } qw(script style);
@@ -106,81 +95,112 @@ sub parse {
 
   my $xml     = $self->xml;
   my $current = my $tree = ['root'];
-  while ($html =~ /\G$TOKEN_RE/gcso) {
-    my ($text, $doctype, $comment, $cdata, $pi, $tag, $runaway) = ($1, $2, $3, $4, $5, $6, $11);
+  my %unclosed;
+  while ((my $offset = pos($html) // 0) < length $html) {
 
-    # DOCTYPE, CDATA (outside of foreign content) and processing instructions end at the first ">" in HTML
-    if (!$xml && (my $i = index $doctype // $cdata // $pi // '', '>') >= 0 && !(defined $cdata && _foreign($current))) {
-      pos($html) = $-[defined $doctype ? 2 : defined $cdata ? 4 : 5] + $i + 1;
-      defined && ($_ = substr $_, 0, $i) for $doctype, $cdata, $pi;
+    # Text
+    if ($html =~ /\G([^<]+)/gc) {
+      _node($current, 'text', html_unescape $1);
+      next;
     }
 
-    # Text (and runaway "<")
-    $text .= '<'                                 if defined $runaway;
-    _node($current, 'text', html_unescape $text) if defined $text;
+    # DOCTYPE, comment, CDATA and processing instruction (only trying the regex for the opener keeps failures fast)
+    my $next = substr $html, $offset + 1, 1;
+    if ($next eq '!' || $next eq '?') {
+      my $opener = uc substr $html, $offset, 9;
+      my $type
+        = substr($opener, 0, 4) eq '<!--' ? 'comment'
+        : $opener eq '<!DOCTYPE'          ? 'doctype'
+        : $opener eq '<![CDATA['          ? 'cdata'
+        : $next eq '?'                    ? 'pi'
+        :                                   undef;
 
-    # Tag
-    if (defined $tag) {
+      if ($type && !$unclosed{$type}) {
+        if ($html =~ /$MARKUP{$type}/gc) {
+          my $value = $1;
 
-      # End
-      if ($tag =~ /^\/\s*([^\s\/]+)/) {
-        my $end = $xml ? $1 : lc $1;
+          # DOCTYPE, CDATA (outside of foreign content) and processing instructions end at the first ">" in HTML
+          my $i = $xml || $type eq 'comment' ? -1 : index $value, '>';
+          if ($i >= 0 && !($type eq 'cdata' && _foreign($current))) {
+            pos($html) = $-[1] + $i + 1;
+            $value = substr $value, 0, $i;
+          }
 
-        # No more content
-        if (!$xml && (my $tags = $NO_MORE_CONTENT{$end})) { _end($_, $xml, \$current) for @$tags }
-
-        _end($end, $xml, \$current);
-      }
-
-      # Start
-      elsif ($tag =~ m!^([^\s/]+)([\s\S]*)!) {
-        my ($start, $attr) = ($xml ? $1 : lc $1, $2);
-
-        # Attributes
-        my (%attrs, $closing);
-        while ($attr =~ /$ATTR_RE/go) {
-          my ($key, $value) = ($xml ? $1 : lc $1, $3 // $4);
-
-          # Empty tag
-          ++$closing and next if $key eq '/';
-
-          $attrs{$key} = defined $value ? html_attr_unescape $value : $value;
-        }
-
-        # "image" is an alias for "img"
-        $start = 'img' if !$xml && $start eq 'image';
-        _start($start, \%attrs, $xml, \$current);
-
-        # Element without end tag (self-closing)
-        _end($start, $xml, \$current) if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
-
-        # Raw text elements (not in foreign content)
-        next if $xml || !$RAW{$start} && !$RCDATA{$start} || _foreign($current->[3]);
-
-        if ($start eq 'script') {
-          my ($script, $found_end) = _script_content(\$html);
-          _node($current, 'raw', $script) if length $script;
-          _end($start, 0, \$current)      if $found_end;
+          _node($current, $type, $value);
           next;
         }
 
-        next unless $html =~ m!\G(.*?)</\Q$start\E(?=[\s/>])[^>]*>?!gcsi;
-        _node($current, $RCDATA{$start} ? ('text', html_unescape $1) : ('raw', $1));
-        _end($start, 0, \$current);
+        # Without an end for this one, there is none for later ones either (DOCTYPE can fail for other reasons)
+        $unclosed{$type} = 1 unless $type eq 'doctype';
       }
     }
 
-    # DOCTYPE
-    elsif (defined $doctype) { _node($current, 'doctype', $doctype) }
+    # Tag
+    if ($html =~ /\G$TAG_RE/gco) {
+      my ($is_end, $tag) = (defined $1, $xml ? $2 : lc $2);
 
-    # Comment
-    elsif (defined $comment) { _node($current, 'comment', $comment) }
+      # Stray "=" right after the tag name (like an empty attribute name)
+      $html =~ /\G=\s*/gc;
 
-    # CDATA
-    elsif (defined $cdata) { _node($current, 'cdata', $cdata) }
+      # Attributes
+      my (%attrs, $closing);
+      while ($html =~ /\G$ATTR_RE/gco) {
+        my ($key, $value) = ($xml ? $1 : lc $1, $3 // $4);
 
-    # Processing instruction
-    elsif (defined $pi) { _node($current, 'pi', $pi) }
+        # Empty tag
+        ++$closing and next if $key eq '/';
+
+        $attrs{$key} = defined $value ? html_attr_unescape $value : $value;
+      }
+
+      # Incomplete tag
+      if ($html !~ /\G>/gc) { pos($html) = $offset }
+
+      # End
+      elsif ($is_end) {
+
+        # No more content
+        if (!$xml && (my $tags = $NO_MORE_CONTENT{$tag})) { _end($_, $xml, \$current) for @$tags }
+
+        _end($tag, $xml, \$current);
+        next;
+      }
+
+      # Start
+      else {
+
+        # "image" is an alias for "img"
+        $tag = 'img' if !$xml && $tag eq 'image';
+        _start($tag, \%attrs, $xml, \$current);
+
+        # Element without end tag (self-closing)
+        _end($tag, $xml, \$current) if !$xml && $EMPTY{$tag} || ($xml || !$BLOCK{$tag}) && $closing;
+
+        # Raw text elements (not in foreign content)
+        next if $xml || !$RAW{$tag} && !$RCDATA{$tag} || _foreign($current->[3]);
+
+        if ($tag eq 'script') {
+          my ($script, $found_end) = _script_content(\$html);
+          _node($current, 'raw', $script) if length $script;
+          _end($tag, 0, \$current)        if $found_end;
+          next;
+        }
+
+        # Without an end tag for this element, there is none for later elements of the same type either
+        next if $unclosed{$tag};
+        unless ($html =~ m!\G(.*?)</\Q$tag\E(?=[\s/>])[^>]*>?!gcsi) {
+          $unclosed{$tag} = 1;
+          next;
+        }
+        _node($current, $RCDATA{$tag} ? ('text', html_unescape $1) : ('raw', $1));
+        _end($tag, 0, \$current);
+        next;
+      }
+    }
+
+    # Runaway "<"
+    _node($current, 'text', '<');
+    pos($html) = $offset + 1;
   }
 
   return $self->tree($tree);

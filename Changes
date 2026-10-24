@@ -1,6 +1,9 @@
 
 9.53  UNRELEASED
   - Improved at performance in Mojo::DOM for selectors without combinators, it now stops at the first match.
+  - Improved HTML/XML parsing performance in Mojo::DOM by up to 35%, the tokenizer now matches attributes only once.
+  - Fixed a bug in Mojo::DOM where many unclosed comments, CDATA sections, processing instructions or RCDATA elements
+    could make parsing extremely slow.
 
 9.52  2026-10-24
   - Improved multipart/form-data performance in Mojo::Message.

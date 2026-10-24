@@ -129,11 +129,13 @@ sub parse {
   my $headers = $self->{cache} //= [];
   my $size    = $self->max_line_size;
   my $lines   = $self->max_lines;
-  while ($self->{buffer} =~ s/^(.*?)\x0d?\x0a//) {
-    my $line = $1;
+  while ((my $len = index($self->{buffer}, "\x0a") + 1) > 0) {
+    my $line = substr $self->{buffer}, 0, $len, '';
+    chop $line;
+    chop $line if substr($line, -1) eq "\x0d";
 
     # Check line size limit
-    if ($+[0] > $size || @$headers >= $lines) {
+    if ($len > $size || @$headers >= $lines) {
       @$self{qw(state limit)} = ('finished', 1);
       return $self;
     }

@@ -46,7 +46,7 @@ sub body_params {
 
   # "multipart/form-data"
   elsif ($type =~ m!multipart/form-data!i) {
-    $params->append(@$_[0, 1]) for @{$self->_parse_formdata};
+    $params->append(@$_) for @{$self->_formdata->{params}};
   }
 
   return $params;
@@ -195,22 +195,7 @@ sub to_string {
 
 sub upload { shift->_cache('uploads', 0, @_) }
 
-sub uploads {
-  my $self = shift;
-
-  my @uploads;
-  for my $data (@{$self->_parse_formdata(1)}) {
-    my $upload = Mojo::Upload->new(
-      name     => $data->[0],
-      filename => $data->[2],
-      asset    => $data->[1]->asset,
-      headers  => $data->[1]->headers
-    );
-    push @uploads, $upload;
-  }
-
-  return \@uploads;
-}
+sub uploads { [@{shift->_formdata->{uploads}}] }
 
 sub _build {
   my ($self, $method) = @_;
@@ -246,12 +231,13 @@ sub _cache {
 
 sub _limit { ++$_[0]{limit} and return $_[0]->error({message => $_[1]}) }
 
-sub _parse_formdata {
-  my ($self, $upload) = @_;
+sub _formdata {
+  my $self = shift;
 
-  my @formdata;
-  my $content = $self->content;
-  return \@formdata unless $content->is_multipart;
+  return $self->{formdata} if $self->{formdata};
+  my $formdata = $self->{formdata} = {params => [], uploads => []};
+  my $content  = $self->content;
+  return $formdata unless $content->is_multipart;
   my $charset = $content->charset || $self->default_charset;
 
   # Check all parts recursively
@@ -265,21 +251,29 @@ sub _parse_formdata {
 
     next unless my $disposition = $part->headers->content_disposition;
     my ($filename) = $disposition =~ /[; ]filename="((?:\\"|[^"])*)"/;
-    next if $upload && !defined $filename || !$upload && defined $filename;
-    my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
+    my ($name)     = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
     next if !defined $name;
-    $part = $part->asset->slurp unless $upload;
 
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;
-      $part     = decode($charset, $part)     // $part unless $upload;
     }
 
-    push @formdata, [$name, $part, $filename];
+    # Upload
+    if (defined $filename) {
+      push @{$formdata->{uploads}},
+        Mojo::Upload->new(name => $name, filename => $filename, asset => $part->asset, headers => $part->headers);
+    }
+
+    # Parameter
+    else {
+      my $value = $part->asset->slurp;
+      $value = decode($charset, $value) // $value if $charset;
+      push @{$formdata->{params}}, [$name, $value];
+    }
   }
 
-  return \@formdata;
+  return $formdata;
 }
 
 1;

@@ -1,5 +1,6 @@
 
 9.52  UNRELEASED
+  - Improved multipart/form-data performance in Mojo::Message.
   - Fixed a bug in Mojo::Util where gzip did not accept Mojo::ByteStream objects, causing compressed responses
     rendered from them to fail.
   - Fixed a bug in Mojo::Log where messages from nested contexts were not written to the log file.

@@ -1037,6 +1037,26 @@ subtest 'Parse HTTP 1.1 multipart request with missing name' => sub {
   is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';
 };
 
+subtest 'Parse HTTP 1.1 multipart request (cached form data)' => sub {
+  my $body
+    = "------------0xKhTmLbOuNdArY\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"text\"\x0d\x0a\x0d\x0avalue\x0d\x0a"
+    . "------------0xKhTmLbOuNdArY\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"upload\"; filename=\"hello.txt\"\x0d\x0a\x0d\x0aHello!\x0d\x0a"
+    . "------------0xKhTmLbOuNdArY--";
+  my $req = Mojo::Message::Request->new;
+  $req->parse("POST /upload HTTP/1.1\x0d\x0a");
+  $req->parse("Content-Type: multipart/form-data; boundary=----------0xKhTmLbOuNdArY\x0d\x0a");
+  $req->parse('Content-Length: ' . length($body) . "\x0d\x0a\x0d\x0a$body");
+  ok $req->is_finished, 'request is finished';
+  is $req->uploads->[0]->filename, 'hello.txt',        'right filename';
+  is $req->uploads->[0],           $req->uploads->[0], 'same upload object';
+  push @{$req->uploads}, 'x';
+  is scalar @{$req->uploads}, 1, 'cached uploads have not been changed';
+  is_deeply $req->body_params->pairs, ['text', 'value'], 'right parameters';
+  is $req->upload('upload')->asset->slurp, 'Hello!', 'right content';
+};
+
 subtest 'Parse full HTTP 1.1 proxy request with basic authentication' => sub {
   my $req = Mojo::Message::Request->new;
   $req->parse("GET http://127.0.0.1/foo/bar#baz HTTP/1.1\x0d\x0a");

@@ -349,7 +349,12 @@ subtest 'Destroy daemon while writing' => sub {
   my $loop = Mojo::IOLoop->new;
   my $app  = Mojolicious->new;
   $app->log->level('fatal');
-  my $daemon;
+  my ($daemon, $finished);
+  $app->hook(
+    after_build_tx => sub {
+      shift->on(finish => sub { $finished++ });
+    }
+  );
   $app->routes->get(
     '/' => sub {
       my $c = shift;
@@ -375,6 +380,7 @@ subtest 'Destroy daemon while writing' => sub {
   $loop->start;
   ok $closed,   'connection has been closed';
   ok !$timeout, 'no timeout';
+  ok $finished, 'transaction has been finished';
   is_deeply [grep {/I\/O watcher failed/} @warnings], [], 'no exceptions';
 };
 

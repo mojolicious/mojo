@@ -1,5 +1,7 @@
 
 9.54  UNRELEASED
+  - Fixed a bug in Mojo::Server::Daemon where destroying the server with active connections did not emit finish events
+    for their transactions.
 
 9.53  2026-10-25
   - Added any, delete, get, options, patch, post, put, query, under and websocket methods to Mojolicious, as shortcuts

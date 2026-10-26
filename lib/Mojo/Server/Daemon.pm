@@ -22,8 +22,8 @@ has max_requests       => 100;
 sub DESTROY {
   my $self = shift;
   return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-  my $loop = $self->ioloop;
-  $loop->remove($_) for keys %{$self->{connections} // {}}, @{$self->acceptors};
+  $self->_remove($_) for keys %{$self->{connections} // {}};
+  $self->ioloop->remove($_) for @{$self->acceptors};
 }
 
 sub ports { [map { $_[0]->ioloop->acceptor($_)->port } @{$_[0]->acceptors}] }

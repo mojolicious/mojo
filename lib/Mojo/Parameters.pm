@@ -143,6 +143,37 @@ sub to_hash {
   return \%hash;
 }
 
+sub to_deep_hash {
+  my $self = shift;
+
+  my %hash;
+  my $pairs = $self->pairs;
+  for (my $i = 0; $i < @$pairs; $i += 2) {
+    my ($name, $value) = @{$pairs}[$i, $i + 1];
+    my @parts;
+    if ($name =~ m{^([^\[\]]+)((?:\[[^\[\]]+\])+)\z}) {
+      @parts = ($1);
+      push @parts, $2 =~ /\[([^\[\]]+)\]/g;
+    }
+    else { @parts = ($name) }
+    my $target = \%hash;
+    while (@parts > 1) {
+      my $part = shift @parts;
+      $target->{$part} = {} unless ref $target->{$part} eq 'HASH';
+      $target = $target->{$part};
+    }
+
+    my $part = $parts[-1];
+    if (exists $target->{$part}) {
+      $target->{$part} = [$target->{$part}] if ref $target->{$part} ne 'ARRAY';
+      push @{$target->{$part}}, $value;
+    }
+    else { $target->{$part} = $value }
+  }
+
+  return \%hash;
+}
+
 sub to_string {
   my $self = shift;
 
@@ -334,6 +365,22 @@ Turn parameters into a hash reference. Note that this method will normalize the 
 
   # "baz"
   Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}[1];
+
+=head2 to_deep_hash
+
+  my $hash = $params->to_deep_hash;
+
+Turn bracket notation into nested hash references. Parameter names without valid, non-empty bracket segments remain
+unchanged, and repeated values at the same path are represented as arrays.
+
+  # {foo => {bar => 'baz'}}
+  Mojo::Parameters->new('foo[bar]=baz')->to_deep_hash;
+
+  # {foo => {bar => {baz => 'yada'}}}
+  Mojo::Parameters->new('foo[bar][baz]=yada')->to_deep_hash;
+
+Unlike L</"to_hash">, this method interprets bracket notation. Numeric bracket segments are hash keys, not array
+indexes.
 
 =head2 to_string
 

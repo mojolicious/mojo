@@ -8,6 +8,8 @@
     not result in a "Premature connection close" error.
   - Fixed a bug in Mojo::UserAgent where finish events for prematurely closed connections were emitted before the error
     had been set.
+  - Fixed a bug in Mojo::Message::Request where a CGI/PSGI environment with a query string or request method of "0" was
+    ignored. (ether)
 
 9.53  2026-10-25
   - Added any, delete, get, options, patch, post, put, query, under and websocket methods to Mojolicious, as shortcuts

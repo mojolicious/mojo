@@ -2,6 +2,12 @@
 9.54  UNRELEASED
   - Fixed a bug in Mojo::Server::Daemon where destroying the server with active connections did not emit finish events
     for their transactions.
+  - Fixed a bug in Mojo::UserAgent where incomplete responses were accepted as complete if the connection was closed
+    after the start-line had been received.
+  - Fixed a bug in Mojo::UserAgent where destroying the user agent during a response without Content-Length header did
+    not result in a "Premature connection close" error.
+  - Fixed a bug in Mojo::UserAgent where finish events for prematurely closed connections were emitted before the error
+    had been set.
 
 9.53  2026-10-25
   - Added any, delete, get, options, patch, post, put, query, under and websocket methods to Mojolicious, as shortcuts

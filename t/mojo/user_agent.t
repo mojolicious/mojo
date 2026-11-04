@@ -733,6 +733,79 @@ ok !$tx->error, 'no error';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
 
+subtest 'Premature connection close after start-line' => sub {
+  my ($response, $close) = (undef, 1);
+  my $id = Mojo::IOLoop->server(
+    {address => '127.0.0.1'} => sub {
+      my ($loop, $stream) = @_;
+      my $req = Mojo::Message::Request->new;
+      $stream->on(
+        read => sub {
+          my ($stream, $chunk) = @_;
+          $stream->write($response => sub { $stream->close_gracefully if $close }) if $req->parse($chunk)->is_finished;
+        }
+      );
+    }
+  );
+  my $port = Mojo::IOLoop->acceptor($id)->port;
+
+  subtest 'Content-Length not reached' => sub {
+    $response = "HTTP/1.1 200 OK\x0d\x0aContent-Length: 10\x0d\x0a\x0d\x0aHi!";
+    my $tx = $ua->build_tx(GET => "http://127.0.0.1:$port/");
+    my ($tx_error, $res_error);
+    $tx->on(finish => sub { $tx_error = shift->error });
+    $tx->res->on(finish => sub { $res_error = shift->error });
+    $tx = $ua->start($tx);
+    is $tx->error->{message}, 'Premature connection close', 'right error';
+    is $tx_error->{message},  'Premature connection close', 'error is visible in transaction finish event';
+    is $res_error->{message}, 'Premature connection close', 'error is visible in response finish event';
+    is $tx->res->code,        200,                          'right status';
+    is $tx->res->body,        'Hi!',                        'right content';
+  };
+
+  subtest 'Chunked without last chunk' => sub {
+    $response = "HTTP/1.1 200 OK\x0d\x0aTransfer-Encoding: chunked\x0d\x0a\x0d\x0a3\x0d\x0aHi!\x0d\x0a";
+    my $tx = $ua->get("http://127.0.0.1:$port/");
+    is $tx->error->{message}, 'Premature connection close', 'right error';
+    is $tx->res->code,        200,                          'right status';
+    is $tx->res->body,        'Hi!',                        'right content';
+  };
+
+  subtest 'Incomplete headers' => sub {
+    $response = "HTTP/1.1 200 OK\x0d\x0aContent-Le";
+    my $tx = $ua->get("http://127.0.0.1:$port/");
+    is $tx->error->{message}, 'Premature connection close', 'right error';
+    is $tx->res->code,        200,                          'right status';
+    is $tx->res->body,        '',                           'no content';
+  };
+
+  subtest 'Body delimited by connection close' => sub {
+    $response = "HTTP/1.1 200 OK\x0d\x0aConnection: close\x0d\x0a\x0d\x0aHi!";
+    my $tx = $ua->get("http://127.0.0.1:$port/");
+    ok !$tx->error, 'no error';
+    is $tx->res->code, 200,   'right status';
+    is $tx->res->body, 'Hi!', 'right content';
+  };
+
+  subtest 'User agent destroyed during body delimited by connection close' => sub {
+    $response = "HTTP/1.1 200 OK\x0d\x0aConnection: close\x0d\x0a\x0d\x0aHi!";
+    $close    = 0;
+    my $ua = Mojo::UserAgent->new;
+    my $tx = $ua->build_tx(GET => "http://127.0.0.1:$port/");
+    $tx->res->content->once(
+      read => sub {
+        Mojo::IOLoop->next_tick(sub { undef $ua });
+      }
+    );
+    my $error;
+    $ua->start($tx => sub { $error = pop->error; Mojo::IOLoop->stop });
+    Mojo::IOLoop->start;
+    $close = 1;
+    is $error->{message}, 'Premature connection close', 'right error';
+    is $tx->res->body,    'Hi!',                        'right content';
+  };
+};
+
 # Connection limit
 $ua     = Mojo::UserAgent->new(max_connections => 2);
 $result = undef;

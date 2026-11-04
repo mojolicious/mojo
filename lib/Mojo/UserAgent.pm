@@ -89,7 +89,7 @@ sub websocket_p {
 sub _cleanup {
   my $self = shift;
   delete $self->{pid};
-  $self->_finish($_, 1) for keys %{$self->{connections} // {}};
+  $self->_finish($_, 1, 1) for keys %{$self->{connections} // {}};
   return $self;
 }
 
@@ -221,16 +221,22 @@ sub _error {
 }
 
 sub _finish {
-  my ($self, $id, $close) = @_;
+  my ($self, $id, $close, $local) = @_;
 
   # Remove request timeout and finish transaction
   return undef unless my $c = $self->{connections}{$id};
   $c->{ioloop}->remove(delete $c->{timeout}) if $c->{timeout};
   return $self->_reuse($id, $close) unless my $old = $c->{tx};
 
-  # Premature connection close
-  my $res = $old->closed->res->finish;
-  $res->error({message => 'Premature connection close'}) if $close && !$res->code && !$res->error;
+  # Premature connection close (RFC 9112 8: only close-delimited bodies may end with the server closing the connection)
+  my $res       = $old->res;
+  my $content   = $res->content;
+  my $premature = !$res->code || (!$res->is_finished && ($local || $content->is_chunked || !$content->relaxed));
+  $res->error({message => 'Premature connection close'}) if $close && $premature && !$res->error;
+
+  # Finish events need to see the error
+  $res->finish;
+  $old->closed;
 
   # Always remove connection for WebSockets
   return $self->_remove($id) if $old->is_websocket;

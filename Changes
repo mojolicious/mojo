@@ -1,4 +1,6 @@
 
+9.55  UNRELEASED
+
 9.54  2025-11-07
   - Fixed a bug in Mojo::Server::Daemon where destroying the server with active connections did not emit finish events
     for their transactions.

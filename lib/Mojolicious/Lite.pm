@@ -94,6 +94,11 @@ signatures|perlsub/"Signatures">.
 
 See L<Mojolicious::Guides::Tutorial> for more!
 
+Loading L<Mojolicious::Lite> also sets the current application as the default for L<Mojo::UserAgent::Server> (unless one
+has already been set), so relative URLs passed to L<Mojo::UserAgent> are sent to it. This happens process-wide the first
+time C<use Mojolicious::Lite> runs, so if a third-party module loads L<Mojolicious::Lite> before your own application
+does, L<Mojo::UserAgent::Server/"app"> may already point at that module's app instead of yours.
+
 =head1 GROWING
 
 While L<Mojolicious::Guides::Growing> will give you a detailed introduction to growing a L<Mojolicious::Lite> prototype

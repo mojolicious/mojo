@@ -96,6 +96,10 @@ Application this server handles, instance specific applications override the glo
   # Change application behavior
   $server->app->defaults(testing => 'oh yea!');
 
+Note that L<Mojolicious::Lite> sets this global default automatically the first time it is loaded (unless one has
+already been set), so that relative URLs passed to L<Mojo::UserAgent> reach the running app. See
+L<Mojolicious::Lite/"DESCRIPTION"> for details.
+
 =head2 nb_url
 
   my $url = $server->nb_url;

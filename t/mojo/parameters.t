@@ -17,6 +17,20 @@ subtest 'Basic functionality' => sub {
   is $params->remove('a')->to_string, 'foo=b%3Bar&baz=23&b=6&b=7&c=f%3Boo',         'right format';
 };
 
+subtest 'Deep hash' => sub {
+  my $params = Mojo::Parameters->new('foo[bar]=baz&foo[bar]=yada&foo[baz][qux]=23&foo[0]=zero');
+  is_deeply $params->to_hash, {'foo[bar]' => ['baz', 'yada'], 'foo[baz][qux]' => 23, 'foo[0]' => 'zero'},
+    'right shallow structure';
+  is_deeply $params->to_deep_hash, {foo => {bar => ['baz', 'yada'], baz => {qux => 23}, 0 => 'zero'}},
+    'right deep structure';
+  $params = Mojo::Parameters->new(foo => 'bar');
+  is_deeply $params->to_deep_hash, {foo => 'bar'}, 'right shallow structure';
+  $params = Mojo::Parameters->new('foo%5Bbar%5D=baz');
+  is_deeply $params->to_deep_hash, {foo => {bar => 'baz'}}, 'right decoded structure';
+  $params = Mojo::Parameters->new('foo[]=baz&foo[bar=baz');
+  is_deeply $params->to_deep_hash, {'foo[]' => 'baz', 'foo[bar' => 'baz'}, 'right malformed structure';
+};
+
 subtest 'Clone' => sub {
   my $params = Mojo::Parameters->new('foo=b%3Bar&baz=23');
   my $clone  = $params->clone;

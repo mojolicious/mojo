@@ -5,6 +5,7 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::Mojo;
 use Test::More;
 use Mojo::IOLoop;
+use Mojo::Util qw(generate_secret);
 use Mojolicious::Lite;
 
 package MyTestApp::Controller;
@@ -13,6 +14,8 @@ use Mojo::Base 'Mojolicious::Controller';
 sub DESTROY { shift->stash->{destroyed} = 1 }
 
 package main;
+
+app->secrets([generate_secret]);
 
 app->controller_class('MyTestApp::Controller');
 

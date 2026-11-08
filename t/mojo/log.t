@@ -29,7 +29,7 @@ subtest 'Logging to STDERR' => sub {
   my $log    = Mojo::Log->new(level => 'error', path => $path);
   my $buffer = '';
   {
-    open my $handle, '>', \$buffer;
+    open my $handle, '>:raw', \$buffer;
     local *STDERR = $handle;
     my $log = Mojo::Log->new;
     $log->error('Just works');

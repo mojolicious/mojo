@@ -196,7 +196,7 @@ sub encrypt_cookie {
   croak 'CryptX 0.080+ required for encrypted cookie support' unless CRYPTX;
 
   my $dk = $ENCRYPTION{$key}{$salt} ||= Crypt::KeyDerivation::pbkdf2($key, $salt);
-  my $iv = Crypt::PRNG::random_bytes(12);
+  my $iv = random_bytes(12);
   my ($ct, $tag) = Crypt::AuthEnc::ChaCha20Poly1305::chacha20poly1305_encrypt_authenticate($dk, $iv, '', $value);
 
   return join '-', Crypt::Misc::encode_b64($ct), Crypt::Misc::encode_b64($iv), Crypt::Misc::encode_b64($tag);

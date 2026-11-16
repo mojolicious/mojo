@@ -162,6 +162,9 @@ L<Mojolicious> has been designed from the ground up for non-blocking I/O and eve
 in and no response is generated right away, it will assume that this was intentional and return control to the web
 server, which can then handle other requests while waiting for events such as timers to finally generate a response.
 
+This trace message is informational. If no response arrives, make sure your action or callback eventually generates
+one, for example with L<Mojolicious::Controller/"render">.
+
 =head2 What does "Inactivity timeout" mean?
 
 To protect your applications from denial-of-service attacks, all connections have an inactivity timeout which limits

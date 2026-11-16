@@ -170,10 +170,27 @@ This also means you can have routes pointing only to templates without actual ac
 There is one big difference though, by calling it manually you can make sure that templates use the current controller
 object, and not the default controller specified with the attribute L<Mojolicious/"controller_class">.
 
-  $c->render_later;
-
 You can also disable automatic rendering with the method L<Mojolicious::Controller/"render_later">, which can be very
-useful to delay rendering when a non-blocking operation has to be performed first.
+useful to delay rendering when a non-blocking operation has to be performed first. This is only necessary if automatic
+rendering would otherwise generate a response, for example from an existing template.
+
+  use Mojolicious::Lite -signatures;
+  use Mojo::IOLoop;
+
+  # Delay the response instead of rendering "index.html.ep" automatically
+  get '/' => sub ($c) {
+    $c->render_later;
+    Mojo::IOLoop->timer(2 => sub { $c->render(text => 'Delayed by 2 seconds!') });
+  } => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  This response was rendered automatically.
+
+C<render_later> only disables automatic rendering. The callback still needs to generate a response with C<render> once
+the non-blocking operation has finished.
 
 =head2 Rendering templates
 

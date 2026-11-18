@@ -280,7 +280,7 @@ subtest 'Timeout' => sub {
 subtest 'Pipelined' => sub {
   my $daemon = Mojo::Server::Daemon->new({listen => ['http://127.0.0.1'], silent => 1});
   my $port   = $daemon->start->ports->[0];
-  is $daemon->app->moniker, 'mojo-hello_world', 'right moniker';
+  is $daemon->app->moniker, 'mojo_hello_world', 'right moniker';
   my $buffer = '';
   my $id;
   $id = Mojo::IOLoop->client(

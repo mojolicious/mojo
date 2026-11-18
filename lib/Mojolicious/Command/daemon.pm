@@ -19,7 +19,8 @@ sub build_server {
     'k|keep-alive-timeout=i' => sub { $daemon->keep_alive_timeout($_[1]) },
     'l|listen=s'             => \my @listen,
     'p|proxy:s'              => \my @proxy,
-    'r|requests=i'           => sub { $daemon->max_requests($_[1]) };
+    'r|requests=i'           => sub { $daemon->max_requests($_[1]) },
+    's|silent'               => sub { $daemon->silent(1) };
 
   $daemon->listen(\@listen) if @listen;
   $daemon->reverse_proxy(1) if @proxy;
@@ -46,7 +47,7 @@ Mojolicious::Command::daemon - Daemon command
     ./myapp.pl daemon -m production -p -l http://*:8080
     ./myapp.pl daemon -l http://127.0.0.1:8080 -l https://[::]:8081
     ./myapp.pl daemon -l 'https://*:443?cert=./server.crt&key=./server.key'
-    ./myapp.pl daemon -l http+unix://%2Ftmp%2Fmyapp.sock
+    ./myapp.pl daemon -l http+unix://%2Ftmp%2Fmyapp.sock -s
     ./myapp.pl daemon -l http://127.0.0.1:8080 -p 127.0.0.0/8 -p fc00::/7
 
   Options:
@@ -75,6 +76,7 @@ Mojolicious::Command::daemon - Daemon command
                                          networks
     -r, --requests <number>              Maximum number of requests per
                                          keep-alive connection, defaults to 100
+    -s, --silent                         Disable the startup banner
 
 =head1 DESCRIPTION
 

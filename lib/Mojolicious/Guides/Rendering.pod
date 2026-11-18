@@ -198,6 +198,11 @@ L<Mojolicious::Controller/"render_maybe"> to try multiple alternatives.
 
   $c->render_maybe('localized/baz') or $c->render('foo/bar/baz');
 
+If you want to render a template from a specific file not in a C<templates> directory, you can pass it with the
+C<template_path> option.
+
+  $c->render(template_path => '/path/to/the/template');
+
 =head2 Rendering to strings
 
 Sometimes you might want to use the rendered result directly instead of generating a response, for example, to send

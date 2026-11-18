@@ -5,9 +5,10 @@ use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::File qw(tempdir);
-use Mojo::JSON qw(encode_json);
+use Mojo::JSON qw(encode_json to_json);
 use Mojo::Message::Response;
-use Mojo::Util qw(encode gzip);
+use Mojo::Util       qw(encode gzip);
+use Mojo::ByteStream qw(b);
 
 subtest 'Defaults' => sub {
   my $res = Mojo::Message::Response->new;
@@ -1072,6 +1073,62 @@ subtest 'Parse response and extract JSON data' => sub {
   is_deeply $res->json('/baz'), [1, 2, 3], 'right result';
   $res->json->{baz}[1] = 4;
   is_deeply $res->json('/baz'), [1, 4, 3], 'right result';
+};
+
+subtest 'Parse response and extract JSON data in shift_jis encoding' => sub {
+  my $yatta      = 'やった';
+  my $yatta_sjis = b($yatta)->encode('shift_jis')->to_string;
+  my $res        = Mojo::Message::Response->new;
+  $res->parse("HTTP/1.1 200 OK\x0a");
+  $res->parse("Content-Type: application/json;charset=shift_jis\x0a");
+  $res->parse("Content-Length: 16\x0a\x0a");
+  $res->parse(to_json({foo => $yatta_sjis}));
+  ok $res->is_finished, 'response is finished';
+  is $res->code,                 200,         'right status';
+  is $res->message,              'OK',        'right message';
+  is $res->version,              '1.1',       'right version';
+  is length($res->body),         16,          'right length';
+  is $res->body_params->charset, "shift_jis", 'right charset';
+  is_deeply $res->json, {foo => $yatta}, 'right JSON data';
+  is $res->json('/foo'), $yatta, 'right result';
+};
+
+subtest 'Parse response and extract JSON data in euc-jp encoding' => sub {
+  my $miyagawa    = '宮川';
+  my $miyagawa_jp = b($miyagawa)->encode('euc-jp')->to_string;
+  is $miyagawa_jp, "\x{B5}\x{DC}\x{C0}\x{EE}", 'correct encoding';
+  my $res = Mojo::Message::Response->new;
+  $res->parse("HTTP/1.1 200 OK\x0a");
+  $res->parse("Content-Type: application/json;charset=euc-jp\x0a");
+  $res->parse("Content-Length: 14\x0a\x0a");
+  $res->parse(to_json({foo => $miyagawa_jp}));
+  ok $res->is_finished, 'response is finished';
+  is $res->code,                 200,      'right status';
+  is $res->message,              'OK',     'right message';
+  is $res->version,              '1.1',    'right version';
+  is length($res->body),         14,       'right length';
+  is $res->body_params->charset, "euc-jp", 'right charset';
+  is_deeply $res->json, {foo => $miyagawa}, 'right JSON data';
+  is $res->json('/foo'), $miyagawa, 'right result';
+};
+
+subtest 'Parse response and extract JSON data in ISO-8859-1 encoding' => sub {
+  my $hola        = "áèñ";
+  my $hola_latin1 = b($hola)->encode('ISO-8859-1')->to_string;
+  is $hola_latin1, "\x{e1}\x{e8}\x{f1}", 'correct encoding';
+  my $res = Mojo::Message::Response->new;
+  $res->parse("HTTP/1.1 200 OK\x0a");
+  $res->parse("Content-Type: application/json;charset=ISO-8859-1\x0a");
+  $res->parse("Content-Length: 13\x0a\x0a");
+  $res->parse(to_json({foo => $hola_latin1}));
+  ok $res->is_finished, 'response is finished';
+  is $res->code,                 200,          'right status';
+  is $res->message,              'OK',         'right message';
+  is $res->version,              '1.1',        'right version';
+  is length($res->body),         13,           'right length';
+  is $res->body_params->charset, "ISO-8859-1", 'right charset';
+  is_deeply $res->json, {foo => $hola}, 'right JSON data';
+  is $res->json('/foo'), $hola, 'right result';
 };
 
 subtest 'Parse response and extract HTML' => sub {
